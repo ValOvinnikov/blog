@@ -1,13 +1,14 @@
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
-import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
+import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 
 import { CardCarousel } from './card-carousel';
 
 vi.mock('@web/i18n/navigation');
 
 const items = [
-  makePostListItem({ id: 'post-1', title: 'First post' }),
-  makePostListItem({ id: 'post-2', title: 'Second post' }),
+  mockPostListItem({ id: 'post-1', title: 'First post' }),
+  mockPostListItem({ id: 'post-2', title: 'Second post' }),
 ];
 
 const setup = customRender(CardCarousel, {
@@ -30,30 +31,36 @@ describe(`<${CardCarousel.name}/>`, () => {
       items.forEach((item, index) => {
         expect(cards[index]).toHaveTextContent(item.title);
       });
-      expect(
-        await screen.findByRole('button', { name: 'Previous slide' }),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
+      const previousButton = await screen.findByRole('button', {
+        name: 'Previous slide',
+      });
+      const nextButton = screen.getByRole('button', { name: 'Next slide' });
+      expect(previousButton).toBeVisible();
+      expect(nextButton).toBeVisible();
     });
 
-    it('renders no media region when hasImages is omitted', () => {
-      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+    it('renders no media region when images are not requested', () => {
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+      expect(media).not.toBeInTheDocument();
     });
   });
 
-  it('renders a media region with the image node when hasImages is set', () => {
+  it('renders a media region with the item image when images are requested', () => {
     setup({
-      items: [makePostListItem({ image: <div data-testid="image-1" /> })],
+      items: [mockPostListItem({ image: <div data-testid="image-1" /> })],
       hasImages: true,
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeVisible();
-    expect(screen.getByTestId('image-1')).toBeVisible();
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+    const image = screen.getByTestId('image-1');
+    expect(media).toBeVisible();
+    expect(image).toBeVisible();
   });
 
   it('renders no media frame when an item has no image', () => {
-    setup({ items: [makePostListItem()], hasImages: true });
+    setup({ items: [mockPostListItem()], hasImages: true });
 
-    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+    const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+    expect(media).not.toBeInTheDocument();
   });
 });

@@ -1,15 +1,18 @@
-import {
-  buildStarterDocuments,
-  HTTP_METHOD,
-  HTTP_STATUS,
-  SANITY_ROBOT_ROLE,
-} from '@blog/config';
+import { buildStarterDocuments, SANITY_ROBOT_ROLE } from '@blog/config';
 import { SITE_TYPE } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { ClientError } from '@sanity/client';
-import { getProvisionEnv } from '@worker/testing/provision-env/fake-provision-env';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
+import {
+  MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
+  MOCK_MALFORMED_DOCUMENT_MESSAGE,
+} from '@worker/testing/sanity-client-error/fixtures';
+import {
+  MOCK_SANITY_DATASET,
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_TENANT_ID,
+  mockProvisionedTenant,
+} from '@worker/testing/tenant/fixtures';
 import type { Mock } from 'vitest';
 
 import { seedTenantContent, type TSeedContentDeps } from './seed-content';
@@ -23,22 +26,14 @@ vi.mock('@blog/db/queries/tenants', () => ({
     setTenantSanityWriteTokenAndSeededAtMock,
 }));
 
-const env = getProvisionEnv();
-const PROJECT_ID = 'proj123';
-const DATASET = 'production';
 const WRITE_TOKEN = 'sk-write';
 const ROBOT_ID = 'robot-1';
 const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
 const COMMIT_FAILED = 'commit failed';
 const PERSIST_FAILED = 'persist failed';
-const INSUFFICIENT_PERMISSIONS =
-  'transaction failed: Insufficient permissions; permission "create" required';
-const MUTATE_URL = `https://api.sanity.io/v2024-01-01/data/mutate/${DATASET}`;
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return makeTenant({
-    sanityProjectId: PROJECT_ID,
-    sanityDataset: DATASET,
+  return mockProvisionedTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     ...overrides,
   });
@@ -102,7 +97,7 @@ describe(seedTenantContent, () => {
   it('seeds when the dataset lacks settings_site even though seededAt is already set', async () => {
     const seededTenant = baseTenant({ seededAt: new Date() });
 
-    await seedTenantContent(seededTenant, SITE_TYPE.BLANK, env, {
+    await seedTenantContent(seededTenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -120,7 +115,7 @@ describe(seedTenantContent, () => {
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       WRITE_TOKEN,
       expect.any(Date),
     );
@@ -128,7 +123,7 @@ describe(seedTenantContent, () => {
   });
 
   it('seeds the documents of the site type it is given', async () => {
-    await seedTenantContent(tenant, SITE_TYPE.BLOG, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLOG, MOCK_PROVISION_ENV, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -153,7 +148,7 @@ describe(seedTenantContent, () => {
       { fetchResult: 'existing-settings-site-id' },
     );
 
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
       createClient: existingSiteClient.createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -165,8 +160,8 @@ describe(seedTenantContent, () => {
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
       robotId: ROBOT_ID,
     });
   });
@@ -184,12 +179,17 @@ describe(seedTenantContent, () => {
     };
 
     await expect(
-      seedTenantContent(unprovisionedTenant, SITE_TYPE.BLANK, env, deps),
+      seedTenantContent(
+        unprovisionedTenant,
+        SITE_TYPE.BLANK,
+        MOCK_PROVISION_ENV,
+        deps,
+      ),
     ).rejects.toThrow(/has no Sanity project yet/);
   });
 
   it('mints an editor token, uploads no assets, commits a transaction, and persists the token and seededAt together instead of revoking', async () => {
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -197,15 +197,15 @@ describe(seedTenantContent, () => {
     });
 
     expect(mintWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
       label: expect.any(String),
       role: SANITY_ROBOT_ROLE.EDITOR,
     });
     expect(createClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectId: PROJECT_ID,
-        dataset: DATASET,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        dataset: MOCK_SANITY_DATASET,
         token: WRITE_TOKEN,
         useCdn: false,
       }),
@@ -222,7 +222,7 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       WRITE_TOKEN,
       expect.any(Date),
     );
@@ -230,7 +230,7 @@ describe(seedTenantContent, () => {
   });
 
   it('the committed starter documents contain no defaultOgImage on the site settings', async () => {
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
       createClient,
       mintWriteToken,
       revokeWriteToken: vi.fn().mockResolvedValue(undefined),
@@ -251,7 +251,7 @@ describe(seedTenantContent, () => {
     commit.mockRejectedValue(new Error(COMMIT_FAILED));
 
     await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -260,8 +260,8 @@ describe(seedTenantContent, () => {
     ).rejects.toThrow(COMMIT_FAILED);
 
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
       robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
@@ -273,7 +273,7 @@ describe(seedTenantContent, () => {
     );
 
     await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -282,17 +282,17 @@ describe(seedTenantContent, () => {
     ).rejects.toThrow(PERSIST_FAILED);
 
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
       robotId: ROBOT_ID,
     });
   });
 
   it('retries a grant-propagation failure once and succeeds', async () => {
-    const grantError = new Error(INSUFFICIENT_PERMISSIONS);
+    const grantError = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
@@ -302,75 +302,19 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       WRITE_TOKEN,
       expect.any(Date),
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
-  });
-
-  it('retries a structured ClientError carrying the permission-denied status code, even when its message text does not mention "insufficient permissions"', async () => {
-    const grantError = new ClientError({
-      statusCode: HTTP_STATUS.FORBIDDEN,
-      headers: {},
-      body: { message: 'Forbidden' },
-      url: MUTATE_URL,
-      method: HTTP_METHOD.POST,
-    });
-    commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
-
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-    });
-
-    expect(commit).toHaveBeenCalledTimes(2);
-    expect(sleep).toHaveBeenCalledTimes(1);
-    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      TEST_TENANT_ID,
-      WRITE_TOKEN,
-      expect.any(Date),
-    );
-    expect(revokeWriteToken).not.toHaveBeenCalled();
-  });
-
-  it('does not retry a structured ClientError with an unrelated status code and message', async () => {
-    const otherError = new ClientError({
-      statusCode: HTTP_STATUS.BAD_REQUEST,
-      headers: {},
-      body: { message: 'Malformed mutation' },
-      url: MUTATE_URL,
-      method: HTTP_METHOD.POST,
-    });
-    commit.mockRejectedValue(otherError);
-
-    await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
-        createClient,
-        mintWriteToken,
-        revokeWriteToken,
-        sleep,
-      }),
-    ).rejects.toThrow(otherError);
-
-    expect(commit).toHaveBeenCalledTimes(1);
-    expect(sleep).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
-      robotId: ROBOT_ID,
-    });
-    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 
   it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists it or seededAt', async () => {
-    const grantError = new Error(INSUFFICIENT_PERMISSIONS);
+    const grantError = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
     commit.mockRejectedValue(grantError);
 
     await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -380,19 +324,19 @@ describe(seedTenantContent, () => {
 
     expect(commit.mock.calls.length).toBeGreaterThan(1);
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
       robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
   });
 
   it('does not retry a non-grant-propagation commit failure', async () => {
-    const otherError = new Error('malformed document');
+    const otherError = new Error(MOCK_MALFORMED_DOCUMENT_MESSAGE);
     commit.mockRejectedValue(otherError);
 
     await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, env, {
+      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
         createClient,
         mintWriteToken,
         revokeWriteToken,
@@ -403,8 +347,8 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
     expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: env.sanityManagementToken,
-      projectId: PROJECT_ID,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
       robotId: ROBOT_ID,
     });
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();

@@ -1,6 +1,6 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { screen } from '@platform/testing/custom-render';
-import { buildTestEmailDraft } from '@platform/testing/email-draft';
+import { mockEmailDraft } from '@platform/testing/email-draft';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -8,7 +8,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { EmailEditPane } from './email-edit-pane';
 
 const { EN, FR } = LOCALE_ISO_CODES;
-const DRAFT = buildTestEmailDraft();
+const DRAFT = mockEmailDraft();
 
 const setup = customRenderInSettingsForm(EmailEditPane, {
   item: EMAIL_SENDER_ITEM,

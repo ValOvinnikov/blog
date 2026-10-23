@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
 import { userEvent, within } from 'storybook/test';
 
 import { SectionNavigation } from './section-navigation';
@@ -9,7 +9,7 @@ const meta = {
   component: SectionNavigation,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
-  args: { sectionNavigation: makeLandingSectionNavigation() },
+  args: { sectionNavigation: mockLandingSectionNavigation() },
 } satisfies Meta<typeof SectionNavigation>;
 
 export default meta;
@@ -23,13 +23,13 @@ export const Mobile: TStory = {
 
 export const CustomTitle: TStory = {
   args: {
-    sectionNavigation: makeLandingSectionNavigation({ title: 'Guides' }),
+    sectionNavigation: mockLandingSectionNavigation({ title: 'Guides' }),
   },
 };
 
 export const NestedSection: TStory = {
   args: {
-    sectionNavigation: makeLandingSectionNavigation({
+    sectionNavigation: mockLandingSectionNavigation({
       title: 'Profile hero layouts',
       root: {
         title: 'Profile hero',

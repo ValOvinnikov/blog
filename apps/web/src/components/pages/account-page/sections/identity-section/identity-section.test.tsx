@@ -2,7 +2,7 @@ import { queries } from '@blog/db';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
 
 import { IdentitySection } from './identity-section';
 
@@ -27,7 +27,7 @@ const LAST_METHOD_NOTE = "Last remaining method — can't unlink";
 describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockResolvedValue({
-      user: ACCOUNT_USER,
+      user: MOCK_ACCOUNT_USER,
     });
   });
 
@@ -36,9 +36,11 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('heading', { name: SECTION_HEADING }),
-    ).not.toBeInTheDocument();
+    const sectionHeading = screen.queryByRole('heading', {
+      name: SECTION_HEADING,
+    });
+
+    expect(sectionHeading).not.toBeInTheDocument();
     expect(getLinkedProvidersMock).not.toHaveBeenCalled();
   });
 
@@ -51,10 +53,13 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(getLinkedProvidersMock).toHaveBeenCalledWith(ACCOUNT_USER.id);
-    expect(
-      screen.getByRole('heading', { level: 2, name: SECTION_HEADING }),
-    ).toBeVisible();
+    const sectionHeading = screen.getByRole('heading', {
+      level: 2,
+      name: SECTION_HEADING,
+    });
+
+    expect(getLinkedProvidersMock).toHaveBeenCalledWith(MOCK_ACCOUNT_USER.id);
+    expect(sectionHeading).toBeVisible();
   });
 
   it('offers to unlink each linked provider that is not the last method', async () => {
@@ -66,10 +71,11 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getAllByRole('button', { name: 'Unlink' })).toHaveLength(2);
-    expect(
-      screen.queryByRole('button', { name: 'Link' }),
-    ).not.toBeInTheDocument();
+    const unlinkButtons = screen.getAllByRole('button', { name: 'Unlink' });
+    const linkButton = screen.queryByRole('button', { name: 'Link' });
+
+    expect(unlinkButtons).toHaveLength(2);
+    expect(linkButton).not.toBeInTheDocument();
   });
 
   it('offers to link a provider that is not linked', async () => {
@@ -81,7 +87,9 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
+    const linkButton = screen.getByRole('button', { name: 'Link' });
+
+    expect(linkButton).toBeVisible();
   });
 
   describe('with GitHub as the only linked method', () => {
@@ -96,19 +104,23 @@ describe(`<${IdentitySection.name}/>`, () => {
     it('shows the last-method notice instead of a control for the sole method', async () => {
       await setup();
 
-      expect(screen.getByText(LAST_METHOD_NOTE)).toBeVisible();
-      expect(
-        screen.queryByRole('button', { name: 'Unlink' }),
-      ).not.toBeInTheDocument();
+      const lastMethodNote = screen.getByText(LAST_METHOD_NOTE);
+      const unlinkButton = screen.queryByRole('button', { name: 'Unlink' });
+
+      expect(lastMethodNote).toBeVisible();
+      expect(unlinkButton).not.toBeInTheDocument();
     });
 
     it('prefills the display-name field with the session name', async () => {
       await setup();
 
-      expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
-        ACCOUNT_USER.name,
-      );
-      expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+      const displayNameTextbox = screen.getByRole('textbox', {
+        name: 'Display name',
+      });
+      const saveButton = screen.getByRole('button', { name: 'Save' });
+
+      expect(displayNameTextbox).toHaveValue(MOCK_ACCOUNT_USER.name);
+      expect(saveButton).toBeVisible();
     });
   });
 
@@ -121,6 +133,8 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText(LAST_METHOD_NOTE)).toBeVisible();
+    const lastMethodNote = screen.getByText(LAST_METHOD_NOTE);
+
+    expect(lastMethodNote).toBeVisible();
   });
 });

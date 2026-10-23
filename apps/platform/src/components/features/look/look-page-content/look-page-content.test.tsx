@@ -10,7 +10,11 @@ import {
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockReadyTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
@@ -35,7 +39,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
   getEnabledCapabilities: getEnabledCapabilitiesMock,
 }));
 
-const tenant = makeReadyTenant();
+const tenant = mockReadyTenant();
 
 const setup = customRenderAsync(LookPageContent, { tenant });
 
@@ -53,12 +57,12 @@ describe(`<${LookPageContent.name}/>`, () => {
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(screen.getByRole('heading', { name: 'Look' })).toBeVisible();
-    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-      ARIA_CHECKED,
-      'true',
-    );
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    const heading = screen.getByRole('heading', { name: 'Look' });
+    const consoleRadio = screen.getByRole('radio', { name: 'Console' });
+
+    expect(heading).toBeVisible();
+    expect(consoleRadio).toHaveAttribute(ARIA_CHECKED, 'true');
   });
 
   it('previews Sign in when a reader feature is on', async () => {
@@ -66,7 +70,9 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    const signInButton = screen.getByRole('button', { name: 'Sign in' });
+
+    expect(signInButton).toBeVisible();
   });
 
   it('previews no Sign in when only non-reader features are on', async () => {
@@ -74,16 +80,16 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('button', { name: 'Sign in' }),
-    ).not.toBeInTheDocument();
+    const signInButton = screen.queryByRole('button', { name: 'Sign in' });
+
+    expect(signInButton).not.toBeInTheDocument();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
     await setup({
       tenant: {
         ...tenant,
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+        deprovisionedAt: MOCK_ARCHIVED_AT,
       },
     });
 
@@ -93,7 +99,7 @@ describe(`<${LookPageContent.name}/>`, () => {
   it("renders the tenant's saved site_config row when one exists", async () => {
     getSiteConfigMock.mockResolvedValue({
       id: 'config-1',
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       preset: PRESET_ID.EDITORIAL,
       accentHue: 28,
       logoHue: undefined,
@@ -111,10 +117,10 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
-      ARIA_CHECKED,
-      'true',
-    );
-    expect(screen.getByText('hue 28°')).toBeVisible();
+    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+    const hueLabel = screen.getByText('hue 28°');
+
+    expect(editorialRadio).toHaveAttribute(ARIA_CHECKED, 'true');
+    expect(hueLabel).toBeVisible();
   });
 });

@@ -1,54 +1,53 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+} from '@blog/service/testing/entities/fixtures';
+import {
+  MOCK_TEMPLATE_REFERENCE,
+  mockRawCtaRef,
+  mockRawHeroRef,
+  mockRawPostLatestRef,
+  mockRawTopicPage,
+  mockTemplateLayoutDocuments,
+  mockTemplatedPageDocument,
+} from '@blog/service/testing/pages/fixtures';
+import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 
 import { topicPageQuery } from './query';
 
 describe('topicPageQuery', () => {
-  it('parses a topic page with no modules', () => {
-    const raw = makeRawTopicPage({ modules: null });
-
+  it.each([
+    ['with no modules', mockRawTopicPage({ modules: null })],
+    [
+      'with a list module alongside other modules, and SEO',
+      mockRawTopicPage({
+        modules: [
+          { _id: 'post-list-1', _type: 'module_postList' },
+          mockRawCtaRef(),
+        ],
+        seo: {
+          metaTitle: MOCK_TOPIC_TITLE,
+          metaDescription: null,
+          openGraph: null,
+        },
+      }),
+    ],
+    ['with its hero slot set', mockRawTopicPage({ hero: mockRawHeroRef() })],
+    [
+      'with an authored headingBlock',
+      mockRawTopicPage({ headingBlock: mockRawHeadingBlock(MOCK_TOPIC_TITLE) }),
+    ],
+  ])('parses a topic page %s', (_, raw) => {
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
   });
 
-  it('rejects a topic page with no authored SEO', () => {
-    const raw = { ...makeRawTopicPage(), seo: null };
-
-    expect(() => topicPageQuery.parse(raw)).toThrow();
-  });
-
-  it('parses a topic page with a list module alongside other modules, and SEO', () => {
-    const raw = makeRawTopicPage({
-      modules: [
-        { _id: 'post-list-1', _type: 'module_postList' },
-        { _id: 'cta-1', _type: 'module_cta' },
-      ],
-      seo: { metaTitle: 'Engineering', metaDescription: null, openGraph: null },
-    });
-
-    expect(() => topicPageQuery.parse(raw)).not.toThrow();
-  });
-
-  it('parses a topic page with its hero slot set', () => {
-    const raw = makeRawTopicPage({
-      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-    });
-
-    expect(() => topicPageQuery.parse(raw)).not.toThrow();
-  });
-
-  it('parses a topic page with an authored headingBlock', () => {
-    const raw = makeRawTopicPage({
-      headingBlock: makeRawHeadingBlock('Engineering'),
-    });
-
-    expect(() => topicPageQuery.parse(raw)).not.toThrow();
-  });
-
-  it('rejects a topic page with no headingBlock', () => {
-    const raw = { ...makeRawTopicPage(), headingBlock: null };
-
+  it.each([
+    ['authored SEO', { ...mockRawTopicPage(), seo: null }],
+    ['heading block', { ...mockRawTopicPage(), headingBlock: null }],
+  ])('rejects a topic page with no %s', (_, raw) => {
     expect(() => topicPageQuery.parse(raw)).toThrow();
   });
 
@@ -58,44 +57,46 @@ describe('topicPageQuery', () => {
 });
 
 describe('topicPageQuery template layout', () => {
-  const templateRef = { _type: 'reference', _ref: 'template-a' };
-  const dataset = [
-    {
-      _id: 'template-a',
-      _type: 'template_topic',
-      hero: { _type: 'reference', _ref: 'hero-1' },
-      modules: [{ _key: 'a', _type: 'reference', _ref: 'post-latest-1' }],
-    },
-    { _id: 'hero-1', _type: 'module_heroBlog' },
-    { _id: 'post-latest-1', _type: 'module_postLatest' },
-  ];
-
-  function page(template?: typeof templateRef) {
-    return {
-      _id: 'page-a',
-      _type: 'page_topic',
-      slug: { current: 'engineering' },
-      language: LOCALE_ISO_CODES.EN,
-      ...(template ? { template } : {}),
-    };
-  }
+  const templateRef = MOCK_TEMPLATE_REFERENCE;
+  const templatedPageFields = {
+    slug: { current: MOCK_TOPIC_SLUG },
+    language: LOCALE_ISO_CODES.EN,
+  };
+  const dataset = mockTemplateLayoutDocuments({ _type: 'template_topic' });
 
   function run(data: unknown[]): Promise<unknown> {
     return evaluateGroqExpression(topicPageQuery.query, data, null, {
-      slug: 'engineering',
+      slug: MOCK_TOPIC_SLUG,
       locale: LOCALE_ISO_CODES.EN,
     });
   }
 
   it('resolves the hero and modules of the template the topic page references', async () => {
-    expect(await run([page(templateRef), ...dataset])).toMatchObject({
-      hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-      modules: [{ _id: 'post-latest-1', _type: 'module_postLatest' }],
+    expect(
+      await run([
+        mockTemplatedPageDocument({
+          _type: 'page_topic',
+          template: templateRef,
+          ...templatedPageFields,
+        }),
+        ...dataset,
+      ]),
+    ).toMatchObject({
+      hero: mockRawHeroRef(),
+      modules: [mockRawPostLatestRef()],
     });
   });
 
   it('resolves no hero and no modules for a topic page without a template', async () => {
-    expect(await run([page(), ...dataset])).toMatchObject({
+    expect(
+      await run([
+        mockTemplatedPageDocument({
+          _type: 'page_topic',
+          ...templatedPageFields,
+        }),
+        ...dataset,
+      ]),
+    ).toMatchObject({
       hero: null,
       modules: null,
     });
@@ -115,21 +116,16 @@ describe('topicPageQuery language scoping', () => {
     };
   }
 
-  function link(language: string, id: string) {
-    return {
-      _key: language,
-      language,
-      value: { _type: 'reference', _ref: id },
-    };
-  }
-
   const dataset = [
     page('design-en', 'Design', EN),
     page('design-nl', 'Ontwerp', NL),
     {
       _id: 'meta-design',
       _type: 'translation.metadata',
-      translations: [link(EN, 'design-en'), link(NL, 'design-nl')],
+      translations: [
+        mockTranslationLink(EN, 'design-en'),
+        mockTranslationLink(NL, 'design-nl'),
+      ],
     },
   ];
 

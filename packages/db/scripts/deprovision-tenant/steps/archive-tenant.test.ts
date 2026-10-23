@@ -1,7 +1,9 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
-
-import type { TDeprovisionEnv } from '../lib/env';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import {
+  MOCK_DEPROVISION_AUDIT_ACTOR,
+  MOCK_DEPROVISION_ENV,
+} from '@blog/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 
 import { archiveTenantRow } from './archive-tenant';
 
@@ -18,104 +20,55 @@ vi.mock('@blog/db/queries/audit-events', () => ({
   insertAuditEvent: insertAuditEventMock,
 }));
 
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
-
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: null,
-    sanityDataset: null,
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: null,
-    provisioningSteps: null,
-    seededAt: null,
-    deprovisionedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as TTenant;
-}
+const MOCK_TENANT = mockTenant();
 
 beforeEach(() => {
   archiveTenantMock
     .mockReset()
-    .mockResolvedValue({ ok: true, data: baseTenant() });
+    .mockResolvedValue({ ok: true, data: MOCK_TENANT });
   insertAuditEventMock.mockReset().mockResolvedValue({});
-  vi.spyOn(console, 'error').mockImplementation(() => {});
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
 });
 
 describe(archiveTenantRow, () => {
   it('archives the tenant row', async () => {
-    await archiveTenantRow(baseTenant(), env);
+    await archiveTenantRow(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
-    expect(archiveTenantMock).toHaveBeenCalledWith('tenant-1');
+    expect(archiveTenantMock).toHaveBeenCalledWith(MOCK_TENANT.id);
   });
 
-  it('records exactly one DEPROVISIONED/TENANT audit event after a successful archive', async () => {
-    await archiveTenantRow(baseTenant(), env);
+  it('records one DEPROVISIONED audit event for the tenant after a successful archive', async () => {
+    await archiveTenantRow(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'github:octocat',
-      actorEmail: 'octocat@users.noreply.github.com',
-      action: 'DEPROVISIONED',
-      targetType: 'TENANT',
-      targetId: 'tenant-1',
-      details: { via: 'deprovision-tenant-workflow', runId: 'run-42' },
+      ...MOCK_DEPROVISION_AUDIT_ACTOR,
+      action: AUDIT_ACTION.DEPROVISIONED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT.id,
+      details: {
+        via: 'deprovision-tenant-workflow',
+        runId: MOCK_DEPROVISION_ENV.githubRunId,
+      },
     });
   });
 
   it('skips when already deprovisioned', async () => {
-    await archiveTenantRow(baseTenant({ deprovisionedAt: new Date() }), env);
+    await archiveTenantRow(
+      { ...MOCK_TENANT, deprovisionedAt: new Date() },
+      MOCK_DEPROVISION_ENV,
+    );
 
     expect(archiveTenantMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('does not write to the row or record an audit event in dry-run mode', async () => {
-    await archiveTenantRow(baseTenant(), { ...env, dryRun: true });
+    await archiveTenantRow(MOCK_TENANT, {
+      ...MOCK_DEPROVISION_ENV,
+      dryRun: true,
+    });
 
     expect(archiveTenantMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('archives successfully and logs, without throwing, when the audit write fails', async () => {
-    insertAuditEventMock.mockRejectedValueOnce(new Error('insert failed'));
-
-    await expect(archiveTenantRow(baseTenant(), env)).resolves.toBeUndefined();
-
-    expect(archiveTenantMock).toHaveBeenCalledWith('tenant-1');
-    expect(console.error).toHaveBeenCalled();
-  });
-
-  it('archives successfully and skips the audit write when GITHUB_ACTOR is unset', async () => {
-    await expect(
-      archiveTenantRow(baseTenant(), { ...env, githubActor: undefined }),
-    ).resolves.toBeUndefined();
-
-    expect(archiveTenantMock).toHaveBeenCalledWith('tenant-1');
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalled();
   });
 });

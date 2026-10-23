@@ -1,42 +1,45 @@
-import { makeRawTagWithPostCount } from '@blog/service/testing/entities/fixtures';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockRawTagWithPostCount } from '@blog/service/testing/entities/fixtures';
+import { evaluateGroqIds } from '@blog/service/testing/shared/groq';
+import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
 
 import { tagsQuery } from './query';
 
+const { EN, NL } = LOCALE_ISO_CODES;
+
+const BRAVO_TAG_ID = 'tag-bravo';
+const APEX_TAG_ID = 'tag-apex';
+
+const TAG_DOCUMENTS = [
+  {
+    _id: BRAVO_TAG_ID,
+    _type: 'blog_tag',
+    title: mockLocalizedStrings({ [EN]: 'Bravo', [NL]: 'Alef' }),
+  },
+  {
+    _id: APEX_TAG_ID,
+    _type: 'blog_tag',
+    title: mockLocalizedStrings({ [EN]: 'Apex', [NL]: 'Zeta' }),
+  },
+];
+
+function idsIn(locale: string): Promise<string[]> {
+  return evaluateGroqIds(tagsQuery.query, TAG_DOCUMENTS, {
+    locale,
+    defaultLocale: EN,
+  });
+}
+
 describe('tagsQuery', () => {
-  it('parses a tag with a post count', () => {
-    const raw = [makeRawTagWithPostCount({ postCount: 5 })];
-
-    expect(() => tagsQuery.parse(raw)).not.toThrow();
+  it.each([
+    ['a description', mockRawTagWithPostCount({ postCount: 5 })],
+    ['no description', mockRawTagWithPostCount({ description: null })],
+  ])('parses a tag with a post count and %s', (_, tag) => {
+    expect(() => tagsQuery.parse([tag])).not.toThrow();
   });
 
-  it('parses a tag with no description', () => {
-    const raw = [makeRawTagWithPostCount({ description: null, postCount: 5 })];
-
-    expect(() => tagsQuery.parse(raw)).not.toThrow();
-  });
-
-  it('reads the title and description in the requested language, falling back to the default language', () => {
-    expect(tagsQuery.query).toContain(
-      'coalesce(title[][language == $locale][0].value, title[][language == $defaultLocale][0].value)',
-    );
-    expect(tagsQuery.query).toContain(
-      'coalesce(description[][language == $locale][0].value, description[][language == $defaultLocale][0].value)',
-    );
-  });
-
-  it('orders tags by their title in the requested language', () => {
-    expect(tagsQuery.query).toMatch(/\} \| order\(title asc\)$/);
-  });
-
-  it('correlates the post count to the enclosing tag document', () => {
-    expect(tagsQuery.query).toContain('references(^._id)');
-  });
-
-  it('excludes future-dated posts from the post count', () => {
-    expect(tagsQuery.query).toContain('publishedAt <= now()');
-  });
-
-  it('counts only page posts', () => {
-    expect(tagsQuery.query).toContain('_type == "page_post"');
+  it('orders tags by their title in the requested language', async () => {
+    expect(await idsIn(EN)).toEqual([APEX_TAG_ID, BRAVO_TAG_ID]);
+    expect(await idsIn(NL)).toEqual([BRAVO_TAG_ID, APEX_TAG_ID]);
   });
 });

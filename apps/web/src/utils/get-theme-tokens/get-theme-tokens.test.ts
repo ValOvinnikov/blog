@@ -1,4 +1,5 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 
@@ -12,9 +13,8 @@ describe('getThemeTokens', () => {
   it('resolves theme tokens from the site_config row on success', async () => {
     const rowAccentHue =
       PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue;
-    vi.mocked(getSiteConfig).mockResolvedValue({
-      ok: true,
-      data: {
+    vi.mocked(getSiteConfig).mockResolvedValue(
+      okResult({
         preset: PRESET_ID.EDITORIAL,
         accentHue: rowAccentHue,
         headingFont:
@@ -23,8 +23,8 @@ describe('getThemeTokens', () => {
         radiusScale:
           PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.radiusScale,
         density: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.density,
-      } as never,
-    });
+      } as never),
+    );
 
     const tokens = await getThemeTokens();
 
@@ -33,17 +33,16 @@ describe('getThemeTokens', () => {
   });
 
   it('forwards an explicitly supplied tenant to getSiteConfig', async () => {
-    vi.mocked(getSiteConfig).mockResolvedValue({
-      ok: true,
-      data: {
+    vi.mocked(getSiteConfig).mockResolvedValue(
+      okResult({
         preset: PRESET_ID.CONSOLE,
         accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
         headingFont: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.headingFont,
         bodyFont: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.bodyFont,
         radiusScale: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.radiusScale,
         density: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.density,
-      } as never,
-    });
+      } as never),
+    );
 
     await getThemeTokens('tenant-1');
 
@@ -51,10 +50,7 @@ describe('getThemeTokens', () => {
   });
 
   it('falls back to the Console preset tokens and logs when the fetch fails', async () => {
-    vi.mocked(getSiteConfig).mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    vi.mocked(getSiteConfig).mockResolvedValue(errorResult(new Error('boom')));
 
     const tokens = await getThemeTokens();
 

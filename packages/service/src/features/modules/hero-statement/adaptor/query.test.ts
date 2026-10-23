@@ -1,73 +1,86 @@
-import { HERO_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_HERO_MODULE_ID } from '@blog/service/testing/pages/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
-  localizedStrings,
-  localizedValues,
+  MOCK_IMAGE_ASSET_DOCUMENT,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockLocalizedStrings,
+  mockLocalizedValues,
 } from '@blog/service/testing/shared/localized';
 
 import { heroStatementModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const heroDocument = {
-  _id: 'hero-1',
-  _type: 'module_heroStatement',
-  brandVariant: 'PRIMARY',
-  variant: HERO_VARIANT.SPLIT,
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({ [EN]: 'Build calmly', [NL]: 'Bouw rustig' }),
-    supportingText: localizedValues('internationalizedArrayTextValue', {
-      [EN]: 'Notes on making things.',
-      [NL]: 'Notities over maken.',
-    }),
-  },
-  eyebrow: localizedStrings({ [EN]: 'Welcome', [NL]: 'Welkom' }),
-  image: {
-    _type: 'localizedImageWithAlt',
-    asset: { _type: 'reference', _ref: 'image-1' },
-    alt: localizedStrings({ [EN]: 'A desk', [NL]: 'Een bureau' }),
-  },
+const EN_COPY = {
+  eyebrow: 'Welcome',
+  heading: 'Build calmly',
+  supportingText: 'Notes on making things.',
+  alt: 'A desk',
 };
 
-const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
+const NL_COPY = {
+  eyebrow: 'Welkom',
+  heading: 'Bouw rustig',
+  supportingText: 'Notities over maken.',
+  alt: 'Een bureau',
+};
+
+const heroDocument = {
+  _id: MOCK_HERO_MODULE_ID,
+  _type: 'module_heroStatement',
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  variant: HERO_VARIANT.SPLIT,
+  headingBlock: mockLocalizedHeadingBlock(
+    {
+      [EN]: EN_COPY.heading,
+      [NL]: NL_COPY.heading,
+    },
+    {
+      supportingText: mockLocalizedValues('internationalizedArrayTextValue', {
+        [EN]: EN_COPY.supportingText,
+        [NL]: NL_COPY.supportingText,
+      }),
+    },
+  ),
+  eyebrow: mockLocalizedStrings({
+    [EN]: EN_COPY.eyebrow,
+    [NL]: NL_COPY.eyebrow,
+  }),
+  image: mockLocalizedImage({ [EN]: EN_COPY.alt, [NL]: NL_COPY.alt }),
+};
 
 async function runHero(document: Record<string, unknown>, locale: string) {
   const raw = await evaluateGroqExpression(
     heroStatementModuleQuery.query,
-    [document, imageAsset],
+    [document, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: 'hero-1', locale, defaultLocale: EN },
+    { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return heroStatementModuleQuery.parse(raw);
 }
 
 describe('heroStatementModuleQuery', () => {
-  it('picks heading, supporting text, eyebrow and image alt in the visitor language', async () => {
-    const hero = await runHero(heroDocument, NL);
+  it.each([
+    ['picks the copy in the visitor language', NL, NL_COPY],
+    [
+      'falls back to the default language when the visitor language is missing',
+      FR,
+      EN_COPY,
+    ],
+  ])('%s', async (_, locale, copy) => {
+    const hero = await runHero(heroDocument, locale);
 
     expect(hero).toMatchObject({
-      eyebrow: 'Welkom',
+      eyebrow: copy.eyebrow,
       headingBlock: {
-        heading: 'Bouw rustig',
-        supportingText: 'Notities over maken.',
+        heading: copy.heading,
+        supportingText: copy.supportingText,
       },
-      image: { alt: 'Een bureau' },
-    });
-  });
-
-  it('falls back to the default language when the visitor language is missing', async () => {
-    const hero = await runHero(heroDocument, FR);
-
-    expect(hero).toMatchObject({
-      eyebrow: 'Welcome',
-      headingBlock: {
-        heading: 'Build calmly',
-        supportingText: 'Notes on making things.',
-      },
-      image: { alt: 'A desk' },
+      image: { alt: copy.alt },
     });
   });
 
@@ -76,10 +89,7 @@ describe('heroStatementModuleQuery', () => {
       {
         ...heroDocument,
         eyebrow: undefined,
-        headingBlock: {
-          _type: 'moduleHeadingBlock',
-          heading: localizedStrings({ [EN]: 'Build calmly' }),
-        },
+        headingBlock: mockLocalizedHeadingBlock({ [EN]: EN_COPY.heading }),
       },
       NL,
     );

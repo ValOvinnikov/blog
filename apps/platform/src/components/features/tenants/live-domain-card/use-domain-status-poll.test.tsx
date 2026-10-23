@@ -4,7 +4,7 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { act, renderHook } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { useDomainStatusPoll } from './use-domain-status-poll';
 
@@ -44,13 +44,13 @@ describe(useDomainStatusPoll, () => {
 
   it('returns each status the poll fetches for the tenant', async () => {
     const { result } = renderHook(() =>
-      useDomainStatusPoll(TENANT_ID, DOMAIN_VERIFICATION_STATUS.NOT_ADDED),
+      useDomainStatusPoll(MOCK_TENANT_ID, DOMAIN_VERIFICATION_STATUS.NOT_ADDED),
     );
     expect(result.current).toBe(DOMAIN_VERIFICATION_STATUS.NOT_ADDED);
 
     await advance(DOMAIN_POLL_INTERVAL_MS);
     expect(getDomainVerificationStatusActionMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
     );
     expect(result.current).toBe(DOMAIN_VERIFICATION_STATUS.PENDING);
 
@@ -65,7 +65,7 @@ describe(useDomainStatusPoll, () => {
     DOMAIN_VERIFICATION_STATUS.VERIFIED,
     DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
   ])('never polls a domain that starts %s', async (status) => {
-    renderHook(() => useDomainStatusPoll(TENANT_ID, status));
+    renderHook(() => useDomainStatusPoll(MOCK_TENANT_ID, status));
 
     await advance(DOMAIN_POLL_INTERVAL_MS * 3);
 
@@ -77,7 +77,7 @@ describe(useDomainStatusPoll, () => {
       DOMAIN_VERIFICATION_STATUS.VERIFIED,
     );
     const { result } = renderHook(() =>
-      useDomainStatusPoll(TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
+      useDomainStatusPoll(MOCK_TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
     );
 
     await advance(DOMAIN_POLL_INTERVAL_MS);
@@ -89,7 +89,7 @@ describe(useDomainStatusPoll, () => {
 
   it('stops polling at its tick cap while the status stays unsettled', async () => {
     renderHook(() =>
-      useDomainStatusPoll(TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
+      useDomainStatusPoll(MOCK_TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
     );
 
     await advance(DOMAIN_POLL_INTERVAL_MS * (DOMAIN_POLL_MAX_TICKS + 5));
@@ -104,7 +104,7 @@ describe(useDomainStatusPoll, () => {
       .spyOn(document, 'visibilityState', 'get')
       .mockReturnValue('hidden');
     renderHook(() =>
-      useDomainStatusPoll(TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
+      useDomainStatusPoll(MOCK_TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
     );
 
     await advance(DOMAIN_POLL_INTERVAL_MS * 3);
@@ -120,7 +120,7 @@ describe(useDomainStatusPoll, () => {
       new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
     );
     const { result } = renderHook(() =>
-      useDomainStatusPoll(TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
+      useDomainStatusPoll(MOCK_TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
     );
 
     await advance(DOMAIN_POLL_INTERVAL_MS);
@@ -134,7 +134,7 @@ describe(useDomainStatusPoll, () => {
 
   it('adopts a fresh starting status from the server', () => {
     const { result, rerender } = renderHook(
-      ({ status }) => useDomainStatusPoll(TENANT_ID, status),
+      ({ status }) => useDomainStatusPoll(MOCK_TENANT_ID, status),
       {
         initialProps: {
           status:

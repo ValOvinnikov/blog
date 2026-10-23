@@ -4,7 +4,7 @@ import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
 import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
 import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function isSignupBlocked(
@@ -12,7 +12,7 @@ export async function isSignupBlocked(
 ): Promise<TResult<boolean, TErrorCode>> {
   const normalized = normalizeSignupEmail(email);
 
-  if (!normalized) return { ok: false, error: ERROR_CODE.DB_INVALID_EMAIL };
+  if (!normalized) return errorResult(ERROR_CODE.DB_INVALID_EMAIL);
 
   const db = getDb();
   const addressIndex = requirePersonalEmailIndex(normalized.address);
@@ -34,5 +34,5 @@ export async function isSignupBlocked(
     )
     .limit(1);
 
-  return { ok: true, data: match !== undefined };
+  return okResult(match !== undefined);
 }

@@ -1,8 +1,11 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_TAG } from '@blog/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { TagList } from './tag-list';
+
+const LINKED_HREF = '/topics/linked';
 
 faker.seed(123);
 
@@ -14,7 +17,8 @@ describe(`<${TagList.name}/>`, () => {
   it('renders all tags as visible elements', () => {
     setup();
     for (const tag of tags) {
-      expect(screen.getByText(tag)).toBeVisible();
+      const tagElement = screen.getByText(tag);
+      expect(tagElement).toBeVisible();
     }
   });
 
@@ -25,55 +29,35 @@ describe(`<${TagList.name}/>`, () => {
 
   it('forwards dataTestId', () => {
     setup({ dataTestId: 'tag-list' });
-    expect(screen.getByTestId('tag-list')).toBeVisible();
-  });
-
-  it('renders a tag with an href as a link', () => {
-    setup({
-      tags: [{ label: 'Architecture', href: '/topics/architecture' }],
-    });
-    expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
-      'href',
-      '/topics/architecture',
-    );
+    const tagList = screen.getByTestId('tag-list');
+    expect(tagList).toBeVisible();
   });
 
   it('renders a tag without an href as plain text, not a link', () => {
-    setup({ tags: [{ label: 'Architecture' }] });
-    expect(screen.getByText('Architecture')).toBeVisible();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    setup({ tags: [{ label: MOCK_TAG.label }] });
+    const plainTag = screen.getByText(MOCK_TAG.label);
+    const link = screen.queryByRole('link');
+    expect(plainTag).toBeVisible();
+    expect(link).not.toBeInTheDocument();
   });
 
   it('renders linked tags using the custom `linkAs` component', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom="true">
-        {children}
-      </a>
-    );
     setup({
-      tags: [{ label: 'Architecture', href: '/topics/architecture' }],
-      linkAs: CustomLink,
+      tags: [MOCK_TAG],
+      linkAs: MockLink,
     });
-    expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
-      'data-custom',
-      'true',
-    );
+    const tagLink = screen.getByRole('link', { name: MOCK_TAG.label });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(tagLink).toBe(mockLink);
   });
 
   it('renders a mix of plain and linked tags from a single array', () => {
     setup({
-      tags: ['Plain', { label: 'Linked', href: '/topics/linked' }],
+      tags: ['Plain', { label: 'Linked', href: LINKED_HREF }],
     });
-    expect(screen.getByText('Plain')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Linked' })).toHaveAttribute(
-      'href',
-      '/topics/linked',
-    );
+    const plainTag = screen.getByText('Plain');
+    const linkedTag = screen.getByRole('link', { name: 'Linked' });
+    expect(plainTag).toBeVisible();
+    expect(linkedTag).toHaveAttribute('href', LINKED_HREF);
   });
 });

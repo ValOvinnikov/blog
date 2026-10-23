@@ -4,13 +4,14 @@ import {
   FINDING_SOURCE,
 } from '@blog/config/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
+import { mockFinding } from '@platform/testing/findings/fixtures';
+import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 
 import { FindingsView } from './findings-view';
 
 const render = renderWithIntl;
 
-const finding = makeFinding({
+const finding = mockFinding({
   source: FINDING_SOURCE.DOCUMENT_VALIDATION,
   kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
   severity: FINDING_SEVERITY.WARNING,
@@ -20,15 +21,20 @@ describe(FindingsView, () => {
   it('renders the page heading and the real findings table', () => {
     render(<FindingsView findings={[finding]} />);
 
-    expect(screen.getByRole('heading', { name: 'Findings' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toBeVisible();
+    const heading = screen.getByRole('heading', { name: 'Findings' });
+    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+
+    expect(heading).toBeVisible();
+    expect(tenantLink).toBeVisible();
   });
 
   it('renders the healthy empty state when there are no open findings', () => {
     render(<FindingsView findings={[]} />);
 
-    expect(
-      screen.getByText("No open findings. Everything's healthy."),
-    ).toBeVisible();
+    const emptyState = screen.getByText(
+      "No open findings. Everything's healthy.",
+    );
+
+    expect(emptyState).toBeVisible();
   });
 });

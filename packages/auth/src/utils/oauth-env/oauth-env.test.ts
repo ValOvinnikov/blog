@@ -1,3 +1,10 @@
+import {
+  MOCK_GITHUB_ID,
+  MOCK_GITHUB_SECRET,
+  MOCK_GOOGLE_ID,
+  MOCK_GOOGLE_SECRET,
+} from '@blog/auth/testing/oauth-fixtures';
+
 export {};
 
 const ENV_KEYS = [
@@ -46,17 +53,17 @@ describe('oauthEnv', () => {
   });
 
   it('exposes configured credentials by their exact env var names', async () => {
-    process.env['AUTH_GITHUB_ID'] = 'github-id';
-    process.env['AUTH_GITHUB_SECRET'] = 'github-secret';
-    process.env['AUTH_GOOGLE_ID'] = 'google-id';
-    process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
+    process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
+    process.env['AUTH_GITHUB_SECRET'] = MOCK_GITHUB_SECRET;
+    process.env['AUTH_GOOGLE_ID'] = MOCK_GOOGLE_ID;
+    process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
 
     const { oauthEnv } = await importOAuthEnv();
 
-    expect(oauthEnv.AUTH_GITHUB_ID).toBe('github-id');
-    expect(oauthEnv.AUTH_GITHUB_SECRET).toBe('github-secret');
-    expect(oauthEnv.AUTH_GOOGLE_ID).toBe('google-id');
-    expect(oauthEnv.AUTH_GOOGLE_SECRET).toBe('google-secret');
+    expect(oauthEnv.AUTH_GITHUB_ID).toBe(MOCK_GITHUB_ID);
+    expect(oauthEnv.AUTH_GITHUB_SECRET).toBe(MOCK_GITHUB_SECRET);
+    expect(oauthEnv.AUTH_GOOGLE_ID).toBe(MOCK_GOOGLE_ID);
+    expect(oauthEnv.AUTH_GOOGLE_SECRET).toBe(MOCK_GOOGLE_SECRET);
   });
 
   it('does not require AUTH_SECRET, unlike @blog/auth/utils/env/env', async () => {

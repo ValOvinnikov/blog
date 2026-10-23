@@ -1,23 +1,32 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
-import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_POST_LIST_HEADING,
+  mockPostListItem,
+} from '@web/testing/modules/post-list/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
 vi.mock('@web/i18n/navigation');
 
-const post = makePostListItem();
+const TITLE_ID = 'posts-title';
+const DATA_TEST_ID = 'post-list-module-post-list-1';
+const EMPTY_MESSAGE = 'No posts yet.';
+const PAGER_LABEL = 'Engineering pages';
+
+const post = mockPostListItem();
 
 const setup = customRender(PostListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   items: [post],
   layout: undefined,
   contentAlignment: undefined,
-  titleId: 'posts-title',
-  dataTestId: 'post-list-module-post-list-1',
-  emptyMessage: 'No posts yet.',
+  titleId: TITLE_ID,
+  dataTestId: DATA_TEST_ID,
+  emptyMessage: EMPTY_MESSAGE,
 });
 
 describe(`<${PostListModuleView.name}/>`, () => {
@@ -27,65 +36,58 @@ describe(`<${PostListModuleView.name}/>`, () => {
     });
 
     it('labels the section with the given titleId', () => {
-      const label = screen.getByText('Latest posts');
-      expect(label).toHaveAttribute('id', 'posts-title');
-      expect(label.tagName).toBe('H2');
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_POST_LIST_HEADING,
+      });
+      expect(heading).toHaveAttribute('id', TITLE_ID);
 
-      const section = label.closest('section');
-      expect(section).toHaveAttribute('aria-labelledby', 'posts-title');
-      expect(section).toHaveAttribute(
-        'data-testid',
-        'post-list-module-post-list-1',
-      );
-      expect(
-        screen.getByRole('region', { name: 'Latest posts' }),
-      ).toBeVisible();
+      const section = screen.getByRole('region', {
+        name: MOCK_POST_LIST_HEADING,
+      });
+      expect(section).toBeVisible();
+      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
+      expect(section).toHaveAttribute('data-testid', DATA_TEST_ID);
     });
 
     it('renders a card per item, linked to its href', () => {
       const link = screen.getByRole('link', { name: post.title });
       expect(link).toHaveAttribute('href', post.href);
-      expect(
-        screen.getByRole('heading', { level: 3, name: post.title }),
-      ).toBeVisible();
+      const cardHeading = screen.getByRole('heading', {
+        level: 3,
+        name: post.title,
+      });
+      expect(cardHeading).toBeVisible();
     });
 
-    it('renders no pagination nav when the pagination prop is absent', () => {
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    it('renders no pagination nav without pagination', () => {
+      const pagination = screen.queryByRole('navigation');
+      expect(pagination).not.toBeInTheDocument();
     });
 
     it('renders no media region when hasImages is not given', () => {
-      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+      const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+      expect(media).not.toBeInTheDocument();
     });
   });
 
-  it('derives a different section id from a different titleId, avoiding duplicate ids', () => {
-    setup({
-      titleId: 'other-posts-title',
-      headingBlock: makeHeadingBlock({ heading: 'More posts' }),
-    });
-
-    expect(screen.getByText('More posts')).toHaveAttribute(
-      'id',
-      'other-posts-title',
-    );
-  });
-
-  it('renders Pagination as a sibling of the grid, inside the same Section', () => {
+  it('renders the pager inside the section', () => {
     setup({
       pagination: {
         currentPage: 2,
         totalPages: 3,
         createHref: (page: number) => `/topics/engineering/page/${page}`,
-        ariaLabel: 'Engineering pages',
+        ariaLabel: PAGER_LABEL,
         previousLabel: 'Previous',
         nextLabel: 'Next',
       },
     });
 
-    const section = screen.getByRole('region', { name: 'Latest posts' });
+    const section = screen.getByRole('region', {
+      name: MOCK_POST_LIST_HEADING,
+    });
     const nav = within(section).getByRole('navigation', {
-      name: 'Engineering pages',
+      name: PAGER_LABEL,
     });
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
@@ -95,11 +97,13 @@ describe(`<${PostListModuleView.name}/>`, () => {
     expect(nav).toBeVisible();
   });
 
-  it('renders the resolved i18n empty message instead of the grid when items is empty', () => {
+  it('renders the empty message and no cards when there are no items', () => {
     setup({ items: [] });
 
-    expect(screen.getByText('No posts yet.')).toBeVisible();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const emptyMessage = screen.getByText(EMPTY_MESSAGE);
+    const link = screen.queryByRole('link');
+    expect(emptyMessage).toBeVisible();
+    expect(link).not.toBeInTheDocument();
   });
 
   it('renders a media region for each item when hasImages is true', () => {
@@ -108,7 +112,9 @@ describe(`<${PostListModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeVisible();
-    expect(screen.getByTestId('post-image')).toBeVisible();
+    const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+    const image = screen.getByTestId('post-image');
+    expect(media).toBeVisible();
+    expect(image).toBeVisible();
   });
 });

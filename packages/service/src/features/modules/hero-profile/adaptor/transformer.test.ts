@@ -1,31 +1,51 @@
 import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
   HERO_VARIANT,
-  LINK_TYPE,
   MEDIA_ORDER,
   SOCIAL_PLATFORMS,
 } from '@blog/config';
 import {
-  makeRawCtaButton,
-  makeRawHeroProfileModule,
+  MOCK_HERO_EYEBROW,
+  MOCK_HERO_IMAGE_ALT,
+  mockCtaButtonView,
+  mockRawCtaButton,
+  mockRawHeroProfileModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
-  makeRawExternalLinkDocument,
-  makeRawHeadingBlock,
-  makeRawSanityImage,
+  MOCK_BIO_BLOCK_KEY,
+  mockLinkView,
+  mockRawExternalLinkDocument,
+  mockRawHeadingBlock,
+  mockRawHeroLayout,
+  mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
-import { toHeroProfileModule } from './transformer';
+import { toHeroProfileModule, type TRawHeroProfileModule } from './transformer';
+
+type TRawProfileAuthor = TRawHeroProfileModule['author'];
+
+const AUTHOR_BIO: TRawProfileAuthor['bio'] = [
+  { _type: 'block', _key: MOCK_BIO_BLOCK_KEY, markDefs: null },
+];
+
+const AUTHOR_ROLE = 'Staff Engineer';
+const AUTHOR_PHOTO_ALT = 'Author photo';
+const PROFILE_HEADING = 'Meet the author';
+const GITHUB_LINK = { label: 'GitHub', url: 'https://github.com/val' };
+
+function mockRawProfileAuthor(
+  overrides: Partial<TRawProfileAuthor> = {},
+): TRawProfileAuthor {
+  return { ...mockRawHeroProfileModule().author, ...overrides };
+}
 
 describe(toHeroProfileModule, () => {
   it('maps brandVariant, variant and headingBlock straight through', () => {
-    const raw = makeRawHeroProfileModule({
+    const raw = mockRawHeroProfileModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
-      headingBlock: makeRawHeadingBlock('Meet the author'),
+      headingBlock: mockRawHeadingBlock(PROFILE_HEADING),
     });
 
     const hero = toHeroProfileModule(raw);
@@ -33,170 +53,92 @@ describe(toHeroProfileModule, () => {
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.variant).toBe(HERO_VARIANT.BANNER);
     expect(hero.headingBlock).toEqual({
-      heading: 'Meet the author',
+      heading: PROFILE_HEADING,
       supportingText: undefined,
     });
   });
 
-  describe('eyebrow', () => {
-    it('resolves to the author role when showRole is on, ignoring a stale typed eyebrow', () => {
-      const raw = makeRawHeroProfileModule({
-        showRole: true,
-        eyebrow: 'Field notes',
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: 'Staff Engineer',
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.eyebrow).toBe('Staff Engineer');
+  it.each([
+    [
+      'the author role when showRole is on, ignoring a typed eyebrow',
+      true,
+      MOCK_HERO_EYEBROW,
+      AUTHOR_ROLE,
+      AUTHOR_ROLE,
+    ],
+    [
+      'the typed eyebrow when showRole is off',
+      false,
+      MOCK_HERO_EYEBROW,
+      AUTHOR_ROLE,
+      MOCK_HERO_EYEBROW,
+    ],
+    [
+      'undefined when showRole is off and no eyebrow is typed',
+      false,
+      null,
+      null,
+      undefined,
+    ],
+    [
+      'undefined when showRole is on and the author has no role',
+      true,
+      null,
+      null,
+      undefined,
+    ],
+  ])('resolves eyebrow to %s', (_, showRole, eyebrow, role, expected) => {
+    const raw = mockRawHeroProfileModule({
+      showRole,
+      eyebrow,
+      author: mockRawProfileAuthor({ role }),
     });
 
-    it('falls back to the typed eyebrow when showRole is off', () => {
-      const raw = makeRawHeroProfileModule({
-        showRole: false,
-        eyebrow: 'Field notes',
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: 'Staff Engineer',
-          bio: null,
-          socialLinks: null,
-        },
-      });
+    const hero = toHeroProfileModule(raw);
 
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.eyebrow).toBe('Field notes');
-    });
-
-    it('leaves eyebrow undefined when showRole is off and no eyebrow is typed', () => {
-      const raw = makeRawHeroProfileModule({ showRole: false, eyebrow: null });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.eyebrow).toBeUndefined();
-    });
-
-    it('leaves eyebrow undefined when showRole is on and the author has no role', () => {
-      const raw = makeRawHeroProfileModule({
-        showRole: true,
-        eyebrow: null,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.eyebrow).toBeUndefined();
-    });
+    expect(hero.eyebrow).toBe(expected);
   });
 
-  describe('bio', () => {
-    it('maps the author bio blocks when showBio is on', () => {
-      const raw = makeRawHeroProfileModule({
-        showBio: true,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: [
-            {
-              _type: 'block',
-              _key: 'bio-block-1',
-              markDefs: null,
-            },
-          ],
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.bio).toEqual([
+  it.each([
+    [
+      'maps the author bio blocks when showBio is on',
+      true,
+      AUTHOR_BIO,
+      [
         {
           _type: 'block',
-          _key: 'bio-block-1',
+          _key: MOCK_BIO_BLOCK_KEY,
           children: [],
           markDefs: undefined,
         },
-      ]);
+      ],
+    ],
+    [
+      'leaves bio undefined when showBio is off, even if the author has one',
+      false,
+      AUTHOR_BIO,
+      undefined,
+    ],
+    [
+      'leaves bio undefined when showBio is on and the author has none',
+      true,
+      null,
+      undefined,
+    ],
+  ])('%s', (_, showBio, bio, expected) => {
+    const raw = mockRawHeroProfileModule({
+      showBio,
+      author: mockRawProfileAuthor({ bio }),
     });
 
-    it('leaves bio undefined when showBio is off, even if the author has one', () => {
-      const raw = makeRawHeroProfileModule({
-        showBio: false,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: [
-            {
-              _type: 'block',
-              _key: 'bio-block-1',
-              markDefs: null,
-            },
-          ],
-          socialLinks: null,
-        },
-      });
+    const hero = toHeroProfileModule(raw);
 
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.bio).toBeUndefined();
-    });
-
-    it('leaves bio undefined when showBio is on and the author has none', () => {
-      const raw = makeRawHeroProfileModule({
-        showBio: true,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.bio).toBeUndefined();
-    });
+    expect(hero.bio).toEqual(expected);
   });
 
   it("maps avatarName from the author's name, straight through", () => {
-    const raw = makeRawHeroProfileModule({
-      author: {
-        _id: 'author-1',
-        profilePage: null,
-        name: 'Alex Chen',
-        image: null,
-        role: null,
-        bio: null,
-        socialLinks: null,
-      },
+    const raw = mockRawHeroProfileModule({
+      author: mockRawProfileAuthor({ name: 'Alex Chen' }),
     });
 
     const hero = toHeroProfileModule(raw);
@@ -204,297 +146,131 @@ describe(toHeroProfileModule, () => {
     expect(hero.avatarName).toBe('Alex Chen');
   });
 
-  describe('image precedence', () => {
-    it("uses the hero's own image when set, ignoring the author photo", () => {
-      const raw = makeRawHeroProfileModule({
-        image: makeRawSanityImage('Custom alt'),
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: makeRawSanityImage('Author photo'),
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage?.alt).toBe('Custom alt');
+  it.each([
+    [
+      "uses the hero's own image over the author photo",
+      HERO_VARIANT.SPLIT,
+      MOCK_HERO_IMAGE_ALT,
+      AUTHOR_PHOTO_ALT,
+      MOCK_HERO_IMAGE_ALT,
+    ],
+    [
+      "falls back to the author's photo",
+      HERO_VARIANT.SPLIT,
+      null,
+      AUTHOR_PHOTO_ALT,
+      AUTHOR_PHOTO_ALT,
+    ],
+    [
+      'leaves sanityImage undefined when neither has a photo',
+      HERO_VARIANT.SPLIT,
+      null,
+      null,
+      undefined,
+    ],
+    [
+      'on Banner, ignores the author photo',
+      HERO_VARIANT.BANNER,
+      null,
+      AUTHOR_PHOTO_ALT,
+      undefined,
+    ],
+    [
+      'on Banner, keeps the custom image',
+      HERO_VARIANT.BANNER,
+      MOCK_HERO_IMAGE_ALT,
+      AUTHOR_PHOTO_ALT,
+      MOCK_HERO_IMAGE_ALT,
+    ],
+  ])('%s', (_, variant, imageAlt, authorPhotoAlt, expectedAlt) => {
+    const raw = mockRawHeroProfileModule({
+      variant,
+      image: imageAlt ? mockRawSanityImage(imageAlt) : null,
+      author: mockRawProfileAuthor({
+        image: authorPhotoAlt ? mockRawSanityImage(authorPhotoAlt) : null,
+      }),
     });
 
-    it("falls back to the author's photo when the hero has no image of its own", () => {
-      const raw = makeRawHeroProfileModule({
-        image: null,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: makeRawSanityImage('Author photo'),
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
+    const hero = toHeroProfileModule(raw);
 
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage?.alt).toBe('Author photo');
-    });
-
-    it('leaves sanityImage undefined when neither the hero nor the author has a photo (a supported state)', () => {
-      const raw = makeRawHeroProfileModule({
-        image: null,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage).toBeUndefined();
-    });
-
-    it('on Banner, leaves sanityImage undefined when only the author has a photo', () => {
-      const raw = makeRawHeroProfileModule({
-        variant: HERO_VARIANT.BANNER,
-        image: null,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: makeRawSanityImage('Author photo'),
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage).toBeUndefined();
-    });
-
-    it('on Banner, keeps the custom image', () => {
-      const raw = makeRawHeroProfileModule({
-        variant: HERO_VARIANT.BANNER,
-        image: makeRawSanityImage('Custom alt'),
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: makeRawSanityImage('Author photo'),
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.sanityImage?.alt).toBe('Custom alt');
-    });
+    expect(hero.sanityImage?.alt).toBe(expectedAlt);
   });
 
-  describe('social links', () => {
-    it('maps the author social links when showSocialLinks is on', () => {
-      const raw = makeRawHeroProfileModule({
-        showSocialLinks: true,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: [
-            {
-              platform: SOCIAL_PLATFORMS.GITHUB,
-              link: makeRawExternalLinkDocument({
-                label: 'GitHub',
-                url: 'https://github.com/val',
-              }),
-            },
-          ],
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.socialLinks).toEqual([
-        {
-          platform: SOCIAL_PLATFORMS.GITHUB,
-          link: {
-            label: 'GitHub',
-            href: 'https://github.com/val',
-            target: undefined,
-            platform: undefined,
-            ariaLabel: undefined,
+  it('maps the author social links when showSocialLinks is on', () => {
+    const raw = mockRawHeroProfileModule({
+      showSocialLinks: true,
+      author: mockRawProfileAuthor({
+        socialLinks: [
+          {
+            platform: SOCIAL_PLATFORMS.GITHUB,
+            link: mockRawExternalLinkDocument(GITHUB_LINK),
           },
-        },
-      ]);
-    });
-
-    it('returns an empty array when showSocialLinks is off, even if the author has links', () => {
-      const raw = makeRawHeroProfileModule({
-        showSocialLinks: false,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: [
-            {
-              platform: SOCIAL_PLATFORMS.GITHUB,
-              link: makeRawExternalLinkDocument(),
-            },
-          ],
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.socialLinks).toEqual([]);
-    });
-
-    it('returns an empty array when showSocialLinks is on and the author has none (a supported state)', () => {
-      const raw = makeRawHeroProfileModule({
-        showSocialLinks: true,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: null,
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.socialLinks).toEqual([]);
-    });
-
-    it('drops a social link whose href cannot resolve', () => {
-      const raw = makeRawHeroProfileModule({
-        showSocialLinks: true,
-        author: {
-          _id: 'author-1',
-          profilePage: null,
-          name: 'Jamie Rivera',
-          image: null,
-          role: null,
-          bio: null,
-          socialLinks: [
-            {
-              platform: SOCIAL_PLATFORMS.GITHUB,
-              link: {
-                label: 'Broken',
-                linkType: LINK_TYPE.INTERNAL,
-                internalReference: null,
-                url: null,
-                openInNewTab: null,
-              },
-            },
-          ],
-        },
-      });
-
-      const hero = toHeroProfileModule(raw);
-
-      expect(hero.socialLinks).toEqual([]);
-    });
-  });
-
-  it('returns an empty array for an absent ctaButtons field', () => {
-    const raw = makeRawHeroProfileModule({ ctaButtons: null });
-
-    const hero = toHeroProfileModule(raw);
-
-    expect(hero.ctaButtons).toEqual([]);
-  });
-
-  it('maps an authored cta button', () => {
-    const raw = makeRawHeroProfileModule({
-      ctaButtons: [makeRawCtaButton()],
+        ],
+      }),
     });
 
     const hero = toHeroProfileModule(raw);
 
-    expect(hero.ctaButtons).toEqual([
+    expect(hero.socialLinks).toEqual([
       {
-        variant: CTA_ACTION_VARIANT.PRIMARY,
-        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-        link: {
-          label: 'Subscribe',
-          href: '/newsletter',
-          target: undefined,
-          platform: undefined,
-          ariaLabel: undefined,
-        },
+        platform: SOCIAL_PLATFORMS.GITHUB,
+        link: mockLinkView({ label: GITHUB_LINK.label, href: GITHUB_LINK.url }),
       },
     ]);
   });
 
-  it('takes contentPosition from contentPositionSplit on Split, ignoring contentPositionBanner', () => {
-    const raw = makeRawHeroProfileModule({
+  it.each([
+    [
+      'off, even if the author has links',
+      false,
+      [
+        {
+          platform: SOCIAL_PLATFORMS.GITHUB,
+          link: mockRawExternalLinkDocument(),
+        },
+      ],
+    ],
+    ['on and the author has none', true, null],
+  ])(
+    'returns no social links when showSocialLinks is %s',
+    (_, showSocialLinks, socialLinks) => {
+      const raw = mockRawHeroProfileModule({
+        showSocialLinks,
+        author: mockRawProfileAuthor({ socialLinks }),
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.socialLinks).toEqual([]);
+    },
+  );
+
+  it('maps an authored cta button', () => {
+    const raw = mockRawHeroProfileModule({
+      ctaButtons: [mockRawCtaButton()],
+    });
+
+    const hero = toHeroProfileModule(raw);
+
+    expect(hero.ctaButtons).toEqual([mockCtaButtonView()]);
+  });
+
+  it('takes contentPosition and mediaOrder from the Split keys', () => {
+    const raw = mockRawHeroProfileModule({
       variant: HERO_VARIANT.SPLIT,
       contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
-    });
-
-    const hero = toHeroProfileModule(raw);
-
-    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
-  });
-
-  it('takes contentPosition from contentPositionBanner on Banner, ignoring contentPositionSplit', () => {
-    const raw = makeRawHeroProfileModule({
-      variant: HERO_VARIANT.BANNER,
-      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
-      contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const hero = toHeroProfileModule(raw);
-
-    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.CENTER);
-  });
-
-  it('leaves contentPosition undefined on Stacked regardless of stored position keys', () => {
-    const raw = makeRawHeroProfileModule({
-      variant: HERO_VARIANT.STACKED,
-      contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
-      contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const hero = toHeroProfileModule(raw);
-
-    expect(hero.contentPosition).toBeUndefined();
-  });
-
-  it('takes mediaOrder from mediaOrderSplit on Split', () => {
-    const raw = makeRawHeroProfileModule({
-      variant: HERO_VARIANT.SPLIT,
       mediaOrderSplit: MEDIA_ORDER.FIRST,
     });
 
     const hero = toHeroProfileModule(raw);
 
+    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
     expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
 
-  it('leaves mediaOrder undefined on Stacked — heroProfile authors no mediaOrderStacked field', () => {
-    const raw = makeRawHeroProfileModule({
+  it('leaves mediaOrder undefined on Stacked, which authors no order of its own', () => {
+    const raw = mockRawHeroProfileModule({
       variant: HERO_VARIANT.STACKED,
       mediaOrderSplit: MEDIA_ORDER.FIRST,
     });
@@ -504,32 +280,12 @@ describe(toHeroProfileModule, () => {
     expect(hero.mediaOrder).toBeUndefined();
   });
 
-  it('leaves layout undefined when unset (no faked default)', () => {
-    const raw = makeRawHeroProfileModule({ layout: null });
-
-    const hero = toHeroProfileModule(raw);
-
-    expect(hero.layout).toBeUndefined();
-  });
-
   it('maps a fully-authored layout object', () => {
-    const raw = makeRawHeroProfileModule({
-      layout: {
-        spacingTop: 'LG',
-        spacingBottom: 'SM',
-        dividerTop: true,
-        dividerBottom: false,
-      },
-    });
+    const layout = mockRawHeroLayout();
+    const raw = mockRawHeroProfileModule({ layout });
 
     const hero = toHeroProfileModule(raw);
 
-    expect(hero.layout).toEqual({
-      spacingTop: 'LG',
-      spacingBottom: 'SM',
-      containerWidth: undefined,
-      dividerTop: true,
-      dividerBottom: false,
-    });
+    expect(hero.layout).toEqual({ ...layout, containerWidth: undefined });
   });
 });

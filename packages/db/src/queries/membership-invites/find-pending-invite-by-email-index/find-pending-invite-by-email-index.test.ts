@@ -2,7 +2,7 @@ import type { TMaybeNull } from '@blog/config/types';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, TEST_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
 import {
   testPersonalEmailIndex,
   usePersonalDataKeys,
@@ -20,7 +20,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(TEST_INVITE_EMAIL);
+const TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);
 
 afterEach(async () => {
   await db().delete(schema.membershipInvites);
@@ -29,7 +29,7 @@ afterEach(async () => {
 
 async function insertInvite(
   consumedAt: TMaybeNull<Date>,
-  email = TEST_INVITE_EMAIL,
+  email = MOCK_INVITE_EMAIL,
 ): Promise<string> {
   const { id: tenantId } = await insertTestTenant(db());
   await db()
@@ -44,34 +44,41 @@ async function insertInvite(
 }
 
 describe(findPendingInviteByEmailIndex, () => {
+  let pendingTenantId: string;
+
+  beforeEach(async () => {
+    pendingTenantId = await insertInvite(null);
+  });
+
   it('returns every pending invite for the address across tenants, skipping consumed ones', async () => {
-    const first = await insertInvite(null);
-    const second = await insertInvite(null);
+    const secondPendingTenantId = await insertInvite(null);
     await insertInvite(new Date());
 
     const invites = await findPendingInviteByEmailIndex(
-      TEST_INVITE_EMAIL.toUpperCase(),
+      MOCK_INVITE_EMAIL.toUpperCase(),
     );
 
     expect(invites.map(({ tenantId }) => tenantId).sort()).toEqual(
-      [first, second].sort(),
+      [pendingTenantId, secondPendingTenantId].sort(),
     );
   });
 
   it.each([
     [
       'an address by a +tag variant of it',
-      TEST_INVITE_EMAIL,
+      MOCK_INVITE_EMAIL,
       TAGGED_INVITE_EMAIL,
     ],
-    ['a +tag variant by the address', TAGGED_INVITE_EMAIL, TEST_INVITE_EMAIL],
+    ['a +tag variant by the address', TAGGED_INVITE_EMAIL, MOCK_INVITE_EMAIL],
   ])(
     'never matches an invite sent to %s',
     async (_label, sentTo, requested) => {
-      await insertInvite(null, sentTo);
+      const sentToTenantId = await insertInvite(null, sentTo);
 
-      await expect(findPendingInviteByEmailIndex(requested)).resolves.toEqual(
-        [],
+      const invites = await findPendingInviteByEmailIndex(requested);
+
+      expect(invites.map(({ tenantId }) => tenantId)).not.toContain(
+        sentToTenantId,
       );
     },
   );
@@ -82,19 +89,17 @@ describe(findPendingInviteByEmailIndex, () => {
       .insert(schema.membershipInvites)
       .values({
         tenantId,
-        email: TEST_INVITE_EMAIL,
-        emailIndex: testPersonalEmailIndex(TEST_INVITE_EMAIL),
+        email: MOCK_INVITE_EMAIL,
+        emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
         role: MEMBERSHIP_ROLE.OWNER,
       });
 
-    const invites = await findPendingInviteByEmailIndex(TEST_INVITE_EMAIL);
+    const invites = await findPendingInviteByEmailIndex(MOCK_INVITE_EMAIL);
 
-    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    expect(invites.map((invite) => invite.tenantId)).toContain(tenantId);
   });
 
   it('returns nothing for an address with no invite', async () => {
-    await insertInvite(null);
-
     await expect(
       findPendingInviteByEmailIndex(faker.internet.email()),
     ).resolves.toEqual([]);

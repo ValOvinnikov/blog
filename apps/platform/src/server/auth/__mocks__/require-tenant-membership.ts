@@ -1,10 +1,10 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TTenantMembershipContext } from '@platform/server/auth/require-tenant-membership';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 
 export const requireTenantMembership = vi.fn(
   async (tenantId: string): Promise<TTenantMembershipContext> => ({
-    tenant: makeReadyTenant({ id: tenantId }),
+    tenant: mockReadyTenant({ id: tenantId }),
     membership: {
       id: 'membership-1',
       userId: 'user-1',

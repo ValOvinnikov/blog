@@ -5,7 +5,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TopbarNavMenu } from './topbar-nav-menu';
@@ -84,7 +84,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
   });
 
   it('marks only the item matching the current pathname active', async () => {
-    setPathname(`/tenants/${TENANT_ID}/look`);
+    setPathname(`/tenants/${MOCK_TENANT_ID}/look`);
     render(
       <TopbarNavMenu
         sections={[
@@ -94,12 +94,12 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: `/tenants/${TENANT_ID}/look`,
+                href: `/tenants/${MOCK_TENANT_ID}/look`,
               },
               {
                 label: 'Voice',
                 icon: ICONS.QUOTE,
-                href: `/tenants/${TENANT_ID}/voice`,
+                href: `/tenants/${MOCK_TENANT_ID}/voice`,
               },
             ],
           },
@@ -119,7 +119,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
   });
 
   it('renders an item with no href as an inert row that is never marked active', async () => {
-    setPathname(`/tenants/${TENANT_ID}/domain`);
+    setPathname(`/tenants/${MOCK_TENANT_ID}/domain`);
     render(
       <TopbarNavMenu
         sections={[

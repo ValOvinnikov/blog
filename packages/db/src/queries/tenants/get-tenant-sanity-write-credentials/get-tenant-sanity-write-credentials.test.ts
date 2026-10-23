@@ -1,9 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import { archiveTenant } from '@blog/db/queries/tenants/archive-tenant';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import { setTenantProvisioningStatus } from '@blog/db/queries/tenants/set-tenant-provisioning-status';
@@ -16,6 +11,14 @@ import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
 } from '@blog/db/testing/tenant-token-encryption-key';
+import {
+  MOCK_MISSING_TENANT_ID,
+  MOCK_RUN_AT,
+  MOCK_TENANT_READ_TOKEN,
+  MOCK_TENANT_VALUES,
+  MOCK_TENANT_WRITE_TOKEN,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -23,31 +26,32 @@ import {
   toTenantSanityWriteCredentials,
 } from './get-tenant-sanity-write-credentials';
 
-async function insertTenant(): Promise<TTenant> {
-  const result = await createTenant({
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'abc123',
-    sanityDataset: 'production',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-  });
-  if (!result.ok) throw new Error('setup: createTenant failed.');
-  return result.data;
-}
-
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
-const READ_TOKEN = 'sk-real-read-token-value';
-const WRITE_TOKEN = 'sk-real-write-token-value';
-
 const db = useQueryTestDb(getDbMock);
 useTenantTokenEncryptionKey();
 
+const { sanityProjectId, sanityDataset } = MOCK_TENANT_VALUES;
+
+const ACTIVE_WRITE_CREDENTIALS = {
+  projectId: sanityProjectId,
+  dataset: sanityDataset,
+  token: MOCK_TENANT_WRITE_TOKEN,
+  status: TENANT_STATUS.ACTIVE,
+  deprovisionedAt: null,
+  provisioningStatus: null,
+};
+
+async function insertTenant(): Promise<TTenant> {
+  return unwrapOk(
+    await createTenant({ ...MOCK_TENANT_VALUES, status: TENANT_STATUS.ACTIVE }),
+  );
+}
+
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.tenants);
 });
 
@@ -60,42 +64,28 @@ describe(getTenantSanityWriteCredentials, () => {
 
   describe('with a write token set', () => {
     beforeEach(async () => {
-      await setTenantSanityWriteToken(tenant.id, WRITE_TOKEN);
+      await setTenantSanityWriteToken(tenant.id, MOCK_TENANT_WRITE_TOKEN);
     });
 
-    it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
+    it('resolves the decrypted token, project, dataset and state for an active tenant', async () => {
+      const credentials = await getTenantSanityWriteCredentials(tenant.id);
+
+      expect(credentials).toEqual(ACTIVE_WRITE_CREDENTIALS);
+    });
+
+    it('still resolves write credentials for an archived tenant, with its deprovisionedAt', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(MOCK_RUN_AT));
+      unwrapOk(await archiveTenant(tenant.id));
+      vi.useRealTimers();
+
       const credentials = await getTenantSanityWriteCredentials(tenant.id);
 
       expect(credentials).toEqual({
-        projectId: 'abc123',
-        dataset: 'production',
-        token: WRITE_TOKEN,
-        status: TENANT_STATUS.ACTIVE,
-        deprovisionedAt: null,
-        provisioningStatus: null,
-      });
-    });
-
-    it('still resolves working write credentials for an archived tenant, tagged with its ARCHIVED status', async () => {
-      const archived = await archiveTenant(tenant.id);
-      if (!archived.ok) throw new Error('setup: archiveTenant failed.');
-
-      const credentials = await getTenantSanityWriteCredentials(tenant.id);
-
-      expect(credentials).toMatchObject({
-        projectId: 'abc123',
-        dataset: 'production',
-        token: WRITE_TOKEN,
+        ...ACTIVE_WRITE_CREDENTIALS,
         status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: new Date(MOCK_RUN_AT),
       });
-    });
-
-    it('surfaces deprovisionedAt for a deprovisioned tenant instead of collapsing to undefined', async () => {
-      await archiveTenant(tenant.id);
-
-      const credentials = await getTenantSanityWriteCredentials(tenant.id);
-
-      expect(credentials?.deprovisionedAt).toBeInstanceOf(Date);
     });
 
     it('throws when the encryption key is not configured', async () => {
@@ -107,27 +97,19 @@ describe(getTenantSanityWriteCredentials, () => {
     });
   });
 
-  it('resolves undefined for a mid-provisioning tenant with no write token set yet', async () => {
-    await setTenantProvisioningStatus(
-      tenant.id,
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
+  it.each([
+    TENANT_PROVISIONING_STATUS.PROVISIONING,
+    TENANT_PROVISIONING_STATUS.FAILED,
+  ])(
+    'resolves undefined for a %s tenant with no write token set yet',
+    async (status) => {
+      await setTenantProvisioningStatus(tenant.id, status);
 
-    await expect(
-      getTenantSanityWriteCredentials(tenant.id),
-    ).resolves.toBeUndefined();
-  });
-
-  it('resolves undefined for a tenant whose provisioning failed and never set a write token', async () => {
-    await setTenantProvisioningStatus(
-      tenant.id,
-      TENANT_PROVISIONING_STATUS.FAILED,
-    );
-
-    await expect(
-      getTenantSanityWriteCredentials(tenant.id),
-    ).resolves.toBeUndefined();
-  });
+      await expect(
+        getTenantSanityWriteCredentials(tenant.id),
+      ).resolves.toBeUndefined();
+    },
+  );
 
   it('resolves undefined when the tenant has no write token set yet', async () => {
     await expect(
@@ -136,7 +118,7 @@ describe(getTenantSanityWriteCredentials, () => {
   });
 
   it('resolves undefined when only the read token is set, not the write token', async () => {
-    await setTenantSanityToken(tenant.id, READ_TOKEN);
+    await setTenantSanityToken(tenant.id, MOCK_TENANT_READ_TOKEN);
 
     await expect(
       getTenantSanityWriteCredentials(tenant.id),
@@ -145,7 +127,7 @@ describe(getTenantSanityWriteCredentials, () => {
 
   it('resolves undefined for an unknown tenant id', async () => {
     await expect(
-      getTenantSanityWriteCredentials('00000000-0000-0000-0000-000000000000'),
+      getTenantSanityWriteCredentials(MOCK_MISSING_TENANT_ID),
     ).resolves.toBeUndefined();
   });
 });
@@ -166,18 +148,13 @@ describe(toTenantSanityWriteCredentials, () => {
     let row: TTenant;
 
     beforeEach(async () => {
-      row = await insertTenantRow(WRITE_TOKEN);
+      row = await insertTenantRow(MOCK_TENANT_WRITE_TOKEN);
     });
 
-    it('maps a tenant row with a write token to decrypted credentials and servable state', async () => {
-      expect(toTenantSanityWriteCredentials(row)).toEqual({
-        projectId: 'abc123',
-        dataset: 'production',
-        token: WRITE_TOKEN,
-        status: TENANT_STATUS.ACTIVE,
-        deprovisionedAt: null,
-        provisioningStatus: null,
-      });
+    it('maps a row with a write token to decrypted credentials and state', async () => {
+      expect(toTenantSanityWriteCredentials(row)).toEqual(
+        ACTIVE_WRITE_CREDENTIALS,
+      );
     });
 
     it('throws mapping the row when the encryption key is not configured', async () => {

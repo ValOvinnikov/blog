@@ -1,7 +1,11 @@
-import { getRequestContext } from '@web/server/request-context/request-context';
+import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeStatsModule } from '@web/testing/modules/stats/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_STAT_ITEMS,
+  mockStatsModule,
+} from '@web/testing/modules/stats/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { StatsModule } from './stats-module';
 
@@ -21,8 +25,6 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
 const setup = customRenderAsync(StatsModule, {
   id: 'stats-1',
 });
@@ -30,32 +32,20 @@ const setup = customRenderAsync(StatsModule, {
 describe(`<${StatsModule.name}/>`, () => {
   beforeEach(() => {
     getStatsModuleMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getStatsModuleMock.mockResolvedValue(okResult(mockStatsModule()));
   });
 
-  it('calls getStatsModule with the module id and the tenant Sanity context', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
-    getStatsModuleMock.mockResolvedValue({ ok: true, data: makeStatsModule() });
-
+  it('fetches the module with the tenant Sanity context', async () => {
     await setup();
 
-    expect(getStatsModuleMock).toHaveBeenCalledWith('stats-1', tenant);
+    expect(getStatsModuleMock).toHaveBeenCalledWith(
+      'stats-1',
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getStatsModuleMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getStatsModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -63,29 +53,11 @@ describe(`<${StatsModule.name}/>`, () => {
   });
 
   it('renders the resolved stat figures', async () => {
-    getStatsModuleMock.mockResolvedValue({
-      ok: true,
-      data: makeStatsModule({
-        stats: [
-          {
-            id: 'stat-1',
-            value: '2.4M',
-            label: 'Monthly readers',
-            description: undefined,
-          },
-          {
-            id: 'stat-2',
-            value: '<50ms',
-            label: 'Median TTFB',
-            description: undefined,
-          },
-        ],
-      }),
-    });
-
     await setup();
 
-    expect(screen.getByText('Monthly readers')).toBeVisible();
-    expect(screen.getByText('Median TTFB')).toBeVisible();
+    MOCK_STAT_ITEMS.forEach(({ label }) => {
+      const statLabel = screen.getByText(label);
+      expect(statLabel).toBeVisible();
+    });
   });
 });

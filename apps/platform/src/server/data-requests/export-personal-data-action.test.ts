@@ -3,12 +3,13 @@ import {
   AUDIT_ACTION,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { okResult } from '@blog/utils';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
-  DATA_REQUEST_EMAIL,
-  makePersonalDataExport,
-  makePersonalDataMatches,
+  MOCK_DATA_REQUEST_EMAIL,
+  mockPersonalDataExport,
+  mockPersonalDataMatches,
 } from '@platform/testing/data-requests/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { notFound } from 'next/navigation';
@@ -37,10 +38,10 @@ vi.mock('@blog/db', async () => ({
 
 describe(exportPersonalDataAction, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
+    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
     findPersonalDataMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: makePersonalDataMatches() });
+      .mockResolvedValue(okResult(mockPersonalDataMatches()));
     recordAuditEventMock.mockReset();
   });
 
@@ -50,24 +51,24 @@ describe(exportPersonalDataAction, () => {
     });
 
     await expect(
-      exportPersonalDataAction({ email: DATA_REQUEST_EMAIL }),
+      exportPersonalDataAction({ email: MOCK_DATA_REQUEST_EMAIL }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     expect(findPersonalDataMock).not.toHaveBeenCalled();
   });
 
   it('exports every match without the email index', async () => {
     const result = await exportPersonalDataAction({
-      email: DATA_REQUEST_EMAIL,
+      email: MOCK_DATA_REQUEST_EMAIL,
     });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
-      data: makePersonalDataExport(),
+      data: mockPersonalDataExport(),
     });
   });
 
   it('audits the export', async () => {
-    await exportPersonalDataAction({ email: DATA_REQUEST_EMAIL });
+    await exportPersonalDataAction({ email: MOCK_DATA_REQUEST_EMAIL });
 
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toMatchObject({
       action: AUDIT_ACTION.PERSONAL_DATA_EXPORTED,

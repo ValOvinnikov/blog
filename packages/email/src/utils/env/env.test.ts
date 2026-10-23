@@ -1,3 +1,5 @@
+import { MOCK_RESEND_API_KEY } from '@blog/email/testing/email-fixtures';
+
 export {};
 
 const ENV_KEYS = ['RESEND_API_KEY', 'SKIP_ENV_VALIDATION'] as const;
@@ -32,11 +34,11 @@ describe('env', () => {
   });
 
   it('exposes a valid RESEND_API_KEY', async () => {
-    process.env['RESEND_API_KEY'] = 'test-resend-key';
+    process.env['RESEND_API_KEY'] = MOCK_RESEND_API_KEY;
 
     const { env } = await importEnv();
 
-    expect(env.RESEND_API_KEY).toBe('test-resend-key');
+    expect(env.RESEND_API_KEY).toBe(MOCK_RESEND_API_KEY);
   });
 
   it('leaves RESEND_API_KEY undefined when absent', async () => {

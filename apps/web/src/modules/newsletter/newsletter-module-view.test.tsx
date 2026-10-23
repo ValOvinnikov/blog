@@ -1,14 +1,20 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_NEWSLETTER_MODULE_ID,
+  mockNewsletterModule,
+} from '@web/testing/modules/newsletter/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
 vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
+
+const EMAIL_INPUT_NAME = 'Email address';
+const BAND_TEST_ID = `newsletter-module-${MOCK_NEWSLETTER_MODULE_ID}`;
 
 const heading = faker.company.catchPhrase();
 const supportingText = faker.lorem.sentence();
@@ -17,9 +23,9 @@ const secondCue = faker.lorem.words(3);
 const content = faker.lorem.sentences(2);
 
 const setup = customRender(NewsletterModuleView, {
-  id: 'newsletter-1',
-  ...makeNewsletterModule({
-    headingBlock: makeHeadingBlock({ heading, supportingText }),
+  id: MOCK_NEWSLETTER_MODULE_ID,
+  ...mockNewsletterModule({
+    headingBlock: mockHeadingBlock({ heading, supportingText }),
     trustCues: [firstCue, secondCue],
   }),
 });
@@ -34,37 +40,40 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
       setup();
     });
 
-    it('renders the full signup with the authored heading and supporting text', () => {
-      expect(screen.getByRole('heading', { name: heading })).toBeVisible();
-      expect(screen.getByText(supportingText)).toBeVisible();
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
+    it('renders the authored supporting text', () => {
+      const supportingTextElement = screen.getByText(supportingText);
+      expect(supportingTextElement).toBeVisible();
     });
 
     it('renders the authored heading exactly once, as an h2', () => {
-      expect(screen.getAllByRole('heading')).toHaveLength(1);
-      expect(
-        screen.getByRole('heading', { level: 2, name: heading }),
-      ).toBeVisible();
+      const headings = screen.getAllByRole('heading');
+      const headingElement = screen.getByRole('heading', {
+        level: 2,
+        name: heading,
+      });
+      expect(headings).toHaveLength(1);
+      expect(headingElement).toBeVisible();
     });
 
     it('labels the section landmark by the rendered heading', () => {
-      expect(screen.getByRole('region', { name: heading })).toBeVisible();
+      const region = screen.getByRole('region', { name: heading });
+      expect(region).toBeVisible();
     });
 
     it('renders the authored trust cues for a FULL module', () => {
-      expect(screen.getByText(firstCue)).toBeVisible();
-      expect(screen.getByText(secondCue)).toBeVisible();
+      const firstCueElement = screen.getByText(firstCue);
+      const secondCueElement = screen.getByText(secondCue);
+      expect(firstCueElement).toBeVisible();
+      expect(secondCueElement).toBeVisible();
     });
 
-    it('renders the band and the form together on first render without the cookie', () => {
-      expect(
-        screen.getByTestId('newsletter-module-newsletter-1'),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
+    it('renders the band and the form on first render without the cookie', () => {
+      const band = screen.getByTestId(BAND_TEST_ID);
+      const emailInput = screen.getByRole('textbox', {
+        name: EMAIL_INPUT_NAME,
+      });
+      expect(band).toBeVisible();
+      expect(emailInput).toBeVisible();
     });
   });
 
@@ -78,51 +87,53 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
         name: heading,
       })
       .map(({ id }) => id);
+    const regions = screen.getAllByRole('region', { name: heading });
     expect(new Set(headingIds).size).toBe(2);
-    expect(screen.getAllByRole('region', { name: heading })).toHaveLength(2);
+    expect(regions).toHaveLength(2);
   });
 
   it("renders a FULL module's content text in the panel", () => {
     setup({ content });
 
-    expect(screen.getByText(content)).toBeVisible();
+    const contentText = screen.getByText(content);
+    expect(contentText).toBeVisible();
   });
 
-  it('renders a COMPACT module without content text', () => {
-    setup({
-      variant: NEWSLETTER_VARIANT.COMPACT,
-      content,
+  it('renders a COMPACT module with only its heading and the form', () => {
+    setup({ variant: NEWSLETTER_VARIANT.COMPACT, content });
+
+    const headingElement = screen.getByRole('heading', {
+      level: 2,
+      name: heading,
     });
-
-    expect(screen.queryByText(content)).not.toBeInTheDocument();
-  });
-
-  it('renders a COMPACT module without supporting text or trust cues', () => {
-    setup({ variant: NEWSLETTER_VARIANT.COMPACT });
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: heading }),
-    ).toBeVisible();
-    expect(screen.queryByText(supportingText)).not.toBeInTheDocument();
-    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
+    const emailInput = screen.getByRole('textbox', { name: EMAIL_INPUT_NAME });
+    const supportingTextElement = screen.queryByText(supportingText);
+    const firstCueElement = screen.queryByText(firstCue);
+    const contentText = screen.queryByText(content);
+    expect(headingElement).toBeVisible();
+    expect(emailInput).toBeVisible();
+    expect(supportingTextElement).not.toBeInTheDocument();
+    expect(firstCueElement).not.toBeInTheDocument();
+    expect(contentText).not.toBeInTheDocument();
   });
 
   it('renders no trust cues when the tenant never authored any', () => {
     setup({ trustCues: undefined });
 
-    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
+    const firstCueElement = screen.queryByText(firstCue);
+    expect(firstCueElement).not.toBeInTheDocument();
   });
 
-  it('renders neither the band nor the form for a reader with the subscribed cookie', () => {
+  it('renders neither band nor form for an already-subscribed reader', () => {
     document.cookie = 'newsletter_subscribed=1';
 
     setup();
 
-    expect(
-      screen.queryByTestId('newsletter-module-newsletter-1'),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('textbox', { name: 'Email address' }),
-    ).not.toBeInTheDocument();
+    const band = screen.queryByTestId(BAND_TEST_ID);
+    const emailInput = screen.queryByRole('textbox', {
+      name: EMAIL_INPUT_NAME,
+    });
+    expect(band).not.toBeInTheDocument();
+    expect(emailInput).not.toBeInTheDocument();
   });
 });

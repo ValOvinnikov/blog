@@ -1,7 +1,19 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_IDLE_DEPROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_RERUN_AT,
+  MOCK_RUN_AT,
+  MOCK_WORKFLOW_RUN_URL,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { startDeprovisioningRun } from './start-deprovisioning-run';
 
@@ -11,11 +23,11 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const NOW = '2026-09-02T12:00:00.000Z';
+const DONE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date(NOW));
+  vi.setSystemTime(new Date(MOCK_RUN_AT));
 });
 
 afterEach(async () => {
@@ -32,65 +44,62 @@ describe(startDeprovisioningRun, () => {
     });
 
     it('writes startedAt and workflowRunUrl when supplied', async () => {
-      const result = await startDeprovisioningRun({
-        tenantId: tenant.id,
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
-      });
+      const { deprovisioningSteps } = unwrapOk(
+        await startDeprovisioningRun({
+          tenantId: tenant.id,
+          workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
+        }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.deprovisioningSteps?.run).toEqual({
-        startedAt: NOW,
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      expect(deprovisioningSteps?.run).toEqual({
+        startedAt: MOCK_RUN_AT,
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
       });
     });
 
     it('omits workflowRunUrl entirely when not supplied', async () => {
-      const result = await startDeprovisioningRun({ tenantId: tenant.id });
+      const { deprovisioningSteps } = unwrapOk(
+        await startDeprovisioningRun({ tenantId: tenant.id }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.deprovisioningSteps?.run).toEqual({ startedAt: NOW });
+      expect(deprovisioningSteps?.run).toEqual({ startedAt: MOCK_RUN_AT });
     });
 
     it('replaces a previous run wholesale rather than merging', async () => {
       await startDeprovisioningRun({
         tenantId: tenant.id,
-        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/1',
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
       });
 
-      vi.setSystemTime(new Date('2026-09-02T13:00:00.000Z'));
-      const result = await startDeprovisioningRun({ tenantId: tenant.id });
+      vi.setSystemTime(new Date(MOCK_RERUN_AT));
+      const { deprovisioningSteps } = unwrapOk(
+        await startDeprovisioningRun({ tenantId: tenant.id }),
+      );
 
-      if (!result.ok) throw new Error('expected ok:true');
-      expect(result.data.deprovisioningSteps?.run).toEqual({
-        startedAt: '2026-09-02T13:00:00.000Z',
-      });
+      expect(deprovisioningSteps?.run).toEqual({ startedAt: MOCK_RERUN_AT });
     });
   });
 
   it('leaves every step entry untouched', async () => {
     const tenant = await insertTestTenant(db(), {
       deprovisioningSteps: {
-        REMOVE_DOMAIN: { status: 'DONE' },
-        ARCHIVE_SANITY_PROJECT: { status: 'IDLE' },
-        REVOKE_SANITY_TOKENS: { status: 'IDLE' },
-        CLEAR_ARTIFACTS: { status: 'IDLE' },
-        ARCHIVE_TENANT: { status: 'IDLE' },
-        PURGE_READER_DATA: { status: 'IDLE' },
-        INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
+        ...MOCK_IDLE_DEPROVISIONING_STEPS,
+        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: DONE_STEP,
       },
     });
 
-    const result = await startDeprovisioningRun({ tenantId: tenant.id });
+    const { deprovisioningSteps } = unwrapOk(
+      await startDeprovisioningRun({ tenantId: tenant.id }),
+    );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.REMOVE_DOMAIN).toEqual({
-      status: 'DONE',
-    });
+    expect(deprovisioningSteps?.[DEPROVISIONING_STEP.REMOVE_DOMAIN]).toEqual(
+      DONE_STEP,
+    );
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await startDeprovisioningRun({
-      tenantId: '00000000-0000-0000-0000-000000000000',
+      tenantId: MOCK_MISSING_TENANT_ID,
     });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });

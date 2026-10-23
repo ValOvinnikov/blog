@@ -12,16 +12,16 @@ import type {
 } from '@blog/db/schema/tenants';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
-  idleProvisioningSteps,
-  makeReadyTenant,
+  mockIdleProvisioningSteps,
+  mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import { ownerStudioAccessFor } from './owner-studio-access';
 
-const owner = makeMembership();
+const owner = mockMembership();
 const invitedAt = new Date('2026-10-18T09:00:00.000Z');
 const acceptedAt = new Date('2026-10-18T10:00:00.000Z');
 const beforeStall = new Date(
@@ -31,14 +31,14 @@ const atStall = new Date(invitedAt.getTime() + OWNER_ACCESS_STALL_AFTER_MS);
 const sanityUserId = 'sanity-user-1';
 
 const invitedTenant = (overrides: Partial<TTenant> = {}) =>
-  makeReadyTenant({
+  mockReadyTenant({
     ownerInviteSentAt: invitedAt,
     ...overrides,
   });
 
 const ownerCheckSteps = (detail: string) =>
   ({
-    ...idleProvisioningSteps(),
+    ...mockIdleProvisioningSteps(),
     [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
       detail,
@@ -97,7 +97,7 @@ describe(ownerStudioAccessFor, () => {
   );
 
   it.each([
-    { record: 'no recorded', provisioningSteps: idleProvisioningSteps() },
+    { record: 'no recorded', provisioningSteps: mockIdleProvisioningSteps() },
     {
       record: 'an unrecognised',
       provisioningSteps: ownerCheckSteps('NOT_AN_OUTCOME'),
@@ -138,7 +138,7 @@ describe(ownerStudioAccessFor, () => {
     expect(
       ownerStudioAccessFor(
         invitedTenant(),
-        makeMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
       ),
     ).toBeUndefined();
   });
@@ -147,7 +147,7 @@ describe(ownerStudioAccessFor, () => {
     expect(
       ownerStudioAccessFor(
         invitedTenant(),
-        buildVirtualAdminMembership(makeAdmin().userId, owner.tenantId),
+        buildVirtualAdminMembership(mockAdmin().userId, owner.tenantId),
       ),
     ).toBeUndefined();
   });

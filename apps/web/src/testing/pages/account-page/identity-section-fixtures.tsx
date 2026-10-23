@@ -29,7 +29,7 @@ const makeIdentityProviderRow = (
   };
 };
 
-export const makeIdentitySectionView = (
+export const mockIdentitySectionView = (
   overrides: Partial<IIdentitySectionViewProps> = {},
 ): IIdentitySectionViewProps => {
   return {

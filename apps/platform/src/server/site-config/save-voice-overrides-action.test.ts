@@ -13,9 +13,10 @@ import {
 } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import { errorResult, okResult } from '@blog/utils';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
@@ -52,7 +53,7 @@ const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
 
-const tenant = { id: TENANT_ID };
+const tenant = { id: MOCK_TENANT_ID };
 
 const overrides = { notFoundSupportingText: 'Custom 404 copy.' };
 
@@ -87,7 +88,7 @@ describe(saveVoiceOverridesAction, () => {
       logoAssetUrl: 'https://blob.example.com/logo.png',
       faviconAssetUrl: 'https://blob.example.com/favicon.png',
     });
-    upsertSiteConfigMock.mockResolvedValue({ ok: true });
+    upsertSiteConfigMock.mockResolvedValue(okResult());
     requireTenantMembershipMock.mockResolvedValue({
       tenant,
       membership: { role: MEMBERSHIP_ROLE.OWNER },
@@ -95,20 +96,20 @@ describe(saveVoiceOverridesAction, () => {
   });
 
   it('resolves the tenant from the checked membership, never a bare client-supplied id', async () => {
-    await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
+    await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
-    expect(getSiteConfigOrDefaultsMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getSiteConfigOrDefaultsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       expect.objectContaining({ voiceOverridesByLocale: overridesByLocale }),
     );
   });
 
   it('round-trips the saved theme and never writes the logo or favicon columns', async () => {
-    await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
+    await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
 
-    expect(upsertSiteConfigMock).toHaveBeenCalledWith(TENANT_ID, {
+    expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...savedTheme,
       voiceOverridesByLocale: overridesByLocale,
     });
@@ -123,7 +124,7 @@ describe(saveVoiceOverridesAction, () => {
     'rejects %s without touching the db or logging a failed save',
     async (_, payload) => {
       const result = await saveVoiceOverridesAction(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         payload as TVoiceOverridesByLocaleInput,
       );
 
@@ -141,12 +142,15 @@ describe(saveVoiceOverridesAction, () => {
   it('reports a server error and logs when the upsert throws', async () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db down'));
 
-    const result = await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
+    const result = await saveVoiceOverridesAction(
+      MOCK_TENANT_ID,
+      overridesByLocale,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'site_config.voice_save_failed',
-      expect.objectContaining({ tenantId: TENANT_ID }),
+      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(recordAuditEventMock).not.toHaveBeenCalled();
@@ -161,9 +165,12 @@ describe(saveVoiceOverridesAction, () => {
         },
       },
     };
-    upsertSiteConfigMock.mockResolvedValue({ ok: false, fieldErrorsByLocale });
+    upsertSiteConfigMock.mockResolvedValue(errorResult(fieldErrorsByLocale));
 
-    const result = await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
+    const result = await saveVoiceOverridesAction(
+      MOCK_TENANT_ID,
+      overridesByLocale,
+    );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -174,20 +181,23 @@ describe(saveVoiceOverridesAction, () => {
   });
 
   it('succeeds and revalidates once on a successful save', async () => {
-    const result = await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
+    const result = await saveVoiceOverridesAction(
+      MOCK_TENANT_ID,
+      overridesByLocale,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it('records a SETTINGS_UPDATED audit event on the site config after a confirmed save', async () => {
-    await saveVoiceOverridesAction(TENANT_ID, overridesByLocale);
+    await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
 
     expect(recordAuditEventMock).toHaveBeenCalledWith({
       logEvent: 'site_config.voice_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: { voiceOverridesByLocale: overridesByLocale },
     });
   });

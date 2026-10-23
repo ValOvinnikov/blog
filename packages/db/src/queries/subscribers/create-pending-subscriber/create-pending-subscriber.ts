@@ -6,7 +6,7 @@ import {
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
 import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq } from 'drizzle-orm';
 
@@ -38,13 +38,10 @@ export async function createPendingSubscriber(
     .returning();
 
   if (inserted) {
-    return {
-      ok: true,
-      data: {
-        outcome: SUBSCRIBER_OUTCOME.CREATED,
-        subscriber: inserted,
-      },
-    };
+    return okResult({
+      outcome: SUBSCRIBER_OUTCOME.CREATED,
+      subscriber: inserted,
+    });
   }
 
   const [existing] = await db
@@ -58,24 +55,18 @@ export async function createPendingSubscriber(
     );
 
   if (!existing) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
   if (existing.status === 'active') {
-    return {
-      ok: true,
-      data: {
-        outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
-        subscriber: existing,
-      },
-    };
+    return okResult({
+      outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
+      subscriber: existing,
+    });
   }
 
-  return {
-    ok: true,
-    data: {
-      outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
-      subscriber: existing,
-    },
-  };
+  return okResult({
+    outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
+    subscriber: existing,
+  });
 }

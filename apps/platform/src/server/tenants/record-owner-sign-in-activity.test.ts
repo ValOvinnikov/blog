@@ -1,8 +1,9 @@
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { okResult } from '@blog/utils';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { recordOwnerSignInActivity } from './record-owner-sign-in-activity';
@@ -31,13 +32,13 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-const { userId: USER_ID } = makeMembership();
+const { userId: USER_ID } = mockMembership();
 const DB_DOWN = new Error('db down');
-const OWNED_TENANT = makeTenant({ id: 'tenant-owned' });
-const EDITED_TENANT = makeTenant({ id: 'tenant-edited' });
+const OWNED_TENANT = mockTenant({ id: 'tenant-owned' });
+const EDITED_TENANT = mockTenant({ id: 'tenant-edited' });
 
 const membershipFor = (tenant: TTenant, role: TMembershipRole) => ({
-  membership: makeMembership({ userId: USER_ID, tenantId: tenant.id, role }),
+  membership: mockMembership({ userId: USER_ID, tenantId: tenant.id, role }),
   tenant,
 });
 
@@ -47,7 +48,7 @@ describe(recordOwnerSignInActivity, () => {
       membershipFor(OWNED_TENANT, MEMBERSHIP_ROLE.OWNER),
       membershipFor(EDITED_TENANT, MEMBERSHIP_ROLE.EDITOR),
     ]);
-    touchTenantActivityMock.mockResolvedValue({ ok: true, data: OWNED_TENANT });
+    touchTenantActivityMock.mockResolvedValue(okResult(OWNED_TENANT));
     wakeTenantFromInactivityMock.mockResolvedValue(null);
   });
 

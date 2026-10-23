@@ -1,17 +1,20 @@
-import { makeRawSectionPagesModule } from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_SECTION_PAGES_HEADING,
+  mockRawSectionPagesModule,
+} from '@blog/service/testing/modules/fixtures';
 
 import { toSectionPagesModuleDocument } from './transformer';
 
 describe(toSectionPagesModuleDocument, () => {
   it('maps an authored heading block', () => {
-    const module = toSectionPagesModuleDocument(makeRawSectionPagesModule());
+    const module = toSectionPagesModuleDocument(mockRawSectionPagesModule());
 
-    expect(module.headingBlock?.heading).toBe('In this section');
+    expect(module.headingBlock?.heading).toBe(MOCK_SECTION_PAGES_HEADING);
   });
 
   it('leaves the heading block, alignment and layout undefined when unset', () => {
     const module = toSectionPagesModuleDocument(
-      makeRawSectionPagesModule({
+      mockRawSectionPagesModule({
         headingBlock: null,
         contentAlignment: null,
         layout: null,

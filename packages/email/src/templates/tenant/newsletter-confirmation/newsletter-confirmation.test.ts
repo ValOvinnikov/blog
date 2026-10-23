@@ -1,8 +1,16 @@
 import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
 import type { TPortableTextContent } from '@blog/email/portable-text';
-import { TENANT_EMAIL_BRAND as BRAND } from '@blog/email/testing/tenant-email-brand';
+import {
+  MOCK_LOGO_URL,
+  MOCK_POSTAL_ADDRESS,
+  MOCK_TENANT_NAME,
+  MOCK_UNSAFE_MARKUP,
+} from '@blog/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
 
 import { buildNewsletterConfirmationEmail } from './newsletter-confirmation';
+
+const BODY_TEXT = 'Click the button below to confirm.';
 
 const CONFIRMATION_URL = 'https://example.com/api/newsletter/confirm?token=abc';
 const UNSUBSCRIBE_URL =
@@ -12,7 +20,7 @@ const BODY: TPortableTextContent = [
   {
     _type: 'block',
     style: 'normal',
-    children: [{ _type: 'span', text: 'Click the button below to confirm.' }],
+    children: [{ _type: 'span', text: BODY_TEXT }],
   },
 ];
 
@@ -26,8 +34,8 @@ describe('buildNewsletterConfirmationEmail', () => {
         body: BODY,
         confirmationUrl: CONFIRMATION_URL,
         unsubscribeUrl: UNSUBSCRIBE_URL,
-        brand: BRAND,
-        brandName: 'Acme Blog',
+        brand: MOCK_TENANT_EMAIL_BRAND,
+        brandName: MOCK_TENANT_NAME,
       });
     });
 
@@ -36,7 +44,7 @@ describe('buildNewsletterConfirmationEmail', () => {
     });
 
     it('renders the authored body through the shared serializer', () => {
-      expect(email.html).toContain('Click the button below to confirm.');
+      expect(email.html).toContain(BODY_TEXT);
     });
 
     it('renders both the confirm and unsubscribe actions', () => {
@@ -67,7 +75,7 @@ describe('buildNewsletterConfirmationEmail', () => {
     });
 
     it('renders the tenant brand name', () => {
-      expect(email.html).toContain('Acme Blog');
+      expect(email.html).toContain(MOCK_TENANT_NAME);
     });
 
     it('renders byte-identical html when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
@@ -77,8 +85,8 @@ describe('buildNewsletterConfirmationEmail', () => {
           body: BODY,
           confirmationUrl: CONFIRMATION_URL,
           unsubscribeUrl: UNSUBSCRIBE_URL,
-          brand: BRAND,
-          brandName: 'Acme Blog',
+          brand: MOCK_TENANT_EMAIL_BRAND,
+          brandName: MOCK_TENANT_NAME,
           logoImageUrl: undefined,
           footerPostalAddress: undefined,
         },
@@ -95,16 +103,16 @@ describe('buildNewsletterConfirmationEmail', () => {
         {
           _type: 'block',
           style: 'normal',
-          children: [{ _type: 'span', text: '<img src=x onerror=steal()>' }],
+          children: [{ _type: 'span', text: MOCK_UNSAFE_MARKUP }],
         },
       ],
       confirmationUrl: CONFIRMATION_URL,
       unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
+      brand: MOCK_TENANT_EMAIL_BRAND,
+      brandName: MOCK_TENANT_NAME,
     });
 
-    expect(html).not.toContain('<img src=x onerror=steal()>');
+    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
   });
 
   it('no authored body content can remove or duplicate the confirm/unsubscribe actions, even one that mimics them', () => {
@@ -131,8 +139,8 @@ describe('buildNewsletterConfirmationEmail', () => {
       body: impersonatingBody,
       confirmationUrl: CONFIRMATION_URL,
       unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
+      brand: MOCK_TENANT_EMAIL_BRAND,
+      brandName: MOCK_TENANT_NAME,
     });
 
     expect(html).not.toContain('evil.example');
@@ -156,7 +164,7 @@ describe('buildNewsletterConfirmationEmail', () => {
 
   it("renders the subscribing tenant's resolved brand, not a fixed palette", () => {
     const otherBrand: TTenantEmailBrand = {
-      ...BRAND,
+      ...MOCK_TENANT_EMAIL_BRAND,
       brandPrimarySolid: '#112233',
       brandPrimaryContrast: '#f0f0f0',
     };
@@ -167,7 +175,7 @@ describe('buildNewsletterConfirmationEmail', () => {
       confirmationUrl: CONFIRMATION_URL,
       unsubscribeUrl: UNSUBSCRIBE_URL,
       brand: otherBrand,
-      brandName: 'Acme Blog',
+      brandName: MOCK_TENANT_NAME,
     });
 
     expect(html).toContain(otherBrand.brandPrimarySolid);
@@ -180,13 +188,13 @@ describe('buildNewsletterConfirmationEmail', () => {
       body: BODY,
       confirmationUrl: CONFIRMATION_URL,
       unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-      logoImageUrl: 'https://cdn.example.com/logo.png',
-      footerPostalAddress: '123 Main St, Springfield',
+      brand: MOCK_TENANT_EMAIL_BRAND,
+      brandName: MOCK_TENANT_NAME,
+      logoImageUrl: MOCK_LOGO_URL,
+      footerPostalAddress: MOCK_POSTAL_ADDRESS,
     });
 
-    expect(html).toContain('<img src="https://cdn.example.com/logo.png"');
-    expect(html).toContain('123 Main St, Springfield');
+    expect(html).toContain(`<img src="${MOCK_LOGO_URL}"`);
+    expect(html).toContain(MOCK_POSTAL_ADDRESS);
   });
 });

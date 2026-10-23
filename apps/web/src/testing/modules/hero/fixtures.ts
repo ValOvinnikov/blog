@@ -1,6 +1,6 @@
 import type { ISanityImage } from '@blog/config';
 
-export const makeSanityImage = (
+export const mockSanityImage = (
   overrides: Partial<ISanityImage> = {},
 ): ISanityImage => {
   return {

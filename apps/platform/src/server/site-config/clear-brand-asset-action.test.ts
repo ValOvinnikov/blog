@@ -2,18 +2,23 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  DENSITY,
-  FONT_CHOICE,
   NEXT_NAVIGATION_ERROR,
-  PRESET_ID,
-  RADIUS_SCALE,
   type TMaybeNull,
 } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
+} from '@platform/testing/admins/operator';
+import { MOCK_BLOB_TOKEN } from '@platform/testing/blob/fixtures';
+import {
+  MOCK_LOGO_URL,
+  MOCK_FAVICON_URL,
+  MOCK_THEME_FIELDS,
+} from '@platform/testing/site-config/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -52,25 +57,12 @@ vi.mock('@vercel/blob', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-const BLOB_TOKEN = 'test-token';
-const LOGO_URL = 'https://example.blob.vercel-storage.com/logo.png';
-const FAVICON_URL = 'https://example.blob.vercel-storage.com/favicon.png';
-
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
-
-const THEME_FIELDS = {
-  preset: PRESET_ID.CONSOLE,
-  accentHue: 250,
-  headingFont: FONT_CHOICE.SPACE_GROTESK,
-  bodyFont: FONT_CHOICE.NEWSREADER,
-  radiusScale: RADIUS_SCALE.MD,
-  density: DENSITY.DEFAULT,
-};
 
 describe(clearBrandAssetAction, () => {
   beforeEach(() => {
@@ -82,15 +74,15 @@ describe(clearBrandAssetAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: TENANT_ID },
+      tenant: { id: MOCK_TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
     });
@@ -98,50 +90,52 @@ describe(clearBrandAssetAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    await clearBrandAssetAction(TENANT_ID, 'favicon');
+    await clearBrandAssetAction(MOCK_TENANT_ID, 'favicon');
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('nulls the logo column and deletes the stored blob', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
-      logoAssetUrl: LOGO_URL,
+      ...MOCK_THEME_FIELDS,
+      logoAssetUrl: MOCK_LOGO_URL,
       faviconAssetUrl: undefined,
     });
 
-    const result = await clearBrandAssetAction(TENANT_ID, 'logo');
+    const result = await clearBrandAssetAction(MOCK_TENANT_ID, 'logo');
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSiteConfigMock).toHaveBeenCalledWith(TENANT_ID, {
-      ...THEME_FIELDS,
+    expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: null,
     });
-    expect(delMock).toHaveBeenCalledWith(LOGO_URL, { token: BLOB_TOKEN });
+    expect(delMock).toHaveBeenCalledWith(MOCK_LOGO_URL, {
+      token: MOCK_BLOB_TOKEN,
+    });
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: undefined,
-      faviconAssetUrl: FAVICON_URL,
+      faviconAssetUrl: MOCK_FAVICON_URL,
     });
 
-    await clearBrandAssetAction(TENANT_ID, 'favicon');
+    await clearBrandAssetAction(MOCK_TENANT_ID, 'favicon');
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: { asset: 'favicon', operation: 'clear' },
     });
   });
 
   it('is a no-op success when the field is already empty, and records no audit event', async () => {
-    const result = await clearBrandAssetAction(TENANT_ID, 'favicon');
+    const result = await clearBrandAssetAction(MOCK_TENANT_ID, 'favicon');
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -151,13 +145,13 @@ describe(clearBrandAssetAction, () => {
 
   it('reports failure without throwing, and no audit event, when the write fails', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: undefined,
-      faviconAssetUrl: FAVICON_URL,
+      faviconAssetUrl: MOCK_FAVICON_URL,
     });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
-    const result = await clearBrandAssetAction(TENANT_ID, 'favicon');
+    const result = await clearBrandAssetAction(MOCK_TENANT_ID, 'favicon');
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -168,7 +162,7 @@ describe(clearBrandAssetAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
-    await expect(clearBrandAssetAction(TENANT_ID, 'logo')).rejects.toThrow(
+    await expect(clearBrandAssetAction(MOCK_TENANT_ID, 'logo')).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
@@ -180,7 +174,7 @@ describe(clearBrandAssetAction, () => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(clearBrandAssetAction(TENANT_ID, 'logo')).rejects.toThrow(
+    await expect(clearBrandAssetAction(MOCK_TENANT_ID, 'logo')).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 

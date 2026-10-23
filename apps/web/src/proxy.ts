@@ -1,4 +1,9 @@
-import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  type TLocaleIsoCode,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
 import { isCrawler } from '@web/utils/is-crawler';
@@ -62,7 +67,7 @@ const redirectSwitchedOffLocale = (
   return NextResponse.redirect(target);
 };
 
-const DETECTABLE_METHODS = new Set(['GET', 'HEAD']);
+const DETECTABLE_METHODS = new Set<string>([HTTP_METHOD.GET, HTTP_METHOD.HEAD]);
 
 const redirectToPreferredTranslation = async (
   request: NextRequest,
@@ -178,7 +183,7 @@ export default async function proxy(
   const firstSegment = getDecodedFirstPathSegment(pathname);
 
   if (firstSegment === undefined || isTenantShapedPathSegment(firstSegment)) {
-    return new NextResponse(null, { status: 404 });
+    return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
   if (DOTTED_PATH_PATTERN.test(pathname) && !FEED_PATH_PATTERN.test(pathname)) {
@@ -193,13 +198,13 @@ export default async function proxy(
     tenantRouting = await resolveTenantRouting(host);
   } catch (error) {
     logger.error('proxy.tenant_lookup_failed', { host, error });
-    return new NextResponse(null, { status: 503 });
+    return new NextResponse(null, { status: HTTP_STATUS.SERVICE_UNAVAILABLE });
   }
 
   const tenantId = tenantRouting?.tenantId;
 
   if (!tenantId && isProductionEnvironment()) {
-    return new NextResponse(null, { status: 404 });
+    return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
   request.headers.delete(TENANT_ID_HEADER);

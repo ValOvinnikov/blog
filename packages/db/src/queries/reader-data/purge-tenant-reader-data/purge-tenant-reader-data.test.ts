@@ -6,7 +6,7 @@ import {
   insertTestLead,
   insertTestTenant,
   insertTestUser,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -33,11 +33,11 @@ async function seedReaderData(tenantId: string): Promise<void> {
   const user = await insertTestUser(db());
   await db()
     .insert(schema.subscribers)
-    .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL });
+    .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
   await addBookmark(tenantId, user.id, 'purged-post');
   await createMembershipInvite(
     tenantId,
-    TEST_SUBSCRIBER_EMAIL,
+    MOCK_SUBSCRIBER_EMAIL,
     MEMBERSHIP_ROLE.EDITOR,
   );
   await insertTestLead(db(), tenantId);

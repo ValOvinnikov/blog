@@ -1,29 +1,32 @@
-import type { TGitHubFailureReason } from '@platform/server/github/fetch-github';
+import type { TValueOf } from '@blog/config/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
+import {
+  GITHUB_FAILURE,
+  type TGitHubFailure,
+} from '@platform/constants/github';
+import { RELEASE_FAILURE } from '@platform/constants/release';
 import { logger } from '@platform/utils/logger/logger';
 
 export type TReleaseCandidateFailureReason =
-  | Exclude<TGitHubFailureReason, 'notFound'>
-  | 'noReleaseTag'
-  | 'tagListIncomplete'
-  | 'dbError';
+  | Exclude<TGitHubFailure, typeof GITHUB_FAILURE.NOT_FOUND>
+  | TValueOf<typeof RELEASE_FAILURE>;
 
-export type TReleaseResult<T> =
-  { ok: true; data: T } | { ok: false; reason: TReleaseCandidateFailureReason };
+export type TReleaseResult<T> = TResult<T, TReleaseCandidateFailureReason>;
 
 export const toReleaseFailure = (
-  reason: TGitHubFailureReason | 'tagListIncomplete',
-): { ok: false; reason: TReleaseCandidateFailureReason } => ({
-  ok: false,
-  reason: reason === 'notFound' ? 'githubError' : reason,
-});
+  reason: TGitHubFailure | typeof RELEASE_FAILURE.TAG_LIST_INCOMPLETE,
+): TReleaseResult<never> =>
+  errorResult(
+    reason === GITHUB_FAILURE.NOT_FOUND ? GITHUB_FAILURE.GITHUB_ERROR : reason,
+  );
 
 export const readDb = async <T>(
   read: () => Promise<T>,
 ): Promise<TReleaseResult<T>> => {
   try {
-    return { ok: true, data: await read() };
+    return okResult(await read());
   } catch (error) {
     logger.error('releases.db_read_failed', { error });
-    return { ok: false, reason: 'dbError' };
+    return errorResult(RELEASE_FAILURE.DB_ERROR);
   }
 };

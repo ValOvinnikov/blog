@@ -4,7 +4,12 @@ import {
   HTTP_METHOD,
   HTTP_STATUS,
 } from '@blog/config';
-import { PRESET_ID } from '@blog/config/constants';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
@@ -18,9 +23,14 @@ import {
   useFetchFake,
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
 import {
-  SANITY_EXPECTED_URL,
-  SANITY_PROJECT_ID,
+  MOCK_SANITY_EXPECTED_URL,
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_SANITY_TOKEN,
 } from '@blog/db/testing/sanity-management-client/fixtures';
+import {
+  MOCK_MISSING_TENANT_ID,
+  MOCK_TENANT_DOMAIN,
+} from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { deleteTenant } from './delete-tenant';
@@ -30,6 +40,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+
+const MOCK_USER_ID = 'user-1';
 
 async function insertTenant(
   options: {
@@ -47,6 +59,10 @@ async function insertTenant(
   });
 
   return tenant.id;
+}
+
+function selectTenantRows(tenantId: string) {
+  return db().select().from(tenants).where(eq(tenants.id, tenantId));
 }
 
 afterEach(async () => {
@@ -75,27 +91,23 @@ describe(deleteTenant, () => {
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
       });
 
-      const remaining = await db()
-        .select()
-        .from(tenants)
-        .where(eq(tenants.id, tenantId));
-      expect(remaining).toEqual([]);
+      expect(await selectTenantRows(tenantId)).toEqual([]);
     });
 
     describe('with a user', () => {
       beforeEach(async () => {
-        await db().insert(schema.users).values({ id: 'user-1' });
+        await db().insert(schema.users).values({ id: MOCK_USER_ID });
       });
 
-      it('cascades to dependent membership and tenant_domains rows for that tenant', async () => {
+      it('cascades to the tenant membership and tenant_domains rows', async () => {
         await db().insert(schema.memberships).values({
-          userId: 'user-1',
+          userId: MOCK_USER_ID,
           tenantId,
           role: MEMBERSHIP_ROLE.OWNER,
         });
         await db().insert(schema.tenantDomains).values({
           tenantId,
-          domain: 'acme.example.com',
+          domain: MOCK_TENANT_DOMAIN,
         });
 
         await deleteTenant(tenantId);
@@ -120,7 +132,7 @@ describe(deleteTenant, () => {
         });
         await db().insert(schema.bookmarks).values({
           tenantId,
-          userId: 'user-1',
+          userId: MOCK_USER_ID,
           postId: 'post-1',
         });
 
@@ -145,10 +157,10 @@ describe(deleteTenant, () => {
         tenantId,
         preset: PRESET_ID.CONSOLE,
         accentHue: 250,
-        headingFont: 'SPACE_GROTESK',
-        bodyFont: 'NEWSREADER',
-        radiusScale: 'MD',
-        density: 'DEFAULT',
+        headingFont: FONT_CHOICE.SPACE_GROTESK,
+        bodyFont: FONT_CHOICE.NEWSREADER,
+        radiusScale: RADIUS_SCALE.MD,
+        density: DENSITY.DEFAULT,
       });
 
       await deleteTenant(tenantId);
@@ -168,131 +180,113 @@ describe(deleteTenant, () => {
 
     expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED });
 
-    const remaining = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(remaining).toHaveLength(1);
+    expect(await selectTenantRows(tenantId)).toHaveLength(1);
   });
 
   it('returns not-found for a tenant id that does not exist', async () => {
-    const missingId = '00000000-0000-0000-0000-000000000000';
-
-    const result = await deleteTenant(missingId);
+    const result = await deleteTenant(MOCK_MISSING_TENANT_ID);
 
     expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_FOUND });
   });
-});
 
-describe('deleteTenant — Sanity project deletion', () => {
-  const fetchMock = useFetchFake();
+  describe('Sanity project deletion', () => {
+    const fetchMock = useFetchFake();
 
-  describe('a tenant with a Sanity project', () => {
-    let tenantId: string;
+    describe('a tenant with a Sanity project', () => {
+      let tenantId: string;
 
-    beforeEach(async () => {
-      tenantId = await insertTenant({
-        archived: true,
-        sanityProjectId: SANITY_PROJECT_ID,
+      beforeEach(async () => {
+        tenantId = await insertTenant({
+          archived: true,
+          sanityProjectId: MOCK_SANITY_PROJECT_ID,
+        });
+      });
+
+      it('does not attempt Sanity deletion when no token is supplied', async () => {
+        const result = await deleteTenant(tenantId);
+
+        expect(fetchMock).not.toHaveBeenCalled();
+        expect(result).toEqual({
+          outcome: TENANT_DELETE_OUTCOME.DELETED,
+          sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN,
+        });
+      });
+
+      it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
+        fetchMock.mockResolvedValue(emptyResponse());
+
+        const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        const { url, method } = firstFetchCall(fetchMock);
+        expect(url).toBe(MOCK_SANITY_EXPECTED_URL.project);
+        expect(method).toBe(HTTP_METHOD.DELETE);
+        expect(result).toEqual({
+          outcome: TENANT_DELETE_OUTCOME.DELETED,
+          sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED,
+        });
+      });
+
+      it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
+        fetchMock.mockResolvedValue(
+          textResponse('not found', HTTP_STATUS.NOT_FOUND),
+        );
+
+        const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+
+        expect(result).toEqual({
+          outcome: TENANT_DELETE_OUTCOME.DELETED,
+          sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE,
+        });
+
+        expect(await selectTenantRows(tenantId)).toEqual([]);
+      });
+
+      it('hard-deletes the row and reports left-archived on the org-billing 401', async () => {
+        fetchMock.mockResolvedValue(
+          jsonResponse(
+            {
+              code: HTTP_STATUS.UNAUTHORIZED,
+              status: 'Unauthorized',
+              message: `Cancellation of project "${MOCK_SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
+            },
+            HTTP_STATUS.UNAUTHORIZED,
+          ),
+        );
+
+        const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+
+        expect(result).toEqual({
+          outcome: TENANT_DELETE_OUTCOME.DELETED,
+          sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED,
+        });
+
+        expect(await selectTenantRows(tenantId)).toEqual([]);
+      });
+
+      it('throws on a non-billing Sanity failure and leaves the row untouched', async () => {
+        fetchMock.mockResolvedValue(
+          textResponse('forbidden', HTTP_STATUS.FORBIDDEN),
+        );
+
+        await expect(deleteTenant(tenantId, MOCK_SANITY_TOKEN)).rejects.toThrow(
+          new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
+        );
+
+        expect(await selectTenantRows(tenantId)).toHaveLength(1);
       });
     });
 
-    it('does not attempt Sanity deletion when no token is supplied', async () => {
-      const result = await deleteTenant(tenantId);
+    it('reports no-project when the tenant never had one, even with a token', async () => {
+      const tenantId = await insertTenant({ archived: true });
+
+      const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(result).toEqual({
         outcome: TENANT_DELETE_OUTCOME.DELETED,
-        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.SKIPPED_NO_TOKEN,
+        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
       });
-    });
-
-    it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
-      fetchMock.mockResolvedValue(emptyResponse());
-
-      const result = await deleteTenant(tenantId, 'mgmt-token');
-
-      expect(fetchMock).toHaveBeenCalledTimes(1);
-      const { url, method } = firstFetchCall(fetchMock);
-      expect(url).toBe(SANITY_EXPECTED_URL.project);
-      expect(method).toBe(HTTP_METHOD.DELETE);
-      expect(result).toEqual({
-        outcome: TENANT_DELETE_OUTCOME.DELETED,
-        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.DELETED,
-      });
-    });
-
-    it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
-      fetchMock.mockResolvedValue(
-        textResponse('not found', HTTP_STATUS.NOT_FOUND),
-      );
-
-      const result = await deleteTenant(tenantId, 'mgmt-token');
-
-      expect(result).toEqual({
-        outcome: TENANT_DELETE_OUTCOME.DELETED,
-        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE,
-      });
-
-      const remaining = await db()
-        .select()
-        .from(tenants)
-        .where(eq(tenants.id, tenantId));
-      expect(remaining).toEqual([]);
-    });
-
-    it('still hard-deletes the row and reports left-archived on the org-billing 401', async () => {
-      fetchMock.mockResolvedValue(
-        jsonResponse(
-          {
-            code: HTTP_STATUS.UNAUTHORIZED,
-            status: 'Unauthorized',
-            message: `Cancellation of project "${SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
-          },
-          HTTP_STATUS.UNAUTHORIZED,
-        ),
-      );
-
-      const result = await deleteTenant(tenantId, 'mgmt-token');
-
-      expect(result).toEqual({
-        outcome: TENANT_DELETE_OUTCOME.DELETED,
-        sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED,
-      });
-
-      const remaining = await db()
-        .select()
-        .from(tenants)
-        .where(eq(tenants.id, tenantId));
-      expect(remaining).toEqual([]);
-    });
-
-    it('still throws on a Sanity failure unrelated to billing permission, and leaves the row untouched', async () => {
-      fetchMock.mockResolvedValue(
-        textResponse('forbidden', HTTP_STATUS.FORBIDDEN),
-      );
-
-      await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(
-        new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
-      );
-
-      const remaining = await db()
-        .select()
-        .from(tenants)
-        .where(eq(tenants.id, tenantId));
-      expect(remaining).toHaveLength(1);
-    });
-  });
-
-  it('reports no-project when the tenant never had one, even with a token supplied', async () => {
-    const tenantId = await insertTenant({ archived: true });
-
-    const result = await deleteTenant(tenantId, 'mgmt-token');
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      outcome: TENANT_DELETE_OUTCOME.DELETED,
-      sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
     });
   });
 });

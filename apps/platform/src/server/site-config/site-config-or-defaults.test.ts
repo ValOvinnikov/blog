@@ -1,5 +1,6 @@
 import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getSiteConfigOrDefaults } from './site-config-or-defaults';
 
@@ -10,8 +11,6 @@ const { getSiteConfigMock } = vi.hoisted(() => ({
 vi.mock('@blog/db', () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
-
-const LOGO_ASSET_URL = 'https://example.blob.vercel-storage.com/logo.png';
 
 describe(getSiteConfigOrDefaults, () => {
   beforeEach(() => {
@@ -27,12 +26,12 @@ describe(getSiteConfigOrDefaults, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
-      logoAssetUrl: LOGO_ASSET_URL,
+      logoAssetUrl: MOCK_LOGO_URL,
       faviconAssetUrl: undefined,
       voiceOverrides: {},
     });
 
-    const result = await getSiteConfigOrDefaults(TENANT_ID);
+    const result = await getSiteConfigOrDefaults(MOCK_TENANT_ID);
 
     expect(result).toEqual({
       preset: PRESET_ID.EDITORIAL,
@@ -41,7 +40,7 @@ describe(getSiteConfigOrDefaults, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
-      logoAssetUrl: LOGO_ASSET_URL,
+      logoAssetUrl: MOCK_LOGO_URL,
       faviconAssetUrl: undefined,
     });
   });
@@ -49,7 +48,7 @@ describe(getSiteConfigOrDefaults, () => {
   it('falls back to the Console preset defaults with no asset URLs when no row exists', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
-    const result = await getSiteConfigOrDefaults(TENANT_ID);
+    const result = await getSiteConfigOrDefaults(MOCK_TENANT_ID);
 
     expect(result).toEqual({
       preset: PRESET_ID.CONSOLE,

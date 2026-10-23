@@ -104,10 +104,10 @@ export const useEmailDraft = ({
             uploadEmailLogoAction(tenantId, logoTarget, formData),
           clear: () => clearEmailLogoAction(tenantId, logoTarget),
         });
-        if (!result.ok) return finish(result.failure.outcome);
+        if (!result.ok) return finish(result.error.failure.outcome);
 
-        nextSaved = withLogo(nextSaved, target, result.image);
-        nextDraft = withLogo(nextDraft, target, result.image);
+        nextSaved = withLogo(nextSaved, target, result.data);
+        nextDraft = withLogo(nextDraft, target, result.data);
       }
 
       if (isSenderChanged(saved, draft)) {

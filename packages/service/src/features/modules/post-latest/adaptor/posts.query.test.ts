@@ -1,8 +1,11 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
+  MOCK_DESIGN_EN_POST_ID,
+  MOCK_DESIGN_NL_POST_ID,
+  MOCK_ONLY_EN_POST_ID,
+  MOCK_TRANSLATED_POST_DOCUMENTS,
   toIds,
-  translatedPostDocuments,
 } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postLatestModulePostsQuery } from './posts.query';
@@ -13,7 +16,7 @@ async function run(limit: number, locale: string): Promise<string[]> {
   return toIds(
     await evaluateGroqExpression(
       postLatestModulePostsQuery(limit).query,
-      translatedPostDocuments,
+      MOCK_TRANSLATED_POST_DOCUMENTS,
       undefined,
       { locale, defaultLocale: EN },
     ),
@@ -22,7 +25,10 @@ async function run(limit: number, locale: string): Promise<string[]> {
 
 describe('postLatestModulePostsQuery', () => {
   it('lists published posts in the request language, newest first, up to the limit', async () => {
-    expect(await run(2, EN)).toEqual(['only-en', 'design-en']);
-    expect(await run(3, NL)).toEqual(['design-nl']);
+    expect(await run(2, EN)).toEqual([
+      MOCK_ONLY_EN_POST_ID,
+      MOCK_DESIGN_EN_POST_ID,
+    ]);
+    expect(await run(3, NL)).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 });

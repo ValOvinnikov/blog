@@ -1,3 +1,9 @@
+import {
+  MOCK_EMAIL_ADDRESS,
+  MOCK_INVALID_EMAIL_ADDRESS,
+  MOCK_RESEND_API_KEY,
+} from '@blog/email/testing/email-fixtures';
+
 import type { TSendEmailInput } from './send-email';
 
 const { sendMock, resendCtorMock } = vi.hoisted(() => ({
@@ -13,8 +19,6 @@ vi.mock('resend', () => ({
     }
   },
 }));
-
-const RESEND_API_KEY = 'test-resend-key';
 
 const EMAIL = {
   to: 'reader@example.com',
@@ -40,7 +44,7 @@ describe('sendEmail', () => {
   beforeEach(async () => {
     sendMock.mockReset();
     resendCtorMock.mockReset();
-    process.env['RESEND_API_KEY'] = RESEND_API_KEY;
+    process.env['RESEND_API_KEY'] = MOCK_RESEND_API_KEY;
     sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
     ({ sendEmail } = await importSendEmail());
   });
@@ -79,7 +83,7 @@ describe('sendEmail', () => {
   it('constructs the Resend client with the configured API key', async () => {
     await sendEmail(EMAIL);
 
-    expect(resendCtorMock).toHaveBeenCalledWith(RESEND_API_KEY);
+    expect(resendCtorMock).toHaveBeenCalledWith(MOCK_RESEND_API_KEY);
   });
 
   it('reuses a single Resend client across calls', async () => {
@@ -90,7 +94,7 @@ describe('sendEmail', () => {
   });
 
   it('forwards a given replyTo address to the Resend client', async () => {
-    const replyTo = 'editor@example.com';
+    const replyTo = MOCK_EMAIL_ADDRESS;
 
     await sendEmail({ ...EMAIL, replyTo });
 
@@ -105,7 +109,7 @@ describe('sendEmail', () => {
 
   it('rejects a malformed replyTo address before calling the Resend client', async () => {
     await expect(
-      sendEmail({ ...EMAIL, replyTo: 'not-an-email' }),
+      sendEmail({ ...EMAIL, replyTo: MOCK_INVALID_EMAIL_ADDRESS }),
     ).rejects.toThrow('sendEmail received a malformed replyTo address');
     expect(sendMock).not.toHaveBeenCalled();
   });

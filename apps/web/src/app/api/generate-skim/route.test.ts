@@ -1,4 +1,5 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { logger } from '@web/utils/logger/logger';
 
 const {
@@ -120,9 +121,9 @@ describe('POST /api/generate-skim', () => {
     let POST: typeof import('./route').POST;
 
     beforeEach(async () => {
-      getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
+      getPublishedPostBodyMock.mockResolvedValue(okResult([]));
       generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
-      saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
+      saveSkimDraftMock.mockResolvedValue(okResult());
       ({ POST } = await import('./route'));
     });
 
@@ -161,10 +162,9 @@ describe('POST /api/generate-skim', () => {
     });
 
     it('returns 500 when reading the published post body fails', async () => {
-      getPublishedPostBodyMock.mockResolvedValue({
-        ok: false,
-        error: new Error('not found'),
-      });
+      getPublishedPostBodyMock.mockResolvedValue(
+        errorResult(new Error('not found')),
+      );
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
       expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
@@ -194,10 +194,9 @@ describe('POST /api/generate-skim', () => {
     });
 
     it('returns 500 when saving the draft fails for another reason', async () => {
-      saveSkimDraftMock.mockResolvedValue({
-        ok: false,
-        error: new Error('network error'),
-      });
+      saveSkimDraftMock.mockResolvedValue(
+        errorResult(new Error('network error')),
+      );
       const response = await POST(makeRequest({ _id: 'post-1' }));
 
       expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);

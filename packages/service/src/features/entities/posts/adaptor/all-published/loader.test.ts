@@ -1,56 +1,30 @@
-import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  mockFeedPostViews,
+  mockRawFeedPosts,
+} from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { MOCK_POSTS_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getAllPublishedPosts } from './loader';
+import { allPublishedPostsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getAllPublishedPosts, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue([]);
   });
 
-  it('fetches every published post with no pagination parameters', async () => {
-    mockRun.mockResolvedValue([
-      makeRawFeedPost({
-        headingBlock: makeRawHeadingBlock('First'),
-        slug: 'first',
-      }),
-      makeRawFeedPost({
-        headingBlock: makeRawHeadingBlock('Second'),
-        slug: 'second',
-      }),
-    ]);
+  it('maps every published post into a feed post', async () => {
+    mockRun.mockResolvedValueOnce(mockRawFeedPosts());
 
     const result = await getAllPublishedPosts(tenant);
 
-    expect(result).toEqual([
-      {
-        title: 'First',
-        slug: 'first',
-        excerpt: undefined,
-        publishedAt: '2026-01-15T00:00:00Z',
-      },
-      {
-        title: 'Second',
-        slug: 'second',
-        excerpt: undefined,
-        publishedAt: '2026-01-15T00:00:00Z',
-      },
-    ]);
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.not.objectContaining({ parameters: expect.anything() }),
-    );
+    expect(result).toEqual(mockFeedPostViews());
   });
 
   it('returns an empty array when there are no published posts', async () => {
@@ -59,15 +33,15 @@ describe(getAllPublishedPosts, () => {
     expect(result).toEqual([]);
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+  it('queries unpaginated for the tenant with tenant-scoped tags', async () => {
     await getAllPublishedPosts(tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:posts'] }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(allPublishedPostsQuery, {
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_POSTS_CACHE_TAG],
+      },
+    });
   });
 });

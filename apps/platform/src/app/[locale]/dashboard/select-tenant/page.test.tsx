@@ -2,7 +2,13 @@ import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -44,7 +50,7 @@ describe(`<${SelectTenantPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
   });
 
   it('redirects to /workspace-pending with zero memberships', async () => {
@@ -52,38 +58,42 @@ describe(`<${SelectTenantPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/workspace-pending');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.workspacePending());
   });
 
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID },
       },
     ]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/dashboard');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.dashboard());
   });
 
   it('renders the picker for multiple memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: TENANT_ID },
-        tenant: { id: TENANT_ID, name: 'Acme Inc.' },
+        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
+        tenant: { id: MOCK_TENANT_ID, name: MOCK_TENANT_NAME },
       },
       {
-        membership: { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2' },
-        tenant: { id: 'tenant-2', name: 'Globex Corp.' },
+        membership: {
+          id: 'm-2',
+          userId: 'user-1',
+          tenantId: MOCK_OTHER_TENANT_ID,
+        },
+        tenant: { id: MOCK_OTHER_TENANT_ID, name: MOCK_OTHER_TENANT_NAME },
       },
     ]);
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { name: 'Choose a workspace' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { name: 'Choose a workspace' });
+
+    expect(heading).toBeVisible();
   });
 });

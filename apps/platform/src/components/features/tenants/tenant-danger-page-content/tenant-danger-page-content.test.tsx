@@ -4,9 +4,11 @@ import {
 } from '@blog/db/constants';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
-  idleDeprovisioningSteps,
-  makeClientTenant,
-  TENANT_ID,
+  mockIdleDeprovisioningSteps,
+  mockClientTenant,
+  MOCK_RUN_PLUS_1_MIN_AT,
+  MOCK_RUN_STARTED_AT,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
@@ -39,15 +41,15 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: vi.fn(),
 }));
 
-const runStarted = { startedAt: '2026-08-12T14:18:00.000Z' };
+const runStarted = { startedAt: MOCK_RUN_STARTED_AT };
 
 const failedSteps = {
-  ...idleDeprovisioningSteps(),
+  ...mockIdleDeprovisioningSteps(),
   [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
     status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
     error: 'boom',
   },
-  run: { ...runStarted, finishedAt: '2026-08-12T14:19:00.000Z' },
+  run: { ...runStarted, finishedAt: MOCK_RUN_PLUS_1_MIN_AT },
 };
 
 const getTrigger = () => screen.getByRole('button', { name: 'Deprovision' });
@@ -60,7 +62,7 @@ const advancePoll = async (ticks = 1) => {
 
 const ARIA_DISABLED = 'aria-disabled';
 
-describe(TenantDangerPageContent, () => {
+describe(`<${TenantDangerPageContent.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     getTenantDeprovisioningStatusActionMock.mockReset();
@@ -74,39 +76,47 @@ describe(TenantDangerPageContent, () => {
   it('sends no status requests and shows no progress for a tenant that has never been deprovisioned', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({ deprovisionedAt: null })}
+        tenant={mockClientTenant({ deprovisionedAt: null })}
       />,
     );
 
     await advancePoll(3);
 
-    expect(getTrigger()).toBeEnabled();
-    expect(getTrigger()).not.toHaveAttribute(ARIA_DISABLED);
-    expect(screen.queryByText('Remove domain')).not.toBeInTheDocument();
+    const trigger = getTrigger();
+    const removeDomainStep = screen.queryByText('Remove domain');
+
+    expect(trigger).toBeEnabled();
+    expect(trigger).not.toHaveAttribute(ARIA_DISABLED);
+    expect(removeDomainStep).not.toBeInTheDocument();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
 
   it('shows the starting state and keeps the trigger aria-disabled while a pending request has no run yet', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({
+        tenant={mockClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: null,
         })}
-        deprovisionRequestedAt="2026-08-12T14:18:00.000Z"
+        deprovisionRequestedAt={MOCK_RUN_STARTED_AT}
       />,
     );
 
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(getTrigger()).not.toBeDisabled();
+    const startingState = screen.getByText('Starting…');
+    const trigger = getTrigger();
+
+    expect(startingState).toBeVisible();
+    expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(trigger).not.toBeDisabled();
 
     await advancePoll();
 
+    const triggerAfterPoll = getTrigger();
+
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
     );
-    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(triggerAfterPoll).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('keeps the trigger aria-disabled while a run is in progress and re-enables it once the run fails', async () => {
@@ -116,28 +126,32 @@ describe(TenantDangerPageContent, () => {
     });
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({
+        tenant={mockClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: {
-            ...idleDeprovisioningSteps(),
+            ...mockIdleDeprovisioningSteps(),
             run: runStarted,
           },
         })}
       />,
     );
 
-    expect(getTrigger()).toHaveAttribute(ARIA_DISABLED, 'true');
+    const triggerWhileRunning = getTrigger();
+
+    expect(triggerWhileRunning).toHaveAttribute(ARIA_DISABLED, 'true');
 
     await advancePoll();
 
-    expect(getTrigger()).toBeEnabled();
-    expect(getTrigger()).not.toHaveAttribute(ARIA_DISABLED);
+    const triggerAfterFailure = getTrigger();
+
+    expect(triggerAfterFailure).toBeEnabled();
+    expect(triggerAfterFailure).not.toHaveAttribute(ARIA_DISABLED);
   });
 
   it('keeps the trigger enabled and does not poll for a run that had already failed', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeClientTenant({
+        tenant={mockClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: failedSteps,
         })}
@@ -146,7 +160,9 @@ describe(TenantDangerPageContent, () => {
 
     await advancePoll(2);
 
-    expect(getTrigger()).toBeEnabled();
+    const trigger = getTrigger();
+
+    expect(trigger).toBeEnabled();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
 });

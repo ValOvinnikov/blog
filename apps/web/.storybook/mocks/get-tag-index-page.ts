@@ -1,18 +1,18 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import type { TTagIndexPage } from '@blog/service';
 import type { TResult } from '@blog/utils';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
 const tagIndexPage: TTagIndexPage = {
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
-  headingBlock: makeHeadingBlock({
+  headingBlock: mockHeadingBlock({
     heading: 'Tags',
     supportingText: 'Browse every post by tag.',
   }),
   hero: undefined,
   modules: [],
-  seo: makeSeo(),
+  seo: mockSeo(),
   translations: [LOCALE_ISO_CODES.EN],
 };
 

@@ -3,7 +3,13 @@ import { TENANT_PLAN, MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -53,27 +59,27 @@ vi.mock('next/headers', () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const tenant1 = {
-  id: TENANT_ID,
-  name: 'Acme Inc.',
+  id: MOCK_TENANT_ID,
+  name: MOCK_TENANT_NAME,
   primaryDomain: 'acme.com',
   plan: TENANT_PLAN.FREE,
 };
 const tenant2 = {
-  id: 'tenant-2',
-  name: 'Globex Corp.',
+  id: MOCK_OTHER_TENANT_ID,
+  name: MOCK_OTHER_TENANT_NAME,
   primaryDomain: 'globex.com',
   plan: TENANT_PLAN.GROWTH,
 };
 const membership1 = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 const membership2 = {
   id: 'm-2',
   userId: 'user-1',
-  tenantId: 'tenant-2',
+  tenantId: MOCK_OTHER_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 
@@ -88,6 +94,8 @@ const setup = customRenderAsync(DashboardTenantLayout, {
 });
 
 const DASHBOARD_CONTENT = 'dashboard content';
+const LEADS = 'Leads';
+const TEAM = 'Team';
 
 describe(`<${DashboardTenantLayout.name}/>`, () => {
   beforeEach(() => {
@@ -106,35 +114,36 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       { membership: membership1, tenant: tenant1 },
       { membership: membership2, tenant: tenant2 },
     ]);
-    mockCookie('tenant-2');
+    mockCookie(MOCK_OTHER_TENANT_ID);
   });
 
   it('offers Leads on a plan with the contact form', async () => {
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Leads' })).toHaveAttribute(
-      'href',
-      '/dashboard/leads',
-    );
+    const leadsLink = screen.getByRole('link', { name: LEADS });
+
+    expect(leadsLink).toHaveAttribute('href', adminRoutes.dashboardLeads());
   });
 
   it('hides Leads from a plan without the contact form and no stored leads', async () => {
-    mockCookie(TENANT_ID);
+    mockCookie(MOCK_TENANT_ID);
 
     await setup();
 
-    expect(
-      screen.queryByRole('link', { name: 'Leads' }),
-    ).not.toBeInTheDocument();
+    const leadsLink = screen.queryByRole('link', { name: LEADS });
+
+    expect(leadsLink).not.toBeInTheDocument();
   });
 
   it('keeps Leads for a downgraded owner who still has stored leads', async () => {
-    mockCookie(TENANT_ID);
+    mockCookie(MOCK_TENANT_ID);
     listLeadsMock.mockResolvedValue({ leads: [], total: 3 });
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Leads' })).toBeVisible();
+    const leadsLink = screen.getByRole('link', { name: LEADS });
+
+    expect(leadsLink).toBeVisible();
   });
 
   it('hides Leads from an editor', async () => {
@@ -147,9 +156,9 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.queryByRole('link', { name: 'Leads' }),
-    ).not.toBeInTheDocument();
+    const leadsLink = screen.queryByRole('link', { name: LEADS });
+
+    expect(leadsLink).not.toBeInTheDocument();
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {
@@ -157,7 +166,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
@@ -166,7 +175,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/workspace-pending');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.workspacePending());
   });
 
   it('redirects to the picker for several memberships and no active-tenant cookie', async () => {
@@ -174,14 +183,17 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/dashboard/select-tenant');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.dashboardSelectTenant());
   });
 
   it('renders the active tenant and a switcher for several memberships with the cookie', async () => {
     await setup();
 
-    expect(screen.getByText(DASHBOARD_CONTENT)).toBeVisible();
-    expect(screen.getByRole('button', { name: /globex\.com/i })).toBeVisible();
+    const content = screen.getByText(DASHBOARD_CONTENT);
+    const switcher = screen.getByRole('button', { name: /globex\.com/i });
+
+    expect(content).toBeVisible();
+    expect(switcher).toBeVisible();
   });
 
   describe('with one membership', () => {
@@ -194,46 +206,50 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     it('renders the gated content with no switcher for a user with one membership', async () => {
       await setup();
 
-      expect(screen.getByText(DASHBOARD_CONTENT)).toBeVisible();
+      const content = screen.getByText(DASHBOARD_CONTENT);
+      const switcher = screen.queryByRole('button', { name: /acme\.com/i });
+
+      expect(content).toBeVisible();
       expect(redirect).not.toHaveBeenCalled();
-      expect(
-        screen.queryByRole('button', { name: /acme\.com/i }),
-      ).not.toBeInTheDocument();
+      expect(switcher).not.toBeInTheDocument();
     });
 
     it('shows Tenant nav destinations under /dashboard, without a Platform section', async () => {
       await setup();
 
-      expect(screen.getByRole('link', { name: /look/i })).toHaveAttribute(
-        'href',
-        '/dashboard/look',
-      );
-      expect(screen.queryByText('Platform')).not.toBeInTheDocument();
+      const lookLink = screen.getByRole('link', { name: /look/i });
+      const platformSection = screen.queryByText('Platform');
+
+      expect(lookLink).toHaveAttribute('href', adminRoutes.dashboardLook());
+      expect(platformSection).not.toBeInTheDocument();
     });
   });
 
   it('hides Languages and Team from a FREE tenant', async () => {
-    mockCookie(TENANT_ID);
+    mockCookie(MOCK_TENANT_ID);
 
     await setup();
 
-    expect(
-      screen.queryByRole('link', { name: /languages/i }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Team')).not.toBeInTheDocument();
+    const languagesLink = screen.queryByRole('link', { name: /languages/i });
+    const teamText = screen.queryByText(TEAM);
+
+    expect(languagesLink).not.toBeInTheDocument();
+    expect(teamText).not.toBeInTheDocument();
   });
 
   it('shows Languages as a link and Team as "Coming soon" to a GROWTH tenant', async () => {
     await setup();
 
-    expect(screen.getByRole('link', { name: /languages/i })).toHaveAttribute(
+    const languagesLink = screen.getByRole('link', { name: /languages/i });
+    const teamText = screen.getByText(TEAM);
+    const teamLink = screen.queryByRole('link', { name: /team/i });
+
+    expect(languagesLink).toHaveAttribute(
       'href',
-      '/dashboard/languages',
+      adminRoutes.dashboardLanguages(),
     );
-    expect(screen.getByText('Team')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: /team/i }),
-    ).not.toBeInTheDocument();
+    expect(teamText).toBeVisible();
+    expect(teamLink).not.toBeInTheDocument();
   });
 
   it('shows the platform role, never OWNER, for a SUPERADMIN with no memberships row', async () => {
@@ -247,8 +263,12 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText(DASHBOARD_CONTENT)).toBeVisible();
-    expect(screen.getByText('Super admin · Platform')).toBeVisible();
-    expect(screen.queryByText(/Owner/)).not.toBeInTheDocument();
+    const content = screen.getByText(DASHBOARD_CONTENT);
+    const platformRole = screen.getByText('Super admin · Platform');
+    const ownerText = screen.queryByText(/Owner/);
+
+    expect(content).toBeVisible();
+    expect(platformRole).toBeVisible();
+    expect(ownerText).not.toBeInTheDocument();
   });
 });

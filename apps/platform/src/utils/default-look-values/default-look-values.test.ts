@@ -8,7 +8,11 @@ import {
   RADIUS_SCALE,
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_LOGO_URL,
+  MOCK_FAVICON_URL,
+} from '@platform/testing/site-config/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import {
   defaultLookFormValues,
@@ -35,14 +39,11 @@ describe(defaultLookFormValues, () => {
   });
 });
 
-const LOGO_ASSET_URL = 'https://example.blob.vercel-storage.com/logo.png';
-const FAVICON_ASSET_URL = 'https://example.blob.vercel-storage.com/favicon.png';
-
 describe(toLookFormValues, () => {
   it('carries every stored column through unchanged', () => {
     const siteConfig: TSiteConfigResult = {
       id: 'config-1',
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       preset: PRESET_ID.EDITORIAL,
       accentHue: 40,
       logoHue: 90,
@@ -53,8 +54,8 @@ describe(toLookFormValues, () => {
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       cardStyle: CARD_STYLE.OUTLINED,
       headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
-      logoAssetUrl: LOGO_ASSET_URL,
-      faviconAssetUrl: FAVICON_ASSET_URL,
+      logoAssetUrl: MOCK_LOGO_URL,
+      faviconAssetUrl: MOCK_FAVICON_URL,
       voiceOverridesByLocale: {},
       voiceOverrides: {},
       createdAt: new Date(),
@@ -72,8 +73,8 @@ describe(toLookFormValues, () => {
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       cardStyle: CARD_STYLE.OUTLINED,
       headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
-      logo: { url: LOGO_ASSET_URL },
-      favicon: { url: FAVICON_ASSET_URL },
+      logo: { url: MOCK_LOGO_URL },
+      favicon: { url: MOCK_FAVICON_URL },
     });
   });
 });

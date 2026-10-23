@@ -1,12 +1,12 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
 
 import { FeatureHighlightRow } from './feature-highlight-row';
 
 vi.mock('@web/i18n/navigation');
 
-const item = makeFeatureHighlightItem();
+const item = mockFeatureHighlightItem();
 
 const setup = customRender(FeatureHighlightRow, {
   item,
@@ -21,25 +21,30 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
     });
 
     it('renders the row heading as an h3', () => {
-      expect(
-        screen.getByRole('heading', { level: 3, name: item.heading }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: item.heading,
+      });
+      expect(heading).toBeVisible();
     });
 
     it('renders the row image', () => {
-      expect(screen.getByRole('img')).toBeVisible();
+      const image = screen.getByRole('img');
+      expect(image).toBeVisible();
     });
 
     it('renders no action when the item has none', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
   });
 
   it('renders the row action when the item has one', () => {
-    setup({ item: makeFeatureHighlightItem({ action: ctaActionsDemo[0] }) });
+    setup({ item: mockFeatureHighlightItem({ action: MOCK_CTA_ACTIONS[0] }) });
 
-    expect(
-      screen.getByRole('link', { name: ctaActionsDemo[0]!.link.label }),
-    ).toBeVisible();
+    const action = screen.getByRole('link', {
+      name: MOCK_CTA_ACTIONS[0]!.link.label,
+    });
+    expect(action).toBeVisible();
   });
 });

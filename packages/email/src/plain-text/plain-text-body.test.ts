@@ -1,6 +1,6 @@
 import {
-  TEST_SIGN_IN_URL,
-  UNSAFE_URL,
+  MOCK_SIGN_IN_URL,
+  MOCK_UNSAFE_URL,
 } from '@blog/email/testing/email-fixtures';
 
 import { buildPlainTextBody } from './plain-text-body';
@@ -17,16 +17,16 @@ describe(buildPlainTextBody, () => {
     expect(
       buildPlainTextBody([PARAGRAPH], {
         label: ACTION_LABEL,
-        url: TEST_SIGN_IN_URL,
+        url: MOCK_SIGN_IN_URL,
       }),
-    ).toBe(`${PARAGRAPH}\n\n${ACTION_LABEL}: ${TEST_SIGN_IN_URL}`);
+    ).toBe(`${PARAGRAPH}\n\n${ACTION_LABEL}: ${MOCK_SIGN_IN_URL}`);
   });
 
   it('drops an action url that is not a safe link', () => {
     expect(
       buildPlainTextBody([PARAGRAPH], {
         label: ACTION_LABEL,
-        url: UNSAFE_URL,
+        url: MOCK_UNSAFE_URL,
       }),
     ).toBe(`${PARAGRAPH}\n\n${ACTION_LABEL}: `);
   });

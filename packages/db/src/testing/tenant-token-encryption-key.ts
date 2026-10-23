@@ -1,8 +1,8 @@
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 export function useTenantTokenEncryptionKey(): void {
   beforeEach(() => {
-    vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', TEST_ENCRYPTION_KEY);
+    vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', MOCK_ENCRYPTION_KEY);
   });
 
   afterEach(() => {

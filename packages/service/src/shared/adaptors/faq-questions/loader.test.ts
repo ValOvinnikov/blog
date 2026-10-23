@@ -1,49 +1,58 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_FAQ_MODULE_ID,
+  mockRawFaqModuleQuestions,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_BLOCK_FAQ_CACHE_TAG,
+  MOCK_LINK_CACHE_TAG,
+  MOCK_MODULES_FAQ_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getFaqQuestions } from './loader';
+import { faqQuestionsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const SECOND_ID = 'faq-2';
+const tenant = mockTenant();
 
 describe(getFaqQuestions, () => {
-  it('passes the ids as the query parameter and scopes cache tags to the tenant', async () => {
+  it('queries the ids once with cache tags scoped to the tenant', async () => {
     mockRun.mockResolvedValueOnce([]);
 
-    await getFaqQuestions(['faq-1', 'faq-2'], tenant);
+    await getFaqQuestions([MOCK_FAQ_MODULE_ID, SECOND_ID], tenant);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        parameters: { ids: ['faq-1', 'faq-2'] },
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:faq',
-            't:tenant-a:block_faq',
-            't:tenant-a:link',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledExactlyOnceWith(faqQuestionsQuery, {
+      parameters: { ids: [MOCK_FAQ_MODULE_ID, SECOND_ID] },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_MODULES_FAQ_CACHE_TAG,
+          MOCK_BLOCK_FAQ_CACHE_TAG,
+          MOCK_LINK_CACHE_TAG,
+        ],
+      },
+    });
   });
 
   it('returns the modules in the order of the given ids', async () => {
     mockRun.mockResolvedValueOnce([
-      makeRawFaqModuleQuestions({ _id: 'faq-1' }),
-      makeRawFaqModuleQuestions({ _id: 'faq-2' }),
+      mockRawFaqModuleQuestions({ _id: MOCK_FAQ_MODULE_ID }),
+      mockRawFaqModuleQuestions({ _id: SECOND_ID }),
     ]);
 
-    const result = await getFaqQuestions(['faq-2', 'faq-1'], tenant);
+    const result = await getFaqQuestions(
+      [SECOND_ID, MOCK_FAQ_MODULE_ID],
+      tenant,
+    );
 
-    expect(result.map((module) => module._id)).toEqual(['faq-2', 'faq-1']);
+    expect(result.map((module) => module._id)).toEqual([
+      SECOND_ID,
+      MOCK_FAQ_MODULE_ID,
+    ]);
   });
 });

@@ -4,8 +4,10 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import { updateProvisioningStep } from '@blog/db/queries/tenants';
+import { errorResult } from '@blog/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { runReportedStep } from './run-reported-step';
@@ -39,16 +41,15 @@ function reportedStatuses(): string[] {
 describe(runReportedStep, () => {
   beforeEach(() => {
     atAttempt(1);
-    vi.mocked(updateProvisioningStep).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    vi.mocked(updateProvisioningStep).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
   });
 
   function run(work: () => Promise<void>) {
     return runReportedStep({
-      tenantId: TEST_TENANT_ID,
-      ctx: { runId: 'run-1' },
+      tenantId: MOCK_TENANT_ID,
+      ctx: MOCK_RUN_CONTEXT,
       step: STEP,
       run: work,
     });
@@ -57,13 +58,13 @@ describe(runReportedStep, () => {
   it('reports the step running, then done, and succeeds', async () => {
     const result = await run(async () => {});
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.DONE,
     ]);
     expect(updateProvisioningStep).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: TEST_TENANT_ID, step: STEP }),
+      expect.objectContaining({ tenantId: MOCK_TENANT_ID, step: STEP }),
     );
   });
 
@@ -83,7 +84,7 @@ describe(runReportedStep, () => {
 
     const result = await run(() => Promise.reject(new Error(STILL_DOWN)));
 
-    expect(result).toEqual({ ok: false, failedStep: STEP });
+    expect(result).toEqual({ ok: false, error: STEP });
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -98,7 +99,7 @@ describe(runReportedStep, () => {
       Promise.reject(new FatalError('missing credentials')),
     );
 
-    expect(result).toEqual({ ok: false, failedStep: STEP });
+    expect(result).toEqual({ ok: false, error: STEP });
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -111,13 +112,13 @@ describe(runReportedStep, () => {
     });
 
     const result = await runReportedStep({
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       ctx: { runId: 'cli-run', isOneShot: true },
       step: STEP,
       run: () => Promise.reject(new Error(SANITY_TIMED_OUT)),
     });
 
-    expect(result).toEqual({ ok: false, failedStep: STEP });
+    expect(result).toEqual({ ok: false, error: STEP });
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -127,6 +128,6 @@ describe(runReportedStep, () => {
   it('still completes the step when recording its progress fails', async () => {
     const result = await run(async () => {});
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, data: undefined });
   });
 });

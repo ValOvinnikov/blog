@@ -1,3 +1,9 @@
+import {
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import { MOCK_TENANT_PROJECT_ID } from '@blog/service/testing/tenant';
+
 import { isr } from './isr';
 
 const mockEnv = vi.hoisted(() => ({
@@ -18,17 +24,17 @@ describe(isr, () => {
   });
 
   it('prefixes every tag with t:<projectId>:', () => {
-    expect(isr(['posts', 'author'], 'tenant-a')).toEqual({
+    expect(isr(['posts', 'author'], MOCK_TENANT_PROJECT_ID)).toEqual({
       next: {
         revalidate: 3600,
-        tags: ['t:tenant-a:posts', 't:tenant-a:author'],
+        tags: [MOCK_POSTS_CACHE_TAG, MOCK_AUTHOR_CACHE_TAG],
       },
     });
   });
 
   it('accepts a single tag string the same as an array of one', () => {
-    expect(isr('posts', 'tenant-a')).toEqual({
-      next: { revalidate: 3600, tags: ['t:tenant-a:posts'] },
+    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({
+      next: { revalidate: 3600, tags: [MOCK_POSTS_CACHE_TAG] },
     });
   });
 
@@ -36,14 +42,14 @@ describe(isr, () => {
     vi.stubEnv('NODE_ENV', 'development');
     mockEnv.SANITY_LIVE_CONTENT = '1';
 
-    expect(isr('posts', 'tenant-a')).toEqual({ cache: 'no-store' });
+    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({ cache: 'no-store' });
   });
 
   it('keeps the tagged cache in development without the flag', () => {
     vi.stubEnv('NODE_ENV', 'development');
 
-    expect(isr('posts', 'tenant-a')).toEqual({
-      next: { revalidate: 3600, tags: ['t:tenant-a:posts'] },
+    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({
+      next: { revalidate: 3600, tags: [MOCK_POSTS_CACHE_TAG] },
     });
   });
 
@@ -51,8 +57,8 @@ describe(isr, () => {
     vi.stubEnv('NODE_ENV', 'production');
     mockEnv.SANITY_LIVE_CONTENT = '1';
 
-    expect(isr('posts', 'tenant-a')).toEqual({
-      next: { revalidate: 3600, tags: ['t:tenant-a:posts'] },
+    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({
+      next: { revalidate: 3600, tags: [MOCK_POSTS_CACHE_TAG] },
     });
   });
 });

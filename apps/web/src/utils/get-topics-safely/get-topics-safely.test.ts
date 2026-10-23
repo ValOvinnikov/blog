@@ -1,4 +1,5 @@
 import { service, type TTenantSanityContext } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { logger } from '@web/utils/logger/logger';
 
 import { getTopicsSafely } from './get-topics-safely';
@@ -28,19 +29,17 @@ describe('getTopicsSafely', () => {
         postCount: 3,
       },
     ];
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
-      ok: true,
-      data: topics,
-    });
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
+      okResult(topics),
+    );
 
     await expect(getTopicsSafely(tenant)).resolves.toEqual(topics);
   });
 
   it('falls back to an empty list and logs when the fetch resolves to a failure result', async () => {
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
+      errorResult(new Error('boom')),
+    );
 
     await expect(getTopicsSafely(tenant)).resolves.toEqual([]);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(

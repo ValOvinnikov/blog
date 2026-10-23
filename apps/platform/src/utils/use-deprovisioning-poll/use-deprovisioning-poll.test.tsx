@@ -3,10 +3,12 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import {
-  doneDeprovisioningSteps,
-  idleDeprovisioningSteps,
-  makeClientTenant,
-  TENANT_ID,
+  mockDoneDeprovisioningSteps,
+  mockIdleDeprovisioningSteps,
+  mockClientTenant,
+  MOCK_TENANT_ID,
+  MOCK_RUN_STARTED_AT,
+  MOCK_RUN_PLUS_1_MIN_AT,
 } from '@platform/testing/tenants/fixtures';
 import { act, renderHook } from '@testing-library/react';
 
@@ -29,20 +31,18 @@ vi.mock(
 );
 
 const SANITY_ACCESS_API_RETURNED_403 = 'Sanity Access API returned 403';
-const AT_20260812_1418 = '2026-08-12T14:18:00.000Z';
-const AT_20260812_1419 = '2026-08-12T14:19:00.000Z';
 
 const makeFailedRevokeTenant = () =>
-  makeClientTenant({
+  mockClientTenant({
     deprovisioningSteps: {
-      ...idleDeprovisioningSteps(),
+      ...mockIdleDeprovisioningSteps(),
       [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
         status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
         error: SANITY_ACCESS_API_RETURNED_403,
       },
       run: {
-        startedAt: AT_20260812_1418,
-        finishedAt: AT_20260812_1419,
+        startedAt: MOCK_RUN_STARTED_AT,
+        finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
       },
     },
   });
@@ -59,10 +59,10 @@ describe(useDeprovisioningPoll, () => {
 
   describe('status derivation', () => {
     it('reports IDLE, in progress but not running, when every step is idle', () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
-          run: { startedAt: AT_20260812_1418 },
+          ...mockIdleDeprovisioningSteps(),
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       const { result } = renderHook(() =>
@@ -79,9 +79,9 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('reports RUNNING when any step is running, even alongside a stale FAILED entry from a prior attempt', () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
@@ -89,7 +89,7 @@ describe(useDeprovisioningPoll, () => {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'stale failure from a previous run',
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       const { result } = renderHook(() =>
@@ -158,11 +158,11 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('reports DONE only once every step is done', () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...doneDeprovisioningSteps(),
+          ...mockDoneDeprovisioningSteps(),
           run: {
-            startedAt: AT_20260812_1418,
+            startedAt: MOCK_RUN_STARTED_AT,
             finishedAt: AT_20260812_1420,
           },
         },
@@ -180,14 +180,14 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('exposes run and stepUpdatedAt read off deprovisioningSteps', () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            updatedAt: AT_20260812_1419,
+            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       const { result } = renderHook(() =>
@@ -195,9 +195,9 @@ describe(useDeprovisioningPoll, () => {
       );
 
       expect(result.current.run).toEqual({
-        startedAt: AT_20260812_1418,
+        startedAt: MOCK_RUN_STARTED_AT,
       });
-      expect(result.current.stepUpdatedAt[0]).toBe(AT_20260812_1419);
+      expect(result.current.stepUpdatedAt[0]).toBe(MOCK_RUN_PLUS_1_MIN_AT);
       expect(result.current.stepUpdatedAt[1]).toBeUndefined();
     });
   });
@@ -212,22 +212,22 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('polls while the run is in progress and applies a fresh result', async () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
         deprovisionedAt: null,
       });
@@ -244,7 +244,7 @@ describe(useDeprovisioningPoll, () => {
       });
 
       expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-        TENANT_ID,
+        MOCK_TENANT_ID,
       );
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -253,20 +253,20 @@ describe(useDeprovisioningPoll, () => {
 
     it('transitions from running to done across polls and stops polling once done', async () => {
       const runningSteps = {
-        ...idleDeprovisioningSteps(),
+        ...mockIdleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
         },
-        run: { startedAt: AT_20260812_1418 },
+        run: { startedAt: MOCK_RUN_STARTED_AT },
       };
       const doneSteps = {
-        ...doneDeprovisioningSteps(),
+        ...mockDoneDeprovisioningSteps(),
         run: {
-          startedAt: AT_20260812_1418,
+          startedAt: MOCK_RUN_STARTED_AT,
           finishedAt: AT_20260812_1420,
         },
       };
-      const tenant = makeClientTenant({ deprovisioningSteps: runningSteps });
+      const tenant = mockClientTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: doneSteps,
         deprovisionedAt: new Date(AT_20260812_1420),
@@ -291,16 +291,16 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('does not poll at all when the run is already terminal on mount', async () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'boom',
           },
           run: {
-            startedAt: AT_20260812_1418,
-            finishedAt: AT_20260812_1419,
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
       });
@@ -314,22 +314,22 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('resumes polling for a retry dispatched over a stale FAILED run, and adopts the new run once it reports in', async () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'boom',
           },
           run: {
-            startedAt: AT_20260812_1418,
-            finishedAt: AT_20260812_1419,
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
@@ -352,7 +352,7 @@ describe(useDeprovisioningPoll, () => {
       });
 
       expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
-        TENANT_ID,
+        MOCK_TENANT_ID,
       );
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -364,25 +364,25 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('stops polling once the tenant reaches a failed terminal state', async () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'boom',
           },
           run: {
-            startedAt: AT_20260812_1418,
-            finishedAt: AT_20260812_1419,
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
         deprovisionedAt: null,
@@ -401,22 +401,22 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('stops polling once a stale, never-finishing run exceeds the polling cap', async () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
         deprovisionedAt: null,
       });
@@ -437,14 +437,14 @@ describe(useDeprovisioningPoll, () => {
       [
         'a retry over a failed prior run',
         {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: 'boom',
           },
           run: {
-            startedAt: AT_20260812_1418,
-            finishedAt: AT_20260812_1419,
+            startedAt: MOCK_RUN_STARTED_AT,
+            finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
           },
         },
       ],
@@ -452,7 +452,7 @@ describe(useDeprovisioningPoll, () => {
     ])(
       'bounds the starting state of %s by the same stale-run cap when the workflow never reports in',
       async (_label, deprovisioningSteps) => {
-        const tenant = makeClientTenant({ deprovisioningSteps });
+        const tenant = mockClientTenant({ deprovisioningSteps });
         getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
         renderHook(() =>
           useDeprovisioningPoll(tenant, {
@@ -475,7 +475,7 @@ describe(useDeprovisioningPoll, () => {
 
     it('reports nothing in progress and never polls while disabled', async () => {
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(makeClientTenant({ deprovisioningSteps: null }), {
+        useDeprovisioningPoll(mockClientTenant({ deprovisioningSteps: null }), {
           isEnabled: false,
         }),
       );
@@ -489,7 +489,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('pauses polling while the tab is hidden and resumes once it is visible again', async () => {
-      const tenant = makeClientTenant({ deprovisioningSteps: null });
+      const tenant = mockClientTenant({ deprovisioningSteps: null });
       const visibility = vi.spyOn(document, 'visibilityState', 'get');
       visibility.mockReturnValue('hidden');
       renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
@@ -510,13 +510,13 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('stops polling once the hook unmounts', async () => {
-      const tenant = makeClientTenant({
+      const tenant = mockClientTenant({
         deprovisioningSteps: {
-          ...idleDeprovisioningSteps(),
+          ...mockIdleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
-          run: { startedAt: AT_20260812_1418 },
+          run: { startedAt: MOCK_RUN_STARTED_AT },
         },
       });
       const { unmount } = renderHook(() =>

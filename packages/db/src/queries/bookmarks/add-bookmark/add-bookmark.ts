@@ -1,7 +1,7 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { bookmarks, type TBookmark } from '@blog/db/schema/bookmarks';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
 // Adds a bookmark for (tenantId, userId, postId). Idempotent: if the tuple
@@ -21,7 +21,7 @@ export async function addBookmark(
     .onConflictDoNothing()
     .returning();
 
-  if (inserted) return { ok: true, data: inserted };
+  if (inserted) return okResult(inserted);
 
   const [existing] = await db
     .select()
@@ -35,8 +35,8 @@ export async function addBookmark(
     );
 
   if (!existing) {
-    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+    return errorResult(ERROR_CODE.DB_NOT_FOUND);
   }
 
-  return { ok: true, data: existing };
+  return okResult(existing);
 }

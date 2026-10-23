@@ -7,35 +7,44 @@ import {
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { LandingPageLayout } from '@web/components/pages/landing-page/landing-page-layout';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeTeamMember } from '@web/testing/modules/team/fixtures';
-import { makeLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockTeamMember } from '@web/testing/modules/team/fixtures';
+import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { TeamModuleView } from './team-module-view';
 
 const members = [
-  makeTeamMember({
+  mockTeamMember({
     id: 'team-member-1',
     name: 'Jordan Reyes',
     role: 'VP Engineering',
   }),
-  makeTeamMember({
+  mockTeamMember({
     id: 'team-member-2',
     name: 'Priya Nair',
     role: 'Head of Product',
   }),
-  makeTeamMember({
+  mockTeamMember({
     id: 'team-member-3',
     name: 'Marco Duarte',
     role: 'Founder',
   }),
 ];
 
+const moreMembers = [
+  mockTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
+  mockTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
+  mockTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
+  mockTeamMember({ id: 'team-member-7', name: 'Noor Haddad' }),
+  mockTeamMember({ id: 'team-member-8', name: 'Tomás Rivera' }),
+  mockTeamMember({ id: 'team-member-9', name: 'Ines Duarte' }),
+];
+
 const bio = [
-  portableTextBlock(
+  mockPortableTextBlock(
     'Leads the engineering org with a focus on reliability and developer experience.',
   ),
 ];
@@ -92,7 +101,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Meet the team' }),
+    headingBlock: mockHeadingBlock({ heading: 'Meet the team' }),
     members,
     showBios: false,
     showSocialLinks: false,
@@ -116,7 +125,7 @@ export const WithPhotos: TStory = {
   args: {
     members: members.map((member) => ({
       ...member,
-      image: makeSanityImage(),
+      image: mockSanityImage(),
     })),
   },
 };
@@ -126,7 +135,7 @@ export const SquareShape: TStory = {
     imageShape: CARD_IMAGE_SHAPE.SQUARE,
     members: members.map((member) => ({
       ...member,
-      image: makeSanityImage(),
+      image: mockSanityImage(),
     })),
   },
 };
@@ -176,17 +185,12 @@ export const CarouselOverflowCentre: TStory = {
   args: {
     displayMode: DISPLAY_MODE.CAROUSEL,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    members: [
-      ...members,
-      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
-      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
-      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
-    ],
+    members: [...members, ...moreMembers.slice(0, 3)],
   },
 };
 
 export const WithActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const CenterAligned: TStory = {
@@ -198,39 +202,23 @@ export const CenterAligned: TStory = {
 
 export const SixMembers: TStory = {
   args: {
-    members: [
-      ...members,
-      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
-      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
-      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
-    ],
+    members: [...members, ...moreMembers.slice(0, 3)],
   },
 };
 
 export const SevenMembersWithBios: TStory = {
   args: {
     showBios: true,
-    members: [
-      ...members,
-      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
-      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
-      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
-      makeTeamMember({ id: 'team-member-7', name: 'Noor Haddad' }),
-    ].map((member) => ({ ...member, bio })),
+    members: [...members, ...moreMembers.slice(0, 4)].map((member) => ({
+      ...member,
+      bio,
+    })),
   },
 };
 
 export const NineMembers: TStory = {
   args: {
-    members: [
-      ...members,
-      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
-      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
-      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
-      makeTeamMember({ id: 'team-member-7', name: 'Noor Haddad' }),
-      makeTeamMember({ id: 'team-member-8', name: 'Tomás Rivera' }),
-      makeTeamMember({ id: 'team-member-9', name: 'Ines Duarte' }),
-    ],
+    members: [...members, ...moreMembers],
   },
 };
 
@@ -239,13 +227,12 @@ export const Spotlight: TStory = {
     showBios: true,
     showSocialLinks: true,
     members: [
-      makeTeamMember({
-        name: 'Marco Duarte',
-        role: 'Founder',
-        image: makeSanityImage(),
+      {
+        ...members[2]!,
+        image: mockSanityImage(),
         bio,
         socialLinks,
-      }),
+      },
     ],
   },
 };
@@ -254,7 +241,7 @@ export const SpotlightSquareInitials: TStory = {
   args: {
     imageShape: CARD_IMAGE_SHAPE.SQUARE,
     displayMode: DISPLAY_MODE.CAROUSEL,
-    members: [makeTeamMember()],
+    members: [mockTeamMember()],
   },
 };
 
@@ -283,11 +270,11 @@ export const SquarePhotosWithBios: TStory = {
   args: {
     showBios: true,
     imageShape: CARD_IMAGE_SHAPE.SQUARE,
-    members: [
-      ...members,
-      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
-      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
-    ].map((member) => ({ ...member, image: makeSanityImage(), bio })),
+    members: [...members, ...moreMembers.slice(0, 2)].map((member) => ({
+      ...member,
+      image: mockSanityImage(),
+      bio,
+    })),
   },
 };
 
@@ -316,7 +303,7 @@ export const SquarePhotosNextToSidebar: TStory = {
     (Story) => (
       <LandingPageLayout
         topBlock={null}
-        sectionNavigation={makeLandingSectionNavigation()}
+        sectionNavigation={mockLandingSectionNavigation()}
       >
         <Story />
       </LandingPageLayout>

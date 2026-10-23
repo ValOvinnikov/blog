@@ -48,7 +48,7 @@ const TENANT_ID_FLAG = '--tenant-id=';
 // Stable across tenants — `tenantId` + `source` + `kind` already scope the
 // dedupe key to one tenant's document-validation state, so this only needs
 // to be a constant, not per-document.
-const DOCUMENT_VALIDATION_IDENTIFIER = 'documents';
+export const DOCUMENT_VALIDATION_IDENTIFIER = 'documents';
 
 function parseTenantId(argv: string[]): string | undefined {
   const flag = argv.find((arg) => arg.startsWith(TENANT_ID_FLAG));

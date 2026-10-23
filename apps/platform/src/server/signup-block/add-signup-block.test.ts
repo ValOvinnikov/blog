@@ -1,13 +1,14 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { errorResult, okResult } from '@blog/utils';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
-  BLOCK_REASON,
-  BLOCKED_ADDRESS_HASH,
-  BLOCKED_DOMAIN,
-  makeBlockedIdentity,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_ADDRESS_HASH,
+  MOCK_BLOCKED_DOMAIN,
+  mockBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
@@ -29,18 +30,16 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const ADMIN = makeAdmin();
+const ADMIN = mockAdmin();
 const DOMAIN_BLOCK = {
   kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-  identity: BLOCKED_DOMAIN,
-  reason: BLOCK_REASON,
+  identity: MOCK_BLOCKED_DOMAIN,
+  reason: MOCK_BLOCK_REASON,
   admin: ADMIN,
 };
 
-const outcomeOf = (created: boolean) => ({
-  ok: true,
-  data: { entry: makeBlockedIdentity(), created },
-});
+const outcomeOf = (created: boolean) =>
+  okResult({ entry: mockBlockedIdentity(), created });
 
 describe(addSignupBlock, () => {
   beforeEach(() => {
@@ -57,8 +56,8 @@ describe(addSignupBlock, () => {
     expect(result).toEqual(created);
     expect(addBlockedIdentityMock).toHaveBeenCalledWith({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: BLOCKED_DOMAIN,
-      reason: BLOCK_REASON,
+      identity: MOCK_BLOCKED_DOMAIN,
+      reason: MOCK_BLOCK_REASON,
       createdByAdminId: ADMIN.id,
     });
     expect(recordAuditEventMock).toHaveBeenCalledTimes(1);
@@ -68,8 +67,8 @@ describe(addSignupBlock, () => {
       targetId: created.data.entry.id,
       details: {
         kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-        reason: BLOCK_REASON,
-        domain: BLOCKED_DOMAIN,
+        reason: MOCK_BLOCK_REASON,
+        domain: MOCK_BLOCKED_DOMAIN,
       },
     });
   });
@@ -85,7 +84,7 @@ describe(addSignupBlock, () => {
   });
 
   it('records no audit event when the entry could not be stored', async () => {
-    const failure = { ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN };
+    const failure = errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
     addBlockedIdentityMock.mockResolvedValue(failure);
 
     const result = await addSignupBlock(DOMAIN_BLOCK);
@@ -101,18 +100,21 @@ describe(recordSignupBlockAdded, () => {
   });
 
   it('audits an address entry without the address or its hash', async () => {
-    const entry = makeBlockedIdentity({
+    const entry = mockBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      value: BLOCKED_ADDRESS_HASH,
+      value: MOCK_BLOCKED_ADDRESS_HASH,
     });
 
-    await recordSignupBlockAdded(entry, BLOCK_REASON);
+    await recordSignupBlockAdded(entry, MOCK_BLOCK_REASON);
 
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
       action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
       targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
       targetId: entry.id,
-      details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS, reason: BLOCK_REASON },
+      details: {
+        kind: BLOCKED_IDENTITY_KIND.ADDRESS,
+        reason: MOCK_BLOCK_REASON,
+      },
     });
   });
 });

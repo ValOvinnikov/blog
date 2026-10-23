@@ -1,11 +1,10 @@
-import type { TMaybeNull } from '@blog/config/types';
+import { MOCK_USER_EMAIL } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testAccountEmailIndex,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
-import { faker } from '@faker-js/faker';
 
 import {
   accountEmailColumns,
@@ -17,40 +16,47 @@ import {
   requirePersonalEmailIndex,
 } from './personal-data';
 
-const EMAIL = faker.internet.email().toLowerCase();
-
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();
 
   it('encrypts a value so only the keyring reads it back', () => {
-    const encrypted = encryptPersonalValue(EMAIL) ?? '';
+    const encrypted = encryptPersonalValue(MOCK_USER_EMAIL);
 
-    expect(encrypted).not.toContain(EMAIL);
-    expect(decryptPersonalValue(encrypted)).toBe(EMAIL);
+    expect(encrypted).not.toContain(MOCK_USER_EMAIL);
+    expect(decryptTestPersonalValue(encrypted)).toBe(MOCK_USER_EMAIL);
   });
 
-  it.each<[string, () => TMaybeNull<string>, string]>([
-    ['an encrypted value', () => encryptPersonalValue(EMAIL), ''],
-    ['the plain value of a row not yet encrypted', () => null, EMAIL],
-  ])('reads %s', (_label, encrypted, plain) => {
-    expect(readPersonalValue(encrypted(), plain)).toBe(EMAIL);
+  it('decrypts a value it encrypted', () => {
+    const encrypted = encryptPersonalValue(MOCK_USER_EMAIL) ?? '';
+
+    expect(decryptPersonalValue(encrypted)).toBe(MOCK_USER_EMAIL);
   });
 
   it.each([
     [personalEmailColumns, testPersonalEmailIndex],
     [accountEmailColumns, testAccountEmailIndex],
   ])('%o gives an email its encrypted form and its index', (columns, index) => {
-    const { emailEncrypted, emailIndex } = columns(EMAIL);
+    const { emailEncrypted, emailIndex } = columns(MOCK_USER_EMAIL);
 
-    expect(decryptTestPersonalValue(emailEncrypted)).toBe(EMAIL);
-    expect(emailIndex).toBe(index(EMAIL));
+    expect(decryptTestPersonalValue(emailEncrypted)).toBe(MOCK_USER_EMAIL);
+    expect(emailIndex).toBe(index(MOCK_USER_EMAIL));
+  });
+
+  it('reads an encrypted value back', () => {
+    expect(readPersonalValue(encryptPersonalValue(MOCK_USER_EMAIL), '')).toBe(
+      MOCK_USER_EMAIL,
+    );
+  });
+
+  it('reads the plain value of a row not yet encrypted', () => {
+    expect(readPersonalValue(null, MOCK_USER_EMAIL)).toBe(MOCK_USER_EMAIL);
   });
 
   it.each([
     [requirePersonalEmailIndex, testPersonalEmailIndex],
     [requireAccountEmailIndex, testAccountEmailIndex],
   ])('%o indexes an email for lookup', (requireIndex, index) => {
-    expect(requireIndex(EMAIL)).toBe(index(EMAIL));
+    expect(requireIndex(MOCK_USER_EMAIL)).toBe(index(MOCK_USER_EMAIL));
   });
 });
 
@@ -65,20 +71,20 @@ describe('with no personal data keys configured', () => {
   });
 
   it('leaves the encrypted and index forms empty', () => {
-    expect(personalEmailColumns(EMAIL)).toEqual({
+    expect(personalEmailColumns(MOCK_USER_EMAIL)).toEqual({
       emailEncrypted: null,
       emailIndex: null,
     });
   });
 
   it('refuses an index lookup', () => {
-    expect(() => requirePersonalEmailIndex(EMAIL)).toThrow(
+    expect(() => requirePersonalEmailIndex(MOCK_USER_EMAIL)).toThrow(
       'PERSONAL_DATA_INDEX_KEY is not configured.',
     );
   });
 
   it('refuses to decrypt', () => {
-    expect(() => decryptPersonalValue(EMAIL)).toThrow(
+    expect(() => decryptPersonalValue(MOCK_USER_EMAIL)).toThrow(
       'PERSONAL_DATA_ENCRYPTION_KEY is not configured.',
     );
   });

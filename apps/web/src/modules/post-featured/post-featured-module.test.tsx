@@ -1,14 +1,21 @@
-import { BRAND_VARIANT } from '@blog/config';
-import { getRequestContext } from '@web/server/request-context/request-context';
+import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockPostFeaturedModuleData } from '@web/testing/modules/post-featured/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+  MOCK_LEAD_POST_TITLE,
+  MOCK_SECOND_POST_TITLE,
+  MOCK_THIRD_POST_TITLE,
+} from '@web/testing/modules/post-list/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
+
+const MODULE_ID = 'post-featured-1';
+const LEAD_IMAGE_ALT = 'Lead image';
+const TAIL_IMAGE_ALT = 'Tail image';
 
 const { getPostFeaturedMock } = vi.hoisted(() => ({
   getPostFeaturedMock: vi.fn(),
@@ -26,66 +33,39 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
-
-const makePost = (overrides: Record<string, unknown> = {}) => ({
-  id: 'post-1',
-  slug: 'first-post',
-  title: 'First post',
-  excerpt: 'An excerpt',
-  publishedAt: '2026-01-01T00:00:00.000Z',
-  topic: { id: 'topic-1', title: 'News', slug: 'news' },
-  readingTimeMinutes: 2,
-  ...overrides,
-});
-
 const setup = customRenderAsync(PostFeaturedModule, {
-  id: 'post-featured-1',
+  id: MODULE_ID,
 });
 
 describe(`<${PostFeaturedModule.name}/>`, () => {
   beforeEach(() => {
     getPostFeaturedMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   describe('when the module has no posts', () => {
-    beforeEach(() => {
-      getPostFeaturedMock.mockResolvedValue({
-        ok: true,
-        data: {
-          brandVariant: BRAND_VARIANT.PRIMARY,
-          headingBlock: makeHeadingBlock({ heading: 'Featured' }),
-          posts: [],
-          layout: undefined,
-          contentAlignment: undefined,
-          showImages: false,
-        },
-      });
+    let container: HTMLElement;
+
+    beforeEach(async () => {
+      getPostFeaturedMock.mockResolvedValue(
+        okResult(mockPostFeaturedModuleData()),
+      );
+      ({ container } = await setup());
     });
 
-    it('calls getPostFeatured with the module id and resolved tenant Sanity context', async () => {
-      await setup();
-
+    it('fetches the module by id with the resolved tenant Sanity context', () => {
       expect(getPostFeaturedMock).toHaveBeenCalledWith(
-        'post-featured-1',
-        DEFAULT_TENANT_SANITY_CONTEXT,
+        MODULE_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
-    it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
-      const { container } = await setup();
-
+    it('renders nothing, not even an empty landmark, when no posts resolve', () => {
       expect(container).toBeEmptyDOMElement();
     });
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostFeaturedMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -93,62 +73,58 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
   });
 
   it('renders the first post as a lead card and the rest in a tail grid', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
-        posts: [
-          makePost({ id: 'post-1', title: 'Lead post' }),
-          makePost({ id: 'post-2', title: 'Second post' }),
-          makePost({ id: 'post-3', title: 'Third post' }),
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
+    getPostFeaturedMock.mockResolvedValue(
+      okResult(
+        mockPostFeaturedModuleData({
+          posts: [
+            mockPostCard({ id: 'post-1', title: MOCK_LEAD_POST_TITLE }),
+            mockPostCard({ id: 'post-2', title: MOCK_SECOND_POST_TITLE }),
+            mockPostCard({ id: 'post-3', title: MOCK_THIRD_POST_TITLE }),
+          ],
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.getByText('Lead post')).toBeVisible();
-    expect(screen.getByText('Second post')).toBeVisible();
-    expect(screen.getByText('Third post')).toBeVisible();
+    const leadTitle = screen.getByText(MOCK_LEAD_POST_TITLE);
+    const secondTitle = screen.getByText(MOCK_SECOND_POST_TITLE);
+    const thirdTitle = screen.getByText(MOCK_THIRD_POST_TITLE);
     const tailGrid = screen.getByTestId(
       'post-featured-module-post-featured-1-tail-grid',
     );
+    expect(leadTitle).toBeVisible();
+    expect(secondTitle).toBeVisible();
+    expect(thirdTitle).toBeVisible();
     expect(tailGrid).toBeVisible();
-    expect(tailGrid).not.toHaveTextContent('Lead post');
+    expect(tailGrid).not.toHaveTextContent(MOCK_LEAD_POST_TITLE);
   });
 
-  it('renders the lead image sized differently from the tail card images', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
-        posts: [
-          makePost({
-            id: 'post-1',
-            title: 'Lead post',
-            heroImage: makeSanityImage({ alt: 'Lead image' }),
-          }),
-          makePost({
-            id: 'post-2',
-            title: 'Second post',
-            heroImage: makeSanityImage({ alt: 'Tail image' }),
-          }),
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: true,
-      },
-    });
+  it('sizes the lead image differently from the tail card images', async () => {
+    getPostFeaturedMock.mockResolvedValue(
+      okResult(
+        mockPostFeaturedModuleData({
+          posts: [
+            mockPostCard({
+              id: 'post-1',
+              title: MOCK_LEAD_POST_TITLE,
+              heroImage: mockSanityImage({ alt: LEAD_IMAGE_ALT }),
+            }),
+            mockPostCard({
+              id: 'post-2',
+              title: MOCK_SECOND_POST_TITLE,
+              heroImage: mockSanityImage({ alt: TAIL_IMAGE_ALT }),
+            }),
+          ],
+          showImages: true,
+        }),
+      ),
+    );
 
     await setup();
 
-    const leadImage = screen.getByRole('img', { name: 'Lead image' });
-    const tailImage = screen.getByRole('img', { name: 'Tail image' });
+    const leadImage = screen.getByRole('img', { name: LEAD_IMAGE_ALT });
+    const tailImage = screen.getByRole('img', { name: TAIL_IMAGE_ALT });
 
     expect(leadImage).toHaveAttribute(
       'sizes',
@@ -165,26 +141,23 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     expect(tailImage).toHaveAttribute('height', '360');
   });
 
-  it('renders no post images when showImages is false', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
-        posts: [
-          makePost({
-            id: 'post-1',
-            heroImage: makeSanityImage(),
-          }),
-        ],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
+  it('renders no post images when images are turned off', async () => {
+    getPostFeaturedMock.mockResolvedValue(
+      okResult(
+        mockPostFeaturedModuleData({
+          posts: [
+            mockPostCard({
+              id: 'post-1',
+              heroImage: mockSanityImage(),
+            }),
+          ],
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const image = screen.queryByRole('img');
+    expect(image).not.toBeInTheDocument();
   });
 });

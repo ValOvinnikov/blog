@@ -1,5 +1,9 @@
 import type { TCapability } from '@blog/config';
 import { PLAN_REGISTRY } from '@blog/db';
+import {
+  EFFECTIVE_FETCH_FAILED_EVENT,
+  PLAN_FETCH_FAILED_EVENT,
+} from '@web/constants/settings-features';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
@@ -24,14 +28,14 @@ export const isCapabilityEnabledForTenant = async (
   ]);
 
   if (!planResult.ok) {
-    logger.error('settings_features.plan_fetch_failed', {
+    logger.error(PLAN_FETCH_FAILED_EVENT, {
       capability,
       error: planResult.error,
     });
     return false;
   }
   if (!featuresResult.ok) {
-    logger.error('settings_features.effective_fetch_failed', {
+    logger.error(EFFECTIVE_FETCH_FAILED_EVENT, {
       capability,
       error: featuresResult.error,
     });

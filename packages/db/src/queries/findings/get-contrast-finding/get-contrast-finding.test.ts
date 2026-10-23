@@ -1,13 +1,12 @@
 import { FINDING_STATUS } from '@blog/config/constants';
+import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
 import * as schema from '@blog/db/schema';
 import {
-  makeContrastResult,
-  makePassingContrastResult,
+  mockContrastResult,
+  mockPassingContrastResult,
 } from '@blog/db/testing/findings/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
-
-import { recordContrastResult } from '../record-contrast-result';
 
 import { getContrastFinding } from './get-contrast-finding';
 
@@ -22,23 +21,29 @@ afterEach(async () => {
 });
 
 describe(getContrastFinding, () => {
-  it('returns the result for a SHA whose run passed', async () => {
-    const passingRun = makePassingContrastResult();
-    await recordContrastResult(passingRun);
+  it.each([
+    {
+      run: 'has passed',
+      mockRun: mockPassingContrastResult,
+      status: FINDING_STATUS.RESOLVED,
+    },
+    {
+      run: 'has failed',
+      mockRun: mockContrastResult,
+      status: FINDING_STATUS.OPEN,
+    },
+  ])(
+    'returns the result for a SHA whose run $run',
+    async ({ mockRun, status }) => {
+      const contrastRun = mockRun();
+      await recordContrastResult(contrastRun);
 
-    expect(await getContrastFinding(passingRun.sha)).toEqual(
-      expect.objectContaining({ status: FINDING_STATUS.RESOLVED }),
-    );
-  });
+      const finding = await getContrastFinding(contrastRun.sha);
 
-  it('returns the result for a SHA whose run failed', async () => {
-    const failingRun = makeContrastResult();
-    await recordContrastResult(failingRun);
-
-    expect(await getContrastFinding(failingRun.sha)).toEqual(
-      expect.objectContaining({ status: FINDING_STATUS.OPEN }),
-    );
-  });
+      expect(finding?.status).toBe(status);
+      expect(finding?.details).toEqual(contrastRun);
+    },
+  );
 
   it('returns undefined for a SHA with no run', async () => {
     expect(await getContrastFinding(faker.git.commitSha())).toBeUndefined();

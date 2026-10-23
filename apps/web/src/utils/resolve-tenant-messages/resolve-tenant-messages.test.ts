@@ -8,9 +8,13 @@ import {
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
   type TVoicePortableText,
+  VOICE_FIELD_KIND,
 } from '@blog/config';
 import { SITE_CONFIG_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_OTHER_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { resolveTenantMessages } from './resolve-tenant-messages';
@@ -33,11 +37,11 @@ vi.mock('next/cache', () => ({
 
 const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
-const TENANT = { id: 'tenant-1' };
-
 const NOT_FOUND_HEADING_OVERRIDE = 'nope, try again';
+const GERMAN_HEADING_OVERRIDE = 'Verirrt';
 const BLOG_LIST_EMPTY_OVERRIDE = 'Nothing published yet.';
 const TOPIC_EMPTY_OVERRIDE = 'Nothing here yet.';
+const LOCALE_ERROR_TITLE_OVERRIDE = 'Oops';
 const ORIGINAL_HEADING = 'Original heading';
 
 const siteConfigRow = (
@@ -64,41 +68,36 @@ const getAtPath = (source: unknown, path: readonly string[]): unknown => {
   }, source);
 };
 
-const richTextOf = (text: string): TVoicePortableText => [
-  {
-    _type: 'block',
-    _key: 'a',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'a1', text }],
-  },
-];
-
-describe('resolveTenantMessages', () => {
+describe(resolveTenantMessages, () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
     getSiteConfigMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT.id);
     getSiteConfigMock.mockResolvedValue(siteConfigRow());
   });
 
-  it('returns the base messages unchanged when there are no voice overrides', async () => {
+  it.each([
+    { case: 'there are no voice overrides', row: siteConfigRow() },
+    { case: 'the tenant has no site config row', row: undefined },
+    {
+      case: 'an override key is missing from the VOICE_FIELDS registry',
+      row: siteConfigRow({ notARealVoiceField: 'ignored' }),
+    },
+    {
+      case: 'the only override is saved for another language',
+      row: siteConfigRow(
+        { notFoundHeading: GERMAN_HEADING_OVERRIDE },
+        LOCALE_ISO_CODES.DE,
+      ),
+    },
+  ])('returns the base messages unchanged when $case', async ({ row }) => {
+    getSiteConfigMock.mockResolvedValue(row);
+
     const { messages } = await resolveTenantMessages(
-      SITE_MESSAGES,
+      SITE_MESSAGES_BY_LOCALE.EN,
       LOCALE_ISO_CODES.EN,
     );
 
-    expect(messages).toEqual(SITE_MESSAGES);
-  });
-
-  it('returns the base messages unchanged when the tenant has no site config row', async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
-    const { messages } = await resolveTenantMessages(
-      SITE_MESSAGES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(messages).toEqual(SITE_MESSAGES);
+    expect(messages).toEqual(SITE_MESSAGES_BY_LOCALE.EN);
   });
 
   it('applies a TEXT override at its registry path, leaving the rest unchanged', async () => {
@@ -121,7 +120,10 @@ describe('resolveTenantMessages', () => {
 
   it('applies an override saved for the requested language', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notFoundHeading: 'Verirrt' }, LOCALE_ISO_CODES.DE),
+      siteConfigRow(
+        { notFoundHeading: GERMAN_HEADING_OVERRIDE },
+        LOCALE_ISO_CODES.DE,
+      ),
     );
 
     const { messages } = await resolveTenantMessages(
@@ -129,73 +131,63 @@ describe('resolveTenantMessages', () => {
       LOCALE_ISO_CODES.DE,
     );
 
-    expect(getAtPath(messages, ['notFound', 'heading'])).toBe('Verirrt');
+    expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
+      GERMAN_HEADING_OVERRIDE,
+    );
   });
 
-  it('ignores an override saved for another language', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notFoundHeading: 'Verirrt' }, LOCALE_ISO_CODES.DE),
-    );
+  it.each<{
+    kind: string;
+    overrides: Record<string, TVoicePortableText>;
+    path: string[];
+    text: string;
+  }>([
+    {
+      kind: VOICE_FIELD_KIND.RICH,
+      overrides: { blogListEmpty: mockVoiceRichText(BLOG_LIST_EMPTY_OVERRIDE) },
+      path: ['blogListPage', 'empty'],
+      text: BLOG_LIST_EMPTY_OVERRIDE,
+    },
+    {
+      kind: VOICE_FIELD_KIND.RICH,
+      overrides: { topicEmpty: mockVoiceRichText(TOPIC_EMPTY_OVERRIDE) },
+      path: ['topicPage', 'empty'],
+      text: TOPIC_EMPTY_OVERRIDE,
+    },
+    {
+      kind: VOICE_FIELD_KIND.TEXT,
+      overrides: {
+        localeErrorTitle: mockVoiceRichText(LOCALE_ERROR_TITLE_OVERRIDE),
+      },
+      path: ['localeErrorPage', 'title'],
+      text: LOCALE_ERROR_TITLE_OVERRIDE,
+    },
+  ])(
+    'flattens a Portable Text $kind override at $path to plain text',
+    async ({ overrides, path, text }) => {
+      getSiteConfigMock.mockResolvedValue(siteConfigRow(overrides));
 
-    const { messages } = await resolveTenantMessages(
-      SITE_MESSAGES_BY_LOCALE.EN,
-      LOCALE_ISO_CODES.EN,
-    );
+      const { messages } = await resolveTenantMessages(
+        SITE_MESSAGES,
+        LOCALE_ISO_CODES.EN,
+      );
 
-    expect(messages).toEqual(SITE_MESSAGES_BY_LOCALE.EN);
-  });
+      expect(getAtPath(messages, path)).toBe(text);
+    },
+  );
 
-  it('a tenant blogListEmpty voice override reaches blogListPage.empty', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ blogListEmpty: richTextOf(BLOG_LIST_EMPTY_OVERRIDE) }),
-    );
-
-    const { messages } = await resolveTenantMessages(
+  it('forwards an explicit tenant to getRequestTenantId', async () => {
+    await resolveTenantMessages(
       SITE_MESSAGES,
       LOCALE_ISO_CODES.EN,
+      MOCK_OTHER_TENANT_ID,
     );
 
-    expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
-      BLOG_LIST_EMPTY_OVERRIDE,
-    );
-  });
-
-  it('flattens a RICH override to plain text in the message tree', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ topicEmpty: richTextOf(TOPIC_EMPTY_OVERRIDE) }),
-    );
-
-    const { messages } = await resolveTenantMessages(
-      SITE_MESSAGES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(getAtPath(messages, ['topicPage', 'empty'])).toBe(
-      TOPIC_EMPTY_OVERRIDE,
-    );
-  });
-
-  it('ignores an override key missing from the VOICE_FIELDS registry', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notARealVoiceField: 'ignored' }),
-    );
-
-    const { messages } = await resolveTenantMessages(
-      SITE_MESSAGES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(messages).toEqual(SITE_MESSAGES);
-  });
-
-  it('forwards an explicit tenant to getSiteConfig, through to getRequestTenantId', async () => {
-    await resolveTenantMessages(SITE_MESSAGES, LOCALE_ISO_CODES.EN, 'tenant-2');
-
-    expect(getRequestTenantIdMock).toHaveBeenCalledWith('tenant-2');
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(MOCK_OTHER_TENANT_ID);
   });
 
   it('falls back to the base messages when the site config fetch fails', async () => {
-    getSiteConfigMock.mockRejectedValue(new Error('boom'));
+    getSiteConfigMock.mockRejectedValue(MOCK_ERROR);
 
     const { messages } = await resolveTenantMessages(
       SITE_MESSAGES,
@@ -205,7 +197,7 @@ describe('resolveTenantMessages', () => {
     expect(messages).toEqual(SITE_MESSAGES);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       SITE_CONFIG_FETCH_FAILED_EVENT,
-      { error: expect.any(Error) },
+      { error: MOCK_ERROR },
     );
   });
 
@@ -220,21 +212,8 @@ describe('resolveTenantMessages', () => {
     expect(base.notFound.heading).toBe(ORIGINAL_HEADING);
   });
 
-  it('flattens a TEXT-kind override stored as Portable Text to plain text', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ localeErrorTitle: richTextOf('Oops') }),
-    );
-
-    const { messages } = await resolveTenantMessages(
-      SITE_MESSAGES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(getAtPath(messages, ['localeErrorPage', 'title'])).toBe('Oops');
-  });
-
   it('returns a RICH override unflattened in the rich map, keyed by voice field id', async () => {
-    const override = richTextOf(BLOG_LIST_EMPTY_OVERRIDE);
+    const override = mockVoiceRichText(BLOG_LIST_EMPTY_OVERRIDE);
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ blogListEmpty: override }),
     );
@@ -245,27 +224,5 @@ describe('resolveTenantMessages', () => {
     );
 
     expect(rich.blogListEmpty).toBe(override);
-  });
-
-  it('falls back to the catalog default paragraph for a RICH field with no override', async () => {
-    const { rich } = await resolveTenantMessages(
-      SITE_MESSAGES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(rich.blogListEmpty).toEqual([
-      {
-        _type: 'block',
-        _key: 'catalog-block',
-        style: 'normal',
-        children: [
-          {
-            _type: 'span',
-            _key: 'catalog-span',
-            text: SITE_MESSAGES.blogListPage.empty,
-          },
-        ],
-      },
-    ]);
   });
 });

@@ -26,14 +26,32 @@ not to test", and treats "nothing to add" as a complete outcome.
   `src/testing/`**, mirroring the source tree
   (`apps/web/src/components/pages/blog-post-page/` →
   `apps/web/src/testing/pages/blog-post-page/fixtures.tsx`). Export small
-  `make*` builders taking a `Partial<…>` overrides param, and import them
-  through the workspace alias (`@web/testing/…`), never a relative path.
-  Service builders return the raw `TRaw*` shape
-  (`makeRawPostCard` from `@blog/service/testing/pages/fixtures`). A fixture
-  one test file uses stays inline; it moves to `testing/` in the change that
+  builders taking a `Partial<…>` overrides param, named per "Fixture
+  naming", and import them through the workspace alias (`@web/testing/…`),
+  never a relative path. Service builders return the raw `TRaw*` shape. A
+  fixture one test file uses stays inline; it moves to `testing/` in the change that
   adds a second consumer — a story or any other test file counts. A fixture
   literal repeated across files is the same case: it becomes a builder.
   Story-only view-model data follows `web-storybook`.
+- **Fixture naming — required.** A function exported from `testing/`, a
+  `fixtures` file or `__mocks__/` that returns fake data is named
+  `mock<Thing>`; a fixed fake value exported from one is `MOCK_<THING>`. The
+  prefix keeps a fixture from reading as, or colliding with, product code
+  (`makeAsideTypeComponent` is a product factory).
+
+  ```ts
+  export const mockContactFormModule = (overrides = {}) => ({ … }); // ✅
+  export const MOCK_TENANT_ID = faker.string.uuid(); // ✅
+  export const makeContactFormModule = (overrides = {}) => ({ … }); // ❌
+  export const TEST_TENANT_ID = faker.string.uuid(); // ❌
+  ```
+
+  Render and setup helpers (`customRender`, `renderElement`,
+  `renderWithIntl`) are not fixtures and keep their names. Existing `make…`,
+  `get…` and `test…` fixtures are renamed when their workspace's rename
+  lands, never in a file the diff merely touches; a new fixture is named by
+  the rule from the start.
+
 - **Check `testing/` for a builder before writing a mock literal — required.**
   Before hand-rolling an object shaped like a domain entity (SEO, tag,
   author, post, category, tenant, membership, …), grep the workspace's
@@ -146,7 +164,7 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
 
   ```ts
   expect(updateProvisioningStep).toHaveBeenCalledWith({
-    tenantId: TEST_TENANT_ID,
+    tenantId: MOCK_TENANT_ID,
     step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     detail: ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
@@ -423,7 +441,7 @@ tenant)`) is fine: that call is the contract with the outside.
     `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
     (`@blog/service/testing/mock-run-query`) stays the typed handle.
   - **Never restate a `__mocks__` default in `beforeEach`** —
-    `mockResolvedValue(DEFAULT_REQUEST_CONTEXT)`, the default auth session.
+    `mockResolvedValue(MOCK_REQUEST_CONTEXT)`, the default auth session.
     Override only what the case changes.
   - **Override with the `Once` form, or call `vi.mocked(fn).mockReset()` in
     `beforeEach`** — it restores the `vi.fn(impl)` default; never re-set the
@@ -524,6 +542,7 @@ have a test? Report gaps rather than leaving them silent.
       no network, no real time.
 - [ ] Fixtures from `testing/` builders; inputs and expectations use existing
       consts; no value written twice; no const's own value asserted.
+- [ ] A new exported fixture is `mock<Thing>()` or `MOCK_<THING>`.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] No asymmetric matcher (`expect.objectContaining`, `expect.any`, …) inside
       an assertion; every expected value is exact.

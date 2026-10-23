@@ -1,12 +1,12 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
 const items = [
-  makePostListItem({
+  mockPostListItem({
     id: 'post-1',
     href: '/blog/building-a-design-system',
     title: 'Building a Design System from Scratch',
@@ -14,7 +14,7 @@ const items = [
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS.',
     topic: { title: 'Design systems' },
   }),
-  makePostListItem({
+  mockPostListItem({
     id: 'post-2',
     href: '/blog/typescript-tips',
     title: 'TypeScript Tips for 2026',
@@ -40,7 +40,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
+    headingBlock: mockHeadingBlock({ heading: 'Latest posts' }),
     items,
     layout: undefined,
     contentAlignment: undefined,

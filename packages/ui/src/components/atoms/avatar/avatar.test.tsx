@@ -3,12 +3,16 @@ import {
   fireEvent,
   screen,
 } from '@blog/ui/testing/custom-render';
+import { MOCK_PERSON_NAME } from '@blog/ui/testing/fixtures';
 
 import { Avatar } from './avatar';
 
+const PHOTO_SRC = '/photo.jpg';
+const PHOTO_ALT = 'Profile photo';
+
 const setup = customRender(Avatar, {
-  alt: 'Jane Doe',
-  name: 'Jane Doe',
+  alt: MOCK_PERSON_NAME,
+  name: MOCK_PERSON_NAME,
 });
 
 describe(`<${Avatar.name}/>`, () => {
@@ -18,62 +22,56 @@ describe(`<${Avatar.name}/>`, () => {
     });
 
     it('renders initials when no src', () => {
-      expect(screen.getByText('JD')).toBeVisible();
+      const initials = screen.getByText('JD');
+      expect(initials).toBeVisible();
     });
 
     it('renders a text alternative for the initials fallback when alt is provided', () => {
-      expect(screen.getByText('Jane Doe')).toBeVisible();
+      const textAlternative = screen.getByText(MOCK_PERSON_NAME);
+      expect(textAlternative).toBeVisible();
     });
   });
 
   it('renders img when src is provided', () => {
-    setup({ src: '/photo.jpg', alt: 'Profile photo' });
-    expect(screen.getByRole('img', { name: 'Profile photo' })).toBeVisible();
+    setup({ src: PHOTO_SRC, alt: PHOTO_ALT });
+    const photo = screen.getByRole('img', { name: PHOTO_ALT });
+    expect(photo).toBeVisible();
   });
 
-  it('caps initials at 2 chars', () => {
-    setup({ alt: 'John Michael Doe', name: 'John Michael Doe' });
-    expect(screen.getByText('JM')).toBeVisible();
-  });
-
-  it('derives 2 initials from an email address with no whitespace', () => {
-    setup({
-      alt: 'jane.smith@example.com',
-      name: 'jane.smith@example.com',
-    });
-    expect(screen.getByText('JS')).toBeVisible();
-  });
-
-  it('derives 2 initials from an email local-part with no secondary delimiter', () => {
-    setup({ alt: 'madonna@example.com', name: 'madonna@example.com' });
-    expect(screen.getByText('MA')).toBeVisible();
-  });
-
-  it('derives 2 initials from a single unstructured token with no whitespace', () => {
-    setup({ alt: 'madonna', name: 'madonna' });
-    expect(screen.getByText('MA')).toBeVisible();
+  it.each([
+    { case: 'a three-part name', name: 'John Michael Doe', initials: 'JM' },
+    { case: 'a dotted email', name: 'jane.smith@example.com', initials: 'JS' },
+    { case: 'an undotted email', name: 'madonna@example.com', initials: 'MA' },
+    { case: 'a single token', name: 'madonna', initials: 'MA' },
+  ])('derives 2 initials from $case', ({ name, initials }) => {
+    setup({ alt: name, name });
+    const derivedInitials = screen.getByText(initials);
+    expect(derivedInitials).toBeVisible();
   });
 
   it('renders no accessible name on the image when alt is empty', () => {
-    setup({ src: '/photo.jpg', alt: '' });
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    setup({ src: PHOTO_SRC, alt: '' });
+    const photo = screen.queryByRole('img');
+    expect(photo).not.toBeInTheDocument();
   });
 
   it('renders no sr-only name alongside the initials fallback when alt is empty', () => {
     setup({ alt: '' });
-    expect(screen.getByText('JD')).toBeVisible();
-    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
+    const initials = screen.getByText('JD');
+    const textAlternative = screen.queryByText(MOCK_PERSON_NAME);
+    expect(initials).toBeVisible();
+    expect(textAlternative).not.toBeInTheDocument();
   });
 
   it('calls onImageError when the image fails to load', () => {
     const onImageError = vi.fn();
     setup({
       src: '/broken-photo.jpg',
-      alt: 'Profile photo',
+      alt: PHOTO_ALT,
       onImageError,
     });
 
-    const image = screen.getByRole('img', { name: 'Profile photo' });
+    const image = screen.getByRole('img', { name: PHOTO_ALT });
     fireEvent.error(image);
 
     expect(onImageError).toHaveBeenCalledOnce();

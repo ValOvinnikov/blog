@@ -1,8 +1,8 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
-import { OPERATOR_EMAIL } from '@platform/testing/admins/operator';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -25,7 +25,7 @@ describe('recordAuditEvent', () => {
   beforeEach(() => {
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: 'user-1', email: OPERATOR_EMAIL },
+      user: { id: 'user-1', email: MOCK_OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
@@ -39,16 +39,16 @@ describe('recordAuditEvent', () => {
       logEvent: LOG_EVENT,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
     });
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'user-1',
-      actorEmail: OPERATOR_EMAIL,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
     });
     expect(loggerErrorMock).not.toHaveBeenCalled();
@@ -63,7 +63,7 @@ describe('recordAuditEvent', () => {
         logEvent: LOG_EVENT,
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: TENANT_ID,
+        targetId: MOCK_TENANT_ID,
       }),
     ).resolves.toBeUndefined();
 
@@ -72,7 +72,7 @@ describe('recordAuditEvent', () => {
       expect.objectContaining({
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: TENANT_ID,
+        targetId: MOCK_TENANT_ID,
         error: expect.any(Error),
       }),
     );
@@ -86,13 +86,13 @@ describe('recordAuditEvent', () => {
       logEvent: LOG_EVENT,
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
     });
 
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       LOG_EVENT,
-      expect.objectContaining({ targetId: TENANT_ID }),
+      expect.objectContaining({ targetId: MOCK_TENANT_ID }),
     );
   });
 });

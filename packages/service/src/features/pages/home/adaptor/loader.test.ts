@@ -2,24 +2,28 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
-  makeRawHomePage,
-  RAW_HOME_PAGE_ID,
+  MOCK_HOME_PAGE_ID,
+  MOCK_POST_LATEST_MODULE_ID,
+  mockCtaSlotView,
+  mockHeroSlotView,
+  mockRawHomePage,
 } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_TEMPLATE_HOME_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getHomePageDocument } from './loader';
 import { homePageQuery } from './query';
 
-vi.mock(import('@blog/service/sanity/query/query'), async (importOriginal) => ({
-  ...(await importOriginal()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('getHomePageDocument', () => {
+describe(getHomePageDocument, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawHomePage());
+    mockRun.mockResolvedValue(mockRawHomePage());
   });
 
   it('maps the page_home document to its id, module refs and languages', async () => {
@@ -28,11 +32,11 @@ describe('getHomePageDocument', () => {
     const { id, hero, modules, translations } = page;
 
     expect({ id, hero, modules, translations }).toEqual({
-      id: RAW_HOME_PAGE_ID,
-      hero: { id: 'hero-1', type: 'module_heroBlog' },
+      id: MOCK_HOME_PAGE_ID,
+      hero: mockHeroSlotView(),
       modules: [
-        { id: 'post-latest-1', type: 'module_postLatest' },
-        { id: 'cta-1', type: 'module_cta' },
+        { id: MOCK_POST_LATEST_MODULE_ID, type: 'module_postLatest' },
+        mockCtaSlotView(),
       ],
       translations: [LOCALE_ISO_CODES.EN],
     });
@@ -53,7 +57,7 @@ describe('getHomePageDocument', () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: ['t:tenant-a:homePage', 't:tenant-a:template_home'],
+        tags: [MOCK_HOME_PAGE_CACHE_TAG, MOCK_TEMPLATE_HOME_CACHE_TAG],
       },
     });
   });

@@ -44,7 +44,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: true,
-      asset: {
+      data: {
         buffer: expect.any(Buffer),
         contentType: PNG_TYPE,
         extension: 'png',
@@ -128,7 +128,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result).toEqual({
       ok: true,
-      asset: {
+      data: {
         buffer: expect.any(Buffer),
         contentType: SVG_TYPE,
         extension: 'svg',
@@ -183,7 +183,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      const written = result.asset.buffer.toString('utf-8');
+      const written = result.data.buffer.toString('utf-8');
       expect(written).not.toContain('<script');
       expect(written).not.toContain('alert(document.cookie)');
     }
@@ -200,7 +200,7 @@ describe(validateBrandAssetUpload, () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      const written = result.asset.buffer.toString('utf-8');
+      const written = result.data.buffer.toString('utf-8');
       expect(written).not.toContain('onload');
       expect(written).not.toContain('attacker.example');
     }

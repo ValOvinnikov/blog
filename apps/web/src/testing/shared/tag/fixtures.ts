@@ -1,39 +1,43 @@
 import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import type { TTagDetailPage } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockSeo } from '@web/testing/shared/seo/fixtures';
+
+export const MOCK_TAG_SLUG = 'typescript';
 
 type TTagDetailPageTag = TTagDetailPage['tag'];
 
-export const makeTag = (
+export const mockTag = (
   overrides: Partial<TTagDetailPageTag> = {},
 ): TTagDetailPageTag => {
   return {
     id: 'tag-1',
     title: 'TypeScript',
-    slug: 'typescript',
+    slug: MOCK_TAG_SLUG,
     description: 'Posts about TypeScript.',
     ...overrides,
   };
 };
 
-export const makeTagDetailPage = (
+export const mockTagDetailPage = (
   overrides: Partial<TTagDetailPage> = {},
 ): TTagDetailPage => {
+  const tag = mockTag();
+
   return {
-    tag: makeTag(),
+    tag,
     headingAlignment: CONTENT_ALIGNMENT.LEFT,
-    headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+    headingBlock: mockHeadingBlock({ heading: 'TypeScript' }),
     hero: undefined,
     modules: [],
     faqs: [],
-    seo: {
-      title: 'TypeScript',
-      description: 'Posts about TypeScript.',
-      ogTitle: 'TypeScript',
-      ogDescription: 'Posts about TypeScript.',
-      ogImage: undefined,
-    },
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'typescript' }],
+    seo: mockSeo({
+      title: tag.title,
+      description: tag.description,
+      ogTitle: tag.title,
+      ogDescription: tag.description,
+    }),
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_TAG_SLUG }],
     ...overrides,
   };
 };

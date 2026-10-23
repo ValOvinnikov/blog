@@ -1,6 +1,6 @@
 import type { IPrivacySectionProps } from '@web/components/pages/account-page/sections/privacy-section/privacy-section';
 
-export const makePrivacySection = (
+export const mockPrivacySection = (
   overrides: Partial<IPrivacySectionProps> = {},
 ): IPrivacySectionProps => {
   return {

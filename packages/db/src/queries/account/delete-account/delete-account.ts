@@ -5,7 +5,7 @@ import { admins } from '@blog/db/schema/admins';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { users } from '@blog/db/schema/auth';
 import { memberships } from '@blog/db/schema/memberships';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, exists, not } from 'drizzle-orm';
 
 // TODO: once comments exist, tombstone them ahead of this delete — a comment
@@ -64,9 +64,8 @@ export async function deleteAccount(
       .from(users)
       .where(eq(users.id, userId));
 
-    if (remaining)
-      return { ok: false, error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE };
+    if (remaining) return errorResult(ERROR_CODE.DB_HOLDS_PLATFORM_ROLE);
   }
 
-  return { ok: true, data: undefined };
+  return okResult();
 }

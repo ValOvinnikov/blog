@@ -2,7 +2,12 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
-import { makeClientTenant } from '@platform/testing/tenants/fixtures';
+import {
+  CONFIRM_TENANT_NAME_LABEL,
+  mockClientTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -16,8 +21,10 @@ vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
   deleteTenantAction: deleteTenantActionMock,
 }));
 
-const TENANT = makeClientTenant({
-  deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+const DELETE_TENANT_DIALOG_TITLE = `Delete ${MOCK_TENANT_NAME}`;
+
+const TENANT = mockClientTenant({
+  deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 
 const setup = customRender(DeleteTenantControl, { tenant: TENANT });
@@ -38,27 +45,42 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
   });
 
   it('titles the card "Delete this tenant permanently", with no deprovision trigger or badge of its own', () => {
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'Delete this tenant permanently',
-      }),
-    ).toBeVisible();
-    expect(screen.queryByText('Deprovisioned')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Deprovision' }),
-    ).not.toBeInTheDocument();
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Delete this tenant permanently',
+    });
+    const deprovisionedBadge = screen.queryByText('Deprovisioned');
+    const deprovisionButton = screen.queryByRole('button', {
+      name: 'Deprovision',
+    });
+
+    expect(heading).toBeVisible();
+    expect(deprovisionedBadge).not.toBeInTheDocument();
+    expect(deprovisionButton).not.toBeInTheDocument();
   });
 
   describe('once the dialog is open', () => {
     let dialog: HTMLElement;
 
+    const confirmDeletion = async () => {
+      const nameInput = screen.getByRole('textbox', {
+        name: CONFIRM_TENANT_NAME_LABEL,
+      });
+      await user.type(nameInput, MOCK_TENANT_NAME);
+
+      const confirmButton = within(dialog).getByRole('button', {
+        name: 'Delete',
+      });
+      await user.click(confirmButton);
+    };
+
     beforeEach(async () => {
-      await user.click(
-        screen.getByRole('button', { name: 'Delete tenant permanently' }),
-      );
+      const openButton = screen.getByRole('button', {
+        name: 'Delete tenant permanently',
+      });
+      await user.click(openButton);
       dialog = await screen.findByRole('alertdialog', {
-        name: /delete acme inc\./i,
+        name: DELETE_TENANT_DIALOG_TITLE,
       });
     });
 
@@ -68,24 +90,19 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
       });
       expect(confirmButton).toBeDisabled();
 
-      await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
-      );
+      const nameInput = screen.getByRole('textbox', {
+        name: CONFIRM_TENANT_NAME_LABEL,
+      });
+      await user.type(nameInput, MOCK_TENANT_NAME);
 
       expect(confirmButton).toBeEnabled();
     });
 
     it('calls the action with the typed name and navigates to the tenant list', async () => {
-      await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
-      );
-
-      await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+      await confirmDeletion();
 
       expect(deleteTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-        confirm: 'Acme Inc.',
+        confirm: MOCK_TENANT_NAME,
       });
       await vi.waitFor(() =>
         expect(pushMock).toHaveBeenCalledWith(adminRoutes.tenants()),
@@ -97,16 +114,13 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
       });
-      await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
+      await confirmDeletion();
+
+      const mismatchError = await screen.findByText(
+        "Doesn't match the tenant's name.",
       );
 
-      await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
-
-      expect(
-        await screen.findByText("Doesn't match the tenant's name."),
-      ).toBeVisible();
+      expect(mismatchError).toBeVisible();
       expect(pushMock).not.toHaveBeenCalled();
     });
 
@@ -114,16 +128,13 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
       deleteTenantActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
-      await user.type(
-        screen.getByRole('textbox', { name: /type "acme inc\."/i }),
-        'Acme Inc.',
+      await confirmDeletion();
+
+      const deleteFailure = await screen.findByText(
+        "Couldn't delete the tenant — try again.",
       );
 
-      await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
-
-      expect(
-        await screen.findByText("Couldn't delete the tenant — try again."),
-      ).toBeVisible();
+      expect(deleteFailure).toBeVisible();
       expect(pushMock).not.toHaveBeenCalled();
     });
   });

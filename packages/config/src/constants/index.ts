@@ -28,6 +28,7 @@ export * from './language';
 export * from './layout';
 export * from './link';
 export * from './module';
+export * from './next-dynamic-error';
 export * from './next-navigation-error';
 export * from './newsletter-result';
 export * from './operator-alert';
