@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { logger } from '@web/utils/logger/logger';
@@ -89,11 +90,10 @@ describe(submitContactMessage, () => {
   beforeEach(() => {
     isBotOrUnverifiedMock.mockResolvedValue(false);
     isRateLimitedMock.mockResolvedValue(false);
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.GROWTH });
-    getEffectiveSettingsFeaturesMock.mockResolvedValue({
-      ok: true,
-      data: { [CAPABILITY.CONTACT_FORM]: true },
-    });
+    getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.GROWTH));
+    getEffectiveSettingsFeaturesMock.mockResolvedValue(
+      okResult({ [CAPABILITY.CONTACT_FORM]: true }),
+    );
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
@@ -132,19 +132,14 @@ describe(submitContactMessage, () => {
     ],
     [
       'a plan without the contact form',
-      () =>
-        getTenantPlanMock.mockResolvedValue({
-          ok: true,
-          data: TENANT_PLAN.FREE,
-        }),
+      () => getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.FREE)),
     ],
     [
       'the contact form switched off',
       () =>
-        getEffectiveSettingsFeaturesMock.mockResolvedValue({
-          ok: true,
-          data: { [CAPABILITY.CONTACT_FORM]: false },
-        }),
+        getEffectiveSettingsFeaturesMock.mockResolvedValue(
+          okResult({ [CAPABILITY.CONTACT_FORM]: false }),
+        ),
     ],
   ])('blocks %s without storing or sending', async (_case, arrange) => {
     arrange();

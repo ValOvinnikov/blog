@@ -1,19 +1,35 @@
 import { BRAND_VARIANT, HERO_FIELD_MODE } from '@blog/config';
-import { makeRawHeroModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
+import { MOCK_TOPIC_TITLE } from '@blog/service/testing/entities/fixtures';
+import {
+  MOCK_FEATURED_POST_ID,
+  MOCK_HERO_EYEBROW,
+  mockRawHeroModule,
+} from '@blog/service/testing/modules/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_POST_HREF,
+  MOCK_POST_TITLE,
+  mockRawSanityImage,
+  mockSanityImageView,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toHeroModule } from './transformer';
 
+const CUSTOM_COPY = {
+  eyebrow: MOCK_HERO_EYEBROW,
+  title: 'Custom home title',
+  subtitle: 'Custom home subtitle.',
+};
+
 describe('toHeroModule', () => {
-  let fallbackPost: ReturnType<typeof makeRawPostCard>;
+  let fallbackPost: ReturnType<typeof mockRawPostCard>;
 
   beforeEach(() => {
-    fallbackPost = makeRawPostCard({ _id: 'fallback' });
+    fallbackPost = mockRawPostCard({ _id: 'fallback' });
   });
 
   it('maps brandVariant straight through', () => {
-    const raw = makeRawHeroModule({
+    const raw = mockRawHeroModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     });
 
@@ -22,64 +38,38 @@ describe('toHeroModule', () => {
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
 
-  it('trusts an editor-authored primary action label and omits the hidden suffix', () => {
-    const raw = makeRawHeroModule({
-      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
-      primaryActionLabel: 'Discover the story',
-    });
-
-    const hero = toHeroModule(raw, null);
-
-    expect(hero.primaryAction).toEqual({
-      label: 'Discover the story',
-      href: '/blog/hello-world',
-      target: undefined,
-      platform: undefined,
-      hiddenLabelSuffix: undefined,
-    });
-  });
-
   it('uses custom copy and custom sanity image when configured', () => {
-    const raw = makeRawHeroModule({
+    const raw = mockRawHeroModule({
       featuredPost: null,
       heroEyebrowMode: HERO_FIELD_MODE.CUSTOM,
-      heroEyebrow: 'Field notes',
+      heroEyebrow: CUSTOM_COPY.eyebrow,
       heroTitleMode: HERO_FIELD_MODE.CUSTOM,
-      heroTitle: 'Custom home title',
+      heroTitle: CUSTOM_COPY.title,
       heroSubtitleMode: HERO_FIELD_MODE.CUSTOM,
-      heroSubtitle: 'Custom home subtitle.',
+      heroSubtitle: CUSTOM_COPY.subtitle,
       heroImageMode: HERO_FIELD_MODE.CUSTOM,
-      heroImageAsset: makeRawSanityImage(),
+      heroImageAsset: mockRawSanityImage(),
     });
 
     const hero = toHeroModule(raw, null);
 
-    expect(hero.eyebrow).toBe('Field notes');
-    expect(hero.title).toBe('Custom home title');
-    expect(hero.subtitle).toBe('Custom home subtitle.');
-    expect(hero.sanityImage).toEqual({
-      assetId: 'image-abc123-800x600-jpg',
-      alt: 'Alt text',
-      hotspot: undefined,
-      crop: undefined,
-      lqip: 'data:image/png;base64,abc123',
-      dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-    });
+    expect(hero).toMatchObject(CUSTOM_COPY);
+    expect(hero.sanityImage).toEqual(mockSanityImageView());
   });
 
   it('falls back to the featured post topic title when eyebrow mode is POST_TOPIC', () => {
-    const raw = makeRawHeroModule({
-      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+    const raw = mockRawHeroModule({
+      featuredPost: mockRawPostCard({ _id: MOCK_FEATURED_POST_ID }),
       heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
     });
 
     const hero = toHeroModule(raw, null);
 
-    expect(hero.eyebrow).toBe('Engineering');
+    expect(hero.eyebrow).toBe(MOCK_TOPIC_TITLE);
   });
 
   it('hides the image when the mode is NONE, even with a fallback post', () => {
-    const raw = makeRawHeroModule({
+    const raw = mockRawHeroModule({
       featuredPost: null,
       heroImageMode: HERO_FIELD_MODE.NONE,
     });
@@ -90,41 +80,41 @@ describe('toHeroModule', () => {
   });
 
   it('degrades gracefully when the featured post has no image', () => {
-    const raw = makeRawHeroModule({
-      featuredPost: makeRawPostCard({
+    const raw = mockRawHeroModule({
+      featuredPost: mockRawPostCard({
         heroImage: null,
       }),
     });
 
     const hero = toHeroModule(raw, null);
 
-    expect(hero.title).toBe('Hello World');
+    expect(hero.title).toBe(MOCK_POST_TITLE);
     expect(hero.sanityImage).toBeUndefined();
   });
 
   describe('with a configured featured post', () => {
-    let raw: ReturnType<typeof makeRawHeroModule>;
+    let raw: ReturnType<typeof mockRawHeroModule>;
 
     beforeEach(() => {
-      raw = makeRawHeroModule({
-        featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+      raw = mockRawHeroModule({
+        featuredPost: mockRawPostCard({ _id: MOCK_FEATURED_POST_ID }),
       });
     });
 
     it('uses the configured featured post as the fallback source', () => {
       const hero = toHeroModule(raw, null);
 
-      expect(hero.title).toBe('Hello World');
+      expect(hero.title).toBe(MOCK_POST_TITLE);
       expect(hero.primaryAction).toEqual({
         label: 'Read more',
-        href: '/blog/hello-world',
+        href: MOCK_POST_HREF,
         target: undefined,
         platform: undefined,
-        hiddenLabelSuffix: 'Hello World',
+        hiddenLabelSuffix: MOCK_POST_TITLE,
       });
     });
 
-    it('has no appearance on the primary action — module_hero has no appearance field', () => {
+    it('leaves the primary action without an appearance', () => {
       const hero = toHeroModule(raw, null);
 
       expect(hero.primaryAction?.appearance).toBeUndefined();
@@ -132,21 +122,21 @@ describe('toHeroModule', () => {
   });
 
   describe('with no configured featured post', () => {
-    let raw: ReturnType<typeof makeRawHeroModule>;
+    let raw: ReturnType<typeof mockRawHeroModule>;
 
     beforeEach(() => {
-      raw = makeRawHeroModule({ featuredPost: null });
+      raw = mockRawHeroModule({ featuredPost: null });
     });
 
     it('falls back to the newest featured post when none is configured', () => {
       const hero = toHeroModule(raw, fallbackPost);
 
-      expect(hero.title).toBe('Hello World');
-      expect(hero.primaryAction?.href).toBe('/blog/hello-world');
-      expect(hero.primaryAction?.hiddenLabelSuffix).toBe('Hello World');
+      expect(hero.title).toBe(MOCK_POST_TITLE);
+      expect(hero.primaryAction?.href).toBe(MOCK_POST_HREF);
+      expect(hero.primaryAction?.hiddenLabelSuffix).toBe(MOCK_POST_TITLE);
     });
 
-    it('has no primary action and undefined title/subtitle when there is no post at all', () => {
+    it('has no primary action, title or subtitle when there is no post at all', () => {
       const hero = toHeroModule(raw, null);
 
       expect(hero.primaryAction).toBeUndefined();

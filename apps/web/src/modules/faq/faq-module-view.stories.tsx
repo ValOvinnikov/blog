@@ -1,24 +1,24 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
-  faqAnswerWithListAndLinkDemo,
-  makeFaqQuestion,
+  MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
+  mockFaqQuestion,
 } from '@web/testing/modules/faq/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FaqModuleView } from './faq-module-view';
 
 const questions = [
-  makeFaqQuestion({
+  mockFaqQuestion({
     id: 'faq-1',
     question: 'Do you offer a free trial?',
   }),
-  makeFaqQuestion({
+  mockFaqQuestion({
     id: 'faq-2',
     question: 'Can I cancel my subscription at any time?',
   }),
-  makeFaqQuestion({
+  mockFaqQuestion({
     id: 'faq-3',
     question: 'Do you offer discounts for annual billing?',
   }),
@@ -61,16 +61,16 @@ export const CenterAligned: TStory = {
 };
 
 export const WithActions: TStory = {
-  args: { ctaButtons: ctaActionsDemo },
+  args: { ctaButtons: MOCK_CTA_ACTIONS },
 };
 
 export const WithRichAnswer: TStory = {
   args: {
     questions: [
-      makeFaqQuestion({
+      mockFaqQuestion({
         id: 'faq-1',
         question: 'What does the free trial include?',
-        answer: faqAnswerWithListAndLinkDemo,
+        answer: MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK,
       }),
       ...questions.slice(1),
     ],

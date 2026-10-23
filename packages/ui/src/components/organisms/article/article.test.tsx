@@ -1,216 +1,146 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
-import { faker } from '@faker-js/faker';
+import {
+  MOCK_FORMATTED_DATE,
+  MOCK_PERSON_NAME,
+  MOCK_POST_EXCERPT,
+  MOCK_POST_TITLE,
+  MOCK_PUBLISHED_AT,
+  MOCK_TOPIC,
+} from '@blog/ui/testing/fixtures';
+import type { ComponentProps } from 'react';
 
 import { Article } from './article';
 
-faker.seed(123);
+const FOOTER_TAGS = [
+  { label: 'TypeScript', href: '/tag/typescript' },
+  { label: 'Testing', href: '/tag/testing' },
+];
 
 const meta = {
-  author: { name: faker.person.fullName() },
-  publishedAt: faker.date.past().toISOString(),
-  formattedDate: faker.date.past().toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }),
+  author: { name: MOCK_PERSON_NAME },
+  publishedAt: MOCK_PUBLISHED_AT,
+  formattedDate: MOCK_FORMATTED_DATE,
 };
+
+const POST_BODY = 'Post body content.';
+
+const renderArticle = (
+  header: Partial<ComponentProps<typeof Article.Header>> = {},
+  footer?: ComponentProps<typeof Article.Footer>,
+) =>
+  renderElement(
+    <Article>
+      <Article.Header title={MOCK_POST_TITLE} meta={meta} {...header} />
+      <Article.Body>
+        <p>{POST_BODY}</p>
+      </Article.Body>
+      {footer && <Article.Footer {...footer} />}
+    </Article>,
+  );
 
 describe(`<${Article.name}/>`, () => {
   describe('with a title, meta and body only', () => {
     beforeEach(() => {
-      renderElement(
-        <Article>
-          <Article.Header title="Building a Design System" meta={meta} />
-          <Article.Body>
-            <p>Post body content.</p>
-          </Article.Body>
-        </Article>,
-      );
+      renderArticle();
     });
 
     it('renders as an <article> landmark wrapping Header and Body', () => {
-      expect(screen.getByRole('article')).toBeVisible();
-      expect(
-        screen.getByRole('heading', {
-          level: 1,
-          name: 'Building a Design System',
-        }),
-      ).toBeVisible();
-      expect(screen.getByText('Post body content.')).toBeVisible();
+      const article = screen.getByRole('article');
+      const title = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_POST_TITLE,
+      });
+      const body = screen.getByText(POST_BODY);
+      expect(article).toBeVisible();
+      expect(title).toBeVisible();
+      expect(body).toBeVisible();
     });
 
     it('renders no topic eyebrow when topic is omitted', () => {
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
 
     it('does not render a lead paragraph when omitted', () => {
-      expect(
-        screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
-      ).not.toBeInTheDocument();
+      const lead = screen.queryByText(MOCK_POST_EXCERPT);
+      expect(lead).not.toBeInTheDocument();
     });
 
     it('does not render a coverMedia wrapper when omitted', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      const coverImage = screen.queryByRole('img');
+      expect(coverImage).not.toBeInTheDocument();
     });
   });
 
   it('renders the topic eyebrow as non-heading text when no href is given', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          topic={{ label: 'Engineering' }}
-          meta={meta}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByText('Engineering')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Engineering' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: 'Engineering' }),
-    ).not.toBeInTheDocument();
+    renderArticle({ topic: { label: MOCK_TOPIC.label } });
+    const eyebrow = screen.getByText(MOCK_TOPIC.label);
+    const eyebrowLink = screen.queryByRole('link', { name: MOCK_TOPIC.label });
+    const eyebrowHeading = screen.queryByRole('heading', {
+      name: MOCK_TOPIC.label,
+    });
+    expect(eyebrow).toBeVisible();
+    expect(eyebrowLink).not.toBeInTheDocument();
+    expect(eyebrowHeading).not.toBeInTheDocument();
   });
 
   describe('with a linked topic eyebrow', () => {
     beforeEach(() => {
-      renderElement(
-        <Article>
-          <Article.Header
-            title="Building a Design System"
-            topic={{ label: 'Engineering', href: '/topics/engineering' }}
-            meta={meta}
-          />
-          <Article.Body>
-            <p>Post body content.</p>
-          </Article.Body>
-        </Article>,
-      );
+      renderArticle({ topic: MOCK_TOPIC });
     });
 
     it('renders the topic eyebrow as a link when href is given', () => {
-      expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-        'href',
-        '/topics/engineering',
-      );
+      const eyebrowLink = screen.getByRole('link', { name: MOCK_TOPIC.label });
+      expect(eyebrowLink).toHaveAttribute('href', MOCK_TOPIC.href);
     });
 
     it('renders exactly one h1 — the post title — when a topic eyebrow is present', () => {
-      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+      const titleHeadings = screen.getAllByRole('heading', { level: 1 });
+      expect(titleHeadings).toHaveLength(1);
     });
   });
 
   it('renders the lead paragraph when provided', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          lead="A walkthrough of Atomic Design with Tailwind."
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(
-      screen.getByText('A walkthrough of Atomic Design with Tailwind.'),
-    ).toBeVisible();
+    renderArticle({ lead: MOCK_POST_EXCERPT });
+    const lead = screen.getByText(MOCK_POST_EXCERPT);
+    expect(lead).toBeVisible();
   });
 
   it('does not render a PostMeta strip when meta is omitted', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.queryByText(meta.author.name)).not.toBeInTheDocument();
-    expect(screen.queryByText(meta.formattedDate)).not.toBeInTheDocument();
+    renderArticle({ meta: undefined });
+    const authorName = screen.queryByText(meta.author.name);
+    const formattedDate = screen.queryByText(meta.formattedDate);
+    expect(authorName).not.toBeInTheDocument();
+    expect(formattedDate).not.toBeInTheDocument();
   });
 
   it('renders coverMedia content when provided', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          coverMedia={<img src="/cover.jpg" alt="Post cover" />}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByAltText('Post cover')).toBeVisible();
-  });
-
-  it('renders Article.Body children', () => {
-    const body = faker.lorem.paragraph();
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>{body}</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByText(body)).toBeVisible();
+    renderArticle({ coverMedia: <img src="/cover.jpg" alt="Post cover" /> });
+    const coverImage = screen.getByAltText('Post cover');
+    expect(coverImage).toBeVisible();
   });
 
   it('renders Article.Footer tags as links to their routes', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-        <Article.Footer
-          tags={[
-            { label: 'TypeScript', href: '/tag/typescript' },
-            { label: 'Testing', href: '/tag/testing' },
-          ]}
-        />
-      </Article>,
-    );
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
-      'href',
-      '/tag/typescript',
-    );
-    expect(screen.getByRole('link', { name: 'Testing' })).toHaveAttribute(
-      'href',
-      '/tag/testing',
-    );
+    renderArticle({}, { tags: FOOTER_TAGS });
+    for (const tag of FOOTER_TAGS) {
+      const tagLink = screen.getByRole('link', { name: tag.label });
+      expect(tagLink).toHaveAttribute('href', tag.href);
+    }
   });
 
   it('does not render an Article.Footer when tags is empty', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-        <Article.Footer tags={[]} />
-      </Article>,
-    );
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    renderArticle({}, { tags: [] });
+    const link = screen.queryByRole('link');
+    expect(link).not.toBeInTheDocument();
   });
 
   it('forwards dataTestId to the root element', () => {
     renderElement(
       <Article dataTestId="article">
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
+        <Article.Header title={MOCK_POST_TITLE} meta={meta} />
       </Article>,
     );
-    expect(screen.getByTestId('article')).toBeVisible();
+    const article = screen.getByTestId('article');
+    expect(article).toBeVisible();
   });
 });

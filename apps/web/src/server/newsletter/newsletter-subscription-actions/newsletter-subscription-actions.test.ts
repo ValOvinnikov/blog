@@ -4,6 +4,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import {
@@ -149,10 +150,7 @@ describe(resendConfirmationAction, () => {
       confirmationToken: CONFIRMATION_TOKEN,
     });
     deliverNewsletterConfirmationMock.mockResolvedValue(undefined);
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: TENANT_ID,
-    });
+    resolveWritableTenantMock.mockResolvedValue(okResult(TENANT_ID));
   });
 
   it("emails a new confirmation to the subscriber's stored address", async () => {
@@ -175,19 +173,17 @@ describe(resendConfirmationAction, () => {
       'server-error with no tenant',
       SERVER_ERROR,
       () =>
-        resolveWritableTenantMock.mockResolvedValue({
-          ok: false,
-          reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-        }),
+        resolveWritableTenantMock.mockResolvedValue(
+          errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+        ),
     ],
     [
       'unavailable for an inactive tenant',
       toOutcome(ACTION_OUTCOME.UNAVAILABLE),
       () =>
-        resolveWritableTenantMock.mockResolvedValue({
-          ok: false,
-          reason: TENANT_WRITE_REFUSAL.INACTIVE,
-        }),
+        resolveWritableTenantMock.mockResolvedValue(
+          errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+        ),
     ],
   ])('answers %s without resending', async (_case, expected, arrange) => {
     arrange();

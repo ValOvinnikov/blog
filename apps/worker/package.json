@@ -13,7 +13,8 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run --passWithNoTests",
-    "provision-tenant": "tsx --conditions=react-server src/cli/provision-tenant.ts"
+    "provision-tenant": "tsx --conditions=react-server src/cli/provision-tenant.ts",
+    "rotate-webhook-secrets": "tsx --conditions=react-server src/cli/rotate-revalidate-webhook-secrets.ts"
   },
   "dependencies": {
     "@blog/config": "workspace:*",

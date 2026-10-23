@@ -223,6 +223,11 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   "Where tests live", "Rendering and arrangement", "What to fake"; repetition
   already on `main` that the diff adds nothing to is filed (`CLAUDE.md`
   "Duplication that already existed is filed, not fixed inline").
+- A fixture the diff adds to `testing/`, a `fixtures` file or `__mocks__/`
+  that is not named `mock<Thing>` (a builder) or `MOCK_<THING>` (a fixed
+  value) is a finding; render and setup helpers are exempt, and existing
+  fixtures it does not add are left to their workspace's rename
+  (→ `testing-practices` "Fixture naming").
 - A `screen` query inside `expect(…)` in any test file the diff creates or
   touches is **blocking** — the asserted element is a named `const` first,
   and a touched file is converted whole (→ `testing-practices` "Name the

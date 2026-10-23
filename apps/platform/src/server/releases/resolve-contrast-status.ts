@@ -1,5 +1,6 @@
 import { FINDING_STATUS, RELEASE_CHANGE } from '@blog/config';
 import { queries } from '@blog/db';
+import { okResult } from '@blog/utils';
 import {
   CONTRAST_STATUS,
   CONTRAST_WORKFLOW_FILE,
@@ -31,36 +32,32 @@ export const resolveContrastStatus = async ({
   if (!finding.ok) return finding;
   if (finding.data) {
     const isGreen = finding.data.status === FINDING_STATUS.RESOLVED;
-    return {
-      ok: true,
-      data: isGreen ? CONTRAST_STATUS.GREEN : CONTRAST_STATUS.FAILED,
-    };
+    return okResult(isGreen ? CONTRAST_STATUS.GREEN : CONTRAST_STATUS.FAILED);
   }
 
   const active = await isWorkflowRunActive(CONTRAST_WORKFLOW_FILE, headSha);
-  if (!active.ok) return toReleaseFailure(active.reason);
-  if (active.data) return { ok: true, data: CONTRAST_STATUS.RUNNING };
+  if (!active.ok) return toReleaseFailure(active.error);
+  if (active.data) return okResult(CONTRAST_STATUS.RUNNING);
 
   if (!renderingChangedSinceTag) {
-    return { ok: true, data: CONTRAST_STATUS.NONE };
+    return okResult(CONTRAST_STATUS.NONE);
   }
 
   const lastGreenSha = await readDb(() =>
     queries.findings.getLatestPassingContrastSha(),
   );
   if (!lastGreenSha.ok) return lastGreenSha;
-  if (!lastGreenSha.data) return { ok: true, data: CONTRAST_STATUS.DUE };
+  if (!lastGreenSha.data) return okResult(CONTRAST_STATUS.DUE);
 
   const sinceGreen = await compareCommits(lastGreenSha.data, headSha);
-  if (!sinceGreen.ok) return toReleaseFailure(sinceGreen.reason);
+  if (!sinceGreen.ok) return toReleaseFailure(sinceGreen.error);
 
   const { files, isFileListTruncated } = sinceGreen.data;
   const changes = classifyReleaseChanges(files, isFileListTruncated);
 
-  return {
-    ok: true,
-    data: changes[RELEASE_CHANGE.RENDERING]
+  return okResult(
+    changes[RELEASE_CHANGE.RENDERING]
       ? CONTRAST_STATUS.DUE
       : CONTRAST_STATUS.NONE,
-  };
+  );
 };

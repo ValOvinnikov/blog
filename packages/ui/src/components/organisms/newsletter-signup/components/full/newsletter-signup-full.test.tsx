@@ -1,25 +1,25 @@
 import { ICONS, FORM_STATUS } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import {
+  MOCK_NEWSLETTER_EMAIL_LABEL,
+  mockNewsletterSignupArgs,
+} from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { NewsletterSignupFull } from './newsletter-signup-full';
 
+const HEADING_ID = 'newsletter-full-heading';
+const FULL_TEST_ID = 'newsletter-signup-full';
+
 faker.seed(123);
 
-const SUBMIT_LABEL = faker.lorem.word();
-const EMAIL_LABEL = faker.lorem.words(2);
 const FIRST_CUE = faker.lorem.words(2);
 const SECOND_CUE = faker.lorem.words(3);
 
 const baseArgs = {
-  email: '',
-  onChange: vi.fn(),
-  onSubmit: vi.fn(),
-  status: FORM_STATUS.IDLE,
+  ...mockNewsletterSignupArgs(),
   heading: faker.lorem.sentence(3),
-  submitLabel: SUBMIT_LABEL,
-  emailAriaLabel: EMAIL_LABEL,
 };
 
 const setup = customRender(NewsletterSignupFull, baseArgs);
@@ -42,15 +42,25 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     expect(supportingTextElement).toBeVisible();
   });
 
-  it('renders the heading as an h2 when headingLevel is omitted', () => {
-    setup({ heading });
-
-    const headingElement = screen.getByRole('heading', {
-      name: heading,
-      level: 2,
+  describe('with only a heading', () => {
+    beforeEach(() => {
+      setup({ heading });
     });
 
-    expect(headingElement).toBeVisible();
+    it('renders the heading as an h2 when headingLevel is omitted', () => {
+      const headingElement = screen.getByRole('heading', {
+        name: heading,
+        level: 2,
+      });
+
+      expect(headingElement).toBeVisible();
+    });
+
+    it('renders the heading with no id when headingId is omitted', () => {
+      const headingElement = screen.getByRole('heading', { name: heading });
+
+      expect(headingElement).not.toHaveAttribute('id');
+    });
   });
 
   it.each([1, 3, 4] as const)(
@@ -68,26 +78,20 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
   );
 
   it('assigns headingId to the heading element when provided', () => {
-    setup({ heading, headingId: 'newsletter-full-heading' });
+    setup({ heading, headingId: HEADING_ID });
 
     const headingElement = screen.getByRole('heading', { name: heading });
 
-    expect(headingElement).toHaveAttribute('id', 'newsletter-full-heading');
-  });
-
-  it('renders the heading with no id when headingId is omitted', () => {
-    setup({ heading });
-
-    const headingElement = screen.getByRole('heading', { name: heading });
-
-    expect(headingElement).not.toHaveAttribute('id');
+    expect(headingElement).toHaveAttribute('id', HEADING_ID);
   });
 
   it('renders no heading when heading is omitted', () => {
     setup({ heading: undefined });
 
     const headingElement = screen.queryByRole('heading');
-    const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
+    const emailField = screen.getByRole('textbox', {
+      name: MOCK_NEWSLETTER_EMAIL_LABEL,
+    });
 
     expect(headingElement).not.toBeInTheDocument();
     expect(emailField).toBeVisible();
@@ -158,9 +162,9 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
   });
 
   it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'newsletter-signup-full' });
+    setup({ dataTestId: FULL_TEST_ID });
 
-    const root = screen.getByTestId('newsletter-signup-full');
+    const root = screen.getByTestId(FULL_TEST_ID);
 
     expect(root).toBeVisible();
   });

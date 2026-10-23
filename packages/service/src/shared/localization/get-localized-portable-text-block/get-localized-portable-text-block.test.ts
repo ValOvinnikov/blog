@@ -7,8 +7,14 @@ import { q } from '@blog/service/sanity/query/query';
 import type { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 import type { TLocalizedKey } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { paragraphBlocks } from '@blog/service/testing/shared/localized';
+import { MOCK_CTA_MODULE_ID } from '@blog/service/testing/modules/fixtures';
+import { createLocalizedFieldResolver } from '@blog/service/testing/shared/groq';
+import {
+  MOCK_DUTCH_TEXT,
+  MOCK_ENGLISH_TEXT,
+  mockLocalizedEntry,
+  mockParagraphBlocks,
+} from '@blog/service/testing/shared/localized';
 import type { InferFragmentType } from 'groqd';
 
 import { getLocalizedPortableTextBlock } from './get-localized-portable-text-block';
@@ -23,37 +29,36 @@ const query = q
     content: getLocalizedPortableTextBlock(sub, 'content'),
   }));
 
-function resolve(content: unknown[], locale: string) {
-  return evaluateGroqExpression(
-    query.query,
-    [{ _id: 'cta-1', _type: 'module_cta', content }],
-    undefined,
-    { locale, defaultLocale: EN },
-  );
-}
+const resolve = createLocalizedFieldResolver(query.query, (content) => ({
+  _id: MOCK_CTA_MODULE_ID,
+  _type: 'module_cta',
+  content,
+}));
 
-const english = { _key: EN, language: EN, value: paragraphBlocks('Read on.') };
-const dutch = {
-  _key: NL,
-  language: NL,
-  value: paragraphBlocks('Lees verder.'),
-};
+const english = mockLocalizedEntry(EN, mockParagraphBlocks(MOCK_ENGLISH_TEXT));
+const dutch = mockLocalizedEntry(NL, mockParagraphBlocks(MOCK_DUTCH_TEXT));
 
 describe(getLocalizedPortableTextBlock, () => {
   it('resolves the blocks in the requested language', async () => {
-    expect(await resolve([english, dutch], NL)).toMatchObject({
-      content: [{ children: [{ text: 'Lees verder.' }] }],
+    const result = await resolve([english, dutch], NL);
+
+    expect(result).toMatchObject({
+      content: [{ children: [{ text: MOCK_DUTCH_TEXT }] }],
     });
   });
 
   it('falls back to the default language when the requested one is missing', async () => {
-    expect(await resolve([english, dutch], FR)).toMatchObject({
-      content: [{ children: [{ text: 'Read on.' }] }],
+    const result = await resolve([english, dutch], FR);
+
+    expect(result).toMatchObject({
+      content: [{ children: [{ text: MOCK_ENGLISH_TEXT }] }],
     });
   });
 
   it('resolves to nothing when neither language has blocks', async () => {
-    expect(await resolve([dutch], FR)).toEqual({ content: null });
+    const result = await resolve([dutch], FR);
+
+    expect(result).toEqual({ content: null });
   });
 });
 

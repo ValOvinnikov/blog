@@ -69,13 +69,13 @@ export const resendConfirmationAction =
       'newsletter.resend_confirmation',
     );
     if (!tenant.ok) {
-      if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+      if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
         logger.warn('newsletter.resend_confirmation_tenant_not_active');
         return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
       }
       return SERVER_ERROR;
     }
-    const { tenantId } = tenant;
+    const { data: tenantId } = tenant;
 
     try {
       const result = await queries.subscribers.resendConfirmation(

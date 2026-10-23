@@ -56,7 +56,7 @@ export async function sendOwnerInactivityEmail(
     ...text,
     action: {
       label: copy.actionLabel,
-      url: new URL(OWNER_DASHBOARD_PATH, env.adminAppBaseUrl).toString(),
+      url: new URL(OWNER_DASHBOARD_PATH, env.platformAppBaseUrl).toString(),
     },
   });
 
@@ -87,7 +87,7 @@ export async function alertOperatorsOfSuspensionWarning({
     tenantId,
     ownerEmail,
     pauseDate: formatInactivityDate(date, LOCALE_ISO_CODES.EN),
-    signInUrl: env.adminAppBaseUrl,
+    signInUrl: env.platformAppBaseUrl,
   });
 
   await sendOperatorEmail(tenantId, message, {

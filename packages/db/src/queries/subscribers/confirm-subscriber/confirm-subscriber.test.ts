@@ -3,7 +3,7 @@ import * as schema from '@blog/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -49,7 +49,7 @@ describe(confirmSubscriber, () => {
     ({ id: subscriberId } = await insertTestSubscriber(
       db(),
       tenantId,
-      TEST_SUBSCRIBER_EMAIL,
+      MOCK_SUBSCRIBER_EMAIL,
       { confirmationTokenHash },
     ));
   });

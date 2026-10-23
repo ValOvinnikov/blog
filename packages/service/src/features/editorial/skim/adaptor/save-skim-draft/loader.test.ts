@@ -1,5 +1,11 @@
 import { getWriteClient } from '@blog/service/sanity/write-client/write-client';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_SKIM_MODEL,
+  MOCK_SKIM_TAKEAWAYS,
+  mockSkimDraftInput,
+} from '@blog/service/testing/editorial/fixtures';
+import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { saveSkimDraft } from './loader';
 
@@ -7,118 +13,94 @@ vi.mock('@blog/service/sanity/write-client/write-client', () => ({
   getWriteClient: vi.fn(),
 }));
 
-const mockGetWriteClient = vi.mocked(getWriteClient);
-const tenant = makeTenant();
+const DRAFT_ID = `drafts.${MOCK_POST_ID}`;
+const NOW = '2026-07-20T00:00:00.000Z';
+const SKIM_INPUT = mockSkimDraftInput();
+const PUBLISHED_POST = {
+  _id: MOCK_POST_ID,
+  _type: 'page_post',
+  title: 'Hello',
+};
 
-function makeMockClient() {
+const mockGetWriteClient = vi.mocked(getWriteClient);
+const tenant = mockTenant();
+
+function mockWriteClient() {
   const commit = vi.fn().mockResolvedValue(undefined);
   const patch = vi.fn().mockReturnValue({ commit });
   const createIfNotExists = vi.fn().mockReturnValue({ patch });
   const transaction = vi.fn().mockReturnValue({ createIfNotExists });
-  const getDocument = vi
-    .fn()
-    .mockResolvedValue({ _id: 'post-1', _type: 'page_post' });
+  const getDocument = vi.fn().mockResolvedValue(PUBLISHED_POST);
 
   return { getDocument, transaction, createIfNotExists, patch, commit };
 }
 
 describe(saveSkimDraft, () => {
-  let client: ReturnType<typeof makeMockClient>;
+  let client: ReturnType<typeof mockWriteClient>;
 
   beforeEach(() => {
-    client = makeMockClient();
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(NOW));
+    client = mockWriteClient();
     mockGetWriteClient.mockReturnValue(client as never);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('throws when there is no published post for the id', async () => {
     client.getDocument.mockResolvedValue(undefined);
 
-    await expect(
-      saveSkimDraft(
-        { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
-        tenant,
-      ),
-    ).rejects.toThrow(/no published post/);
+    await expect(saveSkimDraft(SKIM_INPUT, tenant)).rejects.toThrow(
+      /no published post/,
+    );
   });
 
-  it('propagates when the write client is unavailable (missing write token)', async () => {
+  it('propagates when the write client is missing its write token', async () => {
     mockGetWriteClient.mockImplementation(() => {
       throw new Error('getWriteClient: SANITY_API_WRITE_TOKEN is not set');
     });
 
-    await expect(
-      saveSkimDraft(
-        { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
-        tenant,
-      ),
-    ).rejects.toThrow(/SANITY_API_WRITE_TOKEN/);
-  });
-
-  it('creates the draft from the published doc if none exists, and patches only the draft id', async () => {
-    client.getDocument.mockResolvedValue({
-      _id: 'post-1',
-      _type: 'page_post',
-      title: 'Hello',
-    });
-
-    await saveSkimDraft(
-      {
-        postId: 'post-1',
-        takeaways: ['One', 'Two', 'Three'],
-        model: 'claude-haiku-4-5',
-      },
-      tenant,
-    );
-
-    expect(client.getDocument).toHaveBeenCalledWith('post-1');
-    expect(client.createIfNotExists).toHaveBeenCalledWith(
-      expect.objectContaining({ _id: 'drafts.post-1', title: 'Hello' }),
-    );
-    expect(client.patch).toHaveBeenCalledWith(
-      'drafts.post-1',
-      expect.objectContaining({
-        set: {
-          postTakeaways: expect.objectContaining({
-            _type: 'postTakeaways',
-            takeaways: ['One', 'Two', 'Three'],
-            model: 'claude-haiku-4-5',
-          }),
-        },
-      }),
-    );
-    expect(client.commit).toHaveBeenCalled();
-  });
-
-  it('never patches the published document id', async () => {
-    await saveSkimDraft(
-      { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
-      tenant,
-    );
-
-    expect(client.patch).not.toHaveBeenCalledWith('post-1', expect.anything());
-  });
-
-  it('normalizes an already-draft postId (idempotent re-run) to the same draft id', async () => {
-    await saveSkimDraft(
-      { postId: 'drafts.post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
-      tenant,
-    );
-
-    expect(client.getDocument).toHaveBeenCalledWith('post-1');
-    expect(client.createIfNotExists).toHaveBeenCalledWith(
-      expect.objectContaining({ _id: 'drafts.post-1' }),
-    );
-    expect(client.patch).toHaveBeenCalledWith(
-      'drafts.post-1',
-      expect.anything(),
+    await expect(saveSkimDraft(SKIM_INPUT, tenant)).rejects.toThrow(
+      /SANITY_API_WRITE_TOKEN/,
     );
   });
+
+  it.each([
+    ['a published id', MOCK_POST_ID],
+    ['an already-draft id', DRAFT_ID],
+  ])(
+    'drafts the published doc and patches only the draft, given %s',
+    async (_, postId) => {
+      await saveSkimDraft({ ...SKIM_INPUT, postId }, tenant);
+
+      expect(client.getDocument).toHaveBeenCalledWith(MOCK_POST_ID);
+      expect(client.createIfNotExists).toHaveBeenCalledWith({
+        ...PUBLISHED_POST,
+        _id: DRAFT_ID,
+      });
+      expect(client.patch.mock.calls).toEqual([
+        [
+          DRAFT_ID,
+          {
+            set: {
+              postTakeaways: {
+                _type: 'postTakeaways',
+                takeaways: MOCK_SKIM_TAKEAWAYS,
+                generatedAt: NOW,
+                model: MOCK_SKIM_MODEL,
+              },
+            },
+          },
+        ],
+      ]);
+      expect(client.commit).toHaveBeenCalled();
+    },
+  );
 
   it('passes the tenant context through to getWriteClient', async () => {
-    await saveSkimDraft(
-      { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
-      tenant,
-    );
+    await saveSkimDraft(SKIM_INPUT, tenant);
 
     expect(mockGetWriteClient).toHaveBeenCalledWith(tenant);
   });

@@ -7,8 +7,8 @@ import {
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Section } from '@web/components/shared/section';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
@@ -60,7 +60,7 @@ const meta = {
     contentPosition: undefined,
     contentAlignment: undefined,
     mobileMediaOrder: undefined,
-    ctaButtons: ctaActionsDemo,
+    ctaButtons: MOCK_CTA_ACTIONS,
     footnote: undefined,
     layout: undefined,
   },
@@ -78,7 +78,7 @@ export const Callout: TStory = {
 export const Split: TStory = {
   args: {
     variant: CTA_VARIANT.SPLIT,
-    image: makeSanityImage(),
+    image: mockSanityImage(),
     contentPosition: CONTENT_ALIGNMENT.RIGHT,
     contentAlignment: CONTENT_ALIGNMENT.RIGHT,
   },
@@ -88,7 +88,7 @@ export const Banner: TStory = {
   args: {
     variant: CTA_VARIANT.BANNER,
     brandVariant: BRAND_VARIANT.SECONDARY,
-    image: makeSanityImage(),
+    image: mockSanityImage(),
     contentPosition: CONTENT_ALIGNMENT.CENTER,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
@@ -99,7 +99,7 @@ export const BannerBetweenSecondarySectionsSpacingNone: TStory = {
     variant: CTA_VARIANT.BANNER,
     brandVariant: BRAND_VARIANT.SECONDARY,
     bandTone: BRAND_VARIANT.SECONDARY,
-    image: makeSanityImage(),
+    image: mockSanityImage(),
     contentPosition: CONTENT_ALIGNMENT.CENTER,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
     layout: {

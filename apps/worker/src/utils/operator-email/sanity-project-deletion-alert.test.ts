@@ -7,15 +7,19 @@ import {
   SANITY_MANAGE_PROJECT_URL,
 } from '@worker/constants/deprovisioning';
 import { DEFAULT_OPERATOR_ALERT_FROM_ADDRESS } from '@worker/constants/operator-alert';
-import { SUPERADMIN_EMAILS } from '@worker/testing/operator-email/fixtures';
-import { SANITY_PROJECT_ID } from '@worker/testing/owner-access/fixtures';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_SUPERADMIN_EMAILS } from '@worker/testing/operator-email/fixtures';
+import { MOCK_RESEND_DOWN } from '@worker/testing/outage/fixtures';
+import {
+  MOCK_SANITY_PROJECT_ID,
+  MOCK_TENANT_ID,
+  mockProvisionedTenant,
+  mockTenant,
+} from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 
 import { alertOperatorsToDeleteSanityProject } from './sanity-project-deletion-alert';
 
-const ARCHIVED_TENANT = makeTenant({ sanityProjectId: SANITY_PROJECT_ID });
-const RESEND_DOWN = 'resend down';
+const ARCHIVED_TENANT = mockProvisionedTenant();
 
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
@@ -32,26 +36,26 @@ function sentTo(): string[] {
 
 describe(alertOperatorsToDeleteSanityProject, () => {
   beforeEach(() => {
-    vi.mocked(listSuperadminEmails).mockResolvedValue(SUPERADMIN_EMAILS);
+    vi.mocked(listSuperadminEmails).mockResolvedValue(MOCK_SUPERADMIN_EMAILS);
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
   it('sends every super admin one email naming the project to delete in Sanity Manage', async () => {
     await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
 
-    expect(sentTo()).toEqual(SUPERADMIN_EMAILS);
+    expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
     expect(sendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         from: DEFAULT_OPERATOR_ALERT_FROM_ADDRESS,
         html: expect.stringContaining(
-          `href="${SANITY_MANAGE_PROJECT_URL}${SANITY_PROJECT_ID}"`,
+          `href="${SANITY_MANAGE_PROJECT_URL}${MOCK_SANITY_PROJECT_ID}"`,
         ),
       }),
     );
   });
 
   it('sends nothing for a tenant without a Sanity project', async () => {
-    await alertOperatorsToDeleteSanityProject(makeTenant());
+    await alertOperatorsToDeleteSanityProject(mockTenant());
 
     expect(listSuperadminEmails).not.toHaveBeenCalled();
     expect(sendEmail).not.toHaveBeenCalled();
@@ -65,19 +69,19 @@ describe(alertOperatorsToDeleteSanityProject, () => {
     expect(sendEmail).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
       DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
-      { tenantId: TEST_TENANT_ID },
+      { tenantId: MOCK_TENANT_ID },
     );
   });
 
   it('logs a failed send and still sends the rest', async () => {
-    vi.mocked(sendEmail).mockRejectedValueOnce(new Error(RESEND_DOWN));
+    vi.mocked(sendEmail).mockRejectedValueOnce(new Error(MOCK_RESEND_DOWN));
 
     await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
 
-    expect(sentTo()).toEqual(SUPERADMIN_EMAILS);
+    expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
     expect(logger.error).toHaveBeenCalledWith(
       DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
-      { tenantId: TEST_TENANT_ID, error: RESEND_DOWN },
+      { tenantId: MOCK_TENANT_ID, error: MOCK_RESEND_DOWN },
     );
   });
 });

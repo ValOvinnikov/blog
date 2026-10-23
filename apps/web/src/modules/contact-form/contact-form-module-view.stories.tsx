@@ -5,7 +5,7 @@ import {
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
+import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { ContactFormModuleView } from './contact-form-module-view';
@@ -29,7 +29,7 @@ const meta = {
     id: faker.string.uuid(),
     currentLocale: LOCALE_ISO_CODES.EN,
     defaultLocale: LOCALE_ISO_CODES.EN,
-    ...makeContactFormModule({
+    ...mockContactFormModule({
       privacyNote: [portableTextBlock(faker.lorem.sentence())],
     }),
   },

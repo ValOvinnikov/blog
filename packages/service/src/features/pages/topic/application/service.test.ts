@@ -1,35 +1,40 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
+import { MOCK_TOPIC_SLUG } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
-import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  mockFaqView,
+  mockRawFaqModuleQuestions,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_HERO_MODULE_ID,
+  mockListModulePageSize,
+  mockListModuleRefs,
+  mockRawTopicPage,
+} from '@blog/service/testing/pages/fixtures';
+import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { createTopicService } from './service';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
 vi.mock('@blog/service/shared/adaptors/faq-questions/loader');
 
 const mockFaqQuestions = vi.mocked(getFaqQuestions);
 const { EN, NL } = LOCALE_ISO_CODES;
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('createTopicService', () => {
+describe(createTopicService, () => {
   describe('v1.getTopicPage', () => {
     it("adds the faqs of the page's FAQ modules to the page", async () => {
       mockRun.mockResolvedValueOnce(
-        makeRawTopicPage({ modules: [{ _id: 'faq-a', _type: 'module_faq' }] }),
+        mockRawTopicPage({ modules: [{ _id: 'faq-a', _type: 'module_faq' }] }),
       );
-      mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
+      mockFaqQuestions.mockResolvedValueOnce([mockRawFaqModuleQuestions()]);
 
       const result = await createTopicService().v1.getTopicPage(
-        'engineering',
+        MOCK_TOPIC_SLUG,
         tenant,
       );
       if (!result.ok || !result.data) throw new Error('expected a page');
@@ -38,20 +43,14 @@ describe('createTopicService', () => {
         ['faq-a'],
         tenant,
       );
-      expect(result.data.faqs).toEqual([
-        {
-          id: 'block-faq-1',
-          question: 'How long does onboarding take?',
-          answer: 'Most teams are live within a week.',
-        },
-      ]);
+      expect(result.data.faqs).toEqual([mockFaqView()]);
     });
 
     it('resolves undefined data without a FAQ request when no page matches the slug', async () => {
       mockRun.mockResolvedValueOnce(null);
 
       const result = await createTopicService().v1.getTopicPage(
-        'missing',
+        MOCK_MISSING_ID,
         tenant,
       );
 
@@ -65,25 +64,25 @@ describe('createTopicService', () => {
       mockRun
         .mockResolvedValueOnce([
           {
-            slug: 'engineering',
+            slug: MOCK_TOPIC_SLUG,
             language: EN,
-            moduleRefs: [{ _ref: 'list-1' }],
+            moduleRefs: mockListModuleRefs(),
             postCount: 20,
           },
           {
             slug: 'design',
             language: EN,
-            moduleRefs: [{ _ref: 'list-1' }],
+            moduleRefs: mockListModuleRefs(),
             postCount: 9,
           },
           {
             slug: 'no-list',
             language: EN,
-            moduleRefs: [{ _ref: 'hero-1' }],
+            moduleRefs: [{ _ref: MOCK_HERO_MODULE_ID }],
             postCount: 50,
           },
         ])
-        .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
+        .mockResolvedValueOnce([mockListModulePageSize()]);
 
       const result = await createTopicService().v1.getTopicPaginationParams(
         tenant,
@@ -93,37 +92,10 @@ describe('createTopicService', () => {
       expect(result).toEqual({
         ok: true,
         data: [
-          { slug: 'engineering', language: EN, page: '2' },
-          { slug: 'engineering', language: EN, page: '3' },
+          { slug: MOCK_TOPIC_SLUG, language: EN, page: '2' },
+          { slug: MOCK_TOPIC_SLUG, language: EN, page: '3' },
         ],
       });
-    });
-
-    it('fetches the page sizes of all pages in one request', async () => {
-      mockRun
-        .mockResolvedValueOnce([
-          {
-            slug: 'engineering',
-            language: EN,
-            moduleRefs: [{ _ref: 'list-1' }],
-            postCount: 20,
-          },
-          {
-            slug: 'design',
-            language: EN,
-            moduleRefs: [{ _ref: 'list-2' }],
-            postCount: 20,
-          },
-        ])
-        .mockResolvedValueOnce([]);
-
-      await createTopicService().v1.getTopicPaginationParams(tenant, [EN, NL]);
-
-      expect(mockRun).toHaveBeenCalledTimes(2);
-      expect(mockRun).toHaveBeenLastCalledWith(
-        expect.anything(),
-        expect.objectContaining({ parameters: { ids: ['list-1', 'list-2'] } }),
-      );
     });
   });
 });

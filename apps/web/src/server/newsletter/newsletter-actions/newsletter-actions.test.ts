@@ -6,6 +6,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import {
@@ -80,25 +81,20 @@ const UNAVAILABLE = { outcome: ACTION_OUTCOME.UNAVAILABLE };
 const ALREADY_SUBSCRIBED = { outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
 
 const resolveSubscriber = (outcome: string) =>
-  createPendingSubscriberMock.mockResolvedValue({
-    ok: true,
-    data: { outcome, subscriber: SUBSCRIBER },
-  });
+  createPendingSubscriberMock.mockResolvedValue(
+    okResult({ outcome, subscriber: SUBSCRIBER }),
+  );
 
 describe(subscribeToNewsletterAction, () => {
   beforeEach(() => {
     resolveSubscriber(SUBSCRIBER_OUTCOME.CREATED);
     sendNewsletterConfirmationMock.mockResolvedValue(undefined);
     markNewsletterSubscribedMock.mockResolvedValue(undefined);
-    getTenantPlanMock.mockResolvedValue({ ok: true, data: TENANT_PLAN.GROWTH });
-    getEffectiveSettingsFeaturesMock.mockResolvedValue({
-      ok: true,
-      data: { [CAPABILITY.NEWSLETTER]: true },
-    });
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: TENANT_ID,
-    });
+    getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.GROWTH));
+    getEffectiveSettingsFeaturesMock.mockResolvedValue(
+      okResult({ [CAPABILITY.NEWSLETTER]: true }),
+    );
+    resolveWritableTenantMock.mockResolvedValue(okResult(TENANT_ID));
     isSubscribeAttemptRefusedMock.mockResolvedValue(false);
   });
 
@@ -163,37 +159,30 @@ describe(subscribeToNewsletterAction, () => {
       'server-error when no tenant resolves',
       SERVER_ERROR,
       () =>
-        resolveWritableTenantMock.mockResolvedValue({
-          ok: false,
-          reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
-        }),
+        resolveWritableTenantMock.mockResolvedValue(
+          errorResult(TENANT_WRITE_REFUSAL.UNRESOLVED),
+        ),
     ],
     [
       'unavailable for an inactive tenant',
       UNAVAILABLE,
       () =>
-        resolveWritableTenantMock.mockResolvedValue({
-          ok: false,
-          reason: TENANT_WRITE_REFUSAL.INACTIVE,
-        }),
+        resolveWritableTenantMock.mockResolvedValue(
+          errorResult(TENANT_WRITE_REFUSAL.INACTIVE),
+        ),
     ],
     [
       'unavailable with the newsletter switched off',
       UNAVAILABLE,
       () =>
-        getEffectiveSettingsFeaturesMock.mockResolvedValue({
-          ok: true,
-          data: { [CAPABILITY.NEWSLETTER]: false },
-        }),
+        getEffectiveSettingsFeaturesMock.mockResolvedValue(
+          okResult({ [CAPABILITY.NEWSLETTER]: false }),
+        ),
     ],
     [
       'unavailable on a plan without the newsletter',
       UNAVAILABLE,
-      () =>
-        getTenantPlanMock.mockResolvedValue({
-          ok: true,
-          data: TENANT_PLAN.FREE,
-        }),
+      () => getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.FREE)),
     ],
   ])('answers %s without storing', async (_case, expected, arrange) => {
     arrange();
@@ -206,10 +195,9 @@ describe(subscribeToNewsletterAction, () => {
   });
 
   it('answers server-error and logs the code when storing fails', async () => {
-    createPendingSubscriberMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    createPendingSubscriberMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await subscribeToNewsletterAction(EMAIL);
 

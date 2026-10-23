@@ -5,13 +5,13 @@ import {
 } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import {
-  BLOCK_REASON,
-  NOT_AN_ADDRESS,
+  MOCK_BLOCK_REASON,
+  MOCK_NOT_AN_ADDRESS,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import {
   insertTestTenant,
-  TEST_INVITE_EMAIL,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_INVITE_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
   testPersonalEmailIndex,
@@ -20,8 +20,8 @@ import {
 import {
   deleteTestPersonalDataRows,
   insertTestPersonalDataRows,
-  PERSONAL_DATA_LEAD_MESSAGE,
-  PERSONAL_DATA_LEAD_NAME,
+  MOCK_PERSONAL_DATA_LEAD_MESSAGE,
+  MOCK_PERSONAL_DATA_LEAD_NAME,
   taggedMixedCaseAddress,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -47,63 +47,96 @@ describe(findPersonalData, () => {
 
   beforeEach(async () => {
     ({ id: tenantId, name: tenantName } = await insertTestTenant(db()));
-    await insertTestPersonalDataRows(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
-    await insertTestPersonalDataRows(db(), tenantId, TEST_INVITE_EMAIL);
+    await insertTestPersonalDataRows(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
+    await insertTestPersonalDataRows(db(), tenantId, MOCK_INVITE_EMAIL);
   });
 
   it('finds every row held for the mailbox, decrypted and named by site', async () => {
     const result = await findPersonalData(
-      taggedMixedCaseAddress(TEST_SUBSCRIBER_EMAIL),
+      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
     );
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        emailIndex: testPersonalEmailIndex(TEST_SUBSCRIBER_EMAIL),
-        subscribers: [
-          expect.objectContaining({
-            tenantId,
-            tenantName,
-            email: TEST_SUBSCRIBER_EMAIL,
-            confirmedAt: undefined,
-          }),
-        ],
-        leads: [
-          expect.objectContaining({
-            tenantName,
-            name: PERSONAL_DATA_LEAD_NAME,
-            email: TEST_SUBSCRIBER_EMAIL,
-            message: PERSONAL_DATA_LEAD_MESSAGE,
-          }),
-        ],
-        membershipInvites: [
-          expect.objectContaining({
-            tenantName,
-            email: TEST_SUBSCRIBER_EMAIL,
-            role: MEMBERSHIP_ROLE.EDITOR,
-          }),
-        ],
-        blockedSignupIdentities: [
-          expect.objectContaining({ reason: BLOCK_REASON }),
-        ],
-        auditEvents: [
-          expect.objectContaining({
-            email: taggedMixedCaseAddress(TEST_SUBSCRIBER_EMAIL),
-            action: AUDIT_ACTION.SETTINGS_UPDATED,
-            targetType: AUDIT_TARGET_TYPE.TENANT,
-            targetId: tenantId,
-          }),
-        ],
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const {
+      emailIndex,
+      subscribers,
+      leads,
+      membershipInvites,
+      blockedSignupIdentities,
+      auditEvents,
+    } = result.data;
+    expect(emailIndex).toBe(testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL));
+    expect(
+      subscribers.map(({ tenantId, tenantName, email, confirmedAt }) => ({
+        tenantId,
+        tenantName,
+        email,
+        confirmedAt,
+      })),
+    ).toEqual([
+      {
+        tenantId,
+        tenantName,
+        email: MOCK_SUBSCRIBER_EMAIL,
+        confirmedAt: undefined,
       },
-    });
+    ]);
+    expect(
+      leads.map(({ tenantName, name, email, message }) => ({
+        tenantName,
+        name,
+        email,
+        message,
+      })),
+    ).toEqual([
+      {
+        tenantName,
+        name: MOCK_PERSONAL_DATA_LEAD_NAME,
+        email: MOCK_SUBSCRIBER_EMAIL,
+        message: MOCK_PERSONAL_DATA_LEAD_MESSAGE,
+      },
+    ]);
+    expect(
+      membershipInvites.map(({ tenantName, email, role }) => ({
+        tenantName,
+        email,
+        role,
+      })),
+    ).toEqual([
+      {
+        tenantName,
+        email: MOCK_SUBSCRIBER_EMAIL,
+        role: MEMBERSHIP_ROLE.EDITOR,
+      },
+    ]);
+    expect(blockedSignupIdentities.map(({ reason }) => reason)).toEqual([
+      MOCK_BLOCK_REASON,
+    ]);
+    expect(
+      auditEvents.map(({ email, action, targetType, targetId }) => ({
+        email,
+        action,
+        targetType,
+        targetId,
+      })),
+    ).toEqual([
+      {
+        email: taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.TENANT,
+        targetId: tenantId,
+      },
+    ]);
   });
 
   it('finds nothing for a mailbox with no rows', async () => {
     const result = await findPersonalData(NOBODY_EMAIL);
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       ok: true,
       data: {
+        emailIndex: testPersonalEmailIndex(NOBODY_EMAIL),
         subscribers: [],
         leads: [],
         membershipInvites: [],
@@ -114,7 +147,7 @@ describe(findPersonalData, () => {
   });
 
   it('refuses a value that is not an email address', async () => {
-    await expect(findPersonalData(NOT_AN_ADDRESS)).resolves.toEqual({
+    await expect(findPersonalData(MOCK_NOT_AN_ADDRESS)).resolves.toEqual({
       ok: false,
       error: ERROR_CODE.DB_INVALID_EMAIL,
     });

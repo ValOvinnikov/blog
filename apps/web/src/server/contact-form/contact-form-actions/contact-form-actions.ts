@@ -39,6 +39,7 @@ export type TSubmitContactResult = TActionResult<
 >;
 
 const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
+
 const BLOCKED = toOutcome(ACTION_OUTCOME.BLOCKED);
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
@@ -106,7 +107,7 @@ export const submitContactMessage = async (
   if (!validation.ok) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: validation.fieldErrors,
+      fieldErrors: validation.error,
     };
   }
 

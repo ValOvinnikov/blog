@@ -45,7 +45,7 @@ describe('validateContactMessage', () => {
   ] as const)('rejects %s', (_, overrides, field) => {
     expect(validateContactMessage({ ...VALID, ...overrides })).toEqual({
       ok: false,
-      fieldErrors: { [field]: { reason: FIELD_ERROR.INVALID } },
+      error: { [field]: { reason: FIELD_ERROR.INVALID } },
     });
   });
 

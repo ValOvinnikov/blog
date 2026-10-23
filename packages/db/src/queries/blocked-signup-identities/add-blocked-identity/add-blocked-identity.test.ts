@@ -1,18 +1,21 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import {
+  BLOCKED_IDENTITY_KIND,
+  type TBlockedIdentityKind,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
-  BLOCK_REASON,
-  BLOCKED_ADDRESS,
-  BLOCKED_ADDRESS_DOMAIN,
-  BLOCKED_ADDRESS_INDEX,
-  BLOCKED_DOMAIN,
-  NOT_A_DOMAIN,
-  NOT_AN_ADDRESS,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_ADDRESS,
+  MOCK_BLOCKED_ADDRESS_DOMAIN,
+  MOCK_BLOCKED_ADDRESS_INDEX,
+  MOCK_BLOCKED_DOMAIN,
+  MOCK_NOT_A_DOMAIN,
+  MOCK_NOT_AN_ADDRESS,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { TEST_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
@@ -25,7 +28,7 @@ const OTHER_REASON = 'Another reason';
 const db = useQueryTestDb(getDbMock);
 
 beforeEach(() => {
-  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', TEST_ENCRYPTION_KEY);
+  vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_ENCRYPTION_KEY);
 });
 
 afterEach(async () => {
@@ -42,20 +45,27 @@ describe(addBlockedIdentity, () => {
     ({ id: createdByAdminId } = await insertTestAdmin(db()));
   });
 
-  it('stores an address entry with no readable address in any column', async () => {
-    const result = await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: 'Blocked+promo@Example.com',
-      reason: BLOCK_REASON,
+  function addEntry(kind: TBlockedIdentityKind, identity: string) {
+    return addBlockedIdentity({
+      kind,
+      identity,
+      reason: MOCK_BLOCK_REASON,
       createdByAdminId,
     });
+  }
+
+  it('stores an address entry with no readable address in any column', async () => {
+    const result = await addEntry(
+      BLOCKED_IDENTITY_KIND.ADDRESS,
+      'Blocked+promo@Example.com',
+    );
 
     expect(result.ok).toBe(true);
     const [row] = await db().select().from(schema.blockedSignupIdentities);
     expect(row).toMatchObject({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      value: BLOCKED_ADDRESS_INDEX,
-      reason: BLOCK_REASON,
+      value: MOCK_BLOCKED_ADDRESS_INDEX,
+      reason: MOCK_BLOCK_REASON,
       createdByAdminId,
     });
     expect(JSON.stringify(row).toLowerCase()).not.toContain('blocked@');
@@ -65,41 +75,31 @@ describe(addBlockedIdentity, () => {
     vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
 
     await expect(
-      addBlockedIdentity({
-        kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-        identity: BLOCKED_ADDRESS,
-        reason: BLOCK_REASON,
-        createdByAdminId,
-      }),
+      addEntry(BLOCKED_IDENTITY_KIND.ADDRESS, MOCK_BLOCKED_ADDRESS),
     ).rejects.toThrow('PERSONAL_DATA_INDEX_KEY is not configured.');
   });
 
   it('stores a domain entry as the lower-cased domain', async () => {
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: ' Mailinator.COM ',
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
+    await addEntry(BLOCKED_IDENTITY_KIND.DOMAIN, ' Mailinator.COM ');
 
     const [row] = await db().select().from(schema.blockedSignupIdentities);
-    expect(row?.value).toBe(BLOCKED_DOMAIN);
+    expect(row?.value).toBe(MOCK_BLOCKED_DOMAIN);
   });
 
-  it('returns the existing entry instead of adding a duplicate', async () => {
-    const first = await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: BLOCKED_ADDRESS,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
+  it('returns the existing entry, not created, instead of adding a duplicate', async () => {
+    const { id: otherAdminId } = await insertTestAdmin(db());
+    const first = await addEntry(
+      BLOCKED_IDENTITY_KIND.ADDRESS,
+      MOCK_BLOCKED_ADDRESS,
+    );
     const second = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
       identity: 'BLOCKED+again@example.com',
       reason: OTHER_REASON,
-      createdByAdminId,
+      createdByAdminId: otherAdminId,
     });
 
+    expect(first.ok && first.data.created).toBe(true);
     expect(second).toEqual({
       ok: true,
       data: { entry: first.ok && first.data.entry, created: false },
@@ -108,77 +108,33 @@ describe(addBlockedIdentity, () => {
     expect(rows).toHaveLength(1);
   });
 
-  it('reports created on the first add and not on a repeat', async () => {
-    const input = {
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: BLOCKED_ADDRESS,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    };
-    const { id: otherAdminId } = await insertTestAdmin(db());
-
-    const first = await addBlockedIdentity(input);
-    const repeat = await addBlockedIdentity({
-      ...input,
-      reason: OTHER_REASON,
-      createdByAdminId: otherAdminId,
-    });
-
-    expect(first.ok && first.data.created).toBe(true);
-    expect(repeat.ok && repeat.data.created).toBe(false);
-    expect(repeat.ok && repeat.data.entry).toMatchObject({
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
-  });
-
   it('keeps an address and a domain with the same text apart', async () => {
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: BLOCKED_ADDRESS_DOMAIN,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: BLOCKED_ADDRESS,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
+    await addEntry(BLOCKED_IDENTITY_KIND.DOMAIN, MOCK_BLOCKED_ADDRESS_DOMAIN);
+    await addEntry(BLOCKED_IDENTITY_KIND.ADDRESS, MOCK_BLOCKED_ADDRESS);
 
     const rows = await db().select().from(schema.blockedSignupIdentities);
     expect(rows).toHaveLength(2);
   });
 
-  it('refuses a malformed address', async () => {
-    const result = await addBlockedIdentity({
+  it.each([
+    {
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: NOT_AN_ADDRESS,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_INVALID_EMAIL });
-  });
-
-  it('refuses a malformed domain', async () => {
-    const result = await addBlockedIdentity({
+      identity: MOCK_NOT_AN_ADDRESS,
+      error: ERROR_CODE.DB_INVALID_EMAIL,
+    },
+    {
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      identity: NOT_A_DOMAIN,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
+      identity: MOCK_NOT_A_DOMAIN,
+      error: ERROR_CODE.DB_INVALID_DOMAIN,
+    },
+  ])('refuses a malformed $kind', async ({ kind, identity, error }) => {
+    const result = await addEntry(kind, identity);
 
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_INVALID_DOMAIN });
+    expect(result).toEqual({ ok: false, error });
   });
 
   it('keeps the entry when the admin who added it is removed', async () => {
-    await addBlockedIdentity({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: BLOCKED_ADDRESS,
-      reason: BLOCK_REASON,
-      createdByAdminId,
-    });
+    await addEntry(BLOCKED_IDENTITY_KIND.ADDRESS, MOCK_BLOCKED_ADDRESS);
 
     await db().delete(schema.admins);
 

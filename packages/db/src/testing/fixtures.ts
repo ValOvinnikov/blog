@@ -18,15 +18,20 @@ import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema>;
 
-export const TEST_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
-export const TEST_SUBSCRIBER_TAGGED_EMAIL = TEST_SUBSCRIBER_EMAIL.replace(
+export const MOCK_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_SUBSCRIBER_TAGGED_EMAIL = MOCK_SUBSCRIBER_EMAIL.replace(
   /@/,
   '+news@',
 );
-export const TEST_INVITE_EMAIL = faker.internet.email().toLowerCase();
-export const TEST_LEAD_NAME = 'Jane Doe';
-export const TEST_LEAD_EMAIL = 'lead@example.com';
-export const TEST_LEAD_MESSAGE = 'I would like to talk about a project.';
+export const MOCK_INVITE_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_LEAD_NAME = 'Ada Lovelace';
+export const MOCK_LEAD_EMAIL = 'lead@example.com';
+export const MOCK_LEAD_MESSAGE = 'I would like to talk about a project.';
+export const MOCK_LEAD_READ_AT = faker.date.past();
+export const MOCK_USER_NAME = faker.person.fullName();
+export const MOCK_USER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_OWNER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_OPERATOR_EMAIL = 'operator@example.com';
 
 // Seeds one `tenants` row against the given `createTestDb()` instance for a
 // test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`
@@ -138,9 +143,9 @@ export async function insertTestLead(
     .insert(schema.leads)
     .values({
       tenantId,
-      name: TEST_LEAD_NAME,
-      email: TEST_LEAD_EMAIL,
-      message: TEST_LEAD_MESSAGE,
+      name: MOCK_LEAD_NAME,
+      email: MOCK_LEAD_EMAIL,
+      message: MOCK_LEAD_MESSAGE,
       sourcePath: '/en/hire-me',
       ...overrides,
     })

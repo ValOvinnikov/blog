@@ -1,14 +1,16 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service } from '@blog/service';
+import { service, type TTopicDetailPage } from '@blog/service';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
-import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
-import { makePostListModuleData } from '@web/testing/modules/post-list/fixtures';
+import { mockCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
@@ -44,9 +46,18 @@ const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
 
 const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
+const TOPIC_SLUG = 'news';
+
 const setup = customRenderServerAsync(TopicPage, {
-  slug: 'news',
+  slug: TOPIC_SLUG,
 });
+
+const NEWS_TOPIC = makeTopic({ title: 'News', slug: TOPIC_SLUG });
+
+const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage>) =>
+  getTopicPageMock.mockResolvedValueOnce(
+    okResult(makeTopicDetailPage({ topic: NEWS_TOPIC, ...overrides })),
+  );
 
 const SUPPORTING_TEXT = 'The latest updates.';
 const ARIA_CURRENT = 'aria-current';
@@ -55,27 +66,27 @@ const HERO_HEADING = 'All about news';
 
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        headingBlock: makeHeadingBlock({
-          heading: 'News',
-          supportingText: SUPPORTING_TEXT,
+    getTopicPageMock.mockResolvedValue(
+      okResult(
+        makeTopicDetailPage({
+          topic: NEWS_TOPIC,
+          headingBlock: makeHeadingBlock({
+            heading: 'News',
+            supportingText: SUPPORTING_TEXT,
+          }),
         }),
-      }),
-    });
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
-      ok: true,
-      data: [
-        makeTopicWithPostCount({ title: 'News', slug: 'news' }),
+      ),
+    );
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
+      okResult([
+        makeTopicWithPostCount({ title: 'News', slug: TOPIC_SLUG }),
         makeTopicWithPostCount({
           id: 'topic-2',
           title: 'Design',
           slug: 'design',
         }),
-      ],
-    });
+      ]),
+    );
   });
 
   describe('with the default topic', () => {
@@ -85,69 +96,69 @@ describe(`<${TopicPage.name}/>`, () => {
 
     it('fetches the topic for the given slug with the tenant context', () => {
       expect(getTopicPageMock).toHaveBeenCalledWith(
-        'news',
+        TOPIC_SLUG,
         DEFAULT_TENANT_SANITY_CONTEXT,
       );
     });
 
     it('renders the topic heading and supporting text inside main', () => {
       const main = screen.getByRole('main');
-      expect(
-        within(main).getByRole('heading', { level: 1, name: 'News' }),
-      ).toBeVisible();
-      expect(within(main).getByText(SUPPORTING_TEXT)).toBeVisible();
+      const heading = within(main).getByRole('heading', {
+        level: 1,
+        name: 'News',
+      });
+      const supportingText = within(main).getByText(SUPPORTING_TEXT);
+      expect(heading).toBeVisible();
+      expect(supportingText).toBeVisible();
     });
 
     it('renders the breadcrumb trail outside main', () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
-      expect(
-        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
-      expect(within(breadcrumbs).getByText('News')).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      const homeLink = within(breadcrumbs).getByRole('link', {
+        name: 'Northwind Journal',
+      });
+      const currentCrumb = within(breadcrumbs).getByText('News');
+      const main = screen.getByRole('main');
+      expect(homeLink).toBeVisible();
+      expect(currentCrumb).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
     });
 
-    it('renders the topic chips inside main with the current topic active', () => {
-      const chips = within(screen.getByRole('main')).getByRole('navigation', {
-        name: 'Topics',
-      });
-      expect(within(chips).getByRole('link', { name: 'News' })).toHaveAttribute(
-        ARIA_CURRENT,
-        'page',
-      );
-      expect(
-        within(chips).getByRole('link', { name: 'Design' }),
-      ).not.toHaveAttribute(ARIA_CURRENT);
+    it('marks the current topic chip inside main', () => {
+      const main = screen.getByRole('main');
+      const chips = within(main).getByRole('navigation', { name: 'Topics' });
+      const newsChip = within(chips).getByRole('link', { name: 'News' });
+      const designChip = within(chips).getByRole('link', { name: 'Design' });
+      expect(newsChip).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(designChip).not.toHaveAttribute(ARIA_CURRENT);
     });
 
     it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
+      const scripts = screen.queryAllByTestId(JSON_LD_SCRIPT_TEST_ID);
       expect(
-        screen
-          .queryAllByTestId(JSON_LD_SCRIPT_TEST_ID)
-          .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+        scripts.some((script) =>
+          script.textContent?.includes(FAQ_PAGE_JSON_LD),
+        ),
       ).toBe(false);
     });
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getTopicPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).toHaveBeenCalledWith(
-      'topic_page.fetch_failed',
-      expect.objectContaining({ slug: 'news' }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('topic_page.fetch_failed', {
+      slug: TOPIC_SLUG,
+      error: MOCK_ERROR,
+    });
   });
 
   it('calls notFound() without logging when the topic does not exist', async () => {
-    getTopicPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getTopicPageMock.mockResolvedValueOnce(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -156,51 +167,45 @@ describe(`<${TopicPage.name}/>`, () => {
   });
 
   it('renders the authored modules inside main', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        modules: [{ id: 'cta-1', type: 'module_cta' }],
-      }),
+    resolveTopicPageWith({
+      modules: [{ id: 'cta-1', type: 'module_cta' }],
     });
-    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
-      ok: true,
-      data: makeCtaModuleData({
-        headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
-      }),
-    });
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
+      okResult(
+        mockCtaModuleData({
+          headingBlock: makeHeadingBlock({ heading: CTA_HEADING }),
+        }),
+      ),
+    );
 
     await setup();
 
-    expect(
-      within(screen.getByRole('main')).getByRole('region', {
-        name: CTA_HEADING,
-      }),
-    ).toBeVisible();
+    const main = screen.getByRole('main');
+    const ctaRegion = within(main).getByRole('region', { name: CTA_HEADING });
+    expect(ctaRegion).toBeVisible();
   });
 
   it('renders the hero in place of the topic heading when one is set', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        hero: { id: 'hero-1', type: 'module_heroBlog' },
-      }),
+    resolveTopicPageWith({
+      headingBlock: makeHeadingBlock({ heading: 'News' }),
+      hero: { id: 'hero-1', type: 'module_heroBlog' },
     });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
-      ok: true,
-      data: makeHeroBlogData({ heading: HERO_HEADING }),
-    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
+      okResult(mockHeroBlogData({ heading: HERO_HEADING })),
+    );
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: HERO_HEADING }),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('heading', { level: 1, name: 'News' }),
-    ).not.toBeInTheDocument();
+    const heroHeading = screen.getByRole('heading', {
+      level: 1,
+      name: HERO_HEADING,
+    });
+    const pageHeading = screen.queryByRole('heading', {
+      level: 1,
+      name: 'News',
+    });
+    expect(heroHeading).toBeVisible();
+    expect(pageHeading).not.toBeInTheDocument();
   });
 
   it.each([
@@ -209,17 +214,12 @@ describe(`<${TopicPage.name}/>`, () => {
   ])(
     'loads post lists for page $expected of the topic archive',
     async ({ page, expected }) => {
-      getTopicPageMock.mockResolvedValueOnce({
-        ok: true,
-        data: makeTopicDetailPage({
-          topic: makeTopic({ title: 'News', slug: 'news' }),
-          modules: [{ id: 'list-1', type: 'module_postList' }],
-        }),
+      resolveTopicPageWith({
+        modules: [{ id: 'list-1', type: 'module_postList' }],
       });
-      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-        ok: false,
-        error: new Error('boom'),
-      });
+      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+        errorResult(MOCK_ERROR),
+      );
 
       await expect(setup({ page })).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -235,44 +235,35 @@ describe(`<${TopicPage.name}/>`, () => {
   );
 
   it('names the topic in an empty post list', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        modules: [{ id: 'list-1', type: 'module_postList' }],
-      }),
+    resolveTopicPageWith({
+      modules: [{ id: 'list-1', type: 'module_postList' }],
     });
-    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
-      ok: true,
-      data: makePostListModuleData(),
-    });
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+      okResult(mockPostListModuleData()),
+    );
 
     await setup();
 
-    expect(screen.getByText('No posts in News yet.')).toBeVisible();
+    const emptyState = screen.getByText('No posts in News yet.');
+    expect(emptyState).toBeVisible();
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getTopicPageMock.mockResolvedValueOnce({
-      ok: true,
-      data: makeTopicDetailPage({
-        topic: makeTopic({ title: 'News', slug: 'news' }),
-        faqs: [
-          {
-            id: 'faq-1',
-            question: 'Do you offer a free trial?',
-            answer: 'Yes.',
-          },
-        ],
-      }),
+    resolveTopicPageWith({
+      faqs: [
+        {
+          id: 'faq-1',
+          question: 'Do you offer a free trial?',
+          answer: 'Yes.',
+        },
+      ],
     });
 
     await setup();
 
+    const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
     expect(
-      screen
-        .getAllByTestId(JSON_LD_SCRIPT_TEST_ID)
-        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+      scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
     ).toBe(true);
   });
 });

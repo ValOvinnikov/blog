@@ -116,7 +116,7 @@ jobs:
 
       - name: Post the result
         env:
-          ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
+          PLATFORM_APP_BASE_URL: ${{ vars.PLATFORM_APP_BASE_URL }}
           CONTRAST_RESULT_SECRET: ${{ secrets.CONTRAST_RESULT_SECRET }}
           SHARD_RESULT: ${{ needs.shard.result }}
           REPORTS_DIR: ${{ runner.temp }}/contrast-reports
@@ -126,7 +126,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          : "${ADMIN_APP_BASE_URL:?ADMIN_APP_BASE_URL is not set in the development environment}"
+          : "${PLATFORM_APP_BASE_URL:?PLATFORM_APP_BASE_URL is not set in the development environment}"
           : "${CONTRAST_RESULT_SECRET:?CONTRAST_RESULT_SECRET is not set in the development environment}"
 
           shopt -s nullglob
@@ -151,7 +151,7 @@ jobs:
           echo "Posting ${body}"
 
           curl --fail-with-body --silent --show-error --max-time 30 \
-            --request POST "${ADMIN_APP_BASE_URL}/api/internal/contrast-result" \
+            --request POST "${PLATFORM_APP_BASE_URL}/api/internal/contrast-result" \
             --header "Authorization: Bearer ${CONTRAST_RESULT_SECRET}" \
             --header 'Content-Type: application/json' \
             --data "${body}"

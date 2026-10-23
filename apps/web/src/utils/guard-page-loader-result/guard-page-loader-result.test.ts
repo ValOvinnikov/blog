@@ -1,4 +1,5 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -9,7 +10,7 @@ const FETCH_FAILED_EVENT = 'tag_page.fetch_failed';
 describe(guardPageLoaderResult.name, () => {
   it('returns the data when the result is ok and data is present', () => {
     const data = guardPageLoaderResult(
-      { ok: true, data: { title: 'Hello' } },
+      okResult({ title: 'Hello' }),
       'some_page.fetch_failed',
     );
 
@@ -22,7 +23,7 @@ describe(guardPageLoaderResult.name, () => {
     const error = new Error('boom');
 
     expect(() =>
-      guardPageLoaderResult({ ok: false, error }, FETCH_FAILED_EVENT, {
+      guardPageLoaderResult(errorResult(error), FETCH_FAILED_EVENT, {
         slug: 'engineering',
       }),
     ).toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
@@ -36,7 +37,7 @@ describe(guardPageLoaderResult.name, () => {
 
   it('calls notFound() without logging when ok but data is undefined', () => {
     expect(() =>
-      guardPageLoaderResult({ ok: true, data: undefined }, FETCH_FAILED_EVENT, {
+      guardPageLoaderResult(okResult(), FETCH_FAILED_EVENT, {
         slug: 'missing',
       }),
     ).toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);

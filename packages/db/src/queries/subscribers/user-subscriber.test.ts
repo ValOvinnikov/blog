@@ -4,8 +4,8 @@ import {
   insertTestSubscriber,
   insertTestTenant,
   insertTestUser,
-  TEST_SUBSCRIBER_EMAIL,
-  TEST_SUBSCRIBER_TAGGED_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -31,13 +31,13 @@ describe(findUserSubscriber, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    ({ id: userId } = await insertTestReader(db(), TEST_SUBSCRIBER_EMAIL));
+    ({ id: userId } = await insertTestReader(db(), MOCK_SUBSCRIBER_EMAIL));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it.each([
-    ['the exact address', TEST_SUBSCRIBER_EMAIL],
-    ['a re-cased, padded address', ` ${TEST_SUBSCRIBER_EMAIL.toUpperCase()} `],
+    ['the exact address', MOCK_SUBSCRIBER_EMAIL],
+    ['a re-cased, padded address', ` ${MOCK_SUBSCRIBER_EMAIL.toUpperCase()} `],
   ])('finds the row stored under %s', async (_case, storedEmail) => {
     const { id, status } = await insertTestSubscriber(
       db(),
@@ -51,21 +51,21 @@ describe(findUserSubscriber, () => {
   });
 
   it('finds nothing for a +tag sibling of the account address', async () => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_TAGGED_EMAIL);
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL);
 
     expect(await findUserSubscriber(tenantId, userId)).toBeUndefined();
   });
 
   it('finds nothing for a +tag account whose plain address is subscribed', async () => {
-    const { id } = await insertTestReader(db(), TEST_SUBSCRIBER_TAGGED_EMAIL);
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
+    const { id } = await insertTestReader(db(), MOCK_SUBSCRIBER_TAGGED_EMAIL);
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
     expect(await findUserSubscriber(tenantId, id)).toBeUndefined();
   });
 
   it("finds nothing for the account's address on another tenant", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await insertTestSubscriber(db(), otherTenantId, TEST_SUBSCRIBER_EMAIL);
+    await insertTestSubscriber(db(), otherTenantId, MOCK_SUBSCRIBER_EMAIL);
 
     expect(await findUserSubscriber(tenantId, userId)).toBeUndefined();
   });
@@ -74,7 +74,7 @@ describe(findUserSubscriber, () => {
     ['an unknown user', async () => faker.string.uuid()],
     ['a user without an email', async () => (await insertTestUser(db())).id],
   ])('finds nothing for %s', async (_case, user) => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
     expect(await findUserSubscriber(tenantId, await user())).toBeUndefined();
   });

@@ -1,4 +1,5 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
 import { BLOCKED_OWNER_EMAIL } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -30,9 +31,7 @@ const SIGN_UP = { clientKey: CLIENT_KEY, email: BLOCKED_OWNER_EMAIL };
 
 describe(admitCreateSite, () => {
   beforeEach(() => {
-    isSignupBlockedMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: false });
+    isSignupBlockedMock.mockReset().mockResolvedValue(okResult(false));
     takeSlotMock.mockReset().mockResolvedValue(true);
     loggerErrorMock.mockReset();
   });
@@ -46,7 +45,7 @@ describe(admitCreateSite, () => {
   });
 
   it('refuses a blocked email without taking a slot', async () => {
-    isSignupBlockedMock.mockResolvedValue({ ok: true, data: true });
+    isSignupBlockedMock.mockResolvedValue(okResult(true));
 
     const admitted = await admitCreateSite(SIGN_UP);
 
@@ -63,10 +62,9 @@ describe(admitCreateSite, () => {
   });
 
   it('refuses and logs when the blocklist lookup fails', async () => {
-    isSignupBlockedMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_INVALID_EMAIL,
-    });
+    isSignupBlockedMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_INVALID_EMAIL),
+    );
 
     const admitted = await admitCreateSite(SIGN_UP);
     const [, context] = loggerErrorMock.mock.calls[0] ?? [];

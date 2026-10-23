@@ -13,8 +13,8 @@ async function sanityWebhooksRequest<T>(
   projectId: string,
   token: string,
   init: RequestInit = {},
+  path: string = SANITY_API_PATH.projectWebhooks(projectId),
 ): Promise<T> {
-  const path = SANITY_API_PATH.projectWebhooks(projectId);
   // A followed redirect replays a POST as a GET, whose 2xx list reads as success.
   const response = await sanityWebhooksResponse(
     path,
@@ -84,4 +84,27 @@ export async function createSanityWebhook(input: {
   }
 
   return { id: created.id, url: created.url };
+}
+
+export async function updateSanityWebhookSecret(input: {
+  token: string;
+  projectId: string;
+  webhookId: string;
+  secret: string;
+}): Promise<void> {
+  const updated = await sanityWebhooksRequest<Partial<TSanityWebhook>>(
+    input.projectId,
+    input.token,
+    {
+      method: HTTP_METHOD.PATCH,
+      body: JSON.stringify({ secret: input.secret }),
+    },
+    SANITY_API_PATH.projectWebhook(input.projectId, input.webhookId),
+  );
+
+  if (updated?.id !== input.webhookId) {
+    throw new Error(
+      `Sanity Webhooks API: updating webhook "${input.webhookId}" of project "${input.projectId}" returned no matching hook.`,
+    );
+  }
 }

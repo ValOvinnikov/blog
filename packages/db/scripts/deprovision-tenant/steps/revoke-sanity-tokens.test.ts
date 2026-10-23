@@ -1,51 +1,21 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
 import {
   SANITY_READ_TOKEN_LABEL,
   SANITY_WRITE_TOKEN_LABEL,
 } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-
-import type { TDeprovisionEnv } from '../lib/env';
 
 import {
   revokeTenantSanityTokens,
   type TRevokeSanityTokensDeps,
 } from './revoke-sanity-tokens';
 
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
-
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'enc',
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    seededAt: new Date(),
-    deprovisionedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as TTenant;
-}
+const MOCK_TENANT = mockTenant();
+const MOCK_SANITY_PROJECT_ID = MOCK_TENANT.sanityProjectId;
+const MOCK_REVOKE_ERROR = 'network error';
+const MOCK_READ_ROBOT = { id: 'robot-read', label: SANITY_READ_TOKEN_LABEL };
+const MOCK_WRITE_ROBOT = { id: 'robot-write', label: SANITY_WRITE_TOKEN_LABEL };
+const MOCK_HUMAN_ROBOT = { id: 'robot-human', label: 'someone@example.com' };
 
 function deps(
   overrides: Partial<TRevokeSanityTokensDeps> = {},
@@ -67,8 +37,8 @@ describe(revokeTenantSanityTokens, () => {
 
     it('skips when no Sanity project id is set', async () => {
       await revokeTenantSanityTokens(
-        baseTenant({ sanityProjectId: null }),
-        env,
+        { ...MOCK_TENANT, sanityProjectId: null },
+        MOCK_DEPROVISION_ENV,
         testDeps,
       );
 
@@ -77,8 +47,8 @@ describe(revokeTenantSanityTokens, () => {
 
     it('does not call the API in dry-run mode', async () => {
       await revokeTenantSanityTokens(
-        baseTenant(),
-        { ...env, dryRun: true },
+        MOCK_TENANT,
+        { ...MOCK_DEPROVISION_ENV, dryRun: true },
         testDeps,
       );
 
@@ -89,42 +59,40 @@ describe(revokeTenantSanityTokens, () => {
 
   it('lists the project robots and deletes only the provisioned read/write tokens by label', async () => {
     const testDeps = deps({
-      listRobotTokens: vi.fn().mockResolvedValue([
-        { id: 'robot-read', label: SANITY_READ_TOKEN_LABEL },
-        { id: 'robot-write', label: SANITY_WRITE_TOKEN_LABEL },
-        { id: 'robot-human', label: 'someone@example.com' },
-      ]),
+      listRobotTokens: vi
+        .fn()
+        .mockResolvedValue([
+          MOCK_READ_ROBOT,
+          MOCK_WRITE_ROBOT,
+          MOCK_HUMAN_ROBOT,
+        ]),
     });
 
-    await revokeTenantSanityTokens(baseTenant(), env, testDeps);
+    await revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, testDeps);
 
     expect(testDeps.listRobotTokens).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
+      token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
     });
     expect(testDeps.revokeToken).toHaveBeenCalledTimes(2);
     expect(testDeps.revokeToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-read',
+      token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
+      robotId: MOCK_READ_ROBOT.id,
     });
     expect(testDeps.revokeToken).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      robotId: 'robot-write',
+      token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_SANITY_PROJECT_ID,
+      robotId: MOCK_WRITE_ROBOT.id,
     });
   });
 
   it('does nothing when no robot matches a provisioned label', async () => {
     const testDeps = deps({
-      listRobotTokens: vi
-        .fn()
-        .mockResolvedValue([
-          { id: 'robot-human', label: 'someone@example.com' },
-        ]),
+      listRobotTokens: vi.fn().mockResolvedValue([MOCK_HUMAN_ROBOT]),
     });
 
-    await revokeTenantSanityTokens(baseTenant(), env, testDeps);
+    await revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, testDeps);
 
     expect(testDeps.revokeToken).not.toHaveBeenCalled();
   });
@@ -132,18 +100,17 @@ describe(revokeTenantSanityTokens, () => {
   it('does not throw and still attempts the other matched token when one deletion fails', async () => {
     const revokeToken = vi
       .fn()
-      .mockRejectedValueOnce(new Error('network error'))
+      .mockRejectedValueOnce(new Error(MOCK_REVOKE_ERROR))
       .mockResolvedValueOnce(undefined);
     const testDeps = deps({
-      listRobotTokens: vi.fn().mockResolvedValue([
-        { id: 'robot-read', label: SANITY_READ_TOKEN_LABEL },
-        { id: 'robot-write', label: SANITY_WRITE_TOKEN_LABEL },
-      ]),
+      listRobotTokens: vi
+        .fn()
+        .mockResolvedValue([MOCK_READ_ROBOT, MOCK_WRITE_ROBOT]),
       revokeToken,
     });
 
     await expect(
-      revokeTenantSanityTokens(baseTenant(), env, testDeps),
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, testDeps),
     ).resolves.toBeUndefined();
 
     expect(revokeToken).toHaveBeenCalledTimes(2);
@@ -151,11 +118,11 @@ describe(revokeTenantSanityTokens, () => {
 
   it('does not throw when listing the project robots fails', async () => {
     const testDeps = deps({
-      listRobotTokens: vi.fn().mockRejectedValue(new Error('network error')),
+      listRobotTokens: vi.fn().mockRejectedValue(new Error(MOCK_REVOKE_ERROR)),
     });
 
     await expect(
-      revokeTenantSanityTokens(baseTenant(), env, testDeps),
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, testDeps),
     ).resolves.toBeUndefined();
 
     expect(testDeps.revokeToken).not.toHaveBeenCalled();

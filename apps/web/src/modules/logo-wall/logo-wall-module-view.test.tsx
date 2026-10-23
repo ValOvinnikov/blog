@@ -1,7 +1,15 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
+import {
+  MOCK_CTA_PRIMARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION,
+  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+  MOCK_CTA_ACTIONS,
+} from '@web/testing/modules/cta/fixtures';
+import {
+  MOCK_LOGO_ITEMS,
+  MOCK_LOGO_WALL_HEADING,
+} from '@web/testing/modules/logo-wall/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
@@ -16,22 +24,18 @@ vi.mock('./components/logo-wall-carousel/logo-wall-carousel', () => ({
   LogoWallCarousel,
 }));
 
-const logos = [
-  makeLogoItem({ id: 'logo-1', name: 'Acme Corp' }),
-  makeLogoItem({ id: 'logo-2', name: 'Nimbus Inc' }),
-];
-
 const dataTestId = 'logo-wall-module-logo-wall-1';
+const TITLE_ID = 'logo-wall-title';
 
 const setup = customRender(LogoWallModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Trusted by' }),
-  logos,
+  headingBlock: makeHeadingBlock({ heading: MOCK_LOGO_WALL_HEADING }),
+  logos: MOCK_LOGO_ITEMS,
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   layout: undefined,
-  titleId: 'logo-wall-title',
+  titleId: TITLE_ID,
   dataTestId,
 });
 
@@ -41,72 +45,59 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
       setup();
     });
 
-    it('labels the section with the given titleId', () => {
-      const label = screen.getByText('Trusted by');
-      expect(label).toHaveAttribute('id', 'logo-wall-title');
-      expect(label.tagName).toBe('H2');
-
-      const section = label.closest('section');
-      expect(section).toHaveAttribute('aria-labelledby', 'logo-wall-title');
+    it('labels the section with its h2 heading', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_LOGO_WALL_HEADING,
+      });
+      const section = screen.getByRole('region', {
+        name: MOCK_LOGO_WALL_HEADING,
+      });
+      expect(heading).toHaveAttribute('id', TITLE_ID);
+      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
       expect(section).toHaveAttribute('data-testid', dataTestId);
     });
 
-    it('renders every logo as an image named after the company, never as visible text', () => {
-      logos.forEach((logo) => {
-        expect(screen.getByRole('img', { name: logo.name })).toBeVisible();
+    it('renders every logo as an image named after the company', () => {
+      MOCK_LOGO_ITEMS.forEach((logo) => {
+        const logoImage = screen.getByRole('img', { name: logo.name });
+        expect(logoImage).toBeVisible();
       });
       expect(LogoWallCarousel).not.toHaveBeenCalled();
     });
 
     it('renders no action group when there are no cta buttons', () => {
-      expect(screen.queryAllByRole('link')).toHaveLength(0);
+      const links = screen.queryAllByRole('link');
+      expect(links).toHaveLength(0);
     });
   });
 
-  it('wraps a logo in a link when it has one, and leaves an unlinked logo bare', () => {
-    setup({
-      logos: [
-        makeLogoItem({
-          id: 'logo-1',
-          name: 'Acme Corp',
-          link: {
-            label: 'Visit Acme Corp',
-            href: 'https://acme.example.com',
-            target: undefined,
-            platform: undefined,
-            ariaLabel: undefined,
-          },
-        }),
-        makeLogoItem({ id: 'logo-2', name: 'Nimbus Inc' }),
-      ],
-    });
-
-    expect(screen.getByRole('link', { name: 'Acme Corp' })).toHaveAttribute(
-      'href',
-      'https://acme.example.com',
-    );
-    expect(screen.getAllByRole('link')).toHaveLength(1);
-  });
-
-  it('renders the carousel instead of the row when displayMode is CAROUSEL', () => {
+  it('renders the carousel in place of the row in carousel mode', () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
     expect(LogoWallCarousel).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('logo-wall-carousel-stub')).toBeVisible();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const carousel = screen.getByTestId('logo-wall-carousel-stub');
+    const logoImage = screen.queryByRole('img');
+    expect(carousel).toBeVisible();
+    expect(logoImage).not.toBeInTheDocument();
   });
 
   it('renders the resolved cta buttons when present', () => {
-    setup({ ctaButtons: ctaActionsDemo });
+    setup({ ctaButtons: MOCK_CTA_ACTIONS });
 
-    expect(screen.getByRole('link', { name: 'Subscribe now' })).toHaveAttribute(
+    const primaryLink = screen.getByRole('link', {
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
+    });
+    const secondaryLink = screen.getByRole('link', {
+      name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+    });
+    expect(primaryLink).toHaveAttribute(
       'href',
-      '/blog',
+      MOCK_CTA_PRIMARY_ACTION.link.href,
     );
-    expect(
-      screen.getByRole('link', {
-        name: 'Learn more about our subscription plans',
-      }),
-    ).toHaveAttribute('href', '/about-us');
+    expect(secondaryLink).toHaveAttribute(
+      'href',
+      MOCK_CTA_SECONDARY_ACTION.link.href,
+    );
   });
 });

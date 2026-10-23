@@ -4,7 +4,7 @@ import {
   insertTestReader,
   insertTestSubscriber,
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -36,7 +36,7 @@ describe(resendConfirmation, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    ({ id: userId } = await insertTestReader(db(), TEST_SUBSCRIBER_EMAIL));
+    ({ id: userId } = await insertTestReader(db(), MOCK_SUBSCRIBER_EMAIL));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
@@ -44,7 +44,7 @@ describe(resendConfirmation, () => {
     const subscriber = await insertTestSubscriber(
       db(),
       tenantId,
-      TEST_SUBSCRIBER_EMAIL,
+      MOCK_SUBSCRIBER_EMAIL,
     );
 
     vi.spyOn(crypto, 'randomUUID').mockReturnValueOnce(CONFIRMATION_TOKEN);
@@ -54,14 +54,14 @@ describe(resendConfirmation, () => {
     expect(result).toEqual({
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
       subscriberId: subscriber.id,
-      email: TEST_SUBSCRIBER_EMAIL,
+      email: MOCK_SUBSCRIBER_EMAIL,
       confirmationToken: CONFIRMATION_TOKEN,
     });
     expect(await db().select().from(schema.subscribers)).toEqual([subscriber]);
   });
 
   it('returns not-pending for an already-active subscriber', async () => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL, {
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL, {
       status: 'active',
     });
 

@@ -2,7 +2,7 @@ import { BRAND_VARIANT } from '@blog/config';
 import type { TStatItem, TStatsModule } from '@blog/service';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-export const makeStatItem = (
+export const mockStatItem = (
   overrides: Partial<TStatItem> = {},
 ): TStatItem => ({
   id: 'stat-1',
@@ -12,15 +12,17 @@ export const makeStatItem = (
   ...overrides,
 });
 
-export const makeStatsModule = (
+export const MOCK_STAT_ITEMS: TStatItem[] = [
+  mockStatItem(),
+  mockStatItem({ id: 'stat-2', value: '<50ms', label: 'Median TTFB' }),
+];
+
+export const mockStatsModule = (
   overrides: Partial<TStatsModule> = {},
 ): TStatsModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: makeHeadingBlock({ heading: 'By the numbers' }),
-  stats: [
-    makeStatItem({ id: 'stat-1', value: '2.4M', label: 'Monthly readers' }),
-    makeStatItem({ id: 'stat-2', value: '<50ms', label: 'Median TTFB' }),
-  ],
+  stats: MOCK_STAT_ITEMS,
   footnote: undefined,
   ctaButtons: [],
   contentAlignment: undefined,

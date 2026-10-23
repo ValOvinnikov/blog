@@ -2,9 +2,9 @@ import { LOCALE_BCP47_TAGS } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_LEAD_EMAIL,
-  TEST_LEAD_MESSAGE,
-  TEST_LEAD_NAME,
+  MOCK_LEAD_EMAIL,
+  MOCK_LEAD_MESSAGE,
+  MOCK_LEAD_NAME,
 } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
@@ -24,9 +24,9 @@ const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
 const LEAD = {
-  name: TEST_LEAD_NAME,
-  email: TEST_LEAD_EMAIL,
-  message: TEST_LEAD_MESSAGE,
+  name: MOCK_LEAD_NAME,
+  email: MOCK_LEAD_EMAIL,
+  message: MOCK_LEAD_MESSAGE,
   sourcePath: '/en/contact',
 };
 
@@ -72,10 +72,10 @@ describe(createLead, () => {
       message: decryptTestPersonalValue(messageEncrypted),
       emailIndex,
     }).toEqual({
-      name: TEST_LEAD_NAME,
-      email: TEST_LEAD_EMAIL,
-      message: TEST_LEAD_MESSAGE,
-      emailIndex: testPersonalEmailIndex(TEST_LEAD_EMAIL),
+      name: MOCK_LEAD_NAME,
+      email: MOCK_LEAD_EMAIL,
+      message: MOCK_LEAD_MESSAGE,
+      emailIndex: testPersonalEmailIndex(MOCK_LEAD_EMAIL),
     });
   });
 

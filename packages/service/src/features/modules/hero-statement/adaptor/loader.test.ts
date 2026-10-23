@@ -1,77 +1,65 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawHeroStatementModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockRawHeroStatementModule } from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_LINK_CACHE_TAG,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockRawHeadingBlock,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getHeroStatement } from './loader';
+import { heroStatementModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const HERO_STATEMENT_ID = 'hero-statement-1';
+const HERO_STATEMENT_HEADING = 'Ship confidently';
+
+const tenant = mockTenant();
 
 describe(getHeroStatement, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawHeroStatementModule());
+    mockRun.mockResolvedValue(
+      mockRawHeroStatementModule({
+        headingBlock: mockRawHeadingBlock(HERO_STATEMENT_HEADING),
+      }),
+    );
   });
 
   it('resolves the hero in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawHeroStatementModule({
-        headingBlock: makeRawHeadingBlock('Ship confidently'),
-      }),
-    );
-
-    const hero = await getHeroStatement('hero-statement-1', tenant);
+    const hero = await getHeroStatement(HERO_STATEMENT_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(hero.headingBlock.heading).toBe('Ship confidently');
+    expect(hero.headingBlock.heading).toBe(HERO_STATEMENT_HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getHeroStatement('missing', tenant)).rejects.toThrow();
+    await expect(getHeroStatement(MOCK_MISSING_ID, tenant)).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    await getHeroStatement('hero-statement-1', tenant);
+    await getHeroStatement(HERO_STATEMENT_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:heroStatement',
-            't:tenant-a:module:hero-statement-1',
-            't:tenant-a:link',
-          ],
-        }),
-      }),
-    );
-  });
-
-  it('carries no page-type tag, since the webhook purges this module by id when a link target changes', async () => {
-    await getHeroStatement('hero-statement-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({
-          tags: expect.not.arrayContaining([
-            't:tenant-a:homePage',
-            't:tenant-a:page_landing',
-          ]),
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenNthCalledWith(1, heroStatementModuleQuery, {
+      parameters: { id: HERO_STATEMENT_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          mockCacheTag('modules:heroStatement'),
+          mockCacheTag(`module:${HERO_STATEMENT_ID}`),
+          MOCK_LINK_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

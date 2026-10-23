@@ -37,6 +37,12 @@ export const RELEASE_FIELD_ERROR = {
 
 export type TReleaseFieldError = TValueOf<typeof RELEASE_FIELD_ERROR>;
 
+export const RELEASE_FAILURE = {
+  NO_RELEASE_TAG: 'NO_RELEASE_TAG',
+  TAG_LIST_INCOMPLETE: 'TAG_LIST_INCOMPLETE',
+  DB_ERROR: 'DB_ERROR',
+} as const;
+
 export const RELEASE_RUN_STATUS = {
   DISPATCHED: 'DISPATCHED',
   RUNNING: 'RUNNING',

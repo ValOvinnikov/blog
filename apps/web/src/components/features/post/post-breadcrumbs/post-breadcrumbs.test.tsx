@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
@@ -10,6 +11,11 @@ import {
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
+
+const POST_SLUG = 'hello-world';
+const SITE_NAME = 'Northwind Journal';
+const TOPIC_HREF = '/topics/engineering';
+const POST_TITLE = 'Hello World';
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -26,7 +32,7 @@ vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
 }));
 
 const setup = customRenderAsync(PostBreadcrumbs, {
-  slug: 'hello-world',
+  slug: POST_SLUG,
 });
 
 describe(`<${PostBreadcrumbs.name}/>`, () => {
@@ -41,25 +47,25 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     setup,
     successData: mockPostDetail,
     linkSteps: [
-      { label: 'Northwind Journal', href: '/' },
-      { label: 'Engineering', href: '/topics/engineering' },
+      { label: SITE_NAME, href: '/' },
+      { label: 'Engineering', href: TOPIC_HREF },
     ],
-    currentLabel: 'Hello World',
+    currentLabel: POST_TITLE,
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getPostPageMock,
     setup,
     successData: mockPostDetail,
-    itemPath: '/topics/engineering',
+    itemPath: TOPIC_HREF,
   });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getPostPageMock,
     setup,
     successData: mockPostDetail,
     expectedTrail: [
-      { name: 'Northwind Journal', path: '/' },
-      { name: 'Engineering', path: '/topics/engineering' },
-      { name: 'Hello World', path: '/blog/hello-world' },
+      { name: SITE_NAME, path: '/' },
+      { name: 'Engineering', path: TOPIC_HREF },
+      { name: POST_TITLE, path: '/blog/hello-world' },
     ],
   });
   testForwardsArgsToLoader({
@@ -67,25 +73,22 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     setup,
     successData: mockPostDetail,
     description: 'forwards the slug to getPostPage',
-    expectedArgs: ['hello-world'],
+    expectedArgs: [POST_SLUG],
   });
 
   describe('when the topic has no topic page', () => {
     it('omits the topic crumb', async () => {
-      getPostPageMock.mockResolvedValue({
-        ok: true,
-        data: {
+      getPostPageMock.mockResolvedValue(
+        okResult({
           ...mockPostDetail,
           topic: { ...mockPostDetail.topic, slug: undefined },
-        },
-      });
+        }),
+      );
 
       await setup();
 
       const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-      expect(
-        within(nav).getByRole('link', { name: 'Northwind Journal' }),
-      ).toBeVisible();
+      expect(within(nav).getByRole('link', { name: SITE_NAME })).toBeVisible();
       expect(within(nav).queryByText('Engineering')).not.toBeInTheDocument();
     });
   });

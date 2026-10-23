@@ -6,6 +6,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { errorResult, okResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
@@ -53,10 +54,7 @@ describe('GET /api/newsletter/confirm', () => {
     confirmSubscriberMock.mockResolvedValue(
       toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED),
     );
-    resolveWritableTenantMock.mockResolvedValue({
-      ok: true,
-      tenantId: DEFAULT_TENANT_ID,
-    });
+    resolveWritableTenantMock.mockResolvedValue(okResult(DEFAULT_TENANT_ID));
     resolveNewsletterLinkLocaleMock.mockResolvedValue(
       makeNewsletterLinkLocale(),
     );
@@ -128,7 +126,7 @@ describe('GET /api/newsletter/confirm', () => {
       FAILED_LOCATION,
     ],
   ])('sends %s page without confirming', async (_case, reason, location) => {
-    resolveWritableTenantMock.mockResolvedValue({ ok: false, reason });
+    resolveWritableTenantMock.mockResolvedValue(errorResult(reason));
 
     const response = await GET(request);
 

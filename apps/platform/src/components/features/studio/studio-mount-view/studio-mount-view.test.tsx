@@ -4,10 +4,19 @@ import {
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  makeReadyTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { StudioMountView } from './studio-mount-view';
+
+const STUDIO_MOUNT = 'studio-mount';
+const PROJ_GLOBEX = 'proj-globex';
 
 const { studioMountMock, getEnabledCapabilitiesMock, selectLiveLocalesMock } =
   vi.hoisted(() => ({
@@ -29,7 +38,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
 vi.mock('@blog/studio', () => ({
   StudioMount: (props: unknown) => {
     studioMountMock(props);
-    return <div data-testid="studio-mount" />;
+    return <div data-testid={STUDIO_MOUNT} />;
   },
 }));
 
@@ -52,7 +61,7 @@ describe(`<${StudioMountView.name}/>`, () => {
 
   it('shows the archived notice instead of mounting Studio for a deprovisioned tenant', async () => {
     const tenant = makeProvisionedTenant({
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     });
 
     renderWithIntl(
@@ -66,8 +75,8 @@ describe(`<${StudioMountView.name}/>`, () => {
       level: 1,
       name: 'Studio',
     });
-    const thisTenantIsText = screen.getByText('This tenant is archived');
-    const studioMount = screen.queryByTestId('studio-mount');
+    const thisTenantIsText = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
     expect(studioHeading).toBeVisible();
     expect(thisTenantIsText).toBeVisible();
@@ -96,7 +105,7 @@ describe(`<${StudioMountView.name}/>`, () => {
         name: 'Studio',
       });
       const studioIsNotText = screen.getByText("Studio isn't ready yet");
-      const studioMount = screen.queryByTestId('studio-mount');
+      const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
       expect(studioHeading).toBeVisible();
       expect(studioIsNotText).toBeVisible();
@@ -107,30 +116,32 @@ describe(`<${StudioMountView.name}/>`, () => {
 
   it("mounts Studio with the tenant's project and dataset and the given basePath", async () => {
     const tenant = makeProvisionedTenant({
-      id: 'tenant-2',
-      name: 'Globex Corp.',
-      sanityProjectId: 'proj-globex',
+      id: MOCK_OTHER_TENANT_ID,
+      name: MOCK_OTHER_TENANT_NAME,
+      sanityProjectId: PROJ_GLOBEX,
       sanityDataset: 'staging',
     });
 
     renderWithIntl(
       await StudioMountView({
         tenant,
-        basePath: adminRoutes.tenantStudio('tenant-2'),
+        basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
       }),
     );
 
-    const studioMount = screen.getByTestId('studio-mount');
+    const studioMount = screen.getByTestId(STUDIO_MOUNT);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectId: 'proj-globex',
-        dataset: 'staging',
-        basePath: adminRoutes.tenantStudio('tenant-2'),
-        title: 'Globex Corp.',
-      }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: PROJ_GLOBEX,
+      dataset: 'staging',
+      basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
+      title: MOCK_OTHER_TENANT_NAME,
+      enabledCapabilities: [],
+      defaultLocale: tenant.locale,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      loginProvider: undefined,
+    });
   });
 
   it("passes the tenant's effective capabilities to Studio", async () => {
@@ -145,9 +156,16 @@ describe(`<${StudioMountView.name}/>`, () => {
     );
 
     expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(tenant);
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({ enabledCapabilities: [CAPABILITY.COMMENTS] }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: tenant.sanityProjectId,
+      dataset: tenant.sanityDataset,
+      basePath: adminRoutes.dashboardStudio(),
+      title: tenant.name,
+      enabledCapabilities: [CAPABILITY.COMMENTS],
+      defaultLocale: tenant.locale,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      loginProvider: undefined,
+    });
   });
 
   it("passes the tenant's default and live languages to Studio", async () => {
@@ -165,25 +183,38 @@ describe(`<${StudioMountView.name}/>`, () => {
     );
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        defaultLocale: LOCALE_ISO_CODES.NL,
-        liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
-      }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: tenant.sanityProjectId,
+      dataset: tenant.sanityDataset,
+      basePath: adminRoutes.dashboardStudio(),
+      title: tenant.name,
+      enabledCapabilities: [],
+      defaultLocale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
+      loginProvider: undefined,
+    });
   });
 
   it('restricts Studio to the given login provider', async () => {
+    const tenant = makeProvisionedTenant();
+
     renderWithIntl(
       await StudioMountView({
-        tenant: makeProvisionedTenant(),
+        tenant,
         basePath: adminRoutes.dashboardStudio(),
         loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
       }),
     );
 
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({ loginProvider: SANITY_LOGIN_PROVIDER.GITHUB }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: tenant.sanityProjectId,
+      dataset: tenant.sanityDataset,
+      basePath: adminRoutes.dashboardStudio(),
+      title: tenant.name,
+      enabledCapabilities: [],
+      defaultLocale: tenant.locale,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
+    });
   });
 });

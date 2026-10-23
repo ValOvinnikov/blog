@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { RELEASE_FAILURE } from '@platform/constants/release';
 import {
   githubJson,
   githubPage,
@@ -55,7 +56,7 @@ describe(getLatestReleaseTag, () => {
 
     expect(await getLatestReleaseTag()).toEqual({
       ok: false,
-      reason: 'tagListIncomplete',
+      error: RELEASE_FAILURE.TAG_LIST_INCOMPLETE,
     });
     expect(github.fetchMock).toHaveBeenCalledTimes(10);
   });

@@ -1,7 +1,10 @@
 import { ALERT_TYPE } from '@blog/config';
 import { render, screen } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 
 import { Alert } from './alert';
+
+const PROVISIONED = 'Provisioned';
 
 describe(Alert, () => {
   it('renders its title and description', () => {
@@ -12,22 +15,30 @@ describe(Alert, () => {
         description="Details are still fully editable."
       />,
     );
-    expect(screen.getByText('Not provisioned yet')).toBeVisible();
-    expect(screen.getByText('Details are still fully editable.')).toBeVisible();
+
+    const title = screen.getByText('Not provisioned yet');
+    const description = screen.getByText('Details are still fully editable.');
+
+    expect(title).toBeVisible();
+    expect(description).toBeVisible();
   });
 
   it('renders without a description', () => {
-    render(<Alert type={ALERT_TYPE.SUCCESS} title="Provisioned" />);
-    expect(screen.getByText('Provisioned')).toBeVisible();
+    render(<Alert type={ALERT_TYPE.SUCCESS} title={PROVISIONED} />);
+
+    const title = screen.getByText(PROVISIONED);
+
+    expect(title).toBeVisible();
   });
 
   it('renders a description without a title', () => {
     render(
       <Alert type={ALERT_TYPE.INFO} description="Labels are translated." />,
     );
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Labels are translated.',
-    );
+
+    const status = screen.getByRole('status');
+
+    expect(status).toHaveTextContent('Labels are translated.');
   });
 
   it('renders rich content in its description', () => {
@@ -45,31 +56,44 @@ describe(Alert, () => {
         }
       />,
     );
-    expect(screen.getByText('They were kept on this device.')).toBeVisible();
-    expect(screen.getByText('Review the differences')).toBeVisible();
+
+    const paragraph = screen.getByText('They were kept on this device.');
+    const summary = screen.getByText('Review the differences');
+
+    expect(paragraph).toBeVisible();
+    expect(summary).toBeVisible();
   });
 
   it('renders its action', () => {
     render(
       <Alert
         type={ALERT_TYPE.SUCCESS}
-        title="Provisioned"
+        title={PROVISIONED}
         action={<button type="button">View steps</button>}
       />,
     );
-    expect(screen.getByRole('button', { name: 'View steps' })).toBeVisible();
+
+    const actionButton = screen.getByRole('button', { name: 'View steps' });
+
+    expect(actionButton).toBeVisible();
   });
 
   it('renders an assertive alert role for the ERROR type', () => {
     render(<Alert type={ALERT_TYPE.ERROR} title="Provisioning failed" />);
-    expect(screen.getByRole('alert')).toHaveTextContent('Provisioning failed');
+
+    const alert = screen.getByRole('alert');
+
+    expect(alert).toHaveTextContent('Provisioning failed');
   });
 
   it.each([ALERT_TYPE.SUCCESS, ALERT_TYPE.WARNING, ALERT_TYPE.INFO])(
     'renders a polite status role for the %s type',
     (type) => {
       render(<Alert type={type} title="Status update" />);
-      expect(screen.getByRole('status')).toHaveTextContent('Status update');
+
+      const status = screen.getByRole('status');
+
+      expect(status).toHaveTextContent('Status update');
     },
   );
 
@@ -77,8 +101,12 @@ describe(Alert, () => {
     render(
       <Alert type={ALERT_TYPE.ERROR} role="status" title="Draft differs" />,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('Draft differs');
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    const status = screen.getByRole('status');
+    const alert = screen.queryByRole('alert');
+
+    expect(status).toHaveTextContent('Draft differs');
+    expect(alert).not.toBeInTheDocument();
   });
 
   it('carries an id, so a control elsewhere can point aria-describedby at it', () => {
@@ -87,22 +115,25 @@ describe(Alert, () => {
         <Alert
           id="archived-notice"
           type={ALERT_TYPE.WARNING}
-          title="This tenant is archived"
+          title={ARCHIVED_NOTICE_TEXT}
         />
         <button type="button" aria-describedby="archived-notice">
           Save
         </button>
       </>,
     );
-    expect(
-      screen.getByRole('button', { name: 'Save' }),
-    ).toHaveAccessibleDescription('This tenant is archived');
+
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+
+    expect(saveButton).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
   });
 
   it('renders a decorative icon for every type', () => {
     for (const type of Object.values(ALERT_TYPE)) {
       const { unmount } = render(<Alert type={type} title="Label" />);
-      expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
+      const icon = screen.getByTestId('icon');
+
+      expect(icon).toHaveAttribute('aria-hidden', 'true');
       unmount();
     }
   });

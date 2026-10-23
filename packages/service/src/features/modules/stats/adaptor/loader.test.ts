@@ -1,61 +1,68 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawStatsModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_STATS_MODULE_ID,
+  mockRawStatsModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LANDING_CACHE_TAG,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockRawHeadingBlock,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getStatsModule } from './loader';
+import { statsModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const HEADING = 'Our reach';
+const tenant = mockTenant();
 
 describe(getStatsModule, () => {
-  it('resolves the module in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawStatsModule({
-        headingBlock: makeRawHeadingBlock('By the numbers'),
-      }),
+  beforeEach(() => {
+    mockRun.mockResolvedValue(
+      mockRawStatsModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
     );
+  });
 
-    const stats = await getStatsModule('stats-1', tenant);
+  it('resolves the module in a single round trip', async () => {
+    const stats = await getStatsModule(MOCK_STATS_MODULE_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(stats.headingBlock.heading).toBe('By the numbers');
+    expect(stats.headingBlock.heading).toBe(HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getStatsModule('missing', tenant)).rejects.toThrow();
+    await expect(getStatsModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawStatsModule());
-
-    await getStatsModule('stats-1', tenant);
+    await getStatsModule(MOCK_STATS_MODULE_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:stats',
-            't:tenant-a:module:stats-1',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_landing',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(statsModuleQuery, {
+      parameters: { id: MOCK_STATS_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          mockCacheTag('modules:stats'),
+          mockCacheTag(`module:${MOCK_STATS_MODULE_ID}`),
+          MOCK_LINK_CACHE_TAG,
+          MOCK_HOME_PAGE_CACHE_TAG,
+          MOCK_PAGE_LANDING_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

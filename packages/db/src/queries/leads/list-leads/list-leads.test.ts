@@ -2,9 +2,9 @@ import * as schema from '@blog/db/schema';
 import {
   insertTestLead,
   insertTestTenant,
-  TEST_LEAD_EMAIL,
-  TEST_LEAD_MESSAGE,
-  TEST_LEAD_NAME,
+  MOCK_LEAD_EMAIL,
+  MOCK_LEAD_MESSAGE,
+  MOCK_LEAD_NAME,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -30,8 +30,8 @@ async function insertEncryptedLead(
   await insertTestLead(db(), tenantId, {
     name,
     nameEncrypted: encryptPersonalValue(name),
-    emailEncrypted: encryptPersonalValue(TEST_LEAD_EMAIL),
-    messageEncrypted: encryptPersonalValue(TEST_LEAD_MESSAGE),
+    emailEncrypted: encryptPersonalValue(MOCK_LEAD_EMAIL),
+    messageEncrypted: encryptPersonalValue(MOCK_LEAD_MESSAGE),
     createdAt,
   });
 }
@@ -112,11 +112,11 @@ describe(listLeads, () => {
   it('returns the decrypted name, email and message rather than the plain columns', async () => {
     const lead = await insertTestLead(db(), tenantId, {
       name: 'stale plain name',
-      nameEncrypted: encryptPersonalValue(TEST_LEAD_NAME),
+      nameEncrypted: encryptPersonalValue(MOCK_LEAD_NAME),
       email: 'stale@example.com',
-      emailEncrypted: encryptPersonalValue(TEST_LEAD_EMAIL),
+      emailEncrypted: encryptPersonalValue(MOCK_LEAD_EMAIL),
       message: 'stale plain message',
-      messageEncrypted: encryptPersonalValue(TEST_LEAD_MESSAGE),
+      messageEncrypted: encryptPersonalValue(MOCK_LEAD_MESSAGE),
       createdAt: JANUARY_1,
     });
 
@@ -125,9 +125,9 @@ describe(listLeads, () => {
     expect(result.leads).toEqual([
       {
         id: lead.id,
-        name: TEST_LEAD_NAME,
-        email: TEST_LEAD_EMAIL,
-        message: TEST_LEAD_MESSAGE,
+        name: MOCK_LEAD_NAME,
+        email: MOCK_LEAD_EMAIL,
+        message: MOCK_LEAD_MESSAGE,
         sourcePath: lead.sourcePath,
         createdAt: JANUARY_1,
       },

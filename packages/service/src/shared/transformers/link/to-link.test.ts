@@ -1,12 +1,26 @@
 import { LINK_TYPE } from '@blog/config';
+import { MOCK_TOPIC_SLUG } from '@blog/service/testing/entities/fixtures';
+import {
+  MOCK_EXTERNAL_URL,
+  MOCK_LINK_LABEL,
+  MOCK_POST_HREF,
+  MOCK_POST_SLUG,
+  mockLinkView,
+} from '@blog/service/testing/shared/fixtures';
+import {
+  MOCK_ABOUT_HREF,
+  MOCK_ABOUT_SLUG,
+} from '@blog/service/testing/shared/translated-pages-dataset';
 
 import { toLink, type TRawLink } from './to-link';
 
-function makeRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
+const ACCESSIBLE_LABEL = 'Read the full announcement';
+
+function mockRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
   return {
-    label: 'Learn more',
+    label: MOCK_LINK_LABEL,
     linkType: LINK_TYPE.EXTERNAL,
-    url: '/newsletter',
+    url: MOCK_EXTERNAL_URL,
     internalReference: null,
     openInNewTab: null,
     platform: null,
@@ -15,93 +29,53 @@ function makeRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
   };
 }
 
-describe('toLink', () => {
-  it('returns undefined for a null/undefined raw link', () => {
-    expect(toLink(null)).toBeUndefined();
-    expect(toLink(undefined)).toBeUndefined();
+describe(toLink, () => {
+  it.each([null, undefined])('returns undefined for a %s raw link', (raw) => {
+    const result = toLink(raw);
+
+    expect(result).toBeUndefined();
   });
 
   it('resolves an external link to its raw url', () => {
-    const result = toLink(makeRawLink({ url: 'https://example.com' }));
+    const result = toLink(mockRawLink());
 
-    expect(result).toEqual({
-      label: 'Learn more',
-      href: 'https://example.com',
-      target: undefined,
-      platform: undefined,
-      ariaLabel: undefined,
-    });
+    expect(result).toEqual(mockLinkView());
   });
 
   it('threads accessibleLabel through to ariaLabel when present', () => {
-    const result = toLink(
-      makeRawLink({ accessibleLabel: 'Read the full announcement' }),
-    );
+    const result = toLink(mockRawLink({ accessibleLabel: ACCESSIBLE_LABEL }));
 
-    expect(result?.ariaLabel).toBe('Read the full announcement');
-  });
-
-  it('leaves ariaLabel undefined when accessibleLabel is absent', () => {
-    const result = toLink(makeRawLink({ accessibleLabel: null }));
-
-    expect(result?.ariaLabel).toBeUndefined();
+    expect(result?.ariaLabel).toBe(ACCESSIBLE_LABEL);
   });
 
   it('opens external links in a new tab when flagged', () => {
-    const result = toLink(
-      makeRawLink({ url: 'https://example.com', openInNewTab: true }),
-    );
+    const result = toLink(mockRawLink({ openInNewTab: true }));
 
     expect(result?.target).toBe('_blank');
   });
 
-  it('resolves an internal page_post reference to its post route', () => {
+  it.each([
+    { _type: 'page_post', slug: MOCK_POST_SLUG, href: MOCK_POST_HREF },
+    { _type: 'blog_topic', slug: MOCK_TOPIC_SLUG, href: '/topics/engineering' },
+    { _type: 'page_landing', slug: MOCK_ABOUT_SLUG, href: MOCK_ABOUT_HREF },
+    { _type: 'page_postIndex', slug: null, href: '/blog' },
+  ] as const)(
+    'resolves an internal $_type reference to its route',
+    ({ _type, slug, href }) => {
+      const result = toLink(
+        mockRawLink({
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: { _type, slug },
+        }),
+      );
+
+      expect(result?.href).toBe(href);
+    },
+  );
+
+  it('returns undefined for a page_post reference missing its slug', () => {
     const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_post', slug: 'hello-world' },
-      }),
-    );
-
-    expect(result?.href).toBe('/blog/hello-world');
-  });
-
-  it('resolves an internal blog_topic reference to its topic route', () => {
-    const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'blog_topic', slug: 'engineering' },
-      }),
-    );
-
-    expect(result?.href).toBe('/topics/engineering');
-  });
-
-  it('resolves an internal page_landing reference to its landing-page route', () => {
-    const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_landing', slug: 'about' },
-      }),
-    );
-
-    expect(result?.href).toBe('/about');
-  });
-
-  it('resolves an internal page_postIndex reference to the blog index — no slug required', () => {
-    const result = toLink(
-      makeRawLink({
-        linkType: LINK_TYPE.INTERNAL,
-        internalReference: { _type: 'page_postIndex', slug: null },
-      }),
-    );
-
-    expect(result?.href).toBe('/blog');
-  });
-
-  it('returns undefined when a slug-having internal reference is genuinely missing its slug', () => {
-    const result = toLink(
-      makeRawLink({
+      mockRawLink({
         linkType: LINK_TYPE.INTERNAL,
         internalReference: { _type: 'page_post', slug: null },
       }),
@@ -112,7 +86,7 @@ describe('toLink', () => {
 
   it('returns undefined when an internal link has no reference and no url', () => {
     const result = toLink(
-      makeRawLink({
+      mockRawLink({
         linkType: LINK_TYPE.INTERNAL,
         internalReference: null,
         url: null,

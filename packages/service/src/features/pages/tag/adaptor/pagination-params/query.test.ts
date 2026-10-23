@@ -1,40 +1,45 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  MOCK_TAG_ID,
+  MOCK_TAG_SLUG,
+} from '@blog/service/testing/entities/fixtures';
+import { mockListModuleRefs } from '@blog/service/testing/pages/fixtures';
+import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
+import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { tagPaginationParamsQuery } from './query';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
 describe('tagPaginationParamsQuery', () => {
-  it('parses a tag page slug with its module ids and a post count', () => {
-    const raw = [
-      { slug: 'typescript', moduleRefs: [{ _ref: 'list-1' }], postCount: 5 },
-    ];
-
-    expect(() => tagPaginationParamsQuery.parse(raw)).not.toThrow();
-  });
-
-  it('parses a tag page with no modules and zero posts', () => {
-    const raw = [{ slug: 'empty', moduleRefs: null, postCount: 0 }];
-
+  it.each([
+    [
+      'slug with its module ids and a post count',
+      [{ slug: MOCK_TAG_SLUG, moduleRefs: mockListModuleRefs(), postCount: 5 }],
+    ],
+    [
+      'with no modules and zero posts',
+      [{ slug: 'empty', moduleRefs: null, postCount: 0 }],
+    ],
+  ])('parses a tag page %s', (_, raw) => {
     expect(() => tagPaginationParamsQuery.parse(raw)).not.toThrow();
   });
 
   it('counts the published posts on the tag in the tag page language', async () => {
     const dataset = [
-      ...translatedPostDocuments,
+      ...MOCK_TRANSLATED_POST_DOCUMENTS,
       {
         _id: 'page-en',
         _type: 'page_tag',
-        tag: { _type: 'reference', _ref: 'tag-1' },
+        tag: mockReference(MOCK_TAG_ID),
         slug: { current: 'design' },
         language: EN,
       },
       {
         _id: 'page-nl',
         _type: 'page_tag',
-        tag: { _type: 'reference', _ref: 'tag-1' },
+        tag: mockReference(MOCK_TAG_ID),
         slug: { current: 'ontwerp' },
         language: NL,
       },

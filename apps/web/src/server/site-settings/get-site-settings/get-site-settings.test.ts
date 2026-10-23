@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getSiteSettings } from './get-site-settings';
@@ -20,7 +21,7 @@ describe(getSiteSettings, () => {
   });
 
   it('forwards the resolved tenant context to the site settings service', async () => {
-    getSiteSettingsMock.mockResolvedValue({ ok: true, data: {} });
+    getSiteSettingsMock.mockResolvedValue(okResult({}));
 
     await getSiteSettings();
 
@@ -30,7 +31,7 @@ describe(getSiteSettings, () => {
   });
 
   it('returns the raw TResult from the service unchanged', async () => {
-    const result = { ok: true, data: { brand: { name: 'Blog' } } };
+    const result = okResult({ brand: { name: 'Blog' } });
     getSiteSettingsMock.mockResolvedValue(result);
 
     await expect(getSiteSettings()).resolves.toBe(result);
@@ -45,7 +46,7 @@ describe('getSiteSettings memoization', () => {
 
   it('fetches once however many components read it in one render pass', async () => {
     getSiteSettingsMock.mockReset();
-    getSiteSettingsMock.mockResolvedValue({ ok: true, data: {} });
+    getSiteSettingsMock.mockResolvedValue(okResult({}));
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();

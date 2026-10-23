@@ -1,20 +1,26 @@
-import { makeRawTag } from '@blog/service/testing/entities/fixtures';
+import {
+  MOCK_TAG_ID,
+  MOCK_TAG_SLUG,
+  MOCK_TAG_TITLE,
+  mockRawTag,
+} from '@blog/service/testing/entities/fixtures';
 
 import { toTag } from './to-tag';
 
-describe('toTag', () => {
+describe(toTag, () => {
   it('maps all fields from raw input', () => {
-    const raw = makeRawTag();
-    const result = toTag(raw);
+    const result = toTag(mockRawTag());
 
     expect(result).toEqual({
-      id: 'tag-1',
-      title: 'TypeScript',
-      slug: 'typescript',
+      id: MOCK_TAG_ID,
+      title: MOCK_TAG_TITLE,
+      slug: MOCK_TAG_SLUG,
     });
   });
 
   it('maps a tag with no tag page to an undefined slug', () => {
-    expect(toTag(makeRawTag({ slug: null })).slug).toBeUndefined();
+    const { slug } = toTag(mockRawTag({ slug: null }));
+
+    expect(slug).toBeUndefined();
   });
 });

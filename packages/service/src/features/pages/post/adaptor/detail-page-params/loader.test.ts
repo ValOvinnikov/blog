@@ -1,36 +1,32 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { MOCK_PAGE_POST_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPostParams } from './loader';
+import { postParamsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL } = LOCALE_ISO_CODES;
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('getPostParams', () => {
+describe(getPostParams, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue([]);
   });
 
   it('returns the slug, language and publishedAt entries', async () => {
-    mockRun.mockResolvedValue([
+    const entries = [
       { slug: 'post-a', language: EN, publishedAt: '2026-01-01T00:00:00Z' },
       { slug: 'artikel-a', language: NL, publishedAt: '2026-02-01T00:00:00Z' },
-    ]);
+    ];
+    mockRun.mockResolvedValueOnce(entries);
 
     const params = await getPostParams(tenant, [EN, NL]);
 
-    expect(params).toEqual([
-      { slug: 'post-a', language: EN, publishedAt: '2026-01-01T00:00:00Z' },
-      { slug: 'artikel-a', language: NL, publishedAt: '2026-02-01T00:00:00Z' },
-    ]);
+    expect(params).toEqual(entries);
   });
 
   it('returns an empty array when there are no posts', async () => {
@@ -39,24 +35,16 @@ describe('getPostParams', () => {
     expect(params).toEqual([]);
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getPostParams(tenant, [EN]);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_post'] }),
-      }),
-    );
-  });
-
-  it('passes the live languages to the query', async () => {
+  it('queries the live languages for the tenant and scopes the tags to it', async () => {
     await getPostParams(tenant, [EN, NL]);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(postParamsQuery, {
+      parameters: { locales: [EN, NL] },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_PAGE_POST_CACHE_TAG],
+      },
+    });
   });
 });

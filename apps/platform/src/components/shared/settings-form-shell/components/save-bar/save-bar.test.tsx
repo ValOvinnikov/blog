@@ -1,8 +1,21 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import {
+  GO_TO_THE_FIRST_ONE,
+  ONE_FIELD_NEEDS_ATTENTION,
+  SAVE_CHANGES,
+  UNSAVED_CHANGES,
+} from '@platform/testing/render-in-settings-form';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
 import { SaveBar, type TSaveBarProps } from './save-bar';
+
+const THREE_UNSAVED_CHANGES = '3 unsaved changes';
+const DISCARD = 'Discard';
+const HEADING = 'Heading';
+const FIELD_HEADING_ID = 'field-heading';
+const BREAKDOWN = 'English 2 · Deutsch 1';
+const SAVE_ERROR = "Couldn't save Look settings — try again.";
 
 const baseProps: TSaveBarProps = {
   changeCount: 3,
@@ -21,11 +34,11 @@ const BarWithHiddenField = () => {
 
   return (
     <>
-      {isRevealed && <input id="field-heading" aria-label="Heading" />}
+      {isRevealed && <input id={FIELD_HEADING_ID} aria-label={HEADING} />}
       <SaveBar
         {...baseProps}
         invalidControls={{
-          ids: ['field-heading'],
+          ids: [FIELD_HEADING_ID],
           revealFirst: () => setIsRevealed(true),
         }}
       />
@@ -34,93 +47,121 @@ const BarWithHiddenField = () => {
 };
 
 describe(`<${SaveBar.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('shows a single change in the singular', () => {
     renderBar({ changeCount: 1 });
 
-    expect(screen.getByText('1 unsaved change')).toBeVisible();
+    const changeCount = screen.getByText('1 unsaved change');
+
+    expect(changeCount).toBeVisible();
   });
 
   it('shows the per-language breakdown beside the count', () => {
-    renderBar({ breakdown: 'English 2 · Deutsch 1' });
+    renderBar({ breakdown: BREAKDOWN });
 
-    expect(screen.getByText('3 unsaved changes')).toBeVisible();
-    expect(screen.getByText('English 2 · Deutsch 1')).toBeVisible();
+    const changeCount = screen.getByText(THREE_UNSAVED_CHANGES);
+    const breakdown = screen.getByText(BREAKDOWN);
+
+    expect(changeCount).toBeVisible();
+    expect(breakdown).toBeVisible();
   });
 
   it('shows the saving state on Save and disables Discard while pending', () => {
     renderBar({ isPending: true });
 
-    expect(screen.getByRole('button', { name: 'Saving…' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Discard' })).toBeDisabled();
+    const savingButton = screen.getByRole('button', { name: 'Saving…' });
+    const discardButton = screen.getByRole('button', { name: DISCARD });
+
+    expect(savingButton).toBeDisabled();
+    expect(discardButton).toBeDisabled();
   });
 
   describe('after a save with field errors', () => {
     beforeEach(() => {
-      renderBar({ invalidControls: { ids: ['field-heading', 'field-body'] } });
+      renderBar({ invalidControls: { ids: [FIELD_HEADING_ID, 'field-body'] } });
     });
 
     it('counts the fields that need attention in place of the change count', () => {
-      expect(screen.getByText('2 fields need attention')).toBeVisible();
-      expect(screen.queryByText('3 unsaved changes')).not.toBeInTheDocument();
+      const attentionCount = screen.getByText('2 fields need attention');
+      const changeCount = screen.queryByText(THREE_UNSAVED_CHANGES);
+
+      expect(attentionCount).toBeVisible();
+      expect(changeCount).not.toBeInTheDocument();
     });
 
     it('links to the first field that needs attention', () => {
-      expect(
-        screen.getByRole('link', { name: 'Go to the first one' }),
-      ).toHaveAttribute('href', '#field-heading');
+      const firstFieldLink = screen.getByRole('link', {
+        name: GO_TO_THE_FIRST_ONE,
+      });
+
+      expect(firstFieldLink).toHaveAttribute('href', `#${FIELD_HEADING_ID}`);
     });
 
     it('focuses the first field from the link', async () => {
-      renderWithIntl(<input id="field-heading" aria-label="Heading" />);
+      renderWithIntl(<input id={FIELD_HEADING_ID} aria-label={HEADING} />);
 
-      await userEvent.click(
-        screen.getByRole('link', { name: 'Go to the first one' }),
-      );
+      const firstFieldLink = screen.getByRole('link', {
+        name: GO_TO_THE_FIRST_ONE,
+      });
+      await user.click(firstFieldLink);
 
-      expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
+      const headingField = screen.getByRole('textbox', { name: HEADING });
+
+      expect(headingField).toHaveFocus();
     });
 
     it('focuses the control inside a first field that cannot take focus', async () => {
       renderWithIntl(
-        <div id="field-heading">
-          <input aria-label="Heading" />
+        <div id={FIELD_HEADING_ID}>
+          <input aria-label={HEADING} />
         </div>,
       );
 
-      await userEvent.click(
-        screen.getByRole('link', { name: 'Go to the first one' }),
-      );
+      const firstFieldLink = screen.getByRole('link', {
+        name: GO_TO_THE_FIRST_ONE,
+      });
+      await user.click(firstFieldLink);
 
-      expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
+      const headingField = screen.getByRole('textbox', { name: HEADING });
+
+      expect(headingField).toHaveFocus();
     });
 
     it('keeps Save and Discard available', () => {
-      expect(
-        screen.getByRole('button', { name: 'Save changes' }),
-      ).toBeEnabled();
-      expect(screen.getByRole('button', { name: 'Discard' })).toBeEnabled();
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const discardButton = screen.getByRole('button', { name: DISCARD });
+
+      expect(saveButton).toBeEnabled();
+      expect(discardButton).toBeEnabled();
     });
   });
 
   it('lets the page reveal the first field before focusing it', async () => {
     renderWithIntl(<BarWithHiddenField />);
 
-    await userEvent.click(
-      screen.getByRole('link', { name: 'Go to the first one' }),
-    );
+    const firstFieldLink = screen.getByRole('link', {
+      name: GO_TO_THE_FIRST_ONE,
+    });
+    await user.click(firstFieldLink);
 
-    expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
+    const headingField = screen.getByRole('textbox', { name: HEADING });
+
+    expect(headingField).toHaveFocus();
   });
 
   describe('after a save that failed', () => {
     it('announces the error beside Save when no field caused it', () => {
-      renderBar({ saveError: "Couldn't save Look settings — try again." });
+      renderBar({ saveError: SAVE_ERROR });
 
       const alert = screen.getByRole('alert');
-      const changeCount = screen.queryByText('3 unsaved changes');
-      expect(alert).toHaveTextContent(
-        "Couldn't save Look settings — try again.",
-      );
+      const changeCount = screen.queryByText(THREE_UNSAVED_CHANGES);
+
+      expect(alert).toHaveTextContent(SAVE_ERROR);
       expect(changeCount).not.toBeInTheDocument();
     });
 
@@ -130,12 +171,14 @@ describe(`<${SaveBar.name}/>`, () => {
         invalidControls: { ids: ['field-logo'] },
       });
 
-      const region = screen.getByRole('region', { name: 'Unsaved changes' });
-      const link = screen.getByRole('link', { name: 'Go to the first one' });
+      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const link = screen.getByRole('link', { name: GO_TO_THE_FIRST_ONE });
+      const alert = screen.queryByRole('alert');
+
       expect(region).toHaveTextContent('Not saved');
-      expect(region).toHaveTextContent('1 field needs attention');
+      expect(region).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
       expect(link).toHaveAttribute('href', '#field-logo');
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(alert).not.toBeInTheDocument();
     });
   });
 });

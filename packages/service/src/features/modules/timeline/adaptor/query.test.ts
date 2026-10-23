@@ -1,61 +1,61 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  makeRawTimelineItem,
-  makeRawTimelineModule,
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  LOCALE_ISO_CODES,
+  TIMELINE_MARKER_STYLE,
+  TIMELINE_ORIENTATION,
+} from '@blog/config/constants';
+import {
+  MOCK_TIMELINE_MODULE_ID,
+  mockRawTimelineItem,
+  mockRawTimelineModule,
 } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
-  localizedStrings,
-  localizedValues,
-  paragraphBlocks,
+  mockLocalizedHeadingBlock,
+  mockLocalizedParagraphText,
+  mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@blog/service/testing/shared/localized';
 
 import { timelineModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-function localizedParagraphs(values: Partial<Record<string, string>>) {
-  return localizedValues(
-    'internationalizedArrayParagraphTextValue',
-    Object.fromEntries(
-      Object.entries(values).map(([language, text]) => [
-        language,
-        paragraphBlocks(text ?? ''),
-      ]),
-    ),
-  );
-}
+const FIRST_KEY = 'kick-off-item';
+const SECOND_KEY = 'ship-item';
+const HEADING = { [EN]: 'How it works', [NL]: 'Hoe het werkt' };
+const FIRST_MARKER = 'Week 1';
+const FIRST_HEADING = { [EN]: 'Kick off', [NL]: 'Aftrap' };
+const FIRST_BODY = { [EN]: 'The project begins.', [NL]: 'Het project begint.' };
+const SECOND_MARKER = { [EN]: 'Week 2', [FR]: 'Semaine 2' };
+const SECOND_HEADING = 'Ship';
+const SECOND_BODY = 'It goes live.';
 
 const timelineDocument = {
-  _id: 'timeline-1',
+  _id: MOCK_TIMELINE_MODULE_ID,
   _type: 'module_timeline',
-  brandVariant: 'PRIMARY',
-  headingBlock: {
-    _type: 'moduleHeadingBlock',
-    heading: localizedStrings({ [EN]: 'How it works', [NL]: 'Hoe het werkt' }),
-  },
-  markerStyle: 'LABELLED',
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockLocalizedHeadingBlock(HEADING),
+  markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
   items: [
     {
-      _key: 'item-1',
+      _key: FIRST_KEY,
       _type: 'timelineItem',
-      marker: localizedStrings({ [EN]: 'Week 1', [NL]: 'Week 1' }),
-      heading: localizedStrings({ [EN]: 'Kick off', [NL]: 'Aftrap' }),
-      body: localizedParagraphs({
-        [EN]: 'The project begins.',
-        [NL]: 'Het project begint.',
-      }),
+      marker: mockLocalizedStrings({ [EN]: FIRST_MARKER, [NL]: FIRST_MARKER }),
+      heading: mockLocalizedStrings(FIRST_HEADING),
+      body: mockLocalizedParagraphText(FIRST_BODY),
     },
     {
-      _key: 'item-2',
+      _key: SECOND_KEY,
       _type: 'timelineItem',
-      marker: localizedStrings({ [EN]: 'Week 2', [FR]: 'Semaine 2' }),
-      heading: localizedStrings({ [EN]: 'Ship' }),
-      body: localizedParagraphs({ [EN]: 'It goes live.' }),
+      marker: mockLocalizedStrings(SECOND_MARKER),
+      heading: mockLocalizedStrings({ [EN]: SECOND_HEADING }),
+      body: mockLocalizedParagraphText({ [EN]: SECOND_BODY }),
     },
   ],
-  orientation: 'VERTICAL',
-  itemAlignment: 'LEFT',
+  orientation: TIMELINE_ORIENTATION.VERTICAL,
+  itemAlignment: CONTENT_ALIGNMENT.LEFT,
 };
 
 async function runTimeline(document: Record<string, unknown>, locale: string) {
@@ -63,7 +63,7 @@ async function runTimeline(document: Record<string, unknown>, locale: string) {
     timelineModuleQuery.query,
     [document],
     undefined,
-    { id: 'timeline-1', locale, defaultLocale: EN },
+    { id: MOCK_TIMELINE_MODULE_ID, locale, defaultLocale: EN },
   );
 
   return timelineModuleQuery.parse(raw);
@@ -75,96 +75,68 @@ describe('timelineModuleQuery', () => {
     expect(timelineModuleQuery.query).toContain('_id == $id');
   });
 
-  it('rejects a module with no headingBlock', () => {
-    const raw = { ...makeRawTimelineModule(), headingBlock: null };
-
-    expect(() => timelineModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no items', () => {
-    const raw = { ...makeRawTimelineModule(), items: null };
-
-    expect(() => timelineModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects an item with no heading', () => {
-    const raw = {
-      ...makeRawTimelineModule(),
-      items: [{ ...makeRawTimelineItem(), heading: null }],
-    };
+  it.each([
+    ['a module with no headingBlock', { headingBlock: null }],
+    ['a module with no items', { items: null }],
+    [
+      'an item with no heading',
+      { items: [{ ...mockRawTimelineItem(), heading: null }] },
+    ],
+    ['a module with no markerStyle', { markerStyle: null }],
+    ['a module with no orientation', { orientation: null }],
+    ['a module with no itemAlignment', { itemAlignment: null }],
+  ])('rejects %s', (_case, overrides) => {
+    const raw = { ...mockRawTimelineModule(), ...overrides };
 
     expect(() => timelineModuleQuery.parse(raw)).toThrow();
   });
 
   it('parses an item with no marker or body', () => {
     const raw = {
-      ...makeRawTimelineModule(),
-      items: [{ ...makeRawTimelineItem(), marker: null, body: null }],
+      ...mockRawTimelineModule(),
+      items: [{ ...mockRawTimelineItem(), marker: null, body: null }],
     };
 
-    expect(() => timelineModuleQuery.parse(raw)).not.toThrow();
-    const parsed = timelineModuleQuery.parse(raw).items?.[0];
-    expect(parsed?.marker).toBeNull();
-    expect(parsed?.body).toBeNull();
+    const [item] = timelineModuleQuery.parse(raw).items;
+
+    expect(item?.marker).toBeNull();
+    expect(item?.body).toBeNull();
   });
 
-  it('rejects a module with no markerStyle', () => {
-    const raw = { ...makeRawTimelineModule(), markerStyle: null };
+  it.each([
+    [NL, HEADING[NL], FIRST_HEADING[NL], FIRST_BODY[NL], SECOND_MARKER[EN]],
+    [FR, HEADING[EN], FIRST_HEADING[EN], FIRST_BODY[EN], SECOND_MARKER[FR]],
+  ])(
+    'resolves the heading and each item for a %s visitor',
+    async (locale, heading, firstHeading, firstBody, secondMarker) => {
+      const timeline = await runTimeline(timelineDocument, locale);
 
-    expect(() => timelineModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no orientation', () => {
-    const raw = { ...makeRawTimelineModule(), orientation: null };
-
-    expect(() => timelineModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('rejects a module with no itemAlignment', () => {
-    const raw = { ...makeRawTimelineModule(), itemAlignment: null };
-
-    expect(() => timelineModuleQuery.parse(raw)).toThrow();
-  });
-
-  it('picks the heading and each item in the visitor language', async () => {
-    const timeline = await runTimeline(timelineDocument, NL);
-
-    expect(timeline).toMatchObject({
-      headingBlock: { heading: 'Hoe het werkt' },
-      items: [
-        {
-          marker: 'Week 1',
-          heading: 'Aftrap',
-          body: [{ children: [{ text: 'Het project begint.' }] }],
-        },
-        {
-          marker: 'Week 2',
-          heading: 'Ship',
-          body: [{ children: [{ text: 'It goes live.' }] }],
-        },
-      ],
-    });
-  });
-
-  it('falls back to the default language for the heading and each item', async () => {
-    const timeline = await runTimeline(timelineDocument, FR);
-
-    expect(timeline).toMatchObject({
-      headingBlock: { heading: 'How it works' },
-      items: [
-        {
-          marker: 'Week 1',
-          heading: 'Kick off',
-          body: [{ children: [{ text: 'The project begins.' }] }],
-        },
-        {
-          marker: 'Semaine 2',
-          heading: 'Ship',
-          body: [{ children: [{ text: 'It goes live.' }] }],
-        },
-      ],
-    });
-  });
+      expect(timeline).toEqual({
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: { heading, supportingText: null },
+        markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+        items: [
+          {
+            _key: FIRST_KEY,
+            marker: FIRST_MARKER,
+            heading: firstHeading,
+            body: mockParagraphBlocks(firstBody),
+          },
+          {
+            _key: SECOND_KEY,
+            marker: secondMarker,
+            heading: SECOND_HEADING,
+            body: mockParagraphBlocks(SECOND_BODY),
+          },
+        ],
+        orientation: TIMELINE_ORIENTATION.VERTICAL,
+        ctaButtons: null,
+        contentAlignment: null,
+        itemAlignment: CONTENT_ALIGNMENT.LEFT,
+        layout: null,
+      });
+    },
+  );
 
   it('fails when an item heading is missing in both languages', async () => {
     const [first, second] = timelineDocument.items;
@@ -175,7 +147,7 @@ describe('timelineModuleQuery', () => {
           ...timelineDocument,
           items: [
             first,
-            { ...second, heading: localizedStrings({ [FR]: 'Lancement' }) },
+            { ...second, heading: mockLocalizedStrings({ [FR]: 'Lancement' }) },
           ],
         },
         NL,

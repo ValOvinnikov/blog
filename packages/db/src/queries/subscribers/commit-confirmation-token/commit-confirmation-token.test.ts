@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { sha256Hex } from '@blog/utils/hash';
@@ -33,7 +33,7 @@ describe(commitConfirmationToken, () => {
   ): Promise<schema.TSubscriber> {
     const [subscriber] = await db()
       .insert(schema.subscribers)
-      .values({ tenantId, email: TEST_SUBSCRIBER_EMAIL, ...overrides })
+      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, ...overrides })
       .returning();
     if (!subscriber) throw new Error('failed to seed a subscriber row');
     return subscriber;
@@ -48,23 +48,32 @@ describe(commitConfirmationToken, () => {
     return row;
   }
 
-  it('stores only the hash of the token', async () => {
-    const { id } = await insertSubscriber();
-    const confirmationToken = faker.string.uuid();
+  describe('with an unconfirmed subscriber', () => {
+    let subscriber: schema.TSubscriber;
 
-    await commitConfirmationToken(id, confirmationToken);
+    beforeEach(async () => {
+      subscriber = await insertSubscriber();
+    });
 
-    expect((await readRow(id)).confirmationTokenHash).toBe(
-      sha256Hex(confirmationToken),
-    );
-  });
+    it('stores only the hash of the token', async () => {
+      const confirmationToken = faker.string.uuid();
 
-  it('leaves the unsubscribe token hash untouched', async () => {
-    const { id, unsubscribeTokenHash } = await insertSubscriber();
+      await commitConfirmationToken(subscriber.id, confirmationToken);
 
-    await commitConfirmationToken(id, faker.string.uuid());
+      expect((await readRow(subscriber.id)).confirmationTokenHash).toBe(
+        sha256Hex(confirmationToken),
+      );
+    });
 
-    expect((await readRow(id)).unsubscribeTokenHash).toBe(unsubscribeTokenHash);
+    it('leaves the unsubscribe token hash untouched', async () => {
+      const { id, unsubscribeTokenHash } = subscriber;
+
+      await commitConfirmationToken(id, faker.string.uuid());
+
+      expect((await readRow(id)).unsubscribeTokenHash).toBe(
+        unsubscribeTokenHash,
+      );
+    });
   });
 
   it('never changes a subscriber who has confirmed', async () => {

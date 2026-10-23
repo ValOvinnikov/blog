@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
@@ -27,7 +28,7 @@ export const testNotFoundWithoutLog = ({
   setup,
 }: IWithLoaderMock) => {
   it('calls notFound() without logging when the page document is missing', async () => {
-    pageLoaderMock.mockResolvedValue({ ok: true, data: undefined });
+    pageLoaderMock.mockResolvedValue(okResult());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -42,7 +43,7 @@ export const testNotFoundOnFetchFailure = ({
   eventFragment,
 }: IWithLoaderMock & { eventFragment?: string }) => {
   it('calls notFound() when the fetch fails', async () => {
-    pageLoaderMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    pageLoaderMock.mockResolvedValue(errorResult(new Error('boom')));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -67,7 +68,7 @@ export const testBreadcrumbsTrail = <TData,>({
   currentLabel: string;
 }) => {
   it('renders the breadcrumbs trail', async () => {
-    pageLoaderMock.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock.mockResolvedValue(okResult(successData));
 
     await setup();
 
@@ -94,7 +95,7 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
   itemPath: string;
 }) => {
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock?.mockResolvedValue(okResult(successData));
 
     await setup();
 
@@ -107,7 +108,7 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
   });
 
   it('prefixes the JSON-LD item URLs with the language on a non-default-language page', async () => {
-    pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock?.mockResolvedValue(okResult(successData));
     vi.mocked(getRequestContext).mockResolvedValueOnce({
       ...DEFAULT_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
@@ -129,7 +130,7 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
   setup: TAsyncSetup;
 }) => {
   it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
-    pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock?.mockResolvedValue(okResult(successData));
     vi.mocked(getRequestContext).mockResolvedValueOnce({
       ...DEFAULT_REQUEST_CONTEXT,
       metadataBase: undefined,
@@ -154,7 +155,7 @@ export const testForwardsArgsToLoader = <TData,>({
   expectedArgs: unknown[];
 }) => {
   it(description, async () => {
-    pageLoaderMock.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock.mockResolvedValue(okResult(successData));
 
     await setup();
 
@@ -171,7 +172,7 @@ export const testBreadcrumbsJsonLdTrail = <TData,>({
   expectedTrail: { name: string; path: string }[];
 }) => {
   it('emits a BreadcrumbList node for each crumb in the trail', async () => {
-    pageLoaderMock.mockResolvedValue({ ok: true, data: successData });
+    pageLoaderMock.mockResolvedValue(okResult(successData));
 
     await setup();
 

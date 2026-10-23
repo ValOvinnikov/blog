@@ -3,8 +3,8 @@ import {
   insertTestReader,
   insertTestSubscriber,
   insertTestTenant,
-  TEST_SUBSCRIBER_EMAIL,
-  TEST_SUBSCRIBER_TAGGED_EMAIL,
+  MOCK_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -29,16 +29,16 @@ describe(unsubscribe, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    ({ id: userId } = await insertTestReader(db(), TEST_SUBSCRIBER_EMAIL));
+    ({ id: userId } = await insertTestReader(db(), MOCK_SUBSCRIBER_EMAIL));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it("deletes only the account's own subscriber row", async () => {
-    await insertTestSubscriber(db(), tenantId, TEST_SUBSCRIBER_EMAIL);
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
     const sibling = await insertTestSubscriber(
       db(),
       tenantId,
-      TEST_SUBSCRIBER_TAGGED_EMAIL,
+      MOCK_SUBSCRIBER_TAGGED_EMAIL,
     );
 
     await unsubscribe(tenantId, userId);

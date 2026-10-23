@@ -1,3 +1,8 @@
+import {
+  MOCK_ESCAPED_SCRIPT_MARKUP,
+  MOCK_SCRIPT_MARKUP,
+} from '@blog/email/testing/email-fixtures';
+
 import { escapeHtml } from './escape-html';
 
 describe('escapeHtml', () => {
@@ -6,9 +11,7 @@ describe('escapeHtml', () => {
   });
 
   it('escapes angle brackets', () => {
-    expect(escapeHtml('<script>alert(1)</script>')).toBe(
-      '&lt;script&gt;alert(1)&lt;/script&gt;',
-    );
+    expect(escapeHtml(MOCK_SCRIPT_MARKUP)).toBe(MOCK_ESCAPED_SCRIPT_MARKUP);
   });
 
   it('escapes double and single quotes', () => {

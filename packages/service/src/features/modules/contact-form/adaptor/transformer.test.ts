@@ -1,11 +1,9 @@
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures';
 import {
-  BRAND_VARIANT,
-  CONTAINER_WIDTH,
-  CONTENT_ALIGNMENT,
-  SPACING_SCALE,
-} from '@blog/config';
-import { makeRawContactFormModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawParagraphTextBlock } from '@blog/service/testing/shared/fixtures';
+  mockRawParagraphTextBlock,
+  mockRawWideLayout,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toContactFormModule, type TRawContactFormModule } from './transformer';
 
@@ -13,23 +11,19 @@ type TRawPrivacyNoteBlock = NonNullable<
   TRawContactFormModule['privacyNote']
 >[number];
 
+const PRIVACY_NOTE_TEXT = 'We only use your details to reply.';
+
 describe('toContactFormModule', () => {
   it('maps a fully authored contact form module', () => {
-    const raw = makeRawContactFormModule({
+    const raw = mockRawContactFormModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
       privacyNote: [
-        makeRawParagraphTextBlock<TRawPrivacyNoteBlock>({
-          text: 'We only use your details to reply.',
+        mockRawParagraphTextBlock<TRawPrivacyNoteBlock>({
+          text: PRIVACY_NOTE_TEXT,
         }),
       ],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
-      layout: {
-        spacingTop: SPACING_SCALE.SM,
-        spacingBottom: SPACING_SCALE.LG,
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: true,
-        dividerBottom: false,
-      },
+      layout: mockRawWideLayout(),
     });
 
     const module = toContactFormModule(raw);
@@ -50,25 +44,19 @@ describe('toContactFormModule', () => {
             {
               _type: 'span',
               _key: 'span-1',
-              text: 'We only use your details to reply.',
+              text: PRIVACY_NOTE_TEXT,
             },
           ],
           markDefs: undefined,
         },
       ],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
-      layout: {
-        spacingTop: SPACING_SCALE.SM,
-        spacingBottom: SPACING_SCALE.LG,
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: true,
-        dividerBottom: false,
-      },
+      layout: mockRawWideLayout(),
     });
   });
 
   it('leaves privacyNote undefined when none is authored', () => {
-    const raw = makeRawContactFormModule({ privacyNote: null });
+    const raw = mockRawContactFormModule({ privacyNote: null });
 
     const module = toContactFormModule(raw);
 
@@ -76,7 +64,7 @@ describe('toContactFormModule', () => {
   });
 
   it('leaves contentAlignment and layout undefined when unset', () => {
-    const raw = makeRawContactFormModule();
+    const raw = mockRawContactFormModule();
 
     const module = toContactFormModule(raw);
 

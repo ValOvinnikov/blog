@@ -15,7 +15,7 @@ import { tenantSiteUrl } from './owner-email-context';
 import { OWNER_EMAIL_COPY } from './owner-email-copy';
 
 function adminUrl(env: TOwnerAccessTarget['env'], path: string): string {
-  return new URL(path, env.adminAppBaseUrl).toString();
+  return new URL(path, env.platformAppBaseUrl).toString();
 }
 
 export function buildOwnerEmailMessage(

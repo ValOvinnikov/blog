@@ -1,14 +1,20 @@
 import { CARD_IMAGE_SHAPE } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeTeamMember } from '@web/testing/modules/team/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import {
+  MOCK_TEAM_MEMBER_BIO,
+  MOCK_TEAM_MEMBER_PROFILE_URL,
+  mockTeamMember,
+} from '@web/testing/modules/team/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { TeamSpotlight } from './team-spotlight';
 
 vi.mock('@web/i18n/navigation');
 
-const member = makeTeamMember();
+const member = mockTeamMember();
+
+const MEMBER_ROLE = 'Staff Engineer';
 
 const setup = customRender(TeamSpotlight, {
   member,
@@ -24,52 +30,58 @@ describe(`<${TeamSpotlight.name}/>`, () => {
     });
 
     it('renders initials, never an empty frame, when the member has no photo', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
-      expect(screen.getByText('JR')).toBeVisible();
+      const missingPhoto = screen.queryByRole('img');
+      const initials = screen.getByText('JR');
+      expect(missingPhoto).not.toBeInTheDocument();
+      expect(initials).toBeVisible();
       unmount();
 
-      setup({ member: makeTeamMember({ image: makeSanityImage() }) });
+      setup({ member: mockTeamMember({ image: mockSanityImage() }) });
 
-      expect(screen.getByRole('img')).toBeVisible();
-      expect(screen.queryByText('JR')).not.toBeInTheDocument();
+      const photo = screen.getByRole('img');
+      const hiddenInitials = screen.queryByText('JR');
+      expect(photo).toBeVisible();
+      expect(hiddenInitials).not.toBeInTheDocument();
     });
 
     it("links the person's name only when a profile page is set", () => {
-      expect(
-        screen.queryByRole('link', { name: member.name }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole('heading', { level: 3, name: member.name }),
-      ).toBeVisible();
+      const missingLink = screen.queryByRole('link', { name: member.name });
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: member.name,
+      });
+      expect(missingLink).not.toBeInTheDocument();
+      expect(heading).toBeVisible();
       unmount();
 
-      setup({ member: makeTeamMember({ profileUrl: '/team/jordan-reyes' }) });
+      setup({
+        member: mockTeamMember({ profileUrl: MOCK_TEAM_MEMBER_PROFILE_URL }),
+      });
 
-      expect(screen.getByRole('link', { name: member.name })).toHaveAttribute(
-        'href',
-        '/team/jordan-reyes',
-      );
+      const profileLink = screen.getByRole('link', { name: member.name });
+      expect(profileLink).toHaveAttribute('href', MOCK_TEAM_MEMBER_PROFILE_URL);
     });
   });
 
-  it('renders the role and bio only when the loader supplied them', () => {
-    const { unmount } = setup({ member: makeTeamMember({ role: undefined }) });
+  it('renders the role and bio only when supplied', () => {
+    const { unmount } = setup({ member: mockTeamMember({ role: undefined }) });
 
-    expect(screen.queryByText('VP Engineering')).not.toBeInTheDocument();
-    expect(
-      screen.queryByText('Builds resilient distributed systems.'),
-    ).not.toBeInTheDocument();
+    const missingRole = screen.queryByText(MEMBER_ROLE);
+    const missingBio = screen.queryByText(MOCK_TEAM_MEMBER_BIO);
+    expect(missingRole).not.toBeInTheDocument();
+    expect(missingBio).not.toBeInTheDocument();
     unmount();
 
     setup({
-      member: makeTeamMember({
-        bio: [portableTextBlock('Builds resilient distributed systems.')],
+      member: mockTeamMember({
+        role: MEMBER_ROLE,
+        bio: [portableTextBlock(MOCK_TEAM_MEMBER_BIO)],
       }),
     });
 
-    expect(screen.getByText('VP Engineering')).toBeVisible();
-    expect(
-      screen.getByText('Builds resilient distributed systems.'),
-    ).toBeVisible();
+    const role = screen.getByText(MEMBER_ROLE);
+    const bio = screen.getByText(MOCK_TEAM_MEMBER_BIO);
+    expect(role).toBeVisible();
+    expect(bio).toBeVisible();
   });
 });

@@ -1,3 +1,4 @@
+import { okResult } from '@blog/utils';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import { z } from 'zod';
 
@@ -100,13 +101,10 @@ export const compareCommits = async (
     .slice(-PER_PAGE)
     .reverse();
 
-  return {
-    ok: true,
-    data: {
-      commits: newestCommits.map(toComparedCommit),
-      totalCommits: total_commits,
-      files,
-      isFileListTruncated: files.length >= GITHUB_COMPARE_FILE_LIMIT,
-    },
-  };
+  return okResult({
+    commits: newestCommits.map(toComparedCommit),
+    totalCommits: total_commits,
+    files,
+    isFileListTruncated: files.length >= GITHUB_COMPARE_FILE_LIMIT,
+  });
 };

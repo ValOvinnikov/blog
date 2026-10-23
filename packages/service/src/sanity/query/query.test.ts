@@ -1,8 +1,14 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
+import {
+  MOCK_TENANT_DATASET,
+  MOCK_TENANT_PROJECT_ID,
+} from '@blog/service/testing/tenant';
 import type { IGroqBuilder } from 'groqd';
 
 import { q, runQuery, type TSlugQueryParams } from './query';
 
+const SLUG_FILTER = 'slug.current == $slug';
 const { mockFetch, getClientMock } = vi.hoisted(() => {
   const mockFetch = vi.fn();
   const getClientMock = vi.fn(() => ({ fetch: mockFetch }));
@@ -13,20 +19,22 @@ vi.mock('@blog/service/sanity/client/client', () => ({
   getClient: getClientMock,
 }));
 
+const { NL, DE } = LOCALE_ISO_CODES;
+
 const testTenant = {
-  projectId: 'tenant-a',
-  dataset: 'production',
+  projectId: MOCK_TENANT_PROJECT_ID,
+  dataset: MOCK_TENANT_DATASET,
   token: 'tok',
 };
 
 describe(runQuery, () => {
-  it('rejects, rather than resolving to a falsy value, when the fetch resolves null for a slice(0)+notNull query', async () => {
+  it('rejects when the fetch for a single non-null query resolves null', async () => {
     mockFetch.mockResolvedValue(null);
 
     const query = q
       .parameters<TSlugQueryParams>()
       .star.filterByType('page_post')
-      .filterBy('slug.current == $slug')
+      .filterBy(SLUG_FILTER)
       .slice(0)
       .project((sub) => ({ title: sub.field('title').notNull() }));
 
@@ -43,7 +51,7 @@ describe('runQuery injected locale parameters', () => {
   const localizedQuery = q
     .parameters<TSlugQueryParams & { locale: TLocaleIsoCode }>()
     .star.filterByType('page_landing')
-    .filterBy('slug.current == $slug')
+    .filterBy(SLUG_FILTER)
     .filterBy('language == $locale')
     .slice(0)
     .project((sub) => ({ slug: sub.field('slug.current').notNull() }))
@@ -52,7 +60,7 @@ describe('runQuery injected locale parameters', () => {
   it('runs a query that declares locale without the caller passing it', () => {
     function run() {
       return runQuery(localizedQuery, {
-        parameters: { slug: 'about' },
+        parameters: { slug: MOCK_ABOUT_SLUG },
         tenant: testTenant,
       });
     }
@@ -91,26 +99,22 @@ describe('runQuery tenant threading', () => {
 
   it("sends the tenant's request and default language as query params", async () => {
     await runQuery(query, {
-      tenant: { ...testTenant, locale: 'NL', defaultLocale: 'DE' },
+      tenant: { ...testTenant, locale: NL, defaultLocale: DE },
     }).catch(() => {});
+    const [, params, options] = mockFetch.mock.lastCall ?? [];
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      { locale: 'NL', defaultLocale: 'DE' },
-      undefined,
-    );
+    expect(params).toEqual({ locale: NL, defaultLocale: DE });
+    expect(options).toBeUndefined();
   });
 
   it('defaults the request language to the default language', async () => {
     await runQuery(query, {
-      tenant: { ...testTenant, defaultLocale: 'DE' },
+      tenant: { ...testTenant, defaultLocale: DE },
     }).catch(() => {});
+    const [, params, options] = mockFetch.mock.lastCall ?? [];
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      { locale: 'DE', defaultLocale: 'DE' },
-      undefined,
-    );
+    expect(params).toEqual({ locale: DE, defaultLocale: DE });
+    expect(options).toBeUndefined();
   });
 });
 
@@ -126,10 +130,8 @@ describe('runQuery fetch cache options', () => {
       () => {},
     );
 
-    expect(mockFetch).toHaveBeenLastCalledWith(
-      expect.any(String),
-      expect.any(Object),
-      { cache: 'no-store' },
-    );
+    const [, , options] = mockFetch.mock.lastCall ?? [];
+
+    expect(options).toEqual({ cache: 'no-store' });
   });
 });

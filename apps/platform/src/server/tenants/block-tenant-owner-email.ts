@@ -9,7 +9,7 @@ import {
 import { BLOCKED_IDENTITY_KIND, queries } from '@blog/db';
 import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup-identities/add-blocked-identity';
 import type { TAdmin } from '@blog/db/schema/admins';
-import type { TResult } from '@blog/utils';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import {
@@ -36,13 +36,10 @@ export const blockTenantOwnerEmail = async (
 ): Promise<TResult<TSavedOwnerEmailBlock, TBlockTenantOwnerEmailFailure>> => {
   const ownerEmail = await queries.memberships.getTenantOwnerEmail(tenantId);
   if (!ownerEmail) {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN,
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN,
+    });
   }
 
   const saved = await saveSignupBlock({
@@ -51,13 +48,13 @@ export const blockTenantOwnerEmail = async (
     reason,
     admin,
   });
-  if (saved.ok) return { ok: true, data: { ...saved.data, reason } };
+  if (saved.ok) return okResult({ ...saved.data, reason });
 
   logger.error('tenant.suspension_block_failed', {
     tenantId,
     error: saved.error,
   });
-  return { ok: false, error: toOutcome(ACTION_OUTCOME.SERVER_ERROR) };
+  return errorResult(toOutcome(ACTION_OUTCOME.SERVER_ERROR));
 };
 
 export const confirmOwnerEmailBlock = async (
