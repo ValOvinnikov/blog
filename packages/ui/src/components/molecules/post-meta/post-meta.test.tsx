@@ -1,27 +1,26 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import {
+  MOCK_FORMATTED_DATE,
+  MOCK_PERSON_NAME,
+  MOCK_PUBLISHED_AT,
+} from '@blog/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { PostMeta } from './post-meta';
 
 faker.seed(123);
 
 const author = {
-  name: faker.person.fullName(),
+  name: MOCK_PERSON_NAME,
   imageUrl: faker.image.avatarGitHub(),
 };
-const publishedAt = faker.date.past().toISOString();
-const formattedDate = faker.date.past().toLocaleDateString('en-GB', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
 const readingTime = `${faker.number.int({ min: 3, max: 15 })} min read`;
 
 const setup = customRender(PostMeta, {
   author,
-  publishedAt,
-  formattedDate,
+  publishedAt: MOCK_PUBLISHED_AT,
+  formattedDate: MOCK_FORMATTED_DATE,
 });
 
 describe(`<${PostMeta.name}/>`, () => {
@@ -36,16 +35,16 @@ describe(`<${PostMeta.name}/>`, () => {
       setup();
     });
 
-    it('renders the author name once, with the avatar image contributing no duplicate accessible name', () => {
+    it('announces the author name once, beside its avatar image', () => {
       expect(screen.getAllByText(author.name)).toHaveLength(1);
       expect(screen.queryByRole('img')).not.toBeInTheDocument();
     });
 
     it('renders a time element with the correct dateTime attribute and label', () => {
-      const timeEl = screen.getByText(formattedDate);
+      const timeEl = screen.getByText(MOCK_FORMATTED_DATE);
       expect(timeEl).toBeVisible();
       expect(timeEl.tagName).toBe('TIME');
-      expect(timeEl).toHaveAttribute('dateTime', publishedAt);
+      expect(timeEl).toHaveAttribute('dateTime', MOCK_PUBLISHED_AT);
     });
 
     it('omits reading time segment when not provided', () => {
@@ -95,22 +94,12 @@ describe(`<${PostMeta.name}/>`, () => {
   });
 
   it('renders the author link as the linkAs component when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom-link="true">
-        {children}
-      </a>
-    );
     setup({
       author: { ...author, href: authorHref },
-      linkAs: CustomLink,
+      linkAs: MockLink,
     });
-    const link = screen.getByRole('link', { name: author.name });
-    expect(link).toHaveAttribute('data-custom-link', 'true');
+    expect(screen.getByRole('link', { name: author.name })).toBe(
+      screen.getByTestId(MOCK_LINK_TEST_ID),
+    );
   });
 });

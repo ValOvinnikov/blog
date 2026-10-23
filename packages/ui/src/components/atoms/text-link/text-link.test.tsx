@@ -1,7 +1,8 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
 
 import { TextLink, type TTextLinkProps } from './text-link';
 
@@ -13,12 +14,21 @@ const HREF = `/${faker.lorem.slug()}`;
 const setup = customRender(TextLink, { href: HREF, children: LABEL });
 
 describe(`<${TextLink.name}/>`, () => {
-  it('renders a link to href named by its children', () => {
-    setup();
-    expect(screen.getByRole('link', { name: LABEL })).toHaveAttribute(
-      'href',
-      HREF,
-    );
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders a link to href named by its children', () => {
+      expect(screen.getByRole('link', { name: LABEL })).toHaveAttribute(
+        'href',
+        HREF,
+      );
+    });
+
+    it('omits aria-current when not current', () => {
+      expect(screen.getByRole('link')).not.toHaveAttribute(ARIA_CURRENT);
+    });
   });
 
   it('names the link by ariaLabel when given', () => {
@@ -48,28 +58,12 @@ describe(`<${TextLink.name}/>`, () => {
 
   it('sets aria-current="page" when current', () => {
     setup({ isCurrent: true });
-    expect(screen.getByRole('link')).toHaveAttribute('aria-current', 'page');
-  });
-
-  it('omits aria-current when not current', () => {
-    setup();
-    expect(screen.getByRole('link')).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link')).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('renders through the as component', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-testid="custom-link">
-        {children}
-      </a>
-    );
-    setup({ as: CustomLink });
-    expect(screen.getByTestId('custom-link')).toHaveAttribute('href', HREF);
+    setup({ as: MockLink });
+    expect(screen.getByTestId(MOCK_LINK_TEST_ID)).toHaveAttribute('href', HREF);
   });
 
   it('forwards data-testid', () => {
@@ -94,7 +88,7 @@ describe(`<${TextLink.name}/>`, () => {
     it('still marks the current item with aria-current', () => {
       setup({ href: undefined, isCurrent: true, dataTestId: 'text-link' });
       expect(screen.getByTestId('text-link')).toHaveAttribute(
-        'aria-current',
+        ARIA_CURRENT,
         'page',
       );
     });

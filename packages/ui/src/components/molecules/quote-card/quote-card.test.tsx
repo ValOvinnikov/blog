@@ -1,10 +1,15 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { customRender, screen, within } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
 import type { ReactNode } from 'react';
 
 import { QuoteCard } from './quote-card';
+
+const ROLE = 'Head of Product';
+const NAME_TEST_ID = 'quote-card-name';
+const QUOTE_CARD_TEST_ID = 'quote-card';
 
 faker.seed(123);
 
@@ -29,22 +34,10 @@ const buildChildrenWithAvatar = (avatar: ReactNode) => [
   </QuoteCard.Name>,
 ];
 
-const CustomLink = ({
-  href,
-  children,
-}: {
-  href: string;
-  children?: ReactNode;
-}) => (
-  <a href={href} data-testid="custom-link">
-    {children}
-  </a>
-);
-
-const buildChildrenWithCustomLink = (nameProps?: { dataTestId?: string }) => [
+const buildChildrenWithMockLink = (nameProps?: { dataTestId?: string }) => [
   <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
   <QuoteCard.Name key="name" dataTestId={nameProps?.dataTestId}>
-    <CustomLink href="/case-studies/ada">{faker.person.fullName()}</CustomLink>
+    <MockLink href="/case-studies/ada">{faker.person.fullName()}</MockLink>
   </QuoteCard.Name>,
 ];
 
@@ -77,8 +70,8 @@ describe(`<${QuoteCard.name}/>`, () => {
   });
 
   it('renders the role text when provided', () => {
-    setup({ role: 'Head of Product' });
-    expect(screen.getByText('Head of Product')).toBeVisible();
+    setup({ role: ROLE });
+    expect(screen.getByText(ROLE)).toBeVisible();
   });
 
   describe('with the default props', () => {
@@ -110,7 +103,7 @@ describe(`<${QuoteCard.name}/>`, () => {
       expect(screen.getByText('AL')).toBeVisible();
     });
 
-    it('announces the quoted person once when the caller-supplied Avatar sits beside QuoteCard.Name', () => {
+    it('announces the quoted person once beside the caller-supplied Avatar', () => {
       expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
     });
   });
@@ -166,20 +159,20 @@ describe(`<${QuoteCard.name}/>`, () => {
   });
 
   it('renders a caller-supplied custom link component inside QuoteCard.Name', () => {
-    setup({ children: buildChildrenWithCustomLink() });
-    expect(screen.getByTestId('custom-link')).toBeVisible();
+    setup({ children: buildChildrenWithMockLink() });
+    expect(screen.getByTestId(MOCK_LINK_TEST_ID)).toBeVisible();
   });
 
-  it('wraps a custom link component that ignores className in its own focus-treatment element, instead of relying on the child to forward it', () => {
+  it('wraps a custom link component in its own focus-treatment element', () => {
     setup({
-      children: buildChildrenWithCustomLink({ dataTestId: 'quote-card-name' }),
+      children: buildChildrenWithMockLink({ dataTestId: NAME_TEST_ID }),
     });
-    const wrapper = screen.getByTestId('quote-card-name');
-    const link = screen.getByTestId('custom-link');
+    const wrapper = screen.getByTestId(NAME_TEST_ID);
+    const link = screen.getByTestId(MOCK_LINK_TEST_ID);
     expect(link.parentElement).toBe(wrapper);
   });
 
-  it('keeps figcaption as the last child of the figure even when duplicate slot content is unmatched', () => {
+  it('keeps figcaption last in the figure when duplicate slot content is unmatched', () => {
     setup({
       children: [
         <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
@@ -197,7 +190,7 @@ describe(`<${QuoteCard.name}/>`, () => {
   });
 
   it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: 'quote-card' });
-    expect(screen.getByTestId('quote-card')).toBeVisible();
+    setup({ dataTestId: QUOTE_CARD_TEST_ID });
+    expect(screen.getByTestId(QUOTE_CARD_TEST_ID)).toBeVisible();
   });
 });

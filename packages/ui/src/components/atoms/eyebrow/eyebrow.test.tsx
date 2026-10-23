@@ -1,16 +1,19 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
-import type { ReactNode } from 'react';
+import { MOCK_TOPIC } from '@blog/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 
 import { Eyebrow } from './eyebrow';
 
+const EYEBROW_TEXT = 'Featured Post';
+
 const setup = customRender(Eyebrow, {
-  children: 'Featured Post',
+  children: EYEBROW_TEXT,
 });
 
 describe(`<${Eyebrow.name}/>`, () => {
   it('renders children', () => {
     setup();
-    expect(screen.getByText('Featured Post')).toBeVisible();
+    expect(screen.getByText(EYEBROW_TEXT)).toBeVisible();
   });
 
   it('renders as a <p> element', () => {
@@ -19,33 +22,20 @@ describe(`<${Eyebrow.name}/>`, () => {
   });
 
   it('renders as a link when href is provided', () => {
-    setup({ href: '/topics/engineering', children: 'Engineering' });
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/topics/engineering',
-    );
+    setup({ href: MOCK_TOPIC.href, children: MOCK_TOPIC.label });
+    expect(
+      screen.getByRole('link', { name: MOCK_TOPIC.label }),
+    ).toHaveAttribute('href', MOCK_TOPIC.href);
   });
 
   it('renders using the custom linkAs component when href is provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom="true">
-        {children}
-      </a>
-    );
     setup({
-      href: '/topics/engineering',
-      linkAs: CustomLink,
-      children: 'Engineering',
+      href: MOCK_TOPIC.href,
+      linkAs: MockLink,
+      children: MOCK_TOPIC.label,
     });
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'data-custom',
-      'true',
+    expect(screen.getByRole('link', { name: MOCK_TOPIC.label })).toBe(
+      screen.getByTestId(MOCK_LINK_TEST_ID),
     );
   });
 

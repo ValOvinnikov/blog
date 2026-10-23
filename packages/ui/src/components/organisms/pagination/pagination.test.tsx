@@ -1,16 +1,22 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen, within } from '@blog/ui/testing/custom-render';
-import type { ReactNode } from 'react';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 
 import { Pagination } from './pagination';
 
 const createHref = (page: number) =>
   page === 1 ? '/blog' : `/blog/page/${page}`;
 
+const ARIA_LABEL = 'Blog pages';
+const PAGINATION_TEST_ID = 'blog-pagination';
+const PREVIOUS_LABEL = 'Previous';
+const NEXT_LABEL = 'Next';
+
 const setup = customRender(Pagination, {
   createHref,
-  ariaLabel: 'Blog pages',
-  previousLabel: 'Previous',
-  nextLabel: 'Next',
+  ariaLabel: ARIA_LABEL,
+  previousLabel: PREVIOUS_LABEL,
+  nextLabel: NEXT_LABEL,
   currentPage: 2,
   totalPages: 3,
 });
@@ -21,66 +27,48 @@ describe(`<${Pagination.name}/>`, () => {
       setup();
     });
 
-    it('renders a labeled nav with a link per page and correct hrefs', () => {
-      expect(
-        screen.getByRole('navigation', { name: 'Blog pages' }),
-      ).toBeVisible();
-      expect(screen.getByRole('link', { name: '1' })).toHaveAttribute(
+    it.each([1, 2, 3])('links page %i to its href', (page) => {
+      expect(screen.getByRole('link', { name: String(page) })).toHaveAttribute(
         'href',
-        '/blog',
-      );
-      expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
-        'href',
-        '/blog/page/2',
-      );
-      expect(screen.getByRole('link', { name: '3' })).toHaveAttribute(
-        'href',
-        '/blog/page/3',
+        createHref(page),
       );
     });
 
-    it('exposes the page list with an explicit list role', () => {
-      const nav = screen.getByRole('navigation', { name: 'Blog pages' });
+    it('exposes the page list inside a labelled nav', () => {
+      const nav = screen.getByRole('navigation', { name: ARIA_LABEL });
       expect(within(nav).getByRole('list')).toBeVisible();
     });
 
     it('marks the current page with aria-current', () => {
       expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
-        'aria-current',
+        ARIA_CURRENT,
         'page',
       );
       expect(screen.getByRole('link', { name: '1' })).not.toHaveAttribute(
-        'aria-current',
+        ARIA_CURRENT,
       );
     });
   });
 
-  it('hides previous on the first page and next on the last page', () => {
-    const { rerender } = setup({ currentPage: 1 });
+  it('hides previous on the first page', () => {
+    setup({ currentPage: 1 });
     expect(
-      screen.queryByRole('link', { name: 'Previous' }),
+      screen.queryByRole('link', { name: PREVIOUS_LABEL }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Next' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: NEXT_LABEL })).toHaveAttribute(
       'href',
-      '/blog/page/2',
+      createHref(2),
     );
+  });
 
-    rerender(
-      <Pagination
-        createHref={createHref}
-        ariaLabel="Blog pages"
-        previousLabel="Previous"
-        nextLabel="Next"
-        currentPage={3}
-        totalPages={3}
-      />,
-    );
-    expect(screen.getByRole('link', { name: 'Previous' })).toHaveAttribute(
+  it('hides next on the last page', () => {
+    setup({ currentPage: 3 });
+    expect(screen.getByRole('link', { name: PREVIOUS_LABEL })).toHaveAttribute(
       'href',
-      '/blog/page/2',
+      createHref(2),
     );
     expect(
-      screen.queryByRole('link', { name: 'Next' }),
+      screen.queryByRole('link', { name: NEXT_LABEL }),
     ).not.toBeInTheDocument();
   });
 
@@ -90,26 +78,14 @@ describe(`<${Pagination.name}/>`, () => {
   });
 
   it('renders links via linkAs when provided, one per page link plus prev and next', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-testid="custom-link">
-        {children}
-      </a>
-    );
+    setup({ linkAs: MockLink });
 
-    setup({ linkAs: CustomLink });
-
-    expect(screen.getAllByTestId('custom-link')).toHaveLength(5);
+    expect(screen.getAllByTestId(MOCK_LINK_TEST_ID)).toHaveLength(5);
   });
 
   it('forwards data-testid', () => {
-    setup({ currentPage: 1, totalPages: 2, dataTestId: 'blog-pagination' });
-    expect(screen.getByTestId('blog-pagination')).toBeVisible();
+    setup({ currentPage: 1, totalPages: 2, dataTestId: PAGINATION_TEST_ID });
+    expect(screen.getByTestId(PAGINATION_TEST_ID)).toBeVisible();
   });
 
   describe('truncation', () => {
@@ -143,7 +119,7 @@ describe(`<${Pagination.name}/>`, () => {
         setup({ currentPage: 6, totalPages: 12 });
       });
 
-      it('shows the first page, the last page, and the current page neighbours, with two ellipses, in the middle', () => {
+      it('shows the first, last and neighbouring pages, with two ellipses', () => {
         expect(pageLinkNumbers()).toEqual([1, 5, 6, 7, 12]);
         expect(screen.getAllByText('…')).toHaveLength(2);
       });

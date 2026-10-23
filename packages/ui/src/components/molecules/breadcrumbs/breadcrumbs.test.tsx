@@ -1,6 +1,7 @@
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { Breadcrumbs } from './breadcrumbs';
 
@@ -39,7 +40,7 @@ describe(`<${Breadcrumbs.name}/>`, () => {
       }
     });
 
-    it('renders the first item as a link with a decorative House icon, keeping the label as its accessible name', () => {
+    it('names the home link by its label, with a decorative House icon', () => {
       const homeLink = screen.getByRole('link', { name: firstItem.label });
       const icon = homeLink.querySelector('svg');
 
@@ -54,7 +55,7 @@ describe(`<${Breadcrumbs.name}/>`, () => {
 
     it('renders the last item as text with aria-current="page", not a link', () => {
       const current = screen.getByText(lastItem.label);
-      expect(current).toHaveAttribute('aria-current', 'page');
+      expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
       expect(
         screen.queryByRole('link', { name: lastItem.label }),
       ).not.toBeInTheDocument();
@@ -78,26 +79,15 @@ describe(`<${Breadcrumbs.name}/>`, () => {
   it('sets a title attribute on the first item even when it is also the current page', () => {
     setup({ items: [firstItem] });
     expect(screen.getByTitle(firstItem.label)).toHaveAttribute(
-      'aria-current',
+      ARIA_CURRENT,
       'page',
     );
   });
 
   it('renders links via the linkAs component when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom-link="true">
-        {children}
-      </a>
-    );
-    setup({ linkAs: CustomLink });
+    setup({ linkAs: MockLink });
     const firstLink = screen.getByRole('link', { name: firstItem.label });
-    expect(firstLink).toHaveAttribute('data-custom-link', 'true');
+    expect(screen.getAllByTestId(MOCK_LINK_TEST_ID)).toContain(firstLink);
   });
 
   it('forwards dataTestId to the nav element', () => {

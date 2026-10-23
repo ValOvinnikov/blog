@@ -1,7 +1,15 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import {
+  MOCK_FORMATTED_DATE,
+  MOCK_PERSON_NAME,
+  MOCK_PUBLISHED_AT,
+} from '@blog/ui/testing/fixtures';
 import { cloneElement } from 'react';
 
 import { MediaCard } from './media-card';
+
+const POST_HREF = '/posts/hello-world';
+const MEDIA_TEST_ID = 'media-card-media';
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>();
@@ -14,7 +22,7 @@ describe(`<${MediaCard.name}/>`, () => {
       renderElement(
         <MediaCard>
           <MediaCard.Title level={3}>
-            <a href="/posts/hello-world">Hello World</a>
+            <a href={POST_HREF}>Hello World</a>
           </MediaCard.Title>
         </MediaCard>,
       );
@@ -22,10 +30,7 @@ describe(`<${MediaCard.name}/>`, () => {
 
     it('renders MediaCard.Title at the caller-specified heading level', () => {
       expect(screen.getByRole('heading', { level: 3 })).toBeVisible();
-      expect(screen.getByRole('link')).toHaveAttribute(
-        'href',
-        '/posts/hello-world',
-      );
+      expect(screen.getByRole('link')).toHaveAttribute('href', POST_HREF);
     });
 
     it('does not render media when MediaCard.Media is omitted', () => {
@@ -37,7 +42,7 @@ describe(`<${MediaCard.name}/>`, () => {
     renderElement(
       <MediaCard>
         <MediaCard.Title level={2}>
-          <a href="/posts/hello-world">Hello World</a>
+          <a href={POST_HREF}>Hello World</a>
         </MediaCard.Title>
       </MediaCard>,
     );
@@ -71,7 +76,7 @@ describe(`<${MediaCard.name}/>`, () => {
     });
 
     it('does not render author section when authorName is omitted', () => {
-      expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
+      expect(screen.queryByText(MOCK_PERSON_NAME)).not.toBeInTheDocument();
     });
   });
 
@@ -81,45 +86,44 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByText('typescript')).toBeVisible();
   });
 
-  it('renders the author name once as visible text in the Footer, with the Avatar contributing no duplicate accessible name', () => {
+  it('announces the Footer author name once, beside its Avatar', () => {
     renderElement(
       <MediaCard>
-        <MediaCard.Footer authorName="Jane Doe" />
+        <MediaCard.Footer authorName={MOCK_PERSON_NAME} />
       </MediaCard>,
     );
-    expect(screen.getAllByText('Jane Doe')).toHaveLength(1);
+    expect(screen.getAllByText(MOCK_PERSON_NAME)).toHaveLength(1);
   });
 
   it('renders a time element with the correct dateTime and display text', () => {
-    const iso = '2024-01-15T00:00:00Z';
     renderElement(
       <MediaCard>
-        <MediaCard.Footer publishedAt={iso} formattedDate="January 15, 2024" />
+        <MediaCard.Footer
+          publishedAt={MOCK_PUBLISHED_AT}
+          formattedDate={MOCK_FORMATTED_DATE}
+        />
       </MediaCard>,
     );
     const timeEl = screen.getByRole('time');
     expect(timeEl).toBeVisible();
-    expect(timeEl).toHaveAttribute('dateTime', iso);
-    expect(timeEl).toHaveTextContent('January 15, 2024');
+    expect(timeEl).toHaveAttribute('dateTime', MOCK_PUBLISHED_AT);
+    expect(timeEl).toHaveTextContent(MOCK_FORMATTED_DATE);
   });
 
-  it('does not render time element when publishedAt is omitted', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Footer formattedDate="January 15, 2024" />
-      </MediaCard>,
-    );
-    expect(screen.queryByRole('time')).not.toBeInTheDocument();
-  });
-
-  it('does not render time element when formattedDate is omitted', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Footer publishedAt="2024-01-15T00:00:00Z" />
-      </MediaCard>,
-    );
-    expect(screen.queryByRole('time')).not.toBeInTheDocument();
-  });
+  it.each([
+    { omitted: 'publishedAt', footer: { formattedDate: MOCK_FORMATTED_DATE } },
+    { omitted: 'formattedDate', footer: { publishedAt: MOCK_PUBLISHED_AT } },
+  ])(
+    'does not render a time element when $omitted is omitted',
+    ({ footer }) => {
+      renderElement(
+        <MediaCard>
+          <MediaCard.Footer {...footer} />
+        </MediaCard>,
+      );
+      expect(screen.queryByRole('time')).not.toBeInTheDocument();
+    },
+  );
 
   it('renders unmatched children without dropping them', () => {
     renderElement(
@@ -148,18 +152,6 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByText(/design systems/)).toBeVisible();
   });
 
-  it('renders a caller-supplied trailing icon via MediaCard.Footer', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Footer
-          topic="Design Systems"
-          trailingIcon={<span data-testid="custom-icon" />}
-        />
-      </MediaCard>,
-    );
-    expect(screen.getByTestId('custom-icon')).toBeVisible();
-  });
-
   it('renders leadingIcon and trailingIcon with matching spacing around the topic text', () => {
     renderElement(
       <MediaCard>
@@ -178,13 +170,13 @@ describe(`<${MediaCard.name}/>`, () => {
     renderElement(
       <MediaCard>
         <MediaCard.Title level={3}>
-          <MediaCard.Link href="/posts/hello-world">Hello World</MediaCard.Link>
+          <MediaCard.Link href={POST_HREF}>Hello World</MediaCard.Link>
         </MediaCard.Title>
       </MediaCard>,
     );
     expect(screen.getByRole('link', { name: 'Hello World' })).toHaveAttribute(
       'href',
-      '/posts/hello-world',
+      POST_HREF,
     );
   });
 
@@ -223,12 +215,12 @@ describe(`<${MediaCard.name}/>`, () => {
   ])('$name', ({ isSplit }) => {
     renderElement(
       <MediaCard isSplit={isSplit}>
-        <MediaCard.Media dataTestId="media-card-media">
+        <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
           <img src="/cover.jpg" alt="Cover photo" />
         </MediaCard.Media>
       </MediaCard>,
     );
-    const media = screen.getByTestId('media-card-media');
+    const media = screen.getByTestId(MEDIA_TEST_ID);
     const article = screen.getByRole('article');
 
     if (isSplit) {
@@ -244,33 +236,25 @@ describe(`<${MediaCard.name}/>`, () => {
       vi.mocked(cloneElement).mockClear();
     });
 
-    it('passes the Media slot through unmodified when isLead is unset and align is not center', () => {
+    it('passes the Media slot through unmodified when neither lead nor centred', () => {
       renderElement(
         <MediaCard>
-          <MediaCard.Media dataTestId="media-card-media">
+          <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
             <img src="/cover.jpg" alt="Cover photo" />
           </MediaCard.Media>
         </MediaCard>,
       );
       expect(cloneElement).not.toHaveBeenCalled();
-      expect(screen.getByTestId('media-card-media')).toBeVisible();
+      expect(screen.getByTestId(MEDIA_TEST_ID)).toBeVisible();
     });
 
-    it('clones the Media slot when isLead is set', () => {
+    it.each([
+      { name: 'isLead is set', props: { isLead: true } },
+      { name: 'align is "center"', props: { align: 'center' as const } },
+    ])('clones the Media slot when $name', ({ props }) => {
       renderElement(
-        <MediaCard isLead={true}>
-          <MediaCard.Media dataTestId="media-card-media">
-            <img src="/cover.jpg" alt="Cover photo" />
-          </MediaCard.Media>
-        </MediaCard>,
-      );
-      expect(cloneElement).toHaveBeenCalledTimes(1);
-    });
-
-    it('clones the Media slot when align is "center"', () => {
-      renderElement(
-        <MediaCard align="center">
-          <MediaCard.Media dataTestId="media-card-media">
+        <MediaCard {...props}>
+          <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
             <img src="/cover.jpg" alt="Cover photo" />
           </MediaCard.Media>
         </MediaCard>,

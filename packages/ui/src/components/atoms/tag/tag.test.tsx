@@ -3,47 +3,39 @@ import {
   renderElement,
   screen,
 } from '@blog/ui/testing/custom-render';
-import type { AnchorHTMLAttributes } from 'react';
+import { MOCK_TAG } from '@blog/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 
 import { Tag } from './tag';
 
-const setup = customRender(Tag, { children: 'Label' });
+const setup = customRender(Tag, { children: MOCK_TAG.label });
 
 describe(`<${Tag.name}/>`, () => {
   it('renders a span element', () => {
     setup();
-    expect(screen.getByText('Label').tagName).toBe('SPAN');
+    expect(screen.getByText(MOCK_TAG.label).tagName).toBe('SPAN');
   });
 
   it('renders as an anchor when `as` is set to "a"', () => {
     renderElement(
-      <Tag as="a" href="/topics/architecture">
-        Architecture
+      <Tag as="a" href={MOCK_TAG.href}>
+        {MOCK_TAG.label}
       </Tag>,
     );
-    expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: MOCK_TAG.label })).toHaveAttribute(
       'href',
-      '/topics/architecture',
+      MOCK_TAG.href,
     );
   });
 
   it('renders with a custom component when `as` prop is provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-      ...props
-    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a href={href} data-custom="true" {...props}>
-        {children}
-      </a>
-    );
     renderElement(
-      <Tag as={CustomLink} href="/custom">
-        Custom
+      <Tag as={MockLink} href={MOCK_TAG.href}>
+        {MOCK_TAG.label}
       </Tag>,
     );
-    const link = screen.getByRole('link', { name: 'Custom' });
-    expect(link).toHaveAttribute('data-custom', 'true');
-    expect(link).toHaveAttribute('href', '/custom');
+    const link = screen.getByRole('link', { name: MOCK_TAG.label });
+    expect(link).toBe(screen.getByTestId(MOCK_LINK_TEST_ID));
+    expect(link).toHaveAttribute('href', MOCK_TAG.href);
   });
 });

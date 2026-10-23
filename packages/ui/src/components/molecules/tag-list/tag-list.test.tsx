@@ -1,8 +1,11 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_TAG } from '@blog/ui/testing/fixtures';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { TagList } from './tag-list';
+
+const LINKED_HREF = '/topics/linked';
 
 faker.seed(123);
 
@@ -28,52 +31,30 @@ describe(`<${TagList.name}/>`, () => {
     expect(screen.getByTestId('tag-list')).toBeVisible();
   });
 
-  it('renders a tag with an href as a link', () => {
-    setup({
-      tags: [{ label: 'Architecture', href: '/topics/architecture' }],
-    });
-    expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
-      'href',
-      '/topics/architecture',
-    );
-  });
-
   it('renders a tag without an href as plain text, not a link', () => {
-    setup({ tags: [{ label: 'Architecture' }] });
-    expect(screen.getByText('Architecture')).toBeVisible();
+    setup({ tags: [{ label: MOCK_TAG.label }] });
+    expect(screen.getByText(MOCK_TAG.label)).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('renders linked tags using the custom `linkAs` component', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom="true">
-        {children}
-      </a>
-    );
     setup({
-      tags: [{ label: 'Architecture', href: '/topics/architecture' }],
-      linkAs: CustomLink,
+      tags: [MOCK_TAG],
+      linkAs: MockLink,
     });
-    expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
-      'data-custom',
-      'true',
+    expect(screen.getByRole('link', { name: MOCK_TAG.label })).toBe(
+      screen.getByTestId(MOCK_LINK_TEST_ID),
     );
   });
 
   it('renders a mix of plain and linked tags from a single array', () => {
     setup({
-      tags: ['Plain', { label: 'Linked', href: '/topics/linked' }],
+      tags: ['Plain', { label: 'Linked', href: LINKED_HREF }],
     });
     expect(screen.getByText('Plain')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Linked' })).toHaveAttribute(
       'href',
-      '/topics/linked',
+      LINKED_HREF,
     );
   });
 });

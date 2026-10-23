@@ -1,8 +1,10 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { ShareLink } from './share-link';
+
+const SHARE_LINK_TEST_ID = 'share-link';
 
 faker.seed(123);
 
@@ -31,25 +33,13 @@ describe(`<${ShareLink.name}/>`, () => {
   });
 
   it('renders via the as prop when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-testid="custom-link">
-        {children}
-      </a>
-    );
+    setup({ as: MockLink });
 
-    setup({ as: CustomLink });
-
-    expect(screen.getByTestId('custom-link')).toBeVisible();
+    expect(screen.getByTestId(MOCK_LINK_TEST_ID)).toBeVisible();
   });
 
   it('forwards data-testid', () => {
-    setup({ dataTestId: 'share-link' });
-    expect(screen.getByTestId('share-link')).toBeVisible();
+    setup({ dataTestId: SHARE_LINK_TEST_ID });
+    expect(screen.getByTestId(SHARE_LINK_TEST_ID)).toBeVisible();
   });
 });
