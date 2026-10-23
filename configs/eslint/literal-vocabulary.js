@@ -1,4 +1,7 @@
-export const PROTOCOL_ATTRIBUTE_KEYS = new Set(['sameSite', 'target']);
+export const PROTOCOL_ATTRIBUTE_KEYS = new Set(['sameSite']);
+export const PROTOCOL_ATTRIBUTE_VALUES = new Map([
+  ['target', new Set(['_blank'])],
+]);
 export const EQUALITY_OPERATORS = new Set(['===', '!==', '==', '!=']);
 export const ENV_OBJECT_NAME = 'env';
 export const PROCESS_NAME = 'process';

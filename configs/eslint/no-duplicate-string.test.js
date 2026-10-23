@@ -63,6 +63,11 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
       errors: 1,
     },
     {
+      code: "const a = { target: 'tenant-workspace' }; const b = { target: 'tenant-workspace' };",
+      options,
+      errors: 1,
+    },
+    {
       code: "f('strict-mode'); f('strict-mode');",
       options,
       errors: 1,
