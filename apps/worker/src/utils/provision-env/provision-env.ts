@@ -8,7 +8,7 @@ export type TProvisionEnv = {
   vercelToken: string;
   vercelTeamId: TMaybeUndefined<string>;
   vercelWebProjectId: string;
-  adminAppBaseUrl: string;
+  platformAppBaseUrl: string;
   tenantSanityDataset: string;
   webAppBaseUrl: string;
   revalidateSecret: string;
@@ -46,7 +46,10 @@ export function getProvisionEnv(): TProvisionEnv {
       'VERCEL_PROJECT_ID_WEB',
       env.VERCEL_PROJECT_ID_WEB,
     ),
-    adminAppBaseUrl: requireValue('ADMIN_APP_BASE_URL', env.ADMIN_APP_BASE_URL),
+    platformAppBaseUrl: requireValue(
+      'PLATFORM_APP_BASE_URL',
+      env.PLATFORM_APP_BASE_URL,
+    ),
     tenantSanityDataset: requireValue(
       'TENANT_SANITY_DATASET',
       env.TENANT_SANITY_DATASET,

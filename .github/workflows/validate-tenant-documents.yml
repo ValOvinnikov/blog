@@ -88,7 +88,7 @@ jobs:
       # transition. Unset means the sweep still runs; only that
       # notification is skipped. Resolved from the job's own `environment:`
       # binding above — it's a variable, not a secret.
-      ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
+      PLATFORM_APP_BASE_URL: ${{ vars.PLATFORM_APP_BASE_URL }}
       # Shared secret apps/platform's `/api/internal/operator-alert` route
       # verifies as a Bearer token — same value in both places.
       OPERATOR_ALERT_SECRET: ${{ secrets.OPERATOR_ALERT_SECRET }}

@@ -195,7 +195,7 @@ linking + domains remain:
         `VERCEL_PROJECT_ID_PLATFORM` for the `production` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
   - [ ] Settings → Domains → add `admin.{your-hosting}`; add the DNS record it
-        shows you, same as above. This must match the `ADMIN_APP_BASE_URL`
+        shows you, same as above. This must match the `PLATFORM_APP_BASE_URL`
         Variable in §4 exactly (no trailing slash).
 
 #### Tenant subdomains — the wildcard and the domains that beat it
@@ -551,8 +551,8 @@ overlapping subsets:
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `deprovision-tenant.yml`        | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
 | `invalidate-tenant-cache.yml`   | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
-| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `ADMIN_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                             |
-| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `ADMIN_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                         |
+| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `PLATFORM_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                          |
+| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `PLATFORM_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                      |
 
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
@@ -596,7 +596,7 @@ dispatch can point it at `development`.
       project (see the `@blog/db` env vars table above): `web-dev`'s on
       `development`, `web-prod`'s on `production`. `setTenantSanityToken`
       throws without it.
-- [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/platform` origin for
+- [ ] Variable `PLATFORM_APP_BASE_URL` — the deployed `apps/platform` origin for
       that environment (no trailing slash/path), e.g.
       `https://admin.{your-hosting}`. The two sweeps below
       (`recheck-tenant-owners.yml`, `validate-tenant-documents.yml`) use it as
@@ -617,7 +617,7 @@ dispatch can point it at `development`.
       absent, so a run fails loudly instead of leaving the site serving from
       cache.
 - [ ] (Optional) Secret `OPERATOR_ALERT_SECRET` — paired with
-      `ADMIN_APP_BASE_URL` above, this is what lets
+      `PLATFORM_APP_BASE_URL` above, this is what lets
       `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` report
       an operator alert. Neither workflow sends email itself: each POSTs the
       bare facts (tenant id, outcome or invalid-document count) to

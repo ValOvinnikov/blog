@@ -118,7 +118,7 @@ module types whose capability is off for the tenant carry a warning.
   into Sanity with their own account, and the tenant project's member roles
   apply. The platform session only gates the route.
 - The tenant project must allow the platform origin as a credentialed CORS
-  origin. Provisioning adds it from `ADMIN_APP_BASE_URL`
+  origin. Provisioning adds it from `PLATFORM_APP_BASE_URL`
   ([tenant-provisioning](./tenant-provisioning.md)).
 - The platform CSP allows the Studio: `connect-src https://*.sanity.io
 https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
