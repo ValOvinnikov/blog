@@ -1,4 +1,5 @@
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { ensureOwnerAccess } from '@worker/workflows/ensure-owner-access';
 import { resumeHook, start } from 'workflow/api';
 import { HookNotFoundError } from 'workflow/errors';
@@ -14,10 +15,10 @@ describe(wakeOwnerAccess, () => {
   it('wakes the run already checking the tenant', async () => {
     vi.mocked(resumeHook).mockResolvedValue({} as never);
 
-    await wakeOwnerAccess(TEST_TENANT_ID);
+    await wakeOwnerAccess(MOCK_TENANT_ID);
 
     expect(resumeHook).toHaveBeenCalledWith(
-      `owner-access:${TEST_TENANT_ID}`,
+      `owner-access:${MOCK_TENANT_ID}`,
       null,
     );
     expect(start).not.toHaveBeenCalled();
@@ -25,18 +26,20 @@ describe(wakeOwnerAccess, () => {
 
   it('starts a new run when none is checking the tenant', async () => {
     vi.mocked(resumeHook).mockRejectedValue(
-      new HookNotFoundError(`owner-access:${TEST_TENANT_ID}`),
+      new HookNotFoundError(`owner-access:${MOCK_TENANT_ID}`),
     );
 
-    await wakeOwnerAccess(TEST_TENANT_ID);
+    await wakeOwnerAccess(MOCK_TENANT_ID);
 
-    expect(start).toHaveBeenCalledWith(ensureOwnerAccess, [TEST_TENANT_ID]);
+    expect(start).toHaveBeenCalledWith(ensureOwnerAccess, [MOCK_TENANT_ID]);
   });
 
   it('starts nothing when waking fails for another reason', async () => {
-    vi.mocked(resumeHook).mockRejectedValue(new Error('queue down'));
+    vi.mocked(resumeHook).mockRejectedValue(new Error(MOCK_QUEUE_DOWN));
 
-    await expect(wakeOwnerAccess(TEST_TENANT_ID)).rejects.toThrow('queue down');
+    await expect(wakeOwnerAccess(MOCK_TENANT_ID)).rejects.toThrow(
+      MOCK_QUEUE_DOWN,
+    );
     expect(start).not.toHaveBeenCalled();
   });
 });

@@ -6,7 +6,8 @@ import {
 import { updateProvisioningStep } from '@blog/db/queries/tenants';
 import { errorResult } from '@blog/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
-import { TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
+import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { runReportedStep } from './run-reported-step';
@@ -47,8 +48,8 @@ describe(runReportedStep, () => {
 
   function run(work: () => Promise<void>) {
     return runReportedStep({
-      tenantId: TEST_TENANT_ID,
-      ctx: { runId: 'run-1' },
+      tenantId: MOCK_TENANT_ID,
+      ctx: MOCK_RUN_CONTEXT,
       step: STEP,
       run: work,
     });
@@ -63,7 +64,7 @@ describe(runReportedStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.DONE,
     ]);
     expect(updateProvisioningStep).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: TEST_TENANT_ID, step: STEP }),
+      expect.objectContaining({ tenantId: MOCK_TENANT_ID, step: STEP }),
     );
   });
 
@@ -111,7 +112,7 @@ describe(runReportedStep, () => {
     });
 
     const result = await runReportedStep({
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       ctx: { runId: 'cli-run', isOneShot: true },
       step: STEP,
       run: () => Promise.reject(new Error(SANITY_TIMED_OUT)),

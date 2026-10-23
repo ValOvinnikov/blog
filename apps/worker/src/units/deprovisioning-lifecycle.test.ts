@@ -6,7 +6,7 @@ import {
 } from '@blog/db/queries/tenants';
 import { errorResult, okResult } from '@blog/utils/result';
 import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
-import { makeTenant, TEST_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { alertOperatorsToDeleteSanityProject } from '@worker/utils/operator-email/sanity-project-deletion-alert';
 
@@ -17,7 +17,7 @@ import {
 
 const CTX = { runId: 'deprovision-lifecycle-run' };
 const CRASH = 'lost the database';
-const ARCHIVED_TENANT = makeTenant({ deprovisionedAt: new Date(0) });
+const ARCHIVED_TENANT = mockTenant({ deprovisionedAt: new Date(0) });
 
 vi.mock('@worker/utils/operator-email/sanity-project-deletion-alert');
 vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
@@ -28,22 +28,22 @@ vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
 
 describe(beginDeprovisioning, () => {
   beforeEach(() => {
-    vi.mocked(getTenantById).mockResolvedValue(makeTenant());
-    vi.mocked(startDeprovisioningRun).mockResolvedValue(okResult(makeTenant()));
+    vi.mocked(getTenantById).mockResolvedValue(mockTenant());
+    vi.mocked(startDeprovisioningRun).mockResolvedValue(okResult(mockTenant()));
   });
 
   it('records the run start for a tenant still to deprovision', async () => {
-    await expect(beginDeprovisioning(TEST_TENANT_ID)).resolves.toBe(true);
+    await expect(beginDeprovisioning(MOCK_TENANT_ID)).resolves.toBe(true);
 
     expect(startDeprovisioningRun).toHaveBeenCalledWith({
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
     });
   });
 
   it('records nothing for an already-deprovisioned tenant', async () => {
     vi.mocked(getTenantById).mockResolvedValue(ARCHIVED_TENANT);
 
-    await expect(beginDeprovisioning(TEST_TENANT_ID)).resolves.toBe(false);
+    await expect(beginDeprovisioning(MOCK_TENANT_ID)).resolves.toBe(false);
 
     expect(startDeprovisioningRun).not.toHaveBeenCalled();
   });
@@ -59,13 +59,13 @@ describe(finishDeprovisioning, () => {
 
   it('records the run finish and alerts the operators after a successful run', async () => {
     await finishDeprovisioning(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       CTX,
       okResult({ skipped: false }),
     );
 
     expect(finishDeprovisioningRun).toHaveBeenCalledWith({
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
     });
     expect(alertOperatorsToDeleteSanityProject).toHaveBeenCalledWith(
       ARCHIVED_TENANT,
@@ -74,7 +74,7 @@ describe(finishDeprovisioning, () => {
 
   it('alerts nobody after a failed step', async () => {
     await finishDeprovisioning(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       CTX,
       errorResult({ failedStep: DEPROVISIONING_STEP.ARCHIVE_TENANT }),
     );
@@ -86,13 +86,13 @@ describe(finishDeprovisioning, () => {
 
   it('logs a run that failed outside any step', async () => {
     await finishDeprovisioning(
-      TEST_TENANT_ID,
+      MOCK_TENANT_ID,
       CTX,
       errorResult({ message: CRASH }),
     );
 
     expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_RUN_FAILED_EVENT, {
-      tenantId: TEST_TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       runId: CTX.runId,
       error: CRASH,
     });
