@@ -1,3 +1,4 @@
+import { routes } from '@blog/config';
 import type { TPostCard } from '@blog/service';
 import {
   mockPostCard,
@@ -8,35 +9,30 @@ import type { ReactNode } from 'react';
 
 import { toPostListItems } from './to-post-list-items';
 
-const POST_ID = 'post-1';
-const POST_TITLE = 'Hello World';
-const POST_EXCERPT = 'An excerpt.';
-const FRENCH_DATE = '15 janvier 2026';
 const PUBLISHED_AT = '2026-01-15T00:00:00.000Z';
-const FORMATTED_DATE = 'January 15, 2026';
 
-describe('toPostListItems', () => {
+describe(toPostListItems, () => {
   it('maps a post card into the href/formattedDate shape MediaCardItem expects', async () => {
     const topic = mockPostCardTopic({ title: 'Engineering' });
     const post = mockPostCard({
-      id: POST_ID,
       slug: 'hello-world',
-      title: POST_TITLE,
-      excerpt: POST_EXCERPT,
+      title: 'Hello World',
+      excerpt: 'An excerpt.',
       publishedAt: PUBLISHED_AT,
       topic,
       readingTimeMinutes: 2,
     });
+    const { id, slug, title, excerpt } = post;
 
     const [item] = await toPostListItems([post]);
 
     expect(item).toEqual({
-      id: POST_ID,
-      href: '/blog/hello-world',
-      title: POST_TITLE,
-      excerpt: POST_EXCERPT,
+      id,
+      href: routes.post(slug),
+      title,
+      excerpt,
       publishedAt: PUBLISHED_AT,
-      formattedDate: FORMATTED_DATE,
+      formattedDate: 'January 15, 2026',
       readingTime: '2 min',
       topic,
     });
@@ -49,18 +45,19 @@ describe('toPostListItems', () => {
       post = mockPostCard({ publishedAt: PUBLISHED_AT });
     });
 
-    it('formats the date via next-intl getFormatter, using the request-scoped locale', async () => {
+    it('formats the date with the request-scoped next-intl formatter', async () => {
+      const formattedDate = '15 janvier 2026';
       vi.mocked(getFormatter).mockResolvedValueOnce({
-        dateTime: () => FRENCH_DATE,
+        dateTime: () => formattedDate,
       } as unknown as Awaited<ReturnType<typeof getFormatter>>);
 
       const [item] = await toPostListItems([post]);
 
-      expect(item?.formattedDate).toBe(FRENCH_DATE);
+      expect(item?.formattedDate).toBe(formattedDate);
     });
 
     it('calls dateTime with the published date and the year/month/day format', async () => {
-      const dateTimeMock = vi.fn().mockReturnValue(FORMATTED_DATE);
+      const dateTimeMock = vi.fn();
 
       vi.mocked(getFormatter).mockResolvedValueOnce({
         dateTime: dateTimeMock,
@@ -68,7 +65,7 @@ describe('toPostListItems', () => {
 
       await toPostListItems([post]);
 
-      expect(dateTimeMock).toHaveBeenCalledWith(new Date(post.publishedAt), {
+      expect(dateTimeMock).toHaveBeenCalledWith(new Date(PUBLISHED_AT), {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -92,7 +89,7 @@ describe('toPostListItems', () => {
     let post: TPostCard;
 
     beforeEach(() => {
-      post = mockPostCard({ id: POST_ID });
+      post = mockPostCard();
     });
 
     it('sets image from renderImage when given', async () => {

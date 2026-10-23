@@ -40,15 +40,9 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
       setup();
     });
 
-    it('renders the full signup with its heading and supporting text', () => {
-      const headingElement = screen.getByRole('heading', { name: heading });
+    it('renders the authored supporting text', () => {
       const supportingTextElement = screen.getByText(supportingText);
-      const emailInput = screen.getByRole('textbox', {
-        name: EMAIL_INPUT_NAME,
-      });
-      expect(headingElement).toBeVisible();
       expect(supportingTextElement).toBeVisible();
-      expect(emailInput).toBeVisible();
     });
 
     it('renders the authored heading exactly once, as an h2', () => {
@@ -105,28 +99,22 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     expect(contentText).toBeVisible();
   });
 
-  it('renders a COMPACT module without content text', () => {
-    setup({
-      variant: NEWSLETTER_VARIANT.COMPACT,
-      content,
-    });
-
-    const contentText = screen.queryByText(content);
-    expect(contentText).not.toBeInTheDocument();
-  });
-
-  it('renders a COMPACT module without supporting text or trust cues', () => {
-    setup({ variant: NEWSLETTER_VARIANT.COMPACT });
+  it('renders a COMPACT module with only its heading and the form', () => {
+    setup({ variant: NEWSLETTER_VARIANT.COMPACT, content });
 
     const headingElement = screen.getByRole('heading', {
       level: 2,
       name: heading,
     });
+    const emailInput = screen.getByRole('textbox', { name: EMAIL_INPUT_NAME });
     const supportingTextElement = screen.queryByText(supportingText);
     const firstCueElement = screen.queryByText(firstCue);
+    const contentText = screen.queryByText(content);
     expect(headingElement).toBeVisible();
+    expect(emailInput).toBeVisible();
     expect(supportingTextElement).not.toBeInTheDocument();
     expect(firstCueElement).not.toBeInTheDocument();
+    expect(contentText).not.toBeInTheDocument();
   });
 
   it('renders no trust cues when the tenant never authored any', () => {

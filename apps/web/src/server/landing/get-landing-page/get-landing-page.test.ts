@@ -1,7 +1,10 @@
 import { okResult } from '@blog/utils';
+import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getLandingPage } from './get-landing-page';
+
+const PAGE_PATH = 'about-us';
 
 const { getPageMock } = vi.hoisted(() => ({ getPageMock: vi.fn() }));
 
@@ -16,7 +19,7 @@ describe(getLandingPage, () => {
     getPageMock.mockReset();
   });
 
-  it('forwards the path segments and the resolved tenant context to the landing page service', async () => {
+  it('forwards the path segments and tenant context to the landing page service', async () => {
     getPageMock.mockResolvedValue(okResult());
 
     await getLandingPage('modules/faq');
@@ -31,44 +34,28 @@ describe(getLandingPage, () => {
     const result = okResult({ title: 'About Us' });
     getPageMock.mockResolvedValue(result);
 
-    await expect(getLandingPage('about-us')).resolves.toBe(result);
-  });
-});
-
-describe('getLandingPage memoization', () => {
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
+    await expect(getLandingPage(PAGE_PATH)).resolves.toBe(result);
   });
 
-  it('dedupes the page query across one render pass with the same arguments', async () => {
-    getPageMock.mockReset();
-    getPageMock.mockResolvedValue(okResult());
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: <T extends (...args: never[]) => unknown>(fn: T) => {
-          const cacheByArgs = new Map<string, unknown>();
-          return ((...args: never[]) => {
-            const key = JSON.stringify(args);
-            if (!cacheByArgs.has(key)) {
-              cacheByArgs.set(key, fn(...args));
-            }
-            return cacheByArgs.get(key);
-          }) as T;
-        },
-      };
+  describe('memoization', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.resetModules();
     });
-    vi.resetModules();
 
-    const { getLandingPage: freshGetLandingPage } =
-      await import('./get-landing-page');
+    it('dedupes the page query across one render pass with the same arguments', async () => {
+      getPageMock.mockResolvedValue(okResult());
 
-    await freshGetLandingPage('about-us');
-    await freshGetLandingPage('about-us');
+      vi.doMock('react', withMemoizingReactCache);
+      vi.resetModules();
 
-    expect(getPageMock).toHaveBeenCalledTimes(1);
+      const { getLandingPage: freshGetLandingPage } =
+        await import('./get-landing-page');
+
+      await freshGetLandingPage(PAGE_PATH);
+      await freshGetLandingPage(PAGE_PATH);
+
+      expect(getPageMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

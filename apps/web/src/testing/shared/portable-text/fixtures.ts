@@ -6,6 +6,8 @@ import {
 import type { TPortableTextBody } from '@blog/service';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
+export const MOCK_PARAGRAPH_STYLE = 'normal';
+
 export type TPortableTextSpan = TPortableTextBlock['children'][number];
 
 let keySeq = 0;
@@ -36,7 +38,7 @@ export const mockPortableTextBlock = (
 ): TPortableTextBlock => ({
   _type: 'block',
   _key: options.key ?? nextKey('block'),
-  style: options.style ?? 'normal',
+  style: options.style ?? MOCK_PARAGRAPH_STYLE,
   children: Array.isArray(text)
     ? text
     : [mockPortableTextSpan(text, options.marks)],
@@ -64,7 +66,7 @@ export const MOCK_RICH_TEXT_DEMO: TPortableTextBody = [
       mockPortableTextSpan('inline code', ['code']),
       mockPortableTextSpan(' marks.'),
     ],
-    { style: 'normal' },
+    { style: MOCK_PARAGRAPH_STYLE },
   ),
   mockPortableTextBlock('A subsection heading', { style: 'h3' }),
   mockPortableTextBlock('A paragraph nested under the subsection heading.'),

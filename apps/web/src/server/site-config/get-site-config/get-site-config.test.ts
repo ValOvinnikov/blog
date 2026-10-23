@@ -1,4 +1,18 @@
+import {
+  DENSITY,
+  FONT_CHOICE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  MOCK_DYNAMIC_SERVER_USAGE_ERROR,
+  MOCK_ERROR,
+} from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { getSiteConfig } from './get-site-config';
 
@@ -20,19 +34,16 @@ vi.mock('next/cache', () => ({
 
 const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
-const TENANT_A_ID = 'tenant-a';
-const TENANT_B_ID = 'tenant-b';
-
 const SITE_CONFIG_ROW_A = {
   id: 'row-a',
-  tenantId: TENANT_A_ID,
-  preset: 'CONSOLE',
+  tenantId: MOCK_TENANT_ID,
+  preset: PRESET_ID.CONSOLE,
   accentHue: 250,
   logoHue: undefined,
-  headingFont: 'SPACE_GROTESK',
-  bodyFont: 'NEWSREADER',
-  radiusScale: 'MD',
-  density: 'DEFAULT',
+  headingFont: FONT_CHOICE.SPACE_GROTESK,
+  bodyFont: FONT_CHOICE.NEWSREADER,
+  radiusScale: RADIUS_SCALE.MD,
+  density: DENSITY.DEFAULT,
   logoAssetUrl: undefined,
   faviconAssetUrl: undefined,
   voiceOverrides: {},
@@ -41,8 +52,8 @@ const SITE_CONFIG_ROW_A = {
 const SITE_CONFIG_ROW_B = {
   ...SITE_CONFIG_ROW_A,
   id: 'row-b',
-  tenantId: TENANT_B_ID,
-  preset: 'EDITORIAL',
+  tenantId: MOCK_OTHER_TENANT_ID,
+  preset: PRESET_ID.EDITORIAL,
   accentHue: 40,
 };
 
@@ -50,27 +61,27 @@ describe(getSiteConfig, () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
     getSiteConfigMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
   });
 
-  it("resolves each request's own tenant's site_config row rather than a shared one", async () => {
+  it("resolves each request's own tenant's site_config row", async () => {
     getSiteConfigMock.mockImplementation((tenantId: string) =>
-      tenantId === TENANT_A_ID ? SITE_CONFIG_ROW_A : SITE_CONFIG_ROW_B,
+      tenantId === MOCK_TENANT_ID ? SITE_CONFIG_ROW_A : SITE_CONFIG_ROW_B,
     );
 
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     const resultA = await getSiteConfig();
 
-    getRequestTenantIdMock.mockResolvedValue(TENANT_B_ID);
+    getRequestTenantIdMock.mockResolvedValue(MOCK_OTHER_TENANT_ID);
     const resultB = await getSiteConfig();
 
     expect(resultA).toEqual({ ok: true, data: SITE_CONFIG_ROW_A });
     expect(resultB).toEqual({ ok: true, data: SITE_CONFIG_ROW_B });
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_A_ID);
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_B_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_OTHER_TENANT_ID);
   });
 
-  it('returns ok:true with undefined data when the request has no resolvable tenant', async () => {
+  it('resolves no row when the request has no resolvable tenant', async () => {
     getRequestTenantIdMock.mockResolvedValue(undefined);
 
     const result = await getSiteConfig();
@@ -79,32 +90,26 @@ describe(getSiteConfig, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
+  it('reads the request tenant from the supplied tenant', async () => {
     getSiteConfigMock.mockResolvedValue(SITE_CONFIG_ROW_A);
 
-    await getSiteConfig(TENANT_A_ID);
+    await getSiteConfig(MOCK_TENANT_ID);
 
-    expect(getRequestTenantIdMock).toHaveBeenCalledWith(TENANT_A_ID);
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('returns ok:false when the query rejects', async () => {
-    getSiteConfigMock.mockRejectedValue(new Error('boom'));
+    getSiteConfigMock.mockRejectedValue(MOCK_ERROR);
 
     const result = await getSiteConfig();
 
     expect(result.ok).toBe(false);
   });
 
-  it("rethrows the header read's dynamic-rendering signal instead of a fetch failure", async () => {
-    const dynamicSignal = Object.assign(
-      new Error(
-        "Dynamic server usage: Route /[tenant]/[locale] couldn't be rendered statically because it used `headers`",
-      ),
-      { digest: 'DYNAMIC_SERVER_USAGE' },
-    );
-    getRequestTenantIdMock.mockRejectedValue(dynamicSignal);
+  it("rethrows the header read's dynamic-rendering signal", async () => {
+    getRequestTenantIdMock.mockRejectedValue(MOCK_DYNAMIC_SERVER_USAGE_ERROR);
 
-    await expect(getSiteConfig()).rejects.toBe(dynamicSignal);
+    await expect(getSiteConfig()).rejects.toBe(MOCK_DYNAMIC_SERVER_USAGE_ERROR);
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 });

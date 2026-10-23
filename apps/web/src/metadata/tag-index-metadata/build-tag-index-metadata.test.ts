@@ -1,14 +1,13 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
-import { urlForSanityImage } from '@blog/service';
+import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+  MOCK_OG_IMAGE,
+  MOCK_OG_IMAGE_URL,
+} from '@web/testing/shared/seo/og-image-fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildTagIndexMetadata } from './build-tag-index-metadata';
@@ -23,21 +22,18 @@ vi.mock('@web/server/tag-index/get-tag-index-page/get-tag-index-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const ogImage = mockSanityImage();
-const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
-  ogImage,
-  MOCK_TENANT_SANITY_CONTEXT,
-);
-
+const TITLE = 'Tags';
+const INDEX_PATH = routes.tags();
+const NL_INDEX_PATH = `/nl${INDEX_PATH}`;
 const DESCRIPTION = 'Browse every post by tag.';
 const OG_DESCRIPTION = 'Browse every post by tag OG.';
 
 const seo = mockSeo({
-  title: 'Tags',
+  title: TITLE,
   description: DESCRIPTION,
   ogTitle: 'Tags OG',
   ogDescription: OG_DESCRIPTION,
-  ogImage,
+  ogImage: MOCK_OG_IMAGE,
 });
 
 const resolveIndexPageWith = (
@@ -45,7 +41,7 @@ const resolveIndexPageWith = (
 ) =>
   getTagIndexPageMock.mockResolvedValue(
     okResult({
-      headingBlock: { heading: 'Tags' },
+      headingBlock: { heading: TITLE },
       seo,
       modules: [],
       translations,
@@ -68,14 +64,12 @@ describe(buildTagIndexMetadata, () => {
   it('builds metadata from the resolved seo, self-canonical to /tags', async () => {
     const metadata = await buildTagIndexMetadata();
 
-    expect(metadata.title).toBe('Tags');
+    expect(metadata.title).toBe(TITLE);
     expect(metadata.description).toBe(DESCRIPTION);
-    expect(metadata.alternates?.canonical).toBe('/tags');
+    expect(metadata.alternates?.canonical).toBe(INDEX_PATH);
     expect(metadata.openGraph?.title).toBe('Tags OG');
     expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
-    expect(metadata.openGraph?.images).toEqual([
-      { url: EXPECTED_OG_IMAGE_URL },
-    ]);
+    expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
   });
 
   describe('when no metadata can be built', () => {
@@ -113,9 +107,13 @@ describe(buildTagIndexMetadata, () => {
 
     const metadata = await buildTagIndexMetadata();
 
-    expect(metadata.alternates).toMatchObject({
-      canonical: '/nl/tags',
-      languages: { en: '/tags', nl: '/nl/tags', 'x-default': '/tags' },
+    expect(metadata.alternates).toEqual({
+      canonical: NL_INDEX_PATH,
+      languages: {
+        en: INDEX_PATH,
+        nl: NL_INDEX_PATH,
+        'x-default': INDEX_PATH,
+      },
     });
   });
 });

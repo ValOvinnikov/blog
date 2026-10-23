@@ -33,7 +33,7 @@ describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
     expect(homeLink).toHaveAttribute('href', '/');
   });
 
-  it('posts to the unsubscribe endpoint in the page language, with no token in the URL', () => {
+  it('posts to the page-language unsubscribe endpoint with no token in the URL', () => {
     const form = screen.getByTestId('newsletter-unsubscribe-form');
     const button = screen.getByRole('button', { name: 'Confirm unsubscribe' });
 

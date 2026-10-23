@@ -3,6 +3,8 @@ import type { TTagDetailPage } from '@blog/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
+export const MOCK_TAG_SLUG = 'typescript';
+
 type TTagDetailPageTag = TTagDetailPage['tag'];
 
 export const mockTag = (
@@ -11,7 +13,7 @@ export const mockTag = (
   return {
     id: 'tag-1',
     title: 'TypeScript',
-    slug: 'typescript',
+    slug: MOCK_TAG_SLUG,
     description: 'Posts about TypeScript.',
     ...overrides,
   };
@@ -35,7 +37,7 @@ export const mockTagDetailPage = (
       ogTitle: tag.title,
       ogDescription: tag.description,
     }),
-    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'typescript' }],
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: MOCK_TAG_SLUG }],
     ...overrides,
   };
 };

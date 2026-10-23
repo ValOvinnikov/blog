@@ -1,4 +1,5 @@
 import { okResult } from '@blog/utils';
+import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getSiteSettings } from './get-site-settings';
@@ -36,43 +37,27 @@ describe(getSiteSettings, () => {
 
     await expect(getSiteSettings()).resolves.toBe(result);
   });
-});
 
-describe('getSiteSettings memoization', () => {
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
-  });
-
-  it('fetches once however many components read it in one render pass', async () => {
-    getSiteSettingsMock.mockReset();
-    getSiteSettingsMock.mockResolvedValue(okResult({}));
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: <T extends (...args: never[]) => unknown>(fn: T) => {
-          const cacheByArgs = new Map<string, unknown>();
-          return ((...args: never[]) => {
-            const key = JSON.stringify(args);
-            if (!cacheByArgs.has(key)) {
-              cacheByArgs.set(key, fn(...args));
-            }
-            return cacheByArgs.get(key);
-          }) as T;
-        },
-      };
+  describe('memoization', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.resetModules();
     });
-    vi.resetModules();
 
-    const { getSiteSettings: freshGetSiteSettings } =
-      await import('./get-site-settings');
+    it('fetches once however many components read it in one render pass', async () => {
+      getSiteSettingsMock.mockResolvedValue(okResult({}));
 
-    await freshGetSiteSettings();
-    await freshGetSiteSettings();
-    await freshGetSiteSettings();
+      vi.doMock('react', withMemoizingReactCache);
+      vi.resetModules();
 
-    expect(getSiteSettingsMock).toHaveBeenCalledTimes(1);
+      const { getSiteSettings: freshGetSiteSettings } =
+        await import('./get-site-settings');
+
+      await freshGetSiteSettings();
+      await freshGetSiteSettings();
+      await freshGetSiteSettings();
+
+      expect(getSiteSettingsMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

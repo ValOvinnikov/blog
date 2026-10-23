@@ -21,6 +21,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 const TENANT_NAME = 'Zeta Times';
+const ACCENT_HUE = 40;
 
 describe(resolveTenantEmailIdentity, () => {
   beforeEach(() => {
@@ -31,18 +32,21 @@ describe(resolveTenantEmailIdentity, () => {
 
   it("resolves the tenant's own brand and name on success", async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(
-      okResult({ preset: PRESET_ID.CONSOLE, accentHue: 40 } as never),
+      okResult({ preset: PRESET_ID.CONSOLE, accentHue: ACCENT_HUE } as never),
     );
 
     const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
 
     expect(identity.brandName).toBe(TENANT_NAME);
     expect(identity.brand).toEqual(
-      resolveTenantEmailBrand({ preset: PRESET_ID.CONSOLE, accentHue: 40 }),
+      resolveTenantEmailBrand({
+        preset: PRESET_ID.CONSOLE,
+        accentHue: ACCENT_HUE,
+      }),
     );
   });
 
-  it('falls back to the default brand and logs when the site config fetch fails', async () => {
+  it('falls back to the default brand and logs when the site config fails', async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
@@ -61,7 +65,7 @@ describe(resolveTenantEmailIdentity, () => {
     );
   });
 
-  it('falls back to the default name and logs when the tenant row cannot be found', async () => {
+  it('falls back to the default name and logs when the tenant row is missing', async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(okResult());
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
 

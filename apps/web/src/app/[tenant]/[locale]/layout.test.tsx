@@ -105,8 +105,6 @@ describe('LocaleLayout', () => {
     });
 
     it('omits robots restrictions in production (indexable)', async () => {
-      isProductionEnvironmentMock.mockReturnValue(true);
-
       const metadata = await generateMetadata({ params: makeParams() });
 
       expect(metadata).not.toHaveProperty('robots');

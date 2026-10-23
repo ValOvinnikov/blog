@@ -4,6 +4,7 @@ import { service } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -32,48 +33,39 @@ describe(redirectMovedLandingPage, () => {
     getRedirectMock.mockResolvedValue(MISSING);
   });
 
-  it('redirects permanently to the destination in the request language', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.NL,
-    });
-    getRedirectMock.mockResolvedValueOnce(
-      okResult({
-        destination: FAQ_DESTINATION,
-        status: REDIRECT_STATUS.PERMANENT,
-      }),
-    );
+  it.each([
+    {
+      status: REDIRECT_STATUS.PERMANENT,
+      redirectsWith: permanentRedirect,
+      skips: redirect,
+    },
+    {
+      status: REDIRECT_STATUS.TEMPORARY,
+      redirectsWith: redirect,
+      skips: permanentRedirect,
+    },
+  ])(
+    'follows a $status redirect to the destination in the request language',
+    async ({ status, redirectsWith, skips }) => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...MOCK_REQUEST_CONTEXT,
+        locale: LOCALE_ISO_CODES.NL,
+      });
+      getRedirectMock.mockResolvedValueOnce(
+        okResult({ destination: FAQ_DESTINATION, status }),
+      );
 
-    await expect(
-      redirectMovedLandingPage(MISSING, OLD_FAQ_PATH),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+      await expect(
+        redirectMovedLandingPage(MISSING, OLD_FAQ_PATH),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(permanentRedirect).toHaveBeenCalledWith({
-      href: FAQ_DESTINATION,
-      locale: LOCALE_ISO_CODES.NL,
-    });
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('redirects temporarily when the redirect is temporary', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.NL,
-    });
-    getRedirectMock.mockResolvedValueOnce(
-      okResult({ destination: '/offers', status: REDIRECT_STATUS.TEMPORARY }),
-    );
-
-    await expect(redirectMovedLandingPage(MISSING, 'sale')).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(redirect).toHaveBeenCalledWith({
-      href: '/offers',
-      locale: LOCALE_ISO_CODES.NL,
-    });
-    expect(permanentRedirect).not.toHaveBeenCalled();
-  });
+      expect(redirectsWith).toHaveBeenCalledWith({
+        href: FAQ_DESTINATION,
+        locale: LOCALE_ISO_CODES.NL,
+      });
+      expect(skips).not.toHaveBeenCalled();
+    },
+  );
 
   it('looks the redirect up by path segments with the tenant context', async () => {
     await redirectMovedLandingPage(MISSING, 'old/faq');
@@ -92,25 +84,22 @@ describe(redirectMovedLandingPage, () => {
   });
 
   it('logs and does not redirect when the lookup fails', async () => {
-    getRedirectMock.mockResolvedValueOnce(errorResult(new Error('boom')));
+    getRedirectMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await redirectMovedLandingPage(MISSING, OLD_FAQ_PATH);
 
     expect(permanentRedirect).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith(
-      'landing_redirect.fetch_failed',
-      expect.objectContaining({ path: OLD_FAQ_PATH }),
-    );
+    expect(logger.error).toHaveBeenCalledWith('landing_redirect.fetch_failed', {
+      path: OLD_FAQ_PATH,
+      error: MOCK_ERROR,
+    });
   });
 
-  it('does not look up a redirect when the page exists', async () => {
-    await redirectMovedLandingPage(okResult({ title: 'FAQ' }), 'faq');
-
-    expect(getRedirectMock).not.toHaveBeenCalled();
-  });
-
-  it('does not look up a redirect when the page fetch failed', async () => {
-    await redirectMovedLandingPage(errorResult(new Error('boom')), 'faq');
+  it.each([
+    { case: 'the page exists', page: okResult({}) },
+    { case: 'the page fetch failed', page: errorResult(MOCK_ERROR) },
+  ])('does not look up a redirect when $case', async ({ page }) => {
+    await redirectMovedLandingPage(page, OLD_FAQ_PATH);
 
     expect(getRedirectMock).not.toHaveBeenCalled();
   });

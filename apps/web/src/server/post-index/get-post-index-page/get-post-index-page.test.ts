@@ -1,4 +1,5 @@
 import { okResult } from '@blog/utils';
+import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostIndexPage } from './get-post-index-page';
@@ -30,42 +31,26 @@ describe(getPostIndexPage, () => {
 
     await expect(getPostIndexPage()).resolves.toBe(result);
   });
-});
 
-describe('getPostIndexPage memoization', () => {
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
-  });
-
-  it('dedupes the index-page query across one render pass with the same arguments', async () => {
-    getIndexPageMock.mockReset();
-    getIndexPageMock.mockResolvedValue(okResult());
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: <T extends (...args: never[]) => unknown>(fn: T) => {
-          const cacheByArgs = new Map<string, unknown>();
-          return ((...args: never[]) => {
-            const key = JSON.stringify(args);
-            if (!cacheByArgs.has(key)) {
-              cacheByArgs.set(key, fn(...args));
-            }
-            return cacheByArgs.get(key);
-          }) as T;
-        },
-      };
+  describe('memoization', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.resetModules();
     });
-    vi.resetModules();
 
-    const { getPostIndexPage: freshGetPostIndexPage } =
-      await import('./get-post-index-page');
+    it('dedupes the index-page query across one render pass with the same arguments', async () => {
+      getIndexPageMock.mockResolvedValue(okResult());
 
-    await freshGetPostIndexPage();
-    await freshGetPostIndexPage();
+      vi.doMock('react', withMemoizingReactCache);
+      vi.resetModules();
 
-    expect(getIndexPageMock).toHaveBeenCalledTimes(1);
+      const { getPostIndexPage: freshGetPostIndexPage } =
+        await import('./get-post-index-page');
+
+      await freshGetPostIndexPage();
+      await freshGetPostIndexPage();
+
+      expect(getIndexPageMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

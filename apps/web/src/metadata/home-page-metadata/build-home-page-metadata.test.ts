@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -28,7 +29,7 @@ const homePage = (translations: string[]) =>
     translations,
   });
 
-describe('buildHomePageMetadata', () => {
+describe(buildHomePageMetadata, () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
     vi.mocked(getRequestContext).mockResolvedValue({
@@ -39,12 +40,12 @@ describe('buildHomePageMetadata', () => {
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the fetch fails', async () => {
-      getHomePageMock.mockResolvedValue(errorResult(new Error('boom')));
+      getHomePageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       expect(await buildHomePageMetadata()).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'home_page.metadata_fetch_failed',
-        expect.objectContaining({ error: expect.any(Error) }),
+        { error: MOCK_ERROR },
       );
     });
 
@@ -67,7 +68,7 @@ describe('buildHomePageMetadata', () => {
       expect(metadata.title).toEqual({ absolute: 'Home' });
     });
 
-    it('is self-canonical to / with no languages when only this Home exists', async () => {
+    it('is self-canonical to / with no languages', async () => {
       const metadata = await buildHomePageMetadata();
 
       expect(metadata.alternates).toEqual({ canonical: '/' });

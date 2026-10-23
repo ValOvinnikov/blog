@@ -164,48 +164,27 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(emptyMessage).toBeVisible();
   });
 
-  it('renders each post image when showImages is true', async () => {
-    const sanityImage = mockSanityImage();
-    getPostListMock.mockResolvedValue(
-      okResult(
-        mockPostListModuleData({
-          posts: [
-            {
-              ...FIRST_POST,
-              heroImage: sanityImage,
-            },
-          ],
-          showImages: true,
-        }),
-      ),
-    );
+  it.each([
+    { showImages: true, imageCount: 1 },
+    { showImages: false, imageCount: 0 },
+  ])(
+    'renders $imageCount post images when showImages is $showImages',
+    async ({ showImages, imageCount }) => {
+      getPostListMock.mockResolvedValue(
+        okResult(
+          mockPostListModuleData({
+            posts: [{ ...FIRST_POST, heroImage: mockSanityImage() }],
+            showImages,
+          }),
+        ),
+      );
 
-    await setup();
+      await setup();
 
-    const image = screen.getByRole('img', { name: sanityImage.alt });
-    expect(image).toBeVisible();
-  });
-
-  it('renders no post images when showImages is false', async () => {
-    getPostListMock.mockResolvedValue(
-      okResult(
-        mockPostListModuleData({
-          posts: [
-            {
-              ...FIRST_POST,
-              heroImage: mockSanityImage(),
-            },
-          ],
-          showImages: false,
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.queryByRole('img');
-    expect(image).not.toBeInTheDocument();
-  });
+      const images = screen.queryAllByRole('img');
+      expect(images).toHaveLength(imageCount);
+    },
+  );
 
   it.each([
     {

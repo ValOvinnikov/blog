@@ -1,5 +1,9 @@
 import { HTTP_STATUS } from '@blog/config/constants';
-import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_TENANT_HOST,
+  MOCK_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
 const { authMock, exportAccountDataMock, resolveTenantIdMock, headersMock } =
   vi.hoisted(() => ({
@@ -22,7 +26,7 @@ vi.mock('@blog/db', () => ({
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
 const USER_ID = 'user-1';
-const HOST = 'acme.example.com';
+const POST_ID = 'post-1';
 const PROFILE = { id: USER_ID, name: 'Jane Doe', email: 'jane@example.com' };
 
 describe('GET /api/account/export', () => {
@@ -35,7 +39,7 @@ describe('GET /api/account/export', () => {
     resolveTenantIdMock.mockReset();
     resolveTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     headersMock.mockReset();
-    headersMock.mockResolvedValue(new Headers({ host: HOST }));
+    headersMock.mockResolvedValue(new Headers({ host: MOCK_TENANT_HOST }));
     ({ GET } = await import('./route'));
   });
 
@@ -57,19 +61,20 @@ describe('GET /api/account/export', () => {
   it('streams the export as a downloadable JSON attachment', async () => {
     const exportData = {
       profile: PROFILE,
-      bookmarks: [{ postId: 'post-1', createdAt: new Date('2026-01-01') }],
+      bookmarks: [{ postId: POST_ID, createdAt: new Date('2026-01-01') }],
     };
     exportAccountDataMock.mockResolvedValue(exportData);
     const response = await GET();
     const json = await response.json();
 
+    const contentType = response.headers.get('Content-Type');
+    const contentDisposition = response.headers.get('Content-Disposition');
+
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(response.headers.get('Content-Type')).toBe('application/json');
-    expect(response.headers.get('Content-Disposition')).toBe(
-      'attachment; filename="account-data.json"',
-    );
+    expect(contentType).toBe('application/json');
+    expect(contentDisposition).toBe('attachment; filename="account-data.json"');
     expect(json.profile).toEqual(PROFILE);
-    expect(json.bookmarks[0].postId).toBe('post-1');
+    expect(json.bookmarks[0].postId).toBe(POST_ID);
     expect(exportAccountDataMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
   });
 
@@ -88,11 +93,11 @@ describe('GET /api/account/export', () => {
     });
     await GET();
 
-    expect(resolveTenantIdMock).toHaveBeenCalledWith(HOST);
+    expect(resolveTenantIdMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
   });
 
   it('returns 500 when the export query throws', async () => {
-    exportAccountDataMock.mockRejectedValue(new Error('boom'));
+    exportAccountDataMock.mockRejectedValue(MOCK_ERROR);
     const response = await GET();
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);

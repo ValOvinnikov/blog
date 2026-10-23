@@ -11,6 +11,7 @@ import {
   TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
   UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
 import { mockTag } from '@web/testing/shared/tag/fixtures';
 import {
@@ -95,11 +96,13 @@ const postInput = {
   tenant: MOCK_TENANT_SANITY_CONTEXT,
 };
 
-describe('isDerivableRevalidateType', () => {
-  it('is true only for page_post', () => {
-    expect(isDerivableRevalidateType(POST_TYPE)).toBe(true);
-    expect(isDerivableRevalidateType('person')).toBe(false);
-    expect(isDerivableRevalidateType('page_home')).toBe(false);
+describe(isDerivableRevalidateType, () => {
+  it.each([
+    [POST_TYPE, true],
+    ['person', false],
+    ['page_home', false],
+  ])('reports %s as derivable: %s', (type, expected) => {
+    expect(isDerivableRevalidateType(type)).toBe(expected);
   });
 });
 
@@ -130,7 +133,7 @@ describe(deriveRevalidatePaths, () => {
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('resolves every path for a published post, including its tag and topic pages', async () => {
+  it('resolves every path a published post affects, tag and topic pages included', async () => {
     getTagParamsMock.mockResolvedValue(
       okResult([{ slug: tag.slug }, { slug: UNRELATED_TAG_SLUG }]),
     );
@@ -139,20 +142,18 @@ describe(deriveRevalidatePaths, () => {
     const result = await deriveRevalidatePaths(postInput);
 
     expect(result).toEqual(
-      okResult(
-        expect.arrayContaining([
-          LOCALE_ROOT,
-          `${LOCALE_ROOT}/blog`,
-          `${LOCALE_ROOT}/blog/${post.slug}`,
-          `${LOCALE_ROOT}/tags/${tag.slug}`,
-          `${LOCALE_ROOT}/tags/${UNRELATED_TAG_SLUG}`,
-          `${LOCALE_ROOT}/topics/${topic.slug}`,
-        ]),
-      ),
+      okResult([
+        LOCALE_ROOT,
+        `${LOCALE_ROOT}/blog`,
+        `${LOCALE_ROOT}/blog/${post.slug}`,
+        `${LOCALE_ROOT}/tags/${tag.slug}`,
+        `${LOCALE_ROOT}/tags/${UNRELATED_TAG_SLUG}`,
+        `${LOCALE_ROOT}/topics/${topic.slug}`,
+      ]),
     );
   });
 
-  it('falls back with document_not_found when the id matches no post (e.g. a delete)', async () => {
+  it('falls back with document_not_found when the id matches no post', async () => {
     getPostsByIdsMock.mockResolvedValue(okResult([]));
 
     const result = await deriveRevalidatePaths(postInput);
@@ -195,15 +196,15 @@ describe(deriveRevalidatePaths, () => {
   ])(
     'falls back with fetch_failed and logs when the $lookup lookup fails',
     async ({ mock, event }) => {
-      mock.mockResolvedValue(errorResult(new Error('boom')));
+      mock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       const result = await deriveRevalidatePaths(postInput);
 
       expect(result).toEqual(errorResult(FETCH_FAILED_REASON));
-      expect(loggerErrorMock).toHaveBeenCalledWith(
-        event,
-        expect.objectContaining({ id: post.id }),
-      );
+      expect(loggerErrorMock).toHaveBeenCalledWith(event, {
+        id: post.id,
+        error: MOCK_ERROR,
+      });
     },
   );
 });

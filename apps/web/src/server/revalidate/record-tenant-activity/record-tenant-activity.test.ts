@@ -2,6 +2,7 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { TENANT_ACTIVITY_TOUCH_FAILED_EVENT } from '@web/constants/revalidate';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -18,7 +19,6 @@ vi.mock('@blog/db', () => ({
 const loggerErrorMock = vi.mocked(logger.error);
 
 const AT = faker.date.recent();
-const CONNECTION_ERROR_MESSAGE = faker.lorem.sentence();
 
 describe(recordTenantActivity, () => {
   beforeEach(() => {
@@ -35,9 +35,15 @@ describe(recordTenantActivity, () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('logs and resolves when the update throws', async () => {
-    const error = new Error(CONNECTION_ERROR_MESSAGE);
-    touchTenantActivityMock.mockRejectedValue(error);
+  it.each([
+    ['throws an error', () => Promise.reject(MOCK_ERROR), MOCK_ERROR],
+    [
+      'returns a failure',
+      async () => errorResult(ERROR_CODE.DB_NOT_FOUND),
+      ERROR_CODE.DB_NOT_FOUND,
+    ],
+  ])('logs and resolves when the update %s', async (_, touch, error) => {
+    touchTenantActivityMock.mockImplementation(touch);
 
     await expect(
       recordTenantActivity(MOCK_TENANT_ID, AT),
@@ -46,21 +52,6 @@ describe(recordTenantActivity, () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
       { tenantId: MOCK_TENANT_ID, error },
-    );
-  });
-
-  it('logs and resolves when the update returns a failure', async () => {
-    touchTenantActivityMock.mockResolvedValue(
-      errorResult(ERROR_CODE.DB_NOT_FOUND),
-    );
-
-    await expect(
-      recordTenantActivity(MOCK_TENANT_ID, AT),
-    ).resolves.toBeUndefined();
-
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
-      { tenantId: MOCK_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
     );
   });
 });

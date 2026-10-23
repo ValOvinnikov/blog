@@ -1,14 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
-import { type TTopicDetailPage, urlForSanityImage } from '@blog/service';
+import { LOCALE_ISO_CODES, routes } from '@blog/config';
+import { type TTopicDetailPage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+  MOCK_OG_IMAGE,
+  MOCK_OG_IMAGE_URL,
+} from '@web/testing/shared/seo/og-image-fixtures';
+import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockTopicDetailPage } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -24,25 +24,22 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const ogImage = mockSanityImage();
-const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
-  ogImage,
-  MOCK_TENANT_SANITY_CONTEXT,
-);
-
+const TITLE = 'Engineering';
+const SLUG = 'engineering';
+const EN_DESIGN_SLUG = 'design';
+const NL_SLUG = 'ontwerp';
 const DESCRIPTION = 'Posts about building things.';
-const OG_TITLE = 'Engineering OG';
+const OG_TITLE = `${TITLE} OG`;
 const OG_DESCRIPTION = 'Posts about building things OG.';
-const TOPIC_PATH = '/topics/engineering';
-const NL_DESIGN_TOPIC_PATH = '/nl/topics/ontwerp';
-const EN_DESIGN_TOPIC_PATH = '/topics/design';
+const NL_DESIGN_TOPIC_PATH = `/nl${routes.topic(NL_SLUG)}`;
+const EN_DESIGN_TOPIC_PATH = routes.topic(EN_DESIGN_SLUG);
 
 const seo = mockSeo({
-  title: 'Engineering',
+  title: TITLE,
   description: DESCRIPTION,
   ogTitle: OG_TITLE,
   ogDescription: OG_DESCRIPTION,
-  ogImage,
+  ogImage: MOCK_OG_IMAGE,
 });
 
 const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage> = {}) =>
@@ -62,31 +59,28 @@ describe(buildTopicMetadata, () => {
     });
 
     it('reads the same topic the topic page renders', async () => {
-      await buildTopicMetadata('engineering');
+      await buildTopicMetadata(SLUG);
 
-      expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
+      expect(getTopicPageMock).toHaveBeenCalledWith(SLUG);
     });
 
     it('builds page-1 metadata from the seo, canonical to the topic', async () => {
-      const metadata = await buildTopicMetadata('engineering');
+      const metadata = await buildTopicMetadata(SLUG);
 
-      expect(metadata.title).toBe('Engineering');
+      expect(metadata.title).toBe(TITLE);
       expect(metadata.description).toBe(DESCRIPTION);
-      expect(metadata.alternates?.canonical).toBe(TOPIC_PATH);
+      expect(metadata.alternates?.canonical).toBe(routes.topic(SLUG));
       expect(metadata.openGraph?.title).toBe(OG_TITLE);
       expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
-      expect(metadata.openGraph?.images).toEqual([
-        { url: EXPECTED_OG_IMAGE_URL },
-      ]);
+      expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
     });
 
     it('suffixes page-N titles with the page, canonical to that page', async () => {
-      const metadata = await buildTopicMetadata('engineering', 2);
+      const metadata = await buildTopicMetadata(SLUG, 2);
 
-      expect(metadata.title).toBe('Engineering – Page 2');
-      expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
-      expect(metadata.alternates?.canonical).toBe('/topics/engineering/page/2');
-      expect(metadata.alternates?.canonical).not.toBe(TOPIC_PATH);
+      expect(metadata.title).toBe(`${TITLE} – Page 2`);
+      expect(metadata.openGraph?.title).toBe(`${OG_TITLE} – Page 2`);
+      expect(metadata.alternates?.canonical).toBe(routes.topic(SLUG, 2));
     });
   });
 
@@ -96,7 +90,7 @@ describe(buildTopicMetadata, () => {
     });
 
     it.each([
-      { slug: 'engineering', page: undefined, scope: 'the first page' },
+      { slug: SLUG, page: undefined, scope: 'the first page' },
       { slug: 'missing', page: 2, scope: 'page 2' },
     ])(
       'returns empty metadata on $scope when the fetch fails',
@@ -111,7 +105,7 @@ describe(buildTopicMetadata, () => {
   it('omits the OG title past page 1 when none is authored', async () => {
     resolveTopicPageWith({ seo: mockSeo({ ogTitle: undefined }) });
 
-    const metadata = await buildTopicMetadata('engineering', 2);
+    const metadata = await buildTopicMetadata(SLUG, 2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -137,17 +131,17 @@ describe(buildTopicMetadata, () => {
       });
       resolveTopicPageWith({
         translations: [
-          { language: EN, slug: 'design' },
-          { language: NL, slug: 'ontwerp' },
+          { language: EN, slug: EN_DESIGN_SLUG },
+          { language: NL, slug: NL_SLUG },
           { language: DE, slug: 'gestaltung' },
         ],
       });
     });
 
     it('lists each live translation as hreflang, canonical to its prefix', async () => {
-      const metadata = await buildTopicMetadata('ontwerp');
+      const metadata = await buildTopicMetadata(NL_SLUG);
 
-      expect(metadata.alternates).toMatchObject({
+      expect(metadata.alternates).toEqual({
         canonical: NL_DESIGN_TOPIC_PATH,
         languages: {
           en: EN_DESIGN_TOPIC_PATH,
@@ -158,9 +152,11 @@ describe(buildTopicMetadata, () => {
     });
 
     it('lists no hreflang past page 1', async () => {
-      const metadata = await buildTopicMetadata('ontwerp', 2);
+      const metadata = await buildTopicMetadata(NL_SLUG, 2);
 
-      expect(metadata.alternates?.canonical).toBe('/nl/topics/ontwerp/page/2');
+      expect(metadata.alternates?.canonical).toBe(
+        `/nl${routes.topic(NL_SLUG, 2)}`,
+      );
       expect(metadata.alternates?.languages).toBeUndefined();
     });
   });

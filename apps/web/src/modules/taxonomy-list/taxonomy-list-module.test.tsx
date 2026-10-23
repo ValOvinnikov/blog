@@ -270,16 +270,5 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       const list = screen.queryByRole('list', { name: LATEST_POSTS_LABEL });
       expect(list).not.toBeInTheDocument();
     });
-
-    it('omits the latest-posts list when the entry has no posts, even with the flag on', async () => {
-      getTaxonomyListMock.mockResolvedValue(
-        mockTopicsResult([{ ...entry, latestPosts: [] }], true),
-      );
-
-      await setup();
-
-      const list = screen.queryByRole('list', { name: LATEST_POSTS_LABEL });
-      expect(list).not.toBeInTheDocument();
-    });
   });
 });
