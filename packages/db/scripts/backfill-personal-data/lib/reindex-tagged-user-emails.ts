@@ -2,6 +2,7 @@ import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { accountEmailIndex } from '@blog/utils/encryption';
 import {
+  EMAIL_TAG_SEPARATOR,
   normalizeEmail,
   normalizeEmailIdentity,
 } from '@blog/utils/normalize-email-identity';
@@ -9,8 +10,6 @@ import { and, asc, eq, gt, isNotNull, like, sql } from 'drizzle-orm';
 
 import { BATCH_SIZE } from './batch-size';
 import type { TPersonalDataKeys } from './personal-data-keys';
-
-const TAG_SEPARATOR = '+';
 
 interface IStaleUserIndex {
   id: string;
@@ -36,7 +35,7 @@ async function findStaleUserIndexes({
       .where(
         and(
           isNotNull(users.email),
-          like(users.email, `%${TAG_SEPARATOR}%`),
+          like(users.email, `%${EMAIL_TAG_SEPARATOR}%`),
           afterId === undefined ? undefined : gt(users.id, afterId),
         ),
       )
