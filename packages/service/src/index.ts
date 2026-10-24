@@ -34,6 +34,7 @@ import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createTimelineModuleService } from './features/modules/timeline';
 import { createHomeService } from './features/pages/home';
 import { createLandingPageService } from './features/pages/landing';
+import { createPageTitleService } from './features/pages/page-title';
 import { createPostService } from './features/pages/post';
 import { createBlogService } from './features/pages/post-index';
 import { createTagService } from './features/pages/tag';
@@ -48,6 +49,7 @@ export const service = {
   pages: {
     home: createHomeService(),
     landing: createLandingPageService(),
+    pageTitle: createPageTitleService(),
     blog: createBlogService(),
     post: createPostService(),
     topic: createTopicService(),
