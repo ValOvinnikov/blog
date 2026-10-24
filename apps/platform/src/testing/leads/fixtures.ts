@@ -4,10 +4,10 @@ import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 
 export const MOCK_LEAD_ID = faker.string.uuid();
 export const MOCK_LEAD_NAME = faker.person.fullName();
-export const MOCK_LEAD_EMAIL = faker.internet.email();
-export const MOCK_LEAD_MESSAGE = faker.lorem.sentence();
+const MOCK_LEAD_EMAIL = faker.internet.email();
+const MOCK_LEAD_MESSAGE = faker.lorem.sentence();
 export const MOCK_LEAD_SOURCE_PATH = `/${faker.lorem.slug()}`;
-export const MOCK_LEAD_CREATED_AT = new Date('2026-04-02T09:30:00.000Z');
+const MOCK_LEAD_CREATED_AT = new Date('2026-04-02T09:30:00.000Z');
 
 const MOCK_LEAD_FIELDS = {
   id: MOCK_LEAD_ID,
