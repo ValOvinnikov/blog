@@ -5,6 +5,7 @@ import {
 } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   INTERNAL_PAGES_SECRET_MISSING_EVENT,
   INTERNAL_PAGES_TITLE_FETCH_FAILED_EVENT,
@@ -44,7 +45,7 @@ export async function POST(
   }
 
   const rawBody = await readSignedRequestBody(request, secret);
-  if (rawBody === undefined) {
+  if (isUndefined(rawBody)) {
     return respondEmpty(HTTP_STATUS.UNAUTHORIZED);
   }
 
@@ -79,7 +80,7 @@ export async function POST(
     });
     return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
-  if (result.data === undefined) {
+  if (isUndefined(result.data)) {
     return respondEmpty(HTTP_STATUS.NOT_FOUND);
   }
 

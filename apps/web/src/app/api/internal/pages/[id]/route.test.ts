@@ -7,6 +7,7 @@ import {
   buildEnqueueHeaders,
   ENQUEUE_MAX_AGE_MS,
 } from '@blog/utils/enqueue-signature';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   INTERNAL_PAGES_SECRET_MISSING_EVENT,
   INTERNAL_PAGES_TITLE_FETCH_FAILED_EVENT,
@@ -67,7 +68,7 @@ const signedRequest = (
       secret,
       path,
       rawBody,
-      ...(now === undefined ? {} : { now }),
+      ...(isUndefined(now) ? {} : { now }),
     }),
     body: rawBody,
   });
