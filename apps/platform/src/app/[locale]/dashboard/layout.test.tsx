@@ -42,7 +42,7 @@ describe(`<${DashboardLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith('/sign-in?callbackUrl=%2F');
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 

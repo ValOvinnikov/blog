@@ -9,7 +9,7 @@ describe(signOutAction, () => {
     await signOutAction();
 
     expect(signOut).toHaveBeenCalledWith({
-      redirectTo: '/api/auth/signin?callbackUrl=%2F',
+      redirectTo: '/sign-in?callbackUrl=%2F',
     });
   });
 });

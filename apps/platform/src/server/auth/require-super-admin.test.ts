@@ -1,3 +1,5 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -30,30 +32,39 @@ describe(requireSuperAdmin, () => {
   it('redirects to sign-in without querying the admins row when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSuperAdmin()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith('/sign-in?callbackUrl=%2F');
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
   it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(requireSuperAdmin()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('404s when the admin row is below SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      role: ADMIN_ROLE.ADMIN,
+    });
 
-    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(requireSuperAdmin()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('resolves to the admin row when the role is SUPERADMIN', async () => {
-    const admin = { id: 'admin-1', role: 'SUPERADMIN' };
+    const admin = { id: 'admin-1', role: ADMIN_ROLE.SUPERADMIN };
     getAdminByUserIdMock.mockResolvedValue(admin);
 
     const result = await requireSuperAdmin();

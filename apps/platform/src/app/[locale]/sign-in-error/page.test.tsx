@@ -2,6 +2,8 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 
 import SignInErrorPage from './page';
 
+const SIGN_IN_HREF = '/sign-in?callbackUrl=%2F';
+
 const setup = customRenderAsync(SignInErrorPage, {
   searchParams: Promise.resolve({}),
 });
@@ -23,10 +25,7 @@ describe(SignInErrorPage, () => {
 
     expect(heading).toBeVisible();
     expect(description).toBeVisible();
-    expect(newLinkLink).toHaveAttribute(
-      'href',
-      '/api/auth/signin?callbackUrl=%2F',
-    );
+    expect(newLinkLink).toHaveAttribute('href', SIGN_IN_HREF);
   });
 
   it.each(['Configuration', 'AccessDenied', undefined])(
@@ -45,10 +44,7 @@ describe(SignInErrorPage, () => {
 
       expect(heading).toBeVisible();
       expect(description).toBeVisible();
-      expect(backLink).toHaveAttribute(
-        'href',
-        '/api/auth/signin?callbackUrl=%2F',
-      );
+      expect(backLink).toHaveAttribute('href', SIGN_IN_HREF);
     },
   );
 });

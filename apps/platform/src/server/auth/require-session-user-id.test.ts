@@ -1,3 +1,4 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -27,18 +28,22 @@ describe(requireSessionUserId, () => {
       new Headers({ 'x-admin-requested-path': '/dashboard/leads?page=2' }),
     );
 
-    await expect(requireSessionUserId()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSessionUserId()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
     expect(redirect).toHaveBeenCalledWith(
-      '/api/auth/signin?callbackUrl=%2Fdashboard%2Fleads%3Fpage%3D2',
+      '/sign-in?callbackUrl=%2Fdashboard%2Fleads%3Fpage%3D2',
     );
   });
 
   it('returns a signed-out visitor to home when the requested page is unknown', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(requireSessionUserId()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSessionUserId()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith('/sign-in?callbackUrl=%2F');
   });
 });

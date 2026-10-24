@@ -55,7 +55,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith(
-      '/api/auth/signin?callbackUrl=%2F',
+      '/sign-in?callbackUrl=%2F',
     );
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
