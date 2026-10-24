@@ -1,8 +1,13 @@
+import {
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+} from '@blog/db/constants';
 import { MOCK_USER_EMAIL } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   mockAccountEmailIndex,
   testPersonalEmailIndex,
+  usePersonalDataFallbackListener,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
@@ -11,9 +16,15 @@ import {
   decryptPersonalValue,
   emailColumns,
   encryptPersonalValue,
+  readOptionalPersonalValue,
   readPersonalValue,
+  reportPlainPersonalRead,
   requireEmailIndex,
 } from './personal-data';
+
+const MOCK_CIPHERTEXT = 'v1:ciphertext';
+
+const fallbackListener = usePersonalDataFallbackListener();
 
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();
@@ -54,6 +65,28 @@ describe('with both personal data keys configured', () => {
     expect(readPersonalValue(null, MOCK_USER_EMAIL)).toBe(MOCK_USER_EMAIL);
   });
 
+  it('reads no value when neither form holds one', () => {
+    expect(readOptionalPersonalValue(null, null)).toBeNull();
+  });
+
+  it('reports a row not yet encrypted', () => {
+    reportPlainPersonalRead(PERSONAL_DATA_OWNER.LEAD, null);
+
+    expect(fallbackListener).toHaveBeenCalledWith({
+      owner: PERSONAL_DATA_OWNER.LEAD,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
+  });
+
+  it('reports nothing for an encrypted row', () => {
+    reportPlainPersonalRead(
+      PERSONAL_DATA_OWNER.LEAD,
+      encryptPersonalValue(MOCK_USER_EMAIL),
+    );
+
+    expect(fallbackListener).not.toHaveBeenCalled();
+  });
+
   it.each([
     [personalDataIndex, testPersonalEmailIndex],
     [accountEmailIndex, mockAccountEmailIndex],
@@ -85,6 +118,21 @@ describe('with no personal data keys configured', () => {
     expect(() => requireEmailIndex(MOCK_USER_EMAIL, personalDataIndex)).toThrow(
       'PERSONAL_DATA_INDEX_KEY is not configured.',
     );
+  });
+
+  it('reads the plain value of an encrypted row', () => {
+    expect(readPersonalValue(MOCK_CIPHERTEXT, MOCK_USER_EMAIL)).toBe(
+      MOCK_USER_EMAIL,
+    );
+  });
+
+  it('reports the unset encryption key', () => {
+    reportPlainPersonalRead(PERSONAL_DATA_OWNER.USER, MOCK_CIPHERTEXT);
+
+    expect(fallbackListener).toHaveBeenCalledWith({
+      owner: PERSONAL_DATA_OWNER.USER,
+      reason: PERSONAL_DATA_FALLBACK_REASON.ENCRYPTION_KEY_UNSET,
+    });
   });
 
   it('refuses to decrypt', () => {

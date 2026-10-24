@@ -1,12 +1,20 @@
 import type { TMaybeNull } from '@blog/config/types';
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+  type TMembershipRole,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   MOCK_OWNER_EMAIL,
   insertTestTenant,
   insertTestUser,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
@@ -19,6 +27,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
 
 const EDITOR_EMAIL = 'editor@example.com';
 const SIGNED_IN_EMAIL = 'signed-in@example.com';
@@ -106,6 +115,22 @@ describe(getTenantOwnerMembership, () => {
     const result = await getTenantOwnerMembership(tenantId);
 
     expect(result).toEqual({ email: MOCK_OWNER_EMAIL });
+  });
+
+  it('reads a pending OWNER invite not yet backfilled from its plain email, and reports it', async () => {
+    await db().insert(schema.membershipInvites).values({
+      tenantId,
+      email: MOCK_OWNER_EMAIL,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toEqual({ email: MOCK_OWNER_EMAIL });
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.INVITE,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
   });
 
   it('ignores an OWNER invite that has already been consumed', async () => {

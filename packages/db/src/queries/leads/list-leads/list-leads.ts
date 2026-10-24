@@ -1,6 +1,10 @@
 import { getDb } from '@blog/db/client';
+import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { leads, type TLead } from '@blog/db/schema/leads';
-import { requireDecryptedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import {
+  readPersonalValue,
+  reportPlainPersonalRead,
+} from '@blog/db/utils/personal-data/personal-data';
 import { count, desc, eq } from 'drizzle-orm';
 
 export type TListLeadsInput = {
@@ -19,8 +23,6 @@ export type TListLeadsResult = {
   total: number;
 };
 
-const LEAD_OWNER = 'Lead';
-
 export async function listLeads({
   tenantId,
   page,
@@ -33,8 +35,11 @@ export async function listLeads({
     db
       .select({
         id: leads.id,
+        name: leads.name,
         nameEncrypted: leads.nameEncrypted,
+        email: leads.email,
         emailEncrypted: leads.emailEncrypted,
+        message: leads.message,
         messageEncrypted: leads.messageEncrypted,
         sourcePath: leads.sourcePath,
         createdAt: leads.createdAt,
@@ -51,19 +56,25 @@ export async function listLeads({
     leads: rows.map(
       ({
         id,
+        name,
         nameEncrypted,
+        email,
         emailEncrypted,
+        message,
         messageEncrypted,
         sourcePath,
         createdAt,
-      }) => ({
-        id,
-        name: requireDecryptedPersonalValue(nameEncrypted, LEAD_OWNER),
-        email: requireDecryptedPersonalValue(emailEncrypted, LEAD_OWNER),
-        message: requireDecryptedPersonalValue(messageEncrypted, LEAD_OWNER),
-        sourcePath,
-        createdAt,
-      }),
+      }) => {
+        reportPlainPersonalRead(PERSONAL_DATA_OWNER.LEAD, emailEncrypted);
+        return {
+          id,
+          name: readPersonalValue(nameEncrypted, name),
+          email: readPersonalValue(emailEncrypted, email),
+          message: readPersonalValue(messageEncrypted, message),
+          sourcePath,
+          createdAt,
+        };
+      },
     ),
     total: totalRow?.total ?? 0,
   };

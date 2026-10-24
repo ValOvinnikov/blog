@@ -1,13 +1,14 @@
 import type { TMaybeNull, TNullable } from '@blog/config/types';
+import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import type { TUser } from '@blog/db/schema/auth';
 import {
   emailColumns,
-  decryptPersonalValue,
   encryptPersonalValue,
-  requireDecryptedPersonalValue,
+  readOptionalPersonalValue,
+  reportPlainPersonalRead,
 } from '@blog/db/utils/personal-data/personal-data';
 import { accountEmailIndex } from '@blog/utils/encryption';
-import { isUndefined } from '@blog/utils/primitives';
+import { isNull, isUndefined } from '@blog/utils/primitives';
 
 type TUserPersonalColumns = Pick<
   TUser,
@@ -25,20 +26,28 @@ export function userPersonalColumns({
   return {
     ...(!isUndefined(email) && emailColumns(email, accountEmailIndex)),
     ...(!isUndefined(name) && {
-      nameEncrypted: name === null ? null : encryptPersonalValue(name),
+      nameEncrypted: isNull(name) ? null : encryptPersonalValue(name),
     }),
   };
 }
 
 export function readUserPersonalData({
+  email = null,
+  name = null,
   emailEncrypted = null,
   nameEncrypted = null,
-}: Partial<Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>>): {
+}: Partial<
+  Pick<TUser, 'email' | 'name' | 'emailEncrypted' | 'nameEncrypted'>
+>): {
   email: string;
   name: TMaybeNull<string>;
 } {
+  const readEmail = readOptionalPersonalValue(emailEncrypted, email);
+  if (isNull(readEmail)) throw new Error('User has no email.');
+  reportPlainPersonalRead(PERSONAL_DATA_OWNER.USER, emailEncrypted);
+
   return {
-    email: requireDecryptedPersonalValue(emailEncrypted, 'User'),
-    name: nameEncrypted === null ? null : decryptPersonalValue(nameEncrypted),
+    email: readEmail,
+    name: readOptionalPersonalValue(nameEncrypted, name),
   };
 }

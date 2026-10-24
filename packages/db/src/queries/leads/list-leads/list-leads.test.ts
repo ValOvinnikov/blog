@@ -1,3 +1,7 @@
+import {
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestLead,
@@ -6,7 +10,10 @@ import {
   MOCK_LEAD_MESSAGE,
   MOCK_LEAD_NAME,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 
@@ -18,6 +25,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
 
 const JANUARY_1 = new Date('2026-01-01T00:00:00Z');
 const JANUARY_2 = new Date('2026-01-02T00:00:00Z');
@@ -134,11 +142,29 @@ describe(listLeads, () => {
     ]);
   });
 
-  it('throws when a lead has no encrypted form', async () => {
+  it('reads a lead not yet backfilled from its plain columns and reports it', async () => {
     await insertTestLead(db(), tenantId);
 
-    await expect(
-      listLeads({ tenantId, page: 1, pageSize: 10 }),
-    ).rejects.toThrow('Lead has no encrypted form.');
+    const { leads } = await listLeads({ tenantId, page: 1, pageSize: 10 });
+
+    expect(leads).toEqual([
+      expect.objectContaining({
+        name: MOCK_LEAD_NAME,
+        email: MOCK_LEAD_EMAIL,
+        message: MOCK_LEAD_MESSAGE,
+      }),
+    ]);
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.LEAD,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
+  });
+
+  it('reports nothing for a backfilled lead', async () => {
+    await insertEncryptedLead(tenantId, MOCK_LEAD_NAME, JANUARY_1);
+
+    await listLeads({ tenantId, page: 1, pageSize: 10 });
+
+    expect(fallbackListener).not.toHaveBeenCalled();
   });
 });
