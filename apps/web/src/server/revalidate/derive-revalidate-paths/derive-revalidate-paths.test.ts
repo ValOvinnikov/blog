@@ -1,14 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import {
-  BLOG_PAGINATION_LOOKUP_FAILED_EVENT,
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
-  POST_LOOKUP_FAILED_EVENT,
-  TAG_PAGINATION_LOOKUP_FAILED_EVENT,
-  TAG_PARAMS_LOOKUP_FAILED_EVENT,
-  TOPIC_PAGINATION_LOOKUP_FAILED_EVENT,
-  TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
+  REVALIDATE_LOG,
   UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -166,32 +161,32 @@ describe(deriveRevalidatePaths, () => {
     {
       lookup: 'post by id',
       mock: getPostsByIdsMock,
-      event: POST_LOOKUP_FAILED_EVENT,
+      event: REVALIDATE_LOG.POST_LOOKUP_FAILED,
     },
     {
       lookup: 'blog pagination',
       mock: getIndexPageParamsMock,
-      event: BLOG_PAGINATION_LOOKUP_FAILED_EVENT,
+      event: REVALIDATE_LOG.BLOG_PAGINATION_LOOKUP_FAILED,
     },
     {
       lookup: 'tag params',
       mock: getTagParamsMock,
-      event: TAG_PARAMS_LOOKUP_FAILED_EVENT,
+      event: REVALIDATE_LOG.TAG_PARAMS_LOOKUP_FAILED,
     },
     {
       lookup: 'tag pagination',
       mock: getTagPaginationParamsMock,
-      event: TAG_PAGINATION_LOOKUP_FAILED_EVENT,
+      event: REVALIDATE_LOG.TAG_PAGINATION_LOOKUP_FAILED,
     },
     {
       lookup: 'topic params',
       mock: getTopicParamsMock,
-      event: TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
+      event: REVALIDATE_LOG.TOPIC_PARAMS_LOOKUP_FAILED,
     },
     {
       lookup: 'topic pagination',
       mock: getTopicPaginationParamsMock,
-      event: TOPIC_PAGINATION_LOOKUP_FAILED_EVENT,
+      event: REVALIDATE_LOG.TOPIC_PAGINATION_LOOKUP_FAILED,
     },
   ])(
     'falls back with fetch_failed and logs when the $lookup lookup fails',

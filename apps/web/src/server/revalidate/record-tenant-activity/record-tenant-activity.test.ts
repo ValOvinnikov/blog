@@ -1,7 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { TENANT_ACTIVITY_TOUCH_FAILED_EVENT } from '@web/constants/revalidate';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -50,7 +50,7 @@ describe(recordTenantActivity, () => {
     ).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_ACTIVITY_TOUCH_FAILED_EVENT,
+      REVALIDATE_LOG.TENANT_ACTIVITY_TOUCH_FAILED,
       { tenantId: MOCK_TENANT_ID, error },
     );
   });

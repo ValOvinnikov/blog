@@ -94,9 +94,10 @@ src/testing/fixtures.ts            — test fixtures, imported as @blog/insight/
   dependency: the package stays at zero runtime dependencies.
 - **`LOG_LEVEL`** lives here, not in `@blog/config` — this package depends
   on nothing. UPPERCASE keys, `as const`; the values stay lowercase because
-  log aggregators expect lowercase severity strings. Both are departures from
-  CLAUDE.md → "Key/value-pair consts are always both UPPERCASE" that its
-  named exceptions do not yet cover — don't "fix" them to match.
+  log aggregators expect lowercase severity strings. Its home is a departure
+  from CLAUDE.md → "Key/value-pair consts" that its named exceptions do not
+  yet cover; its lowercase values are that rule's log-vocabulary exception —
+  don't "fix" either to match.
 - **`sanitizeLogMessage`** is the CodeQL-recognized log-injection barrier and
   the repo's only implementation of it. Keep its control-character regex
   literal as written — CodeQL recognizes only that idiom — and chain further

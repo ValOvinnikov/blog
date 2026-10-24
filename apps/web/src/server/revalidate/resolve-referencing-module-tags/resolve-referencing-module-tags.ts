@@ -1,4 +1,5 @@
 import { service, type TTenantSanityContext } from '@blog/service';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { logger } from '@web/utils/logger/logger';
 
 export type TResolveReferencingModuleTagsInput = {
@@ -24,7 +25,7 @@ export const resolveReferencingModuleTags = async ({
   );
 
   if (!result.ok) {
-    logger.error('revalidate.referencing_modules_lookup_failed', {
+    logger.error(REVALIDATE_LOG.REFERENCING_MODULES_LOOKUP_FAILED, {
       type,
       id,
       tenantId,

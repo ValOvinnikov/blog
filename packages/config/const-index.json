@@ -4078,6 +4078,134 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "revalidate.secret_missing": [
+      {
+        "ref": "REVALIDATE_LOG.SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_id_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_ID_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_by_id_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_BY_ID_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_archived": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_ARCHIVED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_sanity_credentials_missing": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_sanity_credentials_fetch_threw": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_FETCH_THREW",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_activity_touch_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_ACTIVITY_TOUCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.path_purge_fallback": [
+      {
+        "ref": "REVALIDATE_LOG.PATH_PURGE_FALLBACK",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.referencing_modules_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.REFERENCING_MODULES_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.post_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.POST_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.blog_pagination_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.BLOG_PAGINATION_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tag_params_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TAG_PARAMS_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tag_pagination_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TAG_PAGINATION_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.topic_params_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TOPIC_PARAMS_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.topic_pagination_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TOPIC_PAGINATION_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.bookmark_cleanup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
     "UNAUTHORIZED": [
       {
         "ref": "ENQUEUE_ERROR.UNAUTHORIZED",

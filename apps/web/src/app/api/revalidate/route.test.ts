@@ -6,10 +6,8 @@ import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
-  PATH_PURGE_FALLBACK_EVENT,
+  REVALIDATE_LOG,
   SIGNATURE_REFUSED_REASON,
-  TENANT_BY_ID_LOOKUP_FAILED_EVENT,
-  TENANT_ID_LOOKUP_FAILED_EVENT,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
@@ -357,7 +355,7 @@ describe('POST /api/revalidate', () => {
               new Error(MOCK_ERROR_MESSAGE),
             );
           },
-          event: TENANT_ID_LOOKUP_FAILED_EVENT,
+          event: REVALIDATE_LOG.TENANT_ID_LOOKUP_FAILED,
           context: { tenantProjectId: TENANT_PROJECT_ID },
         },
         {
@@ -368,7 +366,7 @@ describe('POST /api/revalidate', () => {
             );
             getTenantByIdMock.mockRejectedValue(new Error(MOCK_ERROR_MESSAGE));
           },
-          event: TENANT_BY_ID_LOOKUP_FAILED_EVENT,
+          event: REVALIDATE_LOG.TENANT_BY_ID_LOOKUP_FAILED,
           context: { tenantId: MOCK_TENANT_ID },
         },
       ])(
@@ -586,7 +584,7 @@ describe('POST /api/revalidate', () => {
           bookmarksRemoved: 0,
         });
         expect(loggerErrorMock).toHaveBeenCalledWith(
-          'revalidate.bookmark_cleanup_failed',
+          REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED,
           expect.objectContaining({ type: 'page_post', id: POST_ID }),
         );
       });
@@ -626,7 +624,7 @@ describe('POST /api/revalidate', () => {
           arrange: () => {
             getTenantSanityCredentialsMock.mockResolvedValue(undefined);
           },
-          event: 'revalidate.tenant_sanity_credentials_missing',
+          event: REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_MISSING,
         },
         {
           case: 'the credentials lookup throws',
@@ -635,7 +633,7 @@ describe('POST /api/revalidate', () => {
               new Error(MOCK_ERROR_MESSAGE),
             );
           },
-          event: 'revalidate.tenant_sanity_credentials_fetch_threw',
+          event: REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_FETCH_THREW,
         },
       ])(
         'falls back to the whole-site purge and logs when $case',
@@ -655,7 +653,7 @@ describe('POST /api/revalidate', () => {
             expect.objectContaining({ type: 'page_post', id: POST_ID }),
           );
           expect(loggerWarnMock).toHaveBeenCalledWith(
-            PATH_PURGE_FALLBACK_EVENT,
+            REVALIDATE_LOG.PATH_PURGE_FALLBACK,
             expect.objectContaining({ reason: FETCH_FAILED_REASON }),
           );
           expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
@@ -674,7 +672,7 @@ describe('POST /api/revalidate', () => {
         await POST(request);
 
         expect(loggerWarnMock).toHaveBeenCalledWith(
-          PATH_PURGE_FALLBACK_EVENT,
+          REVALIDATE_LOG.PATH_PURGE_FALLBACK,
           expect.objectContaining({ reason: DOCUMENT_NOT_FOUND_REASON }),
         );
         expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
@@ -690,7 +688,7 @@ describe('POST /api/revalidate', () => {
 
         expect(isDerivableRevalidateTypeMock).not.toHaveBeenCalled();
         expect(loggerWarnMock).toHaveBeenCalledWith(
-          PATH_PURGE_FALLBACK_EVENT,
+          REVALIDATE_LOG.PATH_PURGE_FALLBACK,
           expect.objectContaining({ reason: TENANT_UNRESOLVED_REASON }),
         );
         expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
@@ -710,7 +708,7 @@ describe('POST /api/revalidate', () => {
           await POST(request);
 
           expect(loggerWarnMock).toHaveBeenCalledWith(
-            PATH_PURGE_FALLBACK_EVENT,
+            REVALIDATE_LOG.PATH_PURGE_FALLBACK,
             expect.objectContaining({ reason: UNSUPPORTED_TYPE_REASON }),
           );
           expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');

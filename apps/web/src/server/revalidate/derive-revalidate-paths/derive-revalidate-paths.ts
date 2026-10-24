@@ -2,14 +2,9 @@ import { queries } from '@blog/db';
 import { service, type TTenantSanityContext } from '@blog/service';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
-  BLOG_PAGINATION_LOOKUP_FAILED_EVENT,
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
-  POST_LOOKUP_FAILED_EVENT,
-  TAG_PAGINATION_LOOKUP_FAILED_EVENT,
-  TAG_PARAMS_LOOKUP_FAILED_EVENT,
-  TOPIC_PAGINATION_LOOKUP_FAILED_EVENT,
-  TOPIC_PARAMS_LOOKUP_FAILED_EVENT,
+  REVALIDATE_LOG,
   UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
 import { routing } from '@web/i18n/routing';
@@ -63,7 +58,7 @@ const deriveBlogPostPublishPaths = async ({
   ]);
 
   if (!postsResult.ok) {
-    logger.error(POST_LOOKUP_FAILED_EVENT, {
+    logger.error(REVALIDATE_LOG.POST_LOOKUP_FAILED, {
       id,
       error: postsResult.error,
     });
@@ -75,35 +70,35 @@ const deriveBlogPostPublishPaths = async ({
   }
 
   if (!blogParamsResult.ok) {
-    logger.error(BLOG_PAGINATION_LOOKUP_FAILED_EVENT, {
+    logger.error(REVALIDATE_LOG.BLOG_PAGINATION_LOOKUP_FAILED, {
       id,
       error: blogParamsResult.error,
     });
     return errorResult(FETCH_FAILED_REASON);
   }
   if (!tagSlugsResult.ok) {
-    logger.error(TAG_PARAMS_LOOKUP_FAILED_EVENT, {
+    logger.error(REVALIDATE_LOG.TAG_PARAMS_LOOKUP_FAILED, {
       id,
       error: tagSlugsResult.error,
     });
     return errorResult(FETCH_FAILED_REASON);
   }
   if (!tagPaginationParamsResult.ok) {
-    logger.error(TAG_PAGINATION_LOOKUP_FAILED_EVENT, {
+    logger.error(REVALIDATE_LOG.TAG_PAGINATION_LOOKUP_FAILED, {
       id,
       error: tagPaginationParamsResult.error,
     });
     return errorResult(FETCH_FAILED_REASON);
   }
   if (!topicSlugsResult.ok) {
-    logger.error(TOPIC_PARAMS_LOOKUP_FAILED_EVENT, {
+    logger.error(REVALIDATE_LOG.TOPIC_PARAMS_LOOKUP_FAILED, {
       id,
       error: topicSlugsResult.error,
     });
     return errorResult(FETCH_FAILED_REASON);
   }
   if (!topicPaginationParamsResult.ok) {
-    logger.error(TOPIC_PAGINATION_LOOKUP_FAILED_EVENT, {
+    logger.error(REVALIDATE_LOG.TOPIC_PAGINATION_LOOKUP_FAILED, {
       id,
       error: topicPaginationParamsResult.error,
     });

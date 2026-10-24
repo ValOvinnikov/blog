@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -69,7 +70,7 @@ describe(resolveReferencingModuleTags, () => {
     expect(result).toEqual([]);
     expect(loggerErrorMock).toHaveBeenCalledTimes(1);
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'revalidate.referencing_modules_lookup_failed',
+      REVALIDATE_LOG.REFERENCING_MODULES_LOOKUP_FAILED,
       {
         type: input.type,
         id: input.id,

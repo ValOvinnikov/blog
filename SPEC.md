@@ -2647,7 +2647,10 @@ stdout — stdout is the transport, so there is no logging framework.
 caller, and the app layer logs it once, with request context. A failure logged
 in two layers is one failure that looks like two.
 
-Event names are static, lowercase and dot-namespaced (`tenants.create_failed`).
+Event names are static, lowercase and dot-namespaced (`tenants.create_failed`),
+and each logging domain declares its names once, in a `<DOMAIN>_LOG` const
+(UPPERCASE keys, the lowercase event names as values) that every file logging
+for it imports.
 Dynamic values — slugs, ids, domains, status codes — are structured context
 fields, never interpolated into the name. A static name is what makes failures
 groupable, and it is also the log-injection barrier CodeQL checks. Two distinct
