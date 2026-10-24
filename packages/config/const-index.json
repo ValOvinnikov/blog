@@ -1522,6 +1522,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "PERSONAL_DATA_OWNER.USER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
       }
     ],
     "USERS": [
@@ -2160,6 +2166,14 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
+      }
+    ],
+    "personal_data.plain_fallback": [
+      {
+        "ref": "PERSONAL_DATA_LOG.PLAIN_FALLBACK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/personal-data.ts"
       }
     ],
     "bodyImage": [
@@ -2892,6 +2906,72 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
+    "LEAD": [
+      {
+        "ref": "PERSONAL_DATA_OWNER.LEAD",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "SUBSCRIBER": [
+      {
+        "ref": "PERSONAL_DATA_OWNER.SUBSCRIBER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "INVITE": [
+      {
+        "ref": "PERSONAL_DATA_OWNER.INVITE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "NOT_BACKFILLED": [
+      {
+        "ref": "PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
+      }
+    ],
+    "ENCRYPTION_KEY_UNSET": [
+      {
+        "ref": "PERSONAL_DATA_FALLBACK_REASON.ENCRYPTION_KEY_UNSET",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
+      }
+    ],
+    "INDEX_KEY_UNSET": [
+      {
+        "ref": "PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/personal-data.ts"
+      }
+    ],
     "REMOVE_DOMAIN": [
       {
         "ref": "DEPROVISIONING_STEP.REMOVE_DOMAIN",
@@ -3458,30 +3538,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/control-mode",
         "file": "apps/platform/src/constants/control-mode.ts"
-      }
-    ],
-    "SUBSCRIBER": [
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "LEAD": [
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "INVITE": [
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
     "SIGNUP_BLOCK": [

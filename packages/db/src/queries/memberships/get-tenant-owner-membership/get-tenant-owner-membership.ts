@@ -1,10 +1,13 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { users } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
-import { requireDecryptedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import {
+  readPersonalValue,
+  reportPlainPersonalRead,
+} from '@blog/db/utils/personal-data/personal-data';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TTenantOwnerMembership = {
@@ -31,7 +34,10 @@ export async function getTenantOwnerMembership(
   if (owner?.email) return { email: owner.email, joinedAt: owner.joinedAt };
 
   const [invite] = await db
-    .select({ emailEncrypted: membershipInvites.emailEncrypted })
+    .select({
+      email: membershipInvites.email,
+      emailEncrypted: membershipInvites.emailEncrypted,
+    })
     .from(membershipInvites)
     .where(
       and(
@@ -43,7 +49,7 @@ export async function getTenantOwnerMembership(
 
   if (!invite) return undefined;
 
-  return {
-    email: requireDecryptedPersonalValue(invite.emailEncrypted, 'Invite'),
-  };
+  const { email, emailEncrypted } = invite;
+  reportPlainPersonalRead(PERSONAL_DATA_OWNER.INVITE, emailEncrypted);
+  return { email: readPersonalValue(emailEncrypted, email) };
 }

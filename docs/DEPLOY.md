@@ -1138,13 +1138,15 @@ commit or redeploy a prior Vercel build.
 
 ### The personal-data backfill — between two releases
 
-Sign-in reads users only through their encrypted email, so a production
-release that ships that reader before `db:backfill-personal-data` has run
-against production fails every existing user's sign-in with "User has no
-encrypted email" (Auth.js reports it as `error=Configuration`). The workflow
-cannot run the backfill for you: `migrate-db` is followed straight by the app
-deploys, with no gap to fill the columns in between. So the first production
-release that contains the readers ships in two tags:
+The readers fall back to the plain columns for any row the backfill has not
+reached yet, and for every row while a personal-data key is unset, so a release
+that ships them before `db:backfill-personal-data` has run locks no one out.
+Each fallback logs `personal_data.plain_fallback` (warn, with the owner and
+reason, never the address), so leftover rows stay visible in the log stream.
+The workflow cannot run the backfill for you: `migrate-db` is followed straight
+by the app deploys. Ship the first production release that contains the readers
+in two tags anyway, so the readers meet a filled table and the fallback lines
+stay at zero:
 
 1. **Tag the expand.** Tag a green `main` commit that contains the encrypted
    columns (migration `0055_add_personal_data_encrypted_columns`, PR #5703)

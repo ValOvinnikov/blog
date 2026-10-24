@@ -11,13 +11,12 @@ import {
   mockAccountEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
-import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
 import { withEncryptedUsers } from './encrypted-users';
 
-const { getUsersByEmailIndexMock } = vi.hoisted(() => ({
-  getUsersByEmailIndexMock: vi.fn(),
+const { findUserByEmailMock } = vi.hoisted(() => ({
+  findUserByEmailMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async (importActual) => {
@@ -28,7 +27,7 @@ vi.mock('@blog/db', async (importActual) => {
       ...actual.queries,
       users: {
         ...actual.queries.users,
-        getUsersByEmailIndex: getUsersByEmailIndexMock,
+        findUserByEmail: findUserByEmailMock,
       },
     },
   };
@@ -40,7 +39,6 @@ const MOCK_NAME = 'Ada Reader';
 const MOCK_CHANGED_EMAIL = 'renamed-reader@example.com';
 const MOCK_PLAIN_EMAIL = 'plain-reader@example.com';
 const MOCK_PLAIN_NAME = 'Plain Name';
-const MOCK_TAGGED_EMAIL = taggedMixedCaseAddress(MOCK_EMAIL);
 
 const signedUpUser = (): AdapterUser => ({
   id: MOCK_USER_ID,
@@ -63,17 +61,14 @@ const storedUser = (): TUser & AdapterUser => ({
   ...queries.users.userPersonalColumns({ email: MOCK_EMAIL, name: MOCK_NAME }),
 });
 
-const MOCK_EXACT_USER_ID = 'exact-user';
-const MOCK_OTHER_USER_ID = 'other-user';
-
-const taggedUser = (): TUser & AdapterUser => ({
+const unbackfilledUser = (): TUser & AdapterUser => ({
   ...storedUser(),
-  id: MOCK_OTHER_USER_ID,
-  ...queries.users.userPersonalColumns({
-    email: MOCK_TAGGED_EMAIL.trim().toLowerCase(),
-    name: MOCK_NAME,
-  }),
+  emailEncrypted: null,
+  nameEncrypted: null,
+  emailIndex: null,
 });
+
+const PERSONAL_COLUMNS = ['emailEncrypted', 'emailIndex', 'nameEncrypted'];
 
 const echoUser = async (user: AdapterUser) => user;
 
@@ -173,79 +168,93 @@ describe(withEncryptedUsers, () => {
     expect(found?.user).toMatchObject(decrypted);
   });
 
-  it('looks a user up by email index, never through the plain column', async () => {
-    getUsersByEmailIndexMock.mockResolvedValue([storedUser()]);
+  it('reads a user found by email from the encrypted columns', async () => {
+    findUserByEmailMock.mockResolvedValue(storedUser());
 
     const user = await encryptedAdapter.getUserByEmail?.(MOCK_EMAIL);
 
-    expect(getUsersByEmailIndexMock).toHaveBeenCalledWith(MOCK_EMAIL);
+    expect(findUserByEmailMock).toHaveBeenCalledWith(MOCK_EMAIL);
     expect(adapter.getUserByEmail).not.toHaveBeenCalled();
     expect(user).toMatchObject(decrypted);
   });
 
-  it.each([
-    ['another casing of the address', MOCK_EMAIL.toUpperCase(), MOCK_EMAIL],
-    ['a +tag variant of the stored address', MOCK_TAGGED_EMAIL, null],
-  ])('resolves %s by email', async (_label, requested, expected) => {
-    getUsersByEmailIndexMock.mockResolvedValue([storedUser()]);
-
-    const user = await encryptedAdapter.getUserByEmail?.(requested);
-
-    expect(user?.email ?? null).toBe(expected);
-  });
-
-  it('picks the candidate whose email is exactly the requested address', async () => {
-    const exact = { ...storedUser(), id: MOCK_EXACT_USER_ID };
-    getUsersByEmailIndexMock.mockResolvedValue([
-      taggedUser(),
-      exact,
-      { ...storedUser(), id: MOCK_OTHER_USER_ID },
-    ]);
-
-    const user = await encryptedAdapter.getUserByEmail?.(MOCK_EMAIL);
-
-    expect(user?.id).toBe(MOCK_EXACT_USER_ID);
-  });
-
-  it('finds no user when every candidate is a +tag variant', async () => {
-    getUsersByEmailIndexMock.mockResolvedValue([taggedUser(), taggedUser()]);
-
-    const user = await encryptedAdapter.getUserByEmail?.(MOCK_EMAIL);
-
-    expect(user).toBeNull();
-  });
-
-  it('skips a candidate with no encrypted email instead of throwing', async () => {
-    const unreadable = { ...storedUser(), emailEncrypted: null };
-    getUsersByEmailIndexMock.mockResolvedValue([unreadable]);
+  it('finds no user when no address matches', async () => {
+    findUserByEmailMock.mockResolvedValue(undefined);
 
     await expect(
       encryptedAdapter.getUserByEmail?.(MOCK_EMAIL),
     ).resolves.toBeNull();
   });
 
-  it('still finds the exact candidate behind one with no encrypted email', async () => {
-    const unreadable = { ...storedUser(), emailEncrypted: null };
-    getUsersByEmailIndexMock.mockResolvedValue([unreadable, storedUser()]);
+  it('signs in a user not yet backfilled, read from the plain columns', async () => {
+    findUserByEmailMock.mockResolvedValue(unbackfilledUser());
 
-    const user = await encryptedAdapter.getUserByEmail?.(MOCK_EMAIL);
+    const user = await encryptedAdapter.getUserByEmail?.(MOCK_PLAIN_EMAIL);
 
-    expect(user).toMatchObject(decrypted);
+    expect(user).toMatchObject({
+      email: MOCK_PLAIN_EMAIL,
+      name: MOCK_PLAIN_NAME,
+    });
   });
 
-  it('finds no user when no index matches', async () => {
-    getUsersByEmailIndexMock.mockResolvedValue([]);
+  it('keeps the session of a user not yet backfilled', async () => {
+    adapter.getSessionAndUser.mockResolvedValue({
+      session: {
+        sessionToken: MOCK_SESSION_TOKEN,
+        userId: MOCK_USER_ID,
+        expires: new Date(),
+      },
+      user: unbackfilledUser(),
+    });
 
-    const user = await encryptedAdapter.getUserByEmail?.(MOCK_EMAIL);
+    const found =
+      await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
-    expect(user).toBeNull();
+    expect(found?.user).toMatchObject({
+      email: MOCK_PLAIN_EMAIL,
+      name: MOCK_PLAIN_NAME,
+    });
   });
 
-  it('refuses a user the adapter returns without its encrypted columns', async () => {
-    const adapter = { getUser: vi.fn(async () => signedUpUser()) };
+  it.each(PERSONAL_COLUMNS)(
+    'returns the user to Auth.js without %s',
+    async (column) => {
+      const created = await encryptedAdapter.createUser?.(signedUpUser());
+      const found =
+        await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
-    await expect(
-      withEncryptedUsers(adapter).getUser?.(MOCK_USER_ID),
-    ).rejects.toThrow();
+      expect(created).not.toHaveProperty(column);
+      expect(found?.user).not.toHaveProperty(column);
+    },
+  );
+
+  describe('with no personal data keys configured', () => {
+    beforeEach(() => {
+      vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', undefined);
+      vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
+    });
+
+    it('creates a user with only the plain email and name', async () => {
+      const created = await encryptedAdapter.createUser?.(signedUpUser());
+
+      const [written] = adapter.createUser.mock.calls[0] ?? [];
+      const { emailEncrypted, emailIndex, nameEncrypted } = written as TUser;
+      expect([emailEncrypted, emailIndex, nameEncrypted]).toEqual([
+        null,
+        null,
+        null,
+      ]);
+      expect(created).toMatchObject(decrypted);
+    });
+
+    it("reads a backfilled user's session from the plain columns", async () => {
+      const found =
+        await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
+
+      expect(found?.user).toMatchObject({
+        email: MOCK_PLAIN_EMAIL,
+        name: MOCK_PLAIN_NAME,
+      });
+    });
   });
 });
