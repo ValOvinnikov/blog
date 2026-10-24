@@ -135,6 +135,57 @@ describe(listAuditEventsForTarget, () => {
     ]);
   });
 
+  it('breaks a tie on the same timestamp by id, so paging neither repeats nor skips', async () => {
+    const createdAt = new Date(2026, 0, 1);
+    await insertEvent({
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TARGET_ID,
+      createdAt,
+    });
+    await insertEvent({
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TARGET_ID,
+      createdAt,
+    });
+    const all = await listAuditEventsForTarget(
+      AUDIT_TARGET_TYPE.TENANT,
+      MOCK_TARGET_ID,
+    );
+    const idsNewestFirst = all
+      .map((event) => event.id)
+      .sort()
+      .reverse();
+
+    const [first] = await listAuditEventsForTarget(
+      AUDIT_TARGET_TYPE.TENANT,
+      MOCK_TARGET_ID,
+      { limit: 1 },
+    );
+    const [second] = await listAuditEventsForTarget(
+      AUDIT_TARGET_TYPE.TENANT,
+      MOCK_TARGET_ID,
+      { limit: 1, offset: 1 },
+    );
+
+    expect([first?.id, second?.id]).toEqual(idsNewestFirst);
+  });
+
+  it('treats a negative offset as the first page', async () => {
+    await insertEvent({
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TARGET_ID,
+      createdAt: new Date(2026, 0, 1),
+    });
+
+    const result = await listAuditEventsForTarget(
+      AUDIT_TARGET_TYPE.TENANT,
+      MOCK_TARGET_ID,
+      { offset: -25 },
+    );
+
+    expect(result).toHaveLength(1);
+  });
+
   it("does not leak another target's events", async () => {
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,

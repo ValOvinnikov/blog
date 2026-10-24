@@ -26,5 +26,5 @@ export async function listAuditEventsForTarget(
     )
     .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
     .limit(options.limit ?? 20)
-    .offset(options.offset ?? 0);
+    .offset(Math.max(options.offset ?? 0, 0));
 }

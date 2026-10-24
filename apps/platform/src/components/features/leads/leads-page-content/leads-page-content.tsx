@@ -1,11 +1,11 @@
 import { queries } from '@blog/db';
+import { LEADS_PAGE_SIZE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import { LeadsView } from '@platform/components/features/leads/leads-view';
 import { Pagination } from '@platform/components/shared/pagination';
-import { countPages, PAGE_SIZE } from '@platform/utils/pagination/pagination';
+import { resolveTotalPages } from '@platform/utils/pagination/pagination';
 import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
-import { redirect } from 'next/navigation';
 
 export type TLeadsPageContentProps = {
   tenant: TTenant;
@@ -21,11 +21,14 @@ export const LeadsPageContent = async ({
   const { leads, total } = await queries.leads.listLeads({
     tenantId: tenant.id,
     page,
-    pageSize: PAGE_SIZE,
+    pageSize: LEADS_PAGE_SIZE,
   });
-  const totalPages = countPages(total);
-
-  if (page > totalPages) redirect(pageHref(totalPages));
+  const totalPages = resolveTotalPages({
+    page,
+    total,
+    pageSize: LEADS_PAGE_SIZE,
+    pageHref,
+  });
 
   return (
     <LeadsTenantProvider tenantId={tenant.id}>

@@ -38,14 +38,14 @@ const ACTIVITY_ICON = {
 } as const satisfies Record<TAuditAction, TRegisteredIconName>;
 
 export const ActivityList = ({ events }: TActivityListProps) => {
-  const t = useTranslations('tenantOverviewPage');
+  const t = useTranslations('activityList');
   const locale = useLocale();
   const { activityIcon } = activityListVariants();
 
   return (
     <CardList
       items={events}
-      emptyMessage={t('activityEmpty')}
+      emptyMessage={t('empty')}
       renderRow={(event) => (
         <CardList.Row key={event.id}>
           <CardList.Lead>
@@ -53,11 +53,9 @@ export const ActivityList = ({ events }: TActivityListProps) => {
               <Icon name={ACTIVITY_ICON[event.action]} size={SIZE.SM} />
             </span>
           </CardList.Lead>
-          <CardList.Primary>
-            {t(`activityAction.${event.action}`)}
-          </CardList.Primary>
+          <CardList.Primary>{t(`action.${event.action}`)}</CardList.Primary>
           <CardList.Secondary>
-            {event.actorEmail ?? t('activityActorDeleted')}
+            {event.actorEmail ?? t('actorDeleted')}
           </CardList.Secondary>
           <CardList.Time date={event.createdAt}>
             {formatRelativeTime(event.createdAt, t, locale)}

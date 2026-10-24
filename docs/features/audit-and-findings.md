@@ -8,6 +8,7 @@ code:
   - packages/db/src/queries/audit-events/**
   - packages/db/src/queries/findings/**
   - packages/config/src/constants/audit.ts
+  - packages/db/src/constants/audit-event.ts
   - packages/config/src/constants/finding.ts
   - packages/db/scripts/validate-tenant-documents/**
   - apps/worker/src/utils/provisioning-report/**
@@ -36,8 +37,8 @@ append-only log of who did what to a tenant: created, reconfigured,
 provisioned, archived, deleted. `findings` holds operational conditions a
 human should act on, each open or resolved and usually tied to a tenant.
 Operators see a tenant's recent activity and open findings on its overview,
-its full activity on a page of its own, and every open finding on the platform-wide Findings page. Tenant owners see
-neither.
+its full `TENANT` activity on a page of its own, and every open finding on the
+platform-wide Findings page. Tenant owners see neither.
 
 ## Surfaces and routes
 
@@ -56,12 +57,14 @@ neither.
 - `/tenants/{id}` overview: the Findings card (OPEN findings, with a
   disclosure that loads `details` on open) and the Recent activity card (the
   last five `TENANT` audit events: action, actor email, relative time), with
-  a View all activity link to the activity page. An event whose actor deleted
-  their account shows "Deleted account" instead.
+  a View all activity link to the activity page while there is any. An event
+  whose actor deleted their account shows "Deleted account" instead.
 - `/tenants/{id}/activity` (operator, gated by `requireTenantById`): every
-  `TENANT` audit event for the tenant, newest first, 25 per page
-  (`?page=n`), rows shown as on the card. A page past the end redirects to
-  the last page.
+  `TENANT` audit event for the tenant, newest first (ties broken by id),
+  `AUDIT_EVENTS_PAGE_SIZE` per page (`?page=n`), rows shown as on the card.
+  The count is read first, and a page past the end redirects to the last page
+  without reading rows. Paging is by offset, so an event recorded between two
+  page loads shifts rows by one.
 - `/tenants/{id}/danger`: reads the latest `DEPROVISION_REQUESTED` time to
   decide whether a deprovisioning run is current or a retry.
 - No page lists `SITE_CONFIG` or `SETTINGS_FEATURES` events, and no UI

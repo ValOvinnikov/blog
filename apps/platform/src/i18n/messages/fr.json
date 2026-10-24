@@ -321,14 +321,20 @@
     "notSetValue": "Non défini",
     "recentActivityCardTitle": "Activité récente",
     "recentActivitySourceLabel": "Journal système",
-    "viewAllActivityLink": "Voir toute l'activité",
-    "activityEmpty": "Aucune activité enregistrée pour le moment.",
-    "activityActorDeleted": "Compte supprimé",
+    "viewAllActivityLink": "Voir toute l'activité"
+  },
+  "tenantActivityPage": {
+    "title": "Activité",
+    "description": "Actions de cycle de vie et d'opérateur sur ce locataire, de la plus récente à la plus ancienne."
+  },
+  "activityList": {
+    "empty": "Aucune activité enregistrée pour le moment.",
+    "actorDeleted": "Compte supprimé",
     "relativeJustNow": "À l'instant",
     "relativeMinutesAgo": "il y a {minutes} min",
     "relativeHoursAgo": "il y a {hours} h",
     "relativeDaysAgo": "il y a {days} j",
-    "activityAction": {
+    "action": {
       "CREATED": "Locataire créé",
       "DEPROVISION_REQUESTED": "Déprovisionnement demandé",
       "DEPROVISIONED": "Locataire déprovisionné",
@@ -350,10 +356,6 @@
       "PERSONAL_DATA_EXPORTED": "Données personnelles exportées",
       "PERSONAL_DATA_ERASED": "Données personnelles effacées"
     }
-  },
-  "tenantActivityPage": {
-    "title": "Activité",
-    "description": "Tout ce qui a été enregistré pour ce locataire, du plus récent au plus ancien."
   },
   "tenantDomainPage": {
     "pageTitle": "Domaine",

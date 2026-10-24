@@ -5,6 +5,8 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { RecentActivityCard } from './recent-activity-card';
 
+const VIEW_ALL_ACTIVITY = 'View all activity';
+
 const setup = customRender(RecentActivityCard, {
   events: [mockAuditEvent()],
   viewAllHref: adminRoutes.tenantActivity(MOCK_TENANT_ID),
@@ -25,11 +27,21 @@ describe(`<${RecentActivityCard.name}/>`, () => {
   it("links to the tenant's full activity page", () => {
     setup();
 
-    const viewAllLink = screen.getByRole('link', { name: 'View all activity' });
+    const viewAllLink = screen.getByRole('link', { name: VIEW_ALL_ACTIVITY });
 
     expect(viewAllLink).toHaveAttribute(
       'href',
       `/tenants/${MOCK_TENANT_ID}/activity`,
     );
+  });
+
+  it('offers no View all link while there is no activity to view', () => {
+    setup({ events: [] });
+
+    const viewAllLink = screen.queryByRole('link', {
+      name: VIEW_ALL_ACTIVITY,
+    });
+
+    expect(viewAllLink).not.toBeInTheDocument();
   });
 });

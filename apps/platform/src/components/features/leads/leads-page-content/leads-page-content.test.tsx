@@ -1,5 +1,5 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { LEADS_PAGE_SIZE, TENANT_PLAN } from '@blog/db/constants';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockLead } from '@platform/testing/leads/fixtures';
 import {
@@ -36,7 +36,7 @@ describe(LeadsPageContent, () => {
     listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
   });
 
-  it("asks for the requested page of the tenant's own leads, 25 at a time", async () => {
+  it("asks for the requested page of the tenant's own leads, a page at a time", async () => {
     listLeadsMock.mockResolvedValue({ leads: [mockLead()], total: 60 });
 
     await setup({ page: 2 });
@@ -44,7 +44,7 @@ describe(LeadsPageContent, () => {
     expect(listLeadsMock).toHaveBeenCalledWith({
       tenantId: MOCK_TENANT_ID,
       page: 2,
-      pageSize: 25,
+      pageSize: LEADS_PAGE_SIZE,
     });
   });
 

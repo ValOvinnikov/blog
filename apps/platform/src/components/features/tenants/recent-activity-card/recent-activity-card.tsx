@@ -26,14 +26,16 @@ export const RecentActivityCard = ({
             <Text variant="meta" as="span">
               {t('recentActivitySourceLabel')}
             </Text>
-            <LinkButton
-              href={viewAllHref}
-              variant="ghost"
-              size={SIZE.SM}
-              hasArrow={true}
-            >
-              {t('viewAllActivityLink')}
-            </LinkButton>
+            {events.length > 0 && (
+              <LinkButton
+                href={viewAllHref}
+                variant="ghost"
+                size={SIZE.SM}
+                hasArrow={true}
+              >
+                {t('viewAllActivityLink')}
+              </LinkButton>
+            )}
           </>
         }
       />

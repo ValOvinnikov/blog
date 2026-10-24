@@ -321,14 +321,20 @@
     "notSetValue": "Niet ingesteld",
     "recentActivityCardTitle": "Recente activiteit",
     "recentActivitySourceLabel": "Systeemlog",
-    "viewAllActivityLink": "Alle activiteit bekijken",
-    "activityEmpty": "Nog geen activiteit geregistreerd.",
-    "activityActorDeleted": "Verwijderd account",
+    "viewAllActivityLink": "Alle activiteit bekijken"
+  },
+  "tenantActivityPage": {
+    "title": "Activiteit",
+    "description": "Levenscyclus- en operatoracties voor deze tenant, nieuwste eerst."
+  },
+  "activityList": {
+    "empty": "Nog geen activiteit geregistreerd.",
+    "actorDeleted": "Verwijderd account",
     "relativeJustNow": "Zojuist",
     "relativeMinutesAgo": "{minutes} min geleden",
     "relativeHoursAgo": "{hours} uur geleden",
     "relativeDaysAgo": "{days} d geleden",
-    "activityAction": {
+    "action": {
       "CREATED": "Tenant aangemaakt",
       "DEPROVISION_REQUESTED": "Ontmanteling aangevraagd",
       "DEPROVISIONED": "Tenant ontmanteld",
@@ -350,10 +356,6 @@
       "PERSONAL_DATA_EXPORTED": "Persoonsgegevens geëxporteerd",
       "PERSONAL_DATA_ERASED": "Persoonsgegevens gewist"
     }
-  },
-  "tenantActivityPage": {
-    "title": "Activiteit",
-    "description": "Alles wat voor deze tenant is vastgelegd, nieuwste eerst."
   },
   "tenantDomainPage": {
     "pageTitle": "Domein",
