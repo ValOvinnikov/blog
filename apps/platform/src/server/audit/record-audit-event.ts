@@ -29,17 +29,15 @@ export const recordAuditEvent = async ({
   try {
     const session = await auth();
     const actorId = session?.user?.id;
-    const actorEmail = session?.user?.email;
 
-    if (!actorId || !actorEmail) {
+    if (!actorId) {
       throw new Error(
-        'recordAuditEvent: no authenticated actor id/email on session.',
+        'recordAuditEvent: no authenticated actor id on session.',
       );
     }
 
     await queries.auditEvents.insertAuditEvent({
       actorId,
-      actorEmail,
       action,
       targetType,
       targetId,

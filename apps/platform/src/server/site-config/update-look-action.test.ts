@@ -165,7 +165,6 @@ describe(updateLookAction, () => {
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
-      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,

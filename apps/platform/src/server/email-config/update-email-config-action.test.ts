@@ -247,7 +247,6 @@ describe(updateEmailConfigAction, () => {
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'user-1',
-      actorEmail: 'user@example.com',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,

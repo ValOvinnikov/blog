@@ -11,30 +11,34 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const MOCK_ACTOR_ID = 'admin-1';
+const MOCK_TENANT_ID = 'tenant-123';
+const MOCK_REPEATED_TARGET_ID = 'tenant-789';
+const MOCK_DETAILS = {
+  previousStatus: 'active',
+  reason: 'customer offboarding',
+};
+
 afterEach(async () => {
   await db().delete(schema.auditEvents);
 });
 
 describe(insertAuditEvent, () => {
-  it('writes the actor, action, target, and details exactly as given', async () => {
+  it('writes the actor id, action, target, and details exactly as given, and no actor email', async () => {
     const event = await insertAuditEvent({
-      actorId: 'admin-1',
-      actorEmail: 'admin-1@example.com',
+      actorId: MOCK_ACTOR_ID,
       action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-123',
-      details: { previousStatus: 'active', reason: 'customer offboarding' },
+      targetId: MOCK_TENANT_ID,
+      details: MOCK_DETAILS,
     });
 
-    expect(event.actorId).toBe('admin-1');
-    expect(event.actorEmail).toBe('admin-1@example.com');
+    expect(event.actorId).toBe(MOCK_ACTOR_ID);
+    expect(event.actorEmail).toBeNull();
     expect(event.action).toBe(AUDIT_ACTION.DEPROVISIONED);
     expect(event.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
-    expect(event.targetId).toBe('tenant-123');
-    expect(event.details).toEqual({
-      previousStatus: 'active',
-      reason: 'customer offboarding',
-    });
+    expect(event.targetId).toBe(MOCK_TENANT_ID);
+    expect(event.details).toEqual(MOCK_DETAILS);
     expect(event.createdAt).toBeInstanceOf(Date);
 
     const [row] = await db()
@@ -42,17 +46,13 @@ describe(insertAuditEvent, () => {
       .from(schema.auditEvents)
       .where(eq(schema.auditEvents.id, event.id));
     expect(row?.action).toBe(AUDIT_ACTION.DEPROVISIONED);
-    expect(row?.targetId).toBe('tenant-123');
-    expect(row?.details).toEqual({
-      previousStatus: 'active',
-      reason: 'customer offboarding',
-    });
+    expect(row?.targetId).toBe(MOCK_TENANT_ID);
+    expect(row?.details).toEqual(MOCK_DETAILS);
   });
 
   it('leaves details NULL when omitted, rather than an empty-object sentinel', async () => {
     const event = await insertAuditEvent({
-      actorId: 'admin-1',
-      actorEmail: 'admin-1@example.com',
+      actorId: MOCK_ACTOR_ID,
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-456',
@@ -63,24 +63,22 @@ describe(insertAuditEvent, () => {
 
   it('persists a distinct row per call, even for the same action and target', async () => {
     await insertAuditEvent({
-      actorId: 'admin-1',
-      actorEmail: 'admin-1@example.com',
+      actorId: MOCK_ACTOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: 'tenant-789',
+      targetId: MOCK_REPEATED_TARGET_ID,
     });
     await insertAuditEvent({
-      actorId: 'admin-1',
-      actorEmail: 'admin-1@example.com',
+      actorId: MOCK_ACTOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: 'tenant-789',
+      targetId: MOCK_REPEATED_TARGET_ID,
     });
 
     const rows = await db()
       .select()
       .from(schema.auditEvents)
-      .where(eq(schema.auditEvents.targetId, 'tenant-789'));
+      .where(eq(schema.auditEvents.targetId, MOCK_REPEATED_TARGET_ID));
     expect(rows).toHaveLength(2);
   });
 });

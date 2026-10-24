@@ -96,7 +96,6 @@ describe('startContrastCheckAction', () => {
     expect(dispatchContrastWorkflowMock).toHaveBeenCalledOnce();
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
-      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.CONTRAST_CHECK_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: headSha,

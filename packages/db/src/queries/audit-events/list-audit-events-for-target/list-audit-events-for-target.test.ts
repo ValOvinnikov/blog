@@ -3,10 +3,20 @@ import {
   AUDIT_TARGET_TYPE,
   type TAuditAction,
   type TAuditTargetType,
+  WORKER_AUDIT_ACTOR_ID,
 } from '@blog/config/constants';
+import {
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { MOCK_OPERATOR_EMAIL } from '@blog/db/testing/fixtures';
+import { MOCK_OPERATOR_EMAIL, insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -21,6 +31,8 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
 
 const MOCK_TARGET_ID = faker.string.uuid();
 const MOCK_FIRST_DAY = new Date(2026, 0, 1);
@@ -35,13 +47,13 @@ async function insertEvent(
     targetId?: string;
     createdAt?: Date;
     action?: TAuditAction;
+    actorId?: string;
   } = {},
 ): Promise<void> {
   await db()
     .insert(schema.auditEvents)
     .values({
-      actorId: faker.string.uuid(),
-      actorEmail: MOCK_OPERATOR_EMAIL,
+      actorId: overrides.actorId ?? faker.string.uuid(),
       action: overrides.action ?? AUDIT_ACTION.DEPROVISIONED,
       targetType: overrides.targetType ?? AUDIT_TARGET_TYPE.TENANT,
       targetId: overrides.targetId ?? MOCK_TARGET_ID,
@@ -67,6 +79,7 @@ function listTargetEvents(
 
 afterEach(async () => {
   await db().delete(schema.auditEvents);
+  await db().delete(schema.users);
 });
 
 describe(listAuditEventsForTarget, () => {
@@ -151,6 +164,47 @@ describe(listAuditEventsForTarget, () => {
     expect(result[0]?.targetId).toBe(MOCK_TARGET_ID);
     expect(result[0]?.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
   });
+
+  it("returns the actor's account email, read from the encrypted column", async () => {
+    const { id } = await insertTestUser(db(), {
+      email: faker.internet.email(),
+      emailEncrypted: encryptPersonalValue(MOCK_OPERATOR_EMAIL),
+    });
+    await insertEvent({ actorId: id });
+
+    const [event] = await listTargetEvents();
+
+    expect(event?.actorAccountEmail).toBe(MOCK_OPERATOR_EMAIL);
+    expect(event).not.toHaveProperty('actorEmail');
+  });
+
+  it('reads an account not yet backfilled from its plain email, and reports it', async () => {
+    const { id } = await insertTestUser(db(), { email: MOCK_OPERATOR_EMAIL });
+    await insertEvent({ actorId: id });
+
+    const [event] = await listTargetEvents();
+
+    expect(event?.actorAccountEmail).toBe(MOCK_OPERATOR_EMAIL);
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.USER,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
+  });
+
+  it.each([
+    ['a deleted account', faker.string.uuid()],
+    ['a system actor', WORKER_AUDIT_ACTOR_ID],
+  ])(
+    'returns a null account email, and reports nothing, for %s',
+    async (_, actorId) => {
+      await insertEvent({ actorId });
+
+      const [event] = await listTargetEvents();
+
+      expect(event?.actorAccountEmail).toBeNull();
+      expect(fallbackListener).not.toHaveBeenCalled();
+    },
+  );
 
   it('returns an empty array when no events exist for the target', async () => {
     const result = await listTargetEvents();

@@ -330,6 +330,7 @@
   "activityList": {
     "empty": "Aucune activité enregistrée pour le moment.",
     "actorDeleted": "Compte supprimé",
+    "actorSystem": "Système",
     "relativeJustNow": "À l'instant",
     "relativeMinutesAgo": "il y a {minutes} min",
     "relativeHoursAgo": "il y a {hours} h",

@@ -330,6 +330,7 @@
   "activityList": {
     "empty": "No activity recorded yet.",
     "actorDeleted": "Deleted account",
+    "actorSystem": "System",
     "relativeJustNow": "Just now",
     "relativeMinutesAgo": "{minutes}m ago",
     "relativeHoursAgo": "{hours}h ago",

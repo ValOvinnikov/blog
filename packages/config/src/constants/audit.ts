@@ -11,6 +11,9 @@ export const AUDIT_TARGET_TYPE = {
 
 export type TAuditTargetType = TValueOf<typeof AUDIT_TARGET_TYPE>;
 
+export const WORKER_AUDIT_ACTOR_ID = 'worker';
+export const GITHUB_AUDIT_ACTOR_ID_PREFIX = 'github:';
+
 // A lifecycle run spanning two systems gets one action per system, reading
 // request-then-outcome: `DEPROVISION_REQUESTED` is the platform app
 // dispatching the workflow, `DEPROVISIONED` is the CLI reporting the archive

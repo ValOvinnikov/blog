@@ -159,7 +159,6 @@ describe('startReleaseAction', () => {
     expect(insertAuditEventMock).toHaveBeenCalledOnce();
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
-      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.RELEASE_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: 'v1.5.0',
@@ -197,7 +196,6 @@ describe('startReleaseAction', () => {
     });
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
-      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.RELEASE_OVERRIDE,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: 'v1.5.0',
