@@ -7,8 +7,9 @@
 # Contract (Claude Code hooks):
 #   stdin  — JSON payload; the edited file is .tool_input.file_path
 #   exit 0 — silent success (also: non-TS file, missing file, no eslint,
-#            ESLint fatal error such as no eslint.config.* resolving)
-#   exit 2 — stderr is fed back to the agent as feedback; report-only, no --fix
+#            ESLint fatal error where no eslint.config.* resolves)
+#   exit 2 — stderr is fed back to the agent as feedback (lint problems, or
+#            ESLint failing to load a config that exists); report-only, no --fix
 set -u
 
 payload=$(cat)
@@ -62,12 +63,18 @@ cd "$workspace_dir" || exit 0
 output=$(BLOG_LINT_TOUCHED=1 "$eslint" --no-warn-ignored "$file_path" 2>&1)
 status=$?
 
-# ESLint exit codes: 0 = clean, 1 = lint problems, >=2 = fatal (e.g. no
-# eslint.config.* resolves for a file outside every workspace). Only real
-# lint problems are agent feedback; a tool failure must not be presented
-# as one — stay silent and let the commit-time gates cover the file.
+# ESLint exits 0 clean, 1 on lint problems, >=2 fatal. A fatal exit beside an
+# eslint.config.* means the config failed to load (often a stale install), so
+# every edit would go unlinted unless the agent is told.
 if [ "$status" -eq 1 ]; then
   printf '%s\n' "$output" >&2
+  exit 2
+fi
+
+if [ "$status" -ge 2 ] && ls ./eslint.config.* >/dev/null 2>&1; then
+  first_error=$(printf '%s\n' "$output" | grep -m1 -i 'error' || printf '%s\n' "$output" | head -n 1)
+  printf 'ESLint could not load its config, so %s was not linted:\n  %s\nRun pnpm install in %s, then re-save the file.\n' \
+    "$file_path" "$first_error" "$project_dir" >&2
   exit 2
 fi
 

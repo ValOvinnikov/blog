@@ -2,12 +2,13 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import {
   decryptPersonalValue,
   requireDecryptedPersonalValue,
-  requirePersonalEmailIndex,
+  requireEmailIndex,
 } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { and, eq } from 'drizzle-orm';
 
 const SUBSCRIBER_OWNER = 'Subscriber';
@@ -32,7 +33,10 @@ export async function findSubscriberByExactEmail(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.emailIndex, requirePersonalEmailIndex(normalizedEmail)),
+        eq(
+          subscribers.emailIndex,
+          requireEmailIndex(normalizedEmail, personalDataIndex),
+        ),
       ),
     );
 

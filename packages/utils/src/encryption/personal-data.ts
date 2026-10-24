@@ -1,7 +1,10 @@
 import { createHmac } from 'node:crypto';
 
 import { SHA256_ALGORITHM } from '@blog/utils/hash';
-import { normalizeEmailIdentity } from '@blog/utils/normalize-email-identity';
+import {
+  normalizeEmail,
+  normalizeEmailIdentity,
+} from '@blog/utils/normalize-email-identity';
 
 import { KEY_ENCODING, PAYLOAD_ENCODING } from './crypto-encoding';
 import { decryptSecret, encryptSecret } from './encrypt-secret';
@@ -88,9 +91,18 @@ export function decryptPersonalData(
   return decryptSecret(encrypted.slice(separatorIndex + 1), key);
 }
 
-/** A keyed hash of the address an email lookup compares against instead of the address itself. */
-export function personalDataIndex(email: string, keyBase64: string): string {
+function keyedIndex(value: string, keyBase64: string): string {
   return createHmac(SHA256_ALGORITHM, Buffer.from(keyBase64, KEY_ENCODING))
-    .update(normalizeEmailIdentity(email))
+    .update(value)
     .digest(PAYLOAD_ENCODING);
+}
+
+/** A keyed hash of the mailbox an email lookup compares against instead of the address itself; `+tag` variants share it. */
+export function personalDataIndex(email: string, keyBase64: string): string {
+  return keyedIndex(normalizeEmailIdentity(email), keyBase64);
+}
+
+/** A keyed hash of the exact address an account is looked up by; `+tag` variants each get their own. */
+export function accountEmailIndex(email: string, keyBase64: string): string {
+  return keyedIndex(normalizeEmail(email), keyBase64);
 }

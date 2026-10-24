@@ -234,6 +234,12 @@ Run once, after all work is complete:
   A test file you touch is pruned (`testing-practices` → "When you touch a
   test file"): list each test removed or moved, with the test that still
   asserts its behaviour.
+- **Reuse** (required): one line per const, literal value, fixture, builder,
+  fake or helper the diff adds — what you searched
+  (`packages/config/const-index.json`, the workspace's `src/testing/` and
+  `__mocks__/`, the nearest sibling) and the result: `reused <name> (<file>)`
+  or `none found — added <name>`. Write "nothing added" only when the diff
+  adds none (CLAUDE.md → "Reuse before you create").
 - Exported functions and signatures
   (`queries.bookmarks.addBookmark(tenantId, userId, postId): Promise<TResult<TBookmark, TErrorCode>>`).
 - View-model types the calling app's agent (`web` or `platform-app`) will

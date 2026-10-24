@@ -134,6 +134,10 @@ fake or helper before writing one:
 - An extend-or-add-alongside call that the existing one's callers and
   `SPEC.md` do not settle: put it in your report as an explicit question.
 
+Made-up data is seeded `faker`, and a workspace without `@faker-js/faker`
+gets a question in your report, never the dependency (testing-practices →
+"Where tests live").
+
 Inputs and expectations use the const `packages/config/CONSTANTS.md` names
 (`toBe(HTTP_STATUS.NOT_FOUND)`, never `404`), and a value a test file writes a
 second time becomes a const at the top of that file (testing-practices →
@@ -157,6 +161,12 @@ deletion stays as it was, so it still runs):
   Write "nothing found" only after reading them. List each test removed or
   moved, with the test (file and `it` title) that still asserts its
   behaviour.
+- **Reuse** (required): one line per const, literal value, fixture, builder,
+  fake or helper the diff adds — what you searched
+  (`packages/config/const-index.json`, the workspace's `src/testing/` and
+  `__mocks__/`, the nearest sibling) and the result: `reused <name> (<file>)`
+  or `none found — added <name>`. Write "nothing added" only when the diff
+  adds none (CLAUDE.md → "Reuse before you create").
 - **Files**: the absolute path of every test file added or changed, and
   separately every file to be deleted.
 - Test cases **added** and **removed** as two counts, then one line per file

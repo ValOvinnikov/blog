@@ -1,7 +1,8 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
+import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 import { and, eq } from 'drizzle-orm';
 
 export async function getSubscriberByEmailIndex(
@@ -14,7 +15,7 @@ export async function getSubscriberByEmailIndex(
     .where(
       and(
         eq(subscribers.tenantId, tenantId),
-        eq(subscribers.emailIndex, requirePersonalEmailIndex(email)),
+        eq(subscribers.emailIndex, requireEmailIndex(email, personalDataIndex)),
       ),
     );
 

@@ -33,11 +33,3 @@ export const listTouchedSourceFiles = (base) =>
     .filter((file) => /\.tsx?$/.test(file) && !file.endsWith('.d.ts'))
     .filter((file) => existsSync(join(repoRoot, file)))
     .sort();
-
-export const readBaseVersion = (base, file) => {
-  try {
-    return git(['show', `${base}:${file}`]);
-  } catch {
-    return '';
-  }
-};

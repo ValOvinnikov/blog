@@ -61,14 +61,31 @@ not to test", and treats "nothing to add" as a complete outcome.
   `src/testing/` — and `packages/service/src/testing/` for raw Sanity shapes —
   and reuse the builder with overrides, even from a directory the test would
   not otherwise touch. A generic entity with no builder yet gets one in
-  `testing/` in the same PR, not inline "for now".
+  `testing/` in the same PR, not inline "for now". The same search covers a
+  fixed fake value: a `MOCK_` const in `testing/` or a `__mocks__/` default
+  that already holds it is imported, never retyped.
+- **Made-up data comes from `@faker-js/faker` — required where the workspace
+  has it.** An id, name, email, title, slug, URL or body text a test or
+  fixture invents is a `faker` call (`faker.string.uuid()`,
+  `faker.person.fullName()`, `faker.internet.email()`,
+  `faker.lorem.sentence()`) held in a `MOCK_<THING>` const or a builder's
+  default — not a hand-typed `'user-1'`, `'Title'` or `'jane@example.com'`.
+  A test file that uses it calls `faker.seed(<number>)` at module top, so
+  every run draws the same values; stories may leave it unseeded. A value the
+  code reads by meaning — a status, locale, route or `_type` — is its const,
+  never faker.
+- **No `@faker-js/faker` in the workspace's `package.json` → ask before
+  adding it.** Check the workspace's own `package.json`, not the root's. If
+  the dependency is missing, put the question to the user — a subagent reports
+  it to the orchestrator, which asks — and add it only on a yes. Until then
+  the test uses hand-typed `MOCK_` consts.
 - **Test inputs and expectations use existing consts — required.** Check
   `packages/config/CONSTANTS.md` before typing a value into a test, and
   write `expect(response.status).toBe(HTTP_STATUS.NOT_FOUND)`, never `404`.
   A value a test file writes a second time becomes a const — or a `testing/`
   builder when it is entity-shaped (CLAUDE.md → "Reuse a const; never retype
-  its value"). `prefer-shared-constant`, `no-duplicate-string` and
-  `pnpm check:duplicate-literals` enforce this on touched test files too.
+  its value"). `prefer-shared-constant` and `no-duplicate-string` enforce this on
+  touched test files too.
   Using a const is not asserting it: `expect(HTTP_STATUS.NOT_FOUND).toBe(404)`
   still falls under "What not to test".
 - **Run:** `pnpm test`, `pnpm --filter <pkg> test`, `pnpm test:watch`. Run
@@ -123,8 +140,9 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
 
 - **Identities in fixtures are fake** — never a real person's name or email,
   the maintainer's included. `user.name`, `user.email`, `author.name`, avatar
-  `alt` and the like use placeholders (`'Jane Doe'`, `'jane@example.com'`) in
-  tests and stories alike.
+  `alt` and the like come from `faker` ("Where tests live"), or placeholders
+  (`'Jane Doe'`, `'jane@example.com'`) in a workspace without it, in tests and
+  stories alike.
 - **One behaviour per `it`, Arrange–Act–Assert, and the title states that
   behaviour in 80 characters or fewer.** It never names a prop, a mock, a
   helper or how the code gets there: "labels the region with the carousel
@@ -156,7 +174,9 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   the file is touched, never in a mass rename; a bare symbol on a component
   is fixed whenever the file is touched and never written new.
 
-- **Deterministic:** no real dates, network or randomness — inject or freeze.
+- **Deterministic:** no real dates, network or unseeded randomness — inject
+  or freeze. Seeded `faker` ("Where tests live") is the fake-data source, not
+  an exception.
 - **No nested `expect` — assert exact values.** Never an asymmetric matcher
   inside an assertion: `expect.objectContaining`, `expect.any`,
   `expect.anything`, `expect.stringContaining`, `expect.arrayContaining` or
@@ -549,6 +569,8 @@ have a test? Report gaps rather than leaving them silent.
       consts; no value written twice; no const's own value asserted.
 - [ ] A new exported fixture is `mock<Thing>()`; every fixed fake value,
       a test file's own `const` included, is `MOCK_<THING>`.
+- [ ] Made-up data is seeded `faker` where the workspace has it; where it
+      doesn't, adding it was asked, not done.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] No asymmetric matcher (`expect.objectContaining`, `expect.any`, …) inside
       an assertion; every expected value is exact.
