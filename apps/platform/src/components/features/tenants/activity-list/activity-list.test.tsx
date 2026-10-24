@@ -1,4 +1,5 @@
 import { AUDIT_ACTION } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import {
   mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
@@ -7,6 +8,10 @@ import {
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { ActivityList } from './activity-list';
+
+faker.seed(5783);
+
+const MOCK_SECOND_EVENT_ID = faker.string.uuid();
 
 const render = renderWithIntl;
 
@@ -23,7 +28,10 @@ describe(`<${ActivityList.name}/>`, () => {
       <ActivityList
         events={[
           mockAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
-          mockAuditEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
+          mockAuditEvent({
+            id: MOCK_SECOND_EVENT_ID,
+            action: AUDIT_ACTION.CREATED,
+          }),
         ]}
       />,
     );

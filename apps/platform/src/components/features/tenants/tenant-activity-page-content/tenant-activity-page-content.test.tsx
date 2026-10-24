@@ -3,6 +3,7 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { mockAuditEvent } from '@platform/testing/audit-events/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
@@ -12,6 +13,10 @@ import {
 import { redirect } from 'next/navigation';
 
 import { TenantActivityPageContent } from './tenant-activity-page-content';
+
+faker.seed(5783);
+
+const MOCK_SECOND_EVENT_ID = faker.string.uuid();
 
 const { listAuditEventsForTargetMock, countAuditEventsForTargetMock } =
   vi.hoisted(() => ({
@@ -60,7 +65,10 @@ describe(TenantActivityPageContent, () => {
   it('renders the activity with the page position', async () => {
     listAuditEventsForTargetMock.mockResolvedValue([
       mockAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
-      mockAuditEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
+      mockAuditEvent({
+        id: MOCK_SECOND_EVENT_ID,
+        action: AUDIT_ACTION.CREATED,
+      }),
     ]);
     countAuditEventsForTargetMock.mockResolvedValue(30);
 

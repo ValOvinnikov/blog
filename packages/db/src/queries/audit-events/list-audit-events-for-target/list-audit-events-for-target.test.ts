@@ -5,9 +5,13 @@ import {
   type TAuditTargetType,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import { MOCK_OPERATOR_EMAIL } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { listAuditEventsForTarget } from './list-audit-events-for-target';
+
+faker.seed(5783);
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -15,7 +19,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const MOCK_TARGET_ID = 'tenant-1';
+const MOCK_TARGET_ID = faker.string.uuid();
 
 async function insertEvent(overrides: {
   targetType: TAuditTargetType;
@@ -27,8 +31,8 @@ async function insertEvent(overrides: {
   await db()
     .insert(schema.auditEvents)
     .values({
-      actorId: 'admin-1',
-      actorEmail: overrides.actorEmail ?? 'admin-1@example.com',
+      actorId: faker.string.uuid(),
+      actorEmail: overrides.actorEmail ?? MOCK_OPERATOR_EMAIL,
       action: overrides.action ?? AUDIT_ACTION.DEPROVISIONED,
       targetType: overrides.targetType,
       targetId: overrides.targetId,
@@ -139,7 +143,7 @@ describe(listAuditEventsForTarget, () => {
     });
     await insertEvent({
       targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: 'tenant-2',
+      targetId: faker.string.uuid(),
       createdAt: new Date(2026, 0, 1),
     });
     await insertEvent({

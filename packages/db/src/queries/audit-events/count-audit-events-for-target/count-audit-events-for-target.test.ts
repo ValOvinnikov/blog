@@ -6,6 +6,8 @@ import { faker } from '@faker-js/faker';
 
 import { countAuditEventsForTarget } from './count-audit-events-for-target';
 
+faker.seed(5783);
+
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));

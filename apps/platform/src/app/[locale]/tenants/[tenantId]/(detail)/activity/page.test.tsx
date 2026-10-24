@@ -10,6 +10,8 @@ import type { Session } from 'next-auth';
 
 import TenantActivityPage from './page';
 
+faker.seed(5783);
+
 const {
   getAdminByUserIdMock,
   getTenantByIdMock,
