@@ -1,10 +1,20 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { mockInboxLead } from '@platform/testing/leads/fixtures';
+import {
+  renderWithIntl,
+  screen,
+  waitFor,
+} from '@platform/testing/custom-render';
+import {
+  MOCK_LEAD_SOURCE_PATH,
+  mockInboxLead,
+} from '@platform/testing/leads/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { LeadPageSource } from './lead-page-source';
+
+faker.seed(5757);
 
 const { getLeadPageTitleActionMock } = vi.hoisted(() => ({
   getLeadPageTitleActionMock: vi.fn(),
@@ -14,81 +24,95 @@ vi.mock('@platform/server/leads/get-lead-page-title-action', () => ({
   getLeadPageTitleAction: getLeadPageTitleActionMock,
 }));
 
-const SOURCE_PATH = '/en/hire-me';
-const DOCUMENT_ID = 'page-hire-me';
-const PAGE_TITLE = 'Hire me';
-
-const leadFromPage = mockInboxLead({
-  sourcePath: SOURCE_PATH,
-  sourceDocumentId: DOCUMENT_ID,
+const MOCK_DOCUMENT_ID = faker.string.alphanumeric(12);
+const MOCK_PAGE_TITLE = faker.lorem.words(3);
+const MOCK_LEAD_FROM_PAGE = mockInboxLead({
+  sourceDocumentId: MOCK_DOCUMENT_ID,
   sourceLocale: LOCALE_ISO_CODES.DE,
 });
 
-const renderSource = (lead = leadFromPage) =>
+const renderSources = (count = 1, lead = MOCK_LEAD_FROM_PAGE) =>
   renderWithIntl(
     <LeadsTenantProvider tenantId={MOCK_TENANT_ID}>
-      <LeadPageSource lead={lead} />
+      {Array.from({ length: count }, (_, index) => (
+        <LeadPageSource key={index} lead={lead} />
+      ))}
     </LeadsTenantProvider>,
   );
 
 describe(`<${LeadPageSource.name}/>`, () => {
   beforeEach(() => {
     getLeadPageTitleActionMock.mockReset();
-    getLeadPageTitleActionMock.mockResolvedValue(PAGE_TITLE);
+    getLeadPageTitleActionMock.mockResolvedValue(MOCK_PAGE_TITLE);
   });
 
-  it("shows the stored path, then swaps in the page's title and language", async () => {
-    renderSource();
+  describe('for a lead from a recorded page', () => {
+    beforeEach(() => {
+      renderSources();
+    });
 
-    expect(screen.getByText(SOURCE_PATH)).toBeVisible();
-    expect(await screen.findByText(PAGE_TITLE)).toBeVisible();
-    expect(screen.getByText('German')).toBeVisible();
-    expect(screen.queryByText(SOURCE_PATH)).not.toBeInTheDocument();
-    expect(getLeadPageTitleActionMock).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
-      documentId: DOCUMENT_ID,
-      locale: LOCALE_ISO_CODES.DE,
+    it('shows the stored path until the title arrives', () => {
+      const path = screen.getByText(MOCK_LEAD_SOURCE_PATH);
+
+      expect(path).toBeVisible();
+    });
+
+    it("swaps the path for the page's title and language", async () => {
+      const title = await screen.findByText(MOCK_PAGE_TITLE);
+      const language = screen.getByText('German');
+      const path = screen.queryByText(MOCK_LEAD_SOURCE_PATH);
+
+      expect(title).toBeVisible();
+      expect(language).toBeVisible();
+      expect(path).not.toBeInTheDocument();
+    });
+
+    it('asks for the page in the language the message was sent in', async () => {
+      await screen.findByText(MOCK_PAGE_TITLE);
+
+      expect(getLeadPageTitleActionMock).toHaveBeenCalledWith({
+        tenantId: MOCK_TENANT_ID,
+        documentId: MOCK_DOCUMENT_ID,
+        locale: LOCALE_ISO_CODES.DE,
+      });
     });
   });
 
-  it('keeps the path when the title is not available', async () => {
-    getLeadPageTitleActionMock.mockResolvedValue(undefined);
-    renderSource();
+  it.each([
+    [
+      'the title is not available',
+      () => getLeadPageTitleActionMock.mockResolvedValue(undefined),
+    ],
+    [
+      'the call fails',
+      () => getLeadPageTitleActionMock.mockRejectedValue(new Error()),
+    ],
+  ])('keeps the path when %s', async (_label, arrange) => {
+    arrange();
+    renderSources();
 
-    await vi.waitFor(() =>
-      expect(getLeadPageTitleActionMock).toHaveBeenCalled(),
+    await waitFor(() =>
+      expect(getLeadPageTitleActionMock).toHaveBeenCalledTimes(1),
     );
-    expect(screen.getByText(SOURCE_PATH)).toBeVisible();
+    const path = screen.getByText(MOCK_LEAD_SOURCE_PATH);
+    expect(path).toBeVisible();
   });
 
-  it('keeps the path when the call fails', async () => {
-    getLeadPageTitleActionMock.mockRejectedValue(new Error('offline'));
-    renderSource();
+  it('asks the website once for a page shown twice in the same visit', async () => {
+    renderSources(2);
 
-    await vi.waitFor(() =>
-      expect(getLeadPageTitleActionMock).toHaveBeenCalled(),
-    );
-    expect(screen.getByText(SOURCE_PATH)).toBeVisible();
-  });
+    const titles = await screen.findAllByText(MOCK_PAGE_TITLE);
 
-  it('asks the website nothing for a lead sent before pages were recorded', () => {
-    renderSource(mockInboxLead({ sourcePath: '/' }));
-
-    expect(screen.getByText('Home page')).toBeVisible();
-    expect(getLeadPageTitleActionMock).not.toHaveBeenCalled();
-  });
-
-  it('asks the website once when the same page is shown again in the same visit', async () => {
-    const { rerender } = renderSource();
-    await screen.findByText(PAGE_TITLE);
-
-    rerender(
-      <LeadsTenantProvider tenantId={MOCK_TENANT_ID}>
-        <LeadPageSource lead={{ ...leadFromPage }} key="reopened" />
-      </LeadsTenantProvider>,
-    );
-
-    expect(await screen.findByText(PAGE_TITLE)).toBeVisible();
+    expect(titles).toHaveLength(2);
     expect(getLeadPageTitleActionMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks nothing for a lead sent before pages were recorded', () => {
+    renderSources(1, mockInboxLead({ sourcePath: '/' }));
+
+    const homePage = screen.getByText('Home page');
+
+    expect(homePage).toBeVisible();
+    expect(getLeadPageTitleActionMock).not.toHaveBeenCalled();
   });
 });

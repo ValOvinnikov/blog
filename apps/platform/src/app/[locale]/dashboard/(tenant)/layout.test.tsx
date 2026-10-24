@@ -1,13 +1,17 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { TENANT_PLAN, MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
+  MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
-  MOCK_TENANT_NAME,
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -45,9 +49,7 @@ vi.mock('@blog/db', async () => ({
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
-    tenants: {
-      listTenants: listTenantsMock,
-    },
+    tenants: { listTenants: listTenantsMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
     leads: {
       countLeadsForTenant: countLeadsForTenantMock,
@@ -61,67 +63,48 @@ vi.mock('next/headers', () => ({
   headers: async () => new Headers(),
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-
-const tenant1 = {
-  id: MOCK_TENANT_ID,
-  name: MOCK_TENANT_NAME,
-  primaryDomain: 'acme.com',
-  plan: TENANT_PLAN.FREE,
-};
-const tenant2 = {
+const MOCK_FREE_TENANT = mockTenant({ plan: TENANT_PLAN.FREE });
+const MOCK_GROWTH_TENANT = mockTenant({
   id: MOCK_OTHER_TENANT_ID,
   name: MOCK_OTHER_TENANT_NAME,
-  primaryDomain: 'globex.com',
+  primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
   plan: TENANT_PLAN.GROWTH,
-};
-const membership1 = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: MOCK_TENANT_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-};
-const membership2 = {
-  id: 'm-2',
-  userId: 'user-1',
+});
+const MOCK_FREE_MEMBERSHIP = mockMembership({ tenantId: MOCK_TENANT_ID });
+const MOCK_GROWTH_MEMBERSHIP = mockMembership({
   tenantId: MOCK_OTHER_TENANT_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-};
+});
+const MOCK_DASHBOARD_CONTENT = 'dashboard content';
+const MOCK_STORED_LEADS_COUNT = 3;
+const MOCK_UNREAD_LEADS_COUNT = 3;
+const LEADS = 'Leads';
+const TEAM = 'Team';
 
-const mockCookie = (value: string | undefined) => {
+const mockActiveTenantCookie = (value: string | undefined) => {
   cookiesMock.mockResolvedValue({
     get: vi.fn(() => (value === undefined ? undefined : { value })),
   });
 };
 
-const setup = customRenderAsync(DashboardTenantLayout, {
-  children: <div>dashboard content</div>,
-});
+const switcherNamed = (domain: string) => (name: string) =>
+  name.includes(domain);
 
-const DASHBOARD_CONTENT = 'dashboard content';
-const LEADS = 'Leads';
-const TEAM = 'Team';
+const setup = customRenderAsync(DashboardTenantLayout, {
+  children: <div>{MOCK_DASHBOARD_CONTENT}</div>,
+});
 
 describe(`<${DashboardTenantLayout.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    listMembershipsWithTenantsForUserMock.mockReset();
-    listTenantsMock.mockReset();
-    getAdminByUserIdMock.mockReset();
+    vi.mocked(auth).mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    countLeadsForTenantMock.mockReset();
     countLeadsForTenantMock.mockResolvedValue(0);
-    countUnreadLeadsForTenantMock.mockReset();
     countUnreadLeadsForTenantMock.mockResolvedValue(0);
-    cookiesMock.mockReset();
-    resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership: membership1, tenant: tenant1 },
-      { membership: membership2, tenant: tenant2 },
+      { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
+      { membership: MOCK_GROWTH_MEMBERSHIP, tenant: MOCK_GROWTH_TENANT },
     ]);
-    mockCookie(MOCK_OTHER_TENANT_ID);
+    mockActiveTenantCookie(MOCK_OTHER_TENANT_ID);
   });
 
   it('offers Leads on a plan with the contact form', async () => {
@@ -133,20 +116,20 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it("shows the site's unread lead count beside Leads", async () => {
-    countUnreadLeadsForTenantMock.mockResolvedValue(3);
+    countUnreadLeadsForTenantMock.mockResolvedValue(MOCK_UNREAD_LEADS_COUNT);
 
     await setup();
 
-    expect(screen.getByRole('link', { name: /Leads/ })).toHaveTextContent(
-      '3 new',
-    );
+    const leadsLink = screen.getByRole('link', { name: /Leads/ });
+
+    expect(leadsLink).toHaveTextContent(`${MOCK_UNREAD_LEADS_COUNT} new`);
     expect(countUnreadLeadsForTenantMock).toHaveBeenCalledWith(
       MOCK_OTHER_TENANT_ID,
     );
   });
 
   it('hides Leads from a plan without the contact form and no stored leads', async () => {
-    mockCookie(MOCK_TENANT_ID);
+    mockActiveTenantCookie(MOCK_TENANT_ID);
 
     await setup();
 
@@ -156,8 +139,8 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('keeps Leads for a downgraded owner who still has stored leads', async () => {
-    mockCookie(MOCK_TENANT_ID);
-    countLeadsForTenantMock.mockResolvedValue(3);
+    mockActiveTenantCookie(MOCK_TENANT_ID);
+    countLeadsForTenantMock.mockResolvedValue(MOCK_STORED_LEADS_COUNT);
 
     await setup();
 
@@ -169,8 +152,8 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   it('hides Leads from an editor', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       {
-        membership: { ...membership2, role: MEMBERSHIP_ROLE.EDITOR },
-        tenant: tenant2,
+        membership: { ...MOCK_GROWTH_MEMBERSHIP, role: MEMBERSHIP_ROLE.EDITOR },
+        tenant: MOCK_GROWTH_TENANT,
       },
     ]);
 
@@ -181,8 +164,8 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(leadsLink).not.toBeInTheDocument();
   });
 
-  it('redirects to sign-in without querying memberships when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('redirects to sign-in without querying memberships when signed out', async () => {
+    vi.mocked<() => Promise<Session | null>>(auth).mockResolvedValueOnce(null);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
@@ -190,7 +173,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
+  it('redirects to /workspace-pending for a user with no memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
@@ -199,62 +182,59 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
   });
 
   it('redirects to the picker for several memberships and no active-tenant cookie', async () => {
-    mockCookie(undefined);
+    mockActiveTenantCookie(undefined);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith(adminRoutes.dashboardSelectTenant());
   });
 
-  it('renders the active tenant and a switcher for several memberships with the cookie', async () => {
+  it('renders the active tenant and a switcher for several memberships', async () => {
     await setup();
 
-    const content = screen.getByText(DASHBOARD_CONTENT);
-    const switcher = screen.getByRole('button', { name: /globex\.com/i });
+    const content = screen.getByText(MOCK_DASHBOARD_CONTENT);
+    const switcher = screen.getByRole('button', {
+      name: switcherNamed(MOCK_OTHER_TENANT_DOMAIN),
+    });
 
     expect(content).toBeVisible();
     expect(switcher).toBeVisible();
   });
 
   describe('with one membership', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       listMembershipsWithTenantsForUserMock.mockResolvedValue([
-        { membership: membership1, tenant: tenant1 },
+        { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
       ]);
+      await setup();
     });
 
-    it('renders the gated content with no switcher for a user with one membership', async () => {
-      await setup();
-
-      const content = screen.getByText(DASHBOARD_CONTENT);
-      const switcher = screen.queryByRole('button', { name: /acme\.com/i });
+    it('renders the gated content with no switcher', () => {
+      const content = screen.getByText(MOCK_DASHBOARD_CONTENT);
+      const switcher = screen.queryByRole('button', {
+        name: switcherNamed(MOCK_TENANT_DOMAIN),
+      });
 
       expect(content).toBeVisible();
       expect(redirect).not.toHaveBeenCalled();
       expect(switcher).not.toBeInTheDocument();
     });
 
-    it('shows Tenant nav destinations under /dashboard, without a Platform section', async () => {
-      await setup();
-
+    it('shows Tenant nav destinations under /dashboard, without a Platform section', () => {
       const lookLink = screen.getByRole('link', { name: /look/i });
       const platformSection = screen.queryByText('Platform');
 
       expect(lookLink).toHaveAttribute('href', adminRoutes.dashboardLook());
       expect(platformSection).not.toBeInTheDocument();
     });
-  });
 
-  it('hides Languages and Team from a FREE tenant', async () => {
-    mockCookie(MOCK_TENANT_ID);
+    it('hides Languages and Team from a FREE tenant', () => {
+      const languagesLink = screen.queryByRole('link', { name: /languages/i });
+      const teamText = screen.queryByText(TEAM);
 
-    await setup();
-
-    const languagesLink = screen.queryByRole('link', { name: /languages/i });
-    const teamText = screen.queryByText(TEAM);
-
-    expect(languagesLink).not.toBeInTheDocument();
-    expect(teamText).not.toBeInTheDocument();
+      expect(languagesLink).not.toBeInTheDocument();
+      expect(teamText).not.toBeInTheDocument();
+    });
   });
 
   it('shows Languages as a link and Team as "Coming soon" to a GROWTH tenant', async () => {
@@ -272,18 +252,16 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(teamLink).not.toBeInTheDocument();
   });
 
-  it('shows the platform role, never OWNER, for a SUPERADMIN with no memberships row', async () => {
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: ADMIN_ROLE.SUPERADMIN,
-      createdAt: new Date(),
-    });
-    listTenantsMock.mockResolvedValue([tenant1]);
+  it('shows the platform role, never OWNER, for a SUPERADMIN with no memberships', async () => {
+    getAdminByUserIdMock.mockResolvedValue(
+      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+    );
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
+    listTenantsMock.mockResolvedValue([MOCK_FREE_TENANT]);
 
     await setup();
 
-    const content = screen.getByText(DASHBOARD_CONTENT);
+    const content = screen.getByText(MOCK_DASHBOARD_CONTENT);
     const platformRole = screen.getByText('Super admin · Platform');
     const ownerText = screen.queryByText(/Owner/);
 

@@ -1,44 +1,51 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
 
 import { formatShortDateTime } from './format-short-date-time';
 
-const NOW = new Date('2026-10-24T15:00:00.000Z');
-const YESTERDAY = 'Yesterday';
-const EARLIER_THIS_YEAR = '2026-10-19T12:00:00.000Z';
-
-const format = (iso: string) =>
-  formatShortDateTime({
-    date: new Date(iso),
-    now: NOW,
-    locale: LOCALE_ISO_CODES.EN,
-    yesterdayLabel: YESTERDAY,
-  });
+const MOCK_NOW = new Date('2026-10-24T15:00:00.000Z');
+const MOCK_YESTERDAY_LABEL = 'Yesterday';
+const MOCK_EARLIER_THIS_YEAR = '2026-10-19T12:00:00.000Z';
 
 describe(formatShortDateTime, () => {
-  it('shows only the time for a moment earlier today', () => {
-    expect(format('2026-10-24T09:05:00.000Z')).toBe('9:05 AM');
-  });
+  it.each<[string, TLocaleIsoCode, string, string]>([
+    [
+      'only the time earlier today',
+      LOCALE_ISO_CODES.EN,
+      '2026-10-24T09:05:00.000Z',
+      '9:05 AM',
+    ],
+    [
+      'the yesterday label for yesterday',
+      LOCALE_ISO_CODES.EN,
+      '2026-10-23T23:59:00.000Z',
+      MOCK_YESTERDAY_LABEL,
+    ],
+    [
+      'the day and month earlier this year',
+      LOCALE_ISO_CODES.EN,
+      MOCK_EARLIER_THIS_YEAR,
+      'Oct 19',
+    ],
+    [
+      'the year too for an earlier year',
+      LOCALE_ISO_CODES.EN,
+      '2025-12-31T12:00:00.000Z',
+      'Dec 31, 2025',
+    ],
+    [
+      "the date in the locale's own order",
+      LOCALE_ISO_CODES.DE,
+      MOCK_EARLIER_THIS_YEAR,
+      '19. Okt.',
+    ],
+  ])('shows %s', (_label, locale, isoDate, expected) => {
+    const formatted = formatShortDateTime({
+      date: new Date(isoDate),
+      now: MOCK_NOW,
+      locale,
+      yesterdayLabel: MOCK_YESTERDAY_LABEL,
+    });
 
-  it('shows the yesterday label for a moment yesterday', () => {
-    expect(format('2026-10-23T23:59:00.000Z')).toBe(YESTERDAY);
-  });
-
-  it('shows the day and month for an earlier day this year', () => {
-    expect(format(EARLIER_THIS_YEAR)).toBe('Oct 19');
-  });
-
-  it('adds the year for a day in an earlier year', () => {
-    expect(format('2025-12-31T12:00:00.000Z')).toBe('Dec 31, 2025');
-  });
-
-  it("follows the locale's own date order", () => {
-    expect(
-      formatShortDateTime({
-        date: new Date(EARLIER_THIS_YEAR),
-        now: NOW,
-        locale: LOCALE_ISO_CODES.DE,
-        yesterdayLabel: YESTERDAY,
-      }),
-    ).toBe('19. Okt.');
+    expect(formatted).toBe(expected);
   });
 });

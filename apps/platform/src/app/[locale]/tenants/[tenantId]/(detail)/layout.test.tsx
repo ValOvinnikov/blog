@@ -1,12 +1,13 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_DOMAIN,
-  MOCK_TENANT_NAME,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -41,38 +42,25 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const MOCK_TENANT_CONTENT = 'tenant content';
+const MOCK_UNREAD_LEADS_COUNT = 2;
 
 const setup = customRenderAsync(TenantDetailLayout, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
-  children: <div>tenant content</div>,
+  children: <div>{MOCK_TENANT_CONTENT}</div>,
 });
 
 describe(`<${TenantDetailLayout.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getTenantByIdMock.mockReset();
-    resolveIsSidebarCollapsedMock.mockReset();
+    vi.mocked(auth).mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
-    countUnreadLeadsForTenantMock.mockReset();
     countUnreadLeadsForTenantMock.mockResolvedValue(0);
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: ADMIN_ROLE.ADMIN,
-      createdAt: new Date(),
-    });
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      name: MOCK_TENANT_NAME,
-      primaryDomain: MOCK_TENANT_DOMAIN,
-    });
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getTenantByIdMock.mockResolvedValue(mockReadyTenant());
   });
 
   it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+    vi.mocked<() => Promise<Session | null>>(auth).mockResolvedValueOnce(null);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
@@ -87,48 +75,41 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('renders the gated content for a platform operator', async () => {
-    await setup();
+  describe('for a platform operator', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    const content = screen.getByText('tenant content');
+    it('renders the gated content', () => {
+      const content = screen.getByText(MOCK_TENANT_CONTENT);
 
-    expect(content).toBeVisible();
-    expect(redirect).not.toHaveBeenCalled();
-  });
+      expect(content).toBeVisible();
+      expect(redirect).not.toHaveBeenCalled();
+    });
 
-  it('renders both the Platform and Tenant sections in the sidebar', async () => {
-    await setup();
+    it('renders both the Platform and Tenant sections in the sidebar', () => {
+      const platformSection = screen.getByText('Platform', { selector: 'p' });
+      const tenantSection = screen.getByText(`Tenant · ${MOCK_TENANT_NAME}`);
 
-    const platformSection = screen.getByText('Platform', { selector: 'p' });
-    const tenantSection = screen.getByText(`Tenant · ${MOCK_TENANT_NAME}`);
+      expect(platformSection).toBeVisible();
+      expect(tenantSection).toBeVisible();
+    });
 
-    expect(platformSection).toBeVisible();
-    expect(tenantSection).toBeVisible();
+    it('renders no tenant switcher in the sidebar', () => {
+      const tenantDomain = screen.queryByText(MOCK_TENANT_DOMAIN);
+
+      expect(tenantDomain).not.toBeInTheDocument();
+    });
   });
 
   it("shows the tenant's unread lead count beside Leads", async () => {
-    countUnreadLeadsForTenantMock.mockResolvedValue(2);
+    countUnreadLeadsForTenantMock.mockResolvedValue(MOCK_UNREAD_LEADS_COUNT);
 
     await setup();
 
-    expect(screen.getByRole('link', { name: /Leads/ })).toHaveTextContent(
-      '2 new',
-    );
+    const leadsLink = screen.getByRole('link', { name: /Leads/ });
+
+    expect(leadsLink).toHaveTextContent(`${MOCK_UNREAD_LEADS_COUNT} new`);
     expect(countUnreadLeadsForTenantMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-  });
-
-  it('renders no tenant switcher in the sidebar', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      slug: 'acme',
-      name: MOCK_TENANT_NAME,
-      primaryDomain: MOCK_TENANT_DOMAIN,
-    });
-
-    await setup();
-
-    const tenantDomain = screen.queryByText(MOCK_TENANT_DOMAIN);
-
-    expect(tenantDomain).not.toBeInTheDocument();
   });
 });

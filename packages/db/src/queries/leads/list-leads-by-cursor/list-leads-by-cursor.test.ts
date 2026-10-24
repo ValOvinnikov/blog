@@ -21,11 +21,12 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const LEAD_COUNT = LEADS_PAGE_SIZE + 5;
+const MOCK_LEAD_COUNT = LEADS_PAGE_SIZE + 5;
 const MINUTE_MS = 60_000;
-const START = Date.UTC(2026, 0, 1);
-const EARLIER_MICROSECOND = 'Earlier microsecond';
-const LATER_MICROSECOND = 'Later microsecond';
+const MOCK_START = Date.UTC(2026, 0, 1);
+const MOCK_EARLIER_MICROSECOND_NAME = 'Earlier microsecond';
+const MOCK_LATER_MICROSECOND_NAME = 'Later microsecond';
+const MOCK_LATE_LEAD_NAME = 'Arrived later';
 
 function insertEncryptedLead(
   tenantId: string,
@@ -49,7 +50,7 @@ async function insertLeadsOneMinuteApart(tenantId: string, count: number) {
   for (let index = 0; index < count; index += 1) {
     await insertEncryptedLead(tenantId, {
       name: leadName(index),
-      createdAt: new Date(START + index * MINUTE_MS),
+      createdAt: new Date(MOCK_START + index * MINUTE_MS),
     });
   }
 }
@@ -85,14 +86,13 @@ describe(listLeadsByCursor, () => {
   });
 
   it('returns no leads and no next cursor when the tenant has none', async () => {
-    await expect(listLeadsByCursor({ tenantId })).resolves.toEqual({
-      leads: [],
-      nextCursor: undefined,
-    });
+    const page = await listLeadsByCursor({ tenantId });
+
+    expect(page).toEqual({ leads: [], nextCursor: undefined });
   });
 
   it('returns the name, email and message from their encrypted form', async () => {
-    await insertTestLead(db(), tenantId, {
+    const { id, sourcePath, createdAt } = await insertTestLead(db(), tenantId, {
       name: '',
       email: '',
       message: '',
@@ -104,16 +104,22 @@ describe(listLeadsByCursor, () => {
     const { leads } = await listLeadsByCursor({ tenantId });
 
     expect(leads).toEqual([
-      expect.objectContaining({
+      {
+        id,
         name: MOCK_LEAD_NAME,
         email: MOCK_LEAD_EMAIL,
         message: MOCK_LEAD_MESSAGE,
-      }),
+        sourcePath,
+        sourceDocumentId: null,
+        sourceLocale: null,
+        readAt: null,
+        createdAt,
+      },
     ]);
   });
 
   it('pages through every lead once, newest first', async () => {
-    await insertLeadsOneMinuteApart(tenantId, LEAD_COUNT);
+    await insertLeadsOneMinuteApart(tenantId, MOCK_LEAD_COUNT);
 
     const first = await listLeadsByCursor({ tenantId });
     const second = await listLeadsByCursor({
@@ -124,17 +130,17 @@ describe(listLeadsByCursor, () => {
     expect(first.leads).toHaveLength(LEADS_PAGE_SIZE);
     expect(second.nextCursor).toBeUndefined();
     expect([...first.leads, ...second.leads].map(({ name }) => name)).toEqual(
-      newestFirstNames(LEAD_COUNT),
+      newestFirstNames(MOCK_LEAD_COUNT),
     );
   });
 
   it('neither repeats nor skips a lead when a new one arrives between calls', async () => {
-    await insertLeadsOneMinuteApart(tenantId, LEAD_COUNT);
+    await insertLeadsOneMinuteApart(tenantId, MOCK_LEAD_COUNT);
     const first = await listLeadsByCursor({ tenantId });
 
     await insertEncryptedLead(tenantId, {
-      name: 'Arrived later',
-      createdAt: new Date(START + LEAD_COUNT * MINUTE_MS),
+      name: MOCK_LATE_LEAD_NAME,
+      createdAt: new Date(MOCK_START + MOCK_LEAD_COUNT * MINUTE_MS),
     });
     const second = await listLeadsByCursor({
       tenantId,
@@ -142,7 +148,7 @@ describe(listLeadsByCursor, () => {
     });
 
     expect([...first.leads, ...second.leads].map(({ name }) => name)).toEqual(
-      newestFirstNames(LEAD_COUNT),
+      newestFirstNames(MOCK_LEAD_COUNT),
     );
   });
 
@@ -150,12 +156,12 @@ describe(listLeadsByCursor, () => {
     await insertLeadsOneMinuteApart(tenantId, LEADS_PAGE_SIZE - 1);
     await insertLeadAtExactTime(
       tenantId,
-      EARLIER_MICROSECOND,
+      MOCK_EARLIER_MICROSECOND_NAME,
       '2025-12-31 00:00:00.000100+00',
     );
     await insertLeadAtExactTime(
       tenantId,
-      LATER_MICROSECOND,
+      MOCK_LATER_MICROSECOND_NAME,
       '2025-12-31 00:00:00.000200+00',
     );
 
@@ -165,13 +171,15 @@ describe(listLeadsByCursor, () => {
       after: first.nextCursor,
     });
 
-    expect(first.leads.at(-1)?.name).toBe(LATER_MICROSECOND);
-    expect(second.leads.map(({ name }) => name)).toEqual([EARLIER_MICROSECOND]);
+    expect(first.leads.at(-1)?.name).toBe(MOCK_LATER_MICROSECOND_NAME);
+    expect(second.leads.map(({ name }) => name)).toEqual([
+      MOCK_EARLIER_MICROSECOND_NAME,
+    ]);
   });
 
   it('orders leads created at the same moment by id, still listing each once', async () => {
-    const createdAt = new Date(START);
-    for (let index = 0; index < LEAD_COUNT; index += 1) {
+    const createdAt = new Date(MOCK_START);
+    for (let index = 0; index < MOCK_LEAD_COUNT; index += 1) {
       await insertEncryptedLead(tenantId, { createdAt });
     }
 
@@ -182,7 +190,7 @@ describe(listLeadsByCursor, () => {
     });
 
     const ids = [...first.leads, ...second.leads].map(({ id }) => id);
-    expect(new Set(ids).size).toBe(LEAD_COUNT);
+    expect(new Set(ids).size).toBe(MOCK_LEAD_COUNT);
   });
 
   it("never returns another tenant's leads", async () => {

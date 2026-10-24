@@ -1,4 +1,10 @@
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+  type TMembershipRole,
+  type TTenantPlan,
+} from '@blog/db/constants';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   mockReadyTenant,
   MOCK_TENANT_ID,
@@ -14,14 +20,13 @@ vi.mock('@blog/db', () => ({
   queries: { leads: { countLeadsForTenant: countLeadsForTenantMock } },
 }));
 
-const membershipOf = (role: string) =>
-  ({
-    id: 'm-1',
-    userId: 'user-1',
-    tenantId: MOCK_TENANT_ID,
-    role,
-    createdAt: new Date(0),
-  }) as Parameters<typeof resolveTenantPageAccess>[1];
+const MOCK_STORED_LEAD_COUNT = 2;
+
+const resolveFor = (plan: TTenantPlan, role: TMembershipRole) =>
+  resolveTenantPageAccess(
+    mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
+    mockMembership({ role }),
+  );
 
 describe(resolveTenantPageAccess, () => {
   beforeEach(() => {
@@ -29,43 +34,37 @@ describe(resolveTenantPageAccess, () => {
     countLeadsForTenantMock.mockResolvedValue(0);
   });
 
-  it('opens Leads for an owner on a plan with the contact form, without reading leads', async () => {
-    const access = await resolveTenantPageAccess(
-      mockReadyTenant({ plan: TENANT_PLAN.GROWTH }),
-      membershipOf(MEMBERSHIP_ROLE.OWNER),
+  it('opens Leads to an owner on a plan with the contact form', async () => {
+    const { leads } = await resolveFor(
+      TENANT_PLAN.GROWTH,
+      MEMBERSHIP_ROLE.OWNER,
     );
 
-    expect(access.leads).toBe(true);
+    expect(leads).toBe(true);
     expect(countLeadsForTenantMock).not.toHaveBeenCalled();
   });
 
   it('keeps Leads closed for a downgraded owner with no stored leads', async () => {
-    const access = await resolveTenantPageAccess(
-      mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE }),
-      membershipOf(MEMBERSHIP_ROLE.OWNER),
-    );
+    const { leads } = await resolveFor(TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER);
 
-    expect(access.leads).toBe(false);
+    expect(leads).toBe(false);
     expect(countLeadsForTenantMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('keeps Leads open for a downgraded owner with stored leads', async () => {
-    countLeadsForTenantMock.mockResolvedValue(2);
+    countLeadsForTenantMock.mockResolvedValue(MOCK_STORED_LEAD_COUNT);
 
-    const access = await resolveTenantPageAccess(
-      mockReadyTenant({ plan: TENANT_PLAN.FREE }),
-      membershipOf(MEMBERSHIP_ROLE.OWNER),
-    );
+    const { leads } = await resolveFor(TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER);
 
-    expect(access.leads).toBe(true);
+    expect(leads).toBe(true);
   });
 
-  it('closes Leads for an editor whatever the plan', async () => {
-    const access = await resolveTenantPageAccess(
-      mockReadyTenant({ plan: TENANT_PLAN.GROWTH }),
-      membershipOf(MEMBERSHIP_ROLE.EDITOR),
+  it('closes Leads to an editor whatever the plan', async () => {
+    const { leads } = await resolveFor(
+      TENANT_PLAN.GROWTH,
+      MEMBERSHIP_ROLE.EDITOR,
     );
 
-    expect(access.leads).toBe(false);
+    expect(leads).toBe(false);
   });
 });

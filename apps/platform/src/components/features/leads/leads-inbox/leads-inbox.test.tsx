@@ -1,18 +1,24 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import {
-  act,
   renderWithIntl,
   screen,
   waitFor,
   within,
 } from '@platform/testing/custom-render';
-import { mockInboxLead } from '@platform/testing/leads/fixtures';
+import {
+  MOCK_LEAD_ID,
+  MOCK_LEAD_NAME,
+  mockInboxLead,
+} from '@platform/testing/leads/fixtures';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LeadsInbox } from './leads-inbox';
+
+faker.seed(5757);
 
 const { setLeadReadActionMock, loadMoreLeadsActionMock } = vi.hoisted(() => ({
   setLeadReadActionMock: vi.fn(),
@@ -27,51 +33,50 @@ vi.mock('@platform/server/leads/load-more-leads-action', () => ({
   loadMoreLeadsAction: loadMoreLeadsActionMock,
 }));
 
-vi.mock('@platform/server/leads/get-lead-page-title-action', () => ({
-  getLeadPageTitleAction: vi.fn(),
-}));
+vi.mock('@platform/server/leads/get-lead-page-title-action');
 
-vi.mock('@platform/server/leads/delete-lead-action', () => ({
-  deleteLeadAction: vi.fn(),
-}));
+vi.mock('@platform/server/leads/delete-lead-action');
 
-const LEAD_ID = 'lead-1';
-const ADA = 'Ada Lovelace';
-const OLDER_LEAD_ID = 'lead-0';
-const OLDER_LEAD = 'Older lead';
-const NEXT_CURSOR = {
-  createdAt: '2026-04-01 09:30:00+00',
-  id: OLDER_LEAD_ID,
+const MOCK_OLDER_LEAD_ID = faker.string.uuid();
+const MOCK_OLDER_LEAD_NAME = faker.person.fullName();
+const MOCK_NEXT_CURSOR = {
+  createdAt: '2026-04-01 09:30:00.123456+00',
+  id: MOCK_OLDER_LEAD_ID,
 };
-const MARK_UNREAD = 'Mark unread';
-const UNREAD = 'Unread';
+const MOCK_UNREAD_LABEL = 'Unread';
 
-let observerCallback: IntersectionObserverCallback;
+class EndOfListInView {
+  constructor(private readonly callback: IntersectionObserverCallback) {}
 
-const reachEndOfList = () =>
-  act(() =>
-    observerCallback(
+  observe() {
+    this.callback(
       [{ isIntersecting: true } as IntersectionObserverEntry],
-      {} as IntersectionObserver,
-    ),
-  );
+      this as unknown as IntersectionObserver,
+    );
+  }
 
-const setup = (
-  leads = [mockInboxLead({ id: LEAD_ID, name: ADA })],
-  nextCursor?: typeof NEXT_CURSOR,
-) =>
+  disconnect() {}
+}
+
+const renderInbox = ({
+  leads = [mockInboxLead()],
+  nextCursor,
+}: {
+  leads?: ReturnType<typeof mockInboxLead>[];
+  nextCursor?: typeof MOCK_NEXT_CURSOR;
+} = {}) =>
   renderWithIntl(
     <LeadsTenantProvider tenantId={MOCK_TENANT_ID}>
       <LeadsInbox initialPage={{ leads, nextCursor }} />
     </LeadsTenantProvider>,
   );
 
-const rowFor = (name: string) =>
-  within(screen.getByRole('list')).getByRole('button', {
-    name: new RegExp(name),
+const getRow = (name: string) => {
+  const list = screen.getByRole('list');
+  return within(list).getByRole('button', {
+    name: (accessibleName) => accessibleName.includes(name),
   });
-
-const openLead = (user: UserEvent, name: string) => user.click(rowFor(name));
+};
 
 describe(`<${LeadsInbox.name}/>`, () => {
   let user: UserEvent;
@@ -85,120 +90,136 @@ describe(`<${LeadsInbox.name}/>`, () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     loadMoreLeadsActionMock.mockReset();
-    vi.stubGlobal(
-      'IntersectionObserver',
-      vi.fn(function (
-        this: IntersectionObserver,
-        callback: IntersectionObserverCallback,
-      ) {
-        observerCallback = callback;
-        return { observe: vi.fn(), disconnect: vi.fn() };
-      }),
-    );
+    vi.stubGlobal('IntersectionObserver', EndOfListInView);
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('marks an unread lead read when it opens, then refreshes the sidebar count', async () => {
-    setup();
-    const row = rowFor(ADA);
-    expect(row).toHaveTextContent(UNREAD);
+  describe('with an unread lead', () => {
+    let row: HTMLElement;
 
-    await openLead(user, ADA);
+    beforeEach(() => {
+      renderInbox();
+      row = getRow(MOCK_LEAD_NAME);
+    });
 
-    expect(setLeadReadActionMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      LEAD_ID,
-      true,
-    );
-    await waitFor(() => expect(refresh).toHaveBeenCalled());
-    expect(row).not.toHaveTextContent(UNREAD);
-    expect(screen.getByRole('heading', { name: ADA })).toBeVisible();
+    it('marks the lead unread in the list', () => {
+      expect(row).toHaveTextContent(MOCK_UNREAD_LABEL);
+    });
+
+    it('puts the read state back and says so when saving it fails', async () => {
+      setLeadReadActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+
+      await user.click(row);
+
+      const error = await screen.findByText(
+        "Couldn't update the message. Try again.",
+      );
+      expect(error).toBeVisible();
+      expect(row).toHaveTextContent(MOCK_UNREAD_LABEL);
+      expect(refresh).not.toHaveBeenCalled();
+    });
+
+    describe('once opened', () => {
+      beforeEach(async () => {
+        await user.click(row);
+      });
+
+      it('marks the lead read', () => {
+        expect(setLeadReadActionMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          MOCK_LEAD_ID,
+          true,
+        );
+        expect(row).not.toHaveTextContent(MOCK_UNREAD_LABEL);
+      });
+
+      it('refreshes the sidebar count', async () => {
+        await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
+      });
+
+      it('shows the message in the reading pane', () => {
+        const heading = screen.getByRole('heading', { name: MOCK_LEAD_NAME });
+
+        expect(heading).toBeVisible();
+      });
+
+      it('marks the lead unread again from the reading pane', async () => {
+        const markUnreadButton = screen.getByRole('button', {
+          name: 'Mark unread',
+        });
+
+        await user.click(markUnreadButton);
+
+        expect(setLeadReadActionMock).toHaveBeenLastCalledWith(
+          MOCK_TENANT_ID,
+          MOCK_LEAD_ID,
+          false,
+        );
+        expect(row).toHaveTextContent(MOCK_UNREAD_LABEL);
+      });
+
+      it('shows the list again after going back from the message', async () => {
+        const backButton = screen.getByRole('button', {
+          name: 'Back to messages',
+        });
+
+        await user.click(backButton);
+
+        const placeholder = screen.getByText('Select a message to read it.');
+        const heading = screen.queryByRole('heading', { name: MOCK_LEAD_NAME });
+        expect(placeholder).toBeVisible();
+        expect(heading).not.toBeInTheDocument();
+      });
+    });
   });
 
-  it('does not mark an already read lead again', async () => {
-    setup([mockInboxLead({ name: ADA, isRead: true })]);
+  it('does not mark a lead that is already read', async () => {
+    renderInbox({ leads: [mockInboxLead({ isRead: true })] });
+    const row = getRow(MOCK_LEAD_NAME);
 
-    await openLead(user, ADA);
+    await user.click(row);
 
     expect(setLeadReadActionMock).not.toHaveBeenCalled();
-  });
-
-  it('marks the lead unread again from the reading pane', async () => {
-    setup();
-    await openLead(user, ADA);
-
-    await user.click(screen.getByRole('button', { name: MARK_UNREAD }));
-
-    expect(setLeadReadActionMock).toHaveBeenLastCalledWith(
-      MOCK_TENANT_ID,
-      LEAD_ID,
-      false,
-    );
-    expect(rowFor(ADA)).toHaveTextContent(UNREAD);
-  });
-
-  it('puts the read state back and says so when saving it fails', async () => {
-    setLeadReadActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    setup();
-
-    await openLead(user, ADA);
-
-    expect(
-      await screen.findByText("Couldn't update the message. Try again."),
-    ).toBeVisible();
-    expect(rowFor(ADA)).toHaveTextContent(UNREAD);
-    expect(refresh).not.toHaveBeenCalled();
   });
 
   it('loads the next leads when the end of the list scrolls into view', async () => {
     loadMoreLeadsActionMock.mockResolvedValue({
       isLoaded: true,
       page: {
-        leads: [mockInboxLead({ id: OLDER_LEAD_ID, name: OLDER_LEAD })],
+        leads: [
+          mockInboxLead({ id: MOCK_OLDER_LEAD_ID, name: MOCK_OLDER_LEAD_NAME }),
+        ],
         nextCursor: undefined,
       },
     });
-    setup(undefined, NEXT_CURSOR);
 
-    reachEndOfList();
+    renderInbox({ nextCursor: MOCK_NEXT_CURSOR });
 
-    expect(await screen.findByText(OLDER_LEAD)).toBeVisible();
+    const olderLead = await screen.findByText(MOCK_OLDER_LEAD_NAME);
+    const list = screen.getByRole('list');
+    const items = within(list).getAllByRole('listitem');
+    expect(olderLead).toBeVisible();
+    expect(items).toHaveLength(2);
     expect(loadMoreLeadsActionMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      NEXT_CURSOR,
+      MOCK_NEXT_CURSOR,
     );
-    expect(
-      within(screen.getByRole('list')).getAllByRole('listitem'),
-    ).toHaveLength(2);
   });
 
-  it('offers to try again when loading more fails', async () => {
+  it('loads the next leads again when the owner retries a failed load', async () => {
     loadMoreLeadsActionMock.mockResolvedValue({ isLoaded: false });
-    setup(undefined, NEXT_CURSOR);
+    renderInbox({ nextCursor: MOCK_NEXT_CURSOR });
 
-    reachEndOfList();
-    await user.click(
-      await screen.findByRole('button', {
-        name: "Couldn't load more messages. Try again",
-      }),
-    );
+    const retryButton = await screen.findByRole('button', {
+      name: "Couldn't load more messages. Try again",
+    });
+    await user.click(retryButton);
 
     expect(loadMoreLeadsActionMock).toHaveBeenCalledTimes(2);
-  });
-
-  it('shows the list again after going back from a message', async () => {
-    setup();
-    await openLead(user, ADA);
-
-    await user.click(screen.getByRole('button', { name: 'Back to messages' }));
-
-    expect(
-      screen.getByText('Select a message to read it.'),
-    ).toBeInTheDocument();
   });
 });

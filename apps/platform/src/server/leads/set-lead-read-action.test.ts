@@ -1,10 +1,13 @@
 import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { LEAD_LOG, LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { setLeadReadAction } from './set-lead-read-action';
+
+faker.seed(5758);
 
 const { markLeadReadMock, markLeadUnreadMock } = vi.hoisted(() => ({
   markLeadReadMock: vi.fn(),
@@ -22,8 +25,10 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const LEAD_ID = '0b7d5c1e-8a47-4c3e-b1f6-2f4d9e6a7b31';
-const LEAD_KEY = { tenantId: MOCK_TENANT_ID, id: LEAD_ID };
+const MOCK_LEAD_ID = faker.string.uuid();
+const MOCK_LEAD_KEY = { tenantId: MOCK_TENANT_ID, id: MOCK_LEAD_ID };
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
+const MOCK_NOT_FOUND = new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
 describe(setLeadReadAction, () => {
   beforeEach(() => {
@@ -33,35 +38,41 @@ describe(setLeadReadAction, () => {
     markLeadUnreadMock.mockResolvedValue(true);
   });
 
-  it("marks the lead read inside the session's tenant", async () => {
-    const result = await setLeadReadAction(MOCK_TENANT_ID, LEAD_ID, true);
+  it.each([
+    ['read', true, markLeadReadMock, markLeadUnreadMock],
+    ['unread', false, markLeadUnreadMock, markLeadReadMock],
+  ])(
+    "marks the lead %s inside the session's tenant",
+    async (_label, isRead, applied, untouched) => {
+      const result = await setLeadReadAction(
+        MOCK_TENANT_ID,
+        MOCK_LEAD_ID,
+        isRead,
+      );
 
-    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(markLeadReadMock).toHaveBeenCalledWith(LEAD_KEY);
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-  });
-
-  it('marks the lead unread again', async () => {
-    await setLeadReadAction(MOCK_TENANT_ID, LEAD_ID, false);
-
-    expect(markLeadUnreadMock).toHaveBeenCalledWith(LEAD_KEY);
-    expect(markLeadReadMock).not.toHaveBeenCalled();
-  });
+      expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(applied).toHaveBeenCalledWith(MOCK_LEAD_KEY);
+      expect(untouched).not.toHaveBeenCalled();
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    },
+  );
 
   it('changes nothing for a caller who is not a member of the tenant', async () => {
-    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
-      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
-    );
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(MOCK_NOT_FOUND);
 
     await expect(
-      setLeadReadAction(MOCK_TENANT_ID, LEAD_ID, true),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+      setLeadReadAction(MOCK_TENANT_ID, MOCK_LEAD_ID, true),
+    ).rejects.toThrow(MOCK_NOT_FOUND);
 
     expect(markLeadReadMock).not.toHaveBeenCalled();
   });
 
   it('rejects an id that is not a uuid without touching the gate', async () => {
-    const result = await setLeadReadAction(MOCK_TENANT_ID, 'not-a-uuid', true);
+    const result = await setLeadReadAction(
+      MOCK_TENANT_ID,
+      faker.lorem.word(),
+      true,
+    );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -73,7 +84,7 @@ describe(setLeadReadAction, () => {
   it('reports a lead that is not in that tenant as not found', async () => {
     markLeadReadMock.mockResolvedValue(false);
 
-    const result = await setLeadReadAction(MOCK_TENANT_ID, LEAD_ID, true);
+    const result = await setLeadReadAction(MOCK_TENANT_ID, MOCK_LEAD_ID, true);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -82,14 +93,14 @@ describe(setLeadReadAction, () => {
   });
 
   it('reports failure and logs when the update throws', async () => {
-    markLeadReadMock.mockRejectedValue(new Error('db unavailable'));
+    markLeadReadMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await setLeadReadAction(MOCK_TENANT_ID, LEAD_ID, true);
+    const result = await setLeadReadAction(MOCK_TENANT_ID, MOCK_LEAD_ID, true);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(
-      LEAD_LOG.READ_STATE_FAILED,
-      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
-    );
+    expect(logger.error).toHaveBeenCalledWith(LEAD_LOG.READ_STATE_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      error: MOCK_DB_ERROR,
+    });
   });
 });
