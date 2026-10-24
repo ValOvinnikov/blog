@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type * as BlogEmail from '@blog/email';
+import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
@@ -168,7 +169,7 @@ describe(sendTestEmailAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
-      'email_test.send_failed',
+      EMAIL_TEST_LOG.SEND_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
   });

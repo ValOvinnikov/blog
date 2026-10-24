@@ -1,8 +1,10 @@
 import { DOMAIN_PATTERN } from '@blog/config';
+import { HTTP_STATUS } from '@blog/config/constants';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
+import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -73,7 +75,7 @@ export const getProjectDomain = async (
     return projectDomain(DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED);
 
   if (!DOMAIN_PATTERN.test(domain)) {
-    logger.error('provisioning.domain_check_invalid_domain', { domain });
+    logger.error(PROVISIONING_LOG.DOMAIN_CHECK_INVALID_DOMAIN, { domain });
     return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
   }
 
@@ -83,11 +85,11 @@ export const getProjectDomain = async (
       `/v9/projects/${credentials.projectId}/domains/${encodeURIComponent(domain)}`,
     );
 
-    if (response.status === 404)
+    if (response.status === HTTP_STATUS.NOT_FOUND)
       return projectDomain(DOMAIN_VERIFICATION_STATUS.NOT_ADDED);
 
     if (!response.ok) {
-      logger.error('provisioning.domain_check_failed', {
+      logger.error(PROVISIONING_LOG.DOMAIN_CHECK_FAILED, {
         domain,
         responseStatus: response.status,
       });
@@ -108,7 +110,7 @@ export const getProjectDomain = async (
       })),
     );
   } catch (error) {
-    logger.error('provisioning.domain_check_error', { domain, error });
+    logger.error(PROVISIONING_LOG.DOMAIN_CHECK_ERROR, { domain, error });
     return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
   }
 };

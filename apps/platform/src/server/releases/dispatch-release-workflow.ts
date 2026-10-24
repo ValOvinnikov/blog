@@ -1,4 +1,7 @@
-import { RELEASE_WORKFLOW_FILE } from '@platform/constants/release';
+import {
+  RELEASE_WORKFLOW_FILE,
+  RELEASE_LOG,
+} from '@platform/constants/release';
 import { dispatchGitHubWorkflow } from '@platform/server/github/dispatch-github-workflow';
 
 type TDispatchReleaseWorkflowInput = {
@@ -14,9 +17,9 @@ export const dispatchReleaseWorkflow = ({
     workflowFile: RELEASE_WORKFLOW_FILE,
     inputs: { version, override: String(isOverride) },
     logEvents: {
-      skipped: 'releases.release_dispatch_skipped',
-      failed: 'releases.release_dispatch_failed',
-      error: 'releases.release_dispatch_error',
+      skipped: RELEASE_LOG.RELEASE_DISPATCH_SKIPPED,
+      failed: RELEASE_LOG.RELEASE_DISPATCH_FAILED,
+      error: RELEASE_LOG.RELEASE_DISPATCH_ERROR,
     },
     logContext: { version, isOverride },
   });

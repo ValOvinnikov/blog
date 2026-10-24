@@ -8,7 +8,11 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  TENANT_LOG,
+} from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import {
   MOCK_OPERATOR_ID,
@@ -190,7 +194,7 @@ describe('deleteTenantAction', () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith('tenants.delete_failed', {
+    expect(loggerErrorMock).toHaveBeenCalledWith(TENANT_LOG.DELETE_FAILED, {
       tenantId: MOCK_TENANT_ID,
       error: new Error(CONNECTION_ERROR_MESSAGE),
     });
@@ -204,7 +208,7 @@ describe('deleteTenantAction', () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.delete_audit_failed',
+      TENANT_LOG.DELETE_AUDIT_FAILED,
       {
         action: AUDIT_ACTION.DELETED,
         targetType: AUDIT_TARGET_TYPE.TENANT,

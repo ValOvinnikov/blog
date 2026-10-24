@@ -2,6 +2,7 @@
 
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -59,13 +60,13 @@ export const uploadBrandAssetAction = async (
     if (previousUrl && previousUrl !== blob.url) {
       await deleteBlobBestEffort(
         previousUrl,
-        'site_config.brand_asset_delete_failed',
+        SITE_CONFIG_LOG.BRAND_ASSET_DELETE_FAILED,
         { tenantId: tenant.id, kind: targetKind },
       );
     }
 
     await recordAuditEvent({
-      logEvent: 'site_config.brand_asset_upload_audit_failed',
+      logEvent: SITE_CONFIG_LOG.BRAND_ASSET_UPLOAD_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
@@ -74,7 +75,7 @@ export const uploadBrandAssetAction = async (
 
     return { outcome: ACTION_OUTCOME.SUCCESS, url: blob.url };
   } catch (error) {
-    logger.error('site_config.brand_asset_upload_failed', {
+    logger.error(SITE_CONFIG_LOG.BRAND_ASSET_UPLOAD_FAILED, {
       tenantId: tenant.id,
       kind: targetKind,
       error,

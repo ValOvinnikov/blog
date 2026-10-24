@@ -10,6 +10,7 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CONTRAST_WORKFLOW_FILE,
   RELEASE_REFUSAL,
+  RELEASE_LOG,
 } from '@platform/constants/release';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -51,7 +52,7 @@ export const startContrastCheckAction =
     if (!isDispatched) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
     await recordAuditEvent({
-      logEvent: 'releases.contrast_check_audit_failed',
+      logEvent: RELEASE_LOG.CONTRAST_CHECK_AUDIT_FAILED,
       action: AUDIT_ACTION.CONTRAST_CHECK_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: headSha.data,

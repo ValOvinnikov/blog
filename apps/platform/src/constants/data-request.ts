@@ -11,3 +11,8 @@ export const DATA_REQUEST_MATCH_KIND = {
 export type TDataRequestMatchKind = TValueOf<typeof DATA_REQUEST_MATCH_KIND>;
 
 export const DATA_REQUEST_EXPORT_FILE_NAME = 'personal-data-export.json';
+
+export const DATA_REQUEST_LOG = {
+  AUDIT_FAILED: 'data_request.audit_failed',
+  FAILED: 'data_request.failed',
+} as const;

@@ -1,5 +1,6 @@
 import { HTTP_STATUS } from '@blog/config';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
+import { TENANT_LOG } from '@platform/constants/tenant';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -14,7 +15,6 @@ const loggerErrorMock = vi.mocked(logger.error);
 const DOMAIN = 'example.com';
 const SUBDOMAIN = 'blog-dev.valstack.dev';
 const SUBDOMAIN_LOOKUP_PATH = '/v1/domains/valstack.dev/project-domains';
-const APEX_UNDETERMINED_EVENT = 'tenants.domain_availability_apex_undetermined';
 const UNRELATED_SUBDOMAIN = 'someone-else.valstack.dev';
 
 describe(checkDomainAvailability, () => {
@@ -131,9 +131,12 @@ describe(checkDomainAvailability, () => {
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(APEX_UNDETERMINED_EVENT, {
-      domain: 'co.uk',
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED,
+      {
+        domain: 'co.uk',
+      },
+    );
   });
 
   it('returns ERROR with no request for an IP-literal host', async () => {
@@ -141,9 +144,12 @@ describe(checkDomainAvailability, () => {
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(APEX_UNDETERMINED_EVENT, {
-      domain: '1.2.3.4',
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED,
+      {
+        domain: '1.2.3.4',
+      },
+    );
   });
 
   it('returns IN_USE for a subdomain attached to another project under the same apex', async () => {

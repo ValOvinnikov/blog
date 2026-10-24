@@ -51,3 +51,16 @@ export const RELEASE_RUN_STATUS = {
 } as const;
 
 export type TReleaseRunStatus = TValueOf<typeof RELEASE_RUN_STATUS>;
+
+export const RELEASE_LOG = {
+  CONTRAST_CHECK_AUDIT_FAILED: 'releases.contrast_check_audit_failed',
+  CONTRAST_DISPATCH_ERROR: 'releases.contrast_dispatch_error',
+  CONTRAST_DISPATCH_FAILED: 'releases.contrast_dispatch_failed',
+  CONTRAST_DISPATCH_SKIPPED: 'releases.contrast_dispatch_skipped',
+  DB_READ_FAILED: 'releases.db_read_failed',
+  RELEASE_AUDIT_FAILED: 'releases.release_audit_failed',
+  RELEASE_DISPATCH_ERROR: 'releases.release_dispatch_error',
+  RELEASE_DISPATCH_FAILED: 'releases.release_dispatch_failed',
+  RELEASE_DISPATCH_SKIPPED: 'releases.release_dispatch_skipped',
+  RELEASE_OVERRIDE_AUDIT_FAILED: 'releases.release_override_audit_failed',
+} as const;

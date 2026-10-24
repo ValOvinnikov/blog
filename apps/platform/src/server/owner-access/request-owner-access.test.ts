@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
+import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -85,7 +86,7 @@ describe.each([
     const result = await action(tenantId);
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'owner_access.request_failed',
+      OWNER_ACCESS_LOG.REQUEST_FAILED,
       { tenantId, path, responseStatus: HTTP_STATUS.CONFLICT },
     );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });

@@ -3436,6 +3436,22 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "contrast_result.record_failed": [
+      {
+        "ref": "CONTRAST_RESULT_LOG.RECORD_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/contrast-result",
+        "file": "apps/platform/src/constants/contrast-result.ts"
+      }
+    ],
+    "contrast_result.secret_missing": [
+      {
+        "ref": "CONTRAST_RESULT_LOG.SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/contrast-result",
+        "file": "apps/platform/src/constants/contrast-result.ts"
+      }
+    ],
     "EDITABLE": [
       {
         "ref": "CONTROL_MODE.EDITABLE",
@@ -3458,6 +3474,62 @@
         "scope": "app:platform",
         "from": "@platform/constants/control-mode",
         "file": "apps/platform/src/constants/control-mode.ts"
+      }
+    ],
+    "create_site_gate.alert_failed": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.ALERT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "create_site_gate.alert_no_recipients": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.ALERT_NO_RECIPIENTS",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "create_site_gate.alert_send_failed": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "create_site_gate.blocked": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.BLOCKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "create_site_gate.block_check_failed": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.BLOCK_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "create_site_gate.global_limited": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.GLOBAL_LIMITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "create_site_gate.ip_limited": [
+      {
+        "ref": "CREATE_SITE_GATE_LOG.IP_LIMITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/create-site-gate",
+        "file": "apps/platform/src/constants/create-site-gate.ts"
       }
     ],
     "SUBSCRIBER": [
@@ -3495,6 +3567,22 @@
     "AUDIT_EVENT": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.AUDIT_EVENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "data_request.audit_failed": [
+      {
+        "ref": "DATA_REQUEST_LOG.AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "data_request.failed": [
+      {
+        "ref": "DATA_REQUEST_LOG.FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"
@@ -3546,6 +3634,22 @@
         "file": "apps/platform/src/constants/domain.ts"
       }
     ],
+    "email_config.update_audit_failed": [
+      {
+        "ref": "EMAIL_CONFIG_LOG.UPDATE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-config",
+        "file": "apps/platform/src/constants/email-config.ts"
+      }
+    ],
+    "email_config.update_failed": [
+      {
+        "ref": "EMAIL_CONFIG_LOG.UPDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-config",
+        "file": "apps/platform/src/constants/email-config.ts"
+      }
+    ],
     "SENDER": [
       {
         "ref": "EMAIL_LOGO_KIND.SENDER",
@@ -3557,6 +3661,46 @@
     "TEMPLATE": [
       {
         "ref": "EMAIL_LOGO_KIND.TEMPLATE",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "email_logo.clear_audit_failed": [
+      {
+        "ref": "EMAIL_LOGO_LOG.CLEAR_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "email_logo.clear_failed": [
+      {
+        "ref": "EMAIL_LOGO_LOG.CLEAR_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "email_logo.delete_failed": [
+      {
+        "ref": "EMAIL_LOGO_LOG.DELETE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "email_logo.upload_audit_failed": [
+      {
+        "ref": "EMAIL_LOGO_LOG.UPLOAD_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-logo",
+        "file": "apps/platform/src/constants/email-logo.ts"
+      }
+    ],
+    "email_logo.upload_failed": [
+      {
+        "ref": "EMAIL_LOGO_LOG.UPLOAD_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/email-logo",
         "file": "apps/platform/src/constants/email-logo.ts"
@@ -3578,12 +3722,132 @@
         "file": "apps/platform/src/constants/email-sender.ts"
       }
     ],
+    "email_templates.update_audit_failed": [
+      {
+        "ref": "EMAIL_TEMPLATES_LOG.UPDATE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-templates",
+        "file": "apps/platform/src/constants/email-templates.ts"
+      }
+    ],
+    "email_templates.update_failed": [
+      {
+        "ref": "EMAIL_TEMPLATES_LOG.UPDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-templates",
+        "file": "apps/platform/src/constants/email-templates.ts"
+      }
+    ],
+    "email_test.send_failed": [
+      {
+        "ref": "EMAIL_TEST_LOG.SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/email-test",
+        "file": "apps/platform/src/constants/email-test.ts"
+      }
+    ],
     "GITHUB_ERROR": [
       {
         "ref": "GITHUB_FAILURE.GITHUB_ERROR",
         "scope": "app:platform",
         "from": "@platform/constants/github",
         "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "github.not_configured": [
+      {
+        "ref": "GITHUB_LOG.NOT_CONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "github.rate_limited": [
+      {
+        "ref": "GITHUB_LOG.RATE_LIMITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "github.request_error": [
+      {
+        "ref": "GITHUB_LOG.REQUEST_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "github.request_failed": [
+      {
+        "ref": "GITHUB_LOG.REQUEST_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "github.tag_list_incomplete": [
+      {
+        "ref": "GITHUB_LOG.TAG_LIST_INCOMPLETE",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "github.unexpected_response": [
+      {
+        "ref": "GITHUB_LOG.UNEXPECTED_RESPONSE",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "leads.delete_failed": [
+      {
+        "ref": "LEAD_LOG.DELETE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "operator_alert.no_recipients": [
+      {
+        "ref": "OPERATOR_ALERT_LOG.NO_RECIPIENTS",
+        "scope": "app:platform",
+        "from": "@platform/constants/operator-alert",
+        "file": "apps/platform/src/constants/operator-alert.ts"
+      }
+    ],
+    "operator_alert.secret_missing": [
+      {
+        "ref": "OPERATOR_ALERT_LOG.SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/operator-alert",
+        "file": "apps/platform/src/constants/operator-alert.ts"
+      }
+    ],
+    "operator_alert.send_failed": [
+      {
+        "ref": "OPERATOR_ALERT_LOG.SEND_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/operator-alert",
+        "file": "apps/platform/src/constants/operator-alert.ts"
+      }
+    ],
+    "operator_alert.tenant_not_found": [
+      {
+        "ref": "OPERATOR_ALERT_LOG.TENANT_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/operator-alert",
+        "file": "apps/platform/src/constants/operator-alert.ts"
+      }
+    ],
+    "owner_access.request_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.REQUEST_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/owner-access",
+        "file": "apps/platform/src/constants/owner-access.ts"
       }
     ],
     "INVITE_SENT": [
@@ -3616,6 +3880,86 @@
         "scope": "app:platform",
         "from": "@platform/constants/preview",
         "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "provisioning.deprovision_audit_failed": [
+      {
+        "ref": "PROVISIONING_LOG.DEPROVISION_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.deprovision_dispatch_error": [
+      {
+        "ref": "PROVISIONING_LOG.DEPROVISION_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.deprovision_dispatch_failed": [
+      {
+        "ref": "PROVISIONING_LOG.DEPROVISION_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.deprovision_dispatch_skipped": [
+      {
+        "ref": "PROVISIONING_LOG.DEPROVISION_DISPATCH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.domain_check_error": [
+      {
+        "ref": "PROVISIONING_LOG.DOMAIN_CHECK_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.domain_check_failed": [
+      {
+        "ref": "PROVISIONING_LOG.DOMAIN_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.domain_check_invalid_domain": [
+      {
+        "ref": "PROVISIONING_LOG.DOMAIN_CHECK_INVALID_DOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.enqueue_failed": [
+      {
+        "ref": "PROVISIONING_LOG.ENQUEUE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.enqueue_not_found": [
+      {
+        "ref": "PROVISIONING_LOG.ENQUEUE_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.reactivate_audit_failed": [
+      {
+        "ref": "PROVISIONING_LOG.REACTIVATE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
       }
     ],
     "GREEN": [
@@ -3714,6 +4058,118 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "releases.contrast_check_audit_failed": [
+      {
+        "ref": "RELEASE_LOG.CONTRAST_CHECK_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.contrast_dispatch_error": [
+      {
+        "ref": "RELEASE_LOG.CONTRAST_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.contrast_dispatch_failed": [
+      {
+        "ref": "RELEASE_LOG.CONTRAST_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.contrast_dispatch_skipped": [
+      {
+        "ref": "RELEASE_LOG.CONTRAST_DISPATCH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.db_read_failed": [
+      {
+        "ref": "RELEASE_LOG.DB_READ_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.release_audit_failed": [
+      {
+        "ref": "RELEASE_LOG.RELEASE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.release_dispatch_error": [
+      {
+        "ref": "RELEASE_LOG.RELEASE_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.release_dispatch_failed": [
+      {
+        "ref": "RELEASE_LOG.RELEASE_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.release_dispatch_skipped": [
+      {
+        "ref": "RELEASE_LOG.RELEASE_DISPATCH_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.release_override_audit_failed": [
+      {
+        "ref": "RELEASE_LOG.RELEASE_OVERRIDE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "request.unhandled_error": [
+      {
+        "ref": "REQUEST_LOG.UNHANDLED_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/request",
+        "file": "apps/platform/src/constants/request.ts"
+      }
+    ],
+    "settings_features.plan_entitlement_rejected": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.update_audit_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.UPDATE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "settings_features.update_failed": [
+      {
+        "ref": "SETTINGS_FEATURES_LOG.UPDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-features",
+        "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
     "NOT_IN_PLAN": [
       {
         "ref": "SETTINGS_REFUSAL.NOT_IN_PLAN",
@@ -3776,6 +4232,150 @@
         "scope": "app:platform",
         "from": "@platform/constants/signup-block",
         "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "signup_block.add_audit_failed": [
+      {
+        "ref": "SIGNUP_BLOCK_LOG.ADD_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "signup_block.add_domain_failed": [
+      {
+        "ref": "SIGNUP_BLOCK_LOG.ADD_DOMAIN_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "signup_block.remove_audit_failed": [
+      {
+        "ref": "SIGNUP_BLOCK_LOG.REMOVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "signup_block.remove_failed": [
+      {
+        "ref": "SIGNUP_BLOCK_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "signup_block.remove_lookup_failed": [
+      {
+        "ref": "SIGNUP_BLOCK_LOG.REMOVE_LOOKUP_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/signup-block",
+        "file": "apps/platform/src/constants/signup-block.ts"
+      }
+    ],
+    "site_config.brand_asset_clear_audit_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_ASSET_CLEAR_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.brand_asset_clear_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_ASSET_CLEAR_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.brand_asset_delete_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_ASSET_DELETE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.brand_asset_upload_audit_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_ASSET_UPLOAD_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.brand_asset_upload_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_ASSET_UPLOAD_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.look_audit_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.LOOK_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.look_save_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.LOOK_SAVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.revalidate_error": [
+      {
+        "ref": "SITE_CONFIG_LOG.REVALIDATE_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.revalidate_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.REVALIDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.revalidate_skipped": [
+      {
+        "ref": "SITE_CONFIG_LOG.REVALIDATE_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.svg_sanitize_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.SVG_SANITIZE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.voice_audit_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.VOICE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.voice_save_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.VOICE_SAVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
       }
     ],
     "UPCOMING": [
@@ -3934,6 +4534,174 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "tenants.create_audit_failed": [
+      {
+        "ref": "TENANT_LOG.CREATE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.create_draft_failed": [
+      {
+        "ref": "TENANT_LOG.CREATE_DRAFT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.delete_audit_failed": [
+      {
+        "ref": "TENANT_LOG.DELETE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.delete_failed": [
+      {
+        "ref": "TENANT_LOG.DELETE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.domain_availability_apex_undetermined": [
+      {
+        "ref": "TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.domain_availability_check_error": [
+      {
+        "ref": "TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.domain_availability_check_failed": [
+      {
+        "ref": "TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.domain_availability_check_pagination_exhausted": [
+      {
+        "ref": "TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.domain_availability_invalid_domain": [
+      {
+        "ref": "TENANT_LOG.DOMAIN_AVAILABILITY_INVALID_DOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.owner_invite_email_failed": [
+      {
+        "ref": "TENANT_LOG.OWNER_INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.sign_in_activity_failed": [
+      {
+        "ref": "TENANT_LOG.SIGN_IN_ACTIVITY_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.sign_in_owner_lookup_failed": [
+      {
+        "ref": "TENANT_LOG.SIGN_IN_OWNER_LOOKUP_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_audit_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_block_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_BLOCK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_block_undo_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_save_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_SAVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.update_details_audit_failed": [
+      {
+        "ref": "TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.update_details_failed": [
+      {
+        "ref": "TENANT_LOG.UPDATE_DETAILS_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.update_languages_audit_failed": [
+      {
+        "ref": "TENANT_LOG.UPDATE_LANGUAGES_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.update_languages_failed": [
+      {
+        "ref": "TENANT_LOG.UPDATE_LANGUAGES_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.update_languages_rejected": [
+      {
+        "ref": "TENANT_LOG.UPDATE_LANGUAGES_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "UPLOADS_NOT_CONFIGURED": [
       {
         "ref": "UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED",
@@ -4052,6 +4820,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/upload",
         "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "worker.enqueue_error": [
+      {
+        "ref": "WORKER_LOG.ENQUEUE_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/worker",
+        "file": "apps/platform/src/constants/worker.ts"
+      }
+    ],
+    "worker.enqueue_skipped": [
+      {
+        "ref": "WORKER_LOG.ENQUEUE_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/worker",
+        "file": "apps/platform/src/constants/worker.ts"
       }
     ],
     "UNKNOWN": [

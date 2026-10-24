@@ -7,6 +7,7 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import {
   SIGNUP_BLOCK_FIELD_ERROR,
   type TSignupBlockFieldError,
+  SIGNUP_BLOCK_LOG,
 } from '@platform/constants/signup-block';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { addSignupBlock } from '@platform/server/signup-block/add-signup-block';
@@ -14,8 +15,6 @@ import { signupBlockReasonSchema } from '@platform/server/signup-block/signup-bl
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
-
-const ADD_DOMAIN_FAILED_EVENT = 'signup_block.add_domain_failed';
 
 const addBlockedDomainInputSchema = z.object({
   domain: z.string().trim().min(1),
@@ -71,9 +70,9 @@ export const addBlockedDomainAction = async (
       };
     }
 
-    logger.error(ADD_DOMAIN_FAILED_EVENT, { error: result.error });
+    logger.error(SIGNUP_BLOCK_LOG.ADD_DOMAIN_FAILED, { error: result.error });
   } catch (error) {
-    logger.error(ADD_DOMAIN_FAILED_EVENT, { error });
+    logger.error(SIGNUP_BLOCK_LOG.ADD_DOMAIN_FAILED, { error });
   }
 
   return toOutcome(ACTION_OUTCOME.SERVER_ERROR);

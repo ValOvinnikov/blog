@@ -12,7 +12,11 @@ import {
 import { queries, TENANT_PLAN } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  TENANT_LOG,
+} from '@platform/constants/tenant';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { signIn } from '@platform/server/auth/auth';
@@ -32,9 +36,6 @@ import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-
-const CREATE_DRAFT_FAILED_EVENT = 'tenants.create_draft_failed';
-const OWNER_INVITE_EMAIL_FAILED_EVENT = 'tenants.owner_invite_email_failed';
 
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1),
@@ -134,7 +135,7 @@ export const createTenantAction = async (
     });
 
     if (!result.ok) {
-      logger.error(CREATE_DRAFT_FAILED_EVENT, {
+      logger.error(TENANT_LOG.CREATE_DRAFT_FAILED, {
         domain,
         error: result.error,
       });
@@ -143,12 +144,12 @@ export const createTenantAction = async (
 
     tenantId = result.data.id;
   } catch (error) {
-    logger.error(CREATE_DRAFT_FAILED_EVENT, { domain, error });
+    logger.error(TENANT_LOG.CREATE_DRAFT_FAILED, { domain, error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
   await recordAuditEvent({
-    logEvent: 'tenants.create_audit_failed',
+    logEvent: TENANT_LOG.CREATE_AUDIT_FAILED,
     action: AUDIT_ACTION.CREATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
@@ -162,14 +163,14 @@ export const createTenantAction = async (
         redirect: false,
       });
       if (!inviteEmailResult?.ok) {
-        logger.error(OWNER_INVITE_EMAIL_FAILED_EVENT, {
+        logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, {
           tenantId,
           ownerEmail,
           error: inviteEmailResult?.error,
         });
       }
     } catch (error) {
-      logger.error(OWNER_INVITE_EMAIL_FAILED_EVENT, {
+      logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, {
         tenantId,
         ownerEmail,
         error,

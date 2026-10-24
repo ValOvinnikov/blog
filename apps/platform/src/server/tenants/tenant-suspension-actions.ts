@@ -9,7 +9,7 @@ import {
 } from '@blog/config';
 import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { TTenantLifecycleResult } from '@platform/server/provisioning/tenant-lifecycle-result';
@@ -91,13 +91,17 @@ const setSuspension = async (
     await confirmOwnerEmailBlock(ownerBlock);
     await revalidateSiteConfig(tenantId);
   } catch (error) {
-    logger.error('tenant.suspension_save_failed', { tenantId, status, error });
+    logger.error(TENANT_LOG.SUSPENSION_SAVE_FAILED, {
+      tenantId,
+      status,
+      error,
+    });
     if (!isSuspensionSaved) await undoOwnerEmailBlock(ownerBlock);
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
   await recordAuditEvent({
-    logEvent: 'tenant.suspension_audit_failed',
+    logEvent: TENANT_LOG.SUSPENSION_AUDIT_FAILED,
     action: SUSPENSION_AUDIT_ACTION[status],
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,

@@ -3,6 +3,7 @@ import {
   HTTP_METHOD,
   HTTP_STATUS,
 } from '@blog/config/constants';
+import { CONTRAST_RESULT_LOG } from '@platform/constants/contrast-result';
 import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { env } from '@platform/utils/env/env';
@@ -73,7 +74,7 @@ describe('POST /api/internal/contrast-result', () => {
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'contrast_result.secret_missing',
+      CONTRAST_RESULT_LOG.SECRET_MISSING,
     );
     expect(recordContrastResultMock).not.toHaveBeenCalled();
   });
@@ -132,7 +133,7 @@ describe('POST /api/internal/contrast-result', () => {
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'contrast_result.record_failed',
+      CONTRAST_RESULT_LOG.RECORD_FAILED,
       { sha: SHA, outcome: CONTRAST_CHECK_OUTCOME.FAIL, error },
     );
   });

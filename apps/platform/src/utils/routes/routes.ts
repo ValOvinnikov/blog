@@ -37,6 +37,10 @@ export const adminRoutes = {
     page > 1
       ? `/tenants/${tenantId}/leads?page=${page}`
       : `/tenants/${tenantId}/leads`,
+  tenantActivity: (tenantId: string, page = 1) =>
+    page > 1
+      ? `/tenants/${tenantId}/activity?page=${page}`
+      : `/tenants/${tenantId}/activity`,
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',

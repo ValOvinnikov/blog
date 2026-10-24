@@ -11,6 +11,7 @@
     "signInError": "Problème de connexion",
     "addTenant": "Ajouter un locataire · Administration",
     "tenantOverview": "Aperçu du locataire · Administration",
+    "tenantActivity": "Activité du locataire · Administration",
     "tenantProvisioning": "Provisionnement · Administration",
     "tenantDanger": "Zone de danger · Administration",
     "tenantDomain": "Domaine · Administration",
@@ -320,13 +321,20 @@
     "notSetValue": "Non défini",
     "recentActivityCardTitle": "Activité récente",
     "recentActivitySourceLabel": "Journal système",
-    "activityEmpty": "Aucune activité enregistrée pour le moment.",
-    "activityActorDeleted": "Compte supprimé",
+    "viewAllActivityLink": "Voir toute l'activité"
+  },
+  "tenantActivityPage": {
+    "title": "Activité",
+    "description": "Actions de cycle de vie et d'opérateur sur ce locataire, de la plus récente à la plus ancienne."
+  },
+  "activityList": {
+    "empty": "Aucune activité enregistrée pour le moment.",
+    "actorDeleted": "Compte supprimé",
     "relativeJustNow": "À l'instant",
     "relativeMinutesAgo": "il y a {minutes} min",
     "relativeHoursAgo": "il y a {hours} h",
     "relativeDaysAgo": "il y a {days} j",
-    "activityAction": {
+    "action": {
       "CREATED": "Locataire créé",
       "DEPROVISION_REQUESTED": "Déprovisionnement demandé",
       "DEPROVISIONED": "Locataire déprovisionné",
@@ -1154,7 +1162,7 @@
     "showMore": "Afficher plus",
     "showLess": "Afficher moins"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Pagination",
     "previous": "Précédent",
     "next": "Suivant",

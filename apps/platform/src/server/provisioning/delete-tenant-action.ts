@@ -8,7 +8,11 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  TENANT_LOG,
+} from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { logger } from '@platform/utils/logger/logger';
@@ -54,7 +58,7 @@ export const deleteTenantAction = async (
   try {
     result = await queries.tenants.deleteTenant(tenantId);
   } catch (error) {
-    logger.error('tenants.delete_failed', { tenantId, error });
+    logger.error(TENANT_LOG.DELETE_FAILED, { tenantId, error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
@@ -73,7 +77,7 @@ export const deleteTenantAction = async (
   }
 
   await recordAuditEvent({
-    logEvent: 'tenants.delete_audit_failed',
+    logEvent: TENANT_LOG.DELETE_AUDIT_FAILED,
     action: AUDIT_ACTION.DELETED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,

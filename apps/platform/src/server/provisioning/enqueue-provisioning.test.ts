@@ -5,6 +5,7 @@ import {
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
 import { faker } from '@faker-js/faker';
+import { WORKER_LOG } from '@platform/constants/worker';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -45,7 +46,7 @@ describe(enqueueProvisioning, () => {
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
-        'worker.enqueue_skipped',
+        WORKER_LOG.ENQUEUE_SKIPPED,
         expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
       );
       expect(status).toBeNull();
@@ -93,7 +94,7 @@ describe(enqueueProvisioning, () => {
 
     const status = await enqueueProvisioning(MOCK_TENANT_ID);
 
-    expect(loggerErrorMock).toHaveBeenCalledWith('worker.enqueue_error', {
+    expect(loggerErrorMock).toHaveBeenCalledWith(WORKER_LOG.ENQUEUE_ERROR, {
       tenantId: MOCK_TENANT_ID,
       path: PROVISION_PATH,
       error,

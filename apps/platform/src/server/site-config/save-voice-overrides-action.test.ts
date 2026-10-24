@@ -14,6 +14,7 @@ import {
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { errorResult, okResult } from '@blog/utils';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -149,7 +150,7 @@ describe(saveVoiceOverridesAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'site_config.voice_save_failed',
+      SITE_CONFIG_LOG.VOICE_SAVE_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -194,7 +195,7 @@ describe(saveVoiceOverridesAction, () => {
     await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
 
     expect(recordAuditEventMock).toHaveBeenCalledWith({
-      logEvent: 'site_config.voice_audit_failed',
+      logEvent: SITE_CONFIG_LOG.VOICE_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,

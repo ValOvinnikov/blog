@@ -11,6 +11,7 @@
     "signInError": "Problem bei der Anmeldung",
     "addTenant": "Mandant hinzufügen · Admin",
     "tenantOverview": "Mandantenübersicht · Admin",
+    "tenantActivity": "Mandantenaktivität · Admin",
     "tenantProvisioning": "Bereitstellung · Admin",
     "tenantDanger": "Gefahrenzone · Admin",
     "tenantDomain": "Domain · Admin",
@@ -320,13 +321,20 @@
     "notSetValue": "Nicht gesetzt",
     "recentActivityCardTitle": "Letzte Aktivitäten",
     "recentActivitySourceLabel": "Systemprotokoll",
-    "activityEmpty": "Noch keine Aktivitäten erfasst.",
-    "activityActorDeleted": "Gelöschtes Konto",
+    "viewAllActivityLink": "Alle Aktivitäten anzeigen"
+  },
+  "tenantActivityPage": {
+    "title": "Aktivität",
+    "description": "Lebenszyklus- und Operatoraktionen für diesen Mandanten, neueste zuerst."
+  },
+  "activityList": {
+    "empty": "Noch keine Aktivitäten erfasst.",
+    "actorDeleted": "Gelöschtes Konto",
     "relativeJustNow": "Gerade eben",
     "relativeMinutesAgo": "vor {minutes} Min.",
     "relativeHoursAgo": "vor {hours} Std.",
     "relativeDaysAgo": "vor {days} Tg.",
-    "activityAction": {
+    "action": {
       "CREATED": "Mandant erstellt",
       "DEPROVISION_REQUESTED": "Deprovisionierung angefordert",
       "DEPROVISIONED": "Mandant deprovisioniert",
@@ -1154,7 +1162,7 @@
     "showMore": "Mehr anzeigen",
     "showLess": "Weniger anzeigen"
   },
-  "leadsPagination": {
+  "pagination": {
     "ariaLabel": "Seitennavigation",
     "previous": "Zurück",
     "next": "Weiter",
