@@ -64,21 +64,39 @@ describe(ownsFreeTenant, () => {
   it.each([
     ['the owner address itself', OWNER_EMAIL],
     ['a differently cased variant', MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL],
-  ])('is true for %s once that person owns a Free tenant', async (_, email) => {
-    await seedMember();
+    ['a +tag variant of the owner address', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
+  ])(
+    'is true for %s once that person owns an operator-created Free tenant',
+    async (_, email) => {
+      await seedMember();
 
-    expect(await ownsFreeTenant(email)).toEqual(OWNS_ONE);
-  });
+      expect(await ownsFreeTenant(email)).toEqual(OWNS_ONE);
+    },
+  );
 
   it.each([
-    ['a +tag variant of the owner address', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
-  ])('is false for %s, which is a different account', async (_, email) => {
-    await seedMember();
+    [
+      'a +tag variant of the address that self-served it',
+      OWNER_EMAIL,
+      MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
+    ],
+    [
+      'the plain address when a +tag variant self-served it',
+      MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
+      OWNER_EMAIL,
+    ],
+  ])(
+    'is true for %s, as the database guard is',
+    async (_, ownerEmail, email) => {
+      await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: testPersonalEmailIndex(ownerEmail),
+      });
 
-    expect(await ownsFreeTenant(email)).toEqual(OWNS_NONE);
-  });
+      expect(await ownsFreeTenant(email)).toEqual(OWNS_ONE);
+    },
+  );
 
-  it('is false for the plain address when the account sits under a +tag address', async () => {
+  it('is false for the plain address when an operator-created Free tenant is owned by a +tag variant', async () => {
     await seedMember(
       {},
       MEMBERSHIP_ROLE.OWNER,
@@ -86,6 +104,17 @@ describe(ownsFreeTenant, () => {
     );
 
     expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_NONE);
+  });
+
+  it("is false for a +tag variant when the owner's only Free tenant is archived", async () => {
+    await seedMember({
+      status: TENANT_STATUS.ARCHIVED,
+      selfServeOwnerEmailIndex: testPersonalEmailIndex(OWNER_EMAIL),
+    });
+
+    expect(await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL)).toEqual(
+      OWNS_NONE,
+    );
   });
 
   it('is true for a suspended Free tenant', async () => {
