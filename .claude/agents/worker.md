@@ -114,7 +114,9 @@ default to zero".
 
 - Log through the one shared logger at `src/utils/logger/logger.ts`, built
   with `createLogger({ service: 'worker' })`; never call `createLogger` per
-  module, and no bare `console.*` (`SPEC.md` §17).
+  module, and no bare `console.*` (`SPEC.md` §17). Event names come from the
+  domain's `<DOMAIN>_LOG` const in `src/constants/<domain>.ts`, never a
+  literal at the call (CLAUDE.md → "No bare `console.*`").
 - `@blog/db` and `@blog/email` never log — their failures reach you, and you
   log them once, with the tenant id and unit name as context. Log the gap
   between what the run reports and what happened; a result that already says

@@ -9,11 +9,13 @@ import type { EmailConfig } from 'next-auth/providers/email';
 // Above a typical lookup-and-Resend round trip, so a refused send is not measurably faster than a real one.
 const MAGIC_LINK_RESPONSE_FLOOR_MS = 1500;
 
+export const MAGIC_LINK_PROVIDER_ID = 'email';
+
 export function buildMagicLinkProvider(app: TAuthApp): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);
 
   return {
-    id: 'email',
+    id: MAGIC_LINK_PROVIDER_ID,
     type: 'email',
     name: 'Email',
     from,

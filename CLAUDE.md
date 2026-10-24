@@ -630,12 +630,21 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   as licence to drift. The exceptions and the Next.js reserved-export
   carve-out: `.claude/agents/web.md` / `platform-app.md` § "Function style".
 - **Key/value-pair consts are always both UPPERCASE** (key === uppercase
-  value), `as const`, and live in `@blog/config` (`constants/`). e.g.
+  value; a `<DOMAIN>_LOG` const's values are its event names, "No bare
+  `console.*`" below), `as const`, and live in `@blog/config` (`constants/`). e.g.
   `export const LINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
   The uppercase value is the stored/serialized value, so schema `options.list`
   and migrations use it too; derive unions with `TValueOf<typeof C>`. Shape
-  and casing never change; two exceptions move only the home, both decided by
-  who reads the const — and a const a package reads never lives in an app:
+  never changes. Casing has one exception: **log vocabulary keeps lowercase
+  values** under UPPERCASE keys, because the value is read by a log pipeline,
+  not stored — `LOG_LEVEL`'s severities, and each logging domain's event names
+  gathered in one `<DOMAIN>_LOG` const beside the code that logs them
+  (`REVALIDATE_LOG = { TENANT_ARCHIVED: 'revalidate.tenant_archived' }` in
+  `apps/web/src/constants/revalidate.ts`). A file that logs imports its
+  domain's `<DOMAIN>_LOG`, never a bare event string or a scalar `*_EVENT`
+  const; a touched file still logging that way converts in the same change.
+  Two further exceptions move only the home, both decided by who reads the
+  const — and a const a package reads never lives in an app:
 
   - **An app's own vocabulary lives in that app.** A const read by exactly one
     app and by no package lives in that app's `src/constants/`, one domain per
@@ -717,7 +726,13 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   `apps/web`'s `e2e/**`, places where stdout _is_ the interface — lives in that
   workspace's preset, because flat-config `files` globs resolve per consuming
   workspace. Event names are static, lowercase and dot-namespaced; dynamic
-  values go in the context object, never into the name. **Log the gap between
+  values go in the context object, never into the name. **Each domain's event
+  names live in one `<DOMAIN>_LOG` key/value const**, never a literal at the
+  call: `logger.error(SIGN_IN_LOG.LINK_FAILED, { error })`, with
+  `SIGN_IN_LOG = { LINK_FAILED: 'auth.sign_in_link_failed' } as const` in the
+  app's `src/constants/<domain>.ts`. Its keys are UPPERCASE and its values are
+  the event names, the one exception to key === value. A file that logs is
+  converted when the diff touches it. **Log the gap between
   what the user was told and what actually happened — no gap, no log:** a
   specific, self-correctable message (a validation error, a duplicate slug) is
   the whole truth and needs no line, while a deliberately vague one hides the

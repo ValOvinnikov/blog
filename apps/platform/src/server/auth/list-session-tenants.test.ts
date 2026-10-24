@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
@@ -53,7 +54,7 @@ describe(listSessionTenants, () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 

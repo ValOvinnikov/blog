@@ -3,10 +3,10 @@ import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
 import { errorResult, type TResult } from '@blog/utils';
-import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   FETCH_FAILED_REASON,
-  PATH_PURGE_FALLBACK_EVENT,
+  REVALIDATE_LOG,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
@@ -18,6 +18,7 @@ import {
 } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { recordTenantActivity } from '@web/server/revalidate/record-tenant-activity/record-tenant-activity';
 import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags';
+import { verifyRevalidateSignature } from '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
@@ -75,17 +76,37 @@ const resolveDerivedRevalidatePaths = async (
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SANITY_REVALIDATE_SECRET;
   if (!secret) {
-    logger.error('revalidate.secret_missing');
+    logger.error(REVALIDATE_LOG.SECRET_MISSING);
     return NextResponse.json(
       { message: 'Revalidation secret is not configured.' },
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
     );
   }
 
-  const signature = request.headers.get(SIGNATURE_HEADER_NAME);
+  const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
   const rawBody = await request.text();
 
-  if (!signature || !(await isValidSignature(rawBody, signature, secret))) {
+  let verified;
+  try {
+    verified = await verifyRevalidateSignature({
+      rawBody,
+      signature: request.headers.get(SIGNATURE_HEADER_NAME),
+      projectId: tenantProjectId,
+      sharedSecret: secret,
+      now: Date.now(),
+    });
+  } catch (error) {
+    logger.error(REVALIDATE_LOG.TENANT_ID_LOOKUP_FAILED, {
+      tenantProjectId,
+      error,
+    });
+    return NextResponse.json(
+      { message: TENANT_LOOKUP_FAILED_MESSAGE },
+      { status: HTTP_STATUS.BAD_GATEWAY },
+    );
+  }
+
+  if (!verified.ok) {
     return NextResponse.json(
       { message: 'Invalid signature.' },
       { status: HTTP_STATUS.UNAUTHORIZED },
@@ -111,41 +132,27 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { _type: type, _id: id } = parsedBody;
 
-  const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
-
-  let tenantId: TMaybeUndefined<string>;
-  if (tenantProjectId) {
-    try {
-      tenantId =
-        await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId);
-    } catch (error) {
-      logger.error('revalidate.tenant_id_lookup_failed', {
-        tenantProjectId,
-        error,
-      });
-      return NextResponse.json(
-        { message: TENANT_LOOKUP_FAILED_MESSAGE },
-        { status: 502 },
-      );
-    }
-  }
+  const tenantId = verified.data;
 
   if (tenantId) {
     let tenant;
     try {
       tenant = await queries.tenants.getTenantById(tenantId);
     } catch (error) {
-      logger.error('revalidate.tenant_by_id_lookup_failed', {
+      logger.error(REVALIDATE_LOG.TENANT_BY_ID_LOOKUP_FAILED, {
         tenantId,
         error,
       });
       return NextResponse.json(
         { message: TENANT_LOOKUP_FAILED_MESSAGE },
-        { status: 502 },
+        { status: HTTP_STATUS.BAD_GATEWAY },
       );
     }
     if (!tenant) {
-      logger.warn('revalidate.tenant_archived', { tenantProjectId, tenantId });
+      logger.warn(REVALIDATE_LOG.TENANT_ARCHIVED, {
+        tenantProjectId,
+        tenantId,
+      });
       return NextResponse.json(
         { message: 'Tenant is archived; event ignored.' },
         { status: HTTP_STATUS.OK },
@@ -163,14 +170,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     try {
       tenantSanity = await queries.tenants.getTenantSanityCredentials(tenantId);
       if (!tenantSanity) {
-        logger.error('revalidate.tenant_sanity_credentials_missing', {
+        logger.error(REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_MISSING, {
           type,
           id,
           tenantId,
         });
       }
     } catch (error) {
-      logger.error('revalidate.tenant_sanity_credentials_fetch_threw', {
+      logger.error(REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_FETCH_THREW, {
         type,
         id,
         tenantId,
@@ -220,7 +227,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         revalidatePath(path);
       }
     } else {
-      logger.warn(PATH_PURGE_FALLBACK_EVENT, {
+      logger.warn(REVALIDATE_LOG.PATH_PURGE_FALLBACK, {
         type,
         id,
         tenantId,
@@ -239,7 +246,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         id,
       );
     } catch (error) {
-      logger.error('revalidate.bookmark_cleanup_failed', {
+      logger.error(REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED, {
         type,
         id,
         error,

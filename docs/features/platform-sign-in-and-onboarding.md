@@ -6,6 +6,12 @@ code:
   - apps/platform/src/app/api/auth/**
   - apps/platform/src/app/*/workspace-pending/**
   - apps/platform/src/app/*/sign-in-error/**
+  - apps/platform/src/app/*/sign-in/**
+  - apps/platform/src/components/features/sign-in/**
+  - apps/platform/src/server/auth/send-sign-in-link-action*
+  - apps/platform/src/server/auth/sign-in-with-provider-action*
+  - apps/platform/src/utils/safe-callback-path/**
+  - apps/platform/src/utils/sign-in-error/**
   - apps/platform/src/components/features/layout/workspace-pending-view/**
   - apps/platform/src/components/features/layout/sign-out-button/**
   - apps/platform/src/server/auth/auth.ts
@@ -25,24 +31,31 @@ epics: [4840, 4960, 4979, 4982, 4958, 4949, 5649]
 ## What it does
 
 How a person gets into `apps/platform` and, once signed in, into a workspace.
-Today the platform has no sign-in page of its own and no way to create a site
-without an operator. The decided shape is one branded `/sign-in` for every
-platform user, a `/signup` gate for prospects, and an `/onboarding` wizard
-that creates a Free site.
+Today every platform user, operator, owner or invited editor, signs in on one
+branded `/sign-in` page, and there is no way to create a site without an
+operator. The decided shape adds a `/signup` gate for prospects and an
+`/onboarding` wizard that creates a Free site.
 
 ## Surfaces and routes
 
 Today:
 
-- `adminRoutes.signIn(callbackUrl)` is `/api/auth/signin`, Auth.js's default,
-  unbranded page, always with an explicit `callbackUrl` (`/` by default), so
-  Auth.js never falls back to a stale callback-url cookie. A session gate
-  passes the page the visitor asked for, which `src/proxy.ts` records in the
-  `x-admin-requested-path` request header; a sign-in therefore lands on that
-  page, by email link, GitHub or Google alike.
+- `/sign-in` is Auth.js's `pages.signIn`, public and in the panel's own
+  pre-shell styling: a button per configured OAuth provider, then an email
+  field that sends a magic link and says to check your inbox on the same page.
+  `adminRoutes.signIn(callbackUrl)` builds it, always with an explicit
+  `callbackUrl` (`/` by default). A session gate passes the page the visitor
+  asked for, which `src/proxy.ts` records in the `x-admin-requested-path`
+  request header; a sign-in therefore lands on that page, by email link,
+  GitHub or Google alike. `toSafeCallbackPath` keeps only a same-origin path,
+  so a crafted `callbackUrl` falls back to `/`. Auth.js's own
+  `/api/auth/signin` redirects here.
+- Auth.js sends a sign-in failure back to `/sign-in?error=…`.
+  `OAuthAccountNotLinked` (the email already signs in with another provider)
+  gets its own message; any other error a general one.
 - `/` redirects by `resolveHomeHref`: an admin to `/tenants`, anyone else to
   `/dashboard`, a signed-out visitor to sign-in.
-- A signed-in user opening the sign-in page is redirected to `/`.
+- A signed-in user opening `/sign-in` is sent on to its `callbackUrl`.
 - Providers come from `@blog/auth`: GitHub and Google when their credentials
   are set, and the email magic link always.
 - `/sign-in-error`: Auth.js's `pages.error`, public and in the panel's own
@@ -57,8 +70,6 @@ Today:
 
 Decided:
 
-- `/sign-in`: one page for operators, owners and invited editors, handling
-  Auth.js errors such as `OAuthAccountNotLinked` with its own message.
 - `/signup`: a gate in front of the same providers (Vercel BotID, terms and
   privacy acceptance), not a second login.
 - `/onboarding`: site type, name, slug with a live availability check,
@@ -165,6 +176,7 @@ Decided:
 - `apps/platform/src/server/auth/auth.ts` (the platform's `NextAuth()` call)
 - `apps/platform/src/server/auth/require-session-user-id.ts`
 - `apps/platform/src/server/auth/resolve-home-href.ts`
+- `apps/platform/src/app/[locale]/sign-in/page.tsx`
 - `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
@@ -176,8 +188,10 @@ Decided:
 ## Tests and stories
 
 - `apps/platform/src/server/auth/resolve-home-href.test.ts`,
-  `sign-out-action.test.ts`, `sign-in-error/page.test.tsx`, and the view
-  tests beside
+  `sign-out-action.test.ts`, `send-sign-in-link-action.test.ts`,
+  `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
+  `sign-in-error/page.test.tsx`, `safe-callback-path.test.ts`, and the view
+  tests beside `sign-in-view`, `email-sign-in-form`,
   `workspace-pending-view` and `sign-out-button`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.

@@ -1,3 +1,4 @@
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 
 import SignInErrorPage from './page';
@@ -23,10 +24,7 @@ describe(SignInErrorPage, () => {
 
     expect(heading).toBeVisible();
     expect(description).toBeVisible();
-    expect(newLinkLink).toHaveAttribute(
-      'href',
-      '/api/auth/signin?callbackUrl=%2F',
-    );
+    expect(newLinkLink).toHaveAttribute('href', MOCK_SIGN_IN_HREF);
   });
 
   it.each(['Configuration', 'AccessDenied', undefined])(
@@ -45,10 +43,7 @@ describe(SignInErrorPage, () => {
 
       expect(heading).toBeVisible();
       expect(description).toBeVisible();
-      expect(backLink).toHaveAttribute(
-        'href',
-        '/api/auth/signin?callbackUrl=%2F',
-      );
+      expect(backLink).toHaveAttribute('href', MOCK_SIGN_IN_HREF);
     },
   );
 });

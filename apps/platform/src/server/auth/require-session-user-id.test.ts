@@ -1,4 +1,6 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -27,18 +29,22 @@ describe(requireSessionUserId, () => {
       new Headers({ 'x-admin-requested-path': '/dashboard/leads?page=2' }),
     );
 
-    await expect(requireSessionUserId()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSessionUserId()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
     expect(redirect).toHaveBeenCalledWith(
-      '/api/auth/signin?callbackUrl=%2Fdashboard%2Fleads%3Fpage%3D2',
+      '/sign-in?callbackUrl=%2Fdashboard%2Fleads%3Fpage%3D2',
     );
   });
 
   it('returns a signed-out visitor to home when the requested page is unknown', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(requireSessionUserId()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSessionUserId()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
   });
 });

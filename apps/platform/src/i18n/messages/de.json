@@ -7,6 +7,7 @@
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
     "workspacePending": "Arbeitsbereich nicht bereit · Admin",
+    "signInTitle": "Anmelden",
     "signInError": "Problem bei der Anmeldung",
     "addTenant": "Mandant hinzufügen · Admin",
     "tenantOverview": "Mandantenübersicht · Admin",
@@ -28,6 +29,31 @@
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
     "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt.",
     "tryAgain": "Erneut versuchen"
+  },
+  "signInPage": {
+    "heading": "Anmelden",
+    "description": "Verwenden Sie das Konto, mit dem Sie sich registriert haben oder eingeladen wurden.",
+    "brandMarkLabel": "Valstack",
+    "accountNotLinkedTitle": "Diese E-Mail-Adresse meldet sich bereits anders an",
+    "accountNotLinkedDescription": "Ihre E-Mail-Adresse wird bereits mit einer anderen Anmeldemethode verwendet. Melden Sie sich so an wie beim letzten Mal.",
+    "signInFailedTitle": "Anmeldung fehlgeschlagen",
+    "signInFailedDescription": "Bei der Anmeldung ist etwas schiefgelaufen. Versuchen Sie es erneut oder wählen Sie eine andere Anmeldemethode."
+  },
+  "providerSignInButton": {
+    "continueWithGithub": "Weiter mit GitHub",
+    "continueWithGoogle": "Weiter mit Google",
+    "redirecting": "Weiterleitung…"
+  },
+  "emailSignInForm": {
+    "emailLabel": "E-Mail-Adresse",
+    "emailHint": "Wir senden Ihnen einen Link, mit dem Sie sich anmelden.",
+    "emailPlaceholder": "sie@beispiel.de",
+    "sendLink": "Anmeldelink per E-Mail senden",
+    "sending": "Wird gesendet…",
+    "sendFailedTitle": "Wir konnten Ihren Anmeldelink nicht senden",
+    "sendFailedDescription": "Versuchen Sie es in ein paar Minuten erneut.",
+    "linkSentTitle": "Prüfen Sie Ihre E-Mails",
+    "linkSentDescription": "Wir haben einen Anmeldelink an {email} gesendet. Er funktioniert nur einmal und läuft nach einiger Zeit ab."
   },
   "signInErrorPage": {
     "linkSpentHeading": "Dieser Anmeldelink funktioniert nicht mehr",

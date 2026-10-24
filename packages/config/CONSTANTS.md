@@ -309,6 +309,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SETTINGS_REFUSAL**: `NOT_IN_PLAN`, `NOT_FOUND`, `LOCALE_NOT_LIVE`
 
+### `@platform/constants/sign-in` — `apps/platform/src/constants/sign-in.ts`
+
+- **SIGN_IN_ERROR**: `ACCOUNT_NOT_LINKED`, `SIGN_IN_FAILED`
+- **SIGN_IN_LOG**: `LINK_FAILED`=`"auth.sign_in_link_failed"`
+
 ### `@platform/constants/signup-block` — `apps/platform/src/constants/signup-block.ts`
 
 - **SIGNUP_BLOCK_FIELD_ERROR**: `BLOCK_DOMAIN_INVALID`, `BLOCK_REASON_REQUIRED`
@@ -341,6 +346,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/newsletter` — `apps/web/src/constants/newsletter.ts`
 
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
+
+### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
+
+- **REVALIDATE_LOG**: `SECRET_MISSING`=`"revalidate.secret_missing"`, `TENANT_ID_LOOKUP_FAILED`=`"revalidate.tenant_id_lookup_failed"`, `TENANT_BY_ID_LOOKUP_FAILED`=`"revalidate.tenant_by_id_lookup_failed"`, `TENANT_ARCHIVED`=`"revalidate.tenant_archived"`, `TENANT_SANITY_CREDENTIALS_MISSING`=`"revalidate.tenant_sanity_credentials_missing"`, `TENANT_SANITY_CREDENTIALS_FETCH_THREW`=`"revalidate.tenant_sanity_credentials_fetch_threw"`, `TENANT_ACTIVITY_TOUCH_FAILED`=`"revalidate.tenant_activity_touch_failed"`, `PATH_PURGE_FALLBACK`=`"revalidate.path_purge_fallback"`, `REFERENCING_MODULES_LOOKUP_FAILED`=`"revalidate.referencing_modules_lookup_failed"`, `POST_LOOKUP_FAILED`=`"revalidate.post_lookup_failed"`, `BLOG_PAGINATION_LOOKUP_FAILED`=`"revalidate.blog_pagination_lookup_failed"`, `TAG_PARAMS_LOOKUP_FAILED`=`"revalidate.tag_params_lookup_failed"`, `TAG_PAGINATION_LOOKUP_FAILED`=`"revalidate.tag_pagination_lookup_failed"`, `TOPIC_PARAMS_LOOKUP_FAILED`=`"revalidate.topic_params_lookup_failed"`, `TOPIC_PAGINATION_LOOKUP_FAILED`=`"revalidate.topic_pagination_lookup_failed"`, `BOOKMARK_CLEANUP_FAILED`=`"revalidate.bookmark_cleanup_failed"`
 
 ## app:worker
 

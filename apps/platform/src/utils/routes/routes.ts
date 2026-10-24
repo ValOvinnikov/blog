@@ -5,7 +5,7 @@
  */
 export const STUDIO_SEGMENT = 'studio';
 
-export const SIGN_IN_PATH = '/api/auth/signin';
+export const SIGN_IN_PATH = '/sign-in';
 
 /**
  * Single source of truth for apps/platform's own URL construction — never build
@@ -13,7 +13,6 @@ export const SIGN_IN_PATH = '/api/auth/signin';
  */
 export const adminRoutes = {
   home: () => '/',
-  // Always explicit: without it Auth.js returns to its callback-url cookie, which sign-out leaves on this page.
   signIn: (callbackUrl = '/') =>
     `${SIGN_IN_PATH}?${new URLSearchParams({ callbackUrl })}`,
   signInError: () => '/sign-in-error',

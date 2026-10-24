@@ -1,4 +1,6 @@
 import { auth } from '@platform/server/auth/auth';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import type { Session } from 'next-auth';
 
@@ -28,15 +30,13 @@ describe(resolveHomeHref, () => {
   it('links to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(resolveHomeHref()).resolves.toBe(
-      '/api/auth/signin?callbackUrl=%2F',
-    );
+    await expect(resolveHomeHref()).resolves.toBe(MOCK_SIGN_IN_HREF);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
   it('links an admin to the tenants list', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
 
     await expect(resolveHomeHref()).resolves.toBe('/tenants');
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');

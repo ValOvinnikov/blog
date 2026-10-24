@@ -1,6 +1,7 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockLead } from '@platform/testing/leads/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -93,7 +94,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
     expect(listLeadsMock).not.toHaveBeenCalled();
   });
 
