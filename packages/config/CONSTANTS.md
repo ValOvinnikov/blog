@@ -146,6 +146,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`
 
+### `@blog/config/constants` — `packages/config/src/constants/personal-data.ts`
+
+- **PERSONAL_DATA_LOG**: `PLAIN_FALLBACK`=`"personal_data.plain_fallback"`
+
 ### `@blog/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
 - **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`
@@ -227,6 +231,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
+
+### `@blog/db/constants` — `packages/db/src/constants/personal-data.ts`
+
+- **PERSONAL_DATA_OWNER**: `USER`, `LEAD`, `SUBSCRIBER`, `INVITE`
+- **PERSONAL_DATA_FALLBACK_REASON**: `NOT_BACKFILLED`, `ENCRYPTION_KEY_UNSET`, `INDEX_KEY_UNSET`
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 

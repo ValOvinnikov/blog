@@ -1,3 +1,7 @@
+import {
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestReader,
@@ -8,7 +12,10 @@ import {
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
   MOCK_USER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -32,6 +39,7 @@ const REJECTS_UNDECRYPTABLE_TITLE =
 
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -86,14 +94,29 @@ describe(findUserSubscriber, () => {
   it.each([
     ['an unknown user', async () => faker.string.uuid()],
     ['a user without an email', async () => (await insertTestUser(db())).id],
-    [
-      'a user with only a plain email',
-      async () => (await insertTestUser(db(), { email: MOCK_USER_EMAIL })).id,
-    ],
   ])('finds nothing for %s', async (_case, user) => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
     expect(await findUserSubscriber(tenantId, await user())).toBeUndefined();
+  });
+
+  it('finds the subscriber of a user not yet backfilled, and reports the user', async () => {
+    const { id } = await insertTestUser(db(), { email: MOCK_USER_EMAIL });
+    const { id: subscriberId, status } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_USER_EMAIL,
+    );
+
+    expect(await findUserSubscriber(tenantId, id)).toEqual({
+      id: subscriberId,
+      status,
+      email: MOCK_USER_EMAIL,
+    });
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.USER,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
   });
 
   it(REJECTS_UNDECRYPTABLE_TITLE, async () => {
@@ -168,8 +191,28 @@ describe(findSubscriberByExactEmail, () => {
     ).toBeUndefined();
   });
 
-  it('finds nothing for a row without an index', async () => {
-    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL, {
+  it.each(STORED_EMAIL_CASES)(
+    'finds a row not yet backfilled stored under %s, and reports it',
+    async (_case, storedEmail) => {
+      const { id, status } = await insertTestSubscriber(
+        db(),
+        tenantId,
+        storedEmail,
+        { emailEncrypted: null, emailIndex: null },
+      );
+
+      expect(
+        await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
+      ).toEqual({ id, status, email: storedEmail });
+      expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+        owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
+        reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+      });
+    },
+  );
+
+  it('finds nothing for a +tag sibling not yet backfilled', async () => {
+    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL, {
       emailEncrypted: null,
       emailIndex: null,
     });
@@ -177,6 +220,23 @@ describe(findSubscriberByExactEmail, () => {
     expect(
       await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
     ).toBeUndefined();
+  });
+
+  it('finds a row by its plain email when the index key is unset, and reports it', async () => {
+    const { id, status } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
+
+    expect(
+      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
+    ).toEqual({ id, status, email: MOCK_SUBSCRIBER_EMAIL });
+    expect(fallbackListener).toHaveBeenCalledWith({
+      owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
+      reason: PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET,
+    });
   });
 
   it(REJECTS_UNDECRYPTABLE_TITLE, async () => {

@@ -1,8 +1,12 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
+import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { users } from '@blog/db/schema/auth';
 import { bookmarks } from '@blog/db/schema/bookmarks';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import {
+  readOptionalPersonalValue,
+  reportPlainPersonalRead,
+} from '@blog/db/utils/personal-data/personal-data';
 import { and, desc, eq } from 'drizzle-orm';
 
 export type TAccountProfileExport = {
@@ -23,10 +27,11 @@ export type TAccountDataExport = {
   bookmarks: TAccountBookmarkExport[];
 };
 
-function decryptOptional(
+function readOptional(
   encrypted: TMaybeNull<string>,
+  plain: TMaybeNull<string>,
 ): TMaybeUndefined<string> {
-  return encrypted === null ? undefined : decryptPersonalValue(encrypted);
+  return readOptionalPersonalValue(encrypted, plain) ?? undefined;
 }
 
 // TODO: fold in comments and ratings once each lands (#1040, #1041).
@@ -40,7 +45,9 @@ export async function exportAccountData(
   const [user] = await db
     .select({
       id: users.id,
+      name: users.name,
       nameEncrypted: users.nameEncrypted,
+      email: users.email,
       emailEncrypted: users.emailEncrypted,
       emailVerified: users.emailVerified,
       image: users.image,
@@ -50,6 +57,17 @@ export async function exportAccountData(
 
   if (!user) return undefined;
 
+  const {
+    id,
+    name,
+    nameEncrypted,
+    email,
+    emailEncrypted,
+    emailVerified,
+    image,
+  } = user;
+  reportPlainPersonalRead(PERSONAL_DATA_OWNER.USER, emailEncrypted);
+
   const userBookmarks = await db
     .select({ postId: bookmarks.postId, createdAt: bookmarks.createdAt })
     .from(bookmarks)
@@ -58,11 +76,11 @@ export async function exportAccountData(
 
   return {
     profile: {
-      id: user.id,
-      name: decryptOptional(user.nameEncrypted),
-      email: decryptOptional(user.emailEncrypted),
-      emailVerified: user.emailVerified ?? undefined,
-      image: user.image ?? undefined,
+      id,
+      name: readOptional(nameEncrypted, name),
+      email: readOptional(emailEncrypted, email),
+      emailVerified: emailVerified ?? undefined,
+      image: image ?? undefined,
     },
     bookmarks: userBookmarks,
   };

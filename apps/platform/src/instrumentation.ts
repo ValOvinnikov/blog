@@ -5,6 +5,9 @@ export const register = async (): Promise<void> => {
     const { registerLokiSink } =
       await import('@platform/server/log-shipping/register-loki-sink/register-loki-sink');
     registerLokiSink();
+    const { logPersonalDataFallbacks } =
+      await import('@platform/server/personal-data/log-personal-data-fallbacks/log-personal-data-fallbacks');
+    logPersonalDataFallbacks();
   }
 };
 
