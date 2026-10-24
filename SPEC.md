@@ -2308,7 +2308,12 @@ Full mechanics:
 
 Cache tags are always tenant-scoped (`t:<projectId>:<tag>`); the revalidation
 webhook purges both that form and the legacy unprefixed one per publish, keyed
-off Sanity's own `sanity-project-id` webhook header. Tag expiry alone does not
+off Sanity's own `sanity-project-id` webhook header. That header is unsigned,
+so it only picks the secret: a tenant's delivery verifies against that
+tenant's own stored webhook secret alone, while a tenant with none stored yet
+and the platform's own projects verify against `SANITY_REVALIDATE_SECRET`. A
+signature timestamped more than five minutes from now is refused, and every
+refusal is the same unlogged 401. Tag expiry alone does not
 invalidate a prerendered route on Vercel, so the webhook also purges resolved,
 tenant-scoped paths (`revalidatePath('/<tenantId>/<locale>/blog/my-post')`) —
 precisely derived for a published `page_post`: its own page, the home and blog
@@ -2645,7 +2650,10 @@ stdout — stdout is the transport, so there is no logging framework.
 caller, and the app layer logs it once, with request context. A failure logged
 in two layers is one failure that looks like two.
 
-Event names are static, lowercase and dot-namespaced (`tenants.create_failed`).
+Event names are static, lowercase and dot-namespaced (`tenants.create_failed`),
+and each logging domain declares its names once, in a `<DOMAIN>_LOG` const
+(UPPERCASE keys, the lowercase event names as values) that every file logging
+for it imports.
 Dynamic values — slugs, ids, domains, status codes — are structured context
 fields, never interpolated into the name. A static name is what makes failures
 groupable, and it is also the log-injection barrier CodeQL checks. Two distinct

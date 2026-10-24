@@ -635,8 +635,16 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   `export const LINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
   The uppercase value is the stored/serialized value, so schema `options.list`
   and migrations use it too; derive unions with `TValueOf<typeof C>`. Shape
-  and casing never change; two exceptions move only the home, both decided by
-  who reads the const — and a const a package reads never lives in an app:
+  never changes. Casing has one exception: **log vocabulary keeps lowercase
+  values** under UPPERCASE keys, because the value is read by a log pipeline,
+  not stored — `LOG_LEVEL`'s severities, and each logging domain's event names
+  gathered in one `<DOMAIN>_LOG` const beside the code that logs them
+  (`REVALIDATE_LOG = { TENANT_ARCHIVED: 'revalidate.tenant_archived' }` in
+  `apps/web/src/constants/revalidate.ts`). A file that logs imports its
+  domain's `<DOMAIN>_LOG`, never a bare event string or a scalar `*_EVENT`
+  const; a touched file still logging that way converts in the same change.
+  Two further exceptions move only the home, both decided by who reads the
+  const — and a const a package reads never lives in an app:
 
   - **An app's own vocabulary lives in that app.** A const read by exactly one
     app and by no package lives in that app's `src/constants/`, one domain per
