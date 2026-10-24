@@ -215,7 +215,12 @@ backwards.
 schema type, field helper, constant, type, component, test fake or fixture** —
 every app and package, not just the one being changed. A near-duplicate is the
 most expensive kind of mistake to find later, because nothing fails — both
-versions work.
+versions work. No check catches a value or fixture repeated across files, so
+the search is the gate: every implementing agent reports it in a required
+**Reuse** item — for each const, literal value, fixture, builder, fake or
+helper the diff adds, where it looked (`packages/config/const-index.json`, the
+workspace's `src/testing/` and `__mocks__/`, the nearest sibling) and what it
+found. A missing or empty Reuse item is a blocking review finding.
 
 When something similar already exists and it is not obvious whether to extend
 it or add alongside it, that is **not** a judgement call to settle quietly.
@@ -278,8 +283,9 @@ ticket itself. Then sort what you find:
 
 Every implementing agent's report carries a required **Examined** section —
 what it read beyond the files it changed, what it fixed in passing, and what it
-found and left — so a skipped examination shows up in the report instead of
-passing silently.
+found and left — and a required **Reuse** item ("Reuse before you create"), so
+a skipped examination or search shows up in the report instead of passing
+silently.
 
 ## Mid-task decisions land in the ticket/spec before work continues
 

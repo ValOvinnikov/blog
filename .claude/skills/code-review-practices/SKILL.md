@@ -100,6 +100,23 @@ D | grep -nE '^\+ {4,}// '
 # comments in a test file").
 D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
 
+# A fixed fake value not named MOCK_<THING> in a test file, testing/ or
+# __mocks__/ (testing-practices → "Fixture naming").
+D | awk '/^\+\+\+ b\//{t=($0 ~ /(\.test\.tsx?|\/testing\/.*\.tsx?|\/__mocks__\/.*\.tsx?)$/)} t&&/^\+(export )?const [A-Za-z_][A-Za-z0-9_]* = (\047|"|`|\[|\{|-?[0-9]|faker\.)/&&!/^\+(export )?const (MOCK_|mock)/{print FNR": "$0}'
+
+# A fake value a test adds that the workspace's testing/ or __mocks__/ already
+# holds (testing-practices → "Check `testing/` for a builder"). Read each hit: it
+# is blocking when the value stands for the same fake thing.
+for f in $( (git diff "$BASE"...HEAD --name-only --diff-filter=AM; git diff --name-only --diff-filter=AM) | grep -E '\.test\.tsx?$' | sort -u); do
+  ws=$(printf '%s' "$f" | cut -d/ -f1-2)
+  { git diff "$BASE"...HEAD -- "$f"; git diff -- "$f"; } | grep -E '^\+[^+]' \
+    | grep -vE '^\+\s*(import |\} from |vi\.mock\()|ByRole\(|stubEnv|process\.env' \
+    | grep -oE "'[^' ]{4,}'" | sort -u | while read -r lit; do
+      hit=$(git grep -l -F -e "$lit" -- "$ws/src/testing" ":(glob)$ws/src/**/__mocks__/**" | head -1)
+      [ -n "$hit" ] && echo "$f: $lit is already in $hit"
+    done
+done
+
 # Clones across every workspace the diff touches (~5s); read the hits that
 # involve a changed file. A clone the diff creates — helper, component, hook,
 # test fake, fixture, repeated arrangement — is blocking; one whose copies were
@@ -223,11 +240,22 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   "Where tests live", "Rendering and arrangement", "What to fake"; repetition
   already on `main` that the diff adds nothing to is filed (`CLAUDE.md`
   "Duplication that already existed is filed, not fixed inline").
-- A fixture the diff adds to `testing/`, a `fixtures` file or `__mocks__/`
-  that is not named `mock<Thing>` (a builder) or `MOCK_<THING>` (a fixed
-  value) is a finding; render and setup helpers are exempt, and existing
-  fixtures it does not add are left to their workspace's rename
-  (→ `testing-practices` "Fixture naming").
+- **Fixtures (blocking on what the diff adds)** → `testing-practices` "Where
+  tests live":
+  - a builder not named `mock<Thing>`, or a fixed fake value not named
+    `MOCK_<THING>` — in `testing/`, a `fixtures` file, `__mocks__/` or a test
+    file's own top-level `const`; render and setup helpers are exempt, and
+    fixtures the diff does not add are left to their workspace's rename;
+  - a fake value or entity the diff types out that a `testing/` builder, a
+    `__mocks__/` default or a `MOCK_` const already holds;
+  - made-up data typed by hand in a workspace whose `package.json` has
+    `@faker-js/faker`, or a test file using `faker` without `faker.seed()`;
+  - `@faker-js/faker` added to a workspace without the user's yes on record
+    in the dispatch or ticket.
+- **Reuse item (blocking).** Every implementing agent's report carries one
+  (→ `CLAUDE.md` "Reuse before you create"). A missing or empty one, or an
+  entry that says "none found" for a value §0's fixture scan finds in
+  `testing/` or `__mocks__/`, is a finding.
 - A `screen` query inside `expect(…)` in any test file the diff creates or
   touches is **blocking** — the asserted element is a named `const` first,
   and a touched file is converted whole (→ `testing-practices` "Name the

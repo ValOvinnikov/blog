@@ -230,6 +230,12 @@ all work is complete:
   A test file you touch is pruned (`testing-practices` → "When you touch a
   test file"): list each test removed or moved, with the test that still
   asserts its behaviour.
+- **Reuse** (required): one line per const, literal value, fixture, builder,
+  fake or helper the diff adds — what you searched
+  (`packages/config/const-index.json`, the workspace's `src/testing/` and
+  `__mocks__/`, the nearest sibling) and the result: `reused <name> (<file>)`
+  or `none found — added <name>`. Write "nothing added" only when the diff
+  adds none (CLAUDE.md → "Reuse before you create").
 - New or changed constants, types, route builders and `@blog/utils` helpers,
   with their exact import path and signature (`LINK_TYPE` from
   `@blog/config`, `routes.topic(slug, page?)`).
