@@ -16,7 +16,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const TAGGED_USER_EMAIL = taggedMixedCaseAddress(MOCK_USER_EMAIL);
+const MOCK_TAGGED_USER_EMAIL = taggedMixedCaseAddress(MOCK_USER_EMAIL);
 
 afterEach(async () => {
   await db().delete(schema.users);
@@ -33,28 +33,33 @@ describe(getUsersByEmailIndex, () => {
     ).resolves.toEqual([user]);
   });
 
-  it('finds the account of a +tag address by that exact address', async () => {
+  it.each([
+    {
+      title: 'finds the account of a +tag address by that exact address',
+      indexedEmail: MOCK_TAGGED_USER_EMAIL,
+      requestedEmail: MOCK_TAGGED_USER_EMAIL,
+      found: true,
+    },
+    {
+      title: 'never finds the account of an address for a +tag variant of it',
+      indexedEmail: MOCK_USER_EMAIL,
+      requestedEmail: MOCK_TAGGED_USER_EMAIL,
+      found: false,
+    },
+  ])('$title', async ({ indexedEmail, requestedEmail, found }) => {
     const user = await insertTestUser(db(), {
-      emailIndex: mockAccountEmailIndex(TAGGED_USER_EMAIL),
+      emailIndex: mockAccountEmailIndex(indexedEmail),
     });
 
-    await expect(getUsersByEmailIndex(TAGGED_USER_EMAIL)).resolves.toEqual([
-      user,
-    ]);
+    await expect(getUsersByEmailIndex(requestedEmail)).resolves.toEqual(
+      found ? [user] : [],
+    );
   });
 
   it('returns nothing when no user has that index', async () => {
     await insertTestUser(db(), { email: MOCK_USER_EMAIL });
 
     await expect(getUsersByEmailIndex(MOCK_USER_EMAIL)).resolves.toEqual([]);
-  });
-
-  it('never finds the account of an address for a +tag variant of it', async () => {
-    await insertTestUser(db(), {
-      emailIndex: mockAccountEmailIndex(MOCK_USER_EMAIL),
-    });
-
-    await expect(getUsersByEmailIndex(TAGGED_USER_EMAIL)).resolves.toEqual([]);
   });
 
   it('returns every user sharing the index', async () => {
@@ -64,7 +69,7 @@ describe(getUsersByEmailIndex, () => {
       emailIndex,
     });
     const second = await insertTestUser(db(), {
-      email: TAGGED_USER_EMAIL,
+      email: MOCK_TAGGED_USER_EMAIL,
       emailIndex,
     });
 

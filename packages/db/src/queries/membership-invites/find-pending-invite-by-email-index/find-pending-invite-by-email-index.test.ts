@@ -16,7 +16,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);
+const MOCK_TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);
 
 afterEach(async () => {
   await db().delete(schema.membershipInvites);
@@ -55,10 +55,12 @@ describe(findPendingInviteByEmailIndex, () => {
 
   it('finds an invite sent to a +tag address by that exact address', async () => {
     const tenantId = await insertInvite(
-      inviteEmailColumns(TAGGED_INVITE_EMAIL),
+      inviteEmailColumns(MOCK_TAGGED_INVITE_EMAIL),
     );
 
-    const invites = await findPendingInviteByEmailIndex(TAGGED_INVITE_EMAIL);
+    const invites = await findPendingInviteByEmailIndex(
+      MOCK_TAGGED_INVITE_EMAIL,
+    );
 
     expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
   });
@@ -67,9 +69,13 @@ describe(findPendingInviteByEmailIndex, () => {
     [
       'an address by a +tag variant of it',
       MOCK_INVITE_EMAIL,
-      TAGGED_INVITE_EMAIL,
+      MOCK_TAGGED_INVITE_EMAIL,
     ],
-    ['a +tag variant by the address', TAGGED_INVITE_EMAIL, MOCK_INVITE_EMAIL],
+    [
+      'a +tag variant by the address',
+      MOCK_TAGGED_INVITE_EMAIL,
+      MOCK_INVITE_EMAIL,
+    ],
   ])(
     'never matches an invite sent to %s',
     async (_label, sentTo, requested) => {

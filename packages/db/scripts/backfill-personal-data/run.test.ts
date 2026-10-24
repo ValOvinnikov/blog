@@ -35,9 +35,9 @@ const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
 const MOCK_EXISTING_CIPHERTEXT = 'v1:existing-ciphertext';
-const USER_COUNT_OVER_ONE_BATCH = 501;
+const MOCK_USER_COUNT_OVER_ONE_BATCH = 501;
 
-const NO_GAPS = {
+const MOCK_NO_GAPS = {
   users: 0,
   subscribers: 0,
   membership_invites: 0,
@@ -107,15 +107,15 @@ describe(backfillPersonalData, () => {
     await db()
       .insert(schema.users)
       .values(
-        Array.from({ length: USER_COUNT_OVER_ONE_BATCH }, () => ({
+        Array.from({ length: MOCK_USER_COUNT_OVER_ONE_BATCH }, () => ({
           email: faker.internet.email(),
         })),
       );
 
     const { users } = await backfillPersonalData(loadPersonalDataKeys());
 
-    expect(users).toBe(USER_COUNT_OVER_ONE_BATCH);
-    expect(await countPersonalDataGaps()).toEqual(NO_GAPS);
+    expect(users).toBe(MOCK_USER_COUNT_OVER_ONE_BATCH);
+    expect(await countPersonalDataGaps()).toEqual(MOCK_NO_GAPS);
   });
 
   describe('with plain rows seeded', () => {
@@ -183,7 +183,7 @@ describe(backfillPersonalData, () => {
 
       const backfilled = await backfillPersonalData(loadPersonalDataKeys());
 
-      expect(backfilled).toEqual(NO_GAPS);
+      expect(backfilled).toEqual(MOCK_NO_GAPS);
       expect(await readAllRows()).toEqual(afterFirstRun);
     });
   });
@@ -206,17 +206,17 @@ describe(countPersonalDataGaps, () => {
   it('finds no gaps once the backfill has run', async () => {
     await backfillPersonalData(loadPersonalDataKeys());
 
-    expect(await countPersonalDataGaps()).toEqual(NO_GAPS);
+    expect(await countPersonalDataGaps()).toEqual(MOCK_NO_GAPS);
   });
 });
 
 describe(reindexTaggedUserEmails, () => {
-  const TAGGED_USER_EMAIL = taggedMixedCaseAddress(MOCK_USER_EMAIL).trim();
+  const MOCK_TAGGED_USER_EMAIL = taggedMixedCaseAddress(MOCK_USER_EMAIL).trim();
 
   async function insertStaleTaggedUser(): Promise<string> {
     const { id } = await insertTestUser(db(), {
-      email: TAGGED_USER_EMAIL,
-      emailIndex: testPersonalEmailIndex(TAGGED_USER_EMAIL),
+      email: MOCK_TAGGED_USER_EMAIL,
+      emailIndex: testPersonalEmailIndex(MOCK_TAGGED_USER_EMAIL),
     });
     return id;
   }
@@ -228,7 +228,9 @@ describe(reindexTaggedUserEmails, () => {
 
     const [user] = await db().select().from(schema.users);
     expect(reindexed).toBe(1);
-    expect(user?.emailIndex).toBe(mockAccountEmailIndex(TAGGED_USER_EMAIL));
+    expect(user?.emailIndex).toBe(
+      mockAccountEmailIndex(MOCK_TAGGED_USER_EMAIL),
+    );
   });
 
   it('counts the stale rows without writing them', async () => {
@@ -237,7 +239,9 @@ describe(reindexTaggedUserEmails, () => {
     expect(await countStaleTaggedUserIndexes(loadPersonalDataKeys())).toBe(1);
 
     const [user] = await db().select().from(schema.users);
-    expect(user?.emailIndex).toBe(testPersonalEmailIndex(TAGGED_USER_EMAIL));
+    expect(user?.emailIndex).toBe(
+      testPersonalEmailIndex(MOCK_TAGGED_USER_EMAIL),
+    );
   });
 
   it('leaves untagged and already-correct rows alone, so a re-run does nothing', async () => {
@@ -257,6 +261,6 @@ describe(reindexTaggedUserEmails, () => {
     await backfillPersonalData(loadPersonalDataKeys());
     await reindexTaggedUserEmails(loadPersonalDataKeys());
 
-    expect(await countPersonalDataGaps()).toEqual(NO_GAPS);
+    expect(await countPersonalDataGaps()).toEqual(MOCK_NO_GAPS);
   });
 });

@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { accountEmailIndex } from '@blog/utils/encryption';
@@ -6,6 +7,7 @@ import {
   normalizeEmail,
   normalizeEmailIdentity,
 } from '@blog/utils/normalize-email-identity';
+import { isUndefined } from '@blog/utils/primitives';
 import { and, asc, eq, gt, isNotNull, like, sql } from 'drizzle-orm';
 
 import { BATCH_SIZE } from './batch-size';
@@ -22,7 +24,7 @@ async function findStaleUserIndexes({
 }: TPersonalDataKeys): Promise<IStaleUserIndex[]> {
   const db = getDb();
   const stale: IStaleUserIndex[] = [];
-  let afterId: string | undefined;
+  let afterId: TMaybeUndefined<string>;
 
   for (;;) {
     const batch = await db
@@ -36,7 +38,7 @@ async function findStaleUserIndexes({
         and(
           isNotNull(users.email),
           like(users.email, `%${EMAIL_TAG_SEPARATOR}%`),
-          afterId === undefined ? undefined : gt(users.id, afterId),
+          isUndefined(afterId) ? undefined : gt(users.id, afterId),
         ),
       )
       .orderBy(asc(users.id))

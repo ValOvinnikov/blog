@@ -6,6 +6,7 @@ import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/n
 import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { personalDataIndex } from '@blog/utils/encryption';
+import { isUndefined } from '@blog/utils/primitives';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function isSignupBlocked(
@@ -35,5 +36,5 @@ export async function isSignupBlocked(
     )
     .limit(1);
 
-  return okResult(match !== undefined);
+  return okResult(!isUndefined(match));
 }

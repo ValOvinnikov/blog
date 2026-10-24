@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { encryptPersonalData } from '@blog/utils/encryption';
-import { isString } from '@blog/utils/primitives';
+import { isUndefined, isString } from '@blog/utils/primitives';
 import { and, asc, gt, type SQL, sql } from 'drizzle-orm';
 
 import { BATCH_SIZE } from './batch-size';
@@ -60,7 +60,7 @@ export async function backfillTarget(
       .select(selection)
       .from(table)
       .where(
-        afterId === undefined
+        isUndefined(afterId)
           ? targetGap(target)
           : and(targetGap(target), gt(id, afterId)),
       )

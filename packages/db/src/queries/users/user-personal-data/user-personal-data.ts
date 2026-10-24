@@ -6,6 +6,7 @@ import {
   encryptPersonalValue,
 } from '@blog/db/utils/personal-data/personal-data';
 import { accountEmailIndex } from '@blog/utils/encryption';
+import { isUndefined } from '@blog/utils/primitives';
 
 type TUserPersonalColumns = Pick<
   TUser,
@@ -21,8 +22,8 @@ export function userPersonalColumns({
   name?: TNullable<string>;
 }): Partial<TUserPersonalColumns> {
   return {
-    ...(email !== undefined && emailColumns(email, accountEmailIndex)),
-    ...(name !== undefined && {
+    ...(!isUndefined(email) && emailColumns(email, accountEmailIndex)),
+    ...(!isUndefined(name) && {
       nameEncrypted: name === null ? null : encryptPersonalValue(name),
     }),
   };
