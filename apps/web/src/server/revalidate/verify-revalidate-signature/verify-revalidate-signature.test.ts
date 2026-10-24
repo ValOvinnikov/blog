@@ -115,10 +115,10 @@ describe(verifyRevalidateSignature, () => {
   });
 
   it.each([
-    ['older', -1],
-    ['newer', 1],
+    ['in the past', -1],
+    ['in the future', 1],
   ])(
-    'refuses a signature more than five minutes %s than now, before any lookup',
+    'refuses a signature timestamped more than five minutes %s, before any lookup',
     async (_, direction) => {
       const timestamp = NOW + direction * (REVALIDATE_SIGNATURE_MAX_AGE_MS + 1);
 
@@ -138,9 +138,12 @@ describe(verifyRevalidateSignature, () => {
   });
 
   it.each([
-    ['missing', null],
-    ['malformed', faker.string.alphanumeric(24)],
-  ])('refuses a %s signature header', async (_, signature) => {
+    ['no signature header', null],
+    [
+      'a signature header not in the t=…,v1=… form',
+      faker.string.alphanumeric(24),
+    ],
+  ])('refuses a request with %s', async (_, signature) => {
     await expect(verify(signature, TENANT_PROJECT_ID)).resolves.toEqual(
       REFUSED,
     );
