@@ -36,6 +36,7 @@ usePersonalDataKeys();
 
 const MOCK_EXISTING_CIPHERTEXT = 'v1:existing-ciphertext';
 const MOCK_USER_COUNT_OVER_ONE_BATCH = 501;
+const MOCK_BATCH_USER_EMAIL_PREFIX = 'batch-user-';
 
 const MOCK_NO_GAPS = {
   users: 0,
@@ -107,8 +108,8 @@ describe(backfillPersonalData, () => {
     await db()
       .insert(schema.users)
       .values(
-        Array.from({ length: MOCK_USER_COUNT_OVER_ONE_BATCH }, () => ({
-          email: faker.internet.email(),
+        Array.from({ length: MOCK_USER_COUNT_OVER_ONE_BATCH }, (_, index) => ({
+          email: `${MOCK_BATCH_USER_EMAIL_PREFIX}${index}@example.test`,
         })),
       );
 
