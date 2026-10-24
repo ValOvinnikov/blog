@@ -4,9 +4,9 @@ import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
+  LEAD_LOG,
   LEAD_REFUSAL,
   type TLeadRefusal,
-  LEAD_LOG,
 } from '@platform/constants/lead';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { logger } from '@platform/utils/logger/logger';

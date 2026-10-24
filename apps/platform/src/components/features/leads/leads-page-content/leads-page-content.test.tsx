@@ -1,136 +1,123 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { LEADS_PAGE_SIZE, TENANT_PLAN } from '@blog/db/constants';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import {
+  customRenderAsync,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { mockLead } from '@platform/testing/leads/fixtures';
 import {
-  mockReadyTenant,
   MOCK_TENANT_ID,
+  mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { redirect } from 'next/navigation';
 
 import { LeadsPageContent } from './leads-page-content';
 
-const { listLeadsMock } = vi.hoisted(() => ({ listLeadsMock: vi.fn() }));
+faker.seed(5757);
+
+const { listLeadsByCursorMock } = vi.hoisted(() => ({
+  listLeadsByCursorMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', () => ({
-  queries: { leads: { listLeads: listLeadsMock } },
+  queries: { leads: { listLeadsByCursor: listLeadsByCursorMock } },
 }));
 
-vi.mock('@platform/server/leads/delete-lead-action', () => ({
-  deleteLeadAction: vi.fn(),
-}));
+vi.mock('@platform/server/leads/delete-lead-action');
+
+vi.mock('@platform/server/leads/load-more-leads-action');
+
+vi.mock('@platform/server/leads/get-lead-page-title-action');
+
+vi.mock('@platform/server/leads/set-lead-read-action');
+
+const MOCK_NEWEST_LEAD = mockLead({
+  id: faker.string.uuid(),
+  name: faker.person.fullName(),
+});
+const MOCK_OLDEST_LEAD = mockLead({
+  id: faker.string.uuid(),
+  name: faker.person.fullName(),
+});
+const CONTACT_FORM_NOT_INCLUDED = 'Contact form not included in your plan';
 
 const setup = customRenderAsync(LeadsPageContent, {
   tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-  page: 1,
-  pageHref: adminRoutes.dashboardLeads,
 });
 
-const CONTACT_FORM_NOT_INCLUDED_IN = 'Contact form not included in your plan';
-const ADA_LOVELACE = 'Ada Lovelace';
-
-describe(LeadsPageContent, () => {
+describe(`<${LeadsPageContent.name}/>`, () => {
   beforeEach(() => {
-    listLeadsMock.mockReset();
-    listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
-  });
-
-  it("asks for the requested page of the tenant's own leads, a page at a time", async () => {
-    listLeadsMock.mockResolvedValue({ leads: [mockLead()], total: 60 });
-
-    await setup({ page: 2 });
-
-    expect(listLeadsMock).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
-      page: 2,
-      pageSize: LEADS_PAGE_SIZE,
+    listLeadsByCursorMock.mockResolvedValue({
+      leads: [],
+      nextCursor: undefined,
     });
   });
 
-  it('renders the leads newest first, as returned, with the page position', async () => {
-    listLeadsMock.mockResolvedValue({
-      leads: [
-        mockLead({ id: 'lead-2', name: 'Newest' }),
-        mockLead({ id: 'lead-1', name: 'Oldest' }),
-      ],
-      total: 30,
+  describe('with no leads', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it("asks for the first page of the tenant's own leads", () => {
+      expect(listLeadsByCursorMock).toHaveBeenCalledWith({
+        tenantId: MOCK_TENANT_ID,
+      });
+    });
+
+    it('says so when there are no messages yet', () => {
+      const emptyState = screen.getByText(/No messages yet/);
+
+      expect(emptyState).toBeVisible();
+    });
+
+    it('states that each message was also emailed', () => {
+      const description = screen.getByText(/also emailed to you/);
+
+      expect(description).toBeVisible();
+    });
+
+    it('shows no plan notice while the plan includes the contact form', () => {
+      const planNotice = screen.queryByText(CONTACT_FORM_NOT_INCLUDED);
+
+      expect(planNotice).not.toBeInTheDocument();
+    });
+  });
+
+  it('lists the leads newest first, as returned', async () => {
+    listLeadsByCursorMock.mockResolvedValue({
+      leads: [MOCK_NEWEST_LEAD, MOCK_OLDEST_LEAD],
+      nextCursor: undefined,
     });
 
     await setup();
 
-    const [, newest, oldest] = screen.getAllByRole('row');
-    expect(newest).toHaveTextContent('Newest');
-    expect(oldest).toHaveTextContent('Oldest');
-    expect(screen.getByText('Page 1 of 2')).toBeVisible();
+    const list = screen.getByRole('list', { name: 'Messages' });
+    const [newest, oldest] = within(list).getAllByRole('listitem');
+
+    expect(newest).toHaveTextContent(MOCK_NEWEST_LEAD.name);
+    expect(oldest).toHaveTextContent(MOCK_OLDEST_LEAD.name);
   });
 
-  it('states that each message was also emailed', async () => {
-    await setup();
-
-    expect(screen.getByText(/also emailed to you/)).toBeVisible();
-  });
-
-  it('shows no plan notice while the plan includes the contact form', async () => {
-    await setup();
-
-    expect(
-      screen.queryByText(CONTACT_FORM_NOT_INCLUDED_IN),
-    ).not.toBeInTheDocument();
-  });
-
-  it('keeps the leads and warns when the plan no longer includes the contact form', async () => {
-    listLeadsMock.mockResolvedValue({
-      leads: [mockLead({ name: ADA_LOVELACE })],
-      total: 1,
+  it('keeps the leads and warns when the plan no longer has the contact form', async () => {
+    listLeadsByCursorMock.mockResolvedValue({
+      leads: [MOCK_NEWEST_LEAD],
+      nextCursor: undefined,
     });
 
     await setup({
       tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE }),
     });
 
-    expect(screen.getByText(CONTACT_FORM_NOT_INCLUDED_IN)).toBeVisible();
-    expect(
-      screen.getByText(/messages you already received are kept/),
-    ).toBeVisible();
-    expect(screen.getByText(ADA_LOVELACE)).toBeVisible();
-    expect(
-      screen.getByRole('button', {
-        name: 'Delete the message from Ada Lovelace',
-      }),
-    ).toBeVisible();
-  });
-
-  it('redirects within the address space the caller gives', async () => {
-    listLeadsMock.mockResolvedValue({ leads: [], total: 30 });
-
-    await expect(
-      setup({
-        page: 9,
-        pageHref: (page) => `/tenants/${MOCK_TENANT_ID}/leads?page=${page}`,
-      }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(redirect).toHaveBeenCalledWith(
-      `/tenants/${MOCK_TENANT_ID}/leads?page=2`,
+    const planNotice = screen.getByText(CONTACT_FORM_NOT_INCLUDED);
+    const keptNotice = screen.getByText(
+      /messages you already received are kept/,
     );
-  });
+    const leadRow = screen.getByRole('button', {
+      name: new RegExp(MOCK_NEWEST_LEAD.name),
+    });
 
-  it('sends a page past the end to the last page', async () => {
-    listLeadsMock.mockResolvedValue({ leads: [], total: 30 });
-
-    await expect(setup({ page: 9 })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(redirect).toHaveBeenCalledWith('/dashboard/leads?page=2');
-  });
-
-  it('sends a page past the end of an empty list to the first page', async () => {
-    await expect(setup({ page: 3 })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(redirect).toHaveBeenCalledWith('/dashboard/leads');
+    expect(planNotice).toBeVisible();
+    expect(keptNotice).toBeVisible();
+    expect(leadRow).toBeVisible();
   });
 });

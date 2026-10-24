@@ -1,23 +1,20 @@
 import { ALERT_TYPE } from '@blog/config';
-import type { TListedLead } from '@blog/db/queries/leads';
-import { LeadsTable } from '@platform/components/features/leads/leads-table';
+import { LeadsInbox } from '@platform/components/features/leads/leads-inbox';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
+import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 import { leadsViewVariants } from './leads-view-variants';
 
 export type TLeadsViewProps = {
-  leads: TListedLead[];
+  initialPage: TInboxLeadsPage;
   isContactFormIncluded: boolean;
-  pagination: ReactNode;
 };
 
 export const LeadsView = ({
-  leads,
+  initialPage,
   isContactFormIncluded,
-  pagination,
 }: TLeadsViewProps) => {
   const t = useTranslations('leadsView');
   const { root } = leadsViewVariants();
@@ -32,8 +29,7 @@ export const LeadsView = ({
           description={t('downgradedDescription')}
         />
       )}
-      <LeadsTable leads={leads} />
-      {pagination}
+      <LeadsInbox initialPage={initialPage} />
     </div>
   );
 };

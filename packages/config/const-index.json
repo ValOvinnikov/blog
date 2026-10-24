@@ -3866,6 +3866,46 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "leads.load_failed": [
+      {
+        "ref": "LEAD_LOG.LOAD_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "leads.read_state_failed": [
+      {
+        "ref": "LEAD_LOG.READ_STATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "leads.page_title_skipped": [
+      {
+        "ref": "LEAD_LOG.PAGE_TITLE_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "leads.page_title_failed": [
+      {
+        "ref": "LEAD_LOG.PAGE_TITLE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "leads.page_title_error": [
+      {
+        "ref": "LEAD_LOG.PAGE_TITLE_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/lead",
+        "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
     "operator_alert.no_recipients": [
       {
         "ref": "OPERATOR_ALERT_LOG.NO_RECIPIENTS",

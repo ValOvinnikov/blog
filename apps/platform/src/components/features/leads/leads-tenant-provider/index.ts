@@ -1,1 +1,5 @@
-export { LeadsTenantProvider, useLeadsTenantId } from './leads-tenant-provider';
+export {
+  LeadsTenantProvider,
+  useLeadPageTitleCache,
+  useLeadsTenantId,
+} from './leads-tenant-provider';
