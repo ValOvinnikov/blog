@@ -1,11 +1,14 @@
-import { CONTRAST_CHECK_OUTCOME } from '@blog/config/constants';
+import { CONTRAST_CHECK_OUTCOME, HTTP_STATUS } from '@blog/config/constants';
 import type { TContrastResultBody } from '@blog/config/types';
 import { queries } from '@blog/db';
+import { CONTRAST_RESULT_LOG } from '@platform/constants/contrast-result';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+
+const MALFORMED_BODY_MESSAGE = 'Malformed contrast result body.';
 
 const contrastResultBodySchema = z.object({
   sha: z.string().regex(/^[0-9a-f]{40}$/),
@@ -18,17 +21,17 @@ const contrastResultBodySchema = z.object({
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.CONTRAST_RESULT_SECRET;
   if (!secret) {
-    logger.error('contrast_result.secret_missing');
+    logger.error(CONTRAST_RESULT_LOG.SECRET_MISSING);
     return NextResponse.json(
       { message: 'Contrast result secret is not configured.' },
-      { status: 500 },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
     );
   }
 
   if (!hasBearerSecret(request, secret)) {
     return NextResponse.json(
       { message: 'Invalid or missing secret.' },
-      { status: 401 },
+      { status: HTTP_STATUS.UNAUTHORIZED },
     );
   }
 
@@ -37,16 +40,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     body = await request.json();
   } catch {
     return NextResponse.json(
-      { message: 'Malformed contrast result body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
   const parsed = contrastResultBodySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { message: 'Malformed contrast result body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
@@ -55,12 +58,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     await queries.findings.recordContrastResult(parsed.data);
   } catch (error) {
-    logger.error('contrast_result.record_failed', { sha, outcome, error });
+    logger.error(CONTRAST_RESULT_LOG.RECORD_FAILED, { sha, outcome, error });
     return NextResponse.json(
       { message: 'Failed to record contrast result.' },
-      { status: 500 },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
     );
   }
 
-  return NextResponse.json({ sha, outcome }, { status: 200 });
+  return NextResponse.json({ sha, outcome }, { status: HTTP_STATUS.OK });
 }

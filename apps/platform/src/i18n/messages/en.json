@@ -11,6 +11,7 @@
     "signInError": "Sign-in problem",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
+    "tenantActivity": "Tenant activity · Admin",
     "tenantProvisioning": "Provisioning · Admin",
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
@@ -321,13 +322,20 @@
     "notSetValue": "Not set",
     "recentActivityCardTitle": "Recent activity",
     "recentActivitySourceLabel": "System log",
-    "activityEmpty": "No activity recorded yet.",
-    "activityActorDeleted": "Deleted account",
+    "viewAllActivityLink": "View all activity"
+  },
+  "tenantActivityPage": {
+    "title": "Activity",
+    "description": "Lifecycle and operator actions on this tenant, newest first."
+  },
+  "activityList": {
+    "empty": "No activity recorded yet.",
+    "actorDeleted": "Deleted account",
     "relativeJustNow": "Just now",
     "relativeMinutesAgo": "{minutes}m ago",
     "relativeHoursAgo": "{hours}h ago",
     "relativeDaysAgo": "{days}d ago",
-    "activityAction": {
+    "action": {
       "CREATED": "Tenant created",
       "DEPROVISION_REQUESTED": "Deprovisioning requested",
       "DEPROVISIONED": "Tenant deprovisioned",
@@ -1157,6 +1165,12 @@
     "page": "Page",
     "homePage": "Home page",
     "readStateFailed": "Couldn't update the message. Try again."
+  },
+  "pagination": {
+    "ariaLabel": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "status": "Page {page} of {totalPages}"
   },
   "deleteLeadControl": {
     "triggerButton": "Delete",

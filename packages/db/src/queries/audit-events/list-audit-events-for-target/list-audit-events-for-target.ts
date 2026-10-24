@@ -5,10 +5,9 @@ import { and, desc, eq } from 'drizzle-orm';
 
 export type TListAuditEventsForTargetOptions = {
   limit?: number;
+  offset?: number;
 };
 
-// The query `audit_events_target_idx` exists for — every event recorded
-// against one target, newest first.
 export async function listAuditEventsForTarget(
   targetType: TAuditTargetType,
   targetId: string,
@@ -25,6 +24,7 @@ export async function listAuditEventsForTarget(
         eq(auditEvents.targetId, targetId),
       ),
     )
-    .orderBy(desc(auditEvents.createdAt))
-    .limit(options.limit ?? 20);
+    .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
+    .limit(options.limit ?? 20)
+    .offset(Math.max(options.offset ?? 0, 0));
 }

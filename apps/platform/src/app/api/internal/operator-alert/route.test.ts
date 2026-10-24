@@ -4,6 +4,7 @@ import {
   OPERATOR_ALERT_KIND,
 } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
@@ -40,7 +41,6 @@ const ENDPOINT = 'https://admin.example.com/api/internal/operator-alert';
 const SUPERADMIN_ONE = 'super-one@example.com';
 const SUPERADMIN_TWO = 'super-two@example.com';
 const SEND_FAILURE_MESSAGE = 'Failed to send email via Resend: rejected';
-const SEND_FAILED_EVENT = 'operator_alert.send_failed';
 
 const postRequest = (
   body: unknown,
@@ -220,11 +220,14 @@ describe('POST /api/internal/operator-alert', () => {
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({ to: SUPERADMIN_TWO }),
     );
-    expect(loggerErrorMock).toHaveBeenCalledWith(SEND_FAILED_EVENT, {
-      tenantId: 't1',
-      kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-      error: sendError,
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      OPERATOR_ALERT_LOG.SEND_FAILED,
+      {
+        tenantId: 't1',
+        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
+        error: sendError,
+      },
+    );
     expect(response.status).toBe(207);
     const responseBody = await response.json();
     expect(responseBody).toEqual({ sent: 1, failed: 1 });
@@ -243,11 +246,14 @@ describe('POST /api/internal/operator-alert', () => {
       }),
     );
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(SEND_FAILED_EVENT, {
-      tenantId: 't1',
-      kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-      error: sendError,
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      OPERATOR_ALERT_LOG.SEND_FAILED,
+      {
+        tenantId: 't1',
+        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
+        error: sendError,
+      },
+    );
     expect(response.status).toBe(HTTP_STATUS.BAD_GATEWAY);
   });
 });

@@ -9,7 +9,11 @@ import {
 import { TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  TENANT_LOG,
+} from '@platform/constants/tenant';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import {
@@ -32,8 +36,6 @@ const OWNER_USER_ID = 'user-1';
 const TENANT_ROOT_DOMAIN = 'example.com';
 const PROVISIONING_PATH = `/tenants/${MOCK_TENANT_ID}/provisioning`;
 const EXISTING_TENANT_ID = 'existing-tenant';
-const OWNER_INVITE_EMAIL_FAILED_EVENT = 'tenants.owner_invite_email_failed';
-const CREATE_DRAFT_FAILED_EVENT = 'tenants.create_draft_failed';
 
 const validOwnerInviteToken = createOwnerInviteToken(MOCK_OWNER_EMAIL);
 
@@ -235,7 +237,7 @@ describe('createTenantAction', () => {
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      OWNER_INVITE_EMAIL_FAILED_EVENT,
+      TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
       expect.objectContaining({
         tenantId: MOCK_TENANT_ID,
         ownerEmail: MOCK_OWNER_EMAIL,
@@ -257,7 +259,7 @@ describe('createTenantAction', () => {
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      OWNER_INVITE_EMAIL_FAILED_EVENT,
+      TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
       expect.objectContaining({
         tenantId: MOCK_TENANT_ID,
         ownerEmail: MOCK_OWNER_EMAIL,
@@ -369,7 +371,7 @@ describe('createTenantAction', () => {
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      CREATE_DRAFT_FAILED_EVENT,
+      TENANT_LOG.CREATE_DRAFT_FAILED,
       expect.objectContaining({ domain: MOCK_TENANT_DOMAIN }),
     );
   });
@@ -385,7 +387,7 @@ describe('createTenantAction', () => {
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      CREATE_DRAFT_FAILED_EVENT,
+      TENANT_LOG.CREATE_DRAFT_FAILED,
       expect.objectContaining({
         domain: MOCK_TENANT_DOMAIN,
         error: ERROR_CODE.DB_NOT_FOUND,
@@ -489,7 +491,7 @@ describe('createTenantAction', () => {
     expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.create_audit_failed',
+      TENANT_LOG.CREATE_AUDIT_FAILED,
       expect.objectContaining({
         targetId: MOCK_TENANT_ID,
         error: expect.any(Error),

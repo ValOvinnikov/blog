@@ -9,13 +9,14 @@ import {
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND, queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
+import {
+  SIGNUP_BLOCK_REFUSAL,
+  SIGNUP_BLOCK_LOG,
+} from '@platform/constants/signup-block';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
-
-const REMOVE_FAILED_EVENT = 'signup_block.remove_failed';
 
 const removeBlockedIdentityInputSchema = z.string().min(1);
 
@@ -43,7 +44,7 @@ export const removeBlockedIdentityAction = async (
     const entries =
       await queries.blockedSignupIdentities.listBlockedIdentities();
     if (!entries.ok) {
-      logger.error('signup_block.remove_lookup_failed', {
+      logger.error(SIGNUP_BLOCK_LOG.REMOVE_LOOKUP_FAILED, {
         error: entries.error,
       });
       return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
@@ -59,12 +60,12 @@ export const removeBlockedIdentityAction = async (
     );
     if (!removed.ok) {
       if (removed.error === ERROR_CODE.DB_NOT_FOUND) return NOT_FOUND;
-      logger.error(REMOVE_FAILED_EVENT, { error: removed.error });
+      logger.error(SIGNUP_BLOCK_LOG.REMOVE_FAILED, { error: removed.error });
       return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
     await recordAuditEvent({
-      logEvent: 'signup_block.remove_audit_failed',
+      logEvent: SIGNUP_BLOCK_LOG.REMOVE_AUDIT_FAILED,
       action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
       targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
       targetId: entry.id,
@@ -76,7 +77,7 @@ export const removeBlockedIdentityAction = async (
       },
     });
   } catch (error) {
-    logger.error(REMOVE_FAILED_EVENT, { error });
+    logger.error(SIGNUP_BLOCK_LOG.REMOVE_FAILED, { error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

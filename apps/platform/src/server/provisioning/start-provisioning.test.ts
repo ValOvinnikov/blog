@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
+import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -49,7 +50,7 @@ describe(startProvisioning, () => {
     const result = await startProvisioning(MOCK_TENANT_ID);
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'provisioning.enqueue_not_found',
+      PROVISIONING_LOG.ENQUEUE_NOT_FOUND,
       { tenantId: MOCK_TENANT_ID },
     );
     expect(result).toEqual({
@@ -70,7 +71,7 @@ describe(startProvisioning, () => {
       const result = await startProvisioning(MOCK_TENANT_ID);
 
       expect(loggerErrorMock).toHaveBeenCalledWith(
-        'provisioning.enqueue_failed',
+        PROVISIONING_LOG.ENQUEUE_FAILED,
         { tenantId: MOCK_TENANT_ID, responseStatus },
       );
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });

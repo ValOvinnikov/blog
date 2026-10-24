@@ -11,6 +11,7 @@
     "signInError": "Problema al iniciar sesión",
     "addTenant": "Añadir cliente · Administración",
     "tenantOverview": "Resumen del cliente · Administración",
+    "tenantActivity": "Actividad del cliente · Administración",
     "tenantProvisioning": "Aprovisionamiento · Administración",
     "tenantDanger": "Zona de peligro · Administración",
     "tenantDomain": "Dominio · Administración",
@@ -321,13 +322,20 @@
     "notSetValue": "Sin definir",
     "recentActivityCardTitle": "Actividad reciente",
     "recentActivitySourceLabel": "Registro del sistema",
-    "activityEmpty": "Todavía no hay actividad registrada.",
-    "activityActorDeleted": "Cuenta eliminada",
+    "viewAllActivityLink": "Ver toda la actividad"
+  },
+  "tenantActivityPage": {
+    "title": "Actividad",
+    "description": "Acciones de ciclo de vida y de operadores en este cliente, de la más reciente a la más antigua."
+  },
+  "activityList": {
+    "empty": "Todavía no hay actividad registrada.",
+    "actorDeleted": "Cuenta eliminada",
     "relativeJustNow": "Ahora mismo",
     "relativeMinutesAgo": "hace {minutes} min",
     "relativeHoursAgo": "hace {hours} h",
     "relativeDaysAgo": "hace {days} d",
-    "activityAction": {
+    "action": {
       "CREATED": "Cliente creado",
       "DEPROVISION_REQUESTED": "Desaprovisionamiento solicitado",
       "DEPROVISIONED": "Cliente desaprovisionado",
@@ -1157,6 +1165,12 @@
     "page": "Página",
     "homePage": "Página de inicio",
     "readStateFailed": "No se pudo actualizar el mensaje. Inténtalo de nuevo."
+  },
+  "pagination": {
+    "ariaLabel": "Paginación",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "status": "Página {page} de {totalPages}"
   },
   "deleteLeadControl": {
     "triggerButton": "Eliminar",

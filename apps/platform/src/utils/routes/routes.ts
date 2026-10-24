@@ -34,6 +34,10 @@ export const adminRoutes = {
   languages: (tenantId: string) => `/tenants/${tenantId}/languages`,
   email: (tenantId: string) => `/tenants/${tenantId}/email`,
   leads: (tenantId: string) => `/tenants/${tenantId}/leads`,
+  tenantActivity: (tenantId: string, page = 1) =>
+    page > 1
+      ? `/tenants/${tenantId}/activity?page=${page}`
+      : `/tenants/${tenantId}/activity`,
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',

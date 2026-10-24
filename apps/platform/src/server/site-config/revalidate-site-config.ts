@@ -1,3 +1,5 @@
+import { HTTP_METHOD } from '@blog/config/constants';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -8,13 +10,13 @@ export const revalidateSiteConfig = async (tenantId: string): Promise<void> => {
   const { WEB_APP_URL: webAppUrl, SITE_CONFIG_REVALIDATE_SECRET: secret } = env;
 
   if (!webAppUrl || !secret) {
-    logger.error('site_config.revalidate_skipped');
+    logger.error(SITE_CONFIG_LOG.REVALIDATE_SKIPPED);
     return;
   }
 
   try {
     const response = await fetch(new URL(REVALIDATE_PATH, webAppUrl), {
-      method: 'POST',
+      method: HTTP_METHOD.POST,
       headers: {
         Authorization: `Bearer ${secret}`,
         'Content-Type': 'application/json',
@@ -24,11 +26,11 @@ export const revalidateSiteConfig = async (tenantId: string): Promise<void> => {
     });
 
     if (!response.ok) {
-      logger.error('site_config.revalidate_failed', {
+      logger.error(SITE_CONFIG_LOG.REVALIDATE_FAILED, {
         responseStatus: response.status,
       });
     }
   } catch (error) {
-    logger.error('site_config.revalidate_error', { error });
+    logger.error(SITE_CONFIG_LOG.REVALIDATE_ERROR, { error });
   }
 };

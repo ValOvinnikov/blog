@@ -1,4 +1,5 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import {
   MOCK_WEB_APP_URL,
   MOCK_REVALIDATE_SECRET,
@@ -13,8 +14,6 @@ vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
-const REVALIDATE_SKIPPED_EVENT = 'site_config.revalidate_skipped';
-const REVALIDATE_ERROR_EVENT = 'site_config.revalidate_error';
 const NETWORK_ERROR_MESSAGE = 'network down';
 
 const loggerErrorMock = vi.mocked(logger.error);
@@ -56,7 +55,9 @@ describe(revalidateSiteConfig, () => {
     await revalidateSiteConfig(MOCK_TENANT_ID);
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(REVALIDATE_SKIPPED_EVENT);
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.REVALIDATE_SKIPPED,
+    );
   });
 
   it('logs and skips the call when SITE_CONFIG_REVALIDATE_SECRET is not configured', async () => {
@@ -65,7 +66,9 @@ describe(revalidateSiteConfig, () => {
     await revalidateSiteConfig(MOCK_TENANT_ID);
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(REVALIDATE_SKIPPED_EVENT);
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.REVALIDATE_SKIPPED,
+    );
   });
 
   it('logs but does not throw when the response is not ok', async () => {
@@ -78,7 +81,7 @@ describe(revalidateSiteConfig, () => {
     await expect(revalidateSiteConfig(MOCK_TENANT_ID)).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'site_config.revalidate_failed',
+      SITE_CONFIG_LOG.REVALIDATE_FAILED,
       { responseStatus: HTTP_STATUS.UNAUTHORIZED },
     );
   });
@@ -90,9 +93,12 @@ describe(revalidateSiteConfig, () => {
 
     await expect(revalidateSiteConfig(MOCK_TENANT_ID)).resolves.toBeUndefined();
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(REVALIDATE_ERROR_EVENT, {
-      error: new Error(NETWORK_ERROR_MESSAGE),
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.REVALIDATE_ERROR,
+      {
+        error: new Error(NETWORK_ERROR_MESSAGE),
+      },
+    );
   });
 
   it('logs but does not throw (and never hangs the caller) when the call times out', async () => {
@@ -105,7 +111,7 @@ describe(revalidateSiteConfig, () => {
     await expect(revalidateSiteConfig(MOCK_TENANT_ID)).resolves.toBeUndefined();
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      REVALIDATE_ERROR_EVENT,
+      SITE_CONFIG_LOG.REVALIDATE_ERROR,
       expect.objectContaining({ error: expect.any(DOMException) }),
     );
   });

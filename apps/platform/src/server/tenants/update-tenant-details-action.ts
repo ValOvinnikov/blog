@@ -11,8 +11,13 @@ import {
 } from '@blog/config';
 import { queries, TENANT_DETAILS_UPDATE_OUTCOME, TENANT_PLAN } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  TENANT_LOG,
+} from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -113,13 +118,13 @@ export const updateTenantDetailsAction = async (
         const { ownerEmail, ...auditedDetails } = parsed.data;
         await revalidateSiteConfig(tenantId);
         await recordAuditEvent({
-          logEvent: 'tenants.update_details_audit_failed',
+          logEvent: TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED,
           action: AUDIT_ACTION.SETTINGS_UPDATED,
           targetType: AUDIT_TARGET_TYPE.TENANT,
           targetId: tenantId,
           details: {
             ...auditedDetails,
-            ownerEmailUpdated: ownerEmail !== undefined,
+            ownerEmailUpdated: !isUndefined(ownerEmail),
           },
         });
         return { outcome: ACTION_OUTCOME.SUCCESS, tenant: result.tenant };
@@ -178,7 +183,7 @@ export const updateTenantDetailsAction = async (
       }
     }
   } catch (error) {
-    logger.error('tenants.update_details_failed', { tenantId, error });
+    logger.error(TENANT_LOG.UPDATE_DETAILS_FAILED, { tenantId, error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

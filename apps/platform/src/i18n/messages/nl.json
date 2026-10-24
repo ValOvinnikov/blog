@@ -11,6 +11,7 @@
     "signInError": "Probleem bij inloggen",
     "addTenant": "Tenant toevoegen · Admin",
     "tenantOverview": "Tenantoverzicht · Admin",
+    "tenantActivity": "Tenantactiviteit · Admin",
     "tenantProvisioning": "Inrichting · Admin",
     "tenantDanger": "Gevarenzone · Admin",
     "tenantDomain": "Domein · Admin",
@@ -321,13 +322,20 @@
     "notSetValue": "Niet ingesteld",
     "recentActivityCardTitle": "Recente activiteit",
     "recentActivitySourceLabel": "Systeemlog",
-    "activityEmpty": "Nog geen activiteit geregistreerd.",
-    "activityActorDeleted": "Verwijderd account",
+    "viewAllActivityLink": "Alle activiteit bekijken"
+  },
+  "tenantActivityPage": {
+    "title": "Activiteit",
+    "description": "Levenscyclus- en operatoracties voor deze tenant, nieuwste eerst."
+  },
+  "activityList": {
+    "empty": "Nog geen activiteit geregistreerd.",
+    "actorDeleted": "Verwijderd account",
     "relativeJustNow": "Zojuist",
     "relativeMinutesAgo": "{minutes} min geleden",
     "relativeHoursAgo": "{hours} uur geleden",
     "relativeDaysAgo": "{days} d geleden",
-    "activityAction": {
+    "action": {
       "CREATED": "Tenant aangemaakt",
       "DEPROVISION_REQUESTED": "Ontmanteling aangevraagd",
       "DEPROVISIONED": "Tenant ontmanteld",
@@ -1157,6 +1165,12 @@
     "page": "Pagina",
     "homePage": "Startpagina",
     "readStateFailed": "Kon het bericht niet bijwerken. Probeer het opnieuw."
+  },
+  "pagination": {
+    "ariaLabel": "Paginering",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "status": "Pagina {page} van {totalPages}"
   },
   "deleteLeadControl": {
     "triggerButton": "Verwijderen",

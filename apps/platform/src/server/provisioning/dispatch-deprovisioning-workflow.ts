@@ -1,3 +1,4 @@
+import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { dispatchGitHubWorkflow } from '@platform/server/github/dispatch-github-workflow';
 import { env } from '@platform/utils/env/env';
 
@@ -24,9 +25,9 @@ export const dispatchDeprovisioningWorkflow = async ({
       environment: env.TENANT_PROVISIONING_DATASET,
     },
     logEvents: {
-      skipped: 'provisioning.deprovision_dispatch_skipped',
-      failed: 'provisioning.deprovision_dispatch_failed',
-      error: 'provisioning.deprovision_dispatch_error',
+      skipped: PROVISIONING_LOG.DEPROVISION_DISPATCH_SKIPPED,
+      failed: PROVISIONING_LOG.DEPROVISION_DISPATCH_FAILED,
+      error: PROVISIONING_LOG.DEPROVISION_DISPATCH_ERROR,
     },
     logContext: { tenantId },
   });

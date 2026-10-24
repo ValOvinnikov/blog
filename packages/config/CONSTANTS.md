@@ -259,35 +259,66 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:platform
 
+### `@platform/constants/contrast-result` — `apps/platform/src/constants/contrast-result.ts`
+
+- **CONTRAST_RESULT_LOG**: `RECORD_FAILED`=`"contrast_result.record_failed"`, `SECRET_MISSING`=`"contrast_result.secret_missing"`
+
 ### `@platform/constants/control-mode` — `apps/platform/src/constants/control-mode.ts`
 
 - **CONTROL_MODE**: `EDITABLE`, `READ_ONLY`, `DISABLED`
 
+### `@platform/constants/create-site-gate` — `apps/platform/src/constants/create-site-gate.ts`
+
+- **CREATE_SITE_GATE_LOG**: `ALERT_FAILED`=`"create_site_gate.alert_failed"`, `ALERT_NO_RECIPIENTS`=`"create_site_gate.alert_no_recipients"`, `ALERT_SEND_FAILED`=`"create_site_gate.alert_send_failed"`, `BLOCKED`=`"create_site_gate.blocked"`, `BLOCK_CHECK_FAILED`=`"create_site_gate.block_check_failed"`, `GLOBAL_LIMITED`=`"create_site_gate.global_limited"`, `IP_LIMITED`=`"create_site_gate.ip_limited"`
+
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
 - **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`
+- **DATA_REQUEST_LOG**: `AUDIT_FAILED`=`"data_request.audit_failed"`, `FAILED`=`"data_request.failed"`
 
 ### `@platform/constants/domain` — `apps/platform/src/constants/domain.ts`
 
 - **DOMAIN_VERIFICATION_STATUS**: `NOT_CONFIGURED`, `NOT_ADDED`, `PENDING`, `VERIFIED`, `ERROR`
 - **DOMAIN_AVAILABILITY**: `NOT_CONFIGURED`, `AVAILABLE`, `IN_USE`, `ERROR`
 
+### `@platform/constants/email-config` — `apps/platform/src/constants/email-config.ts`
+
+- **EMAIL_CONFIG_LOG**: `UPDATE_AUDIT_FAILED`=`"email_config.update_audit_failed"`, `UPDATE_FAILED`=`"email_config.update_failed"`
+
 ### `@platform/constants/email-logo` — `apps/platform/src/constants/email-logo.ts`
 
 - **EMAIL_LOGO_KIND**: `SENDER`, `TEMPLATE`
+- **EMAIL_LOGO_LOG**: `CLEAR_AUDIT_FAILED`=`"email_logo.clear_audit_failed"`, `CLEAR_FAILED`=`"email_logo.clear_failed"`, `DELETE_FAILED`=`"email_logo.delete_failed"`, `UPLOAD_AUDIT_FAILED`=`"email_logo.upload_audit_failed"`, `UPLOAD_FAILED`=`"email_logo.upload_failed"`
 
 ### `@platform/constants/email-sender` — `apps/platform/src/constants/email-sender.ts`
 
 - **EMAIL_SENDER_FIELD_ERROR**: `SENDER_NAME_INVALID`, `CONTACT_RECIPIENT_INVALID`
 
+### `@platform/constants/email-templates` — `apps/platform/src/constants/email-templates.ts`
+
+- **EMAIL_TEMPLATES_LOG**: `UPDATE_AUDIT_FAILED`=`"email_templates.update_audit_failed"`, `UPDATE_FAILED`=`"email_templates.update_failed"`
+
+### `@platform/constants/email-test` — `apps/platform/src/constants/email-test.ts`
+
+- **EMAIL_TEST_LOG**: `SEND_FAILED`=`"email_test.send_failed"`
+
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`
+- **GITHUB_LOG**: `NOT_CONFIGURED`=`"github.not_configured"`, `RATE_LIMITED`=`"github.rate_limited"`, `REQUEST_ERROR`=`"github.request_error"`, `REQUEST_FAILED`=`"github.request_failed"`, `TAG_LIST_INCOMPLETE`=`"github.tag_list_incomplete"`, `UNEXPECTED_RESPONSE`=`"github.unexpected_response"`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
 - **LEAD_REFUSAL**: `NOT_FOUND`
 - **LEAD_LOG**: `DELETE_FAILED`=`"leads.delete_failed"`, `LOAD_FAILED`=`"leads.load_failed"`, `READ_STATE_FAILED`=`"leads.read_state_failed"`, `PAGE_TITLE_SKIPPED`=`"leads.page_title_skipped"`, `PAGE_TITLE_FAILED`=`"leads.page_title_failed"`, `PAGE_TITLE_ERROR`=`"leads.page_title_error"`
+
+### `@platform/constants/operator-alert` — `apps/platform/src/constants/operator-alert.ts`
+
+- **OPERATOR_ALERT_LOG**: `NO_RECIPIENTS`=`"operator_alert.no_recipients"`, `SECRET_MISSING`=`"operator_alert.secret_missing"`, `SEND_FAILED`=`"operator_alert.send_failed"`, `TENANT_NOT_FOUND`=`"operator_alert.tenant_not_found"`
+
+### `@platform/constants/owner-access` — `apps/platform/src/constants/owner-access.ts`
+
+- **OWNER_ACCESS_LOG**: `REQUEST_FAILED`=`"owner_access.request_failed"`
 
 ### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
 
@@ -298,6 +329,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PREVIEW_MODE**: `LIGHT`, `DARK`
 - **PREVIEW_WIDTH**: `DESKTOP`, `MOBILE`
 
+### `@platform/constants/provisioning` — `apps/platform/src/constants/provisioning.ts`
+
+- **PROVISIONING_LOG**: `DEPROVISION_AUDIT_FAILED`=`"provisioning.deprovision_audit_failed"`, `DEPROVISION_DISPATCH_ERROR`=`"provisioning.deprovision_dispatch_error"`, `DEPROVISION_DISPATCH_FAILED`=`"provisioning.deprovision_dispatch_failed"`, `DEPROVISION_DISPATCH_SKIPPED`=`"provisioning.deprovision_dispatch_skipped"`, `DOMAIN_CHECK_ERROR`=`"provisioning.domain_check_error"`, `DOMAIN_CHECK_FAILED`=`"provisioning.domain_check_failed"`, `DOMAIN_CHECK_INVALID_DOMAIN`=`"provisioning.domain_check_invalid_domain"`, `ENQUEUE_FAILED`=`"provisioning.enqueue_failed"`, `ENQUEUE_NOT_FOUND`=`"provisioning.enqueue_not_found"`, `REACTIVATE_AUDIT_FAILED`=`"provisioning.reactivate_audit_failed"`
+
 ### `@platform/constants/release` — `apps/platform/src/constants/release.ts`
 
 - **CONTRAST_STATUS**: `GREEN`, `FAILED`, `RUNNING`, `NONE`, `DUE`
@@ -305,6 +340,15 @@ Every key/value const an agent should reuse before writing a literal. The
 - **RELEASE_FIELD_ERROR**: `VERSION_MALFORMED`, `VERSION_NOT_GREATER`, `REASON_REQUIRED`
 - **RELEASE_FAILURE**: `NO_RELEASE_TAG`, `TAG_LIST_INCOMPLETE`, `DB_ERROR`
 - **RELEASE_RUN_STATUS**: `DISPATCHED`, `RUNNING`, `SUCCEEDED`, `FAILED`
+- **RELEASE_LOG**: `CONTRAST_CHECK_AUDIT_FAILED`=`"releases.contrast_check_audit_failed"`, `CONTRAST_DISPATCH_ERROR`=`"releases.contrast_dispatch_error"`, `CONTRAST_DISPATCH_FAILED`=`"releases.contrast_dispatch_failed"`, `CONTRAST_DISPATCH_SKIPPED`=`"releases.contrast_dispatch_skipped"`, `DB_READ_FAILED`=`"releases.db_read_failed"`, `RELEASE_AUDIT_FAILED`=`"releases.release_audit_failed"`, `RELEASE_DISPATCH_ERROR`=`"releases.release_dispatch_error"`, `RELEASE_DISPATCH_FAILED`=`"releases.release_dispatch_failed"`, `RELEASE_DISPATCH_SKIPPED`=`"releases.release_dispatch_skipped"`, `RELEASE_OVERRIDE_AUDIT_FAILED`=`"releases.release_override_audit_failed"`
+
+### `@platform/constants/request` — `apps/platform/src/constants/request.ts`
+
+- **REQUEST_LOG**: `UNHANDLED_ERROR`=`"request.unhandled_error"`
+
+### `@platform/constants/settings-features` — `apps/platform/src/constants/settings-features.ts`
+
+- **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`
 
 ### `@platform/constants/settings` — `apps/platform/src/constants/settings.ts`
 
@@ -319,6 +363,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SIGNUP_BLOCK_FIELD_ERROR**: `BLOCK_DOMAIN_INVALID`, `BLOCK_REASON_REQUIRED`
 - **SIGNUP_BLOCK_REFUSAL**: `ENTRY_NOT_FOUND`
+- **SIGNUP_BLOCK_LOG**: `ADD_AUDIT_FAILED`=`"signup_block.add_audit_failed"`, `ADD_DOMAIN_FAILED`=`"signup_block.add_domain_failed"`, `REMOVE_AUDIT_FAILED`=`"signup_block.remove_audit_failed"`, `REMOVE_FAILED`=`"signup_block.remove_failed"`, `REMOVE_LOOKUP_FAILED`=`"signup_block.remove_lookup_failed"`
+
+### `@platform/constants/site-config` — `apps/platform/src/constants/site-config.ts`
+
+- **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
 
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 
@@ -328,11 +377,16 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
 - **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`
+- **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
 
 ### `@platform/constants/upload` — `apps/platform/src/constants/upload.ts`
 
 - **UPLOAD_REFUSAL**: `UPLOADS_NOT_CONFIGURED`, `FILE_MISSING`, `FILE_TOO_LARGE`, `UNREADABLE_IMAGE`, `UNRECOGNIZED_TARGET`, `BRAND_IMAGE_TYPE_UNSUPPORTED`, `IMAGE_TOO_SMALL`, `IMAGE_TOO_LARGE`, `FAVICON_NOT_SQUARE`, `SVG_FAVICON_NOT_SQUARE`, `EMAIL_LOGO_SVG`, `EMAIL_LOGO_WEBP`, `EMAIL_LOGO_TYPE_UNSUPPORTED`
 - **UPLOAD_OPERATION**: `UPLOAD`, `CLEAR`
+
+### `@platform/constants/worker` — `apps/platform/src/constants/worker.ts`
+
+- **WORKER_LOG**: `ENQUEUE_ERROR`=`"worker.enqueue_error"`, `ENQUEUE_SKIPPED`=`"worker.enqueue_skipped"`
 
 ## app:web
 

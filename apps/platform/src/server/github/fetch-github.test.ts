@@ -5,6 +5,7 @@ import {
   GITHUB_FAILURE,
   GITHUB_RATE_LIMIT_EXHAUSTED,
   GITHUB_RATE_LIMIT_REMAINING_HEADER,
+  GITHUB_LOG,
 } from '@platform/constants/github';
 import {
   mockGitHubResponse,
@@ -70,7 +71,7 @@ describe(fetchGitHub, () => {
       ok: false,
       error: GITHUB_FAILURE.RATE_LIMITED,
     });
-    expect(loggerWarnMock).toHaveBeenCalledWith('github.rate_limited', {
+    expect(loggerWarnMock).toHaveBeenCalledWith(GITHUB_LOG.RATE_LIMITED, {
       path,
     });
     expect(loggerErrorMock).not.toHaveBeenCalled();
@@ -98,7 +99,7 @@ describe(fetchGitHub, () => {
       ok: false,
       error: GITHUB_FAILURE.GITHUB_ERROR,
     });
-    expect(loggerErrorMock).toHaveBeenCalledWith('github.request_failed', {
+    expect(loggerErrorMock).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_FAILED, {
       path,
       responseStatus: HTTP_STATUS.BAD_GATEWAY,
     });
@@ -112,7 +113,7 @@ describe(fetchGitHub, () => {
       ok: false,
       error: GITHUB_FAILURE.GITHUB_ERROR,
     });
-    expect(loggerErrorMock).toHaveBeenCalledWith('github.request_error', {
+    expect(loggerErrorMock).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_ERROR, {
       path,
       error: thrown,
     });

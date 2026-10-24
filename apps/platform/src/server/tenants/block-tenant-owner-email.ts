@@ -11,14 +11,12 @@ import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup
 import type { TAdmin } from '@blog/db/schema/admins';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
 import {
   recordSignupBlockAdded,
   saveSignupBlock,
 } from '@platform/server/signup-block/add-signup-block';
 import { logger } from '@platform/utils/logger/logger';
-
-const UNDO_FAILED_EVENT = 'tenant.suspension_block_undo_failed';
 
 type TBlockTenantOwnerEmailFailure =
   | TOutcome<typeof ACTION_OUTCOME.SERVER_ERROR>
@@ -50,7 +48,7 @@ export const blockTenantOwnerEmail = async (
   });
   if (saved.ok) return okResult({ ...saved.data, reason });
 
-  logger.error('tenant.suspension_block_failed', {
+  logger.error(TENANT_LOG.SUSPENSION_BLOCK_FAILED, {
     tenantId,
     error: saved.error,
   });
@@ -73,9 +71,12 @@ export const undoOwnerEmailBlock = async (
     const removed =
       await queries.blockedSignupIdentities.removeBlockedIdentity(entryId);
     if (!removed.ok) {
-      logger.error(UNDO_FAILED_EVENT, { entryId, error: removed.error });
+      logger.error(TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED, {
+        entryId,
+        error: removed.error,
+      });
     }
   } catch (error) {
-    logger.error(UNDO_FAILED_EVENT, { entryId, error });
+    logger.error(TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED, { entryId, error });
   }
 };

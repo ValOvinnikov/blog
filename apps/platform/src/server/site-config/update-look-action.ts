@@ -18,6 +18,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -60,7 +61,7 @@ export const updateLookAction = async (
     await queries.siteConfig.upsertSiteConfig(tenant.id, parsed.data);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
-      logEvent: 'site_config.look_audit_failed',
+      logEvent: SITE_CONFIG_LOG.LOOK_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
@@ -68,7 +69,7 @@ export const updateLookAction = async (
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error('site_config.look_save_failed', {
+    logger.error(SITE_CONFIG_LOG.LOOK_SAVE_FAILED, {
       tenantId: tenant.id,
       error,
     });

@@ -11,9 +11,8 @@ import { tenants } from '@blog/db/schema/tenants';
 import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
 import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
-import { accountEmailIndex } from '@blog/utils/encryption';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
-import { and, eq, ne } from 'drizzle-orm';
+import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
+import { and, eq, exists, ne, or } from 'drizzle-orm';
 
 // An archived tenant frees the slot; suspended and failed ones keep it.
 export async function ownsFreeTenant(
@@ -22,20 +21,35 @@ export async function ownsFreeTenant(
   const normalized = normalizeSignupEmail(email);
   if (!normalized) return errorResult(ERROR_CODE.DB_INVALID_EMAIL);
 
-  const [match] = await getDb()
-    .select({ tenantId: tenants.id })
+  const { address } = normalized;
+  const db = getDb();
+
+  const ownedByAccount = db
+    .select({ tenantId: memberships.tenantId })
     .from(memberships)
     .innerJoin(users, eq(users.id, memberships.userId))
-    .innerJoin(tenants, eq(tenants.id, memberships.tenantId))
     .where(
       and(
-        eq(
-          users.emailIndex,
-          requireEmailIndex(normalizeEmail(email), accountEmailIndex),
-        ),
+        eq(memberships.tenantId, tenants.id),
         eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
+        eq(users.emailIndex, requireEmailIndex(address, accountEmailIndex)),
+      ),
+    );
+
+  const [match] = await db
+    .select({ tenantId: tenants.id })
+    .from(tenants)
+    .where(
+      and(
         eq(tenants.plan, TENANT_PLAN.FREE),
         ne(tenants.status, TENANT_STATUS.ARCHIVED),
+        or(
+          eq(
+            tenants.selfServeOwnerEmailIndex,
+            requireEmailIndex(address, personalDataIndex),
+          ),
+          exists(ownedByAccount),
+        ),
       ),
     )
     .limit(1);
