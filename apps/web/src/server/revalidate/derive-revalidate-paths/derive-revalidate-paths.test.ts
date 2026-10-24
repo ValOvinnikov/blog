@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
@@ -21,6 +22,8 @@ import {
   isDerivableRevalidateType,
   POST_TYPE,
 } from './derive-revalidate-paths';
+
+faker.seed(5722);
 
 const {
   getPostsByIdsMock,
@@ -78,15 +81,15 @@ vi.mock('@blog/service', () => ({
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-const post = mockPostCard();
-const tag = mockTag();
-const topic = mockTopic();
-const UNRELATED_TAG_SLUG = 'unrelated-tag';
-const LOCALE_ROOT = `/${MOCK_TENANT_ID}/${LOCALE_ISO_CODES.EN}`;
+const MOCK_POST = mockPostCard();
+const MOCK_TAG = mockTag();
+const MOCK_TOPIC = mockTopic();
+const MOCK_UNRELATED_TAG_SLUG = faker.lorem.slug();
+const MOCK_LOCALE_ROOT = `/${MOCK_TENANT_ID}/${LOCALE_ISO_CODES.EN}`;
 
-const postInput = {
+const MOCK_POST_INPUT = {
   type: POST_TYPE,
-  id: post.id,
+  id: MOCK_POST.id,
   tenantId: MOCK_TENANT_ID,
   tenant: MOCK_TENANT_SANITY_CONTEXT,
 };
@@ -110,7 +113,7 @@ describe(deriveRevalidatePaths, () => {
     getTopicParamsMock.mockReset();
     getTopicPaginationParamsMock.mockReset();
     loggerErrorMock.mockReset();
-    getPostsByIdsMock.mockResolvedValue(okResult([post]));
+    getPostsByIdsMock.mockResolvedValue(okResult([MOCK_POST]));
     getIndexPageParamsMock.mockResolvedValue(okResult([]));
     getTagParamsMock.mockResolvedValue(okResult([]));
     getTagPaginationParamsMock.mockResolvedValue(okResult([]));
@@ -120,7 +123,7 @@ describe(deriveRevalidatePaths, () => {
 
   it('falls back with unsupported_type for an unknown type, skipping the service', async () => {
     const result = await deriveRevalidatePaths({
-      ...postInput,
+      ...MOCK_POST_INPUT,
       type: 'person',
     });
 
@@ -130,20 +133,20 @@ describe(deriveRevalidatePaths, () => {
 
   it('resolves every path a published post affects, tag and topic pages included', async () => {
     getTagParamsMock.mockResolvedValue(
-      okResult([{ slug: tag.slug }, { slug: UNRELATED_TAG_SLUG }]),
+      okResult([{ slug: MOCK_TAG.slug }, { slug: MOCK_UNRELATED_TAG_SLUG }]),
     );
-    getTopicParamsMock.mockResolvedValue(okResult([{ slug: topic.slug }]));
+    getTopicParamsMock.mockResolvedValue(okResult([{ slug: MOCK_TOPIC.slug }]));
 
-    const result = await deriveRevalidatePaths(postInput);
+    const result = await deriveRevalidatePaths(MOCK_POST_INPUT);
 
     expect(result).toEqual(
       okResult([
-        LOCALE_ROOT,
-        `${LOCALE_ROOT}/blog`,
-        `${LOCALE_ROOT}/blog/${post.slug}`,
-        `${LOCALE_ROOT}/tags/${tag.slug}`,
-        `${LOCALE_ROOT}/tags/${UNRELATED_TAG_SLUG}`,
-        `${LOCALE_ROOT}/topics/${topic.slug}`,
+        MOCK_LOCALE_ROOT,
+        `${MOCK_LOCALE_ROOT}/blog`,
+        `${MOCK_LOCALE_ROOT}/blog/${MOCK_POST.slug}`,
+        `${MOCK_LOCALE_ROOT}/tags/${MOCK_TAG.slug}`,
+        `${MOCK_LOCALE_ROOT}/tags/${MOCK_UNRELATED_TAG_SLUG}`,
+        `${MOCK_LOCALE_ROOT}/topics/${MOCK_TOPIC.slug}`,
       ]),
     );
   });
@@ -151,7 +154,7 @@ describe(deriveRevalidatePaths, () => {
   it('falls back with document_not_found when the id matches no post', async () => {
     getPostsByIdsMock.mockResolvedValue(okResult([]));
 
-    const result = await deriveRevalidatePaths(postInput);
+    const result = await deriveRevalidatePaths(MOCK_POST_INPUT);
 
     expect(result).toEqual(errorResult(DOCUMENT_NOT_FOUND_REASON));
     expect(loggerErrorMock).not.toHaveBeenCalled();
@@ -193,11 +196,11 @@ describe(deriveRevalidatePaths, () => {
     async ({ mock, event }) => {
       mock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-      const result = await deriveRevalidatePaths(postInput);
+      const result = await deriveRevalidatePaths(MOCK_POST_INPUT);
 
       expect(result).toEqual(errorResult(FETCH_FAILED_REASON));
       expect(loggerErrorMock).toHaveBeenCalledWith(event, {
-        id: post.id,
+        id: MOCK_POST.id,
         error: MOCK_ERROR,
       });
     },
