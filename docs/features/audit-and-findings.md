@@ -121,6 +121,11 @@ Nothing is configurable. Only admins (any role) see either record.
 - `audit_events` is insert-only, through `insertAuditEvent`. The two updates
   clear `actorEmail`: `deleteAccount` for the deleted user, and
   `erasePersonalData` for an erased address. The events and `actorId` stay.
+- Retention: `queries.retention.deleteAuditEventsPastRetention(now)` deletes
+  audit events written more than 24 months before `now`, and
+  `deleteResolvedFindingsPastRetention(now)` deletes findings resolved more
+  than 90 days before it; an open finding is never deleted. Each returns the
+  number of rows it deleted. Nothing runs them on a schedule yet.
 - Neither `details` column holds an email address or other personal field.
   Writers record field names or ids instead: email config lists the saved
   field names, tenant details records `ownerEmailUpdated`, and tenant
