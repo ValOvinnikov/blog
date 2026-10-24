@@ -13,7 +13,10 @@
   // runtime for any workspace's Prettier invocation (apps/web is the only
   // config that imports it); nothing in source imports it directly, so
   // knip's root-level import graph can't see the usage.
-  "ignoreDependencies": ["prettier-plugin-tailwindcss"],
+  //
+  // @faker-js/faker is declared by every workspace with tests so test data
+  // can use it, whether or not a test there imports it yet.
+  "ignoreDependencies": ["prettier-plugin-tailwindcss", "@faker-js/faker"],
   // `sanity` is invoked via `pnpm exec sanity` in
   // `validate-tenant-documents`'s CLI wrapper, resolved from
   // `packages/studio`'s devDependency, not `packages/db`'s own — same
