@@ -12,7 +12,8 @@ import type { TUser } from '@blog/db/schema/auth';
 import type { TLead } from '@blog/db/schema/leads';
 import type { TSubscriber } from '@blog/db/schema/subscribers';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
+import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 import { faker } from '@faker-js/faker';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
@@ -92,7 +93,12 @@ export async function insertTestSubscriber(
 ): Promise<TSubscriber> {
   const [subscriber] = await db
     .insert(schema.subscribers)
-    .values({ tenantId, email, ...personalEmailColumns(email), ...overrides })
+    .values({
+      tenantId,
+      email,
+      ...emailColumns(email, personalDataIndex),
+      ...overrides,
+    })
     .returning();
 
   if (!subscriber) {

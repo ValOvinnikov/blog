@@ -258,8 +258,9 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   diff writes a second time without making it a const, and a new key/value
   const that duplicates the values of an existing one are findings — in tests
   as in source (→ `CLAUDE.md` "Reuse a const; never retype its value").
-  `pnpm verify`'s touched-file lint and `check:duplicate-literals` catch most
-  literals, but not a new const restating an existing one: compare each new
+  `pnpm verify`'s touched-file lint catches a retyped const value and a
+  value repeated within one file, but not a value repeated across files or a
+  new const restating an existing one: search for each, and compare each new
   const against the index. A const the diff adds or changes without a
   regenerated `CONSTANTS.md` fails `gen:const-index:check`.
 - **Comments (blocking).** Read every comment the diff adds or touches, not

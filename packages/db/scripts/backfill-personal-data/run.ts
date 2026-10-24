@@ -14,6 +14,10 @@ import {
   type TPersonalDataKeys,
 } from './lib/personal-data-keys';
 import { PERSONAL_DATA_TARGETS } from './lib/personal-data-targets';
+import {
+  countStaleTaggedUserIndexes,
+  reindexTaggedUserEmails,
+} from './lib/reindex-tagged-user-emails';
 
 export async function backfillPersonalData(
   keys: TPersonalDataKeys,
@@ -35,6 +39,12 @@ function report(label: string, counts: TPersonalDataCounts): void {
   }
 }
 
+function reportReindexed(label: string, total: number): void {
+  console.warn(
+    `backfill-personal-data: users — ${total} +tag row(s) ${label}.`,
+  );
+}
+
 function hasGaps(counts: TPersonalDataCounts): boolean {
   return Object.values(counts).some((total) => total > 0);
 }
@@ -44,10 +54,12 @@ async function main(): Promise<void> {
 
   if (hasDryRunFlag(process.argv)) {
     report('to backfill', await countPersonalDataGaps());
+    reportReindexed('to re-index', await countStaleTaggedUserIndexes(keys));
     return;
   }
 
   report('backfilled', await backfillPersonalData(keys));
+  reportReindexed('re-indexed', await reindexTaggedUserEmails(keys));
 
   const gaps = await countPersonalDataGaps();
   report('still missing an encrypted form or index', gaps);

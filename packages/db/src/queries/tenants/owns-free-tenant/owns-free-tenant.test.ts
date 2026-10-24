@@ -9,6 +9,7 @@ import * as schema from '@blog/db/schema';
 import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import {
+  mockAccountEmailIndex,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
@@ -40,7 +41,7 @@ async function seedMember(
 ): Promise<void> {
   const user = await insertTestUser(db(), {
     email,
-    emailIndex: testPersonalEmailIndex(email),
+    emailIndex: mockAccountEmailIndex(email),
   });
   const tenant = await insertTestTenant(db(), overrides);
   await db()
@@ -62,7 +63,6 @@ describe(ownsFreeTenant, () => {
 
   it.each([
     ['the owner address itself', OWNER_EMAIL],
-    ['a +tag variant of it', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
     ['a differently cased variant', MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL],
   ])('is true for %s once that person owns a Free tenant', async (_, email) => {
     await seedMember();
@@ -70,14 +70,22 @@ describe(ownsFreeTenant, () => {
     expect(await ownsFreeTenant(email)).toEqual(OWNS_ONE);
   });
 
-  it('is true when the tenant sits in an account stored under a +tag address', async () => {
+  it.each([
+    ['a +tag variant of the owner address', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
+  ])('is false for %s, which is a different account', async (_, email) => {
+    await seedMember();
+
+    expect(await ownsFreeTenant(email)).toEqual(OWNS_NONE);
+  });
+
+  it('is false for the plain address when the account sits under a +tag address', async () => {
     await seedMember(
       {},
       MEMBERSHIP_ROLE.OWNER,
       MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
     );
 
-    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_ONE);
+    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_NONE);
   });
 
   it('is true for a suspended Free tenant', async () => {
