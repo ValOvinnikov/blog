@@ -93,7 +93,7 @@ describe(verifyRevalidateSignature, () => {
     });
   });
 
-  it('resolves a tenant with no stored secret yet for a request signed with the shared secret', async () => {
+  it('accepts the shared secret for a tenant with no stored secret yet', async () => {
     getTenantRevalidateWebhookSecretMock.mockResolvedValue({
       tenantId: MOCK_TENANT_ID,
       secret: undefined,
@@ -104,7 +104,7 @@ describe(verifyRevalidateSignature, () => {
     ).resolves.toEqual(okResult(MOCK_TENANT_ID));
   });
 
-  it('resolves no tenant for a project no tenant owns, signed with the shared secret', async () => {
+  it('accepts the shared secret, resolving no tenant, for an unowned project', async () => {
     getTenantRevalidateWebhookSecretMock.mockResolvedValue(undefined);
 
     await expect(
