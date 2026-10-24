@@ -13,6 +13,7 @@ import {
 import { queries } from '@blog/db';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { EMAIL_TEMPLATES_LOG } from '@platform/constants/email-templates';
 import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
@@ -77,7 +78,7 @@ export const updateEmailTemplateAction = async (
       parsedLocale.data,
     );
     await recordAuditEvent({
-      logEvent: 'email_templates.update_audit_failed',
+      logEvent: EMAIL_TEMPLATES_LOG.UPDATE_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
@@ -88,7 +89,7 @@ export const updateEmailTemplateAction = async (
     });
     return { outcome: ACTION_OUTCOME.SUCCESS, result };
   } catch (error) {
-    logger.error('email_templates.update_failed', {
+    logger.error(EMAIL_TEMPLATES_LOG.UPDATE_FAILED, {
       tenantId: tenant.id,
       templateType: parsedTemplateType.data,
       locale: parsedLocale.data,

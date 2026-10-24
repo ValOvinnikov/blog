@@ -12,6 +12,7 @@ import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
 } from '@platform/constants/settings';
+import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
@@ -65,7 +66,7 @@ export const updateFeaturesAction = async (
   );
 
   if (outOfPlan.length > 0) {
-    logger.warn('settings_features.plan_entitlement_rejected', {
+    logger.warn(SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED, {
       tenantId: tenant.id,
       plan: tenant.plan,
       capabilities: outOfPlan.map(({ capability }) => capability),
@@ -84,7 +85,7 @@ export const updateFeaturesAction = async (
     await queries.settingsFeatures.upsertSettingsFeatures(tenant.id, toWrite);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
-      logEvent: 'settings_features.update_audit_failed',
+      logEvent: SETTINGS_FEATURES_LOG.UPDATE_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: tenant.id,
@@ -92,7 +93,7 @@ export const updateFeaturesAction = async (
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error('settings_features.update_failed', {
+    logger.error(SETTINGS_FEATURES_LOG.UPDATE_FAILED, {
       tenantId: tenant.id,
       error,
     });

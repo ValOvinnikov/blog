@@ -8,6 +8,7 @@ import {
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
+import { TENANT_LOG } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -121,7 +122,7 @@ describe(updateTenantLanguagesAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
     expect(loggerWarnMock).toHaveBeenCalledWith(
-      'tenants.update_languages_rejected',
+      TENANT_LOG.UPDATE_LANGUAGES_REJECTED,
       expect.objectContaining({ error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED }),
     );
   });

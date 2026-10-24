@@ -10,7 +10,11 @@ import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_REFUSAL,
+  TENANT_LOG,
+} from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
@@ -350,7 +354,7 @@ describe('updateTenantDetailsAction', () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     const [eventName, context] = loggerErrorMock.mock.lastCall ?? [];
 
-    expect(eventName).toBe('tenants.update_details_audit_failed');
+    expect(eventName).toBe(TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED);
     expect(context?.targetId).toBe(MOCK_TENANT_ID);
     expect(context?.error).toBeInstanceOf(Error);
   });

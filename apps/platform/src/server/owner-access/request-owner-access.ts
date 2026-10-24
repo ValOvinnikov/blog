@@ -2,6 +2,7 @@ import 'server-only';
 
 import { ACTION_OUTCOME, HTTP_STATUS, type TActionResult } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
@@ -23,7 +24,7 @@ export const requestOwnerAccess = async (
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   }
   if (status !== null) {
-    logger.error('owner_access.request_failed', {
+    logger.error(OWNER_ACCESS_LOG.REQUEST_FAILED, {
       tenantId,
       path,
       responseStatus: status,

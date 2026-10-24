@@ -1,6 +1,7 @@
 import {
   OPERATOR_ALERT_KIND,
   type TOperatorAlertBody,
+  HTTP_STATUS,
 } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME, queries } from '@blog/db';
 import {
@@ -8,12 +9,15 @@ import {
   buildOwnerElevationAlertEmail,
   sendEmail,
 } from '@blog/email';
+import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+
+const MALFORMED_BODY_MESSAGE = 'Malformed alert body.';
 
 const operatorAlertBodySchema = z.discriminatedUnion('kind', [
   z.object({
@@ -40,17 +44,17 @@ const operatorAlertBodySchema = z.discriminatedUnion('kind', [
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.OPERATOR_ALERT_SECRET;
   if (!secret) {
-    logger.error('operator_alert.secret_missing');
+    logger.error(OPERATOR_ALERT_LOG.SECRET_MISSING);
     return NextResponse.json(
       { message: 'Operator alert secret is not configured.' },
-      { status: 500 },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
     );
   }
 
   if (!hasBearerSecret(request, secret)) {
     return NextResponse.json(
       { message: 'Invalid or missing secret.' },
-      { status: 401 },
+      { status: HTTP_STATUS.UNAUTHORIZED },
     );
   }
 
@@ -59,31 +63,34 @@ export async function POST(request: Request): Promise<NextResponse> {
     body = await request.json();
   } catch {
     return NextResponse.json(
-      { message: 'Malformed alert body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
   const parsed = operatorAlertBodySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { message: 'Malformed alert body.' },
-      { status: 400 },
+      { message: MALFORMED_BODY_MESSAGE },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
   const tenant = await queries.tenants.getTenantById(parsed.data.tenantId);
   if (!tenant) {
-    logger.warn('operator_alert.tenant_not_found', {
+    logger.warn(OPERATOR_ALERT_LOG.TENANT_NOT_FOUND, {
       tenantId: parsed.data.tenantId,
     });
-    return NextResponse.json({ message: 'Unknown tenant.' }, { status: 404 });
+    return NextResponse.json(
+      { message: 'Unknown tenant.' },
+      { status: HTTP_STATUS.NOT_FOUND },
+    );
   }
 
   const recipients = await queries.admins.listSuperadminEmails();
   if (recipients.length === 0) {
-    logger.warn('operator_alert.no_recipients', { tenantId: tenant.id });
-    return NextResponse.json({ sent: 0 }, { status: 200 });
+    logger.warn(OPERATOR_ALERT_LOG.NO_RECIPIENTS, { tenantId: tenant.id });
+    return NextResponse.json({ sent: 0 }, { status: HTTP_STATUS.OK });
   }
 
   const { subject, html } =
@@ -111,7 +118,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   );
 
   failures.forEach((failure) => {
-    logger.error('operator_alert.send_failed', {
+    logger.error(OPERATOR_ALERT_LOG.SEND_FAILED, {
       tenantId: tenant.id,
       kind: parsed.data.kind,
       error: failure.reason,
@@ -123,7 +130,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (failures.length === recipients.length) {
     return NextResponse.json(
       { message: 'Failed to send operator alert email.' },
-      { status: 502 },
+      { status: HTTP_STATUS.BAD_GATEWAY },
     );
   }
 
@@ -134,5 +141,5 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  return NextResponse.json({ sent }, { status: 200 });
+  return NextResponse.json({ sent }, { status: HTTP_STATUS.OK });
 }

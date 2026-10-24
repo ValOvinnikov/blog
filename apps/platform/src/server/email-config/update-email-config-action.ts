@@ -9,6 +9,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import {
   EMAIL_SENDER_FIELD_ERROR,
   type TEmailSenderFieldErrorReason,
@@ -72,7 +73,7 @@ export const updateEmailConfigAction = async (
   try {
     await queries.emailConfig.upsertEmailConfig(tenant.id, data);
     await recordAuditEvent({
-      logEvent: 'email_config.update_audit_failed',
+      logEvent: EMAIL_CONFIG_LOG.UPDATE_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
@@ -80,7 +81,7 @@ export const updateEmailConfigAction = async (
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error('email_config.update_failed', {
+    logger.error(EMAIL_CONFIG_LOG.UPDATE_FAILED, {
       tenantId: tenant.id,
       error,
     });

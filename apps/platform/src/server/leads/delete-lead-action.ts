@@ -3,7 +3,11 @@
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { LEAD_REFUSAL, type TLeadRefusal } from '@platform/constants/lead';
+import {
+  LEAD_REFUSAL,
+  type TLeadRefusal,
+  LEAD_LOG,
+} from '@platform/constants/lead';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -40,7 +44,7 @@ export const deleteLeadAction = async (
       ? toOutcome(ACTION_OUTCOME.SUCCESS)
       : { outcome: ACTION_OUTCOME.REFUSED, reason: LEAD_REFUSAL.NOT_FOUND };
   } catch (error) {
-    logger.error('leads.delete_failed', { tenantId: tenant.id, error });
+    logger.error(LEAD_LOG.DELETE_FAILED, { tenantId: tenant.id, error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

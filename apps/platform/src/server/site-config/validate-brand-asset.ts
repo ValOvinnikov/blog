@@ -3,6 +3,7 @@ import 'server-only';
 import { ACTION_OUTCOME } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import {
   readImageUpload,
@@ -41,7 +42,7 @@ const validateSvgAsset = async (
   try {
     sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
   } catch (error) {
-    logger.error('site_config.svg_sanitize_failed', { kind, error });
+    logger.error(SITE_CONFIG_LOG.SVG_SANITIZE_FAILED, { kind, error });
     return errorResult(toOutcome(ACTION_OUTCOME.SERVER_ERROR));
   }
   if (!sanitized) {

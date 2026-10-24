@@ -2,6 +2,7 @@
 
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { EMAIL_LOGO_LOG } from '@platform/constants/email-logo';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
@@ -57,14 +58,14 @@ export const uploadEmailLogoAction = async (
     await setEmailLogoUrl(tenant.id, logoTarget, blob.url);
 
     if (previousUrl && previousUrl !== blob.url) {
-      await deleteBlobBestEffort(previousUrl, 'email_logo.delete_failed', {
+      await deleteBlobBestEffort(previousUrl, EMAIL_LOGO_LOG.DELETE_FAILED, {
         tenantId: tenant.id,
         target: logoTarget,
       });
     }
 
     await recordAuditEvent({
-      logEvent: 'email_logo.upload_audit_failed',
+      logEvent: EMAIL_LOGO_LOG.UPLOAD_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
@@ -73,7 +74,7 @@ export const uploadEmailLogoAction = async (
 
     return { outcome: ACTION_OUTCOME.SUCCESS, url: blob.url };
   } catch (error) {
-    logger.error('email_logo.upload_failed', {
+    logger.error(EMAIL_LOGO_LOG.UPLOAD_FAILED, {
       tenantId: tenant.id,
       target: logoTarget,
       error,

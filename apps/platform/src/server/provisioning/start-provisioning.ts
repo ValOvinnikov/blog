@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, HTTP_STATUS, type TActionResult } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -31,14 +32,14 @@ export const startProvisioning = async (
     };
   }
   if (status === HTTP_STATUS.NOT_FOUND) {
-    logger.error('provisioning.enqueue_not_found', { tenantId });
+    logger.error(PROVISIONING_LOG.ENQUEUE_NOT_FOUND, { tenantId });
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.NOT_FOUND,
     };
   }
   if (status !== null) {
-    logger.error('provisioning.enqueue_failed', {
+    logger.error(PROVISIONING_LOG.ENQUEUE_FAILED, {
       tenantId,
       responseStatus: status,
     });

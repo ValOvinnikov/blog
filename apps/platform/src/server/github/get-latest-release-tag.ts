@@ -4,7 +4,7 @@ import {
   isReleaseVersionGreater,
   parseReleaseVersion,
 } from '@blog/utils/version';
-import type { TGitHubFailure } from '@platform/constants/github';
+import { type TGitHubFailure, GITHUB_LOG } from '@platform/constants/github';
 import { RELEASE_FAILURE } from '@platform/constants/release';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -41,7 +41,7 @@ const listReleaseTagRefs = async (): Promise<
     if (result.data.length < TAG_PAGE_SIZE) return okResult(refs);
   }
 
-  logger.warn('github.tag_list_incomplete', { pageCap: MAX_TAG_PAGES });
+  logger.warn(GITHUB_LOG.TAG_LIST_INCOMPLETE, { pageCap: MAX_TAG_PAGES });
   return errorResult(RELEASE_FAILURE.TAG_LIST_INCOMPLETE);
 };
 

@@ -12,3 +12,11 @@ export const SIGNUP_BLOCK_REFUSAL = {
 } as const;
 
 export const SIGNUP_BLOCK_REASON_MAX_LENGTH = 500;
+
+export const SIGNUP_BLOCK_LOG = {
+  ADD_AUDIT_FAILED: 'signup_block.add_audit_failed',
+  ADD_DOMAIN_FAILED: 'signup_block.add_domain_failed',
+  REMOVE_AUDIT_FAILED: 'signup_block.remove_audit_failed',
+  REMOVE_FAILED: 'signup_block.remove_failed',
+  REMOVE_LOOKUP_FAILED: 'signup_block.remove_lookup_failed',
+} as const;

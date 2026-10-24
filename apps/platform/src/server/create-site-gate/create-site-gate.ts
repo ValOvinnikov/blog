@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { alertSelfServeLimit } from '@platform/server/create-site-gate/alert-self-serve-limit';
 import { createRateLimitStore } from '@platform/server/rate-limit/create-rate-limit-store';
 import { logger } from '@platform/utils/logger/logger';
@@ -24,7 +25,7 @@ export const takeCreateSiteSlot = async (
     DAY_MS,
   );
   if (ipCount > MAX_SITES_PER_IP_PER_DAY) {
-    logger.warn('create_site_gate.ip_limited', { day });
+    logger.warn(CREATE_SITE_GATE_LOG.IP_LIMITED, { day });
     return false;
   }
 
@@ -34,7 +35,7 @@ export const takeCreateSiteSlot = async (
   );
   if (globalCount <= MAX_SELF_SERVE_SITES_PER_DAY) return true;
 
-  logger.warn('create_site_gate.global_limited', { day });
+  logger.warn(CREATE_SITE_GATE_LOG.GLOBAL_LIMITED, { day });
   if (globalCount === MAX_SELF_SERVE_SITES_PER_DAY + 1) {
     await alertSelfServeLimit(day, MAX_SELF_SERVE_SITES_PER_DAY);
   }

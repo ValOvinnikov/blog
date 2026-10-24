@@ -1,8 +1,10 @@
 import { DOMAIN_PATTERN } from '@blog/config';
+import { HTTP_STATUS } from '@blog/config/constants';
 import {
   DOMAIN_AVAILABILITY,
   type TDomainAvailability,
 } from '@platform/constants/domain';
+import { TENANT_LOG } from '@platform/constants/tenant';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 
@@ -59,14 +61,14 @@ export const checkDomainAvailability = async (
   if (!credentials) return DOMAIN_AVAILABILITY.NOT_CONFIGURED;
 
   if (!DOMAIN_PATTERN.test(domain)) {
-    logger.error('tenants.domain_availability_invalid_domain', { domain });
+    logger.error(TENANT_LOG.DOMAIN_AVAILABILITY_INVALID_DOMAIN, { domain });
     return DOMAIN_AVAILABILITY.ERROR;
   }
 
   const apexDomain = deriveApexDomain(domain);
 
   if (!apexDomain) {
-    logger.error('tenants.domain_availability_apex_undetermined', { domain });
+    logger.error(TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED, { domain });
     return DOMAIN_AVAILABILITY.ERROR;
   }
 
@@ -85,10 +87,11 @@ export const checkDomainAvailability = async (
       // A 404 means the apex itself is unknown to the team's Vercel
       // account — no project can have a domain registered under an apex
       // the account doesn't hold, so no conflict is possible.
-      if (response.status === 404) return DOMAIN_AVAILABILITY.AVAILABLE;
+      if (response.status === HTTP_STATUS.NOT_FOUND)
+        return DOMAIN_AVAILABILITY.AVAILABLE;
 
       if (!response.ok) {
-        logger.error('tenants.domain_availability_check_failed', {
+        logger.error(TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_FAILED, {
           domain,
           responseStatus: response.status,
         });
@@ -110,13 +113,13 @@ export const checkDomainAvailability = async (
       until = data.pagination.next;
     }
 
-    logger.warn('tenants.domain_availability_check_pagination_exhausted', {
+    logger.warn(TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED, {
       domain,
       maxPages: MAX_PROJECT_DOMAINS_PAGES,
     });
     return DOMAIN_AVAILABILITY.ERROR;
   } catch (error) {
-    logger.error('tenants.domain_availability_check_error', {
+    logger.error(TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_ERROR, {
       domain,
       error,
     });
