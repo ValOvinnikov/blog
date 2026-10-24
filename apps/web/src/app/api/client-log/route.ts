@@ -1,6 +1,7 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { resolveClientKey } from '@blog/utils/client-key';
+import { CLIENT_LOG_LOG } from '@web/constants/client-log';
 import {
   clientLogSchema,
   sanitizeClientLogPayload,
@@ -14,11 +15,19 @@ const MAX_PAYLOAD_BYTES = 8 * 1024;
 const PAYLOAD_TOO_LARGE_MESSAGE = 'Payload too large.';
 const MALFORMED_BODY_MESSAGE = 'Malformed request body.';
 
-const clientLogRateLimiter = createRateLimiter({
-  name: 'client-log',
-  windowMs: 60_000,
-  maxRequests: 20,
-});
+type TRateLimiter = ReturnType<typeof createRateLimiter>;
+
+let clientLogRateLimiter: TMaybeUndefined<TRateLimiter>;
+
+// Built on first use: `next build` imports this route, and a build sees only placeholder KV credentials.
+const getClientLogRateLimiter = (): TRateLimiter => {
+  clientLogRateLimiter ??= createRateLimiter({
+    name: 'client-log',
+    windowMs: 60_000,
+    maxRequests: 20,
+  });
+  return clientLogRateLimiter;
+};
 
 // `Content-Length` is optional and caller-supplied, so the cap is enforced while streaming.
 const readBodyWithinByteCap = async (
@@ -52,14 +61,14 @@ const readBodyWithinByteCap = async (
 
 // `proxy.ts`'s matcher excludes `/api/**`, so no tenant or locale resolution runs first.
 export async function POST(request: Request): Promise<NextResponse> {
-  const isLimited = await clientLogRateLimiter.isLimited({
+  const isLimited = await getClientLogRateLimiter().isLimited({
     tenantKey: request.headers.get('host') ?? 'unknown',
     clientKey: resolveClientKey(request.headers),
   });
   if (isLimited) {
     return NextResponse.json(
       { message: 'Too many requests.' },
-      { status: 429 },
+      { status: HTTP_STATUS.TOO_MANY_REQUESTS },
     );
   }
 
@@ -100,7 +109,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { event: clientEvent, ...context } = sanitizeClientLogPayload(
     parsed.data,
   );
-  logger.error('client_log.report_received', {
+  logger.error(CLIENT_LOG_LOG.REPORT_RECEIVED, {
     ...context,
     clientEvent,
     source: 'client',

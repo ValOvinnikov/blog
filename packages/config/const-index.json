@@ -4934,6 +4934,14 @@
         "file": "apps/platform/src/constants/worker.ts"
       }
     ],
+    "client_log.report_received": [
+      {
+        "ref": "CLIENT_LOG_LOG.REPORT_RECEIVED",
+        "scope": "app:web",
+        "from": "@web/constants/client-log",
+        "file": "apps/web/src/constants/client-log.ts"
+      }
+    ],
     "UNKNOWN": [
       {
         "ref": "CONSENT_STATUS.UNKNOWN",
