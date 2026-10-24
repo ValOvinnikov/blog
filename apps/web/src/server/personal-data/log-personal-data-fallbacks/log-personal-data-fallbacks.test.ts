@@ -13,7 +13,6 @@ vi.mock('@blog/db', async () => ({
   ...(await vi.importActual('@blog/db/constants')),
   onPersonalDataFallback: vi.fn(),
 }));
-vi.mock('@web/utils/logger/logger', () => ({ logger: { warn: vi.fn() } }));
 
 const MOCK_FALLBACK: TPersonalDataFallback = {
   owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
