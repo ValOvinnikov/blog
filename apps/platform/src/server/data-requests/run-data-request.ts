@@ -12,12 +12,11 @@ import { ERROR_CODE } from '@blog/config/constants';
 import type { TPersonalDataCounts } from '@blog/db/queries/personal-data/erase-personal-data';
 import { errorResult, type TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { DATA_REQUEST_LOG } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
-
-const DATA_REQUEST_FAILED_EVENT = 'data_request.failed';
 
 const dataRequestInputSchema = z.object({
   email: z.string().trim().email(),
@@ -63,7 +62,7 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
 
     if (result.ok) {
       await recordAuditEvent({
-        logEvent: 'data_request.audit_failed',
+        logEvent: DATA_REQUEST_LOG.AUDIT_FAILED,
         action,
         targetType: AUDIT_TARGET_TYPE.PERSONAL_DATA,
         targetId: result.data.emailIndex,
@@ -76,9 +75,9 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
       return errorResult(INVALID_EMAIL);
     }
 
-    logger.error(DATA_REQUEST_FAILED_EVENT, { action, error: result.error });
+    logger.error(DATA_REQUEST_LOG.FAILED, { action, error: result.error });
   } catch (error) {
-    logger.error(DATA_REQUEST_FAILED_EVENT, {
+    logger.error(DATA_REQUEST_LOG.FAILED, {
       action,
       errorName: errorName(error),
     });

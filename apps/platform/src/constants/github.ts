@@ -14,3 +14,12 @@ export type TGitHubFailure = TValueOf<typeof GITHUB_FAILURE>;
 export const GITHUB_RATE_LIMIT_REMAINING_HEADER = 'x-ratelimit-remaining';
 
 export const GITHUB_RATE_LIMIT_EXHAUSTED = String(0);
+
+export const GITHUB_LOG = {
+  NOT_CONFIGURED: 'github.not_configured',
+  RATE_LIMITED: 'github.rate_limited',
+  REQUEST_ERROR: 'github.request_error',
+  REQUEST_FAILED: 'github.request_failed',
+  TAG_LIST_INCOMPLETE: 'github.tag_list_incomplete',
+  UNEXPECTED_RESPONSE: 'github.unexpected_response',
+} as const;

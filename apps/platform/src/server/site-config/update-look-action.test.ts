@@ -14,6 +14,7 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -179,7 +180,7 @@ describe(updateLookAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'site_config.look_audit_failed',
+      SITE_CONFIG_LOG.LOOK_AUDIT_FAILED,
       expect.objectContaining({
         targetId: MOCK_TENANT_ID,
         error: expect.any(Error),

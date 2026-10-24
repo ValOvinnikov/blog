@@ -2,6 +2,7 @@
 
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -56,7 +57,7 @@ export const reactivateTenantAction = async (
   }
 
   await recordAuditEvent({
-    logEvent: 'provisioning.reactivate_audit_failed',
+    logEvent: PROVISIONING_LOG.REACTIVATE_AUDIT_FAILED,
     action: AUDIT_ACTION.REACTIVATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,

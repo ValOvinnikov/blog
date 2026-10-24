@@ -4,21 +4,21 @@ import { LinkButton } from '@platform/components/shared/link-button';
 import { Text } from '@platform/components/shared/text';
 import { useTranslations } from 'next-intl';
 
-import { leadsPaginationVariants } from './leads-pagination-variants';
+import { paginationVariants } from './pagination-variants';
 
-export type TLeadsPaginationProps = {
+export type TPaginationProps = {
   page: number;
   totalPages: number;
   pageHref: (page: number) => string;
 };
 
-export const LeadsPagination = ({
+export const Pagination = ({
   page,
   totalPages,
   pageHref,
-}: TLeadsPaginationProps) => {
-  const t = useTranslations('leadsPagination');
-  const { root } = leadsPaginationVariants();
+}: TPaginationProps) => {
+  const t = useTranslations('pagination');
+  const { root } = paginationVariants();
 
   if (totalPages <= 1) return null;
 

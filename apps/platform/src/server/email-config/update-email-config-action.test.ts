@@ -9,6 +9,7 @@ import {
   TENANT_PLAN,
   type TTenantPlan,
 } from '@blog/db/constants';
+import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
@@ -233,7 +234,7 @@ describe(updateEmailConfigAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
-      'email_config.update_failed',
+      EMAIL_CONFIG_LOG.UPDATE_FAILED,
       expect.objectContaining({
         tenantId: MOCK_TENANT_ID,
         error: expect.any(Error),

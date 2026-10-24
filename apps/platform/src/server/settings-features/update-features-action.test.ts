@@ -10,6 +10,7 @@ import {
   TENANT_PLAN,
 } from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
+import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -352,7 +353,7 @@ describe(updateFeaturesAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'settings_features.update_audit_failed',
+      SETTINGS_FEATURES_LOG.UPDATE_AUDIT_FAILED,
       expect.objectContaining({
         targetId: MOCK_TENANT_ID,
         error: expect.any(Error),

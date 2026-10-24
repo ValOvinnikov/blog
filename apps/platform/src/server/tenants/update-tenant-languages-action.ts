@@ -14,6 +14,7 @@ import {
   SETTINGS_REFUSAL,
   type TSettingsRefusal,
 } from '@platform/constants/settings';
+import { TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -58,7 +59,7 @@ export const updateTenantLanguagesAction = async (
           reason: SETTINGS_REFUSAL.NOT_FOUND,
         };
       }
-      logger.warn('tenants.update_languages_rejected', {
+      logger.warn(TENANT_LOG.UPDATE_LANGUAGES_REJECTED, {
         tenantId: tenant.id,
         plan: tenant.plan,
         error: result.error,
@@ -73,7 +74,7 @@ export const updateTenantLanguagesAction = async (
 
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
-      logEvent: 'tenants.update_languages_audit_failed',
+      logEvent: TENANT_LOG.UPDATE_LANGUAGES_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenant.id,
@@ -81,7 +82,7 @@ export const updateTenantLanguagesAction = async (
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error('tenants.update_languages_failed', {
+    logger.error(TENANT_LOG.UPDATE_LANGUAGES_FAILED, {
       tenantId: tenant.id,
       error,
     });

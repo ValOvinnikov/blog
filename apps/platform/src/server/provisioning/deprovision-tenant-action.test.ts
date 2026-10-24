@@ -5,6 +5,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import {
@@ -215,7 +216,7 @@ describe('deprovisionTenantAction', () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      'provisioning.deprovision_audit_failed',
+      PROVISIONING_LOG.DEPROVISION_AUDIT_FAILED,
       {
         action: AUDIT_ACTION.DEPROVISION_REQUESTED,
         targetType: AUDIT_TARGET_TYPE.TENANT,

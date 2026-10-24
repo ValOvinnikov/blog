@@ -1,14 +1,11 @@
 import { queries } from '@blog/db';
+import { LEADS_PAGE_SIZE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { LeadsPagination } from '@platform/components/features/leads/leads-pagination';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
 import { LeadsView } from '@platform/components/features/leads/leads-view';
-import {
-  countLeadsPages,
-  LEADS_PAGE_SIZE,
-} from '@platform/utils/leads-pagination/leads-pagination';
+import { Pagination } from '@platform/components/shared/pagination';
+import { resolveTotalPages } from '@platform/utils/pagination/pagination';
 import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
-import { redirect } from 'next/navigation';
 
 export type TLeadsPageContentProps = {
   tenant: TTenant;
@@ -26,9 +23,12 @@ export const LeadsPageContent = async ({
     page,
     pageSize: LEADS_PAGE_SIZE,
   });
-  const totalPages = countLeadsPages(total);
-
-  if (page > totalPages) redirect(pageHref(totalPages));
+  const totalPages = resolveTotalPages({
+    page,
+    total,
+    pageSize: LEADS_PAGE_SIZE,
+    pageHref,
+  });
 
   return (
     <LeadsTenantProvider tenantId={tenant.id}>
@@ -36,11 +36,7 @@ export const LeadsPageContent = async ({
         leads={leads}
         isContactFormIncluded={planPageAccess(tenant.plan).leads}
         pagination={
-          <LeadsPagination
-            page={page}
-            totalPages={totalPages}
-            pageHref={pageHref}
-          />
+          <Pagination page={page} totalPages={totalPages} pageHref={pageHref} />
         }
       />
     </LeadsTenantProvider>

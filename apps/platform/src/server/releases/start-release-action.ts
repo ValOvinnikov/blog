@@ -14,6 +14,7 @@ import {
   RELEASE_OVERRIDE_REASON_MAX_LENGTH,
   RELEASE_REFUSAL,
   type TReleaseFieldError,
+  RELEASE_LOG,
 } from '@platform/constants/release';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -115,7 +116,7 @@ export const startReleaseAction = async (
   if (!isDispatched) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
   await recordAuditEvent({
-    logEvent: 'releases.release_audit_failed',
+    logEvent: RELEASE_LOG.RELEASE_AUDIT_FAILED,
     action: AUDIT_ACTION.RELEASE_STARTED,
     targetType: AUDIT_TARGET_TYPE.RELEASE,
     targetId: version,
@@ -123,7 +124,7 @@ export const startReleaseAction = async (
   });
   if (isOverride) {
     await recordAuditEvent({
-      logEvent: 'releases.release_override_audit_failed',
+      logEvent: RELEASE_LOG.RELEASE_OVERRIDE_AUDIT_FAILED,
       action: AUDIT_ACTION.RELEASE_OVERRIDE,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
       targetId: version,

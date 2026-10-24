@@ -67,7 +67,10 @@ export const TenantOverviewView = async ({
         </div>
         <div className={cardsColumn()}>
           <ContentWorkspaceCard tenant={clientTenant} />
-          <RecentActivityCard events={auditEvents} />
+          <RecentActivityCard
+            events={auditEvents}
+            viewAllHref={adminRoutes.tenantActivity(id)}
+          />
         </div>
       </div>
     </div>

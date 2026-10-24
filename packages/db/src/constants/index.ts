@@ -1,4 +1,5 @@
 export * from './admin';
+export * from './audit-event';
 export * from './blocked-signup-identity';
 export * from './email-template-defaults';
 export * from './lead';

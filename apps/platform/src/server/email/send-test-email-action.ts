@@ -9,7 +9,9 @@ import {
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sendEmail } from '@blog/email';
+import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
@@ -51,8 +53,8 @@ export const sendTestEmailAction = async (
   const parsed = sendTestEmailInputSchema.safeParse(input);
   if (
     !parsed.success ||
-    parsed.data.copy.subject === null ||
-    parsed.data.copy.body === null
+    isNull(parsed.data.copy.subject) ||
+    isNull(parsed.data.copy.body)
   ) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
@@ -99,7 +101,7 @@ export const sendTestEmailAction = async (
 
     return { outcome: ACTION_OUTCOME.SUCCESS, to };
   } catch (error) {
-    logger.error('email_test.send_failed', {
+    logger.error(EMAIL_TEST_LOG.SEND_FAILED, {
       tenantId: tenant.id,
       templateType,
       error,

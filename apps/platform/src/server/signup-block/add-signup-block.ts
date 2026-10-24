@@ -10,6 +10,7 @@ import type { TAddBlockedIdentityOutcome } from '@blog/db/queries/blocked-signup
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TBlockedSignupIdentity } from '@blog/db/schema/blocked-signup-identities';
 import type { TResult } from '@blog/utils';
+import { SIGNUP_BLOCK_LOG } from '@platform/constants/signup-block';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 
 export type TAddSignupBlockInput = {
@@ -39,7 +40,7 @@ export const recordSignupBlockAdded = async (
   reason: string,
 ): Promise<void> => {
   await recordAuditEvent({
-    logEvent: 'signup_block.add_audit_failed',
+    logEvent: SIGNUP_BLOCK_LOG.ADD_AUDIT_FAILED,
     action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
     targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
     targetId: id,

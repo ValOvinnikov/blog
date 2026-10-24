@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   MOCK_OFF_ORIGIN_PATH,
   MOCK_OFF_ORIGIN_URL,
@@ -6,11 +7,14 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { toSafeCallbackPath } from './safe-callback-path';
 
+const MOCK_TENANT_ID = faker.string.uuid();
+
 describe(toSafeCallbackPath, () => {
   it.each([
     adminRoutes.home(),
     adminRoutes.dashboardLeads(2),
     adminRoutes.tenants({ archived: true }),
+    `${adminRoutes.tenantOverview(MOCK_TENANT_ID)}?${faker.word.noun()}=1#${faker.word.noun()}`,
   ])('keeps the same-origin path %s', (path) => {
     expect(toSafeCallbackPath(path)).toBe(path);
   });
@@ -19,6 +23,10 @@ describe(toSafeCallbackPath, () => {
     MOCK_OFF_ORIGIN_PATH,
     `/\\${MOCK_OFF_ORIGIN_PATH.slice(2)}`,
     `/\t${MOCK_OFF_ORIGIN_PATH}`,
+    `/.${MOCK_OFF_ORIGIN_PATH}`,
+    `/..${MOCK_OFF_ORIGIN_PATH}`,
+    `/${faker.word.noun()}/..${MOCK_OFF_ORIGIN_PATH}`,
+    `/%2e${MOCK_OFF_ORIGIN_PATH}`,
     MOCK_OFF_ORIGIN_URL,
     '',
     undefined,

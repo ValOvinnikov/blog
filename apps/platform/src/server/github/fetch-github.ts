@@ -5,6 +5,7 @@ import {
   GITHUB_RATE_LIMIT_EXHAUSTED,
   GITHUB_RATE_LIMIT_REMAINING_HEADER,
   type TGitHubFailure,
+  GITHUB_LOG,
 } from '@platform/constants/github';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -28,7 +29,7 @@ export const fetchGitHub = async (
   const credentials = readGitHubCredentials();
 
   if (!credentials) {
-    logger.error('github.not_configured');
+    logger.error(GITHUB_LOG.NOT_CONFIGURED);
     return errorResult(GITHUB_FAILURE.NOT_CONFIGURED);
   }
 
@@ -52,17 +53,17 @@ export const fetchGitHub = async (
       return errorResult(GITHUB_FAILURE.NOT_FOUND);
 
     if (isRateLimited(response)) {
-      logger.warn('github.rate_limited', { path });
+      logger.warn(GITHUB_LOG.RATE_LIMITED, { path });
       return errorResult(GITHUB_FAILURE.RATE_LIMITED);
     }
 
-    logger.error('github.request_failed', {
+    logger.error(GITHUB_LOG.REQUEST_FAILED, {
       path,
       responseStatus: response.status,
     });
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   } catch (error) {
-    logger.error('github.request_error', { path, error });
+    logger.error(GITHUB_LOG.REQUEST_ERROR, { path, error });
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   }
 };
@@ -78,7 +79,7 @@ export const fetchGitHubJson = async <T>(
   try {
     return okResult(parse(await result.data.json()));
   } catch (error) {
-    logger.error('github.unexpected_response', { path, error });
+    logger.error(GITHUB_LOG.UNEXPECTED_RESPONSE, { path, error });
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   }
 };

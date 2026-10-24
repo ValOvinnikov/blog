@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { MAX_UPLOAD_BYTES } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { logger } from '@platform/utils/logger/logger';
@@ -250,7 +251,7 @@ describe(validateBrandAssetUpload, () => {
     });
     expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error).toHaveBeenCalledWith(
-      'site_config.svg_sanitize_failed',
+      SITE_CONFIG_LOG.SVG_SANITIZE_FAILED,
       {
         kind: 'logo',
         error: cause,

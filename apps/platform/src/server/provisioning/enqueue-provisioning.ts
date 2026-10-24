@@ -1,5 +1,6 @@
 import { HTTP_METHOD, type TMaybeNull } from '@blog/config';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
+import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -16,7 +17,7 @@ export const enqueueWorkerRequest = async (
   const secret = env.WORKER_ENQUEUE_SECRET;
 
   if (!workerUrl || !secret) {
-    logger.error('worker.enqueue_skipped', {
+    logger.error(WORKER_LOG.ENQUEUE_SKIPPED, {
       tenantId,
       path,
       hasWorkerUrl: Boolean(workerUrl),
@@ -40,7 +41,7 @@ export const enqueueWorkerRequest = async (
     });
     return response.status;
   } catch (error) {
-    logger.error('worker.enqueue_error', { tenantId, path, error });
+    logger.error(WORKER_LOG.ENQUEUE_ERROR, { tenantId, path, error });
     return null;
   }
 };

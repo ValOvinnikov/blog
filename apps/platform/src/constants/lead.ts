@@ -5,3 +5,7 @@ export const LEAD_REFUSAL = {
 } as const;
 
 export type TLeadRefusal = TValueOf<typeof LEAD_REFUSAL>;
+
+export const LEAD_LOG = {
+  DELETE_FAILED: 'leads.delete_failed',
+} as const;

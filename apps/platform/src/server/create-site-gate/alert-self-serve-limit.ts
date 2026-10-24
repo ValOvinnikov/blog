@@ -2,6 +2,8 @@ import 'server-only';
 
 import { queries } from '@blog/db';
 import { buildSelfServeLimitAlertEmail, sendEmail } from '@blog/email';
+import { hasArrayGotItems } from '@blog/utils/primitives';
+import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -11,8 +13,8 @@ export const alertSelfServeLimit = async (
 ): Promise<void> => {
   try {
     const recipients = await queries.admins.listSuperadminEmails();
-    if (recipients.length === 0) {
-      logger.warn('create_site_gate.alert_no_recipients', { day });
+    if (!hasArrayGotItems(recipients)) {
+      logger.warn(CREATE_SITE_GATE_LOG.ALERT_NO_RECIPIENTS, { day });
       return;
     }
 
@@ -24,11 +26,11 @@ export const alertSelfServeLimit = async (
     await Promise.all(
       recipients.map((to) =>
         sendEmail({ to, from, subject, html }).catch((error: unknown) => {
-          logger.error('create_site_gate.alert_send_failed', { day, error });
+          logger.error(CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED, { day, error });
         }),
       ),
     );
   } catch (error) {
-    logger.error('create_site_gate.alert_failed', { day, error });
+    logger.error(CREATE_SITE_GATE_LOG.ALERT_FAILED, { day, error });
   }
 };

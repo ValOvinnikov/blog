@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { queries } from '@blog/db';
+import { TENANT_LOG } from '@platform/constants/tenant';
 import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
@@ -13,7 +14,7 @@ const touchAndWakeTenant = async (tenantId: string, at: Date) => {
       await revalidateSiteConfig(tenantId);
     }
   } catch (error) {
-    logger.error('tenant.sign_in_activity_failed', { tenantId, error });
+    logger.error(TENANT_LOG.SIGN_IN_ACTIVITY_FAILED, { tenantId, error });
   }
 };
 
@@ -31,6 +32,6 @@ export const recordOwnerSignInActivity = async (
         .map(({ tenant }) => touchAndWakeTenant(tenant.id, at)),
     );
   } catch (error) {
-    logger.error('tenant.sign_in_owner_lookup_failed', { userId, error });
+    logger.error(TENANT_LOG.SIGN_IN_OWNER_LOOKUP_FAILED, { userId, error });
   }
 };
