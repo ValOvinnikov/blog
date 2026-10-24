@@ -12,7 +12,7 @@ const MOCK_TENANT_ID = faker.string.uuid();
 describe(toSafeCallbackPath, () => {
   it.each([
     adminRoutes.home(),
-    adminRoutes.dashboardLeads(2),
+    adminRoutes.dashboardLeads(),
     adminRoutes.tenants({ archived: true }),
     `${adminRoutes.tenantOverview(MOCK_TENANT_ID)}?${faker.word.noun()}=1#${faker.word.noun()}`,
   ])('keeps the same-origin path %s', (path) => {

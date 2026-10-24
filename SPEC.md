@@ -1355,6 +1355,24 @@ locale code and emails the recipient from
 fails still answers `SUCCESS`, and the failure is logged once. The visitor is never
 emailed.
 
+The admin panel's Leads page, on both `/dashboard/leads` and an operator's
+`/tenants/{id}/leads`, is an inbox: from `lg` up the list sits beside a
+reading pane, and below `lg` the list and the open message are separate
+screens with a way back. The list loads 25 leads through `@blog/db`'s
+`listLeadsByCursor` (newest first on `(createdAt, id)`) and 25 more through a
+Server Action as its end scrolls near; there is no offset paging. Each lead
+carries a `readAt`, shared by the site's members: opening an unread lead marks
+it read and Mark unread clears it, both through a Server Action scoped to the
+session's tenant, and the sidebar shows the site's unread count beside Leads.
+The pane shows the stored path at once and then asks `apps/web` for the source
+page's current title: a `POST /api/internal/pages/{documentId}` carrying the
+tenant id and the lead's locale, signed with `@blog/utils`'s
+`buildEnqueueHeaders` under `INTERNAL_PAGES_SECRET`, a secret of its own held
+by both apps. The route reads through `@blog/service`'s tagged queries, so the
+Sanity webhook keeps it fresh; the title is never stored. The panel keeps
+fetched titles in memory for the visit, keyed by document id and language,
+and falls back to the path when the call fails or the page is gone.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)

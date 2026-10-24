@@ -1,3 +1,4 @@
+import { queries } from '@blog/db';
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
@@ -26,11 +27,13 @@ type TProps = {
  */
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
-  const [{ admin: sessionAdmin }, chrome, access] = await Promise.all([
-    listSessionTenants(),
-    loadAdminShellChrome(),
-    resolveTenantPageAccess(tenant, membership),
-  ]);
+  const [{ admin: sessionAdmin }, chrome, access, unreadLeadsCount] =
+    await Promise.all([
+      listSessionTenants(),
+      loadAdminShellChrome(),
+      resolveTenantPageAccess(tenant, membership),
+      queries.leads.countUnreadLeadsForTenant(tenant.id),
+    ]);
   const { isSidebarInitiallyCollapsed, tNavSections, userName } = chrome;
 
   // A virtual membership is correct for authorization but never a correct
@@ -44,6 +47,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
         tNavSections,
         access,
         ownerStudioAccessFor(tenant, membership),
+        unreadLeadsCount,
       )}
       switcher={
         tenants.length > 1 ? (
