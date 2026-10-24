@@ -73,7 +73,7 @@ const isContactFormOpen = async (tenant: TTenant): Promise<boolean> =>
 
 const storeLead = async (
   input: queries.leads.TCreateLeadInput,
-): Promise<TMaybeUndefined<schema.TLead>> => {
+): Promise<TMaybeUndefined<Pick<schema.TLead, 'id'>>> => {
   try {
     return await queries.leads.createLead(input);
   } catch (error) {
@@ -119,17 +119,18 @@ export const submitContactMessage = async (
     };
   }
 
-  const lead = await storeLead({
+  const leadInput = {
     tenantId: tenant.id,
     ...validation.data,
     sourcePath: toSourcePath(asText(input.sourcePath)),
     sourceDocumentId,
     sourceLocale,
-  });
+  };
+  const lead = await storeLead(leadInput);
   if (!lead) return SERVER_ERROR;
 
   try {
-    await sendContactNotification(lead);
+    await sendContactNotification(leadInput);
   } catch (error) {
     logger.error('contact_form.notification_send_failed', {
       leadId: lead.id,

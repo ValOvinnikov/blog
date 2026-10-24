@@ -1,5 +1,4 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
+import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates/get-email-template/get-email-template';
 import { LIST_UNSUBSCRIBE_ONE_CLICK, type TSendEmailInput } from '@blog/email';
@@ -21,11 +20,6 @@ export const MOCK_AUTHORED_SUBJECT = faker.lorem.sentence();
 const MOCK_EMAIL_CONFIG_ID = faker.string.uuid();
 
 const MOCK_EMAIL_CONFIG_CREATED_AT = faker.date.past();
-
-export const MOCK_CONFIRMATION_SUBJECT =
-  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
-    EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION
-  ].subject;
 
 export const MOCK_UNSUBSCRIBE_URL = `${MOCK_TENANT_BASE_URL}/api/newsletter/unsubscribe?token=${MOCK_UNSUBSCRIBE_TOKEN}`;
 

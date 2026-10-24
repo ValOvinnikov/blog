@@ -3,31 +3,61 @@ import {
   ERROR_CODE,
   type TErrorCode,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import { findSubscriberByExactEmail } from '@blog/db/queries/subscribers/user-subscriber';
+import { subscribers } from '@blog/db/schema/subscribers';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
-import { and, eq } from 'drizzle-orm';
+
+export type TPendingSubscriber = {
+  id: string;
+  email: string;
+};
 
 export interface ICreatePendingSubscriberResult {
   outcome:
     | typeof SUBSCRIBER_OUTCOME.CREATED
     | typeof SUBSCRIBER_OUTCOME.ALREADY_PENDING
     | typeof SUBSCRIBER_OUTCOME.ALREADY_ACTIVE;
-  subscriber: TSubscriber;
+  subscriber: TPendingSubscriber;
 }
 
-// Inserts first and reads only on conflict, so two concurrent signups for one
+type TCreatePendingSubscriberResult = TResult<
+  ICreatePendingSubscriberResult,
+  TErrorCode
+>;
+
+async function findExisting(
+  tenantId: string,
+  normalizedEmail: string,
+): Promise<TMaybeUndefined<TCreatePendingSubscriberResult>> {
+  const existing = await findSubscriberByExactEmail(tenantId, normalizedEmail);
+  if (!existing) return undefined;
+
+  const { id, status, email } = existing;
+  return okResult({
+    outcome:
+      status === 'active'
+        ? SUBSCRIBER_OUTCOME.ALREADY_ACTIVE
+        : SUBSCRIBER_OUTCOME.ALREADY_PENDING,
+    subscriber: { id, email },
+  });
+}
+
+// Reads again after a conflicting insert, so two concurrent signups for one
 // new email resolve through the unique constraint instead of one throwing.
 export async function createPendingSubscriber(
   tenantId: string,
   email: string,
-): Promise<TResult<ICreatePendingSubscriberResult, TErrorCode>> {
-  const db = getDb();
+): Promise<TCreatePendingSubscriberResult> {
   const normalizedEmail = normalizeEmail(email);
 
-  const [inserted] = await db
+  const existing = await findExisting(tenantId, normalizedEmail);
+  if (existing) return existing;
+
+  const [inserted] = await getDb()
     .insert(subscribers)
     .values({
       tenantId,
@@ -35,38 +65,17 @@ export async function createPendingSubscriber(
       ...personalEmailColumns(normalizedEmail),
     })
     .onConflictDoNothing()
-    .returning();
+    .returning({ id: subscribers.id });
 
   if (inserted) {
     return okResult({
       outcome: SUBSCRIBER_OUTCOME.CREATED,
-      subscriber: inserted,
+      subscriber: { id: inserted.id, email: normalizedEmail },
     });
   }
 
-  const [existing] = await db
-    .select()
-    .from(subscribers)
-    .where(
-      and(
-        eq(subscribers.tenantId, tenantId),
-        eq(subscribers.email, normalizedEmail),
-      ),
-    );
-
-  if (!existing) {
-    return errorResult(ERROR_CODE.DB_NOT_FOUND);
-  }
-
-  if (existing.status === 'active') {
-    return okResult({
-      outcome: SUBSCRIBER_OUTCOME.ALREADY_ACTIVE,
-      subscriber: existing,
-    });
-  }
-
-  return okResult({
-    outcome: SUBSCRIBER_OUTCOME.ALREADY_PENDING,
-    subscriber: existing,
-  });
+  return (
+    (await findExisting(tenantId, normalizedEmail)) ??
+    errorResult(ERROR_CODE.DB_NOT_FOUND)
+  );
 }
