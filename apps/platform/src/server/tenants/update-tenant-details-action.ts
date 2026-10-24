@@ -11,6 +11,7 @@ import {
 } from '@blog/config';
 import { queries, TENANT_DETAILS_UPDATE_OUTCOME, TENANT_PLAN } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   TENANT_FIELD_ERROR,
@@ -123,7 +124,7 @@ export const updateTenantDetailsAction = async (
           targetId: tenantId,
           details: {
             ...auditedDetails,
-            ownerEmailUpdated: ownerEmail !== undefined,
+            ownerEmailUpdated: !isUndefined(ownerEmail),
           },
         });
         return { outcome: ACTION_OUTCOME.SUCCESS, tenant: result.tenant };

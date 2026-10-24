@@ -7,6 +7,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { PLAN_REGISTRY, queries } from '@blog/db';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   SETTINGS_REFUSAL,
@@ -65,7 +66,7 @@ export const updateFeaturesAction = async (
     ({ capability, field }) => values[field] && !entitled.includes(capability),
   );
 
-  if (outOfPlan.length > 0) {
+  if (hasArrayGotItems(outOfPlan)) {
     logger.warn(SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED, {
       tenantId: tenant.id,
       plan: tenant.plan,

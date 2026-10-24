@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import { isNull } from '@blog/utils/primitives';
 import {
   isReleaseVersionGreater,
   parseReleaseVersion,
@@ -52,7 +53,7 @@ export const getLatestReleaseTag =
 
     const latest = result.data
       .map((ref) => ref.slice(TAG_REF_PREFIX.length))
-      .filter((tag) => parseReleaseVersion(tag) !== null)
+      .filter((tag) => !isNull(parseReleaseVersion(tag)))
       .reduce<TMaybeUndefined<string>>(
         (greatest, tag) =>
           !greatest || isReleaseVersionGreater(tag, greatest) ? tag : greatest,

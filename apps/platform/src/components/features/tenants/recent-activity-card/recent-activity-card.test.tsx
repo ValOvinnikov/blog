@@ -13,35 +13,41 @@ const setup = customRender(RecentActivityCard, {
 });
 
 describe(`<${RecentActivityCard.name}/>`, () => {
-  it("nests the card's title one level under the page's own h1", () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Recent activity',
+  describe('with recorded activity', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(heading).toBeVisible();
-  });
+    it("nests the card's title one level under the page's own h1", () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Recent activity',
+      });
 
-  it("links to the tenant's full activity page", () => {
-    setup();
-
-    const viewAllLink = screen.getByRole('link', { name: VIEW_ALL_ACTIVITY });
-
-    expect(viewAllLink).toHaveAttribute(
-      'href',
-      `/tenants/${MOCK_TENANT_ID}/activity`,
-    );
-  });
-
-  it('offers no View all link while there is no activity to view', () => {
-    setup({ events: [] });
-
-    const viewAllLink = screen.queryByRole('link', {
-      name: VIEW_ALL_ACTIVITY,
+      expect(heading).toBeVisible();
     });
 
-    expect(viewAllLink).not.toBeInTheDocument();
+    it("links to the tenant's full activity page", () => {
+      const viewAllLink = screen.getByRole('link', { name: VIEW_ALL_ACTIVITY });
+
+      expect(viewAllLink).toHaveAttribute(
+        'href',
+        `/tenants/${MOCK_TENANT_ID}/activity`,
+      );
+    });
+  });
+
+  describe('with no activity', () => {
+    beforeEach(() => {
+      setup({ events: [] });
+    });
+
+    it('offers no View all link', () => {
+      const viewAllLink = screen.queryByRole('link', {
+        name: VIEW_ALL_ACTIVITY,
+      });
+
+      expect(viewAllLink).not.toBeInTheDocument();
+    });
   });
 });

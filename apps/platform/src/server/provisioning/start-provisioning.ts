@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, HTTP_STATUS, type TActionResult } from '@blog/config';
+import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -38,7 +39,7 @@ export const startProvisioning = async (
       reason: TENANT_REFUSAL.NOT_FOUND,
     };
   }
-  if (status !== null) {
+  if (!isNull(status)) {
     logger.error(PROVISIONING_LOG.ENQUEUE_FAILED, {
       tenantId,
       responseStatus: status,

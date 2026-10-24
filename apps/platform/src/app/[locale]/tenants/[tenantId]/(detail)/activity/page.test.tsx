@@ -47,18 +47,13 @@ const setup = customRenderAsync(TenantActivityPage, {
 
 describe(`<${TenantActivityPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: faker.string.uuid() } });
-    getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue({
       id: MOCK_OPERATOR_ID,
       role: ADMIN_ROLE.ADMIN,
     });
-    getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(mockTenant({ id: MOCK_TENANT_ID }));
-    listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
-    countAuditEventsForTargetMock.mockReset();
     countAuditEventsForTargetMock.mockResolvedValue(0);
   });
 

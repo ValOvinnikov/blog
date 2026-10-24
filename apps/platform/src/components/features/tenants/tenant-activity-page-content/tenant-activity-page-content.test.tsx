@@ -41,31 +41,6 @@ const setup = customRenderAsync(TenantActivityPageContent, {
 
 describe(TenantActivityPageContent, () => {
   beforeEach(() => {
-    listAuditEventsForTargetMock.mockReset();
-    listAuditEventsForTargetMock.mockResolvedValue([]);
-    countAuditEventsForTargetMock.mockReset();
-    countAuditEventsForTargetMock.mockResolvedValue(0);
-  });
-
-  it("asks for the requested page of the tenant's own activity", async () => {
-    countAuditEventsForTargetMock.mockResolvedValue(
-      AUDIT_EVENTS_PAGE_SIZE * 2 + 1,
-    );
-
-    await setup({ page: 2 });
-
-    expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
-      AUDIT_TARGET_TYPE.TENANT,
-      MOCK_TENANT_ID,
-      { limit: AUDIT_EVENTS_PAGE_SIZE, offset: AUDIT_EVENTS_PAGE_SIZE },
-    );
-    expect(countAuditEventsForTargetMock).toHaveBeenCalledWith(
-      AUDIT_TARGET_TYPE.TENANT,
-      MOCK_TENANT_ID,
-    );
-  });
-
-  it('renders the activity with the page position', async () => {
     listAuditEventsForTargetMock.mockResolvedValue([
       mockAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
       mockAuditEvent({
@@ -73,40 +48,63 @@ describe(TenantActivityPageContent, () => {
         action: AUDIT_ACTION.CREATED,
       }),
     ]);
-    countAuditEventsForTargetMock.mockResolvedValue(AUDIT_EVENTS_PAGE_SIZE + 1);
-
-    await setup();
-
-    const settingsUpdatedLabel = screen.getByText('Settings updated');
-    const createdLabel = screen.getByText('Tenant created');
-    const pagePosition = screen.getByText('Page 1 of 2');
-
-    expect(settingsUpdatedLabel).toBeVisible();
-    expect(createdLabel).toBeVisible();
-    expect(pagePosition).toBeVisible();
   });
 
-  it('shows no paging while all the activity fits on one page', async () => {
-    listAuditEventsForTargetMock.mockResolvedValue([mockAuditEvent()]);
-    countAuditEventsForTargetMock.mockResolvedValue(1);
+  describe('with more than one page of activity', () => {
+    beforeEach(() => {
+      countAuditEventsForTargetMock.mockResolvedValue(
+        AUDIT_EVENTS_PAGE_SIZE + 1,
+      );
+    });
 
-    await setup();
+    it("asks for the requested page of the tenant's own activity", async () => {
+      await setup({ page: 2 });
 
-    const navigation = screen.queryByRole('navigation');
+      expect(countAuditEventsForTargetMock).toHaveBeenCalledWith(
+        AUDIT_TARGET_TYPE.TENANT,
+        MOCK_TENANT_ID,
+      );
+      expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
+        AUDIT_TARGET_TYPE.TENANT,
+        MOCK_TENANT_ID,
+        { limit: AUDIT_EVENTS_PAGE_SIZE, offset: AUDIT_EVENTS_PAGE_SIZE },
+      );
+    });
 
-    expect(navigation).not.toBeInTheDocument();
+    it('renders the activity with the page position', async () => {
+      await setup();
+
+      const settingsUpdatedLabel = screen.getByText('Settings updated');
+      const createdLabel = screen.getByText('Tenant created');
+      const pagePosition = screen.getByText('Page 1 of 2');
+
+      expect(settingsUpdatedLabel).toBeVisible();
+      expect(createdLabel).toBeVisible();
+      expect(pagePosition).toBeVisible();
+    });
+
+    it('sends a page past the end to the last page without reading its rows', async () => {
+      await expect(setup({ page: 9 })).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
+
+      expect(redirect).toHaveBeenCalledWith(
+        `/tenants/${MOCK_TENANT_ID}/activity?page=2`,
+      );
+      expect(listAuditEventsForTargetMock).not.toHaveBeenCalled();
+    });
   });
 
-  it('sends a page past the end to the last page without reading its rows', async () => {
-    countAuditEventsForTargetMock.mockResolvedValue(AUDIT_EVENTS_PAGE_SIZE + 1);
+  describe('with one page of activity', () => {
+    beforeEach(async () => {
+      countAuditEventsForTargetMock.mockResolvedValue(1);
+      await setup();
+    });
 
-    await expect(setup({ page: 9 })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
+    it('shows no paging', () => {
+      const navigation = screen.queryByRole('navigation');
 
-    expect(redirect).toHaveBeenCalledWith(
-      `/tenants/${MOCK_TENANT_ID}/activity?page=2`,
-    );
-    expect(listAuditEventsForTargetMock).not.toHaveBeenCalled();
+      expect(navigation).not.toBeInTheDocument();
+    });
   });
 });

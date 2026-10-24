@@ -9,6 +9,7 @@ import {
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sendEmail } from '@blog/email';
+import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { auth } from '@platform/server/auth/auth';
@@ -52,8 +53,8 @@ export const sendTestEmailAction = async (
   const parsed = sendTestEmailInputSchema.safeParse(input);
   if (
     !parsed.success ||
-    parsed.data.copy.subject === null ||
-    parsed.data.copy.body === null
+    isNull(parsed.data.copy.subject) ||
+    isNull(parsed.data.copy.body)
   ) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }

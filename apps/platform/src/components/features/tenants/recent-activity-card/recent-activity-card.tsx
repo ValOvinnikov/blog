@@ -1,5 +1,6 @@
 import { SIZE } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { ActivityList } from '@platform/components/features/tenants/activity-list';
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
@@ -26,7 +27,7 @@ export const RecentActivityCard = ({
             <Text variant="meta" as="span">
               {t('recentActivitySourceLabel')}
             </Text>
-            {events.length > 0 && (
+            {hasArrayGotItems(events) && (
               <LinkButton
                 href={viewAllHref}
                 variant="ghost"

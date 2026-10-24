@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { ACTION_OUTCOME, HTTP_STATUS, type TActionResult } from '@blog/config';
+import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
@@ -23,7 +24,7 @@ export const requestOwnerAccess = async (
   if (status === HTTP_STATUS.ACCEPTED) {
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   }
-  if (status !== null) {
+  if (!isNull(status)) {
     logger.error(OWNER_ACCESS_LOG.REQUEST_FAILED, {
       tenantId,
       path,

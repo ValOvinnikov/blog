@@ -9,6 +9,7 @@ import {
   buildOwnerElevationAlertEmail,
   sendEmail,
 } from '@blog/email';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
@@ -88,7 +89,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const recipients = await queries.admins.listSuperadminEmails();
-  if (recipients.length === 0) {
+  if (!hasArrayGotItems(recipients)) {
     logger.warn(OPERATOR_ALERT_LOG.NO_RECIPIENTS, { tenantId: tenant.id });
     return NextResponse.json({ sent: 0 }, { status: HTTP_STATUS.OK });
   }
@@ -134,7 +135,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  if (failures.length > 0) {
+  if (hasArrayGotItems(failures)) {
     return NextResponse.json(
       { sent, failed: failures.length },
       { status: 207 },

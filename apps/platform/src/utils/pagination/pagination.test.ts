@@ -34,27 +34,25 @@ describe(countPages, () => {
 });
 
 describe(resolveTotalPages, () => {
-  it('returns the page count while the page is in range', () => {
-    const totalPages = resolveTotalPages({
-      page: 2,
+  const resolveForTwoPages = (page: number) =>
+    resolveTotalPages({
+      page,
       total: MOCK_PAGE_SIZE + 1,
       pageSize: MOCK_PAGE_SIZE,
       pageHref,
     });
+
+  it('returns the page count while the page is in range', () => {
+    const totalPages = resolveForTwoPages(2);
 
     expect(totalPages).toBe(2);
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('sends a page past the end to the last page', () => {
-    expect(() =>
-      resolveTotalPages({
-        page: 9,
-        total: MOCK_PAGE_SIZE + 1,
-        pageSize: MOCK_PAGE_SIZE,
-        pageHref,
-      }),
-    ).toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+    expect(() => resolveForTwoPages(9)).toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
     expect(redirect).toHaveBeenCalledWith('/items?page=2');
   });

@@ -8,6 +8,7 @@ import {
   type TFieldErrors,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import {
@@ -67,7 +68,7 @@ export const updateEmailConfigAction = async (
     : { ...parsed.data, contactRecipient: undefined };
 
   const writtenFields = Object.entries(data)
-    .filter(([, value]) => value !== undefined)
+    .filter(([, value]) => !isUndefined(value))
     .map(([field]) => field);
 
   try {

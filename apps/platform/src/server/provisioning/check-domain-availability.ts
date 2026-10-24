@@ -1,5 +1,6 @@
 import { DOMAIN_PATTERN } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   DOMAIN_AVAILABILITY,
   type TDomainAvailability,
@@ -81,7 +82,7 @@ export const checkDomainAvailability = async (
       const response = await fetchVercel(
         credentials,
         `/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
-        until === undefined ? {} : { until: String(until) },
+        isUndefined(until) ? {} : { until: String(until) },
       );
 
       // A 404 means the apex itself is unknown to the team's Vercel
