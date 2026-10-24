@@ -277,6 +277,12 @@ Run once, after all schema work is complete:
   A test file you touch is pruned (`testing-practices` → "When you touch a
   test file"): list each test removed or moved, with the test that still
   asserts its behaviour.
+- **Reuse** (required): one line per const, literal value, fixture, builder,
+  fake or helper the diff adds — what you searched
+  (`packages/config/const-index.json`, the workspace's `src/testing/` and
+  `__mocks__/`, the nearest sibling) and the result: `reused <name> (<file>)`
+  or `none found — added <name>`. Write "nothing added" only when the diff
+  adds none (CLAUDE.md → "Reuse before you create").
 - The exact names of new/changed types as they appear in `types.ts`
   (`Page_post`, `Module_heroBlog`, `Settings_site`).
 - A field-by-field breakdown for every new/changed type — name, type, and

@@ -118,6 +118,17 @@ contracts:
     a third of its cases repeating each other or re-testing units that had
     their own test files; pruning a touched test file is mandatory, never
     repo-wide.
+  - The same eleven, and `test-writer`, list a required **Reuse** item right
+    after it: for each const, literal value, fixture, builder, fake or helper
+    the diff adds, where they searched (`const-index.json`, the workspace's
+    `src/testing/` and `__mocks__/`, the nearest sibling) and what they found.
+    It replaced `check:duplicate-literals` (#5853) as the cross-file guard: a
+    string-equality gate could not tell duplication from coincidence, while
+    the `MOCK_` naming and fixture-reuse rules had been skipped unless a PR
+    comment asked for them. `code-review-practices` treats a missing Reuse
+    item as blocking, and its §0 runs two scans that back it — a fixed fake
+    value not named `MOCK_…`, and a value a test adds that the workspace's
+    `testing/` or `__mocks__/` already holds (#5854).
   - They no longer carry comment rules of their own. Each points at
     `CLAUDE.md`'s `## Conventions` → "Comments default to zero", the single
     source. **A dispatched subagent inherits both the project and the user
@@ -757,7 +768,7 @@ file` are all denied alike) — an earlier version only handled the
   - `platform-ui-practices` — the `apps/platform` admin design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, and a red-flags table; placement, props and size defer to `react-component-practices`. The reviewer checks platform diffs against it.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, split a growing island at its state branches, a `@blog/ui` atom before raw markup, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
-  - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, an exported fixture named `mock<Thing>` (builder) and every fixed fake value `MOCK_<THING>`, a test file's own consts included, with render and setup helpers exempt, never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), behaviour titles of 80 characters or fewer, and a mandatory pruning pass over every touched test file (duplicates deleted, cases another unit owns moved to it, input/output repeats tabled, each removal reported with where its behaviour is still asserted).
+  - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, an exported fixture named `mock<Thing>` (builder) and every fixed fake value `MOCK_<THING>`, a test file's own consts included, with render and setup helpers exempt, made-up data from seeded `@faker-js/faker` where the workspace's `package.json` has it (and the user asked before it is added where it doesn't), never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), behaviour titles of 80 characters or fewer, and a mandatory pruning pass over every touched test file (duplicates deleted, cases another unit owns moved to it, input/output repeats tabled, each removal reported with where its behaviour is still asserted).
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR, plus the spec and feature-doc sync item, converge-on-touch findings (placement, size, props, variants files) and a flag on a UI or behaviour diff with no manual-test issue.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
