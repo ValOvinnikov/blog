@@ -69,7 +69,6 @@ vi.mock(
 
 const MOCK_SOURCE_PATH = `/${faker.lorem.slug()}`;
 const MOCK_LEAD_ID = faker.string.uuid();
-const MOCK_CREATED_AT = faker.date.recent();
 const MOCK_SOURCE: TContactMessageSource = {
   sourceDocumentId: faker.string.uuid(),
   sourceLocale: LOCALE_ISO_CODES.NL,
@@ -103,24 +102,16 @@ describe(submitContactMessage, () => {
       okResult({ [CAPABILITY.CONTACT_FORM]: true }),
     );
     resolveRequestTenantMock.mockResolvedValue(mockTenant());
-    createLeadMock.mockImplementation(async (input) => ({
-      id: MOCK_LEAD_ID,
-      createdAt: MOCK_CREATED_AT,
-      ...input,
-    }));
+    createLeadMock.mockResolvedValue({ id: MOCK_LEAD_ID });
     sendContactNotificationMock.mockResolvedValue(undefined);
   });
 
-  it('stores the lead with the page it came from, notifies and answers success', async () => {
+  it('stores the lead with the page it came from, notifies the owner with what was sent and succeeds', async () => {
     const result = await submit();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(createLeadMock).toHaveBeenCalledWith(MOCK_STORED_LEAD);
-    expect(sendContactNotificationMock).toHaveBeenCalledWith({
-      id: MOCK_LEAD_ID,
-      createdAt: MOCK_CREATED_AT,
-      ...MOCK_STORED_LEAD,
-    });
+    expect(sendContactNotificationMock).toHaveBeenCalledWith(MOCK_STORED_LEAD);
   });
 
   it('checks the rate limit and capability against the resolved tenant', async () => {

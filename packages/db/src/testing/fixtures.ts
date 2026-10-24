@@ -5,17 +5,25 @@ import {
   TENANT_PLAN,
   TENANT_STATUS,
 } from '@blog/db/constants';
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TUser } from '@blog/db/schema/auth';
 import type { TLead } from '@blog/db/schema/leads';
+import type { TSubscriber } from '@blog/db/schema/subscribers';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 import { faker } from '@faker-js/faker';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema>;
 
 export const MOCK_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_SUBSCRIBER_TAGGED_EMAIL = MOCK_SUBSCRIBER_EMAIL.replace(
+  /@/,
+  '+news@',
+);
 export const MOCK_INVITE_EMAIL = faker.internet.email().toLowerCase();
 export const MOCK_LEAD_NAME = 'Ada Lovelace';
 export const MOCK_LEAD_EMAIL = 'lead@example.com';
@@ -68,6 +76,36 @@ export async function insertTestUser(
   if (!user) throw new Error('insertTestUser: insert returned no row.');
 
   return user;
+}
+
+export async function insertTestReader(
+  db: TTestDb,
+  email: string,
+): Promise<TUser> {
+  return insertTestUser(db, { email, ...userPersonalColumns({ email }) });
+}
+
+export async function insertTestSubscriber(
+  db: TTestDb,
+  tenantId: string,
+  email: string,
+  overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
+): Promise<TSubscriber> {
+  const [subscriber] = await db
+    .insert(schema.subscribers)
+    .values({
+      tenantId,
+      email,
+      ...emailColumns(email, personalDataIndex),
+      ...overrides,
+    })
+    .returning();
+
+  if (!subscriber) {
+    throw new Error('insertTestSubscriber: insert returned no row.');
+  }
+
+  return subscriber;
 }
 
 export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {

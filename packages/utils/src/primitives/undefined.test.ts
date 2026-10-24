@@ -1,0 +1,11 @@
+import { isUndefined } from './undefined';
+
+describe(isUndefined, () => {
+  it('accepts undefined', () => {
+    expect(isUndefined(undefined)).toBe(true);
+  });
+
+  it.each([[null], [''], [0], [false], [{}]])('rejects %j', (value) => {
+    expect(isUndefined(value)).toBe(false);
+  });
+});

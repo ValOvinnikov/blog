@@ -1,4 +1,4 @@
-import { queries, type schema } from '@blog/db';
+import { queries } from '@blog/db';
 import { buildContactNotificationEmail, sendEmail } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
@@ -23,7 +23,7 @@ export const sendContactNotification = async ({
   email,
   message,
   sourcePath,
-}: schema.TLead): Promise<void> => {
+}: queries.leads.TCreateLeadInput): Promise<void> => {
   const [recipient, emailConfig, identity, siteUrl] = await Promise.all([
     queries.emailConfig.getContactRecipient(tenantId),
     queries.emailConfig.getEmailConfig(tenantId),

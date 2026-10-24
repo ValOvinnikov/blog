@@ -215,7 +215,12 @@ backwards.
 schema type, field helper, constant, type, component, test fake or fixture** —
 every app and package, not just the one being changed. A near-duplicate is the
 most expensive kind of mistake to find later, because nothing fails — both
-versions work.
+versions work. No check catches a value or fixture repeated across files, so
+the search is the gate: every implementing agent reports it in a required
+**Reuse** item — for each const, literal value, fixture, builder, fake or
+helper the diff adds, where it looked (`packages/config/const-index.json`, the
+workspace's `src/testing/` and `__mocks__/`, the nearest sibling) and what it
+found. A missing or empty Reuse item is a blocking review finding.
 
 When something similar already exists and it is not obvious whether to extend
 it or add alongside it, that is **not** a judgement call to settle quietly.
@@ -278,8 +283,9 @@ ticket itself. Then sort what you find:
 
 Every implementing agent's report carries a required **Examined** section —
 what it read beyond the files it changed, what it fixed in passing, and what it
-found and left — so a skipped examination shows up in the report instead of
-passing silently.
+found and left — and a required **Reuse** item ("Reuse before you create"), so
+a skipped examination or search shows up in the report instead of passing
+silently.
 
 ## Mid-task decisions land in the ticket/spec before work continues
 
@@ -678,9 +684,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   (`getByRole('button')`); a
   match in the other app is reported, never shared. Lint enforces both on
   touched files only — `prefer-shared-constant` and `no-duplicate-string` in
-  the post-edit hook, lint-staged and `pnpm check:touched-lint`, plus the
-  cross-file `pnpm check:duplicate-literals`, all in `pnpm verify` — so an
-  untouched file keeps its backlog. After adding or changing a const, run
+  the post-edit hook, lint-staged and `pnpm check:touched-lint` (in
+  `pnpm verify`) — so an untouched file keeps its backlog. After adding or changing a const, run
   `pnpm gen:const-index`; `pnpm gen:const-index:check` guards drift.
 
 - `'use client'` never in `@blog/ui` (it stays pure and prop-driven). Two
@@ -801,8 +806,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   `lint`, `test`, `knip`, the six gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
   `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`)
-  and the two local-only diff checks (`check:touched-lint`,
-  `check:duplicate-literals`), so it stops at the first failure and mirrors every required or gating CI check that has a local
+  and the local-only diff check `check:touched-lint`, so it stops at the first failure and mirrors every required or gating CI check that has a local
   equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
   part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
   it locally only when diagnosing an actual CI build failure

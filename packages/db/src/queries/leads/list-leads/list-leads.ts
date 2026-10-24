@@ -1,7 +1,6 @@
-import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { leads, type TLead } from '@blog/db/schema/leads';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { requireDecryptedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { count, desc, eq } from 'drizzle-orm';
 
 export type TListLeadsInput = {
@@ -20,10 +19,7 @@ export type TListLeadsResult = {
   total: number;
 };
 
-function decryptLeadValue(encrypted: TMaybeNull<string>): string {
-  if (encrypted === null) throw new Error('Lead has no encrypted form.');
-  return decryptPersonalValue(encrypted);
-}
+const LEAD_OWNER = 'Lead';
 
 export async function listLeads({
   tenantId,
@@ -62,9 +58,9 @@ export async function listLeads({
         createdAt,
       }) => ({
         id,
-        name: decryptLeadValue(nameEncrypted),
-        email: decryptLeadValue(emailEncrypted),
-        message: decryptLeadValue(messageEncrypted),
+        name: requireDecryptedPersonalValue(nameEncrypted, LEAD_OWNER),
+        email: requireDecryptedPersonalValue(emailEncrypted, LEAD_OWNER),
+        message: requireDecryptedPersonalValue(messageEncrypted, LEAD_OWNER),
         sourcePath,
         createdAt,
       }),

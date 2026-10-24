@@ -4,6 +4,7 @@ import {
   MOCK_ENCRYPTION_KEY as KEY_V1,
 } from './encryption-fixtures';
 import {
+  accountEmailIndex,
   decryptPersonalData,
   encryptPersonalData,
   isPersonalDataKey,
@@ -11,7 +12,8 @@ import {
   parsePersonalDataKeyring,
   personalDataIndex,
 } from './personal-data';
-const ADDRESS = 'reader@example.com';
+const LOCAL_PART = 'reader';
+const ADDRESS = `${LOCAL_PART}@example.com`;
 const KEYRING_V1 = parsePersonalDataKeyring(`v1:${KEY_V1}`);
 const KEYRING_V2 = parsePersonalDataKeyring(`v2:${KEY_V2},v1:${KEY_V1}`);
 const MALFORMED_KEYRING = 'Malformed personal data keyring.';
@@ -46,25 +48,25 @@ describe(parsePersonalDataKeyring, () => {
 });
 
 describe(isPersonalDataKeyring, () => {
-  it('accepts a keyring whose every version holds a 32-byte key', () => {
-    expect(isPersonalDataKeyring(`v2:${KEY_V2},v1:${KEY_V1}`)).toBe(true);
-  });
-
-  it('rejects a keyring whose older version holds a long key', () => {
-    expect(isPersonalDataKeyring(`v2:${KEY_V2},v1:${LONG_KEY}`)).toBe(false);
+  it.each<[string, string, boolean]>([
+    ['every version holds a 32-byte key', `v2:${KEY_V2},v1:${KEY_V1}`, true],
+    ['an older version holds a long key', `v2:${KEY_V2},v1:${LONG_KEY}`, false],
+  ])('judges a keyring where %s', (_label, raw, expected) => {
+    expect(isPersonalDataKeyring(raw)).toBe(expected);
   });
 });
 
 describe(isPersonalDataKey, () => {
-  it('accepts a 32-byte base64 key', () => {
-    expect(isPersonalDataKey(KEY_V1)).toBe(true);
-  });
-
-  it.each<[string, string]>([
-    ...BAD_KEYS,
-    ['a key with surrounding whitespace', ` ${KEY_V1}`],
-  ])('rejects %s as a key', (_label, key) => {
-    expect(isPersonalDataKey(key)).toBe(false);
+  it.each<[string, string, boolean]>([
+    ['a 32-byte base64 key', KEY_V1, true],
+    ...BAD_KEYS.map(([label, key]): [string, string, boolean] => [
+      label,
+      key,
+      false,
+    ]),
+    ['a key with surrounding whitespace', ` ${KEY_V1}`, false],
+  ])('judges %s', (_label, key, expected) => {
+    expect(isPersonalDataKey(key)).toBe(expected);
   });
 });
 
@@ -118,26 +120,48 @@ describe(decryptPersonalData, () => {
   });
 });
 
-describe(personalDataIndex, () => {
-  it('gives two spellings of one address the same index', () => {
-    expect(personalDataIndex(' Reader+news@Example.com', KEY_V1)).toBe(
-      personalDataIndex(ADDRESS, KEY_V1),
-    );
-  });
-
+describe.each([personalDataIndex, accountEmailIndex])('%o', (indexEmail) => {
   it('gives different addresses different indexes', () => {
-    expect(personalDataIndex('writer@example.com', KEY_V1)).not.toBe(
-      personalDataIndex(ADDRESS, KEY_V1),
+    expect(indexEmail('writer@example.com', KEY_V1)).not.toBe(
+      indexEmail(ADDRESS, KEY_V1),
     );
   });
 
   it('gives one address a different index under another key', () => {
-    expect(personalDataIndex(ADDRESS, KEY_V2)).not.toBe(
-      personalDataIndex(ADDRESS, KEY_V1),
-    );
+    expect(indexEmail(ADDRESS, KEY_V2)).not.toBe(indexEmail(ADDRESS, KEY_V1));
   });
 
   it('never contains the address', () => {
-    expect(personalDataIndex(ADDRESS, KEY_V1)).not.toContain('reader');
+    expect(indexEmail(ADDRESS, KEY_V1)).not.toContain(LOCAL_PART);
   });
+});
+
+describe('email index normalisation', () => {
+  it.each([
+    {
+      indexEmail: personalDataIndex,
+      variant: ' Reader+news@Example.com',
+    },
+    {
+      indexEmail: accountEmailIndex,
+      variant: ' Reader@Example.com ',
+    },
+  ])(
+    '$indexEmail.name indexes $variant the same as the address',
+    ({ indexEmail, variant }) => {
+      expect(indexEmail(variant, KEY_V1)).toBe(indexEmail(ADDRESS, KEY_V1));
+    },
+  );
+
+  it.each([
+    {
+      indexEmail: accountEmailIndex,
+      variant: 'reader+news@example.com',
+    },
+  ])(
+    '$indexEmail.name indexes $variant differently from the address',
+    ({ indexEmail, variant }) => {
+      expect(indexEmail(variant, KEY_V1)).not.toBe(indexEmail(ADDRESS, KEY_V1));
+    },
+  );
 });

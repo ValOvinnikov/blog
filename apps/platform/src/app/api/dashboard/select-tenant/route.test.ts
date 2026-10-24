@@ -51,7 +51,7 @@ describe('GET /api/dashboard/select-tenant', () => {
       ),
     );
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(response.headers.get('location')).toBe(
       `https://admin.example.com/api/auth/signin?callbackUrl=%2Fapi%2Fdashboard%2Fselect-tenant%3FtenantId%3D${MOCK_TENANT_ID}`,
     );

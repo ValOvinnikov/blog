@@ -26,6 +26,10 @@ cat > "$project/node_modules/.bin/eslint" <<'EOF'
 #!/bin/sh
 for arg; do file=$arg; done
 printf 'eslint cwd=%s file=%s\n' "$PWD" "$file" >> "$CALLS"
+if grep -q 'LOAD_FAIL' "$file"; then
+  printf "Oops! Something went wrong! :(\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package 'eslint-plugin-sonarjs'\n" >&2
+  exit 2
+fi
 if grep -q 'console.log' "$file"; then
   printf '%s\n  1:1  error  Unexpected console statement  no-console\n' "$file"
   exit 1
@@ -41,6 +45,10 @@ printf "console.log('x');\n" > "$dirty"
 printf "export const x = 1;\n" > "$clean"
 printf "console.log('x');\n" > "$outside"
 printf "# hi\n" > "$markdown"
+load_fail="$project/apps/web/src/load-fail.ts"
+load_fail_outside="$project/packages/utils/src/load-fail.ts"
+printf "// LOAD_FAIL\n" > "$load_fail"
+printf "// LOAD_FAIL\n" > "$load_fail_outside"
 
 payload_for() {
   printf '{"tool_input":{"file_path":"%s"}}' "$1"
@@ -87,6 +95,21 @@ run_hook "$(payload_for "$outside")"
 expect "file with no workspace config lints from the project root" 2 \
   "prettier cwd=$project file=$outside
 eslint cwd=$project file=$outside" "no-console"
+
+run_hook "$(payload_for "$load_fail")"
+expect "ESLint failing to load inside a workspace reaches the agent" 2 \
+  "prettier cwd=$project file=$load_fail
+eslint cwd=$project/apps/web file=$load_fail" "Run pnpm install in $project"
+
+run_hook "$(payload_for "$load_fail")"
+expect "the load failure names the error ESLint printed" 2 \
+  "prettier cwd=$project file=$load_fail
+eslint cwd=$project/apps/web file=$load_fail" "ERR_MODULE_NOT_FOUND"
+
+run_hook "$(payload_for "$load_fail_outside")"
+expect "ESLint failing where no config resolves stays silent" 0 \
+  "prettier cwd=$project file=$load_fail_outside
+eslint cwd=$project file=$load_fail_outside" ""
 
 run_hook "$(payload_for "$markdown")"
 expect "non-TS file is formatted but not linted" 0 \

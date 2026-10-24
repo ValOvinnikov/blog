@@ -1,9 +1,11 @@
 import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -12,137 +14,90 @@ import { eq } from 'drizzle-orm';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
-const EXPECTED_CONFIRMED = 'expected confirmed';
-
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
+const MOCK_CONFIRMED_AT = new Date('2026-10-23T09:00:00Z');
+
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
+
+async function readSubscriber(id: string): Promise<schema.TSubscriber> {
+  const [row] = await db()
+    .select()
+    .from(schema.subscribers)
+    .where(eq(schema.subscribers.id, id));
+  if (!row) throw new Error(`No subscriber "${id}".`);
+  return row;
+}
 
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.subscribers);
   await db().delete(schema.tenants);
 });
 
-async function insertPendingSubscriber(
-  tenantId: string,
-): Promise<schema.TSubscriber & { confirmationToken: string }> {
-  const { confirmationToken, confirmationTokenHash } = mintConfirmationToken();
-  const [inserted] = await db()
-    .insert(schema.subscribers)
-    .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, confirmationTokenHash })
-    .returning();
-
-  if (!inserted) throw new Error('failed to seed a subscriber row');
-
-  return { ...inserted, confirmationToken };
-}
-
 describe(confirmSubscriber, () => {
   let tenantId: string;
+  let otherTenantId: string;
+  let subscriberId: string;
+  let confirmationToken: string;
+  let confirmationTokenHash: string;
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
+    ({ id: otherTenantId } = await insertTestTenant(db()));
+    ({ confirmationToken, confirmationTokenHash } = mintConfirmationToken());
+    ({ id: subscriberId } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+      { confirmationTokenHash },
+    ));
   });
 
-  it('returns not-found for an unrecognized token', async () => {
-    const result = await confirmSubscriber(tenantId, faker.string.uuid());
+  it('activates a pending subscriber and stamps the confirmation time', async () => {
+    vi.useFakeTimers({ now: MOCK_CONFIRMED_AT });
+    const result = await confirmSubscriber(tenantId, confirmationToken);
 
-    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED));
+    const { status, confirmedAt } = await readSubscriber(subscriberId);
+    expect(status).toBe('active');
+    expect(confirmedAt).toEqual(MOCK_CONFIRMED_AT);
   });
 
-  it("returns not-found for another tenant's token", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    const pending = await insertPendingSubscriber(tenantOneId);
+  it('reports a second confirm as already confirmed and keeps the first time', async () => {
+    await confirmSubscriber(tenantId, confirmationToken);
+    const { confirmedAt } = await readSubscriber(subscriberId);
 
-    const result = await confirmSubscriber(
-      tenantTwoId,
-      pending.confirmationToken,
+    const second = await confirmSubscriber(tenantId, confirmationToken);
+
+    expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED));
+    expect((await readSubscriber(subscriberId)).confirmedAt).toEqual(
+      confirmedAt,
     );
+  });
+
+  it.each([
+    ['an unknown token', () => faker.string.uuid(), () => tenantId],
+    ['the stored hash', () => confirmationTokenHash, () => tenantId],
+    ["another tenant's token", () => confirmationToken, () => otherTenantId],
+  ])('returns not-found for %s', async (_case, token, tenant) => {
+    const result = await confirmSubscriber(tenant(), token());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
   });
 
-  describe('with a pending subscriber', () => {
-    let pending: Awaited<ReturnType<typeof insertPendingSubscriber>>;
+  it('confirms exactly once when the same link is opened twice at once', async () => {
+    const results = await Promise.all([
+      confirmSubscriber(tenantId, confirmationToken),
+      confirmSubscriber(tenantId, confirmationToken),
+    ]);
 
-    beforeEach(async () => {
-      pending = await insertPendingSubscriber(tenantId);
-    });
-
-    it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-      const result = await confirmSubscriber(
-        tenantId,
-        pending.confirmationToken,
-      );
-
-      expect(result.outcome).toBe(SUBSCRIBER_OUTCOME.CONFIRMED);
-      if (result.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
-        throw new Error(EXPECTED_CONFIRMED);
-      expect(result.subscriber.status).toBe('active');
-      expect(result.subscriber.confirmedAt).not.toBeNull();
-
-      const [row] = await db()
-        .select()
-        .from(schema.subscribers)
-        .where(eq(schema.subscribers.id, pending.id));
-      expect(row?.status).toBe('active');
-    });
-
-    it('reports already confirmed on a repeat confirm, keeping the first confirmedAt', async () => {
-      const first = await confirmSubscriber(
-        tenantId,
-        pending.confirmationToken,
-      );
-      if (first.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED)
-        throw new Error(EXPECTED_CONFIRMED);
-
-      const second = await confirmSubscriber(
-        tenantId,
-        pending.confirmationToken,
-      );
-
-      expect(second).toEqual({
-        outcome: SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
-        subscriber: first.subscriber,
-      });
-    });
-
-    it('treats the stored hash like an unknown token', async () => {
-      const result = await confirmSubscriber(
-        tenantId,
-        pending.confirmationTokenHash,
-      );
-
-      expect(result).toEqual(
-        await confirmSubscriber(tenantId, faker.string.uuid()),
-      );
-    });
-
-    it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-      const [first, second] = await Promise.all([
-        confirmSubscriber(tenantId, pending.confirmationToken),
-        confirmSubscriber(tenantId, pending.confirmationToken),
-      ]);
-
-      const outcomes = [first.outcome, second.outcome].sort();
-      expect(outcomes).toEqual([
-        SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
-        SUBSCRIBER_OUTCOME.CONFIRMED,
-      ]);
-
-      const confirmed =
-        first.outcome === SUBSCRIBER_OUTCOME.CONFIRMED ? first : second;
-      if (confirmed.outcome !== SUBSCRIBER_OUTCOME.CONFIRMED) {
-        throw new Error('expected one confirmed outcome');
-      }
-      const [row] = await db()
-        .select()
-        .from(schema.subscribers)
-        .where(eq(schema.subscribers.id, pending.id));
-      expect(row?.confirmedAt).toEqual(confirmed.subscriber.confirmedAt);
-    });
+    expect(results.map(({ outcome }) => outcome).sort()).toEqual([
+      SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
+      SUBSCRIBER_OUTCOME.CONFIRMED,
+    ]);
   });
 });

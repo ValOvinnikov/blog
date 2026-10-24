@@ -2,13 +2,20 @@ import { users } from '@blog/db/schema/auth';
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { subscribers } from '@blog/db/schema/subscribers';
+import type { TEmailIndexer } from '@blog/db/utils/personal-data/personal-data';
+import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
 import { type SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn, PgTable } from 'drizzle-orm/pg-core';
+
+interface IEmailIndexField {
+  column: AnyPgColumn;
+  indexer: TEmailIndexer;
+}
 
 export interface IPersonalDataField {
   plain: AnyPgColumn;
   encrypted: AnyPgColumn;
-  emailIndex?: AnyPgColumn;
+  emailIndex?: IEmailIndexField;
 }
 
 export interface IPersonalDataTarget {
@@ -26,7 +33,7 @@ export const PERSONAL_DATA_TARGETS: IPersonalDataTarget[] = [
       {
         plain: users.email,
         encrypted: users.emailEncrypted,
-        emailIndex: users.emailIndex,
+        emailIndex: { column: users.emailIndex, indexer: accountEmailIndex },
       },
     ],
   },
@@ -37,7 +44,10 @@ export const PERSONAL_DATA_TARGETS: IPersonalDataTarget[] = [
       {
         plain: subscribers.email,
         encrypted: subscribers.emailEncrypted,
-        emailIndex: subscribers.emailIndex,
+        emailIndex: {
+          column: subscribers.emailIndex,
+          indexer: personalDataIndex,
+        },
       },
     ],
   },
@@ -48,7 +58,10 @@ export const PERSONAL_DATA_TARGETS: IPersonalDataTarget[] = [
       {
         plain: membershipInvites.email,
         encrypted: membershipInvites.emailEncrypted,
-        emailIndex: membershipInvites.emailIndex,
+        emailIndex: {
+          column: membershipInvites.emailIndex,
+          indexer: personalDataIndex,
+        },
       },
     ],
   },
@@ -60,7 +73,7 @@ export const PERSONAL_DATA_TARGETS: IPersonalDataTarget[] = [
       {
         plain: leads.email,
         encrypted: leads.emailEncrypted,
-        emailIndex: leads.emailIndex,
+        emailIndex: { column: leads.emailIndex, indexer: personalDataIndex },
       },
       { plain: leads.message, encrypted: leads.messageEncrypted },
     ],
@@ -73,7 +86,7 @@ export function fieldGap({
   emailIndex,
 }: IPersonalDataField): SQL {
   const missing = emailIndex
-    ? sql`(${encrypted} is null or ${emailIndex} is null)`
+    ? sql`(${encrypted} is null or ${emailIndex.column} is null)`
     : sql`${encrypted} is null`;
 
   return sql`(${plain} <> '' and ${missing})`;

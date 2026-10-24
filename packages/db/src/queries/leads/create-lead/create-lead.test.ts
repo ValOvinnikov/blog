@@ -1,12 +1,18 @@
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  MOCK_LEAD_EMAIL,
+  MOCK_LEAD_MESSAGE,
+  MOCK_LEAD_NAME,
+} from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { createLead } from './create-lead';
 
@@ -17,12 +23,18 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
 
-const LEAD = {
-  name: 'Ada Lovelace',
-  email: 'ada@example.com',
-  message: 'I would like to talk about a project.',
+const MOCK_LEAD = {
+  name: MOCK_LEAD_NAME,
+  email: MOCK_LEAD_EMAIL,
+  message: MOCK_LEAD_MESSAGE,
   sourcePath: '/en/contact',
 };
+
+async function readOnlyLead(): Promise<schema.TLead> {
+  const [row, ...others] = await db().select().from(schema.leads);
+  if (!row || others.length > 0) throw new Error('Expected exactly one lead.');
+  return row;
+}
 
 afterEach(async () => {
   await db().delete(schema.leads);
@@ -36,60 +48,65 @@ describe(createLead, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('stores the lead and returns it with an id and a creation time', async () => {
-    const lead = await createLead({ tenantId, ...LEAD });
+  it('stores an unread lead and returns only its id', async () => {
+    const created = await createLead({ tenantId, ...MOCK_LEAD });
 
-    expect(lead).toMatchObject({ tenantId, ...LEAD });
-    expect(lead.id).toEqual(expect.any(String));
-    expect(lead.createdAt).toBeInstanceOf(Date);
-    const rows = await db().select().from(schema.leads);
-    expect(rows).toHaveLength(1);
-  });
-
-  it('stores the name, email and message encrypted beside the plain values, with an email index', async () => {
-    const lead = await createLead({ tenantId, ...LEAD });
-
-    expect({
-      name: decryptTestPersonalValue(lead.nameEncrypted),
-      email: decryptTestPersonalValue(lead.emailEncrypted),
-      message: decryptTestPersonalValue(lead.messageEncrypted),
-    }).toEqual({ name: LEAD.name, email: LEAD.email, message: LEAD.message });
-    expect(lead.emailIndex).toBe(testPersonalEmailIndex(LEAD.email));
-  });
-
-  it('stores the source page document id and locale when given', async () => {
-    const source = {
-      sourceDocumentId: 'page-contact',
-      sourceLocale: LOCALE_BCP47_TAGS.EN,
-    };
-
-    const lead = await createLead({ tenantId, ...LEAD, ...source });
-
-    expect(lead).toMatchObject(source);
-  });
-
-  it('stores a new lead unread and with no source page document id or locale', async () => {
-    const lead = await createLead({ tenantId, ...LEAD });
-
-    expect(lead).toMatchObject({
+    const row = await readOnlyLead();
+    const { id, name, email, message, sourcePath, readAt } = row;
+    expect(created).toEqual({ id });
+    expect({ name, email, message, sourcePath, readAt }).toEqual({
+      ...MOCK_LEAD,
       readAt: null,
-      sourceDocumentId: null,
-      sourceLocale: null,
+    });
+    expect(row.tenantId).toBe(tenantId);
+  });
+
+  it('stores the name, email and message encrypted, and the email index', async () => {
+    await createLead({ tenantId, ...MOCK_LEAD });
+
+    const { nameEncrypted, emailEncrypted, messageEncrypted, emailIndex } =
+      await readOnlyLead();
+    expect({
+      name: decryptTestPersonalValue(nameEncrypted),
+      email: decryptTestPersonalValue(emailEncrypted),
+      message: decryptTestPersonalValue(messageEncrypted),
+      emailIndex,
+    }).toEqual({
+      name: MOCK_LEAD_NAME,
+      email: MOCK_LEAD_EMAIL,
+      message: MOCK_LEAD_MESSAGE,
+      emailIndex: testPersonalEmailIndex(MOCK_LEAD_EMAIL),
     });
   });
 
-  it('rejects a tenantId with no matching tenants row', async () => {
+  it.each([
+    [
+      'stores',
+      { sourceDocumentId: 'page-contact', sourceLocale: LOCALE_BCP47_TAGS.EN },
+    ],
+    ['leaves empty', {}],
+  ])('%s the source document and locale', async (_case, source) => {
+    await createLead({ tenantId, ...MOCK_LEAD, ...source });
+
+    const { sourceDocumentId, sourceLocale } = await readOnlyLead();
+    expect({ sourceDocumentId, sourceLocale }).toEqual({
+      sourceDocumentId: null,
+      sourceLocale: null,
+      ...source,
+    });
+  });
+
+  it('rejects a tenant that does not exist', async () => {
     await expect(
-      createLead({ tenantId: '00000000-0000-0000-0000-000000000000', ...LEAD }),
+      createLead({ tenantId: faker.string.uuid(), ...MOCK_LEAD }),
     ).rejects.toThrow();
   });
 
   it('is removed when its tenant is deleted', async () => {
-    await createLead({ tenantId, ...LEAD });
+    await createLead({ tenantId, ...MOCK_LEAD });
 
     await db().delete(schema.tenants);
 
-    const rows = await db().select().from(schema.leads);
-    expect(rows).toHaveLength(0);
+    expect(await db().select().from(schema.leads)).toEqual([]);
   });
 });

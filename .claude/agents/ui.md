@@ -84,9 +84,8 @@ arrangement", "Writing a component test", "What not to test"). On top of it:
 - **A bugfix's regression test is yours, written first** and failing before
   the fix; new-feature coverage comes from `test-writer` after your
   implementation lands.
-- **Mock data comes from `@faker-js/faker`**, never a hardcoded `"Title"` or
-  `"Lorem ipsum"`. Tests call `faker.seed(123)` at the top of the file;
-  stories may leave it unseeded.
+- **Mock data comes from seeded `@faker-js/faker`** (`testing-practices` →
+  "Where tests live").
 - **Every new or changed component gets a story** (`ui-storybook`), including
   the explicit `select` control for a prop backed by a `tv()` variant map or
   an UPPERCASE dictionary const.
@@ -119,6 +118,12 @@ with uncommitted changes from ending its turn.
   A test file you touch is pruned (`testing-practices` → "When you touch a
   test file"): list each test removed or moved, with the test that still
   asserts its behaviour.
+- **Reuse** (required): one line per const, literal value, fixture, builder,
+  fake or helper the diff adds — what you searched
+  (`packages/config/const-index.json`, the workspace's `src/testing/` and
+  `__mocks__/`, the nearest sibling) and the result: `reused <name> (<file>)`
+  or `none found — added <name>`. Write "nothing added" only when the diff
+  adds none (CLAUDE.md → "Reuse before you create").
 - Each component and its import path
   (`MediaCard` from `@blog/ui/components/molecules/media-card`).
 - Prop type names and shapes (`TMediaCardProps { excerpt?: string; … }`).
