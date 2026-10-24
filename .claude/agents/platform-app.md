@@ -135,12 +135,16 @@ beside `reason` on the same variant — `create-tenant-action.ts`'s owner-invite
 
 CLAUDE.md → "No bare `console.*`" and `SPEC.md` §17 govern. On top of them:
 
+- Event names come from the domain's `<DOMAIN>_LOG` const in
+  `src/constants/<domain>.ts` (CLAUDE.md → "No bare `console.*`"), never a
+  literal at the call; a file you touch that logs is converted.
 - Pass the raw `error` in the context; the logger normalizes it. Never log a
   secret's value (log whether it was configured) or a response body (log its
   status code).
 - Levels: `SPEC.md` §17 → "Levels" (an expected, user-correctable outcome is a
   return value, never an `error` line). Modelled on
-  `server/tenants/create-tenant-action.ts`:
+  `server/tenants/create-tenant-action.ts`, with its event name in a
+  `TENANT_LOG` const as the bullet above asks:
 
 ```ts
 if (existingDomain) {
@@ -155,7 +159,10 @@ const result = await queries.tenants.createTenantDraft({
   domain /* … */,
 });
 if (!result.ok) {
-  logger.error('tenants.create_draft_failed', { domain, error: result.error });
+  logger.error(TENANT_LOG.CREATE_DRAFT_FAILED, {
+    domain,
+    error: result.error,
+  });
   return { outcome: ACTION_OUTCOME.SERVER_ERROR };
 }
 ```

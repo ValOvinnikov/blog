@@ -37,6 +37,10 @@ D() { git diff "$BASE"...HEAD; git diff; }
 D | grep -nE '^\+.*console\.(log|info|debug|trace|warn|error)'
 D | grep -nE '^\+.*\bdebugger\b'
 
+# A log event name typed at the call instead of read from the domain's
+# <DOMAIN>_LOG const (CLAUDE.md → "No bare console.*").
+D | grep -nE "^\+.*logger\.(error|warn|info|debug)\(\s*['\"\`]"
+
 # Focused/skipped tests
 D | grep -nE '^\+.*\.(only|skip)\('
 

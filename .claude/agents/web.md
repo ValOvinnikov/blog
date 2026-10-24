@@ -90,6 +90,9 @@ Before writing code:
 CLAUDE.md → "No bare `console.*`" and `SPEC.md` §17 govern; the logger is
 `import { logger } from '@web/utils/logger/logger';`. On top of them:
 
+- Event names come from the domain's `<DOMAIN>_LOG` const in
+  `src/constants/<domain>.ts` (CLAUDE.md → "No bare `console.*`"), never a
+  literal at the call; a file you touch that logs is converted.
 - Pass the raw `error` in the context — the logger normalizes it. Give two
   failure sites two event names, even in one file.
 - **Pick the level by who can act.** `error`: broken, a human must look (an
@@ -103,10 +106,10 @@ CLAUDE.md → "No bare `console.*`" and `SPEC.md` §17 govern; the logger is
 const result = await queries.bookmarks.addBookmark(tenantId, userId, postId);
 if (!result.ok) {
   if (result.error === ERROR_CODE.DB_NOT_FOUND) {
-    logger.warn('bookmark.add_row_vanished', { postId });
+    logger.warn(BOOKMARK_LOG.ADD_ROW_VANISHED, { postId });
     return { ok: false };
   }
-  logger.error('bookmark.add_failed', { postId, error: result.error });
+  logger.error(BOOKMARK_LOG.ADD_FAILED, { postId, error: result.error });
   return { ok: false };
 }
 ```
