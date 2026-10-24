@@ -918,7 +918,7 @@ filterable:
       arrives within 10 minutes of the line.
 - [ ] **Synthetic uptime checks** (Grafana Synthetic Monitoring, HTTP): the
       apex home page `/` and the platform host's sign-in page
-      `/api/auth/signin`. **2 probes, every 3 minutes**, alerting on **2
+      `/sign-in`. **2 probes, every 3 minutes**, alerting on **2
       failures in 5 minutes** — both probes failing one run — and resolving on
       recovery. The free tier allows 100k executions a month and every probe
       run counts: two checks at this setting use about 60k, while the 1-minute

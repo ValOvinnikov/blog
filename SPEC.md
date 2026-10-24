@@ -2649,7 +2649,10 @@ Event names are static, lowercase and dot-namespaced (`tenants.create_failed`).
 Dynamic values — slugs, ids, domains, status codes — are structured context
 fields, never interpolated into the name. A static name is what makes failures
 groupable, and it is also the log-injection barrier CodeQL checks. Two distinct
-failure sites get two distinct names, even in the same file.
+failure sites get two distinct names, even in the same file. A domain's names
+live in one `<DOMAIN>_LOG` const in the app's `src/constants/<domain>.ts`
+(`SIGN_IN_LOG.LINK_FAILED` is `auth.sign_in_link_failed`), so the call site and
+its test read the same value.
 
 ### What belongs in the log stream
 

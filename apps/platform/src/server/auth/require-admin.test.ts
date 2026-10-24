@@ -1,3 +1,6 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -30,23 +33,27 @@ describe(requireAdmin, () => {
   it('redirects to sign-in without querying admins when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(requireAdmin()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireAdmin()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    );
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
   it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(requireAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(requireAdmin()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
 
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('resolves to the admin row for a signed-in admins row', async () => {
-    const admin = { id: 'admin-1', userId: 'user-1', role: 'ADMIN' };
+    const admin = mockAdmin();
     getAdminByUserIdMock.mockResolvedValue(admin);
 
     const result = await requireAdmin();

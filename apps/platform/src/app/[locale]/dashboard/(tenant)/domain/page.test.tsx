@@ -2,6 +2,7 @@ import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import {
   act,
   customRenderAsync,
@@ -75,7 +76,7 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
     expect(getProjectDomainMock).not.toHaveBeenCalled();
   });
 

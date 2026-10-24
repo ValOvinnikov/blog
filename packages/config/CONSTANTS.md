@@ -309,6 +309,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SETTINGS_REFUSAL**: `NOT_IN_PLAN`, `NOT_FOUND`, `LOCALE_NOT_LIVE`
 
+### `@platform/constants/sign-in` — `apps/platform/src/constants/sign-in.ts`
+
+- **SIGN_IN_ERROR**: `ACCOUNT_NOT_LINKED`, `SIGN_IN_FAILED`
+- **SIGN_IN_LOG**: `LINK_FAILED`=`"auth.sign_in_link_failed"`
+
 ### `@platform/constants/signup-block` — `apps/platform/src/constants/signup-block.ts`
 
 - **SIGNUP_BLOCK_FIELD_ERROR**: `BLOCK_DOMAIN_INVALID`, `BLOCK_REASON_REQUIRED`

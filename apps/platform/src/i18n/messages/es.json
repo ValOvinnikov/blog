@@ -7,6 +7,7 @@
     "voice": "Voz · Administración",
     "selectTenant": "Elija un espacio de trabajo · Administración",
     "workspacePending": "Espacio de trabajo no listo · Administración",
+    "signInTitle": "Iniciar sesión",
     "signInError": "Problema al iniciar sesión",
     "addTenant": "Añadir cliente · Administración",
     "tenantOverview": "Resumen del cliente · Administración",
@@ -27,6 +28,31 @@
     "heading": "Su espacio de trabajo aún no está listo",
     "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó.",
     "tryAgain": "Volver a intentarlo"
+  },
+  "signInPage": {
+    "heading": "Iniciar sesión",
+    "description": "Usa la cuenta con la que te registraste o te invitaron.",
+    "brandMarkLabel": "Valstack",
+    "accountNotLinkedTitle": "Este correo ya inicia sesión de otra forma",
+    "accountNotLinkedDescription": "Tu correo electrónico ya se usa con otro método de inicio de sesión. Inicia sesión como lo hiciste la última vez.",
+    "signInFailedTitle": "No hemos podido iniciar tu sesión",
+    "signInFailedDescription": "Algo ha fallado al iniciar sesión. Inténtalo de nuevo o elige otra forma de iniciar sesión."
+  },
+  "providerSignInButton": {
+    "continueWithGithub": "Continuar con GitHub",
+    "continueWithGoogle": "Continuar con Google",
+    "redirecting": "Redirigiendo…"
+  },
+  "emailSignInForm": {
+    "emailLabel": "Correo electrónico",
+    "emailHint": "Te enviaremos un enlace para iniciar sesión.",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "sendLink": "Enviarme un enlace de inicio de sesión",
+    "sending": "Enviando…",
+    "sendFailedTitle": "No hemos podido enviar tu enlace de inicio de sesión",
+    "sendFailedDescription": "Inténtalo de nuevo dentro de unos minutos.",
+    "linkSentTitle": "Revisa tu correo",
+    "linkSentDescription": "Hemos enviado un enlace de inicio de sesión a {email}. Funciona una sola vez y caduca pasado un tiempo."
   },
   "signInErrorPage": {
     "linkSpentHeading": "Este enlace de inicio de sesión ya no funciona",

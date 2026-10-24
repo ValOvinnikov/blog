@@ -1,4 +1,5 @@
 import { signOut } from '@platform/server/auth/auth';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 
 import { signOutAction } from './sign-out-action';
 
@@ -9,7 +10,7 @@ describe(signOutAction, () => {
     await signOutAction();
 
     expect(signOut).toHaveBeenCalledWith({
-      redirectTo: '/api/auth/signin?callbackUrl=%2F',
+      redirectTo: MOCK_SIGN_IN_HREF,
     });
   });
 });
