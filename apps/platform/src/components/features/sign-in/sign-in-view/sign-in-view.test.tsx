@@ -1,6 +1,8 @@
+import { OAUTH_PROVIDER_IDS } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { SIGN_IN_ERROR } from '@platform/constants/sign-in';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent from '@testing-library/user-event';
 
 import { SignInView } from './sign-in-view';
@@ -13,13 +15,13 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
   sendSignInLinkAction: vi.fn(),
 }));
 
-const MOCK_CALLBACK_PATH = '/dashboard';
+const [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
 const GITHUB_BUTTON = { name: 'Continue with GitHub' };
 const GOOGLE_BUTTON = { name: 'Continue with Google' };
 
 const setup = customRender(SignInView, {
-  providerIds: ['github', 'google'],
-  callbackPath: MOCK_CALLBACK_PATH,
+  providerIds: OAUTH_PROVIDER_IDS,
+  callbackPath: adminRoutes.dashboard(),
   error: undefined,
 });
 
@@ -52,13 +54,13 @@ describe(`<${SignInView.name}/>`, () => {
 
   it('starts the chosen provider sign-in for the requested page', async () => {
     const user = userEvent.setup();
-    setup();
+    setup({ providerIds: [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] });
 
     await user.click(screen.getByRole('button', GOOGLE_BUTTON));
 
     expect(signInWithProviderAction).toHaveBeenCalledWith({
-      providerId: 'google',
-      callbackPath: MOCK_CALLBACK_PATH,
+      providerId: GOOGLE_PROVIDER_ID,
+      callbackPath: adminRoutes.dashboard(),
     });
   });
 

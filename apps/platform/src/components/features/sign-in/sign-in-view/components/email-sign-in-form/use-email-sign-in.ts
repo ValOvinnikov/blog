@@ -1,22 +1,23 @@
 'use client';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
-import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import {
+  ACTION_OUTCOME,
+  type TMaybeUndefined,
+  type TReasonedFailure,
+} from '@blog/config';
 import {
   sendSignInLinkAction,
   type TSendSignInLinkFieldError,
 } from '@platform/server/auth/send-sign-in-link-action';
 import { useState, useTransition } from 'react';
 
-const FIELD_ERROR_KEYS = {
-  [TENANT_FIELD_ERROR.EMAIL_INVALID]: 'emailInvalid',
-} as const satisfies Record<TSendSignInLinkFieldError, string>;
-
 export const useEmailSignIn = (callbackPath: string) => {
   const [email, setEmail] = useState('');
   const [sentTo, setSentTo] = useState<TMaybeUndefined<string>>(undefined);
-  const [fieldError, setFieldError] =
-    useState<TMaybeUndefined<TSendSignInLinkFieldError>>(undefined);
+  const [emailError, setEmailError] =
+    useState<TMaybeUndefined<TReasonedFailure<TSendSignInLinkFieldError>>>(
+      undefined,
+    );
   const [hasSendFailed, setHasSendFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -24,9 +25,9 @@ export const useEmailSignIn = (callbackPath: string) => {
     startTransition(async () => {
       const result = await sendSignInLinkAction({ email, callbackPath });
 
-      setFieldError(
+      setEmailError(
         result.outcome === ACTION_OUTCOME.INVALID
-          ? result.fieldErrors.email?.reason
+          ? result.fieldErrors.email
           : undefined,
       );
       setHasSendFailed(result.outcome === ACTION_OUTCOME.SERVER_ERROR);
@@ -41,7 +42,7 @@ export const useEmailSignIn = (callbackPath: string) => {
     email,
     setEmail,
     sentTo,
-    emailErrorKey: fieldError && FIELD_ERROR_KEYS[fieldError],
+    emailError,
     hasSendFailed,
     isPending,
     submit,

@@ -25,7 +25,7 @@ export const ProviderSignInButton = ({
   providerId,
   callbackPath,
 }: TProviderSignInButtonProps) => {
-  const t = useTranslations('signInPage');
+  const t = useTranslations('providerSignInButton');
   const [isPending, startTransition] = useTransition();
 
   const handleClick = () => {

@@ -1,7 +1,9 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { sendSignInLinkAction } from '@platform/server/auth/send-sign-in-link-action';
+import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailSignInForm } from './email-sign-in-form';
@@ -10,13 +12,11 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
   sendSignInLinkAction: vi.fn(),
 }));
 
-const MOCK_EMAIL = 'jane@example.com';
-const MOCK_CALLBACK_PATH = '/dashboard';
 const EMAIL_FIELD = { name: 'Email address' };
 const SEND_BUTTON = { name: 'Email me a sign-in link' };
 
 const setup = customRender(EmailSignInForm, {
-  callbackPath: MOCK_CALLBACK_PATH,
+  callbackPath: adminRoutes.dashboard(),
 });
 
 describe(`<${EmailSignInForm.name}/>`, () => {
@@ -28,7 +28,10 @@ describe(`<${EmailSignInForm.name}/>`, () => {
       .mockReset()
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     setup();
-    await user.type(screen.getByRole('textbox', EMAIL_FIELD), MOCK_EMAIL);
+    await user.type(
+      screen.getByRole('textbox', EMAIL_FIELD),
+      MOCK_SIGN_IN_EMAIL,
+    );
   });
 
   it('sends a link for the requested page and asks the user to check email', async () => {
@@ -37,11 +40,11 @@ describe(`<${EmailSignInForm.name}/>`, () => {
     const status = await screen.findByRole('status');
 
     expect(sendSignInLinkAction).toHaveBeenCalledWith({
-      email: MOCK_EMAIL,
-      callbackPath: MOCK_CALLBACK_PATH,
+      email: MOCK_SIGN_IN_EMAIL,
+      callbackPath: adminRoutes.dashboard(),
     });
     expect(status).toHaveTextContent(
-      `Check your emailWe've sent a sign-in link to ${MOCK_EMAIL}. It works once and expires after a while.`,
+      `Check your emailWe've sent a sign-in link to ${MOCK_SIGN_IN_EMAIL}. It works once and expires after a while.`,
     );
   });
 
@@ -53,12 +56,12 @@ describe(`<${EmailSignInForm.name}/>`, () => {
 
     await user.click(screen.getByRole('button', SEND_BUTTON));
 
-    const error = await screen.findByText(
-      'Enter a valid email address, such as you@example.com.',
-    );
+    const error = await screen.findByText('Enter a valid email.');
 
     expect(error).toBeVisible();
-    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(MOCK_EMAIL);
+    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(
+      MOCK_SIGN_IN_EMAIL,
+    );
   });
 
   it('says the link could not be sent and keeps the address', async () => {
@@ -73,6 +76,8 @@ describe(`<${EmailSignInForm.name}/>`, () => {
     expect(alert).toHaveTextContent(
       "We couldn't send your sign-in linkTry again in a few minutes.",
     );
-    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(MOCK_EMAIL);
+    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(
+      MOCK_SIGN_IN_EMAIL,
+    );
   });
 });

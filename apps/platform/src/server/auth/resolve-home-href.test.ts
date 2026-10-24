@@ -1,5 +1,6 @@
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import type { Session } from 'next-auth';
 
@@ -29,7 +30,7 @@ describe(resolveHomeHref, () => {
   it('links to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    await expect(resolveHomeHref()).resolves.toBe('/sign-in?callbackUrl=%2F');
+    await expect(resolveHomeHref()).resolves.toBe(MOCK_SIGN_IN_HREF);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 

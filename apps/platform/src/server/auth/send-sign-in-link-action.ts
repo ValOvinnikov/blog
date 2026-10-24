@@ -1,5 +1,6 @@
 'use server';
 
+import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
@@ -9,8 +10,6 @@ import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-call
 import { z } from 'zod';
 
 import { signIn } from './auth';
-
-const MAGIC_LINK_PROVIDER_ID = 'email';
 
 const sendSignInLinkInputSchema = z.object({
   email: z.string().trim().toLowerCase().email(),

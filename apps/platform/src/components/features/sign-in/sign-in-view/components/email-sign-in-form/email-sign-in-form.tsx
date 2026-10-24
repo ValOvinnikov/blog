@@ -6,6 +6,7 @@ import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { tv } from '@platform/utils/tv/tv';
+import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
 
@@ -23,16 +24,17 @@ export type TEmailSignInFormProps = {
 };
 
 export const EmailSignInForm = ({ callbackPath }: TEmailSignInFormProps) => {
-  const t = useTranslations('signInPage');
+  const t = useTranslations('emailSignInForm');
   const {
     email,
     setEmail,
     sentTo,
-    emailErrorKey,
+    emailError,
     hasSendFailed,
     isPending,
     submit,
   } = useEmailSignIn(callbackPath);
+  const fieldErrorText = useTenantFieldErrorText();
   const { root, submit: submitSlot } = emailSignInFormVariants();
 
   if (sentTo) {
@@ -62,7 +64,7 @@ export const EmailSignInForm = ({ callbackPath }: TEmailSignInFormProps) => {
       <FormTextInput
         label={t('emailLabel')}
         hint={t('emailHint')}
-        error={emailErrorKey && t(emailErrorKey)}
+        error={fieldErrorText(emailError)}
         type="email"
         placeholder={t('emailPlaceholder')}
         value={email}

@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -36,7 +37,7 @@ describe(requireAdmin, () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(redirect).toHaveBeenCalledWith('/sign-in?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 

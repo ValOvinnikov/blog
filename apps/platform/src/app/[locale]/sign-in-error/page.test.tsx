@@ -1,8 +1,7 @@
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 
 import SignInErrorPage from './page';
-
-const SIGN_IN_HREF = '/sign-in?callbackUrl=%2F';
 
 const setup = customRenderAsync(SignInErrorPage, {
   searchParams: Promise.resolve({}),
@@ -25,7 +24,7 @@ describe(SignInErrorPage, () => {
 
     expect(heading).toBeVisible();
     expect(description).toBeVisible();
-    expect(newLinkLink).toHaveAttribute('href', SIGN_IN_HREF);
+    expect(newLinkLink).toHaveAttribute('href', MOCK_SIGN_IN_HREF);
   });
 
   it.each(['Configuration', 'AccessDenied', undefined])(
@@ -44,7 +43,7 @@ describe(SignInErrorPage, () => {
 
       expect(heading).toBeVisible();
       expect(description).toBeVisible();
-      expect(backLink).toHaveAttribute('href', SIGN_IN_HREF);
+      expect(backLink).toHaveAttribute('href', MOCK_SIGN_IN_HREF);
     },
   );
 });

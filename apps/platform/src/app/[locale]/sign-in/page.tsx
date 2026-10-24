@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMetadata('signIn');
+  return pageMetadata('signInTitle');
 }
 
 type TProps = {

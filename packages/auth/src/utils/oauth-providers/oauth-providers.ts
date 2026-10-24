@@ -9,7 +9,10 @@ type TOAuthCredentials = {
   clientSecret: string;
 };
 
-const OAUTH_PROVIDER_IDS: readonly TOAuthProviderId[] = ['github', 'google'];
+export const OAUTH_PROVIDER_IDS = [
+  'github',
+  'google',
+] as const satisfies readonly TOAuthProviderId[];
 
 const OAUTH_CREDENTIAL_GETTERS: Record<
   TOAuthProviderId,

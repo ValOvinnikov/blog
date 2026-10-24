@@ -7,7 +7,7 @@
     "voice": "Toon · Admin",
     "selectTenant": "Kies een werkruimte · Admin",
     "workspacePending": "Werkruimte niet klaar · Admin",
-    "signIn": "Inloggen",
+    "signInTitle": "Inloggen",
     "signInError": "Probleem bij inloggen",
     "addTenant": "Tenant toevoegen · Admin",
     "tenantOverview": "Tenantoverzicht · Admin",
@@ -32,23 +32,27 @@
   "signInPage": {
     "heading": "Inloggen",
     "description": "Gebruik het account waarmee je je hebt aangemeld of bent uitgenodigd.",
+    "brandMarkLabel": "Valstack",
+    "accountNotLinkedTitle": "Dit e-mailadres logt al op een andere manier in",
+    "accountNotLinkedDescription": "Je e-mailadres wordt al gebruikt met een andere inlogmethode. Log in zoals je de vorige keer deed.",
+    "signInFailedTitle": "We konden je niet inloggen",
+    "signInFailedDescription": "Er ging iets mis bij het inloggen. Probeer het opnieuw of kies een andere manier om in te loggen."
+  },
+  "providerSignInButton": {
     "continueWithGithub": "Doorgaan met GitHub",
     "continueWithGoogle": "Doorgaan met Google",
-    "redirecting": "Doorsturen…",
+    "redirecting": "Doorsturen…"
+  },
+  "emailSignInForm": {
     "emailLabel": "E-mailadres",
     "emailHint": "We mailen je een link waarmee je inlogt.",
     "emailPlaceholder": "jij@voorbeeld.nl",
-    "emailInvalid": "Vul een geldig e-mailadres in, zoals jij@voorbeeld.nl.",
     "sendLink": "Mail me een inloglink",
     "sending": "Versturen…",
     "sendFailedTitle": "We konden je inloglink niet versturen",
     "sendFailedDescription": "Probeer het over een paar minuten opnieuw.",
     "linkSentTitle": "Check je e-mail",
-    "linkSentDescription": "We hebben een inloglink naar {email} gestuurd. Hij werkt maar één keer en verloopt na een tijdje.",
-    "accountNotLinkedTitle": "Dit e-mailadres logt al op een andere manier in",
-    "accountNotLinkedDescription": "Je e-mailadres wordt al gebruikt met een andere inlogmethode. Log in zoals je de vorige keer deed.",
-    "failedTitle": "We konden je niet inloggen",
-    "failedDescription": "Er ging iets mis bij het inloggen. Probeer het opnieuw of kies een andere manier om in te loggen."
+    "linkSentDescription": "We hebben een inloglink naar {email} gestuurd. Hij werkt maar één keer en verloopt na een tijdje."
   },
   "signInErrorPage": {
     "linkSpentHeading": "Deze inloglink werkt niet meer",

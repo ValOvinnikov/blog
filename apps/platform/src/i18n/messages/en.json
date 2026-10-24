@@ -7,7 +7,7 @@
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
     "workspacePending": "Workspace not ready · Admin",
-    "signIn": "Sign in",
+    "signInTitle": "Sign in",
     "signInError": "Sign-in problem",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
@@ -32,23 +32,27 @@
   "signInPage": {
     "heading": "Sign in",
     "description": "Use the account you signed up or were invited with.",
+    "brandMarkLabel": "Valstack",
+    "accountNotLinkedTitle": "This email already signs in another way",
+    "accountNotLinkedDescription": "Your email address is already used with a different sign-in method. Sign in the way you did before.",
+    "signInFailedTitle": "We couldn't sign you in",
+    "signInFailedDescription": "Something went wrong while signing you in. Try again, or choose another way to sign in."
+  },
+  "providerSignInButton": {
     "continueWithGithub": "Continue with GitHub",
     "continueWithGoogle": "Continue with Google",
-    "redirecting": "Redirecting…",
+    "redirecting": "Redirecting…"
+  },
+  "emailSignInForm": {
     "emailLabel": "Email address",
     "emailHint": "We'll email you a link that signs you in.",
     "emailPlaceholder": "you@example.com",
-    "emailInvalid": "Enter a valid email address, such as you@example.com.",
     "sendLink": "Email me a sign-in link",
     "sending": "Sending…",
     "sendFailedTitle": "We couldn't send your sign-in link",
     "sendFailedDescription": "Try again in a few minutes.",
     "linkSentTitle": "Check your email",
-    "linkSentDescription": "We've sent a sign-in link to {email}. It works once and expires after a while.",
-    "accountNotLinkedTitle": "This email already signs in another way",
-    "accountNotLinkedDescription": "Your email address is already used with a different sign-in method. Sign in the way you did before.",
-    "failedTitle": "We couldn't sign you in",
-    "failedDescription": "Something went wrong while signing you in. Try again, or choose another way to sign in."
+    "linkSentDescription": "We've sent a sign-in link to {email}. It works once and expires after a while."
   },
   "signInErrorPage": {
     "linkSpentHeading": "This sign-in link no longer works",

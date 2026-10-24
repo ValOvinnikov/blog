@@ -17,8 +17,8 @@ const SIGN_IN_ERROR_KEYS = {
     description: 'accountNotLinkedDescription',
   },
   [SIGN_IN_ERROR.SIGN_IN_FAILED]: {
-    title: 'failedTitle',
-    description: 'failedDescription',
+    title: 'signInFailedTitle',
+    description: 'signInFailedDescription',
   },
 } as const satisfies Record<
   TSignInError,
@@ -37,7 +37,6 @@ export const SignInView = ({
   error,
 }: TSignInViewProps) => {
   const t = useTranslations('signInPage');
-  const tSidebar = useTranslations('sidebar');
   const { content, providers } = signInViewVariants();
 
   return (
@@ -46,7 +45,7 @@ export const SignInView = ({
         <PageHeader
           title={t('heading')}
           description={t('description')}
-          actions={<BrandMark title={tSidebar('brandName')} />}
+          actions={<BrandMark title={t('brandMarkLabel')} />}
         />
       }
     >

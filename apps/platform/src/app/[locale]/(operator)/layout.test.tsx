@@ -3,6 +3,7 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { usePathname } from '@platform/i18n/navigation';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { redirect, useParams } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -54,9 +55,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith(
-      '/sign-in?callbackUrl=%2F',
-    );
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 

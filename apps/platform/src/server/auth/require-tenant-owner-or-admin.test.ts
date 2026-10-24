@@ -1,6 +1,7 @@
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
@@ -46,7 +47,7 @@ describe(requireTenantOwnerOrAdmin, () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(redirect).toHaveBeenCalledWith('/sign-in?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
   });
 
   it('404s for a signed-in user with no membership in the tenant', async () => {

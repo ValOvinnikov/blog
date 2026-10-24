@@ -1,21 +1,28 @@
+import {
+  MOCK_OFF_ORIGIN_PATH,
+  MOCK_OFF_ORIGIN_URL,
+} from '@platform/testing/auth/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
+
 import { toSafeCallbackPath } from './safe-callback-path';
 
 describe(toSafeCallbackPath, () => {
-  it.each(['/', '/dashboard/leads?page=2', '/tenants#archived'])(
-    'keeps the same-origin path %s',
-    (path) => {
-      expect(toSafeCallbackPath(path)).toBe(path);
-    },
-  );
+  it.each([
+    adminRoutes.home(),
+    adminRoutes.dashboardLeads(2),
+    adminRoutes.tenants({ archived: true }),
+  ])('keeps the same-origin path %s', (path) => {
+    expect(toSafeCallbackPath(path)).toBe(path);
+  });
 
   it.each([
-    '//evil.example',
-    '/\\evil.example',
-    '/\t/evil.example',
-    'https://evil.example/',
+    MOCK_OFF_ORIGIN_PATH,
+    `/\\${MOCK_OFF_ORIGIN_PATH.slice(2)}`,
+    `/\t${MOCK_OFF_ORIGIN_PATH}`,
+    MOCK_OFF_ORIGIN_URL,
     '',
     undefined,
   ])('falls back to home for %j, which could leave this origin', (value) => {
-    expect(toSafeCallbackPath(value)).toBe('/');
+    expect(toSafeCallbackPath(value)).toBe(adminRoutes.home());
   });
 });
