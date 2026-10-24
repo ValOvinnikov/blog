@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
@@ -52,10 +53,7 @@ describe(requireSuperAdmin, () => {
   });
 
   it('404s when the admin row is below SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.ADMIN,
-    });
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
 
     await expect(requireSuperAdmin()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -65,7 +63,7 @@ describe(requireSuperAdmin, () => {
   });
 
   it('resolves to the admin row when the role is SUPERADMIN', async () => {
-    const admin = { id: 'admin-1', role: ADMIN_ROLE.SUPERADMIN };
+    const admin = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
     getAdminByUserIdMock.mockResolvedValue(admin);
 
     const result = await requireSuperAdmin();

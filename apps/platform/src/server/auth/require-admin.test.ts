@@ -1,5 +1,5 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { notFound, redirect } from 'next/navigation';
@@ -53,7 +53,7 @@ describe(requireAdmin, () => {
   });
 
   it('resolves to the admin row for a signed-in admins row', async () => {
-    const admin = { id: 'admin-1', userId: 'user-1', role: ADMIN_ROLE.ADMIN };
+    const admin = mockAdmin();
     getAdminByUserIdMock.mockResolvedValue(admin);
 
     const result = await requireAdmin();

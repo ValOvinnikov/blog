@@ -1,5 +1,5 @@
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import type { Session } from 'next-auth';
@@ -36,10 +36,7 @@ describe(resolveHomeHref, () => {
 
   it('links an admin to the tenants list', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.ADMIN,
-    });
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
 
     await expect(resolveHomeHref()).resolves.toBe('/tenants');
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
