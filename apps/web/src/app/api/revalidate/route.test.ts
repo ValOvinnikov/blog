@@ -7,6 +7,7 @@ import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
   PATH_PURGE_FALLBACK_EVENT,
+  SIGNATURE_REFUSED_REASON,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
@@ -17,8 +18,8 @@ import { logger } from '@web/utils/logger/logger';
 
 import { SANITY_OPERATION_HEADER, SANITY_PROJECT_ID_HEADER } from './route';
 
-const { isValidSignatureMock } = vi.hoisted(() => ({
-  isValidSignatureMock: vi.fn(),
+const { verifyRevalidateSignatureMock } = vi.hoisted(() => ({
+  verifyRevalidateSignatureMock: vi.fn(),
 }));
 
 const { revalidateTagMock, revalidatePathMock } = vi.hoisted(() => ({
@@ -27,12 +28,10 @@ const { revalidateTagMock, revalidatePathMock } = vi.hoisted(() => ({
 }));
 
 const {
-  getTenantIdBySanityProjectIdMock,
   getTenantByIdMock,
   getTenantSanityCredentialsMock,
   removeBookmarksForPostMock,
 } = vi.hoisted(() => ({
-  getTenantIdBySanityProjectIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   getTenantSanityCredentialsMock: vi.fn(),
   removeBookmarksForPostMock: vi.fn(),
@@ -45,10 +44,10 @@ const { isDerivableRevalidateTypeMock, deriveRevalidatePathsMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@sanity/webhook', () => ({
-  isValidSignature: isValidSignatureMock,
-  SIGNATURE_HEADER_NAME: 'sanity-webhook-signature',
-}));
+vi.mock(
+  '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature',
+  () => ({ verifyRevalidateSignature: verifyRevalidateSignatureMock }),
+);
 
 vi.mock('next/cache', () => ({
   revalidateTag: revalidateTagMock,
@@ -64,7 +63,6 @@ vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
-      getTenantIdBySanityProjectId: getTenantIdBySanityProjectIdMock,
       getTenantById: getTenantByIdMock,
       getTenantSanityCredentials: getTenantSanityCredentialsMock,
     },
@@ -152,10 +150,9 @@ describe('POST /api/revalidate', () => {
     loggerErrorMock = vi.mocked(fresh.logger.error);
     loggerWarnMock = vi.mocked(fresh.logger.warn);
     envMock.SANITY_REVALIDATE_SECRET = REVALIDATE_SECRET;
-    isValidSignatureMock.mockReset();
+    verifyRevalidateSignatureMock.mockReset();
     revalidateTagMock.mockReset();
     revalidatePathMock.mockReset();
-    getTenantIdBySanityProjectIdMock.mockReset();
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue({ id: MOCK_TENANT_ID });
     getTenantSanityCredentialsMock.mockReset();
@@ -179,7 +176,7 @@ describe('POST /api/revalidate', () => {
     let POST: typeof import('./route').POST;
 
     beforeEach(async () => {
-      isValidSignatureMock.mockResolvedValue(true);
+      verifyRevalidateSignatureMock.mockResolvedValue(okResult(undefined));
       ({ POST } = await import('./route'));
     });
 
@@ -255,9 +252,27 @@ describe('POST /api/revalidate', () => {
       expect(revalidateTagMock).toHaveBeenCalledTimes(10);
     });
 
+    it("verifies the raw body and signature against the request's project id and the shared secret", async () => {
+      const body = { _type: 'page_post', _id: POST_ID };
+      const request = makeRequest(body, VALID_SIGNATURE, {
+        [SANITY_PROJECT_ID_HEADER]: TENANT_PROJECT_ID,
+      });
+      await POST(request);
+
+      expect(verifyRevalidateSignatureMock).toHaveBeenCalledWith({
+        rawBody: JSON.stringify(body),
+        signature: VALID_SIGNATURE,
+        projectId: TENANT_PROJECT_ID,
+        sharedSecret: REVALIDATE_SECRET,
+        now: expect.any(Number),
+      });
+    });
+
     describe('tenant activity', () => {
       it("records the publishing tenant's activity", async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          okResult(MOCK_TENANT_ID),
+        );
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           VALID_SIGNATURE,
@@ -273,7 +288,9 @@ describe('POST /api/revalidate', () => {
       });
 
       it('records no activity for an archived tenant', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          okResult(MOCK_TENANT_ID),
+        );
         getTenantByIdMock.mockResolvedValue(undefined);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
@@ -298,7 +315,9 @@ describe('POST /api/revalidate', () => {
 
     describe('archived tenant', () => {
       it('ignores the event and revalidates nothing when the resolved tenant is archived', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          okResult(MOCK_TENANT_ID),
+        );
         getTenantByIdMock.mockResolvedValue(undefined);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
@@ -332,7 +351,7 @@ describe('POST /api/revalidate', () => {
         {
           case: 'the project-id lookup throws',
           arrange: () => {
-            getTenantIdBySanityProjectIdMock.mockRejectedValue(
+            verifyRevalidateSignatureMock.mockRejectedValue(
               new Error(MOCK_ERROR_MESSAGE),
             );
           },
@@ -342,7 +361,9 @@ describe('POST /api/revalidate', () => {
         {
           case: 'getTenantById throws',
           arrange: () => {
-            getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+            verifyRevalidateSignatureMock.mockResolvedValue(
+              okResult(MOCK_TENANT_ID),
+            );
             getTenantByIdMock.mockRejectedValue(new Error(MOCK_ERROR_MESSAGE));
           },
           event: 'revalidate.tenant_by_id_lookup_failed',
@@ -374,7 +395,9 @@ describe('POST /api/revalidate', () => {
 
     describe('with a signature that fails verification', () => {
       beforeEach(() => {
-        isValidSignatureMock.mockResolvedValue(false);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          errorResult(SIGNATURE_REFUSED_REASON),
+        );
       });
 
       it('returns 401 and revalidates nothing for an invalid signature', async () => {
@@ -386,10 +409,11 @@ describe('POST /api/revalidate', () => {
 
         expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
         expect(revalidateTagMock).not.toHaveBeenCalled();
+        expect(loggerErrorMock).not.toHaveBeenCalled();
+        expect(loggerWarnMock).not.toHaveBeenCalled();
       });
 
       it('records no tenant activity for an invalid signature', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           INVALID_SIGNATURE,
@@ -397,17 +421,8 @@ describe('POST /api/revalidate', () => {
         );
         await POST(request);
 
-        expect(getTenantIdBySanityProjectIdMock).not.toHaveBeenCalled();
+        expect(getTenantByIdMock).not.toHaveBeenCalled();
         expect(recordTenantActivityMock).not.toHaveBeenCalled();
-      });
-
-      it('returns 401 and revalidates nothing when the signature header is missing', async () => {
-        const request = makeRequest({ _type: 'page_post', _id: POST_ID });
-        const response = await POST(request);
-
-        expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-        expect(isValidSignatureMock).not.toHaveBeenCalled();
-        expect(revalidateTagMock).not.toHaveBeenCalled();
       });
     });
 
@@ -453,7 +468,9 @@ describe('POST /api/revalidate', () => {
 
     describe('bookmark cleanup on delete', () => {
       beforeEach(() => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          okResult(MOCK_TENANT_ID),
+        );
       });
 
       it('removes bookmarks for a deleted page_post with a resolvable tenant', async () => {
@@ -469,8 +486,8 @@ describe('POST /api/revalidate', () => {
         const response = await POST(request);
         const json = await response.json();
 
-        expect(getTenantIdBySanityProjectIdMock).toHaveBeenCalledWith(
-          TENANT_PROJECT_ID,
+        expect(verifyRevalidateSignatureMock).toHaveBeenCalledWith(
+          expect.objectContaining({ projectId: TENANT_PROJECT_ID }),
         );
         expect(removeBookmarksForPostMock).toHaveBeenCalledWith(
           MOCK_TENANT_ID,
@@ -514,23 +531,8 @@ describe('POST /api/revalidate', () => {
         },
       );
 
-      it('skips cleanup when sanity-project-id is missing on a delete', async () => {
-        const request = makeRequest(
-          { _type: 'page_post', _id: POST_ID },
-          VALID_SIGNATURE,
-          { [SANITY_OPERATION_HEADER]: 'delete' },
-        );
-        const response = await POST(request);
-        const json = await response.json();
-
-        expect(getTenantIdBySanityProjectIdMock).not.toHaveBeenCalled();
-        expect(removeBookmarksForPostMock).not.toHaveBeenCalled();
-        expect(json.bookmarksRemoved).toBe(0);
-        expect(response.status).toBe(HTTP_STATUS.OK);
-      });
-
       it('skips cleanup when the tenant cannot be resolved from the project id', async () => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(undefined);
+        verifyRevalidateSignatureMock.mockResolvedValue(okResult(undefined));
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           VALID_SIGNATURE,
@@ -590,7 +592,9 @@ describe('POST /api/revalidate', () => {
 
     describe('resolved path purge', () => {
       beforeEach(() => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          okResult(MOCK_TENANT_ID),
+        );
         isDerivableRevalidateTypeMock.mockReturnValue(true);
         getTenantSanityCredentialsMock.mockResolvedValue(TENANT_SANITY_CONTEXT);
       });
@@ -675,6 +679,7 @@ describe('POST /api/revalidate', () => {
       });
 
       it('falls back to the whole-site purge, logging tenant_unresolved, with no tenant', async () => {
+        verifyRevalidateSignatureMock.mockResolvedValue(okResult(undefined));
         const request = makeRequest(
           { _type: 'page_post', _id: POST_ID },
           VALID_SIGNATURE,
@@ -726,7 +731,9 @@ describe('POST /api/revalidate', () => {
 
     describe('referencing module purge', () => {
       const withTenant = async (type: string, id: string) => {
-        getTenantIdBySanityProjectIdMock.mockResolvedValue(MOCK_TENANT_ID);
+        verifyRevalidateSignatureMock.mockResolvedValue(
+          okResult(MOCK_TENANT_ID),
+        );
         getTenantSanityCredentialsMock.mockResolvedValue(TENANT_SANITY_CONTEXT);
         return POST(
           makeRequest({ _type: type, _id: id }, VALID_SIGNATURE, {
@@ -823,7 +830,7 @@ describe('POST /api/revalidate', () => {
     const response = await POST(request);
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(isValidSignatureMock).not.toHaveBeenCalled();
+    expect(verifyRevalidateSignatureMock).not.toHaveBeenCalled();
     expect(revalidateTagMock).not.toHaveBeenCalled();
   });
 });

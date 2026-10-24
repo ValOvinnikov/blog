@@ -3,7 +3,7 @@ import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
 import { errorResult, type TResult } from '@blog/utils';
-import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
+import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   FETCH_FAILED_REASON,
   PATH_PURGE_FALLBACK_EVENT,
@@ -18,6 +18,7 @@ import {
 } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { recordTenantActivity } from '@web/server/revalidate/record-tenant-activity/record-tenant-activity';
 import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags';
+import { verifyRevalidateSignature } from '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
@@ -82,10 +83,30 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const signature = request.headers.get(SIGNATURE_HEADER_NAME);
+  const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
   const rawBody = await request.text();
 
-  if (!signature || !(await isValidSignature(rawBody, signature, secret))) {
+  let verified;
+  try {
+    verified = await verifyRevalidateSignature({
+      rawBody,
+      signature: request.headers.get(SIGNATURE_HEADER_NAME),
+      projectId: tenantProjectId,
+      sharedSecret: secret,
+      now: Date.now(),
+    });
+  } catch (error) {
+    logger.error('revalidate.tenant_id_lookup_failed', {
+      tenantProjectId,
+      error,
+    });
+    return NextResponse.json(
+      { message: TENANT_LOOKUP_FAILED_MESSAGE },
+      { status: HTTP_STATUS.BAD_GATEWAY },
+    );
+  }
+
+  if (!verified.ok) {
     return NextResponse.json(
       { message: 'Invalid signature.' },
       { status: HTTP_STATUS.UNAUTHORIZED },
@@ -111,24 +132,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { _type: type, _id: id } = parsedBody;
 
-  const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
-
-  let tenantId: TMaybeUndefined<string>;
-  if (tenantProjectId) {
-    try {
-      tenantId =
-        await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId);
-    } catch (error) {
-      logger.error('revalidate.tenant_id_lookup_failed', {
-        tenantProjectId,
-        error,
-      });
-      return NextResponse.json(
-        { message: TENANT_LOOKUP_FAILED_MESSAGE },
-        { status: 502 },
-      );
-    }
-  }
+  const tenantId = verified.data;
 
   if (tenantId) {
     let tenant;
@@ -141,7 +145,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       });
       return NextResponse.json(
         { message: TENANT_LOOKUP_FAILED_MESSAGE },
-        { status: 502 },
+        { status: HTTP_STATUS.BAD_GATEWAY },
       );
     }
     if (!tenant) {

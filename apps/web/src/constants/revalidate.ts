@@ -29,3 +29,7 @@ export const TOPIC_PARAMS_LOOKUP_FAILED_EVENT =
 
 export const TOPIC_PAGINATION_LOOKUP_FAILED_EVENT =
   'revalidate.topic_pagination_lookup_failed';
+
+export const REVALIDATE_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;
+
+export const SIGNATURE_REFUSED_REASON = 'signature_refused';
