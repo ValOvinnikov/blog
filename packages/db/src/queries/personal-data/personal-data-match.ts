@@ -3,7 +3,8 @@ import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
 import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/normalize-signup-identity';
-import { requirePersonalEmailIndex } from '@blog/db/utils/personal-data/personal-data';
+import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 import { and, eq, type SQL, sql } from 'drizzle-orm';
 
 export type TPersonalDataMatch = {
@@ -18,7 +19,7 @@ export function toPersonalDataMatch(
   if (!normalized) return undefined;
 
   return {
-    emailIndex: requirePersonalEmailIndex(normalized.address),
+    emailIndex: requireEmailIndex(normalized.address, personalDataIndex),
     mailbox: normalized.address,
   };
 }

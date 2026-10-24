@@ -4,7 +4,6 @@ import {
   decryptPersonalData,
   encryptPersonalData,
   parsePersonalDataKeyring,
-  personalDataIndex,
 } from '@blog/utils/encryption';
 
 // Null while a key is unset, so writes keep working on the plain columns and the backfill fills the gap.
@@ -34,23 +33,33 @@ export function readPersonalValue(
   return encrypted === null ? plain : decryptPersonalValue(encrypted);
 }
 
-function indexPersonalEmail(email: string): TMaybeNull<string> {
+export type TEmailIndexer = (email: string, keyBase64: string) => string;
+
+type TEmailColumns = {
+  emailEncrypted: TMaybeNull<string>;
+  emailIndex: TMaybeNull<string>;
+};
+
+function indexEmail(email: string, indexer: TEmailIndexer): TMaybeNull<string> {
   const key = env.PERSONAL_DATA_INDEX_KEY;
-  return key ? personalDataIndex(email, key) : null;
+  return key ? indexer(email, key) : null;
 }
 
-export function requirePersonalEmailIndex(email: string): string {
-  const index = indexPersonalEmail(email);
+export function requireEmailIndex(
+  email: string,
+  indexer: TEmailIndexer,
+): string {
+  const index = indexEmail(email, indexer);
   if (!index) throw new Error('PERSONAL_DATA_INDEX_KEY is not configured.');
   return index;
 }
 
-export function personalEmailColumns(email: string): {
-  emailEncrypted: TMaybeNull<string>;
-  emailIndex: TMaybeNull<string>;
-} {
+export function emailColumns(
+  email: string,
+  indexer: TEmailIndexer,
+): TEmailColumns {
   return {
     emailEncrypted: encryptPersonalValue(email),
-    emailIndex: indexPersonalEmail(email),
+    emailIndex: indexEmail(email, indexer),
   };
 }
