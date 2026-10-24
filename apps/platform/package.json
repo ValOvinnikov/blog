@@ -50,7 +50,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
-    "@faker-js/faker": "^10.6.0",
+    "@faker-js/faker": "catalog:",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^6.6.0",

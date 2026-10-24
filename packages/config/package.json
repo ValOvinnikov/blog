@@ -25,6 +25,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
+    "@faker-js/faker": "catalog:",
     "@types/node": "^26",
     "@types/react": "^19.3.0",
     "eslint": "catalog:",

@@ -41,7 +41,7 @@
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
     "@electric-sql/pglite": "^0.5.10",
-    "@faker-js/faker": "^10.6.0",
+    "@faker-js/faker": "catalog:",
     "@types/node": "^26",
     "drizzle-kit": "^0.31.11",
     "eslint": "catalog:",
