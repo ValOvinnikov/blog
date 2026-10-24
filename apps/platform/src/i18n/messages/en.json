@@ -144,7 +144,8 @@
       "STALLED": "Action needed"
     },
     "blockedSignups": "Blocked sign-ups",
-    "dataRequests": "Data requests"
+    "dataRequests": "Data requests",
+    "badgeUnreadLeads": "{count} new"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -1148,19 +1149,22 @@
     "downgradedTitle": "Contact form not included in your plan",
     "downgradedDescription": "The contact form is a Growth feature, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
   },
-  "leadsTable": {
-    "columnReceived": "Received",
-    "columnName": "Name",
-    "columnEmail": "Email",
-    "columnMessage": "Message",
-    "columnPage": "Page",
-    "columnActions": "Actions",
+  "leadsInbox": {
+    "listLabel": "Messages",
     "empty": "No messages yet. When someone uses your contact form, their message will appear here.",
-    "homePage": "Home page"
-  },
-  "leadMessage": {
-    "showMore": "Show more",
-    "showLess": "Show less"
+    "unread": "Unread",
+    "yesterday": "Yesterday",
+    "loadingMore": "Loading more messages…",
+    "loadMoreFailed": "Couldn't load more messages. Try again",
+    "noSelection": "Select a message to read it.",
+    "back": "Back to messages",
+    "reply": "Reply",
+    "markUnread": "Mark unread",
+    "email": "Email",
+    "received": "Received",
+    "page": "Page",
+    "homePage": "Home page",
+    "readStateFailed": "Couldn't update the message. Try again."
   },
   "pagination": {
     "ariaLabel": "Pagination",

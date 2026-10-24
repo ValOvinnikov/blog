@@ -144,7 +144,8 @@
       "STALLED": "Action requise"
     },
     "blockedSignups": "Inscriptions bloquées",
-    "dataRequests": "Demandes de données"
+    "dataRequests": "Demandes de données",
+    "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}"
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
@@ -1148,19 +1149,22 @@
     "downgradedTitle": "Formulaire de contact non inclus dans votre offre",
     "downgradedDescription": "Le formulaire de contact est une fonctionnalité Growth : plus aucun nouveau message n'arrive. Les messages déjà reçus sont conservés ici et vous pouvez toujours en supprimer."
   },
-  "leadsTable": {
-    "columnReceived": "Reçu",
-    "columnName": "Nom",
-    "columnEmail": "E-mail",
-    "columnMessage": "Message",
-    "columnPage": "Page",
-    "columnActions": "Actions",
+  "leadsInbox": {
+    "listLabel": "Messages",
     "empty": "Aucun message pour l'instant. Quand quelqu'un utilisera votre formulaire de contact, son message apparaîtra ici.",
-    "homePage": "Page d'accueil"
-  },
-  "leadMessage": {
-    "showMore": "Afficher plus",
-    "showLess": "Afficher moins"
+    "unread": "Non lu",
+    "yesterday": "Hier",
+    "loadingMore": "Chargement d'autres messages…",
+    "loadMoreFailed": "Impossible de charger d'autres messages. Réessayer",
+    "noSelection": "Sélectionnez un message pour le lire.",
+    "back": "Retour aux messages",
+    "reply": "Répondre",
+    "markUnread": "Marquer comme non lu",
+    "email": "E-mail",
+    "received": "Reçu",
+    "page": "Page",
+    "homePage": "Page d'accueil",
+    "readStateFailed": "Impossible de mettre à jour le message. Réessayez."
   },
   "pagination": {
     "ariaLabel": "Pagination",

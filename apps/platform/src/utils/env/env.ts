@@ -39,6 +39,9 @@ export const env = createEnv({
     // Must be byte-identical to `apps/worker`'s own `WORKER_ENQUEUE_SECRET`.
     // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
+    // Must be byte-identical to `apps/web`'s own `INTERNAL_PAGES_SECRET`.
+    // @env-optional
+    INTERNAL_PAGES_SECRET: z.string().min(1).optional(),
     // @env-optional
     TENANT_ROOT_DOMAIN: z
       .string()
@@ -97,6 +100,7 @@ export const env = createEnv({
     TENANT_PROVISIONING_DATASET: process.env.TENANT_PROVISIONING_DATASET,
     WORKER_ENQUEUE_URL: process.env.WORKER_ENQUEUE_URL,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
+    INTERNAL_PAGES_SECRET: process.env.INTERNAL_PAGES_SECRET,
     TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,

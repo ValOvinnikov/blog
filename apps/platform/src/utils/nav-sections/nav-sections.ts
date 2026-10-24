@@ -1,5 +1,6 @@
 import { ICONS, type TMaybeUndefined } from '@blog/config';
 import type { TAdminRole } from '@blog/db/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import type {
   TSidebarNavItem,
   TSidebarNavSection,
@@ -74,8 +75,17 @@ const configurationNavItems = (
   t: TLooseTranslator,
   hrefs: TTenantNavHrefs,
   access: TPlanPageAccess,
+  unreadLeadsCount: number,
 ): TSidebarNavItem[] => {
   const comingSoon = { label: t('badgeComingSoon'), tone: 'neutral' } as const;
+  const unreadLeads =
+    unreadLeadsCount > 0
+      ? ({
+          label: t('badgeUnreadLeads', { count: unreadLeadsCount }),
+          tone: 'brand',
+          hasDot: false,
+        } as const)
+      : undefined;
   const ifAccessible = (page: TPlanPage, item: TSidebarNavItem) =>
     access[page] ? [item] : [];
 
@@ -88,6 +98,7 @@ const configurationNavItems = (
           label: t('leads'),
           icon: ICONS.SEND,
           href: hrefs.leads,
+          badge: unreadLeads,
         })
       : []),
     ...ifAccessible('languages', {
@@ -132,6 +143,7 @@ export const tenantNavSections = (
   t: TLooseTranslator,
   tenantId: string,
   tenantName: string,
+  unreadLeadsCount = 0,
 ): TSidebarNavSection[] => {
   const platform = {
     label: t('badgePlatform'),
@@ -166,7 +178,7 @@ export const tenantNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, EVERY_PLAN_PAGE),
+      items: configurationNavItems(t, hrefs, EVERY_PLAN_PAGE, unreadLeadsCount),
     },
     {
       label: t('platformSectionLabel'),
@@ -192,6 +204,7 @@ export const dashboardNavSections = (
   t: TLooseTranslator,
   access: TPlanPageAccess,
   studioAccess?: TOwnerStudioAccess,
+  unreadLeadsCount = 0,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {
     look: adminRoutes.dashboardLook(),
@@ -221,7 +234,7 @@ export const dashboardNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, access),
+      items: configurationNavItems(t, hrefs, access, unreadLeadsCount),
     },
   ];
 };
@@ -237,5 +250,5 @@ export const navLabelForPathname = (
   sections
     .flatMap((section) => section.items)
     .find(
-      (item) => item.href !== undefined && isNavItemFor(item.href, pathname),
+      (item) => !isUndefined(item.href) && isNavItemFor(item.href, pathname),
     )?.label;

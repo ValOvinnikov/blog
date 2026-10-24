@@ -1,3 +1,4 @@
+import { queries } from '@blog/db';
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
@@ -13,27 +14,31 @@ type TProps = {
   params: Promise<{ tenantId: string }>;
 };
 
-/**
- * The `AdminShell` chrome for the tenant's regular pages — the ancestor
- * `layout.tsx` already gates this tree via `requireTenantById`; this layout
- * calls it again purely to read the resolved tenant/admin, deduped against
- * the ancestor's call by `requireTenantById`'s own `cache()` wrapper.
- */
 export default async function TenantDetailLayout({ children, params }: TProps) {
   const { tenantId } = await params;
+  // Deduped against the ancestor layout's gate by `requireTenantById`'s own `cache()`.
   const { tenant, admin } = await requireTenantById(tenantId);
-  const [{ isSidebarInitiallyCollapsed, tNavSections, userName }, t] =
-    await Promise.all([
-      loadAdminShellChrome(),
-      getTranslations('tenantLayout'),
-    ]);
+  const [
+    { isSidebarInitiallyCollapsed, tNavSections, userName },
+    t,
+    unreadLeadsCount,
+  ] = await Promise.all([
+    loadAdminShellChrome(),
+    getTranslations('tenantLayout'),
+    queries.leads.countUnreadLeadsForTenant(tenant.id),
+  ]);
 
   return (
     <AdminShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
         ...operatorNavSections(tNavSections, admin.role),
-        ...tenantNavSections(tNavSections, tenant.id, tenant.name),
+        ...tenantNavSections(
+          tNavSections,
+          tenant.id,
+          tenant.name,
+          unreadLeadsCount,
+        ),
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
       roleChip={{
