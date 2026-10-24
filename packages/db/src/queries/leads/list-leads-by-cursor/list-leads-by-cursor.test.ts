@@ -1,7 +1,15 @@
 import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
 import * as schema from '@blog/db/schema';
-import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestLead,
+  insertTestTenant,
+  MOCK_LEAD_EMAIL,
+  MOCK_LEAD_MESSAGE,
+  MOCK_LEAD_NAME,
+} from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { eq, sql } from 'drizzle-orm';
 
 import { listLeadsByCursor } from './list-leads-by-cursor';
@@ -11,6 +19,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 
 const LEAD_COUNT = LEADS_PAGE_SIZE + 5;
 const MINUTE_MS = 60_000;
@@ -18,13 +27,27 @@ const START = Date.UTC(2026, 0, 1);
 const EARLIER_MICROSECOND = 'Earlier microsecond';
 const LATER_MICROSECOND = 'Later microsecond';
 
+function insertEncryptedLead(
+  tenantId: string,
+  overrides: Partial<typeof schema.leads.$inferInsert> = {},
+) {
+  const name = overrides.name ?? MOCK_LEAD_NAME;
+  return insertTestLead(db(), tenantId, {
+    ...overrides,
+    name,
+    nameEncrypted: encryptPersonalValue(name),
+    emailEncrypted: encryptPersonalValue(MOCK_LEAD_EMAIL),
+    messageEncrypted: encryptPersonalValue(MOCK_LEAD_MESSAGE),
+  });
+}
+
 function leadName(index: number) {
   return `Lead ${index}`;
 }
 
 async function insertLeadsOneMinuteApart(tenantId: string, count: number) {
   for (let index = 0; index < count; index += 1) {
-    await insertTestLead(db(), tenantId, {
+    await insertEncryptedLead(tenantId, {
       name: leadName(index),
       createdAt: new Date(START + index * MINUTE_MS),
     });
@@ -36,7 +59,7 @@ async function insertLeadAtExactTime(
   name: string,
   createdAt: string,
 ) {
-  const { id } = await insertTestLead(db(), tenantId, { name });
+  const { id } = await insertEncryptedLead(tenantId, { name });
   await db()
     .update(schema.leads)
     .set({ createdAt: sql`${createdAt}::timestamptz` })
@@ -68,6 +91,27 @@ describe(listLeadsByCursor, () => {
     });
   });
 
+  it('returns the name, email and message from their encrypted form', async () => {
+    await insertTestLead(db(), tenantId, {
+      name: '',
+      email: '',
+      message: '',
+      nameEncrypted: encryptPersonalValue(MOCK_LEAD_NAME),
+      emailEncrypted: encryptPersonalValue(MOCK_LEAD_EMAIL),
+      messageEncrypted: encryptPersonalValue(MOCK_LEAD_MESSAGE),
+    });
+
+    const { leads } = await listLeadsByCursor({ tenantId });
+
+    expect(leads).toEqual([
+      expect.objectContaining({
+        name: MOCK_LEAD_NAME,
+        email: MOCK_LEAD_EMAIL,
+        message: MOCK_LEAD_MESSAGE,
+      }),
+    ]);
+  });
+
   it('pages through every lead once, newest first', async () => {
     await insertLeadsOneMinuteApart(tenantId, LEAD_COUNT);
 
@@ -88,7 +132,7 @@ describe(listLeadsByCursor, () => {
     await insertLeadsOneMinuteApart(tenantId, LEAD_COUNT);
     const first = await listLeadsByCursor({ tenantId });
 
-    await insertTestLead(db(), tenantId, {
+    await insertEncryptedLead(tenantId, {
       name: 'Arrived later',
       createdAt: new Date(START + LEAD_COUNT * MINUTE_MS),
     });
@@ -128,7 +172,7 @@ describe(listLeadsByCursor, () => {
   it('orders leads created at the same moment by id, still listing each once', async () => {
     const createdAt = new Date(START);
     for (let index = 0; index < LEAD_COUNT; index += 1) {
-      await insertTestLead(db(), tenantId, { createdAt });
+      await insertEncryptedLead(tenantId, { createdAt });
     }
 
     const first = await listLeadsByCursor({ tenantId });
@@ -143,8 +187,8 @@ describe(listLeadsByCursor, () => {
 
   it("never returns another tenant's leads", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    const mine = await insertTestLead(db(), tenantId);
-    await insertTestLead(db(), otherTenantId);
+    const mine = await insertEncryptedLead(tenantId);
+    await insertEncryptedLead(otherTenantId);
 
     const { leads } = await listLeadsByCursor({ tenantId });
 

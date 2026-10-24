@@ -9,7 +9,7 @@ import { toSafeCallbackPath } from './safe-callback-path';
 describe(toSafeCallbackPath, () => {
   it.each([
     adminRoutes.home(),
-    adminRoutes.dashboardLeads(2),
+    adminRoutes.dashboardLeads(),
     adminRoutes.tenants({ archived: true }),
   ])('keeps the same-origin path %s', (path) => {
     expect(toSafeCallbackPath(path)).toBe(path);

@@ -143,7 +143,8 @@
       "STALLED": "Acción necesaria"
     },
     "blockedSignups": "Registros bloqueados",
-    "dataRequests": "Solicitudes de datos"
+    "dataRequests": "Solicitudes de datos",
+    "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}"
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"
@@ -1140,25 +1141,22 @@
     "downgradedTitle": "El formulario de contacto no está incluido en su plan",
     "downgradedDescription": "El formulario de contacto es una función de Growth, por lo que ya no llegan mensajes nuevos. Los mensajes ya recibidos se conservan aquí y puede seguir eliminando cualquiera de ellos."
   },
-  "leadsTable": {
-    "columnReceived": "Recibido",
-    "columnName": "Nombre",
-    "columnEmail": "Correo electrónico",
-    "columnMessage": "Mensaje",
-    "columnPage": "Página",
-    "columnActions": "Acciones",
+  "leadsInbox": {
+    "listLabel": "Mensajes",
     "empty": "Todavía no hay mensajes. Cuando alguien use su formulario de contacto, su mensaje aparecerá aquí.",
-    "homePage": "Página de inicio"
-  },
-  "leadMessage": {
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos"
-  },
-  "leadsPagination": {
-    "ariaLabel": "Paginación",
-    "previous": "Anterior",
-    "next": "Siguiente",
-    "status": "Página {page} de {totalPages}"
+    "unread": "No leído",
+    "yesterday": "Ayer",
+    "loadingMore": "Cargando más mensajes…",
+    "loadMoreFailed": "No se pudieron cargar más mensajes. Reintentar",
+    "noSelection": "Selecciona un mensaje para leerlo.",
+    "back": "Volver a los mensajes",
+    "reply": "Responder",
+    "markUnread": "Marcar como no leído",
+    "email": "Correo electrónico",
+    "received": "Recibido",
+    "page": "Página",
+    "homePage": "Página de inicio",
+    "readStateFailed": "No se pudo actualizar el mensaje. Inténtalo de nuevo."
   },
   "deleteLeadControl": {
     "triggerButton": "Eliminar",

@@ -143,7 +143,8 @@
       "STALLED": "Actie nodig"
     },
     "blockedSignups": "Geblokkeerde aanmeldingen",
-    "dataRequests": "Gegevensverzoeken"
+    "dataRequests": "Gegevensverzoeken",
+    "badgeUnreadLeads": "{count} nieuw"
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
@@ -1140,25 +1141,22 @@
     "downgradedTitle": "Contactformulier niet inbegrepen in je abonnement",
     "downgradedDescription": "Het contactformulier is een Growth-functie, dus er komen geen nieuwe berichten meer binnen. De berichten die je al hebt ontvangen blijven hier bewaard en je kunt ze nog steeds verwijderen."
   },
-  "leadsTable": {
-    "columnReceived": "Ontvangen",
-    "columnName": "Naam",
-    "columnEmail": "E-mail",
-    "columnMessage": "Bericht",
-    "columnPage": "Pagina",
-    "columnActions": "Acties",
+  "leadsInbox": {
+    "listLabel": "Berichten",
     "empty": "Nog geen berichten. Zodra iemand je contactformulier gebruikt, verschijnt het bericht hier.",
-    "homePage": "Startpagina"
-  },
-  "leadMessage": {
-    "showMore": "Meer tonen",
-    "showLess": "Minder tonen"
-  },
-  "leadsPagination": {
-    "ariaLabel": "Paginering",
-    "previous": "Vorige",
-    "next": "Volgende",
-    "status": "Pagina {page} van {totalPages}"
+    "unread": "Ongelezen",
+    "yesterday": "Gisteren",
+    "loadingMore": "Meer berichten laden…",
+    "loadMoreFailed": "Kon geen berichten meer laden. Opnieuw proberen",
+    "noSelection": "Kies een bericht om het te lezen.",
+    "back": "Terug naar berichten",
+    "reply": "Beantwoorden",
+    "markUnread": "Markeren als ongelezen",
+    "email": "E-mail",
+    "received": "Ontvangen",
+    "page": "Pagina",
+    "homePage": "Startpagina",
+    "readStateFailed": "Kon het bericht niet bijwerken. Probeer het opnieuw."
   },
   "deleteLeadControl": {
     "triggerButton": "Verwijderen",

@@ -18,7 +18,9 @@ const {
   getAdminByUserIdMock,
   getTenantByIdMock,
   resolveIsSidebarCollapsedMock,
+  countUnreadLeadsForTenantMock,
 } = vi.hoisted(() => ({
+  countUnreadLeadsForTenantMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   resolveIsSidebarCollapsedMock: vi.fn(),
@@ -35,6 +37,7 @@ vi.mock('@blog/db', async () => ({
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: { getTenantById: getTenantByIdMock },
+    leads: { countUnreadLeadsForTenant: countUnreadLeadsForTenantMock },
   },
 }));
 
@@ -52,6 +55,8 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     getTenantByIdMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
+    countUnreadLeadsForTenantMock.mockReset();
+    countUnreadLeadsForTenantMock.mockResolvedValue(0);
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
@@ -99,6 +104,17 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
     expect(platformSection).toBeVisible();
     expect(tenantSection).toBeVisible();
+  });
+
+  it("shows the tenant's unread lead count beside Leads", async () => {
+    countUnreadLeadsForTenantMock.mockResolvedValue(2);
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: /Leads/ })).toHaveTextContent(
+      '2 new',
+    );
+    expect(countUnreadLeadsForTenantMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('renders no tenant switcher in the sidebar', async () => {

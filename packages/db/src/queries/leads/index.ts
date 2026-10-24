@@ -3,7 +3,6 @@ export * from './count-unread-leads-for-tenant';
 export * from './create-lead';
 export * from './delete-lead';
 export * from './delete-leads-for-tenant';
-export * from './list-leads';
 export * from './list-leads-by-cursor';
 export * from './mark-lead-read';
 export * from './mark-lead-unread';

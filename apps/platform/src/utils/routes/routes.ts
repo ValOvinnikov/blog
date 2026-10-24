@@ -33,10 +33,7 @@ export const adminRoutes = {
   features: (tenantId: string) => `/tenants/${tenantId}/features`,
   languages: (tenantId: string) => `/tenants/${tenantId}/languages`,
   email: (tenantId: string) => `/tenants/${tenantId}/email`,
-  leads: (tenantId: string, page = 1) =>
-    page > 1
-      ? `/tenants/${tenantId}/leads?page=${page}`
-      : `/tenants/${tenantId}/leads`,
+  leads: (tenantId: string) => `/tenants/${tenantId}/leads`,
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
   dashboard: () => '/dashboard',
   dashboardDomain: () => '/dashboard/domain',
@@ -45,8 +42,7 @@ export const adminRoutes = {
   dashboardFeatures: () => '/dashboard/features',
   dashboardLanguages: () => '/dashboard/languages',
   dashboardEmail: () => '/dashboard/email',
-  dashboardLeads: (page = 1) =>
-    page > 1 ? `/dashboard/leads?page=${page}` : '/dashboard/leads',
+  dashboardLeads: () => '/dashboard/leads',
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>

@@ -14,13 +14,15 @@ import DashboardLeadsPage from './page';
 const {
   listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
-  listLeadsMock,
+  listLeadsByCursorMock,
+  countLeadsForTenantMock,
   listTenantsMock,
 } = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
   listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
-  listLeadsMock: vi.fn(),
+  listLeadsByCursorMock: vi.fn(),
+  countLeadsForTenantMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -36,7 +38,10 @@ vi.mock('@blog/db', async () => ({
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    leads: { listLeads: listLeadsMock },
+    leads: {
+      listLeadsByCursor: listLeadsByCursorMock,
+      countLeadsForTenant: countLeadsForTenantMock,
+    },
     tenants: { listTenants: listTenantsMock },
   },
 }));
@@ -64,9 +69,7 @@ const useTenant = ({
     },
   ]);
 
-const setup = customRenderAsync(DashboardLeadsPage, {
-  searchParams: Promise.resolve({}),
-});
+const setup = customRenderAsync(DashboardLeadsPage, {});
 
 const ADA_LOVELACE = 'Ada Lovelace';
 
@@ -75,7 +78,8 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     authMock.mockReset();
     listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    listLeadsMock.mockReset();
+    listLeadsByCursorMock.mockReset();
+    countLeadsForTenantMock.mockReset();
     listTenantsMock.mockReset();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
@@ -83,10 +87,11 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership, tenant: { id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH } },
     ]);
-    listLeadsMock.mockResolvedValue({
+    listLeadsByCursorMock.mockResolvedValue({
       leads: [mockLead({ name: ADA_LOVELACE })],
-      total: 1,
+      nextCursor: undefined,
     });
+    countLeadsForTenantMock.mockResolvedValue(1);
   });
 
   it('redirects to sign-in without a session, reading no leads', async () => {
@@ -95,7 +100,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-    expect(listLeadsMock).not.toHaveBeenCalled();
+    expect(listLeadsByCursorMock).not.toHaveBeenCalled();
   });
 
   it('sends a user with no membership to the pending workspace', async () => {
@@ -104,37 +109,22 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(redirect).toHaveBeenCalledWith('/workspace-pending');
-    expect(listLeadsMock).not.toHaveBeenCalled();
+    expect(listLeadsByCursorMock).not.toHaveBeenCalled();
   });
 
   it("shows a member their own tenant's leads, never one named by the request", async () => {
-    await setup({ searchParams: Promise.resolve({ page: '1' }) });
+    await setup();
 
-    expect(listLeadsMock).toHaveBeenCalledWith({
+    expect(listLeadsByCursorMock).toHaveBeenCalledWith({
       tenantId: MOCK_TENANT_ID,
-      page: 1,
-      pageSize: 25,
     });
     expect(screen.getByRole('heading', { name: 'Leads' })).toBeVisible();
     expect(screen.getByText(ADA_LOVELACE)).toBeVisible();
   });
 
-  it('reads the requested page from the query string', async () => {
-    listLeadsMock.mockResolvedValue({
-      leads: [mockLead()],
-      total: 40,
-    });
-
-    await setup({ searchParams: Promise.resolve({ page: '2' }) });
-
-    expect(listLeadsMock).toHaveBeenCalledWith(
-      expect.objectContaining({ page: 2 }),
-    );
-  });
-
   it('is not found on a plan without the contact form and no stored leads', async () => {
     useTenant({ plan: TENANT_PLAN.FREE });
-    listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
+    countLeadsForTenantMock.mockResolvedValue(0);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
@@ -157,7 +147,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(listLeadsMock).not.toHaveBeenCalled();
+    expect(listLeadsByCursorMock).not.toHaveBeenCalled();
   });
 
   it('opens for an operator on a tenant they have no membership in', async () => {
@@ -172,7 +162,7 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
 
     await setup();
 
-    expect(listLeadsMock).toHaveBeenCalledWith(
+    expect(listLeadsByCursorMock).toHaveBeenCalledWith(
       expect.objectContaining({ tenantId: 'tenant-9' }),
     );
   });

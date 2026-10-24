@@ -6,10 +6,12 @@ import {
 
 import { resolveTenantPageAccess } from './resolve-tenant-page-access';
 
-const { listLeadsMock } = vi.hoisted(() => ({ listLeadsMock: vi.fn() }));
+const { countLeadsForTenantMock } = vi.hoisted(() => ({
+  countLeadsForTenantMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', () => ({
-  queries: { leads: { listLeads: listLeadsMock } },
+  queries: { leads: { countLeadsForTenant: countLeadsForTenantMock } },
 }));
 
 const membershipOf = (role: string) =>
@@ -23,8 +25,8 @@ const membershipOf = (role: string) =>
 
 describe(resolveTenantPageAccess, () => {
   beforeEach(() => {
-    listLeadsMock.mockReset();
-    listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
+    countLeadsForTenantMock.mockReset();
+    countLeadsForTenantMock.mockResolvedValue(0);
   });
 
   it('opens Leads for an owner on a plan with the contact form, without reading leads', async () => {
@@ -34,7 +36,7 @@ describe(resolveTenantPageAccess, () => {
     );
 
     expect(access.leads).toBe(true);
-    expect(listLeadsMock).not.toHaveBeenCalled();
+    expect(countLeadsForTenantMock).not.toHaveBeenCalled();
   });
 
   it('keeps Leads closed for a downgraded owner with no stored leads', async () => {
@@ -44,15 +46,11 @@ describe(resolveTenantPageAccess, () => {
     );
 
     expect(access.leads).toBe(false);
-    expect(listLeadsMock).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
-      page: 1,
-      pageSize: 1,
-    });
+    expect(countLeadsForTenantMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('keeps Leads open for a downgraded owner with stored leads', async () => {
-    listLeadsMock.mockResolvedValue({ leads: [], total: 2 });
+    countLeadsForTenantMock.mockResolvedValue(2);
 
     const access = await resolveTenantPageAccess(
       mockReadyTenant({ plan: TENANT_PLAN.FREE }),

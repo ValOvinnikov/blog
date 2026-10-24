@@ -143,7 +143,8 @@
       "STALLED": "Aktion nötig"
     },
     "blockedSignups": "Gesperrte Registrierungen",
-    "dataRequests": "Datenanfragen"
+    "dataRequests": "Datenanfragen",
+    "badgeUnreadLeads": "{count} neu"
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
@@ -1140,25 +1141,22 @@
     "downgradedTitle": "Kontaktformular nicht im Tarif enthalten",
     "downgradedDescription": "Das Kontaktformular ist eine Growth-Funktion, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
   },
-  "leadsTable": {
-    "columnReceived": "Eingegangen",
-    "columnName": "Name",
-    "columnEmail": "E-Mail",
-    "columnMessage": "Nachricht",
-    "columnPage": "Seite",
-    "columnActions": "Aktionen",
+  "leadsInbox": {
+    "listLabel": "Nachrichten",
     "empty": "Noch keine Nachrichten. Sobald jemand Ihr Kontaktformular nutzt, erscheint die Nachricht hier.",
-    "homePage": "Startseite"
-  },
-  "leadMessage": {
-    "showMore": "Mehr anzeigen",
-    "showLess": "Weniger anzeigen"
-  },
-  "leadsPagination": {
-    "ariaLabel": "Seitennavigation",
-    "previous": "Zurück",
-    "next": "Weiter",
-    "status": "Seite {page} von {totalPages}"
+    "unread": "Ungelesen",
+    "yesterday": "Gestern",
+    "loadingMore": "Weitere Nachrichten werden geladen…",
+    "loadMoreFailed": "Weitere Nachrichten konnten nicht geladen werden. Erneut versuchen",
+    "noSelection": "Wählen Sie eine Nachricht aus, um sie zu lesen.",
+    "back": "Zurück zu den Nachrichten",
+    "reply": "Antworten",
+    "markUnread": "Als ungelesen markieren",
+    "email": "E-Mail",
+    "received": "Empfangen",
+    "page": "Seite",
+    "homePage": "Startseite",
+    "readStateFailed": "Die Nachricht konnte nicht aktualisiert werden. Versuchen Sie es erneut."
   },
   "deleteLeadControl": {
     "triggerButton": "Löschen",

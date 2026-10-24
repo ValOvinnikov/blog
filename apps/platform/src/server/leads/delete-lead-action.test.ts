@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { LEAD_REFUSAL } from '@platform/constants/lead';
+import { LEAD_LOG, LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
   mockReadyTenant,
@@ -109,7 +109,7 @@ describe(deleteLeadAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
-      'leads.delete_failed',
+      LEAD_LOG.DELETE_FAILED,
       expect.objectContaining({
         tenantId: MOCK_TENANT_ID,
         error: expect.any(Error),

@@ -19,14 +19,16 @@ const {
   listMembershipsWithTenantsForUserMock,
   listTenantsMock,
   getAdminByUserIdMock,
-  listLeadsMock,
+  countLeadsForTenantMock,
+  countUnreadLeadsForTenantMock,
   cookiesMock,
   resolveIsSidebarCollapsedMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
-  listLeadsMock: vi.fn(),
+  countLeadsForTenantMock: vi.fn(),
+  countUnreadLeadsForTenantMock: vi.fn(),
   cookiesMock: vi.fn(),
   resolveIsSidebarCollapsedMock: vi.fn(),
 }));
@@ -47,7 +49,10 @@ vi.mock('@blog/db', async () => ({
       listTenants: listTenantsMock,
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    leads: { listLeads: listLeadsMock },
+    leads: {
+      countLeadsForTenant: countLeadsForTenantMock,
+      countUnreadLeadsForTenant: countUnreadLeadsForTenantMock,
+    },
   },
 }));
 
@@ -104,8 +109,10 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    listLeadsMock.mockReset();
-    listLeadsMock.mockResolvedValue({ leads: [], total: 0 });
+    countLeadsForTenantMock.mockReset();
+    countLeadsForTenantMock.mockResolvedValue(0);
+    countUnreadLeadsForTenantMock.mockReset();
+    countUnreadLeadsForTenantMock.mockResolvedValue(0);
     cookiesMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
@@ -125,6 +132,19 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(leadsLink).toHaveAttribute('href', adminRoutes.dashboardLeads());
   });
 
+  it("shows the site's unread lead count beside Leads", async () => {
+    countUnreadLeadsForTenantMock.mockResolvedValue(3);
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: /Leads/ })).toHaveTextContent(
+      '3 new',
+    );
+    expect(countUnreadLeadsForTenantMock).toHaveBeenCalledWith(
+      MOCK_OTHER_TENANT_ID,
+    );
+  });
+
   it('hides Leads from a plan without the contact form and no stored leads', async () => {
     mockCookie(MOCK_TENANT_ID);
 
@@ -137,7 +157,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
   it('keeps Leads for a downgraded owner who still has stored leads', async () => {
     mockCookie(MOCK_TENANT_ID);
-    listLeadsMock.mockResolvedValue({ leads: [], total: 3 });
+    countLeadsForTenantMock.mockResolvedValue(3);
 
     await setup();
 
