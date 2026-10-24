@@ -18,6 +18,8 @@ import { logger } from '@web/utils/logger/logger';
 
 import { SANITY_OPERATION_HEADER, SANITY_PROJECT_ID_HEADER } from './route';
 
+faker.seed(5722);
+
 const { verifyRevalidateSignatureMock } = vi.hoisted(() => ({
   verifyRevalidateSignatureMock: vi.fn(),
 }));

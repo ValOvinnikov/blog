@@ -6,9 +6,15 @@ import {
   REVALIDATE_SIGNATURE_MAX_AGE_MS,
   SIGNATURE_REFUSED_REASON,
 } from '@web/constants/revalidate';
-import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { verifyRevalidateSignature } from './verify-revalidate-signature';
+
+faker.seed(5722);
 
 const { getTenantRevalidateWebhookSecretMock } = vi.hoisted(() => ({
   getTenantRevalidateWebhookSecretMock: vi.fn(),
@@ -22,32 +28,31 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const NOW = faker.date.recent().getTime();
-const RAW_BODY = JSON.stringify({
+const MOCK_NOW = faker.date.recent().getTime();
+const MOCK_RAW_BODY = JSON.stringify({
   _type: 'page_post',
   _id: faker.string.uuid(),
 });
-const SHARED_SECRET = faker.string.alphanumeric(32);
-const TENANT_SECRET = faker.string.alphanumeric(32);
-const OTHER_TENANT_SECRET = faker.string.alphanumeric(32);
-const TENANT_PROJECT_ID = faker.string.alphanumeric(8);
-const OTHER_PROJECT_ID = faker.string.alphanumeric(8);
-const OTHER_TENANT_ID = faker.string.uuid();
+const MOCK_SHARED_SECRET = faker.string.alphanumeric(32);
+const MOCK_TENANT_SECRET = faker.string.alphanumeric(32);
+const MOCK_OTHER_TENANT_SECRET = faker.string.alphanumeric(32);
+const MOCK_TENANT_PROJECT_ID = MOCK_TENANT_SANITY_CONTEXT.projectId;
+const MOCK_OTHER_PROJECT_ID = faker.string.alphanumeric(8);
 const REFUSED = errorResult(SIGNATURE_REFUSED_REASON);
 
-const sign = (secret: string, timestamp = NOW): Promise<string> =>
-  encodeSignatureHeader(RAW_BODY, timestamp, secret);
+const sign = (secret: string, timestamp = MOCK_NOW): Promise<string> =>
+  encodeSignatureHeader(MOCK_RAW_BODY, timestamp, secret);
 
 const verify = (
   signature: TMaybeNull<string>,
   projectId: TMaybeNull<string> = null,
 ) =>
   verifyRevalidateSignature({
-    rawBody: RAW_BODY,
+    rawBody: MOCK_RAW_BODY,
     signature,
     projectId,
-    sharedSecret: SHARED_SECRET,
-    now: NOW,
+    sharedSecret: MOCK_SHARED_SECRET,
+    now: MOCK_NOW,
   });
 
 describe(verifyRevalidateSignature, () => {
@@ -56,13 +61,13 @@ describe(verifyRevalidateSignature, () => {
     getTenantRevalidateWebhookSecretMock.mockImplementation(
       async (projectId: string) =>
         ({
-          [TENANT_PROJECT_ID]: {
+          [MOCK_TENANT_PROJECT_ID]: {
             tenantId: MOCK_TENANT_ID,
-            secret: TENANT_SECRET,
+            secret: MOCK_TENANT_SECRET,
           },
-          [OTHER_PROJECT_ID]: {
-            tenantId: OTHER_TENANT_ID,
-            secret: OTHER_TENANT_SECRET,
+          [MOCK_OTHER_PROJECT_ID]: {
+            tenantId: MOCK_OTHER_TENANT_ID,
+            secret: MOCK_OTHER_TENANT_SECRET,
           },
         })[projectId],
     );
@@ -71,19 +76,19 @@ describe(verifyRevalidateSignature, () => {
   describe('for a tenant with its own secret', () => {
     it('resolves the tenant for a request signed with its secret', async () => {
       await expect(
-        verify(await sign(TENANT_SECRET), TENANT_PROJECT_ID),
+        verify(await sign(MOCK_TENANT_SECRET), MOCK_TENANT_PROJECT_ID),
       ).resolves.toEqual(okResult(MOCK_TENANT_ID));
     });
 
     it("refuses another tenant's signed request resent with its project id", async () => {
       await expect(
-        verify(await sign(OTHER_TENANT_SECRET), TENANT_PROJECT_ID),
+        verify(await sign(MOCK_OTHER_TENANT_SECRET), MOCK_TENANT_PROJECT_ID),
       ).resolves.toEqual(REFUSED);
     });
 
     it('refuses a request signed with the shared secret', async () => {
       await expect(
-        verify(await sign(SHARED_SECRET), TENANT_PROJECT_ID),
+        verify(await sign(MOCK_SHARED_SECRET), MOCK_TENANT_PROJECT_ID),
       ).resolves.toEqual(REFUSED);
     });
   });
@@ -95,7 +100,7 @@ describe(verifyRevalidateSignature, () => {
     });
 
     await expect(
-      verify(await sign(SHARED_SECRET), TENANT_PROJECT_ID),
+      verify(await sign(MOCK_SHARED_SECRET), MOCK_TENANT_PROJECT_ID),
     ).resolves.toEqual(okResult(MOCK_TENANT_ID));
   });
 
@@ -103,12 +108,12 @@ describe(verifyRevalidateSignature, () => {
     getTenantRevalidateWebhookSecretMock.mockResolvedValue(undefined);
 
     await expect(
-      verify(await sign(SHARED_SECRET), TENANT_PROJECT_ID),
+      verify(await sign(MOCK_SHARED_SECRET), MOCK_TENANT_PROJECT_ID),
     ).resolves.toEqual(okResult(undefined));
   });
 
   it('resolves no tenant and looks none up without a project id', async () => {
-    await expect(verify(await sign(SHARED_SECRET))).resolves.toEqual(
+    await expect(verify(await sign(MOCK_SHARED_SECRET))).resolves.toEqual(
       okResult(undefined),
     );
     expect(getTenantRevalidateWebhookSecretMock).not.toHaveBeenCalled();
@@ -120,20 +125,24 @@ describe(verifyRevalidateSignature, () => {
   ])(
     'refuses a signature timestamped more than five minutes %s, before any lookup',
     async (_, direction) => {
-      const timestamp = NOW + direction * (REVALIDATE_SIGNATURE_MAX_AGE_MS + 1);
+      const timestamp =
+        MOCK_NOW + direction * (REVALIDATE_SIGNATURE_MAX_AGE_MS + 1);
 
       await expect(
-        verify(await sign(TENANT_SECRET, timestamp), TENANT_PROJECT_ID),
+        verify(
+          await sign(MOCK_TENANT_SECRET, timestamp),
+          MOCK_TENANT_PROJECT_ID,
+        ),
       ).resolves.toEqual(REFUSED);
       expect(getTenantRevalidateWebhookSecretMock).not.toHaveBeenCalled();
     },
   );
 
   it('accepts a signature exactly five minutes old', async () => {
-    const timestamp = NOW - REVALIDATE_SIGNATURE_MAX_AGE_MS;
+    const timestamp = MOCK_NOW - REVALIDATE_SIGNATURE_MAX_AGE_MS;
 
     await expect(
-      verify(await sign(TENANT_SECRET, timestamp), TENANT_PROJECT_ID),
+      verify(await sign(MOCK_TENANT_SECRET, timestamp), MOCK_TENANT_PROJECT_ID),
     ).resolves.toEqual(okResult(MOCK_TENANT_ID));
   });
 
@@ -144,7 +153,7 @@ describe(verifyRevalidateSignature, () => {
       faker.string.alphanumeric(24),
     ],
   ])('refuses a request with %s', async (_, signature) => {
-    await expect(verify(signature, TENANT_PROJECT_ID)).resolves.toEqual(
+    await expect(verify(signature, MOCK_TENANT_PROJECT_ID)).resolves.toEqual(
       REFUSED,
     );
   });
@@ -154,7 +163,7 @@ describe(verifyRevalidateSignature, () => {
     getTenantRevalidateWebhookSecretMock.mockRejectedValue(error);
 
     await expect(
-      verify(await sign(TENANT_SECRET), TENANT_PROJECT_ID),
+      verify(await sign(MOCK_TENANT_SECRET), MOCK_TENANT_PROJECT_ID),
     ).rejects.toBe(error);
   });
 });
