@@ -5,7 +5,11 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db/constants';
+import {
+  TENANT_DETAILS_UPDATE_OUTCOME,
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STEP,
+} from '@blog/db/constants';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -16,8 +20,12 @@ import {
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  MOCK_NEW_OWNER_EMAIL,
   MOCK_OWNER_EMAIL,
+  MOCK_RENAMED_TENANT_NAME,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
@@ -58,17 +66,20 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
-const UPDATED = 'updated';
-const NEW_OWNER_EMAIL = 'new-owner@example.com';
-const RENAMED_TENANT_NAME = 'Acme Renamed';
-const DOMAIN_TAKEN = 'domain-taken';
-const DOMAIN_INVALID = 'domain-invalid';
-const OWNER_EMAIL_TAKEN = 'owner-email-taken';
-const OWNER_ALREADY_JOINED = 'owner-already-joined';
+const {
+  UPDATED,
+  DOMAIN_TAKEN,
+  DOMAIN_INVALID,
+  DOMAIN_LOCKED,
+  PROVISIONING_STARTED,
+  OWNER_EMAIL_TAKEN,
+  OWNER_ALREADY_JOINED,
+  OWNS_FREE_TENANT,
+} = TENANT_DETAILS_UPDATE_OUTCOME;
 
 const validInput = {
   name: MOCK_TENANT_NAME,
-  primaryDomain: 'acme.example.com',
+  primaryDomain: MOCK_TENANT_DOMAIN,
   plan: TENANT_PLAN.FREE,
   locale: LOCALE_ISO_CODES.EN,
 };
@@ -118,7 +129,7 @@ describe('updateTenantDetailsAction', () => {
 
   it('rejects a write against an archived tenant with no update or audit event', async () => {
     getTenantByIdMock.mockResolvedValue(
-      mockTenant({ deprovisionedAt: new Date('2026-08-26T00:00:00.000Z') }),
+      mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     );
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
@@ -165,13 +176,13 @@ describe('updateTenantDetailsAction', () => {
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
       ...validInput,
-      ownerEmail: 'New-Owner@Example.com',
+      ownerEmail: MOCK_NEW_OWNER_EMAIL.toUpperCase(),
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...validInput,
-      ownerEmail: NEW_OWNER_EMAIL,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
     });
   });
 
@@ -208,7 +219,7 @@ describe('updateTenantDetailsAction', () => {
     },
     {
       updateResult: {
-        outcome: 'domain-locked',
+        outcome: DOMAIN_LOCKED,
         blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
       },
       expected: {
@@ -222,7 +233,7 @@ describe('updateTenantDetailsAction', () => {
       },
     },
     {
-      updateResult: { outcome: 'provisioning-started' },
+      updateResult: { outcome: PROVISIONING_STARTED },
       expected: {
         outcome: ACTION_OUTCOME.REFUSED,
         reason: TENANT_REFUSAL.PROVISIONING_STARTED,
@@ -244,6 +255,13 @@ describe('updateTenantDetailsAction', () => {
         reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
       },
     },
+    {
+      updateResult: { outcome: OWNS_FREE_TENANT },
+      expected: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,
+      },
+    },
   ])(
     'maps a rejected $updateResult.outcome update without auditing or revalidating',
     async ({ updateResult, expected }) => {
@@ -251,7 +269,7 @@ describe('updateTenantDetailsAction', () => {
 
       const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
         ...validInput,
-        ownerEmail: NEW_OWNER_EMAIL,
+        ownerEmail: MOCK_NEW_OWNER_EMAIL,
       });
 
       expect(result).toEqual(expected);
@@ -261,19 +279,19 @@ describe('updateTenantDetailsAction', () => {
   );
 
   it('succeeds on a rename that resends the current owner email after they joined', async () => {
-    const tenant = mockTenant({ name: RENAMED_TENANT_NAME });
+    const tenant = mockTenant({ name: MOCK_RENAMED_TENANT_NAME });
     updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
       ...validInput,
-      name: RENAMED_TENANT_NAME,
+      name: MOCK_RENAMED_TENANT_NAME,
       ownerEmail: MOCK_OWNER_EMAIL,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...validInput,
-      name: RENAMED_TENANT_NAME,
+      name: MOCK_RENAMED_TENANT_NAME,
       ownerEmail: MOCK_OWNER_EMAIL,
     });
   });
@@ -311,14 +329,15 @@ describe('updateTenantDetailsAction', () => {
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {
       ...validInput,
-      ownerEmail: NEW_OWNER_EMAIL,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
     });
 
-    expect(insertAuditEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        details: { ...validInput, ownerEmailUpdated: true },
-      }),
-    );
+    const [event] = insertAuditEventMock.mock.lastCall ?? [];
+
+    expect(event.details).toStrictEqual({
+      ...validInput,
+      ownerEmailUpdated: true,
+    });
   });
 
   it('still returns the updated tenant when the audit write fails, and logs it', async () => {
@@ -329,13 +348,11 @@ describe('updateTenantDetailsAction', () => {
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      'tenants.update_details_audit_failed',
-      expect.objectContaining({
-        targetId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
-    );
+    const [eventName, context] = loggerErrorMock.mock.lastCall ?? [];
+
+    expect(eventName).toBe('tenants.update_details_audit_failed');
+    expect(context?.targetId).toBe(MOCK_TENANT_ID);
+    expect(context?.error).toBeInstanceOf(Error);
   });
 
   it('returns a generic error when the mutation throws', async () => {

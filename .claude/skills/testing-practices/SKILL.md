@@ -35,15 +35,18 @@ not to test", and treats "nothing to add" as a complete outcome.
   Story-only view-model data follows `web-storybook`.
 - **Fixture naming — required.** A function exported from `testing/`, a
   `fixtures` file or `__mocks__/` that returns fake data is named
-  `mock<Thing>`; a fixed fake value exported from one is `MOCK_<THING>`. The
-  prefix keeps a fixture from reading as, or colliding with, product code
-  (`makeAsideTypeComponent` is a product factory).
+  `mock<Thing>`. A fixed fake value is `MOCK_<THING>` wherever it is
+  declared — exported from one of those files or a test file's own `const`
+  alike. The prefix keeps a fixture from reading as, or colliding with,
+  product code (`makeAsideTypeComponent` is a product factory).
 
   ```ts
   export const mockContactFormModule = (overrides = {}) => ({ … }); // ✅
   export const MOCK_TENANT_ID = faker.string.uuid(); // ✅
+  const MOCK_TAGGED_EMAIL = 'reader+news@example.com'; // ✅ in a test file
   export const makeContactFormModule = (overrides = {}) => ({ … }); // ❌
   export const TEST_TENANT_ID = faker.string.uuid(); // ❌
+  const TAGGED_EMAIL = 'reader+news@example.com'; // ❌ in a test file
   ```
 
   Render and setup helpers (`customRender`, `renderElement`,
@@ -517,6 +520,8 @@ is left alone; this is never a sweep.
   `it.each` table.**
 - **A test "What not to test" bans is deleted** — a source-back assertion, a
   class assertion, a Studio schema test.
+- **The file's own fake-value consts are renamed `MOCK_<THING>`** ("Fixture
+  naming"), or replaced by the `testing/` const that already holds the value.
 
 Report every test removed or moved with the test that still asserts its
 behaviour (file and `it` title). A removal whose behaviour is asserted
@@ -542,7 +547,8 @@ have a test? Report gaps rather than leaving them silent.
       no network, no real time.
 - [ ] Fixtures from `testing/` builders; inputs and expectations use existing
       consts; no value written twice; no const's own value asserted.
-- [ ] A new exported fixture is `mock<Thing>()` or `MOCK_<THING>`.
+- [ ] A new exported fixture is `mock<Thing>()`; every fixed fake value,
+      a test file's own `const` included, is `MOCK_<THING>`.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] No asymmetric matcher (`expect.objectContaining`, `expect.any`, …) inside
       an assertion; every expected value is exact.

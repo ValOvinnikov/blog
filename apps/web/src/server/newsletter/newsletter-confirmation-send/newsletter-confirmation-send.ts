@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { queries, type schema } from '@blog/db';
+import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
@@ -75,7 +75,7 @@ export const deliverNewsletterConfirmation = async (
 
 export const sendNewsletterConfirmation = async (
   tenantId: string,
-  subscriber: schema.TSubscriber,
+  subscriber: queries.subscribers.TPendingSubscriber,
 ): Promise<void> => {
   const { id, email } = subscriber;
   const claim = await queries.subscribers.claimConfirmationSend(

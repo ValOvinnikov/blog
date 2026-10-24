@@ -18,6 +18,14 @@ export function decryptPersonalValue(encrypted: string): string {
   return decryptPersonalData(encrypted, parsePersonalDataKeyring(raw));
 }
 
+export function requireDecryptedPersonalValue(
+  encrypted: TMaybeNull<string>,
+  owner: string,
+): string {
+  if (encrypted === null) throw new Error(`${owner} has no encrypted form.`);
+  return decryptPersonalValue(encrypted);
+}
+
 export function readPersonalValue(
   encrypted: TMaybeNull<string>,
   plain: string,

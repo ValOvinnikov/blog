@@ -12,7 +12,9 @@ export type TCreateLeadInput = Pick<
 > &
   Partial<Pick<TLead, 'sourceDocumentId' | 'sourceLocale'>>;
 
-export async function createLead(input: TCreateLeadInput): Promise<TLead> {
+export async function createLead(
+  input: TCreateLeadInput,
+): Promise<Pick<TLead, 'id'>> {
   const db = getDb();
   const { name, email, message } = input;
 
@@ -24,7 +26,7 @@ export async function createLead(input: TCreateLeadInput): Promise<TLead> {
       ...emailColumns(email, personalDataIndex),
       messageEncrypted: encryptPersonalValue(message),
     })
-    .returning();
+    .returning({ id: leads.id });
 
   if (!row) {
     throw new Error(

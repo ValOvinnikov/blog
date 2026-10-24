@@ -1,9 +1,10 @@
-'use server';
+import 'server-only';
 
 import {
   ACTION_OUTCOME,
   CAPABILITY,
   type TActionResult,
+  type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@blog/config';
 import { queries, type schema } from '@blog/db';
@@ -27,6 +28,11 @@ const SOURCE_PATH_MAX_LENGTH = 2_048;
 export type TContactMessageInput = TContactMessageFields & {
   website: string;
   sourcePath: string;
+};
+
+export type TContactMessageSource = {
+  sourceDocumentId: TMaybeUndefined<string>;
+  sourceLocale: TLocaleIsoCode;
 };
 
 export type TContactRefusal =
@@ -67,7 +73,7 @@ const isContactFormOpen = async (tenant: TTenant): Promise<boolean> =>
 
 const storeLead = async (
   input: queries.leads.TCreateLeadInput,
-): Promise<TMaybeUndefined<schema.TLead>> => {
+): Promise<TMaybeUndefined<Pick<schema.TLead, 'id'>>> => {
   try {
     return await queries.leads.createLead(input);
   } catch (error) {
@@ -76,8 +82,10 @@ const storeLead = async (
   }
 };
 
+/** Only an inline Server Action may call this, so the browser never supplies `source`. */
 export const submitContactMessage = async (
   input: TContactMessageInput,
+  { sourceDocumentId, sourceLocale }: TContactMessageSource,
 ): Promise<TSubmitContactResult> => {
   if (await isBotOrUnverified()) return BLOCKED;
 
@@ -111,15 +119,18 @@ export const submitContactMessage = async (
     };
   }
 
-  const lead = await storeLead({
+  const leadInput = {
     tenantId: tenant.id,
     ...validation.data,
     sourcePath: toSourcePath(asText(input.sourcePath)),
-  });
+    sourceDocumentId,
+    sourceLocale,
+  };
+  const lead = await storeLead(leadInput);
   if (!lead) return SERVER_ERROR;
 
   try {
-    await sendContactNotification(lead);
+    await sendContactNotification(leadInput);
   } catch (error) {
     logger.error('contact_form.notification_send_failed', {
       leadId: lead.id,

@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
+  TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -31,6 +32,7 @@ import {
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_DOMAIN,
 } from '@blog/db/testing/tenants/fixtures';
+import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq } from 'drizzle-orm';
 
@@ -55,12 +57,18 @@ const GLOBEX_DOMAIN = 'globex.example.com';
 const NEW_OWNER_EMAIL = 'new-owner@example.com';
 const UNNORMALIZED_NEW_OWNER_EMAIL = '  New-Owner@Example.com  ';
 const MEMBER_EMAIL = 'member@example.com';
-const OWNER_ALREADY_JOINED = 'owner-already-joined';
-const PROVISIONING_STARTED = 'provisioning-started';
-const DOMAIN_TAKEN = 'domain-taken';
-const DOMAIN_LOCKED = 'domain-locked';
-const UPDATED = 'updated';
 usePersonalDataKeys();
+
+const {
+  UPDATED,
+  OWNER_ALREADY_JOINED,
+  PROVISIONING_STARTED,
+  DOMAIN_TAKEN,
+  DOMAIN_LOCKED,
+  DOMAIN_INVALID,
+  OWNER_EMAIL_TAKEN,
+  OWNS_FREE_TENANT,
+} = TENANT_DETAILS_UPDATE_OUTCOME;
 
 const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 const RUNNING_STEP = { status: RUNNING };
@@ -275,7 +283,7 @@ describe(updateTenantDetails, () => {
           ownerEmail: MEMBER_EMAIL,
         });
 
-        expect(result).toEqual({ outcome: 'owner-email-taken' });
+        expect(result).toEqual({ outcome: OWNER_EMAIL_TAKEN });
         expect((await readOwnerInvite(tenantId))?.email).toBe(MOCK_OWNER_EMAIL);
       });
     });
@@ -356,7 +364,7 @@ describe(updateTenantDetails, () => {
           primaryDomain,
         });
 
-        expect(result).toEqual({ outcome: 'domain-invalid' });
+        expect(result).toEqual({ outcome: DOMAIN_INVALID });
         expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
         expect(await readDomains(tenantId)).toEqual([MOCK_TENANT_DOMAIN]);
       },
@@ -621,5 +629,34 @@ describe(updateTenantDetails, () => {
     ).rejects.toThrow(
       `updateTenantDetails: no tenant found for id "${MOCK_MISSING_TENANT_ID}".`,
     );
+  });
+
+  it('refuses a move to FREE that would give a person a second Free site', async () => {
+    const selfServeOwnerEmailIndex = testPersonalEmailIndex(
+      MOCK_SELF_SERVE_OWNER_EMAIL,
+    );
+    const tenantId = await insertTenantWithDomain();
+    await db()
+      .update(tenants)
+      .set({ plan: TENANT_PLAN.GROWTH, selfServeOwnerEmailIndex })
+      .where(eq(tenants.id, tenantId));
+    await insertTestTenant(db(), { selfServeOwnerEmailIndex });
+    const [before] = await db()
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: NEW_NAME,
+      plan: TENANT_PLAN.FREE,
+    });
+
+    expect(result).toEqual({ outcome: OWNS_FREE_TENANT });
+    const [after] = await db()
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(after).toEqual(before);
   });
 });

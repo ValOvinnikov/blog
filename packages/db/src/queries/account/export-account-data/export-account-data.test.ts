@@ -1,6 +1,14 @@
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+  MOCK_USER_EMAIL,
+  MOCK_USER_NAME,
+} from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { exportAccountData } from './export-account-data';
 
@@ -8,12 +16,18 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
+const MOCK_UNKNOWN_USER_ID = faker.string.uuid();
+const MOCK_OLDER_POST_ID = 'post-older';
+const MOCK_NEWER_POST_ID = 'post-newer';
+const MOCK_OTHER_POST_ID = 'post-other';
+const MOCK_AVATAR_URL = 'https://example.com/avatar.png';
+
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
 let tenantId: string;
 
 beforeEach(async () => {
-  const tenant = await insertTestTenant(db());
-  tenantId = tenant.id;
+  ({ id: tenantId } = await insertTestTenant(db()));
 });
 
 afterEach(async () => {
@@ -23,106 +37,91 @@ afterEach(async () => {
 });
 
 describe(exportAccountData, () => {
-  it('returns undefined for a userId with no matching users row', async () => {
-    expect(await exportAccountData(tenantId, 'missing-user')).toBeUndefined();
+  it('returns nothing for an unknown user', async () => {
+    expect(
+      await exportAccountData(tenantId, MOCK_UNKNOWN_USER_ID),
+    ).toBeUndefined();
   });
 
-  it("aggregates the user's profile fields and bookmarks", async () => {
-    await db().insert(schema.users).values({
-      id: 'user-1',
-      name: 'Jane Doe',
-      email: 'jane@example.com',
-      image: 'https://example.com/avatar.png',
+  it("exports the decrypted profile and this tenant's bookmarks, newest first", async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    const { id: userId } = await insertTestUser(db(), {
+      name: MOCK_USER_NAME,
+      email: MOCK_USER_EMAIL,
+      ...userPersonalColumns({ name: MOCK_USER_NAME, email: MOCK_USER_EMAIL }),
+      image: MOCK_AVATAR_URL,
     });
+    const { id: otherUserId } = await insertTestUser(db());
     await db()
       .insert(schema.bookmarks)
       .values([
         {
           tenantId,
-          userId: 'user-1',
-          postId: 'post-older',
+          userId,
+          postId: MOCK_OLDER_POST_ID,
           createdAt: new Date(2026, 0, 1),
         },
         {
           tenantId,
-          userId: 'user-1',
-          postId: 'post-newer',
+          userId,
+          postId: MOCK_NEWER_POST_ID,
           createdAt: new Date(2026, 0, 2),
         },
+        { tenantId, userId: otherUserId, postId: MOCK_OTHER_POST_ID },
+        { tenantId: otherTenantId, userId, postId: MOCK_OTHER_POST_ID },
       ]);
 
-    const result = await exportAccountData(tenantId, 'user-1');
+    const result = await exportAccountData(tenantId, userId);
 
     expect(result).toEqual({
       profile: {
-        id: 'user-1',
-        name: 'Jane Doe',
-        email: 'jane@example.com',
+        id: userId,
+        name: MOCK_USER_NAME,
+        email: MOCK_USER_EMAIL,
         emailVerified: undefined,
-        image: 'https://example.com/avatar.png',
+        image: MOCK_AVATAR_URL,
       },
       bookmarks: [
-        { postId: 'post-newer', createdAt: new Date(2026, 0, 2) },
-        { postId: 'post-older', createdAt: new Date(2026, 0, 1) },
+        { postId: MOCK_NEWER_POST_ID, createdAt: new Date(2026, 0, 2) },
+        { postId: MOCK_OLDER_POST_ID, createdAt: new Date(2026, 0, 1) },
       ],
     });
   });
 
-  it("does not include another user's bookmarks", async () => {
-    await db()
-      .insert(schema.users)
-      .values([{ id: 'user-1' }, { id: 'user-2' }]);
-    await db()
-      .insert(schema.bookmarks)
-      .values([
-        { tenantId, userId: 'user-1', postId: 'post-1' },
-        { tenantId, userId: 'user-2', postId: 'post-2' },
-      ]);
+  it('exports unset profile fields as undefined and no bookmarks', async () => {
+    const { id: userId } = await insertTestUser(db());
 
-    const result = await exportAccountData(tenantId, 'user-1');
+    const result = await exportAccountData(tenantId, userId);
 
-    expect(result?.bookmarks.map((bookmark) => bookmark.postId)).toEqual([
-      'post-1',
-    ]);
-  });
-
-  describe('with a user who has no other data', () => {
-    beforeEach(async () => {
-      await db().insert(schema.users).values({ id: 'user-1' });
-    });
-
-    it('maps unset nullable profile fields to undefined, never null', async () => {
-      const result = await exportAccountData(tenantId, 'user-1');
-
-      expect(result?.profile).toEqual({
-        id: 'user-1',
+    expect(result).toEqual({
+      profile: {
+        id: userId,
         name: undefined,
         email: undefined,
         emailVerified: undefined,
         image: undefined,
-      });
+      },
+      bookmarks: [],
+    });
+  });
+
+  it('exports no name or email when only the plain columns are set', async () => {
+    const { id: userId } = await insertTestUser(db(), {
+      name: MOCK_USER_NAME,
+      email: MOCK_USER_EMAIL,
     });
 
-    it('returns an empty bookmarks array for a user with none', async () => {
-      const result = await exportAccountData(tenantId, 'user-1');
+    const result = await exportAccountData(tenantId, userId);
 
-      expect(result?.bookmarks).toEqual([]);
-    });
-
-    it("does not include the user's bookmarks from another tenant", async () => {
-      const { id: otherTenantId } = await insertTestTenant(db());
-      await db()
-        .insert(schema.bookmarks)
-        .values([
-          { tenantId, userId: 'user-1', postId: 'post-1' },
-          { tenantId: otherTenantId, userId: 'user-1', postId: 'post-2' },
-        ]);
-
-      const result = await exportAccountData(tenantId, 'user-1');
-
-      expect(result?.bookmarks.map((bookmark) => bookmark.postId)).toEqual([
-        'post-1',
-      ]);
+    expect(result).toEqual({
+      profile: {
+        id: userId,
+        name: undefined,
+        email: undefined,
+        emailVerified: undefined,
+        image: undefined,
+      },
+      bookmarks: [],
     });
   });
 });

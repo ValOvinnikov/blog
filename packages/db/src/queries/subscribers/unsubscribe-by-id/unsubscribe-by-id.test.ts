@@ -1,13 +1,15 @@
 import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
+  MOCK_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
-import { eq } from 'drizzle-orm';
 
 import { unsubscribeById } from './unsubscribe-by-id';
 
@@ -16,78 +18,56 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
+usePersonalDataKeys();
+
+async function readSubscriberIds(): Promise<string[]> {
+  const rows = await db().select().from(schema.subscribers);
+  return rows.map(({ id }) => id).sort();
+}
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
   await db().delete(schema.tenants);
 });
 
-async function insertSubscriber(
-  tenantId: string,
-  email: string = MOCK_SUBSCRIBER_EMAIL,
-): Promise<schema.TSubscriber> {
-  const [inserted] = await db()
-    .insert(schema.subscribers)
-    .values({ tenantId, email })
-    .returning();
-  if (!inserted) throw new Error('failed to seed a subscriber row');
-  return inserted;
-}
-
-async function countRows(id: string): Promise<number> {
-  const rows = await db()
-    .select()
-    .from(schema.subscribers)
-    .where(eq(schema.subscribers.id, id));
-  return rows.length;
-}
-
 describe(unsubscribeById, () => {
   let tenantId: string;
+  let otherTenantId: string;
+  let subscriberId: string;
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
+    ({ id: otherTenantId } = await insertTestTenant(db()));
+    ({ id: subscriberId } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    ));
   });
 
-  it('returns not-found for an unknown subscriber', async () => {
-    const result = await unsubscribeById(tenantId, faker.string.uuid());
+  it('deletes only the named subscriber', async () => {
+    const { id: siblingId } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_SUBSCRIBER_TAGGED_EMAIL,
+    );
 
-    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
+    const result = await unsubscribeById(tenantId, subscriberId);
+
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
+    expect(await readSubscriberIds()).toEqual([siblingId]);
   });
 
-  it("returns not-found for another tenant's subscriber and keeps the row", async () => {
-    const { id: otherTenantId } = await insertTestTenant(db());
-    const subscriber = await insertSubscriber(otherTenantId);
+  it.each([
+    ['an unknown subscriber', () => tenantId, () => faker.string.uuid()],
+    ["another tenant's subscriber", () => otherTenantId, () => subscriberId],
+  ])(
+    'returns not-found for %s and deletes nothing',
+    async (_case, tenant, id) => {
+      const result = await unsubscribeById(tenant(), id());
 
-    const result = await unsubscribeById(tenantId, subscriber.id);
-
-    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
-    expect(await countRows(subscriber.id)).toBe(1);
-  });
-
-  describe("with one of the tenant's subscribers", () => {
-    let subscriber: schema.TSubscriber;
-
-    beforeEach(async () => {
-      subscriber = await insertSubscriber(tenantId);
-    });
-
-    it('deletes the subscriber row', async () => {
-      const result = await unsubscribeById(tenantId, subscriber.id);
-
-      expect(result).toEqual({
-        ...toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED),
-        subscriber,
-      });
-      expect(await countRows(subscriber.id)).toBe(0);
-    });
-
-    it("does not remove another subscriber's row", async () => {
-      const other = await insertSubscriber(tenantId, faker.internet.email());
-
-      await unsubscribeById(tenantId, subscriber.id);
-
-      expect(await countRows(other.id)).toBe(1);
-    });
-  });
+      expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
+      expect(await readSubscriberIds()).toEqual([subscriberId]);
+    },
+  );
 });

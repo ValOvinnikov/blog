@@ -24,6 +24,7 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.LOCALE_IS_ADDITIONAL]: 'localeIsAdditional',
   [TENANT_REFUSAL.PROVISIONING_STARTED]: 'provisioningStarted',
   [TENANT_REFUSAL.OWNER_ALREADY_JOINED]: 'ownerAlreadyJoined',
+  [TENANT_REFUSAL.OWNER_HAS_FREE_TENANT]: 'ownerHasFreeTenant',
 } as const satisfies Record<TUpdateTenantDetailsRefusal, string>;
 
 type TFormErrorKey =

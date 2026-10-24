@@ -3,6 +3,8 @@ import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
+export const TENANT_DOMAINS_DOMAIN_UNIQUE_NAME = 'tenant_domains_domain_unique';
+
 // Every domain a tenant answers to (a tenant has many). `tenants.primaryDomain`
 // stays a plain column rather than a FK into this table, so the two tables
 // don't reference each other circularly.
@@ -11,7 +13,7 @@ export const tenantDomains = pgTable('tenant_domains', {
   tenantId: uuid('tenant_id')
     .notNull()
     .references(() => tenants.id, { onDelete: 'cascade' }),
-  domain: text('domain').notNull().unique(),
+  domain: text('domain').notNull().unique(TENANT_DOMAINS_DOMAIN_UNIQUE_NAME),
   createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
     .notNull()
     .defaultNow(),
