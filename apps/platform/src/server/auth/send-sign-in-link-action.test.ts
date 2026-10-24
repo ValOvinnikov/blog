@@ -1,5 +1,6 @@
 import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { ACTION_OUTCOME } from '@blog/config';
+import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
 import {
@@ -70,9 +71,9 @@ describe(sendSignInLinkAction, () => {
       callbackPath: adminRoutes.dashboardLeads(),
     });
 
-    const context = vi.mocked(logger.error).mock.calls[0]?.[1];
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledOnce();
-    expect(context).toEqual({ error });
+    expect(logger.error).toHaveBeenCalledWith(SIGN_IN_LOG.LINK_FAILED, {
+      error,
+    });
   });
 });

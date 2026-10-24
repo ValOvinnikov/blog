@@ -3,6 +3,7 @@
 import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -48,7 +49,7 @@ export const sendSignInLinkAction = async (
       redirect: false,
     });
   } catch (error) {
-    logger.error('auth.sign_in_link_failed', { error });
+    logger.error(SIGN_IN_LOG.LINK_FAILED, { error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

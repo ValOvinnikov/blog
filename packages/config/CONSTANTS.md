@@ -312,6 +312,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/sign-in` — `apps/platform/src/constants/sign-in.ts`
 
 - **SIGN_IN_ERROR**: `ACCOUNT_NOT_LINKED`, `SIGN_IN_FAILED`
+- **SIGN_IN_LOG**: `LINK_FAILED`=`"auth.sign_in_link_failed"`
 
 ### `@platform/constants/signup-block` — `apps/platform/src/constants/signup-block.ts`
 

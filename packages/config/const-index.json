@@ -3746,6 +3746,14 @@
         "file": "apps/platform/src/constants/sign-in.ts"
       }
     ],
+    "auth.sign_in_link_failed": [
+      {
+        "ref": "SIGN_IN_LOG.LINK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in",
+        "file": "apps/platform/src/constants/sign-in.ts"
+      }
+    ],
     "BLOCK_DOMAIN_INVALID": [
       {
         "ref": "SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID",
