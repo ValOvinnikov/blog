@@ -7,9 +7,10 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { findSubscriberByExactEmail } from '@blog/db/queries/subscribers/user-subscriber';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
-import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
+import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import { personalDataIndex } from '@blog/utils/encryption';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 
 export type TPendingSubscriber = {
   id: string;
@@ -62,7 +63,7 @@ export async function createPendingSubscriber(
     .values({
       tenantId,
       email: normalizedEmail,
-      ...personalEmailColumns(normalizedEmail),
+      ...emailColumns(normalizedEmail, personalDataIndex),
     })
     .onConflictDoNothing()
     .returning({ id: subscribers.id });

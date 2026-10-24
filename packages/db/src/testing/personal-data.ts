@@ -1,5 +1,6 @@
 import type { TMaybeNull } from '@blog/config/types';
 import {
+  accountEmailIndex,
   decryptPersonalData,
   parsePersonalDataKeyring,
   personalDataIndex,
@@ -32,4 +33,8 @@ export function decryptTestPersonalValue(
 
 export function testPersonalEmailIndex(email: string): string {
   return personalDataIndex(email, MOCK_OTHER_ENCRYPTION_KEY);
+}
+
+export function mockAccountEmailIndex(email: string): string {
+  return accountEmailIndex(email, MOCK_OTHER_ENCRYPTION_KEY);
 }

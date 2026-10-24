@@ -2,8 +2,9 @@ import { getDb } from '@blog/db/client';
 import { leads, type TLead } from '@blog/db/schema/leads';
 import {
   encryptPersonalValue,
-  personalEmailColumns,
+  emailColumns,
 } from '@blog/db/utils/personal-data/personal-data';
+import { personalDataIndex } from '@blog/utils/encryption';
 
 export type TCreateLeadInput = Pick<
   TLead,
@@ -22,7 +23,7 @@ export async function createLead(
     .values({
       ...input,
       nameEncrypted: encryptPersonalValue(name),
-      ...personalEmailColumns(email),
+      ...emailColumns(email, personalDataIndex),
       messageEncrypted: encryptPersonalValue(message),
     })
     .returning({ id: leads.id });
