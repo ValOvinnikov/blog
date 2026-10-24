@@ -15,11 +15,9 @@ import {
   NEWSLETTER_OUTCOME,
   SUBSCRIBE_FAILED_EVENT,
 } from '@web/constants/newsletter';
-import {
-  firstSentEmail,
-  mockEmailConfig,
-  mockEmailTemplate,
-} from '@web/testing/server/newsletter/fixtures';
+import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
+import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
+import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -27,19 +25,8 @@ import { logger } from '@web/utils/logger/logger';
 
 import { subscribeToNewsletterAction } from './newsletter-actions';
 
-const { MOCK_UNSUBSCRIBE_KEY } = vi.hoisted(() => ({
-  MOCK_UNSUBSCRIBE_KEY: Buffer.alloc(32, 1).toString('base64'),
-}));
-
 const {
   createPendingSubscriberMock,
-  claimConfirmationSendMock,
-  commitConfirmationTokenMock,
-  releaseConfirmationSendMock,
-  getEmailConfigMock,
-  getEmailTemplateMock,
-  resolveTenantEmailIdentityMock,
-  sendEmailMock,
   markNewsletterSubscribedMock,
   resolveWritableTenantMock,
   isSubscribeAttemptRefusedMock,
@@ -47,13 +34,6 @@ const {
   getEffectiveSettingsFeaturesMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
-  claimConfirmationSendMock: vi.fn(),
-  commitConfirmationTokenMock: vi.fn(),
-  releaseConfirmationSendMock: vi.fn(),
-  getEmailConfigMock: vi.fn(),
-  getEmailTemplateMock: vi.fn(),
-  resolveTenantEmailIdentityMock: vi.fn(),
-  sendEmailMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
   resolveWritableTenantMock: vi.fn(),
   isSubscribeAttemptRefusedMock: vi.fn(),
@@ -61,36 +41,35 @@ const {
   getEffectiveSettingsFeaturesMock: vi.fn(),
 }));
 
+const { sendEmail: sendEmailMock } = confirmationEmailEdges;
+
 vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
-  queries: {
-    subscribers: {
-      createPendingSubscriber: createPendingSubscriberMock,
-      claimConfirmationSend: claimConfirmationSendMock,
-      commitConfirmationToken: commitConfirmationTokenMock,
-      releaseConfirmationSend: releaseConfirmationSendMock,
-    },
-    emailConfig: { getEmailConfig: getEmailConfigMock },
-    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
-  },
+  queries: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailQueries({
+    createPendingSubscriber: createPendingSubscriberMock,
+  }),
 }));
 
 vi.mock(import('@blog/email'), async (importOriginal) => ({
   ...(await importOriginal()),
-  sendEmail: sendEmailMock,
+  sendEmail: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailEdges.sendEmail,
 }));
 
-vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
-  resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
+vi.mock('@web/utils/resolve-tenant-email-identity', async () => ({
+  resolveTenantEmailIdentity: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailEdges.resolveTenantEmailIdentity,
 }));
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@web/utils/env/env', () => ({
-  env: {
-    NEWSLETTER_FROM_ADDRESS: undefined,
-    NEWSLETTER_UNSUBSCRIBE_KEY: MOCK_UNSUBSCRIBE_KEY,
-  },
+vi.mock('@web/utils/env/env', async () => ({
+  env: (await import('@web/testing/server/newsletter/confirmation-email-edges'))
+    .confirmationEmailEnv,
 }));
 
 vi.mock(
@@ -135,19 +114,7 @@ const resolveSubscriber = (outcome: string) =>
 describe(subscribeToNewsletterAction, () => {
   beforeEach(() => {
     resolveSubscriber(SUBSCRIBER_OUTCOME.CREATED);
-    sendEmailMock.mockResolvedValue(undefined);
-    claimConfirmationSendMock.mockResolvedValue({
-      claimedAt: faker.date.recent(),
-      confirmationToken: faker.string.alphanumeric(16),
-    });
-    commitConfirmationTokenMock.mockResolvedValue(undefined);
-    releaseConfirmationSendMock.mockResolvedValue(undefined);
-    getEmailConfigMock.mockResolvedValue(mockEmailConfig());
-    getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
-    resolveTenantEmailIdentityMock.mockResolvedValue({
-      brand: MOCK_BRAND,
-      brandName: faker.company.name(),
-    });
+    setConfirmationEmailDefaults({ brand: MOCK_BRAND });
     markNewsletterSubscribedMock.mockResolvedValue(undefined);
     getTenantPlanMock.mockResolvedValue(okResult(TENANT_PLAN.GROWTH));
     getEffectiveSettingsFeaturesMock.mockResolvedValue(

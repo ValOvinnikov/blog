@@ -5,6 +5,8 @@ import {
 } from '@blog/config';
 import { escapeHtml } from '@blog/email';
 import { faker } from '@faker-js/faker';
+import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
+import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
 import {
   firstSentEmail,
   MOCK_AUTHORED_SUBJECT,
@@ -14,7 +16,6 @@ import {
   MOCK_UNSUBSCRIBE_TOKEN,
   MOCK_UNSUBSCRIBE_URL,
   mockEmailConfig,
-  mockEmailTemplate,
 } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
@@ -26,46 +27,36 @@ import { getLocale } from 'next-intl/server';
 
 import { sendNewsletterConfirmation } from './newsletter-confirmation-send';
 
-const {
-  sendEmailMock,
-  resolveTenantEmailIdentityMock,
-  getEmailConfigMock,
-  getEmailTemplateMock,
-  claimConfirmationSendMock,
-  releaseConfirmationSendMock,
-  commitConfirmationTokenMock,
-  mintNewsletterUnsubscribeTokenMock,
-} = vi.hoisted(() => ({
-  sendEmailMock: vi.fn(),
-  resolveTenantEmailIdentityMock: vi.fn(),
-  getEmailConfigMock: vi.fn(),
-  getEmailTemplateMock: vi.fn(),
-  claimConfirmationSendMock: vi.fn(),
-  releaseConfirmationSendMock: vi.fn(),
-  commitConfirmationTokenMock: vi.fn(),
+const { mintNewsletterUnsubscribeTokenMock } = vi.hoisted(() => ({
   mintNewsletterUnsubscribeTokenMock: vi.fn(),
 }));
 
+const {
+  sendEmail: sendEmailMock,
+  resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
+  claimConfirmationSend: claimConfirmationSendMock,
+  releaseConfirmationSend: releaseConfirmationSendMock,
+  commitConfirmationToken: commitConfirmationTokenMock,
+} = confirmationEmailEdges;
+
 vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
-  queries: {
-    subscribers: {
-      claimConfirmationSend: claimConfirmationSendMock,
-      releaseConfirmationSend: releaseConfirmationSendMock,
-      commitConfirmationToken: commitConfirmationTokenMock,
-    },
-    emailConfig: { getEmailConfig: getEmailConfigMock },
-    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
-  },
+  queries: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailQueries(),
 }));
 
 vi.mock(import('@blog/email'), async (importOriginal) => ({
   ...(await importOriginal()),
-  sendEmail: sendEmailMock,
+  sendEmail: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailEdges.sendEmail,
 }));
 
-vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
-  resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
+vi.mock('@web/utils/resolve-tenant-email-identity', async () => ({
+  resolveTenantEmailIdentity: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailEdges.resolveTenantEmailIdentity,
 }));
 
 vi.mock(
@@ -77,8 +68,9 @@ vi.mock(
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@web/utils/env/env', () => ({
-  env: { NEWSLETTER_FROM_ADDRESS: undefined },
+vi.mock('@web/utils/env/env', async () => ({
+  env: (await import('@web/testing/server/newsletter/confirmation-email-edges'))
+    .confirmationEmailEnv,
 }));
 
 const MOCK_BRAND_NAME = faker.company.name();
@@ -94,21 +86,15 @@ const sentEmail = () => firstSentEmail(sendEmailMock);
 
 describe(sendNewsletterConfirmation, () => {
   beforeEach(() => {
-    sendEmailMock.mockResolvedValue(undefined);
-    resolveTenantEmailIdentityMock.mockResolvedValue({
+    setConfirmationEmailDefaults({
       brand: MOCK_BRAND,
       brandName: MOCK_BRAND_NAME,
+      emailConfig: mockEmailConfig({ replyToAddress: MOCK_REPLY_TO }),
+      claim: {
+        claimedAt: MOCK_CLAIMED_AT,
+        confirmationToken: MOCK_CONFIRMATION_TOKEN,
+      },
     });
-    getEmailConfigMock.mockResolvedValue(
-      mockEmailConfig({ replyToAddress: MOCK_REPLY_TO }),
-    );
-    getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
-    claimConfirmationSendMock.mockResolvedValue({
-      claimedAt: MOCK_CLAIMED_AT,
-      confirmationToken: MOCK_CONFIRMATION_TOKEN,
-    });
-    releaseConfirmationSendMock.mockResolvedValue(undefined);
-    commitConfirmationTokenMock.mockResolvedValue(undefined);
     mintNewsletterUnsubscribeTokenMock.mockReturnValue(MOCK_UNSUBSCRIBE_TOKEN);
   });
 

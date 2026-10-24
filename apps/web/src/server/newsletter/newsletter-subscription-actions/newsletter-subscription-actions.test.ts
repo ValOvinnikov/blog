@@ -14,11 +14,11 @@ import {
   CONFIRMATION_RESEND_FAILED_EVENT,
   UNSUBSCRIBE_FAILED_EVENT,
 } from '@web/constants/newsletter';
+import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
+import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
 import {
   firstSentEmail,
   MOCK_CONFIRMATION_TOKEN,
-  mockEmailConfig,
-  mockEmailTemplate,
 } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
@@ -34,19 +34,10 @@ import {
   unsubscribeAction,
 } from './newsletter-subscription-actions';
 
-const { MOCK_UNSUBSCRIBE_KEY } = vi.hoisted(() => ({
-  MOCK_UNSUBSCRIBE_KEY: Buffer.alloc(32, 1).toString('base64'),
-}));
-
 const {
   authMock,
   unsubscribeMock,
   resendConfirmationMock,
-  commitConfirmationTokenMock,
-  getEmailConfigMock,
-  getEmailTemplateMock,
-  resolveTenantEmailIdentityMock,
-  sendEmailMock,
   clearNewsletterSubscribedCookieMock,
   resolveWritableTenantMock,
   resolveRequestTenantMock,
@@ -54,47 +45,46 @@ const {
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
   resendConfirmationMock: vi.fn(),
-  commitConfirmationTokenMock: vi.fn(),
-  getEmailConfigMock: vi.fn(),
-  getEmailTemplateMock: vi.fn(),
-  resolveTenantEmailIdentityMock: vi.fn(),
-  sendEmailMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
   resolveWritableTenantMock: vi.fn(),
   resolveRequestTenantMock: vi.fn(),
 }));
 
+const {
+  sendEmail: sendEmailMock,
+  commitConfirmationToken: commitConfirmationTokenMock,
+} = confirmationEmailEdges;
+
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
-  queries: {
-    subscribers: {
-      unsubscribe: unsubscribeMock,
-      resendConfirmation: resendConfirmationMock,
-      commitConfirmationToken: commitConfirmationTokenMock,
-    },
-    emailConfig: { getEmailConfig: getEmailConfigMock },
-    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
-  },
+  queries: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailQueries({
+    unsubscribe: unsubscribeMock,
+    resendConfirmation: resendConfirmationMock,
+  }),
 }));
 
 vi.mock(import('@blog/email'), async (importOriginal) => ({
   ...(await importOriginal()),
-  sendEmail: sendEmailMock,
+  sendEmail: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailEdges.sendEmail,
 }));
 
-vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
-  resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
+vi.mock('@web/utils/resolve-tenant-email-identity', async () => ({
+  resolveTenantEmailIdentity: (
+    await import('@web/testing/server/newsletter/confirmation-email-edges')
+  ).confirmationEmailEdges.resolveTenantEmailIdentity,
 }));
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@web/utils/env/env', () => ({
-  env: {
-    NEWSLETTER_FROM_ADDRESS: undefined,
-    NEWSLETTER_UNSUBSCRIBE_KEY: MOCK_UNSUBSCRIBE_KEY,
-  },
+vi.mock('@web/utils/env/env', async () => ({
+  env: (await import('@web/testing/server/newsletter/confirmation-email-edges'))
+    .confirmationEmailEnv,
 }));
 
 vi.mock(
@@ -189,14 +179,7 @@ describe(resendConfirmationAction, () => {
       email: MOCK_SUBSCRIBER.email,
       confirmationToken: MOCK_CONFIRMATION_TOKEN,
     });
-    sendEmailMock.mockResolvedValue(undefined);
-    commitConfirmationTokenMock.mockResolvedValue(undefined);
-    getEmailConfigMock.mockResolvedValue(mockEmailConfig());
-    getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
-    resolveTenantEmailIdentityMock.mockResolvedValue({
-      brand: MOCK_BRAND,
-      brandName: faker.company.name(),
-    });
+    setConfirmationEmailDefaults({ brand: MOCK_BRAND });
     resolveWritableTenantMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
   });
 
