@@ -67,8 +67,8 @@ not to test", and treats "nothing to add" as a complete outcome.
   write `expect(response.status).toBe(HTTP_STATUS.NOT_FOUND)`, never `404`.
   A value a test file writes a second time becomes a const — or a `testing/`
   builder when it is entity-shaped (CLAUDE.md → "Reuse a const; never retype
-  its value"). `prefer-shared-constant`, `no-duplicate-string` and
-  `pnpm check:duplicate-literals` enforce this on touched test files too.
+  its value"). `prefer-shared-constant` and `no-duplicate-string` enforce this on
+  touched test files too.
   Using a const is not asserting it: `expect(HTTP_STATUS.NOT_FOUND).toBe(404)`
   still falls under "What not to test".
 - **Run:** `pnpm test`, `pnpm --filter <pkg> test`, `pnpm test:watch`. Run

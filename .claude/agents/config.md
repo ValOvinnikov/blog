@@ -18,7 +18,7 @@ hooks:
     - matcher: 'Edit|MultiEdit|Write'
       hooks:
         - type: command
-          command: 'LAYER_PATHS=packages/config:packages/utils:configs:scripts/check-duplicate-literals.mjs:scripts/check-duplicate-literals.test.mjs LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
+          command: 'LAYER_PATHS=packages/config:packages/utils:configs LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
 You are the config/tooling engineer for this blog monorepo: `packages/config`
