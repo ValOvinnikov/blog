@@ -8,6 +8,8 @@ import {
   FETCH_FAILED_REASON,
   PATH_PURGE_FALLBACK_EVENT,
   SIGNATURE_REFUSED_REASON,
+  TENANT_BY_ID_LOOKUP_FAILED_EVENT,
+  TENANT_ID_LOOKUP_FAILED_EVENT,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
@@ -355,7 +357,7 @@ describe('POST /api/revalidate', () => {
               new Error(MOCK_ERROR_MESSAGE),
             );
           },
-          event: 'revalidate.tenant_id_lookup_failed',
+          event: TENANT_ID_LOOKUP_FAILED_EVENT,
           context: { tenantProjectId: TENANT_PROJECT_ID },
         },
         {
@@ -366,7 +368,7 @@ describe('POST /api/revalidate', () => {
             );
             getTenantByIdMock.mockRejectedValue(new Error(MOCK_ERROR_MESSAGE));
           },
-          event: 'revalidate.tenant_by_id_lookup_failed',
+          event: TENANT_BY_ID_LOOKUP_FAILED_EVENT,
           context: { tenantId: MOCK_TENANT_ID },
         },
       ])(

@@ -7,6 +7,8 @@ import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   FETCH_FAILED_REASON,
   PATH_PURGE_FALLBACK_EVENT,
+  TENANT_BY_ID_LOOKUP_FAILED_EVENT,
+  TENANT_ID_LOOKUP_FAILED_EVENT,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
@@ -96,7 +98,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       now: Date.now(),
     });
   } catch (error) {
-    logger.error('revalidate.tenant_id_lookup_failed', {
+    logger.error(TENANT_ID_LOOKUP_FAILED_EVENT, {
       tenantProjectId,
       error,
     });
@@ -139,7 +141,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     try {
       tenant = await queries.tenants.getTenantById(tenantId);
     } catch (error) {
-      logger.error('revalidate.tenant_by_id_lookup_failed', {
+      logger.error(TENANT_BY_ID_LOOKUP_FAILED_EVENT, {
         tenantId,
         error,
       });

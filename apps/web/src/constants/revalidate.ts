@@ -3,6 +3,12 @@ export const TENANT_ACTIVITY_TOUCH_FAILED_EVENT =
 
 export const PATH_PURGE_FALLBACK_EVENT = 'revalidate.path_purge_fallback';
 
+export const TENANT_ID_LOOKUP_FAILED_EVENT =
+  'revalidate.tenant_id_lookup_failed';
+
+export const TENANT_BY_ID_LOOKUP_FAILED_EVENT =
+  'revalidate.tenant_by_id_lookup_failed';
+
 export const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
 
 export const UNSUPPORTED_TYPE_REASON = 'unsupported_type';

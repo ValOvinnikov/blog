@@ -1,6 +1,6 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { errorResult, isUndefined, okResult, type TResult } from '@blog/utils';
 import { decodeSignatureHeader, isValidSignature } from '@sanity/webhook';
 import {
   REVALIDATE_SIGNATURE_MAX_AGE_MS,
@@ -36,7 +36,7 @@ export const verifyRevalidateSignature = async ({
   const timestamp = signature ? readSignatureTimestamp(signature) : undefined;
   if (
     !signature ||
-    timestamp === undefined ||
+    isUndefined(timestamp) ||
     Math.abs(now - timestamp) > REVALIDATE_SIGNATURE_MAX_AGE_MS
   ) {
     return errorResult(SIGNATURE_REFUSED_REASON);
