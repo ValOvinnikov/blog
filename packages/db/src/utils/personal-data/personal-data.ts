@@ -1,10 +1,17 @@
-import type { TMaybeNull } from '@blog/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
+import {
+  PERSONAL_DATA_FALLBACK_REASON,
+  type TPersonalDataFallbackReason,
+  type TPersonalDataOwner,
+} from '@blog/db/constants';
 import { env } from '@blog/db/utils/env/env';
+import { notifyPersonalDataFallback } from '@blog/db/utils/personal-data/personal-data-fallback';
 import {
   decryptPersonalData,
   encryptPersonalData,
   parsePersonalDataKeyring,
 } from '@blog/utils/encryption';
+import { isNull } from '@blog/utils/primitives';
 
 // Null while a key is unset, so writes keep working on the plain columns and the backfill fills the gap.
 export function encryptPersonalValue(value: string): TMaybeNull<string> {
@@ -18,11 +25,22 @@ export function decryptPersonalValue(encrypted: string): string {
   return decryptPersonalData(encrypted, parsePersonalDataKeyring(raw));
 }
 
-export function requireDecryptedPersonalValue(
+function plainReadReason(
   encrypted: TMaybeNull<string>,
-  owner: string,
-): string {
-  if (encrypted === null) throw new Error(`${owner} has no encrypted form.`);
+): TMaybeUndefined<TPersonalDataFallbackReason> {
+  if (isNull(encrypted)) return PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED;
+  if (!env.PERSONAL_DATA_ENCRYPTION_KEY) {
+    return PERSONAL_DATA_FALLBACK_REASON.ENCRYPTION_KEY_UNSET;
+  }
+  return undefined;
+}
+
+// TODO: drop the plain fallback along with the plain columns (#5666).
+export function readOptionalPersonalValue(
+  encrypted: TMaybeNull<string>,
+  plain: TMaybeNull<string>,
+): TMaybeNull<string> {
+  if (isNull(encrypted) || !env.PERSONAL_DATA_ENCRYPTION_KEY) return plain;
   return decryptPersonalValue(encrypted);
 }
 
@@ -30,7 +48,15 @@ export function readPersonalValue(
   encrypted: TMaybeNull<string>,
   plain: string,
 ): string {
-  return encrypted === null ? plain : decryptPersonalValue(encrypted);
+  return readOptionalPersonalValue(encrypted, plain) ?? plain;
+}
+
+export function reportPlainPersonalRead(
+  owner: TPersonalDataOwner,
+  encrypted: TMaybeNull<string>,
+): void {
+  const reason = plainReadReason(encrypted);
+  if (reason) notifyPersonalDataFallback({ owner, reason });
 }
 
 export type TEmailIndexer = (email: string, keyBase64: string) => string;
@@ -43,6 +69,10 @@ type TEmailColumns = {
 function indexEmail(email: string, indexer: TEmailIndexer): TMaybeNull<string> {
   const key = env.PERSONAL_DATA_INDEX_KEY;
   return key ? indexer(email, key) : null;
+}
+
+export function isEmailIndexConfigured(): boolean {
+  return Boolean(env.PERSONAL_DATA_INDEX_KEY);
 }
 
 export function requireEmailIndex(

@@ -4,3 +4,7 @@ export { getDb } from './client';
 export * from './constants';
 export * as queries from './queries';
 export * as schema from './schema';
+export {
+  onPersonalDataFallback,
+  type TPersonalDataFallback,
+} from './utils/personal-data/personal-data-fallback';

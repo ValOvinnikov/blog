@@ -1,3 +1,7 @@
+import {
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+} from '@blog/db/constants';
 import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
 import * as schema from '@blog/db/schema';
 import {
@@ -7,7 +11,10 @@ import {
   MOCK_LEAD_MESSAGE,
   MOCK_LEAD_NAME,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { eq, sql } from 'drizzle-orm';
@@ -20,6 +27,7 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
 
 const MOCK_LEAD_COUNT = LEADS_PAGE_SIZE + 5;
 const MINUTE_MS = 60_000;
@@ -116,6 +124,38 @@ describe(listLeadsByCursor, () => {
         createdAt,
       },
     ]);
+  });
+
+  it('reads a lead not yet backfilled from its plain columns and reports it', async () => {
+    const { id, sourcePath, createdAt } = await insertTestLead(db(), tenantId);
+
+    const { leads } = await listLeadsByCursor({ tenantId });
+
+    expect(leads).toEqual([
+      {
+        id,
+        name: MOCK_LEAD_NAME,
+        email: MOCK_LEAD_EMAIL,
+        message: MOCK_LEAD_MESSAGE,
+        sourcePath,
+        sourceDocumentId: null,
+        sourceLocale: null,
+        readAt: null,
+        createdAt,
+      },
+    ]);
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.LEAD,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
+  });
+
+  it('reports nothing for a backfilled lead', async () => {
+    await insertEncryptedLead(tenantId);
+
+    await listLeadsByCursor({ tenantId });
+
+    expect(fallbackListener).not.toHaveBeenCalled();
   });
 
   it('pages through every lead once, newest first', async () => {

@@ -1,13 +1,23 @@
 import { queries } from '@blog/db';
 import type { TUser } from '@blog/db/schema/auth';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
-type TStoredUser = Omit<AdapterUser, 'email'> &
-  Partial<Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>>;
+type TStoredUser = Omit<AdapterUser, 'email'> & {
+  email?: TUser['email'];
+} & Partial<Pick<TUser, 'emailEncrypted' | 'emailIndex' | 'nameEncrypted'>>;
 
-function decryptUser(user: TStoredUser): AdapterUser {
-  return { ...user, ...queries.users.readUserPersonalData(user) };
+function decryptUser({
+  id,
+  emailVerified,
+  image,
+  ...personal
+}: TStoredUser): AdapterUser {
+  return {
+    id,
+    emailVerified,
+    image,
+    ...queries.users.readUserPersonalData(personal),
+  };
 }
 
 export function withEncryptedUsers(adapter: Adapter): Adapter {
@@ -37,16 +47,8 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
         return user && decryptUser(user);
       }),
     getUserByEmail: async (email) => {
-      const candidates = await queries.users.getUsersByEmailIndex(email);
-      const requested = normalizeEmail(email);
-      const readable = candidates
-        .filter(({ emailEncrypted }) => emailEncrypted !== null)
-        .map(decryptUser);
-      return (
-        readable.find(
-          ({ email: found }) => normalizeEmail(found) === requested,
-        ) ?? null
-      );
+      const user = await queries.users.findUserByEmail(email);
+      return user ? decryptUser(user) : null;
     },
     getUserByAccount:
       getUserByAccount &&

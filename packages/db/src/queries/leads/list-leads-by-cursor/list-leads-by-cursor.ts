@@ -1,8 +1,12 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getDb } from '@blog/db/client';
+import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
 import { leads, type TLead } from '@blog/db/schema/leads';
-import { requireDecryptedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import {
+  readPersonalValue,
+  reportPlainPersonalRead,
+} from '@blog/db/utils/personal-data/personal-data';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
 export type TLeadsCursor = {
@@ -33,8 +37,6 @@ export type TListLeadsByCursorResult = {
   nextCursor: TMaybeUndefined<TLeadsCursor>;
 };
 
-const LEAD_OWNER = 'Lead';
-
 export async function listLeadsByCursor({
   tenantId,
   after,
@@ -45,8 +47,11 @@ export async function listLeadsByCursor({
     .select({
       lead: {
         id: leads.id,
+        name: leads.name,
         nameEncrypted: leads.nameEncrypted,
+        email: leads.email,
         emailEncrypted: leads.emailEncrypted,
+        message: leads.message,
         messageEncrypted: leads.messageEncrypted,
         sourcePath: leads.sourcePath,
         sourceDocumentId: leads.sourceDocumentId,
@@ -74,13 +79,24 @@ export async function listLeadsByCursor({
   return {
     leads: page.map(
       ({
-        lead: { nameEncrypted, emailEncrypted, messageEncrypted, ...lead },
-      }) => ({
-        ...lead,
-        name: requireDecryptedPersonalValue(nameEncrypted, LEAD_OWNER),
-        email: requireDecryptedPersonalValue(emailEncrypted, LEAD_OWNER),
-        message: requireDecryptedPersonalValue(messageEncrypted, LEAD_OWNER),
-      }),
+        lead: {
+          name,
+          nameEncrypted,
+          email,
+          emailEncrypted,
+          message,
+          messageEncrypted,
+          ...lead
+        },
+      }) => {
+        reportPlainPersonalRead(PERSONAL_DATA_OWNER.LEAD, emailEncrypted);
+        return {
+          ...lead,
+          name: readPersonalValue(nameEncrypted, name),
+          email: readPersonalValue(emailEncrypted, email),
+          message: readPersonalValue(messageEncrypted, message),
+        };
+      },
     ),
     nextCursor:
       rows.length > LEADS_PAGE_SIZE && last
