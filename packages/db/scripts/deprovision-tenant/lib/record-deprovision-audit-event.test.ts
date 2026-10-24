@@ -1,27 +1,21 @@
-import type { TDeprovisionEnv } from './env';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import {
+  MOCK_DEPROVISION_AUDIT_ACTOR,
+  MOCK_DEPROVISION_ENV,
+} from '@blog/db/testing/deprovision-tenant/fixtures';
+import { faker } from '@faker-js/faker';
+
 import { recordDeprovisionAuditEvent } from './record-deprovision-audit-event';
 
 const { insertAuditEventMock } = vi.hoisted(() => ({
   insertAuditEventMock: vi.fn(),
 }));
 
+const MOCK_TENANT_ID = faker.string.uuid();
+
 vi.mock('@blog/db/queries/audit-events', () => ({
   insertAuditEvent: insertAuditEventMock,
 }));
-
-const env: TDeprovisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  dryRun: false,
-  githubActor: 'octocat',
-  githubRunId: 'run-42',
-  githubRepository: 'acme/blog',
-  githubServerUrl: 'https://github.com',
-  webAppUrl: 'https://web.example.com',
-  siteConfigRevalidateSecret: 'shared-secret',
-};
 
 beforeEach(() => {
   insertAuditEventMock.mockReset().mockResolvedValue({});
@@ -34,15 +28,17 @@ afterEach(() => {
 
 describe(recordDeprovisionAuditEvent, () => {
   it('inserts a DEPROVISIONED/TENANT audit event attributed to the GitHub actor', async () => {
-    await recordDeprovisionAuditEvent('tenant-1', env);
+    await recordDeprovisionAuditEvent(MOCK_TENANT_ID, MOCK_DEPROVISION_ENV);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'github:octocat',
-      actorEmail: 'octocat@users.noreply.github.com',
-      action: 'DEPROVISIONED',
-      targetType: 'TENANT',
-      targetId: 'tenant-1',
-      details: { via: 'deprovision-tenant-workflow', runId: 'run-42' },
+      ...MOCK_DEPROVISION_AUDIT_ACTOR,
+      action: AUDIT_ACTION.DEPROVISIONED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: {
+        via: 'deprovision-tenant-workflow',
+        runId: MOCK_DEPROVISION_ENV.githubRunId,
+      },
     });
   });
 
@@ -50,15 +46,15 @@ describe(recordDeprovisionAuditEvent, () => {
     insertAuditEventMock.mockRejectedValueOnce(new Error('db down'));
 
     await expect(
-      recordDeprovisionAuditEvent('tenant-1', env),
+      recordDeprovisionAuditEvent(MOCK_TENANT_ID, MOCK_DEPROVISION_ENV),
     ).resolves.toBeUndefined();
 
     expect(console.error).toHaveBeenCalled();
   });
 
   it('logs and skips the insert when GITHUB_ACTOR is unset', async () => {
-    await recordDeprovisionAuditEvent('tenant-1', {
-      ...env,
+    await recordDeprovisionAuditEvent(MOCK_TENANT_ID, {
+      ...MOCK_DEPROVISION_ENV,
       githubActor: undefined,
     });
 

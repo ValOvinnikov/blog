@@ -1,7 +1,7 @@
 import {
-  BLOCKED_ADDRESS,
-  BLOCKED_ADDRESS_DOMAIN,
-  NOT_A_DOMAIN,
+  MOCK_BLOCKED_ADDRESS,
+  MOCK_BLOCKED_ADDRESS_DOMAIN,
+  MOCK_NOT_A_DOMAIN,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 
 import {
@@ -10,17 +10,13 @@ import {
 } from './normalize-signup-identity';
 
 describe(normalizeSignupEmail, () => {
-  it('lower-cases and trims the address', () => {
-    expect(normalizeSignupEmail('  Blocked@Example.COM ')).toEqual({
-      address: BLOCKED_ADDRESS,
-      domain: BLOCKED_ADDRESS_DOMAIN,
-    });
-  });
-
-  it('drops a +tag from the local part', () => {
-    expect(normalizeSignupEmail('blocked+promo+2@example.com')).toEqual({
-      address: BLOCKED_ADDRESS,
-      domain: BLOCKED_ADDRESS_DOMAIN,
+  it.each([
+    ['lower-cases and trims', '  Blocked@Example.COM '],
+    ['drops a +tag from', 'blocked+promo+2@example.com'],
+  ])('%s the address', (_, email) => {
+    expect(normalizeSignupEmail(email)).toEqual({
+      address: MOCK_BLOCKED_ADDRESS,
+      domain: MOCK_BLOCKED_ADDRESS_DOMAIN,
     });
   });
 
@@ -36,10 +32,12 @@ describe(normalizeSignupEmail, () => {
 
 describe(normalizeSignupDomain, () => {
   it('lower-cases and trims the domain', () => {
-    expect(normalizeSignupDomain(' Example.COM ')).toBe(BLOCKED_ADDRESS_DOMAIN);
+    expect(normalizeSignupDomain(' Example.COM ')).toBe(
+      MOCK_BLOCKED_ADDRESS_DOMAIN,
+    );
   });
 
   it('rejects a value that is not a domain', () => {
-    expect(normalizeSignupDomain(NOT_A_DOMAIN)).toBeUndefined();
+    expect(normalizeSignupDomain(MOCK_NOT_A_DOMAIN)).toBeUndefined();
   });
 });

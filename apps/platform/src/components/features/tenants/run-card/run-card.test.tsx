@@ -1,10 +1,17 @@
 import type { TProvisioningRun } from '@blog/db/schema/tenants';
 import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  MOCK_RUN_PLUS_4_MIN_AT,
+  MOCK_RUN_PLUS_6_MIN_AT,
+  MOCK_RUN_STARTED_AT,
+} from '@platform/testing/tenants/fixtures';
 
 import { RunCard } from './run-card';
 
+const WORKFLOW_RUN_URL = 'https://github.com/example/actions/runs/1';
+
 const setup = customRender(RunCard, {
-  run: { startedAt: '2026-08-12T14:18:00.000Z' } as TProvisioningRun,
+  run: { startedAt: MOCK_RUN_STARTED_AT } as TProvisioningRun,
 });
 
 describe(`<${RunCard.name}/>`, () => {
@@ -17,30 +24,32 @@ describe(`<${RunCard.name}/>`, () => {
   });
 
   it('renders the started and finished times as relative and absolute UTC together when the run has finished', () => {
-    vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
+    vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
 
     setup({
       run: {
-        startedAt: '2026-08-12T14:18:00.000Z',
-        finishedAt: '2026-08-12T14:22:00.000Z',
+        startedAt: MOCK_RUN_STARTED_AT,
+        finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
         registry: 'production',
-        workflowRunUrl: 'https://github.com/example/actions/runs/1',
+        workflowRunUrl: WORKFLOW_RUN_URL,
       } as TProvisioningRun,
     });
 
     const started = screen.getByText('6m ago · Aug 12, 2026, 2:18 PM UTC');
     const finished = screen.getByText('2m ago · Aug 12, 2026, 2:22 PM UTC');
+    const registry = screen.getByText('production');
+
     expect(started.tagName).toBe('TIME');
-    expect(started).toHaveAttribute('dateTime', '2026-08-12T14:18:00.000Z');
+    expect(started).toHaveAttribute('dateTime', MOCK_RUN_STARTED_AT);
     expect(finished.tagName).toBe('TIME');
-    expect(finished).toHaveAttribute('dateTime', '2026-08-12T14:22:00.000Z');
-    expect(screen.getByText('production')).toBeVisible();
+    expect(finished).toHaveAttribute('dateTime', MOCK_RUN_PLUS_4_MIN_AT);
+    expect(registry).toBeVisible();
   });
 
   it('shows a waiting-to-start placeholder for Started when the run has been admitted but has not yet begun, with no <time> element', () => {
     setup({
       run: {
-        admittedAt: '2026-08-12T14:18:00.000Z',
+        admittedAt: MOCK_RUN_STARTED_AT,
       } as unknown as TProvisioningRun,
     });
 
@@ -49,70 +58,74 @@ describe(`<${RunCard.name}/>`, () => {
     expect(placeholder.tagName).not.toBe('TIME');
   });
 
-  it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
-    setup();
+  describe('with a run still in flight', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const placeholder = screen.getByText('—');
-    expect(placeholder).toBeVisible();
-    expect(placeholder.tagName).not.toBe('TIME');
+    it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
+      const placeholder = screen.getByText('—');
+      expect(placeholder).toBeVisible();
+      expect(placeholder.tagName).not.toBe('TIME');
+    });
+
+    it('nests the card title one level under the page heading', () => {
+      const heading = screen.getByRole('heading', { level: 2, name: 'Run' });
+
+      expect(heading).toBeVisible();
+    });
   });
 
   it('renders no workflow log link when the run has no workflowRunUrl', () => {
     setup({
       run: {
-        startedAt: '2026-08-12T14:18:00.000Z',
-        finishedAt: '2026-08-12T14:22:00.000Z',
+        startedAt: MOCK_RUN_STARTED_AT,
+        finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
       } as TProvisioningRun,
     });
 
-    expect(
-      screen.queryByRole('link', { name: /workflow log/i }),
-    ).not.toBeInTheDocument();
+    const workflowLink = screen.queryByRole('link', { name: /workflow log/i });
+
+    expect(workflowLink).not.toBeInTheDocument();
   });
 
   it('links out to the workflow run when workflowRunUrl is present', () => {
     setup({
       run: {
-        startedAt: '2026-08-12T14:18:00.000Z',
-        workflowRunUrl: 'https://github.com/example/actions/runs/1',
+        startedAt: MOCK_RUN_STARTED_AT,
+        workflowRunUrl: WORKFLOW_RUN_URL,
       } as TProvisioningRun,
     });
 
     const link = screen.getByRole('link', { name: /workflow log/i });
-    expect(link).toHaveAttribute(
-      'href',
-      'https://github.com/example/actions/runs/1',
-    );
+    expect(link).toHaveAttribute('href', WORKFLOW_RUN_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  it('nests the card title one level under the page heading', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Run' }),
-    ).toBeVisible();
   });
 
   it('takes the heading level it is given', () => {
     setup({ headingLevel: 3 });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Run' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', { level: 3, name: 'Run' });
+
+    expect(heading).toBeVisible();
   });
 
   it('says no run has started yet when there is no run', () => {
     setup({ run: undefined });
 
-    expect(screen.getByText('No run has started yet.')).toBeVisible();
-    expect(screen.queryByText('Started')).not.toBeInTheDocument();
+    const emptyMessage = screen.getByText('No run has started yet.');
+    const startedLabel = screen.queryByText('Started');
+
+    expect(emptyMessage).toBeVisible();
+    expect(startedLabel).not.toBeInTheDocument();
   });
 
   it('renders actions in the card header', () => {
     setup({ actions: <span>Complete</span> });
 
-    expect(screen.getByText('Complete')).toBeVisible();
+    const action = screen.getByText('Complete');
+
+    expect(action).toBeVisible();
   });
 });

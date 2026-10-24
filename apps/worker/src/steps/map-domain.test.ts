@@ -1,7 +1,11 @@
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { makeTenant } from '@worker/testing/tenant/fixtures';
-import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
+import {
+  MOCK_ENCRYPTED_TOKEN,
+  MOCK_TENANT_DOMAIN,
+  mockProvisionedTenant,
+} from '@worker/testing/tenant/fixtures';
 
 import { mapTenantDomain } from './map-domain';
 
@@ -17,31 +21,7 @@ vi.mock('@worker/utils/vercel-client/vercel-client', () => ({
   addVercelProjectDomain: addVercelProjectDomainMock,
 }));
 
-const TENANT_DOMAIN = 'acme.example.com';
-
-const env: TProvisionEnv = {
-  sanityManagementToken: 'mgmt-token',
-  sanityOrganizationId: 'org-abc',
-  vercelToken: 'v-token',
-  vercelTeamId: undefined,
-  vercelWebProjectId: 'prj_web',
-  adminAppBaseUrl: 'https://admin.example.com',
-  tenantSanityDataset: 'test-dataset',
-  webAppBaseUrl: 'https://example.com',
-  revalidateSecret: 'revalidate-shh',
-};
-
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return makeTenant({
-    primaryDomain: TENANT_DOMAIN,
-    sanityProjectId: 'proj123',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'enc',
-    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    seededAt: new Date(),
-    ...overrides,
-  });
-}
+const { vercelToken, vercelWebProjectId } = MOCK_PROVISION_ENV;
 
 beforeEach(() => {
   listVercelProjectDomainsMock.mockReset();
@@ -52,31 +32,37 @@ describe(mapTenantDomain, () => {
   let tenant: TTenant;
 
   beforeEach(() => {
-    tenant = baseTenant();
+    tenant = mockProvisionedTenant({
+      sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      seededAt: new Date(),
+    });
   });
 
   it('adds the domain to the shared web project when not already registered', async () => {
     listVercelProjectDomainsMock.mockResolvedValue([
       { name: 'other-tenant.example.com' },
     ]);
-    await mapTenantDomain(tenant, env);
+    await mapTenantDomain(tenant, MOCK_PROVISION_ENV);
 
     expect(listVercelProjectDomainsMock).toHaveBeenCalledWith({
-      token: 'v-token',
+      token: vercelToken,
       teamId: undefined,
-      projectId: 'prj_web',
+      projectId: vercelWebProjectId,
     });
     expect(addVercelProjectDomainMock).toHaveBeenCalledWith({
-      token: 'v-token',
+      token: vercelToken,
       teamId: undefined,
-      projectId: 'prj_web',
-      domain: TENANT_DOMAIN,
+      projectId: vercelWebProjectId,
+      domain: MOCK_TENANT_DOMAIN,
     });
   });
 
   it('skips adding the domain when already registered on the project', async () => {
-    listVercelProjectDomainsMock.mockResolvedValue([{ name: TENANT_DOMAIN }]);
-    await mapTenantDomain(tenant, env);
+    listVercelProjectDomainsMock.mockResolvedValue([
+      { name: MOCK_TENANT_DOMAIN },
+    ]);
+    await mapTenantDomain(tenant, MOCK_PROVISION_ENV);
 
     expect(addVercelProjectDomainMock).not.toHaveBeenCalled();
   });

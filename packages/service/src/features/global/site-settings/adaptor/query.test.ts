@@ -1,10 +1,15 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  BRAND_TAGLINE_SEPARATORS,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { localizedStrings } from '@blog/service/testing/shared/localized';
+import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
 
 import { siteSettingsQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+const BUILD_ITEM = 'build 2026.07';
 
 const siteSettingsDocument = {
   _id: 'settings_site',
@@ -18,15 +23,15 @@ const siteSettingsDocument = {
         {
           _key: 'item-1',
           _type: 'brandTaglineItem',
-          text: localizedStrings({ [EN]: 'online', [NL]: 'actief' }),
+          text: mockLocalizedStrings({ [EN]: 'online', [NL]: 'actief' }),
         },
         {
           _key: 'item-2',
           _type: 'brandTaglineItem',
-          text: localizedStrings({ [EN]: 'build 2026.07' }),
+          text: mockLocalizedStrings({ [EN]: BUILD_ITEM }),
         },
       ],
-      separator: 'DOT',
+      separator: BRAND_TAGLINE_SEPARATORS.DOT,
     },
   },
   currency: 'USD',
@@ -49,7 +54,7 @@ describe('siteSettingsQuery', () => {
 
     expect(settings.brand.tagline?.items).toEqual([
       { _key: 'item-1', text: 'actief' },
-      { _key: 'item-2', text: 'build 2026.07' },
+      { _key: 'item-2', text: BUILD_ITEM },
     ]);
   });
 
@@ -58,7 +63,7 @@ describe('siteSettingsQuery', () => {
 
     expect(settings.brand.tagline?.items).toEqual([
       { _key: 'item-1', text: 'online' },
-      { _key: 'item-2', text: 'build 2026.07' },
+      { _key: 'item-2', text: BUILD_ITEM },
     ]);
   });
 });

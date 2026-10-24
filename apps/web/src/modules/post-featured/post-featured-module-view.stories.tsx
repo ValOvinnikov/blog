@@ -1,11 +1,11 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
-const leadItem = makePostListItem({
+const leadItem = mockPostListItem({
   id: 'post-1',
   href: '/blog/building-a-design-system',
   title: 'Building a Design System from Scratch',
@@ -14,7 +14,7 @@ const leadItem = makePostListItem({
   topic: { title: 'Design systems' },
 });
 
-const secondItem = makePostListItem({
+const secondItem = mockPostListItem({
   id: 'post-2',
   href: '/blog/typescript-tips',
   title: 'TypeScript Tips for 2026',
@@ -22,7 +22,7 @@ const secondItem = makePostListItem({
   topic: { title: 'TypeScript' },
 });
 
-const thirdItem = makePostListItem({
+const thirdItem = mockPostListItem({
   id: 'post-3',
   href: '/blog/accessible-forms',
   title: 'Designing Accessible Forms',
@@ -61,7 +61,7 @@ const meta = {
   },
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({ heading: 'Featured' }),
+    headingBlock: mockHeadingBlock({ heading: 'Featured' }),
     items: [leadItem, secondItem, thirdItem],
     layout: undefined,
     contentAlignment: undefined,

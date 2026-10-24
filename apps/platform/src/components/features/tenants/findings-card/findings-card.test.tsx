@@ -1,6 +1,6 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockFinding } from '@platform/testing/findings/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { FindingsCard } from './findings-card';
 
@@ -13,7 +13,7 @@ const render = renderWithIntl;
 describe(FindingsCard, () => {
   describe('with no findings', () => {
     beforeEach(() => {
-      render(<FindingsCard tenantId={TENANT_ID} findings={[]} />);
+      render(<FindingsCard tenantId={MOCK_TENANT_ID} findings={[]} />);
     });
 
     it("nests the card's title one level under the page's own h1", () => {
@@ -32,7 +32,9 @@ describe(FindingsCard, () => {
   });
 
   it('renders a finding with its source, kind and severity', () => {
-    render(<FindingsCard tenantId={TENANT_ID} findings={[makeFinding()]} />);
+    render(
+      <FindingsCard tenantId={MOCK_TENANT_ID} findings={[mockFinding()]} />,
+    );
 
     expect(screen.getByText('Tenant provisioning')).toBeVisible();
     expect(screen.getByText('Provisioning step failed')).toBeVisible();
@@ -42,10 +44,10 @@ describe(FindingsCard, () => {
   it('renders a Details disclosure only when the finding carries details', () => {
     render(
       <FindingsCard
-        tenantId={TENANT_ID}
+        tenantId={MOCK_TENANT_ID}
         findings={[
-          makeFinding({ id: 'finding-1', hasDetails: true }),
-          makeFinding({ id: 'finding-2', hasDetails: false }),
+          mockFinding({ id: 'finding-1', hasDetails: true }),
+          mockFinding({ id: 'finding-2', hasDetails: false }),
         ]}
       />,
     );

@@ -1,4 +1,5 @@
 import type { TFieldErrors } from '@blog/config';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,
@@ -18,17 +19,13 @@ export type TContactFieldErrors = TFieldErrors<
   TFieldErrorReason
 >;
 
-type TContactMessageValidation =
-  | { ok: true; data: TContactMessageFields }
-  | { ok: false; fieldErrors: TContactFieldErrors };
-
 // The name becomes the notification email's subject, a mail header.
 const normalizeName = (name: string): string =>
   name.replace(/[\r\n]+/g, ' ').trim();
 
 export const validateContactMessage = (
   fields: TContactMessageFields,
-): TContactMessageValidation => {
+): TResult<TContactMessageFields, TContactFieldErrors> => {
   const name = normalizeName(fields.name);
   const email = fields.email.trim();
   const message = fields.message.trim();
@@ -48,6 +45,6 @@ export const validateContactMessage = (
   }
 
   return Object.keys(fieldErrors).length > 0
-    ? { ok: false, fieldErrors }
-    : { ok: true, data: { name, email, message } };
+    ? errorResult(fieldErrors)
+    : okResult({ name, email, message });
 };

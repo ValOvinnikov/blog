@@ -6,17 +6,18 @@ import {
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND, TENANT_STATUS } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
-  BLOCK_REASON,
-  BLOCKED_ADDRESS_HASH,
-  BLOCKED_OWNER_EMAIL,
-  makeBlockedIdentity,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_OWNER_EMAIL,
+  MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+  mockBlockedAddressIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -73,16 +74,12 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const ADMIN = makeAdmin();
-const ENTRY = makeBlockedIdentity({
-  kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-  value: BLOCKED_ADDRESS_HASH,
-});
-const OWNER_EMAIL = BLOCKED_OWNER_EMAIL;
+const ADMIN = mockAdmin();
+const OWNER_EMAIL = MOCK_BLOCKED_OWNER_EMAIL;
 const UNDO_FAILURE = new Error('delete failed');
 
 const ACTIVE_TENANT = {
-  id: TENANT_ID,
+  id: MOCK_TENANT_ID,
   name: 'Acme',
   status: TENANT_STATUS.ACTIVE,
   deprovisionedAt: null,
@@ -97,15 +94,15 @@ describe('tenant suspension actions', () => {
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(ACTIVE_TENANT);
     setTenantSuspensionMock.mockReset();
-    setTenantSuspensionMock.mockResolvedValue({ ok: true, data: {} });
+    setTenantSuspensionMock.mockResolvedValue(okResult({}));
     getTenantOwnerEmailMock.mockReset().mockResolvedValue(OWNER_EMAIL);
     saveSignupBlockMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: { entry: ENTRY, created: true } });
+      .mockResolvedValue(
+        okResult({ entry: mockBlockedAddressIdentity(), created: true }),
+      );
     recordSignupBlockAddedMock.mockReset();
-    removeBlockedIdentityMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: undefined });
+    removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     vi.mocked(logger.error).mockReset();
     recordAuditEventMock.mockReset();
     revalidateSiteConfigMock.mockReset();
@@ -199,10 +196,9 @@ describe('tenant suspension actions', () => {
   );
 
   it('refuses when the tenant is archived before the write lands', async () => {
-    setTenantSuspensionMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    setTenantSuspensionMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await actions.suspendTenantAction(ACTIVE_TENANT.id);
 
@@ -224,11 +220,11 @@ describe('tenant suspension actions', () => {
   });
 
   describe('when the operator also blocks the owner email', () => {
-    const OWNER_BLOCK = { reason: BLOCK_REASON };
+    const OWNER_BLOCK = { reason: MOCK_BLOCK_REASON };
     const SAVED_BLOCK = {
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
       identity: OWNER_EMAIL,
-      reason: BLOCK_REASON,
+      reason: MOCK_BLOCK_REASON,
       admin: ADMIN,
     };
 
@@ -244,8 +240,8 @@ describe('tenant suspension actions', () => {
         TENANT_STATUS.SUSPENDED,
       );
       expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
-        ENTRY,
-        BLOCK_REASON,
+        mockBlockedAddressIdentity(),
+        MOCK_BLOCK_REASON,
       );
       expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -253,17 +249,16 @@ describe('tenant suspension actions', () => {
 
     it('trims the reason before storing it', async () => {
       await actions.suspendTenantAction(ACTIVE_TENANT.id, {
-        reason: `  ${BLOCK_REASON}  `,
+        reason: `  ${MOCK_BLOCK_REASON}  `,
       });
 
       expect(saveSignupBlockMock).toHaveBeenCalledWith(SAVED_BLOCK);
     });
 
     it('does not audit a block that was already on the list', async () => {
-      saveSignupBlockMock.mockResolvedValue({
-        ok: true,
-        data: { entry: ENTRY, created: false },
-      });
+      saveSignupBlockMock.mockResolvedValue(
+        okResult({ entry: mockBlockedAddressIdentity(), created: false }),
+      );
 
       const result = await actions.suspendTenantAction(
         ACTIVE_TENANT.id,
@@ -304,10 +299,9 @@ describe('tenant suspension actions', () => {
     });
 
     it('fails without suspending when the block cannot be stored', async () => {
-      saveSignupBlockMock.mockResolvedValue({
-        ok: false,
-        error: ERROR_CODE.DB_INVALID_EMAIL,
-      });
+      saveSignupBlockMock.mockResolvedValue(
+        errorResult(ERROR_CODE.DB_INVALID_EMAIL),
+      );
 
       const result = await actions.suspendTenantAction(
         ACTIVE_TENANT.id,
@@ -332,10 +326,9 @@ describe('tenant suspension actions', () => {
         [
           'is refused',
           () =>
-            setTenantSuspensionMock.mockResolvedValue({
-              ok: false,
-              error: ERROR_CODE.DB_NOT_FOUND,
-            }),
+            setTenantSuspensionMock.mockResolvedValue(
+              errorResult(ERROR_CODE.DB_NOT_FOUND),
+            ),
           { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED },
         ],
         [
@@ -354,7 +347,9 @@ describe('tenant suspension actions', () => {
           );
 
           expect(result).toEqual(expected);
-          expect(removeBlockedIdentityMock).toHaveBeenCalledWith(ENTRY.id);
+          expect(removeBlockedIdentityMock).toHaveBeenCalledWith(
+            MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+          );
           expect(recordSignupBlockAddedMock).not.toHaveBeenCalled();
           expect(recordAuditEventMock).not.toHaveBeenCalled();
         },
@@ -372,20 +367,18 @@ describe('tenant suspension actions', () => {
         expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
         expect(recordSignupBlockAddedMock).toHaveBeenCalledTimes(1);
         expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
-          ENTRY,
-          BLOCK_REASON,
+          mockBlockedAddressIdentity(),
+          MOCK_BLOCK_REASON,
         );
       });
 
       it('keeps a block that was already on the list', async () => {
-        saveSignupBlockMock.mockResolvedValue({
-          ok: true,
-          data: { entry: ENTRY, created: false },
-        });
-        setTenantSuspensionMock.mockResolvedValue({
-          ok: false,
-          error: ERROR_CODE.DB_NOT_FOUND,
-        });
+        saveSignupBlockMock.mockResolvedValue(
+          okResult({ entry: mockBlockedAddressIdentity(), created: false }),
+        );
+        setTenantSuspensionMock.mockResolvedValue(
+          errorResult(ERROR_CODE.DB_NOT_FOUND),
+        );
 
         await actions.suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
@@ -396,10 +389,9 @@ describe('tenant suspension actions', () => {
         [
           'returns an error',
           () =>
-            removeBlockedIdentityMock.mockResolvedValue({
-              ok: false,
-              error: ERROR_CODE.DB_NOT_FOUND,
-            }),
+            removeBlockedIdentityMock.mockResolvedValue(
+              errorResult(ERROR_CODE.DB_NOT_FOUND),
+            ),
           { error: ERROR_CODE.DB_NOT_FOUND },
         ],
         [
@@ -410,10 +402,9 @@ describe('tenant suspension actions', () => {
       ])(
         'logs once without the address and keeps the failure when the undo %s',
         async (_, failUndo, loggedError) => {
-          setTenantSuspensionMock.mockResolvedValue({
-            ok: false,
-            error: ERROR_CODE.DB_NOT_FOUND,
-          });
+          setTenantSuspensionMock.mockResolvedValue(
+            errorResult(ERROR_CODE.DB_NOT_FOUND),
+          );
           failUndo();
 
           const result = await actions.suspendTenantAction(
@@ -427,7 +418,10 @@ describe('tenant suspension actions', () => {
             reason: TENANT_REFUSAL.ARCHIVED,
           });
           expect(logger.error).toHaveBeenCalledTimes(1);
-          expect(context).toEqual({ entryId: ENTRY.id, ...loggedError });
+          expect(context).toEqual({
+            entryId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+            ...loggedError,
+          });
         },
       );
     });

@@ -899,6 +899,7 @@
       "localeIsAdditional": "Deze taal is al een extra taal. Verwijder deze daar eerst.",
       "provisioningStarted": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
       "ownerAlreadyJoined": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
+      "ownerHasFreeTenant": "Deze eigenaar heeft al een gratis site. Archiveer die of laat deze site op het huidige abonnement.",
       "saveFailed": "De tenantgegevens konden niet worden opgeslagen — probeer het opnieuw."
     }
   },

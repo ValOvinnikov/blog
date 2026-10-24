@@ -1,7 +1,7 @@
 import { KEY_ENCODING } from './crypto-encoding';
 import {
-  OTHER_TEST_ENCRYPTION_KEY as KEY_V2,
-  TEST_ENCRYPTION_KEY as KEY_V1,
+  MOCK_OTHER_ENCRYPTION_KEY as KEY_V2,
+  MOCK_ENCRYPTION_KEY as KEY_V1,
 } from './encryption-fixtures';
 import {
   decryptPersonalData,
@@ -88,17 +88,22 @@ describe(encryptPersonalData, () => {
 });
 
 describe(decryptPersonalData, () => {
-  it('decrypts a value stored under an older key version with that key', () => {
-    const encrypted = encryptPersonalData(ADDRESS, KEYRING_V1);
+  describe('with a value stored under the v1 key', () => {
+    let encrypted: string;
 
-    expect(decryptPersonalData(encrypted, KEYRING_V2)).toBe(ADDRESS);
-  });
+    beforeEach(() => {
+      encrypted = encryptPersonalData(ADDRESS, KEYRING_V1);
+    });
 
-  it('rejects a value when its version maps to the wrong key', () => {
-    const encrypted = encryptPersonalData(ADDRESS, KEYRING_V1);
-    const wrongKeyring = parsePersonalDataKeyring(`v1:${KEY_V2}`);
+    it('decrypts it with a keyring that keeps v1 as an older version', () => {
+      expect(decryptPersonalData(encrypted, KEYRING_V2)).toBe(ADDRESS);
+    });
 
-    expect(() => decryptPersonalData(encrypted, wrongKeyring)).toThrow();
+    it('rejects it when v1 maps to the wrong key', () => {
+      const wrongKeyring = parsePersonalDataKeyring(`v1:${KEY_V2}`);
+
+      expect(() => decryptPersonalData(encrypted, wrongKeyring)).toThrow();
+    });
   });
 
   it.each([

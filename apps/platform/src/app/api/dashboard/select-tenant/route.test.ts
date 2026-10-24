@@ -2,7 +2,7 @@ import { HTTP_STATUS } from '@blog/config';
 import { MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { Session } from 'next-auth';
 
 const { getMembershipMock, getAdminByUserIdMock, listTenantsByIdsMock } =
@@ -47,13 +47,13 @@ describe('GET /api/dashboard/select-tenant', () => {
 
     const response = await GET(
       new Request(
-        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
       ),
     );
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(response.headers.get('location')).toBe(
-      `https://admin.example.com/api/auth/signin?callbackUrl=%2Fapi%2Fdashboard%2Fselect-tenant%3FtenantId%3D${TENANT_ID}`,
+      `https://admin.example.com/api/auth/signin?callbackUrl=%2Fapi%2Fdashboard%2Fselect-tenant%3FtenantId%3D${MOCK_TENANT_ID}`,
     );
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
@@ -89,18 +89,20 @@ describe('GET /api/dashboard/select-tenant', () => {
     getMembershipMock.mockResolvedValue({
       id: 'm-1',
       userId: 'user-1',
-      tenantId: TENANT_ID,
+      tenantId: MOCK_TENANT_ID,
       role: MEMBERSHIP_ROLE.OWNER,
     });
 
     const response = await GET(
       new Request(
-        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
       ),
     );
 
     expect(response.headers.get('location')).toBe(DASHBOARD_URL);
-    expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(TENANT_ID);
+    expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(
+      MOCK_TENANT_ID,
+    );
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
@@ -128,17 +130,19 @@ describe('GET /api/dashboard/select-tenant', () => {
     });
 
     it('sets the cookie and redirects to /dashboard for a SUPERADMIN with no membership', async () => {
-      listTenantsByIdsMock.mockResolvedValue([{ id: TENANT_ID }]);
+      listTenantsByIdsMock.mockResolvedValue([{ id: MOCK_TENANT_ID }]);
 
       const response = await GET(
         new Request(
-          `https://admin.example.com/api/dashboard/select-tenant?tenantId=${TENANT_ID}`,
+          `https://admin.example.com/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
         ),
       );
 
-      expect(listTenantsByIdsMock).toHaveBeenCalledWith([TENANT_ID]);
+      expect(listTenantsByIdsMock).toHaveBeenCalledWith([MOCK_TENANT_ID]);
       expect(response.headers.get('location')).toBe(DASHBOARD_URL);
-      expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(TENANT_ID);
+      expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(
+        MOCK_TENANT_ID,
+      );
     });
   });
 });

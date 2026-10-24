@@ -1,24 +1,23 @@
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config/constants';
+import { mockRawPostListModule } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
-  BRAND_VARIANT,
-  CONTAINER_WIDTH,
-  CONTENT_ALIGNMENT,
-} from '@blog/config';
-import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
+  MOCK_POST_ID,
+  mockRawWideLayout,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toPostListModule, type TRawPostListModulePosts } from './transformer';
 
 const rawPosts: TRawPostListModulePosts = [];
 const pagination = { currentPage: 1, totalPages: 1 };
 
-describe('toPostListModule', () => {
-  let raw: ReturnType<typeof makeRawPostListModule>;
-
-  beforeEach(() => {
-    raw = makeRawPostListModule();
-  });
-
+describe(toPostListModule, () => {
   it('maps headingBlock straight through', () => {
-    const module = toPostListModule(raw, rawPosts, pagination);
+    const module = toPostListModule(
+      mockRawPostListModule(),
+      rawPosts,
+      pagination,
+    );
 
     expect(module.headingBlock).toEqual({
       heading: 'Latest',
@@ -26,93 +25,60 @@ describe('toPostListModule', () => {
     });
   });
 
-  it('maps brandVariant straight through', () => {
-    raw = makeRawPostListModule({
-      brandVariant: BRAND_VARIANT.SECONDARY,
-    });
+  it.each([
+    { brandVariant: BRAND_VARIANT.SECONDARY },
+    { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+    { showImages: true },
+    { showImages: false },
+  ])('maps an authored %o straight through', (authored) => {
+    const module = toPostListModule(
+      mockRawPostListModule(authored),
+      rawPosts,
+      pagination,
+    );
 
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+    expect(module).toMatchObject(authored);
   });
 
-  it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    raw = makeRawPostListModule({ contentAlignment: null });
+  it.each([
+    [{ contentAlignment: null }, { contentAlignment: undefined }],
+    [{ layout: null }, { layout: undefined }],
+  ])('maps an unset %o to %o', (unset, expected) => {
+    const module = toPostListModule(
+      mockRawPostListModule(unset),
+      rawPosts,
+      pagination,
+    );
 
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.contentAlignment).toBeUndefined();
-  });
-
-  it('maps contentAlignment when authored', () => {
-    raw = makeRawPostListModule({
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
+    expect(module).toMatchObject(expected);
   });
 
   it('maps a fully-authored layout object 1:1', () => {
-    raw = makeRawPostListModule({
-      layout: {
-        spacingTop: 'MD',
-        spacingBottom: 'MD',
-        containerWidth: CONTAINER_WIDTH.WIDE,
-        dividerTop: true,
-        dividerBottom: true,
-      },
-    });
+    const layout = mockRawWideLayout();
+    const raw = mockRawPostListModule({ layout });
 
     const module = toPostListModule(raw, rawPosts, pagination);
 
-    expect(module.layout).toEqual({
-      spacingTop: 'MD',
-      spacingBottom: 'MD',
-      containerWidth: CONTAINER_WIDTH.WIDE,
-      dividerTop: true,
-      dividerBottom: true,
-    });
+    expect(module.layout).toEqual(layout);
   });
 
-  it('leaves layout undefined when the field is unset (no faked default)', () => {
-    raw = makeRawPostListModule({ layout: null });
+  it('maps each post to a post card', () => {
+    const module = toPostListModule(
+      mockRawPostListModule(),
+      [mockRawPostCard()],
+      pagination,
+    );
 
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.layout).toBeUndefined();
+    expect(module.posts.map((p) => p.id)).toEqual([MOCK_POST_ID]);
   });
 
-  it('maps posts through toPostCard', () => {
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.posts).toEqual([]);
-  });
-
-  it('maps currentPage/totalPages straight through', () => {
-    const module = toPostListModule(raw, rawPosts, {
+  it('maps currentPage and totalPages straight through', () => {
+    const module = toPostListModule(mockRawPostListModule(), rawPosts, {
       currentPage: 2,
       totalPages: 5,
     });
 
     expect(module.currentPage).toBe(2);
     expect(module.totalPages).toBe(5);
-  });
-
-  it('passes showImages through when true', () => {
-    raw = makeRawPostListModule({ showImages: true });
-
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.showImages).toBe(true);
-  });
-
-  it('passes showImages through when false', () => {
-    raw = makeRawPostListModule({ showImages: false });
-
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.showImages).toBe(false);
   });
 });

@@ -1,14 +1,27 @@
 import {
+  ACTION_OUTCOME,
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeContactFormModule } from '@web/testing/modules/contact-form/fixtures';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import type { TSubmitContactMessage } from '@web/modules/contact-form/hooks/use-contact-form/use-contact-form';
+import { mockContactFormModule } from '@web/testing/modules/contact-form/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { ContactFormModuleView } from './contact-form-module-view';
+
+type TSendOutcome =
+  typeof ACTION_OUTCOME.SUCCESS | typeof ACTION_OUTCOME.SERVER_ERROR;
+
+const sendAfter =
+  (outcome: TSendOutcome): TSubmitContactMessage =>
+  async () => {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    return { outcome };
+  };
 
 const meta = {
   title: 'Modules/ContactFormModule',
@@ -29,8 +42,9 @@ const meta = {
     id: faker.string.uuid(),
     currentLocale: LOCALE_ISO_CODES.EN,
     defaultLocale: LOCALE_ISO_CODES.EN,
-    ...makeContactFormModule({
-      privacyNote: [portableTextBlock(faker.lorem.sentence())],
+    submitMessage: sendAfter(ACTION_OUTCOME.SUCCESS),
+    ...mockContactFormModule({
+      privacyNote: [mockPortableTextBlock(faker.lorem.sentence())],
     }),
   },
 } satisfies Meta<typeof ContactFormModuleView>;
@@ -50,4 +64,8 @@ export const Centered: TStory = {
 
 export const WithoutPrivacyNote: TStory = {
   args: { privacyNote: undefined },
+};
+
+export const SendFails: TStory = {
+  args: { submitMessage: sendAfter(ACTION_OUTCOME.SERVER_ERROR) },
 };

@@ -7,11 +7,11 @@ import {
   useFetchFake,
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
 import {
-  SANITY_EXPECTED_URL,
-  SANITY_INVITE_EMAIL,
-  SANITY_INVITE_ID,
-  SANITY_PROJECT_USER_ID,
-  withSanityProject,
+  MOCK_SANITY_EXPECTED_URL,
+  MOCK_SANITY_INVITE_EMAIL,
+  MOCK_SANITY_INVITE_ID,
+  MOCK_SANITY_PROJECT_USER_ID,
+  mockSanityProjectInput,
 } from '@blog/db/testing/sanity-management-client/fixtures';
 
 import {
@@ -22,44 +22,48 @@ import {
   listSanityProjectInvites,
 } from './sanity-project-access';
 
-const createInviteInput = withSanityProject({
-  email: SANITY_INVITE_EMAIL,
+const createInviteInput = mockSanityProjectInput({
+  email: MOCK_SANITY_INVITE_EMAIL,
   role: SANITY_PROJECT_ROLE.EDITOR,
 });
-const grantRoleInput = withSanityProject({
-  projectUserId: SANITY_PROJECT_USER_ID,
+const grantRoleInput = mockSanityProjectInput({
+  projectUserId: MOCK_SANITY_PROJECT_USER_ID,
   role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
 });
+
+const MOCK_ERROR_BODY = 'nope';
 
 const fetchMock = useFetchFake();
 
 describe(listSanityProjectInvites, () => {
   it('GETs pending and accepted invites, unwrapping the `data` envelope', async () => {
-    const invites = [{ email: SANITY_INVITE_EMAIL, status: 'pending' }];
+    const invites = [{ email: MOCK_SANITY_INVITE_EMAIL, status: 'pending' }];
     fetchMock.mockResolvedValue(
       jsonResponse({ data: invites, nextCursor: null }),
     );
 
-    const result = await listSanityProjectInvites(withSanityProject({}));
+    const result = await listSanityProjectInvites(mockSanityProjectInput({}));
 
     const { url, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(invites);
-    expect(url).toBe(SANITY_EXPECTED_URL.pendingAndAcceptedInvites);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.pendingAndAcceptedInvites);
     expect(method).toBe(HTTP_METHOD.GET);
   });
 
   it('accepts a bare array response with no envelope', async () => {
-    const invites = [{ email: SANITY_INVITE_EMAIL, status: 'accepted' }];
+    const invites = [{ email: MOCK_SANITY_INVITE_EMAIL, status: 'accepted' }];
     fetchMock.mockResolvedValue(jsonResponse(invites));
 
-    const result = await listSanityProjectInvites(withSanityProject({}));
+    const result = await listSanityProjectInvites(mockSanityProjectInput({}));
 
     expect(result).toEqual(invites);
   });
 });
 
 describe(deleteSanityProjectInvite, () => {
-  const deleteInviteInput = withSanityProject({ inviteId: SANITY_INVITE_ID });
+  const deleteInviteInput = mockSanityProjectInput({
+    inviteId: MOCK_SANITY_INVITE_ID,
+  });
 
   it('DELETEs the invite by id', async () => {
     fetchMock.mockResolvedValue(emptyResponse(HTTP_STATUS.NO_CONTENT));
@@ -67,7 +71,7 @@ describe(deleteSanityProjectInvite, () => {
     await deleteSanityProjectInvite(deleteInviteInput);
 
     const { url, method } = firstFetchCall(fetchMock);
-    expect(url).toBe(SANITY_EXPECTED_URL.invite);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.invite);
     expect(method).toBe(HTTP_METHOD.DELETE);
   });
 
@@ -80,7 +84,9 @@ describe(deleteSanityProjectInvite, () => {
   });
 
   it('throws on any other failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', HTTP_STATUS.FORBIDDEN));
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
+    );
 
     await expect(deleteSanityProjectInvite(deleteInviteInput)).rejects.toThrow(
       new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
@@ -97,7 +103,7 @@ describe(createSanityProjectInvite, () => {
     await createSanityProjectInvite(createInviteInput);
 
     const { url, body, method } = firstFetchCall(fetchMock);
-    expect(url).toBe(SANITY_EXPECTED_URL.invites);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.invites);
     expect(method).toBe(HTTP_METHOD.POST);
     expect(body).toEqual({
       email: createInviteInput.email,
@@ -105,13 +111,13 @@ describe(createSanityProjectInvite, () => {
     });
   });
 
-  it('throws with the response status and body on failure', async () => {
+  it('throws with the response status when the invite is refused', async () => {
     fetchMock.mockResolvedValue(
-      textResponse('nope', HTTP_STATUS.PAYMENT_REQUIRED),
+      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.PAYMENT_REQUIRED),
     );
 
     await expect(createSanityProjectInvite(createInviteInput)).rejects.toThrow(
-      /402/,
+      new RegExp(`${HTTP_STATUS.PAYMENT_REQUIRED}`),
     );
   });
 });
@@ -120,27 +126,29 @@ describe(listSanityProjectAcl, () => {
   it('GETs the project-scoped acl endpoint and returns the list', async () => {
     const acl = [
       {
-        projectUserId: SANITY_PROJECT_USER_ID,
+        projectUserId: MOCK_SANITY_PROJECT_USER_ID,
         roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
         isRobot: false,
       },
     ];
     fetchMock.mockResolvedValue(jsonResponse(acl));
 
-    const result = await listSanityProjectAcl(withSanityProject({}));
+    const result = await listSanityProjectAcl(mockSanityProjectInput({}));
 
     const { url, method } = firstFetchCall(fetchMock);
     expect(result).toEqual(acl);
-    expect(url).toBe(SANITY_EXPECTED_URL.acl);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.acl);
     expect(method).toBe(HTTP_METHOD.GET);
   });
 
-  it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', HTTP_STATUS.FORBIDDEN));
-
-    await expect(listSanityProjectAcl(withSanityProject({}))).rejects.toThrow(
-      new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
+  it('throws with the response status when the acl read fails', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
     );
+
+    await expect(
+      listSanityProjectAcl(mockSanityProjectInput({})),
+    ).rejects.toThrow(new RegExp(`${HTTP_STATUS.FORBIDDEN}`));
   });
 });
 
@@ -148,7 +156,7 @@ describe(grantSanityProjectRole, () => {
   it('PUTs the roleName to the legacy acl endpoint keyed on projectUserId', async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(
-        { projectUserId: SANITY_PROJECT_USER_ID },
+        { projectUserId: MOCK_SANITY_PROJECT_USER_ID },
         HTTP_STATUS.CREATED,
       ),
     );
@@ -156,13 +164,15 @@ describe(grantSanityProjectRole, () => {
     await grantSanityProjectRole(grantRoleInput);
 
     const { url, body, method } = firstFetchCall(fetchMock);
-    expect(url).toBe(SANITY_EXPECTED_URL.aclEntry);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.aclEntry);
     expect(method).toBe(HTTP_METHOD.PUT);
     expect(body).toEqual({ roleName: grantRoleInput.role });
   });
 
-  it('throws with the response status and body on failure', async () => {
-    fetchMock.mockResolvedValue(textResponse('nope', HTTP_STATUS.FORBIDDEN));
+  it('throws with the response status when the grant fails', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
+    );
 
     await expect(grantSanityProjectRole(grantRoleInput)).rejects.toThrow(
       new RegExp(`${HTTP_STATUS.FORBIDDEN}`),

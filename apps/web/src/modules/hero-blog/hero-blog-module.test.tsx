@@ -1,12 +1,14 @@
-import { getRequestContext } from '@web/server/request-context/request-context';
+import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
-  makeHeroBlogData,
-  makeStaleUnresolvedHeroBlogData,
-  makeUnresolvedHeroBlogData,
+  MOCK_HERO_BLOG_MODULE_ID,
+  mockHeroBlogData,
+  mockStaleUnresolvedHeroBlogData,
+  mockUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModule } from './hero-blog-module';
@@ -25,46 +27,33 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const HERO_BLOG_ID = 'hero-blog-1';
 const POST_HEADING = 'Hello World';
 const POST_UNRESOLVED_EVENT = 'hero_blog_module.post_unresolved';
 
 const setup = customRenderAsync(HeroBlogModule, {
-  id: HERO_BLOG_ID,
+  id: MOCK_HERO_BLOG_MODULE_ID,
 });
 
 describe(`<${HeroBlogModule.name}/>`, () => {
   beforeEach(() => {
     getHeroBlogMock.mockReset();
-    getRequestContextMock.mockReset();
-    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('forwards the resolved tenant Sanity context to getHeroBlog', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroBlogData(),
-    });
+  it('fetches the module with the resolved tenant Sanity context', async () => {
+    getHeroBlogMock.mockResolvedValue(okResult(mockHeroBlogData()));
 
     await setup();
 
-    expect(getHeroBlogMock).toHaveBeenCalledWith(HERO_BLOG_ID, tenant);
+    expect(getHeroBlogMock).toHaveBeenCalledWith(
+      MOCK_HERO_BLOG_MODULE_ID,
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getHeroBlogMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getHeroBlogMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
@@ -72,37 +61,42 @@ describe(`<${HeroBlogModule.name}/>`, () => {
   });
 
   it('renders the resolved heading', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroBlogData({ heading: POST_HEADING }),
-    });
+    getHeroBlogMock.mockResolvedValue(
+      okResult(mockHeroBlogData({ heading: POST_HEADING })),
+    );
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: POST_HEADING }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: POST_HEADING,
+    });
+    expect(heading).toBeVisible();
   });
 
-  it('logs and renders nothing when no post resolves', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeUnresolvedHeroBlogData(),
-    });
+  it.each([
+    { result: 'no post resolves', data: mockUnresolvedHeroBlogData() },
+    {
+      result: 'a stale unresolved result carries a heading',
+      data: mockStaleUnresolvedHeroBlogData(
+        'Stale hero title left over from an unpublished post',
+      ),
+    },
+  ])('logs and renders nothing when $result', async ({ data }) => {
+    getHeroBlogMock.mockResolvedValue(okResult(data));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
     expect(loggerErrorMock).toHaveBeenCalledWith(POST_UNRESOLVED_EVENT, {
-      id: HERO_BLOG_ID,
+      id: MOCK_HERO_BLOG_MODULE_ID,
     });
   });
 
-  it('renders nothing without an error log when the post has no version in the request language', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeUnresolvedHeroBlogData({ isPostUntranslated: true }),
-    });
+  it('renders nothing, unlogged, when the post lacks the request language', async () => {
+    getHeroBlogMock.mockResolvedValue(
+      okResult(mockUnresolvedHeroBlogData({ isPostUntranslated: true })),
+    );
 
     const { container } = await setup();
 
@@ -110,32 +104,15 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('logs and renders nothing for a stale hasPost: false result carrying a heading', async () => {
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeStaleUnresolvedHeroBlogData(
-        'Stale hero title left over from an unpublished post',
-      ),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-    expect(loggerErrorMock).toHaveBeenCalledWith(POST_UNRESOLVED_EVENT, {
-      id: HERO_BLOG_ID,
-    });
-  });
-
   it('renders the hero image resolving through the Sanity CDN', async () => {
-    const sanityImage = makeSanityImage();
-    getHeroBlogMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroBlogData({ sanityImage }),
-    });
+    const sanityImage = mockSanityImage();
+    getHeroBlogMock.mockResolvedValue(
+      okResult(mockHeroBlogData({ sanityImage })),
+    );
 
     await setup();
 
-    const img = screen.getByRole('img', { name: sanityImage.alt });
-    expect(img.getAttribute('src')).toContain('cdn.sanity.io');
+    const image = screen.getByRole('img', { name: sanityImage.alt });
+    expect(image.getAttribute('src')).toContain('cdn.sanity.io');
   });
 });

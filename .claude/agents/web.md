@@ -414,6 +414,9 @@ its turn.
   fixed in passing in files the diff touches, and what you found and left,
   each with `file:line` (CLAUDE.md → "Examine before you change"). Write
   "nothing found" only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - Routes created or changed, and the metadata wired (title, description, OG,
   canonical).
 - ISR tags consumed from the service layer.

@@ -8,7 +8,9 @@ import {
   DISPLAY_MODE,
   HERO_FIELD_MODE,
   HERO_VARIANT,
+  ICONS,
   LINK_TYPE,
+  LOCALE_ISO_CODES,
   MEDIA_ORDER,
   NEWSLETTER_VARIANT,
   POST_SOURCE,
@@ -43,13 +45,86 @@ import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor
 import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawTimelineModule } from '@blog/service/features/modules/timeline/adaptor/transformer';
 import type { TFaqModuleQuestions } from '@blog/service/shared/adaptors/faq-questions/types';
-import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type {
+  TCtaButton,
+  TRawCtaButton,
+} from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import {
-  makeRawHeadingBlock,
-  makeRawParagraphTextBlock,
-  makeRawPortableTextMarkDef,
-  makeRawSanityImage,
+  MOCK_AUTHOR_ID,
+  MOCK_TOPIC_DESCRIPTION,
+  MOCK_TOPIC_ID,
+  MOCK_TOPIC_SLUG,
+  MOCK_TOPIC_TITLE,
+} from '@blog/service/testing/entities/fixtures';
+import {
+  mockLinkView,
+  mockRawHeadingBlock,
+  mockRawParagraphTextBlock,
+  mockRawPortableTextMarkDef,
+  mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { mockLocalizedHeadingBlock } from '@blog/service/testing/shared/localized';
+
+export const MOCK_MODULE_ID = 'module-1';
+export const MOCK_HERO_EYEBROW = 'Field notes';
+export const MOCK_HERO_IMAGE_ALT = 'Custom alt';
+export const MOCK_FEATURED_POST_ID = 'featured-ref';
+export const MOCK_CONTENT_MODULE_ID = 'content-1';
+export const MOCK_CTA_MODULE_ID = 'cta-1';
+export const MOCK_FAQ_MODULE_ID = 'faq-1';
+export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
+export const MOCK_LOGO_WALL_MODULE_ID = 'logo-wall-1';
+export const MOCK_NEWSLETTER_MODULE_ID = 'newsletter-1';
+export const MOCK_POST_RELATED_MODULE_ID = 'post-related-1';
+export const MOCK_PRICING_MODULE_ID = 'pricing-1';
+export const MOCK_SECTION_PAGES_MODULE_ID = 'section-pages-1';
+export const MOCK_SECTION_PAGES_PARENT_ID = 'page-modules';
+export const MOCK_SECTION_PAGES_PARENT_PATH = 'section-home';
+export const MOCK_STATS_MODULE_ID = 'stats-1';
+export const MOCK_TAXONOMY_LIST_MODULE_ID = 'taxonomy-list-1';
+export const MOCK_TESTIMONIAL_MODULE_ID = 'testimonial-1';
+export const MOCK_TIMELINE_MODULE_ID = 'timeline-1';
+export const MOCK_ENGLISH_MODULE_HEADING = 'Latest posts';
+export const MOCK_DUTCH_MODULE_HEADING = 'Nieuwste berichten';
+const CTA_BUTTON_LABEL = 'Subscribe';
+export const MOCK_CTA_BUTTON_URL = '/newsletter';
+export const MOCK_FAQ_QUESTION_ID = 'block-faq-1';
+export const MOCK_SECOND_FAQ_QUESTION_ID = 'block-faq-2';
+export const MOCK_SECTION_PAGES_HEADING = 'In this section';
+export const MOCK_NEWSLETTER_HEADING = 'Stay in the loop';
+export const MOCK_RECENT_POSTS_HEADING = 'Recent writing';
+export const MOCK_POST_LIST_PAGE_SIZE = 9;
+export const MOCK_UNLIMITED_POSTS_FEATURE = 'Unlimited posts';
+export const MOCK_PRIORITY_SUPPORT_FEATURE = 'Priority support';
+export const MOCK_PRICING_FEATURE_KEY = 'feature-1';
+export const MOCK_SECOND_PRICING_FEATURE_KEY = 'feature-2';
+export const MOCK_PRICING_FOOTNOTE = 'Prices exclude VAT.';
+export const MOCK_PRICING_HIGHLIGHT_LABEL = 'Most popular';
+export const MOCK_PRICING_TIER_DESCRIPTION = 'For growing teams';
+export const MOCK_PRICING_TIER_FOOTNOTE = 'Billed annually';
+export const MOCK_PRICING_TIER_ID = 'tier-pro';
+export const MOCK_PRICING_TIER_NAME = 'Pro';
+
+const FAQ_QUESTION = 'How long does onboarding take?';
+const FAQ_ANSWER = 'Most teams are live within a week.';
+const PERSON_NAME = 'Jamie Rivera';
+const INBOX_SUPPORTING_TEXT = 'Get new posts in your inbox.';
+const SHIP_FASTER = 'Ship faster';
+
+export function mockModuleDocument(
+  fields: { _type: string } & Record<string, unknown>,
+) {
+  return {
+    _id: MOCK_MODULE_ID,
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: mockLocalizedHeadingBlock({
+      [LOCALE_ISO_CODES.EN]: MOCK_ENGLISH_MODULE_HEADING,
+      [LOCALE_ISO_CODES.NL]: MOCK_DUTCH_MODULE_HEADING,
+    }),
+    ...fields,
+  };
+}
 
 type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 type TRawCtaContentMarkDef = NonNullable<
@@ -74,7 +149,7 @@ type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
 type TRawTimelineItemBody = NonNullable<TRawTimelineItem['body']>[number];
 
-export function makeRawHeroModule(
+export function mockRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
 ): TRawHeroModule {
   return {
@@ -95,7 +170,7 @@ export function makeRawHeroModule(
   };
 }
 
-export function makeRawHeroBlogModule(
+export function mockRawHeroBlogModule(
   overrides: Partial<TRawHeroBlogModule> = {},
 ): TRawHeroBlogModule {
   return {
@@ -118,14 +193,14 @@ export function makeRawHeroBlogModule(
   };
 }
 
-export function makeRawHeroStatementModule(
+export function mockRawHeroStatementModule(
   overrides: Partial<TRawHeroStatementModule> = {},
 ): TRawHeroStatementModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     variant: HERO_VARIANT.SPLIT,
     eyebrow: null,
-    headingBlock: makeRawHeadingBlock('Statement heading'),
+    headingBlock: mockRawHeadingBlock('Statement heading'),
     image: null,
     ctaButtons: null,
     contentPositionSplit: null,
@@ -138,21 +213,21 @@ export function makeRawHeroStatementModule(
   };
 }
 
-export function makeRawHeroProfileModule(
+export function mockRawHeroProfileModule(
   overrides: Partial<TRawHeroProfileModule> = {},
 ): TRawHeroProfileModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     variant: HERO_VARIANT.SPLIT,
     eyebrow: null,
-    headingBlock: makeRawHeadingBlock('Profile heading'),
+    headingBlock: mockRawHeadingBlock('Profile heading'),
     image: null,
     showSocialLinks: true,
     showRole: true,
     showBio: true,
     author: {
-      _id: 'author-1',
-      name: 'Jamie Rivera',
+      _id: MOCK_AUTHOR_ID,
+      name: PERSON_NAME,
       image: null,
       profilePage: null,
       role: null,
@@ -169,12 +244,12 @@ export function makeRawHeroProfileModule(
   };
 }
 
-export function makeRawPostListModule(
+export function mockRawPostListModule(
   overrides: Partial<TRawPostListModule> = {},
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Latest'),
+    headingBlock: mockRawHeadingBlock('Latest'),
     pageSize: 6,
     layout: null,
     contentAlignment: null,
@@ -183,12 +258,12 @@ export function makeRawPostListModule(
   };
 }
 
-export function makeRawPostLatestModule(
+export function mockRawPostLatestModule(
   overrides: Partial<TRawPostLatestModule> = {},
 ): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Latest'),
+    headingBlock: mockRawHeadingBlock('Latest'),
     limit: 6,
     layout: null,
     contentAlignment: null,
@@ -198,12 +273,12 @@ export function makeRawPostLatestModule(
   };
 }
 
-export function makeRawPostFeaturedModule(
+export function mockRawPostFeaturedModule(
   overrides: Partial<TRawPostFeaturedModule> = {},
 ): TRawPostFeaturedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Featured'),
+    headingBlock: mockRawHeadingBlock('Featured'),
     postSource: POST_SOURCE.PINNED,
     posts: [],
     limit: null,
@@ -215,38 +290,38 @@ export function makeRawPostFeaturedModule(
   };
 }
 
-export function makeRawSectionPagesModule(
+export function mockRawSectionPagesModule(
   overrides: Partial<TRawSectionPagesModule> = {},
 ): TRawSectionPagesModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('In this section'),
+    headingBlock: mockRawHeadingBlock(MOCK_SECTION_PAGES_HEADING),
     contentAlignment: null,
     layout: null,
     ...overrides,
   };
 }
 
-export function makeRawSectionPage(
+export function mockRawSectionPage(
   overrides: Partial<TRawSectionPages[number]> = {},
 ): TRawSectionPages[number] {
   return {
     _id: 'page-faq',
     slug: 'faq',
-    headingBlock: makeRawHeadingBlock('FAQ', {
+    headingBlock: mockRawHeadingBlock('FAQ', {
       supportingText: 'Answers to common questions.',
     }),
-    image: makeRawSanityImage(),
+    image: mockRawSanityImage(),
     ...overrides,
   };
 }
 
-export function makeRawPostRelatedModule(
+export function mockRawPostRelatedModule(
   overrides: Partial<TRawPostRelatedModule> = {},
 ): TRawPostRelatedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Related reading'),
+    headingBlock: mockRawHeadingBlock('Related reading'),
     limit: 3,
     layout: null,
     contentAlignment: null,
@@ -255,18 +330,18 @@ export function makeRawPostRelatedModule(
   };
 }
 
-export function makeRawContentModule(
+export function mockRawContentModule(
   overrides: Partial<TRawContentModule> = {},
 ): TRawContentModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    body: [makeRawContentBlock()],
+    body: [mockRawContentBlock()],
     layout: null,
     ...overrides,
   };
 }
 
-export function makeRawCtaModule(
+export function mockRawCtaModule(
   overrides: Partial<TRawCtaModule> = {},
 ): TRawCtaModule {
   return {
@@ -274,8 +349,8 @@ export function makeRawCtaModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: null,
-    headingBlock: makeRawHeadingBlock('Subscribe to the newsletter', {
-      supportingText: 'Get new posts in your inbox.',
+    headingBlock: mockRawHeadingBlock('Subscribe to the newsletter', {
+      supportingText: INBOX_SUPPORTING_TEXT,
     }),
     content: null,
     image: null,
@@ -290,16 +365,16 @@ export function makeRawCtaModule(
   };
 }
 
-export function makeRawCtaButton(
+export function mockRawCtaButton(
   overrides: Partial<TRawCtaButton> = {},
 ): TRawCtaButton {
   return {
     variant: CTA_ACTION_VARIANT.PRIMARY,
     appearance: CTA_ACTION_APPEARANCE.CONTAINED,
     link: {
-      label: 'Subscribe',
+      label: CTA_BUTTON_LABEL,
       linkType: LINK_TYPE.EXTERNAL,
-      url: '/newsletter',
+      url: MOCK_CTA_BUTTON_URL,
       internalReference: null,
       openInNewTab: null,
     },
@@ -307,24 +382,38 @@ export function makeRawCtaButton(
   };
 }
 
-export function makeRawContentMarkDef(
+export function mockCtaButtonView(
+  overrides: Partial<TCtaButton> = {},
+): TCtaButton {
+  return {
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+    link: mockLinkView({
+      label: CTA_BUTTON_LABEL,
+      href: MOCK_CTA_BUTTON_URL,
+    }),
+    ...overrides,
+  };
+}
+
+export function mockRawContentMarkDef(
   overrides: Partial<TRawCtaContentMarkDef> = {},
 ): TRawCtaContentMarkDef {
-  return makeRawPortableTextMarkDef(overrides);
+  return mockRawPortableTextMarkDef(overrides);
 }
 
-export function makeRawContentBlock(
+export function mockRawContentBlock(
   overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
 ): TRawCtaContentBlock {
-  return makeRawParagraphTextBlock<TRawCtaContentBlock>(overrides);
+  return mockRawParagraphTextBlock<TRawCtaContentBlock>(overrides);
 }
 
-export function makeRawTaxonomyListModule(
+export function mockRawTaxonomyListModule(
   overrides: Partial<TRawTaxonomyListModule> = {},
 ): TRawTaxonomyListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Topics'),
+    headingBlock: mockRawHeadingBlock('Topics'),
     layout: null,
     contentAlignment: null,
     taxonomy: TAXONOMY_KIND.TOPICS,
@@ -336,27 +425,27 @@ export function makeRawTaxonomyListModule(
   };
 }
 
-export function makeRawTaxonomyEntry(
+export function mockRawTaxonomyEntry(
   overrides: Partial<TRawTaxonomyEntry> = {},
 ): TRawTaxonomyEntry {
   return {
-    _id: 'topic-1',
-    title: 'Engineering',
-    slug: 'engineering',
-    description: 'Engineering posts',
+    _id: MOCK_TOPIC_ID,
+    title: MOCK_TOPIC_TITLE,
+    slug: MOCK_TOPIC_SLUG,
+    description: MOCK_TOPIC_DESCRIPTION,
     postCount: 0,
     latestPosts: [],
     ...overrides,
   };
 }
 
-export function makeRawNewsletterModule(
+export function mockRawNewsletterModule(
   overrides: Partial<TRawNewsletterModule> = {},
 ): TRawNewsletterModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Stay in the loop', {
-      supportingText: 'Get new posts in your inbox.',
+    headingBlock: mockRawHeadingBlock(MOCK_NEWSLETTER_HEADING, {
+      supportingText: INBOX_SUPPORTING_TEXT,
     }),
     content: null,
     variant: NEWSLETTER_VARIANT.FULL,
@@ -367,12 +456,12 @@ export function makeRawNewsletterModule(
   };
 }
 
-export function makeRawContactFormModule(
+export function mockRawContactFormModule(
   overrides: Partial<TRawContactFormModule> = {},
 ): TRawContactFormModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Get in touch', {
+    headingBlock: mockRawHeadingBlock('Get in touch', {
       supportingText: 'Questions, ideas or work enquiries.',
     }),
     successMessage: "Thanks — I'll reply within two days.",
@@ -383,28 +472,28 @@ export function makeRawContactFormModule(
   };
 }
 
-export function makeRawFeatureListItem(
+export function mockRawFeatureListItem(
   overrides: Partial<TRawFeatureListItem> = {},
 ): TRawFeatureListItem {
   return {
     _id: 'block-feature-1',
-    headingBlock: makeRawHeadingBlock('Ship faster'),
-    icon: 'ROCKET',
+    headingBlock: mockRawHeadingBlock(SHIP_FASTER),
+    icon: ICONS.ROCKET,
     image: null,
     link: null,
     ...overrides,
   };
 }
 
-export function makeRawFeatureListModule(
+export function mockRawFeatureListModule(
   overrides: Partial<TRawFeatureListModule> = {},
 ): TRawFeatureListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Features'),
+    headingBlock: mockRawHeadingBlock('Features'),
     features: [
-      makeRawFeatureListItem(),
-      makeRawFeatureListItem({ _id: 'block-feature-2' }),
+      mockRawFeatureListItem(),
+      mockRawFeatureListItem({ _id: 'block-feature-2' }),
     ],
     ctaButtons: null,
     imageShape: CARD_IMAGE_SHAPE.WIDE,
@@ -416,26 +505,26 @@ export function makeRawFeatureListModule(
   };
 }
 
-export function makeRawLogoImage(): TRawLogoItem['image'] {
-  const { asset, hotspot, crop } = makeRawSanityImage();
+export function mockRawLogoImage(): TRawLogoItem['image'] {
+  const { asset, hotspot, crop } = mockRawSanityImage();
 
   return { asset, hotspot, crop };
 }
 
-export function makeRawLogoItem(
+export function mockRawLogoItem(
   overrides: Partial<TRawLogoItem> = {},
 ): TRawLogoItem {
   return {
     _key: 'block-logo-1',
     name: 'Acme Corp',
-    image: makeRawLogoImage(),
+    image: mockRawLogoImage(),
     imageDark: null,
     link: null,
     ...overrides,
   };
 }
 
-export function makeRawPricingPrice(
+export function mockRawPricingPrice(
   overrides: Partial<TRawPricingPrice> = {},
 ): TRawPricingPrice {
   return {
@@ -448,18 +537,21 @@ export function makeRawPricingPrice(
   };
 }
 
-export function makeRawPricingTier(
+export function mockRawPricingTier(
   overrides: Partial<TRawPricingTier> = {},
 ): TRawPricingTier {
   return {
     _key: 'tier-1',
-    name: 'Pro',
+    name: MOCK_PRICING_TIER_NAME,
     description: null,
-    prices: [makeRawPricingPrice()],
+    prices: [mockRawPricingPrice()],
     priceLabel: null,
     features: [
-      { _key: 'feature-1', text: 'Unlimited posts' },
-      { _key: 'feature-2', text: 'Priority support' },
+      { _key: MOCK_PRICING_FEATURE_KEY, text: MOCK_UNLIMITED_POSTS_FEATURE },
+      {
+        _key: MOCK_SECOND_PRICING_FEATURE_KEY,
+        text: MOCK_PRIORITY_SUPPORT_FEATURE,
+      },
     ],
     ctaButtons: null,
     highlightLabel: null,
@@ -468,15 +560,15 @@ export function makeRawPricingTier(
   };
 }
 
-export function makeRawPricingModule(
+export function mockRawPricingModule(
   overrides: Partial<TRawPricingModule> = {},
 ): TRawPricingModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Pricing'),
+    headingBlock: mockRawHeadingBlock('Pricing'),
     tiers: [
-      makeRawPricingTier(),
-      makeRawPricingTier({ _key: 'tier-2', name: 'Team' }),
+      mockRawPricingTier(),
+      mockRawPricingTier({ _key: 'tier-2', name: 'Team' }),
     ],
     footnote: null,
     ctaButtons: null,
@@ -486,13 +578,13 @@ export function makeRawPricingModule(
   };
 }
 
-export function makeRawTestimonialItem(
+export function mockRawTestimonialItem(
   overrides: Partial<TRawTestimonialItem> = {},
 ): TRawTestimonialItem {
   return {
     _id: 'block-testimonial-1',
-    name: 'Jamie Rivera',
-    quote: [makeRawContentBlock({ text: 'Great work.' })],
+    name: PERSON_NAME,
+    quote: [mockRawContentBlock({ text: 'Great work.' })],
     role: null,
     image: null,
     link: null,
@@ -500,16 +592,16 @@ export function makeRawTestimonialItem(
   };
 }
 
-export function makeRawLogoWallModule(
+export function mockRawLogoWallModule(
   overrides: Partial<TRawLogoWallModule> = {},
 ): TRawLogoWallModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Trusted by'),
+    headingBlock: mockRawHeadingBlock('Trusted by'),
     logos: [
-      makeRawLogoItem(),
-      makeRawLogoItem({ _key: 'block-logo-2' }),
-      makeRawLogoItem({ _key: 'block-logo-3' }),
+      mockRawLogoItem(),
+      mockRawLogoItem({ _key: 'block-logo-2' }),
+      mockRawLogoItem({ _key: 'block-logo-3' }),
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
@@ -519,28 +611,28 @@ export function makeRawLogoWallModule(
   };
 }
 
-export function makeRawFeatureHighlightItem(
+export function mockRawFeatureHighlightItem(
   overrides: Partial<TRawFeatureHighlightItem> = {},
 ): TRawFeatureHighlightItem {
   return {
     _key: 'block-highlight-1',
-    heading: 'Ship faster',
-    body: [makeRawContentBlock({ text: 'Ship faster with less friction.' })],
-    image: makeRawSanityImage(),
+    heading: SHIP_FASTER,
+    body: [mockRawContentBlock({ text: 'Ship faster with less friction.' })],
+    image: mockRawSanityImage(),
     action: null,
     ...overrides,
   };
 }
 
-export function makeRawFeatureHighlightsModule(
+export function mockRawFeatureHighlightsModule(
   overrides: Partial<TRawFeatureHighlightsModule> = {},
 ): TRawFeatureHighlightsModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Why teams choose us'),
+    headingBlock: mockRawHeadingBlock('Why teams choose us'),
     highlights: [
-      makeRawFeatureHighlightItem(),
-      makeRawFeatureHighlightItem({ _key: 'block-highlight-2' }),
+      mockRawFeatureHighlightItem(),
+      mockRawFeatureHighlightItem({ _key: 'block-highlight-2' }),
     ],
     ctaButtons: null,
     mediaOrder: MEDIA_ORDER.FIRST,
@@ -550,7 +642,7 @@ export function makeRawFeatureHighlightsModule(
   };
 }
 
-export function makeRawStatItem(
+export function mockRawStatItem(
   overrides: Partial<TRawStatItem> = {},
 ): TRawStatItem {
   return {
@@ -562,15 +654,15 @@ export function makeRawStatItem(
   };
 }
 
-export function makeRawStatsModule(
+export function mockRawStatsModule(
   overrides: Partial<TRawStatsModule> = {},
 ): TRawStatsModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('By the numbers'),
+    headingBlock: mockRawHeadingBlock('By the numbers'),
     stats: [
-      makeRawStatItem(),
-      makeRawStatItem({
+      mockRawStatItem(),
+      mockRawStatItem({
         _key: 'stat-2',
         value: '128',
         label: 'Countries reached',
@@ -584,15 +676,15 @@ export function makeRawStatsModule(
   };
 }
 
-export function makeRawTestimonialModule(
+export function mockRawTestimonialModule(
   overrides: Partial<TRawTestimonialModule> = {},
 ): TRawTestimonialModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('What people say'),
+    headingBlock: mockRawHeadingBlock('What people say'),
     testimonials: [
-      makeRawTestimonialItem(),
-      makeRawTestimonialItem({ _id: 'block-testimonial-2' }),
+      mockRawTestimonialItem(),
+      mockRawTestimonialItem({ _id: 'block-testimonial-2' }),
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
@@ -603,12 +695,12 @@ export function makeRawTestimonialModule(
   };
 }
 
-export function makeRawTeamMember(
+export function mockRawTeamMember(
   overrides: Partial<TRawTeamMember> = {},
 ): TRawTeamMember {
   return {
     _id: 'person-1',
-    name: 'Jamie Rivera',
+    name: PERSON_NAME,
     image: null,
     profilePage: null,
     role: null,
@@ -618,15 +710,15 @@ export function makeRawTeamMember(
   };
 }
 
-export function makeRawTeamModule(
+export function mockRawTeamModule(
   overrides: Partial<TRawTeamModule> = {},
 ): TRawTeamModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Meet the team'),
+    headingBlock: mockRawHeadingBlock('Meet the team'),
     members: [
-      makeRawTeamMember(),
-      makeRawTeamMember({ _id: 'person-2', name: 'Alex Chen' }),
+      mockRawTeamMember(),
+      mockRawTeamMember({ _id: 'person-2', name: 'Alex Chen' }),
     ],
     showBios: false,
     showSocialLinks: true,
@@ -640,38 +732,44 @@ export function makeRawTeamModule(
   };
 }
 
-export function makeRawFaqQuestionItem(
+export function mockRawFaqQuestionItem(
   overrides: Partial<TRawFaqQuestionItem> = {},
 ): TRawFaqQuestionItem {
   return {
-    _id: 'block-faq-1',
-    question: 'How long does onboarding take?',
-    answer: [
-      makeRawContentBlock({ text: 'Most teams are live within a week.' }),
-    ],
+    _id: MOCK_FAQ_QUESTION_ID,
+    question: FAQ_QUESTION,
+    answer: [mockRawContentBlock({ text: FAQ_ANSWER })],
     ...overrides,
   };
 }
 
-export function makeRawFaqModuleQuestions(
+export function mockFaqView(): TFaqPageQuestion {
+  return {
+    id: MOCK_FAQ_QUESTION_ID,
+    question: FAQ_QUESTION,
+    answer: FAQ_ANSWER,
+  };
+}
+
+export function mockRawFaqModuleQuestions(
   overrides: Partial<TFaqModuleQuestions> = {},
 ): TFaqModuleQuestions {
   return {
     _id: 'module-faq-1',
-    questions: [makeRawFaqQuestionItem()],
+    questions: [mockRawFaqQuestionItem()],
     ...overrides,
   };
 }
 
-export function makeRawFaqModule(
+export function mockRawFaqModule(
   overrides: Partial<TRawFaqModule> = {},
 ): TRawFaqModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('Frequently asked questions'),
+    headingBlock: mockRawHeadingBlock('Frequently asked questions'),
     questions: [
-      makeRawFaqQuestionItem(),
-      makeRawFaqQuestionItem({ _id: 'block-faq-2' }),
+      mockRawFaqQuestionItem(),
+      mockRawFaqQuestionItem({ _id: MOCK_SECOND_FAQ_QUESTION_ID }),
     ],
     ctaButtons: null,
     contentAlignment: null,
@@ -680,7 +778,7 @@ export function makeRawFaqModule(
   };
 }
 
-export function makeRawTimelineItem(
+export function mockRawTimelineItem(
   overrides: Partial<TRawTimelineItem> = {},
 ): TRawTimelineItem {
   return {
@@ -688,7 +786,7 @@ export function makeRawTimelineItem(
     marker: null,
     heading: 'Kick off',
     body: [
-      makeRawParagraphTextBlock<TRawTimelineItemBody>({
+      mockRawParagraphTextBlock<TRawTimelineItemBody>({
         _key: 'timeline-body-1',
         text: 'The project begins.',
       }),
@@ -697,16 +795,16 @@ export function makeRawTimelineItem(
   };
 }
 
-export function makeRawTimelineModule(
+export function mockRawTimelineModule(
   overrides: Partial<TRawTimelineModule> = {},
 ): TRawTimelineModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeRawHeadingBlock('How it works'),
+    headingBlock: mockRawHeadingBlock('How it works'),
     markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
     items: [
-      makeRawTimelineItem(),
-      makeRawTimelineItem({
+      mockRawTimelineItem(),
+      mockRawTimelineItem({
         _key: 'block-timeline-2',
         heading: 'Ship',
         body: null,

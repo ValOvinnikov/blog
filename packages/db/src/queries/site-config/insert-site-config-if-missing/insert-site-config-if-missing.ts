@@ -5,6 +5,7 @@ import { siteConfig } from '@blog/db/schema/site-config';
 export async function insertSiteConfigIfMissing(
   tenantId: string,
   preset: TPresetId,
+  accentHue?: number,
 ): Promise<void> {
   const { themeTokens, cardStyle, headerControlStyle } =
     PRESET_REGISTRY[preset];
@@ -14,7 +15,7 @@ export async function insertSiteConfigIfMissing(
     .values({
       tenantId,
       preset,
-      accentHue: themeTokens.accentHue,
+      accentHue: accentHue ?? themeTokens.accentHue,
       headingFont: themeTokens.headingFont,
       bodyFont: themeTokens.bodyFont,
       radiusScale: themeTokens.radiusScale,

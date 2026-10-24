@@ -1,22 +1,22 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
-  makeSectionPageCard,
-  makeSectionPagesModule,
+  mockSectionPageCard,
+  mockSectionPagesModule,
 } from '@web/testing/modules/section-pages/fixtures';
 
 import { SectionPagesModuleView } from './section-pages-module-view';
 
 const pages = [
-  makeSectionPageCard(),
-  makeSectionPageCard({
+  mockSectionPageCard(),
+  mockSectionPageCard({
     id: 'pricing',
     title: 'Pricing',
     summary: 'Plans for every size of team.',
     path: 'modules/pricing',
   }),
-  makeSectionPageCard({
+  mockSectionPageCard({
     id: 'testimonials',
     title: 'Testimonials',
     summary: undefined,
@@ -40,7 +40,7 @@ const meta = {
     },
   },
   args: {
-    ...makeSectionPagesModule({ pages }),
+    ...mockSectionPagesModule({ pages }),
     titleId: 'section-pages-title',
     dataTestId: 'section-pages-module-section-pages-1',
   },
@@ -53,7 +53,7 @@ export const Default: TStory = {};
 
 export const WithImages: TStory = {
   args: {
-    pages: pages.map((page) => ({ ...page, image: makeSanityImage() })),
+    pages: pages.map((page) => ({ ...page, image: mockSanityImage() })),
   },
 };
 
@@ -75,19 +75,19 @@ export const MixedTitleOnlyAndSummary: TStory = {
   args: {
     pages: [
       ...pages,
-      makeSectionPageCard({
+      mockSectionPageCard({
         id: 'contact',
         title: 'Contact',
         summary: undefined,
         path: 'modules/contact',
       }),
-      makeSectionPageCard({
+      mockSectionPageCard({
         id: 'careers',
         title: 'Careers',
         summary: undefined,
         path: 'modules/careers',
       }),
-      makeSectionPageCard({
+      mockSectionPageCard({
         id: 'press',
         title: 'Press',
         summary: undefined,

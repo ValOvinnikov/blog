@@ -227,6 +227,9 @@ all work is complete:
   you fixed in passing in touched files, and what you found and left, each
   with `file:line` (CLAUDE.md → "Examine before you change"). Write "nothing
   found" only after reading them.
+  A test file you touch is pruned (`testing-practices` → "When you touch a
+  test file"): list each test removed or moved, with the test that still
+  asserts its behaviour.
 - New or changed constants, types, route builders and `@blog/utils` helpers,
   with their exact import path and signature (`LINK_TYPE` from
   `@blog/config`, `routes.topic(slug, page?)`).

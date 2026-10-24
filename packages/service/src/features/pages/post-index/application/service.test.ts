@@ -1,26 +1,29 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_HERO_MODULE_ID,
+  MOCK_LIST_MODULE_ID,
+  mockListModulePageSize,
+} from '@blog/service/testing/pages/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { createBlogService } from './service';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
-describe('createBlogService', () => {
+describe(createBlogService, () => {
   describe('v1.getIndexPageParams', () => {
     it('pages each page by the page size of its first post list module', async () => {
       mockRun
         .mockResolvedValueOnce({
           blogPosts: { total: 20 },
-          moduleRefs: [{ _ref: 'hero-1' }, { _ref: 'list-1' }],
+          moduleRefs: [
+            { _ref: MOCK_HERO_MODULE_ID },
+            { _ref: MOCK_LIST_MODULE_ID },
+          ],
         })
-        .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
+        .mockResolvedValueOnce([mockListModulePageSize()]);
 
       const result = await createBlogService().v1.getIndexPageParams(tenant);
 
@@ -34,14 +37,13 @@ describe('createBlogService', () => {
       mockRun
         .mockResolvedValueOnce({
           blogPosts: { total: 200 },
-          moduleRefs: [{ _ref: 'hero-1' }],
+          moduleRefs: [{ _ref: MOCK_HERO_MODULE_ID }],
         })
         .mockResolvedValueOnce([]);
 
-      expect(await createBlogService().v1.getIndexPageParams(tenant)).toEqual({
-        ok: true,
-        data: [],
-      });
+      const result = await createBlogService().v1.getIndexPageParams(tenant);
+
+      expect(result).toEqual({ ok: true, data: [] });
     });
   });
 });

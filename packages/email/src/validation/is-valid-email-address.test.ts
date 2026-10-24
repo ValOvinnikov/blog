@@ -1,13 +1,18 @@
+import {
+  MOCK_EMAIL_ADDRESS,
+  MOCK_INVALID_EMAIL_ADDRESS,
+} from '@blog/email/testing/email-fixtures';
+
 import { isValidEmailAddress } from './is-valid-email-address';
 
 describe('isValidEmailAddress', () => {
   const cases: Array<[string, boolean]> = [
-    ['editor@example.com', true],
+    [MOCK_EMAIL_ADDRESS, true],
     ['reader+tag@mail.example.com', true],
     ['a@b.c', true],
     ['a.b@c.d', true],
     ['user@a..b', true],
-    ['not-an-email', false],
+    [MOCK_INVALID_EMAIL_ADDRESS, false],
     ['someone@localhost', false],
     ['some one@example.com', false],
     ['', false],

@@ -1,6 +1,10 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  MOCK_FIRST_POST_TITLE,
+  MOCK_SECOND_POST_TITLE,
+} from '@blog/service/testing/entities/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 import { toPostsByIds } from './transformer';
 
@@ -10,16 +14,16 @@ describe(toPostsByIds, () => {
   it('maps every raw post card into a domain post card', () => {
     const raw = [
       {
-        ...makeRawPostCard({
+        ...mockRawPostCard({
           _id: 'a',
-          headingBlock: makeRawHeadingBlock('First'),
+          headingBlock: mockRawHeadingBlock(MOCK_FIRST_POST_TITLE),
         }),
         language: EN,
       },
       {
-        ...makeRawPostCard({
+        ...mockRawPostCard({
           _id: 'b',
-          headingBlock: makeRawHeadingBlock('Second'),
+          headingBlock: mockRawHeadingBlock(MOCK_SECOND_POST_TITLE),
         }),
         language: NL,
       },
@@ -28,8 +32,8 @@ describe(toPostsByIds, () => {
     const result = toPostsByIds(raw);
 
     expect(result.map((post) => post.id)).toEqual(['a', 'b']);
-    expect(result[0]?.title).toBe('First');
-    expect(result[1]?.title).toBe('Second');
+    expect(result[0]?.title).toBe(MOCK_FIRST_POST_TITLE);
+    expect(result[1]?.title).toBe(MOCK_SECOND_POST_TITLE);
     expect(result.map((post) => post.language)).toEqual([EN, NL]);
   });
 

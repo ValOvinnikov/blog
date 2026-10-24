@@ -1,28 +1,27 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
 import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
-import { getRequestContext } from '@web/server/request-context/request-context';
-import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
+import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 
 import { buildBreadcrumbListSchema } from './build-breadcrumb-list-schema';
 
+const HOME_PATH = routes.home();
+const NL_PREFIX = `/${LOCALE_BCP47_TAGS.NL}`;
+const TOPIC_PATH = '/topics/engineering';
+const POST_PATH = '/blog/hello-world';
+const HOME_LABEL = 'Home';
+const TOPIC_LABEL = 'Engineering';
+const POST_LABEL = 'Hello World';
+
 const trail: IBreadcrumbItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Engineering', href: '/topics/engineering' },
-  { label: 'Hello World', href: '/blog/hello-world' },
+  { label: HOME_LABEL, href: HOME_PATH },
+  { label: TOPIC_LABEL, href: TOPIC_PATH },
+  { label: POST_LABEL, href: POST_PATH },
 ];
 
 vi.mock('@web/server/request-context/request-context');
 
-const mockContext = (overrides: Partial<typeof DEFAULT_REQUEST_CONTEXT>) =>
-  vi
-    .mocked(getRequestContext)
-    .mockResolvedValue({ ...DEFAULT_REQUEST_CONTEXT, ...overrides });
-
 describe(buildBreadcrumbListSchema, () => {
-  beforeEach(() => {
-    mockContext({ metadataBase: new URL('https://example.com') });
-  });
-
   it('builds a BreadcrumbList schema from the trail', async () => {
     const schema = await buildBreadcrumbListSchema(trail);
 
@@ -33,75 +32,58 @@ describe(buildBreadcrumbListSchema, () => {
         {
           '@type': 'ListItem',
           position: 1,
-          name: 'Home',
-          item: 'https://example.com/',
+          name: HOME_LABEL,
+          item: `${MOCK_TENANT_BASE_URL}${HOME_PATH}`,
         },
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Engineering',
-          item: 'https://example.com/topics/engineering',
+          name: TOPIC_LABEL,
+          item: `${MOCK_TENANT_BASE_URL}${TOPIC_PATH}`,
         },
         {
           '@type': 'ListItem',
           position: 3,
-          name: 'Hello World',
-          item: 'https://example.com/blog/hello-world',
+          name: POST_LABEL,
+          item: `${MOCK_TENANT_BASE_URL}${POST_PATH}`,
         },
       ],
     });
   });
 
-  it('assigns 1-based positions in trail order', async () => {
-    const schema = await buildBreadcrumbListSchema(trail);
+  it('returns undefined when there is no base URL to make item URLs absolute', async () => {
+    mockRequestContextOnce({ metadataBase: undefined });
 
-    expect(schema?.itemListElement.map((item) => item.position)).toEqual([
-      1, 2, 3,
-    ]);
-  });
-
-  it('builds absolute item URLs from the base URL and each item href', async () => {
-    mockContext({ metadataBase: new URL('https://blog.example.com') });
-    const schema = await buildBreadcrumbListSchema(trail);
-
-    expect(schema?.itemListElement.map((item) => item.item)).toEqual([
-      'https://blog.example.com/',
-      'https://blog.example.com/topics/engineering',
-      'https://blog.example.com/blog/hello-world',
-    ]);
-  });
-
-  it('returns undefined when there is no base URL, rather than emitting a relative (invalid) url', async () => {
-    mockContext({ metadataBase: undefined });
     const schema = await buildBreadcrumbListSchema(trail);
 
     expect(schema).toBeUndefined();
   });
 
-  it('prefixes every item URL with the language on a non-default-language page', async () => {
-    mockContext({ locale: LOCALE_ISO_CODES.NL });
+  it.each([
+    {
+      case: 'prefixes item URLs with a non-default page language',
+      context: { locale: LOCALE_ISO_CODES.NL },
+      expected: [
+        NL_PREFIX,
+        `${NL_PREFIX}${TOPIC_PATH}`,
+        `${NL_PREFIX}${POST_PATH}`,
+      ],
+    },
+    {
+      case: 'leaves item URLs unprefixed for the tenant default language',
+      context: {
+        locale: LOCALE_ISO_CODES.NL,
+        defaultLocale: LOCALE_ISO_CODES.NL,
+      },
+      expected: [HOME_PATH, TOPIC_PATH, POST_PATH],
+    },
+  ])('$case', async ({ context, expected }) => {
+    mockRequestContextOnce(context);
 
     const schema = await buildBreadcrumbListSchema(trail);
 
-    expect(schema?.itemListElement.map((item) => item.item)).toEqual([
-      'https://example.com/nl',
-      'https://example.com/nl/topics/engineering',
-      'https://example.com/nl/blog/hello-world',
-    ]);
-  });
-
-  it('leaves item URLs unprefixed when the page language is the tenant default', async () => {
-    mockContext({
-      locale: LOCALE_ISO_CODES.NL,
-      defaultLocale: LOCALE_ISO_CODES.NL,
-    });
-
-    const schema = await buildBreadcrumbListSchema(trail);
-
-    expect(schema?.itemListElement.map((item) => item.item)).toEqual([
-      'https://example.com/',
-      'https://example.com/topics/engineering',
-      'https://example.com/blog/hello-world',
-    ]);
+    expect(schema?.itemListElement.map((item) => item.item)).toEqual(
+      expected.map((path) => `${MOCK_TENANT_BASE_URL}${path}`),
+    );
   });
 });

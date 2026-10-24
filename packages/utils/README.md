@@ -16,7 +16,7 @@ logic it needs without inheriting framework baggage.
 
 ## Layout
 
-- `async/` — `safeAsync`, a result-wrapping helper for async calls (`TResult<T>`).
+- `async/` — `safeAsync`, which turns an async call's throw into a failed `TResult`.
 - `color/` — `oklchToHex`, `WCAG_AA_CONTRAST_MIN`, and
   `renderedContrastRatio`, which composites translucent layers and takes the
   worse of CSS Color 4 gamut mapping and per-channel clipping.
@@ -25,6 +25,7 @@ logic it needs without inheriting framework baggage.
 - `pagination/` — `toTotalPages`.
 - `primitives/` — `objectKeys`, `toTitleCase`.
 - `reading-time/` — `toReadingTimeMinutes`.
+- `result/` — `TResult<T, E>` and its builders `okResult` / `errorResult`.
 
 Each directory re-exports through its own `index.ts` and gets its own
 `package.json` `exports` subpath (`@blog/utils/async`, `@blog/utils/color`,

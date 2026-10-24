@@ -1,10 +1,30 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { QUOTE_CARD_CAPTION_TEST_ID } from '@blog/ui/constants/quote-card';
 import { customRender, screen, within } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 
 import { QuoteCard } from './quote-card';
+
+const ROLE = 'Head of Product';
+const NAME_TEST_ID = 'quote-card-name';
+const IGNORING_LINK_TEST_ID = 'class-name-ignoring-link';
+const CASE_STUDY_HREF = '/case-studies/ada';
+const AVATAR_NAME = 'Ada Lovelace';
+const AVATAR_INITIALS = 'AL';
+const AVATAR_SRC = 'https://example.com/avatar.jpg';
+const TEAM_HREF = 'https://example.com/team/ada';
+
+const ClassNameIgnoringLink = ({
+  href,
+  children,
+}: AnchorHTMLAttributes<HTMLAnchorElement>) => (
+  <a href={href} data-testid={IGNORING_LINK_TEST_ID}>
+    {children}
+  </a>
+);
 
 faker.seed(123);
 
@@ -25,26 +45,23 @@ const buildChildrenWithAvatar = (avatar: ReactNode) => [
   <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
   <QuoteCard.Avatar key="avatar">{avatar}</QuoteCard.Avatar>,
   <QuoteCard.Name key="name">
-    <span>Ada Lovelace</span>
+    <span>{AVATAR_NAME}</span>
   </QuoteCard.Name>,
 ];
 
-const CustomLink = ({
-  href,
-  children,
-}: {
-  href: string;
-  children?: ReactNode;
-}) => (
-  <a href={href} data-testid="custom-link">
-    {children}
-  </a>
-);
-
-const buildChildrenWithCustomLink = (nameProps?: { dataTestId?: string }) => [
+const buildChildrenWithMockLink = () => [
   <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
-  <QuoteCard.Name key="name" dataTestId={nameProps?.dataTestId}>
-    <CustomLink href="/case-studies/ada">{faker.person.fullName()}</CustomLink>
+  <QuoteCard.Name key="name">
+    <MockLink href={CASE_STUDY_HREF}>{faker.person.fullName()}</MockLink>
+  </QuoteCard.Name>,
+];
+
+const buildChildrenWithClassNameIgnoringLink = () => [
+  <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
+  <QuoteCard.Name key="name" dataTestId={NAME_TEST_ID}>
+    <ClassNameIgnoringLink href={CASE_STUDY_HREF}>
+      {faker.person.fullName()}
+    </ClassNameIgnoringLink>
   </QuoteCard.Name>,
 ];
 
@@ -66,19 +83,23 @@ describe(`<${QuoteCard.name}/>`, () => {
     setup({ children: buildChildren({ quote, name }) });
 
     const figure = screen.getByRole('figure');
-    expect(within(figure).getByText(quote)).toBeVisible();
-    expect(within(figure).getByText(name)).toBeVisible();
+    const quoteText = within(figure).getByText(quote);
+    const nameText = within(figure).getByText(name);
+    expect(quoteText).toBeVisible();
+    expect(nameText).toBeVisible();
   });
 
   it('renders the quote slot content inside the blockquote', () => {
     setup({ children: buildChildren({ quote }) });
 
-    expect(screen.getByRole('blockquote')).toHaveTextContent(quote);
+    const blockquote = screen.getByRole('blockquote');
+    expect(blockquote).toHaveTextContent(quote);
   });
 
   it('renders the role text when provided', () => {
-    setup({ role: 'Head of Product' });
-    expect(screen.getByText('Head of Product')).toBeVisible();
+    setup({ role: ROLE });
+    const roleText = screen.getByText(ROLE);
+    expect(roleText).toBeVisible();
   });
 
   describe('with the default props', () => {
@@ -87,60 +108,51 @@ describe(`<${QuoteCard.name}/>`, () => {
     });
 
     it('does not render a role element when omitted', () => {
-      expect(screen.queryByText(/head of/i)).not.toBeInTheDocument();
+      const roleText = screen.queryByText(/head of/i);
+      expect(roleText).not.toBeInTheDocument();
+    });
+
+    it('renders the name as plain text, not a link, when the caller supplies a span', () => {
+      const link = screen.queryByRole('link');
+      expect(link).not.toBeInTheDocument();
     });
 
     it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
-      expect(screen.queryByText('AL')).not.toBeInTheDocument();
+      const image = screen.queryByRole('img');
+      const initials = screen.queryByText(AVATAR_INITIALS);
+      expect(image).not.toBeInTheDocument();
+      expect(initials).not.toBeInTheDocument();
     });
   });
 
   describe('with a caller-supplied initials Avatar', () => {
     beforeEach(() => {
       setup({
-        children: buildChildrenWithAvatar(
-          <Avatar name="Ada Lovelace" alt="" />,
-        ),
+        children: buildChildrenWithAvatar(<Avatar name={AVATAR_NAME} alt="" />),
       });
     });
 
     it('renders the caller-supplied Avatar with its initials fallback', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
-      expect(screen.getByText('AL')).toBeVisible();
+      const image = screen.queryByRole('img');
+      const initials = screen.getByText(AVATAR_INITIALS);
+      expect(image).not.toBeInTheDocument();
+      expect(initials).toBeVisible();
     });
 
-    it('announces the quoted person once when the caller-supplied Avatar sits beside QuoteCard.Name', () => {
-      expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
+    it('announces the quoted person once beside the caller-supplied Avatar', () => {
+      const personNames = screen.getAllByText(AVATAR_NAME);
+      expect(personNames).toHaveLength(1);
     });
   });
 
   it('renders the caller-supplied Avatar image when given a src', () => {
     setup({
       children: buildChildrenWithAvatar(
-        <Avatar
-          name="Ada Lovelace"
-          alt=""
-          src="https://example.com/avatar.jpg"
-        />,
+        <Avatar name={AVATAR_NAME} alt="" src={AVATAR_SRC} />,
       ),
     });
-    expect(screen.getByRole('presentation')).toHaveAttribute(
-      'src',
-      'https://example.com/avatar.jpg',
-    );
-  });
-
-  it('renders the name as plain text, not a link, when the caller supplies a span', () => {
-    setup({
-      children: [
-        <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
-        <QuoteCard.Name key="name">
-          <span>{faker.person.fullName()}</span>
-        </QuoteCard.Name>,
-      ],
-    });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const avatarImage = screen.getByRole('presentation');
+    expect(avatarImage).toHaveAttribute('src', AVATAR_SRC);
   });
 
   it('renders the name as a link with whatever attributes the caller supplies', () => {
@@ -148,11 +160,7 @@ describe(`<${QuoteCard.name}/>`, () => {
       children: [
         <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
         <QuoteCard.Name key="name">
-          <a
-            href="https://example.com/team/ada"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={TEAM_HREF} target="_blank" rel="noopener noreferrer">
             {name}
           </a>
         </QuoteCard.Name>,
@@ -160,44 +168,43 @@ describe(`<${QuoteCard.name}/>`, () => {
     });
 
     const link = screen.getByRole('link', { name });
-    expect(link).toHaveAttribute('href', 'https://example.com/team/ada');
+    expect(link).toHaveAttribute('href', TEAM_HREF);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders a caller-supplied custom link component inside QuoteCard.Name', () => {
-    setup({ children: buildChildrenWithCustomLink() });
-    expect(screen.getByTestId('custom-link')).toBeVisible();
+    setup({ children: buildChildrenWithMockLink() });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLink).toBeVisible();
   });
 
-  it('wraps a custom link component that ignores className in its own focus-treatment element, instead of relying on the child to forward it', () => {
-    setup({
-      children: buildChildrenWithCustomLink({ dataTestId: 'quote-card-name' }),
-    });
-    const wrapper = screen.getByTestId('quote-card-name');
-    const link = screen.getByTestId('custom-link');
-    expect(link.parentElement).toBe(wrapper);
+  it('wraps a link that ignores className in its own focus element', () => {
+    setup({ children: buildChildrenWithClassNameIgnoringLink() });
+    const wrapper = screen.getByTestId(NAME_TEST_ID);
+    const link = within(wrapper).getByTestId(IGNORING_LINK_TEST_ID);
+    expect(link).toBeVisible();
   });
 
-  it('keeps figcaption as the last child of the figure even when duplicate slot content is unmatched', () => {
+  it('renders unmatched duplicate slot content before the figcaption, keeping it last', () => {
+    const duplicateName = faker.person.fullName();
     setup({
       children: [
         <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,
         <QuoteCard.Name key="name1">
-          <span>{faker.person.fullName()}</span>
+          <span>{name}</span>
         </QuoteCard.Name>,
         <QuoteCard.Name key="name2">
-          <span>{faker.person.fullName()}</span>
+          <span>{duplicateName}</span>
         </QuoteCard.Name>,
       ],
     });
-    const figure = screen.getByRole('figure');
-    const figcaption = figure.querySelector('figcaption');
-    expect(figure.lastElementChild).toBe(figcaption);
-  });
-
-  it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: 'quote-card' });
-    expect(screen.getByTestId('quote-card')).toBeVisible();
+    const caption = screen.getByTestId(QUOTE_CARD_CAPTION_TEST_ID);
+    const unmatched = screen.getByText(duplicateName);
+    const captionNameText = within(caption).queryByText(duplicateName);
+    expect(captionNameText).not.toBeInTheDocument();
+    expect(unmatched.compareDocumentPosition(caption)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 });

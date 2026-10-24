@@ -1,10 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { evaluateGroqIds } from '@blog/service/testing/shared/groq';
 import {
-  toIds,
-  translatedPostDocuments,
+  MOCK_DESIGN_EN_POST_ID,
+  MOCK_DESIGN_NL_POST_ID,
+  MOCK_NOTES_EN_POST_ID,
+  MOCK_ONLY_EN_POST_ID,
+  MOCK_TRANSLATED_POST_DOCUMENTS,
 } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { publishedPostsInLocale } from './published-posts-in-locale';
@@ -13,22 +16,28 @@ const { EN, NL } = LOCALE_ISO_CODES;
 
 async function idsIn(locale: string): Promise<string[]> {
   const query = publishedPostsInLocale(q.parameters<TLocaleQueryParams>().star);
-  const posts = await evaluateGroqExpression(
+  const ids = await evaluateGroqIds(
     query.query,
-    translatedPostDocuments,
-    null,
-    { locale, defaultLocale: EN },
+    MOCK_TRANSLATED_POST_DOCUMENTS,
+    {
+      locale,
+      defaultLocale: EN,
+    },
   );
 
-  return toIds(posts).sort();
+  return ids.sort();
 }
 
-describe('publishedPostsInLocale', () => {
+describe(publishedPostsInLocale, () => {
   it('keeps only published posts written in the reader language', async () => {
-    expect(await idsIn(EN)).toEqual(['design-en', 'notes-en', 'only-en']);
+    expect(await idsIn(EN)).toEqual([
+      MOCK_DESIGN_EN_POST_ID,
+      MOCK_NOTES_EN_POST_ID,
+      MOCK_ONLY_EN_POST_ID,
+    ]);
   });
 
   it('leaves out posts scheduled for the future', async () => {
-    expect(await idsIn(NL)).toEqual(['design-nl']);
+    expect(await idsIn(NL)).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 });

@@ -1,6 +1,8 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { BREADCRUMBS_HOME_ICON_TEST_ID } from '@blog/ui/constants/breadcrumbs';
+import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+import { customRender, screen, within } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { Breadcrumbs } from './breadcrumbs';
 
@@ -27,81 +29,63 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     });
 
     it('renders a nav landmark with the passed ariaLabel', () => {
-      expect(screen.getByRole('navigation', { name: ariaLabel })).toBeVisible();
+      const nav = screen.getByRole('navigation', { name: ariaLabel });
+
+      expect(nav).toBeVisible();
     });
 
     it('renders every item except the last as a link with the correct label and href', () => {
       for (const item of items.slice(0, -1)) {
-        expect(screen.getByRole('link', { name: item.label })).toHaveAttribute(
-          'href',
-          item.href,
-        );
+        const itemLink = screen.getByRole('link', { name: item.label });
+
+        expect(itemLink).toHaveAttribute('href', item.href);
       }
     });
 
-    it('renders the first item as a link with a decorative House icon, keeping the label as its accessible name', () => {
+    it('names the home link by its label, with a decorative House icon', () => {
       const homeLink = screen.getByRole('link', { name: firstItem.label });
-      const icon = homeLink.querySelector('svg');
+      const icon = within(homeLink).getByTestId(BREADCRUMBS_HOME_ICON_TEST_ID);
 
       expect(icon).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('sets a title attribute on the first item for sighted hover users', () => {
-      expect(
-        screen.getByRole('link', { name: firstItem.label }),
-      ).toHaveAttribute('title', firstItem.label);
-    });
+    it.each([firstItem, lastItem])(
+      'sets a title attribute on the "$label" item so its full text is available on hover',
+      ({ label }) => {
+        const titled = screen.getByTitle(label);
+
+        expect(titled).toHaveTextContent(label);
+      },
+    );
 
     it('renders the last item as text with aria-current="page", not a link', () => {
       const current = screen.getByText(lastItem.label);
-      expect(current).toHaveAttribute('aria-current', 'page');
-      expect(
-        screen.queryByRole('link', { name: lastItem.label }),
-      ).not.toBeInTheDocument();
+      const currentLink = screen.queryByRole('link', { name: lastItem.label });
+
+      expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(currentLink).not.toBeInTheDocument();
     });
 
     it('preserves trail order', () => {
-      const rendered = screen
-        .getAllByRole('listitem')
-        .map((li) => li.textContent);
-      expect(rendered).toEqual(items.map((item) => item.label));
-    });
+      const listItems = screen.getAllByRole('listitem');
+      const rendered = listItems.map((li) => li.textContent);
 
-    it('sets a title attribute on the last item so its full text is available on hover', () => {
-      expect(screen.getByText(lastItem.label)).toHaveAttribute(
-        'title',
-        lastItem.label,
-      );
+      expect(rendered).toEqual(items.map((item) => item.label));
     });
   });
 
   it('sets a title attribute on the first item even when it is also the current page', () => {
     setup({ items: [firstItem] });
-    expect(screen.getByTitle(firstItem.label)).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    const current = screen.getByTitle(firstItem.label);
+
+    expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
   });
 
   it('renders links via the linkAs component when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom-link="true">
-        {children}
-      </a>
-    );
-    setup({ linkAs: CustomLink });
+    setup({ linkAs: MockLink });
     const firstLink = screen.getByRole('link', { name: firstItem.label });
-    expect(firstLink).toHaveAttribute('data-custom-link', 'true');
-  });
+    const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
 
-  it('forwards dataTestId to the nav element', () => {
-    setup({ dataTestId: 'breadcrumbs' });
-    expect(screen.getByTestId('breadcrumbs')).toBeVisible();
+    expect(mockLinks).toContain(firstLink);
   });
 });

@@ -5,16 +5,16 @@ import {
   personalDataIndex,
 } from '@blog/utils/encryption';
 import {
-  OTHER_TEST_ENCRYPTION_KEY,
-  TEST_ENCRYPTION_KEY,
+  MOCK_OTHER_ENCRYPTION_KEY,
+  MOCK_ENCRYPTION_KEY,
 } from '@blog/utils/encryption/encryption-fixtures';
 
-const TEST_KEYRING = `v1:${TEST_ENCRYPTION_KEY}`;
+const TEST_KEYRING = `v1:${MOCK_ENCRYPTION_KEY}`;
 
 export function usePersonalDataKeys(): void {
   beforeEach(() => {
     vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', TEST_KEYRING);
-    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', OTHER_TEST_ENCRYPTION_KEY);
+    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_OTHER_ENCRYPTION_KEY);
   });
 
   afterEach(() => {
@@ -31,5 +31,5 @@ export function decryptTestPersonalValue(
 }
 
 export function testPersonalEmailIndex(email: string): string {
-  return personalDataIndex(email, OTHER_TEST_ENCRYPTION_KEY);
+  return personalDataIndex(email, MOCK_OTHER_ENCRYPTION_KEY);
 }

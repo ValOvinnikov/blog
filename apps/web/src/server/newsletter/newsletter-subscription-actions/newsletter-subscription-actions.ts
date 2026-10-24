@@ -63,20 +63,19 @@ export const resendConfirmationAction =
   async (): Promise<TResendConfirmationActionResult> => {
     const session = await auth();
     const userId = session?.user?.id;
-    const email = session?.user?.email;
-    if (!userId || !email) return SERVER_ERROR;
+    if (!userId) return SERVER_ERROR;
 
     const tenant = await resolveWritableTenant(
       'newsletter.resend_confirmation',
     );
     if (!tenant.ok) {
-      if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+      if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
         logger.warn('newsletter.resend_confirmation_tenant_not_active');
         return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
       }
       return SERVER_ERROR;
     }
-    const { tenantId } = tenant;
+    const { data: tenantId } = tenant;
 
     try {
       const result = await queries.subscribers.resendConfirmation(
@@ -86,7 +85,7 @@ export const resendConfirmationAction =
       if (result.outcome === SUBSCRIBER_OUTCOME.NOT_PENDING)
         return SERVER_ERROR;
 
-      const { subscriberId, confirmationToken } = result;
+      const { subscriberId, email, confirmationToken } = result;
       await deliverNewsletterConfirmation(
         tenantId,
         { subscriberId, email },

@@ -1,29 +1,36 @@
-import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  portableTextBlock,
-  portableTextSpan,
+  BRAND_VARIANT,
+  HERO_VARIANT,
+  PORTABLE_TEXT_BLOCK_TYPE,
+  SOCIAL_PLATFORMS,
+} from '@blog/config';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  mockPortableTextBlock,
+  mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const bioDemo = [
-  portableTextBlock(
+  mockPortableTextBlock(
     'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
   ),
-  portableTextBlock(
+  mockPortableTextBlock(
     [
-      portableTextSpan('Outside of work, she writes about design systems on '),
-      portableTextSpan('her blog', ['link-1']),
-      portableTextSpan('.'),
+      mockPortableTextSpan(
+        'Outside of work, she writes about design systems on ',
+      ),
+      mockPortableTextSpan('her blog', ['link-1']),
+      mockPortableTextSpan('.'),
     ],
     {
       markDefs: [
         {
-          _type: 'linkRef',
+          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
           _key: 'link-1',
           link: { href: 'https://example.com', target: undefined },
         },
@@ -74,16 +81,16 @@ const meta = {
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     variant: HERO_VARIANT.STACKED,
     eyebrow: 'Product designer',
-    headingBlock: makeHeadingBlock({
+    headingBlock: mockHeadingBlock({
       heading: "Hi, I'm Jane",
       supportingText:
         'I design and build products for teams who care about craft.',
     }),
     avatarName: 'Jane Cooper',
-    sanityImage: makeSanityImage(),
+    sanityImage: mockSanityImage(),
     bio: bioDemo,
     socialLinks,
-    ctaButtons: ctaActionsDemo.slice(0, 1),
+    ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
     contentPosition: undefined,
     contentAlignment: undefined,
     mediaOrder: undefined,
@@ -118,7 +125,7 @@ export const SplitNoPhoto: TStory = {
 export const Banner: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
-    ctaButtons: ctaActionsDemo,
+    ctaButtons: MOCK_CTA_ACTIONS,
   },
 };
 

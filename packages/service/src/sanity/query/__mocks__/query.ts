@@ -1,8 +1,9 @@
-import type * as TQueryModule from '@blog/service/sanity/query/query';
+import type * as QueryModule from '@blog/service/sanity/query/query';
 
-const actual = await vi.importActual<typeof TQueryModule>(
+const actual = await vi.importActual<typeof QueryModule>(
   '@blog/service/sanity/query/query',
 );
 
 export const { q } = actual;
+
 export const runQuery = vi.fn();

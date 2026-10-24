@@ -1,4 +1,6 @@
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 const {
   checkBotIdMock,
@@ -37,7 +39,7 @@ describe('isSubscribeAttemptRefused', () => {
   beforeEach(() => {
     checkBotIdMock.mockResolvedValue({ isBot: false });
     headersMock.mockResolvedValue(
-      new Headers({ 'x-forwarded-for': '203.0.113.5' }),
+      new Headers({ [FORWARDED_FOR_HEADER]: '203.0.113.5' }),
     );
     createRateLimiterMock.mockImplementation(realCreateRateLimiter);
   });
@@ -47,7 +49,7 @@ describe('isSubscribeAttemptRefused', () => {
 
     const refusals: boolean[] = [];
     for (let i = 0; i < 6; i += 1) {
-      refusals.push(await isSubscribeAttemptRefused(DEFAULT_TENANT_ID));
+      refusals.push(await isSubscribeAttemptRefused(MOCK_TENANT_ID));
     }
 
     expect(refusals).toEqual([false, false, false, false, false, true]);
@@ -56,14 +58,14 @@ describe('isSubscribeAttemptRefused', () => {
   it('counts each address separately', async () => {
     const { isSubscribeAttemptRefused } = await loadGuard();
     for (let i = 0; i < 6; i += 1) {
-      await isSubscribeAttemptRefused(DEFAULT_TENANT_ID);
+      await isSubscribeAttemptRefused(MOCK_TENANT_ID);
     }
 
     headersMock.mockResolvedValue(
-      new Headers({ 'x-forwarded-for': '203.0.113.9' }),
+      new Headers({ [FORWARDED_FOR_HEADER]: '203.0.113.9' }),
     );
 
-    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
+    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(
       false,
     );
   });
@@ -72,9 +74,7 @@ describe('isSubscribeAttemptRefused', () => {
     const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
     checkBotIdMock.mockResolvedValue({ isBot: true });
 
-    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
-      true,
-    );
+    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'bot',
     });
@@ -83,42 +83,40 @@ describe('isSubscribeAttemptRefused', () => {
 
   it('refuses and logs, without counting against the address, when BotID errors', async () => {
     const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
-    checkBotIdMock.mockRejectedValue(new Error('botid down'));
+    checkBotIdMock.mockRejectedValue(MOCK_ERROR);
 
-    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
-      true,
-    );
-    expect(warnMock).toHaveBeenCalledWith(
-      SUBSCRIBE_BLOCKED_EVENT,
-      expect.objectContaining({ reason: 'bot_check_unavailable' }),
-    );
+    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
+      reason: 'bot_check_unavailable',
+      error: MOCK_ERROR,
+    });
     expect(createRateLimiterMock).not.toHaveBeenCalled();
   });
 
-  it('refuses and logs when the rate-limit store errors', async () => {
-    createRateLimiterMock.mockReturnValue({
-      isLimited: vi.fn().mockRejectedValue(new Error('redis down')),
-    });
+  it.each([
+    [
+      'errors',
+      () =>
+        createRateLimiterMock.mockReturnValue({
+          isLimited: vi.fn().mockRejectedValue(MOCK_ERROR),
+        }),
+    ],
+    [
+      'cannot be configured',
+      () =>
+        createRateLimiterMock.mockImplementation(() => {
+          throw MOCK_ERROR;
+        }),
+    ],
+  ])('refuses and logs when the rate-limit store %s', async (_, arrange) => {
+    arrange();
     const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
 
-    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
-      true,
-    );
-    expect(warnMock).toHaveBeenCalledWith(
-      SUBSCRIBE_BLOCKED_EVENT,
-      expect.objectContaining({ reason: 'rate_limit_store_unavailable' }),
-    );
-  });
-
-  it('refuses when the store cannot be configured', async () => {
-    createRateLimiterMock.mockImplementation(() => {
-      throw new Error('missing KV config');
+    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
+      reason: 'rate_limit_store_unavailable',
+      error: MOCK_ERROR,
     });
-    const { isSubscribeAttemptRefused } = await loadGuard();
-
-    await expect(isSubscribeAttemptRefused(DEFAULT_TENANT_ID)).resolves.toBe(
-      true,
-    );
   });
 
   it('refuses when the store does not answer in time', async () => {
@@ -128,7 +126,7 @@ describe('isSubscribeAttemptRefused', () => {
     });
     const { isSubscribeAttemptRefused } = await loadGuard();
 
-    const refused = isSubscribeAttemptRefused(DEFAULT_TENANT_ID);
+    const refused = isSubscribeAttemptRefused(MOCK_TENANT_ID);
     await vi.advanceTimersByTimeAsync(2_000);
 
     await expect(refused).resolves.toBe(true);

@@ -8,11 +8,12 @@ import {
 import { stampTenantInactivityStage } from '@blog/db/queries/tenants/stamp-tenant-inactivity-stage';
 import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   daysAfterLastActivity,
-  LAST_ACTIVITY_AT,
+  MOCK_LAST_ACTIVITY_AT,
 } from '@blog/db/testing/tenants/inactivity';
 
 import { listTenantsDueForInactivityStage } from './list-tenants-due-for-inactivity-stage';
@@ -47,37 +48,41 @@ afterEach(async () => {
 });
 
 describe(listTenantsDueForInactivityStage, () => {
-  it('returns a tenant once at each of day 23, 30, 50 and 60', async () => {
-    const tenant = await insertTestTenant(db(), {
-      lastActivityAt: LAST_ACTIVITY_AT,
+  describe('a tenant last active at the reference time', () => {
+    let tenant: TTenant;
+
+    beforeEach(async () => {
+      tenant = await insertTestTenant(db(), {
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+      });
     });
 
-    for (const [stage, now] of STAMPED_STAGES) {
-      expect(await dueIds(stage, now)).toEqual([tenant.id]);
-      await stampTenantInactivityStage(tenant.id, stage, now);
-      expect(await dueIds(stage, now)).toEqual([]);
-    }
+    it('returns a tenant once at each of day 23, 30, 50 and 60', async () => {
+      for (const [stage, now] of STAMPED_STAGES) {
+        expect(await dueIds(stage, now)).toEqual([tenant.id]);
+        await stampTenantInactivityStage(tenant.id, stage, now);
+        expect(await dueIds(stage, now)).toEqual([]);
+      }
 
-    expect(await dueIds(INACTIVITY_STAGE.DEPROVISIONING, DAY_60)).toEqual([
-      tenant.id,
-    ]);
-    await startDeprovisioningRun({ tenantId: tenant.id });
-    expect(await dueIds(INACTIVITY_STAGE.DEPROVISIONING, DAY_60)).toEqual([]);
-  });
+      expect(await dueIds(INACTIVITY_STAGE.DEPROVISIONING, DAY_60)).toEqual([
+        tenant.id,
+      ]);
+      await startDeprovisioningRun({ tenantId: tenant.id });
+      expect(await dueIds(INACTIVITY_STAGE.DEPROVISIONING, DAY_60)).toEqual([]);
+    });
 
-  it('returns nothing before day 23', async () => {
-    await insertTestTenant(db(), { lastActivityAt: LAST_ACTIVITY_AT });
-
-    expect(await dueIds(INACTIVITY_STAGE.SUSPENSION_WARNING, DAY_22)).toEqual(
-      [],
-    );
+    it('returns nothing before day 23', async () => {
+      expect(await dueIds(INACTIVITY_STAGE.SUSPENSION_WARNING, DAY_22)).toEqual(
+        [],
+      );
+    });
   });
 
   it('never returns an archived tenant', async () => {
     await insertTestTenant(db(), {
       status: TENANT_STATUS.ARCHIVED,
       deprovisionedAt: DAY_22,
-      lastActivityAt: LAST_ACTIVITY_AT,
+      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
     });
 
     for (const stage of Object.values(INACTIVITY_STAGE)) {

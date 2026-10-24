@@ -7,9 +7,13 @@ import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { makeMembership } from '@platform/testing/memberships/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockTenant,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -52,28 +56,30 @@ vi.mock('@blog/studio', () => ({
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const membership = makeMembership();
+const membership = mockMembership();
 
 const setup = customRenderAsync(DashboardStudioPage, {});
 
 const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
+  const tenant = mockTenant({
+    id: MOCK_TENANT_ID,
+    name: MOCK_TENANT_NAME,
+    sanityProjectId: STUDIO_PROJECT_ID,
+    sanityDataset: STUDIO_DATASET,
+    sanityReadTokenEncrypted: 'encrypted-token',
+    ...overrides,
+  });
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
-    {
-      membership,
-      tenant: makeTenant({
-        id: TENANT_ID,
-        name: 'Acme Inc.',
-        sanityProjectId: 'proj-acme',
-        sanityDataset: 'production',
-        sanityReadTokenEncrypted: 'encrypted-token',
-        ...overrides,
-      }),
-    },
+    { membership, tenant },
   ]);
   await setup();
+
+  return tenant;
 };
 
 const STUDIO_MOUNT_TEST_ID = 'studio-mount';
+const STUDIO_PROJECT_ID = 'proj-acme';
+const STUDIO_DATASET = 'production';
 const invitedAt = new Date();
 
 describe(`<${DashboardStudioPage.name}/>`, () => {
@@ -90,24 +96,26 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/api/auth/signin?callbackUrl=%2F');
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
   it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
-    await renderForTenant();
+    const tenant = await renderForTenant();
 
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectId: 'proj-acme',
-        dataset: 'production',
-        basePath: adminRoutes.dashboardStudio(),
-        title: 'Acme Inc.',
-      }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: STUDIO_PROJECT_ID,
+      dataset: STUDIO_DATASET,
+      basePath: adminRoutes.dashboardStudio(),
+      title: MOCK_TENANT_NAME,
+      enabledCapabilities: [],
+      defaultLocale: tenant.locale,
+      liveLocales: [],
+      loginProvider: undefined,
+    });
   });
 
   it("explains the owner's pending Studio access instead of mounting Studio", async () => {
@@ -127,7 +135,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   });
 
   it("opens Studio straight into the owner's login provider once their access is ready", async () => {
-    await renderForTenant({
+    const tenant = await renderForTenant({
       ownerInviteSentAt: invitedAt,
       ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
       ownerSanityUserId: 'sanity-user-1',
@@ -138,8 +146,15 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith(
-      expect.objectContaining({ loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE }),
-    );
+    expect(studioMountMock).toHaveBeenCalledWith({
+      projectId: STUDIO_PROJECT_ID,
+      dataset: STUDIO_DATASET,
+      basePath: adminRoutes.dashboardStudio(),
+      title: MOCK_TENANT_NAME,
+      enabledCapabilities: [],
+      defaultLocale: tenant.locale,
+      liveLocales: [],
+      loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+    });
   });
 });

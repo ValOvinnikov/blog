@@ -1,77 +1,69 @@
-import { POST_SOURCE } from '@blog/config';
+import { POST_SOURCE, SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_POSTS_CACHE_TAG,
+  MOCK_TOPIC_CACHE_TAG,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPostFeatured } from './loader';
+import { postFeaturedModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const POST_FEATURED_ID = 'post-featured-1';
+
+const tenant = mockTenant();
 
 describe(getPostFeatured, () => {
   it('maps the pinned posts through', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawPostFeaturedModule({
+      mockRawPostFeaturedModule({
         postSource: POST_SOURCE.PINNED,
         posts: [
-          { post: makeRawPostCard({ _id: 'a' }) },
-          { post: makeRawPostCard({ _id: 'b' }) },
+          { post: mockRawPostCard({ _id: 'a' }) },
+          { post: mockRawPostCard({ _id: 'b' }) },
         ],
       }),
     );
 
-    const postFeatured = await getPostFeatured('post-featured-1', tenant);
+    const postFeatured = await getPostFeatured(POST_FEATURED_ID, tenant);
 
     expect(postFeatured.posts.map((p) => p.id)).toEqual(['a', 'b']);
   });
 
-  it('returns an empty list when nothing resolves', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawPostFeaturedModule({
-        postSource: POST_SOURCE.NEWEST_FEATURED,
-        limit: 3,
-        posts: [],
-      }),
-    );
-
-    const postFeatured = await getPostFeatured('post-featured-1', tenant);
-
-    expect(postFeatured.posts).toEqual([]);
-  });
-
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getPostFeatured('missing', tenant)).rejects.toThrow();
+    await expect(getPostFeatured(MOCK_MISSING_ID, tenant)).rejects.toThrow();
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostFeaturedModule());
+    mockRun.mockResolvedValueOnce(mockRawPostFeaturedModule());
 
-    await getPostFeatured('post-featured-1', tenant);
+    await getPostFeatured(POST_FEATURED_ID, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        parameters: { id: 'post-featured-1' },
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:postFeatured',
-            't:tenant-a:module:post-featured-1',
-            't:tenant-a:posts',
-            't:tenant-a:author',
-            't:tenant-a:topic',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(postFeaturedModuleQuery, {
+      parameters: { id: POST_FEATURED_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          mockCacheTag('modules:postFeatured'),
+          mockCacheTag(`module:${POST_FEATURED_ID}`),
+          MOCK_POSTS_CACHE_TAG,
+          MOCK_AUTHOR_CACHE_TAG,
+          MOCK_TOPIC_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

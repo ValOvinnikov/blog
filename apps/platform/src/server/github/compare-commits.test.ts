@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
-  githubCompareJson,
-  githubJson,
+  mockGitHubCompareResponse,
+  mockGitHubResponse,
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 
@@ -36,7 +37,7 @@ describe(compareCommits, () => {
     files: ReturnType<typeof makeFiles>,
   ) => {
     github.respond(`/compare/${base}...${head}`, (path) =>
-      githubCompareJson(path, commits, files),
+      mockGitHubCompareResponse(path, commits, files),
     );
   };
 
@@ -99,16 +100,16 @@ describe(compareCommits, () => {
     );
   });
 
-  it('fails with githubError when a later page errors', async () => {
+  it('fails with GITHUB_ERROR when a later page errors', async () => {
     const commits = Array.from({ length: 150 }, makeCommit);
     respondCompare(commits, []);
     github.respond(`/compare/${base}...${head}?per_page=100&page=2`, () =>
-      githubJson({}, 500),
+      mockGitHubResponse({}, 500),
     );
 
     expect(await compareCommits(base, head)).toEqual({
       ok: false,
-      reason: 'githubError',
+      error: GITHUB_FAILURE.GITHUB_ERROR,
     });
   });
 });

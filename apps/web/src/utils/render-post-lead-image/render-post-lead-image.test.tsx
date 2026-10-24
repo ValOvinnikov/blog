@@ -1,47 +1,45 @@
-import type { ISanityImage } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
 
 import { renderPostLeadImage } from './render-post-lead-image';
 
-const sanityImage: ISanityImage = {
-  assetId: 'image-abc123-800x600-jpg',
-  alt: 'A scenic mountain range',
-  hotspot: undefined,
-  crop: undefined,
-  lqip: undefined,
-  dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
-};
+const heroImage = mockSanityImage();
 
 const RenderPostLeadImageHarness = ({
   post,
 }: {
-  post: ReturnType<typeof makePostCard>;
+  post: ReturnType<typeof mockPostCard>;
 }) => <>{renderPostLeadImage(post)}</>;
 
 const setup = customRender(RenderPostLeadImageHarness, {
-  post: makePostCard({ heroImage: sanityImage }),
+  post: mockPostCard({ heroImage }),
 });
 
-describe('renderPostLeadImage', () => {
+describe(renderPostLeadImage, () => {
   describe('with a hero image', () => {
     beforeEach(() => {
       setup();
     });
 
-    it('renders a SanityImage for a post with a hero image', () => {
-      const img = screen.getByRole('img', { name: sanityImage.alt });
-      expect(img).toHaveAttribute('loading', 'lazy');
+    it('renders the hero image lazily', () => {
+      const image = screen.getByRole('img', { name: heroImage.alt });
+
+      expect(image).toHaveAttribute('loading', 'lazy');
     });
 
     it('never sets priority/fetchpriority on the lead image', () => {
-      expect(screen.getByRole('img')).not.toHaveAttribute('fetchpriority');
+      const image = screen.getByRole('img', { name: heroImage.alt });
+
+      expect(image).not.toHaveAttribute('fetchpriority');
     });
   });
 
   it('renders nothing for a post with no hero image', () => {
-    setup({ post: makePostCard({ heroImage: undefined }) });
+    setup({ post: mockPostCard({ heroImage: undefined }) });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    const image = screen.queryByRole('img');
+
+    expect(image).not.toBeInTheDocument();
   });
 });

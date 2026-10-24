@@ -1,9 +1,10 @@
+import { okResult } from '@blog/utils';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { testStaticBreadcrumbsContract } from '@web/testing/shared/static-breadcrumbs-contract/static-breadcrumbs-contract';
 
 import { TopicIndexBreadcrumbs } from './topic-index-breadcrumbs';
@@ -26,7 +27,7 @@ vi.mock(
 );
 
 const indexPage = {
-  headingBlock: makeHeadingBlock({ heading: 'Subjects' }),
+  headingBlock: mockHeadingBlock({ heading: 'Subjects' }),
 };
 
 const setup = customRenderAsync(TopicIndexBreadcrumbs, {});
@@ -34,7 +35,7 @@ const setup = customRenderAsync(TopicIndexBreadcrumbs, {});
 describe(`<${TopicIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTopicIndexPageMock.mockReset();
-    getTopicIndexPageMock.mockResolvedValue({ ok: true, data: indexPage });
+    getTopicIndexPageMock.mockResolvedValue(okResult(indexPage));
   });
 
   testStaticBreadcrumbsContract({

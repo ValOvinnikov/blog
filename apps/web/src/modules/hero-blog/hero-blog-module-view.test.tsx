@@ -1,15 +1,18 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import { MOCK_HERO_BLOG_MODULE_ID } from '@web/testing/modules/hero-blog/fixtures';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
+const HEADING = 'Welcome to the blog';
+
 const setup = customRender(HeroBlogModuleView, {
-  id: 'hero-blog-1',
+  id: MOCK_HERO_BLOG_MODULE_ID,
   hasPost: true,
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  heading: 'Welcome to the blog',
+  heading: HEADING,
   supportingText: undefined,
   sanityImage: undefined,
   ctaButtons: [],
@@ -23,12 +26,13 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
   it('names the section by its top-level heading', () => {
     setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('region', { name: 'Welcome to the blog' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: HEADING,
+    });
+    const region = screen.getByRole('region', { name: HEADING });
+    expect(heading).toBeVisible();
+    expect(region).toBeVisible();
   });
 
   it('gives two instances of the same module distinct heading ids', () => {
@@ -38,12 +42,13 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
     const headingIds = screen
       .getAllByRole('heading', {
         level: 1,
-        name: 'Welcome to the blog',
+        name: HEADING,
       })
       .map(({ id }) => id);
+    const regions = screen.getAllByRole('region', {
+      name: HEADING,
+    });
     expect(new Set(headingIds).size).toBe(2);
-    expect(
-      screen.getAllByRole('region', { name: 'Welcome to the blog' }),
-    ).toHaveLength(2);
+    expect(regions).toHaveLength(2);
   });
 });

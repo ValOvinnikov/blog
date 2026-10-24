@@ -6,7 +6,9 @@ import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
 } from '@blog/db/testing/tenant-token-encryption-key';
-import { REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
+import { MOCK_REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
+import { decryptSecret } from '@blog/utils';
+import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantRevalidateWebhookSecret } from './set-tenant-revalidate-webhook-secret';
@@ -33,7 +35,7 @@ describe(setTenantRevalidateWebhookSecret, () => {
   it('stores the secret encrypted, not as plaintext', async () => {
     await setTenantRevalidateWebhookSecret(
       tenant.id,
-      REVALIDATE_WEBHOOK_SECRET,
+      MOCK_REVALIDATE_WEBHOOK_SECRET,
     );
 
     const [row] = await db()
@@ -41,9 +43,14 @@ describe(setTenantRevalidateWebhookSecret, () => {
       .from(tenants)
       .where(eq(tenants.id, tenant.id));
 
-    expect(row?.revalidateWebhookSecretEncrypted).toEqual(expect.any(String));
+    expect(
+      decryptSecret(
+        row?.revalidateWebhookSecretEncrypted ?? '',
+        MOCK_ENCRYPTION_KEY,
+      ),
+    ).toBe(MOCK_REVALIDATE_WEBHOOK_SECRET);
     expect(row?.revalidateWebhookSecretEncrypted).not.toContain(
-      REVALIDATE_WEBHOOK_SECRET,
+      MOCK_REVALIDATE_WEBHOOK_SECRET,
     );
   });
 
@@ -52,7 +59,7 @@ describe(setTenantRevalidateWebhookSecret, () => {
 
     await setTenantRevalidateWebhookSecret(
       tenant.id,
-      REVALIDATE_WEBHOOK_SECRET,
+      MOCK_REVALIDATE_WEBHOOK_SECRET,
     );
 
     const [row] = await db()
@@ -67,7 +74,10 @@ describe(setTenantRevalidateWebhookSecret, () => {
     vi.stubEnv('TENANT_TOKEN_ENCRYPTION_KEY', undefined);
 
     await expect(
-      setTenantRevalidateWebhookSecret(tenant.id, REVALIDATE_WEBHOOK_SECRET),
+      setTenantRevalidateWebhookSecret(
+        tenant.id,
+        MOCK_REVALIDATE_WEBHOOK_SECRET,
+      ),
     ).rejects.toThrow(MISSING_TENANT_TOKEN_KEY_ERROR);
   });
 });

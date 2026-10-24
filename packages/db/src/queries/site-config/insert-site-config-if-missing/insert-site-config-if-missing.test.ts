@@ -15,6 +15,8 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
+const CUSTOM_ACCENT_HUE = 123;
+
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
@@ -26,6 +28,14 @@ describe(insertSiteConfigIfMissing, () => {
     await insertSiteConfigIfMissing(id, PRESET_ID.EDITORIAL);
 
     expect((await getSiteConfig(id))?.preset).toBe(PRESET_ID.EDITORIAL);
+  });
+
+  it('seeds the accent hue it is given instead of the preset default', async () => {
+    const { id } = await insertTestTenant(db());
+
+    await insertSiteConfigIfMissing(id, PRESET_ID.CONSOLE, CUSTOM_ACCENT_HUE);
+
+    expect((await getSiteConfig(id))?.accentHue).toBe(CUSTOM_ACCENT_HUE);
   });
 
   it('leaves an existing site config untouched', async () => {

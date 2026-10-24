@@ -9,6 +9,7 @@ import {
   EQUALITY_OPERATORS,
   PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
+  PROTOCOL_ATTRIBUTE_VALUES,
   ROLE_QUERY_CALLEES,
   SANITY_TYPE_KEY,
   STUB_ENV_CALLEE,
@@ -43,7 +44,21 @@ const MODULE_PATH_CALLEES = new Set([
   'importMock',
   'resolve',
 ]);
-const TEST_TITLE_CALLEES = new Set(['describe', 'it', 'test', 'bench']);
+const TEST_TITLE_CALLEES = new Set([
+  'describe',
+  'it',
+  'test',
+  'bench',
+  'suite',
+]);
+const TEST_TABLE_METHODS = new Set(['each', 'for']);
+const GROQD_TYPED_METHODS = new Set([
+  'field',
+  'filterBy',
+  'filterByType',
+  'order',
+]);
+const ISR_CALLEE = 'isr';
 const MAX_LISTED_LOCATIONS = 3;
 
 const isExemptPath = (file) => EXEMPT_PATHS.some((re) => re.test(file));
@@ -65,6 +80,43 @@ const isFirstArgumentOf = (node, names) => {
     parent.arguments[0] === node &&
     (parent.expression.kind === ts.SyntaxKind.ImportKeyword ||
       names.has(calleeName(parent.expression)))
+  );
+};
+
+const rootName = (expression) => {
+  let current = expression;
+  while (ts.isPropertyAccessExpression(current)) {
+    current = current.expression;
+  }
+  return ts.isIdentifier(current) ? current.text : undefined;
+};
+
+const isTestTitle = (node) => {
+  const { parent } = node;
+  return (
+    ts.isCallExpression(parent) &&
+    parent.arguments[0] === node &&
+    TEST_TITLE_CALLEES.has(rootName(parent.expression))
+  );
+};
+
+const isTestTable = (expression) =>
+  ts.isPropertyAccessExpression(expression) &&
+  TEST_TABLE_METHODS.has(expression.name.text) &&
+  TEST_TITLE_CALLEES.has(rootName(expression.expression));
+
+const isTestTableTitle = (node) => {
+  const { parent } = node;
+  if (ts.isTaggedTemplateExpression(parent)) {
+    return parent.template === node && isTestTable(parent.tag);
+  }
+  if (!ts.isCallExpression(parent) || parent.arguments[0] !== node) {
+    return false;
+  }
+  const table = parent.expression;
+  return (
+    (ts.isCallExpression(table) && isTestTable(table.expression)) ||
+    (ts.isTaggedTemplateExpression(table) && isTestTable(table.tag))
   );
 };
 
@@ -114,16 +166,40 @@ const isStubEnvArgument = ({ parent }) =>
   ts.isPropertyAccessExpression(parent.expression) &&
   parent.expression.name.text === STUB_ENV_CALLEE;
 
-const isProtocolAttributeValue = ({ parent }) =>
-  ts.isPropertyAssignment(parent) &&
-  (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
-  PROTOCOL_ATTRIBUTE_KEYS.has(parent.name.text);
+const isProtocolAttributeValue = (node) => {
+  const { parent } = node;
+  return (
+    ts.isPropertyAssignment(parent) &&
+    (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
+    (PROTOCOL_ATTRIBUTE_KEYS.has(parent.name.text) ||
+      PROTOCOL_ATTRIBUTE_VALUES.get(parent.name.text)?.has(node.text) === true)
+  );
+};
 
 // Sanity `_type` names and literal types are checked against the generated types, so they cannot drift.
 const isSanityTypeValue = ({ parent }) =>
   ts.isPropertyAssignment(parent) &&
   (ts.isIdentifier(parent.name) || ts.isStringLiteral(parent.name)) &&
   parent.name.text === SANITY_TYPE_KEY;
+
+// groqd checks its typed builders' arguments against the generated Sanity types, so they cannot drift.
+const isGroqdTypedArgument = ({ parent }) =>
+  ts.isCallExpression(parent) &&
+  ts.isPropertyAccessExpression(parent.expression) &&
+  GROQD_TYPED_METHODS.has(parent.expression.name.text);
+
+// `check:revalidate-tags-sync` checks every `isr(...)` tag against the revalidation webhook's map.
+const isIsrTag = (node) => {
+  const { parent } = node;
+  const tagArgument = ts.isArrayLiteralExpression(parent) ? parent : node;
+  const call = tagArgument.parent;
+  return (
+    ts.isCallExpression(call) &&
+    call.arguments[0] === tagArgument &&
+    ts.isIdentifier(call.expression) &&
+    call.expression.text === ISR_CALLEE
+  );
+};
 
 const isExemptLiteral = (node) => {
   const { parent } = node;
@@ -138,14 +214,17 @@ const isExemptLiteral = (node) => {
     ts.isLiteralTypeNode(parent) ||
     (parent.name === node && !ts.isElementAccessExpression(parent)) ||
     isFirstArgumentOf(node, MODULE_PATH_CALLEES) ||
-    isFirstArgumentOf(node, TEST_TITLE_CALLEES) ||
+    isTestTitle(node) ||
+    isTestTableTitle(node) ||
     isFirstArgumentOf(node, ROLE_QUERY_CALLEES) ||
     isInsideClassOrJsxAttribute(node) ||
     isEnvComparisonOperand(node) ||
     isEnvReadKey(node) ||
     isStubEnvArgument(node) ||
     isProtocolAttributeValue(node) ||
-    isSanityTypeValue(node)
+    isSanityTypeValue(node) ||
+    isGroqdTypedArgument(node) ||
+    isIsrTag(node)
   );
 };
 

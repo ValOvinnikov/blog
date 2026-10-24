@@ -1,61 +1,68 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawTimelineModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_TIMELINE_MODULE_ID,
+  mockRawTimelineModule,
+} from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LANDING_CACHE_TAG,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockRawHeadingBlock,
+  mockValidationError,
+} from '@blog/service/testing/shared/fixtures';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getTimelineModule } from './loader';
+import { timelineModuleQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const HEADING = 'Our story';
+const tenant = mockTenant();
 
 describe(getTimelineModule, () => {
-  it('resolves the module in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTimelineModule({
-        headingBlock: makeRawHeadingBlock('How it works'),
-      }),
+  beforeEach(() => {
+    mockRun.mockResolvedValue(
+      mockRawTimelineModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
     );
+  });
 
-    const timeline = await getTimelineModule('timeline-1', tenant);
+  it('resolves the module in a single round trip', async () => {
+    const timeline = await getTimelineModule(MOCK_TIMELINE_MODULE_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(timeline.headingBlock.heading).toBe('How it works');
+    expect(timeline.headingBlock.heading).toBe(HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+    mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getTimelineModule('missing', tenant)).rejects.toThrow();
+    await expect(getTimelineModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTimelineModule());
-
-    await getTimelineModule('timeline-1', tenant);
+    await getTimelineModule(MOCK_TIMELINE_MODULE_ID, tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:timeline',
-            't:tenant-a:module:timeline-1',
-            't:tenant-a:link',
-            't:tenant-a:homePage',
-            't:tenant-a:page_landing',
-          ],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(timelineModuleQuery, {
+      parameters: { id: MOCK_TIMELINE_MODULE_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          mockCacheTag('modules:timeline'),
+          mockCacheTag(`module:${MOCK_TIMELINE_MODULE_ID}`),
+          MOCK_LINK_CACHE_TAG,
+          MOCK_HOME_PAGE_CACHE_TAG,
+          MOCK_PAGE_LANDING_CACHE_TAG,
+        ],
+      },
+    });
   });
 });

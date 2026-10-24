@@ -4,7 +4,7 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { users } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { requireDecryptedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, eq, isNull } from 'drizzle-orm';
 
 export type TTenantOwnerMembership = {
@@ -42,9 +42,8 @@ export async function getTenantOwnerMembership(
     );
 
   if (!invite) return undefined;
-  if (invite.emailEncrypted === null) {
-    throw new Error('Invite has no encrypted email.');
-  }
 
-  return { email: decryptPersonalValue(invite.emailEncrypted) };
+  return {
+    email: requireDecryptedPersonalValue(invite.emailEncrypted, 'Invite'),
+  };
 }

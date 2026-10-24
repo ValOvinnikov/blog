@@ -73,7 +73,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/error.ts`
 
-- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`
+- **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`
 
 ### `@blog/config/constants` — `packages/config/src/constants/finding.ts`
 
@@ -92,11 +92,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/http-methods.ts`
 
-- **HTTP_METHOD**: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+- **HTTP_METHOD**: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`
 
 ### `@blog/config/constants` — `packages/config/src/constants/http-statuses.ts`
 
-- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `SEE_OTHER`=`303`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `CONFLICT`=`409`, `INTERNAL_SERVER_ERROR`=`500`
+- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `CONFLICT`=`409`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
 
 ### `@blog/config/constants` — `packages/config/src/constants/icon.ts`
 
@@ -133,6 +133,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/newsletter-result.ts`
 
 - **NEWSLETTER_RESULT**: `CONFIRMED`, `CONFIRM_INVALID`, `CONFIRM_UNAVAILABLE`, `CONFIRM_FAILED`, `UNSUBSCRIBED`, `UNSUBSCRIBE_INVALID`, `UNSUBSCRIBE_FAILED`
+
+### `@blog/config/constants` — `packages/config/src/constants/next-dynamic-error.ts`
+
+- **NEXT_DYNAMIC_ERROR**: `DYNAMIC_SERVER_USAGE`
 
 ### `@blog/config/constants` — `packages/config/src/constants/next-navigation-error.ts`
 
@@ -251,6 +255,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_STATUS**: `ACTIVE`, `SUSPENDED`, `ARCHIVED`
 - **TENANT_PLAN**: `FREE`, `GROWTH`
+- **TENANT_DETAILS_UPDATE_OUTCOME**: `UPDATED`, `DOMAIN_TAKEN`, `DOMAIN_LOCKED`, `DOMAIN_INVALID`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_EMAIL_TAKEN`, `OWNS_FREE_TENANT`
 
 ## app:platform
 
@@ -275,6 +280,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_SENDER_FIELD_ERROR**: `SENDER_NAME_INVALID`, `CONTACT_RECIPIENT_INVALID`
 
+### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
+
+- **GITHUB_FAILURE**: `GITHUB_ERROR`
+
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
 - **LEAD_REFUSAL**: `NOT_FOUND`
@@ -293,6 +302,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **CONTRAST_STATUS**: `GREEN`, `FAILED`, `RUNNING`, `NONE`, `DUE`
 - **RELEASE_REFUSAL**: `CONTRAST_CHECK_RUNNING`, `RELEASE_RUNNING`, `RELEASES_PAUSED`
 - **RELEASE_FIELD_ERROR**: `VERSION_MALFORMED`, `VERSION_NOT_GREATER`, `REASON_REQUIRED`
+- **RELEASE_FAILURE**: `NO_RELEASE_TAG`, `TAG_LIST_INCOMPLETE`, `DB_ERROR`
 - **RELEASE_RUN_STATUS**: `DISPATCHED`, `RUNNING`, `SUCCEEDED`, `FAILED`
 
 ### `@platform/constants/settings` — `apps/platform/src/constants/settings.ts`
@@ -311,7 +321,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
-- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`
+- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`
 
 ### `@platform/constants/upload` — `apps/platform/src/constants/upload.ts`
 

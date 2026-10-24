@@ -16,6 +16,8 @@ export type TSetBookmarkResult = TActionResult<
   typeof ACTION_OUTCOME.UNAVAILABLE | typeof ACTION_OUTCOME.SERVER_ERROR
 >;
 
+const UPDATE_FAILED_EVENT = 'bookmark.update_failed';
+
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 export const getBookmarkStatus = async (postId: string): Promise<boolean> => {
@@ -39,13 +41,13 @@ export const setBookmarkStatus = async (
 
   const tenant = await resolveWritableTenant('bookmark.set');
   if (!tenant.ok) {
-    if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+    if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
       logger.warn('bookmark.tenant_not_active', { postId });
       return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
     }
     return SERVER_ERROR;
   }
-  const { tenantId } = tenant;
+  const { data: tenantId } = tenant;
 
   try {
     if (isBookmarked) {
@@ -55,7 +57,7 @@ export const setBookmarkStatus = async (
         postId,
       );
       if (!result.ok) {
-        logger.error('bookmark.update_failed', {
+        logger.error(UPDATE_FAILED_EVENT, {
           postId,
           error: result.error,
         });
@@ -66,7 +68,7 @@ export const setBookmarkStatus = async (
     }
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error('bookmark.update_failed', { postId, error });
+    logger.error(UPDATE_FAILED_EVENT, { postId, error });
     return SERVER_ERROR;
   }
 };

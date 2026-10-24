@@ -26,7 +26,7 @@ import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate'
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
 
-export type TSubscribeRefusal =
+type TSubscribeRefusal =
   | typeof ACTION_OUTCOME.RATE_LIMITED
   | typeof ACTION_OUTCOME.SERVER_ERROR
   | typeof ACTION_OUTCOME.UNAVAILABLE;
@@ -50,13 +50,13 @@ export const subscribeToNewsletterAction = async (
 
   const tenant = await resolveWritableTenant('newsletter.subscribe');
   if (!tenant.ok) {
-    if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+    if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
       logger.warn('newsletter.subscribe_tenant_not_active');
       return UNAVAILABLE;
     }
     return SERVER_ERROR;
   }
-  const { tenantId } = tenant;
+  const { data: tenantId } = tenant;
 
   if (!(await isCapabilityEnabledForTenant(tenantId, CAPABILITY.NEWSLETTER))) {
     logger.warn('newsletter.subscribe_capability_disabled');

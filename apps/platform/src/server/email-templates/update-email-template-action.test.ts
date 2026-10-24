@@ -10,8 +10,11 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { OPERATOR_ID, OPERATOR_EMAIL } from '@platform/testing/admins/operator';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_EMAIL,
+} from '@platform/testing/admins/operator';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -60,11 +63,11 @@ const mockMembershipAndUpsert = (
   }> = {},
 ) => {
   requireTenantMembershipMock.mockResolvedValue({
-    tenant: { id: TENANT_ID },
+    tenant: { id: MOCK_TENANT_ID },
     membership: { role: MEMBERSHIP_ROLE.OWNER },
   });
   upsertEmailTemplateMock.mockResolvedValue({
-    tenantId: TENANT_ID,
+    tenantId: MOCK_TENANT_ID,
     templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
     subject: VALID_INPUT.subject,
     body: VALID_INPUT.body,
@@ -91,7 +94,7 @@ describe(updateEmailTemplateAction, () => {
     requireTenantMembershipMock.mockReset();
     authMock.mockReset();
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     upsertEmailTemplateMock.mockReset();
     insertAuditEventMock.mockReset();
@@ -107,14 +110,14 @@ describe(updateEmailTemplateAction, () => {
 
   it('writes the copy to the requested language', async () => {
     await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.FR,
       VALID_INPUT,
     );
 
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       VALID_INPUT,
       LOCALE_ISO_CODES.FR,
@@ -123,7 +126,7 @@ describe(updateEmailTemplateAction, () => {
 
   it('rejects a language the tenant does not offer without writing', async () => {
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.DE,
       VALID_INPUT,
@@ -138,7 +141,7 @@ describe(updateEmailTemplateAction, () => {
 
   it('rejects an unrecognized language without ever calling the tenant gate', async () => {
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       'XX' as never,
       VALID_INPUT,
@@ -153,15 +156,15 @@ describe(updateEmailTemplateAction, () => {
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       VALID_INPUT,
     );
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       VALID_INPUT,
       LOCALE_ISO_CODES.EN,
@@ -171,7 +174,7 @@ describe(updateEmailTemplateAction, () => {
 
   it('rejects an unrecognized template type without ever calling the tenant gate', async () => {
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'NOT_A_TEMPLATE' as never,
       LOCALE_ISO_CODES.EN,
       VALID_INPUT,
@@ -186,7 +189,7 @@ describe(updateEmailTemplateAction, () => {
 
   it('rejects an empty subject string rather than storing it as a blank', async () => {
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       { ...VALID_INPUT, subject: '' },
@@ -221,7 +224,7 @@ describe(updateEmailTemplateAction, () => {
     };
 
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       input,
@@ -229,7 +232,7 @@ describe(updateEmailTemplateAction, () => {
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       input,
       LOCALE_ISO_CODES.EN,
@@ -267,7 +270,7 @@ describe(updateEmailTemplateAction, () => {
       };
 
       const result = await updateEmailTemplateAction(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         LOCALE_ISO_CODES.EN,
         input,
@@ -322,7 +325,7 @@ describe(updateEmailTemplateAction, () => {
     };
 
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       input,
@@ -340,7 +343,7 @@ describe(updateEmailTemplateAction, () => {
     mockMembershipAndUpsert({ subject: 'Default subject', body: [] });
 
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       { subject: null, body: null },
@@ -348,7 +351,7 @@ describe(updateEmailTemplateAction, () => {
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       { subject: null, body: null },
       LOCALE_ISO_CODES.EN,
@@ -357,13 +360,13 @@ describe(updateEmailTemplateAction, () => {
 
   it('reports failure without throwing, and no audit event, when the write fails', async () => {
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: TENANT_ID },
+      tenant: { id: MOCK_TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     upsertEmailTemplateMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       VALID_INPUT,
@@ -375,18 +378,18 @@ describe(updateEmailTemplateAction, () => {
 
   it('records a SETTINGS_UPDATED audit event, with the operator as actor', async () => {
     await updateEmailTemplateAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       LOCALE_ISO_CODES.EN,
       VALID_INPUT,
     );
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: {
         templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         locale: LOCALE_ISO_CODES.EN,
@@ -414,7 +417,7 @@ describe(updateEmailTemplateAction, () => {
 
       await expect(
         updateEmailTemplateAction(
-          TENANT_ID,
+          MOCK_TENANT_ID,
           EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           LOCALE_ISO_CODES.EN,
           VALID_INPUT,

@@ -6,13 +6,14 @@ import {
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
-  BLOCKED_ADDRESS_ENTRY_ID,
-  BLOCKED_ADDRESS_HASH,
-  makeBlockedIdentity,
+  MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+  mockBlockedIdentity,
+  mockBlockedAddressIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { notFound } from 'next/navigation';
@@ -49,22 +50,17 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const DOMAIN_ENTRY = makeBlockedIdentity();
-const ADDRESS_ENTRY = makeBlockedIdentity({
-  id: BLOCKED_ADDRESS_ENTRY_ID,
-  kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-  value: BLOCKED_ADDRESS_HASH,
-});
+const DOMAIN_ENTRY = mockBlockedIdentity();
 
 describe(removeBlockedIdentityAction, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
+    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
     listBlockedIdentitiesMock
       .mockReset()
-      .mockResolvedValue({ ok: true, data: [DOMAIN_ENTRY, ADDRESS_ENTRY] });
-    removeBlockedIdentityMock
-      .mockReset()
-      .mockResolvedValue({ ok: true, data: undefined });
+      .mockResolvedValue(
+        okResult([DOMAIN_ENTRY, mockBlockedAddressIdentity()]),
+      );
+    removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     recordAuditEventMock.mockReset();
   });
 
@@ -96,12 +92,12 @@ describe(removeBlockedIdentityAction, () => {
   });
 
   it('audits a removed address entry without its hash', async () => {
-    await removeBlockedIdentityAction(ADDRESS_ENTRY.id);
+    await removeBlockedIdentityAction(MOCK_BLOCKED_ADDRESS_ENTRY_ID);
 
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
       action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
       targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-      targetId: ADDRESS_ENTRY.id,
+      targetId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
       details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
     });
   });
@@ -118,10 +114,9 @@ describe(removeBlockedIdentityAction, () => {
   });
 
   it('refuses an entry removed by someone else meanwhile and records nothing', async () => {
-    removeBlockedIdentityMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
+    removeBlockedIdentityMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
 
     const result = await removeBlockedIdentityAction(DOMAIN_ENTRY.id);
 

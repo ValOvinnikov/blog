@@ -1,11 +1,11 @@
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import {
-  BLOCK_AUTHOR_EMAIL,
-  BLOCK_REASON,
-  BLOCKED_ADDRESS_ENTRY_ID,
-  BLOCKED_ADDRESS_HASH_PREVIEW,
-  BLOCKED_DOMAIN,
-  makeBlockedSignupEntry,
+  MOCK_BLOCK_AUTHOR_EMAIL,
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+  MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
+  MOCK_BLOCKED_DOMAIN,
+  mockBlockedSignupEntry,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 
@@ -19,16 +19,16 @@ vi.mock('@platform/server/signup-block/remove-blocked-identity-action', () => ({
   removeBlockedIdentityAction: vi.fn(),
 }));
 
-const ADDRESS_ENTRY = makeBlockedSignupEntry({
-  id: BLOCKED_ADDRESS_ENTRY_ID,
+const ADDRESS_ENTRY = mockBlockedSignupEntry({
+  id: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
   kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-  displayValue: BLOCKED_ADDRESS_HASH_PREVIEW,
-  reason: `${BLOCK_REASON} again`,
+  displayValue: MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
+  reason: `${MOCK_BLOCK_REASON} again`,
   addedBy: null,
 });
 
 const setup = customRender(BlockedSignupsView, {
-  entries: [makeBlockedSignupEntry(), ADDRESS_ENTRY],
+  entries: [mockBlockedSignupEntry(), ADDRESS_ENTRY],
 });
 
 describe(`<${BlockedSignupsView.name}/>`, () => {
@@ -39,16 +39,18 @@ describe(`<${BlockedSignupsView.name}/>`, () => {
 
     it('shows each entry with its value, reason and author', () => {
       const domainRow = screen.getByRole('row', {
-        name: new RegExp(BLOCKED_DOMAIN),
+        name: new RegExp(MOCK_BLOCKED_DOMAIN),
       });
       const addressRow = screen.getByRole('row', {
-        name: new RegExp(BLOCKED_ADDRESS_HASH_PREVIEW),
+        name: new RegExp(MOCK_BLOCKED_ADDRESS_HASH_PREVIEW),
       });
 
-      const domainReason = within(domainRow).getByText(BLOCK_REASON);
-      const domainAuthor = within(domainRow).getByText(BLOCK_AUTHOR_EMAIL);
+      const domainReason = within(domainRow).getByText(MOCK_BLOCK_REASON);
+      const domainAuthor = within(domainRow).getByText(MOCK_BLOCK_AUTHOR_EMAIL);
       const addressKind = within(addressRow).getByText('Email address');
-      const addressAuthor = within(addressRow).queryByText(BLOCK_AUTHOR_EMAIL);
+      const addressAuthor = within(addressRow).queryByText(
+        MOCK_BLOCK_AUTHOR_EMAIL,
+      );
 
       expect(domainReason).toBeVisible();
       expect(domainAuthor).toBeVisible();
@@ -58,10 +60,10 @@ describe(`<${BlockedSignupsView.name}/>`, () => {
 
     it('offers a removal control for every entry', () => {
       const removeDomain = screen.getByRole('button', {
-        name: `Remove block ${BLOCKED_DOMAIN}`,
+        name: `Remove block ${MOCK_BLOCKED_DOMAIN}`,
       });
       const removeAddress = screen.getByRole('button', {
-        name: `Remove block ${BLOCKED_ADDRESS_HASH_PREVIEW}`,
+        name: `Remove block ${MOCK_BLOCKED_ADDRESS_HASH_PREVIEW}`,
       });
 
       expect(removeDomain).toBeVisible();

@@ -1,7 +1,18 @@
 import type { TPortableTextBody } from '@blog/service';
-import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { extractPostHeadings } from './extract-post-headings';
+
+const H2_STYLE = 'h2';
+const H3_STYLE = 'h3';
+const KEY_FIRST = 'k1';
+const KEY_SECOND = 'k2';
+const KEY_THIRD = 'k3';
+const KEY_FOURTH = 'k4';
+const GETTING_STARTED = 'Getting started';
+const SECTION_ONE = 'Section one';
+const SECTION_TWO = 'Section two';
+const SECTION_THREE = 'Section three';
 
 describe(extractPostHeadings, () => {
   it('returns an empty array for an undefined body', () => {
@@ -10,8 +21,8 @@ describe(extractPostHeadings, () => {
 
   it('returns an empty array when the body has zero H2 headings', () => {
     const body: TPortableTextBody = [
-      portableTextBlock('Just a paragraph.'),
-      portableTextBlock('A stray subsection', { style: 'h3' }),
+      mockPortableTextBlock('Just a paragraph.'),
+      mockPortableTextBlock('A stray subsection', { style: H3_STYLE }),
     ];
 
     expect(extractPostHeadings(body)).toEqual([]);
@@ -19,9 +30,9 @@ describe(extractPostHeadings, () => {
 
   it('returns an empty array when the body has fewer than 3 H2 headings', () => {
     const body: TPortableTextBody = [
-      portableTextBlock('First section', { style: 'h2' }),
-      portableTextBlock('Some text.'),
-      portableTextBlock('Second section', { style: 'h2' }),
+      mockPortableTextBlock('First section', { style: H2_STYLE }),
+      mockPortableTextBlock('Some text.'),
+      mockPortableTextBlock('Second section', { style: H2_STYLE }),
     ];
 
     expect(extractPostHeadings(body)).toEqual([]);
@@ -29,27 +40,36 @@ describe(extractPostHeadings, () => {
 
   it('returns the ordered heading list, including nested H3s, once the body has 3+ H2 headings', () => {
     const body: TPortableTextBody = [
-      portableTextBlock('Getting started', { style: 'h2', key: 'k1' }),
-      portableTextBlock('Intro text.'),
-      portableTextBlock('Prerequisites', { style: 'h3', key: 'k2' }),
-      portableTextBlock('Configuration', { style: 'h2', key: 'k3' }),
-      portableTextBlock('Deployment', { style: 'h2', key: 'k4' }),
+      mockPortableTextBlock(GETTING_STARTED, {
+        style: H2_STYLE,
+        key: KEY_FIRST,
+      }),
+      mockPortableTextBlock('Intro text.'),
+      mockPortableTextBlock('Prerequisites', {
+        style: H3_STYLE,
+        key: KEY_SECOND,
+      }),
+      mockPortableTextBlock('Configuration', {
+        style: H2_STYLE,
+        key: KEY_THIRD,
+      }),
+      mockPortableTextBlock('Deployment', { style: H2_STYLE, key: KEY_FOURTH }),
     ];
 
     expect(extractPostHeadings(body)).toEqual([
-      { key: 'k1', text: 'Getting started', level: 2 },
-      { key: 'k2', text: 'Prerequisites', level: 3 },
-      { key: 'k3', text: 'Configuration', level: 2 },
-      { key: 'k4', text: 'Deployment', level: 2 },
+      { key: KEY_FIRST, text: GETTING_STARTED, level: 2 },
+      { key: KEY_SECOND, text: 'Prerequisites', level: 3 },
+      { key: KEY_THIRD, text: 'Configuration', level: 2 },
+      { key: KEY_FOURTH, text: 'Deployment', level: 2 },
     ]);
   });
 
   it('ignores non-block nodes (images, code) and non-heading block styles', () => {
     const body: TPortableTextBody = [
-      portableTextBlock('Section one', { style: 'h2' }),
-      portableTextBlock('Section two', { style: 'h2' }),
-      portableTextBlock('Section three', { style: 'h2' }),
-      portableTextBlock('A quote.', { style: 'blockquote' }),
+      mockPortableTextBlock(SECTION_ONE, { style: H2_STYLE }),
+      mockPortableTextBlock(SECTION_TWO, { style: H2_STYLE }),
+      mockPortableTextBlock(SECTION_THREE, { style: H2_STYLE }),
+      mockPortableTextBlock('A quote.', { style: 'blockquote' }),
       { _type: 'code', _key: 'code-1', code: 'const x = 1;' },
     ];
 
@@ -57,9 +77,9 @@ describe(extractPostHeadings, () => {
 
     expect(headings).toHaveLength(3);
     expect(headings.map((heading) => heading.text)).toEqual([
-      'Section one',
-      'Section two',
-      'Section three',
+      SECTION_ONE,
+      SECTION_TWO,
+      SECTION_THREE,
     ]);
   });
 });

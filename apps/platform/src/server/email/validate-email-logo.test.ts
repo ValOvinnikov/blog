@@ -72,7 +72,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: true,
-      asset: {
+      data: {
         buffer: expect.any(Buffer),
         contentType: 'image/png',
         extension: 'png',
@@ -85,7 +85,7 @@ describe(validateEmailLogoUpload, () => {
 
     expect(result).toEqual({
       ok: true,
-      asset: {
+      data: {
         buffer: expect.any(Buffer),
         contentType: 'image/gif',
         extension: 'gif',

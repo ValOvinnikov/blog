@@ -1,6 +1,6 @@
 import { SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
   buildVoiceDraft,
   localeDraftOf,
@@ -35,7 +35,7 @@ const Wrapper = ({ children }: { children: ReactNode }) => (
     openListFieldId={undefined}
     setOpenListFieldId={vi.fn()}
     setFieldValue={setFieldValue}
-    specimenTheme={SITE_PREVIEW_THEME}
+    specimenTheme={MOCK_SITE_PREVIEW_THEME}
   >
     {children}
   </VoiceEditorProvider>

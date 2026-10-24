@@ -1,19 +1,25 @@
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { render, screen } from '@platform/testing/custom-render';
+import { MOCK_RUN_PLUS_1_MIN_AT } from '@platform/testing/tenants/fixtures';
 import type { ComponentProps } from 'react';
 
 import { StepList } from './step-list';
 
+const SANITY_PROJECT = 'Sanity project';
+const SEED_CONTENT = 'Seed content';
+const HIDDEN_ICON_SELECTOR = 'span[aria-hidden="true"]';
+const RUNNING_NOW = 'Running now';
+
 const steps: ComponentProps<typeof StepList>['steps'] = [
   {
     key: 'one',
-    title: 'Sanity project',
+    title: SANITY_PROJECT,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     statusLabel: 'Complete',
   },
   {
     key: 'two',
-    title: 'Seed content',
+    title: SEED_CONTENT,
     status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
     statusLabel: 'Running…',
   },
@@ -31,43 +37,49 @@ const steps: ComponentProps<typeof StepList>['steps'] = [
   },
 ];
 
-describe(StepList, () => {
+describe(`<${StepList.name}/>`, () => {
   describe('with the full step set', () => {
     beforeEach(() => {
       render(<StepList steps={steps} />);
     });
 
     it('maps each status to its indicator glyph, keeping every glyph decorative', () => {
-      expect(
-        screen.getByText('✓', { selector: 'span[aria-hidden="true"]' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('2', { selector: 'span[aria-hidden="true"]' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('!', { selector: 'span[aria-hidden="true"]' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('4', { selector: 'span[aria-hidden="true"]' }),
-      ).toBeVisible();
+      const doneGlyph = screen.getByText('✓', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const runningGlyph = screen.getByText('2', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const failedGlyph = screen.getByText('!', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const idleGlyph = screen.getByText('4', {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+
+      expect(doneGlyph).toBeVisible();
+      expect(runningGlyph).toBeVisible();
+      expect(failedGlyph).toBeVisible();
+      expect(idleGlyph).toBeVisible();
     });
 
     it('renders a connector after every step except the last', () => {
-      expect(
-        screen.getAllByText((content) => content.length > 0, {
-          selector: 'span[aria-hidden="true"]',
-        }),
-      ).toHaveLength(steps.length);
-      expect(screen.getAllByTestId('step-connector')).toHaveLength(
-        steps.length - 1,
-      );
+      const glyphs = screen.getAllByText((content) => content.length > 0, {
+        selector: HIDDEN_ICON_SELECTOR,
+      });
+      const connectors = screen.getAllByTestId('step-connector');
+
+      expect(glyphs).toHaveLength(steps.length);
+      expect(connectors).toHaveLength(steps.length - 1);
     });
 
     it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
-      for (const { statusLabel } of steps) {
-        const status = screen.getByText(statusLabel);
-        expect(status.closest('[aria-live="polite"]')).not.toBeNull();
-      }
+      const liveRegions = screen.getAllByRole('status');
+
+      expect(liveRegions).toHaveLength(steps.length);
+      steps.forEach(({ statusLabel }, index) => {
+        expect(liveRegions[index]).toHaveTextContent(statusLabel);
+      });
     });
   });
 
@@ -77,16 +89,18 @@ describe(StepList, () => {
         steps={[
           {
             key: 'one',
-            title: 'Seed content',
+            title: SEED_CONTENT,
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
             statusLabel: 'Running…',
-            trailingSlot: 'Running now',
+            trailingSlot: RUNNING_NOW,
           },
         ]}
       />,
     );
 
-    expect(screen.getByText('Running now')).toBeVisible();
+    const trailingSlot = screen.getByText(RUNNING_NOW);
+
+    expect(trailingSlot).toBeVisible();
   });
 
   it('renders an already-formatted updatedAt as a <time> element carrying the raw ISO value', () => {
@@ -95,10 +109,10 @@ describe(StepList, () => {
         steps={[
           {
             key: 'one',
-            title: 'Sanity project',
+            title: SANITY_PROJECT,
             status: TENANT_PROVISIONING_STEP_STATUS.DONE,
             statusLabel: 'Complete',
-            updatedAt: '2026-08-12T14:19:00.000Z',
+            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
             updatedAtLabel: '6m ago',
           },
         ]}
@@ -107,6 +121,6 @@ describe(StepList, () => {
 
     const timestamp = screen.getByText('6m ago');
     expect(timestamp.tagName).toBe('TIME');
-    expect(timestamp).toHaveAttribute('dateTime', '2026-08-12T14:19:00.000Z');
+    expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_1_MIN_AT);
   });
 });

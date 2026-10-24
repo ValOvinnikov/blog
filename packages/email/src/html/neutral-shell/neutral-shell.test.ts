@@ -1,6 +1,15 @@
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import {
+  MOCK_BODY_HTML,
+  MOCK_ESCAPED_SCRIPT_MARKUP,
+  MOCK_LINK_HTML,
+  MOCK_SCRIPT_MARKUP,
+} from '@blog/email/testing/email-fixtures';
 
 import { buildNeutralShell } from './neutral-shell';
+
+const OPERATOR_BRAND_NAME = 'Tenant Alerts';
+const STRUCTURAL_HTML = '<p>Structural</p>';
 
 describe(buildNeutralShell, () => {
   describe('with only a title and body HTML', () => {
@@ -9,13 +18,13 @@ describe(buildNeutralShell, () => {
     beforeEach(() => {
       html = buildNeutralShell({
         title: 'Sign in',
-        bodyHtml: '<p>Body</p>',
+        bodyHtml: MOCK_BODY_HTML,
       });
     });
 
     it('wraps the body in a full HTML document', () => {
       expect(html).toContain('<!doctype html>');
-      expect(html).toContain('<p>Body</p>');
+      expect(html).toContain(MOCK_BODY_HTML);
     });
 
     it('titles the document with the given title', () => {
@@ -30,7 +39,7 @@ describe(buildNeutralShell, () => {
     });
 
     it('renders no operator branding', () => {
-      expect(html).not.toContain('Tenant Alerts');
+      expect(html).not.toContain(OPERATOR_BRAND_NAME);
       expect(html).not.toContain(PLATFORM_EMAIL_BRAND.surface2);
     });
 
@@ -41,25 +50,25 @@ describe(buildNeutralShell, () => {
 
   it('escapes the title', () => {
     const html = buildNeutralShell({
-      title: '<script>alert(1)</script>',
-      bodyHtml: '<p>Body</p>',
+      title: MOCK_SCRIPT_MARKUP,
+      bodyHtml: MOCK_BODY_HTML,
     });
 
-    expect(html).not.toContain('<script>alert(1)</script>');
-    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_SCRIPT_MARKUP);
   });
 
   it('renders structural and action HTML after the body', () => {
     const html = buildNeutralShell({
       title: 'Sign in',
-      bodyHtml: '<p>Body</p>',
-      structuralHtml: '<p>Structural</p>',
-      actionHtml: '<a href="https://example.com">Act</a>',
+      bodyHtml: MOCK_BODY_HTML,
+      structuralHtml: STRUCTURAL_HTML,
+      actionHtml: MOCK_LINK_HTML,
     });
 
-    const bodyIndex = html.indexOf('<p>Body</p>');
-    const structuralIndex = html.indexOf('<p>Structural</p>');
-    const actionIndex = html.indexOf('<a href="https://example.com">Act</a>');
+    const bodyIndex = html.indexOf(MOCK_BODY_HTML);
+    const structuralIndex = html.indexOf(STRUCTURAL_HTML);
+    const actionIndex = html.indexOf(MOCK_LINK_HTML);
 
     expect(bodyIndex).toBeLessThan(structuralIndex);
     expect(structuralIndex).toBeLessThan(actionIndex);
@@ -69,11 +78,11 @@ describe(buildNeutralShell, () => {
     const html = buildNeutralShell({
       title: 'Sign in',
       // @ts-expect-error -- an unresolved tenant has no defensible name, so the neutral shell accepts none.
-      brandName: 'Tenant Alerts',
-      bodyHtml: '<p>Body</p>',
+      brandName: OPERATOR_BRAND_NAME,
+      bodyHtml: MOCK_BODY_HTML,
     });
 
-    expect(html).not.toContain('Tenant Alerts');
+    expect(html).not.toContain(OPERATOR_BRAND_NAME);
   });
 
   it('cannot be passed a brand palette at compile time', () => {
@@ -81,7 +90,7 @@ describe(buildNeutralShell, () => {
       title: 'Sign in',
       // @ts-expect-error -- the neutral shell's palette is fixed, so no tenant or operator palette can reach it.
       brand: PLATFORM_EMAIL_BRAND,
-      bodyHtml: '<p>Body</p>',
+      bodyHtml: MOCK_BODY_HTML,
     });
 
     expect(html).not.toContain(PLATFORM_EMAIL_BRAND.surface2);

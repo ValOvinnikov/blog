@@ -1,0 +1,3 @@
+export const NEXT_DYNAMIC_ERROR = {
+  DYNAMIC_SERVER_USAGE: 'DYNAMIC_SERVER_USAGE',
+} as const;

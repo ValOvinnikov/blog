@@ -1,5 +1,5 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { notFound } from 'next/navigation';
 
@@ -29,7 +29,7 @@ const setup = customRenderAsync(DataRequestsPage, {});
 
 describe(DataRequestsPage, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
+    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
   });
 
   it('404s for anyone who is not a super admin', async () => {

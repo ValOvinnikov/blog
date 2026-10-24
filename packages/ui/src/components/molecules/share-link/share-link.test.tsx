@@ -1,8 +1,10 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import type { ReactNode } from 'react';
 
 import { ShareLink } from './share-link';
+
+const SHARE_LINK_TEST_ID = 'share-link';
 
 faker.seed(123);
 
@@ -27,29 +29,20 @@ describe(`<${ShareLink.name}/>`, () => {
   it('renders the given icon alongside the label', () => {
     setup({ icon: <svg data-testid="share-icon" /> });
 
-    expect(screen.getByTestId('share-icon')).toBeVisible();
+    const icon = screen.getByTestId('share-icon');
+    expect(icon).toBeVisible();
   });
 
   it('renders via the as prop when provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-testid="custom-link">
-        {children}
-      </a>
-    );
+    setup({ as: MockLink });
 
-    setup({ as: CustomLink });
-
-    expect(screen.getByTestId('custom-link')).toBeVisible();
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+    expect(mockLink).toBeVisible();
   });
 
   it('forwards data-testid', () => {
-    setup({ dataTestId: 'share-link' });
-    expect(screen.getByTestId('share-link')).toBeVisible();
+    setup({ dataTestId: SHARE_LINK_TEST_ID });
+    const shareLink = screen.getByTestId(SHARE_LINK_TEST_ID);
+    expect(shareLink).toBeVisible();
   });
 });

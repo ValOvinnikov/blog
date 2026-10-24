@@ -3,26 +3,47 @@ import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
+import messages from '@platform/i18n/messages/en.json';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   renderWithIntl,
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouter } from '@platform/testing/mock-router';
 import {
-  makeClientTenant,
-  TENANT_ID,
+  ARCHIVED_NOTICE_ID,
+  ARCHIVED_NOTICE_TEXT,
+  SAVE_CHANGES,
+} from '@platform/testing/render-in-settings-form';
+import {
+  mockClientTenant,
+  MOCK_ARCHIVED_AT,
+  MOCK_INVITED_OWNER_EMAIL,
+  MOCK_NEW_OWNER_EMAIL,
+  MOCK_OTHER_TENANT_DOMAIN,
+  MOCK_OWNER_EMAIL,
+  MOCK_RENAMED_TENANT_NAME,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  OWNER_EMAIL_LABEL,
+  PRIMARY_DOMAIN_LABEL,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { TenantDetailsPanel } from './tenant-details-panel';
+import {
+  TenantDetailsPanel,
+  type TTenantDetailsPanelProps,
+} from './tenant-details-panel';
+import type { TTenantDetailsValues } from './tenant-details-values';
 
 const render = renderWithIntl;
 
-const OWNER_EXAMPLE_COM = 'owner@example.com';
-
-const OWNER = { email: OWNER_EXAMPLE_COM };
+const OWNER = { email: MOCK_OWNER_EMAIL };
 
 const NO_LOCKS: TTenantFieldLocks = {};
 const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
@@ -46,26 +67,79 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-const ACME_EXAMPLE_COM = 'acme.example.com';
-const PRIMARY_DOMAIN = 'Primary domain';
+const {
+  tenantDetailsPanel,
+  tenantFieldErrors,
+  languageNames,
+  navSections,
+  provisioningStatusView,
+  leavePageDialog,
+} = messages;
+const t = makeEnTranslator();
+
 const ARIA_PRESSED = 'aria-pressed';
-const OWNER_EMAIL = 'Owner email';
-const SAVE_CHANGES = 'Save changes';
-const NEW_OWNER_EXAMPLE_COM = 'new-owner@example.com';
-const ACME_RENAMED = 'Acme Renamed';
-const THIS_DOMAIN_ALREADY_IN_USE = 'This domain is already in use.';
-const ENTER_A_TENANT_NAME = 'Enter a tenant name.';
-const TENANT_DETAILS_SAVED = 'Tenant details saved.';
-const LOCKED_CONNECT_DOMAIN_STEP_HAS =
-  'Locked — the "Connect domain" step has already completed and used this value.';
+const NAME_LABEL = tenantDetailsPanel.nameLabel;
+const PLAN_LABEL = tenantDetailsPanel.planLabel;
+const FREE_LABEL = tenantDetailsPanel.planOptionFree;
+const GROWTH_LABEL = tenantDetailsPanel.planOptionGrowth;
+const SAVING_LABEL = tenantDetailsPanel.savingButton;
+const ENGLISH_LABEL = languageNames[LOCALE_ISO_CODES.EN];
+const DUTCH_LABEL = languageNames[LOCALE_ISO_CODES.NL];
+const TENANTS_LABEL = navSections.tenants;
+const LOCKED_CONNECT_DOMAIN_STEP_HAS = t(
+  'tenantDetailsPanel.fieldLockedReasonStep',
+  {
+    step: provisioningStatusView.stepLabel[TENANT_PROVISIONING_STEP.MAP_DOMAIN],
+  },
+);
+const LOCKED_THIS_TENANT_IS_ARCHIVED =
+  tenantDetailsPanel.fieldLockedReasonArchived;
 const NEW_DOMAIN_EXAMPLE_COM = 'new-domain.example.com';
-const TENANT_DETAIL_FIELDS = 'Tenant detail fields';
 const UNSAVED_DOMAIN_EXAMPLE_COM = 'unsaved-domain.example.com';
-const ACME_RENAMED_UNSAVED = 'Acme Renamed (unsaved)';
+const ACME_RENAMED_UNSAVED = `${MOCK_RENAMED_TENANT_NAME} (unsaved)`;
 const LOCK_ANNOUNCEMENT_LIVE = 'lock-announcement-live';
-const AT_20260826_0000 = '2026-08-26T00:00:00.000Z';
-const LOCKED_THIS_TENANT_IS_ARCHIVED = 'Locked — this tenant is archived.';
-const SAVE_AND_LEAVE = 'Save and leave';
+const ACME_LTD = 'Acme Ltd';
+
+const DEFAULT_TENANT = mockClientTenant();
+
+const REFUSAL_CASES = [
+  {
+    reason: TENANT_REFUSAL.PROVISIONING_STARTED,
+    message: tenantDetailsPanel.errors.provisioningStarted,
+  },
+  {
+    reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
+    message: tenantDetailsPanel.errors.ownerAlreadyJoined,
+  },
+  {
+    reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,
+    message: tenantDetailsPanel.errors.ownerHasFreeTenant,
+  },
+];
+
+const detailsValuesOf = (
+  tenant: TClientTenant,
+  overrides: Partial<TTenantDetailsValues> = {},
+): TTenantDetailsValues => ({
+  name: tenant.name,
+  primaryDomain: tenant.primaryDomain,
+  plan: tenant.plan,
+  locale: tenant.locale,
+  ownerEmail: MOCK_OWNER_EMAIL,
+  ...overrides,
+});
+
+const panel = (props: Partial<TTenantDetailsPanelProps> = {}) => (
+  <TenantDetailsPanel
+    tenant={DEFAULT_TENANT}
+    fieldLocks={NO_LOCKS}
+    owner={OWNER}
+    {...props}
+  />
+);
+
+const renderPanel = (props?: Partial<TTenantDetailsPanelProps>) =>
+  render(panel(props));
 
 describe(`<${TenantDetailsPanel.name}/>`, () => {
   const refreshMock = vi.fn();
@@ -80,111 +154,91 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('every field unlocked (fieldLocks={})', () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
-      const tenant = makeClientTenant({
-        name: 'Acme Inc.',
-        primaryDomain: ACME_EXAMPLE_COM,
-        plan: TENANT_PLAN.FREE,
-        locale: LOCALE_ISO_CODES.EN,
+      renderPanel({
+        tenant: mockClientTenant({
+          name: MOCK_TENANT_NAME,
+          primaryDomain: MOCK_TENANT_DOMAIN,
+          plan: TENANT_PLAN.FREE,
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      expect(nameInput).toHaveValue('Acme Inc.');
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
       expect(nameInput).not.toBeDisabled();
 
-      expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        ACME_EXAMPLE_COM,
-      );
-      expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
-        ARIA_PRESSED,
-        'true',
-      );
-      expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute(
-        ARIA_PRESSED,
-        'true',
-      );
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      expect(primaryDomainInput).toHaveValue(MOCK_TENANT_DOMAIN);
+      const freeButton = screen.getByRole('button', { name: FREE_LABEL });
+      expect(freeButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      const englishButton = screen.getByRole('button', { name: ENGLISH_LABEL });
+      expect(englishButton).toHaveAttribute(ARIA_PRESSED, 'true');
 
       const ownerEmailInput = screen.getByRole('textbox', {
-        name: OWNER_EMAIL,
+        name: OWNER_EMAIL_LABEL,
       });
-      expect(ownerEmailInput).toHaveValue(OWNER_EXAMPLE_COM);
+      expect(ownerEmailInput).toHaveValue(MOCK_OWNER_EMAIL);
       expect(ownerEmailInput).toHaveAttribute('type', 'email');
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
     });
 
     it('renders the plan field label as a plain span, not a <label htmlFor> pointing nowhere, while still exposing the accessible name via ariaLabel', () => {
-      const tenant = makeClientTenant({ plan: TENANT_PLAN.FREE });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel({ tenant: mockClientTenant({ plan: TENANT_PLAN.FREE }) });
 
-      const planLabelText = screen.getByText('Plan');
+      const planLabelText = screen.getByText(PLAN_LABEL);
       expect(planLabelText.tagName).toBe('SPAN');
       expect(planLabelText).not.toHaveAttribute('for');
 
-      expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
+      const planGroup = screen.getByRole('group', { name: PLAN_LABEL });
+      expect(planGroup).toBeVisible();
     });
 
     it('enables Save when only the owner email is edited', async () => {
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel();
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        NEW_OWNER_EXAMPLE_COM,
-      );
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, MOCK_NEW_OWNER_EMAIL);
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeEnabled();
+      expect(saveChangesButton).toBeEnabled();
     });
 
     it('saves the edited values and refreshes on success, sending the unchanged owner email as an ordinary field', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ name: ACME_RENAMED }),
+        tenant: mockClientTenant({ name: MOCK_RENAMED_TENANT_NAME }),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      const tenant = mockClientTenant({
+        id: MOCK_TENANT_ID,
+        name: MOCK_TENANT_NAME,
+      });
+      renderPanel({ tenant });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      await user.clear(nameInput);
+      await user.type(nameInput, MOCK_RENAMED_TENANT_NAME);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
-          expect.objectContaining({
-            name: ACME_RENAMED,
-            ownerEmail: OWNER_EXAMPLE_COM,
-          }),
+          MOCK_TENANT_ID,
+          detailsValuesOf(tenant, { name: MOCK_RENAMED_TENANT_NAME }),
         );
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
@@ -193,57 +247,73 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('submits the edited owner email value', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant(),
+        tenant: mockClientTenant(),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      const tenant = mockClientTenant({ id: MOCK_TENANT_ID });
+      renderPanel({ tenant });
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        NEW_OWNER_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, MOCK_NEW_OWNER_EMAIL);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
-          expect.objectContaining({ ownerEmail: NEW_OWNER_EXAMPLE_COM }),
+          MOCK_TENANT_ID,
+          detailsValuesOf(tenant, { ownerEmail: MOCK_NEW_OWNER_EMAIL }),
         );
       });
     });
 
-    it('shows a field error and does not refresh when saving fails', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: {
-          primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
-        },
+    describe('when the domain is already taken', () => {
+      beforeEach(() => {
+        updateTenantDetailsActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.INVALID,
+          fieldErrors: {
+            primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
+          },
+        });
+        renderPanel();
       });
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
 
-      await user.clear(screen.getByRole('textbox', { name: PRIMARY_DOMAIN }));
-      await user.type(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-        'taken.example.com',
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      it('shows a field error and does not refresh when saving fails', async () => {
+        const primaryDomainInput = screen.getByRole('textbox', {
+          name: PRIMARY_DOMAIN_LABEL,
+        });
+        await user.clear(primaryDomainInput);
+        await user.type(primaryDomainInput, MOCK_OTHER_TENANT_DOMAIN);
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        await user.click(saveChangesButton);
 
-      expect(await screen.findByText(THIS_DOMAIN_ALREADY_IN_USE)).toBeVisible();
-      expect(refreshMock).not.toHaveBeenCalled();
+        const thisDomainAlreadyInUseText = await screen.findByText(
+          tenantFieldErrors.domainTaken,
+        );
+        expect(thisDomainAlreadyInUseText).toBeVisible();
+        expect(refreshMock).not.toHaveBeenCalled();
+      });
+
+      it('does not show a success alert when saving fails', async () => {
+        const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+        await user.type(nameInput, '!');
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        await user.click(saveChangesButton);
+
+        const thisDomainAlreadyInUseText = await screen.findByText(
+          tenantFieldErrors.domainTaken,
+        );
+        expect(thisDomainAlreadyInUseText).toBeVisible();
+        const savedToast = screen.queryByText(tenantDetailsPanel.alertSuccess);
+        expect(savedToast).not.toBeInTheDocument();
+      });
     });
 
     it("associates a field's error with its input via aria-invalid and aria-describedby", async () => {
@@ -254,133 +324,93 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_INVALID },
         },
       });
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
+      renderPanel();
+
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      await user.type(nameInput, '!');
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
+      await screen.findByText(tenantFieldErrors.nameRequired);
+
+      expect(nameInput).toBeInvalid();
+      expect(nameInput).toHaveAccessibleDescription(
+        tenantFieldErrors.nameRequired,
       );
 
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-      await screen.findByText(ENTER_A_TENANT_NAME);
-
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      expect(nameInput).toBeInvalid();
-      expect(nameInput).toHaveAccessibleDescription(ENTER_A_TENANT_NAME);
-
       const domainInput = screen.getByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       expect(domainInput).toBeInvalid();
-      expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
+      expect(domainInput).toHaveAccessibleDescription(
+        tenantFieldErrors.domainInvalid,
+      );
     });
 
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_RENAMED_TENANT_NAME,
+        }),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
+      renderPanel({
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_TENANT_NAME,
+        }),
+      });
+
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      await user.clear(nameInput);
+      await user.type(nameInput, MOCK_RENAMED_TENANT_NAME);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
+
+      const savedToast = await screen.findByText(
+        tenantDetailsPanel.alertSuccess,
       );
+      expect(savedToast).toBeVisible();
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
+      await user.type(nameInput, ' again');
+      const savedToastAfterEdit = screen.getByText(
+        tenantDetailsPanel.alertSuccess,
       );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      expect(await screen.findByText(TENANT_DETAILS_SAVED)).toBeVisible();
-
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
-      expect(screen.getByText(TENANT_DETAILS_SAVED)).toBeVisible();
+      expect(savedToastAfterEdit).toBeVisible();
     });
 
-    it('does not show a success alert when saving fails', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: {
-          primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN },
-        },
-      });
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+    it.each(REFUSAL_CASES)(
+      'shows the $reason message in place of the generic save error and does not refresh',
+      async ({ reason, message }) => {
+        updateTenantDetailsActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason,
+        });
+        renderPanel({ tenant: mockClientTenant({ id: MOCK_TENANT_ID }) });
 
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+        const ownerEmailInput = screen.getByRole('textbox', {
+          name: OWNER_EMAIL_LABEL,
+        });
+        await user.clear(ownerEmailInput);
+        await user.type(ownerEmailInput, MOCK_NEW_OWNER_EMAIL);
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        await user.click(saveChangesButton);
 
-      expect(await screen.findByText(THIS_DOMAIN_ALREADY_IN_USE)).toBeVisible();
-      expect(screen.queryByText(TENANT_DETAILS_SAVED)).not.toBeInTheDocument();
-    });
-
-    it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.PROVISIONING_STARTED,
-      });
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
-
-      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      expect(
-        await screen.findByText(
-          "This tenant's provisioning has already started; its details can no longer be edited.",
-        ),
-      ).toBeVisible();
-      expect(refreshMock).not.toHaveBeenCalled();
-    });
-
-    it('shows a distinct, non-generic message when the owner has already joined, and does not refresh', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.OWNER_ALREADY_JOINED,
-      });
-      const tenant = makeClientTenant({ id: TENANT_ID });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
-
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        NEW_OWNER_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const message = await screen.findByText(
-        "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
-      );
-      expect(message).toBeVisible();
-      expect(screen.queryByText(/couldn.?t save/i)).not.toBeInTheDocument();
-      expect(refreshMock).not.toHaveBeenCalled();
-    });
+        const refusalMessage = await screen.findByText(message);
+        expect(refusalMessage).toBeVisible();
+        const saveFailedAlert = screen.queryByText(
+          tenantDetailsPanel.errors.saveFailed,
+        );
+        expect(saveFailedAlert).not.toBeInTheDocument();
+        expect(refreshMock).not.toHaveBeenCalled();
+      },
+    );
 
     it('shows a field-level error on owner email when the new address already has a pending invite', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
@@ -389,28 +419,24 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
         },
       });
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel();
 
-      await user.clear(screen.getByRole('textbox', { name: OWNER_EMAIL }));
-      await user.type(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-        'taken@example.com',
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
-
-      const ownerEmailInput = await screen.findByRole('textbox', {
-        name: OWNER_EMAIL,
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
       });
-      expect(ownerEmailInput).toBeInvalid();
-      expect(ownerEmailInput).toHaveAccessibleDescription(
-        'This email already has a pending invite on this tenant.',
+      await user.clear(ownerEmailInput);
+      await user.type(ownerEmailInput, MOCK_INVITED_OWNER_EMAIL);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
+
+      const invalidOwnerEmailInput = await screen.findByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      expect(invalidOwnerEmailInput).toBeInvalid();
+      expect(invalidOwnerEmailInput).toHaveAccessibleDescription(
+        tenantFieldErrors.ownerEmailTaken,
       );
       expect(refreshMock).not.toHaveBeenCalled();
     });
@@ -418,19 +444,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('per-field locking', () => {
     it('renders a field whose consuming step already completed as disabled, stating why', () => {
-      const tenant = makeClientTenant({ primaryDomain: ACME_EXAMPLE_COM });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={DOMAIN_LOCKED}
-          owner={OWNER}
-        />,
-      );
+      renderPanel({ fieldLocks: DOMAIN_LOCKED });
 
       const domainInput = screen.getByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
-      expect(domainInput).toHaveValue(ACME_EXAMPLE_COM);
+      expect(domainInput).toHaveValue(MOCK_TENANT_DOMAIN);
       expect(domainInput).toBeDisabled();
       expect(domainInput).toHaveAccessibleDescription(
         LOCKED_CONNECT_DOMAIN_STEP_HAS,
@@ -438,90 +457,83 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('renders every other field as editable when only one field is locked', () => {
-      const tenant = makeClientTenant({
-        name: 'Acme Inc.',
-        primaryDomain: ACME_EXAMPLE_COM,
-        plan: TENANT_PLAN.FREE,
-        locale: LOCALE_ISO_CODES.EN,
+      renderPanel({
+        tenant: mockClientTenant({
+          name: MOCK_TENANT_NAME,
+          primaryDomain: MOCK_TENANT_DOMAIN,
+          plan: TENANT_PLAN.FREE,
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+        fieldLocks: DOMAIN_LOCKED,
       });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={DOMAIN_LOCKED}
-          owner={OWNER}
-        />,
-      );
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Free' })).not.toBeDisabled();
-      expect(
-        screen.getByRole('button', { name: 'English' }),
-      ).not.toBeDisabled();
-      expect(
-        screen.getByRole('textbox', { name: OWNER_EMAIL }),
-      ).not.toBeDisabled();
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      expect(nameInput).not.toBeDisabled();
+      const freeButton = screen.getByRole('button', { name: FREE_LABEL });
+      expect(freeButton).not.toBeDisabled();
+      const englishButton = screen.getByRole('button', { name: ENGLISH_LABEL });
+      expect(englishButton).not.toBeDisabled();
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      expect(ownerEmailInput).not.toBeDisabled();
     });
 
     it('lets the operator correct the unlocked field that caused the failure and save it', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({
-          id: TENANT_ID,
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
           primaryDomain: NEW_DOMAIN_EXAMPLE_COM,
         }),
       });
-      const tenant = makeClientTenant({
-        id: TENANT_ID,
-        name: 'Acme Inc.',
-        primaryDomain: 'taken-domain.example.com',
+      const tenant = mockClientTenant({
+        id: MOCK_TENANT_ID,
+        name: MOCK_TENANT_NAME,
+        primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
       });
-      const nameLocked: TTenantFieldLocks = {
-        name: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
-      };
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={nameLocked}
-          owner={OWNER}
-        />,
-      );
+      renderPanel({
+        tenant,
+        fieldLocks: {
+          name: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
+        },
+      });
 
-      await user.clear(screen.getByRole('textbox', { name: PRIMARY_DOMAIN }));
-      await user.type(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-        NEW_DOMAIN_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      await user.clear(primaryDomainInput);
+      await user.type(primaryDomainInput, NEW_DOMAIN_EXAMPLE_COM);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
-          expect.objectContaining({
-            primaryDomain: NEW_DOMAIN_EXAMPLE_COM,
-            name: tenant.name,
-          }),
+          MOCK_TENANT_ID,
+          detailsValuesOf(tenant, { primaryDomain: NEW_DOMAIN_EXAMPLE_COM }),
         );
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
     });
 
     it('renders the plan control locked with a "provisioning succeeded" reason once every step is DONE', () => {
-      const tenant = makeClientTenant({ plan: TENANT_PLAN.GROWTH });
       render(
         <TenantDetailsPanel
-          tenant={tenant}
+          tenant={mockClientTenant({ plan: TENANT_PLAN.GROWTH })}
           fieldLocks={{ plan: { kind: 'succeeded' } }}
           owner={OWNER}
         />,
       );
 
-      const planGroup = screen.getByRole('group', { name: 'Plan' });
+      const planGroup = screen.getByRole('group', { name: PLAN_LABEL });
       expect(planGroup).toHaveAttribute('data-disabled');
       expect(planGroup).toHaveAccessibleDescription(
-        'Locked — provisioning has already finished.',
+        tenantDetailsPanel.fieldLockedReasonSucceeded,
       );
 
-      const growthOption = screen.getByRole('button', { name: 'Growth' });
+      const growthOption = screen.getByRole('button', { name: GROWTH_LABEL });
       expect(growthOption).toBeDisabled();
       expect(growthOption).toHaveAttribute(ARIA_PRESSED, 'true');
     });
@@ -529,26 +541,25 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('saves the default language chosen from the supported list', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ locale: LOCALE_ISO_CODES.NL }),
+        tenant: mockClientTenant({ locale: LOCALE_ISO_CODES.NL }),
       });
-      render(
-        <TenantDetailsPanel
-          tenant={makeClientTenant({
-            id: TENANT_ID,
-            locale: LOCALE_ISO_CODES.EN,
-          })}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      const tenant = mockClientTenant({
+        id: MOCK_TENANT_ID,
+        locale: LOCALE_ISO_CODES.EN,
+      });
+      renderPanel({ tenant });
 
-      await user.click(screen.getByRole('button', { name: 'Dutch' }));
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const dutchButton = screen.getByRole('button', { name: DUTCH_LABEL });
+      await user.click(dutchButton);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-          TENANT_ID,
-          expect.objectContaining({ locale: LOCALE_ISO_CODES.NL }),
+          MOCK_TENANT_ID,
+          detailsValuesOf(tenant, { locale: LOCALE_ISO_CODES.NL }),
         );
       });
     });
@@ -563,24 +574,20 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           },
         },
       });
-      const tenant = makeClientTenant({ id: TENANT_ID });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel({ tenant: mockClientTenant({ id: MOCK_TENANT_ID }) });
 
-      await user.clear(screen.getByRole('textbox', { name: PRIMARY_DOMAIN }));
-      await user.type(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-        NEW_DOMAIN_EXAMPLE_COM,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      await user.clear(primaryDomainInput);
+      await user.type(primaryDomainInput, NEW_DOMAIN_EXAMPLE_COM);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       const domainInput = await screen.findByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription(
@@ -592,151 +599,114 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('every field locked (RUNNING/SUCCEEDED)', () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
-      const tenant = makeClientTenant({
-        name: 'Acme Inc.',
-        primaryDomain: ACME_EXAMPLE_COM,
-        plan: TENANT_PLAN.GROWTH,
-        locale: LOCALE_ISO_CODES.EN,
+      renderPanel({
+        tenant: mockClientTenant({
+          name: MOCK_TENANT_NAME,
+          primaryDomain: MOCK_TENANT_DOMAIN,
+          plan: TENANT_PLAN.GROWTH,
+          locale: LOCALE_ISO_CODES.EN,
+        }),
+        fieldLocks: ALL_LOCKED_RUNNING,
       });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={ALL_LOCKED_RUNNING}
-          owner={OWNER}
-        />,
-      );
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
-      expect(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-      ).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'English' })).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: OWNER_EMAIL })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Growth' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      expect(nameInput).toBeDisabled();
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      expect(primaryDomainInput).toBeDisabled();
+      const englishButton = screen.getByRole('button', { name: ENGLISH_LABEL });
+      expect(englishButton).toBeDisabled();
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: OWNER_EMAIL_LABEL,
+      });
+      expect(ownerEmailInput).toBeDisabled();
+      const growthButton = screen.getByRole('button', { name: GROWTH_LABEL });
+      expect(growthButton).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
     });
   });
 
   describe('fields container', () => {
     it('exposes a group role with an accessible name, so a forced-focus landing announces something', () => {
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel();
 
-      expect(
-        screen.getByRole('group', { name: TENANT_DETAIL_FIELDS }),
-      ).toBeVisible();
+      const tenantDetailFieldsGroup = screen.getByRole('group', {
+        name: tenantDetailsPanel.fieldsGroupLabel,
+      });
+      expect(tenantDetailFieldsGroup).toBeVisible();
     });
   });
 
   describe('mid-edit lock transition', () => {
-    it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
-      const tenant = makeClientTenant({ primaryDomain: ACME_EXAMPLE_COM });
-      const { rerender } = render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+    let rerender: ReturnType<typeof renderPanel>['rerender'];
 
+    beforeEach(() => {
+      ({ rerender } = renderPanel());
+    });
+
+    it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
       const domainInput = screen.getByRole('textbox', {
-        name: PRIMARY_DOMAIN,
+        name: PRIMARY_DOMAIN_LABEL,
       });
       await user.clear(domainInput);
       await user.type(domainInput, UNSAVED_DOMAIN_EXAMPLE_COM);
-      expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        UNSAVED_DOMAIN_EXAMPLE_COM,
-      );
+      const primaryDomainInput = screen.getByRole('textbox', {
+        name: PRIMARY_DOMAIN_LABEL,
+      });
+      expect(primaryDomainInput).toHaveValue(UNSAVED_DOMAIN_EXAMPLE_COM);
 
-      rerender(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={DOMAIN_LOCKED}
-          owner={OWNER}
-        />,
-      );
+      rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
-      expect(screen.getByRole('textbox', { name: PRIMARY_DOMAIN })).toHaveValue(
-        ACME_EXAMPLE_COM,
-      );
-      expect(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-      ).toBeDisabled();
+      expect(primaryDomainInput).toHaveValue(MOCK_TENANT_DOMAIN);
+      expect(primaryDomainInput).toBeDisabled();
     });
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
-      const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      const { rerender } = render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
-
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
       await user.clear(nameInput);
       await user.type(nameInput, ACME_RENAMED_UNSAVED);
 
-      rerender(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={DOMAIN_LOCKED}
-          owner={OWNER}
-        />,
-      );
+      rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
-        ACME_RENAMED_UNSAVED,
-      );
+      expect(nameInput).toHaveValue(ACME_RENAMED_UNSAVED);
     });
   });
 
   describe('Save button dirty-state gating', () => {
     it('is disabled when the form is pristine', () => {
-      const tenant = makeClientTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel();
 
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeDisabled();
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
-      const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel({ tenant: mockClientTenant({ name: MOCK_TENANT_NAME }) });
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
 
       await user.clear(nameInput);
-      await user.type(nameInput, ACME_RENAMED);
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeEnabled();
+      await user.type(nameInput, MOCK_RENAMED_TENANT_NAME);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButton).toBeEnabled();
 
       await user.clear(nameInput);
-      await user.type(nameInput, 'Acme Inc.');
-      expect(screen.getByRole('button', { name: SAVE_CHANGES })).toBeDisabled();
+      await user.type(nameInput, MOCK_TENANT_NAME);
+      expect(saveChangesButton).toBeDisabled();
     });
 
     it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
       let resolveAction: (value: {
         outcome: typeof ACTION_OUTCOME.SUCCESS;
-        tenant: ReturnType<typeof makeClientTenant>;
+        tenant: ReturnType<typeof mockClientTenant>;
       }) => void = () => {};
       updateTenantDetailsActionMock.mockImplementation(
         () =>
@@ -744,32 +714,35 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      const tenant = makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      renderPanel({
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_TENANT_NAME,
+        }),
+      });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      await user.clear(nameInput);
+      await user.type(nameInput, MOCK_RENAMED_TENANT_NAME);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       const saveButton = await screen.findByRole('button', {
-        name: 'Saving…',
+        name: SAVING_LABEL,
       });
       expect(saveButton).toBeDisabled();
       expect(saveButton).toHaveAttribute('aria-busy', 'true');
-      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
+      const status = screen.getByRole('status');
+      expect(status).toHaveTextContent(SAVING_LABEL);
 
       resolveAction({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_RENAMED_TENANT_NAME,
+        }),
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
     });
@@ -777,207 +750,162 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('returns to disabled after a successful save applies the refreshed tenant', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED }),
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_RENAMED_TENANT_NAME,
+        }),
       });
-      const tenant = makeClientTenant({ id: TENANT_ID, name: 'Acme Inc.' });
-      const { rerender } = render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      const { rerender } = renderPanel({
+        tenant: mockClientTenant({
+          id: MOCK_TENANT_ID,
+          name: MOCK_TENANT_NAME,
+        }),
+      });
 
-      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
-      await user.type(
-        screen.getByRole('textbox', { name: 'Name' }),
-        ACME_RENAMED,
-      );
-      await user.click(screen.getByRole('button', { name: SAVE_CHANGES }));
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+      await user.clear(nameInput);
+      await user.type(nameInput, MOCK_RENAMED_TENANT_NAME);
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveChangesButton);
 
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
 
       rerender(
-        <TenantDetailsPanel
-          tenant={makeClientTenant({ id: TENANT_ID, name: ACME_RENAMED })}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
+        panel({
+          tenant: mockClientTenant({
+            id: MOCK_TENANT_ID,
+            name: MOCK_RENAMED_TENANT_NAME,
+          }),
+        }),
       );
 
-      expect(
-        await screen.findByRole('button', { name: SAVE_CHANGES }),
-      ).toBeDisabled();
+      const saveChangesButtonAfterRerender = await screen.findByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      expect(saveChangesButtonAfterRerender).toBeDisabled();
     });
   });
 
   describe('lock transition announcement', () => {
     it('announces a lock once a field newly locks', () => {
-      const tenant = makeClientTenant();
-      const { rerender } = render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      const { rerender } = renderPanel();
 
-      rerender(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={DOMAIN_LOCKED}
-          owner={OWNER}
-        />,
-      );
+      rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
-      expect(screen.getByTestId(LOCK_ANNOUNCEMENT_LIVE)).toHaveTextContent(
-        'Some tenant detail fields are now locked.',
+      const lockAnnouncementLive = screen.getByTestId(LOCK_ANNOUNCEMENT_LIVE);
+      expect(lockAnnouncementLive).toHaveTextContent(
+        tenantDetailsPanel.lockedAnnouncement,
       );
     });
 
     it('announces an unlock once a field becomes editable again', () => {
-      const tenant = makeClientTenant();
-      const { rerender } = render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={DOMAIN_LOCKED}
-          owner={OWNER}
-        />,
-      );
+      const { rerender } = renderPanel({ fieldLocks: DOMAIN_LOCKED });
 
       const liveRegion = screen.getByTestId(LOCK_ANNOUNCEMENT_LIVE);
       expect(liveRegion).toHaveTextContent('');
 
-      rerender(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      rerender(panel());
       expect(liveRegion).toHaveTextContent(
-        'More tenant detail fields are now editable.',
+        tenantDetailsPanel.unlockedAnnouncement,
       );
     });
   });
 
   describe('archived tenant', () => {
-    it('disables every field and the Save button, regardless of edits or field locks', async () => {
-      const tenant = makeClientTenant({
-        name: 'Acme Inc.',
-        deprovisionedAt: new Date(AT_20260826_0000),
-      });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+    let tenant: TClientTenant;
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
-      expect(
-        screen.getByRole('textbox', { name: PRIMARY_DOMAIN }),
-      ).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'English' })).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: OWNER_EMAIL })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Free' })).toBeDisabled();
-
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      expect(saveButton).toBeDisabled();
-
-      await user.click(saveButton);
-      expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
+    beforeEach(() => {
+      tenant = mockClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT });
     });
 
-    it('exposes an accessible hint for an archived field, reusing the same lock convention as a step/succeeded/running lock', () => {
-      const tenant = makeClientTenant({
-        deprovisionedAt: new Date(AT_20260826_0000),
+    describe('on its own', () => {
+      beforeEach(() => {
+        renderPanel({ tenant });
       });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      expect(nameInput).toHaveAccessibleDescription(
-        LOCKED_THIS_TENANT_IS_ARCHIVED,
-      );
+      it('disables every field and the Save button, regardless of edits or field locks', async () => {
+        const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+        expect(nameInput).toBeDisabled();
+        const primaryDomainInput = screen.getByRole('textbox', {
+          name: PRIMARY_DOMAIN_LABEL,
+        });
+        expect(primaryDomainInput).toBeDisabled();
+        const englishButton = screen.getByRole('button', {
+          name: ENGLISH_LABEL,
+        });
+        expect(englishButton).toBeDisabled();
+        const ownerEmailInput = screen.getByRole('textbox', {
+          name: OWNER_EMAIL_LABEL,
+        });
+        expect(ownerEmailInput).toBeDisabled();
+        const freeButton = screen.getByRole('button', { name: FREE_LABEL });
+        expect(freeButton).toBeDisabled();
 
-      const planGroup = screen.getByRole('group', { name: 'Plan' });
-      expect(planGroup).toHaveAccessibleDescription(
-        LOCKED_THIS_TENANT_IS_ARCHIVED,
-      );
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        expect(saveButton).toBeDisabled();
+
+        await user.click(saveButton);
+        expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
+      });
+
+      it('exposes an accessible hint for an archived field, reusing the same lock convention as a step/succeeded/running lock', () => {
+        const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+        expect(nameInput).toHaveAccessibleDescription(
+          LOCKED_THIS_TENANT_IS_ARCHIVED,
+        );
+
+        const planGroup = screen.getByRole('group', { name: PLAN_LABEL });
+        expect(planGroup).toHaveAccessibleDescription(
+          LOCKED_THIS_TENANT_IS_ARCHIVED,
+        );
+      });
+
+      it('leaves the Save button without a description when no archivedNoticeId is supplied', () => {
+        const saveChangesButton = screen.getByRole('button', {
+          name: SAVE_CHANGES,
+        });
+        expect(saveChangesButton).not.toHaveAttribute('aria-describedby');
+      });
     });
 
     it('describes the disabled Save button with the page-level archived notice when an archivedNoticeId is supplied', () => {
-      const tenant = makeClientTenant({
-        deprovisionedAt: new Date(AT_20260826_0000),
-      });
       render(
         <>
           <TenantDetailsPanel
             tenant={tenant}
             fieldLocks={NO_LOCKS}
             owner={OWNER}
-            archivedNoticeId="archived-notice"
+            archivedNoticeId={ARCHIVED_NOTICE_ID}
           />
-          <p id="archived-notice">This tenant is archived.</p>
+          <p id={ARCHIVED_NOTICE_ID}>{ARCHIVED_NOTICE_TEXT}</p>
         </>,
       );
 
-      expect(
-        screen.getByRole('button', { name: SAVE_CHANGES }),
-      ).toHaveAccessibleDescription('This tenant is archived.');
-    });
-
-    it('leaves the Save button without a description when no archivedNoticeId is supplied', () => {
-      const tenant = makeClientTenant({
-        deprovisionedAt: new Date(AT_20260826_0000),
+      const saveChangesButton = screen.getByRole('button', {
+        name: SAVE_CHANGES,
       });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
+      expect(saveChangesButton).toHaveAccessibleDescription(
+        ARCHIVED_NOTICE_TEXT,
       );
-
-      expect(
-        screen.getByRole('button', { name: SAVE_CHANGES }),
-      ).not.toHaveAttribute('aria-describedby');
     });
   });
 
   describe('focus management on a locking transition', () => {
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
-      const tenant = makeClientTenant({ name: 'Acme Inc.' });
-      const { rerender } = render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          owner={OWNER}
-        />,
-      );
+      const { rerender } = renderPanel();
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
       nameInput.focus();
       expect(nameInput).toHaveFocus();
 
-      rerender(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={ALL_LOCKED_RUNNING}
-          owner={OWNER}
-        />,
-      );
+      rerender(panel({ fieldLocks: ALL_LOCKED_RUNNING }));
 
-      expect(
-        screen.getByRole('group', { name: TENANT_DETAIL_FIELDS }),
-      ).toHaveFocus();
+      const tenantDetailFieldsGroup = screen.getByRole('group', {
+        name: tenantDetailsPanel.fieldsGroupLabel,
+      });
+      expect(tenantDetailFieldsGroup).toHaveFocus();
       expect(document.body).not.toHaveFocus();
     });
   });
@@ -985,91 +913,101 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('leaving with unsaved edits', () => {
     const push = vi.mocked(vi.mocked(useGuardRouter)().push);
 
-    const renderGuardedPanel = () =>
-      render(
-        <>
-          <TenantDetailsPanel
-            tenant={makeClientTenant({ name: 'Acme Inc.' })}
-            fieldLocks={NO_LOCKS}
-            owner={OWNER}
-          />
-          <GuardedLink href="/tenants">Tenants</GuardedLink>
-        </>,
-      );
-
     beforeEach(() => {
       push.mockReset();
+      render(
+        <>
+          {panel()}
+          <GuardedLink href={adminRoutes.tenants()}>
+            {TENANTS_LABEL}
+          </GuardedLink>
+        </>,
+      );
     });
 
     it('navigates without asking when nothing is edited', async () => {
-      renderGuardedPanel();
+      const tenantsLink = screen.getByRole('link', { name: TENANTS_LABEL });
+      await user.click(tenantsLink);
 
-      await user.click(screen.getByRole('link', { name: 'Tenants' }));
-
-      expect(push).toHaveBeenCalledWith('/tenants');
-      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+      expect(push).toHaveBeenCalledWith(adminRoutes.tenants());
+      const alertdialog = screen.queryByRole('alertdialog');
+      expect(alertdialog).not.toBeInTheDocument();
     });
 
-    it('asks first, then restores the saved values on Discard and leave', async () => {
-      renderGuardedPanel();
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Acme Ltd');
+    describe('with an edited name', () => {
+      let nameInput: HTMLElement;
 
-      await user.click(screen.getByRole('link', { name: 'Tenants' }));
-
-      expect(
-        screen.getByRole('alertdialog', { name: 'Leave without saving?' }),
-      ).toHaveAccessibleDescription(
-        'You have 1 unsaved change on Tenant details.',
-      );
-      expect(push).not.toHaveBeenCalled();
-
-      await user.click(
-        screen.getByRole('button', { name: 'Discard and leave' }),
-      );
-
-      expect(push).toHaveBeenCalledWith('/tenants');
-      expect(nameInput).toHaveValue('Acme Inc.');
-    });
-
-    it('saves the edits before leaving on Save and leave', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SUCCESS,
-        tenant: makeClientTenant(),
+      beforeEach(async () => {
+        nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
+        await user.clear(nameInput);
+        await user.type(nameInput, ACME_LTD);
       });
-      renderGuardedPanel();
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Acme Ltd');
 
-      await user.click(screen.getByRole('link', { name: 'Tenants' }));
-      await user.click(screen.getByRole('button', { name: SAVE_AND_LEAVE }));
+      it('asks first, then restores the saved values on Discard and leave', async () => {
+        const tenantsLink = screen.getByRole('link', { name: TENANTS_LABEL });
+        await user.click(tenantsLink);
 
-      await waitFor(() => expect(push).toHaveBeenCalledWith('/tenants'));
-      expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ name: 'Acme Ltd' }),
-      );
-    });
+        const leaveWithoutSavingAlertdialog = screen.getByRole('alertdialog', {
+          name: leavePageDialog.title,
+        });
+        expect(leaveWithoutSavingAlertdialog).toHaveAccessibleDescription(
+          t('leavePageDialog.description', {
+            count: 1,
+            page: tenantDetailsPanel.heading,
+          }),
+        );
+        expect(push).not.toHaveBeenCalled();
 
-    it('stays on the page with the save error shown when Save and leave fails', async () => {
-      updateTenantDetailsActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
+        const discardAndLeaveButton = screen.getByRole('button', {
+          name: leavePageDialog.discardAndLeave,
+        });
+        await user.click(discardAndLeaveButton);
+
+        expect(push).toHaveBeenCalledWith(adminRoutes.tenants());
+        expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
       });
-      renderGuardedPanel();
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Acme Ltd');
 
-      await user.click(screen.getByRole('link', { name: 'Tenants' }));
-      await user.click(screen.getByRole('button', { name: SAVE_AND_LEAVE }));
+      it('saves the edits before leaving on Save and leave', async () => {
+        updateTenantDetailsActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.SUCCESS,
+          tenant: mockClientTenant(),
+        });
 
-      expect(
-        await screen.findByText("Couldn't save tenant details — try again."),
-      ).toBeVisible();
-      expect(push).not.toHaveBeenCalled();
-      expect(nameInput).toHaveValue('Acme Ltd');
+        const tenantsLink = screen.getByRole('link', { name: TENANTS_LABEL });
+        await user.click(tenantsLink);
+        const saveAndLeaveButton = screen.getByRole('button', {
+          name: leavePageDialog.saveAndLeave,
+        });
+        await user.click(saveAndLeaveButton);
+
+        await waitFor(() =>
+          expect(push).toHaveBeenCalledWith(adminRoutes.tenants()),
+        );
+        expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
+          DEFAULT_TENANT.id,
+          detailsValuesOf(DEFAULT_TENANT, { name: ACME_LTD }),
+        );
+      });
+
+      it('stays on the page with the save error shown when Save and leave fails', async () => {
+        updateTenantDetailsActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.SERVER_ERROR,
+        });
+
+        const tenantsLink = screen.getByRole('link', { name: TENANTS_LABEL });
+        await user.click(tenantsLink);
+        const saveAndLeaveButton = screen.getByRole('button', {
+          name: leavePageDialog.saveAndLeave,
+        });
+        await user.click(saveAndLeaveButton);
+
+        const saveFailedMessage = await screen.findByText(
+          tenantDetailsPanel.errors.saveFailed,
+        );
+        expect(saveFailedMessage).toBeVisible();
+        expect(push).not.toHaveBeenCalled();
+        expect(nameInput).toHaveValue(ACME_LTD);
+      });
     });
   });
 });

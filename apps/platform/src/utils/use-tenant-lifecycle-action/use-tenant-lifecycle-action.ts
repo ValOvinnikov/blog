@@ -1,6 +1,7 @@
 'use client';
 
 import { ACTION_OUTCOME, type TOutcome } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
 import type {
@@ -60,7 +61,7 @@ export const useTenantLifecycleAction = <
 
   return async (...args: TArgs) => {
     const result = await action(...args);
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) return { ok: true as const };
-    return { ok: false as const, error: t(errorKey(result)) };
+    if (result.outcome === ACTION_OUTCOME.SUCCESS) return okResult();
+    return errorResult(t(errorKey(result)));
   };
 };

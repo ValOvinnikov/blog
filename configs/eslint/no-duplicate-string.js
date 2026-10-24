@@ -5,6 +5,7 @@ import {
   EQUALITY_OPERATORS,
   PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
+  PROTOCOL_ATTRIBUTE_VALUES,
   ROLE_QUERY_CALLEES,
   STUB_ENV_CALLEE,
 } from './literal-vocabulary.js';
@@ -42,11 +43,13 @@ const isRoleQueryArgument = ({ parent }) =>
 
 const isProtocolAttributeValue = (node) => {
   const { parent } = node;
+  if (parent.type !== 'Property' || parent.value !== node || parent.computed) {
+    return false;
+  }
+  const key = parent.key.name ?? parent.key.value;
   return (
-    parent.type === 'Property' &&
-    parent.value === node &&
-    !parent.computed &&
-    PROTOCOL_ATTRIBUTE_KEYS.has(parent.key.name ?? parent.key.value)
+    PROTOCOL_ATTRIBUTE_KEYS.has(key) ||
+    PROTOCOL_ATTRIBUTE_VALUES.get(key)?.has(node.value) === true
   );
 };
 

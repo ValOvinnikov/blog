@@ -1,5 +1,4 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
 import {
   REDIRECT_DUPLICATE_SOURCE_ERROR,
   REDIRECT_INCOMING_CHAIN_ERROR,
@@ -7,56 +6,34 @@ import {
   validateRedirectDestination,
   validateRedirectSource,
 } from '@blog/studio/schema-types/validation/validate-redirect-chain/validate-redirect-chain';
-import { evaluate, parse } from 'groq-js';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import {
+  MOCK_REDIRECT_SOURCE,
+  mockRedirect,
+} from '@blog/studio/testing/mock-documents';
+import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
+import type { SanityDocument } from 'sanity';
 
-const { EN, NL } = LOCALE_ISO_CODES;
+const { NL } = LOCALE_ISO_CODES;
 
-const redirect = (
-  _id: string,
-  source: string,
-  destination: string,
-  {
-    isPrefix = false,
-    language = EN,
-  }: { isPrefix?: boolean; language?: string } = {},
-) =>
-  ({
-    _id,
-    _type: REDIRECT_TYPE,
-    language,
-    source,
-    destination,
-    isPrefix,
-  }) as unknown as SanityDocument;
-
-const createContext = (
-  document: SanityDocument,
-  dataset: unknown[],
-  fetchError?: Error,
-) =>
-  ({
-    document,
-    getClient: () => ({
-      withConfig: () => ({
-        fetch: async (query: string, params: Record<string, unknown>) => {
-          if (fetchError) throw fetchError;
-          return (await evaluate(parse(query), { dataset, params })).get();
-        },
-      }),
-    }),
-  }) as unknown as ValidationContext;
+const MODULES_FAQ_PATH = '/modules/faq';
 
 describe(validateRedirectSource, () => {
   let draft: SanityDocument;
 
   beforeEach(() => {
-    draft = redirect('drafts.r1', '/faq', '/help');
+    draft = mockRedirect({
+      _id: 'drafts.r1',
+      source: '/faq',
+      destination: '/help',
+    });
   });
 
   it('passes a source no other redirect uses', async () => {
     await expect(
-      validateRedirectSource('/faq', createContext(draft, [draft])),
+      validateRedirectSource(
+        '/faq',
+        mockGroqValidationContext([draft], { document: draft }),
+      ),
     ).resolves.toBe(true);
   });
 
@@ -64,7 +41,10 @@ describe(validateRedirectSource, () => {
     await expect(
       validateRedirectSource(
         '/faq',
-        createContext(draft, [redirect('r2', '/faq', '/other')]),
+        mockGroqValidationContext(
+          [mockRedirect({ _id: 'r2', source: '/faq', destination: '/other' })],
+          { document: draft },
+        ),
       ),
     ).resolves.toBe(REDIRECT_DUPLICATE_SOURCE_ERROR);
   });
@@ -73,20 +53,41 @@ describe(validateRedirectSource, () => {
     await expect(
       validateRedirectSource(
         '/faq',
-        createContext(draft, [redirect('r2', '/questions', '/faq')]),
+        mockGroqValidationContext(
+          [
+            mockRedirect({
+              _id: 'r2',
+              source: '/questions',
+              destination: '/faq',
+            }),
+          ],
+          { document: draft },
+        ),
       ),
     ).resolves.toBe(REDIRECT_INCOMING_CHAIN_ERROR);
   });
 
   it('rejects a prefix source another redirect sends visitors beneath', async () => {
-    const prefixDraft = redirect('drafts.r1', '/modules', '/catalog', {
+    const prefixDraft = mockRedirect({
+      _id: 'drafts.r1',
+      source: '/modules',
+      destination: '/catalog',
       isPrefix: true,
     });
 
     await expect(
       validateRedirectSource(
         '/modules',
-        createContext(prefixDraft, [redirect('r2', '/old', '/modules/faq')]),
+        mockGroqValidationContext(
+          [
+            mockRedirect({
+              _id: 'r2',
+              source: MOCK_REDIRECT_SOURCE,
+              destination: MODULES_FAQ_PATH,
+            }),
+          ],
+          { document: prefixDraft },
+        ),
       ),
     ).resolves.toBe(REDIRECT_INCOMING_CHAIN_ERROR);
   });
@@ -95,14 +96,30 @@ describe(validateRedirectSource, () => {
     await expect(
       validateRedirectSource(
         '/faq',
-        createContext(draft, [redirect('r2', '/faq', '/x', { language: NL })]),
+        mockGroqValidationContext(
+          [
+            mockRedirect({
+              _id: 'r2',
+              source: '/faq',
+              destination: '/x',
+              language: NL,
+            }),
+          ],
+          { document: draft },
+        ),
       ),
     ).resolves.toBe(true);
   });
 
   it('passes when the lookup fails', async () => {
     await expect(
-      validateRedirectSource('/faq', createContext(draft, [], new Error('x'))),
+      validateRedirectSource(
+        '/faq',
+        mockGroqValidationContext([], {
+          document: draft,
+          fetchError: new Error('x'),
+        }),
+      ),
     ).resolves.toBe(true);
   });
 });
@@ -111,12 +128,19 @@ describe(validateRedirectDestination, () => {
   let draft: SanityDocument;
 
   beforeEach(() => {
-    draft = redirect('drafts.r1', '/faq', '/help');
+    draft = mockRedirect({
+      _id: 'drafts.r1',
+      source: '/faq',
+      destination: '/help',
+    });
   });
 
   it('passes a destination that is not redirected', async () => {
     await expect(
-      validateRedirectDestination('/help', createContext(draft, [])),
+      validateRedirectDestination(
+        '/help',
+        mockGroqValidationContext([], { document: draft }),
+      ),
     ).resolves.toBe(true);
   });
 
@@ -124,20 +148,41 @@ describe(validateRedirectDestination, () => {
     await expect(
       validateRedirectDestination(
         '/help',
-        createContext(draft, [redirect('r2', '/help', '/support')]),
+        mockGroqValidationContext(
+          [
+            mockRedirect({
+              _id: 'r2',
+              source: '/help',
+              destination: '/support',
+            }),
+          ],
+          { document: draft },
+        ),
       ),
     ).resolves.toBe(REDIRECT_OUTGOING_CHAIN_ERROR);
   });
 
   it('rejects a destination beneath a prefix redirect', async () => {
-    const nestedDraft = redirect('drafts.r1', '/faq', '/modules/faq');
+    const nestedDraft = mockRedirect({
+      _id: 'drafts.r1',
+      source: '/faq',
+      destination: MODULES_FAQ_PATH,
+    });
 
     await expect(
       validateRedirectDestination(
-        '/modules/faq',
-        createContext(nestedDraft, [
-          redirect('r2', '/modules', '/catalog', { isPrefix: true }),
-        ]),
+        MODULES_FAQ_PATH,
+        mockGroqValidationContext(
+          [
+            mockRedirect({
+              _id: 'r2',
+              source: '/modules',
+              destination: '/catalog',
+              isPrefix: true,
+            }),
+          ],
+          { document: nestedDraft },
+        ),
       ),
     ).resolves.toBe(REDIRECT_OUTGOING_CHAIN_ERROR);
   });

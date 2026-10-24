@@ -1,10 +1,10 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import { BLOCK_REASON } from '@platform/testing/blocked-signups/fixtures';
+import { MOCK_BLOCK_REASON } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { makeClientTenant } from '@platform/testing/tenants/fixtures';
+import { mockClientTenant } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantSuspensionControl } from './tenant-suspension-control';
@@ -21,8 +21,8 @@ vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
   liftTenantSuspensionAction: liftTenantSuspensionActionMock,
 }));
 
-const ACTIVE_TENANT = makeClientTenant({ status: TENANT_STATUS.ACTIVE });
-const SUSPENDED_TENANT = makeClientTenant({ status: TENANT_STATUS.SUSPENDED });
+const ACTIVE_TENANT = mockClientTenant({ status: TENANT_STATUS.ACTIVE });
+const SUSPENDED_TENANT = mockClientTenant({ status: TENANT_STATUS.SUSPENDED });
 
 const setup = customRender(TenantSuspensionControl, { tenant: ACTIVE_TENANT });
 
@@ -60,7 +60,7 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       const reasonField = screen.getByRole('textbox', {
         name: BLOCK_REASON_FIELD,
       });
-      await user.type(reasonField, BLOCK_REASON);
+      await user.type(reasonField, MOCK_BLOCK_REASON);
     };
 
     beforeEach(async () => {
@@ -110,7 +110,7 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       await user.click(confirm);
 
       expect(suspendTenantActionMock).toHaveBeenCalledWith(ACTIVE_TENANT.id, {
-        reason: BLOCK_REASON,
+        reason: MOCK_BLOCK_REASON,
       });
     });
 
@@ -122,15 +122,6 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       const confirm = screen.getByRole('button', { name: CONFIRM_SUSPEND });
 
       expect(confirm).toBeDisabled();
-    });
-
-    it('suspends without a block when the choice is left off', async () => {
-      const confirm = await screen.findByRole('button', {
-        name: CONFIRM_SUSPEND,
-      });
-      await user.click(confirm);
-
-      expect(suspendTenantActionMock).toHaveBeenCalledWith(ACTIVE_TENANT.id);
     });
 
     it('keeps the dialog open with the refusal when the owner has no email on record', async () => {

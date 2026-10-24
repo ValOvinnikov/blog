@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import type { THeroBlogModule } from '@blog/service';
+import { faker } from '@faker-js/faker';
 
 type THeroBlogDataBase = Omit<
   Extract<THeroBlogModule, { hasPost: true }>,
@@ -19,7 +20,7 @@ const heroBlogDataBase: THeroBlogDataBase = {
   layout: undefined,
 };
 
-export const makeHeroBlogData = (
+export const mockHeroBlogData = (
   overrides: Partial<
     Omit<Extract<THeroBlogModule, { hasPost: true }>, 'hasPost'>
   > = {},
@@ -30,7 +31,7 @@ export const makeHeroBlogData = (
   ...overrides,
 });
 
-export const makeUnresolvedHeroBlogData = (
+export const mockUnresolvedHeroBlogData = (
   overrides: Partial<
     Omit<Extract<THeroBlogModule, { hasPost: false }>, 'hasPost'>
   > = {},
@@ -46,7 +47,7 @@ export const makeUnresolvedHeroBlogData = (
  * union forbids but a stale service response could still produce at
  * runtime; models that case for tests exercising the `hasPost` guard.
  */
-export const makeStaleUnresolvedHeroBlogData = (
+export const mockStaleUnresolvedHeroBlogData = (
   heading: string,
 ): THeroBlogModule =>
   ({
@@ -55,3 +56,5 @@ export const makeStaleUnresolvedHeroBlogData = (
     isPostUntranslated: false,
     heading,
   }) as THeroBlogModule;
+
+export const MOCK_HERO_BLOG_MODULE_ID = faker.string.uuid();

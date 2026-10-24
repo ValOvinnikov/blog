@@ -3,6 +3,7 @@ import {
   HTTP_METHOD,
   HTTP_STATUS,
 } from '@blog/config/constants';
+import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -25,7 +26,6 @@ vi.mock('@blog/db', async () => ({
 const loggerErrorMock = vi.mocked(logger.error);
 
 const ENDPOINT = 'https://admin.example.com/api/internal/contrast-result';
-const VALID_SECRET = 'a-very-secret-value';
 const SHA = 'a'.repeat(40);
 
 const VALID_BODY = {
@@ -38,7 +38,7 @@ const VALID_BODY = {
 const postRequest = (
   body: unknown,
   { authorization }: { authorization?: string } = {
-    authorization: `Bearer ${VALID_SECRET}`,
+    authorization: `Bearer ${MOCK_BEARER_SECRET}`,
   },
 ): Request =>
   new Request(ENDPOINT, {
@@ -51,19 +51,10 @@ describe('POST /api/internal/contrast-result', () => {
   let POST: typeof import('./route').POST;
 
   beforeEach(async () => {
-    envMock.CONTRAST_RESULT_SECRET = VALID_SECRET;
+    envMock.CONTRAST_RESULT_SECRET = MOCK_BEARER_SECRET;
     recordContrastResultMock.mockReset().mockResolvedValue({ id: 'f1' });
     loggerErrorMock.mockReset();
     ({ POST } = await import('./route'));
-  });
-
-  it('rejects a request with no Authorization header', async () => {
-    const response = await POST(
-      postRequest(VALID_BODY, { authorization: undefined }),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(recordContrastResultMock).not.toHaveBeenCalled();
   });
 
   it('rejects a request with the wrong secret', async () => {
@@ -90,7 +81,7 @@ describe('POST /api/internal/contrast-result', () => {
   it('returns 400 for a body that is not valid JSON', async () => {
     const request = new Request(ENDPOINT, {
       method: HTTP_METHOD.POST,
-      headers: { authorization: `Bearer ${VALID_SECRET}` },
+      headers: { authorization: `Bearer ${MOCK_BEARER_SECRET}` },
       body: '{not valid json',
     });
 

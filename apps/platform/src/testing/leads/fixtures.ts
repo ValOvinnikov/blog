@@ -1,6 +1,6 @@
 import type { TListedLead } from '@blog/db/queries/leads';
 
-export const makeLead = (
+export const mockLead = (
   overrides: Partial<TListedLead> = {},
 ): TListedLead => ({
   id: 'lead-1',

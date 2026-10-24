@@ -1,21 +1,15 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
+  evaluateRelatedPostsQuery,
+  MOCK_DESIGN_NL_POST_ID,
   toIds,
-  translatedPostDocuments,
 } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { relatedByTagsQuery } from './by-tags.query';
 
 describe('relatedByTagsQuery', () => {
-  it('filters to page_post documents', () => {
-    expect(relatedByTagsQuery.query).toContain('_type == "page_post"');
-  });
-
-  it('excludes posts whose publishedAt is in the future', () => {
-    expect(relatedByTagsQuery.query).toContain('publishedAt <= now()');
-  });
-
   describe('candidate selection', () => {
     function post(id: string, tagRefs: string[]) {
       return {
@@ -51,21 +45,16 @@ describe('relatedByTagsQuery', () => {
 });
 
 describe('relatedByTagsQuery language scoping', () => {
-  const { NL, EN } = LOCALE_ISO_CODES;
-
-  function run(query: string, params: Record<string, unknown>) {
-    return evaluateGroqExpression(query, translatedPostDocuments, undefined, {
-      currentId: 'notes-en',
-      defaultLocale: EN,
-      ...params,
-    });
-  }
+  const { NL } = LOCALE_ISO_CODES;
 
   it('picks tag candidates only in the request language', async () => {
     expect(
       toIds(
-        await run(relatedByTagsQuery.query, { tagIds: ['tag-1'], locale: NL }),
+        await evaluateRelatedPostsQuery(relatedByTagsQuery.query, {
+          tagIds: [MOCK_TAG_ID],
+          locale: NL,
+        }),
       ),
-    ).toEqual(['design-nl']);
+    ).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 });

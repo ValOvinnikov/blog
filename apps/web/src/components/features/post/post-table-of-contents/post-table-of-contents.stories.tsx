@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { mockPostHeadings } from '@web/testing/shared/post-table-of-contents/fixtures';
+import { MOCK_POST_HEADINGS } from '@web/testing/shared/post-table-of-contents/fixtures';
 
 import { PostTableOfContents } from './post-table-of-contents';
 
@@ -8,7 +8,7 @@ const meta = {
   component: PostTableOfContents,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
-  args: { headings: mockPostHeadings },
+  args: { headings: MOCK_POST_HEADINGS },
 } satisfies Meta<typeof PostTableOfContents>;
 
 export default meta;

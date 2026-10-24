@@ -4,10 +4,10 @@ import type {
   TPricingPrice,
   TPricingTier,
 } from '@blog/service';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import type { IPricingLabels } from '@web/utils/to-pricing-panels';
 
-export const makePricingPrice = (
+export const mockPricingPrice = (
   overrides: Partial<TPricingPrice> = {},
 ): TPricingPrice => ({
   period: PRICE_PERIOD.MONTH,
@@ -17,13 +17,13 @@ export const makePricingPrice = (
   ...overrides,
 });
 
-export const makePricingTier = (
+export const mockPricingTier = (
   overrides: Partial<TPricingTier> = {},
 ): TPricingTier => ({
   id: 'tier-1',
   name: 'Starter',
   description: undefined,
-  prices: [makePricingPrice()],
+  prices: [mockPricingPrice()],
   priceLabel: undefined,
   features: [],
   ctaButtons: [],
@@ -32,12 +32,12 @@ export const makePricingTier = (
   ...overrides,
 });
 
-export const makePricingModule = (
+export const mockPricingModule = (
   overrides: Partial<TPricingModule> = {},
 ): TPricingModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({ heading: 'Pricing' }),
-  tiers: [makePricingTier()],
+  headingBlock: mockHeadingBlock({ heading: 'Pricing' }),
+  tiers: [mockPricingTier()],
   footnote: undefined,
   ctaButtons: [],
   contentAlignment: undefined,
@@ -45,7 +45,7 @@ export const makePricingModule = (
   ...overrides,
 });
 
-export const pricingLabels: IPricingLabels = {
+export const MOCK_PRICING_LABELS: IPricingLabels = {
   free: 'Free',
   compareAtLabel: 'Regular price',
   from: 'From',

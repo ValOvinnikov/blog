@@ -1,82 +1,49 @@
-import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  MOCK_TAG_ID,
+  mockFeedPostViews,
+  mockRawFeedPosts,
+} from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import { MOCK_POSTS_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPublishedPostsByTag } from './loader';
+import { tagScopedPublishedPostsQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const tenant = mockTenant();
 
 describe(getPublishedPostsByTag, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue([]);
   });
 
-  it('fetches every published post tagged with the given tag id', async () => {
-    mockRun.mockResolvedValue([
-      makeRawFeedPost({
-        headingBlock: makeRawHeadingBlock('First', {
-          supportingText: 'A sufficiently long excerpt for the card.',
-        }),
-        slug: 'first',
-      }),
-      makeRawFeedPost({
-        headingBlock: makeRawHeadingBlock('Second', {
-          supportingText: 'A sufficiently long excerpt for the card.',
-        }),
-        slug: 'second',
-      }),
-    ]);
+  it('maps every published post tagged with the tag into a feed post', async () => {
+    mockRun.mockResolvedValueOnce(mockRawFeedPosts());
 
-    const result = await getPublishedPostsByTag('tag-1', tenant);
+    const result = await getPublishedPostsByTag(MOCK_TAG_ID, tenant);
 
-    expect(result).toEqual([
-      {
-        title: 'First',
-        slug: 'first',
-        excerpt: 'A sufficiently long excerpt for the card.',
-        publishedAt: '2026-01-15T00:00:00Z',
-      },
-      {
-        title: 'Second',
-        slug: 'second',
-        excerpt: 'A sufficiently long excerpt for the card.',
-        publishedAt: '2026-01-15T00:00:00Z',
-      },
-    ]);
-  });
-
-  it('passes the tag id as a query parameter', async () => {
-    await getPublishedPostsByTag('tag-1', tenant);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { tagId: 'tag-1' } }),
-    );
+    expect(result).toEqual(mockFeedPostViews());
   });
 
   it('returns an empty array when no posts are tagged', async () => {
-    const result = await getPublishedPostsByTag('tag-1', tenant);
+    const result = await getPublishedPostsByTag(MOCK_TAG_ID, tenant);
 
     expect(result).toEqual([]);
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getPublishedPostsByTag('tag-1', tenant);
+  it('queries the tag id for the tenant with tenant-scoped tags', async () => {
+    await getPublishedPostsByTag(MOCK_TAG_ID, tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:posts'] }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(tagScopedPublishedPostsQuery, {
+      parameters: { tagId: MOCK_TAG_ID },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_POSTS_CACHE_TAG],
+      },
+    });
   });
 });

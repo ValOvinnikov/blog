@@ -1,28 +1,29 @@
 import { FORM_STATUS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import {
+  MOCK_NEWSLETTER_EMAIL_LABEL,
+  mockNewsletterSignupArgs,
+} from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { NewsletterSignupCompact } from './newsletter-signup-compact';
 
+const PREFIX_TEST_ID = 'newsletter-signup-compact-prefix';
+const HEADING_ID = 'newsletter-compact-heading';
+const COMPACT_TEST_ID = 'newsletter-signup-compact';
+
 faker.seed(123);
 
 const HEADING = faker.lorem.words(2);
-const SUBMIT_LABEL = faker.lorem.word();
-const EMAIL_LABEL = faker.lorem.words(2);
 
 const baseArgs = {
-  email: '',
-  onChange: vi.fn(),
-  onSubmit: vi.fn(),
-  status: FORM_STATUS.IDLE,
+  ...mockNewsletterSignupArgs(),
   heading: HEADING,
   prefix: (
-    <span data-testid="newsletter-signup-compact-prefix" aria-hidden="true">
+    <span data-testid={PREFIX_TEST_ID} aria-hidden="true">
       $
     </span>
   ),
-  submitLabel: SUBMIT_LABEL,
-  emailAriaLabel: EMAIL_LABEL,
 };
 
 const setup = customRender(NewsletterSignupCompact, baseArgs);
@@ -42,7 +43,9 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     it('renders as a slim strip with no heading element', () => {
       const headingElement = screen.queryByRole('heading');
       const label = screen.getByText(HEADING);
-      const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
 
       expect(headingElement).not.toBeInTheDocument();
       expect(label).toBeVisible();
@@ -56,7 +59,7 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     });
 
     it('renders the prefix node as-is, ahead of the heading', () => {
-      const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
+      const prefix = screen.getByTestId(PREFIX_TEST_ID);
       const label = screen.getByText(HEADING);
 
       expect(prefix).toHaveTextContent('$');
@@ -82,19 +85,21 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
   });
 
   it('assigns headingId to the label element when provided', () => {
-    setup({ headingId: 'newsletter-compact-heading' });
+    setup({ headingId: HEADING_ID });
 
     const label = screen.getByText(HEADING);
 
-    expect(label).toHaveAttribute('id', 'newsletter-compact-heading');
+    expect(label).toHaveAttribute('id', HEADING_ID);
   });
 
   it('renders neither label nor prefix when both are omitted', () => {
     setup({ heading: undefined, prefix: undefined });
 
     const label = screen.queryByText(HEADING);
-    const prefix = screen.queryByTestId('newsletter-signup-compact-prefix');
-    const emailField = screen.getByRole('textbox', { name: EMAIL_LABEL });
+    const prefix = screen.queryByTestId(PREFIX_TEST_ID);
+    const emailField = screen.getByRole('textbox', {
+      name: MOCK_NEWSLETTER_EMAIL_LABEL,
+    });
 
     expect(label).not.toBeInTheDocument();
     expect(prefix).not.toBeInTheDocument();
@@ -104,7 +109,7 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
   it('renders no prefix element when prefix is omitted', () => {
     setup({ prefix: undefined });
 
-    const prefix = screen.queryByTestId('newsletter-signup-compact-prefix');
+    const prefix = screen.queryByTestId(PREFIX_TEST_ID);
 
     expect(prefix).not.toBeInTheDocument();
   });
@@ -123,7 +128,7 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     });
 
     it('keeps the prefix and heading visible on success', () => {
-      const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
+      const prefix = screen.getByTestId(PREFIX_TEST_ID);
       const label = screen.getByText(HEADING);
 
       expect(prefix).toBeVisible();
@@ -132,9 +137,9 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
   });
 
   it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'newsletter-signup-compact' });
+    setup({ dataTestId: COMPACT_TEST_ID });
 
-    const root = screen.getByTestId('newsletter-signup-compact');
+    const root = screen.getByTestId(COMPACT_TEST_ID);
 
     expect(root).toBeVisible();
   });

@@ -2,27 +2,27 @@ import 'server-only';
 
 import { ACTION_OUTCOME } from '@blog/config';
 import type { TMaybeUndefined } from '@blog/config/types';
+import { errorResult, okResult, type TResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import type { TUploadFailure } from '@platform/server/uploads/upload-error';
 import { imageSize } from 'image-size';
 
 export type TImageFormat = { contentType: string; extension: string };
 
-export type TImageUploadValidationResult =
-  | { ok: true; asset: TImageFormat & { buffer: Buffer } }
-  | { ok: false; error: TUploadFailure };
+export type TImageUploadValidationResult = TResult<
+  TImageFormat & { buffer: Buffer },
+  TUploadFailure
+>;
 
-type TReadImageUploadResult =
-  | {
-      ok: true;
-      image: {
-        buffer: Buffer;
-        type: TMaybeUndefined<string>;
-        width: number;
-        height: number;
-      };
-    }
-  | { ok: false; error: TUploadFailure };
+type TReadImageUploadResult = TResult<
+  {
+    buffer: Buffer;
+    type: TMaybeUndefined<string>;
+    width: number;
+    height: number;
+  },
+  TUploadFailure
+>;
 
 /**
  * Reads the real header bytes rather than trusting the browser-reported
@@ -34,38 +34,29 @@ export const readImageUpload = async (
   maxSizeLabel: string,
 ): Promise<TReadImageUploadResult> => {
   if (file.size === 0) {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_MISSING,
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.FILE_MISSING,
+    });
   }
 
   if (file.size > maxBytes) {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
-        values: { limit: maxSizeLabel },
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
+      values: { limit: maxSizeLabel },
+    });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
   try {
     const { type, width, height } = imageSize(buffer);
-    return { ok: true, image: { buffer, type, width, height } };
+    return okResult({ buffer, type, width, height });
   } catch {
-    return {
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
-      },
-    };
+    return errorResult({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
+    });
   }
 };

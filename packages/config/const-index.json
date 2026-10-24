@@ -896,6 +896,14 @@
         "file": "packages/config/src/constants/error.ts"
       }
     ],
+    "DB_ALREADY_OWNS_FREE_TENANT": [
+      {
+        "ref": "ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
     "DOCUMENT_VALIDATION": [
       {
         "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
@@ -1071,6 +1079,14 @@
     "GET": [
       {
         "ref": "HTTP_METHOD.GET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-methods.ts"
+      }
+    ],
+    "HEAD": [
+      {
+        "ref": "HTTP_METHOD.HEAD",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-methods.ts"
@@ -2106,6 +2122,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/newsletter-result.ts"
+      }
+    ],
+    "DYNAMIC_SERVER_USAGE": [
+      {
+        "ref": "NEXT_DYNAMIC_ERROR.DYNAMIC_SERVER_USAGE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/next-dynamic-error.ts"
       }
     ],
     "NEXT_NOT_FOUND": [
@@ -3312,6 +3336,106 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "UPDATED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.UPDATED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_TAKEN": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_LOCKED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_LOCKED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_LOCKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "DOMAIN_INVALID": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_INVALID",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.DOMAIN_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "PROVISIONING_STARTED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.PROVISIONING_STARTED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.PROVISIONING_STARTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_ALREADY_JOINED": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNER_ALREADY_JOINED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_REFUSAL.OWNER_ALREADY_JOINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_EMAIL_TAKEN": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNER_EMAIL_TAKEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNS_FREE_TENANT": [
+      {
+        "ref": "TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
     "EDITABLE": [
       {
         "ref": "CONTROL_MODE.EDITABLE",
@@ -3454,6 +3578,14 @@
         "file": "apps/platform/src/constants/email-sender.ts"
       }
     ],
+    "GITHUB_ERROR": [
+      {
+        "ref": "GITHUB_FAILURE.GITHUB_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
     "INVITE_SENT": [
       {
         "ref": "OWNER_STUDIO_ACCESS.INVITE_SENT",
@@ -3550,6 +3682,30 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "NO_RELEASE_TAG": [
+      {
+        "ref": "RELEASE_FAILURE.NO_RELEASE_TAG",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "TAG_LIST_INCOMPLETE": [
+      {
+        "ref": "RELEASE_FAILURE.TAG_LIST_INCOMPLETE",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "DB_ERROR": [
+      {
+        "ref": "RELEASE_FAILURE.DB_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
     "DISPATCHED": [
       {
         "ref": "RELEASE_RUN_STATUS.DISPATCHED",
@@ -3630,33 +3786,9 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
-    "DOMAIN_INVALID": [
-      {
-        "ref": "TENANT_FIELD_ERROR.DOMAIN_INVALID",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "DOMAIN_TAKEN": [
-      {
-        "ref": "TENANT_FIELD_ERROR.DOMAIN_TAKEN",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
     "DOMAIN_ATTACHED_ELSEWHERE": [
       {
         "ref": "TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "DOMAIN_LOCKED": [
-      {
-        "ref": "TENANT_FIELD_ERROR.DOMAIN_LOCKED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -3710,14 +3842,6 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
-    "OWNER_EMAIL_TAKEN": [
-      {
-        "ref": "TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
     "ALREADY_DEPROVISIONED": [
       {
         "ref": "TENANT_REFUSAL.ALREADY_DEPROVISIONED",
@@ -3762,17 +3886,9 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
-    "PROVISIONING_STARTED": [
+    "OWNER_HAS_FREE_TENANT": [
       {
-        "ref": "TENANT_REFUSAL.PROVISIONING_STARTED",
-        "scope": "app:platform",
-        "from": "@platform/constants/tenant",
-        "file": "apps/platform/src/constants/tenant.ts"
-      }
-    ],
-    "OWNER_ALREADY_JOINED": [
-      {
-        "ref": "TENANT_REFUSAL.OWNER_ALREADY_JOINED",
+        "ref": "TENANT_REFUSAL.OWNER_HAS_FREE_TENANT",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -4028,6 +4144,14 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "307": [
+      {
+        "ref": "HTTP_STATUS.TEMPORARY_REDIRECT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "400": [
       {
         "ref": "HTTP_STATUS.BAD_REQUEST",
@@ -4076,9 +4200,33 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "429": [
+      {
+        "ref": "HTTP_STATUS.TOO_MANY_REQUESTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "500": [
       {
         "ref": "HTTP_STATUS.INTERNAL_SERVER_ERROR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "502": [
+      {
+        "ref": "HTTP_STATUS.BAD_GATEWAY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "503": [
+      {
+        "ref": "HTTP_STATUS.SERVICE_UNAVAILABLE",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"

@@ -2,14 +2,20 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 
-export const TEST_TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_DOMAIN = 'acme.example.com';
+export const MOCK_SANITY_PROJECT_ID = 'sanity-project-1';
+export const MOCK_SANITY_DATASET = MOCK_PROVISION_ENV.tenantSanityDataset;
+export const MOCK_SANITY_READ_TOKEN = 'sk-read';
+export const MOCK_ENCRYPTED_TOKEN = 'encrypted-read-token';
 
-export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
+export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {
-    id: TEST_TENANT_ID,
+    id: MOCK_TENANT_ID,
     name: 'Acme',
-    primaryDomain: 'acme.example.com',
+    primaryDomain: MOCK_TENANT_DOMAIN,
     sanityProjectId: null,
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
@@ -28,6 +34,7 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     deprovisioningSteps: null,
     siteType: null,
     siteTemplateVersion: null,
+    selfServeOwnerEmailIndex: null,
     ownerSanityInviteId: null,
     ownerInviteSentAt: null,
     ownerInviteAcceptedAt: null,
@@ -46,4 +53,14 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     updatedAt: new Date(0),
     ...overrides,
   };
+}
+
+export function mockProvisionedTenant(
+  overrides: Partial<TTenant> = {},
+): TTenant {
+  return mockTenant({
+    sanityProjectId: MOCK_SANITY_PROJECT_ID,
+    sanityDataset: MOCK_SANITY_DATASET,
+    ...overrides,
+  });
 }

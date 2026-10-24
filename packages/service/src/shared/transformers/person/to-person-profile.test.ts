@@ -1,72 +1,45 @@
-import { SOCIAL_PLATFORMS } from '@blog/config';
+import { mockRawAuthor } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawExternalLinkDocument,
-  makeRawPersonBioBlock,
-  makeRawSanityImage,
-  makeRawSocialProfile,
+  mockRawPersonBioBlock,
+  mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
 
-import { toPersonProfile, type TRawPersonProfile } from './to-person-profile';
+import { toPersonProfile } from './to-person-profile';
 
-function makeRaw(
-  overrides: Partial<TRawPersonProfile> = {},
-): TRawPersonProfile {
-  return {
-    _id: 'person-1',
-    name: 'Jamie Rivera',
-    image: null,
-    profilePage: null,
-    role: null,
-    bio: null,
-    socialLinks: null,
-    ...overrides,
-  };
-}
+const BIO_TEXT = 'Builds things.';
+const ROLE = 'Staff Engineer';
+
+const rawProfile = mockRawAuthor({ image: null, role: null });
 
 describe(toPersonProfile, () => {
   it('maps everything absent', () => {
-    const result = toPersonProfile(makeRaw());
+    const result = toPersonProfile(rawProfile);
 
-    expect(result.image).toBeUndefined();
-    expect(result.role).toBeUndefined();
-    expect(result.bio).toBeUndefined();
-    expect(result.socialLinks).toEqual([]);
-    expect(result.profileUrl).toBeUndefined();
+    expect(result).toEqual({
+      id: rawProfile._id,
+      name: rawProfile.name,
+      image: undefined,
+      role: undefined,
+      bio: undefined,
+      socialLinks: [],
+      profileUrl: undefined,
+    });
   });
 
-  it('maps everything populated', () => {
-    const result = toPersonProfile(
-      makeRaw({
-        image: makeRawSanityImage('Jamie headshot'),
-        role: 'Staff Engineer',
-        bio: [makeRawPersonBioBlock({ text: 'Builds things.' })],
-        socialLinks: [
-          makeRawSocialProfile({
-            platform: SOCIAL_PLATFORMS.GITHUB,
-            link: makeRawExternalLinkDocument({
-              url: 'https://github.com/jamie',
-            }),
-          }),
-        ],
-        profilePage: makeRawExternalLinkDocument({
-          url: 'https://example.com/team/jamie',
-        }),
-      }),
-    );
+  it('maps the role, bio and social links when populated', () => {
+    const socialProfile = mockRawSocialProfile();
 
-    expect(result.id).toBe('person-1');
-    expect(result.name).toBe('Jamie Rivera');
-    expect(result.image).toMatchObject({ alt: 'Jamie headshot' });
-    expect(result.role).toBe('Staff Engineer');
-    expect(result.bio?.[0]).toMatchObject({
-      children: [{ text: 'Builds things.' }],
+    const { role, bio, socialLinks } = toPersonProfile({
+      ...rawProfile,
+      role: ROLE,
+      bio: [mockRawPersonBioBlock({ text: BIO_TEXT })],
+      socialLinks: [socialProfile],
     });
-    expect(result.socialLinks).toEqual([
-      {
-        platform: SOCIAL_PLATFORMS.GITHUB,
-        link: expect.objectContaining({ href: 'https://github.com/jamie' }),
-      },
-    ]);
-    expect(result.profileUrl).toBe('https://example.com/team/jamie');
+
+    expect(role).toBe(ROLE);
+    expect(bio?.[0]).toMatchObject({ children: [{ text: BIO_TEXT }] });
+    expect(
+      socialLinks.map(({ platform, link }) => [platform, link.href]),
+    ).toEqual([[socialProfile.platform, socialProfile.link.url]]);
   });
 });

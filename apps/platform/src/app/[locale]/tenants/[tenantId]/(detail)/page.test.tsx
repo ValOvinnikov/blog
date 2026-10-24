@@ -3,9 +3,16 @@ import { FINDING_STATUS } from '@blog/config/constants';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { makeFinding } from '@platform/testing/findings/fixtures';
+import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  INVITED_PENDING_TEXT,
+  mockTenant,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_URL,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 
 import TenantOverviewPage from './page';
 
@@ -74,18 +81,18 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
 }));
 
 const setup = customRenderAsync(TenantOverviewPage, {
-  params: Promise.resolve({ tenantId: TENANT_ID }),
+  params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
 const AT_20260812_0000 = '2026-08-12T00:00:00.000Z';
 const INVITED_EXAMPLE_COM = 'invited@example.com';
 
 describe(TenantOverviewPage, () => {
-  let tenant: ReturnType<typeof makeTenant>;
+  let tenant: ReturnType<typeof mockTenant>;
 
   beforeEach(() => {
     requireTenantByIdMock.mockReset();
-    tenant = makeTenant();
+    tenant = mockTenant();
     requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
     getTenantOwnerMembershipMock.mockReset();
     getTenantOwnerMembershipMock.mockResolvedValue({
@@ -108,12 +115,12 @@ describe(TenantOverviewPage, () => {
     });
 
     it('renders the overview for the resolved tenant', () => {
-      expect(requireTenantByIdMock).toHaveBeenCalledWith(TENANT_ID);
+      expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
         tenant.id,
       );
       expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-        'acme.example.com',
+        MOCK_TENANT_DOMAIN,
       );
       expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
         AUDIT_TARGET_TYPE.TENANT,
@@ -127,7 +134,7 @@ describe(TenantOverviewPage, () => {
 
       const heading = screen.getByRole('heading', {
         level: 1,
-        name: 'Acme Inc.',
+        name: MOCK_TENANT_NAME,
       });
       expect(heading).toBeVisible();
     });
@@ -144,7 +151,7 @@ describe(TenantOverviewPage, () => {
       const openSiteLink = screen.getByRole('link', {
         name: 'Open site (opens in new tab)',
       });
-      expect(openSiteLink).toHaveAttribute('href', 'https://acme.example.com');
+      expect(openSiteLink).toHaveAttribute('href', MOCK_TENANT_URL);
     });
 
     it('never shows an "Open Studio" action — Studio opens from the sidebar', () => {
@@ -180,12 +187,12 @@ describe(TenantOverviewPage, () => {
 
     await setup();
 
-    const pendingBadge = screen.getByText('Invited, pending');
+    const pendingBadge = screen.getByText(INVITED_PENDING_TEXT);
     expect(pendingBadge).toBeVisible();
   });
 
   it("renders the tenant's open findings from listFindingsForTenant", async () => {
-    listFindingsForTenantMock.mockResolvedValue([makeFinding()]);
+    listFindingsForTenantMock.mockResolvedValue([mockFinding()]);
 
     await setup();
 
@@ -200,7 +207,7 @@ describe(TenantOverviewPage, () => {
 
     const pageHeading = screen.getByRole('heading', {
       level: 1,
-      name: 'Acme Inc.',
+      name: MOCK_TENANT_NAME,
     });
     const ownerHeading = screen.getByRole('heading', {
       level: 2,

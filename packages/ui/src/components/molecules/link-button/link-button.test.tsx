@@ -3,7 +3,7 @@ import {
   renderElement,
   screen,
 } from '@blog/ui/testing/custom-render';
-import type { AnchorHTMLAttributes } from 'react';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 
 import { LinkButton } from './link-button';
 
@@ -16,35 +16,29 @@ describe(`<${LinkButton.name}/>`, () => {
   it('renders an anchor by default', () => {
     setup();
 
-    expect(screen.getByRole('link', { name: 'Read more' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
+    const link = screen.getByRole('link', { name: 'Read more' });
+
+    expect(link).toHaveAttribute('href', '/blog');
   });
 
   it('supports custom link components through as', () => {
-    const CustomLink = ({
-      href,
-      ...rest
-    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a data-custom-link="true" href={href} {...rest} />
-    );
-
     renderElement(
-      <LinkButton as={CustomLink} href="/about">
+      <LinkButton as={MockLink} href="/about">
         About
       </LinkButton>,
     );
 
-    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute(
-      'data-custom-link',
-      'true',
-    );
+    const link = screen.getByRole('link', { name: 'About' });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
+    expect(link).toBe(mockLink);
   });
 
   it('forwards data-testid', () => {
     setup({ dataTestId: 'blog-link', children: 'Blog' });
 
-    expect(screen.getByTestId('blog-link')).toBeVisible();
+    const link = screen.getByTestId('blog-link');
+
+    expect(link).toBeVisible();
   });
 });

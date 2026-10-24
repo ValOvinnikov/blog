@@ -2,19 +2,21 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  DENSITY,
-  FONT_CHOICE,
   NEXT_NAVIGATION_ERROR,
-  PRESET_ID,
-  RADIUS_SCALE,
   type TMaybeNull,
 } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { OPERATOR_EMAIL, OPERATOR_ID } from '@platform/testing/admins/operator';
-import { TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
+} from '@platform/testing/admins/operator';
+import { MOCK_BLOB_TOKEN } from '@platform/testing/blob/fixtures';
+import { MOCK_THEME_FIELDS } from '@platform/testing/site-config/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -62,27 +64,17 @@ vi.mock('@vercel/blob', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-const BLOB_TOKEN = 'test-token';
 const UPLOADED_LOGO_URL =
   'https://example.blob.vercel-storage.com/logo-abc.png';
 const PREVIOUS_LOGO_URL =
   'https://example.blob.vercel-storage.com/logo-old.png';
 
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
-
-const THEME_FIELDS = {
-  preset: PRESET_ID.CONSOLE,
-  accentHue: 250,
-  headingFont: FONT_CHOICE.SPACE_GROTESK,
-  bodyFont: FONT_CHOICE.NEWSREADER,
-  radiusScale: RADIUS_SCALE.MD,
-  density: DENSITY.DEFAULT,
-};
 
 const makeFormData = (file: TMaybeNull<File>): FormData => {
   const formData = new FormData();
@@ -102,53 +94,51 @@ describe(uploadBrandAssetAction, () => {
     delMock.mockReset();
 
     requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: TENANT_ID },
+      tenant: { id: MOCK_TENANT_ID },
       membership: { role: MEMBERSHIP_ROLE.OWNER },
     });
     authMock.mockResolvedValue({
-      user: { id: OPERATOR_ID, email: OPERATOR_EMAIL },
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
+    validateBrandAssetUploadMock.mockResolvedValue(
+      okResult({
         buffer: Buffer.from('bytes'),
         contentType: 'image/png',
         extension: 'png',
-      },
-    });
+      }),
+    );
     putMock.mockResolvedValue({
       url: UPLOADED_LOGO_URL,
     });
     upsertSiteConfigMock.mockResolvedValue({});
     getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
     });
   });
 
   it('re-resolves the tenant from the session before touching Blob or the db', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: false,
-      error: {
+    validateBrandAssetUploadMock.mockResolvedValue(
+      errorResult({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
-      },
-    });
+      }),
+    );
 
     await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('rejects when no file is present in the form data', async () => {
     const result = await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(null),
     );
@@ -162,16 +152,15 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('returns the validation error and never calls Blob when validation fails', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: false,
-      error: {
+    validateBrandAssetUploadMock.mockResolvedValue(
+      errorResult({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
-      },
-    });
+      }),
+    );
 
     const result = await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'favicon',
       makeFormData(new File(['x'], 'favicon.png', { type: 'image/png' })),
     );
@@ -187,7 +176,7 @@ describe(uploadBrandAssetAction, () => {
 
   it('uploads under a unique name, saves the theme fields plus the new logo URL, and returns it', async () => {
     const result = await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -197,30 +186,30 @@ describe(uploadBrandAssetAction, () => {
       url: UPLOADED_LOGO_URL,
     });
     expect(putMock).toHaveBeenCalledWith(
-      `tenants/${TENANT_ID}/logo.png`,
+      `tenants/${MOCK_TENANT_ID}/logo.png`,
       expect.any(Buffer),
       expect.objectContaining({ addRandomSuffix: true }),
     );
-    expect(upsertSiteConfigMock).toHaveBeenCalledWith(TENANT_ID, {
-      ...THEME_FIELDS,
+    expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: UPLOADED_LOGO_URL,
     });
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: OPERATOR_ID,
-      actorEmail: OPERATOR_EMAIL,
+      actorId: MOCK_OPERATOR_ID,
+      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: TENANT_ID,
+      targetId: MOCK_TENANT_ID,
       details: {
         asset: 'logo',
         operation: 'upload',
@@ -231,7 +220,7 @@ describe(uploadBrandAssetAction, () => {
 
   it('deletes the previous asset after a replace, without blocking the result on it', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
+      ...MOCK_THEME_FIELDS,
       logoAssetUrl: PREVIOUS_LOGO_URL,
       faviconAssetUrl: undefined,
     });
@@ -241,14 +230,14 @@ describe(uploadBrandAssetAction, () => {
     delMock.mockRejectedValue(new Error('blob unavailable'));
 
     const result = await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
     expect(delMock).toHaveBeenCalledWith(PREVIOUS_LOGO_URL, {
-      token: BLOB_TOKEN,
+      token: MOCK_BLOB_TOKEN,
     });
   });
 
@@ -256,7 +245,7 @@ describe(uploadBrandAssetAction, () => {
     putMock.mockRejectedValue(new Error('blob store unavailable'));
 
     const result = await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -270,7 +259,7 @@ describe(uploadBrandAssetAction, () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadBrandAssetAction(
-      TENANT_ID,
+      MOCK_TENANT_ID,
       'logo',
       makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
     );
@@ -284,7 +273,7 @@ describe(uploadBrandAssetAction, () => {
 
     try {
       const result = await uploadBrandAssetAction(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         'logo',
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       );
@@ -297,7 +286,7 @@ describe(uploadBrandAssetAction, () => {
       expect(putMock).not.toHaveBeenCalled();
       expect(insertAuditEventMock).not.toHaveBeenCalled();
     } finally {
-      Object.assign(env, { BLOB_READ_WRITE_TOKEN: BLOB_TOKEN });
+      Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
     }
   });
 
@@ -308,7 +297,7 @@ describe(uploadBrandAssetAction, () => {
 
     await expect(
       uploadBrandAssetAction(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         'logo',
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),
@@ -324,7 +313,7 @@ describe(uploadBrandAssetAction, () => {
 
     await expect(
       uploadBrandAssetAction(
-        TENANT_ID,
+        MOCK_TENANT_ID,
         'logo',
         makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
       ),

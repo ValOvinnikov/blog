@@ -1,6 +1,10 @@
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { okResult } from '@blog/utils';
+import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostPage } from './get-post-page';
+
+const POST_SLUG = 'hello-world';
 
 const { getPostMock } = vi.hoisted(() => ({ getPostMock: vi.fn() }));
 
@@ -16,57 +20,41 @@ describe(getPostPage, () => {
   });
 
   it('forwards the slug and the resolved tenant context to the post service', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: undefined });
+    getPostMock.mockResolvedValue(okResult());
 
-    await getPostPage('hello-world');
+    await getPostPage(POST_SLUG);
 
     expect(getPostMock).toHaveBeenCalledWith(
-      'hello-world',
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      POST_SLUG,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
   it('returns the raw TResult from getPost unchanged', async () => {
-    const result = { ok: true, data: { id: 'post-1' } };
+    const result = okResult({ id: 'post-1' });
     getPostMock.mockResolvedValue(result);
 
-    await expect(getPostPage('hello-world')).resolves.toBe(result);
-  });
-});
-
-describe('getPostPage memoization', () => {
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
+    await expect(getPostPage(POST_SLUG)).resolves.toBe(result);
   });
 
-  it('dedupes the post query across one render pass with the same arguments', async () => {
-    getPostMock.mockReset();
-    getPostMock.mockResolvedValue({ ok: true, data: undefined });
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: <T extends (...args: never[]) => unknown>(fn: T) => {
-          const cacheByArgs = new Map<string, unknown>();
-          return ((...args: never[]) => {
-            const key = JSON.stringify(args);
-            if (!cacheByArgs.has(key)) {
-              cacheByArgs.set(key, fn(...args));
-            }
-            return cacheByArgs.get(key);
-          }) as T;
-        },
-      };
+  describe('memoization', () => {
+    afterEach(() => {
+      vi.doUnmock('react');
+      vi.resetModules();
     });
-    vi.resetModules();
 
-    const { getPostPage: freshGetPostPage } = await import('./get-post-page');
+    it('dedupes the post query across one render pass with the same arguments', async () => {
+      getPostMock.mockResolvedValue(okResult());
 
-    await freshGetPostPage('hello-world');
-    await freshGetPostPage('hello-world');
+      vi.doMock('react', withMemoizingReactCache);
+      vi.resetModules();
 
-    expect(getPostMock).toHaveBeenCalledTimes(1);
+      const { getPostPage: freshGetPostPage } = await import('./get-post-page');
+
+      await freshGetPostPage(POST_SLUG);
+      await freshGetPostPage(POST_SLUG);
+
+      expect(getPostMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

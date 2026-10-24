@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { resolveFaqs } from '@blog/service/shared/transformers/faq/resolve-faqs';
-import { faqPageDocuments } from '@blog/service/testing/shared/faq-page-dataset';
+import { MOCK_FAQ_PAGE_DOCUMENTS } from '@blog/service/testing/shared/faq-page-dataset';
+import { MOCK_MISSING_ID } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { faqQuestionsQuery } from './query';
@@ -8,22 +9,32 @@ import { toFaqModuleQuestions } from './transformer';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-async function runFaqs(locale: string, ids: string[]) {
+const MODULE_A_ID = 'module-faq-a';
+const MODULE_B_ID = 'module-faq-b';
+const TRANSLATED_QUESTION_ID = 'question-ok';
+
+async function runFaqModules(locale: string, ids: string[]) {
   const raw = await evaluateGroqExpression(
     faqQuestionsQuery.query,
-    faqPageDocuments,
+    MOCK_FAQ_PAGE_DOCUMENTS,
     null,
     { ids, locale, defaultLocale: EN },
   );
 
-  return resolveFaqs(toFaqModuleQuestions(faqQuestionsQuery.parse(raw), ids));
+  return toFaqModuleQuestions(faqQuestionsQuery.parse(raw), ids);
+}
+
+async function runFaqs(locale: string, ids: string[]) {
+  return resolveFaqs(await runFaqModules(locale, ids));
 }
 
 describe('faqQuestionsQuery', () => {
-  it('lists each question once in the reader language with a plain-text answer', async () => {
-    expect(await runFaqs(NL, ['module-faq-a', 'module-faq-b'])).toEqual([
+  it('lists each question once in the reader language with plain-text answers', async () => {
+    const faqs = await runFaqs(NL, [MODULE_A_ID, MODULE_B_ID]);
+
+    expect(faqs).toEqual([
       {
-        id: 'question-ok',
+        id: TRANSLATED_QUESTION_ID,
         question: 'Hoeveel?',
         answer: 'Dat hangt ervan af.',
       },
@@ -31,8 +42,14 @@ describe('faqQuestionsQuery', () => {
   });
 
   it('falls back to the default language per question', async () => {
-    expect(await runFaqs(FR, ['module-faq-a'])).toEqual([
-      { id: 'question-ok', question: 'How much?', answer: 'It depends.' },
+    const faqs = await runFaqs(FR, [MODULE_A_ID]);
+
+    expect(faqs).toEqual([
+      {
+        id: TRANSLATED_QUESTION_ID,
+        question: 'How much?',
+        answer: 'It depends.',
+      },
       {
         id: 'question-untranslated',
         question: 'Combien?',
@@ -42,31 +59,20 @@ describe('faqQuestionsQuery', () => {
   });
 
   it('leaves out a question with no text in either language', async () => {
-    const faqs = await runFaqs(EN, ['module-faq-a']);
+    const faqs = await runFaqs(EN, [MODULE_A_ID]);
 
-    expect(faqs.map(({ id }) => id)).toEqual(['question-ok']);
+    expect(faqs.map(({ id }) => id)).toEqual([TRANSLATED_QUESTION_ID]);
   });
 
   it('returns the modules in the order of the ids given', async () => {
-    const raw = await evaluateGroqExpression(
-      faqQuestionsQuery.query,
-      faqPageDocuments,
-      null,
-      { ids: ['module-faq-b', 'module-faq-a'], locale: EN, defaultLocale: EN },
-    );
+    const modules = await runFaqModules(EN, [MODULE_B_ID, MODULE_A_ID]);
 
-    const modules = toFaqModuleQuestions(faqQuestionsQuery.parse(raw), [
-      'module-faq-b',
-      'module-faq-a',
-    ]);
-
-    expect(modules.map(({ _id }) => _id)).toEqual([
-      'module-faq-b',
-      'module-faq-a',
-    ]);
+    expect(modules.map(({ _id }) => _id)).toEqual([MODULE_B_ID, MODULE_A_ID]);
   });
 
   it('returns no modules when no id matches', async () => {
-    expect(await runFaqs(EN, ['missing'])).toEqual([]);
+    const faqs = await runFaqs(EN, [MOCK_MISSING_ID]);
+
+    expect(faqs).toEqual([]);
   });
 });

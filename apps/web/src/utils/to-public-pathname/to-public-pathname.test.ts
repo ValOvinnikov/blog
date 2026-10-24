@@ -1,24 +1,31 @@
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+
 import { toPublicPathname } from './to-public-pathname';
 
-const TENANT_ID = '0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee';
-
 describe(toPublicPathname, () => {
-  it('strips the tenant and locale segments from a rewritten path', () => {
-    expect(toPublicPathname(`/${TENANT_ID}/EN/modules/latest-posts`)).toBe(
-      '/modules/latest-posts',
-    );
+  it.each([
+    {
+      case: 'strips the tenant and locale segments from a rewritten path',
+      pathname: `/${MOCK_TENANT_ID}/EN/modules/latest-posts`,
+      expected: '/modules/latest-posts',
+    },
+    {
+      case: 'resolves the rewritten home path to the root',
+      pathname: `/${MOCK_TENANT_ID}/NL`,
+      expected: '/',
+    },
+  ])('$case', ({ pathname, expected }) => {
+    expect(toPublicPathname(pathname)).toBe(expected);
   });
 
-  it('resolves the rewritten home path to the root', () => {
-    expect(toPublicPathname(`/${TENANT_ID}/NL`)).toBe('/');
-  });
-
-  it('leaves a public path unchanged', () => {
-    expect(toPublicPathname('/blog/hello-world')).toBe('/blog/hello-world');
-    expect(toPublicPathname('/')).toBe('/');
-  });
-
-  it('leaves a path whose second segment is not a locale unchanged', () => {
-    expect(toPublicPathname(`/${TENANT_ID}/blog`)).toBe(`/${TENANT_ID}/blog`);
+  it.each([
+    { case: 'a public path', pathname: '/blog/hello-world' },
+    { case: 'the root', pathname: '/' },
+    {
+      case: 'a path whose second segment is not a locale',
+      pathname: `/${MOCK_TENANT_ID}/blog`,
+    },
+  ])('leaves $case unchanged', ({ pathname }) => {
+    expect(toPublicPathname(pathname)).toBe(pathname);
   });
 });

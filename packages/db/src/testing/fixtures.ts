@@ -5,21 +5,33 @@ import {
   TENANT_PLAN,
   TENANT_STATUS,
 } from '@blog/db/constants';
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TUser } from '@blog/db/schema/auth';
 import type { TLead } from '@blog/db/schema/leads';
+import type { TSubscriber } from '@blog/db/schema/subscribers';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { personalEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema>;
 
-export const TEST_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
-export const TEST_INVITE_EMAIL = faker.internet.email().toLowerCase();
-export const TEST_LEAD_NAME = 'Ada Lovelace';
-export const TEST_LEAD_EMAIL = 'lead@example.com';
-export const TEST_LEAD_MESSAGE = 'I would like to talk about a project.';
+export const MOCK_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_SUBSCRIBER_TAGGED_EMAIL = MOCK_SUBSCRIBER_EMAIL.replace(
+  /@/,
+  '+news@',
+);
+export const MOCK_INVITE_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_LEAD_NAME = 'Ada Lovelace';
+export const MOCK_LEAD_EMAIL = 'lead@example.com';
+export const MOCK_LEAD_MESSAGE = 'I would like to talk about a project.';
+export const MOCK_LEAD_READ_AT = faker.date.past();
+export const MOCK_USER_NAME = faker.person.fullName();
+export const MOCK_USER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_OWNER_EMAIL = faker.internet.email().toLowerCase();
+export const MOCK_OPERATOR_EMAIL = 'operator@example.com';
 
 // Seeds one `tenants` row against the given `createTestDb()` instance for a
 // test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`
@@ -65,6 +77,31 @@ export async function insertTestUser(
   return user;
 }
 
+export async function insertTestReader(
+  db: TTestDb,
+  email: string,
+): Promise<TUser> {
+  return insertTestUser(db, { email, ...userPersonalColumns({ email }) });
+}
+
+export async function insertTestSubscriber(
+  db: TTestDb,
+  tenantId: string,
+  email: string,
+  overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
+): Promise<TSubscriber> {
+  const [subscriber] = await db
+    .insert(schema.subscribers)
+    .values({ tenantId, email, ...personalEmailColumns(email), ...overrides })
+    .returning();
+
+  if (!subscriber) {
+    throw new Error('insertTestSubscriber: insert returned no row.');
+  }
+
+  return subscriber;
+}
+
 export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {
   const { id: userId } = await insertTestUser(db);
 
@@ -106,9 +143,9 @@ export async function insertTestLead(
     .insert(schema.leads)
     .values({
       tenantId,
-      name: TEST_LEAD_NAME,
-      email: TEST_LEAD_EMAIL,
-      message: TEST_LEAD_MESSAGE,
+      name: MOCK_LEAD_NAME,
+      email: MOCK_LEAD_EMAIL,
+      message: MOCK_LEAD_MESSAGE,
       sourcePath: '/en/hire-me',
       ...overrides,
     })

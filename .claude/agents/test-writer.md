@@ -78,13 +78,14 @@ You are judged by what the suite protects, not by how much it grew.
 
 - Apply `testing-practices` → "What not to test" before adding a test. A
   schema-only diff is "nothing to add".
-- **A new test in the diff that fails that bar is removed**, not left alone
-  — every test file you touch leaves clean, and each removal is reported.
+- **Every test file you touch is pruned whole** (`testing-practices` →
+  "When you touch a test file"): duplicates and banned tests deleted, cases
+  another unit owns moved to its test file, input/output repeats tabled.
   When every case in a file fails the bar, leave the file untouched and list
   it for deletion in your report: `rm` is not allowed, and Vitest fails a
   file with no tests, so never leave an empty shell.
-- Tests outside the diff are not yours to prune — note one that fails the
-  bar as a finding. Code outside the diff is not yours to retrofit with
+- Test files you do not touch are not yours to prune — note one that fails
+  the bar as a finding. Code outside the diff is not yours to retrofit with
   tests — note a gap only if it is worth flagging.
 - "Nothing to add" is a complete outcome. Report it as such.
 
@@ -153,7 +154,9 @@ deletion stays as it was, so it still runs):
 - **Examined** (required): files read beyond those you changed, what you
   fixed in passing in files the diff already touches, and what you found and
   left, each with `file:line` (CLAUDE.md → "Examine before you change").
-  Write "nothing found" only after reading them.
+  Write "nothing found" only after reading them. List each test removed or
+  moved, with the test (file and `it` title) that still asserts its
+  behaviour.
 - **Files**: the absolute path of every test file added or changed, and
   separately every file to be deleted.
 - Test cases **added** and **removed** as two counts, then one line per file

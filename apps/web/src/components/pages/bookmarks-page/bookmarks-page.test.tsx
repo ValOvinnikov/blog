@@ -1,14 +1,15 @@
 import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { mockPostCard } from '@web/testing/shared/post/fixtures';
 import {
-  DEFAULT_REQUEST_CONTEXT,
-  DEFAULT_TENANT_ID,
-  DEFAULT_TENANT_SANITY_CONTEXT,
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
-import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
@@ -48,7 +49,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getPostsByIdsMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+    getPostsByIdsMock.mockResolvedValue(okResult([]));
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -63,7 +64,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
   it('redirects home without querying bookmarks when no tenant resolves', async () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       tenantId: undefined,
     });
 
@@ -74,13 +75,13 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('queries bookmarks for the signed-in user and tenant, then resolves ids via getPostsByIds', async () => {
+  it('resolves the signed-in user and tenant bookmarks into posts', async () => {
     await setup();
 
-    expect(listBookmarksMock).toHaveBeenCalledWith(DEFAULT_TENANT_ID, 'user-1');
+    expect(listBookmarksMock).toHaveBeenCalledWith(MOCK_TENANT_ID, 'user-1');
     expect(getPostsByIdsMock).toHaveBeenCalledWith(
       [],
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
@@ -91,7 +92,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
       token: 'tenant-token',
     };
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
 
@@ -105,19 +106,18 @@ describe(`<${BookmarksPage.name}/>`, () => {
       { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
       { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
     ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: true,
-      data: [
-        { ...makePostCard({ id: 'post-1', slug: 'first' }), language: EN },
-        { ...makePostCard({ id: 'post-2', slug: 'second' }), language: EN },
-      ],
-    });
+    getPostsByIdsMock.mockResolvedValue(
+      okResult([
+        { ...mockPostCard({ id: 'post-1', slug: 'first' }), language: EN },
+        { ...mockPostCard({ id: 'post-2', slug: 'second' }), language: EN },
+      ]),
+    );
 
     await setup();
 
     expect(getPostsByIdsMock).toHaveBeenCalledWith(
       ['post-2', 'post-1'],
-      DEFAULT_TENANT_SANITY_CONTEXT,
+      MOCK_TENANT_SANITY_CONTEXT,
     );
 
     const links = screen.getAllByRole('link');
@@ -134,21 +134,20 @@ describe(`<${BookmarksPage.name}/>`, () => {
       { userId: 'user-1', postId: 'post-nl', createdAt: new Date() },
       { userId: 'user-1', postId: 'post-en', createdAt: new Date() },
     ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: true,
-      data: [
+    getPostsByIdsMock.mockResolvedValue(
+      okResult([
         {
-          ...makePostCard({ id: 'post-nl', slug: 'mijn-artikel' }),
+          ...mockPostCard({ id: 'post-nl', slug: 'mijn-artikel' }),
           language: NL,
         },
         {
-          ...makePostCard({ id: 'post-en', slug: 'my-article' }),
+          ...mockPostCard({ id: 'post-en', slug: 'my-article' }),
           language: EN,
         },
-      ],
-    });
+      ]),
+    );
     vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...DEFAULT_REQUEST_CONTEXT,
+      ...MOCK_REQUEST_CONTEXT,
       locale: NL,
       defaultLocale: EN,
     });
@@ -163,35 +162,35 @@ describe(`<${BookmarksPage.name}/>`, () => {
   it('renders the catalog empty message when there are no bookmarks', async () => {
     await setup();
 
+    const emptyMessage = screen.getByText(
+      'No bookmarks yet — save a post to find it here.',
+    );
+
     expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
-    expect(
-      screen.getByText('No bookmarks yet — save a post to find it here.'),
-    ).toBeVisible();
+    expect(emptyMessage).toBeVisible();
   });
 
   it('renders the tenant-authored empty message with its formatting and link', async () => {
     vi.mocked(getVoiceRich).mockResolvedValueOnce(
-      makeFormattedVoiceRich({ linkText: LINK_TEXT, href: '/blog' }),
+      mockFormattedVoiceRich({ linkText: LINK_TEXT, href: '/blog' }),
     );
 
     await setup();
 
-    expect(screen.getByRole('link', { name: LINK_TEXT })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
-    expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
+    const inlineLink = screen.getByRole('link', { name: LINK_TEXT });
+    const boldText = screen.getByText('bold', { selector: 'strong' });
+    const italicText = screen.getByText('italic', { selector: 'em' });
+
+    expect(inlineLink).toHaveAttribute('href', '/blog');
+    expect(boldText).toBeVisible();
+    expect(italicText).toBeVisible();
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
     ]);
-    getPostsByIdsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+    getPostsByIdsMock.mockResolvedValue(errorResult(new Error('boom')));
 
     const { container } = await setup();
 

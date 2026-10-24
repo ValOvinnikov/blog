@@ -111,6 +111,13 @@ contracts:
     fixed in passing, and what they found and left. The rule it reports on,
     "Examine before you change", lives once in `CLAUDE.md`; the reviewer's
     `code-review-practices` treats drift left in a touched file as blocking.
+    Since 2026-10-23 that item also lists each test removed or moved while
+    pruning a touched test file, with the test that still asserts its
+    behaviour (`testing-practices` → "When you touch a test file", #5793).
+    Test files carry no size budget, and one reached ~1,160 lines with about
+    a third of its cases repeating each other or re-testing units that had
+    their own test files; pruning a touched test file is mandatory, never
+    repo-wide.
   - They no longer carry comment rules of their own. Each points at
     `CLAUDE.md`'s `## Conventions` → "Comments default to zero", the single
     source. **A dispatched subagent inherits both the project and the user
@@ -164,7 +171,11 @@ contracts:
     corrected. The greps were added after every module on `main` was found
     carrying an identical `XModule — fetches module_x and hands it to
 XModuleView` block that the rule already forbade and no review had
-    flagged. A merge from `origin/main` after either `verify-runner` or
+    flagged. The same pass names each touched test file over 500 lines, and
+    the reviewer reads every touched test file in full: a duplicate test, a
+    case another unit with its own test file owns, an untabled set of
+    input/output repeats, or a removed test whose behaviour nothing else
+    asserts is blocking (`code-review-practices` §6, #5793). A merge from `origin/main` after either `verify-runner` or
     `reviewer` has already run invalidates both, same as any other new
     change — re-run verify and re-dispatch `reviewer`
     (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). This is
@@ -192,9 +203,9 @@ XModuleView` block that the rule already forbade and no review had
     Edit/Write check entirely. A needed product-code change comes back as a
     finding for the orchestrator to route, never a fix this agent makes
     itself. Holds the `testing-practices` bar in both directions (#3366): it
-    adds only what protects behaviour and **deletes** a new test that
-    restates its source or clones a sibling block, reporting added and
-    removed counts — "nothing to add" is a complete outcome. Sees the
+    adds only what protects behaviour and prunes every test file it touches
+    whole, not only its new cases (#5793), reporting added and removed
+    counts — "nothing to add" is a complete outcome. Sees the
     product change it's covering via the same "Sequential
     agent worktrees compose" mechanism below (#1796) rather than any seeding
     step of its own — the orchestrator must land the layer agent's commit
@@ -742,7 +753,7 @@ file` are all denied alike) — an earlier version only handled the
   - `platform-ui-practices` — the `apps/platform` admin design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, and a red-flags table; placement, props and size defer to `react-component-practices`. The reviewer checks platform diffs against it.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, split a growing island at its state branches, a `@blog/ui` atom before raw markup, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
-  - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), and behaviour titles of 80 characters or fewer.
+  - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, an exported fixture named `mock<Thing>` (builder) and every fixed fake value `MOCK_<THING>`, a test file's own consts included, with render and setup helpers exempt, never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), behaviour titles of 80 characters or fewer, and a mandatory pruning pass over every touched test file (duplicates deleted, cases another unit owns moved to it, input/output repeats tabled, each removal reported with where its behaviour is still asserted).
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR, plus the spec and feature-doc sync item, converge-on-touch findings (placement, size, props, variants files) and a flag on a UI or behaviour diff with no manual-test issue.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,

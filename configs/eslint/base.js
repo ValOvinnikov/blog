@@ -32,6 +32,19 @@ const touchedFileRules = {
   },
 };
 
+export const nextAppFolderNaming = {
+  // Next.js App Router uses bracket and paren folder conventions ([locale],
+  // (group)) which are not kebab-case, so src/app/ is exempt from the shared rule.
+  plugins: { 'check-file': checkFile },
+  rules: {
+    'check-file/folder-naming-convention': [
+      'error',
+      { 'src/!(app)/**/': 'KEBAB_CASE' },
+      { ignoreWords: ['__mocks__'] },
+    ],
+  },
+};
+
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   {

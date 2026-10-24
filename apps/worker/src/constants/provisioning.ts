@@ -14,3 +14,4 @@ export const PROVISION_CLI_RESULT = {
 
 export type TProvisionCliResult = TValueOf<typeof PROVISION_CLI_RESULT>;
 export const UNKNOWN_RUN_ERROR = 'unknown error';
+export const PROVISIONING_BEGIN_FAILED_EVENT = 'provisioning.begin_failed';

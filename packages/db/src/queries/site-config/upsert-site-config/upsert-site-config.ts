@@ -21,14 +21,17 @@ import {
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
+  toSiteConfigResult,
+  type TSiteConfigResult,
+} from '@blog/db/queries/site-config/get-site-config';
+import {
   siteConfig,
   type TVoiceOverridesByLocale,
 } from '@blog/db/schema/site-config';
 import { tenants } from '@blog/db/schema/tenants';
+import { okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
-
-import { toSiteConfigResult, type TSiteConfigResult } from '../get-site-config';
 
 import {
   assertKnownLocales,
@@ -43,9 +46,10 @@ export type {
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
-export type TUpsertSiteConfigResult =
-  | ({ ok: true } & TSiteConfigResult)
-  | { ok: false; fieldErrorsByLocale: TVoiceFieldFailuresByLocale };
+export type TUpsertSiteConfigResult = TResult<
+  TSiteConfigResult,
+  TVoiceFieldFailuresByLocale
+>;
 
 // A field absent from the input is left untouched on `UPDATE` — Look and
 // Voice are saved from separate admin-panel tabs, so a Look save must never
@@ -148,10 +152,8 @@ export async function upsertSiteConfig(
   if (voiceOverridesByLocale !== undefined) {
     assertKnownLocales(voiceOverridesByLocale);
     const result = parseVoiceOverridesByLocale(voiceOverridesByLocale);
-    if (!result.ok) {
-      return { ok: false, fieldErrorsByLocale: result.fieldErrorsByLocale };
-    }
-    voicePatch = result.value;
+    if (!result.ok) return result;
+    voicePatch = result.data;
   }
 
   const required = {
@@ -194,5 +196,5 @@ export async function upsertSiteConfig(
     );
   }
 
-  return { ok: true, ...toSiteConfigResult(row, defaultLocale) };
+  return okResult(toSiteConfigResult(row, defaultLocale));
 }

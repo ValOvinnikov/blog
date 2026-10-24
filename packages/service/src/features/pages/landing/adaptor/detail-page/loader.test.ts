@@ -1,138 +1,151 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawHeadingBlock,
-  makeRawSeo,
+  MOCK_ABOUT_PAGE_TITLE,
+  mockContentSlotView,
+  mockCtaSlotView,
+  mockHeroSlotView,
+  mockRawCtaRef,
+  mockRawHeroRef,
+  mockRawLandingPage,
+} from '@blog/service/testing/pages/fixtures';
+import {
+  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_TEMPLATE_LANDING_CACHE_TAG,
+} from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_MISSING_ID,
+  mockRawHeadingBlock,
+  mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
-import { makeTenant } from '@blog/service/testing/tenant';
+import {
+  MOCK_ABOUT_SLUG,
+  MOCK_PRICING_SLUG,
+} from '@blog/service/testing/shared/translated-pages-dataset';
+import { mockTenant } from '@blog/service/testing/tenant';
 
 import { getPageDocument } from './loader';
+import { landingPageQuery } from './query';
 
-vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('@blog/service/sanity/query/query')
-  >()),
-  runQuery: vi.fn(),
-}));
+vi.mock('@blog/service/sanity/query/query');
 
-const tenant = makeTenant();
+const ABOUT_TITLE = MOCK_ABOUT_PAGE_TITLE;
+const ABOUT_SUPPORTING_TEXT = 'Who we are';
+const MODULES_PATH = 'modules';
+const FAQ_SLUG = 'faq';
+const FAQ_PATH = `${MODULES_PATH}/${FAQ_SLUG}`;
+const PRICING_PATH = 'modules/pricing';
+const ANSWERS_PATH = 'modules/faq/answers';
+const GLOSSARY_PATH = 'modules/faq/glossary';
 
-describe('getPageDocument', () => {
+const tenant = mockTenant();
+
+async function loadPage(
+  overrides: Parameters<typeof mockRawLandingPage>[0] = {},
+  slug = MOCK_ABOUT_SLUG,
+) {
+  mockRun.mockResolvedValueOnce(mockRawLandingPage(overrides));
+  const page = await getPageDocument([slug], tenant);
+  if (!page) throw new Error('expected a landing page');
+
+  return page;
+}
+
+describe(getPageDocument, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(makeRawLandingPage());
+    mockRun.mockResolvedValue(mockRawLandingPage());
   });
 
   it('maps the thin page_landing document to module refs', async () => {
-    const page = await getPageDocument(['about'], tenant);
-    if (!page) throw new Error('expected a landing page');
+    const { id, path, modules } = await loadPage();
 
-    expect(page.id).toBe('about');
-    expect(page.path).toBe('about');
-    expect(page.modules).toEqual([
-      { id: 'content-1', type: 'module_content' },
-      { id: 'cta-1', type: 'module_cta' },
-    ]);
+    expect({ id, path, modules }).toEqual({
+      id: MOCK_ABOUT_SLUG,
+      path: MOCK_ABOUT_SLUG,
+      modules: [mockContentSlotView(), mockCtaSlotView()],
+    });
   });
 
   it('maps an authored page_landing.headingBlock through to the view model', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawLandingPage({
-        headingBlock: makeRawHeadingBlock('About Us', {
-          supportingText: 'Who we are',
-        }),
+    const { headingBlock } = await loadPage({
+      headingBlock: mockRawHeadingBlock(ABOUT_TITLE, {
+        supportingText: ABOUT_SUPPORTING_TEXT,
       }),
-    );
+    });
 
-    const page = await getPageDocument(['about'], tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.headingBlock.heading).toBe('About Us');
-    expect(page.headingBlock.supportingText).toBe('Who we are');
+    expect(headingBlock.heading).toBe(ABOUT_TITLE);
+    expect(headingBlock.supportingText).toBe(ABOUT_SUPPORTING_TEXT);
   });
 
-  it('leaves hero undefined when page_landing.hero is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLandingPage({ hero: null }));
+  it.each([
+    ['leaves hero undefined when page_landing.hero is unset', null, undefined],
+    [
+      'maps a set page_landing.hero to a hero slot',
+      mockRawHeroRef(),
+      mockHeroSlotView(),
+    ],
+  ])('%s', async (_, hero, expected) => {
+    const page = await loadPage({ hero });
 
-    const page = await getPageDocument(['about'], tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.hero).toBeUndefined();
-  });
-
-  it('maps a set page_landing.hero to a hero slot', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawLandingPage({
-        hero: { _id: 'hero-1', _type: 'module_heroBlog' },
-      }),
-    );
-
-    const page = await getPageDocument(['about'], tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
+    expect(page.hero).toEqual(expected);
   });
 
   it('rejects when page_landing.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawLandingPage({
-        hero: { _id: 'cta-1', _type: 'module_cta' as never },
+      mockRawLandingPage({
+        hero: mockRawCtaRef() as never,
       }),
     );
 
-    await expect(getPageDocument(['about'], tenant)).rejects.toThrow();
+    await expect(getPageDocument([MOCK_ABOUT_SLUG], tenant)).rejects.toThrow();
   });
 
-  it('lets authored seo override the resolved defaults, with no fallback for an unauthored openGraph', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawLandingPage({
-        seo: makeRawSeo({ metaTitle: 'About Us' }),
-      }),
-    );
+  it('uses authored seo, with no fallback for an unauthored openGraph', async () => {
+    const { seo } = await loadPage({
+      seo: mockRawSeo({ metaTitle: ABOUT_TITLE }),
+    });
 
-    const page = await getPageDocument(['about'], tenant);
-    if (!page) throw new Error('expected a landing page');
-
-    expect(page.seo.title).toBe('About Us');
-    expect(page.seo.ogTitle).toBeUndefined();
+    expect(seo.title).toBe(ABOUT_TITLE);
+    expect(seo.ogTitle).toBeUndefined();
   });
 
-  it('resolves undefined, rather than rejecting, when no page_landing matches the slug', async () => {
+  it('resolves undefined when no page_landing matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const page = await getPageDocument(['missing'], tenant);
+    const page = await getPageDocument([MOCK_MISSING_ID], tenant);
 
     expect(page).toBeUndefined();
   });
 
-  it('threads tenant context into the query and scopes its tags to it', async () => {
-    await getPageDocument(['about'], tenant);
+  it('queries the slug and path for the tenant and scopes the tags to it', async () => {
+    await getPageDocument([MODULES_PATH, FAQ_SLUG], tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: ['t:tenant-a:page_landing', 't:tenant-a:template_landing'],
-        }),
-      }),
-    );
+    expect(mockRun).toHaveBeenCalledWith(landingPageQuery, {
+      parameters: { slug: FAQ_SLUG, path: FAQ_PATH },
+      tenant,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [MOCK_PAGE_LANDING_CACHE_TAG, MOCK_TEMPLATE_LANDING_CACHE_TAG],
+      },
+    });
   });
+
   describe('section navigation', () => {
-    const faq = { _id: 'faq', title: 'FAQ', path: 'modules/faq' };
+    const faq = { _id: FAQ_SLUG, title: 'FAQ', path: FAQ_PATH };
     const pricing = {
-      _id: 'pricing',
+      _id: MOCK_PRICING_SLUG,
       title: 'Pricing',
-      path: 'modules/pricing',
+      path: PRICING_PATH,
     };
     const answers = {
       _id: 'answers',
       title: 'Answers',
-      path: 'modules/faq/answers',
+      path: ANSWERS_PATH,
     };
     const glossary = {
       _id: 'glossary',
       title: 'Glossary',
-      path: 'modules/faq/glossary',
+      path: GLOSSARY_PATH,
     };
 
     type TSectionPage = {
@@ -154,16 +167,14 @@ describe('getPageDocument', () => {
     }
 
     const modulesSection = chainNode(
-      { _id: 'modules', title: 'Modules', path: 'modules' },
+      { _id: MODULES_PATH, title: 'Modules', path: MODULES_PATH },
       [faq, pricing],
     );
 
     async function navigationFor(
-      overrides: Parameters<typeof makeRawLandingPage>[0],
+      overrides: Parameters<typeof mockRawLandingPage>[0],
     ) {
-      mockRun.mockResolvedValueOnce(makeRawLandingPage(overrides));
-      const page = await getPageDocument(['modules'], tenant);
-      if (!page) throw new Error('expected a landing page');
+      const page = await loadPage(overrides, MODULES_PATH);
 
       return page.sectionNavigation;
     }
@@ -175,15 +186,15 @@ describe('getPageDocument', () => {
         }),
       ).toEqual({
         title: null,
-        root: { title: 'Modules', path: 'modules', isCurrent: false },
+        root: { title: 'Modules', path: MODULES_PATH, isCurrent: false },
         pages: [
-          { title: 'FAQ', path: 'modules/faq', isCurrent: true },
-          { title: 'Pricing', path: 'modules/pricing', isCurrent: false },
+          { title: 'FAQ', path: FAQ_PATH, isCurrent: true },
+          { title: 'Pricing', path: PRICING_PATH, isCurrent: false },
         ],
         breadcrumbs: [
-          { title: 'Modules', path: 'modules' },
-          { title: 'FAQ', path: 'modules/faq' },
-          { title: 'Answers', path: 'modules/faq/answers' },
+          { title: 'Modules', path: MODULES_PATH },
+          { title: 'FAQ', path: FAQ_PATH },
+          { title: 'Answers', path: ANSWERS_PATH },
         ],
         parentSection: undefined,
       });
@@ -212,16 +223,16 @@ describe('getPageDocument', () => {
 
       expect(navigation?.root).toEqual({
         title: 'FAQ',
-        path: 'modules/faq',
+        path: FAQ_PATH,
         isCurrent: false,
       });
       expect(navigation?.pages).toEqual([
-        { title: 'Glossary', path: 'modules/faq/glossary', isCurrent: false },
-        { title: 'Answers', path: 'modules/faq/answers', isCurrent: true },
+        { title: 'Glossary', path: GLOSSARY_PATH, isCurrent: false },
+        { title: 'Answers', path: ANSWERS_PATH, isCurrent: true },
       ]);
     });
 
-    it('returns the nearest outer section root as the parent section of a nested section', async () => {
+    it("returns the nearest outer section root as a nested section's parent", async () => {
       const navigation = await navigationFor({
         sectionChain: [
           chainNode(answers),
@@ -233,7 +244,7 @@ describe('getPageDocument', () => {
 
       expect(navigation?.parentSection).toEqual({
         title: 'Modules',
-        path: 'modules',
+        path: MODULES_PATH,
       });
     });
 
@@ -281,16 +292,14 @@ describe('getPageDocument', () => {
     it('leaves out a child page that has no path', async () => {
       const navigation = await navigationFor({
         sectionChain: [
-          chainNode({ _id: 'modules', title: 'Modules', path: 'modules' }, [
-            faq,
-            { ...pricing, path: null },
-          ]),
+          chainNode(
+            { _id: MODULES_PATH, title: 'Modules', path: MODULES_PATH },
+            [faq, { ...pricing, path: null }],
+          ),
         ],
       });
 
-      expect(navigation?.pages.map(({ path }) => path)).toEqual([
-        'modules/faq',
-      ]);
+      expect(navigation?.pages.map(({ path }) => path)).toEqual([FAQ_PATH]);
     });
 
     it('returns none when the page turns section navigation off', async () => {
@@ -307,7 +316,11 @@ describe('getPageDocument', () => {
         await navigationFor({
           sectionChain: [
             chainNode(faq),
-            chainNode({ _id: 'modules', title: 'Modules', path: 'modules' }),
+            chainNode({
+              _id: MODULES_PATH,
+              title: 'Modules',
+              path: MODULES_PATH,
+            }),
           ],
         }),
       ).toBeUndefined();

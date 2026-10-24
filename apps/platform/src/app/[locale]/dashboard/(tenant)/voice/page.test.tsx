@@ -3,7 +3,10 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { makeReadyTenant, TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  mockReadyTenant,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -40,7 +43,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const membership = {
   id: 'm-1',
   userId: 'user-1',
-  tenantId: TENANT_ID,
+  tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
 };
 
@@ -56,7 +59,7 @@ describe(`<${DashboardVoicePage.name}/>`, () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: makeReadyTenant({ id: TENANT_ID }) },
+      { membership, tenant: mockReadyTenant({ id: MOCK_TENANT_ID }) },
     ]);
   });
 
@@ -74,7 +77,7 @@ describe(`<${DashboardVoicePage.name}/>`, () => {
 
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(TENANT_ID);
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(screen.getByRole('heading', { name: 'Voice' })).toBeVisible();
   });
 });

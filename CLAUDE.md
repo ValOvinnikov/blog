@@ -262,8 +262,9 @@ ticket itself. Then sort what you find:
 - **Mechanical drift in a file the diff already touches is fixed in the same
   change** — a comment that fails the comment test, a type `@blog/config`
   already exports, a dead import or export, a pattern a later convention
-  replaced. This is the steady-state rule comments already follow, applied to
-  every convention.
+  replaced, a test file not yet pruned (`testing-practices` → "When you
+  touch a test file"). This is the steady-state rule comments already follow,
+  applied to every convention.
 - **Everything else is reported, not fixed** — drift in a file the diff does
   not touch, a behaviour change, a design call. It goes in the agent's
   **Examined** report section with `file:line`. The orchestrator lands it in
@@ -672,7 +673,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   vocabulary an outside standard spells — a value compared with an env read
   (`process.env.NODE_ENV === 'production'`), an env read's bracket key
   (`process.env['X']`), a `stubEnv` argument, a protocol attribute's
-  value (`sameSite: 'strict'`), and a Testing Library role query's role
+  value (`sameSite: 'strict'`; for `target`, only `'_blank'`), and a
+  Testing Library role query's role
   (`getByRole('button')`); a
   match in the other app is reported, never shared. Lint enforces both on
   touched files only — `prefer-shared-constant` and `no-duplicate-string` in

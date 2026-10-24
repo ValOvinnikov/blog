@@ -1,12 +1,13 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import { makeAdmin } from '@platform/testing/admins/fixtures';
+import { okResult } from '@blog/utils';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
-  BLOCKED_ADDRESS_ENTRY_ID,
-  BLOCKED_ADDRESS_HASH,
-  BLOCKED_ADDRESS_HASH_PREVIEW,
-  BLOCKED_DOMAIN,
-  makeBlockedIdentityListing,
+  MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+  MOCK_BLOCKED_ADDRESS_HASH,
+  MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
+  MOCK_BLOCKED_DOMAIN,
+  mockBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -44,18 +45,17 @@ const setup = customRenderAsync(BlockedSignupsPage, {});
 
 describe(BlockedSignupsPage, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(makeAdmin());
-    listBlockedIdentitiesMock.mockReset().mockResolvedValue({
-      ok: true,
-      data: [
-        makeBlockedIdentityListing(),
-        makeBlockedIdentityListing({
-          id: BLOCKED_ADDRESS_ENTRY_ID,
+    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
+    listBlockedIdentitiesMock.mockReset().mockResolvedValue(
+      okResult([
+        mockBlockedIdentityListing(),
+        mockBlockedIdentityListing({
+          id: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          value: BLOCKED_ADDRESS_HASH,
+          value: MOCK_BLOCKED_ADDRESS_HASH,
         }),
-      ],
-    });
+      ]),
+    );
   });
 
   it('404s for anyone who is not a super admin without reading the list', async () => {
@@ -71,8 +71,8 @@ describe(BlockedSignupsPage, () => {
   it('lists every entry, showing an address only as the start of its hash', async () => {
     await setup();
 
-    const domain = screen.getByText(BLOCKED_DOMAIN);
-    const addressHash = screen.getByText(BLOCKED_ADDRESS_HASH_PREVIEW);
+    const domain = screen.getByText(MOCK_BLOCKED_DOMAIN);
+    const addressHash = screen.getByText(MOCK_BLOCKED_ADDRESS_HASH_PREVIEW);
 
     expect(domain).toBeVisible();
     expect(addressHash).toBeVisible();
