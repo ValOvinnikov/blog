@@ -361,7 +361,13 @@ file` are all denied alike) — an earlier version only handled the
     `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
     (`prefer-shared-constant`, `no-duplicate-string`) that repo-wide
     `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
-    same way. Report-only (never
+    same way. When ESLint exits fatally in a directory that has an
+    `eslint.config.*` (the workspace's, or the root one the walk falls back
+    to) — the config failed to load, typically a checkout installed before a
+    plugin the shared config imports — the hook tells the agent, with
+    ESLint's first error line and a `pnpm install` hint, instead of passing
+    silently and leaving every later edit unlinted; a fatal exit where no
+    config resolves at all stays silent. Report-only (never
     `--fix`); the commit-time gates (lint-staged) stay authoritative. Both
     scripts fall back to `git rev-parse --show-toplevel` (from the file's
     directory) when `CLAUDE_PROJECT_DIR` is unset.
