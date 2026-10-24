@@ -11,6 +11,7 @@ import {
   encryptPersonalData,
   parsePersonalDataKeyring,
 } from '@blog/utils/encryption';
+import { isNull } from '@blog/utils/primitives';
 
 // Null while a key is unset, so writes keep working on the plain columns and the backfill fills the gap.
 export function encryptPersonalValue(value: string): TMaybeNull<string> {
@@ -27,7 +28,7 @@ export function decryptPersonalValue(encrypted: string): string {
 function plainReadReason(
   encrypted: TMaybeNull<string>,
 ): TMaybeUndefined<TPersonalDataFallbackReason> {
-  if (encrypted === null) return PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED;
+  if (isNull(encrypted)) return PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED;
   if (!env.PERSONAL_DATA_ENCRYPTION_KEY) {
     return PERSONAL_DATA_FALLBACK_REASON.ENCRYPTION_KEY_UNSET;
   }
@@ -39,7 +40,7 @@ export function readOptionalPersonalValue(
   encrypted: TMaybeNull<string>,
   plain: TMaybeNull<string>,
 ): TMaybeNull<string> {
-  if (encrypted === null || !env.PERSONAL_DATA_ENCRYPTION_KEY) return plain;
+  if (isNull(encrypted) || !env.PERSONAL_DATA_ENCRYPTION_KEY) return plain;
   return decryptPersonalValue(encrypted);
 }
 

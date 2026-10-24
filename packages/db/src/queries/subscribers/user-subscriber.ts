@@ -16,7 +16,15 @@ import {
 import { notifyPersonalDataFallback } from '@blog/db/utils/personal-data/personal-data-fallback';
 import { personalDataIndex } from '@blog/utils/encryption';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
-import { and, eq, isNull, or, sql, type SQL } from 'drizzle-orm';
+import { isNull } from '@blog/utils/primitives';
+import {
+  and,
+  eq,
+  isNull as isNullColumn,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 
 export type TUserSubscriber = Pick<TSubscriber, 'id' | 'status'> & {
   email: string;
@@ -37,7 +45,7 @@ function byAddress(normalizedEmail: string): TMaybeUndefined<SQL> {
       subscribers.emailIndex,
       requireEmailIndex(normalizedEmail, personalDataIndex),
     ),
-    and(isNull(subscribers.emailIndex), plainMatch),
+    and(isNullColumn(subscribers.emailIndex), plainMatch),
   );
 }
 
@@ -82,7 +90,7 @@ export async function findUserSubscriber(
 
   const { email, emailEncrypted } = user;
   const address = readOptionalPersonalValue(emailEncrypted, email);
-  if (address === null) return undefined;
+  if (isNull(address)) return undefined;
   reportPlainPersonalRead(PERSONAL_DATA_OWNER.USER, emailEncrypted);
 
   return findSubscriberByExactEmail(tenantId, normalizeEmail(address));

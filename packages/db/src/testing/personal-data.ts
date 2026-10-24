@@ -13,6 +13,7 @@ import {
   MOCK_OTHER_ENCRYPTION_KEY,
   MOCK_ENCRYPTION_KEY,
 } from '@blog/utils/encryption/encryption-fixtures';
+import { isNull } from '@blog/utils/primitives';
 import type { Mock } from 'vitest';
 
 const TEST_KEYRING = `v1:${MOCK_ENCRYPTION_KEY}`;
@@ -47,7 +48,7 @@ export function usePersonalDataFallbackListener(): Mock<TPersonalDataFallbackLis
 export function decryptTestPersonalValue(
   encrypted: TMaybeNull<string>,
 ): TMaybeNull<string> {
-  return encrypted === null
+  return isNull(encrypted)
     ? null
     : decryptPersonalData(encrypted, parsePersonalDataKeyring(TEST_KEYRING));
 }

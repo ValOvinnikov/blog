@@ -12,6 +12,7 @@ import {
 } from '@blog/db/utils/personal-data/personal-data';
 import { notifyPersonalDataFallback } from '@blog/db/utils/personal-data/personal-data-fallback';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+import { isNull } from '@blog/utils/primitives';
 
 // The index ignores a `+tag`, so only a candidate whose own address matches is the user.
 async function findIndexedUser(email: string): Promise<TMaybeUndefined<TUser>> {
@@ -20,7 +21,7 @@ async function findIndexedUser(email: string): Promise<TMaybeUndefined<TUser>> {
 
   return candidates.find(
     ({ email: plain, emailEncrypted }) =>
-      emailEncrypted !== null &&
+      !isNull(emailEncrypted) &&
       normalizeEmail(readPersonalValue(emailEncrypted, plain ?? '')) ===
         requested,
   );
