@@ -1,5 +1,6 @@
 'use client';
 
+import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
 
 import { LeadReadingPane } from './components/lead-reading-pane';
@@ -19,7 +20,7 @@ export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
     useLeadSelection({ updateLead, removeLead });
   const selectedLead = leads.find(({ id }) => id === selectedId);
   const { root, listColumn, paneColumn } = leadsInboxVariants({
-    hasSelection: selectedLead !== undefined,
+    hasSelection: !isUndefined(selectedLead),
   });
 
   return (
@@ -32,7 +33,7 @@ export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
           loading={loading}
         />
       </div>
-      {leads.length > 0 && (
+      {hasArrayGotItems(leads) && (
         <div className={paneColumn()}>
           {selectedLead ? (
             <LeadReadingPane

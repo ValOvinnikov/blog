@@ -6,6 +6,7 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import type { TListedLead } from '@blog/db/queries/leads';
+import { isNull } from '@blog/utils/primitives';
 
 export type TInboxLead = Pick<
   TListedLead,
@@ -35,6 +36,6 @@ export const toInboxLead = ({
   sourceDocumentId,
   sourceLocale:
     sourceLocale && isLocaleIsoCode(sourceLocale) ? sourceLocale : null,
-  isRead: readAt !== null,
+  isRead: !isNull(readAt),
   createdAt,
 });

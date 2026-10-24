@@ -1,4 +1,5 @@
 import { SIZE, type TMaybeUndefined } from '@blog/config';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import type { TLeadsLoading } from '@platform/components/features/leads/leads-inbox/use-leads-pages';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -33,7 +34,7 @@ export const LeadsList = ({
   });
   const { list, sentinel, footer } = leadsListVariants();
 
-  if (leads.length === 0) {
+  if (!hasArrayGotItems(leads)) {
     return (
       <Card>
         <Card.Body>

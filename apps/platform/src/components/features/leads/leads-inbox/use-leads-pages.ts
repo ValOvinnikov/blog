@@ -1,3 +1,4 @@
+import { isUndefined } from '@blog/utils/primitives';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
 import { loadMoreLeadsAction } from '@platform/server/leads/load-more-leads-action';
@@ -40,7 +41,7 @@ export const useLeadsPages = (initialPage: TInboxLeadsPage) => {
   return {
     leads,
     loading: {
-      hasMore: nextCursor !== undefined,
+      hasMore: !isUndefined(nextCursor),
       isLoading,
       hasLoadFailed,
       loadMore,

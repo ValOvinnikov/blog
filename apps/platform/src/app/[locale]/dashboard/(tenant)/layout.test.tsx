@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -82,7 +83,7 @@ const TEAM = 'Team';
 
 const mockActiveTenantCookie = (value: string | undefined) => {
   cookiesMock.mockResolvedValue({
-    get: vi.fn(() => (value === undefined ? undefined : { value })),
+    get: vi.fn(() => (isUndefined(value) ? undefined : { value })),
   });
 };
 

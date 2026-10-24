@@ -1,5 +1,6 @@
 import { ICONS, type TMaybeUndefined } from '@blog/config';
 import type { TAdminRole } from '@blog/db/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import type {
   TSidebarNavItem,
   TSidebarNavSection,
@@ -249,5 +250,5 @@ export const navLabelForPathname = (
   sections
     .flatMap((section) => section.items)
     .find(
-      (item) => item.href !== undefined && isNavItemFor(item.href, pathname),
+      (item) => !isUndefined(item.href) && isNavItemFor(item.href, pathname),
     )?.label;
