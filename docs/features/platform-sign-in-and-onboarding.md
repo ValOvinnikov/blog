@@ -92,11 +92,15 @@ Decided:
   (`DB_ALREADY_OWNS_FREE_TENANT`). Decided: Create site calls it after
   `admitCreateSite`, then enqueues the worker.
 - One Free tenant per person: `ownsFreeTenant(email)` is the pre-check. It
-  matches an OWNER membership on a FREE, non-archived tenant whose user's
-  `users.emailIndex` is the keyed hash of the normalised address, so `+tag`
-  variants count as one person. An archived tenant frees the slot; suspended
-  and failed ones keep it, and an unaccepted OWNER invite doesn't count. The
-  database enforces it too: `createSelfServeTenant` stores that hash in
+  strips the `+tag` (`normalizeEmailIdentity`) and matches a FREE,
+  non-archived tenant whose `self_serve_owner_email_index` is that address's
+  index — exactly what the database guard below compares, so the two never
+  disagree for a self-served site — or which an OWNER membership ties to the
+  account at the stripped address (operator-created Free sites). Accepted
+  gap: an operator-created Free site owned by `name+1@…` does not block
+  `name+2@…`. An archived tenant frees the slot; suspended and failed ones
+  keep it, and an unaccepted OWNER invite doesn't count. The database
+  enforces it too: `createSelfServeTenant` stores the `+tag`-free hash in
   `tenants.self_serve_owner_email_index`, under a partial unique index over
   FREE, non-archived rows, so two simultaneous submits can't both succeed.
   Operator-created tenants leave it null. The index guards every write, not
