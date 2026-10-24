@@ -23,7 +23,8 @@
     "leads": "Berichten · Admin",
     "releases": "Releases · Admin",
     "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
-    "dataRequestsPage": "Gegevensverzoeken · Admin"
+    "dataRequestsPage": "Gegevensverzoeken · Admin",
+    "signUpTitle": "Account aanmaken"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -37,7 +38,21 @@
     "accountNotLinkedTitle": "Dit e-mailadres logt al op een andere manier in",
     "accountNotLinkedDescription": "Je e-mailadres wordt al gebruikt met een andere inlogmethode. Log in zoals je de vorige keer deed.",
     "signInFailedTitle": "We konden je niet inloggen",
-    "signInFailedDescription": "Er ging iets mis bij het inloggen. Probeer het opnieuw of kies een andere manier om in te loggen."
+    "signInFailedDescription": "Er ging iets mis bij het inloggen. Probeer het opnieuw of kies een andere manier om in te loggen.",
+    "signUpPrompt": "Nieuw hier? <link>Maak een account aan</link>"
+  },
+  "signUpPage": {
+    "heading": "Account aanmaken",
+    "description": "Accepteer de voorwaarden en kies daarna hoe je wilt inloggen.",
+    "brandMarkLabel": "Valstack"
+  },
+  "signUpForm": {
+    "acceptTerms": "Ik ga akkoord met de <terms>Servicevoorwaarden</terms> en het <privacy>Privacybeleid</privacy>.",
+    "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan.",
+    "continue": "Doorgaan",
+    "continuing": "Controleren…",
+    "refusedTitle": "We konden je aanmelding niet voortzetten",
+    "refusedDescription": "Probeer het later opnieuw."
   },
   "providerSignInButton": {
     "continueWithGithub": "Doorgaan met GitHub",

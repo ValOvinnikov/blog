@@ -42,6 +42,8 @@ export const routes = {
   newsletterResult: (result: TNewsletterResult) =>
     `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
   landingPage: (slug: string) => `/${slug}`,
+  terms: () => '/terms',
+  privacy: () => '/privacy',
   switchLanguage: (to: string, from: string) =>
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
   rssFeed: () => '/rss.xml',

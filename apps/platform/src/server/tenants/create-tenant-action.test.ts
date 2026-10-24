@@ -20,6 +20,7 @@ import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
 } from '@platform/testing/admins/operator';
+import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_ID,
@@ -33,7 +34,6 @@ import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 const OWNER_USER_ID = 'user-1';
-const TENANT_ROOT_DOMAIN = 'example.com';
 const PROVISIONING_PATH = `/tenants/${MOCK_TENANT_ID}/provisioning`;
 const EXISTING_TENANT_ID = 'existing-tenant';
 
@@ -296,7 +296,7 @@ describe('createTenantAction', () => {
   ])(
     'rejects %s under the tenant root domain with its slug reason',
     async (domain, reason) => {
-      Object.assign(env, { TENANT_ROOT_DOMAIN });
+      Object.assign(env, { TENANT_ROOT_DOMAIN: MOCK_TENANT_ROOT_DOMAIN });
 
       const result = await createTenantAction({ ...validInput, domain });
 
@@ -309,7 +309,7 @@ describe('createTenantAction', () => {
   );
 
   it('rejects a slug another tenant holds under the tenant root domain', async () => {
-    Object.assign(env, { TENANT_ROOT_DOMAIN });
+    Object.assign(env, { TENANT_ROOT_DOMAIN: MOCK_TENANT_ROOT_DOMAIN });
     getTenantByDomainMock.mockResolvedValue({ id: EXISTING_TENANT_ID });
 
     const result = await createTenantAction(validInput);
@@ -322,7 +322,7 @@ describe('createTenantAction', () => {
   });
 
   it('accepts a reserved-looking label on a custom domain', async () => {
-    Object.assign(env, { TENANT_ROOT_DOMAIN });
+    Object.assign(env, { TENANT_ROOT_DOMAIN: MOCK_TENANT_ROOT_DOMAIN });
 
     await expect(
       createTenantAction({ ...validInput, domain: 'admin.acme.com' }),

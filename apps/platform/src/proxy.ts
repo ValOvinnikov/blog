@@ -16,6 +16,8 @@ export default function proxy(request: NextRequest) {
 }
 
 // Root-level dotted paths only: Studio structure ids contain dots, and a skipped request is never rewritten onto `[locale]`.
+// The UUID is BotID's fixed path prefix, which `[locale]` would otherwise swallow.
 export const config = {
-  matcher: '/((?!api|_next|_vercel|[^/]*\\.[^/]*$).*)',
+  matcher:
+    '/((?!api|_next|_vercel|149e9513-01fa-4fb0-aad4-566afd725d1b|[^/]*\\.[^/]*$).*)',
 };

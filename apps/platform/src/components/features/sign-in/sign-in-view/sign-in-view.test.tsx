@@ -84,9 +84,19 @@ describe(`<${SignInView.name}/>`, () => {
     );
   });
 
+  it('points a new visitor at sign-up', () => {
+    setup();
+
+    const signUp = screen.getByRole('link', { name: 'Create an account' });
+
+    expect(signUp).toHaveAttribute('href', adminRoutes.signUp());
+  });
+
   it('shows no error when the sign-in has not failed', () => {
     setup();
 
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const alert = screen.queryByRole('alert');
+
+    expect(alert).not.toBeInTheDocument();
   });
 });

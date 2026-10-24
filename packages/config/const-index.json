@@ -4306,6 +4306,38 @@
         "file": "apps/platform/src/constants/sign-in.ts"
       }
     ],
+    "TERMS_NOT_ACCEPTED": [
+      {
+        "ref": "SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
+    "TRY_AGAIN_LATER": [
+      {
+        "ref": "SIGN_UP_REFUSAL.TRY_AGAIN_LATER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
+    "auth.sign_up_bot_refused": [
+      {
+        "ref": "SIGN_UP_LOG.BOT_REFUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
+    "auth.sign_up_bot_check_failed": [
+      {
+        "ref": "SIGN_UP_LOG.BOT_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
     "BLOCK_DOMAIN_INVALID": [
       {
         "ref": "SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID",

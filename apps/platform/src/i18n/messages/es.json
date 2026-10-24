@@ -23,7 +23,8 @@
     "leads": "Contactos · Administración",
     "releases": "Versiones · Admin",
     "blockedSignupsPage": "Registros bloqueados · Admin",
-    "dataRequestsPage": "Solicitudes de datos · Admin"
+    "dataRequestsPage": "Solicitudes de datos · Admin",
+    "signUpTitle": "Crear una cuenta"
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
@@ -37,7 +38,21 @@
     "accountNotLinkedTitle": "Este correo ya inicia sesión de otra forma",
     "accountNotLinkedDescription": "Tu correo electrónico ya se usa con otro método de inicio de sesión. Inicia sesión como lo hiciste la última vez.",
     "signInFailedTitle": "No hemos podido iniciar tu sesión",
-    "signInFailedDescription": "Algo ha fallado al iniciar sesión. Inténtalo de nuevo o elige otra forma de iniciar sesión."
+    "signInFailedDescription": "Algo ha fallado al iniciar sesión. Inténtalo de nuevo o elige otra forma de iniciar sesión.",
+    "signUpPrompt": "¿Eres nuevo? <link>Crea una cuenta</link>"
+  },
+  "signUpPage": {
+    "heading": "Crear una cuenta",
+    "description": "Acepta las condiciones y elige cómo quieres iniciar sesión.",
+    "brandMarkLabel": "Valstack"
+  },
+  "signUpForm": {
+    "acceptTerms": "Acepto los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
+    "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar.",
+    "continue": "Continuar",
+    "continuing": "Comprobando…",
+    "refusedTitle": "No hemos podido continuar con tu registro",
+    "refusedDescription": "Vuelve a intentarlo más tarde."
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuar con GitHub",
