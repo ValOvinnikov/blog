@@ -27,7 +27,7 @@ describe(`<${Checkbox.name}/>`, () => {
 
     await user.click(label);
 
-    const [[isChecked]] = onCheckedChange.mock.calls;
+    const [isChecked] = onCheckedChange.mock.calls[0] ?? [];
 
     expect(isChecked).toBe(true);
   });
