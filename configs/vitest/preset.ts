@@ -4,23 +4,15 @@ import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
-/**
- * Shared Vitest preset.
- *
- * Component packages (ui, web) merge this with a jsdom environment and a
- * setup file that loads `@testing-library/jest-dom`. Pure logic packages
- * (service) can use it as-is with the default `node` environment by passing
- * `environment: "node"`.
- *
- *   // packages/ui/vitest.config.ts
- *   import preset from "@blog/vitest-config/preset";
- *   import { mergeConfig, defineConfig } from "vitest/config";
- *   export default mergeConfig(preset, defineConfig({
- *     test: { environment: "jsdom", setupFiles: ["./vitest.setup.ts"] },
- *   }));
- */
+// The root entry loads every locale; `faker` there is this same English instance.
+const FAKER_EN_ALIAS = {
+  find: /^@faker-js\/faker$/,
+  replacement: '@faker-js/faker/locale/en',
+};
+
 const preset = defineConfig({
   plugins: [react()],
+  resolve: { alias: [FAKER_EN_ALIAS] },
   test: {
     globals: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],

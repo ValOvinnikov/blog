@@ -154,6 +154,21 @@ passing both ways:
 | `apps/web`      | 181s             | 81s                 |
 | `apps/platform` | 221s             | 98s                 |
 
+### Adopted: faker's English build
+
+The shared preset aliases exactly `@faker-js/faker` to
+`@faker-js/faker/locale/en`, so every workspace extending it skips the
+all-locales root entry (86 files, 2.39 MB → 3 files, 0.42 MB). The root
+`faker` export is that same English instance and nothing imports another
+locale, so no test changed. Storybook does not use the preset and keeps the
+root entry.
+
+Measured 2026-10-25 with `--experimental.importDurations.print`, three runs
+each of `apps/worker`'s `rotate-revalidate-webhook-secrets.test.ts`: faker's
+import fell from 167-179ms (`dist/index.js`) to 24-35ms (`dist/locale/en.js`)
+per test process. The `jsdom`/`vmThreads` project in `apps/web` and
+`packages/ui`'s own config load the English build too (42ms and 23ms).
+
 ## Caveat on absolute numbers
 
 Timings measured during this investigation ran at load averages of 587-646 on
