@@ -13,6 +13,7 @@ export * as memberships from './memberships';
 export * as migrations from './migrations';
 export * as personalData from './personal-data';
 export * as readerData from './reader-data';
+export * as retention from './retention';
 export * as settingsFeatures from './settings-features';
 export * as siteConfig from './site-config';
 export * as subscribers from './subscribers';

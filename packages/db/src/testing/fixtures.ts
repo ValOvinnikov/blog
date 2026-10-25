@@ -1,4 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  LOCALE_ISO_CODES,
+} from '@blog/config/constants';
 import {
   ADMIN_ROLE,
   GRANTED_VIA,
@@ -8,6 +12,7 @@ import {
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import type { TAdmin } from '@blog/db/schema/admins';
+import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import type { TUser } from '@blog/db/schema/auth';
 import type { TLead } from '@blog/db/schema/leads';
 import type { TSubscriber } from '@blog/db/schema/subscribers';
@@ -160,4 +165,26 @@ export async function insertTestLead(
   if (!lead) throw new Error('insertTestLead: insert returned no row.');
 
   return lead;
+}
+
+export async function insertTestAuditEvent(
+  db: TTestDb,
+  overrides: Partial<typeof schema.auditEvents.$inferInsert> = {},
+): Promise<TAuditEvent> {
+  const [auditEvent] = await db
+    .insert(schema.auditEvents)
+    .values({
+      actorId: faker.string.uuid(),
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: faker.string.uuid(),
+      ...overrides,
+    })
+    .returning();
+
+  if (!auditEvent) {
+    throw new Error('insertTestAuditEvent: insert returned no row.');
+  }
+
+  return auditEvent;
 }
