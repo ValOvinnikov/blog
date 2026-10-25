@@ -15,11 +15,9 @@ import { eq } from 'drizzle-orm';
 
 import { wakeTenantFromInactivity } from './wake-tenant-from-inactivity';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertTenantSuspendedForInactivity(
   overrides: Parameters<typeof insertTestTenant>[1] = {},

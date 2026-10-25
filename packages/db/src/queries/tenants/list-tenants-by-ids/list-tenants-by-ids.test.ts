@@ -1,14 +1,13 @@
+import { getDb } from '@blog/db/client';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listTenantsByIds } from './list-tenants-by-ids';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -48,6 +47,6 @@ describe(listTenantsByIds, () => {
     const result = await listTenantsByIds([]);
 
     expect(result).toEqual([]);
-    expect(getDbMock).not.toHaveBeenCalled();
+    expect(getDb).not.toHaveBeenCalled();
   });
 });

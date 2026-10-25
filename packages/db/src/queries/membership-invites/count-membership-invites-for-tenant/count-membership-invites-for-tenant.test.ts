@@ -7,11 +7,12 @@ import { createMembershipInvite } from '../create-membership-invite';
 
 import { countMembershipInvitesForTenant } from './count-membership-invites-for-tenant';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_FIRST_EMAIL = 'one@example.com';
+const MOCK_SECOND_EMAIL = 'two@example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.membershipInvites);
@@ -28,12 +29,12 @@ describe(countMembershipInvitesForTenant, () => {
   it('counts every invite row for the tenant', async () => {
     await createMembershipInvite(
       tenantId,
-      'one@example.com',
+      MOCK_FIRST_EMAIL,
       MEMBERSHIP_ROLE.EDITOR,
     );
     await createMembershipInvite(
       tenantId,
-      'two@example.com',
+      MOCK_SECOND_EMAIL,
       MEMBERSHIP_ROLE.READER,
     );
 
@@ -44,7 +45,7 @@ describe(countMembershipInvitesForTenant, () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await createMembershipInvite(
       otherTenantId,
-      'one@example.com',
+      MOCK_FIRST_EMAIL,
       MEMBERSHIP_ROLE.EDITOR,
     );
 

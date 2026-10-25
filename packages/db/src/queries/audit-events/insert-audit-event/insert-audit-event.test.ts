@@ -5,11 +5,9 @@ import { eq } from 'drizzle-orm';
 
 import { insertAuditEvent } from './insert-audit-event';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const MOCK_ACTOR_ID = 'admin-1';
 const MOCK_TENANT_ID = 'tenant-123';

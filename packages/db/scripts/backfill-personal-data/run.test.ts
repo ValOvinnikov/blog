@@ -27,11 +27,9 @@ import {
 } from './lib/reindex-tagged-user-emails';
 import { backfillPersonalData } from './run';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const MOCK_EXISTING_CIPHERTEXT = 'v1:existing-ciphertext';

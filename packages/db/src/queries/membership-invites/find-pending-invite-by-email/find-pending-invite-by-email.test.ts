@@ -1,15 +1,13 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { findPendingInviteByEmail } from './find-pending-invite-by-email';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertInvite(
   tenantId: string,
@@ -39,27 +37,29 @@ describe(findPendingInviteByEmail, () => {
   });
 
   it('returns a pending invite matching the normalized email', async () => {
-    await insertInvite(tenantId, 'owner@example.com');
+    await insertInvite(tenantId, MOCK_INVITE_EMAIL);
 
-    const results = await findPendingInviteByEmail('Owner@Example.com');
+    const results = await findPendingInviteByEmail(
+      MOCK_INVITE_EMAIL.toUpperCase(),
+    );
 
     expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ tenantId, email: 'owner@example.com' });
+    expect(results[0]).toMatchObject({ tenantId, email: MOCK_INVITE_EMAIL });
   });
 
   it('matches an email padded with leading/trailing whitespace', async () => {
-    await insertInvite(tenantId, 'owner@example.com');
+    await insertInvite(tenantId, MOCK_INVITE_EMAIL);
 
-    const results = await findPendingInviteByEmail('  owner@example.com  ');
+    const results = await findPendingInviteByEmail(`  ${MOCK_INVITE_EMAIL}  `);
 
     expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ tenantId, email: 'owner@example.com' });
+    expect(results[0]).toMatchObject({ tenantId, email: MOCK_INVITE_EMAIL });
   });
 
   it('excludes already-consumed invites', async () => {
-    await insertInvite(tenantId, 'owner@example.com', true);
+    await insertInvite(tenantId, MOCK_INVITE_EMAIL, true);
 
-    const results = await findPendingInviteByEmail('owner@example.com');
+    const results = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
 
     expect(results).toHaveLength(0);
   });
@@ -67,10 +67,10 @@ describe(findPendingInviteByEmail, () => {
   it('returns every pending invite across multiple tenants for the same email', async () => {
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
-    await insertInvite(tenantOneId, 'owner@example.com');
-    await insertInvite(tenantTwoId, 'owner@example.com');
+    await insertInvite(tenantOneId, MOCK_INVITE_EMAIL);
+    await insertInvite(tenantTwoId, MOCK_INVITE_EMAIL);
 
-    const results = await findPendingInviteByEmail('owner@example.com');
+    const results = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
 
     expect(results).toHaveLength(2);
     expect(results.map((invite) => invite.tenantId).sort()).toEqual(

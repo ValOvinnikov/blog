@@ -8,11 +8,9 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getSubscriberByEmail } from './get-subscriber-by-email';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);

@@ -9,11 +9,9 @@ import { getSiteConfig } from '../get-site-config';
 
 import { insertSiteConfigIfMissing } from './insert-site-config-if-missing';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const CUSTOM_ACCENT_HUE = 123;
 

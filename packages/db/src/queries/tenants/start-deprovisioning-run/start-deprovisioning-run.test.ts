@@ -17,11 +17,9 @@ import {
 
 import { startDeprovisioningRun } from './start-deprovisioning-run';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const DONE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
 

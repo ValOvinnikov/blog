@@ -3,14 +3,19 @@ import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 
 import { upsertEmailTemplate } from './upsert-email-template';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_CUSTOM_SUBJECT = 'Custom sign-in subject';
+const MOCK_SECOND_SUBJECT = 'Second subject';
+const MOCK_FRENCH_SUBJECT = 'Sujet français';
+const MOCK_ENGLISH_SUBJECT = 'English subject';
+const MOCK_LOGO_URL = 'https://blob.example.com/logo.png';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.emailTemplates);
@@ -28,10 +33,10 @@ describe(upsertEmailTemplate, () => {
     const result = await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: 'Custom sign-in subject' },
+      { subject: MOCK_CUSTOM_SUBJECT },
     );
 
-    expect(result.subject).toBe('Custom sign-in subject');
+    expect(result.subject).toBe(MOCK_CUSTOM_SUBJECT);
     expect(result.body).toEqual(EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.body);
   });
 
@@ -43,10 +48,10 @@ describe(upsertEmailTemplate, () => {
     const result = await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: 'Second subject' },
+      { subject: MOCK_SECOND_SUBJECT },
     );
 
-    expect(result.subject).toBe('Second subject');
+    expect(result.subject).toBe(MOCK_SECOND_SUBJECT);
     const rows = await db().select().from(schema.emailTemplates);
     expect(rows).toHaveLength(1);
   });
@@ -55,18 +60,18 @@ describe(upsertEmailTemplate, () => {
     await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: 'Sujet français' },
+      { subject: MOCK_FRENCH_SUBJECT },
       LOCALE_ISO_CODES.FR,
     );
 
     const english = await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: 'English subject' },
+      { subject: MOCK_ENGLISH_SUBJECT },
       LOCALE_ISO_CODES.EN,
     );
 
-    expect(english.subject).toBe('English subject');
+    expect(english.subject).toBe(MOCK_ENGLISH_SUBJECT);
     const rows = await db()
       .select({
         locale: schema.emailTemplates.locale,
@@ -75,8 +80,8 @@ describe(upsertEmailTemplate, () => {
       .from(schema.emailTemplates)
       .orderBy(schema.emailTemplates.locale);
     expect(rows).toEqual([
-      { locale: LOCALE_ISO_CODES.EN, subject: 'English subject' },
-      { locale: LOCALE_ISO_CODES.FR, subject: 'Sujet français' },
+      { locale: LOCALE_ISO_CODES.EN, subject: MOCK_ENGLISH_SUBJECT },
+      { locale: LOCALE_ISO_CODES.FR, subject: MOCK_FRENCH_SUBJECT },
     ]);
   });
 
@@ -112,7 +117,7 @@ describe(upsertEmailTemplate, () => {
   it('rejects a tenantId with no matching tenants row', async () => {
     await expect(
       upsertEmailTemplate(
-        '00000000-0000-0000-0000-000000000000',
+        MOCK_MISSING_TENANT_ID,
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         { subject: 'Custom subject' },
       ),
@@ -129,21 +134,21 @@ describe('partial updates — omission leaves a field untouched, explicit null c
 
   it('preserves subject when a later update omits the field', async () => {
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
-      subject: 'Custom sign-in subject',
+      subject: MOCK_CUSTOM_SUBJECT,
     });
 
     const result = await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { logoAssetUrl: 'https://blob.example.com/logo.png' },
+      { logoAssetUrl: MOCK_LOGO_URL },
     );
 
-    expect(result.subject).toBe('Custom sign-in subject');
+    expect(result.subject).toBe(MOCK_CUSTOM_SUBJECT);
   });
 
   it('clears an authored subject back to the default when explicitly set to null', async () => {
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
-      subject: 'Custom sign-in subject',
+      subject: MOCK_CUSTOM_SUBJECT,
     });
 
     const result = await upsertEmailTemplate(
@@ -167,23 +172,23 @@ describe('logo override', () => {
     await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { logoAssetUrl: 'https://blob.example.com/logo.png' },
+      { logoAssetUrl: MOCK_LOGO_URL },
       LOCALE_ISO_CODES.FR,
     );
 
     const result = await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: 'English subject' },
+      { subject: MOCK_ENGLISH_SUBJECT },
       LOCALE_ISO_CODES.EN,
     );
 
-    expect(result.logoAssetUrl).toBe('https://blob.example.com/logo.png');
+    expect(result.logoAssetUrl).toBe(MOCK_LOGO_URL);
   });
 
   it('removes the override when the logo is set to null', async () => {
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
-      logoAssetUrl: 'https://blob.example.com/logo.png',
+      logoAssetUrl: MOCK_LOGO_URL,
     });
 
     const result = await upsertEmailTemplate(
@@ -198,7 +203,7 @@ describe('logo override', () => {
 
   it('creates no per-language row when only the logo changes', async () => {
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
-      logoAssetUrl: 'https://blob.example.com/logo.png',
+      logoAssetUrl: MOCK_LOGO_URL,
     });
 
     expect(await db().select().from(schema.emailTemplates)).toEqual([]);

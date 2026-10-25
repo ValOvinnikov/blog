@@ -7,18 +7,18 @@ import { eq } from 'drizzle-orm';
 
 import { setTenantSanityProject } from './set-tenant-sanity-project';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_ACME_DOMAIN = 'acme.example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertDraftTenant(): Promise<string> {
   const [tenant] = await db()
     .insert(schema.tenants)
     .values({
       name: 'Acme',
-      primaryDomain: 'acme.example.com',
+      primaryDomain: MOCK_ACME_DOMAIN,
       locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
@@ -71,7 +71,7 @@ describe(setTenantSanityProject, () => {
 
     expect(row).toMatchObject({
       name: 'Acme',
-      primaryDomain: 'acme.example.com',
+      primaryDomain: MOCK_ACME_DOMAIN,
       seededAt: null,
     });
   });

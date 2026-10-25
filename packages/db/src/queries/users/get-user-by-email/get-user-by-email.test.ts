@@ -3,11 +3,12 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getUserByEmail } from './get-user-by-email';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_JANE_EMAIL = 'jane@example.com';
+const MOCK_MIXED_CASE_EMAIL = 'User@Example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.users);
@@ -18,13 +19,13 @@ describe(getUserByEmail, () => {
     beforeEach(async () => {
       await db()
         .insert(schema.users)
-        .values({ id: 'user-1', email: 'jane@example.com' });
+        .values({ id: 'user-1', email: MOCK_JANE_EMAIL });
     });
 
     it('returns the row for an existing email', async () => {
-      const result = await getUserByEmail('jane@example.com');
+      const result = await getUserByEmail(MOCK_JANE_EMAIL);
 
-      expect(result).toMatchObject({ id: 'user-1', email: 'jane@example.com' });
+      expect(result).toMatchObject({ id: 'user-1', email: MOCK_JANE_EMAIL });
     });
 
     it('matches case-insensitively', async () => {
@@ -37,11 +38,14 @@ describe(getUserByEmail, () => {
   it('matches a differently-cased lookup against a mixed-case stored email', async () => {
     await db()
       .insert(schema.users)
-      .values({ id: 'user-1', email: 'User@Example.com' });
+      .values({ id: 'user-1', email: MOCK_MIXED_CASE_EMAIL });
 
     const result = await getUserByEmail('user@example.com');
 
-    expect(result).toMatchObject({ id: 'user-1', email: 'User@Example.com' });
+    expect(result).toMatchObject({
+      id: 'user-1',
+      email: MOCK_MIXED_CASE_EMAIL,
+    });
   });
 
   it('returns undefined for an email with no row', async () => {

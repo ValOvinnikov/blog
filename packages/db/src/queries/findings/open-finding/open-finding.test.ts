@@ -8,15 +8,14 @@ import {
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { openFinding } from './open-finding';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.findings);
@@ -36,7 +35,7 @@ describe(openFinding, () => {
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
       kind: FINDING_KIND.DOMAIN_NOT_ADDED,
       severity: FINDING_SEVERITY.WARNING,
-      identifier: 'acme.example.com',
+      identifier: MOCK_TENANT_DOMAIN,
     });
 
     expect(result).toEqual({
@@ -196,7 +195,7 @@ describe('foreign-key cascade', () => {
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
       kind: FINDING_KIND.DOMAIN_NOT_ADDED,
       severity: FINDING_SEVERITY.WARNING,
-      identifier: 'acme.example.com',
+      identifier: MOCK_TENANT_DOMAIN,
     });
 
     await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));

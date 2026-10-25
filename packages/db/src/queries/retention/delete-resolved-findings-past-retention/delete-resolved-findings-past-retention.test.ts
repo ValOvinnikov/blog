@@ -17,11 +17,9 @@ import {
 
 import { deleteResolvedFindingsPastRetention } from './delete-resolved-findings-past-retention';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const CUTOFF = daysBefore(MOCK_RETENTION_NOW, RESOLVED_FINDING_RETENTION_DAYS);
 

@@ -17,11 +17,9 @@ import { eq } from 'drizzle-orm';
 
 import { deleteAccount } from './delete-account';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 const USER_ID = 'user-1';
 const OTHER_USER_ID = 'user-2';
 const DELETE_FAILURE = 'connection lost';

@@ -42,11 +42,9 @@ import {
   type TUpdateTenantDetailsResult,
 } from './update-tenant-details';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const TENANT_NAME = 'Acme';
 const NEW_NAME = 'New Name';

@@ -1,20 +1,25 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  DEPROVISIONING_STEP,
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { reportDeprovisioningStepStatus } from './report-deprovisioning-step-status';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_STEP_ERROR = 'Sanity Projects API returned 429';
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb();
 
 async function insertTenant(): Promise<string> {
-  const [tenant] = await db
+  const [tenant] = await db()
     .insert(schema.tenants)
     .values({
       name: 'Acme',
@@ -23,13 +28,17 @@ async function insertTenant(): Promise<string> {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       deprovisioningSteps: {
-        REMOVE_DOMAIN: { status: 'IDLE' },
-        ARCHIVE_SANITY_PROJECT: { status: 'IDLE' },
-        REVOKE_SANITY_TOKENS: { status: 'IDLE' },
-        CLEAR_ARTIFACTS: { status: 'IDLE' },
-        ARCHIVE_TENANT: { status: 'IDLE' },
-        PURGE_READER_DATA: { status: 'IDLE' },
-        INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
+        REMOVE_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        ARCHIVE_SANITY_PROJECT: {
+          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+        },
+        REVOKE_SANITY_TOKENS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CLEAR_ARTIFACTS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        ARCHIVE_TENANT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        PURGE_READER_DATA: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        INVALIDATE_TENANT_CACHE: {
+          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+        },
       },
     })
     .returning();
@@ -40,7 +49,7 @@ async function insertTenant(): Promise<string> {
 }
 
 async function loadTenant(tenantId: string) {
-  const [tenant] = await db
+  const [tenant] = await db()
     .select()
     .from(schema.tenants)
     .where(eq(schema.tenants.id, tenantId));
@@ -48,16 +57,8 @@ async function loadTenant(tenantId: string) {
   return tenant;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
   vi.restoreAllMocks();
 });
 
@@ -71,29 +72,29 @@ describe(reportDeprovisioningStepStatus, () => {
   it('writes the step status directly to Postgres', async () => {
     await reportDeprovisioningStepStatus({
       tenantId,
-      step: 'REMOVE_DOMAIN',
-      status: 'RUNNING',
+      step: DEPROVISIONING_STEP.REMOVE_DOMAIN,
+      status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
     });
 
     const tenant = await loadTenant(tenantId);
     expect(tenant?.deprovisioningSteps).toMatchObject({
-      REMOVE_DOMAIN: { status: 'RUNNING' },
+      REMOVE_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
     });
   });
 
   it('stores the error message only when supplied', async () => {
     await reportDeprovisioningStepStatus({
       tenantId,
-      step: 'ARCHIVE_SANITY_PROJECT',
-      status: 'FAILED',
-      error: 'Sanity Projects API returned 429',
+      step: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+      status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      error: MOCK_STEP_ERROR,
     });
 
     const tenant = await loadTenant(tenantId);
     expect(tenant?.deprovisioningSteps).toMatchObject({
       ARCHIVE_SANITY_PROJECT: {
-        status: 'FAILED',
-        error: 'Sanity Projects API returned 429',
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+        error: MOCK_STEP_ERROR,
       },
     });
   });
@@ -103,9 +104,9 @@ describe(reportDeprovisioningStepStatus, () => {
 
     await expect(
       reportDeprovisioningStepStatus({
-        tenantId: '00000000-0000-0000-0000-000000000000',
-        step: 'REMOVE_DOMAIN',
-        status: 'RUNNING',
+        tenantId: MOCK_MISSING_TENANT_ID,
+        step: DEPROVISIONING_STEP.REMOVE_DOMAIN,
+        status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       }),
     ).resolves.toBeUndefined();
 

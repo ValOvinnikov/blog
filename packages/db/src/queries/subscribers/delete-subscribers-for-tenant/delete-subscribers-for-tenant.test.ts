@@ -5,11 +5,12 @@ import { eq } from 'drizzle-orm';
 
 import { deleteSubscribersForTenant } from './delete-subscribers-for-tenant';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_FIRST_EMAIL = 'one@example.com';
+const MOCK_SECOND_EMAIL = 'two@example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -27,8 +28,8 @@ describe(deleteSubscribersForTenant, () => {
     await db()
       .insert(schema.subscribers)
       .values([
-        { tenantId, email: 'one@example.com' },
-        { tenantId, email: 'two@example.com' },
+        { tenantId, email: MOCK_FIRST_EMAIL },
+        { tenantId, email: MOCK_SECOND_EMAIL },
       ]);
 
     await expect(deleteSubscribersForTenant(tenantId)).resolves.toBe(2);
@@ -44,7 +45,7 @@ describe(deleteSubscribersForTenant, () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
-      .values({ tenantId: otherTenantId, email: 'one@example.com' });
+      .values({ tenantId: otherTenantId, email: MOCK_FIRST_EMAIL });
 
     await deleteSubscribersForTenant(tenantId);
 

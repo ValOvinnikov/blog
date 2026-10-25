@@ -24,9 +24,7 @@ import {
   findUserSubscriber,
 } from './user-subscriber';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 const MOCK_UNDECRYPTABLE_CIPHERTEXT = 'not-a-ciphertext';
 const STORED_EMAIL_CASES = [
@@ -37,7 +35,7 @@ const FINDS_STORED_ROW_TITLE = 'finds the row stored under %s';
 const REJECTS_UNDECRYPTABLE_TITLE =
   'rejects when a +tag sibling row cannot be decrypted';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 const fallbackListener = usePersonalDataFallbackListener();
 

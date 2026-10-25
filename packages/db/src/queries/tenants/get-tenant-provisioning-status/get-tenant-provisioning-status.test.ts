@@ -1,16 +1,21 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantProvisioningStatus } from './get-tenant-provisioning-status';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const NO_TENANT_ROW = 'setup: tenant insert returned no row.';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -19,13 +24,13 @@ afterEach(async () => {
 describe(getTenantProvisioningStatus, () => {
   it('returns the overall status and per-step map for an existing tenant', async () => {
     const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: { status: 'RUNNING' },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
     };
     const [tenant] = await db()
       .insert(schema.tenants)
@@ -35,17 +40,17 @@ describe(getTenantProvisioningStatus, () => {
         locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
-        provisioningStatus: 'PROVISIONING',
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps,
       })
       .returning();
 
-    if (!tenant) throw new Error('setup: tenant insert returned no row.');
+    if (!tenant) throw new Error(NO_TENANT_ROW);
 
     const result = await getTenantProvisioningStatus(tenant.id);
 
     expect(result).toEqual({
-      provisioningStatus: 'PROVISIONING',
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps,
     });
   });
@@ -70,7 +75,7 @@ describe(getTenantProvisioningStatus, () => {
       })
       .returning();
 
-    if (!tenant) throw new Error('setup: tenant insert returned no row.');
+    if (!tenant) throw new Error(NO_TENANT_ROW);
 
     const result = await getTenantProvisioningStatus(tenant.id);
 

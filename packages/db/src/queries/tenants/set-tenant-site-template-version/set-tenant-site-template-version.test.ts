@@ -6,11 +6,9 @@ import { eq } from 'drizzle-orm';
 
 import { setTenantSiteTemplateVersion } from './set-tenant-site-template-version';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const TEMPLATE_VERSION = 3;
 

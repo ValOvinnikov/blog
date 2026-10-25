@@ -19,13 +19,11 @@ import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures'
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 const OTHER_REASON = 'Another reason';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 beforeEach(() => {
   vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_ENCRYPTION_KEY);

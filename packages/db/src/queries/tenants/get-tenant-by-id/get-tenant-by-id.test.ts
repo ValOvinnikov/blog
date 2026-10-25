@@ -5,11 +5,12 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantById } from './get-tenant-by-id';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_ACME_DOMAIN = 'acme.example.com';
+const NO_TENANT_ROW = 'setup: tenant insert returned no row.';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -21,7 +22,7 @@ describe(getTenantById, () => {
       .insert(schema.tenants)
       .values({
         name: 'Acme',
-        primaryDomain: 'acme.example.com',
+        primaryDomain: MOCK_ACME_DOMAIN,
         sanityProjectId: 'abc123',
         sanityDataset: 'production',
         locale: LOCALE_ISO_CODES.EN,
@@ -29,7 +30,7 @@ describe(getTenantById, () => {
         status: TENANT_STATUS.ACTIVE,
       })
       .returning();
-    if (!inserted) throw new Error('setup: tenant insert returned no row.');
+    if (!inserted) throw new Error(NO_TENANT_ROW);
 
     const result = await getTenantById(inserted.id);
 
@@ -44,7 +45,7 @@ describe(getTenantById, () => {
         .insert(schema.tenants)
         .values({
           name: 'Acme',
-          primaryDomain: 'acme.example.com',
+          primaryDomain: MOCK_ACME_DOMAIN,
           sanityProjectId: 'abc123',
           sanityDataset: 'production',
           locale: LOCALE_ISO_CODES.EN,
@@ -53,7 +54,7 @@ describe(getTenantById, () => {
           deprovisionedAt: new Date(),
         })
         .returning();
-      if (!row) throw new Error('setup: tenant insert returned no row.');
+      if (!row) throw new Error(NO_TENANT_ROW);
       inserted = row;
     });
 

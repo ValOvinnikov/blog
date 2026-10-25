@@ -1,23 +1,23 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import {
   reportDeprovisioningRunFinish,
   reportDeprovisioningRunStart,
 } from './report-deprovisioning-run';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_WORKFLOW_RUN_URL = 'https://github.com/acme/blog/actions/runs/123';
 
-let db: PgliteDatabase<typeof schema>;
+const db = useQueryTestDb();
 
 async function insertTenant(): Promise<string> {
-  const [tenant] = await db
+  const [tenant] = await db()
     .insert(schema.tenants)
     .values({
       name: 'Acme',
@@ -34,7 +34,7 @@ async function insertTenant(): Promise<string> {
 }
 
 async function loadTenant(tenantId: string) {
-  const [tenant] = await db
+  const [tenant] = await db()
     .select()
     .from(schema.tenants)
     .where(eq(schema.tenants.id, tenantId));
@@ -42,16 +42,8 @@ async function loadTenant(tenantId: string) {
   return tenant;
 }
 
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
-
-beforeEach(() => {
-  getDbMock.mockReturnValue(db);
-});
-
 afterEach(async () => {
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
   vi.restoreAllMocks();
 });
 
@@ -61,21 +53,21 @@ describe(reportDeprovisioningRunStart, () => {
 
     await reportDeprovisioningRunStart({
       tenantId,
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
     });
 
     const tenant = await loadTenant(tenantId);
     expect(tenant?.deprovisioningSteps?.run).toMatchObject({
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
     });
   });
 
-  it('never throws when the tenant id does not exist — logs instead', async () => {
+  it('logs instead of throwing when the run starts for an unknown tenant id', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(
       reportDeprovisioningRunStart({
-        tenantId: '00000000-0000-0000-0000-000000000000',
+        tenantId: MOCK_MISSING_TENANT_ID,
       }),
     ).resolves.toBeUndefined();
 
@@ -100,7 +92,7 @@ describe(reportDeprovisioningRunFinish, () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(
-      reportDeprovisioningRunFinish('00000000-0000-0000-0000-000000000000'),
+      reportDeprovisioningRunFinish(MOCK_MISSING_TENANT_ID),
     ).resolves.toBeUndefined();
 
     expect(errorSpy).toHaveBeenCalledTimes(1);

@@ -48,7 +48,6 @@ import {
 } from './create-self-serve-tenant';
 
 const {
-  getDbMock,
   ownsFreeTenantMock,
   getTenantByDomainMock,
   insertAuditEventMock,
@@ -56,7 +55,6 @@ const {
   GET_TENANT_BY_DOMAIN_MODULE,
   INSERT_AUDIT_EVENT_MODULE,
 } = vi.hoisted(() => ({
-  getDbMock: vi.fn(),
   ownsFreeTenantMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
@@ -66,7 +64,7 @@ const {
   INSERT_AUDIT_EVENT_MODULE: '@blog/db/queries/audit-events/insert-audit-event',
 }));
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 vi.mock(OWNS_FREE_TENANT_MODULE, () => ({
   ownsFreeTenant: ownsFreeTenantMock,
@@ -80,7 +78,7 @@ vi.mock(INSERT_AUDIT_EVENT_MODULE, () => ({
   insertAuditEvent: insertAuditEventMock,
 }));
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const ACCENT_HUE = 123;

@@ -8,16 +8,15 @@ import {
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
 
 import { openFinding } from '../open-finding';
 
 import { resolveFinding } from './resolve-finding';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.findings);
@@ -37,7 +36,7 @@ describe(resolveFinding, () => {
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
       kind: FINDING_KIND.DOMAIN_NOT_ADDED,
       severity: FINDING_SEVERITY.WARNING,
-      identifier: 'acme.example.com',
+      identifier: MOCK_TENANT_DOMAIN,
     });
     expect(opened.ok).toBe(true);
     if (!opened.ok) return;
@@ -60,7 +59,7 @@ describe(resolveFinding, () => {
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
       kind: FINDING_KIND.DOMAIN_NOT_ADDED,
       severity: FINDING_SEVERITY.WARNING,
-      identifier: 'acme.example.com',
+      identifier: MOCK_TENANT_DOMAIN,
     };
     const opened = await openFinding(input);
     expect(opened.ok).toBe(true);
@@ -87,7 +86,7 @@ describe(resolveFinding, () => {
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
       kind: FINDING_KIND.DOMAIN_NOT_ADDED,
       severity: FINDING_SEVERITY.WARNING,
-      identifier: 'acme.example.com',
+      identifier: MOCK_TENANT_DOMAIN,
     });
     expect(opened.ok).toBe(true);
     if (!opened.ok) return;

@@ -1,16 +1,16 @@
+import { addBookmark } from '@blog/db/queries/bookmarks/add-bookmark/add-bookmark';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
-import { addBookmark } from '../add-bookmark';
-
 import { listBookmarks } from './list-bookmarks';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_OLDER_POST_ID = 'post-older';
+const MOCK_NEWER_POST_ID = 'post-newer';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.bookmarks);
@@ -50,13 +50,13 @@ describe(listBookmarks, () => {
         {
           tenantId,
           userId: 'user-1',
-          postId: 'post-older',
+          postId: MOCK_OLDER_POST_ID,
           createdAt: new Date(2026, 0, 1),
         },
         {
           tenantId,
           userId: 'user-1',
-          postId: 'post-newer',
+          postId: MOCK_NEWER_POST_ID,
           createdAt: new Date(2026, 0, 2),
         },
       ]);
@@ -64,8 +64,8 @@ describe(listBookmarks, () => {
     const result = await listBookmarks(tenantId, 'user-1');
 
     expect(result.map((bookmark) => bookmark.postId)).toEqual([
-      'post-newer',
-      'post-older',
+      MOCK_NEWER_POST_ID,
+      MOCK_OLDER_POST_ID,
     ]);
   });
 

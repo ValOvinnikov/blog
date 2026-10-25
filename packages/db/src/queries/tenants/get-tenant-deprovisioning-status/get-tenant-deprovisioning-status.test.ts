@@ -1,16 +1,20 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenantDeprovisioningState } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getTenantDeprovisioningStatus } from './get-tenant-deprovisioning-status';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const NO_TENANT_ROW = 'setup: tenant insert returned no row.';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -19,13 +23,15 @@ afterEach(async () => {
 describe(getTenantDeprovisioningStatus, () => {
   it('returns the per-step map and deprovisionedAt for an existing tenant', async () => {
     const deprovisioningSteps: TTenantDeprovisioningState = {
-      REMOVE_DOMAIN: { status: 'DONE' },
-      ARCHIVE_SANITY_PROJECT: { status: 'RUNNING' },
-      REVOKE_SANITY_TOKENS: { status: 'IDLE' },
-      CLEAR_ARTIFACTS: { status: 'IDLE' },
-      ARCHIVE_TENANT: { status: 'IDLE' },
-      PURGE_READER_DATA: { status: 'IDLE' },
-      INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
+      REMOVE_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      ARCHIVE_SANITY_PROJECT: {
+        status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      },
+      REVOKE_SANITY_TOKENS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      CLEAR_ARTIFACTS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      ARCHIVE_TENANT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      PURGE_READER_DATA: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      INVALIDATE_TENANT_CACHE: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
     };
     const [tenant] = await db()
       .insert(schema.tenants)
@@ -39,7 +45,7 @@ describe(getTenantDeprovisioningStatus, () => {
       })
       .returning();
 
-    if (!tenant) throw new Error('setup: tenant insert returned no row.');
+    if (!tenant) throw new Error(NO_TENANT_ROW);
 
     const result = await getTenantDeprovisioningStatus(tenant.id);
 
@@ -69,7 +75,7 @@ describe(getTenantDeprovisioningStatus, () => {
       })
       .returning();
 
-    if (!tenant) throw new Error('setup: tenant insert returned no row.');
+    if (!tenant) throw new Error(NO_TENANT_ROW);
 
     const result = await getTenantDeprovisioningStatus(tenant.id);
 
@@ -93,7 +99,7 @@ describe(getTenantDeprovisioningStatus, () => {
       })
       .returning();
 
-    if (!tenant) throw new Error('setup: tenant insert returned no row.');
+    if (!tenant) throw new Error(NO_TENANT_ROW);
 
     const result = await getTenantDeprovisioningStatus(tenant.id);
 

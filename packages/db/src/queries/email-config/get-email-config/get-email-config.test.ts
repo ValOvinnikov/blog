@@ -4,11 +4,17 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getEmailConfig } from './get-email-config';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_EMAIL_CONFIG = {
+  logoAssetUrl: 'https://blob.example.com/email-logo.png',
+  senderName: 'Acme Weekly',
+  replyToAddress: 'support@example.com',
+  footerPostalAddress: '123 Main St, Springfield',
+  contactRecipient: 'leads@example.com',
+};
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.emailConfig);
@@ -44,23 +50,12 @@ describe(getEmailConfig, () => {
   });
 
   it('returns every set field', async () => {
-    await db().insert(schema.emailConfig).values({
-      tenantId,
-      logoAssetUrl: 'https://blob.example.com/email-logo.png',
-      senderName: 'Acme Weekly',
-      replyToAddress: 'support@example.com',
-      footerPostalAddress: '123 Main St, Springfield',
-      contactRecipient: 'leads@example.com',
-    });
+    await db()
+      .insert(schema.emailConfig)
+      .values({ tenantId, ...MOCK_EMAIL_CONFIG });
 
     const result = await getEmailConfig(tenantId);
 
-    expect(result).toMatchObject({
-      logoAssetUrl: 'https://blob.example.com/email-logo.png',
-      senderName: 'Acme Weekly',
-      replyToAddress: 'support@example.com',
-      footerPostalAddress: '123 Main St, Springfield',
-      contactRecipient: 'leads@example.com',
-    });
+    expect(result).toMatchObject(MOCK_EMAIL_CONFIG);
   });
 });

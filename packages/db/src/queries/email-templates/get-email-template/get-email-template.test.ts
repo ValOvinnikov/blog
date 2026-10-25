@@ -9,11 +9,15 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getEmailTemplate } from './get-email-template';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_CUSTOM_SUBJECT = 'Custom sign-in subject';
+const MOCK_NEWSLETTER_LOGO_URL = 'https://blob.example.com/newsletter-logo.png';
+const MOCK_GERMAN_SUBJECT = 'Deutscher Betreff';
+const MOCK_FRENCH_SUBJECT = 'Sujet français';
+const MOCK_LOGO_URL = 'https://blob.example.com/logo.png';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.emailTemplates);
@@ -47,7 +51,7 @@ describe(getEmailTemplate, () => {
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       locale: LOCALE_ISO_CODES.EN,
-      subject: 'Custom sign-in subject',
+      subject: MOCK_CUSTOM_SUBJECT,
     });
 
     const result = await getEmailTemplate(
@@ -55,7 +59,7 @@ describe(getEmailTemplate, () => {
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
     );
 
-    expect(result.subject).toBe('Custom sign-in subject');
+    expect(result.subject).toBe(MOCK_CUSTOM_SUBJECT);
     expect(result.body).toEqual(EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.body);
   });
 
@@ -96,7 +100,7 @@ describe(getEmailTemplate, () => {
     await db().insert(schema.emailTemplateLogos).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-      logoAssetUrl: 'https://blob.example.com/newsletter-logo.png',
+      logoAssetUrl: MOCK_NEWSLETTER_LOGO_URL,
     });
 
     const result = await getEmailTemplate(
@@ -104,9 +108,7 @@ describe(getEmailTemplate, () => {
       EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
     );
 
-    expect(result.logoAssetUrl).toBe(
-      'https://blob.example.com/newsletter-logo.png',
-    );
+    expect(result.logoAssetUrl).toBe(MOCK_NEWSLETTER_LOGO_URL);
 
     const other = await getEmailTemplate(
       tenantId,
@@ -131,13 +133,13 @@ describe('per-language fallback', () => {
           tenantId,
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.DE,
-          subject: 'Deutscher Betreff',
+          subject: MOCK_GERMAN_SUBJECT,
         },
         {
           tenantId,
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.FR,
-          subject: 'Sujet français',
+          subject: MOCK_FRENCH_SUBJECT,
         },
       ]);
   });
@@ -149,7 +151,7 @@ describe('per-language fallback', () => {
       LOCALE_ISO_CODES.FR,
     );
 
-    expect(result.subject).toBe('Sujet français');
+    expect(result.subject).toBe(MOCK_FRENCH_SUBJECT);
   });
 
   it("falls back to the tenant's default language when the requested one has none", async () => {
@@ -159,7 +161,7 @@ describe('per-language fallback', () => {
       LOCALE_ISO_CODES.ES,
     );
 
-    expect(result.subject).toBe('Deutscher Betreff');
+    expect(result.subject).toBe(MOCK_GERMAN_SUBJECT);
   });
 
   it('falls back to the product default in the requested language when neither has the field', async () => {
@@ -189,7 +191,7 @@ describe('per-language fallback', () => {
     await db().insert(schema.emailTemplateLogos).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      logoAssetUrl: 'https://blob.example.com/logo.png',
+      logoAssetUrl: MOCK_LOGO_URL,
     });
 
     const logos = await Promise.all(
@@ -203,8 +205,6 @@ describe('per-language fallback', () => {
       }),
     );
 
-    expect(new Set(logos)).toEqual(
-      new Set(['https://blob.example.com/logo.png']),
-    );
+    expect(new Set(logos)).toEqual(new Set([MOCK_LOGO_URL]));
   });
 });

@@ -1,15 +1,19 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+  MOCK_OWNER_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getContactRecipient } from './get-contact-recipient';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_LEADS_EMAIL = 'leads@example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.emailConfig);
@@ -23,7 +27,7 @@ describe(getContactRecipient, () => {
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
-    await insertTestUser(db(), { id: 'owner-1', email: 'owner@example.com' });
+    await insertTestUser(db(), { id: 'owner-1', email: MOCK_OWNER_EMAIL });
     await db().insert(schema.memberships).values({
       userId: 'owner-1',
       tenantId,
@@ -34,11 +38,11 @@ describe(getContactRecipient, () => {
   it('returns the override when one is set', async () => {
     await db()
       .insert(schema.emailConfig)
-      .values({ tenantId, contactRecipient: 'leads@example.com' });
+      .values({ tenantId, contactRecipient: MOCK_LEADS_EMAIL });
 
     const result = await getContactRecipient(tenantId);
 
-    expect(result).toBe('leads@example.com');
+    expect(result).toBe(MOCK_LEADS_EMAIL);
   });
 
   it("falls back to the owner's email when the override is unset", async () => {
@@ -46,12 +50,12 @@ describe(getContactRecipient, () => {
 
     const result = await getContactRecipient(tenantId);
 
-    expect(result).toBe('owner@example.com');
+    expect(result).toBe(MOCK_OWNER_EMAIL);
   });
 
   it("falls back to the owner's email when the tenant has no email config row", async () => {
     const result = await getContactRecipient(tenantId);
 
-    expect(result).toBe('owner@example.com');
+    expect(result).toBe(MOCK_OWNER_EMAIL);
   });
 });

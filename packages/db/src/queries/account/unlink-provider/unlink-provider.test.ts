@@ -5,11 +5,11 @@ import { and, eq } from 'drizzle-orm';
 
 import { unlinkProvider } from './unlink-provider';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_LAST_METHOD = 'last-method';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.accounts);
@@ -53,7 +53,7 @@ describe(unlinkProvider, () => {
 
       const result = await unlinkProvider(user.id, 'github');
 
-      expect(result).toEqual({ outcome: 'last-method' });
+      expect(result).toEqual({ outcome: MOCK_LAST_METHOD });
       expect(await findAccount(user.id, 'github')).toHaveLength(1);
     });
 
@@ -95,7 +95,7 @@ describe(unlinkProvider, () => {
         ]);
 
         const outcomes = [githubResult.outcome, googleResult.outcome].sort();
-        expect(outcomes).toEqual(['last-method', 'unlinked']);
+        expect(outcomes).toEqual([MOCK_LAST_METHOD, 'unlinked']);
 
         const remainingAccounts = await db()
           .select()

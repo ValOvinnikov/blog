@@ -5,11 +5,12 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listTenants } from './list-tenants';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_ACME_DOMAIN = 'acme.example.com';
+const MOCK_ZETA_DOMAIN = 'zeta.example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -23,7 +24,7 @@ describe(listTenants, () => {
         .values([
           {
             name: 'Acme',
-            primaryDomain: 'acme.example.com',
+            primaryDomain: MOCK_ACME_DOMAIN,
             sanityProjectId: 'p1',
             sanityDataset: 'production',
             locale: LOCALE_ISO_CODES.EN,
@@ -32,7 +33,7 @@ describe(listTenants, () => {
           },
           {
             name: 'Zeta',
-            primaryDomain: 'zeta.example.com',
+            primaryDomain: MOCK_ZETA_DOMAIN,
             sanityProjectId: 'p2',
             sanityDataset: 'production',
             locale: LOCALE_ISO_CODES.EN,
@@ -62,7 +63,7 @@ describe(listTenants, () => {
       .values([
         {
           name: 'Zeta',
-          primaryDomain: 'zeta.example.com',
+          primaryDomain: MOCK_ZETA_DOMAIN,
           sanityProjectId: 'p1',
           sanityDataset: 'production',
           locale: LOCALE_ISO_CODES.EN,
@@ -71,7 +72,7 @@ describe(listTenants, () => {
         },
         {
           name: 'Acme',
-          primaryDomain: 'acme.example.com',
+          primaryDomain: MOCK_ACME_DOMAIN,
           sanityProjectId: 'p2',
           sanityDataset: 'production',
           locale: LOCALE_ISO_CODES.EN,

@@ -11,11 +11,9 @@ import { claimConfirmationSend } from './claim-confirmation-send';
 
 const NO_CLAIM_ERROR = 'expected a claim';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const COOLDOWN_MS = 15 * 60_000;
 

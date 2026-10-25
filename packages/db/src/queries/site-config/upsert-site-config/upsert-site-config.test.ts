@@ -25,15 +25,13 @@ import {
   type TVoiceOverridesInput,
 } from './upsert-site-config';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
 const { SYNTHETIC_MULTILINE_FIELD_ID, SYNTHETIC_MULTILINE_FIELD_MAX } =
   vi.hoisted(() => ({
     SYNTHETIC_MULTILINE_FIELD_ID: 'testMultilineField',
     SYNTHETIC_MULTILINE_FIELD_MAX: 300,
   }));
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 vi.mock('@blog/config', async (importOriginal) => {
   const actual = await importOriginal<typeof BlogConfig>();
@@ -53,7 +51,7 @@ vi.mock('@blog/config', async (importOriginal) => {
   };
 });
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const CUSTOM_HEADING = 'Custom heading';
 const UNSAFE_HREF = 'javascript:alert(1)';
