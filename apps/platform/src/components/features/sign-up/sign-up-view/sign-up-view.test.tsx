@@ -32,8 +32,12 @@ describe(`<${SignUpView.name}/>`, () => {
   it('links the terms and privacy policy it asks the visitor to accept', () => {
     setup();
 
-    const terms = screen.getByRole('link', { name: 'Terms of Service' });
-    const privacy = screen.getByRole('link', { name: 'Privacy Policy' });
+    const terms = screen.getByRole('link', {
+      name: 'Terms of Service (opens in new tab)',
+    });
+    const privacy = screen.getByRole('link', {
+      name: 'Privacy Policy (opens in new tab)',
+    });
 
     expect(terms).toHaveAttribute('href', LEGAL_PAGE_URLS?.terms);
     expect(privacy).toHaveAttribute('href', LEGAL_PAGE_URLS?.privacy);

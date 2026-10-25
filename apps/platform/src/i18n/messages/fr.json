@@ -1155,7 +1155,7 @@
     "draftColumn": "Votre brouillon",
     "emptyValue": "Vide"
   },
-  "externalLinkButton": {
+  "externalLink": {
     "newTabHint": "(s'ouvre dans un nouvel onglet)"
   },
   "leadsView": {

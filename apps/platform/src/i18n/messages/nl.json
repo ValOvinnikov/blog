@@ -1155,7 +1155,7 @@
     "draftColumn": "Jouw concept",
     "emptyValue": "Leeg"
   },
-  "externalLinkButton": {
+  "externalLink": {
     "newTabHint": "(opent in nieuw tabblad)"
   },
   "leadsView": {

@@ -1155,7 +1155,7 @@
     "draftColumn": "Dein Entwurf",
     "emptyValue": "Leer"
   },
-  "externalLinkButton": {
+  "externalLink": {
     "newTabHint": "(öffnet in neuem Tab)"
   },
   "leadsView": {

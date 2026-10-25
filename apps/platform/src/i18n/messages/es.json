@@ -1155,7 +1155,7 @@
     "draftColumn": "Tu borrador",
     "emptyValue": "Vacío"
   },
-  "externalLinkButton": {
+  "externalLink": {
     "newTabHint": "(se abre en una pestaña nueva)"
   },
   "leadsView": {

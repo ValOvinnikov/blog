@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { ExternalLink } from '@platform/components/shared/external-link';
 import { tv } from '@platform/utils/tv/tv';
 import type { ReactNode } from 'react';
 
@@ -16,14 +17,9 @@ export type TLegalLinkProps = {
 
 export const LegalLink = ({ href, children }: TLegalLinkProps) =>
   href ? (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={legalLinkVariants()}
-    >
+    <ExternalLink href={href} className={legalLinkVariants()}>
       {children}
-    </a>
+    </ExternalLink>
   ) : (
     children
   );
