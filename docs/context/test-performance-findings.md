@@ -179,6 +179,9 @@ helpers rather than components:
 - `env.test.ts` silences the expected "Invalid environment variables" output
   in every validation-failure case.
 
+`apps/web/src/vitest-setup.ts` now fails any test during which React reports
+an act() warning, naming the message, so new ones cannot return unnoticed.
+
 ## The 62 node-safe `apps/web` files
 
 ```

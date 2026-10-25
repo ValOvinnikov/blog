@@ -88,8 +88,8 @@ export default [
     },
   },
   {
-    // Playwright specs may log to aid debugging a failed run.
-    files: ['e2e/**/*.{ts,tsx}'],
+    // Playwright specs may log to aid debugging a failed run; the Vitest setup wraps console.error to catch React act() warnings.
+    files: ['e2e/**/*.{ts,tsx}', 'src/vitest-setup.ts'],
     rules: {
       'no-console': 'off',
     },
