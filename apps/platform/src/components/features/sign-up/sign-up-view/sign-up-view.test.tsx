@@ -11,9 +11,14 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignUpView } from './sign-up-view';
 
-vi.mock('@platform/server/auth/accept-signup-terms-action', () => ({
-  acceptSignupTermsAction: vi.fn(),
-}));
+vi.mock('@platform/server/auth/accept-signup-terms-action', async () => {
+  const { ACTION_OUTCOME } = await import('@blog/config');
+  return {
+    acceptSignupTermsAction: vi.fn(async () => ({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    })),
+  };
+});
 
 const acceptMock = vi.mocked(acceptSignupTermsAction);
 const MOCK_LEGAL_PAGE_URLS = toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN);
@@ -28,9 +33,6 @@ describe(`<${SignUpView.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
-    acceptMock
-      .mockReset()
-      .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     user = userEvent.setup();
   });
 
@@ -66,7 +68,7 @@ describe(`<${SignUpView.name}/>`, () => {
     });
 
     it('asks for acceptance when the visitor continues without it', async () => {
-      acceptMock.mockResolvedValue({
+      acceptMock.mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
           hasAcceptedTerms: { reason: SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED },
@@ -83,7 +85,7 @@ describe(`<${SignUpView.name}/>`, () => {
     });
 
     it('shows the neutral refusal when the sign-up is refused', async () => {
-      acceptMock.mockResolvedValue({
+      acceptMock.mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,
       });

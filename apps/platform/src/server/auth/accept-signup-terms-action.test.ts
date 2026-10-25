@@ -16,21 +16,23 @@ import { redirect } from 'next/navigation';
 
 import { acceptSignupTermsAction } from './accept-signup-terms-action';
 
-const { setCookieMock } = vi.hoisted(() => ({ setCookieMock: vi.fn() }));
+const { setCookieMock, mockBotIdVerdict } = vi.hoisted(() => ({
+  setCookieMock: vi.fn(),
+  mockBotIdVerdict: (isBot: boolean) => ({
+    isHuman: !isBot,
+    isBot,
+    isVerifiedBot: false,
+    bypassed: false,
+  }),
+}));
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ set: setCookieMock })),
 }));
 
-vi.mock('botid/server', () => ({ checkBotId: vi.fn() }));
-
-const checkBotIdMock = vi.mocked(checkBotId);
-
-const mockBotVerdict = (isBot: boolean) => {
-  checkBotIdMock.mockResolvedValue({
-    isBot,
-  } as Awaited<ReturnType<typeof checkBotId>>);
-};
+vi.mock('botid/server', () => ({
+  checkBotId: vi.fn(async () => mockBotIdVerdict(false)),
+}));
 
 const MOCK_REFUSED_RESULT = {
   outcome: ACTION_OUTCOME.REFUSED,
@@ -38,22 +40,17 @@ const MOCK_REFUSED_RESULT = {
 };
 
 describe(acceptSignupTermsAction, () => {
-  beforeEach(() => {
-    setCookieMock.mockReset();
-    checkBotIdMock.mockReset();
-    mockBotVerdict(false);
-  });
-
   it('records the current terms version and sends the visitor on to sign in', async () => {
     await expect(
       acceptSignupTermsAction({ hasAcceptedTerms: true }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(setCookieMock).toHaveBeenCalledWith(
-      SIGNUP_TERMS_COOKIE_NAME,
-      TERMS_VERSION,
-      expect.objectContaining({ httpOnly: true }),
-    );
+    const [cookieName, cookieValue, cookieOptions] =
+      setCookieMock.mock.calls[0] ?? [];
+
+    expect(cookieName).toBe(SIGNUP_TERMS_COOKIE_NAME);
+    expect(cookieValue).toBe(TERMS_VERSION);
+    expect(cookieOptions.httpOnly).toBe(true);
     expect(redirect).toHaveBeenCalledWith(
       adminRoutes.signIn(adminRoutes.home()),
     );
@@ -68,12 +65,12 @@ describe(acceptSignupTermsAction, () => {
         hasAcceptedTerms: { reason: SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED },
       },
     });
-    expect(checkBotIdMock).not.toHaveBeenCalled();
+    expect(checkBotId).not.toHaveBeenCalled();
     expect(setCookieMock).not.toHaveBeenCalled();
   });
 
   it('refuses a bot with the neutral message and records nothing', async () => {
-    mockBotVerdict(true);
+    vi.mocked(checkBotId).mockResolvedValueOnce(mockBotIdVerdict(true));
 
     const result = await acceptSignupTermsAction({ hasAcceptedTerms: true });
 
@@ -84,7 +81,7 @@ describe(acceptSignupTermsAction, () => {
 
   it('refuses and logs when the bot check itself fails', async () => {
     const error = new Error('BotID unreachable');
-    checkBotIdMock.mockRejectedValue(error);
+    vi.mocked(checkBotId).mockRejectedValueOnce(error);
 
     const result = await acceptSignupTermsAction({ hasAcceptedTerms: true });
 

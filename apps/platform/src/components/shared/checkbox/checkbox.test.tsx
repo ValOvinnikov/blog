@@ -27,7 +27,9 @@ describe(`<${Checkbox.name}/>`, () => {
 
     await user.click(label);
 
-    expect(onCheckedChange).toHaveBeenCalledWith(true, expect.anything());
+    const [[isChecked]] = onCheckedChange.mock.calls;
+
+    expect(isChecked).toBe(true);
   });
 
   it('describes the checkbox by its error', () => {
