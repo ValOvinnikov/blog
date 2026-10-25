@@ -3,11 +3,13 @@ import userEvent from '@testing-library/user-event';
 
 import { HueSlider } from './hue-slider';
 
+const ACCENT_HUE = 'Accent hue';
+
 describe(HueSlider, () => {
   it('exposes the given aria-label on the slider thumb', () => {
-    render(<HueSlider ariaLabel="Accent hue" value={100} onChange={vi.fn()} />);
+    render(<HueSlider ariaLabel={ACCENT_HUE} value={100} onChange={vi.fn()} />);
 
-    expect(screen.getByRole('slider', { name: 'Accent hue' })).toHaveAttribute(
+    expect(screen.getByRole('slider', { name: ACCENT_HUE })).toHaveAttribute(
       'aria-valuenow',
       '100',
     );
@@ -17,10 +19,10 @@ describe(HueSlider, () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
-      <HueSlider ariaLabel="Accent hue" value={100} onChange={handleChange} />,
+      <HueSlider ariaLabel={ACCENT_HUE} value={100} onChange={handleChange} />,
     );
 
-    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.click(screen.getByRole('slider', { name: ACCENT_HUE }));
     await user.keyboard('{ArrowRight}');
 
     expect(handleChange).toHaveBeenCalledWith(101);

@@ -2,10 +2,11 @@
 
 import { Toolbar } from '@base-ui/react/toolbar';
 import { Tooltip } from '@base-ui/react/tooltip';
-import { ICONS } from '@blog/config';
+import { ICONS, type TMaybeUndefined } from '@blog/config';
 import {
   useEditor,
   useEditorSelector,
+  type EditorSelector,
   type SchemaDefinition,
 } from '@portabletext/editor';
 import * as selectors from '@portabletext/editor/selectors';
@@ -15,11 +16,12 @@ import { useId, useState } from 'react';
 import { PortableTextEditorLinkControl } from './components/link-control/portable-text-editor-link-control';
 import { PortableTextEditorToggleButton } from './components/toggle-button/portable-text-editor-toggle-button';
 import { portableTextEditorToolbarVariants } from './portable-text-editor-toolbar-variants';
+import { useToolbarCommands } from './use-toolbar-commands';
 
-const findActiveLinkHref = (
-  annotations: ReturnType<typeof selectors.getActiveAnnotations>,
-): string => {
-  const link = annotations.find((annotation) => annotation._type === 'link');
+const selectActiveLinkHref: EditorSelector<string> = (snapshot) => {
+  const link = selectors
+    .getActiveAnnotations(snapshot)
+    .find((annotation) => annotation._type === 'link');
   return typeof link?.href === 'string' ? link.href : '';
 };
 
@@ -28,7 +30,7 @@ export type TPortableTextEditorToolbarProps = {
 };
 
 const hasName = (
-  entries: readonly { name: string }[] | undefined,
+  entries: TMaybeUndefined<readonly { name: string }[]>,
   name: string,
 ): boolean => entries?.some((entry) => entry.name === name) ?? false;
 
@@ -38,6 +40,14 @@ export const PortableTextEditorToolbar = ({
 }: TPortableTextEditorToolbarProps) => {
   const t = useTranslations('portableTextEditorToolbar');
   const editor = useEditor();
+  const {
+    focusEditor,
+    toggleDecorator,
+    toggleStyle,
+    toggleListItem,
+    addLink,
+    removeLink,
+  } = useToolbarCommands();
   const linkControlId = useId();
   const [isLinkControlOpen, setIsLinkControlOpen] = useState(false);
 
@@ -65,10 +75,7 @@ export const PortableTextEditorToolbar = ({
     editor,
     selectors.isActiveAnnotation('link'),
   );
-  const activeAnnotations = useEditorSelector(
-    editor,
-    selectors.getActiveAnnotations,
-  );
+  const activeLinkHref = useEditorSelector(editor, selectActiveLinkHref);
 
   const { root, bar, divider } = portableTextEditorToolbarVariants();
   const hasBold = hasName(schema.decorators, 'strong');
@@ -79,22 +86,17 @@ export const PortableTextEditorToolbar = ({
   const hasLink = hasName(schema.annotations, 'link');
   const hasLists = hasBulletList || hasNumberedList;
 
-  const focusEditor = () => editor.send({ type: 'focus' });
-
   const handleLinkApply = (href: string) => {
     if (isLinkActive) {
-      editor.send({ type: 'annotation.remove', annotation: { name: 'link' } });
+      removeLink();
     }
-    editor.send({
-      type: 'annotation.add',
-      annotation: { name: 'link', value: { href } },
-    });
+    addLink(href);
     setIsLinkControlOpen(false);
     focusEditor();
   };
 
   const handleLinkRemove = () => {
-    editor.send({ type: 'annotation.remove', annotation: { name: 'link' } });
+    removeLink();
     setIsLinkControlOpen(false);
     focusEditor();
   };
@@ -108,10 +110,7 @@ export const PortableTextEditorToolbar = ({
               label={t('bold')}
               isActive={isBoldActive}
               icon={ICONS.BOLD}
-              onToggle={() => {
-                editor.send({ type: 'decorator.toggle', decorator: 'strong' });
-                focusEditor();
-              }}
+              onToggle={() => toggleDecorator('strong')}
             />
           )}
           {hasItalic && (
@@ -119,10 +118,7 @@ export const PortableTextEditorToolbar = ({
               label={t('italic')}
               isActive={isItalicActive}
               icon={ICONS.ITALIC}
-              onToggle={() => {
-                editor.send({ type: 'decorator.toggle', decorator: 'em' });
-                focusEditor();
-              }}
+              onToggle={() => toggleDecorator('em')}
             />
           )}
           {hasHeading && (
@@ -131,13 +127,7 @@ export const PortableTextEditorToolbar = ({
               <PortableTextEditorToggleButton
                 label={t('heading')}
                 isActive={isHeadingActive}
-                onToggle={() => {
-                  editor.send({
-                    type: 'style.toggle',
-                    style: isHeadingActive ? 'normal' : 'h2',
-                  });
-                  focusEditor();
-                }}
+                onToggle={() => toggleStyle(isHeadingActive ? 'normal' : 'h2')}
               />
             </>
           )}
@@ -146,20 +136,14 @@ export const PortableTextEditorToolbar = ({
             <PortableTextEditorToggleButton
               label={t('bulletList')}
               isActive={isBulletListActive}
-              onToggle={() => {
-                editor.send({ type: 'list item.toggle', listItem: 'bullet' });
-                focusEditor();
-              }}
+              onToggle={() => toggleListItem('bullet')}
             />
           )}
           {hasNumberedList && (
             <PortableTextEditorToggleButton
               label={t('numberedList')}
               isActive={isNumberedListActive}
-              onToggle={() => {
-                editor.send({ type: 'list item.toggle', listItem: 'number' });
-                focusEditor();
-              }}
+              onToggle={() => toggleListItem('number')}
             />
           )}
           {hasLink && (
@@ -179,7 +163,7 @@ export const PortableTextEditorToolbar = ({
         {isLinkControlOpen && (
           <PortableTextEditorLinkControl
             id={linkControlId}
-            initialHref={findActiveLinkHref(activeAnnotations)}
+            initialHref={activeLinkHref}
             hasExistingLink={isLinkActive}
             onApply={handleLinkApply}
             onRemove={handleLinkRemove}
