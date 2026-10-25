@@ -399,6 +399,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:web
 
+### `@web/constants/client-log` — `apps/web/src/constants/client-log.ts`
+
+- **CLIENT_LOG_LOG**: `REPORT_RECEIVED`=`"client_log.report_received"`
+
 ### `@web/constants/consent` — `apps/web/src/constants/consent.ts`
 
 - **CONSENT_STATUS**: `UNKNOWN`, `UNANSWERED`, `ANSWERED`, `GRANTED`, `DENIED`

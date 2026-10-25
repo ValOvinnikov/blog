@@ -1,8 +1,23 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
+import { CLIENT_LOG_LOG } from '@web/constants/client-log';
+import type * as TRateLimiterModule from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';
 
 import type * as TRoute from './route';
+
+const { createRateLimiterSpy } = vi.hoisted(() => ({
+  createRateLimiterSpy: vi.fn(),
+}));
+
+vi.mock(
+  '@web/server/rate-limit/rate-limiter/rate-limiter',
+  async (importOriginal) => {
+    const actual = await importOriginal<typeof TRateLimiterModule>();
+    createRateLimiterSpy.mockImplementation(actual.createRateLimiter);
+    return { createRateLimiter: createRateLimiterSpy };
+  },
+);
 
 let loggerErrorMock = vi.mocked(logger.error);
 
@@ -59,15 +74,30 @@ describe('POST /api/client-log', () => {
     ({ POST } = await freshRoute());
   });
 
+  it('builds no rate limiter until the first request, so importing the route reads no KV credentials', async () => {
+    createRateLimiterSpy.mockClear();
+    const { POST: freshPost } = await freshRoute();
+
+    expect(createRateLimiterSpy).not.toHaveBeenCalled();
+
+    await freshPost(postRequest(validPayload));
+    await freshPost(postRequest(validPayload));
+
+    expect(createRateLimiterSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('accepts a valid payload and logs through the shared logger with source: client', async () => {
     const response = await POST(postRequest(validPayload));
 
     expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
-    expect(loggerErrorMock).toHaveBeenCalledWith('client_log.report_received', {
-      message: validPayload.message,
-      clientEvent: validPayload.event,
-      source: 'client',
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      CLIENT_LOG_LOG.REPORT_RECEIVED,
+      {
+        message: validPayload.message,
+        clientEvent: validPayload.event,
+        source: 'client',
+      },
+    );
   });
 
   it('rejects a payload with an unknown key', async () => {
