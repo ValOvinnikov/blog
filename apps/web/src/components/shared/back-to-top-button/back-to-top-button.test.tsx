@@ -1,50 +1,15 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
-import { act } from 'react';
+import {
+  getFakeIntersectionObserver,
+  stubFakeIntersectionObserver,
+} from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 
 import { BackToTopButton } from './back-to-top-button';
 
-class FakeIntersectionObserver implements IntersectionObserver {
-  static instances: FakeIntersectionObserver[] = [];
-
-  root = null;
-  rootMargin = '';
-  scrollMargin = '';
-  thresholds: number[] = [];
-  callback: IntersectionObserverCallback;
-  observed: Element[] = [];
-
-  constructor(callback: IntersectionObserverCallback) {
-    this.callback = callback;
-    FakeIntersectionObserver.instances.push(this);
-  }
-
-  observe(target: Element) {
-    this.observed.push(target);
-  }
-
-  unobserve() {}
-
-  disconnect() {
-    this.observed = [];
-  }
-
-  takeRecords(): IntersectionObserverEntry[] {
-    return [];
-  }
-
-  trigger(isIntersecting: boolean) {
-    this.callback([{ isIntersecting } as IntersectionObserverEntry], this);
-  }
-}
-
-const getObserver = (): FakeIntersectionObserver => {
-  const [observer] = FakeIntersectionObserver.instances;
-  if (!observer) {
-    throw new Error('Expected an IntersectionObserver instance to exist.');
-  }
-  return observer;
-};
+const BACK_TO_TOP_LABEL = 'Back to top';
+const SITE_FOOTER_TEST_ID = 'site-footer';
+const SITE_FOOTER_HTML = `<footer data-testid="${SITE_FOOTER_TEST_ID}"></footer>`;
 
 const setup = customRender(BackToTopButton, {});
 
@@ -56,20 +21,19 @@ const setScrollY = (value: number) => {
   });
 };
 
-const fireScroll = () => {
-  fireEvent.scroll(window);
-};
+const getHiddenButton = () =>
+  screen.getByRole('button', { hidden: true, name: BACK_TO_TOP_LABEL });
 
 describe(`<${BackToTopButton.name}/>`, () => {
   beforeEach(() => {
-    document.body.innerHTML = '<footer data-testid="site-footer"></footer>';
-    FakeIntersectionObserver.instances = [];
-    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
+    document.body.innerHTML = SITE_FOOTER_HTML;
+    stubFakeIntersectionObserver();
   });
 
   afterEach(() => {
     setScrollY(0);
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   describe('once rendered', () => {
@@ -80,27 +44,16 @@ describe(`<${BackToTopButton.name}/>`, () => {
     });
 
     it('is hidden while scrolled less than one viewport height', () => {
-      const button = screen.getByRole('button', {
-        hidden: true,
-        name: 'Back to top',
-      });
+      const button = getHiddenButton();
 
       expect(button).toHaveAttribute('inert');
     });
 
-    it('removes the scroll listener on unmount', () => {
-      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-
-      unmount();
-
-      expect(removeEventListenerSpy).toHaveBeenCalledWith(
-        'scroll',
-        expect.any(Function),
-      );
-    });
-
     it('disconnects the footer observer on unmount', () => {
-      const disconnectSpy = vi.spyOn(getObserver(), 'disconnect');
+      const disconnectSpy = vi.spyOn(
+        getFakeIntersectionObserver(),
+        'disconnect',
+      );
 
       unmount();
 
@@ -108,65 +61,70 @@ describe(`<${BackToTopButton.name}/>`, () => {
     });
 
     describe('scrolled past one viewport height', () => {
+      let user: UserEvent;
+
       beforeEach(() => {
+        user = userEvent.setup();
         setScrollY(window.innerHeight + 1);
-        fireScroll();
+        fireEvent.scroll(window);
       });
 
-      it('becomes visible once scrolled past one viewport height', () => {
-        expect(
-          screen.getByRole('button', { name: 'Back to top' }),
-        ).toBeVisible();
+      it('becomes visible', () => {
+        const button = screen.getByRole('button', { name: BACK_TO_TOP_LABEL });
+
+        expect(button).toBeVisible();
       });
 
       it('smooth-scrolls to the top on click', async () => {
         const scrollTo = vi.fn();
-        window.scrollTo = scrollTo;
+        vi.stubGlobal('scrollTo', scrollTo);
+        const button = screen.getByRole('button', { name: BACK_TO_TOP_LABEL });
 
-        await userEvent
-          .setup()
-          .click(screen.getByRole('button', { name: 'Back to top' }));
+        await user.click(button);
 
         expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
       });
 
-      it('hides once the footer scrolls into view, even past one viewport height', () => {
-        expect(
-          screen.getByRole('button', { name: 'Back to top' }),
-        ).toBeVisible();
+      it('hides once the footer scrolls into view', () => {
+        getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
 
-        act(() => {
-          getObserver().trigger(true);
-        });
+        const button = getHiddenButton();
 
-        expect(
-          screen.getByRole('button', { hidden: true, name: 'Back to top' }),
-        ).toHaveAttribute('inert');
+        expect(button).toHaveAttribute('inert');
       });
 
       it('reappears once the footer scrolls back out of view', () => {
-        act(() => {
-          getObserver().trigger(true);
-        });
-        act(() => {
-          getObserver().trigger(false);
-        });
+        getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
+        getFakeIntersectionObserver().trigger([{ isIntersecting: false }]);
 
-        expect(
-          screen.getByRole('button', { name: 'Back to top' }),
-        ).toBeVisible();
+        const button = screen.getByRole('button', { name: BACK_TO_TOP_LABEL });
+
+        expect(button).toBeVisible();
       });
     });
   });
 
-  it('observes the site footer by test id, not an earlier in-DOM article footer', () => {
-    document.body.innerHTML =
-      '<footer></footer><footer data-testid="site-footer"></footer>';
+  it('removes its scroll listener on unmount', () => {
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+    const { unmount } = setup();
+    const [, scrollListener] =
+      addEventListenerSpy.mock.calls.find(([type]) => type === 'scroll') ?? [];
 
+    unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'scroll',
+      scrollListener,
+    );
+  });
+
+  it('observes the site footer, not an earlier article footer', () => {
+    document.body.innerHTML = `<footer></footer>${SITE_FOOTER_HTML}`;
     setup();
 
-    const siteFooter = screen.getByTestId('site-footer');
+    const siteFooter = screen.getByTestId(SITE_FOOTER_TEST_ID);
 
-    expect(getObserver().observed).toEqual([siteFooter]);
+    expect(getFakeIntersectionObserver().observed).toEqual([siteFooter]);
   });
 });
