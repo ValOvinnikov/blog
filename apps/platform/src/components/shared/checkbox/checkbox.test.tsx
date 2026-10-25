@@ -12,7 +12,7 @@ const setup = customRender(Checkbox, {
   label: MOCK_LABEL,
 });
 
-describe(Checkbox, () => {
+describe(`<${Checkbox.name}/>`, () => {
   it('toggles when its label is clicked', async () => {
     const onCheckedChange = vi.fn();
     setup({ onCheckedChange });

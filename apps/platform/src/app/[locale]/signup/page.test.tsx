@@ -20,7 +20,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(SignUpPage, {});
 
-describe('SignUpPage', () => {
+describe(`<${SignUpPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset().mockResolvedValue(null);
   });
