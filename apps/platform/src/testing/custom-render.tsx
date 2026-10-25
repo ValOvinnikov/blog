@@ -3,6 +3,7 @@ import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import messages from '@platform/i18n/messages/en.json';
 import {
+  act,
   render as rtlRender,
   renderHook as rtlRenderHook,
   type RenderHookOptions,
@@ -33,7 +34,9 @@ export const customRenderAsync = <P extends object>(
     options?: TRenderOpts,
   ): Promise<RenderResult> => {
     const ui = await Component({ ...defaultProps, ...overrides });
-    return rtlRender(ui, { ...options, wrapper: AppProviders });
+    return act(async () =>
+      rtlRender(ui, { ...options, wrapper: AppProviders }),
+    );
   };
 };
 
