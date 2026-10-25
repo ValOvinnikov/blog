@@ -5,11 +5,11 @@ import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Checkbox } from '@platform/components/shared/checkbox';
+import { ExternalLink } from '@platform/components/shared/external-link';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
 
-import { LegalLink } from './components/legal-link';
 import { signUpFormVariants } from './sign-up-form-variants';
 import { useSignUp } from './use-sign-up';
 
@@ -27,7 +27,7 @@ export const SignUpForm = ({ legalPageUrls }: TSignUpFormProps) => {
     isPending,
     submit,
   } = useSignUp();
-  const { root, submit: submitSlot } = signUpFormVariants();
+  const { root, legalLink, submit: submitSlot } = signUpFormVariants();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -47,12 +47,25 @@ export const SignUpForm = ({ legalPageUrls }: TSignUpFormProps) => {
         isChecked={hasAcceptedTerms}
         onCheckedChange={changeAcceptance}
         label={t.rich('acceptTerms', {
-          terms: (chunks) => (
-            <LegalLink href={legalPageUrls?.terms}>{chunks}</LegalLink>
-          ),
-          privacy: (chunks) => (
-            <LegalLink href={legalPageUrls?.privacy}>{chunks}</LegalLink>
-          ),
+          terms: (chunks) =>
+            legalPageUrls ? (
+              <ExternalLink href={legalPageUrls.terms} className={legalLink()}>
+                {chunks}
+              </ExternalLink>
+            ) : (
+              chunks
+            ),
+          privacy: (chunks) =>
+            legalPageUrls ? (
+              <ExternalLink
+                href={legalPageUrls.privacy}
+                className={legalLink()}
+              >
+                {chunks}
+              </ExternalLink>
+            ) : (
+              chunks
+            ),
         })}
         error={termsError && t('termsNotAccepted')}
       />
