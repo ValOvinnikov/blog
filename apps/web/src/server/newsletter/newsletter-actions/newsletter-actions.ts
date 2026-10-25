@@ -14,10 +14,7 @@ import {
   FIELD_ERROR,
   type TFieldErrorReason,
 } from '@web/constants/field-error';
-import {
-  SUBSCRIBE_FAILED_EVENT,
-  NEWSLETTER_OUTCOME,
-} from '@web/constants/newsletter';
+import { NEWSLETTER_LOG, NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { sendNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { isSubscribeAttemptRefused } from '@web/server/newsletter/subscribe-guard/subscribe-guard';
@@ -51,7 +48,7 @@ export const subscribeToNewsletterAction = async (
   const tenant = await resolveWritableTenant('newsletter.subscribe');
   if (!tenant.ok) {
     if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
-      logger.warn('newsletter.subscribe_tenant_not_active');
+      logger.warn(NEWSLETTER_LOG.SUBSCRIBE_TENANT_NOT_ACTIVE);
       return UNAVAILABLE;
     }
     return SERVER_ERROR;
@@ -59,7 +56,7 @@ export const subscribeToNewsletterAction = async (
   const { data: tenantId } = tenant;
 
   if (!(await isCapabilityEnabledForTenant(tenantId, CAPABILITY.NEWSLETTER))) {
-    logger.warn('newsletter.subscribe_capability_disabled');
+    logger.warn(NEWSLETTER_LOG.SUBSCRIBE_CAPABILITY_DISABLED);
     return UNAVAILABLE;
   }
 
@@ -74,7 +71,7 @@ export const subscribeToNewsletterAction = async (
     );
 
     if (!result.ok) {
-      logger.error(SUBSCRIBE_FAILED_EVENT, { error: result.error });
+      logger.error(NEWSLETTER_LOG.SUBSCRIBE_FAILED, { error: result.error });
       return SERVER_ERROR;
     }
 
@@ -90,7 +87,7 @@ export const subscribeToNewsletterAction = async (
     await markNewsletterSubscribedSafely();
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error(SUBSCRIBE_FAILED_EVENT, { error });
+    logger.error(NEWSLETTER_LOG.SUBSCRIBE_FAILED, { error });
     return SERVER_ERROR;
   }
 };
@@ -99,6 +96,6 @@ const markNewsletterSubscribedSafely = async (): Promise<void> => {
   try {
     await markNewsletterSubscribed();
   } catch (error) {
-    logger.error('newsletter.subscribed_cookie_set_failed', { error });
+    logger.error(NEWSLETTER_LOG.SUBSCRIBED_COOKIE_SET_FAILED, { error });
   }
 };

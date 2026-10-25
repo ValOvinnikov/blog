@@ -1,4 +1,6 @@
+import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import { queries } from '@blog/db';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -37,52 +39,51 @@ describe(`<${NewsletterSection.name}/>`, () => {
     });
   });
 
-  it('renders nothing when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it.each([
+    [
+      'there is no session',
+      () => {
+        authMock.mockResolvedValue(null);
+      },
+    ],
+    [
+      'no tenant resolves',
+      () => {
+        vi.mocked(getRequestContext).mockResolvedValueOnce({
+          ...MOCK_REQUEST_CONTEXT,
+          tenantId: undefined,
+        });
+      },
+    ],
+  ])('renders nothing when %s', async (_case, arrange) => {
+    arrange();
 
     await setup();
 
     const newsletterHeading = screen.queryByRole('heading', {
       name: 'Newsletter',
     });
-
-    expect(newsletterHeading).not.toBeInTheDocument();
-    expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
-  });
-
-  it('renders nothing when no tenant resolves', async () => {
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...MOCK_REQUEST_CONTEXT,
-      tenantId: undefined,
-    });
-
-    await setup();
-
-    const newsletterHeading = screen.queryByRole('heading', {
-      name: 'Newsletter',
-    });
-
     expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
   it('renders nothing when the account is not subscribed', async () => {
-    getSubscriptionStatusMock.mockResolvedValue({ outcome: 'not-subscribed' });
+    getSubscriptionStatusMock.mockResolvedValue({
+      outcome: SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED,
+    });
 
     await setup();
 
     const newsletterHeading = screen.queryByRole('heading', {
       name: 'Newsletter',
     });
-
     expect(newsletterHeading).not.toBeInTheDocument();
   });
 
   it('shows the active subscription with an unsubscribe button', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
-      outcome: 'active',
-      subscriber: { email: MOCK_ACCOUNT_USER.email },
-    } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
+      outcome: SUBSCRIBER_STATUS.ACTIVE,
+    });
 
     await setup();
 
@@ -103,9 +104,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
   it('offers to resend the confirmation for a pending subscription', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
-      outcome: 'pending',
-      subscriber: { email: MOCK_ACCOUNT_USER.email },
-    } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
+      outcome: SUBSCRIBER_STATUS.PENDING,
+    });
 
     await setup();
 

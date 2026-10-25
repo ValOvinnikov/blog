@@ -1,5 +1,8 @@
+import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import { queries } from '@blog/db';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
+import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTranslations } from 'next-intl/server';
@@ -22,7 +25,7 @@ export const NewsletterSection = async () => {
 
   // Subscribing is a separate `NewsletterForm` module's job — this
   // section only ever manages an existing subscription.
-  if (status.outcome === 'not-subscribed') return null;
+  if (status.outcome === SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED) return null;
 
   const t = await getTranslations('accountPage.newsletter');
 
@@ -39,7 +42,11 @@ export const NewsletterSection = async () => {
       pendingDescription={t('pendingDescription')}
       control={
         <NewsletterSubscriptionControl
-          action={status.outcome === 'active' ? 'unsubscribe' : 'resend'}
+          action={
+            status.outcome === SUBSCRIBER_STATUS.ACTIVE
+              ? NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE
+              : NEWSLETTER_SUBSCRIPTION_ACTION.RESEND
+          }
         />
       }
     />

@@ -1,4 +1,5 @@
 import { SUBSCRIBER_OUTCOME, ERROR_CODE } from '@blog/config/constants';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestSubscriber,
@@ -54,7 +55,7 @@ describe(createPendingSubscriber, () => {
         subscriber: { id: row?.id, email: MOCK_SUBSCRIBER_EMAIL },
       }),
     );
-    expect(row?.status).toBe('pending');
+    expect(row?.status).toBe(SUBSCRIBER_STATUS.PENDING);
     expect(row?.emailIndex).toBe(testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL));
     expect(decryptTestPersonalValue(row?.emailEncrypted ?? null)).toBe(
       MOCK_SUBSCRIBER_EMAIL,
@@ -108,7 +109,7 @@ describe(createPendingSubscriber, () => {
       db(),
       tenantId,
       MOCK_SUBSCRIBER_EMAIL,
-      { status: 'active' },
+      { status: SUBSCRIBER_STATUS.ACTIVE },
     );
 
     const result = await createPendingSubscriber(

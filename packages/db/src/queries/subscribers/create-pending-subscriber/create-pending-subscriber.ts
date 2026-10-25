@@ -5,6 +5,7 @@ import {
 } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { findSubscriberByExactEmail } from '@blog/db/queries/subscribers/user-subscriber';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
@@ -40,7 +41,7 @@ async function findExisting(
   const { id, status, email } = existing;
   return okResult({
     outcome:
-      status === 'active'
+      status === SUBSCRIBER_STATUS.ACTIVE
         ? SUBSCRIBER_OUTCOME.ALREADY_ACTIVE
         : SUBSCRIBER_OUTCOME.ALREADY_PENDING,
     subscriber: { id, email },

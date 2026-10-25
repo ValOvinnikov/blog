@@ -6,6 +6,7 @@ export * from './lead';
 export * from './membership';
 export * from './personal-data';
 export * from './retention';
+export * from './subscriber';
 export * from './tenant';
 export * from './tenant-deprovisioning';
 export * from './tenant-inactivity';

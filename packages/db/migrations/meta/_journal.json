@@ -414,6 +414,13 @@
       "when": 1792698686192,
       "tag": "0058_add_self_serve_free_tenant_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1792915246284,
+      "tag": "0059_uppercase_subscriber_status",
+      "breakpoints": true
     }
   ]
 }

@@ -197,7 +197,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
-- **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`
+- **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/taxonomy.ts`
 
@@ -236,6 +236,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **PERSONAL_DATA_OWNER**: `USER`, `LEAD`, `SUBSCRIBER`, `INVITE`
 - **PERSONAL_DATA_FALLBACK_REASON**: `NOT_BACKFILLED`, `ENCRYPTION_KEY_UNSET`, `INDEX_KEY_UNSET`
+
+### `@blog/db/constants` — `packages/db/src/constants/subscriber.ts`
+
+- **SUBSCRIBER_STATUS**: `PENDING`, `ACTIVE`
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 
@@ -420,6 +424,8 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/newsletter` — `apps/web/src/constants/newsletter.ts`
 
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
+- **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
+- **NEWSLETTER_LOG**: `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
 
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 
