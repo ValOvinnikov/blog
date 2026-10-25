@@ -119,14 +119,24 @@ describe('env', () => {
     expect(env.PERSONAL_DATA_INDEX_KEY).toBe(MOCK_ENCRYPTION_KEY);
   });
 
-  it.each(Object.entries(INVALID_VALUE))(
-    'rejects an invalid %s',
-    async (key, value) => {
-      process.env[key] = value;
+  describe('validation failure', () => {
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-      await expect(importEnvOnServer()).rejects.toThrow();
-    },
-  );
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it.each(Object.entries(INVALID_VALUE))(
+      'rejects an invalid %s',
+      async (key, value) => {
+        process.env[key] = value;
+
+        await expect(importEnvOnServer()).rejects.toThrow();
+      },
+    );
+  });
 
   it('skips validation entirely when SKIP_ENV_VALIDATION is set', async () => {
     process.env['SKIP_ENV_VALIDATION'] = 'true';

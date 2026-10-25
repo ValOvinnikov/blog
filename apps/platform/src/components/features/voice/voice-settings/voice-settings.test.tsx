@@ -427,7 +427,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const section = card(EMPTY_LISTS);
       const row = within(section).getByRole('button', { name: /Tag page/ });
 
-      row.focus();
+      await user.pointer({ keys: '[MouseLeft>]', target: row });
       await user.keyboard('{Enter}');
 
       expect(row).toHaveFocus();
