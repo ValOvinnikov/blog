@@ -2,10 +2,8 @@ import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { INACTIVITY_STAGE } from '@blog/db/constants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import {
-  INACTIVITY_SWEEP_FAILED_EVENT,
-  INACTIVITY_SWEEP_NOT_CONFIGURED_EVENT,
-} from '@worker/constants/inactivity-sweep';
+import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
+import { RETENTION_KIND } from '@worker/constants/retention';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_FORGED_SECRET } from '@worker/testing/enqueue/fixtures';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
@@ -13,6 +11,7 @@ import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { runInactivitySweep } from '@worker/utils/inactivity-sweep/run-inactivity-sweep';
 import { logger } from '@worker/utils/logger/logger';
+import { runRetentionCleanups } from '@worker/utils/retention/run-retention-cleanups';
 
 import { GET } from './route';
 
@@ -25,12 +24,14 @@ const ADVANCED = {
   [INACTIVITY_STAGE.DELETION_NOTICE]: 0,
   [INACTIVITY_STAGE.DEPROVISIONING]: 0,
 };
+const DELETED = { [RETENTION_KIND.LEADS]: 4, [RETENTION_KIND.SESSIONS]: 9 };
 
 const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
 
 vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
 vi.mock('@worker/utils/inactivity-sweep/inactivity-sweep-env');
 vi.mock('@worker/utils/inactivity-sweep/run-inactivity-sweep');
+vi.mock('@worker/utils/retention/run-retention-cleanups');
 
 function cronRequest(secret: string = CRON_SECRET): Request {
   return new Request(SWEEP_URL, {
@@ -44,21 +45,26 @@ describe('GET /api/inactivity-sweep', () => {
     mockEnv.CRON_SECRET = CRON_SECRET;
     vi.mocked(getInactivitySweepEnv).mockReturnValue(SWEEP_ENV);
     vi.mocked(runInactivitySweep).mockResolvedValue(ADVANCED);
+    vi.mocked(runRetentionCleanups).mockResolvedValue(DELETED);
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('runs the sweep for now and answers with what it advanced', async () => {
+  it('runs the sweep and the retention cleanups for now and answers with both results', async () => {
     const response = await GET(cronRequest());
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    await expect(response.json()).resolves.toEqual({ advanced: ADVANCED });
+    await expect(response.json()).resolves.toEqual({
+      advanced: ADVANCED,
+      deleted: DELETED,
+    });
     expect(runInactivitySweep).toHaveBeenCalledWith({
       now: MOCK_NOW,
       env: SWEEP_ENV,
     });
+    expect(runRetentionCleanups).toHaveBeenCalledWith(MOCK_NOW);
   });
 
   it('refuses a request without the cron secret', async () => {
@@ -78,7 +84,7 @@ describe('GET /api/inactivity-sweep', () => {
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(logger.error).toHaveBeenCalledWith(
-      INACTIVITY_SWEEP_NOT_CONFIGURED_EVENT,
+      INACTIVITY_SWEEP_LOG.NOT_CONFIGURED,
     );
     expect(runInactivitySweep).not.toHaveBeenCalled();
   });
@@ -92,8 +98,16 @@ describe('GET /api/inactivity-sweep', () => {
     await expect(response.json()).resolves.toEqual({
       error: ENQUEUE_ERROR.SERVER_ERROR,
     });
-    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_SWEEP_FAILED_EVENT, {
+    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_SWEEP_LOG.FAILED, {
       error: MOCK_DB_DOWN,
     });
+  });
+
+  it('still runs the retention cleanups when the sweep fails', async () => {
+    vi.mocked(runInactivitySweep).mockRejectedValue(new Error(MOCK_DB_DOWN));
+
+    await GET(cronRequest());
+
+    expect(runRetentionCleanups).toHaveBeenCalledWith(MOCK_NOW);
   });
 });

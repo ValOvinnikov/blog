@@ -16,11 +16,7 @@ import {
 import type { TTenant } from '@blog/db/schema/tenants';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { sendEmail } from '@blog/email';
-import {
-  INACTIVITY_EMAIL_SEND_FAILED_EVENT,
-  INACTIVITY_OWNER_MISSING_EVENT,
-  INACTIVITY_STAGE_FAILED_EVENT,
-} from '@worker/constants/inactivity-sweep';
+import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
 import { MOCK_SUPERADMIN_EMAILS } from '@worker/testing/operator-email/fixtures';
@@ -236,10 +232,13 @@ describe(runInactivitySweep, () => {
     await sweep();
 
     expect(sendEmail).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_OWNER_MISSING_EVENT, {
-      tenantId: MOCK_TENANT_ID,
-      stage: INACTIVITY_STAGE.DELETION_NOTICE,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      INACTIVITY_SWEEP_LOG.OWNER_MISSING,
+      {
+        tenantId: MOCK_TENANT_ID,
+        stage: INACTIVITY_STAGE.DELETION_NOTICE,
+      },
+    );
   });
 
   it('logs a failed owner email and still alerts the super admins', async () => {
@@ -252,7 +251,7 @@ describe(runInactivitySweep, () => {
 
     expect(sentTo()).toEqual(expect.arrayContaining(MOCK_SUPERADMIN_EMAILS));
     expect(logger.error).toHaveBeenCalledWith(
-      INACTIVITY_EMAIL_SEND_FAILED_EVENT,
+      INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED,
       {
         tenantId: MOCK_TENANT_ID,
         stage: INACTIVITY_STAGE.SUSPENSION_WARNING,
@@ -274,11 +273,14 @@ describe(runInactivitySweep, () => {
     await expect(sweep()).resolves.toMatchObject({
       [INACTIVITY_STAGE.SUSPENSION]: 1,
     });
-    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_STAGE_FAILED_EVENT, {
-      tenantId: MOCK_TENANT_ID,
-      stage: INACTIVITY_STAGE.SUSPENSION,
-      error: CACHE_DOWN,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      INACTIVITY_SWEEP_LOG.STAGE_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        stage: INACTIVITY_STAGE.SUSPENSION,
+        error: CACHE_DOWN,
+      },
+    );
     expect(requestTenantCacheInvalidation).toHaveBeenLastCalledWith(
       expect.objectContaining({ tenantId: secondTenantId }),
     );

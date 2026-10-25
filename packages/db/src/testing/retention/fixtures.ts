@@ -10,3 +10,5 @@ export function justPast(cutoff: Date): Date {
 export function justWithin(cutoff: Date): Date {
   return new Date(cutoff.getTime() + DAY_MS);
 }
+
+export const MOCK_RETENTION_LIMIT = 100;
