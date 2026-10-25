@@ -1,16 +1,16 @@
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
 import { subscribers } from '@blog/db/schema/subscribers';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   insertReplayTenant,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 function byEmail(a: { email: string }, b: { email: string }): number {
   return a.email < b.email ? -1 : 1;
@@ -22,7 +22,7 @@ describe('0059_uppercase_subscriber_status (subscriber statuses stored uppercase
   let db: PgliteDatabase<typeof schema>;
 
   beforeEach(async () => {
-    db = drizzle(new PGlite(), { schema });
+    db = await createEmptyTestDb();
     for (const file of listMigrationFiles()) {
       if (file >= UPPERCASE_MIGRATION) break;
       await applyMigrationFile(db, file);

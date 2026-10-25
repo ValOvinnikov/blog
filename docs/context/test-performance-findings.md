@@ -97,18 +97,35 @@ suite produced **207 failures**, DOM from one test file leaking into the next
 (`getByRole` matching leftover elements). Do not enable without per-file
 teardown discipline.
 
+## `packages/db` — adopted: threads and an empty snapshot
+
+`packages/db/vitest.config.ts` runs on `pool: 'threads'`. Global setup now
+dumps the PGlite instance twice — straight after `initdb` and again once every
+migration is applied — and the `src/schema/*-migration.test.ts` files restore
+the empty one through `createEmptyTestDb()` instead of calling `new PGlite()`,
+so no test runs `initdb` itself. No assertion changed.
+
+Measured 2026-10-25 on one machine, `vitest run src/schema`, all 15 files / 46
+tests passing both ways: `forks` with `new PGlite()` 64s, threads with the
+empty snapshot 32s.
+
 ## Secondary: worker oversubscription
 
-Nothing in the repo sets `maxWorkers`, `poolOptions` or `fileParallelism`, and
-`turbo run test` has no `--concurrency` cap (turbo defaults to 10). Vitest
-defaults to roughly `cores - 1` workers per instance, so `pnpm test` can run
-~10 vitest instances x ~7 workers on an 8-core machine.
+Nothing in the repo sets `maxWorkers`, `poolOptions` or `fileParallelism`.
+Vitest defaults to roughly `cores - 1` workers per instance, so at turbo's
+default concurrency of 10, `turbo run test` could run ~10 vitest instances x ~7
+workers on an 8-core machine.
+
+**Adopted:** turbo concurrency is capped — `--concurrency=2` in CI's Test job,
+`--concurrency=50%` in the root `pnpm test` script (local runs and
+`deploy-development.yml`). Measured with `--force` on 8 cores: default 8m55s,
+`50%` 7m07s, and the contention timeouts stopped
+(`docs/context/ci-automation.md`).
 
 The shared preset already carries a symptom of this — `testTimeout: 20_000`,
 whose comment cites "parallel-turbo contention across packages".
 
-Worth measuring on a quiet machine: `turbo run test --concurrency=3`, or a
-`maxWorkers` cap in `configs/vitest/preset.ts`.
+Still unmeasured: a `maxWorkers` cap in `configs/vitest/preset.ts`.
 
 ## `apps/web` and `apps/platform` — adopted: per-project pools
 
@@ -147,7 +164,22 @@ treated as the baseline.
 
 ## `act()` warnings
 
-**`apps/platform`: fixed.** A whole-suite run with `--silent=false` used to
+`apps/web` — fixed. A whole-suite run with `--silent=false` printed 5 "not
+wrapped in act" warnings and 13 false "unique key" warnings, all from test
+helpers rather than components:
+
+- `customRenderAsync` and `customRenderServerAsync` now render inside an
+  awaited `act`, so an effect that resolves after mount (`BookmarkButton`'s
+  status check) settles before the helper returns.
+- the server-tree walk in `customRenderServerAsync` copies React's
+  static-children marking onto each rebuilt element and keeps a keyed async
+  element's key, so only a genuinely unkeyed list warns.
+- `use-active-heading-id.test.tsx`'s fake `IntersectionObserver` delivers its
+  entries inside `act`.
+- `env.test.ts` silences the expected "Invalid environment variables" output
+  in every validation-failure case.
+
+`apps/platform` — fixed. A whole-suite run with `--silent=false` used to
 print 219 "not wrapped in act" warnings and 16 Suspense act messages. It now
 prints none. The causes, and the rules that keep them out:
 

@@ -13,11 +13,9 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'node',
+      pool: 'threads',
       mockReset: true,
       include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
-      // Builds one migrated PGlite snapshot per vitest process; every query
-      // test's `createTestDb()` restores from it instead of replaying all
-      // migrations itself (see `src/testing/global-setup.ts`).
       globalSetup: ['./src/testing/global-setup.ts'],
       env: {
         // `env.ts` validates at import time; SKIP_ENV_VALIDATION lets tests

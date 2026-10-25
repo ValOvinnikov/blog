@@ -117,19 +117,6 @@ describe('env', () => {
     expect(env.PERSONAL_DATA_INDEX_KEY).toBe(MOCK_ENCRYPTION_KEY);
   });
 
-  it('rejects a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes', async () => {
-    process.env['PERSONAL_DATA_INDEX_KEY'] = SHORT_KEY;
-
-    await expect(importEnvOnServer()).rejects.toThrow();
-  });
-
-  it('rejects a PERSONAL_DATA_ENCRYPTION_KEY with a short key in an older version', async () => {
-    process.env['PERSONAL_DATA_ENCRYPTION_KEY'] =
-      `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
-
-    await expect(importEnvOnServer()).rejects.toThrow();
-  });
-
   describe('with SANITY_REVALIDATE_SECRET set', () => {
     beforeEach(() => {
       process.env['SANITY_REVALIDATE_SECRET'] = REVALIDATE_SECRET;
@@ -165,6 +152,19 @@ describe('env', () => {
 
     afterEach(() => {
       vi.restoreAllMocks();
+    });
+
+    it('rejects a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes', async () => {
+      process.env['PERSONAL_DATA_INDEX_KEY'] = SHORT_KEY;
+
+      await expect(importEnvOnServer()).rejects.toThrow();
+    });
+
+    it('rejects a PERSONAL_DATA_ENCRYPTION_KEY with a short key in an older version', async () => {
+      process.env['PERSONAL_DATA_ENCRYPTION_KEY'] =
+        `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`;
+
+      await expect(importEnvOnServer()).rejects.toThrow();
     });
 
     it('throws when WEB_ANALYTICS_ENABLED is set to an unrecognized value', async () => {

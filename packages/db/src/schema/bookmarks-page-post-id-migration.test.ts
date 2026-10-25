@@ -1,13 +1,11 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
-import { drizzle } from 'drizzle-orm/pglite';
 
 import { users } from './auth';
 import { bookmarks } from './bookmarks';
@@ -17,8 +15,7 @@ const REWRITE_MIGRATION = '0030_rewrite_bookmark_post_ids_to_page_post.sql';
 const PREFIXED_POST_ID = 'page_post-welcome';
 
 async function setUpDbWithBookmark(postId: string) {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const db = await createEmptyTestDb();
 
   const otherMigrations = listMigrationFiles().filter(
     (file) => file !== REWRITE_MIGRATION,
@@ -84,8 +81,7 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
   it(
     'still applies cleanly against an empty bookmarks table',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
+      const db = await createEmptyTestDb();
 
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);

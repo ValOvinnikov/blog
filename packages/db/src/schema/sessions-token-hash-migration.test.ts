@@ -1,23 +1,23 @@
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
 import { sessions, users } from '@blog/db/schema/auth';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 const DELETE_SESSIONS_MIGRATION = '0054_delete_unhashed_sessions.sql';
 
 describe('0054_delete_unhashed_sessions (sessions stored before hashing end)', () => {
   let db: PgliteDatabase<typeof schema>;
 
-  beforeEach(() => {
-    db = drizzle(new PGlite(), { schema });
-  });
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'removes every existing session and keeps its user',

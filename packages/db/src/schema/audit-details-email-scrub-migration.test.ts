@@ -6,9 +6,10 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { findings } from '@blog/db/schema/findings';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import { MOCK_OPERATOR_EMAIL } from '@blog/db/testing/fixtures';
 import {
   applyMigrationFile,
@@ -16,10 +17,9 @@ import {
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   insertReplayTenant,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 const SCRUB_MIGRATION = '0053_scrub_emails_from_audit_and_findings_details.sql';
 const ACTOR_ID = 'operator-1';
@@ -64,7 +64,7 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
   let tenant: Awaited<ReturnType<typeof insertReplayTenant>>;
 
   beforeEach(async () => {
-    db = drizzle(new PGlite(), { schema });
+    db = await createEmptyTestDb();
     await migrateUpToScrub(db);
     tenant = await insertReplayTenant(db);
   }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);

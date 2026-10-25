@@ -13,34 +13,39 @@ declare module 'vitest' {
   // Augmenting vitest's own interface — the name must match theirs exactly.
   // eslint-disable-next-line @typescript-eslint/naming-convention
   export interface ProvidedContext {
+    pgliteEmptySnapshotPath: string;
     pgliteMigratedSnapshotPath: string;
   }
 }
 
-// Builds one fully-migrated PGlite instance for the whole vitest process and
-// snapshots it to a temp file; `createTestDb()` restores each test file's
-// own private instance from this snapshot instead of replaying every
-// migration itself. Runs in vitest's main process, separate from the worker
-// processes that run test files, so the snapshot crosses that boundary via
-// the filesystem rather than an in-memory reference.
+async function writeSnapshot(client: PGlite, path: string): Promise<void> {
+  const tarball = await client.dumpDataDir();
+  await writeFile(path, Buffer.from(await tarball.arrayBuffer()));
+}
+
+// Global setup runs outside the test workers, so the snapshots reach them as files, not in-memory instances.
 export async function setup(
   project: TestProject,
 ): Promise<() => Promise<void>> {
-  const client = new PGlite();
+  const snapshotDir = await mkdtemp(join(tmpdir(), 'blog-db-pglite-'));
+  const emptySnapshotPath = join(snapshotDir, 'empty.tar.gz');
+  const migratedSnapshotPath = join(snapshotDir, 'migrated.tar.gz');
+
+  // `new PGlite()` would not be ready yet: dumping it before initdb finishes ends the process silently.
+  const client = await PGlite.create();
   const db = drizzle(client, { schema });
+
+  await writeSnapshot(client, emptySnapshotPath);
 
   for (const file of listMigrationFiles()) {
     await applyMigrationFile(db, file);
   }
 
-  const tarball = await client.dumpDataDir();
+  await writeSnapshot(client, migratedSnapshotPath);
   await client.close();
 
-  const snapshotDir = await mkdtemp(join(tmpdir(), 'blog-db-pglite-'));
-  const snapshotPath = join(snapshotDir, 'snapshot.tar.gz');
-  await writeFile(snapshotPath, Buffer.from(await tarball.arrayBuffer()));
-
-  project.provide('pgliteMigratedSnapshotPath', snapshotPath);
+  project.provide('pgliteEmptySnapshotPath', emptySnapshotPath);
+  project.provide('pgliteMigratedSnapshotPath', migratedSnapshotPath);
 
   return async function teardown() {
     await rm(snapshotDir, { recursive: true, force: true });

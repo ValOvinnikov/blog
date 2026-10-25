@@ -1,21 +1,18 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
 
 import { tenants } from './tenants';
 
 const LOCALE_MIGRATION = '0032_famous_hawkeye.sql';
 
 async function migrateWithTenantLocales(locales: string[]) {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const db = await createEmptyTestDb();
   const migrationFiles = listMigrationFiles();
 
   for (const file of migrationFiles.filter((f) => f < LOCALE_MIGRATION)) {
@@ -41,7 +38,11 @@ describe('0032_famous_hawkeye (tenants locale codes)', () => {
   it(
     'normalizes existing locales to supported codes with no additional locales',
     async () => {
-      const { db, run } = await migrateWithTenantLocales(['en', ' fr ', 'DE']);
+      const { db, run } = await migrateWithTenantLocales([
+        'en',
+        ' fr ',
+        LOCALE_ISO_CODES.DE,
+      ]);
 
       await run();
 
@@ -56,7 +57,7 @@ describe('0032_famous_hawkeye (tenants locale codes)', () => {
       expect(rows).toEqual([
         { locale: LOCALE_ISO_CODES.EN, additionalLocales: [] },
         { locale: LOCALE_ISO_CODES.FR, additionalLocales: [] },
-        { locale: 'DE', additionalLocales: [] },
+        { locale: LOCALE_ISO_CODES.DE, additionalLocales: [] },
       ]);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
