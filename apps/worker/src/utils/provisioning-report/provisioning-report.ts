@@ -1,4 +1,8 @@
-import { AUDIT_TARGET_TYPE, type TAuditAction } from '@blog/config/constants';
+import {
+  AUDIT_TARGET_TYPE,
+  type TAuditAction,
+  WORKER_AUDIT_ACTOR_ID,
+} from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -12,11 +16,7 @@ import {
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
-import {
-  PROVISIONING_AUDIT_ACTOR_EMAIL,
-  PROVISIONING_AUDIT_ACTOR_ID,
-  PROVISIONING_AUDIT_VIA,
-} from '@worker/constants/provisioning';
+import { PROVISIONING_AUDIT_VIA } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { overallStatusFor } from '@worker/utils/overall-provisioning-status/overall-provisioning-status';
 
@@ -75,8 +75,7 @@ export async function insertWorkerAuditEvent(input: {
   const { tenantId, action, details } = input;
   try {
     await insertAuditEvent({
-      actorId: PROVISIONING_AUDIT_ACTOR_ID,
-      actorEmail: PROVISIONING_AUDIT_ACTOR_EMAIL,
+      actorId: WORKER_AUDIT_ACTOR_ID,
       action,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,

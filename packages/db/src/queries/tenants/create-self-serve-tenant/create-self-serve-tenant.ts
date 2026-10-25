@@ -99,7 +99,6 @@ export async function createSelfServeTenant(
 
         await insertAuditEvent({
           actorId: owner.userId,
-          actorEmail: owner.email,
           action: AUDIT_ACTION.CREATED,
           targetType: AUDIT_TARGET_TYPE.TENANT,
           targetId: tenantId,

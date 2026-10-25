@@ -32,7 +32,7 @@ describe('recordAuditEvent', () => {
     loggerErrorMock.mockReset();
   });
 
-  it('inserts the actor, action, target, and details exactly as given', async () => {
+  it('inserts the actor id, action, target, and details exactly as given, with no actor email', async () => {
     const { recordAuditEvent } = await import('./record-audit-event');
 
     await recordAuditEvent({
@@ -45,7 +45,6 @@ describe('recordAuditEvent', () => {
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'user-1',
-      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
@@ -79,7 +78,7 @@ describe('recordAuditEvent', () => {
   });
 
   it('swallows a missing session actor without ever calling the insert', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1', email: undefined } });
+    authMock.mockResolvedValue(null);
     const { recordAuditEvent } = await import('./record-audit-event');
 
     await recordAuditEvent({

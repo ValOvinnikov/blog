@@ -331,6 +331,7 @@
   "activityList": {
     "empty": "Noch keine Aktivitäten erfasst.",
     "actorDeleted": "Gelöschtes Konto",
+    "actorSystem": "System",
     "relativeJustNow": "Gerade eben",
     "relativeMinutesAgo": "vor {minutes} Min.",
     "relativeHoursAgo": "vor {hours} Std.",

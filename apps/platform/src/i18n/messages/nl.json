@@ -331,6 +331,7 @@
   "activityList": {
     "empty": "Nog geen activiteit geregistreerd.",
     "actorDeleted": "Verwijderd account",
+    "actorSystem": "Systeem",
     "relativeJustNow": "Zojuist",
     "relativeMinutesAgo": "{minutes} min geleden",
     "relativeHoursAgo": "{hours} uur geleden",

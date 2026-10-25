@@ -1,4 +1,4 @@
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
 import { ActivityList } from '@platform/components/features/tenants/activity-list';
 import { Card } from '@platform/components/shared/card';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 export type TTenantActivityViewProps = {
-  events: TAuditEvent[];
+  events: TListedAuditEvent[];
   pagination: ReactNode;
 };
 

@@ -1,5 +1,12 @@
-import { AUDIT_ACTION, ICONS, SIZE, type TAuditAction } from '@blog/config';
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import {
+  AUDIT_ACTION,
+  GITHUB_AUDIT_ACTOR_ID_PREFIX,
+  ICONS,
+  SIZE,
+  type TAuditAction,
+  WORKER_AUDIT_ACTOR_ID,
+} from '@blog/config';
+import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
 import { CardList } from '@platform/components/shared/card-list';
 import {
   Icon,
@@ -11,7 +18,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { activityListVariants } from './activity-list-variants';
 
 export type TActivityListProps = {
-  events: TAuditEvent[];
+  events: TListedAuditEvent[];
 };
 
 const ACTIVITY_ICON = {
@@ -41,6 +48,13 @@ export const ActivityList = ({ events }: TActivityListProps) => {
   const t = useTranslations('activityList');
   const locale = useLocale();
   const { activityIcon } = activityListVariants();
+  const actorLabel = ({ actorId, actorAccountEmail }: TListedAuditEvent) => {
+    if (actorId === WORKER_AUDIT_ACTOR_ID) return t('actorSystem');
+    if (actorId.startsWith(GITHUB_AUDIT_ACTOR_ID_PREFIX)) {
+      return actorId.slice(GITHUB_AUDIT_ACTOR_ID_PREFIX.length);
+    }
+    return actorAccountEmail ?? t('actorDeleted');
+  };
 
   return (
     <CardList
@@ -54,9 +68,7 @@ export const ActivityList = ({ events }: TActivityListProps) => {
             </span>
           </CardList.Lead>
           <CardList.Primary>{t(`action.${event.action}`)}</CardList.Primary>
-          <CardList.Secondary>
-            {event.actorEmail ?? t('actorDeleted')}
-          </CardList.Secondary>
+          <CardList.Secondary>{actorLabel(event)}</CardList.Secondary>
           <CardList.Time date={event.createdAt}>
             {formatRelativeTime(event.createdAt, t, locale)}
           </CardList.Time>
