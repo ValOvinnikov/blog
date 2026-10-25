@@ -203,7 +203,8 @@ shows, never a fresh object (`useEditorSelector` compares with `Object.is`);
 a page that suspends on `use()` renders inside an awaited `act`, which
 `customRenderAsync` does; focus moves through user-event, never
 `element.focus()`/`.blur()`; a test that leaves a promise pending waits for it
-to settle.
+to settle. `apps/platform/src/vitest-setup.ts` fails any test during which
+React reports an act() warning, naming the message.
 
 **`apps/web` is fixed**: the async render helpers, the server-tree walk, the
 fake IntersectionObserver and `env.test.ts` changed as the table describes. `apps/web/src/vitest-setup.ts` now fails any test during which React
@@ -233,9 +234,6 @@ needed a product change. Also found:
 - **`FakeIntersectionObserver` is declared twice** in `apps/web`:
   `back-to-top-button.test.tsx` and `use-active-heading-id.test.tsx`, and the
   first wraps each trigger in its own `act()`.
-
-A `console.error` hook in each app's setup that fails a test on "not wrapped in
-act" would keep the count at zero once the fixes land.
 
 ## Orchestration
 
