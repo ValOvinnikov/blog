@@ -150,6 +150,23 @@ _ratios_ and the pass/fail results above are reliable; the absolute wall-clock
 figures from that window are not, and the reference run at the top should be
 treated as the baseline.
 
+## `act()` warnings
+
+`apps/web` — fixed. A whole-suite run with `--silent=false` printed 5 "not
+wrapped in act" warnings and 13 false "unique key" warnings, all from test
+helpers rather than components:
+
+- `customRenderAsync` and `customRenderServerAsync` now render inside an
+  awaited `act`, so an effect that resolves after mount (`BookmarkButton`'s
+  status check) settles before the helper returns.
+- the server-tree walk in `customRenderServerAsync` copies React's
+  static-children marking onto each rebuilt element and keeps a keyed async
+  element's key, so only a genuinely unkeyed list warns.
+- `use-active-heading-id.test.tsx`'s fake `IntersectionObserver` delivers its
+  entries inside `act`.
+- `env.test.ts` silences the expected "Invalid environment variables" output
+  in every validation-failure case.
+
 ## The 62 node-safe `apps/web` files
 
 ```

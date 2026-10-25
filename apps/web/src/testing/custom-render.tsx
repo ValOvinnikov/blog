@@ -1,4 +1,5 @@
 import {
+  act,
   render as rtlRender,
   type RenderOptions,
   type RenderResult,
@@ -7,6 +8,7 @@ import { AppProviders } from '@web/testing/providers';
 import {
   cloneElement,
   createElement,
+  Fragment,
   isValidElement,
   type ComponentType,
   type ReactElement,
@@ -16,6 +18,17 @@ import {
 const Providers = AppProviders;
 
 type TRenderOpts = Omit<RenderOptions, 'wrapper'>;
+
+const renderSettled = async (
+  ui: ReactElement,
+  options?: TRenderOpts,
+): Promise<RenderResult> => {
+  let result!: RenderResult;
+  await act(async () => {
+    result = rtlRender(ui, { wrapper: Providers, ...options });
+  });
+  return result;
+};
 
 /**
  * Bind a (sync) component + its default props once, get a `setup(overrides?)`
@@ -52,11 +65,25 @@ export const customRenderAsync = <P extends object>(
     options?: TRenderOpts,
   ): Promise<RenderResult> => {
     const ui = await Component({ ...defaultProps, ...overrides });
-    return rtlRender(<>{ui}</>, { wrapper: Providers, ...options });
+    return renderSettled(<>{ui}</>, options);
   };
 };
 
 type TAsyncComponent = (props: object) => Promise<ReactNode>;
+
+type TElementWithStore = ReactElement & { _store?: { validated: number } };
+
+// React's dev build flags static JSX children as key-checked on `_store`;
+// a rebuilt element starts unflagged and would warn as an unkeyed list item.
+const keepKeyValidation = (
+  source: TElementWithStore,
+  resolved: TElementWithStore,
+): ReactElement => {
+  if (source._store && resolved._store) {
+    resolved._store.validated = source._store.validated;
+  }
+  return resolved;
+};
 
 const isAsyncComponent = (type: unknown): type is TAsyncComponent =>
   typeof type === 'function' && type.constructor.name === 'AsyncFunction';
@@ -81,9 +108,18 @@ const resolveValue = async (value: unknown): Promise<unknown> => {
   if (Array.isArray(value)) return Promise.all(value.map(resolveValue));
   if (isValidElement<Record<string, unknown>>(value)) {
     if (isAsyncComponent(value.type)) {
-      return resolveValue(await value.type(value.props));
+      const resolved = (await resolveValue(
+        await value.type(value.props),
+      )) as ReactNode;
+      return keepKeyValidation(
+        value,
+        createElement(Fragment, { key: value.key ?? undefined }, resolved),
+      );
     }
-    return cloneElement(value, await resolveEntries(value.props));
+    return keepKeyValidation(
+      value,
+      cloneElement(value, await resolveEntries(value.props)),
+    );
   }
   if (isPlainObject(value)) return resolveEntries(value);
   return value;
@@ -111,10 +147,10 @@ export const customRenderServerAsync = <P extends object>(
     const ui = await resolveServerTree(
       await Component({ ...defaultProps, ...overrides }),
     );
-    return rtlRender(Wrapper ? <Wrapper>{ui}</Wrapper> : <>{ui}</>, {
-      wrapper: Providers,
-      ...options,
-    });
+    return renderSettled(
+      Wrapper ? <Wrapper>{ui}</Wrapper> : <>{ui}</>,
+      options,
+    );
   };
 };
 
