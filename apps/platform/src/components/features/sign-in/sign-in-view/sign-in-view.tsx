@@ -4,7 +4,10 @@ import { PreShellFrame } from '@platform/components/features/layout/pre-shell-fr
 import { Alert } from '@platform/components/shared/alert';
 import { BrandMark } from '@platform/components/shared/brand-mark';
 import { PageHeader } from '@platform/components/shared/page-header';
+import { Text } from '@platform/components/shared/text';
 import { SIGN_IN_ERROR, type TSignInError } from '@platform/constants/sign-in';
+import { Link } from '@platform/i18n/navigation';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 import { EmailSignInForm } from './components/email-sign-in-form';
@@ -37,7 +40,7 @@ export const SignInView = ({
   error,
 }: TSignInViewProps) => {
   const t = useTranslations('signInPage');
-  const { content, providers } = signInViewVariants();
+  const { content, providers, signUpLink } = signInViewVariants();
 
   return (
     <PreShellFrame
@@ -69,6 +72,15 @@ export const SignInView = ({
           </div>
         )}
         <EmailSignInForm callbackPath={callbackPath} />
+        <Text variant="hint">
+          {t.rich('signUpPrompt', {
+            link: (chunks) => (
+              <Link href={adminRoutes.signUp()} className={signUpLink()}>
+                {chunks}
+              </Link>
+            ),
+          })}
+        </Text>
       </div>
     </PreShellFrame>
   );

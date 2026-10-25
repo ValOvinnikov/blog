@@ -30,6 +30,7 @@
     "@upstash/redis": "^1.39.0",
     "@vercel/blob": "^2.8.2",
     "@vercel/functions": "^3.10.1",
+    "botid": "^1.5.11",
     "dompurify": "^3.4.17",
     "image-size": "^2.0.4",
     "jsdom": "^29.1.1",
