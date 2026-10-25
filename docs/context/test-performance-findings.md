@@ -192,6 +192,15 @@ Whole-suite runs print **206** act warnings in 12 platform files and 5 in 3
 web files, plus 13 Suspense-related lines. A single-file `vitest run` hides
 console output from passing tests, so count with `--silent=false`.
 
+**`apps/platform` is fixed**: a whole-suite run with `--silent=false` used to
+print 219 "not wrapped in act" warnings and 16 Suspense act messages, and now
+prints none. The rules that keep them out: select the primitive a component
+shows, never a fresh object (`useEditorSelector` compares with `Object.is`);
+a page that suspends on `use()` renders inside an awaited `act`, which
+`customRenderAsync` does; focus moves through user-event, never
+`element.focus()`/`.blur()`; a test that leaves a promise pending waits for it
+to settle.
+
 **`apps/web` is fixed**: the async render helpers, the server-tree walk, the
 fake IntersectionObserver and `env.test.ts` changed as the table describes.
 

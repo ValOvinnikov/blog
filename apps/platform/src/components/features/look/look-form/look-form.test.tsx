@@ -319,7 +319,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(savedNote).not.toBeInTheDocument();
 
       const accentHueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
-      accentHueSlider.focus();
+      await user.click(accentHueSlider);
       await user.keyboard(ARROW_RIGHT_KEY);
 
       const dirtySaveButton = screen.getByRole('button', {
@@ -398,7 +398,7 @@ describe(`<${LookForm.name}/>`, () => {
         const accentHueSlider = screen.getByRole('slider', {
           name: ACCENT_HUE,
         });
-        accentHueSlider.focus();
+        await user.click(accentHueSlider);
         await user.keyboard(ARROW_RIGHT_KEY);
       });
 
@@ -559,7 +559,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup();
 
     const accentHueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
-    accentHueSlider.focus();
+    await user.click(accentHueSlider);
     await user.keyboard(ARROW_RIGHT_KEY);
     const saveChangesButton = screen.getByRole('button', {
       name: SAVE_CHANGES,
@@ -571,6 +571,7 @@ describe(`<${LookForm.name}/>`, () => {
     expect(saveButton).toBeDisabled();
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
+    await screen.findByText(ALL_CHANGES_SAVED);
   });
 
   it('shows an error alert when the save fails', async () => {
@@ -580,7 +581,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup();
 
     const accentHueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
-    accentHueSlider.focus();
+    await user.click(accentHueSlider);
     await user.keyboard(ARROW_RIGHT_KEY);
     const saveChangesButton = screen.getByRole('button', {
       name: SAVE_CHANGES,
@@ -602,7 +603,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup();
 
     const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-    slider.focus();
+    await user.click(slider);
     await user.keyboard(ARROW_RIGHT_KEY);
 
     expect(slider).toHaveAccessibleDescription(REJECTED_ACCENT_HUE_DESCRIPTION);
@@ -629,9 +630,9 @@ describe(`<${LookForm.name}/>`, () => {
       isAccentHueAccessibleMock.mockImplementation((hue) => hue !== 251);
       setup();
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-      slider.focus();
+      await user.click(slider);
       await user.keyboard(ARROW_RIGHT_KEY);
-      slider.blur();
+      await user.tab();
     });
 
     it('focuses the accent hue slider from the save bar', async () => {
@@ -903,7 +904,7 @@ describe(`<${LookForm.name}/>`, () => {
         const accentHueSlider = screen.getByRole('slider', {
           name: ACCENT_HUE,
         });
-        accentHueSlider.focus();
+        await user.click(accentHueSlider);
         await user.keyboard(ARROW_RIGHT_KEY);
         resolveUpload({
           outcome: ACTION_OUTCOME.SUCCESS,
@@ -973,7 +974,7 @@ describe(`<${LookForm.name}/>`, () => {
         const accentHueSlider = screen.getByRole('slider', {
           name: ACCENT_HUE,
         });
-        accentHueSlider.focus();
+        await user.click(accentHueSlider);
         await user.keyboard(ARROW_RIGHT_KEY);
         await pickLogo(user);
         const saveChangesButton = screen.getByRole('button', {

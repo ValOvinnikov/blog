@@ -669,6 +669,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
       await user.clear(nameInput);
       await user.type(nameInput, ACME_RENAMED_UNSAVED);
+      await user.tab();
 
       rerender(panel({ fieldLocks: DOMAIN_LOCKED }));
 
@@ -893,11 +894,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   });
 
   describe('focus management on a locking transition', () => {
-    it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
+    it('moves focus to the fields container when a field newly locks while focus was inside the panel', async () => {
       const { rerender } = renderPanel();
 
       const nameInput = screen.getByRole('textbox', { name: NAME_LABEL });
-      nameInput.focus();
+      await user.click(nameInput);
       expect(nameInput).toHaveFocus();
 
       rerender(panel({ fieldLocks: ALL_LOCKED_RUNNING }));
