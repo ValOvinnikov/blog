@@ -20,11 +20,11 @@ epics: [5047, 2799]
 
 ## What it does
 
-A signed-in reader saves a post for later with a toggle in the post header and finds every saved post on `/bookmarks`, newest first. A bookmark is private: there is no public count and nobody else sees it. Saving and removing give a toast with Undo; a failed save offers Retry.
+A reader saves a post for later with a toggle in the post header and finds every saved post on `/bookmarks`, newest first. A bookmark is private: there is no public count and nobody else sees it. Saving and removing give a toast with Undo; a failed save offers Retry.
 
 ## Surfaces and routes
 
-- **Post page** — `BookmarkButtonGate` in the article header renders `BookmarkButton` when the `BOOKMARKS` capability is on. The button renders nothing for a signed-out reader, and for a signed-in one appears only once the session and the post's saved state have loaded, already in its final state.
+- **Post page** — `BookmarkButtonGate` in the article header renders `BookmarkButton` when the `BOOKMARKS` capability is on. The button is server-rendered with the post for every reader, as Save, inside a cell sized to the longer of its two labels so nothing moves when it settles. For a signed-in reader it switches to Saved once the post's saved state loads, and presses before then are ignored. A signed-out reader's press opens the header's sign-in panel through `HeaderOverlayProvider`, and either sign-in method returns them to the same post.
 - `/[locale]/bookmarks` — `force-dynamic`. 404 when the site has no reader account; a signed-out visitor is redirected home. Lists title, date and link per post, with an empty state when there are none.
 - **Header avatar menu** — "My bookmarks" links here (see [reader-auth](./reader-auth.md)).
 - No platform or Studio surface.

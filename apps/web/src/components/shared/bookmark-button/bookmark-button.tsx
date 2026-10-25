@@ -1,7 +1,12 @@
 'use client';
 
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, type IWithClassName } from '@blog/config';
 import { BookmarkToggle } from '@blog/ui/components/atoms/bookmark-toggle';
+import { BOOKMARK_LOG } from '@web/constants/bookmark';
+import {
+  ACCOUNT_OVERLAY_ID,
+  useHeaderOverlay,
+} from '@web/context/header-overlay-provider';
 import { useToast } from '@web/context/toast-provider';
 import {
   getBookmarkStatus,
@@ -15,22 +20,22 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { bookmarkButtonVariants } from './bookmark-button-variants';
 
-export type TBookmarkButtonProps = {
+export type TBookmarkButtonProps = IWithClassName & {
   postId: string;
-  className?: string;
 };
 
 export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   const t = useTranslations('bookmarkButton');
   const toast = useToast();
-  const sessionResult = useSession();
+  const overlay = useHeaderOverlay();
+  const { status } = useSession();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isResolved, setIsResolved] = useState(false);
   const [isPending, startTransition] = useTransition();
   const s = bookmarkButtonVariants();
 
   useEffect(() => {
-    if (sessionResult.status !== 'authenticated') return;
+    if (status !== 'authenticated') return;
 
     let cancelled = false;
 
@@ -41,11 +46,11 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
         setIsResolved(true);
       })
       .catch((fetchError: unknown) => {
-        logger.error('bookmark_button.status_fetch_failed', {
+        logger.error(BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED, {
           postId,
           error: fetchError,
         });
-        reportClientError('bookmark_button.status_fetch_failed', fetchError);
+        reportClientError(BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED, fetchError);
         if (cancelled) return;
         setIsBookmarked(false);
         setIsResolved(true);
@@ -54,9 +59,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
     return () => {
       cancelled = true;
     };
-  }, [sessionResult.status, postId]);
-
-  if (sessionResult.status !== 'authenticated' || !isResolved) return null;
+  }, [status, postId]);
 
   const performUndo = (committedValue: boolean) => {
     const reverted = !committedValue;
@@ -117,17 +120,38 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   };
 
   const handleToggle = () => {
+    if (status === 'unauthenticated') {
+      overlay?.setActiveId(ACCOUNT_OVERLAY_ID);
+      return;
+    }
+    if (!isResolved) return;
+
     performToggle(!isBookmarked);
   };
 
+  const saveLabel = t('save');
+  const savedLabel = t('saved');
+  // The toggle is monospaced, so the longer label is the wider one.
+  const widestLabel =
+    savedLabel.length > saveLabel.length ? savedLabel : saveLabel;
+
   return (
     <span className={s.root({ class: className })}>
+      <span inert={true} aria-hidden="true" className={s.sizer()}>
+        <BookmarkToggle
+          isBookmarked={false}
+          onToggle={() => {}}
+          label={widestLabel}
+          ariaLabel={widestLabel}
+        />
+      </span>
       <BookmarkToggle
         isBookmarked={isBookmarked}
         onToggle={handleToggle}
-        label={isBookmarked ? t('saved') : t('save')}
+        label={isBookmarked ? savedLabel : saveLabel}
         ariaLabel={isBookmarked ? t('removeAriaLabel') : t('saveAriaLabel')}
         isDisabled={isPending}
+        className={s.toggle()}
       />
     </span>
   );

@@ -1,5 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { BOOKMARK_LOG } from '@web/constants/bookmark';
+import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { act, customRender, screen, waitFor } from '@web/testing/custom-render';
 import { logger } from '@web/utils/logger/logger';
 
@@ -13,6 +15,7 @@ const {
   toastInfoMock,
   toastErrorMock,
   reportClientErrorMock,
+  setActiveOverlayMock,
 } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),
   getBookmarkStatusMock: vi.fn(),
@@ -21,9 +24,18 @@ const {
   toastInfoMock: vi.fn(),
   toastErrorMock: vi.fn(),
   reportClientErrorMock: vi.fn(),
+  setActiveOverlayMock: vi.fn(),
 }));
 
 vi.mock('next-auth/react', () => ({ useSession: useSessionMock }));
+
+vi.mock('@web/context/header-overlay-provider', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useHeaderOverlay: () => ({
+    activeId: null,
+    setActiveId: setActiveOverlayMock,
+  }),
+}));
 
 vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
@@ -50,7 +62,6 @@ const setup = customRender(BookmarkButton, { postId: 'post-1' });
 const REMOVE_BOOKMARK = 'Remove bookmark';
 const SAVE_POST = 'Save post';
 const ARIA_PRESSED = 'aria-pressed';
-const STATUS_FETCH_FAILED_EVENT = 'bookmark_button.status_fetch_failed';
 const SAVED_MESSAGE = 'Saved to bookmarks';
 const SAVE_FAILED_MESSAGE = "Couldn't save that. Try again.";
 const UNAVAILABLE_MESSAGE =
@@ -68,22 +79,54 @@ describe(`<${BookmarkButton.name}/>`, () => {
     toastInfoMock.mockReset();
     toastErrorMock.mockReset();
     reportClientErrorMock.mockReset();
+    setActiveOverlayMock.mockReset();
   });
 
-  it('renders nothing when the session is unauthenticated', () => {
-    useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
+  describe('when signed out', () => {
+    beforeEach(() => {
+      useSessionMock.mockReturnValue({
+        data: null,
+        status: 'unauthenticated',
+      });
+      setup();
+    });
 
-    setup();
+    it('renders an enabled, not-bookmarked toggle', () => {
+      expect(screen.getByRole('button', { name: SAVE_POST })).toBeEnabled();
+      expect(screen.getByRole('button', { name: SAVE_POST })).toHaveAttribute(
+        ARIA_PRESSED,
+        'false',
+      );
+    });
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    it('opens the sign-in panel instead of saving when pressed', async () => {
+      await user.click(screen.getByRole('button', { name: SAVE_POST }));
+
+      expect(setActiveOverlayMock).toHaveBeenCalledWith(ACCOUNT_OVERLAY_ID);
+      expect(setBookmarkStatusMock).not.toHaveBeenCalled();
+      expect(getBookmarkStatusMock).not.toHaveBeenCalled();
+    });
   });
 
-  it('renders nothing while the session is resolving', () => {
-    useSessionMock.mockReturnValue({ data: null, status: 'loading' });
+  describe('while the session is resolving', () => {
+    beforeEach(() => {
+      useSessionMock.mockReturnValue({ data: null, status: 'loading' });
+      setup();
+    });
 
-    setup();
+    it('renders a not-bookmarked toggle', () => {
+      expect(screen.getByRole('button', { name: SAVE_POST })).toHaveAttribute(
+        ARIA_PRESSED,
+        'false',
+      );
+    });
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    it('neither saves nor opens the sign-in panel when pressed', async () => {
+      await user.click(screen.getByRole('button', { name: SAVE_POST }));
+
+      expect(setBookmarkStatusMock).not.toHaveBeenCalled();
+      expect(setActiveOverlayMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('when authenticated', () => {
@@ -94,12 +137,17 @@ describe(`<${BookmarkButton.name}/>`, () => {
       });
     });
 
-    it('renders nothing until the initial bookmark status resolves', () => {
+    it('renders a not-bookmarked toggle that does not save until the initial bookmark status resolves', async () => {
       getBookmarkStatusMock.mockReturnValue(new Promise(() => {}));
 
       setup();
+      await user.click(screen.getByRole('button', { name: SAVE_POST }));
 
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: SAVE_POST })).toHaveAttribute(
+        ARIA_PRESSED,
+        'false',
+      );
+      expect(setBookmarkStatusMock).not.toHaveBeenCalled();
     });
 
     it('reflects the resolved bookmark status once it loads, then becomes interactive', async () => {
@@ -134,11 +182,11 @@ describe(`<${BookmarkButton.name}/>`, () => {
         'false',
       );
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        STATUS_FETCH_FAILED_EVENT,
+        BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED,
         expect.anything(),
       );
       expect(reportClientErrorMock).toHaveBeenCalledWith(
-        STATUS_FETCH_FAILED_EVENT,
+        BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED,
         fetchError,
       );
     });

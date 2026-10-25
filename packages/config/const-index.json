@@ -4986,6 +4986,14 @@
         "file": "apps/platform/src/constants/worker.ts"
       }
     ],
+    "bookmark_button.status_fetch_failed": [
+      {
+        "ref": "BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/bookmark",
+        "file": "apps/web/src/constants/bookmark.ts"
+      }
+    ],
     "client_log.report_received": [
       {
         "ref": "CLIENT_LOG_LOG.REPORT_RECEIVED",

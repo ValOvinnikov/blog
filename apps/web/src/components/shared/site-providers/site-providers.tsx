@@ -3,6 +3,7 @@ import { getSanityImageBaseUrl } from '@blog/service';
 import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
+import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
@@ -47,7 +48,7 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
           <ToastProvider>
             <VoiceRichProvider values={rich}>
               <ConsentPreferencesProvider>
-                {children}
+                <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
                 <ConsentBannerSlot isEnabled={isConsentBannerEnabled} />
                 <ConsentPreferencesDialog />
               </ConsentPreferencesProvider>
