@@ -1,6 +1,6 @@
 import type { TOutcome } from '@blog/config';
+import type { TSubscriberStatus } from '@blog/db/constants';
 import { findUserSubscriber } from '@blog/db/queries/subscribers/user-subscriber';
-import type { TSubscriberStatus } from '@blog/db/schema/subscribers';
 import { toOutcome } from '@blog/utils/to-outcome';
 
 export type TSubscriptionStatusResult = TOutcome<

@@ -1,4 +1,5 @@
 import { queries } from '@blog/db';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -80,7 +81,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
   it('shows the active subscription with an unsubscribe button', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
-      outcome: 'active',
+      outcome: SUBSCRIBER_STATUS.ACTIVE,
       subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
@@ -103,7 +104,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
   it('offers to resend the confirmation for a pending subscription', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
-      outcome: 'pending',
+      outcome: SUBSCRIBER_STATUS.PENDING,
       subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 

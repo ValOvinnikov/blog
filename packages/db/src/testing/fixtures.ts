@@ -20,6 +20,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { personalDataIndex } from '@blog/utils/encryption';
 import { faker } from '@faker-js/faker';
+import { sql } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema>;
@@ -111,6 +112,15 @@ export async function insertTestSubscriber(
   }
 
   return subscriber;
+}
+
+export async function storeLegacySubscriberStatus(
+  db: TTestDb,
+  subscriberId: string,
+): Promise<void> {
+  await db.execute(
+    sql`update ${schema.subscribers} set ${sql.identifier('status')} = lower(${schema.subscribers.status}) where ${schema.subscribers.id} = ${subscriberId}`,
+  );
 }
 
 export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {

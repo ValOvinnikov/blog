@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config/types';
-import type { TMembershipRole } from '@blog/db/constants';
-import type { TSubscriberStatus } from '@blog/db/schema/subscribers';
+import type { TMembershipRole, TSubscriberStatus } from '@blog/db/constants';
 
 type TPersonalDataSite = {
   tenantId: string;

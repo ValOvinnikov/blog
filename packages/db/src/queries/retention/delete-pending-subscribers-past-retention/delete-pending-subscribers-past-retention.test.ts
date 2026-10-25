@@ -1,4 +1,7 @@
-import { PENDING_SUBSCRIBER_RETENTION_DAYS } from '@blog/db/constants';
+import {
+  PENDING_SUBSCRIBER_RETENTION_DAYS,
+  SUBSCRIBER_STATUS,
+} from '@blog/db/constants';
 import { daysBefore } from '@blog/db/queries/retention/retention-cutoff';
 import * as schema from '@blog/db/schema';
 import {
@@ -92,7 +95,7 @@ describe(deletePendingSubscribersPastRetention, () => {
 
   it('never deletes an active subscriber', async () => {
     const activeId = await insertSubscriber({
-      status: 'active',
+      status: SUBSCRIBER_STATUS.ACTIVE,
       subscribedAt: justPast(CUTOFF),
       confirmationSentAt: justPast(CUTOFF),
     });

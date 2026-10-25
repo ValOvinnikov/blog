@@ -1,3 +1,4 @@
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
@@ -114,7 +115,7 @@ describe(claimConfirmationSend, () => {
 
   it('never claims an active subscriber', async () => {
     const { id } = await insertSubscriber({
-      status: 'active',
+      status: SUBSCRIBER_STATUS.ACTIVE,
       confirmedAt: new Date(),
     });
 

@@ -1,4 +1,5 @@
 import { SUBSCRIBER_OUTCOME } from '@blog/config';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestReader,
@@ -62,7 +63,7 @@ describe(resendConfirmation, () => {
 
   it('returns not-pending for an already-active subscriber', async () => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL, {
-      status: 'active',
+      status: SUBSCRIBER_STATUS.ACTIVE,
     });
 
     expect(await resendConfirmation(tenantId, userId)).toEqual(NOT_PENDING);

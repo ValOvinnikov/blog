@@ -1,4 +1,5 @@
 import { queries } from '@blog/db';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -39,7 +40,11 @@ export const NewsletterSection = async () => {
       pendingDescription={t('pendingDescription')}
       control={
         <NewsletterSubscriptionControl
-          action={status.outcome === 'active' ? 'unsubscribe' : 'resend'}
+          action={
+            status.outcome === SUBSCRIBER_STATUS.ACTIVE
+              ? 'unsubscribe'
+              : 'resend'
+          }
         />
       }
     />

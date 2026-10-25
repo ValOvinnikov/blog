@@ -1,3 +1,4 @@
+import { SUBSCRIBER_STATUS, type TSubscriberStatus } from '@blog/db/constants';
 import { sha256Hex } from '@blog/utils/hash';
 import {
   index,
@@ -15,9 +16,6 @@ function mintUnusableTokenHash(): string {
   return sha256Hex(crypto.randomUUID());
 }
 
-export const SUBSCRIBER_STATUS = ['pending', 'active'] as const;
-export type TSubscriberStatus = (typeof SUBSCRIBER_STATUS)[number];
-
 export const subscribers = pgTable(
   'subscribers',
   {
@@ -30,9 +28,14 @@ export const subscribers = pgTable(
     email: text('email').notNull(),
     emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
     emailIndex: text(EMAIL_INDEX_COLUMN),
-    status: text('status', { enum: SUBSCRIBER_STATUS })
+    status: text('status', {
+      enum: Object.values(SUBSCRIBER_STATUS) as [
+        TSubscriberStatus,
+        ...TSubscriberStatus[],
+      ],
+    })
       .notNull()
-      .default('pending'),
+      .default(SUBSCRIBER_STATUS.PENDING),
     // Globally unique rather than per tenant: the confirm link carries only the token.
     // The default hashes a token nobody holds; real ones are minted per email sent.
     confirmationTokenHash: text('confirmation_token_hash')

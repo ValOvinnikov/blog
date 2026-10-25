@@ -5,6 +5,7 @@ import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { tenants } from '@blog/db/schema/tenants';
 import { readPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { toSubscriberStatus } from '@blog/db/utils/subscriber-status/subscriber-status';
 import { asc, eq } from 'drizzle-orm';
 
 const siteColumns = { tenantId: tenants.id, tenantName: tenants.name };
@@ -64,9 +65,10 @@ export async function findSitePersonalData(
 
   return {
     subscribers: subscriberRows.map(
-      ({ email, emailEncrypted, confirmedAt, ...subscriber }) => ({
+      ({ email, emailEncrypted, status, confirmedAt, ...subscriber }) => ({
         ...subscriber,
         email: readPersonalValue(emailEncrypted, email),
+        status: toSubscriberStatus(status),
         confirmedAt: confirmedAt ?? undefined,
       }),
     ),

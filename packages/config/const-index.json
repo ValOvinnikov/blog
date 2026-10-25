@@ -2720,6 +2720,12 @@
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       },
       {
+        "ref": "SUBSCRIBER_STATUS.PENDING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/subscriber.ts"
+      },
+      {
         "ref": "TENANT_PROVISIONING_STATUS.PENDING",
         "scope": "db",
         "from": "@blog/db/constants",
@@ -2970,6 +2976,26 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/personal-data.ts"
+      }
+    ],
+    "ACTIVE": [
+      {
+        "ref": "SUBSCRIBER_STATUS.ACTIVE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/subscriber.ts"
+      },
+      {
+        "ref": "TENANT_STATUS.ACTIVE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
       }
     ],
     "REMOVE_DOMAIN": [
@@ -3376,20 +3402,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "ACTIVE": [
-      {
-        "ref": "TENANT_STATUS.ACTIVE",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/tenant.ts"
-      },
-      {
-        "ref": "STEP_INDICATOR_STATE.ACTIVE",
-        "scope": "app:platform",
-        "from": "@platform/constants/step-indicator",
-        "file": "apps/platform/src/constants/step-indicator.ts"
       }
     ],
     "SUSPENDED": [

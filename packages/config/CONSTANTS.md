@@ -237,6 +237,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PERSONAL_DATA_OWNER**: `USER`, `LEAD`, `SUBSCRIBER`, `INVITE`
 - **PERSONAL_DATA_FALLBACK_REASON**: `NOT_BACKFILLED`, `ENCRYPTION_KEY_UNSET`, `INDEX_KEY_UNSET`
 
+### `@blog/db/constants` — `packages/db/src/constants/subscriber.ts`
+
+- **SUBSCRIBER_STATUS**: `PENDING`, `ACTIVE`
+
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 
 - **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `ARCHIVE_SANITY_PROJECT`, `REVOKE_SANITY_TOKENS`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`

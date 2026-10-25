@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
@@ -43,7 +44,7 @@ describe(`<${AccountPage.name}/>`, () => {
       emailLink: true,
     });
     vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValue({
-      outcome: 'active',
+      outcome: SUBSCRIBER_STATUS.ACTIVE,
       subscriber: { email: MOCK_ACCOUNT_USER.email },
     } as Awaited<ReturnType<typeof queries.subscribers.getSubscriptionStatus>>);
   });
