@@ -6,11 +6,9 @@ import { MOCK_TENANT_VALUES } from '@blog/db/testing/tenants/fixtures';
 
 import { listActiveTenants } from './list-active-tenants';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertTenant(
   overrides: Parameters<typeof insertTestTenant>[1] = {},

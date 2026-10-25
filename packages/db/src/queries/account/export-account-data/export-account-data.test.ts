@@ -19,9 +19,7 @@ import { faker } from '@faker-js/faker';
 
 import { exportAccountData } from './export-account-data';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 const MOCK_UNKNOWN_USER_ID = faker.string.uuid();
 const MOCK_OLDER_POST_ID = 'post-older';
@@ -29,7 +27,7 @@ const MOCK_NEWER_POST_ID = 'post-newer';
 const MOCK_OTHER_POST_ID = 'post-other';
 const MOCK_AVATAR_URL = 'https://example.com/avatar.png';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 const fallbackListener = usePersonalDataFallbackListener();
 let tenantId: string;

@@ -4,10 +4,9 @@ import { sql } from 'drizzle-orm';
 
 import { listAppliedMigrationTimestamps } from './list-applied-migration-timestamps';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 beforeAll(async () => {
   await db().execute(sql`create schema if not exists drizzle`);

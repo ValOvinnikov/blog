@@ -5,11 +5,11 @@ import { eq } from 'drizzle-orm';
 
 import { releaseConfirmationSend } from './release-confirmation-send';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -41,10 +41,9 @@ describe(releaseConfirmationSend, () => {
   }
 
   it('clears the send time it claimed', async () => {
-    const claimedAt = new Date('2026-10-15T10:00:00.000Z');
-    const { id } = await insertSubscriberSentAt(claimedAt);
+    const { id } = await insertSubscriberSentAt(MOCK_CLAIMED_AT);
 
-    await releaseConfirmationSend(id, claimedAt);
+    await releaseConfirmationSend(id, MOCK_CLAIMED_AT);
 
     await expect(readSentAt(id)).resolves.toBeNull();
   });
@@ -53,7 +52,7 @@ describe(releaseConfirmationSend, () => {
     const newerClaim = new Date('2026-10-15T10:20:00.000Z');
     const { id } = await insertSubscriberSentAt(newerClaim);
 
-    await releaseConfirmationSend(id, new Date('2026-10-15T10:00:00.000Z'));
+    await releaseConfirmationSend(id, MOCK_CLAIMED_AT);
 
     await expect(readSentAt(id)).resolves.toEqual(newerClaim);
   });

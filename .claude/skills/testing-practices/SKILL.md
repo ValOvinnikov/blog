@@ -456,10 +456,11 @@ tenant)`) is fine: that call is the contract with the outside.
   as a `vi.fn()` with a sensible default.
   - **A `vi.mock` factory byte-identical in three or more files becomes a
     `__mocks__/` file** in the change that would write the third copy; until
-    then an inline factory is fine. Two are already far past three copies,
-    so the next test that needs one extracts it instead of writing another:
-    db's `@blog/db/client` (`src/__mocks__/client.ts`), and service's
-    `@blog/service/sanity/query/query` — a partial mock, because every loader
+    then an inline factory is fine. db's `@blog/db/client` already has one
+    (`src/__mocks__/client.ts`, which `useQueryTestDb()` points at the
+    file's PGlite instance). Service's `@blog/service/sanity/query/query` is
+    far past three copies, so the next test that needs it extracts it
+    instead of writing another — a partial mock, because every loader
     needs the real `q` builder, so its `__mocks__/query.ts` spreads
     `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
     (`@blog/service/testing/mock-run-query`) stays the typed handle.

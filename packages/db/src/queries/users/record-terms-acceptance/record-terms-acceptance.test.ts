@@ -5,11 +5,9 @@ import { eq } from 'drizzle-orm';
 
 import { recordTermsAcceptance } from './record-terms-acceptance';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const USER_ID = 'terms-user';
 const ACCEPTED_AT = new Date('2026-10-20T09:00:00Z');

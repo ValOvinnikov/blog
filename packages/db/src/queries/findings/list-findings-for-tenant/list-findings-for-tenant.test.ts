@@ -13,11 +13,9 @@ import { resolveFinding } from '../resolve-finding';
 
 import { listFindingsForTenant } from './list-findings-for-tenant';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.findings);

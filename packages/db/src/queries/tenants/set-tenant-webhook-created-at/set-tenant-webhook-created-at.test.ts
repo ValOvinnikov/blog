@@ -7,11 +7,11 @@ import { eq } from 'drizzle-orm';
 
 import { setTenantWebhookCreatedAt } from './set-tenant-webhook-created-at';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_WEBHOOK_CREATED_AT_ISO = '2026-08-15T12:00:00.000Z';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertDraftTenant(): Promise<string> {
   const [tenant] = await db()
@@ -44,7 +44,7 @@ describe(setTenantWebhookCreatedAt, () => {
   });
 
   it('sets the webhook-created-at timestamp', async () => {
-    const webhookCreatedAt = new Date('2026-08-15T12:00:00.000Z');
+    const webhookCreatedAt = new Date(MOCK_WEBHOOK_CREATED_AT_ISO);
 
     await setTenantWebhookCreatedAt(tenantId, webhookCreatedAt);
 
@@ -59,7 +59,7 @@ describe(setTenantWebhookCreatedAt, () => {
   it('leaves every other column untouched', async () => {
     await setTenantWebhookCreatedAt(
       tenantId,
-      new Date('2026-08-15T12:00:00.000Z'),
+      new Date(MOCK_WEBHOOK_CREATED_AT_ISO),
     );
 
     const [row] = await db()

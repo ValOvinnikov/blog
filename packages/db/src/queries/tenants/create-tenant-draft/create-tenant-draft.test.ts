@@ -25,11 +25,9 @@ import {
   type TCreateTenantDraftInput,
 } from './create-tenant-draft';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const SECOND_OWNER_EMAIL = 'owner-2@example.com';

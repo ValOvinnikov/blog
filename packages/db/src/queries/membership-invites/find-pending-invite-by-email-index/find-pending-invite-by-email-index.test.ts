@@ -9,11 +9,9 @@ import { faker } from '@faker-js/faker';
 
 import { findPendingInviteByEmailIndex } from './find-pending-invite-by-email-index';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const MOCK_TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);

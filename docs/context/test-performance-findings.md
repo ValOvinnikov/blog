@@ -97,25 +97,30 @@ post-`initdb` PGlite, and the replay tests restore that instead of calling
 whole suite gains only 10–17%: those files finish within the first ~95s, and
 the rest of the run is import and collection of the other 193 files.
 
-**`--no-isolate` fails** with `getDb()` returning `undefined`. Each query test
-mocks `@blog/db/client` with its own `vi.hoisted` `getDbMock`. With isolation
-off, a query module imported by an earlier file in the same worker keeps that
-file's (now reset) mock. 66 query modules are reached by two or more test
-files. To unblock it:
+**`--no-isolate` failed** with `getDb()` returning `undefined`. Each query
+test mocked `@blog/db/client` with its own `vi.hoisted` `getDbMock`, so with
+isolation off a query module imported by an earlier file in the same worker
+kept that file's (now reset) mock.
 
-- one shared client mock whose `getDb` reads a holder that `useQueryTestDb`
-  sets — the `src/__mocks__/client.ts` that `testing-practices` already asks
-  for;
-- close each PGlite instance after its file (no file does today, so a reused
-  worker would accumulate 128 MiB reservations);
-- `unstubEnvs: true` (11 files stub env without unstubbing).
+**Adopted:** every db test now takes the shared `src/__mocks__/client.ts`
+through a bare `vi.mock('@blog/db/client')`, and `useQueryTestDb()` points its
+`getDb` at the file's PGlite instance and closes that instance after the file.
+`vitest.config.ts` sets `unstubEnvs: true`.
 
-**Adopted:** `packages/db/vitest.config.ts` runs on `pool: 'threads'`, and
-global setup dumps PGlite twice — straight after `initdb` and once every
-migration is applied. The migration tests restore the empty one through
-`createEmptyTestDb()`, so no test runs `initdb` itself. Re-measured with
-`vitest run src/schema` (15 files / 46 tests, all passing): `forks` with
-`new PGlite()` 64s, threads with the empty snapshot 32s.
+**`isolate: false` stays rejected.** Measured back to back on one 4-core
+machine, both on `pool: 'threads'`:
+
+| run                    | default isolation | `--no-isolate`                       |
+| ---------------------- | ----------------- | ------------------------------------ |
+| full suite (214 files) | 136s, all pass    | 109–119s, **1–3 files fail per run** |
+| `src` only (179 files) | 119s, all pass    | 108s, all pass                       |
+
+The remaining failures are all in `scripts/deprovision-tenant` and
+`scripts/invalidate-tenant-cache`, and change with file order. Those tests
+mock shared modules (`@blog/db/queries/audit-events`, the `steps/*` modules,
+`request-tenant-cache-invalidation`) with per-file factories, or mock a module
+that a sibling file uses for real, so whichever file loads the module first
+wins. Fixing them means restructuring those mocks, for a 10–20% gain.
 
 ### Rejected
 

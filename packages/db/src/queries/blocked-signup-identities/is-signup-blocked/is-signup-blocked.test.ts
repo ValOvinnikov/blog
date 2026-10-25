@@ -17,11 +17,9 @@ import { isSignupBlocked } from './is-signup-blocked';
 const BLOCKED = { ok: true, data: true };
 const NOT_BLOCKED = { ok: true, data: false };
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   vi.unstubAllEnvs();

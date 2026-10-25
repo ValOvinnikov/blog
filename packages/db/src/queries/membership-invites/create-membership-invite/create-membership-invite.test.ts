@@ -11,13 +11,11 @@ import { eq } from 'drizzle-orm';
 
 import { createMembershipInvite } from './create-membership-invite';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 const ALREADY_PENDING = 'already-pending';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 afterEach(async () => {

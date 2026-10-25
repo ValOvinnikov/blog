@@ -16,13 +16,11 @@ import { eq } from 'drizzle-orm';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 const MOCK_CONFIRMED_AT = new Date('2026-10-23T09:00:00Z');
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 async function readSubscriber(id: string): Promise<schema.TSubscriber> {

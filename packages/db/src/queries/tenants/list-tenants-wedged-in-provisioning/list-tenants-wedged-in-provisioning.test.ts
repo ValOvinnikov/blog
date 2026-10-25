@@ -1,15 +1,16 @@
-import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listTenantsWedgedInProvisioning } from './list-tenants-wedged-in-provisioning';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -20,13 +21,16 @@ describe(listTenantsWedgedInProvisioning, () => {
     const tenant = await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
-        SANITY_PROJECT: { status: 'DONE' },
-        SEED_CONTENT: { status: 'FAILED', error: 'boom' },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'boom',
+        },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
 
@@ -39,13 +43,13 @@ describe(listTenantsWedgedInProvisioning, () => {
     await insertTestTenant(db(), {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
-        SANITY_PROJECT: { status: 'DONE' },
-        SEED_CONTENT: { status: 'RUNNING' },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       },
     });
 
@@ -74,13 +78,16 @@ describe(listTenantsWedgedInProvisioning, () => {
       await insertTestTenant(db(), {
         provisioningStatus: status,
         provisioningSteps: {
-          SANITY_PROJECT: { status: 'FAILED', error: 'boom' },
-          SEED_CONTENT: { status: 'IDLE' },
-          PERSIST_TOKEN: { status: 'IDLE' },
-          MAP_DOMAIN: { status: 'IDLE' },
-          CREATE_WEBHOOK: { status: 'IDLE' },
-          VERIFY_CONTENT: { status: 'IDLE' },
-          OWNER_ELEVATION: { status: 'IDLE' },
+          SANITY_PROJECT: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'boom',
+          },
+          SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+          PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+          MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+          CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+          VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+          OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         },
       });
 

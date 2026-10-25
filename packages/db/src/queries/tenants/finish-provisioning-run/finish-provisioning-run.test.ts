@@ -21,11 +21,9 @@ import { startProvisioningRun } from '../start-provisioning-run';
 
 import { finishProvisioningRun } from './finish-provisioning-run';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const FAILED_STEP = {
   status: TENANT_PROVISIONING_STEP_STATUS.FAILED,

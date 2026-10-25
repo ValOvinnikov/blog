@@ -14,11 +14,9 @@ import { faker } from '@faker-js/faker';
 
 import { unsubscribeByToken } from './unsubscribe-by-token';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const MOCK_UNSUBSCRIBE_TOKEN = faker.string.uuid();

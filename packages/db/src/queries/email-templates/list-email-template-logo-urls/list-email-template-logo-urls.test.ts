@@ -5,11 +5,11 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listEmailTemplateLogoUrls } from './list-email-template-logo-urls';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_MAGIC_LINK_LOGO_URL = 'https://cdn.example.com/magic-link.png';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.emailTemplateLogos);
@@ -40,13 +40,13 @@ describe(listEmailTemplateLogoUrls, () => {
     await db().insert(schema.emailTemplateLogos).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      logoAssetUrl: 'https://cdn.example.com/magic-link.png',
+      logoAssetUrl: MOCK_MAGIC_LINK_LOGO_URL,
     });
 
     const result = await listEmailTemplateLogoUrls(tenantId);
 
     expect(result[EMAIL_TEMPLATE_TYPE.MAGIC_LINK]).toBe(
-      'https://cdn.example.com/magic-link.png',
+      MOCK_MAGIC_LINK_LOGO_URL,
     );
     expect(result[EMAIL_TEMPLATE_TYPE.TENANT_INVITE]).toBeUndefined();
   });

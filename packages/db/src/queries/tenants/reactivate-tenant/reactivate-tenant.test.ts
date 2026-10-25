@@ -18,11 +18,9 @@ import { eq } from 'drizzle-orm';
 
 import { reactivateTenant } from './reactivate-tenant';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const EXPECTED_OK = 'expected ok:true';
 

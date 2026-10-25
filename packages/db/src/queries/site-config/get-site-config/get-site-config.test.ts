@@ -1,7 +1,10 @@
 import {
   CARD_STYLE,
+  DENSITY,
+  FONT_CHOICE,
   LOCALE_ISO_CODES,
   PRESET_ID,
+  RADIUS_SCALE,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -9,11 +12,11 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getSiteConfig } from './get-site-config';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_DE_NOT_FOUND_HEADING = 'Nicht gefunden';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.siteConfig);
@@ -38,10 +41,10 @@ describe(getSiteConfig, () => {
       tenantId,
       preset: PRESET_ID.CONSOLE,
       accentHue: 250,
-      headingFont: 'SPACE_GROTESK',
-      bodyFont: 'NEWSREADER',
-      radiusScale: 'MD',
-      density: 'DEFAULT',
+      headingFont: FONT_CHOICE.SPACE_GROTESK,
+      bodyFont: FONT_CHOICE.NEWSREADER,
+      radiusScale: RADIUS_SCALE.MD,
+      density: DENSITY.DEFAULT,
     });
 
     const result = await getSiteConfig(tenantId);
@@ -63,17 +66,17 @@ describe(getSiteConfig, () => {
       locale: LOCALE_ISO_CODES.DE,
     });
     const voiceOverridesByLocale = {
-      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: MOCK_DE_NOT_FOUND_HEADING },
       [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
     };
     await db().insert(schema.siteConfig).values({
       tenantId: germanTenantId,
       preset: PRESET_ID.CONSOLE,
       accentHue: 250,
-      headingFont: 'SPACE_GROTESK',
-      bodyFont: 'NEWSREADER',
-      radiusScale: 'MD',
-      density: 'DEFAULT',
+      headingFont: FONT_CHOICE.SPACE_GROTESK,
+      bodyFont: FONT_CHOICE.NEWSREADER,
+      radiusScale: RADIUS_SCALE.MD,
+      density: DENSITY.DEFAULT,
       voiceOverridesByLocale,
     });
 
@@ -81,7 +84,7 @@ describe(getSiteConfig, () => {
 
     expect(result).toMatchObject({
       voiceOverridesByLocale,
-      voiceOverrides: { notFoundHeading: 'Nicht gefunden' },
+      voiceOverrides: { notFoundHeading: MOCK_DE_NOT_FOUND_HEADING },
     });
   });
 });

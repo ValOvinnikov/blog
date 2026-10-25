@@ -8,11 +8,11 @@ import { eq } from 'drizzle-orm';
 
 import { setTenantProvisioningStatus } from './set-tenant-provisioning-status';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const EXPECTED_OK = 'expected ok:true';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertTenant(overrides?: {
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
@@ -45,7 +45,7 @@ describe(setTenantProvisioningStatus, () => {
         TENANT_PROVISIONING_STATUS.PENDING,
       );
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       expect(result.data.provisioningStatus).toBe(
         TENANT_PROVISIONING_STATUS.PENDING,
       );
@@ -54,7 +54,7 @@ describe(setTenantProvisioningStatus, () => {
     it('reverts a PROVISIONING tenant back to NULL when there was no prior status', async () => {
       const result = await setTenantProvisioningStatus(tenantId, null);
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       expect(result.data.provisioningStatus).toBeNull();
     });
 

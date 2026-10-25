@@ -19,11 +19,9 @@ import {
 
 import { updateProvisioningStep } from './update-provisioning-step';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const { SANITY_PROJECT, SEED_CONTENT, MAP_DOMAIN, OWNER_ELEVATION } =
   TENANT_PROVISIONING_STEP;

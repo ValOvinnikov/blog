@@ -21,11 +21,9 @@ import { faker } from '@faker-js/faker';
 
 import { getTenantOwnerMembership } from './get-tenant-owner-membership';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 const fallbackListener = usePersonalDataFallbackListener();
 

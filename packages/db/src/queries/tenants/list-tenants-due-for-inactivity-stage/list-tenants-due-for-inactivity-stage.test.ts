@@ -18,11 +18,9 @@ import {
 
 import { listTenantsDueForInactivityStage } from './list-tenants-due-for-inactivity-stage';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const DAY_23 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION_WARNING);
 const DAY_22 = daysAfterLastActivity(

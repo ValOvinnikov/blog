@@ -1,16 +1,20 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  insertTestUser,
+  MOCK_INVITE_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
 import { consumeMembershipInvite } from './consume-membership-invite';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_MISSING_USER_ID = 'missing-user';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertInvite(
   tenantId: string,
@@ -42,7 +46,7 @@ describe(consumeMembershipInvite, () => {
   it('inserts the real membership row and stamps consumedAt', async () => {
     const inviteId = await insertInvite(
       tenantId,
-      'owner@example.com',
+      MOCK_INVITE_EMAIL,
       MEMBERSHIP_ROLE.OWNER,
     );
 
@@ -62,7 +66,7 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('is idempotent for an already-consumed invite: no-op, returns undefined', async () => {
-    const inviteId = await insertInvite(tenantId, 'owner@example.com');
+    const inviteId = await insertInvite(tenantId, MOCK_INVITE_EMAIL);
     await consumeMembershipInvite(inviteId, 'user-1');
 
     const second = await consumeMembershipInvite(inviteId, 'user-1');
@@ -82,10 +86,10 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('rolls back the claim when the dependent membership insert fails, leaving the invite pending and retryable', async () => {
-    const inviteId = await insertInvite(tenantId, 'owner@example.com');
+    const inviteId = await insertInvite(tenantId, MOCK_INVITE_EMAIL);
 
     await expect(
-      consumeMembershipInvite(inviteId, 'missing-user'),
+      consumeMembershipInvite(inviteId, MOCK_MISSING_USER_ID),
     ).rejects.toThrow();
 
     const [invite] = await db()
@@ -94,9 +98,15 @@ describe(consumeMembershipInvite, () => {
       .where(eq(schema.membershipInvites.id, inviteId));
     expect(invite!.consumedAt).toBeNull();
 
-    await insertTestUser(db(), { id: 'missing-user' });
-    const membership = await consumeMembershipInvite(inviteId, 'missing-user');
-    expect(membership).toMatchObject({ userId: 'missing-user', tenantId });
+    await insertTestUser(db(), { id: MOCK_MISSING_USER_ID });
+    const membership = await consumeMembershipInvite(
+      inviteId,
+      MOCK_MISSING_USER_ID,
+    );
+    expect(membership).toMatchObject({
+      userId: MOCK_MISSING_USER_ID,
+      tenantId,
+    });
   });
 
   it('returns the existing membership without erroring when one already exists for the (userId, tenantId) pair', async () => {
@@ -106,7 +116,7 @@ describe(consumeMembershipInvite, () => {
       .returning();
     const inviteId = await insertInvite(
       tenantId,
-      'owner@example.com',
+      MOCK_INVITE_EMAIL,
       MEMBERSHIP_ROLE.OWNER,
     );
 

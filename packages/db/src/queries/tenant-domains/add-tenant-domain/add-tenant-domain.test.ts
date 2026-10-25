@@ -2,15 +2,16 @@ import { ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { addTenantDomain } from './add-tenant-domain';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_SHARED_DOMAIN = 'shared.example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenantDomains);
@@ -22,26 +23,26 @@ describe(addTenantDomain, () => {
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
+      primaryDomain: MOCK_TENANT_DOMAIN,
     }));
   });
 
   it('inserts a new domain row for the given tenant', async () => {
-    const result = await addTenantDomain(tenantId, 'acme.example.com');
+    const result = await addTenantDomain(tenantId, MOCK_TENANT_DOMAIN);
 
     expect(result).toEqual({
       ok: true,
       data: expect.objectContaining({
         tenantId,
-        domain: 'acme.example.com',
+        domain: MOCK_TENANT_DOMAIN,
       }),
     });
   });
 
   it('is idempotent when the same (tenantId, domain) pair is added again', async () => {
-    const first = await addTenantDomain(tenantId, 'acme.example.com');
+    const first = await addTenantDomain(tenantId, MOCK_TENANT_DOMAIN);
 
-    const second = await addTenantDomain(tenantId, 'acme.example.com');
+    const second = await addTenantDomain(tenantId, MOCK_TENANT_DOMAIN);
 
     expect(second).toEqual(first);
     const rows = await db().select().from(schema.tenantDomains);
@@ -52,9 +53,9 @@ describe(addTenantDomain, () => {
     const { id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: 'other.example.com',
     });
-    await addTenantDomain(tenantId, 'shared.example.com');
+    await addTenantDomain(tenantId, MOCK_SHARED_DOMAIN);
 
-    const result = await addTenantDomain(otherTenantId, 'shared.example.com');
+    const result = await addTenantDomain(otherTenantId, MOCK_SHARED_DOMAIN);
 
     expect(result).toEqual({
       ok: false,
@@ -63,13 +64,13 @@ describe(addTenantDomain, () => {
   });
 
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    await addTenantDomain(tenantId, 'shared.example.com');
+    await addTenantDomain(tenantId, MOCK_SHARED_DOMAIN);
 
     const selectSpy = vi.spyOn(db(), 'select').mockReturnValueOnce({
       from: () => ({ where: () => Promise.resolve([]) }),
     } as unknown as ReturnType<ReturnType<typeof db>['select']>);
 
-    const result = await addTenantDomain(tenantId, 'shared.example.com');
+    const result = await addTenantDomain(tenantId, MOCK_SHARED_DOMAIN);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     selectSpy.mockRestore();
@@ -98,9 +99,9 @@ describe(addTenantDomain, () => {
 describe('foreign-key cascade', () => {
   it('removes a tenant_domains row when its owning tenant is deleted', async () => {
     const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
+      primaryDomain: MOCK_TENANT_DOMAIN,
     });
-    await addTenantDomain(tenantId, 'acme.example.com');
+    await addTenantDomain(tenantId, MOCK_TENANT_DOMAIN);
 
     await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
 

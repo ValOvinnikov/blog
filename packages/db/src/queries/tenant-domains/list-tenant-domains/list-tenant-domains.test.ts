@@ -4,11 +4,13 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listTenantDomains } from './list-tenant-domains';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_ACME_DOMAIN = 'acme.example.com';
+const MOCK_OTHER_DOMAIN = 'other.example.com';
+const MOCK_WWW_ACME_DOMAIN = 'www.acme.example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenantDomains);
@@ -20,27 +22,27 @@ describe(listTenantDomains, () => {
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
+      primaryDomain: MOCK_ACME_DOMAIN,
     }));
   });
 
   it('returns every domain for the given tenant', async () => {
     const { id: otherTenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'other.example.com',
+      primaryDomain: MOCK_OTHER_DOMAIN,
     });
     await db()
       .insert(schema.tenantDomains)
       .values([
-        { tenantId, domain: 'acme.example.com' },
-        { tenantId, domain: 'www.acme.example.com' },
-        { tenantId: otherTenantId, domain: 'other.example.com' },
+        { tenantId, domain: MOCK_ACME_DOMAIN },
+        { tenantId, domain: MOCK_WWW_ACME_DOMAIN },
+        { tenantId: otherTenantId, domain: MOCK_OTHER_DOMAIN },
       ]);
 
     const result = await listTenantDomains(tenantId);
 
     expect(result.map((row) => row.domain).sort()).toEqual([
-      'acme.example.com',
-      'www.acme.example.com',
+      MOCK_ACME_DOMAIN,
+      MOCK_WWW_ACME_DOMAIN,
     ]);
   });
 

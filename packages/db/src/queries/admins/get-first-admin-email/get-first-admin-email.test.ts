@@ -1,3 +1,4 @@
+import type { TValueOf } from '@blog/config/utils';
 import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
@@ -5,16 +6,20 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getFirstAdminEmail } from './get-first-admin-email';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_FIRST_USER_ID = 'user-1';
+const MOCK_SECOND_USER_ID = 'user-2';
+const MOCK_JANUARY = new Date('2026-01-01T00:00:00Z');
+const MOCK_FEBRUARY = new Date('2026-02-01T00:00:00Z');
+const MOCK_MODERATOR_EMAIL = 'moderator@example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 async function insertAdmin(
   userId: string,
   createdAt: Date,
-  role: (typeof ADMIN_ROLE)[keyof typeof ADMIN_ROLE] = ADMIN_ROLE.SUPERADMIN,
+  role: TValueOf<typeof ADMIN_ROLE> = ADMIN_ROLE.SUPERADMIN,
 ): Promise<void> {
   await db().insert(schema.admins).values({
     userId,
@@ -31,25 +36,39 @@ afterEach(async () => {
 
 describe(getFirstAdminEmail, () => {
   it('returns the email of the earliest-created admin row', async () => {
-    await insertTestUser(db(), { id: 'user-1', email: 'first@example.com' });
-    await insertTestUser(db(), { id: 'user-2', email: 'second@example.com' });
-    await insertAdmin('user-1', new Date('2026-01-01T00:00:00Z'));
-    await insertAdmin('user-2', new Date('2026-02-01T00:00:00Z'));
+    const firstEmail = 'first@example.com';
+    await insertTestUser(db(), {
+      id: MOCK_FIRST_USER_ID,
+      email: firstEmail,
+    });
+    await insertTestUser(db(), {
+      id: MOCK_SECOND_USER_ID,
+      email: 'second@example.com',
+    });
+    await insertAdmin(MOCK_FIRST_USER_ID, MOCK_JANUARY);
+    await insertAdmin(MOCK_SECOND_USER_ID, MOCK_FEBRUARY);
 
     const result = await getFirstAdminEmail();
 
-    expect(result).toBe('first@example.com');
+    expect(result).toBe(firstEmail);
   });
 
   it('ignores insertion order and only orders by createdAt', async () => {
-    await insertTestUser(db(), { id: 'user-1', email: 'later@example.com' });
-    await insertTestUser(db(), { id: 'user-2', email: 'earlier@example.com' });
-    await insertAdmin('user-1', new Date('2026-03-01T00:00:00Z'));
-    await insertAdmin('user-2', new Date('2026-01-15T00:00:00Z'));
+    const earlierEmail = 'earlier@example.com';
+    await insertTestUser(db(), {
+      id: MOCK_FIRST_USER_ID,
+      email: 'later@example.com',
+    });
+    await insertTestUser(db(), {
+      id: MOCK_SECOND_USER_ID,
+      email: earlierEmail,
+    });
+    await insertAdmin(MOCK_FIRST_USER_ID, new Date('2026-03-01T00:00:00Z'));
+    await insertAdmin(MOCK_SECOND_USER_ID, new Date('2026-01-15T00:00:00Z'));
 
     const result = await getFirstAdminEmail();
 
-    expect(result).toBe('earlier@example.com');
+    expect(result).toBe(earlierEmail);
   });
 
   it('returns undefined when there are no admins rows at all', async () => {
@@ -59,8 +78,8 @@ describe(getFirstAdminEmail, () => {
   });
 
   it('returns undefined when the earliest admin has no email on file', async () => {
-    await insertTestUser(db(), { id: 'user-1', email: null });
-    await insertAdmin('user-1', new Date('2026-01-01T00:00:00Z'));
+    await insertTestUser(db(), { id: MOCK_FIRST_USER_ID, email: null });
+    await insertAdmin(MOCK_FIRST_USER_ID, MOCK_JANUARY);
 
     const result = await getFirstAdminEmail();
 
@@ -69,26 +88,22 @@ describe(getFirstAdminEmail, () => {
 
   it('is not filtered by role — the earliest row wins regardless of its role value', async () => {
     await insertTestUser(db(), {
-      id: 'user-1',
-      email: 'moderator@example.com',
+      id: MOCK_FIRST_USER_ID,
+      email: MOCK_MODERATOR_EMAIL,
     });
     await insertTestUser(db(), {
-      id: 'user-2',
+      id: MOCK_SECOND_USER_ID,
       email: 'superadmin@example.com',
     });
+    await insertAdmin(MOCK_FIRST_USER_ID, MOCK_JANUARY, ADMIN_ROLE.MODERATOR);
     await insertAdmin(
-      'user-1',
-      new Date('2026-01-01T00:00:00Z'),
-      ADMIN_ROLE.MODERATOR,
-    );
-    await insertAdmin(
-      'user-2',
-      new Date('2026-02-01T00:00:00Z'),
+      MOCK_SECOND_USER_ID,
+      MOCK_FEBRUARY,
       ADMIN_ROLE.SUPERADMIN,
     );
 
     const result = await getFirstAdminEmail();
 
-    expect(result).toBe('moderator@example.com');
+    expect(result).toBe(MOCK_MODERATOR_EMAIL);
   });
 });

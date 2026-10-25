@@ -19,11 +19,9 @@ import { faker } from '@faker-js/faker';
 
 import { deletePendingSubscribersPastRetention } from './delete-pending-subscribers-past-retention';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const CUTOFF = daysBefore(
   MOCK_RETENTION_NOW,

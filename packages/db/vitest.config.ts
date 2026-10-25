@@ -15,6 +15,7 @@ export default mergeConfig(
       environment: 'node',
       pool: 'threads',
       mockReset: true,
+      unstubEnvs: true,
       include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
       globalSetup: ['./src/testing/global-setup.ts'],
       env: {

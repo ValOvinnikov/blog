@@ -4,11 +4,12 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { countSubscribersForTenant } from './count-subscribers-for-tenant';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_FIRST_EMAIL = 'one@example.com';
+const MOCK_SECOND_EMAIL = 'two@example.com';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -26,8 +27,8 @@ describe(countSubscribersForTenant, () => {
     await db()
       .insert(schema.subscribers)
       .values([
-        { tenantId, email: 'one@example.com' },
-        { tenantId, email: 'two@example.com' },
+        { tenantId, email: MOCK_FIRST_EMAIL },
+        { tenantId, email: MOCK_SECOND_EMAIL },
       ]);
 
     await expect(countSubscribersForTenant(tenantId)).resolves.toBe(2);
@@ -37,7 +38,7 @@ describe(countSubscribersForTenant, () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
-      .values({ tenantId: otherTenantId, email: 'one@example.com' });
+      .values({ tenantId: otherTenantId, email: MOCK_FIRST_EMAIL });
 
     await expect(countSubscribersForTenant(tenantId)).resolves.toBe(0);
   });

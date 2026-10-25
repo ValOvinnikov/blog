@@ -21,11 +21,9 @@ import {
 
 import { getTenantSanityCredentials } from './get-tenant-sanity-credentials';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 useTenantTokenEncryptionKey();
 
 const { sanityProjectId, sanityDataset } = MOCK_TENANT_VALUES;

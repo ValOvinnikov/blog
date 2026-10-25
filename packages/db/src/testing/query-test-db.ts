@@ -1,10 +1,10 @@
-import type { Mock } from 'vitest';
+import { getDb } from '@blog/db/client';
 
 import { createTestDb } from './create-test-db';
 import type { TTestDb } from './fixtures';
 
-// Wires a query test file's isolated PGlite instance to its mocked getDb().
-export function useQueryTestDb(getDbMock: Mock): () => TTestDb {
+// Points the shared `@blog/db/client` mock at a private PGlite instance for the current test file.
+export function useQueryTestDb(): () => TTestDb {
   let db: TTestDb;
 
   beforeAll(async () => {
@@ -12,7 +12,11 @@ export function useQueryTestDb(getDbMock: Mock): () => TTestDb {
   }, 30_000);
 
   beforeEach(() => {
-    getDbMock.mockReturnValue(db);
+    vi.mocked(getDb).mockReturnValue(db);
+  });
+
+  afterAll(async () => {
+    await db.$client.close();
   });
 
   return () => db;

@@ -1,15 +1,18 @@
-import { PRESET_ID } from '@blog/config/constants';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getSettingsFeaturesAndPreset } from './get-settings-features-and-preset';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.settingsFeatures);
@@ -39,10 +42,10 @@ describe(getSettingsFeaturesAndPreset, () => {
       tenantId,
       preset: PRESET_ID.EDITORIAL,
       accentHue: 28,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
+      headingFont: FONT_CHOICE.FRAUNCES,
+      bodyFont: FONT_CHOICE.INTER,
+      radiusScale: RADIUS_SCALE.SM,
+      density: DENSITY.COMPACT,
     });
 
     const result = await getSettingsFeaturesAndPreset(tenantId);

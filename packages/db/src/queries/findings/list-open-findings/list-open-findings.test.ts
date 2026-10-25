@@ -13,11 +13,9 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { listOpenFindings } from './list-open-findings';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 const MOCK_PLATFORM_FINDING_IDENTIFIER = 'platform-wide';
 const MOCK_TENANT_NAME = 'Acme';

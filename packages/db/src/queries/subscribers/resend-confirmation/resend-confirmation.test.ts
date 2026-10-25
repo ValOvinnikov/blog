@@ -14,11 +14,9 @@ import { faker } from '@faker-js/faker';
 
 import { resendConfirmation } from './resend-confirmation';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
-
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const NOT_PENDING = toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING);

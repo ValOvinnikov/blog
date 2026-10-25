@@ -3,6 +3,7 @@ import {
   TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES,
   TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES,
   TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
@@ -17,11 +18,11 @@ import { setTenantProvisioningStatus } from '../set-tenant-provisioning-status';
 
 import { beginTenantProvisioning } from './begin-tenant-provisioning';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const EXPECTED_OK = 'expected ok:true';
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 
 function minutesAgo(minutes: number): string {
   return new Date(Date.now() - minutes * 60_000).toISOString();
@@ -56,7 +57,7 @@ describe(beginTenantProvisioning, () => {
     it('moves a tenant with no provisioningStatus (NULL) to PROVISIONING', async () => {
       const result = await beginTenantProvisioning(tenantId);
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       expect(result.data.tenant.provisioningStatus).toBe(
         TENANT_PROVISIONING_STATUS.PROVISIONING,
       );
@@ -97,7 +98,7 @@ describe(beginTenantProvisioning, () => {
 
     const result = await beginTenantProvisioning(tenantId);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.tenant.provisioningStatus).toBe(
       TENANT_PROVISIONING_STATUS.PROVISIONING,
     );
@@ -113,7 +114,7 @@ describe(beginTenantProvisioning, () => {
 
     const result = await beginTenantProvisioning(tenantId);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.tenant.provisioningStatus).toBe(
       TENANT_PROVISIONING_STATUS.PROVISIONING,
     );
@@ -148,17 +149,17 @@ describe(beginTenantProvisioning, () => {
       TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 6,
     );
     const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
+      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
       SEED_CONTENT: {
-        status: 'FAILED',
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
         error: 'boom from an earlier attempt',
         updatedAt: staleUpdatedAt,
       },
-      PERSIST_TOKEN: { status: 'RUNNING' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       run: { startedAt: WEDGED_STARTED_AT },
     };
     const tenant = await insertTestTenant(db(), {
@@ -184,13 +185,13 @@ describe(beginTenantProvisioning, () => {
 
   it('admits a PROVISIONING tenant whose run recorded finishedAt, past the debounce', async () => {
     const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: { status: 'DONE' },
-      PERSIST_TOKEN: { status: 'DONE' },
-      MAP_DOMAIN: { status: 'DONE' },
-      CREATE_WEBHOOK: { status: 'DONE' },
-      VERIFY_CONTENT: { status: 'DONE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       run: {
         startedAt: WEDGED_STARTED_AT,
         finishedAt: minutesAgo(TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES),
@@ -203,7 +204,7 @@ describe(beginTenantProvisioning, () => {
 
     const result = await beginTenantProvisioning(tenant.id);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.tenant.provisioningStatus).toBe(
       TENANT_PROVISIONING_STATUS.PROVISIONING,
     );
@@ -214,13 +215,13 @@ describe(beginTenantProvisioning, () => {
       TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES + 1,
     );
     const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: { status: 'RUNNING' },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       run: { startedAt: staleStartedAt },
     };
     const tenant = await insertTestTenant(db(), {
@@ -230,7 +231,7 @@ describe(beginTenantProvisioning, () => {
 
     const result = await beginTenantProvisioning(tenant.id);
 
-    if (!result.ok) throw new Error('expected ok:true');
+    if (!result.ok) throw new Error(EXPECTED_OK);
     expect(result.data.tenant.provisioningStatus).toBe(
       TENANT_PROVISIONING_STATUS.PROVISIONING,
     );
@@ -238,13 +239,13 @@ describe(beginTenantProvisioning, () => {
 
   it('refuses a genuinely live PROVISIONING run (recent startedAt, no FAILED step, no finishedAt)', async () => {
     const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: { status: 'RUNNING' },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
+      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
       run: { startedAt: new Date().toISOString() },
     };
     const tenant = await insertTestTenant(db(), {
@@ -273,17 +274,17 @@ describe(beginTenantProvisioning, () => {
 
     beforeEach(async () => {
       const provisioningSteps: TTenantProvisioningState = {
-        SANITY_PROJECT: { status: 'DONE' },
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
         SEED_CONTENT: {
-          status: 'FAILED',
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
           error: 'boom',
           updatedAt: WEDGED_STARTED_AT,
         },
-        PERSIST_TOKEN: { status: 'IDLE' },
-        MAP_DOMAIN: { status: 'IDLE' },
-        CREATE_WEBHOOK: { status: 'IDLE' },
-        VERIFY_CONTENT: { status: 'IDLE' },
-        OWNER_ELEVATION: { status: 'IDLE' },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
         run: { startedAt: WEDGED_STARTED_AT },
       };
       tenant = await insertTestTenant(db(), {
@@ -295,7 +296,7 @@ describe(beginTenantProvisioning, () => {
     it('admits a PROVISIONING tenant wedged with a FAILED step whose updatedAt matches run.startedAt, preserving the step error text', async () => {
       const result = await beginTenantProvisioning(tenant.id);
 
-      if (!result.ok) throw new Error('expected ok:true');
+      if (!result.ok) throw new Error(EXPECTED_OK);
       expect(result.data.tenant.provisioningStatus).toBe(
         TENANT_PROVISIONING_STATUS.PROVISIONING,
       );
@@ -303,7 +304,7 @@ describe(beginTenantProvisioning, () => {
         TENANT_PROVISIONING_STATUS.PROVISIONING,
       );
       expect(result.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
-        status: 'FAILED',
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
         error: 'boom',
         updatedAt: WEDGED_STARTED_AT,
       });
@@ -314,7 +315,7 @@ describe(beginTenantProvisioning, () => {
 
     it('refuses immediately after a reverted dispatch failure, then admits again once the debounce has elapsed, preserving the FAILED step', async () => {
       const firstAttempt = await beginTenantProvisioning(tenant.id);
-      if (!firstAttempt.ok) throw new Error('expected ok:true');
+      if (!firstAttempt.ok) throw new Error(EXPECTED_OK);
 
       const reverted = await setTenantProvisioningStatus(
         tenant.id,
@@ -344,12 +345,12 @@ describe(beginTenantProvisioning, () => {
 
       const delayedRetry = await beginTenantProvisioning(tenant.id);
 
-      if (!delayedRetry.ok) throw new Error('expected ok:true');
+      if (!delayedRetry.ok) throw new Error(EXPECTED_OK);
       expect(delayedRetry.data.tenant.provisioningStatus).toBe(
         TENANT_PROVISIONING_STATUS.PROVISIONING,
       );
       expect(delayedRetry.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
-        status: 'FAILED',
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
         error: 'boom',
         updatedAt: WEDGED_STARTED_AT,
       });

@@ -19,11 +19,12 @@ import type { TSubscriber } from '@blog/db/schema/subscribers';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { personalDataIndex } from '@blog/utils/encryption';
+import type { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-export type TTestDb = PgliteDatabase<typeof schema>;
+export type TTestDb = PgliteDatabase<typeof schema> & { $client: PGlite };
 
 export const MOCK_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
 export const MOCK_SUBSCRIBER_TAGGED_EMAIL = MOCK_SUBSCRIBER_EMAIL.replace(

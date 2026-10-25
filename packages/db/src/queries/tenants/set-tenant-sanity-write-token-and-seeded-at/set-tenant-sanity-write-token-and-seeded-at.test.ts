@@ -13,13 +13,11 @@ import { eq } from 'drizzle-orm';
 
 import { setTenantSanityWriteTokenAndSeededAt } from './set-tenant-sanity-write-token-and-seeded-at';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
-
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+vi.mock('@blog/db/client');
 
 const SEEDED_AT = new Date('2026-08-15T12:00:00.000Z');
 
-const db = useQueryTestDb(getDbMock);
+const db = useQueryTestDb();
 useTenantTokenEncryptionKey();
 
 afterEach(async () => {

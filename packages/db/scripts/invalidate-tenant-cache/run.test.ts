@@ -1,16 +1,16 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { archiveTenant } from '@blog/db/queries/tenants';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import * as schema from '@blog/db/schema';
-import { createTestDb } from '@blog/db/testing/create-test-db';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { runInvalidateTenantCache } from './run';
 
-const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
+vi.mock('@blog/db/client');
 
-vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
+const MOCK_CREATE_TENANT_FAILED = 'setup: createTenant failed.';
+const MOCK_ARCHIVE_TENANT_FAILED = 'setup: archiveTenant failed.';
 
 const fetchMock = vi.fn();
 
@@ -20,21 +20,18 @@ const env = {
   dryRun: false,
 };
 
-let db: PgliteDatabase<typeof schema>;
-
-beforeAll(async () => {
-  db = await createTestDb();
-}, 30_000);
+const db = useQueryTestDb();
 
 beforeEach(() => {
-  getDbMock.mockReturnValue(db);
   vi.stubGlobal('fetch', fetchMock);
-  fetchMock.mockReset().mockResolvedValue(new Response(null, { status: 200 }));
+  fetchMock
+    .mockReset()
+    .mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
 });
 
 afterEach(async () => {
   vi.unstubAllGlobals();
-  await db.delete(schema.tenants);
+  await db().delete(schema.tenants);
 });
 
 describe(runInvalidateTenantCache, () => {
@@ -48,10 +45,10 @@ describe(runInvalidateTenantCache, () => {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
-    if (!created.ok) throw new Error('setup: createTenant failed.');
+    if (!created.ok) throw new Error(MOCK_CREATE_TENANT_FAILED);
 
     const archived = await archiveTenant(created.data.id);
-    if (!archived.ok) throw new Error('setup: archiveTenant failed.');
+    if (!archived.ok) throw new Error(MOCK_ARCHIVE_TENANT_FAILED);
     expect(archived.data.deprovisionedAt).not.toBeNull();
 
     const result = await runInvalidateTenantCache(created.data.id, env);
@@ -78,7 +75,7 @@ describe(runInvalidateTenantCache, () => {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
-    if (!created.ok) throw new Error('setup: createTenant failed.');
+    if (!created.ok) throw new Error(MOCK_CREATE_TENANT_FAILED);
 
     const result = await runInvalidateTenantCache(created.data.id, env);
 
@@ -96,11 +93,13 @@ describe(runInvalidateTenantCache, () => {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
-    if (!created.ok) throw new Error('setup: createTenant failed.');
+    if (!created.ok) throw new Error(MOCK_CREATE_TENANT_FAILED);
     const archived = await archiveTenant(created.data.id);
-    if (!archived.ok) throw new Error('setup: archiveTenant failed.');
+    if (!archived.ok) throw new Error(MOCK_ARCHIVE_TENANT_FAILED);
 
-    fetchMock.mockResolvedValue(new Response('boom', { status: 500 }));
+    fetchMock.mockResolvedValue(
+      new Response('boom', { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
+    );
 
     const result = await runInvalidateTenantCache(created.data.id, env);
 
