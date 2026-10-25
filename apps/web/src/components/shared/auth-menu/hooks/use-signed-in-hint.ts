@@ -1,6 +1,7 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import { SESSION_STATUS } from '@web/constants/session';
 import {
   encodeClearedSignedInHint,
   encodeSignedInHint,
@@ -13,10 +14,10 @@ export const useSignedInHint = (
   sessionExpires: TMaybeUndefined<string>,
 ) => {
   useEffect(() => {
-    if (status === 'authenticated' && sessionExpires) {
+    if (status === SESSION_STATUS.AUTHENTICATED && sessionExpires) {
       document.cookie = encodeSignedInHint(sessionExpires);
     }
-    if (status === 'unauthenticated') {
+    if (status === SESSION_STATUS.UNAUTHENTICATED) {
       document.cookie = encodeClearedSignedInHint();
     }
   }, [status, sessionExpires]);

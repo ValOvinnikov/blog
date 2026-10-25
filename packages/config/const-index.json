@@ -4986,6 +4986,14 @@
         "file": "apps/platform/src/constants/worker.ts"
       }
     ],
+    "bookmark_button.status_fetch_failed": [
+      {
+        "ref": "BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/bookmark",
+        "file": "apps/web/src/constants/bookmark.ts"
+      }
+    ],
     "client_log.report_received": [
       {
         "ref": "CLIENT_LOG_LOG.REPORT_RECEIVED",
@@ -5256,6 +5264,30 @@
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "authenticated": [
+      {
+        "ref": "SESSION_STATUS.AUTHENTICATED",
+        "scope": "app:web",
+        "from": "@web/constants/session",
+        "file": "apps/web/src/constants/session.ts"
+      }
+    ],
+    "unauthenticated": [
+      {
+        "ref": "SESSION_STATUS.UNAUTHENTICATED",
+        "scope": "app:web",
+        "from": "@web/constants/session",
+        "file": "apps/web/src/constants/session.ts"
+      }
+    ],
+    "loading": [
+      {
+        "ref": "SESSION_STATUS.LOADING",
+        "scope": "app:web",
+        "from": "@web/constants/session",
+        "file": "apps/web/src/constants/session.ts"
       }
     ],
     "UNAUTHORIZED": [

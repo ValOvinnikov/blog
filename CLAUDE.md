@@ -643,6 +643,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   `apps/web/src/constants/revalidate.ts`). A file that logs imports its
   domain's `<DOMAIN>_LOG`, never a bare event string or a scalar `*_EVENT`
   const; a touched file still logging that way converts in the same change.
+  The second casing exception is **a library's own vocabulary**: values a
+  third-party API defines and we only compare against keep that library's
+  spelling under UPPERCASE keys (`SESSION_STATUS = { AUTHENTICATED:
+'authenticated' }` in `apps/web/src/constants/session.ts`, whose values
+  Auth.js's `useSession` defines).
   Two further exceptions move only the home, both decided by who reads the
   const — and a const a package reads never lives in an app:
 
