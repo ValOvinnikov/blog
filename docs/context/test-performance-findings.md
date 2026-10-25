@@ -1,281 +1,296 @@
 # Test suite performance findings
 
-Investigation of slow `pnpm test`. Reference run (clean machine, user-supplied):
-`apps/web` 151 files / 976 tests, **325s**; `turbo run test` total **5m28s**.
+What makes `pnpm test` slow, what was measured, and what was rejected. Latest
+investigation: 2026-10-25, Vitest 5.0.5, 8-core / 16 GB Mac. Timings below
+were taken one suite at a time unless a row says otherwise. The same command
+varied by up to ±30% between rounds on this machine, so compare variants only
+within one round. A variant counts as adopted only if every test still passes.
+The adopted changes are tracked in epic #5892; "Follow-ups not filed" at the
+end lists what has no ticket.
 
-## Where the time goes
+## Per-suite picture
 
-The reference run's own breakdown, summed across parallel workers:
+| suite           | files | local `pnpm test` (turbo, concurrent) | alone, default | dominant phases                   |
+| --------------- | ----- | ------------------------------------- | -------------- | --------------------------------- |
+| `apps/platform` | 352   | 472s                                  | 243–359s       | environment, tests, import, setup |
+| `apps/web`      | 330   | 262s                                  | 224–313s       | environment, import, setup        |
+| `packages/db`   | 207   | 366s                                  | 350s           | tests (PGlite), import            |
+| `apps/worker`   | 37    | 36s                                   | —              | import (88%)                      |
+| `packages/auth` | 17    | 12s                                   | —              | import, transform                 |
 
-| phase           | time        |
-| --------------- | ----------- |
-| **environment** | **505.71s** |
-| import          | 156.71s     |
-| tests           | 145.97s     |
-| setup           | 59.64s      |
-| transform       | 32.84s      |
+`packages/db` is as slow alone as under turbo, so it is not slowed by
+contention. It used only ~2.85 of 8 cores (`823s user / 351s wall`).
 
-`environment` is jsdom construction, and it is larger than every other phase
-combined. It is not the assertions that are slow.
+## `packages/db`
 
-## Root cause
+### No test touches Neon
 
-`apps/web`, `apps/platform` and `packages/ui` set `environment: 'jsdom'` for
-**every** test file. With `isolate: true` (the default) each test file gets a
-fresh module registry, so each one re-imports the jsdom module.
+Every db test runs against **PGlite**, Postgres compiled to WASM and running
+in-process. `src/testing/global-setup.ts` builds one migrated instance per
+vitest run and snapshots it. `createTestDb()` restores a private copy per test
+file. No test file in any workspace calls `neon(` or imports
+`@neondatabase/serverless` against a real database. The `DATABASE_URL` values
+in `packages/auth/vitest.config.ts` and `db/src/client.test.ts` are syntactic
+placeholders. So the usual advice — local Postgres instead of remote Neon,
+Neon branches in CI, the Neon pooler for parallel tests — is either already
+true or does not apply.
 
-Measured on this repo: importing the `jsdom` module costs **~1-10s**, while
-constructing the DOM afterwards costs only **~155-240ms**. The repeated module
-import is the cost, not the DOM itself.
+PGlite is the right engine here:
 
-Most of those files never touch a DOM:
+- **pg-mem** cannot run the real migration SQL: `DO $$` blocks, a plpgsql
+  function, 10 `CREATE TYPE` enums, and the partial unique index in
+  `0058_add_self_serve_free_tenant_guard.sql` that `is-free-owner-violation.ts`
+  relies on.
+- **Docker Postgres** would be closer to Neon and could run the pgvector
+  migration that PGlite skips. It would also add a service on every dev
+  machine and CI runner, a network driver in tests, and coordination across
+  parallel worktrees. The PGlite costs below can be amortised without it.
 
-| workspace       | total test files | need no DOM                                     |
-| --------------- | ---------------- | ----------------------------------------------- |
-| `apps/web`      | 151              | **62**                                          |
-| `apps/platform` | 78               | ~35                                             |
-| `packages/ui`   | 63               | 3 (correctly jsdom — it is a component library) |
+### Where the time goes
 
-## Validated fix: run non-DOM tests on the node environment
+Measured from Vitest's per-file results (durations include hooks):
 
-Splitting `apps/web` into a node project (62 files) and a jsdom project
-(89 files) was verified to be **behaviour-preserving**:
+| test files                                          | files | share of file time |
+| --------------------------------------------------- | ----- | ------------------ |
+| migration replay (`src/schema/*-migration.test.ts`) | 14    | **47%** (626s)     |
+| query tests (`useQueryTestDb`, one PGlite per file) | 140   | 51% (681s)         |
+| `createTestDb()` direct, client test, pure units    | 53    | 2%                 |
 
-- node project: 62 files / 366 tests pass — `environment 31ms`
-- jsdom project: 89 files / 610 tests pass
-- 62 + 89 = 151 files, 366 + 610 = 976 tests — exactly matches the baseline
+- **Migration-replay tests** call `new PGlite()` for every `it()`. That runs a
+  full `initdb` (2.5s alone, ~7–8s under parallel load) and then replays every
+  migration (0.23s for all 58). There were 3 such files and 16 migrations in
+  August; there are now 14 files and 58 migrations.
+- **Query test files** pay a fixed ~4.5s each under load (fitted over 114
+  files: 4.49s per file + 0.078s per test). That is the PGlite boot plus the
+  snapshot restore. The test bodies and their `afterEach` DELETEs total about
+  51s.
+- **Import** is 38–46% of the Duration line. With the default `forks` pool and
+  `isolate: true`, every file gets a fresh process that re-imports drizzle,
+  PGlite (2.1 MB JS + 10.5 MB WASM), the schema barrel and faker.
 
-`environmentMatchGlobs` was **removed in Vitest 4**. The supported routes are a
-per-file `// @vitest-environment node` docblock, or `test.projects`.
+PGlite micro-benchmark (one process, quiet machine):
 
-Four files look node-safe by grep but genuinely need jsdom, because they use
-`DOMParser` (XML parsing) or simulate a browser via `window`:
+| operation                                       | time          |
+| ----------------------------------------------- | ------------- |
+| `new PGlite()` + `waitReady` (initdb)           | 2,454–2,659ms |
+| replay 58 migrations                            | 231ms         |
+| `PGlite.create({ loadDataDir })`, gzip snapshot | 648–869ms     |
+| same, uncompressed snapshot (41 MB vs 4.7 MB)   | 501ms         |
+| `clone()` of a migrated instance                | 630–717ms     |
+| `TRUNCATE` every public table `CASCADE`         | 36ms          |
+| `BEGIN` / `ROLLBACK`                            | 1ms           |
 
-- `src/app/rss.xml/route.test.ts`
-- `src/app/[locale]/tag/[slug]/rss.xml/route.test.ts`
-- `src/utils/build-rss-feed/build-rss-feed.test.ts`
-- `src/utils/env/env.test.ts`
+### Measured variants
 
-## Measured effect of the split — wall-clock win NOT demonstrated
+| variant                                   | wall            | result                       |
+| ----------------------------------------- | --------------- | ---------------------------- |
+| default (`forks`, isolated)               | 350s            | 207 / 1098 pass              |
+| `--pool=threads`                          | 231–288s        | all pass                     |
+| `--no-isolate`                            | 186s            | **24 files / 81 tests fail** |
+| replay fix, `src/schema` only, forks      | 98s → 57s       | all pass                     |
+| replay fix, `src/schema` only, threads    | 78–84s → 40–41s | all pass                     |
+| replay fix + `--pool=threads`, full suite | 214–238s        | all pass                     |
 
-Two full `apps/web` runs, back to back on the same machine:
+The **replay fix** prototype: global setup also snapshots an empty
+post-`initdb` PGlite, and the replay tests restore that instead of calling
+`new PGlite()`. No assertion changes. It halves the migration files, but the
+whole suite gains only 10–17%: those files finish within the first ~95s, and
+the rest of the run is import and collection of the other 193 files.
 
-| config                         | wall    | environment |
-| ------------------------------ | ------- | ----------- |
-| baseline (all 151 under jsdom) | 516.12s | 1911.48s    |
-| split (62 files on `node`)     | 543.49s | 1507.15s    |
+**`--no-isolate` fails** with `getDb()` returning `undefined`. Each query test
+mocks `@blog/db/client` with its own `vi.hoisted` `getDbMock`. With isolation
+off, a query module imported by an earlier file in the same worker keeps that
+file's (now reset) mock. 66 query modules are reached by two or more test
+files. To unblock it:
 
-Both runs: 151 files / 976 tests passing. The split removes ~21% of the
-environment work, but **wall-clock did not improve** — the two runs are within
-noise of each other.
+- one shared client mock whose `getDb` reads a holder that `useQueryTestDb`
+  sets — the `src/__mocks__/client.ts` that `testing-practices` already asks
+  for;
+- close each PGlite instance after its file (no file does today, so a reused
+  worker would accumulate 128 MiB reservations);
+- `unstubEnvs: true` (11 files stub env without unstubbing).
 
-The machine was saturated throughout (load 100-780 on 8 cores), so runtime was
-bound by CPU starvation, not by the jsdom work being removed. Removing real
-work from a queue that is already starved does not shorten it.
+**Adopted:** `packages/db/vitest.config.ts` runs on `pool: 'threads'`, and
+global setup dumps PGlite twice — straight after `initdb` and once every
+migration is applied. The migration tests restore the empty one through
+`createEmptyTestDb()`, so no test runs `initdb` itself. Re-measured with
+`vitest run src/schema` (15 files / 46 tests, all passing): `forks` with
+`new PGlite()` 64s, threads with the empty snapshot 32s.
 
-So the split is _correct and does less work_, but its wall-clock benefit is
-unproven. Re-run the two-config comparison on a quiet machine before treating
-it as a performance fix. That result would also indicate whether the
-oversubscription below is the dominant term.
+### Rejected
 
-## Config gotcha: `include` merges, `exclude` replaces
+- **`clone()` per file** — in PGlite 0.5.10 `clone()` is `dumpDataDir('none')`
+  plus `PGlite.create({ loadDataDir })`, the same restore path.
+- **Transaction-per-test rollback** — at most ~4% (all per-test time is ~51s),
+  25 files expect database errors that would abort the outer transaction, and
+  `now()` would freeze for ordering tests. Code under test never calls
+  `.transaction()`.
+- **Uncompressed snapshot** — about 1–3%.
 
-A project's `include` is **merged** with the inherited root `include` rather
-than replacing it, so an `include`-based split silently widens each project to
-the whole suite. The first attempt matched 143 + 151 = 294 files (81 `.tsx`
-render tests wrongly on `node`, 475 failures). Split via `exclude` instead, and
-verify the partition with `vitest list --project <name> --filesOnly`.
+### Open policy question
 
-The `.ts` files that do need a DOM opt back in with their own
-`/** @vitest-environment jsdom */` docblock, which overrides the project's
-environment per file.
+The backfill tests for migrations already applied in production could be
+retired. No rule requires keeping them, and global setup replays every
+migration on every run. Retiring them would also touch
+`docs/features/bookmarks.md` and `docs/features/tenant-access.md`.
 
-## Rejected: `--no-isolate`
+## `apps/web` and `apps/platform`
 
-Fast (roughly halves the jsdom set) but **incorrect here**: the full `apps/web`
-suite produced **207 failures**, DOM from one test file leaking into the next
-(`getByRole` matching leftover elements). Do not enable without per-file
-teardown discipline.
+### Measured variants
 
-## `packages/db` — adopted: threads and an empty snapshot
+| variant                                                                | platform                        | web                              |
+| ---------------------------------------------------------------------- | ------------------------------- | -------------------------------- |
+| default                                                                | 243–358s                        | 224–231s                         |
+| `--pool=threads`                                                       | 225–321s, all pass (−7 to −10%) | 169–200s, all pass (−11 to −27%) |
+| jsdom project only, default                                            | 257s                            | 196s                             |
+| jsdom project, `vmThreads`, `vmMemoryLimit=1024MB`                     | 97s, **3 files fail**           | 50s, **6 files fail**            |
+| same + web-streams polyfill setup file                                 | **198s → 70s**, all pass        | **185s → 51s**, all pass         |
+| full run: node project `threads`, jsdom project `vmThreads` + polyfill | **240s → 102s**, all pass       | **208s → 84s**, all pass         |
+| `NODE_COMPILE_CACHE` warm                                              | —                               | no measurable change             |
 
-`packages/db/vitest.config.ts` runs on `pool: 'threads'`. Global setup now
-dumps the PGlite instance twice — straight after `initdb` and again once every
-migration is applied — and the `src/schema/*-migration.test.ts` files restore
-the empty one through `createEmptyTestDb()` instead of calling `new PGlite()`,
-so no test runs `initdb` itself. No assertion changed.
+**`vmThreads`** imports jsdom once per worker and builds a fresh `window` per
+file, so `vi.mock` stays per file. Without help, 9 files fail at collection
+with `ReferenceError: ReadableStream is not defined` from undici's webidl
+module, because the vm context exposes no web-streams globals. A setup file
+that assigns `ReadableStream`, `WritableStream` and `TransformStream` from
+`node:stream/web` when they are missing fixes all 9. Watch memory: the
+default `vmMemoryLimit` is `1/maxWorkers` of RAM, so set it explicitly.
 
-Measured 2026-10-25 on one machine, `vitest run src/schema`, all 15 files / 46
-tests passing both ways: `forks` with `new PGlite()` 64s, threads with the
-empty snapshot 32s.
+**Adopted** in `createVitestConfig()` (`configs/vitest/preset.ts`): the `node`
+project on `threads`, the `jsdom` project on `vmThreads` with
+`vmMemoryLimit: '1024MB'` and the `vm-web-streams.ts` setup file. It also
+aliases bare `react-syntax-highlighter` to its ESM entry, because the vm
+CommonJS loader cannot `require()` the ESM-only `refractor` its CJS build
+loads. Re-measured on a 4-core machine: web 181s → 81s, platform 221s → 98s,
+every test passing.
 
-## Secondary: worker oversubscription
+### Not measured, with evidence
 
-Nothing in the repo sets `maxWorkers`, `poolOptions` or `fileParallelism`.
-Vitest defaults to roughly `cores - 1` workers per instance, so at turbo's
-default concurrency of 10, `turbo run test` could run ~10 vitest instances x ~7
-workers on an 8-core machine.
-
-**Adopted:** turbo concurrency is capped — `--concurrency=2` in CI's Test job,
-`--concurrency=50%` in the root `pnpm test` script (local runs and
-`deploy-development.yml`). Measured with `--force` on 8 cores: default 8m55s,
-`50%` 7m07s, and the contention timeouts stopped
-(`docs/context/ci-automation.md`).
-
-The shared preset already carries a symptom of this — `testTimeout: 20_000`,
-whose comment cites "parallel-turbo contention across packages".
-
-Still unmeasured: a `maxWorkers` cap in `configs/vitest/preset.ts`.
-
-## `apps/web` and `apps/platform` — adopted: per-project pools
-
-`createVitestConfig()` runs the `node` project on `pool: 'threads'` and the
-`jsdom` project on `pool: 'vmThreads'` with `vmMemoryLimit: '1024MB'`.
-`vmThreads` imports jsdom once per worker rather than once per file, which
-removes the environment phase that dominated the `forks` default. `maxWorkers`
-stays unset: Vitest throws when projects in one run disagree on it.
-
-Two things the `vm` context needs, both in `configs/vitest/`, so no test file
-changes:
-
-- `vm-web-streams.ts`, a `jsdom`-project setup file, assigns
-  `ReadableStream`, `WritableStream` and `TransformStream` from
-  `node:stream/web`; without it undici fails at collection with
-  `ReferenceError: ReadableStream is not defined`.
-- an alias sends bare `react-syntax-highlighter` to its ESM entry, because the
-  `vm` CommonJS loader cannot `require()` the ESM-only `refractor` its CJS
-  build loads.
-
-Measured 2026-10-25 on one 4-core machine, full `vitest run`, every test
-passing both ways:
-
-| app             | `forks` (before) | threads + vmThreads |
-| --------------- | ---------------- | ------------------- |
-| `apps/web`      | 181s             | 81s                 |
-| `apps/platform` | 221s             | 98s                 |
-
-### Adopted: faker's English build
-
-The shared preset aliases exactly `@faker-js/faker` to
-`@faker-js/faker/locale/en`, so every workspace extending it skips the
-all-locales root entry (86 files, 2.39 MB → 3 files, 0.42 MB). The root
-`faker` export is that same English instance and nothing imports another
-locale, so no test changed. Storybook does not use the preset and keeps the
-root entry.
-
-Measured 2026-10-25 with `--experimental.importDurations.print`, three runs
-each of `apps/worker`'s `rotate-revalidate-webhook-secrets.test.ts`: faker's
-import fell from 167-179ms (`dist/index.js`) to 24-35ms (`dist/locale/en.js`)
-per test process. The `jsdom`/`vmThreads` project in `apps/web` and
-`packages/ui`'s own config load the English build too (42ms and 23ms).
-
-## Caveat on absolute numbers
-
-Timings measured during this investigation ran at load averages of 587-646 on
-8 cores (parallel background jobs), inflating wall times up to ~3x. The
-_ratios_ and the pass/fail results above are reliable; the absolute wall-clock
-figures from that window are not, and the reference run at the top should be
-treated as the baseline.
+- **Setup files load more than node tests need.** Each app's
+  `src/vitest-setup.ts` runs for both projects and eagerly loads jest-dom
+  (~204 modules), next-intl's client build and the `@blog/config` barrel.
+  None of the 298 node-project files uses a jest-dom matcher.
+- **faker's root entry** loads every locale: 86 files / 2.39 MB, against 3
+  files / 0.42 MB for `@faker-js/faker/locale/en`. The root `faker` export is
+  the `en` instance, and all 184 imports in the repo use the root entry.
+  **Adopted:** the shared preset aliases exactly `@faker-js/faker` to the
+  English build, so no import changed (Storybook keeps the root entry).
+  Measured with `--experimental.importDurations.print`: faker's import fell
+  from 167–179ms to 24–35ms per test process.
+- **`react-syntax-highlighter`** is imported from its package index in
+  `code-block.tsx`, which loads highlight.js and refractor in full (587
+  modules) for 49 web jsdom test files and the production server.
+- **`isolate: false` stays rejected for both apps.** 54–63% of their files use
+  `vi.mock`, which shares the db problem above and has no setup-level fix.
+  Separately, `@testing-library/react` registers `afterEach(cleanup)` and
+  sets `IS_REACT_ACT_ENVIRONMENT` only when first imported, so with isolation
+  off later files in a worker get no cleanup and no act warnings.
+  `packages/ui` works with `isolate: false` because its setup calls `cleanup()`
+  itself and only 2 of its 72 files mock.
+- **happy-dom**: medium risk (DOMParser for RSS, custom-property
+  `getComputedStyle`, Base UI), and mostly superseded by `vmThreads`.
 
 ## `act()` warnings
 
-`apps/web` — fixed. A whole-suite run with `--silent=false` printed 5 "not
-wrapped in act" warnings and 13 false "unique key" warnings, all from test
-helpers rather than components:
+Whole-suite runs print **206** act warnings in 12 platform files and 5 in 3
+web files, plus 13 Suspense-related lines. A single-file `vitest run` hides
+console output from passing tests, so count with `--silent=false`.
 
-- `customRenderAsync` and `customRenderServerAsync` now render inside an
-  awaited `act`, so an effect that resolves after mount (`BookmarkButton`'s
-  status check) settles before the helper returns.
-- the server-tree walk in `customRenderServerAsync` copies React's
-  static-children marking onto each rebuilt element and keeps a keyed async
-  element's key, so only a genuinely unkeyed list warns.
-- `use-active-heading-id.test.tsx`'s fake `IntersectionObserver` delivers its
-  entries inside `act`.
-- `env.test.ts` silences the expected "Invalid environment variables" output
-  in every validation-failure case.
+**`apps/platform` is fixed**: a whole-suite run with `--silent=false` used to
+print 219 "not wrapped in act" warnings and 16 Suspense act messages, and now
+prints none. The rules that keep them out: select the primitive a component
+shows, never a fresh object (`useEditorSelector` compares with `Object.is`);
+a page that suspends on `use()` renders inside an awaited `act`, which
+`customRenderAsync` does; focus moves through user-event, never
+`element.focus()`/`.blur()`; a test that leaves a promise pending waits for it
+to settle.
 
-`apps/web/src/vitest-setup.ts` now fails any test during which React reports
-an act() warning, naming the message, so new ones cannot return unnoticed.
+**`apps/web` is fixed**: the async render helpers, the server-tree walk, the
+fake IntersectionObserver and `env.test.ts` changed as the table describes. `apps/web/src/vitest-setup.ts` now fails any test during which React
+reports an act() warning, naming the message, so new ones cannot return
+unnoticed.
 
-`apps/platform` — fixed. A whole-suite run with `--silent=false` used to
-print 219 "not wrapped in act" warnings and 16 Suspense act messages. It now
-prints none. The causes, and the rules that keep them out:
+| source                                                                                | count | cause                                                                                                                                                                       | fix                                                                                                                |
+| ------------------------------------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `PortableTextEditorToolbar` (8 platform files)                                        | 135   | `useEditorSelector(editor, selectors.getActiveAnnotations)` gets a new `[]` per snapshot, so every coalesced editor update (a microtask after mount) re-renders the toolbar | component: select the derived href string instead of the array — also stops a toolbar re-render on every keystroke |
+| Base UI `SliderRoot` / `FieldRootInner` (look-form, hue-slider, tenant-details-panel) | 49    | tests call `element.focus()` / `.blur()` directly; user-event wraps its own focus in act                                                                                    | tests: focus via `user.click` on the label or `user.tab()`                                                         |
+| `LookForm`, `SettingsFormShell`, `FeaturesSettings`, `ToastProvider`                  | 14    | "busy while saving" tests resolve the save promise as their last line; the save finishes as an async transition afterwards                                                  | tests: `await waitFor` until the busy button is gone                                                               |
+| platform async page tests (tenant detail, owner dashboard)                            | 13    | `customRenderAsync` renders synchronously; `LiveDomainCard` suspends on `use()` inside that act                                                                             | shared helper: `return act(async () => render(ui))`                                                                |
+| web `BookmarkButton` (post-article, bookmark-button-gate)                             | 3     | an effect's `.then(setState)` resolves before the async helper returns                                                                                                      | shared helpers: the same awaited act in `customRenderAsync` / `customRenderServerAsync`                            |
+| `LeadPageSource`, web `Harness`, tooltip, `VoiceSurfaceCard`                          | 8     | sync render in an async `beforeEach`; a fake IntersectionObserver calling its callback outside act; raw `.focus()`                                                          | tests and the fake                                                                                                 |
 
-- **A selector that returns a fresh object re-renders on every editor
-  update.** `useEditorSelector` compares with `Object.is`, so selecting
-  `getActiveAnnotations` (a new `[]` each snapshot) re-rendered the editor
-  toolbar after mount, outside `act` — 135 of the 219. Select the primitive
-  the component shows instead.
-- **A page that suspends on `use()` renders inside an awaited `act`.**
-  `customRenderAsync` does this, so page tests need nothing extra.
-- **Focus moves through user-event, never `element.focus()`/`.blur()`.**
-  Focus handlers set state, and a direct call runs outside `act`.
-- **A test that leaves a promise pending waits for it to settle**, so the
-  update it triggers lands inside the test.
+Every source above was fixed in an experiment, re-run to 0 warnings, and
+reverted. All tests in the affected files kept passing. Only the toolbar
+needed a product change. Also found:
 
-## The 62 node-safe `apps/web` files
+- **13 web "unique key" warnings** come from `customRenderServerAsync`'s tree
+  walk (`cloneElement` drops React's static-children mark, and a keyed async
+  element loses its key), not from components.
+- **`prefetch={false}`** reaches a plain `<a>` through
+  `apps/platform/src/i18n/__mocks__/navigation.ts`.
+- **"Invalid environment variables"** lines are expected output of negative env
+  tests.
+- **`FakeIntersectionObserver` is declared twice** in `apps/web`:
+  `back-to-top-button.test.tsx` and `use-active-heading-id.test.tsx`, and the
+  first wraps each trigger in its own `act()`.
 
-```
-src/app/api/account/export/route.test.ts
-src/app/api/client-log/route.test.ts
-src/app/api/generate-skim/route.test.ts
-src/app/api/newsletter/confirm/route.test.ts
-src/app/api/revalidate-site-config/route.test.ts
-src/app/api/revalidate/route.test.ts
-src/app/robots.test.ts
-src/app/sitemap.test.ts
-src/components/shared/portable-text-renderer/code-block-syntax-theme.test.ts
-src/config/fonts.test.ts
-src/context/toast-provider/toast-store.test.ts
-src/i18n/request.test.ts
-src/metadata/account-metadata/build-account-metadata.test.ts
-src/metadata/author-metadata/build-author-metadata.test.ts
-src/metadata/blog-list-metadata/build-blog-list-metadata.test.ts
-src/metadata/bookmarks-metadata/build-bookmarks-metadata.test.ts
-src/metadata/category-metadata/build-category-metadata.test.ts
-src/metadata/landing-page-metadata/build-landing-page-metadata.test.ts
-src/metadata/post-metadata/build-post-metadata.test.ts
-src/metadata/tag-metadata/build-tag-metadata.test.ts
-src/metadata/to-metadata.test.ts
-src/metadata/topics-metadata/build-topics-metadata.test.ts
-src/proxy.test.ts
-src/server/account/account-actions/account-actions.test.ts
-src/server/account/identity-actions/identity-actions.test.ts
-src/server/bookmarks/bookmark-actions/bookmark-actions.test.ts
-src/server/client-log/client-log-rate-limiter/client-log-rate-limiter.test.ts
-src/server/client-log/client-log-schema/client-log-schema.test.ts
-src/server/email/send-email.test.ts
-src/server/newsletter/newsletter-actions/newsletter-actions.test.ts
-src/server/newsletter/newsletter-confirmation-email.test.ts
-src/server/newsletter/newsletter-from-address/newsletter-from-address.test.ts
-src/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions.test.ts
-src/server/site-config/get-site-config/get-site-config.test.ts
-src/server/skim/generate-takeaways/generate-takeaways.test.ts
-src/server/tenant/request-tenant/request-tenant.test.ts
-src/server/tenant/resolve-tenant/resolve-tenant.test.ts
-src/server/tenant/tenant-sanity-context/tenant-sanity-context.test.ts
-src/utils/apply-voice-overrides/apply-voice-overrides.test.ts
-src/utils/block-text-to-plain/block-text-to-plain.test.ts
-src/utils/build-blog-posting-schema/build-blog-posting-schema.test.ts
-src/utils/build-breadcrumb-list-schema/build-breadcrumb-list-schema.test.ts
-src/utils/build-share-links/build-share-links.test.ts
-src/utils/build-theme-style-block/build-theme-style-block.test.ts
-src/utils/escape-xml/escape-xml.test.ts
-src/utils/extract-post-headings/extract-post-headings.test.ts
-src/utils/get-categories-safely/get-categories-safely.test.ts
-src/utils/get-chrome-on/get-chrome-on.test.ts
-src/utils/get-theme-tokens/get-theme-tokens.test.ts
-src/utils/has-newsletter-subscribed-cookie/has-newsletter-subscribed-cookie.test.ts
-src/utils/is-production-environment/is-production-environment.test.ts
-src/utils/is-secret-match/is-secret-match.test.ts
-src/utils/is-valid-email/is-valid-email.test.ts
-src/utils/is-web-analytics-enabled/is-web-analytics-enabled.test.ts
-src/utils/parse-page-param/parse-page-param.test.ts
-src/utils/revalidate-tags/revalidate-tags.test.ts
-src/utils/segment-portable-text-body/segment-portable-text-body.test.ts
-src/utils/to-portable-text-image/to-portable-text-image.test.ts
-src/utils/to-post-list-items/to-post-list-items.test.ts
-src/utils/to-session-username/to-session-username.test.ts
-src/utils/to-social-icon-name/to-social-icon-name.test.ts
-src/utils/to-theme-tokens/to-theme-tokens.test.ts
-```
+A `console.error` hook in each app's setup that fails a test on "not wrapped in
+act" would keep the count at zero once the fixes land.
+
+## Orchestration
+
+- **Turbo concurrency is capped (adopted).** Every vitest instance defaults
+  to `availableParallelism() - 1` = 7 workers, so turbo's default of 10
+  instances put up to 70 workers on 8 cores. CI's Test job runs
+  `--concurrency=2`; the root `pnpm test` script runs `--concurrency=50%`,
+  which also covers `deploy-development.yml`. Measured with `--force` on 8
+  cores: default 8m55s, `50%` 7m07s, and the contention timeouts stopped
+  (`ci-automation.md`).
+- **Keep `test`'s `dependsOn: ["^build"]`.** No package has a `build` script,
+  but the dependency is likely what invalidates a suite's cache when a package
+  it reads through an alias changes.
+- **`apps/worker` and `packages/auth`**: `isolate: false` is unsafe for the
+  same `vi.mock` reason. Their import time comes from the tests themselves:
+  `importOriginal` spreads of the db tenants barrel in
+  `fake-tenants-queries.ts` (18 files), the real `workflow` package loaded
+  through `importOriginal` (10 files), and `config.test.ts` importing the whole
+  `@blog/db` barrel up to 4 times.
+- **`isolate: false` candidates** (no or few module mocks, unmeasured):
+  `packages/utils`, `packages/email`, and `packages/studio`'s `migrations`
+  project.
+
+## Follow-ups not filed
+
+Kept here rather than ticketed, because the gain is unmeasured and small, or a
+decision comes first:
+
+- **Trim `apps/worker` and `packages/auth` test imports** — about 48s of suite
+  time between them. Stop spreading `importOriginal()` in
+  `fake-tenants-queries.ts`, replace the real `workflow` package in tests with
+  a light shim that re-exports its error classes, turn db automocks into
+  factories, and mock `@blog/db` in auth's `config.test.ts`. Measure with
+  `--experimental.importDurations.print` first.
+- **`isolate: false` for `packages/utils`, `packages/email` and
+  `packages/studio`'s `migrations` project** — none or almost none of their
+  files mock modules. Validate each with a normal run and a
+  `--sequence.shuffle` run before adopting it.
+- **Import `react-syntax-highlighter`'s Prism build directly** in
+  `code-block.tsx` instead of the package index, which loads highlight.js and
+  refractor in full for 49 web test files and the production server. The
+  light build only highlights registered languages, so this changes what
+  readers see for an unregistered language; it needs a measured reason and a
+  manual test.
+- **Retire the backfill tests of migrations already applied in production**
+  — a policy decision; see "Open policy question" under `packages/db`.
+
+## Earlier findings that still hold
+
+- `apps/web` and `apps/platform` run `*.test.ts` in a `node` project and
+  `*.test.tsx` in a `jsdom` project (`configs/vitest/preset.ts`), because jsdom
+  construction dominated the original reference run.
+- **`include` merges, `exclude` replaces.** A project's `include` is merged with
+  the inherited root `include`, so an `include`-based split widens each project
+  to the whole suite. Split via `exclude`, and check the partition with
+  `vitest list --project <name> --filesOnly`.
+- A `.ts` test that needs a DOM opts back in with a `@vitest-environment jsdom`
+  docblock.
