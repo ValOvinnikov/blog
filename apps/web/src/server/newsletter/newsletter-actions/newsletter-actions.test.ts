@@ -11,10 +11,7 @@ import { TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
-import {
-  NEWSLETTER_OUTCOME,
-  SUBSCRIBE_FAILED_EVENT,
-} from '@web/constants/newsletter';
+import { NEWSLETTER_LOG, NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
 import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
 import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
@@ -95,7 +92,6 @@ vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 
-const COOKIE_SET_FAILED_EVENT = 'newsletter.subscribed_cookie_set_failed';
 const MOCK_SUBSCRIBER = mockSubscriber();
 const MOCK_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
@@ -228,7 +224,7 @@ describe(subscribeToNewsletterAction, () => {
 
     expect(result).toEqual(SERVER_ERROR);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      SUBSCRIBE_FAILED_EVENT,
+      NEWSLETTER_LOG.SUBSCRIBE_FAILED,
       { error: ERROR_CODE.DB_NOT_FOUND },
     );
     expect(sendEmailMock).not.toHaveBeenCalled();
@@ -244,7 +240,7 @@ describe(subscribeToNewsletterAction, () => {
 
     expect(result).toEqual(SERVER_ERROR);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      SUBSCRIBE_FAILED_EVENT,
+      NEWSLETTER_LOG.SUBSCRIBE_FAILED,
       { error: MOCK_ERROR },
     );
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
@@ -267,7 +263,7 @@ describe(subscribeToNewsletterAction, () => {
 
       expect(result).toEqual(expected);
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        COOKIE_SET_FAILED_EVENT,
+        NEWSLETTER_LOG.SUBSCRIBED_COOKIE_SET_FAILED,
         { error: MOCK_ERROR },
       );
     },

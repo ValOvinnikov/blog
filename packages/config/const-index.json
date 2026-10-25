@@ -5026,6 +5026,78 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.subscribe_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribe_tenant_not_active": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribe_capability_disabled": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_CAPABILITY_DISABLED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribed_cookie_set_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBED_COOKIE_SET_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribed_cookie_clear_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_tenant_unresolved": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_TENANT_UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.confirmation_resend_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.CONFIRMATION_RESEND_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.resend_confirmation_tenant_not_active": [
+      {
+        "ref": "NEWSLETTER_LOG.RESEND_CONFIRMATION_TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "revalidate.secret_missing": [
       {
         "ref": "REVALIDATE_LOG.SECRET_MISSING",

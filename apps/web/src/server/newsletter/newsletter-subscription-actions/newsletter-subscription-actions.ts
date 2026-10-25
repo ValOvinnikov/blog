@@ -8,10 +8,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
-import {
-  CONFIRMATION_RESEND_FAILED_EVENT,
-  UNSUBSCRIBE_FAILED_EVENT,
-} from '@web/constants/newsletter';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';
 import { deliverNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
@@ -36,7 +33,7 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
 
   const tenant = await resolveRequestTenant();
   if (!tenant) {
-    logger.error('newsletter.unsubscribe_tenant_unresolved');
+    logger.error(NEWSLETTER_LOG.UNSUBSCRIBE_TENANT_UNRESOLVED);
     return SERVER_ERROR;
   }
   const { id: tenantId } = tenant;
@@ -46,7 +43,7 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
     await clearNewsletterSubscribedCookieSafely();
     return SUCCESS;
   } catch (error) {
-    logger.error(UNSUBSCRIBE_FAILED_EVENT, { error });
+    logger.error(NEWSLETTER_LOG.UNSUBSCRIBE_FAILED, { error });
     return SERVER_ERROR;
   }
 };
@@ -55,7 +52,7 @@ const clearNewsletterSubscribedCookieSafely = async (): Promise<void> => {
   try {
     await clearNewsletterSubscribedCookie();
   } catch (error) {
-    logger.error('newsletter.subscribed_cookie_clear_failed', { error });
+    logger.error(NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED, { error });
   }
 };
 
@@ -70,7 +67,7 @@ export const resendConfirmationAction =
     );
     if (!tenant.ok) {
       if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
-        logger.warn('newsletter.resend_confirmation_tenant_not_active');
+        logger.warn(NEWSLETTER_LOG.RESEND_CONFIRMATION_TENANT_NOT_ACTIVE);
         return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
       }
       return SERVER_ERROR;
@@ -93,7 +90,7 @@ export const resendConfirmationAction =
       );
       return SUCCESS;
     } catch (error) {
-      logger.error(CONFIRMATION_RESEND_FAILED_EVENT, { error });
+      logger.error(NEWSLETTER_LOG.CONFIRMATION_RESEND_FAILED, { error });
       return SERVER_ERROR;
     }
   };
