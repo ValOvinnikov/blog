@@ -314,9 +314,11 @@ revisited that call and declared the type instead, since the job being
 advisory doesn't make an avoidable warning worth carrying indefinitely.
 
 **The Test job caps turbo at two suites at a time** (#3364):
-`pnpm turbo run test --affected --concurrency=2`, in the workflow only — the root
-`pnpm test` script and `turbo.json` keep turbo's default of 10, so local runs
-are unchanged. At the default, every workspace's vitest spawns its own worker
+`pnpm turbo run test --affected --concurrency=2`. The root `pnpm test` script
+caps local runs, and `deploy-development.yml`'s Test step, at
+`turbo run test --concurrency=50%` — half the machine's cores, 4 on an 8-core
+laptop and 2 on a 4-vCPU runner — while `pnpm test:watch` and `turbo.json` keep
+turbo's default of 10. At the default, every workspace's vitest spawns its own worker
 pool at once and the runner is oversubscribed: the symptom is a hook or test
 timeout in whichever heavy suite (`@blog/db`'s per-file PGlite setup, `web`,
 `platform`, `@blog/studio`) lost the scheduling race, and the failure set
