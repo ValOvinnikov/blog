@@ -1,12 +1,12 @@
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { bookmarks } from './bookmarks';
 import { subscribers } from './subscribers';
@@ -16,9 +16,9 @@ const BACKFILL_MIGRATION = '0008_silly_xorn.sql';
 describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
   let db: PgliteDatabase<typeof schema>;
 
-  beforeEach(() => {
-    db = drizzle(new PGlite(), { schema });
-  });
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'backfills pre-existing bookmark and subscriber rows to the sole existing tenant',

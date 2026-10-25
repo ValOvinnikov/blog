@@ -13,10 +13,7 @@ const migrationsDir = fileURLToPath(
   new URL('../../migrations', import.meta.url),
 );
 
-// Tests that replay migrations from scratch (building their own PGlite
-// instance and running real migration SQL, rather than restoring the
-// pre-built snapshot) can't share that snapshot's speed — give them enough
-// headroom to survive a machine under heavy concurrent load.
+// Replaying every migration on a machine under heavy concurrent load far outlasts Vitest's default timeouts.
 export const MIGRATION_REPLAY_TEST_TIMEOUT_MS = 120_000;
 
 // pglite (Postgres compiled to WASM) doesn't ship the `pgvector` extension,
@@ -26,18 +23,12 @@ export const MIGRATION_REPLAY_TEST_TIMEOUT_MS = 120_000;
 // genuine Postgres engine.
 const SKIPPED_MIGRATIONS = new Set(['0000_enable_pgvector_extension.sql']);
 
-// Every generated migration filename, in application order, excluding ones
-// pglite can't run (see `SKIPPED_MIGRATIONS`).
 export function listMigrationFiles(): string[] {
   return readdirSync(migrationsDir)
     .filter((file) => file.endsWith('.sql') && !SKIPPED_MIGRATIONS.has(file))
     .sort();
 }
 
-// Runs one generated migration file's statements against `db`, in order —
-// the real generated SQL, not a hand-rolled stand-in, so a query/mutation
-// test exercises the actual constraints (unique/foreign-key) drizzle-kit
-// generated.
 export async function applyMigrationFile(db: TDb, file: string): Promise<void> {
   const migrationSql = readFileSync(join(migrationsDir, file), 'utf-8');
   const statements = migrationSql
