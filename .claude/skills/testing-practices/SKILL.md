@@ -104,10 +104,23 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   — a `.ts` test that needs `DOMParser`, `window` or `renderHook`, a `.tsx`
   that must run in `node` — its first line is a
   `@vitest-environment <env>` docblock: the one per-file override, and the
-  only comment a test file may carry.
-- **`packages/ui`** — merges the preset with jsdom and `src/test-setup.ts`.
+  only comment a test file may carry. The `node` project runs on
+  `pool: 'threads'`; the `jsdom` project runs on `pool: 'vmThreads'` with
+  `vmMemoryLimit` and the `configs/vitest/vm-web-streams.ts` setup file, so
+  each file gets a fresh `window` and its own `vi.mock`s. Pools are set per
+  project; `maxWorkers` never is (Vitest throws when projects disagree).
+  Each app's setup also fails any test during which React reports an act
+  warning.
+- **`packages/ui`** — merges the preset with jsdom and `src/test-setup.ts`,
+  with `isolate: false`, which its setup's explicit `cleanup()` makes safe.
+- **`packages/service`** runs on `vmThreads`; **`packages/db`** on `threads`,
+  with `unstubEnvs: true`, query tests getting their database from
+  `useQueryTestDb()` and the shared `src/__mocks__/client.ts`.
 - **Every other package** runs in `node`; `service`, `db`, `auth` and `email`
   also set `mockReset: true`.
+- **`isolate: false` is not a free speed-up.** With isolation off, a module
+  one file imported keeps that file's `vi.mock` bindings in the next file of
+  the same worker, so it is only safe where files do not mock modules.
 - **Aliases.** Vitest does not read `tsconfig` `paths`. `resolve.alias` maps
   the workspace's own alias and every dependency's
   (`blogPackageAlias('<pkg>', import.meta.url)` in the apps), or cross-package
@@ -363,8 +376,20 @@ userEvent.setup()`), then `await user.click(…)`, `user.type(…)`,
   cannot produce, such as an outside `mousedown` on `document.body`; a
   `fireEvent.click` is a finding.
 - **Async is `findBy*` or `waitFor`**, never a manual `act` or a
-  `setTimeout`. An `act` warning means a missing `await` on a `userEvent` call
-  or a `findBy`.
+  `setTimeout`. An `act` warning fails the test (each app's setup turns it
+  into an error). Its usual causes:
+  - a missing `await` on a `userEvent` call, or no `findBy*`/`waitFor` for an
+    update a promise triggers after the last step;
+  - focus moved with `element.focus()`/`.blur()` instead of `userEvent`;
+  - an async tree rendered without the workspace's async helper —
+    `customRenderAsync` (and web's `customRenderServerAsync`) render inside
+    an awaited `act`, so a page that suspends on `use()` or an effect that
+    resolves after mount settles before the test resumes;
+  - a component selecting a fresh object or array (`useEditorSelector`,
+    `useSyncExternalStore`) that re-renders on every store update — select
+    the primitive it shows instead.
+    A test double that fires callbacks itself (a fake observer) wraps them in
+    `act` inside the double, never in the test body.
 - **Each case calls `setup(overrides)` and discards its return** — there is
   no `container` to reach into.
 - **Assert the observable the prop changes** — `aria-current`, `disabled`, a
