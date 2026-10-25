@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
 
@@ -60,8 +61,11 @@ const resolveErrorMessage = async (): Promise<unknown> => {
   return error(failure).message;
 };
 
+const UNSUBSCRIBE_BUTTON_NAME = 'Unsubscribe';
+const RESEND_BUTTON_NAME = 'Resend confirmation';
+
 const setup = customRender(NewsletterSubscriptionControl, {
-  action: 'unsubscribe' as const,
+  action: NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE,
 });
 
 let user: UserEvent;
@@ -81,14 +85,18 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     it('renders the unsubscribe button copy for the "unsubscribe" action', () => {
-      expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
+      expect(
+        screen.getByRole('button', { name: UNSUBSCRIBE_BUTTON_NAME }),
+      ).toBeVisible();
     });
 
     it('runs unsubscribeAction through toast.promise and refreshes the router on success', async () => {
       unsubscribeActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
       });
-      await user.click(screen.getByRole('button', { name: 'Unsubscribe' }));
+      await user.click(
+        screen.getByRole('button', { name: UNSUBSCRIBE_BUTTON_NAME }),
+      );
 
       await waitFor(() => {
         expect(unsubscribeActionMock).toHaveBeenCalled();
@@ -111,14 +119,16 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
       unsubscribeActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
-      await user.click(screen.getByRole('button', { name: 'Unsubscribe' }));
+      await user.click(
+        screen.getByRole('button', { name: UNSUBSCRIBE_BUTTON_NAME }),
+      );
 
       await waitFor(() => {
         expect(toastPromiseMock).toHaveBeenCalled();
       });
       await waitFor(() => {
         expect(
-          screen.getByRole('button', { name: 'Unsubscribe' }),
+          screen.getByRole('button', { name: UNSUBSCRIBE_BUTTON_NAME }),
         ).toHaveAttribute('aria-busy', 'false');
       });
       expect(routerRefreshMock).not.toHaveBeenCalled();
@@ -134,7 +144,9 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      const button = screen.getByRole('button', { name: 'Unsubscribe' });
+      const button = screen.getByRole('button', {
+        name: UNSUBSCRIBE_BUTTON_NAME,
+      });
       await user.click(button);
 
       await waitFor(() => {
@@ -151,12 +163,12 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
   describe('resend action', () => {
     beforeEach(() => {
-      setup({ action: 'resend' });
+      setup({ action: NEWSLETTER_SUBSCRIPTION_ACTION.RESEND });
     });
 
     it('renders the resend button copy for the "resend" action', () => {
       expect(
-        screen.getByRole('button', { name: 'Resend confirmation' }),
+        screen.getByRole('button', { name: RESEND_BUTTON_NAME }),
       ).toBeVisible();
     });
 
@@ -165,7 +177,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
       });
       await user.click(
-        screen.getByRole('button', { name: 'Resend confirmation' }),
+        screen.getByRole('button', { name: RESEND_BUTTON_NAME }),
       );
 
       await waitFor(() => {
@@ -190,7 +202,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
         outcome: ACTION_OUTCOME.UNAVAILABLE,
       });
       await user.click(
-        screen.getByRole('button', { name: 'Resend confirmation' }),
+        screen.getByRole('button', { name: RESEND_BUTTON_NAME }),
       );
 
       await waitFor(() => {

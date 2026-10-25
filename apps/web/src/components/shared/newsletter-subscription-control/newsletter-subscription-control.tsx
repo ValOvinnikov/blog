@@ -1,7 +1,9 @@
 'use client';
 
 import { ACTION_OUTCOME } from '@blog/config';
+import type { TValueOf } from '@blog/config/utils';
 import { Button } from '@blog/ui/components/atoms/button';
+import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { useToast } from '@web/context/toast-provider';
 import {
   resendConfirmationAction,
@@ -12,7 +14,7 @@ import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
 export type TNewsletterSubscriptionControlProps = {
-  action: 'unsubscribe' | 'resend';
+  action: TValueOf<typeof NEWSLETTER_SUBSCRIPTION_ACTION>;
 };
 
 export const NewsletterSubscriptionControl = ({
@@ -23,7 +25,7 @@ export const NewsletterSubscriptionControl = ({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const isUnsubscribe = action === 'unsubscribe';
+  const isUnsubscribe = action === NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE;
   const loadingMessageKey = isUnsubscribe
     ? 'unsubscribeToastLoadingMessage'
     : 'resendToastLoadingMessage';

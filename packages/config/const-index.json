@@ -5002,6 +5002,22 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "UNSUBSCRIBE": [
+      {
+        "ref": "NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "RESEND": [
+      {
+        "ref": "NEWSLETTER_SUBSCRIPTION_ACTION.RESEND",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "revalidate.secret_missing": [
       {
         "ref": "REVALIDATE_LOG.SECRET_MISSING",

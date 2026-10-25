@@ -1,6 +1,7 @@
 import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
+import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTranslations } from 'next-intl/server';
@@ -42,8 +43,8 @@ export const NewsletterSection = async () => {
         <NewsletterSubscriptionControl
           action={
             status.outcome === SUBSCRIBER_STATUS.ACTIVE
-              ? 'unsubscribe'
-              : 'resend'
+              ? NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE
+              : NEWSLETTER_SUBSCRIPTION_ACTION.RESEND
           }
         />
       }

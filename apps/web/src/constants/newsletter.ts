@@ -2,6 +2,11 @@ export const NEWSLETTER_OUTCOME = {
   ALREADY_SUBSCRIBED: 'ALREADY_SUBSCRIBED',
 } as const;
 
+export const NEWSLETTER_SUBSCRIPTION_ACTION = {
+  UNSUBSCRIBE: 'UNSUBSCRIBE',
+  RESEND: 'RESEND',
+} as const;
+
 export const SUBSCRIBE_FAILED_EVENT = 'newsletter.subscribe_failed';
 
 export const UNSUBSCRIBE_FAILED_EVENT = 'newsletter.unsubscribe_failed';

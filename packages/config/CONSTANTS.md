@@ -418,6 +418,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/newsletter` — `apps/web/src/constants/newsletter.ts`
 
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
+- **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
 
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 
