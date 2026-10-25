@@ -7,22 +7,15 @@ import {
 
 import { useActiveHeadingId } from './use-active-heading-id';
 
-const headingEntry = (
-  id: string,
-  isIntersecting: boolean,
-  top: number,
-): Partial<IntersectionObserverEntry> => ({
-  target: document.getElementById(id)!,
-  isIntersecting,
-  boundingClientRect: { top } as DOMRectReadOnly,
-});
+const ACTIVE_ID_TEST_ID = 'active-id';
+const NO_ACTIVE_ID = 'none';
 
 const Harness = ({ ids }: { ids: string[] }) => {
   const activeId = useActiveHeadingId(ids);
 
   return (
     <div>
-      <p data-testid="active-id">{activeId ?? 'none'}</p>
+      <p data-testid={ACTIVE_ID_TEST_ID}>{activeId ?? NO_ACTIVE_ID}</p>
       {ids.map((id) => (
         <h2 key={id} id={id}>
           {id}
@@ -34,6 +27,16 @@ const Harness = ({ ids }: { ids: string[] }) => {
 
 const setup = customRender(Harness, { ids: [] });
 
+const headingEntry = (
+  id: string,
+  isIntersecting: boolean,
+  top: number,
+): Partial<IntersectionObserverEntry> => ({
+  target: screen.getByRole('heading', { name: id }),
+  isIntersecting,
+  boundingClientRect: { top } as DOMRectReadOnly,
+});
+
 describe(useActiveHeadingId, () => {
   beforeEach(() => {
     stubFakeIntersectionObserver();
@@ -44,46 +47,50 @@ describe(useActiveHeadingId, () => {
   });
 
   describe('with three headings', () => {
-    let observer: FakeIntersectionObserver;
-
     beforeEach(() => {
       setup({ ids: ['one', 'two', 'three'] });
-      observer = getFakeIntersectionObserver();
     });
 
-    it('returns null before any heading has intersected', () => {
-      expect(screen.getByTestId('active-id')).toHaveTextContent('none');
+    it('has no active heading before any heading has intersected', () => {
+      const activeId = screen.getByTestId(ACTIVE_ID_TEST_ID);
+
+      expect(activeId).toHaveTextContent(NO_ACTIVE_ID);
     });
 
-    it('sets the active id to the intersecting heading', () => {
-      observer.trigger([headingEntry('one', true, 10)]);
+    it.each([
+      {
+        title: 'marks the intersecting heading active',
+        entries: () => [headingEntry('one', true, 10)],
+        expected: 'one',
+      },
+      {
+        title: 'marks the topmost of several intersecting headings active',
+        entries: () => [
+          headingEntry('two', true, 50),
+          headingEntry('one', true, 5),
+        ],
+        expected: 'one',
+      },
+      {
+        title: 'ignores a heading that is not intersecting',
+        entries: () => [headingEntry('one', false, 5)],
+        expected: NO_ACTIVE_ID,
+      },
+    ])('$title', ({ entries, expected }) => {
+      getFakeIntersectionObserver().trigger(entries());
 
-      expect(screen.getByTestId('active-id')).toHaveTextContent('one');
-    });
+      const activeId = screen.getByTestId(ACTIVE_ID_TEST_ID);
 
-    it('picks the topmost heading when multiple are intersecting at once', () => {
-      observer.trigger([
-        headingEntry('two', true, 50),
-        headingEntry('one', true, 5),
-      ]);
-
-      expect(screen.getByTestId('active-id')).toHaveTextContent('one');
+      expect(activeId).toHaveTextContent(expected);
     });
   });
 
-  it('returns nothing to observe for an empty id list', () => {
+  it('observes nothing for an empty id list', () => {
     setup({ ids: [] });
 
+    const activeId = screen.getByTestId(ACTIVE_ID_TEST_ID);
+
     expect(FakeIntersectionObserver.instances).toHaveLength(0);
-    expect(screen.getByTestId('active-id')).toHaveTextContent('none');
-  });
-
-  it('ignores non-intersecting entries', () => {
-    setup({ ids: ['one', 'two'] });
-    const observer = getFakeIntersectionObserver();
-
-    observer.trigger([headingEntry('one', false, 5)]);
-
-    expect(screen.getByTestId('active-id')).toHaveTextContent('none');
+    expect(activeId).toHaveTextContent(NO_ACTIVE_ID);
   });
 });
