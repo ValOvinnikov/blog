@@ -1,5 +1,5 @@
 import { customRender, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Checkbox } from './checkbox';
 
@@ -13,11 +13,19 @@ const setup = customRender(Checkbox, {
 });
 
 describe(`<${Checkbox.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('toggles when its label is clicked', async () => {
     const onCheckedChange = vi.fn();
     setup({ onCheckedChange });
 
-    await userEvent.click(screen.getByText(MOCK_LABEL));
+    const label = screen.getByText(MOCK_LABEL);
+
+    await user.click(label);
 
     expect(onCheckedChange).toHaveBeenCalledWith(true, expect.anything());
   });

@@ -36,8 +36,11 @@ describe(`<${SignUpView.name}/>`, () => {
 
   describe('with the legal pages on the apex', () => {
     const acceptAndContinue = async () => {
-      await user.click(screen.getByRole('checkbox', MOCK_ACCEPTANCE));
-      await user.click(screen.getByRole('button', MOCK_CONTINUE));
+      const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+      const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+      await user.click(acceptance);
+      await user.click(continueButton);
     };
 
     beforeEach(() => {
@@ -70,7 +73,9 @@ describe(`<${SignUpView.name}/>`, () => {
         },
       });
 
-      await user.click(screen.getByRole('button', MOCK_CONTINUE));
+      const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+      await user.click(continueButton);
 
       const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
 

@@ -75,7 +75,9 @@ describe(`<${SignInView.name}/>`, () => {
     const user = userEvent.setup();
     setup({ providerIds: [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] });
 
-    await user.click(screen.getByRole('button', MOCK_GOOGLE_BUTTON));
+    const google = screen.getByRole('button', MOCK_GOOGLE_BUTTON);
+
+    await user.click(google);
 
     expect(signInWithProviderAction).toHaveBeenCalledWith({
       providerId: GOOGLE_PROVIDER_ID,
