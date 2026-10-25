@@ -131,7 +131,8 @@ describe(`<${LeadsInbox.name}/>`, () => {
       await user.keyboard('{Enter}');
 
       const heading = screen.getByRole('heading', { name: MOCK_LEAD_NAME });
-      expect(within(heading).getByText(MOCK_LEAD_NAME)).toHaveFocus();
+      const headingName = within(heading).getByText(MOCK_LEAD_NAME);
+      expect(headingName).toHaveFocus();
     });
 
     describe('once opened', () => {
