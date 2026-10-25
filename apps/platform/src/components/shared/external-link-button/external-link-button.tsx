@@ -3,11 +3,9 @@ import {
   buttonVariants,
   type TButtonVariants,
 } from '@platform/components/shared/button/button-variants';
+import { ExternalLink } from '@platform/components/shared/external-link';
 import { Icon } from '@platform/components/shared/icon';
-import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
-
-import { newTabHintVariants } from './external-link-button-variants';
 
 export type TExternalLinkButtonProps = {
   href: string;
@@ -28,20 +26,15 @@ export const ExternalLinkButton = ({
   ariaLabel,
   title,
 }: TExternalLinkButtonProps) => {
-  const t = useTranslations('externalLinkButton');
-
   return (
-    <a
+    <ExternalLink
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
       className={buttonVariants({ variant, size }).root({ class: className })}
-      aria-label={ariaLabel}
+      ariaLabel={ariaLabel}
       title={title}
     >
       {children}
-      <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />{' '}
-      <span className={newTabHintVariants()}>{t('newTabHint')}</span>
-    </a>
+      <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />
+    </ExternalLink>
   );
 };

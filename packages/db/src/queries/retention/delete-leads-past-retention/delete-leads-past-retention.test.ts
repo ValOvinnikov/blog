@@ -6,6 +6,7 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
+  MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
 
@@ -37,16 +38,32 @@ describe(deleteLeadsPastRetention, () => {
       createdAt: justWithin(CUTOFF),
     });
 
-    await expect(deleteLeadsPastRetention(MOCK_RETENTION_NOW)).resolves.toBe(1);
+    await expect(
+      deleteLeadsPastRetention(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT),
+    ).resolves.toBe(1);
 
     const rows = await db().select({ id: schema.leads.id }).from(schema.leads);
     expect(rows).toEqual([{ id: recent.id }]);
   });
 
+  it('deletes at most the given number of leads per call', async () => {
+    await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
+    await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
+
+    await expect(deleteLeadsPastRetention(MOCK_RETENTION_NOW, 1)).resolves.toBe(
+      1,
+    );
+
+    const rows = await db().select({ id: schema.leads.id }).from(schema.leads);
+    expect(rows).toHaveLength(1);
+  });
+
   it('deletes nothing when run a second time', async () => {
     await insertTestLead(db(), tenantId, { createdAt: justPast(CUTOFF) });
-    await deleteLeadsPastRetention(MOCK_RETENTION_NOW);
+    await deleteLeadsPastRetention(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT);
 
-    await expect(deleteLeadsPastRetention(MOCK_RETENTION_NOW)).resolves.toBe(0);
+    await expect(
+      deleteLeadsPastRetention(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT),
+    ).resolves.toBe(0);
   });
 });

@@ -16,6 +16,7 @@ export const adminRoutes = {
   signIn: (callbackUrl = '/') =>
     `${SIGN_IN_PATH}?${new URLSearchParams({ callbackUrl })}`,
   signInError: () => '/sign-in-error',
+  signUp: () => '/signup',
   workspacePending: () => '/workspace-pending',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',

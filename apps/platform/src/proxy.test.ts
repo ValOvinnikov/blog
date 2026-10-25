@@ -1,3 +1,4 @@
+import { REQUESTED_PATH_HEADER } from '@platform/utils/requested-path/requested-path';
 import { NextRequest } from 'next/server';
 
 const { handleI18nRoutingMock } = vi.hoisted(() => ({
@@ -47,6 +48,12 @@ describe('proxy matcher', () => {
     ).toBe(true);
   });
 
+  it("leaves BotID's challenge path to BotID", () => {
+    expect(
+      matcher.test('/149e9513-01fa-4fb0-aad4-566afd725d1b/a-4-a/c.js'),
+    ).toBe(false);
+  });
+
   it('excludes api, _next, _vercel, and root-level dotted paths', () => {
     expect(matcher.test('/api/auth/signin')).toBe(false);
     expect(matcher.test('/_next/static/chunk.js')).toBe(false);
@@ -64,7 +71,7 @@ describe(proxy, () => {
 
     proxy(request);
 
-    expect(request.headers.get('x-admin-requested-path')).toBe(
+    expect(request.headers.get(REQUESTED_PATH_HEADER)).toBe(
       '/dashboard/leads?page=2',
     );
     expect(handleI18nRoutingMock).toHaveBeenCalledWith(request);
@@ -72,11 +79,11 @@ describe(proxy, () => {
 
   it('overwrites a requested path the client sent itself', () => {
     const request = new NextRequest('https://admin.example.com/tenants', {
-      headers: { 'x-admin-requested-path': 'https://evil.example.com' },
+      headers: { [REQUESTED_PATH_HEADER]: 'https://evil.example.com' },
     });
 
     proxy(request);
 
-    expect(request.headers.get('x-admin-requested-path')).toBe('/tenants');
+    expect(request.headers.get(REQUESTED_PATH_HEADER)).toBe('/tenants');
   });
 });

@@ -372,6 +372,12 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SIGN_IN_ERROR**: `ACCOUNT_NOT_LINKED`, `SIGN_IN_FAILED`
 - **SIGN_IN_LOG**: `LINK_FAILED`=`"auth.sign_in_link_failed"`
 
+### `@platform/constants/sign-up` — `apps/platform/src/constants/sign-up.ts`
+
+- **SIGN_UP_FIELD_ERROR**: `TERMS_NOT_ACCEPTED`
+- **SIGN_UP_REFUSAL**: `TRY_AGAIN_LATER`
+- **SIGN_UP_LOG**: `BOT_REFUSED`=`"auth.sign_up_bot_refused"`, `BOT_CHECK_FAILED`=`"auth.sign_up_bot_check_failed"`
+
 ### `@platform/constants/signup-block` — `apps/platform/src/constants/signup-block.ts`
 
 - **SIGNUP_BLOCK_FIELD_ERROR**: `BLOCK_DOMAIN_INVALID`, `BLOCK_REASON_REQUIRED`
@@ -431,6 +437,15 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`
 
+### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
+
+- **INACTIVITY_SWEEP_LOG**: `NOT_CONFIGURED`=`"inactivity_sweep.not_configured"`, `FAILED`=`"inactivity_sweep.failed"`, `STAGE_FAILED`=`"inactivity_sweep.stage_failed"`, `OWNER_MISSING`=`"inactivity_sweep.owner_missing"`, `ALERT_NO_RECIPIENTS`=`"inactivity_sweep.alert_no_recipients"`, `EMAIL_SEND_FAILED`=`"inactivity_sweep.email_send_failed"`
+
 ### `@worker/constants/provisioning` — `apps/worker/src/constants/provisioning.ts`
 
 - **PROVISION_CLI_RESULT**: `SUCCEEDED`, `FAILED`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`
+
+### `@worker/constants/retention` — `apps/worker/src/constants/retention.ts`
+
+- **RETENTION_KIND**: `PENDING_SUBSCRIBERS`, `LEADS`, `SESSIONS`, `VERIFICATION_TOKENS`, `AUDIT_EVENTS`, `RESOLVED_FINDINGS`
+- **RETENTION_LOG**: `DELETED`=`"retention.deleted"`, `CLEANUP_FAILED`=`"retention.cleanup_failed"`

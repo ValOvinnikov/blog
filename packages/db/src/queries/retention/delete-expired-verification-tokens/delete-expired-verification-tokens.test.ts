@@ -4,6 +4,7 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
+  MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
 
@@ -33,7 +34,7 @@ describe(deleteExpiredVerificationTokens, () => {
     const liveToken = await insertToken(justWithin(MOCK_RETENTION_NOW));
 
     await expect(
-      deleteExpiredVerificationTokens(MOCK_RETENTION_NOW),
+      deleteExpiredVerificationTokens(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT),
     ).resolves.toBe(1);
 
     const rows = await db()
@@ -42,12 +43,29 @@ describe(deleteExpiredVerificationTokens, () => {
     expect(rows).toEqual([{ token: liveToken }]);
   });
 
-  it('deletes nothing when run a second time', async () => {
+  it('deletes at most the given number of tokens per call', async () => {
     await insertToken(justPast(MOCK_RETENTION_NOW));
-    await deleteExpiredVerificationTokens(MOCK_RETENTION_NOW);
+    await insertToken(justPast(MOCK_RETENTION_NOW));
 
     await expect(
-      deleteExpiredVerificationTokens(MOCK_RETENTION_NOW),
+      deleteExpiredVerificationTokens(MOCK_RETENTION_NOW, 1),
+    ).resolves.toBe(1);
+
+    const rows = await db()
+      .select({ token: schema.verificationTokens.token })
+      .from(schema.verificationTokens);
+    expect(rows).toHaveLength(1);
+  });
+
+  it('deletes nothing when run a second time', async () => {
+    await insertToken(justPast(MOCK_RETENTION_NOW));
+    await deleteExpiredVerificationTokens(
+      MOCK_RETENTION_NOW,
+      MOCK_RETENTION_LIMIT,
+    );
+
+    await expect(
+      deleteExpiredVerificationTokens(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT),
     ).resolves.toBe(0);
   });
 });

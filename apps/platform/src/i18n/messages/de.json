@@ -23,7 +23,8 @@
     "leads": "Anfragen · Admin",
     "releases": "Releases · Admin",
     "blockedSignupsPage": "Gesperrte Registrierungen · Admin",
-    "dataRequestsPage": "Datenanfragen · Admin"
+    "dataRequestsPage": "Datenanfragen · Admin",
+    "signUpTitle": "Konto erstellen"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -37,7 +38,21 @@
     "accountNotLinkedTitle": "Diese E-Mail-Adresse meldet sich bereits anders an",
     "accountNotLinkedDescription": "Ihre E-Mail-Adresse wird bereits mit einer anderen Anmeldemethode verwendet. Melden Sie sich so an wie beim letzten Mal.",
     "signInFailedTitle": "Anmeldung fehlgeschlagen",
-    "signInFailedDescription": "Bei der Anmeldung ist etwas schiefgelaufen. Versuchen Sie es erneut oder wählen Sie eine andere Anmeldemethode."
+    "signInFailedDescription": "Bei der Anmeldung ist etwas schiefgelaufen. Versuchen Sie es erneut oder wählen Sie eine andere Anmeldemethode.",
+    "signUpPrompt": "Neu hier? <link>Konto erstellen</link>"
+  },
+  "signUpPage": {
+    "heading": "Konto erstellen",
+    "description": "Akzeptiere die Bedingungen und wähle dann, wie du dich anmelden möchtest.",
+    "brandMarkLabel": "Valstack"
+  },
+  "signUpForm": {
+    "acceptTerms": "Ich stimme den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
+    "termsNotAccepted": "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren.",
+    "continue": "Weiter",
+    "continuing": "Wird geprüft…",
+    "refusedTitle": "Wir konnten deine Registrierung nicht fortsetzen",
+    "refusedDescription": "Versuche es später erneut."
   },
   "providerSignInButton": {
     "continueWithGithub": "Weiter mit GitHub",
@@ -1141,7 +1156,7 @@
     "draftColumn": "Dein Entwurf",
     "emptyValue": "Leer"
   },
-  "externalLinkButton": {
+  "externalLink": {
     "newTabHint": "(öffnet in neuem Tab)"
   },
   "leadsView": {

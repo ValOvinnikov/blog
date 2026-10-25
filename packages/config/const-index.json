@@ -4326,6 +4326,38 @@
         "file": "apps/platform/src/constants/sign-in.ts"
       }
     ],
+    "TERMS_NOT_ACCEPTED": [
+      {
+        "ref": "SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
+    "TRY_AGAIN_LATER": [
+      {
+        "ref": "SIGN_UP_REFUSAL.TRY_AGAIN_LATER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
+    "auth.sign_up_bot_refused": [
+      {
+        "ref": "SIGN_UP_LOG.BOT_REFUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
+    "auth.sign_up_bot_check_failed": [
+      {
+        "ref": "SIGN_UP_LOG.BOT_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-up",
+        "file": "apps/platform/src/constants/sign-up.ts"
+      }
+    ],
     "BLOCK_DOMAIN_INVALID": [
       {
         "ref": "SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID",
@@ -5248,6 +5280,118 @@
         "scope": "app:worker",
         "from": "@worker/constants/enqueue-error",
         "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "inactivity_sweep.not_configured": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.NOT_CONFIGURED",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "inactivity_sweep.failed": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "inactivity_sweep.stage_failed": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.STAGE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "inactivity_sweep.owner_missing": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.OWNER_MISSING",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "inactivity_sweep.alert_no_recipients": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.ALERT_NO_RECIPIENTS",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "inactivity_sweep.email_send_failed": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "PENDING_SUBSCRIBERS": [
+      {
+        "ref": "RETENTION_KIND.PENDING_SUBSCRIBERS",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "LEADS": [
+      {
+        "ref": "RETENTION_KIND.LEADS",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "SESSIONS": [
+      {
+        "ref": "RETENTION_KIND.SESSIONS",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "VERIFICATION_TOKENS": [
+      {
+        "ref": "RETENTION_KIND.VERIFICATION_TOKENS",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "AUDIT_EVENTS": [
+      {
+        "ref": "RETENTION_KIND.AUDIT_EVENTS",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "RESOLVED_FINDINGS": [
+      {
+        "ref": "RETENTION_KIND.RESOLVED_FINDINGS",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "retention.deleted": [
+      {
+        "ref": "RETENTION_LOG.DELETED",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "retention.cleanup_failed": [
+      {
+        "ref": "RETENTION_LOG.CLEANUP_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
       }
     ]
   },

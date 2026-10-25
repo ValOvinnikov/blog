@@ -6,6 +6,7 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
+  MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
 
@@ -31,7 +32,7 @@ describe(deleteAuditEventsPastRetention, () => {
     });
 
     await expect(
-      deleteAuditEventsPastRetention(MOCK_RETENTION_NOW),
+      deleteAuditEventsPastRetention(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT),
     ).resolves.toBe(1);
 
     const rows = await db()
@@ -40,12 +41,29 @@ describe(deleteAuditEventsPastRetention, () => {
     expect(rows).toEqual([{ id: recent.id }]);
   });
 
-  it('deletes nothing when run a second time', async () => {
+  it('deletes at most the given number of events per call', async () => {
     await insertTestAuditEvent(db(), { createdAt: justPast(CUTOFF) });
-    await deleteAuditEventsPastRetention(MOCK_RETENTION_NOW);
+    await insertTestAuditEvent(db(), { createdAt: justPast(CUTOFF) });
 
     await expect(
-      deleteAuditEventsPastRetention(MOCK_RETENTION_NOW),
+      deleteAuditEventsPastRetention(MOCK_RETENTION_NOW, 1),
+    ).resolves.toBe(1);
+
+    const rows = await db()
+      .select({ id: schema.auditEvents.id })
+      .from(schema.auditEvents);
+    expect(rows).toHaveLength(1);
+  });
+
+  it('deletes nothing when run a second time', async () => {
+    await insertTestAuditEvent(db(), { createdAt: justPast(CUTOFF) });
+    await deleteAuditEventsPastRetention(
+      MOCK_RETENTION_NOW,
+      MOCK_RETENTION_LIMIT,
+    );
+
+    await expect(
+      deleteAuditEventsPastRetention(MOCK_RETENTION_NOW, MOCK_RETENTION_LIMIT),
     ).resolves.toBe(0);
   });
 });

@@ -7,6 +7,11 @@ code:
   - apps/platform/src/app/*/workspace-pending/**
   - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/app/*/sign-in/**
+  - apps/platform/src/app/*/signup/**
+  - apps/platform/src/components/features/sign-up/**
+  - apps/platform/src/server/auth/accept-signup-terms-action*
+  - apps/platform/src/utils/legal-page-urls/**
+  - apps/platform/src/instrumentation-client.ts
   - apps/platform/src/components/features/sign-in/**
   - apps/platform/src/server/auth/send-sign-in-link-action*
   - apps/platform/src/server/auth/sign-in-with-provider-action*
@@ -32,9 +37,9 @@ epics: [4840, 4960, 4979, 4982, 4958, 4949, 5649]
 
 How a person gets into `apps/platform` and, once signed in, into a workspace.
 Today every platform user, operator, owner or invited editor, signs in on one
-branded `/sign-in` page, and there is no way to create a site without an
-operator. The decided shape adds a `/signup` gate for prospects and an
-`/onboarding` wizard that creates a Free site.
+branded `/sign-in` page, and a prospect passes a `/signup` gate first; there
+is still no way to create a site without an operator. The decided shape adds
+an `/onboarding` wizard that creates a Free site.
 
 ## Surfaces and routes
 
@@ -64,14 +69,22 @@ Today:
   and a link back to sign-in.
 - `/workspace-pending`: a session-gated dead end for a signed-in user with no
   membership, with "Try again" (to `/dashboard`) and "Sign out".
+- `/signup`: a public gate in front of the same providers, not a second
+  login. The visitor ticks acceptance of the Terms of Service and the Privacy
+  Policy, linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
+  (`routes.terms()` and `routes.privacy()` in `@blog/config`; the marketing
+  site serves them), or named as plain text without a root domain. Continue
+  runs `acceptSignupTermsAction`: Vercel BotID with Deep Analysis, then the
+  `SIGNUP_TERMS_COOKIE_NAME` cookie set to `TERMS_VERSION` for two days, then
+  `/sign-in` with a `callbackUrl` of `/`. A bot, or a failed check, gets a
+  neutral "try again later" and no cookie; a failed check is logged. A
+  signed-in visitor is sent to `/`. `/sign-in` links to it ("New here?").
 - Sign-out (account menu, or the button on pre-shell pages) runs
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
 
 Decided:
 
-- `/signup`: a gate in front of the same providers (Vercel BotID, terms and
-  privacy acceptance), not a second login.
 - `/onboarding`: site type, name, slug with a live availability check,
   language, preset and accent with the site preview, then **Create site**.
 
@@ -113,7 +126,7 @@ Decided:
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
   cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
   users are never stamped, and a recorded acceptance is never overwritten.
-  Decided: `/signup` sets that cookie; a magic link opened in another browser
+  `/signup` sets that cookie. Decided: a magic link opened in another browser
   has no cookie, so `/onboarding` asks for acceptance again.
 
 ## Configuration
@@ -170,6 +183,10 @@ Decided:
   [platform-shell](./platform-shell.md),
   [plans-and-entitlements](./plans-and-entitlements.md),
   [public-front-door](./public-front-door.md).
+- Vercel BotID (`botid`: `withBotId` in `next.config.ts`, `initBotId` in
+  `src/instrumentation-client.ts` protecting POSTs to `/signup`; `src/proxy.ts`
+  skips its challenge path). No env var of its own; Deep Analysis is billed
+  per check.
 - Env: `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
   `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_API_KEY`,
   `MAGIC_LINK_FROM_ADDRESS`, `KV_REST_API_URL`/`KV_REST_API_TOKEN` (the
@@ -181,6 +198,8 @@ Decided:
 - `apps/platform/src/server/auth/require-session-user-id.ts`
 - `apps/platform/src/server/auth/resolve-home-href.ts`
 - `apps/platform/src/app/[locale]/sign-in/page.tsx`
+- `apps/platform/src/app/[locale]/signup/page.tsx`
+- `apps/platform/src/server/auth/accept-signup-terms-action.ts`
 - `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
@@ -194,8 +213,10 @@ Decided:
 - `apps/platform/src/server/auth/resolve-home-href.test.ts`,
   `sign-out-action.test.ts`, `send-sign-in-link-action.test.ts`,
   `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
-  `sign-in-error/page.test.tsx`, `safe-callback-path.test.ts`, and the view
-  tests beside `sign-in-view`, `email-sign-in-form`,
+  `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
+  `accept-signup-terms-action.test.ts`, `legal-page-urls.test.ts`,
+  `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
+  `sign-in-view`, `email-sign-in-form`,
   `workspace-pending-view` and `sign-out-button`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.
