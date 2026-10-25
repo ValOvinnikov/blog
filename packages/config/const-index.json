@@ -5266,6 +5266,30 @@
         "file": "apps/web/src/constants/revalidate.ts"
       }
     ],
+    "authenticated": [
+      {
+        "ref": "SESSION_STATUS.AUTHENTICATED",
+        "scope": "app:web",
+        "from": "@web/constants/session",
+        "file": "apps/web/src/constants/session.ts"
+      }
+    ],
+    "unauthenticated": [
+      {
+        "ref": "SESSION_STATUS.UNAUTHENTICATED",
+        "scope": "app:web",
+        "from": "@web/constants/session",
+        "file": "apps/web/src/constants/session.ts"
+      }
+    ],
+    "loading": [
+      {
+        "ref": "SESSION_STATUS.LOADING",
+        "scope": "app:web",
+        "from": "@web/constants/session",
+        "file": "apps/web/src/constants/session.ts"
+      }
+    ],
     "UNAUTHORIZED": [
       {
         "ref": "ENQUEUE_ERROR.UNAUTHORIZED",

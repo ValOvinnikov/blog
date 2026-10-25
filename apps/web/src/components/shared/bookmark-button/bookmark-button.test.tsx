@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
+import { SESSION_STATUS } from '@web/constants/session';
 import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { act, customRender, screen, waitFor } from '@web/testing/custom-render';
 import { logger } from '@web/utils/logger/logger';
@@ -86,7 +87,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     beforeEach(() => {
       useSessionMock.mockReturnValue({
         data: null,
-        status: 'unauthenticated',
+        status: SESSION_STATUS.UNAUTHENTICATED,
       });
       setup();
     });
@@ -110,7 +111,10 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
   describe('while the session is resolving', () => {
     beforeEach(() => {
-      useSessionMock.mockReturnValue({ data: null, status: 'loading' });
+      useSessionMock.mockReturnValue({
+        data: null,
+        status: SESSION_STATUS.LOADING,
+      });
       setup();
     });
 
@@ -133,7 +137,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     beforeEach(() => {
       useSessionMock.mockReturnValue({
         data: { user: { id: 'user-1' } },
-        status: 'authenticated',
+        status: SESSION_STATUS.AUTHENTICATED,
       });
     });
 

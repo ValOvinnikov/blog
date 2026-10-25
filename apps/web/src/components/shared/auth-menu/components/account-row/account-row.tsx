@@ -2,6 +2,7 @@
 
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { SESSION_STATUS } from '@web/constants/session';
 import {
   ACCOUNT_OVERLAY_ID,
   useHeaderOverlay,
@@ -17,7 +18,7 @@ export const AccountRow = () => {
   const overlay = useHeaderOverlay();
   const { root, glyph } = accountRowVariants();
 
-  if (status === 'loading' || !overlay) {
+  if (status === SESSION_STATUS.LOADING || !overlay) {
     return null;
   }
 
@@ -32,7 +33,9 @@ export const AccountRow = () => {
       className={root()}
     >
       <Icon name={ICONS.USER} size={SIZE.SM} className={glyph()} />
-      {status === 'authenticated' ? t('accountHeading') : t('signIn')}
+      {status === SESSION_STATUS.AUTHENTICATED
+        ? t('accountHeading')
+        : t('signIn')}
     </button>
   );
 };

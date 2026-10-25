@@ -1,6 +1,7 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
+import { SESSION_STATUS } from '@web/constants/session';
 import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
@@ -29,7 +30,7 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
   const { loadingStatus, reveal } = authMenuVariants();
   useSignedInHint(status, data?.expires);
 
-  if (status === 'loading') {
+  if (status === SESSION_STATUS.LOADING) {
     return (
       <AccountPlaceholder>
         <span
@@ -43,7 +44,7 @@ export const AuthMenu = ({ oauthProviderIds }: IAuthMenuProps) => {
     );
   }
 
-  if (status === 'authenticated') {
+  if (status === SESSION_STATUS.AUTHENTICATED) {
     const { name, email, image } = data.user ?? {};
 
     return (

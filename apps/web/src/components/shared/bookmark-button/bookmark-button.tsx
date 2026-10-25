@@ -3,6 +3,7 @@
 import { ACTION_OUTCOME, type IWithClassName } from '@blog/config';
 import { BookmarkToggle } from '@blog/ui/components/atoms/bookmark-toggle';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
+import { SESSION_STATUS } from '@web/constants/session';
 import {
   ACCOUNT_OVERLAY_ID,
   useHeaderOverlay,
@@ -35,7 +36,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   const s = bookmarkButtonVariants();
 
   useEffect(() => {
-    if (status !== 'authenticated') return;
+    if (status !== SESSION_STATUS.AUTHENTICATED) return;
 
     let cancelled = false;
 
@@ -120,7 +121,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   };
 
   const handleToggle = () => {
-    if (status === 'unauthenticated') {
+    if (status === SESSION_STATUS.UNAUTHENTICATED) {
       overlay?.setActiveId(ACCOUNT_OVERLAY_ID);
       return;
     }
