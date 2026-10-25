@@ -40,7 +40,7 @@ A visitor sends the site's owner a message from a contact form placed on a page,
 - Recipient: `getContactRecipient` returns the override when set, otherwise the owner's sign-in email from `getTenantOwnerEmail`. The address is never stored in Sanity, whose content is publicly readable.
 - `module_contactForm` holds its own `successMessage` (localised, required in the default language, max 160 per language) and an optional `privacyNote` (localised `paragraphText`, for the policy link), so two forms can say different things; there is no settings singleton. Field labels, the button and error messages are fixed product copy.
 - Fields are fixed: name, email and message, all required. No toggles, no consent checkbox; a privacy note links the policy.
-- Automatic expiry of old leads is a separate, planned retention job.
+- Leads are deleted 12 months after they arrive, one period for every site, by the worker's daily inactivity sweep (`queries.retention.deleteLeadsPastRetention`, see tenant-provisioning.md). Owners may still delete earlier by hand.
 
 ## Configuration
 

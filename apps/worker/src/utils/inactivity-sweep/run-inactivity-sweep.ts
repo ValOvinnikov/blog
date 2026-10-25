@@ -2,7 +2,7 @@ import { INACTIVITY_STAGE, type TInactivityStage } from '@blog/db/constants';
 import { listTenantsDueForInactivityStage } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
-import { INACTIVITY_STAGE_FAILED_EVENT } from '@worker/constants/inactivity-sweep';
+import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { logger } from '@worker/utils/logger/logger';
 
 import {
@@ -28,7 +28,7 @@ async function advanceTenant(
   try {
     return await INACTIVITY_STAGE_HANDLERS[stage](tenant, ctx);
   } catch (error) {
-    logger.error(INACTIVITY_STAGE_FAILED_EVENT, {
+    logger.error(INACTIVITY_SWEEP_LOG.STAGE_FAILED, {
       tenantId: tenant.id,
       stage,
       error: sanitizeLogMessage(error),

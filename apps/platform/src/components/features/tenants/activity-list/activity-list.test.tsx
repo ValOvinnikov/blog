@@ -1,4 +1,8 @@
-import { AUDIT_ACTION } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  GITHUB_AUDIT_ACTOR_ID_PREFIX,
+  WORKER_AUDIT_ACTOR_ID,
+} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   mockAuditEvent,
@@ -12,6 +16,7 @@ import { ActivityList } from './activity-list';
 faker.seed(5783);
 
 const MOCK_SECOND_EVENT_ID = faker.string.uuid();
+const MOCK_GITHUB_HANDLE = faker.internet.username();
 
 const setup = customRender(ActivityList, {
   events: [
@@ -59,12 +64,42 @@ describe(`<${ActivityList.name}/>`, () => {
     });
   });
 
-  it("names a deleted account in place of an actor's cleared email", () => {
-    setup({ events: [mockAuditEvent({ actorEmail: null })] });
+  it('names a deleted account when the actor has no account any more', () => {
+    setup({ events: [mockAuditEvent({ actorAccountEmail: null })] });
 
     const deletedAccountLabel = screen.getByText('Deleted account');
 
     expect(deletedAccountLabel).toBeVisible();
+  });
+
+  it('names the worker as the system', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          actorId: WORKER_AUDIT_ACTOR_ID,
+          actorAccountEmail: null,
+        }),
+      ],
+    });
+
+    const systemLabel = screen.getByText('System');
+
+    expect(systemLabel).toBeVisible();
+  });
+
+  it('names a GitHub workflow actor by their handle', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          actorId: `${GITHUB_AUDIT_ACTOR_ID_PREFIX}${MOCK_GITHUB_HANDLE}`,
+          actorAccountEmail: null,
+        }),
+      ],
+    });
+
+    const handleLabel = screen.getByText(MOCK_GITHUB_HANDLE);
+
+    expect(handleLabel).toBeVisible();
   });
 
   it('shows an empty state when there is no recorded activity', () => {

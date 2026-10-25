@@ -56,9 +56,11 @@ platform-wide Findings page. Tenant owners see neither.
   read. ADMINs and MODERATORs never trigger the read.
 - `/tenants/{id}` overview: the Findings card (OPEN findings, with a
   disclosure that loads `details` on open) and the Recent activity card (the
-  last five `TENANT` audit events: action, actor email, relative time), with
-  a View all activity link to the activity page while there is any. An event
-  whose actor deleted their account shows "Deleted account" instead.
+  last five `TENANT` audit events: action, actor, relative time), with a
+  View all activity link to the activity page while there is any. The actor
+  is the email on the acting user's account, read when the page loads; the
+  `worker` actor shows "System", a `github:<handle>` actor shows the handle,
+  and a user whose account no longer exists shows "Deleted account".
 - `/tenants/{id}/activity` (operator, gated by `requireTenantById`): every
   `TENANT` audit event for the tenant, newest first (ties broken by id),
   `AUDIT_EVENTS_PAGE_SIZE` per page (`?page=n`), rows shown as on the card.
@@ -72,8 +74,9 @@ platform-wide Findings page. Tenant owners see neither.
 
 ## Data
 
-- `audit_events`: `actorId`, `actorEmail` (a snapshot taken at insert,
-  nullable: `deleteAccount` clears it on the user's rows),
+- `audit_events`: `actorId` (a `users.id`, `worker`, or `github:<handle>`),
+  `actorEmail` (no writer fills it; older rows still hold a snapshot until
+  the column is dropped, and nothing reads it for display),
   `action`, `targetType`, `targetId` (no foreign key; rows outlive their
   target), `details` jsonb, `createdAt`. Indexed on (`targetType`,
   `targetId`).
@@ -95,7 +98,8 @@ platform-wide Findings page. Tenant owners see neither.
     `PERSONAL_DATA_EXPORTED` and `PERSONAL_DATA_ERASED` against target
     `PERSONAL_DATA`, whose `targetId` is the email's index, never the email
     ([Data requests](data-requests.md)).
-  - CLI workflows (actor `github:<actor>`): `PROVISIONED`,
+  - The provisioning worker (actor `worker`) and the CLI workflows (actor
+    `github:<actor>`): `PROVISIONED`,
     `PROVISIONING_FAILED` (with the failed step and run id), `DEPROVISIONED`,
     `READER_DATA_PURGED`.
   - Findings: only `validate-tenant-documents` writes, as
@@ -118,9 +122,15 @@ Nothing is configurable. Only admins (any role) see either record.
 
 ## Constraints and invariants
 
-- `audit_events` is insert-only, through `insertAuditEvent`. The two updates
-  clear `actorEmail`: `deleteAccount` for the deleted user, and
+- `audit_events` is insert-only, through `insertAuditEvent`, which takes no
+  actor email. The two updates clear `actorEmail` left on older rows: `deleteAccount` for the deleted user, and
   `erasePersonalData` for an erased address. The events and `actorId` stay.
+- Retention: `queries.retention.deleteAuditEventsPastRetention(now, limit)`
+  deletes audit events written more than 24 months before `now`, and
+  `deleteResolvedFindingsPastRetention(now, limit)` deletes findings resolved
+  more than 90 days before it; an open finding is never deleted. Each deletes
+  at most `limit` rows and returns how many it deleted. The worker's daily
+  inactivity sweep runs both (see tenant-provisioning.md).
 - Neither `details` column holds an email address or other personal field.
   Writers record field names or ids instead: email config lists the saved
   field names, tenant details records `ownerEmailUpdated`, and tenant

@@ -1,3 +1,4 @@
+import { GITHUB_AUDIT_ACTOR_ID_PREFIX } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 
 export const MOCK_DEPROVISION_ENV = {
@@ -22,6 +23,5 @@ export const MOCK_PURGED_READER_DATA_COUNTS = {
 };
 
 export const MOCK_DEPROVISION_AUDIT_ACTOR = {
-  actorId: `github:${MOCK_DEPROVISION_ENV.githubActor}`,
-  actorEmail: `${MOCK_DEPROVISION_ENV.githubActor}@users.noreply.github.com`,
+  actorId: `${GITHUB_AUDIT_ACTOR_ID_PREFIX}${MOCK_DEPROVISION_ENV.githubActor}`,
 };

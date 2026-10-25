@@ -4,7 +4,6 @@ import { auditEvents, type TAuditEvent } from '@blog/db/schema/audit-events';
 
 export type TInsertAuditEventInput = {
   actorId: string;
-  actorEmail: string;
   action: TAuditAction;
   targetType: TAuditTargetType;
   targetId: string;

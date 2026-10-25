@@ -178,7 +178,6 @@ describe('deprovisionTenantAction', () => {
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
-      actorEmail: MOCK_OPERATOR_EMAIL,
       action: AUDIT_ACTION.DEPROVISION_REQUESTED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,

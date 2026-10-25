@@ -8,7 +8,7 @@ import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { stampTenantInactivityStage } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
-import { INACTIVITY_OWNER_MISSING_EVENT } from '@worker/constants/inactivity-sweep';
+import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { reportDeprovisioningRunStart } from '@worker/utils/deprovisioning-report/deprovisioning-report';
 import { logger } from '@worker/utils/logger/logger';
 import { deprovisionTenant } from '@worker/workflows/deprovision-tenant';
@@ -37,7 +37,7 @@ async function findOwnerEmail(
 ): Promise<TMaybeUndefined<string>> {
   const ownerEmail = await getTenantOwnerEmail(tenantId);
   if (!ownerEmail) {
-    logger.error(INACTIVITY_OWNER_MISSING_EVENT, { tenantId, stage });
+    logger.error(INACTIVITY_SWEEP_LOG.OWNER_MISSING, { tenantId, stage });
   }
   return ownerEmail;
 }

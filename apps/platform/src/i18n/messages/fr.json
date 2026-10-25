@@ -23,7 +23,8 @@
     "leads": "Messages reçus · Administration",
     "releases": "Versions · Admin",
     "blockedSignupsPage": "Inscriptions bloquées · Admin",
-    "dataRequestsPage": "Demandes de données · Admin"
+    "dataRequestsPage": "Demandes de données · Admin",
+    "signUpTitle": "Créer un compte"
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
@@ -37,7 +38,21 @@
     "accountNotLinkedTitle": "Cette adresse se connecte déjà autrement",
     "accountNotLinkedDescription": "Votre adresse e-mail est déjà utilisée avec une autre méthode de connexion. Connectez-vous comme la dernière fois.",
     "signInFailedTitle": "Nous n'avons pas pu vous connecter",
-    "signInFailedDescription": "Un problème est survenu lors de la connexion. Réessayez ou choisissez une autre méthode de connexion."
+    "signInFailedDescription": "Un problème est survenu lors de la connexion. Réessayez ou choisissez une autre méthode de connexion.",
+    "signUpPrompt": "Nouveau ? <link>Créer un compte</link>"
+  },
+  "signUpPage": {
+    "heading": "Créer un compte",
+    "description": "Acceptez les conditions, puis choisissez comment vous connecter.",
+    "brandMarkLabel": "Valstack"
+  },
+  "signUpForm": {
+    "acceptTerms": "J'accepte les <terms>Conditions d'utilisation</terms> et la <privacy>Politique de confidentialité</privacy>.",
+    "termsNotAccepted": "Acceptez les Conditions d'utilisation et la Politique de confidentialité pour continuer.",
+    "continue": "Continuer",
+    "continuing": "Vérification…",
+    "refusedTitle": "Nous n'avons pas pu poursuivre votre inscription",
+    "refusedDescription": "Réessayez plus tard."
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuer avec GitHub",
@@ -331,6 +346,7 @@
   "activityList": {
     "empty": "Aucune activité enregistrée pour le moment.",
     "actorDeleted": "Compte supprimé",
+    "actorSystem": "Système",
     "relativeJustNow": "À l'instant",
     "relativeMinutesAgo": "il y a {minutes} min",
     "relativeHoursAgo": "il y a {hours} h",
@@ -1140,7 +1156,7 @@
     "draftColumn": "Votre brouillon",
     "emptyValue": "Vide"
   },
-  "externalLinkButton": {
+  "externalLink": {
     "newTabHint": "(s'ouvre dans un nouvel onglet)"
   },
   "leadsView": {

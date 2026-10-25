@@ -1,4 +1,8 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  GITHUB_AUDIT_ACTOR_ID_PREFIX,
+} from '@blog/config/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
 import type { TTenantReaderDataCounts } from '@blog/db/queries/reader-data';
 import { sanitizeLogMessage } from '@blog/insight';
@@ -19,8 +23,7 @@ export async function recordReaderDataPurgeAuditEvent(
 
   try {
     await insertAuditEvent({
-      actorId: `github:${env.githubActor}`,
-      actorEmail: `${env.githubActor}@users.noreply.github.com`,
+      actorId: `${GITHUB_AUDIT_ACTOR_ID_PREFIX}${env.githubActor}`,
       action: AUDIT_ACTION.READER_DATA_PURGED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,

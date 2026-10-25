@@ -1,5 +1,5 @@
 import { SIZE } from '@blog/config';
-import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { ActivityList } from '@platform/components/features/tenants/activity-list';
 import { Card } from '@platform/components/shared/card';
@@ -8,7 +8,7 @@ import { Text } from '@platform/components/shared/text';
 import { useTranslations } from 'next-intl';
 
 export type TRecentActivityCardProps = {
-  events: TAuditEvent[];
+  events: TListedAuditEvent[];
   viewAllHref: string;
 };
 

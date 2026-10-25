@@ -1,4 +1,8 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  GITHUB_AUDIT_ACTOR_ID_PREFIX,
+} from '@blog/config/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
 import { sanitizeLogMessage } from '@blog/insight';
 
@@ -25,8 +29,7 @@ export async function recordDeprovisionAuditEvent(
 
   try {
     await insertAuditEvent({
-      actorId: `github:${env.githubActor}`,
-      actorEmail: `${env.githubActor}@users.noreply.github.com`,
+      actorId: `${GITHUB_AUDIT_ACTOR_ID_PREFIX}${env.githubActor}`,
       action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
