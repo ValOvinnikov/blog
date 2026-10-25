@@ -425,6 +425,15 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`
 
+### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
+
+- **INACTIVITY_SWEEP_LOG**: `NOT_CONFIGURED`=`"inactivity_sweep.not_configured"`, `FAILED`=`"inactivity_sweep.failed"`, `STAGE_FAILED`=`"inactivity_sweep.stage_failed"`, `OWNER_MISSING`=`"inactivity_sweep.owner_missing"`, `ALERT_NO_RECIPIENTS`=`"inactivity_sweep.alert_no_recipients"`, `EMAIL_SEND_FAILED`=`"inactivity_sweep.email_send_failed"`
+
 ### `@worker/constants/provisioning` — `apps/worker/src/constants/provisioning.ts`
 
 - **PROVISION_CLI_RESULT**: `SUCCEEDED`, `FAILED`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`
+
+### `@worker/constants/retention` — `apps/worker/src/constants/retention.ts`
+
+- **RETENTION_KIND**: `PENDING_SUBSCRIBERS`, `LEADS`, `SESSIONS`, `VERIFICATION_TOKENS`, `AUDIT_EVENTS`, `RESOLVED_FINDINGS`
+- **RETENTION_LOG**: `DELETED`=`"retention.deleted"`, `CLEANUP_FAILED`=`"retention.cleanup_failed"`

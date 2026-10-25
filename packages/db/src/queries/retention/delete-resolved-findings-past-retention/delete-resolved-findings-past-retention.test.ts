@@ -11,6 +11,7 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
+  MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
 
@@ -59,7 +60,10 @@ describe(deleteResolvedFindingsPastRetention, () => {
     const recentId = await insertFinding({ resolvedAt: justWithin(CUTOFF) });
 
     await expect(
-      deleteResolvedFindingsPastRetention(MOCK_RETENTION_NOW),
+      deleteResolvedFindingsPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(1);
     expect(await remainingIds()).toEqual([recentId]);
   });
@@ -72,17 +76,36 @@ describe(deleteResolvedFindingsPastRetention, () => {
     });
 
     await expect(
-      deleteResolvedFindingsPastRetention(MOCK_RETENTION_NOW),
+      deleteResolvedFindingsPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(0);
     expect(await remainingIds()).toEqual([openId]);
   });
 
-  it('deletes nothing when run a second time', async () => {
+  it('deletes at most the given number of findings per call', async () => {
     await insertFinding({ resolvedAt: justPast(CUTOFF) });
-    await deleteResolvedFindingsPastRetention(MOCK_RETENTION_NOW);
+    await insertFinding({ resolvedAt: justPast(CUTOFF) });
 
     await expect(
-      deleteResolvedFindingsPastRetention(MOCK_RETENTION_NOW),
+      deleteResolvedFindingsPastRetention(MOCK_RETENTION_NOW, 1),
+    ).resolves.toBe(1);
+    expect(await remainingIds()).toHaveLength(1);
+  });
+
+  it('deletes nothing when run a second time', async () => {
+    await insertFinding({ resolvedAt: justPast(CUTOFF) });
+    await deleteResolvedFindingsPastRetention(
+      MOCK_RETENTION_NOW,
+      MOCK_RETENTION_LIMIT,
+    );
+
+    await expect(
+      deleteResolvedFindingsPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(0);
   });
 });

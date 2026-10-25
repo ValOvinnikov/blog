@@ -9,10 +9,7 @@ import {
   sendEmail,
 } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
-import {
-  INACTIVITY_ALERT_NO_RECIPIENTS_EVENT,
-  INACTIVITY_EMAIL_SEND_FAILED_EVENT,
-} from '@worker/constants/inactivity-sweep';
+import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { logger } from '@worker/utils/logger/logger';
 import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-email';
@@ -67,7 +64,7 @@ export async function sendOwnerInactivityEmail(
       ...message,
     });
   } catch (error) {
-    logger.error(INACTIVITY_EMAIL_SEND_FAILED_EVENT, {
+    logger.error(INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED, {
       tenantId,
       stage: email,
       error: sanitizeLogMessage(error),
@@ -91,7 +88,7 @@ export async function alertOperatorsOfSuspensionWarning({
   });
 
   await sendOperatorEmail(tenantId, message, {
-    noRecipientsEvent: INACTIVITY_ALERT_NO_RECIPIENTS_EVENT,
-    sendFailedEvent: INACTIVITY_EMAIL_SEND_FAILED_EVENT,
+    noRecipientsEvent: INACTIVITY_SWEEP_LOG.ALERT_NO_RECIPIENTS,
+    sendFailedEvent: INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED,
   });
 }

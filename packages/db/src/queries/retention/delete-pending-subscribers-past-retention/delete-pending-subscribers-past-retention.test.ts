@@ -9,6 +9,7 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   justPast,
   justWithin,
+  MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
 import { faker } from '@faker-js/faker';
@@ -61,7 +62,10 @@ describe(deletePendingSubscribersPastRetention, () => {
     await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
 
     await expect(
-      deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW),
+      deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(1);
     expect(await remainingIds()).toEqual([]);
   });
@@ -73,7 +77,10 @@ describe(deletePendingSubscribersPastRetention, () => {
     });
 
     await expect(
-      deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW),
+      deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(0);
     expect(await remainingIds()).toEqual([recentId]);
   });
@@ -85,7 +92,10 @@ describe(deletePendingSubscribersPastRetention, () => {
     });
 
     await expect(
-      deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW),
+      deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(1);
     expect(await remainingIds()).toEqual([recentId]);
   });
@@ -98,17 +108,36 @@ describe(deletePendingSubscribersPastRetention, () => {
     });
 
     await expect(
-      deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW),
+      deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(0);
     expect(await remainingIds()).toEqual([activeId]);
   });
 
-  it('deletes nothing when run a second time', async () => {
+  it('deletes at most the given number of subscribers per call', async () => {
     await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
-    await deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW);
+    await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
 
     await expect(
-      deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW),
+      deletePendingSubscribersPastRetention(MOCK_RETENTION_NOW, 1),
+    ).resolves.toBe(1);
+    expect(await remainingIds()).toHaveLength(1);
+  });
+
+  it('deletes nothing when run a second time', async () => {
+    await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
+    await deletePendingSubscribersPastRetention(
+      MOCK_RETENTION_NOW,
+      MOCK_RETENTION_LIMIT,
+    );
+
+    await expect(
+      deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      ),
     ).resolves.toBe(0);
   });
 });
