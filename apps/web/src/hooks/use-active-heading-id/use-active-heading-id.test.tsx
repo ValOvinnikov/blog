@@ -1,54 +1,21 @@
-import { act, customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
+import {
+  FakeIntersectionObserver,
+  getFakeIntersectionObserver,
+  stubFakeIntersectionObserver,
+} from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 
 import { useActiveHeadingId } from './use-active-heading-id';
 
-type TObserverEntryInit = {
-  target: Element;
-  isIntersecting: boolean;
-  top: number;
-};
-
-class FakeIntersectionObserver implements IntersectionObserver {
-  static instances: FakeIntersectionObserver[] = [];
-
-  root = null;
-  rootMargin = '';
-  scrollMargin = '';
-  thresholds: number[] = [];
-  callback: IntersectionObserverCallback;
-  observed: Element[] = [];
-
-  constructor(callback: IntersectionObserverCallback) {
-    this.callback = callback;
-    FakeIntersectionObserver.instances.push(this);
-  }
-
-  observe(target: Element) {
-    this.observed.push(target);
-  }
-
-  unobserve() {}
-
-  disconnect() {
-    this.observed = [];
-  }
-
-  takeRecords(): IntersectionObserverEntry[] {
-    return [];
-  }
-
-  trigger(entries: TObserverEntryInit[]) {
-    const fullEntries = entries.map(
-      (entry) =>
-        ({
-          target: entry.target,
-          isIntersecting: entry.isIntersecting,
-          boundingClientRect: { top: entry.top } as DOMRectReadOnly,
-        }) as IntersectionObserverEntry,
-    );
-    act(() => this.callback(fullEntries, this));
-  }
-}
+const headingEntry = (
+  id: string,
+  isIntersecting: boolean,
+  top: number,
+): Partial<IntersectionObserverEntry> => ({
+  target: document.getElementById(id)!,
+  isIntersecting,
+  boundingClientRect: { top } as DOMRectReadOnly,
+});
 
 const Harness = ({ ids }: { ids: string[] }) => {
   const activeId = useActiveHeadingId(ids);
@@ -67,18 +34,9 @@ const Harness = ({ ids }: { ids: string[] }) => {
 
 const setup = customRender(Harness, { ids: [] });
 
-const getObserver = (): FakeIntersectionObserver => {
-  const [observer] = FakeIntersectionObserver.instances;
-  if (!observer) {
-    throw new Error('Expected an IntersectionObserver instance to exist.');
-  }
-  return observer;
-};
-
 describe(useActiveHeadingId, () => {
   beforeEach(() => {
-    FakeIntersectionObserver.instances = [];
-    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
+    stubFakeIntersectionObserver();
   });
 
   afterEach(() => {
@@ -90,7 +48,7 @@ describe(useActiveHeadingId, () => {
 
     beforeEach(() => {
       setup({ ids: ['one', 'two', 'three'] });
-      observer = getObserver();
+      observer = getFakeIntersectionObserver();
     });
 
     it('returns null before any heading has intersected', () => {
@@ -98,29 +56,15 @@ describe(useActiveHeadingId, () => {
     });
 
     it('sets the active id to the intersecting heading', () => {
-      observer.trigger([
-        {
-          target: document.getElementById('one')!,
-          isIntersecting: true,
-          top: 10,
-        },
-      ]);
+      observer.trigger([headingEntry('one', true, 10)]);
 
       expect(screen.getByTestId('active-id')).toHaveTextContent('one');
     });
 
     it('picks the topmost heading when multiple are intersecting at once', () => {
       observer.trigger([
-        {
-          target: document.getElementById('two')!,
-          isIntersecting: true,
-          top: 50,
-        },
-        {
-          target: document.getElementById('one')!,
-          isIntersecting: true,
-          top: 5,
-        },
+        headingEntry('two', true, 50),
+        headingEntry('one', true, 5),
       ]);
 
       expect(screen.getByTestId('active-id')).toHaveTextContent('one');
@@ -136,15 +80,9 @@ describe(useActiveHeadingId, () => {
 
   it('ignores non-intersecting entries', () => {
     setup({ ids: ['one', 'two'] });
-    const observer = getObserver();
+    const observer = getFakeIntersectionObserver();
 
-    observer.trigger([
-      {
-        target: document.getElementById('one')!,
-        isIntersecting: false,
-        top: 5,
-      },
-    ]);
+    observer.trigger([headingEntry('one', false, 5)]);
 
     expect(screen.getByTestId('active-id')).toHaveTextContent('none');
   });

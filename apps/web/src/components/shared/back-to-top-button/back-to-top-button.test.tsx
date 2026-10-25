@@ -1,50 +1,13 @@
 import userEvent from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
-import { act } from 'react';
+import {
+  getFakeIntersectionObserver,
+  stubFakeIntersectionObserver,
+} from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 
 import { BackToTopButton } from './back-to-top-button';
 
-class FakeIntersectionObserver implements IntersectionObserver {
-  static instances: FakeIntersectionObserver[] = [];
-
-  root = null;
-  rootMargin = '';
-  scrollMargin = '';
-  thresholds: number[] = [];
-  callback: IntersectionObserverCallback;
-  observed: Element[] = [];
-
-  constructor(callback: IntersectionObserverCallback) {
-    this.callback = callback;
-    FakeIntersectionObserver.instances.push(this);
-  }
-
-  observe(target: Element) {
-    this.observed.push(target);
-  }
-
-  unobserve() {}
-
-  disconnect() {
-    this.observed = [];
-  }
-
-  takeRecords(): IntersectionObserverEntry[] {
-    return [];
-  }
-
-  trigger(isIntersecting: boolean) {
-    this.callback([{ isIntersecting } as IntersectionObserverEntry], this);
-  }
-}
-
-const getObserver = (): FakeIntersectionObserver => {
-  const [observer] = FakeIntersectionObserver.instances;
-  if (!observer) {
-    throw new Error('Expected an IntersectionObserver instance to exist.');
-  }
-  return observer;
-};
+const BACK_TO_TOP_LABEL = 'Back to top';
 
 const setup = customRender(BackToTopButton, {});
 
@@ -63,8 +26,7 @@ const fireScroll = () => {
 describe(`<${BackToTopButton.name}/>`, () => {
   beforeEach(() => {
     document.body.innerHTML = '<footer data-testid="site-footer"></footer>';
-    FakeIntersectionObserver.instances = [];
-    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
+    stubFakeIntersectionObserver();
   });
 
   afterEach(() => {
@@ -82,7 +44,7 @@ describe(`<${BackToTopButton.name}/>`, () => {
     it('is hidden while scrolled less than one viewport height', () => {
       const button = screen.getByRole('button', {
         hidden: true,
-        name: 'Back to top',
+        name: BACK_TO_TOP_LABEL,
       });
 
       expect(button).toHaveAttribute('inert');
@@ -100,7 +62,10 @@ describe(`<${BackToTopButton.name}/>`, () => {
     });
 
     it('disconnects the footer observer on unmount', () => {
-      const disconnectSpy = vi.spyOn(getObserver(), 'disconnect');
+      const disconnectSpy = vi.spyOn(
+        getFakeIntersectionObserver(),
+        'disconnect',
+      );
 
       unmount();
 
@@ -115,7 +80,7 @@ describe(`<${BackToTopButton.name}/>`, () => {
 
       it('becomes visible once scrolled past one viewport height', () => {
         expect(
-          screen.getByRole('button', { name: 'Back to top' }),
+          screen.getByRole('button', { name: BACK_TO_TOP_LABEL }),
         ).toBeVisible();
       });
 
@@ -125,35 +90,29 @@ describe(`<${BackToTopButton.name}/>`, () => {
 
         await userEvent
           .setup()
-          .click(screen.getByRole('button', { name: 'Back to top' }));
+          .click(screen.getByRole('button', { name: BACK_TO_TOP_LABEL }));
 
         expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
       });
 
       it('hides once the footer scrolls into view, even past one viewport height', () => {
         expect(
-          screen.getByRole('button', { name: 'Back to top' }),
+          screen.getByRole('button', { name: BACK_TO_TOP_LABEL }),
         ).toBeVisible();
 
-        act(() => {
-          getObserver().trigger(true);
-        });
+        getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
 
         expect(
-          screen.getByRole('button', { hidden: true, name: 'Back to top' }),
+          screen.getByRole('button', { hidden: true, name: BACK_TO_TOP_LABEL }),
         ).toHaveAttribute('inert');
       });
 
       it('reappears once the footer scrolls back out of view', () => {
-        act(() => {
-          getObserver().trigger(true);
-        });
-        act(() => {
-          getObserver().trigger(false);
-        });
+        getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
+        getFakeIntersectionObserver().trigger([{ isIntersecting: false }]);
 
         expect(
-          screen.getByRole('button', { name: 'Back to top' }),
+          screen.getByRole('button', { name: BACK_TO_TOP_LABEL }),
         ).toBeVisible();
       });
     });
@@ -167,6 +126,6 @@ describe(`<${BackToTopButton.name}/>`, () => {
 
     const siteFooter = screen.getByTestId('site-footer');
 
-    expect(getObserver().observed).toEqual([siteFooter]);
+    expect(getFakeIntersectionObserver().observed).toEqual([siteFooter]);
   });
 });
