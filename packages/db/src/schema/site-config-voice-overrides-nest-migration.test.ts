@@ -7,23 +7,22 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { eq, sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
 
 import { siteConfig } from './site-config';
 
+const GERMAN_NOT_FOUND_HEADING = 'Nicht gefunden';
+const ENGLISH_NOT_FOUND_HEADING = 'Lost the plot?';
 const NEST_MIGRATION = '0037_nest_voice_overrides_by_locale.sql';
 
 async function setUpDbBeforeNestMigration() {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const db = await createEmptyTestDb();
 
   for (const file of listMigrationFiles().filter(
     (name) => name < NEST_MIGRATION,
@@ -90,24 +89,24 @@ describe(`${NEST_MIGRATION} (voiceOverrides nested under the default locale)`, (
       const germanTenant = await seedTenantWithOverrides(
         db,
         LOCALE_ISO_CODES.DE,
-        { notFoundHeading: 'Nicht gefunden', blogListEmpty: richValue },
+        { notFoundHeading: GERMAN_NOT_FOUND_HEADING, blogListEmpty: richValue },
       );
       const englishTenant = await seedTenantWithOverrides(
         db,
         LOCALE_ISO_CODES.EN,
-        { notFoundHeading: 'Lost the plot?' },
+        { notFoundHeading: ENGLISH_NOT_FOUND_HEADING },
       );
 
       await applyMigrationFile(db, NEST_MIGRATION);
 
       expect(await readVoiceOverrides(db, germanTenant)).toEqual({
         [LOCALE_ISO_CODES.DE]: {
-          notFoundHeading: 'Nicht gefunden',
+          notFoundHeading: GERMAN_NOT_FOUND_HEADING,
           blogListEmpty: richValue,
         },
       });
       expect(await readVoiceOverrides(db, englishTenant)).toEqual({
-        [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
+        [LOCALE_ISO_CODES.EN]: { notFoundHeading: ENGLISH_NOT_FOUND_HEADING },
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,

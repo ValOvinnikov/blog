@@ -6,15 +6,13 @@ import {
   RADIUS_SCALE,
 } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
 
 import { siteConfig } from './site-config';
 import { tenants } from './tenants';
@@ -29,8 +27,7 @@ const OLD_CATEGORY_EMPTY_COPY = 'Old copy from categoryEmpty.';
 async function setUpDbWithSiteConfigRow(
   voiceOverrides: Record<string, string>,
 ) {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const db = await createEmptyTestDb();
 
   const otherMigrations = listMigrationFiles().filter(
     (file) => file !== RENAME_MIGRATION,
@@ -145,8 +142,7 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   it(
     'still applies cleanly against an empty site_config table',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
+      const db = await createEmptyTestDb();
 
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);

@@ -1,21 +1,24 @@
 import { readFile } from 'node:fs/promises';
 
 import * as schema from '@blog/db/schema';
+import type { TTestDb } from '@blog/db/testing/fixtures';
 import { PGlite } from '@electric-sql/pglite';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import { drizzle } from 'drizzle-orm/pglite';
 import { inject } from 'vitest';
 
-// Restores a fresh, isolated, in-memory Postgres database from the snapshot
-// `global-setup.ts` builds once per vitest process (every committed
-// migration applied — the real generated SQL, not a hand-rolled stand-in, so
-// a query/mutation test exercises the actual constraints drizzle-kit
-// generated) instead of replaying every migration file itself. Call once per
-// test file (or `beforeEach`) for full isolation between tests; each call
-// still gets its own private in-memory instance.
-export async function createTestDb(): Promise<PgliteDatabase<typeof schema>> {
-  const snapshotPath = inject('pgliteMigratedSnapshotPath');
+async function restoreSnapshot(snapshotPath: string): Promise<TTestDb> {
   const snapshot = await readFile(snapshotPath);
   const client = await PGlite.create({ loadDataDir: new Blob([snapshot]) });
 
   return drizzle(client, { schema });
+}
+
+// A private in-memory database with every committed migration applied.
+export function createTestDb(): Promise<TTestDb> {
+  return restoreSnapshot(inject('pgliteMigratedSnapshotPath'));
+}
+
+// A private in-memory database with no migration applied, for tests that replay migrations themselves.
+export function createEmptyTestDb(): Promise<TTestDb> {
+  return restoreSnapshot(inject('pgliteEmptySnapshotPath'));
 }

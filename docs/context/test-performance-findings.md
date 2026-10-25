@@ -97,6 +97,18 @@ suite produced **207 failures**, DOM from one test file leaking into the next
 (`getByRole` matching leftover elements). Do not enable without per-file
 teardown discipline.
 
+## `packages/db` — adopted: threads and an empty snapshot
+
+`packages/db/vitest.config.ts` runs on `pool: 'threads'`. Global setup now
+dumps the PGlite instance twice — straight after `initdb` and again once every
+migration is applied — and the `src/schema/*-migration.test.ts` files restore
+the empty one through `createEmptyTestDb()` instead of calling `new PGlite()`,
+so no test runs `initdb` itself. No assertion changed.
+
+Measured 2026-10-25 on one machine, `vitest run src/schema`, all 15 files / 46
+tests passing both ways: `forks` with `new PGlite()` 64s, threads with the
+empty snapshot 32s.
+
 ## Secondary: worker oversubscription
 
 Nothing in the repo sets `maxWorkers`, `poolOptions` or `fileParallelism`.

@@ -6,26 +6,31 @@ import {
   RADIUS_SCALE,
 } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
 
 import { siteConfig } from './site-config';
 import { tenants } from './tenants';
 
+const BLOG_LIST_EMPTY = 'Nothing published yet.';
+const BOOKMARKS_EMPTY = 'No bookmarks yet.';
+const NOT_FOUND_DESCRIPTION = "That route doesn't resolve to anything here.";
+const NOT_FOUND_RETURN_HOME = 'Return home';
+const TAG_EMPTY = 'No posts with this tag yet.';
+const TOPICS_EMPTY = 'No topics yet.';
+const NOT_FOUND_SUPPORTING_TEXT = "That route doesn't exist.";
+const TOPIC_EMPTY = 'No posts in this topic yet.';
 const RETIRE_MIGRATION = '0029_retire_voice_override_keys.sql';
 
 async function setUpDbWithSiteConfigRow(
   voiceOverrides: Record<string, string>,
 ) {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const db = await createEmptyTestDb();
 
   const otherMigrations = listMigrationFiles().filter(
     (file) => file !== RETIRE_MIGRATION,
@@ -91,15 +96,15 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
         bookmarkToastRemovedMessage: 'removed from ~/bookmarks',
         notFoundMetaTitle: 'Not found',
         notFoundMetaDescription: "This route doesn't exist.",
-        blogListEmpty: 'Nothing published yet.',
-        bookmarksEmpty: 'No bookmarks yet.',
+        blogListEmpty: BLOG_LIST_EMPTY,
+        bookmarksEmpty: BOOKMARKS_EMPTY,
       });
 
       await applyRetireMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
-        blogListEmpty: 'Nothing published yet.',
-        bookmarksEmpty: 'No bookmarks yet.',
+        blogListEmpty: BLOG_LIST_EMPTY,
+        bookmarksEmpty: BOOKMARKS_EMPTY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -110,16 +115,16 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
         notFoundCommandNotFound: 'Not found',
-        notFoundDescription: "That route doesn't resolve to anything here.",
-        notFoundReturnHome: 'Return home',
+        notFoundDescription: NOT_FOUND_DESCRIPTION,
+        notFoundReturnHome: NOT_FOUND_RETURN_HOME,
       });
 
       await applyRetireMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
         notFoundHeading: 'Not found',
-        notFoundSupportingText: "That route doesn't resolve to anything here.",
-        notFoundReturnHome: 'Return home',
+        notFoundSupportingText: NOT_FOUND_DESCRIPTION,
+        notFoundReturnHome: NOT_FOUND_RETURN_HOME,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -150,15 +155,15 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
     'leaves a row with none of the affected keys untouched',
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
-        tagEmpty: 'No posts with this tag yet.',
-        topicsEmpty: 'No topics yet.',
+        tagEmpty: TAG_EMPTY,
+        topicsEmpty: TOPICS_EMPTY,
       });
 
       await applyRetireMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
-        tagEmpty: 'No posts with this tag yet.',
-        topicsEmpty: 'No topics yet.',
+        tagEmpty: TAG_EMPTY,
+        topicsEmpty: TOPICS_EMPTY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -181,16 +186,16 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
         notFoundHeading: 'Not found',
-        notFoundSupportingText: "That route doesn't exist.",
-        topicEmpty: 'No posts in this topic yet.',
+        notFoundSupportingText: NOT_FOUND_SUPPORTING_TEXT,
+        topicEmpty: TOPIC_EMPTY,
       });
 
       await applyRetireMigration(db);
 
       expect(await readVoiceOverrides(db)).toEqual({
         notFoundHeading: 'Not found',
-        notFoundSupportingText: "That route doesn't exist.",
-        topicEmpty: 'No posts in this topic yet.',
+        notFoundSupportingText: NOT_FOUND_SUPPORTING_TEXT,
+        topicEmpty: TOPIC_EMPTY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -202,8 +207,8 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
       const { db } = await setUpDbWithSiteConfigRow({
         terminalPromptHost: '~/blog $',
         notFoundCommandNotFound: 'Not found',
-        notFoundDescription: "That route doesn't exist.",
-        tagEmpty: 'No posts with this tag yet.',
+        notFoundDescription: NOT_FOUND_SUPPORTING_TEXT,
+        tagEmpty: TAG_EMPTY,
       });
 
       await applyRetireMigration(db);
@@ -215,8 +220,8 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
       expect(afterSecondRun).toEqual(afterFirstRun);
       expect(afterSecondRun).toEqual({
         notFoundHeading: 'Not found',
-        notFoundSupportingText: "That route doesn't exist.",
-        tagEmpty: 'No posts with this tag yet.',
+        notFoundSupportingText: NOT_FOUND_SUPPORTING_TEXT,
+        tagEmpty: TAG_EMPTY,
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -225,8 +230,7 @@ describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`
   it(
     'still applies cleanly against an empty site_config table',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
+      const db = await createEmptyTestDb();
 
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);
