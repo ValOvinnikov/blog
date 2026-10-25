@@ -149,6 +149,14 @@ that assigns `ReadableStream`, `WritableStream` and `TransformStream` from
 `node:stream/web` when they are missing fixes all 9. Watch memory: the
 default `vmMemoryLimit` is `1/maxWorkers` of RAM, so set it explicitly.
 
+**Adopted** in `createVitestConfig()` (`configs/vitest/preset.ts`): the `node`
+project on `threads`, the `jsdom` project on `vmThreads` with
+`vmMemoryLimit: '1024MB'` and the `vm-web-streams.ts` setup file. It also
+aliases bare `react-syntax-highlighter` to its ESM entry, because the vm
+CommonJS loader cannot `require()` the ESM-only `refractor` its CJS build
+loads. Re-measured on a 4-core machine: web 181s → 81s, platform 221s → 98s,
+every test passing.
+
 ### Not measured, with evidence
 
 - **Setup files load more than node tests need.** Each app's
@@ -176,6 +184,9 @@ default `vmMemoryLimit` is `1/maxWorkers` of RAM, so set it explicitly.
 Whole-suite runs print **206** act warnings in 12 platform files and 5 in 3
 web files, plus 13 Suspense-related lines. A single-file `vitest run` hides
 console output from passing tests, so count with `--silent=false`.
+
+**`apps/web` is fixed**: the async render helpers, the server-tree walk, the
+fake IntersectionObserver and `env.test.ts` changed as the table describes.
 
 | source                                                                                | count | cause                                                                                                                                                                       | fix                                                                                                                |
 | ------------------------------------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
@@ -206,12 +217,13 @@ act" would keep the count at zero once the fixes land.
 
 ## Orchestration
 
-- **Local `pnpm test`** runs `turbo run test` at turbo's default concurrency of 10. Every vitest instance defaults to `availableParallelism() - 1` = 7
-  workers, so up to 70 workers share 8 cores. CI caps turbo at 2 (see
-  `ci-automation.md`), which measured 8m55s → 7m08s with `--force`. Capping
-  the root script (`--concurrency=50%`) would apply the same locally. The
-  uncapped `pnpm test` in `deploy-development.yml` has the same problem on a
-  4-vCPU runner.
+- **Turbo concurrency is capped (adopted).** Every vitest instance defaults
+  to `availableParallelism() - 1` = 7 workers, so turbo's default of 10
+  instances put up to 70 workers on 8 cores. CI's Test job runs
+  `--concurrency=2`; the root `pnpm test` script runs `--concurrency=50%`,
+  which also covers `deploy-development.yml`. Measured with `--force` on 8
+  cores: default 8m55s, `50%` 7m07s, and the contention timeouts stopped
+  (`ci-automation.md`).
 - **Keep `test`'s `dependsOn: ["^build"]`.** No package has a `build` script,
   but the dependency is likely what invalidates a suite's cache when a package
   it reads through an alias changes.

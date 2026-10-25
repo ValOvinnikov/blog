@@ -2720,6 +2720,12 @@
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       },
       {
+        "ref": "SUBSCRIBER_STATUS.PENDING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/subscriber.ts"
+      },
+      {
         "ref": "TENANT_PROVISIONING_STATUS.PENDING",
         "scope": "db",
         "from": "@blog/db/constants",
@@ -2735,6 +2741,14 @@
     "NOT_PENDING": [
       {
         "ref": "SUBSCRIBER_OUTCOME.NOT_PENDING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/subscriber-outcome.ts"
+      }
+    ],
+    "NOT_SUBSCRIBED": [
+      {
+        "ref": "SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
@@ -2970,6 +2984,26 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/personal-data.ts"
+      }
+    ],
+    "ACTIVE": [
+      {
+        "ref": "SUBSCRIBER_STATUS.ACTIVE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/subscriber.ts"
+      },
+      {
+        "ref": "TENANT_STATUS.ACTIVE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
       }
     ],
     "REMOVE_DOMAIN": [
@@ -3376,20 +3410,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "ACTIVE": [
-      {
-        "ref": "TENANT_STATUS.ACTIVE",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/tenant.ts"
-      },
-      {
-        "ref": "STEP_INDICATOR_STATE.ACTIVE",
-        "scope": "app:platform",
-        "from": "@platform/constants/step-indicator",
-        "file": "apps/platform/src/constants/step-indicator.ts"
       }
     ],
     "SUSPENDED": [
@@ -5017,6 +5037,94 @@
     "ALREADY_SUBSCRIBED": [
       {
         "ref": "NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "UNSUBSCRIBE": [
+      {
+        "ref": "NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "RESEND": [
+      {
+        "ref": "NEWSLETTER_SUBSCRIPTION_ACTION.RESEND",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribe_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribe_tenant_not_active": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribe_capability_disabled": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_CAPABILITY_DISABLED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribed_cookie_set_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBED_COOKIE_SET_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribed_cookie_clear_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.unsubscribe_tenant_unresolved": [
+      {
+        "ref": "NEWSLETTER_LOG.UNSUBSCRIBE_TENANT_UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.confirmation_resend_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.CONFIRMATION_RESEND_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.resend_confirmation_tenant_not_active": [
+      {
+        "ref": "NEWSLETTER_LOG.RESEND_CONFIRMATION_TENANT_NOT_ACTIVE",
         "scope": "app:web",
         "from": "@web/constants/newsletter",
         "file": "apps/web/src/constants/newsletter.ts"

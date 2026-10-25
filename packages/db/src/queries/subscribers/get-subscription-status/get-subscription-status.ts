@@ -1,10 +1,10 @@
-import type { TOutcome } from '@blog/config';
+import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
+import type { TSubscriberStatus } from '@blog/db/constants';
 import { findUserSubscriber } from '@blog/db/queries/subscribers/user-subscriber';
-import type { TSubscriberStatus } from '@blog/db/schema/subscribers';
 import { toOutcome } from '@blog/utils/to-outcome';
 
 export type TSubscriptionStatusResult = TOutcome<
-  TSubscriberStatus | 'not-subscribed'
+  TSubscriberStatus | typeof SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED
 >;
 
 export async function getSubscriptionStatus(
@@ -13,5 +13,5 @@ export async function getSubscriptionStatus(
 ): Promise<TSubscriptionStatusResult> {
   const subscriber = await findUserSubscriber(tenantId, userId);
 
-  return toOutcome(subscriber?.status ?? 'not-subscribed');
+  return toOutcome(subscriber?.status ?? SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED);
 }

@@ -14,6 +14,7 @@ import {
   requireEmailIndex,
 } from '@blog/db/utils/personal-data/personal-data';
 import { notifyPersonalDataFallback } from '@blog/db/utils/personal-data/personal-data-fallback';
+import { toSubscriberStatus } from '@blog/db/utils/subscriber-status/subscriber-status';
 import { personalDataIndex } from '@blog/utils/encryption';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { isNull } from '@blog/utils/primitives';
@@ -75,7 +76,7 @@ export async function findSubscriberByExactEmail(
 
   const { id, status, emailEncrypted, address } = found;
   reportPlainPersonalRead(PERSONAL_DATA_OWNER.SUBSCRIBER, emailEncrypted);
-  return { id, status, email: address };
+  return { id, status: toSubscriberStatus(status), email: address };
 }
 
 export async function findUserSubscriber(

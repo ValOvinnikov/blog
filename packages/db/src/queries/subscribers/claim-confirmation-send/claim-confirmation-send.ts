@@ -1,6 +1,8 @@
 import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { subscribers } from '@blog/db/schema/subscribers';
+import { hasSubscriberStatus } from '@blog/db/utils/subscriber-status/subscriber-status';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
@@ -22,7 +24,7 @@ export async function claimConfirmationSend(
     .where(
       and(
         eq(subscribers.id, subscriberId),
-        eq(subscribers.status, 'pending'),
+        hasSubscriberStatus(SUBSCRIBER_STATUS.PENDING),
         or(
           isNull(subscribers.confirmationSentAt),
           lt(subscribers.confirmationSentAt, cooldownStart),

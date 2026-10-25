@@ -1,5 +1,9 @@
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  MOCK_SUBSCRIBER_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getSubscriberByEmail } from './get-subscriber-by-email';
@@ -25,27 +29,27 @@ describe(getSubscriberByEmail, () => {
   it('returns the row for an existing email', async () => {
     await db()
       .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com' });
+      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
 
-    const result = await getSubscriberByEmail(tenantId, 'reader@example.com');
+    const result = await getSubscriberByEmail(tenantId, MOCK_SUBSCRIBER_EMAIL);
 
     expect(result).toMatchObject({
-      email: 'reader@example.com',
-      status: 'pending',
+      email: MOCK_SUBSCRIBER_EMAIL,
+      status: SUBSCRIBER_STATUS.PENDING,
     });
   });
 
   it('normalizes casing/whitespace before looking the row up', async () => {
     await db()
       .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com' });
+      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
 
     const result = await getSubscriberByEmail(
       tenantId,
-      '  Reader@Example.com  ',
+      `  ${MOCK_SUBSCRIBER_EMAIL.toUpperCase()}  `,
     );
 
-    expect(result).toMatchObject({ email: 'reader@example.com' });
+    expect(result).toMatchObject({ email: MOCK_SUBSCRIBER_EMAIL });
   });
 
   it('returns undefined for an email with no row', async () => {
@@ -59,11 +63,11 @@ describe(getSubscriberByEmail, () => {
     const { id: tenantTwoId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
-      .values({ tenantId: tenantOneId, email: 'reader@example.com' });
+      .values({ tenantId: tenantOneId, email: MOCK_SUBSCRIBER_EMAIL });
 
     const result = await getSubscriberByEmail(
       tenantTwoId,
-      'reader@example.com',
+      MOCK_SUBSCRIBER_EMAIL,
     );
 
     expect(result).toBeUndefined();

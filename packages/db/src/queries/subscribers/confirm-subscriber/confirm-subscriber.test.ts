@@ -1,9 +1,11 @@
 import { SUBSCRIBER_OUTCOME } from '@blog/config';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
+  storeLegacySubscriberStatus,
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -63,8 +65,19 @@ describe(confirmSubscriber, () => {
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED));
     const { status, confirmedAt } = await readSubscriber(subscriberId);
-    expect(status).toBe('active');
+    expect(status).toBe(SUBSCRIBER_STATUS.ACTIVE);
     expect(confirmedAt).toEqual(MOCK_CONFIRMED_AT);
+  });
+
+  it('activates a subscriber still stored with a lowercase pending status', async () => {
+    await storeLegacySubscriberStatus(db(), subscriberId);
+
+    const result = await confirmSubscriber(tenantId, confirmationToken);
+
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED));
+    expect((await readSubscriber(subscriberId)).status).toBe(
+      SUBSCRIBER_STATUS.ACTIVE,
+    );
   });
 
   it('reports a second confirm as already confirmed and keeps the first time', async () => {

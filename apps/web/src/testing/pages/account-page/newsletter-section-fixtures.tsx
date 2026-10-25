@@ -1,4 +1,5 @@
 import { SIZE } from '@blog/config';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { Button } from '@blog/ui/components/atoms/button';
 import type { INewsletterSectionViewProps } from '@web/components/pages/account-page/sections/newsletter-section/newsletter-section-view';
 
@@ -7,7 +8,7 @@ export const mockNewsletterSectionView = (
 ): INewsletterSectionViewProps => {
   return {
     heading: 'Newsletter',
-    status: 'active',
+    status: SUBSCRIBER_STATUS.ACTIVE,
     label: 'Newsletter',
     email: 'jane@example.com',
     activeBadgeLabel: 'Subscribed',

@@ -1,7 +1,6 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, SUBSCRIBER_STATUS } from '@blog/db/constants';
 import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
-import { SUBSCRIBER_STATUS } from '@blog/db/schema/subscribers';
 import { faker } from '@faker-js/faker';
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import type { TPersonalDataExport } from '@platform/server/data-requests/export-personal-data-action';
@@ -14,7 +13,9 @@ export const MOCK_NOT_AN_EMAIL = faker.lorem.slug();
 
 const TENANT_ID = faker.string.uuid();
 const SUBSCRIBER_ID = faker.string.uuid();
-const SUBSCRIBER_STATUS_VALUE = faker.helpers.arrayElement(SUBSCRIBER_STATUS);
+const SUBSCRIBER_STATUS_VALUE = faker.helpers.arrayElement(
+  Object.values(SUBSCRIBER_STATUS),
+);
 const LEAD_ID = faker.string.uuid();
 const LEAD_NAME = faker.person.fullName();
 const LEAD_MESSAGE = faker.lorem.sentence();

@@ -1,3 +1,4 @@
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
@@ -71,7 +72,7 @@ describe(claimConfirmationSend, () => {
 
       const claim = await claimConfirmationSend(id, COOLDOWN_MS);
 
-      expect(claim?.confirmationToken).toEqual(expect.any(String));
+      expect(claim?.confirmationToken).toBeTypeOf('string');
       const row = await readRow(id);
       expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
       expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);
@@ -114,7 +115,7 @@ describe(claimConfirmationSend, () => {
 
   it('never claims an active subscriber', async () => {
     const { id } = await insertSubscriber({
-      status: 'active',
+      status: SUBSCRIBER_STATUS.ACTIVE,
       confirmedAt: new Date(),
     });
 

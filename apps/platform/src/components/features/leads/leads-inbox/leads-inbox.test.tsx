@@ -44,6 +44,8 @@ const MOCK_NEXT_CURSOR = {
   id: MOCK_OLDER_LEAD_ID,
 };
 const MOCK_UNREAD_LABEL = 'Unread';
+const MOCK_BACK_LABEL = 'Back to messages';
+const MOCK_MARK_UNREAD_LABEL = 'Mark unread';
 
 class EndOfListInView {
   constructor(private readonly callback: IntersectionObserverCallback) {}
@@ -124,6 +126,15 @@ describe(`<${LeadsInbox.name}/>`, () => {
       expect(refresh).not.toHaveBeenCalled();
     });
 
+    it('moves focus to the message heading when the lead is opened by keyboard', async () => {
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      const heading = screen.getByRole('heading', { name: MOCK_LEAD_NAME });
+      const headingName = within(heading).getByText(MOCK_LEAD_NAME);
+      expect(headingName).toHaveFocus();
+    });
+
     describe('once opened', () => {
       beforeEach(async () => {
         await user.click(row);
@@ -150,7 +161,7 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
       it('marks the lead unread again from the reading pane', async () => {
         const markUnreadButton = screen.getByRole('button', {
-          name: 'Mark unread',
+          name: MOCK_MARK_UNREAD_LABEL,
         });
 
         await user.click(markUnreadButton);
@@ -165,7 +176,7 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
       it('shows the list again after going back from the message', async () => {
         const backButton = screen.getByRole('button', {
-          name: 'Back to messages',
+          name: MOCK_BACK_LABEL,
         });
 
         await user.click(backButton);
@@ -174,6 +185,26 @@ describe(`<${LeadsInbox.name}/>`, () => {
         const heading = screen.queryByRole('heading', { name: MOCK_LEAD_NAME });
         expect(placeholder).toBeVisible();
         expect(heading).not.toBeInTheDocument();
+      });
+
+      it('returns focus to the lead after going back from the message', async () => {
+        const backButton = screen.getByRole('button', {
+          name: MOCK_BACK_LABEL,
+        });
+
+        await user.click(backButton);
+
+        expect(row).toHaveFocus();
+      });
+
+      it('returns focus to the lead after marking it unread', async () => {
+        const markUnreadButton = screen.getByRole('button', {
+          name: MOCK_MARK_UNREAD_LABEL,
+        });
+
+        await user.click(markUnreadButton);
+
+        expect(row).toHaveFocus();
       });
     });
   });

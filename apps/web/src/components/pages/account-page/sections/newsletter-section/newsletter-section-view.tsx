@@ -1,3 +1,4 @@
+import { SUBSCRIBER_STATUS, type TSubscriberStatus } from '@blog/db/constants';
 import { StatusBadge } from '@blog/ui/components/atoms/status-badge';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import { SettingRow } from '@blog/ui/components/molecules/setting-row';
@@ -9,7 +10,7 @@ const s = newsletterSectionVariants();
 
 export interface INewsletterSectionViewProps {
   heading: string;
-  status: 'active' | 'pending';
+  status: TSubscriberStatus;
   label: string;
   email: string;
   activeBadgeLabel: string;
@@ -20,11 +21,6 @@ export interface INewsletterSectionViewProps {
   control: ReactNode;
 }
 
-/**
- * Whether the section renders at all (not-subscribed, no
- * tenant, signed out) is the wrapper's own business call — this component
- * only ever receives an already-decided `active`/`pending` state.
- */
 export const NewsletterSectionView = ({
   heading,
   status,
@@ -38,7 +34,7 @@ export const NewsletterSectionView = ({
   control,
 }: INewsletterSectionViewProps) => {
   const settingRow =
-    status === 'active' ? (
+    status === SUBSCRIBER_STATUS.ACTIVE ? (
       <SettingRow
         label={
           <>

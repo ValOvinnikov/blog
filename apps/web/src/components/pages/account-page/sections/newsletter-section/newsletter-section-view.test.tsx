@@ -1,3 +1,4 @@
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockNewsletterSectionView } from '@web/testing/pages/account-page/newsletter-section-fixtures';
 
@@ -35,7 +36,7 @@ describe(`<${NewsletterSectionView.name}/>`, () => {
 
   it('renders the pending state with the pending badge, no email, and control', () => {
     setup({
-      status: 'pending',
+      status: SUBSCRIBER_STATUS.PENDING,
       control: <button type="button">Resend</button>,
     });
 

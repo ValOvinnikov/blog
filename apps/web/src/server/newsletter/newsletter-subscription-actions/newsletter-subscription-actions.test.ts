@@ -10,10 +10,7 @@ import { TENANT_STATUS } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
-import {
-  CONFIRMATION_RESEND_FAILED_EVENT,
-  UNSUBSCRIBE_FAILED_EVENT,
-} from '@web/constants/newsletter';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
 import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
 import {
@@ -102,7 +99,7 @@ vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 
-const USER_ID = faker.string.uuid();
+const MOCK_USER_ID = faker.string.uuid();
 const MOCK_SUBSCRIBER = mockSubscriber();
 const MOCK_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
@@ -113,7 +110,7 @@ const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 describe(unsubscribeAction, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
+    authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
     unsubscribeMock.mockResolvedValue(undefined);
     clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
     resolveRequestTenantMock.mockResolvedValue(mockTenant());
@@ -129,7 +126,10 @@ describe(unsubscribeAction, () => {
       resolveRequestTenantMock.mockResolvedValue(mockTenant({ status }));
 
       expect(await unsubscribeAction()).toEqual(SUCCESS);
-      expect(unsubscribeMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
+      expect(unsubscribeMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_USER_ID,
+      );
       expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledOnce();
     },
   );
@@ -153,7 +153,7 @@ describe(unsubscribeAction, () => {
 
     expect(await unsubscribeAction()).toEqual(SERVER_ERROR);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      UNSUBSCRIBE_FAILED_EVENT,
+      NEWSLETTER_LOG.UNSUBSCRIBE_FAILED,
       { error: MOCK_ERROR },
     );
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
@@ -164,7 +164,7 @@ describe(unsubscribeAction, () => {
 
     expect(await unsubscribeAction()).toEqual(SUCCESS);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'newsletter.subscribed_cookie_clear_failed',
+      NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED,
       { error: MOCK_ERROR },
     );
   });
@@ -172,7 +172,7 @@ describe(unsubscribeAction, () => {
 
 describe(resendConfirmationAction, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
+    authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
     resendConfirmationMock.mockResolvedValue({
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
       subscriberId: MOCK_SUBSCRIBER.id,
@@ -187,7 +187,7 @@ describe(resendConfirmationAction, () => {
     expect(await resendConfirmationAction()).toEqual(SUCCESS);
     expect(resendConfirmationMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      USER_ID,
+      MOCK_USER_ID,
     );
     const { to, html } = firstSentEmail(sendEmailMock);
     expect(to).toBe(MOCK_SUBSCRIBER.email);
@@ -244,7 +244,7 @@ describe(resendConfirmationAction, () => {
 
     expect(await resendConfirmationAction()).toEqual(SERVER_ERROR);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      CONFIRMATION_RESEND_FAILED_EVENT,
+      NEWSLETTER_LOG.CONFIRMATION_RESEND_FAILED,
       { error: MOCK_ERROR },
     );
   });

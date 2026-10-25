@@ -1,4 +1,5 @@
 import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
+import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { findUserSubscriber } from '@blog/db/queries/subscribers/user-subscriber';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -17,7 +18,7 @@ export async function resendConfirmation(
 ): Promise<TResendConfirmationResult> {
   const subscriber = await findUserSubscriber(tenantId, userId);
 
-  if (subscriber?.status !== 'pending') {
+  if (subscriber?.status !== SUBSCRIBER_STATUS.PENDING) {
     return toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING);
   }
 

@@ -1,4 +1,4 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import { act, customRender, screen } from '@web/testing/custom-render';
 
 import { useActiveHeadingId } from './use-active-heading-id';
 
@@ -46,7 +46,7 @@ class FakeIntersectionObserver implements IntersectionObserver {
           boundingClientRect: { top: entry.top } as DOMRectReadOnly,
         }) as IntersectionObserverEntry,
     );
-    this.callback(fullEntries, this);
+    act(() => this.callback(fullEntries, this));
   }
 }
 

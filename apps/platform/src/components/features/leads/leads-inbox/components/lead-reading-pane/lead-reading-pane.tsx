@@ -1,4 +1,4 @@
-import { SIZE } from '@blog/config';
+import { SIZE, type TMaybeNull } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
 import { Card } from '@platform/components/shared/card';
@@ -7,6 +7,7 @@ import { Text } from '@platform/components/shared/text';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { useLocale, useTranslations } from 'next-intl';
+import type { RefObject } from 'react';
 
 import { DeleteLeadControl } from './components/delete-lead-control';
 import { LeadPageSource } from './components/lead-page-source';
@@ -14,6 +15,7 @@ import { leadReadingPaneVariants } from './lead-reading-pane-variants';
 
 export type TLeadReadingPaneProps = {
   lead: TInboxLead;
+  headingRef: RefObject<TMaybeNull<HTMLSpanElement>>;
   onBack: () => void;
   onMarkUnread: (lead: TInboxLead) => void;
   onDeleted: (leadId: string) => void;
@@ -21,6 +23,7 @@ export type TLeadReadingPaneProps = {
 
 export const LeadReadingPane = ({
   lead,
+  headingRef,
   onBack,
   onMarkUnread,
   onDeleted,
@@ -43,7 +46,11 @@ export const LeadReadingPane = ({
       </Button>
       <Card className={styles.card()}>
         <Card.Header
-          title={<span className={styles.name()}>{name}</span>}
+          title={
+            <span ref={headingRef} tabIndex={-1} className={styles.name()}>
+              {name}
+            </span>
+          }
           actions={
             <>
               <a

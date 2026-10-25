@@ -47,6 +47,18 @@ const SERVER_ONLY_STUB_ALIAS = {
   replacement: fileURLToPath(new URL('./server-only-stub.ts', import.meta.url)),
 };
 
+// vmThreads' CommonJS loader cannot require() ESM, which react-syntax-highlighter's CJS entry does with refractor.
+const VM_SYNTAX_HIGHLIGHTER_ESM_ALIAS = {
+  find: /^react-syntax-highlighter$/,
+  replacement: 'react-syntax-highlighter/dist/esm/index.js',
+};
+
+const NODE_MODULES_GLOB = '**/node_modules/**';
+
+const VM_WEB_STREAMS_SETUP = fileURLToPath(
+  new URL('./vm-web-streams.ts', import.meta.url),
+);
+
 export type TNextAppVitestOverrides = {
   resolve: { alias: TAliasEntry[] };
 };
@@ -91,14 +103,20 @@ export function createVitestConfig(overrides: TNextAppVitestOverrides) {
             test: {
               name: 'node',
               environment: 'node',
-              exclude: ['**/node_modules/**', 'src/**/*.test.tsx'],
+              pool: 'threads',
+              exclude: [NODE_MODULES_GLOB, 'src/**/*.test.tsx'],
             },
           },
           {
             extends: true,
             test: {
               name: 'jsdom',
-              exclude: ['**/node_modules/**', 'src/**/*.test.ts'],
+              // vmThreads keeps jsdom imported per worker but leaks memory across files, so a worker restarts past this measured limit.
+              pool: 'vmThreads',
+              vmMemoryLimit: '1024MB',
+              setupFiles: [VM_WEB_STREAMS_SETUP],
+              alias: [VM_SYNTAX_HIGHLIGHTER_ESM_ALIAS],
+              exclude: [NODE_MODULES_GLOB, 'src/**/*.test.ts'],
             },
           },
         ],

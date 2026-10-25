@@ -8,7 +8,7 @@ import { leadRowVariants } from './lead-row-variants';
 export type TLeadRowProps = {
   lead: TInboxLead;
   isSelected: boolean;
-  onOpen: (lead: TInboxLead) => void;
+  onOpen: (lead: TInboxLead, opener: HTMLButtonElement) => void;
 };
 
 export const LeadRow = ({ lead, isSelected, onOpen }: TLeadRowProps) => {
@@ -23,7 +23,7 @@ export const LeadRow = ({ lead, isSelected, onOpen }: TLeadRowProps) => {
       variant="unstyled"
       className={styles.row()}
       aria-current={isSelected ? 'true' : undefined}
-      onClick={() => onOpen(lead)}
+      onClick={(event) => onOpen(lead, event.currentTarget)}
     >
       <span className={styles.top()}>
         {!isRead && (

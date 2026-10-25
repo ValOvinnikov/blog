@@ -15,7 +15,7 @@ import { useLoadMoreSentinel } from './use-load-more-sentinel';
 export type TLeadsListProps = {
   leads: TInboxLead[];
   selectedId: TMaybeUndefined<string>;
-  onOpen: (lead: TInboxLead) => void;
+  onOpen: (lead: TInboxLead, opener: HTMLButtonElement) => void;
   loading: TLeadsLoading;
 };
 
