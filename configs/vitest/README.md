@@ -11,7 +11,7 @@ setup file on top, pure logic packages use it with `environment: 'node'`.
 
 Also exports `createVitestConfig(overrides)`, the shared Next.js app preset
 (SVGR, jsdom, the `next-intl` server-deps inline, and the node/jsdom project
-split) that `apps/web` and `apps/platform` call directly instead of
+split — `node` on `threads`, `jsdom` on `vmThreads`) that `apps/web` and `apps/platform` call directly instead of
 `mergeConfig`-ing the base preset themselves, and `blogPackageAlias(pkg,
 import.meta.url)`, a one-line builder for a `@blog/<pkg>/*` -> `packages/<pkg>/src`
 resolve alias entry.
