@@ -194,6 +194,9 @@ helpers rather than components:
 - `env.test.ts` silences the expected "Invalid environment variables" output
   in every validation-failure case.
 
+`apps/web/src/vitest-setup.ts` now fails any test during which React reports
+an act() warning, naming the message, so new ones cannot return unnoticed.
+
 `apps/platform` — fixed. A whole-suite run with `--silent=false` used to
 print 219 "not wrapped in act" warnings and 16 Suspense act messages. It now
 prints none. The causes, and the rules that keep them out:
