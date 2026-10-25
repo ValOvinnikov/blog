@@ -179,6 +179,22 @@ helpers rather than components:
 - `env.test.ts` silences the expected "Invalid environment variables" output
   in every validation-failure case.
 
+`apps/platform` — fixed. A whole-suite run with `--silent=false` used to
+print 219 "not wrapped in act" warnings and 16 Suspense act messages. It now
+prints none. The causes, and the rules that keep them out:
+
+- **A selector that returns a fresh object re-renders on every editor
+  update.** `useEditorSelector` compares with `Object.is`, so selecting
+  `getActiveAnnotations` (a new `[]` each snapshot) re-rendered the editor
+  toolbar after mount, outside `act` — 135 of the 219. Select the primitive
+  the component shows instead.
+- **A page that suspends on `use()` renders inside an awaited `act`.**
+  `customRenderAsync` does this, so page tests need nothing extra.
+- **Focus moves through user-event, never `element.focus()`/`.blur()`.**
+  Focus handlers set state, and a direct call runs outside `act`.
+- **A test that leaves a promise pending waits for it to settle**, so the
+  update it triggers lands inside the test.
+
 ## The 62 node-safe `apps/web` files
 
 ```

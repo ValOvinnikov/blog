@@ -335,6 +335,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     expect(savingButton).toBeDisabled();
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
+    await screen.findByText(ALL_CHANGES_SAVED);
   });
 
   it('shows an error alert and does not refresh when the save fails', async () => {

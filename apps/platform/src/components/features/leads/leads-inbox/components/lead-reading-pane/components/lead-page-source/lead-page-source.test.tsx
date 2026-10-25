@@ -46,19 +46,23 @@ describe(`<${LeadPageSource.name}/>`, () => {
     getLeadPageTitleActionMock.mockResolvedValue(MOCK_PAGE_TITLE);
   });
 
+  it('shows the stored path until the title arrives', () => {
+    getLeadPageTitleActionMock.mockReturnValue(new Promise(() => {}));
+    renderSources();
+
+    const path = screen.getByText(MOCK_LEAD_SOURCE_PATH);
+
+    expect(path).toBeVisible();
+  });
+
   describe('for a lead from a recorded page', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       renderSources();
+      await screen.findByText(MOCK_PAGE_TITLE);
     });
 
-    it('shows the stored path until the title arrives', () => {
-      const path = screen.getByText(MOCK_LEAD_SOURCE_PATH);
-
-      expect(path).toBeVisible();
-    });
-
-    it("swaps the path for the page's title and language", async () => {
-      const title = await screen.findByText(MOCK_PAGE_TITLE);
+    it("swaps the path for the page's title and language", () => {
+      const title = screen.getByText(MOCK_PAGE_TITLE);
       const language = screen.getByText('German');
       const path = screen.queryByText(MOCK_LEAD_SOURCE_PATH);
 
@@ -67,9 +71,7 @@ describe(`<${LeadPageSource.name}/>`, () => {
       expect(path).not.toBeInTheDocument();
     });
 
-    it('asks for the page in the language the message was sent in', async () => {
-      await screen.findByText(MOCK_PAGE_TITLE);
-
+    it('asks for the page in the language the message was sent in', () => {
       expect(getLeadPageTitleActionMock).toHaveBeenCalledWith({
         tenantId: MOCK_TENANT_ID,
         documentId: MOCK_DOCUMENT_ID,

@@ -13,6 +13,19 @@ import { PortableTextEditor } from './portable-text-editor';
 
 const render = renderWithIntl;
 
+const BULLET_ONE = 'Bullet one';
+const BULLET_TWO = 'Bullet two';
+const NUMBER_ONE = 'Number one';
+const NUMBER_TWO = 'Number two';
+const NESTED_ONE = 'Nested one';
+const NESTED_TWO = 'Nested two';
+const OUTER_THREE = 'Outer three';
+const ARIA_PRESSED = 'aria-pressed';
+const ARIA_DISABLED = 'aria-disabled';
+const ARIA_MULTILINE = 'aria-multiline';
+const ARIA_SETSIZE = 'aria-setsize';
+const ARIA_POSINSET = 'aria-posinset';
+
 const linkBody = (href: string): TEmailTemplateBlock[] => [
   {
     _type: 'block',
@@ -32,7 +45,7 @@ const listBody: TEmailTemplateBlock[] = [
     style: 'normal',
     listItem: 'bullet',
     level: 1,
-    children: [{ _type: 'span', _key: 'bs1', text: 'Bullet one', marks: [] }],
+    children: [{ _type: 'span', _key: 'bs1', text: BULLET_ONE, marks: [] }],
   },
   {
     _type: 'block',
@@ -40,7 +53,7 @@ const listBody: TEmailTemplateBlock[] = [
     style: 'normal',
     listItem: 'bullet',
     level: 1,
-    children: [{ _type: 'span', _key: 'bs2', text: 'Bullet two', marks: [] }],
+    children: [{ _type: 'span', _key: 'bs2', text: BULLET_TWO, marks: [] }],
   },
   {
     _type: 'block',
@@ -48,7 +61,7 @@ const listBody: TEmailTemplateBlock[] = [
     style: 'normal',
     listItem: 'number',
     level: 1,
-    children: [{ _type: 'span', _key: 'os1', text: 'Number one', marks: [] }],
+    children: [{ _type: 'span', _key: 'os1', text: NUMBER_ONE, marks: [] }],
   },
   {
     _type: 'block',
@@ -56,7 +69,7 @@ const listBody: TEmailTemplateBlock[] = [
     style: 'normal',
     listItem: 'number',
     level: 1,
-    children: [{ _type: 'span', _key: 'os2', text: 'Number two', marks: [] }],
+    children: [{ _type: 'span', _key: 'os2', text: NUMBER_TWO, marks: [] }],
   },
 ];
 
@@ -102,7 +115,7 @@ const numberedListWithNestedBulletBody: TEmailTemplateBlock[] = [
     listItem: 'bullet',
     level: 2,
     children: [
-      { _type: 'span', _key: 'nested1s', text: 'Nested one', marks: [] },
+      { _type: 'span', _key: 'nested1s', text: NESTED_ONE, marks: [] },
     ],
   },
   {
@@ -112,7 +125,7 @@ const numberedListWithNestedBulletBody: TEmailTemplateBlock[] = [
     listItem: 'bullet',
     level: 2,
     children: [
-      { _type: 'span', _key: 'nested2s', text: 'Nested two', marks: [] },
+      { _type: 'span', _key: 'nested2s', text: NESTED_TWO, marks: [] },
     ],
   },
   {
@@ -121,7 +134,7 @@ const numberedListWithNestedBulletBody: TEmailTemplateBlock[] = [
     style: 'normal',
     listItem: 'number',
     level: 1,
-    children: [{ _type: 'span', _key: 'n3s', text: 'Outer three', marks: [] }],
+    children: [{ _type: 'span', _key: 'n3s', text: OUTER_THREE, marks: [] }],
   },
 ];
 
@@ -177,9 +190,7 @@ describe(PortableTextEditor, () => {
       />,
     );
 
-    within(screen.getByRole('toolbar'))
-      .getByRole('button', { name: 'Bold' })
-      .focus();
+    await user.tab();
     await user.keyboard('{ArrowRight}');
 
     expect(screen.getByRole('button', { name: 'Italic' })).toHaveFocus();
@@ -200,11 +211,11 @@ describe(PortableTextEditor, () => {
     );
 
     expect(screen.getByRole('button', { name: 'Bold' })).toHaveAttribute(
-      'aria-pressed',
+      ARIA_PRESSED,
       'false',
     );
     expect(screen.getByRole('button', { name: 'Italic' })).toHaveAttribute(
-      'aria-pressed',
+      ARIA_PRESSED,
       'false',
     );
   });
@@ -276,8 +287,8 @@ describe(PortableTextEditor, () => {
     );
 
     const field = screen.getByRole('textbox', { name: 'Body' });
-    expect(field).toHaveAttribute('aria-disabled', 'true');
-    expect(field).toHaveAttribute('aria-multiline', 'true');
+    expect(field).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
     expect(field).not.toHaveAttribute('tabindex');
   });
 
@@ -293,7 +304,7 @@ describe(PortableTextEditor, () => {
 
     const field = screen.getByRole('textbox', { name: 'Body' });
     expect(field).toHaveAttribute('aria-readonly', 'true');
-    expect(field).not.toHaveAttribute('aria-disabled');
+    expect(field).not.toHaveAttribute(ARIA_DISABLED);
     expect(field).toHaveAttribute('tabindex', '0');
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
@@ -308,8 +319,8 @@ describe(PortableTextEditor, () => {
     );
 
     const field = screen.getByRole('textbox', { name: 'Body' });
-    expect(field).toHaveAttribute('aria-multiline', 'true');
-    expect(field).not.toHaveAttribute('aria-disabled');
+    expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
+    expect(field).not.toHaveAttribute(ARIA_DISABLED);
   });
 
   it('renders an authored link with a safe href as a real, working anchor', async () => {
@@ -400,10 +411,10 @@ describe(PortableTextEditor, () => {
       expect(item).toBeVisible();
     }
 
-    expect(screen.getByText('Bullet one')).toBeVisible();
-    expect(screen.getByText('Bullet two')).toBeVisible();
-    expect(screen.getByText('Number one')).toBeVisible();
-    expect(screen.getByText('Number two')).toBeVisible();
+    expect(screen.getByText(BULLET_ONE)).toBeVisible();
+    expect(screen.getByText(BULLET_TWO)).toBeVisible();
+    expect(screen.getByText(NUMBER_ONE)).toBeVisible();
+    expect(screen.getByText(NUMBER_TWO)).toBeVisible();
   });
 
   it('conveys the true set size and position of a four-item list despite the one-list-per-item DOM', async () => {
@@ -422,8 +433,8 @@ describe(PortableTextEditor, () => {
     });
 
     items.forEach((item, index) => {
-      expect(item).toHaveAttribute('aria-setsize', '4');
-      expect(item).toHaveAttribute('aria-posinset', String(index + 1));
+      expect(item).toHaveAttribute(ARIA_SETSIZE, '4');
+      expect(item).toHaveAttribute(ARIA_POSINSET, String(index + 1));
     });
   });
 
@@ -443,20 +454,20 @@ describe(PortableTextEditor, () => {
     });
 
     const outerThirdItem = items.find((item) =>
-      within(item).queryByText('Outer three'),
+      within(item).queryByText(OUTER_THREE),
     );
     const nestedFirstItem = items.find((item) =>
-      within(item).queryByText('Nested one'),
+      within(item).queryByText(NESTED_ONE),
     );
     const nestedSecondItem = items.find((item) =>
-      within(item).queryByText('Nested two'),
+      within(item).queryByText(NESTED_TWO),
     );
 
-    expect(outerThirdItem).toHaveAttribute('aria-posinset', '3');
-    expect(outerThirdItem).toHaveAttribute('aria-setsize', '3');
-    expect(nestedFirstItem).toHaveAttribute('aria-posinset', '1');
-    expect(nestedFirstItem).toHaveAttribute('aria-setsize', '2');
-    expect(nestedSecondItem).toHaveAttribute('aria-posinset', '2');
-    expect(nestedSecondItem).toHaveAttribute('aria-setsize', '2');
+    expect(outerThirdItem).toHaveAttribute(ARIA_POSINSET, '3');
+    expect(outerThirdItem).toHaveAttribute(ARIA_SETSIZE, '3');
+    expect(nestedFirstItem).toHaveAttribute(ARIA_POSINSET, '1');
+    expect(nestedFirstItem).toHaveAttribute(ARIA_SETSIZE, '2');
+    expect(nestedSecondItem).toHaveAttribute(ARIA_POSINSET, '2');
+    expect(nestedSecondItem).toHaveAttribute(ARIA_SETSIZE, '2');
   });
 });
