@@ -110,6 +110,13 @@ files. To unblock it:
   worker would accumulate 128 MiB reservations);
 - `unstubEnvs: true` (11 files stub env without unstubbing).
 
+**Adopted:** `packages/db/vitest.config.ts` runs on `pool: 'threads'`, and
+global setup dumps PGlite twice — straight after `initdb` and once every
+migration is applied. The migration tests restore the empty one through
+`createEmptyTestDb()`, so no test runs `initdb` itself. Re-measured with
+`vitest run src/schema` (15 files / 46 tests, all passing): `forks` with
+`new PGlite()` 64s, threads with the empty snapshot 32s.
+
 ### Rejected
 
 - **`clone()` per file** — in PGlite 0.5.10 `clone()` is `dumpDataDir('none')`

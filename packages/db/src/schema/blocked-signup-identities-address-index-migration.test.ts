@@ -1,5 +1,5 @@
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
 import {
   MOCK_BLOCK_REASON,
@@ -7,23 +7,23 @@ import {
   MOCK_BLOCKED_ADDRESS_INDEX,
   MOCK_BLOCKED_DOMAIN,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { sha256Hex } from '@blog/utils/hash';
-import { PGlite } from '@electric-sql/pglite';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 const INDEX_MIGRATION = '0052_remove_plain_hash_blocked_addresses.sql';
 
 describe('0052_remove_plain_hash_blocked_addresses', () => {
   let db: PgliteDatabase<typeof schema>;
 
-  beforeEach(() => {
-    db = drizzle(new PGlite(), { schema });
-  });
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'removes plain-hash address entries and keeps indexed addresses and domains',

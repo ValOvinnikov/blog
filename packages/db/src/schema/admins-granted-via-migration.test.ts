@@ -1,13 +1,13 @@
 import { GRANTED_VIA } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { admins } from './admins';
 
@@ -16,9 +16,9 @@ const BACKFILL_MIGRATION = '0007_wide_silver_samurai.sql';
 describe('0007_wide_silver_samurai (granted_via backfill)', () => {
   let db: PgliteDatabase<typeof schema>;
 
-  beforeEach(() => {
-    db = drizzle(new PGlite(), { schema });
-  });
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'backfills a pre-existing admin row to BREAK_GLASS instead of failing NOT NULL',

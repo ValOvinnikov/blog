@@ -1,17 +1,17 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
-import * as schema from '@blog/db/schema';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
 
 import { emailTemplateLogos, emailTemplates } from './email-templates';
 
+const CUSTOM_SUBJECT = 'Eigener Betreff';
+const MAGIC_LINK_LOGO_URL = 'https://blob.example.com/magic-link.png';
 const LOCALE_MIGRATION = '0035_massive_lucky_pierre.sql';
 
 const customBody = [
@@ -39,8 +39,7 @@ async function migrateGermanTenantTemplates(
     logoAssetUrl?: string;
   }[],
 ) {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const db = await createEmptyTestDb();
   const migrationFiles = listMigrationFiles();
 
   for (const file of migrationFiles.filter((f) => f < LOCALE_MIGRATION)) {
@@ -90,7 +89,7 @@ describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per lang
       const { templates } = await migrateGermanTenantTemplates([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          subject: 'Eigener Betreff',
+          subject: CUSTOM_SUBJECT,
           body: EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.body,
         },
         {
@@ -109,7 +108,7 @@ describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per lang
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.DE,
-          subject: 'Eigener Betreff',
+          subject: CUSTOM_SUBJECT,
           body: null,
         },
         {
@@ -135,9 +134,9 @@ describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per lang
       const { logos } = await migrateGermanTenantTemplates([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          subject: 'Eigener Betreff',
+          subject: CUSTOM_SUBJECT,
           body: customBody,
-          logoAssetUrl: 'https://blob.example.com/magic-link.png',
+          logoAssetUrl: MAGIC_LINK_LOGO_URL,
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
@@ -149,7 +148,7 @@ describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per lang
       expect(logos).toEqual([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          logoAssetUrl: 'https://blob.example.com/magic-link.png',
+          logoAssetUrl: MAGIC_LINK_LOGO_URL,
         },
       ]);
     },

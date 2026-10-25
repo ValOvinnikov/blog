@@ -1,14 +1,14 @@
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
 import { subscribers } from '@blog/db/schema/subscribers';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
-import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 const NO_TENANT_ERROR = 'failed to seed a tenant row';
 
@@ -17,9 +17,9 @@ const BACKFILL_MIGRATION = '0024_faithful_kree.sql';
 describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
   let db: PgliteDatabase<typeof schema>;
 
-  beforeEach(() => {
-    db = drizzle(new PGlite(), { schema });
-  });
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'backfills every pre-existing subscriber row with a distinct, non-null unsubscribe_token',

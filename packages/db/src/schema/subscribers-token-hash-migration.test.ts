@@ -1,5 +1,6 @@
-import * as schema from '@blog/db/schema';
+import type * as schema from '@blog/db/schema';
 import { subscribers } from '@blog/db/schema/subscribers';
+import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
   listMigrationFiles,
@@ -7,10 +8,9 @@ import {
   insertReplayTenant,
 } from '@blog/db/testing/migration-files';
 import { sha256Hex } from '@blog/utils/hash';
-import { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
-import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 function byId(a: { id: string }, b: { id: string }): number {
   return a.id < b.id ? -1 : 1;
@@ -21,9 +21,9 @@ const HASH_MIGRATION = '0050_hash_subscriber_tokens.sql';
 describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () => {
   let db: PgliteDatabase<typeof schema>;
 
-  beforeEach(() => {
-    db = drizzle(new PGlite(), { schema });
-  });
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
     'replaces every stored token with its SHA-256 hash',
