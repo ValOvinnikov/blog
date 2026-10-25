@@ -1,4 +1,4 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { Checkbox } from './checkbox';
@@ -6,16 +6,16 @@ import { Checkbox } from './checkbox';
 const MOCK_LABEL = 'I agree to the terms';
 const MOCK_ERROR = 'Accept the terms to continue.';
 
+const setup = customRender(Checkbox, {
+  isChecked: false,
+  onCheckedChange: vi.fn(),
+  label: MOCK_LABEL,
+});
+
 describe(Checkbox, () => {
   it('toggles when its label is clicked', async () => {
     const onCheckedChange = vi.fn();
-    render(
-      <Checkbox
-        isChecked={false}
-        onCheckedChange={onCheckedChange}
-        label={MOCK_LABEL}
-      />,
-    );
+    setup({ onCheckedChange });
 
     await userEvent.click(screen.getByText(MOCK_LABEL));
 
@@ -23,14 +23,7 @@ describe(Checkbox, () => {
   });
 
   it('describes the checkbox by its error', () => {
-    render(
-      <Checkbox
-        isChecked={false}
-        onCheckedChange={vi.fn()}
-        label={MOCK_LABEL}
-        error={MOCK_ERROR}
-      />,
-    );
+    setup({ error: MOCK_ERROR });
 
     const checkbox = screen.getByRole('checkbox', { name: MOCK_LABEL });
 
