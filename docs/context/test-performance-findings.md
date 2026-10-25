@@ -206,7 +206,9 @@ a page that suspends on `use()` renders inside an awaited `act`, which
 to settle.
 
 **`apps/web` is fixed**: the async render helpers, the server-tree walk, the
-fake IntersectionObserver and `env.test.ts` changed as the table describes.
+fake IntersectionObserver and `env.test.ts` changed as the table describes. `apps/web/src/vitest-setup.ts` now fails any test during which React
+reports an act() warning, naming the message, so new ones cannot return
+unnoticed.
 
 | source                                                                                | count | cause                                                                                                                                                                       | fix                                                                                                                |
 | ------------------------------------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
