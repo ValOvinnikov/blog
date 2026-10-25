@@ -173,6 +173,10 @@ every test passing.
 - **faker's root entry** loads every locale: 86 files / 2.39 MB, against 3
   files / 0.42 MB for `@faker-js/faker/locale/en`. The root `faker` export is
   the `en` instance, and all 184 imports in the repo use the root entry.
+  **Adopted:** the shared preset aliases exactly `@faker-js/faker` to the
+  English build, so no import changed (Storybook keeps the root entry).
+  Measured with `--experimental.importDurations.print`: faker's import fell
+  from 167–179ms to 24–35ms per test process.
 - **`react-syntax-highlighter`** is imported from its package index in
   `code-block.tsx`, which loads highlight.js and refractor in full (587
   modules) for 49 web jsdom test files and the production server.
