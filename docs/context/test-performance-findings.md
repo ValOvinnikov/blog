@@ -110,6 +110,33 @@ whose comment cites "parallel-turbo contention across packages".
 Worth measuring on a quiet machine: `turbo run test --concurrency=3`, or a
 `maxWorkers` cap in `configs/vitest/preset.ts`.
 
+## `apps/web` and `apps/platform` — adopted: per-project pools
+
+`createVitestConfig()` runs the `node` project on `pool: 'threads'` and the
+`jsdom` project on `pool: 'vmThreads'` with `vmMemoryLimit: '1024MB'`.
+`vmThreads` imports jsdom once per worker rather than once per file, which
+removes the environment phase that dominated the `forks` default. `maxWorkers`
+stays unset: Vitest throws when projects in one run disagree on it.
+
+Two things the `vm` context needs, both in `configs/vitest/`, so no test file
+changes:
+
+- `vm-web-streams.ts`, a `jsdom`-project setup file, assigns
+  `ReadableStream`, `WritableStream` and `TransformStream` from
+  `node:stream/web`; without it undici fails at collection with
+  `ReferenceError: ReadableStream is not defined`.
+- an alias sends bare `react-syntax-highlighter` to its ESM entry, because the
+  `vm` CommonJS loader cannot `require()` the ESM-only `refractor` its CJS
+  build loads.
+
+Measured 2026-10-25 on one 4-core machine, full `vitest run`, every test
+passing both ways:
+
+| app             | `forks` (before) | threads + vmThreads |
+| --------------- | ---------------- | ------------------- |
+| `apps/web`      | 181s             | 81s                 |
+| `apps/platform` | 221s             | 98s                 |
+
 ## Caveat on absolute numbers
 
 Timings measured during this investigation ran at load averages of 587-646 on
