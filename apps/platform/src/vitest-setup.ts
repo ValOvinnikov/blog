@@ -1,3 +1,5 @@
+import { format } from 'node:util';
+
 import {
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
@@ -66,6 +68,31 @@ vi.mock('next/navigation', async () => {
     useSelectedLayoutSegment: vi.fn(() => null),
     useRouter: vi.fn(createRouterStub),
   };
+});
+
+const REACT_ACT_WARNINGS = [
+  'not wrapped in act',
+  'A suspended resource finished loading inside a test',
+  'suspended inside an `act` scope',
+];
+
+const actWarnings: string[] = [];
+const passThroughConsoleError = console.error;
+
+// Assigned rather than spied, so a test's own spy and its restore wrap this.
+console.error = (...args: unknown[]) => {
+  const message = format(...args);
+  if (REACT_ACT_WARNINGS.some((warning) => message.includes(warning))) {
+    actWarnings.push(message);
+  }
+  passThroughConsoleError(...args);
+};
+
+afterEach(() => {
+  const warnings = actWarnings.splice(0);
+  if (warnings.length > 0) {
+    throw new Error(`React reported an act() warning:\n${warnings.join('\n')}`);
+  }
 });
 
 vi.mock('@platform/utils/logger/logger');

@@ -132,4 +132,11 @@ export default [
       'func-style': 'off',
     },
   },
+  {
+    // The Vitest setup wraps console.error to catch React act() warnings.
+    files: ['src/vitest-setup.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ];
