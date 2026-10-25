@@ -5,7 +5,10 @@ export const leadReadingPaneVariants = tv({
     root: ['flex flex-col items-start gap-4'],
     back: ['lg:hidden'],
     card: ['w-full'],
-    name: ['break-words'],
+    name: [
+      'break-words rounded-admin-control',
+      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+    ],
     body: ['flex flex-col gap-4'],
     email: [
       'break-all rounded-admin-control text-admin-brand underline underline-offset-2',
