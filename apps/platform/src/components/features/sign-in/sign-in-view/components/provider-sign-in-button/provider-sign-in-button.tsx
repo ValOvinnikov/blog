@@ -1,16 +1,24 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
+import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import {
+  Icon,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
-const PROVIDER_LABEL_KEYS = {
-  github: 'continueWithGithub',
-  google: 'continueWithGoogle',
-} as const satisfies Record<TOAuthProviderId, string>;
+const PROVIDERS = {
+  github: { labelKey: 'continueWithGithub', icon: ICONS.GITHUB },
+  google: { labelKey: 'continueWithGoogle', icon: ICONS.GOOGLE },
+} as const satisfies Record<
+  TOAuthProviderId,
+  { labelKey: string; icon: TRegisteredIconName }
+>;
 
 const providerSignInButtonVariants = tv({
   base: ['w-full justify-center'],
@@ -27,6 +35,7 @@ export const ProviderSignInButton = ({
 }: TProviderSignInButtonProps) => {
   const t = useTranslations('providerSignInButton');
   const [isPending, startTransition] = useTransition();
+  const { labelKey, icon } = PROVIDERS[providerId];
 
   const handleClick = () => {
     startTransition(() =>
@@ -42,7 +51,8 @@ export const ProviderSignInButton = ({
       onClick={handleClick}
       className={providerSignInButtonVariants()}
     >
-      {t(PROVIDER_LABEL_KEYS[providerId])}
+      <Icon name={icon} size={SIZE.SM} />
+      {t(labelKey)}
     </Button>
   );
 };

@@ -11,7 +11,9 @@ import Clock from '@platform/assets/icons/clock.svg';
 import Comment from '@platform/assets/icons/comment.svg';
 import ErrorCircle from '@platform/assets/icons/error.svg';
 import ExternalLink from '@platform/assets/icons/external-link.svg';
+import GitHub from '@platform/assets/icons/github.svg';
 import Globe from '@platform/assets/icons/globe.svg';
+import Google from '@platform/assets/icons/google.svg';
 import Grid from '@platform/assets/icons/grid.svg';
 import House from '@platform/assets/icons/house.svg';
 import Info from '@platform/assets/icons/info.svg';
@@ -52,7 +54,9 @@ export const ICON_REGISTRY = {
   [ICONS.CLOSE]: ErrorCircle,
   [ICONS.COMMENT]: Comment,
   [ICONS.EXTERNAL_LINK]: ExternalLink,
+  [ICONS.GITHUB]: GitHub,
   [ICONS.GLOBE]: Globe,
+  [ICONS.GOOGLE]: Google,
   [ICONS.GRID]: Grid,
   [ICONS.HOUSE]: House,
   [ICONS.INFO]: Info,
