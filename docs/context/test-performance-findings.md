@@ -99,16 +99,21 @@ teardown discipline.
 
 ## Secondary: worker oversubscription
 
-Nothing in the repo sets `maxWorkers`, `poolOptions` or `fileParallelism`, and
-`turbo run test` has no `--concurrency` cap (turbo defaults to 10). Vitest
-defaults to roughly `cores - 1` workers per instance, so `pnpm test` can run
-~10 vitest instances x ~7 workers on an 8-core machine.
+Nothing in the repo sets `maxWorkers`, `poolOptions` or `fileParallelism`.
+Vitest defaults to roughly `cores - 1` workers per instance, so at turbo's
+default concurrency of 10, `turbo run test` could run ~10 vitest instances x ~7
+workers on an 8-core machine.
+
+**Adopted:** turbo concurrency is capped — `--concurrency=2` in CI's Test job,
+`--concurrency=50%` in the root `pnpm test` script (local runs and
+`deploy-development.yml`). Measured with `--force` on 8 cores: default 8m55s,
+`50%` 7m07s, and the contention timeouts stopped
+(`docs/context/ci-automation.md`).
 
 The shared preset already carries a symptom of this — `testTimeout: 20_000`,
 whose comment cites "parallel-turbo contention across packages".
 
-Worth measuring on a quiet machine: `turbo run test --concurrency=3`, or a
-`maxWorkers` cap in `configs/vitest/preset.ts`.
+Still unmeasured: a `maxWorkers` cap in `configs/vitest/preset.ts`.
 
 ## Caveat on absolute numbers
 
