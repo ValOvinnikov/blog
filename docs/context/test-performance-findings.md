@@ -5,6 +5,8 @@ investigation: 2026-10-25, Vitest 5.0.5, 8-core / 16 GB Mac. Timings below
 were taken one suite at a time unless a row says otherwise. The same command
 varied by up to ±30% between rounds on this machine, so compare variants only
 within one round. A variant counts as adopted only if every test still passes.
+The adopted changes are tracked in epic #5892; "Follow-ups not filed" at the
+end lists what has no ticket.
 
 ## Per-suite picture
 
@@ -195,6 +197,9 @@ needed a product change. Also found:
   `apps/platform/src/i18n/__mocks__/navigation.ts`.
 - **"Invalid environment variables"** lines are expected output of negative env
   tests.
+- **`FakeIntersectionObserver` is declared twice** in `apps/web`:
+  `back-to-top-button.test.tsx` and `use-active-heading-id.test.tsx`, and the
+  first wraps each trigger in its own `act()`.
 
 A `console.error` hook in each app's setup that fails a test on "not wrapped in
 act" would keep the count at zero once the fixes land.
@@ -219,6 +224,30 @@ act" would keep the count at zero once the fixes land.
 - **`isolate: false` candidates** (no or few module mocks, unmeasured):
   `packages/utils`, `packages/email`, and `packages/studio`'s `migrations`
   project.
+
+## Follow-ups not filed
+
+Kept here rather than ticketed, because the gain is unmeasured and small, or a
+decision comes first:
+
+- **Trim `apps/worker` and `packages/auth` test imports** — about 48s of suite
+  time between them. Stop spreading `importOriginal()` in
+  `fake-tenants-queries.ts`, replace the real `workflow` package in tests with
+  a light shim that re-exports its error classes, turn db automocks into
+  factories, and mock `@blog/db` in auth's `config.test.ts`. Measure with
+  `--experimental.importDurations.print` first.
+- **`isolate: false` for `packages/utils`, `packages/email` and
+  `packages/studio`'s `migrations` project** — none or almost none of their
+  files mock modules. Validate each with a normal run and a
+  `--sequence.shuffle` run before adopting it.
+- **Import `react-syntax-highlighter`'s Prism build directly** in
+  `code-block.tsx` instead of the package index, which loads highlight.js and
+  refractor in full for 49 web test files and the production server. The
+  light build only highlights registered languages, so this changes what
+  readers see for an unregistered language; it needs a measured reason and a
+  manual test.
+- **Retire the backfill tests of migrations already applied in production**
+  — a policy decision; see "Open policy question" under `packages/db`.
 
 ## Earlier findings that still hold
 
