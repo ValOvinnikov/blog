@@ -1,4 +1,7 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import {
+  NEXT_NAVIGATION_ERROR,
+  SUBSCRIBER_OUTCOME,
+} from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import userEvent from '@testing-library/user-event';
@@ -45,8 +48,7 @@ describe(`<${AccountPage.name}/>`, () => {
     });
     vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValue({
       outcome: SUBSCRIBER_STATUS.ACTIVE,
-      subscriber: { email: MOCK_ACCOUNT_USER.email },
-    } as Awaited<ReturnType<typeof queries.subscribers.getSubscriptionStatus>>);
+    });
   });
 
   it('redirects home when there is no session', async () => {
@@ -97,7 +99,7 @@ describe(`<${AccountPage.name}/>`, () => {
 
   it('omits the newsletter section when the account is not subscribed', async () => {
     vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValueOnce({
-      outcome: 'not-subscribed',
+      outcome: SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED,
     });
 
     await setup();

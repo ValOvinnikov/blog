@@ -2746,6 +2746,14 @@
         "file": "packages/config/src/constants/subscriber-outcome.ts"
       }
     ],
+    "NOT_SUBSCRIBED": [
+      {
+        "ref": "SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/subscriber-outcome.ts"
+      }
+    ],
     "TOPICS": [
       {
         "ref": "TAXONOMY_KIND.TOPICS",

@@ -12,6 +12,10 @@ import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
+function byEmail(a: { email: string }, b: { email: string }): number {
+  return a.email < b.email ? -1 : 1;
+}
+
 const UPPERCASE_MIGRATION = '0059_uppercase_subscriber_status.sql';
 
 describe('0059_uppercase_subscriber_status (subscriber statuses stored uppercase)', () => {
@@ -45,8 +49,7 @@ describe('0059_uppercase_subscriber_status (subscriber statuses stored uppercase
       const rows = await db
         .select({ email: subscribers.email, status: subscribers.status })
         .from(subscribers);
-      expect(rows).toEqual(expect.arrayContaining(seeds));
-      expect(rows).toHaveLength(seeds.length);
+      expect(rows.sort(byEmail)).toEqual([...seeds].sort(byEmail));
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );

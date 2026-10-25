@@ -1,3 +1,4 @@
+import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
@@ -24,7 +25,7 @@ export const NewsletterSection = async () => {
 
   // Subscribing is a separate `NewsletterForm` module's job — this
   // section only ever manages an existing subscription.
-  if (status.outcome === 'not-subscribed') return null;
+  if (status.outcome === SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED) return null;
 
   const t = await getTranslations('accountPage.newsletter');
 

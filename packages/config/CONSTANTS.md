@@ -197,7 +197,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
-- **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`
+- **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/taxonomy.ts`
 

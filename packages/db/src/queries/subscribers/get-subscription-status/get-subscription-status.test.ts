@@ -1,3 +1,4 @@
+import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
@@ -68,6 +69,6 @@ describe(getSubscriptionStatus, () => {
   it('returns not-subscribed when the account has no subscription', async () => {
     const result = await getSubscriptionStatus(tenantId, userId);
 
-    expect(result).toEqual(toOutcome('not-subscribed'));
+    expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED));
   });
 });
