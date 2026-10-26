@@ -2,6 +2,9 @@
 
 import {
   ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeServerError,
+  isOutcomeSuccess,
   type TMaybeUndefined,
   type TReasonedFailure,
 } from '@blog/config';
@@ -28,18 +31,16 @@ export const useEmailSignIn = (callbackPath: string) => {
       const result = await sendSignInLinkAction({ email, callbackPath });
 
       setEmailError(
-        result.outcome === ACTION_OUTCOME.INVALID
-          ? result.fieldErrors.email
-          : undefined,
+        isOutcomeInvalid(result) ? result.fieldErrors.email : undefined,
       );
       setSendRefusal(
         result.outcome === ACTION_OUTCOME.RATE_LIMITED ||
-          result.outcome === ACTION_OUTCOME.SERVER_ERROR
+          isOutcomeServerError(result)
           ? result.outcome
           : undefined,
       );
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
         setSentTo(email.trim());
       }
     });

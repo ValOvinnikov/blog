@@ -56,6 +56,9 @@ new upstream here means auditing every consumer's `paths` and vitest alias.
   `IBodyImageBlock`).
 - `portable-text/` — the resolved Portable Text block type, built on
   `@portabletext/types`.
+- `action-outcome/` — the `isOutcome*` guards that read and narrow an
+  action result; one is added only with its outcome's second use (CLAUDE.md
+  → "Read an action result through its outcome guards").
 - `theme/` — the WCAG AA accent-hue guard (`isAccentHueAccessible`), the
   OKLCH theme declaration tables, and `resolveTenantEmailBrand`.
 - `voice/` — the public site's message catalog (`site-messages.<locale>.json`;
