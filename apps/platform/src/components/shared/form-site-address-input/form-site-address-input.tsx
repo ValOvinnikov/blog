@@ -5,7 +5,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { Text } from '@platform/components/shared/text';
 import { TextInput } from '@platform/components/shared/text-input';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 
 import { formSiteAddressInputVariants } from './form-site-address-input-variants';
 
@@ -29,10 +29,17 @@ export const FormSiteAddressInput = ({
   rootDomain,
 }: TFormSiteAddressInputProps) => {
   const t = useTranslations('formSiteAddressInput');
+  const suffixId = useId();
   const { row, input, suffix } = formSiteAddressInputVariants();
 
   return (
-    <FormField label={label} hint={hint} error={error} footer={footer}>
+    <FormField
+      label={label}
+      hint={hint}
+      error={error}
+      footer={footer}
+      control={{ describedBy: rootDomain ? suffixId : undefined }}
+    >
       <div className={row()}>
         <TextInput
           value={value}
@@ -40,7 +47,12 @@ export const FormSiteAddressInput = ({
           className={input()}
         />
         {rootDomain && (
-          <Text as="span" variant="supporting" className={suffix()}>
+          <Text
+            as="span"
+            id={suffixId}
+            variant="supporting"
+            className={suffix()}
+          >
             {t('suffix', { rootDomain })}
           </Text>
         )}
