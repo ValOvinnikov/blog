@@ -242,12 +242,15 @@ needed a product change. Also found:
 
 ## Orchestration
 
-- **Turbo concurrency is capped (adopted).** Every vitest instance defaults
-  to `availableParallelism() - 1` = 7 workers, so turbo's default of 10
-  instances put up to 70 workers on 8 cores. CI's Test job runs
-  `--concurrency=2`; the root `pnpm test` script runs `--concurrency=50%`,
-  which also covers `deploy-development.yml`. Measured with `--force` on 8
-  cores: default 8m55s, `50%` 7m07s, and the contention timeouts stopped
+- **Turbo concurrency is capped at 2 (adopted).** Every vitest instance
+  defaults to `availableParallelism() - 1` = 7 workers, so turbo's default of
+  10 instances put up to 70 workers on 8 cores. CI's Test job and the root
+  `pnpm test` script (which also covers `pnpm verify` and
+  `deploy-development.yml`) both run `--concurrency=2`. The local script first
+  ran `50%`, which was faster than the default until the big suites moved to
+  `threads`/`vmThreads`; after that, 4 suites each spreading across every core
+  starved each other. Measured with `--force` on 8 cores: `2` 10m36s and
+  green, `50%` 13m09s with 32 timeouts in files that pass alone
   (`ci-automation.md`).
 - **Keep `test`'s `dependsOn: ["^build"]`.** No package has a `build` script,
   but the dependency is likely what invalidates a suite's cache when a package
