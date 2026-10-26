@@ -91,12 +91,12 @@ describe(`<${DashboardLeadsPage.name}/>`, () => {
     expect(listLeadsByCursorMock).not.toHaveBeenCalled();
   });
 
-  it('sends a user with no membership to the pending workspace', async () => {
+  it('sends a user with no membership to onboarding', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.workspacePending());
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
     expect(listLeadsByCursorMock).not.toHaveBeenCalled();
   });
 

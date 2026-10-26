@@ -3,6 +3,7 @@ import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -34,8 +35,6 @@ vi.mock('@blog/db', async () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
-const WORKSPACE_PENDING = '/workspace-pending';
-
 describe(listSessionTenants, () => {
   beforeEach(() => {
     authMock.mockReset();
@@ -58,16 +57,16 @@ describe(listSessionTenants, () => {
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /workspace-pending for a non-SUPERADMIN with zero memberships', async () => {
+  it('redirects to /onboarding for a non-SUPERADMIN with zero memberships', async () => {
     await expect(listSessionTenants()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(redirect).toHaveBeenCalledWith(WORKSPACE_PENDING);
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
   });
 
   it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    'redirects to /workspace-pending for a %s admins row with zero memberships',
+    'redirects to /onboarding for a %s admins row with zero memberships',
     async (role) => {
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
 
@@ -75,7 +74,7 @@ describe(listSessionTenants, () => {
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
       );
 
-      expect(redirect).toHaveBeenCalledWith(WORKSPACE_PENDING);
+      expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
       expect(listTenantsMock).not.toHaveBeenCalled();
     },
   );

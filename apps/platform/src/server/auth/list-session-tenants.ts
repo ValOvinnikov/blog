@@ -20,17 +20,7 @@ export type TSessionTenants = {
   tenants: TTenant[];
 };
 
-/**
- * `/dashboard`'s shared first step: who's signed in, and every tenant their
- * `memberships` rows grant access to. Redirects to sign-in with no session;
- * zero memberships redirects to `/workspace-pending` rather than 404ing,
- * since under auto-provisioning that workspace is either still being
- * created or failed to provision, not genuinely missing. A platform
- * SUPERADMIN instead resolves against every tenant in the system (virtual
- * OWNER-level memberships). `cache()`-wrapped so `dashboard/layout.tsx`,
- * `resolveDashboardTenant`, and `/dashboard/select-tenant` share one fetch
- * per request instead of each resolving it separately.
- */
+/** Zero memberships sends the user to `/onboarding`; a SUPERADMIN resolves against every tenant through virtual memberships. */
 export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
   const userId = await requireSessionUserId();
   const [admin, membershipsWithTenants] = await Promise.all([
@@ -54,7 +44,7 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
   }
 
   if (membershipsWithTenants.length === 0) {
-    redirect(adminRoutes.workspacePending());
+    redirect(adminRoutes.onboarding());
   }
 
   return {

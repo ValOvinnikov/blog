@@ -24,7 +24,8 @@
     "releases": "Versiones · Admin",
     "blockedSignupsPage": "Registros bloqueados · Admin",
     "dataRequestsPage": "Solicitudes de datos · Admin",
-    "signUpTitle": "Crear una cuenta"
+    "signUpTitle": "Crear una cuenta",
+    "onboarding": "Crear tu sitio · Administración"
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
@@ -47,12 +48,58 @@
     "brandMarkLabel": "Valstack"
   },
   "signUpForm": {
-    "acceptTerms": "Acepto los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
-    "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar.",
     "continue": "Continuar",
     "continuing": "Comprobando…",
     "refusedTitle": "No hemos podido continuar con tu registro",
     "refusedDescription": "Vuelve a intentarlo más tarde."
+  },
+  "termsAcceptance": {
+    "acceptTerms": "Acepto los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
+    "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar."
+  },
+  "onboardingPage": {
+    "heading": "Crea tu sitio",
+    "description": "Elige qué tipo de sitio quieres, su dirección y su aspecto. Podrás cambiarlo todo más adelante, salvo la dirección.",
+    "brandMarkLabel": "Valstack"
+  },
+  "onboardingForm": {
+    "siteTypeLabel": "Tipo de sitio",
+    "siteTypeHint": "Tu sitio empieza con páginas para este tipo.",
+    "siteTypes": {
+      "BLOG": "Blog",
+      "PORTFOLIO": "Portafolio",
+      "PERSONAL": "Personal / currículum",
+      "DOCS": "Documentación",
+      "BLANK": "En blanco"
+    },
+    "nameLabel": "Nombre del sitio",
+    "nameHint": "Se muestra en la cabecera de tu sitio y en las pestañas del navegador.",
+    "siteAddressLabel": "Dirección del sitio",
+    "siteAddressHint": "Letras, números y guiones. Con el plan Growth puedes conectar tu propio dominio.",
+    "siteAddressSuffix": ".{rootDomain}",
+    "siteAddressChecking": "Comprobando la dirección…",
+    "siteAddressAvailable": "{address} está disponible.",
+    "languageLabel": "Idioma",
+    "languageHint": "El idioma con el que empieza tu sitio. Podrás añadir más después.",
+    "presetLabel": "Aspecto",
+    "presetHint": "Un estilo de partida para tu sitio. Podrás ajustarlo después de crearlo.",
+    "accentLabel": "Color de acento",
+    "previewNamePlaceholder": "Tu sitio",
+    "createSite": "Crear sitio",
+    "creating": "Creando tu sitio…",
+    "failureTitle": "No hemos podido crear tu sitio",
+    "failures": {
+      "alreadyOwnsFreeSite": "Ya tienes un sitio gratuito. Cada persona puede tener uno.",
+      "tryAgainLater": "Vuelve a intentarlo más tarde.",
+      "serverError": "Algo ha salido mal. Vuelve a intentarlo."
+    },
+    "fieldErrors": {
+      "nameRequired": "Escribe un nombre para tu sitio.",
+      "siteAddressInvalid": "Usa solo letras minúsculas, números y guiones, hasta 63 caracteres, sin empezar ni terminar con un guion.",
+      "siteAddressReserved": "Esta dirección está reservada. Elige otra.",
+      "siteAddressTaken": "Esta dirección ya está en uso. Elige otra.",
+      "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar."
+    }
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuar con GitHub",

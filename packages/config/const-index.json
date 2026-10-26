@@ -62,6 +62,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
+      },
+      {
+        "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "REFUSED": [
@@ -1050,6 +1056,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "SITE_ADDRESS_STATUS.IDLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "SUBMITTING": [
@@ -3700,6 +3712,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/domain",
         "file": "apps/platform/src/constants/domain.ts"
+      },
+      {
+        "ref": "SITE_ADDRESS_STATUS.AVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "IN_USE": [
@@ -3924,6 +3942,54 @@
         "scope": "app:platform",
         "from": "@platform/constants/lead",
         "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "CHECKING": [
+      {
+        "ref": "SITE_ADDRESS_STATUS.CHECKING",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "onboarding.root_domain_missing": [
+      {
+        "ref": "ONBOARDING_LOG.ROOT_DOMAIN_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "onboarding.session_email_missing": [
+      {
+        "ref": "ONBOARDING_LOG.SESSION_EMAIL_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "onboarding.owns_free_tenant_check_failed": [
+      {
+        "ref": "ONBOARDING_LOG.OWNS_FREE_TENANT_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "onboarding.terms_record_failed": [
+      {
+        "ref": "ONBOARDING_LOG.TERMS_RECORD_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "onboarding.create_failed": [
+      {
+        "ref": "ONBOARDING_LOG.CREATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "operator_alert.no_recipients": [

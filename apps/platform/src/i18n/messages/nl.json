@@ -24,7 +24,8 @@
     "releases": "Releases · Admin",
     "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
     "dataRequestsPage": "Gegevensverzoeken · Admin",
-    "signUpTitle": "Account aanmaken"
+    "signUpTitle": "Account aanmaken",
+    "onboarding": "Je site maken · Admin"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -47,12 +48,58 @@
     "brandMarkLabel": "Valstack"
   },
   "signUpForm": {
-    "acceptTerms": "Ik ga akkoord met de <terms>Servicevoorwaarden</terms> en het <privacy>Privacybeleid</privacy>.",
-    "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan.",
     "continue": "Doorgaan",
     "continuing": "Controleren…",
     "refusedTitle": "We konden je aanmelding niet voortzetten",
     "refusedDescription": "Probeer het later opnieuw."
+  },
+  "termsAcceptance": {
+    "acceptTerms": "Ik ga akkoord met de <terms>Servicevoorwaarden</terms> en het <privacy>Privacybeleid</privacy>.",
+    "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan."
+  },
+  "onboardingPage": {
+    "heading": "Maak je site",
+    "description": "Kies wat voor site je wilt, het adres en het uiterlijk. Alles behalve het adres kun je later nog wijzigen.",
+    "brandMarkLabel": "Valstack"
+  },
+  "onboardingForm": {
+    "siteTypeLabel": "Type site",
+    "siteTypeHint": "Je site begint met pagina’s voor dit type.",
+    "siteTypes": {
+      "BLOG": "Blog",
+      "PORTFOLIO": "Portfolio",
+      "PERSONAL": "Persoonlijk / cv",
+      "DOCS": "Documentatie",
+      "BLANK": "Leeg"
+    },
+    "nameLabel": "Naam van de site",
+    "nameHint": "Staat in de kop van je site en in browsertabbladen.",
+    "siteAddressLabel": "Adres van de site",
+    "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
+    "siteAddressSuffix": ".{rootDomain}",
+    "siteAddressChecking": "Adres controleren…",
+    "siteAddressAvailable": "{address} is beschikbaar.",
+    "languageLabel": "Taal",
+    "languageHint": "De taal waarmee je site begint. Je kunt later meer talen toevoegen.",
+    "presetLabel": "Uiterlijk",
+    "presetHint": "Een startstijl voor je site. Je kunt die na het maken verfijnen.",
+    "accentLabel": "Accentkleur",
+    "previewNamePlaceholder": "Je site",
+    "createSite": "Site maken",
+    "creating": "Je site wordt gemaakt…",
+    "failureTitle": "We konden je site niet maken",
+    "failures": {
+      "alreadyOwnsFreeSite": "Je hebt al een gratis site. Iedereen kan er één hebben.",
+      "tryAgainLater": "Probeer het later opnieuw.",
+      "serverError": "Er ging iets mis. Probeer het opnieuw."
+    },
+    "fieldErrors": {
+      "nameRequired": "Vul een naam voor je site in.",
+      "siteAddressInvalid": "Gebruik alleen kleine letters, cijfers en koppeltekens, maximaal 63 tekens, zonder koppelteken aan het begin of eind.",
+      "siteAddressReserved": "Dit adres is gereserveerd. Kies een ander.",
+      "siteAddressTaken": "Dit adres is al in gebruik. Kies een ander.",
+      "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan."
+    }
   },
   "providerSignInButton": {
     "continueWithGithub": "Doorgaan met GitHub",

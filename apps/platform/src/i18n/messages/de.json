@@ -24,7 +24,8 @@
     "releases": "Releases · Admin",
     "blockedSignupsPage": "Gesperrte Registrierungen · Admin",
     "dataRequestsPage": "Datenanfragen · Admin",
-    "signUpTitle": "Konto erstellen"
+    "signUpTitle": "Konto erstellen",
+    "onboarding": "Website erstellen · Admin"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -47,12 +48,58 @@
     "brandMarkLabel": "Valstack"
   },
   "signUpForm": {
-    "acceptTerms": "Ich stimme den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
-    "termsNotAccepted": "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren.",
     "continue": "Weiter",
     "continuing": "Wird geprüft…",
     "refusedTitle": "Wir konnten deine Registrierung nicht fortsetzen",
     "refusedDescription": "Versuche es später erneut."
+  },
+  "termsAcceptance": {
+    "acceptTerms": "Ich stimme den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
+    "termsNotAccepted": "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
+  },
+  "onboardingPage": {
+    "heading": "Erstelle deine Website",
+    "description": "Wähle, welche Art von Website du möchtest, ihre Adresse und ihr Aussehen. Bis auf die Adresse kannst du später alles ändern.",
+    "brandMarkLabel": "Valstack"
+  },
+  "onboardingForm": {
+    "siteTypeLabel": "Art der Website",
+    "siteTypeHint": "Deine Website startet mit Seiten für diese Art.",
+    "siteTypes": {
+      "BLOG": "Blog",
+      "PORTFOLIO": "Portfolio",
+      "PERSONAL": "Persönlich / Lebenslauf",
+      "DOCS": "Dokumentation",
+      "BLANK": "Leer"
+    },
+    "nameLabel": "Name der Website",
+    "nameHint": "Wird im Kopfbereich deiner Website und in Browser-Tabs angezeigt.",
+    "siteAddressLabel": "Adresse der Website",
+    "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
+    "siteAddressSuffix": ".{rootDomain}",
+    "siteAddressChecking": "Adresse wird geprüft…",
+    "siteAddressAvailable": "{address} ist verfügbar.",
+    "languageLabel": "Sprache",
+    "languageHint": "Die Sprache, mit der deine Website startet. Weitere kannst du später hinzufügen.",
+    "presetLabel": "Aussehen",
+    "presetHint": "Ein Ausgangsstil für deine Website. Du kannst ihn nach dem Erstellen anpassen.",
+    "accentLabel": "Akzentfarbe",
+    "previewNamePlaceholder": "Deine Website",
+    "createSite": "Website erstellen",
+    "creating": "Deine Website wird erstellt…",
+    "failureTitle": "Wir konnten deine Website nicht erstellen",
+    "failures": {
+      "alreadyOwnsFreeSite": "Du hast bereits eine kostenlose Website. Jede Person kann eine haben.",
+      "tryAgainLater": "Versuche es später erneut.",
+      "serverError": "Etwas ist schiefgelaufen. Versuche es erneut."
+    },
+    "fieldErrors": {
+      "nameRequired": "Gib einen Namen für deine Website ein.",
+      "siteAddressInvalid": "Verwende nur Kleinbuchstaben, Ziffern und Bindestriche, höchstens 63 Zeichen, nicht mit einem Bindestrich am Anfang oder Ende.",
+      "siteAddressReserved": "Diese Adresse ist reserviert. Wähle eine andere.",
+      "siteAddressTaken": "Diese Adresse ist vergeben. Wähle eine andere.",
+      "termsNotAccepted": "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
+    }
   },
   "providerSignInButton": {
     "continueWithGithub": "Weiter mit GitHub",

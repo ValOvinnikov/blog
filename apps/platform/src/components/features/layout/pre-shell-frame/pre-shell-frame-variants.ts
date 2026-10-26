@@ -9,4 +9,9 @@ export const preShellFrameVariants = tv({
     card: ['overflow-clip'],
     headerGutter: ['px-[18px]'],
   },
+  variants: {
+    isWide: {
+      true: { main: ['max-w-5xl'] },
+    },
+  },
 });

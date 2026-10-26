@@ -47,12 +47,12 @@ describe(`<${DashboardLayout.name}/>`, () => {
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
+  it('redirects to /onboarding when the signed-in user has zero memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith('/workspace-pending');
+    expect(redirect).toHaveBeenCalledWith('/onboarding');
   });
 
   it('renders the gated content for any membership without resolving a single tenant', async () => {

@@ -1,6 +1,6 @@
 ---
 title: Platform sign-in and onboarding
-status: partial
+status: built
 layers: [platform, auth, db, email, config, worker]
 code:
   - apps/platform/src/app/api/auth/**
@@ -9,6 +9,10 @@ code:
   - apps/platform/src/app/*/sign-in/**
   - apps/platform/src/app/*/signup/**
   - apps/platform/src/components/features/sign-up/**
+  - apps/platform/src/app/*/onboarding/**
+  - apps/platform/src/components/features/onboarding/**
+  - apps/platform/src/server/onboarding/**
+  - apps/platform/src/constants/onboarding.ts
   - apps/platform/src/server/auth/accept-signup-terms-action*
   - apps/platform/src/utils/legal-page-urls/**
   - apps/platform/src/instrumentation-client.ts
@@ -36,14 +40,12 @@ epics: [4840, 4960, 4979, 4982, 4958, 4949, 5649]
 ## What it does
 
 How a person gets into `apps/platform` and, once signed in, into a workspace.
-Today every platform user, operator, owner or invited editor, signs in on one
-branded `/sign-in` page, and a prospect passes a `/signup` gate first; there
-is still no way to create a site without an operator. The decided shape adds
-an `/onboarding` wizard that creates a Free site.
+Every platform user, operator, owner or invited editor, signs in on one
+branded `/sign-in` page, and a prospect passes a `/signup` gate first. A
+signed-in user with no workspace lands on `/onboarding`, which creates their
+Free site.
 
 ## Surfaces and routes
-
-Today:
 
 - `/sign-in` is Auth.js's `pages.signIn`, public and in the panel's own
   pre-shell styling: a button per configured OAuth provider, then an email
@@ -58,8 +60,9 @@ Today:
 - Auth.js sends a sign-in failure back to `/sign-in?error=…`.
   `OAuthAccountNotLinked` (the email already signs in with another provider)
   gets its own message; any other error a general one.
-- `/` redirects by `resolveHomeHref`: an admin to `/tenants`, anyone else to
-  `/dashboard`, a signed-out visitor to sign-in.
+- `/` redirects by `resolveHomeHref`: an admin to `/tenants`, a member to
+  `/dashboard`, a user with no membership to `/onboarding`, a signed-out
+  visitor to sign-in.
 - A signed-in user opening `/sign-in` is sent on to its `callbackUrl`.
 - Providers come from `@blog/auth`: GitHub and Google when their credentials
   are set, and the email magic link always.
@@ -67,14 +70,15 @@ Today:
   styling. A `Verification` error (a magic link already used or expired) says
   so and links to sign-in for a new link; any other error gets a plain message
   and a link back to sign-in.
-- `/workspace-pending`: a session-gated dead end for a signed-in user with no
-  membership, with "Try again" (to `/dashboard`) and "Sign out".
+- `/workspace-pending`: a session-gated dead end with "Try again" (to
+  `/dashboard`) and "Sign out". Nothing routes to it any more: a user with no
+  membership goes to `/onboarding` instead.
 - `/signup`: a public gate in front of the same providers, not a second
   login. The visitor ticks acceptance of the Terms of Service and the Privacy
   Policy, linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
   (`routes.terms()` and `routes.privacy()` in `@blog/config`; the marketing
   site serves them), or named as plain text without a root domain. Continue
-  runs `acceptSignupTermsAction`: Vercel BotID with Deep Analysis, then the
+  runs `acceptSignupTermsAction`: Vercel BotID at its free Basic level, then the
   `SIGNUP_TERMS_COOKIE_NAME` cookie set to `TERMS_VERSION` for two days, then
   `/sign-in` with a `callbackUrl` of `/`. A bot, or a failed check, gets a
   neutral "try again later" and no cookie; a failed check is logged. A
@@ -83,17 +87,24 @@ Today:
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
 
-Decided:
-
-- `/onboarding`: site type, name, slug with a live availability check,
-  language, preset and accent with the site preview, then **Create site**.
+- `/onboarding`: one pre-shell form beside a live site preview, for a
+  signed-in user with no membership and no `admins` row
+  (`requireOnboardingUser`; anyone else is sent to their own home, so an
+  invited member never sees it). It asks for the site type (Blog, Portfolio,
+  Personal / résumé, Docs or Blank), the site name, the Site address (only
+  the subdomain, with `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live
+  by `checkSiteAddressAction` as the user types), the starting language, the
+  preset and accent colour, and the terms acceptance again (a magic link
+  opened in another browser carries no `/signup` cookie). **Create site**
+  runs `createSiteAction`, then redirects to `/dashboard`, whose site setup
+  card follows provisioning.
 
 ## Data
 
-- Today: the Auth.js tables in Neon (`users`, `accounts`, `sessions`,
+- The Auth.js tables in Neon (`users`, `accounts`, `sessions`,
   `verification_tokens`) with the `database` session strategy. On sign-in,
   pending `membership_invites` for the email become `memberships`.
-- Today, built ahead of Create site: `@blog/db`'s `createSelfServeTenant`
+- `@blog/db`'s `createSelfServeTenant`
   writes a FREE tenant (status ACTIVE, provisioning PENDING, `site_type`),
   the OWNER membership, the `tenant_domains` row for `<slug>.<domain>`,
   `site_config` with the chosen preset and accent hue, `settings_features`
@@ -102,8 +113,16 @@ Decided:
   its FK cascades sweep the rest. It refuses an invalid domain or address, a
   taken domain (`DB_DUPLICATE_DOMAIN`, including a concurrent submit of the
   same slug) and a person who already owns a Free tenant
-  (`DB_ALREADY_OWNS_FREE_TENANT`). Decided: Create site calls it after
-  `admitCreateSite`, then enqueues the worker.
+  (`DB_ALREADY_OWNS_FREE_TENANT`).
+- Create site (`createSiteAction`), in order: validate; check the address
+  (`checkTenantSlug`) and `ownsFreeTenant` for the session's email, so a
+  refusal there spends no gate slot; `admitCreateSite`, refused with the same
+  neutral "try again later" as `/signup`; record the terms acceptance
+  (`recordTermsAcceptance`, a no-op once recorded); `createSelfServeTenant`,
+  mapping `DB_DUPLICATE_DOMAIN` to a taken address and
+  `DB_ALREADY_OWNS_FREE_TENANT` to the one-site refusal; then
+  `startProvisioning` and `/dashboard`, even when the enqueue failed, since
+  the dashboard shows the run's state.
 - One Free tenant per person: `ownsFreeTenant(email)` is the pre-check. It
   strips the `+tag` (`normalizeEmailIdentity`) and matches a FREE,
   non-archived tenant whose `self_serve_owner_email_index` is that address's
@@ -122,55 +141,53 @@ Decided:
   one back to FREE (`updateTenantDetails`, shown in the tenant details form as
   a refusal alert, with no audit event) is refused while its owner holds
   another.
-- Today: a new user's first platform sign-in records `users.termsAcceptedAt`
+- A new user's first platform sign-in records `users.termsAcceptedAt`
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
   cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
   users are never stamped, and a recorded acceptance is never overwritten.
-  `/signup` sets that cookie. Decided: a magic link opened in another browser
-  has no cookie, so `/onboarding` asks for acceptance again.
+  `/signup` sets that cookie; Create site records the acceptance it asks for
+  again.
 
 ## Configuration
 
 - Operator access is decided by an `admins` row after sign-in, never by a
   separate sign-in. The first admin is granted by hand with
   `pnpm --filter @blog/db db:seed-admin`.
-- Decided: v1 offers the FREE plan only, one Free tenant per user. Wizard,
+- v1 offers the FREE plan only, one Free tenant per user. Wizard,
   card and email copy is fixed platform copy, not [Voice](./voice.md).
-- Today, built ahead of Create site: `takeCreateSiteSlot(clientKey)` allows
+- `takeCreateSiteSlot(clientKey)` allows
   at most `MAX_SITES_PER_IP_PER_DAY` (3) creates per IP and
   `MAX_SELF_SERVE_SITES_PER_DAY` (50) in total per UTC day, counted in Upstash
   Redis. The first refusal past the total cap emails every super admin once
   that day. `admitCreateSite({ clientKey, email })` wraps it: an email that
   `isSignupBlocked` matches is refused first and takes no slot, and a failed
-  lookup refuses too. Create site (#4960) calls `admitCreateSite` before
-  enqueuing anything and answers every refusal with the same neutral "try
-  again later" message, so the blocklist can't be probed.
-- Today: `@blog/db`'s `normalizeSignupEmail` lower-cases an address and drops
-  any `+tag`, so `name+1@…` and `name+2@…` resolve to one person. #4960's
+  lookup refuses too. Create site calls `admitCreateSite` before writing
+  anything and answers every refusal with the same neutral "try again later"
+  message, so the blocklist can't be probed.
+- `@blog/db`'s `normalizeSignupEmail` lower-cases an address and drops any
+  `+tag`, so `name+1@…` and `name+2@…` resolve to one person. The
   one-site-per-user lookup compares addresses in that form.
 
 ## Constraints and invariants
 
-- Today `@blog/auth`'s `isMagicLinkSendAllowed` refuses a magic-link send to
+- `@blog/auth`'s `isMagicLinkSendAllowed` refuses a magic-link send to
   an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
   keys on `normalizeEmailIdentity`, so `+tag` variants share one budget. A
   refusal, or a failed check, sends nothing and never throws, and every
   request, refused or sent, takes at least `MAGIC_LINK_RESPONSE_FLOOR_MS`, so
   the check-your-inbox page cannot be told apart by content or timing.
-- Today `resolveHomeHref` picks a dead end's link and `/`'s redirect: `/tenants` for an
-  admin, `/dashboard` for anyone else. `/dashboard` with no membership
-  redirects to `/workspace-pending`.
-- Decided: after sign-in, `resolveHomeHref` routes by role (operators to
-  `/tenants`, members to `/dashboard`, no membership to `/onboarding`), and
-  invited users with a membership never see the wizard.
-- Decided: the Sanity project is created at Create site, never at signup.
-- Today the admin builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
+- `resolveHomeHref` picks a dead end's link and `/`'s redirect by role:
+  operators to `/tenants`, members to `/dashboard`, no membership to
+  `/onboarding`. `/dashboard` with no membership redirects to `/onboarding`.
+- The Sanity project is created by the provisioning run Create site starts,
+  never at signup.
+- The admin builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
   their own names, each session it creates is stamped `PLATFORM` in
   `sessions.app`, and a session stamped otherwise reads as signed out. Invite
   side effects run only here: the invite-consuming and terms-recording
   sign-in events and the invite email template.
-- Today the admin's sign-in and invite emails render in the platform layout
+- The admin's sign-in and invite emails render in the platform layout
   (the stacked logo mark and "Platform" in the top band). A site's sign-in
   email keeps its tenant's layout, or the neutral one on an unknown host.
 
@@ -185,8 +202,9 @@ Decided:
   [public-front-door](./public-front-door.md).
 - Vercel BotID (`botid`: `withBotId` in `next.config.ts`, `initBotId` in
   `src/instrumentation-client.ts` protecting POSTs to `/signup`; `src/proxy.ts`
-  skips its challenge path). No env var of its own; Deep Analysis is billed
-  per check.
+  skips its challenge path). No env var of its own. It runs at the free Basic
+  level; Deep Analysis is a paid option billed per check, to reconsider at
+  public launch.
 - Env: `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
   `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_API_KEY`,
   `MAGIC_LINK_FROM_ADDRESS`, `KV_REST_API_URL`/`KV_REST_API_TOKEN` (the
@@ -200,6 +218,9 @@ Decided:
 - `apps/platform/src/app/[locale]/sign-in/page.tsx`
 - `apps/platform/src/app/[locale]/signup/page.tsx`
 - `apps/platform/src/server/auth/accept-signup-terms-action.ts`
+- `apps/platform/src/app/[locale]/onboarding/page.tsx`
+- `apps/platform/src/server/onboarding/create-site-action.ts`
+- `apps/platform/src/server/onboarding/check-site-address-action.ts`
 - `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
@@ -215,6 +236,8 @@ Decided:
   `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
   `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
   `accept-signup-terms-action.test.ts`, `legal-page-urls.test.ts`,
+  `create-site-action.test.ts`, `check-site-address-action.test.ts`,
+  `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
   `sign-in-view`, `email-sign-in-form`,
   `workspace-pending-view` and `sign-out-button`.
