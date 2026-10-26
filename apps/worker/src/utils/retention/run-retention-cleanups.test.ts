@@ -10,8 +10,9 @@ import {
   RETENTION_DELETE_BATCH_SIZE,
   RETENTION_KIND,
   RETENTION_LOG,
+  RETENTION_RUN_DEADLINE_MS,
 } from '@worker/constants/retention';
-import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
+import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 
@@ -30,7 +31,12 @@ const ALL_CLEANUPS = [
 
 describe(runRetentionCleanups, () => {
   beforeEach(() => {
+    freezeClock();
     for (const cleanup of ALL_CLEANUPS) vi.mocked(cleanup).mockResolvedValue(0);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('runs every cleanup for now and logs one line with the count per kind', async () => {
@@ -87,5 +93,40 @@ describe(runRetentionCleanups, () => {
     );
     expect(deleted).not.toHaveProperty(RETENTION_KIND.LEADS);
     expect(deleted[RETENTION_KIND.RESOLVED_FINDINGS]).toBe(5);
+  });
+
+  it('stops starting batches at the deadline and logs what it deleted and what is left', async () => {
+    vi.mocked(deleteExpiredSessions).mockResolvedValue(7);
+    vi.mocked(deleteAuditEventsPastRetention).mockImplementation(async () => {
+      vi.advanceTimersByTime(RETENTION_RUN_DEADLINE_MS);
+      return RETENTION_DELETE_BATCH_SIZE;
+    });
+
+    const deleted = await runRetentionCleanups(MOCK_NOW);
+
+    expect(deleteAuditEventsPastRetention).toHaveBeenCalledOnce();
+    expect(deleteResolvedFindingsPastRetention).not.toHaveBeenCalled();
+    expect(deleted[RETENTION_KIND.SESSIONS]).toBe(7);
+    expect(deleted[RETENTION_KIND.AUDIT_EVENTS]).toBe(
+      RETENTION_DELETE_BATCH_SIZE,
+    );
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      RETENTION_LOG.DEADLINE_REACHED,
+      {
+        unfinished: [
+          RETENTION_KIND.AUDIT_EVENTS,
+          RETENTION_KIND.RESOLVED_FINDINGS,
+        ],
+      },
+    );
+    expect(logger.info).toHaveBeenCalledExactlyOnceWith(RETENTION_LOG.DELETED, {
+      deleted,
+    });
+  });
+
+  it('finishes a run inside the deadline without a deadline warning', async () => {
+    await runRetentionCleanups(MOCK_NOW);
+
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 });
