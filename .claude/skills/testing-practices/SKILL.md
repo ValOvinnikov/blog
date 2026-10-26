@@ -277,10 +277,9 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
     });
 
     it('is closed by default', () => {
-      expect(screen.getByRole('button', { name: 'Share' })).toHaveAttribute(
-        'aria-expanded',
-        'false',
-      );
+      const shareButton = screen.getByRole('button', { name: 'Share' });
+
+      expect(shareButton).toHaveAttribute('aria-expanded', 'false');
     });
   });
   ```
@@ -317,7 +316,8 @@ never reads state, props, handlers or markup shape.
 
   ```tsx
   <span className={cursor()} aria-hidden="true" data-testid="cursor" />;
-  expect(screen.getByTestId('cursor')).toHaveAttribute('aria-hidden', 'true'); // ✅
+  const cursor = screen.getByTestId('cursor');
+  expect(cursor).toHaveAttribute('aria-hidden', 'true'); // ✅
   expect(container.querySelector('[aria-hidden="true"]:empty')).toBeTruthy(); // ❌
   ```
 
@@ -413,11 +413,11 @@ describe(`<${SubscribeForm.name}/>`, () => {
     const onSubscribe = vi.fn();
     setup({ onSubscribe });
 
-    await user.type(
-      screen.getByRole('textbox', { name: 'Email' }),
-      'jane@example.com',
-    );
-    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
+    const subscribeButton = screen.getByRole('button', { name: 'Subscribe' });
+
+    await user.type(emailField, 'jane@example.com');
+    await user.click(subscribeButton);
 
     expect(onSubscribe).toHaveBeenCalledWith('jane@example.com');
   });
@@ -425,13 +425,16 @@ describe(`<${SubscribeForm.name}/>`, () => {
   it('replaces the form with the confirmation once subscribed', async () => {
     setup({ onSubscribe: vi.fn().mockResolvedValue(undefined) });
 
-    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+    const subscribeButton = screen.getByRole('button', { name: 'Subscribe' });
+    await user.click(subscribeButton);
 
     const confirmation = await screen.findByText('Check your inbox');
-    const subscribeButton = screen.queryByRole('button', { name: 'Subscribe' });
+    const removedSubscribeButton = screen.queryByRole('button', {
+      name: 'Subscribe',
+    });
 
     expect(confirmation).toBeVisible();
-    expect(subscribeButton).not.toBeInTheDocument();
+    expect(removedSubscribeButton).not.toBeInTheDocument();
   });
 });
 ```
