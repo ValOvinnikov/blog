@@ -4,7 +4,12 @@ import {
   DATA_REQUEST_MATCH_KIND,
 } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_SITE_NAME,
@@ -161,6 +166,9 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
     const exportButton = await screen.findByRole('button', EXPORT_BUTTON);
     await user.click(exportButton);
+    await waitFor(() => {
+      expect(screen.getByRole('button', EXPORT_BUTTON)).toBeEnabled();
+    });
 
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
