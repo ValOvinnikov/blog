@@ -137,6 +137,8 @@ vi.mock('next-intl/server', () => ({
 
 vi.mock('@web/utils/logger/logger');
 
+vi.mock('@vercel/functions', () => ({ waitUntil: vi.fn() }));
+
 // `next/font/local` relies on a Next build-time transform and throws when
 // `@web/config/fonts` is evaluated under Vitest.
 vi.mock('next/font/local', () => ({

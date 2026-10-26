@@ -8,7 +8,6 @@ import {
 
 import { onRequestError } from './instrumentation';
 
-vi.mock('@vercel/functions', () => ({ waitUntil: vi.fn() }));
 vi.mock('@web/server/log-shipping/log-request-error/log-request-error', () => ({
   logRequestError: vi.fn(),
 }));

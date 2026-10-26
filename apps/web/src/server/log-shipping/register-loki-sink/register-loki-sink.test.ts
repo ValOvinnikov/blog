@@ -9,7 +9,6 @@ vi.mock('@blog/insight', () => ({
   createLokiSink: vi.fn(),
   registerLogSink: vi.fn(),
 }));
-vi.mock('@vercel/functions', () => ({ waitUntil: vi.fn() }));
 vi.mock('@web/utils/env/env', () => ({ env: {} }));
 
 const VALID_ENV = {
