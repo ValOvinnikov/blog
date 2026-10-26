@@ -11,6 +11,7 @@ import {
   getBrandAssetUrl,
   setBrandAssetUrl,
 } from '@platform/server/site-config/brand-asset-store';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import type { TClearUploadResult } from '@platform/server/uploads/upload-error';
 import {
   brandAssetKindSchema,
@@ -33,6 +34,7 @@ export const clearBrandAssetAction = async (
     if (!previousUrl) return toOutcome(ACTION_OUTCOME.SUCCESS);
 
     await setBrandAssetUrl(tenant.id, targetKind, null);
+    await revalidateSiteConfig(tenant.id);
 
     await deleteBlobBestEffort(
       previousUrl,

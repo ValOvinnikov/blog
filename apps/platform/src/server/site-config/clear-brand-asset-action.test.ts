@@ -8,6 +8,7 @@ import {
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
@@ -40,6 +41,8 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/site-config/revalidate-site-config');
+
 vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
 }));
@@ -63,6 +66,7 @@ const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 describe(clearBrandAssetAction, () => {
   beforeEach(() => {
@@ -72,6 +76,7 @@ describe(clearBrandAssetAction, () => {
     upsertSiteConfigMock.mockReset();
     insertAuditEventMock.mockReset();
     delMock.mockReset();
+    revalidateSiteConfigMock.mockClear();
 
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: MOCK_TENANT_ID },
@@ -114,6 +119,19 @@ describe(clearBrandAssetAction, () => {
     });
   });
 
+  it('refreshes the public site for the tenant once the field is cleared', async () => {
+    getSiteConfigOrDefaultsMock.mockResolvedValue({
+      ...MOCK_THEME_FIELDS,
+      logoAssetUrl: MOCK_LOGO_URL,
+      faviconAssetUrl: undefined,
+    });
+
+    await clearBrandAssetAction(MOCK_TENANT_ID, 'logo');
+
+    expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
+    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  });
+
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...MOCK_THEME_FIELDS,
@@ -140,9 +158,10 @@ describe(clearBrandAssetAction, () => {
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     expect(delMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('reports failure without throwing, and no audit event, when the write fails', async () => {
+  it('reports failure without throwing, no audit event and no site refresh, when the write fails', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...MOCK_THEME_FIELDS,
       logoAssetUrl: undefined,
@@ -154,6 +173,7 @@ describe(clearBrandAssetAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {

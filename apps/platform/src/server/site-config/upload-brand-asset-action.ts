@@ -12,6 +12,7 @@ import {
   getBrandAssetUrl,
   setBrandAssetUrl,
 } from '@platform/server/site-config/brand-asset-store';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { validateBrandAssetUpload } from '@platform/server/site-config/validate-brand-asset';
 import type { TUploadResult } from '@platform/server/uploads/upload-error';
 import {
@@ -56,6 +57,7 @@ export const uploadBrandAssetAction = async (
     });
 
     await setBrandAssetUrl(tenant.id, targetKind, blob.url);
+    await revalidateSiteConfig(tenant.id);
 
     if (previousUrl && previousUrl !== blob.url) {
       await deleteBlobBestEffort(
