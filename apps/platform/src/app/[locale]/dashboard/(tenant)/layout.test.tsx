@@ -174,12 +174,12 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /workspace-pending for a user with no memberships', async () => {
+  it('redirects to /onboarding for a user with no memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.workspacePending());
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
   });
 
   it('redirects to the picker for several memberships and no active-tenant cookie', async () => {

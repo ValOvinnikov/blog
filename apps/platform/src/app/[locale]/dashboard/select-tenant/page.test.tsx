@@ -53,12 +53,12 @@ describe(`<${SelectTenantPage.name}/>`, () => {
     expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
   });
 
-  it('redirects to /workspace-pending with zero memberships', async () => {
+  it('redirects to /onboarding with zero memberships', async () => {
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.workspacePending());
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
   });
 
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {

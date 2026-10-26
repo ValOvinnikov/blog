@@ -5,12 +5,17 @@ import { preShellFrameVariants } from './pre-shell-frame-variants';
 
 export type TPreShellFrameProps = {
   header: ReactNode;
+  isWide?: boolean;
   children: ReactNode;
 };
 
 /** The page frame for routes that render before `AdminShell` exists. */
-export const PreShellFrame = ({ header, children }: TPreShellFrameProps) => {
-  const { root, main, card, headerGutter } = preShellFrameVariants();
+export const PreShellFrame = ({
+  header,
+  isWide = false,
+  children,
+}: TPreShellFrameProps) => {
+  const { root, main, card, headerGutter } = preShellFrameVariants({ isWide });
 
   return (
     <div className={root()}>

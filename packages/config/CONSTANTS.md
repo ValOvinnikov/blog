@@ -325,6 +325,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **LEAD_REFUSAL**: `NOT_FOUND`
 - **LEAD_LOG**: `DELETE_FAILED`=`"leads.delete_failed"`, `LOAD_FAILED`=`"leads.load_failed"`, `READ_STATE_FAILED`=`"leads.read_state_failed"`, `PAGE_TITLE_SKIPPED`=`"leads.page_title_skipped"`, `PAGE_TITLE_FAILED`=`"leads.page_title_failed"`, `PAGE_TITLE_ERROR`=`"leads.page_title_error"`
 
+### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
+
+- **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`
+- **ONBOARDING_LOG**: `ROOT_DOMAIN_MISSING`=`"onboarding.root_domain_missing"`, `SESSION_EMAIL_MISSING`=`"onboarding.session_email_missing"`, `OWNS_FREE_TENANT_CHECK_FAILED`=`"onboarding.owns_free_tenant_check_failed"`, `TERMS_RECORD_FAILED`=`"onboarding.terms_record_failed"`, `CREATE_FAILED`=`"onboarding.create_failed"`
+
 ### `@platform/constants/operator-alert` — `apps/platform/src/constants/operator-alert.ts`
 
 - **OPERATOR_ALERT_LOG**: `NO_RECIPIENTS`=`"operator_alert.no_recipients"`, `SECRET_MISSING`=`"operator_alert.secret_missing"`, `SEND_FAILED`=`"operator_alert.send_failed"`, `TENANT_NOT_FOUND`=`"operator_alert.tenant_not_found"`

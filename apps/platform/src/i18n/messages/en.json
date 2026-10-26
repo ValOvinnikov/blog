@@ -24,7 +24,8 @@
     "releases": "Releases · Admin",
     "blockedSignupsPage": "Blocked sign-ups · Admin",
     "dataRequestsPage": "Data requests · Admin",
-    "signUpTitle": "Create an account"
+    "signUpTitle": "Create an account",
+    "onboarding": "Create your site · Admin"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -47,12 +48,58 @@
     "brandMarkLabel": "Valstack"
   },
   "signUpForm": {
-    "acceptTerms": "I agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
-    "termsNotAccepted": "Accept the Terms of Service and the Privacy Policy to continue.",
     "continue": "Continue",
     "continuing": "Checking…",
     "refusedTitle": "We couldn't continue your sign-up",
     "refusedDescription": "Try again later."
+  },
+  "termsAcceptance": {
+    "acceptTerms": "I agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
+    "termsNotAccepted": "Accept the Terms of Service and the Privacy Policy to continue."
+  },
+  "onboardingPage": {
+    "heading": "Create your site",
+    "description": "Choose what kind of site you want, its address and its look. You can change everything except the address later.",
+    "brandMarkLabel": "Valstack"
+  },
+  "onboardingForm": {
+    "siteTypeLabel": "Site type",
+    "siteTypeHint": "Your site starts with pages for this type.",
+    "siteTypes": {
+      "BLOG": "Blog",
+      "PORTFOLIO": "Portfolio",
+      "PERSONAL": "Personal / résumé",
+      "DOCS": "Docs",
+      "BLANK": "Blank"
+    },
+    "nameLabel": "Site name",
+    "nameHint": "Shown in your site’s header and in browser tabs.",
+    "siteAddressLabel": "Site address",
+    "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
+    "siteAddressSuffix": ".{rootDomain}",
+    "siteAddressChecking": "Checking the address…",
+    "siteAddressAvailable": "{address} is available.",
+    "languageLabel": "Language",
+    "languageHint": "The language your site starts in. You can add more later.",
+    "presetLabel": "Look",
+    "presetHint": "A starting style for your site. You can fine-tune it after it’s created.",
+    "accentLabel": "Accent colour",
+    "previewNamePlaceholder": "Your site",
+    "createSite": "Create site",
+    "creating": "Creating your site…",
+    "failureTitle": "We couldn’t create your site",
+    "failures": {
+      "alreadyOwnsFreeSite": "You already have a free site. Each person can have one.",
+      "tryAgainLater": "Try again later.",
+      "serverError": "Something went wrong. Try again."
+    },
+    "fieldErrors": {
+      "nameRequired": "Enter a name for your site.",
+      "siteAddressInvalid": "Use only lowercase letters, numbers and hyphens, up to 63 characters, not starting or ending with a hyphen.",
+      "siteAddressReserved": "This address is reserved. Choose another.",
+      "siteAddressTaken": "This address is taken. Choose another.",
+      "termsNotAccepted": "Accept the Terms of Service and the Privacy Policy to continue."
+    }
   },
   "providerSignInButton": {
     "continueWithGithub": "Continue with GitHub",

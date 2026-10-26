@@ -18,6 +18,7 @@ export const adminRoutes = {
   signInError: () => '/sign-in-error',
   signUp: () => '/signup',
   workspacePending: () => '/workspace-pending',
+  onboarding: () => '/onboarding',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',
   newTenant: () => '/tenants/new',

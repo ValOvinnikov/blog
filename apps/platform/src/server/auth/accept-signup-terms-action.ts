@@ -38,9 +38,7 @@ export type TAcceptSignupTermsResult = TActionResult<
 
 const isBotOrUnverified = async (): Promise<boolean> => {
   try {
-    const { isBot } = await checkBotId({
-      advancedOptions: { checkLevel: 'deepAnalysis' },
-    });
+    const { isBot } = await checkBotId();
     if (isBot) {
       logger.warn(SIGN_UP_LOG.BOT_REFUSED);
     }

@@ -2,10 +2,9 @@
 
 import { Form } from '@base-ui/react/form';
 import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
+import { TermsAcceptanceCheckbox } from '@platform/components/features/sign-up/terms-acceptance-checkbox';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
-import { Checkbox } from '@platform/components/shared/checkbox';
-import { ExternalLink } from '@platform/components/shared/external-link';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
@@ -27,7 +26,7 @@ export const SignUpForm = ({ legalPageUrls }: TSignUpFormProps) => {
     isPending,
     submit,
   } = useSignUp();
-  const { root, legalLink, submit: submitSlot } = signUpFormVariants();
+  const { root, submit: submitSlot } = signUpFormVariants();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,31 +42,11 @@ export const SignUpForm = ({ legalPageUrls }: TSignUpFormProps) => {
           description={t('refusedDescription')}
         />
       )}
-      <Checkbox
+      <TermsAcceptanceCheckbox
+        legalPageUrls={legalPageUrls}
         isChecked={hasAcceptedTerms}
         onCheckedChange={changeAcceptance}
-        label={t.rich('acceptTerms', {
-          terms: (chunks) =>
-            legalPageUrls ? (
-              <ExternalLink href={legalPageUrls.terms} className={legalLink()}>
-                {chunks}
-              </ExternalLink>
-            ) : (
-              chunks
-            ),
-          privacy: (chunks) =>
-            legalPageUrls ? (
-              <ExternalLink
-                href={legalPageUrls.privacy}
-                className={legalLink()}
-              >
-                {chunks}
-              </ExternalLink>
-            ) : (
-              chunks
-            ),
-        })}
-        error={termsError && t('termsNotAccepted')}
+        hasError={Boolean(termsError)}
       />
       <Button
         type="submit"
