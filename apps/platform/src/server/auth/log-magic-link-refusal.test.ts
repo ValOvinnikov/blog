@@ -4,15 +4,9 @@ import { logger } from '@platform/utils/logger/logger';
 
 import { logMagicLinkRefusal } from './log-magic-link-refusal';
 
-vi.mock('@platform/utils/logger/logger');
-
 const CHECK_ERROR = new Error('connection lost');
 
 describe(logMagicLinkRefusal, () => {
-  beforeEach(() => {
-    vi.mocked(logger.warn).mockReset();
-  });
-
   it.each(Object.values(MAGIC_LINK_REFUSAL))(
     'logs one warn line naming a %s refusal',
     (reason) => {
