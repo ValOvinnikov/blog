@@ -469,7 +469,7 @@ and our context providers render for real. This holds in both apps.
 - **Check the app's `src/vitest-setup.ts` before writing a `vi.mock`.** Both
   apps fake `next/navigation`, `next-intl/server` and `next/font/local` and
   stub `ResizeObserver` and `matchMedia` there (`apps/web` also
-  `IntersectionObserver`), and every app fakes its shared logger there with
+  `IntersectionObserver` and `@vercel/functions`' `waitUntil`), and every app fakes its shared logger there with
   its `__mocks__` copy; never mock those again. A test asserting a log line
   reads `vi.mocked(logger)`.
 - **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test

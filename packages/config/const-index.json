@@ -4364,6 +4364,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/request",
         "file": "apps/platform/src/constants/request.ts"
+      },
+      {
+        "ref": "REQUEST_LOG.UNHANDLED_ERROR",
+        "scope": "app:web",
+        "from": "@web/constants/request",
+        "file": "apps/web/src/constants/request.ts"
       }
     ],
     "settings_features.plan_entitlement_rejected": [
