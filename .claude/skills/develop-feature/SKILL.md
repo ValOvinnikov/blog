@@ -248,6 +248,7 @@ bash .claude/hooks/pre-agent-gate0-guard.test.sh
 bash .claude/hooks/post-edit.test.sh
 bash .claude/hooks/subagent-stop-commit-guard.test.sh
 bash .claude/hooks/layer-scope-guard.test.sh
+bash .claude/hooks/board-keeper-graphql-guard.test.sh
 sh scripts/vercel-ignore-affected.test.sh
 ```
 
