@@ -54,7 +54,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - `PRESET_REGISTRY` (`@blog/config`) — `CONSOLE`: hue 250, Space Grotesk / Newsreader, `MD`, `DEFAULT`, `ACCENT_BAR`. `EDITORIAL`: hue 28, Fraunces / Inter, `SM`, `COMPACT`, `OUTLINED`. Each preset also carries the capability `featureDefaults`.
 - Provisioning writes no row. With no row, the site renders the Console preset and the form opens on Console defaults.
 - Brand images live in Vercel Blob at `tenants/<id>/<logo|favicon>-<random suffix>.<ext>`, public. Every upload gets a unique name, so a same-type replacement never collides with the old file or its cached copy. A replaced or cleared image's old blob is deleted best-effort.
-- **Caching (web)** — `getSiteConfig` is `unstable_cache` per tenant, tag `site-config:<id>`, 3600s fallback (`TENANT_CONFIG_REVALIDATE_SECONDS`). `updateLookAction` POSTs `/api/revalidate-site-config` after the write, which expires the tenant's tags and purges the whole layout.
+- **Caching (web)** — `getSiteConfig` is `unstable_cache` per tenant, tag `site-config:<id>`, 3600s fallback (`TENANT_CONFIG_REVALIDATE_SECONDS`). `updateLookAction`, `uploadBrandAssetAction` and `clearBrandAssetAction` each POST `/api/revalidate-site-config` after their write, which expires the tenant's tags and purges the whole layout.
 
 ## Configuration
 
@@ -79,7 +79,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - Density rescales layout spacing only. Tailwind's base `--spacing` is untouched, so controls keep their size.
 - Fonts are self-hosted woff2 files in both apps, with no Google Fonts fetch. Only the Console pair and the mono font preload on the site.
 - Brand images: PNG, JPEG, WebP or SVG. The logo may be up to 4 MB and 32–4000px; the favicon up to 1 MB, 16–512px and square. The server sniffs the real bytes and sanitises SVG; the client check is a convenience only.
-- Images upload before the Look save. The upload and clear actions do not revalidate the site; the `updateLookAction` call that follows does.
+- Images upload before the Look save. Each successful upload or clear revalidates the site itself, so an image already stored still reaches the public site when a later step of the save fails; a failed one does not revalidate.
 - A failed image upload or clear stops the save: its message shows under that picker, which is marked invalid and takes focus, and the save bar reads "Not saved" with a link to it. Any other save failure is announced beside Save.
 - The public site's header logo is `logo_asset_url` and its favicon is `favicon_asset_url`, each falling back to the platform's default three-layer mark when unset. The Studio's Site Settings brand logo is not a source for either. A logo that fails to load in the browser, or a favicon the icon route cannot fetch within 5s, also falls back to the default mark, so a broken upload never breaks the page. The public site's CSP allows `https://*.blob.vercel-storage.com` in `img-src` so the uploaded logo loads; the favicon is served from the site's own origin. Both follow a save on the next render after `site-config:<id>` expires, subject to browser favicon caching.
 - Every save writes an audit event (`SETTINGS_UPDATED` on `SITE_CONFIG`).
@@ -97,7 +97,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - `apps/platform/src/components/features/look/look-page-content/look-page-content.tsx`
 - `apps/platform/src/components/features/look/look-form/look-form.tsx`, `use-look-form-state.ts`, `use-look-save.ts`
 - `apps/platform/src/utils/look-form-values/look-form-values.ts` — `applyPresetDefaults`
-- `apps/platform/src/server/site-config/update-look-action.ts`, `upload-brand-asset-action.ts`, `validate-brand-asset.ts`
+- `apps/platform/src/server/site-config/update-look-action.ts`, `upload-brand-asset-action.ts`, `clear-brand-asset-action.ts`, `validate-brand-asset.ts`
 - `apps/platform/src/utils/theme-preview-tokens/theme-preview-tokens.ts`
 - `apps/web/src/utils/to-theme-tokens/to-theme-tokens.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.ts`
