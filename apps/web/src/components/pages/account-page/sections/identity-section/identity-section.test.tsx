@@ -1,4 +1,5 @@
 import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
@@ -22,6 +23,15 @@ const setup = customRenderServerAsync(
 );
 
 const SECTION_HEADING = 'Connected accounts';
+faker.seed(5960);
+
+const MOCK_HANDLE = faker.internet.username();
+const MOCK_NAMELESS_USER = {
+  ...MOCK_ACCOUNT_USER,
+  name: null,
+  email: `${MOCK_HANDLE}@${faker.internet.domainName()}`,
+};
+const DISPLAY_NAME_LABEL = 'Display name';
 const LAST_METHOD_NOTE = "Last remaining method — can't unlink";
 
 describe(`<${IdentitySection.name}/>`, () => {
@@ -115,7 +125,7 @@ describe(`<${IdentitySection.name}/>`, () => {
       await setup();
 
       const displayNameTextbox = screen.getByRole('textbox', {
-        name: 'Display name',
+        name: DISPLAY_NAME_LABEL,
       });
       const saveButton = screen.getByRole('button', { name: 'Save' });
 
@@ -136,5 +146,19 @@ describe(`<${IdentitySection.name}/>`, () => {
     const lastMethodNote = screen.getByText(LAST_METHOD_NOTE);
 
     expect(lastMethodNote).toBeVisible();
+  });
+
+  it('prefills the display-name field with the handle when the reader has no name', async () => {
+    authMock.mockResolvedValue({ user: MOCK_NAMELESS_USER });
+    getLinkedProvidersMock.mockResolvedValue({
+      github: false,
+      google: false,
+      emailLink: true,
+    });
+    await setup();
+    const displayNameTextbox = screen.getByRole('textbox', {
+      name: DISPLAY_NAME_LABEL,
+    });
+    expect(displayNameTextbox).toHaveValue(MOCK_HANDLE);
   });
 });

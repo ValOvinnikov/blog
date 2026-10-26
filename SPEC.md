@@ -2534,7 +2534,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 | Vercel project (web)     | `web-dev`                         | `web-prod`                         |
 | Vercel project (admin)   | `platform-dev`                    | `platform-prod`                    |
 | Vercel project (worker)  | `worker-dev`                      | `worker-prod`                      |
-| Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
+| Admin hostname           | `platform.dev.{your-hosting}`     | `platform.{your-hosting}`          |
 | Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
 | Web deploy mechanism     | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
 | Admin deploy mechanism   | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
