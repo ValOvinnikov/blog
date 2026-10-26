@@ -12,6 +12,8 @@ import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_URL,
   MOCK_TENANT_ID,
+  MOCK_OWNER_JOINED_AT,
+  mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 
 import TenantOverviewPage from './page';
@@ -84,7 +86,6 @@ const setup = customRenderAsync(TenantOverviewPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
-const AT_20260812_0000 = '2026-08-12T00:00:00.000Z';
 const INVITED_EXAMPLE_COM = 'invited@example.com';
 
 describe(TenantOverviewPage, () => {
@@ -95,10 +96,9 @@ describe(TenantOverviewPage, () => {
     tenant = mockTenant();
     requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
     getTenantOwnerMembershipMock.mockReset();
-    getTenantOwnerMembershipMock.mockResolvedValue({
-      email: 'owner@example.com',
-      joinedAt: new Date(AT_20260812_0000),
-    });
+    getTenantOwnerMembershipMock.mockResolvedValue(
+      mockJoinedOwner('owner@example.com'),
+    );
     listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockReset();
@@ -144,7 +144,10 @@ describe(TenantOverviewPage, () => {
       const joinedTime = screen.getByText('Aug 12, 2026');
       expect(joinedLabel).toBeVisible();
       expect(joinedTime).toBeVisible();
-      expect(joinedTime).toHaveAttribute('dateTime', AT_20260812_0000);
+      expect(joinedTime).toHaveAttribute(
+        'dateTime',
+        MOCK_OWNER_JOINED_AT.toISOString(),
+      );
     });
 
     it('always shows "Open site", pointing at the tenant\'s live domain', () => {
