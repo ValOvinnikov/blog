@@ -51,6 +51,12 @@ export const env = createEnv({
       .string()
       .refine(isPersonalDataKey, PERSONAL_DATA_KEY_FORMAT)
       .optional(),
+    // @env-optional
+    LOKI_PUSH_URL: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_USER: z.string().min(1).optional(),
+    // @env-optional
+    LOKI_TOKEN: z.string().min(1).optional(),
   },
   runtimeEnv: {
     SANITY_MANAGEMENT_TOKEN: process.env.SANITY_MANAGEMENT_TOKEN,
@@ -70,6 +76,9 @@ export const env = createEnv({
     OWNER_EMAIL_FROM_ADDRESS: process.env.OWNER_EMAIL_FROM_ADDRESS,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
+    LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,
+    LOKI_USER: process.env.LOKI_USER,
+    LOKI_TOKEN: process.env.LOKI_TOKEN,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

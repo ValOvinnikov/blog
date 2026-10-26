@@ -14,8 +14,9 @@ import {
   TENANT_REFUSAL,
   TENANT_LOG,
 } from '@platform/constants/tenant';
-import { auth, signIn } from '@platform/server/auth/auth';
+import { auth } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
+import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
@@ -64,6 +65,10 @@ vi.mock('@platform/server/auth/require-admin', () => ({
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/tenants/send-owner-invite-email', () => ({
+  sendOwnerInviteEmail: vi.fn(),
+}));
+
 vi.mock('@platform/server/provisioning/start-provisioning', () => ({
   startProvisioning: startProvisioningMock,
 }));
@@ -87,7 +92,7 @@ vi.mock('@blog/db', async () => ({
 }));
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-const signInMock = vi.mocked(signIn);
+const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);
 const loggerErrorMock = vi.mocked(logger.error);
 const loggerWarnMock = vi.mocked(logger.warn);
 
@@ -112,8 +117,6 @@ describe('createTenantAction', () => {
     startProvisioningMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    signInMock.mockReset();
-    signInMock.mockResolvedValue(okResult());
     getUserByEmailMock.mockReset();
     getUserByEmailMock.mockResolvedValue({
       id: OWNER_USER_ID,
@@ -183,7 +186,7 @@ describe('createTenantAction', () => {
       token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
-    expect(signInMock).not.toHaveBeenCalled();
+    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
   });
 
   it('re-issues a confirmation when the confirming token was for a different email', async () => {
@@ -202,7 +205,7 @@ describe('createTenantAction', () => {
       token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
-    expect(signInMock).not.toHaveBeenCalled();
+    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
   });
 
   it('re-issues a confirmation when the confirming token is invalid', async () => {
@@ -220,7 +223,7 @@ describe('createTenantAction', () => {
       token: expect.any(String),
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
-    expect(signInMock).not.toHaveBeenCalled();
+    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
   });
 
   it('proceeds down the invite path once the token verifies for an unregistered email', async () => {
@@ -240,65 +243,20 @@ describe('createTenantAction', () => {
       plan: TENANT_PLAN.FREE,
       owner: { type: 'invite', email: MOCK_OWNER_EMAIL },
     });
-    expect(signInMock).toHaveBeenCalledWith('email', {
-      email: MOCK_OWNER_EMAIL,
-      redirect: false,
-    });
-    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
-  });
-
-  it('logs an error but still redirects when the owner-invite email fails to send', async () => {
-    getUserByEmailMock.mockResolvedValue(undefined);
-    signInMock.mockResolvedValue(errorResult('EmailSignInError'));
-
-    await expect(
-      createTenantAction({
-        ...validInput,
-        confirmOwnerInviteToken: validOwnerInviteToken,
-      }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
-      expect.objectContaining({
-        tenantId: MOCK_TENANT_ID,
-        ownerEmail: MOCK_OWNER_EMAIL,
-      }),
+    expect(sendOwnerInviteEmailMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_OWNER_EMAIL,
     );
     expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
   });
 
-  it('logs an error but still redirects when the owner-invite sign-in throws', async () => {
-    getUserByEmailMock.mockResolvedValue(undefined);
-    signInMock.mockRejectedValue(new Error('network error'));
-
-    await expect(
-      createTenantAction({
-        ...validInput,
-        confirmOwnerInviteToken: validOwnerInviteToken,
-      }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
-      expect.objectContaining({
-        tenantId: MOCK_TENANT_ID,
-        ownerEmail: MOCK_OWNER_EMAIL,
-        error: expect.any(Error),
-      }),
-    );
-    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
-  });
-
-  it('never triggers the owner-invite sign-in email on the found-owner path', async () => {
+  it('never sends the owner-invite email on the found-owner path', async () => {
     await expect(createTenantAction(validInput)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(signInMock).not.toHaveBeenCalled();
+    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
   });
 
   it.each(['admin', 'www'])(
