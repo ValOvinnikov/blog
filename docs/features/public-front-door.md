@@ -48,7 +48,7 @@ Decided, not built:
 
 - **Marketing site** — an ordinary `apps/web` tenant, the "platform tenant", with its own `tenants` row and Sanity project, built from the existing page-builder modules and edited by operators through the operator Studio route. Apex and `www` resolve to it through its `tenant_domains` rows.
 - **Signup** — in `apps/platform`: `/signup`, then an `/onboarding` wizard for a user with no memberships (site type, name, slug with a live availability check, language, preset and accent), then `/dashboard` with a provisioning progress card. Look, Voice and Features are usable while it runs.
-- **Hosts** — a platform host serves `apps/platform` and the Studio (its name is open: `platform.<domain>` is proposed, SPEC still says `admin.{your-hosting}`, and a rename needs a CORS update on every tenant project); `<slug>.<domain>` serves self-serve tenants through a wildcard on the web projects, with no Vercel call at signup. A custom domain is a paid upgrade.
+- **Hosts** — a platform host serves `apps/platform` and the Studio: `platform.<domain>`, and `platform.dev.<domain>` on development (the old `admin-dev` host is retired); a rename of this host needs a CORS update on every tenant project; `<slug>.<domain>` serves self-serve tenants through a wildcard on the web projects, with no Vercel call at signup. A custom domain is a paid upgrade.
 - **Billing** — Stripe Checkout starts a subscription; the Stripe Customer Portal handles plan changes, payment methods and cancellation.
 
 ## Data
