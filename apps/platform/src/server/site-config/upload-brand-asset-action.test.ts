@@ -10,6 +10,7 @@ import { errorResult, okResult } from '@blog/utils';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
@@ -42,6 +43,8 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/site-config/revalidate-site-config');
+
 vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
 }));
@@ -69,12 +72,15 @@ const UPLOADED_LOGO_URL =
 const PREVIOUS_LOGO_URL =
   'https://example.blob.vercel-storage.com/logo-old.png';
 
+const FAVICON_FILE_NAME = 'favicon.png';
+
 Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
 
 const requireTenantMembershipMock = vi.mocked<
   (tenantId: string) => Promise<unknown>
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
 const makeFormData = (file: TMaybeNull<File>): FormData => {
   const formData = new FormData();
@@ -92,6 +98,7 @@ describe(uploadBrandAssetAction, () => {
     insertAuditEventMock.mockReset();
     putMock.mockReset();
     delMock.mockReset();
+    revalidateSiteConfigMock.mockClear();
 
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: MOCK_TENANT_ID },
@@ -162,7 +169,7 @@ describe(uploadBrandAssetAction, () => {
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
       'favicon',
-      makeFormData(new File(['x'], 'favicon.png', { type: 'image/png' })),
+      makeFormData(new File(['x'], FAVICON_FILE_NAME, { type: 'image/png' })),
     );
 
     expect(result).toEqual({
@@ -172,6 +179,7 @@ describe(uploadBrandAssetAction, () => {
     expect(putMock).not.toHaveBeenCalled();
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('uploads under a unique name, saves the theme fields plus the new logo URL, and returns it', async () => {
@@ -194,6 +202,17 @@ describe(uploadBrandAssetAction, () => {
       ...MOCK_THEME_FIELDS,
       logoAssetUrl: UPLOADED_LOGO_URL,
     });
+  });
+
+  it('refreshes the public site for the tenant once the new URL is saved', async () => {
+    await uploadBrandAssetAction(
+      MOCK_TENANT_ID,
+      'favicon',
+      makeFormData(new File(['x'], FAVICON_FILE_NAME, { type: 'image/png' })),
+    );
+
+    expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
+    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
@@ -252,9 +271,10 @@ describe(uploadBrandAssetAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('records no audit event when the site_config write itself fails', async () => {
+  it('records no audit event and leaves the public site alone when the site_config write itself fails', async () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadBrandAssetAction(
@@ -265,6 +285,7 @@ describe(uploadBrandAssetAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('reports a readable error and never touches Blob when the token is unconfigured', async () => {
