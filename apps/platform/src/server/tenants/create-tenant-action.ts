@@ -19,7 +19,6 @@ import {
 } from '@platform/constants/tenant';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { signIn } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { checkDomainAvailability } from '@platform/server/provisioning/check-domain-availability';
 import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
@@ -28,6 +27,7 @@ import {
   createOwnerInviteToken,
   verifyOwnerInviteToken,
 } from '@platform/server/tenants/owner-invite-token';
+import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
@@ -157,25 +157,7 @@ export const createTenantAction = async (
   });
 
   if (!owner) {
-    try {
-      const inviteEmailResult = await signIn('email', {
-        email: ownerEmail,
-        redirect: false,
-      });
-      if (!inviteEmailResult?.ok) {
-        logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, {
-          tenantId,
-          ownerEmail,
-          error: inviteEmailResult?.error,
-        });
-      }
-    } catch (error) {
-      logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, {
-        tenantId,
-        ownerEmail,
-        error,
-      });
-    }
+    await sendOwnerInviteEmail(tenantId, ownerEmail);
   }
 
   await startProvisioning(tenantId);
