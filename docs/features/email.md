@@ -46,6 +46,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 ## Configuration
 
 - Owners and operators edit, per tenant: sender name, reply-to, postal footer, a tenant logo and per-template logos (all language-independent), and each template's subject and body per language. One draft is saved through the settings save bar; a blank field shows and sends its fallback.
+- **Sender name** replaces only the display name of the configured From address (`applyTenantSenderName` in `@blog/auth`); the address itself always stays the platform's verified sender. With no sender name set, a tenant's emails show the display name in the From env var, e.g. "Valstack".
 - Plan gating: applies to the owner's `/dashboard/email` only, which exists only when the plan carries an email-sending capability (see [plans-and-entitlements](./plans-and-entitlements.md)); operators reach `/tenants/<id>/email` on every plan.
 - Look reach: brand colours and logo marks follow the tenant's Look ([look](./look.md)). Email copy is not Voice.
 - Operator alert copy is fixed and never tenant-editable.
@@ -70,7 +71,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 
 - Layers: `email`, `db`, `auth`, `web`, `platform`, `config`.
 - Features: [reader-auth](./reader-auth.md), [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md), [tenant-access](./tenant-access.md), [newsletter](./newsletter.md), [operator-alerts](./operator-alerts.md), [look](./look.md), [languages](./languages.md), [plans-and-entitlements](./plans-and-entitlements.md).
-- Env vars: `RESEND_API_KEY`, `MAGIC_LINK_FROM_ADDRESS`, `NEWSLETTER_FROM_ADDRESS`, `OPERATOR_ALERT_FROM_ADDRESS` (each From falls back to a `resend.dev` address), `OPERATOR_ALERT_SECRET`, `BLOB_READ_WRITE_TOKEN` (platform, logo uploads).
+- Env vars: `RESEND_API_KEY`, `MAGIC_LINK_FROM_ADDRESS`, `NEWSLETTER_FROM_ADDRESS`, `OPERATOR_ALERT_FROM_ADDRESS` (each From falls back to a `resend.dev` address, which Resend delivers only to the account owner, so every one must be set to a verified domain on each project that sends it — `docs/DEPLOY.md`), `OPERATOR_ALERT_SECRET`, `BLOB_READ_WRITE_TOKEN` (platform, logo uploads).
 
 ## Entry points
 
