@@ -5,6 +5,7 @@ import { DisplayNameControl } from '@web/components/shared/display-name-control'
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
 import type { TLinkableProvider } from '@web/server/account/identity-actions/identity-actions';
 import { auth } from '@web/server/auth/auth';
+import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
@@ -96,7 +97,7 @@ export const IdentitySection = async () => {
       displayNameDescription={t('displayNameDescription')}
       displayNameControl={
         <DisplayNameControl
-          initialName={name ?? ''}
+          initialName={name ?? toSessionUsername(name, email)}
           email={email}
           image={image}
         />

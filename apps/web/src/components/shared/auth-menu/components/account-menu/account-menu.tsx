@@ -8,6 +8,7 @@ import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
+import { toSessionUsername } from '@web/utils/to-session-username';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useState, type RefObject } from 'react';
@@ -52,7 +53,7 @@ export const AccountMenu = ({
     signOutItem,
   } = accountMenuVariants();
 
-  const displayName = name ?? email ?? '';
+  const displayName = name ?? toSessionUsername(name, email);
 
   const [lastImage, setLastImage] = useState(image);
   const [imageFailed, setImageFailed] = useState(false);

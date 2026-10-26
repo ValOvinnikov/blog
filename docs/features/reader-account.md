@@ -26,7 +26,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 ## Surfaces and routes
 
 - `/[locale]/account` — `force-dynamic`. 404 when the site has no reader account; a signed-out visitor is redirected home.
-  - **Identity** — rows for GitHub, Google and email link with their linked status; Link / Unlink controls for the two OAuth providers; a display-name field.
+  - **Identity** — rows for GitHub, Google and email link with their linked status; Link / Unlink controls for the two OAuth providers; a display-name field, prefilled with the reader's handle when they have no name.
   - **Newsletter** — shown only when the reader's email has a subscriber row on this tenant: Unsubscribe when active, Resend confirmation when pending (see [newsletter](./newsletter.md)).
   - **Privacy** — "Export my data" and a typed-confirm delete (the reader types their handle to arm the danger button).
 - `GET /api/account/export` — downloads `account-data.json`, with the email and name decrypted from their encrypted forms, or read from the plain columns for a user not yet backfilled. 401 without a session, 404 when the tenant or user is unknown.
@@ -53,6 +53,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 - Email link cannot be unlinked.
 - Linking runs `signIn(provider)` while signed in, which Auth.js links to the current user, and returns to `/account`.
 - The display name is trimmed and an empty name is refused.
+- A reader's handle is their email's local part (`toSessionUsername`). A reader with no name — a magic-link sign-in — is shown by that handle in the account menu and the display-name field, so the handle the delete confirmation asks for is always visible.
 - The typed confirmation is a client-side guard; the server action requires only a session. Only a successful delete signs the reader out.
 - Export and delete are ungated by capability, but `/account` itself is not, so a reader on a site whose reader features are off cannot reach them there.
 - One `users` row serves every tenant and the platform: deleting on one site deletes the identity everywhere, which the delete description states. `deleteAccount` refuses a tenant owner or platform admin in the same statement as the delete, so no deletion from a site leaves a tenant without an owner or the platform without its admins. Audit events the user acted in stay, with their email snapshot cleared.
