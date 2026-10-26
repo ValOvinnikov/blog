@@ -224,6 +224,9 @@ seven is a design question to raise, not a new group to invent.
 
 ## Tests
 
+Read `.claude/skills/testing-practices/SKILL.md` with Read (you have no Skill
+tool) before writing or changing any test.
+
 - A schema definition gets no test, and a schema change ships with
   `no-tests-needed`: `testing-practices` → "What to test" / "What not to
   test". Shared fakes live in `src/testing/`.

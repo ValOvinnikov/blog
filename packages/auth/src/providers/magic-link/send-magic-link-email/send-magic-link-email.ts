@@ -85,7 +85,10 @@ export async function sendMagicLinkEmail({
 
   await sendEmail({
     to: identifier,
-    from: applyTenantSenderName(from, emailSettings?.senderName),
+    from: applyTenantSenderName(
+      from,
+      emailSettings?.senderName || tenantIdentity?.brandName,
+    ),
     subject,
     html,
     replyTo: emailSettings?.replyTo,

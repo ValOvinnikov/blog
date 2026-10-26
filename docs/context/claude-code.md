@@ -118,6 +118,12 @@ contracts:
     a third of its cases repeating each other or re-testing units that had
     their own test files; pruning a touched test file is mandatory, never
     repo-wide.
+  - Every layer agent that writes tests, and `test-writer`, opens its testing
+    section with an explicit step to Read
+    `.claude/skills/testing-practices/SKILL.md`. Subagents have no Skill tool,
+    so a guide that only names the skill leaves reading it optional: a
+    `platform-app` run that skipped it copied its neighbours' inline
+    `expect(screen.…)` queries, which the skill bans and no lint rule catches.
   - The same eleven, and `test-writer`, list a required **Reuse** item right
     after it: for each const, literal value, fixture, builder, fake or helper
     the diff adds, where they searched (`const-index.json`, the workspace's

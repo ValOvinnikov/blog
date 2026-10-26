@@ -78,6 +78,9 @@ when the constraint means something, as the polymorphic
 
 ## Testing and stories
 
+Read `.claude/skills/testing-practices/SKILL.md` with Read (you have no Skill
+tool) before writing or changing any test.
+
 `testing-practices` governs every test (→ "Who writes tests", "Rendering and
 arrangement", "Writing a component test", "What not to test"). On top of it:
 
