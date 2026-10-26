@@ -50,6 +50,7 @@ export const TENANT_LOG = {
   DOMAIN_AVAILABILITY_INVALID_DOMAIN:
     'tenants.domain_availability_invalid_domain',
   OWNER_INVITE_EMAIL_FAILED: 'tenants.owner_invite_email_failed',
+  ROOT_DOMAIN_MISSING: 'tenants.root_domain_missing',
   SIGN_IN_ACTIVITY_FAILED: 'tenant.sign_in_activity_failed',
   SIGN_IN_OWNER_LOOKUP_FAILED: 'tenant.sign_in_owner_lookup_failed',
   SUSPENSION_AUDIT_FAILED: 'tenant.suspension_audit_failed',

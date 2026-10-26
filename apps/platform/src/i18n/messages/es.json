@@ -76,7 +76,6 @@
     "nameHint": "Se muestra en la cabecera de tu sitio y en las pestañas del navegador.",
     "siteAddressLabel": "Dirección del sitio",
     "siteAddressHint": "Letras, números y guiones. Con el plan Growth puedes conectar tu propio dominio.",
-    "siteAddressSuffix": ".{rootDomain}",
     "siteAddressChecking": "Comprobando la dirección…",
     "siteAddressAvailable": "{address} está disponible.",
     "languageLabel": "Idioma",
@@ -819,8 +818,8 @@
     "heading": "Detalles del cliente",
     "description": "La parte rápida. Todo lo que sigue se ejecuta automáticamente, y cada paso puede reanudarse si falla.",
     "nameLabel": "Nombre del cliente",
-    "domainLabel": "Dominio",
-    "domainHint": "El dominio público al que responderá el sitio de este cliente.",
+    "siteAddressLabel": "Dirección del sitio",
+    "siteAddressHint": "Letras, números y guiones. Con el plan Growth puedes conectar tu propio dominio.",
     "planLabel": "Plan",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
@@ -834,6 +833,9 @@
     "errors": {
       "createFailed": "No se pudo crear el cliente. Vuelva a intentarlo."
     }
+  },
+  "formSiteAddressInput": {
+    "suffix": ".{rootDomain}"
   },
   "provisioningStatusView": {
     "pageTitle": "Aprovisionamiento",

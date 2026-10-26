@@ -76,7 +76,6 @@
     "nameHint": "Shown in your site’s header and in browser tabs.",
     "siteAddressLabel": "Site address",
     "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
-    "siteAddressSuffix": ".{rootDomain}",
     "siteAddressChecking": "Checking the address…",
     "siteAddressAvailable": "{address} is available.",
     "languageLabel": "Language",
@@ -819,8 +818,8 @@
     "heading": "Tenant details",
     "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
     "nameLabel": "Tenant name",
-    "domainLabel": "Domain",
-    "domainHint": "The public domain this tenant's site will answer to.",
+    "siteAddressLabel": "Site address",
+    "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
     "planLabel": "Plan",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
@@ -834,6 +833,9 @@
     "errors": {
       "createFailed": "Couldn't create the tenant — try again."
     }
+  },
+  "formSiteAddressInput": {
+    "suffix": ".{rootDomain}"
   },
   "provisioningStatusView": {
     "pageTitle": "Provisioning",

@@ -9,7 +9,8 @@ import {
 } from '@platform/testing/custom-render';
 import {
   MOCK_OWNER_EMAIL,
-  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_ROOT_DOMAIN,
+  MOCK_TENANT_SLUG,
   OWNER_EMAIL_LABEL,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -17,6 +18,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { TenantDetailsForm } from './tenant-details-form';
 
 const TENANT_NAME = 'Tenant name';
+const SITE_ADDRESS_LABEL = 'Site address';
 const NEW_TENANT_NAME = 'Acme';
 const ENTER_A_VALID_EMAIL = 'Enter a valid email.';
 const BEGINNING_PROVISIONING = 'Beginning provisioning…';
@@ -37,13 +39,15 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
 
 const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
   const nameInput = screen.getByRole('textbox', { name: TENANT_NAME });
-  const domainInput = screen.getByRole('textbox', { name: 'Domain' });
+  const siteAddressInput = screen.getByRole('textbox', {
+    name: SITE_ADDRESS_LABEL,
+  });
   const ownerEmailInput = screen.getByRole('textbox', {
     name: OWNER_EMAIL_LABEL,
   });
 
   await user.type(nameInput, NEW_TENANT_NAME);
-  await user.type(domainInput, MOCK_TENANT_DOMAIN);
+  await user.type(siteAddressInput, MOCK_TENANT_SLUG);
   await user.type(ownerEmailInput, MOCK_OWNER_EMAIL);
 };
 
@@ -107,21 +111,43 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    render(<TenantDetailsForm />);
+    render(<TenantDetailsForm rootDomain={MOCK_TENANT_ROOT_DOMAIN} />);
   });
 
   it('renders every Details-step field from the mock shape', () => {
     const nameInput = screen.getByRole('textbox', { name: TENANT_NAME });
-    const domainInput = screen.getByRole('textbox', { name: 'Domain' });
+    const siteAddressInput = screen.getByRole('textbox', {
+      name: SITE_ADDRESS_LABEL,
+    });
     const planGroup = screen.getByRole('group', { name: 'Plan' });
     const ownerEmailInput = screen.getByRole('textbox', {
       name: OWNER_EMAIL_LABEL,
     });
 
     expect(nameInput).toBeVisible();
-    expect(domainInput).toBeVisible();
+    expect(siteAddressInput).toBeVisible();
     expect(planGroup).toBeVisible();
     expect(ownerEmailInput).toBeVisible();
+  });
+
+  it('shows the fixed root-domain suffix beside the site address', () => {
+    const suffix = screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+
+    expect(suffix).toBeVisible();
+  });
+
+  it('shows a taken site address error beside the field', async () => {
+    createTenantActionMock.mockResolvedValueOnce({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
+    });
+
+    await fillValidForm(user);
+    await clickBeginProvisioning(user);
+
+    const slugError = await screen.findByText(en.tenantFieldErrors.slugTaken);
+
+    expect(slugError).toBeVisible();
   });
 
   it('defaults the plan to Free', () => {
@@ -139,7 +165,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
     expect(createTenantActionMock).toHaveBeenCalledWith({
       name: NEW_TENANT_NAME,
-      domain: MOCK_TENANT_DOMAIN,
+      slug: MOCK_TENANT_SLUG,
       plan: TENANT_PLAN.GROWTH,
       ownerEmail: MOCK_OWNER_EMAIL,
     });
@@ -266,7 +292,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
       expect(createTenantActionMock).toHaveBeenLastCalledWith({
         name: NEW_TENANT_NAME,
-        domain: MOCK_TENANT_DOMAIN,
+        slug: MOCK_TENANT_SLUG,
         plan: TENANT_PLAN.FREE,
         ownerEmail: MOCK_OWNER_EMAIL,
       });
@@ -292,7 +318,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
       expect(createTenantActionMock).toHaveBeenLastCalledWith({
         name: NEW_TENANT_NAME,
-        domain: MOCK_TENANT_DOMAIN,
+        slug: MOCK_TENANT_SLUG,
         plan: TENANT_PLAN.FREE,
         ownerEmail: `${MOCK_OWNER_EMAIL}.uk`,
       });
@@ -305,20 +331,22 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     });
 
     const nameInput = screen.getByRole('textbox', { name: TENANT_NAME });
-    const domainInput = screen.getByRole('textbox', { name: 'Domain' });
+    const siteAddressInput = screen.getByRole('textbox', {
+      name: SITE_ADDRESS_LABEL,
+    });
     const ownerEmailInput = screen.getByRole('textbox', {
       name: OWNER_EMAIL_LABEL,
     });
 
     await user.type(nameInput, NEW_TENANT_NAME);
-    await user.type(domainInput, MOCK_TENANT_DOMAIN);
+    await user.type(siteAddressInput, MOCK_TENANT_SLUG);
     await user.type(ownerEmailInput, MIXED_CASE_OWNER_EMAIL);
     await clickBeginProvisioning(user);
     await clickConfirmInviteOwner(user);
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith({
       name: NEW_TENANT_NAME,
-      domain: MOCK_TENANT_DOMAIN,
+      slug: MOCK_TENANT_SLUG,
       plan: TENANT_PLAN.FREE,
       ownerEmail: MIXED_CASE_OWNER_EMAIL,
     });
@@ -339,7 +367,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
       expect(createTenantActionMock).toHaveBeenLastCalledWith({
         name: NEW_TENANT_NAME,
-        domain: MOCK_TENANT_DOMAIN,
+        slug: MOCK_TENANT_SLUG,
         plan: TENANT_PLAN.FREE,
         ownerEmail: MOCK_OWNER_EMAIL,
         confirmOwnerInviteToken: OWNER_CONFIRMATION_TOKEN,
@@ -357,7 +385,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
       expect(createTenantActionMock).toHaveBeenLastCalledWith({
         name: NEW_TENANT_NAME,
-        domain: MOCK_TENANT_DOMAIN,
+        slug: MOCK_TENANT_SLUG,
         plan: TENANT_PLAN.FREE,
         ownerEmail: `${MOCK_OWNER_EMAIL}.uk`,
         confirmOwnerInviteToken: undefined,

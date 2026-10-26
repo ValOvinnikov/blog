@@ -76,7 +76,6 @@
     "nameHint": "Staat in de kop van je site en in browsertabbladen.",
     "siteAddressLabel": "Adres van de site",
     "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
-    "siteAddressSuffix": ".{rootDomain}",
     "siteAddressChecking": "Adres controleren…",
     "siteAddressAvailable": "{address} is beschikbaar.",
     "languageLabel": "Taal",
@@ -819,8 +818,8 @@
     "heading": "Tenantgegevens",
     "description": "Het snelle deel. Alles hierna verloopt automatisch, en elke stap kan na een fout worden hervat.",
     "nameLabel": "Tenantnaam",
-    "domainLabel": "Domein",
-    "domainHint": "Het openbare domein waarop de site van deze tenant bereikbaar is.",
+    "siteAddressLabel": "Adres van de site",
+    "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
     "planLabel": "Abonnement",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
@@ -834,6 +833,9 @@
     "errors": {
       "createFailed": "De tenant kon niet worden aangemaakt — probeer het opnieuw."
     }
+  },
+  "formSiteAddressInput": {
+    "suffix": ".{rootDomain}"
   },
   "provisioningStatusView": {
     "pageTitle": "Inrichting",

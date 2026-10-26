@@ -112,7 +112,9 @@ export const mockMapDomainFailedProvisioningSteps = (
 
 export const MOCK_TENANT_ID = faker.string.uuid();
 export const MOCK_TENANT_NAME = 'Acme Inc.';
-export const MOCK_TENANT_DOMAIN = 'acme.example.com';
+export const MOCK_TENANT_SLUG = 'acme';
+export const MOCK_TENANT_ROOT_DOMAIN = 'example.com';
+export const MOCK_TENANT_DOMAIN = `${MOCK_TENANT_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
 export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
 export const MOCK_VERCEL_A_RECORD = '76.76.21.21';
 export const MOCK_OTHER_TENANT_ID = faker.string.uuid();

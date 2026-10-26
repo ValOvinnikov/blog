@@ -4,7 +4,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  DOMAIN_PATTERN,
+  DOMAIN_LABEL_PATTERN,
   type TActionResult,
   type TOutcome,
   type TReasonedFailure,
@@ -22,7 +22,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { checkDomainAvailability } from '@platform/server/provisioning/check-domain-availability';
 import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
-import { checkTenantDomainSlug } from '@platform/server/tenants/check-tenant-slug';
+import { checkTenantSlug } from '@platform/server/tenants/check-tenant-slug';
 import {
   createOwnerInviteToken,
   verifyOwnerInviteToken,
@@ -32,6 +32,7 @@ import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
+import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -39,7 +40,7 @@ import { z } from 'zod';
 
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1),
-  domain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
+  slug: z.string().trim().toLowerCase().regex(DOMAIN_LABEL_PATTERN),
   plan: z.enum(TENANT_PLAN),
   ownerEmail: z.string().trim().toLowerCase().email(),
   confirmOwnerInviteToken: z.string().optional(),
@@ -72,7 +73,7 @@ export const createTenantAction = async (
         parsed.error.issues,
         {
           name: TENANT_FIELD_ERROR.NAME_REQUIRED,
-          domain: TENANT_FIELD_ERROR.DOMAIN_INVALID,
+          slug: TENANT_FIELD_ERROR.SLUG_INVALID,
           plan: TENANT_FIELD_ERROR.PLAN_UNSUPPORTED,
           ownerEmail: TENANT_FIELD_ERROR.EMAIL_INVALID,
         },
@@ -80,8 +81,14 @@ export const createTenantAction = async (
     };
   }
 
-  const { name, domain, plan, ownerEmail, confirmOwnerInviteToken } =
-    parsed.data;
+  const rootDomain = env.TENANT_ROOT_DOMAIN;
+  if (!rootDomain) {
+    logger.error(TENANT_LOG.ROOT_DOMAIN_MISSING);
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  }
+
+  const { name, slug, plan, ownerEmail, confirmOwnerInviteToken } = parsed.data;
+  const domain = `${slug}.${rootDomain}`;
 
   const owner = await queries.users.getUserByEmail(ownerEmail);
   if (!owner && !verifyOwnerInviteToken(ownerEmail, confirmOwnerInviteToken)) {
@@ -93,31 +100,19 @@ export const createTenantAction = async (
     };
   }
 
-  const slugError = await checkTenantDomainSlug(domain);
+  const slugError = await checkTenantSlug(slug, rootDomain);
   if (slugError) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { domain: { reason: slugError } },
+      fieldErrors: { slug: { reason: slugError } },
     };
   }
 
-  const [existingDomain, domainAvailability] = await Promise.all([
-    queries.tenantDomains.getTenantByDomain(domain),
-    checkDomainAvailability(domain),
-  ]);
-
-  if (existingDomain) {
-    return {
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { domain: { reason: TENANT_FIELD_ERROR.DOMAIN_TAKEN } },
-    };
-  }
-
-  if (domainAvailability === DOMAIN_AVAILABILITY.IN_USE) {
+  if ((await checkDomainAvailability(domain)) === DOMAIN_AVAILABILITY.IN_USE) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {
-        domain: { reason: TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE },
+        slug: { reason: TENANT_FIELD_ERROR.DOMAIN_ATTACHED_ELSEWHERE },
       },
     };
   }
