@@ -173,7 +173,6 @@ describe(listAuditEventsForTarget, () => {
     const [event] = await listTargetEvents();
 
     expect(event?.actorAccountEmail).toBe(MOCK_OPERATOR_EMAIL);
-    expect(event).not.toHaveProperty('actorEmail');
   });
 
   it('reads an account not yet backfilled from its plain email, and reports it', async () => {

@@ -13,10 +13,8 @@ import {
 import {
   deleteTestPersonalDataRows,
   insertTestPersonalDataRows,
-  MOCK_PERSONAL_DATA_ACTOR_ID,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { isNull } from 'drizzle-orm';
 
 import { erasePersonalData } from './erase-personal-data';
 
@@ -30,14 +28,12 @@ const ONE_OF_EACH = {
   leads: 1,
   membershipInvites: 1,
   blockedSignupIdentities: 1,
-  auditEvents: 1,
 };
 const NONE = {
   subscribers: 0,
   leads: 0,
   membershipInvites: 0,
   blockedSignupIdentities: 0,
-  auditEvents: 0,
 };
 
 afterEach(async () => {
@@ -80,13 +76,12 @@ describe(erasePersonalData, () => {
       });
     });
 
-    it('keeps an audit event but clears its email', async () => {
-      const anonymised = await db()
-        .select({ actorId: schema.auditEvents.actorId })
-        .from(schema.auditEvents)
-        .where(isNull(schema.auditEvents.actorEmail));
+    it('keeps the audit history', async () => {
+      const events = await db()
+        .select({ id: schema.auditEvents.id })
+        .from(schema.auditEvents);
 
-      expect(anonymised).toEqual([{ actorId: MOCK_PERSONAL_DATA_ACTOR_ID }]);
+      expect(events).toHaveLength(2);
     });
 
     it('finds nothing left to erase on a second run', async () => {

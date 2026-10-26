@@ -1402,7 +1402,7 @@
     "exporting": "Wird vorbereitet…",
     "erase": "Löschen",
     "eraseDialogTitle": "Daten dieser Person löschen?",
-    "eraseDialogDescription": "Löscht ihre Abonnements, Kontaktnachrichten, Einladungen und Registrierungssperre auf allen Websites und entfernt ihre Adresse aus den Audit-Ereignissen. Das lässt sich nicht rückgängig machen.",
+    "eraseDialogDescription": "Löscht ihre Abonnements, Kontaktnachrichten, Einladungen und Registrierungssperre auf allen Websites. Das lässt sich nicht rückgängig machen.",
     "eraseConfirm": "Daten löschen",
     "erasing": "Wird gelöscht…"
   },

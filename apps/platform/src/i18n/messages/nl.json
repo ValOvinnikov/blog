@@ -1402,7 +1402,7 @@
     "exporting": "Voorbereiden…",
     "erase": "Wissen",
     "eraseDialogTitle": "Gegevens van deze persoon wissen?",
-    "eraseDialogDescription": "Verwijdert de abonnementen, contactberichten, uitnodigingen en aanmeldblokkade op alle sites, en haalt het adres uit de auditgebeurtenissen. Dit kan niet ongedaan worden gemaakt.",
+    "eraseDialogDescription": "Verwijdert de abonnementen, contactberichten, uitnodigingen en aanmeldblokkade op alle sites. Dit kan niet ongedaan worden gemaakt.",
     "eraseConfirm": "Gegevens wissen",
     "erasing": "Wissen…"
   },

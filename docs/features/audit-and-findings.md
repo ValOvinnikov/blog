@@ -75,8 +75,6 @@ platform-wide Findings page. Tenant owners see neither.
 ## Data
 
 - `audit_events`: `actorId` (a `users.id`, `worker`, or `github:<handle>`),
-  `actorEmail` (no writer fills it; older rows still hold a snapshot until
-  the column is dropped, and nothing reads it for display),
   `action`, `targetType`, `targetId` (no foreign key; rows outlive their
   target), `details` jsonb, `createdAt`. Indexed on (`targetType`,
   `targetId`).
@@ -122,9 +120,10 @@ Nothing is configurable. Only admins (any role) see either record.
 
 ## Constraints and invariants
 
-- `audit_events` is insert-only, through `insertAuditEvent`, which takes no
-  actor email. The two updates clear `actorEmail` left on older rows: `deleteAccount` for the deleted user, and
-  `erasePersonalData` for an erased address. The events and `actorId` stay.
+- `audit_events` is insert-only, through `insertAuditEvent`, and holds no
+  email: the actor's address is read from their `users` row, so deleting the
+  account (`deleteAccount`) leaves the events and `actorId` behind with no
+  address.
 - Retention: `queries.retention.deleteAuditEventsPastRetention(now, limit)`
   deletes audit events written more than 24 months before `now`, and
   `deleteResolvedFindingsPastRetention(now, limit)` deletes findings resolved

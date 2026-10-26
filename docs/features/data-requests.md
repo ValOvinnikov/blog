@@ -49,11 +49,13 @@ page (#5090). The page serves either answer.
     lead name and message decrypted (falling back to the plain column while a
     row has no encrypted form);
   - `blocked_signup_identities` ADDRESS entries whose `value` is that index;
-  - `audit_events` whose `actor_email` normalises to the same mailbox.
+  - `audit_events` acted by the account whose address is exactly the one
+    given (`users.emailIndex`, which keeps a `+tag`), with no email of their
+    own.
 - `queries.personalData.erasePersonalData(email)` deletes the matched
-  subscribers, leads, invites and sign-up block, and sets `actor_email` to null
-  on the matched audit events, which keep their history. It returns how many of
-  each it changed.
+  subscribers, leads, invites and sign-up block, and returns how many of each
+  it deleted. Audit events hold no email and keep their history; the account
+  they point at goes through account deletion.
 - Both return `TResult`, with `DB_INVALID_EMAIL` for a value that is not an
   email address. Both return the index, so the app can audit without the email.
 

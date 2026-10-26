@@ -212,7 +212,6 @@ describe(createSelfServeTenant, () => {
 
       expect(event).toMatchObject({
         actorId: OWNER_ID,
-        actorEmail: null,
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: result.data.id,

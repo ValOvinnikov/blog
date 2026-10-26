@@ -1402,7 +1402,7 @@
     "exporting": "Preparando…",
     "erase": "Borrar",
     "eraseDialogTitle": "¿Borrar los datos de esta persona?",
-    "eraseDialogDescription": "Elimina sus suscripciones, mensajes de contacto, invitaciones y bloqueo de registro en todos los sitios, y quita su dirección de los eventos de auditoría. No se puede deshacer.",
+    "eraseDialogDescription": "Elimina sus suscripciones, mensajes de contacto, invitaciones y bloqueo de registro en todos los sitios. No se puede deshacer.",
     "eraseConfirm": "Borrar datos",
     "erasing": "Borrando…"
   },

@@ -74,7 +74,6 @@ export const mockPersonalDataMatches = (
   auditEvents: [
     {
       id: AUDIT_EVENT_ID,
-      email: MOCK_DATA_REQUEST_EMAIL,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: TENANT_ID,
@@ -107,6 +106,10 @@ export const MOCK_ONE_OF_EACH_COUNT = {
   leads: 1,
   membershipInvites: 1,
   blockedSignupIdentities: 1,
+};
+
+export const MOCK_ONE_OF_EACH_MATCH_COUNT = {
+  ...MOCK_ONE_OF_EACH_COUNT,
   auditEvents: 1,
 };
 

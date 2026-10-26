@@ -22,7 +22,6 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 const USER_ID = 'user-1';
 const OTHER_USER_ID = 'user-2';
-const DELETE_FAILURE = 'connection lost';
 let tenantId: string;
 
 beforeEach(async () => {
@@ -74,23 +73,17 @@ async function seedUserWithRelatedRows(userId: string): Promise<void> {
 }
 
 async function seedAuditEvent(actorId: string): Promise<void> {
-  await db()
-    .insert(schema.auditEvents)
-    .values({
-      actorId,
-      actorEmail: `${actorId}@example.com`,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: tenantId,
-    });
+  await db().insert(schema.auditEvents).values({
+    actorId,
+    action: AUDIT_ACTION.SETTINGS_UPDATED,
+    targetType: AUDIT_TARGET_TYPE.TENANT,
+    targetId: tenantId,
+  });
 }
 
 async function findAuditEvents(actorId: string) {
   return db()
-    .select({
-      actorId: schema.auditEvents.actorId,
-      actorEmail: schema.auditEvents.actorEmail,
-    })
+    .select({ actorId: schema.auditEvents.actorId })
     .from(schema.auditEvents)
     .where(eq(schema.auditEvents.actorId, actorId));
 }
@@ -156,65 +149,12 @@ describe(deleteAccount, () => {
     expect(remainingBookmarks).toHaveLength(1);
   });
 
-  it("keeps the user's audit events but clears their email", async () => {
+  it("keeps the user's audit events", async () => {
     await seedAuditEvent(USER_ID);
 
     await deleteAccount(USER_ID);
 
-    expect(await findAuditEvents(USER_ID)).toEqual([
-      { actorId: USER_ID, actorEmail: null },
-    ]);
-  });
-
-  it('removes the user and their audit email on a retry after the user delete fails', async () => {
-    await seedAuditEvent(USER_ID);
-    const testDb = db();
-    const deleteFrom = testDb.delete.bind(testDb);
-    let shouldFail = true;
-    testDb.delete = (table) => {
-      if (!shouldFail) return deleteFrom(table);
-      shouldFail = false;
-      throw new Error(DELETE_FAILURE);
-    };
-
-    await expect(deleteAccount(USER_ID)).rejects.toThrow(DELETE_FAILURE);
-    expect(await findUser(USER_ID)).toHaveLength(1);
-    expect(await findAuditEvents(USER_ID)).toEqual([
-      { actorId: USER_ID, actorEmail: null },
-    ]);
-
-    await expect(deleteAccount(USER_ID)).resolves.toEqual({
-      ok: true,
-      data: undefined,
-    });
-
-    expect(await findUser(USER_ID)).toEqual([]);
-    expect(await findAuditEvents(USER_ID)).toEqual([
-      { actorId: USER_ID, actorEmail: null },
-    ]);
-  });
-
-  it("leaves another actor's audit email in place", async () => {
-    await seedAuditEvent(OTHER_USER_ID);
-
-    await deleteAccount(USER_ID);
-
-    expect(await findAuditEvents(OTHER_USER_ID)).toEqual([
-      { actorId: OTHER_USER_ID, actorEmail: `${OTHER_USER_ID}@example.com` },
-    ]);
-  });
-
-  it('keeps the audit email of a refused owner', async () => {
-    await seedAuditEvent(USER_ID);
-    await db()
-      .insert(schema.memberships)
-      .values({ userId: USER_ID, tenantId, role: MEMBERSHIP_ROLE.OWNER });
-
-    await deleteAccount(USER_ID);
-
-    expect(await findAuditEvents(USER_ID)).toEqual([
-      { actorId: USER_ID, actorEmail: `${USER_ID}@example.com` },
-    ]);
+    expect(await findAuditEvents(USER_ID)).toEqual([{ actorId: USER_ID }]);
   });
 
   it('is a no-op when the user does not exist', async () => {

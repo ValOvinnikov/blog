@@ -1,4 +1,8 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  type TAuditAction,
+} from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -11,13 +15,12 @@ const db = useQueryTestDb();
 async function insertEvent(overrides: {
   targetId: string;
   createdAt: Date;
-  action?: (typeof AUDIT_ACTION)[keyof typeof AUDIT_ACTION];
+  action?: TAuditAction;
 }): Promise<void> {
   await db()
     .insert(schema.auditEvents)
     .values({
       actorId: 'admin-1',
-      actorEmail: 'admin-1@example.com',
       action: overrides.action ?? AUDIT_ACTION.DEPROVISION_REQUESTED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: overrides.targetId,
