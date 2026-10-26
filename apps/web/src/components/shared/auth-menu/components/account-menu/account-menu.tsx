@@ -81,6 +81,7 @@ export const AccountMenu = ({
           size={SIZE.MD}
           className={avatar()}
           onImageError={() => setImageFailed(true)}
+          dataTestId="account-menu-trigger-avatar"
         />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
@@ -100,6 +101,7 @@ export const AccountMenu = ({
             alt=""
             size={SIZE.SM}
             onImageError={() => setImageFailed(true)}
+            dataTestId="account-menu-panel-avatar"
           />
           <div className={accountText()}>
             <p className={accountName()} title={displayName}>
