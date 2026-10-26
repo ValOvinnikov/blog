@@ -49,7 +49,9 @@ Free site.
 
 - `/sign-in` is Auth.js's `pages.signIn`, public and in the panel's own
   pre-shell styling: a button per configured OAuth provider, then an email
-  field that sends a magic link and says to check your inbox on the same page.
+  field that sends a magic link and says to check your inbox on the same page,
+  or, when the send limit refused it, that too many links were requested and
+  to try again in an hour.
   `adminRoutes.signIn(callbackUrl)` builds it, always with an explicit
   `callbackUrl` (`/` by default). A session gate passes the page the visitor
   asked for, which `src/proxy.ts` records in the `x-admin-requested-path`
@@ -174,9 +176,14 @@ Free site.
   an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
   keys on `normalizeEmailIdentity`, so `+tag` variants share one budget. A
-  refusal, or a failed check, sends nothing and never throws, and every
-  request, refused or sent, takes at least `MAGIC_LINK_RESPONSE_FLOOR_MS`, so
-  the check-your-inbox page cannot be told apart by content or timing.
+  refusal sends nothing. A block or a failed check never throws, so it shows
+  the same check-your-inbox page as a real send and a block is never
+  confirmed to the person blocked. A send over either limit throws
+  `MagicLinkSendLimitedError`, a `CredentialsSignin` whose `code` is
+  `MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED`; `sendSignInLinkAction` answers it
+  with `RATE_LIMITED`, which the form shows as the try-again message. It
+  names no account, so it reveals nothing about whether one exists. Every
+  request, refused or sent, takes at least `MAGIC_LINK_RESPONSE_FLOOR_MS`.
 - Each refusal reaches the app through `buildAuthConfig`'s
   `onMagicLinkSendRefused` handler, which logs one `auth.sign_in_link_refused`
   warn line with its `MAGIC_LINK_REFUSAL` reason. A failed check adds only

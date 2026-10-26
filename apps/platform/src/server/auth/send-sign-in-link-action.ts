@@ -1,6 +1,7 @@
 'use server';
 
 import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
@@ -21,8 +22,11 @@ export type TSendSignInLinkInput = z.input<typeof sendSignInLinkInputSchema>;
 
 export type TSendSignInLinkFieldError = typeof TENANT_FIELD_ERROR.EMAIL_INVALID;
 
+export type TSendSignInLinkRefusal =
+  typeof ACTION_OUTCOME.RATE_LIMITED | typeof ACTION_OUTCOME.SERVER_ERROR;
+
 export type TSendSignInLinkResult = TActionResult<
-  typeof ACTION_OUTCOME.SERVER_ERROR,
+  TSendSignInLinkRefusal,
   keyof TSendSignInLinkInput,
   TSendSignInLinkFieldError
 >;
@@ -49,6 +53,10 @@ export const sendSignInLinkAction = async (
       redirect: false,
     });
   } catch (error) {
+    if (error instanceof MagicLinkSendLimitedError) {
+      return toOutcome(ACTION_OUTCOME.RATE_LIMITED);
+    }
+
     logger.error(SIGN_IN_LOG.LINK_FAILED, { error });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

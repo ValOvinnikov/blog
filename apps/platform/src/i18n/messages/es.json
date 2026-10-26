@@ -113,6 +113,8 @@
     "sending": "Enviando…",
     "sendFailedTitle": "No hemos podido enviar tu enlace de inicio de sesión",
     "sendFailedDescription": "Inténtalo de nuevo dentro de unos minutos.",
+    "sendLimitedTitle": "Se han solicitado demasiados enlaces de inicio de sesión para esta dirección",
+    "sendLimitedDescription": "Inténtalo de nuevo dentro de una hora.",
     "linkSentTitle": "Revisa tu correo",
     "linkSentDescription": "Hemos enviado un enlace de inicio de sesión a {email}. Funciona una sola vez y caduca pasado un tiempo."
   },

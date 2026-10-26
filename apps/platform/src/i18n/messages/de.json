@@ -113,6 +113,8 @@
     "sending": "Wird gesendet…",
     "sendFailedTitle": "Wir konnten Ihren Anmeldelink nicht senden",
     "sendFailedDescription": "Versuchen Sie es in ein paar Minuten erneut.",
+    "sendLimitedTitle": "Für diese Adresse wurden zu viele Anmeldelinks angefordert",
+    "sendLimitedDescription": "Versuchen Sie es in einer Stunde erneut.",
     "linkSentTitle": "Prüfen Sie Ihre E-Mails",
     "linkSentDescription": "Wir haben einen Anmeldelink an {email} gesendet. Er funktioniert nur einmal und läuft nach einiger Zeit ab."
   },

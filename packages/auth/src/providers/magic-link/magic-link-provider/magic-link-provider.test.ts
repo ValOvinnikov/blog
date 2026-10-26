@@ -1,3 +1,4 @@
+import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
 import {
   MOCK_DB_ERROR_MESSAGE,
   MOCK_FRENCH_PATH,
@@ -49,7 +50,8 @@ const COPYRIGHT_MARK = '&copy;';
 const CUSTOM_BODY_TEXT = 'Use the button below to get back in.';
 const ADVERSARIAL_LINK_KEY = 'adversarial-link';
 const SITE_LINK_HREF = `href="${SITE_CALLBACK_URL}"`;
-const REFUSAL = { reason: MAGIC_LINK_REFUSAL.ADDRESS_LIMIT };
+const REFUSAL = { reason: MAGIC_LINK_REFUSAL.BLOCKED };
+const LIMIT_REFUSAL = { reason: MAGIC_LINK_REFUSAL.ADDRESS_LIMIT };
 
 function sendVerificationRequestFor(
   provider: ReturnType<typeof buildMagicLinkProvider>,
@@ -179,10 +181,35 @@ describe(buildMagicLinkProvider, () => {
     expect(onSendRefusedMock).not.toHaveBeenCalled();
   });
 
-  it('resolves a refused request as it resolves a real send', async () => {
-    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
+  it.each([MAGIC_LINK_REFUSAL.BLOCKED, MAGIC_LINK_REFUSAL.CHECK_FAILED])(
+    'resolves a %s refusal as it resolves a real send',
+    async (reason) => {
+      findMagicLinkSendRefusalMock.mockResolvedValue({ reason });
 
-    await expect(sendVerificationRequestFor(provider)).resolves.toBeUndefined();
+      await expect(
+        sendVerificationRequestFor(provider),
+      ).resolves.toBeUndefined();
+    },
+  );
+
+  it.each([MAGIC_LINK_REFUSAL.NETWORK_LIMIT, MAGIC_LINK_REFUSAL.ADDRESS_LIMIT])(
+    'rejects a %s refusal as a send limit, sending nothing',
+    async (reason) => {
+      findMagicLinkSendRefusalMock.mockResolvedValue({ reason });
+
+      await expect(sendVerificationRequestFor(provider)).rejects.toBeInstanceOf(
+        MagicLinkSendLimitedError,
+      );
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it("hands a send-limit refusal to the app's handler before rejecting", async () => {
+    findMagicLinkSendRefusalMock.mockResolvedValue(LIMIT_REFUSAL);
+
+    await expect(sendVerificationRequestFor(provider)).rejects.toThrow();
+
+    expect(onSendRefusedMock).toHaveBeenCalledExactlyOnceWith(LIMIT_REFUSAL);
   });
 
   it('holds a refused request to the same minimum duration as a real send', async () => {

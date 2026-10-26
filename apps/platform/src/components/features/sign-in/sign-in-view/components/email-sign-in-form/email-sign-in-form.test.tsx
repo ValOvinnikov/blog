@@ -80,4 +80,21 @@ describe(`<${EmailSignInForm.name}/>`, () => {
       MOCK_SIGN_IN_EMAIL,
     );
   });
+
+  it('says too many links were requested and keeps the address', async () => {
+    vi.mocked(sendSignInLinkAction).mockResolvedValueOnce({
+      outcome: ACTION_OUTCOME.RATE_LIMITED,
+    });
+
+    await user.click(screen.getByRole('button', SEND_BUTTON));
+
+    const alert = await screen.findByRole('alert');
+
+    expect(alert).toHaveTextContent(
+      'Too many sign-in links were requested for this addressTry again in an hour.',
+    );
+    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(
+      MOCK_SIGN_IN_EMAIL,
+    );
+  });
 });

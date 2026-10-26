@@ -8,3 +8,7 @@ export const MAGIC_LINK_REFUSAL = {
 } as const;
 
 export type TMagicLinkRefusal = TValueOf<typeof MAGIC_LINK_REFUSAL>;
+
+export const MAGIC_LINK_SIGN_IN_CODE = {
+  SEND_LIMITED: 'SEND_LIMITED',
+} as const;

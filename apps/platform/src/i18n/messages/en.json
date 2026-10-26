@@ -113,6 +113,8 @@
     "sending": "Sending…",
     "sendFailedTitle": "We couldn't send your sign-in link",
     "sendFailedDescription": "Try again in a few minutes.",
+    "sendLimitedTitle": "Too many sign-in links were requested for this address",
+    "sendLimitedDescription": "Try again in an hour.",
     "linkSentTitle": "Check your email",
     "linkSentDescription": "We've sent a sign-in link to {email}. It works once and expires after a while."
   },
