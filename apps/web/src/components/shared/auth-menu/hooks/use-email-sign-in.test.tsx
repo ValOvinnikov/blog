@@ -1,4 +1,8 @@
-import { HTTP_STATUS, MAGIC_LINK_SIGN_IN_CODE } from '@blog/config';
+import {
+  FORM_STATUS,
+  HTTP_STATUS,
+  MAGIC_LINK_SIGN_IN_CODE,
+} from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useState } from 'react';
@@ -20,45 +24,48 @@ const READER_EMAIL = 'reader@example.com';
 const Harness = () => {
   const [open, setOpen] = useState(true);
   const {
-    emailStep,
-    setEmailStep,
+    isEmailFormOpen,
+    openEmailForm,
+    status,
     email,
     setEmail,
-    emailError,
     isSendLimited,
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(open);
+  const isSubmitting = status === FORM_STATUS.SUBMITTING;
 
   return (
     <div>
       <button type="button" onClick={() => setOpen((current) => !current)}>
         toggle open
       </button>
-      {emailStep === 'collapsed' && (
-        <button type="button" onClick={() => setEmailStep('expanded')}>
+      {!isEmailFormOpen && (
+        <button type="button" onClick={openEmailForm}>
           {CONTINUE_WITH_EMAIL}
         </button>
       )}
-      {(emailStep === 'expanded' || emailStep === 'submitting') && (
+      {isEmailFormOpen && status !== FORM_STATUS.SUCCESS && (
         <form ref={emailFormRef} onSubmit={handleEmailSubmit}>
           <input
             aria-label={EMAIL_FIELD}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            disabled={emailStep === 'submitting'}
+            disabled={isSubmitting}
           />
           <button
             type="button"
-            disabled={emailStep === 'submitting'}
+            disabled={isSubmitting}
             onClick={handleEmailSubmit}
           >
-            {emailStep === 'submitting' ? 'sending' : 'send'}
+            {isSubmitting ? 'sending' : 'send'}
           </button>
         </form>
       )}
-      {emailStep === 'sent' && <p role="status">sent</p>}
-      {emailError && <p role="alert">{isSendLimited ? 'limited' : 'error'}</p>}
+      {status === FORM_STATUS.SUCCESS && <p role="status">sent</p>}
+      {status === FORM_STATUS.ERROR && (
+        <p role="alert">{isSendLimited ? 'limited' : 'error'}</p>
+      )}
     </div>
   );
 };

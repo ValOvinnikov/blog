@@ -1,7 +1,13 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ICONS, SIZE, type TIconName, type TMaybeNull } from '@blog/config';
+import {
+  FORM_STATUS,
+  ICONS,
+  SIZE,
+  type TIconName,
+  type TMaybeNull,
+} from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { Text } from '@blog/ui/components/atoms/text';
@@ -43,15 +49,18 @@ export const SignInMenu = ({
 }: TSignInMenuProps) => {
   const t = useTranslations('authMenu');
   const {
-    emailStep,
-    setEmailStep,
+    isEmailFormOpen,
+    openEmailForm,
+    status,
     email,
     setEmail,
-    emailError,
     isSendLimited,
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(isOpen);
+  const isSent = status === FORM_STATUS.SUCCESS;
+  const isSubmitting = status === FORM_STATUS.SUBMITTING;
+  const hasSendFailed = status === FORM_STATUS.ERROR;
   const { panel, signInTrigger } = authMenuVariants();
   const {
     label,
@@ -123,21 +132,21 @@ export const SignInMenu = ({
             {providerLabel}
           </PopoverMenu.Item>
         ))}
-        {emailStep === 'sent' && (
+        {isSent && (
           <p role="status" aria-live="polite" className={emailSent()}>
             {t('checkYourInbox')}
           </p>
         )}
-        {emailStep === 'collapsed' && (
+        {!isSent && !isEmailFormOpen && (
           <PopoverMenu.Item
             variant="bordered"
             className={providerButton()}
-            onClick={() => setEmailStep('expanded')}
+            onClick={openEmailForm}
           >
             {t('continueWithEmail')}
           </PopoverMenu.Item>
         )}
-        {(emailStep === 'expanded' || emailStep === 'submitting') && (
+        {!isSent && isEmailFormOpen && (
           <form
             ref={emailFormRef}
             className={emailForm()}
@@ -157,10 +166,10 @@ export const SignInMenu = ({
                   dataTestId="sign-in-prompt-icon"
                 />
               }
-              isInvalid={emailError}
-              isDisabled={emailStep === 'submitting'}
+              isInvalid={hasSendFailed}
+              isDisabled={isSubmitting}
             />
-            {emailError && (
+            {hasSendFailed && (
               <p role="status" aria-live="polite" className={emailHint()}>
                 {isSendLimited ? t('sendLimited') : t('emailError')}
               </p>
@@ -169,10 +178,10 @@ export const SignInMenu = ({
               <Button
                 size={SIZE.SM}
                 className={sendButton()}
-                isDisabled={emailStep === 'submitting'}
+                isDisabled={isSubmitting}
                 onClick={handleEmailSubmit}
               >
-                {emailStep === 'submitting' ? t('sending') : t('sendLink')}
+                {isSubmitting ? t('sending') : t('sendLink')}
               </Button>
             </div>
           </form>
