@@ -9,4 +9,5 @@ export type TSignInError = TValueOf<typeof SIGN_IN_ERROR>;
 
 export const SIGN_IN_LOG = {
   LINK_FAILED: 'auth.sign_in_link_failed',
+  LINK_REFUSED: 'auth.sign_in_link_refused',
 } as const;

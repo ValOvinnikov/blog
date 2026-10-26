@@ -104,7 +104,7 @@ describe(buildAuthConfig, () => {
     let config: NextAuthConfig;
 
     beforeEach(() => {
-      config = buildAuthConfig(AUTH_APP.SITE);
+      config = buildAuthConfig(AUTH_APP.SITE, vi.fn());
     });
 
     it('uses the database session strategy', () => {
@@ -178,7 +178,7 @@ describe(buildAuthConfig, () => {
       process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig(AUTH_APP.SITE);
+      const config = freshBuildAuthConfig(AUTH_APP.SITE, vi.fn());
 
       expect(config.cookies).toBeUndefined();
     });
@@ -186,7 +186,7 @@ describe(buildAuthConfig, () => {
     it('reads the secret from AUTH_SECRET', async () => {
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig(AUTH_APP.SITE);
+      const config = freshBuildAuthConfig(AUTH_APP.SITE, vi.fn());
 
       expect(config.secret).toBe(MOCK_AUTH_SECRET);
     });
@@ -198,7 +198,7 @@ describe(buildAuthConfig, () => {
       process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig(AUTH_APP.SITE);
+      const config = freshBuildAuthConfig(AUTH_APP.SITE, vi.fn());
 
       const providerIds = providerIdsOf(config);
       expect(providerIds).toContain('github');
@@ -210,7 +210,7 @@ describe(buildAuthConfig, () => {
     let config: ReturnType<typeof buildAuthConfig>;
 
     beforeEach(() => {
-      config = buildAuthConfig(AUTH_APP.PLATFORM);
+      config = buildAuthConfig(AUTH_APP.PLATFORM, vi.fn());
     });
 
     it('scopes its sessions to the platform', () => {
@@ -251,7 +251,7 @@ describe(buildAuthConfig, () => {
 
     it('keeps the secure cookie prefixes in production', () => {
       vi.stubEnv('NODE_ENV', 'production');
-      config = buildAuthConfig(AUTH_APP.PLATFORM);
+      config = buildAuthConfig(AUTH_APP.PLATFORM, vi.fn());
 
       expect(config.useSecureCookies).toBe(true);
       expect(config.cookies?.sessionToken?.name).toMatch(/^__Secure-/);
@@ -268,7 +268,7 @@ describe(buildAuthConfig, () => {
     let config: ReturnType<typeof buildAuthConfig>;
 
     beforeEach(() => {
-      config = buildAuthConfig(AUTH_APP.SITE);
+      config = buildAuthConfig(AUTH_APP.SITE, vi.fn());
     });
 
     it('scopes its sessions to sites', () => {

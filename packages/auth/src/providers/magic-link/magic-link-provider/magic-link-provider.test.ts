@@ -21,6 +21,7 @@ import {
   AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
+  MAGIC_LINK_REFUSAL,
   PRESET_ID,
 } from '@blog/config/constants';
 import {
@@ -48,6 +49,7 @@ const COPYRIGHT_MARK = '&copy;';
 const CUSTOM_BODY_TEXT = 'Use the button below to get back in.';
 const ADVERSARIAL_LINK_KEY = 'adversarial-link';
 const SITE_LINK_HREF = `href="${SITE_CALLBACK_URL}"`;
+const REFUSAL = { reason: MAGIC_LINK_REFUSAL.ADDRESS_LIMIT };
 
 function sendVerificationRequestFor(
   provider: ReturnType<typeof buildMagicLinkProvider>,
@@ -84,8 +86,9 @@ const {
   getEmailConfigMock,
   getEmailTemplateMock,
   sendEmailMock,
-  isMagicLinkSendAllowedMock,
+  findMagicLinkSendRefusalMock,
   withMinimumDurationMock,
+  onSendRefusedMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
@@ -94,13 +97,14 @@ const {
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
   sendEmailMock: vi.fn<(input: TSendEmailInput) => Promise<void>>(),
-  isMagicLinkSendAllowedMock: vi.fn(),
+  findMagicLinkSendRefusalMock: vi.fn(),
   withMinimumDurationMock: vi.fn(),
+  onSendRefusedMock: vi.fn(),
 }));
 
 vi.mock(
-  '@blog/auth/providers/magic-link/is-magic-link-send-allowed/is-magic-link-send-allowed',
-  () => ({ isMagicLinkSendAllowed: isMagicLinkSendAllowedMock }),
+  '@blog/auth/providers/magic-link/find-magic-link-send-refusal/find-magic-link-send-refusal',
+  () => ({ findMagicLinkSendRefusal: findMagicLinkSendRefusalMock }),
 );
 
 vi.mock('@blog/auth/utils/with-minimum-duration/with-minimum-duration', () => ({
@@ -145,30 +149,45 @@ describe(buildMagicLinkProvider, () => {
       logoAssetUrl: undefined,
     });
     sendEmailMock.mockReset().mockResolvedValue(undefined);
-    isMagicLinkSendAllowedMock.mockResolvedValue(true);
+    findMagicLinkSendRefusalMock.mockResolvedValue(undefined);
+    onSendRefusedMock.mockReset();
     withMinimumDurationMock.mockImplementation(
       (_minimumMs: number, task: () => Promise<unknown>) => task(),
     );
-    provider = buildMagicLinkProvider(AUTH_APP.SITE);
+    provider = buildMagicLinkProvider(AUTH_APP.SITE, onSendRefusedMock);
   });
 
   it('sends nothing once the send check refuses the request', async () => {
-    isMagicLinkSendAllowedMock.mockResolvedValue(false);
+    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
 
     await sendVerificationRequestFor(provider);
 
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
+  it("hands the refusal to the app's handler", async () => {
+    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
+
+    await sendVerificationRequestFor(provider);
+
+    expect(onSendRefusedMock).toHaveBeenCalledExactlyOnceWith(REFUSAL);
+  });
+
+  it('reports no refusal for a link it sends', async () => {
+    await sendVerificationRequestFor(provider);
+
+    expect(onSendRefusedMock).not.toHaveBeenCalled();
+  });
+
   it('resolves a refused request as it resolves a real send', async () => {
-    isMagicLinkSendAllowedMock.mockResolvedValue(false);
+    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
 
     await expect(sendVerificationRequestFor(provider)).resolves.toBeUndefined();
   });
 
   it('holds a refused request to the same minimum duration as a real send', async () => {
     await sendVerificationRequestFor(provider);
-    isMagicLinkSendAllowedMock.mockResolvedValue(false);
+    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
     await sendVerificationRequestFor(provider);
 
     const [sentFloorMs, refusedFloorMs] =
@@ -180,7 +199,7 @@ describe(buildMagicLinkProvider, () => {
   it('checks the requested address before sending', async () => {
     await sendVerificationRequestFor(provider);
 
-    const [address, request] = isMagicLinkSendAllowedMock.mock.calls[0] ?? [];
+    const [address, request] = findMagicLinkSendRefusalMock.mock.calls[0] ?? [];
     expect(address).toBe(MOCK_READER_EMAIL);
     expect(request).toBeInstanceOf(Request);
   });
@@ -207,7 +226,10 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it('sends invite-flavored copy when the identifier has a pending invite', async () => {
-    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+    const provider = buildMagicLinkProvider(
+      AUTH_APP.PLATFORM,
+      onSendRefusedMock,
+    );
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
     ]);
@@ -250,7 +272,10 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {
-    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+    const provider = buildMagicLinkProvider(
+      AUTH_APP.PLATFORM,
+      onSendRefusedMock,
+    );
     findPendingInviteByEmailMock.mockRejectedValue(
       new Error(MOCK_DB_ERROR_MESSAGE),
     );
@@ -267,7 +292,10 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it("sends the admin's sign-in email in the platform layout", async () => {
-    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+    const provider = buildMagicLinkProvider(
+      AUTH_APP.PLATFORM,
+      onSendRefusedMock,
+    );
 
     await sendVerificationRequestFor(provider, {
       identifier: ADMIN_EMAIL,
@@ -280,7 +308,10 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it("sends the admin's invite email in the platform layout", async () => {
-    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+    const provider = buildMagicLinkProvider(
+      AUTH_APP.PLATFORM,
+      onSendRefusedMock,
+    );
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
     ]);
@@ -337,7 +368,10 @@ describe(buildMagicLinkProvider, () => {
   });
 
   it("writes an invite sent from a tenant-less host in the invited tenant's default language", async () => {
-    const provider = buildMagicLinkProvider(AUTH_APP.PLATFORM);
+    const provider = buildMagicLinkProvider(
+      AUTH_APP.PLATFORM,
+      onSendRefusedMock,
+    );
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
     ]);
