@@ -22,6 +22,7 @@ const setup = customRenderServerAsync(
 );
 
 const SECTION_HEADING = 'Connected accounts';
+const DISPLAY_NAME_LABEL = 'Display name';
 const LAST_METHOD_NOTE = "Last remaining method — can't unlink";
 
 describe(`<${IdentitySection.name}/>`, () => {
@@ -115,7 +116,7 @@ describe(`<${IdentitySection.name}/>`, () => {
       await setup();
 
       const displayNameTextbox = screen.getByRole('textbox', {
-        name: 'Display name',
+        name: DISPLAY_NAME_LABEL,
       });
       const saveButton = screen.getByRole('button', { name: 'Save' });
 
@@ -136,5 +137,21 @@ describe(`<${IdentitySection.name}/>`, () => {
     const lastMethodNote = screen.getByText(LAST_METHOD_NOTE);
 
     expect(lastMethodNote).toBeVisible();
+  });
+
+  it('prefills the display-name field with the handle when the reader has no name', async () => {
+    authMock.mockResolvedValue({
+      user: { ...MOCK_ACCOUNT_USER, name: null },
+    });
+    getLinkedProvidersMock.mockResolvedValue({
+      github: false,
+      google: false,
+      emailLink: true,
+    });
+    await setup();
+    const displayNameTextbox = screen.getByRole('textbox', {
+      name: DISPLAY_NAME_LABEL,
+    });
+    expect(displayNameTextbox).toHaveValue('jane');
   });
 });

@@ -11,6 +11,10 @@ import { useId } from 'react';
 
 import { AccountMenu, type TAccountMenuProps } from './account-menu';
 
+const ACCOUNT_MENU_LABEL = 'Account menu';
+const JANE_NAME = 'Jane Doe';
+const JANE_EMAIL = 'jane@example.com';
+
 type TWrapperProps = Pick<TAccountMenuProps, 'name' | 'email' | 'image'>;
 
 const Wrapper = ({ name, email, image }: TWrapperProps) => {
@@ -32,13 +36,13 @@ const Wrapper = ({ name, email, image }: TWrapperProps) => {
 };
 
 const setup = customRender(Wrapper, {
-  name: 'Jane Doe',
-  email: 'jane@example.com',
+  name: JANE_NAME,
+  email: JANE_EMAIL,
   image: 'https://example.com/broken-avatar.png',
 });
 
 const getTriggerImage = () => {
-  const trigger = screen.getByRole('button', { name: 'Account menu' });
+  const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
 
   return within(trigger).queryByRole('presentation');
 };
@@ -58,7 +62,7 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     fireEvent.error(image!);
 
-    const trigger = screen.getByRole('button', { name: 'Account menu' });
+    const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     expect(within(trigger).queryByRole('presentation')).not.toBeInTheDocument();
     expect(within(trigger).getByText('JD')).toBeVisible();
   });
@@ -66,7 +70,7 @@ describe(`<${AccountMenu.name}/>`, () => {
   it('also falls back to initials in the panel body avatar, since it shares the same failure state as the trigger', async () => {
     fireEvent.error(getTriggerImage()!);
 
-    const trigger = screen.getByRole('button', { name: 'Account menu' });
+    const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     await user.click(trigger);
     const panel = screen.getByRole('menu');
 
@@ -80,8 +84,8 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     rerender(
       <Wrapper
-        name="Jane Doe"
-        email="jane@example.com"
+        name={JANE_NAME}
+        email={JANE_EMAIL}
         image="https://example.com/a-different-avatar.png"
       />,
     );
@@ -90,16 +94,26 @@ describe(`<${AccountMenu.name}/>`, () => {
   });
 
   it('renders a plain "Account" label — not a heading — and the session name/email', async () => {
-    await user.click(screen.getByRole('button', { name: 'Account menu' }));
+    await user.click(screen.getByRole('button', { name: ACCOUNT_MENU_LABEL }));
     const panel = screen.getByRole('menu');
 
     expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
     expect(within(panel).getByText('Account')).toBeVisible();
-    expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
-    expect(within(panel).getByText('jane@example.com')).toBeVisible();
+    expect(within(panel).getAllByText(JANE_NAME).length).toBeGreaterThan(0);
+    expect(within(panel).getByText(JANE_EMAIL)).toBeVisible();
     expect(
       screen.getByRole('menuitem', { name: 'My bookmarks' }),
     ).toBeVisible();
     expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
+  });
+
+  it('shows the handle on the name line and the email once when the reader has no name', async () => {
+    rerender(<Wrapper name={null} email={JANE_EMAIL} image={null} />);
+
+    await user.click(screen.getByRole('button', { name: ACCOUNT_MENU_LABEL }));
+    const panel = screen.getByRole('menu');
+
+    expect(within(panel).getByText('jane')).toBeVisible();
+    expect(within(panel).getAllByText(JANE_EMAIL)).toHaveLength(1);
   });
 });
