@@ -377,6 +377,9 @@ Accessibility is `react-component-practices` → "Accessible by construction"
 
 ## Testing
 
+Read `.claude/skills/testing-practices/SKILL.md` with Read (you have no Skill
+tool) before writing or changing any test.
+
 Tests follow `testing-practices` → "Rendering and arrangement", "Writing a
 component test", "What to fake", "What not to test". Render through
 `@web/testing/custom-render`. On top of it:
