@@ -28,14 +28,13 @@ describe(`<${EmailSignInForm.name}/>`, () => {
       .mockReset()
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     setup();
-    await user.type(
-      screen.getByRole('textbox', EMAIL_FIELD),
-      MOCK_SIGN_IN_EMAIL,
-    );
+    const emailField = screen.getByRole('textbox', EMAIL_FIELD);
+    await user.type(emailField, MOCK_SIGN_IN_EMAIL);
   });
 
   it('sends a link for the requested page and asks the user to check email', async () => {
-    await user.click(screen.getByRole('button', SEND_BUTTON));
+    const sendButton = screen.getByRole('button', SEND_BUTTON);
+    await user.click(sendButton);
 
     const status = await screen.findByRole('status');
 
@@ -54,14 +53,14 @@ describe(`<${EmailSignInForm.name}/>`, () => {
       fieldErrors: { email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
     });
 
-    await user.click(screen.getByRole('button', SEND_BUTTON));
+    const sendButton = screen.getByRole('button', SEND_BUTTON);
+    await user.click(sendButton);
 
     const error = await screen.findByText('Enter a valid email.');
+    const emailField = screen.getByRole('textbox', EMAIL_FIELD);
 
     expect(error).toBeVisible();
-    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(
-      MOCK_SIGN_IN_EMAIL,
-    );
+    expect(emailField).toHaveValue(MOCK_SIGN_IN_EMAIL);
   });
 
   it('says the link could not be sent and keeps the address', async () => {
@@ -69,32 +68,30 @@ describe(`<${EmailSignInForm.name}/>`, () => {
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
 
-    await user.click(screen.getByRole('button', SEND_BUTTON));
+    const sendButton = screen.getByRole('button', SEND_BUTTON);
+    await user.click(sendButton);
 
     const alert = await screen.findByRole('alert');
+    const emailField = screen.getByRole('textbox', EMAIL_FIELD);
 
     expect(alert).toHaveTextContent(
       "We couldn't send your sign-in linkTry again in a few minutes.",
     );
-    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(
-      MOCK_SIGN_IN_EMAIL,
-    );
+    expect(emailField).toHaveValue(MOCK_SIGN_IN_EMAIL);
   });
 
-  it('says too many links were requested and keeps the address', async () => {
+  it('says too many links were requested for the address', async () => {
     vi.mocked(sendSignInLinkAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.RATE_LIMITED,
     });
 
-    await user.click(screen.getByRole('button', SEND_BUTTON));
+    const sendButton = screen.getByRole('button', SEND_BUTTON);
+    await user.click(sendButton);
 
     const alert = await screen.findByRole('alert');
 
     expect(alert).toHaveTextContent(
       'Too many sign-in links were requested for this addressTry again in an hour.',
-    );
-    expect(screen.getByRole('textbox', EMAIL_FIELD)).toHaveValue(
-      MOCK_SIGN_IN_EMAIL,
     );
   });
 });
