@@ -868,7 +868,9 @@ env vars are set.
 
 Set the three vars on **`web-prod` and `platform-prod`**, Production target
 only, so preview deployments send nothing. `web-dev` and `platform-dev` get them
-only for the rehearsal in 8e.
+only for the rehearsal in 8e. **`worker-dev`** gets them too, Production target,
+because the worker has no production deployment yet; `worker-prod` gets them
+when it is stood up.
 
 | Variable        | Value                            | Vercel type               |
 | --------------- | -------------------------------- | ------------------------- |
@@ -883,9 +885,9 @@ only for the rehearsal in 8e.
 - [ ] Redeploy each project after setting them; `instrumentation.ts` registers
       the sink at server start, so a running deployment does not pick them up.
 
-With any of the three unset, an app logs to the console only and sends
-nothing. Each push is kept alive past the response by Vercel's `waitUntil`, so
-shipping a line never delays or fails a request.
+With any of the three unset, an app (web, platform or worker) logs to the
+console only and sends nothing. Each push is kept alive past the response by
+Vercel's `waitUntil`, so shipping a line never delays or fails a request.
 
 #### 8c. Querying in Loki
 
@@ -909,7 +911,7 @@ filterable:
       outage alert fires in Grafana and reaches no one.
 - [ ] **Error alert, one rule per app**, each on the query below with its own
       `service` label — `service="web"` as written, `service="platform"` in the
-      platform rule:
+      platform rule, `service="worker"` in the worker rule:
       `sum by (service, event) (count_over_time({service="web", level="error"} | json [5m]))`
       above zero, evaluated every minute, with **No data → OK** (otherwise
       every quiet window raises a `DatasourceNoData` alert). Each rule sets its
