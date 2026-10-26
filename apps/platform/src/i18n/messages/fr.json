@@ -1444,18 +1444,42 @@
     "lookUpFailed": "Impossible de rechercher cette adresse. Réessayez.",
     "exportFailed": "Impossible de préparer l’export. Réessayez.",
     "eraseFailed": "Impossible d’effacer les données. Réessayez.",
-    "erased": "{count, plural, one {# enregistrement effacé.} other {# enregistrements effacés.}}"
+    "erased": "{count, plural, one {# enregistrement effacé.} other {# enregistrements effacés.}}",
+    "erasedAccountKept": "{count, plural, one {# enregistrement effacé.} other {# enregistrements effacés.}} Le compte lecteur a été conservé : il possède un site ou est opérateur."
   },
   "dataRequestResultCard": {
     "title": "Données conservées pour {email}",
     "matchCount": "{count, plural, =0 {Aucun enregistrement trouvé.} one {# enregistrement trouvé.} other {# enregistrements trouvés.}}",
     "export": "Télécharger l’export",
-    "exporting": "Préparation…",
+    "exporting": "Préparation…"
+  },
+  "dataRequestEraseDialog": {
     "erase": "Effacer",
-    "eraseDialogTitle": "Effacer les données de cette personne ?",
-    "eraseDialogDescription": "Supprime ses abonnements, messages de contact, invitations et blocage d’inscription sur tous les sites. Cette action est irréversible.",
-    "eraseConfirm": "Effacer les données",
-    "erasing": "Effacement…"
+    "title": "Effacer les données de cette personne ?",
+    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites. Cette action est irréversible.",
+    "confirm": "Effacer les données",
+    "erasing": "Effacement…",
+    "includesReaderAccount": "Supprimer aussi le compte lecteur",
+    "readerAccountHint": "Supprime son profil, ses connexions et ses favoris, et la déconnecte partout. Un compte qui possède un site ou est opérateur est conservé.",
+    "signupBlockKept": "Le blocage d'inscription reste : il ne contient qu'une empreinte de l'adresse et la garde bloquée."
+  },
+  "dataRequestAccountCard": {
+    "title": "Compte lecteur",
+    "supportingText": "Le compte avec lequel cette adresse se connecte.",
+    "name": "Nom",
+    "noName": "Non défini",
+    "email": "E-mail",
+    "providers": "Méthodes de connexion",
+    "noProviders": "Aucune",
+    "activeSessions": "Sessions actives",
+    "sessionCount": "{count, plural, =0 {Aucune} one {# session} other {# sessions}}",
+    "bookmarks": "Favoris",
+    "bookmarkCount": "{count, plural, =0 {Aucun} one {# favori} other {# favoris}}",
+    "provider": {
+      "github": "GitHub",
+      "google": "Google",
+      "emailLink": "Lien par e-mail"
+    }
   },
   "dataRequestMatchesTable": {
     "columnKind": "Type",
@@ -1465,13 +1489,16 @@
     "platformWide": "Plateforme",
     "emailHashed": "Conservé sous forme de hash",
     "empty": "Rien n’est conservé pour cette adresse.",
-    "regionLabel": "Enregistrements conservés"
+    "regionLabel": "Enregistrements conservés",
+    "notRecorded": "Non enregistré"
   },
   "dataRequestMatchKind": {
     "SUBSCRIBER": "Abonné",
     "LEAD": "Message de contact",
     "INVITE": "Invitation",
     "SIGNUP_BLOCK": "Blocage d’inscription",
-    "AUDIT_EVENT": "Événement d’audit"
+    "AUDIT_EVENT": "Événement d’audit",
+    "READER_ACCOUNT": "Compte lecteur",
+    "BOOKMARK": "Favori"
   }
 }

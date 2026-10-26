@@ -1,7 +1,6 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import type { TPersonalDataCounts } from '@blog/db/queries/personal-data/erase-personal-data';
 import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
 import {
   DATA_REQUEST_MATCH_KIND,
@@ -13,7 +12,7 @@ export type TDataRequestMatch = {
   kind: TDataRequestMatchKind;
   siteName: TMaybeUndefined<string>;
   email: TMaybeUndefined<string>;
-  recordedAt: Date;
+  recordedAt: TMaybeUndefined<Date>;
 };
 
 const toMatch = (
@@ -21,7 +20,7 @@ const toMatch = (
   id: string,
   siteName: TMaybeUndefined<string>,
   email: TMaybeUndefined<string>,
-  recordedAt: Date,
+  recordedAt: TMaybeUndefined<Date>,
 ): TDataRequestMatch => ({
   key: `${kind}-${id}`,
   kind,
@@ -30,14 +29,16 @@ const toMatch = (
   recordedAt,
 });
 
-export type TPersonalDataMatchCounts = TPersonalDataCounts & {
-  auditEvents: number;
-};
+export type TPersonalDataMatchCounts = Record<
+  keyof Omit<TPersonalDataMatches, 'emailIndex'> | 'bookmarks',
+  number
+>;
 
 export const toDataRequestMatches = ({
   subscribers,
   leads,
   membershipInvites,
+  readerAccount,
   blockedSignupIdentities,
   auditEvents,
 }: TPersonalDataMatches): TDataRequestMatch[] => [
@@ -56,6 +57,27 @@ export const toDataRequestMatches = ({
   ...membershipInvites.map(({ id, tenantName, email, createdAt }) =>
     toMatch(DATA_REQUEST_MATCH_KIND.INVITE, id, tenantName, email, createdAt),
   ),
+  ...(readerAccount
+    ? [
+        toMatch(
+          DATA_REQUEST_MATCH_KIND.READER_ACCOUNT,
+          readerAccount.id,
+          undefined,
+          readerAccount.email,
+          readerAccount.emailVerified,
+        ),
+        ...readerAccount.bookmarks.map(
+          ({ tenantId, tenantName, postId, createdAt }) =>
+            toMatch(
+              DATA_REQUEST_MATCH_KIND.BOOKMARK,
+              `${tenantId}-${postId}`,
+              tenantName,
+              undefined,
+              createdAt,
+            ),
+        ),
+      ]
+    : []),
   ...blockedSignupIdentities.map(({ id, createdAt }) =>
     toMatch(
       DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
@@ -80,12 +102,15 @@ export const countPersonalDataMatches = ({
   subscribers,
   leads,
   membershipInvites,
+  readerAccount,
   blockedSignupIdentities,
   auditEvents,
 }: TPersonalDataMatches): TPersonalDataMatchCounts => ({
   subscribers: subscribers.length,
   leads: leads.length,
   membershipInvites: membershipInvites.length,
+  readerAccount: readerAccount ? 1 : 0,
+  bookmarks: readerAccount?.bookmarks.length ?? 0,
   blockedSignupIdentities: blockedSignupIdentities.length,
   auditEvents: auditEvents.length,
 });

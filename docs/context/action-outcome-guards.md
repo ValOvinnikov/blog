@@ -22,7 +22,6 @@ itself stays.
 
 - `apps/platform/src/components/features/blocked-signups/blocked-signups-view/components/add-blocked-domain-card/use-add-blocked-domain.ts` — INVALID, SUCCESS
 - `apps/platform/src/components/features/blocked-signups/blocked-signups-view/components/blocked-signups-table/components/remove-blocked-identity-control/remove-blocked-identity-control.tsx` — REFUSED, SUCCESS
-- `apps/platform/src/components/features/data-requests/data-request-view/components/data-request-panel/use-data-request.ts` — INVALID, SUCCESS
 - `apps/platform/src/components/features/email/email-settings/components/send-test-email-button/use-send-test-email.ts` — SUCCESS
 - `apps/platform/src/components/features/email/email-settings/use-email-draft.ts` — INVALID, SUCCESS
 - `apps/platform/src/components/features/leads/leads-inbox/components/lead-reading-pane/components/delete-lead-control/delete-lead-control.tsx` — REFUSED, SUCCESS

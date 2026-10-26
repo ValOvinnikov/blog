@@ -1,12 +1,10 @@
 'use client';
 
 import { SIZE } from '@blog/config';
+import { DataRequestEraseDialog } from '@platform/components/features/data-requests/data-request-view/components/data-request-erase-dialog/data-request-erase-dialog';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import {
-  ConfirmDialog,
-  type TConfirmDialogActionResult,
-} from '@platform/components/shared/confirm-dialog';
+import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
@@ -21,15 +19,21 @@ const dataRequestResultCardVariants = tv({
 export type TDataRequestResultCardProps = {
   email: string;
   matchCount: number;
+  hasReaderAccount: boolean;
+  hasSignupBlock: boolean;
   isExporting: boolean;
   onExport: (link: HTMLAnchorElement) => void;
-  onErase: () => Promise<TConfirmDialogActionResult>;
+  onErase: (
+    includesReaderAccount: boolean,
+  ) => Promise<TConfirmDialogActionResult>;
   onErased: () => void;
 };
 
 export const DataRequestResultCard = ({
   email,
   matchCount,
+  hasReaderAccount,
+  hasSignupBlock,
   isExporting,
   onExport,
   onErase,
@@ -60,22 +64,13 @@ export const DataRequestResultCard = ({
               {t('export')}
             </Button>
             {matchCount > 0 && (
-              <ConfirmDialog
-                tone="danger"
-                expectedValue={email}
-                onConfirm={onErase}
-                onConfirmed={onErased}
-              >
-                <ConfirmDialog.Trigger size={SIZE.SM}>
-                  {t('erase')}
-                </ConfirmDialog.Trigger>
-                <ConfirmDialog.Content
-                  title={t('eraseDialogTitle')}
-                  description={t('eraseDialogDescription')}
-                  confirmButtonLabel={t('eraseConfirm')}
-                  confirmingButtonLabel={t('erasing')}
-                />
-              </ConfirmDialog>
+              <DataRequestEraseDialog
+                email={email}
+                hasReaderAccount={hasReaderAccount}
+                hasSignupBlock={hasSignupBlock}
+                onErase={onErase}
+                onErased={onErased}
+              />
             )}
           </div>
         }

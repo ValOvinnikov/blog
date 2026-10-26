@@ -56,6 +56,7 @@ describe(lookUpPersonalDataAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       matches: toDataRequestMatches(mockPersonalDataMatches()),
+      readerAccount: mockPersonalDataMatches().readerAccount,
     });
   });
 

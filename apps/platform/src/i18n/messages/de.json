@@ -1444,18 +1444,42 @@
     "lookUpFailed": "Die Suche nach dieser Adresse ist fehlgeschlagen – versuch es erneut.",
     "exportFailed": "Der Export konnte nicht erstellt werden – versuch es erneut.",
     "eraseFailed": "Die Daten konnten nicht gelöscht werden – versuch es erneut.",
-    "erased": "{count, plural, one {# Eintrag gelöscht.} other {# Einträge gelöscht.}}"
+    "erased": "{count, plural, one {# Eintrag gelöscht.} other {# Einträge gelöscht.}}",
+    "erasedAccountKept": "{count, plural, one {# Eintrag gelöscht.} other {# Einträge gelöscht.}} Das Leserkonto wurde behalten: Es besitzt eine Website oder ist ein Operator."
   },
   "dataRequestResultCard": {
     "title": "Gespeicherte Daten zu {email}",
     "matchCount": "{count, plural, =0 {Keine Einträge gefunden.} one {# Eintrag gefunden.} other {# Einträge gefunden.}}",
     "export": "Export herunterladen",
-    "exporting": "Wird vorbereitet…",
+    "exporting": "Wird vorbereitet…"
+  },
+  "dataRequestEraseDialog": {
     "erase": "Löschen",
-    "eraseDialogTitle": "Daten dieser Person löschen?",
-    "eraseDialogDescription": "Löscht ihre Abonnements, Kontaktnachrichten, Einladungen und Registrierungssperre auf allen Websites. Das lässt sich nicht rückgängig machen.",
-    "eraseConfirm": "Daten löschen",
-    "erasing": "Wird gelöscht…"
+    "title": "Daten dieser Person löschen?",
+    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites. Das lässt sich nicht rückgängig machen.",
+    "confirm": "Daten löschen",
+    "erasing": "Wird gelöscht…",
+    "includesReaderAccount": "Auch das Leserkonto löschen",
+    "readerAccountHint": "Löscht Profil, Anmeldungen und Lesezeichen und meldet die Person überall ab. Ein Konto, das eine Website besitzt oder ein Operator ist, bleibt erhalten.",
+    "signupBlockKept": "Die Registrierungssperre bleibt: Sie enthält nur einen Hash der Adresse und hält sie gesperrt."
+  },
+  "dataRequestAccountCard": {
+    "title": "Leserkonto",
+    "supportingText": "Das Konto, mit dem sich diese Adresse anmeldet.",
+    "name": "Name",
+    "noName": "Nicht festgelegt",
+    "email": "E-Mail",
+    "providers": "Anmeldemethoden",
+    "noProviders": "Keine",
+    "activeSessions": "Aktive Sitzungen",
+    "sessionCount": "{count, plural, =0 {Keine} one {# Sitzung} other {# Sitzungen}}",
+    "bookmarks": "Lesezeichen",
+    "bookmarkCount": "{count, plural, =0 {Keine} one {# Lesezeichen} other {# Lesezeichen}}",
+    "provider": {
+      "github": "GitHub",
+      "google": "Google",
+      "emailLink": "E-Mail-Link"
+    }
   },
   "dataRequestMatchesTable": {
     "columnKind": "Art",
@@ -1465,13 +1489,16 @@
     "platformWide": "Plattform",
     "emailHashed": "Als Hash gespeichert",
     "empty": "Zu dieser Adresse ist nichts gespeichert.",
-    "regionLabel": "Gespeicherte Einträge"
+    "regionLabel": "Gespeicherte Einträge",
+    "notRecorded": "Nicht erfasst"
   },
   "dataRequestMatchKind": {
     "SUBSCRIBER": "Abonnent",
     "LEAD": "Kontaktnachricht",
     "INVITE": "Einladung",
     "SIGNUP_BLOCK": "Registrierungssperre",
-    "AUDIT_EVENT": "Audit-Ereignis"
+    "AUDIT_EVENT": "Audit-Ereignis",
+    "READER_ACCOUNT": "Leserkonto",
+    "BOOKMARK": "Lesezeichen"
   }
 }

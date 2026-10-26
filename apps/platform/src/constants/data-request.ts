@@ -6,6 +6,8 @@ export const DATA_REQUEST_MATCH_KIND = {
   INVITE: 'INVITE',
   SIGNUP_BLOCK: 'SIGNUP_BLOCK',
   AUDIT_EVENT: 'AUDIT_EVENT',
+  READER_ACCOUNT: 'READER_ACCOUNT',
+  BOOKMARK: 'BOOKMARK',
 } as const;
 
 export type TDataRequestMatchKind = TValueOf<typeof DATA_REQUEST_MATCH_KIND>;

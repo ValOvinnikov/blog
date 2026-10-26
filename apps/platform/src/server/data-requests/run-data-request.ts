@@ -9,7 +9,6 @@ import {
   type TOutcome,
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
-import type { TPersonalDataCounts } from '@blog/db/queries/personal-data/erase-personal-data';
 import { errorResult, type TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { DATA_REQUEST_LOG } from '@platform/constants/data-request';
@@ -43,7 +42,7 @@ const INVALID_EMAIL: TDataRequestFailure = {
 type TDataRequestStep<TData extends { emailIndex: string }> = {
   run: (email: string) => Promise<TResult<TData, TErrorCode>>;
   action: TAuditAction;
-  auditDetails: (data: TData) => TPersonalDataCounts;
+  auditDetails: (data: TData) => Record<string, number>;
 };
 
 // A failed query's message lists its bound parameters, the email among them, so only its name is logged.
