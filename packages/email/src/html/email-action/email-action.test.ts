@@ -11,15 +11,16 @@ import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand'
 import { renderEmailAction } from './email-action';
 
 const JAVASCRIPT_SCHEME = 'javascript:';
+const SIGN_IN_URL = 'https://example.com/sign-in';
 
 describe('renderEmailAction', () => {
   it('renders a button using the solid fill and contrast text colours', () => {
     const html = renderEmailAction(
-      { label: 'Sign in', url: 'https://example.com/sign-in' },
+      { label: 'Sign in', url: SIGN_IN_URL },
       MOCK_TENANT_EMAIL_BRAND,
     );
 
-    expect(html).toContain('href="https://example.com/sign-in"');
+    expect(html).toContain(`href="${SIGN_IN_URL}"`);
     expect(html).toContain('>Sign in</a>');
     expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.brandPrimarySolid);
     expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.brandPrimaryContrast);
@@ -32,6 +33,17 @@ describe('renderEmailAction', () => {
     );
 
     expect(html).toContain('<table');
+  });
+
+  it('makes the link the whole content of the button cell', () => {
+    const html = renderEmailAction(
+      { label: 'Sign in', url: SIGN_IN_URL },
+      MOCK_TENANT_EMAIL_BRAND,
+    );
+
+    expect(html).toMatch(
+      new RegExp(`<td[^>]*><a href="${SIGN_IN_URL}"[^>]*>Sign in</a></td>`),
+    );
   });
 
   it('renders the link variant using brandPrimary rather than the solid fill', () => {
