@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePopover } from '@web/hooks/use-popover';
 import {
@@ -11,10 +12,17 @@ import { useId } from 'react';
 
 import { AccountMenu, type TAccountMenuProps } from './account-menu';
 
+faker.seed(5960);
+
 const ACCOUNT_MENU_LABEL = 'Account menu';
-const JANE_NAME = 'Jane Doe';
-const JANE_EMAIL = 'jane@example.com';
-const JANE_INITIALS = 'JD';
+const MOCK_FIRST_NAME = faker.person.firstName();
+const MOCK_LAST_NAME = faker.person.lastName();
+const MOCK_NAME = `${MOCK_FIRST_NAME} ${MOCK_LAST_NAME}`;
+const MOCK_INITIALS = `${MOCK_FIRST_NAME[0]}${MOCK_LAST_NAME[0]}`.toUpperCase();
+const MOCK_HANDLE = faker.internet.username();
+const MOCK_EMAIL = `${MOCK_HANDLE}@${faker.internet.domainName()}`;
+const MOCK_IMAGE_URL = faker.image.url();
+const MOCK_OTHER_IMAGE_URL = faker.image.url();
 
 type TWrapperProps = Pick<TAccountMenuProps, 'name' | 'email' | 'image'>;
 
@@ -37,9 +45,9 @@ const Wrapper = ({ name, email, image }: TWrapperProps) => {
 };
 
 const setup = customRender(Wrapper, {
-  name: JANE_NAME,
-  email: JANE_EMAIL,
-  image: 'https://example.com/broken-avatar.png',
+  name: MOCK_NAME,
+  email: MOCK_EMAIL,
+  image: MOCK_IMAGE_URL,
 });
 
 describe(`<${AccountMenu.name}/>`, () => {
@@ -59,7 +67,7 @@ describe(`<${AccountMenu.name}/>`, () => {
     fireEvent.error(triggerImage);
 
     const failedImage = within(trigger).queryByRole('presentation');
-    const triggerInitials = within(trigger).getByText(JANE_INITIALS);
+    const triggerInitials = within(trigger).getByText(MOCK_INITIALS);
     expect(failedImage).not.toBeInTheDocument();
     expect(triggerInitials).toBeVisible();
   });
@@ -73,7 +81,7 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     const panel = screen.getByRole('menu');
     const panelImage = within(panel).queryByRole('presentation');
-    const panelInitials = within(panel).getByText(JANE_INITIALS);
+    const panelInitials = within(panel).getByText(MOCK_INITIALS);
     expect(panelImage).not.toBeInTheDocument();
     expect(panelInitials).toBeVisible();
   });
@@ -85,9 +93,9 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     rerender(
       <Wrapper
-        name={JANE_NAME}
-        email={JANE_EMAIL}
-        image="https://example.com/a-different-avatar.png"
+        name={MOCK_NAME}
+        email={MOCK_EMAIL}
+        image={MOCK_OTHER_IMAGE_URL}
       />,
     );
 
@@ -102,8 +110,8 @@ describe(`<${AccountMenu.name}/>`, () => {
     const panel = screen.getByRole('menu');
     const heading = within(panel).queryByRole('heading');
     const accountLabel = within(panel).getByText('Account');
-    const name = within(panel).getByText(JANE_NAME);
-    const email = within(panel).getByText(JANE_EMAIL);
+    const name = within(panel).getByText(MOCK_NAME);
+    const email = within(panel).getByText(MOCK_EMAIL);
     const bookmarksItem = within(panel).getByRole('menuitem', {
       name: 'My bookmarks',
     });
@@ -119,14 +127,14 @@ describe(`<${AccountMenu.name}/>`, () => {
   });
 
   it('shows the handle on the name line and the email once when the reader has no name', async () => {
-    rerender(<Wrapper name={null} email={JANE_EMAIL} image={null} />);
+    rerender(<Wrapper name={null} email={MOCK_EMAIL} image={null} />);
 
     const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     await user.click(trigger);
 
     const panel = screen.getByRole('menu');
-    const handle = within(panel).getByText('jane');
-    const emails = within(panel).getAllByText(JANE_EMAIL);
+    const handle = within(panel).getByText(MOCK_HANDLE);
+    const emails = within(panel).getAllByText(MOCK_EMAIL);
     expect(handle).toBeVisible();
     expect(emails).toHaveLength(1);
   });

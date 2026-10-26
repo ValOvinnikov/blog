@@ -366,6 +366,19 @@ never reads state, props, handlers or markup shape.
   await user.click(screen.getByRole('button', { name: 'Save' })); // ❌
   ```
 
+  `within` is a query like any other: it scopes freely, but its result is
+  bound to a `const` too, never written inside `expect` or an interaction:
+
+  ```tsx
+  const panel = screen.getByRole('menu');
+  const signOutItem = within(panel).getByRole('menuitem', { name: 'Sign out' });
+  expect(signOutItem).toBeVisible(); // ✅
+
+  expect(
+    within(panel).getByRole('menuitem', { name: 'Sign out' }),
+  ).toBeVisible(); // ❌
+  ```
+
   **A test file you create or touch is converted whole** — every inline
   query assertion in it, not only the lines your change edits. Files the
   change does not touch stay as they are.
