@@ -1,6 +1,7 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { MEMBERSHIP_ROLE, SUBSCRIBER_STATUS } from '@blog/db/constants';
 import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
+import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
 import { faker } from '@faker-js/faker';
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import type { TPersonalDataExport } from '@platform/server/data-requests/export-personal-data-action';
@@ -25,6 +26,30 @@ const BLOCK_ID = faker.string.uuid();
 const BLOCK_REASON = faker.lorem.sentence();
 const AUDIT_EVENT_ID = faker.string.uuid();
 const RECORDED_AT = faker.date.past();
+const READER_ID = faker.string.uuid();
+const READER_NAME = faker.person.fullName();
+const BOOKMARKED_POST_ID = faker.string.uuid();
+
+export const mockPersonalDataReaderAccount = (
+  overrides: Partial<TPersonalDataReaderAccount> = {},
+): TPersonalDataReaderAccount => ({
+  id: READER_ID,
+  name: READER_NAME,
+  email: MOCK_DATA_REQUEST_EMAIL,
+  emailVerified: RECORDED_AT,
+  image: undefined,
+  linkedProviders: { github: true, google: false, emailLink: true },
+  activeSessionCount: 1,
+  bookmarks: [
+    {
+      tenantId: TENANT_ID,
+      tenantName: MOCK_DATA_REQUEST_SITE_NAME,
+      postId: BOOKMARKED_POST_ID,
+      createdAt: RECORDED_AT,
+    },
+  ],
+  ...overrides,
+});
 
 export const mockPersonalDataMatches = (
   overrides: Partial<TPersonalDataMatches> = {},
@@ -64,6 +89,7 @@ export const mockPersonalDataMatches = (
       consumedAt: undefined,
     },
   ],
+  readerAccount: mockPersonalDataReaderAccount(),
   blockedSignupIdentities: [
     {
       id: BLOCK_ID,
@@ -88,6 +114,7 @@ export const mockPersonalDataExport = (): TPersonalDataExport => {
     subscribers,
     leads,
     membershipInvites,
+    readerAccount,
     blockedSignupIdentities,
     auditEvents,
   } = mockPersonalDataMatches();
@@ -96,6 +123,7 @@ export const mockPersonalDataExport = (): TPersonalDataExport => {
     subscribers,
     leads,
     membershipInvites,
+    readerAccount,
     blockedSignupIdentities,
     auditEvents,
   };
@@ -105,11 +133,16 @@ export const MOCK_ONE_OF_EACH_COUNT = {
   subscribers: 1,
   leads: 1,
   membershipInvites: 1,
-  blockedSignupIdentities: 1,
+  readerAccounts: 1,
 };
 
 export const MOCK_ONE_OF_EACH_MATCH_COUNT = {
-  ...MOCK_ONE_OF_EACH_COUNT,
+  subscribers: 1,
+  leads: 1,
+  membershipInvites: 1,
+  readerAccount: 1,
+  bookmarks: 1,
+  blockedSignupIdentities: 1,
   auditEvents: 1,
 };
 

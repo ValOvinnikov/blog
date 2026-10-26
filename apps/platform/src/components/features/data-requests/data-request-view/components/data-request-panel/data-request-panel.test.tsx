@@ -10,6 +10,7 @@ import {
   MOCK_DATA_REQUEST_SITE_NAME,
   mockDataRequestMatch,
   mockPersonalDataExport,
+  mockPersonalDataReaderAccount,
 } from '@platform/testing/data-requests/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -49,6 +50,10 @@ const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
 const EXPORT_BUTTON = { name: 'Download export' };
 const RESULTS_TABLE = { name: 'Stored records' };
+const READER_ACCOUNT_CHECKBOX = { name: 'Also delete the reader account' };
+const SIGNUP_BLOCK_KEPT =
+  'The sign-up block stays: it holds only a hash of the address and keeps it blocked.';
+const ERASED = { outcome: ACTION_OUTCOME.SUCCESS, erasedCount: 2 };
 const BLOCK_MATCH = mockDataRequestMatch({
   key: 'SIGNUP_BLOCK-block-1',
   kind: DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
@@ -85,6 +90,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     lookUpPersonalDataActionMock.mockReset().mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
       matches: [mockDataRequestMatch(), BLOCK_MATCH],
+      readerAccount: mockPersonalDataReaderAccount(),
     });
     exportPersonalDataActionMock.mockReset();
     erasePersonalDataActionMock.mockReset();
@@ -131,6 +137,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     lookUpPersonalDataActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
       matches: [],
+      readerAccount: undefined,
     });
 
     await lookUp();
@@ -165,10 +172,74 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     );
   });
 
+  it("shows the reader account's sign-in methods, sessions and bookmarks", async () => {
+    await lookUp();
+
+    const providers = await screen.findByText('GitHub and Email link');
+    const sessions = screen.getByText('1 session');
+    const bookmarks = screen.getByText('1 bookmark');
+
+    expect(providers).toBeVisible();
+    expect(sessions).toBeVisible();
+    expect(bookmarks).toBeVisible();
+  });
+
+  it('erases the reader account too unless the operator unticks it', async () => {
+    erasePersonalDataActionMock.mockResolvedValue({
+      ...ERASED,
+      isReaderAccountRefused: false,
+    });
+    await lookUp();
+
+    const { dialog, confirmField, confirmButton } = await openEraseDialog();
+    const checkbox = within(dialog).getByRole(
+      'checkbox',
+      READER_ACCOUNT_CHECKBOX,
+    );
+
+    expect(checkbox).toBeChecked();
+
+    await user.click(checkbox);
+    await user.type(confirmField, MOCK_DATA_REQUEST_EMAIL);
+    await user.click(confirmButton);
+
+    expect(erasePersonalDataActionMock).toHaveBeenCalledWith({
+      email: MOCK_DATA_REQUEST_EMAIL,
+      includesReaderAccount: false,
+    });
+  });
+
+  it('says the sign-up block stays after an erase', async () => {
+    await lookUp();
+
+    const { dialog } = await openEraseDialog();
+    const note = within(dialog).getByText(SIGNUP_BLOCK_KEPT);
+
+    expect(note).toBeVisible();
+  });
+
+  it('explains why a reader account was kept', async () => {
+    erasePersonalDataActionMock.mockResolvedValue({
+      ...ERASED,
+      isReaderAccountRefused: true,
+    });
+    await lookUp();
+
+    const { confirmField, confirmButton } = await openEraseDialog();
+    await user.type(confirmField, MOCK_DATA_REQUEST_EMAIL);
+    await user.click(confirmButton);
+
+    const toast = await screen.findByText(
+      '2 records erased. The reader account was kept: it owns a site or is an operator.',
+    );
+
+    expect(toast).toBeVisible();
+  });
+
   it('erases only after the email is typed to confirm, then clears the results', async () => {
     erasePersonalDataActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-      erasedCount: 2,
+      ...ERASED,
+      isReaderAccountRefused: false,
     });
     await lookUp();
 
@@ -184,6 +255,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
     expect(erasePersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
+      includesReaderAccount: true,
     });
     expect(toast).toBeVisible();
     expect(table).not.toBeInTheDocument();

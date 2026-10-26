@@ -1,7 +1,8 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
   type TMaybeUndefined,
   type TReasonedFailure,
 } from '@blog/config';
@@ -12,23 +13,28 @@ import type { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
 import { erasePersonalDataAction } from '@platform/server/data-requests/erase-personal-data-action';
 import { exportPersonalDataAction } from '@platform/server/data-requests/export-personal-data-action';
-import { lookUpPersonalDataAction } from '@platform/server/data-requests/look-up-personal-data-action';
-import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
+import {
+  lookUpPersonalDataAction,
+  type TLookUpPersonalDataResult,
+} from '@platform/server/data-requests/look-up-personal-data-action';
 import { downloadJson } from '@platform/utils/download-json/download-json';
 import { useRef, useState, useTransition } from 'react';
 
 type TEmailError = TReasonedFailure<typeof TENANT_FIELD_ERROR.EMAIL_INVALID>;
 
-type TDataRequestLookup = {
-  email: string;
-  matches: TDataRequestMatch[];
-};
+type TDataRequestLookup = Pick<
+  Extract<TLookUpPersonalDataResult, { matches: unknown }>,
+  'matches' | 'readerAccount'
+> & { email: string };
+
+type TErasure = { count: number; isReaderAccountRefused: boolean };
 
 export type TUseDataRequestMessages = {
   lookUpFailed: string;
   exportFailed: string;
   eraseFailed: string;
   erased: (count: number) => string;
+  erasedAccountKept: (count: number) => string;
 };
 
 export const useDataRequest = ({
@@ -36,6 +42,7 @@ export const useDataRequest = ({
   exportFailed,
   eraseFailed,
   erased,
+  erasedAccountKept,
 }: TUseDataRequestMessages) => {
   const toast = useToast();
   const [email, setEmail] = useState('');
@@ -45,20 +52,24 @@ export const useDataRequest = ({
     useState<TMaybeUndefined<TDataRequestLookup>>(undefined);
   const [isLookingUp, startLookUp] = useTransition();
   const [isExporting, startExport] = useTransition();
-  const erasedCount = useRef(0);
+  const erasure = useRef<TErasure>({
+    count: 0,
+    isReaderAccountRefused: false,
+  });
 
   const lookUp = () => {
     startLookUp(async () => {
       const result = await lookUpPersonalDataAction({ email });
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
+        const { matches, readerAccount } = result;
         setEmailError(undefined);
-        setLookup({ email: email.trim(), matches: result.matches });
+        setLookup({ email: email.trim(), matches, readerAccount });
         return;
       }
 
       setLookup(undefined);
-      if (result.outcome === ACTION_OUTCOME.INVALID) {
+      if (isOutcomeInvalid(result)) {
         setEmailError(result.fieldErrors.email);
         return;
       }
@@ -71,7 +82,7 @@ export const useDataRequest = ({
     startExport(async () => {
       const result = await exportPersonalDataAction({ email: lookedUpEmail });
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
         downloadJson(link, DATA_REQUEST_EXPORT_FILE_NAME, {
           email: lookedUpEmail,
           ...result.data,
@@ -85,18 +96,28 @@ export const useDataRequest = ({
 
   const erase = async (
     lookedUpEmail: string,
+    includesReaderAccount: boolean,
   ): Promise<TConfirmDialogActionResult> => {
-    const result = await erasePersonalDataAction({ email: lookedUpEmail });
-    if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
-      return errorResult(eraseFailed);
-    }
+    const result = await erasePersonalDataAction({
+      email: lookedUpEmail,
+      includesReaderAccount,
+    });
+    if (!isOutcomeSuccess(result)) return errorResult(eraseFailed);
 
-    erasedCount.current = result.erasedCount;
+    erasure.current = {
+      count: result.erasedCount,
+      isReaderAccountRefused: result.isReaderAccountRefused,
+    };
     return okResult();
   };
 
   const finishErase = () => {
-    toast.success({ message: erased(erasedCount.current) });
+    const { count, isReaderAccountRefused } = erasure.current;
+    toast.success({
+      message: isReaderAccountRefused
+        ? erasedAccountKept(count)
+        : erased(count),
+    });
     setLookup(undefined);
   };
 

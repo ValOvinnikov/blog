@@ -50,9 +50,13 @@ export const DataRequestMatchesTable = ({
             {email ?? <span className={secondary()}>{t('emailHashed')}</span>}
           </DataTableShell.Cell>
           <DataTableShell.Cell>
-            <time dateTime={recordedAt.toISOString()}>
-              {formatDate(recordedAt, locale)}
-            </time>
+            {recordedAt ? (
+              <time dateTime={recordedAt.toISOString()}>
+                {formatDate(recordedAt, locale)}
+              </time>
+            ) : (
+              <span className={secondary()}>{t('notRecorded')}</span>
+            )}
           </DataTableShell.Cell>
         </DataTableShell.Row>
       )}

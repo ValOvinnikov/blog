@@ -1444,18 +1444,42 @@
     "lookUpFailed": "No se pudo buscar esta dirección. Inténtalo de nuevo.",
     "exportFailed": "No se pudo preparar la exportación. Inténtalo de nuevo.",
     "eraseFailed": "No se pudieron borrar los datos. Inténtalo de nuevo.",
-    "erased": "{count, plural, one {# registro borrado.} other {# registros borrados.}}"
+    "erased": "{count, plural, one {# registro borrado.} other {# registros borrados.}}",
+    "erasedAccountKept": "{count, plural, one {# registro borrado.} other {# registros borrados.}} Se ha conservado la cuenta de lector: es propietaria de un sitio o es operadora."
   },
   "dataRequestResultCard": {
     "title": "Datos guardados de {email}",
     "matchCount": "{count, plural, =0 {No se encontró ningún registro.} one {# registro encontrado.} other {# registros encontrados.}}",
     "export": "Descargar exportación",
-    "exporting": "Preparando…",
+    "exporting": "Preparando…"
+  },
+  "dataRequestEraseDialog": {
     "erase": "Borrar",
-    "eraseDialogTitle": "¿Borrar los datos de esta persona?",
-    "eraseDialogDescription": "Elimina sus suscripciones, mensajes de contacto, invitaciones y bloqueo de registro en todos los sitios. No se puede deshacer.",
-    "eraseConfirm": "Borrar datos",
-    "erasing": "Borrando…"
+    "title": "¿Borrar los datos de esta persona?",
+    "description": "Borra sus suscripciones, mensajes de contacto e invitaciones en todos los sitios. No se puede deshacer.",
+    "confirm": "Borrar datos",
+    "erasing": "Borrando…",
+    "includesReaderAccount": "Borrar también la cuenta de lector",
+    "readerAccountHint": "Borra su perfil, sus inicios de sesión y sus marcadores, y cierra su sesión en todas partes. Se conserva una cuenta que es propietaria de un sitio o es operadora.",
+    "signupBlockKept": "El bloqueo de registro se mantiene: solo guarda un hash de la dirección y la mantiene bloqueada."
+  },
+  "dataRequestAccountCard": {
+    "title": "Cuenta de lector",
+    "supportingText": "La cuenta con la que inicia sesión esta dirección.",
+    "name": "Nombre",
+    "noName": "Sin definir",
+    "email": "Correo",
+    "providers": "Métodos de inicio de sesión",
+    "noProviders": "Ninguno",
+    "activeSessions": "Sesiones activas",
+    "sessionCount": "{count, plural, =0 {Ninguna} one {# sesión} other {# sesiones}}",
+    "bookmarks": "Marcadores",
+    "bookmarkCount": "{count, plural, =0 {Ninguno} one {# marcador} other {# marcadores}}",
+    "provider": {
+      "github": "GitHub",
+      "google": "Google",
+      "emailLink": "Enlace por correo"
+    }
   },
   "dataRequestMatchesTable": {
     "columnKind": "Tipo",
@@ -1465,13 +1489,16 @@
     "platformWide": "Plataforma",
     "emailHashed": "Guardado como hash",
     "empty": "No hay nada guardado para esta dirección.",
-    "regionLabel": "Registros guardados"
+    "regionLabel": "Registros guardados",
+    "notRecorded": "Sin registrar"
   },
   "dataRequestMatchKind": {
     "SUBSCRIBER": "Suscriptor",
     "LEAD": "Mensaje de contacto",
     "INVITE": "Invitación",
     "SIGNUP_BLOCK": "Bloqueo de registro",
-    "AUDIT_EVENT": "Evento de auditoría"
+    "AUDIT_EVENT": "Evento de auditoría",
+    "READER_ACCOUNT": "Cuenta de lector",
+    "BOOKMARK": "Marcador"
   }
 }

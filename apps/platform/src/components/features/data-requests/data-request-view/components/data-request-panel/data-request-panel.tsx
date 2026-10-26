@@ -1,8 +1,10 @@
 'use client';
 
+import { DataRequestAccountCard } from '@platform/components/features/data-requests/data-request-view/components/data-request-account-card/data-request-account-card';
 import { DataRequestMatchesTable } from '@platform/components/features/data-requests/data-request-view/components/data-request-matches-table/data-request-matches-table';
 import { DataRequestResultCard } from '@platform/components/features/data-requests/data-request-view/components/data-request-result-card/data-request-result-card';
 import { DataRequestSearchCard } from '@platform/components/features/data-requests/data-request-view/components/data-request-search-card/data-request-search-card';
+import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 
@@ -27,6 +29,7 @@ export const DataRequestPanel = () => {
     exportFailed: t('exportFailed'),
     eraseFailed: t('eraseFailed'),
     erased: (count) => t('erased', { count }),
+    erasedAccountKept: (count) => t('erasedAccountKept', { count }),
   });
 
   return (
@@ -43,11 +46,20 @@ export const DataRequestPanel = () => {
           <DataRequestResultCard
             email={lookup.email}
             matchCount={lookup.matches.length}
+            hasReaderAccount={Boolean(lookup.readerAccount)}
+            hasSignupBlock={lookup.matches.some(
+              ({ kind }) => kind === DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
+            )}
             isExporting={isExporting}
             onExport={(link) => exportData(lookup.email, link)}
-            onErase={() => erase(lookup.email)}
+            onErase={(includesReaderAccount) =>
+              erase(lookup.email, includesReaderAccount)
+            }
             onErased={finishErase}
           />
+          {lookup.readerAccount && (
+            <DataRequestAccountCard readerAccount={lookup.readerAccount} />
+          )}
           <DataRequestMatchesTable matches={lookup.matches} />
         </>
       )}

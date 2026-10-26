@@ -29,15 +29,24 @@ page (#5090). The page serves either answer.
   requests" for a SUPERADMIN only. Its layout and page both call
   `requireSuperAdmin`, so every other role, and every site owner, gets a 404.
 - The page has a search card (one email field), and after a search a result
-  card ("Data held for {email}", with the count) and a table of every match:
-  kind, site ("Platform" for a platform-wide record), the stored email
-  ("Stored as a hash" for a sign-up block) and when it was recorded.
-- "Download export" saves `personal-data-export.json`. "Erase" opens a
-  confirmation dialog that needs the email typed in full. On success it shows
-  how many records were erased and clears the results.
-- Server Actions: `lookUpPersonalDataAction`, `exportPersonalDataAction` and
-  `erasePersonalDataAction`, each taking `{ email }`. The email travels in the
-  POST body, never in a URL.
+  card ("Data held for {email}", with the count), a "Reader account" card when
+  the address has one (name, email, sign-in methods, active sessions,
+  bookmarks) and a table of every match: kind, site ("Platform" for a
+  platform-wide record), the stored email ("Stored as a hash" for a sign-up
+  block) and when it was recorded ("Not recorded" for an account whose email
+  was never verified).
+- "Download export" saves `personal-data-export.json`, the reader account
+  included. "Erase" opens a confirmation dialog that needs the email typed in
+  full. When the address has a reader account the dialog has "Also delete the
+  reader account", ticked by default; unticked, the account, its sessions and
+  bookmarks are left alone (a narrower request, such as newsletter only). When
+  the address has a sign-up block the dialog says it stays. On success it shows
+  how many records were erased, and why the reader account was kept if it was
+  refused, and clears the results.
+- Server Actions: `lookUpPersonalDataAction` and `exportPersonalDataAction`
+  take `{ email }`; `erasePersonalDataAction` takes
+  `{ email, includesReaderAccount }`. The email travels in the POST body, never
+  in a URL.
 
 ## Data
 
@@ -49,13 +58,19 @@ page (#5090). The page serves either answer.
     lead name and message decrypted (falling back to the plain column while a
     row has no encrypted form);
   - `blocked_signup_identities` ADDRESS entries whose `value` is that index;
-  - `audit_events` acted by the account whose address is exactly the one
-    given (`users.emailIndex`, which keeps a `+tag`), with no email of their
+  - the reader account whose address is exactly the one given
+    (`findUserByEmail`, which keeps a `+tag` and falls back to the plain
+    column for a user with no index): its profile, its linked sign-in methods
+    (`getLinkedProviders`, no tokens), its bookmarks on every site and its
+    count of unexpired sessions;
+  - `audit_events` whose `actor_id` is that account, with no email of their
     own.
-- `queries.personalData.erasePersonalData(email)` deletes the matched
-  subscribers, leads, invites and sign-up block, and returns how many of each
-  it deleted. Audit events hold no email and keep their history; the account
-  they point at goes through account deletion.
+- `queries.personalData.erasePersonalData(email, { includesReaderAccount })`
+  deletes the matched subscribers, leads and invites and, when asked, the
+  reader account through `deleteAccount`: its sessions (so it is signed out
+  everywhere), linked sign-ins and bookmarks cascade. It returns how many of
+  each it deleted and whether the account was refused. Audit events hold no
+  email and keep their history, shown as a deleted account.
 - Both return `TResult`, with `DB_INVALID_EMAIL` for a value that is not an
   email address. Both return the index, so the app can audit without the email.
 
@@ -76,13 +91,18 @@ Nothing is configurable. Both personal-data keys must be set: without
 - Erasure runs one statement per table, without a transaction (`neon-http`).
   Each statement is idempotent, so retrying after a partial failure finishes
   the rest.
-- Erasing a sign-up block lifts it: the address can sign up again.
-- The search covers only these five tables. A `users` row, its sessions and
-  bookmarks go through account deletion ([Reader account](reader-account.md)).
+- Erasure keeps a sign-up block: it holds only the address's keyed hash and
+  keeps the address out of sign-up. A repeat lookup still lists it.
+- Erasure never deletes an account that owns a site or is an operator
+  (`DB_HOLDS_PLATFORM_ROLE` from `deleteAccount`); the site records are still
+  erased and the operator is told why the account was kept.
+- Account deletion is the same as the reader's own "Delete account"
+  ([Reader account](reader-account.md)).
 
 ## Dependencies
 
-- `@blog/db` (`findPersonalData`, `erasePersonalData`), `@blog/utils`
+- `@blog/db` (`findPersonalData`, `erasePersonalData`, `findUserByEmail`,
+  `getLinkedProviders`, `deleteAccount`), `@blog/utils`
   (`normalizeEmailIdentity`, `personalDataIndex`, `decryptPersonalData`),
   `@blog/config` (`AUDIT_ACTION`, `AUDIT_TARGET_TYPE`).
 - Features: [tenant-access](./tenant-access.md),

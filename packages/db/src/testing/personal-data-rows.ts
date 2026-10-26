@@ -1,4 +1,5 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { BLOCKED_IDENTITY_KIND, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { MOCK_BLOCK_REASON } from '@blog/db/testing/blocked-signup-identities/fixtures';
@@ -12,6 +13,7 @@ import {
   emailColumns,
 } from '@blog/db/utils/personal-data/personal-data';
 import { personalDataIndex } from '@blog/utils/encryption';
+import { eq } from 'drizzle-orm';
 
 export const MOCK_PERSONAL_DATA_LEAD_NAME = 'Grace Hopper';
 export const MOCK_PERSONAL_DATA_LEAD_MESSAGE = 'Please call me back.';
@@ -60,6 +62,26 @@ export async function insertTestPersonalDataRows(
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
   });
+}
+
+export async function findTestReaderId(
+  db: TTestDb,
+  email: string,
+): Promise<TMaybeUndefined<string>> {
+  const [reader] = await db
+    .select({ id: schema.users.id })
+    .from(schema.users)
+    .where(eq(schema.users.email, email));
+  return reader?.id;
+}
+
+export async function getTestReaderId(
+  db: TTestDb,
+  email: string,
+): Promise<string> {
+  const id = await findTestReaderId(db, email);
+  if (!id) throw new Error('Seed the reader first.');
+  return id;
 }
 
 export async function deleteTestPersonalDataRows(db: TTestDb): Promise<void> {

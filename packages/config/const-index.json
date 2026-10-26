@@ -1404,6 +1404,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.BOOKMARK",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
     "SPINNER": [
@@ -3693,6 +3699,14 @@
     "AUDIT_EVENT": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.AUDIT_EVENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "READER_ACCOUNT": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.READER_ACCOUNT",
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"

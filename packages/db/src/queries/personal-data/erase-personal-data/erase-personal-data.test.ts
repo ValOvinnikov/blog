@@ -1,4 +1,6 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { isSignupBlocked } from '@blog/db/queries/blocked-signup-identities/is-signup-blocked';
 import * as schema from '@blog/db/schema';
 import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import {
@@ -12,6 +14,8 @@ import {
 } from '@blog/db/testing/personal-data';
 import {
   deleteTestPersonalDataRows,
+  findTestReaderId,
+  getTestReaderId,
   insertTestPersonalDataRows,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -23,17 +27,15 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
-const ONE_OF_EACH = {
-  subscribers: 1,
-  leads: 1,
-  membershipInvites: 1,
-  blockedSignupIdentities: 1,
-};
+const WITH_READER_ACCOUNT = { includesReaderAccount: true };
+const WITHOUT_READER_ACCOUNT = { includesReaderAccount: false };
+const SITE_RECORDS = { subscribers: 1, leads: 1, membershipInvites: 1 };
+const ONE_OF_EACH = { ...SITE_RECORDS, readerAccounts: 1 };
 const NONE = {
   subscribers: 0,
   leads: 0,
   membershipInvites: 0,
-  blockedSignupIdentities: 0,
+  readerAccounts: 0,
 };
 
 afterEach(async () => {
@@ -41,38 +43,116 @@ afterEach(async () => {
 });
 
 describe(erasePersonalData, () => {
+  let tenantId: string;
+
   beforeEach(async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+    ({ id: tenantId } = await insertTestTenant(db()));
     await insertTestPersonalDataRows(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
     await insertTestPersonalDataRows(db(), tenantId, MOCK_INVITE_EMAIL);
   });
 
-  it("erases the mailbox's rows and reports how many of each", async () => {
-    const result = await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
+  it("erases the mailbox's rows and reader account and reports how many of each", async () => {
+    const result = await erasePersonalData(
+      MOCK_SUBSCRIBER_EMAIL,
+      WITH_READER_ACCOUNT,
+    );
 
     expect(result).toEqual({
       ok: true,
       data: {
         emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
         erased: ONE_OF_EACH,
+        isReaderAccountRefused: false,
       },
     });
+    await expect(
+      findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL),
+    ).resolves.toBeUndefined();
+  });
+
+  it('revokes every session of the erased reader account', async () => {
+    const readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+    await db()
+      .insert(schema.sessions)
+      .values({ sessionToken: 'token', userId: readerId, expires: new Date() });
+
+    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
+
+    const sessions = await db().select().from(schema.sessions);
+    expect(sessions).toEqual([]);
+  });
+
+  it('leaves the reader account alone when it is out of scope', async () => {
+    const result = await erasePersonalData(
+      MOCK_SUBSCRIBER_EMAIL,
+      WITHOUT_READER_ACCOUNT,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+        erased: { ...SITE_RECORDS, readerAccounts: 0 },
+        isReaderAccountRefused: false,
+      },
+    });
+    await expect(
+      findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL),
+    ).resolves.toBeDefined();
+  });
+
+  it("refuses to delete a site owner's account but still erases the site records", async () => {
+    const readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+    await db().insert(schema.memberships).values({
+      tenantId,
+      userId: readerId,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+
+    const result = await erasePersonalData(
+      MOCK_SUBSCRIBER_EMAIL,
+      WITH_READER_ACCOUNT,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+        erased: { ...SITE_RECORDS, readerAccounts: 0 },
+        isReaderAccountRefused: true,
+      },
+    });
+    await expect(
+      findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL),
+    ).resolves.toBeDefined();
+    await db().delete(schema.memberships);
   });
 
   describe('once the mailbox has been erased', () => {
     beforeEach(async () => {
-      await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
+      await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
     });
 
     it("keeps everyone else's rows", async () => {
-      const result = await erasePersonalData(MOCK_INVITE_EMAIL);
+      const result = await erasePersonalData(
+        MOCK_INVITE_EMAIL,
+        WITH_READER_ACCOUNT,
+      );
 
       expect(result).toEqual({
         ok: true,
         data: {
           emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
           erased: ONE_OF_EACH,
+          isReaderAccountRefused: false,
         },
+      });
+    });
+
+    it('keeps the address on the sign-up blocklist', async () => {
+      await expect(isSignupBlocked(MOCK_SUBSCRIBER_EMAIL)).resolves.toEqual({
+        ok: true,
+        data: true,
       });
     });
 
@@ -85,20 +165,26 @@ describe(erasePersonalData, () => {
     });
 
     it('finds nothing left to erase on a second run', async () => {
-      const result = await erasePersonalData(MOCK_SUBSCRIBER_EMAIL);
+      const result = await erasePersonalData(
+        MOCK_SUBSCRIBER_EMAIL,
+        WITH_READER_ACCOUNT,
+      );
 
       expect(result).toEqual({
         ok: true,
         data: {
           emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
           erased: NONE,
+          isReaderAccountRefused: false,
         },
       });
     });
   });
 
   it('refuses a value that is not an email address', async () => {
-    await expect(erasePersonalData(MOCK_NOT_AN_ADDRESS)).resolves.toEqual({
+    await expect(
+      erasePersonalData(MOCK_NOT_AN_ADDRESS, WITH_READER_ACCOUNT),
+    ).resolves.toEqual({
       ok: false,
       error: ERROR_CODE.DB_INVALID_EMAIL,
     });

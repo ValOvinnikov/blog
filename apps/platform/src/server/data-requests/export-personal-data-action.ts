@@ -33,6 +33,7 @@ export const exportPersonalDataAction = async (
     subscribers,
     leads,
     membershipInvites,
+    readerAccount,
     blockedSignupIdentities,
     auditEvents,
   } = result.data;
@@ -43,6 +44,7 @@ export const exportPersonalDataAction = async (
       subscribers,
       leads,
       membershipInvites,
+      readerAccount,
       blockedSignupIdentities,
       auditEvents,
     },

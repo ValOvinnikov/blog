@@ -38,6 +38,11 @@ vi.mock('@blog/db', async () => ({
   queries: { personalData: { erasePersonalData: erasePersonalDataMock } },
 }));
 
+const ERASE_EVERYTHING = {
+  email: MOCK_DATA_REQUEST_EMAIL,
+  includesReaderAccount: true,
+};
+
 describe(erasePersonalDataAction, () => {
   beforeEach(() => {
     requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
@@ -45,6 +50,7 @@ describe(erasePersonalDataAction, () => {
       okResult({
         emailIndex: MOCK_DATA_REQUEST_EMAIL_INDEX,
         erased: MOCK_ONE_OF_EACH_COUNT,
+        isReaderAccountRefused: false,
       }),
     );
     recordAuditEventMock.mockReset();
@@ -55,26 +61,54 @@ describe(erasePersonalDataAction, () => {
       notFound();
     });
 
-    await expect(
-      erasePersonalDataAction({ email: MOCK_DATA_REQUEST_EMAIL }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(erasePersonalDataAction(ERASE_EVERYTHING)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
     expect(erasePersonalDataMock).not.toHaveBeenCalled();
   });
 
   it('erases the email and reports how many records went', async () => {
-    const result = await erasePersonalDataAction({
-      email: MOCK_DATA_REQUEST_EMAIL,
-    });
+    const result = await erasePersonalDataAction(ERASE_EVERYTHING);
 
-    expect(erasePersonalDataMock).toHaveBeenCalledWith(MOCK_DATA_REQUEST_EMAIL);
+    expect(erasePersonalDataMock).toHaveBeenCalledWith(
+      MOCK_DATA_REQUEST_EMAIL,
+      { includesReaderAccount: true },
+    );
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       erasedCount: Object.keys(MOCK_ONE_OF_EACH_COUNT).length,
+      isReaderAccountRefused: false,
     });
   });
 
+  it('leaves the reader account out when the operator unticks it', async () => {
+    await erasePersonalDataAction({
+      ...ERASE_EVERYTHING,
+      includesReaderAccount: false,
+    });
+
+    expect(erasePersonalDataMock).toHaveBeenCalledWith(
+      MOCK_DATA_REQUEST_EMAIL,
+      { includesReaderAccount: false },
+    );
+  });
+
+  it('reports a reader account the data layer refused to delete', async () => {
+    erasePersonalDataMock.mockResolvedValue(
+      okResult({
+        emailIndex: MOCK_DATA_REQUEST_EMAIL_INDEX,
+        erased: { ...MOCK_ONE_OF_EACH_COUNT, readerAccounts: 0 },
+        isReaderAccountRefused: true,
+      }),
+    );
+
+    const result = await erasePersonalDataAction(ERASE_EVERYTHING);
+
+    expect(result).toMatchObject({ isReaderAccountRefused: true });
+  });
+
   it('audits the erasure with how many of each record went', async () => {
-    await erasePersonalDataAction({ email: MOCK_DATA_REQUEST_EMAIL });
+    await erasePersonalDataAction(ERASE_EVERYTHING);
 
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
       action: AUDIT_ACTION.PERSONAL_DATA_ERASED,
@@ -89,9 +123,7 @@ describe(erasePersonalDataAction, () => {
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await erasePersonalDataAction({
-      email: MOCK_DATA_REQUEST_EMAIL,
-    });
+    const result = await erasePersonalDataAction(ERASE_EVERYTHING);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(recordAuditEventMock).not.toHaveBeenCalled();
