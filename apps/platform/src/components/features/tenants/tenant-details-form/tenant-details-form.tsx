@@ -1,11 +1,12 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
+import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
+import { FormSiteAddressInput } from '@platform/components/shared/form-site-address-input';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
@@ -19,19 +20,23 @@ import { useCreateTenantSubmit } from './use-create-tenant-submit';
 
 type TFormValues = {
   name: string;
-  domain: string;
+  slug: string;
   plan: TTenantPlan;
   ownerEmail: string;
 };
 
 const INITIAL_VALUES: TFormValues = {
   name: '',
-  domain: '',
+  slug: '',
   plan: TENANT_PLAN.FREE,
   ownerEmail: '',
 };
 
-export const TenantDetailsForm = () => {
+export type TTenantDetailsFormProps = {
+  rootDomain: TMaybeUndefined<string>;
+};
+
+export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
   const t = useTranslations('tenantDetailsForm');
   const fieldErrorText = useTenantFieldErrorText();
   const [values, setValues] = useState<TFormValues>(INITIAL_VALUES);
@@ -104,12 +109,13 @@ export const TenantDetailsForm = () => {
                   onChange={(value) => updateField('name', value)}
                 />
 
-                <FormTextInput
-                  label={t('domainLabel')}
-                  hint={t('domainHint')}
-                  error={fieldErrorText(fieldErrors.domain)}
-                  value={values.domain}
-                  onChange={(value) => updateField('domain', value)}
+                <FormSiteAddressInput
+                  label={t('siteAddressLabel')}
+                  hint={t('siteAddressHint')}
+                  error={fieldErrorText(fieldErrors.slug)}
+                  value={values.slug}
+                  onChange={(value) => updateField('slug', value)}
+                  rootDomain={rootDomain}
                 />
 
                 <FormField

@@ -5,7 +5,6 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
-import { env } from '@platform/utils/env/env';
 
 export type TTenantSlugError =
   | typeof TENANT_FIELD_ERROR.SLUG_INVALID
@@ -26,19 +25,4 @@ export const checkTenantSlug = async (
     `${slug}.${rootDomain}`,
   );
   return tenant ? TENANT_FIELD_ERROR.SLUG_TAKEN : undefined;
-};
-
-export const checkTenantDomainSlug = async (
-  domain: string,
-): Promise<TMaybeUndefined<TTenantSlugError>> => {
-  const rootDomain = env.TENANT_ROOT_DOMAIN;
-  if (!rootDomain) return undefined;
-
-  const suffix = `.${rootDomain}`;
-  if (!domain.endsWith(suffix)) return undefined;
-
-  const slug = domain.slice(0, -suffix.length);
-  if (slug.includes('.')) return undefined;
-
-  return checkTenantSlug(slug, rootDomain);
 };

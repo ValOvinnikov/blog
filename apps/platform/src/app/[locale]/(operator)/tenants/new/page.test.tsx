@@ -4,6 +4,8 @@ import NewTenantPage from './page';
 
 const render = renderWithIntl;
 
+vi.mock('@platform/utils/env/env');
+
 vi.mock('@platform/server/tenants/create-tenant-action', () => ({
   createTenantAction: vi.fn(),
 }));

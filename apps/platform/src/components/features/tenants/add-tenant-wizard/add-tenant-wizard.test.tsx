@@ -1,5 +1,6 @@
 import { CORE_PROVISIONING_STEPS } from '@blog/db/constants';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 
 import { AddTenantWizard } from './add-tenant-wizard';
 
@@ -11,7 +12,7 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
 
 describe(AddTenantWizard, () => {
   beforeEach(() => {
-    render(<AddTenantWizard />);
+    render(<AddTenantWizard rootDomain={MOCK_TENANT_ROOT_DOMAIN} />);
   });
 
   it('renders the page H1 and demotes Tenant details to the step-1 card heading', () => {

@@ -76,7 +76,6 @@
     "nameHint": "Wird im Kopfbereich deiner Website und in Browser-Tabs angezeigt.",
     "siteAddressLabel": "Adresse der Website",
     "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
-    "siteAddressSuffix": ".{rootDomain}",
     "siteAddressChecking": "Adresse wird geprüft…",
     "siteAddressAvailable": "{address} ist verfügbar.",
     "languageLabel": "Sprache",
@@ -819,8 +818,8 @@
     "heading": "Mandantendetails",
     "description": "Der schnelle Teil. Alles danach läuft automatisch, und jeder Schritt lässt sich nach einem Fehler fortsetzen.",
     "nameLabel": "Mandantenname",
-    "domainLabel": "Domain",
-    "domainHint": "Die öffentliche Domain, unter der die Website dieses Mandanten erreichbar ist.",
+    "siteAddressLabel": "Adresse der Website",
+    "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
     "planLabel": "Tarif",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
@@ -834,6 +833,9 @@
     "errors": {
       "createFailed": "Der Mandant konnte nicht erstellt werden — bitte erneut versuchen."
     }
+  },
+  "formSiteAddressInput": {
+    "suffix": ".{rootDomain}"
   },
   "provisioningStatusView": {
     "pageTitle": "Bereitstellung",

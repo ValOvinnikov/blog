@@ -4828,6 +4828,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "tenants.root_domain_missing": [
+      {
+        "ref": "TENANT_LOG.ROOT_DOMAIN_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "tenant.sign_in_activity_failed": [
       {
         "ref": "TENANT_LOG.SIGN_IN_ACTIVITY_FAILED",

@@ -76,7 +76,6 @@
     "nameHint": "Affiché dans l’en-tête de votre site et dans les onglets du navigateur.",
     "siteAddressLabel": "Adresse du site",
     "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
-    "siteAddressSuffix": ".{rootDomain}",
     "siteAddressChecking": "Vérification de l’adresse…",
     "siteAddressAvailable": "{address} est disponible.",
     "languageLabel": "Langue",
@@ -819,8 +818,8 @@
     "heading": "Détails du locataire",
     "description": "La partie rapide. Tout le reste s'exécute automatiquement, et chaque étape peut être reprise en cas d'échec.",
     "nameLabel": "Nom du locataire",
-    "domainLabel": "Domaine",
-    "domainHint": "Le domaine public auquel répondra le site de ce locataire.",
+    "siteAddressLabel": "Adresse du site",
+    "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
     "planLabel": "Formule",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
@@ -834,6 +833,9 @@
     "errors": {
       "createFailed": "Impossible de créer le locataire — veuillez réessayer."
     }
+  },
+  "formSiteAddressInput": {
+    "suffix": ".{rootDomain}"
   },
   "provisioningStatusView": {
     "pageTitle": "Provisionnement",
