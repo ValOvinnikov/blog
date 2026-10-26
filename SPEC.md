@@ -2816,7 +2816,8 @@ from its server-only `instrumentation.ts`, never from `logger.ts`, which client
 components import, and only when its three optional server env vars are set
 (`LOKI_PUSH_URL`, `LOKI_USER`, `LOKI_TOKEN`), each push handed to Vercel's
 `waitUntil` so it outlives the response without delaying it; unset, logging
-stays console-only. `instrumentation.ts`'s `onRequestError`
+stays console-only. `apps/web`, `apps/platform` and `apps/worker` all register
+it. In web and platform, `instrumentation.ts`'s `onRequestError`
 logs unhandled request errors through the same logger, so a render or route
 crash reaches Loki too.
 

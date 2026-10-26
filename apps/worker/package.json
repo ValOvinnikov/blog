@@ -24,6 +24,7 @@
     "@blog/utils": "workspace:*",
     "@sanity/client": "^8.9.0",
     "@t3-oss/env-nextjs": "^0.13.11",
+    "@vercel/functions": "^3.10.1",
     "next": "^16.4.1",
     "react": "catalog:",
     "react-dom": "catalog:",
