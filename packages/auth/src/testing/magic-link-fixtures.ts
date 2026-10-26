@@ -11,6 +11,7 @@ export const MOCK_VERIFIED_DOMAIN_FROM_ADDRESS =
   'Sign in <sign-in@mail.valstack.dev>';
 export const MOCK_SENDER_NAME = 'Acme Support';
 export const MOCK_SENDER_FROM_ADDRESS = 'Acme Support <onboarding@resend.dev>';
+export const MOCK_TENANT_FROM_ADDRESS = 'Acme Blog <onboarding@resend.dev>';
 export const MOCK_REPLY_TO = 'support@acme.example.com';
 export const MOCK_POSTAL_ADDRESS = '123 Main St, Springfield';
 export const MOCK_SUBJECT = 'Welcome back to Acme';

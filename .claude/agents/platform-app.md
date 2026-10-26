@@ -413,6 +413,9 @@ The Voice page edits the site copy registered in `@blog/config`'s
 
 ## Testing
 
+Read `.claude/skills/testing-practices/SKILL.md` with Read (you have no Skill
+tool) before writing or changing any test.
+
 `testing-practices` governs rendering (`@platform/testing/custom-render`),
 arrangement, fakes and queries. On top of it:
 
