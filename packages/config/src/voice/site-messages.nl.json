@@ -123,6 +123,7 @@
     "sending": "Versturen…",
     "checkYourInbox": "Controleer uw inbox voor een inloglink.",
     "emailError": "De link kon niet worden verstuurd. Probeer het opnieuw.",
+    "sendLimited": "Er zijn te veel inloglinks aangevraagd voor dit adres. Probeer het over een uur opnieuw.",
     "oauthError": "Inloggen mislukt. Probeer het opnieuw.",
     "accountMenuAriaLabel": "Accountmenu",
     "signOut": "Uitloggen",

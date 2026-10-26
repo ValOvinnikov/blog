@@ -123,6 +123,7 @@
     "sending": "Wird gesendet…",
     "checkYourInbox": "Prüfen Sie Ihr Postfach auf einen Anmeldelink.",
     "emailError": "Der Link konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "sendLimited": "Für diese Adresse wurden zu viele Anmeldelinks angefordert. Versuchen Sie es in einer Stunde erneut.",
     "oauthError": "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "accountMenuAriaLabel": "Kontomenü",
     "signOut": "Abmelden",

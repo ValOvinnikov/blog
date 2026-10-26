@@ -123,6 +123,7 @@
     "sending": "Envoi…",
     "checkYourInbox": "Consultez votre boîte de réception pour trouver le lien de connexion.",
     "emailError": "Le lien n'a pas pu être envoyé. Veuillez réessayer.",
+    "sendLimited": "Trop de liens de connexion ont été demandés pour cette adresse. Réessayez dans une heure.",
     "oauthError": "La connexion a échoué. Veuillez réessayer.",
     "accountMenuAriaLabel": "Menu du compte",
     "signOut": "Se déconnecter",
