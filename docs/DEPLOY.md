@@ -293,6 +293,26 @@ scope as the five keys above:
 > different systems — keep them in sync when a Neon branch's credentials
 > rotate.
 
+Email senders — reader sign-in links and newsletter confirmations go out
+from `apps/web` itself, so the web projects need their own sender keys,
+Production scope like the rest:
+
+| Key                       | `web-dev` / `web-prod` value                     |
+| ------------------------- | ------------------------------------------------ |
+| `RESEND_API_KEY`          | the Resend API key                               |
+| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <signin@mail.{your-hosting}>`     |
+| `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>` |
+
+> **Set every `*_FROM_ADDRESS` to an address on a domain verified in
+> Resend.** Unset, each falls back to a `resend.dev` sender, and Resend
+> delivers from that sender only to the Resend account owner's own address —
+> every other recipient is refused at send time ("You can only send testing
+> emails to your own email address"). The app logs the error, but the reader
+> only sees "check your inbox", so a missing sender looks like a sign-in that
+> works for you and for nobody else. The display name before `<…>` is only
+> the default: a tenant's **Sender name** on its Email page replaces it for
+> that tenant's emails, and never the address.
+
 > `TENANT_TOKEN_ENCRYPTION_KEY` decrypts `tenants.sanityReadTokenEncrypted`
 > (`@blog/utils`'s `encryptSecret`/`decryptSecret`, AES-256-GCM) — a 32-byte
 > key, base64-encoded. Generate one per environment with
@@ -449,7 +469,7 @@ not fully functional until they are set:
 | ---------------------------------- | ---------------------------------------------------------------------- |
 | `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                          |
 | `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                          |
-| `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender address (`@blog/auth`)                               |
+| `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender, on a Resend-verified domain (see the web note)      |
 | `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)      |
 | `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                       |
 | `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache    |
