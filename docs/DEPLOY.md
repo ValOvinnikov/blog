@@ -45,7 +45,7 @@ Architecture rationale lives in `SPEC.md` §13 and
 | CI gate before deploy   | `verify` job on `main`            | Full gate on the `v*` tag          |
 | Revalidation webhook    | dev → dev site                    | prod → prod site                   |
 
-> **Project name vs. hostname.** The Vercel _projects_ are named `web-dev`/`web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `admin-dev.{your-hosting}` (and the apex plus `admin.{your-hosting}` in production). The gap is deliberate and it widened when the projects were renamed off their `blog-` prefix (#2426): the product is no longer a blog, but the hostnames are live DNS records wired into OAuth callback registrations, so renaming them is separate work with its own checklist — not a side effect of tidying project names. Both forms appear in this file on purpose: `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname. The two Storybook projects follow the same split — `ui-library` happens to match its `ui-library.{your_hosting}` hostname, while `web-ui-library`'s intended hostname, `web-storybook.{your_hosting}`, is not attached to it yet and does not resolve.
+> **Project name vs. hostname.** The Vercel _projects_ are named `web-dev`/`web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `platform.dev.{your-hosting}` (and the apex plus `platform.{your-hosting}` in production; the old `admin-dev` host was retired on 2026-10-22). The gap is deliberate and it widened when the projects were renamed off their `blog-` prefix (#2426): the product is no longer a blog, but the hostnames are live DNS records wired into OAuth callback registrations, so renaming them is separate work with its own checklist — not a side effect of tidying project names. Both forms appear in this file on purpose: `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname. The two Storybook projects follow the same split — `ui-library` happens to match its `ui-library.{your_hosting}` hostname, while `web-ui-library`'s intended hostname, `web-storybook.{your_hosting}`, is not attached to it yet and does not resolve.
 
 > `<DEV_ADMIN_URL>` / `<PRD_ADMIN_URL>` are the admin panel's equivalents, on
 > its own two projects.
@@ -177,7 +177,7 @@ exact callback URL with Google and creating a whole new GitHub OAuth App
 (one callback each) — neither supports wildcards — for every branch, and the admin accepts only sessions it issued itself. A preview you can't sign
 in to can't be reviewed, so previews would cost a standing OAuth chore and a
 new grant of preview database access while delivering nothing. Admin changes
-are reviewed on `admin-dev.{your-hosting}`, which deploys automatically on
+are reviewed on `platform.dev.{your-hosting}`, which deploys automatically on
 merge.
 
 Nothing to set per project in the dashboard for this anymore; only project
@@ -196,14 +196,14 @@ linking + domains remain:
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
         `VERCEL_PROJECT_ID_PLATFORM` for the `development` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
-  - [ ] Settings → Domains → add `admin-dev.{your-hosting}`; add the DNS record
+  - [ ] Settings → Domains → add `platform.dev.{your-hosting}`; add the DNS record
         it shows you, same as above.
 - [ ] **`platform-prod`**
   - [ ] From repo root: `npx vercel link` → select `platform-prod`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
         `VERCEL_PROJECT_ID_PLATFORM` for the `production` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
-  - [ ] Settings → Domains → add `admin.{your-hosting}`; add the DNS record it
+  - [ ] Settings → Domains → add `platform.{your-hosting}`; add the DNS record it
         shows you, same as above. This must match the `PLATFORM_APP_BASE_URL`
         Variable in §4 exactly (no trailing slash).
 - [ ] **`worker-dev`**
@@ -223,19 +223,21 @@ Vercel's nameservers (`{your-hosting}` is); Vercel then issues the wildcard
 certificate itself. Each environment has its own root so development never
 claims a production host:
 
-- [ ] **`web-dev`** → Settings → Domains → add `*.dev.{your-hosting}`
+- [x] **`web-dev`** → Settings → Domains → add `*.dev.{your-hosting}`
       (Production environment).
-- [ ] **`platform-dev`** → add `platform.dev.{your-hosting}`. An explicitly
+- [x] **`platform-dev`** → add `platform.dev.{your-hosting}`. An explicitly
       assigned domain on another project beats the wildcard — this host serves
       the admin, not the public site (checked on dev 2026-10-22).
-- [ ] **`platform-dev`** env → `TENANT_ROOT_DOMAIN=dev.{your-hosting}`, so the
+- [x] **`platform-dev`** env → `TENANT_ROOT_DOMAIN=dev.{your-hosting}`, so the
       admin's slug check uses the dev root.
 - [ ] Production repeats the three with `*.{your-hosting}`,
       `platform.{your-hosting}` and `TENANT_ROOT_DOMAIN={your-hosting}` when
       self-serve signup ships (epic #4840).
 
 A host under the wildcard renders its tenant once `tenant_domains` holds that
-exact host; production answers any other host with a 404.
+exact host; production answers any other host with a 404. Development does the
+same once #5724 is deployed; until then an unknown dev subdomain falls back to
+the platform tenant.
 
 #### Vercel env vars
 
@@ -358,7 +360,7 @@ two-branch split is recent and the secret wiring has not fully caught up:
   `recheck-tenant-owners.yml` additionally falls back to `production` when
   that input is absent, which is every `schedule`-triggered sweep. The two purposes — tenant registry and deploy migration — used to
   share one secret until #2056 split them apart, after pointing it at
-  `development` to unblock tenant provisioning from `admin-dev.{your-hosting}`
+  `development` to unblock tenant provisioning from `platform.dev.{your-hosting}`
   had silently repointed a production tag's `migrate-db` step at
   `development` too, leaving `main` unmigrated while reporting success — the
   same silent-wrong-branch failure mode #2264's guard now catches
@@ -496,14 +498,14 @@ session-reader subset. The two providers register callbacks differently:
 
 - **Google** — one OAuth client takes several redirect URIs, so add the admin
   origin's callback to the client the web projects already use:
-  - [ ] `https://admin.{your-hosting}/api/auth/callback/google`
-  - [ ] `https://admin-dev.{your-hosting}/api/auth/callback/google`
+  - [ ] `https://platform.{your-hosting}/api/auth/callback/google`
+  - [ ] `https://platform.dev.{your-hosting}/api/auth/callback/google`
 - **GitHub** — an OAuth App takes exactly **one** callback URL and rejects any
   other host, so each origin needs its own OAuth App. Create one per admin
   origin and set its `AUTH_GITHUB_ID` / `_SECRET` on that platform project
   only, leaving the web projects' values untouched:
-  - [ ] `platform-prod` — callback `https://admin.{your-hosting}/api/auth/callback/github`
-  - [ ] `platform-dev` — callback `https://admin-dev.{your-hosting}/api/auth/callback/github`
+  - [ ] `platform-prod` — callback `https://platform.{your-hosting}/api/auth/callback/github`
+  - [ ] `platform-dev` — callback `https://platform.dev.{your-hosting}/api/auth/callback/github`
 
 Without these, OAuth from admin fails at the provider with a redirect-URI
 mismatch — before it ever reaches our code, so nothing in this repo can
@@ -636,7 +638,7 @@ dispatch can point it at `development`.
       throws without it.
 - [ ] Variable `PLATFORM_APP_BASE_URL` — the deployed `apps/platform` origin for
       that environment (no trailing slash/path), e.g.
-      `https://admin.{your-hosting}`. The two sweeps below
+      `https://platform.{your-hosting}`. The two sweeps below
       (`recheck-tenant-owners.yml`, `validate-tenant-documents.yml`) use it as
       the base they POST operator alerts to.
 - [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin for that
@@ -804,9 +806,9 @@ Create **two** (the route `/api/revalidate` already exists):
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).
 - [ ] `http://localhost:3001` — credentials **on** (the Studio mounted in a
       locally-running `apps/platform`).
-- [ ] `https://admin-dev.{your-hosting}` — credentials **on** (the dev admin
+- [ ] `https://platform.dev.{your-hosting}` — credentials **on** (the dev admin
       panel, which mounts the Studio).
-- [ ] `https://admin.{your-hosting}` — credentials **on** (the prod admin panel).
+- [ ] `https://platform.{your-hosting}` — credentials **on** (the prod admin panel).
 - [ ] `https://<DEV_WEB_URL>` — credentials **off** (token reads).
 - [ ] `https://<PRD_WEB_URL>` — credentials **off**.
 - [ ] Remove the old `https://valovinnikov-blog-dev.sanity.studio` /
