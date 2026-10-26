@@ -178,7 +178,7 @@ describe(buildAuthConfig, () => {
       process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig(AUTH_APP.SITE);
+      const config = freshBuildAuthConfig(AUTH_APP.SITE, vi.fn());
 
       expect(config.cookies).toBeUndefined();
     });
@@ -186,7 +186,7 @@ describe(buildAuthConfig, () => {
     it('reads the secret from AUTH_SECRET', async () => {
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig(AUTH_APP.SITE);
+      const config = freshBuildAuthConfig(AUTH_APP.SITE, vi.fn());
 
       expect(config.secret).toBe(MOCK_AUTH_SECRET);
     });
@@ -198,7 +198,7 @@ describe(buildAuthConfig, () => {
       process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
       const freshBuildAuthConfig = await importBuildAuthConfig();
 
-      const config = freshBuildAuthConfig(AUTH_APP.SITE);
+      const config = freshBuildAuthConfig(AUTH_APP.SITE, vi.fn());
 
       const providerIds = providerIdsOf(config);
       expect(providerIds).toContain('github');
