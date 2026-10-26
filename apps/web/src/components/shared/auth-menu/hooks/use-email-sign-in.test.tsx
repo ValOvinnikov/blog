@@ -68,16 +68,23 @@ const setup = customRender(Harness, {});
 describe(useEmailSignIn, () => {
   let user: UserEvent;
 
-  const expandEmailForm = () =>
-    user.click(screen.getByRole('button', { name: CONTINUE_WITH_EMAIL }));
+  const expandEmailForm = async () => {
+    const continueWithEmail = screen.getByRole('button', {
+      name: CONTINUE_WITH_EMAIL,
+    });
+    await user.click(continueWithEmail);
+  };
+
+  const typeEmail = async () => {
+    await expandEmailForm();
+    const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
+    await user.type(emailField, READER_EMAIL);
+  };
 
   const submitEmail = async () => {
-    await expandEmailForm();
-    await user.type(
-      screen.getByRole('textbox', { name: EMAIL_FIELD }),
-      READER_EMAIL,
-    );
-    await user.click(screen.getByRole('button', { name: 'send' }));
+    await typeEmail();
+    const sendButton = screen.getByRole('button', { name: 'send' });
+    await user.click(sendButton);
   };
 
   const refuseSignIn = (code?: string) =>
@@ -96,16 +103,18 @@ describe(useEmailSignIn, () => {
   });
 
   it('starts collapsed', () => {
-    expect(
-      screen.getByRole('button', { name: CONTINUE_WITH_EMAIL }),
-    ).toBeVisible();
+    const continueWithEmail = screen.getByRole('button', {
+      name: CONTINUE_WITH_EMAIL,
+    });
+    expect(continueWithEmail).toBeVisible();
   });
 
   it('moves focus into the field once it expands', async () => {
     await expandEmailForm();
 
+    const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
     await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: EMAIL_FIELD })).toHaveFocus();
+      expect(emailField).toHaveFocus();
     });
   });
 
@@ -123,34 +132,36 @@ describe(useEmailSignIn, () => {
       email: READER_EMAIL,
       redirect: false,
     });
-    expect(await screen.findByRole('status')).toBeVisible();
+    const sentNotice = await screen.findByRole('status');
+    expect(sentNotice).toBeVisible();
   });
 
   it('shows an error and stays expanded when the sign-in fails', async () => {
     refuseSignIn();
     await submitEmail();
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('error');
-    expect(screen.getByRole('textbox', { name: EMAIL_FIELD })).toBeVisible();
+    const errorNotice = await screen.findByRole('alert');
+    expect(errorNotice).toHaveTextContent('error');
+    const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
+    expect(emailField).toBeVisible();
   });
 
   it('tells a send refused by the send limit apart from a failed one', async () => {
     refuseSignIn(MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED);
     await submitEmail();
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('limited');
+    const errorNotice = await screen.findByRole('alert');
+    expect(errorNotice).toHaveTextContent('limited');
   });
 
   it('resets to collapsed once the popover itself closes', async () => {
-    await expandEmailForm();
-    await user.type(
-      screen.getByRole('textbox', { name: EMAIL_FIELD }),
-      READER_EMAIL,
-    );
-    await user.click(screen.getByRole('button', { name: 'toggle open' }));
+    await typeEmail();
+    const toggleOpen = screen.getByRole('button', { name: 'toggle open' });
+    await user.click(toggleOpen);
 
-    expect(
-      screen.getByRole('button', { name: CONTINUE_WITH_EMAIL }),
-    ).toBeVisible();
+    const continueWithEmail = screen.getByRole('button', {
+      name: CONTINUE_WITH_EMAIL,
+    });
+    expect(continueWithEmail).toBeVisible();
   });
 });
