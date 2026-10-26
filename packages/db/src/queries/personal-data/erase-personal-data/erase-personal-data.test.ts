@@ -19,8 +19,12 @@ import {
   insertTestPersonalDataRows,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { errorResult, okResult } from '@blog/utils';
 
-import { erasePersonalData } from './erase-personal-data';
+import {
+  erasePersonalData,
+  type TPersonalDataCounts,
+} from './erase-personal-data';
 
 vi.mock('@blog/db/client');
 
@@ -37,6 +41,18 @@ const NONE = {
   membershipInvites: 0,
   readerAccounts: 0,
 };
+
+function erasure(
+  email: string,
+  erased: TPersonalDataCounts,
+  isReaderAccountRefused = false,
+) {
+  return okResult({
+    emailIndex: testPersonalEmailIndex(email),
+    erased,
+    isReaderAccountRefused,
+  });
+}
 
 afterEach(async () => {
   await deleteTestPersonalDataRows(db());
@@ -57,14 +73,7 @@ describe(erasePersonalData, () => {
       WITH_READER_ACCOUNT,
     );
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-        erased: ONE_OF_EACH,
-        isReaderAccountRefused: false,
-      },
-    });
+    expect(result).toEqual(erasure(MOCK_SUBSCRIBER_EMAIL, ONE_OF_EACH));
     await expect(
       findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL),
     ).resolves.toBeUndefined();
@@ -88,14 +97,9 @@ describe(erasePersonalData, () => {
       WITHOUT_READER_ACCOUNT,
     );
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-        erased: { ...SITE_RECORDS, readerAccounts: 0 },
-        isReaderAccountRefused: false,
-      },
-    });
+    expect(result).toEqual(
+      erasure(MOCK_SUBSCRIBER_EMAIL, { ...SITE_RECORDS, readerAccounts: 0 }),
+    );
     await expect(
       findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL),
     ).resolves.toBeDefined();
@@ -114,14 +118,13 @@ describe(erasePersonalData, () => {
       WITH_READER_ACCOUNT,
     );
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-        erased: { ...SITE_RECORDS, readerAccounts: 0 },
-        isReaderAccountRefused: true,
-      },
-    });
+    expect(result).toEqual(
+      erasure(
+        MOCK_SUBSCRIBER_EMAIL,
+        { ...SITE_RECORDS, readerAccounts: 0 },
+        true,
+      ),
+    );
     await expect(
       findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL),
     ).resolves.toBeDefined();
@@ -139,21 +142,13 @@ describe(erasePersonalData, () => {
         WITH_READER_ACCOUNT,
       );
 
-      expect(result).toEqual({
-        ok: true,
-        data: {
-          emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
-          erased: ONE_OF_EACH,
-          isReaderAccountRefused: false,
-        },
-      });
+      expect(result).toEqual(erasure(MOCK_INVITE_EMAIL, ONE_OF_EACH));
     });
 
     it('keeps the address on the sign-up blocklist', async () => {
-      await expect(isSignupBlocked(MOCK_SUBSCRIBER_EMAIL)).resolves.toEqual({
-        ok: true,
-        data: true,
-      });
+      await expect(isSignupBlocked(MOCK_SUBSCRIBER_EMAIL)).resolves.toEqual(
+        okResult(true),
+      );
     });
 
     it('keeps the audit history', async () => {
@@ -170,23 +165,13 @@ describe(erasePersonalData, () => {
         WITH_READER_ACCOUNT,
       );
 
-      expect(result).toEqual({
-        ok: true,
-        data: {
-          emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-          erased: NONE,
-          isReaderAccountRefused: false,
-        },
-      });
+      expect(result).toEqual(erasure(MOCK_SUBSCRIBER_EMAIL, NONE));
     });
   });
 
   it('refuses a value that is not an email address', async () => {
     await expect(
       erasePersonalData(MOCK_NOT_AN_ADDRESS, WITH_READER_ACCOUNT),
-    ).resolves.toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_INVALID_EMAIL,
-    });
+    ).resolves.toEqual(errorResult(ERROR_CODE.DB_INVALID_EMAIL));
   });
 });

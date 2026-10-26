@@ -1,4 +1,5 @@
 import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
+import { objectKeys } from '@blog/utils/primitives';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { useFormatter, useTranslations } from 'next-intl';
@@ -15,7 +16,7 @@ export const DataRequestAccountCard = ({
   const format = useFormatter();
   const { name, email, linkedProviders, activeSessionCount, bookmarks } =
     readerAccount;
-  const providerNames = (['github', 'google', 'emailLink'] as const)
+  const providerNames = objectKeys(linkedProviders)
     .filter((provider) => linkedProviders[provider])
     .map((provider) => tProvider(provider));
 

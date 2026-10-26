@@ -28,6 +28,7 @@ import {
   taggedMixedCaseAddress,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { errorResult, okResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 import { findPersonalData } from './find-personal-data';
@@ -219,9 +220,8 @@ describe(findPersonalData, () => {
   it('finds nothing for a mailbox with no rows', async () => {
     const result = await findPersonalData(NOBODY_EMAIL);
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
+    expect(result).toEqual(
+      okResult({
         emailIndex: testPersonalEmailIndex(NOBODY_EMAIL),
         subscribers: [],
         leads: [],
@@ -229,14 +229,13 @@ describe(findPersonalData, () => {
         readerAccount: undefined,
         blockedSignupIdentities: [],
         auditEvents: [],
-      },
-    });
+      }),
+    );
   });
 
   it('refuses a value that is not an email address', async () => {
-    await expect(findPersonalData(MOCK_NOT_AN_ADDRESS)).resolves.toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_INVALID_EMAIL,
-    });
+    await expect(findPersonalData(MOCK_NOT_AN_ADDRESS)).resolves.toEqual(
+      errorResult(ERROR_CODE.DB_INVALID_EMAIL),
+    );
   });
 });
