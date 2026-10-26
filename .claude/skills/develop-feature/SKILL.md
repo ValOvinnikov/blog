@@ -64,6 +64,10 @@ approvals, never bundled.
   candidates"). This is the plan's **Copy** line.
 - **Manual-test check** → if the change alters what a page shows or how it
   behaves, the plan carries a manual-test issue (step 2).
+- **Cost check** → list every new or changed cron, Workflow run, paid API
+  call, Blob/KV use and hot-path query with its expected volume and whether
+  it stays inside the free allowances, or "none". This is the plan's
+  **Cost** line (`CLAUDE.md` "Say what it touches before starting").
 - Surface unknowns early; ask only when a decision is genuinely the user's.
 - **Follow Gate 0 in `open-pull-request`** — board → In Progress, the branch,
   and its exception for worktree-delegated work. For multi-layer work, run

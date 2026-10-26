@@ -201,6 +201,11 @@ state plainly:
 - **Manual test** — whether the change alters what a page shows or how it
   behaves; if so, its manual-test issue is filed with the tickets
   (`develop-feature` §2, template in "Issue body template").
+- **Cost** — every new or changed cron, Workflow run, external API call
+  (Resend, Anthropic/AI Gateway, Sanity Management), Blob/KV use and
+  per-request database query on a hot path, each with its expected volume and
+  whether it stays inside the free allowances — or "none". It goes into the
+  ticket's `## Scope` as a `Cost:` line, and the PR body states it.
 - **Doubts** — including scope you suspect but have not yet confirmed.
 
 **If anything blocks, ask and wait for an answer.** Never proceed on an
@@ -1205,6 +1210,7 @@ sections:
 ## Scope
 - <layer>: <what changes>
 - Feature doc: docs/features/<feature>.md (update | create | none)
+- Cost: <volume and free-allowance fit> (only when the ticket adds a cron, Workflow run, paid API call, Blob/KV use or hot-path query)
 
 ## Acceptance criteria
 - [ ] <observable outcome, not an implementation step>

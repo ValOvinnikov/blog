@@ -302,6 +302,11 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 - **Manual-test issue (flagged, not blocking).** Flag a UI or behaviour diff
   whose dispatch names no manual-test issue (→ `develop-feature`
   § Manual-test issue).
+- **Running cost (flagged, not blocking).** Flag a diff that adds a cron,
+  Workflow run, paid API call (Resend, Anthropic/AI Gateway, Sanity
+  Management), Blob/KV use or hot-path database query when neither its ticket
+  nor its PR body states the cost (→ `CLAUDE.md` "Say what it touches before
+  starting", **Cost**).
 - **Voice candidates (listed, not blocking).** Under a "Voice candidates"
   heading, list every key the diff adds or rewords in
   `packages/config/src/voice/site-messages.*.json` with the list it landed on
