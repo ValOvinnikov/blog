@@ -1,4 +1,5 @@
 import { ICONS, SIZE } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
 import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
@@ -47,9 +48,11 @@ export const Button = ({
   hasArrow,
 }: TButtonProps) => {
   const { root, srOnlyStatus } = buttonVariants({ variant, size });
-  const hasPendingLabel = pendingLabel !== undefined;
+  const hasPendingLabel = !isUndefined(pendingLabel);
   const isPendingWithLabel = isPending && hasPendingLabel;
   const label = isPendingWithLabel ? pendingLabel : children;
+
+  const hasClickBehaviour = !isUndefined(onClick) || isAriaDisabled;
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     if (isAriaDisabled) {
@@ -67,7 +70,7 @@ export const Button = ({
         disabled={isDisabled || isPending}
         aria-disabled={isAriaDisabled || undefined}
         aria-busy={isPending}
-        onClick={handleClick}
+        onClick={hasClickBehaviour ? handleClick : undefined}
         className={root({ class: className })}
         aria-describedby={ariaDescribedBy}
         aria-expanded={ariaExpanded}
