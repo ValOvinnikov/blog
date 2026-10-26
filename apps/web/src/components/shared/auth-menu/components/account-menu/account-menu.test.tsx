@@ -5,6 +5,7 @@ import {
   fireEvent,
   type RenderResult,
   screen,
+  within,
 } from '@web/testing/custom-render';
 import { useId } from 'react';
 
@@ -14,8 +15,6 @@ const ACCOUNT_MENU_LABEL = 'Account menu';
 const JANE_NAME = 'Jane Doe';
 const JANE_EMAIL = 'jane@example.com';
 const JANE_INITIALS = 'JD';
-const TRIGGER_AVATAR_TEST_ID = 'account-menu-trigger-avatar';
-const PANEL_AVATAR_TEST_ID = 'account-menu-panel-avatar';
 
 type TWrapperProps = Pick<TAccountMenuProps, 'name' | 'email' | 'image'>;
 
@@ -53,32 +52,35 @@ describe(`<${AccountMenu.name}/>`, () => {
   });
 
   it('falls back to initials in the trigger avatar once its image fails to load', () => {
-    const triggerImage = screen.getByRole('presentation');
+    const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
+    const triggerImage = within(trigger).getByRole('presentation');
     expect(triggerImage).toBeVisible();
 
     fireEvent.error(triggerImage);
 
-    const failedImage = screen.queryByRole('presentation');
-    const triggerAvatar = screen.getByTestId(TRIGGER_AVATAR_TEST_ID);
+    const failedImage = within(trigger).queryByRole('presentation');
+    const triggerInitials = within(trigger).getByText(JANE_INITIALS);
     expect(failedImage).not.toBeInTheDocument();
-    expect(triggerAvatar).toHaveTextContent(JANE_INITIALS);
+    expect(triggerInitials).toBeVisible();
   });
 
   it('also falls back to initials in the panel body avatar, since it shares the same failure state as the trigger', async () => {
-    const triggerImage = screen.getByRole('presentation');
+    const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
+    const triggerImage = within(trigger).getByRole('presentation');
     fireEvent.error(triggerImage);
 
-    const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     await user.click(trigger);
 
-    const avatarImage = screen.queryByRole('presentation');
-    const panelAvatar = screen.getByTestId(PANEL_AVATAR_TEST_ID);
-    expect(avatarImage).not.toBeInTheDocument();
-    expect(panelAvatar).toHaveTextContent(JANE_INITIALS);
+    const panel = screen.getByRole('menu');
+    const panelImage = within(panel).queryByRole('presentation');
+    const panelInitials = within(panel).getByText(JANE_INITIALS);
+    expect(panelImage).not.toBeInTheDocument();
+    expect(panelInitials).toBeVisible();
   });
 
   it('does not carry a stale failure forward once a different image URL is supplied', () => {
-    const triggerImage = screen.getByRole('presentation');
+    const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
+    const triggerImage = within(trigger).getByRole('presentation');
     fireEvent.error(triggerImage);
 
     rerender(
@@ -89,7 +91,7 @@ describe(`<${AccountMenu.name}/>`, () => {
       />,
     );
 
-    const newImage = screen.getByRole('presentation');
+    const newImage = within(trigger).getByRole('presentation');
     expect(newImage).toBeVisible();
   });
 
@@ -97,14 +99,17 @@ describe(`<${AccountMenu.name}/>`, () => {
     const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     await user.click(trigger);
 
-    const heading = screen.queryByRole('heading');
-    const accountLabel = screen.getByText('Account');
-    const name = screen.getByText(JANE_NAME);
-    const email = screen.getByText(JANE_EMAIL);
-    const bookmarksItem = screen.getByRole('menuitem', {
+    const panel = screen.getByRole('menu');
+    const heading = within(panel).queryByRole('heading');
+    const accountLabel = within(panel).getByText('Account');
+    const name = within(panel).getByText(JANE_NAME);
+    const email = within(panel).getByText(JANE_EMAIL);
+    const bookmarksItem = within(panel).getByRole('menuitem', {
       name: 'My bookmarks',
     });
-    const signOutItem = screen.getByRole('menuitem', { name: 'Sign out' });
+    const signOutItem = within(panel).getByRole('menuitem', {
+      name: 'Sign out',
+    });
     expect(heading).not.toBeInTheDocument();
     expect(accountLabel).toBeVisible();
     expect(name).toBeVisible();
@@ -119,8 +124,9 @@ describe(`<${AccountMenu.name}/>`, () => {
     const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     await user.click(trigger);
 
-    const handle = screen.getByText('jane');
-    const emails = screen.getAllByText(JANE_EMAIL);
+    const panel = screen.getByRole('menu');
+    const handle = within(panel).getByText('jane');
+    const emails = within(panel).getAllByText(JANE_EMAIL);
     expect(handle).toBeVisible();
     expect(emails).toHaveLength(1);
   });
