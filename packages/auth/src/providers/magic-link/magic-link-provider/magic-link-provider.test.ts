@@ -11,6 +11,7 @@ import {
   MOCK_SENDER_NAME,
   MOCK_SUBJECT,
   MOCK_TEMPLATE_LOGO_URL,
+  MOCK_TENANT_FROM_ADDRESS,
   MOCK_TENANT_ID,
   MOCK_TENANT_LOGO_URL,
   MOCK_TENANT_NAME,
@@ -497,13 +498,19 @@ describe(buildMagicLinkProvider, () => {
       expect(html).toContain(MOCK_POSTAL_ADDRESS);
     });
 
+    it("shows the site's name as the sender when the tenant has no sender name", async () => {
+      await sendVerificationRequestFor(provider);
+
+      expect(sentEmail().from).toBe(MOCK_TENANT_FROM_ADDRESS);
+    });
+
     it('still delivers with product defaults when the email-config lookup fails', async () => {
       getEmailConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
       await sendVerificationRequestFor(provider);
 
       const { from, replyTo } = sentEmail();
-      expect(from).toBe(MOCK_FROM_ADDRESS);
+      expect(from).toBe(MOCK_TENANT_FROM_ADDRESS);
       expect(replyTo).toBeUndefined();
     });
 
