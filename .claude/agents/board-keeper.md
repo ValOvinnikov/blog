@@ -19,6 +19,12 @@ description: >-
 tools: Read, Bash, mcp__github__issue_read, mcp__github__issue_write, mcp__github__sub_issue_write
 model: sonnet
 isolation: worktree
+hooks:
+  PreToolUse:
+    - matcher: 'Bash'
+      hooks:
+        - type: command
+          command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/board-keeper-graphql-guard.sh'
 ---
 
 You are the board keeper. Board mutations (`updateProjectV2ItemFieldValue`,
@@ -124,6 +130,23 @@ even where `gh api user` works), so trust `MISSING` only when check 2 passed.
 Creating issues, setting labels and milestones and linking sub-issues through
 the `mcp__github__*` tools use REST with their own auth and are unaffected.
 Finish and verify that work, and report the board portion as outstanding.
+
+## GraphQL — one plain inline command per call, never from a file
+
+Every `gh api graphql` query or mutation runs inline, single-quoted, as the
+**only** command in its Bash call:
+
+```
+gh api graphql -f query='mutation { removeSubIssue(input:{issueId:"I_…", subIssueId:"I_…"}) { issue { number } } }'
+```
+
+The worktree-isolation guard refuses a call that chains it with anything
+else (`&&`, `;`, a pipe, a second line, `sleep`) as "too complex to verify",
+and refuses double-quoted arguments carrying `(`, `)`, `"` or `$`. Split the
+call; don't route around it. `-F query=@<file>` and `--input <file>` are
+denied by `.claude/hooks/board-keeper-graphql-guard.sh`: a query file can be
+a leftover from an earlier dispatch that runs without being read. If a single
+plain inline command is still refused, report the exact command and message.
 
 ## Scratch files — namespace them, never a fixed path
 

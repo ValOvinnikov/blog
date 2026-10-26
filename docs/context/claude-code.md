@@ -567,6 +567,16 @@ file` are all denied alike) — an earlier version only handled the
     `layer-scope-guard.test.sh` pins the deny/allow matrix against throwaway
     directories under a worktree-shaped path — hermetic, no live session
     state.
+
+  - `board-keeper-graphql-guard.sh` — `PreToolUse` hook on `Bash`, wired in
+    `board-keeper`'s frontmatter only. `board-keeper`'s one sanctioned
+    GraphQL write is a plain inline `gh api graphql -f query='…'`, alone in
+    its Bash call — the harness's worktree-isolation guard admits that and
+    refuses the same mutation chained with other commands. The hook denies
+    the file route (`-F query=@<file>`, `query=@-`, `--input`), which agents
+    had used to dodge that refusal and which once re-ran a stale query file
+    left by an earlier dispatch, removing an issue dependency.
+    `board-keeper-graphql-guard.test.sh` pins the deny/allow matrix.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
   `boolean-prop-prefix.js`, `no-class-assertions.js` and
   `text-input-textarea-accessible-name.js` are the repo's hand-written rules
