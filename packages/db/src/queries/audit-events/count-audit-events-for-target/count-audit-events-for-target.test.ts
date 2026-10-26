@@ -1,6 +1,5 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { MOCK_OPERATOR_EMAIL } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -17,7 +16,6 @@ const MOCK_TARGET_ID = faker.string.uuid();
 async function insertTenantEvent(targetId: string): Promise<void> {
   await db().insert(schema.auditEvents).values({
     actorId: faker.string.uuid(),
-    actorEmail: MOCK_OPERATOR_EMAIL,
     action: AUDIT_ACTION.SETTINGS_UPDATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId,

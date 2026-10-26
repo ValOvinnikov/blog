@@ -1402,7 +1402,7 @@
     "exporting": "Préparation…",
     "erase": "Effacer",
     "eraseDialogTitle": "Effacer les données de cette personne ?",
-    "eraseDialogDescription": "Supprime ses abonnements, messages de contact, invitations et blocage d’inscription sur tous les sites, et retire son adresse des événements d’audit. Cette action est irréversible.",
+    "eraseDialogDescription": "Supprime ses abonnements, messages de contact, invitations et blocage d’inscription sur tous les sites. Cette action est irréversible.",
     "eraseConfirm": "Effacer les données",
     "erasing": "Effacement…"
   },

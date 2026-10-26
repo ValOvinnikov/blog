@@ -1,6 +1,5 @@
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import {
-  MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_SITE_NAME,
   mockPersonalDataMatches,
 } from '@platform/testing/data-requests/fixtures';
@@ -32,13 +31,13 @@ describe(toDataRequestMatches, () => {
     ]);
   });
 
-  it('shows no email for a sign-up block, which holds only a hash', () => {
+  it('shows no email for a sign-up block or an audit event, which hold none', () => {
     const [, , , block, auditEvent] = toDataRequestMatches(
       mockPersonalDataMatches(),
     );
 
     expect(block?.email).toBeUndefined();
-    expect(auditEvent?.email).toBe(MOCK_DATA_REQUEST_EMAIL);
+    expect(auditEvent?.email).toBeUndefined();
   });
 
   it('keys rows apart even when two tables share an id', () => {

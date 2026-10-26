@@ -8,7 +8,7 @@ import {
   MOCK_DATA_REQUEST_EMAIL_INDEX,
   mockPersonalDataMatches,
   MOCK_NOT_AN_EMAIL,
-  MOCK_ONE_OF_EACH_COUNT,
+  MOCK_ONE_OF_EACH_MATCH_COUNT,
 } from '@platform/testing/data-requests/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -63,7 +63,7 @@ describe(runDataRequest, () => {
       action: AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP,
       targetType: AUDIT_TARGET_TYPE.PERSONAL_DATA,
       targetId: MOCK_DATA_REQUEST_EMAIL_INDEX,
-      details: MOCK_ONE_OF_EACH_COUNT,
+      details: MOCK_ONE_OF_EACH_MATCH_COUNT,
     });
   });
 

@@ -1402,7 +1402,7 @@
     "exporting": "Preparing…",
     "erase": "Erase",
     "eraseDialogTitle": "Erase this person's data?",
-    "eraseDialogDescription": "Deletes their subscriptions, contact messages, invites and sign-up block on every site, and removes their address from audit events. This can't be undone.",
+    "eraseDialogDescription": "Deletes their subscriptions, contact messages, invites and sign-up block on every site. This can't be undone.",
     "eraseConfirm": "Erase data",
     "erasing": "Erasing…"
   },

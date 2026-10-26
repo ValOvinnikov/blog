@@ -62,7 +62,6 @@ describe(findPersonalData, () => {
       leads,
       membershipInvites,
       blockedSignupIdentities,
-      auditEvents,
     } = result.data;
     expect(emailIndex).toBe(testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL));
     expect(
@@ -111,21 +110,36 @@ describe(findPersonalData, () => {
     expect(blockedSignupIdentities.map(({ reason }) => reason)).toEqual([
       MOCK_BLOCK_REASON,
     ]);
+  });
+
+  it('finds the audit events of the account with exactly that address', async () => {
+    const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
     expect(
-      auditEvents.map(({ email, action, targetType, targetId }) => ({
-        email,
+      result.data.auditEvents.map(({ action, targetType, targetId }) => ({
         action,
         targetType,
         targetId,
       })),
     ).toEqual([
       {
-        email: taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: tenantId,
       },
     ]);
+  });
+
+  it('finds no audit events for a +tag variant of the account address', async () => {
+    const result = await findPersonalData(
+      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.auditEvents).toEqual([]);
   });
 
   it('finds nothing for a mailbox with no rows', async () => {

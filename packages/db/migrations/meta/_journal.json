@@ -421,6 +421,13 @@
       "when": 1792915246284,
       "tag": "0059_uppercase_subscriber_status",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1793001146232,
+      "tag": "0060_drop_audit_events_actor_email",
+      "breakpoints": true
     }
   ]
 }

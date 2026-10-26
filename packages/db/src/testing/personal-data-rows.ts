@@ -2,7 +2,11 @@ import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { MOCK_BLOCK_REASON } from '@blog/db/testing/blocked-signup-identities/fixtures';
-import { insertTestLead, type TTestDb } from '@blog/db/testing/fixtures';
+import {
+  insertTestLead,
+  insertTestReader,
+  type TTestDb,
+} from '@blog/db/testing/fixtures';
 import {
   encryptPersonalValue,
   emailColumns,
@@ -11,7 +15,6 @@ import { personalDataIndex } from '@blog/utils/encryption';
 
 export const MOCK_PERSONAL_DATA_LEAD_NAME = 'Grace Hopper';
 export const MOCK_PERSONAL_DATA_LEAD_MESSAGE = 'Please call me back.';
-export const MOCK_PERSONAL_DATA_ACTOR_ID = 'user-with-remaining-data';
 
 export function taggedMixedCaseAddress(email: string): string {
   const tagged = email.replace(
@@ -50,9 +53,9 @@ export async function insertTestPersonalDataRows(
     value: emailIndex,
     reason: MOCK_BLOCK_REASON,
   });
+  const { id: actorId } = await insertTestReader(db, email);
   await db.insert(schema.auditEvents).values({
-    actorId: MOCK_PERSONAL_DATA_ACTOR_ID,
-    actorEmail: taggedMixedCaseAddress(email),
+    actorId,
     action: AUDIT_ACTION.SETTINGS_UPDATED,
     targetType: AUDIT_TARGET_TYPE.TENANT,
     targetId: tenantId,
@@ -66,4 +69,5 @@ export async function deleteTestPersonalDataRows(db: TTestDb): Promise<void> {
   await db.delete(schema.leads);
   await db.delete(schema.subscribers);
   await db.delete(schema.tenants);
+  await db.delete(schema.users);
 }

@@ -22,7 +22,7 @@ afterEach(async () => {
 });
 
 describe(insertAuditEvent, () => {
-  it('writes the actor id, action, target, and details exactly as given, and no actor email', async () => {
+  it('writes the actor id, action, target, and details exactly as given', async () => {
     const event = await insertAuditEvent({
       actorId: MOCK_ACTOR_ID,
       action: AUDIT_ACTION.DEPROVISIONED,
@@ -32,7 +32,6 @@ describe(insertAuditEvent, () => {
     });
 
     expect(event.actorId).toBe(MOCK_ACTOR_ID);
-    expect(event.actorEmail).toBeNull();
     expect(event.action).toBe(AUDIT_ACTION.DEPROVISIONED);
     expect(event.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
     expect(event.targetId).toBe(MOCK_TENANT_ID);

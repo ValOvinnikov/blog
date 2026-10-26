@@ -10,7 +10,6 @@ import type * as schema from '@blog/db/schema';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { findings } from '@blog/db/schema/findings';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
-import { MOCK_OPERATOR_EMAIL } from '@blog/db/testing/fixtures';
 import {
   applyMigrationFile,
   listMigrationFiles,
@@ -45,7 +44,7 @@ async function insertAuditEvent(
 ) {
   const [inserted] = await db
     .insert(auditEvents)
-    .values({ actorId: ACTOR_ID, actorEmail: MOCK_OPERATOR_EMAIL, ...values })
+    .values({ actorId: ACTOR_ID, ...values })
     .returning();
   if (!inserted) throw new Error('failed to seed an audit event');
   return inserted;

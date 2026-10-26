@@ -16,7 +16,7 @@ export type TListAuditEventsForTargetOptions = {
   offset?: number;
 };
 
-export type TListedAuditEvent = Omit<TAuditEvent, 'actorEmail'> & {
+export type TListedAuditEvent = TAuditEvent & {
   actorAccountEmail: TMaybeNull<string>;
 };
 

@@ -30,6 +30,10 @@ const toMatch = (
   recordedAt,
 });
 
+export type TPersonalDataMatchCounts = TPersonalDataCounts & {
+  auditEvents: number;
+};
+
 export const toDataRequestMatches = ({
   subscribers,
   leads,
@@ -61,12 +65,12 @@ export const toDataRequestMatches = ({
       createdAt,
     ),
   ),
-  ...auditEvents.map(({ id, email, createdAt }) =>
+  ...auditEvents.map(({ id, createdAt }) =>
     toMatch(
       DATA_REQUEST_MATCH_KIND.AUDIT_EVENT,
       id,
       undefined,
-      email,
+      undefined,
       createdAt,
     ),
   ),
@@ -78,7 +82,7 @@ export const countPersonalDataMatches = ({
   membershipInvites,
   blockedSignupIdentities,
   auditEvents,
-}: TPersonalDataMatches): TPersonalDataCounts => ({
+}: TPersonalDataMatches): TPersonalDataMatchCounts => ({
   subscribers: subscribers.length,
   leads: leads.length,
   membershipInvites: membershipInvites.length,

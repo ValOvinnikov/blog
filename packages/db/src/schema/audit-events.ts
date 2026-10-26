@@ -20,7 +20,6 @@ export const auditEvents = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     actorId: text('actor_id').notNull(),
-    actorEmail: text('actor_email'),
     action: text('action').notNull().$type<TAuditAction>(),
     targetType: text('target_type').notNull().$type<TAuditTargetType>(),
     targetId: text('target_id').notNull(),
