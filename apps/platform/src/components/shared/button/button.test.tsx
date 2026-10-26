@@ -1,5 +1,6 @@
 import { SIZE } from '@blog/config';
 import { render, screen } from '@platform/testing/custom-render';
+import { findServerEventHandlers } from '@platform/testing/server-event-handlers';
 import userEvent from '@testing-library/user-event';
 
 import { Button } from './button';
@@ -48,6 +49,12 @@ describe(Button, () => {
 
     await user.click(button);
     expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it('renders from a Server Component when given no onClick', () => {
+    const disabledButton = <Button isDisabled={true}>Save</Button>;
+
+    expect(findServerEventHandlers(disabledButton)).toEqual([]);
   });
 
   it('calls onClick when enabled', async () => {

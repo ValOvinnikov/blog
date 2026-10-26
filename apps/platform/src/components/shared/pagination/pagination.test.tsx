@@ -1,6 +1,9 @@
 import { customRender, screen } from '@platform/testing/custom-render';
+import { findServerEventHandlers } from '@platform/testing/server-event-handlers';
 
 import { Pagination } from './pagination';
+
+vi.mock('@platform/i18n/navigation');
 
 const PREVIOUS = 'Previous';
 const NEXT = 'Next';
@@ -48,5 +51,15 @@ describe(`<${Pagination.name}/>`, () => {
     const nextButton = screen.getByRole('button', { name: NEXT });
 
     expect(nextButton).toBeDisabled();
+  });
+
+  it('renders from a Server Component on the first and the last page', () => {
+    const firstPage = (
+      <Pagination page={1} totalPages={2} pageHref={pageHref} />
+    );
+    const lastPage = <Pagination page={2} totalPages={2} pageHref={pageHref} />;
+
+    expect(findServerEventHandlers(firstPage)).toEqual([]);
+    expect(findServerEventHandlers(lastPage)).toEqual([]);
   });
 });

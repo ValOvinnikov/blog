@@ -51,6 +51,8 @@ export const Button = ({
   const isPendingWithLabel = isPending && hasPendingLabel;
   const label = isPendingWithLabel ? pendingLabel : children;
 
+  const hasClickBehaviour = onClick !== undefined || isAriaDisabled;
+
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     if (isAriaDisabled) {
       event.preventDefault();
@@ -67,7 +69,7 @@ export const Button = ({
         disabled={isDisabled || isPending}
         aria-disabled={isAriaDisabled || undefined}
         aria-busy={isPending}
-        onClick={handleClick}
+        onClick={hasClickBehaviour ? handleClick : undefined}
         className={root({ class: className })}
         aria-describedby={ariaDescribedBy}
         aria-expanded={ariaExpanded}
