@@ -123,6 +123,7 @@
     "sending": "Enviando…",
     "checkYourInbox": "Revise su bandeja de entrada para encontrar el enlace de inicio de sesión.",
     "emailError": "No se pudo enviar el enlace. Vuelva a intentarlo.",
+    "sendLimited": "Se han solicitado demasiados enlaces de inicio de sesión para esta dirección. Vuelva a intentarlo dentro de una hora.",
     "oauthError": "No se pudo iniciar sesión. Vuelva a intentarlo.",
     "accountMenuAriaLabel": "Menú de la cuenta",
     "signOut": "Cerrar sesión",

@@ -1,19 +1,16 @@
 'use client';
 
+import { MAGIC_LINK_SIGN_IN_CODE } from '@blog/config';
 import { signIn } from 'next-auth/react';
 import { useEffect, useRef, useState } from 'react';
 
 export type TEmailStep = 'collapsed' | 'expanded' | 'submitting' | 'sent';
 
-/**
- * `open` (the parent popover's own open/close state) is passed in as a
- * parameter rather than read here, since it's owned by `AuthMenu`'s single
- * `usePopover()` call, not by this hook.
- */
 export const useEmailSignIn = (open: boolean) => {
   const [emailStep, setEmailStep] = useState<TEmailStep>('collapsed');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
+  const [isSendLimited, setIsSendLimited] = useState(false);
   const emailFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -23,31 +20,21 @@ export const useEmailSignIn = (open: boolean) => {
     setEmailStep('collapsed');
     setEmail('');
     setEmailError(false);
+    setIsSendLimited(false);
   }, [open]);
 
   useEffect(() => {
-    // Collapsed → expanded unmounts the focused "Continue with email"
-    // `PopoverMenu.Item` button and mounts this form in its place — move
-    // focus into the new field so keyboard/screen-reader users don't lose
-    // their place. `TextInput` (`@blog/ui`) doesn't forward a ref, so this
-    // queries the one input inside the form we do hold a ref to, the same
-    // ref-scoped-query pattern `useDismissibleMenu`'s `getFocusables` already
-    // uses in this codebase (never an unscoped `document.querySelector`).
     if (emailStep !== 'expanded') return;
 
     emailFormRef.current?.querySelector('input')?.focus();
   }, [emailStep]);
 
-  // Shared by the form's `onSubmit` (Enter key in the field) and the send
-  // button's `onClick` — `Button` always renders a native `type="button"`
-  // (never `submit`), so a click alone never fires the form's submit event;
-  // wiring both to the same handler covers mouse and keyboard equally. The
-  // parameter is typed structurally (only `preventDefault` is used) so one
-  // handler accepts both a `FormEvent` and a `MouseEvent`.
+  // `Button` always renders `type="button"`, so the send button's click and the form's submit share this handler.
   const handleEmailSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setEmailStep('submitting');
     setEmailError(false);
+    setIsSendLimited(false);
 
     const result = await signIn('email', { email, redirect: false });
 
@@ -56,6 +43,7 @@ export const useEmailSignIn = (open: boolean) => {
     } else {
       setEmailStep('expanded');
       setEmailError(true);
+      setIsSendLimited(result.code === MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED);
     }
   };
 
@@ -65,6 +53,7 @@ export const useEmailSignIn = (open: boolean) => {
     email,
     setEmail,
     emailError,
+    isSendLimited,
     emailFormRef,
     handleEmailSubmit,
   };

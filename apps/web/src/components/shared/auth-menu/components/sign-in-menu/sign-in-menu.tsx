@@ -48,6 +48,7 @@ export const SignInMenu = ({
     email,
     setEmail,
     emailError,
+    isSendLimited,
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(isOpen);
@@ -65,8 +66,6 @@ export const SignInMenu = ({
     emailSent,
   } = signInMenuVariants();
 
-  // `providerId` is the Auth.js provider id (next-auth's default lowercase
-  // ids) — kept separate from `icon`, the unrelated `ICONS` key.
   const allProviders: {
     providerId: TOAuthProviderId;
     icon: TIconName;
@@ -163,7 +162,7 @@ export const SignInMenu = ({
             />
             {emailError && (
               <p role="status" aria-live="polite" className={emailHint()}>
-                {t('emailError')}
+                {isSendLimited ? t('sendLimited') : t('emailError')}
               </p>
             )}
             <div className={emailFormActions()}>

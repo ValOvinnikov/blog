@@ -123,6 +123,7 @@
     "sending": "Sending…",
     "checkYourInbox": "Check your inbox for a sign-in link.",
     "emailError": "Couldn't send the link. Try again.",
+    "sendLimited": "Too many sign-in links were requested for this address. Try again in an hour.",
     "oauthError": "Sign-in failed. Please try again.",
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
