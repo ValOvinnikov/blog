@@ -5425,6 +5425,14 @@
         "from": "@worker/constants/retention",
         "file": "apps/worker/src/constants/retention.ts"
       }
+    ],
+    "retention.deadline_reached": [
+      {
+        "ref": "RETENTION_LOG.DEADLINE_REACHED",
+        "scope": "app:worker",
+        "from": "@worker/constants/retention",
+        "file": "apps/worker/src/constants/retention.ts"
+      }
     ]
   },
   "numbers": {

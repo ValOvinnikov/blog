@@ -456,4 +456,4 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@worker/constants/retention` — `apps/worker/src/constants/retention.ts`
 
 - **RETENTION_KIND**: `PENDING_SUBSCRIBERS`, `LEADS`, `SESSIONS`, `VERIFICATION_TOKENS`, `AUDIT_EVENTS`, `RESOLVED_FINDINGS`
-- **RETENTION_LOG**: `DELETED`=`"retention.deleted"`, `CLEANUP_FAILED`=`"retention.cleanup_failed"`
+- **RETENTION_LOG**: `DELETED`=`"retention.deleted"`, `CLEANUP_FAILED`=`"retention.cleanup_failed"`, `DEADLINE_REACHED`=`"retention.deadline_reached"`
