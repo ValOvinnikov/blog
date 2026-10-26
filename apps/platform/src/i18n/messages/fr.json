@@ -113,6 +113,8 @@
     "sending": "Envoi…",
     "sendFailedTitle": "Nous n'avons pas pu envoyer votre lien de connexion",
     "sendFailedDescription": "Réessayez dans quelques minutes.",
+    "sendLimitedTitle": "Trop de liens de connexion ont été demandés pour cette adresse",
+    "sendLimitedDescription": "Réessayez dans une heure.",
     "linkSentTitle": "Consultez vos e-mails",
     "linkSentDescription": "Nous avons envoyé un lien de connexion à {email}. Il ne fonctionne qu'une fois et expire au bout d'un moment."
   },

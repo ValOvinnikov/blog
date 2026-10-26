@@ -21,6 +21,12 @@ const preset = defineConfig({
     // Vitest's 5000ms default is crossed by real render-work tests (1.3-1.9s)
     // under root `pnpm test`'s parallel-turbo contention across packages.
     testTimeout: 20_000,
+    // next-auth's root entry imports the extensionless `next/server`, which Vitest's externalized resolver can't load.
+    server: {
+      deps: {
+        inline: ['next-auth'],
+      },
+    },
   },
 });
 

@@ -113,6 +113,8 @@
     "sending": "Versturen…",
     "sendFailedTitle": "We konden je inloglink niet versturen",
     "sendFailedDescription": "Probeer het over een paar minuten opnieuw.",
+    "sendLimitedTitle": "Er zijn te veel inloglinks aangevraagd voor dit adres",
+    "sendLimitedDescription": "Probeer het over een uur opnieuw.",
     "linkSentTitle": "Check je e-mail",
     "linkSentDescription": "We hebben een inloglink naar {email} gestuurd. Hij werkt maar één keer en verloopt na een tijdje."
   },

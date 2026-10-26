@@ -2,12 +2,16 @@
 
 import {
   ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeServerError,
+  isOutcomeSuccess,
   type TMaybeUndefined,
   type TReasonedFailure,
 } from '@blog/config';
 import {
   sendSignInLinkAction,
   type TSendSignInLinkFieldError,
+  type TSendSignInLinkRefusal,
 } from '@platform/server/auth/send-sign-in-link-action';
 import { useState, useTransition } from 'react';
 
@@ -18,7 +22,8 @@ export const useEmailSignIn = (callbackPath: string) => {
     useState<TMaybeUndefined<TReasonedFailure<TSendSignInLinkFieldError>>>(
       undefined,
     );
-  const [hasSendFailed, setHasSendFailed] = useState(false);
+  const [sendRefusal, setSendRefusal] =
+    useState<TMaybeUndefined<TSendSignInLinkRefusal>>(undefined);
   const [isPending, startTransition] = useTransition();
 
   const submit = () => {
@@ -26,13 +31,16 @@ export const useEmailSignIn = (callbackPath: string) => {
       const result = await sendSignInLinkAction({ email, callbackPath });
 
       setEmailError(
-        result.outcome === ACTION_OUTCOME.INVALID
-          ? result.fieldErrors.email
+        isOutcomeInvalid(result) ? result.fieldErrors.email : undefined,
+      );
+      setSendRefusal(
+        result.outcome === ACTION_OUTCOME.RATE_LIMITED ||
+          isOutcomeServerError(result)
+          ? result.outcome
           : undefined,
       );
-      setHasSendFailed(result.outcome === ACTION_OUTCOME.SERVER_ERROR);
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
         setSentTo(email.trim());
       }
     });
@@ -43,7 +51,7 @@ export const useEmailSignIn = (callbackPath: string) => {
     setEmail,
     sentTo,
     emailError,
-    hasSendFailed,
+    sendRefusal,
     isPending,
     submit,
   };

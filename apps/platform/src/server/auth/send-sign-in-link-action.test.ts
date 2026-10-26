@@ -1,4 +1,5 @@
 import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
 import { ACTION_OUTCOME } from '@blog/config';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
@@ -75,5 +76,17 @@ describe(sendSignInLinkAction, () => {
     expect(logger.error).toHaveBeenCalledWith(SIGN_IN_LOG.LINK_FAILED, {
       error,
     });
+  });
+
+  it('reports a send refused by the send limit without logging it as a failure', async () => {
+    vi.mocked(signIn).mockRejectedValueOnce(new MagicLinkSendLimitedError());
+
+    const result = await sendSignInLinkAction({
+      email: MOCK_SIGN_IN_EMAIL,
+      callbackPath: adminRoutes.dashboardLeads(),
+    });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
+    expect(logger.error).not.toHaveBeenCalled();
   });
 });

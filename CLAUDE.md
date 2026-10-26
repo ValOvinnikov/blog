@@ -611,6 +611,14 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   raw forms already in the repo are converted file by file as each file is
   touched, the same steady-state rule as comments. Where helpers and shared
   constants live: `.claude/agents/config.md`.
+- **Read an action result through its outcome guards.** `@blog/config`'s
+  `isOutcomeSuccess(result)`, `isOutcomeInvalid(result)` and
+  `isOutcomeServerError(result)` take the whole result and narrow it — never
+  `result.outcome === ACTION_OUTCOME.<X>`. A guard for another outcome is
+  added by the change that gives that check its second use, never ahead of
+  it. Files still comparing raw outcomes, and what is left to add:
+  `docs/context/action-outcome-guards.md`; a touched file converts and leaves
+  that list in the same change.
 - **File size budgets, in non-blank lines:** a component `.tsx` 150, a hook
   120, any other `.ts` 120. Exempt: `*-variants` files, registries and
   catalogs (`icon-registry.ts`), Studio schema definitions, generated files,

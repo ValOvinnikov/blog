@@ -85,9 +85,12 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   consumer's `tsconfig.json` `include`s `packages/auth/src/**/*.d.ts`.
 - **Magic-link send limits** — `findMagicLinkSendRefusal` counts each send per
   client IP, then per email, in `@blog/db`'s counter table; a refused send
-  returns without sending, so the user sees the same page as a real send. The
-  refusal goes to the app's `onMagicLinkSendRefused` handler, because this
-  package never logs and the app does.
+  sends nothing. A block or a failed check returns, so the user sees the same
+  page as a real send and a block is never confirmed; a send over a limit
+  throws `MagicLinkSendLimitedError`, whose `code` both apps' sign-in UIs
+  read to say try again later. The refusal goes to the app's
+  `onMagicLinkSendRefused` handler, because this package never logs and the
+  app does.
 - **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`,
   `recordSignupTermsOnSignIn`),
   registered for `PLATFORM` only; a site sign-in never acts on platform

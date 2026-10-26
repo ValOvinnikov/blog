@@ -4,8 +4,8 @@
 
 ## What it provides
 
-`preset.ts` — globals, the default test file glob, `css: false`, and the
-React plugin. Consumers `mergeConfig` it with their own `vitest.config.ts`;
+`preset.ts` — globals, the default test file glob, `css: false`, the
+`next-auth` server-deps inline, and the React plugin. Consumers `mergeConfig` it with their own `vitest.config.ts`;
 component packages (`ui`, `web`, `platform`) layer a `jsdom` environment and a
 setup file on top, pure logic packages use it with `environment: 'node'`.
 
