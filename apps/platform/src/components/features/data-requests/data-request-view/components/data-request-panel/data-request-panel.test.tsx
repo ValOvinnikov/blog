@@ -20,12 +20,12 @@ const {
   lookUpPersonalDataActionMock,
   exportPersonalDataActionMock,
   erasePersonalDataActionMock,
-  downloadJsonMock,
+  downloadFileMock,
 } = vi.hoisted(() => ({
   lookUpPersonalDataActionMock: vi.fn(),
   exportPersonalDataActionMock: vi.fn(),
   erasePersonalDataActionMock: vi.fn(),
-  downloadJsonMock: vi.fn(),
+  downloadFileMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/data-requests/look-up-personal-data-action', () => ({
@@ -40,15 +40,16 @@ vi.mock('@platform/server/data-requests/erase-personal-data-action', () => ({
   erasePersonalDataAction: erasePersonalDataActionMock,
 }));
 
-vi.mock('@platform/utils/download-json/download-json', () => ({
-  downloadJson: downloadJsonMock,
+vi.mock('@platform/utils/download-file/download-file', () => ({
+  downloadFile: downloadFileMock,
 }));
 
 const EMAIL_FIELD = { name: 'Email address' };
 const FIND_BUTTON = { name: 'Find data' };
 const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
-const EXPORT_BUTTON = { name: 'Download export' };
+const EXPORT_JSON_BUTTON = { name: 'Download JSON' };
+const EXPORT_CSV_BUTTON = { name: 'Download CSV' };
 const RESULTS_TABLE = { name: 'Stored records' };
 const READER_ACCOUNT_CHECKBOX = { name: 'Also delete the reader account' };
 const SIGNUP_BLOCK_KEPT =
@@ -92,9 +93,12 @@ describe(`<${DataRequestPanel.name}/>`, () => {
       matches: [mockDataRequestMatch(), BLOCK_MATCH],
       readerAccount: mockPersonalDataReaderAccount(),
     });
-    exportPersonalDataActionMock.mockReset();
+    exportPersonalDataActionMock.mockReset().mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      data: mockPersonalDataExport(),
+    });
     erasePersonalDataActionMock.mockReset();
-    downloadJsonMock.mockReset();
+    downloadFileMock.mockReset();
     setup();
   });
 
@@ -151,25 +155,53 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(eraseButton).not.toBeInTheDocument();
   });
 
-  it('downloads the export for the searched email', async () => {
-    const data = mockPersonalDataExport();
-    exportPersonalDataActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-      data,
-    });
+  it('downloads the JSON export for the searched email', async () => {
     await lookUp();
 
-    const exportButton = await screen.findByRole('button', EXPORT_BUTTON);
+    const exportButton = await screen.findByRole('button', EXPORT_JSON_BUTTON);
     await user.click(exportButton);
+
+    const [, fileName, content] = downloadFileMock.mock.lastCall ?? [];
 
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
     });
-    expect(downloadJsonMock).toHaveBeenCalledWith(
-      expect.any(HTMLAnchorElement),
-      DATA_REQUEST_EXPORT_FILE_NAME,
-      { email: MOCK_DATA_REQUEST_EMAIL, ...data },
+    expect(fileName).toBe(DATA_REQUEST_EXPORT_FILE_NAME.JSON);
+    expect(JSON.parse(content)).toEqual(
+      JSON.parse(JSON.stringify(mockPersonalDataExport())),
     );
+  });
+
+  it('downloads the CSV export for the searched email', async () => {
+    await lookUp();
+
+    const exportButton = await screen.findByRole('button', EXPORT_CSV_BUTTON);
+    await user.click(exportButton);
+
+    const [, fileName, content] = downloadFileMock.mock.lastCall ?? [];
+
+    expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
+      email: MOCK_DATA_REQUEST_EMAIL,
+    });
+    expect(fileName).toBe(DATA_REQUEST_EXPORT_FILE_NAME.CSV);
+    expect(content).toContain(DATA_REQUEST_MATCH_KIND.SUBSCRIBER);
+  });
+
+  it('says so when the export fails, and downloads nothing', async () => {
+    exportPersonalDataActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
+    await lookUp();
+
+    const exportButton = await screen.findByRole('button', EXPORT_CSV_BUTTON);
+    await user.click(exportButton);
+
+    const toast = await screen.findByText(
+      "Couldn't prepare the export — try again.",
+    );
+
+    expect(toast).toBeVisible();
+    expect(downloadFileMock).not.toHaveBeenCalled();
   });
 
   it("shows the reader account's sign-in methods, sessions and bookmarks", async () => {

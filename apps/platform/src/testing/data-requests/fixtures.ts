@@ -6,11 +6,13 @@ import { faker } from '@faker-js/faker';
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import type { TPersonalDataExport } from '@platform/server/data-requests/export-personal-data-action';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 
 export const MOCK_DATA_REQUEST_EMAIL = faker.internet.email().toLowerCase();
 export const MOCK_DATA_REQUEST_EMAIL_INDEX = faker.string.alphanumeric(43);
 export const MOCK_DATA_REQUEST_SITE_NAME = faker.company.name();
 export const MOCK_NOT_AN_EMAIL = faker.lorem.slug();
+export const MOCK_EXPORT_GENERATED_AT = faker.date.recent();
 
 const TENANT_ID = faker.string.uuid();
 const SUBSCRIBER_ID = faker.string.uuid();
@@ -120,6 +122,9 @@ export const mockPersonalDataExport = (): TPersonalDataExport => {
   } = mockPersonalDataMatches();
 
   return {
+    generatedAt: MOCK_EXPORT_GENERATED_AT.toISOString(),
+    searchedEmail: MOCK_DATA_REQUEST_EMAIL,
+    operatorId: mockAdmin().userId,
     subscribers,
     leads,
     membershipInvites,

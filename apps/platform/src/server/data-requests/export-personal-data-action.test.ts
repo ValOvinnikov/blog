@@ -8,6 +8,7 @@ import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_DATA_REQUEST_EMAIL,
+  MOCK_EXPORT_GENERATED_AT,
   mockPersonalDataExport,
   mockPersonalDataMatches,
 } from '@platform/testing/data-requests/fixtures';
@@ -38,11 +39,17 @@ vi.mock('@blog/db', async () => ({
 
 describe(exportPersonalDataAction, () => {
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(MOCK_EXPORT_GENERATED_AT);
     requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
     findPersonalDataMock
       .mockReset()
       .mockResolvedValue(okResult(mockPersonalDataMatches()));
     recordAuditEventMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('rejects a caller who is not a super admin before reading any data', async () => {
@@ -56,9 +63,9 @@ describe(exportPersonalDataAction, () => {
     expect(findPersonalDataMock).not.toHaveBeenCalled();
   });
 
-  it('exports every match without the email index', async () => {
+  it('exports every match without the email index, headed by when, for whom and by which operator', async () => {
     const result = await exportPersonalDataAction({
-      email: MOCK_DATA_REQUEST_EMAIL,
+      email: ` ${MOCK_DATA_REQUEST_EMAIL} `,
     });
 
     expect(result).toEqual({

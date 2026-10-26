@@ -12,7 +12,19 @@ export const DATA_REQUEST_MATCH_KIND = {
 
 export type TDataRequestMatchKind = TValueOf<typeof DATA_REQUEST_MATCH_KIND>;
 
-export const DATA_REQUEST_EXPORT_FILE_NAME = 'personal-data-export.json';
+export const DATA_REQUEST_EXPORT_FORMAT = {
+  JSON: 'JSON',
+  CSV: 'CSV',
+} as const;
+
+export type TDataRequestExportFormat = TValueOf<
+  typeof DATA_REQUEST_EXPORT_FORMAT
+>;
+
+export const DATA_REQUEST_EXPORT_FILE_NAME = {
+  JSON: 'personal-data-export.json',
+  CSV: 'personal-data-export.csv',
+} as const satisfies Record<TDataRequestExportFormat, string>;
 
 export const DATA_REQUEST_LOG = {
   AUDIT_FAILED: 'data_request.audit_failed',

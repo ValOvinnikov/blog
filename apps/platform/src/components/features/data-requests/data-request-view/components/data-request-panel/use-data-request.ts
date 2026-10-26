@@ -8,16 +8,13 @@ import {
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
-import { DATA_REQUEST_EXPORT_FILE_NAME } from '@platform/constants/data-request';
 import type { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
 import { erasePersonalDataAction } from '@platform/server/data-requests/erase-personal-data-action';
-import { exportPersonalDataAction } from '@platform/server/data-requests/export-personal-data-action';
 import {
   lookUpPersonalDataAction,
   type TLookUpPersonalDataResult,
 } from '@platform/server/data-requests/look-up-personal-data-action';
-import { downloadJson } from '@platform/utils/download-json/download-json';
 import { useRef, useState, useTransition } from 'react';
 
 type TEmailError = TReasonedFailure<typeof TENANT_FIELD_ERROR.EMAIL_INVALID>;
@@ -31,7 +28,6 @@ type TErasure = { count: number; isReaderAccountRefused: boolean };
 
 export type TUseDataRequestMessages = {
   lookUpFailed: string;
-  exportFailed: string;
   eraseFailed: string;
   erased: (count: number) => string;
   erasedAccountKept: (count: number) => string;
@@ -39,7 +35,6 @@ export type TUseDataRequestMessages = {
 
 export const useDataRequest = ({
   lookUpFailed,
-  exportFailed,
   eraseFailed,
   erased,
   erasedAccountKept,
@@ -51,7 +46,6 @@ export const useDataRequest = ({
   const [lookup, setLookup] =
     useState<TMaybeUndefined<TDataRequestLookup>>(undefined);
   const [isLookingUp, startLookUp] = useTransition();
-  const [isExporting, startExport] = useTransition();
   const erasure = useRef<TErasure>({
     count: 0,
     isReaderAccountRefused: false,
@@ -75,22 +69,6 @@ export const useDataRequest = ({
       }
 
       toast.error({ message: lookUpFailed });
-    });
-  };
-
-  const exportData = (lookedUpEmail: string, link: HTMLAnchorElement) => {
-    startExport(async () => {
-      const result = await exportPersonalDataAction({ email: lookedUpEmail });
-
-      if (isOutcomeSuccess(result)) {
-        downloadJson(link, DATA_REQUEST_EXPORT_FILE_NAME, {
-          email: lookedUpEmail,
-          ...result.data,
-        });
-        return;
-      }
-
-      toast.error({ message: exportFailed });
     });
   };
 
@@ -127,9 +105,7 @@ export const useDataRequest = ({
     emailError,
     lookup,
     isLookingUp,
-    isExporting,
     lookUp,
-    exportData,
     erase,
     finishErase,
   };

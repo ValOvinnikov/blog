@@ -3,17 +3,17 @@ import { type Blob, resolveObjectURL } from 'node:buffer';
 import type { TMaybeUndefined } from '@blog/config';
 import { faker } from '@faker-js/faker';
 
-import { downloadJson } from './download-json';
+import { downloadFile } from './download-file';
 
 const FILE_NAME = faker.system.fileName();
-const VALUE = { subscribers: [{ id: faker.string.uuid() }] };
+const CONTENT = faker.lorem.paragraph();
 
-describe(downloadJson, () => {
+describe(downloadFile, () => {
   const link = { href: '', download: '', click: vi.fn() };
   let saved: TMaybeUndefined<Blob>;
 
   const download = () =>
-    downloadJson(link as unknown as HTMLAnchorElement, FILE_NAME, VALUE);
+    downloadFile(link as unknown as HTMLAnchorElement, FILE_NAME, CONTENT);
 
   beforeEach(() => {
     saved = undefined;
@@ -22,11 +22,11 @@ describe(downloadJson, () => {
     });
   });
 
-  it('saves the value as a JSON file under the given name', async () => {
+  it('saves the content as a file under the given name', async () => {
     download();
 
     expect(link.download).toBe(FILE_NAME);
-    await expect(saved?.text().then(JSON.parse)).resolves.toEqual(VALUE);
+    await expect(saved?.text()).resolves.toBe(CONTENT);
   });
 
   it('releases the file once saved', () => {

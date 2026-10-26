@@ -1450,7 +1450,8 @@
   "dataRequestResultCard": {
     "title": "Gespeicherte Daten zu {email}",
     "matchCount": "{count, plural, =0 {Keine Einträge gefunden.} one {# Eintrag gefunden.} other {# Einträge gefunden.}}",
-    "export": "Export herunterladen",
+    "exportJson": "JSON herunterladen",
+    "exportCsv": "CSV herunterladen",
     "exporting": "Wird vorbereitet…"
   },
   "dataRequestEraseDialog": {

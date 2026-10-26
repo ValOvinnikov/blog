@@ -1,11 +1,15 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { DataRequestEraseDialog } from '@platform/components/features/data-requests/data-request-view/components/data-request-erase-dialog/data-request-erase-dialog';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
+import {
+  DATA_REQUEST_EXPORT_FORMAT,
+  type TDataRequestExportFormat,
+} from '@platform/constants/data-request';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
@@ -21,8 +25,8 @@ export type TDataRequestResultCardProps = {
   matchCount: number;
   hasReaderAccount: boolean;
   hasSignupBlock: boolean;
-  isExporting: boolean;
-  onExport: (link: HTMLAnchorElement) => void;
+  exportingFormat: TMaybeUndefined<TDataRequestExportFormat>;
+  onExport: (link: HTMLAnchorElement, format: TDataRequestExportFormat) => void;
   onErase: (
     includesReaderAccount: boolean,
   ) => Promise<TConfirmDialogActionResult>;
@@ -34,7 +38,7 @@ export const DataRequestResultCard = ({
   matchCount,
   hasReaderAccount,
   hasSignupBlock,
-  isExporting,
+  exportingFormat,
   onExport,
   onErase,
   onErased,
@@ -43,8 +47,8 @@ export const DataRequestResultCard = ({
   const { actions } = dataRequestResultCardVariants();
   const exportLinkRef = useRef<HTMLAnchorElement>(null);
 
-  const handleExport = () => {
-    if (exportLinkRef.current) onExport(exportLinkRef.current);
+  const handleExport = (format: TDataRequestExportFormat) => {
+    if (exportLinkRef.current) onExport(exportLinkRef.current, format);
   };
 
   return (
@@ -57,11 +61,21 @@ export const DataRequestResultCard = ({
               type="button"
               variant="secondary"
               size={SIZE.SM}
-              onClick={handleExport}
-              isPending={isExporting}
+              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
+              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
               pendingLabel={t('exporting')}
             >
-              {t('export')}
+              {t('exportJson')}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size={SIZE.SM}
+              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
+              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
+              pendingLabel={t('exporting')}
+            >
+              {t('exportCsv')}
             </Button>
             {matchCount > 0 && (
               <DataRequestEraseDialog

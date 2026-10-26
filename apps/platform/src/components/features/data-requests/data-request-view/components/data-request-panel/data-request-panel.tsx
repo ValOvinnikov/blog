@@ -9,6 +9,7 @@ import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-
 import { useTranslations } from 'next-intl';
 
 import { useDataRequest } from './use-data-request';
+import { useDataRequestExport } from './use-data-request-export';
 
 export const DataRequestPanel = () => {
   const t = useTranslations('dataRequestPanel');
@@ -19,18 +20,18 @@ export const DataRequestPanel = () => {
     emailError,
     lookup,
     isLookingUp,
-    isExporting,
     lookUp,
-    exportData,
     erase,
     finishErase,
   } = useDataRequest({
     lookUpFailed: t('lookUpFailed'),
-    exportFailed: t('exportFailed'),
     eraseFailed: t('eraseFailed'),
     erased: (count) => t('erased', { count }),
     erasedAccountKept: (count) => t('erasedAccountKept', { count }),
   });
+  const { exportingFormat, exportData } = useDataRequestExport(
+    t('exportFailed'),
+  );
 
   return (
     <>
@@ -50,8 +51,8 @@ export const DataRequestPanel = () => {
             hasSignupBlock={lookup.matches.some(
               ({ kind }) => kind === DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
             )}
-            isExporting={isExporting}
-            onExport={(link) => exportData(lookup.email, link)}
+            exportingFormat={exportingFormat}
+            onExport={(link, format) => exportData(lookup.email, link, format)}
             onErase={(includesReaderAccount) =>
               erase(lookup.email, includesReaderAccount)
             }

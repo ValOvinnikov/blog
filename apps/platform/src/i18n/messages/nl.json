@@ -1450,7 +1450,8 @@
   "dataRequestResultCard": {
     "title": "Opgeslagen gegevens van {email}",
     "matchCount": "{count, plural, =0 {Geen records gevonden.} one {# record gevonden.} other {# records gevonden.}}",
-    "export": "Export downloaden",
+    "exportJson": "JSON downloaden",
+    "exportCsv": "CSV downloaden",
     "exporting": "Voorbereiden…"
   },
   "dataRequestEraseDialog": {
