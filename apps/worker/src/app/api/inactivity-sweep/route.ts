@@ -17,6 +17,9 @@ import { logger } from '@worker/utils/logger/logger';
 import { runRetentionCleanups } from '@worker/utils/retention/run-retention-cleanups';
 import { respondError } from '@worker/utils/signed-tenant-request/signed-tenant-request';
 
+// Next requires a literal here, so it cannot import a const.
+export const maxDuration = 300;
+
 function hasCronSecret(request: Request, secret: string): boolean {
   const authorization = request.headers.get('authorization');
   const provided = authorization?.startsWith(CRON_BEARER_PREFIX)
