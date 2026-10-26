@@ -14,12 +14,18 @@ describe(NewTenantPage, () => {
   it('renders the Add tenant wizard with the Details step form', () => {
     render(<NewTenantPage />);
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Add tenant' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Tenant details' }),
-    ).toBeVisible();
-    expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
+    const pageHeading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Add tenant',
+    });
+    const cardHeading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Tenant details',
+    });
+    const nameInput = screen.getByRole('textbox', { name: 'Tenant name' });
+
+    expect(pageHeading).toBeVisible();
+    expect(cardHeading).toBeVisible();
+    expect(nameInput).toBeVisible();
   });
 });

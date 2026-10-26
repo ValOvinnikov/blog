@@ -131,7 +131,9 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   });
 
   it('shows the fixed root-domain suffix beside the site address', () => {
-    expect(screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`)).toBeVisible();
+    const suffix = screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+
+    expect(suffix).toBeVisible();
   });
 
   it('shows a taken site address error beside the field', async () => {
@@ -143,9 +145,9 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await fillValidForm(user);
     await clickBeginProvisioning(user);
 
-    expect(
-      await screen.findByText(en.tenantFieldErrors.slugTaken),
-    ).toBeVisible();
+    const slugError = await screen.findByText(en.tenantFieldErrors.slugTaken);
+
+    expect(slugError).toBeVisible();
   });
 
   it('defaults the plan to Free', () => {
