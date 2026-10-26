@@ -2819,7 +2819,9 @@ components import, and only when its three optional server env vars are set
 stays console-only. `apps/web`, `apps/platform` and `apps/worker` all register
 it. In web and platform, `instrumentation.ts`'s `onRequestError`
 logs unhandled request errors through the same logger, so a render or route
-crash reaches Loki too.
+crash reaches Loki too. Next does not await `onRequestError` for a render
+error, so the handler hands its whole log, import included, to `waitUntil`
+before its first await.
 
 Grafana alerts the operator by email, with an optional Slack contact point
 beside it: one rule per app on error-level lines, grouped by event so a burst

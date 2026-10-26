@@ -1,3 +1,4 @@
+import { REQUEST_LOG } from '@web/constants/request';
 import { logger } from '@web/utils/logger/logger';
 import type { Instrumentation } from 'next';
 
@@ -6,7 +7,7 @@ export const logRequestError: Instrumentation.onRequestError = (
   request,
   context,
 ) => {
-  logger.error('request.unhandled_error', {
+  logger.error(REQUEST_LOG.UNHANDLED_ERROR, {
     error,
     routePath: context.routePath,
     routeType: context.routeType,
