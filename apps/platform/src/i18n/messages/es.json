@@ -333,7 +333,12 @@
     "siteSetupRetry": "Reintentar",
     "siteSetupRetrying": "Reiniciando…",
     "siteSetupRetryFailed": "No se pudo reiniciar la configuración. Inténtalo de nuevo.",
-    "siteSetupRetryRefused": "No se pudo reiniciar la configuración. Recarga la página e inténtalo de nuevo."
+    "siteSetupRetryRefused": "No se pudo reiniciar la configuración. Recarga la página e inténtalo de nuevo.",
+    "siteSetupNotStartedTitle": "La configuración de tu sitio no ha empezado",
+    "siteSetupNotStartedDescription": "No pudimos empezar a configurar tu sitio. Iníciala ahora: no se pierde nada.",
+    "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
+    "siteSetupStart": "Iniciar configuración",
+    "siteSetupStarting": "Iniciando…"
   },
   "provisioningBanner": {
     "readyTitle": "Aprovisionado",

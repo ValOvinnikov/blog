@@ -3,6 +3,7 @@
 import { ACTION_OUTCOME, ALERT_TYPE, SIZE } from '@blog/config';
 import {
   CORE_PROVISIONING_STEPS,
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
@@ -31,6 +32,8 @@ export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
     stepUpdatedAt,
     isAwaitingRunner,
     isOverallFailed,
+    allIdle,
+    provisioningStatus,
   } = useProvisioningPoll(tenant);
   const { root } = siteSetupCardVariants();
 
@@ -43,6 +46,20 @@ export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
   const isRetryFailed =
     dispatchNotice !== undefined &&
     dispatchNotice !== TENANT_REFUSAL.ALREADY_IN_PROGRESS;
+  const isNotStarted =
+    allIdle && provisioningStatus === TENANT_PROVISIONING_STATUS.PENDING;
+  const dispatchButton = (label: string, pendingLabel: string) =>
+    canRetry ? (
+      <Button
+        variant="secondary"
+        size={SIZE.SM}
+        isPending={isDispatchPending}
+        pendingLabel={pendingLabel}
+        onClick={handleDispatch}
+      >
+        {label}
+      </Button>
+    ) : undefined;
 
   return (
     <div className={root()}>
@@ -55,19 +72,19 @@ export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
               ? 'siteSetupFailedDescription'
               : 'siteSetupFailedContactDescription',
           )}
-          action={
-            canRetry ? (
-              <Button
-                variant="secondary"
-                size={SIZE.SM}
-                isPending={isDispatchPending}
-                pendingLabel={t('siteSetupRetrying')}
-                onClick={handleDispatch}
-              >
-                {t('siteSetupRetry')}
-              </Button>
-            ) : undefined
-          }
+          action={dispatchButton(t('siteSetupRetry'), t('siteSetupRetrying'))}
+        />
+      )}
+      {isNotStarted && (
+        <Alert
+          type={ALERT_TYPE.WARNING}
+          title={t('siteSetupNotStartedTitle')}
+          description={t(
+            canRetry
+              ? 'siteSetupNotStartedDescription'
+              : 'siteSetupNotStartedContactDescription',
+          )}
+          action={dispatchButton(t('siteSetupStart'), t('siteSetupStarting'))}
         />
       )}
       {isRetryFailed && (

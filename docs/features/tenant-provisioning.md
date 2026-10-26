@@ -74,7 +74,7 @@ The run then verifies all of it. The admin polls each step's progress and offers
   - `/tenants/{id}/provisioning` shows each step's status and the run. Until the workflow starts the run, it says the run is queued and counts the wait. A step that finishes between two polls is still shown Running before it settles.
   - `/tenants/{id}/domain` shows DNS records and live Vercel verification.
 - **SUPERADMIN only:** `/tenants/{id}/danger` holds deprovision (with dry run), reactivate and delete.
-- **Owner:** `/dashboard` shows a setup progress card, with Retry on a failure, until provisioning is READY. `/dashboard/domain` shows the same domain view.
+- **Owner:** `/dashboard` shows a setup progress card, with Retry on a failure and Start setup when the first run never started (PENDING, every step idle), until provisioning is READY. Both call the same retry action, whose worker guard refuses a second concurrent run. `/dashboard/domain` shows the same domain view.
 - **Workflows:**
   - `deprovision-tenant.yml` and `invalidate-tenant-cache.yml` are dispatch only. No workflow provisions a tenant.
   - `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` are dispatch only while their crons are parked.

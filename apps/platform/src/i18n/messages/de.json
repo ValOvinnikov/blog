@@ -333,7 +333,12 @@
     "siteSetupRetry": "Erneut versuchen",
     "siteSetupRetrying": "Wird neu gestartet…",
     "siteSetupRetryFailed": "Die Einrichtung konnte nicht neu gestartet werden – versuchen Sie es erneut.",
-    "siteSetupRetryRefused": "Die Einrichtung konnte nicht neu gestartet werden – laden Sie die Seite neu und versuchen Sie es erneut."
+    "siteSetupRetryRefused": "Die Einrichtung konnte nicht neu gestartet werden – laden Sie die Seite neu und versuchen Sie es erneut.",
+    "siteSetupNotStartedTitle": "Die Einrichtung Ihrer Website hat noch nicht begonnen",
+    "siteSetupNotStartedDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Starten Sie sie jetzt – es geht nichts verloren.",
+    "siteSetupNotStartedContactDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Bitten Sie Ihren Plattform-Kontakt, sie zu starten.",
+    "siteSetupStart": "Einrichtung starten",
+    "siteSetupStarting": "Wird gestartet…"
   },
   "provisioningBanner": {
     "readyTitle": "Bereitgestellt",
