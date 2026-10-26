@@ -170,13 +170,17 @@ Free site.
 
 ## Constraints and invariants
 
-- `@blog/auth`'s `isMagicLinkSendAllowed` refuses a magic-link send to
+- `@blog/auth`'s `findMagicLinkSendRefusal` refuses a magic-link send to
   an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
   keys on `normalizeEmailIdentity`, so `+tag` variants share one budget. A
   refusal, or a failed check, sends nothing and never throws, and every
   request, refused or sent, takes at least `MAGIC_LINK_RESPONSE_FLOOR_MS`, so
   the check-your-inbox page cannot be told apart by content or timing.
+- Each refusal reaches the app through `buildAuthConfig`'s
+  `onMagicLinkSendRefused` handler, which logs one `auth.sign_in_link_refused`
+  warn line with its `MAGIC_LINK_REFUSAL` reason, and the error for a failed
+  check. The line never carries the email, the IP or a hash of either.
 - `resolveHomeHref` picks a dead end's link and `/`'s redirect by role:
   operators to `/tenants`, members to `/dashboard`, no membership to
   `/onboarding`. `/dashboard` with no membership redirects to `/onboarding`.

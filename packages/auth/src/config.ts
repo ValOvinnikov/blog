@@ -9,12 +9,16 @@ import { buildPlatformCookies } from '@blog/auth/sessions/platform-cookies';
 import { env } from '@blog/auth/utils/env/env';
 import { getOAuthProviderCredentials } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
+import type { IMagicLinkSendRefusal } from '@blog/config/types';
 import { getDb, schema } from '@blog/db';
 import type { NextAuthConfig } from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
-export function buildAuthConfig(app: TAuthApp): NextAuthConfig {
+export function buildAuthConfig(
+  app: TAuthApp,
+  onMagicLinkSendRefused: (refusal: IMagicLinkSendRefusal) => void,
+): NextAuthConfig {
   const githubCredentials = getOAuthProviderCredentials('github');
   const googleCredentials = getOAuthProviderCredentials('google');
   const adapter = DrizzleAdapter(getDb(), {
@@ -59,7 +63,7 @@ export function buildAuthConfig(app: TAuthApp): NextAuthConfig {
     providers: [
       ...(githubCredentials ? [GitHub(githubCredentials)] : []),
       ...(googleCredentials ? [Google(googleCredentials)] : []),
-      buildMagicLinkProvider(app),
+      buildMagicLinkProvider(app, onMagicLinkSendRefused),
     ],
   };
 }

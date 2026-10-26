@@ -27,6 +27,7 @@ export * from './landing-page';
 export * from './language';
 export * from './layout';
 export * from './link';
+export * from './magic-link-refusal';
 export * from './module';
 export * from './next-dynamic-error';
 export * from './next-navigation-error';

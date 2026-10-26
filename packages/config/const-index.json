@@ -46,6 +46,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/action-outcome.ts"
+      },
+      {
+        "ref": "MAGIC_LINK_REFUSAL.BLOCKED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
     "RATE_LIMITED": [
@@ -2006,6 +2012,30 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "NETWORK_LIMIT": [
+      {
+        "ref": "MAGIC_LINK_REFUSAL.NETWORK_LIMIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/magic-link-refusal.ts"
+      }
+    ],
+    "ADDRESS_LIMIT": [
+      {
+        "ref": "MAGIC_LINK_REFUSAL.ADDRESS_LIMIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/magic-link-refusal.ts"
+      }
+    ],
+    "CHECK_FAILED": [
+      {
+        "ref": "MAGIC_LINK_REFUSAL.CHECK_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
     "CUSTOM": [
@@ -4390,6 +4420,20 @@
         "scope": "app:platform",
         "from": "@platform/constants/sign-in",
         "file": "apps/platform/src/constants/sign-in.ts"
+      }
+    ],
+    "auth.sign_in_link_refused": [
+      {
+        "ref": "SIGN_IN_LOG.LINK_REFUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in",
+        "file": "apps/platform/src/constants/sign-in.ts"
+      },
+      {
+        "ref": "SIGN_IN_LOG.LINK_REFUSED",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
       }
     ],
     "TERMS_NOT_ACCEPTED": [

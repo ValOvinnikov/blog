@@ -1,6 +1,6 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE, MAGIC_LINK_REFUSAL } from '@blog/config/constants';
 
-import { isMagicLinkSendAllowed } from './is-magic-link-send-allowed';
+import { findMagicLinkSendRefusal } from './find-magic-link-send-refusal';
 
 const { incrementMagicLinkSendCountMock, isSignupBlockedMock } = vi.hoisted(
   () => ({
@@ -40,7 +40,7 @@ const withSendCounts = ({ email, ip }: { email: number; ip: number }) => {
 const counterKeys = () =>
   incrementMagicLinkSendCountMock.mock.calls.map(([key]) => key);
 
-describe(isMagicLinkSendAllowed, () => {
+describe(findMagicLinkSendRefusal, () => {
   beforeEach(() => {
     isSignupBlockedMock.mockResolvedValue(NOT_BLOCKED);
   });
@@ -48,31 +48,40 @@ describe(isMagicLinkSendAllowed, () => {
   it('allows a send within both limits', async () => {
     withSendCounts({ email: 10, ip: 20 });
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(true);
+    expect(result).toBeUndefined();
   });
 
-  it('refuses a send over the per-email limit', async () => {
+  it('refuses a send over the per-email limit as an address limit', async () => {
     withSendCounts({ email: 11, ip: 1 });
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(false);
+    expect(result).toEqual({ reason: MAGIC_LINK_REFUSAL.ADDRESS_LIMIT });
   });
 
-  it('refuses a send over the per-IP limit', async () => {
+  it('refuses a send over the per-IP limit as a network limit', async () => {
     withSendCounts({ email: 1, ip: 21 });
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(false);
+    expect(result).toEqual({ reason: MAGIC_LINK_REFUSAL.NETWORK_LIMIT });
   });
 
   it("leaves the address's count untouched when the IP is over its limit", async () => {
     withSendCounts({ email: 1, ip: 21 });
 
-    await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL, requestFrom(CLIENT_IP));
 
     expect(incrementMagicLinkSendCountMock).toHaveBeenCalledOnce();
   });
@@ -80,8 +89,8 @@ describe(isMagicLinkSendAllowed, () => {
   it('counts the same email under the same key whatever its case', async () => {
     withSendCounts({ email: 1, ip: 1 });
 
-    await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
-    await isMagicLinkSendAllowed(EMAIL.toUpperCase(), requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL.toUpperCase(), requestFrom(CLIENT_IP));
 
     expect(counterKeys()[3]).toBe(counterKeys()[1]);
   });
@@ -89,8 +98,8 @@ describe(isMagicLinkSendAllowed, () => {
   it('counts a +tag variant against the same address', async () => {
     withSendCounts({ email: 1, ip: 1 });
 
-    await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
-    await isMagicLinkSendAllowed(TAGGED_EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(TAGGED_EMAIL, requestFrom(CLIENT_IP));
 
     expect(counterKeys()[3]).toBe(counterKeys()[1]);
   });
@@ -98,25 +107,28 @@ describe(isMagicLinkSendAllowed, () => {
   it('stores neither the email nor the IP in a counter key', async () => {
     withSendCounts({ email: 1, ip: 1 });
 
-    await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL, requestFrom(CLIENT_IP));
 
     expect(counterKeys().join()).not.toMatch(
       /limited@example\.com|198\.51\.100\.7/,
     );
   });
 
-  it('refuses a blocked address or domain', async () => {
+  it('refuses a blocked address or domain as blocked', async () => {
     isSignupBlockedMock.mockResolvedValue(BLOCKED);
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(false);
+    expect(result).toEqual({ reason: MAGIC_LINK_REFUSAL.BLOCKED });
   });
 
   it('spends no sends on a blocked address', async () => {
     isSignupBlockedMock.mockResolvedValue(BLOCKED);
 
-    await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL, requestFrom(CLIENT_IP));
 
     expect(incrementMagicLinkSendCountMock).not.toHaveBeenCalled();
   });
@@ -124,35 +136,53 @@ describe(isMagicLinkSendAllowed, () => {
   it('checks the address it was asked to send to', async () => {
     withSendCounts({ email: 1, ip: 1 });
 
-    await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    await findMagicLinkSendRefusal(EMAIL, requestFrom(CLIENT_IP));
 
     expect(isSignupBlockedMock).toHaveBeenCalledWith(EMAIL);
   });
 
-  it('refuses an address the blocklist cannot read', async () => {
+  it('refuses an address the blocklist cannot read as a failed check, with its error', async () => {
     isSignupBlockedMock.mockResolvedValue({
       ok: false,
       error: ERROR_CODE.DB_INVALID_EMAIL,
     });
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(false);
+    expect(result).toEqual({
+      reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
+      error: ERROR_CODE.DB_INVALID_EMAIL,
+    });
   });
 
-  it('refuses rather than throws when the blocklist check fails', async () => {
+  it('refuses rather than throws when the blocklist check fails, carrying the error', async () => {
     isSignupBlockedMock.mockRejectedValue(DB_FAILURE);
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(false);
+    expect(result).toEqual({
+      reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
+      error: DB_FAILURE,
+    });
   });
 
-  it('refuses rather than throws when a send counter fails', async () => {
+  it('refuses rather than throws when a send counter fails, carrying the error', async () => {
     incrementMagicLinkSendCountMock.mockRejectedValue(DB_FAILURE);
 
-    const result = await isMagicLinkSendAllowed(EMAIL, requestFrom(CLIENT_IP));
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
 
-    expect(result).toBe(false);
+    expect(result).toEqual({
+      reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
+      error: DB_FAILURE,
+    });
   });
 });

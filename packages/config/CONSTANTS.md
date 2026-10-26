@@ -123,6 +123,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **LINK_TYPE**: `INTERNAL`, `EXTERNAL`
 - **SOCIAL_PLATFORMS**: `X`, `GITHUB`, `LINKEDIN`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `FACEBOOK`, `THREADS`, `RSS`
 
+### `@blog/config/constants` — `packages/config/src/constants/magic-link-refusal.ts`
+
+- **MAGIC_LINK_REFUSAL**: `BLOCKED`, `NETWORK_LIMIT`, `ADDRESS_LIMIT`, `CHECK_FAILED`
+
 ### `@blog/config/constants` — `packages/config/src/constants/module.ts`
 
 - **HERO_FIELD_MODE**: `CUSTOM`, `NONE`, `POST_TOPIC`, `POST_TITLE`, `POST_EXCERPT`, `POST_IMAGE`
@@ -375,7 +379,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/sign-in` — `apps/platform/src/constants/sign-in.ts`
 
 - **SIGN_IN_ERROR**: `ACCOUNT_NOT_LINKED`, `SIGN_IN_FAILED`
-- **SIGN_IN_LOG**: `LINK_FAILED`=`"auth.sign_in_link_failed"`
+- **SIGN_IN_LOG**: `LINK_FAILED`=`"auth.sign_in_link_failed"`, `LINK_REFUSED`=`"auth.sign_in_link_refused"`
 
 ### `@platform/constants/sign-up` — `apps/platform/src/constants/sign-up.ts`
 
@@ -443,6 +447,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 
 - **SESSION_STATUS**: `AUTHENTICATED`=`"authenticated"`, `UNAUTHENTICATED`=`"unauthenticated"`, `LOADING`=`"loading"`
+
+### `@web/constants/sign-in` — `apps/web/src/constants/sign-in.ts`
+
+- **SIGN_IN_LOG**: `LINK_REFUSED`=`"auth.sign_in_link_refused"`
 
 ## app:worker
 
