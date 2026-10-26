@@ -19,20 +19,19 @@ describe(FormSiteAddressInput, () => {
   it('describes the input with its domain suffix and hint', () => {
     setup();
 
-    expect(
-      screen.getByRole('textbox', { name: LABEL }),
-    ).toHaveAccessibleDescription(`.${MOCK_TENANT_ROOT_DOMAIN} ${HINT}`);
+    const siteAddress = screen.getByRole('textbox', { name: LABEL });
+    expect(siteAddress).toHaveAccessibleDescription(
+      `.${MOCK_TENANT_ROOT_DOMAIN} ${HINT}`,
+    );
   });
 
   it('shows no suffix when no root domain is set', () => {
     setup({ rootDomain: undefined });
 
-    expect(
-      screen.queryByText(`.${MOCK_TENANT_ROOT_DOMAIN}`),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('textbox', { name: LABEL }),
-    ).toHaveAccessibleDescription(HINT);
+    const suffix = screen.queryByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+    expect(suffix).not.toBeInTheDocument();
+    const siteAddress = screen.getByRole('textbox', { name: LABEL });
+    expect(siteAddress).toHaveAccessibleDescription(HINT);
   });
 
   it('trims and lowercases the typed address', async () => {
@@ -40,7 +39,8 @@ describe(FormSiteAddressInput, () => {
     const onChange = vi.fn();
     setup({ onChange });
 
-    await user.click(screen.getByRole('textbox', { name: LABEL }));
+    const siteAddress = screen.getByRole('textbox', { name: LABEL });
+    await user.click(siteAddress);
     await user.paste('  My-Site ');
 
     expect(onChange).toHaveBeenCalledWith('my-site');
