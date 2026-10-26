@@ -43,14 +43,20 @@ const setup = customRender(OnboardingView, {
 describe(`<${OnboardingView.name}/>`, () => {
   let user: UserEvent;
 
+  const typeAddress = async () => {
+    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+    await user.type(addressField, MOCK_SLUG);
+    return addressField;
+  };
+
   const fillAndCreate = async () => {
-    await user.type(
-      screen.getByRole('textbox', MOCK_NAME_FIELD),
-      MOCK_TENANT_NAME,
-    );
-    await user.type(screen.getByRole('textbox', MOCK_ADDRESS_FIELD), MOCK_SLUG);
-    await user.click(screen.getByRole('checkbox', MOCK_ACCEPTANCE));
-    await user.click(screen.getByRole('button', MOCK_CREATE));
+    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+    await user.type(nameField, MOCK_TENANT_NAME);
+    await typeAddress();
+    const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+    await user.click(acceptance);
+    const createButton = screen.getByRole('button', MOCK_CREATE);
+    await user.click(createButton);
   };
 
   beforeEach(() => {
@@ -75,7 +81,8 @@ describe(`<${OnboardingView.name}/>`, () => {
   });
 
   it('starts from the accent of the preset the user picks', async () => {
-    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+    const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
+    await user.click(editorialPreset);
     await fillAndCreate();
 
     expect(createSiteMock).toHaveBeenCalledWith(
@@ -87,8 +94,12 @@ describe(`<${OnboardingView.name}/>`, () => {
   });
 
   it('creates the site type the user picks', async () => {
-    await user.click(screen.getByRole('combobox', { name: 'Site type' }));
-    await user.click(await screen.findByRole('option', { name: 'Portfolio' }));
+    const siteTypeSelect = screen.getByRole('combobox', { name: 'Site type' });
+    await user.click(siteTypeSelect);
+    const portfolioOption = await screen.findByRole('option', {
+      name: 'Portfolio',
+    });
+    await user.click(portfolioOption);
     await fillAndCreate();
 
     expect(createSiteMock).toHaveBeenCalledWith(
@@ -97,7 +108,7 @@ describe(`<${OnboardingView.name}/>`, () => {
   });
 
   it('says the address is free once it has been checked', async () => {
-    await user.type(screen.getByRole('textbox', MOCK_ADDRESS_FIELD), MOCK_SLUG);
+    await typeAddress();
 
     const available = await screen.findByText(
       `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN} is available.`,
@@ -110,14 +121,14 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('marks a taken address invalid', async () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
 
-    await user.type(screen.getByRole('textbox', MOCK_ADDRESS_FIELD), MOCK_SLUG);
+    const addressField = await typeAddress();
 
     const message = await screen.findByText(
       'This address is taken. Choose another.',
     );
 
     expect(message).toBeVisible();
-    expect(screen.getByRole('textbox', MOCK_ADDRESS_FIELD)).toBeInvalid();
+    expect(addressField).toBeInvalid();
   });
 
   it('shows the neutral refusal when site creation is refused', async () => {
@@ -128,6 +139,8 @@ describe(`<${OnboardingView.name}/>`, () => {
 
     await fillAndCreate();
 
-    expect(await screen.findByText('Try again later.')).toBeVisible();
+    const refusal = await screen.findByText('Try again later.');
+
+    expect(refusal).toBeVisible();
   });
 });

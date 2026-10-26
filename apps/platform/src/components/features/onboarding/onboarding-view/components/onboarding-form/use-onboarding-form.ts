@@ -15,11 +15,20 @@ import type {
   TCreateSiteFieldError,
   TCreateSiteInput,
   TCreateSiteRefusal,
+  TCreateSiteResult,
 } from '@platform/server/onboarding/create-site-input';
 import { useState, useTransition } from 'react';
 
 export type TOnboardingFormFailure =
   TCreateSiteRefusal | typeof ACTION_OUTCOME.SERVER_ERROR;
+
+const toFailure = (
+  result: TCreateSiteResult,
+): TMaybeUndefined<TOnboardingFormFailure> => {
+  if (result.outcome === ACTION_OUTCOME.REFUSED) return result.reason;
+  if (result.outcome === ACTION_OUTCOME.SERVER_ERROR) return result.outcome;
+  return undefined;
+};
 
 export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
   const [values, setValues] = useState<TCreateSiteInput>({
@@ -62,13 +71,7 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
       setFieldErrors(
         result.outcome === ACTION_OUTCOME.INVALID ? result.fieldErrors : {},
       );
-      setFailure(
-        result.outcome === ACTION_OUTCOME.REFUSED
-          ? result.reason
-          : result.outcome === ACTION_OUTCOME.SERVER_ERROR
-            ? ACTION_OUTCOME.SERVER_ERROR
-            : undefined,
-      );
+      setFailure(toFailure(result));
     });
   };
 

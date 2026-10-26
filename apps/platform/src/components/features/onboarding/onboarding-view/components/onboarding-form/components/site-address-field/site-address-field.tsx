@@ -32,21 +32,26 @@ export const SiteAddressField = ({
   const { row, input, suffix } = siteAddressFieldVariants();
   const error = submittedError ?? checkError;
 
-  const statusLine =
-    status === SITE_ADDRESS_STATUS.CHECKING ? (
-      <Spinner label={t('siteAddressChecking')} hasLabel={true} />
-    ) : status === SITE_ADDRESS_STATUS.AVAILABLE && !submittedError ? (
-      <Text variant="meta">
-        {t('siteAddressAvailable', { address: `${value}.${rootDomain}` })}
-      </Text>
-    ) : undefined;
+  const isAvailable =
+    status === SITE_ADDRESS_STATUS.AVAILABLE && !submittedError;
 
   return (
     <FormField
       label={t('siteAddressLabel')}
       hint={t('siteAddressHint')}
       error={error && toErrorText(error)}
-      footer={statusLine}
+      footer={
+        <>
+          {status === SITE_ADDRESS_STATUS.CHECKING && (
+            <Spinner label={t('siteAddressChecking')} hasLabel={true} />
+          )}
+          {isAvailable && (
+            <Text variant="meta">
+              {t('siteAddressAvailable', { address: `${value}.${rootDomain}` })}
+            </Text>
+          )}
+        </>
+      }
     >
       <div className={row()}>
         <TextInput

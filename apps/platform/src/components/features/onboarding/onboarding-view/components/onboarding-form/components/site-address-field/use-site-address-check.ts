@@ -17,6 +17,16 @@ type TSiteAddressCheck = {
   error: TMaybeUndefined<TTenantSlugError>;
 };
 
+const toSiteAddressStatus = (
+  slug: string,
+  check: TMaybeUndefined<TSiteAddressCheck>,
+): TSiteAddressStatus => {
+  if (!slug) return SITE_ADDRESS_STATUS.IDLE;
+  if (check?.slug !== slug) return SITE_ADDRESS_STATUS.CHECKING;
+  if (check.error) return SITE_ADDRESS_STATUS.UNAVAILABLE;
+  return SITE_ADDRESS_STATUS.AVAILABLE;
+};
+
 export const useSiteAddressCheck = (slug: string) => {
   const [check, setCheck] =
     useState<TMaybeUndefined<TSiteAddressCheck>>(undefined);
@@ -40,14 +50,11 @@ export const useSiteAddressCheck = (slug: string) => {
     };
   }, [slug]);
 
-  const isChecked = Boolean(slug) && check?.slug === slug;
-  const status: TSiteAddressStatus = !slug
-    ? SITE_ADDRESS_STATUS.IDLE
-    : !isChecked
-      ? SITE_ADDRESS_STATUS.CHECKING
-      : check?.error
-        ? SITE_ADDRESS_STATUS.UNAVAILABLE
-        : SITE_ADDRESS_STATUS.AVAILABLE;
+  const status = toSiteAddressStatus(slug, check);
 
-  return { status, error: isChecked ? check?.error : undefined };
+  return {
+    status,
+    error:
+      status === SITE_ADDRESS_STATUS.UNAVAILABLE ? check?.error : undefined,
+  };
 };
