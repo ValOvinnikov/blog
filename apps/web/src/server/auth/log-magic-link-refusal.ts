@@ -4,7 +4,8 @@ import { logger } from '@web/utils/logger/logger';
 
 export const logMagicLinkRefusal = ({
   reason,
-  error,
+  errorName,
+  errorCode,
 }: IMagicLinkSendRefusal): void => {
-  logger.warn(SIGN_IN_LOG.LINK_REFUSED, { reason, error });
+  logger.warn(SIGN_IN_LOG.LINK_REFUSED, { reason, errorName, errorCode });
 };

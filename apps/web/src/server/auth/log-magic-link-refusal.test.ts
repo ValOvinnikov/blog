@@ -4,7 +4,8 @@ import { logger } from '@web/utils/logger/logger';
 
 import { logMagicLinkRefusal } from './log-magic-link-refusal';
 
-const CHECK_ERROR = new Error('connection lost');
+const ERROR_NAME = 'DrizzleQueryError';
+const POSTGRES_ERROR_CODE = '57P01';
 
 describe(logMagicLinkRefusal, () => {
   it.each(Object.values(MAGIC_LINK_REFUSAL))(
@@ -14,20 +15,23 @@ describe(logMagicLinkRefusal, () => {
 
       expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
         SIGN_IN_LOG.LINK_REFUSED,
-        { reason, error: undefined },
+        { reason, errorName: undefined, errorCode: undefined },
       );
     },
   );
 
-  it('carries the error of a failed check', () => {
-    logMagicLinkRefusal({
+  it('carries the error name and code of a failed check', () => {
+    const refusal = {
       reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
-      error: CHECK_ERROR,
-    });
+      errorName: ERROR_NAME,
+      errorCode: POSTGRES_ERROR_CODE,
+    };
+
+    logMagicLinkRefusal(refusal);
 
     expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
       SIGN_IN_LOG.LINK_REFUSED,
-      { reason: MAGIC_LINK_REFUSAL.CHECK_FAILED, error: CHECK_ERROR },
+      refusal,
     );
   });
 });

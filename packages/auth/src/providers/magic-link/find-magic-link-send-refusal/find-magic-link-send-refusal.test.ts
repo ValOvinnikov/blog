@@ -23,7 +23,27 @@ const TAGGED_EMAIL = 'limited+promo@example.com';
 const CLIENT_IP = '198.51.100.7';
 const NOT_BLOCKED = { ok: true, data: false };
 const BLOCKED = { ok: true, data: true };
-const DB_FAILURE = new Error('connection lost');
+const POSTGRES_ERROR_CODE = '57P01';
+const QUERY_ERROR_NAME = 'DrizzleQueryError';
+
+const queryErrorNaming = (...secrets: string[]) => {
+  const leak = secrets.join(' ');
+  const error = new Error(`Failed query: insert … params: ${leak}`, {
+    cause: Object.assign(new Error(`terminating connection: ${leak}`), {
+      code: POSTGRES_ERROR_CODE,
+      detail: leak,
+    }),
+  });
+  error.name = QUERY_ERROR_NAME;
+  return error;
+};
+
+const DB_FAILURE = queryErrorNaming(EMAIL);
+const CHECK_FAILURE = {
+  reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
+  errorName: QUERY_ERROR_NAME,
+  errorCode: POSTGRES_ERROR_CODE,
+};
 
 const requestFrom = (ip: string) =>
   new Request('https://platform.example.com/api/auth/signin/email', {
@@ -154,11 +174,11 @@ describe(findMagicLinkSendRefusal, () => {
 
     expect(result).toEqual({
       reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
-      error: ERROR_CODE.DB_INVALID_EMAIL,
+      errorCode: ERROR_CODE.DB_INVALID_EMAIL,
     });
   });
 
-  it('refuses rather than throws when the blocklist check fails, carrying the error', async () => {
+  it('refuses rather than throws when the blocklist check fails, carrying its name and code', async () => {
     isSignupBlockedMock.mockRejectedValue(DB_FAILURE);
 
     const result = await findMagicLinkSendRefusal(
@@ -166,13 +186,10 @@ describe(findMagicLinkSendRefusal, () => {
       requestFrom(CLIENT_IP),
     );
 
-    expect(result).toEqual({
-      reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
-      error: DB_FAILURE,
-    });
+    expect(result).toEqual(CHECK_FAILURE);
   });
 
-  it('refuses rather than throws when a send counter fails, carrying the error', async () => {
+  it('refuses rather than throws when a send counter fails, carrying its name and code', async () => {
     incrementMagicLinkSendCountMock.mockRejectedValue(DB_FAILURE);
 
     const result = await findMagicLinkSendRefusal(
@@ -180,9 +197,37 @@ describe(findMagicLinkSendRefusal, () => {
       requestFrom(CLIENT_IP),
     );
 
-    expect(result).toEqual({
-      reason: MAGIC_LINK_REFUSAL.CHECK_FAILED,
-      error: DB_FAILURE,
-    });
+    expect(result).toEqual(CHECK_FAILURE);
+  });
+
+  it('carries neither counter key, the address nor the IP from a failed check', async () => {
+    incrementMagicLinkSendCountMock
+      .mockResolvedValueOnce(1)
+      .mockImplementationOnce(() =>
+        Promise.reject(queryErrorNaming(...counterKeys(), EMAIL, CLIENT_IP)),
+      );
+
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
+
+    const [ipKey, emailKey] = counterKeys();
+    const serialized = JSON.stringify(result);
+    expect(result).toEqual(CHECK_FAILURE);
+    for (const secret of [ipKey, emailKey, EMAIL, CLIENT_IP]) {
+      expect(serialized).not.toContain(secret);
+    }
+  });
+
+  it('carries only the reason when what failed is not an Error', async () => {
+    isSignupBlockedMock.mockRejectedValue(EMAIL);
+
+    const result = await findMagicLinkSendRefusal(
+      EMAIL,
+      requestFrom(CLIENT_IP),
+    );
+
+    expect(result).toEqual({ reason: MAGIC_LINK_REFUSAL.CHECK_FAILED });
   });
 });

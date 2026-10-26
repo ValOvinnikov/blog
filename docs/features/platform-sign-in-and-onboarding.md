@@ -179,8 +179,10 @@ Free site.
   the check-your-inbox page cannot be told apart by content or timing.
 - Each refusal reaches the app through `buildAuthConfig`'s
   `onMagicLinkSendRefused` handler, which logs one `auth.sign_in_link_refused`
-  warn line with its `MAGIC_LINK_REFUSAL` reason, and the error for a failed
-  check. The line never carries the email, the IP or a hash of either.
+  warn line with its `MAGIC_LINK_REFUSAL` reason. A failed check adds only
+  the error's name and its Postgres `cause.code`, never a message or detail,
+  which can embed a counter key or the address. The line never carries the
+  email, the IP or a hash of either.
 - `resolveHomeHref` picks a dead end's link and `/`'s redirect by role:
   operators to `/tenants`, members to `/dashboard`, no membership to
   `/onboarding`. `/dashboard` with no membership redirects to `/onboarding`.
