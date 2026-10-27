@@ -6,6 +6,7 @@ import { Spinner } from './spinner';
 faker.seed(123);
 
 const label = faker.lorem.words(2);
+const ARIA_HIDDEN = 'aria-hidden';
 
 const setup = customRender(Spinner, { label });
 
@@ -25,8 +26,9 @@ describe(`<${Spinner.name}/>`, () => {
 
     it('hides the animated glyph from assistive tech', () => {
       const status = screen.getByRole('status', { name: label });
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       const glyph = status.firstElementChild;
-      expect(glyph).toHaveAttribute('aria-hidden', 'true');
+      expect(glyph).toHaveAttribute(ARIA_HIDDEN, 'true');
     });
   });
 
@@ -40,7 +42,7 @@ describe(`<${Spinner.name}/>`, () => {
     });
 
     it('hides the visible label text from assistive tech so it is not announced twice alongside the root aria-label', () => {
-      expect(screen.getByText(label)).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByText(label)).toHaveAttribute(ARIA_HIDDEN, 'true');
     });
   });
 

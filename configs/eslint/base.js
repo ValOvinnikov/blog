@@ -115,7 +115,6 @@ export default [
       'testing-library': testingLibrary,
     },
     settings: {
-      // Without it, no-node-access only reports in files importing @testing-library/* directly.
       'testing-library/utils-module': 'testing/custom-render',
       'testing-library/custom-renders': [
         'setup',

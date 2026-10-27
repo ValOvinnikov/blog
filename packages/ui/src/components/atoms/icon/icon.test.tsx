@@ -4,6 +4,10 @@ import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { Icon } from './icon';
 import { ICON_REGISTRY } from './icon-registry';
 
+const ARIA_HIDDEN = 'aria-hidden';
+const SHARE_LABEL = 'Share this post';
+const FEATURE_ICON_TEST_ID = 'feature-icon';
+
 const setup = customRender(Icon, { name: ICONS.SUN });
 
 describe(`<${Icon.name}/>`, () => {
@@ -12,9 +16,11 @@ describe(`<${Icon.name}/>`, () => {
     setup({ name: ICONS.MOON, dataTestId: 'moon-icon' });
 
     expect(
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       screen.getByTestId('sun-icon').querySelectorAll('line'),
     ).toHaveLength(8);
     expect(
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       screen.getByTestId('moon-icon').querySelectorAll('line'),
     ).toHaveLength(0);
   });
@@ -29,26 +35,26 @@ describe(`<${Icon.name}/>`, () => {
     });
 
     it('defaults to aria-hidden', () => {
-      expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByTestId('icon')).toHaveAttribute(ARIA_HIDDEN, 'true');
     });
   });
 
   it('does not default aria-hidden when an aria-label is given', () => {
-    setup({ 'aria-label': 'Share this post', dataTestId: 'icon' });
+    setup({ 'aria-label': SHARE_LABEL, dataTestId: 'icon' });
 
     const icon = screen.getByTestId('icon');
-    expect(icon).toHaveAccessibleName('Share this post');
-    expect(icon).not.toHaveAttribute('aria-hidden');
+    expect(icon).toHaveAccessibleName(SHARE_LABEL);
+    expect(icon).not.toHaveAttribute(ARIA_HIDDEN);
   });
 
   it('lets an explicit aria-hidden override the default even with an aria-label', () => {
     setup({
-      'aria-label': 'Share this post',
-      'aria-hidden': false,
+      'aria-label': SHARE_LABEL,
+      [ARIA_HIDDEN]: false,
       dataTestId: 'icon',
     });
 
-    expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByTestId('icon')).toHaveAttribute(ARIA_HIDDEN, 'false');
   });
 });
 
@@ -66,8 +72,8 @@ describe('ICON_REGISTRY', () => {
 
 describe.each(FEATURE_ICONS)('<%s Icon/>', (name) => {
   it('renders', () => {
-    setup({ name, dataTestId: 'feature-icon' });
+    setup({ name, dataTestId: FEATURE_ICON_TEST_ID });
 
-    expect(screen.getByTestId('feature-icon')).toBeVisible();
+    expect(screen.getByTestId(FEATURE_ICON_TEST_ID)).toBeVisible();
   });
 });

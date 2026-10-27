@@ -1,8 +1,13 @@
-import type { TVoicePortableText } from '@blog/config';
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type TVoicePortableText,
+} from '@blog/config';
 import { PortableText } from '@web/components/shared/portable-text';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { voicePortableTextToInlineText } from './voice-portable-text-to-inline-text';
+
+const DOCS_HREF = 'https://example.com/docs';
 
 const VOICE_VALUE: TVoicePortableText = [
   {
@@ -14,9 +19,7 @@ const VOICE_VALUE: TVoicePortableText = [
       { _type: 'span', _key: 's2', text: 'docs', marks: ['link-1'] },
       { _type: 'span', _key: 's3', text: ' for more.', marks: [] },
     ],
-    markDefs: [
-      { _key: 'link-1', _type: 'link', href: 'https://example.com/docs' },
-    ],
+    markDefs: [{ _key: 'link-1', _type: 'link', href: DOCS_HREF }],
   },
 ];
 
@@ -27,10 +30,11 @@ describe(voicePortableTextToInlineText, () => {
     expect(result[0]?.markDefs).toEqual([
       {
         _key: 'link-1',
-        _type: 'linkRef',
-        link: { href: 'https://example.com/docs', target: undefined },
+        _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+        link: { href: DOCS_HREF, target: undefined },
       },
     ]);
+    // eslint-disable-next-line testing-library/no-node-access -- reads Portable Text block children, not a DOM node
     expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
   });
 
@@ -43,7 +47,7 @@ describe(voicePortableTextToInlineText, () => {
 
     expect(screen.getByRole('link', { name: 'docs' })).toHaveAttribute(
       'href',
-      'https://example.com/docs',
+      DOCS_HREF,
     );
   });
 });

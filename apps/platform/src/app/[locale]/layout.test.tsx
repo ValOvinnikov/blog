@@ -1,4 +1,8 @@
-import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+} from '@blog/config';
 import realMessages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { notFound } from 'next/navigation';
@@ -10,6 +14,7 @@ type TAnyElement = ReactElement<Record<string, unknown>>;
 
 const firstChildOf = (node: TAnyElement): TAnyElement =>
   [
+    // eslint-disable-next-line testing-library/no-node-access -- reads React element props, not a DOM node
     (node.props as { children: TAnyElement | TAnyElement[] }).children,
   ].flat()[0] as TAnyElement;
 
@@ -48,7 +53,7 @@ describe('LocaleLayout', () => {
         children: <div>content</div>,
         params: Promise.resolve({ locale: 'PT' }),
       }),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(notFound).toHaveBeenCalledTimes(1);
     expect(setRequestLocaleMock).not.toHaveBeenCalled();

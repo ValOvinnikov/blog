@@ -214,6 +214,7 @@ describe(`<${Hero.name}/>`, () => {
       const wrapper = screen.getByTestId(MEDIA_TEST_ID);
       const image = screen.getByAltText(HERO_MEDIA_ALT);
 
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       expect(image.parentElement).not.toBe(wrapper);
 
       unmount();
@@ -226,6 +227,7 @@ describe(`<${Hero.name}/>`, () => {
     const wrapper = screen.getByTestId(MEDIA_TEST_ID);
     const image = screen.getByAltText(HERO_MEDIA_ALT);
 
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
     expect(image.parentElement).toBe(wrapper);
   });
 
