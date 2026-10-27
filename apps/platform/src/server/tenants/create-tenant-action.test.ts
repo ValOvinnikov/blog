@@ -5,6 +5,7 @@ import {
   ERROR_CODE,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
+  RESERVED_SUBDOMAINS,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
@@ -16,6 +17,8 @@ import {
   TENANT_LOG,
 } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
+import { requireAdmin } from '@platform/server/auth/require-admin';
+import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
@@ -60,16 +63,12 @@ const MOCK_TENANT_DRAFT_FIELDS = {
 const validOwnerInviteToken = createOwnerInviteToken(MOCK_OWNER_EMAIL);
 
 const {
-  requireAdminMock,
-  startProvisioningMock,
   findUserByEmailMock,
   getTenantByDomainMock,
   createTenantDraftMock,
   insertAuditEventMock,
   checkDomainAvailabilityMock,
 } = vi.hoisted(() => ({
-  requireAdminMock: vi.fn(),
-  startProvisioningMock: vi.fn(),
   findUserByEmailMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   createTenantDraftMock: vi.fn(),
@@ -77,9 +76,7 @@ const {
   checkDomainAvailabilityMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-admin', () => ({
-  requireAdmin: requireAdminMock,
-}));
+vi.mock('@platform/server/auth/require-admin');
 
 vi.mock('@platform/server/auth/auth');
 
@@ -87,9 +84,7 @@ vi.mock('@platform/server/tenants/send-owner-invite-email', () => ({
   sendOwnerInviteEmail: vi.fn(),
 }));
 
-vi.mock('@platform/server/provisioning/start-provisioning', () => ({
-  startProvisioning: startProvisioningMock,
-}));
+vi.mock('@platform/server/provisioning/start-provisioning');
 
 vi.mock('@platform/server/provisioning/check-domain-availability', () => ({
   checkDomainAvailability: checkDomainAvailabilityMock,
@@ -111,6 +106,8 @@ vi.mock('@blog/db', async () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);
+const requireAdminMock = vi.mocked(requireAdmin);
+const startProvisioningMock = vi.mocked(startProvisioning);
 const loggerErrorMock = vi.mocked(logger.error);
 const loggerWarnMock = vi.mocked(logger.warn);
 
@@ -124,15 +121,11 @@ const validInput = {
 describe(createTenantAction, () => {
   beforeEach(() => {
     requireAdminMock.mockReset();
-    requireAdminMock.mockResolvedValue({ id: MOCK_OPERATOR_ID });
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     startProvisioningMock.mockReset();
-    startProvisioningMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
     findUserByEmailMock.mockReset();
     findUserByEmailMock.mockResolvedValue({
       id: MOCK_OWNER_USER_ID,
@@ -179,11 +172,15 @@ describe(createTenantAction, () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('creates the tenant at the site address under the tenant root domain', async () => {
+  it('creates the tenant for the found owner at the site address under the root', async () => {
     await expect(
-      createTenantAction({ ...validInput, slug: ' Acme ' }),
+      createTenantAction({
+        ...validInput,
+        slug: ` ${MOCK_TENANT_SLUG.toUpperCase()} `,
+      }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
+    expect(findUserByEmailMock).toHaveBeenCalledWith(MOCK_OWNER_EMAIL);
     expect(createTenantDraftMock).toHaveBeenCalledWith({
       ...MOCK_TENANT_DRAFT_FIELDS,
       owner: { type: 'user', userId: MOCK_OWNER_USER_ID },
@@ -272,18 +269,18 @@ describe(createTenantAction, () => {
     expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
   });
 
-  it.each(['admin', 'www'])(
-    'rejects the reserved site address %s',
-    async (slug) => {
-      const result = await createTenantAction({ ...validInput, slug });
+  it('rejects a reserved site address', async () => {
+    const result = await createTenantAction({
+      ...validInput,
+      slug: RESERVED_SUBDOMAINS[0],
+    });
 
-      expect(result).toEqual({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_RESERVED } },
-      });
-      expect(createTenantDraftMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_RESERVED } },
+    });
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+  });
 
   it('rejects a site address another tenant holds', async () => {
     getTenantByDomainMock.mockResolvedValue({ id: MOCK_EXISTING_TENANT_ID });
@@ -362,18 +359,6 @@ describe(createTenantAction, () => {
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
-  it('creates the draft with the resolved owner id and platform default locale', async () => {
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(findUserByEmailMock).toHaveBeenCalledWith(MOCK_OWNER_EMAIL);
-    expect(createTenantDraftMock).toHaveBeenCalledWith({
-      ...MOCK_TENANT_DRAFT_FIELDS,
-      owner: { type: 'user', userId: MOCK_OWNER_USER_ID },
-    });
-  });
-
   it('starts provisioning, then redirects to the status page', async () => {
     await expect(createTenantAction(validInput)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
@@ -443,7 +428,7 @@ describe(createTenantAction, () => {
   });
 
   it('requires an admin session before doing anything else', async () => {
-    requireAdminMock.mockImplementation(() => {
+    requireAdminMock.mockImplementationOnce(() => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     });
 
