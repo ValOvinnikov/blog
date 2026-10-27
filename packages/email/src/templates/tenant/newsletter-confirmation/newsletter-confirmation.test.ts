@@ -5,69 +5,78 @@ import {
   MOCK_POSTAL_ADDRESS,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
+  MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
+import { mockPortableTextBody } from '@blog/email/testing/portable-text-fixtures';
 import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+import { faker } from '@faker-js/faker';
 
-import { buildNewsletterConfirmationEmail } from './newsletter-confirmation';
+import {
+  buildNewsletterConfirmationEmail,
+  LIST_UNSUBSCRIBE_ONE_CLICK,
+} from './newsletter-confirmation';
 
-const BODY_TEXT = 'Click the button below to confirm.';
+faker.seed(6026);
 
-const CONFIRMATION_URL = 'https://example.com/api/newsletter/confirm?token=abc';
-const UNSUBSCRIBE_URL =
-  'https://example.com/api/newsletter/unsubscribe?token=xyz&ref=email';
-const SUBJECT = 'Confirm your newsletter subscription';
-const BODY: TPortableTextContent = [
-  {
-    _type: 'block',
-    style: 'normal',
-    children: [{ _type: 'span', text: BODY_TEXT }],
-  },
-];
+const MOCK_SUBJECT = faker.lorem.sentence();
+const MOCK_BODY_TEXT = faker.lorem.sentence();
+const MOCK_CONFIRMATION_URL = `${MOCK_URL}/api/newsletter/confirm?token=${faker.string.alphanumeric(12)}`;
+const MOCK_UNSUBSCRIBE_URL = `${MOCK_URL}/api/newsletter/unsubscribe?token=${faker.string.alphanumeric(12)}&ref=email`;
+const MOCK_ESCAPED_UNSUBSCRIBE_URL = MOCK_UNSUBSCRIBE_URL.replace(
+  /&/g,
+  '&amp;',
+);
+const MOCK_ATTACKER_HOST = 'evil.example';
+const MOCK_SOLID_COLOUR = faker.color.rgb();
+const MOCK_CONTRAST_COLOUR = faker.color.rgb();
 
-describe('buildNewsletterConfirmationEmail', () => {
-  describe('with the default input', () => {
+const MOCK_INPUT = {
+  subject: MOCK_SUBJECT,
+  body: mockPortableTextBody(MOCK_BODY_TEXT),
+  confirmationUrl: MOCK_CONFIRMATION_URL,
+  unsubscribeUrl: MOCK_UNSUBSCRIBE_URL,
+  brand: MOCK_TENANT_EMAIL_BRAND,
+  brandName: MOCK_TENANT_NAME,
+};
+
+function countOccurrences(html: string, fragment: string): number {
+  return html.split(fragment).length - 1;
+}
+
+describe(buildNewsletterConfirmationEmail, () => {
+  describe('for a pending subscription', () => {
     let email: ReturnType<typeof buildNewsletterConfirmationEmail>;
 
     beforeEach(() => {
-      email = buildNewsletterConfirmationEmail({
-        subject: SUBJECT,
-        body: BODY,
-        confirmationUrl: CONFIRMATION_URL,
-        unsubscribeUrl: UNSUBSCRIBE_URL,
-        brand: MOCK_TENANT_EMAIL_BRAND,
-        brandName: MOCK_TENANT_NAME,
-      });
+      email = buildNewsletterConfirmationEmail(MOCK_INPUT);
     });
 
-    it('returns the given subject unchanged', () => {
-      expect(email.subject).toBe(SUBJECT);
+    it('passes the subject through unchanged', () => {
+      expect(email.subject).toBe(MOCK_SUBJECT);
     });
 
-    it('renders the authored body through the shared serializer', () => {
-      expect(email.html).toContain(BODY_TEXT);
+    it('renders the authored body', () => {
+      expect(email.html).toContain(MOCK_BODY_TEXT);
     });
 
-    it('renders both the confirm and unsubscribe actions', () => {
-      expect(email.html).toContain('>Confirm subscription</a>');
-      expect(email.html).toContain('>Unsubscribe</a>');
+    it('links the confirmation url', () => {
+      expect(email.html).toContain(`href="${MOCK_CONFIRMATION_URL}"`);
     });
 
-    it('sanitizes and escapes the unsubscribe url via the shared action helper', () => {
-      expect(email.html).not.toContain(`href="${UNSUBSCRIBE_URL}"`);
-      expect(email.html).toContain(
-        `href="${UNSUBSCRIBE_URL.replace(/&/g, '&amp;')}"`,
-      );
+    it('links the unsubscribe url escaped', () => {
+      expect(email.html).not.toContain(`href="${MOCK_UNSUBSCRIBE_URL}"`);
+      expect(email.html).toContain(`href="${MOCK_ESCAPED_UNSUBSCRIBE_URL}"`);
     });
 
-    it('sets List-Unsubscribe and List-Unsubscribe-Post headers with raw, unescaped urls', () => {
+    it('sets one-click List-Unsubscribe headers with the raw url', () => {
       expect(email.headers).toEqual({
-        'List-Unsubscribe': `<${UNSUBSCRIBE_URL}>`,
-        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'List-Unsubscribe': `<${MOCK_UNSUBSCRIBE_URL}>`,
+        'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
       });
     });
 
-    it('does not put either link in the authored body html', () => {
-      const bodyEndMarker = 'Click the button below to confirm.</p>';
+    it('renders no link inside the authored body', () => {
+      const bodyEndMarker = `${MOCK_BODY_TEXT}</p>`;
       const bodyEnd = email.html.indexOf(bodyEndMarker) + bodyEndMarker.length;
       const bodyOnlyHtml = email.html.slice(0, bodyEnd);
 
@@ -78,15 +87,10 @@ describe('buildNewsletterConfirmationEmail', () => {
       expect(email.html).toContain(MOCK_TENANT_NAME);
     });
 
-    it('renders byte-identical html when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
+    it('renders the same email for undefined logo and address as for none', () => {
       const { html: withUndefinedOptionals } = buildNewsletterConfirmationEmail(
         {
-          subject: SUBJECT,
-          body: BODY,
-          confirmationUrl: CONFIRMATION_URL,
-          unsubscribeUrl: UNSUBSCRIBE_URL,
-          brand: MOCK_TENANT_EMAIL_BRAND,
-          brandName: MOCK_TENANT_NAME,
+          ...MOCK_INPUT,
           logoImageUrl: undefined,
           footerPostalAddress: undefined,
         },
@@ -98,98 +102,54 @@ describe('buildNewsletterConfirmationEmail', () => {
 
   it('escapes an authored body that attempts to inject markup', () => {
     const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: [
-        {
-          _type: 'block',
-          style: 'normal',
-          children: [{ _type: 'span', text: MOCK_UNSAFE_MARKUP }],
-        },
-      ],
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: MOCK_TENANT_EMAIL_BRAND,
-      brandName: MOCK_TENANT_NAME,
+      ...MOCK_INPUT,
+      body: mockPortableTextBody(MOCK_UNSAFE_MARKUP),
     });
 
     expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
   });
 
-  it('no authored body content can remove or duplicate the confirm/unsubscribe actions, even one that mimics them', () => {
+  it('renders each action exactly once whatever the authored body mimics', () => {
     const impersonatingBody: TPortableTextContent = [
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [
-          {
-            _type: 'span',
-            text: `Confirm subscription ${CONFIRMATION_URL}`,
-          },
-        ],
-      },
+      ...mockPortableTextBody(`Confirm subscription ${MOCK_CONFIRMATION_URL}`),
       {
         _type: 'unsupportedFutureBlock',
         label: 'Unsubscribe',
-        url: 'https://evil.example/unsubscribe',
+        url: `https://${MOCK_ATTACKER_HOST}/unsubscribe`,
       },
     ];
 
     const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
+      ...MOCK_INPUT,
       body: impersonatingBody,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: MOCK_TENANT_EMAIL_BRAND,
-      brandName: MOCK_TENANT_NAME,
     });
 
-    expect(html).not.toContain('evil.example');
+    expect(html).not.toContain(MOCK_ATTACKER_HOST);
+    expect(countOccurrences(html, `href="${MOCK_CONFIRMATION_URL}"`)).toBe(1);
     expect(
-      html.match(
-        new RegExp(
-          `href="${CONFIRMATION_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`,
-          'g',
-        ),
-      ),
-    ).toHaveLength(1);
-    expect(
-      html.match(
-        new RegExp(
-          `href="${UNSUBSCRIBE_URL.replace(/&/g, '&amp;').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`,
-          'g',
-        ),
-      ),
-    ).toHaveLength(1);
+      countOccurrences(html, `href="${MOCK_ESCAPED_UNSUBSCRIBE_URL}"`),
+    ).toBe(1);
   });
 
-  it("renders the subscribing tenant's resolved brand, not a fixed palette", () => {
+  it("renders the subscribing tenant's resolved palette", () => {
     const otherBrand: TTenantEmailBrand = {
       ...MOCK_TENANT_EMAIL_BRAND,
-      brandPrimarySolid: '#112233',
-      brandPrimaryContrast: '#f0f0f0',
+      brandPrimarySolid: MOCK_SOLID_COLOUR,
+      brandPrimaryContrast: MOCK_CONTRAST_COLOUR,
     };
 
     const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
+      ...MOCK_INPUT,
       brand: otherBrand,
-      brandName: MOCK_TENANT_NAME,
     });
 
-    expect(html).toContain(otherBrand.brandPrimarySolid);
-    expect(html).toContain(otherBrand.brandPrimaryContrast);
+    expect(html).toContain(MOCK_SOLID_COLOUR);
+    expect(html).toContain(MOCK_CONTRAST_COLOUR);
   });
 
-  it('forwards a given logo URL and footer postal address to the shell', () => {
+  it('renders a given logo and footer postal address', () => {
     const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: MOCK_TENANT_EMAIL_BRAND,
-      brandName: MOCK_TENANT_NAME,
+      ...MOCK_INPUT,
       logoImageUrl: MOCK_LOGO_URL,
       footerPostalAddress: MOCK_POSTAL_ADDRESS,
     });
