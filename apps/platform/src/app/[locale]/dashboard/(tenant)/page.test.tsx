@@ -11,6 +11,7 @@ import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
   MOCK_TENANT_ID,
+  mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -75,10 +76,9 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     getTenantOwnerMembershipMock.mockReset();
-    getTenantOwnerMembershipMock.mockResolvedValue({
-      email: 'owner@example.com',
-      joinedAt: new Date('2026-08-12T00:00:00.000Z'),
-    });
+    getTenantOwnerMembershipMock.mockResolvedValue(
+      mockJoinedOwner('owner@example.com'),
+    );
     getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.VERIFIED,

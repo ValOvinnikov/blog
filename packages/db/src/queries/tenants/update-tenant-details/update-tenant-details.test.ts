@@ -10,7 +10,7 @@ import {
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { users } from '@blog/db/schema/auth';
+import { type users, verificationTokens } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
@@ -19,7 +19,14 @@ import {
   type TTenant,
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
-import { MOCK_OWNER_EMAIL, insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  MOCK_EMAIL_VERIFIED_AT,
+  MOCK_OAUTH_PROVIDER,
+  MOCK_OWNER_EMAIL,
+  insertTestAccount,
+  insertTestTenant,
+  insertTestUser,
+} from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
@@ -34,6 +41,7 @@ import {
 } from '@blog/db/testing/tenants/fixtures';
 import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { faker } from '@faker-js/faker';
 import { and, eq } from 'drizzle-orm';
 
 import {
@@ -55,6 +63,7 @@ const GLOBEX_DOMAIN = 'globex.example.com';
 const NEW_OWNER_EMAIL = 'new-owner@example.com';
 const UNNORMALIZED_NEW_OWNER_EMAIL = '  New-Owner@Example.com  ';
 const MEMBER_EMAIL = 'member@example.com';
+const TOKEN_EXPIRES_AT = new Date('2099-01-01T00:00:00.000Z');
 usePersonalDataKeys();
 
 const {
@@ -77,6 +86,13 @@ const EARLY_STEPS_DONE = {
   [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
   [TENANT_PROVISIONING_STEP.SEED_CONTENT]: DONE_STEP,
   [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: DONE_STEP,
+};
+
+const CORE_STEPS_DONE = {
+  ...EARLY_STEPS_DONE,
+  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: DONE_STEP,
+  [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: DONE_STEP,
+  [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: DONE_STEP,
 };
 
 const ORIGINAL_DETAILS = {
@@ -131,23 +147,70 @@ async function insertOwnerInvite(tenantId: string, email: string) {
     });
 }
 
+async function insertOwnerMember(
+  tenantId: string,
+  user: Partial<typeof users.$inferInsert>,
+): Promise<string> {
+  const { id: userId } = await insertTestUser(db(), user);
+
+  await db()
+    .insert(memberships)
+    .values({ tenantId, userId, role: MEMBERSHIP_ROLE.OWNER });
+
+  return userId;
+}
+
 async function insertJoinedOwner(
   tenantId: string,
   email?: string,
 ): Promise<void> {
-  const [user] = await db().insert(users).values({ email }).returning();
-  if (!user) throw new Error('setup: user insert returned no row.');
-
-  await db()
-    .insert(memberships)
-    .values({ tenantId, userId: user.id, role: MEMBERSHIP_ROLE.OWNER });
+  await insertOwnerMember(tenantId, {
+    email,
+    emailVerified: MOCK_EMAIL_VERIFIED_AT,
+  });
 }
 
-function unwrapUpdated(result: TUpdateTenantDetailsResult): TTenant {
+async function insertVerificationToken(identifier: string): Promise<void> {
+  await db()
+    .insert(verificationTokens)
+    .values({
+      identifier,
+      token: faker.string.alphanumeric(32),
+      expires: TOKEN_EXPIRES_AT,
+    });
+}
+
+async function readVerificationIdentifiers(): Promise<string[]> {
+  const rows = await db()
+    .select({ identifier: verificationTokens.identifier })
+    .from(verificationTokens);
+  return rows.map(({ identifier }) => identifier).sort();
+}
+
+async function readOwnerMembership(tenantId: string) {
+  const [membership] = await db()
+    .select()
+    .from(memberships)
+    .where(
+      and(
+        eq(memberships.tenantId, tenantId),
+        eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
+      ),
+    );
+  return membership;
+}
+
+function unwrapUpdatedResult(
+  result: TUpdateTenantDetailsResult,
+): Extract<TUpdateTenantDetailsResult, { outcome: typeof UPDATED }> {
   if (result.outcome !== UPDATED) {
     throw new Error(`expected '${UPDATED}', got '${result.outcome}'`);
   }
-  return result.tenant;
+  return result;
+}
+
+function unwrapUpdated(result: TUpdateTenantDetailsResult): TTenant {
+  return unwrapUpdatedResult(result).tenant;
 }
 
 async function readDetails(tenantId: string) {
@@ -188,6 +251,7 @@ afterEach(async () => {
   await db().delete(schema.tenantDomains);
   await db().delete(schema.tenants);
   await db().delete(schema.users);
+  await db().delete(schema.verificationTokens);
 });
 
 describe(updateTenantDetails, () => {
@@ -222,7 +286,8 @@ describe(updateTenantDetails, () => {
       );
 
       expect(primaryDomain).toBe(ACME_NEW_DOMAIN);
-      expect(await readDomains(tenantId)).toEqual([ACME_NEW_DOMAIN]);
+      const domains = await readDomains(tenantId);
+      expect(domains).toEqual([ACME_NEW_DOMAIN]);
     });
 
     describe('with a pending owner invite', () => {
@@ -231,12 +296,13 @@ describe(updateTenantDetails, () => {
       });
 
       it('rewrites the pending owner invite to the normalized new address', async () => {
-        unwrapUpdated(
-          await updateTenantDetails(tenantId, {
-            ...validInput,
-            ownerEmail: UNNORMALIZED_NEW_OWNER_EMAIL,
-          }),
-        );
+        const result = await updateTenantDetails(tenantId, {
+          ...validInput,
+          ownerEmail: UNNORMALIZED_NEW_OWNER_EMAIL,
+        });
+
+        const { ownerEmailChanged } = unwrapUpdatedResult(result);
+        expect(ownerEmailChanged).toBe(true);
 
         const invite = await readOwnerInvite(tenantId);
         expect(invite?.email).toBe(NEW_OWNER_EMAIL);
@@ -263,11 +329,37 @@ describe(updateTenantDetails, () => {
           );
 
           expect(name).toBe(NEW_NAME);
-          expect((await readOwnerInvite(tenantId))?.email).toBe(
-            MOCK_OWNER_EMAIL,
-          );
+          const ownerInvite = await readOwnerInvite(tenantId);
+          expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
         },
       );
+
+      it("revokes the unused sign-in links sent to the old address, keeping everyone else's", async () => {
+        await insertVerificationToken(MOCK_OWNER_EMAIL);
+        await insertVerificationToken(MEMBER_EMAIL);
+
+        await updateTenantDetails(tenantId, {
+          ...validInput,
+          ownerEmail: NEW_OWNER_EMAIL,
+        });
+
+        const identifiers = await readVerificationIdentifiers();
+        expect(identifiers).toEqual([MEMBER_EMAIL]);
+      });
+
+      it("keeps the old address's sign-in links when the owner email is unchanged", async () => {
+        await insertVerificationToken(MOCK_OWNER_EMAIL);
+
+        const result = await updateTenantDetails(tenantId, {
+          ...validInput,
+          ownerEmail: MOCK_OWNER_EMAIL,
+        });
+
+        const { ownerEmailChanged } = unwrapUpdatedResult(result);
+        expect(ownerEmailChanged).toBe(false);
+        const identifiers = await readVerificationIdentifiers();
+        expect(identifiers).toEqual([MOCK_OWNER_EMAIL]);
+      });
 
       it('returns owner-email-taken when the new email matches another invite', async () => {
         await db().insert(membershipInvites).values({
@@ -282,7 +374,8 @@ describe(updateTenantDetails, () => {
         });
 
         expect(result).toEqual({ outcome: OWNER_EMAIL_TAKEN });
-        expect((await readOwnerInvite(tenantId))?.email).toBe(MOCK_OWNER_EMAIL);
+        const ownerInvite = await readOwnerInvite(tenantId);
+        expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
       });
     });
 
@@ -314,7 +407,47 @@ describe(updateTenantDetails, () => {
         });
 
         expect(result).toEqual({ outcome: OWNER_ALREADY_JOINED });
-        expect((await readDetails(tenantId))?.name).toBe(TENANT_NAME);
+        const details = await readDetails(tenantId);
+        expect(details?.name).toBe(TENANT_NAME);
+      });
+    });
+
+    describe('with an owner account that has never signed in', () => {
+      let ownerUserId: string;
+
+      beforeEach(async () => {
+        ownerUserId = await insertOwnerMember(tenantId, {
+          email: MOCK_OWNER_EMAIL,
+        });
+      });
+
+      it('swaps the owner membership for a pending invite to the new address', async () => {
+        const result = await updateTenantDetails(tenantId, {
+          ...validInput,
+          ownerEmail: NEW_OWNER_EMAIL,
+        });
+
+        const { ownerEmailChanged } = unwrapUpdatedResult(result);
+        expect(ownerEmailChanged).toBe(true);
+        const ownerMembership = await readOwnerMembership(tenantId);
+        expect(ownerMembership).toBeUndefined();
+        const ownerInvite = await readOwnerInvite(tenantId);
+        expect(ownerInvite?.email).toBe(NEW_OWNER_EMAIL);
+      });
+
+      it('returns owner-already-joined once the owner has linked an OAuth account', async () => {
+        await insertTestAccount(db(), ownerUserId, MOCK_OAUTH_PROVIDER);
+
+        const result = await updateTenantDetails(tenantId, {
+          ...validInput,
+          ownerEmail: NEW_OWNER_EMAIL,
+        });
+
+        expect(result).toEqual({ outcome: OWNER_ALREADY_JOINED });
+        const ownerMembership = await readOwnerMembership(tenantId);
+        expect(ownerMembership).toBeDefined();
+        const ownerInvite = await readOwnerInvite(tenantId);
+        expect(ownerInvite).toBeUndefined();
       });
     });
 
@@ -328,8 +461,10 @@ describe(updateTenantDetails, () => {
       });
 
       expect(result).toEqual({ outcome: OWNER_ALREADY_JOINED });
-      expect((await readDetails(tenantId))?.name).toBe(TENANT_NAME);
-      expect(await readOwnerInvite(tenantId)).toBeUndefined();
+      const details = await readDetails(tenantId);
+      expect(details?.name).toBe(TENANT_NAME);
+      const ownerInvite = await readOwnerInvite(tenantId);
+      expect(ownerInvite).toBeUndefined();
     });
 
     it('returns domain-taken when renaming onto its own secondary domain', async () => {
@@ -343,10 +478,10 @@ describe(updateTenantDetails, () => {
       });
 
       expect(result).toEqual({ outcome: DOMAIN_TAKEN });
-      expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
-      expect(await readDomains(tenantId)).toEqual(
-        [ACME_ALT_DOMAIN, MOCK_TENANT_DOMAIN].sort(),
-      );
+      const details = await readDetails(tenantId);
+      expect(details).toEqual(ORIGINAL_DETAILS);
+      const domains = await readDomains(tenantId);
+      expect(domains).toEqual([ACME_ALT_DOMAIN, MOCK_TENANT_DOMAIN].sort());
     });
 
     it.each([
@@ -363,8 +498,10 @@ describe(updateTenantDetails, () => {
         });
 
         expect(result).toEqual({ outcome: DOMAIN_INVALID });
-        expect(await readDetails(tenantId)).toEqual(ORIGINAL_DETAILS);
-        expect(await readDomains(tenantId)).toEqual([MOCK_TENANT_DOMAIN]);
+        const details = await readDetails(tenantId);
+        expect(details).toEqual(ORIGINAL_DETAILS);
+        const domains = await readDomains(tenantId);
+        expect(domains).toEqual([MOCK_TENANT_DOMAIN]);
       },
     );
   });
@@ -387,7 +524,8 @@ describe(updateTenantDetails, () => {
       });
 
       expect(result).toEqual({ outcome: PROVISIONING_STARTED });
-      expect((await readDetails(tenantId))?.name).toBe(TENANT_NAME);
+      const details = await readDetails(tenantId);
+      expect(details?.name).toBe(TENANT_NAME);
     });
 
     it('refuses an ownerEmail edit with provisioning-started, leaving the invite', async () => {
@@ -399,7 +537,43 @@ describe(updateTenantDetails, () => {
       });
 
       expect(result).toEqual({ outcome: PROVISIONING_STARTED });
-      expect((await readOwnerInvite(tenantId))?.email).toBe(MOCK_OWNER_EMAIL);
+      const ownerInvite = await readOwnerInvite(tenantId);
+      expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
+    });
+  });
+
+  describe('a tenant whose provisioning has succeeded, with a pending owner invite', () => {
+    let tenantId: string;
+
+    beforeEach(async () => {
+      tenantId = await insertTenantWithDomain({
+        provisioningSteps: stepsWith(CORE_STEPS_DONE),
+      });
+      await insertOwnerInvite(tenantId, MOCK_OWNER_EMAIL);
+    });
+
+    it('accepts a change to the owner email alone', async () => {
+      const result = await updateTenantDetails(tenantId, {
+        ...ORIGINAL_DETAILS,
+        ownerEmail: NEW_OWNER_EMAIL,
+      });
+
+      const { ownerEmailChanged } = unwrapUpdatedResult(result);
+      expect(ownerEmailChanged).toBe(true);
+      const ownerInvite = await readOwnerInvite(tenantId);
+      expect(ownerInvite?.email).toBe(NEW_OWNER_EMAIL);
+    });
+
+    it('refuses an owner-email change bundled with another field, leaving the invite', async () => {
+      const result = await updateTenantDetails(tenantId, {
+        ...ORIGINAL_DETAILS,
+        name: NEW_NAME,
+        ownerEmail: NEW_OWNER_EMAIL,
+      });
+
+      expect(result).toEqual({ outcome: PROVISIONING_STARTED });
+      const ownerInvite = await readOwnerInvite(tenantId);
+      expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
     });
   });
 
@@ -419,11 +593,13 @@ describe(updateTenantDetails, () => {
       });
 
       expect(result).toEqual({ outcome: DOMAIN_TAKEN });
-      expect(await readDetails(secondTenantId)).toEqual({
+      const details = await readDetails(secondTenantId);
+      expect(details).toEqual({
         ...ORIGINAL_DETAILS,
         primaryDomain: GLOBEX_DOMAIN,
       });
-      expect(await readDomains(secondTenantId)).toEqual([GLOBEX_DOMAIN]);
+      const domains = await readDomains(secondTenantId);
+      expect(domains).toEqual([GLOBEX_DOMAIN]);
     });
 
     it('returns provisioning-started over domain-taken when both apply', async () => {
@@ -467,9 +643,8 @@ describe(updateTenantDetails, () => {
         outcome: DOMAIN_LOCKED,
         blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
       });
-      expect((await readDetails(tenantId))?.primaryDomain).toBe(
-        MOCK_TENANT_DOMAIN,
-      );
+      const details = await readDetails(tenantId);
+      expect(details?.primaryDomain).toBe(MOCK_TENANT_DOMAIN);
     });
 
     it('keeps name, plan and locale editable when primaryDomain is unchanged', async () => {
@@ -524,20 +699,14 @@ describe(updateTenantDetails, () => {
     [
       'every core step has succeeded',
       {
-        provisioningSteps: stepsWith({
-          ...EARLY_STEPS_DONE,
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: DONE_STEP,
-        }),
+        provisioningSteps: stepsWith(CORE_STEPS_DONE),
       },
     ],
     [
       'every core step has succeeded and OWNER_ELEVATION is FAILED',
       {
         provisioningSteps: stepsWith({
-          ...EARLY_STEPS_DONE,
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: DONE_STEP,
-          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: DONE_STEP,
+          ...CORE_STEPS_DONE,
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: FAILED_STEP,
         }),
       },
@@ -553,7 +722,8 @@ describe(updateTenantDetails, () => {
       });
 
       expect(result).toEqual({ outcome: PROVISIONING_STARTED });
-      expect((await readDetails(tenantId))?.name).toBe(TENANT_NAME);
+      const details = await readDetails(tenantId);
+      expect(details?.name).toBe(TENANT_NAME);
     },
   );
 

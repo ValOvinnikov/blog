@@ -30,6 +30,7 @@ import {
   MOCK_TENANT_NAME,
   OWNER_EMAIL_LABEL,
   PRIMARY_DOMAIN_LABEL,
+  mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
@@ -43,7 +44,7 @@ import type { TTenantDetailsValues } from './tenant-details-values';
 
 const render = renderWithIntl;
 
-const OWNER = { email: MOCK_OWNER_EMAIL };
+const OWNER = mockJoinedOwner();
 
 const NO_LOCKS: TTenantFieldLocks = {};
 const ALL_LOCKED_RUNNING: TTenantFieldLocks = {

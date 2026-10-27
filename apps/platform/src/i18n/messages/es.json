@@ -377,6 +377,8 @@
     "roleLabel": "Rol",
     "ownerInvitedPendingBadge": "Invitado, pendiente",
     "joinedLabel": "Se unió",
+    "invitedLabel": "Invitado",
+    "ownerNotSignedInYet": "<time>{date}</time>, aún no ha iniciado sesión",
     "contentWorkspaceCardTitle": "Espacio de contenido",
     "platformBadge": "plataforma",
     "sanityProjectLabel": "Proyecto de Sanity",

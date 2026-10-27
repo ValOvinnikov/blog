@@ -40,6 +40,8 @@ export const MOCK_USER_NAME = faker.person.fullName();
 export const MOCK_USER_EMAIL = faker.internet.email().toLowerCase();
 export const MOCK_OWNER_EMAIL = faker.internet.email().toLowerCase();
 export const MOCK_OPERATOR_EMAIL = 'operator@example.com';
+export const MOCK_EMAIL_VERIFIED_AT = faker.date.past();
+export const MOCK_OAUTH_PROVIDER = 'github';
 
 // Seeds one `tenants` row against the given `createTestDb()` instance for a
 // test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`

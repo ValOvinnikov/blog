@@ -40,6 +40,7 @@ export const TenantProvisioningSection = ({
         fieldLocks={computeTenantFieldLocks(
           provisioningSteps,
           provisioningStatus,
+          owner,
         )}
         owner={owner}
         archivedNoticeId={archivedNoticeId}

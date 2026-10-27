@@ -377,6 +377,8 @@
     "roleLabel": "Rol",
     "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting",
     "joinedLabel": "Lid sinds",
+    "invitedLabel": "Uitgenodigd",
+    "ownerNotSignedInYet": "<time>{date}</time>, nog niet aangemeld",
     "contentWorkspaceCardTitle": "Contentwerkruimte",
     "platformBadge": "platform",
     "sanityProjectLabel": "Sanity-project",

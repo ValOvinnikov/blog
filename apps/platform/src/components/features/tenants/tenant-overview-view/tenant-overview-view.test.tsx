@@ -33,8 +33,6 @@ import {
   mockTenant,
   MOCK_ARCHIVED_AT,
   MOCK_INVITED_OWNER_EMAIL,
-  MOCK_OWNER_EMAIL,
-  MOCK_OWNER_JOINED_AT,
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
@@ -43,6 +41,8 @@ import {
   PRIMARY_DOMAIN_LABEL,
   REACTIVATE_TENANT_LABEL,
   MOCK_TENANT_ID,
+  mockInvitedOwner,
+  mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantOverviewView } from './tenant-overview-view';
@@ -127,10 +127,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     retryProvisioningStepActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantOwnerMembershipMock.mockReset();
-    getTenantOwnerMembershipMock.mockResolvedValue({
-      email: MOCK_OWNER_EMAIL,
-      joinedAt: MOCK_OWNER_JOINED_AT,
-    });
+    getTenantOwnerMembershipMock.mockResolvedValue(mockJoinedOwner());
     listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockReset();
@@ -360,9 +357,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('shows a pending invite email in both the owner card and details panel', async () => {
-    getTenantOwnerMembershipMock.mockResolvedValue({
-      email: MOCK_INVITED_OWNER_EMAIL,
-    });
+    getTenantOwnerMembershipMock.mockResolvedValue(mockInvitedOwner());
 
     await setup();
 
