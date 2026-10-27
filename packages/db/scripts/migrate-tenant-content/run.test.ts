@@ -1,31 +1,35 @@
+import { join } from 'node:path';
+
 import { TENANT_STATUS } from '@blog/db/constants';
 import { mockTenantSanityCredentials } from '@blog/db/testing/tenant-sanity-credentials/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_MISSING_TENANT_ID,
+  mockTenant,
+} from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   hasSystemicFailures,
   runMigration,
   runMigrationForTenant,
+  type TMigrateSummary,
 } from './run';
 
-const { listActiveTenantsMock } = vi.hoisted(() => ({
+const {
+  listActiveTenantsMock,
+  getTenantByIdMock,
+  getTenantSanityWriteCredentialsMock,
+  isTenantMigrationLedgerEmptyMock,
+  runTenantMigrationDeployMock,
+  exportTenantDatasetMock,
+} = vi.hoisted(() => ({
   listActiveTenantsMock: vi.fn(),
-}));
-const { getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
-}));
-const { getTenantSanityWriteCredentialsMock } = vi.hoisted(() => ({
   getTenantSanityWriteCredentialsMock: vi.fn(),
-}));
-const { isTenantMigrationLedgerEmptyMock } = vi.hoisted(() => ({
   isTenantMigrationLedgerEmptyMock: vi.fn(),
+  runTenantMigrationDeployMock: vi.fn(),
+  exportTenantDatasetMock: vi.fn(),
 }));
-const { runTenantMigrationDeployMock, exportTenantDatasetMock } = vi.hoisted(
-  () => ({
-    runTenantMigrationDeployMock: vi.fn(),
-    exportTenantDatasetMock: vi.fn(),
-  }),
-);
 
 vi.mock('@blog/db/queries/tenants', () => ({
   listActiveTenants: listActiveTenantsMock,
@@ -40,37 +44,38 @@ vi.mock('./lib/run-tenant-migrate-script', () => ({
   exportTenantDataset: exportTenantDatasetMock,
 }));
 
-const EXPORT_DIR = '/tmp/exports';
+faker.seed(5804);
+
 const EXPORT_CALL = 'export';
 const DEPLOY_CALL = 'deploy';
 
+const MOCK_EXPORT_DIR = faker.system.directoryPath();
 const MOCK_TENANT = mockTenant();
 const MOCK_TENANTS = [MOCK_TENANT, mockTenant(), mockTenant()];
 const MOCK_CREDENTIALS = mockTenantSanityCredentials();
-const MOCK_MIGRATION_ERROR = 'migration deploy crashed';
+const MOCK_DEPROVISIONED_AT = faker.date.past();
+const MOCK_MIGRATION_ERROR = faker.lorem.sentence();
+const MOCK_LEDGER_ERROR = faker.lorem.sentence();
+const MOCK_EXPORT_ERROR = faker.lorem.sentence();
+const MOCK_EMPTY_SUMMARY: TMigrateSummary = {
+  checked: 0,
+  migrated: 0,
+  backfilled: 0,
+  skipped: 0,
+  errors: 0,
+};
 
 beforeEach(() => {
-  listActiveTenantsMock.mockReset().mockResolvedValue([]);
-  getTenantByIdMock.mockReset();
-  getTenantSanityWriteCredentialsMock
-    .mockReset()
-    .mockResolvedValue(MOCK_CREDENTIALS);
-  isTenantMigrationLedgerEmptyMock.mockReset().mockReturnValue(false);
-  runTenantMigrationDeployMock.mockReset();
-  exportTenantDatasetMock.mockReset();
+  listActiveTenantsMock.mockResolvedValue([]);
+  getTenantSanityWriteCredentialsMock.mockResolvedValue(MOCK_CREDENTIALS);
+  isTenantMigrationLedgerEmptyMock.mockReturnValue(false);
 });
 
 describe(runMigration, () => {
   it('is a clean no-op when there are no in-scope tenants', async () => {
     const summary = await runMigration();
 
-    expect(summary).toEqual({
-      checked: 0,
-      migrated: 0,
-      backfilled: 0,
-      skipped: 0,
-      errors: 0,
-    });
+    expect(summary).toEqual(MOCK_EMPTY_SUMMARY);
   });
 
   it("one tenant's failure does not abort the sweep for the rest", async () => {
@@ -85,10 +90,9 @@ describe(runMigration, () => {
     const summary = await runMigration();
 
     expect(summary).toEqual({
+      ...MOCK_EMPTY_SUMMARY,
       checked: 3,
       migrated: 2,
-      backfilled: 0,
-      skipped: 0,
       errors: 1,
     });
     expect(runTenantMigrationDeployMock).toHaveBeenCalledTimes(3);
@@ -99,17 +103,16 @@ describe(runMigration, () => {
     listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS.slice(0, 2));
     isTenantMigrationLedgerEmptyMock
       .mockImplementationOnce(() => {
-        throw new Error('sanity CLI crashed');
+        throw new Error(MOCK_LEDGER_ERROR);
       })
       .mockImplementationOnce(() => false);
 
     const summary = await runMigration();
 
     expect(summary).toEqual({
+      ...MOCK_EMPTY_SUMMARY,
       checked: 2,
       migrated: 1,
-      backfilled: 0,
-      skipped: 0,
       errors: 1,
     });
     expect(runTenantMigrationDeployMock).toHaveBeenCalledTimes(1);
@@ -136,12 +139,7 @@ describe(runMigration, () => {
 
       const summary = await runMigration();
 
-      expect(summary).toEqual({
-        checked: 1,
-        ...tally,
-        skipped: 0,
-        errors: 0,
-      });
+      expect(summary).toEqual({ ...MOCK_EMPTY_SUMMARY, checked: 1, ...tally });
       expect(getTenantSanityWriteCredentialsMock).toHaveBeenCalledWith(
         MOCK_TENANT.id,
       );
@@ -160,14 +158,10 @@ describe(runMigration, () => {
 
     describe('with an export directory set', () => {
       beforeEach(() => {
-        vi.stubEnv('TENANT_EXPORT_DIR', EXPORT_DIR);
+        vi.stubEnv('TENANT_EXPORT_DIR', MOCK_EXPORT_DIR);
       });
 
-      afterEach(() => {
-        vi.unstubAllEnvs();
-      });
-
-      it('exports the tenant dataset before migrating it when an export directory is set', async () => {
+      it('exports the tenant dataset before migrating it', async () => {
         const calls: string[] = [];
         exportTenantDatasetMock.mockImplementation(() =>
           calls.push(EXPORT_CALL),
@@ -180,23 +174,21 @@ describe(runMigration, () => {
 
         expect(exportTenantDatasetMock).toHaveBeenCalledWith(
           MOCK_CREDENTIALS,
-          `${EXPORT_DIR}/${MOCK_TENANT.id}.tar.gz`,
+          join(MOCK_EXPORT_DIR, `${MOCK_TENANT.id}.tar.gz`),
         );
         expect(calls).toEqual([EXPORT_CALL, DEPLOY_CALL]);
       });
 
-      it('does not migrate a tenant whose export failed, and counts it as an error', async () => {
+      it('skips migrating a tenant whose export failed and counts an error', async () => {
         exportTenantDatasetMock.mockImplementation(() => {
-          throw new Error('export failed');
+          throw new Error(MOCK_EXPORT_ERROR);
         });
 
         const summary = await runMigration();
 
         expect(summary).toEqual({
+          ...MOCK_EMPTY_SUMMARY,
           checked: 1,
-          migrated: 0,
-          backfilled: 0,
-          skipped: 0,
           errors: 1,
         });
         expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
@@ -211,10 +203,7 @@ describe(runMigration, () => {
       ],
       [
         'resolves to a deprovisioned timestamp',
-        {
-          ...MOCK_CREDENTIALS,
-          deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
-        },
+        { ...MOCK_CREDENTIALS, deprovisionedAt: MOCK_DEPROVISIONED_AT },
       ],
     ])('tallies a tenant that %s as skipped', async (_case, resolved) => {
       getTenantSanityWriteCredentialsMock.mockResolvedValue(resolved);
@@ -222,11 +211,9 @@ describe(runMigration, () => {
       const summary = await runMigration();
 
       expect(summary).toEqual({
+        ...MOCK_EMPTY_SUMMARY,
         checked: 1,
-        migrated: 0,
-        backfilled: 0,
         skipped: 1,
-        errors: 0,
       });
       expect(isTenantMigrationLedgerEmptyMock).not.toHaveBeenCalled();
       expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
@@ -248,7 +235,7 @@ describe(runMigrationForTenant, () => {
   it('returns an empty summary when the tenant id does not resolve', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    const summary = await runMigrationForTenant('missing');
+    const summary = await runMigrationForTenant(MOCK_MISSING_TENANT_ID);
 
     expect(summary.checked).toBe(0);
     expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
@@ -260,14 +247,8 @@ describe(hasSystemicFailures, () => {
     ['false when every candidate resolved to an expected outcome', 0, false],
     ['true when at least one candidate threw', 1, true],
   ])('is %s', (_case, errors, expected) => {
-    expect(
-      hasSystemicFailures({
-        checked: 3,
-        migrated: 2,
-        backfilled: 0,
-        skipped: 0,
-        errors,
-      }),
-    ).toBe(expected);
+    const summary = { ...MOCK_EMPTY_SUMMARY, checked: 3, migrated: 2, errors };
+
+    expect(hasSystemicFailures(summary)).toBe(expected);
   });
 });

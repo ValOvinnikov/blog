@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
 
+faker.seed(7741);
+
+export const MOCK_SANITY_ERROR_BODY = faker.lorem.words(2);
 export const MOCK_SANITY_TOKEN = faker.string.alphanumeric(12);
 export const MOCK_SANITY_PROJECT_ID = faker.string.alphanumeric(8);
 export const MOCK_SANITY_DATASET = faker.string.alpha({

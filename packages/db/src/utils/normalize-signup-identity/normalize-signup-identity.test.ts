@@ -9,10 +9,16 @@ import {
   normalizeSignupEmail,
 } from './normalize-signup-identity';
 
+const MOCK_TAG = '+promo';
+const [MOCK_LOCAL_PART = ''] = MOCK_BLOCKED_ADDRESS.split('@');
+
 describe(normalizeSignupEmail, () => {
   it.each([
-    ['lower-cases and trims', '  Blocked@Example.COM '],
-    ['drops a +tag from', 'blocked+promo+2@example.com'],
+    ['lower-cases and trims', ` ${MOCK_BLOCKED_ADDRESS.toUpperCase()} `],
+    [
+      'drops a +tag from',
+      `${MOCK_LOCAL_PART}${MOCK_TAG}${MOCK_TAG}@${MOCK_BLOCKED_ADDRESS_DOMAIN}`,
+    ],
   ])('%s the address', (_, email) => {
     expect(normalizeSignupEmail(email)).toEqual({
       address: MOCK_BLOCKED_ADDRESS,
@@ -21,10 +27,13 @@ describe(normalizeSignupEmail, () => {
   });
 
   it.each([
-    ['no @', 'blocked.example.com'],
-    ['an empty local part', '@example.com'],
-    ['a local part that is only a tag', '+promo@example.com'],
-    ['an invalid domain', 'blocked@not a domain'],
+    ['no @', `${MOCK_LOCAL_PART}.${MOCK_BLOCKED_ADDRESS_DOMAIN}`],
+    ['an empty local part', `@${MOCK_BLOCKED_ADDRESS_DOMAIN}`],
+    [
+      'a local part that is only a tag',
+      `${MOCK_TAG}@${MOCK_BLOCKED_ADDRESS_DOMAIN}`,
+    ],
+    ['an invalid domain', `${MOCK_LOCAL_PART}@${MOCK_NOT_A_DOMAIN}`],
   ])('rejects an address with %s', (_, email) => {
     expect(normalizeSignupEmail(email)).toBeUndefined();
   });
@@ -32,9 +41,9 @@ describe(normalizeSignupEmail, () => {
 
 describe(normalizeSignupDomain, () => {
   it('lower-cases and trims the domain', () => {
-    expect(normalizeSignupDomain(' Example.COM ')).toBe(
-      MOCK_BLOCKED_ADDRESS_DOMAIN,
-    );
+    expect(
+      normalizeSignupDomain(` ${MOCK_BLOCKED_ADDRESS_DOMAIN.toUpperCase()} `),
+    ).toBe(MOCK_BLOCKED_ADDRESS_DOMAIN);
   });
 
   it('rejects a value that is not a domain', () => {

@@ -1,5 +1,4 @@
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
-import type * as schema from '@blog/db/schema';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
 import {
   MOCK_BLOCK_REASON,
@@ -10,29 +9,19 @@ import {
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
-  listMigrationFiles,
+  applyMigrationsBefore,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { sha256Hex } from '@blog/utils/hash';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 const INDEX_MIGRATION = '0052_remove_plain_hash_blocked_addresses.sql';
 
-describe('0052_remove_plain_hash_blocked_addresses', () => {
-  let db: PgliteDatabase<typeof schema>;
-
-  beforeEach(async () => {
-    db = await createEmptyTestDb();
-  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
-
+describe(`${INDEX_MIGRATION} (plain-hash blocked addresses removed)`, () => {
   it(
     'removes plain-hash address entries and keeps indexed addresses and domains',
     async () => {
-      for (const file of listMigrationFiles()) {
-        if (file >= INDEX_MIGRATION) break;
-        await applyMigrationFile(db, file);
-      }
-
+      const db = await createEmptyTestDb();
+      await applyMigrationsBefore(db, INDEX_MIGRATION);
       await db.insert(blockedSignupIdentities).values([
         {
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
@@ -60,7 +49,6 @@ describe('0052_remove_plain_hash_blocked_addresses', () => {
         })
         .from(blockedSignupIdentities)
         .orderBy(blockedSignupIdentities.kind);
-
       expect(rows).toEqual([
         {
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
