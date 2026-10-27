@@ -1,6 +1,7 @@
 import { ConnectedDomainDetails } from '@platform/components/features/tenants/domain-page-content/components/connected-domain-details/connected-domain-details';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
+import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import {
@@ -11,6 +12,8 @@ import type { TProjectDomain } from '@platform/server/provisioning/vercel-domain
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 import { use } from 'react';
+
+import { domainVerificationCardVariants } from './domain-verification-card-variants';
 
 const UNCHECKED_STATUSES: ReadonlySet<TDomainVerificationStatus> = new Set([
   DOMAIN_VERIFICATION_STATUS.ERROR,
@@ -32,6 +35,7 @@ export const DomainVerificationCard = ({
   const { status, dnsRecords } = use(projectDomain);
   const isVerified = status === DOMAIN_VERIFICATION_STATUS.VERIFIED;
   const wasChecked = !UNCHECKED_STATUSES.has(status);
+  const { pendingAddress } = domainVerificationCardVariants();
 
   return (
     <Card>
@@ -58,13 +62,22 @@ export const DomainVerificationCard = ({
             domain={domain}
             isPlatformAddress={isPlatformAddress}
           />
-        ) : dnsRecords.length > 0 ? (
-          <>
-            <Text variant="muted">{t('bodyCopy')}</Text>
-            <DnsRecordsTable records={dnsRecords} />
-          </>
         ) : (
-          <Text variant="supporting">{t('unavailableState')}</Text>
+          <>
+            <DetailList className={pendingAddress()}>
+              <DetailList.Row label={t('addressLabel')} isMono={true}>
+                {domain}
+              </DetailList.Row>
+            </DetailList>
+            {dnsRecords.length > 0 ? (
+              <>
+                <Text variant="muted">{t('bodyCopy')}</Text>
+                <DnsRecordsTable records={dnsRecords} />
+              </>
+            ) : (
+              <Text variant="supporting">{t('unavailableState')}</Text>
+            )}
+          </>
         )}
       </Card.Body>
     </Card>

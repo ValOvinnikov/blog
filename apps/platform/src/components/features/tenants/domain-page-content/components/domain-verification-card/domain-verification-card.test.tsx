@@ -134,6 +134,19 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     expect(visitSite).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
   });
 
+  it('names the domain while it awaits verification, with no site link', async () => {
+    await setup({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
+    });
+
+    const address = await screen.findByText(MOCK_CUSTOM_DOMAIN);
+    const visitSite = screen.queryByRole('link', { name: /Visit site/ });
+
+    expect(address).toBeVisible();
+    expect(visitSite).not.toBeInTheDocument();
+  });
+
   it('asks for the records only alongside the table', async () => {
     await setup({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
