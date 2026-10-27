@@ -1,4 +1,5 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { ClientError } from '@sanity/client';
 import {
   MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
@@ -11,6 +12,11 @@ import type { Mock } from 'vitest';
 
 import { grantPropagationRetryOptions } from './grant-propagation-retry';
 
+faker.seed(7012);
+
+const MOCK_RESULT = faker.lorem.word();
+const MOCK_MALFORMED_MUTATION = faker.lorem.sentence();
+
 describe(grantPropagationRetryOptions, () => {
   let sleep: Mock<(ms: number) => Promise<void>>;
 
@@ -18,7 +24,7 @@ describe(grantPropagationRetryOptions, () => {
     sleep = vi.fn().mockResolvedValue(undefined);
   });
 
-  it('retries an "insufficient permissions" message failure until it gives up, a bounded and stable number of times', async () => {
+  it('retries an "insufficient permissions" failure a bounded, stable number of times', async () => {
     const failure = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
     const firstRun = vi.fn().mockRejectedValue(failure);
 
@@ -38,18 +44,18 @@ describe(grantPropagationRetryOptions, () => {
     expect(secondRun).toHaveBeenCalledTimes(attemptCount);
   });
 
-  it('retries a structured ClientError carrying the 403 status code until it succeeds', async () => {
+  it('retries a ClientError carrying the 403 status code until it succeeds', async () => {
     const fn = vi
       .fn()
       .mockRejectedValueOnce(mockSanityGrantError())
-      .mockResolvedValueOnce('ok');
+      .mockResolvedValueOnce(MOCK_RESULT);
 
     const result = await retryWithBackoff(
       fn,
       grantPropagationRetryOptions(sleep),
     );
 
-    expect(result).toBe('ok');
+    expect(result).toBe(MOCK_RESULT);
     expect(fn).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
   });
@@ -60,7 +66,7 @@ describe(grantPropagationRetryOptions, () => {
       new ClientError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         headers: {},
-        body: { message: 'Malformed mutation' },
+        body: { message: MOCK_MALFORMED_MUTATION },
         url: MOCK_SANITY_MUTATE_URL,
         method: HTTP_METHOD.POST,
       }),

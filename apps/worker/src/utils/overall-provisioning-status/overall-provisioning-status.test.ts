@@ -1,4 +1,5 @@
 import {
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
@@ -6,75 +7,48 @@ import {
 import { overallStatusFor } from './overall-provisioning-status';
 
 describe(overallStatusFor, () => {
-  it('returns READY when the last step (VERIFY_CONTENT) finishes', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-      ),
-    ).toBe('READY');
-  });
-
-  it('returns FAILED when the last step (VERIFY_CONTENT) fails', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
-        TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      ),
-    ).toBe('FAILED');
-  });
-
-  it('returns undefined when VERIFY_CONTENT is only RUNNING', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-      ),
-    ).toBeUndefined();
-  });
-
-  it('returns undefined when the second-to-last step (CREATE_WEBHOOK) finishes', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-      ),
-    ).toBeUndefined();
-  });
-
-  it('returns undefined for an earlier step succeeding', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-      ),
-    ).toBeUndefined();
-  });
-
-  it('returns FAILED when an earlier step fails, not just the last one', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
-        TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      ),
-    ).toBe('FAILED');
-  });
-
-  it('returns FAILED when the very first step fails', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.SANITY_PROJECT,
-        TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      ),
-    ).toBe('FAILED');
-  });
-
-  it('returns undefined for an earlier step only RUNNING', () => {
-    expect(
-      overallStatusFor(
-        TENANT_PROVISIONING_STEP.SEED_CONTENT,
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-      ),
-    ).toBeUndefined();
+  it.each([
+    [
+      TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STATUS.READY,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      TENANT_PROVISIONING_STATUS.FAILED,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      TENANT_PROVISIONING_STATUS.FAILED,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.SANITY_PROJECT,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      TENANT_PROVISIONING_STATUS.FAILED,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
+      TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      undefined,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      undefined,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      undefined,
+    ],
+    [
+      TENANT_PROVISIONING_STEP.SEED_CONTENT,
+      TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      undefined,
+    ],
+  ])('settles %s %s as %s', (step, status, expected) => {
+    expect(overallStatusFor(step, status)).toBe(expected);
   });
 });

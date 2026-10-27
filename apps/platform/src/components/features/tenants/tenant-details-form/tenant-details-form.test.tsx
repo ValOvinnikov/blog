@@ -244,7 +244,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       await clickBeginProvisioning();
     });
 
-    it('offers a soft confirmation instead of a blocking error', async () => {
+    it('asks to confirm the owner invite without showing an error', async () => {
       const confirmButton = await screen.findByRole(
         'button',
         CONFIRM_INVITE_BUTTON,

@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_OWNER_EMAIL } from '@blog/db/constants';
+import { DAY_MS, TENANT_OWNER_EMAIL } from '@blog/db/constants';
 import {
   claimTenantOwnerEmail,
   releaseTenantOwnerEmail,
@@ -12,9 +12,14 @@ import {
 } from '@worker/constants/owner-email';
 import { freezeClock, MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import {
+  MOCK_DB_DOWN,
+  MOCK_RESEND_DOWN,
+} from '@worker/testing/outage/fixtures';
+import {
   mockOwnerAccessTarget,
   MOCK_OWNER_EMAIL,
 } from '@worker/testing/owner-access/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_TENANT_ID,
   mockProvisionedTenant,
@@ -25,22 +30,13 @@ import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access
 import { OWNER_EMAIL_COPY } from './owner-email-copy';
 import { sendOwnerEmailOnce, sendPendingOwnerEmails } from './send-owner-email';
 
-const CLAIMED_AT = MOCK_NOW;
-const TWO_DAYS_AGO = new Date(MOCK_NOW.getTime() - 2 * 24 * 60 * 60_000);
-const AN_HOUR_AGO = new Date(MOCK_NOW.getTime() - 60 * 60_000);
-const RESEND_DOWN = 'Resend is down';
-const CLAIM_REFUSED = 'claim refused';
-const RELEASE_REFUSED = 'release refused';
+const MOCK_CLAIMED_AT = MOCK_NOW;
+const MOCK_TWO_DAYS_AGO = new Date(MOCK_NOW.getTime() - 2 * DAY_MS);
+const MOCK_AN_HOUR_AGO = new Date(MOCK_NOW.getTime() - DAY_MS / 24);
+const { platformAppBaseUrl } = MOCK_PROVISION_ENV;
 
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
-vi.mock(import('@blog/email'), async (importOriginal) => ({
-  ...(await importOriginal()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/db/queries/tenants');
+vi.mock('@blog/email/transport/send-email');
 
 function makeTarget(
   overrides: Parameters<typeof mockProvisionedTenant>[0] = {},
@@ -62,7 +58,7 @@ function sentEmails() {
 
 describe(sendOwnerEmailOnce, () => {
   beforeEach(() => {
-    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(CLAIMED_AT);
+    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(MOCK_CLAIMED_AT);
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
@@ -102,25 +98,20 @@ describe(sendOwnerEmailOnce, () => {
     expect(email?.subject).toBe(subject);
   });
 
-  it('links the nudge to the admin dashboard', async () => {
-    await sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.INVITE_NUDGE);
+  it.each([
+    [TENANT_OWNER_EMAIL.INVITE_NUDGE, '/dashboard'],
+    [TENANT_OWNER_EMAIL.SITE_READY, '/dashboard/studio'],
+  ])('links the %s email to the admin %s', async (email, path) => {
+    await sendOwnerEmailOnce(makeTarget(), email);
 
     expect(sentEmails()[0]?.html).toContain(
-      'href="https://admin.example.com/dashboard"',
-    );
-  });
-
-  it('links site ready to the Studio', async () => {
-    await sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.SITE_READY);
-
-    expect(sentEmails()[0]?.html).toContain(
-      'href="https://admin.example.com/dashboard/studio"',
+      `href="${platformAppBaseUrl}${path}"`,
     );
   });
 
   describe('when the send fails', () => {
     beforeEach(() => {
-      vi.mocked(sendEmail).mockRejectedValue(new Error(RESEND_DOWN));
+      vi.mocked(sendEmail).mockRejectedValue(new Error(MOCK_RESEND_DOWN));
     });
 
     it('logs the failure without throwing', async () => {
@@ -130,7 +121,7 @@ describe(sendOwnerEmailOnce, () => {
       expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
         tenantId: MOCK_TENANT_ID,
         email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
-        error: RESEND_DOWN,
+        error: MOCK_RESEND_DOWN,
       });
     });
 
@@ -143,13 +134,13 @@ describe(sendOwnerEmailOnce, () => {
       expect(releaseTenantOwnerEmail).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
-        CLAIMED_AT,
+        MOCK_CLAIMED_AT,
       );
     });
 
     it('logs a release that fails without throwing', async () => {
       vi.mocked(releaseTenantOwnerEmail).mockRejectedValue(
-        new Error(RELEASE_REFUSED),
+        new Error(MOCK_DB_DOWN),
       );
 
       await expect(
@@ -160,16 +151,14 @@ describe(sendOwnerEmailOnce, () => {
         {
           tenantId: MOCK_TENANT_ID,
           email: TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
-          error: RELEASE_REFUSED,
+          error: MOCK_DB_DOWN,
         },
       );
     });
   });
 
   it('logs a claim that fails without sending or releasing', async () => {
-    vi.mocked(claimTenantOwnerEmail).mockRejectedValue(
-      new Error(CLAIM_REFUSED),
-    );
+    vi.mocked(claimTenantOwnerEmail).mockRejectedValue(new Error(MOCK_DB_DOWN));
 
     await expect(
       sendOwnerEmailOnce(makeTarget(), TENANT_OWNER_EMAIL.SITE_READY),
@@ -179,14 +168,14 @@ describe(sendOwnerEmailOnce, () => {
     expect(logger.error).toHaveBeenCalledWith(OWNER_EMAIL_SEND_FAILED_EVENT, {
       tenantId: MOCK_TENANT_ID,
       email: TENANT_OWNER_EMAIL.SITE_READY,
-      error: CLAIM_REFUSED,
+      error: MOCK_DB_DOWN,
     });
   });
 });
 
 describe(sendPendingOwnerEmails, () => {
   beforeEach(() => {
-    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(CLAIMED_AT);
+    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(MOCK_CLAIMED_AT);
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
@@ -198,7 +187,7 @@ describe(sendPendingOwnerEmails, () => {
 
   it('retries a heads-up that has not gone out yet', async () => {
     await sendPendingOwnerEmails(
-      makeTarget({ ownerInviteSentAt: AN_HOUR_AGO }),
+      makeTarget({ ownerInviteSentAt: MOCK_AN_HOUR_AGO }),
     );
 
     expect(claimedEmails()).toEqual([TENANT_OWNER_EMAIL.INVITE_HEADS_UP]);
@@ -207,8 +196,8 @@ describe(sendPendingOwnerEmails, () => {
   it('sends nothing within a day of a heads-up that went out', async () => {
     await sendPendingOwnerEmails(
       makeTarget({
-        ownerInviteSentAt: AN_HOUR_AGO,
-        ownerInviteHeadsUpSentAt: AN_HOUR_AGO,
+        ownerInviteSentAt: MOCK_AN_HOUR_AGO,
+        ownerInviteHeadsUpSentAt: MOCK_AN_HOUR_AGO,
       }),
     );
 
@@ -218,8 +207,8 @@ describe(sendPendingOwnerEmails, () => {
   it('nudges an owner who has not accepted a day after the invite', async () => {
     await sendPendingOwnerEmails(
       makeTarget({
-        ownerInviteSentAt: TWO_DAYS_AGO,
-        ownerInviteHeadsUpSentAt: TWO_DAYS_AGO,
+        ownerInviteSentAt: MOCK_TWO_DAYS_AGO,
+        ownerInviteHeadsUpSentAt: MOCK_TWO_DAYS_AGO,
       }),
     );
 
@@ -229,9 +218,9 @@ describe(sendPendingOwnerEmails, () => {
   it('never nudges twice', async () => {
     await sendPendingOwnerEmails(
       makeTarget({
-        ownerInviteSentAt: TWO_DAYS_AGO,
-        ownerInviteHeadsUpSentAt: TWO_DAYS_AGO,
-        ownerInviteNudgeSentAt: AN_HOUR_AGO,
+        ownerInviteSentAt: MOCK_TWO_DAYS_AGO,
+        ownerInviteHeadsUpSentAt: MOCK_TWO_DAYS_AGO,
+        ownerInviteNudgeSentAt: MOCK_AN_HOUR_AGO,
       }),
     );
 

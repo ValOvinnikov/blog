@@ -98,63 +98,67 @@ describe('personDetailFragment', () => {
 
     expect(author?.socialLinks).toEqual([socialProfile]);
   });
-});
 
-describe('personDetailFragment per language', () => {
-  const personDocument = {
-    _id: MOCK_PERSON_ID,
-    _type: 'person',
-    name: rawCard.name,
-    image: mockLocalizedImage({ [EN]: MOCK_ENGLISH_ALT, [NL]: MOCK_DUTCH_ALT }),
-    role: mockLocalizedStrings({
-      [EN]: MOCK_ENGLISH_ROLE,
-      [NL]: MOCK_DUTCH_ROLE,
-    }),
-    bio: mockLocalizedParagraphText({
-      [EN]: MOCK_ENGLISH_BIO,
-      [NL]: MOCK_DUTCH_BIO,
-    }),
-  };
+  describe('per language', () => {
+    const personDocument = {
+      _id: MOCK_PERSON_ID,
+      _type: 'person',
+      name: rawCard.name,
+      image: mockLocalizedImage({
+        [EN]: MOCK_ENGLISH_ALT,
+        [NL]: MOCK_DUTCH_ALT,
+      }),
+      role: mockLocalizedStrings({
+        [EN]: MOCK_ENGLISH_ROLE,
+        [NL]: MOCK_DUTCH_ROLE,
+      }),
+      bio: mockLocalizedParagraphText({
+        [EN]: MOCK_ENGLISH_BIO,
+        [NL]: MOCK_DUTCH_BIO,
+      }),
+    };
 
-  async function runPerson(locale: string) {
-    const raw = await evaluateGroqExpression(
-      authorDetailDocQuery.query,
-      [personDocument, MOCK_IMAGE_ASSET_DOCUMENT],
-      undefined,
-      { locale, defaultLocale: EN },
-    );
+    async function runPerson(locale: string) {
+      const raw = await evaluateGroqExpression(
+        authorDetailDocQuery.query,
+        [personDocument, MOCK_IMAGE_ASSET_DOCUMENT],
+        undefined,
+        { locale, defaultLocale: EN },
+      );
 
-    return authorDetailDocQuery.parse(raw);
-  }
+      return authorDetailDocQuery.parse(raw);
+    }
 
-  it.each([
-    {
-      behaviour: 'picks the role, bio and photo alt in the visitor language',
-      locale: NL,
-      expected: {
-        role: MOCK_DUTCH_ROLE,
-        bio: MOCK_DUTCH_BIO,
-        alt: MOCK_DUTCH_ALT,
+    it.each([
+      {
+        behaviour: 'picks the role, bio and photo alt in the visitor language',
+        locale: NL,
+        expected: {
+          role: MOCK_DUTCH_ROLE,
+          bio: MOCK_DUTCH_BIO,
+          alt: MOCK_DUTCH_ALT,
+        },
       },
-    },
-    {
-      behaviour: 'falls back to the default language for the role, bio and alt',
-      locale: FR,
-      expected: {
-        role: MOCK_ENGLISH_ROLE,
-        bio: MOCK_ENGLISH_BIO,
-        alt: MOCK_ENGLISH_ALT,
+      {
+        behaviour:
+          'falls back to the default language for the role, bio and alt',
+        locale: FR,
+        expected: {
+          role: MOCK_ENGLISH_ROLE,
+          bio: MOCK_ENGLISH_BIO,
+          alt: MOCK_ENGLISH_ALT,
+        },
       },
-    },
-  ])('$behaviour', async ({ locale, expected }) => {
-    const person = await runPerson(locale);
+    ])('$behaviour', async ({ locale, expected }) => {
+      const person = await runPerson(locale);
 
-    const [bioBlock] = person?.bio ?? [];
-    const [bioSpan] = bioBlock?.children ?? [];
+      const [bioBlock] = person?.bio ?? [];
+      const [bioSpan] = bioBlock?.children ?? [];
 
-    expect(person?.name).toBe(rawCard.name);
-    expect(person?.role).toBe(expected.role);
-    expect(bioSpan?.text).toBe(expected.bio);
-    expect(person?.image?.alt).toBe(expected.alt);
+      expect(person?.name).toBe(rawCard.name);
+      expect(person?.role).toBe(expected.role);
+      expect(bioSpan?.text).toBe(expected.bio);
+      expect(person?.image?.alt).toBe(expected.alt);
+    });
   });
 });

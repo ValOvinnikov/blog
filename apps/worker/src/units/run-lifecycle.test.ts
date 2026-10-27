@@ -10,18 +10,18 @@ import {
   startProvisioningRun,
 } from '@blog/db/queries/tenants';
 import { errorResult, okResult } from '@blog/utils/result';
-import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
+import { PROVISIONING_AUDIT_VIA } from '@worker/constants/provisioning';
+import {
+  MOCK_DB_DOWN,
+  MOCK_WORKFLOW_CRASH,
+} from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 
 import { beginRun, finishRun } from './run-lifecycle';
 
-vi.mock('@blog/db/queries/audit-events', () => ({ insertAuditEvent: vi.fn() }));
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+vi.mock('@blog/db/queries/audit-events');
+vi.mock('@blog/db/queries/tenants');
 
 function recordedActions(): string[] {
   return vi.mocked(insertAuditEvent).mock.calls.map(([event]) => event.action);
@@ -60,7 +60,7 @@ describe(finishRun, () => {
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONED]);
   });
 
-  it('audits the failed step of a failed run without overriding its status', async () => {
+  it('audits the failed step without overriding the tenant status', async () => {
     await finishRun(
       MOCK_TENANT_ID,
       MOCK_RUN_CONTEXT,
@@ -68,14 +68,12 @@ describe(finishRun, () => {
     );
 
     expect(recordedActions()).toEqual([AUDIT_ACTION.PROVISIONING_FAILED]);
-    expect(insertAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        details: expect.objectContaining({
-          step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-          runId: MOCK_RUN_CONTEXT.runId,
-        }),
-      }),
-    );
+    const [event] = vi.mocked(insertAuditEvent).mock.lastCall ?? [];
+    expect(event?.details).toEqual({
+      via: PROVISIONING_AUDIT_VIA,
+      runId: MOCK_RUN_CONTEXT.runId,
+      step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+    });
     expect(setTenantProvisioningStatus).not.toHaveBeenCalled();
   });
 
@@ -83,7 +81,7 @@ describe(finishRun, () => {
     await finishRun(
       MOCK_TENANT_ID,
       MOCK_RUN_CONTEXT,
-      errorResult({ message: 'workflow crashed' }),
+      errorResult({ message: MOCK_WORKFLOW_CRASH }),
     );
 
     expect(setTenantProvisioningStatus).toHaveBeenCalledWith(

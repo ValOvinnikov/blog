@@ -96,7 +96,7 @@ describe(`<${BookmarksList.name}/>`, () => {
     expect(hint).toBeVisible();
   });
 
-  it('renders the empty message instead of the list when rows is empty', () => {
+  it('renders only the empty message when rows is empty', () => {
     setup({ rows: [] });
 
     const emptyMessage = screen.getByText(MOCK_EMPTY_MESSAGE);

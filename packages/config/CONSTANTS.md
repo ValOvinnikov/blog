@@ -38,6 +38,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BRAND_TAGLINE_SEPARATORS**: `DOT`, `PIPE`, `BULLET`, `SLASH`
 
+### `@blog/config/constants` — `packages/config/src/constants/busy-button.ts`
+
+- **BUSY_BUTTON_STYLE**: `LABEL`, `KEPT`, `EDGE`
+- **SPINNER_STYLE**: `PRESET`, `BRAILLE`, `RING`, `DOTS`, `PULSE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/capability.ts`
 
 - **CAPABILITY**: `COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`
@@ -455,9 +460,17 @@ Every key/value const an agent should reuse before writing a literal. The
 - **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
 - **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
 
+### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
+
+- **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`
+
 ### `@web/constants/request` — `apps/web/src/constants/request.ts`
 
 - **REQUEST_LOG**: `UNHANDLED_ERROR`=`"request.unhandled_error"`
+
+### `@web/constants/revalidate-site-config` — `apps/web/src/constants/revalidate-site-config.ts`
+
+- **REVALIDATE_SITE_CONFIG_LOG**: `SECRET_MISSING`=`"revalidate_site_config.secret_missing"`, `WHOLE_SITE_PURGE`=`"revalidate_site_config.whole_site_purge"`
 
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 

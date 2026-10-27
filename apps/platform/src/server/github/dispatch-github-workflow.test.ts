@@ -111,7 +111,7 @@ describe(dispatchGitHubWorkflow, () => {
     );
   });
 
-  it('dispatches against the given ref instead of main', async () => {
+  it('dispatches against the given ref', async () => {
     respondNoContent();
     const ref = `release/v${faker.system.semver()}`;
 

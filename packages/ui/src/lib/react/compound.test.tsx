@@ -144,7 +144,7 @@ describe(mapCompoundSlots, () => {
     expect(unmatchedItems).toHaveLength(0);
   });
 
-  it('drops false, null and undefined children instead of routing them', () => {
+  it('drops false, null and undefined children', () => {
     renderElement(
       <TestHarness>
         <Alpha>{MOCK_FIRST}</Alpha>

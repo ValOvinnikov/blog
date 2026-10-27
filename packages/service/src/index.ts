@@ -104,7 +104,10 @@ export type {
   TTopicWithPostCount,
 } from './features/entities/topics';
 export type { TFooter } from './features/global/footer';
-export type { TNavigation } from './features/global/navigation';
+export type {
+  TNavigation,
+  TNavigationItem,
+} from './features/global/navigation';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type {
   TTranslationEntry,

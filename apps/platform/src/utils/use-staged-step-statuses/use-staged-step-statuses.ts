@@ -7,7 +7,7 @@ import {
 import { useEffect, useState } from 'react';
 
 // Long enough to read a step's Running state before the next change replaces it.
-const STEP_REVEAL_DWELL_MS = 800;
+export const STEP_REVEAL_DWELL_MS = 800;
 
 type TStatuses = TTenantProvisioningStepStatus[];
 

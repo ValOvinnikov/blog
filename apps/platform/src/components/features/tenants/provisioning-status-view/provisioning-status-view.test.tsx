@@ -35,12 +35,12 @@ import {
   mockMapDomainFailedProvisioningSteps,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
+import { STEP_REVEAL_DWELL_MS } from '@platform/utils/use-staged-step-statuses/use-staged-step-statuses';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ProvisioningStatusView } from './provisioning-status-view';
 
-const STEP_POLL_INTERVAL_MS = 1500;
-const STEP_REVEAL_DWELL_MS = 800;
 const ONE_MINUTE_MS = 60_000;
 const QUEUED_WAIT_MS = 5000;
 const REVEALS_UNTIL_ALL_DONE = 11;
@@ -416,10 +416,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     afterEach(async () => {
-      await act(async () => {
-        resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
-        await Promise.resolve();
-      });
+      resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
+      await advance(0);
     });
 
     it('hides Start and shows the run as running at once', async () => {

@@ -1,32 +1,26 @@
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
+import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_ENCRYPTED_TOKEN,
   MOCK_TENANT_DOMAIN,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
+import {
+  addVercelProjectDomain,
+  listVercelProjectDomains,
+} from '@worker/utils/vercel-client/vercel-client';
 
 import { mapTenantDomain } from './map-domain';
 
-const { listVercelProjectDomainsMock, addVercelProjectDomainMock } = vi.hoisted(
-  () => ({
-    listVercelProjectDomainsMock: vi.fn(),
-    addVercelProjectDomainMock: vi.fn(),
-  }),
-);
+faker.seed(7005);
 
-vi.mock('@worker/utils/vercel-client/vercel-client', () => ({
-  listVercelProjectDomains: listVercelProjectDomainsMock,
-  addVercelProjectDomain: addVercelProjectDomainMock,
-}));
+const MOCK_OTHER_TENANT_DOMAIN = faker.internet.domainName();
+const { vercelToken, vercelTeamId, vercelWebProjectId } = MOCK_PROVISION_ENV;
 
-const { vercelToken, vercelWebProjectId } = MOCK_PROVISION_ENV;
-
-beforeEach(() => {
-  listVercelProjectDomainsMock.mockReset();
-  addVercelProjectDomainMock.mockReset();
-});
+vi.mock('@worker/utils/vercel-client/vercel-client');
 
 describe(mapTenantDomain, () => {
   let tenant: TTenant;
@@ -35,35 +29,35 @@ describe(mapTenantDomain, () => {
     tenant = mockProvisionedTenant({
       sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      seededAt: new Date(),
+      seededAt: MOCK_NOW,
     });
   });
 
-  it('adds the domain to the shared web project when not already registered', async () => {
-    listVercelProjectDomainsMock.mockResolvedValue([
-      { name: 'other-tenant.example.com' },
+  it('adds the domain to the web project when not already registered', async () => {
+    vi.mocked(listVercelProjectDomains).mockResolvedValue([
+      { name: MOCK_OTHER_TENANT_DOMAIN },
     ]);
     await mapTenantDomain(tenant, MOCK_PROVISION_ENV);
 
-    expect(listVercelProjectDomainsMock).toHaveBeenCalledWith({
+    expect(listVercelProjectDomains).toHaveBeenCalledWith({
       token: vercelToken,
-      teamId: undefined,
+      teamId: vercelTeamId,
       projectId: vercelWebProjectId,
     });
-    expect(addVercelProjectDomainMock).toHaveBeenCalledWith({
+    expect(addVercelProjectDomain).toHaveBeenCalledWith({
       token: vercelToken,
-      teamId: undefined,
+      teamId: vercelTeamId,
       projectId: vercelWebProjectId,
       domain: MOCK_TENANT_DOMAIN,
     });
   });
 
   it('skips adding the domain when already registered on the project', async () => {
-    listVercelProjectDomainsMock.mockResolvedValue([
+    vi.mocked(listVercelProjectDomains).mockResolvedValue([
       { name: MOCK_TENANT_DOMAIN },
     ]);
     await mapTenantDomain(tenant, MOCK_PROVISION_ENV);
 
-    expect(addVercelProjectDomainMock).not.toHaveBeenCalled();
+    expect(addVercelProjectDomain).not.toHaveBeenCalled();
   });
 });

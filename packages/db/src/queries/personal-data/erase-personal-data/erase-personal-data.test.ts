@@ -102,6 +102,8 @@ describe(erasePersonalData, () => {
   });
 
   it('leaves the reader account alone when it is out of scope', async () => {
+    const readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+
     const result = await erasePersonalData(
       MOCK_SUBSCRIBER_EMAIL,
       WITHOUT_READER_ACCOUNT,
@@ -110,8 +112,8 @@ describe(erasePersonalData, () => {
     expect(result).toEqual(
       erasure(MOCK_SUBSCRIBER_EMAIL, { ...SITE_RECORDS, readerAccounts: 0 }),
     );
-    const readerId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-    expect(readerId).toBeDefined();
+    const keptReaderId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+    expect(keptReaderId).toBe(readerId);
   });
 
   it("refuses to delete a site owner's account but still erases the site records", async () => {

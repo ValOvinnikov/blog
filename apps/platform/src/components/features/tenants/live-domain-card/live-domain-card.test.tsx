@@ -1,5 +1,9 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import { act, customRender, screen } from '@platform/testing/custom-render';
+import {
+  act,
+  customRenderAsync,
+  screen,
+} from '@platform/testing/custom-render';
 import {
   mockClientTenant,
   MOCK_TENANT_ID,
@@ -30,7 +34,7 @@ const SuspendedLiveDomainCard = (props: TLiveDomainCardProps) => (
   </Suspense>
 );
 
-const setup = customRender(SuspendedLiveDomainCard, {
+const setup = customRenderAsync(SuspendedLiveDomainCard, {
   tenant: mockClientTenant({ id: MOCK_TENANT_ID }),
   domainVerificationStatus: Promise.resolve(
     DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
@@ -59,9 +63,7 @@ describe(`<${LiveDomainCard.name}/>`, () => {
       .mockResolvedValueOnce(DOMAIN_VERIFICATION_STATUS.PENDING)
       .mockResolvedValueOnce(DOMAIN_VERIFICATION_STATUS.VERIFIED);
 
-    await act(async () => {
-      setup();
-    });
+    await setup();
     const streamedStatus = screen.getByText('Not added yet');
 
     expect(streamedStatus).toBeVisible();

@@ -138,32 +138,35 @@ describe('taxonomyListModuleQuery', () => {
 
     expect(headingBlock.heading).toBe(MOCK_HEADING_BY_LOCALE[language]);
   });
-});
 
-describe('taxonomyListModuleQuery language scoping', () => {
-  async function runEntry(locale: string) {
-    const raw = (await evaluateGroqExpression(
-      taxonomyListModuleQuery.query,
-      [MOCK_MODULE_DOCUMENT, ...MOCK_TRANSLATED_POST_DOCUMENTS],
-      undefined,
-      { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
-    )) as { entries: { postCount: number; latestPosts: unknown }[] };
-    const [entry] = raw.entries;
-    if (!entry) throw new Error('expected a topic entry');
+  describe('language scoping', () => {
+    async function runEntry(locale: string) {
+      const raw = (await evaluateGroqExpression(
+        taxonomyListModuleQuery.query,
+        [MOCK_MODULE_DOCUMENT, ...MOCK_TRANSLATED_POST_DOCUMENTS],
+        undefined,
+        { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
+      )) as { entries: { postCount: number; latestPosts: unknown }[] };
+      const [entry] = raw.entries;
+      if (!entry) throw new Error('expected a topic entry');
 
-    return { postCount: entry.postCount, latest: toIds(entry.latestPosts) };
-  }
+      return { postCount: entry.postCount, latest: toIds(entry.latestPosts) };
+    }
 
-  it.each([
-    [
-      EN,
-      { postCount: 3, latest: [MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID] },
-    ],
-    [NL, { postCount: 1, latest: [MOCK_DESIGN_NL_POST_ID] }],
-  ])(
-    'counts and lists only published posts in the %s request language',
-    async (locale, expected) => {
-      expect(await runEntry(locale)).toEqual(expected);
-    },
-  );
+    it.each([
+      [
+        EN,
+        {
+          postCount: 3,
+          latest: [MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID],
+        },
+      ],
+      [NL, { postCount: 1, latest: [MOCK_DESIGN_NL_POST_ID] }],
+    ])(
+      'counts and lists only published posts in the %s request language',
+      async (locale, expected) => {
+        expect(await runEntry(locale)).toEqual(expected);
+      },
+    );
+  });
 });

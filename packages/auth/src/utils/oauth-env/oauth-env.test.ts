@@ -57,7 +57,10 @@ describe('oauthEnv', () => {
   it('loads without AUTH_SECRET or skipped validation', async () => {
     vi.stubEnv('AUTH_SECRET', undefined);
     vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
+    vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
 
-    await expect(importOAuthEnv()).resolves.toBeDefined();
+    const { oauthEnv } = await importOAuthEnv();
+
+    expect(oauthEnv.AUTH_GITHUB_ID).toBe(MOCK_GITHUB_ID);
   });
 });

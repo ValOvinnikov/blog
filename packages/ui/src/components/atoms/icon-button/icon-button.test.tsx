@@ -55,7 +55,7 @@ describe(`<${IconButton.name}/>`, () => {
       setup({ isDisabled: true, isFocusableWhenDisabled: true, onClick });
     });
 
-    it('is aria-disabled rather than disabled, and takes focus', async () => {
+    it('is aria-disabled and stays focusable', async () => {
       const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
       await user.tab();
 

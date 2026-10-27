@@ -124,7 +124,7 @@ describe(`<${TenantsTable.name}/>`, () => {
     });
   });
 
-  it('shows an empty state instead of a table when there are no tenants', () => {
+  it('shows an empty state when there are no tenants', () => {
     setup({ tenants: [] });
 
     const emptyMessage = screen.getByText('No tenants yet.');

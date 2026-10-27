@@ -140,7 +140,7 @@ describe(updateLookAction, () => {
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('reports failure instead of throwing when the write itself fails', async () => {
+  it('reports a server error when the write fails', async () => {
     upsertSiteConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
     const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);

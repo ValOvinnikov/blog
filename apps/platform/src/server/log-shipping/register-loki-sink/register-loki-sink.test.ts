@@ -1,5 +1,6 @@
 import { createLokiSink, registerLogSink } from '@blog/insight';
 import { faker } from '@faker-js/faker';
+import { MOCK_LOKI_ENV } from '@platform/testing/env/fixtures';
 import { env } from '@platform/utils/env/env';
 import { waitUntil } from '@vercel/functions';
 
@@ -14,11 +15,6 @@ vi.mock('@blog/insight', () => ({
 vi.mock('@vercel/functions', () => ({ waitUntil: vi.fn() }));
 vi.mock('@platform/utils/env/env');
 
-const MOCK_LOKI_ENV = {
-  LOKI_PUSH_URL: faker.internet.url({ appendSlash: false }),
-  LOKI_USER: faker.string.numeric(6),
-  LOKI_TOKEN: faker.string.alphanumeric(24),
-};
 const MOCK_UNUSABLE_PUSH_URLS = [
   '[SENSITIVE]',
   faker.lorem.words(3),

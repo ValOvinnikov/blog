@@ -171,65 +171,65 @@ describe('postPageQuery', () => {
       bodyImageBlock,
     ]);
   });
-});
 
-describe('postPageQuery language scoping', () => {
-  const { EN, NL, FR } = LOCALE_ISO_CODES;
+  describe('language scoping', () => {
+    const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-  const dataset = [
-    mockSlugPageDocument({
-      _id: MOCK_EN_ID,
-      _type: 'page_post',
-      slug: MOCK_EN_SLUG,
-      language: EN,
-      publishedAt: MOCK_PUBLISHED_AT,
-    }),
-    mockSlugPageDocument({
-      _id: MOCK_NL_ID,
-      _type: 'page_post',
-      slug: MOCK_NL_SLUG,
-      language: NL,
-      publishedAt: MOCK_PUBLISHED_AT,
-    }),
-    mockSlugPageDocument({
-      _id: MOCK_SCHEDULED_ID,
-      _type: 'page_post',
-      slug: MOCK_SCHEDULED_SLUG,
-      language: NL,
-      publishedAt: MOCK_SCHEDULED_AT,
-    }),
-    {
-      _id: MOCK_METADATA_ID,
-      _type: 'translation.metadata',
-      translations: [
-        mockTranslationLink(EN, MOCK_EN_ID),
-        mockTranslationLink(NL, MOCK_NL_ID),
-      ],
-    },
-  ];
+    const dataset = [
+      mockSlugPageDocument({
+        _id: MOCK_EN_ID,
+        _type: 'page_post',
+        slug: MOCK_EN_SLUG,
+        language: EN,
+        publishedAt: MOCK_PUBLISHED_AT,
+      }),
+      mockSlugPageDocument({
+        _id: MOCK_NL_ID,
+        _type: 'page_post',
+        slug: MOCK_NL_SLUG,
+        language: NL,
+        publishedAt: MOCK_PUBLISHED_AT,
+      }),
+      mockSlugPageDocument({
+        _id: MOCK_SCHEDULED_ID,
+        _type: 'page_post',
+        slug: MOCK_SCHEDULED_SLUG,
+        language: NL,
+        publishedAt: MOCK_SCHEDULED_AT,
+      }),
+      {
+        _id: MOCK_METADATA_ID,
+        _type: 'translation.metadata',
+        translations: [
+          mockTranslationLink(EN, MOCK_EN_ID),
+          mockTranslationLink(NL, MOCK_NL_ID),
+        ],
+      },
+    ];
 
-  function run(slug: string, locale: string): Promise<unknown> {
-    return evaluateGroqExpression(postPageQuery.query, dataset, null, {
-      slug,
-      locale,
-      defaultLocale: EN,
+    function run(slug: string, locale: string): Promise<unknown> {
+      return evaluateGroqExpression(postPageQuery.query, dataset, null, {
+        slug,
+        locale,
+        defaultLocale: EN,
+      });
+    }
+
+    it('resolves a slug only in the language the post is authored in', async () => {
+      expect(await run(MOCK_NL_SLUG, NL)).toHaveProperty('_id', MOCK_NL_ID);
+      expect(await run(MOCK_NL_SLUG, EN)).toBeNull();
+      expect(await run(MOCK_EN_SLUG, FR)).toBeNull();
     });
-  }
 
-  it('resolves a slug only in the language the post is authored in', async () => {
-    expect(await run(MOCK_NL_SLUG, NL)).toHaveProperty('_id', MOCK_NL_ID);
-    expect(await run(MOCK_NL_SLUG, EN)).toBeNull();
-    expect(await run(MOCK_EN_SLUG, FR)).toBeNull();
-  });
+    it('resolves nothing for a scheduled post', async () => {
+      expect(await run(MOCK_SCHEDULED_SLUG, NL)).toBeNull();
+    });
 
-  it('resolves nothing for a scheduled post', async () => {
-    expect(await run(MOCK_SCHEDULED_SLUG, NL)).toBeNull();
-  });
-
-  it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run(MOCK_NL_SLUG, NL)).toHaveProperty('translations', [
-      { language: EN, slug: MOCK_EN_SLUG },
-      { language: NL, slug: MOCK_NL_SLUG },
-    ]);
+    it('returns the linked translations with their languages and slugs', async () => {
+      expect(await run(MOCK_NL_SLUG, NL)).toHaveProperty('translations', [
+        { language: EN, slug: MOCK_EN_SLUG },
+        { language: NL, slug: MOCK_NL_SLUG },
+      ]);
+    });
   });
 });

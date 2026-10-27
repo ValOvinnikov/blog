@@ -1,6 +1,9 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils/result';
-import { MOCK_REGISTRY_UNREACHABLE } from '@worker/testing/outage/fixtures';
+import {
+  MOCK_REGISTRY_UNREACHABLE,
+  MOCK_WORKFLOW_CRASH,
+} from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { applySiteTemplate } from '@worker/units/apply-site-template';
@@ -13,18 +16,13 @@ import { FatalError, getWorkflowMetadata } from 'workflow';
 
 import { provisionTenant } from './provision-tenant';
 
-const NO_PROJECT = 'no project';
-
 vi.mock('@worker/units/apply-site-template');
 vi.mock('@worker/units/ensure-infrastructure');
 vi.mock('@worker/units/invite-owner');
 vi.mock('@worker/units/run-lifecycle');
 vi.mock('@worker/units/start-owner-access');
 vi.mock('@worker/units/verify-tenant');
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
-  getWorkflowMetadata: vi.fn(),
-}));
+vi.mock('workflow');
 
 describe(provisionTenant, () => {
   beforeEach(() => {
@@ -128,13 +126,13 @@ describe(provisionTenant, () => {
   });
 
   it('finishes the run with the error when a unit throws', async () => {
-    vi.mocked(inviteOwner).mockRejectedValue(new Error(NO_PROJECT));
+    vi.mocked(inviteOwner).mockRejectedValue(new Error(MOCK_WORKFLOW_CRASH));
 
     await expect(provisionTenant(MOCK_TENANT_ID)).rejects.toThrow(FatalError);
 
     expect(finishRun).toHaveBeenCalledWith(MOCK_TENANT_ID, MOCK_RUN_CONTEXT, {
       ok: false,
-      error: { message: NO_PROJECT },
+      error: { message: MOCK_WORKFLOW_CRASH },
     });
     expect(applySiteTemplate).not.toHaveBeenCalled();
   });

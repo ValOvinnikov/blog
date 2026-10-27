@@ -32,39 +32,41 @@ async function runFeaturedPost(ref: string, locale: string) {
   return raw.featuredPost?._id ?? null;
 }
 
-describe('heroModuleQuery featured post language', () => {
-  it.each([
-    [
-      'shows the featured post in its own language',
-      MOCK_DESIGN_EN_POST_ID,
-      EN,
-      MOCK_DESIGN_EN_POST_ID,
-    ],
-    [
-      'swaps the featured post for its translation',
-      MOCK_DESIGN_EN_POST_ID,
-      NL,
-      MOCK_DESIGN_NL_POST_ID,
-    ],
-    [
-      'shows no post when the featured one has no translation',
-      MOCK_ONLY_EN_POST_ID,
-      NL,
-      null,
-    ],
-    [
-      'shows a group-less featured post in its own language',
-      MOCK_SOLO_NL_POST_ID,
-      NL,
-      MOCK_SOLO_NL_POST_ID,
-    ],
-    [
-      'shows no post for a group-less featured post in another language',
-      MOCK_SOLO_NL_POST_ID,
-      EN,
-      null,
-    ],
-  ])('%s', async (_, ref, locale, expected) => {
-    expect(await runFeaturedPost(ref, locale)).toBe(expected);
+describe('heroModuleQuery', () => {
+  describe('featured post language', () => {
+    it.each([
+      [
+        'shows the featured post in its own language',
+        MOCK_DESIGN_EN_POST_ID,
+        EN,
+        MOCK_DESIGN_EN_POST_ID,
+      ],
+      [
+        'swaps the featured post for its translation',
+        MOCK_DESIGN_EN_POST_ID,
+        NL,
+        MOCK_DESIGN_NL_POST_ID,
+      ],
+      [
+        'shows no post when the featured one has no translation',
+        MOCK_ONLY_EN_POST_ID,
+        NL,
+        null,
+      ],
+      [
+        'shows a group-less featured post in its own language',
+        MOCK_SOLO_NL_POST_ID,
+        NL,
+        MOCK_SOLO_NL_POST_ID,
+      ],
+      [
+        'shows no post for a group-less featured post in another language',
+        MOCK_SOLO_NL_POST_ID,
+        EN,
+        null,
+      ],
+    ])('%s', async (_, ref, locale, expected) => {
+      expect(await runFeaturedPost(ref, locale)).toBe(expected);
+    });
   });
 });

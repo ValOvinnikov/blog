@@ -26,7 +26,7 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
 );
 
 export const customRenderAsync = <P extends object>(
-  Component: (props: P) => Promise<ReactNode>,
+  Component: (props: P) => ReactNode | Promise<ReactNode>,
   defaultProps: NoInfer<P>,
 ) => {
   return async (

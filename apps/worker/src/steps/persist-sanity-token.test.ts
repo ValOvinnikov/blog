@@ -1,6 +1,9 @@
 import { SANITY_ROBOT_ROLE } from '@blog/config';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { setTenantSanityToken } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { SANITY_READ_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { faker } from '@faker-js/faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
@@ -15,13 +18,12 @@ import {
   type TPersistSanityTokenDeps,
 } from './persist-sanity-token';
 
-const { setTenantSanityTokenMock } = vi.hoisted(() => ({
-  setTenantSanityTokenMock: vi.fn(),
-}));
+faker.seed(7006);
 
-vi.mock('@blog/db/queries/tenants', () => ({
-  setTenantSanityToken: setTenantSanityTokenMock,
-}));
+const MOCK_PERSISTED_TOKEN = faker.string.alphanumeric(32);
+const MOCK_ROBOT_ID = faker.string.uuid();
+
+vi.mock('@blog/db/queries/tenants');
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return mockProvisionedTenant({
@@ -29,10 +31,6 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     ...overrides,
   });
 }
-
-beforeEach(() => {
-  setTenantSanityTokenMock.mockReset();
-});
 
 describe(persistTenantSanityToken, () => {
   describe('when no token can be minted', () => {
@@ -43,14 +41,16 @@ describe(persistTenantSanityToken, () => {
     });
 
     it('skips minting when a token is already persisted', async () => {
-      const tenant = baseTenant({ sanityReadTokenEncrypted: 'already-set' });
+      const tenant = baseTenant({
+        sanityReadTokenEncrypted: MOCK_PERSISTED_TOKEN,
+      });
 
       await persistTenantSanityToken(tenant, MOCK_PROVISION_ENV, {
         mintReadToken,
       });
 
       expect(mintReadToken).not.toHaveBeenCalled();
-      expect(setTenantSanityTokenMock).not.toHaveBeenCalled();
+      expect(setTenantSanityToken).not.toHaveBeenCalled();
     });
 
     it('throws when the Sanity project has not been created yet', async () => {
@@ -66,7 +66,7 @@ describe(persistTenantSanityToken, () => {
     const tenant = baseTenant();
     const mintReadToken: TPersistSanityTokenDeps['mintReadToken'] = vi
       .fn()
-      .mockResolvedValue({ id: 'robot-2', token: MOCK_SANITY_READ_TOKEN });
+      .mockResolvedValue({ id: MOCK_ROBOT_ID, token: MOCK_SANITY_READ_TOKEN });
 
     await persistTenantSanityToken(tenant, MOCK_PROVISION_ENV, {
       mintReadToken,
@@ -75,10 +75,10 @@ describe(persistTenantSanityToken, () => {
     expect(mintReadToken).toHaveBeenCalledWith({
       token: MOCK_PROVISION_ENV.sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
-      label: expect.any(String),
+      label: SANITY_READ_TOKEN_LABEL,
       role: SANITY_ROBOT_ROLE.VIEWER,
     });
-    expect(setTenantSanityTokenMock).toHaveBeenCalledWith(
+    expect(setTenantSanityToken).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_SANITY_READ_TOKEN,
     );

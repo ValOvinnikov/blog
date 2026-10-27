@@ -1,10 +1,12 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 
-export const MOCK_TENANT_ID = faker.string.uuid();
+const mockFaker = createMockFaker(6025);
+
+export const MOCK_TENANT_ID = mockFaker.string.uuid();
 export const MOCK_TENANT_DOMAIN = 'acme.example.com';
 export const MOCK_SANITY_PROJECT_ID = 'sanity-project-1';
 export const MOCK_SANITY_DATASET = MOCK_PROVISION_ENV.tenantSanityDataset;

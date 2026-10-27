@@ -1,5 +1,9 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
+import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
+import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_PROVISION_ENV,
   MOCK_REVALIDATE_WEBHOOK_URL,
@@ -14,9 +18,8 @@ import {
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
 import {
-  MOCK_OTHER_WEBHOOK_ID,
-  MOCK_OTHER_WEBHOOK_URL,
-  MOCK_WEBHOOK_ID,
+  MOCK_CURRENT_WEBHOOK,
+  MOCK_OTHER_WEBHOOK,
 } from '@worker/testing/webhook/fixtures';
 import type { Mock } from 'vitest';
 
@@ -25,39 +28,42 @@ import {
   type TVerifyTenantSeededContentDeps,
 } from './verify-seeded-content';
 
-const { getTenantSanityCredentialsMock } = vi.hoisted(() => ({
-  getTenantSanityCredentialsMock: vi.fn(),
-}));
+faker.seed(7008);
 
-vi.mock('@blog/db/queries/tenants', () => ({
-  getTenantSanityCredentials: getTenantSanityCredentialsMock,
-}));
+vi.mock('@blog/db/queries/tenants');
 
-const { sanityManagementToken, vercelToken, vercelWebProjectId } =
+const { sanityManagementToken, vercelToken, vercelTeamId, vercelWebProjectId } =
   MOCK_PROVISION_ENV;
 
-function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
-  return mockProvisionedTenant({
-    sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
-    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    seededAt: new Date(),
-    ...overrides,
-  });
-}
-
-const baseCredentials = {
+const MOCK_CREDENTIALS = {
   projectId: MOCK_SANITY_PROJECT_ID,
   dataset: MOCK_SANITY_DATASET,
   token: MOCK_SANITY_READ_TOKEN,
   status: TENANT_STATUS.ACTIVE,
   deprovisionedAt: null,
   provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+  defaultLocale: LOCALE_ISO_CODES.EN,
 };
+const MOCK_VALID_HOME_PAGE = {
+  headingBlock: { heading: faker.lorem.words(3) },
+  seo: { metaTitle: faker.string.alpha(40) },
+};
+const MOCK_OTHER_DOMAIN = faker.internet.domainName();
+const REQUIRED_TYPES = [
+  'settings_site',
+  'settings_navigation',
+  'settings_footer',
+];
+const MOCK_VALID_NAVIGATION_ITEMS = [{ resolved: true }];
 
-const VALID_HOME_PAGE = {
-  headingBlock: { heading: 'Welcome to Acme' },
-  seo: { metaTitle: 'Welcome to Acme — starter site' },
-};
+function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
+  return mockProvisionedTenant({
+    sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+    seededAt: MOCK_NOW,
+    ...overrides,
+  });
+}
 
 function createClientStub(fetch: ReturnType<typeof vi.fn>) {
   const client = { fetch };
@@ -71,17 +77,10 @@ function createClientStub(fetch: ReturnType<typeof vi.fn>) {
   };
 }
 
-const REQUIRED_TYPES = [
-  'settings_site',
-  'settings_navigation',
-  'settings_footer',
-];
-const VALID_NAVIGATION_ITEMS = [{ resolved: true }];
-
 function createClientStubResolving(
   foundTypes: string[],
-  homePage: unknown = VALID_HOME_PAGE,
-  navigationItems: unknown = VALID_NAVIGATION_ITEMS,
+  homePage: unknown = MOCK_VALID_HOME_PAGE,
+  navigationItems: unknown = MOCK_VALID_NAVIGATION_ITEMS,
 ) {
   return createClientStub(
     vi.fn().mockImplementation((query: string) => {
@@ -105,49 +104,102 @@ function baseDeps(
 
   return {
     createClient,
-    getCredentials: getTenantSanityCredentialsMock,
-    listWebhooks: vi
-      .fn()
-      .mockResolvedValue([
-        { id: MOCK_WEBHOOK_ID, url: MOCK_REVALIDATE_WEBHOOK_URL },
-      ]),
+    getCredentials: getTenantSanityCredentials,
+    listWebhooks: vi.fn().mockResolvedValue([MOCK_CURRENT_WEBHOOK]),
     listDomains: vi.fn().mockResolvedValue([{ name: MOCK_TENANT_DOMAIN }]),
     sleep: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
 
-beforeEach(() => {
-  getTenantSanityCredentialsMock.mockReset();
-  getTenantSanityCredentialsMock.mockResolvedValue(baseCredentials);
-});
+function transientThenOk(okValue: unknown) {
+  return vi
+    .fn()
+    .mockRejectedValueOnce(mockSanityGrantError())
+    .mockResolvedValueOnce(okValue);
+}
+
+const MOCK_GRANT_DENIED_READS = [
+  {
+    read: 'content',
+    transient: () => {
+      const reader = vi
+        .fn()
+        .mockRejectedValueOnce(mockSanityGrantError())
+        .mockResolvedValueOnce(REQUIRED_TYPES)
+        .mockResolvedValueOnce(MOCK_VALID_NAVIGATION_ITEMS)
+        .mockResolvedValueOnce(MOCK_VALID_HOME_PAGE);
+      return {
+        reader,
+        deps: { createClient: createClientStub(reader).createClient },
+      };
+    },
+    transientCalls: 4,
+    persistent: () => {
+      const reader = vi.fn().mockRejectedValue(mockSanityGrantError());
+      return {
+        reader,
+        deps: { createClient: createClientStub(reader).createClient },
+      };
+    },
+    failure: /persisted Sanity read token failed against its dataset/,
+  },
+  {
+    read: 'webhook',
+    transient: () => {
+      const reader = transientThenOk([MOCK_CURRENT_WEBHOOK]);
+      return { reader, deps: { listWebhooks: reader } };
+    },
+    transientCalls: 2,
+    persistent: () => {
+      const reader = vi.fn().mockRejectedValue(mockSanityGrantError());
+      return { reader, deps: { listWebhooks: reader } };
+    },
+    failure: /revalidate webhook check against its Sanity project failed/,
+  },
+  {
+    read: 'domain',
+    transient: () => {
+      const reader = transientThenOk([{ name: MOCK_TENANT_DOMAIN }]);
+      return { reader, deps: { listDomains: reader } };
+    },
+    transientCalls: 2,
+    persistent: () => {
+      const reader = vi.fn().mockRejectedValue(mockSanityGrantError());
+      return { reader, deps: { listDomains: reader } };
+    },
+    failure: /domain mapping check against the shared Vercel project failed/,
+  },
+];
 
 describe(verifyTenantSeededContent, () => {
   let tenant: TTenant;
   let sleep: Mock<(ms: number) => Promise<void>>;
 
+  function verify(overrides: Partial<TVerifyTenantSeededContentDeps> = {}) {
+    return verifyTenantSeededContent(
+      tenant,
+      MOCK_PROVISION_ENV,
+      baseDeps({ sleep, ...overrides }),
+    );
+  }
+
   beforeEach(() => {
     tenant = baseTenant();
     sleep = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(getTenantSanityCredentials).mockResolvedValue(MOCK_CREDENTIALS);
   });
 
   it('passes when content, webhook, and domain are all verified', async () => {
     const { createClient, fetch } = createClientStubResolving(REQUIRED_TYPES);
-    const listWebhooks = vi
-      .fn()
-      .mockResolvedValue([
-        { id: MOCK_WEBHOOK_ID, url: MOCK_REVALIDATE_WEBHOOK_URL },
-      ]);
+    const listWebhooks = vi.fn().mockResolvedValue([MOCK_CURRENT_WEBHOOK]);
     const listDomains = vi
       .fn()
       .mockResolvedValue([{ name: MOCK_TENANT_DOMAIN }]);
 
-    await verifyTenantSeededContent(
-      tenant,
-      MOCK_PROVISION_ENV,
-      baseDeps({ createClient, listWebhooks, listDomains, sleep }),
-    );
+    await verify({ createClient, listWebhooks, listDomains });
 
+    const [clientOptions] = vi.mocked(createClient).mock.lastCall ?? [];
     expect(fetch).toHaveBeenCalledWith('*[_type in $types]._type', {
       types: REQUIRED_TYPES,
     });
@@ -157,21 +209,17 @@ describe(verifyTenantSeededContent, () => {
     expect(fetch).toHaveBeenCalledWith(
       '*[_type == "page_home"][0]{ headingBlock, seo }',
     );
-    expect(createClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectId: MOCK_SANITY_PROJECT_ID,
-        dataset: MOCK_SANITY_DATASET,
-        token: MOCK_SANITY_READ_TOKEN,
-        useCdn: false,
-      }),
-    );
+    expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
+    expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
+    expect(clientOptions?.token).toBe(MOCK_SANITY_READ_TOKEN);
+    expect(clientOptions?.useCdn).toBe(false);
     expect(listWebhooks).toHaveBeenCalledWith({
       token: sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
     });
     expect(listDomains).toHaveBeenCalledWith({
       token: vercelToken,
-      teamId: undefined,
+      teamId: vercelTeamId,
       projectId: vercelWebProjectId,
     });
     expect(sleep).not.toHaveBeenCalled();
@@ -193,13 +241,7 @@ describe(verifyTenantSeededContent, () => {
     async (_label, foundTypes, expected) => {
       const { createClient } = createClientStubResolving(foundTypes);
 
-      await expect(
-        verifyTenantSeededContent(
-          tenant,
-          MOCK_PROVISION_ENV,
-          baseDeps({ createClient }),
-        ),
-      ).rejects.toThrow(expected);
+      await expect(verify({ createClient })).rejects.toThrow(expected);
     },
   );
 
@@ -207,40 +249,28 @@ describe(verifyTenantSeededContent, () => {
     [[{ resolved: false }], 1],
     [[{ resolved: true }, { resolved: false }, { resolved: false }], 2],
   ])(
-    'fails the run counting the navigation items with no link reference (%j)',
+    'fails the run counting navigation items with no link reference (%j)',
     async (navigationItems, unresolvedCount) => {
       const { createClient } = createClientStubResolving(
         REQUIRED_TYPES,
-        VALID_HOME_PAGE,
+        MOCK_VALID_HOME_PAGE,
         navigationItems,
       );
 
-      await expect(
-        verifyTenantSeededContent(
-          tenant,
-          MOCK_PROVISION_ENV,
-          baseDeps({ createClient }),
-        ),
-      ).rejects.toThrow(
+      await expect(verify({ createClient })).rejects.toThrow(
         `"settings_navigation" has ${unresolvedCount} item(s) with no resolvable "link" reference`,
       );
     },
   );
 
-  it('does not throw when settings_navigation has no items field (GROQ evaluates items[] to null, not [])', async () => {
+  it('does not throw when settings_navigation has no items field', async () => {
     const { createClient } = createClientStubResolving(
       REQUIRED_TYPES,
-      VALID_HOME_PAGE,
+      MOCK_VALID_HOME_PAGE,
       null,
     );
 
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ createClient }),
-      ),
-    ).resolves.toBeUndefined();
+    await expect(verify({ createClient })).resolves.toBeUndefined();
   });
 
   it.each([
@@ -251,23 +281,26 @@ describe(verifyTenantSeededContent, () => {
     ],
     [
       'page_home has no headingBlock.heading',
-      { headingBlock: null, seo: VALID_HOME_PAGE.seo },
+      { headingBlock: null, seo: MOCK_VALID_HOME_PAGE.seo },
       /missing a non-empty headingBlock\.heading/,
     ],
     [
       'page_home has no seo.metaTitle',
-      { headingBlock: VALID_HOME_PAGE.headingBlock, seo: null },
+      { headingBlock: MOCK_VALID_HOME_PAGE.headingBlock, seo: null },
       /missing a non-empty seo\.metaTitle/,
     ],
     [
       'the seo.metaTitle is under the 30 character minimum',
-      { headingBlock: VALID_HOME_PAGE.headingBlock, seo: { metaTitle: 'x' } },
+      {
+        headingBlock: MOCK_VALID_HOME_PAGE.headingBlock,
+        seo: { metaTitle: 'x' },
+      },
       /has a seo\.metaTitle of 1 characters, outside the 30-60 bound/,
     ],
     [
       'the seo.metaTitle is over the 60 character maximum',
       {
-        headingBlock: VALID_HOME_PAGE.headingBlock,
+        headingBlock: MOCK_VALID_HOME_PAGE.headingBlock,
         seo: { metaTitle: 'x'.repeat(61) },
       },
       /has a seo\.metaTitle of 61 characters, outside the 30-60 bound/,
@@ -278,160 +311,57 @@ describe(verifyTenantSeededContent, () => {
       homePage,
     );
 
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ createClient }),
-      ),
-    ).rejects.toThrow(expected);
+    await expect(verify({ createClient })).rejects.toThrow(expected);
   });
 
   it('throws when the tenant has no persisted Sanity read token yet', async () => {
-    getTenantSanityCredentialsMock.mockResolvedValue(undefined);
+    vi.mocked(getTenantSanityCredentials).mockResolvedValue(undefined);
     const createClient = vi.fn();
 
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ createClient }),
-      ),
-    ).rejects.toThrow(/has no persisted Sanity read token yet/);
+    await expect(verify({ createClient })).rejects.toThrow(
+      /has no persisted Sanity read token yet/,
+    );
     expect(createClient).not.toHaveBeenCalled();
   });
 
-  it('retries a transient permission-denied content read once and passes once it succeeds', async () => {
-    const fetch = vi
-      .fn()
-      .mockRejectedValueOnce(mockSanityGrantError())
-      .mockResolvedValueOnce(REQUIRED_TYPES)
-      .mockResolvedValueOnce(VALID_NAVIGATION_ITEMS)
-      .mockResolvedValueOnce(VALID_HOME_PAGE);
-    const { createClient } = createClientStub(fetch);
+  it.each(MOCK_GRANT_DENIED_READS)(
+    'retries a transient permission-denied $read read once and passes',
+    async ({ transient, transientCalls }) => {
+      const { reader, deps } = transient();
 
-    await verifyTenantSeededContent(
-      tenant,
-      MOCK_PROVISION_ENV,
-      baseDeps({ createClient, sleep }),
-    );
+      await verify(deps);
 
-    expect(fetch).toHaveBeenCalledTimes(4);
-    expect(sleep).toHaveBeenCalledTimes(1);
-  });
+      expect(reader).toHaveBeenCalledTimes(transientCalls);
+      expect(sleep).toHaveBeenCalledTimes(1);
+    },
+  );
 
-  it('exhausts retries on a persistent permission-denied content read and fails with a token-specific message, not a missing-content one', async () => {
-    const fetch = vi.fn().mockRejectedValue(mockSanityGrantError());
-    const { createClient } = createClientStub(fetch);
+  it.each(MOCK_GRANT_DENIED_READS)(
+    'fails with a $read-specific message once permission-denied retries run out',
+    async ({ persistent, failure }) => {
+      const { reader, deps } = persistent();
 
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ createClient, sleep }),
-      ),
-    ).rejects.toThrow(/persisted Sanity read token failed against its dataset/);
+      await expect(verify(deps)).rejects.toThrow(failure);
 
-    expect(fetch.mock.calls.length).toBeGreaterThan(1);
-  });
+      expect(reader.mock.calls.length).toBeGreaterThan(1);
+    },
+  );
 
-  it('fails the run when no webhook targets the revalidate URL on the tenant project', async () => {
-    const listWebhooks = vi
-      .fn()
-      .mockResolvedValue([
-        { id: MOCK_OTHER_WEBHOOK_ID, url: MOCK_OTHER_WEBHOOK_URL },
-      ]);
+  it('fails the run when no webhook targets the revalidate URL', async () => {
+    const listWebhooks = vi.fn().mockResolvedValue([MOCK_OTHER_WEBHOOK]);
 
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ listWebhooks }),
-      ),
-    ).rejects.toThrow(
-      /has no revalidate webhook targeting "https:\/\/web\.example\.com\/api\/revalidate"/,
+    await expect(verify({ listWebhooks })).rejects.toThrow(
+      `has no revalidate webhook targeting "${MOCK_REVALIDATE_WEBHOOK_URL}"`,
     );
   });
 
-  it('retries a transient permission-denied webhook read once and passes once it succeeds', async () => {
-    const listWebhooks = vi
-      .fn()
-      .mockRejectedValueOnce(mockSanityGrantError())
-      .mockResolvedValueOnce([
-        { id: MOCK_WEBHOOK_ID, url: MOCK_REVALIDATE_WEBHOOK_URL },
-      ]);
-
-    await verifyTenantSeededContent(
-      tenant,
-      MOCK_PROVISION_ENV,
-      baseDeps({ listWebhooks, sleep }),
-    );
-
-    expect(listWebhooks).toHaveBeenCalledTimes(2);
-    expect(sleep).toHaveBeenCalledTimes(1);
-  });
-
-  it('exhausts retries on a persistent permission-denied webhook read and fails with a webhook-specific message', async () => {
-    const listWebhooks = vi.fn().mockRejectedValue(mockSanityGrantError());
-
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ listWebhooks, sleep }),
-      ),
-    ).rejects.toThrow(
-      /revalidate webhook check against its Sanity project failed/,
-    );
-
-    expect(listWebhooks.mock.calls.length).toBeGreaterThan(1);
-  });
-
-  it('fails the run when the tenant domain is not mapped on the shared Vercel project', async () => {
+  it('fails the run when the tenant domain is not mapped on the Vercel project', async () => {
     const listDomains = vi
       .fn()
-      .mockResolvedValue([{ name: 'someone-else.example.com' }]);
+      .mockResolvedValue([{ name: MOCK_OTHER_DOMAIN }]);
 
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ listDomains }),
-      ),
-    ).rejects.toThrow(
-      /domain "acme\.example\.com" is not mapped on the shared Vercel project/,
+    await expect(verify({ listDomains })).rejects.toThrow(
+      `domain "${MOCK_TENANT_DOMAIN}" is not mapped on the shared Vercel project`,
     );
-  });
-
-  it('retries a transient permission-denied domain read once and passes once it succeeds', async () => {
-    const listDomains = vi
-      .fn()
-      .mockRejectedValueOnce(mockSanityGrantError())
-      .mockResolvedValueOnce([{ name: MOCK_TENANT_DOMAIN }]);
-
-    await verifyTenantSeededContent(
-      tenant,
-      MOCK_PROVISION_ENV,
-      baseDeps({ listDomains, sleep }),
-    );
-
-    expect(listDomains).toHaveBeenCalledTimes(2);
-    expect(sleep).toHaveBeenCalledTimes(1);
-  });
-
-  it('exhausts retries on a persistent permission-denied domain read and fails with a domain-specific message', async () => {
-    const listDomains = vi.fn().mockRejectedValue(mockSanityGrantError());
-
-    await expect(
-      verifyTenantSeededContent(
-        tenant,
-        MOCK_PROVISION_ENV,
-        baseDeps({ listDomains, sleep }),
-      ),
-    ).rejects.toThrow(
-      /domain mapping check against the shared Vercel project failed/,
-    );
-
-    expect(listDomains.mock.calls.length).toBeGreaterThan(1);
   });
 });

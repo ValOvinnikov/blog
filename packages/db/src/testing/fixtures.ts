@@ -17,6 +17,8 @@ import type { TUser } from '@blog/db/schema/auth';
 import type { TLead } from '@blog/db/schema/leads';
 import type { TSubscriber } from '@blog/db/schema/subscribers';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { personalDataIndex } from '@blog/utils/encryption';
 import type { PGlite } from '@electric-sql/pglite';
@@ -25,22 +27,28 @@ import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema> & { $client: PGlite };
 
-export const MOCK_SUBSCRIBER_EMAIL = faker.internet.email().toLowerCase();
+const fixturesFaker = createMockFaker(60223);
+
+export const MOCK_SUBSCRIBER_EMAIL = fixturesFaker.internet
+  .email()
+  .toLowerCase();
 export const MOCK_SUBSCRIBER_TAGGED_EMAIL = MOCK_SUBSCRIBER_EMAIL.replace(
   /@/,
   '+news@',
 );
-export const MOCK_INVITE_EMAIL = faker.internet.email().toLowerCase();
-export const MOCK_LEAD_NAME = 'Ada Lovelace';
-export const MOCK_LEAD_EMAIL = 'lead@example.com';
-export const MOCK_LEAD_MESSAGE = 'I would like to talk about a project.';
-export const MOCK_LEAD_READ_AT = faker.date.past();
-export const MOCK_USER_NAME = faker.person.fullName();
-export const MOCK_USER_EMAIL = faker.internet.email().toLowerCase();
-export const MOCK_OWNER_EMAIL = faker.internet.email().toLowerCase();
-export const MOCK_OPERATOR_EMAIL = 'operator@example.com';
-export const MOCK_EMAIL_VERIFIED_AT = faker.date.past();
-export const MOCK_OAUTH_PROVIDER = 'github';
+export const MOCK_INVITE_EMAIL = fixturesFaker.internet.email().toLowerCase();
+export const MOCK_LEAD_NAME = fixturesFaker.person.fullName();
+export const MOCK_LEAD_EMAIL = fixturesFaker.internet.email().toLowerCase();
+export const MOCK_LEAD_MESSAGE = fixturesFaker.lorem.sentence();
+export const MOCK_LEAD_READ_AT = fixturesFaker.date.past({ refDate: MOCK_NOW });
+export const MOCK_USER_NAME = fixturesFaker.person.fullName();
+export const MOCK_USER_EMAIL = fixturesFaker.internet.email().toLowerCase();
+export const MOCK_OWNER_EMAIL = fixturesFaker.internet.email().toLowerCase();
+export const MOCK_OPERATOR_EMAIL = fixturesFaker.internet.email().toLowerCase();
+export const MOCK_EMAIL_VERIFIED_AT = fixturesFaker.date.past({
+  refDate: MOCK_NOW,
+});
+const MOCK_LEAD_SOURCE_PATH = `/${fixturesFaker.lorem.slug()}`;
 
 export async function insertTestTenant(
   db: TTestDb,
@@ -150,7 +158,7 @@ export async function insertTestLead(
       name: MOCK_LEAD_NAME,
       email: MOCK_LEAD_EMAIL,
       message: MOCK_LEAD_MESSAGE,
-      sourcePath: '/en/hire-me',
+      sourcePath: MOCK_LEAD_SOURCE_PATH,
       ...overrides,
     })
     .returning();

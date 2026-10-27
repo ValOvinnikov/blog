@@ -261,7 +261,7 @@ describe(updateFeaturesAction, () => {
     },
   );
 
-  it('reports failure instead of throwing when reading the stored toggles fails', async () => {
+  it('reports a server error when reading the stored toggles fails', async () => {
     getSettingsFeaturesOrDefaultsMock.mockRejectedValue(
       new Error(MOCK_DB_ERROR_MESSAGE),
     );
@@ -272,7 +272,7 @@ describe(updateFeaturesAction, () => {
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it('reports failure instead of throwing when the write itself fails', async () => {
+  it('reports a server error when the write fails', async () => {
     upsertSettingsFeaturesMock.mockRejectedValue(
       new Error(MOCK_DB_ERROR_MESSAGE),
     );

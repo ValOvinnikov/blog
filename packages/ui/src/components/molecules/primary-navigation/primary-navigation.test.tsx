@@ -220,10 +220,11 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       const drawerActionButton = within(drawerActions).getByRole('button', {
         name: MOCK_DRAWER_ACTION_LABEL,
       });
-      const position = panelActions.compareDocumentPosition(drawerActions);
 
       expect(drawerActionButton).toBeVisible();
-      expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(panelActions.compareDocumentPosition(drawerActions)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
     });
 
     it('leaves drawerActions out of the closed panel and the bar', () => {

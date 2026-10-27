@@ -6,11 +6,9 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { validateEmailLogoUpload } from '@platform/server/email/validate-email-logo';
 import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_SESSION,
@@ -28,7 +26,10 @@ import {
   MOCK_TEMPLATE_LOGO_TARGET,
 } from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
+import {
+  buildPngBuffer,
+  MOCK_MIME_TYPE,
+} from '@platform/testing/upload/fixtures';
 import { env } from '@platform/utils/env/env';
 import { put } from '@vercel/blob';
 
@@ -46,7 +47,6 @@ vi.mock('@blog/db', () => ({
 }));
 
 vi.mock('@vercel/blob', () => ({ put: vi.fn(), del: vi.fn() }));
-vi.mock('@platform/server/email/validate-email-logo');
 vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/utils/env/env');
@@ -55,22 +55,27 @@ faker.seed(5998);
 
 const MOCK_TEMPLATE_LOGO_URL = faker.internet.url();
 const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
-const MOCK_LOGO_FILE = new File([faker.lorem.word()], 'logo.png', {
-  type: MOCK_MIME_TYPE.PNG,
-});
-const MOCK_VALID_ASSET = {
-  buffer: Buffer.from(faker.lorem.word()),
-  contentType: MOCK_MIME_TYPE.PNG,
-  extension: 'png',
-};
+const MOCK_LOGO_SIZE_PX = 64;
+const MOCK_LOGO_BYTES = buildPngBuffer(MOCK_LOGO_SIZE_PX, MOCK_LOGO_SIZE_PX);
+const MOCK_LOGO_FILE_NAME = 'logo.png';
+const MOCK_LOGO_FILE = new File(
+  [new Uint8Array(MOCK_LOGO_BYTES)],
+  MOCK_LOGO_FILE_NAME,
+  { type: MOCK_MIME_TYPE.PNG },
+);
+const MOCK_UNREADABLE_FILE = new File(
+  [faker.lorem.word()],
+  MOCK_LOGO_FILE_NAME,
+  { type: MOCK_MIME_TYPE.PNG },
+);
 
 const { getEmailConfig, upsertEmailConfig } = queries.emailConfig;
 const { getEmailTemplate, upsertEmailTemplate } = queries.emailTemplates;
 const { insertAuditEvent } = queries.auditEvents;
 
-const buildLogoFormData = (): FormData => {
+const buildLogoFormData = (file: File = MOCK_LOGO_FILE): FormData => {
   const formData = new FormData();
-  formData.append('file', MOCK_LOGO_FILE);
+  formData.append('file', file);
   return formData;
 };
 
@@ -82,13 +87,9 @@ describe(uploadEmailLogoAction, () => {
     vi.mocked(upsertEmailConfig).mockReset();
     vi.mocked(upsertEmailTemplate).mockReset();
     vi.mocked(insertAuditEvent).mockReset();
-    vi.mocked(validateEmailLogoUpload).mockReset();
     vi.mocked(put).mockReset();
     vi.mocked(getEmailConfig).mockResolvedValue(mockEmailConfig());
     vi.mocked(getEmailTemplate).mockResolvedValue(mockEmailTemplateResult());
-    vi.mocked(validateEmailLogoUpload).mockResolvedValue(
-      okResult(MOCK_VALID_ASSET),
-    );
     vi.mocked(put).mockResolvedValue(
       mockPutBlobResult({ url: MOCK_EMAIL_LOGO_URL }),
     );
@@ -107,11 +108,11 @@ describe(uploadEmailLogoAction, () => {
     });
     expect(put).toHaveBeenCalledWith(
       `tenants/${MOCK_TENANT_ID}/email-logo.png`,
-      MOCK_VALID_ASSET.buffer,
+      MOCK_LOGO_BYTES,
       {
         access: 'public',
         addRandomSuffix: true,
-        contentType: MOCK_VALID_ASSET.contentType,
+        contentType: MOCK_MIME_TYPE.PNG,
         token: MOCK_BLOB_TOKEN,
       },
     );
@@ -137,11 +138,11 @@ describe(uploadEmailLogoAction, () => {
     });
     expect(put).toHaveBeenCalledWith(
       `tenants/${MOCK_TENANT_ID}/email-logo-magic_link.png`,
-      MOCK_VALID_ASSET.buffer,
+      MOCK_LOGO_BYTES,
       {
         access: 'public',
         addRandomSuffix: true,
-        contentType: MOCK_VALID_ASSET.contentType,
+        contentType: MOCK_MIME_TYPE.PNG,
         token: MOCK_BLOB_TOKEN,
       },
     );
@@ -152,23 +153,16 @@ describe(uploadEmailLogoAction, () => {
     );
   });
 
-  it('returns the validation error without calling Blob when validation fails', async () => {
-    vi.mocked(validateEmailLogoUpload).mockResolvedValue(
-      errorResult({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
-      }),
-    );
-
+  it('refuses an unreadable image without calling Blob', async () => {
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
       MOCK_TENANT_LOGO_TARGET,
-      buildLogoFormData(),
+      buildLogoFormData(MOCK_UNREADABLE_FILE),
     );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
+      reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
     });
     expect(put).not.toHaveBeenCalled();
     expect(insertAuditEvent).not.toHaveBeenCalled();

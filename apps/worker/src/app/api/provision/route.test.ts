@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { ERROR_CODE, HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -10,43 +9,42 @@ import {
   finishProvisioningRun,
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
+import { ENQUEUE_MAX_AGE_MS } from '@blog/utils/enqueue-signature';
 import { errorResult, okResult } from '@blog/utils/result';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
+import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_FORGED_SECRET,
+  MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
+import { MOCK_DB_DOWN, MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_ID } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
+import { provisionTenant } from '@worker/workflows/provision-tenant';
 import { start } from 'workflow/api';
 
 import { POST } from './route';
 
-const PROVISION_URL = 'https://worker.example.com/api/provision';
+const MOCK_PROVISION_URL = `${MOCK_WORKER_ORIGIN}/api/provision`;
+const MOCK_NON_UUID_TENANT_ID = 'not-a-uuid';
 
 function signedRequest(
   rawBody: string,
   overrides: { secret?: string; timestamp?: number } = {},
 ): Request {
-  return mockSignedRequest(PROVISION_URL, rawBody, {
+  return mockSignedRequest(MOCK_PROVISION_URL, rawBody, {
     secret: MOCK_ENQUEUE_SECRET,
     ...overrides,
   });
 }
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
-
-vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/workflows/provision-tenant', () => ({
-  provisionTenant: vi.fn(),
-}));
-vi.mock('workflow/api', () => ({ start: vi.fn() }));
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+vi.mock('@worker/utils/env/env');
+vi.mock('@worker/workflows/provision-tenant');
+vi.mock('workflow/api');
+vi.mock('@blog/db/queries/tenants');
 
 function enqueueRequest(tenantId: string = MOCK_TENANT_ID): Request {
   return signedRequest(JSON.stringify({ tenantId }));
@@ -54,6 +52,7 @@ function enqueueRequest(tenantId: string = MOCK_TENANT_ID): Request {
 
 describe('POST /api/provision', () => {
   beforeEach(() => {
+    freezeClock();
     mockEnv.WORKER_ENQUEUE_SECRET = MOCK_ENQUEUE_SECRET;
     vi.mocked(beginTenantProvisioning).mockResolvedValue(
       okResult({ tenant: mockTenant(), previousProvisioningStatus: null }),
@@ -63,11 +62,15 @@ describe('POST /api/provision', () => {
     vi.mocked(start).mockResolvedValue({ runId: MOCK_RUN_ID } as never);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it.each([
     [
       'a tampered body',
       () =>
-        new Request(PROVISION_URL, {
+        new Request(MOCK_PROVISION_URL, {
           method: HTTP_METHOD.POST,
           headers: signedRequest('{}').headers,
           body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
@@ -83,7 +86,7 @@ describe('POST /api/provision', () => {
     [
       'no signature headers',
       () =>
-        new Request(PROVISION_URL, {
+        new Request(MOCK_PROVISION_URL, {
           method: HTTP_METHOD.POST,
           body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
         }),
@@ -92,7 +95,7 @@ describe('POST /api/provision', () => {
       'a stale timestamp',
       () =>
         signedRequest(JSON.stringify({ tenantId: MOCK_TENANT_ID }), {
-          timestamp: Date.now() - 10 * 60_000,
+          timestamp: MOCK_NOW.getTime() - ENQUEUE_MAX_AGE_MS - 1,
         }),
     ],
   ])('answers 401 and starts nothing for %s', async (_label, build) => {
@@ -128,7 +131,7 @@ describe('POST /api/provision', () => {
   });
 
   it.each([
-    ['a non-uuid tenant id', { tenantId: 'tenant-1' }],
+    ['a non-uuid tenant id', { tenantId: MOCK_NON_UUID_TENANT_ID }],
     ['a missing tenant id', {}],
   ])('answers 400 for %s', async (_label, body) => {
     const response = await POST(signedRequest(JSON.stringify(body)));
@@ -181,7 +184,9 @@ describe('POST /api/provision', () => {
   });
 
   it('answers 500 when the guard query throws', async () => {
-    vi.mocked(beginTenantProvisioning).mockRejectedValue(new Error('boom'));
+    vi.mocked(beginTenantProvisioning).mockRejectedValue(
+      new Error(MOCK_DB_DOWN),
+    );
 
     const response = await POST(enqueueRequest());
 
@@ -202,12 +207,12 @@ describe('POST /api/provision', () => {
   it('starts the workflow for the tenant that was enqueued', async () => {
     await POST(enqueueRequest());
 
-    expect(start).toHaveBeenCalledWith(expect.any(Function), [MOCK_TENANT_ID]);
+    expect(start).toHaveBeenCalledWith(provisionTenant, [MOCK_TENANT_ID]);
   });
 
   describe('when the run cannot be started', () => {
     beforeEach(() => {
-      vi.mocked(start).mockRejectedValue(new Error('queue unavailable'));
+      vi.mocked(start).mockRejectedValue(new Error(MOCK_QUEUE_DOWN));
     });
 
     it('answers 500', async () => {
@@ -219,16 +224,15 @@ describe('POST /api/provision', () => {
       });
     });
 
-    it('marks the tenant failed instead of leaving it in progress', async () => {
+    it('marks the tenant failed', async () => {
       await POST(enqueueRequest());
 
-      expect(updateProvisioningStep).toHaveBeenCalledWith(
-        expect.objectContaining({
-          tenantId: MOCK_TENANT_ID,
-          step: TENANT_PROVISIONING_STEP.SANITY_PROJECT,
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        }),
+      const [failure] = vi.mocked(updateProvisioningStep).mock.lastCall ?? [];
+      expect(failure?.tenantId).toBe(MOCK_TENANT_ID);
+      expect(failure?.step).toBe(TENANT_PROVISIONING_STEP.SANITY_PROJECT);
+      expect(failure?.status).toBe(TENANT_PROVISIONING_STEP_STATUS.FAILED);
+      expect(failure?.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.FAILED,
       );
       expect(finishProvisioningRun).toHaveBeenCalledWith({
         tenantId: MOCK_TENANT_ID,

@@ -130,7 +130,7 @@ describe(runMigration, () => {
         { migrated: 1, backfilled: 0 },
       ],
       [
-        'a backfill instead of a replay for a tenant with an empty ledger',
+        'a backfill for a tenant with an empty ledger',
         true,
         { migrated: 0, backfilled: 1 },
       ],

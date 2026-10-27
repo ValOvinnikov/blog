@@ -5,6 +5,8 @@ import { Avatar } from './avatar';
 
 faker.seed(5995);
 
+const AVATAR_TEST_ID = 'avatar';
+
 const MOCK_FIRST_NAME = faker.person.firstName();
 const MOCK_MIDDLE_NAME = faker.person.middleName();
 const MOCK_LAST_NAME = faker.person.lastName();
@@ -44,9 +46,9 @@ describe(`<${Avatar.name}/>`, () => {
   it('renders no initials for an empty name', () => {
     setup({ name: '' });
 
-    const initials = screen.queryByText(/\S/);
+    const avatar = screen.getByTestId(AVATAR_TEST_ID);
 
-    expect(initials).not.toBeInTheDocument();
+    expect(avatar).toBeEmptyDOMElement();
   });
 
   it('is hidden from assistive tech', () => {

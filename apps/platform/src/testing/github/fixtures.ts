@@ -9,6 +9,7 @@ export const MOCK_GITHUB_MAIN_BRANCH_PATH = '/branches/main';
 export const MOCK_GITHUB_DB_JOURNAL_PATH =
   '/contents/packages/db/migrations/meta/_journal.json';
 export const MOCK_GITHUB_CONTRAST_RUNS_PATH = `/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`;
+export const MOCK_GITHUB_CONTRAST_DISPATCH_PATH = `/actions/workflows/${CONTRAST_WORKFLOW_FILE}/dispatches`;
 
 export const mockGitHubCommit = () => ({
   sha: faker.git.commitSha(),
