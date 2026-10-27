@@ -3,7 +3,7 @@ import {
   parseReleaseVersion,
 } from './release-version';
 
-describe('parseReleaseVersion', () => {
+describe(parseReleaseVersion, () => {
   it('parses a vMAJOR.MINOR.PATCH tag into numbers', () => {
     expect(parseReleaseVersion('v1.20.3')).toEqual({
       major: 1,
@@ -27,24 +27,17 @@ describe('parseReleaseVersion', () => {
   });
 });
 
-describe('isReleaseVersionGreater', () => {
-  it('orders minor versions numerically, not as text', () => {
-    expect(isReleaseVersionGreater('v0.10.0', 'v0.9.0')).toBe(true);
-    expect(isReleaseVersionGreater('v0.9.0', 'v0.10.0')).toBe(false);
-  });
-
-  it('compares major before minor and minor before patch', () => {
-    expect(isReleaseVersionGreater('v2.0.0', 'v1.99.99')).toBe(true);
-    expect(isReleaseVersionGreater('v1.3.0', 'v1.2.9')).toBe(true);
-    expect(isReleaseVersionGreater('v1.2.10', 'v1.2.9')).toBe(true);
-  });
-
-  it('is false for an equal version', () => {
-    expect(isReleaseVersionGreater('v1.2.3', 'v1.2.3')).toBe(false);
-  });
-
-  it('is false when either version is malformed', () => {
-    expect(isReleaseVersionGreater('v1.2', 'v1.0.0')).toBe(false);
-    expect(isReleaseVersionGreater('v2.0.0', 'latest')).toBe(false);
+describe(isReleaseVersionGreater, () => {
+  it.each([
+    ['a higher minor, compared numerically', 'v0.10.0', 'v0.9.0', true],
+    ['a lower minor, compared numerically', 'v0.9.0', 'v0.10.0', false],
+    ['a higher major against a higher minor', 'v2.0.0', 'v1.99.99', true],
+    ['a higher minor against a higher patch', 'v1.3.0', 'v1.2.9', true],
+    ['a higher patch, compared numerically', 'v1.2.10', 'v1.2.9', true],
+    ['an equal version', 'v1.2.3', 'v1.2.3', false],
+    ['a malformed candidate', 'v1.2', 'v1.0.0', false],
+    ['a malformed current version', 'v2.0.0', 'latest', false],
+  ])('judges %s', (_label, candidate, current, expected) => {
+    expect(isReleaseVersionGreater(candidate, current)).toBe(expected);
   });
 });

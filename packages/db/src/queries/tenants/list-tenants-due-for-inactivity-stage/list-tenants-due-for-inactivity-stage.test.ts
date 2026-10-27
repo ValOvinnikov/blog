@@ -22,18 +22,20 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
-const DAY_23 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION_WARNING);
-const DAY_22 = daysAfterLastActivity(
+const MOCK_DAY_23 = daysAfterLastActivity(
+  INACTIVITY_STAGE_DAY.SUSPENSION_WARNING,
+);
+const MOCK_DAY_22 = daysAfterLastActivity(
   INACTIVITY_STAGE_DAY.SUSPENSION_WARNING - 1,
 );
-const DAY_30 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION);
-const DAY_50 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DELETION_NOTICE);
-const DAY_60 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DEPROVISIONING);
+const MOCK_DAY_30 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.SUSPENSION);
+const MOCK_DAY_50 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DELETION_NOTICE);
+const MOCK_DAY_60 = daysAfterLastActivity(INACTIVITY_STAGE_DAY.DEPROVISIONING);
 
-const STAMPED_STAGES: [TStampedInactivityStage, Date][] = [
-  [INACTIVITY_STAGE.SUSPENSION_WARNING, DAY_23],
-  [INACTIVITY_STAGE.SUSPENSION, DAY_30],
-  [INACTIVITY_STAGE.DELETION_NOTICE, DAY_50],
+const MOCK_STAMPED_STAGES: [TStampedInactivityStage, Date][] = [
+  [INACTIVITY_STAGE.SUSPENSION_WARNING, MOCK_DAY_23],
+  [INACTIVITY_STAGE.SUSPENSION, MOCK_DAY_30],
+  [INACTIVITY_STAGE.DELETION_NOTICE, MOCK_DAY_50],
 ];
 
 async function dueIds(stage: TInactivityStage, now: Date) {
@@ -55,36 +57,55 @@ describe(listTenantsDueForInactivityStage, () => {
       });
     });
 
-    it('returns a tenant once at each of day 23, 30, 50 and 60', async () => {
-      for (const [stage, now] of STAMPED_STAGES) {
-        expect(await dueIds(stage, now)).toEqual([tenant.id]);
+    it('returns the tenant once at each of day 23, 30, 50 and 60', async () => {
+      const dueBeforeAndAfter: string[][] = [];
+      for (const [stage, now] of MOCK_STAMPED_STAGES) {
+        dueBeforeAndAfter.push(await dueIds(stage, now));
         await stampTenantInactivityStage(tenant.id, stage, now);
-        expect(await dueIds(stage, now)).toEqual([]);
+        dueBeforeAndAfter.push(await dueIds(stage, now));
       }
-
-      expect(await dueIds(INACTIVITY_STAGE.DEPROVISIONING, DAY_60)).toEqual([
-        tenant.id,
-      ]);
+      dueBeforeAndAfter.push(
+        await dueIds(INACTIVITY_STAGE.DEPROVISIONING, MOCK_DAY_60),
+      );
       await startDeprovisioningRun({ tenantId: tenant.id });
-      expect(await dueIds(INACTIVITY_STAGE.DEPROVISIONING, DAY_60)).toEqual([]);
+      dueBeforeAndAfter.push(
+        await dueIds(INACTIVITY_STAGE.DEPROVISIONING, MOCK_DAY_60),
+      );
+
+      expect(dueBeforeAndAfter).toEqual([
+        [tenant.id],
+        [],
+        [tenant.id],
+        [],
+        [tenant.id],
+        [],
+        [tenant.id],
+        [],
+      ]);
     });
 
     it('returns nothing before day 23', async () => {
-      expect(await dueIds(INACTIVITY_STAGE.SUSPENSION_WARNING, DAY_22)).toEqual(
-        [],
+      const due = await listTenantsDueForInactivityStage(
+        INACTIVITY_STAGE.SUSPENSION_WARNING,
+        MOCK_DAY_22,
       );
+
+      expect(due).toEqual([]);
     });
   });
 
-  it('never returns an archived tenant', async () => {
-    await insertTestTenant(db(), {
-      status: TENANT_STATUS.ARCHIVED,
-      deprovisionedAt: DAY_22,
-      lastActivityAt: MOCK_LAST_ACTIVITY_AT,
-    });
+  it.each(Object.values(INACTIVITY_STAGE))(
+    'never returns an archived tenant at the %s stage',
+    async (stage) => {
+      await insertTestTenant(db(), {
+        status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: MOCK_DAY_22,
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+      });
 
-    for (const stage of Object.values(INACTIVITY_STAGE)) {
-      expect(await dueIds(stage, DAY_60)).toEqual([]);
-    }
-  });
+      const due = await listTenantsDueForInactivityStage(stage, MOCK_DAY_60);
+
+      expect(due).toEqual([]);
+    },
+  );
 });

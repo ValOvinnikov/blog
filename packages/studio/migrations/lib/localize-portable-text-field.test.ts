@@ -1,70 +1,63 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizePortableTextField } from './localize-portable-text-field';
 
+faker.seed(7);
+
 const { EN } = LOCALE_ISO_CODES;
 
-const blocks = [{ _type: 'block', _key: 'block-1', children: [] }];
+const LISTED_TEXT_VALUE_TYPE = 'internationalizedArrayListedTextValue';
+const MOCK_BLOCKS = [
+  { _type: 'block', _key: faker.string.uuid(), children: [] },
+];
+
+const inEnglish = (type: string, value: unknown) => [
+  { _key: EN, _type: type, language: EN, value },
+];
 
 describe(localizePortableTextField, () => {
   it('moves plain Portable Text into the default language', () => {
-    expect(localizePortableTextField('content', blocks)).toEqual([
-      at(
-        'content',
-        set([
-          {
-            _key: EN,
-            _type: 'internationalizedArrayListedTextValue',
-            language: EN,
-            value: blocks,
-          },
-        ]),
-      ),
+    expect(localizePortableTextField('content', MOCK_BLOCKS)).toEqual([
+      at('content', set(inEnglish(LISTED_TEXT_VALUE_TYPE, MOCK_BLOCKS))),
     ]);
   });
 
-  it('leaves an already localized, empty or missing value alone', () => {
-    expect(
-      localizePortableTextField('content', [
-        {
-          _key: EN,
-          _type: 'internationalizedArrayListedTextValue',
-          language: EN,
-          value: blocks,
-        },
-      ]),
-    ).toEqual([]);
-    expect(localizePortableTextField('content', [])).toEqual([]);
-    expect(localizePortableTextField('content', undefined)).toEqual([]);
+  it.each([
+    [
+      'an already localized value',
+      inEnglish(LISTED_TEXT_VALUE_TYPE, MOCK_BLOCKS),
+    ],
+    ['an empty value', []],
+    ['a missing value', undefined],
+  ])('leaves %s alone', (_label, value) => {
+    expect(localizePortableTextField('content', value)).toEqual([]);
   });
 
   it('moves plain Portable Text into the given localized value type', () => {
     expect(
       localizePortableTextField(
         'body',
-        blocks,
+        MOCK_BLOCKS,
         'internationalizedArrayParagraphTextValue',
       ),
     ).toEqual([
       at(
         'body',
-        set([
-          {
-            _key: EN,
-            _type: 'internationalizedArrayParagraphTextValue',
-            language: EN,
-            value: blocks,
-          },
-        ]),
+        set(inEnglish('internationalizedArrayParagraphTextValue', MOCK_BLOCKS)),
       ),
     ]);
   });
 
   it('moves Portable Text with embedded objects into the default language', () => {
     const article = [
-      ...blocks,
-      { _type: 'bodyImage', _key: 'image-1', alt: 'A diagram' },
+      ...MOCK_BLOCKS,
+      {
+        _type: 'bodyImage',
+        _key: faker.string.uuid(),
+        alt: faker.lorem.words(),
+      },
     ];
 
     expect(
@@ -76,14 +69,7 @@ describe(localizePortableTextField, () => {
     ).toEqual([
       at(
         'body',
-        set([
-          {
-            _key: EN,
-            _type: 'internationalizedArrayArticleTextValue',
-            language: EN,
-            value: article,
-          },
-        ]),
+        set(inEnglish('internationalizedArrayArticleTextValue', article)),
       ),
     ]);
   });

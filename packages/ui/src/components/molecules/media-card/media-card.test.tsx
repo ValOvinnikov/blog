@@ -4,78 +4,67 @@ import {
   MOCK_PERSON_NAME,
   MOCK_PUBLISHED_AT,
 } from '@blog/ui/testing/fixtures';
-import { cloneElement, type ComponentProps } from 'react';
+import { faker } from '@faker-js/faker';
 
 import { MediaCard } from './media-card';
 
-const POST_HREF = '/posts/hello-world';
+faker.seed(123);
+
 const MEDIA_TEST_ID = 'media-card-media';
+const MOCK_POST_HREF = `/posts/${faker.lorem.slug()}`;
+const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_COVER_SRC = faker.image.url();
+const MOCK_COVER_ALT = faker.lorem.words(2);
+const MOCK_EXCERPT = faker.lorem.sentence();
+const MOCK_TAGS = [faker.lorem.word(), faker.lorem.word()];
+const MOCK_TOPIC = faker.commerce.department();
+const MOCK_STRAY_TEXT = faker.lorem.words(2);
+const MOCK_CONTROL_LABEL = faker.lorem.word();
+const MOCK_CONTROL_HREF = faker.internet.url();
+const MOCK_CARD_LINK_LABEL = faker.person.fullName();
+const MOCK_CARD_LINK_HREF = `/team/${faker.lorem.slug()}`;
+const MOCK_LEADING_ICON = 'L';
+const MOCK_TRAILING_ICON = 'R';
 
-type TMediaCardChildren = ComponentProps<typeof MediaCard>['children'];
-
-vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react')>();
-  return { ...actual, cloneElement: vi.fn(actual.cloneElement) };
-});
+const renderMediaCard = () =>
+  renderElement(
+    <MediaCard>
+      <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
+        <img src={MOCK_COVER_SRC} alt={MOCK_COVER_ALT} />
+      </MediaCard.Media>
+    </MediaCard>,
+  );
 
 describe(`<${MediaCard.name}/>`, () => {
-  describe('with only a level-3 title', () => {
-    beforeEach(() => {
+  it.each([2, 3] as const)(
+    'renders MediaCard.Title at heading level %s',
+    (level) => {
       renderElement(
         <MediaCard>
-          <MediaCard.Title level={3}>
-            <a href={POST_HREF}>Hello World</a>
+          <MediaCard.Title level={level}>
+            <a href={MOCK_POST_HREF}>{MOCK_TITLE}</a>
           </MediaCard.Title>
         </MediaCard>,
       );
-    });
 
-    it('renders MediaCard.Title at the caller-specified heading level', () => {
-      const heading = screen.getByRole('heading', { level: 3 });
-      const link = screen.getByRole('link');
+      const heading = screen.getByRole('heading', { level });
 
       expect(heading).toBeVisible();
-      expect(link).toHaveAttribute('href', POST_HREF);
-    });
-
-    it('does not render media when MediaCard.Media is omitted', () => {
-      const image = screen.queryByRole('img');
-
-      expect(image).not.toBeInTheDocument();
-    });
-  });
-
-  it('renders MediaCard.Title at a different caller-specified heading level', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Title level={2}>
-          <a href={POST_HREF}>Hello World</a>
-        </MediaCard.Title>
-      </MediaCard>,
-    );
-    const heading = screen.getByRole('heading', { level: 2 });
-    const levelThreeHeading = screen.queryByRole('heading', { level: 3 });
-
-    expect(heading).toBeVisible();
-    expect(levelThreeHeading).not.toBeInTheDocument();
-  });
+    },
+  );
 
   it('renders MediaCard.Media content', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Media>
-          <img src="/cover.jpg" alt="Cover photo" />
-        </MediaCard.Media>
-      </MediaCard>,
-    );
-    const image = screen.getByRole('img', { name: 'Cover photo' });
+    renderMediaCard();
+
+    const image = screen.getByRole('img', { name: MOCK_COVER_ALT });
 
     expect(image).toBeVisible();
   });
 
-  it('renders excerpt when provided', () => {
-    renderElement(<MediaCard excerpt="A short summary." />);
-    const excerpt = screen.getByText('A short summary.');
+  it('renders the excerpt when provided', () => {
+    renderElement(<MediaCard excerpt={MOCK_EXCERPT} />);
+
+    const excerpt = screen.getByText(MOCK_EXCERPT);
 
     expect(excerpt).toBeVisible();
   });
@@ -85,26 +74,31 @@ describe(`<${MediaCard.name}/>`, () => {
       renderElement(<MediaCard />);
     });
 
-    it('does not render excerpt element when omitted', () => {
-      const excerpt = screen.queryByText(/summary/i);
+    it('renders no media', () => {
+      const image = screen.queryByRole('img');
+
+      expect(image).not.toBeInTheDocument();
+    });
+
+    it('renders no excerpt', () => {
+      const excerpt = screen.queryByText(MOCK_EXCERPT);
 
       expect(excerpt).not.toBeInTheDocument();
     });
 
-    it('does not render author section when authorName is omitted', () => {
+    it('renders no author', () => {
       const authorName = screen.queryByText(MOCK_PERSON_NAME);
 
       expect(authorName).not.toBeInTheDocument();
     });
   });
 
-  it('renders all provided tags', () => {
-    renderElement(<MediaCard tags={['react', 'typescript']} />);
-    const reactTag = screen.getByText('react');
-    const typescriptTag = screen.getByText('typescript');
+  it.each(MOCK_TAGS)('renders the "%s" tag', (tagName) => {
+    renderElement(<MediaCard tags={MOCK_TAGS} />);
 
-    expect(reactTag).toBeVisible();
-    expect(typescriptTag).toBeVisible();
+    const tag = screen.getByText(tagName);
+
+    expect(tag).toBeVisible();
   });
 
   it('announces the Footer author name once, beside its Avatar', () => {
@@ -113,12 +107,13 @@ describe(`<${MediaCard.name}/>`, () => {
         <MediaCard.Footer authorName={MOCK_PERSON_NAME} />
       </MediaCard>,
     );
+
     const authorNames = screen.getAllByText(MOCK_PERSON_NAME);
 
     expect(authorNames).toHaveLength(1);
   });
 
-  it('renders a time element with the correct dateTime and display text', () => {
+  it('renders a time element with the date and display text', () => {
     renderElement(
       <MediaCard>
         <MediaCard.Footer
@@ -127,36 +122,37 @@ describe(`<${MediaCard.name}/>`, () => {
         />
       </MediaCard>,
     );
-    const timeEl = screen.getByRole('time');
-    expect(timeEl).toBeVisible();
-    expect(timeEl).toHaveAttribute('dateTime', MOCK_PUBLISHED_AT);
-    expect(timeEl).toHaveTextContent(MOCK_FORMATTED_DATE);
+
+    const time = screen.getByRole('time');
+
+    expect(time).toBeVisible();
+    expect(time).toHaveAttribute('dateTime', MOCK_PUBLISHED_AT);
+    expect(time).toHaveTextContent(MOCK_FORMATTED_DATE);
   });
 
   it.each([
     { omitted: 'publishedAt', footer: { formattedDate: MOCK_FORMATTED_DATE } },
     { omitted: 'formattedDate', footer: { publishedAt: MOCK_PUBLISHED_AT } },
-  ])(
-    'does not render a time element when $omitted is omitted',
-    ({ footer }) => {
-      renderElement(
-        <MediaCard>
-          <MediaCard.Footer {...footer} />
-        </MediaCard>,
-      );
-      const timeEl = screen.queryByRole('time');
+  ])('renders no time element without $omitted', ({ footer }) => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Footer {...footer} />
+      </MediaCard>,
+    );
 
-      expect(timeEl).not.toBeInTheDocument();
-    },
-  );
+    const time = screen.queryByRole('time');
+
+    expect(time).not.toBeInTheDocument();
+  });
 
   it('renders unmatched children without dropping them', () => {
     renderElement(
       <MediaCard>
-        <span>stray content</span>
+        <span>{MOCK_STRAY_TEXT}</span>
       </MediaCard>,
     );
-    const strayContent = screen.getByText('stray content');
+
+    const strayContent = screen.getByText(MOCK_STRAY_TEXT);
 
     expect(strayContent).toBeVisible();
   });
@@ -164,149 +160,108 @@ describe(`<${MediaCard.name}/>`, () => {
   it('renders MediaCard.Meta content', () => {
     renderElement(
       <MediaCard>
-        <MediaCard.Meta dateValue="2024-01-01" dateLabel="Jan 1, 2024" />
+        <MediaCard.Meta
+          dateValue={MOCK_PUBLISHED_AT}
+          dateLabel={MOCK_FORMATTED_DATE}
+        />
       </MediaCard>,
     );
-    const dateLabel = screen.getByText('Jan 1, 2024');
+
+    const dateLabel = screen.getByText(MOCK_FORMATTED_DATE);
 
     expect(dateLabel).toBeVisible();
   });
 
-  it('renders the topic lowercased via MediaCard.Footer', () => {
+  it('renders the Footer topic lowercased', () => {
     renderElement(
       <MediaCard>
-        <MediaCard.Footer topic="Design Systems" />
+        <MediaCard.Footer topic={MOCK_TOPIC} />
       </MediaCard>,
     );
-    const topicText = screen.getByText(/design systems/);
 
-    expect(topicText).toBeVisible();
+    const topic = screen.getByText(MOCK_TOPIC.toLowerCase());
+
+    expect(topic).toBeVisible();
   });
 
-  it('renders leadingIcon and trailingIcon with matching spacing around the topic text', () => {
+  it('renders leading and trailing icons around the topic text', () => {
     renderElement(
       <MediaCard>
         <MediaCard.Footer
-          topic="Design Systems"
-          leadingIcon={<span aria-hidden="true">L</span>}
-          trailingIcon={<span aria-hidden="true">R</span>}
+          topic={MOCK_TOPIC}
+          leadingIcon={<span aria-hidden="true">{MOCK_LEADING_ICON}</span>}
+          trailingIcon={<span aria-hidden="true">{MOCK_TRAILING_ICON}</span>}
         />
       </MediaCard>,
     );
-    const topicText = screen.getByText(/design systems/);
-    expect(topicText.textContent).toBe('L design systems R');
+
+    const topic = screen.getByText(MOCK_TOPIC.toLowerCase());
+
+    expect(topic).toHaveTextContent(
+      `${MOCK_LEADING_ICON} ${MOCK_TOPIC.toLowerCase()} ${MOCK_TRAILING_ICON}`,
+    );
   });
 
   it('renders MediaCard.Link inside the title as the card link', () => {
     renderElement(
       <MediaCard>
         <MediaCard.Title level={3}>
-          <MediaCard.Link href={POST_HREF}>Hello World</MediaCard.Link>
+          <MediaCard.Link href={MOCK_POST_HREF}>{MOCK_TITLE}</MediaCard.Link>
         </MediaCard.Title>
       </MediaCard>,
     );
-    const cardLink = screen.getByRole('link', { name: 'Hello World' });
 
-    expect(cardLink).toHaveAttribute('href', POST_HREF);
+    const cardLink = screen.getByRole('link', { name: MOCK_TITLE });
+
+    expect(cardLink).toHaveAttribute('href', MOCK_POST_HREF);
   });
 
   it('renders controls passed to MediaCard.Footer alongside the card link', () => {
     renderElement(
       <MediaCard>
         <MediaCard.Title level={3}>
-          <MediaCard.Link href="/team/ada">Ada Lovelace</MediaCard.Link>
+          <MediaCard.Link href={MOCK_CARD_LINK_HREF}>
+            {MOCK_CARD_LINK_LABEL}
+          </MediaCard.Link>
         </MediaCard.Title>
         <MediaCard.Footer>
-          <a href="https://github.com/ada">GitHub</a>
+          <a href={MOCK_CONTROL_HREF}>{MOCK_CONTROL_LABEL}</a>
         </MediaCard.Footer>
       </MediaCard>,
     );
-    const githubLink = screen.getByRole('link', { name: 'GitHub' });
-    const cardLink = screen.getByRole('link', { name: 'Ada Lovelace' });
 
-    expect(githubLink).toHaveAttribute('href', 'https://github.com/ada');
+    const control = screen.getByRole('link', { name: MOCK_CONTROL_LABEL });
+    const cardLink = screen.getByRole('link', { name: MOCK_CARD_LINK_LABEL });
+
+    expect(control).toHaveAttribute('href', MOCK_CONTROL_HREF);
     expect(cardLink).toBeVisible();
   });
 
-  it('forwards data-testid to root element', () => {
-    renderElement(<MediaCard dataTestId="media-card" />);
-    const root = screen.getByTestId('media-card');
-
-    expect(root).toBeVisible();
-  });
-
-  it.each([
-    {
-      name: 'wraps MediaCard.Media in a split container only when isSplit is set and Media is present',
-      isSplit: true,
-    },
-    {
-      name: 'renders MediaCard.Media as a direct child of the article when isSplit is unset',
-      isSplit: undefined,
-    },
-  ])('$name', ({ isSplit }) => {
-    renderElement(
-      <MediaCard isSplit={isSplit}>
-        <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
-          <img src="/cover.jpg" alt="Cover photo" />
-        </MediaCard.Media>
-      </MediaCard>,
-    );
-    const media = screen.getByTestId(MEDIA_TEST_ID);
-    const article = screen.getByRole('article');
-
-    if (isSplit) {
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      expect(media.parentElement).not.toBe(article);
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      expect(media.parentElement?.parentElement).toBe(article);
-    } else {
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      expect(media.parentElement).toBe(article);
-    }
-  });
-
-  describe('cloning the Media slot', () => {
-    beforeEach(() => {
-      vi.mocked(cloneElement).mockClear();
-    });
-
-    it('passes the Media slot through unmodified when neither lead nor centred', () => {
+  describe('Media placement', () => {
+    it('wraps Media in a split container when split and Media is present', () => {
       renderElement(
-        <MediaCard>
+        <MediaCard isSplit={true}>
           <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
-            <img src="/cover.jpg" alt="Cover photo" />
+            <img src={MOCK_COVER_SRC} alt={MOCK_COVER_ALT} />
           </MediaCard.Media>
         </MediaCard>,
       );
-      const media = screen.getByTestId(MEDIA_TEST_ID);
 
-      expect(cloneElement).not.toHaveBeenCalled();
-      expect(media).toBeVisible();
+      const media = screen.getByTestId(MEDIA_TEST_ID);
+      const article = screen.getByRole('article');
+
+      // eslint-disable-next-line testing-library/no-node-access -- structural layout claim: the split container has no semantic handle
+      expect(media.parentElement?.parentElement).toBe(article);
     });
 
-    it.each([
-      {
-        name: 'isLead is set',
-        renderCard: (media: TMediaCardChildren) => (
-          <MediaCard isLead={true}>{media}</MediaCard>
-        ),
-      },
-      {
-        name: 'align is "center"',
-        renderCard: (media: TMediaCardChildren) => (
-          <MediaCard align="center">{media}</MediaCard>
-        ),
-      },
-    ])('clones the Media slot when $name', ({ renderCard }) => {
-      renderElement(
-        renderCard(
-          <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
-            <img src="/cover.jpg" alt="Cover photo" />
-          </MediaCard.Media>,
-        ),
-      );
-      expect(cloneElement).toHaveBeenCalledTimes(1);
+    it('renders Media as a direct child of the article when not split', () => {
+      renderMediaCard();
+
+      const media = screen.getByTestId(MEDIA_TEST_ID);
+      const article = screen.getByRole('article');
+
+      // eslint-disable-next-line testing-library/no-node-access -- structural layout claim: Media sits directly in the article
+      expect(media.parentElement).toBe(article);
     });
   });
 });

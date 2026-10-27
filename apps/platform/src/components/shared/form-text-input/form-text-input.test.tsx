@@ -1,42 +1,52 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FormTextInput } from './form-text-input';
 
-describe(FormTextInput, () => {
-  it('names the input by its label', () => {
-    render(<FormTextInput label="Tenant name" value="" onChange={vi.fn()} />);
+faker.seed(5995);
 
-    const input = screen.getByRole('textbox', { name: 'Tenant name' });
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_HINT = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
+
+const setup = customRender(FormTextInput, {
+  label: MOCK_LABEL,
+  value: '',
+  onChange: vi.fn(),
+});
+
+describe(`<${FormTextInput.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
+  it('names the input by its label', () => {
+    setup();
+
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
     expect(input).toBeVisible();
     expect(input).not.toHaveAttribute('aria-label');
   });
 
   it('describes the input with its hint and error', () => {
-    render(
-      <FormTextInput
-        label="Slug"
-        hint={<span data-testid="hint">Used in the URL</span>}
-        error="Already in use"
-        value=""
-        onChange={vi.fn()}
-      />,
-    );
+    setup({ hint: MOCK_HINT, error: MOCK_ERROR });
 
-    const input = screen.getByRole('textbox', { name: 'Slug' });
-    expect(input).toHaveAccessibleDescription('Used in the URL Already in use');
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toHaveAccessibleDescription(`${MOCK_HINT} ${MOCK_ERROR}`);
     expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('calls onChange with the typed value', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
+    setup({ onChange: handleChange });
 
-    render(
-      <FormTextInput label="Tenant name" value="" onChange={handleChange} />,
-    );
-
-    await user.type(screen.getByLabelText('Tenant name'), 'a');
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+    await user.type(input, 'a');
 
     expect(handleChange).toHaveBeenCalledWith('a');
   });

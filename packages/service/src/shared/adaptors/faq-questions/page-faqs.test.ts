@@ -4,39 +4,45 @@ import {
 } from '@blog/service/testing/modules/fixtures';
 import { mockCtaSlotView } from '@blog/service/testing/pages/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getFaqQuestions } from './loader';
 import { getPageFaqs } from './page-faqs';
 
 vi.mock('./loader');
 
-const mockFaqQuestions = vi.mocked(getFaqQuestions);
-const tenant = mockTenant();
+faker.seed(6021);
+
+const MOCK_FIRST_FAQ_MODULE_ID = faker.string.uuid();
+const MOCK_SECOND_FAQ_MODULE_ID = faker.string.uuid();
+const MOCK_TENANT = mockTenant();
 
 describe(getPageFaqs, () => {
-  it('builds the faqs from the FAQ modules in page order with one request', async () => {
-    mockFaqQuestions.mockResolvedValueOnce([mockRawFaqModuleQuestions()]);
+  it('builds the faqs from the FAQ modules in page order in one request', async () => {
+    vi.mocked(getFaqQuestions).mockResolvedValueOnce([
+      mockRawFaqModuleQuestions(),
+    ]);
 
     const faqs = await getPageFaqs(
       [
-        { id: 'faq-b', type: 'module_faq' },
+        { id: MOCK_FIRST_FAQ_MODULE_ID, type: 'module_faq' },
         mockCtaSlotView(),
-        { id: 'faq-a', type: 'module_faq' },
+        { id: MOCK_SECOND_FAQ_MODULE_ID, type: 'module_faq' },
       ],
-      tenant,
+      MOCK_TENANT,
     );
 
-    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
-      ['faq-b', 'faq-a'],
-      tenant,
+    expect(getFaqQuestions).toHaveBeenCalledExactlyOnceWith(
+      [MOCK_FIRST_FAQ_MODULE_ID, MOCK_SECOND_FAQ_MODULE_ID],
+      MOCK_TENANT,
     );
     expect(faqs).toEqual([mockFaqView()]);
   });
 
-  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
-    const faqs = await getPageFaqs([mockCtaSlotView()], tenant);
+  it('makes no FAQ request when the page has no FAQ module', async () => {
+    const faqs = await getPageFaqs([mockCtaSlotView()], MOCK_TENANT);
 
-    expect(mockFaqQuestions).not.toHaveBeenCalled();
+    expect(getFaqQuestions).not.toHaveBeenCalled();
     expect(faqs).toEqual([]);
   });
 });

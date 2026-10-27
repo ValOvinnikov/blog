@@ -4,29 +4,28 @@ import { subscribers } from '@blog/db/schema/subscribers';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
+  applyMigrationsBefore,
   insertReplayTenant,
-  listMigrationFiles,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
+faker.seed(6023);
+
+const UPPERCASE_MIGRATION = '0059_uppercase_subscriber_status.sql';
+
 function byEmail(a: { email: string }, b: { email: string }): number {
   return a.email < b.email ? -1 : 1;
 }
 
-const UPPERCASE_MIGRATION = '0059_uppercase_subscriber_status.sql';
-
-describe('0059_uppercase_subscriber_status (subscriber statuses stored uppercase)', () => {
+describe(`${UPPERCASE_MIGRATION} (subscriber statuses stored uppercase)`, () => {
   let db: PgliteDatabase<typeof schema>;
 
   beforeEach(async () => {
     db = await createEmptyTestDb();
-    for (const file of listMigrationFiles()) {
-      if (file >= UPPERCASE_MIGRATION) break;
-      await applyMigrationFile(db, file);
-    }
+    await applyMigrationsBefore(db, UPPERCASE_MIGRATION);
   }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
   it(
@@ -59,9 +58,10 @@ describe('0059_uppercase_subscriber_status (subscriber statuses stored uppercase
     async () => {
       await applyMigrationFile(db, UPPERCASE_MIGRATION);
       const tenant = await insertReplayTenant(db);
-      const email = faker.internet.email();
 
-      await db.insert(subscribers).values({ tenantId: tenant.id, email });
+      await db
+        .insert(subscribers)
+        .values({ tenantId: tenant.id, email: faker.internet.email() });
 
       const [row] = await db
         .select({ status: subscribers.status })

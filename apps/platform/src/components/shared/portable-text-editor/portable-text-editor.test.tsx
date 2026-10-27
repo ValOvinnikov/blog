@@ -1,467 +1,278 @@
 import { VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+import { faker } from '@faker-js/faker';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
+import { customRender, screen, within } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
-  renderWithIntl,
-  screen,
-  waitFor,
-  within,
-} from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+  BULLET_LIST_ITEM,
+  mockTextBlock,
+  NUMBER_LIST_ITEM,
+} from '@platform/testing/portable-text-editor/fixtures';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PortableTextEditor } from './portable-text-editor';
 
-const render = renderWithIntl;
+faker.seed(5995);
 
-const BULLET_ONE = 'Bullet one';
-const BULLET_TWO = 'Bullet two';
-const NUMBER_ONE = 'Number one';
-const NUMBER_TWO = 'Number two';
-const NESTED_ONE = 'Nested one';
-const NESTED_TWO = 'Nested two';
-const OUTER_THREE = 'Outer three';
+const t = makeEnTranslator('portableTextEditorToolbar');
+
+const MOCK_LABEL = faker.lorem.word();
+const MOCK_PLACEHOLDER = faker.lorem.sentence();
+const MOCK_DESCRIPTION_ID = faker.string.alpha(8);
+const MOCK_LINK_TEXT = faker.lorem.words(2);
+const MOCK_URL = faker.internet.url({ appendSlash: true });
+const MOCK_ITEM_ONE = faker.lorem.words(3);
+const MOCK_ITEM_TWO = faker.lorem.words(3);
+const MOCK_ITEM_THREE = faker.lorem.words(3);
+const MOCK_ITEM_FOUR = faker.lorem.words(3);
+const MOCK_ITEM_FIVE = faker.lorem.words(3);
 const ARIA_PRESSED = 'aria-pressed';
 const ARIA_DISABLED = 'aria-disabled';
 const ARIA_MULTILINE = 'aria-multiline';
 const ARIA_SETSIZE = 'aria-setsize';
 const ARIA_POSINSET = 'aria-posinset';
 
-const linkBody = (href: string): TEmailTemplateBlock[] => [
-  {
-    _type: 'block',
-    _key: 'k1',
-    style: 'normal',
-    children: [
-      { _type: 'span', _key: 's1', text: 'click me', marks: ['link1'] },
-    ],
-    markDefs: [{ _key: 'link1', _type: 'link', href }],
-  },
-];
+const mockLinkBody = (href: string): TEmailTemplateBlock[] => {
+  const linkKey = faker.string.uuid();
+  return [
+    {
+      _type: 'block',
+      _key: faker.string.uuid(),
+      style: 'normal',
+      children: [
+        {
+          _type: 'span',
+          _key: faker.string.uuid(),
+          text: MOCK_LINK_TEXT,
+          marks: [linkKey],
+        },
+      ],
+      markDefs: [{ _key: linkKey, _type: 'link', href }],
+    },
+  ];
+};
 
-const listBody: TEmailTemplateBlock[] = [
-  {
-    _type: 'block',
-    _key: 'b1',
-    style: 'normal',
-    listItem: 'bullet',
-    level: 1,
-    children: [{ _type: 'span', _key: 'bs1', text: BULLET_ONE, marks: [] }],
-  },
-  {
-    _type: 'block',
-    _key: 'b2',
-    style: 'normal',
-    listItem: 'bullet',
-    level: 1,
-    children: [{ _type: 'span', _key: 'bs2', text: BULLET_TWO, marks: [] }],
-  },
-  {
-    _type: 'block',
-    _key: 'o1',
-    style: 'normal',
-    listItem: 'number',
-    level: 1,
-    children: [{ _type: 'span', _key: 'os1', text: NUMBER_ONE, marks: [] }],
-  },
-  {
-    _type: 'block',
-    _key: 'o2',
-    style: 'normal',
-    listItem: 'number',
-    level: 1,
-    children: [{ _type: 'span', _key: 'os2', text: NUMBER_TWO, marks: [] }],
-  },
-];
+const setup = customRender(PortableTextEditor, {
+  initialValue: [],
+  onChange: vi.fn(),
+  field: { label: MOCK_LABEL },
+});
 
-const fourItemBulletBody: TEmailTemplateBlock[] = ['a', 'b', 'c', 'd'].map(
-  (letter, index) => ({
-    _type: 'block',
-    _key: `run-${letter}`,
-    style: 'normal',
-    listItem: 'bullet',
-    level: 1,
-    children: [
-      {
-        _type: 'span',
-        _key: `run-${letter}-span`,
-        text: `Item ${index + 1}`,
-        marks: [],
+describe(`<${PortableTextEditor.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
+  describe('with the default schema', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('is an enabled, named, multiline text field', () => {
+      const field = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+      expect(field).toBeVisible();
+      expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
+      expect(field).not.toHaveAttribute(ARIA_DISABLED);
+    });
+
+    it.each([t('bold'), t('heading'), t('bulletList')])(
+      'offers the %s control',
+      (name) => {
+        const control = screen.getByRole('button', { name });
+
+        expect(control).toBeVisible();
       },
-    ],
-  }),
-);
-
-const numberedListWithNestedBulletBody: TEmailTemplateBlock[] = [
-  {
-    _type: 'block',
-    _key: 'n1',
-    style: 'normal',
-    listItem: 'number',
-    level: 1,
-    children: [{ _type: 'span', _key: 'n1s', text: 'Outer one', marks: [] }],
-  },
-  {
-    _type: 'block',
-    _key: 'n2',
-    style: 'normal',
-    listItem: 'number',
-    level: 1,
-    children: [{ _type: 'span', _key: 'n2s', text: 'Outer two', marks: [] }],
-  },
-  {
-    _type: 'block',
-    _key: 'nested1',
-    style: 'normal',
-    listItem: 'bullet',
-    level: 2,
-    children: [
-      { _type: 'span', _key: 'nested1s', text: NESTED_ONE, marks: [] },
-    ],
-  },
-  {
-    _type: 'block',
-    _key: 'nested2',
-    style: 'normal',
-    listItem: 'bullet',
-    level: 2,
-    children: [
-      { _type: 'span', _key: 'nested2s', text: NESTED_TWO, marks: [] },
-    ],
-  },
-  {
-    _type: 'block',
-    _key: 'n3',
-    style: 'normal',
-    listItem: 'number',
-    level: 1,
-    children: [{ _type: 'span', _key: 'n3s', text: OUTER_THREE, marks: [] }],
-  },
-];
-
-describe(PortableTextEditor, () => {
-  it('mounts with an accessible name and no starting content', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    expect(screen.getByRole('textbox', { name: 'Body' })).toBeVisible();
-  });
-
-  it('shows a formatting toolbar when not disabled', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: 'Bold' })).toBeVisible();
-  });
-
-  it('offers only the controls the schema allows', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        schema={VOICE_PORTABLE_TEXT_SCHEMA}
-      />,
-    );
-
-    expect(screen.getAllByRole('button')).toHaveLength(3);
-    expect(screen.getByRole('button', { name: 'Bold' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Italic' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
-  });
-
-  it('moves focus between toolbar controls with the arrow keys', async () => {
-    const user = userEvent.setup();
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        schema={VOICE_PORTABLE_TEXT_SCHEMA}
-      />,
-    );
-
-    await user.tab();
-    await user.keyboard('{ArrowRight}');
-
-    expect(screen.getByRole('button', { name: 'Italic' })).toHaveFocus();
-
-    await user.keyboard('{ArrowLeft}');
-
-    expect(screen.getByRole('button', { name: 'Bold' })).toHaveFocus();
-  });
-
-  it('announces each toggle as not pressed while its format is inactive', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        schema={VOICE_PORTABLE_TEXT_SCHEMA}
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: 'Bold' })).toHaveAttribute(
-      ARIA_PRESSED,
-      'false',
-    );
-    expect(screen.getByRole('button', { name: 'Italic' })).toHaveAttribute(
-      ARIA_PRESSED,
-      'false',
     );
   });
 
-  it('offers headings and lists under the default schema', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
+  describe('with the Voice schema', () => {
+    beforeEach(() => {
+      setup({ schema: VOICE_PORTABLE_TEXT_SCHEMA });
+    });
 
-    expect(screen.getByRole('button', { name: 'Heading' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Bullet list' })).toBeVisible();
+    it('offers only the controls the schema allows', () => {
+      const controls = screen.getAllByRole('button');
+      const allowedControls = [t('bold'), t('italic'), t('link')].map((name) =>
+        screen.getByRole('button', { name }),
+      );
+
+      expect(controls).toEqual(allowedControls);
+    });
+
+    it('moves focus between toolbar controls with the arrow keys', async () => {
+      const boldButton = screen.getByRole('button', { name: t('bold') });
+      const italicButton = screen.getByRole('button', { name: t('italic') });
+
+      await user.tab();
+      await user.keyboard('{ArrowRight}');
+      expect(italicButton).toHaveFocus();
+
+      await user.keyboard('{ArrowLeft}');
+      expect(boldButton).toHaveFocus();
+    });
+
+    it.each([t('bold'), t('italic')])(
+      'announces %s as not pressed while its format is inactive',
+      (name) => {
+        const toggle = screen.getByRole('button', { name });
+
+        expect(toggle).toHaveAttribute(ARIA_PRESSED, 'false');
+      },
+    );
   });
 
-  it('shows the placeholder while empty', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        placeholder="No posts yet."
-      />,
-    );
+  describe('when disabled', () => {
+    beforeEach(() => {
+      setup({ mode: CONTROL_MODE.DISABLED });
+    });
 
-    expect(screen.getByText('No posts yet.')).toBeVisible();
+    it('hides the formatting toolbar', () => {
+      const boldButton = screen.queryByRole('button', { name: t('bold') });
+
+      expect(boldButton).not.toBeInTheDocument();
+    });
+
+    it('conveys its disabled state to assistive technology', () => {
+      const field = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+      expect(field).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
+      expect(field).not.toHaveAttribute('tabindex');
+    });
   });
 
-  it('marks the field invalid and points it at its description', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body', isInvalid: true }}
-        aria-describedby="body-error"
-      />,
-    );
+  it('announces a read-only editor as focusable and read-only, with no toolbar', () => {
+    setup({ mode: CONTROL_MODE.READ_ONLY });
 
-    const field = screen.getByRole('textbox', { name: 'Body' });
-    expect(field).toHaveAttribute('aria-invalid', 'true');
-    expect(field).toHaveAttribute('aria-describedby', 'body-error');
-  });
+    const field = screen.getByRole('textbox', { name: MOCK_LABEL });
+    const toolbarButton = screen.queryByRole('button');
 
-  it('hides the formatting toolbar when disabled', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        mode={CONTROL_MODE.DISABLED}
-      />,
-    );
-
-    expect(
-      screen.queryByRole('button', { name: 'Bold' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('conveys its disabled state to assistive technology as a dimmed text field, not only visually', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        mode={CONTROL_MODE.DISABLED}
-      />,
-    );
-
-    const field = screen.getByRole('textbox', { name: 'Body' });
-    expect(field).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
-    expect(field).not.toHaveAttribute('tabindex');
-  });
-
-  it('announces a read-only editor as a focusable, read-only text field with no toolbar', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-        mode={CONTROL_MODE.READ_ONLY}
-      />,
-    );
-
-    const field = screen.getByRole('textbox', { name: 'Body' });
     expect(field).toHaveAttribute('aria-readonly', 'true');
     expect(field).not.toHaveAttribute(ARIA_DISABLED);
     expect(field).toHaveAttribute('tabindex', '0');
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(toolbarButton).not.toBeInTheDocument();
   });
 
-  it('keeps its own multiline textbox role and carries no aria-disabled attribute when enabled', () => {
-    render(
-      <PortableTextEditor
-        initialValue={[]}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
+  it('shows the placeholder while empty', () => {
+    setup({ placeholder: MOCK_PLACEHOLDER });
 
-    const field = screen.getByRole('textbox', { name: 'Body' });
-    expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
-    expect(field).not.toHaveAttribute(ARIA_DISABLED);
+    const placeholder = screen.getByText(MOCK_PLACEHOLDER);
+
+    expect(placeholder).toBeVisible();
   });
 
-  it('renders an authored link with a safe href as a real, working anchor', async () => {
-    render(
-      <PortableTextEditor
-        initialValue={linkBody('https://example.com')}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole('link', { name: 'click me' })).toHaveAttribute(
-        'href',
-        'https://example.com/',
-      );
+  it('marks the field invalid and points it at its description', () => {
+    setup({
+      field: { label: MOCK_LABEL, isInvalid: true },
+      'aria-describedby': MOCK_DESCRIPTION_ID,
     });
+
+    const field = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(field).toHaveAttribute('aria-describedby', MOCK_DESCRIPTION_ID);
   });
 
-  it('strips a javascript: href instead of rendering it as a working anchor', async () => {
-    render(
-      <PortableTextEditor
-        initialValue={linkBody('javascript:alert(1)')}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
+  it('renders an authored link with a safe href as a working anchor', async () => {
+    setup({ initialValue: mockLinkBody(MOCK_URL) });
 
-    await waitFor(() => {
-      expect(screen.getByText('click me')).toBeVisible();
-    });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const link = await screen.findByRole('link', { name: MOCK_LINK_TEXT });
+
+    expect(link).toHaveAttribute('href', MOCK_URL);
   });
 
-  it('strips a data: href instead of rendering it as a working anchor', async () => {
-    render(
-      <PortableTextEditor
-        initialValue={linkBody('data:text/html,<script>alert(1)</script>')}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    '  JaVaScRiPt:alert(1)',
+  ])('strips the unsafe href %j from an authored link', async (href) => {
+    setup({ initialValue: mockLinkBody(href) });
 
-    await waitFor(() => {
-      expect(screen.getByText('click me')).toBeVisible();
-    });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
+    const linkText = await screen.findByText(MOCK_LINK_TEXT);
+    const link = screen.queryByRole('link');
 
-  it('strips a case- and whitespace-obfuscated javascript: href', async () => {
-    render(
-      <PortableTextEditor
-        initialValue={linkBody('  JaVaScRiPt:alert(1)')}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('click me')).toBeVisible();
-    });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(linkText).toBeVisible();
+    expect(link).not.toBeInTheDocument();
   });
 
   it('renders bulleted and numbered list items inside real list containers', async () => {
-    render(
-      <PortableTextEditor
-        initialValue={listBody}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+    setup({
+      initialValue: [
+        mockTextBlock({ text: MOCK_ITEM_ONE, listItem: BULLET_LIST_ITEM }),
+        mockTextBlock({ text: MOCK_ITEM_TWO, listItem: BULLET_LIST_ITEM }),
+        mockTextBlock({ text: MOCK_ITEM_THREE, listItem: NUMBER_LIST_ITEM }),
+        mockTextBlock({ text: MOCK_ITEM_FOUR, listItem: NUMBER_LIST_ITEM }),
+      ],
     });
 
+    const items = await screen.findAllByRole('listitem');
     const lists = screen.getAllByRole('list');
+    const [, , firstNumberedList, secondNumberedList] = lists;
+
+    expect(items.map((item) => item.textContent)).toEqual([
+      MOCK_ITEM_ONE,
+      MOCK_ITEM_TWO,
+      MOCK_ITEM_THREE,
+      MOCK_ITEM_FOUR,
+    ]);
     expect(lists).toHaveLength(4);
-    for (const list of lists) {
-      expect(list).toBeVisible();
-    }
-    expect(lists[2]).toHaveAttribute('start', '1');
-    expect(lists[3]).toHaveAttribute('start', '2');
-
-    const items = screen.getAllByRole('listitem');
-    for (const item of items) {
-      expect(item).toBeVisible();
-    }
-
-    expect(screen.getByText(BULLET_ONE)).toBeVisible();
-    expect(screen.getByText(BULLET_TWO)).toBeVisible();
-    expect(screen.getByText(NUMBER_ONE)).toBeVisible();
-    expect(screen.getByText(NUMBER_TWO)).toBeVisible();
+    expect(firstNumberedList).toHaveAttribute('start', '1');
+    expect(secondNumberedList).toHaveAttribute('start', '2');
   });
 
-  it('conveys the true set size and position of a four-item list despite the one-list-per-item DOM', async () => {
-    render(
-      <PortableTextEditor
-        initialValue={fourItemBulletBody}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    const items = await waitFor(() => {
-      const found = screen.getAllByRole('listitem');
-      expect(found).toHaveLength(4);
-      return found;
+  it('conveys the set size and position of each item in a four-item list', async () => {
+    setup({
+      initialValue: [
+        MOCK_ITEM_ONE,
+        MOCK_ITEM_TWO,
+        MOCK_ITEM_THREE,
+        MOCK_ITEM_FOUR,
+      ].map((text) => mockTextBlock({ text, listItem: BULLET_LIST_ITEM })),
     });
 
-    items.forEach((item, index) => {
-      expect(item).toHaveAttribute(ARIA_SETSIZE, '4');
-      expect(item).toHaveAttribute(ARIA_POSINSET, String(index + 1));
-    });
+    const items = await screen.findAllByRole('listitem');
+    const positions = items.map((item) => [
+      item.getAttribute(ARIA_POSINSET),
+      item.getAttribute(ARIA_SETSIZE),
+    ]);
+
+    expect(positions).toEqual([
+      ['1', '4'],
+      ['2', '4'],
+      ['3', '4'],
+      ['4', '4'],
+    ]);
   });
 
-  it("continues an outer numbered list's position past a nested sub-list instead of restarting it", async () => {
-    render(
-      <PortableTextEditor
-        initialValue={numberedListWithNestedBulletBody}
-        onChange={() => {}}
-        field={{ label: 'Body' }}
-      />,
-    );
-
-    const items = await waitFor(() => {
-      const found = screen.getAllByRole('listitem');
-      expect(found).toHaveLength(5);
-      return found;
+  it('continues an outer numbered list past a nested sub-list', async () => {
+    setup({
+      initialValue: [
+        mockTextBlock({ text: MOCK_ITEM_ONE, listItem: NUMBER_LIST_ITEM }),
+        mockTextBlock({ text: MOCK_ITEM_TWO, listItem: NUMBER_LIST_ITEM }),
+        mockTextBlock({
+          text: MOCK_ITEM_THREE,
+          listItem: BULLET_LIST_ITEM,
+          level: 2,
+        }),
+        mockTextBlock({
+          text: MOCK_ITEM_FOUR,
+          listItem: BULLET_LIST_ITEM,
+          level: 2,
+        }),
+        mockTextBlock({ text: MOCK_ITEM_FIVE, listItem: NUMBER_LIST_ITEM }),
+      ],
     });
 
-    const outerThirdItem = items.find((item) =>
-      within(item).queryByText(OUTER_THREE),
-    );
-    const nestedFirstItem = items.find((item) =>
-      within(item).queryByText(NESTED_ONE),
-    );
-    const nestedSecondItem = items.find((item) =>
-      within(item).queryByText(NESTED_TWO),
-    );
+    const items = await screen.findAllByRole('listitem');
+    const findItem = (text: string) =>
+      items.find((item) => within(item).queryByText(text));
+    const outerThirdItem = findItem(MOCK_ITEM_FIVE);
+    const nestedFirstItem = findItem(MOCK_ITEM_THREE);
+    const nestedSecondItem = findItem(MOCK_ITEM_FOUR);
 
     expect(outerThirdItem).toHaveAttribute(ARIA_POSINSET, '3');
     expect(outerThirdItem).toHaveAttribute(ARIA_SETSIZE, '3');

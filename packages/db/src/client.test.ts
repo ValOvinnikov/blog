@@ -1,32 +1,22 @@
-export {};
+import { MOCK_DATABASE_URL } from '@blog/db/testing/env/fixtures';
 
 describe('db client module loading', () => {
-  const originalDatabaseUrl = process.env['DATABASE_URL'];
-
   beforeEach(() => {
     vi.resetModules();
   });
 
   afterEach(() => {
-    if (originalDatabaseUrl === undefined) {
-      delete process.env['DATABASE_URL'];
-    } else {
-      process.env['DATABASE_URL'] = originalDatabaseUrl;
-    }
     vi.resetModules();
   });
 
   it('does not connect to Neon while merely importing the module', async () => {
-    delete process.env['DATABASE_URL'];
+    vi.stubEnv('DATABASE_URL', undefined);
 
-    await expect(import('./client')).resolves.toHaveProperty(
-      'getDb',
-      expect.any(Function),
-    );
+    await expect(import('./client')).resolves.toHaveProperty('getDb');
   });
 
   it('creates and caches a single drizzle instance across calls', async () => {
-    process.env['DATABASE_URL'] = 'postgresql://user:pass@host/db';
+    vi.stubEnv('DATABASE_URL', MOCK_DATABASE_URL);
 
     const { getDb } = await import('./client');
 

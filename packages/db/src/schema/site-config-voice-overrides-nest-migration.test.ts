@@ -1,112 +1,72 @@
-import {
-  DENSITY,
-  FONT_CHOICE,
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  RADIUS_SCALE,
-  type TLocaleIsoCode,
-} from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import type * as schema from '@blog/db/schema';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
-  listMigrationFiles,
+  applyMigrationsBefore,
+  insertReplayVoiceOverrides,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  readReplayVoiceOverrides,
 } from '@blog/db/testing/migration-files';
-import { eq, sql } from 'drizzle-orm';
+import { faker } from '@faker-js/faker';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-import { siteConfig } from './site-config';
+faker.seed(6023);
 
-const GERMAN_NOT_FOUND_HEADING = 'Nicht gefunden';
-const ENGLISH_NOT_FOUND_HEADING = 'Lost the plot?';
 const NEST_MIGRATION = '0037_nest_voice_overrides_by_locale.sql';
-
-async function setUpDbBeforeNestMigration() {
-  const db = await createEmptyTestDb();
-
-  for (const file of listMigrationFiles().filter(
-    (name) => name < NEST_MIGRATION,
-  )) {
-    await applyMigrationFile(db, file);
-  }
-
-  return db;
-}
-
-type TDb = Awaited<ReturnType<typeof setUpDbBeforeNestMigration>>;
-
-async function seedTenantWithOverrides(
-  db: TDb,
-  locale: TLocaleIsoCode,
-  voiceOverrides: Record<string, unknown>,
-) {
-  const { rows } = await db.execute<{ id: string }>(sql`
-    INSERT INTO tenants (name, primary_domain, locale, plan, status)
-    VALUES (
-      ${`tenant-${locale}`}, ${`${locale}.example.com`}, ${locale},
-      ${TENANT_PLAN.FREE}, ${TENANT_STATUS.ACTIVE}
-    )
-    RETURNING id
-  `);
-  const [tenant] = rows;
-  if (!tenant) throw new Error('failed to seed a tenant row');
-
-  await db.execute(sql`
-    INSERT INTO site_config
-      (tenant_id, preset, accent_hue, heading_font, body_font, radius_scale, density, voice_overrides)
-    VALUES (
-      ${tenant.id}, ${PRESET_ID.EDITORIAL}, 28, ${FONT_CHOICE.FRAUNCES}, ${FONT_CHOICE.INTER},
-      ${RADIUS_SCALE.SM}, ${DENSITY.COMPACT}, ${JSON.stringify(voiceOverrides)}::jsonb
-    )
-  `);
-
-  return tenant.id;
-}
-
-async function readVoiceOverrides(db: TDb, tenantId: string) {
-  const [row] = await db
-    .select({ voiceOverridesByLocale: siteConfig.voiceOverridesByLocale })
-    .from(siteConfig)
-    .where(eq(siteConfig.tenantId, tenantId));
-  if (!row) throw new Error('expected a site_config row');
-  return row.voiceOverridesByLocale;
-}
-
-const richValue = [
+const MOCK_GERMAN_HEADING = faker.lorem.words(2);
+const MOCK_ENGLISH_HEADING = faker.lorem.words(2);
+const MOCK_FRENCH_HEADING = faker.lorem.words(2);
+const MOCK_RICH_VALUE = [
   {
     _type: 'block',
-    _key: 'block-1',
+    _key: faker.string.alphanumeric(8),
     style: 'normal',
-    children: [{ _type: 'span', _key: 'span-1', text: 'Nothing yet.' }],
+    children: [
+      {
+        _type: 'span',
+        _key: faker.string.alphanumeric(8),
+        text: faker.lorem.sentence(),
+      },
+    ],
   },
 ];
 
 describe(`${NEST_MIGRATION} (voiceOverrides nested under the default locale)`, () => {
+  let db: PgliteDatabase<typeof schema>;
+
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+    await applyMigrationsBefore(db, NEST_MIGRATION);
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
+
   it(
     "nests every tenant's overrides under its own default locale, losing nothing",
     async () => {
-      const db = await setUpDbBeforeNestMigration();
-      const germanTenant = await seedTenantWithOverrides(
+      const germanTenantId = await insertReplayVoiceOverrides(
         db,
+        {
+          notFoundHeading: MOCK_GERMAN_HEADING,
+          blogListEmpty: MOCK_RICH_VALUE,
+        },
         LOCALE_ISO_CODES.DE,
-        { notFoundHeading: GERMAN_NOT_FOUND_HEADING, blogListEmpty: richValue },
       );
-      const englishTenant = await seedTenantWithOverrides(
+      const englishTenantId = await insertReplayVoiceOverrides(
         db,
+        { notFoundHeading: MOCK_ENGLISH_HEADING },
         LOCALE_ISO_CODES.EN,
-        { notFoundHeading: ENGLISH_NOT_FOUND_HEADING },
       );
 
       await applyMigrationFile(db, NEST_MIGRATION);
 
-      expect(await readVoiceOverrides(db, germanTenant)).toEqual({
+      expect(await readReplayVoiceOverrides(db, germanTenantId)).toEqual({
         [LOCALE_ISO_CODES.DE]: {
-          notFoundHeading: GERMAN_NOT_FOUND_HEADING,
-          blogListEmpty: richValue,
+          notFoundHeading: MOCK_GERMAN_HEADING,
+          blogListEmpty: MOCK_RICH_VALUE,
         },
       });
-      expect(await readVoiceOverrides(db, englishTenant)).toEqual({
-        [LOCALE_ISO_CODES.EN]: { notFoundHeading: ENGLISH_NOT_FOUND_HEADING },
+      expect(await readReplayVoiceOverrides(db, englishTenantId)).toEqual({
+        [LOCALE_ISO_CODES.EN]: { notFoundHeading: MOCK_ENGLISH_HEADING },
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -115,16 +75,11 @@ describe(`${NEST_MIGRATION} (voiceOverrides nested under the default locale)`, (
   it(
     'leaves a tenant with no overrides as an empty map',
     async () => {
-      const db = await setUpDbBeforeNestMigration();
-      const tenantId = await seedTenantWithOverrides(
-        db,
-        LOCALE_ISO_CODES.EN,
-        {},
-      );
+      const tenantId = await insertReplayVoiceOverrides(db, {});
 
       await applyMigrationFile(db, NEST_MIGRATION);
 
-      expect(await readVoiceOverrides(db, tenantId)).toEqual({});
+      expect(await readReplayVoiceOverrides(db, tenantId)).toEqual({});
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
@@ -132,16 +87,17 @@ describe(`${NEST_MIGRATION} (voiceOverrides nested under the default locale)`, (
   it(
     'does not nest a second time when re-applied',
     async () => {
-      const db = await setUpDbBeforeNestMigration();
-      const tenantId = await seedTenantWithOverrides(db, LOCALE_ISO_CODES.FR, {
-        notFoundHeading: 'Introuvable',
-      });
+      const tenantId = await insertReplayVoiceOverrides(
+        db,
+        { notFoundHeading: MOCK_FRENCH_HEADING },
+        LOCALE_ISO_CODES.FR,
+      );
 
       await applyMigrationFile(db, NEST_MIGRATION);
       await applyMigrationFile(db, NEST_MIGRATION);
 
-      expect(await readVoiceOverrides(db, tenantId)).toEqual({
-        [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
+      expect(await readReplayVoiceOverrides(db, tenantId)).toEqual({
+        [LOCALE_ISO_CODES.FR]: { notFoundHeading: MOCK_FRENCH_HEADING },
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,

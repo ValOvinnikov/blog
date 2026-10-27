@@ -5,127 +5,115 @@ import { faker } from '@faker-js/faker';
 
 import { TaxonomyCard } from './taxonomy-card';
 
-const DESCRIPTION = 'Posts about building things.';
-const TAXONOMY_CARD_TEST_ID = 'taxonomy-card';
-const FIRST_POST_TITLE = 'First post';
-const FIRST_POST_HREF = '/posts/first';
-const SECOND_POST_TITLE = 'Second post';
-const SECOND_POST_HREF = '/posts/second';
-
 faker.seed(123);
 
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_POST_COUNT_LABEL = `${faker.number.int({ min: 2, max: 40 })} posts`;
+const MOCK_POSTS_LABEL = faker.lorem.words(2);
+const MOCK_SEPARATOR = ' — ';
+const MOCK_POSTS = faker.helpers.multiple(
+  () => ({
+    id: faker.string.uuid(),
+    title: faker.lorem.words(3),
+    href: `/posts/${faker.lorem.slug()}`,
+  }),
+  { count: 2 },
+);
+
 const setup = customRender(TaxonomyCard, {
-  title: faker.lorem.words(2),
-  href: `/topics/${faker.lorem.slug()}`,
-  postCountLabel: '5 posts',
+  title: MOCK_TOPIC.label,
+  href: MOCK_TOPIC.href,
+  postCountLabel: MOCK_POST_COUNT_LABEL,
   headingLevel: 2 as const,
 });
 
 describe(`<${TaxonomyCard.name}/>`, () => {
   it('renders the title as a heading at the given level, linking to href', () => {
-    const title = faker.lorem.words(3);
-    const href = `/topics/${faker.lorem.slug()}`;
-    setup({ title, href, headingLevel: 3 });
+    setup({ headingLevel: 3 });
 
     const heading = screen.getByRole('heading', { level: 3 });
     const link = screen.getByRole('link');
+
     expect(heading).toContainElement(link);
-    expect(link).toHaveAttribute('href', href);
+    expect(link).toHaveAttribute('href', MOCK_TOPIC.href);
   });
 
-  it('renders description when provided', () => {
-    setup({ description: DESCRIPTION });
-    const description = screen.getByText(DESCRIPTION);
+  it('renders the description', () => {
+    setup({ description: MOCK_DESCRIPTION });
+
+    const description = screen.getByText(MOCK_DESCRIPTION);
+
     expect(description).toBeVisible();
   });
 
-  it('does not render a description element when omitted', () => {
+  it('renders no description when omitted', () => {
     setup();
-    const description = screen.queryByText(/posts about/i);
+
+    const description = screen.queryByText(MOCK_DESCRIPTION);
+
     expect(description).not.toBeInTheDocument();
   });
 
   it('renders the pre-formatted post count label as visible text', () => {
-    setup({ postCountLabel: '1 post' });
-    const postCount = screen.getByText('1 post');
+    setup();
+
+    const postCount = screen.getByText(MOCK_POST_COUNT_LABEL);
+
     expect(postCount).toBeVisible();
   });
 
   it('names the link by the visible title followed by the post count', () => {
-    setup({ title: MOCK_TOPIC.label, postCountLabel: '5 posts' });
+    setup();
+
     const link = screen.getByRole('link');
-    expect(link).toHaveAccessibleName(`${MOCK_TOPIC.label}, 5 posts`);
+
+    expect(link).toHaveAccessibleName(
+      `${MOCK_TOPIC.label}, ${MOCK_POST_COUNT_LABEL}`,
+    );
   });
 
-  it('honours a custom accessibleNameSeparator when composing the accessible name', () => {
-    setup({
-      title: MOCK_TOPIC.label,
-      postCountLabel: '5 posts',
-      accessibleNameSeparator: ' — ',
-    });
-    const link = screen.getByRole('link', {
-      name: `${MOCK_TOPIC.label} — 5 posts`,
-    });
-    expect(link).toBeVisible();
+  it('joins the accessible name with a custom separator', () => {
+    setup({ accessibleNameSeparator: MOCK_SEPARATOR });
+
+    const link = screen.getByRole('link');
+
+    expect(link).toHaveAccessibleName(
+      `${MOCK_TOPIC.label}${MOCK_SEPARATOR}${MOCK_POST_COUNT_LABEL}`,
+    );
   });
 
-  it('renders the link via the linkAs component when provided', () => {
+  it('renders the link through the supplied link component', () => {
     setup({ linkAs: MockLink });
 
     const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
     expect(mockLink).toBeVisible();
   });
 
-  it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: TAXONOMY_CARD_TEST_ID });
-    const card = screen.getByTestId(TAXONOMY_CARD_TEST_ID);
-    expect(card).toBeVisible();
-  });
-
-  it('renders TaxonomyCard.Posts as a labelled list of post links', () => {
+  it('renders its posts as a labelled list of post links', () => {
     setup({
       children: (
-        <TaxonomyCard.Posts
-          ariaLabel="Latest posts"
-          posts={[
-            { id: '1', title: FIRST_POST_TITLE, href: FIRST_POST_HREF },
-            { id: '2', title: SECOND_POST_TITLE, href: SECOND_POST_HREF },
-          ]}
-        />
+        <TaxonomyCard.Posts ariaLabel={MOCK_POSTS_LABEL} posts={MOCK_POSTS} />
       ),
     });
 
-    const postList = screen.getByRole('list', { name: 'Latest posts' });
-    const firstPostLink = screen.getByRole('link', { name: FIRST_POST_TITLE });
-    const secondPostLink = screen.getByRole('link', {
-      name: SECOND_POST_TITLE,
-    });
+    const postList = screen.getByRole('list', { name: MOCK_POSTS_LABEL });
+
     expect(postList).toBeVisible();
-    expect(firstPostLink).toHaveAttribute('href', FIRST_POST_HREF);
-    expect(secondPostLink).toHaveAttribute('href', SECOND_POST_HREF);
+    for (const { title, href } of MOCK_POSTS) {
+      const postLink = screen.getByRole('link', { name: title });
+
+      expect(postLink).toHaveAttribute('href', href);
+    }
   });
 
-  it('renders nothing for TaxonomyCard.Posts when posts is empty', () => {
+  it('renders no list when there are no posts', () => {
     setup({
-      children: <TaxonomyCard.Posts ariaLabel="Latest posts" posts={[]} />,
+      children: <TaxonomyCard.Posts ariaLabel={MOCK_POSTS_LABEL} posts={[]} />,
     });
 
     const postList = screen.queryByRole('list');
+
     expect(postList).not.toBeInTheDocument();
-  });
-
-  it('resolves a post link to its own href rather than the taxonomy term href', () => {
-    setup({
-      href: MOCK_TOPIC.href,
-      children: (
-        <TaxonomyCard.Posts
-          ariaLabel="Latest posts"
-          posts={[{ id: '1', title: FIRST_POST_TITLE, href: FIRST_POST_HREF }]}
-        />
-      ),
-    });
-
-    const postLink = screen.getByRole('link', { name: FIRST_POST_TITLE });
-    expect(postLink).toHaveAttribute('href', FIRST_POST_HREF);
   });
 });

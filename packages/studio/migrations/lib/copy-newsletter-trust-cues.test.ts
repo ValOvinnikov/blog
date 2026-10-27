@@ -1,9 +1,15 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { copyNewsletterTrustCues } from './copy-newsletter-trust-cues';
 
+faker.seed(10);
+
 const { EN } = LOCALE_ISO_CODES;
+
+const MOCK_FIRST_CUE = faker.lorem.words();
+const MOCK_SECOND_CUE = faker.lorem.words();
 
 const trustCue = (key: string, text: string) => ({
   _key: key,
@@ -21,30 +27,31 @@ const trustCue = (key: string, text: string) => ({
 describe(copyNewsletterTrustCues, () => {
   it('copies the settings trust cues into the module in the default language', () => {
     expect(
-      copyNewsletterTrustCues({}, ['No spam', 'Unsubscribe anytime']),
+      copyNewsletterTrustCues({}, [MOCK_FIRST_CUE, MOCK_SECOND_CUE]),
     ).toEqual([
       at(
         'trustCues',
         set([
-          trustCue('trust-cue-1', 'No spam'),
-          trustCue('trust-cue-2', 'Unsubscribe anytime'),
+          trustCue('trust-cue-1', MOCK_FIRST_CUE),
+          trustCue('trust-cue-2', MOCK_SECOND_CUE),
         ]),
       ),
     ]);
   });
 
   it('copies into a module whose trust cue list is empty', () => {
-    expect(copyNewsletterTrustCues({ trustCues: [] }, ['No spam'])).toEqual([
-      at('trustCues', set([trustCue('trust-cue-1', 'No spam')])),
+    expect(
+      copyNewsletterTrustCues({ trustCues: [] }, [MOCK_FIRST_CUE]),
+    ).toEqual([
+      at('trustCues', set([trustCue('trust-cue-1', MOCK_FIRST_CUE)])),
     ]);
   });
 
   it('leaves a module that already has trust cues untouched', () => {
+    const existingCues = [trustCue(faker.string.uuid(), MOCK_SECOND_CUE)];
+
     expect(
-      copyNewsletterTrustCues(
-        { trustCues: [trustCue('existing', 'Weekly digest')] },
-        ['No spam'],
-      ),
+      copyNewsletterTrustCues({ trustCues: existingCues }, [MOCK_FIRST_CUE]),
     ).toBeUndefined();
   });
 

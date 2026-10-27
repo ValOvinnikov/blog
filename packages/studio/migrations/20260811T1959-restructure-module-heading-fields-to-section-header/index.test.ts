@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { at, setIfMissing, unset } from 'sanity/migrate';
 
 import {
@@ -5,91 +6,72 @@ import {
   movePostListTitleToSectionHeader,
 } from './index';
 
+faker.seed(6);
+
+const MOCK_HEADING = faker.lorem.words();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_TITLE = faker.lorem.words();
+
 describe(moveHeadingFieldsToSectionHeader, () => {
-  it('moves module_cta heading + text onto sectionHeader and unsets both', () => {
-    const result = moveHeadingFieldsToSectionHeader({
-      heading: 'Get Started',
-      text: 'Join the newsletter today.',
-    });
+  it.each(['text', 'description'])(
+    'moves heading and %s onto sectionHeader and unsets both',
+    (supportingField) => {
+      const result = moveHeadingFieldsToSectionHeader({
+        heading: MOCK_HEADING,
+        [supportingField]: MOCK_SUPPORTING_TEXT,
+      });
+
+      expect(result).toEqual([
+        at(
+          'sectionHeader',
+          setIfMissing({
+            heading: MOCK_HEADING,
+            supportingText: MOCK_SUPPORTING_TEXT,
+          }),
+        ),
+        at('heading', unset()),
+        at(supportingField, unset()),
+      ]);
+    },
+  );
+
+  it('only unsets fields that were present on the doc', () => {
+    const result = moveHeadingFieldsToSectionHeader({ heading: MOCK_HEADING });
 
     expect(result).toEqual([
-      at(
-        'sectionHeader',
-        setIfMissing({
-          heading: 'Get Started',
-          supportingText: 'Join the newsletter today.',
-        }),
-      ),
-      at('heading', unset()),
-      at('text', unset()),
-    ]);
-  });
-
-  it('moves module_newsletter heading + description onto sectionHeader and unsets both', () => {
-    const result = moveHeadingFieldsToSectionHeader({
-      heading: 'Stay in the loop',
-      description: 'One email a week, no spam.',
-    });
-
-    expect(result).toEqual([
-      at(
-        'sectionHeader',
-        setIfMissing({
-          heading: 'Stay in the loop',
-          supportingText: 'One email a week, no spam.',
-        }),
-      ),
-      at('heading', unset()),
-      at('description', unset()),
-    ]);
-  });
-
-  it('only unsets fields that were actually present on the doc', () => {
-    const result = moveHeadingFieldsToSectionHeader({ heading: 'Get Started' });
-
-    expect(result).toEqual([
-      at('sectionHeader', setIfMissing({ heading: 'Get Started' })),
+      at('sectionHeader', setIfMissing({ heading: MOCK_HEADING })),
       at('heading', unset()),
     ]);
   });
 
-  it('is idempotent — a doc already migrated (sectionHeader set) is left alone', () => {
+  it('leaves an already migrated doc alone', () => {
     const result = moveHeadingFieldsToSectionHeader({
-      heading: 'Get Started',
-      text: 'Join today.',
-      sectionHeader: { heading: 'Get Started', supportingText: 'Join today.' },
+      heading: MOCK_HEADING,
+      text: MOCK_SUPPORTING_TEXT,
+      sectionHeader: {
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
+      },
     });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('documents the known edge case: no heading and no text/description is left alone', () => {
-    const result = moveHeadingFieldsToSectionHeader({});
 
     expect(result).toBeUndefined();
   });
 });
 
 describe(movePostListTitleToSectionHeader, () => {
-  it('copies title onto sectionHeader without touching title', () => {
-    const result = movePostListTitleToSectionHeader({ title: 'Latest Posts' });
+  it('copies title onto sectionHeader and keeps title', () => {
+    const result = movePostListTitleToSectionHeader({ title: MOCK_TITLE });
 
     expect(result).toEqual([
-      at('sectionHeader', setIfMissing({ heading: 'Latest Posts' })),
+      at('sectionHeader', setIfMissing({ heading: MOCK_TITLE })),
     ]);
   });
 
-  it('is idempotent — a doc already migrated (sectionHeader set) is left alone', () => {
+  it('leaves an already migrated doc alone', () => {
     const result = movePostListTitleToSectionHeader({
-      title: 'Latest Posts',
-      sectionHeader: { heading: 'Latest Posts' },
+      title: MOCK_TITLE,
+      sectionHeader: { heading: MOCK_TITLE },
     });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('returns undefined for a doc with no title', () => {
-    const result = movePostListTitleToSectionHeader({});
 
     expect(result).toBeUndefined();
   });

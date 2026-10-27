@@ -6,12 +6,24 @@ import {
   mockRawTimelineItem,
   mockRawTimelineModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockRawParagraphTextBlock } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
-import { toTimelineModule } from './transformer';
+import { toTimelineModule, type TRawTimelineModule } from './transformer';
 
-const FIRST_ID = 'block-timeline-a';
-const SECOND_ID = 'block-timeline-b';
-const FIRST_MARKER = '2019';
+type TRawTimelineItemBody = NonNullable<
+  NonNullable<TRawTimelineModule['items']>[number]['body']
+>[number];
+
+faker.seed(5);
+
+const MOCK_FIRST_ID = faker.string.uuid();
+const MOCK_SECOND_ID = faker.string.uuid();
+const MOCK_FIRST_MARKER = faker.lorem.word();
+const MOCK_SECOND_MARKER = faker.lorem.word();
+const MOCK_FIRST_HEADING = faker.lorem.words(2);
+const MOCK_SECOND_HEADING = faker.lorem.words(2);
+const MOCK_BODY_TEXT = faker.lorem.sentence();
 
 describe(toTimelineModule, () => {
   it('maps a Labelled module in authored order, with each item marker and heading', () => {
@@ -20,14 +32,14 @@ describe(toTimelineModule, () => {
       orientation: TIMELINE_ORIENTATION.HORIZONTAL,
       items: [
         mockRawTimelineItem({
-          _key: FIRST_ID,
-          marker: FIRST_MARKER,
-          heading: 'Founded',
+          _key: MOCK_FIRST_ID,
+          marker: MOCK_FIRST_MARKER,
+          heading: MOCK_FIRST_HEADING,
         }),
         mockRawTimelineItem({
-          _key: SECOND_ID,
-          marker: '2023',
-          heading: 'Series A',
+          _key: MOCK_SECOND_ID,
+          marker: MOCK_SECOND_MARKER,
+          heading: MOCK_SECOND_HEADING,
         }),
       ],
     });
@@ -39,11 +51,36 @@ describe(toTimelineModule, () => {
     expect(
       module.items.map(({ id, marker, heading }) => ({ id, marker, heading })),
     ).toEqual([
-      { id: FIRST_ID, marker: FIRST_MARKER, heading: 'Founded' },
-      { id: SECOND_ID, marker: '2023', heading: 'Series A' },
+      {
+        id: MOCK_FIRST_ID,
+        marker: MOCK_FIRST_MARKER,
+        heading: MOCK_FIRST_HEADING,
+      },
+      {
+        id: MOCK_SECOND_ID,
+        marker: MOCK_SECOND_MARKER,
+        heading: MOCK_SECOND_HEADING,
+      },
     ]);
+  });
+
+  it('maps an item body into portable text', () => {
+    const raw = mockRawTimelineModule({
+      items: [
+        mockRawTimelineItem({
+          body: [
+            mockRawParagraphTextBlock<TRawTimelineItemBody>({
+              text: MOCK_BODY_TEXT,
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const module = toTimelineModule(raw);
+
     expect(module.items[0]?.body?.[0]?.children?.[0]?.text).toBe(
-      'The project begins.',
+      MOCK_BODY_TEXT,
     );
   });
 
@@ -51,16 +88,16 @@ describe(toTimelineModule, () => {
     const raw = mockRawTimelineModule({
       markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
       items: [
-        mockRawTimelineItem({ _key: FIRST_ID, marker: FIRST_MARKER }),
-        mockRawTimelineItem({ _key: SECOND_ID, marker: null }),
+        mockRawTimelineItem({ _key: MOCK_FIRST_ID, marker: MOCK_FIRST_MARKER }),
+        mockRawTimelineItem({ _key: MOCK_SECOND_ID, marker: null }),
       ],
     });
 
     const module = toTimelineModule(raw);
 
     expect(module.items.map(({ id, marker }) => ({ id, marker }))).toEqual([
-      { id: FIRST_ID, marker: undefined },
-      { id: SECOND_ID, marker: undefined },
+      { id: MOCK_FIRST_ID, marker: undefined },
+      { id: MOCK_SECOND_ID, marker: undefined },
     ]);
   });
 });

@@ -1,5 +1,6 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
 import {
@@ -31,11 +32,13 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+faker.seed(5998);
+
 const takeSlotMock = vi.mocked(takeCreateSiteSlot);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const MOCK_CLIENT_KEY = '203.0.113.7';
-const MOCK_NOW = new Date('2026-10-21T09:00:00Z');
+const MOCK_CLIENT_KEY = faker.internet.ipv4();
+const MOCK_NOW = faker.date.past({ refDate: new Date('2026-10-21T09:00:00Z') });
 const MOCK_SIGN_UP = {
   clientKey: MOCK_CLIENT_KEY,
   email: MOCK_BLOCKED_OWNER_EMAIL,
@@ -45,7 +48,6 @@ describe(admitCreateSite, () => {
   beforeEach(() => {
     isSignupBlockedMock.mockReset().mockResolvedValue(okResult(false));
     takeSlotMock.mockReset().mockResolvedValue(true);
-    loggerErrorMock.mockReset();
   });
 
   it('admits an email that is not blocked while a slot is free', async () => {
@@ -65,7 +67,7 @@ describe(admitCreateSite, () => {
     expect(takeSlotMock).not.toHaveBeenCalled();
   });
 
-  it('refuses an email that is not blocked once the daily limits are spent', async () => {
+  it('refuses an unblocked email once the daily limits are spent', async () => {
     takeSlotMock.mockResolvedValue(false);
 
     const admitted = await admitCreateSite(MOCK_SIGN_UP);

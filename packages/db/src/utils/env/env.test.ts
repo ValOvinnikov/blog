@@ -1,21 +1,4 @@
-export {};
-
-const ENV_KEYS = ['DATABASE_URL', 'SKIP_ENV_VALIDATION'] as const;
-
-const originalEnv = Object.fromEntries(
-  ENV_KEYS.map((key) => [key, process.env[key]]),
-) as Record<(typeof ENV_KEYS)[number], string | undefined>;
-
-function restoreEnv(): void {
-  for (const key of ENV_KEYS) {
-    const value = originalEnv[key];
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
-}
+import { MOCK_DATABASE_URL } from '@blog/db/testing/env/fixtures';
 
 async function importEnv(): Promise<typeof import('./env')> {
   vi.resetModules();
@@ -24,19 +7,15 @@ async function importEnv(): Promise<typeof import('./env')> {
 
 describe('env', () => {
   beforeEach(() => {
-    delete process.env['SKIP_ENV_VALIDATION'];
+    vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
   });
 
-  afterEach(() => {
-    restoreEnv();
-  });
-
-  it('parses a valid environment and exposes the typed pooled connection string', async () => {
-    process.env['DATABASE_URL'] = 'postgresql://user:pass@host/db';
+  it('parses a valid environment and exposes the pooled connection string', async () => {
+    vi.stubEnv('DATABASE_URL', MOCK_DATABASE_URL);
 
     const { env } = await importEnv();
 
-    expect(env.DATABASE_URL).toBe('postgresql://user:pass@host/db');
+    expect(env.DATABASE_URL).toBe(MOCK_DATABASE_URL);
   });
 
   describe('invalid environment', () => {
@@ -49,21 +28,21 @@ describe('env', () => {
     });
 
     it('throws when DATABASE_URL is missing', async () => {
-      delete process.env['DATABASE_URL'];
+      vi.stubEnv('DATABASE_URL', undefined);
 
       await expect(importEnv()).rejects.toThrow();
     });
 
-    it('throws when DATABASE_URL is empty (no default)', async () => {
-      process.env['DATABASE_URL'] = '';
+    it('throws when DATABASE_URL is empty', async () => {
+      vi.stubEnv('DATABASE_URL', '');
 
       await expect(importEnv()).rejects.toThrow();
     });
   });
 
-  it('skips validation when SKIP_ENV_VALIDATION is set, even with DATABASE_URL missing', async () => {
-    process.env['SKIP_ENV_VALIDATION'] = 'true';
-    delete process.env['DATABASE_URL'];
+  it('skips validation when SKIP_ENV_VALIDATION is set', async () => {
+    vi.stubEnv('SKIP_ENV_VALIDATION', 'true');
+    vi.stubEnv('DATABASE_URL', undefined);
 
     const { env } = await importEnv();
 

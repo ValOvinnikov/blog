@@ -13,53 +13,54 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getHeroProfile } from './loader';
 import { heroProfileModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HERO_PROFILE_ID = 'hero-profile-1';
-const HERO_PROFILE_HEADING = 'Meet the author';
+faker.seed(6014);
 
-const tenant = mockTenant();
+const MOCK_HERO_PROFILE_ID = faker.string.uuid();
+const MOCK_HERO_PROFILE_HEADING = faker.lorem.words(3);
 
 describe(getHeroProfile, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawHeroProfileModule({
-        headingBlock: mockRawHeadingBlock(HERO_PROFILE_HEADING),
+        headingBlock: mockRawHeadingBlock(MOCK_HERO_PROFILE_HEADING),
       }),
     );
   });
 
-  it('resolves the hero in a single round trip — exactly one runQuery call', async () => {
-    const hero = await getHeroProfile(HERO_PROFILE_ID, tenant);
+  it('resolves the hero from a single query', async () => {
+    const hero = await getHeroProfile(MOCK_HERO_PROFILE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(hero.headingBlock.heading).toBe(HERO_PROFILE_HEADING);
+    expect(hero.headingBlock.heading).toBe(MOCK_HERO_PROFILE_HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getHeroProfile(MOCK_MISSING_ID, tenant)).rejects.toThrow();
-    expect(mockRun).toHaveBeenCalledTimes(1);
+    await expect(
+      getHeroProfile(MOCK_MISSING_ID, MOCK_TENANT),
+    ).rejects.toThrow();
   });
 
-  it('threads tenant context and scopes cache tags to it', async () => {
-    await getHeroProfile(HERO_PROFILE_ID, tenant);
+  it('queries with the tenant and tenant-scoped cache tags', async () => {
+    await getHeroProfile(MOCK_HERO_PROFILE_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
     expect(mockRun).toHaveBeenNthCalledWith(1, heroProfileModuleQuery, {
-      parameters: { id: HERO_PROFILE_ID },
-      tenant,
+      parameters: { id: MOCK_HERO_PROFILE_ID },
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
           mockCacheTag('modules:heroProfile'),
-          mockCacheTag(`module:${HERO_PROFILE_ID}`),
+          mockCacheTag(`module:${MOCK_HERO_PROFILE_ID}`),
           MOCK_AUTHOR_CACHE_TAG,
           MOCK_LINK_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,

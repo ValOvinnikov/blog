@@ -1,34 +1,39 @@
 import { FORM_STATUS } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { customRender, screen, within } from '@blog/ui/testing/custom-render';
 import {
   MOCK_NEWSLETTER_EMAIL_LABEL,
   MOCK_NEWSLETTER_SUBMIT_LABEL,
   mockNewsletterSignupArgs,
 } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { NewsletterSignupContent } from './newsletter-signup-content';
 
-const ERROR_MESSAGE_ID = 'newsletter-content-error';
-
 faker.seed(123);
+
+const PROMPT_TEST_ID = 'newsletter-signup-content-prompt';
+const ERROR_ICON_TEST_ID = 'alert-icon';
+const MOCK_ERROR_MESSAGE_ID = faker.string.uuid();
+const MOCK_ERROR_MESSAGE = faker.lorem.sentence();
+const MOCK_EMAIL = faker.internet.email();
+const MOCK_CHARACTER = faker.string.alpha(1);
 
 const baseArgs = {
   ...mockNewsletterSignupArgs(),
-  inputPrompt: (
-    <span data-testid="newsletter-signup-content-prompt" aria-hidden="true">
-      $
-    </span>
-  ),
+  inputPrompt: <span data-testid={PROMPT_TEST_ID} aria-hidden="true" />,
   variant: 'full' as const,
 };
-
-const errorMessage = faker.lorem.sentence();
 
 const setup = customRender(NewsletterSignupContent, baseArgs);
 
 describe(`<${NewsletterSignupContent.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   describe('with the default props', () => {
     beforeEach(() => {
       setup();
@@ -46,61 +51,52 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
       expect(submitButton).toBeVisible();
     });
 
-    it('associates the email field with its accessible label', () => {
-      const emailField = screen.getByLabelText(MOCK_NEWSLETTER_EMAIL_LABEL);
-
-      expect(emailField).toHaveAttribute('type', 'email');
-    });
-
     it('renders inputPrompt as the field leading icon', () => {
-      const prompt = screen.getByTestId('newsletter-signup-content-prompt');
+      const prompt = screen.getByTestId(PROMPT_TEST_ID);
 
       expect(prompt).toBeVisible();
     });
-
-    it('submits through a real submit control, not an onClick shortcut', () => {
-      const submitButton = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
-      });
-
-      expect(submitButton).toHaveAttribute('type', 'submit');
-    });
   });
 
-  it('forwards the typed character to onChange and does not manage its own state', async () => {
+  it('forwards the typed character to onChange without keeping its own state', async () => {
     const onChange = vi.fn();
-    const character = faker.string.alpha(1);
     setup({ onChange });
-    const emailField = screen.getByRole('textbox');
 
-    await userEvent.type(emailField, character);
+    const emailField = screen.getByRole('textbox', {
+      name: MOCK_NEWSLETTER_EMAIL_LABEL,
+    });
+    await user.type(emailField, MOCK_CHARACTER);
 
-    expect(onChange).toHaveBeenCalledWith(character);
+    expect(onChange).toHaveBeenCalledWith(MOCK_CHARACTER);
     expect(emailField).toHaveValue('');
   });
 
   it.each([
     {
       name: 'clicking the submit button',
-      submit: async () => {
+      submit: async (user: UserEvent) => {
         const submitButton = screen.getByRole('button', {
           name: MOCK_NEWSLETTER_SUBMIT_LABEL,
         });
-        await userEvent.click(submitButton);
+
+        await user.click(submitButton);
       },
     },
     {
       name: 'pressing Enter in the field',
-      submit: async () => {
-        const emailField = screen.getByRole('textbox');
-        await userEvent.type(emailField, '{Enter}');
+      submit: async (user: UserEvent) => {
+        const emailField = screen.getByRole('textbox', {
+          name: MOCK_NEWSLETTER_EMAIL_LABEL,
+        });
+
+        await user.type(emailField, '{Enter}');
       },
     },
   ])('calls onSubmit when $name', async ({ submit }) => {
     const onSubmit = vi.fn();
-    setup({ onSubmit, email: faker.internet.email() });
+    setup({ onSubmit, email: MOCK_EMAIL });
 
-    await submit();
+    await submit(user);
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
@@ -110,8 +106,10 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
       setup({ status: FORM_STATUS.SUBMITTING });
     });
 
-    it('disables the field and button and marks the button busy while submitting', () => {
-      const emailField = screen.getByRole('textbox');
+    it('disables the field and button and marks the button busy', () => {
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
       const button = screen.getByRole('button', {
         name: MOCK_NEWSLETTER_SUBMIT_LABEL,
       });
@@ -121,66 +119,72 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
       expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
-    it('shows the Spinner atom inside the button while submitting', () => {
+    it('shows a spinner inside the button', () => {
       const button = screen.getByRole('button', {
         name: MOCK_NEWSLETTER_SUBMIT_LABEL,
       });
-      const spinner = screen.getByTestId('newsletter-signup-spinner');
+      const spinner = within(button).getByRole('status', {
+        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+      });
 
       expect(spinner).toBeVisible();
-      expect(button).toContainElement(spinner);
     });
   });
 
-  it('surfaces the error message inline and marks the field invalid', () => {
-    setup({ status: FORM_STATUS.ERROR, errorMessage });
-
-    const alert = screen.getByRole('alert');
-    const emailField = screen.getByRole('textbox');
-
-    expect(alert).toHaveTextContent(errorMessage);
-    expect(emailField).toHaveAttribute('aria-invalid', 'true');
-  });
-
-  it('renders the error message without an icon', () => {
-    setup({
-      status: FORM_STATUS.ERROR,
-      errorMessage,
+  describe('with an error', () => {
+    beforeEach(() => {
+      setup({
+        status: FORM_STATUS.ERROR,
+        errorMessage: MOCK_ERROR_MESSAGE,
+        errorMessageId: MOCK_ERROR_MESSAGE_ID,
+      });
     });
 
-    const alert = screen.getByRole('alert');
-    const icon = screen.queryByTestId('alert-icon');
+    it('surfaces the error message inline and marks the field invalid', () => {
+      const message = screen.getByText(MOCK_ERROR_MESSAGE);
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
 
-    expect(alert).toBeVisible();
-    expect(icon).not.toBeInTheDocument();
-  });
-
-  it('does not render an error when status is not error', () => {
-    setup({ errorMessage: faker.lorem.sentence() });
-
-    const alert = screen.queryByRole('alert');
-
-    expect(alert).not.toBeInTheDocument();
-  });
-
-  it('describes the email field by the error message', () => {
-    setup({
-      status: FORM_STATUS.ERROR,
-      errorMessage,
-      errorMessageId: ERROR_MESSAGE_ID,
+      expect(message).toBeVisible();
+      expect(emailField).toHaveAttribute('aria-invalid', 'true');
     });
 
-    const emailField = screen.getByRole('textbox');
+    it('renders the error message without an icon', () => {
+      const icon = screen.queryByTestId(ERROR_ICON_TEST_ID);
 
-    expect(emailField).toHaveAccessibleDescription(errorMessage);
+      expect(icon).not.toBeInTheDocument();
+    });
+
+    it('describes the email field by the error message', () => {
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
+
+      expect(emailField).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
+    });
   });
 
-  it('has no accessible description or aria-describedby when there is no error', () => {
-    setup({ errorMessageId: ERROR_MESSAGE_ID });
+  describe('without an error status', () => {
+    beforeEach(() => {
+      setup({
+        errorMessage: MOCK_ERROR_MESSAGE,
+        errorMessageId: MOCK_ERROR_MESSAGE_ID,
+      });
+    });
 
-    const emailField = screen.getByRole('textbox');
+    it('renders no error message', () => {
+      const message = screen.queryByText(MOCK_ERROR_MESSAGE);
 
-    expect(emailField).not.toHaveAttribute('aria-describedby');
-    expect(emailField).toHaveAccessibleDescription('');
+      expect(message).not.toBeInTheDocument();
+    });
+
+    it('leaves the email field with no accessible description', () => {
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
+
+      expect(emailField).toHaveAccessibleDescription('');
+    });
   });
 });

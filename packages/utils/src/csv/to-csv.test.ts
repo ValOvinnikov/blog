@@ -1,15 +1,19 @@
+import { faker } from '@faker-js/faker';
+
 import { toCsv } from './to-csv';
 
+faker.seed(6029);
+
 const BOM = '﻿';
+const MOCK_HEADING = faker.lorem.word();
+const MOCK_CELL = faker.lorem.word();
+const MOCK_COUNT = faker.number.int();
 
 describe(toCsv, () => {
   it('joins cells with commas and rows with CRLF after a byte-order mark', () => {
-    expect(
-      toCsv([
-        ['kind', 'count'],
-        ['LEAD', 2],
-      ]),
-    ).toBe(`${BOM}kind,count\r\nLEAD,2\r\n`);
+    const csv = toCsv([[MOCK_HEADING], [MOCK_CELL, MOCK_COUNT]]);
+
+    expect(csv).toBe(`${BOM}${MOCK_HEADING}\r\n${MOCK_CELL},${MOCK_COUNT}\r\n`);
   });
 
   it('quotes a cell holding a comma, a quote or a line break', () => {

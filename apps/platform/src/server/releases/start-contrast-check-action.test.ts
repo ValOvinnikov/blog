@@ -5,36 +5,35 @@ import {
   NEXT_NAVIGATION_ERROR,
   type TMaybeNull,
 } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
-  MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import type { Session } from 'next-auth';
 
+import { startContrastCheckAction } from './start-contrast-check-action';
+
+faker.seed(5998);
+
 const {
-  requireSuperAdminMock,
   getBranchHeadShaMock,
   isWorkflowRunActiveMock,
   dispatchContrastWorkflowMock,
   insertAuditEventMock,
 } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
   getBranchHeadShaMock: vi.fn(),
   isWorkflowRunActiveMock: vi.fn(),
   dispatchContrastWorkflowMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
 
@@ -56,30 +55,24 @@ vi.mock('@blog/db', () => ({
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-describe('startContrastCheckAction', () => {
-  let startContrastCheckAction: (typeof import('./start-contrast-check-action'))['startContrastCheckAction'];
+describe(startContrastCheckAction, () => {
   let headSha: string;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     headSha = faker.git.commitSha();
-    requireSuperAdminMock
-      .mockReset()
-      .mockResolvedValue(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getBranchHeadShaMock.mockReset().mockResolvedValue(okResult(headSha));
     isWorkflowRunActiveMock.mockReset().mockResolvedValue(okResult(false));
     dispatchContrastWorkflowMock.mockReset().mockResolvedValue(true);
-    insertAuditEventMock.mockReset().mockResolvedValue({ id: 'event-1' });
-    ({ startContrastCheckAction } =
-      await import('./start-contrast-check-action'));
+    insertAuditEventMock.mockReset();
   });
 
   it('requires a super-admin before dispatching anything', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    });
+    vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
     await expect(startContrastCheckAction()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
@@ -148,7 +141,7 @@ describe('startContrastCheckAction', () => {
   });
 
   it('still succeeds when the audit write is lost', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error('connection lost'));
+    insertAuditEventMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
     expect(await startContrastCheckAction()).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,

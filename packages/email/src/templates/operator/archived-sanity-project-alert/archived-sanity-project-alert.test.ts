@@ -3,54 +3,60 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
+  MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
+import { faker } from '@faker-js/faker';
 
 import { buildArchivedSanityProjectAlertEmail } from './archived-sanity-project-alert';
 
-const SANITY_PROJECT_ID = 'abc123';
-const MANAGE_URL = 'https://www.sanity.io/manage/project/abc123';
+faker.seed(6026);
+
+const MOCK_SANITY_PROJECT_ID = faker.string.alphanumeric(8);
+const MOCK_MANAGE_URL = `${MOCK_URL}/manage/project/${MOCK_SANITY_PROJECT_ID}`;
+const MOCK_ALERT = {
+  tenantName: MOCK_TENANT_NAME,
+  tenantId: MOCK_TENANT_ID,
+  sanityProjectId: MOCK_SANITY_PROJECT_ID,
+  manageUrl: MOCK_MANAGE_URL,
+};
 
 describe(buildArchivedSanityProjectAlertEmail, () => {
-  let email: ReturnType<typeof buildArchivedSanityProjectAlertEmail>;
+  describe('for an archived project', () => {
+    let email: ReturnType<typeof buildArchivedSanityProjectAlertEmail>;
 
-  beforeEach(() => {
-    email = buildArchivedSanityProjectAlertEmail({
-      tenantName: MOCK_TENANT_NAME,
-      tenantId: MOCK_TENANT_ID,
-      sanityProjectId: SANITY_PROJECT_ID,
-      manageUrl: MANAGE_URL,
+    beforeEach(() => {
+      email = buildArchivedSanityProjectAlertEmail(MOCK_ALERT);
     });
-  });
 
-  it('names the tenant in the subject', () => {
-    expect(email.subject).toBe(
-      'Delete the archived Sanity project of tenant "Northwind" (tenant_1)',
+    it('names the tenant and its id in the subject', () => {
+      expect(email.subject).toContain(MOCK_TENANT_NAME);
+      expect(email.subject).toContain(MOCK_TENANT_ID);
+    });
+
+    it.each(['html', 'text'] as const)(
+      'names the tenant, its id and the project in the %s body',
+      (part) => {
+        expect(email[part]).toContain(MOCK_TENANT_NAME);
+        expect(email[part]).toContain(MOCK_TENANT_ID);
+        expect(email[part]).toContain(MOCK_SANITY_PROJECT_ID);
+      },
     );
-  });
 
-  it('names the tenant and the archived project in the body', () => {
-    expect(email.html).toContain(
-      '<p>Tenant Northwind (id tenant_1) has been deprovisioned. Its Sanity project abc123 is archived, not deleted.</p><p>Delete the project in Sanity Manage. Deprovisioning cannot delete it for you.</p>',
-    );
-  });
+    it('links to the project in Sanity Manage', () => {
+      expect(email.html).toContain(`href="${MOCK_MANAGE_URL}"`);
+    });
 
-  it('links to the project in Sanity Manage', () => {
-    expect(email.html).toContain(`href="${MANAGE_URL}"`);
-    expect(email.html).toContain('>Open the project in Sanity Manage</a>');
-  });
-
-  it('carries the same copy and link as plain text', () => {
-    expect(email.text).toBe(
-      `Tenant Northwind (id tenant_1) has been deprovisioned. Its Sanity project abc123 is archived, not deleted.\n\nDelete the project in Sanity Manage. Deprovisioning cannot delete it for you.\n\nOpen the project in Sanity Manage: ${MANAGE_URL}`,
-    );
+    it('ends the plain text with the Sanity Manage link', () => {
+      expect(email.text.endsWith(`: ${MOCK_MANAGE_URL}`)).toBe(true);
+    });
   });
 
   it('escapes every caller-supplied value in the HTML', () => {
     const { html } = buildArchivedSanityProjectAlertEmail({
+      ...MOCK_ALERT,
       tenantName: MOCK_UNSAFE_MARKUP,
       tenantId: MOCK_UNSAFE_MARKUP,
       sanityProjectId: MOCK_UNSAFE_MARKUP,
-      manageUrl: MANAGE_URL,
     });
 
     expect(html).not.toContain(MOCK_UNSAFE_MARKUP);

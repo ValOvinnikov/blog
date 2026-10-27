@@ -2,6 +2,7 @@ import {
   MOCK_EMAIL,
   MOCK_PROVIDER,
   MOCK_PROVIDER_ACCOUNT_ID,
+  MOCK_SESSION_EXPIRES,
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
@@ -11,9 +12,12 @@ import {
   mockAccountEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
+import { faker } from '@faker-js/faker';
 import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
 import { withEncryptedUsers } from './encrypted-users';
+
+faker.seed(6027);
 
 const { findUserByEmailMock } = vi.hoisted(() => ({
   findUserByEmailMock: vi.fn(),
@@ -35,22 +39,26 @@ vi.mock('@blog/db', async (importActual) => {
 
 usePersonalDataKeys();
 
-const MOCK_NAME = 'Ada Reader';
-const MOCK_CHANGED_EMAIL = 'renamed-reader@example.com';
-const MOCK_PLAIN_EMAIL = 'plain-reader@example.com';
-const MOCK_PLAIN_NAME = 'Plain Name';
+const MOCK_NAME = faker.person.fullName();
+const MOCK_CHANGED_EMAIL = faker.internet.exampleEmail();
+const MOCK_PLAIN_EMAIL = faker.internet.exampleEmail();
+const MOCK_PLAIN_NAME = faker.person.fullName();
+const MOCK_PERSONAL_DATA = { email: MOCK_EMAIL, name: MOCK_NAME };
+const MOCK_PLAIN_PERSONAL_DATA = {
+  email: MOCK_PLAIN_EMAIL,
+  name: MOCK_PLAIN_NAME,
+};
+const PERSONAL_COLUMNS = ['emailEncrypted', 'emailIndex', 'nameEncrypted'];
 
-const signedUpUser = (): AdapterUser => ({
+const mockSignedUpUser = (): AdapterUser => ({
   id: MOCK_USER_ID,
-  email: MOCK_EMAIL,
-  name: MOCK_NAME,
+  ...MOCK_PERSONAL_DATA,
   emailVerified: null,
 });
 
-const storedUser = (): TUser & AdapterUser => ({
+const mockUnbackfilledUser = (): TUser & AdapterUser => ({
   id: MOCK_USER_ID,
-  email: MOCK_PLAIN_EMAIL,
-  name: MOCK_PLAIN_NAME,
+  ...MOCK_PLAIN_PERSONAL_DATA,
   emailVerified: null,
   image: null,
   termsAcceptedAt: null,
@@ -58,37 +66,39 @@ const storedUser = (): TUser & AdapterUser => ({
   emailEncrypted: null,
   nameEncrypted: null,
   emailIndex: null,
-  ...queries.users.userPersonalColumns({ email: MOCK_EMAIL, name: MOCK_NAME }),
 });
 
-const unbackfilledUser = (): TUser & AdapterUser => ({
-  ...storedUser(),
-  emailEncrypted: null,
-  nameEncrypted: null,
-  emailIndex: null,
+const mockStoredUser = (): TUser & AdapterUser => ({
+  ...mockUnbackfilledUser(),
+  ...queries.users.userPersonalColumns(MOCK_PERSONAL_DATA),
 });
 
-const PERSONAL_COLUMNS = ['emailEncrypted', 'emailIndex', 'nameEncrypted'];
+const mockSession = () => ({
+  sessionToken: MOCK_SESSION_TOKEN,
+  userId: MOCK_USER_ID,
+  expires: MOCK_SESSION_EXPIRES,
+});
 
-const echoUser = async (user: AdapterUser) => user;
+const personalDataOf = (user: Partial<AdapterUser> | null | undefined) => ({
+  email: user?.email,
+  name: user?.name,
+});
 
 function buildAdapter() {
-  const stored = storedUser();
+  const stored = mockStoredUser();
 
   return {
-    createUser: vi.fn(echoUser),
+    createUser: vi.fn(async (user: AdapterUser) => user),
     updateUser: vi.fn(async (user) => ({ ...stored, ...user })),
     getUser: vi.fn(async () => stored),
     getUserByEmail: vi.fn(async () => stored),
     getUserByAccount: vi.fn(async () => stored),
-    getSessionAndUser: vi.fn(async (sessionToken: string) => ({
-      session: { sessionToken, userId: MOCK_USER_ID, expires: new Date() },
+    getSessionAndUser: vi.fn(async () => ({
+      session: mockSession(),
       user: stored,
     })),
   } satisfies Adapter;
 }
-
-const decrypted = { email: MOCK_EMAIL, name: MOCK_NAME };
 
 describe(withEncryptedUsers, () => {
   let adapter: ReturnType<typeof buildAdapter>;
@@ -100,22 +110,21 @@ describe(withEncryptedUsers, () => {
   });
 
   it('writes a new user with the encrypted email, its index and the encrypted name', async () => {
-    await encryptedAdapter.createUser?.(signedUpUser());
+    await encryptedAdapter.createUser?.(mockSignedUpUser());
 
     const [created] = adapter.createUser.mock.calls[0] ?? [];
     const { email, name, emailIndex, emailEncrypted, nameEncrypted } =
       created as TUser;
-    expect(email).toBe(MOCK_EMAIL);
-    expect(name).toBe(MOCK_NAME);
+    expect({ email, name }).toEqual(MOCK_PERSONAL_DATA);
     expect(emailIndex).toBe(mockAccountEmailIndex(MOCK_EMAIL));
     expect(emailEncrypted).not.toContain(MOCK_EMAIL);
     expect(nameEncrypted).not.toContain(MOCK_NAME);
   });
 
-  it('returns the created user with the email and name read from the encrypted columns', async () => {
-    const created = await encryptedAdapter.createUser?.(signedUpUser());
+  it('returns the created user read from the encrypted columns', async () => {
+    const created = await encryptedAdapter.createUser?.(mockSignedUpUser());
 
-    expect(created).toMatchObject(decrypted);
+    expect(personalDataOf(created)).toEqual(MOCK_PERSONAL_DATA);
   });
 
   it('encrypts a changed email and name on update', async () => {
@@ -129,53 +138,49 @@ describe(withEncryptedUsers, () => {
     const { emailIndex, nameEncrypted } = changes as TUser;
     expect(emailIndex).toBe(mockAccountEmailIndex(MOCK_CHANGED_EMAIL));
     expect(nameEncrypted).toBeNull();
-    expect(updated).toMatchObject({ email: MOCK_CHANGED_EMAIL, name: null });
-  });
-
-  it('leaves the encrypted columns alone when an update sets neither email nor name', async () => {
-    const emailVerified = new Date();
-
-    await encryptedAdapter.updateUser?.({
-      id: MOCK_USER_ID,
-      emailVerified,
-    });
-
-    expect(adapter.updateUser).toHaveBeenCalledWith({
-      id: MOCK_USER_ID,
-      emailVerified,
+    expect(personalDataOf(updated)).toEqual({
+      email: MOCK_CHANGED_EMAIL,
+      name: null,
     });
   });
 
-  it('reads a user by id from the encrypted columns', async () => {
-    const user = await encryptedAdapter.getUser?.(MOCK_USER_ID);
+  it('leaves the encrypted columns alone when an update sets neither field', async () => {
+    const changes = { id: MOCK_USER_ID, emailVerified: faker.date.past() };
 
-    expect(user).toMatchObject(decrypted);
+    await encryptedAdapter.updateUser?.(changes);
+
+    expect(adapter.updateUser).toHaveBeenCalledWith(changes);
   });
 
-  it('reads a user by provider account from the encrypted columns', async () => {
-    const user = await encryptedAdapter.getUserByAccount?.({
-      provider: MOCK_PROVIDER,
-      providerAccountId: MOCK_PROVIDER_ACCOUNT_ID,
-    });
+  it.each([
+    ['by id', () => encryptedAdapter.getUser?.(MOCK_USER_ID)],
+    [
+      'by provider account',
+      () =>
+        encryptedAdapter.getUserByAccount?.({
+          provider: MOCK_PROVIDER,
+          providerAccountId: MOCK_PROVIDER_ACCOUNT_ID,
+        }),
+    ],
+    [
+      'for a session',
+      async () =>
+        (await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN))?.user,
+    ],
+  ])('reads a user %s from the encrypted columns', async (_, readUser) => {
+    const user = await readUser();
 
-    expect(user).toMatchObject(decrypted);
-  });
-
-  it("reads the session's user from the encrypted columns", async () => {
-    const found =
-      await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
-
-    expect(found?.user).toMatchObject(decrypted);
+    expect(personalDataOf(user)).toEqual(MOCK_PERSONAL_DATA);
   });
 
   it('reads a user found by email from the encrypted columns', async () => {
-    findUserByEmailMock.mockResolvedValue(storedUser());
+    findUserByEmailMock.mockResolvedValue(mockStoredUser());
 
     const user = await encryptedAdapter.getUserByEmail?.(MOCK_EMAIL);
 
     expect(findUserByEmailMock).toHaveBeenCalledWith(MOCK_EMAIL);
     expect(adapter.getUserByEmail).not.toHaveBeenCalled();
-    expect(user).toMatchObject(decrypted);
+    expect(personalDataOf(user)).toEqual(MOCK_PERSONAL_DATA);
   });
 
   it('finds no user when no address matches', async () => {
@@ -187,39 +192,29 @@ describe(withEncryptedUsers, () => {
   });
 
   it('signs in a user not yet backfilled, read from the plain columns', async () => {
-    findUserByEmailMock.mockResolvedValue(unbackfilledUser());
+    findUserByEmailMock.mockResolvedValue(mockUnbackfilledUser());
 
     const user = await encryptedAdapter.getUserByEmail?.(MOCK_PLAIN_EMAIL);
 
-    expect(user).toMatchObject({
-      email: MOCK_PLAIN_EMAIL,
-      name: MOCK_PLAIN_NAME,
-    });
+    expect(personalDataOf(user)).toEqual(MOCK_PLAIN_PERSONAL_DATA);
   });
 
   it('keeps the session of a user not yet backfilled', async () => {
     adapter.getSessionAndUser.mockResolvedValue({
-      session: {
-        sessionToken: MOCK_SESSION_TOKEN,
-        userId: MOCK_USER_ID,
-        expires: new Date(),
-      },
-      user: unbackfilledUser(),
+      session: mockSession(),
+      user: mockUnbackfilledUser(),
     });
 
     const found =
       await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
-    expect(found?.user).toMatchObject({
-      email: MOCK_PLAIN_EMAIL,
-      name: MOCK_PLAIN_NAME,
-    });
+    expect(personalDataOf(found?.user)).toEqual(MOCK_PLAIN_PERSONAL_DATA);
   });
 
   it.each(PERSONAL_COLUMNS)(
     'returns the user to Auth.js without %s',
     async (column) => {
-      const created = await encryptedAdapter.createUser?.(signedUpUser());
+      const created = await encryptedAdapter.createUser?.(mockSignedUpUser());
       const found =
         await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
@@ -235,7 +230,7 @@ describe(withEncryptedUsers, () => {
     });
 
     it('creates a user with only the plain email and name', async () => {
-      const created = await encryptedAdapter.createUser?.(signedUpUser());
+      const created = await encryptedAdapter.createUser?.(mockSignedUpUser());
 
       const [written] = adapter.createUser.mock.calls[0] ?? [];
       const { emailEncrypted, emailIndex, nameEncrypted } = written as TUser;
@@ -244,17 +239,14 @@ describe(withEncryptedUsers, () => {
         null,
         null,
       ]);
-      expect(created).toMatchObject(decrypted);
+      expect(personalDataOf(created)).toEqual(MOCK_PERSONAL_DATA);
     });
 
     it("reads a backfilled user's session from the plain columns", async () => {
       const found =
         await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
-      expect(found?.user).toMatchObject({
-        email: MOCK_PLAIN_EMAIL,
-        name: MOCK_PLAIN_NAME,
-      });
+      expect(personalDataOf(found?.user)).toEqual(MOCK_PLAIN_PERSONAL_DATA);
     });
   });
 });

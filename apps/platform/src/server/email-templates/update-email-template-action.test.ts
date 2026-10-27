@@ -6,129 +6,93 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
+import { EMAIL_TEMPLATES_LOG } from '@platform/constants/email-templates';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
-import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
   MOCK_OPERATOR_ID,
-  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_SESSION,
 } from '@platform/testing/admins/operator';
+import { mockedAuth } from '@platform/testing/auth/mocked-auth';
+import {
+  mockEmailBodyWithLink,
+  mockEmailBodyWithText,
+  mockEmailTemplateResult,
+} from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
-import type { Session } from 'next-auth';
 
 import {
   updateEmailTemplateAction,
   type TUpdateEmailTemplateInput,
 } from './update-email-template-action';
 
-const { upsertEmailTemplateMock, insertAuditEventMock, selectLiveLocalesMock } =
-  vi.hoisted(() => ({
-    upsertEmailTemplateMock: vi.fn(),
-    insertAuditEventMock: vi.fn(),
-    selectLiveLocalesMock: vi.fn(),
-  }));
-
-vi.mock('@platform/server/auth/require-tenant-membership');
-
-vi.mock('@platform/server/auth/auth');
-
 vi.mock('@blog/db', () => ({
   queries: {
-    emailTemplates: { upsertEmailTemplate: upsertEmailTemplateMock },
-    auditEvents: { insertAuditEvent: insertAuditEventMock },
-    tenants: { selectLiveLocales: selectLiveLocalesMock },
+    emailTemplates: { upsertEmailTemplate: vi.fn() },
+    auditEvents: { insertAuditEvent: vi.fn() },
+    tenants: { selectLiveLocales: vi.fn() },
   },
 }));
 
-const LINK_KEY = 'link1';
-const LINK_TEXT = 'click here';
-const SAFE_HREF = 'https://acme.example';
-const JAVASCRIPT_HREF = 'javascript:alert(1)';
+vi.mock('@platform/server/auth/require-tenant-membership');
+vi.mock('@platform/server/auth/auth');
 
-const requireTenantMembershipMock = vi.mocked<
-  (tenantId: string) => Promise<unknown>
->(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-const loggerErrorMock = vi.mocked(logger.error);
+faker.seed(5998);
 
-const mockMembershipAndUpsert = (
-  upsertResult: Partial<{
-    tenantId: string;
-    templateType: string;
-    subject: string | null;
-    body: TUpdateEmailTemplateInput['body'];
-    logoAssetUrl: string | undefined;
-  }> = {},
-) => {
-  requireTenantMembershipMock.mockResolvedValue({
-    tenant: { id: MOCK_TENANT_ID },
-    membership: { role: MEMBERSHIP_ROLE.OWNER },
-  });
-  upsertEmailTemplateMock.mockResolvedValue({
-    tenantId: MOCK_TENANT_ID,
-    templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-    subject: VALID_INPUT.subject,
-    body: VALID_INPUT.body,
-    logoAssetUrl: undefined,
-    ...upsertResult,
-  });
-};
+const { MAGIC_LINK } = EMAIL_TEMPLATE_TYPE;
+const { EN, FR, DE } = LOCALE_ISO_CODES;
+
+const MOCK_SAFE_HREF = faker.internet.url();
+const MOCK_JAVASCRIPT_HREF = 'javascript:alert(1)';
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 
 const VALID_INPUT: TUpdateEmailTemplateInput = {
-  subject: 'Sign in to Acme Co',
-  body: [
-    {
-      _type: 'block',
-      _key: 'k1',
-      style: 'normal',
-      children: [{ _type: 'span', _key: 's1', text: 'Hello', marks: [] }],
-      markDefs: [],
-    },
-  ],
+  subject: faker.lorem.sentence(),
+  body: mockEmailBodyWithText(faker.lorem.word()),
 };
+
+const { upsertEmailTemplate } = queries.emailTemplates;
+const { insertAuditEvent } = queries.auditEvents;
+const { selectLiveLocales } = queries.tenants;
 
 describe(updateEmailTemplateAction, () => {
   beforeEach(() => {
-    requireTenantMembershipMock.mockReset();
-    authMock.mockReset();
-    authMock.mockResolvedValue({
-      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
-    });
-    upsertEmailTemplateMock.mockReset();
-    insertAuditEventMock.mockReset();
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    loggerErrorMock.mockReset();
-    selectLiveLocalesMock.mockReset();
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.FR,
-    ]);
-    mockMembershipAndUpsert();
+    vi.mocked(requireTenantMembership).mockReset();
+    vi.mocked(upsertEmailTemplate).mockReset();
+    vi.mocked(insertAuditEvent).mockReset();
+    vi.mocked(selectLiveLocales).mockReset();
+    vi.mocked(selectLiveLocales).mockReturnValue([EN, FR]);
   });
 
-  it('writes the copy to the requested language', async () => {
-    await updateEmailTemplateAction(
-      MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.FR,
-      VALID_INPUT,
-    );
+  it('writes the copy in the requested language for the routed tenant', async () => {
+    const stored = mockEmailTemplateResult({ templateType: MAGIC_LINK });
+    vi.mocked(upsertEmailTemplate).mockResolvedValue(stored);
 
-    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      VALID_INPUT,
-      LOCALE_ISO_CODES.FR,
-    );
-  });
-
-  it('rejects a language the tenant does not offer without writing', async () => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.DE,
+      MAGIC_LINK,
+      FR,
+      VALID_INPUT,
+    );
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, result: stored });
+    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(upsertEmailTemplate).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MAGIC_LINK,
+      VALID_INPUT,
+      FR,
+    );
+  });
+
+  it('refuses a language the tenant does not offer without writing', async () => {
+    const result = await updateEmailTemplateAction(
+      MOCK_TENANT_ID,
+      MAGIC_LINK,
+      DE,
       VALID_INPUT,
     );
 
@@ -136,14 +100,15 @@ describe(updateEmailTemplateAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.LOCALE_NOT_LIVE,
     });
-    expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
+    expect(upsertEmailTemplate).not.toHaveBeenCalled();
   });
 
-  it('rejects an unrecognized language without ever calling the tenant gate', async () => {
+  it('rejects an unrecognized language before the tenant gate', async () => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      'XX' as never,
+      MAGIC_LINK,
+      // @ts-expect-error -- a Server Action is callable with any language
+      faker.lorem.word(),
       VALID_INPUT,
     );
 
@@ -151,32 +116,15 @@ describe(updateEmailTemplateAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+    expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
-  it('re-resolves the tenant from the session against the routed id before writing', async () => {
+  it('rejects an unrecognized template type before the tenant gate', async () => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
-      VALID_INPUT,
-    );
-
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      VALID_INPUT,
-      LOCALE_ISO_CODES.EN,
-    );
-    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
-  });
-
-  it('rejects an unrecognized template type without ever calling the tenant gate', async () => {
-    const result = await updateEmailTemplateAction(
-      MOCK_TENANT_ID,
-      'NOT_A_TEMPLATE' as never,
-      LOCALE_ISO_CODES.EN,
+      // @ts-expect-error -- a Server Action is callable with any template type
+      faker.lorem.word(),
+      EN,
       VALID_INPUT,
     );
 
@@ -184,14 +132,14 @@ describe(updateEmailTemplateAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+    expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
-  it('rejects an empty subject string rather than storing it as a blank', async () => {
+  it('rejects an empty subject rather than storing a blank', async () => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
+      MAGIC_LINK,
+      EN,
       { ...VALID_INPUT, subject: '' },
     );
 
@@ -199,231 +147,135 @@ describe(updateEmailTemplateAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+    expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
-  it('accepts a body whose link markDef has a safe href', async () => {
+  it('accepts a body whose link has a safe href', async () => {
     const input: TUpdateEmailTemplateInput = {
-      subject: 'Sign in',
-      body: [
-        {
-          _type: 'block',
-          _key: 'k1',
-          style: 'normal',
-          children: [
-            {
-              _type: 'span',
-              _key: 's1',
-              text: LINK_TEXT,
-              marks: [LINK_KEY],
-            },
-          ],
-          markDefs: [{ _type: 'link', _key: LINK_KEY, href: SAFE_HREF }],
-        },
-      ],
+      ...VALID_INPUT,
+      body: mockEmailBodyWithLink(MOCK_SAFE_HREF),
     };
 
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
+      MAGIC_LINK,
+      EN,
       input,
     );
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
-    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
+    expect(upsertEmailTemplate).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      MAGIC_LINK,
       input,
-      LOCALE_ISO_CODES.EN,
+      EN,
     );
   });
 
   it.each([
-    ['a javascript: href', JAVASCRIPT_HREF],
-    ['a data: href', 'data:text/html,<script>alert(1)</script>'],
+    ['a javascript: href', mockEmailBodyWithLink(MOCK_JAVASCRIPT_HREF)],
+    [
+      'a data: href',
+      mockEmailBodyWithLink('data:text/html,<script>alert(1)</script>'),
+    ],
     [
       'a case- and whitespace-obfuscated javascript: href',
-      '  JaVaScRiPt:alert(1)',
+      mockEmailBodyWithLink('  JaVaScRiPt:alert(1)'),
     ],
-  ])(
-    'rejects the whole update — never reaching upsertEmailTemplate — for a body carrying %s',
-    async (_description, href) => {
-      const input: TUpdateEmailTemplateInput = {
-        subject: 'Sign in',
-        body: [
-          {
-            _type: 'block',
-            _key: 'k1',
-            style: 'normal',
-            children: [
-              {
-                _type: 'span',
-                _key: 's1',
-                text: LINK_TEXT,
-                marks: [LINK_KEY],
-              },
-            ],
-            markDefs: [{ _type: 'link', _key: LINK_KEY, href }],
-          },
-        ],
-      };
-
-      const result = await updateEmailTemplateAction(
-        MOCK_TENANT_ID,
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        LOCALE_ISO_CODES.EN,
-        input,
-      );
-
-      expect(result).toEqual({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: {},
-      });
-      expect(requireTenantMembershipMock).not.toHaveBeenCalled();
-      expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
-    },
-  );
-
-  it('rejects a malicious href buried in a later markDef of a later block', async () => {
-    const input: TUpdateEmailTemplateInput = {
-      subject: 'Sign in',
-      body: [
-        {
-          _type: 'block',
-          _key: 'k1',
-          style: 'normal',
-          children: [
-            { _type: 'span', _key: 's1', text: 'safe link', marks: [LINK_KEY] },
-          ],
-          markDefs: [{ _type: 'link', _key: LINK_KEY, href: SAFE_HREF }],
-        },
-        {
-          _type: 'block',
-          _key: 'k2',
-          style: 'normal',
-          children: [
-            {
-              _type: 'span',
-              _key: 's2',
-              text: 'also safe',
-              marks: ['link2'],
-            },
-            {
-              _type: 'span',
-              _key: 's3',
-              text: 'malicious',
-              marks: ['link3'],
-            },
-          ],
-          markDefs: [
-            { _type: 'link', _key: 'link2', href: 'https://safe.example' },
-            { _type: 'link', _key: 'link3', href: JAVASCRIPT_HREF },
-          ],
-        },
+    [
+      'an unsafe href in a later block',
+      [
+        ...mockEmailBodyWithLink(MOCK_SAFE_HREF),
+        ...mockEmailBodyWithLink(MOCK_JAVASCRIPT_HREF),
       ],
-    };
-
+    ],
+  ])('rejects the whole update for a body carrying %s', async (_href, body) => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
-      input,
+      MAGIC_LINK,
+      EN,
+      { ...VALID_INPUT, body },
     );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
-    expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
+    expect(requireTenantMembership).not.toHaveBeenCalled();
+    expect(upsertEmailTemplate).not.toHaveBeenCalled();
   });
 
-  it('accepts explicit nulls as "revert to product default"', async () => {
-    mockMembershipAndUpsert({ subject: 'Default subject', body: [] });
-
+  it('writes explicit nulls so the copy reverts to the product default', async () => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
+      MAGIC_LINK,
+      EN,
       { subject: null, body: null },
     );
 
     expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
-    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
+    expect(upsertEmailTemplate).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      MAGIC_LINK,
       { subject: null, body: null },
-      LOCALE_ISO_CODES.EN,
+      EN,
     );
   });
 
-  it('reports failure without throwing, and no audit event, when the write fails', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: MOCK_TENANT_ID },
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
-    upsertEmailTemplateMock.mockRejectedValue(new Error('db unavailable'));
+  it('reports failure and records no audit event when the write fails', async () => {
+    vi.mocked(upsertEmailTemplate).mockRejectedValue(MOCK_DB_ERROR);
 
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
+      MAGIC_LINK,
+      EN,
       VALID_INPUT,
     );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(insertAuditEvent).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      EMAIL_TEMPLATES_LOG.UPDATE_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        templateType: MAGIC_LINK,
+        locale: EN,
+        error: MOCK_DB_ERROR,
+      },
+    );
   });
 
-  it('records a SETTINGS_UPDATED audit event, with the operator as actor', async () => {
+  it('records a settings-updated audit event with the operator as actor', async () => {
+    mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
+
     await updateEmailTemplateAction(
       MOCK_TENANT_ID,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.EN,
+      MAGIC_LINK,
+      EN,
       VALID_INPUT,
     );
 
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
+    expect(insertAuditEvent).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
-      details: {
-        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        locale: LOCALE_ISO_CODES.EN,
-      },
+      details: { templateType: MAGIC_LINK, locale: EN },
     });
   });
 
   it.each([
-    [
-      'the sign-in redirect',
-      'unauthenticated',
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    ],
-    [
-      'the 404',
-      'the session has no membership',
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    ],
-  ])(
-    'propagates %s the tenant gate throws when %s',
-    async (_description, _reason, digest) => {
-      requireTenantMembershipMock.mockImplementation(() => {
-        throw new Error(digest);
-      });
+    NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+  ])('propagates the %s the tenant gate throws', async (gateError) => {
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
+      new Error(gateError),
+    );
 
-      await expect(
-        updateEmailTemplateAction(
-          MOCK_TENANT_ID,
-          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          LOCALE_ISO_CODES.EN,
-          VALID_INPUT,
-        ),
-      ).rejects.toThrow(digest);
+    await expect(
+      updateEmailTemplateAction(MOCK_TENANT_ID, MAGIC_LINK, EN, VALID_INPUT),
+    ).rejects.toThrow(gateError);
 
-      expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(upsertEmailTemplate).not.toHaveBeenCalled();
+  });
 });

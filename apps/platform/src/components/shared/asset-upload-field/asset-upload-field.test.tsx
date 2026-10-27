@@ -1,50 +1,59 @@
 import { SIZE } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
 import {
-  MOCK_STAGED_LOGO_BLOB_URL,
   CURRENT_LOGO,
   MOCK_LOGO_URL,
+  MOCK_STAGED_LOGO_BLOB_URL,
   REPLACE_LOGO,
   UPLOAD_LOGO,
 } from '@platform/testing/site-config/fixtures';
-import userEvent from '@testing-library/user-event';
-
 import {
-  AssetUploadField,
-  type TAssetUploadFieldProps,
-} from './asset-upload-field';
+  ACCEPTED_IMAGE_MIME_TYPES,
+  brandAssetKindSchema,
+} from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-const PNG_JPEG_OR_WEBP = 'PNG, JPEG, or WebP.';
-const CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE = 'Choose a PNG, JPEG, or WebP image.';
-const STORED_LOGO_URL = 'https://example.com/logo.png';
-const LOGO_CONTROL = 'logo-control';
+import { AssetUploadField, type TAssetUploadSpec } from './asset-upload-field';
 
-const baseProps: TAssetUploadFieldProps = {
-  label: 'Logo',
-  hint: PNG_JPEG_OR_WEBP,
+faker.seed(5995);
+
+const REMOVE = messages.assetUploadField.remove;
+
+const MOCK_LABEL = faker.lorem.word();
+const MOCK_HINT = faker.lorem.sentence();
+const MOCK_REJECTION = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_CONTROL_ID = faker.string.alpha(8);
+
+const MOCK_ASSET: TAssetUploadSpec = {
+  kind: brandAssetKindSchema.enum.logo,
+  size: SIZE.MD,
+  acceptedMimeTypes: ACCEPTED_IMAGE_MIME_TYPES,
+  validateFile: () => undefined,
+};
+
+const MOCK_REJECTING_ASSET: TAssetUploadSpec = {
+  ...MOCK_ASSET,
+  validateFile: () => MOCK_REJECTION,
+};
+
+const mockPngFile = () =>
+  new File(['bytes'], faker.system.fileName(), { type: 'image/png' });
+
+const setup = customRender(AssetUploadField, {
+  label: MOCK_LABEL,
+  hint: MOCK_HINT,
   image: { url: undefined },
   onStage: vi.fn(),
-  asset: {
-    kind: 'logo',
-    size: SIZE.MD,
-    acceptedMimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
-    validateFile: () => undefined,
-  },
-};
-
-const pngFile = () => new File(['bytes'], 'logo.png', { type: 'image/png' });
-
-const rejectingAsset = {
-  ...baseProps.asset,
-  validateFile: () => CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE,
-};
+  asset: MOCK_ASSET,
+});
 
 describe(`<${AssetUploadField.name}/>`, () => {
-  const onStage = vi.fn();
-
-  let user: ReturnType<typeof userEvent.setup>;
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
@@ -55,50 +64,44 @@ describe(`<${AssetUploadField.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it('shows no thumbnail or Remove control before any value is set', () => {
-    renderWithIntl(<AssetUploadField {...baseProps} />);
+  it('shows no thumbnail or remove control before any value is set', () => {
+    setup();
 
     const thumbnail = screen.queryByAltText(CURRENT_LOGO);
     const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
-    const removeButton = screen.queryByRole('button', { name: 'Remove' });
+    const removeButton = screen.queryByRole('button', { name: REMOVE });
 
     expect(thumbnail).not.toBeInTheDocument();
     expect(uploadButton).toBeVisible();
     expect(removeButton).not.toBeInTheDocument();
   });
 
-  it('shows the thumbnail and a Remove control once a value is set', () => {
-    renderWithIntl(
-      <AssetUploadField {...baseProps} image={{ url: MOCK_LOGO_URL }} />,
-    );
+  it('shows the thumbnail and a remove control once a value is set', () => {
+    setup({ image: { url: MOCK_LOGO_URL } });
 
     const thumbnail = screen.getByAltText(CURRENT_LOGO);
-    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    const removeButton = screen.getByRole('button', { name: REMOVE });
 
     expect(thumbnail).toBeVisible();
     expect(removeButton).toBeVisible();
   });
 
-  it('rejects a file client-side without staging it, showing validateFile’s message', async () => {
-    renderWithIntl(
-      <AssetUploadField
-        {...baseProps}
-        asset={rejectingAsset}
-        onStage={onStage}
-      />,
-    );
+  it('shows a rejected file’s message without staging it', async () => {
+    const onStage = vi.fn();
+    setup({ asset: MOCK_REJECTING_ASSET, onStage });
 
-    await selectFile(pngFile());
+    await selectFile(mockPngFile());
 
-    const rejection = await screen.findByText(CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE);
+    const rejection = await screen.findByText(MOCK_REJECTION);
 
     expect(rejection).toBeVisible();
     expect(onStage).not.toHaveBeenCalled();
   });
 
-  it('stages a chosen file with a local preview URL through onStage', async () => {
-    const file = pngFile();
-    renderWithIntl(<AssetUploadField {...baseProps} onStage={onStage} />);
+  it('stages a chosen file with a local preview URL', async () => {
+    const onStage = vi.fn();
+    const file = mockPngFile();
+    setup({ onStage });
 
     await selectFile(file);
 
@@ -108,33 +111,25 @@ describe(`<${AssetUploadField.name}/>`, () => {
     });
   });
 
-  it('stages a removal through onStage when Remove is clicked', async () => {
-    renderWithIntl(
-      <AssetUploadField
-        {...baseProps}
-        image={{ url: STORED_LOGO_URL }}
-        onStage={onStage}
-      />,
-    );
+  it('stages a removal when remove is clicked', async () => {
+    const onStage = vi.fn();
+    setup({ image: { url: MOCK_LOGO_URL }, onStage });
 
-    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    const removeButton = screen.getByRole('button', { name: REMOVE });
     await user.click(removeButton);
 
     expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });
 
-  it('disables the upload and remove controls, and describes them, when the control is disabled', () => {
-    renderWithIntl(
-      <AssetUploadField
-        {...baseProps}
-        image={{ url: STORED_LOGO_URL }}
-        control={{ isDisabled: true, describedBy: ARCHIVED_NOTICE_ID }}
-      />,
-    );
+  it('disables and describes both controls when the control is disabled', () => {
+    setup({
+      image: { url: MOCK_LOGO_URL },
+      control: { isDisabled: true, describedBy: ARCHIVED_NOTICE_ID },
+    });
 
     const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
-    const removeButton = screen.getByRole('button', { name: 'Remove' });
-    const hint = screen.getByText(PNG_JPEG_OR_WEBP);
+    const removeButton = screen.getByRole('button', { name: REMOVE });
+    const hint = screen.getByText(MOCK_HINT);
 
     expect(uploadButton).toBeDisabled();
     expect(uploadButton).toHaveAttribute(
@@ -145,48 +140,40 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('describes the upload and remove controls with the hint', () => {
-    renderWithIntl(
-      <AssetUploadField {...baseProps} image={{ url: STORED_LOGO_URL }} />,
-    );
+    setup({ image: { url: MOCK_LOGO_URL } });
 
     const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
-    const removeButton = screen.getByRole('button', { name: 'Remove' });
+    const removeButton = screen.getByRole('button', { name: REMOVE });
 
-    expect(uploadButton).toHaveAccessibleDescription(PNG_JPEG_OR_WEBP);
-    expect(removeButton).toHaveAccessibleDescription(PNG_JPEG_OR_WEBP);
+    expect(uploadButton).toHaveAccessibleDescription(MOCK_HINT);
+    expect(removeButton).toHaveAccessibleDescription(MOCK_HINT);
   });
 
   it('announces a rejected file and describes the upload control with it', async () => {
-    renderWithIntl(<AssetUploadField {...baseProps} asset={rejectingAsset} />);
+    setup({ asset: MOCK_REJECTING_ASSET });
 
-    await selectFile(pngFile());
+    await selectFile(mockPngFile());
 
     const alert = await screen.findByRole('alert');
     const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
 
-    expect(alert).toHaveTextContent(CHOOSE_A_PNG_JPEG_OR_WEBP_IMAGE);
+    expect(alert).toHaveTextContent(MOCK_REJECTION);
     expect(uploadButton).toHaveAccessibleDescription(
-      'PNG, JPEG, or WebP. Choose a PNG, JPEG, or WebP image.',
+      `${MOCK_HINT} ${MOCK_REJECTION}`,
     );
   });
 
-  it('shows a given error under the field and describes the upload control with it, without announcing it', () => {
-    renderWithIntl(
-      <AssetUploadField
-        {...baseProps}
-        control={{ id: LOGO_CONTROL }}
-        error="Couldn't upload the logo — try again."
-      />,
-    );
+  it('shows a given error and describes the upload control without announcing it', () => {
+    setup({ control: { id: MOCK_CONTROL_ID }, error: MOCK_ERROR });
 
     const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
-    const error = screen.getByText("Couldn't upload the logo — try again.");
+    const error = screen.getByText(MOCK_ERROR);
     const alert = screen.queryByRole('alert');
 
     expect(error).toBeVisible();
-    expect(uploadButton).toHaveAttribute('id', LOGO_CONTROL);
+    expect(uploadButton).toHaveAttribute('id', MOCK_CONTROL_ID);
     expect(uploadButton).toHaveAccessibleDescription(
-      "PNG, JPEG, or WebP. Couldn't upload the logo — try again.",
+      `${MOCK_HINT} ${MOCK_ERROR}`,
     );
     expect(alert).not.toBeInTheDocument();
   });

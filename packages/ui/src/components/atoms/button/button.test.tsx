@@ -1,17 +1,28 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 
 import { Button } from './button';
 
-const setup = customRender(Button, { children: 'Click me' });
+faker.seed(123);
+
+const MOCK_LABEL = faker.lorem.words(2);
+
+const setup = customRender(Button, { children: MOCK_LABEL });
 
 describe(`<${Button.name}/>`, () => {
-  it('renders a button element', () => {
+  it('renders a button named by its children', () => {
     setup();
-    expect(screen.getByRole('button', { name: 'Click me' })).toBeVisible();
+
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+    expect(button).toBeVisible();
   });
 
-  it('forwards disabled attribute', () => {
-    setup({ isDisabled: true, children: 'Disabled' });
-    expect(screen.getByRole('button', { name: 'Disabled' })).toBeDisabled();
+  it('is disabled when isDisabled is set', () => {
+    setup({ isDisabled: true });
+
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+    expect(button).toBeDisabled();
   });
 });

@@ -1,17 +1,23 @@
+import { MOCK_SYSTEM_FIELDS } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { delete_ } from 'sanity/migrate';
 
 import migration from './index';
 
+faker.seed(11);
+
+const MOCK_CATEGORY_ID = faker.string.uuid();
+
 describe('delete-legacy-blog-category migration', () => {
   it('deletes a blog_category document', () => {
     const category = {
-      _id: 'abc123',
+      ...MOCK_SYSTEM_FIELDS,
+      _id: MOCK_CATEGORY_ID,
       _type: 'blog_category',
-      _createdAt: '2026-01-01T00:00:00Z',
-      _updatedAt: '2026-01-01T00:00:00Z',
-      _rev: 'rev-1',
     };
 
-    expect(migration.migrate.document(category)).toEqual(delete_(category._id));
+    const result = migration.migrate.document(category);
+
+    expect(result).toEqual(delete_(MOCK_CATEGORY_ID));
   });
 });

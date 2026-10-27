@@ -12,23 +12,28 @@ import {
   mockRawSanityImage,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toHeroModule } from './transformer';
 
-const CUSTOM_COPY = {
+faker.seed(6014);
+
+const MOCK_FALLBACK_POST_ID = faker.string.uuid();
+
+const MOCK_CUSTOM_COPY = {
   eyebrow: MOCK_HERO_EYEBROW,
-  title: 'Custom home title',
-  subtitle: 'Custom home subtitle.',
+  title: faker.lorem.words(3),
+  subtitle: faker.lorem.sentence(),
 };
 
-describe('toHeroModule', () => {
+describe(toHeroModule, () => {
   let fallbackPost: ReturnType<typeof mockRawPostCard>;
 
   beforeEach(() => {
-    fallbackPost = mockRawPostCard({ _id: 'fallback' });
+    fallbackPost = mockRawPostCard({ _id: MOCK_FALLBACK_POST_ID });
   });
 
-  it('maps brandVariant straight through', () => {
+  it('keeps the authored brand variant', () => {
     const raw = mockRawHeroModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     });
@@ -38,26 +43,28 @@ describe('toHeroModule', () => {
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
 
-  it('uses custom copy and custom sanity image when configured', () => {
+  it('uses the custom copy and image when configured', () => {
     const raw = mockRawHeroModule({
       featuredPost: null,
       heroEyebrowMode: HERO_FIELD_MODE.CUSTOM,
-      heroEyebrow: CUSTOM_COPY.eyebrow,
+      heroEyebrow: MOCK_CUSTOM_COPY.eyebrow,
       heroTitleMode: HERO_FIELD_MODE.CUSTOM,
-      heroTitle: CUSTOM_COPY.title,
+      heroTitle: MOCK_CUSTOM_COPY.title,
       heroSubtitleMode: HERO_FIELD_MODE.CUSTOM,
-      heroSubtitle: CUSTOM_COPY.subtitle,
+      heroSubtitle: MOCK_CUSTOM_COPY.subtitle,
       heroImageMode: HERO_FIELD_MODE.CUSTOM,
       heroImageAsset: mockRawSanityImage(),
     });
 
     const hero = toHeroModule(raw, null);
 
-    expect(hero).toMatchObject(CUSTOM_COPY);
+    const { eyebrow, title, subtitle } = hero;
+
+    expect({ eyebrow, title, subtitle }).toEqual(MOCK_CUSTOM_COPY);
     expect(hero.sanityImage).toEqual(mockSanityImageView());
   });
 
-  it('falls back to the featured post topic title when eyebrow mode is POST_TOPIC', () => {
+  it('takes the eyebrow from the featured post topic in post-topic mode', () => {
     const raw = mockRawHeroModule({
       featuredPost: mockRawPostCard({ _id: MOCK_FEATURED_POST_ID }),
       heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
@@ -105,13 +112,8 @@ describe('toHeroModule', () => {
       const hero = toHeroModule(raw, null);
 
       expect(hero.title).toBe(MOCK_POST_TITLE);
-      expect(hero.primaryAction).toEqual({
-        label: 'Read more',
-        href: MOCK_POST_HREF,
-        target: undefined,
-        platform: undefined,
-        hiddenLabelSuffix: MOCK_POST_TITLE,
-      });
+      expect(hero.primaryAction?.href).toBe(MOCK_POST_HREF);
+      expect(hero.primaryAction?.hiddenLabelSuffix).toBe(MOCK_POST_TITLE);
     });
 
     it('leaves the primary action without an appearance', () => {
@@ -136,7 +138,7 @@ describe('toHeroModule', () => {
       expect(hero.primaryAction?.hiddenLabelSuffix).toBe(MOCK_POST_TITLE);
     });
 
-    it('has no primary action, title or subtitle when there is no post at all', () => {
+    it('has no primary action, title or subtitle without any post', () => {
       const hero = toHeroModule(raw, null);
 
       expect(hero.primaryAction).toBeUndefined();

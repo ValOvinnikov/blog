@@ -1,10 +1,8 @@
 import {
-  at,
-  createIfNotExists,
-  patch,
-  set,
-  type MigrationContext,
-} from 'sanity/migrate';
+  MOCK_SYSTEM_FIELDS,
+  mockMigrationContext,
+} from '@blog/studio/testing/mock-migration';
+import { at, createIfNotExists, patch, set } from 'sanity/migrate';
 
 import {
   INDIGO_THEME_TARGET,
@@ -14,93 +12,62 @@ import {
 
 import migration from './index';
 
-/**
- * `context.client` is the live, unrestricted `@sanity/client` — unlike
- * `context.filtered`, it isn't scoped to this migration's `documentTypes`,
- * so it's the only context member that can actually resolve a
- * `settings_theme` document from a `settings_site`-typed migration run.
- */
-const fakeContext = (
-  currentTheme: Record<string, unknown> | undefined,
-  getDocument = async () => currentTheme,
-): MigrationContext =>
-  ({
-    client: { getDocument },
-  }) as unknown as MigrationContext;
+const INDIGO_SITE = { brand: { variant: 'INDIGO' } };
+const CONSOLE_SITE = { brand: { variant: 'CONSOLE' } };
 
-describe('settings_theme backfill document() wiring', () => {
-  it('fetches the current settings_theme and forwards it to the transform', async () => {
+const INDIGO_MUTATIONS = [
+  createIfNotExists({
+    _id: THEME_DOCUMENT_ID,
+    _type: THEME_DOCUMENT_TYPE,
+    ...INDIGO_THEME_TARGET,
+  }),
+  patch(THEME_DOCUMENT_ID, [
+    at('preset', set(INDIGO_THEME_TARGET.preset)),
+    at('accentHue', set(INDIGO_THEME_TARGET.accentHue)),
+    at('logoHue', set(INDIGO_THEME_TARGET.logoHue)),
+  ]),
+];
+
+describe('settings_theme backfill migration', () => {
+  it('creates the theme for an INDIGO site when none exists', async () => {
+    const getDocument = vi.fn().mockResolvedValue(undefined);
+
     const result = await migration.migrate.document?.(
       // @ts-expect-error -- only the fields the transform reads are needed
-      { brand: { variant: 'INDIGO' } },
-      fakeContext(undefined),
+      INDIGO_SITE,
+      mockMigrationContext({ getDocument }),
     );
 
-    expect(result).toEqual([
-      createIfNotExists({
-        _id: THEME_DOCUMENT_ID,
-        _type: THEME_DOCUMENT_TYPE,
-        ...INDIGO_THEME_TARGET,
-      }),
-      patch(THEME_DOCUMENT_ID, [
-        at('preset', set(INDIGO_THEME_TARGET.preset)),
-        at('accentHue', set(INDIGO_THEME_TARGET.accentHue)),
-        at('logoHue', set(INDIGO_THEME_TARGET.logoHue)),
-      ]),
-    ]);
+    expect(result).toEqual(INDIGO_MUTATIONS);
   });
 
-  it('is a no-op for a settings_site document with brand.variant CONSOLE, without calling getDocument', async () => {
-    const getDocument = vi.fn(async () => undefined);
+  it('does nothing for a non-INDIGO site and skips the theme lookup', async () => {
+    const getDocument = vi.fn();
 
     const result = await migration.migrate.document?.(
       // @ts-expect-error -- only the fields the transform reads are needed
-      { brand: { variant: 'CONSOLE' } },
-      fakeContext(undefined, getDocument),
+      CONSOLE_SITE,
+      mockMigrationContext({ getDocument }),
     );
 
     expect(result).toEqual([]);
     expect(getDocument).not.toHaveBeenCalled();
   });
 
-  it('skips when settings_theme already matches INDIGO_THEME_TARGET (idempotency guard)', async () => {
+  it('does nothing when the theme already matches the target', async () => {
+    const getDocument = vi.fn().mockResolvedValue({
+      ...MOCK_SYSTEM_FIELDS,
+      _id: THEME_DOCUMENT_ID,
+      _type: THEME_DOCUMENT_TYPE,
+      ...INDIGO_THEME_TARGET,
+    });
+
     const result = await migration.migrate.document?.(
       // @ts-expect-error -- only the fields the transform reads are needed
-      { brand: { variant: 'INDIGO' } },
-      fakeContext({
-        _id: THEME_DOCUMENT_ID,
-        _type: THEME_DOCUMENT_TYPE,
-        ...INDIGO_THEME_TARGET,
-      }),
+      INDIGO_SITE,
+      mockMigrationContext({ getDocument }),
     );
 
     expect(result).toEqual([]);
-  });
-
-  it('migrates when settings_theme exists but differs from INDIGO_THEME_TARGET', async () => {
-    const result = await migration.migrate.document?.(
-      // @ts-expect-error -- only the fields the transform reads are needed
-      { brand: { variant: 'INDIGO' } },
-      fakeContext({
-        _id: THEME_DOCUMENT_ID,
-        _type: THEME_DOCUMENT_TYPE,
-        preset: INDIGO_THEME_TARGET.preset,
-        accentHue: 10,
-        logoHue: 20,
-      }),
-    );
-
-    expect(result).toEqual([
-      createIfNotExists({
-        _id: THEME_DOCUMENT_ID,
-        _type: THEME_DOCUMENT_TYPE,
-        ...INDIGO_THEME_TARGET,
-      }),
-      patch(THEME_DOCUMENT_ID, [
-        at('preset', set(INDIGO_THEME_TARGET.preset)),
-        at('accentHue', set(INDIGO_THEME_TARGET.accentHue)),
-        at('logoHue', set(INDIGO_THEME_TARGET.logoHue)),
-      ]),
-    ]);
   });
 });

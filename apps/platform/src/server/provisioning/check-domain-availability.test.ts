@@ -1,4 +1,5 @@
 import { HTTP_STATUS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { env } from '@platform/utils/env/env';
@@ -8,294 +9,232 @@ import { checkDomainAvailability } from './check-domain-availability';
 
 vi.mock('@platform/utils/env/env');
 
+faker.seed(5997);
+
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 const loggerErrorMock = vi.mocked(logger.error);
+const fetchMock = vi.fn();
 
-const DOMAIN = 'example.com';
-const SUBDOMAIN = 'blog-dev.valstack.dev';
-const SUBDOMAIN_LOOKUP_PATH = '/v1/domains/valstack.dev/project-domains';
-const UNRELATED_SUBDOMAIN = 'someone-else.valstack.dev';
+const lowerAlpha = (length: number) =>
+  faker.string.alpha({ length, casing: 'lower' });
+
+const MULTI_PART_SUFFIX = 'co.uk';
+const MAX_PROJECT_DOMAINS_PAGES = 5;
+const MOCK_VERCEL_TOKEN = faker.string.alphanumeric(24);
+const MOCK_WEB_PROJECT_ID = `prj_${faker.string.alphanumeric(12)}`;
+const MOCK_OTHER_PROJECT_ID = `prj_${faker.string.alphanumeric(12)}`;
+const MOCK_APEX_DOMAIN = `${lowerAlpha(10)}.dev`;
+const MOCK_DOMAIN = `${lowerAlpha(10)}.com`;
+const MOCK_SUBDOMAIN = `${lowerAlpha(8)}.${MOCK_APEX_DOMAIN}`;
+const MOCK_SIBLING_SUBDOMAIN = `${lowerAlpha(9)}.${MOCK_APEX_DOMAIN}`;
+const MOCK_MULTI_PART_APEX = `${lowerAlpha(10)}.${MULTI_PART_SUFFIX}`;
+const MOCK_MULTI_PART_SUBDOMAIN = `${lowerAlpha(4)}.${MOCK_MULTI_PART_APEX}`;
+const MOCK_PAGE_CURSOR = faker.number.int({ min: 1e12, max: 2e12 });
+const MOCK_IP_LITERAL_HOST = faker.internet.ipv4();
+const MOCK_TRAVERSAL_DOMAIN = '../../v1/domains/other';
+const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
+
+const projectDomainsPath = (apex: string) =>
+  `/v1/domains/${apex}/project-domains`;
+
+const respondWith = (body: unknown, status: number = HTTP_STATUS.OK) =>
+  new Response(JSON.stringify(body), { status });
+
+const requestedUrl = (callIndex: number) =>
+  fetchMock.mock.calls[callIndex]?.[0] as URL;
 
 describe(checkDomainAvailability, () => {
-  const fetchMock = vi.fn();
-
   beforeEach(() => {
     fetchMock.mockReset();
-    loggerErrorMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
-    envMock.VERCEL_API_TOKEN = 'vercel-token';
-    envMock.VERCEL_PROJECT_ID_WEB = 'prj_web';
+    envMock.VERCEL_API_TOKEN = MOCK_VERCEL_TOKEN;
+    envMock.VERCEL_PROJECT_ID_WEB = MOCK_WEB_PROJECT_ID;
     envMock.VERCEL_TEAM_ID = undefined;
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ projectDomains: [] }), {
-        status: HTTP_STATUS.OK,
-      }),
-    );
+    fetchMock.mockResolvedValue(respondWith({ projectDomains: [] }));
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('returns NOT_CONFIGURED with no request when the Vercel token or project is unset', async () => {
+  it('returns NOT_CONFIGURED with no request when Vercel is not configured', async () => {
     envMock.VERCEL_API_TOKEN = undefined;
     envMock.VERCEL_PROJECT_ID_WEB = undefined;
 
-    const result = await checkDomainAvailability(DOMAIN);
+    const result = await checkDomainAvailability(MOCK_DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.NOT_CONFIGURED);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('rejects a domain containing path-traversal characters without making a request', async () => {
-    const result = await checkDomainAvailability('../../v1/domains/other');
+  it('rejects a path-traversal domain without making a request', async () => {
+    const result = await checkDomainAvailability(MOCK_TRAVERSAL_DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('returns AVAILABLE for a 404 response (domain unknown to the team)', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
-    );
-
-    const result = await checkDomainAvailability(DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
-  });
-
-  it('returns AVAILABLE when the domain is attached only to the shared web project', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          projectDomains: [{ name: DOMAIN, projectId: 'prj_web' }],
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
-
-    const result = await checkDomainAvailability(DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
-  });
-
-  it('returns IN_USE when the domain is attached to a different project', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          projectDomains: [{ name: DOMAIN, projectId: 'prj_other' }],
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
-
-    const result = await checkDomainAvailability(DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
-  });
-
-  it('matches the response name case-insensitively and ignoring a trailing dot', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          projectDomains: [{ name: 'Example.com.', projectId: 'prj_other' }],
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
-
-    const result = await checkDomainAvailability(DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
-  });
-
-  it('requests the apex domain and matches the full domain in the response', async () => {
-    await checkDomainAvailability(SUBDOMAIN);
-
-    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe(SUBDOMAIN_LOOKUP_PATH);
-  });
-
-  it('requests the registrable domain under a multi-part public suffix', async () => {
-    await checkDomainAvailability('blog.example.co.uk');
-
-    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe(
-      '/v1/domains/example.co.uk/project-domains',
-    );
-  });
-
-  it('returns ERROR with no request, and logs, when the apex domain is undeterminable', async () => {
-    const result = await checkDomainAvailability('co.uk');
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
-    expect(fetchMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED,
-      {
-        domain: 'co.uk',
-      },
+      TENANT_LOG.DOMAIN_AVAILABILITY_INVALID_DOMAIN,
+      { domain: MOCK_TRAVERSAL_DOMAIN },
     );
-  });
-
-  it('returns ERROR with no request for an IP-literal host', async () => {
-    const result = await checkDomainAvailability('1.2.3.4');
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED,
-      {
-        domain: '1.2.3.4',
-      },
-    );
   });
 
-  it('returns IN_USE for a subdomain attached to another project under the same apex', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          projectDomains: [
-            { name: SUBDOMAIN, projectId: 'prj_other' },
-            { name: 'other-tenant.valstack.dev', projectId: 'prj_unrelated' },
-          ],
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
+  it.each([MULTI_PART_SUFFIX, MOCK_IP_LITERAL_HOST])(
+    'returns ERROR with no request, and logs, when %s has no registrable domain',
+    async (domain) => {
+      const result = await checkDomainAvailability(domain);
 
-    const result = await checkDomainAvailability(SUBDOMAIN);
+      expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED,
+        { domain },
+      );
+    },
+  );
 
-    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
-    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe(SUBDOMAIN_LOOKUP_PATH);
-  });
+  it.each([
+    { domain: MOCK_SUBDOMAIN, apex: MOCK_APEX_DOMAIN },
+    { domain: MOCK_MULTI_PART_SUBDOMAIN, apex: MOCK_MULTI_PART_APEX },
+  ])(
+    'looks the domain up by its registrable domain $apex',
+    async ({ domain, apex }) => {
+      await checkDomainAvailability(domain);
 
-  it('returns AVAILABLE for a subdomain already attached to the shared web project', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          projectDomains: [{ name: SUBDOMAIN, projectId: 'prj_web' }],
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
+      expect(requestedUrl(0).pathname).toBe(projectDomainsPath(apex));
+    },
+  );
 
-    const result = await checkDomainAvailability(SUBDOMAIN);
+  it('returns AVAILABLE for a 404 response, the domain being unknown to the team', async () => {
+    fetchMock.mockResolvedValue(respondWith(null, HTTP_STATUS.NOT_FOUND));
 
-    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
-    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe(SUBDOMAIN_LOOKUP_PATH);
-  });
-
-  it('returns AVAILABLE when no returned project domain is the exact requested name', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          projectDomains: [
-            { name: 'other.example.com', projectId: 'prj_other' },
-          ],
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
-    );
-
-    const result = await checkDomainAvailability(DOMAIN);
+    const result = await checkDomainAvailability(MOCK_DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
 
-  it('follows the pagination cursor to a conflict that only appears on a later page', async () => {
+  it.each([
+    {
+      scenario: 'attached only to the shared web project',
+      domain: MOCK_SUBDOMAIN,
+      projectDomains: [
+        { name: MOCK_SUBDOMAIN, projectId: MOCK_WEB_PROJECT_ID },
+      ],
+      expected: DOMAIN_AVAILABILITY.AVAILABLE,
+    },
+    {
+      scenario: 'absent from the listed project domains',
+      domain: MOCK_DOMAIN,
+      projectDomains: [
+        { name: MOCK_SIBLING_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
+      ],
+      expected: DOMAIN_AVAILABILITY.AVAILABLE,
+    },
+    {
+      scenario: 'attached to a different project among unrelated ones',
+      domain: MOCK_SUBDOMAIN,
+      projectDomains: [
+        { name: MOCK_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
+        { name: MOCK_SIBLING_SUBDOMAIN, projectId: MOCK_WEB_PROJECT_ID },
+      ],
+      expected: DOMAIN_AVAILABILITY.IN_USE,
+    },
+    {
+      scenario: 'listed with other casing and a trailing dot',
+      domain: MOCK_DOMAIN,
+      projectDomains: [
+        {
+          name: `${MOCK_DOMAIN.toUpperCase()}.`,
+          projectId: MOCK_OTHER_PROJECT_ID,
+        },
+      ],
+      expected: DOMAIN_AVAILABILITY.IN_USE,
+    },
+  ])(
+    'returns $expected for a domain $scenario',
+    async ({ domain, projectDomains, expected }) => {
+      fetchMock.mockResolvedValue(respondWith({ projectDomains }));
+
+      const result = await checkDomainAvailability(domain);
+
+      expect(result).toBe(expected);
+    },
+  );
+
+  it('follows the pagination cursor to a conflict on a later page', async () => {
     fetchMock
       .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            projectDomains: [
-              {
-                name: UNRELATED_SUBDOMAIN,
-                projectId: 'prj_unrelated',
-              },
-            ],
-            pagination: { count: 1, next: 1700000000000, prev: null },
-          }),
-          { status: HTTP_STATUS.OK },
-        ),
+        respondWith({
+          projectDomains: [
+            { name: MOCK_SIBLING_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
+          ],
+          pagination: { count: 1, next: MOCK_PAGE_CURSOR, prev: null },
+        }),
       )
       .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            projectDomains: [{ name: SUBDOMAIN, projectId: 'prj_other' }],
-            pagination: { count: 1, next: null, prev: null },
-          }),
-          { status: HTTP_STATUS.OK },
-        ),
+        respondWith({
+          projectDomains: [
+            { name: MOCK_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
+          ],
+          pagination: { count: 1, next: null, prev: null },
+        }),
       );
 
-    const result = await checkDomainAvailability(SUBDOMAIN);
+    const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    const secondCall = fetchMock.mock.calls[1];
-    const secondCalledUrl = secondCall?.[0] as URL;
-    expect(secondCalledUrl.searchParams.get('until')).toBe('1700000000000');
+    expect(requestedUrl(1).searchParams.get('until')).toBe(
+      String(MOCK_PAGE_CURSOR),
+    );
   });
 
-  it('stops requesting further pages once a conflict is found on an earlier page', async () => {
+  it('stops requesting pages once a conflict is found', async () => {
     fetchMock.mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          projectDomains: [{ name: SUBDOMAIN, projectId: 'prj_other' }],
-          pagination: { count: 1, next: 1700000000000, prev: null },
-        }),
-        { status: HTTP_STATUS.OK },
-      ),
+      respondWith({
+        projectDomains: [
+          { name: MOCK_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
+        ],
+        pagination: { count: 1, next: MOCK_PAGE_CURSOR, prev: null },
+      }),
     );
 
-    const result = await checkDomainAvailability(SUBDOMAIN);
+    const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns ERROR, not a false AVAILABLE, when the page cap runs out inconclusively', async () => {
-    fetchMock.mockImplementation(() =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({
-            projectDomains: [
-              {
-                name: UNRELATED_SUBDOMAIN,
-                projectId: 'prj_unrelated',
-              },
-            ],
-            pagination: { count: 1, next: 1700000000000, prev: null },
-          }),
-          { status: HTTP_STATUS.OK },
-        ),
-      ),
+  it('returns ERROR, not AVAILABLE, when the page cap runs out inconclusively', async () => {
+    fetchMock.mockImplementation(async () =>
+      respondWith({
+        projectDomains: [
+          { name: MOCK_SIBLING_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
+        ],
+        pagination: { count: 1, next: MOCK_PAGE_CURSOR, prev: null },
+      }),
     );
 
-    const result = await checkDomainAvailability(SUBDOMAIN);
+    const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
-    expect(fetchMock).toHaveBeenCalledTimes(5);
+    expect(fetchMock).toHaveBeenCalledTimes(MAX_PROJECT_DOMAINS_PAGES);
   });
 
   it('returns ERROR for an unexpected non-2xx response', async () => {
     fetchMock.mockResolvedValue(
-      new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
+      respondWith(null, HTTP_STATUS.INTERNAL_SERVER_ERROR),
     );
 
-    const result = await checkDomainAvailability(DOMAIN);
+    const result = await checkDomainAvailability(MOCK_DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
   });
 
-  it('returns ERROR when the request throws or times out', async () => {
-    fetchMock.mockRejectedValue(new Error('network down'));
+  it('returns ERROR when the request throws', async () => {
+    fetchMock.mockRejectedValue(new Error(MOCK_NETWORK_ERROR_MESSAGE));
 
-    const result = await checkDomainAvailability(DOMAIN);
+    const result = await checkDomainAvailability(MOCK_DOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
   });

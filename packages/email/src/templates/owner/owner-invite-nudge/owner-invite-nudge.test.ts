@@ -1,26 +1,12 @@
-import { MOCK_PLATFORM_BRAND_NAME } from '@blog/email/testing/email-fixtures';
+import { buildOwnerEmail } from '@blog/email/templates/owner/owner-email/owner-email';
+import { MOCK_OWNER_EMAIL_INPUT } from '@blog/email/testing/owner-email';
 
 import { buildOwnerInviteNudgeEmail } from './owner-invite-nudge';
 
-const SUBJECT = 'Your Sanity invite is still waiting';
-
 describe(buildOwnerInviteNudgeEmail, () => {
-  it('renders the caller’s subject, escaped copy and action in the platform shell', () => {
-    const email = buildOwnerInviteNudgeEmail({
-      brandName: MOCK_PLATFORM_BRAND_NAME,
-      subject: SUBJECT,
-      paragraphs: ['Accept it to start editing <Acme Blog>.'],
-      action: {
-        label: 'Check now',
-        url: 'https://platform.example.com/dashboard',
-      },
-    });
-
-    expect(email.subject).toBe(SUBJECT);
-    expect(email.html).toContain('editing &lt;Acme Blog&gt;.');
-    expect(email.html).toContain(
-      'href="https://platform.example.com/dashboard"',
+  it('renders the owner email for the given copy and action', () => {
+    expect(buildOwnerInviteNudgeEmail(MOCK_OWNER_EMAIL_INPUT)).toEqual(
+      buildOwnerEmail(MOCK_OWNER_EMAIL_INPUT),
     );
-    expect(email.html).toContain('Check now');
   });
 });

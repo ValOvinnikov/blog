@@ -1,68 +1,102 @@
 import {
   CONTENT_ROUTE_REVALIDATE_SECONDS,
   LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  routes,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { permanentRedirect } from '@web/i18n/navigation';
+import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
-import { customRenderAsync } from '@web/testing/custom-render';
+import { mockRouteParams } from '@web/testing/app/route-params';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
-import PostIndexNumberedPage, { revalidate } from './page';
+import PostIndexNumberedPage, { generateMetadata, revalidate } from './page';
 
-const { getIndexPageMock } = vi.hoisted(() => ({
-  getIndexPageMock: vi.fn(),
-}));
+faker.seed(6009);
+
+const MOCK_METADATA = { title: faker.lorem.words(2) };
+const FIRST_PAGE = '1';
+const SECOND_PAGE = '2';
+const NON_CANONICAL_PAGES = ['abc', '02'];
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      blog: { v1: { getIndexPage: getIndexPageMock } },
-    },
-  },
-}));
-
 vi.mock('@web/i18n/navigation');
 
+vi.mock('@web/metadata/post-index-metadata', () => ({
+  buildPostIndexMetadata: vi.fn(),
+}));
+
+vi.mock('@web/components/pages/post-index-page', () => ({
+  PostIndexPage: ({ page }: { page: number }) => (
+    <div data-testid="post-index-page">{page}</div>
+  ),
+}));
+
+const paramsFor = (page: string) => mockRouteParams({ page });
+
+const firstPageParams = paramsFor(FIRST_PAGE);
+
 const setup = customRenderAsync(PostIndexNumberedPage, {
-  params: Promise.resolve({
-    tenant: 'tenant-1',
-    locale: LOCALE_ISO_CODES.EN,
-    page: '1',
-  }),
+  params: firstPageParams,
 });
 
-describe('PostIndexNumberedPage', () => {
+describe(`<${PostIndexNumberedPage.name}/>`, () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  it('redirects /blog/page/1 to /blog (canonical page 1 has one URL)', async () => {
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+  it('renders PostIndexPage for the requested page', async () => {
+    await setup({ params: paramsFor(SECOND_PAGE) });
 
-    expect(enterRequestContext).toHaveBeenCalled();
+    const postIndexPage = screen.getByTestId('post-index-page');
 
+    expect(postIndexPage).toHaveTextContent(SECOND_PAGE);
+  });
+
+  it('redirects page 1 to the canonical blog index URL', async () => {
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+
+    expect(enterRequestContext).toHaveBeenCalledWith(firstPageParams);
     expect(permanentRedirect).toHaveBeenCalledWith({
-      href: '/blog',
+      href: routes.blogIndex(1),
       locale: LOCALE_ISO_CODES.EN,
     });
   });
 
-  it.each(['abc', '02'])(
+  it.each(NON_CANONICAL_PAGES)(
     'hard-404s a non-canonical page param (%s)',
-    async (raw) => {
-      await expect(
-        setup({
-          params: Promise.resolve({
-            tenant: 'tenant-1',
-            locale: LOCALE_ISO_CODES.EN,
-            page: raw,
-          }),
-        }),
-      ).rejects.toThrow('NEXT_NOT_FOUND');
+    async (page) => {
+      await expect(setup({ params: paramsFor(page) })).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
 
-      expect(vi.mocked(notFound)).toHaveBeenCalled();
+      expect(notFound).toHaveBeenCalledTimes(1);
+    },
+  );
+});
+
+describe(generateMetadata, () => {
+  beforeEach(() => {
+    vi.mocked(buildPostIndexMetadata).mockResolvedValue(MOCK_METADATA);
+  });
+
+  it('builds the post index metadata for page 2', async () => {
+    const metadata = await generateMetadata({ params: paramsFor(SECOND_PAGE) });
+
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildPostIndexMetadata).toHaveBeenCalledWith(Number(SECOND_PAGE));
+  });
+
+  it.each([FIRST_PAGE, ...NON_CANONICAL_PAGES])(
+    'returns empty metadata without building any for page param %s',
+    async (page) => {
+      const metadata = await generateMetadata({ params: paramsFor(page) });
+
+      expect(metadata).toEqual({});
+      expect(buildPostIndexMetadata).not.toHaveBeenCalled();
     },
   );
 });

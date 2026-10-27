@@ -4,11 +4,15 @@ import { normalizeLocaleCode } from './normalize-locale-code';
 
 describe(normalizeLocaleCode, () => {
   it('upper-cases a lower-case code', () => {
-    expect(normalizeLocaleCode('en')).toBe(LOCALE_ISO_CODES.EN);
+    expect(normalizeLocaleCode(LOCALE_ISO_CODES.EN.toLowerCase())).toBe(
+      LOCALE_ISO_CODES.EN,
+    );
   });
 
   it('trims surrounding whitespace', () => {
-    expect(normalizeLocaleCode(' nl ')).toBe(LOCALE_ISO_CODES.NL);
+    expect(normalizeLocaleCode(` ${LOCALE_ISO_CODES.NL} `)).toBe(
+      LOCALE_ISO_CODES.NL,
+    );
   });
 
   it('leaves an already-normalized code unchanged', () => {

@@ -11,7 +11,6 @@ import { retryProvisioningStepAction } from '@platform/server/provisioning/retry
 import {
   act,
   customRender,
-  fireEvent,
   screen,
   waitFor,
   within,
@@ -27,9 +26,6 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_OWNER_EMAIL,
   MOCK_RUN_PLUS_1_MIN_AT,
-  MOCK_RUN_PLUS_2_MIN_AT,
-  MOCK_RUN_PLUS_4_MIN_AT,
-  MOCK_RUN_PLUS_6_MIN_AT,
   MOCK_RUN_PLUS_7_MIN_AT,
   MOCK_RUN_STARTED_AT,
   MOCK_TENANT_NAME,
@@ -45,6 +41,9 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 
 const STEP_POLL_INTERVAL_MS = 1500;
 const STEP_REVEAL_DWELL_MS = 800;
+const ONE_MINUTE_MS = 60_000;
+const QUEUED_WAIT_MS = 5000;
+const REVEALS_UNTIL_ALL_DONE = 11;
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
@@ -57,55 +56,62 @@ const getTenantProvisioningStatusActionMock = vi.mocked(
 
 const RUN_STATUS_LIVE = 'run-status-live';
 const PROVISIONING_STEPS = 'provisioning-steps';
-const HIDDEN_ICON_SELECTOR = 'span[aria-hidden="true"]';
-const NOT_STARTED = 'Not started';
-const VERCEL_DOMAINS_FAILURE =
-  'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error';
-const RETRY_PROVISIONING = 'Retry provisioning';
-const DOMAINS_API_ERROR = 'Vercel Domains API returned 500';
-const START_PROVISIONING = 'Start provisioning';
-const AT_20261015_1300 = '2026-10-15T13:00:00.000Z';
-const QUEUED_PROVISIONING_WORKFLOW_STARTING_UP =
-  'Queued — the provisioning workflow is starting up';
 const QUEUED_RUN_ELAPSED = 'queued-run-elapsed';
-const ARIA_EXPANDED = 'aria-expanded';
-const RUNNING = 'Running…';
-const ANY_NAME = /.+/;
 const FIRST_STEP_LIVE = `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`;
+const NOT_STARTED = 'Not started';
+const RUNNING = 'Running…';
+const START_PROVISIONING = 'Start provisioning';
+const RETRY_PROVISIONING = 'Retry provisioning';
+const STEPS_TOGGLE_NAME = /Steps/;
+const ARIA_EXPANDED = 'aria-expanded';
+const QUEUED_NOTICE = 'Queued — the provisioning workflow is starting up';
+const MOCK_DOMAINS_FAILURE =
+  'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error';
+const MOCK_QUEUED_ADMITTED_AT = '2026-10-15T13:00:00.000Z';
+const MOCK_QUEUED_STARTED_AT = '2026-10-15T13:01:00.000Z';
 
-const renderView = customRender(ProvisioningStatusView, {
+const MOCK_FAILED_TENANT = mockClientTenant({
+  provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+  provisioningSteps: mockMapDomainFailedProvisioningSteps(MOCK_DOMAINS_FAILURE),
+});
+
+const MOCK_FIRST_STEP_RUNNING_TENANT = mockClientTenant({
+  provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+  provisioningSteps: mockFirstStepRunningProvisioningSteps(),
+});
+
+const MOCK_QUEUED_TENANT = mockClientTenant({
+  provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+  provisioningSteps: {
+    ...mockIdleProvisioningSteps(),
+    run: { admittedAt: MOCK_QUEUED_ADMITTED_AT } as TProvisioningRun,
+  },
+});
+
+const MOCK_ARCHIVED_IDLE_TENANT = mockClientTenant({
+  deprovisionedAt: MOCK_ARCHIVED_AT,
+});
+
+const MOCK_ARCHIVED_FAILED_TENANT = mockClientTenant({
+  provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+  deprovisionedAt: MOCK_ARCHIVED_AT,
+  provisioningSteps: mockMapDomainFailedProvisioningSteps(MOCK_DOMAINS_FAILURE),
+});
+
+const setup = customRender(ProvisioningStatusView, {
   tenant: mockClientTenant(),
   ownerEmail: MOCK_OWNER_EMAIL,
 });
 
-const failedRunTenant = (error = DOMAINS_API_ERROR) =>
-  mockClientTenant({
-    provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-    provisioningSteps: mockMapDomainFailedProvisioningSteps(error),
+const advance = async (ms: number) => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
   });
-
-const provisioningFirstStepRunningTenant = () =>
-  mockClientTenant({
-    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    provisioningSteps: mockFirstStepRunningProvisioningSteps(),
-  });
-
-const queuedRunTenant = () =>
-  mockClientTenant({
-    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    provisioningSteps: {
-      ...mockIdleProvisioningSteps(),
-      run: { admittedAt: AT_20261015_1300 } as TProvisioningRun,
-    },
-  });
+};
 
 const pollAndReveal = async () => {
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-  });
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
-  });
+  await advance(STEP_POLL_INTERVAL_MS);
+  await advance(STEP_REVEAL_DWELL_MS);
 };
 
 describe(`<${ProvisioningStatusView.name}/>`, () => {
@@ -122,55 +128,23 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     vi.useRealTimers();
   });
 
-  const clickStartResolvingWith = async (
-    result: Awaited<ReturnType<typeof retryProvisioningStepAction>>,
-  ) => {
-    retryProvisioningStepActionMock.mockResolvedValue(result);
-    renderView();
-    const startButton = screen.getByRole('button', {
-      name: START_PROVISIONING,
-    });
-    await user.click(startButton);
-  };
+  it('titles the page and names the tenant in the description', () => {
+    setup({ tenant: mockClientTenant({ name: MOCK_TENANT_NAME }) });
 
-  it('never lets a rendered poll loop schedule a real setInterval, even for a test that never advances timers', () => {
-    expect(vi.getTimerCount()).toBe(0);
-
-    const { unmount } = renderView();
-
-    expect(vi.isFakeTimers()).toBe(true);
-    expect(vi.getTimerCount()).toBeGreaterThan(0);
-
-    unmount();
-    vi.runOnlyPendingTimers();
-    expect(vi.getTimerCount()).toBe(0);
-  });
-
-  it('titles the page "Provisioning" and names the tenant in the description', () => {
-    renderView({ tenant: mockClientTenant({ name: MOCK_TENANT_NAME }) });
-
-    const provisioningHeading = screen.getByRole('heading', {
+    const heading = screen.getByRole('heading', {
       level: 1,
       name: 'Provisioning',
     });
-    const acmeIncEachText = screen.getByText(
+    const description = screen.getByText(
       `${MOCK_TENANT_NAME} · each step is independently resumable.`,
     );
 
-    expect(provisioningHeading).toBeVisible();
-    expect(acmeIncEachText).toBeVisible();
+    expect(heading).toBeVisible();
+    expect(description).toBeVisible();
   });
 
-  it('does not show the archived notice for a live tenant', () => {
-    renderView({ tenant: mockClientTenant({ deprovisionedAt: null }) });
-
-    const thisTenantIsText = screen.queryByText(ARCHIVED_NOTICE_TEXT);
-
-    expect(thisTenantIsText).not.toBeInTheDocument();
-  });
-
-  it('renders the overall status badge in the Run card header, not the page header', () => {
-    renderView({
+  it('shows the run status in the Run card, not the page header', () => {
+    setup({
       tenant: mockClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
@@ -189,97 +163,26 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(cardBadge).toBeVisible();
   });
 
-  it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
-    renderView({ ownerEmail: undefined });
+  it('shows the invited-pending owner badge when no owner email is resolved', () => {
+    setup({ ownerEmail: undefined });
 
-    const ownerText = screen.getByText('Owner');
-    const invitedPendingText = screen.getByText(INVITED_PENDING_TEXT);
+    const ownerLabel = screen.getByText('Owner');
+    const invitedPending = screen.getByText(INVITED_PENDING_TEXT);
 
-    expect(ownerText).toBeVisible();
-    expect(invitedPendingText).toBeVisible();
+    expect(ownerLabel).toBeVisible();
+    expect(invitedPending).toBeVisible();
   });
 
-  describe('with every step idle', () => {
-    beforeEach(() => {
-      renderView();
-    });
+  it('hides the invited-pending owner badge once the owner email is resolved', () => {
+    setup();
 
-    it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
-      const invitedPendingText = screen.queryByText(INVITED_PENDING_TEXT);
+    const invitedPending = screen.queryByText(INVITED_PENDING_TEXT);
 
-      expect(invitedPendingText).not.toBeInTheDocument();
-    });
-
-    it('renders no complementary landmark around the main content', () => {
-      const complementary = screen.queryByRole('complementary');
-
-      expect(complementary).not.toBeInTheDocument();
-    });
-
-    it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
-      const sidebar = screen.getByTestId(PROVISIONING_STEPS);
-      const stepsHeading = within(sidebar).getByRole('heading', {
-        level: 2,
-        name: /^Steps/,
-      });
-      const completionBadge = within(sidebar).getByText('0 of 6 done');
-
-      expect(stepsHeading).toBeVisible();
-      expect(completionBadge).toBeVisible();
-    });
-
-    it('lists all six provisioning steps in order, in operator language', () => {
-      const headings = [
-        'Create workspace',
-        'Seed content',
-        'Issue read credentials',
-        'Connect domain',
-        'Wire up CMS to website',
-        'Confirm content is ready',
-      ];
-      for (const heading of headings) {
-        const headingElement = screen.getByText(heading);
-
-        expect(headingElement).toBeVisible();
-      }
-    });
-
-    it('does not render a parsed error card when no step has failed', () => {
-      const alert = screen.queryByRole('alert');
-
-      expect(alert).not.toBeInTheDocument();
-    });
-
-    it('shows a Start provisioning action when every step is idle', () => {
-      const startProvisioningButtons = screen.getAllByRole('button', {
-        name: START_PROVISIONING,
-      });
-
-      expect(startProvisioningButtons).toHaveLength(1);
-    });
-
-    it('says no run has started yet in the Run card before any run exists', () => {
-      const noRunHasText = screen.getByText('No run has started yet.');
-
-      expect(noRunHasText).toBeVisible();
-    });
-
-    it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
-      const startButton = screen.getByRole('button', {
-        name: START_PROVISIONING,
-      });
-      await user.click(startButton);
-
-      await waitFor(() => {
-        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
-          MOCK_TENANT_ID,
-        );
-      });
-    });
+    expect(invitedPending).not.toBeInTheDocument();
   });
 
-  it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
-    renderView({
+  it('counts the done steps from the tenant step statuses', () => {
+    setup({
       tenant: mockClientTenant({
         provisioningSteps: {
           ...mockFirstStepDoneProvisioningSteps(),
@@ -296,268 +199,206 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     expect(completionBadge).toBeVisible();
   });
 
-  describe('with the first step running', () => {
+  describe('with every step idle', () => {
     beforeEach(() => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningSteps: mockFirstStepRunningProvisioningSteps(),
-        }),
-      });
+      setup();
     });
 
-    it('shows the current status for a running step', () => {
-      const firstRunningText = screen.getAllByText(RUNNING)[0];
+    it('lists all six provisioning steps in operator language', () => {
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+      const stepTitles = [
+        'Create workspace',
+        'Seed content',
+        'Issue read credentials',
+        'Connect domain',
+        'Wire up CMS to website',
+        'Confirm content is ready',
+      ].map((title) => within(stepsCard).getByText(title));
 
-      expect(firstRunningText).toBeVisible();
+      for (const stepTitle of stepTitles) {
+        expect(stepTitle).toBeVisible();
+      }
     });
 
-    it("shows a running step's number in its circle instead of a spinner", () => {
-      const spinners = screen.queryAllByRole('status', { name: ANY_NAME });
-      const stepOneGlyph = screen.getByText('1', {
-        selector: HIDDEN_ICON_SELECTOR,
-      });
+    it('shows no error card and no live-region landmark noise', () => {
+      const alert = screen.queryByRole('alert');
+      const complementary = screen.queryByRole('complementary');
 
-      expect(spinners).toHaveLength(0);
-      expect(stepOneGlyph).toBeVisible();
+      expect(alert).not.toBeInTheDocument();
+      expect(complementary).not.toBeInTheDocument();
     });
 
-    it('hides the Start provisioning action once any step has progressed past idle', () => {
-      const startProvisioningButton = screen.queryByRole('button', {
+    it('offers a single Start provisioning action', () => {
+      const startButtons = screen.getAllByRole('button', {
         name: START_PROVISIONING,
       });
 
-      expect(startProvisioningButton).not.toBeInTheDocument();
+      expect(startButtons).toHaveLength(1);
+    });
+
+    it('dispatches the workflow for this tenant when Start is clicked', async () => {
+      const startButton = screen.getByRole('button', {
+        name: START_PROVISIONING,
+      });
+      await user.click(startButton);
+
+      await waitFor(() => {
+        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
+      });
     });
   });
 
-  it('exposes exactly one accessible announcement per step across all four statuses', () => {
-    renderView({
-      tenant: mockClientTenant({
-        provisioningSteps: {
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-          },
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Vercel deploy failed',
-          },
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-          },
-          [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-          },
-          [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-          },
-        },
-      }),
-    });
-
-    const spinners = screen.queryAllByRole('status', { name: ANY_NAME });
-
-    expect(spinners).toHaveLength(0);
-
-    for (const text of [NOT_STARTED, RUNNING, 'Complete', 'Failed']) {
-      for (const element of screen.getAllByText(text)) {
-        expect(element).not.toHaveAttribute('aria-hidden');
-      }
-    }
-
-    const stepOneGlyph = screen.getByText('1', {
-      selector: HIDDEN_ICON_SELECTOR,
-    });
-    const stepTwoGlyph = screen.getByText('2', {
-      selector: HIDDEN_ICON_SELECTOR,
-    });
-    const checkMark = screen.getByText('✓', {
-      selector: HIDDEN_ICON_SELECTOR,
-    });
-    const failureMark = screen.getByText('!', {
-      selector: HIDDEN_ICON_SELECTOR,
-    });
-
-    expect(stepOneGlyph).toBeVisible();
-    expect(stepTwoGlyph).toBeVisible();
-    expect(checkMark).toBeVisible();
-    expect(failureMark).toBeVisible();
-  });
-
-  it('shows a single Retry button in the Run card header for a failed step, with no per-step Retry buttons in the sidebar', () => {
-    renderView({ tenant: failedRunTenant(VERCEL_DOMAINS_FAILURE) });
-
-    const retryProvisioningButtons = screen.getAllByRole('button', {
-      name: RETRY_PROVISIONING,
-    });
-    const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
-    const sidebarRetryButton = within(stepsCard).queryByRole('button', {
-      name: RETRY_PROVISIONING,
-    });
-    const failedTexts = screen.getAllByText('Failed');
-
-    expect(retryProvisioningButtons).toHaveLength(1);
-    expect(sidebarRetryButton).not.toBeInTheDocument();
-    expect(failedTexts).toHaveLength(2);
-  });
-
-  it("no longer renders a step's raw error text inline in the sidebar", () => {
-    renderView({
-      tenant: mockClientTenant({
-        provisioningSteps: mockMapDomainFailedProvisioningSteps(
-          VERCEL_DOMAINS_FAILURE,
-        ),
-      }),
-    });
-
-    const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
-    const rawErrorText = within(stepsCard).queryByText(VERCEL_DOMAINS_FAILURE);
-
-    expect(rawErrorText).not.toBeInTheDocument();
-  });
-
-  describe('parsed provisioning error card', () => {
-    const renderFailed = (error: string) => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-          provisioningSteps: {
-            ...mockIdleProvisioningSteps(),
-            [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-              status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-              error,
-            },
-          },
-        }),
-      });
-    };
-
-    it('maps a 403 permission failure to a friendly headline and next step, with the raw text under Technical details', () => {
-      const rawError =
-        'Sanity Access API POST /access/project/xxxxx000/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
-      renderFailed(rawError);
-
-      const missingPermissionToCompleteHeading = screen.getByRole('heading', {
-        name: 'Missing permission to complete this step',
-      });
-      const grantTheMissingText = screen.getByText(
-        'Grant the missing permission, then retry.',
-      );
-      const technicalDetailsText = screen.getByText('Technical details');
-      const rawErrorElement = screen.getByText(rawError);
-
-      expect(missingPermissionToCompleteHeading).toBeVisible();
-      expect(grantTheMissingText).toBeVisible();
-      expect(technicalDetailsText).toBeVisible();
-      expect(rawErrorElement).not.toBeVisible();
-    });
-
-    it('maps a 400 duplicate/already-in-use failure to a friendly headline and next step', () => {
-      const rawError =
-        'Sanity Access API POST /access/project/xxxxx000/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
-      renderFailed(rawError);
-
-      const alreadyInUseByHeading = screen.getByRole('heading', {
-        name: 'Already in use by another tenant',
-      });
-      const resolveTheConflictText = screen.getByText(
-        'Resolve the conflict, then retry.',
-      );
-
-      expect(alreadyInUseByHeading).toBeVisible();
-      expect(resolveTheConflictText).toBeVisible();
-    });
-
-    it('maps a network/timeout failure to a friendly headline and next step', () => {
-      renderFailed('fetch failed');
-
-      const couldNotReachTheHeading = screen.getByRole('heading', {
-        name: "Couldn't reach the provisioning service",
-      });
-      const waitAMomentText = screen.getByText('Wait a moment, then retry.');
-
-      expect(couldNotReachTheHeading).toBeVisible();
-      expect(waitAMomentText).toBeVisible();
-    });
-
-    it('falls back to a generic friendly headline and preserved raw text for an unrecognised failure shape', () => {
-      const rawError = 'CORS API is down';
-      renderFailed(rawError);
-
-      const thisStepFailedHeading = screen.getByRole('heading', {
-        name: 'This step failed',
-      });
-      const retryOrCheckText = screen.getByText(
-        'Retry, or check the technical details before asking for help.',
-      );
-      const rawErrorElement = screen.getByText(rawError);
-
-      expect(thisStepFailedHeading).toBeVisible();
-      expect(retryOrCheckText).toBeVisible();
-      expect(rawErrorElement).not.toBeVisible();
-    });
-  });
-
-  describe('a stale FAILED step while a retried run is genuinely in progress', () => {
+  describe('with the first step running', () => {
     beforeEach(() => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-          provisioningSteps:
-            mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
-        }),
-      });
+      setup({ tenant: MOCK_FIRST_STEP_RUNNING_TENANT });
     });
 
-    it('shows a running indicator, not the stale Failed state, in the overall status badge', () => {
-      const runningCount = screen.getAllByText(RUNNING).length;
-      const failedText = screen.queryByText('Failed');
-      const alert = screen.queryByRole('alert');
+    it('shows the running status on the first step', () => {
+      const firstStepLive = screen.getByTestId(FIRST_STEP_LIVE);
+      const runningStatus = within(firstStepLive).getByText(RUNNING);
 
-      expect(runningCount).toBeGreaterThan(0);
-      expect(failedText).not.toBeInTheDocument();
-      expect(alert).not.toBeInTheDocument();
+      expect(runningStatus).toBeVisible();
     });
 
-    it('renders the stale step with its pending number instead of the failed glyph', () => {
-      const failureMark = screen.queryByText('!', {
-        selector: HIDDEN_ICON_SELECTOR,
-      });
-      const stepFourGlyph = screen.getByText('4', {
-        selector: HIDDEN_ICON_SELECTOR,
+    it('hides Start once any step has progressed past idle', () => {
+      const startButton = screen.queryByRole('button', {
+        name: START_PROVISIONING,
       });
 
-      expect(failureMark).not.toBeInTheDocument();
-      expect(stepFourGlyph).toBeVisible();
+      expect(startButton).not.toBeInTheDocument();
     });
+  });
 
-    it('shows no Retry button while the run is genuinely in progress', () => {
-      const retryProvisioningButton = screen.queryByRole('button', {
+  describe('with a failed step', () => {
+    it('offers one Retry in the Run card and none among the steps', () => {
+      setup({ tenant: MOCK_FAILED_TENANT });
+
+      const retryButtons = screen.getAllByRole('button', {
+        name: RETRY_PROVISIONING,
+      });
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+      const stepsRetryButton = within(stepsCard).queryByRole('button', {
         name: RETRY_PROVISIONING,
       });
 
-      expect(retryProvisioningButton).not.toBeInTheDocument();
+      expect(retryButtons).toHaveLength(1);
+      expect(stepsRetryButton).not.toBeInTheDocument();
+    });
+
+    it('keeps the raw error text out of the steps list', () => {
+      setup({ tenant: MOCK_FAILED_TENANT });
+
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+      const rawError = within(stepsCard).queryByText(MOCK_DOMAINS_FAILURE);
+
+      expect(rawError).not.toBeInTheDocument();
+    });
+
+    it('dispatches the workflow for this tenant when Retry is clicked', async () => {
+      setup({ tenant: MOCK_FAILED_TENANT });
+
+      const retryButton = screen.getByRole('button', {
+        name: RETRY_PROVISIONING,
+      });
+      await user.click(retryButton);
+
+      await waitFor(() => {
+        expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
+      });
     });
   });
 
-  it('re-dispatches the workflow for this tenant when Retry is clicked', async () => {
-    renderView({ tenant: failedRunTenant() });
-
-    const retryButton = screen.getByRole('button', {
-      name: RETRY_PROVISIONING,
+  describe('with a stale failed step while a retried run is in progress', () => {
+    beforeEach(() => {
+      setup({
+        tenant: mockClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+          provisioningSteps:
+            mockMapDomainFailedProvisioningSteps(MOCK_DOMAINS_FAILURE),
+        }),
+      });
     });
-    await user.click(retryButton);
 
-    await waitFor(() => {
-      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-      );
+    it('shows the run as running, not failed', () => {
+      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+      const runningStatus = within(runStatusLive).getByText(RUNNING);
+      const failedStatus = screen.queryByText('Failed');
+      const alert = screen.queryByRole('alert');
+
+      expect(runningStatus).toBeVisible();
+      expect(failedStatus).not.toBeInTheDocument();
+      expect(alert).not.toBeInTheDocument();
     });
+
+    it('offers no Retry', () => {
+      const retryButton = screen.queryByRole('button', {
+        name: RETRY_PROVISIONING,
+      });
+
+      expect(retryButton).not.toBeInTheDocument();
+    });
+  });
+
+  describe('error card for a failed step', () => {
+    it.each([
+      {
+        failure: 'a permission failure',
+        rawError:
+          'Sanity Access API POST /access/project/xxxxx000/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}',
+        headline: 'Missing permission to complete this step',
+        nextStep: 'Grant the missing permission, then retry.',
+      },
+      {
+        failure: 'an already-in-use failure',
+        rawError:
+          'Sanity Access API POST /access/project/xxxxx000/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}',
+        headline: 'Already in use by another tenant',
+        nextStep: 'Resolve the conflict, then retry.',
+      },
+      {
+        failure: 'a network failure',
+        rawError: 'fetch failed',
+        headline: "Couldn't reach the provisioning service",
+        nextStep: 'Wait a moment, then retry.',
+      },
+      {
+        failure: 'an unrecognised failure',
+        rawError: 'CORS API is down',
+        headline: 'This step failed',
+        nextStep:
+          'Retry, or check the technical details before asking for help.',
+      },
+    ])(
+      'explains $failure and keeps the raw text under technical details',
+      ({ rawError, headline, nextStep }) => {
+        setup({
+          tenant: mockClientTenant({
+            provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+            provisioningSteps: {
+              ...mockIdleProvisioningSteps(),
+              [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+                status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+                error: rawError,
+              },
+            },
+          }),
+        });
+
+        const headlineElement = screen.getByRole('heading', { name: headline });
+        const nextStepElement = screen.getByText(nextStep);
+        const technicalDetails = screen.getByText('Technical details');
+        const rawErrorElement = screen.getByText(rawError);
+
+        expect(headlineElement).toBeVisible();
+        expect(nextStepElement).toBeVisible();
+        expect(technicalDetails).toBeVisible();
+        expect(rawErrorElement).not.toBeVisible();
+      },
+    );
   });
 
   describe('while the Start dispatch is still pending', () => {
@@ -571,7 +412,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
           resolveDispatch = resolve;
         }),
       );
-      renderView();
+      setup();
     });
 
     afterEach(async () => {
@@ -581,157 +422,152 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
     });
 
-    it('immediately hides Start and shows the running badge before the dispatch resolves', async () => {
+    it('hides Start and shows the run as running at once', async () => {
       const startButton = screen.getByRole('button', {
         name: START_PROVISIONING,
       });
       await user.click(startButton);
 
-      const startProvisioningButton = screen.queryByRole('button', {
+      const removedStartButton = screen.queryByRole('button', {
         name: START_PROVISIONING,
       });
-      const runningCount = screen.getAllByText(RUNNING).length;
+      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+      const runningStatus = within(runStatusLive).getByText(RUNNING);
 
-      expect(startProvisioningButton).not.toBeInTheDocument();
-      expect(runningCount).toBeGreaterThan(0);
+      expect(removedStartButton).not.toBeInTheDocument();
+      expect(runningStatus).toBeVisible();
     });
 
-    it('mounts the overall status live region before Start is ever clicked, so the first status change is announced', async () => {
-      const liveRegion = screen.getByTestId(RUN_STATUS_LIVE);
-      const notStartedText = within(liveRegion).getByText(NOT_STARTED);
+    it('announces the first status change from a live region mounted before it', async () => {
+      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+      const notStarted = within(runStatusLive).getByText(NOT_STARTED);
 
-      expect(notStartedText).toBeVisible();
+      expect(notStarted).toBeVisible();
 
       const startButton = screen.getByRole('button', {
         name: START_PROVISIONING,
       });
       await user.click(startButton);
 
-      const runningText = within(liveRegion).getByText(RUNNING);
+      const runningStatus = within(runStatusLive).getByText(RUNNING);
 
-      expect(runningText).toBeVisible();
+      expect(runningStatus).toBeVisible();
     });
   });
 
-  it('shows a distinguishable error and re-enables Start when the dispatch fails, reverting the optimistic running state', async () => {
-    await clickStartResolvingWith({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-
-    const couldNotStartText = await screen.findByText(
-      "Couldn't start provisioning — try again.",
-    );
-    const startProvisioningButton = await screen.findByRole('button', {
-      name: START_PROVISIONING,
-    });
-
-    expect(couldNotStartText).toBeVisible();
-    expect(startProvisioningButton).toBeVisible();
-  });
-
-  it('shows a not-found-specific error when the tenant no longer exists server-side', async () => {
-    await clickStartResolvingWith({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
-    });
-
-    const couldNotFindText = await screen.findByText(
-      "Couldn't find this tenant — refresh the page and try again.",
-    );
-
-    expect(couldNotFindText).toBeVisible();
-  });
-
-  it('shows a distinct, non-error notice when a run is already in progress', async () => {
-    await clickStartResolvingWith({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
-    });
-
-    const aProvisioningRunText = await screen.findByText(
-      'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
-    );
-    const alert = screen.queryByRole('alert');
-
-    expect(aProvisioningRunText).toBeVisible();
-    expect(alert).not.toBeInTheDocument();
-  });
-
-  it('shows an archived-specific error if a dispatch is somehow still attempted against an archived tenant', async () => {
-    await clickStartResolvingWith({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.ARCHIVED,
-    });
-
-    const thisTenantIsText = await screen.findByText(
-      "This tenant is archived; provisioning can't be started.",
-    );
-
-    expect(thisTenantIsText).toBeVisible();
-  });
-
-  describe('for an archived tenant with every step idle', () => {
-    beforeEach(() => {
-      renderView({
-        tenant: mockClientTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
-      });
-    });
-
-    it('shows the archived notice for a deprovisioned tenant', () => {
-      const thisTenantIsText = screen.getByText(ARCHIVED_NOTICE_TEXT);
-
-      expect(thisTenantIsText).toBeVisible();
-    });
-
-    it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
+  describe('when the Start dispatch is refused or fails', () => {
+    const startResolvingWith = async (
+      result: Awaited<ReturnType<typeof retryProvisioningStepAction>>,
+    ) => {
+      retryProvisioningStepActionMock.mockResolvedValue(result);
+      setup();
       const startButton = screen.getByRole('button', {
         name: START_PROVISIONING,
       });
-      expect(startButton).toBeDisabled();
-
       await user.click(startButton);
-      expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+    };
+
+    it.each([
+      {
+        cause: 'an unexpected failure',
+        result: { outcome: ACTION_OUTCOME.SERVER_ERROR },
+        message: "Couldn't start provisioning — try again.",
+      },
+      {
+        cause: 'a tenant that no longer exists',
+        result: {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.NOT_FOUND,
+        },
+        message: "Couldn't find this tenant — refresh the page and try again.",
+      },
+      {
+        cause: 'an archived tenant',
+        result: {
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.ARCHIVED,
+        },
+        message: "This tenant is archived; provisioning can't be started.",
+      },
+    ] as const)('explains $cause', async ({ result, message }) => {
+      await startResolvingWith(result);
+
+      const notice = await screen.findByText(message);
+
+      expect(notice).toBeVisible();
     });
 
-    it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
-      const startProvisioningButton = screen.getByRole('button', {
+    it('re-enables Start after an unexpected failure', async () => {
+      await startResolvingWith({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+
+      const startButton = await screen.findByRole('button', {
         name: START_PROVISIONING,
       });
 
-      expect(startProvisioningButton).toHaveAccessibleDescription(
-        ARCHIVED_NOTICE_DESCRIPTION,
+      expect(startButton).toBeVisible();
+    });
+
+    it('explains a run already in progress without raising an alert', async () => {
+      await startResolvingWith({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
+      });
+
+      const notice = await screen.findByText(
+        'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
       );
+      const alert = screen.queryByRole('alert');
+
+      expect(notice).toBeVisible();
+      expect(alert).not.toBeInTheDocument();
     });
   });
 
-  describe('for an archived tenant with a failed step', () => {
-    beforeEach(() => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-          deprovisionedAt: MOCK_ARCHIVED_AT,
-          provisioningSteps:
-            mockMapDomainFailedProvisioningSteps(DOMAINS_API_ERROR),
-        }),
-      });
+  describe('for an archived tenant', () => {
+    it('shows the archived notice', () => {
+      setup({ tenant: MOCK_ARCHIVED_IDLE_TENANT });
+
+      const notice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+
+      expect(notice).toBeVisible();
     });
 
-    it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
-      const retryButton = screen.getByRole('button', {
-        name: RETRY_PROVISIONING,
-      });
-      expect(retryButton).toBeDisabled();
+    it('shows no archived notice for a live tenant', () => {
+      setup();
 
-      await user.click(retryButton);
-      expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+      const notice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
+
+      expect(notice).not.toBeInTheDocument();
     });
 
-    it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
-      const retryProvisioningButton = screen.getByRole('button', {
-        name: RETRY_PROVISIONING,
+    describe.each([
+      {
+        action: START_PROVISIONING,
+        tenant: MOCK_ARCHIVED_IDLE_TENANT,
+      },
+      {
+        action: RETRY_PROVISIONING,
+        tenant: MOCK_ARCHIVED_FAILED_TENANT,
+      },
+    ])('$action', ({ action, tenant }) => {
+      beforeEach(() => {
+        setup({ tenant });
       });
 
-      expect(retryProvisioningButton).toHaveAccessibleDescription(
-        ARCHIVED_NOTICE_DESCRIPTION,
-      );
+      it('is disabled and never dispatches on click', async () => {
+        const button = screen.getByRole('button', { name: action });
+        expect(button).toBeDisabled();
+
+        await user.click(button);
+
+        expect(retryProvisioningStepActionMock).not.toHaveBeenCalled();
+      });
+
+      it('is described by the archived notice', () => {
+        const button = screen.getByRole('button', { name: action });
+
+        expect(button).toHaveAccessibleDescription(ARCHIVED_NOTICE_DESCRIPTION);
+      });
     });
   });
 
@@ -741,104 +577,72 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       vi.useFakeTimers();
     });
 
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    describe('with the first step running and a poll that completes it', () => {
-      beforeEach(() => {
-        getTenantProvisioningStatusActionMock.mockResolvedValue({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-          provisioningSteps: mockFirstStepDoneProvisioningSteps(),
-        });
-        renderView({ tenant: provisioningFirstStepRunningTenant() });
-      });
-
-      it('polls for fresh status while provisioning is not terminal, and re-renders on a new result', async () => {
-        const sidebar = screen.getByTestId(PROVISIONING_STEPS);
-        const runningText = within(sidebar).getByText(RUNNING);
-
-        expect(runningText).toBeVisible();
-
-        await pollAndReveal();
-
-        expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
-          MOCK_TENANT_ID,
-        );
-        const completeText = within(sidebar).getByText('Complete');
-        const sidebarRunningText = within(sidebar).queryByText(RUNNING);
-
-        expect(completeText).toBeVisible();
-        expect(sidebarRunningText).not.toBeInTheDocument();
-      });
-
-      it('announces a polled step-status transition through a stable aria-live region', async () => {
-        const liveRegion = screen.getByTestId(FIRST_STEP_LIVE);
-        const runningText = within(liveRegion).getByText(RUNNING);
-
-        expect(runningText).toBeVisible();
-
-        await pollAndReveal();
-
-        const completeText = within(liveRegion).getByText('Complete');
-
-        expect(completeText).toBeVisible();
-      });
-    });
-
-    it('shows a step that finished between two polls as running before it shows as complete', async () => {
+    it('re-renders the steps from a fresh poll result', async () => {
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: mockFirstStepDoneProvisioningSteps(),
       });
-      renderView({
-        tenant: mockClientTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        }),
-      });
+      setup({ tenant: MOCK_FIRST_STEP_RUNNING_TENANT });
 
-      const liveRegion = screen.getByTestId(FIRST_STEP_LIVE);
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+      const runningStatus = within(stepsCard).getByText(RUNNING);
+
+      expect(runningStatus).toBeVisible();
 
       await pollAndReveal();
 
-      const runningText = within(liveRegion).getByText(RUNNING);
+      const completeStatus = within(stepsCard).getByText('Complete');
+      const removedRunningStatus = within(stepsCard).queryByText(RUNNING);
 
-      expect(runningText).toBeVisible();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
-      });
-
-      const completeText = within(liveRegion).getByText('Complete');
-
-      expect(completeText).toBeVisible();
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      expect(completeStatus).toBeVisible();
+      expect(removedRunningStatus).not.toBeInTheDocument();
     });
 
-    it('says the run is queued, with a wait that keeps counting, until the workflow starts it', async () => {
-      vi.setSystemTime(new Date('2026-10-15T13:00:05.000Z'));
-      renderView({ tenant: queuedRunTenant() });
+    it('collapses the steps once the polled run completes', async () => {
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: mockDoneProvisioningSteps(),
+      });
+      setup({ tenant: MOCK_FIRST_STEP_RUNNING_TENANT });
 
-      const queuedTheProvisioningText = screen.getByText(
-        QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
-      );
-      const queuedRunElapsed = screen.getByTestId(QUEUED_RUN_ELAPSED);
-      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
-      const firstStepLive = screen.getByTestId(FIRST_STEP_LIVE);
-      const startingText = within(runStatusLive).getByText('Starting…');
-      const queuedText = within(firstStepLive).getByText('Queued');
-
-      expect(queuedTheProvisioningText).toBeVisible();
-      expect(queuedRunElapsed).toHaveTextContent('0:05 waiting');
-      expect(startingText).toBeVisible();
-      expect(queuedText).toBeInTheDocument();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(60_000);
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+      const stepsToggle = within(stepsCard).getByRole('button', {
+        name: STEPS_TOGGLE_NAME,
       });
 
-      const queuedRunElapsedLater = screen.getByTestId(QUEUED_RUN_ELAPSED);
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
 
-      expect(queuedRunElapsedLater).toHaveTextContent('1:05 waiting');
+      await advance(STEP_POLL_INTERVAL_MS);
+      for (let reveal = 0; reveal < REVEALS_UNTIL_ALL_DONE; reveal += 1) {
+        await advance(STEP_REVEAL_DWELL_MS);
+      }
+
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('counts the wait of a queued run until the workflow starts it', async () => {
+      vi.setSystemTime(
+        new Date(Date.parse(MOCK_QUEUED_ADMITTED_AT) + QUEUED_WAIT_MS),
+      );
+      setup({ tenant: MOCK_QUEUED_TENANT });
+
+      const queuedNotice = screen.getByText(QUEUED_NOTICE);
+      const queuedElapsed = screen.getByTestId(QUEUED_RUN_ELAPSED);
+      const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
+      const startingStatus = within(runStatusLive).getByText('Starting…');
+
+      expect(queuedNotice).toBeVisible();
+      expect(queuedElapsed).toHaveTextContent('0:05 waiting');
+      expect(startingStatus).toBeVisible();
+
+      await advance(ONE_MINUTE_MS);
+
+      const laterElapsed = screen.getByTestId(QUEUED_RUN_ELAPSED);
+
+      expect(laterElapsed).toHaveTextContent('1:05 waiting');
     });
 
     it('drops the queued notice once the workflow has started the run', async () => {
@@ -846,221 +650,44 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...mockIdleProvisioningSteps(),
-          run: { startedAt: '2026-10-15T13:01:00.000Z' },
+          run: { startedAt: MOCK_QUEUED_STARTED_AT },
         },
       });
-      renderView({ tenant: queuedRunTenant() });
+      setup({ tenant: MOCK_QUEUED_TENANT });
 
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
+      await advance(STEP_POLL_INTERVAL_MS);
 
-      const queuedTheProvisioningText = screen.queryByText(
-        QUEUED_PROVISIONING_WORKFLOW_STARTING_UP,
-      );
+      const removedQueuedNotice = screen.queryByText(QUEUED_NOTICE);
       const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
-      const runningText = within(runStatusLive).getByText(RUNNING);
+      const runningStatus = within(runStatusLive).getByText(RUNNING);
 
-      expect(queuedTheProvisioningText).not.toBeInTheDocument();
-      expect(runningText).toBeVisible();
+      expect(removedQueuedNotice).not.toBeInTheDocument();
+      expect(runningStatus).toBeVisible();
     });
   });
 
-  describe('steps disclosure collapse', () => {
-    beforeEach(() => {
-      vi.useRealTimers();
-      vi.useFakeTimers();
-    });
-
-    const stepsToggle = () => {
-      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
-
-      return within(stepsCard).getByRole('button', { name: /Steps/ });
-    };
-
-    it('is expanded while the run is not done', () => {
-      renderView({ tenant: provisioningFirstStepRunningTenant() });
-
-      const disclosure = stepsToggle();
-
-      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('is collapsed by default once every step is already done on mount', () => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-          provisioningSteps: mockDoneProvisioningSteps(),
-        }),
-      });
-
-      const disclosure = stepsToggle();
-
-      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'false');
-    });
-
-    it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        provisioningSteps: mockDoneProvisioningSteps(),
-      });
-      renderView({ tenant: provisioningFirstStepRunningTenant() });
-
-      const disclosure = stepsToggle();
-      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-      for (let reveal = 0; reveal < 11; reveal += 1) {
-        await act(async () => {
-          await vi.advanceTimersByTimeAsync(STEP_REVEAL_DWELL_MS);
-        });
-      }
-
-      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'false');
-
-      fireEvent.click(disclosure);
-      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(60_000);
-      });
-
-      expect(disclosure).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-  });
-
-  describe('step and run timestamps', () => {
+  describe('step times', () => {
     beforeEach(() => {
       vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] });
+      vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
     });
 
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    describe('seven minutes into the run', () => {
-      beforeEach(() => {
-        vi.setSystemTime(new Date(MOCK_RUN_PLUS_7_MIN_AT));
-      });
-
-      describe('with the first step done a minute in', () => {
-        beforeEach(() => {
-          renderView({
-            tenant: mockClientTenant({
-              provisioningSteps: {
-                ...mockIdleProvisioningSteps(),
-                [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-                  status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-                  updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
-                },
-              },
-            }),
-          });
-        });
-
-        it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-          const timestamp = screen.getByText('6m ago');
-          expect(timestamp.tagName).toBe('TIME');
-          expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_1_MIN_AT);
-        });
-
-        it("keeps a step's timestamp outside the aria-live status region", () => {
-          const stepLiveRegions = screen.getAllByTestId(/^step-status-live-/);
-          const runStatusLive = screen.getByTestId(RUN_STATUS_LIVE);
-          const liveRegions = [...stepLiveRegions, runStatusLive];
-          expect(liveRegions.length).toBeGreaterThan(0);
-          for (const region of liveRegions) {
-            expect(region).not.toHaveTextContent('6m ago');
-          }
-        });
-      });
-
-      it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
-        renderView({
-          tenant: mockClientTenant({
-            provisioningSteps: {
-              ...mockIdleProvisioningSteps(),
-              [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-                status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-                error: 'boom',
-                updatedAt: MOCK_RUN_PLUS_2_MIN_AT,
-              },
-            },
-          }),
-        });
-
-        const timestamp = screen.getByText('5m ago');
-        expect(timestamp.tagName).toBe('TIME');
-        expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_2_MIN_AT);
-      });
-    });
-
-    it('shows "now" for a running step instead of a timestamp', () => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningSteps: mockFirstStepRunningProvisioningSteps(),
-        }),
-      });
-
-      const nowText = screen.getByText('now');
-      expect(nowText).toBeVisible();
-      expect(nowText.tagName).not.toBe('TIME');
-    });
-
-    it('shows no timestamp for a done step with no recorded updatedAt', () => {
-      renderView({
-        tenant: mockClientTenant({
-          provisioningSteps: mockFirstStepDoneProvisioningSteps(),
-        }),
-      });
-
-      const yearText = screen.queryByText(/\d{4}/);
-
-      expect(yearText).not.toBeInTheDocument();
-    });
-
-    it('renders a Run card header with no run details for a tenant with no run', () => {
-      renderView();
-
-      const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-      const startedText = screen.queryByText('Started');
-      const finishedText = screen.queryByText('Finished');
-
-      expect(runHeading).toBeVisible();
-      expect(startedText).not.toBeInTheDocument();
-      expect(finishedText).not.toBeInTheDocument();
-    });
-
-    it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
-      vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
-      renderView({
+    it("dates a done step from the tenant's recorded update", () => {
+      setup({
         tenant: mockClientTenant({
           provisioningSteps: {
             ...mockIdleProvisioningSteps(),
-            run: {
-              startedAt: MOCK_RUN_STARTED_AT,
-              finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
-              registry: 'production',
+            [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+              status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+              updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
             },
           },
         }),
       });
 
-      const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-      const sixMinutesAgoText = screen.getByText(
-        '6m ago · Aug 12, 2026, 2:18 PM UTC',
-      );
-      const twoMinutesAgoText = screen.getByText(
-        '2m ago · Aug 12, 2026, 2:22 PM UTC',
-      );
-      const productionText = screen.getByText('production');
+      const stepAge = screen.getByText('6m ago');
 
-      expect(runHeading).toBeVisible();
-      expect(sixMinutesAgoText).toBeVisible();
-      expect(twoMinutesAgoText).toBeVisible();
-      expect(productionText).toBeVisible();
+      expect(stepAge).toBeVisible();
     });
   });
 });

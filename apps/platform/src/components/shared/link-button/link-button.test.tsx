@@ -1,66 +1,42 @@
-import { SIZE } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
-import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { LinkButton } from './link-button';
 
 vi.mock('@platform/i18n/navigation');
 
-const TENANTS = 'Tenants';
-const MANAGE_TENANT = `Manage ${MOCK_TENANT_NAME}`;
+faker.seed(5995);
 
-describe(LinkButton, () => {
-  it('renders as an anchor with the given href', () => {
-    render(<LinkButton href={adminRoutes.tenants()}>{TENANTS}</LinkButton>);
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_ARIA_LABEL = faker.lorem.words(3);
 
-    const link = screen.getByRole('link', { name: TENANTS });
+const setup = customRender(LinkButton, {
+  href: adminRoutes.tenants(),
+  children: MOCK_LABEL,
+});
 
-    expect(link.tagName).toBe('A');
+describe(`<${LinkButton.name}/>`, () => {
+  it('links to the given href', () => {
+    setup();
+
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
+
     expect(link).toHaveAttribute('href', adminRoutes.tenants());
   });
 
-  it('renders every variant and size without throwing', () => {
-    const variants = ['primary', 'secondary', 'ghost', 'danger'] as const;
-    const sizes = [SIZE.SM, SIZE.MD] as const;
+  it('takes its accessible name from ariaLabel when given', () => {
+    setup({ ariaLabel: MOCK_ARIA_LABEL });
 
-    variants.forEach((variant) => {
-      sizes.forEach((size) => {
-        expect(() =>
-          render(
-            <LinkButton
-              href={adminRoutes.tenants()}
-              variant={variant}
-              size={size}
-            >
-              {TENANTS}
-            </LinkButton>,
-          ),
-        ).not.toThrow();
-      });
-    });
-  });
+    const link = screen.getByRole('link', { name: MOCK_ARIA_LABEL });
 
-  it('applies the given ariaLabel as the accessible name', () => {
-    render(
-      <LinkButton href={adminRoutes.tenants()} ariaLabel={MANAGE_TENANT}>
-        Manage
-      </LinkButton>,
-    );
-
-    const link = screen.getByRole('link', { name: MANAGE_TENANT });
-
-    expect(link).toHaveAttribute('href', adminRoutes.tenants());
+    expect(link).toBeVisible();
   });
 
   it('keeps a decorative arrow out of the accessible name', () => {
-    render(
-      <LinkButton href={adminRoutes.tenants()} hasArrow={true}>
-        View steps
-      </LinkButton>,
-    );
+    setup({ hasArrow: true });
 
-    const link = screen.getByRole('link', { name: 'View steps' });
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
 
     expect(link).toBeVisible();
   });

@@ -10,6 +10,7 @@ import {
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getSiteSettings } from './loader';
 import { siteSettingsQuery } from './query';
@@ -17,19 +18,17 @@ import type { TRawSiteSettings } from './transformer';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const BRAND_NAME = 'Awesome Blog';
-const BUILD_ITEM = 'build 2026.07';
-const ONLINE_ITEM = 'online';
-const LOGO_ALT = 'Logo';
-const DOT_TAGLINE = 'build 2026.07 · online';
+faker.seed(6015104);
 
-const tenant = mockTenant();
+const MOCK_BRAND_NAME = faker.company.name();
+const MOCK_FIRST_ITEM = faker.string.alpha(8);
+const MOCK_SECOND_ITEM = faker.string.alpha(8);
+const MOCK_LOGO_ALT = faker.lorem.words(2);
+const MOCK_CURRENCY = 'EUR';
+const MOCK_TENANT = mockTenant();
 
-function taglineItems(...texts: (string | null)[]) {
-  return texts.map((text, index) => ({
-    _key: `item-${String(index + 1)}`,
-    text,
-  }));
+function mockTaglineItems(...texts: (string | null)[]) {
+  return texts.map((text) => ({ _key: faker.string.uuid(), text }));
 }
 
 function mockSettingsWithBrand(
@@ -37,9 +36,9 @@ function mockSettingsWithBrand(
 ): TRawSiteSettings {
   return mockRawSiteSettings({
     brand: {
-      name: BRAND_NAME,
+      name: MOCK_BRAND_NAME,
       tagline: null,
-      logo: mockRawSanityImage(LOGO_ALT),
+      logo: mockRawSanityImage(MOCK_LOGO_ALT),
       ...brand,
     },
   });
@@ -53,41 +52,37 @@ describe(getSiteSettings, () => {
   it('throws when site settings document does not exist', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await expect(getSiteSettings(tenant)).rejects.toThrow();
+    await expect(getSiteSettings(MOCK_TENANT)).rejects.toThrow();
   });
 
   it('maps the brand name', async () => {
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
-    expect(result.brand.name).toBe(BRAND_NAME);
+    expect(result.brand.name).toBe(MOCK_BRAND_NAME);
   });
 
   it.each([
-    { separator: BRAND_TAGLINE_SEPARATORS.DOT, tagline: DOT_TAGLINE },
-    {
-      separator: BRAND_TAGLINE_SEPARATORS.PIPE,
-      tagline: 'build 2026.07 | online',
-    },
-    {
-      separator: BRAND_TAGLINE_SEPARATORS.BULLET,
-      tagline: 'build 2026.07 • online',
-    },
-    {
-      separator: BRAND_TAGLINE_SEPARATORS.SLASH,
-      tagline: 'build 2026.07 / online',
-    },
+    [BRAND_TAGLINE_SEPARATORS.DOT, '·'],
+    [BRAND_TAGLINE_SEPARATORS.PIPE, '|'],
+    [BRAND_TAGLINE_SEPARATORS.BULLET, '•'],
+    [BRAND_TAGLINE_SEPARATORS.SLASH, '/'],
   ])(
-    'joins tagline items with the $separator separator',
-    async ({ separator, tagline }) => {
+    'joins tagline items with the %s separator',
+    async (separator, character) => {
       mockRun.mockResolvedValueOnce(
         mockSettingsWithBrand({
-          tagline: { items: taglineItems(BUILD_ITEM, ONLINE_ITEM), separator },
+          tagline: {
+            items: mockTaglineItems(MOCK_FIRST_ITEM, MOCK_SECOND_ITEM),
+            separator,
+          },
         }),
       );
 
-      const result = await getSiteSettings(tenant);
+      const result = await getSiteSettings(MOCK_TENANT);
 
-      expect(result.brand.tagline).toBe(tagline);
+      expect(result.brand.tagline).toBe(
+        `${MOCK_FIRST_ITEM} ${character} ${MOCK_SECOND_ITEM}`,
+      );
     },
   );
 
@@ -95,30 +90,32 @@ describe(getSiteSettings, () => {
     mockRun.mockResolvedValueOnce(
       mockSettingsWithBrand({
         tagline: {
-          items: taglineItems(ONLINE_ITEM),
+          items: mockTaglineItems(MOCK_SECOND_ITEM),
           separator: BRAND_TAGLINE_SEPARATORS.DOT,
         },
       }),
     );
 
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
-    expect(result.brand.tagline).toBe(ONLINE_ITEM);
+    expect(result.brand.tagline).toBe(MOCK_SECOND_ITEM);
   });
 
   it('skips tagline items with no text in either language', async () => {
     mockRun.mockResolvedValueOnce(
       mockSettingsWithBrand({
         tagline: {
-          items: taglineItems(BUILD_ITEM, null, ONLINE_ITEM),
+          items: mockTaglineItems(MOCK_FIRST_ITEM, null, MOCK_SECOND_ITEM),
           separator: BRAND_TAGLINE_SEPARATORS.DOT,
         },
       }),
     );
 
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
-    expect(result.brand.tagline).toBe(DOT_TAGLINE);
+    expect(result.brand.tagline).toBe(
+      `${MOCK_FIRST_ITEM} · ${MOCK_SECOND_ITEM}`,
+    );
   });
 
   it.each([
@@ -130,7 +127,7 @@ describe(getSiteSettings, () => {
   ])('maps %s to undefined', async (_, tagline) => {
     mockRun.mockResolvedValueOnce(mockSettingsWithBrand({ tagline }));
 
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
     expect(result.brand.tagline).toBeUndefined();
   });
@@ -138,30 +135,32 @@ describe(getSiteSettings, () => {
   it('leaves logo undefined when no logo is uploaded', async () => {
     mockRun.mockResolvedValueOnce(mockSettingsWithBrand({ logo: null }));
 
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
     expect(result.brand.logo).toBeUndefined();
   });
 
   it('maps an uploaded logo to an image view-model', async () => {
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
-    expect(result.brand.logo).toEqual(mockSanityImageView(LOGO_ALT));
+    expect(result.brand.logo).toEqual(mockSanityImageView(MOCK_LOGO_ALT));
   });
 
   it('returns the currency code', async () => {
-    mockRun.mockResolvedValueOnce(mockRawSiteSettings({ currency: 'EUR' }));
+    mockRun.mockResolvedValueOnce(
+      mockRawSiteSettings({ currency: MOCK_CURRENCY }),
+    );
 
-    const result = await getSiteSettings(tenant);
+    const result = await getSiteSettings(MOCK_TENANT);
 
-    expect(result.currency).toBe('EUR');
+    expect(result.currency).toBe(MOCK_CURRENCY);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getSiteSettings(tenant);
+    await getSiteSettings(MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(siteSettingsQuery, {
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [mockCacheTag('site-settings')],

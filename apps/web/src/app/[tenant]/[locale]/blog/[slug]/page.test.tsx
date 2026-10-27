@@ -1,15 +1,23 @@
-import {
-  CONTENT_ROUTE_REVALIDATE_SECONDS,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { buildPostMetadata } from '@web/metadata/post-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
+import { mockRouteParams } from '@web/testing/app/route-params';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import BlogPostSlugPage, { generateMetadata, revalidate } from './page';
+
+faker.seed(6009);
+
+const MOCK_SLUG = faker.lorem.slug();
+const MOCK_METADATA = { title: faker.lorem.words(2) };
+
+const params = mockRouteParams({ slug: MOCK_SLUG });
 
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/metadata/post-metadata', () => ({
-  buildPostMetadata: vi.fn().mockResolvedValue({ title: 'Hello World' }),
+  buildPostMetadata: vi.fn(),
 }));
 
 vi.mock('@web/components/pages/blog-post-page', () => ({
@@ -18,59 +26,43 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
   ),
 }));
 
-describe('BlogPostSlugPage', () => {
+const setup = customRenderAsync(BlogPostSlugPage, { params });
+
+describe(`<${BlogPostSlugPage.name}/>`, () => {
+  beforeEach(async () => {
+    await setup();
+  });
+
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  it('enters the request context with the route params', async () => {
-    const params = Promise.resolve({
-      tenant: 'tenant-1',
-      locale: LOCALE_ISO_CODES.EN,
-      slug: 'a-slug',
-    });
-
-    await BlogPostSlugPage({ params });
-
+  it('enters the request context with the route params', () => {
     expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 
-  describe('generateMetadata', () => {
-    it('delegates to buildPostMetadata with the resolved slug', async () => {
-      const metadata = await generateMetadata({
-        params: Promise.resolve({
-          tenant: 'tenant-1',
-          locale: 'EN',
-          slug: 'hello-world',
-        }),
-      });
+  it('renders BlogPostPage with the resolved slug', () => {
+    const blogPostPage = screen.getByTestId('blog-post-page');
 
-      expect(metadata).toEqual({ title: 'Hello World' });
-    });
+    expect(blogPostPage).toHaveTextContent(MOCK_SLUG);
+  });
+});
 
-    it('enters the request context with the route params', async () => {
-      const params: Parameters<typeof generateMetadata>[0]['params'] =
-        Promise.resolve({
-          tenant: 'tenant-1',
-          locale: 'EN',
-          slug: 'hello-world',
-        });
-
-      await generateMetadata({ params });
-
-      expect(enterRequestContext).toHaveBeenCalledWith(params);
-    });
+describe(generateMetadata, () => {
+  beforeEach(() => {
+    vi.mocked(buildPostMetadata).mockResolvedValue(MOCK_METADATA);
   });
 
-  it('renders BlogPostPage with the resolved slug', async () => {
-    const ui = await BlogPostSlugPage({
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: 'EN',
-        slug: 'hello-world',
-      }),
-    });
+  it('returns the post metadata built for the resolved slug', async () => {
+    const metadata = await generateMetadata({ params });
 
-    expect(ui.props.slug).toBe('hello-world');
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildPostMetadata).toHaveBeenCalledWith(MOCK_SLUG);
+  });
+
+  it('enters the request context before building the metadata', async () => {
+    await generateMetadata({ params });
+
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 });

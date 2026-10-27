@@ -1,16 +1,19 @@
-import {
-  DENSITY,
-  FONT_CHOICE,
-  PRESET_ID,
-  RADIUS_SCALE,
-} from '@blog/config/constants';
+import { PRESET_ID } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { mockSettingsFeaturesToggles } from '@blog/db/testing/settings-features/fixtures';
+import { MOCK_SITE_CONFIG_FIELDS } from '@blog/db/testing/site-config/fixtures';
 
 import { getSettingsFeaturesAndPreset } from './get-settings-features-and-preset';
 
 vi.mock('@blog/db/client');
+
+const NOTHING_SAVED = {
+  features: undefined,
+  updatedAt: undefined,
+  preset: undefined,
+};
 
 const db = useQueryTestDb();
 
@@ -27,57 +30,39 @@ describe(getSettingsFeaturesAndPreset, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns neither features nor preset when the tenant has saved neither', async () => {
+  it('returns neither features nor preset when nothing is saved', async () => {
     const result = await getSettingsFeaturesAndPreset(tenantId);
 
-    expect(result).toEqual({
-      features: undefined,
-      updatedAt: undefined,
-      preset: undefined,
-    });
+    expect(result).toEqual(NOTHING_SAVED);
   });
 
-  it('returns the preset alone when only site_config exists', async () => {
-    await db().insert(schema.siteConfig).values({
-      tenantId,
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      headingFont: FONT_CHOICE.FRAUNCES,
-      bodyFont: FONT_CHOICE.INTER,
-      radiusScale: RADIUS_SCALE.SM,
-      density: DENSITY.COMPACT,
-    });
+  it('returns the preset alone when only site config exists', async () => {
+    await db()
+      .insert(schema.siteConfig)
+      .values({
+        tenantId,
+        ...MOCK_SITE_CONFIG_FIELDS,
+        preset: PRESET_ID.EDITORIAL,
+      });
 
     const result = await getSettingsFeaturesAndPreset(tenantId);
 
-    expect(result).toEqual({
-      features: undefined,
-      updatedAt: undefined,
-      preset: PRESET_ID.EDITORIAL,
-    });
+    expect(result).toEqual({ ...NOTHING_SAVED, preset: PRESET_ID.EDITORIAL });
   });
 
-  it('returns the saved toggles when only settings_features exists', async () => {
-    await db().insert(schema.settingsFeatures).values({
-      tenantId,
-      commentsEnabled: false,
-      newsletterEnabled: true,
-    });
+  it('returns the saved toggles when only features exist', async () => {
+    const toggles = mockSettingsFeaturesToggles();
+    const [saved] = await db()
+      .insert(schema.settingsFeatures)
+      .values({ tenantId, ...toggles })
+      .returning();
 
     const result = await getSettingsFeaturesAndPreset(tenantId);
 
     expect(result).toEqual({
-      features: {
-        commentsEnabled: false,
-        ratingsEnabled: true,
-        bookmarksEnabled: true,
-        newsletterEnabled: true,
-        analyticsEnabled: false,
-        consentBannerEnabled: false,
-        contactFormEnabled: true,
-      },
-      updatedAt: expect.any(Date),
-      preset: undefined,
+      ...NOTHING_SAVED,
+      features: toggles,
+      updatedAt: saved?.updatedAt,
     });
   });
 
@@ -89,6 +74,6 @@ describe(getSettingsFeaturesAndPreset, () => {
 
     const result = await getSettingsFeaturesAndPreset(tenantId);
 
-    expect(result.features).toBeUndefined();
+    expect(result).toEqual(NOTHING_SAVED);
   });
 });

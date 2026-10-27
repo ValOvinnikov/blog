@@ -22,28 +22,30 @@ import {
   MOCK_POST_TITLE,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getHeroBlog } from './loader';
 import { heroBlogModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HERO_BLOG_ID = 'hero-blog-1';
+faker.seed(6014);
 
-const tenant = mockTenant();
+const MOCK_HERO_BLOG_ID = faker.string.uuid();
+const MOCK_PINNED_POST_ID = faker.string.uuid();
 
 describe(getHeroBlog, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawHeroBlogModule({
-        post: mockRawPostCard({ _id: 'pinned-post' }),
+        post: mockRawPostCard({ _id: MOCK_PINNED_POST_ID }),
       }),
     );
   });
 
-  it('resolves the hero in a single round trip — exactly one runQuery call', async () => {
-    const hero = await getHeroBlog(HERO_BLOG_ID, tenant);
+  it('resolves the hero from a single query', async () => {
+    const hero = await getHeroBlog(MOCK_HERO_BLOG_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
     if (!hero.hasPost) throw new Error('expected a resolved post');
@@ -54,22 +56,20 @@ describe(getHeroBlog, () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getHeroBlog(MOCK_MISSING_ID, tenant)).rejects.toThrow();
-    expect(mockRun).toHaveBeenCalledTimes(1);
+    await expect(getHeroBlog(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toThrow();
   });
 
-  it('threads tenant context and scopes cache tags to it', async () => {
-    await getHeroBlog(HERO_BLOG_ID, tenant);
+  it('queries with the tenant and tenant-scoped cache tags', async () => {
+    await getHeroBlog(MOCK_HERO_BLOG_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
     expect(mockRun).toHaveBeenNthCalledWith(1, heroBlogModuleQuery, {
-      parameters: { id: HERO_BLOG_ID },
-      tenant,
+      parameters: { id: MOCK_HERO_BLOG_ID },
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
           mockCacheTag('modules:heroBlog'),
-          mockCacheTag(`module:${HERO_BLOG_ID}`),
+          mockCacheTag(`module:${MOCK_HERO_BLOG_ID}`),
           MOCK_POSTS_CACHE_TAG,
           MOCK_AUTHOR_CACHE_TAG,
           MOCK_LINK_CACHE_TAG,

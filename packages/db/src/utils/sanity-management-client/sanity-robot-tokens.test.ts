@@ -12,6 +12,7 @@ import {
   MOCK_SANITY_ROBOT_ID,
   mockSanityProjectInput,
 } from '@blog/db/testing/sanity-management-client/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   createSanityRobotToken,
@@ -23,12 +24,15 @@ import {
   SANITY_WRITE_TOKEN_LABEL,
 } from './sanity-token-labels';
 
-const createInput = mockSanityProjectInput({
+faker.seed(1903);
+
+const MOCK_LEGACY_TOKEN = faker.string.alphanumeric(16);
+const MOCK_CREATE_INPUT = mockSanityProjectInput({
   label: SANITY_READ_TOKEN_LABEL,
   role: SANITY_ROBOT_ROLE.VIEWER,
 });
 
-const MOCK_SECOND_ROBOT_ID = 'robot2';
+const MOCK_SECOND_ROBOT_ID = faker.string.alphanumeric(10);
 
 const fetchMock = useFetchFake();
 
@@ -41,7 +45,7 @@ describe(createSanityRobotToken, () => {
       }),
     );
 
-    const result = await createSanityRobotToken(createInput);
+    const result = await createSanityRobotToken(MOCK_CREATE_INPUT);
 
     const { url, body } = firstFetchCall(fetchMock);
     expect(result).toEqual({
@@ -50,12 +54,12 @@ describe(createSanityRobotToken, () => {
     });
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.robots);
     expect(body).toEqual({
-      label: createInput.label,
+      label: MOCK_CREATE_INPUT.label,
       memberships: [
         {
           resourceType: 'project',
           resourceId: MOCK_SANITY_PROJECT_ID,
-          roleNames: [createInput.role],
+          roleNames: [MOCK_CREATE_INPUT.role],
         },
       ],
     });
@@ -64,8 +68,8 @@ describe(createSanityRobotToken, () => {
   it.each([
     {
       field: 'the key field when token is absent',
-      response: { id: MOCK_SANITY_ROBOT_ID, key: 'sk-legacy' },
-      expected: { id: MOCK_SANITY_ROBOT_ID, token: 'sk-legacy' },
+      response: { id: MOCK_SANITY_ROBOT_ID, key: MOCK_LEGACY_TOKEN },
+      expected: { id: MOCK_SANITY_ROBOT_ID, token: MOCK_LEGACY_TOKEN },
     },
     {
       field: 'the tokenId field when id is absent',
@@ -78,7 +82,7 @@ describe(createSanityRobotToken, () => {
   ])('falls back to $field', async ({ response, expected }) => {
     fetchMock.mockResolvedValue(jsonResponse(response));
 
-    const result = await createSanityRobotToken(createInput);
+    const result = await createSanityRobotToken(MOCK_CREATE_INPUT);
 
     expect(result).toEqual(expected);
   });
@@ -92,7 +96,7 @@ describe(createSanityRobotToken, () => {
   ])('throws when the response has neither $fields', async ({ response }) => {
     fetchMock.mockResolvedValue(jsonResponse(response));
 
-    await expect(createSanityRobotToken(createInput)).rejects.toThrow(
+    await expect(createSanityRobotToken(MOCK_CREATE_INPUT)).rejects.toThrow(
       /returned no id\/token/,
     );
   });

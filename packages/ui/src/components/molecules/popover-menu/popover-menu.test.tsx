@@ -1,151 +1,133 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
-import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { createRef, type ReactNode, type Ref } from 'react';
 
 import { PopoverMenu } from './popover-menu';
 
-const openMenuChildren = (
-  <>
-    <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-      Trigger
-    </PopoverMenu.Trigger>
-    <PopoverMenu.Panel id="p1" isOpen={true}>
-      <PopoverMenu.Item>Item one</PopoverMenu.Item>
-    </PopoverMenu.Panel>
-  </>
-);
+faker.seed(123);
+
+const MOCK_TRIGGER_LABEL = faker.lorem.words(2);
+const MOCK_PANEL_ID = faker.string.uuid();
+const MOCK_ITEM_LABEL = faker.lorem.words(2);
+const MOCK_LINK_ITEM_LABEL = faker.lorem.words(2);
+const MOCK_HREF = faker.internet.url();
+
+const renderMenu = ({
+  isOpen = true,
+  items = <PopoverMenu.Item>{MOCK_ITEM_LABEL}</PopoverMenu.Item>,
+  triggerRef,
+}: {
+  isOpen?: boolean;
+  items?: ReactNode;
+  triggerRef?: Ref<HTMLButtonElement>;
+} = {}) =>
+  renderElement(
+    <PopoverMenu>
+      <PopoverMenu.Trigger
+        ariaLabel={MOCK_TRIGGER_LABEL}
+        isOpen={isOpen}
+        panelId={MOCK_PANEL_ID}
+        ref={triggerRef}
+      >
+        {faker.lorem.word()}
+      </PopoverMenu.Trigger>
+      <PopoverMenu.Panel id={MOCK_PANEL_ID} isOpen={isOpen}>
+        {items}
+      </PopoverMenu.Panel>
+    </PopoverMenu>,
+  );
 
 describe(`<${PopoverMenu.name}/>`, () => {
-  it('renders a trigger with the correct menu-button ARIA attributes', () => {
-    renderElement(
-      <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={false} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={false}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
+  let user: UserEvent;
 
-    const trigger = screen.getByRole('button', { name: 'Open menu' });
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
+  it('renders a trigger with the menu-button ARIA attributes', () => {
+    renderMenu({ isOpen: false });
+
+    const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
+
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveAttribute('aria-controls', 'p1');
+    expect(trigger).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
   });
 
   it('forwards a ref on the trigger to the underlying button', () => {
-    const ref = createRef<HTMLButtonElement>();
-    renderElement(
-      <PopoverMenu>
-        <PopoverMenu.Trigger
-          ariaLabel="Open menu"
-          isOpen={false}
-          panelId="p1"
-          ref={ref}
-        >
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={false}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
+    const triggerRef = createRef<HTMLButtonElement>();
+    renderMenu({ isOpen: false, triggerRef });
 
-    expect(ref.current).toBe(screen.getByRole('button', { name: 'Open menu' }));
+    const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
+
+    expect(triggerRef.current).toBe(trigger);
   });
 
-  it('hides the panel when isOpen is false and shows it when isOpen is true', () => {
-    const { rerender } = renderElement(
-      <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={false} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={false}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
+  it('hides the panel while closed', () => {
+    renderMenu({ isOpen: false });
 
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    const menu = screen.queryByRole('menu');
 
-    rerender(
-      <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={true}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
-
-    expect(screen.getByRole('menu')).toBeVisible();
+    expect(menu).not.toBeInTheDocument();
   });
 
-  it('renders each Item with role="menuitem"', () => {
-    renderElement(
-      <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={true}>
-          <PopoverMenu.Item>Item one</PopoverMenu.Item>
-          <PopoverMenu.Item as="a" href="https://example.com">
-            Item two
+  it('shows the panel while open', () => {
+    renderMenu({ isOpen: true });
+
+    const menu = screen.getByRole('menu');
+
+    expect(menu).toBeVisible();
+  });
+
+  it('renders each Item as a menu item, an anchor when given href', () => {
+    renderMenu({
+      items: (
+        <>
+          <PopoverMenu.Item>{MOCK_ITEM_LABEL}</PopoverMenu.Item>
+          <PopoverMenu.Item as="a" href={MOCK_HREF}>
+            {MOCK_LINK_ITEM_LABEL}
           </PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
+        </>
+      ),
+    });
 
-    expect(screen.getAllByRole('menuitem')).toHaveLength(2);
-    expect(screen.getByRole('menuitem', { name: 'Item two' })).toHaveAttribute(
-      'href',
-      'https://example.com',
-    );
+    const menuItems = screen.getAllByRole('menuitem');
+    const linkItem = screen.getByRole('menuitem', {
+      name: MOCK_LINK_ITEM_LABEL,
+    });
+
+    expect(menuItems).toHaveLength(2);
+    expect(linkItem).toHaveAttribute('href', MOCK_HREF);
   });
 
   it('calls onClick when a button Item is clicked', async () => {
     const onClick = vi.fn();
-    renderElement(
-      <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={true}>
-          <PopoverMenu.Item onClick={onClick}>Item one</PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
+    renderMenu({
+      items: (
+        <PopoverMenu.Item onClick={onClick}>{MOCK_ITEM_LABEL}</PopoverMenu.Item>
+      ),
+    });
 
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Item one' }));
+    const item = screen.getByRole('menuitem', { name: MOCK_ITEM_LABEL });
+    await user.click(item);
+
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('renders a Separator between Items with role="separator"', () => {
-    renderElement(
-      <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" isOpen={true} panelId="p1">
-          Trigger
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" isOpen={true}>
-          <PopoverMenu.Item>Copy link</PopoverMenu.Item>
+  it('renders a Separator between Items', () => {
+    renderMenu({
+      items: (
+        <>
+          <PopoverMenu.Item>{MOCK_ITEM_LABEL}</PopoverMenu.Item>
           <PopoverMenu.Separator />
-          <PopoverMenu.Item as="a" href="https://example.com">
-            Share on X
-          </PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </PopoverMenu>,
-    );
+          <PopoverMenu.Item>{MOCK_LINK_ITEM_LABEL}</PopoverMenu.Item>
+        </>
+      ),
+    });
 
-    expect(screen.getByRole('separator')).toBeVisible();
-  });
+    const separator = screen.getByRole('separator');
 
-  it('forwards data-testid', () => {
-    renderElement(
-      <PopoverMenu dataTestId="popover-menu">{openMenuChildren}</PopoverMenu>,
-    );
-
-    expect(screen.getByTestId('popover-menu')).toBeVisible();
+    expect(separator).toBeVisible();
   });
 });

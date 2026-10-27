@@ -1,21 +1,23 @@
 import { CORE_PROVISIONING_STEPS } from '@blog/db/constants';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 
 import { AddTenantWizard } from './add-tenant-wizard';
-
-const render = renderWithIntl;
 
 vi.mock('@platform/server/tenants/create-tenant-action', () => ({
   createTenantAction: vi.fn(),
 }));
 
-describe(AddTenantWizard, () => {
+const setup = customRender(AddTenantWizard, {
+  rootDomain: MOCK_TENANT_ROOT_DOMAIN,
+});
+
+describe(`<${AddTenantWizard.name}/>`, () => {
   beforeEach(() => {
-    render(<AddTenantWizard rootDomain={MOCK_TENANT_ROOT_DOMAIN} />);
+    setup();
   });
 
-  it('renders the page H1 and demotes Tenant details to the step-1 card heading', () => {
+  it('puts the page title above the Tenant details step heading', () => {
     const pageHeading = screen.getByRole('heading', {
       level: 1,
       name: 'Add tenant',
@@ -29,7 +31,7 @@ describe(AddTenantWizard, () => {
     expect(cardHeading).toBeVisible();
   });
 
-  it('renders a rail item for Details plus every core provisioning step, with Details active', () => {
+  it('lists Details and every core provisioning step, with Details active', () => {
     const rail = screen.getByRole('list', {
       name: 'Provisioning steps',
     });
@@ -46,7 +48,7 @@ describe(AddTenantWizard, () => {
     expect(rail).toHaveTextContent('Confirm content is ready');
   });
 
-  it("renders the Details form's fields", () => {
+  it('shows the tenant name field in the Details form', () => {
     const nameInput = screen.getByRole('textbox', { name: 'Tenant name' });
 
     expect(nameInput).toBeVisible();

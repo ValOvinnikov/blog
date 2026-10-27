@@ -16,10 +16,13 @@ import { unsubscribeByToken } from './unsubscribe-by-token';
 
 vi.mock('@blog/db/client');
 
+faker.seed(1);
+
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
 const MOCK_UNSUBSCRIBE_TOKEN = faker.string.uuid();
+const MOCK_UNKNOWN_TOKEN = faker.string.uuid();
 const MOCK_UNSUBSCRIBE_TOKEN_HASH = sha256Hex(MOCK_UNSUBSCRIBE_TOKEN);
 
 async function readSubscriberIds(): Promise<string[]> {
@@ -56,13 +59,14 @@ describe(unsubscribeByToken, () => {
     );
 
     const result = await unsubscribeByToken(tenantId, MOCK_UNSUBSCRIBE_TOKEN);
+    const remainingIds = await readSubscriberIds();
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
-    expect(await readSubscriberIds()).toEqual([siblingId]);
+    expect(remainingIds).toEqual([siblingId]);
   });
 
   it.each([
-    ['an unknown token', () => tenantId, () => faker.string.uuid()],
+    ['an unknown token', () => tenantId, () => MOCK_UNKNOWN_TOKEN],
     ['the stored hash', () => tenantId, () => MOCK_UNSUBSCRIBE_TOKEN_HASH],
     [
       "another tenant's token",
@@ -73,9 +77,10 @@ describe(unsubscribeByToken, () => {
     'returns not-found for %s and deletes nothing',
     async (_case, tenant, token) => {
       const result = await unsubscribeByToken(tenant(), token());
+      const remainingIds = await readSubscriberIds();
 
       expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
-      expect(await readSubscriberIds()).toEqual([subscriberId]);
+      expect(remainingIds).toEqual([subscriberId]);
     },
   );
 });

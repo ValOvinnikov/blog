@@ -2,6 +2,7 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_FEATURE_LIST_MODULE_ID,
+  mockRawFeatureListItem,
   mockRawFeatureListModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
@@ -15,64 +16,70 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getFeatureList } from './loader';
 import { featureListModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const FEATURE_LIST_HEADING = 'What we ship';
+faker.seed(1);
 
-const tenant = mockTenant();
+const MOCK_FEATURE_LIST_HEADING = faker.lorem.words(3);
+const MOCK_FIRST_CARD_ID = faker.string.uuid();
+const MOCK_SECOND_CARD_ID = faker.string.uuid();
 
 describe(getFeatureList, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(mockRawFeatureListModule());
-  });
-
-  it('resolves the module in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
+    mockRun.mockResolvedValue(
       mockRawFeatureListModule({
-        headingBlock: mockRawHeadingBlock(FEATURE_LIST_HEADING),
+        headingBlock: mockRawHeadingBlock(MOCK_FEATURE_LIST_HEADING),
+        features: [
+          mockRawFeatureListItem({ _id: MOCK_FIRST_CARD_ID }),
+          mockRawFeatureListItem({ _id: MOCK_SECOND_CARD_ID }),
+        ],
       }),
     );
+  });
 
+  it('resolves the module with a single query', async () => {
     const featureList = await getFeatureList(
       MOCK_FEATURE_LIST_MODULE_ID,
-      tenant,
+      MOCK_TENANT,
     );
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(featureList.headingBlock.heading).toBe(FEATURE_LIST_HEADING);
+    expect(featureList.headingBlock.heading).toBe(MOCK_FEATURE_LIST_HEADING);
   });
 
   it('returns the referenced cards in authored order', async () => {
     const featureList = await getFeatureList(
       MOCK_FEATURE_LIST_MODULE_ID,
-      tenant,
+      MOCK_TENANT,
     );
 
     expect(featureList.items.map((item) => item.id)).toEqual([
-      'block-feature-1',
-      'block-feature-2',
+      MOCK_FIRST_CARD_ID,
+      MOCK_SECOND_CARD_ID,
     ]);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(mockValidationError());
+    const error = mockValidationError();
+    mockRun.mockRejectedValueOnce(error);
 
-    await expect(getFeatureList(MOCK_MISSING_ID, tenant)).rejects.toThrow();
-    expect(mockRun).toHaveBeenCalledTimes(1);
+    await expect(getFeatureList(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toBe(
+      error,
+    );
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    await getFeatureList(MOCK_FEATURE_LIST_MODULE_ID, tenant);
+    await getFeatureList(MOCK_FEATURE_LIST_MODULE_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(1, featureListModuleQuery, {
+    expect(mockRun).toHaveBeenCalledWith(featureListModuleQuery, {
       parameters: { id: MOCK_FEATURE_LIST_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

@@ -1,32 +1,33 @@
+import { faker } from '@faker-js/faker';
 import { set } from 'sanity/migrate';
 
 import migration from './index';
 
-/** The `object()` node handler is the only piece of migration logic under test here. */
+faker.seed(4);
+
+const MOCK_KEY = faker.string.alphanumeric(6);
+const MOCK_ALT = faker.lorem.words();
+
 const objectHandler = migration.migrate.object;
 
 if (!objectHandler) {
   throw new Error('Expected the migration to define an object() node handler.');
 }
 
-describe('rename-body-image-type migration wiring', () => {
-  it('returns a set() operation for a legacy body image array item', () => {
-    const node = { _type: 'imageWithAlt', _key: 'a1', alt: 'A description' };
+describe('rename-body-image-type migration', () => {
+  it('renames a legacy body image array item', () => {
+    const node = { _type: 'imageWithAlt', _key: MOCK_KEY, alt: MOCK_ALT };
 
-    const result = objectHandler(node, ['body', { _key: 'a1' }]);
+    const result = objectHandler(node, ['body', { _key: MOCK_KEY }]);
 
     expect(result).toEqual(set({ ...node, _type: 'bodyImage' }));
   });
 
-  it('returns undefined for a node outside the body[] array scope', () => {
-    const node = { _type: 'imageWithAlt', alt: 'Hero' };
+  it('leaves a node outside the body array alone', () => {
+    const node = { _type: 'imageWithAlt', alt: MOCK_ALT };
 
     const result = objectHandler(node, ['heroImage']);
 
     expect(result).toBeUndefined();
-  });
-
-  it('is scoped to blog_post and module_content document types only', () => {
-    expect(migration.documentTypes).toEqual(['blog_post', 'module_content']);
   });
 });

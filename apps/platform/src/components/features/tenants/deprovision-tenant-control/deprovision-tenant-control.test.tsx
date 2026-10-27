@@ -19,9 +19,11 @@ vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: deprovisionTenantActionMock,
 }));
 
-const TENANT = mockClientTenant({ deprovisionedAt: null });
+const MOCK_CLIENT_TENANT = mockClientTenant({ deprovisionedAt: null });
 
-const setup = customRender(DeprovisionTenantControl, { tenant: TENANT });
+const setup = customRender(DeprovisionTenantControl, {
+  tenant: MOCK_CLIENT_TENANT,
+});
 
 const DEPROVISION = 'Deprovision';
 const DEPROVISION_DIALOG_TITLE = `Deprovision ${MOCK_TENANT_NAME}`;
@@ -102,10 +104,13 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
     await typeTenantNameAndConfirm(user, dialog);
 
-    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-      confirm: MOCK_TENANT_NAME,
-      dryRun: true,
-    });
+    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(
+      MOCK_CLIENT_TENANT.id,
+      {
+        confirm: MOCK_TENANT_NAME,
+        dryRun: true,
+      },
+    );
     await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
   });
 
@@ -117,10 +122,13 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
     await typeTenantNameAndConfirm(user, dialog);
 
-    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-      confirm: MOCK_TENANT_NAME,
-      dryRun: false,
-    });
+    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(
+      MOCK_CLIENT_TENANT.id,
+      {
+        confirm: MOCK_TENANT_NAME,
+        dryRun: false,
+      },
+    );
   });
 
   it('turns the dry-run switch back on when the dialog closes', async () => {
@@ -160,8 +168,8 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     expect(refreshMock).not.toHaveBeenCalled();
   });
 
-  describe('isDeprovisioningInProgress', () => {
-    it('renders the trigger enabled by default, with no in-progress hint', () => {
+  describe('with a run in progress', () => {
+    it('offers an enabled trigger with no hint when no run is in progress', () => {
       setup();
 
       const trigger = screen.getByRole('button', { name: DEPROVISION });
@@ -171,7 +179,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
       expect(hint).not.toBeInTheDocument();
     });
 
-    it('marks the trigger aria-disabled and describes it with the hint while a run is in progress', () => {
+    it('blocks the trigger and explains why while a run is in progress', () => {
       setup({ isDeprovisioningInProgress: true });
 
       const trigger = screen.getByRole('button', { name: DEPROVISION });

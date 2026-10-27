@@ -1,12 +1,18 @@
+import {
+  CONTAINER_WIDTH,
+  CONTENT_ALIGNMENT,
+  SPACING_SCALE,
+} from '@blog/config/constants';
+
 import { appearanceToLayout } from './transform';
 
 describe(appearanceToLayout, () => {
-  it('maps spacingTop/spacingBottom and divider onto both dividerTop/dividerBottom', () => {
+  it('maps the divider onto both the top and bottom dividers', () => {
     const result = appearanceToLayout(
       {
         appearance: {
-          spacingTop: 'LG',
-          spacingBottom: 'LG',
+          spacingTop: SPACING_SCALE.LG,
+          spacingBottom: SPACING_SCALE.SM,
           divider: true,
         },
       },
@@ -14,41 +20,14 @@ describe(appearanceToLayout, () => {
     );
 
     expect(result).toEqual({
-      spacingTop: 'LG',
-      spacingBottom: 'LG',
+      spacingTop: SPACING_SCALE.LG,
+      spacingBottom: SPACING_SCALE.SM,
       dividerTop: true,
       dividerBottom: true,
     });
   });
 
-  it('carries containerWidth only when includeContainerWidth is true (module_newsletter)', () => {
-    const result = appearanceToLayout(
-      { appearance: { containerWidth: 'WIDE' } },
-      { includeContainerWidth: true },
-    );
-
-    expect(result).toEqual({ containerWidth: 'WIDE' });
-  });
-
-  it('drops containerWidth for module_hero even when set on appearance', () => {
-    const result = appearanceToLayout(
-      { appearance: { containerWidth: 'WIDE' } },
-      { includeContainerWidth: false },
-    );
-
-    expect(result).toEqual({});
-  });
-
-  it('never copies align', () => {
-    const result = appearanceToLayout(
-      { appearance: { align: 'START' } },
-      { includeContainerWidth: true },
-    );
-
-    expect(result).toEqual({});
-  });
-
-  it('copies an explicit divider: false', () => {
+  it('copies a divider that is switched off', () => {
     const result = appearanceToLayout(
       { appearance: { divider: false } },
       { includeContainerWidth: false },
@@ -57,33 +36,42 @@ describe(appearanceToLayout, () => {
     expect(result).toEqual({ dividerTop: false, dividerBottom: false });
   });
 
+  it.each([
+    [true, { containerWidth: CONTAINER_WIDTH.WIDE }],
+    [false, {}],
+  ])(
+    'copies the container width only when allowed (allowed: %s)',
+    (includeContainerWidth, expected) => {
+      const result = appearanceToLayout(
+        { appearance: { containerWidth: CONTAINER_WIDTH.WIDE } },
+        { includeContainerWidth },
+      );
+
+      expect(result).toEqual(expected);
+    },
+  );
+
+  it('never copies the alignment', () => {
+    const result = appearanceToLayout(
+      { appearance: { align: CONTENT_ALIGNMENT.LEFT } },
+      { includeContainerWidth: true },
+    );
+
+    expect(result).toEqual({});
+  });
+
   it('returns undefined when appearance is absent', () => {
     const result = appearanceToLayout({}, { includeContainerWidth: false });
 
     expect(result).toBeUndefined();
   });
 
-  it('is idempotent — a doc that already has layout is left alone', () => {
+  it('treats a null layout as not yet migrated', () => {
     const result = appearanceToLayout(
-      {
-        appearance: { spacingTop: 'LG' },
-        layout: { spacingTop: 'LG' },
-      },
+      { appearance: { spacingTop: SPACING_SCALE.LG }, layout: null },
       { includeContainerWidth: false },
     );
 
-    expect(result).toBeUndefined();
-  });
-
-  it('treats an explicit layout: null as not yet migrated', () => {
-    const result = appearanceToLayout(
-      {
-        appearance: { spacingTop: 'LG' },
-        layout: null,
-      },
-      { includeContainerWidth: false },
-    );
-
-    expect(result).toEqual({ spacingTop: 'LG' });
+    expect(result).toEqual({ spacingTop: SPACING_SCALE.LG });
   });
 });

@@ -1,112 +1,121 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import { queries } from '@blog/db';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { auth } from '@platform/server/auth/auth';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
-import { auth } from './auth';
 import { listSessionTenants } from './list-session-tenants';
 
-const {
-  listMembershipsWithTenantsForUserMock,
-  listTenantsMock,
-  getAdminByUserIdMock,
-} = vi.hoisted(() => ({
-  listMembershipsWithTenantsForUserMock: vi.fn(),
-  listTenantsMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-}));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('./auth');
+vi.mock('@blog/db', async () => {
+  const { mockDbConstants } =
+    await import('@platform/testing/mock-db-constants');
 
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: {
-    memberships: {
-      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+  return {
+    ...(await mockDbConstants()),
+    queries: {
+      memberships: { listMembershipsWithTenantsForUser: vi.fn() },
+      tenants: { listTenants: vi.fn() },
+      admins: { getAdminByUserId: vi.fn() },
     },
-    tenants: { listTenants: listTenantsMock },
-    admins: { getAdminByUserId: getAdminByUserIdMock },
-  },
-}));
+  };
+});
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+faker.seed(5997);
+
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_SUPERADMIN_USER_ID = faker.string.uuid();
+const MOCK_THIRD_TENANT_ID = faker.string.uuid();
+const MOCK_SECOND_MEMBERSHIP_ID = faker.string.uuid();
+
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+const listMembershipsWithTenantsForUser = vi.mocked(
+  queries.memberships.listMembershipsWithTenantsForUser,
+);
+const listTenants = vi.mocked(queries.tenants.listTenants);
+const getAdminByUserId = vi.mocked(queries.admins.getAdminByUserId);
+
+const NON_SUPERADMIN_ROWS = [
+  { adminsRow: 'no admins row', admin: undefined },
+  { adminsRow: 'an ADMIN admins row', admin: mockAdmin() },
+  {
+    adminsRow: 'a MODERATOR admins row',
+    admin: mockAdmin({ role: ADMIN_ROLE.MODERATOR }),
+  },
+];
 
 describe(listSessionTenants, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    listMembershipsWithTenantsForUserMock.mockReset();
-    listTenantsMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
+    authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
+    getAdminByUserId.mockReset();
+    listMembershipsWithTenantsForUser.mockReset();
+    listTenants.mockReset();
+    getAdminByUserId.mockResolvedValue(undefined);
+    listMembershipsWithTenantsForUser.mockResolvedValue([]);
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+    authMock.mockResolvedValueOnce(null);
 
     await expect(listSessionTenants()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
     expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-    expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
+    expect(listMembershipsWithTenantsForUser).not.toHaveBeenCalled();
   });
 
-  it('redirects to /onboarding for a non-SUPERADMIN with zero memberships', async () => {
-    await expect(listSessionTenants()).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
-  });
-
-  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    'redirects to /onboarding for a %s admins row with zero memberships',
-    async (role) => {
-      getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
+  it.each(NON_SUPERADMIN_ROWS)(
+    'redirects to /onboarding with $adminsRow and zero memberships',
+    async ({ admin }) => {
+      getAdminByUserId.mockResolvedValue(admin);
 
       await expect(listSessionTenants()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
       );
 
       expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
-      expect(listTenantsMock).not.toHaveBeenCalled();
+      expect(listTenants).not.toHaveBeenCalled();
     },
   );
 
   it('resolves every tenant behind the memberships row set, not a client-supplied list', async () => {
-    const memberships = [
-      {
-        id: 'm-1',
-        userId: 'user-1',
-        tenantId: MOCK_TENANT_ID,
-        role: MEMBERSHIP_ROLE.OWNER,
-      },
-      {
-        id: 'm-2',
-        userId: 'user-1',
-        tenantId: 'tenant-2',
-        role: MEMBERSHIP_ROLE.OWNER,
-      },
+    const tenants = [
+      mockTenant({ id: MOCK_TENANT_ID }),
+      mockTenant({ id: MOCK_OTHER_TENANT_ID }),
     ];
-    const tenants = [{ id: MOCK_TENANT_ID }, { id: 'tenant-2' }];
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership: memberships[0], tenant: tenants[0] },
-      { membership: memberships[1], tenant: tenants[1] },
+    const memberships = [
+      mockMembership({ userId: MOCK_USER_ID, tenantId: MOCK_TENANT_ID }),
+      mockMembership({
+        id: MOCK_SECOND_MEMBERSHIP_ID,
+        userId: MOCK_USER_ID,
+        tenantId: MOCK_OTHER_TENANT_ID,
+      }),
+    ];
+    listMembershipsWithTenantsForUser.mockResolvedValue([
+      { membership: memberships[0]!, tenant: tenants[0]! },
+      { membership: memberships[1]!, tenant: tenants[1]! },
     ]);
 
     const result = await listSessionTenants();
 
-    expect(listMembershipsWithTenantsForUserMock).toHaveBeenCalledWith(
-      'user-1',
+    expect(listMembershipsWithTenantsForUser).toHaveBeenCalledWith(
+      MOCK_USER_ID,
     );
     expect(result).toEqual({
-      userId: 'user-1',
+      userId: MOCK_USER_ID,
       admin: undefined,
       memberships,
       tenants,
@@ -115,12 +124,12 @@ describe(listSessionTenants, () => {
   });
 
   it('returns the admins row it read alongside real memberships', async () => {
-    const admin = { id: 'admin-1', role: ADMIN_ROLE.ADMIN };
-    getAdminByUserIdMock.mockResolvedValue(admin);
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+    const admin = mockAdmin({ userId: MOCK_USER_ID });
+    getAdminByUserId.mockResolvedValue(admin);
+    listMembershipsWithTenantsForUser.mockResolvedValue([
       {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
-        tenant: { id: MOCK_TENANT_ID },
+        membership: mockMembership({ userId: MOCK_USER_ID }),
+        tenant: mockTenant(),
       },
     ]);
 
@@ -129,31 +138,49 @@ describe(listSessionTenants, () => {
     expect(result.admin).toEqual(admin);
   });
 
-  it('resolves every tenant for a SUPERADMIN, regardless of their own memberships', async () => {
-    authMock.mockResolvedValue({ user: { id: 'super-1' } });
-    const admin = { id: 'admin-1', role: ADMIN_ROLE.SUPERADMIN };
-    getAdminByUserIdMock.mockResolvedValue(admin);
+  describe('for a SUPERADMIN', () => {
     const tenants = [
-      { id: MOCK_TENANT_ID },
-      { id: 'tenant-2' },
-      { id: 'tenant-3' },
+      mockTenant({ id: MOCK_TENANT_ID }),
+      mockTenant({ id: MOCK_OTHER_TENANT_ID }),
+      mockTenant({ id: MOCK_THIRD_TENANT_ID }),
     ];
-    listTenantsMock.mockResolvedValue(tenants);
+    const admin = mockAdmin({
+      userId: MOCK_SUPERADMIN_USER_ID,
+      role: ADMIN_ROLE.SUPERADMIN,
+    });
 
-    const result = await listSessionTenants();
+    beforeEach(() => {
+      authMock.mockResolvedValue({ user: { id: MOCK_SUPERADMIN_USER_ID } });
+      getAdminByUserId.mockResolvedValue(admin);
+      listTenants.mockResolvedValue(tenants);
+    });
 
-    expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
-    expect(result.userId).toBe('super-1');
-    expect(result.admin).toEqual(admin);
-    expect(result.tenants).toEqual(tenants);
-    expect(result.memberships).toHaveLength(3);
-    expect(
-      result.memberships.every(
-        (membership) =>
-          membership.role === MEMBERSHIP_ROLE.OWNER &&
-          membership.userId === 'super-1',
-      ),
-    ).toBe(true);
-    expect(redirect).not.toHaveBeenCalled();
+    it('resolves every tenant, archived included', async () => {
+      const result = await listSessionTenants();
+
+      expect(listTenants).toHaveBeenCalledWith({ includeArchived: true });
+      expect(result.userId).toBe(MOCK_SUPERADMIN_USER_ID);
+      expect(result.admin).toEqual(admin);
+      expect(result.tenants).toEqual(tenants);
+      expect(redirect).not.toHaveBeenCalled();
+    });
+
+    it('grants an OWNER-level virtual membership on each tenant', async () => {
+      const { memberships } = await listSessionTenants();
+
+      const grants = memberships.map(({ role, userId, tenantId }) => ({
+        role,
+        userId,
+        tenantId,
+      }));
+
+      expect(grants).toEqual(
+        tenants.map(({ id }) => ({
+          role: MEMBERSHIP_ROLE.OWNER,
+          userId: MOCK_SUPERADMIN_USER_ID,
+          tenantId: id,
+        })),
+      );
+    });
   });
 });

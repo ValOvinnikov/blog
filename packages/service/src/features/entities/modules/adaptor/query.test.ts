@@ -3,48 +3,53 @@ import {
   mockReference,
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
 
 import {
   linkIdsReferencingDocumentQuery,
   referencingModuleIdsQuery,
 } from './query';
 
-const OTHER_POST_ID = 'post-2';
-const LINK_TO_POST_ID = 'link-to-post';
-const DIRECT_MODULE_ID = 'module-direct';
-const VIA_LINK_MODULE_ID = 'module-via-link';
-const UNRELATED_MODULE_ID = 'module-unrelated';
-const LEGACY_DIRECT_MODULE_ID = 'blog_module-direct';
+faker.seed(6102);
+
+const MOCK_OTHER_POST_ID = faker.string.uuid();
+const MOCK_UNREFERENCED_ID = faker.string.uuid();
+const MOCK_LINK_TO_POST_ID = faker.string.uuid();
+const MOCK_LINK_TO_OTHER_ID = faker.string.uuid();
+const MOCK_DIRECT_MODULE_ID = faker.string.uuid();
+const MOCK_VIA_LINK_MODULE_ID = faker.string.uuid();
+const MOCK_UNRELATED_MODULE_ID = faker.string.uuid();
+const MOCK_LEGACY_MODULE_ID = faker.string.uuid();
 
 const dataset = [
   { _id: MOCK_POST_ID, _type: 'page_post' },
   {
-    _id: LINK_TO_POST_ID,
+    _id: MOCK_LINK_TO_POST_ID,
     _type: 'link',
     internalReference: mockReference(MOCK_POST_ID),
   },
   {
-    _id: 'link-to-other',
+    _id: MOCK_LINK_TO_OTHER_ID,
     _type: 'link',
-    internalReference: mockReference(OTHER_POST_ID),
+    internalReference: mockReference(MOCK_OTHER_POST_ID),
   },
   {
-    _id: DIRECT_MODULE_ID,
+    _id: MOCK_DIRECT_MODULE_ID,
     _type: 'module_cta',
     target: mockReference(MOCK_POST_ID),
   },
   {
-    _id: VIA_LINK_MODULE_ID,
+    _id: MOCK_VIA_LINK_MODULE_ID,
     _type: 'module_hero',
-    link: mockReference(LINK_TO_POST_ID),
+    link: mockReference(MOCK_LINK_TO_POST_ID),
   },
   {
-    _id: UNRELATED_MODULE_ID,
+    _id: MOCK_UNRELATED_MODULE_ID,
     _type: 'module_cta',
-    target: mockReference(OTHER_POST_ID),
+    target: mockReference(MOCK_OTHER_POST_ID),
   },
   {
-    _id: LEGACY_DIRECT_MODULE_ID,
+    _id: MOCK_LEGACY_MODULE_ID,
     _type: 'blog_module',
     target: mockReference(MOCK_POST_ID),
   },
@@ -74,43 +79,36 @@ async function findModuleIds(documentId: string, linkIds: string[]) {
 
 describe('linkIdsReferencingDocumentQuery', () => {
   it('lists the links that reference the document', async () => {
-    expect(await findLinkIds(MOCK_POST_ID)).toEqual([LINK_TO_POST_ID]);
+    const ids = await findLinkIds(MOCK_POST_ID);
+
+    expect(ids).toEqual([MOCK_LINK_TO_POST_ID]);
   });
 
   it('lists nothing when no link references the document', async () => {
-    expect(await findLinkIds('unreferenced')).toEqual([]);
+    const ids = await findLinkIds(MOCK_UNREFERENCED_ID);
+
+    expect(ids).toEqual([]);
   });
 });
 
 describe('referencingModuleIdsQuery', () => {
   it('matches modules that reference the document directly or through a link', async () => {
-    const ids = await findModuleIds(MOCK_POST_ID, [LINK_TO_POST_ID]);
+    const ids = await findModuleIds(MOCK_POST_ID, [MOCK_LINK_TO_POST_ID]);
 
-    expect(ids).toHaveLength(2);
-    expect(new Set(ids)).toEqual(
-      new Set([DIRECT_MODULE_ID, VIA_LINK_MODULE_ID]),
+    expect([...ids].sort()).toEqual(
+      [MOCK_DIRECT_MODULE_ID, MOCK_VIA_LINK_MODULE_ID].sort(),
     );
   });
 
   it('still matches direct references when no link references the document', async () => {
-    expect(await findModuleIds(MOCK_POST_ID, [])).toEqual([DIRECT_MODULE_ID]);
-  });
+    const ids = await findModuleIds(MOCK_POST_ID, []);
 
-  it('skips modules that reference neither the document nor its links', async () => {
-    expect(await findModuleIds(MOCK_POST_ID, [LINK_TO_POST_ID])).not.toContain(
-      UNRELATED_MODULE_ID,
-    );
-  });
-
-  it('skips documents whose type only contains a module prefix elsewhere', async () => {
-    expect(await findModuleIds(MOCK_POST_ID, [LINK_TO_POST_ID])).not.toContain(
-      LEGACY_DIRECT_MODULE_ID,
-    );
+    expect(ids).toEqual([MOCK_DIRECT_MODULE_ID]);
   });
 
   it('rejects a result that is not a list of ids', () => {
     expect(() =>
-      referencingModuleIdsQuery.parse([{ _id: 'module-a' }]),
+      referencingModuleIdsQuery.parse([{ _id: MOCK_DIRECT_MODULE_ID }]),
     ).toThrow();
   });
 });

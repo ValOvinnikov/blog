@@ -1,3 +1,4 @@
+import { routes } from '@blog/config';
 import {
   MOCK_AUTHOR_AVATAR_ALT,
   MOCK_AUTHOR_ID,
@@ -17,8 +18,13 @@ import {
   mockRawInternalLinkDocument,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toPostCard } from './to-post-card';
+
+faker.seed(6019);
+
+const MOCK_PROFILE_SLUG = faker.lorem.slug();
 
 describe(toPostCard, () => {
   const raw = mockRawPostCard();
@@ -50,45 +56,50 @@ describe(toPostCard, () => {
   });
 
   it('computes reading time from the word count', () => {
-    const result = toPostCard(mockRawPostCard({ wordCount: 600 }));
+    const { readingTimeMinutes } = toPostCard(
+      mockRawPostCard({ wordCount: 600 }),
+    );
 
-    expect(result.readingTimeMinutes).toBe(3);
+    expect(readingTimeMinutes).toBe(3);
   });
 
   it("resolves the author's profile page to its url", () => {
-    const result = toPostCard(
+    const { author } = toPostCard(
       mockRawPostCard({
         author: {
           ...raw.author,
           profilePage: mockRawInternalLinkDocument({
-            internalReference: { _type: 'page_landing', slug: 'jane-doe' },
+            internalReference: {
+              _type: 'page_landing',
+              slug: MOCK_PROFILE_SLUG,
+            },
           }),
         },
       }),
     );
 
-    expect(result.author.profileUrl).toBe('/jane-doe');
+    expect(author.profileUrl).toBe(routes.landingPage(MOCK_PROFILE_SLUG));
   });
 
-  it('maps a sparse post-card with no excerpt to undefined', () => {
-    const result = toPostCard(
+  it('maps a post with no supporting text to an undefined excerpt', () => {
+    const { excerpt } = toPostCard(
       mockRawPostCard({
         headingBlock: mockRawHeadingBlock(raw.headingBlock.heading),
       }),
     );
 
-    expect(result.excerpt).toBeUndefined();
+    expect(excerpt).toBeUndefined();
   });
 
   it('defaults featured to false when null', () => {
-    const result = toPostCard(mockRawPostCard({ featured: null }));
+    const { featured } = toPostCard(mockRawPostCard({ featured: null }));
 
-    expect(result.featured).toBe(false);
+    expect(featured).toBe(false);
   });
 
   it('returns an undefined heroImage when heroImage is absent', () => {
-    const result = toPostCard(mockRawPostCard({ heroImage: null }));
+    const { heroImage } = toPostCard(mockRawPostCard({ heroImage: null }));
 
-    expect(result.heroImage).toBeUndefined();
+    expect(heroImage).toBeUndefined();
   });
 });

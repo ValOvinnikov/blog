@@ -17,6 +17,8 @@ faker.seed(5783);
 
 const MOCK_SECOND_EVENT_ID = faker.string.uuid();
 const MOCK_GITHUB_HANDLE = faker.internet.username();
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
+const MOCK_NOW = new Date(MOCK_AUDIT_EVENT_AT.getTime() + FIVE_MINUTES_MS);
 
 const setup = customRender(ActivityList, {
   events: [
@@ -29,7 +31,7 @@ describe(`<${ActivityList.name}/>`, () => {
   describe('with recorded activity', () => {
     beforeEach(() => {
       vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(new Date('2026-08-24T12:05:00.000Z'));
+      vi.setSystemTime(MOCK_NOW);
       setup();
     });
 

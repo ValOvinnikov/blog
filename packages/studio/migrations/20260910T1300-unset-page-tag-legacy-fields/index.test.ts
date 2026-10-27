@@ -1,129 +1,87 @@
+import { faker } from '@faker-js/faker';
 import { at, unset } from 'sanity/migrate';
 
 import { isPageTagPostListFolded, unsetLegacyTagPageFields } from './index';
 
-const foldedModules = [
-  { _key: 'postList-1', _type: 'module_postList', _ref: 'postList-1' },
+faker.seed(5101);
+
+const MOCK_PAGE_ID = faker.string.uuid();
+const MOCK_POST_LIST_ID = faker.string.uuid();
+const MOCK_OTHER_MODULE_ID = faker.string.uuid();
+
+const MOCK_POST_LIST = { _ref: MOCK_POST_LIST_ID };
+const MOCK_FOLDED_MODULES = [
+  {
+    _key: MOCK_POST_LIST_ID,
+    _type: 'module_postList',
+    _ref: MOCK_POST_LIST_ID,
+  },
+];
+const MOCK_UNRELATED_MODULES = [
+  {
+    _key: MOCK_OTHER_MODULE_ID,
+    _type: 'module_cta',
+    _ref: MOCK_OTHER_MODULE_ID,
+  },
 ];
 
 describe(isPageTagPostListFolded, () => {
-  it('is folded when modules[] contains a member referencing postList._ref', () => {
-    expect(
-      isPageTagPostListFolded({
-        _id: 'page-tag',
-        postList: { _ref: 'postList-1' },
-        modules: foldedModules,
-      }),
-    ).toBe(true);
+  it('is folded when a module references the post list', () => {
+    const folded = isPageTagPostListFolded({
+      _id: MOCK_PAGE_ID,
+      postList: MOCK_POST_LIST,
+      modules: MOCK_FOLDED_MODULES,
+    });
+
+    expect(folded).toBe(true);
   });
 
-  it('is not folded when postList is unset', () => {
-    expect(
-      isPageTagPostListFolded({
-        _id: 'page-tag',
-        modules: foldedModules,
-      }),
-    ).toBe(false);
-  });
+  it.each([
+    ['postList is unset', { modules: MOCK_FOLDED_MODULES }],
+    [
+      'no module references the post list',
+      { postList: MOCK_POST_LIST, modules: MOCK_UNRELATED_MODULES },
+    ],
+    ['modules is empty', { postList: MOCK_POST_LIST, modules: [] }],
+  ])('is not folded when %s', (_name, fields) => {
+    const folded = isPageTagPostListFolded({ _id: MOCK_PAGE_ID, ...fields });
 
-  it('is not folded when modules[] has no member referencing postList._ref', () => {
-    expect(
-      isPageTagPostListFolded({
-        _id: 'page-tag',
-        postList: { _ref: 'postList-1' },
-        modules: [{ _key: 'cta-1', _type: 'module_cta', _ref: 'cta-1' }],
-      }),
-    ).toBe(false);
-  });
-
-  it('is not folded when modules[] is empty', () => {
-    expect(
-      isPageTagPostListFolded({
-        _id: 'page-tag',
-        postList: { _ref: 'postList-1' },
-        modules: [],
-      }),
-    ).toBe(false);
+    expect(folded).toBe(false);
   });
 });
 
 describe(unsetLegacyTagPageFields, () => {
-  it('unsets postList once modules[] already references it', () => {
+  it.each([
+    ['a published document', MOCK_PAGE_ID],
+    ['a draft document', `drafts.${MOCK_PAGE_ID}`],
+  ])('unsets postList once modules reference it on %s', (_name, _id) => {
     const result = unsetLegacyTagPageFields({
-      _id: 'page-tag',
-      postList: { _ref: 'postList-1' },
-      modules: foldedModules,
+      _id,
+      postList: MOCK_POST_LIST,
+      modules: MOCK_FOLDED_MODULES,
     });
 
     expect(result).toEqual([at('postList', unset())]);
   });
 
-  it('produces no patch when postList is already unset', () => {
-    const result = unsetLegacyTagPageFields({
-      _id: 'page-tag',
-      modules: foldedModules,
-    });
+  it.each([
+    ['postList is already unset', { modules: MOCK_FOLDED_MODULES }],
+    [
+      'modules do not reference the post list',
+      { postList: MOCK_POST_LIST, modules: MOCK_UNRELATED_MODULES },
+    ],
+    ['modules is empty', { postList: MOCK_POST_LIST, modules: [] }],
+    ['modules is missing', { postList: MOCK_POST_LIST }],
+  ])('produces no patch when %s', (_name, fields) => {
+    const result = unsetLegacyTagPageFields({ _id: MOCK_PAGE_ID, ...fields });
 
     expect(result).toBeUndefined();
   });
 
-  it('skips (does not unset) a document whose modules[] does not yet reference postList', () => {
+  it('produces no patch for a draft that fails the fold guard', () => {
     const result = unsetLegacyTagPageFields({
-      _id: 'page-tag',
-      postList: { _ref: 'postList-1' },
-      modules: [{ _key: 'cta-1', _type: 'module_cta', _ref: 'cta-1' }],
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('skips a document with no modules[] at all', () => {
-    const result = unsetLegacyTagPageFields({
-      _id: 'page-tag',
-      postList: { _ref: 'postList-1' },
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is idempotent — running twice on an already-unset document', () => {
-    const alreadyUnset = {
-      _id: 'page-tag',
-      modules: foldedModules,
-    };
-
-    expect(unsetLegacyTagPageFields(alreadyUnset)).toBeUndefined();
-    expect(unsetLegacyTagPageFields(alreadyUnset)).toBeUndefined();
-  });
-
-  it('applies the same guard and behavior to a draft document id', () => {
-    const result = unsetLegacyTagPageFields({
-      _id: 'drafts.page-tag',
-      postList: { _ref: 'postList-1' },
-      modules: foldedModules,
-    });
-
-    expect(result).toEqual([at('postList', unset())]);
-  });
-
-  it('skips a draft document that fails the guard the same way a published one would', () => {
-    const result = unsetLegacyTagPageFields({
-      _id: 'drafts.page-tag',
-      postList: { _ref: 'postList-1' },
-      modules: [],
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  /**
-   * Regression guard: `postList` must not be unset merely because it is still
-   * defined — `modules[]` must actually reference it.
-   */
-  it('never unsets an unfolded document just because postList is still defined', () => {
-    const result = unsetLegacyTagPageFields({
-      _id: 'page-tag',
-      postList: { _ref: 'postList-1' },
+      _id: `drafts.${MOCK_PAGE_ID}`,
+      postList: MOCK_POST_LIST,
       modules: [],
     });
 

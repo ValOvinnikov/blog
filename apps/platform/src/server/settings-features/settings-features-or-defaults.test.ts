@@ -1,5 +1,7 @@
-import { PRESET_ID } from '@blog/config';
+import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { featureDefaultsToValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 
 import { getSettingsFeaturesOrDefaults } from './settings-features-or-defaults';
 
@@ -15,25 +17,23 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
+const MOCK_SAVED_AT = new Date('2026-10-01T09:00:00.000Z');
+
 describe(getSettingsFeaturesOrDefaults, () => {
   beforeEach(() => {
     getSettingsFeaturesAndPresetMock.mockReset();
   });
 
-  it('returns the saved toggles and their save time when the tenant has saved Features', async () => {
-    const saved = {
-      commentsEnabled: false,
+  it('returns the saved toggles and their save time', async () => {
+    const saved = mockSettingsFeaturesValues({
       ratingsEnabled: true,
       bookmarksEnabled: true,
       newsletterEnabled: true,
-      analyticsEnabled: false,
       consentBannerEnabled: true,
-      contactFormEnabled: false,
-    };
-    const updatedAt = new Date('2026-10-01T09:00:00.000Z');
+    });
     getSettingsFeaturesAndPresetMock.mockResolvedValue({
       features: saved,
-      updatedAt,
+      updatedAt: MOCK_SAVED_AT,
       preset: PRESET_ID.EDITORIAL,
     });
 
@@ -42,50 +42,36 @@ describe(getSettingsFeaturesOrDefaults, () => {
     expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
     );
-    expect(result).toEqual({ values: saved, savedAt: updatedAt });
+    expect(result).toEqual({ values: saved, savedAt: MOCK_SAVED_AT });
   });
 
-  it("falls back to the saved preset's featureDefaults when Features was never saved", async () => {
-    getSettingsFeaturesAndPresetMock.mockResolvedValue({
-      features: undefined,
+  it.each([
+    {
+      scenario: 'the saved preset',
       preset: PRESET_ID.EDITORIAL,
-    });
-
-    const result = await getSettingsFeaturesOrDefaults(MOCK_TENANT_ID);
-
-    expect(result).toEqual({
-      values: {
-        commentsEnabled: true,
-        ratingsEnabled: true,
-        bookmarksEnabled: true,
-        newsletterEnabled: false,
-        analyticsEnabled: false,
-        consentBannerEnabled: false,
-        contactFormEnabled: true,
-      },
-      savedAt: undefined,
-    });
-  });
-
-  it('falls back to the CONSOLE preset featureDefaults when neither Features nor Look was saved', async () => {
-    getSettingsFeaturesAndPresetMock.mockResolvedValue({
-      features: undefined,
+      expectedPreset: PRESET_ID.EDITORIAL,
+    },
+    {
+      scenario: 'the CONSOLE preset when none was saved',
       preset: undefined,
-    });
+      expectedPreset: PRESET_ID.CONSOLE,
+    },
+  ])(
+    'falls back to the featureDefaults of $scenario',
+    async ({ preset, expectedPreset }) => {
+      getSettingsFeaturesAndPresetMock.mockResolvedValue({
+        features: undefined,
+        preset,
+      });
 
-    const result = await getSettingsFeaturesOrDefaults(MOCK_TENANT_ID);
+      const result = await getSettingsFeaturesOrDefaults(MOCK_TENANT_ID);
 
-    expect(result).toEqual({
-      values: {
-        commentsEnabled: true,
-        ratingsEnabled: true,
-        bookmarksEnabled: true,
-        newsletterEnabled: false,
-        analyticsEnabled: false,
-        consentBannerEnabled: false,
-        contactFormEnabled: true,
-      },
-      savedAt: undefined,
-    });
-  });
+      expect(result).toEqual({
+        values: featureDefaultsToValues(
+          PRESET_REGISTRY[expectedPreset].featureDefaults,
+        ),
+        savedAt: undefined,
+      });
+    },
+  );
 });

@@ -1,23 +1,39 @@
 import { BRAND_VARIANT } from '@blog/config/constants';
+import { brandVariantTitle } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { faker } from '@faker-js/faker';
 
-import { moduleSubtitle } from './module-subtitle';
+faker.seed(4111);
+
+const MOCK_DETAIL = faker.lorem.words(2);
 
 describe(moduleSubtitle, () => {
-  it('joins the brand variant and the detail with a middle dot', () => {
-    expect(moduleSubtitle(BRAND_VARIANT.BRAND_PRIMARY, 'Limit: 3')).toBe(
-      'Brand tint · Limit: 3',
-    );
-  });
-
-  it('shows the brand variant alone when there is no detail', () => {
-    expect(moduleSubtitle(BRAND_VARIANT.PRIMARY, undefined)).toBe('Plain');
-  });
-
-  it('shows the detail alone when no brand variant is set', () => {
-    expect(moduleSubtitle(undefined, 'Limit: 3')).toBe('Limit: 3');
-  });
-
-  it('is undefined when nothing is set', () => {
-    expect(moduleSubtitle(undefined, undefined)).toBeUndefined();
+  it.each([
+    {
+      behaviour: 'joins the brand variant and the detail with a middle dot',
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+      detail: MOCK_DETAIL,
+      expected: `${brandVariantTitle(BRAND_VARIANT.BRAND_PRIMARY)} · ${MOCK_DETAIL}`,
+    },
+    {
+      behaviour: 'shows the brand variant alone when there is no detail',
+      brandVariant: BRAND_VARIANT.PRIMARY,
+      detail: undefined,
+      expected: brandVariantTitle(BRAND_VARIANT.PRIMARY),
+    },
+    {
+      behaviour: 'shows the detail alone when no brand variant is set',
+      brandVariant: undefined,
+      detail: MOCK_DETAIL,
+      expected: MOCK_DETAIL,
+    },
+    {
+      behaviour: 'is undefined when nothing is set',
+      brandVariant: undefined,
+      detail: undefined,
+      expected: undefined,
+    },
+  ])('$behaviour', ({ brandVariant, detail, expected }) => {
+    expect(moduleSubtitle(brandVariant, detail)).toBe(expected);
   });
 });

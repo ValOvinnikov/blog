@@ -6,13 +6,13 @@ import {
   isOutcomeSuccess,
 } from './is-outcome';
 
-const FIELD_ERRORS = { email: { reason: 'EMAIL_INVALID' } };
+const MOCK_FIELD_ERRORS = { email: { reason: 'EMAIL_INVALID' } };
 
 type TResult =
   | { outcome: typeof ACTION_OUTCOME.SUCCESS }
   | {
       outcome: typeof ACTION_OUTCOME.INVALID;
-      fieldErrors: typeof FIELD_ERRORS;
+      fieldErrors: typeof MOCK_FIELD_ERRORS;
     }
   | { outcome: typeof ACTION_OUTCOME.SERVER_ERROR };
 
@@ -39,11 +39,11 @@ describe(isOutcomeInvalid, () => {
   it('narrows the result to the one carrying field errors', () => {
     const result: TResult = {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: FIELD_ERRORS,
+      fieldErrors: MOCK_FIELD_ERRORS,
     };
 
     const fieldErrors = isOutcomeInvalid(result) ? result.fieldErrors : {};
 
-    expect(fieldErrors).toEqual(FIELD_ERRORS);
+    expect(fieldErrors).toEqual(MOCK_FIELD_ERRORS);
   });
 });

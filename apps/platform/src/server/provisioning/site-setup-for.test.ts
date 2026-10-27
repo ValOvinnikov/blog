@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STATUS,
 } from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
@@ -22,58 +23,43 @@ const virtualAdmin = buildVirtualAdminMembership(
 
 describe(siteSetupFor, () => {
   it("shows the owner their tenant's setup, with retry, while it is not ready", () => {
-    const setup = siteSetupFor(
-      mockTenant({ provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED }),
-      owner,
-      undefined,
-    );
-
-    expect(setup).toMatchObject({
-      tenant: {
-        id: owner.tenantId,
-        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      },
-      canRetry: true,
+    const tenant = mockTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
     });
+
+    const setup = siteSetupFor(tenant, owner, undefined);
+
+    expect(setup).toEqual({ tenant: toClientTenant(tenant), canRetry: true });
   });
 
   it('shows nothing once provisioning is ready', () => {
-    expect(siteSetupFor(mockReadyTenant(), owner, undefined)).toBeUndefined();
+    const setup = siteSetupFor(mockReadyTenant(), owner, undefined);
+
+    expect(setup).toBeUndefined();
   });
 
   it('shows nothing for a tenant with no recorded provisioning', () => {
-    expect(
-      siteSetupFor(mockTenant({ provisioningStatus: null }), owner, undefined),
-    ).toBeUndefined();
+    const tenant = mockTenant({ provisioningStatus: null });
+
+    const setup = siteSetupFor(tenant, owner, undefined);
+
+    expect(setup).toBeUndefined();
   });
 
   it('shows nothing to an editor', () => {
-    expect(
-      siteSetupFor(
-        mockTenant(),
-        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-        undefined,
-      ),
-    ).toBeUndefined();
+    const editor = mockMembership({ role: MEMBERSHIP_ROLE.EDITOR });
+
+    const setup = siteSetupFor(mockTenant(), editor, undefined);
+
+    expect(setup).toBeUndefined();
   });
 
-  it('lets a super-admin viewing the tenant retry', () => {
-    expect(
-      siteSetupFor(
-        mockTenant(),
-        virtualAdmin,
-        mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
-      )?.canRetry,
-    ).toBe(true);
-  });
+  it.each([
+    { role: ADMIN_ROLE.SUPERADMIN, canRetry: true },
+    { role: ADMIN_ROLE.MODERATOR, canRetry: false },
+  ])('sets retry to $canRetry for a viewing $role', ({ role, canRetry }) => {
+    const setup = siteSetupFor(mockTenant(), virtualAdmin, mockAdmin({ role }));
 
-  it('shows a lesser admin the progress without retry', () => {
-    expect(
-      siteSetupFor(
-        mockTenant(),
-        virtualAdmin,
-        mockAdmin({ role: ADMIN_ROLE.MODERATOR }),
-      )?.canRetry,
-    ).toBe(false);
+    expect(setup?.canRetry).toBe(canRetry);
   });
 });

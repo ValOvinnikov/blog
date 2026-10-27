@@ -1,15 +1,27 @@
+import { faker } from '@faker-js/faker';
+
 import { toPostLatestId } from './id';
 
-describe('toPostLatestId', () => {
-  it('prefixes a published module_postList id', () => {
-    expect(toPostLatestId('abc123')).toBe('postLatest-abc123');
-  });
+faker.seed(9);
 
-  it('keeps the drafts. prefix outermost', () => {
-    expect(toPostLatestId('drafts.abc123')).toBe('drafts.postLatest-abc123');
-  });
+const MOCK_POST_LIST_ID = faker.string.uuid();
 
-  it('is idempotent for an already-migrated id', () => {
-    expect(toPostLatestId('postLatest-abc123')).toBe('postLatest-abc123');
+describe(toPostLatestId, () => {
+  it.each([
+    ['a published id', MOCK_POST_LIST_ID, `postLatest-${MOCK_POST_LIST_ID}`],
+    [
+      'a draft id, keeping the drafts prefix outermost',
+      `drafts.${MOCK_POST_LIST_ID}`,
+      `drafts.postLatest-${MOCK_POST_LIST_ID}`,
+    ],
+    [
+      'an already migrated id',
+      `postLatest-${MOCK_POST_LIST_ID}`,
+      `postLatest-${MOCK_POST_LIST_ID}`,
+    ],
+  ])('converts %s', (_label, postListId, expected) => {
+    const result = toPostLatestId(postListId);
+
+    expect(result).toBe(expected);
   });
 });

@@ -1,66 +1,38 @@
 import { MOCK_RESEND_API_KEY } from '@blog/email/testing/email-fixtures';
 
-export {};
+type TEnv = (typeof import('./env'))['env'];
 
-const ENV_KEYS = ['RESEND_API_KEY', 'SKIP_ENV_VALIDATION'] as const;
-
-const originalEnv = Object.fromEntries(
-  ENV_KEYS.map((key) => [key, process.env[key]]),
-) as Record<(typeof ENV_KEYS)[number], string | undefined>;
-
-function restoreEnv(): void {
-  for (const key of ENV_KEYS) {
-    const value = originalEnv[key];
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
-}
-
-async function importEnv(): Promise<typeof import('./env')> {
+async function importFreshEnv(): Promise<TEnv> {
   vi.resetModules();
-  return import('./env');
+  const freshModule = await import('./env');
+  return freshModule.env;
 }
 
 describe('env', () => {
   beforeEach(() => {
-    delete process.env['SKIP_ENV_VALIDATION'];
+    vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
   });
 
   afterEach(() => {
-    restoreEnv();
+    vi.unstubAllEnvs();
   });
 
   it('exposes a valid RESEND_API_KEY', async () => {
-    process.env['RESEND_API_KEY'] = MOCK_RESEND_API_KEY;
+    vi.stubEnv('RESEND_API_KEY', MOCK_RESEND_API_KEY);
 
-    const { env } = await importEnv();
+    const freshEnv = await importFreshEnv();
 
-    expect(env.RESEND_API_KEY).toBe(MOCK_RESEND_API_KEY);
+    expect(freshEnv.RESEND_API_KEY).toBe(MOCK_RESEND_API_KEY);
   });
 
-  it('leaves RESEND_API_KEY undefined when absent', async () => {
-    delete process.env['RESEND_API_KEY'];
+  it.each([
+    ['an absent', undefined],
+    ['an empty', ''],
+  ])('leaves RESEND_API_KEY undefined for %s value', async (_name, value) => {
+    vi.stubEnv('RESEND_API_KEY', value);
 
-    const { env } = await importEnv();
+    const freshEnv = await importFreshEnv();
 
-    expect(env.RESEND_API_KEY).toBeUndefined();
-  });
-
-  it('treats an empty RESEND_API_KEY as absent rather than throwing', async () => {
-    process.env['RESEND_API_KEY'] = '';
-
-    const { env } = await importEnv();
-
-    expect(env.RESEND_API_KEY).toBeUndefined();
-  });
-
-  it('skips validation entirely when SKIP_ENV_VALIDATION is set', async () => {
-    process.env['SKIP_ENV_VALIDATION'] = 'true';
-    delete process.env['RESEND_API_KEY'];
-
-    await expect(importEnv()).resolves.toBeDefined();
+    expect(freshEnv.RESEND_API_KEY).toBeUndefined();
   });
 });

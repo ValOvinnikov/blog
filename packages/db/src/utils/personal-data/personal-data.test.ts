@@ -31,6 +31,19 @@ const MOCK_PLAIN_EMAIL = faker.internet.email().toLowerCase();
 
 const fallbackListener = usePersonalDataFallbackListener();
 
+const INDEXERS = [
+  {
+    kind: 'personal data',
+    indexer: personalDataIndex,
+    index: testPersonalEmailIndex,
+  },
+  {
+    kind: 'account',
+    indexer: accountEmailIndex,
+    index: mockAccountEmailIndex,
+  },
+];
+
 describe('with both personal data keys configured', () => {
   usePersonalDataKeys();
 
@@ -47,18 +60,18 @@ describe('with both personal data keys configured', () => {
     expect(decryptPersonalValue(encrypted)).toBe(MOCK_USER_EMAIL);
   });
 
-  it.each([
-    [personalDataIndex, testPersonalEmailIndex],
-    [accountEmailIndex, mockAccountEmailIndex],
-  ])('%o gives an email its encrypted form and its index', (indexer, index) => {
-    const { emailEncrypted, emailIndex } = emailColumns(
-      MOCK_USER_EMAIL,
-      indexer,
-    );
+  it.each(INDEXERS)(
+    'gives an email its encrypted form and $kind index',
+    ({ indexer, index }) => {
+      const { emailEncrypted, emailIndex } = emailColumns(
+        MOCK_USER_EMAIL,
+        indexer,
+      );
 
-    expect(decryptTestPersonalValue(emailEncrypted)).toBe(MOCK_USER_EMAIL);
-    expect(emailIndex).toBe(index(MOCK_USER_EMAIL));
-  });
+      expect(decryptTestPersonalValue(emailEncrypted)).toBe(MOCK_USER_EMAIL);
+      expect(emailIndex).toBe(index(MOCK_USER_EMAIL));
+    },
+  );
 
   it('reads an encrypted value back', () => {
     expect(readPersonalValue(encryptPersonalValue(MOCK_USER_EMAIL), '')).toBe(
@@ -128,14 +141,14 @@ describe('with both personal data keys configured', () => {
     expect(fallbackListener).not.toHaveBeenCalled();
   });
 
-  it.each([
-    [personalDataIndex, testPersonalEmailIndex],
-    [accountEmailIndex, mockAccountEmailIndex],
-  ])('%o indexes an email for lookup', (indexer, index) => {
-    expect(requireEmailIndex(MOCK_USER_EMAIL, indexer)).toBe(
-      index(MOCK_USER_EMAIL),
-    );
-  });
+  it.each(INDEXERS)(
+    'indexes an email for lookup with the $kind index',
+    ({ indexer, index }) => {
+      expect(requireEmailIndex(MOCK_USER_EMAIL, indexer)).toBe(
+        index(MOCK_USER_EMAIL),
+      );
+    },
+  );
 });
 
 describe('with no personal data keys configured', () => {

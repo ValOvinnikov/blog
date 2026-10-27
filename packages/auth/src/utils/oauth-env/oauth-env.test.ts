@@ -5,86 +5,59 @@ import {
   MOCK_GOOGLE_SECRET,
 } from '@blog/auth/testing/oauth-fixtures';
 
-export {};
-
-const ENV_KEYS = [
-  'AUTH_GITHUB_ID',
-  'AUTH_GITHUB_SECRET',
-  'AUTH_GOOGLE_ID',
-  'AUTH_GOOGLE_SECRET',
-] as const;
-
-const originalEnv = Object.fromEntries(
-  ENV_KEYS.map((key) => [key, process.env[key]]),
-) as Record<(typeof ENV_KEYS)[number], string | undefined>;
-
-function restoreEnv(): void {
-  for (const key of ENV_KEYS) {
-    const value = originalEnv[key];
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
-}
-
 async function importOAuthEnv(): Promise<typeof import('./oauth-env')> {
   vi.resetModules();
   return import('./oauth-env');
 }
 
 describe('oauthEnv', () => {
+  beforeEach(() => {
+    vi.stubEnv('AUTH_GITHUB_ID', undefined);
+    vi.stubEnv('AUTH_GITHUB_SECRET', undefined);
+    vi.stubEnv('AUTH_GOOGLE_ID', undefined);
+    vi.stubEnv('AUTH_GOOGLE_SECRET', undefined);
+  });
+
   afterEach(() => {
-    restoreEnv();
+    vi.unstubAllEnvs();
   });
 
   it('leaves every credential undefined when none are set', async () => {
-    for (const key of ENV_KEYS) {
-      delete process.env[key];
-    }
-
     const { oauthEnv } = await importOAuthEnv();
 
-    expect(oauthEnv.AUTH_GITHUB_ID).toBeUndefined();
-    expect(oauthEnv.AUTH_GITHUB_SECRET).toBeUndefined();
-    expect(oauthEnv.AUTH_GOOGLE_ID).toBeUndefined();
-    expect(oauthEnv.AUTH_GOOGLE_SECRET).toBeUndefined();
+    expect([
+      oauthEnv.AUTH_GITHUB_ID,
+      oauthEnv.AUTH_GITHUB_SECRET,
+      oauthEnv.AUTH_GOOGLE_ID,
+      oauthEnv.AUTH_GOOGLE_SECRET,
+    ]).toEqual([undefined, undefined, undefined, undefined]);
   });
 
   it('exposes configured credentials by their exact env var names', async () => {
-    process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
-    process.env['AUTH_GITHUB_SECRET'] = MOCK_GITHUB_SECRET;
-    process.env['AUTH_GOOGLE_ID'] = MOCK_GOOGLE_ID;
-    process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
+    vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
+    vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
+    vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
+    vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
 
     const { oauthEnv } = await importOAuthEnv();
 
-    expect(oauthEnv.AUTH_GITHUB_ID).toBe(MOCK_GITHUB_ID);
-    expect(oauthEnv.AUTH_GITHUB_SECRET).toBe(MOCK_GITHUB_SECRET);
-    expect(oauthEnv.AUTH_GOOGLE_ID).toBe(MOCK_GOOGLE_ID);
-    expect(oauthEnv.AUTH_GOOGLE_SECRET).toBe(MOCK_GOOGLE_SECRET);
+    expect([
+      oauthEnv.AUTH_GITHUB_ID,
+      oauthEnv.AUTH_GITHUB_SECRET,
+      oauthEnv.AUTH_GOOGLE_ID,
+      oauthEnv.AUTH_GOOGLE_SECRET,
+    ]).toEqual([
+      MOCK_GITHUB_ID,
+      MOCK_GITHUB_SECRET,
+      MOCK_GOOGLE_ID,
+      MOCK_GOOGLE_SECRET,
+    ]);
   });
 
-  it('does not require AUTH_SECRET, unlike @blog/auth/utils/env/env', async () => {
-    const previousAuthSecret = process.env['AUTH_SECRET'];
-    const previousSkipValidation = process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['AUTH_SECRET'];
-    delete process.env['SKIP_ENV_VALIDATION'];
+  it('loads without AUTH_SECRET or skipped validation', async () => {
+    vi.stubEnv('AUTH_SECRET', undefined);
+    vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
 
-    try {
-      await expect(importOAuthEnv()).resolves.toBeDefined();
-    } finally {
-      if (previousAuthSecret === undefined) {
-        delete process.env['AUTH_SECRET'];
-      } else {
-        process.env['AUTH_SECRET'] = previousAuthSecret;
-      }
-      if (previousSkipValidation === undefined) {
-        delete process.env['SKIP_ENV_VALIDATION'];
-      } else {
-        process.env['SKIP_ENV_VALIDATION'] = previousSkipValidation;
-      }
-    }
+    await expect(importOAuthEnv()).resolves.toBeDefined();
   });
 });

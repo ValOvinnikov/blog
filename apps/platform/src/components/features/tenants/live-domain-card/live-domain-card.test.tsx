@@ -1,9 +1,10 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
   mockClientTenant,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { Suspense } from 'react';
 
 import { LiveDomainCard } from './live-domain-card';
@@ -21,24 +22,29 @@ vi.mock(
   }),
 );
 
-const render = async () => {
-  const tenant = mockClientTenant({ id: MOCK_TENANT_ID });
+type TLiveDomainCardProps = Parameters<typeof LiveDomainCard>[0];
+
+const SuspendedLiveDomainCard = (props: TLiveDomainCardProps) => (
+  <Suspense>
+    <LiveDomainCard {...props} />
+  </Suspense>
+);
+
+const setup = customRender(SuspendedLiveDomainCard, {
+  tenant: mockClientTenant({ id: MOCK_TENANT_ID }),
+  domainVerificationStatus: Promise.resolve(
+    DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
+  ),
+  dnsHref: adminRoutes.tenantDomain(MOCK_TENANT_ID),
+});
+
+const advancePoll = async () => {
   await act(async () => {
-    renderWithIntl(
-      <Suspense>
-        <LiveDomainCard
-          tenant={tenant}
-          domainVerificationStatus={Promise.resolve(
-            DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
-          )}
-          dnsHref={`/tenants/${MOCK_TENANT_ID}/domain`}
-        />
-      </Suspense>,
-    );
+    await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
   });
 };
 
-describe(LiveDomainCard, () => {
+describe(`<${LiveDomainCard.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     getDomainVerificationStatusActionMock.mockReset();
@@ -53,17 +59,21 @@ describe(LiveDomainCard, () => {
       .mockResolvedValueOnce(DOMAIN_VERIFICATION_STATUS.PENDING)
       .mockResolvedValueOnce(DOMAIN_VERIFICATION_STATUS.VERIFIED);
 
-    await render();
-    expect(screen.getByText('Not added yet')).toBeVisible();
-
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
+      setup();
     });
-    expect(screen.getByText('Pending — awaiting DNS')).toBeVisible();
+    const streamedStatus = screen.getByText('Not added yet');
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-    });
-    expect(screen.getByText('Verified')).toBeVisible();
+    expect(streamedStatus).toBeVisible();
+
+    await advancePoll();
+    const pendingStatus = screen.getByText('Pending — awaiting DNS');
+
+    expect(pendingStatus).toBeVisible();
+
+    await advancePoll();
+    const verifiedStatus = screen.getByText('Verified');
+
+    expect(verifiedStatus).toBeVisible();
   });
 });

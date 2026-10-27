@@ -93,17 +93,17 @@ describe('every client-safe entrypoint declared in package.json', () => {
   });
 
   it.each(entrypoints)(
-    'never transitively imports server-only, resend, or the env module: %s',
+    'keeps server-only, resend and the env module out of %s',
     (entryFile) => {
       const { internal, external } = collectModuleGraph(entryFile);
-
-      for (const forbidden of FORBIDDEN_SPECIFIERS) {
-        expect(external.has(forbidden)).toBe(false);
-      }
-
+      const forbiddenImports = FORBIDDEN_SPECIFIERS.filter((specifier) =>
+        external.has(specifier),
+      );
       const importsEnvModule = [...internal].some((file) =>
         file.includes(resolve(PACKAGE_ROOT, 'src/utils/env')),
       );
+
+      expect(forbiddenImports).toEqual([]);
       expect(importsEnvModule).toBe(false);
     },
   );

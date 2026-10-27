@@ -6,15 +6,35 @@ import {
   mockLandingPage,
   mockTranslationMetadata,
 } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
 import { evaluate, parse } from 'groq-js';
-import type { SanityDocument } from 'sanity';
+import { getDraftId } from 'sanity';
+
+faker.seed(4115);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const MODULES_EN_ID = 'modules-en';
-const MODULES_NL_ID = 'modules-nl';
-const PRICING_NL_ID = 'pricing-nl';
-const PRICING_FR_ID = 'pricing-fr';
+const MOCK_TRANSLATED_EN_ID = faker.string.uuid();
+const MOCK_TRANSLATED_NL_ID = faker.string.uuid();
+const MOCK_NL_ONLY_ID = faker.string.uuid();
+const MOCK_NO_DEFAULT_NL_ID = faker.string.uuid();
+const MOCK_NO_DEFAULT_FR_ID = faker.string.uuid();
+const MOCK_DELETED_EN_ID = faker.string.uuid();
+const MOCK_SURVIVING_NL_ID = faker.string.uuid();
+const MOCK_UNLOCALIZED_ID = faker.string.uuid();
+
+const MOCK_TRANSLATED_EN = mockLandingPage({
+  _id: MOCK_TRANSLATED_EN_ID,
+  language: EN,
+});
+const MOCK_TRANSLATED_NL = mockLandingPage({
+  _id: MOCK_TRANSLATED_NL_ID,
+  language: NL,
+});
+const MOCK_TRANSLATION_GROUP = mockTranslationMetadata([
+  [MOCK_TRANSLATED_EN_ID, EN],
+  [MOCK_TRANSLATED_NL_ID, NL],
+]);
 
 const offeredPages = async (dataset: Record<string, unknown>[]) => {
   const { filter, params } = onePagePerTranslationGroupFilter();
@@ -29,82 +49,81 @@ const offeredPages = async (dataset: Record<string, unknown>[]) => {
 };
 
 describe(onePagePerTranslationGroupFilter, () => {
-  let modulesEn: SanityDocument;
-  let modulesNl: SanityDocument;
-  let modulesGroup: ReturnType<typeof mockTranslationMetadata>;
-
-  beforeEach(() => {
-    modulesEn = mockLandingPage({ _id: MODULES_EN_ID, language: EN });
-    modulesNl = mockLandingPage({ _id: MODULES_NL_ID, language: NL });
-    modulesGroup = mockTranslationMetadata([
-      [MODULES_EN_ID, EN],
-      [MODULES_NL_ID, NL],
-    ]);
-  });
-
   afterEach(() => {
     setDefaultLanguage(EN);
   });
 
-  it('offers a page translated into two languages once, as its default-language document', async () => {
-    await expect(
-      offeredPages([modulesEn, modulesNl, modulesGroup]),
-    ).resolves.toEqual([MODULES_EN_ID]);
-  });
-
-  it('offers a page that exists in one non-default language once', async () => {
-    await expect(
-      offeredPages([mockLandingPage({ _id: 'about-nl', language: NL })]),
-    ).resolves.toEqual(['about-nl']);
-  });
-
-  it('offers a translated page with no default-language document once', async () => {
-    await expect(
-      offeredPages([
-        mockLandingPage({ _id: PRICING_NL_ID, language: NL }),
-        mockLandingPage({ _id: PRICING_FR_ID, language: FR }),
+  it.each([
+    {
+      behaviour:
+        'offers a translated page once, as its default-language document',
+      dataset: [MOCK_TRANSLATED_EN, MOCK_TRANSLATED_NL, MOCK_TRANSLATION_GROUP],
+      expected: [MOCK_TRANSLATED_EN_ID],
+    },
+    {
+      behaviour: 'offers a page that exists in one non-default language once',
+      dataset: [mockLandingPage({ _id: MOCK_NL_ONLY_ID, language: NL })],
+      expected: [MOCK_NL_ONLY_ID],
+    },
+    {
+      behaviour:
+        'offers a translated page with no default-language document once',
+      dataset: [
+        mockLandingPage({ _id: MOCK_NO_DEFAULT_NL_ID, language: NL }),
+        mockLandingPage({ _id: MOCK_NO_DEFAULT_FR_ID, language: FR }),
         mockTranslationMetadata([
-          [PRICING_NL_ID, NL],
-          [PRICING_FR_ID, FR],
+          [MOCK_NO_DEFAULT_NL_ID, NL],
+          [MOCK_NO_DEFAULT_FR_ID, FR],
         ]),
-      ]),
-    ).resolves.toEqual([PRICING_NL_ID]);
-  });
-
-  it('passes over a deleted default-language document still named in the group', async () => {
-    await expect(
-      offeredPages([
-        mockLandingPage({ _id: 'team-nl', language: NL }),
+      ],
+      expected: [MOCK_NO_DEFAULT_NL_ID],
+    },
+    {
+      behaviour:
+        'passes over a deleted default-language document still in the group',
+      dataset: [
+        mockLandingPage({ _id: MOCK_SURVIVING_NL_ID, language: NL }),
         mockTranslationMetadata([
-          ['team-en', EN],
-          ['team-nl', NL],
+          [MOCK_DELETED_EN_ID, EN],
+          [MOCK_SURVIVING_NL_ID, NL],
         ]),
-      ]),
-    ).resolves.toEqual(['team-nl']);
-  });
+      ],
+      expected: [MOCK_SURVIVING_NL_ID],
+    },
+    {
+      behaviour:
+        'hides the draft of a non-default translation with its published one',
+      dataset: [
+        MOCK_TRANSLATED_EN,
+        MOCK_TRANSLATED_NL,
+        mockLandingPage({
+          _id: getDraftId(MOCK_TRANSLATED_NL_ID),
+          language: NL,
+        }),
+        MOCK_TRANSLATION_GROUP,
+      ],
+      expected: [MOCK_TRANSLATED_EN_ID],
+    },
+    {
+      behaviour: 'treats a page without a language as the default language',
+      dataset: [mockLandingPage({ _id: MOCK_UNLOCALIZED_ID })],
+      expected: [MOCK_UNLOCALIZED_ID],
+    },
+  ])('$behaviour', async ({ dataset, expected }) => {
+    const offered = await offeredPages(dataset);
 
-  it('hides the draft of a non-default translation along with its published version', async () => {
-    await expect(
-      offeredPages([
-        modulesEn,
-        modulesNl,
-        mockLandingPage({ _id: 'drafts.modules-nl', language: NL }),
-        modulesGroup,
-      ]),
-    ).resolves.toEqual([MODULES_EN_ID]);
-  });
-
-  it('treats a page without a language as the default language', async () => {
-    await expect(
-      offeredPages([mockLandingPage({ _id: 'legacy' })]),
-    ).resolves.toEqual(['legacy']);
+    expect(offered).toEqual(expected);
   });
 
   it('follows the site default language', async () => {
     setDefaultLanguage(NL);
 
-    await expect(
-      offeredPages([modulesEn, modulesNl, modulesGroup]),
-    ).resolves.toEqual([MODULES_NL_ID]);
+    const offered = await offeredPages([
+      MOCK_TRANSLATED_EN,
+      MOCK_TRANSLATED_NL,
+      MOCK_TRANSLATION_GROUP,
+    ]);
+
+    expect(offered).toEqual([MOCK_TRANSLATED_NL_ID]);
   });
 });

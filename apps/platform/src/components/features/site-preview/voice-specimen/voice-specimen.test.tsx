@@ -1,9 +1,13 @@
 import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
+import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  MOCK_BRAND_PRIMARY,
+  MOCK_SITE_PREVIEW_THEME,
+} from '@platform/testing/site-preview-theme';
 import {
   buildVoiceDraft,
   withVoiceValue,
@@ -13,9 +17,9 @@ import { VoiceSpecimen } from './voice-specimen';
 
 const { EN, DE } = LOCALE_ISO_CODES;
 
-const render = renderWithIntl;
+faker.seed(5994);
 
-const DRAFT_HEADING = 'Lost at sea';
+const MOCK_DRAFT_HEADING = faker.lorem.words(3);
 const DATA_FOCUSED = 'data-focused';
 
 const defaults = buildVoiceDraft({}, [EN, DE]);
@@ -32,138 +36,108 @@ const valuesFor = (
   return draft[locale]!;
 };
 
-describe(VoiceSpecimen, () => {
+const setup = customRender(VoiceSpecimen, {
+  surface: VOICE_SURFACE.NOT_FOUND,
+  locale: EN,
+  values: valuesFor(EN),
+  listSamples: en.voiceSpecimen.lists,
+  theme: MOCK_SITE_PREVIEW_THEME,
+});
+
+describe(`<${VoiceSpecimen.name}/>`, () => {
   it("renders the 404 from the language's defaults, with its fixed action", () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.NOT_FOUND}
-        locale={EN}
-        values={valuesFor(EN)}
-        listSamples={en.voiceSpecimen.lists}
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
-    );
+    setup();
 
     const { notFound } = SITE_MESSAGES_BY_LOCALE.EN;
-    expect(screen.getByText(notFound.eyebrow)).toBeVisible();
-    expect(screen.getByText(notFound.heading)).toBeVisible();
-    expect(screen.getByText(notFound.supportingText)).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: notFound.returnHome }),
-    ).toBeVisible();
+    const eyebrow = screen.getByText(notFound.eyebrow);
+    const heading = screen.getByText(notFound.heading);
+    const supportingText = screen.getByText(notFound.supportingText);
+    const homeLink = screen.getByRole('link', { name: notFound.returnHome });
+
+    expect(eyebrow).toBeVisible();
+    expect(heading).toBeVisible();
+    expect(supportingText).toBeVisible();
+    expect(homeLink).toBeVisible();
   });
 
   it('shows a draft value in place of the default', () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.NOT_FOUND}
-        locale={EN}
-        values={valuesFor(EN, { notFoundHeading: DRAFT_HEADING })}
-        listSamples={en.voiceSpecimen.lists}
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
+    setup({ values: valuesFor(EN, { notFoundHeading: MOCK_DRAFT_HEADING }) });
+
+    const draftHeading = screen.getByText(MOCK_DRAFT_HEADING);
+    const defaultHeading = screen.queryByText(
+      SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
     );
 
-    expect(screen.getByText(DRAFT_HEADING)).toBeVisible();
-    expect(
-      screen.queryByText(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading),
-    ).not.toBeInTheDocument();
+    expect(draftHeading).toBeVisible();
+    expect(defaultHeading).not.toBeInTheDocument();
   });
 
   it("labels the error page's actions in the selected language", () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.ERROR}
-        locale={DE}
-        values={valuesFor(DE)}
-        listSamples={de.voiceSpecimen.lists}
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
-    );
+    setup({
+      surface: VOICE_SURFACE.ERROR,
+      locale: DE,
+      values: valuesFor(DE),
+      listSamples: de.voiceSpecimen.lists,
+    });
 
     const { localeErrorPage } = SITE_MESSAGES_BY_LOCALE.DE;
-    expect(screen.getByText(localeErrorPage.title)).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: localeErrorPage.retry }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: localeErrorPage.goHome }),
-    ).toBeVisible();
+    const title = screen.getByText(localeErrorPage.title);
+    const retryButton = screen.getByRole('button', {
+      name: localeErrorPage.retry,
+    });
+    const homeLink = screen.getByRole('link', { name: localeErrorPage.goHome });
+
+    expect(title).toBeVisible();
+    expect(retryButton).toBeVisible();
+    expect(homeLink).toBeVisible();
   });
 
   it('shows only the open list, with its name filled from a sample', () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.ARCHIVE}
-        locale={EN}
-        values={valuesFor(EN)}
-        listSamples={en.voiceSpecimen.lists}
-        openListFieldId="topicEmpty"
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
+    setup({ surface: VOICE_SURFACE.ARCHIVE, openListFieldId: 'topicEmpty' });
+
+    const openList = screen.getByText(
+      `No posts in ${en.voiceSpecimen.lists.topic.heading} yet.`,
+    );
+    const closedList = screen.queryByText(
+      SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty,
     );
 
-    expect(screen.getByText('No posts in Design yet.')).toBeVisible();
-    expect(
-      screen.queryByText(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty),
-    ).not.toBeInTheDocument();
+    expect(openList).toBeVisible();
+    expect(closedList).not.toBeInTheDocument();
   });
 
   it('renders the empty bookmarks message inside the saved posts panel', () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.BOOKMARKS}
-        locale={EN}
-        values={valuesFor(EN)}
-        listSamples={en.voiceSpecimen.lists}
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
-    );
+    setup({ surface: VOICE_SURFACE.BOOKMARKS });
 
     const { bookmarksPage } = SITE_MESSAGES_BY_LOCALE.EN;
-    expect(screen.getByText(bookmarksPage.title)).toBeVisible();
-    expect(screen.getByText(bookmarksPage.listHeading)).toBeVisible();
-    expect(screen.getByText(bookmarksPage.empty)).toBeVisible();
+    const title = screen.getByText(bookmarksPage.title);
+    const listHeading = screen.getByText(bookmarksPage.listHeading);
+    const empty = screen.getByText(bookmarksPage.empty);
+
+    expect(title).toBeVisible();
+    expect(listHeading).toBeVisible();
+    expect(empty).toBeVisible();
   });
 
   it('outlines only the focused field', () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.NOT_FOUND}
-        locale={EN}
-        values={valuesFor(EN)}
-        listSamples={en.voiceSpecimen.lists}
-        focusedFieldId="notFoundHeading"
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
-    );
+    setup({ focusedFieldId: 'notFoundHeading' });
 
-    expect(screen.getByTestId('voice-key-notFoundHeading')).toHaveAttribute(
-      DATA_FOCUSED,
-      'true',
-    );
-    expect(
-      screen.getByTestId('voice-key-notFoundSupportingText'),
-    ).toHaveAttribute(DATA_FOCUSED, 'false');
+    const focusedField = screen.getByTestId('voice-key-notFoundHeading');
+    const otherField = screen.getByTestId('voice-key-notFoundSupportingText');
+
+    expect(focusedField).toHaveAttribute(DATA_FOCUSED, 'true');
+    expect(otherField).toHaveAttribute(DATA_FOCUSED, 'false');
   });
 
   it('applies the tenant theme to the specimen', () => {
-    render(
-      <VoiceSpecimen
-        surface={VOICE_SURFACE.NOT_FOUND}
-        locale={EN}
-        values={valuesFor(EN)}
-        listSamples={en.voiceSpecimen.lists}
-        theme={MOCK_SITE_PREVIEW_THEME}
-      />,
-    );
+    setup();
 
     const heading = screen.getByText(
       SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
     );
-    const style = getComputedStyle(heading);
-    expect(style.getPropertyValue('--brand-primary')).toBe(
-      'oklch(0.53 0.17 28)',
-    );
+    const brandPrimary =
+      getComputedStyle(heading).getPropertyValue('--brand-primary');
+
+    expect(brandPrimary).toBe(MOCK_BRAND_PRIMARY);
   });
 });

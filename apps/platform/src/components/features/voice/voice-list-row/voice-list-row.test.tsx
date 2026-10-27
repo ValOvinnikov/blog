@@ -1,9 +1,17 @@
 import { VOICE_FIELDS } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { Accordion } from '@platform/components/shared/accordion';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import type { ComponentProps } from 'react';
 
 import { VoiceListRow } from './voice-list-row';
+
+faker.seed(5994);
+
+const MOCK_VALUE = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
+const ARIA_EXPANDED = 'aria-expanded';
 
 const tagEmpty = VOICE_FIELDS.find(({ id }) => id === 'tagEmpty')!;
 
@@ -15,7 +23,7 @@ const setup = (overrides: Partial<ComponentProps<typeof VoiceListRow>> = {}) =>
     >
       <VoiceListRow
         field={tagEmpty}
-        locale="EN"
+        locale={LOCALE_ISO_CODES.EN}
         value={null}
         savedValue={null}
         isOpen={false}
@@ -31,47 +39,49 @@ describe(`<${VoiceListRow.name}/>`, () => {
     setup();
 
     const row = screen.getByRole('button', { name: /Tag page/ });
-    expect(row).toHaveAttribute('aria-expanded', 'false');
+
+    expect(row).toHaveAttribute(ARIA_EXPANDED, 'false');
     expect(row).toHaveTextContent('Shown at /tags/…');
     expect(row).toHaveTextContent('Default');
   });
 
   it('summarises a customised value and announces that it is unsaved', () => {
-    setup({ value: 'Nothing tagged {name}.' });
+    setup({ value: MOCK_VALUE });
 
     const row = screen.getByRole('button', { name: /Tag page/ });
-    expect(row).toHaveTextContent('Nothing tagged {name}.');
+
+    expect(row).toHaveTextContent(MOCK_VALUE);
     expect(row).toHaveTextContent('UnsavedCustomised');
   });
 
   it('describes a closed list with its error in text', () => {
-    setup({ error: 'Missing required placeholder {name}.' });
+    setup({ error: MOCK_ERROR });
 
-    expect(
-      screen.getByRole('button', { name: /Tag page/ }),
-    ).toHaveAccessibleDescription('Missing required placeholder {name}.');
-    expect(
-      screen.getByText('Missing required placeholder {name}.'),
-    ).toBeVisible();
+    const row = screen.getByRole('button', { name: /Tag page/ });
+    const errorText = screen.getByText(MOCK_ERROR);
+
+    expect(row).toHaveAccessibleDescription(MOCK_ERROR);
+    expect(errorText).toBeVisible();
   });
 
   it('leaves the error to the open editor', () => {
-    setup({ isOpen: true, error: 'Missing required placeholder {name}.' });
+    setup({ isOpen: true, error: MOCK_ERROR });
 
-    expect(
-      screen.getByRole('button', { name: /Tag page/ }),
-    ).not.toHaveAccessibleDescription();
-    expect(
-      screen.queryByText('Missing required placeholder {name}.'),
-    ).not.toBeInTheDocument();
+    const row = screen.getByRole('button', { name: /Tag page/ });
+    const errorText = screen.queryByText(MOCK_ERROR);
+
+    expect(row).not.toHaveAccessibleDescription();
+    expect(errorText).not.toBeInTheDocument();
   });
 
   it('trades the summary for its editor when open', () => {
     setup({ isOpen: true });
 
     const row = screen.getByRole('button', { name: /Tag page/ });
-    expect(row).toHaveAttribute('aria-expanded', 'true');
+    const editor = screen.getByText('Editor');
+
+    expect(row).toHaveAttribute(ARIA_EXPANDED, 'true');
     expect(row).not.toHaveTextContent('Default');
-    expect(screen.getByText('Editor')).toBeVisible();
+    expect(editor).toBeVisible();
   });
 });

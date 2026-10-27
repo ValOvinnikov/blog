@@ -1,6 +1,7 @@
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { mockSettingsFeaturesToggles } from '@blog/db/testing/settings-features/fixtures';
 
 import { getSettingsFeatures } from './get-settings-features';
 
@@ -20,28 +21,20 @@ describe(getSettingsFeatures, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns undefined when the tenant has no settings_features row', async () => {
+  it('returns undefined when the tenant has no saved toggles', async () => {
     const result = await getSettingsFeatures(tenantId);
 
     expect(result).toBeUndefined();
   });
 
   it('returns the stored toggles when a row exists', async () => {
-    await db().insert(schema.settingsFeatures).values({
-      tenantId,
-      newsletterEnabled: true,
-      analyticsEnabled: true,
-    });
+    const [saved] = await db()
+      .insert(schema.settingsFeatures)
+      .values({ tenantId, ...mockSettingsFeaturesToggles() })
+      .returning();
 
     const result = await getSettingsFeatures(tenantId);
 
-    expect(result).toMatchObject({
-      tenantId,
-      commentsEnabled: true,
-      ratingsEnabled: true,
-      bookmarksEnabled: true,
-      newsletterEnabled: true,
-      analyticsEnabled: true,
-    });
+    expect(result).toEqual(saved);
   });
 });

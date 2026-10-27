@@ -2,11 +2,11 @@ import { FEATURE_ICONS, ICONS } from './icon';
 
 describe('FEATURE_ICONS', () => {
   it('contains only valid ICONS values', () => {
-    const validValues = Object.values(ICONS);
+    const validValues: readonly string[] = Object.values(ICONS);
 
-    FEATURE_ICONS.forEach((icon) => {
-      expect(validValues).toContain(icon);
-    });
+    const invalid = FEATURE_ICONS.filter((icon) => !validValues.includes(icon));
+
+    expect(invalid).toEqual([]);
   });
 
   it('has no duplicate entries', () => {

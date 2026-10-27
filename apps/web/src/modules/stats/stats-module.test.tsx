@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_STAT_ITEMS,
@@ -25,8 +26,12 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
+faker.seed(32);
+
+const MOCK_MODULE_ID = faker.string.uuid();
+
 const setup = customRenderAsync(StatsModule, {
-  id: 'stats-1',
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${StatsModule.name}/>`, () => {
@@ -39,7 +44,7 @@ describe(`<${StatsModule.name}/>`, () => {
     await setup();
 
     expect(getStatsModuleMock).toHaveBeenCalledWith(
-      'stats-1',
+      MOCK_MODULE_ID,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
@@ -52,12 +57,14 @@ describe(`<${StatsModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the resolved stat figures', async () => {
-    await setup();
+  it.each(MOCK_STAT_ITEMS.map(({ label }) => label))(
+    'renders the resolved stat labelled %s',
+    async (label) => {
+      await setup();
 
-    MOCK_STAT_ITEMS.forEach(({ label }) => {
       const statLabel = screen.getByText(label);
+
       expect(statLabel).toBeVisible();
-    });
-  });
+    },
+  );
 });

@@ -1,7 +1,14 @@
 import { CAPABILITY } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import type { ComponentProps } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { StudioMount } from './studio-mount';
+
+const { STUDIO_LAYOUT_TEST_ID, INPUT_OVERRIDE_MARKER } = vi.hoisted(() => ({
+  STUDIO_LAYOUT_TEST_ID: 'studio-layout-mock',
+  INPUT_OVERRIDE_MARKER: 'has-input-override',
+}));
 
 vi.mock('sanity/structure');
 vi.mock('sanity-plugin-media');
@@ -29,42 +36,47 @@ vi.mock('sanity', async () => {
     }) => (
       <div data-testid="studio-provider-mock">
         {config.projectId}:{config.dataset}:{config.basePath}:{config.title}
-        {config.form?.components?.input ? 'has-input-override' : null}
+        {config.form?.components?.input ? INPUT_OVERRIDE_MARKER : null}
         {children}
       </div>
     ),
-    StudioLayout: () => <div data-testid="studio-layout-mock" />,
+    StudioLayout: () => <div data-testid={STUDIO_LAYOUT_TEST_ID} />,
   };
 });
 
-describe(StudioMount, () => {
-  it('builds the config internally from plain string props and passes it to StudioProvider/StudioLayout', () => {
-    const html = renderToStaticMarkup(
-      <StudioMount
-        projectId="test-project"
-        dataset="test-dataset"
-        basePath="/dashboard/studio"
-        title="Test Studio"
-      />,
-    );
+faker.seed(6017);
+
+const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
+const MOCK_DATASET = faker.lorem.word();
+const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
+const MOCK_TITLE = faker.lorem.words(2);
+
+const renderMount = (
+  overrides: Partial<ComponentProps<typeof StudioMount>> = {},
+) =>
+  renderToStaticMarkup(
+    <StudioMount
+      projectId={MOCK_PROJECT_ID}
+      dataset={MOCK_DATASET}
+      basePath={MOCK_BASE_PATH}
+      title={MOCK_TITLE}
+      {...overrides}
+    />,
+  );
+
+describe(`<${StudioMount.name}/>`, () => {
+  it('mounts the Studio layout with a config built from the given strings', () => {
+    const html = renderMount();
 
     expect(html).toContain(
-      'test-project:test-dataset:/dashboard/studio:Test Studio',
+      `${MOCK_PROJECT_ID}:${MOCK_DATASET}:${MOCK_BASE_PATH}:${MOCK_TITLE}`,
     );
-    expect(html).toContain('studio-layout-mock');
+    expect(html).toContain(STUDIO_LAYOUT_TEST_ID);
   });
 
-  it('passes enabledCapabilities through to the built config', () => {
-    const html = renderToStaticMarkup(
-      <StudioMount
-        projectId="p"
-        dataset="d"
-        basePath="/s"
-        title="T"
-        enabledCapabilities={[CAPABILITY.NEWSLETTER]}
-      />,
-    );
+  it('applies the enabled capabilities to the Studio forms', () => {
+    const html = renderMount({ enabledCapabilities: [CAPABILITY.NEWSLETTER] });
 
-    expect(html).toContain('has-input-override');
+    expect(html).toContain(INPUT_OVERRIDE_MARKER);
   });
 });

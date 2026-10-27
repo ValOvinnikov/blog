@@ -1,31 +1,31 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Text } from './text';
 
-describe(Text, () => {
-  it('renders its content', () => {
-    render(<Text>Every site on the platform.</Text>);
-    expect(screen.getByText('Every site on the platform.')).toBeVisible();
+faker.seed(5995);
+
+const MOCK_COPY = faker.lorem.sentence();
+
+const setup = customRender(Text, { children: MOCK_COPY });
+
+describe(`<${Text.name}/>`, () => {
+  it('renders its content as a paragraph by default', () => {
+    setup();
+
+    const paragraph = screen.getByRole('paragraph');
+
+    expect(paragraph).toBeVisible();
+    expect(paragraph).toHaveTextContent(MOCK_COPY);
   });
 
-  it('defaults to the body variant as a <p>', () => {
-    render(<Text>Body copy</Text>);
-    const node = screen.getByText('Body copy');
-    expect(node.tagName).toBe('P');
-  });
+  it('renders inline copy as a span', () => {
+    setup({ as: 'span' });
 
-  it('renders as a <span> when selected', () => {
-    render(<Text as="span">Inline copy</Text>);
-    expect(screen.getByText('Inline copy').tagName).toBe('SPAN');
-  });
+    const text = screen.getByText(MOCK_COPY);
+    const paragraph = screen.queryByRole('paragraph');
 
-  it('renders every variant without throwing', () => {
-    const variants = ['body', 'muted', 'supporting', 'hint'] as const;
-    for (const variant of variants) {
-      expect(() =>
-        render(<Text variant={variant}>Variant copy</Text>),
-      ).not.toThrow();
-    }
-    expect(screen.getAllByText('Variant copy')).toHaveLength(variants.length);
+    expect(text.tagName).toBe('SPAN');
+    expect(paragraph).not.toBeInTheDocument();
   });
 });

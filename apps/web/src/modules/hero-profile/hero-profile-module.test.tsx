@@ -1,22 +1,19 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
-import type { THeroProfileModule } from '@blog/service';
+import { SITE_MESSAGES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
-  MOCK_HERO_PROFILE_AVATAR_NAME,
+  MOCK_GITHUB_PROFILE_LINK_NAME,
+  MOCK_HERO_PROFILE_HEADING,
   MOCK_HERO_PROFILE_MODULE_ID,
+  mockHeroProfileModule,
 } from '@web/testing/modules/hero-profile/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroProfileModule } from './hero-profile-module';
-
-const HEADLINE = "Hi, I'm Jane";
-const GITHUB_PROFILE = mockSocialProfile();
 
 const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
@@ -32,24 +29,7 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const mockHeroProfileData = (
-  overrides: Partial<THeroProfileModule> = {},
-): THeroProfileModule => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
-  eyebrow: undefined,
-  headingBlock: mockHeadingBlock({ heading: HEADLINE }),
-  avatarName: MOCK_HERO_PROFILE_AVATAR_NAME,
-  bio: undefined,
-  sanityImage: undefined,
-  socialLinks: [],
-  ctaButtons: [],
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
-  layout: undefined,
-  ...overrides,
-});
+const MOCK_GITHUB_PROFILE = mockSocialProfile();
 
 const setup = customRenderAsync(HeroProfileModule, {
   id: MOCK_HERO_PROFILE_MODULE_ID,
@@ -58,7 +38,7 @@ const setup = customRenderAsync(HeroProfileModule, {
 describe(`<${HeroProfileModule.name}/>`, () => {
   beforeEach(() => {
     getHeroProfileMock.mockReset();
-    getHeroProfileMock.mockResolvedValue(okResult(mockHeroProfileData()));
+    getHeroProfileMock.mockResolvedValue(okResult(mockHeroProfileModule()));
   });
 
   describe('with the default module data', () => {
@@ -74,7 +54,11 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     });
 
     it('renders the resolved heading', () => {
-      const heading = screen.getByRole('heading', { level: 1, name: HEADLINE });
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_HERO_PROFILE_HEADING,
+      });
+
       expect(heading).toBeVisible();
     });
   });
@@ -90,26 +74,31 @@ describe(`<${HeroProfileModule.name}/>`, () => {
   it('serves the hero image from the configured Sanity CDN', async () => {
     const sanityImage = mockSanityImage();
     getHeroProfileMock.mockResolvedValue(
-      okResult(mockHeroProfileData({ sanityImage })),
+      okResult(mockHeroProfileModule({ sanityImage })),
     );
 
     await setup();
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
-    expect(
-      image.getAttribute('src')?.startsWith(STATIC_SANITY_IMAGE_BASE_URL),
-    ).toBe(true);
+    const imageSource = image.getAttribute('src');
+
+    expect(imageSource?.startsWith(STATIC_SANITY_IMAGE_BASE_URL)).toBe(true);
   });
 
   it('renders the resolved social links in a labelled list', async () => {
     getHeroProfileMock.mockResolvedValue(
-      okResult(mockHeroProfileData({ socialLinks: [GITHUB_PROFILE] })),
+      okResult(mockHeroProfileModule({ socialLinks: [MOCK_GITHUB_PROFILE] })),
     );
 
     await setup();
 
-    const list = screen.getByRole('list', { name: 'Profiles' });
-    const link = within(list).getByRole('link', { name: 'GitHub profile' });
-    expect(link).toHaveAttribute('href', GITHUB_PROFILE.link.href);
+    const list = screen.getByRole('list', {
+      name: SITE_MESSAGES.socialLinks.listAriaLabel,
+    });
+    const link = within(list).getByRole('link', {
+      name: MOCK_GITHUB_PROFILE_LINK_NAME,
+    });
+
+    expect(link).toHaveAttribute('href', MOCK_GITHUB_PROFILE.link.href);
   });
 });

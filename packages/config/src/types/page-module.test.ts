@@ -10,7 +10,7 @@ import type {
 } from './page-module';
 
 describe('page module type unions', () => {
-  it('resolves page_home from the heroField and modulesField({ allow }) kinds of template_home', () => {
+  it('resolves page_home from the hero and module kinds of template_home', () => {
     expectTypeOf<TPageHomeType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_heroStatement'

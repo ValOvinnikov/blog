@@ -1,4 +1,6 @@
+import { VOICE_FIELDS, VOICE_SURFACE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import de from '@platform/i18n/messages/de.json';
 import {
   customRenderAsync,
@@ -13,11 +15,15 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
 
+faker.seed(5994);
+
 const { EN, DE } = LOCALE_ISO_CODES;
+
+const MOCK_GERMAN_HEADING = faker.lorem.words(2);
 
 const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
@@ -34,9 +40,9 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@platform/server/auth/auth');
 
-const tenant = mockReadyTenant();
-
-const setup = customRenderAsync(VoicePageContent, { tenant });
+const setup = customRenderAsync(VoicePageContent, {
+  tenant: mockReadyTenant(),
+});
 
 const notFoundHeading = () => {
   const notFoundRegion = screen.getByRole('region', {
@@ -47,11 +53,12 @@ const notFoundHeading = () => {
 };
 
 describe(`<${VoicePageContent.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
-    getSiteConfigMock.mockReset();
-    getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReset();
-    selectLiveLocalesMock.mockReturnValue([EN]);
+    user = userEvent.setup();
+    getSiteConfigMock.mockReset().mockResolvedValue(undefined);
+    selectLiveLocalesMock.mockReset().mockReturnValue([EN]);
   });
 
   it('shows every field at its default when there is no site_config row', async () => {
@@ -61,7 +68,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     const defaultBadges = screen.getAllByText('Default');
 
     expect(headingInput).toHaveValue('');
-    expect(defaultBadges).toHaveLength(11);
+    expect(defaultBadges).toHaveLength(VOICE_FIELDS.length);
   });
 
   it("renders the default language's saved override as the field value", async () => {
@@ -69,7 +76,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
       ...defaultLookFormValues(),
       voiceOverridesByLocale: {
         [EN]: { notFoundHeading: NOTHING_HERE },
-        [DE]: { notFoundHeading: 'Nichts hier' },
+        [DE]: { notFoundHeading: MOCK_GERMAN_HEADING },
       },
     });
 
@@ -93,29 +100,27 @@ describe(`<${VoicePageContent.name}/>`, () => {
     });
 
     it('renders the empty-list specimen in the language being edited', async () => {
-      const user = userEvent.setup();
       const germanButton = screen.getByRole('button', { name: 'German' });
       await user.click(germanButton);
 
       const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
-      const specimenRoot = screen.getByTestId('voice-specimen-ARCHIVE');
+      const specimenRoot = screen.getByTestId(
+        `voice-specimen-${VOICE_SURFACE.ARCHIVE}`,
+      );
       const specimen = within(specimenRoot);
       const eyebrowText = specimen.getByText(eyebrow);
       const headingText = specimen.getByText(heading);
       const countText = specimen.getByText(count);
 
-      expect(eyebrowText).toBeInTheDocument();
-      expect(headingText).toBeInTheDocument();
-      expect(countText).toBeInTheDocument();
+      expect(eyebrowText).toBeVisible();
+      expect(headingText).toBeVisible();
+      expect(countText).toBeVisible();
     });
   });
 
-  it('passes the archived date through for a deprovisioned tenant', async () => {
+  it('shows the archived notice and no Save for a deprovisioned tenant', async () => {
     await setup({
-      tenant: {
-        ...tenant,
-        deprovisionedAt: MOCK_ARCHIVED_AT,
-      },
+      tenant: mockReadyTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);

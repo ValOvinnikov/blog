@@ -1,79 +1,81 @@
+import { execFileSync } from 'node:child_process';
+
+import {
+  MOCK_TENANT_MIGRATE_CLI_ENV,
+  MOCK_TENANT_MIGRATE_PARAMS,
+} from '@blog/db/testing/migrate-tenant-content/fixtures';
+import { mockSanityValidationResult } from '@blog/db/testing/validate-tenant-documents/fixtures';
+import { faker } from '@faker-js/faker';
+
 import { validateTenantDocuments } from './run-sanity-documents-validate';
 
-const { execFileSyncMock } = vi.hoisted(() => ({ execFileSyncMock: vi.fn() }));
+vi.mock('node:child_process');
 
-vi.mock('node:child_process', () => ({ execFileSync: execFileSyncMock }));
+faker.seed(5801);
 
-const params = {
-  projectId: 'proj-1',
-  dataset: 'production',
-  token: 'read-token',
-};
+const MOCK_CLI_FAILURE = faker.lorem.sentence();
 
 beforeEach(() => {
-  execFileSyncMock.mockReset().mockReturnValue('[]');
+  vi.mocked(execFileSync).mockReturnValue('[]');
 });
 
 describe(validateTenantDocuments, () => {
   it('parses the JSON array printed on a clean exit', () => {
-    expect(validateTenantDocuments(params)).toEqual([]);
+    expect(validateTenantDocuments(MOCK_TENANT_MIGRATE_PARAMS)).toEqual([]);
   });
 
   it('overrides the per-tenant Sanity env vars for the CLI invocation', () => {
-    validateTenantDocuments(params);
+    validateTenantDocuments(MOCK_TENANT_MIGRATE_PARAMS);
 
-    expect(execFileSyncMock).toHaveBeenCalledWith(
-      'pnpm',
-      ['exec', 'sanity', 'documents', 'validate', '--yes', '--format', 'json'],
-      expect.objectContaining({
-        env: expect.objectContaining({
-          SANITY_STUDIO_PROJECT_ID: 'proj-1',
-          SANITY_STUDIO_DATASET: 'production',
-          SANITY_AUTH_TOKEN: 'read-token',
-        }),
-      }),
-    );
+    const [command, args, options] =
+      vi.mocked(execFileSync).mock.lastCall ?? [];
+
+    expect({ command, args, env: options?.env }).toEqual({
+      command: 'pnpm',
+      args: [
+        'exec',
+        'sanity',
+        'documents',
+        'validate',
+        '--yes',
+        '--format',
+        'json',
+      ],
+      env: { ...process.env, ...MOCK_TENANT_MIGRATE_CLI_ENV },
+    });
   });
 
   it('parses invalid documents reported on a clean exit', () => {
-    const results = [
-      {
-        documentId: 'doc-1',
-        documentType: 'page_post',
-        level: 'warning',
-        markers: [{ level: 'warning', message: 'Missing SEO title' }],
-      },
-    ];
-    execFileSyncMock.mockReturnValue(JSON.stringify(results));
+    const results = [mockSanityValidationResult({ level: 'warning' })];
+    vi.mocked(execFileSync).mockReturnValue(JSON.stringify(results));
 
-    expect(validateTenantDocuments(params)).toEqual(results);
+    expect(validateTenantDocuments(MOCK_TENANT_MIGRATE_PARAMS)).toEqual(
+      results,
+    );
   });
 
-  it('still parses the captured stdout when the CLI exits non-zero for an error-level marker', () => {
-    const results = [
-      {
-        documentId: 'doc-1',
-        documentType: 'page_post',
-        level: 'error',
-        markers: [{ level: 'error', message: 'Required field is missing' }],
-      },
-    ];
-    execFileSyncMock.mockImplementation(() => {
-      throw Object.assign(new Error('Command failed'), {
+  it('parses the captured stdout when the CLI exits non-zero on an error marker', () => {
+    const results = [mockSanityValidationResult({ level: 'error' })];
+    vi.mocked(execFileSync).mockImplementation(() => {
+      throw Object.assign(new Error(MOCK_CLI_FAILURE), {
         status: 1,
         stdout: JSON.stringify(results),
       });
     });
 
-    expect(validateTenantDocuments(params)).toEqual(results);
+    expect(validateTenantDocuments(MOCK_TENANT_MIGRATE_PARAMS)).toEqual(
+      results,
+    );
   });
 
   it('rethrows a systemic failure that produced no captured stdout', () => {
-    const error = new Error('ENOENT: pnpm not found');
-    execFileSyncMock.mockImplementation(() => {
+    const error = new Error(MOCK_CLI_FAILURE);
+    vi.mocked(execFileSync).mockImplementation(() => {
       throw error;
     });
 
-    expect(() => validateTenantDocuments(params)).toThrow(error);
+    expect(() => validateTenantDocuments(MOCK_TENANT_MIGRATE_PARAMS)).toThrow(
+      error,
+    );
   });
 });

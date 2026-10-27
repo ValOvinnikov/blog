@@ -1,59 +1,52 @@
 import { ACTION_OUTCOME, ERROR_CODE } from '@blog/config';
+import { queries } from '@blog/db';
 import { errorResult, okResult } from '@blog/utils';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { arrangeNoSessionOnce } from '@web/testing/shared/session/arrange-no-session-once';
+import { MOCK_USER_ID } from '@web/testing/shared/session/fixtures';
 
 import { deleteAccountAction } from './account-actions';
 
-const { authMock, deleteAccountMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  deleteAccountMock: vi.fn(),
-}));
-
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@web/server/auth/auth');
 
 vi.mock('@blog/db', () => ({
-  queries: { account: { deleteAccount: deleteAccountMock } },
+  queries: { account: { deleteAccount: vi.fn() } },
 }));
 
-describe('deleteAccountAction', () => {
-  beforeEach(() => {
-    authMock.mockReset();
-    deleteAccountMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+describe(deleteAccountAction, () => {
+  it('answers server-error without deleting when there is no session', async () => {
+    arrangeNoSessionOnce();
+
+    const result = await deleteAccountAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(queries.account.deleteAccount).not.toHaveBeenCalled();
   });
 
-  it('returns SERVER_ERROR without deleting when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('deletes the session user and answers success', async () => {
+    vi.mocked(queries.account.deleteAccount).mockResolvedValueOnce(okResult());
 
-    await expect(deleteAccountAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(deleteAccountMock).not.toHaveBeenCalled();
+    const result = await deleteAccountAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(queries.account.deleteAccount).toHaveBeenCalledWith(MOCK_USER_ID);
   });
 
-  it('deletes the session user and returns SUCCESS', async () => {
-    deleteAccountMock.mockResolvedValue(okResult());
-
-    await expect(deleteAccountAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    expect(deleteAccountMock).toHaveBeenCalledWith('user-1');
-  });
-
-  it('returns BLOCKED when the account holds a platform role', async () => {
-    deleteAccountMock.mockResolvedValue(
+  it('answers blocked when the account holds a platform role', async () => {
+    vi.mocked(queries.account.deleteAccount).mockResolvedValueOnce(
       errorResult(ERROR_CODE.DB_HOLDS_PLATFORM_ROLE),
     );
 
-    await expect(deleteAccountAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
+    const result = await deleteAccountAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
   });
 
-  it('returns SERVER_ERROR when the delete throws', async () => {
-    deleteAccountMock.mockRejectedValue(new Error('boom'));
+  it('answers server-error when the delete throws', async () => {
+    vi.mocked(queries.account.deleteAccount).mockRejectedValueOnce(MOCK_ERROR);
 
-    await expect(deleteAccountAction()).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
+    const result = await deleteAccountAction();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 });

@@ -1,50 +1,62 @@
+import { queries } from '@blog/db';
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
+import { TENANT_LOG } from '@platform/constants/tenant';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
-import { mockTenant } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { recordOwnerSignInActivity } from './record-owner-sign-in-activity';
 
-const {
-  listMembershipsWithTenantsForUserMock,
-  touchTenantActivityMock,
-  wakeTenantFromInactivityMock,
-} = vi.hoisted(() => ({
-  listMembershipsWithTenantsForUserMock: vi.fn(),
-  touchTenantActivityMock: vi.fn(),
-  wakeTenantFromInactivityMock: vi.fn(),
-}));
-
 vi.mock('@blog/db', () => ({
   queries: {
-    memberships: {
-      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
-    },
+    memberships: { listMembershipsWithTenantsForUser: vi.fn() },
     tenants: {
-      touchTenantActivity: touchTenantActivityMock,
-      wakeTenantFromInactivity: wakeTenantFromInactivityMock,
+      touchTenantActivity: vi.fn(),
+      wakeTenantFromInactivity: vi.fn(),
     },
   },
 }));
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-const { userId: USER_ID } = mockMembership();
-const DB_DOWN = new Error('db down');
-const OWNED_TENANT = mockTenant({ id: 'tenant-owned' });
-const EDITED_TENANT = mockTenant({ id: 'tenant-edited' });
+faker.seed(5997);
+
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_SIGN_IN_AT = new Date('2026-10-01T12:00:00.000Z');
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
+const OWNED_TENANT = mockTenant({ id: MOCK_TENANT_ID });
+const EDITED_TENANT = mockTenant({ id: MOCK_OTHER_TENANT_ID });
+
+const listMembershipsMock = vi.mocked(
+  queries.memberships.listMembershipsWithTenantsForUser,
+);
+const touchTenantActivityMock = vi.mocked(queries.tenants.touchTenantActivity);
+const wakeTenantFromInactivityMock = vi.mocked(
+  queries.tenants.wakeTenantFromInactivity,
+);
 
 const membershipFor = (tenant: TTenant, role: TMembershipRole) => ({
-  membership: mockMembership({ userId: USER_ID, tenantId: tenant.id, role }),
+  membership: mockMembership({
+    userId: MOCK_USER_ID,
+    tenantId: tenant.id,
+    role,
+  }),
   tenant,
 });
 
 describe(recordOwnerSignInActivity, () => {
   beforeEach(() => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+    vi.useFakeTimers();
+    vi.setSystemTime(MOCK_SIGN_IN_AT);
+    listMembershipsMock.mockResolvedValue([
       membershipFor(OWNED_TENANT, MEMBERSHIP_ROLE.OWNER),
       membershipFor(EDITED_TENANT, MEMBERSHIP_ROLE.EDITOR),
     ]);
@@ -52,48 +64,55 @@ describe(recordOwnerSignInActivity, () => {
     wakeTenantFromInactivityMock.mockResolvedValue(null);
   });
 
-  it('touches activity only for the tenants the user owns', async () => {
-    await recordOwnerSignInActivity(USER_ID);
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-    expect(touchTenantActivityMock).toHaveBeenCalledTimes(1);
-    expect(touchTenantActivityMock).toHaveBeenCalledWith(
+  it('touches activity only for the tenants the user owns', async () => {
+    await recordOwnerSignInActivity(MOCK_USER_ID);
+
+    expect(touchTenantActivityMock).toHaveBeenCalledExactlyOnceWith(
       OWNED_TENANT.id,
-      expect.any(Date),
+      MOCK_SIGN_IN_AT,
     );
   });
 
   it('purges the site cache of a tenant it wakes from inactivity', async () => {
     wakeTenantFromInactivityMock.mockResolvedValue(OWNED_TENANT);
 
-    await recordOwnerSignInActivity(USER_ID);
+    await recordOwnerSignInActivity(MOCK_USER_ID);
 
     expect(wakeTenantFromInactivityMock).toHaveBeenCalledWith(OWNED_TENANT.id);
     expect(revalidateSiteConfig).toHaveBeenCalledWith(OWNED_TENANT.id);
   });
 
   it('leaves the site cache alone when no tenant was woken', async () => {
-    await recordOwnerSignInActivity(USER_ID);
+    await recordOwnerSignInActivity(MOCK_USER_ID);
 
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
   });
 
   it('logs a failed touch without throwing', async () => {
-    touchTenantActivityMock.mockRejectedValue(DB_DOWN);
+    touchTenantActivityMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    await expect(recordOwnerSignInActivity(USER_ID)).resolves.toBeUndefined();
+    await expect(
+      recordOwnerSignInActivity(MOCK_USER_ID),
+    ).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ tenantId: OWNED_TENANT.id }),
+      TENANT_LOG.SIGN_IN_ACTIVITY_FAILED,
+      { tenantId: OWNED_TENANT.id, error: MOCK_DB_ERROR },
     );
   });
 
   it('logs a failed membership lookup without throwing', async () => {
-    listMembershipsWithTenantsForUserMock.mockRejectedValue(DB_DOWN);
+    listMembershipsMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    await expect(recordOwnerSignInActivity(USER_ID)).resolves.toBeUndefined();
+    await expect(
+      recordOwnerSignInActivity(MOCK_USER_ID),
+    ).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ userId: USER_ID }),
+      TENANT_LOG.SIGN_IN_OWNER_LOOKUP_FAILED,
+      { userId: MOCK_USER_ID, error: MOCK_DB_ERROR },
     );
   });
 });

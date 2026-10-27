@@ -1,21 +1,9 @@
+import { MOCK_SANITY_MANAGEMENT_TOKEN } from '@blog/db/testing/recheck-tenant-owners/fixtures';
+
 import { loadRecheckEnv } from './env';
 
-const originalEnv: Record<string, string | undefined> = {};
-
 beforeEach(() => {
-  originalEnv['SANITY_MANAGEMENT_TOKEN'] =
-    process.env['SANITY_MANAGEMENT_TOKEN'];
-  process.env['SANITY_MANAGEMENT_TOKEN'] = 'sanity-token';
-});
-
-afterEach(() => {
-  for (const [key, value] of Object.entries(originalEnv)) {
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
+  vi.stubEnv('SANITY_MANAGEMENT_TOKEN', MOCK_SANITY_MANAGEMENT_TOKEN);
 });
 
 describe(loadRecheckEnv, () => {
@@ -23,12 +11,12 @@ describe(loadRecheckEnv, () => {
     const env = loadRecheckEnv();
 
     expect(env).toEqual({
-      sanityManagementToken: 'sanity-token',
+      sanityManagementToken: MOCK_SANITY_MANAGEMENT_TOKEN,
     });
   });
 
   it('throws when SANITY_MANAGEMENT_TOKEN is missing', () => {
-    delete process.env['SANITY_MANAGEMENT_TOKEN'];
+    vi.stubEnv('SANITY_MANAGEMENT_TOKEN', undefined);
 
     expect(() => loadRecheckEnv()).toThrow(
       'recheck-tenant-owners: missing required env var SANITY_MANAGEMENT_TOKEN.',
