@@ -780,6 +780,24 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   wrong — the next `pnpm typegen` silently undoes it and CI's typegen drift
   guard catches it. If a generated type is wrong, the **schema** in
   `packages/studio` is wrong — fix it there and regenerate.
+- **Until launch, no content migrations (decided 2026-10-27).** Production is
+  replaced at launch, not upgraded: both Neon databases are recreated from one
+  baseline migration, every existing content migration is deleted, and every
+  tenant, the first production one included, is created from starter content.
+  Until then:
+
+  - Write no Sanity content migration, no hand-written data fix (an SQL
+    backfill) and no expand/contract pair. A change to an existing content
+    shape updates the starter content in `packages/config/src/starter-content/`
+    instead, so a new tenant starts at the current shape. Dev content it leaves
+    broken is fixed by the dev reset, not by a migration.
+  - Drizzle schema migrations are still generated for every table change —
+    dev's database only gets new columns that way — and must apply to dev's
+    existing rows, so a new `NOT NULL` column needs a default.
+  - The two rules below return at launch, in the "deploy first, then migrate"
+    form of epic #6152
+    (`docs/superpowers/specs/2026-10-27-deploy-first-migrations-design.md`).
+
 - **Check for migrations.** Content is live in the `production` dataset, so any
   change that alters an _existing_ shape — renaming/removing/moving a field,
   renaming a `_type`, restructuring a document — orphans data unless existing

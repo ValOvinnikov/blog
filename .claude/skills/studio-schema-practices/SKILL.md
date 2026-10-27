@@ -141,6 +141,11 @@ such as a flag that changes behaviour while the field keeps its value.
 
 ## Migration quality
 
+**Until launch, write no content migration** (CLAUDE.md → "Until launch, no
+content migrations"): a change to an existing shape updates
+`packages/config/src/starter-content/` instead. The rules below apply again
+after launch, under epic #6152.
+
 The export → dry-run → inspect → human-gated run workflow, and `lib/` for
 helpers a second migration needs: `migrations/README.md`.
 
