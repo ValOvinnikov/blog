@@ -1,25 +1,20 @@
+import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { GlobalErrorPage } from '@web/components/pages/global-error-page';
+import { MOCK_ERROR_WITH_DIGEST } from '@web/testing/shared/error/fixtures';
 
 import GlobalErrorRoute from './global-error';
 
-describe('GlobalError (root global-error boundary route)', () => {
-  it('renders its own html/body and delegates to GlobalErrorPage', () => {
-    const error = Object.assign(new Error('root layout blew up'), {
-      digest: 'xyz',
-    });
+describe(`<${GlobalErrorRoute.name}/>`, () => {
+  it('wraps GlobalErrorPage in an English document with the error and reset', () => {
     const reset = vi.fn();
 
-    const html = GlobalErrorRoute({ error, reset });
+    const html = GlobalErrorRoute({ error: MOCK_ERROR_WITH_DIGEST, reset });
 
-    expect(html.type).toBe('html');
-    expect(html.props.lang).toBe('en');
-
-    const body = html.props.children;
-    expect(body.type).toBe('body');
-
+    const { lang, children: body } = html.props;
     const content = body.props.children;
+
+    expect(lang).toBe(LOCALE_BCP47_TAGS.EN);
     expect(content.type).toBe(GlobalErrorPage);
-    expect(content.props.error).toBe(error);
-    expect(content.props.reset).toBe(reset);
+    expect(content.props).toEqual({ error: MOCK_ERROR_WITH_DIGEST, reset });
   });
 });

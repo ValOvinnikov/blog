@@ -5,7 +5,6 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   RADIUS_SCALE,
-  type TLocaleIsoCode,
 } from '@blog/config';
 import { errorResult } from '@blog/utils';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
@@ -18,6 +17,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { mockRouteParams } from '@web/testing/app/route-params';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
@@ -70,13 +70,10 @@ const NOINDEX_ROBOTS = { index: false, follow: false };
 
 const SETTINGS_FAILURE_SUITE = 'when site settings fail to load';
 
-const makeParams = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
-  Promise.resolve({ tenant: MOCK_TENANT_ID, locale });
-
 const renderLayout = () =>
   LocaleLayout({
     children: <div>content</div>,
-    params: makeParams(),
+    params: mockRouteParams(),
   }) as unknown as Promise<TAnyElement>;
 
 const settingsFailure = () =>
@@ -95,7 +92,7 @@ describe(generateStaticParams, () => {
 
 describe(generateMetadata, () => {
   it('builds the title from site settings and stays indexable in production', async () => {
-    const metadata = await generateMetadata({ params: makeParams() });
+    const metadata = await generateMetadata({ params: mockRouteParams() });
 
     expect(metadata).toEqual({
       metadataBase: MOCK_REQUEST_CONTEXT.metadataBase,
@@ -109,13 +106,13 @@ describe(generateMetadata, () => {
   it('adds noindex, nofollow robots metadata outside production', async () => {
     isProductionEnvironmentMock.mockReturnValue(false);
 
-    const { robots } = await generateMetadata({ params: makeParams() });
+    const { robots } = await generateMetadata({ params: mockRouteParams() });
 
     expect(robots).toEqual(NOINDEX_ROBOTS);
   });
 
   it('enters the request context from its route params', async () => {
-    const params = makeParams();
+    const params = mockRouteParams();
 
     await generateMetadata({ params });
 
@@ -128,7 +125,7 @@ describe(generateMetadata, () => {
     });
 
     it('falls back to metadataBase only', async () => {
-      const metadata = await generateMetadata({ params: makeParams() });
+      const metadata = await generateMetadata({ params: mockRouteParams() });
 
       expect(metadata).toEqual({
         metadataBase: MOCK_REQUEST_CONTEXT.metadataBase,
@@ -138,7 +135,7 @@ describe(generateMetadata, () => {
     it('still applies noindex, nofollow outside production', async () => {
       isProductionEnvironmentMock.mockReturnValue(false);
 
-      const { robots } = await generateMetadata({ params: makeParams() });
+      const { robots } = await generateMetadata({ params: mockRouteParams() });
 
       expect(robots).toEqual(NOINDEX_ROBOTS);
     });
