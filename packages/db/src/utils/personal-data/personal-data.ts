@@ -59,6 +59,16 @@ export function reportPlainPersonalRead(
   if (reason) notifyPersonalDataFallback({ owner, reason });
 }
 
+export function readReportedPersonalValue(
+  owner: TPersonalDataOwner,
+  encrypted: TMaybeNull<string>,
+  plain: TMaybeNull<string>,
+): TMaybeNull<string> {
+  const value = readOptionalPersonalValue(encrypted, plain);
+  if (!isNull(value)) reportPlainPersonalRead(owner, encrypted);
+  return value;
+}
+
 export type TEmailIndexer = (email: string, keyBase64: string) => string;
 
 type TEmailColumns = {

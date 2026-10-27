@@ -2,6 +2,8 @@ import { getDb } from '@blog/db/client';
 import { users, type TUser } from '@blog/db/schema/auth';
 import { sql } from 'drizzle-orm';
 
+// TODO: remove with the plain columns (#5666).
+
 // Case-insensitive on both sides: Auth.js doesn't guarantee provider-side
 // email normalization on write, so a stored row can be mixed-case — lower()
 // the column too, not just the input.

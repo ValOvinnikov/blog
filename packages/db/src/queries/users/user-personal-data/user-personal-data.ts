@@ -5,7 +5,7 @@ import {
   emailColumns,
   encryptPersonalValue,
   readOptionalPersonalValue,
-  reportPlainPersonalRead,
+  readReportedPersonalValue,
 } from '@blog/db/utils/personal-data/personal-data';
 import { accountEmailIndex } from '@blog/utils/encryption';
 import { isNull, isUndefined } from '@blog/utils/primitives';
@@ -42,9 +42,12 @@ export function readUserPersonalData({
   email: string;
   name: TMaybeNull<string>;
 } {
-  const readEmail = readOptionalPersonalValue(emailEncrypted, email);
+  const readEmail = readReportedPersonalValue(
+    PERSONAL_DATA_OWNER.USER,
+    emailEncrypted,
+    email,
+  );
   if (isNull(readEmail)) throw new Error('User has no email.');
-  reportPlainPersonalRead(PERSONAL_DATA_OWNER.USER, emailEncrypted);
 
   return {
     email: readEmail,

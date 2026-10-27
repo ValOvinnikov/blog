@@ -1,7 +1,11 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
+import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { findPendingInviteByEmail } from './find-pending-invite-by-email';
 
@@ -9,19 +13,21 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
+const MOCK_TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);
+
 async function insertInvite(
-  tenantId: string,
-  email: string,
-  consumed = false,
-): Promise<void> {
+  overrides: Partial<typeof schema.membershipInvites.$inferInsert> = {},
+): Promise<string> {
+  const { id: tenantId } = await insertTestTenant(db());
   await db()
     .insert(schema.membershipInvites)
     .values({
       tenantId,
-      email,
+      ...inviteEmailColumns(MOCK_INVITE_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
-      consumedAt: consumed ? new Date() : null,
+      ...overrides,
     });
+  return tenantId;
 }
 
 afterEach(async () => {
@@ -30,57 +36,93 @@ afterEach(async () => {
 });
 
 describe(findPendingInviteByEmail, () => {
-  let tenantId: string;
+  describe('with the personal data keys configured', () => {
+    usePersonalDataKeys();
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
+    it('returns every pending invite for the address across tenants, skipping consumed ones', async () => {
+      const pendingTenantId = await insertInvite();
+      const secondPendingTenantId = await insertInvite();
+      await insertInvite({ consumedAt: new Date() });
 
-  it('returns a pending invite matching the normalized email', async () => {
-    await insertInvite(tenantId, MOCK_INVITE_EMAIL);
+      const invites = await findPendingInviteByEmail(
+        MOCK_INVITE_EMAIL.toUpperCase(),
+      );
 
-    const results = await findPendingInviteByEmail(
-      MOCK_INVITE_EMAIL.toUpperCase(),
+      expect(invites.map(({ tenantId }) => tenantId).sort()).toEqual(
+        [pendingTenantId, secondPendingTenantId].sort(),
+      );
+    });
+
+    it('matches an address padded with whitespace', async () => {
+      const tenantId = await insertInvite();
+
+      const invites = await findPendingInviteByEmail(
+        `  ${MOCK_INVITE_EMAIL}  `,
+      );
+
+      expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    });
+
+    it('finds an invite sent to a +tag address by that exact address', async () => {
+      const tenantId = await insertInvite(
+        inviteEmailColumns(MOCK_TAGGED_INVITE_EMAIL),
+      );
+
+      const invites = await findPendingInviteByEmail(MOCK_TAGGED_INVITE_EMAIL);
+
+      expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    });
+
+    it.each([
+      [
+        'an address by a +tag variant of it',
+        MOCK_INVITE_EMAIL,
+        MOCK_TAGGED_INVITE_EMAIL,
+      ],
+      [
+        'a +tag variant by the address',
+        MOCK_TAGGED_INVITE_EMAIL,
+        MOCK_INVITE_EMAIL,
+      ],
+    ])(
+      'never matches an invite sent to %s',
+      async (_label, sentTo, requested) => {
+        await insertInvite(inviteEmailColumns(sentTo));
+
+        await expect(findPendingInviteByEmail(requested)).resolves.toEqual([]);
+      },
     );
 
-    expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ tenantId, email: MOCK_INVITE_EMAIL });
+    it('matches an invite not yet backfilled by its plain email', async () => {
+      const tenantId = await insertInvite({
+        emailEncrypted: null,
+        emailIndex: null,
+      });
+
+      const invites = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
+
+      expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    });
+
+    it('returns nothing for an address with no invite', async () => {
+      await insertInvite();
+
+      await expect(
+        findPendingInviteByEmail(faker.internet.email()),
+      ).resolves.toEqual([]);
+    });
   });
 
-  it('matches an email padded with leading/trailing whitespace', async () => {
-    await insertInvite(tenantId, MOCK_INVITE_EMAIL);
+  describe('while the index key is unset', () => {
+    it.each([
+      ['a re-cased address', MOCK_INVITE_EMAIL.toUpperCase()],
+      ['a padded address', `  ${MOCK_INVITE_EMAIL}  `],
+    ])('matches an invite by its plain email for %s', async (_label, email) => {
+      const tenantId = await insertInvite();
 
-    const results = await findPendingInviteByEmail(`  ${MOCK_INVITE_EMAIL}  `);
+      const invites = await findPendingInviteByEmail(email);
 
-    expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ tenantId, email: MOCK_INVITE_EMAIL });
-  });
-
-  it('excludes already-consumed invites', async () => {
-    await insertInvite(tenantId, MOCK_INVITE_EMAIL, true);
-
-    const results = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
-
-    expect(results).toHaveLength(0);
-  });
-
-  it('returns every pending invite across multiple tenants for the same email', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await insertInvite(tenantOneId, MOCK_INVITE_EMAIL);
-    await insertInvite(tenantTwoId, MOCK_INVITE_EMAIL);
-
-    const results = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
-
-    expect(results).toHaveLength(2);
-    expect(results.map((invite) => invite.tenantId).sort()).toEqual(
-      [tenantOneId, tenantTwoId].sort(),
-    );
-  });
-
-  it('returns an empty array when no invite matches', async () => {
-    const results = await findPendingInviteByEmail('nobody@example.com');
-
-    expect(results).toEqual([]);
+      expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    });
   });
 });
