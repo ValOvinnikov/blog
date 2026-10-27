@@ -7,6 +7,7 @@ import {
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import type { TTranslationMap } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { PROXY_LOG } from '@web/constants/proxy';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
@@ -64,6 +65,7 @@ const BOTID_PREFIX =
   '/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3';
 const ROBOTS_PATH = '/robots.txt';
 const SITEMAP_PATH = '/sitemap.xml';
+const DOTTED_SEGMENT_PATH = '/blog/v1.2/post';
 const SITE_RSS_PATH = routes.rssFeed();
 const TAG_RSS_PATH = routes.tagRssFeed(MOCK_TAG_SLUG);
 const BLOG_PATH = '/blog';
@@ -176,6 +178,11 @@ describe('proxy matcher', () => {
       path: `${BOTID_PREFIX}/a-4-a/c.js`,
     },
     { case: 'a BotID proxy path', path: `${BOTID_PREFIX}/fp` },
+    { case: 'robots.txt', path: ROBOTS_PATH },
+    { case: 'the favicon', path: '/favicon.ico' },
+    { case: 'the sitemap', path: SITEMAP_PATH },
+    { case: 'a root-level bot probe', path: '/wp-login.php' },
+    { case: 'a nested bot probe', path: '/wp-admin/setup-config.php' },
   ])('bypasses the proxy for $case', ({ path }) => {
     expect(matcher.test(path)).toBe(false);
   });
@@ -184,11 +191,14 @@ describe('proxy matcher', () => {
     { case: 'the home page', path: '/' },
     { case: 'the blog index', path: BLOG_PATH },
     { case: 'a post', path: '/blog/some-post-slug' },
-    { case: 'robots.txt', path: ROBOTS_PATH },
-    { case: 'the favicon', path: '/favicon.ico' },
-    { case: 'the sitemap', path: SITEMAP_PATH },
     { case: 'the site feed', path: SITE_RSS_PATH },
     { case: 'a dotted multi-segment tag feed', path: TAG_RSS_PATH },
+    { case: 'a dot in a non-final segment', path: DOTTED_SEGMENT_PATH },
+    { case: 'an RSC request', path: `${BLOG_PATH}.rsc` },
+    {
+      case: 'an RSC segment prefetch',
+      path: `${BLOG_PATH}.segments/_tree.segment.rsc`,
+    },
   ])('runs the proxy for $case', ({ path }) => {
     expect(matcher.test(path)).toBe(true);
   });
@@ -231,18 +241,15 @@ describe(proxy, () => {
   });
 
   describe('dotted paths', () => {
-    it.each([ROBOTS_PATH, SITEMAP_PATH])(
-      'passes %s through without resolving a tenant',
-      async (pathname) => {
-        const response = await visit(pathname);
+    it('passes a path with a dotted non-final segment through without resolving a tenant', async () => {
+      const response = await visit(DOTTED_SEGMENT_PATH);
 
-        expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
-        expect(response.headers.get(REWRITE_HEADER)).toBeNull();
-      },
-    );
+      expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
+      expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+    });
 
     it('drops a client-supplied tenant header on a passed-through path', async () => {
-      const response = await visit(ROBOTS_PATH, {
+      const response = await visit(DOTTED_SEGMENT_PATH, {
         headers: { [TENANT_ID_HEADER]: MOCK_SPOOFED_TENANT_ID },
       });
 
@@ -254,7 +261,7 @@ describe(proxy, () => {
     });
 
     it('keeps the host header on a passed-through path', async () => {
-      const response = await visit(ROBOTS_PATH);
+      const response = await visit(DOTTED_SEGMENT_PATH);
 
       expect(response.headers.get('x-middleware-request-host')).toBe(
         MOCK_TENANT_HOST,
@@ -383,7 +390,7 @@ describe(proxy, () => {
 
         expect(logger.error).toHaveBeenCalledTimes(1);
         expect(logger.error).toHaveBeenCalledWith(
-          'proxy.tenant_lookup_failed',
+          PROXY_LOG.TENANT_LOOKUP_FAILED,
           { host: MOCK_TENANT_HOST, error: MOCK_ERROR },
         );
       });

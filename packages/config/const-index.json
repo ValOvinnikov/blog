@@ -5432,6 +5432,30 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "proxy.tenant_lookup_failed": [
+      {
+        "ref": "PROXY_LOG.TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/proxy",
+        "file": "apps/web/src/constants/proxy.ts"
+      }
+    ],
+    "revalidate_site_config.secret_missing": [
+      {
+        "ref": "REVALIDATE_SITE_CONFIG_LOG.SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate-site-config",
+        "file": "apps/web/src/constants/revalidate-site-config.ts"
+      }
+    ],
+    "revalidate_site_config.whole_site_purge": [
+      {
+        "ref": "REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate-site-config",
+        "file": "apps/web/src/constants/revalidate-site-config.ts"
+      }
+    ],
     "revalidate.secret_missing": [
       {
         "ref": "REVALIDATE_LOG.SECRET_MISSING",

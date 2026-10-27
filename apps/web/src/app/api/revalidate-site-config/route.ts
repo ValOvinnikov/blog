@@ -1,11 +1,14 @@
+import { HTTP_STATUS } from '@blog/config';
 import { queries } from '@blog/db';
 import { isSecretMatch } from '@blog/utils';
+import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import {
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,
+  TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
@@ -67,10 +70,10 @@ const resolveTenantIdsToRevalidate = async (
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SITE_CONFIG_REVALIDATE_SECRET;
   if (!secret) {
-    logger.error('revalidate_site_config.secret_missing');
+    logger.error(REVALIDATE_SITE_CONFIG_LOG.SECRET_MISSING);
     return NextResponse.json(
       { message: 'Revalidation secret is not configured.' },
-      { status: 500 },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
     );
   }
 
@@ -82,13 +85,16 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (!isSecretMatch(providedSecret, secret)) {
     return NextResponse.json(
       { message: 'Invalid or missing secret.' },
-      { status: 401 },
+      { status: HTTP_STATUS.UNAUTHORIZED },
     );
   }
 
   const requestedTenantId = await parseTenantId(request);
   const tenantIds = await resolveTenantIdsToRevalidate(requestedTenantId);
-  const revalidatedTags = tenantIds.flatMap(buildTagsForTenant);
+  const revalidatedTags = [
+    ...tenantIds.flatMap(buildTagsForTenant),
+    TENANT_BY_HOST_CACHE_TAG,
+  ];
 
   for (const tag of revalidatedTags) {
     revalidateTag(tag, { expire: 0 });
@@ -98,7 +104,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   // tokens, nav, feature flags), so there is no smaller path set that would
   // be correct to purge instead — the whole-site purge here is deliberate,
   // not an unfinished derivation, and is logged loudly rather than silent.
-  logger.warn('revalidate_site_config.whole_site_purge', {
+  logger.warn(REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE, {
     tenantIds,
     requestedTenantId,
   });
@@ -106,6 +112,6 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   return NextResponse.json(
     { revalidated: revalidatedTags, pathPurged: true },
-    { status: 200 },
+    { status: HTTP_STATUS.OK },
   );
 }

@@ -1,7 +1,14 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import {
+  TENANT_CONFIG_REVALIDATE_SECONDS,
+  type TLocaleIsoCode,
+  type TMaybeNull,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { queries, TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { TENANT_BY_HOST_CACHE_TAG } from '@web/utils/tenant-cache-tags';
+import { unstable_cache } from 'next/cache';
 
 export type TTenantRouting = {
   tenant: TTenant;
@@ -28,7 +35,7 @@ export const isTenantServable = (tenant: TTenant): boolean => {
   return tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY;
 };
 
-const resolveSoleTenant = async (): Promise<TTenant | undefined> => {
+const resolveSoleTenant = async (): Promise<TMaybeUndefined<TTenant>> => {
   const tenants = await queries.tenants.listTenants();
   if (tenants.length !== 1) return undefined;
 
@@ -36,9 +43,9 @@ const resolveSoleTenant = async (): Promise<TTenant | undefined> => {
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
 
-export const resolveTenant = async (
-  host: string | null,
-): Promise<TTenant | undefined> => {
+const resolveUncachedTenant = async (
+  host: TMaybeNull<string>,
+): Promise<TMaybeUndefined<TTenant>> => {
   const tenant = host
     ? await queries.tenantDomains.getTenantByDomain(host)
     : undefined;
@@ -51,23 +58,33 @@ export const resolveTenant = async (
   return resolveSoleTenant();
 };
 
+// A cached row comes back JSON-parsed, so its timestamp fields are ISO strings: read them for presence only.
+export const resolveTenant = unstable_cache(
+  resolveUncachedTenant,
+  [TENANT_BY_HOST_CACHE_TAG],
+  {
+    tags: [TENANT_BY_HOST_CACHE_TAG],
+    revalidate: TENANT_CONFIG_REVALIDATE_SECONDS,
+  },
+);
+
 export const resolveTenantById = async (
   tenantId: string,
-): Promise<TTenant | undefined> => {
+): Promise<TMaybeUndefined<TTenant>> => {
   const tenant = await queries.tenants.getTenantById(tenantId);
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
 
 export const resolveTenantId = async (
-  host: string | null,
-): Promise<string | undefined> => {
+  host: TMaybeNull<string>,
+): Promise<TMaybeUndefined<string>> => {
   const tenant = await resolveTenant(host);
   return tenant?.id;
 };
 
 export const resolveTenantRouting = async (
-  host: string | null,
-): Promise<TTenantRouting | undefined> => {
+  host: TMaybeNull<string>,
+): Promise<TMaybeUndefined<TTenantRouting>> => {
   const tenant = await resolveTenant(host);
 
   if (!tenant) {

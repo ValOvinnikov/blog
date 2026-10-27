@@ -4,6 +4,7 @@ import {
   type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@blog/config';
+import { PROXY_LOG } from '@web/constants/proxy';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
 import { isCrawler } from '@web/utils/is-crawler';
@@ -154,8 +155,8 @@ const prependTenantSegment = (
 
 /**
  * Refuses any request whose first path segment is already tenant-shaped,
- * then passes root-level dotted paths (sitemap.xml, robots.txt, favicon.ico)
- * through unrewritten; RSS feeds are routed per language like pages. Only past both
+ * then passes paths with a dot in a non-final segment through unrewritten;
+ * RSS feeds are routed per language like pages. Only past both
  * checks does it resolve the tenant from the request's `Host` header and
  * hand off to next-intl's own middleware, mutating `request.headers` in
  * place (rather than building a fresh `NextResponse.next({request:{headers}})`)
@@ -197,7 +198,7 @@ export default async function proxy(
   try {
     tenantRouting = await resolveTenantRouting(host);
   } catch (error) {
-    logger.error('proxy.tenant_lookup_failed', { host, error });
+    logger.error(PROXY_LOG.TENANT_LOOKUP_FAILED, { host, error });
     return new NextResponse(null, { status: HTTP_STATUS.SERVICE_UNAVAILABLE });
   }
 
@@ -244,6 +245,7 @@ export default async function proxy(
 
 export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
+  // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
   matcher:
-    '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b).*)',
+    '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
 };

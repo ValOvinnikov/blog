@@ -32,7 +32,8 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 - **Public:** every hostname in `tenant_domains` points at the one web app. `proxy.ts` rewrites each request onto the internal tree `app/[tenant]/[locale]/…`. The `[tenant]` segment is the tenant's UUID and never shows in the browser.
 - **Requests the proxy refuses or bypasses:**
   - a first path segment that is tenant-shaped (starts with a UUID), or that cannot be decoded, returns 404;
-  - any path containing a dot (`robots.txt`, `sitemap.xml`, `favicon.ico`), except `…/rss.xml` feeds, passes through unrewritten and resolves the tenant from `Host` itself;
+  - a path whose last segment has a dot (`robots.txt`, `sitemap.xml`, `favicon.ico`, bot probes like `/wp-login.php`), except `…/rss.xml` feeds and Next's `.rsc` requests, is outside the matcher; its route resolves the tenant from `Host` itself;
+  - any other path containing a dot passes through unrewritten, without a tenant lookup;
   - `/api/*`, `/_next`, `/_vercel`, `/icon` and `/.well-known` are outside the matcher.
 - **Unknown host:** in production, an unmatched host gets 404. Outside production, the proxy falls back to the only `tenants` row when exactly one exists; otherwise it writes the `unresolved-tenant` placeholder, which reads the platform's own Sanity project.
 - **Lookup failure:** if the lookup throws (for example, Neon is unreachable), the proxy fails closed with a 503.
@@ -49,7 +50,8 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
   - Neon-backed per-tenant reads are tagged `site-config:<tenantId>`, `settings-features:<tenantId>` and `tenant-plan:<tenantId>`.
   - `/api/revalidate` maps Sanity's `sanity-project-id` header to a tenant. `/api/revalidate-site-config` takes a `tenantId` behind a bearer secret.
   - Sanity clients are cached per project and token.
-  - The host → tenant lookup itself is an uncached Neon query on every proxied request.
+  - The host → tenant lookup (`resolveTenant`, used by the proxy and every host-resolved route) is cached per host under the one tag `tenant-by-host`, for `TENANT_CONFIG_REVALIDATE_SECONDS` (one hour). Every `/api/revalidate-site-config` call purges that tag, whichever tenant it names, so an archive, suspension, deprovision or language change takes effect on the next request; a domain change made without that call shows within the hour.
+  - A cached tenant row is JSON-parsed, so its timestamp fields are ISO strings; `apps/web` reads them for presence only.
 
 ## Configuration
 
@@ -61,7 +63,7 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 ## Constraints and invariants
 
 - **The proxy owns the `[tenant]` segment.** `proxy.ts` is the only writer of `[tenant]`, so a route never validates its own tenant param; doing so would mean reading `Host` and forcing dynamic rendering.
-- **`x-tenant-id` never gates a write.** The proxy deletes and resets `x-tenant-id` on every request it handles; `/api/*` is outside the matcher, so the header is never stripped there. Reads may use it through `getRequestTenantId`. `resolveRequestTenant`, which every write gate uses, never reads it.
+- **`x-tenant-id` never gates a write.** The proxy deletes and resets `x-tenant-id` on every request it handles; `/api/*` and dotted final segments are outside the matcher, so the header is never stripped there. Reads may use it through `getRequestTenantId`. `resolveRequestTenant`, which every write gate uses, never reads it.
 - **Reads are gated by `isTenantServable`.** The tenant must not be ARCHIVED and must have a project, a dataset and a read token. In production it must also have `provisioningStatus` READY; a null status is refused there.
 - **Writes are gated by `isTenantActive`.** The tenant must be ACTIVE with no `deprovisionedAt`. Every tenant-scoped mutation goes through `resolveWritableTenant` or the host write context's `isActive`, never through its own status check. A SUSPENDED site stays readable but accepts no writes, and the contact form, the newsletter signup and the bookmark button render only when `isRequestTenantActive` holds.
 - **Only a super admin suspends.** The operator's `/tenants/{id}` overview offers Suspend on an ACTIVE tenant and Reactivate on a SUSPENDED one, never on an archived tenant. Both go through `setTenantSuspension`, which never touches an ARCHIVED or deprovisioned row, then purge the tenant's cached site through the web revalidation call Look and Voice saves use, so the change shows on the next page load.

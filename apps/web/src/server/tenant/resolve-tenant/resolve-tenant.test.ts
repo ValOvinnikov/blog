@@ -20,6 +20,10 @@ import {
 faker.seed(7301);
 
 vi.mock('@web/utils/is-production-environment');
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
   queries: {
