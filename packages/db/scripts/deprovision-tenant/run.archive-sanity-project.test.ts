@@ -1,46 +1,24 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
 import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { runSteps } from './run';
+import { archiveTenantRow } from './steps/archive-tenant';
+import { clearTenantArtifacts } from './steps/clear-artifacts';
+import { invalidateTenantCache } from './steps/invalidate-tenant-cache';
+import { purgeTenantReaderData } from './steps/purge-reader-data';
+import { removeTenantDomain } from './steps/remove-domain';
+import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
 
-const { removeTenantDomainMock } = vi.hoisted(() => ({
-  removeTenantDomainMock: vi.fn(),
-}));
-const { revokeTenantSanityTokensMock } = vi.hoisted(() => ({
-  revokeTenantSanityTokensMock: vi.fn(),
-}));
-const { clearTenantArtifactsMock } = vi.hoisted(() => ({
-  clearTenantArtifactsMock: vi.fn(),
-}));
-const { archiveTenantRowMock } = vi.hoisted(() => ({
-  archiveTenantRowMock: vi.fn(),
-}));
-const { purgeTenantReaderDataMock } = vi.hoisted(() => ({
-  purgeTenantReaderDataMock: vi.fn(),
-}));
-const { invalidateTenantCacheMock } = vi.hoisted(() => ({
-  invalidateTenantCacheMock: vi.fn(),
-}));
+vi.mock('./steps/remove-domain');
+vi.mock('./steps/revoke-sanity-tokens');
+vi.mock('./steps/clear-artifacts');
+vi.mock('./steps/archive-tenant');
+vi.mock('./steps/purge-reader-data');
+vi.mock('./steps/invalidate-tenant-cache');
 
-vi.mock('./steps/remove-domain', () => ({
-  removeTenantDomain: removeTenantDomainMock,
-}));
-vi.mock('./steps/revoke-sanity-tokens', () => ({
-  revokeTenantSanityTokens: revokeTenantSanityTokensMock,
-}));
-vi.mock('./steps/clear-artifacts', () => ({
-  clearTenantArtifacts: clearTenantArtifactsMock,
-}));
-vi.mock('./steps/archive-tenant', () => ({
-  archiveTenantRow: archiveTenantRowMock,
-}));
-vi.mock('./steps/purge-reader-data', () => ({
-  purgeTenantReaderData: purgeTenantReaderDataMock,
-}));
-vi.mock('./steps/invalidate-tenant-cache', () => ({
-  invalidateTenantCache: invalidateTenantCacheMock,
-}));
+faker.seed(5765);
 
 const fetchMock = vi.fn();
 
@@ -61,19 +39,12 @@ function sanityProjectResponse(isDisabledByUser: boolean): Response {
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
   fetchMock
-    .mockReset()
     .mockResolvedValueOnce(sanityProjectResponse(false))
     .mockResolvedValueOnce(
       new Response(JSON.stringify({ isDisabledByUser: true }), {
         status: HTTP_STATUS.OK,
       }),
     );
-  removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
-  revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
-  clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
-  archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
-  purgeTenantReaderDataMock.mockReset().mockResolvedValue(undefined);
-  invalidateTenantCacheMock.mockReset().mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -81,7 +52,7 @@ afterEach(() => {
 });
 
 describe(runSteps, () => {
-  it('archives the Sanity project via isDisabledByUser and reaches archive-tenant', async () => {
+  it('archives the Sanity project and reaches the later steps', async () => {
     const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
@@ -95,19 +66,21 @@ describe(runSteps, () => {
     );
     expect(patchInit.method).toBe(HTTP_METHOD.PATCH);
     expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: true }));
-    expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
-    expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
-    expect(purgeTenantReaderDataMock).toHaveBeenCalledTimes(1);
-    expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
+    expect(removeTenantDomain).toHaveBeenCalledTimes(1);
+    expect(revokeTenantSanityTokens).toHaveBeenCalledTimes(1);
+    expect(clearTenantArtifacts).toHaveBeenCalledTimes(1);
+    expect(archiveTenantRow).toHaveBeenCalledTimes(1);
+    expect(purgeTenantReaderData).toHaveBeenCalledTimes(1);
+    expect(invalidateTenantCache).toHaveBeenCalledTimes(1);
   });
 
-  it('does not call PATCH again when the project is already archived', async () => {
+  it('does not PATCH again when the project is already archived', async () => {
     fetchMock.mockReset().mockResolvedValueOnce(sanityProjectResponse(true));
 
     const result = await runSteps(MOCK_TENANT, MOCK_DEPROVISION_ENV);
 
     expect(result).toEqual({ ok: true });
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+    expect(archiveTenantRow).toHaveBeenCalledTimes(1);
   });
 });

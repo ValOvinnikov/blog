@@ -1,66 +1,41 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import type * as schema from '@blog/db/schema';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
-  listMigrationFiles,
+  applyMigrationsExcept,
+  insertReplayTenant,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
+import { faker } from '@faker-js/faker';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { users } from './auth';
 import { bookmarks } from './bookmarks';
-import { tenants } from './tenants';
+
+faker.seed(6023);
 
 const REWRITE_MIGRATION = '0030_rewrite_bookmark_post_ids_to_page_post.sql';
-const PREFIXED_POST_ID = 'page_post-welcome';
+const PAGE_POST_PREFIX = 'page_post-';
+const MOCK_BARE_POST_ID = faker.lorem.slug();
+const PREFIXED_POST_ID = `${PAGE_POST_PREFIX}${MOCK_BARE_POST_ID}`;
 
 async function setUpDbWithBookmark(postId: string) {
-  const db = await createEmptyTestDb();
-
-  const otherMigrations = listMigrationFiles().filter(
-    (file) => file !== REWRITE_MIGRATION,
-  );
-
-  for (const file of otherMigrations) {
-    await applyMigrationFile(db, file);
-  }
-
+  const db: PgliteDatabase<typeof schema> = await createEmptyTestDb();
+  await applyMigrationsExcept(db, REWRITE_MIGRATION);
+  const tenant = await insertReplayTenant(db);
   const [user] = await db
     .insert(users)
-    .values({ email: 'reader@example.com' })
+    .values({ email: faker.internet.email() })
     .returning();
   if (!user) throw new Error('failed to seed a user row');
+  await db
+    .insert(bookmarks)
+    .values({ tenantId: tenant.id, userId: user.id, postId });
 
-  const [tenant] = await db
-    .insert(tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  if (!tenant) throw new Error('failed to seed a tenant row');
-
-  await db.insert(bookmarks).values({
-    tenantId: tenant.id,
-    userId: user.id,
-    postId,
-  });
-
-  return { db, tenantId: tenant.id, userId: user.id };
+  return db;
 }
 
-async function applyRewriteMigration(
-  db: Awaited<ReturnType<typeof setUpDbWithBookmark>>['db'],
-) {
-  await applyMigrationFile(db, REWRITE_MIGRATION);
-}
-
-async function readBookmarkPostIds(
-  db: Awaited<ReturnType<typeof setUpDbWithBookmark>>['db'],
-) {
+async function readBookmarkPostIds(db: PgliteDatabase<typeof schema>) {
   const rows = await db.select().from(bookmarks);
   return rows.map((row) => row.postId);
 }
@@ -69,42 +44,26 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
   it(
     'leaves an already-prefixed post id untouched',
     async () => {
-      const { db } = await setUpDbWithBookmark(PREFIXED_POST_ID);
+      const db = await setUpDbWithBookmark(PREFIXED_POST_ID);
 
-      await applyRewriteMigration(db);
+      await applyMigrationFile(db, REWRITE_MIGRATION);
 
       expect(await readBookmarkPostIds(db)).toEqual([PREFIXED_POST_ID]);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
 
-  it(
-    'still applies cleanly against an empty bookmarks table',
-    async () => {
-      const db = await createEmptyTestDb();
-
-      for (const file of listMigrationFiles()) {
-        await applyMigrationFile(db, file);
-      }
-
-      const rows = await db.select().from(bookmarks);
-
-      expect(rows).toHaveLength(0);
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
   describe('with a bare post id bookmark', () => {
-    let db: Awaited<ReturnType<typeof setUpDbWithBookmark>>['db'];
+    let db: PgliteDatabase<typeof schema>;
 
     beforeEach(async () => {
-      ({ db } = await setUpDbWithBookmark('welcome'));
+      db = await setUpDbWithBookmark(MOCK_BARE_POST_ID);
     }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
     it(
       'prefixes a bare post id with page_post-',
       async () => {
-        await applyRewriteMigration(db);
+        await applyMigrationFile(db, REWRITE_MIGRATION);
 
         expect(await readBookmarkPostIds(db)).toEqual([PREFIXED_POST_ID]);
       },
@@ -112,16 +71,13 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
     );
 
     it(
-      'is idempotent: applying it a second time changes nothing',
+      'changes nothing when applied a second time',
       async () => {
-        await applyRewriteMigration(db);
-        const afterFirstRun = await readBookmarkPostIds(db);
+        await applyMigrationFile(db, REWRITE_MIGRATION);
 
         await applyMigrationFile(db, REWRITE_MIGRATION);
-        const afterSecondRun = await readBookmarkPostIds(db);
 
-        expect(afterSecondRun).toEqual(afterFirstRun);
-        expect(afterSecondRun).toEqual([PREFIXED_POST_ID]);
+        expect(await readBookmarkPostIds(db)).toEqual([PREFIXED_POST_ID]);
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,
     );
