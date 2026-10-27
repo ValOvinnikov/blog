@@ -1,9 +1,11 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { createLokiSink, registerLogSink } from '@blog/insight';
+import { faker } from '@faker-js/faker';
 import { waitUntil } from '@vercel/functions';
-import { env } from '@web/utils/env/env';
+import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
 
 import { registerLokiSink } from './register-loki-sink';
+
+faker.seed(6010);
 
 vi.mock('@blog/insight', () => ({
   createLokiSink: vi.fn(),
@@ -11,34 +13,32 @@ vi.mock('@blog/insight', () => ({
 }));
 vi.mock('@web/utils/env/env', () => ({ env: {} }));
 
-const VALID_ENV = {
-  LOKI_PUSH_URL: 'https://logs.example.com/loki/api/v1/push',
-  LOKI_USER: '123456',
-  LOKI_TOKEN: 'glc_token',
+const MOCK_VALID_ENV = {
+  LOKI_PUSH_URL: faker.internet.url({ protocol: 'https' }),
+  LOKI_USER: faker.string.numeric(6),
+  LOKI_TOKEN: faker.string.alphanumeric(24),
 };
-
-const setEnv = (values: Record<string, TMaybeUndefined<string>>): void => {
-  for (const key of Object.keys(env)) {
-    delete (env as Record<string, unknown>)[key];
-  }
-  Object.assign(env, values);
-};
+const MOCK_LOG_LINE = { event: faker.lorem.slug() };
+const MOCK_MALFORMED_URL = faker.lorem.words(2);
+const MOCK_NON_HTTP_URL = `ftp://${faker.internet.domainName()}`;
 
 describe(registerLokiSink, () => {
-  const push = vi.fn().mockResolvedValue(undefined);
+  const push = vi.fn();
 
   beforeEach(() => {
+    push.mockReset();
+    push.mockResolvedValue(undefined);
     vi.mocked(createLokiSink).mockReturnValue(push);
-    setEnv(VALID_ENV);
+    setMockEnv(MOCK_VALID_ENV);
   });
 
   it('registers a sink when all three variables are set', () => {
     expect(registerLokiSink()).toBe(true);
 
     expect(createLokiSink).toHaveBeenCalledWith({
-      url: VALID_ENV.LOKI_PUSH_URL,
-      user: VALID_ENV.LOKI_USER,
-      token: VALID_ENV.LOKI_TOKEN,
+      url: MOCK_VALID_ENV.LOKI_PUSH_URL,
+      user: MOCK_VALID_ENV.LOKI_USER,
+      token: MOCK_VALID_ENV.LOKI_TOKEN,
     });
     expect(registerLogSink).toHaveBeenCalledOnce();
   });
@@ -46,17 +46,17 @@ describe(registerLokiSink, () => {
   it.each(['LOKI_PUSH_URL', 'LOKI_USER', 'LOKI_TOKEN'])(
     'registers nothing when %s is unset',
     (key) => {
-      setEnv({ ...VALID_ENV, [key]: undefined });
+      setMockEnv({ ...MOCK_VALID_ENV, [key]: undefined });
 
       expect(registerLokiSink()).toBe(false);
       expect(registerLogSink).not.toHaveBeenCalled();
     },
   );
 
-  it.each(['[SENSITIVE]', 'not a url', 'ftp://logs.example.com'])(
+  it.each([MOCK_MALFORMED_URL, MOCK_NON_HTTP_URL])(
     'registers nothing when the push URL is %s',
     (url) => {
-      setEnv({ ...VALID_ENV, LOKI_PUSH_URL: url });
+      setMockEnv({ ...MOCK_VALID_ENV, LOKI_PUSH_URL: url });
 
       expect(registerLokiSink()).toBe(false);
       expect(registerLogSink).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe(registerLokiSink, () => {
   );
 
   it('registers nothing when the credentials cannot be encoded', () => {
-    vi.mocked(createLokiSink).mockReturnValue(undefined);
+    vi.mocked(createLokiSink).mockReturnValueOnce(undefined);
 
     expect(registerLokiSink()).toBe(false);
     expect(registerLogSink).not.toHaveBeenCalled();
@@ -73,11 +73,10 @@ describe(registerLokiSink, () => {
   it('hands each pushed line to waitUntil', () => {
     registerLokiSink();
     const sink = vi.mocked(registerLogSink).mock.calls[0]?.[0];
-    const line = { level: 'error', event: 'x.failed' };
 
-    sink?.(line);
+    sink?.(MOCK_LOG_LINE);
 
-    expect(push).toHaveBeenCalledWith(line);
+    expect(push).toHaveBeenCalledWith(MOCK_LOG_LINE);
     expect(waitUntil).toHaveBeenCalledWith(push.mock.results[0]?.value);
   });
 });
