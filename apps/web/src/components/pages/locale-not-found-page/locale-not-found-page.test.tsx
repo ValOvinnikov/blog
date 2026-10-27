@@ -1,7 +1,6 @@
 import { SITE_MESSAGES } from '@blog/config';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
-import { render, screen } from '@web/testing/custom-render';
-import { AppProviders } from '@web/testing/providers';
+import { renderElement, screen } from '@web/testing/custom-render';
 import {
   MOCK_VOICE_LINK_HREF,
   MOCK_VOICE_LINK_TEXT,
@@ -13,7 +12,7 @@ import { LocaleNotFoundPage } from './locale-not-found-page';
 
 describe(`<${LocaleNotFoundPage.name}/>`, () => {
   it('renders the tenant-authored supporting text from the layout providers', () => {
-    render(
+    renderElement(
       <VoiceRichProvider
         values={{
           ...resolveVoiceRichFields({}, SITE_MESSAGES),
@@ -22,12 +21,11 @@ describe(`<${LocaleNotFoundPage.name}/>`, () => {
       >
         <LocaleNotFoundPage />
       </VoiceRichProvider>,
-      { wrapper: AppProviders },
     );
 
     const heading = screen.getByRole('heading', {
       level: 1,
-      name: 'Page not found',
+      name: SITE_MESSAGES.notFound.heading,
     });
     const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
 

@@ -54,6 +54,8 @@ const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
 const MOCK_MISSING_SLUG = faker.lorem.slug();
 const MOCK_FIRST_TAKEAWAY = faker.lorem.sentence();
+const MOCK_GENERATED_AT = faker.date.recent().toISOString();
+const MOCK_MODEL = faker.string.alphanumeric(12);
 const MOCK_TAKEAWAYS = [
   MOCK_FIRST_TAKEAWAY,
   faker.lorem.sentence(),
@@ -179,8 +181,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
         modules: [],
         postTakeaways: {
           takeaways: MOCK_TAKEAWAYS,
-          generatedAt: '2026-01-01T00:00:00.000Z',
-          model: 'claude-haiku-4-5',
+          generatedAt: MOCK_GENERATED_AT,
+          model: MOCK_MODEL,
         },
       }),
     );

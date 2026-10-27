@@ -1,12 +1,17 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import { TAXONOMY_KIND } from '@blog/config/constants';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
+import type { TModuleComponentProps } from '@web/modules/module-renderer';
+import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  MOCK_POST_LIST_ID,
-  MOCK_TAXONOMY_LIST_ID,
+  MOCK_FAQ_STUB_TEST_ID,
+  mockModule,
 } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
+  testChildrenBetweenHeroAndModules,
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testRendersAllowedModulesInOrder,
@@ -14,153 +19,80 @@ import {
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 import { logger } from '@web/utils/logger/logger';
-import type { ReactNode } from 'react';
 
 import { TopicModuleRenderer } from './topic-module-renderer';
 
-const {
-  ctaModuleMock,
-  newsletterModuleMock,
-  postLatestModuleMock,
-  postListModuleMock,
-  taxonomyListModuleMock,
-  heroBlogModuleMock,
-  contentModuleMock,
-  faqModuleMock,
-} = vi.hoisted(() => ({
-  faqModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-faq">{id}</div>
-  )),
-  contentModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-content">{id}</div>
-  )),
-  ctaModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-cta">{id}</div>
-  )),
-  newsletterModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-newsletter">{id}</div>
-  )),
-  postLatestModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-post-latest">{id}</div>
-  )),
-  postListModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-post-list">{id}</div>
-  )),
-  taxonomyListModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-taxonomy-list">{id}</div>
-  )),
-  heroBlogModuleMock: vi.fn(
-    async ({ id }: { id: string }): Promise<ReactNode> => (
-      <h1 data-testid="stub-hero">{id}</h1>
-    ),
-  ),
-}));
+faker.seed(1186);
 
-vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
-vi.mock('@web/modules/newsletter/newsletter-module', () => ({
-  NewsletterModule: newsletterModuleMock,
-}));
-vi.mock('@web/modules/post-latest/post-latest-module', () => ({
-  PostLatestModule: postLatestModuleMock,
-}));
-vi.mock('@web/modules/post-list/post-list-module', () => ({
-  PostListModule: postListModuleMock,
-}));
-vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
-  TaxonomyListModule: taxonomyListModuleMock,
-}));
-vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
-  HeroBlogModule: heroBlogModuleMock,
-}));
-
-vi.mock('@web/modules/content/content-module', () => ({
-  ContentModule: contentModuleMock,
-}));
-
+vi.mock('@web/modules/cta/cta-module');
+vi.mock('@web/modules/newsletter/newsletter-module');
+vi.mock('@web/modules/post-latest/post-latest-module');
+vi.mock('@web/modules/post-list/post-list-module');
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module');
+vi.mock('@web/modules/hero-blog/hero-blog-module');
+vi.mock('@web/modules/content/content-module');
 vi.mock('@web/modules/faq/faq-module', () => ({
-  FaqModule: faqModuleMock,
+  FaqModule: vi.fn(({ id }: TModuleComponentProps) => (
+    <div data-testid={MOCK_FAQ_STUB_TEST_ID}>{id}</div>
+  )),
 }));
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
+const MOCK_PAGE_HEADING = faker.lorem.sentence();
+const MOCK_CONTEXT = {
+  page: faker.number.int({ min: 2, max: 9 }),
+  archive: {
+    id: faker.string.uuid(),
+    kind: TAXONOMY_KIND.TOPICS,
+    slug: faker.lorem.slug(),
+    name: faker.lorem.word(),
+  },
+};
+
 const setup = customRenderAsync(TopicModuleRenderer, {
   hero: undefined,
-  headingBlock: mockHeadingBlock({ heading: 'News' }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
 describe(`<${TopicModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({ setup, headingText: 'News' });
+  testHeadingWithoutHero({ setup, headingText: MOCK_PAGE_HEADING });
   testResolvedHero({ setup });
   testFallsBackToHeadingWithoutHero({
     setup,
-    heroBlogModuleMock,
-    headingText: 'News',
+    heroBlogModuleMock: vi.mocked(HeroBlogModule),
+    headingText: MOCK_PAGE_HEADING,
   });
-
-  it('renders the given children between the hero and the modules', async () => {
-    await setup({
-      hero: { id: 'hero-1', type: 'module_heroBlog' },
-      modules: [{ id: 'cta-1', type: 'module_cta' }],
-      children: <div data-testid="stub-children">chips</div>,
-    });
-
-    const nodes = screen.getAllByTestId(/^stub-/);
-    expect(nodes.map((node) => node.getAttribute('data-testid'))).toEqual([
-      'stub-hero',
-      'stub-children',
-      'stub-cta',
-    ]);
-  });
-
+  testChildrenBetweenHeroAndModules({ setup });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'stats-1', type: 'module_stats' },
+    unknownModule: mockModule('module_stats'),
     description:
-      'renders nothing and warns once for a module absent from the topic page allow-list',
+      'warns once and renders nothing for a module outside the topic page allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: MOCK_POST_LIST_ID, type: 'module_postList' },
-      { id: 'post-latest-1', type: 'module_postLatest' },
-      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
-      { id: 'cta-1', type: 'module_cta' },
-      { id: 'newsletter-1', type: 'module_newsletter' },
-      { id: 'content-1', type: 'module_content' },
-      { id: 'faq-1', type: 'module_faq' },
+      mockModule('module_postList'),
+      mockModule('module_postLatest'),
+      mockModule('module_taxonomyList'),
+      mockModule('module_cta'),
+      mockModule('module_newsletter'),
+      mockModule('module_content'),
+      mockModule('module_faq'),
     ],
   });
 
   it('forwards the given context to the modules', async () => {
-    await setup({
-      modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
-      context: {
-        page: 2,
-        archive: {
-          id: 'topic-1',
-          kind: TAXONOMY_KIND.TOPICS,
-          slug: 'news',
-          name: 'News',
-        },
-      },
-    });
+    const postListModule = mockModule('module_postList');
 
-    expect(postListModuleMock).toHaveBeenCalledWith(
-      {
-        id: MOCK_POST_LIST_ID,
-        context: {
-          page: 2,
-          archive: {
-            id: 'topic-1',
-            kind: TAXONOMY_KIND.TOPICS,
-            slug: 'news',
-            name: 'News',
-          },
-        },
-      },
+    await setup({ modules: [postListModule], context: MOCK_CONTEXT });
+
+    expect(PostListModule).toHaveBeenCalledWith(
+      { id: postListModule.id, context: MOCK_CONTEXT },
       undefined,
     );
   });
