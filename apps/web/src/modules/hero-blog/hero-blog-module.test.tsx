@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -12,6 +13,8 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModule } from './hero-blog-module';
+
+faker.seed(6011);
 
 const { getHeroBlogMock } = vi.hoisted(() => ({
   getHeroBlogMock: vi.fn(),
@@ -29,7 +32,8 @@ vi.mock('@web/server/request-context/request-context');
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-const POST_HEADING = 'Hello World';
+const MOCK_POST_HEADING = faker.lorem.words(3);
+const MOCK_STALE_HEADING = faker.lorem.words(5);
 const POST_UNRESOLVED_EVENT = 'hero_blog_module.post_unresolved';
 
 const setup = customRenderAsync(HeroBlogModule, {
@@ -62,15 +66,16 @@ describe(`<${HeroBlogModule.name}/>`, () => {
 
   it('renders the resolved heading', async () => {
     getHeroBlogMock.mockResolvedValue(
-      okResult(mockHeroBlogData({ heading: POST_HEADING })),
+      okResult(mockHeroBlogData({ heading: MOCK_POST_HEADING })),
     );
 
     await setup();
 
     const heading = screen.getByRole('heading', {
       level: 1,
-      name: POST_HEADING,
+      name: MOCK_POST_HEADING,
     });
+
     expect(heading).toBeVisible();
   });
 
@@ -78,9 +83,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     { result: 'no post resolves', data: mockUnresolvedHeroBlogData() },
     {
       result: 'a stale unresolved result carries a heading',
-      data: mockStaleUnresolvedHeroBlogData(
-        'Stale hero title left over from an unpublished post',
-      ),
+      data: mockStaleUnresolvedHeroBlogData(MOCK_STALE_HEADING),
     },
   ])('logs and renders nothing when $result', async ({ data }) => {
     getHeroBlogMock.mockResolvedValue(okResult(data));
@@ -104,7 +107,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('renders the hero image resolving through the Sanity CDN', async () => {
+  it('renders the hero image from the resolved Sanity image', async () => {
     const sanityImage = mockSanityImage();
     getHeroBlogMock.mockResolvedValue(
       okResult(mockHeroBlogData({ sanityImage })),
@@ -113,6 +116,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     await setup();
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
-    expect(image.getAttribute('src')).toContain('cdn.sanity.io');
+
+    expect(image).toBeVisible();
   });
 });

@@ -1,17 +1,20 @@
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
-import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
+import { MOCK_CTA_PRIMARY_ACTION } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
 
 import { FeatureHighlightRow } from './feature-highlight-row';
 
 vi.mock('@web/i18n/navigation');
 
-const item = mockFeatureHighlightItem();
+faker.seed(6011);
+
+const MOCK_ITEM = mockFeatureHighlightItem();
 
 const setup = customRender(FeatureHighlightRow, {
-  item,
+  item: MOCK_ITEM,
   mediaSide: 'start',
-  dataTestId: 'feature-highlight-row-highlight-1',
+  dataTestId: faker.string.uuid(),
 });
 
 describe(`<${FeatureHighlightRow.name}/>`, () => {
@@ -23,7 +26,7 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
     it('renders the row heading as an h3', () => {
       const heading = screen.getByRole('heading', {
         level: 3,
-        name: item.heading,
+        name: MOCK_ITEM.heading,
       });
       expect(heading).toBeVisible();
     });
@@ -40,10 +43,12 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
   });
 
   it('renders the row action when the item has one', () => {
-    setup({ item: mockFeatureHighlightItem({ action: MOCK_CTA_ACTIONS[0] }) });
+    setup({
+      item: mockFeatureHighlightItem({ action: MOCK_CTA_PRIMARY_ACTION }),
+    });
 
     const action = screen.getByRole('link', {
-      name: MOCK_CTA_ACTIONS[0]!.link.label,
+      name: MOCK_CTA_PRIMARY_ACTION.link.label,
     });
     expect(action).toBeVisible();
   });

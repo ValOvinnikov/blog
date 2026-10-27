@@ -1,4 +1,5 @@
 import { CARD_IMAGE_SHAPE, ICONS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -7,22 +8,24 @@ import { FeatureListCard } from './feature-list-card';
 
 vi.mock('@web/i18n/navigation');
 
+faker.seed(6011);
+
 const ICON_TEST_ID = 'feature-card-icon';
 const ICON_PANEL_TEST_ID = 'feature-card-icon-panel';
-const LINK_ARIA_LABEL = 'Read the full engineering deep-dive';
+const MOCK_LINK_ARIA_LABEL = faker.lorem.sentence();
 
-const item = mockFeatureListItem();
+const MOCK_ITEM = mockFeatureListItem();
 
-const FEATURE_LINK = {
-  label: 'Learn more',
-  href: '/features/fast',
+const MOCK_FEATURE_LINK = {
+  label: faker.lorem.words(2),
+  href: faker.internet.url(),
   target: undefined,
   platform: undefined,
   ariaLabel: undefined,
 };
 
 const setup = customRender(FeatureListCard, {
-  item,
+  item: MOCK_ITEM,
   imageShape: CARD_IMAGE_SHAPE.WIDE,
   align: 'left',
   imageSizes: '100vw',
@@ -38,9 +41,9 @@ describe(`<${FeatureListCard.name}/>`, () => {
     it('renders the heading and excerpt from the item headingBlock', () => {
       const heading = screen.getByRole('heading', {
         level: 3,
-        name: item.headingBlock.heading,
+        name: MOCK_ITEM.headingBlock.heading,
       });
-      const excerpt = screen.getByText(item.headingBlock.supportingText!);
+      const excerpt = screen.getByText(MOCK_ITEM.headingBlock.supportingText!);
       expect(heading).toBeVisible();
       expect(excerpt).toBeVisible();
     });
@@ -110,29 +113,31 @@ describe(`<${FeatureListCard.name}/>`, () => {
   });
 
   it('links the card title, named by the title, when the item has a link', () => {
-    setup({ item: mockFeatureListItem({ link: FEATURE_LINK }) });
+    setup({ item: mockFeatureListItem({ link: MOCK_FEATURE_LINK }) });
 
-    const link = screen.getByRole('link', { name: item.headingBlock.heading });
-    expect(link).toHaveAttribute('href', FEATURE_LINK.href);
+    const link = screen.getByRole('link', {
+      name: MOCK_ITEM.headingBlock.heading,
+    });
+    expect(link).toHaveAttribute('href', MOCK_FEATURE_LINK.href);
   });
 
   it('names the link by its aria label override when one is set', () => {
     setup({
       item: mockFeatureListItem({
         link: {
-          ...FEATURE_LINK,
-          ariaLabel: LINK_ARIA_LABEL,
+          ...MOCK_FEATURE_LINK,
+          ariaLabel: MOCK_LINK_ARIA_LABEL,
         },
       }),
     });
 
     const link = screen.getByRole('link', {
-      name: LINK_ARIA_LABEL,
+      name: MOCK_LINK_ARIA_LABEL,
     });
     const headingLink = screen.queryByRole('link', {
-      name: item.headingBlock.heading,
+      name: MOCK_ITEM.headingBlock.heading,
     });
-    expect(link).toHaveAttribute('href', FEATURE_LINK.href);
+    expect(link).toHaveAttribute('href', MOCK_FEATURE_LINK.href);
     expect(headingLink).not.toBeInTheDocument();
   });
 });
