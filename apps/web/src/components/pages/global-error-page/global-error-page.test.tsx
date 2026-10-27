@@ -1,7 +1,6 @@
-import { SITE_MESSAGES } from '@blog/config';
-import { render } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { customRender, screen } from '@web/testing/custom-render';
+import { routes, SITE_MESSAGES } from '@blog/config';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { customRender, render, screen } from '@web/testing/custom-render';
 import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';
 import {
   MOCK_ERROR_DIGEST,
@@ -32,7 +31,10 @@ const setup = customRender(GlobalErrorPage, { error, reset });
 
 describe(`<${GlobalErrorPage.name}/>`, () => {
   describe('with the default error', () => {
+    let user: UserEvent;
+
     beforeEach(() => {
+      user = userEvent.setup();
       setup();
     });
 
@@ -53,7 +55,6 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     });
 
     it('calls reset when "Try again" is clicked', async () => {
-      const user = userEvent.setup();
       const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
 
       await user.click(tryAgainButton);
@@ -65,7 +66,7 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
       const goHomeLink = screen.getByRole('link', { name: GO_HOME });
 
       expect(goHomeLink).toBeVisible();
-      expect(goHomeLink).toHaveAttribute('href', '/');
+      expect(goHomeLink).toHaveAttribute('href', routes.home());
     });
 
     it('announces the error to assistive technology after mount', () => {
@@ -77,13 +78,16 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     });
 
     it('names both actions in the announcement as the controls render them', () => {
-      const tryAgainLabel =
-        screen.getByRole('button', { name: TRY_AGAIN }).textContent ?? '';
-      const goHomeLabel =
-        screen.getByRole('link', { name: GO_HOME }).textContent ?? '';
+      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
+      const goHomeLink = screen.getByRole('link', { name: GO_HOME });
+      const announcement = ANNOUNCEMENT.toLowerCase();
 
-      expect(ANNOUNCEMENT.toLowerCase()).toContain(tryAgainLabel.toLowerCase());
-      expect(ANNOUNCEMENT.toLowerCase()).toContain(goHomeLabel.toLowerCase());
+      expect(announcement).toContain(
+        (tryAgainButton.textContent ?? '').toLowerCase(),
+      );
+      expect(announcement).toContain(
+        (goHomeLink.textContent ?? '').toLowerCase(),
+      );
     });
 
     it('sets aria-atomic on the live region', () => {
@@ -101,7 +105,7 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     });
   });
 
-  it('does not re-report or re-announce on a re-render with the same error', () => {
+  it('does not re-report on a re-render with the same error', () => {
     const { rerender } = setup();
 
     rerender(<GlobalErrorPage error={error} reset={reset} />);

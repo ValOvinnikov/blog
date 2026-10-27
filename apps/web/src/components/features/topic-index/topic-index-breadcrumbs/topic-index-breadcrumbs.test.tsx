@@ -1,4 +1,6 @@
+import { routes } from '@blog/config';
 import { okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testNotFoundOnFetchFailure,
@@ -26,8 +28,11 @@ vi.mock(
   }),
 );
 
-const indexPage = {
-  headingBlock: mockHeadingBlock({ heading: 'Subjects' }),
+faker.seed(5776);
+
+const MOCK_INDEX_HEADING = faker.lorem.words(2);
+const MOCK_INDEX_PAGE = {
+  headingBlock: mockHeadingBlock({ heading: MOCK_INDEX_HEADING }),
 };
 
 const setup = customRenderAsync(TopicIndexBreadcrumbs, {});
@@ -35,13 +40,13 @@ const setup = customRenderAsync(TopicIndexBreadcrumbs, {});
 describe(`<${TopicIndexBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTopicIndexPageMock.mockReset();
-    getTopicIndexPageMock.mockResolvedValue(okResult(indexPage));
+    getTopicIndexPageMock.mockResolvedValue(okResult(MOCK_INDEX_PAGE));
   });
 
   testStaticBreadcrumbsContract({
     setup,
-    label: 'Subjects',
-    path: '/topics',
+    label: MOCK_INDEX_HEADING,
+    path: routes.topics(),
   });
   testNotFoundWithoutLog({ pageLoaderMock: getTopicIndexPageMock, setup });
   testNotFoundOnFetchFailure({

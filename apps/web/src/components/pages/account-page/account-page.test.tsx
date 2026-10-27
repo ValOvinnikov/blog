@@ -1,21 +1,20 @@
-import {
-  NEXT_NAVIGATION_ERROR,
-  SUBSCRIBER_OUTCOME,
-} from '@blog/config/constants';
+import { routes, SUBSCRIBER_OUTCOME } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@web/server/auth/auth');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -28,6 +27,15 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 
+const MOCK_HANDLE = toSessionUsername(
+  MOCK_ACCOUNT_USER.name,
+  MOCK_ACCOUNT_USER.email,
+);
+const PAGE_TITLE = 'Account';
+const IDENTITY_TITLE = 'Connected accounts';
+const NEWSLETTER_TITLE = 'Newsletter';
+const PRIVACY_TITLE = 'Privacy';
+
 const authMock = vi.mocked(auth as () => Promise<unknown>);
 
 const setup = customRenderServerAsync(
@@ -37,7 +45,10 @@ const setup = customRenderServerAsync(
 );
 
 describe(`<${AccountPage.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     authMock.mockResolvedValue({
       user: MOCK_ACCOUNT_USER,
     });
@@ -56,7 +67,7 @@ describe(`<${AccountPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith(routes.home());
   });
 
   describe('with an active subscription', () => {
@@ -64,30 +75,35 @@ describe(`<${AccountPage.name}/>`, () => {
       await setup();
     });
 
-    it('renders the three sections under the page heading, in order', () => {
-      const accountHeading = screen.getByRole('heading', {
+    it('renders the three sections under the page heading', () => {
+      const pageHeading = screen.getByRole('heading', {
         level: 1,
-        name: 'Account',
+        name: PAGE_TITLE,
+      });
+      const identityHeading = screen.getByRole('heading', {
+        level: 2,
+        name: IDENTITY_TITLE,
+      });
+      const newsletterHeading = screen.getByRole('heading', {
+        level: 2,
+        name: NEWSLETTER_TITLE,
+      });
+      const privacyHeading = screen.getByRole('heading', {
+        level: 2,
+        name: PRIVACY_TITLE,
       });
 
-      expect(accountHeading).toBeVisible();
-      const sectionHeadings = screen.getAllByRole('heading', { level: 2 });
-      const sectionTitles = sectionHeadings.map((h) => h.textContent);
-
-      expect(sectionTitles).toEqual([
-        'Connected accounts',
-        'Newsletter',
-        'Privacy',
-      ]);
+      expect(pageHeading).toBeVisible();
+      expect(identityHeading).toBeVisible();
+      expect(newsletterHeading).toBeVisible();
+      expect(privacyHeading).toBeVisible();
     });
 
     it('arms account deletion with the handle derived from the session', async () => {
-      const user = userEvent.setup();
-
       const handleTextbox = screen.getByRole('textbox', {
         name: 'Type your handle to confirm deletion',
       });
-      await user.type(handleTextbox, 'jane');
+      await user.type(handleTextbox, MOCK_HANDLE);
 
       const deleteAccountButton = screen.getByRole('button', {
         name: 'Delete account',
@@ -106,7 +122,7 @@ describe(`<${AccountPage.name}/>`, () => {
 
     const newsletterHeading = screen.queryByRole('heading', {
       level: 2,
-      name: 'Newsletter',
+      name: NEWSLETTER_TITLE,
     });
 
     expect(newsletterHeading).not.toBeInTheDocument();

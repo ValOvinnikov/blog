@@ -1,5 +1,10 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
+import {
+  FakeIntersectionObserver,
+  stubFakeIntersectionObserver,
+} from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 import {
   MOCK_CONFIGURATION_HEADING,
   MOCK_GETTING_STARTED_HEADING,
@@ -8,30 +13,38 @@ import {
 
 import { PostTableOfContents } from './post-table-of-contents';
 
-const { useActiveHeadingIdMock } = vi.hoisted(() => ({
-  useActiveHeadingIdMock: vi.fn(() => null as string | null),
-}));
-
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/hooks/use-active-heading-id', () => ({
-  useActiveHeadingId: useActiveHeadingIdMock,
-}));
+const NAV_NAME = SITE_MESSAGES.postContentsRail.label;
 
-const NAV_NAME = 'Contents';
+const PostWithTableOfContents = () => (
+  <>
+    <PostTableOfContents headings={MOCK_POST_HEADINGS} />
+    {MOCK_POST_HEADINGS.map(({ key, text }) => (
+      <h2 key={key} id={key}>
+        {text}
+      </h2>
+    ))}
+  </>
+);
 
-const setup = customRender(PostTableOfContents, {
-  headings: MOCK_POST_HEADINGS,
-});
+const setup = customRender(PostWithTableOfContents, {});
 
 describe(`<${PostTableOfContents.name}/>`, () => {
+  beforeEach(() => {
+    stubFakeIntersectionObserver();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   describe('before any heading is active', () => {
     beforeEach(() => {
-      useActiveHeadingIdMock.mockReturnValue(null);
       setup();
     });
 
-    it('renders a "Contents" nav landmark', () => {
+    it('labels the nav landmark with the contents label', () => {
       const nav = screen.getByRole('navigation', { name: NAV_NAME });
 
       expect(nav).toBeVisible();
@@ -65,18 +78,24 @@ describe(`<${PostTableOfContents.name}/>`, () => {
         expect(link).not.toHaveAttribute(ARIA_CURRENT);
       });
     });
-
-    it('passes the heading ids to useActiveHeadingId in document order', () => {
-      expect(useActiveHeadingIdMock).toHaveBeenCalledWith(
-        MOCK_POST_HEADINGS.map((heading) => heading.key),
-      );
-    });
   });
 
-  describe('once useActiveHeadingId reports a heading', () => {
+  describe('once a heading scrolls into view', () => {
     beforeEach(() => {
-      useActiveHeadingIdMock.mockReturnValue(MOCK_CONFIGURATION_HEADING.key);
       setup();
+      const configurationHeading = screen.getByRole('heading', {
+        name: MOCK_CONFIGURATION_HEADING.text,
+      });
+      const headingObserver = FakeIntersectionObserver.instances.find(
+        (observer) => observer.observed.includes(configurationHeading),
+      );
+      headingObserver?.trigger([
+        {
+          target: configurationHeading,
+          isIntersecting: true,
+          boundingClientRect: { top: 0 } as DOMRectReadOnly,
+        },
+      ]);
     });
 
     it('marks that heading as the current location, and no other', () => {

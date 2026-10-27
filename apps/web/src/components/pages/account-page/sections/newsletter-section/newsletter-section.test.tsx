@@ -13,13 +13,15 @@ import {
 
 import { NewsletterSection } from './newsletter-section';
 
-vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@web/server/auth/auth');
 
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/db', () => ({
   queries: { subscribers: { getSubscriptionStatus: vi.fn() } },
 }));
+
+const NEWSLETTER_HEADING = 'Newsletter';
 
 const authMock = vi.mocked(auth as () => Promise<unknown>);
 const getSubscriptionStatusMock = vi.mocked(
@@ -61,8 +63,9 @@ describe(`<${NewsletterSection.name}/>`, () => {
     await setup();
 
     const newsletterHeading = screen.queryByRole('heading', {
-      name: 'Newsletter',
+      name: NEWSLETTER_HEADING,
     });
+
     expect(newsletterHeading).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
@@ -75,8 +78,9 @@ describe(`<${NewsletterSection.name}/>`, () => {
     await setup();
 
     const newsletterHeading = screen.queryByRole('heading', {
-      name: 'Newsletter',
+      name: NEWSLETTER_HEADING,
     });
+
     expect(newsletterHeading).not.toBeInTheDocument();
   });
 

@@ -3,62 +3,72 @@ import { mockBookmarksPageView } from '@web/testing/pages/bookmarks-page/fixture
 
 import { BookmarksPageView } from './bookmarks-page-view';
 
-const setup = customRender(BookmarksPageView, mockBookmarksPageView());
+const MOCK_HINT = 'Two bookmarks saved';
+const MOCK_EMPTY_MESSAGE = 'Nothing saved yet';
+const MOCK_PROPS = mockBookmarksPageView({
+  hint: MOCK_HINT,
+  emptyMessage: MOCK_EMPTY_MESSAGE,
+});
+
+const setup = customRender(BookmarksPageView, MOCK_PROPS);
 
 describe(`<${BookmarksPageView.name}/>`, () => {
-  describe('with default props', () => {
+  describe('with posts', () => {
     beforeEach(() => {
       setup();
     });
 
     it('renders the heading', () => {
-      const myBookmarksHeading = screen.getByRole('heading', {
+      const pageHeading = screen.getByRole('heading', {
         level: 1,
-        name: 'My bookmarks',
+        name: MOCK_PROPS.heading,
       });
 
-      expect(myBookmarksHeading).toBeVisible();
+      expect(pageHeading).toBeVisible();
     });
 
-    it('renders a distinct level-2 panel heading, not a repeat of the page title', () => {
-      const savedPostsHeading = screen.getByRole('heading', {
+    it('renders a distinct level-2 panel heading', () => {
+      const listHeading = screen.getByRole('heading', {
         level: 2,
-        name: 'Saved posts',
+        name: MOCK_PROPS.listHeading,
       });
 
-      expect(savedPostsHeading).toBeVisible();
+      expect(listHeading).toBeVisible();
     });
 
-    it('renders resolved posts as rows with a saved-count hint, no decorative prefix', () => {
+    it('renders the posts as filename links in the given order', () => {
       const links = screen.getAllByRole('link');
-      const savedCountText = screen.getByText('2 saved');
-      const rowPrefix = screen.queryByTestId('bookmarks-list-row-prefix');
 
-      expect(links.map((link) => link.textContent)).toEqual([
-        'static-first-rendering.md',
-        'a-tour-of-the-new-editor.md',
-      ]);
-      expect(links[0]).toHaveAttribute('href', '/blog/static-first-rendering');
-      expect(links[1]).toHaveAttribute(
-        'href',
-        '/blog/a-tour-of-the-new-editor',
+      expect(links.map((link) => link.textContent)).toEqual(
+        MOCK_PROPS.posts.map(({ filename }) => filename),
       );
-      expect(savedCountText).toBeVisible();
-      expect(rowPrefix).not.toBeInTheDocument();
+    });
+
+    it.each(MOCK_PROPS.posts.map(({ filename, href }) => [filename, href]))(
+      'links %s to its post',
+      (filename, href) => {
+        const postLink = screen.getByRole('link', { name: filename });
+
+        expect(postLink).toHaveAttribute('href', href);
+      },
+    );
+
+    it('renders the hint', () => {
+      const hint = screen.getByText(MOCK_HINT);
+
+      expect(hint).toBeVisible();
     });
   });
 
-  it('renders the true empty state when there are no posts', () => {
-    setup({ posts: [], hint: undefined });
+  it('renders the empty message, with no list or hint, when there are no posts', () => {
+    setup({ posts: [] });
 
-    const emptyMessage = screen.getByText(
-      'No bookmarks yet — save a post to find it here.',
-    );
+    const emptyMessage = screen.getByText(MOCK_EMPTY_MESSAGE);
     const list = screen.queryByRole('list');
-    const savedText = screen.queryByText(/saved$/);
+    const hint = screen.queryByText(MOCK_HINT);
 
     expect(emptyMessage).toBeVisible();
     expect(list).not.toBeInTheDocument();
-    expect(savedText).not.toBeInTheDocument();
+    expect(hint).not.toBeInTheDocument();
   });
 });

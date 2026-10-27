@@ -1,12 +1,15 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { errorResult, okResult } from '@blog/utils';
+import { okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
+import {
+  testForwardsArgsToLoader,
+  testNotFoundOnFetchFailure,
+  testNotFoundWithoutLog,
+} from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { MOCK_BLOG_POSTING_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 
 import { BlogPostingSchema } from './blog-posting-schema';
 
@@ -20,10 +23,8 @@ vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const SLUG = 'hello-world';
-
 const setup = customRenderAsync(BlogPostingSchema, {
-  slug: SLUG,
+  slug: MOCK_POST_DETAIL.slug,
 });
 
 describe(`<${BlogPostingSchema.name}/>`, () => {
@@ -31,28 +32,8 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
     getPostPageMock.mockReset();
   });
 
-  describe('when the post cannot be resolved', () => {
-    it('calls notFound() without logging when no page_post matches the slug', async () => {
-      getPostPageMock.mockResolvedValue(okResult());
-
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
-
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
-    });
-
-    it('calls notFound() when the fetch fails', async () => {
-      getPostPageMock.mockResolvedValue(errorResult(new Error('boom')));
-
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
-
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    });
-  });
+  testNotFoundWithoutLog({ pageLoaderMock: getPostPageMock, setup });
+  testNotFoundOnFetchFailure({ pageLoaderMock: getPostPageMock, setup });
 
   describe('when the post exists', () => {
     beforeEach(() => {
@@ -63,8 +44,9 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
       await setup();
 
       const script = screen.getByTestId(JSON_LD_SCRIPT_TEST_ID);
+
       expect(script).toHaveAttribute('type', 'application/ld+json');
-      expect(script.textContent).toContain('"@type":"BlogPosting"');
+      expect(script.textContent).toContain(MOCK_BLOG_POSTING_JSON_LD_FRAGMENT);
     });
 
     it('renders nothing when the request has no base URL', async () => {
@@ -77,11 +59,13 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
 
       expect(container).toBeEmptyDOMElement();
     });
+  });
 
-    it('forwards the slug to getPostPage', async () => {
-      await setup();
-
-      expect(getPostPageMock).toHaveBeenCalledWith(SLUG);
-    });
+  testForwardsArgsToLoader({
+    pageLoaderMock: getPostPageMock,
+    setup,
+    successData: MOCK_POST_DETAIL,
+    description: 'forwards the slug to getPostPage',
+    expectedArgs: [MOCK_POST_DETAIL.slug],
   });
 });

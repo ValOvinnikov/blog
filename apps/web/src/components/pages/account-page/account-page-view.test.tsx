@@ -1,6 +1,9 @@
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
 import { mockAccountPageView } from '@web/testing/pages/account-page/fixtures';
+import { mockIdentitySectionView } from '@web/testing/pages/account-page/identity-section-fixtures';
+import { mockNewsletterSectionView } from '@web/testing/pages/account-page/newsletter-section-fixtures';
+import { mockPrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
 
 import {
   AccountPageView,
@@ -9,7 +12,12 @@ import {
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@web/server/auth/auth');
+
+const MOCK_VIEW = mockAccountPageView();
+const MOCK_IDENTITY_HEADING = mockIdentitySectionView().heading;
+const MOCK_NEWSLETTER_HEADING = mockNewsletterSectionView().heading;
+const MOCK_PRIVACY_HEADING = mockPrivacySection().heading;
 
 const setup = (overrides?: Partial<IAccountPageViewProps>) =>
   renderElement(
@@ -19,43 +27,28 @@ const setup = (overrides?: Partial<IAccountPageViewProps>) =>
   );
 
 describe(`<${AccountPageView.name}/>`, () => {
-  describe('with default props', () => {
-    beforeEach(() => {
-      setup();
+  it('renders the page heading', () => {
+    setup();
+
+    const accountHeading = screen.getByRole('heading', {
+      level: 1,
+      name: MOCK_VIEW.heading,
     });
 
-    it('renders the page heading', () => {
-      const accountHeading = screen.getByRole('heading', {
-        level: 1,
-        name: 'Account',
-      });
+    expect(accountHeading).toBeVisible();
+  });
 
-      expect(accountHeading).toBeVisible();
-    });
+  it('renders all three sections, in identity/newsletter/privacy order', () => {
+    setup();
 
-    it('renders all three sections, in identity/newsletter/privacy order', () => {
-      const identityHeading = screen.getByRole('heading', {
-        level: 2,
-        name: /Connected accounts/,
-      });
-      const newsletterHeading = screen.getByRole('heading', {
-        level: 2,
-        name: /Newsletter/,
-      });
-      const privacyHeading = screen.getByRole('heading', {
-        level: 2,
-        name: /Privacy/,
-      });
+    const sectionHeadings = screen.getAllByRole('heading', { level: 2 });
+    const sectionTitles = sectionHeadings.map((heading) => heading.textContent);
 
-      expect(
-        identityHeading.compareDocumentPosition(newsletterHeading) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
-      expect(
-        newsletterHeading.compareDocumentPosition(privacyHeading) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
-    });
+    expect(sectionTitles).toEqual([
+      MOCK_IDENTITY_HEADING,
+      MOCK_NEWSLETTER_HEADING,
+      MOCK_PRIVACY_HEADING,
+    ]);
   });
 
   it('renders no newsletter section when the slot is absent', () => {
@@ -63,19 +56,19 @@ describe(`<${AccountPageView.name}/>`, () => {
 
     const newsletterHeading = screen.queryByRole('heading', {
       level: 2,
-      name: /Newsletter/,
+      name: MOCK_NEWSLETTER_HEADING,
     });
-    const connectedAccountsHeading = screen.getByRole('heading', {
+    const identityHeading = screen.getByRole('heading', {
       level: 2,
-      name: /Connected accounts/,
+      name: MOCK_IDENTITY_HEADING,
     });
     const privacyHeading = screen.getByRole('heading', {
       level: 2,
-      name: /Privacy/,
+      name: MOCK_PRIVACY_HEADING,
     });
 
     expect(newsletterHeading).not.toBeInTheDocument();
-    expect(connectedAccountsHeading).toBeVisible();
+    expect(identityHeading).toBeVisible();
     expect(privacyHeading).toBeVisible();
   });
 });

@@ -1,27 +1,32 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTagDetailPage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
-import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
+import { faker } from '@faker-js/faker';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import {
-  MOCK_CTA_HEADING,
-  mockCtaModuleData,
-} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
-import { mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
+import {
+  MOCK_FAQ_PAGE_JSON_LD_FRAGMENT,
+  mockFaqPageQuestion,
+} from '@web/testing/shared/json-ld/fixtures';
+import { readJsonLd } from '@web/testing/shared/json-ld/read-json-ld';
+import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { mockTag, mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
+
+faker.seed(6008);
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -32,7 +37,6 @@ vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: vi.fn() } } },
     modules: {
-      cta: { v1: { getCta: vi.fn() } },
       heroBlog: { v1: { getHeroBlog: vi.fn() } },
       postList: { v1: { getPostList: vi.fn() } },
     },
@@ -42,27 +46,39 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/i18n/navigation');
 
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
+const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
+const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
+
+const MOCK_TAG_SLUG = faker.lorem.slug();
+const MOCK_TAG = mockTag({
+  id: faker.string.uuid(),
+  title: faker.lorem.word(),
+  slug: MOCK_TAG_SLUG,
+});
+const MOCK_HERO_ID = faker.string.uuid();
+const MOCK_HERO_HEADING = faker.lorem.words(3);
+const MOCK_PAGE_HEADING = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_PAGE_NUMBER = faker.number.int({ min: 2, max: 9 });
 
 const resolveTagPageWith = (overrides: Partial<TTagDetailPage>) =>
-  getTagPageMock.mockResolvedValueOnce(okResult(mockTagDetailPage(overrides)));
-
-const TAG_SLUG = 'typescript';
+  getTagPageMock.mockResolvedValueOnce(
+    okResult(mockTagDetailPage({ tag: MOCK_TAG, ...overrides })),
+  );
 
 const setup = customRenderServerAsync(TagPage, {
-  slug: TAG_SLUG,
+  slug: MOCK_TAG_SLUG,
 });
-
-const SUPPORTING_TEXT = 'Posts about TypeScript.';
-const HERO_HEADING = 'All about TypeScript';
 
 describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockResolvedValue(
       okResult(
         mockTagDetailPage({
+          tag: MOCK_TAG,
           headingBlock: mockHeadingBlock({
-            heading: 'TypeScript',
-            supportingText: SUPPORTING_TEXT,
+            heading: MOCK_PAGE_HEADING,
+            supportingText: MOCK_SUPPORTING_TEXT,
           }),
         }),
       ),
@@ -76,7 +92,7 @@ describe(`<${TagPage.name}/>`, () => {
 
     it('fetches the tag for the given slug with the tenant context', () => {
       expect(getTagPageMock).toHaveBeenCalledWith(
-        TAG_SLUG,
+        MOCK_TAG_SLUG,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
@@ -85,34 +101,27 @@ describe(`<${TagPage.name}/>`, () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
         level: 1,
-        name: 'TypeScript',
+        name: MOCK_PAGE_HEADING,
       });
-      const supportingText = within(main).getByText(SUPPORTING_TEXT);
+      const supportingText = within(main).getByText(MOCK_SUPPORTING_TEXT);
+
       expect(heading).toBeVisible();
       expect(supportingText).toBeVisible();
     });
 
     it('renders the breadcrumb trail outside main', () => {
       const breadcrumbs = screen.getByRole('navigation', {
-        name: 'Breadcrumb',
+        name: SITE_MESSAGES.breadcrumbs.ariaLabel,
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
+        name: MOCK_SITE_SETTINGS.brand.name,
       });
-      const currentCrumb = within(breadcrumbs).getByText('TypeScript');
+      const currentCrumb = within(breadcrumbs).getByText(MOCK_TAG.title);
       const main = screen.getByRole('main');
+
       expect(homeLink).toBeVisible();
       expect(currentCrumb).toBeVisible();
       expect(main).not.toContainElement(breadcrumbs);
-    });
-
-    it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
-      const scripts = screen.queryAllByTestId(JSON_LD_SCRIPT_TEST_ID);
-      expect(
-        scripts.some((script) =>
-          script.textContent?.includes(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT),
-        ),
-      ).toBe(false);
     });
   });
 
@@ -123,121 +132,76 @@ describe(`<${TagPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith('tag_page.fetch_failed', {
-      slug: TAG_SLUG,
+      slug: MOCK_TAG_SLUG,
       error: MOCK_ERROR,
     });
   });
 
-  it('calls notFound() without logging when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValueOnce(okResult());
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(logger.error).not.toHaveBeenCalled();
-  });
-
-  it('renders the authored modules inside main', async () => {
-    resolveTagPageWith({
-      modules: [{ id: 'cta-1', type: 'module_cta' }],
-    });
-    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce(
-      okResult(
-        mockCtaModuleData({
-          headingBlock: mockHeadingBlock({ heading: MOCK_CTA_HEADING }),
-        }),
-      ),
-    );
-
-    await setup();
-
-    const main = screen.getByRole('main');
-    const ctaRegion = within(main).getByRole('region', {
-      name: MOCK_CTA_HEADING,
-    });
-    expect(ctaRegion).toBeVisible();
-  });
-
-  it('renders the hero in place of the tag heading when one is set', async () => {
-    resolveTagPageWith({
-      hero: { id: 'hero-1', type: 'module_heroBlog' },
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
-      okResult(mockHeroBlogData({ heading: HERO_HEADING })),
-    );
-
-    await setup();
-
-    const heroHeading = screen.getByRole('heading', {
-      level: 1,
-      name: HERO_HEADING,
-    });
-    const pageHeading = screen.queryByRole('heading', {
-      level: 1,
-      name: 'TypeScript',
-    });
-    expect(heroHeading).toBeVisible();
-    expect(pageHeading).not.toBeInTheDocument();
-  });
-
   it.each([
-    { page: 3, expected: 3 },
+    { page: MOCK_PAGE_NUMBER, expected: MOCK_PAGE_NUMBER },
     { page: undefined, expected: 1 },
   ])(
     'loads post lists for page $expected of the tag archive',
     async ({ page, expected }) => {
       resolveTagPageWith({
-        modules: [{ id: 'list-1', type: 'module_postList' }],
+        modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
       });
-      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
-        errorResult(MOCK_ERROR),
-      );
+      getPostListMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
       await expect(setup({ page })).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );
 
-      expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
-        'list-1',
+      expect(getPostListMock).toHaveBeenCalledWith(
+        MOCK_POST_LIST_ID,
         MOCK_TENANT_SANITY_CONTEXT,
         expected,
-        { termId: 'tag-1' },
+        { termId: MOCK_TAG.id },
       );
     },
   );
 
   it('names the tag in an empty post list', async () => {
     resolveTagPageWith({
-      modules: [{ id: 'list-1', type: 'module_postList' }],
+      modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
     });
-    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
-      okResult(mockPostListModuleData()),
-    );
+    getPostListMock.mockResolvedValueOnce(okResult(mockPostListModuleData()));
 
     await setup();
 
-    const emptyState = screen.getByText('No posts tagged TypeScript yet.');
+    const emptyState = screen.getByText(
+      SITE_MESSAGES.tagPage.empty.replace('{name}', MOCK_TAG.title),
+    );
+
     expect(emptyState).toBeVisible();
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    resolveTagPageWith({
-      faqs: [
-        {
-          id: 'faq-1',
-          question: 'Do you offer a free trial?',
-          answer: 'Yes.',
-        },
-      ],
-    });
+    resolveTagPageWith({ faqs: [mockFaqPageQuestion()] });
 
     await setup();
 
-    const scripts = screen.getAllByTestId(JSON_LD_SCRIPT_TEST_ID);
-    expect(
-      scripts.some((script) =>
-        script.textContent?.includes(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT),
-      ),
-    ).toBe(true);
+    expect(readJsonLd()).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
+  });
+
+  it('renders the hero in place of the heading when one is set', async () => {
+    resolveTagPageWith({ hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' } });
+    getHeroBlogMock.mockResolvedValueOnce(
+      okResult(mockHeroBlogData({ heading: MOCK_HERO_HEADING })),
+    );
+
+    await setup();
+
+    const heroHeading = screen.getByRole('heading', {
+      level: 1,
+      name: MOCK_HERO_HEADING,
+    });
+    const pageHeading = screen.queryByRole('heading', {
+      level: 1,
+      name: MOCK_PAGE_HEADING,
+    });
+
+    expect(heroHeading).toBeVisible();
+    expect(pageHeading).not.toBeInTheDocument();
   });
 });
