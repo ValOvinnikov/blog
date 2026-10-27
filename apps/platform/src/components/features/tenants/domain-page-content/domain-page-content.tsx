@@ -2,6 +2,8 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { env } from '@platform/utils/env/env';
+import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
@@ -30,6 +32,10 @@ export const DomainPageContent = async ({
       <Suspense fallback={<DomainVerificationCardSkeleton />}>
         <DomainVerificationCard
           domain={primaryDomain}
+          isPlatformAddress={isPlatformAddress(
+            primaryDomain,
+            env.TENANT_ROOT_DOMAIN,
+          )}
           projectDomain={projectDomain}
         />
       </Suspense>

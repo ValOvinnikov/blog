@@ -3,6 +3,9 @@ import type { TProjectDomain } from '@platform/server/provisioning/vercel-domain
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
   MOCK_CUSTOM_DOMAIN,
+  MOCK_CUSTOM_DOMAIN_URL,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_URL,
   MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
 import { Suspense } from 'react';
@@ -15,6 +18,11 @@ import {
 const AWAITING_DNS = 'Awaiting DNS';
 const CHECKED_JUST_NOW = 'Checked just now';
 const CNAME_RECORD_VALUE = 'cname.vercel-dns.com';
+const CARD_TITLE = 'Your domain';
+const VERIFIED_PROJECT_DOMAIN: TProjectDomain = {
+  status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+  dnsRecords: [],
+};
 
 const SuspendedDomainVerificationCard = (
   props: TDomainVerificationCardProps,
@@ -26,6 +34,7 @@ const SuspendedDomainVerificationCard = (
 
 const renderCard = customRenderAsync(SuspendedDomainVerificationCard, {
   domain: MOCK_CUSTOM_DOMAIN,
+  isPlatformAddress: false,
   projectDomain: Promise.resolve({
     status: DOMAIN_VERIFICATION_STATUS.PENDING,
     dnsRecords: [],
@@ -36,7 +45,7 @@ const setup = (projectDomain: TProjectDomain) =>
   renderCard({ projectDomain: Promise.resolve(projectDomain) });
 
 describe(`<${DomainVerificationCard.name}/>`, () => {
-  it('shows the status badge in the card header beside the domain', async () => {
+  it('shows the status badge in the card header beside the title', async () => {
     await setup({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [],
@@ -44,7 +53,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
 
     const heading = await screen.findByRole('heading', {
       level: 2,
-      name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
+      name: CARD_TITLE,
     });
     const statusBadge = screen.getByText(AWAITING_DNS);
     const checkedAt = screen.getByText(CHECKED_JUST_NOW);
@@ -73,34 +82,69 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     expect(cnameRecord).toBeVisible();
   });
 
-  describe('once verified', () => {
+  describe('once a platform address is verified', () => {
     beforeEach(async () => {
-      await setup({
-        status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
-        dnsRecords: [],
+      await renderCard({
+        domain: MOCK_TENANT_DOMAIN,
+        isPlatformAddress: true,
+        projectDomain: Promise.resolve(VERIFIED_PROJECT_DOMAIN),
       });
     });
 
-    it('shows the verified empty state with no records table', async () => {
-      const verifiedBadge = await screen.findByText('Verified');
-      const emptyState = screen.getByText(
-        "This domain is verified — there's nothing left to configure.",
-      );
-      const table = screen.queryByRole('table');
-
-      expect(verifiedBadge).toBeVisible();
-      expect(emptyState).toBeVisible();
-      expect(table).not.toBeInTheDocument();
-    });
-
-    it('titles a verified domain as connected', async () => {
+    it('titles the card Your domain', async () => {
       const heading = await screen.findByRole('heading', {
         level: 2,
-        name: `${MOCK_CUSTOM_DOMAIN} is connected`,
+        name: CARD_TITLE,
       });
 
       expect(heading).toBeVisible();
     });
+
+    it('describes the connected domain with no records table', async () => {
+      const address = await screen.findByText(MOCK_TENANT_DOMAIN);
+      const verifiedBadge = screen.getByText('Verified');
+      const lastChecked = screen.getByText('Just now');
+      const domainType = screen.getByText('Platform address');
+      const https = screen.getByText('Active');
+      const table = screen.queryByRole('table');
+
+      expect(address).toBeVisible();
+      expect(verifiedBadge).toBeVisible();
+      expect(lastChecked).toBeVisible();
+      expect(domainType).toBeVisible();
+      expect(https).toBeVisible();
+      expect(table).not.toBeInTheDocument();
+    });
+
+    it('links to the site in a new tab', async () => {
+      const visitSite = await screen.findByRole('link', { name: /Visit site/ });
+
+      expect(visitSite).toHaveAttribute('href', MOCK_TENANT_URL);
+      expect(visitSite).toHaveAttribute('target', '_blank');
+    });
+  });
+
+  it('names a verified custom domain as such', async () => {
+    await setup(VERIFIED_PROJECT_DOMAIN);
+
+    const domainType = await screen.findByText('Custom domain');
+    const visitSite = screen.getByRole('link', { name: /Visit site/ });
+
+    expect(domainType).toBeVisible();
+    expect(visitSite).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
+  });
+
+  it('names the domain while it awaits verification, with no site link', async () => {
+    await setup({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
+    });
+
+    const address = await screen.findByText(MOCK_CUSTOM_DOMAIN);
+    const visitSite = screen.queryByRole('link', { name: /Visit site/ });
+
+    expect(address).toBeVisible();
+    expect(visitSite).not.toBeInTheDocument();
   });
 
   it('asks for the records only alongside the table', async () => {

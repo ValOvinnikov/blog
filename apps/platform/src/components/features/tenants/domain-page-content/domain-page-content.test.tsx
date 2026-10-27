@@ -6,8 +6,11 @@ import {
   mockTenant,
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_ROOT_DOMAIN,
   MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
+import { env } from '@platform/utils/env/env';
 
 import { DomainPageContent } from './domain-page-content';
 
@@ -15,7 +18,10 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
   getProjectDomain: vi.fn(),
 }));
 
+vi.mock('@platform/utils/env/env');
+
 const getProjectDomainMock = vi.mocked(getProjectDomain);
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 const setup = customRenderAsync(DomainPageContent, {
   tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
@@ -24,6 +30,7 @@ const setup = customRenderAsync(DomainPageContent, {
 describe(`<${DomainPageContent.name}/>`, () => {
   beforeEach(() => {
     getProjectDomainMock.mockReset();
+    delete envMock.TENANT_ROOT_DOMAIN;
     getProjectDomainMock.mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
@@ -56,7 +63,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     it('replaces the skeleton with the domain card once Vercel answers', async () => {
       const cardHeading = await screen.findByRole('heading', {
         level: 2,
-        name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
+        name: 'Your domain',
       });
       const statusBadge = screen.getByText('Awaiting DNS');
       const skeleton = screen.queryByTestId('skeleton');
@@ -79,6 +86,20 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
       expect(archivedNotice).not.toBeInTheDocument();
     });
+  });
+
+  it('names a verified subdomain of the root domain as a platform address', async () => {
+    envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+    getProjectDomainMock.mockResolvedValue({
+      status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+      dnsRecords: [],
+    });
+
+    await setup({ tenant: mockTenant({ primaryDomain: MOCK_TENANT_DOMAIN }) });
+
+    const domainType = await screen.findByText('Platform address');
+
+    expect(domainType).toBeVisible();
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {

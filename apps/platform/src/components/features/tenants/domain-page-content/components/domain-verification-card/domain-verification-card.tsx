@@ -1,5 +1,7 @@
+import { ConnectedDomainDetails } from '@platform/components/features/tenants/domain-page-content/components/connected-domain-details/connected-domain-details';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
+import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import {
@@ -11,6 +13,8 @@ import { domainVerificationTone } from '@platform/utils/status-tone/status-tone'
 import { useTranslations } from 'next-intl';
 import { use } from 'react';
 
+import { domainVerificationCardVariants } from './domain-verification-card-variants';
+
 const UNCHECKED_STATUSES: ReadonlySet<TDomainVerificationStatus> = new Set([
   DOMAIN_VERIFICATION_STATUS.ERROR,
   DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
@@ -18,45 +22,62 @@ const UNCHECKED_STATUSES: ReadonlySet<TDomainVerificationStatus> = new Set([
 
 export type TDomainVerificationCardProps = {
   domain: string;
+  isPlatformAddress: boolean;
   projectDomain: Promise<TProjectDomain>;
 };
 
 export const DomainVerificationCard = ({
   domain,
+  isPlatformAddress,
   projectDomain,
 }: TDomainVerificationCardProps) => {
   const t = useTranslations('tenantDomainPage');
   const { status, dnsRecords } = use(projectDomain);
   const isVerified = status === DOMAIN_VERIFICATION_STATUS.VERIFIED;
   const wasChecked = !UNCHECKED_STATUSES.has(status);
+  const { pendingAddress } = domainVerificationCardVariants();
 
   return (
     <Card>
       <Card.Header
-        title={t(isVerified ? 'verifiedCardTitle' : 'cardTitle', { domain })}
+        title={t('cardTitle')}
         actions={
-          <>
-            <StatusBadge tone={domainVerificationTone(status)}>
-              {t(`dnsStatus.${status}`)}
-            </StatusBadge>
-            {wasChecked && (
-              <Text variant="meta" as="span">
-                {t('checkedHint')}
-              </Text>
-            )}
-          </>
+          !isVerified && (
+            <>
+              <StatusBadge tone={domainVerificationTone(status)}>
+                {t(`dnsStatus.${status}`)}
+              </StatusBadge>
+              {wasChecked && (
+                <Text variant="meta" as="span">
+                  {t('checkedHint')}
+                </Text>
+              )}
+            </>
+          )
         }
       />
       <Card.Body>
         {isVerified ? (
-          <Text variant="supporting">{t('verifiedEmptyState')}</Text>
-        ) : dnsRecords.length > 0 ? (
-          <>
-            <Text variant="muted">{t('bodyCopy')}</Text>
-            <DnsRecordsTable records={dnsRecords} />
-          </>
+          <ConnectedDomainDetails
+            domain={domain}
+            isPlatformAddress={isPlatformAddress}
+          />
         ) : (
-          <Text variant="supporting">{t('unavailableState')}</Text>
+          <>
+            <DetailList className={pendingAddress()}>
+              <DetailList.Row label={t('addressLabel')} isMono={true}>
+                {domain}
+              </DetailList.Row>
+            </DetailList>
+            {dnsRecords.length > 0 ? (
+              <>
+                <Text variant="muted">{t('bodyCopy')}</Text>
+                <DnsRecordsTable records={dnsRecords} />
+              </>
+            ) : (
+              <Text variant="supporting">{t('unavailableState')}</Text>
+            )}
+          </>
         )}
       </Card.Body>
     </Card>
