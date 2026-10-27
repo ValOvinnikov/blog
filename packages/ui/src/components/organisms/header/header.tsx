@@ -9,7 +9,7 @@ import { Fragment, type ElementType } from 'react';
 import { HeaderActions } from './components/actions/header-actions';
 import { HeaderBrand } from './components/brand/header-brand';
 import { HeaderNav } from './components/nav/header-nav';
-import { headerVariants } from './header-variants';
+import { headerVariants, type THeaderVariants } from './header-variants';
 
 const HeaderParts = {
   Brand: HeaderBrand,
@@ -19,13 +19,21 @@ const HeaderParts = {
 
 export type THeaderProps = IWithClassName &
   IWithDataTestId & {
+    layout?: THeaderVariants['layout'];
+    barStyle?: THeaderVariants['barStyle'];
     children?: TCompoundChildren<typeof HeaderParts>;
   };
 
-/** The site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`. */
-const HeaderRoot = ({ children, className, dataTestId }: THeaderProps) => {
+/** The site header shell; arranges a `Header.Brand` slot and the navigation for wide screens by `layout`, and sits full width or floating by `barStyle`. */
+const HeaderRoot = ({
+  layout,
+  barStyle,
+  children,
+  className,
+  dataTestId,
+}: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
-  const { root, inner, navActionsGroup } = headerVariants();
+  const { root, inner, navActionsGroup } = headerVariants({ layout, barStyle });
   return (
     <header className={root({ class: className })} data-testid={dataTestId}>
       <div className={inner()}>
