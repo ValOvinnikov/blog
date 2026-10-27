@@ -79,6 +79,11 @@ ruleTester.run('prefer-shared-constant', rule, {
     { code: "const classes = cn('INTERNAL');", filename: WEB_SOURCE },
     { code: "const el = <p>{'INTERNAL'}</p>;", filename: WEB_SOURCE },
     {
+      code: "expect(img).toHaveAttribute('INTERNAL', 'lazy');",
+      filename: WEB_TEST,
+    },
+    { code: "img.getAttribute('INTERNAL');", filename: WEB_TEST },
+    {
       code: "const status = 'INTERNAL';",
       filename: '/repo/packages/utils/src/a.ts',
     },
@@ -119,6 +124,11 @@ ruleTester.run('prefer-shared-constant', rule, {
     {
       code: "const type = 'INTERNAL';",
       filename: WEB_SOURCE,
+      errors: [INTERNAL],
+    },
+    {
+      code: "expect(img).toHaveAttribute('data-type', 'INTERNAL');",
+      filename: WEB_TEST,
       errors: [INTERNAL],
     },
     {

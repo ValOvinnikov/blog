@@ -65,9 +65,8 @@ D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
 D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.function.\)|\.name\)\.toBe\()'
 
 # Tests that bypass Testing Library (testing-practices "Writing a component
-# test" → "Never drop to a raw DOM query"). Lint fails all of these except a
-# chained walk (`container.children[0]`), so a bare hit means a suppression
-# was added.
+# test" → "Never drop to a raw DOM query"). Lint fails all of these, so a
+# hit means a suppression was added.
 D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
 D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
 

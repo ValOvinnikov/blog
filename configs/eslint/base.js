@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import vitest from '@vitest/eslint-plugin';
 import checkFile from 'eslint-plugin-check-file';
 import importX from 'eslint-plugin-import-x';
 import prettier from 'eslint-config-prettier/flat';
@@ -8,6 +9,7 @@ import tseslint from 'typescript-eslint';
 
 import { noClassAssertionsRule } from './no-class-assertions.js';
 import { noDuplicateStringRule } from './no-duplicate-string.js';
+import { noNodeAccessRule } from './no-node-access.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import { preferSharedConstantRule } from './prefer-shared-constant.js';
 
@@ -29,6 +31,26 @@ const touchedFileRules = {
   rules: {
     'blog-touched/prefer-shared-constant': 'error',
     'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
+  },
+};
+
+const ARGUING_TITLE = [
+  String.raw`\b(?:[Ii][Nn][Ss][Tt][Ee][Aa][Dd] [Oo][Ff]|[Rr][Aa][Tt][Hh][Ee][Rr] [Tt][Hh][Aa][Nn])\b`,
+  'State the behaviour, not the alternative it beats — drop "instead of" / "rather than" (testing-practices → "What not to test").',
+];
+
+const touchedTestFileRules = {
+  files: ['**/*.test.{ts,tsx}'],
+  plugins: { vitest },
+  rules: {
+    'vitest/valid-title': [
+      'error',
+      {
+        allowArguments: true,
+        ignoreTypeOfDescribeName: true,
+        mustNotMatch: { it: ARGUING_TITLE, test: ARGUING_TITLE },
+      },
+    ],
   },
 };
 
@@ -112,7 +134,10 @@ export default [
     files: ['**/*.test.{ts,tsx}', 'src/testing/**/*.{ts,tsx}'],
     plugins: {
       'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },
-      'testing-library': testingLibrary,
+      'testing-library': {
+        ...testingLibrary,
+        rules: { ...testingLibrary.rules, 'no-node-access': noNodeAccessRule },
+      },
     },
     settings: {
       'testing-library/utils-module': 'testing/custom-render',
@@ -147,6 +172,6 @@ export default [
       ],
     },
   },
-  ...(lintsTouchedFiles ? [touchedFileRules] : []),
+  ...(lintsTouchedFiles ? [touchedFileRules, touchedTestFileRules] : []),
   prettier,
 ];
