@@ -1,46 +1,53 @@
-import { MAX_UPLOAD_BYTES, quickClientImageCheck } from './brand-asset-limits';
+import { faker } from '@faker-js/faker';
 
-const makeFile = (type: string, sizeBytes: number): File => {
-  return new File([new Uint8Array(sizeBytes)], 'upload', { type });
-};
+import {
+  ACCEPTED_IMAGE_MIME_TYPES,
+  brandAssetKindSchema,
+  MAX_UPLOAD_BYTES,
+  quickClientImageCheck,
+} from './brand-asset-limits';
+
+faker.seed(6006);
+
+const { logo, favicon } = brandAssetKindSchema.enum;
+
+const MOCK_FILE_NAME = faker.system.fileName();
+const MOCK_SMALL_BYTES = 1024;
+const MOCK_UNSUPPORTED_MIME_TYPE = 'image/gif';
+
+const mockFile = (type: string, sizeBytes: number): File =>
+  new File([new Uint8Array(sizeBytes)], MOCK_FILE_NAME, { type });
 
 describe(quickClientImageCheck, () => {
-  it('accepts a PNG within the logo size limit', () => {
-    const file = makeFile('image/png', 1024);
+  it.each(ACCEPTED_IMAGE_MIME_TYPES)(
+    'accepts a %s file within the logo size limit',
+    (mimeType) => {
+      const file = mockFile(mimeType, MOCK_SMALL_BYTES);
 
-    expect(quickClientImageCheck(file, 'logo')).toBeUndefined();
-  });
-
-  it('accepts an SVG within the logo size limit', () => {
-    const file = makeFile('image/svg+xml', 1024);
-
-    expect(quickClientImageCheck(file, 'logo')).toBeUndefined();
-  });
+      expect(quickClientImageCheck(file, logo)).toBeUndefined();
+    },
+  );
 
   it('rejects an unsupported MIME type', () => {
-    const file = makeFile('image/gif', 1024);
+    const file = mockFile(MOCK_UNSUPPORTED_MIME_TYPE, MOCK_SMALL_BYTES);
 
-    expect(quickClientImageCheck(file, 'logo')).toEqual({
+    expect(quickClientImageCheck(file, logo)).toEqual({
       key: 'unsupportedType',
     });
   });
 
-  it('rejects a logo file over the logo size limit', () => {
-    const file = makeFile('image/png', MAX_UPLOAD_BYTES.logo + 1);
+  it.each([
+    [logo, '4.0 MB'],
+    [favicon, '1.0 MB'],
+  ] as const)('rejects a %s file over its own size limit', (kind, limit) => {
+    const file = mockFile(
+      ACCEPTED_IMAGE_MIME_TYPES[0],
+      MAX_UPLOAD_BYTES[kind] + 1,
+    );
 
-    expect(quickClientImageCheck(file, 'logo')).toEqual({
+    expect(quickClientImageCheck(file, kind)).toEqual({
       key: 'tooLarge',
-      limit: '4.0 MB',
+      limit,
     });
-  });
-
-  it("enforces the favicon's tighter size limit independently of the logo's", () => {
-    const file = makeFile('image/png', MAX_UPLOAD_BYTES.favicon + 1);
-
-    expect(quickClientImageCheck(file, 'favicon')).toEqual({
-      key: 'tooLarge',
-      limit: '1.0 MB',
-    });
-    expect(MAX_UPLOAD_BYTES.favicon).toBeLessThan(MAX_UPLOAD_BYTES.logo);
   });
 });

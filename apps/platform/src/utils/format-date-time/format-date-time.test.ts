@@ -2,6 +2,9 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 
 import { formatDateTime } from './format-date-time';
 
+const MOCK_ISO_TIMESTAMP = '2026-08-12T14:18:00.000Z';
+const MOCK_UNPARSEABLE_TIMESTAMP = 'not-a-date';
+
 describe(formatDateTime, () => {
   it.each([
     [LOCALE_ISO_CODES.EN, 'Aug 12, 2026, 2:18 PM UTC'],
@@ -12,11 +15,13 @@ describe(formatDateTime, () => {
   ])(
     'formats an ISO timestamp as a date and time in %s',
     (locale, expected) => {
-      expect(formatDateTime('2026-08-12T14:18:00.000Z', locale)).toBe(expected);
+      expect(formatDateTime(MOCK_ISO_TIMESTAMP, locale)).toBe(expected);
     },
   );
 
-  it('returns undefined for an unparseable value instead of rendering "Invalid Date"', () => {
-    expect(formatDateTime('not-a-date', LOCALE_ISO_CODES.EN)).toBeUndefined();
+  it('returns undefined for an unparseable value', () => {
+    expect(
+      formatDateTime(MOCK_UNPARSEABLE_TIMESTAMP, LOCALE_ISO_CODES.EN),
+    ).toBeUndefined();
   });
 });

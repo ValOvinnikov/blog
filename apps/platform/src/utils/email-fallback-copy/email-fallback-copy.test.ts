@@ -1,5 +1,6 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
+import { faker } from '@faker-js/faker';
 import { mockEmailDraft, MOCK_EMAIL_BODY } from '@platform/testing/email-draft';
 import {
   EMAIL_SENDER_ITEM,
@@ -12,12 +13,17 @@ import {
   resolveFallbackCopy,
 } from './email-fallback-copy';
 
+faker.seed(6006);
+
 const { EN, FR } = LOCALE_ISO_CODES;
 const { MAGIC_LINK, TENANT_INVITE } = EMAIL_TEMPLATE_TYPE;
-const SENDER_LOGO_URL = 'https://cdn.example/sender.png';
-const SIGN_IN_LOGO_URL = 'https://cdn.example/sign-in.png';
+const MOCK_SENDER_LOGO_URL = faker.image.url();
+const MOCK_TEMPLATE_LOGO_URL = faker.image.url();
+const MOCK_ENGLISH_SUBJECT = faker.lorem.words(2);
+const MOCK_FRENCH_SUBJECT = faker.lorem.words(3);
+const MOCK_BLANK_SUBJECT = '   ';
 
-describe('resolveFallbackCopy', () => {
+describe(resolveFallbackCopy, () => {
   it('falls back to the product default in the default language', () => {
     const draft = withCopy(
       mockEmailDraft(),
@@ -25,7 +31,9 @@ describe('resolveFallbackCopy', () => {
       { subject: '', body: null },
     );
 
-    expect(resolveFallbackCopy(draft, TENANT_INVITE, EN, EN)).toEqual(
+    const copy = resolveFallbackCopy(draft, TENANT_INVITE, EN, EN);
+
+    expect(copy).toEqual(
       EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.EN.TENANT_INVITE,
     );
   });
@@ -34,69 +42,76 @@ describe('resolveFallbackCopy', () => {
     const draft = withCopy(
       mockEmailDraft(),
       { templateType: MAGIC_LINK, locale: EN },
-      { subject: 'Sign in', body: MOCK_EMAIL_BODY },
+      { subject: MOCK_ENGLISH_SUBJECT, body: MOCK_EMAIL_BODY },
     );
 
-    expect(resolveFallbackCopy(draft, MAGIC_LINK, FR, EN)).toEqual({
-      subject: 'Sign in',
+    const copy = resolveFallbackCopy(draft, MAGIC_LINK, FR, EN);
+
+    expect(copy).toEqual({
+      subject: MOCK_ENGLISH_SUBJECT,
       body: MOCK_EMAIL_BODY,
     });
   });
 
-  it('falls back to the product default in that language when the default language is blank', () => {
-    expect(
-      resolveFallbackCopy(mockEmailDraft(), TENANT_INVITE, FR, EN),
-    ).toEqual(EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.FR.TENANT_INVITE);
+  it('falls back to the localized product default when the default is blank', () => {
+    const copy = resolveFallbackCopy(mockEmailDraft(), TENANT_INVITE, FR, EN);
+
+    expect(copy).toEqual(
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.FR.TENANT_INVITE,
+    );
   });
 });
 
-describe('resolveEmailPreview', () => {
+describe(resolveEmailPreview, () => {
   it("previews the tenant's own subject and body", () => {
     const draft = withCopy(
       mockEmailDraft(),
       { templateType: MAGIC_LINK, locale: FR },
-      { subject: 'Connexion', body: MOCK_EMAIL_BODY },
+      { subject: MOCK_FRENCH_SUBJECT, body: MOCK_EMAIL_BODY },
     );
 
-    expect(resolveEmailPreview(draft, MAGIC_LINK, FR, EN)).toMatchObject({
-      subject: 'Connexion',
-      body: MOCK_EMAIL_BODY,
-    });
+    const { subject, body } = resolveEmailPreview(draft, MAGIC_LINK, FR, EN);
+
+    expect(subject).toBe(MOCK_FRENCH_SUBJECT);
+    expect(body).toEqual(MOCK_EMAIL_BODY);
   });
 
   it('previews the fallback copy for a blank subject and body', () => {
     const draft = withCopy(
       mockEmailDraft(),
       { templateType: TENANT_INVITE, locale: EN },
-      { subject: '   ', body: null },
+      { subject: MOCK_BLANK_SUBJECT, body: null },
     );
+    const { subject, body } =
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.EN.TENANT_INVITE;
 
-    expect(resolveEmailPreview(draft, TENANT_INVITE, EN, EN)).toMatchObject(
-      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.EN.TENANT_INVITE,
-    );
+    const preview = resolveEmailPreview(draft, TENANT_INVITE, EN, EN);
+
+    expect(preview.subject).toBe(subject);
+    expect(preview.body).toEqual(body);
   });
 
   it("uses the template's own logo over the sender logo", () => {
     const draft = withLogo(
       withLogo(mockEmailDraft(), EMAIL_SENDER_ITEM, {
-        url: SENDER_LOGO_URL,
+        url: MOCK_SENDER_LOGO_URL,
       }),
       MAGIC_LINK,
-      { url: SIGN_IN_LOGO_URL },
+      { url: MOCK_TEMPLATE_LOGO_URL },
     );
 
-    expect(resolveEmailPreview(draft, MAGIC_LINK, EN, EN).logo).toEqual({
-      url: SIGN_IN_LOGO_URL,
-    });
+    const { logo } = resolveEmailPreview(draft, MAGIC_LINK, EN, EN);
+
+    expect(logo).toEqual({ url: MOCK_TEMPLATE_LOGO_URL });
   });
 
   it('falls back to the sender logo when the template has none', () => {
     const draft = withLogo(mockEmailDraft(), EMAIL_SENDER_ITEM, {
-      url: SENDER_LOGO_URL,
+      url: MOCK_SENDER_LOGO_URL,
     });
 
-    expect(resolveEmailPreview(draft, TENANT_INVITE, EN, EN).logo).toEqual({
-      url: SENDER_LOGO_URL,
-    });
+    const { logo } = resolveEmailPreview(draft, TENANT_INVITE, EN, EN);
+
+    expect(logo).toEqual({ url: MOCK_SENDER_LOGO_URL });
   });
 });

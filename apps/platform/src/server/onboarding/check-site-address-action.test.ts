@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkTenantSlug } from '@platform/server/tenants/check-tenant-slug';
-import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
+import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import { checkSiteAddressAction } from './check-site-address-action';
