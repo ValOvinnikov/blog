@@ -2,13 +2,14 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook } from '@platform/testing/custom-render';
 
-import { useStagedStepStatuses } from './use-staged-step-statuses';
+import {
+  STEP_REVEAL_DWELL_MS,
+  useStagedStepStatuses,
+} from './use-staged-step-statuses';
 
 const { IDLE, RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
-
-const STEP_REVEAL_DWELL_MS = 800;
 
 const advanceOneReveal = async () => {
   await act(async () => {

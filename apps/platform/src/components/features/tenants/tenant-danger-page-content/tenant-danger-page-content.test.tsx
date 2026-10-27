@@ -11,14 +11,13 @@ import {
   MOCK_RUN_STARTED_AT,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
 
 faker.seed(6120);
 
 const MOCK_STEP_ERROR = faker.lorem.sentence();
-
-const STEP_POLL_INTERVAL_MS = 4000;
 
 const { getTenantDeprovisioningStatusActionMock } = vi.hoisted(() => ({
   getTenantDeprovisioningStatusActionMock: vi.fn(),

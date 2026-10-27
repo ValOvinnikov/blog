@@ -5,6 +5,7 @@ import {
   featureDefaultsToValues,
   keepStoredOutOfPlan,
   type TSettingsFeaturesValues,
+  withComingSoonOff,
 } from './settings-features-fields';
 
 const ALL_OFF: TSettingsFeaturesValues = {
@@ -107,5 +108,24 @@ describe(keepStoredOutOfPlan, () => {
       consentBannerEnabled: true,
       contactFormEnabled: true,
     });
+  });
+});
+
+describe(withComingSoonOff, () => {
+  it('turns every coming-soon capability off, leaving the rest as given', () => {
+    const values = withComingSoonOff(ALL_ON);
+
+    expect(values).toEqual({
+      ...ALL_ON,
+      commentsEnabled: false,
+      ratingsEnabled: false,
+      newsletterEnabled: false,
+    });
+  });
+
+  it('leaves values with no coming-soon capability on unchanged', () => {
+    const values = { ...ALL_OFF, bookmarksEnabled: true };
+
+    expect(withComingSoonOff(values)).toEqual(values);
   });
 });

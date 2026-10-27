@@ -2,7 +2,6 @@ import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
-import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
 import {
   MOCK_BLOCKED_ADDRESS_HASH,
   MOCK_BLOCKED_OWNER_EMAIL,
@@ -16,14 +15,13 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 
 import { admitCreateSite } from './admit-create-site';
+import { MAX_SITES_PER_IP_PER_DAY } from './create-site-gate';
 
 const { isSignupBlockedMock } = vi.hoisted(() => ({
   isSignupBlockedMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/create-site-gate/create-site-gate', () => ({
-  takeCreateSiteSlot: vi.fn(),
-}));
+vi.mock('@platform/utils/env/env');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -34,43 +32,57 @@ vi.mock('@blog/db', async () => ({
 
 faker.seed(5998);
 
-const takeSlotMock = vi.mocked(takeCreateSiteSlot);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const MOCK_CLIENT_KEY = faker.internet.ipv4();
 const MOCK_NOW = faker.date.past({ refDate: new Date('2026-10-21T09:00:00Z') });
-const MOCK_SIGN_UP = {
-  clientKey: MOCK_CLIENT_KEY,
-  email: MOCK_BLOCKED_OWNER_EMAIL,
+
+const admitRepeatedly = async (
+  times: number,
+  signUp: Parameters<typeof admitCreateSite>[0],
+): Promise<boolean[]> => {
+  const results: boolean[] = [];
+  for (let index = 0; index < times; index += 1) {
+    results.push(await admitCreateSite(signUp));
+  }
+  return results;
 };
 
 describe(admitCreateSite, () => {
+  let signUp: Parameters<typeof admitCreateSite>[0];
+
   beforeEach(() => {
     isSignupBlockedMock.mockReset().mockResolvedValue(okResult(false));
-    takeSlotMock.mockReset().mockResolvedValue(true);
+    signUp = {
+      clientKey: faker.internet.ipv4(),
+      email: MOCK_BLOCKED_OWNER_EMAIL,
+      now: MOCK_NOW,
+    };
   });
 
   it('admits an email that is not blocked while a slot is free', async () => {
-    const admitted = await admitCreateSite({ ...MOCK_SIGN_UP, now: MOCK_NOW });
+    const admitted = await admitCreateSite(signUp);
 
     expect(admitted).toBe(true);
     expect(isSignupBlockedMock).toHaveBeenCalledWith(MOCK_BLOCKED_OWNER_EMAIL);
-    expect(takeSlotMock).toHaveBeenCalledWith(MOCK_CLIENT_KEY, MOCK_NOW);
   });
 
   it('refuses a blocked email without taking a slot', async () => {
-    isSignupBlockedMock.mockResolvedValue(okResult(true));
+    isSignupBlockedMock.mockResolvedValueOnce(okResult(true));
 
-    const admitted = await admitCreateSite(MOCK_SIGN_UP);
+    const admitted = await admitCreateSite(signUp);
+    const laterAdmissions = await admitRepeatedly(
+      MAX_SITES_PER_IP_PER_DAY,
+      signUp,
+    );
 
     expect(admitted).toBe(false);
-    expect(takeSlotMock).not.toHaveBeenCalled();
+    expect(laterAdmissions.every(Boolean)).toBe(true);
   });
 
   it('refuses an unblocked email once the daily limits are spent', async () => {
-    takeSlotMock.mockResolvedValue(false);
+    await admitRepeatedly(MAX_SITES_PER_IP_PER_DAY, signUp);
 
-    const admitted = await admitCreateSite(MOCK_SIGN_UP);
+    const admitted = await admitCreateSite(signUp);
 
     expect(admitted).toBe(false);
   });
@@ -100,10 +112,9 @@ describe(admitCreateSite, () => {
     async (_, failLookup, logged) => {
       failLookup();
 
-      const admitted = await admitCreateSite(MOCK_SIGN_UP);
+      const admitted = await admitCreateSite(signUp);
 
       expect(admitted).toBe(false);
-      expect(takeSlotMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
         CREATE_SITE_GATE_LOG.BLOCK_CHECK_FAILED,
         logged,

@@ -16,10 +16,12 @@ import {
   MOCK_RUN_PLUS_4_MIN_AT,
 } from '@platform/testing/tenants/fixtures';
 
-import { useDeprovisioningPoll } from './use-deprovisioning-poll';
+import {
+  MAX_POLL_TICKS,
+  STEP_POLL_INTERVAL_MS,
+  useDeprovisioningPoll,
+} from './use-deprovisioning-poll';
 
-const STEP_POLL_INTERVAL_MS = 4000;
-const MAX_POLL_TICKS = 75;
 const ENABLED = { isEnabled: true };
 const MOCK_STEP_ERROR = 'Sanity Access API returned 403';
 

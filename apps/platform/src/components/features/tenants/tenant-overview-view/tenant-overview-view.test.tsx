@@ -45,12 +45,12 @@ import {
   mockInvitedOwner,
   mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
+import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 
 import { TenantOverviewView } from './tenant-overview-view';
 
 faker.seed(7319);
 
-const STEP_POLL_INTERVAL_MS = 4000;
 const MOCK_ADMIN_ID = faker.string.uuid();
 const MOCK_STEP_ERROR = faker.lorem.sentence();
 

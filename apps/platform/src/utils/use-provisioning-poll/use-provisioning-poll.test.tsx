@@ -26,10 +26,12 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { MOCK_TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast/fixtures';
 
-import { useProvisioningPoll } from './use-provisioning-poll';
+import {
+  MAX_POLL_TICKS,
+  STEP_POLL_INTERVAL_MS,
+  useProvisioningPoll,
+} from './use-provisioning-poll';
 
-const STEP_POLL_INTERVAL_MS = 1500;
-const MAX_POLL_TICKS = 400;
 const MOCK_NETWORK_ERROR = 'fetch failed';
 const MOCK_DOMAINS_API_ERROR = 'Vercel Domains API returned 500';
 const POLL_ERROR_WARNING = messages.provisioningStatusView.pollErrorWarning;

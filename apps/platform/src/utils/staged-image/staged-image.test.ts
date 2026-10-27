@@ -1,8 +1,13 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { UPLOAD_OPERATION, UPLOAD_REFUSAL } from '@platform/constants/upload';
+import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
 
-import { persistStagedImage } from './staged-image';
+import {
+  createStagingHandlers,
+  isSameStagedImage,
+  persistStagedImage,
+} from './staged-image';
 
 faker.seed(6006);
 
@@ -81,5 +86,61 @@ describe(persistStagedImage, () => {
       ok: false,
       error: { failure: serverError, operation: UPLOAD_OPERATION.CLEAR },
     });
+  });
+});
+
+describe(isSameStagedImage, () => {
+  it('matches two images with the same url and file', () => {
+    const image = { url: MOCK_LOCAL_URL, file: MOCK_FILE };
+
+    expect(isSameStagedImage(image, { ...image })).toBe(true);
+  });
+
+  it('tells apart two images with different urls', () => {
+    expect(
+      isSameStagedImage({ url: MOCK_STORED_URL }, { url: MOCK_LOCAL_URL }),
+    ).toBe(false);
+  });
+
+  it('tells apart two images with the same url but a different file', () => {
+    const otherFile = new File([faker.lorem.word()], MOCK_FILE.name);
+
+    expect(
+      isSameStagedImage(
+        { url: MOCK_LOCAL_URL, file: MOCK_FILE },
+        { url: MOCK_LOCAL_URL, file: otherFile },
+      ),
+    ).toBe(false);
+  });
+});
+
+describe(createStagingHandlers, () => {
+  beforeEach(() => {
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('stages a picked file with a local preview url', () => {
+    const onStage = vi.fn();
+    const { onPick } = createStagingHandlers(onStage);
+
+    onPick(MOCK_FILE);
+
+    expect(onStage).toHaveBeenCalledExactlyOnceWith({
+      url: MOCK_STAGED_LOGO_BLOB_URL,
+      file: MOCK_FILE,
+    });
+  });
+
+  it('stages an empty image when cleared', () => {
+    const onStage = vi.fn();
+    const { onClear } = createStagingHandlers(onStage);
+
+    onClear();
+
+    expect(onStage).toHaveBeenCalledExactlyOnceWith({ url: undefined });
   });
 });

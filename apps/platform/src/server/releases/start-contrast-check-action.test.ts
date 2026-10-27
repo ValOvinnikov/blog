@@ -2,12 +2,12 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
   NEXT_NAVIGATION_ERROR,
   type TMaybeNull,
 } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { GITHUB_FAILURE } from '@platform/constants/github';
+import { GITHUB_RUN_STATUS } from '@platform/constants/github';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
@@ -15,39 +15,30 @@ import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
+import {
+  MOCK_GITHUB_CONTRAST_DISPATCH_PATH,
+  MOCK_GITHUB_CONTRAST_RUNS_PATH,
+  MOCK_GITHUB_MAIN_BRANCH_PATH,
+} from '@platform/testing/github/fixtures';
+import {
+  mockGitHubResponse,
+  useGitHubFetch,
+} from '@platform/testing/github/github-fetch';
 import type { Session } from 'next-auth';
 
 import { startContrastCheckAction } from './start-contrast-check-action';
 
 faker.seed(5998);
 
-const {
-  getBranchHeadShaMock,
-  isWorkflowRunActiveMock,
-  dispatchContrastWorkflowMock,
-  insertAuditEventMock,
-} = vi.hoisted(() => ({
-  getBranchHeadShaMock: vi.fn(),
-  isWorkflowRunActiveMock: vi.fn(),
-  dispatchContrastWorkflowMock: vi.fn(),
+const { insertAuditEventMock } = vi.hoisted(() => ({
   insertAuditEventMock: vi.fn(),
 }));
+
+vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
-
-vi.mock('@platform/server/github/get-branch-head-sha', () => ({
-  getBranchHeadSha: getBranchHeadShaMock,
-}));
-
-vi.mock('@platform/server/github/is-workflow-run-active', () => ({
-  isWorkflowRunActive: isWorkflowRunActiveMock,
-}));
-
-vi.mock('./dispatch-contrast-workflow', () => ({
-  dispatchContrastWorkflow: dispatchContrastWorkflowMock,
-}));
 
 vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
@@ -56,16 +47,29 @@ vi.mock('@blog/db', () => ({
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 describe(startContrastCheckAction, () => {
+  const github = useGitHubFetch();
   let headSha: string;
+
+  const isDispatched = () =>
+    github.fetchMock.mock.calls.some(([url]) =>
+      String(url).endsWith(MOCK_GITHUB_CONTRAST_DISPATCH_PATH),
+    );
 
   beforeEach(() => {
     headSha = faker.git.commitSha();
     authMock.mockReset().mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
-    getBranchHeadShaMock.mockReset().mockResolvedValue(okResult(headSha));
-    isWorkflowRunActiveMock.mockReset().mockResolvedValue(okResult(false));
-    dispatchContrastWorkflowMock.mockReset().mockResolvedValue(true);
+    github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
+      mockGitHubResponse({ commit: { sha: headSha } }),
+    );
+    github.respond(MOCK_GITHUB_CONTRAST_RUNS_PATH, () =>
+      mockGitHubResponse({ workflow_runs: [] }),
+    );
+    github.respond(
+      MOCK_GITHUB_CONTRAST_DISPATCH_PATH,
+      () => new Response(null, { status: HTTP_STATUS.NO_CONTENT }),
+    );
     insertAuditEventMock.mockReset();
   });
 
@@ -78,7 +82,7 @@ describe(startContrastCheckAction, () => {
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
-    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+    expect(isDispatched()).toBe(false);
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -86,7 +90,7 @@ describe(startContrastCheckAction, () => {
     const result = await startContrastCheckAction();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(dispatchContrastWorkflowMock).toHaveBeenCalledOnce();
+    expect(isDispatched()).toBe(true);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.CONTRAST_CHECK_STARTED,
@@ -97,7 +101,11 @@ describe(startContrastCheckAction, () => {
   });
 
   it('refuses, dispatching and recording nothing, while a run is in progress', async () => {
-    isWorkflowRunActiveMock.mockResolvedValue(okResult(true));
+    github.respond(MOCK_GITHUB_CONTRAST_RUNS_PATH, () =>
+      mockGitHubResponse({
+        workflow_runs: [{ status: GITHUB_RUN_STATUS.IN_PROGRESS }],
+      }),
+    );
 
     const result = await startContrastCheckAction();
 
@@ -105,34 +113,36 @@ describe(startContrastCheckAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
     });
-    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+    expect(isDispatched()).toBe(false);
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('is unavailable when the head commit cannot be read', async () => {
-    getBranchHeadShaMock.mockResolvedValue(
-      errorResult(GITHUB_FAILURE.GITHUB_ERROR),
+    github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
+      mockGitHubResponse({}, HTTP_STATUS.INTERNAL_SERVER_ERROR),
     );
 
     const result = await startContrastCheckAction();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
-    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+    expect(isDispatched()).toBe(false);
   });
 
   it('is unavailable when the active run status cannot be read', async () => {
-    isWorkflowRunActiveMock.mockResolvedValue(
-      errorResult(GITHUB_FAILURE.RATE_LIMITED),
+    github.respond(MOCK_GITHUB_CONTRAST_RUNS_PATH, () =>
+      mockGitHubResponse({}, HTTP_STATUS.TOO_MANY_REQUESTS),
     );
 
     const result = await startContrastCheckAction();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
-    expect(dispatchContrastWorkflowMock).not.toHaveBeenCalled();
+    expect(isDispatched()).toBe(false);
   });
 
   it('records no audit event when the dispatch fails', async () => {
-    dispatchContrastWorkflowMock.mockResolvedValue(false);
+    github.respond(MOCK_GITHUB_CONTRAST_DISPATCH_PATH, () =>
+      mockGitHubResponse({}, HTTP_STATUS.INTERNAL_SERVER_ERROR),
+    );
 
     const result = await startContrastCheckAction();
 
