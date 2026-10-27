@@ -1,73 +1,71 @@
-import { render, screen } from '@platform/testing/custom-render';
-import { MOCK_SITE_NAME } from '@platform/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { PageHeader } from './page-header';
+
+faker.seed(5995);
+
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_BADGE = faker.lorem.word();
+const MOCK_ACTION = faker.lorem.words(2);
+
+const setup = customRender(PageHeader, { title: MOCK_TITLE });
 
 describe(`<${PageHeader.name}/>`, () => {
   describe('with only the title', () => {
     beforeEach(() => {
-      render(<PageHeader title="Tenants" />);
+      setup();
     });
 
-    it('renders the title through a level-1 heading', () => {
+    it('renders the title as a level-1 heading', () => {
       const heading = screen.getByRole('heading', {
         level: 1,
-        name: 'Tenants',
+        name: MOCK_TITLE,
       });
 
       expect(heading).toBeVisible();
     });
 
-    it('omits the description when not provided', () => {
-      const description = screen.queryByText(/every site/i);
+    it('renders no description', () => {
+      const description = screen.queryByText(MOCK_DESCRIPTION);
 
       expect(description).not.toBeInTheDocument();
     });
 
-    it('omits the actions container when not provided', () => {
+    it('renders no actions', () => {
       const actionButton = screen.queryByRole('button');
 
       expect(actionButton).not.toBeInTheDocument();
     });
   });
 
-  it('renders a description when provided', () => {
-    render(
-      <PageHeader title="Tenants" description="Every site on the platform." />,
-    );
-    const description = screen.getByText('Every site on the platform.');
+  it('renders the description', () => {
+    setup({ description: MOCK_DESCRIPTION });
+
+    const description = screen.getByText(MOCK_DESCRIPTION);
 
     expect(description).toBeVisible();
   });
 
   it('renders badges beside the title', () => {
-    render(<PageHeader title={MOCK_SITE_NAME} badges={<span>Active</span>} />);
-    const heading = screen.getByRole('heading', { level: 1 });
-    const badge = screen.getByText('Active');
+    setup({ badges: <span>{MOCK_BADGE}</span> });
 
-    expect(heading).toHaveTextContent(MOCK_SITE_NAME);
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: MOCK_TITLE,
+    });
+    const badge = screen.getByText(MOCK_BADGE);
+
+    expect(heading).toBeVisible();
     expect(badge).toBeVisible();
   });
 
-  it('renders right-aligned actions when provided', () => {
-    render(
-      <PageHeader
-        title="Tenants"
-        actions={<button type="button">Add tenant</button>}
-      />,
-    );
-    const addButton = screen.getByRole('button', { name: 'Add tenant' });
+  it('renders the actions', () => {
+    setup({ actions: <button type="button">{MOCK_ACTION}</button> });
 
-    expect(addButton).toBeVisible();
-  });
+    const actionButton = screen.getByRole('button', { name: MOCK_ACTION });
 
-  it('renders with only the required title, without throwing', () => {
-    expect(() => render(<PageHeader title="Tenants" />)).not.toThrow();
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Tenants',
-    });
-
-    expect(heading).toBeVisible();
+    expect(actionButton).toBeVisible();
   });
 });

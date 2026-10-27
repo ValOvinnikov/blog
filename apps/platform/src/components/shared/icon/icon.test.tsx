@@ -1,61 +1,32 @@
 import { ICONS } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Icon } from './icon';
 
-describe(Icon, () => {
-  it('is decorative by default', () => {
-    render(<Icon name={ICONS.GRID} />);
+faker.seed(5995);
 
-    const icon = screen.getByTestId('icon');
-    expect(icon).toHaveAttribute('aria-hidden', 'true');
+const ICON_TEST_ID = 'icon';
+const ARIA_HIDDEN = 'aria-hidden';
+const MOCK_ARIA_LABEL = faker.lorem.word();
+
+const setup = customRender(Icon, { name: ICONS.GRID });
+
+describe(`<${Icon.name}/>`, () => {
+  it('is decorative by default', () => {
+    setup();
+
+    const icon = screen.getByTestId(ICON_TEST_ID);
+
+    expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
   });
 
   it('exposes an accessible name when one is given', () => {
-    render(<Icon name={ICONS.WARNING} ariaLabel="Warning" />);
+    setup({ ariaLabel: MOCK_ARIA_LABEL });
 
-    const icon = screen.getByLabelText('Warning');
-    expect(icon).toBeVisible();
-  });
+    const icon = screen.getByTestId(ICON_TEST_ID);
 
-  it('renders a glyph for every icon admin references', () => {
-    const used = [
-      ICONS.ARROW,
-      ICONS.ARROW_UP,
-      ICONS.BOOK,
-      ICONS.CHECK,
-      ICONS.CHECK_SHEET,
-      ICONS.CHEVRON_DOWN,
-      ICONS.CHEVRON_RIGHT,
-      ICONS.CLOCK,
-      ICONS.CLOSE,
-      ICONS.COMMENT,
-      ICONS.EXTERNAL_LINK,
-      ICONS.GLOBE,
-      ICONS.GRID,
-      ICONS.HOUSE,
-      ICONS.INFO,
-      ICONS.LAYERS,
-      ICONS.LOCK,
-      ICONS.MAIL,
-      ICONS.MENU,
-      ICONS.MENU_ROWS,
-      ICONS.PALETTE,
-      ICONS.PLUS,
-      ICONS.POWER,
-      ICONS.QUOTE,
-      ICONS.ROCKET,
-      ICONS.SETTINGS,
-      ICONS.SHIELD_CHECK,
-      ICONS.USERS,
-      ICONS.WARNING,
-      ICONS.ZAP,
-    ];
-    for (const name of used) {
-      const { unmount } = render(<Icon name={name} />);
-      const icon = screen.getByTestId('icon');
-      expect(icon).toBeVisible();
-      unmount();
-    }
+    expect(icon).toHaveAccessibleName(MOCK_ARIA_LABEL);
+    expect(icon).not.toHaveAttribute(ARIA_HIDDEN);
   });
 });

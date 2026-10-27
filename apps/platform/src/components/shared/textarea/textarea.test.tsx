@@ -1,96 +1,91 @@
+import { faker } from '@faker-js/faker';
 import { FormField } from '@platform/components/shared/form-field';
-import { render, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { customRender, screen } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
-import { Textarea } from './textarea';
+import { Textarea, type TTextareaProps } from './textarea';
 
-describe(Textarea, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+faker.seed(5995);
+
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_VALUE = faker.lorem.sentence();
+const MOCK_PLACEHOLDER = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_ROWS = 6;
+
+type TTextareaFieldProps = TTextareaProps & {
+  field?: Omit<ComponentProps<typeof FormField>, 'label' | 'children'>;
+};
+
+const TextareaField = ({ field, ...props }: TTextareaFieldProps) => (
+  <FormField label={MOCK_LABEL} {...field}>
+    <Textarea {...props} />
+  </FormField>
+);
+
+const setup = customRender(TextareaField, { value: '', onChange: vi.fn() });
+
+describe(`<${Textarea.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
   it('renders the given value', () => {
-    render(
-      <FormField label="Notes">
-        <Textarea value="Hello" onChange={vi.fn()} />
-      </FormField>,
-    );
+    setup({ value: MOCK_VALUE });
 
-    expect(screen.getByLabelText('Notes')).toHaveValue('Hello');
+    const textarea = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(textarea).toHaveValue(MOCK_VALUE);
   });
 
   it('calls onChange with the new string value on input', async () => {
     const handleChange = vi.fn();
+    setup({ onChange: handleChange });
 
-    render(
-      <FormField label="Notes">
-        <Textarea value="" onChange={handleChange} />
-      </FormField>,
-    );
-
-    await user.type(screen.getByLabelText('Notes'), 'a');
+    const textarea = screen.getByRole('textbox', { name: MOCK_LABEL });
+    await user.type(textarea, 'a');
 
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
   it('passes rows and placeholder through to the textarea', () => {
-    render(
-      <FormField label="Bio">
-        <Textarea
-          value=""
-          onChange={vi.fn()}
-          rows={6}
-          placeholder="Inherited from preset"
-        />
-      </FormField>,
-    );
+    setup({ rows: MOCK_ROWS, placeholder: MOCK_PLACEHOLDER });
 
-    const textarea = screen.getByLabelText('Bio');
-    expect(textarea).toHaveAttribute('rows', '6');
-    expect(textarea).toHaveAttribute('placeholder', 'Inherited from preset');
+    const textarea = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(textarea).toHaveAttribute('rows', String(MOCK_ROWS));
+    expect(textarea).toHaveAttribute('placeholder', MOCK_PLACEHOLDER);
   });
 
   it('is disabled when the field it sits in is disabled', () => {
-    render(
-      <FormField label="Locked field" control={{ isDisabled: true }}>
-        <Textarea value="inherited value" onChange={vi.fn()} />
-      </FormField>,
-    );
+    setup({ value: MOCK_VALUE, field: { control: { isDisabled: true } } });
 
-    expect(screen.getByLabelText('Locked field')).toBeDisabled();
+    const textarea = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(textarea).toBeDisabled();
   });
 
-  it('makes the textarea read-only, not disabled, when isReadOnly is true', async () => {
+  it('is read-only, not disabled, when marked read-only', async () => {
     const handleChange = vi.fn();
-    render(
-      <FormField label="Archived field">
-        <Textarea
-          value="authored value"
-          onChange={handleChange}
-          isReadOnly={true}
-        />
-      </FormField>,
-    );
+    setup({ value: MOCK_VALUE, onChange: handleChange, isReadOnly: true });
 
-    const textarea = screen.getByLabelText('Archived field');
+    const textarea = screen.getByRole('textbox', { name: MOCK_LABEL });
+    await user.type(textarea, 'x');
+
     expect(textarea).toHaveAttribute('readonly');
     expect(textarea).toBeEnabled();
-
-    await user.type(textarea, 'x');
     expect(handleChange).not.toHaveBeenCalled();
   });
 
   it('is marked invalid and described by the error of the field it sits in', () => {
-    render(
-      <FormField label="Bio" error="Too long">
-        <Textarea value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+    setup({ field: { error: MOCK_ERROR } });
 
-    const textarea = screen.getByRole('textbox', { name: 'Bio' });
-    expect(textarea).toHaveAttribute('aria-invalid', 'true');
-    expect(textarea).toHaveAccessibleDescription('Too long');
+    const textarea = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(textarea).toBeInvalid();
+    expect(textarea).toHaveAccessibleDescription(MOCK_ERROR);
   });
 });

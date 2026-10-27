@@ -1,4 +1,5 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
@@ -6,43 +7,46 @@ import { Breadcrumbs } from './breadcrumbs';
 
 vi.mock('@platform/i18n/navigation');
 
-const TENANTS = 'Tenants';
-const PLATFORM = 'Platform';
-const LOOK = 'Look';
+faker.seed(5995);
+
 const ARIA_CURRENT = 'aria-current';
+const MOCK_ARIA_LABEL = faker.lorem.word();
+const MOCK_PLATFORM = faker.lorem.words(2);
+const MOCK_TENANTS = faker.lorem.words(3);
+const MOCK_YOUR_SITE = faker.lorem.words(2);
+const MOCK_LOOK = faker.lorem.words(4);
 
-describe(Breadcrumbs, () => {
+const setup = customRender(Breadcrumbs, {
+  ariaLabel: MOCK_ARIA_LABEL,
+  items: [{ label: MOCK_PLATFORM }],
+});
+
+describe(`<${Breadcrumbs.name}/>`, () => {
   it('renders every ancestor with an href as a real link', () => {
-    render(
-      <Breadcrumbs
-        ariaLabel="Breadcrumb"
-        items={[
-          { label: PLATFORM },
-          { label: TENANTS, href: adminRoutes.tenants() },
-          { label: MOCK_TENANT_NAME },
-        ]}
-      />,
-    );
+    setup({
+      items: [
+        { label: MOCK_PLATFORM },
+        { label: MOCK_TENANTS, href: adminRoutes.tenants() },
+        { label: MOCK_TENANT_NAME },
+      ],
+    });
 
-    const tenantsLink = screen.getByRole('link', { name: TENANTS });
+    const tenantsLink = screen.getByRole('link', { name: MOCK_TENANTS });
 
     expect(tenantsLink).toHaveAttribute('href', adminRoutes.tenants());
   });
 
   it('renders the last item as the current, non-clickable label even with an href', () => {
-    render(
-      <Breadcrumbs
-        ariaLabel="Breadcrumb"
-        items={[
-          { label: 'Your site', href: adminRoutes.dashboard() },
-          { label: LOOK, href: adminRoutes.dashboardLook() },
-        ]}
-      />,
-    );
+    setup({
+      items: [
+        { label: MOCK_YOUR_SITE, href: adminRoutes.dashboard() },
+        { label: MOCK_LOOK, href: adminRoutes.dashboardLook() },
+      ],
+    });
 
-    const yourSiteLink = screen.getByRole('link', { name: 'Your site' });
-    const lookLink = screen.queryByRole('link', { name: LOOK });
-    const current = screen.getByText(LOOK);
+    const yourSiteLink = screen.getByRole('link', { name: MOCK_YOUR_SITE });
+    const lookLink = screen.queryByRole('link', { name: MOCK_LOOK });
+    const current = screen.getByText(MOCK_LOOK);
 
     expect(yourSiteLink).toHaveAttribute('href', adminRoutes.dashboard());
     expect(lookLink).not.toBeInTheDocument();
@@ -50,26 +54,19 @@ describe(Breadcrumbs, () => {
   });
 
   it('renders an ancestor with no href as a non-clickable label, not a link', () => {
-    render(
-      <Breadcrumbs
-        ariaLabel="Breadcrumb"
-        items={[{ label: PLATFORM }, { label: TENANTS }]}
-      />,
-    );
+    setup({ items: [{ label: MOCK_PLATFORM }, { label: MOCK_TENANTS }] });
 
-    const platformLink = screen.queryByRole('link', { name: PLATFORM });
-    const platformText = screen.getByText(PLATFORM);
+    const platformLink = screen.queryByRole('link', { name: MOCK_PLATFORM });
+    const platformText = screen.getByText(MOCK_PLATFORM);
 
     expect(platformLink).not.toBeInTheDocument();
     expect(platformText).not.toHaveAttribute(ARIA_CURRENT);
   });
 
-  it('renders a nav landmark labelled with the given ariaLabel', () => {
-    render(
-      <Breadcrumbs ariaLabel="Breadcrumb" items={[{ label: PLATFORM }]} />,
-    );
+  it('renders a nav landmark labelled with the given label', () => {
+    setup();
 
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const nav = screen.getByRole('navigation', { name: MOCK_ARIA_LABEL });
 
     expect(nav).toBeVisible();
   });

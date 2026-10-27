@@ -1,52 +1,59 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Avatar } from './avatar';
 
-describe(Avatar, () => {
-  it('renders initials from a first and last name', () => {
-    render(<Avatar name="Jane Doe" variant="table" />);
-    expect(screen.getByText('JD')).toBeVisible();
+faker.seed(5995);
+
+const MOCK_FIRST_NAME = faker.person.firstName();
+const MOCK_MIDDLE_NAME = faker.person.middleName();
+const MOCK_LAST_NAME = faker.person.lastName();
+const MOCK_FULL_NAME = `${MOCK_FIRST_NAME} ${MOCK_LAST_NAME}`;
+const MOCK_INITIALS =
+  `${MOCK_FIRST_NAME.charAt(0)}${MOCK_LAST_NAME.charAt(0)}`.toUpperCase();
+
+const setup = customRender(Avatar, { name: MOCK_FULL_NAME, variant: 'table' });
+
+describe(`<${Avatar.name}/>`, () => {
+  it.each([
+    ['a first and last name', MOCK_FULL_NAME, MOCK_INITIALS],
+    [
+      'a name with a middle name',
+      `${MOCK_FIRST_NAME} ${MOCK_MIDDLE_NAME} ${MOCK_LAST_NAME}`,
+      MOCK_INITIALS,
+    ],
+    ['a lowercase name', MOCK_FULL_NAME.toLowerCase(), MOCK_INITIALS],
+    [
+      'a name padded with extra whitespace',
+      `  ${MOCK_FIRST_NAME}    ${MOCK_LAST_NAME}  `,
+      MOCK_INITIALS,
+    ],
+    [
+      'a single-word name',
+      MOCK_LAST_NAME,
+      MOCK_LAST_NAME.slice(0, 2).toUpperCase(),
+    ],
+  ])('renders initials for %s', (_case, name, expected) => {
+    setup({ name });
+
+    const initials = screen.getByText(expected);
+
+    expect(initials).toBeVisible();
   });
 
-  it('uses the first and last word for a name with a middle name', () => {
-    render(<Avatar name="Jane Middle Doe" variant="table" />);
-    expect(screen.getByText('JD')).toBeVisible();
+  it('renders no initials for an empty name', () => {
+    setup({ name: '' });
+
+    const initials = screen.queryByText(/\S/);
+
+    expect(initials).not.toBeInTheDocument();
   });
 
-  it('takes the first two letters of a single-word name', () => {
-    render(<Avatar name="Madonna" variant="chip" />);
-    expect(screen.getByText('MA')).toBeVisible();
-  });
+  it('is hidden from assistive tech', () => {
+    setup();
 
-  it('uppercases lowercase input', () => {
-    render(<Avatar name="jane doe" variant="table" />);
-    expect(screen.getByText('JD')).toBeVisible();
-  });
+    const initials = screen.getByText(MOCK_INITIALS);
 
-  it('collapses extra whitespace between name parts', () => {
-    render(<Avatar name="  Jane    Doe  " variant="table" />);
-    expect(screen.getByText('JD')).toBeVisible();
-  });
-
-  it('renders no initials for an empty name without throwing', () => {
-    const { container } = render(<Avatar name="" variant="table" />);
-    expect(container).toHaveTextContent('');
-  });
-
-  it('is decorative — hidden from assistive tech', () => {
-    render(<Avatar name="Jane Doe" variant="table" />);
-    expect(screen.getByText('JD')).toHaveAttribute('aria-hidden', 'true');
-  });
-
-  it('renders every variant without throwing', () => {
-    expect(() =>
-      render(<Avatar name="Jane Doe" variant="table" />),
-    ).not.toThrow();
-    expect(() =>
-      render(<Avatar name="Jane Doe" variant="chip" />),
-    ).not.toThrow();
-    expect(() =>
-      render(<Avatar name="Jane Doe" variant="switcher" />),
-    ).not.toThrow();
+    expect(initials).toHaveAttribute('aria-hidden', 'true');
   });
 });

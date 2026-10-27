@@ -1,197 +1,171 @@
-import { render, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
 import { Disclosure } from './disclosure';
 
-describe(Disclosure, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+faker.seed(5995);
+
+const ARIA_EXPANDED = 'aria-expanded';
+
+const MOCK_SUMMARY = faker.lorem.word();
+const MOCK_BODY = faker.lorem.sentence();
+const MOCK_SUMMARY_TAIL = faker.lorem.word();
+
+const setup = customRender(Disclosure, {
+  summary: MOCK_SUMMARY,
+  children: <p>{MOCK_BODY}</p>,
+});
+
+const ControlledDisclosure = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Disclosure summary={MOCK_SUMMARY} isOpen={isOpen} onOpenChange={setIsOpen}>
+      <p>{MOCK_BODY}</p>
+    </Disclosure>
+  );
+};
+
+describe(`<${Disclosure.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
   it('renders the summary as a collapsed button and hides the content', () => {
-    render(
-      <Disclosure summary="Advanced">
-        <p>Curated overrides live here.</p>
-      </Disclosure>,
-    );
+    setup();
 
-    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-    expect(screen.getByText('Curated overrides live here.')).not.toBeVisible();
+    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+    const body = screen.getByText(MOCK_BODY);
+
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(body).not.toBeVisible();
   });
 
   it('renders the trigger inside a heading of the given level', () => {
-    render(
-      <Disclosure summary="Steps" headingLevel={2}>
-        <p>Body</p>
-      </Disclosure>,
-    );
+    setup({ headingLevel: 2 });
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Steps' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Steps' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: MOCK_SUMMARY,
+    });
+
+    expect(heading).toBeVisible();
   });
 
   it('toggles from inside its heading', async () => {
-    render(
-      <Disclosure summary="Steps" headingLevel={3}>
-        <p>Body</p>
-      </Disclosure>,
-    );
+    setup({ headingLevel: 3 });
 
-    await user.click(screen.getByRole('button', { name: 'Steps' }));
+    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+    await user.click(trigger);
 
-    expect(screen.getByRole('button', { name: 'Steps' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    expect(screen.getByText('Body')).toBeVisible();
+    const body = screen.getByText(MOCK_BODY);
+
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(body).toBeVisible();
   });
 
-  it('renders no heading without a headingLevel', () => {
-    render(
-      <Disclosure summary="Advanced">
-        <p>Body</p>
-      </Disclosure>,
-    );
+  it('renders no heading without a heading level', () => {
+    setup();
 
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading');
+
+    expect(heading).not.toBeInTheDocument();
   });
 
   it('toggles open and closed on click', async () => {
-    render(
-      <Disclosure summary="Advanced">
-        <p>Body</p>
-      </Disclosure>,
-    );
-    const trigger = screen.getByRole('button', { name: 'Advanced' });
+    setup();
+
+    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+    const body = screen.getByText(MOCK_BODY);
 
     await user.click(trigger);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('Body')).toBeVisible();
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(body).toBeVisible();
 
     await user.click(trigger);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.getByText('Body')).not.toBeVisible();
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(body).not.toBeVisible();
   });
 
   it.each(['{Enter}', ' '])('toggles with the %s key', async (key) => {
-    render(
-      <Disclosure summary="Advanced" variant="inline">
-        <p>Body</p>
-      </Disclosure>,
-    );
+    setup();
 
     await user.tab();
-    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveFocus();
+    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+
+    expect(trigger).toHaveFocus();
 
     await user.keyboard(key);
+    const body = screen.getByText(MOCK_BODY);
 
-    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    expect(screen.getByText('Body')).toBeVisible();
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(body).toBeVisible();
   });
 
-  it('renders with no children without throwing', () => {
-    expect(() =>
-      render(<Disclosure summary="Advanced">{null}</Disclosure>),
-    ).not.toThrow();
-    expect(screen.getByRole('button', { name: 'Advanced' })).toBeVisible();
+  it('renders the trigger with no content', () => {
+    setup({ children: null });
+
+    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+
+    expect(trigger).toBeVisible();
   });
 
-  it('accepts a non-text ReactNode as the summary', () => {
-    render(
-      <Disclosure
-        summary={
-          <span>
-            Advanced <span>optional</span>
-          </span>
-        }
-      >
-        <p>Body</p>
-      </Disclosure>,
-    );
-
-    expect(screen.getByText('optional')).toBeVisible();
-  });
-
-  describe('controlled mode', () => {
-    it('reflects isOpen rather than internal state', () => {
-      const { rerender } = render(
-        <Disclosure summary="Advanced" isOpen={false} onOpenChange={vi.fn()}>
-          <p>Body</p>
-        </Disclosure>,
-      );
-
-      expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
-        'aria-expanded',
-        'false',
-      );
-
-      rerender(
-        <Disclosure summary="Advanced" isOpen={true} onOpenChange={vi.fn()}>
-          <p>Body</p>
-        </Disclosure>,
-      );
-
-      expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
-        'aria-expanded',
-        'true',
-      );
+  it('renders a non-text summary', () => {
+    setup({
+      summary: (
+        <span>
+          {MOCK_SUMMARY} <span>{MOCK_SUMMARY_TAIL}</span>
+        </span>
+      ),
     });
 
-    it('calls onOpenChange with the next value without opening on its own', async () => {
-      const onOpenChange = vi.fn();
-      render(
-        <Disclosure
-          summary="Advanced"
-          isOpen={false}
-          onOpenChange={onOpenChange}
-        >
-          <p>Body</p>
-        </Disclosure>,
-      );
+    const summaryTail = screen.getByText(MOCK_SUMMARY_TAIL);
 
-      await user.click(screen.getByRole('button', { name: 'Advanced' }));
+    expect(summaryTail).toBeVisible();
+  });
+
+  describe('controlled', () => {
+    it.each([
+      [false, 'false'],
+      [true, 'true'],
+    ])('reflects an open state of %s', (isOpen, expanded) => {
+      setup({ isOpen, onOpenChange: vi.fn() });
+
+      const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, expanded);
+    });
+
+    it('reports the next open state without opening on its own', async () => {
+      const onOpenChange = vi.fn();
+      setup({ isOpen: false, onOpenChange });
+
+      const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+      await user.click(trigger);
+
+      const body = screen.getByText(MOCK_BODY);
 
       expect(onOpenChange).toHaveBeenCalledWith(true);
-      expect(screen.getByText('Body')).not.toBeVisible();
+      expect(body).not.toBeVisible();
     });
 
-    it('round-trips through a caller that feeds onOpenChange back in as isOpen', async () => {
-      const ControlledDisclosure = () => {
-        const [isOpen, setIsOpen] = useState(false);
-        return (
-          <Disclosure
-            summary="Advanced"
-            isOpen={isOpen}
-            onOpenChange={setIsOpen}
-          >
-            <p>Body</p>
-          </Disclosure>
-        );
-      };
-      render(<ControlledDisclosure />);
+    it('opens when the caller feeds the reported state back in', async () => {
+      renderWithIntl(<ControlledDisclosure />);
 
-      await user.click(screen.getByRole('button', { name: 'Advanced' }));
+      const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+      await user.click(trigger);
 
-      expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
-        'aria-expanded',
-        'true',
-      );
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
   });
 });
