@@ -1068,27 +1068,26 @@
     "confirmingButton": "Lanzando…"
   },
   "tenantSuspensionControl": {
+    "cardTitle": "Suspensión",
     "ACTIVE": {
-      "cardTitle": "Suspender este cliente",
-      "description": "Pausa las funciones de escritura del sitio público —el formulario de contacto, las suscripciones al boletín y los marcadores— mientras sus páginas siguen en línea. Puedes reactivarlo en cualquier momento.",
+      "description": "Pausa las acciones de los lectores en el sitio público, como formularios, suscripciones y elementos guardados, mientras sus páginas siguen en línea. Puedes reactivarlo en cualquier momento.",
       "triggerButton": "Suspender cliente",
       "dialogTitle": "Suspender {name}",
-      "dialogDescription": "El sitio sigue en línea, pero desde la próxima carga de página desaparece su formulario de contacto y se rechazan nuevas suscripciones al boletín y marcadores hasta que lo reactives.",
+      "dialogDescription": "El sitio sigue en línea, pero las acciones de sus lectores se desactivan desde la próxima carga de página hasta que lo reactives.",
       "confirmButton": "Suspender",
       "confirmingButton": "Suspendiendo…"
     },
     "SUSPENDED": {
-      "cardTitle": "Este cliente está suspendido",
-      "description": "El formulario de contacto, las suscripciones al boletín y los marcadores del sitio público están desactivados. Al reactivarlo vuelven desde la próxima carga de página.",
+      "description": "Las acciones de los lectores del sitio público están desactivadas. Al reactivarlo vuelven desde la próxima carga de página.",
       "triggerButton": "Reactivar cliente",
       "dialogTitle": "Reactivar {name}",
-      "dialogDescription": "El formulario de contacto, las suscripciones al boletín y los marcadores del sitio vuelven desde la próxima carga de página.",
+      "dialogDescription": "Las acciones de los lectores del sitio vuelven desde la próxima carga de página.",
       "confirmButton": "Reactivar",
       "confirmingButton": "Reactivando…"
     },
     "blockOwner": {
       "switchLabel": "Bloquear también el correo del propietario",
-      "description": "El propietario ya no podrá registrarse ni crear un sitio con esta dirección. Puede quitar el bloqueo más tarde desde Registros bloqueados.",
+      "description": "El propietario ya no podrá registrarse ni crear un sitio con esta dirección de correo. Puede quitar el bloqueo más tarde desde Registros bloqueados.",
       "reasonLabel": "Motivo del bloqueo",
       "reasonHint": "Los operadores lo ven en la página Registros bloqueados.",
       "switchOn": "Activado",

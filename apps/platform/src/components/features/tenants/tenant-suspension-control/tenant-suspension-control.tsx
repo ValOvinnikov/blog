@@ -58,7 +58,7 @@ export const TenantSuspensionControl = ({
 
   return (
     <Card>
-      <Card.Header title={t(`${copyKey}.cardTitle`)} />
+      <Card.Header title={t('cardTitle')} />
       <Card.Body>
         <div className={content()}>
           <Text variant="muted">{t(`${copyKey}.description`)}</Text>

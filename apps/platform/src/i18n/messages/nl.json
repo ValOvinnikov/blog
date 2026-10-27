@@ -1068,27 +1068,26 @@
     "confirmingButton": "Starten…"
   },
   "tenantSuspensionControl": {
+    "cardTitle": "Opschorting",
     "ACTIVE": {
-      "cardTitle": "Deze tenant opschorten",
-      "description": "Pauzeert de schrijffuncties van de live site — het contactformulier, nieuwsbriefinschrijvingen en bladwijzers — terwijl de pagina's online blijven. Je kunt hem op elk moment opnieuw activeren.",
+      "description": "Pauzeert de lezersacties op de live site, zoals formulieren, inschrijvingen en bewaarde items, terwijl de pagina's online blijven. Je kunt hem op elk moment opnieuw activeren.",
       "triggerButton": "Tenant opschorten",
       "dialogTitle": "{name} opschorten",
-      "dialogDescription": "De site blijft online, maar vanaf de volgende paginaweergave verdwijnt het contactformulier en worden nieuwe nieuwsbriefinschrijvingen en bladwijzers geweigerd tot je hem opnieuw activeert.",
+      "dialogDescription": "De site blijft online, maar vanaf de volgende paginaweergave staan de lezersacties uit tot je hem opnieuw activeert.",
       "confirmButton": "Opschorten",
       "confirmingButton": "Bezig met opschorten…"
     },
     "SUSPENDED": {
-      "cardTitle": "Deze tenant is opgeschort",
-      "description": "Het contactformulier, nieuwsbriefinschrijvingen en bladwijzers van de live site staan uit. Opnieuw activeren herstelt ze vanaf de volgende paginaweergave.",
+      "description": "De lezersacties van de live site staan uit. Opnieuw activeren herstelt ze vanaf de volgende paginaweergave.",
       "triggerButton": "Tenant opnieuw activeren",
       "dialogTitle": "{name} opnieuw activeren",
-      "dialogDescription": "Het contactformulier, nieuwsbriefinschrijvingen en bladwijzers van de site komen terug vanaf de volgende paginaweergave.",
+      "dialogDescription": "De lezersacties van de site komen terug vanaf de volgende paginaweergave.",
       "confirmButton": "Opnieuw activeren",
       "confirmingButton": "Bezig met activeren…"
     },
     "blockOwner": {
       "switchLabel": "Blokkeer ook het e-mailadres van de eigenaar",
-      "description": "De eigenaar kan zich met dit adres niet meer aanmelden of een site maken. Je kunt de blokkade later opheffen via Geblokkeerde aanmeldingen.",
+      "description": "De eigenaar kan zich met dit e-mailadres niet meer aanmelden of een site maken. Je kunt de blokkade later opheffen via Geblokkeerde aanmeldingen.",
       "reasonLabel": "Reden van de blokkade",
       "reasonHint": "Operators zien dit op de pagina Geblokkeerde aanmeldingen.",
       "switchOn": "Aan",
