@@ -3,7 +3,7 @@ import {
   AUDIT_TARGET_TYPE,
   ERROR_CODE,
 } from '@blog/config/constants';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { DAY_MS, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   MOCK_BLOCK_REASON,
@@ -13,6 +13,7 @@ import {
   insertTestAccount,
   insertTestTenant,
   MOCK_INVITE_EMAIL,
+  MOCK_OAUTH_PROVIDER,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { findPersonalData } from './find-personal-data';
@@ -38,10 +40,13 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
-const NOBODY_EMAIL = 'nobody@example.org';
-const BOOKMARKED_POST_ID = 'post-1';
-const GITHUB_PROVIDER = 'github';
-const DAY_MS = 86_400_000;
+faker.seed(6022);
+
+const MOCK_NOW = faker.date.recent({ refDate: '2026-03-15T10:00:00.000Z' });
+const MOCK_NOBODY_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_BOOKMARKED_POST_ID = faker.string.uuid();
+const MOCK_ACTIVE_SESSION_TOKEN = faker.string.uuid();
+const MOCK_EXPIRED_SESSION_TOKEN = faker.string.uuid();
 
 afterEach(async () => {
   await deleteTestPersonalDataRows(db());
@@ -144,51 +149,58 @@ describe(findPersonalData, () => {
     let userId: string;
 
     beforeEach(async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(MOCK_NOW);
       userId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-      await insertTestAccount(db(), userId, GITHUB_PROVIDER);
+      await insertTestAccount(db(), userId, MOCK_OAUTH_PROVIDER);
       await db()
         .insert(schema.bookmarks)
-        .values({ tenantId, userId, postId: BOOKMARKED_POST_ID });
+        .values({ tenantId, userId, postId: MOCK_BOOKMARKED_POST_ID });
       await db()
         .insert(schema.sessions)
         .values([
           {
-            sessionToken: 'active',
+            sessionToken: MOCK_ACTIVE_SESSION_TOKEN,
             userId,
-            expires: new Date(Date.now() + DAY_MS),
+            expires: new Date(MOCK_NOW.getTime() + DAY_MS),
           },
           {
-            sessionToken: 'expired',
+            sessionToken: MOCK_EXPIRED_SESSION_TOKEN,
             userId,
-            expires: new Date(Date.now() - DAY_MS),
+            expires: new Date(MOCK_NOW.getTime() - DAY_MS),
           },
         ]);
     });
 
     afterEach(async () => {
+      vi.useRealTimers();
       await db().delete(schema.sessions);
       await db().delete(schema.bookmarks);
       await db().delete(schema.accounts);
     });
 
-    it('finds the reader account with its providers, bookmarks and active sessions', async () => {
+    it('finds the reader account with providers, bookmarks and active sessions', async () => {
       const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
 
       expect(result.ok).toBe(true);
       if (!result.ok) return;
       const { readerAccount } = result.data;
-      expect(readerAccount).toMatchObject({
-        id: userId,
-        email: MOCK_SUBSCRIBER_EMAIL,
-        linkedProviders: { github: true, google: false, emailLink: false },
-        activeSessionCount: 1,
+      if (!readerAccount) throw new Error('Expected a reader account.');
+      const { id, email, linkedProviders, activeSessionCount } = readerAccount;
+      const bookmarks = readerAccount.bookmarks.map(
+        ({ tenantName, postId }) => ({ tenantName, postId }),
+      );
+      expect(id).toBe(userId);
+      expect(email).toBe(MOCK_SUBSCRIBER_EMAIL);
+      expect(linkedProviders).toEqual({
+        github: true,
+        google: false,
+        emailLink: false,
       });
-      expect(
-        readerAccount?.bookmarks.map(({ tenantName, postId }) => ({
-          tenantName,
-          postId,
-        })),
-      ).toEqual([{ tenantName, postId: BOOKMARKED_POST_ID }]);
+      expect(activeSessionCount).toBe(1);
+      expect(bookmarks).toEqual([
+        { tenantName, postId: MOCK_BOOKMARKED_POST_ID },
+      ]);
     });
   });
 
@@ -218,11 +230,11 @@ describe(findPersonalData, () => {
   });
 
   it('finds nothing for a mailbox with no rows', async () => {
-    const result = await findPersonalData(NOBODY_EMAIL);
+    const result = await findPersonalData(MOCK_NOBODY_EMAIL);
 
     expect(result).toEqual(
       okResult({
-        emailIndex: testPersonalEmailIndex(NOBODY_EMAIL),
+        emailIndex: testPersonalEmailIndex(MOCK_NOBODY_EMAIL),
         subscribers: [],
         leads: [],
         membershipInvites: [],
@@ -234,8 +246,8 @@ describe(findPersonalData, () => {
   });
 
   it('refuses a value that is not an email address', async () => {
-    await expect(findPersonalData(MOCK_NOT_AN_ADDRESS)).resolves.toEqual(
-      errorResult(ERROR_CODE.DB_INVALID_EMAIL),
-    );
+    const result = await findPersonalData(MOCK_NOT_AN_ADDRESS);
+
+    expect(result).toEqual(errorResult(ERROR_CODE.DB_INVALID_EMAIL));
   });
 });
