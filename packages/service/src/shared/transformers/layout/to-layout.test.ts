@@ -1,38 +1,37 @@
-import { CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
+import {
+  mockRawHeroLayout,
+  mockRawWideLayout,
+} from '@blog/service/testing/shared/fixtures';
 
-import { toLayout, type TRawLayout } from './to-layout';
+import { toLayout } from './to-layout';
 
-const rawLayout: TRawLayout = {
-  spacingTop: SPACING_SCALE.SM,
-  spacingBottom: SPACING_SCALE.LG,
-  containerWidth: CONTAINER_WIDTH.NARROW,
-  dividerTop: true,
-  dividerBottom: false,
-};
+describe(toLayout, () => {
+  it.each([null, undefined])('returns undefined for a %s raw layout', (raw) => {
+    const result = toLayout(raw);
 
-describe('toLayout', () => {
-  it('returns undefined when the raw field is null', () => {
-    expect(toLayout(null)).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the raw field is undefined', () => {
-    expect(toLayout(undefined)).toBeUndefined();
+  it('maps a fully authored layout one to one', () => {
+    const raw = mockRawWideLayout();
+
+    const result = toLayout(raw);
+
+    expect(result).toEqual(raw);
   });
 
-  it('maps a fully-authored layout object 1:1', () => {
-    expect(toLayout(rawLayout)).toEqual(rawLayout);
-  });
-
-  it('leaves individually-unset sub-fields undefined (no faked default)', () => {
-    expect(
-      toLayout({
+  it('leaves each unset field undefined with no default', () => {
+    const result = toLayout(
+      mockRawWideLayout({
         spacingTop: null,
         spacingBottom: null,
         containerWidth: null,
         dividerTop: null,
         dividerBottom: null,
       }),
-    ).toEqual({
+    );
+
+    expect(result).toEqual({
       spacingTop: undefined,
       spacingBottom: undefined,
       containerWidth: undefined,
@@ -41,20 +40,11 @@ describe('toLayout', () => {
     });
   });
 
-  it('maps a heroLayout raw object (no containerWidth) with containerWidth left undefined', () => {
-    expect(
-      toLayout({
-        spacingTop: SPACING_SCALE.MD,
-        spacingBottom: null,
-        dividerTop: true,
-        dividerBottom: null,
-      }),
-    ).toEqual({
-      spacingTop: SPACING_SCALE.MD,
-      spacingBottom: undefined,
-      containerWidth: undefined,
-      dividerTop: true,
-      dividerBottom: undefined,
-    });
+  it('leaves the container width undefined for a layout that has none', () => {
+    const raw = mockRawHeroLayout();
+
+    const result = toLayout(raw);
+
+    expect(result).toEqual({ ...raw, containerWidth: undefined });
   });
 });

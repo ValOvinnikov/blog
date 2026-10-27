@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { customRender, screen } from '@platform/testing/custom-render';
 import {
   mockTenant,
   MOCK_CUSTOM_DOMAIN,
@@ -9,7 +9,7 @@ import {
 
 import { YourSiteCard } from './your-site-card';
 
-const render = renderWithIntl;
+const setup = customRender(YourSiteCard, { tenant: mockTenant() });
 
 describe(`<${YourSiteCard.name}/>`, () => {
   it('shows the name, public domain, plan and locale as plain values', () => {
@@ -19,7 +19,7 @@ describe(`<${YourSiteCard.name}/>`, () => {
       plan: TENANT_PLAN.GROWTH,
       locale: LOCALE_ISO_CODES.EN,
     });
-    render(<YourSiteCard tenant={tenant} />);
+    setup({ tenant });
 
     const name = screen.getByText(MOCK_SITE_NAME);
     const domain = screen.getByText(MOCK_CUSTOM_DOMAIN);
@@ -34,9 +34,9 @@ describe(`<${YourSiteCard.name}/>`, () => {
     expect(textbox).not.toBeInTheDocument();
   });
 
-  it('shows the public domain without a link and carries no read-only badge', () => {
+  it('shows the public domain without a link or read-only badge', () => {
     const tenant = mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN });
-    render(<YourSiteCard tenant={tenant} />);
+    setup({ tenant });
 
     const link = screen.queryByRole('link');
     const badge = screen.queryByText('read-only');
@@ -46,7 +46,7 @@ describe(`<${YourSiteCard.name}/>`, () => {
   });
 
   it("nests the card's title one level under the page's own h1", () => {
-    render(<YourSiteCard tenant={mockTenant()} />);
+    setup();
 
     const heading = screen.getByRole('heading', {
       level: 2,

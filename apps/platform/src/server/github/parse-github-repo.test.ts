@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 
 import { parseGitHubRepo } from './parse-github-repo';
 
+faker.seed(5998);
+
 describe(parseGitHubRepo, () => {
   it('splits an "owner/repo" value into its parts', () => {
     const owner = faker.lorem.slug();

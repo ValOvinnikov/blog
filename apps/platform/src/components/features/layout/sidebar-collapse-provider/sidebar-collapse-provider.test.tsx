@@ -1,5 +1,9 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { renderHook } from '@testing-library/react';
+import {
+  renderHook,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
+import { SIDEBAR_COLLAPSED_COOKIE } from '@platform/utils/sidebar-collapsed-cookie/sidebar-collapsed-cookie';
 import userEvent from '@testing-library/user-event';
 
 import {
@@ -7,19 +11,30 @@ import {
   useSidebarCollapse,
 } from './sidebar-collapse-provider';
 
+const PROBE_COLLAPSED_TEXT = 'collapsed';
+const PROBE_EXPANDED_TEXT = 'expanded';
+const SIDEBAR_COLLAPSE_ROOT_TEST_ID = 'sidebar-collapse-root';
+const DATA_COLLAPSED = 'data-collapsed';
+
 const Probe = () => {
   const { isCollapsed, toggle } = useSidebarCollapse();
   return (
     <button type="button" onClick={toggle}>
-      {isCollapsed ? 'collapsed' : 'expanded'}
+      {isCollapsed ? PROBE_COLLAPSED_TEXT : PROBE_EXPANDED_TEXT}
     </button>
   );
 };
 
-describe(SidebarCollapseProvider, () => {
+const renderProvider = (isInitiallyCollapsed: boolean) =>
+  renderWithIntl(
+    <SidebarCollapseProvider isInitiallyCollapsed={isInitiallyCollapsed}>
+      <Probe />
+    </SidebarCollapseProvider>,
+  );
+
+describe(`<${SidebarCollapseProvider.name}/>`, () => {
   afterEach(() => {
-    document.cookie =
-      'admin-sidebar-collapsed=; max-age=0; path=/; SameSite=Lax';
+    document.cookie = `${SIDEBAR_COLLAPSED_COOKIE}=; max-age=0; path=/; SameSite=Lax`;
   });
 
   it('throws when read outside a provider', () => {
@@ -28,48 +43,51 @@ describe(SidebarCollapseProvider, () => {
     );
   });
 
-  it('seeds state from isInitiallyCollapsed and carries it as data-collapsed on the wrapping element', () => {
-    renderWithIntl(
-      <SidebarCollapseProvider isInitiallyCollapsed={true}>
-        <Probe />
-      </SidebarCollapseProvider>,
-    );
+  it('starts collapsed and marks its root when seeded collapsed', () => {
+    renderProvider(true);
 
-    expect(screen.getByText('collapsed')).toBeVisible();
-    expect(screen.getByTestId('sidebar-collapse-root')).toHaveAttribute(
-      'data-collapsed',
-      'true',
-    );
+    const probe = screen.getByRole('button', { name: PROBE_COLLAPSED_TEXT });
+    const root = screen.getByTestId(SIDEBAR_COLLAPSE_ROOT_TEST_ID);
+
+    expect(probe).toBeVisible();
+    expect(root).toHaveAttribute(DATA_COLLAPSED, 'true');
   });
 
-  it('omits data-collapsed once expanded', () => {
-    renderWithIntl(
-      <SidebarCollapseProvider isInitiallyCollapsed={false}>
-        <Probe />
-      </SidebarCollapseProvider>,
-    );
+  it('leaves its root unmarked when seeded expanded', () => {
+    renderProvider(false);
 
-    expect(screen.getByTestId('sidebar-collapse-root')).not.toHaveAttribute(
-      'data-collapsed',
-    );
+    const root = screen.getByTestId(SIDEBAR_COLLAPSE_ROOT_TEST_ID);
+
+    expect(root).not.toHaveAttribute(DATA_COLLAPSED);
   });
 
-  it('flips state and persists the new value to the sidebar-collapsed cookie on toggle', async () => {
-    const user = userEvent.setup();
-    renderWithIntl(
-      <SidebarCollapseProvider isInitiallyCollapsed={false}>
-        <Probe />
-      </SidebarCollapseProvider>,
-    );
+  it.each([
+    {
+      isInitiallyCollapsed: false,
+      from: PROBE_EXPANDED_TEXT,
+      to: PROBE_COLLAPSED_TEXT,
+      isCollapsedAfter: true,
+    },
+    {
+      isInitiallyCollapsed: true,
+      from: PROBE_COLLAPSED_TEXT,
+      to: PROBE_EXPANDED_TEXT,
+      isCollapsedAfter: false,
+    },
+  ])(
+    'flips from $from to $to on toggle and persists it to the cookie',
+    async ({ isInitiallyCollapsed, from, to, isCollapsedAfter }) => {
+      const user = userEvent.setup();
+      renderProvider(isInitiallyCollapsed);
 
-    await user.click(screen.getByRole('button', { name: 'expanded' }));
+      const probe = screen.getByRole('button', { name: from });
+      await user.click(probe);
 
-    expect(screen.getByText('collapsed')).toBeVisible();
-    expect(document.cookie).toContain('admin-sidebar-collapsed=true');
-
-    await user.click(screen.getByRole('button', { name: 'collapsed' }));
-
-    expect(screen.getByText('expanded')).toBeVisible();
-    expect(document.cookie).toContain('admin-sidebar-collapsed=false');
-  });
+      const flippedProbe = screen.getByRole('button', { name: to });
+      expect(flippedProbe).toBeVisible();
+      expect(document.cookie).toBe(
+        `${SIDEBAR_COLLAPSED_COOKIE}=${isCollapsedAfter}`,
+      );
+    },
+  );
 });

@@ -7,6 +7,7 @@ import {
   useFetchFake,
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
 import {
+  MOCK_SANITY_ERROR_BODY,
   MOCK_SANITY_EXPECTED_URL,
   MOCK_SANITY_INVITE_EMAIL,
   MOCK_SANITY_INVITE_ID,
@@ -22,16 +23,14 @@ import {
   listSanityProjectInvites,
 } from './sanity-project-access';
 
-const createInviteInput = mockSanityProjectInput({
+const MOCK_CREATE_INVITE_INPUT = mockSanityProjectInput({
   email: MOCK_SANITY_INVITE_EMAIL,
   role: SANITY_PROJECT_ROLE.EDITOR,
 });
-const grantRoleInput = mockSanityProjectInput({
+const MOCK_GRANT_ROLE_INPUT = mockSanityProjectInput({
   projectUserId: MOCK_SANITY_PROJECT_USER_ID,
   role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
 });
-
-const MOCK_ERROR_BODY = 'nope';
 
 const fetchMock = useFetchFake();
 
@@ -61,14 +60,14 @@ describe(listSanityProjectInvites, () => {
 });
 
 describe(deleteSanityProjectInvite, () => {
-  const deleteInviteInput = mockSanityProjectInput({
+  const MOCK_DELETE_INVITE_INPUT = mockSanityProjectInput({
     inviteId: MOCK_SANITY_INVITE_ID,
   });
 
   it('DELETEs the invite by id', async () => {
     fetchMock.mockResolvedValue(emptyResponse(HTTP_STATUS.NO_CONTENT));
 
-    await deleteSanityProjectInvite(deleteInviteInput);
+    await deleteSanityProjectInvite(MOCK_DELETE_INVITE_INPUT);
 
     const { url, method } = firstFetchCall(fetchMock);
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.invite);
@@ -76,49 +75,51 @@ describe(deleteSanityProjectInvite, () => {
   });
 
   it('treats an invite that is already gone as revoked', async () => {
-    fetchMock.mockResolvedValue(textResponse('gone', HTTP_STATUS.NOT_FOUND));
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.NOT_FOUND),
+    );
 
     await expect(
-      deleteSanityProjectInvite(deleteInviteInput),
+      deleteSanityProjectInvite(MOCK_DELETE_INVITE_INPUT),
     ).resolves.toBeUndefined();
   });
 
   it('throws on any other failure', async () => {
     fetchMock.mockResolvedValue(
-      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
     );
 
-    await expect(deleteSanityProjectInvite(deleteInviteInput)).rejects.toThrow(
-      new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
-    );
+    await expect(
+      deleteSanityProjectInvite(MOCK_DELETE_INVITE_INPUT),
+    ).rejects.toThrow(new RegExp(`${HTTP_STATUS.FORBIDDEN}`));
   });
 });
 
 describe(createSanityProjectInvite, () => {
   it('POSTs the email + role to the project-scoped invites endpoint', async () => {
     fetchMock.mockResolvedValue(
-      jsonResponse({ id: 'invite1', status: 'pending' }),
+      jsonResponse({ id: MOCK_SANITY_INVITE_ID, status: 'pending' }),
     );
 
-    await createSanityProjectInvite(createInviteInput);
+    await createSanityProjectInvite(MOCK_CREATE_INVITE_INPUT);
 
     const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.invites);
     expect(method).toBe(HTTP_METHOD.POST);
     expect(body).toEqual({
-      email: createInviteInput.email,
-      role: createInviteInput.role,
+      email: MOCK_CREATE_INVITE_INPUT.email,
+      role: MOCK_CREATE_INVITE_INPUT.role,
     });
   });
 
   it('throws with the response status when the invite is refused', async () => {
     fetchMock.mockResolvedValue(
-      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.PAYMENT_REQUIRED),
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.PAYMENT_REQUIRED),
     );
 
-    await expect(createSanityProjectInvite(createInviteInput)).rejects.toThrow(
-      new RegExp(`${HTTP_STATUS.PAYMENT_REQUIRED}`),
-    );
+    await expect(
+      createSanityProjectInvite(MOCK_CREATE_INVITE_INPUT),
+    ).rejects.toThrow(new RegExp(`${HTTP_STATUS.PAYMENT_REQUIRED}`));
   });
 });
 
@@ -143,7 +144,7 @@ describe(listSanityProjectAcl, () => {
 
   it('throws with the response status when the acl read fails', async () => {
     fetchMock.mockResolvedValue(
-      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
     );
 
     await expect(
@@ -161,20 +162,20 @@ describe(grantSanityProjectRole, () => {
       ),
     );
 
-    await grantSanityProjectRole(grantRoleInput);
+    await grantSanityProjectRole(MOCK_GRANT_ROLE_INPUT);
 
     const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.aclEntry);
     expect(method).toBe(HTTP_METHOD.PUT);
-    expect(body).toEqual({ roleName: grantRoleInput.role });
+    expect(body).toEqual({ roleName: MOCK_GRANT_ROLE_INPUT.role });
   });
 
   it('throws with the response status when the grant fails', async () => {
     fetchMock.mockResolvedValue(
-      textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
     );
 
-    await expect(grantSanityProjectRole(grantRoleInput)).rejects.toThrow(
+    await expect(grantSanityProjectRole(MOCK_GRANT_ROLE_INPUT)).rejects.toThrow(
       new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
     );
   });

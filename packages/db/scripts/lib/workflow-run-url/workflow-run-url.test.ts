@@ -1,43 +1,37 @@
-import { workflowRunUrl } from './workflow-run-url';
+import { faker } from '@faker-js/faker';
+
+import { workflowRunUrl, type TWorkflowRunUrlInput } from './workflow-run-url';
+
+faker.seed(5802);
+
+const MOCK_SERVER_URL = faker.internet.url({ appendSlash: false });
+const MOCK_REPOSITORY = `${faker.internet.username()}/${faker.word.noun()}`;
+const MOCK_RUN_ID = faker.string.numeric(10);
+
+const MOCK_RUN_INPUT: TWorkflowRunUrlInput = {
+  serverUrl: MOCK_SERVER_URL,
+  repository: MOCK_REPOSITORY,
+  runId: MOCK_RUN_ID,
+};
 
 describe(workflowRunUrl, () => {
   it('builds the absolute run URL when every part is present', () => {
-    const result = workflowRunUrl({
-      serverUrl: 'https://github.com',
-      repository: 'acme/blog',
-      runId: '123456',
-    });
+    const result = workflowRunUrl(MOCK_RUN_INPUT);
 
-    expect(result).toBe('https://github.com/acme/blog/actions/runs/123456');
+    expect(result).toBe(
+      `${MOCK_SERVER_URL}/${MOCK_REPOSITORY}/actions/runs/${MOCK_RUN_ID}`,
+    );
   });
 
-  it('returns undefined when serverUrl is missing', () => {
-    const result = workflowRunUrl({
-      serverUrl: undefined,
-      repository: 'acme/blog',
-      runId: '123456',
-    });
+  it.each(['serverUrl', 'repository', 'runId'] as const)(
+    'returns undefined when %s is missing',
+    (missingPart) => {
+      const result = workflowRunUrl({
+        ...MOCK_RUN_INPUT,
+        [missingPart]: undefined,
+      });
 
-    expect(result).toBeUndefined();
-  });
-
-  it('returns undefined when repository is missing', () => {
-    const result = workflowRunUrl({
-      serverUrl: 'https://github.com',
-      repository: undefined,
-      runId: '123456',
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('returns undefined when runId is missing', () => {
-    const result = workflowRunUrl({
-      serverUrl: 'https://github.com',
-      repository: 'acme/blog',
-      runId: undefined,
-    });
-
-    expect(result).toBeUndefined();
-  });
+      expect(result).toBeUndefined();
+    },
+  );
 });

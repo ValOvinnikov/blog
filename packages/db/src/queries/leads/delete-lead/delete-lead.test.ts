@@ -1,12 +1,15 @@
 import * as schema from '@blog/db/schema';
 import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { deleteLead } from './delete-lead';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+
+faker.seed(6021);
 
 afterEach(async () => {
   await db().delete(schema.leads);
@@ -33,7 +36,7 @@ describe(deleteLead, () => {
   it('reports false when no lead has that id', async () => {
     const removed = await deleteLead({
       tenantId,
-      id: '00000000-0000-0000-0000-000000000000',
+      id: faker.string.uuid(),
     });
 
     expect(removed).toBe(false);

@@ -1,4 +1,4 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import {
   INVITED_PENDING_TEXT,
   MOCK_INVITED_OWNER_EMAIL,
@@ -10,12 +10,12 @@ import {
 
 import { OwnerCard } from './owner-card';
 
-const render = renderWithIntl;
+const setup = customRender(OwnerCard, { owner: mockJoinedOwner() });
 
 describe(`<${OwnerCard.name}/>`, () => {
   describe('with an owner who has signed in', () => {
     beforeEach(() => {
-      render(<OwnerCard owner={mockJoinedOwner()} />);
+      setup();
     });
 
     it("nests the card's title one level under the page's own h1", () => {
@@ -48,7 +48,7 @@ describe(`<${OwnerCard.name}/>`, () => {
 
   describe('with an owner who has not signed in yet', () => {
     beforeEach(() => {
-      render(<OwnerCard owner={mockInvitedOwner()} />);
+      setup({ owner: mockInvitedOwner() });
     });
 
     it('shows the invited email without a Joined row', () => {
@@ -61,7 +61,7 @@ describe(`<${OwnerCard.name}/>`, () => {
       expect(joinedLabel).not.toBeInTheDocument();
     });
 
-    it('shows when the owner was invited and that they have not signed in yet', () => {
+    it('shows the invite date and that the owner has not signed in', () => {
       const invitedLabel = screen.getByText('Invited');
       const invitedTime = screen.getByText('Aug 10, 2026');
       const notSignedIn = screen.getByText(/not signed in yet/);
@@ -77,7 +77,7 @@ describe(`<${OwnerCard.name}/>`, () => {
   });
 
   it('shows the invited-pending badge when the tenant has no owner', () => {
-    render(<OwnerCard owner={undefined} />);
+    setup({ owner: undefined });
 
     const pendingBadge = screen.getByText(INVITED_PENDING_TEXT);
     const joinedLabel = screen.queryByText('Joined');

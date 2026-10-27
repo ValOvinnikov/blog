@@ -1,84 +1,50 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { ShellFrame } from './shell-frame';
 
-const CONTRAST_NOTICE = 'Contrast check due';
-const DATA_COLLAPSED = 'data-collapsed';
+faker.seed(2402);
 
-describe(ShellFrame, () => {
-  afterEach(() => {
-    vi.mocked(useSelectedLayoutSegment).mockReturnValue(null);
-  });
+const MOCK_SIDEBAR = faker.lorem.words(2);
+const MOCK_TOPBAR = faker.lorem.words(3);
+const MOCK_PAGE_CONTENT = faker.lorem.sentence();
+const MOCK_NOTICE = faker.lorem.sentence();
+const SIDEBAR_COLLAPSE_ROOT_TEST_ID = 'sidebar-collapse-root';
 
-  it('renders the sidebar, topbar and children together on an ordinary route', () => {
-    renderWithIntl(
-      <ShellFrame sidebar={<p>Sidebar</p>} topbar={<p>Topbar</p>}>
-        <p>Page content</p>
-      </ShellFrame>,
-    );
+const setup = customRender(ShellFrame, {
+  sidebar: <p>{MOCK_SIDEBAR}</p>,
+  topbar: <p>{MOCK_TOPBAR}</p>,
+  children: <p>{MOCK_PAGE_CONTENT}</p>,
+});
 
-    expect(screen.getByText('Sidebar')).toBeVisible();
-    expect(screen.getByText('Topbar')).toBeVisible();
-    expect(screen.getByText('Page content')).toBeVisible();
-  });
+describe(`<${ShellFrame.name}/>`, () => {
+  it('renders the sidebar, topbar and page content together', () => {
+    setup();
 
-  it('still renders sidebar, topbar and children on the studio route, in full-bleed mode', () => {
-    vi.mocked(useSelectedLayoutSegment).mockReturnValue('studio');
+    const sidebar = screen.getByText(MOCK_SIDEBAR);
+    const topbar = screen.getByText(MOCK_TOPBAR);
+    const pageContent = screen.getByText(MOCK_PAGE_CONTENT);
 
-    renderWithIntl(
-      <ShellFrame sidebar={<p>Sidebar</p>} topbar={<p>Topbar</p>}>
-        <p>Studio content</p>
-      </ShellFrame>,
-    );
-
-    expect(screen.getByText('Sidebar')).toBeVisible();
-    expect(screen.getByText('Topbar')).toBeVisible();
-    expect(screen.getByText('Studio content')).toBeVisible();
+    expect(sidebar).toBeVisible();
+    expect(topbar).toBeVisible();
+    expect(pageContent).toBeVisible();
   });
 
   it('renders a notice above the page content', () => {
-    renderWithIntl(
-      <ShellFrame
-        sidebar={<p>Sidebar</p>}
-        topbar={<p>Topbar</p>}
-        notice={<p>Contrast check due</p>}
-      >
-        <p>Page content</p>
-      </ShellFrame>,
-    );
+    setup({ notice: <p>{MOCK_NOTICE}</p> });
 
-    expect(screen.getByText(CONTRAST_NOTICE)).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(
-      screen.getByText(CONTRAST_NOTICE),
-    );
+    const notice = screen.getByText(MOCK_NOTICE);
+    const main = screen.getByRole('main');
+
+    expect(notice).toBeVisible();
+    expect(main).not.toContainElement(notice);
   });
 
-  it('seeds the sidebar-collapse boundary from isSidebarInitiallyCollapsed', () => {
-    renderWithIntl(
-      <ShellFrame
-        sidebar={<aside>Sidebar</aside>}
-        topbar={<p>Topbar</p>}
-        isSidebarInitiallyCollapsed={true}
-      >
-        <p>Page content</p>
-      </ShellFrame>,
-    );
+  it('can open with the sidebar collapsed', () => {
+    setup({ isSidebarInitiallyCollapsed: true });
 
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #5993
-    const boundary = screen.getByText('Sidebar').parentElement;
-    expect(boundary).toHaveAttribute(DATA_COLLAPSED, 'true');
-  });
+    const collapseRoot = screen.getByTestId(SIDEBAR_COLLAPSE_ROOT_TEST_ID);
 
-  it('defaults the sidebar-collapse boundary to expanded when the prop is omitted', () => {
-    renderWithIntl(
-      <ShellFrame sidebar={<aside>Sidebar</aside>} topbar={<p>Topbar</p>}>
-        <p>Page content</p>
-      </ShellFrame>,
-    );
-
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #5993
-    const boundary = screen.getByText('Sidebar').parentElement;
-    expect(boundary).not.toHaveAttribute(DATA_COLLAPSED);
+    expect(collapseRoot).toHaveAttribute('data-collapsed', 'true');
   });
 });

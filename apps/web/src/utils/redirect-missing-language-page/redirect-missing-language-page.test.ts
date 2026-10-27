@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR, routes } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -25,12 +25,12 @@ describe(redirectMissingLanguagePage, () => {
     inLanguage(NL);
   });
 
-  it('redirects to / when a non-default language has no page of its own', async () => {
+  it('redirects home when a non-default language has no page of its own', async () => {
     await expect(redirectMissingLanguagePage(okResult())).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(redirect).toHaveBeenCalledWith('/');
+    expect(redirect).toHaveBeenCalledWith(routes.home());
   });
 
   it.each([

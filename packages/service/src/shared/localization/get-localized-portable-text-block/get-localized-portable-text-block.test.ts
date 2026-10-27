@@ -1,4 +1,5 @@
 import type {
+  TMaybeNull,
   InternationalizedArrayListedText,
   Module_cta,
 } from '@blog/config';
@@ -35,39 +36,35 @@ const resolve = createLocalizedFieldResolver(query.query, (content) => ({
   content,
 }));
 
-const english = mockLocalizedEntry(EN, mockParagraphBlocks(MOCK_ENGLISH_TEXT));
-const dutch = mockLocalizedEntry(NL, mockParagraphBlocks(MOCK_DUTCH_TEXT));
+const MOCK_ENGLISH_BLOCKS = mockParagraphBlocks(MOCK_ENGLISH_TEXT);
+const MOCK_DUTCH_BLOCKS = mockParagraphBlocks(MOCK_DUTCH_TEXT);
+const MOCK_ENGLISH_ENTRY = mockLocalizedEntry(EN, MOCK_ENGLISH_BLOCKS);
+const MOCK_DUTCH_ENTRY = mockLocalizedEntry(NL, MOCK_DUTCH_BLOCKS);
 
 describe(getLocalizedPortableTextBlock, () => {
   it('resolves the blocks in the requested language', async () => {
-    const result = await resolve([english, dutch], NL);
+    const result = await resolve([MOCK_ENGLISH_ENTRY, MOCK_DUTCH_ENTRY], NL);
 
-    expect(result).toMatchObject({
-      content: [{ children: [{ text: MOCK_DUTCH_TEXT }] }],
-    });
+    expect(result).toEqual({ content: MOCK_DUTCH_BLOCKS });
   });
 
   it('falls back to the default language when the requested one is missing', async () => {
-    const result = await resolve([english, dutch], FR);
+    const result = await resolve([MOCK_ENGLISH_ENTRY, MOCK_DUTCH_ENTRY], FR);
 
-    expect(result).toMatchObject({
-      content: [{ children: [{ text: MOCK_ENGLISH_TEXT }] }],
-    });
+    expect(result).toEqual({ content: MOCK_ENGLISH_BLOCKS });
   });
 
   it('resolves to nothing when neither language has blocks', async () => {
-    const result = await resolve([dutch], FR);
+    const result = await resolve([MOCK_DUTCH_ENTRY], FR);
 
     expect(result).toEqual({ content: null });
   });
-});
 
-describe('getLocalizedPortableTextBlock types', () => {
   it('infers the generic projected text blocks', () => {
     type TResult = NonNullable<ReturnType<typeof query.parse>>;
 
     expectTypeOf<TResult['content']>().toEqualTypeOf<
-      InferFragmentType<typeof textBlockFragment>[] | null
+      TMaybeNull<InferFragmentType<typeof textBlockFragment>[]>
     >();
   });
 

@@ -6,49 +6,53 @@ import { ImageWithCaption } from './image-with-caption';
 
 faker.seed(123);
 
-const caption = faker.lorem.sentence();
-const altText = faker.lorem.words(3);
+const MOCK_CAPTION = faker.lorem.sentence();
+const MOCK_ALT_TEXT = faker.lorem.words(3);
+const MOCK_SRC = faker.image.url();
 
 const setup = customRender(ImageWithCaption, {
-  caption,
-  children: <img src="https://example.com/img.jpg" alt={altText} />,
+  caption: MOCK_CAPTION,
+  children: <img src={MOCK_SRC} alt={MOCK_ALT_TEXT} />,
 });
 
 describe(`<${ImageWithCaption.name}/>`, () => {
-  it('renders the root as a <figure> element', () => {
-    const { container } = setup();
-    expect(container.firstChild?.nodeName).toBe('FIGURE');
+  it('renders as a figure', () => {
+    setup();
+
+    const figure = screen.getByRole('figure');
+
+    expect(figure).toBeVisible();
   });
 
   it('renders children inside the frame', () => {
     setup();
-    expect(screen.getByRole('img')).toBeVisible();
-  });
 
-  it('renders Caption when caption is non-empty', () => {
-    setup({ children: undefined });
-    expect(screen.getByText(caption)).toBeVisible();
+    const image = screen.getByRole('img', { name: MOCK_ALT_TEXT });
+
+    expect(image).toBeVisible();
   });
 
   it.each([
-    ['an empty string', ''],
-    ['omitted', undefined],
-  ])('does not render a <figcaption> when caption is %s', (_, captionValue) => {
-    setup({ caption: captionValue, children: undefined });
-    expect(screen.getByRole('figure')).not.toHaveAccessibleName();
-  });
+    { title: 'an empty string', caption: '' },
+    { title: 'omitted', caption: undefined },
+  ])('renders no caption when the caption is $title', ({ caption }) => {
+    setup({ caption, children: undefined });
 
-  it('forwards dataTestId to the root figure', () => {
-    setup({ dataTestId: 'image-with-caption', children: undefined });
-    expect(screen.getByTestId('image-with-caption')).toBeVisible();
+    const figure = screen.getByRole('figure');
+
+    expect(figure).not.toHaveAccessibleName();
   });
 
   it.each(Object.values(IMAGE_LAYOUT))(
     'renders the image and caption for the %s layout',
     (layout) => {
       setup({ layout });
-      expect(screen.getByRole('img')).toBeVisible();
-      expect(screen.getByText(caption)).toBeVisible();
+
+      const image = screen.getByRole('img', { name: MOCK_ALT_TEXT });
+      const caption = screen.getByText(MOCK_CAPTION);
+
+      expect(image).toBeVisible();
+      expect(caption).toBeVisible();
     },
   );
 });

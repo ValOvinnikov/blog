@@ -5,6 +5,7 @@ import {
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_IDLE_DEPROVISIONING_STEPS,
@@ -19,18 +20,13 @@ import { updateDeprovisioningStep } from './update-deprovisioning-step';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock(new Date(MOCK_RUN_AT));
 
 const { REMOVE_DOMAIN, ARCHIVE_SANITY_PROJECT } = DEPROVISIONING_STEP;
 const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 
-beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(new Date(MOCK_RUN_AT));
-});
-
 afterEach(async () => {
   await db().delete(schema.tenants);
-  vi.useRealTimers();
 });
 
 describe(updateDeprovisioningStep, () => {

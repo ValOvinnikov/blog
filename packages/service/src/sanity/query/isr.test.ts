@@ -1,3 +1,4 @@
+import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
@@ -6,11 +7,19 @@ import { MOCK_TENANT_PROJECT_ID } from '@blog/service/testing/tenant';
 
 import { isr } from './isr';
 
+const POSTS_TAG = 'posts';
+const AUTHOR_TAG = 'author';
+const LIVE_CONTENT_ON = '1';
+
 const mockEnv = vi.hoisted(() => ({
   SANITY_LIVE_CONTENT: undefined as '1' | undefined,
 }));
 
 vi.mock('@blog/service/utils/env/env', () => ({ env: mockEnv }));
+
+function taggedCache(tags: string[]) {
+  return { next: { revalidate: SANITY_CONTENT_REVALIDATE_SECONDS, tags } };
+}
 
 describe(isr, () => {
   afterEach(() => {
@@ -20,45 +29,44 @@ describe(isr, () => {
 
   it('rejects a call site that omits the project id at compile time', () => {
     // @ts-expect-error -- `scopeProjectId` is required; there is no unscoped form that silently shares a cache tag across tenants.
-    isr(['posts', 'author']);
+    isr([POSTS_TAG, AUTHOR_TAG]);
   });
 
-  it('prefixes every tag with t:<projectId>:', () => {
-    expect(isr(['posts', 'author'], MOCK_TENANT_PROJECT_ID)).toEqual({
-      next: {
-        revalidate: 3600,
-        tags: [MOCK_POSTS_CACHE_TAG, MOCK_AUTHOR_CACHE_TAG],
-      },
-    });
+  it('scopes every tag to the project', () => {
+    const options = isr([POSTS_TAG, AUTHOR_TAG], MOCK_TENANT_PROJECT_ID);
+
+    expect(options).toEqual(
+      taggedCache([MOCK_POSTS_CACHE_TAG, MOCK_AUTHOR_CACHE_TAG]),
+    );
   });
 
   it('accepts a single tag string the same as an array of one', () => {
-    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({
-      next: { revalidate: 3600, tags: [MOCK_POSTS_CACHE_TAG] },
-    });
+    const options = isr(POSTS_TAG, MOCK_TENANT_PROJECT_ID);
+
+    expect(options).toEqual(taggedCache([MOCK_POSTS_CACHE_TAG]));
   });
 
-  it('bypasses the fetch cache in development when SANITY_LIVE_CONTENT is set', () => {
+  it('bypasses the fetch cache in development with live content on', () => {
     vi.stubEnv('NODE_ENV', 'development');
-    mockEnv.SANITY_LIVE_CONTENT = '1';
+    mockEnv.SANITY_LIVE_CONTENT = LIVE_CONTENT_ON;
 
-    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({ cache: 'no-store' });
+    const options = isr(POSTS_TAG, MOCK_TENANT_PROJECT_ID);
+
+    expect(options).toEqual({ cache: 'no-store' });
   });
 
-  it('keeps the tagged cache in development without the flag', () => {
-    vi.stubEnv('NODE_ENV', 'development');
+  it.each([
+    { nodeEnv: 'development', liveContent: undefined },
+    { nodeEnv: 'production', liveContent: LIVE_CONTENT_ON },
+  ] as const)(
+    'keeps the tagged cache in $nodeEnv with live content $liveContent',
+    ({ nodeEnv, liveContent }) => {
+      vi.stubEnv('NODE_ENV', nodeEnv);
+      mockEnv.SANITY_LIVE_CONTENT = liveContent;
 
-    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({
-      next: { revalidate: 3600, tags: [MOCK_POSTS_CACHE_TAG] },
-    });
-  });
+      const options = isr(POSTS_TAG, MOCK_TENANT_PROJECT_ID);
 
-  it('ignores the flag in production', () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    mockEnv.SANITY_LIVE_CONTENT = '1';
-
-    expect(isr('posts', MOCK_TENANT_PROJECT_ID)).toEqual({
-      next: { revalidate: 3600, tags: [MOCK_POSTS_CACHE_TAG] },
-    });
-  });
+      expect(options).toEqual(taggedCache([MOCK_POSTS_CACHE_TAG]));
+    },
+  );
 });

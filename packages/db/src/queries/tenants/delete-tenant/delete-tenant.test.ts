@@ -1,8 +1,8 @@
 import {
-  TENANT_DELETE_OUTCOME,
-  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
   HTTP_METHOD,
   HTTP_STATUS,
+  TENANT_DELETE_OUTCOME,
+  TENANT_DELETE_SANITY_PROJECT_OUTCOME,
 } from '@blog/config';
 import {
   DENSITY,
@@ -12,8 +12,13 @@ import {
 } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import {
+  insertTestSubscriber,
+  insertTestTenant,
+  insertTestUser,
+  MOCK_SUBSCRIBER_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   emptyResponse,
@@ -24,39 +29,45 @@ import {
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_EXPECTED_URL,
+  MOCK_SANITY_ORGANIZATION_ID,
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_TOKEN,
 } from '@blog/db/testing/sanity-management-client/fixtures';
 import {
+  MOCK_DEPROVISIONED_AT,
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_DOMAIN,
 } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { deleteTenant } from './delete-tenant';
 
 vi.mock('@blog/db/client');
 
+faker.seed(6020);
+
 const db = useQueryTestDb();
 
-const MOCK_USER_ID = 'user-1';
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
+const MOCK_ERROR_BODY = faker.lorem.sentence();
+const MOCK_BILLING_DENIED_BODY = {
+  code: HTTP_STATUS.UNAUTHORIZED,
+  status: faker.lorem.word(),
+  message: `Cancellation of project "${MOCK_SANITY_PROJECT_ID}" requires billing permission on organization "${MOCK_SANITY_ORGANIZATION_ID}"`,
+};
 
-async function insertTenant(
-  options: {
-    archived?: boolean;
-    sanityProjectId?: string;
-  } = {},
-): Promise<string> {
-  const { archived = true, sanityProjectId } = options;
-
-  const tenant = await insertTestTenant(db(), {
-    name: 'Acme',
-    status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
-    deprovisionedAt: archived ? new Date() : undefined,
-    sanityProjectId,
+async function insertArchivedTenant(
+  overrides: Parameters<typeof insertTestTenant>[1] = {},
+): Promise<TTenant> {
+  return insertTestTenant(db(), {
+    status: TENANT_STATUS.ARCHIVED,
+    deprovisionedAt: MOCK_DEPROVISIONED_AT,
+    sanityProjectId: null,
+    ...overrides,
   });
-
-  return tenant.id;
 }
 
 function selectTenantRows(tenantId: string) {
@@ -78,23 +89,23 @@ describe(deleteTenant, () => {
     let tenantId: string;
 
     beforeEach(async () => {
-      tenantId = await insertTenant({ archived: true });
+      ({ id: tenantId } = await insertArchivedTenant());
     });
 
     it('deletes an archived tenant row', async () => {
       const result = await deleteTenant(tenantId);
 
+      const tenantRows = await selectTenantRows(tenantId);
       expect(result).toEqual({
         outcome: TENANT_DELETE_OUTCOME.DELETED,
         sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
       });
-
-      expect(await selectTenantRows(tenantId)).toEqual([]);
+      expect(tenantRows).toEqual([]);
     });
 
     describe('with a user', () => {
       beforeEach(async () => {
-        await db().insert(schema.users).values({ id: MOCK_USER_ID });
+        await insertTestUser(db(), { id: MOCK_USER_ID });
       });
 
       it('cascades to the tenant membership and tenant_domains rows', async () => {
@@ -114,24 +125,20 @@ describe(deleteTenant, () => {
           .select()
           .from(schema.memberships)
           .where(eq(schema.memberships.tenantId, tenantId));
-        expect(remainingMemberships).toEqual([]);
-
         const remainingDomains = await db()
           .select()
           .from(schema.tenantDomains)
           .where(eq(schema.tenantDomains.tenantId, tenantId));
+        expect(remainingMemberships).toEqual([]);
         expect(remainingDomains).toEqual([]);
       });
 
       it('cascades to dependent subscriber and bookmark rows for that tenant', async () => {
-        await db().insert(schema.subscribers).values({
-          tenantId,
-          email: 'reader@example.com',
-        });
+        await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
         await db().insert(schema.bookmarks).values({
           tenantId,
           userId: MOCK_USER_ID,
-          postId: 'post-1',
+          postId: MOCK_POST_ID,
         });
 
         await deleteTenant(tenantId);
@@ -140,12 +147,11 @@ describe(deleteTenant, () => {
           .select()
           .from(schema.subscribers)
           .where(eq(schema.subscribers.tenantId, tenantId));
-        expect(remainingSubscribers).toEqual([]);
-
         const remainingBookmarks = await db()
           .select()
           .from(schema.bookmarks)
           .where(eq(schema.bookmarks.tenantId, tenantId));
+        expect(remainingSubscribers).toEqual([]);
         expect(remainingBookmarks).toEqual([]);
       });
     });
@@ -154,7 +160,7 @@ describe(deleteTenant, () => {
       await db().insert(schema.siteConfig).values({
         tenantId,
         preset: PRESET_ID.CONSOLE,
-        accentHue: 250,
+        accentHue: MOCK_ACCENT_HUE,
         headingFont: FONT_CHOICE.SPACE_GROTESK,
         bodyFont: FONT_CHOICE.NEWSREADER,
         radiusScale: RADIUS_SCALE.MD,
@@ -172,13 +178,13 @@ describe(deleteTenant, () => {
   });
 
   it('refuses to delete a tenant that is not archived, and the row survives', async () => {
-    const tenantId = await insertTenant({ archived: false });
+    const tenant = await insertTestTenant(db());
 
-    const result = await deleteTenant(tenantId);
+    const result = await deleteTenant(tenant.id);
 
+    const tenantRows = await selectTenantRows(tenant.id);
     expect(result).toEqual({ outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED });
-
-    expect(await selectTenantRows(tenantId)).toHaveLength(1);
+    expect(tenantRows).toEqual([tenant]);
   });
 
   it('returns not-found for a tenant id that does not exist', async () => {
@@ -191,17 +197,16 @@ describe(deleteTenant, () => {
     const fetchMock = useFetchFake();
 
     describe('a tenant with a Sanity project', () => {
-      let tenantId: string;
+      let tenant: TTenant;
 
       beforeEach(async () => {
-        tenantId = await insertTenant({
-          archived: true,
+        tenant = await insertArchivedTenant({
           sanityProjectId: MOCK_SANITY_PROJECT_ID,
         });
       });
 
       it('does not attempt Sanity deletion when no token is supplied', async () => {
-        const result = await deleteTenant(tenantId);
+        const result = await deleteTenant(tenant.id);
 
         expect(fetchMock).not.toHaveBeenCalled();
         expect(result).toEqual({
@@ -213,10 +218,10 @@ describe(deleteTenant, () => {
       it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
         fetchMock.mockResolvedValue(emptyResponse());
 
-        const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+        const result = await deleteTenant(tenant.id, MOCK_SANITY_TOKEN);
 
-        expect(fetchMock).toHaveBeenCalledTimes(1);
         const { url, method } = firstFetchCall(fetchMock);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(url).toBe(MOCK_SANITY_EXPECTED_URL.project);
         expect(method).toBe(HTTP_METHOD.DELETE);
         expect(result).toEqual({
@@ -227,58 +232,52 @@ describe(deleteTenant, () => {
 
       it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
         fetchMock.mockResolvedValue(
-          textResponse('not found', HTTP_STATUS.NOT_FOUND),
+          textResponse(MOCK_ERROR_BODY, HTTP_STATUS.NOT_FOUND),
         );
 
-        const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+        const result = await deleteTenant(tenant.id, MOCK_SANITY_TOKEN);
 
+        const tenantRows = await selectTenantRows(tenant.id);
         expect(result).toEqual({
           outcome: TENANT_DELETE_OUTCOME.DELETED,
           sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.ALREADY_GONE,
         });
-
-        expect(await selectTenantRows(tenantId)).toEqual([]);
+        expect(tenantRows).toEqual([]);
       });
 
       it('hard-deletes the row and reports left-archived on the org-billing 401', async () => {
         fetchMock.mockResolvedValue(
-          jsonResponse(
-            {
-              code: HTTP_STATUS.UNAUTHORIZED,
-              status: 'Unauthorized',
-              message: `Cancellation of project "${MOCK_SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
-            },
-            HTTP_STATUS.UNAUTHORIZED,
-          ),
+          jsonResponse(MOCK_BILLING_DENIED_BODY, HTTP_STATUS.UNAUTHORIZED),
         );
 
-        const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+        const result = await deleteTenant(tenant.id, MOCK_SANITY_TOKEN);
 
+        const tenantRows = await selectTenantRows(tenant.id);
         expect(result).toEqual({
           outcome: TENANT_DELETE_OUTCOME.DELETED,
           sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.LEFT_ARCHIVED,
         });
-
-        expect(await selectTenantRows(tenantId)).toEqual([]);
+        expect(tenantRows).toEqual([]);
       });
 
       it('throws on a non-billing Sanity failure and leaves the row untouched', async () => {
         fetchMock.mockResolvedValue(
-          textResponse('forbidden', HTTP_STATUS.FORBIDDEN),
+          textResponse(MOCK_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
         );
 
-        await expect(deleteTenant(tenantId, MOCK_SANITY_TOKEN)).rejects.toThrow(
-          new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
-        );
+        await expect(
+          deleteTenant(tenant.id, MOCK_SANITY_TOKEN),
+        ).rejects.toThrow(new RegExp(`${HTTP_STATUS.FORBIDDEN}`));
 
-        expect(await selectTenantRows(tenantId)).toHaveLength(1);
+        const tenantRows = await selectTenantRows(tenant.id);
+        expect(tenantRows).toEqual([tenant]);
       });
     });
 
     it('reports no-project when the tenant never had one, even with a token', async () => {
-      const tenantId = await insertTenant({ archived: true });
+      const { id } = await insertArchivedTenant();
 
-      const result = await deleteTenant(tenantId, MOCK_SANITY_TOKEN);
+      const result = await deleteTenant(id, MOCK_SANITY_TOKEN);
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(result).toEqual({

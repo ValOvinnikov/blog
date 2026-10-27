@@ -1,57 +1,43 @@
-import type * as schema from '@blog/db/schema';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
+import {
+  createEmptyTestDb,
+  createTestDb,
+} from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
-  listMigrationFiles,
-  MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  applyMigrationsBefore,
+  insertReplaySubscriber,
   insertReplayTenant,
+  MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { sha256Hex } from '@blog/utils/hash';
 import { faker } from '@faker-js/faker';
-import { sql } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
+
+faker.seed(6023);
+
+const HASH_MIGRATION = '0050_hash_subscriber_tokens.sql';
+const SEEDED_SUBSCRIBER_COUNT = 2;
 
 function byId(a: { id: string }, b: { id: string }): number {
   return a.id < b.id ? -1 : 1;
 }
 
-const HASH_MIGRATION = '0050_hash_subscriber_tokens.sql';
-
-describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () => {
-  let db: PgliteDatabase<typeof schema>;
-
-  beforeEach(async () => {
-    db = await createEmptyTestDb();
-  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
-
+describe(`${HASH_MIGRATION} (subscriber tokens hashed in place)`, () => {
   it(
     'replaces every stored token with its SHA-256 hash',
     async () => {
-      for (const file of listMigrationFiles()) {
-        if (file >= HASH_MIGRATION) break;
-        await applyMigrationFile(db, file);
-      }
-
+      const db = await createEmptyTestDb();
+      await applyMigrationsBefore(db, HASH_MIGRATION);
       const tenant = await insertReplayTenant(db);
-
-      const seeds = Array.from({ length: 2 }, () => ({
-        id: faker.string.uuid(),
-        email: faker.internet.email(),
-        confirmationToken: faker.string.uuid(),
-        unsubscribeToken: faker.string.uuid(),
-      }));
-      const values = seeds
-        .map(
-          ({ id, email, confirmationToken, unsubscribeToken }) =>
-            `('${id}', '${tenant.id}', '${email}', '${confirmationToken}', '${unsubscribeToken}')`,
-        )
-        .join(', ');
-      await db.execute(
-        sql.raw(
-          `insert into "subscribers" ("id", "tenant_id", "email", "confirmation_token", "unsubscribe_token") values ${values}`,
-        ),
-      );
+      const seeds = [];
+      for (let count = 0; count < SEEDED_SUBSCRIBER_COUNT; count += 1) {
+        const unsubscribeToken = faker.string.uuid();
+        const subscriber = await insertReplaySubscriber(db, {
+          tenantId: tenant.id,
+          unsubscribeToken,
+        });
+        seeds.push({ ...subscriber, unsubscribeToken });
+      }
 
       await applyMigrationFile(db, HASH_MIGRATION);
 
@@ -62,7 +48,6 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
           unsubscribeTokenHash: subscribers.unsubscribeTokenHash,
         })
         .from(subscribers);
-
       expect(rows.sort(byId)).toEqual(
         seeds
           .map(({ id, confirmationToken, unsubscribeToken }) => ({
@@ -76,31 +61,21 @@ describe('0050_hash_subscriber_tokens (subscriber tokens hashed in place)', () =
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
 
-  it(
-    'keeps both hash columns unique once fully migrated',
-    async () => {
-      for (const file of listMigrationFiles()) {
-        await applyMigrationFile(db, file);
-      }
+  it('keeps the unsubscribe hash unique once fully migrated', async () => {
+    const db = await createTestDb();
+    const tenant = await insertReplayTenant(db);
+    const [first] = await db
+      .insert(subscribers)
+      .values({ tenantId: tenant.id, email: faker.internet.email() })
+      .returning();
+    if (!first) throw new Error('failed to seed a subscriber row');
 
-      const tenant = await insertReplayTenant(db);
-      const [first] = await db
-        .insert(subscribers)
-        .values({
-          tenantId: tenant.id,
-          email: `${faker.string.uuid()}@example.com`,
-        })
-        .returning();
-      if (!first) throw new Error('failed to seed a subscriber row');
-
-      await expect(
-        db.insert(subscribers).values({
-          tenantId: tenant.id,
-          email: `${faker.string.uuid()}@example.com`,
-          unsubscribeTokenHash: first.unsubscribeTokenHash,
-        }),
-      ).rejects.toThrow();
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
+    await expect(
+      db.insert(subscribers).values({
+        tenantId: tenant.id,
+        email: faker.internet.email(),
+        unsubscribeTokenHash: first.unsubscribeTokenHash,
+      }),
+    ).rejects.toThrow();
+  });
 });

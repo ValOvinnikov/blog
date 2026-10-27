@@ -1,99 +1,126 @@
+import { mockDocument } from '@blog/studio/testing/mock-documents';
+import {
+  MOCK_SYSTEM_FIELDS,
+  mockMigrationContext,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { at, del, patch, unset, type MigrationContext } from 'sanity/migrate';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+faker.seed(1300);
 
-const createContext = (result: {
-  target: { content?: unknown } | null;
-  refCount: number;
-}): MigrationContext => {
-  const fetch = async () => result;
-
-  return { client: { fetch } } as unknown as MigrationContext;
-};
-
-const deletableContext = createContext({
+const BLOG_POST_TYPE = 'blog_post';
+const PAGE_POST_TYPE = 'page_post';
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_PAGE_POST_ID = `page_post-${MOCK_POST_ID}`;
+const MOCK_DELETABLE_RESULT = {
   target: { content: [{ _type: 'block' }] },
   refCount: 0,
-});
+};
 
-describe('retire-blog-post migration — blog_post documents', () => {
-  let doc: typeof baseDoc & { _id: string; _type: string };
+const mockContext = (result: {
+  target: { content?: unknown } | null;
+  refCount: number;
+}): MigrationContext =>
+  mockMigrationContext({ fetch: vi.fn().mockResolvedValue(result) });
+
+describe('retire-blog-post migration', () => {
+  let context: MigrationContext;
 
   beforeEach(() => {
-    doc = { ...baseDoc, _id: 'post-1', _type: 'blog_post' };
+    context = mockContext(MOCK_DELETABLE_RESULT);
   });
 
-  it('deletes a blog_post once its page_post counterpart is verified deletable', async () => {
-    const mutations = await migration.migrate.document(doc, deletableContext);
+  describe('blog_post documents', () => {
+    it('deletes a blog_post once its page_post counterpart is deletable', async () => {
+      const doc = mockDocument({
+        _id: MOCK_POST_ID,
+        _type: BLOG_POST_TYPE,
+        ...MOCK_SYSTEM_FIELDS,
+      });
 
-    expect(mutations).toEqual([del('post-1')]);
+      const mutations = await migration.migrate.document(doc, context);
+
+      expect(mutations).toEqual([del(MOCK_POST_ID)]);
+    });
+
+    it('checks the draft page_post counterpart for a draft blog_post', async () => {
+      const draftId = `drafts.${MOCK_POST_ID}`;
+      const fetch = vi.fn().mockResolvedValue(MOCK_DELETABLE_RESULT);
+      const draftDoc = mockDocument({
+        _id: draftId,
+        _type: BLOG_POST_TYPE,
+        ...MOCK_SYSTEM_FIELDS,
+      });
+
+      const mutations = await migration.migrate.document(
+        draftDoc,
+        mockMigrationContext({ fetch }),
+      );
+      const [, params] = fetch.mock.calls[0] ?? [];
+
+      expect(mutations).toEqual([del(draftId)]);
+      expect(params).toEqual({
+        pagePostId: `drafts.${MOCK_PAGE_POST_ID}`,
+        id: draftId,
+      });
+    });
+
+    it('rejects when the page_post counterpart does not exist', async () => {
+      const doc = mockDocument({
+        _id: MOCK_POST_ID,
+        _type: BLOG_POST_TYPE,
+        ...MOCK_SYSTEM_FIELDS,
+      });
+      const missingContext = mockContext({ target: null, refCount: 0 });
+
+      await expect(
+        migration.migrate.document(doc, missingContext),
+      ).rejects.toThrow(
+        `Cannot delete ${BLOG_POST_TYPE} "${MOCK_POST_ID}": its ${PAGE_POST_TYPE} counterpart "${MOCK_PAGE_POST_ID}" does not exist.`,
+      );
+    });
   });
 
-  it('deletes a draft blog_post, checking its counterpart drafts.page_post id', async () => {
-    const draftDoc = { ...baseDoc, _id: 'drafts.post-1', _type: 'blog_post' };
-    const fetchCalls: unknown[] = [];
-    const context = {
-      client: {
-        fetch: async (_query: string, params: unknown) => {
-          fetchCalls.push(params);
-          return { target: { content: [{ _type: 'block' }] }, refCount: 0 };
-        },
-      },
-    } as unknown as MigrationContext;
+  describe('other documents', () => {
+    it('unsets a leftover post field on a page_post', async () => {
+      const doc = mockDocument({
+        _id: MOCK_PAGE_POST_ID,
+        _type: PAGE_POST_TYPE,
+        ...MOCK_SYSTEM_FIELDS,
+        post: { _type: 'reference', _ref: MOCK_PAGE_POST_ID },
+      });
 
-    const mutations = await migration.migrate.document(draftDoc, context);
+      const mutations = await migration.migrate.document(doc, context);
 
-    expect(mutations).toEqual([del('drafts.post-1')]);
-    expect(fetchCalls).toEqual([
-      { pagePostId: 'drafts.page_post-post-1', id: 'drafts.post-1' },
-    ]);
-  });
+      expect(mutations).toEqual([
+        patch(MOCK_PAGE_POST_ID, [at('post', unset())]),
+      ]);
+    });
 
-  it('rejects (aborting the run) when the precondition fails', async () => {
-    const doc = { ...baseDoc, _id: 'post-1', _type: 'blog_post' };
-    const context = createContext({ target: null, refCount: 0 });
+    it('leaves a page_post with no post field alone', async () => {
+      const doc = mockDocument({
+        _id: MOCK_PAGE_POST_ID,
+        _type: PAGE_POST_TYPE,
+        ...MOCK_SYSTEM_FIELDS,
+      });
 
-    await expect(migration.migrate.document(doc, context)).rejects.toThrow(
-      /does not exist/,
-    );
-  });
-});
+      const mutations = await migration.migrate.document(doc, context);
 
-describe('retire-blog-post migration — page_post.post cleanup', () => {
-  it('unsets a leftover post field', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      post: { _type: 'reference', _ref: 'page_post-post-1' },
-    };
+      expect(mutations).toEqual([]);
+    });
 
-    const mutations = await migration.migrate.document(doc, deletableContext);
+    it('leaves unrelated document types alone', async () => {
+      const doc = mockDocument({
+        _id: faker.string.uuid(),
+        _type: 'blog_author',
+        ...MOCK_SYSTEM_FIELDS,
+      });
 
-    expect(mutations).toEqual([
-      patch('page_post-post-1', [at('post', unset())]),
-    ]);
-  });
+      const mutations = await migration.migrate.document(doc, context);
 
-  it('is a no-op for a page_post with no post field (idempotent on re-run)', async () => {
-    const doc = { ...baseDoc, _id: 'page_post-post-1', _type: 'page_post' };
-
-    const mutations = await migration.migrate.document(doc, deletableContext);
-
-    expect(mutations).toEqual([]);
-  });
-
-  it('leaves unrelated document types untouched', async () => {
-    const doc = { ...baseDoc, _id: 'author-1', _type: 'blog_author' };
-
-    const mutations = await migration.migrate.document(doc, deletableContext);
-
-    expect(mutations).toEqual([]);
+      expect(mutations).toEqual([]);
+    });
   });
 });

@@ -1,20 +1,29 @@
-import { resolveClientKey, UNKNOWN_CLIENT_KEY } from './client-key';
+import { faker } from '@faker-js/faker';
 
-const REAL_IP = '203.0.113.9';
+import {
+  FORWARDED_FOR_HEADER,
+  resolveClientKey,
+  UNKNOWN_CLIENT_KEY,
+} from './client-key';
+
+faker.seed(6029);
+
+const MOCK_CLIENT_IP = faker.internet.ipv4();
+const MOCK_PROXY_IP = faker.internet.ipv4();
 
 describe(resolveClientKey, () => {
   it('uses the first address in x-forwarded-for', () => {
-    expect(
-      resolveClientKey(
-        new Headers({ 'x-forwarded-for': ' 203.0.113.5 , 10.0.0.1' }),
-      ),
-    ).toBe('203.0.113.5');
+    const headers = new Headers({
+      [FORWARDED_FOR_HEADER]: ` ${MOCK_CLIENT_IP} , ${MOCK_PROXY_IP}`,
+    });
+
+    expect(resolveClientKey(headers)).toBe(MOCK_CLIENT_IP);
   });
 
   it('falls back to x-real-ip', () => {
-    expect(resolveClientKey(new Headers({ 'x-real-ip': REAL_IP }))).toBe(
-      REAL_IP,
-    );
+    const headers = new Headers({ 'x-real-ip': MOCK_CLIENT_IP });
+
+    expect(resolveClientKey(headers)).toBe(MOCK_CLIENT_IP);
   });
 
   it('answers "unknown" when neither header is present', () => {

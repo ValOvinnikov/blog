@@ -1,8 +1,10 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { TENANT_PLAN } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { getTenantLiveLocales } from './get-tenant-live-locales';
@@ -13,26 +15,6 @@ const db = useQueryTestDb();
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-async function insertGrowthTenantWith(
-  additionalLocales: TLocaleIsoCode[],
-): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: EN,
-      additionalLocales,
-      plan: TENANT_PLAN.GROWTH,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
-
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
@@ -42,11 +24,17 @@ describe(getTenantLiveLocales, () => {
     let tenantId: string;
 
     beforeEach(async () => {
-      tenantId = await insertGrowthTenantWith([NL, FR]);
+      ({ id: tenantId } = await insertTestTenant(db(), {
+        locale: EN,
+        additionalLocales: [NL, FR],
+        plan: TENANT_PLAN.GROWTH,
+      }));
     });
 
     it('returns the default locale first, then the additional ones', async () => {
-      expect(await getTenantLiveLocales(tenantId)).toEqual([EN, NL, FR]);
+      const result = await getTenantLiveLocales(tenantId);
+
+      expect(result).toEqual([EN, NL, FR]);
     });
 
     it('serves only what the plan allows after a downgrade, keeping the stored locales', async () => {
@@ -56,19 +44,19 @@ describe(getTenantLiveLocales, () => {
         .where(eq(tenants.id, tenantId));
 
       const live = await getTenantLiveLocales(tenantId);
+
       const [stored] = await db()
         .select({ additionalLocales: tenants.additionalLocales })
         .from(tenants)
         .where(eq(tenants.id, tenantId));
-
       expect(live).toEqual([EN]);
-      expect(stored?.additionalLocales).toEqual([NL, FR]);
+      expect(stored).toEqual({ additionalLocales: [NL, FR] });
     });
   });
 
   it('returns undefined for a missing tenant', async () => {
-    expect(
-      await getTenantLiveLocales('00000000-0000-0000-0000-000000000000'),
-    ).toBeUndefined();
+    const result = await getTenantLiveLocales(MOCK_MISSING_TENANT_ID);
+
+    expect(result).toBeUndefined();
   });
 });

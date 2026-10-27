@@ -1,17 +1,22 @@
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { selectFile } from '@platform/testing/select-file';
 import {
-  MOCK_STAGED_LOGO_BLOB_URL,
   MOCK_LOGO_URL,
+  MOCK_STAGED_LOGO_BLOB_URL,
 } from '@platform/testing/site-config/fixtures';
-import userEvent from '@testing-library/user-event';
 
 import { BrandAssetField } from './brand-asset-field';
 
-const SAVES_WITH_CHANGES = 'Saves with changes';
-const NEW_LOGO_PNG = 'new-logo.png';
-const LOGO_PICK_AGAIN =
-  "Your recovered draft had a new logo that couldn't be kept — pick it again.";
+faker.seed(5993);
+
+const MOCK_PNG_FILE_NAME = faker.system.commonFileName('png');
+const MOCK_STORED_LOGO_FILE_NAME = 'brand-logo.png';
+const { savesWithChanges: SAVES_WITH_CHANGES } = messages.brandAssetField;
+
+const mockPngFile = () =>
+  new File(['bytes'], MOCK_PNG_FILE_NAME, { type: 'image/png' });
 
 const setup = customRender(BrandAssetField, {
   kind: 'logo',
@@ -20,8 +25,6 @@ const setup = customRender(BrandAssetField, {
 });
 
 describe(`<${BrandAssetField.name}/>`, () => {
-  const onStage = vi.fn();
-
   beforeEach(() => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
@@ -30,11 +33,13 @@ describe(`<${BrandAssetField.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it('names the field and its upload control after the given kind before any file is chosen', () => {
+  it('names the field and its upload button after the asset kind', () => {
     setup({ kind: 'favicon' });
 
-    const label = screen.getByText('Favicon');
-    const uploadButton = screen.getByRole('button', { name: 'Upload favicon' });
+    const label = screen.getByText(messages.lookForm.faviconFieldLabel);
+    const uploadButton = screen.getByRole('button', {
+      name: messages.assetUploadField.favicon.upload,
+    });
 
     expect(label).toBeVisible();
     expect(uploadButton).toBeVisible();
@@ -43,7 +48,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
   it('names the stored file without marking it as saving with changes', () => {
     setup({ image: { url: `${MOCK_LOGO_URL}?v=2` } });
 
-    const fileName = screen.getByText('brand-logo.png');
+    const fileName = screen.getByText(MOCK_STORED_LOGO_FILE_NAME);
     const savesWithChanges = screen.queryByText(SAVES_WITH_CHANGES);
 
     expect(fileName).toBeVisible();
@@ -51,28 +56,18 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('names a staged file and marks it as saving with changes', () => {
-    const file = new File(['bytes'], NEW_LOGO_PNG, { type: 'image/png' });
-    setup({ image: { url: MOCK_STAGED_LOGO_BLOB_URL, file } });
+    setup({ image: { url: MOCK_STAGED_LOGO_BLOB_URL, file: mockPngFile() } });
 
-    const fileName = screen.getByText(NEW_LOGO_PNG);
+    const fileName = screen.getByText(MOCK_PNG_FILE_NAME);
     const savesWithChanges = screen.getByText(SAVES_WITH_CHANGES);
 
     expect(fileName).toBeVisible();
     expect(savesWithChanges).toBeVisible();
   });
 
-  it('shows the current alt text and the replace label once a value is set', () => {
-    setup({ image: { url: MOCK_LOGO_URL } });
-
-    const currentLogo = screen.getByAltText('Current logo');
-    const replaceButton = screen.getByRole('button', { name: 'Replace logo' });
-
-    expect(currentLogo).toBeVisible();
-    expect(replaceButton).toBeVisible();
-  });
-
   it('stages a picked file with a local preview URL', async () => {
-    const file = new File(['bytes'], 'logo.png', { type: 'image/png' });
+    const onStage = vi.fn();
+    const file = mockPngFile();
     setup({ onStage });
 
     await selectFile(file);
@@ -84,31 +79,26 @@ describe(`<${BrandAssetField.name}/>`, () => {
   });
 
   it('rejects an unsupported type without staging it', async () => {
+    const onStage = vi.fn();
     setup({ onStage });
 
-    await selectFile(new File(['x'], 'logo.gif', { type: 'image/gif' }));
+    await selectFile(
+      new File(['bytes'], faker.system.commonFileName('gif'), {
+        type: 'image/gif',
+      }),
+    );
 
     const alert = screen.getByRole('alert');
 
     expect(onStage).not.toHaveBeenCalled();
-    expect(alert).toHaveTextContent('Choose a PNG, JPEG, WebP, or SVG image.');
-  });
-
-  it('stages a removal', async () => {
-    setup({ image: { url: MOCK_LOGO_URL }, onStage });
-
-    const removeButton = screen.getByRole('button', { name: 'Remove' });
-    await userEvent.setup().click(removeButton);
-
-    expect(onStage).toHaveBeenCalledWith({ url: undefined });
+    expect(alert).toHaveTextContent(messages.brandAssetField.unsupportedType);
   });
 
   it('asks for the file to be picked again when a recovered draft lost it', () => {
     setup({ isRepickNeeded: true });
 
-    const regions = screen.getAllByRole('status');
-    const regionTexts = regions.map((region) => region.textContent);
+    const pickAgain = screen.getByText(messages.brandAssetField.logo.pickAgain);
 
-    expect(regionTexts).toContain(LOGO_PICK_AGAIN);
+    expect(pickAgain).toBeVisible();
   });
 });

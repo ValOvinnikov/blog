@@ -5,30 +5,23 @@ import {
   ERROR_CODE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { queries } from '@blog/db';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
 import { updateTenantLanguagesAction } from './update-tenant-languages-action';
-
-const { setTenantAdditionalLocalesMock, insertAuditEventMock } = vi.hoisted(
-  () => ({
-    setTenantAdditionalLocalesMock: vi.fn(),
-    insertAuditEventMock: vi.fn(),
-  }),
-);
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
@@ -36,42 +29,38 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
+vi.mock('@blog/db', () => ({
   queries: {
-    tenants: { setTenantAdditionalLocales: setTenantAdditionalLocalesMock },
-    auditEvents: { insertAuditEvent: insertAuditEventMock },
+    tenants: { setTenantAdditionalLocales: vi.fn() },
+    auditEvents: { insertAuditEvent: vi.fn() },
   },
 }));
 
-const requireTenantMembershipMock = vi.mocked<
-  (tenantId: string) => Promise<unknown>
->(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-const loggerWarnMock = vi.mocked(logger.warn);
-const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
+faker.seed(5997);
+
+const MOCK_SESSION_EXPIRES = '2099-01-01T00:00:00.000Z';
+const MOCK_UNSUPPORTED_LOCALE = faker.string.alpha(2);
+const MOCK_SAVE_ERROR = new Error(faker.lorem.sentence());
+
+const setTenantAdditionalLocalesMock = vi.mocked(
+  queries.tenants.setTenantAdditionalLocales,
+);
+const authMock = vi.mocked<() => Promise<Session | null>>(auth);
+const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
 
 const { NL, FR } = LOCALE_ISO_CODES;
 
 describe(updateTenantLanguagesAction, () => {
   beforeEach(() => {
-    requireTenantMembershipMock.mockReset();
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH },
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
     authMock.mockReset();
-    authMock.mockResolvedValue({
-      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
-    });
-    setTenantAdditionalLocalesMock.mockReset();
-    insertAuditEventMock.mockReset();
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    loggerWarnMock.mockReset();
   });
 
   it('saves the languages and audits the change', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue(okResult([NL, FR]));
+    authMock.mockResolvedValueOnce({
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
+      expires: MOCK_SESSION_EXPIRES,
+    });
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(okResult([NL, FR]));
 
     const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
 
@@ -80,26 +69,27 @@ describe(updateTenantLanguagesAction, () => {
       MOCK_TENANT_ID,
       [NL, FR],
     );
-    expect(insertAuditEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: AUDIT_ACTION.SETTINGS_UPDATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: { additionalLocales: [NL, FR] },
-      }),
-    );
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: MOCK_OPERATOR_ID,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { additionalLocales: [NL, FR] },
+    });
   });
 
   it('refreshes the public site for the tenant after saving', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue(okResult([NL]));
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(okResult([NL]));
 
     await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL]);
 
-    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('rejects a language outside the supported list without saving', async () => {
-    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, ['xx']);
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [
+      MOCK_UNSUPPORTED_LOCALE,
+    ]);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -109,7 +99,7 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('reports a save over the plan limit without auditing it', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue(
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(
       errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED),
     );
 
@@ -120,15 +110,19 @@ describe(updateTenantLanguagesAction, () => {
       reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
-    expect(loggerWarnMock).toHaveBeenCalledWith(
+    expect(revalidateSiteConfig).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
       TENANT_LOG.UPDATE_LANGUAGES_REJECTED,
-      expect.objectContaining({ error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED }),
+      {
+        tenantId: MOCK_TENANT_ID,
+        plan: TENANT_PLAN.FREE,
+        error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
+      },
     );
   });
 
   it('reports the default language among the additional ones as invalid input', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue(
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(
       errorResult(ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED),
     );
 
@@ -142,7 +136,7 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('refuses a save for a tenant that no longer exists, without a warning', async () => {
-    setTenantAdditionalLocalesMock.mockResolvedValue(
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
@@ -152,6 +146,18 @@ describe(updateTenantLanguagesAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.NOT_FOUND,
     });
-    expect(loggerWarnMock).not.toHaveBeenCalled();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('reports a server error and logs it when the save throws', async () => {
+    setTenantAdditionalLocalesMock.mockRejectedValueOnce(MOCK_SAVE_ERROR);
+
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL]);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(
+      TENANT_LOG.UPDATE_LANGUAGES_FAILED,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_SAVE_ERROR },
+    );
   });
 });

@@ -1,14 +1,25 @@
 import { addBookmark } from '@blog/db/queries/bookmarks/add-bookmark/add-bookmark';
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_OTHER_POST_ID,
+  MOCK_POST_ID,
+} from '@blog/db/testing/bookmarks/fixtures';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { listBookmarks } from './list-bookmarks';
 
 vi.mock('@blog/db/client');
 
-const MOCK_OLDER_POST_ID = 'post-older';
-const MOCK_NEWER_POST_ID = 'post-newer';
+faker.seed(61012);
+
+const MOCK_FOREIGN_USER_POST_ID = faker.string.uuid();
+const MOCK_FOREIGN_TENANT_POST_ID = faker.string.uuid();
+const MOCK_OLDER_CREATED_AT = faker.date.future({ refDate: new Date(0) });
+const MOCK_NEWER_CREATED_AT = faker.date.soon({
+  refDate: MOCK_OLDER_CREATED_AT,
+});
 
 const db = useQueryTestDb();
 
@@ -20,27 +31,25 @@ afterEach(async () => {
 
 describe(listBookmarks, () => {
   let tenantId: string;
+  let userId: string;
 
   beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
+    ({ id: userId } = await insertTestUser(db()));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it("returns only the given tenant and user's bookmarks", async () => {
-    await insertTestUser(db(), { id: 'user-2' });
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await addBookmark(tenantOneId, 'user-1', 'post-1');
-    await addBookmark(tenantOneId, 'user-1', 'post-2');
-    await addBookmark(tenantOneId, 'user-2', 'post-3');
-    await addBookmark(tenantTwoId, 'user-1', 'post-4');
+    const { id: otherUserId } = await insertTestUser(db());
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await addBookmark(tenantId, userId, MOCK_POST_ID);
+    await addBookmark(tenantId, userId, MOCK_OTHER_POST_ID);
+    await addBookmark(tenantId, otherUserId, MOCK_FOREIGN_USER_POST_ID);
+    await addBookmark(otherTenantId, userId, MOCK_FOREIGN_TENANT_POST_ID);
 
-    const result = await listBookmarks(tenantOneId, 'user-1');
+    const result = await listBookmarks(tenantId, userId);
 
-    expect(result.map((bookmark) => bookmark.postId).sort()).toEqual([
-      'post-1',
-      'post-2',
-    ]);
+    const postIds = result.map((bookmark) => bookmark.postId).sort();
+    expect(postIds).toEqual([MOCK_POST_ID, MOCK_OTHER_POST_ID].sort());
   });
 
   it('orders results by most recently bookmarked first', async () => {
@@ -49,27 +58,25 @@ describe(listBookmarks, () => {
       .values([
         {
           tenantId,
-          userId: 'user-1',
-          postId: MOCK_OLDER_POST_ID,
-          createdAt: new Date(2026, 0, 1),
+          userId,
+          postId: MOCK_POST_ID,
+          createdAt: MOCK_OLDER_CREATED_AT,
         },
         {
           tenantId,
-          userId: 'user-1',
-          postId: MOCK_NEWER_POST_ID,
-          createdAt: new Date(2026, 0, 2),
+          userId,
+          postId: MOCK_OTHER_POST_ID,
+          createdAt: MOCK_NEWER_CREATED_AT,
         },
       ]);
 
-    const result = await listBookmarks(tenantId, 'user-1');
+    const result = await listBookmarks(tenantId, userId);
 
-    expect(result.map((bookmark) => bookmark.postId)).toEqual([
-      MOCK_NEWER_POST_ID,
-      MOCK_OLDER_POST_ID,
-    ]);
+    const postIds = result.map((bookmark) => bookmark.postId);
+    expect(postIds).toEqual([MOCK_OTHER_POST_ID, MOCK_POST_ID]);
   });
 
   it('returns an empty array when the user has no bookmarks', async () => {
-    expect(await listBookmarks(tenantId, 'user-1')).toEqual([]);
+    await expect(listBookmarks(tenantId, userId)).resolves.toEqual([]);
   });
 });

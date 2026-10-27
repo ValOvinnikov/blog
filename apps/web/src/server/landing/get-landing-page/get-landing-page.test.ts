@@ -1,10 +1,17 @@
-import { okResult } from '@blog/utils';
-import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { faker } from '@faker-js/faker';
+import { mockPageLoaderResult } from '@web/testing/server/page-loaders/fixtures';
+import {
+  importWithMemoizingCache,
+  restoreReactCache,
+} from '@web/testing/server/page-loaders/import-with-memoizing-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getLandingPage } from './get-landing-page';
 
-const PAGE_PATH = 'about-us';
+faker.seed(6012);
+
+const MOCK_PAGE_SEGMENTS = [faker.lorem.slug(), faker.lorem.slug()];
+const MOCK_PAGE_PATH = MOCK_PAGE_SEGMENTS.join('/');
 
 const { getPageMock } = vi.hoisted(() => ({ getPageMock: vi.fn() }));
 
@@ -15,45 +22,35 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 describe(getLandingPage, () => {
-  beforeEach(() => {
-    getPageMock.mockReset();
-  });
+  it('loads the page by path segments for the resolved tenant', async () => {
+    getPageMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-  it('forwards the path segments and tenant context to the landing page service', async () => {
-    getPageMock.mockResolvedValue(okResult());
-
-    await getLandingPage('modules/faq');
+    await getLandingPage(MOCK_PAGE_PATH);
 
     expect(getPageMock).toHaveBeenCalledWith(
-      ['modules', 'faq'],
+      MOCK_PAGE_SEGMENTS,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
-  it('returns the raw TResult from getPage unchanged', async () => {
-    const result = okResult({ title: 'About Us' });
-    getPageMock.mockResolvedValue(result);
+  it('returns the service result unchanged', async () => {
+    const result = mockPageLoaderResult();
+    getPageMock.mockResolvedValueOnce(result);
 
-    await expect(getLandingPage(PAGE_PATH)).resolves.toBe(result);
+    await expect(getLandingPage(MOCK_PAGE_PATH)).resolves.toBe(result);
   });
 
   describe('memoization', () => {
-    afterEach(() => {
-      vi.doUnmock('react');
-      vi.resetModules();
-    });
+    afterEach(restoreReactCache);
 
-    it('dedupes the page query across one render pass with the same arguments', async () => {
-      getPageMock.mockResolvedValue(okResult());
+    it('queries once per render pass for the same path', async () => {
+      getPageMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-      vi.doMock('react', withMemoizingReactCache);
-      vi.resetModules();
+      const { getLandingPage: memoizedGetLandingPage } =
+        await importWithMemoizingCache(() => import('./get-landing-page'));
 
-      const { getLandingPage: freshGetLandingPage } =
-        await import('./get-landing-page');
-
-      await freshGetLandingPage(PAGE_PATH);
-      await freshGetLandingPage(PAGE_PATH);
+      await memoizedGetLandingPage(MOCK_PAGE_PATH);
+      await memoizedGetLandingPage(MOCK_PAGE_PATH);
 
       expect(getPageMock).toHaveBeenCalledTimes(1);
     });

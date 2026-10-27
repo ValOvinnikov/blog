@@ -1,42 +1,43 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import { renderElement, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
 
 import { renderPostCardImage } from './render-post-card-image';
 
-const heroImage = mockSanityImage();
-
-const RenderPostCardImageHarness = ({
-  post,
-}: {
-  post: ReturnType<typeof mockPostCard>;
-}) => <>{renderPostCardImage(post)}</>;
-
-const setup = customRender(RenderPostCardImageHarness, {
-  post: mockPostCard({ heroImage }),
-});
+const MOCK_HERO_IMAGE = mockSanityImage();
 
 describe(renderPostCardImage, () => {
   describe('for a post with a hero image', () => {
     beforeEach(() => {
-      setup();
+      renderElement(
+        <>
+          {renderPostCardImage(mockPostCard({ heroImage: MOCK_HERO_IMAGE }))}
+        </>,
+      );
     });
 
     it('renders the hero image lazily', () => {
-      const image = screen.getByRole('img', { name: heroImage.alt });
+      const image = screen.getByRole('img', { name: MOCK_HERO_IMAGE.alt });
 
-      expect(image).toHaveAttribute('loading', 'lazy');
+      const attributes = Object.fromEntries(
+        Array.from(image.attributes, ({ name, value }) => [name, value]),
+      );
+      const { loading } = attributes;
+
+      expect(loading).toBe('lazy');
     });
 
-    it('never sets priority/fetchpriority on a grid image', () => {
-      const image = screen.getByRole('img', { name: heroImage.alt });
+    it('does not prioritise loading of the grid image', () => {
+      const image = screen.getByRole('img', { name: MOCK_HERO_IMAGE.alt });
 
       expect(image).not.toHaveAttribute('fetchpriority');
     });
   });
 
   it('renders nothing for a post with no hero image', () => {
-    setup({ post: mockPostCard({ heroImage: undefined }) });
+    renderElement(
+      <>{renderPostCardImage(mockPostCard({ heroImage: undefined }))}</>,
+    );
 
     const image = screen.queryByRole('img');
 

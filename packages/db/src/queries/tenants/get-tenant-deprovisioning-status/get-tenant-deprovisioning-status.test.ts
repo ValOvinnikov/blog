@@ -1,20 +1,33 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
+  DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenantDeprovisioningState } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_DEPROVISIONED_AT,
+  MOCK_IDLE_DEPROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantDeprovisioningStatus } from './get-tenant-deprovisioning-status';
 
 vi.mock('@blog/db/client');
 
-const NO_TENANT_ROW = 'setup: tenant insert returned no row.';
-
 const db = useQueryTestDb();
+
+const MOCK_DEPROVISIONING_STEPS: TTenantDeprovisioningState = {
+  ...MOCK_IDLE_DEPROVISIONING_STEPS,
+  [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+  },
+  [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  },
+};
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -22,62 +35,28 @@ afterEach(async () => {
 
 describe(getTenantDeprovisioningStatus, () => {
   it('returns the per-step map and deprovisionedAt for an existing tenant', async () => {
-    const deprovisioningSteps: TTenantDeprovisioningState = {
-      REMOVE_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      ARCHIVE_SANITY_PROJECT: {
-        status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-      },
-      REVOKE_SANITY_TOKENS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      CLEAR_ARTIFACTS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      ARCHIVE_TENANT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      PURGE_READER_DATA: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      INVALIDATE_TENANT_CACHE: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-    };
-    const [tenant] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Acme',
-        primaryDomain: 'acme.example.com',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-        deprovisioningSteps,
-      })
-      .returning();
+    const { id } = await insertTestTenant(db(), {
+      deprovisioningSteps: MOCK_DEPROVISIONING_STEPS,
+    });
 
-    if (!tenant) throw new Error(NO_TENANT_ROW);
-
-    const result = await getTenantDeprovisioningStatus(tenant.id);
+    const result = await getTenantDeprovisioningStatus(id);
 
     expect(result).toEqual({
-      deprovisioningSteps,
+      deprovisioningSteps: MOCK_DEPROVISIONING_STEPS,
       deprovisionedAt: null,
     });
   });
 
   it('returns undefined for a tenant id that does not exist', async () => {
-    const result = await getTenantDeprovisioningStatus(
-      '00000000-0000-0000-0000-000000000000',
-    );
+    const result = await getTenantDeprovisioningStatus(MOCK_MISSING_TENANT_ID);
 
     expect(result).toBeUndefined();
   });
 
   it('returns null fields for a tenant never deprovisioned', async () => {
-    const [tenant] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Never Deprovisioned',
-        primaryDomain: 'never.example.com',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-      })
-      .returning();
+    const { id } = await insertTestTenant(db());
 
-    if (!tenant) throw new Error(NO_TENANT_ROW);
-
-    const result = await getTenantDeprovisioningStatus(tenant.id);
+    const result = await getTenantDeprovisioningStatus(id);
 
     expect(result).toEqual({
       deprovisioningSteps: null,
@@ -86,23 +65,16 @@ describe(getTenantDeprovisioningStatus, () => {
   });
 
   it('reports a finished teardown via deprovisionedAt', async () => {
-    const deprovisionedAt = new Date('2026-09-02T12:00:00.000Z');
-    const [tenant] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Deprovisioned',
-        primaryDomain: 'gone.example.com',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ARCHIVED,
-        deprovisionedAt,
-      })
-      .returning();
+    const { id } = await insertTestTenant(db(), {
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: MOCK_DEPROVISIONED_AT,
+    });
 
-    if (!tenant) throw new Error(NO_TENANT_ROW);
+    const result = await getTenantDeprovisioningStatus(id);
 
-    const result = await getTenantDeprovisioningStatus(tenant.id);
-
-    expect(result?.deprovisionedAt).toEqual(deprovisionedAt);
+    expect(result).toEqual({
+      deprovisioningSteps: null,
+      deprovisionedAt: MOCK_DEPROVISIONED_AT,
+    });
   });
 });

@@ -1,13 +1,17 @@
 import { LOCALE_ISO_CODES, LOCALE_OPEN_GRAPH_TAGS, routes } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  DE_PATH_PREFIX,
+  MOCK_BILINGUAL_REQUEST_CONTEXT,
+  NL_PATH_PREFIX,
+  mockMetadataSeo,
+} from '@web/testing/metadata/to-metadata/fixtures';
 import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
 import {
   MOCK_DE_POST_SLUG,
   MOCK_EN_POST_SLUG,
   MOCK_NL_POST_SLUG,
 } from '@web/testing/shared/post/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import type { TLanguagePage } from '@web/utils/to-language-alternates';
 
 import { toLocalizedPageMetadata } from './to-localized-page-metadata';
@@ -20,6 +24,7 @@ const TOPICS_PATH = routes.topics();
 vi.mock('@web/server/request-context/request-context');
 
 const { EN, NL, DE } = LOCALE_ISO_CODES;
+const MOCK_SEO = mockMetadataSeo();
 
 const EN_PAGE = { language: EN, href: EN_POST_PATH };
 const NL_PAGE = { language: NL, href: NL_POST_PATH };
@@ -29,18 +34,17 @@ const buildFor = (
   translations: readonly TLanguagePage[],
   href = EN_POST_PATH,
 ) =>
-  toLocalizedPageMetadata(mockSeo(), { href, translations, ogType: 'article' });
+  toLocalizedPageMetadata(MOCK_SEO, { href, translations, ogType: 'article' });
 
 describe(toLocalizedPageMetadata, () => {
   beforeEach(() => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      liveLocales: [EN, NL],
-    });
+    vi.mocked(getRequestContext).mockResolvedValue(
+      MOCK_BILINGUAL_REQUEST_CONTEXT,
+    );
   });
 
   it('emits the page language as og:locale and live translations as alternates', async () => {
-    const metadata = await toLocalizedPageMetadata(mockSeo(), {
+    const metadata = await toLocalizedPageMetadata(MOCK_SEO, {
       href: TOPICS_PATH,
       translations: [
         { language: EN, href: TOPICS_PATH },
@@ -66,19 +70,19 @@ describe(toLocalizedPageMetadata, () => {
     expect(metadata.openGraph?.alternateLocale).toEqual([
       LOCALE_OPEN_GRAPH_TAGS.EN,
     ]);
-    expect(metadata.openGraph?.url).toBe(`/nl${NL_POST_PATH}`);
+    expect(metadata.openGraph?.url).toBe(`${NL_PATH_PREFIX}${NL_POST_PATH}`);
     expect(metadata.alternates).toEqual({
-      canonical: `/nl${NL_POST_PATH}`,
+      canonical: `${NL_PATH_PREFIX}${NL_POST_PATH}`,
       languages: {
         en: EN_POST_PATH,
-        nl: `/nl${NL_POST_PATH}`,
+        nl: `${NL_PATH_PREFIX}${NL_POST_PATH}`,
         'x-default': EN_POST_PATH,
       },
     });
   });
 
   it('emits og:locale without alternates when the page has no translations', async () => {
-    const metadata = await toLocalizedPageMetadata(mockSeo(), {
+    const metadata = await toLocalizedPageMetadata(MOCK_SEO, {
       href: routes.blogIndex(2),
       translations: [],
       ogType: 'website',
@@ -95,7 +99,7 @@ describe(toLocalizedPageMetadata, () => {
       canonical: EN_POST_PATH,
       languages: {
         en: EN_POST_PATH,
-        nl: `/nl${NL_POST_PATH}`,
+        nl: `${NL_PATH_PREFIX}${NL_POST_PATH}`,
         'x-default': EN_POST_PATH,
       },
     });
@@ -107,8 +111,8 @@ describe(toLocalizedPageMetadata, () => {
     const metadata = await buildFor([NL_PAGE, DE_PAGE]);
 
     expect(metadata.alternates?.languages).toEqual({
-      nl: `/nl${NL_POST_PATH}`,
-      de: `/de${DE_POST_PATH}`,
+      nl: `${NL_PATH_PREFIX}${NL_POST_PATH}`,
+      de: `${DE_PATH_PREFIX}${DE_POST_PATH}`,
     });
   });
 

@@ -7,29 +7,60 @@ import {
   MOCK_SEPARATORS,
   MOCK_SERVICE,
 } from '@blog/insight/testing/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { createLogger, LOG_LEVEL } from './logger';
 
-const SIGNED_IN_EVENT = 'user.signed_in';
-const REAL_EVENT = 'real.event';
-const BARE_EVENT = 'bare.event';
-const NESTED_ERROR_MESSAGE = 'nested boom';
-const FIRST_FAILURE_MESSAGE = 'first failure';
-const SECOND_FAILURE_MESSAGE = 'second failure';
-const NOT_AN_ERROR = 'not an error';
-const WITHIN_LIMIT_MESSAGE = 'within limit';
-const DEEP_CONTEXT_EVENT = 'deep.context';
-const MIXED_TYPES_EVENT = 'mixed.types';
-const NULL_PROTO_ERROR_MESSAGE = 'null-proto boom';
-const RETRY_EVENT = 'retry.scheduled';
+faker.seed(6030);
 
-function captureCall(spy: ReturnType<typeof vi.spyOn>): string {
+const MOCK_NOW = new Date('2026-10-15T12:00:00.000Z');
+const MOCK_TS = MOCK_NOW.toISOString();
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_OTHER_EVENT = 'retry.scheduled';
+const MOCK_STACK = `Error: ${MOCK_ERROR_MESSAGE}\n  at frame ()`;
+const MOCK_INJECTED = 'abc\ninjected';
+const MOCK_FIRST_MESSAGE = faker.lorem.sentence();
+const MOCK_SECOND_MESSAGE = faker.lorem.sentence();
+const MOCK_NOT_AN_ERROR = faker.lorem.word();
+const MOCK_SINK_FAILURE = 'sink down';
+const NESTING_WITHIN_LIMIT = 4;
+const NESTING_PAST_LIMIT = 5;
+
+class MockPoint {
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
+}
+
+function lastLine(spy: ReturnType<typeof vi.spyOn>): string {
   const call = spy.mock.calls.at(-1);
   if (!call) {
     throw new Error('console spy was not called');
   }
 
   return call[0] as string;
+}
+
+function parseLastLine<T = Record<string, unknown>>(
+  spy: ReturnType<typeof vi.spyOn>,
+): T {
+  return JSON.parse(lastLine(spy)) as T;
+}
+
+function mockError(message: string): Error {
+  const error = new Error(message);
+  error.stack = MOCK_STACK;
+  return error;
+}
+
+function nestUnder(value: unknown, levels: number): unknown {
+  let nested = value;
+  for (let level = 0; level < levels; level++) {
+    nested = { nested };
+  }
+
+  return nested;
 }
 
 describe(createLogger, () => {
@@ -39,6 +70,9 @@ describe(createLogger, () => {
   let debugSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(MOCK_NOW);
+    vi.stubEnv('NODE_ENV', 'test');
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
@@ -46,23 +80,24 @@ describe(createLogger, () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
   });
 
-  it('emits a single-line JSON object via the matching console method', () => {
+  it('emits the base and call context as one single-line JSON object', () => {
     const logger = createLogger({ service: MOCK_SERVICE });
-    logger.info(SIGNED_IN_EVENT, { userId: 'u_1' });
+    logger.info(MOCK_EVENT, { userId: MOCK_USER_ID });
 
-    const line = captureCall(infoSpy);
+    const line = lastLine(infoSpy);
     expect(line.includes('\n')).toBe(false);
-
-    const parsed = JSON.parse(line) as Record<string, unknown>;
-    expect(parsed.level).toBe(LOG_LEVEL.INFO);
-    expect(parsed.event).toBe(SIGNED_IN_EVENT);
-    expect(parsed.service).toBe(MOCK_SERVICE);
-    expect(parsed.userId).toBe('u_1');
-    expect(typeof parsed.ts).toBe('string');
+    expect(JSON.parse(line)).toEqual({
+      service: MOCK_SERVICE,
+      userId: MOCK_USER_ID,
+      level: LOG_LEVEL.INFO,
+      event: MOCK_EVENT,
+      ts: MOCK_TS,
+    });
   });
 
   describe('with no base context', () => {
@@ -72,337 +107,277 @@ describe(createLogger, () => {
       logger = createLogger();
     });
 
-    it('routes error/warn/info to their matching console method', () => {
-      logger.error('a', {});
-      logger.warn('b', {});
+    it.each(Object.values(LOG_LEVEL))(
+      'writes a %s line with no context through the matching console method',
+      (level) => {
+        logger[level](MOCK_EVENT);
 
-      expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalledTimes(1);
-      expect(infoSpy).not.toHaveBeenCalled();
-    });
+        const consoleMethod = vi.mocked(console[level]);
+        expect(consoleMethod).toHaveBeenCalledTimes(1);
+        expect(parseLastLine(consoleMethod)).toEqual({
+          level,
+          event: MOCK_EVENT,
+          ts: MOCK_TS,
+        });
+      },
+    );
 
-    it('cannot let a control character in context terminate the log line or forge a second entry', () => {
+    it('keeps a control character in context from forging a second log line', () => {
       const forgedEntry = '"}\n{"level":"error","event":"forged"';
-      logger.error('caught.value', {
-        text: `first line\r\nsecond line\x00${forgedEntry}`,
-      });
+      const text = `first line\r\nsecond line\x00${forgedEntry}`;
+      logger.error(MOCK_EVENT, { text });
 
-      const line = captureCall(errorSpy);
+      const line = lastLine(errorSpy);
       expect(line.split('\n')).toHaveLength(1);
-
-      const parsed = JSON.parse(line) as Record<string, unknown>;
-      expect(parsed.text).toBe(`first line\r\nsecond line\x00${forgedEntry}`);
+      expect(JSON.parse(line)).toEqual({
+        text,
+        level: LOG_LEVEL.ERROR,
+        event: MOCK_EVENT,
+        ts: MOCK_TS,
+      });
     });
 
-    it('does not let a spoofed reserved field in context override level/event/ts', () => {
-      logger.error(REAL_EVENT, {
+    it('keeps its own level, event and ts over same-named context fields', () => {
+      logger.error(MOCK_EVENT, {
         level: 'not-a-real-level',
-        event: 'spoofed',
+        event: MOCK_OTHER_EVENT,
         ts: 'fake',
       });
 
-      const parsed = JSON.parse(captureCall(errorSpy)) as Record<
-        string,
-        unknown
-      >;
-      expect(parsed.level).toBe(LOG_LEVEL.ERROR);
-      expect(parsed.event).toBe(REAL_EVENT);
-      expect(typeof parsed.ts).toBe('string');
-      expect(parsed.ts).not.toBe('fake');
+      expect(parseLastLine(errorSpy)).toEqual({
+        level: LOG_LEVEL.ERROR,
+        event: MOCK_EVENT,
+        ts: MOCK_TS,
+      });
     });
 
-    it('sanitizes an Error passed in context and truncates a long stack', () => {
-      const error = new Error('boom\nwith a newline');
-      error.stack = `Error: boom\n${'  at fakeFrame ()\n'.repeat(500)}`;
+    it.each([
+      ['message', new Error(MOCK_INJECTED)],
+      [
+        'digest',
+        Object.assign(new Error(MOCK_ERROR_MESSAGE), { digest: MOCK_INJECTED }),
+      ],
+    ])('strips control characters from an Error %s', (field, error) => {
+      logger.error(MOCK_EVENT, { error });
+
+      const { error: logged } = parseLastLine<{
+        error: Record<string, string>;
+      }>(errorSpy);
+      expect(logged[field]).toBe('abc injected');
+    });
+
+    it('truncates a long Error stack with a marker', () => {
+      const error = new Error(MOCK_ERROR_MESSAGE);
+      error.stack = `${MOCK_STACK}\n${'  at fakeFrame ()\n'.repeat(500)}`;
 
       logger.error(MOCK_EVENT, { error });
 
-      const line = captureCall(errorSpy);
-      const parsed = JSON.parse(line) as {
-        error: { message: string; stack: string };
-      };
-
-      expect(parsed.error.message).toBe('boom with a newline');
-      expect(parsed.error.stack.endsWith('...[truncated]')).toBe(true);
-      expect(parsed.error.stack.length).toBeLessThan(error.stack.length);
+      const {
+        error: { stack },
+      } = parseLastLine<{ error: { stack: string } }>(errorSpy);
+      expect(stack.endsWith('...[truncated]')).toBe(true);
+      expect(stack.length).toBeLessThan(error.stack.length);
     });
 
     it('keeps the name of an Error, and its string digest and code', () => {
-      const error = Object.assign(new TypeError('render failed'), {
+      const error = Object.assign(new TypeError(MOCK_ERROR_MESSAGE), {
         digest: 'DYNAMIC_SERVER_USAGE',
         code: 'ERR_RENDER',
       });
-
-      logger.error('request.unhandled_error', { error });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        error: { name: string; digest: string; code: string };
-      };
-      expect(parsed.error.name).toBe('TypeError');
-      expect(parsed.error.digest).toBe('DYNAMIC_SERVER_USAGE');
-      expect(parsed.error.code).toBe('ERR_RENDER');
-    });
-
-    it('leaves out a digest or code that is not a string', () => {
-      const error = Object.assign(new Error(MOCK_ERROR_MESSAGE), {
-        digest: 42,
-        code: { nested: true },
-      });
+      error.stack = MOCK_STACK;
 
       logger.error(MOCK_EVENT, { error });
 
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        error: Record<string, unknown>;
-      };
-      expect('digest' in parsed.error).toBe(false);
-      expect('code' in parsed.error).toBe(false);
-    });
-
-    it('logs an Error without a digest or code as its name, message and stack', () => {
-      const error = new Error(MOCK_ERROR_MESSAGE);
-      error.stack = 'Error: boom\n  at short ()';
-
-      logger.error(MOCK_EVENT, { error });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        error: Record<string, unknown>;
-      };
-      expect(parsed.error).toEqual({
-        name: 'Error',
+      const { error: logged } = parseLastLine<{ error: unknown }>(errorSpy);
+      expect(logged).toEqual({
+        name: 'TypeError',
         message: MOCK_ERROR_MESSAGE,
-        stack: error.stack,
+        digest: 'DYNAMIC_SERVER_USAGE',
+        code: 'ERR_RENDER',
+        stack: MOCK_STACK,
       });
     });
 
-    it('strips control characters from a digest', () => {
-      const error = Object.assign(new Error(MOCK_ERROR_MESSAGE), {
-        digest: 'abc\ninjected',
+    it.each([
+      ['no digest or code', {}],
+      ['a digest and code that are not strings', { digest: 42, code: {} }],
+    ])(
+      'logs an Error with %s as its name, message and stack',
+      (_name, extra) => {
+        const error = Object.assign(mockError(MOCK_ERROR_MESSAGE), extra);
+
+        logger.error(MOCK_EVENT, { error });
+
+        const { error: logged } = parseLastLine<{ error: unknown }>(errorSpy);
+        expect(logged).toEqual({
+          name: 'Error',
+          message: MOCK_ERROR_MESSAGE,
+          stack: MOCK_STACK,
+        });
+      },
+    );
+
+    it('omits an undefined context field', () => {
+      logger.warn(MOCK_EVENT, { present: MOCK_USER_ID, missing: undefined });
+
+      expect(parseLastLine(warnSpy)).toEqual({
+        present: MOCK_USER_ID,
+        level: LOG_LEVEL.WARN,
+        event: MOCK_EVENT,
+        ts: MOCK_TS,
       });
-
-      logger.error(MOCK_EVENT, { error });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        error: { digest: string };
-      };
-      expect(parsed.error.digest).toBe('abc injected');
-    });
-
-    it('omits undefined context fields instead of emitting null', () => {
-      logger.warn('event.name', { present: 'value', missing: undefined });
-
-      const parsed = JSON.parse(captureCall(warnSpy)) as Record<
-        string,
-        unknown
-      >;
-      expect(parsed.present).toBe('value');
-      expect('missing' in parsed).toBe(false);
-    });
-
-    it('does not throw when called with no context and no base context', () => {
-      expect(() => logger.error(BARE_EVENT)).not.toThrow();
-      expect(() => logger.warn(BARE_EVENT)).not.toThrow();
-      expect(() => logger.info(BARE_EVENT)).not.toThrow();
-      expect(() => logger.debug(BARE_EVENT)).not.toThrow();
     });
 
     it('is a no-op for debug in production', () => {
       vi.stubEnv('NODE_ENV', 'production');
-      logger.debug('should.not.emit', { any: 'thing' });
+      logger.debug(MOCK_EVENT, { userId: MOCK_USER_ID });
 
       expect(debugSpy).not.toHaveBeenCalled();
     });
 
-    it('emits debug outside production', () => {
-      vi.stubEnv('NODE_ENV', 'test');
-      logger.debug('should.emit');
+    it('unwraps an Error nested inside a plain object', () => {
+      logger.error(MOCK_EVENT, {
+        details: { cause: mockError(MOCK_FIRST_MESSAGE) },
+      });
 
-      expect(debugSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('unwraps an Error nested one level deep inside a plain object', () => {
-      const cause = new Error(NESTED_ERROR_MESSAGE);
-      cause.stack = 'Error: nested boom\n  at somewhere ()';
-
-      logger.error(MOCK_EVENT, { details: { cause } });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        details: { cause: { message: string; stack: string } };
-      };
-      expect(parsed.details.cause.message).toBe(NESTED_ERROR_MESSAGE);
-      expect(parsed.details.cause.stack).toBe(cause.stack);
+      const { details } = parseLastLine<{ details: unknown }>(errorSpy);
+      expect(details).toEqual({
+        cause: {
+          name: 'Error',
+          message: MOCK_FIRST_MESSAGE,
+          stack: MOCK_STACK,
+        },
+      });
     });
 
     it('unwraps Errors nested inside an array', () => {
-      const first = new Error(FIRST_FAILURE_MESSAGE);
-      const second = new Error(SECOND_FAILURE_MESSAGE);
-
-      logger.error('batch.failed', {
-        errors: [first, second, NOT_AN_ERROR],
+      logger.error(MOCK_EVENT, {
+        errors: [
+          mockError(MOCK_FIRST_MESSAGE),
+          mockError(MOCK_SECOND_MESSAGE),
+          MOCK_NOT_AN_ERROR,
+        ],
       });
 
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        errors: [{ message: string }, { message: string }, string];
-      };
-      expect(parsed.errors[0].message).toBe(FIRST_FAILURE_MESSAGE);
-      expect(parsed.errors[1].message).toBe(SECOND_FAILURE_MESSAGE);
-      expect(parsed.errors[2]).toBe(NOT_AN_ERROR);
+      const { errors } = parseLastLine<{ errors: unknown }>(errorSpy);
+      expect(errors).toEqual([
+        { name: 'Error', message: MOCK_FIRST_MESSAGE, stack: MOCK_STACK },
+        { name: 'Error', message: MOCK_SECOND_MESSAGE, stack: MOCK_STACK },
+        MOCK_NOT_AN_ERROR,
+      ]);
     });
 
-    it('terminates without hanging or throwing on a cyclic context object', () => {
-      const cyclic: Record<string, unknown> = { name: 'cycle' };
+    it('marks a cyclic reference in context as circular', () => {
+      const cyclic: Record<string, unknown> = { id: MOCK_USER_ID };
       cyclic.self = cyclic;
 
-      expect(() =>
-        logger.error('cyclic.context', { data: cyclic }),
-      ).not.toThrow();
+      logger.error(MOCK_EVENT, { data: cyclic });
 
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        data: { name: string; self: string };
-      };
-      expect(parsed.data.name).toBe('cycle');
-      expect(parsed.data.self).toBe('[Circular]');
+      const { data } = parseLastLine<{ data: unknown }>(errorSpy);
+      expect(data).toEqual({ id: MOCK_USER_ID, self: '[Circular]' });
     });
 
-    it('still unwraps an Error nested just within the depth limit', () => {
-      const error = new Error(WITHIN_LIMIT_MESSAGE);
+    it('does not mark a shared non-cyclic reference as circular', () => {
+      const shared = { id: MOCK_USER_ID };
 
-      let value: unknown = { error };
-      for (let i = 0; i < 4; i++) {
-        value = { nested: value };
-      }
+      logger.error(MOCK_EVENT, { a: shared, b: shared });
 
-      logger.error(DEEP_CONTEXT_EVENT, { deep: value });
+      const { a, b } = parseLastLine<{ a: unknown; b: unknown }>(errorSpy);
+      expect(a).toEqual(shared);
+      expect(b).toEqual(shared);
+    });
 
-      const parsed = JSON.parse(captureCall(errorSpy)) as Record<
-        string,
-        unknown
-      >;
-      let cursor = parsed.deep as Record<string, unknown>;
-      for (let i = 0; i < 4; i++) {
-        cursor = cursor.nested as Record<string, unknown>;
-      }
-      expect((cursor.error as { message: string }).message).toBe(
-        WITHIN_LIMIT_MESSAGE,
+    it('unwraps an Error nested just within the depth limit', () => {
+      const error = mockError(MOCK_FIRST_MESSAGE);
+
+      logger.error(MOCK_EVENT, {
+        deep: nestUnder({ error }, NESTING_WITHIN_LIMIT),
+      });
+
+      const { deep } = parseLastLine<{ deep: unknown }>(errorSpy);
+      expect(deep).toEqual(
+        nestUnder(
+          {
+            error: {
+              name: 'Error',
+              message: MOCK_FIRST_MESSAGE,
+              stack: MOCK_STACK,
+            },
+          },
+          NESTING_WITHIN_LIMIT,
+        ),
       );
     });
 
-    it('does not unwrap an Error nested past the depth limit, and does not throw', () => {
-      const error = new Error('too deep');
+    it('replaces a value nested past the depth limit with a marker', () => {
+      const error = mockError(MOCK_FIRST_MESSAGE);
 
-      let value: unknown = { error };
-      for (let i = 0; i < 5; i++) {
-        value = { nested: value };
-      }
+      logger.error(MOCK_EVENT, {
+        deep: nestUnder({ error }, NESTING_PAST_LIMIT),
+      });
 
-      expect(() =>
-        logger.error(DEEP_CONTEXT_EVENT, { deep: value }),
-      ).not.toThrow();
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as Record<
-        string,
-        unknown
-      >;
-      let cursor = parsed.deep as Record<string, unknown>;
-      for (let i = 0; i < 4; i++) {
-        cursor = cursor.nested as Record<string, unknown>;
-      }
-      expect(cursor.nested).toBe('[MaxDepthExceeded]');
-      expect(JSON.stringify(parsed)).not.toContain('too deep');
-    });
-
-    it('does not run a plain string context value through sanitizeLogMessage (only Error.message is)', () => {
-      const multiline = 'first line\nsecond line';
-      logger.info('note', { text: multiline });
-
-      const parsed = JSON.parse(captureCall(infoSpy)) as Record<
-        string,
-        unknown
-      >;
-      expect(parsed.text).toBe(multiline);
+      const { deep } = parseLastLine<{ deep: unknown }>(errorSpy);
+      expect(deep).toEqual(nestUnder('[MaxDepthExceeded]', NESTING_PAST_LIMIT));
     });
 
     it.each(MOCK_SEPARATORS)(
       'neutralizes a raw %s in a plain string context value',
       (_name, separator) => {
-        logger.error('note', { text: `first${separator}second` });
+        logger.error(MOCK_EVENT, { text: `first${separator}second` });
 
-        const line = captureCall(errorSpy);
+        const line = lastLine(errorSpy);
         expect(line.includes(separator)).toBe(false);
 
-        const parsed = JSON.parse(line) as Record<string, unknown>;
-        expect(parsed.text).toBe('first second');
+        const { text } = JSON.parse(line) as { text: string };
+        expect(text).toBe('first second');
       },
     );
 
-    it('neutralizes U+2028/U+2029 in a string nested inside a plain object and an array', () => {
-      logger.error('note', {
+    it('neutralizes U+2028/U+2029 in strings nested in an object and an array', () => {
+      logger.error(MOCK_EVENT, {
         details: { message: `nested${MOCK_LINE_SEPARATOR}message` },
         items: [`array${MOCK_PARAGRAPH_SEPARATOR}item`],
       });
 
-      const line = captureCall(errorSpy);
+      const line = lastLine(errorSpy);
       expect(line.includes(MOCK_LINE_SEPARATOR)).toBe(false);
       expect(line.includes(MOCK_PARAGRAPH_SEPARATOR)).toBe(false);
 
-      const parsed = JSON.parse(line) as {
-        details: { message: string };
-        items: string[];
+      const { details, items } = JSON.parse(line) as {
+        details: unknown;
+        items: unknown;
       };
-      expect(parsed.details.message).toBe('nested message');
-      expect(parsed.items[0]).toBe('array item');
+      expect(details).toEqual({ message: 'nested message' });
+      expect(items).toEqual(['array item']);
     });
 
-    it('does not mark a shared (non-cyclic) reference as circular', () => {
-      const shared = { id: 1 };
+    it.each([
+      ['a Date', MOCK_NOW, MOCK_TS],
+      ['a class instance', new MockPoint(1, 2), { x: 1, y: 2 }],
+    ])(
+      'passes %s in context through without recursing',
+      (_name, value, expected) => {
+        logger.error(MOCK_EVENT, { value });
 
-      logger.error('shared.ref', { a: shared, b: shared });
+        const { value: logged } = parseLastLine<{ value: unknown }>(errorSpy);
+        expect(logged).toEqual(expected);
+      },
+    );
 
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        a: { id: number };
-        b: { id: number };
-      };
-      expect(parsed.a).toEqual({ id: 1 });
-      expect(parsed.b).toEqual({ id: 1 });
-    });
+    it('recurses into an Object.create(null) value like a plain object', () => {
+      const nullProto = Object.create(null) as Record<string, unknown>;
+      nullProto.cause = mockError(MOCK_FIRST_MESSAGE);
 
-    it('passes a Date nested in context through untouched instead of recursing into it', () => {
-      const date = new Date('2024-01-01T00:00:00.000Z');
+      logger.error(MOCK_EVENT, { details: nullProto });
 
-      logger.error(MIXED_TYPES_EVENT, { date });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as { date: string };
-      expect(parsed.date).toBe(date.toISOString());
-    });
-
-    it('passes a class instance nested in context through untouched instead of recursing into it', () => {
-      class Point {
-        constructor(
-          public x: number,
-          public y: number,
-        ) {}
-      }
-
-      logger.error(MIXED_TYPES_EVENT, { point: new Point(1, 2) });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        point: { x: number; y: number };
-      };
-      expect(parsed.point).toEqual({ x: 1, y: 2 });
-    });
-
-    it('treats an Object.create(null) value as a plain object and recurses into it', () => {
-      const cause = new Error(NULL_PROTO_ERROR_MESSAGE);
-      const nullProtoObj: Record<string, unknown> = Object.create(
-        null,
-      ) as Record<string, unknown>;
-      nullProtoObj.cause = cause;
-
-      logger.error(MOCK_EVENT, { details: nullProtoObj });
-
-      const parsed = JSON.parse(captureCall(errorSpy)) as {
-        details: { cause: { message: string } };
-      };
-      expect(parsed.details.cause.message).toBe(NULL_PROTO_ERROR_MESSAGE);
+      const { details } = parseLastLine<{ details: unknown }>(errorSpy);
+      expect(details).toEqual({
+        cause: {
+          name: 'Error',
+          message: MOCK_FIRST_MESSAGE,
+          stack: MOCK_STACK,
+        },
+      });
     });
   });
 
@@ -412,7 +387,6 @@ describe(createLogger, () => {
     let logger: ReturnType<typeof createLogger>;
 
     beforeEach(() => {
-      vi.stubEnv('NODE_ENV', 'test');
       sink = vi.fn<TLogSink>();
       unregister = registerLogSink(sink);
       logger = createLogger({ service: MOCK_SERVICE });
@@ -422,23 +396,21 @@ describe(createLogger, () => {
       unregister();
     });
 
-    it('hands the sink the same error line it writes to the console', () => {
-      logger.error(MOCK_EVENT, { status: 500 });
+    it.each([LOG_LEVEL.ERROR, LOG_LEVEL.WARN])(
+      'hands the sink the same %s line it writes to the console',
+      (level) => {
+        logger[level](MOCK_EVENT, { userId: MOCK_USER_ID });
 
-      expect(sink).toHaveBeenCalledTimes(1);
-      expect(sink).toHaveBeenCalledWith(JSON.parse(captureCall(errorSpy)));
-    });
-
-    it('hands the sink the same warn line it writes to the console', () => {
-      logger.warn(RETRY_EVENT, { attempt: 2 });
-
-      expect(sink).toHaveBeenCalledTimes(1);
-      expect(sink).toHaveBeenCalledWith(JSON.parse(captureCall(warnSpy)));
-    });
+        expect(sink).toHaveBeenCalledTimes(1);
+        expect(sink).toHaveBeenCalledWith(
+          parseLastLine(vi.mocked(console[level])),
+        );
+      },
+    );
 
     it('never hands info or debug lines to the sink', () => {
-      logger.info(SIGNED_IN_EVENT);
-      logger.debug('cache.hit');
+      logger.info(MOCK_EVENT);
+      logger.debug(MOCK_EVENT);
 
       expect(infoSpy).toHaveBeenCalledTimes(1);
       expect(debugSpy).toHaveBeenCalledTimes(1);
@@ -455,7 +427,7 @@ describe(createLogger, () => {
 
     it('keeps the logging call silent when a sink throws', () => {
       sink.mockImplementation(() => {
-        throw new Error('sink down');
+        throw new Error(MOCK_SINK_FAILURE);
       });
 
       expect(() => logger.error(MOCK_EVENT)).not.toThrow();
@@ -463,9 +435,9 @@ describe(createLogger, () => {
     });
 
     it('keeps the logging call silent when a sink rejects', async () => {
-      sink.mockRejectedValue(new Error('sink down'));
+      sink.mockRejectedValue(new Error(MOCK_SINK_FAILURE));
 
-      expect(() => logger.warn(RETRY_EVENT)).not.toThrow();
+      expect(() => logger.warn(MOCK_EVENT)).not.toThrow();
       await Promise.resolve();
 
       expect(warnSpy).toHaveBeenCalledTimes(1);
@@ -476,7 +448,7 @@ describe(createLogger, () => {
       const healthySink = vi.fn<TLogSink>();
       const unregisterHealthy = registerLogSink(healthySink);
       sink.mockImplementation(() => {
-        throw new Error('sink down');
+        throw new Error(MOCK_SINK_FAILURE);
       });
 
       logger.error(MOCK_EVENT);

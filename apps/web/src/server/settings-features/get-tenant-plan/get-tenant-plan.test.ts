@@ -1,4 +1,7 @@
+import { queries } from '@blog/db';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import {
   MOCK_DYNAMIC_SERVER_USAGE_ERROR,
@@ -7,93 +10,92 @@ import {
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
 
 import { getTenantPlan } from './get-tenant-plan';
 
-const { getTenantByIdMock } = vi.hoisted(() => ({
-  getTenantByIdMock: vi.fn(),
-}));
+faker.seed(6010);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
-      getTenantById: getTenantByIdMock,
+      getTenantById: vi.fn(),
     },
   },
 }));
 
-vi.mock('next/cache', () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
-}));
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
-const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
+const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
 
 describe(getTenantPlan, () => {
   beforeEach(() => {
-    getRequestTenantIdMock.mockReset();
     getTenantByIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
-    });
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({ plan: TENANT_PLAN.GROWTH }),
+    );
   });
 
   it('resolves the plan of the supplied tenant id', async () => {
     const result = await getTenantPlan(MOCK_TENANT_ID);
 
-    expect(result).toEqual({ ok: true, data: TENANT_PLAN.GROWTH });
+    expect(result).toEqual(okResult(TENANT_PLAN.GROWTH));
     expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       includeArchived: true,
     });
   });
 
   it('resolves no plan when the request has no resolvable tenant', async () => {
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    vi.mocked(getRequestTenantId).mockResolvedValueOnce(undefined);
 
     const result = await getTenantPlan(MOCK_TENANT_ID);
 
-    expect(result).toEqual({ ok: true, data: undefined });
+    expect(result).toEqual(okResult());
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('reads the request tenant from the supplied tenant', async () => {
     await getTenantPlan(MOCK_TENANT_ID);
 
-    expect(getRequestTenantIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getRequestTenantId).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it('returns ok:false when a query rejects', async () => {
-    getTenantByIdMock.mockRejectedValue(MOCK_ERROR);
+  it('returns the failure when a query rejects', async () => {
+    getTenantByIdMock.mockRejectedValueOnce(MOCK_ERROR);
 
     const result = await getTenantPlan(MOCK_TENANT_ID);
 
-    expect(result.ok).toBe(false);
+    expect(result).toEqual(errorResult(MOCK_ERROR));
   });
 
   it("resolves each request's own tenant's plan", async () => {
-    getTenantByIdMock.mockImplementation((id: string) => {
-      return {
+    getTenantByIdMock.mockImplementation(async (id) =>
+      mockTenant({
         id,
         plan: id === MOCK_TENANT_ID ? TENANT_PLAN.GROWTH : TENANT_PLAN.FREE,
-      };
-    });
+      }),
+    );
+    vi.mocked(getRequestTenantId)
+      .mockResolvedValueOnce(MOCK_TENANT_ID)
+      .mockResolvedValueOnce(MOCK_OTHER_TENANT_ID);
 
-    getRequestTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     const resultA = await getTenantPlan(MOCK_TENANT_ID);
-
-    getRequestTenantIdMock.mockResolvedValue(MOCK_OTHER_TENANT_ID);
     const resultB = await getTenantPlan(MOCK_OTHER_TENANT_ID);
 
-    expect(resultA).toEqual({ ok: true, data: TENANT_PLAN.GROWTH });
-    expect(resultB).toEqual({ ok: true, data: TENANT_PLAN.FREE });
+    expect(resultA).toEqual(okResult(TENANT_PLAN.GROWTH));
+    expect(resultB).toEqual(okResult(TENANT_PLAN.FREE));
   });
 
   it("rethrows the header read's dynamic-rendering signal", async () => {
-    getRequestTenantIdMock.mockRejectedValue(MOCK_DYNAMIC_SERVER_USAGE_ERROR);
+    vi.mocked(getRequestTenantId).mockRejectedValueOnce(
+      MOCK_DYNAMIC_SERVER_USAGE_ERROR,
+    );
 
     await expect(getTenantPlan(MOCK_TENANT_ID)).rejects.toBe(
       MOCK_DYNAMIC_SERVER_USAGE_ERROR,

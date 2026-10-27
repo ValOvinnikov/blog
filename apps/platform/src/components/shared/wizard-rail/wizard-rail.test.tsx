@@ -1,52 +1,56 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { WizardRail } from './wizard-rail';
 
-const steps = [
-  { id: 'details', title: 'Details', description: 'Name, domain, plan' },
-  {
-    id: 'sanity-project',
-    title: 'Sanity project',
-    description: 'Create + configure',
-  },
-  {
-    id: 'seed-content',
-    title: 'Seed content',
-    description: 'Starter documents',
-  },
-];
+faker.seed(5995);
 
-describe(WizardRail, () => {
-  it('renders every step title and description', () => {
-    render(<WizardRail steps={steps} activeIndex={0} ariaLabel="Steps" />);
+const mockStep = () => ({
+  id: faker.string.uuid(),
+  title: faker.lorem.words(2),
+  description: faker.lorem.sentence(),
+});
 
-    expect(screen.getByText('Details')).toBeVisible();
-    expect(screen.getByText('Name, domain, plan')).toBeVisible();
-    expect(screen.getByText('Sanity project')).toBeVisible();
-    expect(screen.getByText('Seed content')).toBeVisible();
+const MOCK_STEPS = [mockStep(), mockStep(), mockStep()];
+const ARIA_CURRENT = 'aria-current';
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+
+const setup = customRender(WizardRail, {
+  steps: MOCK_STEPS,
+  activeIndex: 1,
+  ariaLabel: MOCK_ARIA_LABEL,
+});
+
+describe(`<${WizardRail.name}/>`, () => {
+  beforeEach(() => {
+    setup();
   });
 
-  it('marks the active step with aria-current="step" and no other step', () => {
-    render(<WizardRail steps={steps} activeIndex={1} ariaLabel="Steps" />);
+  it.each(MOCK_STEPS)('renders the $title step and its description', (step) => {
+    const title = screen.getByText(step.title);
+    const description = screen.getByText(step.description);
 
-    const items = screen.getAllByRole('listitem');
-    expect(items[1]).toHaveAttribute('aria-current', 'step');
-    expect(items[0]).not.toHaveAttribute('aria-current');
-    expect(items[2]).not.toHaveAttribute('aria-current');
+    expect(title).toBeVisible();
+    expect(description).toBeVisible();
   });
 
-  it('exposes the list under the given accessible name', () => {
-    render(
-      <WizardRail
-        steps={steps}
-        activeIndex={0}
-        ariaLabel="Provisioning steps"
-      />,
-    );
+  it('marks only the active step as the current step', () => {
+    const [firstItem, activeItem, lastItem] = screen.getAllByRole('listitem');
 
-    expect(
-      screen.getByRole('list', { name: 'Provisioning steps' }),
-    ).toBeVisible();
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(activeItem).toHaveAttribute(ARIA_CURRENT, 'step');
+    expect(firstItem).not.toHaveAttribute(ARIA_CURRENT);
+    expect(lastItem).not.toHaveAttribute(ARIA_CURRENT);
+  });
+
+  it('names the step list with the given label', () => {
+    const list = screen.getByRole('list', { name: MOCK_ARIA_LABEL });
+
+    expect(list).toBeVisible();
+  });
+
+  it('is a list, not a navigation landmark', () => {
+    const navigation = screen.queryByRole('navigation');
+
+    expect(navigation).not.toBeInTheDocument();
   });
 });

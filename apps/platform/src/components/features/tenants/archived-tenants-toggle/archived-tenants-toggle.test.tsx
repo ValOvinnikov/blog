@@ -1,54 +1,59 @@
 import { useRouter } from '@platform/i18n/navigation';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ArchivedTenantsToggle } from './archived-tenants-toggle';
 
-const render = renderWithIntl;
-
 vi.mock('@platform/i18n/navigation');
 
-const pushMock = vi.fn();
+const ACTIVE_LABEL = 'Active';
+const ALL_LABEL = 'All';
+const ARIA_PRESSED = 'aria-pressed';
 
-describe(ArchivedTenantsToggle, () => {
+const setup = customRender(ArchivedTenantsToggle, {
+  shouldShowArchived: false,
+});
+
+describe(`<${ArchivedTenantsToggle.name}/>`, () => {
   let user: UserEvent;
+  const push = vi.fn();
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push: pushMock });
+    vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push });
   });
 
   it('shows Active selected by default', () => {
-    render(<ArchivedTenantsToggle shouldShowArchived={false} />);
+    setup();
 
-    expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const activeButton = screen.getByRole('button', { name: ACTIVE_LABEL });
+
+    expect(activeButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
-  it('shows All selected when shouldShowArchived is true', () => {
-    render(<ArchivedTenantsToggle shouldShowArchived={true} />);
+  it('shows All selected when archived tenants are shown', () => {
+    setup({ shouldShowArchived: true });
 
-    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const allButton = screen.getByRole('button', { name: ALL_LABEL });
+
+    expect(allButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
   it('navigates to the archived tenant list when All is selected', async () => {
-    render(<ArchivedTenantsToggle shouldShowArchived={false} />);
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'All' }));
+    const allButton = screen.getByRole('button', { name: ALL_LABEL });
+    await user.click(allButton);
 
-    expect(pushMock).toHaveBeenCalledWith('/tenants?archived=1');
+    expect(push).toHaveBeenCalledWith('/tenants?archived=1');
   });
 
   it('navigates back to the active-only list when Active is selected', async () => {
-    render(<ArchivedTenantsToggle shouldShowArchived={true} />);
+    setup({ shouldShowArchived: true });
 
-    await user.click(screen.getByRole('button', { name: 'Active' }));
+    const activeButton = screen.getByRole('button', { name: ACTIVE_LABEL });
+    await user.click(activeButton);
 
-    expect(pushMock).toHaveBeenCalledWith('/tenants');
+    expect(push).toHaveBeenCalledWith('/tenants');
   });
 });

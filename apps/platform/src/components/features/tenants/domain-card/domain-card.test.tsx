@@ -5,11 +5,12 @@ import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { DomainCard } from './domain-card';
 
-const TENANT_DNS_HREF = `/tenants/${MOCK_TENANT_ID}/domain`;
-const OWNER_DNS_HREF = '/dashboard/domain';
+const TENANT_DNS_HREF = adminRoutes.tenantDomain(MOCK_TENANT_ID);
+const OWNER_DNS_HREF = adminRoutes.dashboardDomain();
 
 const setup = customRender(DomainCard, {
   tenant: mockTenant(),

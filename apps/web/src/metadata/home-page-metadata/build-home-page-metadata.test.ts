@@ -1,9 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  MOCK_BILINGUAL_REQUEST_CONTEXT,
+  MOCK_DUTCH_REQUEST_CONTEXT,
+  NL_PATH_PREFIX,
+  mockMetadataSeo,
+} from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildHomePageMetadata } from './build-home-page-metadata';
@@ -18,31 +23,37 @@ vi.mock('@web/server/home/get-home-page/get-home-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
+faker.seed(5202);
+
 const { EN, NL, DE } = LOCALE_ISO_CODES;
+const HOME_PATH = routes.home();
+const NL_HOME_PATH = NL_PATH_PREFIX;
+const MOCK_SEO = mockMetadataSeo();
 
 const homePage = (translations: string[]) =>
   okResult({
     hero: undefined,
     modules: [],
     faqs: [],
-    seo: mockSeo({ title: 'Home' }),
+    seo: MOCK_SEO,
     translations,
   });
 
 describe(buildHomePageMetadata, () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      liveLocales: [EN, NL],
-    });
+    vi.mocked(getRequestContext).mockResolvedValue(
+      MOCK_BILINGUAL_REQUEST_CONTEXT,
+    );
   });
 
   describe('when no metadata can be built', () => {
     it('returns empty metadata and logs when the fetch fails', async () => {
       getHomePageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-      expect(await buildHomePageMetadata()).toEqual({});
+      const metadata = await buildHomePageMetadata();
+
+      expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'home_page.metadata_fetch_failed',
         { error: MOCK_ERROR },
@@ -52,7 +63,9 @@ describe(buildHomePageMetadata, () => {
     it('returns empty metadata without logging when this language has no Home', async () => {
       getHomePageMock.mockResolvedValue(okResult());
 
-      expect(await buildHomePageMetadata()).toEqual({});
+      const metadata = await buildHomePageMetadata();
+
+      expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
   });
@@ -65,13 +78,13 @@ describe(buildHomePageMetadata, () => {
     it('uses the seo title as the absolute title', async () => {
       const metadata = await buildHomePageMetadata();
 
-      expect(metadata.title).toEqual({ absolute: 'Home' });
+      expect(metadata.title).toEqual({ absolute: MOCK_SEO.title });
     });
 
     it('is self-canonical to / with no languages', async () => {
       const metadata = await buildHomePageMetadata();
 
-      expect(metadata.alternates).toEqual({ canonical: '/' });
+      expect(metadata.alternates).toEqual({ canonical: HOME_PATH });
     });
   });
 
@@ -81,24 +94,20 @@ describe(buildHomePageMetadata, () => {
     const metadata = await buildHomePageMetadata();
 
     expect(metadata.alternates).toEqual({
-      canonical: '/',
-      languages: { en: '/', nl: '/nl', 'x-default': '/' },
+      canonical: HOME_PATH,
+      languages: { en: HOME_PATH, nl: NL_HOME_PATH, 'x-default': HOME_PATH },
     });
   });
 
   it('points a non-default Home canonical at its own prefixed address', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
+    vi.mocked(getRequestContext).mockResolvedValue(MOCK_DUTCH_REQUEST_CONTEXT);
     getHomePageMock.mockResolvedValue(homePage([EN, NL]));
 
     const metadata = await buildHomePageMetadata();
 
     expect(metadata.alternates).toEqual({
-      canonical: '/nl',
-      languages: { en: '/', nl: '/nl', 'x-default': '/' },
+      canonical: NL_HOME_PATH,
+      languages: { en: HOME_PATH, nl: NL_HOME_PATH, 'x-default': HOME_PATH },
     });
   });
 });

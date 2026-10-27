@@ -1,5 +1,6 @@
 import {
   MOCK_DATA_URL,
+  MOCK_EMAIL_ACTION,
   MOCK_ESCAPED_SCRIPT_MARKUP,
   MOCK_JAVASCRIPT_URL,
   MOCK_SCRIPT_MARKUP,
@@ -11,48 +12,36 @@ import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand'
 import { renderEmailAction } from './email-action';
 
 const JAVASCRIPT_SCHEME = 'javascript:';
-const SIGN_IN_URL = 'https://example.com/sign-in';
 
-describe('renderEmailAction', () => {
-  it('renders a button using the solid fill and contrast text colours', () => {
-    const html = renderEmailAction(
-      { label: 'Sign in', url: SIGN_IN_URL },
-      MOCK_TENANT_EMAIL_BRAND,
-    );
+describe(renderEmailAction, () => {
+  describe('as a button', () => {
+    let html: string;
 
-    expect(html).toContain(`href="${SIGN_IN_URL}"`);
-    expect(html).toContain('>Sign in</a>');
-    expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.brandPrimarySolid);
-    expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.brandPrimaryContrast);
+    beforeEach(() => {
+      html = renderEmailAction(MOCK_EMAIL_ACTION, MOCK_TENANT_EMAIL_BRAND);
+    });
+
+    it('fills the button with the solid brand colour and its contrast text', () => {
+      expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.brandPrimarySolid);
+      expect(html).toContain(MOCK_TENANT_EMAIL_BRAND.brandPrimaryContrast);
+    });
+
+    it('lays the button out as a table so every client renders it alike', () => {
+      expect(html).toContain('<table');
+    });
+
+    it('makes the labelled link the whole content of the button cell', () => {
+      expect(html).toMatch(
+        new RegExp(
+          `<td[^>]*><a href="${MOCK_EMAIL_ACTION.url}"[^>]*>${MOCK_EMAIL_ACTION.label}</a></td>`,
+        ),
+      );
+    });
   });
 
-  it('uses a table for the button so it renders consistently across clients', () => {
+  it('renders the link variant in the brand colour, not the solid fill', () => {
     const html = renderEmailAction(
-      { label: 'Accept invite', url: 'https://example.com/invite' },
-      MOCK_TENANT_EMAIL_BRAND,
-    );
-
-    expect(html).toContain('<table');
-  });
-
-  it('makes the link the whole content of the button cell', () => {
-    const html = renderEmailAction(
-      { label: 'Sign in', url: SIGN_IN_URL },
-      MOCK_TENANT_EMAIL_BRAND,
-    );
-
-    expect(html).toMatch(
-      new RegExp(`<td[^>]*><a href="${SIGN_IN_URL}"[^>]*>Sign in</a></td>`),
-    );
-  });
-
-  it('renders the link variant using brandPrimary rather than the solid fill', () => {
-    const html = renderEmailAction(
-      {
-        label: 'Unsubscribe',
-        url: 'https://example.com/unsubscribe',
-        variant: 'link',
-      },
+      { ...MOCK_EMAIL_ACTION, variant: 'link' },
       MOCK_TENANT_EMAIL_BRAND,
     );
 
@@ -72,10 +61,7 @@ describe('renderEmailAction', () => {
 
   it('escapes the url', () => {
     const html = renderEmailAction(
-      {
-        label: 'Sign in',
-        url: 'https://example.com/"><script>alert(1)</script>',
-      },
+      { ...MOCK_EMAIL_ACTION, url: `${MOCK_URL}/">${MOCK_SCRIPT_MARKUP}` },
       MOCK_TENANT_EMAIL_BRAND,
     );
 
@@ -88,7 +74,7 @@ describe('renderEmailAction', () => {
     [JAVASCRIPT_SCHEME, MOCK_TAB_SPLIT_JAVASCRIPT_URL],
   ])('neutralises a %s url given as %j to a harmless href', (scheme, url) => {
     const html = renderEmailAction(
-      { label: 'Sign in', url },
+      { ...MOCK_EMAIL_ACTION, url },
       MOCK_TENANT_EMAIL_BRAND,
     );
 
@@ -96,12 +82,16 @@ describe('renderEmailAction', () => {
     expect(html).toContain('href="#"');
   });
 
-  it('allows an http/https/mailto url through unchanged', () => {
+  it.each([
+    'http://example.com/sign-in',
+    `${MOCK_URL}/sign-in?token=abc`,
+    'mailto:someone@example.com',
+  ])('lets the safe url %s through unchanged', (url) => {
     const html = renderEmailAction(
-      { label: 'Sign in', url: 'https://example.com/sign-in?token=abc' },
+      { ...MOCK_EMAIL_ACTION, url },
       MOCK_TENANT_EMAIL_BRAND,
     );
 
-    expect(html).toContain('href="https://example.com/sign-in?token=abc"');
+    expect(html).toContain(`href="${url}"`);
   });
 });

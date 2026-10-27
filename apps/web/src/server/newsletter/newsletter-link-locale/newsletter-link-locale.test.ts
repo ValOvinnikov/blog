@@ -1,75 +1,65 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { resolveNewsletterLinkLocale } from './newsletter-link-locale';
 
-vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
-  resolveRequestTenant: vi.fn(),
-}));
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
-      selectLiveLocales: (tenant: { liveLocales: string[] }) =>
-        tenant.liveLocales,
+      selectLiveLocales: ({
+        locale,
+        additionalLocales,
+      }: Pick<TTenant, 'locale' | 'additionalLocales'>) => [
+        locale,
+        ...additionalLocales,
+      ],
     },
   },
 }));
 
-const resolveRequestTenantMock = vi.mocked(resolveRequestTenant);
+const MOCK_LOOKUP_FAILED_EVENT = 'newsletter.link_locale_tenant_lookup_failed';
 
 describe(resolveNewsletterLinkLocale, () => {
-  beforeEach(() => {
-    resolveRequestTenantMock.mockReset();
-    resolveRequestTenantMock.mockResolvedValue({
-      locale: LOCALE_ISO_CODES.NL,
-      liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.FR],
-    } as never);
-  });
-
   it('keeps a language the tenant offers', async () => {
-    await expect(
-      resolveNewsletterLinkLocale(LOCALE_ISO_CODES.FR),
-    ).resolves.toEqual({
-      locale: LOCALE_ISO_CODES.FR,
-      defaultLocale: LOCALE_ISO_CODES.NL,
-    });
+    const linkLocale = await resolveNewsletterLinkLocale(LOCALE_ISO_CODES.NL);
+
+    expect(linkLocale).toEqual(
+      mockNewsletterLinkLocale({ locale: LOCALE_ISO_CODES.NL }),
+    );
   });
 
-  it.each([null, '', LOCALE_ISO_CODES.DE, 'fr', 'xx'])(
+  it.each([null, '', LOCALE_ISO_CODES.DE, LOCALE_ISO_CODES.NL.toLowerCase()])(
     "falls back to the tenant's default language for %j",
     async (lang) => {
-      await expect(resolveNewsletterLinkLocale(lang)).resolves.toEqual({
-        locale: LOCALE_ISO_CODES.NL,
-        defaultLocale: LOCALE_ISO_CODES.NL,
-      });
+      const linkLocale = await resolveNewsletterLinkLocale(lang);
+
+      expect(linkLocale).toEqual(mockNewsletterLinkLocale());
     },
   );
 
-  it('falls back to English when no tenant matches the request', async () => {
-    resolveRequestTenantMock.mockResolvedValue(undefined);
+  it('falls back to the default language when no tenant matches the request', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
-    await expect(
-      resolveNewsletterLinkLocale(LOCALE_ISO_CODES.FR),
-    ).resolves.toEqual({
-      locale: LOCALE_ISO_CODES.EN,
-      defaultLocale: LOCALE_ISO_CODES.EN,
-    });
+    const linkLocale = await resolveNewsletterLinkLocale(LOCALE_ISO_CODES.NL);
+
+    expect(linkLocale).toEqual(mockNewsletterLinkLocale());
   });
 
-  it('falls back to English when the tenant lookup fails', async () => {
-    resolveRequestTenantMock.mockRejectedValue(new Error('db down'));
+  it('falls back to the default language and warns when the lookup fails', async () => {
+    vi.mocked(resolveRequestTenant).mockRejectedValueOnce(MOCK_ERROR);
 
-    await expect(
-      resolveNewsletterLinkLocale(LOCALE_ISO_CODES.FR),
-    ).resolves.toEqual({
-      locale: LOCALE_ISO_CODES.EN,
-      defaultLocale: LOCALE_ISO_CODES.EN,
-    });
+    const linkLocale = await resolveNewsletterLinkLocale(LOCALE_ISO_CODES.NL);
+
+    expect(linkLocale).toEqual(mockNewsletterLinkLocale());
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      'newsletter.link_locale_tenant_lookup_failed',
-      expect.objectContaining({ error: expect.any(Error) }),
+      MOCK_LOOKUP_FAILED_EVENT,
+      { error: MOCK_ERROR },
     );
   });
 });

@@ -1,62 +1,64 @@
-import {
-  CONTENT_ROUTE_REVALIDATE_SECONDS,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { buildTagIndexMetadata } from '@web/metadata/tag-index-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
+import { mockRouteParams } from '@web/testing/app/route-params';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import TagIndexRoute, { generateMetadata, revalidate } from './page';
+
+faker.seed(6009);
+
+const MOCK_METADATA = { title: faker.lorem.words(2) };
+
+const params = mockRouteParams();
 
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/metadata/tag-index-metadata', () => ({
-  buildTagIndexMetadata: vi.fn().mockResolvedValue({ title: 'Tags' }),
+  buildTagIndexMetadata: vi.fn(),
 }));
 
 vi.mock('@web/components/pages/tag-index-page', () => ({
   TagIndexPage: () => <div data-testid="tag-index-page" />,
 }));
 
-describe('TagIndexRoute', () => {
+const setup = customRenderAsync(TagIndexRoute, { params });
+
+describe(`<${TagIndexRoute.name}/>`, () => {
+  beforeEach(async () => {
+    await setup();
+  });
+
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  it('enters the request context with the route params', async () => {
-    const params = Promise.resolve({
-      tenant: 'tenant-1',
-      locale: LOCALE_ISO_CODES.EN,
-      slug: 'a-slug',
-    });
-
-    await TagIndexRoute({ params });
-
+  it('enters the request context with the route params', () => {
     expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 
-  describe('generateMetadata', () => {
-    it('delegates to buildTagIndexMetadata', async () => {
-      const metadata = await generateMetadata({
-        params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
-      });
+  it('renders TagIndexPage', () => {
+    const tagIndexPage = screen.getByTestId('tag-index-page');
 
-      expect(metadata).toEqual({ title: 'Tags' });
-    });
+    expect(tagIndexPage).toBeVisible();
+  });
+});
 
-    it('enters the request context with the route params', async () => {
-      const params: Parameters<typeof generateMetadata>[0]['params'] =
-        Promise.resolve({ tenant: 'tenant-1', locale: 'EN' });
-
-      await generateMetadata({ params });
-
-      expect(enterRequestContext).toHaveBeenCalledWith(params);
-    });
+describe(generateMetadata, () => {
+  beforeEach(() => {
+    vi.mocked(buildTagIndexMetadata).mockResolvedValue(MOCK_METADATA);
   });
 
-  it('renders TagIndexPage without forwarding route params', async () => {
-    const ui = await TagIndexRoute({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
-    });
+  it('returns the tag index metadata', async () => {
+    const metadata = await generateMetadata({ params });
 
-    expect(ui.props).toEqual({});
+    expect(metadata).toBe(MOCK_METADATA);
+  });
+
+  it('enters the request context before building the metadata', async () => {
+    await generateMetadata({ params });
+
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 });

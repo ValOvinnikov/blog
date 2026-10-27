@@ -1,5 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
+import messages from '@platform/i18n/messages/en.json';
+import { addBlockedDomainAction } from '@platform/server/signup-block/add-blocked-domain-action';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_DOMAIN,
@@ -10,31 +12,22 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { AddBlockedDomainCard } from './add-blocked-domain-card';
 
-const { addBlockedDomainActionMock } = vi.hoisted(() => ({
-  addBlockedDomainActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/signup-block/add-blocked-domain-action');
 
-vi.mock('@platform/server/signup-block/add-blocked-domain-action', () => ({
-  addBlockedDomainAction: addBlockedDomainActionMock,
-}));
-
-const DOMAIN_FIELD = { name: /^domain$/i };
-const REASON_FIELD = { name: 'Reason' };
-const SUBMIT_BUTTON = { name: 'Block domain' };
+const { addBlockedDomainCard } = messages;
+const DOMAIN_FIELD = { name: addBlockedDomainCard.domainLabel };
+const REASON_FIELD = { name: addBlockedDomainCard.reasonLabel };
+const SUBMIT_BUTTON = { name: addBlockedDomainCard.blockSubmit };
 
 const setup = customRender(AddBlockedDomainCard, {});
 
 describe(`<${AddBlockedDomainCard.name}/>`, () => {
-  const refreshMock = vi.fn();
   let user: UserEvent;
+  let refresh: ReturnType<typeof mockRouterRefresh>;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    addBlockedDomainActionMock.mockReset().mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    refreshMock.mockReset();
-    mockRouterRefresh(refreshMock);
+    refresh = mockRouterRefresh();
     setup();
 
     const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
@@ -47,18 +40,18 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     const submit = screen.getByRole('button', SUBMIT_BUTTON);
     await user.click(submit);
 
-    expect(addBlockedDomainActionMock).toHaveBeenCalledWith({
+    const domainField = await screen.findByRole('textbox', DOMAIN_FIELD);
+
+    expect(addBlockedDomainAction).toHaveBeenCalledWith({
       domain: MOCK_BLOCKED_DOMAIN,
       reason: MOCK_BLOCK_REASON,
     });
-    const domainField = await screen.findByRole('textbox', DOMAIN_FIELD);
-
     expect(domainField).toHaveValue('');
-    expect(refreshMock).toHaveBeenCalled();
+    expect(refresh).toHaveBeenCalledTimes(1);
   });
 
   it('shows the field errors the action returns and keeps the input', async () => {
-    addBlockedDomainActionMock.mockResolvedValue({
+    vi.mocked(addBlockedDomainAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {
         domain: { reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID },
@@ -69,28 +62,30 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     await user.click(submit);
 
     const error = await screen.findByText(
-      'Enter a valid domain, such as example.com.',
+      addBlockedDomainCard.domainFormatInvalid,
     );
     const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
 
     expect(error).toBeVisible();
     expect(domainField).toHaveValue(MOCK_BLOCKED_DOMAIN);
-    expect(refreshMock).not.toHaveBeenCalled();
+    expect(refresh).not.toHaveBeenCalled();
   });
 
   it('keeps the input and does not refresh when the action fails', async () => {
-    addBlockedDomainActionMock.mockResolvedValue({
+    vi.mocked(addBlockedDomainAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
 
     const submit = screen.getByRole('button', SUBMIT_BUTTON);
     await user.click(submit);
 
-    const error = await screen.findByText(/couldn't block the domain/i);
+    const error = await screen.findByText(
+      addBlockedDomainCard.domainBlockFailed,
+    );
     const reasonField = screen.getByRole('textbox', REASON_FIELD);
 
     expect(error).toBeVisible();
     expect(reasonField).toHaveValue(MOCK_BLOCK_REASON);
-    expect(refreshMock).not.toHaveBeenCalled();
+    expect(refresh).not.toHaveBeenCalled();
   });
 });

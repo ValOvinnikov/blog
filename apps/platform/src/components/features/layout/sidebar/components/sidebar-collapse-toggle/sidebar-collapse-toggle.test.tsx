@@ -1,8 +1,11 @@
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import messages from '@platform/i18n/messages/en.json';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SidebarCollapseToggle } from './sidebar-collapse-toggle';
+
+const { collapseToggle, expandToggle } = messages.sidebar;
 
 const renderToggle = (isInitiallyCollapsed: boolean) =>
   renderWithIntl(
@@ -11,49 +14,52 @@ const renderToggle = (isInitiallyCollapsed: boolean) =>
     </SidebarCollapseProvider>,
   );
 
-describe(SidebarCollapseToggle, () => {
-  let user: UserEvent;
+describe(`<${SidebarCollapseToggle.name}/>`, () => {
+  it.each([
+    { isInitiallyCollapsed: false, name: collapseToggle, expanded: 'true' },
+    { isInitiallyCollapsed: true, name: expandToggle, expanded: 'false' },
+  ])(
+    'is named for its action when collapsed is $isInitiallyCollapsed',
+    ({ isInitiallyCollapsed, name, expanded }) => {
+      renderToggle(isInitiallyCollapsed);
 
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
+      const toggle = screen.getByRole('button', { name });
 
-  it('is named and marked expanded when the sidebar starts expanded', () => {
-    renderToggle(false);
+      expect(toggle).toHaveAttribute('aria-expanded', expanded);
+    },
+  );
 
-    const button = screen.getByRole('button', { name: 'Collapse sidebar' });
-    expect(button).toHaveAttribute('aria-expanded', 'true');
-  });
+  describe('when the sidebar starts expanded', () => {
+    let user: UserEvent;
 
-  it('is named and marked collapsed when the sidebar starts collapsed', () => {
-    renderToggle(true);
+    beforeEach(() => {
+      user = userEvent.setup();
+      renderToggle(false);
+    });
 
-    const button = screen.getByRole('button', { name: 'Expand sidebar' });
-    expect(button).toHaveAttribute('aria-expanded', 'false');
-  });
+    it('collapses the sidebar on click', async () => {
+      const collapseButton = screen.getByRole('button', {
+        name: collapseToggle,
+      });
 
-  it('toggles the shared collapse state on click', async () => {
-    renderToggle(false);
+      await user.click(collapseButton);
 
-    await user.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+      const expandButton = screen.getByRole('button', { name: expandToggle });
+      expect(expandButton).toBeVisible();
+    });
 
-    expect(
-      screen.getByRole('button', { name: 'Expand sidebar' }),
-    ).toBeVisible();
-  });
+    it('is reachable by keyboard and toggles on Enter', async () => {
+      await user.tab();
 
-  it('is reachable by keyboard and toggles on Enter', async () => {
-    renderToggle(false);
+      const collapseButton = screen.getByRole('button', {
+        name: collapseToggle,
+      });
+      expect(collapseButton).toHaveFocus();
 
-    await user.tab();
-    expect(
-      screen.getByRole('button', { name: 'Collapse sidebar' }),
-    ).toHaveFocus();
+      await user.keyboard('{Enter}');
 
-    await user.keyboard('{Enter}');
-
-    expect(
-      screen.getByRole('button', { name: 'Expand sidebar' }),
-    ).toBeVisible();
+      const expandButton = screen.getByRole('button', { name: expandToggle });
+      expect(expandButton).toBeVisible();
+    });
   });
 });

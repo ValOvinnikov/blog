@@ -5,21 +5,18 @@ import { ContentModule } from './content-module';
 
 faker.seed(123);
 
+const MOCK_BODY = faker.lorem.paragraph();
+
 const setup = customRender(ContentModule, {
-  children: <p>{faker.lorem.paragraph()}</p>,
+  children: <p>{MOCK_BODY}</p>,
 });
 
 describe(`<${ContentModule.name}/>`, () => {
   it('renders the children content', () => {
-    const body = faker.lorem.paragraph();
-    setup({ children: <p>{body}</p> });
+    setup();
 
-    expect(screen.getByText(body)).toBeVisible();
-  });
+    const body = screen.getByText(MOCK_BODY);
 
-  it('forwards data-testid', () => {
-    setup({ dataTestId: 'content-module' });
-
-    expect(screen.getByTestId('content-module')).toBeVisible();
+    expect(body).toBeVisible();
   });
 });

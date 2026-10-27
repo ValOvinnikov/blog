@@ -9,6 +9,7 @@ import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
+  MOCK_DEPROVISIONED_AT,
   MOCK_MISSING_TENANT_ID,
   unwrapOk,
 } from '@blog/db/testing/tenants/fixtures';
@@ -51,8 +52,9 @@ describe(setTenantSuspension, () => {
 
     const { status } = unwrapOk(await setTenantSuspension(tenantId, to));
 
+    const storedStatus = await readStatus(tenantId);
     expect(status).toBe(to);
-    expect(await readStatus(tenantId)).toBe(to);
+    expect(storedStatus).toBe(to);
   });
 
   it('records an operator suspension over an inactivity one', async () => {
@@ -89,12 +91,13 @@ describe(setTenantSuspension, () => {
   ])(
     'leaves a deprovisioned %s tenant untouched when asked for %s',
     async (status, target) => {
-      const tenantId = await insertTenant(status, new Date());
+      const tenantId = await insertTenant(status, MOCK_DEPROVISIONED_AT);
 
       const result = await setTenantSuspension(tenantId, target);
 
+      const storedStatus = await readStatus(tenantId);
       expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
-      expect(await readStatus(tenantId)).toBe(status);
+      expect(storedStatus).toBe(status);
     },
   );
 

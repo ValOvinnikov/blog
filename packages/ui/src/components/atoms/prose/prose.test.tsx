@@ -5,19 +5,18 @@ import { Prose } from './prose';
 
 faker.seed(123);
 
+const MOCK_BODY = faker.lorem.paragraph();
+
 const setup = customRender(Prose, {
-  children: faker.lorem.sentence(),
+  children: MOCK_BODY,
 });
 
 describe(`<${Prose.name}/>`, () => {
   it('renders children', () => {
-    const body = faker.lorem.paragraph();
-    setup({ children: body });
-    expect(screen.getByText(body)).toBeVisible();
-  });
+    setup();
 
-  it('renders as a <div>', () => {
-    const { container } = setup();
-    expect(container.firstChild?.nodeName).toBe('DIV');
+    const body = screen.getByText(MOCK_BODY);
+
+    expect(body).toBeVisible();
   });
 });

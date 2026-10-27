@@ -10,6 +10,7 @@ import {
   type TVoicePortableText,
   VOICE_FIELD_KIND,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_FETCH_FAILED_EVENT } from '@web/constants/site-config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -37,12 +38,18 @@ vi.mock('next/cache', () => ({
 
 const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
-const NOT_FOUND_HEADING_OVERRIDE = 'nope, try again';
-const GERMAN_HEADING_OVERRIDE = 'Verirrt';
-const BLOG_LIST_EMPTY_OVERRIDE = 'Nothing published yet.';
-const TOPIC_EMPTY_OVERRIDE = 'Nothing here yet.';
-const LOCALE_ERROR_TITLE_OVERRIDE = 'Oops';
-const ORIGINAL_HEADING = 'Original heading';
+faker.seed(6012);
+
+const MOCK_NOT_FOUND_HEADING_OVERRIDE = faker.lorem.sentence();
+const MOCK_GERMAN_HEADING_OVERRIDE = faker.lorem.sentence();
+const MOCK_BLOG_LIST_EMPTY_OVERRIDE = faker.lorem.sentence();
+const MOCK_TOPIC_EMPTY_OVERRIDE = faker.lorem.sentence();
+const MOCK_LOCALE_ERROR_TITLE_OVERRIDE = faker.lorem.sentence();
+const MOCK_ORIGINAL_HEADING = faker.lorem.sentence();
+const MOCK_OVERRIDDEN_HEADING = faker.lorem.sentence();
+const MOCK_UNREGISTERED_FIELD_ID = faker.lorem.word();
+const MOCK_IGNORED_OVERRIDE = faker.lorem.sentence();
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 360 });
 
 const siteConfigRow = (
   voiceOverrides: Record<string, string | TVoicePortableText> = {},
@@ -50,7 +57,7 @@ const siteConfigRow = (
 ) => {
   return {
     preset: PRESET_ID.CONSOLE,
-    accentHue: 250,
+    accentHue: MOCK_ACCENT_HUE,
     headingFont: FONT_CHOICE.SPACE_GROTESK,
     bodyFont: FONT_CHOICE.NEWSREADER,
     radiusScale: RADIUS_SCALE.MD,
@@ -79,13 +86,15 @@ describe(resolveTenantMessages, () => {
     { case: 'there are no voice overrides', row: siteConfigRow() },
     { case: 'the tenant has no site config row', row: undefined },
     {
-      case: 'an override key is missing from the VOICE_FIELDS registry',
-      row: siteConfigRow({ notARealVoiceField: 'ignored' }),
+      case: 'an override key is not a registered voice field',
+      row: siteConfigRow({
+        [MOCK_UNREGISTERED_FIELD_ID]: MOCK_IGNORED_OVERRIDE,
+      }),
     },
     {
       case: 'the only override is saved for another language',
       row: siteConfigRow(
-        { notFoundHeading: GERMAN_HEADING_OVERRIDE },
+        { notFoundHeading: MOCK_GERMAN_HEADING_OVERRIDE },
         LOCALE_ISO_CODES.DE,
       ),
     },
@@ -102,7 +111,7 @@ describe(resolveTenantMessages, () => {
 
   it('applies a TEXT override at its registry path, leaving the rest unchanged', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notFoundHeading: NOT_FOUND_HEADING_OVERRIDE }),
+      siteConfigRow({ notFoundHeading: MOCK_NOT_FOUND_HEADING_OVERRIDE }),
     );
 
     const { messages } = await resolveTenantMessages(
@@ -111,7 +120,7 @@ describe(resolveTenantMessages, () => {
     );
 
     expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
-      NOT_FOUND_HEADING_OVERRIDE,
+      MOCK_NOT_FOUND_HEADING_OVERRIDE,
     );
     expect(getAtPath(messages, ['notFound', 'supportingText'])).toBe(
       SITE_MESSAGES.notFound.supportingText,
@@ -121,7 +130,7 @@ describe(resolveTenantMessages, () => {
   it('applies an override saved for the requested language', async () => {
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow(
-        { notFoundHeading: GERMAN_HEADING_OVERRIDE },
+        { notFoundHeading: MOCK_GERMAN_HEADING_OVERRIDE },
         LOCALE_ISO_CODES.DE,
       ),
     );
@@ -132,7 +141,7 @@ describe(resolveTenantMessages, () => {
     );
 
     expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
-      GERMAN_HEADING_OVERRIDE,
+      MOCK_GERMAN_HEADING_OVERRIDE,
     );
   });
 
@@ -144,23 +153,25 @@ describe(resolveTenantMessages, () => {
   }>([
     {
       kind: VOICE_FIELD_KIND.RICH,
-      overrides: { blogListEmpty: mockVoiceRichText(BLOG_LIST_EMPTY_OVERRIDE) },
+      overrides: {
+        blogListEmpty: mockVoiceRichText(MOCK_BLOG_LIST_EMPTY_OVERRIDE),
+      },
       path: ['blogListPage', 'empty'],
-      text: BLOG_LIST_EMPTY_OVERRIDE,
+      text: MOCK_BLOG_LIST_EMPTY_OVERRIDE,
     },
     {
       kind: VOICE_FIELD_KIND.RICH,
-      overrides: { topicEmpty: mockVoiceRichText(TOPIC_EMPTY_OVERRIDE) },
+      overrides: { topicEmpty: mockVoiceRichText(MOCK_TOPIC_EMPTY_OVERRIDE) },
       path: ['topicPage', 'empty'],
-      text: TOPIC_EMPTY_OVERRIDE,
+      text: MOCK_TOPIC_EMPTY_OVERRIDE,
     },
     {
       kind: VOICE_FIELD_KIND.TEXT,
       overrides: {
-        localeErrorTitle: mockVoiceRichText(LOCALE_ERROR_TITLE_OVERRIDE),
+        localeErrorTitle: mockVoiceRichText(MOCK_LOCALE_ERROR_TITLE_OVERRIDE),
       },
       path: ['localeErrorPage', 'title'],
-      text: LOCALE_ERROR_TITLE_OVERRIDE,
+      text: MOCK_LOCALE_ERROR_TITLE_OVERRIDE,
     },
   ])(
     'flattens a Portable Text $kind override at $path to plain text',
@@ -202,18 +213,18 @@ describe(resolveTenantMessages, () => {
   });
 
   it('does not mutate the source object at the overridden path', async () => {
-    const base = { notFound: { heading: ORIGINAL_HEADING } };
+    const base = { notFound: { heading: MOCK_ORIGINAL_HEADING } };
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ notFoundHeading: 'Overridden heading' }),
+      siteConfigRow({ notFoundHeading: MOCK_OVERRIDDEN_HEADING }),
     );
 
     await resolveTenantMessages(base, LOCALE_ISO_CODES.EN);
 
-    expect(base.notFound.heading).toBe(ORIGINAL_HEADING);
+    expect(base.notFound.heading).toBe(MOCK_ORIGINAL_HEADING);
   });
 
   it('returns a RICH override unflattened in the rich map, keyed by voice field id', async () => {
-    const override = mockVoiceRichText(BLOG_LIST_EMPTY_OVERRIDE);
+    const override = mockVoiceRichText(MOCK_BLOG_LIST_EMPTY_OVERRIDE);
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ blogListEmpty: override }),
     );

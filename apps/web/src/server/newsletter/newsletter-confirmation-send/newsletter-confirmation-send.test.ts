@@ -2,9 +2,12 @@ import {
   LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
+  routes,
+  type TLocaleIsoCode,
 } from '@blog/config';
-import { escapeHtml } from '@blog/email';
+import { escapeHtml, LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
 import { faker } from '@faker-js/faker';
+import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
 import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
 import {
@@ -12,9 +15,6 @@ import {
   MOCK_AUTHORED_SUBJECT,
   MOCK_CONFIRMATION_TOKEN,
   MOCK_REPLY_TO,
-  MOCK_UNSUBSCRIBE_HEADERS,
-  MOCK_UNSUBSCRIBE_TOKEN,
-  MOCK_UNSUBSCRIBE_URL,
   mockEmailConfig,
 } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -26,10 +26,6 @@ import {
 import { getLocale } from 'next-intl/server';
 
 import { sendNewsletterConfirmation } from './newsletter-confirmation-send';
-
-const { mintNewsletterUnsubscribeTokenMock } = vi.hoisted(() => ({
-  mintNewsletterUnsubscribeTokenMock: vi.fn(),
-}));
 
 const {
   sendEmail: sendEmailMock,
@@ -59,19 +55,14 @@ vi.mock('@web/utils/resolve-tenant-email-identity', async () => ({
   ).confirmationEmailEdges.resolveTenantEmailIdentity,
 }));
 
-vi.mock(
-  '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token',
-  () => ({
-    mintNewsletterUnsubscribeToken: mintNewsletterUnsubscribeTokenMock,
-  }),
-);
-
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
 vi.mock('@web/utils/env/env', async () => ({
   env: (await import('@web/testing/server/newsletter/confirmation-email-edges'))
     .confirmationEmailEnv,
 }));
+
+faker.seed(3917);
 
 const MOCK_BRAND_NAME = faker.company.name();
 const MOCK_BRAND = resolveTenantEmailBrand({
@@ -80,7 +71,17 @@ const MOCK_BRAND = resolveTenantEmailBrand({
 });
 const MOCK_CLAIMED_AT = faker.date.recent();
 const MOCK_SUBSCRIBER = mockSubscriber();
-const MOCK_CONFIRM_URL = `${MOCK_TENANT_BASE_URL}/api/newsletter/confirm?token=${MOCK_CONFIRMATION_TOKEN}`;
+const MOCK_UNSUBSCRIBE_TOKEN = mintNewsletterUnsubscribeToken(
+  MOCK_SUBSCRIBER.id,
+);
+
+const confirmUrlFor = (locale?: TLocaleIsoCode) =>
+  `${MOCK_TENANT_BASE_URL}${routes.newsletterConfirm(MOCK_CONFIRMATION_TOKEN, locale)}`;
+
+const unsubscribeHeadersFor = (locale?: TLocaleIsoCode) => ({
+  'List-Unsubscribe': `<${MOCK_TENANT_BASE_URL}${routes.newsletterUnsubscribe(MOCK_UNSUBSCRIBE_TOKEN, locale)}>`,
+  'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
+});
 
 const sentEmail = () => firstSentEmail(sendEmailMock);
 
@@ -95,7 +96,6 @@ describe(sendNewsletterConfirmation, () => {
         confirmationToken: MOCK_CONFIRMATION_TOKEN,
       },
     });
-    mintNewsletterUnsubscribeTokenMock.mockReturnValue(MOCK_UNSUBSCRIBE_TOKEN);
   });
 
   it('emails the subscriber a confirm link and their own unsubscribe link', async () => {
@@ -106,24 +106,24 @@ describe(sendNewsletterConfirmation, () => {
       to: MOCK_SUBSCRIBER.email,
       subject: MOCK_AUTHORED_SUBJECT,
       replyTo: MOCK_REPLY_TO,
-      headers: MOCK_UNSUBSCRIBE_HEADERS,
+      headers: unsubscribeHeadersFor(),
     });
-    expect(html).toContain(MOCK_CONFIRM_URL);
-    expect(mintNewsletterUnsubscribeTokenMock).toHaveBeenCalledWith(
-      MOCK_SUBSCRIBER.id,
-    );
+    expect(html).toContain(escapeHtml(confirmUrlFor()));
   });
 
   it('stores the new confirm token only once the email is sent', async () => {
+    let emailsSentWhenStored = 0;
+    commitConfirmationTokenMock.mockImplementationOnce(async () => {
+      emailsSentWhenStored = sendEmailMock.mock.calls.length;
+    });
+
     await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     expect(commitConfirmationTokenMock).toHaveBeenCalledWith(
       MOCK_SUBSCRIBER.id,
       MOCK_CONFIRMATION_TOKEN,
     );
-    expect(sendEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
-      commitConfirmationTokenMock.mock.invocationCallOrder[0] ?? 0,
-    );
+    expect(emailsSentWhenStored).toBe(1);
   });
 
   it('carries the language the reader subscribed in on both links', async () => {
@@ -132,11 +132,8 @@ describe(sendNewsletterConfirmation, () => {
     await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
     const { headers, html } = sentEmail();
-    expect(html).toContain(`${MOCK_CONFIRM_URL}&amp;lang=FR`);
-    expect(headers).toEqual({
-      ...MOCK_UNSUBSCRIBE_HEADERS,
-      'List-Unsubscribe': `<${MOCK_UNSUBSCRIBE_URL}&lang=FR>`,
-    });
+    expect(html).toContain(escapeHtml(confirmUrlFor(LOCALE_ISO_CODES.FR)));
+    expect(headers).toEqual(unsubscribeHeadersFor(LOCALE_ISO_CODES.FR));
   });
 
   it("renders the tenant's own brand and name", async () => {

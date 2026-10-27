@@ -1,69 +1,82 @@
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { OperatorBreadcrumb } from './operator-breadcrumb';
 
 vi.mock('@platform/i18n/navigation');
 
-const render = renderWithIntl;
+faker.seed(2405);
 
-describe(OperatorBreadcrumb, () => {
-  it('renders a 2-segment trail on the tenants list, with Tenants current', () => {
-    vi.mocked(usePathname).mockReturnValue('/tenants');
+const MOCK_UNLISTED_PATHNAME = `/${faker.lorem.slug()}`;
 
-    render(<OperatorBreadcrumb role={ADMIN_ROLE.ADMIN} />);
+const { platformLabel, tenants, addTenant, findings, releases } =
+  messages.navSections;
 
-    expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Platform' })).toBeNull();
-    expect(screen.getByText('Tenants')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Tenants' })).toBeNull();
-  });
+const setup = customRender(OperatorBreadcrumb, { role: ADMIN_ROLE.ADMIN });
 
-  it('renders a 3-segment trail with a linked Tenants on the add-tenant route', () => {
-    vi.mocked(usePathname).mockReturnValue('/tenants/new');
+describe(`<${OperatorBreadcrumb.name}/>`, () => {
+  it.each([
+    { pathname: adminRoutes.tenants(), leaf: tenants },
+    { pathname: adminRoutes.findings(), leaf: findings },
+  ])(
+    'ends the Platform trail with $leaf, unlinked, on $pathname',
+    ({ pathname, leaf }) => {
+      vi.mocked(usePathname).mockReturnValueOnce(pathname);
+      setup();
 
-    render(<OperatorBreadcrumb role={ADMIN_ROLE.ADMIN} />);
+      const platformItem = screen.getByText(platformLabel);
+      const platformLink = screen.queryByRole('link', { name: platformLabel });
+      const leafItem = screen.getByText(leaf);
+      const leafLink = screen.queryByRole('link', { name: leaf });
 
-    expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
-      'href',
-      '/tenants',
-    );
-    expect(screen.getByText('Add tenant')).toBeVisible();
-  });
+      expect(platformItem).toBeVisible();
+      expect(platformLink).not.toBeInTheDocument();
+      expect(leafItem).toBeVisible();
+      expect(leafLink).not.toBeInTheDocument();
+    },
+  );
 
-  it('renders a 2-segment trail on the findings list, with Findings current', () => {
-    vi.mocked(usePathname).mockReturnValue('/findings');
+  it('links back to Tenants from the add-tenant route', () => {
+    vi.mocked(usePathname).mockReturnValueOnce(adminRoutes.newTenant());
+    setup();
 
-    render(<OperatorBreadcrumb role={ADMIN_ROLE.ADMIN} />);
+    const tenantsLink = screen.getByRole('link', { name: tenants });
+    const addTenantItem = screen.getByText(addTenant);
 
-    expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.getByText('Findings')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Findings' })).toBeNull();
+    expect(tenantsLink).toHaveAttribute('href', adminRoutes.tenants());
+    expect(addTenantItem).toBeVisible();
   });
 
   it('shows no leaf on a route the nav does not list', () => {
-    vi.mocked(usePathname).mockReturnValue('/unlisted');
+    vi.mocked(usePathname).mockReturnValueOnce(MOCK_UNLISTED_PATHNAME);
+    setup();
 
-    render(<OperatorBreadcrumb role={ADMIN_ROLE.ADMIN} />);
+    const platformItem = screen.getByText(platformLabel);
+    const tenantsItem = screen.queryByText(tenants);
 
-    expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.queryByText('Tenants')).not.toBeInTheDocument();
+    expect(platformItem).toBeVisible();
+    expect(tenantsItem).not.toBeInTheDocument();
   });
 
-  it('names Releases as the leaf for a SUPERADMIN on the releases route', () => {
-    vi.mocked(usePathname).mockReturnValue('/releases');
+  it('names Releases as the leaf for a superadmin on the releases route', () => {
+    vi.mocked(usePathname).mockReturnValueOnce(adminRoutes.releases());
+    setup({ role: ADMIN_ROLE.SUPERADMIN });
 
-    render(<OperatorBreadcrumb role={ADMIN_ROLE.SUPERADMIN} />);
+    const releasesItem = screen.getByText(releases);
 
-    expect(screen.getByText('Releases')).toBeVisible();
+    expect(releasesItem).toBeVisible();
   });
 
-  it('shows no leaf on the releases route for an ADMIN', () => {
-    vi.mocked(usePathname).mockReturnValue('/releases');
+  it('shows no leaf on the releases route for an admin', () => {
+    vi.mocked(usePathname).mockReturnValueOnce(adminRoutes.releases());
+    setup();
 
-    render(<OperatorBreadcrumb role={ADMIN_ROLE.ADMIN} />);
+    const releasesItem = screen.queryByText(releases);
 
-    expect(screen.queryByText('Releases')).not.toBeInTheDocument();
+    expect(releasesItem).not.toBeInTheDocument();
   });
 });

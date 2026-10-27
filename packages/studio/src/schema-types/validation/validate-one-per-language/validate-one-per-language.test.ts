@@ -1,32 +1,43 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
 import { validateOnePerLanguage } from '@blog/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
 import { mockHomePage } from '@blog/studio/testing/mock-documents';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import { faker } from '@faker-js/faker';
+import {
+  getDraftId,
+  type SanityDocument,
+  type ValidationContext,
+} from 'sanity';
+
+faker.seed(6032);
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const DUTCH_HOME_DRAFT_ID = 'drafts.home-nl';
+const MOCK_TYPE_TITLE = faker.lorem.words(2);
+const MOCK_ENGLISH_HOME_ID = faker.string.uuid();
 
-const DUPLICATE_DUTCH = "There's already a Home Page in Dutch.";
-const DUPLICATE_ENGLISH = "There's already a Home Page in English.";
-
-const HOME_PAGE_TYPE = { title: 'Home Page' };
+const duplicateError = (language: TLocaleIsoCode) =>
+  `There's already a ${MOCK_TYPE_TITLE} in ${LOCALE_LABEL[language]}.`;
 
 const contextWith = (dataset: SanityDocument[], fetchError?: Error) =>
-  mockGroqValidationContext(dataset, { type: HOME_PAGE_TYPE, fetchError });
+  mockGroqValidationContext(dataset, {
+    type: { title: MOCK_TYPE_TITLE },
+    fetchError,
+  });
+
+const mockHomeDraft = (language: TLocaleIsoCode) =>
+  mockHomePage({ _id: getDraftId(faker.string.uuid()), language });
 
 describe(validateOnePerLanguage, () => {
   let englishHome: SanityDocument;
   let untranslatedHome: SanityDocument;
-  let dutchHomeDraft: SanityDocument;
   let context: ValidationContext;
 
   beforeEach(() => {
-    englishHome = mockHomePage({ _id: 'page_home', language: EN });
-    untranslatedHome = mockHomePage({ _id: 'page_home' });
-    dutchHomeDraft = mockHomePage({ _id: DUTCH_HOME_DRAFT_ID, language: NL });
+    englishHome = mockHomePage({ _id: MOCK_ENGLISH_HOME_ID, language: EN });
+    untranslatedHome = mockHomePage({ _id: faker.string.uuid() });
     context = contextWith([englishHome]);
   });
 
@@ -35,47 +46,51 @@ describe(validateOnePerLanguage, () => {
   });
 
   it('allows a Home in another language', async () => {
-    await expect(validateOnePerLanguage(dutchHomeDraft, context)).resolves.toBe(
-      true,
-    );
+    await expect(
+      validateOnePerLanguage(mockHomeDraft(NL), context),
+    ).resolves.toBe(true);
   });
 
   it('rejects a second Home in the same language', async () => {
+    const dutchHome = mockHomePage({ _id: faker.string.uuid(), language: NL });
+
     await expect(
       validateOnePerLanguage(
-        dutchHomeDraft,
-        contextWith([
-          englishHome,
-          mockHomePage({ _id: 'home-nl-first', language: NL }),
-        ]),
+        mockHomeDraft(NL),
+        contextWith([englishHome, dutchHome]),
       ),
-    ).resolves.toBe(DUPLICATE_DUTCH);
+    ).resolves.toBe(duplicateError(NL));
   });
 
   it('does not count the draft of the same Home as a second one', async () => {
+    const englishHomeDraft = mockHomePage({
+      _id: getDraftId(MOCK_ENGLISH_HOME_ID),
+      language: EN,
+    });
+
     await expect(
-      validateOnePerLanguage(
-        mockHomePage({ _id: 'drafts.page_home', language: EN }),
-        context,
-      ),
+      validateOnePerLanguage(englishHomeDraft, context),
     ).resolves.toBe(true);
   });
 
   it('counts a Home without a language as the default language', async () => {
     await expect(
       validateOnePerLanguage(
-        mockHomePage({ _id: 'drafts.home-en', language: EN }),
+        mockHomeDraft(EN),
         contextWith([untranslatedHome]),
       ),
-    ).resolves.toBe(DUPLICATE_ENGLISH);
+    ).resolves.toBe(duplicateError(EN));
   });
 
   it('follows the default language when it is not English', async () => {
     setDefaultLanguage(NL);
 
     await expect(
-      validateOnePerLanguage(dutchHomeDraft, contextWith([untranslatedHome])),
-    ).resolves.toBe(DUPLICATE_DUTCH);
+      validateOnePerLanguage(
+        mockHomeDraft(NL),
+        contextWith([untranslatedHome]),
+      ),
+    ).resolves.toBe(duplicateError(NL));
   });
 
   it('passes when there is no document', async () => {
@@ -85,11 +100,13 @@ describe(validateOnePerLanguage, () => {
   });
 
   it('passes when the fetch fails', async () => {
+    const failingContext = contextWith(
+      [englishHome],
+      new Error(faker.lorem.sentence()),
+    );
+
     await expect(
-      validateOnePerLanguage(
-        mockHomePage({ _id: 'home-en', language: EN }),
-        contextWith([englishHome], new Error('network down')),
-      ),
+      validateOnePerLanguage(mockHomeDraft(EN), failingContext),
     ).resolves.toBe(true);
   });
 });

@@ -13,25 +13,28 @@ const tagDocQuery = q.star
   .project(tagFragment);
 
 describe('tagFragment', () => {
-  it('accepts a fully-projected tag (title and resolved slug present)', () => {
-    const projected = {
-      _id: MOCK_TAG_ID,
-      title: MOCK_TAG_TITLE,
-      slug: MOCK_TAG_SLUG,
-    };
+  it.each([
+    {
+      behaviour: 'accepts a tag with a title and a resolved page slug',
+      projected: {
+        _id: MOCK_TAG_ID,
+        title: MOCK_TAG_TITLE,
+        slug: MOCK_TAG_SLUG,
+      },
+    },
+    {
+      behaviour: 'accepts a tag with no tag page as a null slug',
+      projected: { _id: MOCK_TAG_ID, title: MOCK_TAG_TITLE, slug: null },
+    },
+  ])('$behaviour', ({ projected }) => {
+    const tag = tagDocQuery.parse(projected);
 
-    expect(tagDocQuery.parse(projected)).toEqual(projected);
+    expect(tag).toEqual(projected);
   });
 
   it('throws when the required title is missing', () => {
-    const projected = { _id: 'tag-2', title: null, slug: 'no-title' };
+    const projected = { _id: MOCK_TAG_ID, title: null, slug: MOCK_TAG_SLUG };
 
     expect(() => tagDocQuery.parse(projected)).toThrow();
-  });
-
-  it('accepts a tag with no tag page as a null slug', () => {
-    const projected = { _id: 'tag-3', title: 'No Page', slug: null };
-
-    expect(tagDocQuery.parse(projected)).toEqual(projected);
   });
 });

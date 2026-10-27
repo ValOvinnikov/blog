@@ -1,19 +1,27 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { PageSkeleton } from './page-skeleton';
 
-describe(PageSkeleton, () => {
+const SKELETON_TEST_ID = 'skeleton';
+
+const setup = customRender(PageSkeleton, {});
+
+describe(`<${PageSkeleton.name}/>`, () => {
   beforeEach(() => {
-    renderWithIntl(<PageSkeleton />);
+    setup();
   });
 
   it('announces one loading status', () => {
-    expect(screen.getAllByRole('status')).toHaveLength(1);
-    expect(screen.getByRole('status')).toHaveTextContent('Loading page…');
+    const status = screen.getByRole('status');
+
+    expect(status).toHaveTextContent(messages.pageSkeleton.label);
   });
 
   it('hides every placeholder shape from assistive technology', () => {
-    for (const shape of screen.getAllByTestId('skeleton')) {
+    const shapes = screen.getAllByTestId(SKELETON_TEST_ID);
+
+    for (const shape of shapes) {
       expect(shape).toHaveAttribute('aria-hidden', 'true');
     }
   });

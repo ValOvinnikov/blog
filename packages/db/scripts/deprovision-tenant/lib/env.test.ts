@@ -1,52 +1,62 @@
+import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
+import { faker } from '@faker-js/faker';
+
 import { loadDeprovisionEnv } from './env';
 
-const REQUIRED_ENV: Record<string, string> = {
-  SANITY_MANAGEMENT_TOKEN: 'sanity-token',
-  VERCEL_TOKEN: 'vercel-token',
-  VERCEL_PROJECT_ID_WEB: 'proj-1',
+faker.seed(5765);
+
+const MOCK_ENV = {
+  ...MOCK_DEPROVISION_ENV,
+  vercelTeamId: `team_${faker.string.alphanumeric(12)}`,
 };
 
-const originalEnv: Record<string, string | undefined> = {};
+const REQUIRED_ENV_VARS = {
+  SANITY_MANAGEMENT_TOKEN: MOCK_ENV.sanityManagementToken,
+  VERCEL_TOKEN: MOCK_ENV.vercelToken,
+  VERCEL_PROJECT_ID_WEB: MOCK_ENV.vercelWebProjectId,
+};
 
-beforeEach(() => {
-  for (const key of Object.keys(REQUIRED_ENV)) {
-    originalEnv[key] = process.env[key];
-    process.env[key] = REQUIRED_ENV[key];
-  }
-  for (const key of [
-    'VERCEL_TEAM_ID',
-    'GITHUB_ACTOR',
-    'GITHUB_RUN_ID',
-    'GITHUB_REPOSITORY',
-    'GITHUB_SERVER_URL',
-    'WEB_APP_URL',
-    'SITE_CONFIG_REVALIDATE_SECRET',
-  ]) {
-    originalEnv[key] = process.env[key];
-    delete process.env[key];
-  }
-});
+const OPTIONAL_ENV_VARS = {
+  VERCEL_TEAM_ID: MOCK_ENV.vercelTeamId,
+  GITHUB_ACTOR: MOCK_ENV.githubActor,
+  GITHUB_RUN_ID: MOCK_ENV.githubRunId,
+  GITHUB_REPOSITORY: MOCK_ENV.githubRepository,
+  GITHUB_SERVER_URL: MOCK_ENV.githubServerUrl,
+  WEB_APP_URL: MOCK_ENV.webAppUrl,
+  SITE_CONFIG_REVALIDATE_SECRET: MOCK_ENV.siteConfigRevalidateSecret,
+};
 
-afterEach(() => {
-  for (const [key, value] of Object.entries(originalEnv)) {
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
+function stubEnvVars(vars: Record<string, string | undefined>) {
+  for (const [name, value] of Object.entries(vars)) {
+    vi.stubEnv(name, value);
   }
-});
+}
 
 describe(loadDeprovisionEnv, () => {
-  it('resolves every required var plus the given dryRun flag', () => {
+  beforeEach(() => {
+    stubEnvVars(REQUIRED_ENV_VARS);
+    stubEnvVars(
+      Object.fromEntries(
+        Object.keys(OPTIONAL_ENV_VARS).map((name) => [name, undefined]),
+      ),
+    );
+  });
+
+  it.each([true, false])('resolves every var with dryRun %s', (dryRun) => {
+    stubEnvVars(OPTIONAL_ENV_VARS);
+
+    const env = loadDeprovisionEnv(dryRun);
+
+    expect(env).toEqual({ ...MOCK_ENV, dryRun });
+  });
+
+  it('leaves the optional vars undefined without throwing when unset', () => {
     const env = loadDeprovisionEnv(true);
 
     expect(env).toEqual({
-      sanityManagementToken: 'sanity-token',
-      vercelToken: 'vercel-token',
-      vercelTeamId: undefined,
-      vercelWebProjectId: 'proj-1',
+      ...MOCK_ENV,
       dryRun: true,
+      vercelTeamId: undefined,
       githubActor: undefined,
       githubRunId: undefined,
       githubRepository: undefined,
@@ -56,47 +66,10 @@ describe(loadDeprovisionEnv, () => {
     });
   });
 
-  it('carries through the optional team id when set', () => {
-    process.env['VERCEL_TEAM_ID'] = 'team-1';
-
-    const env = loadDeprovisionEnv(false);
-
-    expect(env.vercelTeamId).toBe('team-1');
-    expect(env.dryRun).toBe(false);
-  });
-
-  it('carries through GITHUB_ACTOR/GITHUB_RUN_ID/GITHUB_REPOSITORY/GITHUB_SERVER_URL when set, without requiring them', () => {
-    process.env['GITHUB_ACTOR'] = 'octocat';
-    process.env['GITHUB_RUN_ID'] = 'run-42';
-    process.env['GITHUB_REPOSITORY'] = 'acme/blog';
-    process.env['GITHUB_SERVER_URL'] = 'https://github.com';
-
-    const env = loadDeprovisionEnv(true);
-
-    expect(env.githubActor).toBe('octocat');
-    expect(env.githubRunId).toBe('run-42');
-    expect(env.githubRepository).toBe('acme/blog');
-    expect(env.githubServerUrl).toBe('https://github.com');
-  });
-
-  it('does not throw when GITHUB_ACTOR/GITHUB_RUN_ID/GITHUB_REPOSITORY/GITHUB_SERVER_URL are unset', () => {
-    expect(() => loadDeprovisionEnv(true)).not.toThrow();
-  });
-
-  it('carries through WEB_APP_URL/SITE_CONFIG_REVALIDATE_SECRET when set, without requiring them', () => {
-    process.env['WEB_APP_URL'] = 'https://web.example.com';
-    process.env['SITE_CONFIG_REVALIDATE_SECRET'] = 'shh';
-
-    const env = loadDeprovisionEnv(true);
-
-    expect(env.webAppUrl).toBe('https://web.example.com');
-    expect(env.siteConfigRevalidateSecret).toBe('shh');
-  });
-
-  it.each(Object.keys(REQUIRED_ENV))(
+  it.each(Object.keys(REQUIRED_ENV_VARS))(
     'throws when %s is missing',
     (missingKey) => {
-      delete process.env[missingKey];
+      vi.stubEnv(missingKey, undefined);
 
       expect(() => loadDeprovisionEnv(true)).toThrow(
         `deprovision-tenant: missing required env var ${missingKey}.`,

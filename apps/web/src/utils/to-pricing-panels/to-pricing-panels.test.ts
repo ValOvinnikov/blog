@@ -1,4 +1,5 @@
 import { PRICE_PERIOD } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import {
   mockPricingPrice,
   mockPricingTier,
@@ -7,8 +8,18 @@ import {
 
 import { toPricingPanels } from './to-pricing-panels';
 
-const PRICE_LABEL = 'Contact us';
-const ONE_TIME_EXTRA = '£99 one-time';
+faker.seed(6012);
+
+const { free, from, compareAtLabel, periods } = MOCK_PRICING_LABELS;
+
+const MOCK_MONTHLY_AMOUNT = faker.number.int({ min: 10, max: 99 });
+const MOCK_YEARLY_AMOUNT = faker.number.int({ min: 100, max: 299 });
+const MOCK_ONE_TIME_AMOUNT = faker.number.int({ min: 300, max: 499 });
+const MOCK_SALE_AMOUNT = faker.number.int({ min: 500, max: 699 });
+const MOCK_COMPARE_AT_AMOUNT = faker.number.int({ min: 700, max: 899 });
+const MOCK_PRICE_LABEL = faker.lorem.words(2);
+
+const formatPounds = (amount: number) => `£${amount}`;
 
 const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
   toPricingPanels({
@@ -19,11 +30,17 @@ const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
   });
 
 const monthlyAndYearly = mockPricingTier({
-  id: 'pro',
+  id: faker.string.uuid(),
   prices: [
-    mockPricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 99 }),
-    mockPricingPrice({ period: PRICE_PERIOD.YEAR, amount: 490 }),
-    mockPricingPrice({ period: PRICE_PERIOD.MONTH, amount: 49 }),
+    mockPricingPrice({
+      period: PRICE_PERIOD.ONE_TIME,
+      amount: MOCK_ONE_TIME_AMOUNT,
+    }),
+    mockPricingPrice({ period: PRICE_PERIOD.YEAR, amount: MOCK_YEARLY_AMOUNT }),
+    mockPricingPrice({
+      period: PRICE_PERIOD.MONTH,
+      amount: MOCK_MONTHLY_AMOUNT,
+    }),
   ],
 });
 
@@ -46,22 +63,33 @@ describe(toPricingPanels, () => {
 
   it('keeps the authored order when there is no switch', () => {
     const panel = firstPanelFor([
-      mockPricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 99 }),
-      mockPricingPrice({ period: PRICE_PERIOD.MONTH, amount: 49 }),
+      mockPricingPrice({
+        period: PRICE_PERIOD.ONE_TIME,
+        amount: MOCK_ONE_TIME_AMOUNT,
+      }),
+      mockPricingPrice({
+        period: PRICE_PERIOD.MONTH,
+        amount: MOCK_MONTHLY_AMOUNT,
+      }),
     ]);
 
-    expect(panel?.cards[0]?.headline?.amount).toBe('£99');
-    expect(panel?.cards[0]?.extras).toEqual(['£49 per month']);
+    expect(panel?.cards[0]?.headline?.amount).toBe(
+      formatPounds(MOCK_ONE_TIME_AMOUNT),
+    );
+    expect(panel?.cards[0]?.extras).toEqual([
+      `${formatPounds(MOCK_MONTHLY_AMOUNT)} ${periods[PRICE_PERIOD.MONTH]}`,
+    ]);
   });
 
   describe('with a monthly and a yearly price', () => {
     let panels: ReturnType<typeof setup>;
+    const oneTimeExtra = `${formatPounds(MOCK_ONE_TIME_AMOUNT)} ${periods[PRICE_PERIOD.ONE_TIME]}`;
 
     beforeEach(() => {
       panels = setup([monthlyAndYearly]);
     });
 
-    it('returns a monthly then a yearly panel when both periods exist', () => {
+    it('returns a monthly then a yearly panel', () => {
       expect(panels.map(({ period }) => period)).toEqual([
         PRICE_PERIOD.MONTH,
         PRICE_PERIOD.YEAR,
@@ -71,94 +99,118 @@ describe(toPricingPanels, () => {
     it('heads each tab with its own price and drops the other tab price', () => {
       const [monthly, yearly] = panels;
 
-      expect(monthly?.cards[0]?.headline).toMatchObject({
-        amount: '£49',
-        period: 'per month',
+      expect(monthly?.cards[0]?.headline).toEqual({
+        amount: formatPounds(MOCK_MONTHLY_AMOUNT),
+        compareAt: undefined,
+        period: periods[PRICE_PERIOD.MONTH],
+        prefix: undefined,
       });
-      expect(monthly?.cards[0]?.extras).toEqual([ONE_TIME_EXTRA]);
-      expect(yearly?.cards[0]?.headline).toMatchObject({
-        amount: '£490',
-        period: 'per year',
+      expect(monthly?.cards[0]?.extras).toEqual([oneTimeExtra]);
+      expect(yearly?.cards[0]?.headline).toEqual({
+        amount: formatPounds(MOCK_YEARLY_AMOUNT),
+        compareAt: undefined,
+        period: periods[PRICE_PERIOD.YEAR],
+        prefix: undefined,
       });
-      expect(yearly?.cards[0]?.extras).toEqual([ONE_TIME_EXTRA]);
+      expect(yearly?.cards[0]?.extras).toEqual([oneTimeExtra]);
     });
   });
 
   it('shows a label-only tier the same on both tabs', () => {
     const [monthly, yearly] = setupBesideMonthlyAndYearly(
       mockPricingTier({
-        id: 'custom',
+        id: faker.string.uuid(),
         prices: [],
-        priceLabel: PRICE_LABEL,
+        priceLabel: MOCK_PRICE_LABEL,
       }),
     );
 
-    expect(monthly?.cards[1]).toMatchObject({
-      headline: undefined,
-      label: PRICE_LABEL,
-    });
-    expect(yearly?.cards[1]).toMatchObject({
-      headline: undefined,
-      label: PRICE_LABEL,
-    });
+    expect(monthly?.cards[1]?.headline).toBeUndefined();
+    expect(monthly?.cards[1]?.label).toBe(MOCK_PRICE_LABEL);
+    expect(yearly?.cards[1]?.headline).toBeUndefined();
+    expect(yearly?.cards[1]?.label).toBe(MOCK_PRICE_LABEL);
   });
 
   it('prefixes a starting-at price and omits the period of a free price', () => {
     const panel = firstPanelFor([
-      mockPricingPrice({ amount: 49, isStartingAt: true }),
+      mockPricingPrice({ amount: MOCK_MONTHLY_AMOUNT, isStartingAt: true }),
       mockPricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 0 }),
     ]);
 
-    expect(panel?.cards[0]?.headline).toMatchObject({
-      prefix: 'From',
-      amount: '£49',
-    });
-    expect(panel?.cards[0]?.extras).toEqual(['Free']);
+    expect(panel?.cards[0]?.headline?.prefix).toBe(from);
+    expect(panel?.cards[0]?.headline?.amount).toBe(
+      formatPounds(MOCK_MONTHLY_AMOUNT),
+    );
+    expect(panel?.cards[0]?.extras).toEqual([free]);
   });
 
   it('pairs the compare-at amount with its translated label', () => {
     const panel = firstPanelFor([
-      mockPricingPrice({ amount: 39, compareAtAmount: 49 }),
+      mockPricingPrice({
+        amount: MOCK_SALE_AMOUNT,
+        compareAtAmount: MOCK_COMPARE_AT_AMOUNT,
+      }),
     ]);
 
     expect(panel?.cards[0]?.headline?.compareAt).toEqual({
-      amount: '£49',
-      label: 'Regular price',
+      amount: formatPounds(MOCK_COMPARE_AT_AMOUNT),
+      label: compareAtLabel,
     });
   });
 
   it('heads the monthly tab with the first price of a yearly-only tier', () => {
     const [monthly, yearly] = setupBesideMonthlyAndYearly(
       mockPricingTier({
-        id: 'annual',
-        prices: [mockPricingPrice({ period: PRICE_PERIOD.YEAR, amount: 300 })],
+        id: faker.string.uuid(),
+        prices: [
+          mockPricingPrice({
+            period: PRICE_PERIOD.YEAR,
+            amount: MOCK_SALE_AMOUNT,
+          }),
+        ],
       }),
     );
 
-    expect(monthly?.cards[1]?.headline).toMatchObject({
-      amount: '£300',
-      period: 'per year',
-    });
+    expect(monthly?.cards[1]?.headline?.amount).toBe(
+      formatPounds(MOCK_SALE_AMOUNT),
+    );
+    expect(monthly?.cards[1]?.headline?.period).toBe(
+      periods[PRICE_PERIOD.YEAR],
+    );
     expect(monthly?.cards[1]?.extras).toEqual([]);
-    expect(yearly?.cards[1]?.headline).toMatchObject({ amount: '£300' });
+    expect(yearly?.cards[1]?.headline?.amount).toBe(
+      formatPounds(MOCK_SALE_AMOUNT),
+    );
   });
 
   it('heads the yearly tab with the first price of a monthly-only tier', () => {
     const [monthly, yearly] = setupBesideMonthlyAndYearly(
       mockPricingTier({
-        id: 'flex',
+        id: faker.string.uuid(),
         prices: [
-          mockPricingPrice({ period: PRICE_PERIOD.MONTH, amount: 9 }),
-          mockPricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 20 }),
+          mockPricingPrice({
+            period: PRICE_PERIOD.MONTH,
+            amount: MOCK_SALE_AMOUNT,
+          }),
+          mockPricingPrice({
+            period: PRICE_PERIOD.ONE_TIME,
+            amount: MOCK_COMPARE_AT_AMOUNT,
+          }),
         ],
       }),
     );
 
-    expect(yearly?.cards[1]?.headline).toMatchObject({
-      amount: '£9',
-      period: 'per month',
-    });
-    expect(yearly?.cards[1]?.extras).toEqual(['£20 one-time']);
-    expect(monthly?.cards[1]?.headline).toMatchObject({ amount: '£9' });
+    expect(yearly?.cards[1]?.headline?.amount).toBe(
+      formatPounds(MOCK_SALE_AMOUNT),
+    );
+    expect(yearly?.cards[1]?.headline?.period).toBe(
+      periods[PRICE_PERIOD.MONTH],
+    );
+    expect(yearly?.cards[1]?.extras).toEqual([
+      `${formatPounds(MOCK_COMPARE_AT_AMOUNT)} ${periods[PRICE_PERIOD.ONE_TIME]}`,
+    ]);
+    expect(monthly?.cards[1]?.headline?.amount).toBe(
+      formatPounds(MOCK_SALE_AMOUNT),
+    );
   });
 });

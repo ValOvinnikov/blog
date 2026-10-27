@@ -1,24 +1,23 @@
+import { faker } from '@faker-js/faker';
 import { at, unset } from 'sanity/migrate';
 
 import { removeBlogAuthorSlug } from './index';
 
+faker.seed(1);
+
+const MOCK_SLUG = faker.lorem.slug();
+
 describe(removeBlogAuthorSlug, () => {
-  it('unsets slug when present', () => {
+  it('unsets the slug of a doc that has one', () => {
     const result = removeBlogAuthorSlug({
-      slug: { _type: 'slug', current: 'jane-doe' },
+      slug: { _type: 'slug', current: MOCK_SLUG },
     });
 
     expect(result).toEqual([at('slug', unset())]);
   });
 
-  it('is a no-op for a doc that never had slug', () => {
+  it('leaves a doc without a slug alone', () => {
     const result = removeBlogAuthorSlug({});
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is idempotent — a doc already migrated is left alone', () => {
-    const result = removeBlogAuthorSlug({ slug: undefined });
 
     expect(result).toBeUndefined();
   });

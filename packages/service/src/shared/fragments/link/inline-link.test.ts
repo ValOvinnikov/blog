@@ -2,14 +2,24 @@ import { LINK_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
 import {
+  MOCK_LINK_LABEL,
   MOCK_POST_SLUG,
   mockReference,
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
 
 import { inlineLinkFragment } from './inline-link';
 
+faker.seed(6016);
+
 const { EN } = LOCALE_ISO_CODES;
+
+const MOCK_LINK_ID = faker.string.uuid();
+const MOCK_PARENT_PAGE_ID = faker.string.uuid();
+const MOCK_PARENT_PAGE_SLUG = faker.lorem.slug(2);
+const MOCK_CHILD_PAGE_ID = faker.string.uuid();
+const MOCK_CHILD_PAGE_SLUG = faker.lorem.slug(2);
 
 const inlineLinkDocQuery = q.star
   .filterByType('inlineLink')
@@ -17,9 +27,9 @@ const inlineLinkDocQuery = q.star
   .project(inlineLinkFragment);
 
 describe('inlineLinkFragment', () => {
-  it('keeps the internalReference field through a real parse for a page_post reference', () => {
+  it('keeps an internal post reference through a real parse', () => {
     const raw = {
-      label: 'Read more',
+      label: MOCK_LINK_LABEL,
       linkType: LINK_TYPE.INTERNAL,
       url: null,
       internalReference: { _type: 'page_post', slug: MOCK_POST_SLUG },
@@ -28,31 +38,51 @@ describe('inlineLinkFragment', () => {
       accessibleLabel: null,
     };
 
-    expect(inlineLinkDocQuery.parse(raw)).toEqual(raw);
+    const link = inlineLinkDocQuery.parse(raw);
+
+    expect(link).toEqual(raw);
   });
 
   it('links a nested landing page to its full path', async () => {
     const dataset = [
       {
-        _id: 'link-1',
+        _id: MOCK_LINK_ID,
         _type: 'inlineLink',
-        label: 'FAQ',
+        label: MOCK_LINK_LABEL,
         linkType: LINK_TYPE.INTERNAL,
-        internalReference: mockReference('faq'),
+        internalReference: mockReference(MOCK_CHILD_PAGE_ID),
       },
-      { _id: 'modules', _type: 'page_landing', slug: { current: 'modules' } },
       {
-        _id: 'faq',
+        _id: MOCK_PARENT_PAGE_ID,
         _type: 'page_landing',
-        slug: { current: 'faq' },
-        parent: mockReference('modules'),
+        slug: { current: MOCK_PARENT_PAGE_SLUG },
+      },
+      {
+        _id: MOCK_CHILD_PAGE_ID,
+        _type: 'page_landing',
+        slug: { current: MOCK_CHILD_PAGE_SLUG },
+        parent: mockReference(MOCK_PARENT_PAGE_ID),
       },
     ];
 
-    expect(
-      await evaluateGroqExpression(inlineLinkDocQuery.query, dataset, null, {
-        locale: EN,
-      }),
-    ).toMatchObject({ internalReference: { slug: 'modules/faq' } });
+    const link = await evaluateGroqExpression(
+      inlineLinkDocQuery.query,
+      dataset,
+      null,
+      { locale: EN },
+    );
+
+    expect(link).toEqual({
+      label: MOCK_LINK_LABEL,
+      linkType: LINK_TYPE.INTERNAL,
+      url: null,
+      internalReference: {
+        _type: 'page_landing',
+        slug: `${MOCK_PARENT_PAGE_SLUG}/${MOCK_CHILD_PAGE_SLUG}`,
+      },
+      openInNewTab: null,
+      platform: null,
+      accessibleLabel: null,
+    });
   });
 });

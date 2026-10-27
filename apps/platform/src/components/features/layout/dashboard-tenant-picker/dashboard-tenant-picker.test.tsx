@@ -1,84 +1,101 @@
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
-  renderWithIntl,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
-import {
-  mockTenant,
+  MOCK_ARCHIVED_AT,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
 
 vi.mock('@platform/server/auth/sign-out-action');
 
-const render = renderWithIntl;
+const ARCHIVED_LABEL = messages.tenantSwitcher.archived;
+const MOCK_TENANT_NAME_PATTERN = new RegExp(MOCK_TENANT_NAME);
+const MOCK_OTHER_TENANT_NAME_PATTERN = new RegExp(MOCK_OTHER_TENANT_NAME);
 
-const tenants = [
-  mockTenant(),
-  mockTenant({
-    id: MOCK_OTHER_TENANT_ID,
-    name: MOCK_OTHER_TENANT_NAME,
-    primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
-    deprovisionedAt: new Date('2026-01-01'),
-  }),
-];
+const setup = customRender(DashboardTenantPicker, {
+  tenants: [
+    mockTenant(),
+    mockTenant({
+      id: MOCK_OTHER_TENANT_ID,
+      name: MOCK_OTHER_TENANT_NAME,
+      primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
+      deprovisionedAt: MOCK_ARCHIVED_AT,
+    }),
+  ],
+});
 
 describe(`<${DashboardTenantPicker.name}/>`, () => {
   describe('with tenants', () => {
     beforeEach(() => {
-      render(<DashboardTenantPicker tenants={tenants} />);
+      setup();
     });
 
-    it('renders a heading and every tenant as a visible link through the select-tenant endpoint', () => {
+    it('lists every tenant under the heading, each linking to select it', () => {
       const main = screen.getByRole('main');
       const heading = within(main).getByRole('heading', {
-        name: 'Choose a workspace',
+        name: messages.dashboardTenantPicker.heading,
       });
-      const acmeLink = within(main).getByRole('link', { name: /acme/i });
-      const globexLink = within(main).getByRole('link', { name: /globex/i });
+      const tenantLink = within(main).getByRole('link', {
+        name: MOCK_TENANT_NAME_PATTERN,
+      });
+      const otherTenantLink = within(main).getByRole('link', {
+        name: MOCK_OTHER_TENANT_NAME_PATTERN,
+      });
 
       expect(heading).toBeVisible();
-      expect(acmeLink).toBeVisible();
-      expect(acmeLink).toHaveAttribute(
+      expect(tenantLink).toBeVisible();
+      expect(tenantLink).toHaveAttribute(
         'href',
-        `/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
+        adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
       );
-      expect(globexLink).toBeVisible();
-      expect(globexLink).toHaveAttribute(
+      expect(otherTenantLink).toBeVisible();
+      expect(otherTenantLink).toHaveAttribute(
         'href',
-        `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
+        adminRoutes.dashboardSelectTenantHref(MOCK_OTHER_TENANT_ID),
       );
     });
 
     it('marks no tenant as the current one', () => {
-      for (const link of screen.getAllByRole('link')) {
+      const links = screen.getAllByRole('link');
+
+      for (const link of links) {
         expect(link).not.toHaveAttribute('aria-current');
       }
     });
 
     it('labels an archived tenant', () => {
-      const globexLink = screen.getByRole('link', { name: /globex/i });
-      const acmeLink = screen.getByRole('link', { name: /acme/i });
-      const globexBadge = within(globexLink).getByText('Archived');
-      const acmeBadge = within(acmeLink).queryByText('Archived');
+      const archivedTenantLink = screen.getByRole('link', {
+        name: MOCK_OTHER_TENANT_NAME_PATTERN,
+      });
+      const activeTenantLink = screen.getByRole('link', {
+        name: MOCK_TENANT_NAME_PATTERN,
+      });
+      const archivedBadge =
+        within(archivedTenantLink).getByText(ARCHIVED_LABEL);
+      const activeBadge = within(activeTenantLink).queryByText(ARCHIVED_LABEL);
 
-      expect(globexBadge).toBeVisible();
-      expect(acmeBadge).not.toBeInTheDocument();
+      expect(archivedBadge).toBeVisible();
+      expect(activeBadge).not.toBeInTheDocument();
     });
 
     it('offers a sign out', () => {
-      const signOutButton = screen.getByRole('button', { name: 'Sign out' });
+      const signOutButton = screen.getByRole('button', {
+        name: messages.account.signOut,
+      });
 
       expect(signOutButton).toBeVisible();
     });
   });
 
   it('renders nothing for an empty tenant list', () => {
-    render(<DashboardTenantPicker tenants={[]} />);
+    setup({ tenants: [] });
 
     const main = screen.queryByRole('main');
 

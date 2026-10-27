@@ -3,8 +3,11 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
+import { startProvisioningRun } from '@blog/db/queries/tenants/start-provisioning-run';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
@@ -17,32 +20,25 @@ import {
   unwrapOk,
 } from '@blog/db/testing/tenants/fixtures';
 
-import { startProvisioningRun } from '../start-provisioning-run';
-
 import { finishProvisioningRun } from './finish-provisioning-run';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock(new Date(MOCK_RUN_AT));
 
-const FAILED_STEP = {
+const MOCK_FAILED_STEP = {
   status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
   error: MOCK_STEP_ERROR,
 };
 
-beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(new Date(MOCK_RUN_AT));
-});
-
 afterEach(async () => {
   await db().delete(schema.tenants);
-  vi.useRealTimers();
 });
 
 describe(finishProvisioningRun, () => {
   describe('a tenant with no run recorded', () => {
-    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
+    let tenant: TTenant;
 
     beforeEach(async () => {
       tenant = await insertTestTenant(db());
@@ -68,7 +64,7 @@ describe(finishProvisioningRun, () => {
       });
     });
 
-    it('sets finishedAt on an absent run rather than throwing', async () => {
+    it('sets finishedAt on an absent run', async () => {
       const { provisioningSteps } = unwrapOk(
         await finishProvisioningRun({ tenantId: tenant.id }),
       );
@@ -81,7 +77,7 @@ describe(finishProvisioningRun, () => {
     const tenant = await insertTestTenant(db(), {
       provisioningSteps: {
         ...MOCK_IDLE_PROVISIONING_STEPS,
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: FAILED_STEP,
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: MOCK_FAILED_STEP,
       },
     });
 
@@ -91,7 +87,7 @@ describe(finishProvisioningRun, () => {
 
     expect(
       provisioningSteps?.[TENANT_PROVISIONING_STEP.SANITY_PROJECT],
-    ).toEqual(FAILED_STEP);
+    ).toEqual(MOCK_FAILED_STEP);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

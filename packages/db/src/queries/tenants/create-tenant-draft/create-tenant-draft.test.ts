@@ -6,7 +6,7 @@ import {
   TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { MOCK_OWNER_EMAIL, insertTestUser } from '@blog/db/testing/fixtures';
+import { insertTestUser, MOCK_OWNER_EMAIL } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
@@ -16,8 +16,15 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_VALUES,
   unwrapOk,
 } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_SELF_SERVE_DOMAIN,
+  MOCK_SELF_SERVE_PADDED_DOMAIN,
+  MOCK_SELF_SERVE_SCHEME_DOMAIN,
+} from '@blog/db/testing/tenants/self-serve-fixtures';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import {
@@ -27,19 +34,21 @@ import {
 
 vi.mock('@blog/db/client');
 
+faker.seed(6020);
+
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
-const SECOND_OWNER_EMAIL = 'owner-2@example.com';
-const OWNER_USER_ID = 'user-1';
-const SECOND_OWNER_USER_ID = 'user-2';
+const MOCK_SECOND_OWNER_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_OWNER_USER_ID = faker.string.uuid();
+const MOCK_SECOND_OWNER_USER_ID = faker.string.uuid();
 
-const draftInput: TCreateTenantDraftInput = {
-  name: 'Acme',
+const MOCK_DRAFT_INPUT: TCreateTenantDraftInput = {
+  name: MOCK_TENANT_VALUES.name,
   domain: MOCK_TENANT_DOMAIN,
   locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
-  owner: { type: 'user', userId: OWNER_USER_ID },
+  owner: { type: 'user', userId: MOCK_OWNER_USER_ID },
 };
 
 afterEach(async () => {
@@ -53,30 +62,65 @@ afterEach(async () => {
 describe(createTenantDraft, () => {
   describe('with an existing owner user', () => {
     beforeEach(async () => {
-      await insertTestUser(db(), { id: OWNER_USER_ID });
+      await insertTestUser(db(), { id: MOCK_OWNER_USER_ID });
     });
 
     it('inserts a PENDING tenant with idle steps and no Sanity project yet', async () => {
-      const tenant = unwrapOk(await createTenantDraft(draftInput));
+      const result = await createTenantDraft(MOCK_DRAFT_INPUT);
 
-      expect(tenant).toMatchObject({
-        name: 'Acme',
+      const [row] = await db().select().from(schema.tenants);
+      const {
+        name,
+        primaryDomain,
+        locale,
+        plan,
+        status,
+        provisioningStatus,
+        provisioningSteps,
+        sanityProjectId,
+        sanityDataset,
+      } = row ?? {};
+      expect(result).toEqual({ ok: true, data: row });
+      expect({
+        name,
+        primaryDomain,
+        locale,
+        plan,
+        status,
+        provisioningStatus,
+        provisioningSteps,
+        sanityProjectId,
+        sanityDataset,
+      }).toEqual({
+        name: MOCK_TENANT_VALUES.name,
         primaryDomain: MOCK_TENANT_DOMAIN,
         locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: MOCK_IDLE_PROVISIONING_STEPS,
         sanityProjectId: null,
         sanityDataset: null,
       });
-      expect(tenant.provisioningSteps).toEqual(MOCK_IDLE_PROVISIONING_STEPS);
     });
 
-    it('starts the tenant with its last activity set and no inactivity stamps', async () => {
-      const tenant = unwrapOk(await createTenantDraft(draftInput));
+    it('starts the tenant active as of its creation, with no inactivity stamps', async () => {
+      const {
+        createdAt,
+        lastActivityAt,
+        inactivityWarnedAt,
+        suspendedAt,
+        deletionNotifiedAt,
+        suspensionReason,
+      } = unwrapOk(await createTenantDraft(MOCK_DRAFT_INPUT));
 
-      expect(tenant.lastActivityAt).toBeInstanceOf(Date);
-      expect(tenant).toMatchObject({
+      expect(lastActivityAt).toEqual(createdAt);
+      expect({
+        inactivityWarnedAt,
+        suspendedAt,
+        deletionNotifiedAt,
+        suspensionReason,
+      }).toEqual({
         inactivityWarnedAt: null,
         suspendedAt: null,
         deletionNotifiedAt: null,
@@ -85,91 +129,87 @@ describe(createTenantDraft, () => {
     });
 
     it('inserts the primary domain into tenant_domains', async () => {
-      const { id: tenantId } = unwrapOk(await createTenantDraft(draftInput));
+      const { id: tenantId } = unwrapOk(
+        await createTenantDraft(MOCK_DRAFT_INPUT),
+      );
 
-      const [domainRow] = await db()
-        .select()
-        .from(schema.tenantDomains)
-        .where(eq(schema.tenantDomains.tenantId, tenantId));
-
-      expect(domainRow).toMatchObject({
-        tenantId: tenantId,
-        domain: MOCK_TENANT_DOMAIN,
-      });
+      const domainRows = await db()
+        .select({
+          tenantId: schema.tenantDomains.tenantId,
+          domain: schema.tenantDomains.domain,
+        })
+        .from(schema.tenantDomains);
+      expect(domainRows).toEqual([{ tenantId, domain: MOCK_TENANT_DOMAIN }]);
     });
 
     it('inserts an OWNER membership row for the given owner user id', async () => {
-      const { id: tenantId } = unwrapOk(await createTenantDraft(draftInput));
+      const { id: tenantId } = unwrapOk(
+        await createTenantDraft(MOCK_DRAFT_INPUT),
+      );
 
-      const [membershipRow] = await db()
-        .select()
-        .from(schema.memberships)
-        .where(eq(schema.memberships.tenantId, tenantId));
-
-      expect(membershipRow).toMatchObject({
-        tenantId: tenantId,
-        userId: OWNER_USER_ID,
-        role: MEMBERSHIP_ROLE.OWNER,
-      });
+      const membershipRows = await db()
+        .select({
+          tenantId: schema.memberships.tenantId,
+          userId: schema.memberships.userId,
+          role: schema.memberships.role,
+        })
+        .from(schema.memberships);
+      expect(membershipRows).toEqual([
+        { tenantId, userId: MOCK_OWNER_USER_ID, role: MEMBERSHIP_ROLE.OWNER },
+      ]);
     });
 
     it('rejects a colliding domain and cleans up the second tenant and dependents', async () => {
-      await insertTestUser(db(), { id: SECOND_OWNER_USER_ID });
-      await createTenantDraft(draftInput);
+      await insertTestUser(db(), { id: MOCK_SECOND_OWNER_USER_ID });
+      const firstTenant = unwrapOk(await createTenantDraft(MOCK_DRAFT_INPUT));
 
       await expect(
         createTenantDraft({
-          ...draftInput,
-          owner: { type: 'user', userId: SECOND_OWNER_USER_ID },
+          ...MOCK_DRAFT_INPUT,
+          owner: { type: 'user', userId: MOCK_SECOND_OWNER_USER_ID },
         }),
       ).rejects.toThrow();
 
       const tenantRows = await db().select().from(schema.tenants);
-      expect(tenantRows).toHaveLength(1);
-
       const secondMembershipRows = await db()
         .select()
         .from(schema.memberships)
-        .where(eq(schema.memberships.userId, SECOND_OWNER_USER_ID));
-      expect(secondMembershipRows).toHaveLength(0);
-
+        .where(eq(schema.memberships.userId, MOCK_SECOND_OWNER_USER_ID));
       const domainRows = await db()
-        .select()
-        .from(schema.tenantDomains)
-        .where(eq(schema.tenantDomains.domain, draftInput.domain));
-      expect(domainRows).toHaveLength(1);
+        .select({ tenantId: schema.tenantDomains.tenantId })
+        .from(schema.tenantDomains);
+      expect(tenantRows).toEqual([firstTenant]);
+      expect(secondMembershipRows).toEqual([]);
+      expect(domainRows).toEqual([{ tenantId: firstTenant.id }]);
     });
 
     it.each([
-      ['a scheme-prefixed value', 'https://acme.com'],
-      ['a trailing-slash value', 'acme.com/'],
-      ['a whitespace-padded value', ' acme.com '],
+      ['a scheme-prefixed value', MOCK_SELF_SERVE_SCHEME_DOMAIN],
+      ['a trailing-slash value', `${MOCK_SELF_SERVE_DOMAIN}/`],
+      ['a whitespace-padded value', MOCK_SELF_SERVE_PADDED_DOMAIN],
     ])(
       'rejects %s for domain without writing any row',
       async (_description, domain) => {
-        const result = await createTenantDraft({ ...draftInput, domain });
+        const result = await createTenantDraft({ ...MOCK_DRAFT_INPUT, domain });
 
+        const tenantRows = await db().select().from(schema.tenants);
+        const domainRows = await db().select().from(schema.tenantDomains);
+        const membershipRows = await db().select().from(schema.memberships);
         expect(result).toEqual({
           ok: false,
           error: ERROR_CODE.DB_INVALID_DOMAIN,
         });
-
-        const tenantRows = await db().select().from(schema.tenants);
-        expect(tenantRows).toHaveLength(0);
-
-        const domainRows = await db().select().from(schema.tenantDomains);
-        expect(domainRows).toHaveLength(0);
-
-        const membershipRows = await db().select().from(schema.memberships);
-        expect(membershipRows).toHaveLength(0);
+        expect(tenantRows).toEqual([]);
+        expect(domainRows).toEqual([]);
+        expect(membershipRows).toEqual([]);
       },
     );
   });
 
-  it('invites an owner with no resolved user instead of adding a membership', async () => {
+  it('invites an owner with no resolved user, adding no membership', async () => {
     const { id: tenantId } = unwrapOk(
       await createTenantDraft({
-        ...draftInput,
+        ...MOCK_DRAFT_INPUT,
         owner: { type: 'invite', email: MOCK_OWNER_EMAIL.toUpperCase() },
       }),
     );
@@ -178,58 +218,54 @@ describe(createTenantDraft, () => {
       .select()
       .from(schema.membershipInvites)
       .where(eq(schema.membershipInvites.tenantId, tenantId));
-
-    expect(inviteRow).toMatchObject({
-      tenantId: tenantId,
+    const membershipRows = await db()
+      .select()
+      .from(schema.memberships)
+      .where(eq(schema.memberships.tenantId, tenantId));
+    const { email, emailIndex, role, consumedAt, emailEncrypted } =
+      inviteRow ?? {};
+    expect({ email, emailIndex, role, consumedAt }).toEqual({
       email: MOCK_OWNER_EMAIL,
       emailIndex: testPersonalEmailIndex(MOCK_OWNER_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
       consumedAt: null,
     });
-    expect(decryptTestPersonalValue(inviteRow?.emailEncrypted ?? null)).toBe(
+    expect(decryptTestPersonalValue(emailEncrypted ?? null)).toBe(
       MOCK_OWNER_EMAIL,
     );
-
-    const membershipRows = await db()
-      .select()
-      .from(schema.memberships)
-      .where(eq(schema.memberships.tenantId, tenantId));
-    expect(membershipRows).toHaveLength(0);
+    expect(membershipRows).toEqual([]);
   });
 
   it('rejects an unknown owner user id and leaves no orphaned tenant or domain', async () => {
-    await expect(createTenantDraft(draftInput)).rejects.toThrow();
+    await expect(createTenantDraft(MOCK_DRAFT_INPUT)).rejects.toThrow();
 
     const tenantRows = await db().select().from(schema.tenants);
-    expect(tenantRows).toHaveLength(0);
-
-    const domainRows = await db()
-      .select()
-      .from(schema.tenantDomains)
-      .where(eq(schema.tenantDomains.domain, draftInput.domain));
-    expect(domainRows).toHaveLength(0);
+    const domainRows = await db().select().from(schema.tenantDomains);
+    expect(tenantRows).toEqual([]);
+    expect(domainRows).toEqual([]);
   });
 
   it('rejects a colliding domain for an invited owner and cleans up its invite', async () => {
-    await createTenantDraft({
-      ...draftInput,
-      owner: { type: 'invite', email: MOCK_OWNER_EMAIL },
-    });
+    const firstTenant = unwrapOk(
+      await createTenantDraft({
+        ...MOCK_DRAFT_INPUT,
+        owner: { type: 'invite', email: MOCK_OWNER_EMAIL },
+      }),
+    );
 
     await expect(
       createTenantDraft({
-        ...draftInput,
-        owner: { type: 'invite', email: SECOND_OWNER_EMAIL },
+        ...MOCK_DRAFT_INPUT,
+        owner: { type: 'invite', email: MOCK_SECOND_OWNER_EMAIL },
       }),
     ).rejects.toThrow();
 
     const tenantRows = await db().select().from(schema.tenants);
-    expect(tenantRows).toHaveLength(1);
-
     const secondInviteRows = await db()
       .select()
       .from(schema.membershipInvites)
-      .where(eq(schema.membershipInvites.email, SECOND_OWNER_EMAIL));
-    expect(secondInviteRows).toHaveLength(0);
+      .where(eq(schema.membershipInvites.email, MOCK_SECOND_OWNER_EMAIL));
+    expect(tenantRows).toEqual([firstTenant]);
+    expect(secondInviteRows).toEqual([]);
   });
 });

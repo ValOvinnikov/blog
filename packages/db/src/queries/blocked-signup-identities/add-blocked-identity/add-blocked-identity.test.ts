@@ -8,6 +8,8 @@ import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS,
   MOCK_BLOCKED_ADDRESS_DOMAIN,
+  MOCK_BLOCKED_ADDRESS_TAGGED_VARIANT,
+  MOCK_BLOCKED_DOMAIN_UPPERCASED_VARIANT,
   MOCK_BLOCKED_ADDRESS_INDEX,
   MOCK_BLOCKED_DOMAIN,
   MOCK_NOT_A_DOMAIN,
@@ -16,12 +18,15 @@ import {
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { faker } from '@faker-js/faker';
 
 import { addBlockedIdentity } from './add-blocked-identity';
 
+faker.seed(602105);
+
 vi.mock('@blog/db/client');
 
-const OTHER_REASON = 'Another reason';
+const MOCK_OTHER_REASON = faker.lorem.sentence();
 
 const db = useQueryTestDb();
 
@@ -55,18 +60,16 @@ describe(addBlockedIdentity, () => {
   it('stores an address entry with no readable address in any column', async () => {
     const result = await addEntry(
       BLOCKED_IDENTITY_KIND.ADDRESS,
-      'Blocked+promo@Example.com',
+      MOCK_BLOCKED_ADDRESS_TAGGED_VARIANT,
     );
 
-    expect(result.ok).toBe(true);
     const [row] = await db().select().from(schema.blockedSignupIdentities);
-    expect(row).toMatchObject({
-      kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      value: MOCK_BLOCKED_ADDRESS_INDEX,
-      reason: MOCK_BLOCK_REASON,
-      createdByAdminId,
-    });
-    expect(JSON.stringify(row).toLowerCase()).not.toContain('blocked@');
+    expect(result.ok).toBe(true);
+    expect(row?.kind).toBe(BLOCKED_IDENTITY_KIND.ADDRESS);
+    expect(row?.value).toBe(MOCK_BLOCKED_ADDRESS_INDEX);
+    expect(row?.reason).toBe(MOCK_BLOCK_REASON);
+    expect(row?.createdByAdminId).toBe(createdByAdminId);
+    expect(JSON.stringify(row)).not.toContain(MOCK_BLOCKED_ADDRESS);
   });
 
   it('throws when the index key is not configured', async () => {
@@ -78,13 +81,16 @@ describe(addBlockedIdentity, () => {
   });
 
   it('stores a domain entry as the lower-cased domain', async () => {
-    await addEntry(BLOCKED_IDENTITY_KIND.DOMAIN, ' Mailinator.COM ');
+    await addEntry(
+      BLOCKED_IDENTITY_KIND.DOMAIN,
+      MOCK_BLOCKED_DOMAIN_UPPERCASED_VARIANT,
+    );
 
     const [row] = await db().select().from(schema.blockedSignupIdentities);
     expect(row?.value).toBe(MOCK_BLOCKED_DOMAIN);
   });
 
-  it('returns the existing entry, not created, instead of adding a duplicate', async () => {
+  it('returns the existing entry as not created when the identity is blocked', async () => {
     const { id: otherAdminId } = await insertTestAdmin(db());
     const first = await addEntry(
       BLOCKED_IDENTITY_KIND.ADDRESS,
@@ -92,8 +98,8 @@ describe(addBlockedIdentity, () => {
     );
     const second = await addBlockedIdentity({
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-      identity: 'BLOCKED+again@example.com',
-      reason: OTHER_REASON,
+      identity: MOCK_BLOCKED_ADDRESS_TAGGED_VARIANT.toUpperCase(),
+      reason: MOCK_OTHER_REASON,
       createdByAdminId: otherAdminId,
     });
 
