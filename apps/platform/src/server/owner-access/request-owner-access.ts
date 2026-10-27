@@ -13,12 +13,10 @@ export type TOwnerAccessRequestResult = TActionResult<
   typeof ACTION_OUTCOME.SERVER_ERROR
 >;
 
-export const requestOwnerAccess = async (
+export const enqueueOwnerAccessRequest = async (
   path: string,
   tenantId: string,
 ): Promise<TOwnerAccessRequestResult> => {
-  await requireTenantOwnerOrAdmin(tenantId, isSuperAdmin);
-
   const status = await enqueueWorkerRequest(path, tenantId);
 
   if (status === HTTP_STATUS.ACCEPTED) {
@@ -32,4 +30,12 @@ export const requestOwnerAccess = async (
     });
   }
   return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+};
+
+export const requestOwnerAccess = async (
+  path: string,
+  tenantId: string,
+): Promise<TOwnerAccessRequestResult> => {
+  await requireTenantOwnerOrAdmin(tenantId, isSuperAdmin);
+  return enqueueOwnerAccessRequest(path, tenantId);
 };

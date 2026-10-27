@@ -11,6 +11,7 @@ import {
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { OWNER_INVITE_RESEND_PATH } from '@platform/constants/owner-access';
 import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
@@ -18,6 +19,7 @@ import {
 } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
+import { enqueueOwnerAccessRequest } from '@platform/server/owner-access/request-owner-access';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
@@ -26,6 +28,7 @@ import {
 } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
+  mockReadyTenant,
   mockTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_DOMAIN,
@@ -63,6 +66,10 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
+vi.mock('@platform/server/owner-access/request-owner-access', () => ({
+  enqueueOwnerAccessRequest: vi.fn(),
+}));
+
 vi.mock('@platform/server/tenants/send-owner-invite-email', () => ({
   sendOwnerInviteEmail: vi.fn(),
 }));
@@ -83,6 +90,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);
+const enqueueOwnerAccessRequestMock = vi.mocked(enqueueOwnerAccessRequest);
 
 const {
   UPDATED,
@@ -121,6 +129,7 @@ describe(updateTenantDetailsAction, () => {
     insertAuditEventMock.mockResolvedValue({ id: MOCK_AUDIT_EVENT_ID });
     loggerErrorMock.mockReset();
     sendOwnerInviteEmailMock.mockReset();
+    enqueueOwnerAccessRequestMock.mockReset();
   });
 
   it('requires an admin session before validating or saving', async () => {
@@ -370,6 +379,57 @@ describe(updateTenantDetailsAction, () => {
       MOCK_TENANT_ID,
       MOCK_NEW_OWNER_EMAIL,
     );
+  });
+
+  it('re-sends the Sanity project invite once a provisioned owner email changed', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant: mockReadyTenant(),
+      ownerEmailChanged: true,
+    });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
+    });
+
+    expect(enqueueOwnerAccessRequestMock).toHaveBeenCalledExactlyOnceWith(
+      OWNER_INVITE_RESEND_PATH,
+      MOCK_TENANT_ID,
+    );
+    expect(sendOwnerInviteEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
+      enqueueOwnerAccessRequestMock.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it('re-sends no Sanity invite while the tenant has no Sanity project', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant: MOCK_UPDATED_TENANT,
+      ownerEmailChanged: true,
+    });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
+    });
+
+    expect(enqueueOwnerAccessRequestMock).not.toHaveBeenCalled();
+  });
+
+  it('re-sends no Sanity invite when the owner email is unchanged', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant: mockReadyTenant(),
+      ownerEmailChanged: false,
+    });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_OWNER_EMAIL,
+    });
+
+    expect(enqueueOwnerAccessRequestMock).not.toHaveBeenCalled();
   });
 
   it('sends no owner invite when the owner email is resubmitted unchanged', async () => {

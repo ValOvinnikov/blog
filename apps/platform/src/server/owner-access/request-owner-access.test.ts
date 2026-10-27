@@ -18,7 +18,10 @@ import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
 import { checkOwnerAccessAction } from './check-owner-access-action';
-import { requestOwnerAccess } from './request-owner-access';
+import {
+  enqueueOwnerAccessRequest,
+  requestOwnerAccess,
+} from './request-owner-access';
 import { resendOwnerInviteAction } from './resend-owner-invite-action';
 
 vi.mock('@platform/server/auth/auth');
@@ -141,6 +144,22 @@ describe(requestOwnerAccess, () => {
       .mock.calls.map(([event]) => event);
     expect(loggedEvents).toEqual([WORKER_LOG.ENQUEUE_ERROR]);
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+  });
+});
+
+describe(enqueueOwnerAccessRequest, () => {
+  it('enqueues without a session for a caller that already checked access', async () => {
+    authMock.mockResolvedValue(null);
+
+    const result = await enqueueOwnerAccessRequest(
+      MOCK_WORKER_PATH,
+      MOCK_TENANT_ID,
+    );
+
+    expect(requestedUrls()).toEqual([
+      new URL(MOCK_WORKER_PATH, MOCK_WORKER_URL).href,
+    ]);
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 });
 

@@ -21,7 +21,7 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
+import { reinviteChangedOwner } from '@platform/server/tenants/reinvite-changed-owner';
 import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
@@ -121,7 +121,7 @@ export const updateTenantDetailsAction = async (
         const { tenant: updatedTenant, ownerEmailChanged } = result;
         await revalidateSiteConfig(tenantId);
         if (ownerEmailChanged && !isUndefined(ownerEmail)) {
-          await sendOwnerInviteEmail(tenantId, ownerEmail);
+          await reinviteChangedOwner(updatedTenant, ownerEmail);
         }
         await recordAuditEvent({
           logEvent: TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED,
