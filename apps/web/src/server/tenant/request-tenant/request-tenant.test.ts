@@ -1,99 +1,88 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries } from '@blog/db';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
 } from '@web/server/tenant/constants/constants';
 import {
-  resolveTenant,
-  resolveTenantById,
-} from '@web/server/tenant/resolve-tenant/resolve-tenant';
+  mockServableTenant,
+  mockTenantSanityCredentials,
+  mockTenantSanityWriteCredentials,
+} from '@web/testing/server/tenant/fixtures';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
-  mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
 
 import { getRequestTenantId, resolveRequestTenant } from './request-tenant';
 
+faker.seed(2288);
+
 const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
-vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
-  resolveTenant: vi.fn(),
-  resolveTenantById: vi.fn(),
-}));
+vi.mock('@web/utils/is-production-environment');
 vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
+    tenantDomains: { getTenantByDomain: vi.fn() },
     tenants: {
       getTenantById: vi.fn(),
+      listTenants: vi.fn(),
       toTenantSanityCredentials: vi.fn(),
       toTenantSanityWriteCredentials: vi.fn(),
     },
   },
-  TENANT_STATUS: (await import('@blog/db/constants')).TENANT_STATUS,
 }));
 
-const OTHER_HOST = 'attacker.example.com';
-const SANITY_PROJECT_ID = 'proj';
-const SANITY_DATASET = 'production';
-
-const TENANT = mockTenant();
-
-const SANITY_ACCESS = {
-  projectId: SANITY_PROJECT_ID,
-  dataset: SANITY_DATASET,
-  status: TENANT_STATUS.ACTIVE,
-  deprovisionedAt: null,
-  provisioningStatus: null,
-};
+const MOCK_TENANT = mockServableTenant();
+const MOCK_NON_TENANT_SHAPED_SEGMENT = '.well-known';
 
 describe(resolveRequestTenant, () => {
   beforeEach(() => {
-    headersMock.mockReset();
-    vi.mocked(resolveTenant).mockReset();
-    vi.mocked(resolveTenantById).mockReset();
-    vi.mocked(queries.tenants.getTenantById).mockReset();
+    vi.resetAllMocks();
+    headersMock.mockResolvedValue(new Headers({ host: MOCK_TENANT_HOST }));
   });
 
   it('resolves by Host even when x-tenant-id names a different tenant', async () => {
-    headersMock.mockResolvedValue(
+    headersMock.mockResolvedValueOnce(
       new Headers({
         host: MOCK_TENANT_HOST,
         [TENANT_ID_HEADER]: MOCK_OTHER_TENANT_ID,
       }),
     );
-    vi.mocked(resolveTenant).mockResolvedValue(TENANT);
-    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
-      mockTenant({
-        id: MOCK_OTHER_TENANT_ID,
-        primaryDomain: OTHER_HOST,
-      }),
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValueOnce(
+      MOCK_TENANT,
     );
 
-    await expect(resolveRequestTenant()).resolves.toEqual(TENANT);
-    expect(resolveTenant).toHaveBeenCalledTimes(1);
-    expect(resolveTenant).toHaveBeenCalledWith(MOCK_TENANT_HOST);
+    await expect(resolveRequestTenant()).resolves.toEqual(MOCK_TENANT);
+    expect(queries.tenantDomains.getTenantByDomain).toHaveBeenCalledWith(
+      MOCK_TENANT_HOST,
+    );
+    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
   });
 
   it('resolves undefined when Host-based resolution finds no tenant', async () => {
-    headersMock.mockResolvedValue(new Headers());
-    vi.mocked(resolveTenant).mockResolvedValue(undefined);
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValueOnce(
+      undefined,
+    );
+    vi.mocked(queries.tenants.listTenants).mockResolvedValueOnce([]);
 
     await expect(resolveRequestTenant()).resolves.toBeUndefined();
   });
 
   it('resolves a supplied tenant id by id, without reading headers', async () => {
-    vi.mocked(resolveTenantById).mockResolvedValue(TENANT);
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValueOnce(MOCK_TENANT);
 
-    await expect(resolveRequestTenant(MOCK_TENANT_ID)).resolves.toEqual(TENANT);
+    await expect(resolveRequestTenant(MOCK_TENANT_ID)).resolves.toEqual(
+      MOCK_TENANT,
+    );
 
     expect(headersMock).not.toHaveBeenCalled();
-    expect(resolveTenant).not.toHaveBeenCalled();
-    expect(resolveTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(queries.tenantDomains.getTenantByDomain).not.toHaveBeenCalled();
+    expect(queries.tenants.getTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('resolves undefined for the placeholder without any lookup', async () => {
@@ -101,86 +90,20 @@ describe(resolveRequestTenant, () => {
       resolveRequestTenant(UNRESOLVED_TENANT_PLACEHOLDER),
     ).resolves.toBeUndefined();
 
-    expect(resolveTenantById).not.toHaveBeenCalled();
-    expect(resolveTenant).not.toHaveBeenCalled();
+    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
+    expect(queries.tenantDomains.getTenantByDomain).not.toHaveBeenCalled();
     expect(headersMock).not.toHaveBeenCalled();
-  });
-
-  describe('memoization', () => {
-    beforeEach(() => {
-      vi.mocked(queries.tenants.toTenantSanityCredentials).mockReset();
-      vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReset();
-      headersMock.mockResolvedValue(new Headers({ host: MOCK_TENANT_HOST }));
-      vi.mocked(resolveTenant).mockResolvedValue(TENANT);
-      vi.doMock('react', withMemoizingReactCache);
-      vi.doMock('@web/utils/is-production-environment', () => ({
-        isProductionEnvironment: () => false,
-      }));
-      vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
-        ...SANITY_ACCESS,
-        token: 'tok',
-        defaultLocale: LOCALE_ISO_CODES.EN,
-      });
-      vi.resetModules();
-    });
-
-    afterEach(() => {
-      vi.doUnmock('react');
-      vi.resetModules();
-    });
-
-    it('dedupes the lookup when called more than once in one render pass', async () => {
-      const { resolveRequestTenant: freshResolveRequestTenant } =
-        await import('./request-tenant');
-
-      await freshResolveRequestTenant();
-      await freshResolveRequestTenant();
-
-      expect(resolveTenant).toHaveBeenCalledTimes(1);
-    });
-
-    it('resolves once for the base URL and the read context in one render pass', async () => {
-      const { getTenantBaseUrl } =
-        await import('@web/server/tenant/tenant-base-url/tenant-base-url');
-      const { getHostTenantSanityContext } =
-        await import('@web/server/tenant/tenant-sanity-context/tenant-sanity-context');
-
-      await getTenantBaseUrl();
-      await getHostTenantSanityContext();
-
-      expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
-      expect(resolveTenant).toHaveBeenCalledTimes(1);
-    });
-
-    it('resolves once for the read and write contexts in one render pass', async () => {
-      vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
-        { ...SANITY_ACCESS, token: 'write-tok' },
-      );
-      const { getHostTenantSanityContext, getHostTenantSanityWriteContext } =
-        await import('@web/server/tenant/tenant-sanity-context/tenant-sanity-context');
-
-      await getHostTenantSanityContext();
-      await getHostTenantSanityWriteContext();
-
-      expect(resolveTenant).toHaveBeenCalledTimes(1);
-      expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
-    });
   });
 });
 
 describe(getRequestTenantId, () => {
   beforeEach(() => {
-    headersMock.mockReset();
+    vi.resetAllMocks();
     headersMock.mockResolvedValue(new Headers());
   });
 
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
-  });
-
   it('returns the tenant id from the x-tenant-id header', async () => {
-    headersMock.mockResolvedValue(
+    headersMock.mockResolvedValueOnce(
       new Headers({ [TENANT_ID_HEADER]: MOCK_TENANT_ID }),
     );
 
@@ -194,7 +117,7 @@ describe(getRequestTenantId, () => {
       new Headers({ [TENANT_ID_HEADER]: UNRESOLVED_TENANT_PLACEHOLDER }),
     ],
   ])('returns undefined when %s', async (_, requestHeaders) => {
-    headersMock.mockResolvedValue(requestHeaders);
+    headersMock.mockResolvedValueOnce(requestHeaders);
 
     await expect(getRequestTenantId()).resolves.toBeUndefined();
   });
@@ -209,7 +132,7 @@ describe(getRequestTenantId, () => {
 
   it.each([
     ['the placeholder', UNRESOLVED_TENANT_PLACEHOLDER],
-    ['a segment that is not tenant-shaped', '.well-known'],
+    ['a segment that is not tenant-shaped', MOCK_NON_TENANT_SHAPED_SEGMENT],
     ['a tenant id with trailing garbage', `${MOCK_TENANT_ID}-trailing-garbage`],
   ])(
     'returns undefined for %s as the tenant param, without reading headers',
@@ -219,13 +142,46 @@ describe(getRequestTenantId, () => {
       expect(headersMock).not.toHaveBeenCalled();
     },
   );
+});
 
-  it('dedupes the header read when called more than once in one render pass', async () => {
+describe('request-scoped memoization', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    headersMock.mockResolvedValue(
+      new Headers({
+        host: MOCK_TENANT_HOST,
+        [TENANT_ID_HEADER]: MOCK_TENANT_ID,
+      }),
+    );
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      MOCK_TENANT,
+    );
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue(
+      mockTenantSanityCredentials(),
+    );
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
+      mockTenantSanityWriteCredentials(),
+    );
     vi.doMock('react', withMemoizingReactCache);
     vi.resetModules();
-    headersMock.mockResolvedValue(
-      new Headers({ [TENANT_ID_HEADER]: MOCK_TENANT_ID }),
-    );
+  });
+
+  afterEach(() => {
+    vi.doUnmock('react');
+    vi.resetModules();
+  });
+
+  it('dedupes the tenant lookup when called more than once in one render pass', async () => {
+    const { resolveRequestTenant: freshResolveRequestTenant } =
+      await import('./request-tenant');
+
+    await freshResolveRequestTenant();
+    await freshResolveRequestTenant();
+
+    expect(queries.tenantDomains.getTenantByDomain).toHaveBeenCalledTimes(1);
+  });
+
+  it('dedupes the header read when the tenant id is requested more than once', async () => {
     const { getRequestTenantId: freshGetRequestTenantId } =
       await import('./request-tenant');
 
@@ -233,5 +189,27 @@ describe(getRequestTenantId, () => {
     await freshGetRequestTenantId();
 
     expect(headersMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves once for the base URL and the read context in one render pass', async () => {
+    const { getTenantBaseUrl } =
+      await import('@web/server/tenant/tenant-base-url/tenant-base-url');
+    const { getHostTenantSanityContext } =
+      await import('@web/server/tenant/tenant-sanity-context/tenant-sanity-context');
+
+    await getTenantBaseUrl();
+    await getHostTenantSanityContext();
+
+    expect(queries.tenantDomains.getTenantByDomain).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves once for the read and write contexts in one render pass', async () => {
+    const { getHostTenantSanityContext, getHostTenantSanityWriteContext } =
+      await import('@web/server/tenant/tenant-sanity-context/tenant-sanity-context');
+
+    await getHostTenantSanityContext();
+    await getHostTenantSanityWriteContext();
+
+    expect(queries.tenantDomains.getTenantByDomain).toHaveBeenCalledTimes(1);
   });
 });

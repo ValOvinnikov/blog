@@ -1,28 +1,50 @@
-import { CAPABILITY, type TCapability } from '@blog/config';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import {
+  CAPABILITY,
+  READER_ACCOUNT_CAPABILITIES,
+  type TCapability,
+} from '@blog/config';
+import { queries } from '@blog/db';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
+import { mockTenant } from '@web/testing/shared/tenant/fixtures';
 
 import { isReaderAccountEnabled } from './is-reader-account-enabled';
 
-vi.mock(
-  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
-  () => ({
-    isCapabilityEnabled: vi.fn(),
-  }),
-);
+faker.seed(6010);
 
-const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
+vi.mock('@web/server/request-context/request-context');
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-const enableOnly = (...capabilities: TCapability[]) =>
-  isCapabilityEnabledMock.mockImplementation(async (capability) =>
-    capabilities.includes(capability),
+vi.mock('@blog/db', async () => ({
+  ...(await vi.importActual('@blog/db/constants')),
+  queries: {
+    tenants: { getTenantById: vi.fn() },
+    settingsFeatures: { getSettingsFeatures: vi.fn() },
+    siteConfig: { getSiteConfig: vi.fn() },
+  },
+}));
+
+vi.mock('next/cache', () => ({
+  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
+}));
+
+const enableOnly = (...capabilities: TCapability[]) => {
+  vi.mocked(queries.settingsFeatures.getSettingsFeatures).mockResolvedValue(
+    mockSettingsFeaturesRowEnabling(capabilities),
   );
+};
 
 describe(isReaderAccountEnabled, () => {
   beforeEach(() => {
-    isCapabilityEnabledMock.mockReset();
+    vi.mocked(queries.tenants.getTenantById).mockReset();
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
+      mockTenant({ plan: TENANT_PLAN.GROWTH }),
+    );
+    vi.mocked(queries.settingsFeatures.getSettingsFeatures).mockReset();
   });
 
-  it.each([CAPABILITY.BOOKMARKS, CAPABILITY.COMMENTS, CAPABILITY.NEWSLETTER])(
+  it.each(READER_ACCOUNT_CAPABILITIES)(
     'is enabled when %s is the only reader-account capability enabled',
     async (capability) => {
       enableOnly(capability);
@@ -39,15 +61,5 @@ describe(isReaderAccountEnabled, () => {
     );
 
     await expect(isReaderAccountEnabled()).resolves.toBe(false);
-  });
-
-  it('asks about each reader-account capability', async () => {
-    enableOnly();
-
-    await isReaderAccountEnabled();
-
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.BOOKMARKS);
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.COMMENTS);
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.NEWSLETTER);
   });
 });

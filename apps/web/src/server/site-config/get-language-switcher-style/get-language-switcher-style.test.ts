@@ -1,44 +1,55 @@
 import { LANGUAGE_SWITCHER_STYLE } from '@blog/config';
-import { errorResult, okResult } from '@blog/utils';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
+import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { getLanguageSwitcherStyle } from './get-language-switcher-style';
 
-vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
-  getSiteConfig: vi.fn(),
+faker.seed(6010);
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+
+vi.mock('@blog/db', () => ({
+  queries: {
+    siteConfig: { getSiteConfig: vi.fn() },
+  },
 }));
 
-const getSiteConfigMock = vi.mocked(getSiteConfig);
+vi.mock('next/cache', () => ({
+  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
+}));
+
+const getSiteConfigMock = vi.mocked(queries.siteConfig.getSiteConfig);
 
 describe(getLanguageSwitcherStyle, () => {
+  beforeEach(() => {
+    getSiteConfigMock.mockReset();
+  });
+
   it("returns the tenant's saved style", async () => {
     getSiteConfigMock.mockResolvedValue(
-      okResult({
-        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      }) as Awaited<ReturnType<typeof getSiteConfig>>,
+      mockSiteConfig({ languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES }),
     );
 
-    await expect(getLanguageSwitcherStyle('tenant-a')).resolves.toBe(
+    await expect(getLanguageSwitcherStyle(MOCK_TENANT_ID)).resolves.toBe(
       LANGUAGE_SWITCHER_STYLE.CODES,
     );
   });
 
   it('falls back to the menu with code when the tenant has no site config', async () => {
-    getSiteConfigMock.mockResolvedValue(okResult());
+    getSiteConfigMock.mockResolvedValue(undefined);
 
-    await expect(getLanguageSwitcherStyle('tenant-a')).resolves.toBe(
+    await expect(getLanguageSwitcherStyle(MOCK_TENANT_ID)).resolves.toBe(
       LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     );
   });
 
   it('falls back to the menu with code when the site config read fails', async () => {
-    getSiteConfigMock.mockResolvedValue(
-      errorResult(new Error('down')) as Awaited<
-        ReturnType<typeof getSiteConfig>
-      >,
-    );
+    getSiteConfigMock.mockRejectedValue(MOCK_ERROR);
 
-    await expect(getLanguageSwitcherStyle('tenant-a')).resolves.toBe(
+    await expect(getLanguageSwitcherStyle(MOCK_TENANT_ID)).resolves.toBe(
       LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     );
   });

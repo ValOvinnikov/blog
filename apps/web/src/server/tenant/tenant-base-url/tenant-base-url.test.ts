@@ -1,69 +1,52 @@
+import { faker } from '@faker-js/faker';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  MOCK_TENANT_HOST,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
+import { env } from '@web/utils/env/env';
 
 import { getTenantBaseUrl } from './tenant-base-url';
 
-vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
-  resolveRequestTenant: vi.fn(),
-}));
+faker.seed(4410);
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+vi.mock('@web/utils/env/env', () => ({ env: {} }));
+
+const MOCK_SITE_URL = faker.internet.url();
 
 describe(getTenantBaseUrl, () => {
   beforeEach(() => {
-    vi.mocked(resolveRequestTenant).mockReset();
+    Reflect.deleteProperty(env, 'NEXT_PUBLIC_SITE_URL');
   });
 
-  it("builds an https URL from the resolved tenant's primaryDomain", async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-      primaryDomain: 'demo.valstack.dev',
-    } as never);
-
-    await expect(getTenantBaseUrl()).resolves.toBe('https://demo.valstack.dev');
+  it("builds an https URL from the resolved tenant's primary domain", async () => {
+    await expect(getTenantBaseUrl()).resolves.toBe(
+      `https://${MOCK_TENANT_HOST}`,
+    );
   });
 
-  describe('with NEXT_PUBLIC_SITE_URL set', () => {
-    let freshGetTenantBaseUrl: typeof getTenantBaseUrl;
-    let freshResolveRequestTenant: typeof resolveRequestTenant;
-
-    beforeEach(async () => {
-      vi.doMock('@web/utils/env/env', () => ({
-        env: { NEXT_PUBLIC_SITE_URL: 'https://blog-dev.valstack.dev' },
-      }));
-      vi.resetModules();
-      ({ getTenantBaseUrl: freshGetTenantBaseUrl } =
-        await import('./tenant-base-url'));
-      ({ resolveRequestTenant: freshResolveRequestTenant } =
-        await import('@web/server/tenant/request-tenant/request-tenant'));
+  describe('with a site URL configured', () => {
+    beforeEach(() => {
+      Object.assign(env, { NEXT_PUBLIC_SITE_URL: MOCK_SITE_URL });
     });
 
-    it('falls back to NEXT_PUBLIC_SITE_URL when no tenant resolves', async () => {
-      vi.mocked(freshResolveRequestTenant).mockResolvedValue(undefined);
+    it.each([
+      ['no tenant resolves', undefined],
+      [
+        'the resolved tenant has no primary domain',
+        mockTenant({ primaryDomain: '' }),
+      ],
+    ])('falls back to the site URL when %s', async (_, tenant) => {
+      vi.mocked(resolveRequestTenant).mockResolvedValueOnce(tenant);
 
-      await expect(freshGetTenantBaseUrl()).resolves.toBe(
-        'https://blog-dev.valstack.dev',
-      );
-    });
-
-    it('falls back to NEXT_PUBLIC_SITE_URL when the resolved tenant has no primaryDomain', async () => {
-      vi.mocked(freshResolveRequestTenant).mockResolvedValue({
-        id: 'tenant-1',
-        primaryDomain: '',
-      } as never);
-
-      await expect(freshGetTenantBaseUrl()).resolves.toBe(
-        'https://blog-dev.valstack.dev',
-      );
+      await expect(getTenantBaseUrl()).resolves.toBe(MOCK_SITE_URL);
     });
   });
 
-  it('returns undefined when no tenant resolves and NEXT_PUBLIC_SITE_URL is unset', async () => {
-    vi.doMock('@web/utils/env/env', () => ({ env: {} }));
-    vi.resetModules();
-    const { getTenantBaseUrl: freshGetTenantBaseUrl } =
-      await import('./tenant-base-url');
-    const { resolveRequestTenant: freshResolveRequestTenant } =
-      await import('@web/server/tenant/request-tenant/request-tenant');
-    vi.mocked(freshResolveRequestTenant).mockResolvedValue(undefined);
+  it('returns undefined when no tenant resolves and no site URL is configured', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
-    await expect(freshGetTenantBaseUrl()).resolves.toBeUndefined();
+    await expect(getTenantBaseUrl()).resolves.toBeUndefined();
   });
 });
