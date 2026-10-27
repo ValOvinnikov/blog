@@ -1,17 +1,23 @@
+import messages from '@platform/i18n/messages/en.json';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { SignOutButton } from './sign-out-button';
 
 vi.mock('@platform/server/auth/sign-out-action');
 
-describe(SignOutButton, () => {
+const setup = customRender(SignOutButton, {});
+
+describe(`<${SignOutButton.name}/>`, () => {
   it('signs out when clicked', async () => {
     const user = userEvent.setup();
-    renderWithIntl(<SignOutButton />);
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    const signOutButton = screen.getByRole('button', {
+      name: messages.account.signOut,
+    });
+    await user.click(signOutButton);
 
     expect(signOutAction).toHaveBeenCalledOnce();
   });
