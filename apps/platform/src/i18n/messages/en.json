@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Tenants · Admin",
-    "ownerHome": "Your site · Admin",
+    "ownerHome": "Dashboard · Admin",
     "look": "Look · Admin",
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
@@ -174,7 +174,7 @@
     "READER": "Reader"
   },
   "navSections": {
-    "yourSiteLabel": "Your site",
+    "dashboardLabel": "Dashboard",
     "platformLabel": "Platform",
     "platformSectionLabel": "Platform actions",
     "contentSectionLabel": "Content",
@@ -311,12 +311,10 @@
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",
     "yourSiteCardTitle": "Your site",
-    "readOnlyBadge": "read-only",
     "nameLabel": "Name",
     "publicDomainLabel": "Public domain",
     "planLabel": "Plan",
     "localeLabel": "Language",
-    "openPublicDomainAriaLabel": "Open {domain} in a new tab",
     "readOnlyHint": "Need one of these changed? Ask your platform contact — these values are wired into your site's hosting.",
     "makeItYoursCardTitle": "Make it yours",
     "makeItYoursSupportingText": "changes go live immediately",

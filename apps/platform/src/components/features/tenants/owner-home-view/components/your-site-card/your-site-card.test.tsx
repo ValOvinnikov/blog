@@ -4,7 +4,6 @@ import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   mockTenant,
   MOCK_CUSTOM_DOMAIN,
-  MOCK_CUSTOM_DOMAIN_URL,
   MOCK_SITE_NAME,
 } from '@platform/testing/tenants/fixtures';
 
@@ -35,15 +34,15 @@ describe(`<${YourSiteCard.name}/>`, () => {
     expect(textbox).not.toBeInTheDocument();
   });
 
-  it('links the public domain out to the live site', () => {
+  it('shows the public domain without a link and carries no read-only badge', () => {
     const tenant = mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN });
     render(<YourSiteCard tenant={tenant} />);
 
-    const siteLink = screen.getByRole('link', {
-      name: `Open ${MOCK_CUSTOM_DOMAIN} in a new tab`,
-    });
+    const link = screen.queryByRole('link');
+    const badge = screen.queryByText('read-only');
 
-    expect(siteLink).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
+    expect(link).not.toBeInTheDocument();
+    expect(badge).not.toBeInTheDocument();
   });
 
   it("nests the card's title one level under the page's own h1", () => {

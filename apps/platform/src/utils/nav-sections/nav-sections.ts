@@ -219,7 +219,7 @@ export const dashboardNavSections = (
 
   return [
     {
-      label: t('yourSiteLabel'),
+      label: t('dashboardLabel'),
       items: [
         {
           label: t('overview'),

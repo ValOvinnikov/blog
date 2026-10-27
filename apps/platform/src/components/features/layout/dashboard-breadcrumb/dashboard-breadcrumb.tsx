@@ -20,14 +20,11 @@ export const DashboardBreadcrumb = () => {
   const tTopbar = useTranslations('topbar');
 
   const homeHref = adminRoutes.dashboard();
-  const yourSite: TBreadcrumbItem = { label: t('yourSiteLabel') };
+  const home: TBreadcrumbItem = { label: t('dashboardLabel') };
 
   if (pathname === homeHref) {
     return (
-      <Breadcrumbs
-        items={[yourSite]}
-        ariaLabel={tTopbar('breadcrumbAriaLabel')}
-      />
+      <Breadcrumbs items={[home]} ariaLabel={tTopbar('breadcrumbAriaLabel')} />
     );
   }
 
@@ -37,7 +34,7 @@ export const DashboardBreadcrumb = () => {
   );
 
   const items: TBreadcrumbItem[] = [
-    { ...yourSite, href: homeHref },
+    { ...home, href: homeHref },
     ...(leafLabel ? [{ label: leafLabel }] : []),
   ];
 

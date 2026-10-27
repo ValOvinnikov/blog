@@ -33,7 +33,7 @@ export const OwnerHomeView = ({
   siteSetup,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
-  const { root, cardsStack } = ownerHomeViewVariants();
+  const { root, cardsGrid, cardsColumn } = ownerHomeViewVariants();
 
   return (
     <div className={root()}>
@@ -48,17 +48,18 @@ export const OwnerHomeView = ({
 
       {siteSetup && <SiteSetupCard {...siteSetup} />}
 
-      <YourSiteCard tenant={tenant} />
-
-      <div className={cardsStack()}>
-        <Suspense fallback={<DomainCardSkeleton />}>
-          <StreamedDomainCard
-            tenant={tenant}
-            domainVerificationStatus={domainVerificationStatus}
-            dnsHref={adminRoutes.dashboardDomain()}
-          />
-        </Suspense>
-        <OwnerCard owner={owner} />
+      <div className={cardsGrid()}>
+        <YourSiteCard tenant={tenant} />
+        <div className={cardsColumn()}>
+          <Suspense fallback={<DomainCardSkeleton />}>
+            <StreamedDomainCard
+              tenant={tenant}
+              domainVerificationStatus={domainVerificationStatus}
+              dnsHref={adminRoutes.dashboardDomain()}
+            />
+          </Suspense>
+          <OwnerCard owner={owner} />
+        </div>
       </div>
 
       <MakeItYoursCard />
