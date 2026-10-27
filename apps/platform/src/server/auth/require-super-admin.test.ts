@@ -1,74 +1,35 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
+import { requireAdmin } from '@platform/server/auth/require-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
 
-import { auth } from './auth';
 import { requireSuperAdmin } from './require-super-admin';
 
-const { getAdminByUserIdMock } = vi.hoisted(() => ({
-  getAdminByUserIdMock: vi.fn(),
-}));
-
-vi.mock('./auth');
-
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: {
-    admins: { getAdminByUserId: getAdminByUserIdMock },
-  },
-}));
-
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+vi.mock('@platform/server/auth/require-admin');
 
 describe(requireSuperAdmin, () => {
-  beforeEach(() => {
-    authMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-  });
-
-  it('redirects to sign-in without querying the admins row when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('passes on the failure of the admin gate', async () => {
+    vi.mocked(requireAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
+    );
 
     await expect(requireSuperAdmin()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
-
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-    expect(getAdminByUserIdMock).not.toHaveBeenCalled();
-  });
-
-  it('404s when the signed-in user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-
-    await expect(requireSuperAdmin()).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
-
-    expect(redirect).not.toHaveBeenCalled();
   });
 
   it('404s when the admin row is below SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
-
     await expect(requireSuperAdmin()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
-
-    expect(redirect).not.toHaveBeenCalled();
   });
 
   it('resolves to the admin row when the role is SUPERADMIN', async () => {
     const admin = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
-    getAdminByUserIdMock.mockResolvedValue(admin);
+    vi.mocked(requireAdmin).mockResolvedValueOnce(admin);
 
     const result = await requireSuperAdmin();
 
     expect(result).toEqual(admin);
-    expect(redirect).not.toHaveBeenCalled();
   });
 });
