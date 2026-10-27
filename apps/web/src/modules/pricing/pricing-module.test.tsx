@@ -1,4 +1,7 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   mockPricingModule,
@@ -10,9 +13,8 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 
 import { PricingModule } from './pricing-module';
 
-const { getPricingModuleMock, getSiteSettingsMock } = vi.hoisted(() => ({
+const { getPricingModuleMock } = vi.hoisted(() => ({
   getPricingModuleMock: vi.fn(),
-  getSiteSettingsMock: vi.fn(),
 }));
 
 vi.mock('@web/i18n/navigation');
@@ -20,21 +22,34 @@ vi.mock('@web/i18n/navigation');
 vi.mock('@blog/service', () => ({
   service: {
     modules: { pricing: { v1: { getPricingModule: getPricingModuleMock } } },
-    global: { siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } } },
   },
 }));
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+
+faker.seed(13);
+
+const MOCK_PRICING_MODULE_ID = faker.string.uuid();
+
 const setup = customRenderAsync(PricingModule, {
-  id: 'pricing-1',
+  id: MOCK_PRICING_MODULE_ID,
 });
 
 describe(`<${PricingModule.name}/>`, () => {
   beforeEach(() => {
     getPricingModuleMock.mockReset();
-    getSiteSettingsMock.mockReset();
-    getSiteSettingsMock.mockResolvedValue(okResult({ currency: 'GBP' }));
+    getPricingModuleMock.mockResolvedValue(okResult(mockPricingModule()));
+  });
+
+  it('fetches the module with the tenant Sanity context', async () => {
+    await setup();
+
+    expect(getPricingModuleMock).toHaveBeenCalledWith(
+      MOCK_PRICING_MODULE_ID,
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders nothing when the module fetch fails', async () => {
@@ -45,61 +60,42 @@ describe(`<${PricingModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  describe('with a default pricing module', () => {
-    beforeEach(() => {
-      getPricingModuleMock.mockResolvedValue(okResult(mockPricingModule()));
-    });
+  it('renders nothing when the site settings fetch fails', async () => {
+    vi.mocked(getSiteSettings).mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    it('fetches the module with the tenant Sanity context', async () => {
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it.each([
+    { title: 'without trailing zeros', amount: 49, formatted: '£49' },
+    { title: 'with its fraction', amount: 49.99, formatted: '£49.99' },
+    {
+      title: 'as free',
+      amount: 0,
+      formatted: SITE_MESSAGES.pricingModule.free,
+    },
+  ])(
+    'formats a price of $amount in the site currency $title',
+    async ({ amount, formatted }) => {
+      getPricingModuleMock.mockResolvedValue(
+        okResult(
+          mockPricingModule({
+            tiers: [
+              mockPricingTier({
+                prices: [mockPricingPrice({ amount })],
+              }),
+            ],
+          }),
+        ),
+      );
+
       await setup();
 
-      expect(getPricingModuleMock).toHaveBeenCalledWith(
-        'pricing-1',
-        MOCK_TENANT_SANITY_CONTEXT,
-      );
-    });
+      const price = screen.getByText(formatted);
 
-    it('renders nothing when the site settings fetch fails', async () => {
-      getSiteSettingsMock.mockResolvedValue(errorResult(MOCK_ERROR));
-
-      const { container } = await setup();
-
-      expect(container).toBeEmptyDOMElement();
-    });
-  });
-
-  it('formats prices in the site currency without trailing zeros', async () => {
-    getPricingModuleMock.mockResolvedValue(
-      okResult(
-        mockPricingModule({
-          tiers: [
-            mockPricingTier({
-              id: 'whole',
-              name: 'Whole',
-              prices: [mockPricingPrice({ amount: 49 })],
-            }),
-            mockPricingTier({
-              id: 'fraction',
-              name: 'Fraction',
-              prices: [mockPricingPrice({ amount: 49.99 })],
-            }),
-            mockPricingTier({
-              id: 'free',
-              name: 'Free tier',
-              prices: [mockPricingPrice({ amount: 0 })],
-            }),
-          ],
-        }),
-      ),
-    );
-
-    await setup();
-
-    const wholePrice = screen.getByText('£49');
-    const fractionPrice = screen.getByText('£49.99');
-    const freePrice = screen.getByText('Free');
-    expect(wholePrice).toBeVisible();
-    expect(fractionPrice).toBeVisible();
-    expect(freePrice).toBeVisible();
-  });
+      expect(price).toBeVisible();
+    },
+  );
 });

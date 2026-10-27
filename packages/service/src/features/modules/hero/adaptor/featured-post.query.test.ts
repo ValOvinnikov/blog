@@ -10,9 +10,9 @@ describe('heroFallbackFeaturedPostQuery', () => {
   it('parses a matching post', () => {
     const rawPost = mockRawPostCard();
 
-    expect(heroFallbackFeaturedPostQuery.parse(rawPost)).toMatchObject({
-      _id: rawPost._id,
-      headingBlock: rawPost.headingBlock,
-    });
+    const post = heroFallbackFeaturedPostQuery.parse(rawPost);
+
+    expect(post?._id).toBe(rawPost._id);
+    expect(post?.headingBlock).toEqual(rawPost.headingBlock);
   });
 });

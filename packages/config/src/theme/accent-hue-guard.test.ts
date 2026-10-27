@@ -1,34 +1,37 @@
 import { renderedContrastRatio } from '@blog/utils/color';
 
+import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+
 import { isAccentHueAccessible } from './accent-hue-guard';
 
-vi.mock('@blog/utils/color', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/utils/color')>()),
-  renderedContrastRatio: vi.fn(),
-}));
+vi.mock(import('@blog/utils/color'), async (importOriginal) => {
+  const actual = await importOriginal();
 
-const mockedRenderedContrastRatio = vi.mocked(renderedContrastRatio);
+  return {
+    ...actual,
+    renderedContrastRatio: vi.fn(actual.renderedContrastRatio),
+  };
+});
 
-beforeEach(async () => {
-  const actual =
-    await vi.importActual<typeof import('@blog/utils/color')>(
-      '@blog/utils/color',
-    );
-  mockedRenderedContrastRatio.mockImplementation(actual.renderedContrastRatio);
+const MOCK_ACCENT_HUE = 310;
+
+beforeEach(() => {
+  vi.mocked(renderedContrastRatio).mockReset();
 });
 
 describe(isAccentHueAccessible, () => {
-  it('accepts the Console preset accent hue', () => {
-    expect(isAccentHueAccessible(250)).toBe(true);
-  });
+  it.each([PRESET_ID.CONSOLE, PRESET_ID.EDITORIAL])(
+    'accepts the %s preset accent hue',
+    (preset) => {
+      const { accentHue } = PRESET_REGISTRY[preset].themeTokens;
 
-  it('accepts the Editorial preset accent hue', () => {
-    expect(isAccentHueAccessible(28)).toBe(true);
-  });
+      expect(isAccentHueAccessible(accentHue)).toBe(true);
+    },
+  );
 
-  it('rejects a hue when the rendered contrast ratio falls below the AA floor', () => {
-    mockedRenderedContrastRatio.mockReturnValue(1);
+  it('rejects a hue whose rendered contrast falls below the AA floor', () => {
+    vi.mocked(renderedContrastRatio).mockReturnValue(1);
 
-    expect(isAccentHueAccessible(310)).toBe(false);
+    expect(isAccentHueAccessible(MOCK_ACCENT_HUE)).toBe(false);
   });
 });

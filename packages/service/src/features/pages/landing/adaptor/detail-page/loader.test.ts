@@ -17,28 +17,35 @@ import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockRawSeo,
+  mockSlug,
 } from '@blog/service/testing/shared/fixtures';
 import {
   MOCK_ABOUT_SLUG,
   MOCK_PRICING_SLUG,
 } from '@blog/service/testing/shared/translated-pages-dataset';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPageDocument } from './loader';
 import { landingPageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const ABOUT_TITLE = MOCK_ABOUT_PAGE_TITLE;
-const ABOUT_SUPPORTING_TEXT = 'Who we are';
-const MODULES_PATH = 'modules';
-const FAQ_SLUG = 'faq';
-const FAQ_PATH = `${MODULES_PATH}/${FAQ_SLUG}`;
-const PRICING_PATH = 'modules/pricing';
-const ANSWERS_PATH = 'modules/faq/answers';
-const GLOSSARY_PATH = 'modules/faq/glossary';
+faker.seed(6015109);
 
 const tenant = mockTenant();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_SIDEBAR_TITLE = faker.lorem.words(2);
+
+const MOCK_SECTION_SLUG = mockSlug();
+const MOCK_FAQ_SLUG = mockSlug();
+const MOCK_ANSWERS_SLUG = mockSlug();
+const MOCK_GLOSSARY_SLUG = mockSlug();
+const MOCK_CATALOG_SLUG = mockSlug();
+const MOCK_FAQ_PATH = `${MOCK_SECTION_SLUG}/${MOCK_FAQ_SLUG}`;
+const MOCK_PRICING_PATH = `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`;
+const MOCK_ANSWERS_PATH = `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`;
+const MOCK_GLOSSARY_PATH = `${MOCK_FAQ_PATH}/${MOCK_GLOSSARY_SLUG}`;
 
 async function loadPage(
   overrides: Parameters<typeof mockRawLandingPage>[0] = {},
@@ -68,13 +75,13 @@ describe(getPageDocument, () => {
 
   it('maps an authored page_landing.headingBlock through to the view model', async () => {
     const { headingBlock } = await loadPage({
-      headingBlock: mockRawHeadingBlock(ABOUT_TITLE, {
-        supportingText: ABOUT_SUPPORTING_TEXT,
+      headingBlock: mockRawHeadingBlock(MOCK_ABOUT_PAGE_TITLE, {
+        supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
 
-    expect(headingBlock.heading).toBe(ABOUT_TITLE);
-    expect(headingBlock.supportingText).toBe(ABOUT_SUPPORTING_TEXT);
+    expect(headingBlock.heading).toBe(MOCK_ABOUT_PAGE_TITLE);
+    expect(headingBlock.supportingText).toBe(MOCK_SUPPORTING_TEXT);
   });
 
   it.each([
@@ -102,10 +109,10 @@ describe(getPageDocument, () => {
 
   it('uses authored seo, with no fallback for an unauthored openGraph', async () => {
     const { seo } = await loadPage({
-      seo: mockRawSeo({ metaTitle: ABOUT_TITLE }),
+      seo: mockRawSeo({ metaTitle: MOCK_ABOUT_PAGE_TITLE }),
     });
 
-    expect(seo.title).toBe(ABOUT_TITLE);
+    expect(seo.title).toBe(MOCK_ABOUT_PAGE_TITLE);
     expect(seo.ogTitle).toBeUndefined();
   });
 
@@ -118,10 +125,10 @@ describe(getPageDocument, () => {
   });
 
   it('queries the slug and path for the tenant and scopes the tags to it', async () => {
-    await getPageDocument([MODULES_PATH, FAQ_SLUG], tenant);
+    await getPageDocument([MOCK_SECTION_SLUG, MOCK_FAQ_SLUG], tenant);
 
     expect(mockRun).toHaveBeenCalledWith(landingPageQuery, {
-      parameters: { slug: FAQ_SLUG, path: FAQ_PATH },
+      parameters: { slug: MOCK_FAQ_SLUG, path: MOCK_FAQ_PATH },
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
@@ -131,30 +138,24 @@ describe(getPageDocument, () => {
   });
 
   describe('section navigation', () => {
-    const faq = { _id: FAQ_SLUG, title: 'FAQ', path: FAQ_PATH };
-    const pricing = {
-      _id: MOCK_PRICING_SLUG,
-      title: 'Pricing',
-      path: PRICING_PATH,
-    };
-    const answers = {
-      _id: 'answers',
-      title: 'Answers',
-      path: ANSWERS_PATH,
-    };
-    const glossary = {
-      _id: 'glossary',
-      title: 'Glossary',
-      path: GLOSSARY_PATH,
-    };
-
     type TSectionPage = {
       _id: string;
       title: string | null;
       path: string | null;
     };
 
-    function chainNode(
+    function mockSectionPage(id: string, path: string): TSectionPage {
+      return { _id: id, title: faker.lorem.words(2), path };
+    }
+
+    const faq = mockSectionPage(MOCK_FAQ_SLUG, MOCK_FAQ_PATH);
+    const pricing = mockSectionPage(MOCK_PRICING_SLUG, MOCK_PRICING_PATH);
+    const answers = mockSectionPage(MOCK_ANSWERS_SLUG, MOCK_ANSWERS_PATH);
+    const glossary = mockSectionPage(MOCK_GLOSSARY_SLUG, MOCK_GLOSSARY_PATH);
+    const catalog = mockSectionPage(MOCK_CATALOG_SLUG, MOCK_CATALOG_SLUG);
+    const sectionRoot = mockSectionPage(MOCK_SECTION_SLUG, MOCK_SECTION_SLUG);
+
+    function mockChainNode(
       page: TSectionPage,
       children: TSectionPage[] | null = null,
     ) {
@@ -166,15 +167,12 @@ describe(getPageDocument, () => {
       };
     }
 
-    const modulesSection = chainNode(
-      { _id: MODULES_PATH, title: 'Modules', path: MODULES_PATH },
-      [faq, pricing],
-    );
+    const modulesSection = mockChainNode(sectionRoot, [faq, pricing]);
 
     async function navigationFor(
       overrides: Parameters<typeof mockRawLandingPage>[0],
     ) {
-      const page = await loadPage(overrides, MODULES_PATH);
+      const page = await loadPage(overrides, MOCK_SECTION_SLUG);
 
       return page.sectionNavigation;
     }
@@ -182,19 +180,27 @@ describe(getPageDocument, () => {
     it("returns the section's children in drag order and the breadcrumb chain", async () => {
       expect(
         await navigationFor({
-          sectionChain: [chainNode(answers), chainNode(faq), modulesSection],
+          sectionChain: [
+            mockChainNode(answers),
+            mockChainNode(faq),
+            modulesSection,
+          ],
         }),
       ).toEqual({
         title: null,
-        root: { title: 'Modules', path: MODULES_PATH, isCurrent: false },
+        root: {
+          title: sectionRoot.title,
+          path: MOCK_SECTION_SLUG,
+          isCurrent: false,
+        },
         pages: [
-          { title: 'FAQ', path: FAQ_PATH, isCurrent: true },
-          { title: 'Pricing', path: PRICING_PATH, isCurrent: false },
+          { title: faq.title, path: MOCK_FAQ_PATH, isCurrent: true },
+          { title: pricing.title, path: MOCK_PRICING_PATH, isCurrent: false },
         ],
         breadcrumbs: [
-          { title: 'Modules', path: MODULES_PATH },
-          { title: 'FAQ', path: FAQ_PATH },
-          { title: 'Answers', path: ANSWERS_PATH },
+          { title: sectionRoot.title, path: MOCK_SECTION_SLUG },
+          { title: faq.title, path: MOCK_FAQ_PATH },
+          { title: answers.title, path: MOCK_ANSWERS_PATH },
         ],
         parentSection: undefined,
       });
@@ -215,45 +221,45 @@ describe(getPageDocument, () => {
     it('returns the nested branch when a nested parent has its own switch on', async () => {
       const navigation = await navigationFor({
         sectionChain: [
-          chainNode(answers),
-          chainNode(faq, [glossary, answers]),
+          mockChainNode(answers),
+          mockChainNode(faq, [glossary, answers]),
           modulesSection,
         ],
       });
 
       expect(navigation?.root).toEqual({
-        title: 'FAQ',
-        path: FAQ_PATH,
+        title: faq.title,
+        path: MOCK_FAQ_PATH,
         isCurrent: false,
       });
       expect(navigation?.pages).toEqual([
-        { title: 'Glossary', path: GLOSSARY_PATH, isCurrent: false },
-        { title: 'Answers', path: ANSWERS_PATH, isCurrent: true },
+        { title: glossary.title, path: MOCK_GLOSSARY_PATH, isCurrent: false },
+        { title: answers.title, path: MOCK_ANSWERS_PATH, isCurrent: true },
       ]);
     });
 
     it("returns the nearest outer section root as a nested section's parent", async () => {
       const navigation = await navigationFor({
         sectionChain: [
-          chainNode(answers),
-          chainNode(faq, [glossary, answers]),
-          chainNode({ _id: 'catalog', title: 'Catalog', path: 'catalog' }),
+          mockChainNode(answers),
+          mockChainNode(faq, [glossary, answers]),
+          mockChainNode(catalog),
           modulesSection,
         ],
       });
 
       expect(navigation?.parentSection).toEqual({
-        title: 'Modules',
-        path: MODULES_PATH,
+        title: sectionRoot.title,
+        path: MOCK_SECTION_SLUG,
       });
     });
 
     it('returns no parent section for a top-level section', async () => {
       const navigation = await navigationFor({
         sectionChain: [
-          chainNode(faq),
+          mockChainNode(faq),
           modulesSection,
-          chainNode({ _id: 'catalog', title: 'Catalog', path: 'catalog' }),
+          mockChainNode(catalog),
         ],
       });
 
@@ -261,14 +267,14 @@ describe(getPageDocument, () => {
     });
 
     it.each([
-      ['Guides', 'Guides'],
+      [MOCK_SIDEBAR_TITLE, MOCK_SIDEBAR_TITLE],
       ['   ', null],
     ])(
       "maps the section root's sidebar title %j to %j",
       async (sectionNavigationTitle, title) => {
         const navigation = await navigationFor({
           sectionChain: [
-            chainNode(faq),
+            mockChainNode(faq),
             { ...modulesSection, sectionNavigationTitle },
           ],
         });
@@ -280,9 +286,9 @@ describe(getPageDocument, () => {
     it("takes the title from the nested section root, not an outer section's", async () => {
       const navigation = await navigationFor({
         sectionChain: [
-          chainNode(answers),
-          chainNode(faq, [glossary, answers]),
-          { ...modulesSection, sectionNavigationTitle: 'Guides' },
+          mockChainNode(answers),
+          mockChainNode(faq, [glossary, answers]),
+          { ...modulesSection, sectionNavigationTitle: MOCK_SIDEBAR_TITLE },
         ],
       });
 
@@ -292,38 +298,31 @@ describe(getPageDocument, () => {
     it('leaves out a child page that has no path', async () => {
       const navigation = await navigationFor({
         sectionChain: [
-          chainNode(
-            { _id: MODULES_PATH, title: 'Modules', path: MODULES_PATH },
-            [faq, { ...pricing, path: null }],
-          ),
+          mockChainNode(sectionRoot, [faq, { ...pricing, path: null }]),
         ],
       });
 
-      expect(navigation?.pages.map(({ path }) => path)).toEqual([FAQ_PATH]);
+      expect(navigation?.pages.map(({ path }) => path)).toEqual([
+        MOCK_FAQ_PATH,
+      ]);
     });
 
-    it('returns none when the page turns section navigation off', async () => {
-      expect(
-        await navigationFor({
+    it.each([
+      [
+        'the page turns section navigation off',
+        {
           showSectionNavigation: false,
-          sectionChain: [chainNode(faq), modulesSection],
-        }),
-      ).toBeUndefined();
-    });
-
-    it('returns none for a page outside any section', async () => {
-      expect(
-        await navigationFor({
-          sectionChain: [
-            chainNode(faq),
-            chainNode({
-              _id: MODULES_PATH,
-              title: 'Modules',
-              path: MODULES_PATH,
-            }),
-          ],
-        }),
-      ).toBeUndefined();
+          sectionChain: [mockChainNode(faq), modulesSection],
+        },
+      ],
+      [
+        'the page is outside any section',
+        {
+          sectionChain: [mockChainNode(faq), mockChainNode(sectionRoot)],
+        },
+      ],
+    ])('returns none when %s', async (_, overrides) => {
+      expect(await navigationFor(overrides)).toBeUndefined();
     });
   });
 });

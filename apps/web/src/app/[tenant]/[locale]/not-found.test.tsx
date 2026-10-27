@@ -1,30 +1,31 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import { getNotFoundContext } from '@web/server/request-context/request-context';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { generateMetadata } from './not-found';
 
-const { buildNotFoundMetadataMock } = vi.hoisted(() => ({
-  buildNotFoundMetadataMock: vi.fn(),
-}));
+faker.seed(6009);
 
-vi.mock('@web/metadata/not-found-metadata', () => ({
-  buildNotFoundMetadata: buildNotFoundMetadataMock,
-}));
+const MOCK_METADATA = { title: faker.lorem.words(3) };
+
+vi.mock('@web/metadata/not-found-metadata/build-not-found-metadata');
 
 vi.mock('@web/server/request-context/request-context');
 
-describe('LocaleNotFound ([tenant]/[locale] not-found route)', () => {
+describe(generateMetadata, () => {
   it('builds the metadata for the requested tenant in the served language', async () => {
-    const metadata = { title: 'Page not found' };
-    buildNotFoundMetadataMock.mockResolvedValue(metadata);
-    vi.mocked(getNotFoundContext).mockResolvedValue({
+    vi.mocked(getNotFoundContext).mockResolvedValueOnce({
       tenantId: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.DE,
     });
+    vi.mocked(buildNotFoundMetadata).mockResolvedValueOnce(MOCK_METADATA);
 
-    await expect(generateMetadata()).resolves.toBe(metadata);
-    expect(buildNotFoundMetadataMock).toHaveBeenCalledWith({
+    const metadata = await generateMetadata();
+
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildNotFoundMetadata).toHaveBeenCalledWith({
       tenant: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.DE,
     });

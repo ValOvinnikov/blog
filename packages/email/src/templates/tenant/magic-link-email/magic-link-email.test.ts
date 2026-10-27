@@ -4,34 +4,49 @@ import {
   PLATFORM_EMAIL_BRAND_NAME,
 } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
+  COPYRIGHT_ENTITY,
+  DOCTYPE,
   MOCK_ATTACKER_URL,
   MOCK_ATTRIBUTE_BREAKOUT,
   MOCK_LOGO_URL,
   MOCK_MAGIC_LINK_URL,
+  MOCK_NOW,
   MOCK_PERCENT_ENCODED_ATTRIBUTE_BREAKOUT,
   MOCK_PLATFORM_MAGIC_LINK_URL,
   MOCK_POSTAL_ADDRESS,
   MOCK_TENANT_NAME,
+  MOCK_URL,
+  OPERATOR_BRAND_NAME,
 } from '@blog/email/testing/email-fixtures';
 import {
   mockLinkedPortableTextBody,
   mockPortableTextBody,
 } from '@blog/email/testing/portable-text-fixtures';
 import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+import { faker } from '@faker-js/faker';
 
 import { buildMagicLinkEmail } from './magic-link-email';
 
-const SUBJECT = 'Sign in to your account';
-const BODY_TEXT = 'We received a request to sign in.';
-const DOCTYPE = '<!doctype html>';
-const OPERATOR_BRAND_NAME = 'Tenant Alerts';
+faker.seed(6026);
+
+const MOCK_SUBJECT = faker.lorem.sentence();
+const MOCK_BODY_TEXT = faker.lorem.sentence();
+const MOCK_MIMIC_LABEL = faker.lorem.words(2);
+const MOCK_INPUT = {
+  url: MOCK_MAGIC_LINK_URL,
+  subject: MOCK_SUBJECT,
+  body: mockPortableTextBody(MOCK_BODY_TEXT),
+};
+const MOCK_TENANT_IDENTITY = {
+  brand: MOCK_TENANT_EMAIL_BRAND,
+  brandName: MOCK_TENANT_NAME,
+};
 
 describe(buildMagicLinkEmail, () => {
   it('percent-encodes an unsafe url in the neutral fallback action', () => {
     const { html } = buildMagicLinkEmail({
-      url: `https://example.com/callback?token=${MOCK_ATTRIBUTE_BREAKOUT}`,
-      subject: SUBJECT,
-      body: mockPortableTextBody(BODY_TEXT),
+      ...MOCK_INPUT,
+      url: `${MOCK_URL}/callback?token=${MOCK_ATTRIBUTE_BREAKOUT}`,
     });
 
     expect(html).not.toContain(MOCK_ATTRIBUTE_BREAKOUT);
@@ -42,29 +57,24 @@ describe(buildMagicLinkEmail, () => {
     let email: ReturnType<typeof buildMagicLinkEmail>;
 
     beforeEach(() => {
-      email = buildMagicLinkEmail({
-        url: MOCK_MAGIC_LINK_URL,
-        subject: SUBJECT,
-        body: mockPortableTextBody(BODY_TEXT),
-      });
+      email = buildMagicLinkEmail(MOCK_INPUT);
     });
 
-    it('passes the resolved subject through unchanged', () => {
-      expect(email.subject).toBe(SUBJECT);
+    it('passes the subject through unchanged', () => {
+      expect(email.subject).toBe(MOCK_SUBJECT);
     });
 
-    it('renders the resolved body through the shared Portable Text serializer', () => {
-      expect(email.html).toContain(BODY_TEXT);
+    it('renders the authored body', () => {
+      expect(email.html).toContain(MOCK_BODY_TEXT);
     });
 
     it('links the magic-link url in the sign-in action', () => {
       expect(email.html).toContain(`href="${MOCK_MAGIC_LINK_URL}"`);
-      expect(email.html).toContain('Sign in');
     });
 
-    it('renders a styled document titled with the subject', () => {
+    it('renders a full HTML document titled with the subject', () => {
       expect(email.html).toContain(DOCTYPE);
-      expect(email.html).toContain(`<title>${email.subject}</title>`);
+      expect(email.html).toContain(`<title>${MOCK_SUBJECT}</title>`);
     });
 
     it('renders the action as a button in the achromatic neutral palette', () => {
@@ -75,7 +85,7 @@ describe(buildMagicLinkEmail, () => {
 
     it('names no brand in a header mark or a copyright line', () => {
       expect(email.html).not.toContain('<svg');
-      expect(email.html).not.toContain('&copy;');
+      expect(email.html).not.toContain(COPYRIGHT_ENTITY);
     });
 
     it('renders no operator branding', () => {
@@ -88,13 +98,17 @@ describe(buildMagicLinkEmail, () => {
     let email: ReturnType<typeof buildMagicLinkEmail>;
 
     beforeEach(() => {
+      vi.useFakeTimers({ now: MOCK_NOW });
       email = buildMagicLinkEmail({
+        ...MOCK_INPUT,
         url: MOCK_PLATFORM_MAGIC_LINK_URL,
-        subject: SUBJECT,
-        body: mockPortableTextBody(BODY_TEXT),
         isSentByPlatform: true,
         logoImageUrl: MOCK_LOGO_URL,
       });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
     });
 
     it('links the platform magic-link url in the sign-in action', () => {
@@ -111,7 +125,7 @@ describe(buildMagicLinkEmail, () => {
       expect(email.html).toContain('<svg');
       expect(email.html).toContain(PLATFORM_EMAIL_BRAND.logo1);
       expect(email.html).toContain(
-        `&copy; ${new Date().getFullYear()} ${PLATFORM_EMAIL_BRAND_NAME}`,
+        `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${PLATFORM_EMAIL_BRAND_NAME}`,
       );
     });
 
@@ -125,15 +139,10 @@ describe(buildMagicLinkEmail, () => {
   });
 
   describe('with a tenant identity', () => {
-    it("threads the resolved tenant's hue into the rendered html", () => {
+    it("renders in the resolved tenant's palette", () => {
       const { html } = buildMagicLinkEmail({
-        url: MOCK_MAGIC_LINK_URL,
-        subject: SUBJECT,
-        body: mockPortableTextBody(BODY_TEXT),
-        tenantIdentity: {
-          brand: MOCK_TENANT_EMAIL_BRAND,
-          brandName: MOCK_TENANT_NAME,
-        },
+        ...MOCK_INPUT,
+        tenantIdentity: MOCK_TENANT_IDENTITY,
       });
 
       expect(html).toContain(DOCTYPE);
@@ -142,13 +151,8 @@ describe(buildMagicLinkEmail, () => {
 
     it('renders an uploaded logo and the footer postal address when given', () => {
       const { html } = buildMagicLinkEmail({
-        url: MOCK_MAGIC_LINK_URL,
-        subject: SUBJECT,
-        body: mockPortableTextBody(BODY_TEXT),
-        tenantIdentity: {
-          brand: MOCK_TENANT_EMAIL_BRAND,
-          brandName: MOCK_TENANT_NAME,
-        },
+        ...MOCK_INPUT,
+        tenantIdentity: MOCK_TENANT_IDENTITY,
         logoImageUrl: MOCK_LOGO_URL,
         footerPostalAddress: MOCK_POSTAL_ADDRESS,
       });
@@ -157,22 +161,17 @@ describe(buildMagicLinkEmail, () => {
       expect(html).toContain(MOCK_POSTAL_ADDRESS);
     });
 
-    it('keeps the sign-in action outside the authored body even when the body mimics it', () => {
+    it('renders the sign-in action after a body link that mimics it', () => {
       const { html } = buildMagicLinkEmail({
-        url: MOCK_MAGIC_LINK_URL,
-        subject: SUBJECT,
-        body: mockLinkedPortableTextBody('Sign in', MOCK_ATTACKER_URL),
-        tenantIdentity: {
-          brand: MOCK_TENANT_EMAIL_BRAND,
-          brandName: MOCK_TENANT_NAME,
-        },
+        ...MOCK_INPUT,
+        body: mockLinkedPortableTextBody(MOCK_MIMIC_LABEL, MOCK_ATTACKER_URL),
+        tenantIdentity: MOCK_TENANT_IDENTITY,
       });
-
-      expect(html).toContain(`href="${MOCK_MAGIC_LINK_URL}"`);
-      expect(html).toContain(`href="${MOCK_ATTACKER_URL}"`);
 
       const realActionIndex = html.indexOf(`href="${MOCK_MAGIC_LINK_URL}"`);
       const adversarialLinkIndex = html.indexOf(`href="${MOCK_ATTACKER_URL}"`);
+
+      expect(adversarialLinkIndex).toBeGreaterThan(-1);
       expect(adversarialLinkIndex).toBeLessThan(realActionIndex);
     });
   });

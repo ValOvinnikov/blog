@@ -1,45 +1,93 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import type { TMaybeNull } from '@blog/config/types';
 import {
   TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES,
   TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES,
   TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStatus,
 } from '@blog/db/constants';
+import { setTenantProvisioningStatus } from '@blog/db/queries/tenants/set-tenant-provisioning-status';
 import * as schema from '@blog/db/schema';
-import {
-  tenants,
-  type TTenantProvisioningState,
+import type {
+  TTenant,
+  TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { eq, sql } from 'drizzle-orm';
-
-import { setTenantProvisioningStatus } from '../set-tenant-provisioning-status';
+import {
+  MOCK_IDLE_PROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_STEP_ERROR,
+} from '@blog/db/testing/tenants/fixtures';
+import { errorResult, okResult } from '@blog/utils';
 
 import { beginTenantProvisioning } from './begin-tenant-provisioning';
 
 vi.mock('@blog/db/client');
 
-const EXPECTED_OK = 'expected ok:true';
-
 const db = useQueryTestDb();
+useFrozenClock();
 
-function minutesAgo(minutes: number): string {
-  return new Date(Date.now() - minutes * 60_000).toISOString();
+const { DONE, FAILED, RUNNING } = TENANT_PROVISIONING_STEP_STATUS;
+const { PROVISIONING } = TENANT_PROVISIONING_STATUS;
+
+function minutesBeforeNow(minutes: number): string {
+  return new Date(MOCK_NOW.getTime() - minutes * 60_000).toISOString();
 }
 
-const WEDGED_STARTED_AT = minutesAgo(
+const MOCK_NOW_ISO = MOCK_NOW.toISOString();
+const MOCK_WEDGED_STARTED_AT = minutesBeforeNow(
   TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1,
 );
+const MOCK_FAILED_STEP = {
+  status: FAILED,
+  error: MOCK_STEP_ERROR,
+  updatedAt: MOCK_WEDGED_STARTED_AT,
+};
+const MOCK_IN_FLIGHT_STEPS: TTenantProvisioningState = {
+  ...MOCK_IDLE_PROVISIONING_STEPS,
+  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: { status: DONE },
+  [TENANT_PROVISIONING_STEP.SEED_CONTENT]: { status: RUNNING },
+};
+const MOCK_ALREADY_PROVISIONING = errorResult(
+  ERROR_CODE.DB_ALREADY_PROVISIONING,
+);
 
-async function insertTenant(overrides?: {
-  provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
-}): Promise<string> {
-  const tenant = await insertTestTenant(db(), {
-    provisioningStatus: overrides?.provisioningStatus,
+const MOCK_RETRY_AT = new Date(
+  MOCK_NOW.getTime() +
+    (TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1) * 60_000,
+);
+
+function admitted(
+  tenant: TTenant,
+  previousProvisioningStatus: TMaybeNull<TTenantProvisioningStatus>,
+  admittedAt: Date = MOCK_NOW,
+) {
+  return okResult({
+    tenant: {
+      ...tenant,
+      provisioningStatus: PROVISIONING,
+      provisioningSteps: {
+        ...tenant.provisioningSteps,
+        run: {
+          ...tenant.provisioningSteps?.run,
+          admittedAt: admittedAt.toISOString(),
+        },
+      },
+      updatedAt: admittedAt,
+    },
+    previousProvisioningStatus,
   });
+}
 
-  return tenant.id;
+function insertProvisioningTenant(provisioningSteps: TTenantProvisioningState) {
+  return insertTestTenant(db(), {
+    provisioningStatus: PROVISIONING,
+    provisioningSteps,
+  });
 }
 
 afterEach(async () => {
@@ -48,349 +96,169 @@ afterEach(async () => {
 
 describe(beginTenantProvisioning, () => {
   describe('a tenant with no provisioningStatus', () => {
-    let tenantId: string;
+    let tenant: TTenant;
 
     beforeEach(async () => {
-      tenantId = await insertTenant();
+      tenant = await insertTestTenant(db());
     });
 
-    it('moves a tenant with no provisioningStatus (NULL) to PROVISIONING', async () => {
-      const result = await beginTenantProvisioning(tenantId);
+    it('moves it to PROVISIONING, reporting no prior status', async () => {
+      const result = await beginTenantProvisioning(tenant.id);
 
-      if (!result.ok) throw new Error(EXPECTED_OK);
-      expect(result.data.tenant.provisioningStatus).toBe(
-        TENANT_PROVISIONING_STATUS.PROVISIONING,
-      );
-      expect(result.data.previousProvisioningStatus).toBeNull();
+      expect(result).toEqual(admitted(tenant, null));
     });
 
     it('resolves exactly one of two concurrent calls with ok:true', async () => {
-      const [first, second] = await Promise.all([
-        beginTenantProvisioning(tenantId),
-        beginTenantProvisioning(tenantId),
+      const outcomes = await Promise.all([
+        beginTenantProvisioning(tenant.id),
+        beginTenantProvisioning(tenant.id),
       ]);
 
-      const outcomes = [first, second];
-      const succeeded = outcomes.filter((result) => result.ok);
-      const refused = outcomes.filter((result) => !result.ok);
-
-      expect(succeeded).toHaveLength(1);
-      expect(refused).toHaveLength(1);
-      expect(refused[0]).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-      });
-
-      const [row] = await db()
-        .select()
-        .from(tenants)
-        .where(eq(tenants.id, tenantId));
-      expect(row?.provisioningStatus).toBe(
-        TENANT_PROVISIONING_STATUS.PROVISIONING,
-      );
+      const rows = await db().select().from(schema.tenants);
+      expect(outcomes).toContainEqual(admitted(tenant, null));
+      expect(outcomes).toContainEqual(MOCK_ALREADY_PROVISIONING);
+      expect(rows).toEqual([admitted(tenant, null).data.tenant]);
     });
   });
 
-  it('moves a PENDING tenant to PROVISIONING and reports the prior status', async () => {
-    const tenantId = await insertTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-    });
+  it.each([
+    TENANT_PROVISIONING_STATUS.PENDING,
+    TENANT_PROVISIONING_STATUS.FAILED,
+  ])(
+    'moves a %s tenant to PROVISIONING and reports the prior status',
+    async (provisioningStatus) => {
+      const tenant = await insertTestTenant(db(), { provisioningStatus });
 
-    const result = await beginTenantProvisioning(tenantId);
+      const result = await beginTenantProvisioning(tenant.id);
 
-    if (!result.ok) throw new Error(EXPECTED_OK);
-    expect(result.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-    expect(result.data.previousProvisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PENDING,
-    );
-  });
+      expect(result).toEqual(admitted(tenant, provisioningStatus));
+    },
+  );
 
-  it('moves a FAILED tenant to PROVISIONING (a retry), reporting FAILED as the prior status', async () => {
-    const tenantId = await insertTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-    });
-
-    const result = await beginTenantProvisioning(tenantId);
-
-    if (!result.ok) throw new Error(EXPECTED_OK);
-    expect(result.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-    expect(result.data.previousProvisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.FAILED,
-    );
-  });
-
-  it('refuses with DB_ALREADY_PROVISIONING and leaves the row untouched when already PROVISIONING', async () => {
-    const tenantId = await insertTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    });
-
-    const result = await beginTenantProvisioning(tenantId);
-
-    expect(result).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-    });
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(row?.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-  });
-
-  it('refuses a genuinely live run carrying a stale FAILED step whose updatedAt predates run.startedAt', async () => {
-    const staleUpdatedAt = minutesAgo(
-      TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 6,
-    );
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      SEED_CONTENT: {
-        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-        error: 'boom from an earlier attempt',
-        updatedAt: staleUpdatedAt,
+  it.each([
+    ['a run with no steps recorded yet', { provisioningStatus: PROVISIONING }],
+    [
+      'a live run carrying a FAILED step from before it started',
+      {
+        provisioningStatus: PROVISIONING,
+        provisioningSteps: {
+          ...MOCK_IN_FLIGHT_STEPS,
+          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+            ...MOCK_FAILED_STEP,
+            updatedAt: minutesBeforeNow(
+              TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 6,
+            ),
+          },
+          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: { status: RUNNING },
+          run: { startedAt: MOCK_WEDGED_STARTED_AT },
+        },
       },
-      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
-      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      run: { startedAt: WEDGED_STARTED_AT },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
-    });
+    ],
+    [
+      'a run started just now, with no FAILED step and no finishedAt',
+      {
+        provisioningStatus: PROVISIONING,
+        provisioningSteps: {
+          ...MOCK_IN_FLIGHT_STEPS,
+          run: { startedAt: MOCK_NOW_ISO },
+        },
+      },
+    ],
+  ])('refuses %s, leaving the row untouched', async (_, overrides) => {
+    const tenant = await insertTestTenant(db(), overrides);
 
     const result = await beginTenantProvisioning(tenant.id);
 
-    expect(result).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-    });
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenant.id));
-    expect(row?.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
+    const rows = await db().select().from(schema.tenants);
+    expect(result).toEqual(MOCK_ALREADY_PROVISIONING);
+    expect(rows).toEqual([tenant]);
   });
 
-  it('admits a PROVISIONING tenant whose run recorded finishedAt, past the debounce', async () => {
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+  it('admits a PROVISIONING tenant whose run recorded finishedAt', async () => {
+    const tenant = await insertProvisioningTenant({
+      ...MOCK_IDLE_PROVISIONING_STEPS,
+      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: { status: DONE },
+      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: { status: DONE },
+      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: { status: DONE },
+      [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: { status: DONE },
+      [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: { status: DONE },
+      [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: { status: DONE },
       run: {
-        startedAt: WEDGED_STARTED_AT,
-        finishedAt: minutesAgo(TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES),
+        startedAt: MOCK_WEDGED_STARTED_AT,
+        finishedAt: minutesBeforeNow(
+          TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES,
+        ),
       },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
     });
 
     const result = await beginTenantProvisioning(tenant.id);
 
-    if (!result.ok) throw new Error(EXPECTED_OK);
-    expect(result.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
+    expect(result).toEqual(admitted(tenant, PROVISIONING));
   });
 
-  it('admits a PROVISIONING tenant whose run.startedAt is older than the staleness backstop, with no FAILED step and no finishedAt', async () => {
-    const staleStartedAt = minutesAgo(
-      TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES + 1,
-    );
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
-      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      run: { startedAt: staleStartedAt },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
+  it('admits a PROVISIONING run started before the staleness backstop', async () => {
+    const tenant = await insertProvisioningTenant({
+      ...MOCK_IN_FLIGHT_STEPS,
+      run: {
+        startedAt: minutesBeforeNow(
+          TENANT_PROVISIONING_RUN_STALE_AFTER_MINUTES + 1,
+        ),
+      },
     });
 
     const result = await beginTenantProvisioning(tenant.id);
 
-    if (!result.ok) throw new Error(EXPECTED_OK);
-    expect(result.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-  });
-
-  it('refuses a genuinely live PROVISIONING run (recent startedAt, no FAILED step, no finishedAt)', async () => {
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
-      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      run: { startedAt: new Date().toISOString() },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
-    });
-
-    const result = await beginTenantProvisioning(tenant.id);
-
-    expect(result).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-    });
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenant.id));
-    expect(row?.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
+    expect(result).toEqual(admitted(tenant, PROVISIONING));
   });
 
   describe('a PROVISIONING tenant wedged with a FAILED step', () => {
-    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
+    let tenant: TTenant;
 
     beforeEach(async () => {
-      const provisioningSteps: TTenantProvisioningState = {
-        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        SEED_CONTENT: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'boom',
-          updatedAt: WEDGED_STARTED_AT,
-        },
-        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        run: { startedAt: WEDGED_STARTED_AT },
-      };
-      tenant = await insertTestTenant(db(), {
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps,
+      tenant = await insertProvisioningTenant({
+        ...MOCK_IDLE_PROVISIONING_STEPS,
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: { status: DONE },
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: MOCK_FAILED_STEP,
+        run: { startedAt: MOCK_WEDGED_STARTED_AT },
       });
     });
 
-    it('admits a PROVISIONING tenant wedged with a FAILED step whose updatedAt matches run.startedAt, preserving the step error text', async () => {
+    it('admits it, preserving the FAILED step and the run start', async () => {
       const result = await beginTenantProvisioning(tenant.id);
 
-      if (!result.ok) throw new Error(EXPECTED_OK);
-      expect(result.data.tenant.provisioningStatus).toBe(
-        TENANT_PROVISIONING_STATUS.PROVISIONING,
-      );
-      expect(result.data.previousProvisioningStatus).toBe(
-        TENANT_PROVISIONING_STATUS.PROVISIONING,
-      );
-      expect(result.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
-        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-        error: 'boom',
-        updatedAt: WEDGED_STARTED_AT,
-      });
-      expect(result.data.tenant.provisioningSteps?.run?.startedAt).toBe(
-        WEDGED_STARTED_AT,
-      );
+      expect(result).toEqual(admitted(tenant, PROVISIONING));
     });
 
-    it('refuses immediately after a reverted dispatch failure, then admits again once the debounce has elapsed, preserving the FAILED step', async () => {
-      const firstAttempt = await beginTenantProvisioning(tenant.id);
-      if (!firstAttempt.ok) throw new Error(EXPECTED_OK);
-
-      const reverted = await setTenantProvisioningStatus(
-        tenant.id,
-        firstAttempt.data.previousProvisioningStatus,
-      );
-      if (!reverted.ok) throw new Error('expected revert ok:true');
+    it('refuses again right after a reverted dispatch, until the debounce elapses', async () => {
+      await beginTenantProvisioning(tenant.id);
+      await setTenantProvisioningStatus(tenant.id, PROVISIONING);
 
       const immediateRetry = await beginTenantProvisioning(tenant.id);
-      expect(immediateRetry).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-      });
-
-      const debouncedAdmittedAt = minutesAgo(
-        TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1,
-      );
-      await db()
-        .update(tenants)
-        .set({
-          provisioningSteps: sql`jsonb_set(
-            ${tenants.provisioningSteps},
-            array['run','admittedAt']::text[],
-            ${JSON.stringify(debouncedAdmittedAt)}::jsonb
-          )`,
-        })
-        .where(eq(tenants.id, tenant.id));
-
+      vi.setSystemTime(MOCK_RETRY_AT);
       const delayedRetry = await beginTenantProvisioning(tenant.id);
 
-      if (!delayedRetry.ok) throw new Error(EXPECTED_OK);
-      expect(delayedRetry.data.tenant.provisioningStatus).toBe(
-        TENANT_PROVISIONING_STATUS.PROVISIONING,
-      );
-      expect(delayedRetry.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
-        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-        error: 'boom',
-        updatedAt: WEDGED_STARTED_AT,
-      });
-      expect(delayedRetry.data.tenant.provisioningSteps?.run?.startedAt).toBe(
-        WEDGED_STARTED_AT,
+      expect(immediateRetry).toEqual(MOCK_ALREADY_PROVISIONING);
+      expect(delayedRetry).toEqual(
+        admitted(tenant, PROVISIONING, MOCK_RETRY_AT),
       );
     });
 
-    it('resolves exactly one of two near-simultaneous calls on a wedged tenant', async () => {
-      const [first, second] = await Promise.all([
+    it('resolves exactly one of two near-simultaneous calls', async () => {
+      const outcomes = await Promise.all([
         beginTenantProvisioning(tenant.id),
         beginTenantProvisioning(tenant.id),
       ]);
 
-      const outcomes = [first, second];
-      const succeeded = outcomes.filter((result) => result.ok);
-      const refused = outcomes.filter((result) => !result.ok);
-
-      expect(succeeded).toHaveLength(1);
-      expect(refused).toHaveLength(1);
-      expect(refused[0]).toEqual({
-        ok: false,
-        error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-      });
-
-      const [row] = await db()
-        .select()
-        .from(tenants)
-        .where(eq(tenants.id, tenant.id));
-      expect(row?.provisioningStatus).toBe(
-        TENANT_PROVISIONING_STATUS.PROVISIONING,
-      );
+      const rows = await db().select().from(schema.tenants);
+      expect(outcomes).toContainEqual(admitted(tenant, PROVISIONING));
+      expect(outcomes).toContainEqual(MOCK_ALREADY_PROVISIONING);
+      expect(rows).toEqual([admitted(tenant, PROVISIONING).data.tenant]);
     });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
-    const result = await beginTenantProvisioning(
-      '00000000-0000-0000-0000-000000000000',
-    );
+    const result = await beginTenantProvisioning(MOCK_MISSING_TENANT_ID);
 
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    expect(result).toEqual(errorResult(ERROR_CODE.DB_NOT_FOUND));
   });
 });

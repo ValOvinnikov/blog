@@ -20,12 +20,6 @@ const LAUNCH_NL_POST_ID = 'launch-nl';
 
 export const MOCK_HERO_IMAGE_FIELD = 'heroImage';
 export const MOCK_WORD_COUNT_FIELD = 'wordCount';
-export const MOCK_FEED_UNPROJECTED_FIELDS = [
-  'author->',
-  MOCK_HERO_IMAGE_FIELD,
-  'topic->',
-  MOCK_WORD_COUNT_FIELD,
-];
 
 export const MOCK_PUBLISHED_FEED_SLUGS: Record<string, string[]> = {
   [EN]: [MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID, MOCK_NOTES_EN_POST_ID],

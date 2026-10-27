@@ -1,60 +1,60 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { HueSlider } from './hue-slider';
 
-const ACCENT_HUE = 'Accent hue';
+faker.seed(5995);
 
-describe(HueSlider, () => {
-  it('exposes the given aria-label on the slider thumb', () => {
-    render(<HueSlider ariaLabel={ACCENT_HUE} value={100} onChange={vi.fn()} />);
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_DESCRIPTION_ID = faker.string.alpha(8);
+const MOCK_HUE = 100;
 
-    expect(screen.getByRole('slider', { name: ACCENT_HUE })).toHaveAttribute(
-      'aria-valuenow',
-      '100',
-    );
+const setup = customRender(HueSlider, {
+  ariaLabel: MOCK_LABEL,
+  value: MOCK_HUE,
+  onChange: vi.fn(),
+});
+
+describe(`<${HueSlider.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
   });
 
-  it('reports an incremented value when the focused thumb receives ArrowRight', async () => {
-    const user = userEvent.setup();
-    const handleChange = vi.fn();
-    render(
-      <HueSlider ariaLabel={ACCENT_HUE} value={100} onChange={handleChange} />,
-    );
+  it('names the slider and reports its value', () => {
+    setup();
 
-    await user.click(screen.getByRole('slider', { name: ACCENT_HUE }));
+    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
+
+    expect(slider).toHaveAttribute('aria-valuenow', String(MOCK_HUE));
+  });
+
+  it('reports an incremented value on ArrowRight', async () => {
+    const handleChange = vi.fn();
+    setup({ onChange: handleChange });
+
+    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
+    await user.click(slider);
     await user.keyboard('{ArrowRight}');
 
-    expect(handleChange).toHaveBeenCalledWith(101);
+    expect(handleChange).toHaveBeenCalledWith(MOCK_HUE + 1);
   });
 
-  it('marks the slider disabled when isDisabled is passed', () => {
-    render(
-      <HueSlider
-        ariaLabel="Logo hue"
-        value={50}
-        onChange={vi.fn()}
-        isDisabled={true}
-      />,
-    );
+  it('is disabled when the slider cannot be changed', () => {
+    setup({ isDisabled: true });
 
-    expect(screen.getByRole('slider', { name: 'Logo hue' })).toBeDisabled();
+    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
+
+    expect(slider).toBeDisabled();
   });
 
-  it('forwards aria-describedby to the slider', () => {
-    render(
-      <HueSlider
-        ariaLabel="Logo hue"
-        value={50}
-        onChange={vi.fn()}
-        isDisabled={true}
-        aria-describedby="archived-notice"
-      />,
-    );
+  it('is described by the element it is pointed at', () => {
+    setup({ 'aria-describedby': MOCK_DESCRIPTION_ID });
 
-    expect(screen.getByRole('slider', { name: 'Logo hue' })).toHaveAttribute(
-      'aria-describedby',
-      'archived-notice',
-    );
+    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
+
+    expect(slider).toHaveAttribute('aria-describedby', MOCK_DESCRIPTION_ID);
   });
 });

@@ -15,14 +15,17 @@ import {
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockRawSeo } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getHomePageDocument } from './loader';
 import { homePageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
+faker.seed(6015101);
+
 const tenant = mockTenant();
-const HOME_SUPPORTING_TEXT = 'A subtitle';
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 
 async function loadHomePage(overrides?: Parameters<typeof mockRawHomePage>[0]) {
   mockRun.mockResolvedValueOnce(mockRawHomePage(overrides));
@@ -61,7 +64,7 @@ describe(getHomePageDocument, () => {
   it('leaves the seo description unset, with no fallback, when it is not authored', async () => {
     const { headingBlock } = mockRawHomePage();
     const { seo } = await loadHomePage({
-      headingBlock: { ...headingBlock, supportingText: HOME_SUPPORTING_TEXT },
+      headingBlock: { ...headingBlock, supportingText: MOCK_SUPPORTING_TEXT },
       seo: mockRawSeo({ metaDescription: null }),
     });
 
@@ -76,7 +79,7 @@ describe(getHomePageDocument, () => {
     expect(translations).toEqual([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL]);
   });
 
-  it('resolves undefined, rather than rejecting, when no page_home exists', async () => {
+  it('resolves undefined when no page_home exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const page = await getHomePageDocument(tenant);

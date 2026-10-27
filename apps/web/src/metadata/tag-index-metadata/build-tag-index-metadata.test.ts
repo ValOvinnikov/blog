@@ -1,13 +1,15 @@
 import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
+import { NL_TAGS_INDEX_PATH } from '@web/testing/metadata/index-paths/fixtures';
 import {
-  MOCK_OG_IMAGE,
-  MOCK_OG_IMAGE_URL,
-} from '@web/testing/shared/seo/og-image-fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+  MOCK_DUTCH_REQUEST_CONTEXT,
+  mockMetadataSeo,
+} from '@web/testing/metadata/to-metadata/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildTagIndexMetadata } from './build-tag-index-metadata';
@@ -22,27 +24,19 @@ vi.mock('@web/server/tag-index/get-tag-index-page/get-tag-index-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const TITLE = 'Tags';
+faker.seed(5206);
+
+const { EN, NL, DE } = LOCALE_ISO_CODES;
 const INDEX_PATH = routes.tags();
-const NL_INDEX_PATH = `/nl${INDEX_PATH}`;
-const DESCRIPTION = 'Browse every post by tag.';
-const OG_DESCRIPTION = 'Browse every post by tag OG.';
 
-const seo = mockSeo({
-  title: TITLE,
-  description: DESCRIPTION,
-  ogTitle: 'Tags OG',
-  ogDescription: OG_DESCRIPTION,
-  ogImage: MOCK_OG_IMAGE,
-});
+const MOCK_SEO = mockMetadataSeo();
+const { title, description, ogTitle, ogDescription } = MOCK_SEO;
 
-const resolveIndexPageWith = (
-  translations: TLocaleIsoCode[] = [LOCALE_ISO_CODES.EN],
-) =>
+const resolveIndexPageWith = (translations: TLocaleIsoCode[] = [EN]) =>
   getTagIndexPageMock.mockResolvedValue(
     okResult({
-      headingBlock: { heading: TITLE },
-      seo,
+      headingBlock: mockHeadingBlock({ heading: title }),
+      seo: MOCK_SEO,
       modules: [],
       translations,
     }),
@@ -55,20 +49,20 @@ describe(buildTagIndexMetadata, () => {
     resolveIndexPageWith();
   });
 
-  it('reads the same index page the tag index renders', async () => {
+  it('reads the index page the tag index renders', async () => {
     await buildTagIndexMetadata();
 
     expect(getTagIndexPageMock).toHaveBeenCalledWith();
   });
 
-  it('builds metadata from the resolved seo, self-canonical to /tags', async () => {
+  it('builds metadata from the resolved seo, self-canonical to the tag index', async () => {
     const metadata = await buildTagIndexMetadata();
 
-    expect(metadata.title).toBe(TITLE);
-    expect(metadata.description).toBe(DESCRIPTION);
+    expect(metadata.title).toBe(title);
+    expect(metadata.description).toBe(description);
     expect(metadata.alternates?.canonical).toBe(INDEX_PATH);
-    expect(metadata.openGraph?.title).toBe('Tags OG');
-    expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
+    expect(metadata.openGraph?.title).toBe(ogTitle);
+    expect(metadata.openGraph?.description).toBe(ogDescription);
     expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
   });
 
@@ -96,22 +90,16 @@ describe(buildTagIndexMetadata, () => {
   });
 
   it('lists each live translated language as hreflang, canonical to its prefix', async () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-    const translations = [EN, NL, DE];
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
-    resolveIndexPageWith(translations);
+    vi.mocked(getRequestContext).mockResolvedValue(MOCK_DUTCH_REQUEST_CONTEXT);
+    resolveIndexPageWith([EN, NL, DE]);
 
     const metadata = await buildTagIndexMetadata();
 
     expect(metadata.alternates).toEqual({
-      canonical: NL_INDEX_PATH,
+      canonical: NL_TAGS_INDEX_PATH,
       languages: {
         en: INDEX_PATH,
-        nl: NL_INDEX_PATH,
+        nl: NL_TAGS_INDEX_PATH,
         'x-default': INDEX_PATH,
       },
     });

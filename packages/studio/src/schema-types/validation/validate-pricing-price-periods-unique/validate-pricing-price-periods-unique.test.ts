@@ -6,22 +6,19 @@ const PERIOD_DUPLICATE_MESSAGE =
 
 describe(validatePricingPricePeriodsUnique, () => {
   it.each([
-    ['no prices are given', undefined],
-    ['prices is empty', []],
+    ['passes when no prices are given', undefined, true],
+    ['passes when there are no prices', [], true],
     [
-      'every price uses a different period',
+      'passes when every price uses a different period',
       [{ period: PRICE_PERIOD.MONTH }, { period: PRICE_PERIOD.YEAR }],
+      true,
     ],
-  ])('passes when %s', (_description, prices) => {
-    expect(validatePricingPricePeriodsUnique(prices)).toBe(true);
-  });
-
-  it('fails with the duplicate-period message when two prices share a period', () => {
-    expect(
-      validatePricingPricePeriodsUnique([
-        { period: PRICE_PERIOD.MONTH },
-        { period: PRICE_PERIOD.MONTH },
-      ]),
-    ).toBe(PERIOD_DUPLICATE_MESSAGE);
+    [
+      'fails when two prices share a period',
+      [{ period: PRICE_PERIOD.MONTH }, { period: PRICE_PERIOD.MONTH }],
+      PERIOD_DUPLICATE_MESSAGE,
+    ],
+  ])('%s', (_description, prices, expected) => {
+    expect(validatePricingPricePeriodsUnique(prices)).toBe(expected);
   });
 });

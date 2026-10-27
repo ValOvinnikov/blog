@@ -1,64 +1,62 @@
+import { faker } from '@faker-js/faker';
+
 import {
   isTenantShapedPathSegment,
   isValidTenantId,
 } from './is-tenant-shaped-path-segment';
 
-describe('isTenantShapedPathSegment', () => {
-  it('recognizes a lowercase UUID', () => {
-    expect(
-      isTenantShapedPathSegment('a1b2c3d4-e5f6-4789-a012-3456789abcde'),
-    ).toBe(true);
-  });
+faker.seed(120);
 
-  it('recognizes an uppercase UUID', () => {
-    expect(
-      isTenantShapedPathSegment('A1B2C3D4-E5F6-4789-A012-3456789ABCDE'),
-    ).toBe(true);
-  });
+const MOCK_UUID = faker.string.uuid();
+const MOCK_UPPERCASE_UUID = MOCK_UUID.toUpperCase();
+const MOCK_SHORT_GROUP_UUID = `${MOCK_UUID.slice(0, 14)}${MOCK_UUID.slice(15)}`;
+const MOCK_UUID_WITH_SUFFIX = `${MOCK_UUID}-${faker.lorem.word()}`;
+const MOCK_SLUG = faker.lorem.slug();
+const DOT_SEGMENT = '.well-known';
 
-  it('rejects an ordinary content slug', () => {
-    expect(isTenantShapedPathSegment('blog')).toBe(false);
-    expect(isTenantShapedPathSegment('my-first-post')).toBe(false);
-  });
+const LOWERCASE_UUID = { case: 'a lowercase UUID', segment: MOCK_UUID };
+const UPPERCASE_UUID = {
+  case: 'an uppercase UUID',
+  segment: MOCK_UPPERCASE_UUID,
+};
+const SUFFIXED_UUID = {
+  case: 'a UUID with trailing text appended',
+  segment: MOCK_UUID_WITH_SUFFIX,
+};
+const CONTENT_SLUG = { case: 'an ordinary content slug', segment: MOCK_SLUG };
+const EMPTY_STRING = { case: 'an empty string', segment: '' };
 
-  it('rejects a UUID-shaped value with the wrong segment lengths', () => {
-    expect(
-      isTenantShapedPathSegment('a1b2c3d4-e5f6-789-a012-3456789abcde'),
-    ).toBe(false);
-  });
+describe(isTenantShapedPathSegment, () => {
+  it.each([LOWERCASE_UUID, UPPERCASE_UUID, SUFFIXED_UUID])(
+    'recognizes $case',
+    ({ segment }) => {
+      expect(isTenantShapedPathSegment(segment)).toBe(true);
+    },
+  );
 
-  it('rejects an empty string', () => {
-    expect(isTenantShapedPathSegment('')).toBe(false);
-  });
-
-  it('recognizes a UUID with trailing garbage appended as tenant-shaped', () => {
-    expect(
-      isTenantShapedPathSegment('a1b2c3d4-e5f6-4789-a012-3456789abcde-extra'),
-    ).toBe(true);
+  it.each([
+    CONTENT_SLUG,
+    {
+      case: 'a UUID-like value with a short group',
+      segment: MOCK_SHORT_GROUP_UUID,
+    },
+    EMPTY_STRING,
+  ])('does not recognize $case', ({ segment }) => {
+    expect(isTenantShapedPathSegment(segment)).toBe(false);
   });
 });
 
-describe('isValidTenantId', () => {
-  it('accepts a lowercase UUID', () => {
-    expect(isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde')).toBe(true);
+describe(isValidTenantId, () => {
+  it.each([LOWERCASE_UUID, UPPERCASE_UUID])('accepts $case', ({ segment }) => {
+    expect(isValidTenantId(segment)).toBe(true);
   });
 
-  it('accepts an uppercase UUID', () => {
-    expect(isValidTenantId('A1B2C3D4-E5F6-4789-A012-3456789ABCDE')).toBe(true);
-  });
-
-  it('rejects an ordinary content slug', () => {
-    expect(isValidTenantId('.well-known')).toBe(false);
-    expect(isValidTenantId('blog')).toBe(false);
-  });
-
-  it('rejects a valid UUID with trailing garbage appended', () => {
-    expect(isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde-extra')).toBe(
-      false,
-    );
-  });
-
-  it('rejects an empty string', () => {
-    expect(isValidTenantId('')).toBe(false);
+  it.each([
+    CONTENT_SLUG,
+    { case: 'a dot segment', segment: DOT_SEGMENT },
+    SUFFIXED_UUID,
+    EMPTY_STRING,
+  ])('rejects $case', ({ segment }) => {
+    expect(isValidTenantId(segment)).toBe(false);
   });
 });

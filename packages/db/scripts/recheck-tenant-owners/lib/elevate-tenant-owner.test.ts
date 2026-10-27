@@ -1,10 +1,15 @@
 import { SANITY_PROJECT_ROLE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  MOCK_RECHECK_ENV,
+  MOCK_SANITY_MANAGEMENT_TOKEN,
+} from '@blog/db/testing/recheck-tenant-owners/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { elevateTenantOwner } from './elevate-tenant-owner';
-import type { TRecheckEnv } from './env';
+
+faker.seed(5804);
 
 const { listSanityProjectAclMock, grantSanityProjectRoleMock } = vi.hoisted(
   () => ({
@@ -21,46 +26,39 @@ vi.mock(
   }),
 );
 
-const env: TRecheckEnv = { sanityManagementToken: 'mgmt-token' };
+const MOCK_NOW = faker.date.recent();
+const MOCK_STALE_INVITE_AGE_MS = 1000 * 60 * 60 * 24 * 10;
 
-function tenantAt(createdAt: Date, overrides: Partial<TTenant> = {}): TTenant {
+function mockAclEntry(
+  roleNames: string[],
+  { isRobot = false }: { isRobot?: boolean } = {},
+) {
   return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj-abc',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    createdAt,
-    updatedAt: createdAt,
-    ...overrides,
-  } as TTenant;
+    projectUserId: faker.string.alphanumeric(10),
+    roles: roleNames.map((name) => ({ name })),
+    isRobot,
+  };
 }
 
 beforeEach(() => {
-  listSanityProjectAclMock.mockReset();
-  grantSanityProjectRoleMock.mockReset().mockResolvedValue(undefined);
+  vi.useFakeTimers();
+  vi.setSystemTime(MOCK_NOW);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe(elevateTenantOwner, () => {
-  it('reports PENDING_ACCEPTANCE and never grants when the owner has not yet accepted (fresh invite)', async () => {
+  it('reports PENDING_ACCEPTANCE and never grants for a fresh invite', async () => {
     listSanityProjectAclMock.mockResolvedValue([
-      {
-        projectUserId: 'p-robot',
-        roles: [{ name: SANITY_PROJECT_ROLE.EDITOR }],
-        isRobot: true,
-      },
+      mockAclEntry([SANITY_PROJECT_ROLE.EDITOR], { isRobot: true }),
     ]);
 
-    const result = await elevateTenantOwner(tenantAt(new Date()), env);
+    const result = await elevateTenantOwner(
+      mockTenant({ createdAt: MOCK_NOW }),
+      MOCK_RECHECK_ENV,
+    );
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
     expect(grantSanityProjectRoleMock).not.toHaveBeenCalled();
@@ -68,82 +66,75 @@ describe(elevateTenantOwner, () => {
 
   it('reports STALLED once the invite is older than the acceptance window', async () => {
     listSanityProjectAclMock.mockResolvedValue([]);
-    const staleCreatedAt = new Date(Date.now() - 1000 * 60 * 60 * 24 * 10);
+    const staleCreatedAt = new Date(
+      MOCK_NOW.getTime() - MOCK_STALE_INVITE_AGE_MS,
+    );
 
-    const result = await elevateTenantOwner(tenantAt(staleCreatedAt), env);
+    const result = await elevateTenantOwner(
+      mockTenant({ createdAt: staleCreatedAt }),
+      MOCK_RECHECK_ENV,
+    );
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
     expect(grantSanityProjectRoleMock).not.toHaveBeenCalled();
   });
 
-  it('grants administrator, keyed on projectUserId, once the owner appears in the ACL listing', async () => {
+  it('grants administrator to the owner once they appear in the ACL', async () => {
+    const tenant = mockTenant({ createdAt: MOCK_NOW });
+    const owner = mockAclEntry([SANITY_PROJECT_ROLE.VIEWER]);
     listSanityProjectAclMock.mockResolvedValue([
-      {
-        projectUserId: 'p-robot',
-        roles: [{ name: SANITY_PROJECT_ROLE.EDITOR }],
-        isRobot: true,
-      },
-      {
-        projectUserId: 'p-owner',
-        roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
-        isRobot: false,
-      },
+      mockAclEntry([SANITY_PROJECT_ROLE.EDITOR], { isRobot: true }),
+      owner,
     ]);
 
-    const result = await elevateTenantOwner(tenantAt(new Date()), env);
+    const result = await elevateTenantOwner(tenant, MOCK_RECHECK_ENV);
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
     expect(grantSanityProjectRoleMock).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj-abc',
-      projectUserId: 'p-owner',
+      token: MOCK_SANITY_MANAGEMENT_TOKEN,
+      projectId: tenant.sanityProjectId,
+      projectUserId: owner.projectUserId,
       role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
     });
   });
 
-  it('is idempotent — an owner who already holds administrator is a safe no-op', async () => {
+  it('is a safe no-op for an owner who already holds administrator', async () => {
     listSanityProjectAclMock.mockResolvedValue([
-      {
-        projectUserId: 'p-owner',
-        roles: [
-          { name: SANITY_PROJECT_ROLE.VIEWER },
-          { name: SANITY_PROJECT_ROLE.ADMINISTRATOR },
-        ],
-        isRobot: false,
-      },
+      mockAclEntry([
+        SANITY_PROJECT_ROLE.VIEWER,
+        SANITY_PROJECT_ROLE.ADMINISTRATOR,
+      ]),
     ]);
 
-    const result = await elevateTenantOwner(tenantAt(new Date()), env);
+    const result = await elevateTenantOwner(
+      mockTenant({ createdAt: MOCK_NOW }),
+      MOCK_RECHECK_ENV,
+    );
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR);
     expect(grantSanityProjectRoleMock).not.toHaveBeenCalled();
   });
 
-  it('does not call the ACL API when the tenant has no Sanity project yet', async () => {
+  it('skips the ACL lookup when the tenant has no Sanity project yet', async () => {
     const result = await elevateTenantOwner(
-      tenantAt(new Date(), { sanityProjectId: null }),
-      env,
+      mockTenant({ createdAt: MOCK_NOW, sanityProjectId: null }),
+      MOCK_RECHECK_ENV,
     );
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
     expect(listSanityProjectAclMock).not.toHaveBeenCalled();
   });
 
-  it('reports AMBIGUOUS_MEMBERSHIP and never grants when more than one human member is present (e.g. a superadmin who joined via Manage)', async () => {
+  it('reports AMBIGUOUS_MEMBERSHIP and never grants with several human members', async () => {
     listSanityProjectAclMock.mockResolvedValue([
-      {
-        projectUserId: 'p-superadmin',
-        roles: [{ name: SANITY_PROJECT_ROLE.ADMINISTRATOR }],
-        isRobot: false,
-      },
-      {
-        projectUserId: 'p-owner',
-        roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
-        isRobot: false,
-      },
+      mockAclEntry([SANITY_PROJECT_ROLE.ADMINISTRATOR]),
+      mockAclEntry([SANITY_PROJECT_ROLE.VIEWER]),
     ]);
 
-    const result = await elevateTenantOwner(tenantAt(new Date()), env);
+    const result = await elevateTenantOwner(
+      mockTenant({ createdAt: MOCK_NOW }),
+      MOCK_RECHECK_ENV,
+    );
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP);
     expect(grantSanityProjectRoleMock).not.toHaveBeenCalled();

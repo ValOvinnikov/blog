@@ -7,12 +7,13 @@ import { Dialog } from './dialog';
 
 faker.seed(123);
 
-const heading = faker.lorem.words(3);
-const closeLabel = faker.lorem.word();
-const body = faker.lorem.paragraph();
-const openLabel = 'Open dialog';
-const fallbackLabel = 'Fallback';
-const actionLabel = 'Done';
+const DIALOG_BACKDROP_TEST_ID = 'dialog-backdrop';
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_CLOSE_LABEL = faker.lorem.word();
+const MOCK_BODY = faker.lorem.paragraph();
+const MOCK_OPEN_LABEL = faker.lorem.words(2);
+const MOCK_FALLBACK_LABEL = faker.lorem.words(2);
+const MOCK_ACTION_LABEL = faker.lorem.word();
 
 const Harness = ({ hidesOpenerOnClose = false, hasCloseControl = true }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,23 +29,23 @@ const Harness = ({ hidesOpenerOnClose = false, hasCloseControl = true }) => {
     <>
       {isOpenerShown && (
         <button type="button" onClick={() => setIsOpen(true)}>
-          {openLabel}
+          {MOCK_OPEN_LABEL}
         </button>
       )}
       <button type="button" ref={fallbackFocusRef}>
-        {fallbackLabel}
+        {MOCK_FALLBACK_LABEL}
       </button>
       <Dialog
         isOpen={isOpen}
         onOpenChange={(nextIsOpen) => (nextIsOpen ? setIsOpen(true) : close())}
-        heading={heading}
+        heading={MOCK_HEADING}
         headingLevel={2}
-        closeLabel={hasCloseControl ? closeLabel : undefined}
+        closeLabel={hasCloseControl ? MOCK_CLOSE_LABEL : undefined}
         fallbackFocusRef={fallbackFocusRef}
       >
-        <p>{body}</p>
+        <p>{MOCK_BODY}</p>
         <button type="button" onClick={close}>
-          {actionLabel}
+          {MOCK_ACTION_LABEL}
         </button>
       </Dialog>
     </>
@@ -55,10 +56,13 @@ describe(`<${Dialog.name}/>`, () => {
   let user: UserEvent;
 
   const openDialog = async () => {
-    await user.click(screen.getByRole('button', { name: openLabel }));
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: closeLabel })).toHaveFocus(),
-    );
+    const openButton = screen.getByRole('button', { name: MOCK_OPEN_LABEL });
+    await user.click(openButton);
+
+    const closeButton = await screen.findByRole('button', {
+      name: MOCK_CLOSE_LABEL,
+    });
+    await waitFor(() => expect(closeButton).toHaveFocus());
   };
 
   beforeEach(() => {
@@ -68,7 +72,9 @@ describe(`<${Dialog.name}/>`, () => {
   it('renders nothing while closed', () => {
     renderElement(<Harness />);
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    const dialog = screen.queryByRole('dialog');
+
+    expect(dialog).not.toBeInTheDocument();
   });
 
   describe('when opened', () => {
@@ -78,32 +84,46 @@ describe(`<${Dialog.name}/>`, () => {
     });
 
     it('is a modal dialog named by its heading', () => {
-      const dialog = screen.getByRole('dialog', { name: heading });
+      const dialog = screen.getByRole('dialog', { name: MOCK_HEADING });
+      const headingElement = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_HEADING,
+      });
+      const body = screen.getByText(MOCK_BODY);
 
       expect(dialog).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 2, name: heading }),
-      ).toBeVisible();
-      expect(screen.getByText(body)).toBeVisible();
+      expect(headingElement).toBeVisible();
+      expect(body).toBeVisible();
     });
 
     it('closes on Escape and returns focus to the opener', async () => {
       await user.keyboard('{Escape}');
 
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: openLabel })).toHaveFocus();
+      const dialog = screen.queryByRole('dialog');
+      const openButton = screen.getByRole('button', { name: MOCK_OPEN_LABEL });
+
+      expect(dialog).not.toBeInTheDocument();
+      expect(openButton).toHaveFocus();
     });
 
     it('closes from the close control', async () => {
-      await user.click(screen.getByRole('button', { name: closeLabel }));
+      const closeButton = screen.getByRole('button', {
+        name: MOCK_CLOSE_LABEL,
+      });
+      await user.click(closeButton);
 
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      const dialog = screen.queryByRole('dialog');
+
+      expect(dialog).not.toBeInTheDocument();
     });
 
     it('closes on a backdrop click', async () => {
-      await user.click(screen.getByTestId('dialog-backdrop'));
+      const backdrop = screen.getByTestId(DIALOG_BACKDROP_TEST_ID);
+      await user.click(backdrop);
 
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      const dialog = screen.queryByRole('dialog');
+
+      expect(dialog).not.toBeInTheDocument();
     });
   });
 
@@ -111,19 +131,31 @@ describe(`<${Dialog.name}/>`, () => {
     renderElement(<Harness hidesOpenerOnClose={true} />);
     await openDialog();
 
-    await user.click(screen.getByRole('button', { name: actionLabel }));
+    const actionButton = screen.getByRole('button', {
+      name: MOCK_ACTION_LABEL,
+    });
+    await user.click(actionButton);
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: fallbackLabel })).toHaveFocus();
+    const dialog = screen.queryByRole('dialog');
+    const fallbackButton = screen.getByRole('button', {
+      name: MOCK_FALLBACK_LABEL,
+    });
+
+    expect(dialog).not.toBeInTheDocument();
+    expect(fallbackButton).toHaveFocus();
   });
 
   it('offers no close control when no close label is given', async () => {
     renderElement(<Harness hasCloseControl={false} />);
-    await user.click(screen.getByRole('button', { name: openLabel }));
+    const openButton = screen.getByRole('button', { name: MOCK_OPEN_LABEL });
+    await user.click(openButton);
 
-    expect(screen.getByRole('dialog', { name: heading })).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: closeLabel }),
-    ).not.toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: MOCK_HEADING });
+    const closeButton = screen.queryByRole('button', {
+      name: MOCK_CLOSE_LABEL,
+    });
+
+    expect(dialog).toBeVisible();
+    expect(closeButton).not.toBeInTheDocument();
   });
 });

@@ -10,7 +10,7 @@ const authoredLayout = {
   dividerBottom: true,
 };
 
-describe(resolveHeroLayout.name, () => {
+describe(resolveHeroLayout, () => {
   it('gives a Banner an unpadded, undivided Primary Section', () => {
     const result = resolveHeroLayout({
       variant: HERO_VARIANT.BANNER,

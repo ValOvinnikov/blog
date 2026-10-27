@@ -15,21 +15,16 @@ describe(resolveIsSidebarCollapsed, () => {
     cookiesMock.mockReset();
   });
 
-  it('resolves false when the cookie is absent', async () => {
-    mockCookie(undefined);
+  it.each([
+    { cookie: 'absent', value: undefined, expected: false },
+    { cookie: 'anything other than "true"', value: '1', expected: false },
+    { cookie: '"true"', value: 'true', expected: true },
+  ])(
+    'resolves $expected when the cookie is $cookie',
+    async ({ value, expected }) => {
+      mockCookie(value);
 
-    expect(await resolveIsSidebarCollapsed()).toBe(false);
-  });
-
-  it('resolves false for any value other than the literal string "true"', async () => {
-    mockCookie('1');
-
-    expect(await resolveIsSidebarCollapsed()).toBe(false);
-  });
-
-  it('resolves true when the cookie is set to "true"', async () => {
-    mockCookie('true');
-
-    expect(await resolveIsSidebarCollapsed()).toBe(true);
-  });
+      expect(await resolveIsSidebarCollapsed()).toBe(expected);
+    },
+  );
 });

@@ -1,64 +1,36 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   DEPROVISIONING_STEP,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_IDLE_DEPROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+  MOCK_RUN_AT,
+  MOCK_STEP_ERROR,
+} from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { reportDeprovisioningStepStatus } from './report-deprovisioning-step-status';
 
 vi.mock('@blog/db/client');
 
-const MOCK_STEP_ERROR = 'Sanity Projects API returned 429';
-
 const db = useQueryTestDb();
 
-async function insertTenant(): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisioningSteps: {
-        REMOVE_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        ARCHIVE_SANITY_PROJECT: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-        REVOKE_SANITY_TOKENS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        CLEAR_ARTIFACTS: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        ARCHIVE_TENANT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        PURGE_READER_DATA: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-        INVALIDATE_TENANT_CACHE: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-      },
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
-
-async function loadTenant(tenantId: string) {
+async function loadSteps(tenantId: string) {
   const [tenant] = await db()
     .select()
     .from(schema.tenants)
     .where(eq(schema.tenants.id, tenantId));
 
-  return tenant;
+  return tenant?.deprovisioningSteps;
 }
 
 afterEach(async () => {
   await db().delete(schema.tenants);
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
@@ -66,23 +38,32 @@ describe(reportDeprovisioningStepStatus, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    tenantId = await insertTenant();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(MOCK_RUN_AT));
+    const tenant = await insertTestTenant(db(), {
+      deprovisioningSteps: MOCK_IDLE_DEPROVISIONING_STEPS,
+    });
+    tenantId = tenant.id;
   });
 
-  it('writes the step status directly to Postgres', async () => {
+  it('persists the step status', async () => {
     await reportDeprovisioningStepStatus({
       tenantId,
       step: DEPROVISIONING_STEP.REMOVE_DOMAIN,
       status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
     });
 
-    const tenant = await loadTenant(tenantId);
-    expect(tenant?.deprovisioningSteps).toMatchObject({
-      REMOVE_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+    const steps = await loadSteps(tenantId);
+    expect(steps).toEqual({
+      ...MOCK_IDLE_DEPROVISIONING_STEPS,
+      [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        updatedAt: MOCK_RUN_AT,
+      },
     });
   });
 
-  it('stores the error message only when supplied', async () => {
+  it('persists the error message when supplied', async () => {
     await reportDeprovisioningStepStatus({
       tenantId,
       step: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
@@ -90,16 +71,18 @@ describe(reportDeprovisioningStepStatus, () => {
       error: MOCK_STEP_ERROR,
     });
 
-    const tenant = await loadTenant(tenantId);
-    expect(tenant?.deprovisioningSteps).toMatchObject({
-      ARCHIVE_SANITY_PROJECT: {
+    const steps = await loadSteps(tenantId);
+    expect(steps).toEqual({
+      ...MOCK_IDLE_DEPROVISIONING_STEPS,
+      [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: {
         status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
         error: MOCK_STEP_ERROR,
+        updatedAt: MOCK_RUN_AT,
       },
     });
   });
 
-  it('never throws when the tenant id does not exist — logs instead', async () => {
+  it('logs instead of throwing for an unknown tenant id', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(

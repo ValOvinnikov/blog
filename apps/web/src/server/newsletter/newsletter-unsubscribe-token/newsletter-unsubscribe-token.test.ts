@@ -7,83 +7,98 @@ import {
   readNewsletterUnsubscribeSubscriberId,
 } from './newsletter-unsubscribe-token';
 
-vi.mock('@web/utils/env/env', () => ({ env: {} }));
+vi.mock('@web/utils/env/env');
 
-const SUBSCRIBER_ID = faker.string.uuid();
-const mintKey = (): string =>
+faker.seed(6010);
+
+const mockKey = (): string =>
   Buffer.from(faker.string.alphanumeric(32)).toString(KEY_ENCODING);
-const KEY = mintKey();
+
+const MOCK_SUBSCRIBER_ID = faker.string.uuid();
+const MOCK_KEY = mockKey();
 
 const setKey = (key: string | undefined): void => {
   Object.assign(env, { NEWSLETTER_UNSUBSCRIBE_KEY: key });
 };
 
-describe(mintNewsletterUnsubscribeToken, () => {
-  beforeEach(() => setKey(KEY));
+beforeEach(() => {
+  setKey(MOCK_KEY);
+});
 
+describe(mintNewsletterUnsubscribeToken, () => {
   it('mints the same token for a subscriber on every call', () => {
-    expect(mintNewsletterUnsubscribeToken(SUBSCRIBER_ID)).toBe(
-      mintNewsletterUnsubscribeToken(SUBSCRIBER_ID),
-    );
+    const first = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID);
+    const second = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID);
+
+    expect(first).toBe(second);
   });
 
   it('mints a different token for another subscriber', () => {
-    expect(mintNewsletterUnsubscribeToken(faker.string.uuid())).not.toBe(
-      mintNewsletterUnsubscribeToken(SUBSCRIBER_ID),
-    );
+    const own = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID);
+    const other = mintNewsletterUnsubscribeToken(faker.string.uuid());
+
+    expect(other).not.toBe(own);
   });
 
   it('throws without a key', () => {
     setKey(undefined);
 
-    expect(() => mintNewsletterUnsubscribeToken(SUBSCRIBER_ID)).toThrow();
+    expect(() => mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID)).toThrow();
   });
 });
 
 describe(readNewsletterUnsubscribeSubscriberId, () => {
-  beforeEach(() => setKey(KEY));
-
   it('reads back the subscriber a minted token names', () => {
-    const token = mintNewsletterUnsubscribeToken(SUBSCRIBER_ID);
+    const token = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID);
 
-    expect(readNewsletterUnsubscribeSubscriberId(token)).toBe(SUBSCRIBER_ID);
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
+
+    expect(subscriberId).toBe(MOCK_SUBSCRIBER_ID);
   });
 
   it('rejects a token whose signature was made for another subscriber', () => {
-    const signedTail = mintNewsletterUnsubscribeToken(SUBSCRIBER_ID).slice(
-      SUBSCRIBER_ID.length,
+    const signedTail = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID).slice(
+      MOCK_SUBSCRIBER_ID.length,
     );
 
-    expect(
-      readNewsletterUnsubscribeSubscriberId(
-        `${faker.string.uuid()}${signedTail}`,
-      ),
-    ).toBeNull();
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(
+      `${faker.string.uuid()}${signedTail}`,
+    );
+
+    expect(subscriberId).toBeNull();
   });
 
   it('rejects a token signed with another key', () => {
-    const token = mintNewsletterUnsubscribeToken(SUBSCRIBER_ID);
-    setKey(mintKey());
+    const token = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID);
+    setKey(mockKey());
 
-    expect(readNewsletterUnsubscribeSubscriberId(token)).toBeNull();
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
+
+    expect(subscriberId).toBeNull();
   });
 
   it('rejects a random token from an email sent before tokens were signed', () => {
-    expect(
-      readNewsletterUnsubscribeSubscriberId(faker.string.uuid()),
-    ).toBeNull();
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(
+      faker.string.uuid(),
+    );
+
+    expect(subscriberId).toBeNull();
   });
 
   it('rejects a token with an empty subscriber id', () => {
-    expect(
-      readNewsletterUnsubscribeSubscriberId(mintNewsletterUnsubscribeToken('')),
-    ).toBeNull();
+    const token = mintNewsletterUnsubscribeToken('');
+
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
+
+    expect(subscriberId).toBeNull();
   });
 
   it('rejects every token without a key', () => {
-    const token = mintNewsletterUnsubscribeToken(SUBSCRIBER_ID);
+    const token = mintNewsletterUnsubscribeToken(MOCK_SUBSCRIBER_ID);
     setKey(undefined);
 
-    expect(readNewsletterUnsubscribeSubscriberId(token)).toBeNull();
+    const subscriberId = readNewsletterUnsubscribeSubscriberId(token);
+
+    expect(subscriberId).toBeNull();
   });
 });

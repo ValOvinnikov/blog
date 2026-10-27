@@ -1,60 +1,37 @@
+import { faker } from '@faker-js/faker';
+import {
+  mockDocumentValidationDetails,
+  mockValidationResult,
+} from '@platform/testing/features/tenants/findings-card/fixtures';
+
 import { parseDocumentValidationDetails } from './parse-document-validation-details';
 
+faker.seed(5994);
+
 describe(parseDocumentValidationDetails, () => {
-  it('parses the DOCUMENT_VALIDATION/SCHEMA_VALIDATION_ERROR shape', () => {
-    const details = {
-      invalidDocumentCount: 1,
-      documents: [
-        {
-          documentId: 'provisioning.author.starter',
-          documentType: 'person',
-          markers: [{ level: 'warning', message: "Field 'slug' missing" }],
-        },
-      ],
-    };
+  it('parses the document validation shape', () => {
+    const details = mockDocumentValidationDetails();
 
-    expect(parseDocumentValidationDetails(details)).toEqual({
-      invalidDocumentCount: 1,
-      documents: details.documents,
-    });
+    expect(parseDocumentValidationDetails(details)).toEqual(details);
   });
 
-  it('returns null when invalidDocumentCount is missing', () => {
-    expect(
-      parseDocumentValidationDetails({
-        documents: [
-          {
-            documentId: 'doc-1',
-            documentType: 'person',
-            markers: [{ level: 'error', message: 'bad' }],
-          },
-        ],
-      }),
-    ).toBeNull();
-  });
-
-  it('returns null when documents is missing', () => {
-    expect(
-      parseDocumentValidationDetails({ invalidDocumentCount: 1 }),
-    ).toBeNull();
-  });
-
-  it('returns null when a marker has an unrecognized level', () => {
-    expect(
-      parseDocumentValidationDetails({
+  it.each([
+    ['the document count is missing', { documents: [mockValidationResult()] }],
+    ['the documents are missing', { invalidDocumentCount: 1 }],
+    [
+      'a marker has an unrecognised level',
+      {
         invalidDocumentCount: 1,
         documents: [
           {
-            documentId: 'doc-1',
-            documentType: 'person',
-            markers: [{ level: 'critical', message: 'bad' }],
+            ...mockValidationResult(),
+            markers: [{ level: 'critical', message: faker.lorem.sentence() }],
           },
         ],
-      }),
-    ).toBeNull();
-  });
-
-  it('returns null for an unrelated details shape', () => {
-    expect(parseDocumentValidationDetails({ step: 'MAP_DOMAIN' })).toBeNull();
+      },
+    ],
+    ['the shape is unrelated', { step: faker.word.noun() }],
+  ])('returns null when %s', (_case, details) => {
+    expect(parseDocumentValidationDetails(details)).toBeNull();
   });
 });

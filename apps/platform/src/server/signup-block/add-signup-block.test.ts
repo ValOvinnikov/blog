@@ -30,12 +30,12 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const ADMIN = mockAdmin();
-const DOMAIN_BLOCK = {
+const MOCK_ADMIN = mockAdmin();
+const MOCK_DOMAIN_BLOCK = {
   kind: BLOCKED_IDENTITY_KIND.DOMAIN,
   identity: MOCK_BLOCKED_DOMAIN,
   reason: MOCK_BLOCK_REASON,
-  admin: ADMIN,
+  admin: MOCK_ADMIN,
 };
 
 const outcomeOf = (created: boolean) =>
@@ -51,14 +51,14 @@ describe(addSignupBlock, () => {
     const created = outcomeOf(true);
     addBlockedIdentityMock.mockResolvedValue(created);
 
-    const result = await addSignupBlock(DOMAIN_BLOCK);
+    const result = await addSignupBlock(MOCK_DOMAIN_BLOCK);
 
     expect(result).toEqual(created);
     expect(addBlockedIdentityMock).toHaveBeenCalledWith({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
       identity: MOCK_BLOCKED_DOMAIN,
       reason: MOCK_BLOCK_REASON,
-      createdByAdminId: ADMIN.id,
+      createdByAdminId: MOCK_ADMIN.id,
     });
     expect(recordAuditEventMock).toHaveBeenCalledTimes(1);
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
@@ -77,7 +77,7 @@ describe(addSignupBlock, () => {
     const existing = outcomeOf(false);
     addBlockedIdentityMock.mockResolvedValue(existing);
 
-    const result = await addSignupBlock(DOMAIN_BLOCK);
+    const result = await addSignupBlock(MOCK_DOMAIN_BLOCK);
 
     expect(result).toEqual(existing);
     expect(recordAuditEventMock).not.toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe(addSignupBlock, () => {
     const failure = errorResult(ERROR_CODE.DB_INVALID_DOMAIN);
     addBlockedIdentityMock.mockResolvedValue(failure);
 
-    const result = await addSignupBlock(DOMAIN_BLOCK);
+    const result = await addSignupBlock(MOCK_DOMAIN_BLOCK);
 
     expect(result).toEqual(failure);
     expect(recordAuditEventMock).not.toHaveBeenCalled();

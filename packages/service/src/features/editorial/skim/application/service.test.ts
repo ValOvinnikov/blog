@@ -6,17 +6,20 @@ import {
   MOCK_POST_ID,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { createSkimService } from './service';
 
 vi.mock('@blog/service/features/editorial/skim/adaptor/get-post-body/loader');
 vi.mock('@blog/service/features/editorial/skim/adaptor/save-skim-draft/loader');
 
-const SKIM_INPUT = mockSkimDraftInput();
+faker.seed(6015103);
+
+const MOCK_SKIM_INPUT = mockSkimDraftInput();
+const MOCK_TENANT = mockTenant();
 
 const mockGetPublishedPostBody = vi.mocked(getPublishedPostBody);
 const mockSaveSkimDraft = vi.mocked(saveSkimDraft);
-const tenant = mockTenant();
 
 describe(createSkimService, () => {
   describe('v1.getPublishedPostBody', () => {
@@ -24,26 +27,26 @@ describe(createSkimService, () => {
       mockGetPublishedPostBody.mockResolvedValue([]);
     });
 
-    it('resolves ok:true with the data the loader read for the tenant', async () => {
+    it('returns the post body the loader read for the tenant', async () => {
       const result = await createSkimService().v1.getPublishedPostBody(
         MOCK_POST_ID,
-        tenant,
+        MOCK_TENANT,
       );
 
       expect(result).toEqual({ ok: true, data: [] });
       expect(mockGetPublishedPostBody).toHaveBeenCalledWith(
         MOCK_POST_ID,
-        tenant,
+        MOCK_TENANT,
       );
     });
 
-    it('resolves ok:false with the error when the loader throws', async () => {
-      const error = new Error('no published post');
+    it('returns the loader failure as an error result', async () => {
+      const error = new Error(faker.lorem.sentence());
       mockGetPublishedPostBody.mockRejectedValueOnce(error);
 
       const result = await createSkimService().v1.getPublishedPostBody(
         MOCK_MISSING_ID,
-        tenant,
+        MOCK_TENANT,
       );
 
       expect(result).toEqual({ ok: false, error });
@@ -55,23 +58,26 @@ describe(createSkimService, () => {
       mockSaveSkimDraft.mockResolvedValue(undefined);
     });
 
-    it('resolves ok:true after saving the input for the tenant', async () => {
+    it('saves the input for the tenant', async () => {
       const result = await createSkimService().v1.saveSkimDraft(
-        SKIM_INPUT,
-        tenant,
+        MOCK_SKIM_INPUT,
+        MOCK_TENANT,
       );
 
       expect(result).toEqual({ ok: true, data: undefined });
-      expect(mockSaveSkimDraft).toHaveBeenCalledWith(SKIM_INPUT, tenant);
+      expect(mockSaveSkimDraft).toHaveBeenCalledWith(
+        MOCK_SKIM_INPUT,
+        MOCK_TENANT,
+      );
     });
 
-    it('resolves ok:false with the error when the patch throws', async () => {
-      const error = new Error('SANITY_API_WRITE_TOKEN is not set');
+    it('returns the save failure as an error result', async () => {
+      const error = new Error(faker.lorem.sentence());
       mockSaveSkimDraft.mockRejectedValueOnce(error);
 
       const result = await createSkimService().v1.saveSkimDraft(
-        SKIM_INPUT,
-        tenant,
+        MOCK_SKIM_INPUT,
+        MOCK_TENANT,
       );
 
       expect(result).toEqual({ ok: false, error });

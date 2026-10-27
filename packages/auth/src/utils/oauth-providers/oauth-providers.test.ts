@@ -5,6 +5,14 @@ import {
   MOCK_GOOGLE_SECRET,
 } from '@blog/auth/testing/oauth-fixtures';
 
+import {
+  getEnabledOAuthProviderIds,
+  getOAuthProviderCredentials,
+} from './oauth-providers';
+
+const GITHUB = 'github';
+const GOOGLE = 'google';
+
 async function importOAuthProviders(): Promise<
   typeof import('./oauth-providers')
 > {
@@ -12,98 +20,73 @@ async function importOAuthProviders(): Promise<
   return import('./oauth-providers');
 }
 
+const withGitHubCredentials = () => {
+  vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
+  vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
+};
+
 describe('oauth-providers', () => {
-  afterEach(() => {
-    delete process.env['AUTH_GITHUB_ID'];
-    delete process.env['AUTH_GITHUB_SECRET'];
-    delete process.env['AUTH_GOOGLE_ID'];
-    delete process.env['AUTH_GOOGLE_SECRET'];
+  beforeEach(() => {
+    vi.stubEnv('AUTH_GITHUB_ID', undefined);
+    vi.stubEnv('AUTH_GITHUB_SECRET', undefined);
+    vi.stubEnv('AUTH_GOOGLE_ID', undefined);
+    vi.stubEnv('AUTH_GOOGLE_SECRET', undefined);
   });
 
-  describe('getEnabledOAuthProviderIds', () => {
-    it('excludes an id when only the client id half of its pair is present', async () => {
-      process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
-      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
 
-      expect(getEnabledOAuthProviderIds()).not.toContain('github');
-    });
-
-    it('excludes an id when only the client secret half of its pair is present', async () => {
-      process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
-      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
-
-      expect(getEnabledOAuthProviderIds()).not.toContain('google');
-    });
-
-    it('excludes an id when neither credential is present', async () => {
-      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+  describe(getEnabledOAuthProviderIds, () => {
+    it.each([
+      ['the client id', 'AUTH_GITHUB_ID', MOCK_GITHUB_ID],
+      ['the client secret', 'AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET],
+    ])('excludes a provider with only %s of its pair set', (_, key, value) => {
+      vi.stubEnv(key, value);
 
       expect(getEnabledOAuthProviderIds()).toEqual([]);
     });
 
-    describe('with the GitHub credential pair set', () => {
-      beforeEach(() => {
-        process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
-        process.env['AUTH_GITHUB_SECRET'] = MOCK_GITHUB_SECRET;
-      });
+    it('enables nothing when no credentials are set', () => {
+      expect(getEnabledOAuthProviderIds()).toEqual([]);
+    });
 
-      it('includes an id when its full credential pair is present', async () => {
-        const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+    it('includes a provider whose full credential pair is set', () => {
+      withGitHubCredentials();
 
-        expect(getEnabledOAuthProviderIds()).toContain('github');
-      });
+      expect(getEnabledOAuthProviderIds()).toEqual([GITHUB]);
+    });
 
-      it('orders enabled ids GitHub before Google, matching config.ts registration order', async () => {
-        process.env['AUTH_GOOGLE_ID'] = MOCK_GOOGLE_ID;
-        process.env['AUTH_GOOGLE_SECRET'] = MOCK_GOOGLE_SECRET;
-        const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+    it('lists GitHub before Google when both are enabled', () => {
+      withGitHubCredentials();
+      vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
+      vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
 
-        expect(getEnabledOAuthProviderIds()).toEqual(['github', 'google']);
-      });
+      expect(getEnabledOAuthProviderIds()).toEqual([GITHUB, GOOGLE]);
     });
   });
 
-  describe('getOAuthProviderCredentials', () => {
-    it('returns the credential pair when both are set', async () => {
-      process.env['AUTH_GITHUB_ID'] = MOCK_GITHUB_ID;
-      process.env['AUTH_GITHUB_SECRET'] = MOCK_GITHUB_SECRET;
-      const { getOAuthProviderCredentials } = await importOAuthProviders();
+  describe(getOAuthProviderCredentials, () => {
+    it('returns the credential pair when both are set', () => {
+      withGitHubCredentials();
 
-      expect(getOAuthProviderCredentials('github')).toEqual({
+      expect(getOAuthProviderCredentials(GITHUB)).toEqual({
         clientId: MOCK_GITHUB_ID,
         clientSecret: MOCK_GITHUB_SECRET,
       });
     });
 
-    it('returns undefined when the credential pair is incomplete', async () => {
-      process.env['AUTH_GOOGLE_ID'] = MOCK_GOOGLE_ID;
-      const { getOAuthProviderCredentials } = await importOAuthProviders();
+    it('returns undefined when the credential pair is incomplete', () => {
+      vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
 
-      expect(getOAuthProviderCredentials('google')).toBeUndefined();
+      expect(getOAuthProviderCredentials(GOOGLE)).toBeUndefined();
     });
   });
 
-  describe('module import', () => {
-    it('does not require AUTH_SECRET, so a route rendering just the OAuth buttons never needs it', async () => {
-      const previousAuthSecret = process.env['AUTH_SECRET'];
-      const previousSkipValidation = process.env['SKIP_ENV_VALIDATION'];
-      delete process.env['AUTH_SECRET'];
-      delete process.env['SKIP_ENV_VALIDATION'];
+  it('loads without AUTH_SECRET, so the OAuth buttons never need it', async () => {
+    vi.stubEnv('AUTH_SECRET', undefined);
+    vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
 
-      try {
-        await expect(importOAuthProviders()).resolves.toBeDefined();
-      } finally {
-        if (previousAuthSecret === undefined) {
-          delete process.env['AUTH_SECRET'];
-        } else {
-          process.env['AUTH_SECRET'] = previousAuthSecret;
-        }
-        if (previousSkipValidation === undefined) {
-          delete process.env['SKIP_ENV_VALIDATION'];
-        } else {
-          process.env['SKIP_ENV_VALIDATION'] = previousSkipValidation;
-        }
-      }
-    });
+    await expect(importOAuthProviders()).resolves.toBeDefined();
   });
 });

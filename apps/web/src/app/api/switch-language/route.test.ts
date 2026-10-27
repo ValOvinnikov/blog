@@ -1,16 +1,22 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  HTTP_STATUS,
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { mockTenant } from '@web/testing/shared/tenant/fixtures';
 import { NextRequest } from 'next/server';
+
+faker.seed(6009);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const {
-  resolveRequestTenantMock,
   isPlatformFallbackAllowedMock,
   selectLiveLocalesMock,
   getTenantTranslationMapMock,
 } = vi.hoisted(() => ({
-  resolveRequestTenantMock: vi.fn(),
   isPlatformFallbackAllowedMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
   getTenantTranslationMapMock: vi.fn(),
@@ -19,9 +25,7 @@ const {
 vi.mock('@blog/db', () => ({
   queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
 }));
-vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
-  resolveRequestTenant: resolveRequestTenantMock,
-}));
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   isPlatformFallbackAllowed: isPlatformFallbackAllowedMock,
 }));
@@ -32,7 +36,13 @@ vi.mock(
 
 const { GET } = await import('./route');
 
-const tenant = { id: 'tenant-1', locale: EN } as TTenant;
+const tenant = mockTenant();
+const MOCK_ORIGIN = `https://${faker.internet.domainName()}`;
+const MOCK_PAGE_SLUG = faker.lorem.slug();
+const MOCK_TRANSLATED_SLUG = faker.lorem.slug();
+const MOCK_PAGE_PATH = `/${MOCK_PAGE_SLUG}`;
+const MOCK_FOREIGN_PATH = `//${faker.internet.domainName()}${MOCK_PAGE_PATH}`;
+const MOCK_PAGE_TYPE = 'page_landing';
 
 const translationMap = {
   homeLanguages: [],
@@ -41,8 +51,12 @@ const translationMap = {
   tagIndexLanguages: [],
   groups: [
     [
-      { documentType: 'page_landing', language: EN, slug: 'about' },
-      { documentType: 'page_landing', language: NL, slug: 'over-ons' },
+      { documentType: MOCK_PAGE_TYPE, language: EN, slug: MOCK_PAGE_SLUG },
+      {
+        documentType: MOCK_PAGE_TYPE,
+        language: NL,
+        slug: MOCK_TRANSLATED_SLUG,
+      },
     ],
   ],
 };
@@ -50,18 +64,16 @@ const translationMap = {
 const switchTo = (to: string, from: string) =>
   GET(
     new NextRequest(
-      `https://acme.example.com/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
+      `${MOCK_ORIGIN}/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
     ),
   );
 
 const serveTenant = (liveLocales: TLocaleIsoCode[]) => {
-  resolveRequestTenantMock.mockResolvedValue(tenant);
   selectLiveLocalesMock.mockReturnValue(liveLocales);
 };
 
-describe('GET /api/switch-language', () => {
+describe(GET, () => {
   beforeEach(() => {
-    resolveRequestTenantMock.mockReset();
     isPlatformFallbackAllowedMock.mockReset();
     isPlatformFallbackAllowedMock.mockReturnValue(false);
     selectLiveLocalesMock.mockReset();
@@ -71,71 +83,67 @@ describe('GET /api/switch-language', () => {
   });
 
   it("redirects to the current page's translation and remembers the language", async () => {
-    const response = await switchTo(NL, '/about');
+    const response = await switchTo(NL, MOCK_PAGE_PATH);
 
     expect(response.headers.get('location')).toBe(
-      'https://acme.example.com/nl/over-ons',
+      `${MOCK_ORIGIN}/nl/${MOCK_TRANSLATED_SLUG}`,
     );
     expect(response.cookies.get('NEXT_LOCALE')?.value).toBe(NL);
     expect(getTenantTranslationMapMock).toHaveBeenCalledWith(tenant);
   });
 
   it('forbids any cache from storing the redirect', async () => {
-    const response = await switchTo(NL, '/about');
+    const response = await switchTo(NL, MOCK_PAGE_PATH);
 
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(response.headers.get('cache-control')).toBe('private, no-store');
   });
 
   it("redirects to the language's home page when the page has no translation", async () => {
-    const response = await switchTo(FR, '/about');
+    const response = await switchTo(FR, MOCK_PAGE_PATH);
 
-    expect(response.headers.get('location')).toBe(
-      'https://acme.example.com/fr',
-    );
+    expect(response.headers.get('location')).toBe(`${MOCK_ORIGIN}/fr`);
   });
 
   it('falls back to the home page when the map cannot be loaded', async () => {
     getTenantTranslationMapMock.mockResolvedValue(undefined);
 
-    const response = await switchTo(NL, '/about');
+    const response = await switchTo(NL, MOCK_PAGE_PATH);
 
-    expect(response.headers.get('location')).toBe(
-      'https://acme.example.com/nl',
-    );
+    expect(response.headers.get('location')).toBe(`${MOCK_ORIGIN}/nl`);
   });
 
   it('rejects a language the tenant does not serve', async () => {
     serveTenant([EN, NL]);
 
-    const response = await switchTo(FR, '/about');
+    const response = await switchTo(FR, MOCK_PAGE_PATH);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(response.cookies.get('NEXT_LOCALE')).toBeUndefined();
   });
 
   it('rejects a current page off this site', async () => {
-    const response = await switchTo(NL, '//evil.example/about');
+    const response = await switchTo(NL, MOCK_FOREIGN_PATH);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
   });
 
-  it('keeps a single-language tenant on the same page without loading the map', async () => {
+  it('keeps a single-language tenant on the same page without the map', async () => {
     serveTenant([EN]);
 
-    const response = await switchTo(EN, '/about');
+    const response = await switchTo(EN, MOCK_PAGE_PATH);
 
     expect(response.headers.get('location')).toBe(
-      'https://acme.example.com/about',
+      `${MOCK_ORIGIN}${MOCK_PAGE_PATH}`,
     );
     expect(getTenantTranslationMapMock).not.toHaveBeenCalled();
   });
 
-  it('404s in production when no tenant serves the host', async () => {
-    resolveRequestTenantMock.mockResolvedValue(undefined);
+  it('responds not found when no tenant serves the host', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
-    const response = await switchTo(EN, '/about');
+    const response = await switchTo(EN, MOCK_PAGE_PATH);
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
   });
 });

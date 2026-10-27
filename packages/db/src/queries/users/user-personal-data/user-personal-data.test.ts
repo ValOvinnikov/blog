@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@blog/config/types';
 import {
   PERSONAL_DATA_FALLBACK_REASON,
   PERSONAL_DATA_OWNER,
@@ -46,36 +47,40 @@ describe(userPersonalColumns, () => {
 });
 
 describe(readUserPersonalData, () => {
-  it('reads back the email and name it was given', () => {
-    const { emailEncrypted = null, nameEncrypted = null } = userPersonalColumns(
-      { email: MOCK_USER_EMAIL, name: MOCK_USER_NAME },
-    );
+  let emailEncrypted: TMaybeNull<string>;
+  let nameEncrypted: TMaybeNull<string>;
 
-    expect(readUserPersonalData({ emailEncrypted, nameEncrypted })).toEqual({
+  beforeEach(() => {
+    ({ emailEncrypted = null, nameEncrypted = null } = userPersonalColumns({
       email: MOCK_USER_EMAIL,
       name: MOCK_USER_NAME,
-    });
+    }));
+  });
+
+  it('reads back the email and name it was given', () => {
+    const result = readUserPersonalData({ emailEncrypted, nameEncrypted });
+
+    expect(result).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
   });
 
   it('reads a user without a name as nameless', () => {
-    const { emailEncrypted = null } = userPersonalColumns({
-      email: MOCK_USER_EMAIL,
+    const result = readUserPersonalData({
+      emailEncrypted,
+      nameEncrypted: null,
     });
 
-    expect(
-      readUserPersonalData({ emailEncrypted, nameEncrypted: null }),
-    ).toEqual({ email: MOCK_USER_EMAIL, name: null });
+    expect(result).toEqual({ email: MOCK_USER_EMAIL, name: null });
   });
 
   it('reads a user not yet backfilled from the plain columns and reports it', () => {
-    expect(
-      readUserPersonalData({
-        email: MOCK_USER_EMAIL,
-        name: MOCK_USER_NAME,
-        emailEncrypted: null,
-        nameEncrypted: null,
-      }),
-    ).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
+    const result = readUserPersonalData({
+      email: MOCK_USER_EMAIL,
+      name: MOCK_USER_NAME,
+      emailEncrypted: null,
+      nameEncrypted: null,
+    });
+
+    expect(result).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
     expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
       owner: PERSONAL_DATA_OWNER.USER,
       reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
@@ -83,27 +88,20 @@ describe(readUserPersonalData, () => {
   });
 
   it('reads the plain columns when the encryption key is unset', () => {
-    const { emailEncrypted = null, nameEncrypted = null } = userPersonalColumns(
-      { email: MOCK_USER_EMAIL, name: MOCK_USER_NAME },
-    );
     vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', undefined);
 
-    expect(
-      readUserPersonalData({
-        email: MOCK_USER_EMAIL,
-        name: MOCK_USER_NAME,
-        emailEncrypted,
-        nameEncrypted,
-      }),
-    ).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
+    const result = readUserPersonalData({
+      email: MOCK_USER_EMAIL,
+      name: MOCK_USER_NAME,
+      emailEncrypted,
+      nameEncrypted,
+    });
+
+    expect(result).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
   });
 
   it('reports nothing for a backfilled user', () => {
-    const { emailEncrypted = null } = userPersonalColumns({
-      email: MOCK_USER_EMAIL,
-    });
-
-    readUserPersonalData({ emailEncrypted, nameEncrypted: null });
+    readUserPersonalData({ emailEncrypted, nameEncrypted });
 
     expect(fallbackListener).not.toHaveBeenCalled();
   });

@@ -1,5 +1,12 @@
+import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
+import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
+import {
+  mockChangedFile,
+  mockChangedFiles,
+  mockGitHubCommit,
+} from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
   mockGitHubResponse,
@@ -8,54 +15,38 @@ import {
 
 import { compareCommits } from './compare-commits';
 
+faker.seed(5998);
+
 vi.mock('@platform/utils/env/env');
 
-const makeCommit = () => ({
-  sha: faker.git.commitSha(),
-  commit: {
-    message: faker.git.commitMessage(),
-    author: {
-      name: faker.person.fullName(),
-      date: faker.date.past().toISOString(),
-    },
-  },
-});
-
-const makeFiles = (count: number) =>
-  Array.from({ length: count }, (_, index) => ({
-    filename: `apps/web/src/file-${index}.ts`,
-    status: 'modified',
-  }));
+const MOCK_BASE = faker.system.semver();
+const MOCK_HEAD = faker.git.commitSha();
+const COMMITS_PER_PAGE = 100;
+const MANY_COMMITS = 250;
+const TWO_PAGES_OF_COMMITS = 150;
 
 describe(compareCommits, () => {
   const github = useGitHubFetch();
-  const base = 'v1.0.0';
-  const head = faker.git.commitSha();
 
   const respondCompare = (
-    commits: ReturnType<typeof makeCommit>[],
-    files: ReturnType<typeof makeFiles>,
+    commits: ReturnType<typeof mockGitHubCommit>[],
+    files: ReturnType<typeof mockChangedFiles>,
   ) => {
-    github.respond(`/compare/${base}...${head}`, (path) =>
+    github.respond(`/compare/${MOCK_BASE}...${MOCK_HEAD}`, (path) =>
       mockGitHubCompareResponse(path, commits, files),
     );
   };
 
   it('lists the commits newest first with the changed files', async () => {
-    const commits = [makeCommit(), makeCommit()];
-    const files = [{ filename: 'apps/web/src/page.tsx', status: 'modified' }];
+    const commits = [mockGitHubCommit(), mockGitHubCommit()];
+    const files = [mockChangedFile(faker.system.filePath())];
     respondCompare(commits, files);
 
-    const result = await compareCommits(base, head);
+    const result = await compareCommits(MOCK_BASE, MOCK_HEAD);
 
-    expect(result).toEqual({
-      ok: true,
-      data: expect.objectContaining({
-        totalCommits: 2,
-        files,
-        isFileListTruncated: false,
-      }),
-    });
+    expect(result.ok && result.data.totalCommits).toBe(commits.length);
+    expect(result.ok && result.data.files).toEqual(files);
+    expect(result.ok && result.data.isFileListTruncated).toBe(false);
     expect(result.ok && result.data.commits.map(({ sha }) => sha)).toEqual([
       commits[1]?.sha,
       commits[0]?.sha,
@@ -63,51 +54,54 @@ describe(compareCommits, () => {
   });
 
   it('returns every changed file of a comparison past one page', async () => {
-    const files = makeFiles(150);
-    respondCompare([makeCommit()], files);
+    const files = mockChangedFiles(TWO_PAGES_OF_COMMITS);
+    respondCompare([mockGitHubCommit()], files);
 
-    expect(await compareCommits(base, head)).toEqual({
-      ok: true,
-      data: expect.objectContaining({ files, isFileListTruncated: false }),
-    });
+    const result = await compareCommits(MOCK_BASE, MOCK_HEAD);
+
+    expect(result.ok && result.data.files).toEqual(files);
+    expect(result.ok && result.data.isFileListTruncated).toBe(false);
   });
 
-  it('reports a file list GitHub cut off at its limit as truncated', async () => {
-    const files = makeFiles(350);
-    respondCompare([makeCommit()], files);
+  it('flags a file list cut off at GitHub limit as truncated', async () => {
+    const files = mockChangedFiles(GITHUB_COMPARE_FILE_LIMIT + 50);
+    respondCompare([mockGitHubCommit()], files);
 
-    expect(await compareCommits(base, head)).toEqual({
-      ok: true,
-      data: expect.objectContaining({
-        files: files.slice(0, 300),
-        isFileListTruncated: true,
-      }),
-    });
+    const result = await compareCommits(MOCK_BASE, MOCK_HEAD);
+
+    expect(result.ok && result.data.files).toEqual(
+      files.slice(0, GITHUB_COMPARE_FILE_LIMIT),
+    );
+    expect(result.ok && result.data.isFileListTruncated).toBe(true);
   });
 
-  it('lists the newest commits first when there are more than one page of them', async () => {
-    const commits = Array.from({ length: 250 }, makeCommit);
+  it('lists the newest commits first across more than one page', async () => {
+    const commits = Array.from({ length: MANY_COMMITS }, mockGitHubCommit);
     respondCompare(commits, []);
 
-    const result = await compareCommits(base, head);
+    const result = await compareCommits(MOCK_BASE, MOCK_HEAD);
 
-    expect(result.ok && result.data.totalCommits).toBe(250);
+    expect(result.ok && result.data.totalCommits).toBe(MANY_COMMITS);
     expect(result.ok && result.data.commits.map(({ sha }) => sha)).toEqual(
       commits
-        .slice(150)
+        .slice(MANY_COMMITS - COMMITS_PER_PAGE)
         .reverse()
         .map(({ sha }) => sha),
     );
   });
 
   it('fails with GITHUB_ERROR when a later page errors', async () => {
-    const commits = Array.from({ length: 150 }, makeCommit);
+    const commits = Array.from(
+      { length: TWO_PAGES_OF_COMMITS },
+      mockGitHubCommit,
+    );
     respondCompare(commits, []);
-    github.respond(`/compare/${base}...${head}?per_page=100&page=2`, () =>
-      mockGitHubResponse({}, 500),
+    github.respond(
+      `/compare/${MOCK_BASE}...${MOCK_HEAD}?per_page=${COMMITS_PER_PAGE}&page=2`,
+      () => mockGitHubResponse({}, HTTP_STATUS.INTERNAL_SERVER_ERROR),
     );
 
-    expect(await compareCommits(base, head)).toEqual({
+    expect(await compareCommits(MOCK_BASE, MOCK_HEAD)).toEqual({
       ok: false,
       error: GITHUB_FAILURE.GITHUB_ERROR,
     });

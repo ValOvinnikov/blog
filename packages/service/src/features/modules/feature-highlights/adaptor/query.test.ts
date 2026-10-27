@@ -15,64 +15,72 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { featureHighlightsModuleQuery } from './query';
 
+faker.seed(4);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const FEATURE_HIGHLIGHTS_ID = 'feature-highlights-1';
-const UNTRANSLATED_ROW = {
-  heading: 'Sleep better',
-  body: 'Fewer pages.',
-  alt: 'A moon',
+const MOCK_FEATURE_HIGHLIGHTS_ID = faker.string.uuid();
+const MOCK_UNTRANSLATED_ROW = {
+  heading: faker.lorem.words(2),
+  body: faker.lorem.sentence(),
+  alt: faker.lorem.words(3),
 };
+const MOCK_FRENCH_ONLY_BODY = faker.lorem.sentence();
 
-const EN_COPY = {
-  heading: 'Why teams switch',
-  row: { heading: 'Ship faster', body: 'Less friction.', alt: 'A rocket' },
-};
-
-const NL_COPY = {
-  heading: 'Waarom teams overstappen',
+const MOCK_EN_COPY = {
+  heading: faker.lorem.words(3),
   row: {
-    heading: 'Sneller leveren',
-    body: 'Minder frictie.',
-    alt: 'Een raket',
+    heading: faker.lorem.words(2),
+    body: faker.lorem.sentence(),
+    alt: faker.lorem.words(3),
   },
 };
 
-const featureHighlightsDocument = {
-  _id: FEATURE_HIGHLIGHTS_ID,
+const MOCK_NL_COPY = {
+  heading: faker.lorem.words(3),
+  row: {
+    heading: faker.lorem.words(2),
+    body: faker.lorem.sentence(),
+    alt: faker.lorem.words(3),
+  },
+};
+
+const MOCK_FEATURE_HIGHLIGHTS_DOCUMENT = {
+  _id: MOCK_FEATURE_HIGHLIGHTS_ID,
   _type: 'module_featureHighlights',
   brandVariant: BRAND_VARIANT.PRIMARY,
   mediaOrder: MEDIA_ORDER.FIRST,
   headingBlock: mockLocalizedHeadingBlock({
-    [EN]: EN_COPY.heading,
-    [NL]: NL_COPY.heading,
+    [EN]: MOCK_EN_COPY.heading,
+    [NL]: MOCK_NL_COPY.heading,
   }),
   highlights: [
     {
-      _key: 'row-1',
+      _key: faker.string.uuid(),
       _type: 'featureHighlight',
       heading: mockLocalizedStrings({
-        [EN]: EN_COPY.row.heading,
-        [NL]: NL_COPY.row.heading,
+        [EN]: MOCK_EN_COPY.row.heading,
+        [NL]: MOCK_NL_COPY.row.heading,
       }),
       body: mockLocalizedListedText({
-        [EN]: EN_COPY.row.body,
-        [NL]: NL_COPY.row.body,
+        [EN]: MOCK_EN_COPY.row.body,
+        [NL]: MOCK_NL_COPY.row.body,
       }),
       image: mockLocalizedImage({
-        [EN]: EN_COPY.row.alt,
-        [NL]: NL_COPY.row.alt,
+        [EN]: MOCK_EN_COPY.row.alt,
+        [NL]: MOCK_NL_COPY.row.alt,
       }),
     },
     {
-      _key: 'row-2',
+      _key: faker.string.uuid(),
       _type: 'featureHighlight',
-      heading: mockLocalizedStrings({ [EN]: UNTRANSLATED_ROW.heading }),
-      body: mockLocalizedListedText({ [EN]: UNTRANSLATED_ROW.body }),
-      image: mockLocalizedImage({ [EN]: UNTRANSLATED_ROW.alt }),
+      heading: mockLocalizedStrings({ [EN]: MOCK_UNTRANSLATED_ROW.heading }),
+      body: mockLocalizedListedText({ [EN]: MOCK_UNTRANSLATED_ROW.body }),
+      image: mockLocalizedImage({ [EN]: MOCK_UNTRANSLATED_ROW.alt }),
     },
   ],
 };
@@ -85,7 +93,7 @@ async function runFeatureHighlights(
     featureHighlightsModuleQuery.query,
     [document, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: FEATURE_HIGHLIGHTS_ID, locale, defaultLocale: EN },
+    { id: MOCK_FEATURE_HIGHLIGHTS_ID, locale, defaultLocale: EN },
   );
 
   return featureHighlightsModuleQuery.parse(raw);
@@ -123,41 +131,48 @@ describe('featureHighlightsModuleQuery', () => {
       highlights: [mockRawFeatureHighlightItem({ action: null })],
     };
 
-    expect(
-      featureHighlightsModuleQuery.parse(raw).highlights?.[0]?.action,
-    ).toBeNull();
+    const [highlight] = featureHighlightsModuleQuery.parse(raw).highlights;
+
+    expect(highlight?.action).toBeNull();
   });
 
   it.each([
-    ['picks the heading and each row in the visitor language', NL, NL_COPY],
+    [
+      'picks the heading and each row in the visitor language',
+      NL,
+      MOCK_NL_COPY,
+    ],
     [
       'falls back to the default language for the heading and each row',
       FR,
-      EN_COPY,
+      MOCK_EN_COPY,
     ],
   ])('%s', async (_, locale, copy) => {
     const module = await runFeatureHighlights(
-      featureHighlightsDocument,
+      MOCK_FEATURE_HIGHLIGHTS_DOCUMENT,
       locale,
     );
 
     expect(module.headingBlock.heading).toBe(copy.heading);
     expect(rowText(module)).toEqual([
       { ...copy.row, body: [[copy.row.body]] },
-      { ...UNTRANSLATED_ROW, body: [[UNTRANSLATED_ROW.body]] },
+      { ...MOCK_UNTRANSLATED_ROW, body: [[MOCK_UNTRANSLATED_ROW.body]] },
     ]);
   });
 
   it('fails when a row body is missing in both languages', async () => {
-    const [first, second] = featureHighlightsDocument.highlights;
+    const [first, second] = MOCK_FEATURE_HIGHLIGHTS_DOCUMENT.highlights;
 
     await expect(
       runFeatureHighlights(
         {
-          ...featureHighlightsDocument,
+          ...MOCK_FEATURE_HIGHLIGHTS_DOCUMENT,
           highlights: [
             first,
-            { ...second, body: mockLocalizedListedText({ [FR]: 'Moins.' }) },
+            {
+              ...second,
+              body: mockLocalizedListedText({ [FR]: MOCK_FRENCH_ONLY_BODY }),
+            },
           ],
         },
         NL,

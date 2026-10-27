@@ -13,8 +13,8 @@ import {
 
 import { toContentModule } from './transformer';
 
-describe('toContentModule', () => {
-  it('maps brandVariant straight through', () => {
+describe(toContentModule, () => {
+  it('maps the brand variant', () => {
     const raw = mockRawContentModule({ brandVariant: BRAND_VARIANT.SECONDARY });
 
     const module = toContentModule(raw);
@@ -22,7 +22,7 @@ describe('toContentModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('maps a fully-authored layout object 1:1', () => {
+  it('maps a fully authored layout', () => {
     const layout = mockRawWideLayout();
     const raw = mockRawContentModule({ layout });
 
@@ -31,7 +31,7 @@ describe('toContentModule', () => {
     expect(module.layout).toEqual(layout);
   });
 
-  it('resolves a bodyImage block into an image view-model, keeping layout', () => {
+  it('resolves a body image block into an image, keeping its layout', () => {
     const raw = mockRawContentModule({
       body: [mockRawBodyImageBlock({ layout: IMAGE_LAYOUT.INLINE })],
     });

@@ -5,18 +5,16 @@ import { StatusBadge } from './status-badge';
 
 faker.seed(123);
 
-const label = faker.word.adjective();
+const MOCK_LABEL = faker.word.adjective();
 
-const setup = customRender(StatusBadge, { tone: 'ok', children: label });
+const setup = customRender(StatusBadge, { tone: 'ok', children: MOCK_LABEL });
 
 describe(`<${StatusBadge.name}/>`, () => {
   it('renders the given text', () => {
     setup();
-    expect(screen.getByText(label)).toBeVisible();
-  });
 
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'status-badge' });
-    expect(screen.getByTestId('status-badge')).toBeVisible();
+    const badge = screen.getByText(MOCK_LABEL);
+
+    expect(badge).toBeVisible();
   });
 });

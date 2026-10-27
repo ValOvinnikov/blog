@@ -1,8 +1,11 @@
+import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
-  MOCK_SECTION_PAGES_HEADING,
+  MOCK_SECTION_PAGE_PATH,
+  MOCK_SECTION_PAGE_SUMMARY,
   MOCK_SECTION_PAGE_TITLE,
+  MOCK_SECTION_PAGES_HEADING,
   mockSectionPageCard,
   mockSectionPagesModule,
 } from '@web/testing/modules/section-pages/fixtures';
@@ -11,10 +14,17 @@ import { SectionPagesModuleView } from './section-pages-module-view';
 
 vi.mock('@web/i18n/navigation');
 
+faker.seed(41);
+
+const MOCK_OTHER_PAGE_TITLE = faker.lorem.words(2);
+const MOCK_OTHER_PAGE_PATH = faker.lorem.slug();
+const MOCK_TITLE_ID = faker.lorem.slug();
+const MOCK_DATA_TEST_ID = faker.lorem.slug();
+
 const setup = customRender(SectionPagesModuleView, {
   ...mockSectionPagesModule(),
-  titleId: 'section-pages-title',
-  dataTestId: 'section-pages-module-section-pages-1',
+  titleId: MOCK_TITLE_ID,
+  dataTestId: MOCK_DATA_TEST_ID,
 });
 
 describe(`<${SectionPagesModuleView.name}/>`, () => {
@@ -31,6 +41,7 @@ describe(`<${SectionPagesModuleView.name}/>`, () => {
         level: 2,
         name: MOCK_SECTION_PAGES_HEADING,
       });
+
       expect(section).toBeVisible();
       expect(heading).toBeVisible();
     });
@@ -40,19 +51,20 @@ describe(`<${SectionPagesModuleView.name}/>`, () => {
         level: 3,
         name: MOCK_SECTION_PAGE_TITLE,
       });
+
       expect(cardTitle).toBeVisible();
     });
 
     it('renders the section page summary', () => {
       const card = screen.getByRole('article');
-      const summary = within(card).getByText(
-        'Answers to the questions we hear most.',
-      );
+      const summary = within(card).getByText(MOCK_SECTION_PAGE_SUMMARY);
+
       expect(summary).toBeVisible();
     });
 
     it('renders no media region when the section page has no image', () => {
       const media = screen.queryByTestId('section-page-card-media');
+
       expect(media).not.toBeInTheDocument();
     });
   });
@@ -61,21 +73,23 @@ describe(`<${SectionPagesModuleView.name}/>`, () => {
     setup({
       pages: [
         mockSectionPageCard({
-          id: 'pricing',
-          title: 'Pricing',
-          path: 'modules/pricing',
+          id: faker.string.uuid(),
+          title: MOCK_OTHER_PAGE_TITLE,
+          path: MOCK_OTHER_PAGE_PATH,
         }),
         mockSectionPageCard(),
       ],
     });
 
     const links = screen.getAllByRole('link');
+    const [firstLink, secondLink] = links;
+
     expect(links.map((link) => link.textContent)).toEqual([
-      'Pricing',
+      MOCK_OTHER_PAGE_TITLE,
       MOCK_SECTION_PAGE_TITLE,
     ]);
-    expect(links[0]).toHaveAttribute('href', '/modules/pricing');
-    expect(links[1]).toHaveAttribute('href', '/modules/faq');
+    expect(firstLink).toHaveAttribute('href', `/${MOCK_OTHER_PAGE_PATH}`);
+    expect(secondLink).toHaveAttribute('href', `/${MOCK_SECTION_PAGE_PATH}`);
   });
 
   it('renders card titles as the top-level heading when the module has no heading', () => {
@@ -86,6 +100,7 @@ describe(`<${SectionPagesModuleView.name}/>`, () => {
       name: MOCK_SECTION_PAGE_TITLE,
     });
     const headings = screen.getAllByRole('heading');
+
     expect(cardTitle).toBeVisible();
     expect(headings).toHaveLength(1);
   });
@@ -95,6 +110,7 @@ describe(`<${SectionPagesModuleView.name}/>`, () => {
     setup({ pages: [mockSectionPageCard({ image })] });
 
     const renderedImage = screen.getByRole('img', { name: image.alt });
+
     expect(renderedImage).toBeVisible();
   });
 });

@@ -9,45 +9,52 @@ import {
   mockLandingPage,
   mockReference,
 } from '@blog/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import type { SanityDocument } from 'sanity';
+import { faker } from '@faker-js/faker';
+import { getDraftId } from 'sanity';
+
+faker.seed(6020);
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
+const MOCK_TOP_ID = faker.string.uuid();
+const MOCK_CHILD_ID = faker.string.uuid();
+const MOCK_GRANDCHILD_ID = faker.string.uuid();
+const MOCK_PAGE_ID = faker.string.uuid();
+const MOCK_MISSING_ID = faker.string.uuid();
+const MOCK_SUB_PAGE_ID = faker.string.uuid();
+
+const topPage = mockLandingPage({ _id: MOCK_TOP_ID, language: EN });
+const childPage = mockLandingPage({
+  _id: MOCK_CHILD_ID,
+  parent: MOCK_TOP_ID,
+  language: EN,
+});
+const draftPage = mockLandingPage({
+  _id: getDraftId(MOCK_PAGE_ID),
+  language: EN,
+});
+const draftTopPage = mockLandingPage({
+  _id: getDraftId(MOCK_TOP_ID),
+  language: EN,
+});
+
 describe(validateLandingParent, () => {
-  let modules: SanityDocument;
-  let faq: SanityDocument;
-  let team: SanityDocument;
-  let draft: SanityDocument;
-
-  beforeEach(() => {
-    modules = mockLandingPage({ _id: 'modules', language: EN });
-    faq = mockLandingPage({ _id: 'faq', parent: 'modules', language: EN });
-    team = mockLandingPage({ _id: 'team', language: EN });
-    draft = mockLandingPage({ _id: 'drafts.modules', language: EN });
-  });
-
   it('passes a page with no parent', async () => {
     await expect(
       validateLandingParent(
         undefined,
-        mockGroqValidationContext([modules], {
-          document: team,
-        }),
+        mockGroqValidationContext([topPage], { document: draftPage }),
       ),
     ).resolves.toBe(true);
   });
 
   it('passes a parent in the same language within the depth bound', async () => {
-    const teamDraft = mockLandingPage({
-      _id: 'drafts.team',
-      language: EN,
-    });
-
     await expect(
       validateLandingParent(
-        mockReference('modules'),
-        mockGroqValidationContext([modules], { document: teamDraft }),
+        mockReference(MOCK_TOP_ID),
+        mockGroqValidationContext([topPage], { document: draftPage }),
       ),
     ).resolves.toBe(true);
   });
@@ -55,8 +62,8 @@ describe(validateLandingParent, () => {
   it('rejects the page as its own parent', async () => {
     await expect(
       validateLandingParent(
-        mockReference('modules'),
-        mockGroqValidationContext([modules], { document: draft }),
+        mockReference(MOCK_TOP_ID),
+        mockGroqValidationContext([topPage], { document: draftTopPage }),
       ),
     ).resolves.toBe(LANDING_PARENT_CYCLE_ERROR);
   });
@@ -64,62 +71,58 @@ describe(validateLandingParent, () => {
   it('rejects a parent that sits beneath the page', async () => {
     await expect(
       validateLandingParent(
-        mockReference('faq'),
-        mockGroqValidationContext([modules, faq], { document: draft }),
+        mockReference(MOCK_CHILD_ID),
+        mockGroqValidationContext([topPage, childPage], {
+          document: draftTopPage,
+        }),
       ),
     ).resolves.toBe(LANDING_PARENT_CYCLE_ERROR);
   });
 
   it('rejects a parent in another language', async () => {
-    const dutch = mockLandingPage({
-      _id: 'drafts.over',
+    const dutchDraft = mockLandingPage({
+      _id: getDraftId(MOCK_PAGE_ID),
       language: NL,
     });
 
     await expect(
       validateLandingParent(
-        mockReference('modules'),
-        mockGroqValidationContext([modules], { document: dutch }),
+        mockReference(MOCK_TOP_ID),
+        mockGroqValidationContext([topPage], { document: dutchDraft }),
       ),
     ).resolves.toBe(LANDING_PARENT_LANGUAGE_ERROR);
   });
 
   it('rejects nesting the page deeper than the bound', async () => {
-    const billing = mockLandingPage({
-      _id: 'billing',
-      parent: 'faq',
-      language: EN,
-    });
-    const invoices = mockLandingPage({
-      _id: 'drafts.invoices',
+    const grandchildPage = mockLandingPage({
+      _id: MOCK_GRANDCHILD_ID,
+      parent: MOCK_CHILD_ID,
       language: EN,
     });
 
     await expect(
       validateLandingParent(
-        mockReference('billing'),
-        mockGroqValidationContext([modules, faq, billing], {
-          document: invoices,
+        mockReference(MOCK_GRANDCHILD_ID),
+        mockGroqValidationContext([topPage, childPage, grandchildPage], {
+          document: draftPage,
         }),
       ),
     ).resolves.toBe(LANDING_PARENT_DEPTH_ERROR);
   });
 
   it('rejects a move that pushes the page’s own sub-pages past the bound', async () => {
-    const pricing = mockLandingPage({
-      _id: 'drafts.pricing',
-      language: EN,
-    });
-    const plans = mockLandingPage({
-      _id: 'plans',
-      parent: 'pricing',
+    const subPage = mockLandingPage({
+      _id: MOCK_SUB_PAGE_ID,
+      parent: MOCK_PAGE_ID,
       language: EN,
     });
 
     await expect(
       validateLandingParent(
-        mockReference('faq'),
-        mockGroqValidationContext([modules, faq, plans], { document: pricing }),
+        mockReference(MOCK_CHILD_ID),
+        mockGroqValidationContext([topPage, childPage, subPage], {
+          document: draftPage,
+        }),
       ),
     ).resolves.toBe(LANDING_PARENT_DEPTH_ERROR);
   });
@@ -127,10 +130,8 @@ describe(validateLandingParent, () => {
   it('passes when the parent no longer exists', async () => {
     await expect(
       validateLandingParent(
-        mockReference('gone'),
-        mockGroqValidationContext([], {
-          document: team,
-        }),
+        mockReference(MOCK_MISSING_ID),
+        mockGroqValidationContext([], { document: draftPage }),
       ),
     ).resolves.toBe(true);
   });
@@ -138,10 +139,10 @@ describe(validateLandingParent, () => {
   it('passes when the fetch fails', async () => {
     await expect(
       validateLandingParent(
-        mockReference('modules'),
-        mockGroqValidationContext([modules], {
-          document: team,
-          fetchError: new Error('network down'),
+        mockReference(MOCK_TOP_ID),
+        mockGroqValidationContext([topPage], {
+          document: draftPage,
+          fetchError: MOCK_FETCH_ERROR,
         }),
       ),
     ).resolves.toBe(true);

@@ -2,32 +2,33 @@ import {
   MOCK_SIGN_IN_URL,
   MOCK_UNSAFE_URL,
 } from '@blog/email/testing/email-fixtures';
+import { faker } from '@faker-js/faker';
 
 import { buildPlainTextBody } from './plain-text-body';
 
-const PARAGRAPH = 'Your site is paused.';
-const ACTION_LABEL = 'Sign in';
+faker.seed(6026);
+
+const MOCK_PARAGRAPH = faker.lorem.sentence();
+const MOCK_SECOND_PARAGRAPH = faker.lorem.sentence();
+const MOCK_ACTION_LABEL = faker.lorem.words(2);
 
 describe(buildPlainTextBody, () => {
   it('separates each paragraph with a blank line', () => {
-    expect(buildPlainTextBody(['First.', 'Second.'])).toBe('First.\n\nSecond.');
+    expect(buildPlainTextBody([MOCK_PARAGRAPH, MOCK_SECOND_PARAGRAPH])).toBe(
+      `${MOCK_PARAGRAPH}\n\n${MOCK_SECOND_PARAGRAPH}`,
+    );
   });
 
-  it('ends with the action label and its url', () => {
+  it.each([
+    [
+      'ends with the action label and its url',
+      MOCK_SIGN_IN_URL,
+      MOCK_SIGN_IN_URL,
+    ],
+    ['drops an action url that is not a safe link', MOCK_UNSAFE_URL, ''],
+  ])('%s', (_title, url, expectedUrl) => {
     expect(
-      buildPlainTextBody([PARAGRAPH], {
-        label: ACTION_LABEL,
-        url: MOCK_SIGN_IN_URL,
-      }),
-    ).toBe(`${PARAGRAPH}\n\n${ACTION_LABEL}: ${MOCK_SIGN_IN_URL}`);
-  });
-
-  it('drops an action url that is not a safe link', () => {
-    expect(
-      buildPlainTextBody([PARAGRAPH], {
-        label: ACTION_LABEL,
-        url: MOCK_UNSAFE_URL,
-      }),
-    ).toBe(`${PARAGRAPH}\n\n${ACTION_LABEL}: `);
+      buildPlainTextBody([MOCK_PARAGRAPH], { label: MOCK_ACTION_LABEL, url }),
+    ).toBe(`${MOCK_PARAGRAPH}\n\n${MOCK_ACTION_LABEL}: ${expectedUrl}`);
   });
 });

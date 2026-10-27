@@ -25,3 +25,15 @@ export const MOCK_PURGED_READER_DATA_COUNTS = {
 export const MOCK_DEPROVISION_AUDIT_ACTOR = {
   actorId: `${GITHUB_AUDIT_ACTOR_ID_PREFIX}${MOCK_DEPROVISION_ENV.githubActor}`,
 };
+
+export const MOCK_DEPROVISION_DRY_RUN_ENV = {
+  ...MOCK_DEPROVISION_ENV,
+  dryRun: true,
+};
+
+export const MOCK_DEPROVISION_AUDIT_DETAILS = {
+  via: 'deprovision-tenant-workflow',
+  runId: MOCK_DEPROVISION_ENV.githubRunId,
+};
+
+export const MOCK_DEPROVISIONED_AT = faker.date.past();

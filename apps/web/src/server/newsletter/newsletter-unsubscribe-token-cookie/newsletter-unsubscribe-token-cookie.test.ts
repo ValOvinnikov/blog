@@ -1,4 +1,9 @@
 import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import {
+  mockCookieStore,
+  stubCookieStore,
+} from '@web/testing/server/newsletter-cookies/fixtures';
 
 import {
   clearNewsletterUnsubscribeToken,
@@ -7,23 +12,18 @@ import {
   storeNewsletterUnsubscribeToken,
 } from './newsletter-unsubscribe-token-cookie';
 
-const TOKEN = 'kept-unsubscribe-token';
+vi.mock('next/headers');
 
-const { setMock, getMock, deleteMock, cookiesMock } = vi.hoisted(() => ({
-  setMock: vi.fn(),
-  getMock: vi.fn(),
-  deleteMock: vi.fn(),
-  cookiesMock: vi.fn(),
-}));
+faker.seed(6010);
 
-vi.mock('next/headers', () => ({ cookies: cookiesMock }));
+const ONE_HOUR_SECONDS = 60 * 60;
+const MOCK_TOKEN = faker.string.alphanumeric(16);
+
+let cookieStore: ReturnType<typeof mockCookieStore>;
 
 beforeEach(() => {
-  cookiesMock.mockResolvedValue({
-    set: setMock,
-    get: getMock,
-    delete: deleteMock,
-  });
+  cookieStore = mockCookieStore();
+  stubCookieStore(cookieStore);
 });
 
 afterEach(() => {
@@ -31,48 +31,61 @@ afterEach(() => {
 });
 
 describe(storeNewsletterUnsubscribeToken, () => {
-  it('keeps the token in a short-lived, strict, httpOnly cookie scoped to the unsubscribe endpoint', async () => {
-    await storeNewsletterUnsubscribeToken(TOKEN);
+  it('keeps the token in a short-lived httpOnly cookie on the unsubscribe path', async () => {
+    vi.stubEnv('NODE_ENV', 'test');
 
-    expect(setMock).toHaveBeenCalledWith(
+    await storeNewsletterUnsubscribeToken(MOCK_TOKEN);
+
+    expect(cookieStore.set).toHaveBeenCalledWith(
       NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
-      TOKEN,
-      expect.objectContaining({
-        maxAge: 60 * 60,
+      MOCK_TOKEN,
+      {
+        maxAge: ONE_HOUR_SECONDS,
         path: routes.newsletterUnsubscribeSubmit(),
         sameSite: 'strict',
+        secure: false,
         httpOnly: true,
-      }),
+      },
     );
   });
 
   it('marks the cookie secure in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
 
-    await storeNewsletterUnsubscribeToken(TOKEN);
+    await storeNewsletterUnsubscribeToken(MOCK_TOKEN);
 
-    expect(setMock).toHaveBeenCalledWith(
+    expect(cookieStore.set).toHaveBeenCalledWith(
       NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
-      TOKEN,
-      expect.objectContaining({ secure: true }),
+      MOCK_TOKEN,
+      {
+        maxAge: ONE_HOUR_SECONDS,
+        path: routes.newsletterUnsubscribeSubmit(),
+        sameSite: 'strict',
+        secure: true,
+        httpOnly: true,
+      },
     );
   });
 });
 
 describe(readNewsletterUnsubscribeToken, () => {
   it('reads the kept token', async () => {
-    getMock.mockReturnValue({ value: TOKEN });
+    cookieStore.get.mockReturnValueOnce({ value: MOCK_TOKEN });
 
-    await expect(readNewsletterUnsubscribeToken()).resolves.toBe(TOKEN);
-    expect(getMock).toHaveBeenCalledWith(
+    const token = await readNewsletterUnsubscribeToken();
+
+    expect(token).toBe(MOCK_TOKEN);
+    expect(cookieStore.get).toHaveBeenCalledWith(
       NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
     );
   });
 
   it('answers undefined when no token is kept', async () => {
-    getMock.mockReturnValue(undefined);
+    cookieStore.get.mockReturnValueOnce(undefined);
 
-    await expect(readNewsletterUnsubscribeToken()).resolves.toBeUndefined();
+    const token = await readNewsletterUnsubscribeToken();
+
+    expect(token).toBeUndefined();
   });
 });
 
@@ -80,7 +93,7 @@ describe(clearNewsletterUnsubscribeToken, () => {
   it('deletes the cookie on the path it was set on', async () => {
     await clearNewsletterUnsubscribeToken();
 
-    expect(deleteMock).toHaveBeenCalledWith({
+    expect(cookieStore.delete).toHaveBeenCalledWith({
       name: NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
       path: routes.newsletterUnsubscribeSubmit(),
     });

@@ -1,112 +1,157 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-
 import {
   collectMissingLocales,
   getMissingLocales,
   getMissingTranslations,
-} from './missing-locales';
+} from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
+
+faker.seed(4102);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const item = (language: string, value: unknown) => ({
-  _key: language,
-  _type: 'internationalizedArrayStringValue',
-  language,
-  value,
+const LOCALIZED_STRING_VALUE_TYPE = 'internationalizedArrayStringValue';
+const CASE_TITLE = '$behaviour';
+const BLANK_TEXT = '  ';
+const MOCK_TEXT = faker.lorem.word();
+const MOCK_TRANSLATED_TEXT = faker.lorem.word();
+const MOCK_PLAIN_TITLE = faker.lorem.words(2);
+const MOCK_BLOCK = { _type: 'block', children: [] };
+
+const mockLocalizedItem = (language: string, value: unknown) => ({
+  ...mockLocalizedValue(language, value),
+  _type: LOCALIZED_STRING_VALUE_TYPE,
 });
 
 describe(getMissingLocales, () => {
-  it('lists every live language without a value', () => {
-    expect(getMissingLocales([item(EN, 'Hello')], [EN, NL, FR])).toEqual([
-      NL,
-      FR,
-    ]);
-  });
-
-  it('treats a blank value as missing', () => {
-    expect(
-      getMissingLocales([item(EN, 'Hello'), item(NL, '  ')], [EN, NL]),
-    ).toEqual([NL]);
-  });
-
-  it('treats empty formatted text as missing', () => {
-    const block = { _type: 'block', children: [] };
-
-    expect(
-      getMissingLocales([item(EN, [block]), item(NL, [])], [EN, NL]),
-    ).toEqual([NL]);
-  });
-
-  it('reports every live language for an empty field', () => {
-    expect(getMissingLocales(undefined, [EN, NL])).toEqual([EN, NL]);
-  });
-
-  it('ignores languages that are not live', () => {
-    expect(
-      getMissingLocales([item(EN, 'Hello'), item(FR, 'Bonjour')], [EN]),
-    ).toEqual([]);
+  it.each([
+    {
+      behaviour: 'lists every live language without a value',
+      value: [mockLocalizedItem(EN, MOCK_TEXT)],
+      liveLocales: [EN, NL, FR],
+      expected: [NL, FR],
+    },
+    {
+      behaviour: 'treats a blank value as missing',
+      value: [
+        mockLocalizedItem(EN, MOCK_TEXT),
+        mockLocalizedItem(NL, BLANK_TEXT),
+      ],
+      liveLocales: [EN, NL],
+      expected: [NL],
+    },
+    {
+      behaviour: 'treats empty formatted text as missing',
+      value: [mockLocalizedItem(EN, [MOCK_BLOCK]), mockLocalizedItem(NL, [])],
+      liveLocales: [EN, NL],
+      expected: [NL],
+    },
+    {
+      behaviour: 'reports every live language for an empty field',
+      value: undefined,
+      liveLocales: [EN, NL],
+      expected: [EN, NL],
+    },
+    {
+      behaviour: 'ignores languages that are not live',
+      value: [
+        mockLocalizedItem(EN, MOCK_TEXT),
+        mockLocalizedItem(FR, MOCK_TRANSLATED_TEXT),
+      ],
+      liveLocales: [EN],
+      expected: [],
+    },
+  ])(CASE_TITLE, ({ value, liveLocales, expected }) => {
+    expect(getMissingLocales(value, liveLocales)).toEqual(expected);
   });
 });
 
 describe(getMissingTranslations, () => {
-  it('lists the languages a partly translated field is missing', () => {
-    expect(getMissingTranslations([item(EN, 'Hello')], [EN, NL, FR])).toEqual([
-      NL,
-      FR,
-    ]);
-  });
-
-  it('reports nothing for a field left empty in every language', () => {
-    expect(getMissingTranslations(undefined, [EN, NL])).toEqual([]);
-  });
-
-  it('reports nothing for a field whose every language is blank', () => {
-    expect(
-      getMissingTranslations([item(EN, ''), item(NL, '  ')], [EN, NL]),
-    ).toEqual([]);
-  });
-
-  it('lists the default language when only a translation is filled', () => {
-    expect(getMissingTranslations([item(NL, 'Hallo')], [EN, NL])).toEqual([EN]);
+  it.each([
+    {
+      behaviour: 'lists the languages a partly translated field is missing',
+      value: [mockLocalizedItem(EN, MOCK_TEXT)],
+      liveLocales: [EN, NL, FR],
+      expected: [NL, FR],
+    },
+    {
+      behaviour: 'reports nothing for a field left empty in every language',
+      value: undefined,
+      liveLocales: [EN, NL],
+      expected: [],
+    },
+    {
+      behaviour: 'reports nothing for a field whose every language is blank',
+      value: [mockLocalizedItem(EN, ''), mockLocalizedItem(NL, BLANK_TEXT)],
+      liveLocales: [EN, NL],
+      expected: [],
+    },
+    {
+      behaviour: 'lists the default language when only a translation is filled',
+      value: [mockLocalizedItem(NL, MOCK_TRANSLATED_TEXT)],
+      liveLocales: [EN, NL],
+      expected: [EN],
+    },
+  ])(CASE_TITLE, ({ value, liveLocales, expected }) => {
+    expect(getMissingTranslations(value, liveLocales)).toEqual(expected);
   });
 });
 
 describe(collectMissingLocales, () => {
-  it('collects missing languages across nested localized fields, in live order', () => {
-    const document = {
-      _type: 'module_cta',
-      heading: [item(EN, 'Hi'), item(NL, 'Hoi')],
-      buttons: [
-        { _type: 'button', label: [item(EN, 'Go'), item(FR, 'Aller')] },
-      ],
-    };
-
-    expect(collectMissingLocales(document, [EN, NL, FR], EN)).toEqual([NL, FR]);
-  });
-
-  it('reports nothing for a document without localized fields', () => {
-    expect(
-      collectMissingLocales({ _type: 'page', title: 'About' }, [EN, NL], EN),
-    ).toEqual([]);
-  });
-
-  it('ignores a localized field left empty in every language', () => {
-    const document = {
-      _type: 'module_heroStatement',
-      heading: [item(EN, 'Hi'), item(NL, 'Hoi')],
-      supportingText: [item(EN, ''), item(NL, '')],
-    };
-
-    expect(collectMissingLocales(document, [EN, NL], EN)).toEqual([]);
-  });
-
-  it('never lists the default language', () => {
-    const document = {
-      _type: 'module_cta',
-      heading: [item(EN, 'Hi')],
-      label: [item(NL, 'Hoi')],
-    };
-
-    expect(collectMissingLocales(document, [EN, NL], EN)).toEqual([NL]);
+  it.each([
+    {
+      behaviour:
+        'collects missing languages across nested fields, in live order',
+      document: {
+        _type: 'module_cta',
+        heading: [
+          mockLocalizedItem(EN, MOCK_TEXT),
+          mockLocalizedItem(NL, MOCK_TRANSLATED_TEXT),
+        ],
+        buttons: [
+          {
+            _type: 'button',
+            label: [
+              mockLocalizedItem(EN, MOCK_TEXT),
+              mockLocalizedItem(FR, MOCK_TRANSLATED_TEXT),
+            ],
+          },
+        ],
+      },
+      liveLocales: [EN, NL, FR],
+      expected: [NL, FR],
+    },
+    {
+      behaviour: 'reports nothing for a document without localized fields',
+      document: { _type: 'page', title: MOCK_PLAIN_TITLE },
+      liveLocales: [EN, NL],
+      expected: [],
+    },
+    {
+      behaviour: 'ignores a localized field left empty in every language',
+      document: {
+        _type: 'module_heroStatement',
+        heading: [
+          mockLocalizedItem(EN, MOCK_TEXT),
+          mockLocalizedItem(NL, MOCK_TRANSLATED_TEXT),
+        ],
+        supportingText: [mockLocalizedItem(EN, ''), mockLocalizedItem(NL, '')],
+      },
+      liveLocales: [EN, NL],
+      expected: [],
+    },
+    {
+      behaviour: 'never lists the default language',
+      document: {
+        _type: 'module_cta',
+        heading: [mockLocalizedItem(EN, MOCK_TEXT)],
+        label: [mockLocalizedItem(NL, MOCK_TRANSLATED_TEXT)],
+      },
+      liveLocales: [EN, NL],
+      expected: [NL],
+    },
+  ])(CASE_TITLE, ({ document, liveLocales, expected }) => {
+    expect(collectMissingLocales(document, liveLocales, EN)).toEqual(expected);
   });
 });

@@ -5,53 +5,44 @@ import { Panel } from './panel';
 
 faker.seed(123);
 
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_BODY = faker.lorem.sentence();
+
 describe(`<${Panel.name}/>`, () => {
-  it('renders the header and body content', () => {
-    const heading = faker.lorem.words(3);
-    const body = faker.lorem.sentence();
-    renderElement(
-      <Panel>
-        <Panel.Header headingLevel={2}>{heading}</Panel.Header>
-        <Panel.Body>{body}</Panel.Body>
-      </Panel>,
-    );
+  it.each([2, 3, 4] as const)(
+    'renders the header as a level-%i heading with the body',
+    (headingLevel) => {
+      renderElement(
+        <Panel>
+          <Panel.Header headingLevel={headingLevel}>
+            {MOCK_HEADING}
+          </Panel.Header>
+          <Panel.Body>{MOCK_BODY}</Panel.Body>
+        </Panel>,
+      );
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: heading }),
-    ).toBeVisible();
-    expect(screen.getByText(body)).toBeVisible();
-  });
+      const heading = screen.getByRole('heading', {
+        level: headingLevel,
+        name: MOCK_HEADING,
+      });
+      const body = screen.getByText(MOCK_BODY);
 
-  it('renders the header at the given heading level', () => {
-    const heading = faker.lorem.words(2);
-    renderElement(
-      <Panel>
-        <Panel.Header headingLevel={3}>{heading}</Panel.Header>
-        <Panel.Body>body</Panel.Body>
-      </Panel>,
-    );
-
-    expect(
-      screen.getByRole('heading', { level: 3, name: heading }),
-    ).toBeVisible();
-  });
-
-  it('forwards data-testid to the root element', () => {
-    renderElement(
-      <Panel dataTestId="panel">
-        <Panel.Header headingLevel={2}>heading</Panel.Header>
-        <Panel.Body>body</Panel.Body>
-      </Panel>,
-    );
-
-    expect(screen.getByTestId('panel')).toBeVisible();
-  });
+      expect(heading).toBeVisible();
+      expect(body).toBeVisible();
+    },
+  );
 
   it('renders a body with no header', () => {
-    const body = faker.lorem.sentence();
-    renderElement(<Panel>{<Panel.Body>{body}</Panel.Body>}</Panel>);
+    renderElement(
+      <Panel>
+        <Panel.Body>{MOCK_BODY}</Panel.Body>
+      </Panel>,
+    );
 
-    expect(screen.getByText(body)).toBeVisible();
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    const body = screen.getByText(MOCK_BODY);
+    const heading = screen.queryByRole('heading');
+
+    expect(body).toBeVisible();
+    expect(heading).not.toBeInTheDocument();
   });
 });

@@ -6,12 +6,56 @@ import {
   mockRedirect,
 } from '@blog/studio/testing/mock-documents';
 import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import type { SanityClient, SanityDocument } from 'sanity';
+import { mockUniqueSlugs } from '@blog/studio/testing/mock-unique-slugs';
+import { faker } from '@faker-js/faker';
+import { getDraftId, type SanityClient, type SanityDocument } from 'sanity';
 
 const { EN, NL } = LOCALE_ISO_CODES;
+const COMMIT = 'commit';
 
-const FAQ_DRAFT_ID = 'drafts.faq';
-const QUESTIONS_PATH = '/questions';
+faker.seed(6017);
+
+const {
+  FAQ: MOCK_FAQ_SLUG,
+  HELP: MOCK_HELP_SLUG,
+  QUESTIONS: MOCK_QUESTIONS_SLUG,
+  MODULES: MOCK_MODULES_SLUG,
+  CATALOG: MOCK_CATALOG_SLUG,
+  PRICING: MOCK_PRICING_SLUG,
+} = mockUniqueSlugs([
+  'FAQ',
+  'HELP',
+  'QUESTIONS',
+  'MODULES',
+  'CATALOG',
+  'PRICING',
+]);
+const MOCK_FAQ_ID = faker.string.uuid();
+const MOCK_HELP_ID = faker.string.uuid();
+const MOCK_MODULES_ID = faker.string.uuid();
+const MOCK_PRICING_ID = faker.string.uuid();
+const MOCK_FAQ_DRAFT_ID = getDraftId(MOCK_FAQ_ID);
+const MOCK_REDIRECT_ID = faker.string.uuid();
+const MOCK_OLD_PATH_REDIRECT_ID = faker.string.uuid();
+const MOCK_OTHER_LANGUAGE_REDIRECT_ID = faker.string.uuid();
+
+const MOCK_FAQ_PATH = `/${MOCK_FAQ_SLUG}`;
+const MOCK_HELP_FAQ_PATH = `/${MOCK_HELP_SLUG}/${MOCK_FAQ_SLUG}`;
+const MOCK_QUESTIONS_PATH = `/${MOCK_QUESTIONS_SLUG}`;
+
+const mockAutomaticRedirect = (
+  source: string,
+  destination: string,
+  isPrefix = false,
+) => ({
+  _type: REDIRECT_TYPE,
+  language: EN,
+  source,
+  destination,
+  isPrefix,
+  status: REDIRECT_STATUS.PERMANENT,
+  isAutomatic: true,
+});
 
 const createClient = (dataset: unknown[]) => {
   const operations: unknown[] = [];
@@ -32,7 +76,7 @@ const createClient = (dataset: unknown[]) => {
       return transaction;
     },
     commit: async () => {
-      operations.push('commit');
+      operations.push(COMMIT);
     },
   };
   const client = {
@@ -49,11 +93,19 @@ describe(applyLandingRedirects, () => {
   let faqDraft: SanityDocument;
 
   beforeEach(() => {
-    faq = mockLandingPage({ _id: 'faq', slug: 'faq', language: EN });
-    help = mockLandingPage({ _id: 'help', slug: 'help', language: EN });
+    faq = mockLandingPage({
+      _id: MOCK_FAQ_ID,
+      slug: MOCK_FAQ_SLUG,
+      language: EN,
+    });
+    help = mockLandingPage({
+      _id: MOCK_HELP_ID,
+      slug: MOCK_HELP_SLUG,
+      language: EN,
+    });
     faqDraft = mockLandingPage({
-      _id: FAQ_DRAFT_ID,
-      slug: 'faq',
+      _id: MOCK_FAQ_DRAFT_ID,
+      slug: MOCK_FAQ_SLUG,
       language: EN,
     });
   });
@@ -66,25 +118,19 @@ describe(applyLandingRedirects, () => {
       ({ client, operations } = createClient([faq]));
     });
 
-    it('redirects a renamed page from its old path with an automatic, permanent redirect', async () => {
+    it('redirects a renamed page from its old path, automatic and permanent', async () => {
       await applyLandingRedirects(
         client,
-        mockLandingPage({ _id: FAQ_DRAFT_ID, slug: 'questions', language: EN }),
+        mockLandingPage({
+          _id: MOCK_FAQ_DRAFT_ID,
+          slug: MOCK_QUESTIONS_SLUG,
+          language: EN,
+        }),
       );
 
       expect(operations).toEqual([
-        {
-          create: {
-            _type: REDIRECT_TYPE,
-            language: EN,
-            source: '/faq',
-            destination: QUESTIONS_PATH,
-            isPrefix: false,
-            status: REDIRECT_STATUS.PERMANENT,
-            isAutomatic: true,
-          },
-        },
-        'commit',
+        { create: mockAutomaticRedirect(MOCK_FAQ_PATH, MOCK_QUESTIONS_PATH) },
+        COMMIT,
       ]);
     });
 
@@ -101,75 +147,84 @@ describe(applyLandingRedirects, () => {
     await applyLandingRedirects(
       client,
       mockLandingPage({
-        _id: FAQ_DRAFT_ID,
-        slug: 'faq',
-        parent: 'help',
+        _id: MOCK_FAQ_DRAFT_ID,
+        slug: MOCK_FAQ_SLUG,
+        parent: MOCK_HELP_ID,
         language: EN,
       }),
     );
 
-    expect(operations).toContainEqual({
-      create: expect.objectContaining({
-        source: '/faq',
-        destination: '/help/faq',
-        isPrefix: false,
-      }),
-    });
+    expect(operations).toEqual([
+      { create: mockAutomaticRedirect(MOCK_FAQ_PATH, MOCK_HELP_FAQ_PATH) },
+      COMMIT,
+    ]);
   });
 
   it('makes a prefix redirect when a renamed parent has sub-pages', async () => {
     const { client, operations } = createClient([
-      mockLandingPage({ _id: 'modules', slug: 'modules', language: EN }),
       mockLandingPage({
-        _id: 'faq',
-        slug: 'faq',
-        parent: 'modules',
+        _id: MOCK_MODULES_ID,
+        slug: MOCK_MODULES_SLUG,
         language: EN,
       }),
       mockLandingPage({
-        _id: 'pricing',
-        slug: 'pricing',
-        parent: 'modules',
+        _id: MOCK_FAQ_ID,
+        slug: MOCK_FAQ_SLUG,
+        parent: MOCK_MODULES_ID,
+        language: EN,
+      }),
+      mockLandingPage({
+        _id: MOCK_PRICING_ID,
+        slug: MOCK_PRICING_SLUG,
+        parent: MOCK_MODULES_ID,
         language: EN,
       }),
     ]);
 
     await applyLandingRedirects(
       client,
-      mockLandingPage({ _id: 'drafts.modules', slug: 'catalog', language: EN }),
+      mockLandingPage({
+        _id: getDraftId(MOCK_MODULES_ID),
+        slug: MOCK_CATALOG_SLUG,
+        language: EN,
+      }),
     );
 
     expect(operations).toEqual([
       {
-        create: expect.objectContaining({
-          source: '/modules',
-          destination: '/catalog',
-          isPrefix: true,
-        }),
+        create: mockAutomaticRedirect(
+          `/${MOCK_MODULES_SLUG}`,
+          `/${MOCK_CATALOG_SLUG}`,
+          true,
+        ),
       },
-      'commit',
+      COMMIT,
     ]);
   });
 
   it('collapses and clears existing redirects in the same language only', async () => {
     const { client, operations } = createClient([
       mockLandingPage({
-        _id: 'faq',
-        slug: 'faq',
-        parent: 'help',
+        _id: MOCK_FAQ_ID,
+        slug: MOCK_FAQ_SLUG,
+        parent: MOCK_HELP_ID,
         language: EN,
       }),
       help,
       mockRedirect({
-        _id: 'r1',
-        source: QUESTIONS_PATH,
-        destination: '/help/faq',
+        _id: MOCK_REDIRECT_ID,
+        source: MOCK_QUESTIONS_PATH,
+        destination: MOCK_HELP_FAQ_PATH,
       }),
-      mockRedirect({ _id: 'r2', source: '/faq', destination: '/help/faq' }),
       mockRedirect({
-        _id: 'r3',
-        source: QUESTIONS_PATH,
-        destination: '/help/faq',
+        _id: MOCK_OLD_PATH_REDIRECT_ID,
+        source: MOCK_FAQ_PATH,
+        destination: MOCK_HELP_FAQ_PATH,
+      }),
+      mockRedirect({
+        _id: MOCK_OTHER_LANGUAGE_REDIRECT_ID,
+        source: MOCK_QUESTIONS_PATH,
+        destination: MOCK_HELP_FAQ_PATH,
         language: NL,
       }),
     ]);
@@ -177,15 +232,10 @@ describe(applyLandingRedirects, () => {
     await applyLandingRedirects(client, faqDraft);
 
     expect(operations).toEqual([
-      { delete: 'r2' },
-      { patch: 'r1', set: { destination: '/faq' } },
-      {
-        create: expect.objectContaining({
-          source: '/help/faq',
-          destination: '/faq',
-        }),
-      },
-      'commit',
+      { delete: MOCK_OLD_PATH_REDIRECT_ID },
+      { patch: MOCK_REDIRECT_ID, set: { destination: MOCK_FAQ_PATH } },
+      { create: mockAutomaticRedirect(MOCK_HELP_FAQ_PATH, MOCK_FAQ_PATH) },
+      COMMIT,
     ]);
   });
 

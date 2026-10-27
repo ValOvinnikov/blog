@@ -1,9 +1,15 @@
 /**
  * @vitest-environment jsdom
  */
+import { faker } from '@faker-js/faker';
 import { renderHook, waitFor } from '@web/testing/custom-render';
 
 import { useOAuthErrorParam } from './use-oauth-error-param';
+
+faker.seed(6012);
+
+const MOCK_ERROR_CODE = faker.string.alpha(12);
+const MOCK_OTHER_PARAM = `${faker.string.alpha(5)}=${faker.string.alpha(5)}`;
 
 const setLocation = (search: string) => {
   window.history.replaceState(null, '', `/${search}`);
@@ -23,17 +29,17 @@ describe(useOAuthErrorParam, () => {
   });
 
   it('returns the error param value on mount', async () => {
-    setLocation('?error=OAuthAccountNotLinked');
+    setLocation(`?error=${MOCK_ERROR_CODE}`);
 
     const { result } = renderHook(() => useOAuthErrorParam());
 
     await waitFor(() => {
-      expect(result.current).toBe('OAuthAccountNotLinked');
+      expect(result.current).toBe(MOCK_ERROR_CODE);
     });
   });
 
   it('strips the error param from the URL bar once read', async () => {
-    setLocation('?error=Configuration');
+    setLocation(`?error=${MOCK_ERROR_CODE}`);
 
     renderHook(() => useOAuthErrorParam());
 
@@ -43,12 +49,12 @@ describe(useOAuthErrorParam, () => {
   });
 
   it('preserves other query params when stripping the error param', async () => {
-    setLocation('?foo=bar&error=Configuration');
+    setLocation(`?${MOCK_OTHER_PARAM}&error=${MOCK_ERROR_CODE}`);
 
     renderHook(() => useOAuthErrorParam());
 
     await waitFor(() => {
-      expect(window.location.search).toBe('?foo=bar');
+      expect(window.location.search).toBe(`?${MOCK_OTHER_PARAM}`);
     });
   });
 });

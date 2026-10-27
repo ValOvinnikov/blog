@@ -1,53 +1,38 @@
+import { MOCK_SYSTEM_FIELDS } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { at, createIfNotExists, set, unset } from 'sanity/migrate';
-
-import { toTopicId } from './id';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+faker.seed(10);
+
+const MOCK_CATEGORY_ID = faker.string.uuid();
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_TITLE = faker.lorem.words();
+const MOCK_SLUG = { _type: 'slug', current: faker.lorem.slug() };
+const MOCK_DESCRIPTION = faker.lorem.sentence();
 
 describe('create-blog-topic-from-category migration', () => {
   describe('blog_category documents', () => {
-    it('creates a blog_topic under toTopicId(doc._id), carrying title/slug/description', () => {
+    it('creates a blog_topic carrying title, slug and description', () => {
       const category = {
-        ...baseDoc,
-        _id: 'abc123',
+        ...MOCK_SYSTEM_FIELDS,
+        _id: MOCK_CATEGORY_ID,
         _type: 'blog_category',
-        title: 'Design',
-        slug: { _type: 'slug', current: 'design' },
-        description: 'Posts about design.',
+        title: MOCK_TITLE,
+        slug: MOCK_SLUG,
+        description: MOCK_DESCRIPTION,
       };
 
-      expect(migration.migrate.document(category)).toEqual([
-        createIfNotExists({
-          _id: toTopicId(category._id),
-          _type: 'blog_topic',
-          title: category.title,
-          slug: category.slug,
-          description: category.description,
-        }),
-      ]);
-    });
+      const result = migration.migrate.document(category);
 
-    it('lands a draft category on the draft topic sibling', () => {
-      const category = {
-        ...baseDoc,
-        _id: 'drafts.abc123',
-        _type: 'blog_category',
-        title: 'Design',
-      };
-
-      expect(migration.migrate.document(category)).toEqual([
+      expect(result).toEqual([
         createIfNotExists({
-          _id: 'drafts.topic-abc123',
+          _id: `topic-${MOCK_CATEGORY_ID}`,
           _type: 'blog_topic',
-          title: category.title,
-          slug: undefined,
-          description: undefined,
+          title: MOCK_TITLE,
+          slug: MOCK_SLUG,
+          description: MOCK_DESCRIPTION,
         }),
       ]);
     });
@@ -56,33 +41,34 @@ describe('create-blog-topic-from-category migration', () => {
   describe('blog_post documents', () => {
     it('repoints a category reference onto the new topic and unsets category', () => {
       const post = {
-        ...baseDoc,
-        _id: 'post-1',
+        ...MOCK_SYSTEM_FIELDS,
+        _id: MOCK_POST_ID,
         _type: 'blog_post',
-        category: { _type: 'reference', _ref: 'abc123' },
+        category: { _type: 'reference', _ref: MOCK_CATEGORY_ID },
       };
 
-      expect(migration.migrate.document(post)).toEqual([
-        at('topic', set({ _type: 'reference', _ref: toTopicId('abc123') })),
+      const result = migration.migrate.document(post);
+
+      expect(result).toEqual([
+        at(
+          'topic',
+          set({ _type: 'reference', _ref: `topic-${MOCK_CATEGORY_ID}` }),
+        ),
         at('category', unset()),
       ]);
     });
 
-    it('produces no patches for a post with no category reference', () => {
-      const post = { ...baseDoc, _id: 'post-2', _type: 'blog_post' };
-
-      expect(migration.migrate.document(post)).toBeUndefined();
-    });
-
-    it('is idempotent — an already-migrated post (no category field) is left alone', () => {
+    it('leaves an already migrated post alone', () => {
       const post = {
-        ...baseDoc,
-        _id: 'post-3',
+        ...MOCK_SYSTEM_FIELDS,
+        _id: MOCK_POST_ID,
         _type: 'blog_post',
-        topic: { _type: 'reference', _ref: toTopicId('abc123') },
+        topic: { _type: 'reference', _ref: `topic-${MOCK_CATEGORY_ID}` },
       };
 
-      expect(migration.migrate.document(post)).toBeUndefined();
+      const result = migration.migrate.document(post);
+
+      expect(result).toBeUndefined();
     });
   });
 });

@@ -2,10 +2,12 @@ import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 
 import { reportOwnerElevationOutcome } from './report-owner-elevation-outcome';
+
+faker.seed(5807);
 
 const { updateProvisioningStepMock } = vi.hoisted(() => ({
   updateProvisioningStepMock: vi.fn(),
@@ -15,63 +17,48 @@ vi.mock('@blog/db/queries/tenants', () => ({
   updateProvisioningStep: updateProvisioningStepMock,
 }));
 
+const MOCK_TENANT_ID = faker.string.uuid();
+
 beforeEach(() => {
   updateProvisioningStepMock.mockResolvedValue({ ok: true, data: undefined });
 });
 
 describe(reportOwnerElevationOutcome, () => {
   it.each(Object.values(ELEVATE_TENANT_OWNER_OUTCOME))(
-    'reports DONE with detail %s for the OWNER_ELEVATION step',
-    async (outcome: TElevateTenantOwnerOutcome) => {
-      await reportOwnerElevationOutcome('tenant-1', outcome);
+    'reports the OWNER_ELEVATION step DONE with detail %s',
+    async (outcome) => {
+      await reportOwnerElevationOutcome(MOCK_TENANT_ID, outcome);
 
-      expect(updateProvisioningStepMock).toHaveBeenCalledTimes(1);
-      expect(updateProvisioningStepMock).toHaveBeenCalledWith({
-        tenantId: 'tenant-1',
-        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        detail: outcome,
-      });
+      expect(updateProvisioningStepMock.mock.calls).toEqual([
+        [
+          {
+            tenantId: MOCK_TENANT_ID,
+            step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+            detail: outcome,
+          },
+        ],
+      ]);
     },
   );
 
-  it('never reports RUNNING or FAILED, regardless of outcome', async () => {
-    for (const outcome of Object.values(ELEVATE_TENANT_OWNER_OUTCOME)) {
-      await reportOwnerElevationOutcome('tenant-1', outcome);
-    }
-
-    const statuses = updateProvisioningStepMock.mock.calls.map(
-      (call) => (call[0] as { status: string }).status,
+  it('records the notified outcome in the same write when a notification fired', async () => {
+    await reportOwnerElevationOutcome(
+      MOCK_TENANT_ID,
+      ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+      ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
     );
-    expect(statuses).toEqual(
-      Object.values(ELEVATE_TENANT_OWNER_OUTCOME).map(
-        () => TENANT_PROVISIONING_STEP_STATUS.DONE,
-      ),
-    );
-  });
 
-  it('records detail and notifiedOwnerElevationOutcome in the same write when a notification fired', async () => {
-    await reportOwnerElevationOutcome('tenant-1', 'STALLED', 'STALLED');
-
-    expect(updateProvisioningStepMock).toHaveBeenCalledTimes(1);
-    expect(updateProvisioningStepMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
-      step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      detail: 'STALLED',
-      notifiedOwnerElevationOutcome: 'STALLED',
-    });
-  });
-
-  it('omits notifiedOwnerElevationOutcome entirely when nothing was notified', async () => {
-    await reportOwnerElevationOutcome('tenant-1', 'STALLED');
-
-    expect(updateProvisioningStepMock).toHaveBeenCalledTimes(1);
-    expect(updateProvisioningStepMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
-      step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      detail: 'STALLED',
-    });
+    expect(updateProvisioningStepMock.mock.calls).toEqual([
+      [
+        {
+          tenantId: MOCK_TENANT_ID,
+          step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+          notifiedOwnerElevationOutcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+        },
+      ],
+    ]);
   });
 });

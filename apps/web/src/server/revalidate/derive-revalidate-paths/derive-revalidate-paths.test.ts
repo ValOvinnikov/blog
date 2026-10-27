@@ -85,6 +85,7 @@ const MOCK_POST = mockPostCard();
 const MOCK_TAG = mockTag();
 const MOCK_TOPIC = mockTopic();
 const MOCK_UNRELATED_TAG_SLUG = faker.lorem.slug();
+const MOCK_UNSUPPORTED_TYPE = 'person';
 const MOCK_LOCALE_ROOT = `/${MOCK_TENANT_ID}/${LOCALE_ISO_CODES.EN}`;
 
 const MOCK_POST_INPUT = {
@@ -97,7 +98,7 @@ const MOCK_POST_INPUT = {
 describe(isDerivableRevalidateType, () => {
   it.each([
     [POST_TYPE, true],
-    ['person', false],
+    [MOCK_UNSUPPORTED_TYPE, false],
     ['page_home', false],
   ])('reports %s as derivable: %s', (type, expected) => {
     expect(isDerivableRevalidateType(type)).toBe(expected);
@@ -112,7 +113,6 @@ describe(deriveRevalidatePaths, () => {
     getTagPaginationParamsMock.mockReset();
     getTopicParamsMock.mockReset();
     getTopicPaginationParamsMock.mockReset();
-    loggerErrorMock.mockReset();
     getPostsByIdsMock.mockResolvedValue(okResult([MOCK_POST]));
     getIndexPageParamsMock.mockResolvedValue(okResult([]));
     getTagParamsMock.mockResolvedValue(okResult([]));
@@ -124,7 +124,7 @@ describe(deriveRevalidatePaths, () => {
   it('falls back with unsupported_type for an unknown type, skipping the service', async () => {
     const result = await deriveRevalidatePaths({
       ...MOCK_POST_INPUT,
-      type: 'person',
+      type: MOCK_UNSUPPORTED_TYPE,
     });
 
     expect(result).toEqual(errorResult(UNSUPPORTED_TYPE_REASON));

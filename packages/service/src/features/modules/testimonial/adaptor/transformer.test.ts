@@ -18,15 +18,39 @@ import {
   mockRawPortableTextMarkDef,
   mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toTestimonialModule } from './transformer';
 
-const NAME = 'Alex Chen';
-const LINK_LABEL = 'Their site';
-const CASE_STUDY_TEXT = 'the case study';
-const CASE_STUDY_URL = 'https://example.com/case-study';
-const MARK_KEY = 'mark-1';
-const IMAGE_ALT = 'A portrait';
+faker.seed(6014);
+
+const MOCK_NAME = faker.person.fullName();
+const MOCK_LINK_LABEL = faker.lorem.words(2);
+const MOCK_MARKED_TEXT = faker.lorem.words(2);
+const MOCK_CASE_STUDY_URL = faker.internet.url();
+const MOCK_MARK_KEY = faker.string.uuid();
+const MOCK_BLOCK_KEY = faker.string.uuid();
+const MOCK_SPAN_KEY = faker.string.uuid();
+const MOCK_IMAGE_ALT = faker.lorem.words(2);
+const MOCK_FIRST_QUOTE_ID = faker.string.uuid();
+const MOCK_SECOND_QUOTE_ID = faker.string.uuid();
+
+function mockQuoteBlock(
+  spans: { text: string; marks: string[] }[],
+  markDefs: ReturnType<typeof mockRawPortableTextMarkDef>[],
+) {
+  return {
+    _type: 'block' as const,
+    _key: MOCK_BLOCK_KEY,
+    style: 'normal' as const,
+    children: spans.map((span) => ({
+      _type: 'span' as const,
+      _key: MOCK_SPAN_KEY,
+      ...span,
+    })),
+    markDefs,
+  };
+}
 
 describe(toTestimonialModule, () => {
   it('maps brandVariant and displayMode straight through', () => {
@@ -68,16 +92,16 @@ describe(toTestimonialModule, () => {
   it('keeps the quotes in authored order', () => {
     const raw = mockRawTestimonialModule({
       testimonials: [
-        mockRawTestimonialItem({ _id: 'quote-b' }),
-        mockRawTestimonialItem({ _id: 'quote-a' }),
+        mockRawTestimonialItem({ _id: MOCK_SECOND_QUOTE_ID }),
+        mockRawTestimonialItem({ _id: MOCK_FIRST_QUOTE_ID }),
       ],
     });
 
     const module = toTestimonialModule(raw);
 
     expect(module.testimonials.map((item) => item.id)).toEqual([
-      'quote-b',
-      'quote-a',
+      MOCK_SECOND_QUOTE_ID,
+      MOCK_FIRST_QUOTE_ID,
     ]);
   });
 
@@ -85,7 +109,7 @@ describe(toTestimonialModule, () => {
     const raw = mockRawTestimonialModule({
       testimonials: [
         mockRawTestimonialItem({
-          name: NAME,
+          name: MOCK_NAME,
           role: null,
           image: null,
           link: null,
@@ -95,7 +119,7 @@ describe(toTestimonialModule, () => {
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.name).toBe(NAME);
+    expect(module.testimonials[0]?.name).toBe(MOCK_NAME);
     expect(module.testimonials[0]?.image).toBeUndefined();
     expect(module.testimonials[0]?.link).toBeUndefined();
   });
@@ -103,13 +127,13 @@ describe(toTestimonialModule, () => {
   it('resolves an image when present', () => {
     const raw = mockRawTestimonialModule({
       testimonials: [
-        mockRawTestimonialItem({ image: mockRawSanityImage(IMAGE_ALT) }),
+        mockRawTestimonialItem({ image: mockRawSanityImage(MOCK_IMAGE_ALT) }),
       ],
     });
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.image?.alt).toBe(IMAGE_ALT);
+    expect(module.testimonials[0]?.image?.alt).toBe(MOCK_IMAGE_ALT);
   });
 
   it('resolves a link to an ILink', () => {
@@ -117,7 +141,7 @@ describe(toTestimonialModule, () => {
       testimonials: [
         mockRawTestimonialItem({
           link: mockRawExternalLinkDocument({
-            label: LINK_LABEL,
+            label: MOCK_LINK_LABEL,
             url: MOCK_EXTERNAL_URL,
           }),
         }),
@@ -127,7 +151,7 @@ describe(toTestimonialModule, () => {
     const module = toTestimonialModule(raw);
 
     expect(module.testimonials[0]?.link).toEqual(
-      mockLinkView({ label: LINK_LABEL, href: MOCK_EXTERNAL_URL }),
+      mockLinkView({ label: MOCK_LINK_LABEL, href: MOCK_EXTERNAL_URL }),
     );
   });
 
@@ -135,7 +159,7 @@ describe(toTestimonialModule, () => {
     const raw = mockRawTestimonialModule({
       testimonials: [
         mockRawTestimonialItem({
-          name: NAME,
+          name: MOCK_NAME,
           link: mockRawInternalLinkDocument({ internalReference: null }),
         }),
       ],
@@ -143,7 +167,7 @@ describe(toTestimonialModule, () => {
 
     const module = toTestimonialModule(raw);
 
-    expect(module.testimonials[0]?.name).toBe(NAME);
+    expect(module.testimonials[0]?.name).toBe(MOCK_NAME);
     expect(module.testimonials[0]?.link).toBeUndefined();
   });
 
@@ -152,26 +176,20 @@ describe(toTestimonialModule, () => {
       testimonials: [
         mockRawTestimonialItem({
           quote: [
-            {
-              _type: 'block',
-              _key: 'block-1',
-              style: 'normal',
-              children: [
-                { _type: 'span', _key: 'span-1', text: 'See ', marks: [] },
-                {
-                  _type: 'span',
-                  _key: 'span-2',
-                  text: CASE_STUDY_TEXT,
-                  marks: [MARK_KEY],
-                },
+            mockQuoteBlock(
+              [
+                { text: faker.lorem.word(), marks: [] },
+                { text: MOCK_MARKED_TEXT, marks: [MOCK_MARK_KEY] },
               ],
-              markDefs: [
+              [
                 mockRawPortableTextMarkDef({
-                  _key: MARK_KEY,
-                  link: mockRawExternalLinkDocument({ url: CASE_STUDY_URL }),
+                  _key: MOCK_MARK_KEY,
+                  link: mockRawExternalLinkDocument({
+                    url: MOCK_CASE_STUDY_URL,
+                  }),
                 }),
               ],
-            },
+            ),
           ],
         }),
       ],
@@ -181,9 +199,9 @@ describe(toTestimonialModule, () => {
 
     expect(module.testimonials[0]?.quote[0]?.markDefs).toEqual([
       {
-        _key: MARK_KEY,
+        _key: MOCK_MARK_KEY,
         _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-        link: { href: CASE_STUDY_URL },
+        link: { href: MOCK_CASE_STUDY_URL },
       },
     ]);
   });
@@ -193,22 +211,10 @@ describe(toTestimonialModule, () => {
       testimonials: [
         mockRawTestimonialItem({
           quote: [
-            {
-              _type: 'block',
-              _key: 'block-1',
-              style: 'normal',
-              children: [
-                {
-                  _type: 'span',
-                  _key: 'span-1',
-                  text: CASE_STUDY_TEXT,
-                  marks: [MARK_KEY],
-                },
-              ],
-              markDefs: [
-                mockRawPortableTextMarkDef({ _key: MARK_KEY, link: null }),
-              ],
-            },
+            mockQuoteBlock(
+              [{ text: MOCK_MARKED_TEXT, marks: [MOCK_MARK_KEY] }],
+              [mockRawPortableTextMarkDef({ _key: MOCK_MARK_KEY, link: null })],
+            ),
           ],
         }),
       ],
@@ -217,7 +223,7 @@ describe(toTestimonialModule, () => {
     const module = toTestimonialModule(raw);
 
     expect(module.testimonials[0]?.quote[0]?.children?.[0]?.text).toBe(
-      CASE_STUDY_TEXT,
+      MOCK_MARKED_TEXT,
     );
     expect(
       module.testimonials[0]?.quote[0]?.markDefs?.[0]?.link,

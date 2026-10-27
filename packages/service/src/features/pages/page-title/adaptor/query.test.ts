@@ -49,7 +49,7 @@ describe('pageTitleQuery', () => {
     expect(await run(MOCK_POST_ID, EN)).toBeNull();
   });
 
-  it('parses no match as null rather than throwing', () => {
+  it('parses no matching page as null', () => {
     expect(pageTitleQuery.parse(null)).toBeNull();
   });
 

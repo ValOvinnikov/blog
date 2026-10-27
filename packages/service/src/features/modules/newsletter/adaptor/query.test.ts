@@ -4,7 +4,6 @@ import {
   NEWSLETTER_VARIANT,
 } from '@blog/config/constants';
 import {
-  MOCK_NEWSLETTER_HEADING,
   MOCK_NEWSLETTER_MODULE_ID,
   mockRawNewsletterModule,
 } from '@blog/service/testing/modules/fixtures';
@@ -14,54 +13,60 @@ import {
   mockLocalizedStrings,
   mockLocalizedValues,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { newsletterModuleQuery } from './query';
+
+faker.seed(11);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const TEXT_VALUE_TYPE = 'internationalizedArrayTextValue';
-const DUTCH_HEADING = 'Blijf op de hoogte';
-const ENGLISH_SUPPORTING_TEXT = 'New posts weekly.';
-const DUTCH_SUPPORTING_TEXT = 'Wekelijks nieuwe berichten.';
-const ENGLISH_CONTENT = 'Practical notes on building for the web.';
-const DUTCH_CONTENT = 'Praktische notities over bouwen voor het web.';
 const TRUST_CUE_TYPE = 'newsletterTrustCue';
-const UNTRANSLATED_TRUST_CUE = 'Unsubscribe anytime';
+const MOCK_ENGLISH_HEADING = faker.lorem.words(3);
+const MOCK_DUTCH_HEADING = faker.lorem.words(3);
+const MOCK_ENGLISH_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_DUTCH_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_ENGLISH_CONTENT = faker.lorem.sentence();
+const MOCK_DUTCH_CONTENT = faker.lorem.sentence();
+const MOCK_ENGLISH_TRUST_CUE = faker.lorem.words(2);
+const MOCK_DUTCH_TRUST_CUE = faker.lorem.words(2);
+const MOCK_UNTRANSLATED_TRUST_CUE = faker.lorem.words(2);
 
-const newsletterDocument = {
+const MOCK_NEWSLETTER_DOCUMENT = {
   _id: MOCK_NEWSLETTER_MODULE_ID,
   _type: 'module_newsletter',
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockLocalizedHeadingBlock(
     {
-      [EN]: MOCK_NEWSLETTER_HEADING,
-      [NL]: DUTCH_HEADING,
+      [EN]: MOCK_ENGLISH_HEADING,
+      [NL]: MOCK_DUTCH_HEADING,
     },
     {
       supportingText: mockLocalizedValues(TEXT_VALUE_TYPE, {
-        [EN]: ENGLISH_SUPPORTING_TEXT,
-        [NL]: DUTCH_SUPPORTING_TEXT,
+        [EN]: MOCK_ENGLISH_SUPPORTING_TEXT,
+        [NL]: MOCK_DUTCH_SUPPORTING_TEXT,
       }),
     },
   ),
   content: mockLocalizedValues(TEXT_VALUE_TYPE, {
-    [EN]: ENGLISH_CONTENT,
-    [NL]: DUTCH_CONTENT,
+    [EN]: MOCK_ENGLISH_CONTENT,
+    [NL]: MOCK_DUTCH_CONTENT,
   }),
   trustCues: [
     {
-      _key: 'cue-1',
+      _key: faker.string.uuid(),
       _type: TRUST_CUE_TYPE,
       text: mockLocalizedStrings({
-        [EN]: 'No spam',
-        [NL]: 'Geen spam',
+        [EN]: MOCK_ENGLISH_TRUST_CUE,
+        [NL]: MOCK_DUTCH_TRUST_CUE,
       }),
     },
     {
-      _key: 'cue-2',
+      _key: faker.string.uuid(),
       _type: TRUST_CUE_TYPE,
       text: mockLocalizedStrings({
-        [EN]: UNTRANSLATED_TRUST_CUE,
+        [EN]: MOCK_UNTRANSLATED_TRUST_CUE,
       }),
     },
   ],
@@ -81,9 +86,11 @@ async function runNewsletter(
   return newsletterModuleQuery.parse(raw);
 }
 
+type TNewsletter = Awaited<ReturnType<typeof runNewsletter>>;
+
 describe('newsletterModuleQuery', () => {
   it('defaults variant to FULL for a document authored without it', async () => {
-    const { variant } = await runNewsletter(newsletterDocument, EN);
+    const { variant } = await runNewsletter(MOCK_NEWSLETTER_DOCUMENT, EN);
 
     expect(variant).toBe(NEWSLETTER_VARIANT.FULL);
   });
@@ -100,67 +107,67 @@ describe('newsletterModuleQuery', () => {
   });
 
   describe('in Dutch', () => {
-    let newsletter: Awaited<ReturnType<typeof runNewsletter>>;
+    let newsletter: TNewsletter;
 
     beforeEach(async () => {
-      newsletter = await runNewsletter(newsletterDocument, NL);
+      newsletter = await runNewsletter(MOCK_NEWSLETTER_DOCUMENT, NL);
     });
 
     it('picks the heading and supporting text in the visitor language', () => {
       expect(newsletter.headingBlock).toEqual({
-        heading: DUTCH_HEADING,
-        supportingText: DUTCH_SUPPORTING_TEXT,
+        heading: MOCK_DUTCH_HEADING,
+        supportingText: MOCK_DUTCH_SUPPORTING_TEXT,
       });
     });
 
     it('picks the content in the visitor language', () => {
-      expect(newsletter.content).toBe(DUTCH_CONTENT);
+      expect(newsletter.content).toBe(MOCK_DUTCH_CONTENT);
     });
 
     it('picks each trust cue in the visitor language, else the default', () => {
       expect(newsletter.trustCues).toEqual([
-        { text: 'Geen spam' },
-        { text: UNTRANSLATED_TRUST_CUE },
+        { text: MOCK_DUTCH_TRUST_CUE },
+        { text: MOCK_UNTRANSLATED_TRUST_CUE },
       ]);
     });
   });
 
   describe('in French', () => {
-    let newsletter: Awaited<ReturnType<typeof runNewsletter>>;
+    let newsletter: TNewsletter;
 
     beforeEach(async () => {
-      newsletter = await runNewsletter(newsletterDocument, FR);
+      newsletter = await runNewsletter(MOCK_NEWSLETTER_DOCUMENT, FR);
     });
 
-    it('falls back to the default language for the heading and supporting text', () => {
+    it('falls back to the default language for heading and supporting text', () => {
       expect(newsletter.headingBlock).toEqual({
-        heading: MOCK_NEWSLETTER_HEADING,
-        supportingText: ENGLISH_SUPPORTING_TEXT,
+        heading: MOCK_ENGLISH_HEADING,
+        supportingText: MOCK_ENGLISH_SUPPORTING_TEXT,
       });
     });
 
     it('falls back to the default language for the content', () => {
-      expect(newsletter.content).toBe(ENGLISH_CONTENT);
+      expect(newsletter.content).toBe(MOCK_ENGLISH_CONTENT);
     });
   });
 
   it.each([
-    [{ content: undefined }, { content: null }],
-    [{ trustCues: undefined }, { trustCues: null }],
-  ])('maps a missing %o to %o', async (missing, expected) => {
+    ['content', { content: undefined }, (n: TNewsletter) => n.content],
+    ['trustCues', { trustCues: undefined }, (n: TNewsletter) => n.trustCues],
+  ])('maps a missing %s to null', async (_, missing, read) => {
     const newsletter = await runNewsletter(
-      { ...newsletterDocument, ...missing },
+      { ...MOCK_NEWSLETTER_DOCUMENT, ...missing },
       NL,
     );
 
-    expect(newsletter).toMatchObject(expected);
+    expect(read(newsletter)).toBeNull();
   });
 
   it('fails when the heading is missing in both languages', async () => {
     await expect(
       runNewsletter(
         {
-          ...newsletterDocument,
+          ...MOCK_NEWSLETTER_DOCUMENT,
           headingBlock: { _type: 'moduleHeadingBlock' },
         },
         NL,

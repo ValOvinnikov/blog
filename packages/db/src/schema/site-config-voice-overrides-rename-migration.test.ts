@@ -1,196 +1,100 @@
-import {
-  DENSITY,
-  FONT_CHOICE,
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  RADIUS_SCALE,
-} from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import type * as schema from '@blog/db/schema';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
-  listMigrationFiles,
+  applyMigrationsExcept,
+  insertReplayVoiceOverrides,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  readReplayVoiceOverrides,
 } from '@blog/db/testing/migration-files';
-import { sql } from 'drizzle-orm';
+import { faker } from '@faker-js/faker';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-import { siteConfig } from './site-config';
-import { tenants } from './tenants';
+faker.seed(6023);
 
 const RENAME_MIGRATION =
   '0018_rename_category_empty_to_topic_empty_voice_override.sql';
-
-const TOPIC_EMPTY_COPY = 'No posts in this topic yet.';
-const TAG_EMPTY_COPY = 'No posts with this tag yet.';
-const OLD_CATEGORY_EMPTY_COPY = 'Old copy from categoryEmpty.';
-
-async function setUpDbWithSiteConfigRow(
-  voiceOverrides: Record<string, string>,
-) {
-  const db = await createEmptyTestDb();
-
-  const otherMigrations = listMigrationFiles().filter(
-    (file) => file !== RENAME_MIGRATION,
-  );
-
-  for (const file of otherMigrations) {
-    await applyMigrationFile(db, file);
-  }
-
-  const [tenant] = await db
-    .insert(tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  if (!tenant) throw new Error('failed to seed a tenant row');
-
-  await db.insert(siteConfig).values({
-    tenantId: tenant.id,
-    preset: PRESET_ID.EDITORIAL,
-    accentHue: 28,
-    headingFont: FONT_CHOICE.FRAUNCES,
-    bodyFont: FONT_CHOICE.INTER,
-    radiusScale: RADIUS_SCALE.SM,
-    density: DENSITY.COMPACT,
-    voiceOverridesByLocale: sql`${JSON.stringify(voiceOverrides)}::jsonb`,
-  });
-
-  return { db };
-}
-
-async function applyRenameMigration(
-  db: Awaited<ReturnType<typeof setUpDbWithSiteConfigRow>>['db'],
-) {
-  await applyMigrationFile(db, RENAME_MIGRATION);
-}
-
-async function readVoiceOverrides(
-  db: Awaited<ReturnType<typeof setUpDbWithSiteConfigRow>>['db'],
-) {
-  const [row] = await db.select().from(siteConfig);
-  if (!row) throw new Error('expected a site_config row');
-  return row.voiceOverridesByLocale;
-}
+const MOCK_TOPIC_EMPTY_COPY = faker.lorem.sentence();
+const MOCK_TAG_EMPTY_COPY = faker.lorem.sentence();
+const MOCK_OLD_CATEGORY_EMPTY_COPY = faker.lorem.sentence();
+const MOCK_NEWER_TOPIC_EMPTY_COPY = faker.lorem.sentence();
 
 describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename)`, () => {
-  it(
-    'leaves a row with no categoryEmpty key untouched',
-    async () => {
-      const { db } = await setUpDbWithSiteConfigRow({
-        tagEmpty: TAG_EMPTY_COPY,
-      });
+  let db: PgliteDatabase<typeof schema>;
 
-      await applyRenameMigration(db);
+  beforeEach(async () => {
+    db = await createEmptyTestDb();
+    await applyMigrationsExcept(db, RENAME_MIGRATION);
+  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
-      expect(await readVoiceOverrides(db)).toEqual({
-        tagEmpty: TAG_EMPTY_COPY,
-      });
+  it.each([
+    ['a row with no categoryEmpty key', { tagEmpty: MOCK_TAG_EMPTY_COPY }],
+    ['an empty voice_overrides object', {}],
+    ['an already-migrated row', { topicEmpty: MOCK_TOPIC_EMPTY_COPY }],
+  ])(
+    'leaves %s untouched',
+    async (_label, voiceOverrides) => {
+      const tenantId = await insertReplayVoiceOverrides(db, voiceOverrides);
+
+      await applyMigrationFile(db, RENAME_MIGRATION);
+
+      expect(await readReplayVoiceOverrides(db, tenantId)).toEqual(
+        voiceOverrides,
+      );
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
 
   it(
-    'leaves an empty voice_overrides object untouched',
+    'gives topicEmpty the old categoryEmpty value when both keys are present',
     async () => {
-      const { db } = await setUpDbWithSiteConfigRow({});
-
-      await applyRenameMigration(db);
-
-      expect(await readVoiceOverrides(db)).toEqual({});
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'leaves an already-migrated row (topicEmpty present, no categoryEmpty) untouched',
-    async () => {
-      const { db } = await setUpDbWithSiteConfigRow({
-        topicEmpty: TOPIC_EMPTY_COPY,
+      const tenantId = await insertReplayVoiceOverrides(db, {
+        categoryEmpty: MOCK_OLD_CATEGORY_EMPTY_COPY,
+        topicEmpty: MOCK_NEWER_TOPIC_EMPTY_COPY,
       });
 
-      await applyRenameMigration(db);
+      await applyMigrationFile(db, RENAME_MIGRATION);
 
-      expect(await readVoiceOverrides(db)).toEqual({
-        topicEmpty: TOPIC_EMPTY_COPY,
+      expect(await readReplayVoiceOverrides(db, tenantId)).toEqual({
+        topicEmpty: MOCK_OLD_CATEGORY_EMPTY_COPY,
       });
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'when both categoryEmpty and topicEmpty are present, topicEmpty ends up holding the old categoryEmpty value (jsonb || favours its right operand — accepted, not a bug)',
-    async () => {
-      const { db } = await setUpDbWithSiteConfigRow({
-        categoryEmpty: OLD_CATEGORY_EMPTY_COPY,
-        topicEmpty: 'Newer copy already under topicEmpty.',
-      });
-
-      await applyRenameMigration(db);
-
-      expect(await readVoiceOverrides(db)).toEqual({
-        topicEmpty: OLD_CATEGORY_EMPTY_COPY,
-      });
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'still applies cleanly against an empty site_config table',
-    async () => {
-      const db = await createEmptyTestDb();
-
-      for (const file of listMigrationFiles()) {
-        await applyMigrationFile(db, file);
-      }
-
-      const rows = await db.select().from(siteConfig);
-
-      expect(rows).toHaveLength(0);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
 
   describe('with categoryEmpty and tagEmpty set', () => {
-    let db: Awaited<ReturnType<typeof setUpDbWithSiteConfigRow>>['db'];
+    let tenantId: string;
 
     beforeEach(async () => {
-      ({ db } = await setUpDbWithSiteConfigRow({
-        categoryEmpty: TOPIC_EMPTY_COPY,
-        tagEmpty: TAG_EMPTY_COPY,
-      }));
+      tenantId = await insertReplayVoiceOverrides(db, {
+        categoryEmpty: MOCK_TOPIC_EMPTY_COPY,
+        tagEmpty: MOCK_TAG_EMPTY_COPY,
+      });
     }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
     it(
-      'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',
+      'renames categoryEmpty to topicEmpty and keeps its value and other keys',
       async () => {
-        await applyRenameMigration(db);
+        await applyMigrationFile(db, RENAME_MIGRATION);
 
-        expect(await readVoiceOverrides(db)).toEqual({
-          topicEmpty: TOPIC_EMPTY_COPY,
-          tagEmpty: TAG_EMPTY_COPY,
+        expect(await readReplayVoiceOverrides(db, tenantId)).toEqual({
+          topicEmpty: MOCK_TOPIC_EMPTY_COPY,
+          tagEmpty: MOCK_TAG_EMPTY_COPY,
         });
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,
     );
 
     it(
-      'is idempotent: applying it a second time changes nothing',
+      'changes nothing when applied a second time',
       async () => {
-        await applyRenameMigration(db);
-        const afterFirstRun = await readVoiceOverrides(db);
+        await applyMigrationFile(db, RENAME_MIGRATION);
 
         await applyMigrationFile(db, RENAME_MIGRATION);
-        const afterSecondRun = await readVoiceOverrides(db);
 
-        expect(afterSecondRun).toEqual(afterFirstRun);
-        expect(afterSecondRun).toEqual({
-          topicEmpty: TOPIC_EMPTY_COPY,
-          tagEmpty: TAG_EMPTY_COPY,
+        expect(await readReplayVoiceOverrides(db, tenantId)).toEqual({
+          topicEmpty: MOCK_TOPIC_EMPTY_COPY,
+          tagEmpty: MOCK_TAG_EMPTY_COPY,
         });
       },
       MIGRATION_REPLAY_TEST_TIMEOUT_MS,

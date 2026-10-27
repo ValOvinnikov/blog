@@ -1,25 +1,23 @@
+import { portableTextToPlainText } from '@blog/config';
+import { faker } from '@faker-js/faker';
+
 import { wrapVoiceText } from './wrap-voice-text';
 
+faker.seed(6012);
+
+const MOCK_TEXT = faker.lorem.sentence();
+
 describe(wrapVoiceText, () => {
-  it('wraps the given text as a single normal-style paragraph block', () => {
-    const result = wrapVoiceText('Nothing here yet.');
+  it.each([
+    { case: 'the given text', text: MOCK_TEXT },
+    { case: 'an empty string', text: '' },
+  ])(
+    'wraps $case as a single block that reads back as the same text',
+    ({ text }) => {
+      const result = wrapVoiceText(text);
 
-    expect(result).toEqual([
-      {
-        _type: 'block',
-        _key: 'catalog-block',
-        style: 'normal',
-        children: [
-          { _type: 'span', _key: 'catalog-span', text: 'Nothing here yet.' },
-        ],
-      },
-    ]);
-  });
-
-  it('wraps an empty string the same way, rather than an empty array', () => {
-    const result = wrapVoiceText('');
-
-    expect(result).toHaveLength(1);
-    expect(result[0]?.children[0]?.text).toBe('');
-  });
+      expect(result).toHaveLength(1);
+      expect(portableTextToPlainText(result)).toBe(text);
+    },
+  );
 });

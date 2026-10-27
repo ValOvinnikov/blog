@@ -25,8 +25,10 @@ describe(isLoneLastInRow, () => {
     },
   );
 
-  it('is false for a single item or a single column', () => {
-    expect(isLoneLastInRow(1, 2)).toBe(false);
-    expect(isLoneLastInRow(5, 1)).toBe(false);
+  it.each([
+    [1, 2],
+    [5, 1],
+  ])('is false for %i items in %i columns', (count, perRow) => {
+    expect(isLoneLastInRow(count, perRow)).toBe(false);
   });
 });

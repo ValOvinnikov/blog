@@ -1,9 +1,10 @@
-import { FINDING_STATUS } from '@blog/config/constants';
+import { FINDING_STATUS, HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
 import {
+  MOCK_GITHUB_CONTRAST_RUNS_PATH,
   MOCK_GITHUB_MAIN_BRANCH_PATH,
   MOCK_GITHUB_RELEASE_TAGS_PATH,
+  mockChangedFile,
 } from '@platform/testing/github/fixtures';
 import {
   mockGitHubCompareResponse,
@@ -11,8 +12,11 @@ import {
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { MOCK_RELEASE_LAST_TAG } from '@platform/testing/releases/fixtures';
 
 import { isContrastDue } from './is-contrast-due';
+
+faker.seed(5998);
 
 vi.mock('@platform/utils/env/env');
 
@@ -33,18 +37,15 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const renderingFile = {
-  filename: 'apps/web/src/app/page.tsx',
-  status: 'modified',
-};
+const MOCK_RENDERING_FILE = mockChangedFile('apps/web/src/app/page.tsx');
+const MOCK_DOCS_FILE = mockChangedFile('docs/ROADMAP.md');
 
 describe(isContrastDue, () => {
   const github = useGitHubFetch();
-  const lastTag = 'v1.4.0';
   let headSha: string;
 
-  const compare = (files: unknown[]) => {
-    github.respond(`/compare/${lastTag}...${headSha}`, (path) =>
+  const compare = (files: ReturnType<typeof mockChangedFile>[]) => {
+    github.respond(`/compare/${MOCK_RELEASE_LAST_TAG}...${headSha}`, (path) =>
       mockGitHubCompareResponse(path, [], files),
     );
   };
@@ -52,12 +53,12 @@ describe(isContrastDue, () => {
   beforeEach(() => {
     headSha = faker.git.commitSha();
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-      mockGitHubResponse([{ ref: `refs/tags/${lastTag}` }]),
+      mockGitHubResponse([{ ref: `refs/tags/${MOCK_RELEASE_LAST_TAG}` }]),
     );
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: headSha } }),
     );
-    github.respond(`/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`, () =>
+    github.respond(MOCK_GITHUB_CONTRAST_RUNS_PATH, () =>
       mockGitHubResponse({ workflow_runs: [] }),
     );
     getContrastFindingMock.mockReset().mockResolvedValue(undefined);
@@ -66,7 +67,7 @@ describe(isContrastDue, () => {
 
   describe('when a rendering path changed', () => {
     beforeEach(() => {
-      compare([renderingFile]);
+      compare([MOCK_RENDERING_FILE]);
     });
 
     it('is due when no run has passed', async () => {
@@ -82,21 +83,23 @@ describe(isContrastDue, () => {
     });
 
     it('is not due when the findings read fails', async () => {
-      getContrastFindingMock.mockRejectedValue(new Error('db down'));
+      getContrastFindingMock.mockRejectedValue(
+        new Error(faker.lorem.sentence()),
+      );
 
       expect(await isContrastDue()).toBe(false);
     });
   });
 
   it('is not due when nothing rendering changed', async () => {
-    compare([{ filename: 'docs/ROADMAP.md', status: 'modified' }]);
+    compare([MOCK_DOCS_FILE]);
 
     expect(await isContrastDue()).toBe(false);
   });
 
   it('is not due when GitHub cannot be reached', async () => {
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
-      mockGitHubResponse({}, 500),
+      mockGitHubResponse({}, HTTP_STATUS.INTERNAL_SERVER_ERROR),
     );
 
     expect(await isContrastDue()).toBe(false);

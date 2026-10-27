@@ -1,47 +1,47 @@
 import {
-  mockRawAuthor,
-  mockRawPersonCard,
-} from '@blog/service/testing/pages/fixtures';
+  MOCK_AUTHOR_ID,
+  MOCK_AUTHOR_NAME,
+} from '@blog/service/testing/entities/fixtures';
+import { mockRawPersonCard } from '@blog/service/testing/pages/fixtures';
 import {
   mockRawExternalLinkDocument,
   mockRawSanityImage,
+  mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toPersonCard } from './to-person-card';
 
-const HEADSHOT_ALT = 'Jamie headshot';
-const PROFILE_URL = 'https://example.com/team/jamie';
+faker.seed(6102);
 
-const { _id, name } = mockRawAuthor();
+const MOCK_HEADSHOT_ALT = faker.lorem.words(2);
+const MOCK_PROFILE_URL = faker.internet.url();
 
 describe(toPersonCard, () => {
-  it('maps everything absent', () => {
-    const result = toPersonCard(mockRawPersonCard());
+  it('maps a card with no image or profile page', () => {
+    const card = toPersonCard(mockRawPersonCard());
 
-    expect(result).toEqual({
-      id: _id,
-      name,
+    expect(card).toEqual({
+      id: MOCK_AUTHOR_ID,
+      name: MOCK_AUTHOR_NAME,
       image: undefined,
       profileUrl: undefined,
     });
   });
 
-  it('maps everything populated', () => {
-    const {
-      id,
-      name: cardName,
-      image,
-      profileUrl,
-    } = toPersonCard(
+  it('maps the image and resolves the profile page to its url', () => {
+    const card = toPersonCard(
       mockRawPersonCard({
-        image: mockRawSanityImage(HEADSHOT_ALT),
-        profilePage: mockRawExternalLinkDocument({ url: PROFILE_URL }),
+        image: mockRawSanityImage(MOCK_HEADSHOT_ALT),
+        profilePage: mockRawExternalLinkDocument({ url: MOCK_PROFILE_URL }),
       }),
     );
 
-    expect(id).toBe(_id);
-    expect(cardName).toBe(name);
-    expect(image?.alt).toBe(HEADSHOT_ALT);
-    expect(profileUrl).toBe(PROFILE_URL);
+    expect(card).toEqual({
+      id: MOCK_AUTHOR_ID,
+      name: MOCK_AUTHOR_NAME,
+      image: mockSanityImageView(MOCK_HEADSHOT_ALT),
+      profileUrl: MOCK_PROFILE_URL,
+    });
   });
 });

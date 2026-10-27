@@ -1,7 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { recoverWedgedTenants } from './recover-wedged-provisioning';
+
+faker.seed(5808);
 
 const { listTenantsWedgedInProvisioningMock, setTenantProvisioningStatusMock } =
   vi.hoisted(() => ({
@@ -14,60 +17,35 @@ vi.mock('@blog/db/queries/tenants', () => ({
   setTenantProvisioningStatus: setTenantProvisioningStatusMock,
 }));
 
-function tenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    slug: 'acme',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj-acme',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    sanityWriteTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: 'ACTIVE',
-    provisioningStatus: 'PROVISIONING',
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    createdAt: new Date('2026-01-01T00:00:00.000Z'),
-    updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-    ...overrides,
-  } as TTenant;
+function mockWedgedTenant() {
+  return mockTenant({
+    provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+  });
 }
 
 beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => {});
 });
 
+afterEach(() => {
+  vi.mocked(console.warn).mockRestore();
+});
+
 describe(recoverWedgedTenants, () => {
   it('settles every wedged tenant to FAILED when not a dry run', async () => {
-    listTenantsWedgedInProvisioningMock.mockResolvedValue([
-      tenant({ id: 'tenant-1' }),
-      tenant({ id: 'tenant-2' }),
-    ]);
+    const tenants = [mockWedgedTenant(), mockWedgedTenant()];
+    listTenantsWedgedInProvisioningMock.mockResolvedValue(tenants);
 
     const count = await recoverWedgedTenants(false);
 
-    expect(count).toBe(2);
-    expect(setTenantProvisioningStatusMock).toHaveBeenCalledTimes(2);
-    expect(setTenantProvisioningStatusMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'FAILED',
-    );
-    expect(setTenantProvisioningStatusMock).toHaveBeenCalledWith(
-      'tenant-2',
-      'FAILED',
+    expect(count).toBe(tenants.length);
+    expect(setTenantProvisioningStatusMock.mock.calls).toEqual(
+      tenants.map(({ id }) => [id, TENANT_PROVISIONING_STATUS.FAILED]),
     );
   });
 
   it('reports wedged tenants without writing anything on a dry run', async () => {
-    listTenantsWedgedInProvisioningMock.mockResolvedValue([
-      tenant({ id: 'tenant-1' }),
-    ]);
+    listTenantsWedgedInProvisioningMock.mockResolvedValue([mockWedgedTenant()]);
 
     const count = await recoverWedgedTenants(true);
 

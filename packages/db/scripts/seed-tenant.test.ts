@@ -1,8 +1,14 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { ERROR_CODE } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
+import {
+  MOCK_TENANT_VALUES,
+  mockTenant,
+} from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { resolveOrCreateTenant } from './seed-tenant';
+
+faker.seed(5809);
 
 const { getTenantByDomainMock } = vi.hoisted(() => ({
   getTenantByDomainMock: vi.fn(),
@@ -28,84 +34,63 @@ vi.mock('@blog/db/queries/tenants', () => ({
   setTenantSanityToken: vi.fn(),
 }));
 
-const args = {
-  name: 'Acme',
-  primaryDomain: 'acme.example.com',
-  sanityProjectId: 'proj-acme',
-  sanityDataset: 'production',
-  locale: LOCALE_ISO_CODES.EN,
-  ownerEmail: 'owner@example.com',
-  plan: TENANT_PLAN.FREE,
+const MOCK_OTHER_SANITY_PROJECT_ID = faker.string.alphanumeric(8);
+const MOCK_ARCHIVED_AT = faker.date.recent();
+
+const MOCK_SEED_ARGS = {
+  ...MOCK_TENANT_VALUES,
+  ownerEmail: faker.internet.email(),
   status: TENANT_STATUS.ACTIVE,
-  extraDomains: [] as string[],
+  extraDomains: [],
 };
 
-function tenant(overrides: Partial<TTenant> = {}): TTenant {
-  return {
-    id: 'tenant-1',
-    name: 'Acme',
-    primaryDomain: 'acme.example.com',
-    sanityProjectId: 'proj-acme',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    sanityWriteTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: TENANT_PLAN.FREE,
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: null,
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    createdAt: new Date('2026-01-01T00:00:00.000Z'),
-    updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+function mockSeededTenant(overrides: Parameters<typeof mockTenant>[0] = {}) {
+  return mockTenant({
+    primaryDomain: MOCK_SEED_ARGS.primaryDomain,
+    sanityProjectId: MOCK_SEED_ARGS.sanityProjectId,
     ...overrides,
-  } as TTenant;
+  });
 }
-
-beforeEach(() => {
-  getTenantByDomainMock.mockReset().mockResolvedValue(undefined);
-  createTenantMock.mockReset();
-  getTenantIdBySanityProjectIdMock.mockReset().mockResolvedValue(undefined);
-  getTenantByIdMock.mockReset();
-});
 
 describe(resolveOrCreateTenant, () => {
   it('creates a new tenant when no row exists for the domain', async () => {
-    createTenantMock.mockResolvedValue({ ok: true, data: tenant() });
+    const created = mockSeededTenant();
+    createTenantMock.mockResolvedValue({ ok: true, data: created });
 
-    const result = await resolveOrCreateTenant(args);
+    const result = await resolveOrCreateTenant(MOCK_SEED_ARGS);
 
     expect(createTenantMock).toHaveBeenCalledTimes(1);
-    expect(result.id).toBe('tenant-1');
+    expect(result.id).toBe(created.id);
   });
 
-  it('is idempotent: reuses the existing tenant for the domain instead of creating a duplicate', async () => {
-    getTenantByDomainMock.mockResolvedValue(tenant());
+  it('reuses the existing tenant for the domain instead of creating a duplicate', async () => {
+    const existing = mockSeededTenant();
+    getTenantByDomainMock.mockResolvedValue(existing);
 
-    const result = await resolveOrCreateTenant(args);
+    const result = await resolveOrCreateTenant(MOCK_SEED_ARGS);
 
     expect(createTenantMock).not.toHaveBeenCalled();
-    expect(result.id).toBe('tenant-1');
+    expect(result.id).toBe(existing.id);
   });
 
   it('reuses the domain-matched tenant when it has no Sanity project id yet', async () => {
-    getTenantByDomainMock.mockResolvedValue(tenant({ sanityProjectId: null }));
+    const existing = mockSeededTenant({ sanityProjectId: null });
+    getTenantByDomainMock.mockResolvedValue(existing);
 
-    const result = await resolveOrCreateTenant(args);
+    const result = await resolveOrCreateTenant(MOCK_SEED_ARGS);
 
     expect(createTenantMock).not.toHaveBeenCalled();
-    expect(result.id).toBe('tenant-1');
+    expect(result.id).toBe(existing.id);
   });
 
   it('rejects when the domain-matched tenant holds a different Sanity project id', async () => {
-    getTenantByDomainMock.mockResolvedValue(
-      tenant({ sanityProjectId: 'proj-other' }),
-    );
+    const existing = mockSeededTenant({
+      sanityProjectId: MOCK_OTHER_SANITY_PROJECT_ID,
+    });
+    getTenantByDomainMock.mockResolvedValue(existing);
 
-    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
-      'seed-tenant: domain "acme.example.com" belongs to tenant "tenant-1", which holds Sanity project "proj-other", not "proj-acme".',
+    await expect(resolveOrCreateTenant(MOCK_SEED_ARGS)).rejects.toThrow(
+      `seed-tenant: domain "${MOCK_SEED_ARGS.primaryDomain}" belongs to tenant "${existing.id}", which holds Sanity project "${MOCK_OTHER_SANITY_PROJECT_ID}", not "${MOCK_SEED_ARGS.sanityProjectId}".`,
     );
     expect(createTenantMock).not.toHaveBeenCalled();
     expect(getTenantIdBySanityProjectIdMock).not.toHaveBeenCalled();
@@ -114,45 +99,46 @@ describe(resolveOrCreateTenant, () => {
   it('throws when createTenant fails', async () => {
     createTenantMock.mockResolvedValue({
       ok: false,
-      error: 'DB_INVALID_DOMAIN',
+      error: ERROR_CODE.DB_INVALID_DOMAIN,
     });
 
-    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
-      'seed-tenant: createTenant failed (DB_INVALID_DOMAIN).',
+    await expect(resolveOrCreateTenant(MOCK_SEED_ARGS)).rejects.toThrow(
+      `seed-tenant: createTenant failed (${ERROR_CODE.DB_INVALID_DOMAIN}).`,
     );
   });
 
   it('resumes a tenant that was created but never got its domain row', async () => {
-    getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
-    getTenantByIdMock.mockResolvedValue(tenant());
+    const existing = mockSeededTenant();
+    getTenantIdBySanityProjectIdMock.mockResolvedValue(existing.id);
+    getTenantByIdMock.mockResolvedValue(existing);
 
-    const result = await resolveOrCreateTenant(args);
+    const result = await resolveOrCreateTenant(MOCK_SEED_ARGS);
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(existing.id, {
       includeArchived: true,
     });
     expect(createTenantMock).not.toHaveBeenCalled();
-    expect(result.id).toBe('tenant-1');
+    expect(result.id).toBe(existing.id);
   });
 
   it('rejects when the Sanity project id belongs to an archived tenant', async () => {
-    getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
-    getTenantByIdMock.mockResolvedValue(
-      tenant({ deprovisionedAt: new Date('2026-02-01T00:00:00.000Z') }),
-    );
+    const archived = mockSeededTenant({ deprovisionedAt: MOCK_ARCHIVED_AT });
+    getTenantIdBySanityProjectIdMock.mockResolvedValue(archived.id);
+    getTenantByIdMock.mockResolvedValue(archived);
 
-    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
-      'seed-tenant: Sanity project id "proj-acme" is already held by archived tenant "tenant-1".',
+    await expect(resolveOrCreateTenant(MOCK_SEED_ARGS)).rejects.toThrow(
+      `seed-tenant: Sanity project id "${MOCK_SEED_ARGS.sanityProjectId}" is already held by archived tenant "${archived.id}".`,
     );
     expect(createTenantMock).not.toHaveBeenCalled();
   });
 
-  it('rejects when the Sanity project id resolves to an id with no tenant row', async () => {
-    getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
+  it('rejects when the Sanity project id resolves to a missing tenant row', async () => {
+    const missingId = faker.string.uuid();
+    getTenantIdBySanityProjectIdMock.mockResolvedValue(missingId);
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    await expect(resolveOrCreateTenant(args)).rejects.toThrow(
-      'seed-tenant: Sanity project id "proj-acme" resolved to tenant id "tenant-1", but that tenant no longer exists.',
+    await expect(resolveOrCreateTenant(MOCK_SEED_ARGS)).rejects.toThrow(
+      `seed-tenant: Sanity project id "${MOCK_SEED_ARGS.sanityProjectId}" resolved to tenant id "${missingId}", but that tenant no longer exists.`,
     );
     expect(createTenantMock).not.toHaveBeenCalled();
   });

@@ -6,55 +6,65 @@ import {
   MOCK_DESIGN_NL_POST_ID,
   toIds,
 } from '@blog/service/testing/shared/translated-posts-dataset';
+import { faker } from '@faker-js/faker';
 
 import { relatedByTagsQuery } from './by-tags.query';
 
+faker.seed(13);
+
+const MOCK_PUBLISHED_AT = faker.date.past().toISOString();
+const MOCK_SCHEDULED_AT = faker.date.future().toISOString();
+const MOCK_TAG_A_ID = faker.string.uuid();
+const MOCK_TAG_B_ID = faker.string.uuid();
+const MOCK_OTHER_TAG_ID = faker.string.uuid();
+const MOCK_ANCHOR_ID = faker.string.uuid();
+const MOCK_SHARES_A_ID = faker.string.uuid();
+const MOCK_SHARES_B_ID = faker.string.uuid();
+const MOCK_SHARES_NONE_ID = faker.string.uuid();
+const MOCK_UNTAGGED_ID = faker.string.uuid();
+const MOCK_SCHEDULED_ID = faker.string.uuid();
+
+function mockPost(id: string, tagRefs: string[]) {
+  return {
+    _id: id,
+    _type: 'page_post',
+    publishedAt: MOCK_PUBLISHED_AT,
+    tags: tagRefs.map((ref) => ({ _key: `${id}-${ref}`, _ref: ref })),
+  };
+}
+
+const MOCK_DATASET = [
+  mockPost(MOCK_ANCHOR_ID, [MOCK_TAG_A_ID, MOCK_TAG_B_ID]),
+  mockPost(MOCK_SHARES_A_ID, [MOCK_TAG_A_ID, MOCK_OTHER_TAG_ID]),
+  mockPost(MOCK_SHARES_B_ID, [MOCK_TAG_B_ID]),
+  mockPost(MOCK_SHARES_NONE_ID, [MOCK_OTHER_TAG_ID]),
+  mockPost(MOCK_UNTAGGED_ID, []),
+  {
+    ...mockPost(MOCK_SCHEDULED_ID, [MOCK_TAG_A_ID]),
+    publishedAt: MOCK_SCHEDULED_AT,
+  },
+];
+
 describe('relatedByTagsQuery', () => {
-  describe('candidate selection', () => {
-    function post(id: string, tagRefs: string[]) {
-      return {
-        _id: id,
-        _type: 'page_post',
-        publishedAt: '2020-01-01T00:00:00Z',
-        tags: tagRefs.map((ref) => ({ _key: `${id}-${ref}`, _ref: ref })),
-      };
-    }
-    const dataset = [
-      post('anchor', ['tag-a', 'tag-b']),
-      post('shares-a', ['tag-a', 'tag-z']),
-      post('shares-b', ['tag-b']),
-      post('shares-none', ['tag-z']),
-      post('untagged', []),
-      { ...post('future', ['tag-a']), publishedAt: '2999-01-01T00:00:00Z' },
-    ];
+  it('returns posts sharing a tag, excluding the anchor and posts sharing none', async () => {
+    const raw = await evaluateGroqExpression(
+      relatedByTagsQuery.query,
+      MOCK_DATASET,
+      undefined,
+      { currentId: MOCK_ANCHOR_ID, tagIds: [MOCK_TAG_A_ID, MOCK_TAG_B_ID] },
+    );
 
-    it('returns posts sharing a tag, excluding the anchor and posts sharing none', async () => {
-      const raw = (await evaluateGroqExpression(
-        relatedByTagsQuery.query,
-        dataset,
-        undefined,
-        { currentId: 'anchor', tagIds: ['tag-a', 'tag-b'] },
-      )) as { _id: string }[];
-
-      expect(raw.map((candidate) => candidate._id).sort()).toEqual([
-        'shares-a',
-        'shares-b',
-      ]);
-    });
+    expect(toIds(raw).sort()).toEqual(
+      [MOCK_SHARES_A_ID, MOCK_SHARES_B_ID].sort(),
+    );
   });
-});
-
-describe('relatedByTagsQuery language scoping', () => {
-  const { NL } = LOCALE_ISO_CODES;
 
   it('picks tag candidates only in the request language', async () => {
-    expect(
-      toIds(
-        await evaluateRelatedPostsQuery(relatedByTagsQuery.query, {
-          tagIds: [MOCK_TAG_ID],
-          locale: NL,
-        }),
-      ),
-    ).toEqual([MOCK_DESIGN_NL_POST_ID]);
+    const raw = await evaluateRelatedPostsQuery(relatedByTagsQuery.query, {
+      tagIds: [MOCK_TAG_ID],
+      locale: LOCALE_ISO_CODES.NL,
+    });
+
+    expect(toIds(raw)).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 });

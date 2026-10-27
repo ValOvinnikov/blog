@@ -1,9 +1,18 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeHeadingBlock } from './localize-heading-block';
 
+faker.seed(5);
+
 const { EN } = LOCALE_ISO_CODES;
+
+const MOCK_HEADING = faker.lorem.words();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+
+const STRING_VALUE_TYPE = 'internationalizedArrayStringValue';
+const LOCALIZED_HEADING_BLOCK_TYPE = 'localizedHeadingBlock';
 
 const inEnglish = (type: string, value: unknown) => [
   { _key: EN, _type: type, language: EN, value },
@@ -14,36 +23,33 @@ describe(localizeHeadingBlock, () => {
     expect(
       localizeHeadingBlock({
         _type: 'headingBlock',
-        heading: 'Stay in the loop',
-        supportingText: 'New posts weekly.',
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
       }),
     ).toEqual([
       at(
         'headingBlock',
         set({
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish(
-            'internationalizedArrayStringValue',
-            'Stay in the loop',
-          ),
+          _type: LOCALIZED_HEADING_BLOCK_TYPE,
+          heading: inEnglish(STRING_VALUE_TYPE, MOCK_HEADING),
           supportingText: inEnglish(
             'internationalizedArrayTextValue',
-            'New posts weekly.',
+            MOCK_SUPPORTING_TEXT,
           ),
         }),
       ),
     ]);
   });
 
-  it('keeps a heading block without supporting text free of one', () => {
+  it('adds no supporting text to a heading block without one', () => {
     expect(
-      localizeHeadingBlock({ _type: 'headingBlock', heading: 'Subscribe' }),
+      localizeHeadingBlock({ _type: 'headingBlock', heading: MOCK_HEADING }),
     ).toEqual([
       at(
         'headingBlock',
         set({
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish('internationalizedArrayStringValue', 'Subscribe'),
+          _type: LOCALIZED_HEADING_BLOCK_TYPE,
+          heading: inEnglish(STRING_VALUE_TYPE, MOCK_HEADING),
         }),
       ),
     ]);
@@ -52,8 +58,8 @@ describe(localizeHeadingBlock, () => {
   it('leaves an already localized heading block alone', () => {
     expect(
       localizeHeadingBlock({
-        _type: 'localizedHeadingBlock',
-        heading: inEnglish('internationalizedArrayStringValue', 'Subscribe'),
+        _type: LOCALIZED_HEADING_BLOCK_TYPE,
+        heading: inEnglish(STRING_VALUE_TYPE, MOCK_HEADING),
       }),
     ).toEqual([]);
   });

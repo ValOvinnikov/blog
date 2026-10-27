@@ -1,26 +1,23 @@
 import { BRAND_VARIANT } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { backfillPostListRequiredFields } from './index';
 
+faker.seed(15);
+
+const BACKFILL_TITLE = 'Blog Archive';
+const MOCK_TITLE = faker.lorem.words();
+
 describe(backfillPostListRequiredFields, () => {
-  it('backfills both title and brandVariant when neither is set', () => {
-    const result = backfillPostListRequiredFields({});
+  it.each([
+    ['unset', {}],
+    ['null', { title: null, brandVariant: null }],
+  ])('backfills title and brandVariant when both are %s', (_label, doc) => {
+    const result = backfillPostListRequiredFields(doc);
 
     expect(result).toEqual([
-      at('title', set('Blog Archive')),
-      at('brandVariant', set(BRAND_VARIANT.PRIMARY)),
-    ]);
-  });
-
-  it('backfills both when they are explicitly null (the live postList-blog shape)', () => {
-    const result = backfillPostListRequiredFields({
-      title: null,
-      brandVariant: null,
-    });
-
-    expect(result).toEqual([
-      at('title', set('Blog Archive')),
+      at('title', set(BACKFILL_TITLE)),
       at('brandVariant', set(BRAND_VARIANT.PRIMARY)),
     ]);
   });
@@ -30,20 +27,18 @@ describe(backfillPostListRequiredFields, () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    expect(result).toEqual([at('title', set('Blog Archive'))]);
+    expect(result).toEqual([at('title', set(BACKFILL_TITLE))]);
   });
 
   it('backfills only brandVariant when title is already set', () => {
-    const result = backfillPostListRequiredFields({
-      title: 'Editor-chosen title',
-    });
+    const result = backfillPostListRequiredFields({ title: MOCK_TITLE });
 
     expect(result).toEqual([at('brandVariant', set(BRAND_VARIANT.PRIMARY))]);
   });
 
-  it('is idempotent — a document with both fields already set is left alone', () => {
+  it('leaves a document with both fields set alone', () => {
     const result = backfillPostListRequiredFields({
-      title: 'Editor-chosen title',
+      title: MOCK_TITLE,
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 

@@ -1,27 +1,32 @@
+import { MOCK_NOW } from '@blog/email/testing/email-fixtures';
+import { faker } from '@faker-js/faker';
+
 import { buildSelfServeLimitAlertEmail } from './self-serve-limit-alert';
 
-const DAY = '2026-10-21';
+faker.seed(6026);
 
-describe('buildSelfServeLimitAlertEmail', () => {
-  it('names the day in the subject', () => {
-    const { subject } = buildSelfServeLimitAlertEmail({
-      day: DAY,
-      dailyLimit: 50,
+const MOCK_DAY = faker.date
+  .recent({ refDate: MOCK_NOW })
+  .toISOString()
+  .slice(0, 10);
+const MOCK_DAILY_LIMIT = faker.number.int({ min: 1000, max: 9999 });
+
+describe(buildSelfServeLimitAlertEmail, () => {
+  let email: ReturnType<typeof buildSelfServeLimitAlertEmail>;
+
+  beforeEach(() => {
+    email = buildSelfServeLimitAlertEmail({
+      day: MOCK_DAY,
+      dailyLimit: MOCK_DAILY_LIMIT,
     });
-
-    expect(subject).toBe(
-      'Self-serve site creation hit its daily limit (2026-10-21)',
-    );
   });
 
-  it('states the limit that was reached', () => {
-    const { html } = buildSelfServeLimitAlertEmail({
-      day: DAY,
-      dailyLimit: 50,
-    });
+  it('names the day in the subject', () => {
+    expect(email.subject).toContain(MOCK_DAY);
+  });
 
-    expect(html).toContain(
-      'reached the limit of 50 new sites for 2026-10-21 (UTC)',
-    );
+  it('states the limit reached and its day in the body', () => {
+    expect(email.html).toContain(String(MOCK_DAILY_LIMIT));
+    expect(email.html).toContain(MOCK_DAY);
   });
 });

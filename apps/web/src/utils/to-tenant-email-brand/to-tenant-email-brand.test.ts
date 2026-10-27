@@ -3,8 +3,15 @@ import {
   PRESET_REGISTRY,
   resolveTenantEmailBrand,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { toTenantEmailBrand } from './to-tenant-email-brand';
+
+faker.seed(6012);
+
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 150 });
+const MOCK_OTHER_ACCENT_HUE = faker.number.int({ min: 200, max: 360 });
+const MOCK_LOGO_HUE = faker.number.int({ min: 0, max: 360 });
 
 describe(toTenantEmailBrand, () => {
   it('falls back to the Console preset defaults when there is no row', () => {
@@ -21,49 +28,49 @@ describe(toTenantEmailBrand, () => {
     );
   });
 
-  it('resolves the given row through the same recipe as resolveTenantEmailBrand', () => {
+  it("resolves the given row's preset and hues", () => {
     const result = toTenantEmailBrand({
       preset: PRESET_ID.EDITORIAL,
-      accentHue: 190,
-      logoHue: 40,
+      accentHue: MOCK_ACCENT_HUE,
+      logoHue: MOCK_LOGO_HUE,
     });
 
     expect(result).toEqual(
       resolveTenantEmailBrand({
         preset: PRESET_ID.EDITORIAL,
-        accentHue: 190,
-        logoHue: 40,
+        accentHue: MOCK_ACCENT_HUE,
+        logoHue: MOCK_LOGO_HUE,
       }),
     );
   });
 
-  it('falls back to the preset accentHue when the row omits logoHue', () => {
+  it("falls back to the preset's logo hue when the row omits it", () => {
     const editorialTokens = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 
     const result = toTenantEmailBrand({
       preset: PRESET_ID.EDITORIAL,
-      accentHue: 190,
+      accentHue: MOCK_ACCENT_HUE,
     });
 
     expect(result).toEqual(
       resolveTenantEmailBrand({
         preset: PRESET_ID.EDITORIAL,
-        accentHue: 190,
+        accentHue: MOCK_ACCENT_HUE,
         logoHue: editorialTokens.logoHue,
       }),
     );
   });
 
-  it('produces a different hex output for a different accent hue', () => {
-    const blue = toTenantEmailBrand({
+  it('produces a different brand colour for a different accent hue', () => {
+    const first = toTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
-      accentHue: 220,
+      accentHue: MOCK_ACCENT_HUE,
     });
-    const orange = toTenantEmailBrand({
+    const second = toTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
-      accentHue: 30,
+      accentHue: MOCK_OTHER_ACCENT_HUE,
     });
 
-    expect(blue.brandPrimary).not.toBe(orange.brandPrimary);
+    expect(first.brandPrimary).not.toBe(second.brandPrimary);
   });
 });

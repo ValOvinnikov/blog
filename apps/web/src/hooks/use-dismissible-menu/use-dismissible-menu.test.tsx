@@ -1,106 +1,32 @@
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import {
+  expectMenuClosed,
+  expectMenuOpen,
+  MENU_FIRST_ITEM_NAME,
+  MENU_LAST_ITEM_NAME,
+  MENU_SIBLING_ACTION_NAME,
+  MENU_TRIGGER_NAME,
   testArrowUpAndHomeBehavior,
   testCoreDismissibleMenuBehavior,
 } from '@web/testing/shared/dismissible-menu-contract/dismissible-menu-contract';
 import { useCallback, useRef } from 'react';
 
-import { useDismissibleMenu } from './use-dismissible-menu';
+import {
+  type TDismissibleMenuAccessors,
+  useDismissibleMenu,
+} from './use-dismissible-menu';
 
-const Harness = () => {
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+type THarnessProps = Pick<
+  TDismissibleMenuAccessors,
+  'trapFocus' | 'closeOnFocusOut'
+> & { hasContainer?: boolean };
 
-  const getTrigger = useCallback(() => triggerRef.current, []);
-  const getPanel = useCallback(() => panelRef.current, []);
-
-  const { open, toggle } = useDismissibleMenu({ getTrigger, getPanel });
-
-  return (
-    <div>
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-expanded={open}
-        onClick={toggle}
-      >
-        trigger
-      </button>
-      <div ref={panelRef} hidden={!open}>
-        <button type="button">first</button>
-        <button type="button">second</button>
-      </div>
-    </div>
-  );
-};
-
-const HarnessNoTrap = () => {
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  const getTrigger = useCallback(() => triggerRef.current, []);
-  const getPanel = useCallback(() => panelRef.current, []);
-
-  const { open, toggle } = useDismissibleMenu({
-    getTrigger,
-    getPanel,
-    trapFocus: false,
-  });
-
-  return (
-    <div>
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-expanded={open}
-        onClick={toggle}
-      >
-        trigger
-      </button>
-      <div ref={panelRef} hidden={!open}>
-        <button type="button">first</button>
-        <button type="button">second</button>
-      </div>
-      <button type="button">after panel</button>
-    </div>
-  );
-};
-
-const HarnessCloseOnFocusOut = () => {
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  const getTrigger = useCallback(() => triggerRef.current, []);
-  const getPanel = useCallback(() => panelRef.current, []);
-
-  const { open, toggle } = useDismissibleMenu({
-    getTrigger,
-    getPanel,
-    trapFocus: false,
-    closeOnFocusOut: true,
-  });
-
-  return (
-    <div>
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-expanded={open}
-        onClick={toggle}
-      >
-        trigger
-      </button>
-      <div ref={panelRef} hidden={!open}>
-        <button type="button">first</button>
-        <button type="button">second</button>
-      </div>
-      <button type="button">after panel</button>
-    </div>
-  );
-};
-
-const HarnessWithContainer = () => {
+const Harness = ({
+  trapFocus,
+  closeOnFocusOut,
+  hasContainer,
+}: THarnessProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -112,7 +38,9 @@ const HarnessWithContainer = () => {
   const { open, toggle } = useDismissibleMenu({
     getTrigger,
     getPanel,
-    getContainer,
+    getContainer: hasContainer ? getContainer : undefined,
+    trapFocus,
+    closeOnFocusOut,
   });
 
   return (
@@ -123,263 +51,221 @@ const HarnessWithContainer = () => {
         aria-expanded={open}
         onClick={toggle}
       >
-        trigger
+        {MENU_TRIGGER_NAME}
       </button>
       <div ref={panelRef} hidden={!open}>
-        <button type="button">first</button>
+        <button type="button">{MENU_FIRST_ITEM_NAME}</button>
+        <button type="button">{MENU_LAST_ITEM_NAME}</button>
       </div>
-      <button type="button">sibling action</button>
+      <button type="button">{MENU_SIBLING_ACTION_NAME}</button>
     </div>
   );
 };
 
 const setup = customRender(Harness, {});
 
-const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
-
 describe(useDismissibleMenu, () => {
   let user: UserEvent;
-  let trigger: HTMLElement;
+  const getUser = () => user;
 
   beforeEach(() => {
     user = userEvent.setup();
-    setup();
-    trigger = getTrigger();
   });
 
-  testCoreDismissibleMenuBehavior();
-  testArrowUpAndHomeBehavior();
+  describe('with the default options', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-  it('reverse-traps Shift+Tab, wrapping focus from the first item to the last', async () => {
-    await user.click(trigger);
+    testCoreDismissibleMenuBehavior(getUser);
+    testArrowUpAndHomeBehavior(getUser);
 
-    const first = screen.getByRole('button', { name: 'first' });
-    const last = screen.getByRole('button', { name: 'second' });
-    first.focus();
+    it('wraps Shift+Tab from the first item to the last', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+      const lastItem = screen.getByRole('button', {
+        name: MENU_LAST_ITEM_NAME,
+      });
 
-    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+      await user.tab({ shift: true });
 
-    expect(last).toHaveFocus();
+      expect(lastItem).toHaveFocus();
+    });
+
+    it('closes on a pointer-down on an element beside the trigger and panel', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+      const siblingAction = screen.getByRole('button', {
+        name: MENU_SIBLING_ACTION_NAME,
+      });
+
+      fireEvent.mouseDown(siblingAction);
+
+      expectMenuClosed(trigger);
+    });
   });
 
-  it('closes on a pointer-down on a sibling element outside the trigger/panel when no `getContainer` is given (narrow scoping, e.g. `usePopover`)', async () => {
-    await user.click(trigger);
+  describe('with a container', () => {
+    beforeEach(() => {
+      setup({ hasContainer: true });
+    });
 
-    const sibling = document.createElement('button');
-    sibling.textContent = 'sibling';
-    document.body.append(sibling);
+    it('stays open on a pointer-down inside the container beside the panel', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+      const siblingAction = screen.getByRole('button', {
+        name: MENU_SIBLING_ACTION_NAME,
+      });
 
-    fireEvent.mouseDown(sibling);
+      fireEvent.mouseDown(siblingAction);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expectMenuOpen(trigger);
+    });
 
-    sibling.remove();
-  });
-});
+    it('closes on a pointer-down outside the container', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
 
-describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
-  let user: UserEvent;
-  let trigger: HTMLElement;
+      fireEvent.mouseDown(document.body);
 
-  const setupNoTrap = customRender(HarnessNoTrap, {});
-
-  beforeEach(() => {
-    user = userEvent.setup();
-    setupNoTrap();
-    trigger = getTrigger();
-  });
-
-  it('does not trap Tab — tabbing from the last item moves focus out of the panel instead of wrapping to the first', async () => {
-    await user.click(trigger);
-
-    const last = screen.getByRole('button', { name: 'second' });
-    last.focus();
-
-    await user.tab();
-
-    expect(screen.getByRole('button', { name: 'after panel' })).toHaveFocus();
+      expectMenuClosed(trigger);
+    });
   });
 
-  it('does not reverse-trap Shift+Tab — tabbing back from the first item moves focus to the trigger instead of wrapping to the last', async () => {
-    await user.click(trigger);
+  describe('without focus trapping', () => {
+    beforeEach(() => {
+      setup({ trapFocus: false });
+    });
 
-    const first = screen.getByRole('button', { name: 'first' });
-    first.focus();
+    it('lets Tab leave the panel from the last item', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+      const lastItem = screen.getByRole('button', {
+        name: MENU_LAST_ITEM_NAME,
+      });
+      await user.click(lastItem);
 
-    await user.tab({ shift: true });
+      await user.tab();
 
-    expect(trigger).toHaveFocus();
+      const siblingAction = screen.getByRole('button', {
+        name: MENU_SIBLING_ACTION_NAME,
+      });
+      expect(siblingAction).toHaveFocus();
+      expectMenuOpen(trigger);
+    });
+
+    it('lets Shift+Tab leave the panel from the first item', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+
+      await user.tab({ shift: true });
+
+      expect(trigger).toHaveFocus();
+    });
+
+    it.each(['{ArrowDown}', '{ArrowUp}', '{Home}', '{End}'])(
+      'leaves focus on the first item for %s',
+      async (key) => {
+        const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+        await user.click(trigger);
+        const firstItem = screen.getByRole('button', {
+          name: MENU_FIRST_ITEM_NAME,
+        });
+
+        await user.keyboard(key);
+
+        expect(firstItem).toHaveFocus();
+      },
+    );
   });
 
-  it('does not move focus on ArrowDown/ArrowUp/Home/End', async () => {
-    await user.click(trigger);
+  describe('closing on focus out', () => {
+    beforeEach(() => {
+      setup({ trapFocus: false, closeOnFocusOut: true });
+    });
 
-    const first = screen.getByRole('button', { name: 'first' });
-    first.focus();
+    it('closes when Tab carries focus out of the panel and keeps focus there', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+      const lastItem = screen.getByRole('button', {
+        name: MENU_LAST_ITEM_NAME,
+      });
+      await user.click(lastItem);
 
-    fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(first).toHaveFocus();
+      await user.tab();
 
-    fireEvent.keyDown(document, { key: 'ArrowUp' });
-    expect(first).toHaveFocus();
+      const siblingAction = screen.getByRole('button', {
+        name: MENU_SIBLING_ACTION_NAME,
+      });
+      expect(siblingAction).toHaveFocus();
+      expectMenuClosed(trigger);
+    });
 
-    fireEvent.keyDown(document, { key: 'Home' });
-    expect(first).toHaveFocus();
+    it('stays open when focus moves within the panel', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
 
-    fireEvent.keyDown(document, { key: 'End' });
-    expect(first).toHaveFocus();
+      await user.tab();
+
+      const lastItem = screen.getByRole('button', {
+        name: MENU_LAST_ITEM_NAME,
+      });
+      expect(lastItem).toHaveFocus();
+      expectMenuOpen(trigger);
+    });
+
+    it('stays open when focus moves back to the trigger', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+
+      await user.tab({ shift: true });
+
+      expect(trigger).toHaveFocus();
+      expectMenuOpen(trigger);
+    });
+
+    it('stays open on a blur that has no related target', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+      const firstItem = screen.getByRole('button', {
+        name: MENU_FIRST_ITEM_NAME,
+      });
+
+      fireEvent.focusOut(firstItem, { relatedTarget: null });
+
+      expectMenuOpen(trigger);
+    });
   });
 
-  it('still closes on Escape and returns focus to the trigger', async () => {
-    await user.click(trigger);
+  describe.each([
+    { title: 'with focus trapping off', options: { trapFocus: false } },
+    {
+      title: 'with focus-out closing on',
+      options: { trapFocus: false, closeOnFocusOut: true },
+    },
+  ])('dismissal $title', ({ options }) => {
+    beforeEach(() => {
+      setup(options);
+    });
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    it('closes on Escape and returns focus to the trigger', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveFocus();
-  });
+      await user.keyboard('{Escape}');
 
-  it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
-    await user.click(trigger);
+      expectMenuClosed(trigger);
+      expect(trigger).toHaveFocus();
+    });
 
-    fireEvent.mouseDown(document.body);
+    it('closes on an outside pointer-down and returns focus to the trigger', async () => {
+      const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveFocus();
-  });
+      fireEvent.mouseDown(document.body);
 
-  it('with the default closeOnFocusOut (false), stays open when Tab carries focus past the last item and out of the panel', async () => {
-    await user.click(trigger);
-
-    const last = screen.getByRole('button', { name: 'second' });
-    last.focus();
-
-    await user.tab();
-
-    expect(screen.getByRole('button', { name: 'after panel' })).toHaveFocus();
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  });
-});
-
-describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
-  let user: UserEvent;
-  let trigger: HTMLElement;
-
-  const setupCloseOnFocusOut = customRender(HarnessCloseOnFocusOut, {});
-
-  beforeEach(() => {
-    user = userEvent.setup();
-    setupCloseOnFocusOut();
-    trigger = getTrigger();
-  });
-
-  it('closes when Tab carries focus past the last item, leaving focus on the element it landed on instead of forcing it back to the trigger', async () => {
-    await user.click(trigger);
-
-    const last = screen.getByRole('button', { name: 'second' });
-    last.focus();
-
-    await user.tab();
-
-    const afterPanel = screen.getByRole('button', { name: 'after panel' });
-    expect(afterPanel).toHaveFocus();
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('closes when focus moves to an arbitrary element outside the trigger/panel', () => {
-    fireEvent.click(trigger);
-
-    const first = screen.getByRole('button', { name: 'first' });
-    first.focus();
-
-    const outside = document.createElement('button');
-    document.body.append(outside);
-
-    fireEvent.focusOut(first, { relatedTarget: outside });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-
-    outside.remove();
-  });
-
-  it('stays open when focus moves within the panel', () => {
-    fireEvent.click(trigger);
-
-    const first = screen.getByRole('button', { name: 'first' });
-    const last = screen.getByRole('button', { name: 'second' });
-    first.focus();
-
-    fireEvent.focusOut(first, { relatedTarget: last });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('stays open when focus moves back to the trigger', () => {
-    fireEvent.click(trigger);
-
-    const first = screen.getByRole('button', { name: 'first' });
-    first.focus();
-
-    fireEvent.focusOut(first, { relatedTarget: trigger });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('stays open on the transient relatedTarget === null blur', () => {
-    fireEvent.click(trigger);
-
-    const first = screen.getByRole('button', { name: 'first' });
-    first.focus();
-
-    fireEvent.focusOut(first, { relatedTarget: null });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('still closes on Escape and returns focus to the trigger', async () => {
-    await user.click(trigger);
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveFocus();
-  });
-
-  it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
-    await user.click(trigger);
-
-    fireEvent.mouseDown(document.body);
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveFocus();
-  });
-});
-
-describe(`${useDismissibleMenu.name} with getContainer`, () => {
-  let user: UserEvent;
-  let trigger: HTMLElement;
-
-  const setupWithContainer = customRender(HarnessWithContainer, {});
-
-  beforeEach(() => {
-    user = userEvent.setup();
-    setupWithContainer();
-    trigger = getTrigger();
-  });
-
-  it('stays open on a pointer-down on a sibling element inside the container but outside the trigger/panel (e.g. the actions slot)', async () => {
-    await user.click(trigger);
-
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'sibling action' }));
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('still closes on a pointer-down outside the container entirely', async () => {
-    await user.click(trigger);
-
-    fireEvent.mouseDown(document.body);
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expectMenuClosed(trigger);
+      expect(trigger).toHaveFocus();
+    });
   });
 });

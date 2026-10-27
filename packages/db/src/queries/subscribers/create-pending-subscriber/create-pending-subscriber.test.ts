@@ -78,7 +78,8 @@ describe(createPendingSubscriber, () => {
         subscriber: { id, email: MOCK_SUBSCRIBER_EMAIL },
       }),
     );
-    expect(await readSubscribers()).toHaveLength(1);
+    const rows = await readSubscribers();
+    expect(rows).toHaveLength(1);
   });
 
   it('creates a separate pending row for a +tag address of a subscribed email', async () => {
@@ -121,7 +122,8 @@ describe(createPendingSubscriber, () => {
         subscriber: { id, email: MOCK_SUBSCRIBER_EMAIL },
       }),
     );
-    expect(await readSubscribers()).toHaveLength(1);
+    const rows = await readSubscribers();
+    expect(rows).toHaveLength(1);
   });
 
   it('creates a separate row for the same email on another tenant', async () => {
@@ -133,7 +135,8 @@ describe(createPendingSubscriber, () => {
       MOCK_SUBSCRIBER_EMAIL,
     );
 
-    const created = (await readSubscribers()).find(
+    const rows = await readSubscribers();
+    const created = rows.find(
       ({ tenantId: rowTenantId }) => rowTenantId === tenantId,
     );
     expect(result).toEqual(
@@ -142,7 +145,7 @@ describe(createPendingSubscriber, () => {
         subscriber: { id: created?.id, email: MOCK_SUBSCRIBER_EMAIL },
       }),
     );
-    expect(await readSubscribers()).toHaveLength(2);
+    expect(rows).toHaveLength(2);
   });
 
   it('settles two simultaneous signups for a new email on one row', async () => {

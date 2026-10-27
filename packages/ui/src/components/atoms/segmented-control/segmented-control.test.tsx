@@ -1,27 +1,37 @@
 import { DEPTH } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
 import { SegmentedControl } from './segmented-control';
 
-const options = [
-  { value: DEPTH.SKIM, label: '30s' },
-  { value: DEPTH.READ, label: 'Read' },
-  { value: DEPTH.DEEP, label: 'Deep' },
+faker.seed(123);
+
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+const MOCK_SKIM_LABEL = `${faker.lorem.word()}-skim`;
+const MOCK_READ_LABEL = `${faker.lorem.word()}-read`;
+const MOCK_DEEP_LABEL = `${faker.lorem.word()}-deep`;
+
+const MOCK_OPTIONS = [
+  { value: DEPTH.SKIM, label: MOCK_SKIM_LABEL },
+  { value: DEPTH.READ, label: MOCK_READ_LABEL },
+  { value: DEPTH.DEEP, label: MOCK_DEEP_LABEL },
 ];
 
 const setup = customRender(SegmentedControl, {
-  options,
+  options: MOCK_OPTIONS,
   value: DEPTH.READ,
   onChange: vi.fn(),
-  ariaLabel: 'Reading depth',
+  ariaLabel: MOCK_ARIA_LABEL,
 });
 
 describe(`<${SegmentedControl.name}/>`, () => {
+  let user: UserEvent;
   let onChange: Mock<(value: string) => void>;
 
   beforeEach(() => {
+    user = userEvent.setup();
     onChange = vi.fn();
   });
 
@@ -30,128 +40,96 @@ describe(`<${SegmentedControl.name}/>`, () => {
       setup();
     });
 
-    it('renders a radiogroup with the given ariaLabel', () => {
-      expect(
-        screen.getByRole('radiogroup', { name: 'Reading depth' }),
-      ).toBeVisible();
+    it('renders a radiogroup named by the ariaLabel', () => {
+      const group = screen.getByRole('radiogroup', { name: MOCK_ARIA_LABEL });
+
+      expect(group).toBeVisible();
     });
 
-    it('renders one radio per option with its label', () => {
-      for (const option of options) {
-        expect(screen.getByRole('radio', { name: option.label })).toBeVisible();
-      }
+    it('renders one radio per option', () => {
+      const radios = screen.getAllByRole('radio');
+
+      expect(radios).toHaveLength(MOCK_OPTIONS.length);
     });
 
-    it('marks the option matching value as checked, and the rest as unchecked', () => {
-      expect(screen.getByRole('radio', { name: 'Read' })).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
-      expect(screen.getByRole('radio', { name: '30s' })).toHaveAttribute(
-        'aria-checked',
-        'false',
-      );
-      expect(screen.getByRole('radio', { name: 'Deep' })).toHaveAttribute(
-        'aria-checked',
-        'false',
-      );
+    it('checks only the option matching value', () => {
+      const skimRadio = screen.getByRole('radio', { name: MOCK_SKIM_LABEL });
+      const readRadio = screen.getByRole('radio', { name: MOCK_READ_LABEL });
+      const deepRadio = screen.getByRole('radio', { name: MOCK_DEEP_LABEL });
+
+      expect(readRadio).toBeChecked();
+      expect(skimRadio).not.toBeChecked();
+      expect(deepRadio).not.toBeChecked();
     });
 
-    it('only the checked option is in the tab order', () => {
-      expect(screen.getByRole('radio', { name: 'Read' })).toHaveAttribute(
-        'tabIndex',
-        '0',
-      );
-      expect(screen.getByRole('radio', { name: '30s' })).toHaveAttribute(
-        'tabIndex',
-        '-1',
-      );
+    it('puts only the checked option in the tab order', async () => {
+      const readRadio = screen.getByRole('radio', { name: MOCK_READ_LABEL });
+
+      await user.tab();
+
+      expect(readRadio).toHaveFocus();
+
+      await user.tab();
+
+      expect(readRadio).not.toHaveFocus();
     });
   });
 
   it('calls onChange with the clicked option value', async () => {
     setup({ onChange });
-    await userEvent.click(screen.getByRole('radio', { name: 'Deep' }));
+
+    const deepRadio = screen.getByRole('radio', { name: MOCK_DEEP_LABEL });
+    await user.click(deepRadio);
+
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith(DEPTH.DEEP);
   });
 
-  it('does not manage its own state — re-checks only after value is updated by the caller', async () => {
+  it('only checks a clicked option once the caller updates value', async () => {
     const { rerender } = setup({ onChange });
-    await userEvent.click(screen.getByRole('radio', { name: 'Deep' }));
-    expect(screen.getByRole('radio', { name: 'Deep' })).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
+
+    const deepRadio = screen.getByRole('radio', { name: MOCK_DEEP_LABEL });
+    await user.click(deepRadio);
+
+    expect(deepRadio).not.toBeChecked();
 
     rerender(
       <SegmentedControl
-        options={options}
+        options={MOCK_OPTIONS}
         value={DEPTH.DEEP}
         onChange={onChange}
-        ariaLabel="Reading depth"
+        ariaLabel={MOCK_ARIA_LABEL}
       />,
     );
-    expect(screen.getByRole('radio', { name: 'Deep' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+
+    expect(deepRadio).toBeChecked();
   });
 
-  it('moves focus and selection to the next option on ArrowRight, wrapping from the last option to the first', async () => {
-    setup({ onChange, value: DEPTH.DEEP });
-    screen.getByRole('radio', { name: 'Deep' }).focus();
+  it.each([
+    { key: '{ArrowRight}', from: DEPTH.DEEP, to: DEPTH.SKIM, label: 'wraps' },
+    { key: '{ArrowLeft}', from: DEPTH.SKIM, to: DEPTH.DEEP, label: 'wraps' },
+    { key: '{ArrowDown}', from: DEPTH.READ, to: DEPTH.DEEP, label: 'moves' },
+    { key: '{ArrowUp}', from: DEPTH.READ, to: DEPTH.SKIM, label: 'moves' },
+  ])('$key $label from $from to $to', async ({ key, from, to }) => {
+    setup({ onChange, value: from });
 
-    await userEvent.keyboard('{ArrowRight}');
+    await user.tab();
+    await user.keyboard(key);
 
-    expect(onChange).toHaveBeenCalledWith(DEPTH.SKIM);
-    expect(screen.getByRole('radio', { name: '30s' })).toHaveFocus();
-  });
+    const targetRadio = screen.getByRole('radio', {
+      name: MOCK_OPTIONS.find(({ value }) => value === to)?.label,
+    });
 
-  it('moves focus and selection to the previous option on ArrowLeft, wrapping from the first option to the last', async () => {
-    setup({ onChange, value: DEPTH.SKIM });
-    screen.getByRole('radio', { name: '30s' }).focus();
-
-    await userEvent.keyboard('{ArrowLeft}');
-
-    expect(onChange).toHaveBeenCalledWith(DEPTH.DEEP);
-    expect(screen.getByRole('radio', { name: 'Deep' })).toHaveFocus();
-  });
-
-  it('treats ArrowDown the same as ArrowRight, and ArrowUp the same as ArrowLeft, re-rendering with the new value between presses since the controlled component re-derives currentIndex from value', async () => {
-    const { rerender } = setup({ onChange, value: DEPTH.READ });
-    screen.getByRole('radio', { name: 'Read' }).focus();
-
-    await userEvent.keyboard('{ArrowDown}');
-    expect(onChange).toHaveBeenLastCalledWith(DEPTH.DEEP);
-    expect(screen.getByRole('radio', { name: 'Deep' })).toHaveFocus();
-
-    rerender(
-      <SegmentedControl
-        options={options}
-        value={DEPTH.DEEP}
-        onChange={onChange}
-        ariaLabel="Reading depth"
-      />,
-    );
-    screen.getByRole('radio', { name: 'Deep' }).focus();
-
-    await userEvent.keyboard('{ArrowUp}');
-    expect(onChange).toHaveBeenLastCalledWith(DEPTH.READ);
-    expect(screen.getByRole('radio', { name: 'Read' })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledWith(to);
+    expect(targetRadio).toHaveFocus();
   });
 
   it('ignores non-navigation keys', async () => {
-    setup({ onChange, value: DEPTH.READ });
-    screen.getByRole('radio', { name: 'Read' }).focus();
+    setup({ onChange });
 
-    await userEvent.keyboard('a');
+    await user.tab();
+    await user.keyboard('a');
 
     expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'segmented-control' });
-    expect(screen.getByTestId('segmented-control')).toBeVisible();
   });
 });

@@ -1,35 +1,27 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { toLiveLanguagePages } from './to-live-language-pages';
 
+faker.seed(6012);
+
 const { EN, NL } = LOCALE_ISO_CODES;
 
-describe('toLiveLanguagePages', () => {
-  it('keeps pages whose language is live', () => {
-    const pages = [{ language: EN }, { language: NL }];
+const MOCK_PAGES = [
+  { language: EN, slug: faker.lorem.slug(2) },
+  { language: NL, slug: faker.lorem.slug(2) },
+];
 
-    expect(toLiveLanguagePages({ pages, liveLocales: [EN, NL] })).toEqual(
-      pages,
-    );
+describe(toLiveLanguagePages, () => {
+  it('keeps pages whose language is live', () => {
+    expect(
+      toLiveLanguagePages({ pages: MOCK_PAGES, liveLocales: [EN, NL] }),
+    ).toEqual(MOCK_PAGES);
   });
 
   it('excludes a page whose language is not live', () => {
     expect(
-      toLiveLanguagePages({
-        pages: [{ language: EN }, { language: NL }],
-        liveLocales: [EN],
-      }),
-    ).toEqual([{ language: EN }]);
-  });
-
-  it('keeps the current locale page, leaving its removal to the caller', () => {
-    const pages = [
-      { language: NL, slug: 'over-ons' },
-      { language: EN, slug: 'about-us' },
-    ];
-
-    expect(toLiveLanguagePages({ pages, liveLocales: [EN, NL] })).toEqual(
-      pages,
-    );
+      toLiveLanguagePages({ pages: MOCK_PAGES, liveLocales: [EN] }),
+    ).toEqual([MOCK_PAGES[0]]);
   });
 });

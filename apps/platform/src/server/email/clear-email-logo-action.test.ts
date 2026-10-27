@@ -4,181 +4,156 @@ import {
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
   NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { auth } from '@platform/server/auth/auth';
+import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
-  MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_SESSION,
 } from '@platform/testing/admins/operator';
+import { mockedAuth } from '@platform/testing/auth/mocked-auth';
 import { MOCK_BLOB_TOKEN } from '@platform/testing/blob/fixtures';
+import {
+  MOCK_EMAIL_LOGO_URL,
+  mockEmailConfig,
+  mockEmailTemplateResult,
+  MOCK_TENANT_LOGO_TARGET,
+  MOCK_TEMPLATE_LOGO_TARGET,
+} from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
-import type { Session } from 'next-auth';
+import { del } from '@vercel/blob';
 
 import { clearEmailLogoAction } from './clear-email-logo-action';
 
-const {
-  getEmailConfigMock,
-  getEmailTemplateMock,
-  upsertEmailConfigMock,
-  upsertEmailTemplateMock,
-  insertAuditEventMock,
-  delMock,
-} = vi.hoisted(() => ({
-  getEmailConfigMock: vi.fn(),
-  getEmailTemplateMock: vi.fn(),
-  upsertEmailConfigMock: vi.fn(),
-  upsertEmailTemplateMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-  delMock: vi.fn(),
-}));
-
-vi.mock('@platform/server/auth/require-tenant-membership');
-
-vi.mock('@platform/server/auth/auth');
-
 vi.mock('@blog/db', () => ({
   queries: {
-    emailConfig: {
-      getEmailConfig: getEmailConfigMock,
-      upsertEmailConfig: upsertEmailConfigMock,
-    },
+    emailConfig: { getEmailConfig: vi.fn(), upsertEmailConfig: vi.fn() },
     emailTemplates: {
-      getEmailTemplate: getEmailTemplateMock,
-      upsertEmailTemplate: upsertEmailTemplateMock,
+      getEmailTemplate: vi.fn(),
+      upsertEmailTemplate: vi.fn(),
     },
-    auditEvents: { insertAuditEvent: insertAuditEventMock },
+    auditEvents: { insertAuditEvent: vi.fn() },
   },
 }));
 
-vi.mock('@vercel/blob', () => ({ del: delMock }));
-
+vi.mock('@vercel/blob', () => ({ del: vi.fn() }));
+vi.mock('@platform/server/auth/require-tenant-membership');
+vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/utils/env/env');
 
-const TENANT_LOGO_URL =
-  'https://example.blob.vercel-storage.com/email-logo.png';
+faker.seed(5998);
 
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
+const MOCK_TEMPLATE_LOGO_URL = faker.internet.url();
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 
-const requireTenantMembershipMock = vi.mocked<
-  (tenantId: string) => Promise<unknown>
->(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+const { getEmailConfig, upsertEmailConfig } = queries.emailConfig;
+const { getEmailTemplate, upsertEmailTemplate } = queries.emailTemplates;
+const { insertAuditEvent } = queries.auditEvents;
 
 describe(clearEmailLogoAction, () => {
   beforeEach(() => {
-    requireTenantMembershipMock.mockReset();
-    authMock.mockReset();
-    getEmailConfigMock.mockReset();
-    getEmailTemplateMock.mockReset();
-    upsertEmailConfigMock.mockReset();
-    upsertEmailTemplateMock.mockReset();
-    insertAuditEventMock.mockReset();
-    delMock.mockReset();
-
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: MOCK_TENANT_ID },
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
-    authMock.mockResolvedValue({
-      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
-    });
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    getEmailConfigMock.mockResolvedValue({
-      logoAssetUrl: TENANT_LOGO_URL,
-    });
-    upsertEmailConfigMock.mockResolvedValue({});
+    Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
+    vi.mocked(getEmailConfig).mockReset();
+    vi.mocked(getEmailTemplate).mockReset();
+    vi.mocked(upsertEmailConfig).mockReset();
+    vi.mocked(upsertEmailTemplate).mockReset();
+    vi.mocked(insertAuditEvent).mockReset();
+    vi.mocked(getEmailConfig).mockResolvedValue(
+      mockEmailConfig({ logoAssetUrl: MOCK_EMAIL_LOGO_URL }),
+    );
   });
 
-  it('is a no-op success when the tenant email logo is already unset', async () => {
-    getEmailConfigMock.mockResolvedValue(undefined);
+  it('succeeds without writing when the tenant email logo is already unset', async () => {
+    vi.mocked(getEmailConfig).mockResolvedValue(undefined);
 
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, {
-      type: 'tenant',
-    });
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertEmailConfigMock).not.toHaveBeenCalled();
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
+    expect(insertAuditEvent).not.toHaveBeenCalled();
   });
 
   it('clears the tenant email logo and deletes the blob', async () => {
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, {
-      type: 'tenant',
-    });
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+    expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       logoAssetUrl: null,
     });
-    expect(delMock).toHaveBeenCalledWith(TENANT_LOGO_URL, {
+    expect(del).toHaveBeenCalledWith(MOCK_EMAIL_LOGO_URL, {
       token: MOCK_BLOB_TOKEN,
     });
   });
 
   it('clears a per-template logo without touching the tenant email logo', async () => {
-    getEmailTemplateMock.mockResolvedValue({
-      logoAssetUrl:
-        'https://example.blob.vercel-storage.com/email-logo-magic-link.png',
-    });
-    upsertEmailTemplateMock.mockResolvedValue({});
+    vi.mocked(getEmailTemplate).mockResolvedValue(
+      mockEmailTemplateResult({ logoAssetUrl: MOCK_TEMPLATE_LOGO_URL }),
+    );
 
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, {
-      type: 'template',
-      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-    });
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TEMPLATE_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
+    expect(upsertEmailTemplate).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       { logoAssetUrl: null },
     );
-    expect(upsertEmailConfigMock).not.toHaveBeenCalled();
+    expect(del).toHaveBeenCalledWith(MOCK_TEMPLATE_LOGO_URL, {
+      token: MOCK_BLOB_TOKEN,
+    });
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
   });
 
-  it('records exactly one SETTINGS_UPDATED audit event', async () => {
-    await clearEmailLogoAction(MOCK_TENANT_ID, { type: 'tenant' });
+  it('records one settings-updated audit event for the operator', async () => {
+    mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
 
-    expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
+    await clearEmailLogoAction(MOCK_TENANT_ID, MOCK_TENANT_LOGO_TARGET);
+
+    expect(insertAuditEvent).toHaveBeenCalledTimes(1);
+    expect(insertAuditEvent).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
-      details: { target: { type: 'tenant' }, operation: 'clear' },
+      details: { target: MOCK_TENANT_LOGO_TARGET, operation: 'clear' },
     });
   });
 
-  it('records no audit event when the write itself fails', async () => {
-    upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
+  it('reports a server error and records no audit event when the write fails', async () => {
+    vi.mocked(upsertEmailConfig).mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, {
-      type: 'tenant',
-    });
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(insertAuditEvent).not.toHaveBeenCalled();
   });
 
   it.each([
     NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-  ])(
-    'propagates the %s the tenant gate throws without writing',
-    async (gateError) => {
-      requireTenantMembershipMock.mockImplementation(() => {
-        throw new Error(gateError);
-      });
+  ])('propagates the %s the tenant gate throws', async (gateError) => {
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
+      new Error(gateError),
+    );
 
-      await expect(
-        clearEmailLogoAction(MOCK_TENANT_ID, { type: 'tenant' }),
-      ).rejects.toThrow(gateError);
+    await expect(
+      clearEmailLogoAction(MOCK_TENANT_ID, MOCK_TENANT_LOGO_TARGET),
+    ).rejects.toThrow(gateError);
 
-      expect(upsertEmailConfigMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
+  });
 });

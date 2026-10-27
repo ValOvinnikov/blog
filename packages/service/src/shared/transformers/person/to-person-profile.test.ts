@@ -1,23 +1,30 @@
+import {
+  MOCK_AUTHOR_ID,
+  MOCK_AUTHOR_NAME,
+} from '@blog/service/testing/entities/fixtures';
 import { mockRawAuthor } from '@blog/service/testing/pages/fixtures';
 import {
+  mockLinkView,
   mockRawPersonBioBlock,
   mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toPersonProfile } from './to-person-profile';
 
-const BIO_TEXT = 'Builds things.';
-const ROLE = 'Staff Engineer';
+faker.seed(6103);
 
-const rawProfile = mockRawAuthor({ image: null, role: null });
+const MOCK_BIO_TEXT = faker.lorem.sentence();
+const MOCK_ROLE = faker.person.jobTitle();
+const MOCK_RAW_PROFILE = mockRawAuthor({ image: null, role: null });
 
 describe(toPersonProfile, () => {
-  it('maps everything absent', () => {
-    const result = toPersonProfile(rawProfile);
+  it('maps a profile with no optional fields', () => {
+    const profile = toPersonProfile(MOCK_RAW_PROFILE);
 
-    expect(result).toEqual({
-      id: rawProfile._id,
-      name: rawProfile.name,
+    expect(profile).toEqual({
+      id: MOCK_AUTHOR_ID,
+      name: MOCK_AUTHOR_NAME,
       image: undefined,
       role: undefined,
       bio: undefined,
@@ -28,18 +35,22 @@ describe(toPersonProfile, () => {
 
   it('maps the role, bio and social links when populated', () => {
     const socialProfile = mockRawSocialProfile();
+    const bioBlock = mockRawPersonBioBlock({ text: MOCK_BIO_TEXT });
 
     const { role, bio, socialLinks } = toPersonProfile({
-      ...rawProfile,
-      role: ROLE,
-      bio: [mockRawPersonBioBlock({ text: BIO_TEXT })],
+      ...MOCK_RAW_PROFILE,
+      role: MOCK_ROLE,
+      bio: [bioBlock],
       socialLinks: [socialProfile],
     });
 
-    expect(role).toBe(ROLE);
-    expect(bio?.[0]).toMatchObject({ children: [{ text: BIO_TEXT }] });
-    expect(
-      socialLinks.map(({ platform, link }) => [platform, link.href]),
-    ).toEqual([[socialProfile.platform, socialProfile.link.url]]);
+    expect(role).toBe(MOCK_ROLE);
+    expect(bio).toEqual([{ ...bioBlock, markDefs: undefined }]);
+    expect(socialLinks).toEqual([
+      {
+        platform: socialProfile.platform,
+        link: mockLinkView({ href: socialProfile.link.url ?? undefined }),
+      },
+    ]);
   });
 });

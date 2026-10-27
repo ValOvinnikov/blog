@@ -1,44 +1,36 @@
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  LOCALE_ISO_CODES,
-} from '@blog/config/constants';
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { AUDIT_ACTION, ERROR_CODE } from '@blog/config/constants';
+import { ADMIN_ROLE, GRANTED_VIA, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
+import {
+  insertTestAccount,
+  insertTestAuditEvent,
+  insertTestTenant,
+  insertTestUser,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { deleteAccount } from './delete-account';
 
 vi.mock('@blog/db/client');
 
+faker.seed(602201);
+
+const MOCK_REF_DATE = new Date(Date.UTC(2026, 0, 1));
+
+const MOCK_MISSING_USER_ID = faker.string.uuid();
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_SESSION_EXPIRES = faker.date.future({ refDate: MOCK_REF_DATE });
+
 const db = useQueryTestDb();
-const USER_ID = 'user-1';
-const OTHER_USER_ID = 'user-2';
 let tenantId: string;
+let userId: string;
 
 beforeEach(async () => {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-  if (!tenant) throw new Error('failed to seed a tenant row');
-  tenantId = tenant.id;
+  ({ id: tenantId } = await insertTestTenant(db()));
 });
 
 afterEach(async () => {
@@ -50,167 +42,133 @@ afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
-async function seedUserWithRelatedRows(userId: string): Promise<void> {
-  await db().insert(schema.users).values({ id: userId });
-  await db()
-    .insert(schema.accounts)
-    .values({
-      userId,
-      type: 'oauth',
-      provider: 'github',
-      providerAccountId: `${userId}-github`,
-    });
-  await db()
-    .insert(schema.sessions)
-    .values({
-      sessionToken: `${userId}-session`,
-      userId,
-      expires: new Date(2030, 0, 1),
-    });
+async function seedUserWithRelatedRows(): Promise<string> {
+  const { id } = await insertTestUser(db());
+  await insertTestAccount(db(), id, GITHUB_PROVIDER);
+  await db().insert(schema.sessions).values({
+    sessionToken: faker.string.uuid(),
+    userId: id,
+    expires: MOCK_SESSION_EXPIRES,
+  });
   await db()
     .insert(schema.bookmarks)
-    .values({ tenantId, userId, postId: 'post-1' });
+    .values({ tenantId, userId: id, postId: MOCK_POST_ID });
+
+  return id;
 }
 
-async function seedAuditEvent(actorId: string): Promise<void> {
-  await db().insert(schema.auditEvents).values({
-    actorId,
-    action: AUDIT_ACTION.SETTINGS_UPDATED,
-    targetType: AUDIT_TARGET_TYPE.TENANT,
-    targetId: tenantId,
-  });
+async function findUser(id: string) {
+  return db().select().from(schema.users).where(eq(schema.users.id, id));
 }
 
-async function findAuditEvents(actorId: string) {
+async function findBookmarks(id: string) {
   return db()
-    .select({ actorId: schema.auditEvents.actorId })
-    .from(schema.auditEvents)
-    .where(eq(schema.auditEvents.actorId, actorId));
-}
-
-async function findUser(userId: string) {
-  return db().select().from(schema.users).where(eq(schema.users.id, userId));
+    .select()
+    .from(schema.bookmarks)
+    .where(eq(schema.bookmarks.userId, id));
 }
 
 describe(deleteAccount, () => {
   beforeEach(async () => {
-    await seedUserWithRelatedRows(USER_ID);
+    userId = await seedUserWithRelatedRows();
   });
 
   it('deletes the users row', async () => {
-    await expect(deleteAccount(USER_ID)).resolves.toEqual({
-      ok: true,
-      data: undefined,
-    });
+    const result = await deleteAccount(userId);
 
-    const remainingUsers = await db()
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.id, USER_ID));
-    expect(remainingUsers).toEqual([]);
+    expect(result).toEqual(okResult());
+    expect(await findUser(userId)).toEqual([]);
   });
 
   it('cascades to accounts, sessions, and bookmarks rows for that user', async () => {
-    await deleteAccount(USER_ID);
+    await deleteAccount(userId);
 
     const remainingAccounts = await db()
       .select()
       .from(schema.accounts)
-      .where(eq(schema.accounts.userId, USER_ID));
+      .where(eq(schema.accounts.userId, userId));
     const remainingSessions = await db()
       .select()
       .from(schema.sessions)
-      .where(eq(schema.sessions.userId, USER_ID));
-    const remainingBookmarks = await db()
-      .select()
-      .from(schema.bookmarks)
-      .where(eq(schema.bookmarks.userId, USER_ID));
+      .where(eq(schema.sessions.userId, userId));
 
     expect(remainingAccounts).toEqual([]);
     expect(remainingSessions).toEqual([]);
-    expect(remainingBookmarks).toEqual([]);
+    expect(await findBookmarks(userId)).toEqual([]);
   });
 
   it("does not delete another user's rows", async () => {
-    await seedUserWithRelatedRows(OTHER_USER_ID);
+    const otherUserId = await seedUserWithRelatedRows();
 
-    await deleteAccount(USER_ID);
+    await deleteAccount(userId);
 
-    const remainingUsers = await db()
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.id, OTHER_USER_ID));
-    const remainingBookmarks = await db()
-      .select()
-      .from(schema.bookmarks)
-      .where(eq(schema.bookmarks.userId, OTHER_USER_ID));
-
-    expect(remainingUsers).toHaveLength(1);
-    expect(remainingBookmarks).toHaveLength(1);
+    expect(await findUser(otherUserId)).toHaveLength(1);
+    expect(await findBookmarks(otherUserId)).toHaveLength(1);
   });
 
   it("keeps the user's audit events", async () => {
-    await seedAuditEvent(USER_ID);
+    await insertTestAuditEvent(db(), {
+      actorId: userId,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+    });
 
-    await deleteAccount(USER_ID);
+    await deleteAccount(userId);
 
-    expect(await findAuditEvents(USER_ID)).toEqual([{ actorId: USER_ID }]);
+    const events = await db()
+      .select({ actorId: schema.auditEvents.actorId })
+      .from(schema.auditEvents)
+      .where(eq(schema.auditEvents.actorId, userId));
+    expect(events).toEqual([{ actorId: userId }]);
   });
 
   it('is a no-op when the user does not exist', async () => {
-    await expect(deleteAccount('missing-user')).resolves.toEqual({
-      ok: true,
-      data: undefined,
-    });
+    const result = await deleteAccount(MOCK_MISSING_USER_ID);
+
+    expect(result).toEqual(okResult());
   });
 
   it('deletes a user whose only memberships are below owner', async () => {
     await db()
       .insert(schema.memberships)
-      .values({ userId: USER_ID, tenantId, role: MEMBERSHIP_ROLE.EDITOR });
+      .values({ userId, tenantId, role: MEMBERSHIP_ROLE.EDITOR });
 
-    await expect(deleteAccount(USER_ID)).resolves.toEqual({
-      ok: true,
-      data: undefined,
-    });
-    expect(await findUser(USER_ID)).toEqual([]);
+    const result = await deleteAccount(userId);
+
+    expect(result).toEqual(okResult());
+    expect(await findUser(userId)).toEqual([]);
   });
 
   it('refuses a tenant owner and keeps the account and its membership', async () => {
     await db()
       .insert(schema.memberships)
-      .values({ userId: USER_ID, tenantId, role: MEMBERSHIP_ROLE.OWNER });
+      .values({ userId, tenantId, role: MEMBERSHIP_ROLE.OWNER });
 
-    await expect(deleteAccount(USER_ID)).resolves.toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
-    });
-    expect(await findUser(USER_ID)).toHaveLength(1);
-    expect(
-      await db()
-        .select()
-        .from(schema.memberships)
-        .where(eq(schema.memberships.userId, USER_ID)),
-    ).toHaveLength(1);
+    const result = await deleteAccount(userId);
+
+    const remainingMemberships = await db()
+      .select()
+      .from(schema.memberships)
+      .where(eq(schema.memberships.userId, userId));
+    expect(result).toEqual(errorResult(ERROR_CODE.DB_HOLDS_PLATFORM_ROLE));
+    expect(await findUser(userId)).toHaveLength(1);
+    expect(remainingMemberships).toHaveLength(1);
   });
 
   it('refuses a platform admin and keeps the account and its admins row', async () => {
     await db().insert(schema.admins).values({
-      userId: USER_ID,
+      userId,
       role: ADMIN_ROLE.SUPERADMIN,
       grantedVia: GRANTED_VIA.BREAK_GLASS,
     });
 
-    await expect(deleteAccount(USER_ID)).resolves.toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_HOLDS_PLATFORM_ROLE,
-    });
-    expect(await findUser(USER_ID)).toHaveLength(1);
-    expect(
-      await db()
-        .select()
-        .from(schema.admins)
-        .where(eq(schema.admins.userId, USER_ID)),
-    ).toHaveLength(1);
+    const result = await deleteAccount(userId);
+
+    const remainingAdmins = await db()
+      .select()
+      .from(schema.admins)
+      .where(eq(schema.admins.userId, userId));
+    expect(result).toEqual(errorResult(ERROR_CODE.DB_HOLDS_PLATFORM_ROLE));
+    expect(await findUser(userId)).toHaveLength(1);
+    expect(remainingAdmins).toHaveLength(1);
   });
 });

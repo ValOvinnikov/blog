@@ -6,6 +6,7 @@ import {
 } from '@blog/service/testing/modules/fixtures';
 import { mockRawHomePage } from '@blog/service/testing/pages/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { createHomeService } from './service';
 
@@ -14,13 +15,18 @@ vi.mock('@blog/service/sanity/query/query');
 vi.mock('@blog/service/shared/adaptors/faq-questions/loader');
 
 const mockFaqQuestions = vi.mocked(getFaqQuestions);
+faker.seed(6015103);
+
 const tenant = mockTenant();
+const MOCK_FAQ_MODULE_ID = faker.string.uuid();
 
 describe(createHomeService, () => {
   describe('v1.getHomePage', () => {
     it("adds the faqs of the page's FAQ modules to the page", async () => {
       mockRun.mockResolvedValueOnce(
-        mockRawHomePage({ modules: [{ _id: 'faq-a', _type: 'module_faq' }] }),
+        mockRawHomePage({
+          modules: [{ _id: MOCK_FAQ_MODULE_ID, _type: 'module_faq' }],
+        }),
       );
       mockFaqQuestions.mockResolvedValueOnce([mockRawFaqModuleQuestions()]);
 
@@ -28,7 +34,7 @@ describe(createHomeService, () => {
       if (!result.ok || !result.data) throw new Error('expected a page');
 
       expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
-        ['faq-a'],
+        [MOCK_FAQ_MODULE_ID],
         tenant,
       );
       expect(result.data.faqs).toEqual([mockFaqView()]);

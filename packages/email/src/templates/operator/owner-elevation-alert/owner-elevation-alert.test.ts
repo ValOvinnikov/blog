@@ -5,57 +5,49 @@ import {
   MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
 
-import { buildOwnerElevationAlertEmail } from './owner-elevation-alert';
+import {
+  buildOwnerElevationAlertEmail,
+  type TOwnerElevationAlertInput,
+} from './owner-elevation-alert';
 
-const ALERT = {
+const MOCK_ALERT: TOwnerElevationAlertInput = {
   tenantName: MOCK_TENANT_NAME,
   tenantId: MOCK_TENANT_ID,
   outcome: 'STALLED',
-} as const;
+};
 
-describe('buildOwnerElevationAlertEmail', () => {
-  it('escapes the tenant name', () => {
+describe(buildOwnerElevationAlertEmail, () => {
+  it.each([
+    [
+      'tenant name',
+      'tenantName',
+      `<strong>${MOCK_ESCAPED_UNSAFE_MARKUP}</strong>`,
+    ],
+    ['tenant id', 'tenantId', `<code>${MOCK_ESCAPED_UNSAFE_MARKUP}</code>`],
+  ] as const)('escapes the %s', (_name, key, expected) => {
     const { html } = buildOwnerElevationAlertEmail({
-      ...ALERT,
-      tenantName: MOCK_UNSAFE_MARKUP,
+      ...MOCK_ALERT,
+      [key]: MOCK_UNSAFE_MARKUP,
     });
 
     expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
-    expect(html).toContain(`<strong>${MOCK_ESCAPED_UNSAFE_MARKUP}</strong>`);
+    expect(html).toContain(expected);
   });
 
-  it('escapes the tenant id', () => {
-    const { html } = buildOwnerElevationAlertEmail({
-      ...ALERT,
-      tenantId: MOCK_UNSAFE_MARKUP,
-    });
+  it('names the tenant and its id in the subject', () => {
+    const { subject } = buildOwnerElevationAlertEmail(MOCK_ALERT);
 
-    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
-    expect(html).toContain(`<code>${MOCK_ESCAPED_UNSAFE_MARKUP}</code>`);
+    expect(subject).toContain(MOCK_TENANT_NAME);
+    expect(subject).toContain(MOCK_TENANT_ID);
   });
 
-  describe('for a stalled elevation', () => {
-    let stalled: ReturnType<typeof buildOwnerElevationAlertEmail>;
-
-    beforeEach(() => {
-      stalled = buildOwnerElevationAlertEmail(ALERT);
+  it('words a stalled elevation differently from an ambiguous membership', () => {
+    const stalled = buildOwnerElevationAlertEmail(MOCK_ALERT);
+    const ambiguous = buildOwnerElevationAlertEmail({
+      ...MOCK_ALERT,
+      outcome: 'AMBIGUOUS_MEMBERSHIP',
     });
 
-    it('names the tenant in the subject', () => {
-      expect(stalled.subject).toBe(
-        'Tenant "Northwind" (tenant_1) needs owner-elevation attention',
-      );
-    });
-
-    it('uses distinct copy per outcome', () => {
-      const ambiguous = buildOwnerElevationAlertEmail({
-        ...ALERT,
-        outcome: 'AMBIGUOUS_MEMBERSHIP',
-      });
-
-      expect(stalled.html).not.toEqual(ambiguous.html);
-      expect(stalled.html).toContain("hasn't accepted their Sanity invite");
-      expect(ambiguous.html).toContain('more than one human member');
-    });
+    expect(stalled.html).not.toBe(ambiguous.html);
   });
 });

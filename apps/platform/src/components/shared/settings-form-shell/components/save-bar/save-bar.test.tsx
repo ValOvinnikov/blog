@@ -1,4 +1,9 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 import {
   GO_TO_THE_FIRST_ONE,
   ONE_FIELD_NEEDS_ATTENTION,
@@ -6,16 +11,19 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { SaveBar, type TSaveBarProps } from './save-bar';
 
+faker.seed(5995);
+
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
 const DISCARD = 'Discard';
-const HEADING = 'Heading';
-const FIELD_HEADING_ID = 'field-heading';
-const BREAKDOWN = 'English 2 · Deutsch 1';
-const SAVE_ERROR = "Couldn't save Look settings — try again.";
+const MOCK_FIELD_LABEL = faker.lorem.word();
+const MOCK_FIELD_ID = faker.string.alpha(10);
+const MOCK_SECOND_FIELD_ID = faker.string.alpha(10);
+const MOCK_BREAKDOWN = faker.lorem.words(3);
+const MOCK_SAVE_ERROR = faker.lorem.sentence();
 
 const baseProps: TSaveBarProps = {
   changeCount: 3,
@@ -26,19 +34,18 @@ const baseProps: TSaveBarProps = {
   onDiscard: vi.fn(),
 };
 
-const renderBar = (overrides: Partial<TSaveBarProps> = {}) =>
-  renderWithIntl(<SaveBar {...baseProps} {...overrides} />);
+const setup = customRender(SaveBar, baseProps);
 
 const BarWithHiddenField = () => {
   const [isRevealed, setIsRevealed] = useState(false);
 
   return (
     <>
-      {isRevealed && <input id={FIELD_HEADING_ID} aria-label={HEADING} />}
+      {isRevealed && <input id={MOCK_FIELD_ID} aria-label={MOCK_FIELD_LABEL} />}
       <SaveBar
         {...baseProps}
         invalidControls={{
-          ids: [FIELD_HEADING_ID],
+          ids: [MOCK_FIELD_ID],
           revealFirst: () => setIsRevealed(true),
         }}
       />
@@ -54,7 +61,7 @@ describe(`<${SaveBar.name}/>`, () => {
   });
 
   it('shows a single change in the singular', () => {
-    renderBar({ changeCount: 1 });
+    setup({ changeCount: 1 });
 
     const changeCount = screen.getByText('1 unsaved change');
 
@@ -62,17 +69,17 @@ describe(`<${SaveBar.name}/>`, () => {
   });
 
   it('shows the per-language breakdown beside the count', () => {
-    renderBar({ breakdown: BREAKDOWN });
+    setup({ breakdown: MOCK_BREAKDOWN });
 
     const changeCount = screen.getByText(THREE_UNSAVED_CHANGES);
-    const breakdown = screen.getByText(BREAKDOWN);
+    const breakdown = screen.getByText(MOCK_BREAKDOWN);
 
     expect(changeCount).toBeVisible();
     expect(breakdown).toBeVisible();
   });
 
   it('shows the saving state on Save and disables Discard while pending', () => {
-    renderBar({ isPending: true });
+    setup({ isPending: true });
 
     const savingButton = screen.getByRole('button', { name: 'Saving…' });
     const discardButton = screen.getByRole('button', { name: DISCARD });
@@ -83,7 +90,9 @@ describe(`<${SaveBar.name}/>`, () => {
 
   describe('after a save with field errors', () => {
     beforeEach(() => {
-      renderBar({ invalidControls: { ids: [FIELD_HEADING_ID, 'field-body'] } });
+      setup({
+        invalidControls: { ids: [MOCK_FIELD_ID, MOCK_SECOND_FIELD_ID] },
+      });
     });
 
     it('counts the fields that need attention in place of the change count', () => {
@@ -99,37 +108,7 @@ describe(`<${SaveBar.name}/>`, () => {
         name: GO_TO_THE_FIRST_ONE,
       });
 
-      expect(firstFieldLink).toHaveAttribute('href', `#${FIELD_HEADING_ID}`);
-    });
-
-    it('focuses the first field from the link', async () => {
-      renderWithIntl(<input id={FIELD_HEADING_ID} aria-label={HEADING} />);
-
-      const firstFieldLink = screen.getByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(firstFieldLink);
-
-      const headingField = screen.getByRole('textbox', { name: HEADING });
-
-      expect(headingField).toHaveFocus();
-    });
-
-    it('focuses the control inside a first field that cannot take focus', async () => {
-      renderWithIntl(
-        <div id={FIELD_HEADING_ID}>
-          <input aria-label={HEADING} />
-        </div>,
-      );
-
-      const firstFieldLink = screen.getByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(firstFieldLink);
-
-      const headingField = screen.getByRole('textbox', { name: HEADING });
-
-      expect(headingField).toHaveFocus();
+      expect(firstFieldLink).toHaveAttribute('href', `#${MOCK_FIELD_ID}`);
     });
 
     it('keeps Save and Discard available', () => {
@@ -141,34 +120,71 @@ describe(`<${SaveBar.name}/>`, () => {
     });
   });
 
-  it('lets the page reveal the first field before focusing it', async () => {
-    renderWithIntl(<BarWithHiddenField />);
+  describe('going to the first field', () => {
+    it.each<{ fieldKind: string; field: ReactNode }>([
+      {
+        fieldKind: 'the field itself',
+        field: <input id={MOCK_FIELD_ID} aria-label={MOCK_FIELD_LABEL} />,
+      },
+      {
+        fieldKind: 'the control inside a field that cannot take focus',
+        field: (
+          <div id={MOCK_FIELD_ID}>
+            <input aria-label={MOCK_FIELD_LABEL} />
+          </div>
+        ),
+      },
+    ])('focuses $fieldKind', async ({ field }) => {
+      renderWithIntl(
+        <>
+          {field}
+          <SaveBar {...baseProps} invalidControls={{ ids: [MOCK_FIELD_ID] }} />
+        </>,
+      );
 
-    const firstFieldLink = screen.getByRole('link', {
-      name: GO_TO_THE_FIRST_ONE,
+      const firstFieldLink = screen.getByRole('link', {
+        name: GO_TO_THE_FIRST_ONE,
+      });
+      await user.click(firstFieldLink);
+
+      const firstField = screen.getByRole('textbox', {
+        name: MOCK_FIELD_LABEL,
+      });
+
+      expect(firstField).toHaveFocus();
     });
-    await user.click(firstFieldLink);
 
-    const headingField = screen.getByRole('textbox', { name: HEADING });
+    it('lets the page reveal the first field before focusing it', async () => {
+      renderWithIntl(<BarWithHiddenField />);
 
-    expect(headingField).toHaveFocus();
+      const firstFieldLink = screen.getByRole('link', {
+        name: GO_TO_THE_FIRST_ONE,
+      });
+      await user.click(firstFieldLink);
+
+      const firstField = screen.getByRole('textbox', {
+        name: MOCK_FIELD_LABEL,
+      });
+
+      expect(firstField).toHaveFocus();
+    });
   });
 
   describe('after a save that failed', () => {
     it('announces the error beside Save when no field caused it', () => {
-      renderBar({ saveError: SAVE_ERROR });
+      setup({ saveError: MOCK_SAVE_ERROR });
 
       const alert = screen.getByRole('alert');
       const changeCount = screen.queryByText(THREE_UNSAVED_CHANGES);
 
-      expect(alert).toHaveTextContent(SAVE_ERROR);
+      expect(alert).toHaveTextContent(MOCK_SAVE_ERROR);
       expect(changeCount).not.toBeInTheDocument();
     });
 
-    it('says the save did not go through and links to the field that caused it', () => {
-      renderBar({
-        saveError: "Couldn't upload the logo — try again.",
-        invalidControls: { ids: ['field-logo'] },
+    it('says the save failed and links to the field that caused it', () => {
+      setup({
+        saveError: MOCK_SAVE_ERROR,
+        invalidControls: { ids: [MOCK_FIELD_ID] },
       });
 
       const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
@@ -177,7 +193,7 @@ describe(`<${SaveBar.name}/>`, () => {
 
       expect(region).toHaveTextContent('Not saved');
       expect(region).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
-      expect(link).toHaveAttribute('href', '#field-logo');
+      expect(link).toHaveAttribute('href', `#${MOCK_FIELD_ID}`);
       expect(alert).not.toBeInTheDocument();
     });
   });

@@ -1,21 +1,32 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_IDLE_PROVISIONING_STEPS,
+  MOCK_MISSING_TENANT_ID,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantProvisioningStatus } from './get-tenant-provisioning-status';
 
 vi.mock('@blog/db/client');
 
-const NO_TENANT_ROW = 'setup: tenant insert returned no row.';
-
 const db = useQueryTestDb();
+
+const MOCK_PROVISIONING_STEPS: TTenantProvisioningState = {
+  ...MOCK_IDLE_PROVISIONING_STEPS,
+  [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+  },
+  [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  },
+};
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -23,61 +34,29 @@ afterEach(async () => {
 
 describe(getTenantProvisioningStatus, () => {
   it('returns the overall status and per-step map for an existing tenant', async () => {
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-      SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
-      PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      VERIFY_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-      OWNER_ELEVATION: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
-    };
-    const [tenant] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Acme',
-        primaryDomain: 'acme.example.com',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps,
-      })
-      .returning();
+    const { id } = await insertTestTenant(db(), {
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      provisioningSteps: MOCK_PROVISIONING_STEPS,
+    });
 
-    if (!tenant) throw new Error(NO_TENANT_ROW);
-
-    const result = await getTenantProvisioningStatus(tenant.id);
+    const result = await getTenantProvisioningStatus(id);
 
     expect(result).toEqual({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
+      provisioningSteps: MOCK_PROVISIONING_STEPS,
     });
   });
 
   it('returns undefined for a tenant id that does not exist', async () => {
-    const result = await getTenantProvisioningStatus(
-      '00000000-0000-0000-0000-000000000000',
-    );
+    const result = await getTenantProvisioningStatus(MOCK_MISSING_TENANT_ID);
 
     expect(result).toBeUndefined();
   });
 
   it('returns null fields for a tenant that predates provisioning tracking', async () => {
-    const [tenant] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Legacy',
-        primaryDomain: 'legacy.example.com',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-      })
-      .returning();
+    const { id } = await insertTestTenant(db());
 
-    if (!tenant) throw new Error(NO_TENANT_ROW);
-
-    const result = await getTenantProvisioningStatus(tenant.id);
+    const result = await getTenantProvisioningStatus(id);
 
     expect(result).toEqual({
       provisioningStatus: null,

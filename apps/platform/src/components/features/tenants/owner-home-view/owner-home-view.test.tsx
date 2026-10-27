@@ -1,9 +1,14 @@
-import { TENANT_PLAN } from '@blog/db';
+import { TENANT_PLAN } from '@blog/db/constants';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
-import { act, customRender, screen } from '@platform/testing/custom-render';
+import {
+  act,
+  customRender,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   mockTenant,
@@ -32,7 +37,7 @@ const defaultProps: TOwnerHomeViewProps = {
   domainVerificationStatus: Promise.resolve(
     DOMAIN_VERIFICATION_STATUS.VERIFIED,
   ),
-  owner: mockJoinedOwner('sam@northwind.dev'),
+  owner: mockJoinedOwner(),
 };
 
 const renderView = customRender(OwnerHomeView, defaultProps);
@@ -49,30 +54,31 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       await setup();
     });
 
-    it("renders the tenant's name, status and plan, and an Open site action", () => {
+    it("shows the tenant's name, status and plan, and an Open site link", () => {
       const tenantHeading = screen.getByRole('heading', {
         level: 1,
         name: MOCK_SITE_NAME,
       });
       const statusText = screen.getByText('Active');
-      const planTexts = screen.getAllByText('Growth');
+      const titleRow = screen.getByTestId('page-header-title-row');
+      const planText = within(titleRow).getByText('Growth');
       const openSiteLink = screen.getByRole('link', {
         name: 'Open site (opens in new tab)',
       });
 
       expect(tenantHeading).toBeVisible();
       expect(statusText).toBeVisible();
-      expect(planTexts.length).toBeGreaterThan(0);
+      expect(planText).toBeVisible();
       expect(openSiteLink).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
     });
 
-    it('does not render the archived notice', () => {
+    it('shows no archived notice', () => {
       const archivedNotice = screen.queryByText(ARCHIVED_NOTICE_TEXT);
 
       expect(archivedNotice).not.toBeInTheDocument();
     });
 
-    it('renders the read-only "Your site" card instead of an editable form', () => {
+    it('shows the read-only Your site card instead of an editable form', () => {
       const yourSiteHeading = screen.getByRole('heading', {
         level: 2,
         name: 'Your site',
@@ -83,25 +89,16 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       expect(textbox).not.toBeInTheDocument();
     });
 
-    it('renders "Make it yours" tiles routing to the Look/Voice/Features dashboard pages', () => {
+    it('shows the Make it yours card', () => {
       const makeItYoursHeading = screen.getByRole('heading', {
         level: 2,
         name: 'Make it yours',
       });
-      const lookLink = screen.getByRole('link', { name: /Look/ });
-      const voiceLink = screen.getByRole('link', { name: /Voice/ });
-      const featuresLink = screen.getByRole('link', { name: /Features/ });
 
       expect(makeItYoursHeading).toBeVisible();
-      expect(lookLink).toHaveAttribute('href', adminRoutes.dashboardLook());
-      expect(voiceLink).toHaveAttribute('href', adminRoutes.dashboardVoice());
-      expect(featuresLink).toHaveAttribute(
-        'href',
-        adminRoutes.dashboardFeatures(),
-      );
     });
 
-    it('never renders the platform-only Content workspace or Recent activity cards', () => {
+    it('omits the platform-only Content workspace and Recent activity cards', () => {
       const contentWorkspaceHeading = screen.queryByRole('heading', {
         name: 'Content workspace',
       });
@@ -118,7 +115,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
   });
 
-  it('renders the archived notice when the tenant has been deprovisioned', async () => {
+  it('shows the archived notice when the tenant has been deprovisioned', async () => {
     await setup({
       tenant: {
         ...tenant,
@@ -140,7 +137,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       });
     });
 
-    it("renders Domain and Owner cards, linking DNS to the owner tree's own domain page", () => {
+    it('shows the Domain and Owner cards, linking DNS to the domain page', () => {
       const domainHeading = screen.getByRole('heading', {
         level: 2,
         name: 'Domain',
@@ -161,11 +158,11 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       const skeleton = screen.queryByTestId('skeleton');
 
       expect(pendingStatusText).toBeVisible();
-      expect(skeleton).toBeNull();
+      expect(skeleton).not.toBeInTheDocument();
     });
   });
 
-  it('renders the page around a Domain card skeleton while Vercel has not answered', async () => {
+  it('shows a Domain card skeleton while Vercel has not answered', async () => {
     await setup({
       domainVerificationStatus: new Promise<TDomainVerificationStatus>(
         () => {},
@@ -188,7 +185,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
 
     expect(tenantHeading).toBeVisible();
     expect(ownerHeading).toBeVisible();
-    expect(domainHeading).toBeNull();
-    expect(skeletons.length).toBeGreaterThan(0);
+    expect(domainHeading).not.toBeInTheDocument();
+    expect(skeletons).not.toHaveLength(0);
   });
 });

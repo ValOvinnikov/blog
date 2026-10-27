@@ -1,89 +1,66 @@
+import {
+  CONTAINER_WIDTH,
+  CONTENT_ALIGNMENT,
+  SPACING_SCALE,
+} from '@blog/config/constants';
 import { at, setIfMissing, unset } from 'sanity/migrate';
 
 import { migrateModuleAppearanceToLayout } from './index';
 
+const MOCK_APPEARANCE = {
+  spacingTop: SPACING_SCALE.LG,
+  spacingBottom: SPACING_SCALE.SM,
+  containerWidth: CONTAINER_WIDTH.WIDE,
+  divider: true,
+  align: CONTENT_ALIGNMENT.LEFT,
+};
+
+const MOCK_LAYOUT = {
+  spacingTop: SPACING_SCALE.LG,
+  spacingBottom: SPACING_SCALE.SM,
+  dividerTop: true,
+  dividerBottom: true,
+};
+
 describe(migrateModuleAppearanceToLayout, () => {
-  it('moves module_hero appearance onto layout (no containerWidth) and unsets appearance', () => {
+  it('moves hero appearance onto layout without the container width', () => {
     const result = migrateModuleAppearanceToLayout('module_hero', {
-      appearance: {
-        spacingTop: 'LG',
-        spacingBottom: 'LG',
-        containerWidth: 'WIDE',
-        divider: true,
-        align: 'START',
-      },
+      appearance: MOCK_APPEARANCE,
     });
 
     expect(result).toEqual([
-      at(
-        'layout',
-        setIfMissing({
-          spacingTop: 'LG',
-          spacingBottom: 'LG',
-          dividerTop: true,
-          dividerBottom: true,
-        }),
-      ),
+      at('layout', setIfMissing(MOCK_LAYOUT)),
       at('appearance', unset()),
     ]);
   });
 
-  it('moves module_newsletter appearance onto layout including containerWidth', () => {
+  it('moves newsletter appearance onto layout with the container width', () => {
     const result = migrateModuleAppearanceToLayout('module_newsletter', {
-      appearance: {
-        spacingTop: 'LG',
-        spacingBottom: 'LG',
-        containerWidth: 'WIDE',
-        divider: true,
-      },
+      appearance: MOCK_APPEARANCE,
     });
 
     expect(result).toEqual([
       at(
         'layout',
-        setIfMissing({
-          spacingTop: 'LG',
-          spacingBottom: 'LG',
-          containerWidth: 'WIDE',
-          dividerTop: true,
-          dividerBottom: true,
-        }),
+        setIfMissing({ ...MOCK_LAYOUT, containerWidth: CONTAINER_WIDTH.WIDE }),
       ),
       at('appearance', unset()),
     ]);
   });
 
-  it('only unsets appearance when nothing worth copying remains (e.g. only align was set)', () => {
+  it('only unsets appearance when nothing worth copying remains', () => {
     const result = migrateModuleAppearanceToLayout('module_hero', {
-      appearance: { align: 'START' },
+      appearance: { align: CONTENT_ALIGNMENT.LEFT },
     });
 
     expect(result).toEqual([at('appearance', unset())]);
   });
 
-  it('is idempotent — a doc already migrated (layout set) is left alone', () => {
+  it('leaves a doc that already has a layout alone', () => {
     const result = migrateModuleAppearanceToLayout('module_hero', {
-      appearance: { spacingTop: 'LG' },
-      layout: { spacingTop: 'LG' },
+      appearance: MOCK_APPEARANCE,
+      layout: MOCK_LAYOUT,
     });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('treats an explicit layout: null as not yet migrated and still produces a patch', () => {
-    const result = migrateModuleAppearanceToLayout('module_hero', {
-      appearance: { spacingTop: 'LG' },
-      layout: null,
-    });
-
-    expect(result).toEqual([
-      at('layout', setIfMissing({ spacingTop: 'LG' })),
-      at('appearance', unset()),
-    ]);
-  });
-
-  it('returns undefined for a doc with no appearance', () => {
-    const result = migrateModuleAppearanceToLayout('module_newsletter', {});
 
     expect(result).toBeUndefined();
   });

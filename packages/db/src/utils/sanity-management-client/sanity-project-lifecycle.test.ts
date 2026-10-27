@@ -15,10 +15,12 @@ import {
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
 import {
   MOCK_SANITY_EXPECTED_URL,
+  MOCK_SANITY_ORGANIZATION_ID,
   MOCK_SANITY_PROJECT_ID,
   mockSanityProjectInput,
 } from '@blog/db/testing/sanity-management-client/fixtures';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { faker } from '@faker-js/faker';
 
 import {
   archiveSanityProject,
@@ -26,16 +28,19 @@ import {
   unarchiveSanityProject,
 } from './sanity-project-lifecycle';
 
+faker.seed(3092);
+
 const fetchMock = useFetchFake();
 
-const INPUT = mockSanityProjectInput({});
-const MOCK_NOT_FOUND_BODY = 'not found';
-const MOCK_FORBIDDEN_BODY = 'forbidden';
-const MOCK_SERVER_ERROR_BODY = 'server error';
-const BILLING_401_BODY = JSON.stringify({
+const MOCK_INPUT = mockSanityProjectInput({});
+const MOCK_NOT_FOUND_BODY = faker.lorem.words(2);
+const MOCK_FORBIDDEN_BODY = faker.lorem.words(2);
+const MOCK_SERVER_ERROR_BODY = faker.lorem.words(2);
+const MOCK_INVALID_TOKEN_BODY = faker.lorem.words(2);
+const MOCK_BILLING_401_BODY = JSON.stringify({
   code: HTTP_STATUS.UNAUTHORIZED,
   status: 'Unauthorized',
-  message: `Cancellation of project "${MOCK_SANITY_PROJECT_ID}" requires billing permission on organization "org1"`,
+  message: `Cancellation of project "${MOCK_SANITY_PROJECT_ID}" requires billing permission on organization "${MOCK_SANITY_ORGANIZATION_ID}"`,
 });
 
 function managementApiError(method: string, status: number, body: string) {
@@ -60,14 +65,14 @@ describe(deleteSanityProject, () => {
     });
 
     it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
-      await deleteSanityProject(INPUT);
+      await deleteSanityProject(MOCK_INPUT);
 
       const { init } = firstFetchCall(fetchMock);
       expect(init.signal).toBeInstanceOf(AbortSignal);
     });
 
     it('DELETEs the project', async () => {
-      const result = await deleteSanityProject(INPUT);
+      const result = await deleteSanityProject(MOCK_INPUT);
 
       expect(result).toEqual(toOutcome(SANITY_PROJECT_DELETE_OUTCOME.DELETED));
       const { url, method } = firstFetchCall(fetchMock);
@@ -81,7 +86,7 @@ describe(deleteSanityProject, () => {
       textResponse(MOCK_NOT_FOUND_BODY, HTTP_STATUS.NOT_FOUND),
     );
 
-    const result = await deleteSanityProject(INPUT);
+    const result = await deleteSanityProject(MOCK_INPUT);
 
     expect(result).toEqual(
       toOutcome(SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE),
@@ -90,10 +95,10 @@ describe(deleteSanityProject, () => {
 
   it('reports blocked by billing permission on the billing 401 without throwing', async () => {
     fetchMock.mockResolvedValue(
-      textResponse(BILLING_401_BODY, HTTP_STATUS.UNAUTHORIZED),
+      textResponse(MOCK_BILLING_401_BODY, HTTP_STATUS.UNAUTHORIZED),
     );
 
-    const result = await deleteSanityProject(INPUT);
+    const result = await deleteSanityProject(MOCK_INPUT);
 
     expect(result).toEqual(
       toOutcome(SANITY_PROJECT_DELETE_OUTCOME.BLOCKED_BY_BILLING_PERMISSION),
@@ -102,13 +107,13 @@ describe(deleteSanityProject, () => {
 
   it.each([
     { status: HTTP_STATUS.FORBIDDEN, body: MOCK_FORBIDDEN_BODY },
-    { status: HTTP_STATUS.UNAUTHORIZED, body: 'invalid token' },
+    { status: HTTP_STATUS.UNAUTHORIZED, body: MOCK_INVALID_TOKEN_BODY },
   ])(
     'throws with the response status and body on a $status failure',
     async ({ status, body }) => {
       fetchMock.mockResolvedValue(textResponse(body, status));
 
-      await expect(deleteSanityProject(INPUT)).rejects.toThrow(
+      await expect(deleteSanityProject(MOCK_INPUT)).rejects.toThrow(
         managementApiError(HTTP_METHOD.DELETE, status, body),
       );
     },
@@ -117,7 +122,7 @@ describe(deleteSanityProject, () => {
 
 describe.each([
   {
-    name: 'archiveSanityProject',
+    name: archiveSanityProject.name,
     run: archiveSanityProject,
     isDisabledByUser: false,
     outcome: SANITY_PROJECT_ARCHIVE_OUTCOME.ARCHIVED,
@@ -125,7 +130,7 @@ describe.each([
     goneOutcome: SANITY_PROJECT_ARCHIVE_OUTCOME.ALREADY_GONE,
   },
   {
-    name: 'unarchiveSanityProject',
+    name: unarchiveSanityProject.name,
     run: unarchiveSanityProject,
     isDisabledByUser: true,
     outcome: SANITY_PROJECT_UNARCHIVE_OUTCOME.UNARCHIVED,
@@ -138,7 +143,7 @@ describe.each([
     it('skips the PATCH when the project is already in the target state', async () => {
       fetchMock.mockResolvedValueOnce(projectResponse(!isDisabledByUser));
 
-      const result = await run(INPUT);
+      const result = await run(MOCK_INPUT);
 
       expect(result).toEqual(toOutcome(alreadyOutcome));
       expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -149,7 +154,7 @@ describe.each([
         textResponse(MOCK_NOT_FOUND_BODY, HTTP_STATUS.NOT_FOUND),
       );
 
-      const result = await run(INPUT);
+      const result = await run(MOCK_INPUT);
 
       expect(result).toEqual(toOutcome(goneOutcome));
       expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -160,7 +165,7 @@ describe.each([
         textResponse(MOCK_FORBIDDEN_BODY, HTTP_STATUS.FORBIDDEN),
       );
 
-      await expect(run(INPUT)).rejects.toThrow(
+      await expect(run(MOCK_INPUT)).rejects.toThrow(
         managementApiError(
           HTTP_METHOD.GET,
           HTTP_STATUS.FORBIDDEN,
@@ -180,7 +185,7 @@ describe.each([
         });
 
         it('GETs, then PATCHes isDisabledByUser to the opposite value', async () => {
-          const result = await run(INPUT);
+          const result = await run(MOCK_INPUT);
 
           expect(result).toEqual(toOutcome(outcome));
           expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -194,7 +199,7 @@ describe.each([
         });
 
         it('sends an abort signal on both the GET and the PATCH', async () => {
-          await run(INPUT);
+          await run(MOCK_INPUT);
 
           expect(nthFetchCall(fetchMock, 0).init.signal).toBeInstanceOf(
             AbortSignal,
@@ -213,7 +218,7 @@ describe.each([
           ),
         );
 
-        await expect(run(INPUT)).rejects.toThrow(
+        await expect(run(MOCK_INPUT)).rejects.toThrow(
           managementApiError(
             HTTP_METHOD.PATCH,
             HTTP_STATUS.INTERNAL_SERVER_ERROR,

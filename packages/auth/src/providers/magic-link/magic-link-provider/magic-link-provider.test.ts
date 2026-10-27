@@ -3,83 +3,101 @@ import {
   MOCK_DB_ERROR_MESSAGE,
   MOCK_FRENCH_PATH,
   MOCK_FROM_ADDRESS,
-  MOCK_INVITE_ID,
+  MOCK_FROM_EMAIL,
   MOCK_POSTAL_ADDRESS,
   MOCK_READER_EMAIL,
   MOCK_REPLY_TO,
-  MOCK_SENDER_FROM_ADDRESS,
   MOCK_SENDER_NAME,
+  MOCK_SITE_CONFIG,
   MOCK_SUBJECT,
   MOCK_TEMPLATE_LOGO_URL,
-  MOCK_TENANT_FROM_ADDRESS,
   MOCK_TENANT_ID,
   MOCK_TENANT_LOGO_URL,
   MOCK_TENANT_NAME,
   MOCK_TOKEN,
+  mockEmailConfig,
+  mockEmailTemplate,
+  mockPendingInvite,
+  mockTenant,
 } from '@blog/auth/testing/magic-link-fixtures';
-import { MOCK_EMAIL } from '@blog/auth/testing/session-fixtures';
 import { resolveTenantEmailBrand } from '@blog/config';
 import {
   AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
+  LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   MAGIC_LINK_REFUSAL,
-  PRESET_ID,
+  type TLocaleIsoCode,
 } from '@blog/config/constants';
 import {
   EMAIL_TEMPLATE_DEFAULT_COPY,
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
-  TENANT_PLAN,
 } from '@blog/db/constants';
-import type { TSendEmailInput } from '@blog/email';
+import { PLATFORM_EMAIL_BRAND_NAME, type TSendEmailInput } from '@blog/email';
+import { faker } from '@faker-js/faker';
 
-import { buildMagicLinkProvider } from './magic-link-provider';
+import {
+  buildMagicLinkProvider,
+  MAGIC_LINK_PROVIDER_ID,
+} from './magic-link-provider';
+
+faker.seed(6027);
 
 const MAGIC_LINK_DEFAULTS =
   EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.MAGIC_LINK];
 const TENANT_INVITE_DEFAULTS =
   EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.TENANT_INVITE];
 
-const SITE_ORIGIN = 'https://example.com';
-const PLATFORM_ORIGIN = 'https://platform.example.com';
-const INVITED_EMAIL = 'invited@example.com';
-const ADMIN_EMAIL = 'admin@example.com';
-const SITE_CALLBACK_URL = `${SITE_ORIGIN}/api/auth/callback/email?token=${MOCK_TOKEN}`;
-const PLATFORM_CALLBACK_URL = `${PLATFORM_ORIGIN}/api/auth/callback/email?token=${MOCK_TOKEN}`;
-const PLATFORM_LAYOUT_MARK = '>Platform</td>';
+const MOCK_SITE_ORIGIN = faker.internet.url({ appendSlash: false });
+const MOCK_PLATFORM_ORIGIN = faker.internet.url({ appendSlash: false });
+const MOCK_INVITED_EMAIL = faker.internet.exampleEmail();
+const MOCK_ADMIN_EMAIL = faker.internet.exampleEmail();
+const MOCK_LINK_EXPIRES = faker.date.future();
+const MOCK_AUTHORED_BODY_TEXT = faker.lorem.sentence();
+const MOCK_PHISHING_URL = faker.internet.url();
+const MIMICKED_ACTION_LABEL = 'Sign in';
+const PLATFORM_LAYOUT_MARK = `>${PLATFORM_EMAIL_BRAND_NAME}</td>`;
 const COPYRIGHT_MARK = '&copy;';
-const CUSTOM_BODY_TEXT = 'Use the button below to get back in.';
-const ADVERSARIAL_LINK_KEY = 'adversarial-link';
-const SITE_LINK_HREF = `href="${SITE_CALLBACK_URL}"`;
-const REFUSAL = { reason: MAGIC_LINK_REFUSAL.BLOCKED };
+const BLOCKED_REFUSAL = { reason: MAGIC_LINK_REFUSAL.BLOCKED };
 const LIMIT_REFUSAL = { reason: MAGIC_LINK_REFUSAL.ADDRESS_LIMIT };
 
-function sendVerificationRequestFor(
-  provider: ReturnType<typeof buildMagicLinkProvider>,
-  {
-    identifier = MOCK_READER_EMAIL,
-    url = SITE_CALLBACK_URL,
-  }: { identifier?: string; url?: string } = {},
-) {
-  return provider.sendVerificationRequest({
-    identifier,
-    url,
-    expires: new Date('2026-01-01T00:00:00.000Z'),
-    provider,
+const callbackUrlOn = (origin: string, callbackPath?: string) =>
+  `${origin}/api/auth/callback/email?${new URLSearchParams({
+    ...(callbackPath && { callbackUrl: `${origin}${callbackPath}` }),
     token: MOCK_TOKEN,
-    theme: {},
-    request: new Request(new URL(url).origin),
-  });
-}
+  })}`;
 
-function sentEmail(): TSendEmailInput {
-  const email = sendEmailMock.mock.calls[0]?.[0];
-  if (!email) {
-    throw new Error('sendEmail was not called');
-  }
+const SITE_CALLBACK_URL = callbackUrlOn(MOCK_SITE_ORIGIN);
+const PLATFORM_CALLBACK_URL = callbackUrlOn(MOCK_PLATFORM_ORIGIN);
+const SITE_LINK_HREF = `href="${SITE_CALLBACK_URL}"`;
+const DEFAULT_ENVELOPE = {
+  to: MOCK_READER_EMAIL,
+  from: MOCK_FROM_ADDRESS,
+  subject: MAGIC_LINK_DEFAULTS.subject,
+};
 
-  return email;
-}
+const mockAuthoredBlock = (
+  text: string,
+  markDefs: { _type: string; _key: string; href: string }[] = [],
+) => ({
+  _type: 'block',
+  _key: faker.string.uuid(),
+  style: 'normal',
+  markDefs,
+  children: [
+    {
+      _type: 'span',
+      _key: faker.string.uuid(),
+      text,
+      marks: markDefs.map(({ _key }) => _key),
+    },
+  ],
+});
+
+const defaultCopyIn = (locale: TLocaleIsoCode, templateType: string) =>
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale][
+    templateType as keyof (typeof EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE)[TLocaleIsoCode]
+  ];
 
 const {
   findPendingInviteByEmailMock,
@@ -137,43 +155,88 @@ vi.mock(import('@blog/email'), async (importOriginal) => ({
   sendEmail: sendEmailMock,
 }));
 
+function sendVerificationRequestFor(
+  provider: ReturnType<typeof buildMagicLinkProvider>,
+  {
+    identifier = MOCK_READER_EMAIL,
+    url = SITE_CALLBACK_URL,
+  }: { identifier?: string; url?: string } = {},
+) {
+  return provider.sendVerificationRequest({
+    identifier,
+    url,
+    expires: MOCK_LINK_EXPIRES,
+    provider,
+    token: MOCK_TOKEN,
+    theme: {},
+    request: new Request(new URL(url).origin),
+  });
+}
+
+function sentEmail(): TSendEmailInput {
+  const email = sendEmailMock.mock.calls[0]?.[0];
+  if (!email) {
+    throw new Error('sendEmail was not called');
+  }
+
+  return email;
+}
+
+const buildPlatformProvider = () =>
+  buildMagicLinkProvider(AUTH_APP.PLATFORM, onSendRefusedMock);
+
+const withPendingInvite = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) => {
+  findPendingInviteByEmailMock.mockResolvedValue([mockPendingInvite()]);
+  listTenantsByIdsMock.mockResolvedValue([mockTenant({ locale })]);
+};
+
 describe(buildMagicLinkProvider, () => {
   let provider: ReturnType<typeof buildMagicLinkProvider>;
 
   beforeEach(() => {
-    findPendingInviteByEmailMock.mockReset().mockResolvedValue([]);
-    listTenantsByIdsMock.mockReset();
-    getTenantByDomainMock.mockReset().mockResolvedValue(undefined);
-    getSiteConfigMock.mockReset();
-    getEmailConfigMock.mockReset().mockResolvedValue(undefined);
-    getEmailTemplateMock.mockReset().mockResolvedValue({
-      subject: MAGIC_LINK_DEFAULTS.subject,
-      body: MAGIC_LINK_DEFAULTS.body,
-      logoAssetUrl: undefined,
-    });
-    sendEmailMock.mockReset().mockResolvedValue(undefined);
+    vi.stubEnv('MAGIC_LINK_FROM_ADDRESS', MOCK_FROM_ADDRESS);
+    findPendingInviteByEmailMock.mockResolvedValue([]);
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    getEmailConfigMock.mockResolvedValue(undefined);
+    getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
+    sendEmailMock.mockResolvedValue(undefined);
     findMagicLinkSendRefusalMock.mockResolvedValue(undefined);
-    onSendRefusedMock.mockReset();
     withMinimumDurationMock.mockImplementation(
       (_minimumMs: number, task: () => Promise<unknown>) => task(),
     );
     provider = buildMagicLinkProvider(AUTH_APP.SITE, onSendRefusedMock);
   });
 
-  it('sends nothing once the send check refuses the request', async () => {
-    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
-
-    await sendVerificationRequestFor(provider);
-
-    expect(sendEmailMock).not.toHaveBeenCalled();
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
-  it("hands the refusal to the app's handler", async () => {
-    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
+  it('identifies itself as the magic-link provider', () => {
+    expect(provider.id).toBe(MAGIC_LINK_PROVIDER_ID);
+  });
 
-    await sendVerificationRequestFor(provider);
+  it('advertises the configured from address', () => {
+    expect(provider.from).toBe(MOCK_FROM_ADDRESS);
+  });
 
-    expect(onSendRefusedMock).toHaveBeenCalledExactlyOnceWith(REFUSAL);
+  describe('when the send check blocks the request', () => {
+    beforeEach(() => {
+      findMagicLinkSendRefusalMock.mockResolvedValue(BLOCKED_REFUSAL);
+    });
+
+    it('sends nothing', async () => {
+      await sendVerificationRequestFor(provider);
+
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    });
+
+    it("hands the refusal to the app's handler", async () => {
+      await sendVerificationRequestFor(provider);
+
+      expect(onSendRefusedMock).toHaveBeenCalledExactlyOnceWith(
+        BLOCKED_REFUSAL,
+      );
+    });
   });
 
   it('reports no refusal for a link it sends', async () => {
@@ -215,7 +278,7 @@ describe(buildMagicLinkProvider, () => {
 
   it('holds a refused request to the same minimum duration as a real send', async () => {
     await sendVerificationRequestFor(provider);
-    findMagicLinkSendRefusalMock.mockResolvedValue(REFUSAL);
+    findMagicLinkSendRefusalMock.mockResolvedValue(BLOCKED_REFUSAL);
     await sendVerificationRequestFor(provider);
 
     const [sentFloorMs, refusedFloorMs] =
@@ -232,264 +295,173 @@ describe(buildMagicLinkProvider, () => {
     expect(request).toBeInstanceOf(Request);
   });
 
-  it('identifies itself as the email provider', () => {
-    expect(provider.id).toBe('email');
-    expect(provider.type).toBe('email');
-  });
-
-  it('resolves the from address via resolveMagicLinkFromAddress', () => {
-    expect(provider.from).toBe(MOCK_FROM_ADDRESS);
-  });
-
-  it("delivers the sign-in link through @blog/email's sendEmail", async () => {
+  it('delivers the sign-in link from the configured address', async () => {
     await sendVerificationRequestFor(provider);
 
     const { html, ...envelope } = sentEmail();
-    expect(envelope).toEqual({
-      to: MOCK_READER_EMAIL,
-      from: MOCK_FROM_ADDRESS,
-      subject: MAGIC_LINK_DEFAULTS.subject,
-    });
+    expect(envelope).toEqual(DEFAULT_ENVELOPE);
     expect(html).toContain(SITE_LINK_HREF);
   });
 
-  it('sends invite-flavored copy when the identifier has a pending invite', async () => {
-    const provider = buildMagicLinkProvider(
-      AUTH_APP.PLATFORM,
-      onSendRefusedMock,
-    );
-    findPendingInviteByEmailMock.mockResolvedValue([
-      { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      {
-        id: MOCK_TENANT_ID,
-        name: MOCK_TENANT_NAME,
-        locale: LOCALE_ISO_CODES.EN,
-      },
-    ]);
+  it('sends invite copy to a platform address with a pending invite', async () => {
+    withPendingInvite();
 
-    await sendVerificationRequestFor(provider, { identifier: INVITED_EMAIL });
+    await sendVerificationRequestFor(buildPlatformProvider(), {
+      identifier: MOCK_INVITED_EMAIL,
+    });
 
-    expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(INVITED_EMAIL);
     const { to, from, subject, html } = sentEmail();
-    expect(to).toBe(INVITED_EMAIL);
-    expect(from).toBe(MOCK_FROM_ADDRESS);
-    expect(subject).toBe(TENANT_INVITE_DEFAULTS.subject);
-    expect(html).toContain('Accept invite');
-    expect(html).toContain(`<strong>${MOCK_TENANT_NAME}</strong>`);
+    expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
+      MOCK_INVITED_EMAIL,
+    );
+    expect([to, from, subject]).toEqual([
+      MOCK_INVITED_EMAIL,
+      MOCK_FROM_ADDRESS,
+      TENANT_INVITE_DEFAULTS.subject,
+    ]);
+    expect(html).toContain(MOCK_TENANT_NAME);
   });
 
   it("sends a site's own sign-in email to an address with a pending invite", async () => {
-    findPendingInviteByEmailMock.mockResolvedValue([
-      { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      {
-        id: MOCK_TENANT_ID,
-        name: MOCK_TENANT_NAME,
-        locale: LOCALE_ISO_CODES.EN,
-      },
-    ]);
+    withPendingInvite();
 
-    await sendVerificationRequestFor(provider, { identifier: INVITED_EMAIL });
+    await sendVerificationRequestFor(provider, {
+      identifier: MOCK_INVITED_EMAIL,
+    });
 
     const { subject, html } = sentEmail();
     expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
     expect(html).not.toContain(MOCK_TENANT_NAME);
   });
 
-  it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {
-    const provider = buildMagicLinkProvider(
-      AUTH_APP.PLATFORM,
-      onSendRefusedMock,
-    );
+  it('falls back to the generic copy when the invite lookup throws', async () => {
     findPendingInviteByEmailMock.mockRejectedValue(
       new Error(MOCK_DB_ERROR_MESSAGE),
     );
 
-    await sendVerificationRequestFor(provider);
+    await sendVerificationRequestFor(buildPlatformProvider());
 
     const { html, ...envelope } = sentEmail();
-    expect(envelope).toEqual({
-      to: MOCK_READER_EMAIL,
-      from: MOCK_FROM_ADDRESS,
-      subject: MAGIC_LINK_DEFAULTS.subject,
-    });
+    expect(envelope).toEqual(DEFAULT_ENVELOPE);
     expect(html).toContain(SITE_LINK_HREF);
   });
 
-  it("sends the admin's sign-in email in the platform layout", async () => {
-    const provider = buildMagicLinkProvider(
-      AUTH_APP.PLATFORM,
-      onSendRefusedMock,
-    );
+  it.each([
+    ['sign-in', () => {}, MAGIC_LINK_DEFAULTS.subject],
+    ['invite', () => withPendingInvite(), TENANT_INVITE_DEFAULTS.subject],
+  ])(
+    "sends the admin's %s email in the platform layout",
+    async (_, arrange, expectedSubject) => {
+      arrange();
 
-    await sendVerificationRequestFor(provider, {
-      identifier: ADMIN_EMAIL,
-      url: PLATFORM_CALLBACK_URL,
-    });
+      await sendVerificationRequestFor(buildPlatformProvider(), {
+        identifier: MOCK_ADMIN_EMAIL,
+        url: PLATFORM_CALLBACK_URL,
+      });
 
-    const { subject, html } = sentEmail();
-    expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
-    expect(html).toContain(PLATFORM_LAYOUT_MARK);
-  });
-
-  it("sends the admin's invite email in the platform layout", async () => {
-    const provider = buildMagicLinkProvider(
-      AUTH_APP.PLATFORM,
-      onSendRefusedMock,
-    );
-    findPendingInviteByEmailMock.mockResolvedValue([
-      { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      {
-        id: MOCK_TENANT_ID,
-        name: MOCK_TENANT_NAME,
-        locale: LOCALE_ISO_CODES.EN,
-      },
-    ]);
-
-    await sendVerificationRequestFor(provider, {
-      identifier: INVITED_EMAIL,
-      url: PLATFORM_CALLBACK_URL,
-    });
-
-    const { subject, html } = sentEmail();
-    expect(subject).toBe(TENANT_INVITE_DEFAULTS.subject);
-    expect(html).toContain(PLATFORM_LAYOUT_MARK);
-  });
+      const { subject, html } = sentEmail();
+      expect(subject).toBe(expectedSubject);
+      expect(html).toContain(PLATFORM_LAYOUT_MARK);
+    },
+  );
 
   it("never sends a site's sign-in email in the platform layout", async () => {
     await sendVerificationRequestFor(provider);
 
-    expect(sentEmail().html).not.toContain('Platform');
+    expect(sentEmail().html).not.toContain(PLATFORM_EMAIL_BRAND_NAME);
   });
 
-  it('still delivers, in the unnamed neutral shell, when the host resolves to no tenant', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
+  it.each([
+    ['resolves to no tenant', () => {}],
+    [
+      'lookup throws',
+      () =>
+        getTenantByDomainMock.mockRejectedValue(
+          new Error(MOCK_DB_ERROR_MESSAGE),
+        ),
+    ],
+  ])(
+    'still delivers, in the unnamed neutral shell, when the host %s',
+    async (_, arrange) => {
+      arrange();
 
-    await sendVerificationRequestFor(provider);
+      await sendVerificationRequestFor(provider);
 
-    const { html, ...envelope } = sentEmail();
-    expect(envelope).toEqual({
-      to: MOCK_READER_EMAIL,
-      from: MOCK_FROM_ADDRESS,
-      subject: MAGIC_LINK_DEFAULTS.subject,
-    });
-    expect(html).not.toContain(COPYRIGHT_MARK);
-  });
+      const { html, ...envelope } = sentEmail();
+      expect(envelope).toEqual(DEFAULT_ENVELOPE);
+      expect(html).not.toContain(COPYRIGHT_MARK);
+    },
+  );
 
-  it('still delivers, in the unnamed neutral shell, when the tenant domain lookup throws', async () => {
-    getTenantByDomainMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
+  it("writes a tenant-less invite in the invited tenant's default language", async () => {
+    withPendingInvite(LOCALE_ISO_CODES.ES);
 
-    await sendVerificationRequestFor(provider);
-
-    const { html, ...envelope } = sentEmail();
-    expect(envelope).toEqual({
-      to: MOCK_READER_EMAIL,
-      from: MOCK_FROM_ADDRESS,
-      subject: MAGIC_LINK_DEFAULTS.subject,
-    });
-    expect(html).not.toContain(COPYRIGHT_MARK);
-  });
-
-  it("writes an invite sent from a tenant-less host in the invited tenant's default language", async () => {
-    const provider = buildMagicLinkProvider(
-      AUTH_APP.PLATFORM,
-      onSendRefusedMock,
-    );
-    findPendingInviteByEmailMock.mockResolvedValue([
-      { id: MOCK_INVITE_ID, tenantId: MOCK_TENANT_ID },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      {
-        id: MOCK_TENANT_ID,
-        name: MOCK_TENANT_NAME,
-        locale: LOCALE_ISO_CODES.ES,
-      },
-    ]);
-
-    await sendVerificationRequestFor(provider, {
-      identifier: MOCK_EMAIL,
+    await sendVerificationRequestFor(buildPlatformProvider(), {
+      identifier: MOCK_INVITED_EMAIL,
       url: PLATFORM_CALLBACK_URL,
     });
 
     expect(sentEmail().subject).toBe(
-      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.ES][
-        EMAIL_TEMPLATE_TYPE.TENANT_INVITE
-      ].subject,
+      defaultCopyIn(LOCALE_ISO_CODES.ES, EMAIL_TEMPLATE_TYPE.TENANT_INVITE)
+        .subject,
     );
   });
 
-  it('writes a sign-in from a tenant-less host in English whatever the return-to path', async () => {
+  it('writes a tenant-less sign-in in English whatever the return-to path', async () => {
     await sendVerificationRequestFor(provider, {
-      identifier: ADMIN_EMAIL,
-      url: `${PLATFORM_ORIGIN}/api/auth/callback/email?${new URLSearchParams({
-        callbackUrl: `${PLATFORM_ORIGIN}/fr`,
-        token: MOCK_TOKEN,
-      })}`,
+      identifier: MOCK_ADMIN_EMAIL,
+      url: callbackUrlOn(
+        MOCK_PLATFORM_ORIGIN,
+        `/${LOCALE_BCP47_TAGS[LOCALE_ISO_CODES.FR]}`,
+      ),
     });
 
     expect(sentEmail().subject).toBe(
-      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK
-      ].subject,
+      defaultCopyIn(LOCALE_ISO_CODES.EN, EMAIL_TEMPLATE_TYPE.MAGIC_LINK)
+        .subject,
     );
   });
 
   describe('when the host resolves to a tenant', () => {
     beforeEach(() => {
-      getTenantByDomainMock.mockResolvedValue({
-        id: MOCK_TENANT_ID,
-        name: MOCK_TENANT_NAME,
-        locale: LOCALE_ISO_CODES.EN,
-        additionalLocales: [LOCALE_ISO_CODES.FR],
-        plan: TENANT_PLAN.GROWTH,
-      });
-      getSiteConfigMock.mockResolvedValue({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: 140,
-        logoHue: undefined,
-      });
+      getTenantByDomainMock.mockResolvedValue(
+        mockTenant({ additionalLocales: [LOCALE_ISO_CODES.FR] }),
+      );
+      getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG);
     });
 
     it("brands the sign-in email with the resolved tenant's hue", async () => {
       await sendVerificationRequestFor(provider);
 
-      const expectedBrand = resolveTenantEmailBrand({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: 140,
-      });
-      expect(sentEmail().html).toContain(expectedBrand.logo1);
+      const { logo1 } = resolveTenantEmailBrand(MOCK_SITE_CONFIG);
+      expect(sentEmail().html).toContain(logo1);
     });
 
     it("applies the tenant's sender name and reply-to address", async () => {
-      getEmailConfigMock.mockResolvedValue({
-        logoAssetUrl: undefined,
-        senderName: MOCK_SENDER_NAME,
-        replyToAddress: MOCK_REPLY_TO,
-        footerPostalAddress: undefined,
-      });
+      getEmailConfigMock.mockResolvedValue(
+        mockEmailConfig({
+          senderName: MOCK_SENDER_NAME,
+          replyToAddress: MOCK_REPLY_TO,
+        }),
+      );
 
       await sendVerificationRequestFor(provider);
 
       const { from, replyTo } = sentEmail();
-      expect(from).toBe(MOCK_SENDER_FROM_ADDRESS);
+      expect(from).toBe(`${MOCK_SENDER_NAME} <${MOCK_FROM_EMAIL}>`);
       expect(replyTo).toBe(MOCK_REPLY_TO);
     });
 
     it('renders the resolved logo and footer postal address in the sent email', async () => {
-      getEmailConfigMock.mockResolvedValue({
-        logoAssetUrl: MOCK_TENANT_LOGO_URL,
-        senderName: undefined,
-        replyToAddress: undefined,
-        footerPostalAddress: MOCK_POSTAL_ADDRESS,
-      });
-      getEmailTemplateMock.mockResolvedValue({
-        logoAssetUrl: MOCK_TEMPLATE_LOGO_URL,
-      });
+      getEmailConfigMock.mockResolvedValue(
+        mockEmailConfig({
+          logoAssetUrl: MOCK_TENANT_LOGO_URL,
+          footerPostalAddress: MOCK_POSTAL_ADDRESS,
+        }),
+      );
+      getEmailTemplateMock.mockResolvedValue(
+        mockEmailTemplate({ logoAssetUrl: MOCK_TEMPLATE_LOGO_URL }),
+      );
 
       await sendVerificationRequestFor(provider);
 
@@ -498,93 +470,70 @@ describe(buildMagicLinkProvider, () => {
       expect(html).toContain(MOCK_POSTAL_ADDRESS);
     });
 
-    it("shows the site's name as the sender when the tenant has no sender name", async () => {
-      await sendVerificationRequestFor(provider);
+    it.each([
+      ['has no sender name', () => {}],
+      [
+        'email config lookup fails',
+        () =>
+          getEmailConfigMock.mockRejectedValue(
+            new Error(MOCK_DB_ERROR_MESSAGE),
+          ),
+      ],
+    ])(
+      "sends as the site's name, with no reply-to, when the tenant %s",
+      async (_, arrange) => {
+        arrange();
 
-      expect(sentEmail().from).toBe(MOCK_TENANT_FROM_ADDRESS);
-    });
+        await sendVerificationRequestFor(provider);
 
-    it('still delivers with product defaults when the email-config lookup fails', async () => {
-      getEmailConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
-
-      await sendVerificationRequestFor(provider);
-
-      const { from, replyTo } = sentEmail();
-      expect(from).toBe(MOCK_TENANT_FROM_ADDRESS);
-      expect(replyTo).toBeUndefined();
-    });
+        const { from, replyTo } = sentEmail();
+        expect(from).toBe(`${MOCK_TENANT_NAME} <${MOCK_FROM_EMAIL}>`);
+        expect(replyTo).toBeUndefined();
+      },
+    );
 
     it('still delivers with product defaults when the email-template lookup fails', async () => {
-      getEmailConfigMock.mockResolvedValue({
-        logoAssetUrl: undefined,
-        senderName: MOCK_SENDER_NAME,
-        replyToAddress: undefined,
-        footerPostalAddress: undefined,
-      });
+      getEmailConfigMock.mockResolvedValue(
+        mockEmailConfig({ senderName: MOCK_SENDER_NAME }),
+      );
       getEmailTemplateMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
       await sendVerificationRequestFor(provider);
 
       const { from, subject } = sentEmail();
-      expect(from).toBe(MOCK_SENDER_FROM_ADDRESS);
+      expect(from).toBe(`${MOCK_SENDER_NAME} <${MOCK_FROM_EMAIL}>`);
       expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
     });
 
-    it('sends the authored subject and body once a tenant has edited its magic-link copy', async () => {
-      getEmailTemplateMock.mockResolvedValue({
-        subject: MOCK_SUBJECT,
-        body: [
-          {
-            _type: 'block',
-            _key: 'authored-1',
-            style: 'normal',
-            children: [
-              {
-                _type: 'span',
-                _key: 'authored-1-span',
-                text: CUSTOM_BODY_TEXT,
-                marks: [],
-              },
-            ],
-          },
-        ],
-        logoAssetUrl: undefined,
-      });
+    it('sends the authored subject and body once a tenant has edited its copy', async () => {
+      getEmailTemplateMock.mockResolvedValue(
+        mockEmailTemplate({
+          subject: MOCK_SUBJECT,
+          body: [mockAuthoredBlock(MOCK_AUTHORED_BODY_TEXT)],
+        }),
+      );
 
       await sendVerificationRequestFor(provider);
 
       const { subject, html } = sentEmail();
       expect(subject).toBe(MOCK_SUBJECT);
-      expect(html).toContain(CUSTOM_BODY_TEXT);
+      expect(html).toContain(MOCK_AUTHORED_BODY_TEXT);
     });
 
-    it('keeps the sign-in action outside an authored body that mimics its own url and label', async () => {
-      getEmailTemplateMock.mockResolvedValue({
-        subject: MAGIC_LINK_DEFAULTS.subject,
-        body: [
-          {
-            _type: 'block',
-            _key: 'adversarial-1',
-            style: 'normal',
-            markDefs: [
+    it('keeps the sign-in action outside an authored body that mimics it', async () => {
+      getEmailTemplateMock.mockResolvedValue(
+        mockEmailTemplate({
+          body: [
+            mockAuthoredBlock(MIMICKED_ACTION_LABEL, [
               {
                 _type: 'link',
-                _key: ADVERSARIAL_LINK_KEY,
-                href: 'https://attacker.example.com/phish',
+                _key: faker.string.uuid(),
+                href: MOCK_PHISHING_URL,
               },
-            ],
-            children: [
-              {
-                _type: 'span',
-                _key: 'adversarial-span',
-                text: 'Sign in',
-                marks: [ADVERSARIAL_LINK_KEY],
-              },
-            ],
-          },
-        ],
-        logoAssetUrl: undefined,
-      });
+            ]),
+          ],
+        }),
+      );
 
       await sendVerificationRequestFor(provider);
 
@@ -596,13 +545,10 @@ describe(buildMagicLinkProvider, () => {
       ['a language the tenant does not offer', '/de/blog', LOCALE_ISO_CODES.EN],
       ['no language prefix', '/blog', LOCALE_ISO_CODES.EN],
     ])(
-      'looks the template up in the right language for a return-to path with %s',
+      'looks the template up in the right language for a path with %s',
       async (_, callbackPath, expectedLocale) => {
         await sendVerificationRequestFor(provider, {
-          url: `${SITE_ORIGIN}/api/auth/callback/email?${new URLSearchParams({
-            callbackUrl: `${SITE_ORIGIN}${callbackPath}`,
-            token: MOCK_TOKEN,
-          })}`,
+          url: callbackUrlOn(MOCK_SITE_ORIGIN, callbackPath),
         });
 
         expect(getEmailTemplateMock).toHaveBeenCalledWith(

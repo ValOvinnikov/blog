@@ -1,47 +1,51 @@
 import { RESERVED_SLUGS } from '@blog/config/constants';
-import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import {
   LANDING_SLUG_SLASH_ERROR,
   landingSlugReservedError,
   validateLandingSlug,
 } from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
+import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
 import type { SlugValue, ValidationContext } from 'sanity';
 
-const [reserved] = RESERVED_SLUGS;
+faker.seed(6028);
 
-const slug = (current: string): SlugValue => ({ _type: 'slug', current });
+const [RESERVED_SLUG] = RESERVED_SLUGS;
 
-const contextFor = (parent?: string) =>
+const MOCK_SLUG = faker.lorem.slug(2);
+const MOCK_SLASHED_SLUG = `${faker.lorem.slug(1)}/${faker.lorem.slug(1)}`;
+const MOCK_PARENT_ID = faker.string.uuid();
+
+const mockSlug = (current: string): SlugValue => ({ _type: 'slug', current });
+
+const contextForPage = (parent?: string) =>
   ({
-    document: {
-      _id: 'drafts.page',
-      _type: PAGE_LANDING_TYPE,
-      ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
-    },
+    document: mockLandingPage({ _id: faker.string.uuid(), parent }),
   }) as unknown as ValidationContext;
 
 describe(validateLandingSlug, () => {
-  it('passes an ordinary slug', () => {
-    expect(validateLandingSlug(slug('about'), contextFor())).toBe(true);
-  });
-
-  it('rejects a slug containing a slash', () => {
-    expect(validateLandingSlug(slug('help/faq'), contextFor())).toBe(
+  it.each([
+    ['passes an ordinary slug', mockSlug(MOCK_SLUG), undefined, true],
+    ['passes an empty slug', undefined, undefined, true],
+    [
+      'rejects a slug containing a slash',
+      mockSlug(MOCK_SLASHED_SLUG),
+      undefined,
       LANDING_SLUG_SLASH_ERROR,
-    );
-  });
-
-  it('rejects a reserved slug on a top-level page', () => {
-    expect(validateLandingSlug(slug(reserved), contextFor())).toBe(
-      landingSlugReservedError(reserved),
-    );
-  });
-
-  it('accepts a reserved slug on a nested page', () => {
-    expect(validateLandingSlug(slug(reserved), contextFor('help'))).toBe(true);
-  });
-
-  it('passes an empty slug', () => {
-    expect(validateLandingSlug(undefined, contextFor())).toBe(true);
+    ],
+    [
+      'rejects a reserved slug on a top-level page',
+      mockSlug(RESERVED_SLUG),
+      undefined,
+      landingSlugReservedError(RESERVED_SLUG),
+    ],
+    [
+      'accepts a reserved slug on a nested page',
+      mockSlug(RESERVED_SLUG),
+      MOCK_PARENT_ID,
+      true,
+    ],
+  ])('%s', (_description, slug, parent, expected) => {
+    expect(validateLandingSlug(slug, contextForPage(parent))).toBe(expected);
   });
 });

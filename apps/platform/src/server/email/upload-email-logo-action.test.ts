@@ -4,174 +4,156 @@ import {
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
   NEXT_NAVIGATION_ERROR,
-  type TMaybeNull,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { queries } from '@blog/db';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
-import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { validateEmailLogoUpload } from '@platform/server/email/validate-email-logo';
 import {
-  MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_SESSION,
 } from '@platform/testing/admins/operator';
-import { MOCK_BLOB_TOKEN } from '@platform/testing/blob/fixtures';
+import { mockedAuth } from '@platform/testing/auth/mocked-auth';
+import {
+  MOCK_BLOB_TOKEN,
+  mockPutBlobResult,
+} from '@platform/testing/blob/fixtures';
+import {
+  MOCK_EMAIL_LOGO_URL,
+  mockEmailConfig,
+  mockEmailTemplateResult,
+  MOCK_TENANT_LOGO_TARGET,
+  MOCK_TEMPLATE_LOGO_TARGET,
+} from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
 import { env } from '@platform/utils/env/env';
-import type { Session } from 'next-auth';
+import { put } from '@vercel/blob';
 
 import { uploadEmailLogoAction } from './upload-email-logo-action';
 
-const {
-  getEmailConfigMock,
-  getEmailTemplateMock,
-  upsertEmailConfigMock,
-  upsertEmailTemplateMock,
-  validateEmailLogoUploadMock,
-  insertAuditEventMock,
-  putMock,
-  delMock,
-} = vi.hoisted(() => ({
-  getEmailConfigMock: vi.fn(),
-  getEmailTemplateMock: vi.fn(),
-  upsertEmailConfigMock: vi.fn(),
-  upsertEmailTemplateMock: vi.fn(),
-  validateEmailLogoUploadMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-  putMock: vi.fn(),
-  delMock: vi.fn(),
-}));
-
-vi.mock('@platform/server/auth/require-tenant-membership');
-
-vi.mock('@platform/server/auth/auth');
-
-vi.mock('@platform/server/email/validate-email-logo', () => ({
-  validateEmailLogoUpload: validateEmailLogoUploadMock,
-}));
-
 vi.mock('@blog/db', () => ({
   queries: {
-    emailConfig: {
-      getEmailConfig: getEmailConfigMock,
-      upsertEmailConfig: upsertEmailConfigMock,
-    },
+    emailConfig: { getEmailConfig: vi.fn(), upsertEmailConfig: vi.fn() },
     emailTemplates: {
-      getEmailTemplate: getEmailTemplateMock,
-      upsertEmailTemplate: upsertEmailTemplateMock,
+      getEmailTemplate: vi.fn(),
+      upsertEmailTemplate: vi.fn(),
     },
-    auditEvents: { insertAuditEvent: insertAuditEventMock },
+    auditEvents: { insertAuditEvent: vi.fn() },
   },
 }));
 
-vi.mock('@vercel/blob', () => ({ put: putMock, del: delMock }));
-
+vi.mock('@vercel/blob', () => ({ put: vi.fn(), del: vi.fn() }));
+vi.mock('@platform/server/email/validate-email-logo');
+vi.mock('@platform/server/auth/require-tenant-membership');
+vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/utils/env/env');
 
-const TENANT_LOGO_URL =
-  'https://example.blob.vercel-storage.com/email-logo-new.png';
-const TEMPLATE_LOGO_URL =
-  'https://example.blob.vercel-storage.com/email-logo-magic-link.png';
+faker.seed(5998);
 
-Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
-
-const requireTenantMembershipMock = vi.mocked<
-  (tenantId: string) => Promise<unknown>
->(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
-
-const makeFormData = (file: TMaybeNull<File>): FormData => {
-  const formData = new FormData();
-  if (file) formData.append('file', file);
-  return formData;
+const MOCK_TEMPLATE_LOGO_URL = faker.internet.url();
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
+const MOCK_LOGO_FILE = new File([faker.lorem.word()], 'logo.png', {
+  type: MOCK_MIME_TYPE.PNG,
+});
+const MOCK_VALID_ASSET = {
+  buffer: Buffer.from(faker.lorem.word()),
+  contentType: MOCK_MIME_TYPE.PNG,
+  extension: 'png',
 };
 
-const VALID_ASSET = {
-  buffer: Buffer.from('bytes'),
-  contentType: 'image/png',
-  extension: 'png',
+const { getEmailConfig, upsertEmailConfig } = queries.emailConfig;
+const { getEmailTemplate, upsertEmailTemplate } = queries.emailTemplates;
+const { insertAuditEvent } = queries.auditEvents;
+
+const buildLogoFormData = (): FormData => {
+  const formData = new FormData();
+  formData.append('file', MOCK_LOGO_FILE);
+  return formData;
 };
 
 describe(uploadEmailLogoAction, () => {
   beforeEach(() => {
-    requireTenantMembershipMock.mockReset();
-    authMock.mockReset();
-    getEmailConfigMock.mockReset();
-    getEmailTemplateMock.mockReset();
-    upsertEmailConfigMock.mockReset();
-    upsertEmailTemplateMock.mockReset();
-    validateEmailLogoUploadMock.mockReset();
-    insertAuditEventMock.mockReset();
-    putMock.mockReset();
-    delMock.mockReset();
-
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: MOCK_TENANT_ID },
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
-    authMock.mockResolvedValue({
-      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
-    });
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    getEmailConfigMock.mockResolvedValue(undefined);
-    getEmailTemplateMock.mockResolvedValue({ logoAssetUrl: undefined });
-    validateEmailLogoUploadMock.mockResolvedValue(okResult(VALID_ASSET));
-    putMock.mockResolvedValue({
-      url: TENANT_LOGO_URL,
-    });
-    upsertEmailConfigMock.mockResolvedValue({});
+    Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
+    vi.mocked(getEmailConfig).mockReset();
+    vi.mocked(getEmailTemplate).mockReset();
+    vi.mocked(upsertEmailConfig).mockReset();
+    vi.mocked(upsertEmailTemplate).mockReset();
+    vi.mocked(insertAuditEvent).mockReset();
+    vi.mocked(validateEmailLogoUpload).mockReset();
+    vi.mocked(put).mockReset();
+    vi.mocked(getEmailConfig).mockResolvedValue(mockEmailConfig());
+    vi.mocked(getEmailTemplate).mockResolvedValue(mockEmailTemplateResult());
+    vi.mocked(validateEmailLogoUpload).mockResolvedValue(
+      okResult(MOCK_VALID_ASSET),
+    );
+    vi.mocked(put).mockResolvedValue(
+      mockPutBlobResult({ url: MOCK_EMAIL_LOGO_URL }),
+    );
   });
 
-  it('uploads and persists the tenant email logo under a unique name at a path distinct from the site logo', async () => {
+  it('stores the tenant email logo under a random-suffixed email-logo path', async () => {
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      { type: 'tenant' },
-      makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+      MOCK_TENANT_LOGO_TARGET,
+      buildLogoFormData(),
     );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
-      url: TENANT_LOGO_URL,
+      url: MOCK_EMAIL_LOGO_URL,
     });
-    expect(putMock).toHaveBeenCalledWith(
+    expect(put).toHaveBeenCalledWith(
       `tenants/${MOCK_TENANT_ID}/email-logo.png`,
-      VALID_ASSET.buffer,
-      expect.objectContaining({ access: 'public', addRandomSuffix: true }),
+      MOCK_VALID_ASSET.buffer,
+      {
+        access: 'public',
+        addRandomSuffix: true,
+        contentType: MOCK_VALID_ASSET.contentType,
+        token: MOCK_BLOB_TOKEN,
+      },
     );
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      logoAssetUrl: TENANT_LOGO_URL,
+    expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      logoAssetUrl: MOCK_EMAIL_LOGO_URL,
     });
   });
 
-  it('uploads and persists a per-template logo under a unique name at a path naming the template', async () => {
-    putMock.mockResolvedValue({
-      url: TEMPLATE_LOGO_URL,
-    });
-    upsertEmailTemplateMock.mockResolvedValue({});
+  it('stores a per-template logo under a path naming the template', async () => {
+    vi.mocked(put).mockResolvedValue(
+      mockPutBlobResult({ url: MOCK_TEMPLATE_LOGO_URL }),
+    );
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      { type: 'template', templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK },
-      makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+      MOCK_TEMPLATE_LOGO_TARGET,
+      buildLogoFormData(),
     );
 
-    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
-    expect(putMock).toHaveBeenCalledWith(
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      url: MOCK_TEMPLATE_LOGO_URL,
+    });
+    expect(put).toHaveBeenCalledWith(
       `tenants/${MOCK_TENANT_ID}/email-logo-magic_link.png`,
-      VALID_ASSET.buffer,
-      expect.objectContaining({ access: 'public', addRandomSuffix: true }),
+      MOCK_VALID_ASSET.buffer,
+      {
+        access: 'public',
+        addRandomSuffix: true,
+        contentType: MOCK_VALID_ASSET.contentType,
+        token: MOCK_BLOB_TOKEN,
+      },
     );
-    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
+    expect(upsertEmailTemplate).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      {
-        logoAssetUrl: TEMPLATE_LOGO_URL,
-      },
+      { logoAssetUrl: MOCK_TEMPLATE_LOGO_URL },
     );
   });
 
-  it('returns the validation error and never calls Blob when validation fails', async () => {
-    validateEmailLogoUploadMock.mockResolvedValue(
+  it('returns the validation error without calling Blob when validation fails', async () => {
+    vi.mocked(validateEmailLogoUpload).mockResolvedValue(
       errorResult({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
@@ -180,91 +162,86 @@ describe(uploadEmailLogoAction, () => {
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      { type: 'tenant' },
-      makeFormData(new File(['x'], 'logo.svg', { type: 'image/svg+xml' })),
+      MOCK_TENANT_LOGO_TARGET,
+      buildLogoFormData(),
     );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
     });
-    expect(putMock).not.toHaveBeenCalled();
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(put).not.toHaveBeenCalled();
+    expect(insertAuditEvent).not.toHaveBeenCalled();
   });
 
-  it('records exactly one SETTINGS_UPDATED audit event identifying the target', async () => {
+  it('records one settings-updated audit event identifying the target', async () => {
+    mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
+
     await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      { type: 'tenant' },
-      makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+      MOCK_TENANT_LOGO_TARGET,
+      buildLogoFormData(),
     );
 
-    expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
+    expect(insertAuditEvent).toHaveBeenCalledTimes(1);
+    expect(insertAuditEvent).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
       details: {
-        target: { type: 'tenant' },
+        target: MOCK_TENANT_LOGO_TARGET,
         operation: 'upload',
-        url: TENANT_LOGO_URL,
+        url: MOCK_EMAIL_LOGO_URL,
       },
     });
   });
 
-  it('records no audit event when the write itself fails', async () => {
-    upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
+  it('reports a server error and records no audit event when the write fails', async () => {
+    vi.mocked(upsertEmailConfig).mockRejectedValue(MOCK_DB_ERROR);
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      { type: 'tenant' },
-      makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+      MOCK_TENANT_LOGO_TARGET,
+      buildLogoFormData(),
     );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(insertAuditEvent).not.toHaveBeenCalled();
   });
 
-  it('reports a readable error and never touches Blob when the token is unconfigured', async () => {
+  it('refuses without touching Blob when the Blob token is unconfigured', async () => {
     Object.assign(env, { BLOB_READ_WRITE_TOKEN: undefined });
 
-    try {
-      const result = await uploadEmailLogoAction(
-        MOCK_TENANT_ID,
-        { type: 'tenant' },
-        makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
-      );
+    const result = await uploadEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+      buildLogoFormData(),
+    );
 
-      expect(result).toEqual({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED,
-      });
-      expect(putMock).not.toHaveBeenCalled();
-    } finally {
-      Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
-    }
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED,
+    });
+    expect(put).not.toHaveBeenCalled();
   });
 
   it.each([
     NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-  ])(
-    'propagates the %s the tenant gate throws without writing',
-    async (gateError) => {
-      requireTenantMembershipMock.mockImplementation(() => {
-        throw new Error(gateError);
-      });
+  ])('propagates the %s the tenant gate throws', async (gateError) => {
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
+      new Error(gateError),
+    );
 
-      await expect(
-        uploadEmailLogoAction(
-          MOCK_TENANT_ID,
-          { type: 'tenant' },
-          makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
-        ),
-      ).rejects.toThrow(gateError);
+    await expect(
+      uploadEmailLogoAction(
+        MOCK_TENANT_ID,
+        MOCK_TENANT_LOGO_TARGET,
+        buildLogoFormData(),
+      ),
+    ).rejects.toThrow(gateError);
 
-      expect(putMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(put).not.toHaveBeenCalled();
+  });
 });

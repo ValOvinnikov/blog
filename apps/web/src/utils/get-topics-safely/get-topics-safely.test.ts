@@ -1,8 +1,17 @@
-import { service, type TTenantSanityContext } from '@blog/service';
+import { service } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { getTopicsSafely } from './get-topics-safely';
+
+faker.seed(114);
+
+const TOPICS_FETCH_FAILED_EVENT = 'topics.fetch_failed';
+const MOCK_TOPICS = [mockTopicWithPostCount({ postCount: 3 })];
+const MOCK_ERROR = new Error(faker.lorem.sentence());
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -12,39 +21,27 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const tenant: TTenantSanityContext = {
-  projectId: 'proj',
-  dataset: 'production',
-  token: 'tok',
-};
-
-describe('getTopicsSafely', () => {
+describe(getTopicsSafely, () => {
   it('returns the topics from the service on success', async () => {
-    const topics = [
-      {
-        id: 'topic-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: undefined,
-        postCount: 3,
-      },
-    ];
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
-      okResult(topics),
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValueOnce(
+      okResult(MOCK_TOPICS),
     );
 
-    await expect(getTopicsSafely(tenant)).resolves.toEqual(topics);
+    const topics = await getTopicsSafely(MOCK_TENANT_SANITY_CONTEXT);
+
+    expect(topics).toEqual(MOCK_TOPICS);
   });
 
-  it('falls back to an empty list and logs when the fetch resolves to a failure result', async () => {
-    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue(
-      errorResult(new Error('boom')),
+  it('falls back to an empty list and logs when the fetch fails', async () => {
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValueOnce(
+      errorResult(MOCK_ERROR),
     );
 
-    await expect(getTopicsSafely(tenant)).resolves.toEqual([]);
-    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'topics.fetch_failed',
-      expect.objectContaining({ error: expect.any(Error) }),
-    );
+    const topics = await getTopicsSafely(MOCK_TENANT_SANITY_CONTEXT);
+
+    expect(topics).toEqual([]);
+    expect(logger.error).toHaveBeenCalledWith(TOPICS_FETCH_FAILED_EVENT, {
+      error: MOCK_ERROR,
+    });
   });
 });

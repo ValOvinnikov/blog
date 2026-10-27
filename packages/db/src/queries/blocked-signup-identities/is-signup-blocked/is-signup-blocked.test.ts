@@ -5,15 +5,26 @@ import * as schema from '@blog/db/schema';
 import {
   MOCK_BLOCK_REASON,
   MOCK_BLOCKED_ADDRESS,
+  MOCK_BLOCKED_ADDRESS_TAGGED_VARIANT,
+  MOCK_BLOCKED_ADDRESS_UPPERCASED_VARIANT,
+  MOCK_BLOCKED_DOMAIN_ADDRESS,
+  MOCK_BLOCKED_DOMAIN_SUBDOMAIN_ADDRESS,
   MOCK_BLOCKED_DOMAIN,
   MOCK_NOT_AN_ADDRESS,
+  MOCK_SAME_DOMAIN_OTHER_ADDRESS,
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { faker } from '@faker-js/faker';
 
 import { isSignupBlocked } from './is-signup-blocked';
 
+faker.seed(602106);
+
+const MOCK_UNRELATED_ADDRESS = faker.internet.email({
+  provider: 'other.example',
+});
 const BLOCKED = { ok: true, data: true };
 const NOT_BLOCKED = { ok: true, data: false };
 
@@ -48,17 +59,17 @@ describe(isSignupBlocked, () => {
 
   it.each([
     ['the blocked address', MOCK_BLOCKED_ADDRESS],
-    ['a +tag variant of it', 'blocked+again@example.com'],
-    ['a differently cased variant', ' BLOCKED@Example.com'],
-    ['an address on a blocked domain', 'anyone@mailinator.com'],
+    ['a +tag variant of it', MOCK_BLOCKED_ADDRESS_TAGGED_VARIANT],
+    ['a differently cased variant', MOCK_BLOCKED_ADDRESS_UPPERCASED_VARIANT],
+    ['an address on a blocked domain', MOCK_BLOCKED_DOMAIN_ADDRESS],
   ])('is true for %s', async (_, email) => {
     expect(await isSignupBlocked(email)).toEqual(BLOCKED);
   });
 
   it.each([
-    ['another address on the same domain', 'grace@example.com'],
-    ['a subdomain of a blocked domain', 'anyone@eu.mailinator.com'],
-    ['an unrelated address', 'someone@other.example'],
+    ['another address on the same domain', MOCK_SAME_DOMAIN_OTHER_ADDRESS],
+    ['a subdomain of a blocked domain', MOCK_BLOCKED_DOMAIN_SUBDOMAIN_ADDRESS],
+    ['an unrelated address', MOCK_UNRELATED_ADDRESS],
   ])('is false for %s', async (_, email) => {
     expect(await isSignupBlocked(email)).toEqual(NOT_BLOCKED);
   });

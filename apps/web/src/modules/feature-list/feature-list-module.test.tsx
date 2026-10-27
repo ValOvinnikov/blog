@@ -5,6 +5,7 @@ import {
   DISPLAY_MODE,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_FEATURE_LIST_HEADING,
@@ -16,7 +17,9 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 
 import { FeatureListModule } from './feature-list-module';
 
-const MODULE_ID = 'feature-list-1';
+faker.seed(6011);
+
+const MOCK_MODULE_ID = faker.string.uuid();
 
 const { getFeatureListMock } = vi.hoisted(() => ({
   getFeatureListMock: vi.fn(),
@@ -34,7 +37,7 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const baseModule = {
+const MOCK_BASE_MODULE = {
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
   ctaButtons: [],
@@ -46,7 +49,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(FeatureListModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${FeatureListModule.name}/>`, () => {
@@ -57,7 +60,7 @@ describe(`<${FeatureListModule.name}/>`, () => {
   describe('when the module resolves', () => {
     beforeEach(async () => {
       getFeatureListMock.mockResolvedValue(
-        okResult({ ...baseModule, items: MOCK_FEATURE_LIST_ITEMS }),
+        okResult({ ...MOCK_BASE_MODULE, items: MOCK_FEATURE_LIST_ITEMS }),
       );
 
       await setup();
@@ -65,14 +68,15 @@ describe(`<${FeatureListModule.name}/>`, () => {
 
     it('fetches the module by id with the tenant Sanity context', () => {
       expect(getFeatureListMock).toHaveBeenCalledWith(
-        MODULE_ID,
+        MOCK_MODULE_ID,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
     it('renders the resolved feature cards', () => {
       const articles = screen.getAllByRole('article');
-      expect(articles).toHaveLength(2);
+
+      expect(articles).toHaveLength(MOCK_FEATURE_LIST_ITEMS.length);
     });
   });
 

@@ -1,21 +1,21 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import { MOCK_RECHECK_ENV } from '@blog/db/testing/recheck-tenant-owners/fixtures';
+import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
-import { hasSystemicFailures, runRecheck } from './run';
+import { hasSystemicFailures, runRecheck, type TRecheckSummary } from './run';
 
-const { listTenantsPendingOwnerElevationMock } = vi.hoisted(() => ({
+faker.seed(5803);
+
+const {
+  listTenantsPendingOwnerElevationMock,
+  elevateTenantOwnerMock,
+  reportOwnerElevationOutcomeMock,
+  notifyOwnerElevationOutcomeMock,
+} = vi.hoisted(() => ({
   listTenantsPendingOwnerElevationMock: vi.fn(),
-}));
-const { elevateTenantOwnerMock } = vi.hoisted(() => ({
   elevateTenantOwnerMock: vi.fn(),
-}));
-
-const { reportOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   reportOwnerElevationOutcomeMock: vi.fn(),
-}));
-
-const { notifyOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   notifyOwnerElevationOutcomeMock: vi.fn(),
 }));
 
@@ -32,212 +32,133 @@ vi.mock('./lib/elevate-tenant-owner', () => ({
   elevateTenantOwner: elevateTenantOwnerMock,
 }));
 
-const env = {
-  sanityManagementToken: 'sanity-token',
-};
+const MOCK_ACL_ERROR = new Error(faker.lorem.sentence());
 
-function tenant(id: string, name: string): TTenant {
+function mockSummary(
+  overrides: Partial<TRecheckSummary> = {},
+): TRecheckSummary {
   return {
-    id,
-    name,
-    primaryDomain: `${name}.example.com`,
-    sanityProjectId: `proj-${name}`,
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: null,
-    locale: LOCALE_ISO_CODES.EN,
-    plan: 'FREE',
-    status: TENANT_STATUS.ACTIVE,
-    provisioningStatus: 'READY',
-    provisioningSteps: null,
-    lastNotifiedOwnerElevationOutcome: null,
-    seededAt: null,
-    webhookCreatedAt: null,
-    deprovisionedAt: null,
-    createdAt: new Date('2026-01-01T00:00:00.000Z'),
-    updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-  } as TTenant;
+    checked: 0,
+    elevated: 0,
+    alreadyAdministrator: 0,
+    pendingAcceptance: 0,
+    stalled: 0,
+    ambiguous: 0,
+    errors: 0,
+    ...overrides,
+  };
 }
 
 beforeEach(() => {
-  listTenantsPendingOwnerElevationMock.mockReset().mockResolvedValue([]);
-  elevateTenantOwnerMock.mockReset();
-  reportOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
-  notifyOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
+  listTenantsPendingOwnerElevationMock.mockResolvedValue([]);
 });
 
 describe(runRecheck, () => {
   it('is a clean no-op when there are no candidates', async () => {
-    const summary = await runRecheck(env);
+    const summary = await runRecheck(MOCK_RECHECK_ENV);
 
-    expect(summary).toEqual({
-      checked: 0,
-      elevated: 0,
-      alreadyAdministrator: 0,
-      pendingAcceptance: 0,
-      stalled: 0,
-      ambiguous: 0,
-      errors: 0,
-    });
+    expect(summary).toEqual(mockSummary());
     expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
   });
 
   it('tallies each candidate outcome into the summary', async () => {
-    const tenants = [
-      tenant('t1', 'acme'),
-      tenant('t2', 'globex'),
-      tenant('t3', 'initech'),
-      tenant('t4', 'umbrella'),
-      tenant('t5', 'soylent'),
-    ];
-    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
+    listTenantsPendingOwnerElevationMock.mockResolvedValue([
+      mockTenant(),
+      mockTenant(),
+      mockTenant(),
+      mockTenant(),
+      mockTenant(),
+    ]);
     elevateTenantOwnerMock
-      .mockResolvedValueOnce('ELEVATED')
-      .mockResolvedValueOnce('ALREADY_ADMINISTRATOR')
-      .mockResolvedValueOnce('PENDING_ACCEPTANCE')
-      .mockResolvedValueOnce('STALLED')
-      .mockResolvedValueOnce('AMBIGUOUS_MEMBERSHIP');
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED)
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR)
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE)
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.STALLED)
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP);
 
-    const summary = await runRecheck(env);
+    const summary = await runRecheck(MOCK_RECHECK_ENV);
 
-    expect(summary).toEqual({
-      checked: 5,
-      elevated: 1,
-      alreadyAdministrator: 1,
-      pendingAcceptance: 1,
-      stalled: 1,
-      ambiguous: 1,
-      errors: 0,
-    });
-    expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(5);
+    expect(summary).toEqual(
+      mockSummary({
+        checked: 5,
+        elevated: 1,
+        alreadyAdministrator: 1,
+        pendingAcceptance: 1,
+        stalled: 1,
+        ambiguous: 1,
+      }),
+    );
     expect(hasSystemicFailures(summary)).toBe(false);
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(5);
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
-      1,
-      't1',
-      'ELEVATED',
-    );
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
-      2,
-      't2',
-      'ALREADY_ADMINISTRATOR',
-    );
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
-      3,
-      't3',
-      'PENDING_ACCEPTANCE',
-    );
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
-      4,
-      't4',
-      'STALLED',
-    );
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
-      5,
-      't5',
-      'AMBIGUOUS_MEMBERSHIP',
-    );
   });
 
-  it('counts a thrown error without stopping the sweep for later candidates', async () => {
-    const tenants = [
-      tenant('t1', 'acme'),
-      tenant('t2', 'globex'),
-      tenant('t3', 'initech'),
-    ];
+  it('reports each candidate outcome against its tenant', async () => {
+    const tenants = [mockTenant(), mockTenant()];
     listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
     elevateTenantOwnerMock
-      .mockResolvedValueOnce('ELEVATED')
-      .mockRejectedValueOnce(new Error('acl fetch failed'))
-      .mockResolvedValueOnce('ALREADY_ADMINISTRATOR');
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED)
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
 
-    const summary = await runRecheck(env);
+    await runRecheck(MOCK_RECHECK_ENV);
 
-    expect(summary).toEqual({
-      checked: 3,
-      elevated: 1,
-      alreadyAdministrator: 1,
-      pendingAcceptance: 0,
-      stalled: 0,
-      ambiguous: 0,
-      errors: 1,
-    });
-    expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(3);
-    expect(hasSystemicFailures(summary)).toBe(true);
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(2);
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
-      't1',
-      'ELEVATED',
-    );
-    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
-      't3',
-      'ALREADY_ADMINISTRATOR',
-    );
-    expect(reportOwnerElevationOutcomeMock).not.toHaveBeenCalledWith(
-      't2',
-      expect.anything(),
-    );
+    expect(reportOwnerElevationOutcomeMock.mock.calls).toEqual([
+      [tenants[0]?.id, ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED],
+      [tenants[1]?.id, ELEVATE_TENANT_OWNER_OUTCOME.STALLED],
+    ]);
   });
 
-  describe('with a single candidate', () => {
-    let tenants: TTenant[];
+  it('counts a thrown error and still sweeps the later candidates', async () => {
+    const tenants = [mockTenant(), mockTenant(), mockTenant()];
+    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
+    elevateTenantOwnerMock
+      .mockResolvedValueOnce(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED)
+      .mockRejectedValueOnce(MOCK_ACL_ERROR)
+      .mockResolvedValueOnce(
+        ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR,
+      );
 
-    beforeEach(() => {
-      tenants = [tenant('t1', 'acme')];
-      listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
-    });
+    const summary = await runRecheck(MOCK_RECHECK_ENV);
 
-    it('delegates every candidate outcome to the shared notify-and-mark-notified helper', async () => {
-      elevateTenantOwnerMock.mockResolvedValueOnce('STALLED');
+    expect(summary).toEqual(
+      mockSummary({
+        checked: 3,
+        elevated: 1,
+        alreadyAdministrator: 1,
+        errors: 1,
+      }),
+    );
+    expect(hasSystemicFailures(summary)).toBe(true);
+    expect(reportOwnerElevationOutcomeMock.mock.calls).toEqual([
+      [tenants[0]?.id, ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED],
+      [tenants[2]?.id, ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR],
+    ]);
+  });
 
-      await runRecheck(env);
+  it.each([
+    ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+    ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
+  ])('hands a %s outcome to the notify helper', async (outcome) => {
+    const tenant = mockTenant();
+    listTenantsPendingOwnerElevationMock.mockResolvedValue([tenant]);
+    elevateTenantOwnerMock.mockResolvedValueOnce(outcome);
 
-      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
-      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
-        tenant: tenants[0],
-        outcome: 'STALLED',
-      });
-    });
+    await runRecheck(MOCK_RECHECK_ENV);
 
-    it('still delegates a non-notifiable outcome — the helper itself decides whether to notify', async () => {
-      elevateTenantOwnerMock.mockResolvedValueOnce('ELEVATED');
-
-      await runRecheck(env);
-
-      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
-      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
-        tenant: tenants[0],
-        outcome: 'ELEVATED',
-      });
-    });
+    expect(notifyOwnerElevationOutcomeMock.mock.calls).toEqual([
+      [{ tenant, outcome }],
+    ]);
   });
 });
 
 describe(hasSystemicFailures, () => {
   it('is false when every candidate resolved to an expected outcome', () => {
-    expect(
-      hasSystemicFailures({
-        checked: 4,
-        elevated: 1,
-        alreadyAdministrator: 1,
-        pendingAcceptance: 1,
-        stalled: 1,
-        ambiguous: 0,
-        errors: 0,
-      }),
-    ).toBe(false);
+    const summary = mockSummary({ checked: 2, elevated: 1, stalled: 1 });
+
+    expect(hasSystemicFailures(summary)).toBe(false);
   });
 
   it('is true when at least one candidate threw', () => {
-    expect(
-      hasSystemicFailures({
-        checked: 4,
-        elevated: 3,
-        alreadyAdministrator: 0,
-        pendingAcceptance: 0,
-        stalled: 0,
-        ambiguous: 0,
-        errors: 1,
-      }),
-    ).toBe(true);
+    const summary = mockSummary({ checked: 2, elevated: 1, errors: 1 });
+
+    expect(hasSystemicFailures(summary)).toBe(true);
   });
 });

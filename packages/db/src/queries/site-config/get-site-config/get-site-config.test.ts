@@ -1,20 +1,20 @@
-import {
-  CARD_STYLE,
-  DENSITY,
-  FONT_CHOICE,
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  RADIUS_SCALE,
-} from '@blog/config/constants';
+import { CARD_STYLE, LOCALE_ISO_CODES } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_NOT_FOUND_HEADING,
+  MOCK_SITE_CONFIG_FIELDS,
+} from '@blog/db/testing/site-config/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { getSiteConfig } from './get-site-config';
 
+faker.seed(6022);
+
 vi.mock('@blog/db/client');
 
-const MOCK_DE_NOT_FOUND_HEADING = 'Nicht gefunden';
+const MOCK_EN_NOT_FOUND_HEADING = faker.lorem.words(3);
 
 const db = useQueryTestDb();
 
@@ -37,24 +37,17 @@ describe(getSiteConfig, () => {
   });
 
   it('maps null theme columns to undefined', async () => {
-    await db().insert(schema.siteConfig).values({
-      tenantId,
-      preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
-      headingFont: FONT_CHOICE.SPACE_GROTESK,
-      bodyFont: FONT_CHOICE.NEWSREADER,
-      radiusScale: RADIUS_SCALE.MD,
-      density: DENSITY.DEFAULT,
-    });
+    const [row] = await db()
+      .insert(schema.siteConfig)
+      .values({ tenantId, ...MOCK_SITE_CONFIG_FIELDS })
+      .returning();
 
     const result = await getSiteConfig(tenantId);
 
-    expect(result).toMatchObject({
-      tenantId,
-      preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
-      logoHue: undefined,
+    expect(result).toEqual({
+      ...row,
       cardStyle: CARD_STYLE.ACCENT_BAR,
+      logoHue: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},
@@ -66,25 +59,26 @@ describe(getSiteConfig, () => {
       locale: LOCALE_ISO_CODES.DE,
     });
     const voiceOverridesByLocale = {
-      [LOCALE_ISO_CODES.DE]: { notFoundHeading: MOCK_DE_NOT_FOUND_HEADING },
-      [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
+      [LOCALE_ISO_CODES.EN]: { notFoundHeading: MOCK_EN_NOT_FOUND_HEADING },
     };
-    await db().insert(schema.siteConfig).values({
-      tenantId: germanTenantId,
-      preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
-      headingFont: FONT_CHOICE.SPACE_GROTESK,
-      bodyFont: FONT_CHOICE.NEWSREADER,
-      radiusScale: RADIUS_SCALE.MD,
-      density: DENSITY.DEFAULT,
-      voiceOverridesByLocale,
-    });
+    const [row] = await db()
+      .insert(schema.siteConfig)
+      .values({
+        tenantId: germanTenantId,
+        ...MOCK_SITE_CONFIG_FIELDS,
+        voiceOverridesByLocale,
+      })
+      .returning();
 
     const result = await getSiteConfig(germanTenantId);
 
-    expect(result).toMatchObject({
-      voiceOverridesByLocale,
-      voiceOverrides: { notFoundHeading: MOCK_DE_NOT_FOUND_HEADING },
+    expect(result).toEqual({
+      ...row,
+      logoHue: undefined,
+      logoAssetUrl: undefined,
+      faviconAssetUrl: undefined,
+      voiceOverrides: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
     });
   });
 });

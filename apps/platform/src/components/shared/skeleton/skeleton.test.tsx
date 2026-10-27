@@ -1,14 +1,15 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Skeleton } from './skeleton';
 
-describe(Skeleton, () => {
-  it('is hidden from assistive technology', () => {
-    render(<Skeleton />);
+const setup = customRender(Skeleton, {});
 
-    expect(screen.getByTestId('skeleton')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+describe(`<${Skeleton.name}/>`, () => {
+  it('is hidden from assistive technology', () => {
+    setup();
+
+    const skeleton = screen.getByTestId('skeleton');
+
+    expect(skeleton).toHaveAttribute('aria-hidden', 'true');
   });
 });

@@ -1,7 +1,6 @@
 import { DAY_MS } from '@blog/db/constants';
-import { faker } from '@faker-js/faker';
 
-export const MOCK_RETENTION_NOW = faker.date.recent();
+export const MOCK_RETENTION_NOW = new Date('2026-06-15T12:00:00.000Z');
 
 export function justPast(cutoff: Date): Date {
   return new Date(cutoff.getTime() - DAY_MS);

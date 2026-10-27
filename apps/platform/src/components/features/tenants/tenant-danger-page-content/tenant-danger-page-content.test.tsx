@@ -2,7 +2,8 @@ import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
   mockIdleDeprovisioningSteps,
   mockClientTenant,
@@ -13,7 +14,9 @@ import {
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
 
-const render = renderWithIntl;
+faker.seed(6120);
+
+const MOCK_STEP_ERROR = faker.lorem.sentence();
 
 const STEP_POLL_INTERVAL_MS = 4000;
 
@@ -47,10 +50,14 @@ const failedSteps = {
   ...mockIdleDeprovisioningSteps(),
   [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
     status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    error: 'boom',
+    error: MOCK_STEP_ERROR,
   },
   run: { ...runStarted, finishedAt: MOCK_RUN_PLUS_1_MIN_AT },
 };
+
+const setup = customRender(TenantDangerPageContent, {
+  tenant: mockClientTenant({ deprovisionedAt: null }),
+});
 
 const getTrigger = () => screen.getByRole('button', { name: 'Deprovision' });
 
@@ -73,12 +80,8 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     vi.useRealTimers();
   });
 
-  it('sends no status requests and shows no progress for a tenant that has never been deprovisioned', async () => {
-    render(
-      <TenantDangerPageContent
-        tenant={mockClientTenant({ deprovisionedAt: null })}
-      />,
-    );
+  it('sends no status requests for a tenant that was never deprovisioned', async () => {
+    setup();
 
     await advancePoll(3);
 
@@ -91,16 +94,8 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
 
-  it('shows the starting state and keeps the trigger aria-disabled while a pending request has no run yet', async () => {
-    render(
-      <TenantDangerPageContent
-        tenant={mockClientTenant({
-          deprovisionedAt: null,
-          deprovisioningSteps: null,
-        })}
-        deprovisionRequestedAt={MOCK_RUN_STARTED_AT}
-      />,
-    );
+  it('shows the starting state while a requested run has not begun', async () => {
+    setup({ deprovisionRequestedAt: MOCK_RUN_STARTED_AT });
 
     const startingState = screen.getByText('Starting…');
     const trigger = getTrigger();
@@ -119,22 +114,20 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     expect(triggerAfterPoll).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
-  it('keeps the trigger aria-disabled while a run is in progress and re-enables it once the run fails', async () => {
+  it('blocks the trigger during a run and re-enables it once the run fails', async () => {
     getTenantDeprovisioningStatusActionMock.mockResolvedValue({
       deprovisioningSteps: failedSteps,
       deprovisionedAt: null,
     });
-    render(
-      <TenantDangerPageContent
-        tenant={mockClientTenant({
-          deprovisionedAt: null,
-          deprovisioningSteps: {
-            ...mockIdleDeprovisioningSteps(),
-            run: runStarted,
-          },
-        })}
-      />,
-    );
+    setup({
+      tenant: mockClientTenant({
+        deprovisionedAt: null,
+        deprovisioningSteps: {
+          ...mockIdleDeprovisioningSteps(),
+          run: runStarted,
+        },
+      }),
+    });
 
     const triggerWhileRunning = getTrigger();
 
@@ -148,15 +141,13 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     expect(triggerAfterFailure).not.toHaveAttribute(ARIA_DISABLED);
   });
 
-  it('keeps the trigger enabled and does not poll for a run that had already failed', async () => {
-    render(
-      <TenantDangerPageContent
-        tenant={mockClientTenant({
-          deprovisionedAt: null,
-          deprovisioningSteps: failedSteps,
-        })}
-      />,
-    );
+  it('keeps the trigger enabled and stops polling for an already failed run', async () => {
+    setup({
+      tenant: mockClientTenant({
+        deprovisionedAt: null,
+        deprovisioningSteps: failedSteps,
+      }),
+    });
 
     await advancePoll(2);
 

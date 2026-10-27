@@ -1,5 +1,8 @@
 import { isCrawler } from './is-crawler';
 
+const BROWSER_USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15';
+
 describe(isCrawler, () => {
   it.each([
     'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
@@ -11,15 +14,14 @@ describe(isCrawler, () => {
     expect(isCrawler(userAgent)).toBe(true);
   });
 
-  it('treats a request without a user agent as a crawler', () => {
-    expect(isCrawler(null)).toBe(true);
-  });
+  it.each([null, ''])(
+    'treats a request with user agent %j as a crawler',
+    (userAgent) => {
+      expect(isCrawler(userAgent)).toBe(true);
+    },
+  );
 
   it('lets a browser through', () => {
-    expect(
-      isCrawler(
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
-      ),
-    ).toBe(false);
+    expect(isCrawler(BROWSER_USER_AGENT)).toBe(false);
   });
 });

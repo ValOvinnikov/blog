@@ -1,28 +1,36 @@
+import { faker } from '@faker-js/faker';
+
 import { safeAsync } from './safe-async';
 
-const ERROR_MESSAGE = 'boom';
-const THROWN_STRING = 'string error';
+faker.seed(6029);
 
-describe('safeAsync', () => {
+const MOCK_DATA = faker.number.int();
+const MOCK_ERROR = new Error(faker.lorem.sentence());
+const MOCK_THROWN_STRING = faker.lorem.sentence();
+const MOCK_COUNT = faker.number.int();
+const MOCK_LABEL = faker.lorem.word();
+
+describe(safeAsync, () => {
   it('returns ok:true with resolved data', async () => {
-    const result = await safeAsync(() => Promise.resolve(42))();
-    expect(result).toEqual({ ok: true, data: 42 });
+    const result = await safeAsync(() => Promise.resolve(MOCK_DATA))();
+
+    expect(result).toEqual({ ok: true, data: MOCK_DATA });
   });
 
-  it('returns ok:false with the rejection reason', async () => {
-    const err = new Error(ERROR_MESSAGE);
-    const result = await safeAsync(() => Promise.reject(err))();
-    expect(result).toEqual({ ok: false, error: err });
-  });
+  it.each([
+    ['an Error', MOCK_ERROR],
+    ['a non-Error value', MOCK_THROWN_STRING],
+  ])('returns ok:false with %s it rejects with', async (_label, reason) => {
+    const result = await safeAsync(() => Promise.reject(reason))();
 
-  it('captures non-Error thrown values', async () => {
-    const result = await safeAsync(() => Promise.reject(THROWN_STRING))();
-    expect(result).toEqual({ ok: false, error: THROWN_STRING });
+    expect(result).toEqual({ ok: false, error: reason });
   });
 
   it('forwards multiple arguments to the wrapped function', async () => {
-    const fn = async (a: number, b: string) => `${b}-${a}`;
-    const result = await safeAsync(fn)(1, 'x');
-    expect(result).toEqual({ ok: true, data: 'x-1' });
+    const fn = async (count: number, label: string) => `${label}-${count}`;
+
+    const result = await safeAsync(fn)(MOCK_COUNT, MOCK_LABEL);
+
+    expect(result).toEqual({ ok: true, data: `${MOCK_LABEL}-${MOCK_COUNT}` });
   });
 });

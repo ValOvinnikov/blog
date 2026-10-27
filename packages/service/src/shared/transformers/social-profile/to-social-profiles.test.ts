@@ -1,12 +1,17 @@
 import { SOCIAL_PLATFORMS } from '@blog/config';
 import {
+  mockLinkView,
   mockRawExternalLinkDocument,
   mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toSocialProfiles } from './to-social-profiles';
 
-const X_URL = 'https://x.com/janedoe';
+faker.seed(6104);
+
+const MOCK_GITHUB_URL = faker.internet.url();
+const MOCK_X_URL = faker.internet.url();
 
 describe(toSocialProfiles, () => {
   it.each([null, undefined, []])('returns an empty array for %j', (raw) => {
@@ -16,35 +21,44 @@ describe(toSocialProfiles, () => {
   });
 
   it('maps every resolvable profile', () => {
-    const githubProfile = mockRawSocialProfile();
-    const raw = [
-      githubProfile,
+    const result = toSocialProfiles([
+      mockRawSocialProfile({
+        link: mockRawExternalLinkDocument({ url: MOCK_GITHUB_URL }),
+      }),
       mockRawSocialProfile({
         platform: SOCIAL_PLATFORMS.X,
-        link: mockRawExternalLinkDocument({ url: X_URL }),
+        link: mockRawExternalLinkDocument({ url: MOCK_X_URL }),
       }),
-    ];
+    ]);
 
-    const result = toSocialProfiles(raw);
-
-    expect(result.map(({ platform, link }) => [platform, link.href])).toEqual([
-      [SOCIAL_PLATFORMS.GITHUB, githubProfile.link.url],
-      [SOCIAL_PLATFORMS.X, X_URL],
+    expect(result).toEqual([
+      {
+        platform: SOCIAL_PLATFORMS.GITHUB,
+        link: mockLinkView({ href: MOCK_GITHUB_URL }),
+      },
+      {
+        platform: SOCIAL_PLATFORMS.X,
+        link: mockLinkView({ href: MOCK_X_URL }),
+      },
     ]);
   });
 
   it('drops entries whose link cannot resolve to an href', () => {
-    const raw = [
+    const result = toSocialProfiles([
       mockRawSocialProfile({
         link: mockRawExternalLinkDocument({ url: null }),
       }),
-      mockRawSocialProfile({ platform: SOCIAL_PLATFORMS.X }),
-    ];
+      mockRawSocialProfile({
+        platform: SOCIAL_PLATFORMS.X,
+        link: mockRawExternalLinkDocument({ url: MOCK_X_URL }),
+      }),
+    ]);
 
-    const result = toSocialProfiles(raw);
-
-    expect(result.map(({ platform }) => platform)).toEqual([
-      SOCIAL_PLATFORMS.X,
+    expect(result).toEqual([
+      {
+        platform: SOCIAL_PLATFORMS.X,
+        link: mockLinkView({ href: MOCK_X_URL }),
+      },
     ]);
   });
 });

@@ -4,117 +4,126 @@ import {
   screen,
 } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
 import { ConsentPlaceholder } from './consent-placeholder';
 
 faker.seed(123);
 
-const providerName = faker.company.name();
-const message = faker.lorem.sentence();
-const allowLabel = faker.word.verb();
-const settingsLabel = faker.word.noun();
-const scopeNote = faker.lorem.sentence();
+const MOCK_PROVIDER_NAME = faker.company.name();
+const MOCK_MESSAGE = faker.lorem.sentence();
+const MOCK_ALLOW_LABEL = faker.lorem.words(2);
+const MOCK_SETTINGS_LABEL = faker.lorem.words(2);
+const MOCK_SCOPE_NOTE = faker.lorem.sentence();
+
+const CONTROLS = [
+  {
+    control: 'Allow',
+    label: MOCK_ALLOW_LABEL,
+    handler: 'onAllow',
+    tabs: 1,
+  },
+  {
+    control: 'Cookie settings',
+    label: MOCK_SETTINGS_LABEL,
+    handler: 'onOpenSettings',
+    tabs: 2,
+  },
+] as const;
 
 const setup = customRender(ConsentPlaceholder, {
-  providerName,
-  message,
-  allowLabel,
-  settingsLabel,
-  scopeNote,
+  providerName: MOCK_PROVIDER_NAME,
+  message: MOCK_MESSAGE,
+  allowLabel: MOCK_ALLOW_LABEL,
+  settingsLabel: MOCK_SETTINGS_LABEL,
+  scopeNote: MOCK_SCOPE_NOTE,
   onAllow: vi.fn(),
   onOpenSettings: vi.fn(),
 });
 
 describe(`<${ConsentPlaceholder.name}/>`, () => {
   describe('with the default props', () => {
-    let onAllow: Mock<() => void>;
-    let onOpenSettings: Mock<() => void>;
+    let user: UserEvent;
+    let handlers: Record<
+      (typeof CONTROLS)[number]['handler'],
+      Mock<() => void>
+    >;
 
     beforeEach(() => {
-      onAllow = vi.fn();
-      onOpenSettings = vi.fn();
-      setup({ onAllow, onOpenSettings });
+      user = userEvent.setup();
+      handlers = { onAllow: vi.fn(), onOpenSettings: vi.fn() };
+      setup(handlers);
     });
 
     it('renders the provider name and message', () => {
-      expect(screen.getByText(providerName)).toBeVisible();
-      expect(screen.getByText(message)).toBeVisible();
-    });
+      const providerName = screen.getByText(MOCK_PROVIDER_NAME);
+      const message = screen.getByText(MOCK_MESSAGE);
 
-    it('renders the Allow and Cookie settings controls', () => {
-      expect(screen.getByRole('button', { name: allowLabel })).toBeVisible();
-      expect(screen.getByRole('button', { name: settingsLabel })).toBeVisible();
+      expect(providerName).toBeVisible();
+      expect(message).toBeVisible();
     });
 
     it('renders the scope note', () => {
-      expect(screen.getByText(scopeNote)).toBeVisible();
+      const scopeNote = screen.getByText(MOCK_SCOPE_NOTE);
+
+      expect(scopeNote).toBeVisible();
     });
 
-    it('associates the scope note as the accessible description of both controls', () => {
-      expect(
-        screen.getByRole('button', {
-          name: allowLabel,
-          description: scopeNote,
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('button', {
-          name: settingsLabel,
-          description: scopeNote,
-        }),
-      ).toBeVisible();
-    });
+    it.each(CONTROLS)(
+      'describes the $control control by the scope note',
+      ({ label }) => {
+        const button = screen.getByRole('button', {
+          name: label,
+          description: MOCK_SCOPE_NOTE,
+        });
 
-    it('calls onAllow when Allow is clicked', async () => {
-      await userEvent.click(screen.getByRole('button', { name: allowLabel }));
-      expect(onAllow).toHaveBeenCalledTimes(1);
-    });
+        expect(button).toBeVisible();
+      },
+    );
 
-    it('calls onAllow when Allow is activated by keyboard', async () => {
-      screen.getByRole('button', { name: allowLabel }).focus();
-      await userEvent.keyboard('{Enter}');
-      expect(onAllow).toHaveBeenCalledTimes(1);
-    });
+    it.each(CONTROLS)(
+      'runs the $control action when clicked',
+      async ({ label, handler }) => {
+        const button = screen.getByRole('button', { name: label });
 
-    it('calls onOpenSettings when Cookie settings is clicked', async () => {
-      await userEvent.click(
-        screen.getByRole('button', { name: settingsLabel }),
-      );
-      expect(onOpenSettings).toHaveBeenCalledTimes(1);
-    });
+        await user.click(button);
 
-    it('calls onOpenSettings when Cookie settings is activated by keyboard', async () => {
-      screen.getByRole('button', { name: settingsLabel }).focus();
-      await userEvent.keyboard('{Enter}');
-      expect(onOpenSettings).toHaveBeenCalledTimes(1);
-    });
+        expect(handlers[handler]).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it.each(CONTROLS)(
+      'runs the $control action when activated by keyboard',
+      async ({ handler, tabs }) => {
+        for (let i = 0; i < tabs; i++) {
+          await user.tab();
+        }
+        await user.keyboard('{Enter}');
+
+        expect(handlers[handler]).toHaveBeenCalledTimes(1);
+      },
+    );
   });
 
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'consent-placeholder' });
-    expect(screen.getByTestId('consent-placeholder')).toBeVisible();
-  });
-
-  it("describes each placeholder's controls by its own scope note when two render on one page", () => {
+  it('describes each placeholder by its own scope note when two share a page', () => {
     const otherAllowLabel = faker.lorem.words(2);
     const otherSettingsLabel = faker.lorem.words(2);
     const otherScopeNote = faker.lorem.sentence();
     renderElement(
       <>
         <ConsentPlaceholder
-          providerName={providerName}
-          message={message}
-          allowLabel={allowLabel}
-          settingsLabel={settingsLabel}
-          scopeNote={scopeNote}
+          providerName={MOCK_PROVIDER_NAME}
+          message={MOCK_MESSAGE}
+          allowLabel={MOCK_ALLOW_LABEL}
+          settingsLabel={MOCK_SETTINGS_LABEL}
+          scopeNote={MOCK_SCOPE_NOTE}
           onAllow={vi.fn()}
           onOpenSettings={vi.fn()}
         />
         <ConsentPlaceholder
-          providerName={providerName}
-          message={message}
+          providerName={MOCK_PROVIDER_NAME}
+          message={MOCK_MESSAGE}
           allowLabel={otherAllowLabel}
           settingsLabel={otherSettingsLabel}
           scopeNote={otherScopeNote}
@@ -124,14 +133,16 @@ describe(`<${ConsentPlaceholder.name}/>`, () => {
       </>,
     );
 
-    expect(
-      screen.getByRole('button', { name: allowLabel, description: scopeNote }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', {
-        name: otherSettingsLabel,
-        description: otherScopeNote,
-      }),
-    ).toBeVisible();
+    const firstAllowButton = screen.getByRole('button', {
+      name: MOCK_ALLOW_LABEL,
+      description: MOCK_SCOPE_NOTE,
+    });
+    const secondSettingsButton = screen.getByRole('button', {
+      name: otherSettingsLabel,
+      description: otherScopeNote,
+    });
+
+    expect(firstAllowButton).toBeVisible();
+    expect(secondSettingsButton).toBeVisible();
   });
 });

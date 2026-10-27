@@ -1,15 +1,26 @@
-import {
-  CONTENT_ROUTE_REVALIDATE_SECONDS,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { buildLandingPageMetadata } from '@web/metadata/landing-page-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
+import { mockRouteParams } from '@web/testing/app/route-params';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import LandingSlugPage, { generateMetadata, revalidate } from './page';
+
+faker.seed(6009);
+
+const [MOCK_SEGMENT, MOCK_NESTED_SEGMENT] = faker.helpers.uniqueArray(
+  faker.lorem.slug,
+  2,
+) as [string, string];
+const MOCK_METADATA = { title: faker.lorem.words(2) };
+
+const params = mockRouteParams({ slug: [MOCK_SEGMENT, MOCK_NESTED_SEGMENT] });
 
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/metadata/landing-page-metadata', () => ({
-  buildLandingPageMetadata: vi.fn().mockResolvedValue({ title: 'About Us' }),
+  buildLandingPageMetadata: vi.fn(),
 }));
 
 vi.mock('@web/components/pages/landing-page', () => ({
@@ -18,71 +29,55 @@ vi.mock('@web/components/pages/landing-page', () => ({
   ),
 }));
 
-describe('LandingSlugPage', () => {
+const setup = customRenderAsync(LandingSlugPage, { params });
+
+describe(`<${LandingSlugPage.name}/>`, () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
   it('enters the request context with the route params', async () => {
-    const params = Promise.resolve({
-      tenant: 'tenant-1',
-      locale: LOCALE_ISO_CODES.EN,
-      slug: ['a-slug'],
-    });
-
-    await LandingSlugPage({ params });
+    await setup();
 
     expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 
-  describe('generateMetadata', () => {
-    it('delegates to buildLandingPageMetadata with the resolved slug', async () => {
-      const metadata = await generateMetadata({
-        params: Promise.resolve({
-          tenant: 'tenant-1',
-          locale: 'EN',
-          slug: ['about-us'],
-        }),
-      });
+  it.each([
+    { label: 'a top-level', slug: [MOCK_SEGMENT], path: MOCK_SEGMENT },
+    {
+      label: 'a nested',
+      slug: [MOCK_SEGMENT, MOCK_NESTED_SEGMENT],
+      path: `${MOCK_SEGMENT}/${MOCK_NESTED_SEGMENT}`,
+    },
+  ])(
+    'renders LandingPage with the joined path of $label page',
+    async ({ slug, path }) => {
+      await setup({ params: mockRouteParams({ slug }) });
 
-      expect(metadata).toEqual({ title: 'About Us' });
-    });
+      const landingPage = screen.getByTestId('landing-page');
 
-    it('enters the request context with the route params', async () => {
-      const params: Parameters<typeof generateMetadata>[0]['params'] =
-        Promise.resolve({
-          tenant: 'tenant-1',
-          locale: 'EN',
-          slug: ['about-us'],
-        });
+      expect(landingPage).toHaveTextContent(path);
+    },
+  );
+});
 
-      await generateMetadata({ params });
-
-      expect(enterRequestContext).toHaveBeenCalledWith(params);
-    });
+describe(generateMetadata, () => {
+  beforeEach(() => {
+    vi.mocked(buildLandingPageMetadata).mockResolvedValue(MOCK_METADATA);
   });
 
-  it('renders LandingPage with the joined path of a nested page', async () => {
-    const ui = await LandingSlugPage({
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: 'EN',
-        slug: ['modules', 'faq'],
-      }),
-    });
+  it('returns the landing metadata built for the joined path', async () => {
+    const metadata = await generateMetadata({ params });
 
-    expect(ui.props).toEqual({ path: 'modules/faq' });
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildLandingPageMetadata).toHaveBeenCalledWith(
+      `${MOCK_SEGMENT}/${MOCK_NESTED_SEGMENT}`,
+    );
   });
 
-  it('renders LandingPage with the resolved slug', async () => {
-    const ui = await LandingSlugPage({
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: 'EN',
-        slug: ['about-us'],
-      }),
-    });
+  it('enters the request context before building the metadata', async () => {
+    await generateMetadata({ params });
 
-    expect(ui.props).toEqual({ path: 'about-us' });
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 });

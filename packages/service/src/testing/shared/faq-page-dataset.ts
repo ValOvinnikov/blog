@@ -7,38 +7,50 @@ import {
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const QUESTION_OK_ID = 'question-ok';
-const QUESTION_UNTRANSLATED_ID = 'question-untranslated';
+export const MOCK_FAQ_MODULE_A_ID = 'module-faq-a';
+export const MOCK_FAQ_MODULE_B_ID = 'module-faq-b';
+export const MOCK_TRANSLATED_QUESTION_ID = 'question-ok';
+export const MOCK_UNTRANSLATED_QUESTION_ID = 'question-untranslated';
+export const MOCK_TRANSLATED_QUESTION = { [EN]: 'How much?', [NL]: 'Hoeveel?' };
+export const MOCK_TRANSLATED_ANSWER = {
+  [EN]: 'It depends.',
+  [NL]: 'Dat hangt ervan af.',
+};
+export const MOCK_UNTRANSLATED_QUESTION = { [FR]: 'Combien?' };
+export const MOCK_UNTRANSLATED_ANSWER = { [FR]: 'Ça dépend.' };
 
 export const MOCK_FAQ_PAGE_DOCUMENTS = [
   {
-    _id: 'module-faq-a',
+    _id: MOCK_FAQ_MODULE_A_ID,
     _type: 'module_faq',
     questions: [
-      mockReference(QUESTION_OK_ID, { _key: QUESTION_OK_ID }),
-      mockReference(QUESTION_UNTRANSLATED_ID, {
-        _key: QUESTION_UNTRANSLATED_ID,
+      mockReference(MOCK_TRANSLATED_QUESTION_ID, {
+        _key: MOCK_TRANSLATED_QUESTION_ID,
+      }),
+      mockReference(MOCK_UNTRANSLATED_QUESTION_ID, {
+        _key: MOCK_UNTRANSLATED_QUESTION_ID,
       }),
     ],
   },
   {
-    _id: 'module-faq-b',
+    _id: MOCK_FAQ_MODULE_B_ID,
     _type: 'module_faq',
-    questions: [mockReference(QUESTION_OK_ID, { _key: QUESTION_OK_ID })],
+    questions: [
+      mockReference(MOCK_TRANSLATED_QUESTION_ID, {
+        _key: MOCK_TRANSLATED_QUESTION_ID,
+      }),
+    ],
   },
   {
-    _id: QUESTION_OK_ID,
+    _id: MOCK_TRANSLATED_QUESTION_ID,
     _type: 'block_faq',
-    question: mockLocalizedStrings({ [EN]: 'How much?', [NL]: 'Hoeveel?' }),
-    answer: mockLocalizedListedText({
-      [EN]: 'It depends.',
-      [NL]: 'Dat hangt ervan af.',
-    }),
+    question: mockLocalizedStrings(MOCK_TRANSLATED_QUESTION),
+    answer: mockLocalizedListedText(MOCK_TRANSLATED_ANSWER),
   },
   {
-    _id: QUESTION_UNTRANSLATED_ID,
+    _id: MOCK_UNTRANSLATED_QUESTION_ID,
     _type: 'block_faq',
-    question: mockLocalizedStrings({ [FR]: 'Combien?' }),
-    answer: mockLocalizedListedText({ [FR]: 'Ça dépend.' }),
+    question: mockLocalizedStrings(MOCK_UNTRANSLATED_QUESTION),
+    answer: mockLocalizedListedText(MOCK_UNTRANSLATED_ANSWER),
   },
 ];

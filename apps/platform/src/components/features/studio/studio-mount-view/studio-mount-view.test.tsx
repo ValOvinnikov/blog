@@ -3,7 +3,8 @@ import {
   LOCALE_ISO_CODES,
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   mockReadyTenant,
@@ -15,8 +16,12 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { StudioMountView } from './studio-mount-view';
 
+faker.seed(5994);
+
 const STUDIO_MOUNT = 'studio-mount';
-const PROJ_GLOBEX = 'proj-globex';
+const MOCK_READ_TOKEN = faker.string.alphanumeric(24);
+const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
+const MOCK_DATASET = faker.lorem.word();
 
 const { studioMountMock, getEnabledCapabilitiesMock, selectLiveLocalesMock } =
   vi.hoisted(() => ({
@@ -42,44 +47,41 @@ vi.mock('@blog/studio', () => ({
   },
 }));
 
-const makeProvisionedTenant = (
+const mockProvisionedTenant = (
   overrides: Parameters<typeof mockReadyTenant>[0] = {},
 ) =>
   mockReadyTenant({
-    sanityReadTokenEncrypted: 'encrypted-token',
+    sanityReadTokenEncrypted: MOCK_READ_TOKEN,
     ...overrides,
   });
 
+const MOCK_TENANT = mockProvisionedTenant();
+
+const setup = customRenderAsync(StudioMountView, {
+  tenant: MOCK_TENANT,
+  basePath: adminRoutes.dashboardStudio(),
+});
+
 describe(`<${StudioMountView.name}/>`, () => {
   beforeEach(() => {
-    studioMountMock.mockReset();
-    getEnabledCapabilitiesMock.mockReset();
-    getEnabledCapabilitiesMock.mockResolvedValue([]);
-    selectLiveLocalesMock.mockReset();
-    selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
+    getEnabledCapabilitiesMock.mockReset().mockResolvedValue([]);
+    selectLiveLocalesMock.mockReset().mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
-  it('shows the archived notice instead of mounting Studio for a deprovisioned tenant', async () => {
-    const tenant = makeProvisionedTenant({
-      deprovisionedAt: MOCK_ARCHIVED_AT,
+  it('shows the archived notice instead of Studio for a deprovisioned tenant', async () => {
+    await setup({
+      tenant: mockProvisionedTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     });
-
-    renderWithIntl(
-      await StudioMountView({
-        tenant,
-        basePath: adminRoutes.dashboardStudio(),
-      }),
-    );
 
     const studioHeading = screen.getByRole('heading', {
       level: 1,
       name: 'Studio',
     });
-    const thisTenantIsText = screen.getByText(ARCHIVED_NOTICE_TEXT);
+    const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
     const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
     expect(studioHeading).toBeVisible();
-    expect(thisTenantIsText).toBeVisible();
+    expect(archivedNotice).toBeVisible();
     expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
     expect(studioMount).not.toBeInTheDocument();
   });
@@ -89,98 +91,72 @@ describe(`<${StudioMountView.name}/>`, () => {
     'sanityDataset',
     'sanityReadTokenEncrypted',
   ] as const)(
-    'shows a not-ready alert instead of mounting Studio when the tenant has no %s',
+    'shows a not-ready alert when the tenant has no %s',
     async (field) => {
-      const tenant = makeProvisionedTenant({ [field]: null });
-
-      renderWithIntl(
-        await StudioMountView({
-          tenant,
-          basePath: adminRoutes.dashboardStudio(),
-        }),
-      );
+      await setup({ tenant: mockProvisionedTenant({ [field]: null }) });
 
       const studioHeading = screen.getByRole('heading', {
         level: 1,
         name: 'Studio',
       });
-      const studioIsNotText = screen.getByText("Studio isn't ready yet");
+      const notReadyAlert = screen.getByText("Studio isn't ready yet");
       const studioMount = screen.queryByTestId(STUDIO_MOUNT);
 
       expect(studioHeading).toBeVisible();
-      expect(studioIsNotText).toBeVisible();
+      expect(notReadyAlert).toBeVisible();
       expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
       expect(studioMount).not.toBeInTheDocument();
     },
   );
 
-  it("mounts Studio with the tenant's project and dataset and the given basePath", async () => {
-    const tenant = makeProvisionedTenant({
+  it("mounts Studio with the tenant's project, dataset and base path", async () => {
+    const tenant = mockProvisionedTenant({
       id: MOCK_OTHER_TENANT_ID,
       name: MOCK_OTHER_TENANT_NAME,
-      sanityProjectId: PROJ_GLOBEX,
-      sanityDataset: 'staging',
+      sanityProjectId: MOCK_PROJECT_ID,
+      sanityDataset: MOCK_DATASET,
     });
+    const basePath = adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID);
 
-    renderWithIntl(
-      await StudioMountView({
-        tenant,
-        basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
-      }),
-    );
+    await setup({ tenant, basePath });
 
     const studioMount = screen.getByTestId(STUDIO_MOUNT);
 
     expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: PROJ_GLOBEX,
-      dataset: 'staging',
-      basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
+      projectId: MOCK_PROJECT_ID,
+      dataset: MOCK_DATASET,
+      basePath,
       title: MOCK_OTHER_TENANT_NAME,
       enabledCapabilities: [],
       defaultLocale: tenant.locale,
       liveLocales: [LOCALE_ISO_CODES.EN],
-      loginProvider: undefined,
     });
   });
 
   it("passes the tenant's effective capabilities to Studio", async () => {
-    const tenant = makeProvisionedTenant();
     getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.COMMENTS]);
 
-    renderWithIntl(
-      await StudioMountView({
-        tenant,
-        basePath: adminRoutes.dashboardStudio(),
-      }),
-    );
+    await setup();
 
-    expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(tenant);
+    expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(MOCK_TENANT);
     expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: tenant.sanityProjectId,
-      dataset: tenant.sanityDataset,
+      projectId: MOCK_TENANT.sanityProjectId,
+      dataset: MOCK_TENANT.sanityDataset,
       basePath: adminRoutes.dashboardStudio(),
-      title: tenant.name,
+      title: MOCK_TENANT.name,
       enabledCapabilities: [CAPABILITY.COMMENTS],
-      defaultLocale: tenant.locale,
+      defaultLocale: MOCK_TENANT.locale,
       liveLocales: [LOCALE_ISO_CODES.EN],
-      loginProvider: undefined,
     });
   });
 
   it("passes the tenant's default and live languages to Studio", async () => {
-    const tenant = makeProvisionedTenant({ locale: LOCALE_ISO_CODES.NL });
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.NL,
-      LOCALE_ISO_CODES.EN,
-    ]);
+    const tenant = mockProvisionedTenant({ locale: LOCALE_ISO_CODES.NL });
+    const liveLocales = [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN];
+    selectLiveLocalesMock.mockReturnValue(liveLocales);
 
-    renderWithIntl(
-      await StudioMountView({
-        tenant,
-        basePath: adminRoutes.dashboardStudio(),
-      }),
-    );
+    await setup({ tenant });
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
     expect(studioMountMock).toHaveBeenCalledWith({
@@ -190,29 +166,20 @@ describe(`<${StudioMountView.name}/>`, () => {
       title: tenant.name,
       enabledCapabilities: [],
       defaultLocale: LOCALE_ISO_CODES.NL,
-      liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
-      loginProvider: undefined,
+      liveLocales,
     });
   });
 
   it('restricts Studio to the given login provider', async () => {
-    const tenant = makeProvisionedTenant();
-
-    renderWithIntl(
-      await StudioMountView({
-        tenant,
-        basePath: adminRoutes.dashboardStudio(),
-        loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
-      }),
-    );
+    await setup({ loginProvider: SANITY_LOGIN_PROVIDER.GITHUB });
 
     expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: tenant.sanityProjectId,
-      dataset: tenant.sanityDataset,
+      projectId: MOCK_TENANT.sanityProjectId,
+      dataset: MOCK_TENANT.sanityDataset,
       basePath: adminRoutes.dashboardStudio(),
-      title: tenant.name,
+      title: MOCK_TENANT.name,
       enabledCapabilities: [],
-      defaultLocale: tenant.locale,
+      defaultLocale: MOCK_TENANT.locale,
       liveLocales: [LOCALE_ISO_CODES.EN],
       loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
     });

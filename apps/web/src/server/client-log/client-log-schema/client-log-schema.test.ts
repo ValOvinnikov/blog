@@ -1,88 +1,68 @@
+import { faker } from '@faker-js/faker';
+
 import { clientLogSchema, sanitizeClientLogPayload } from './client-log-schema';
 
-const validPayload = {
-  event: 'copy_to_clipboard.write_failed',
-  message: 'clipboard write denied',
-  stack: 'Error: denied\n  at copy (/blog/hello:1:1)',
-  url: '/blog/hello',
-  digest: 'abc123',
-  userAgent: 'Mozilla/5.0',
+faker.seed(6010);
+
+const MESSAGE_MAX_LENGTH = 500;
+const STACK_MAX_LENGTH = 1000;
+
+const MOCK_EVENT = `${faker.lorem.word()}.${faker.lorem.word()}`;
+const MOCK_MESSAGE = faker.lorem.sentence();
+const MOCK_URL_PATH = `/${faker.lorem.word()}/${faker.lorem.word()}`;
+const MOCK_QUERY_AND_FRAGMENT = `?token=${faker.string.alphanumeric(8)}&utm_source=${faker.lorem.word()}#${faker.lorem.word()}`;
+
+const MOCK_VALID_PAYLOAD = {
+  event: MOCK_EVENT,
+  message: MOCK_MESSAGE,
+  stack: faker.lorem.lines(2),
+  url: MOCK_URL_PATH,
+  digest: faker.string.alphanumeric(8),
+  userAgent: faker.internet.userAgent(),
 };
 
 describe('clientLogSchema', () => {
-  it('accepts a payload with exactly the fixed field set', () => {
-    const result = clientLogSchema.safeParse(validPayload);
+  it.each([
+    ['the fixed field set', MOCK_VALID_PAYLOAD],
+    ['only the required fields', { event: MOCK_EVENT, message: MOCK_MESSAGE }],
+  ])('accepts a payload with %s', (_label, payload) => {
+    const result = clientLogSchema.safeParse(payload);
 
     expect(result.success).toBe(true);
   });
 
-  it('accepts a payload with only the required fields', () => {
+  it.each([
+    ['an unknown key', { extra: faker.lorem.word() }],
+    [
+      'an event name that is not lowercase dot-namespaced',
+      { event: `${faker.lorem.word().toUpperCase()}; DROP TABLE users;` },
+    ],
+    ['an event name with no namespace dot', { event: faker.lorem.word() }],
+    [
+      'a message over the max length',
+      { message: faker.string.alpha(MESSAGE_MAX_LENGTH + 1) },
+    ],
+    ['an empty message', { message: '' }],
+    [
+      'a stack over the max length',
+      { stack: faker.string.alpha(STACK_MAX_LENGTH + 1) },
+    ],
+  ])('rejects %s', (_label, override) => {
     const result = clientLogSchema.safeParse({
-      event: 'error_boundary.render_failed',
-      message: 'boom',
-    });
-
-    expect(result.success).toBe(true);
-  });
-
-  it('rejects an unknown key outright', () => {
-    const result = clientLogSchema.safeParse({
-      ...validPayload,
-      extra: 'attacker-controlled',
-    });
-
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects an event name that is not lowercase dot-namespaced', () => {
-    const result = clientLogSchema.safeParse({
-      ...validPayload,
-      event: 'Client-Log; DROP TABLE users;',
-    });
-
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects an event name with no namespace dot', () => {
-    const result = clientLogSchema.safeParse({
-      ...validPayload,
-      event: 'boom',
-    });
-
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects a message over the max length', () => {
-    const result = clientLogSchema.safeParse({
-      ...validPayload,
-      message: 'a'.repeat(501),
-    });
-
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects an empty message', () => {
-    const result = clientLogSchema.safeParse({ ...validPayload, message: '' });
-
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects a stack over the max length', () => {
-    const result = clientLogSchema.safeParse({
-      ...validPayload,
-      stack: 'a'.repeat(1001),
+      ...MOCK_VALID_PAYLOAD,
+      ...override,
     });
 
     expect(result.success).toBe(false);
   });
 });
 
-describe('sanitizeClientLogPayload', () => {
+describe(sanitizeClientLogPayload, () => {
   it('strips control characters from message and stack', () => {
     const parsed = clientLogSchema.parse({
-      event: 'copy_to_clipboard.write_failed',
-      message: 'line one\r\nline two',
-      stack: 'Error: boom\r\n  at x (/a:1:1)',
+      event: MOCK_EVENT,
+      message: `${faker.lorem.word()}\r\n${faker.lorem.word()}`,
+      stack: `${faker.lorem.word()}\r\n${faker.lorem.word()}`,
     });
 
     const sanitized = sanitizeClientLogPayload(parsed);
@@ -91,59 +71,29 @@ describe('sanitizeClientLogPayload', () => {
     expect(sanitized.stack).not.toMatch(/[\r\n]/);
   });
 
-  it('cannot be used to forge a second fake log line via embedded newlines + JSON', () => {
-    const forged = JSON.stringify({
-      level: 'error',
-      event: 'fake.forged_entry',
-      message: 'forged',
-    });
+  it.each([
+    ['strips the query string and fragment from', MOCK_QUERY_AND_FRAGMENT],
+    ['leaves a url with no query string untouched in', ''],
+  ])('%s the url', (_label, suffix) => {
     const parsed = clientLogSchema.parse({
-      event: 'copy_to_clipboard.write_failed',
-      message: `real error\n${forged}`,
+      event: MOCK_EVENT,
+      message: MOCK_MESSAGE,
+      url: `${MOCK_URL_PATH}${suffix}`,
     });
 
     const sanitized = sanitizeClientLogPayload(parsed);
 
-    // eslint-disable-next-line no-control-regex
-    expect(sanitized.message).not.toMatch(/[\x00-\x1f\x7f]/);
-    expect(sanitized.message).not.toContain('\n');
-  });
-
-  it('strips the query string and fragment from url', () => {
-    const parsed = clientLogSchema.parse({
-      event: 'copy_to_clipboard.write_failed',
-      message: 'x',
-      url: '/blog/hello?token=secret&utm_source=x#section',
-    });
-
-    const sanitized = sanitizeClientLogPayload(parsed);
-
-    expect(sanitized.url).toBe('/blog/hello');
-  });
-
-  it('leaves a url with no query string untouched', () => {
-    const parsed = clientLogSchema.parse({
-      event: 'copy_to_clipboard.write_failed',
-      message: 'x',
-      url: '/blog/hello',
-    });
-
-    const sanitized = sanitizeClientLogPayload(parsed);
-
-    expect(sanitized.url).toBe('/blog/hello');
+    expect(sanitized.url).toBe(MOCK_URL_PATH);
   });
 
   it('leaves optional fields absent when not provided', () => {
     const parsed = clientLogSchema.parse({
-      event: 'copy_to_clipboard.write_failed',
-      message: 'x',
+      event: MOCK_EVENT,
+      message: MOCK_MESSAGE,
     });
 
     const sanitized = sanitizeClientLogPayload(parsed);
 
-    expect(sanitized.stack).toBeUndefined();
-    expect(sanitized.url).toBeUndefined();
-    expect(sanitized.digest).toBeUndefined();
-    expect(sanitized.userAgent).toBeUndefined();
+    expect(sanitized).toEqual({ event: MOCK_EVENT, message: MOCK_MESSAGE });
   });
 });

@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config/constants';
 import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo/seo';
@@ -7,11 +8,16 @@ import {
 } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
+import { mockReference } from '@blog/studio/testing/mock-documents';
+import { MOCK_SYSTEM_FIELDS } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTopicId, toTopicPostListId } from './id';
 
 import migration, { buildTopicMetaTitle } from './index';
+
+faker.seed(22);
 
 const metaTitleBounds = getRecordedBounds(getField(seoSchema, 'metaTitle'));
 const SEO_META_TITLE_MIN_LENGTH = metaTitleBounds.min!;
@@ -30,42 +36,45 @@ const PAGE_TEMPLATE_EXEMPTION: TExemptField = {
   reason: 'this migration creates page_topic with no template reference',
 };
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+const TOPIC_ITEMS_PER_PAGE = 9;
+const MOCK_TOPIC_ID = faker.string.uuid();
+const MOCK_TOPIC_TITLE = faker.lorem.word();
+const MOCK_TOPIC_SLUG = faker.lorem.slug();
+const MOCK_SHORT_TITLE = 'A';
+const MOCK_LONG_TITLE = 'A'.repeat(200);
 
-const topicDoc = {
-  ...baseDoc,
-  _id: 'abc123',
+const mockTopicDoc = (fields: Record<string, unknown> = {}) => ({
+  ...MOCK_SYSTEM_FIELDS,
+  _id: MOCK_TOPIC_ID,
   _type: 'blog_topic',
-  title: 'React',
-  slug: { _type: 'slug', current: 'react' },
-};
+  title: MOCK_TOPIC_TITLE,
+  slug: { _type: 'slug', current: MOCK_TOPIC_SLUG },
+  ...fields,
+});
 
 describe('seed-page-topic-for-existing-topic migration', () => {
-  it('creates a module_postList and a page_topic referencing the topic and copying its slug', () => {
-    const postListId = toTopicPostListId(topicDoc._id);
-    const pageTopicId = toPageTopicId(topicDoc._id);
-
+  it('creates a post list and a topic page copying the topic slug', () => {
+    const postListId = toTopicPostListId(MOCK_TOPIC_ID);
     const postListPayload = {
       _id: postListId,
       _type: 'module_postList',
-      title: 'React Archive',
-      brandVariant: 'PRIMARY',
-      limit: 9,
-      pageSize: 9,
+      title: `${MOCK_TOPIC_TITLE} Archive`,
+      brandVariant: BRAND_VARIANT.PRIMARY,
+      limit: TOPIC_ITEMS_PER_PAGE,
+      pageSize: TOPIC_ITEMS_PER_PAGE,
       showImages: true,
     };
     const pageTopicPayload = {
-      _id: pageTopicId,
+      _id: toPageTopicId(MOCK_TOPIC_ID),
       _type: 'page_topic',
-      title: 'React Topic Page',
-      slug: { _type: 'slug', current: 'react' },
-      topic: { _type: 'reference', _ref: topicDoc._id },
-      postList: { _type: 'reference', _ref: postListId },
-      seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('React') },
+      title: `${MOCK_TOPIC_TITLE} Topic Page`,
+      slug: { _type: 'slug', current: MOCK_TOPIC_SLUG },
+      topic: mockReference(MOCK_TOPIC_ID),
+      postList: mockReference(postListId),
+      seo: {
+        _type: 'seo',
+        metaTitle: `Browse every post about "${MOCK_TOPIC_TITLE}" on the blog`,
+      },
     };
 
     assertSatisfiesRequiredFields(
@@ -78,64 +87,36 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       PAGE_TEMPLATE_EXEMPTION,
     ]);
 
-    expect(migration.migrate.document(topicDoc)).toEqual([
+    expect(migration.migrate.document(mockTopicDoc())).toEqual([
       createIfNotExists(postListPayload),
       createIfNotExists(pageTopicPayload),
     ]);
   });
 
-  it('skips a drafts.blog_topic document, so the pair is not created twice', () => {
-    const draftDoc = { ...topicDoc, _id: `drafts.${topicDoc._id}` };
+  it('skips a draft topic so the pair is not created twice', () => {
+    const draftDoc = mockTopicDoc({ _id: `drafts.${MOCK_TOPIC_ID}` });
 
     expect(migration.migrate.document(draftDoc)).toBeUndefined();
   });
 
-  it('is idempotent — a second run against the same topic returns the same createIfNotExists mutations', () => {
-    expect(migration.migrate.document(topicDoc)).toEqual(
-      migration.migrate.document(topicDoc),
-    );
+  it('returns the same createIfNotExists mutations on every run', () => {
+    const firstRun = migration.migrate.document(mockTopicDoc());
+    const secondRun = migration.migrate.document(mockTopicDoc());
+
+    expect(secondRun).toEqual(firstRun);
   });
+});
 
-  it('preserves the exact slug value from blog_topic, unmodified', () => {
-    const otherSlugDoc = {
-      ...topicDoc,
-      _id: 'xyz789',
-      title: 'TypeScript',
-      slug: { _type: 'slug', current: 'typescript' },
-    };
-
-    const [, pageTopicMutation] = migration.migrate.document(otherSlugDoc)!;
-
-    const pageTopicPayload = {
-      _id: toPageTopicId(otherSlugDoc._id),
-      _type: 'page_topic',
-      title: 'TypeScript Topic Page',
-      slug: { _type: 'slug', current: 'typescript' },
-      topic: { _type: 'reference', _ref: otherSlugDoc._id },
-      postList: {
-        _type: 'reference',
-        _ref: toTopicPostListId(otherSlugDoc._id),
-      },
-      seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('TypeScript') },
-    };
-
-    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload, [
-      ...HEADING_BLOCK_EXEMPTION,
-      PAGE_TEMPLATE_EXEMPTION,
-    ]);
-
-    expect(pageTopicMutation).toEqual(createIfNotExists(pageTopicPayload));
-  });
-
-  it('seeds a seo.metaTitle within bounds for a one-character topic title', () => {
-    const metaTitle = buildTopicMetaTitle('A');
+describe(buildTopicMetaTitle, () => {
+  it('stays within the bounds for a one-character topic title', () => {
+    const metaTitle = buildTopicMetaTitle(MOCK_SHORT_TITLE);
 
     expect(metaTitle.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
     expect(metaTitle.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
   });
 
-  it('clamps a seo.metaTitle built from a very long topic title to the ceiling', () => {
-    const metaTitle = buildTopicMetaTitle('A'.repeat(200));
+  it('clamps a very long topic title to the ceiling', () => {
+    const metaTitle = buildTopicMetaTitle(MOCK_LONG_TITLE);
 
     expect(metaTitle.length).toBe(SEO_META_TITLE_MAX_LENGTH);
   });

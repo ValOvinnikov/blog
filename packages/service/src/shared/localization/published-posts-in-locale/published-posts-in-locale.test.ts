@@ -30,7 +30,9 @@ async function idsIn(locale: string): Promise<string[]> {
 
 describe(publishedPostsInLocale, () => {
   it('keeps only published posts written in the reader language', async () => {
-    expect(await idsIn(EN)).toEqual([
+    const ids = await idsIn(EN);
+
+    expect(ids).toEqual([
       MOCK_DESIGN_EN_POST_ID,
       MOCK_NOTES_EN_POST_ID,
       MOCK_ONLY_EN_POST_ID,
@@ -38,6 +40,8 @@ describe(publishedPostsInLocale, () => {
   });
 
   it('leaves out posts scheduled for the future', async () => {
-    expect(await idsIn(NL)).toEqual([MOCK_DESIGN_NL_POST_ID]);
+    const ids = await idsIn(NL);
+
+    expect(ids).toEqual([MOCK_DESIGN_NL_POST_ID]);
   });
 });

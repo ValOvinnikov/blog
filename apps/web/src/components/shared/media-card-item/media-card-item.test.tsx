@@ -1,13 +1,13 @@
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { renderElement, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
+import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
 
 import { MediaCardItem } from './media-card-item';
 
 vi.mock('@web/i18n/navigation');
 
 const item = mockPostListItem();
-const POST_IMAGE_TEST_ID = 'post-image';
 const LEAD_CARD_TEST_ID = 'lead-card';
 
 describe(`<${MediaCardItem.name}/>`, () => {
@@ -67,13 +67,13 @@ describe(`<${MediaCardItem.name}/>`, () => {
   it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
     renderElement(
       <MediaCardItem
-        item={{ ...item, image: <div data-testid={POST_IMAGE_TEST_ID} /> }}
+        item={{ ...item, image: <div data-testid={MOCK_POST_IMAGE_TEST_ID} /> }}
         hasImage={true}
       />,
     );
 
     const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
-    const image = screen.getByTestId(POST_IMAGE_TEST_ID);
+    const image = screen.getByTestId(MOCK_POST_IMAGE_TEST_ID);
     expect(media).toBeVisible();
     expect(image).toBeVisible();
   });

@@ -20,24 +20,29 @@ import {
   MOCK_PINNED_POST_DOCUMENTS,
   MOCK_SOLO_NL_POST_ID,
 } from '@blog/service/testing/shared/translated-posts-dataset';
+import { faker } from '@faker-js/faker';
 
 import { heroBlogModuleQuery } from './query';
 
+faker.seed(6014);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const EN_COPY = {
-  eyebrow: 'Featured',
-  primaryActionLabel: 'Read the post',
-  alt: 'A desk',
+const MOCK_EN_COPY = {
+  eyebrow: faker.lorem.word(),
+  primaryActionLabel: faker.lorem.words(3),
+  alt: faker.lorem.words(2),
 };
 
-const NL_COPY = {
-  eyebrow: 'Uitgelicht',
-  primaryActionLabel: 'Lees het bericht',
-  alt: 'Een bureau',
+const MOCK_NL_COPY = {
+  eyebrow: faker.lorem.word(),
+  primaryActionLabel: faker.lorem.words(3),
+  alt: faker.lorem.words(2),
 };
 
-const heroDocument = {
+const MOCK_DELETED_POST_ID = faker.string.uuid();
+
+const MOCK_HERO_DOCUMENT = {
   _id: MOCK_HERO_MODULE_ID,
   _type: 'module_heroBlog',
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -45,25 +50,35 @@ const heroDocument = {
   postSource: POST_SOURCE.NEWEST_FEATURED,
   primaryActionAppearance: CTA_ACTION_APPEARANCE.CONTAINED,
   eyebrow: mockLocalizedStrings({
-    [EN]: EN_COPY.eyebrow,
-    [NL]: NL_COPY.eyebrow,
+    [EN]: MOCK_EN_COPY.eyebrow,
+    [NL]: MOCK_NL_COPY.eyebrow,
   }),
   primaryActionLabel: mockLocalizedStrings({
-    [EN]: EN_COPY.primaryActionLabel,
-    [NL]: NL_COPY.primaryActionLabel,
+    [EN]: MOCK_EN_COPY.primaryActionLabel,
+    [NL]: MOCK_NL_COPY.primaryActionLabel,
   }),
-  image: mockLocalizedImage({ [EN]: EN_COPY.alt, [NL]: NL_COPY.alt }),
+  image: mockLocalizedImage({ [EN]: MOCK_EN_COPY.alt, [NL]: MOCK_NL_COPY.alt }),
 };
 
-async function runHero(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
+async function evaluateHero(
+  module: Record<string, unknown>,
+  locale: string,
+  dataset: unknown[] = [],
+) {
+  return evaluateGroqExpression(
     heroBlogModuleQuery.query,
-    [document, MOCK_IMAGE_ASSET_DOCUMENT],
+    [
+      { ...MOCK_HERO_DOCUMENT, ...module },
+      MOCK_IMAGE_ASSET_DOCUMENT,
+      ...dataset,
+    ],
     undefined,
     { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
   );
+}
 
-  return heroBlogModuleQuery.parse(raw);
+async function runHero(module: Record<string, unknown>, locale: string) {
+  return heroBlogModuleQuery.parse(await evaluateHero(module, locale));
 }
 
 describe('heroBlogModuleQuery', () => {
@@ -71,54 +86,45 @@ describe('heroBlogModuleQuery', () => {
     [
       'picks the eyebrow, action label and image alt in the visitor language',
       NL,
-      NL_COPY,
+      MOCK_NL_COPY,
     ],
     [
       'falls back to the default language when the visitor language is missing',
       FR,
-      EN_COPY,
+      MOCK_EN_COPY,
     ],
   ])('%s', async (_, locale, copy) => {
-    const hero = await runHero(heroDocument, locale);
+    const { eyebrow, primaryActionLabel, image } = await runHero({}, locale);
 
-    expect(hero).toMatchObject({
+    expect({ eyebrow, primaryActionLabel, alt: image?.alt }).toEqual({
       eyebrow: copy.eyebrow,
       primaryActionLabel: copy.primaryActionLabel,
-      image: { alt: copy.alt },
+      alt: copy.alt,
     });
   });
 
   it('leaves the eyebrow null when no language has a value', async () => {
-    const hero = await runHero({ ...heroDocument, eyebrow: undefined }, NL);
+    const hero = await runHero({ eyebrow: undefined }, NL);
 
     expect(hero.eyebrow).toBeNull();
   });
 
   it('fails when the action label is missing in every language', async () => {
     await expect(
-      runHero({ ...heroDocument, primaryActionLabel: undefined }, NL),
+      runHero({ primaryActionLabel: undefined }, NL),
     ).rejects.toThrow();
   });
 });
 
 describe('heroBlogModuleQuery language scoping', () => {
   async function runRaw(module: Record<string, unknown>, locale: string) {
-    return (await evaluateGroqExpression(
-      heroBlogModuleQuery.query,
-      [
-        { ...heroDocument, ...module },
-        MOCK_IMAGE_ASSET_DOCUMENT,
-        ...MOCK_PINNED_POST_DOCUMENTS,
-      ],
-      undefined,
-      { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
-    )) as { post: { _id: string } | null; hasPinnedPost: boolean };
+    return (await evaluateHero(module, locale, MOCK_PINNED_POST_DOCUMENTS)) as {
+      post: { _id: string } | null;
+      hasPinnedPost: boolean;
+    };
   }
 
-  async function runPost(
-    module: Record<string, unknown>,
-    locale: string,
-  ): Promise<unknown> {
+  async function runPost(module: Record<string, unknown>, locale: string) {
     const raw = await runRaw(module, locale);
 
     return raw.post?._id ?? null;
@@ -163,13 +169,22 @@ describe('heroBlogModuleQuery language scoping', () => {
       null,
     ],
   ])('%s', async (_, pinnedId, locale, expected) => {
-    expect(await runPost(pinned(pinnedId), locale)).toBe(expected);
+    const postId = await runPost(pinned(pinnedId), locale);
+
+    expect(postId).toBe(expected);
   });
 
-  it('falls back to the newest featured post in the request language', async () => {
-    expect(await runPost({}, EN)).toBe(MOCK_ONLY_EN_POST_ID);
-    expect(await runPost({}, NL)).toBe(MOCK_DESIGN_NL_POST_ID);
-  });
+  it.each([
+    [EN, MOCK_ONLY_EN_POST_ID],
+    [NL, MOCK_DESIGN_NL_POST_ID],
+  ])(
+    'falls back to the newest featured post in %s',
+    async (locale, expected) => {
+      const postId = await runPost({}, locale);
+
+      expect(postId).toBe(expected);
+    },
+  );
 
   it.each([
     [
@@ -179,11 +194,13 @@ describe('heroBlogModuleQuery language scoping', () => {
     ],
     [
       'as absent when the reference points at a missing document',
-      pinned('deleted-post'),
+      pinned(MOCK_DELETED_POST_ID),
       false,
     ],
     ['as absent in newest-featured mode', {}, false],
   ])('reports the pinned post %s', async (_, module, expected) => {
-    expect((await runRaw(module, NL)).hasPinnedPost).toBe(expected);
+    const { hasPinnedPost } = await runRaw(module, NL);
+
+    expect(hasPinnedPost).toBe(expected);
   });
 });

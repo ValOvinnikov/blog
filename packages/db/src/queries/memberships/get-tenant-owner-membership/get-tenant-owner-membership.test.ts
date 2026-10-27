@@ -8,13 +8,18 @@ import {
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import {
-  MOCK_EMAIL_VERIFIED_AT,
-  MOCK_OAUTH_PROVIDER,
-  MOCK_OWNER_EMAIL,
   insertTestAccount,
   insertTestTenant,
   insertTestUser,
+  MOCK_EMAIL_VERIFIED_AT,
+  MOCK_OAUTH_PROVIDER,
+  MOCK_OWNER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import {
+  MOCK_INVITE_CONSUMED_AT,
+  mockMembershipInvite,
+} from '@blog/db/testing/membership-invites/fixtures';
+import { mockMembership } from '@blog/db/testing/memberships/fixtures';
 import {
   usePersonalDataFallbackListener,
   usePersonalDataKeys,
@@ -37,6 +42,7 @@ const fallbackListener = usePersonalDataFallbackListener();
 const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_SIGNED_IN_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_INVITED_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_STALE_PLAIN_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_MEMBER_USER_ID = faker.string.uuid();
 
 afterEach(async () => {
@@ -53,17 +59,6 @@ describe(getTenantOwnerMembership, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  async function insertMembership(
-    role: TMembershipRole,
-  ): Promise<schema.TMembership> {
-    const [membership] = await db()
-      .insert(schema.memberships)
-      .values({ userId: MOCK_MEMBER_USER_ID, tenantId, role })
-      .returning();
-    if (!membership) throw new Error('failed to seed a membership row');
-    return membership;
-  }
-
   async function insertMember(
     email: TMaybeNull<string>,
     role: TMembershipRole,
@@ -74,7 +69,11 @@ describe(getTenantOwnerMembership, () => {
       emailVerified,
       ...(isNull(email) ? {} : userPersonalColumns({ email })),
     });
-    return insertMembership(role);
+    return mockMembership(db(), {
+      userId: MOCK_MEMBER_USER_ID,
+      tenantId,
+      role,
+    });
   }
 
   async function insertInvite({
@@ -88,18 +87,12 @@ describe(getTenantOwnerMembership, () => {
     role: TMembershipRole;
     consumedAt?: TMaybeNull<Date>;
   }): Promise<schema.TMembershipInvite> {
-    const [invite] = await db()
-      .insert(schema.membershipInvites)
-      .values({
-        tenantId,
-        email,
-        emailEncrypted: encryptPersonalValue(encryptedEmail),
-        role,
-        consumedAt,
-      })
-      .returning();
-    if (!invite) throw new Error('failed to seed an invite row');
-    return invite;
+    return mockMembershipInvite(db(), tenantId, {
+      email,
+      emailEncrypted: encryptPersonalValue(encryptedEmail),
+      role,
+      consumedAt,
+    });
   }
 
   it('returns a signed-in OWNER as joined, decrypted and without a notice', async () => {
@@ -124,7 +117,10 @@ describe(getTenantOwnerMembership, () => {
       email: MOCK_OWNER_EMAIL,
       emailVerified: MOCK_EMAIL_VERIFIED_AT,
     });
-    const membership = await insertMembership(MEMBERSHIP_ROLE.OWNER);
+    const membership = await mockMembership(db(), {
+      userId: MOCK_MEMBER_USER_ID,
+      tenantId,
+    });
 
     const result = await getTenantOwnerMembership(tenantId);
 
@@ -182,7 +178,7 @@ describe(getTenantOwnerMembership, () => {
 
   it('falls back to a pending OWNER invite, reading its encrypted email', async () => {
     const invite = await insertInvite({
-      email: faker.internet.email(),
+      email: MOCK_STALE_PLAIN_EMAIL,
       encryptedEmail: MOCK_OWNER_EMAIL,
       role: MEMBERSHIP_ROLE.OWNER,
     });
@@ -197,21 +193,16 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('reads a pending OWNER invite not yet backfilled from plain, and reports it', async () => {
-    const [invite] = await db()
-      .insert(schema.membershipInvites)
-      .values({
-        tenantId,
-        email: MOCK_OWNER_EMAIL,
-        role: MEMBERSHIP_ROLE.OWNER,
-      })
-      .returning();
+    const invite = await mockMembershipInvite(db(), tenantId, {
+      email: MOCK_OWNER_EMAIL,
+    });
 
     const result = await getTenantOwnerMembership(tenantId);
 
     expect(result).toEqual({
       email: MOCK_OWNER_EMAIL,
       hasSignedIn: false,
-      invitedAt: invite?.createdAt,
+      invitedAt: invite.createdAt,
     });
     expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
       owner: PERSONAL_DATA_OWNER.INVITE,
@@ -224,7 +215,7 @@ describe(getTenantOwnerMembership, () => {
       email: MOCK_OWNER_EMAIL,
       encryptedEmail: MOCK_OWNER_EMAIL,
       role: MEMBERSHIP_ROLE.OWNER,
-      consumedAt: new Date('2026-08-12T00:00:00.000Z'),
+      consumedAt: MOCK_INVITE_CONSUMED_AT,
     });
 
     const result = await getTenantOwnerMembership(tenantId);

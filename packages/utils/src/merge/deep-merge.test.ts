@@ -1,45 +1,49 @@
-import { deepMergePartial } from './deep-merge';
+import { faker } from '@faker-js/faker';
+
+import { deepMergePartial, type TDeepPartial } from './deep-merge';
+
+faker.seed(6029);
 
 type TFixture = {
   a: { x: string; y: string };
   b: string;
 };
 
-const base: TFixture = {
-  a: { x: 'x-base', y: 'y-base' },
-  b: 'b-base',
+const MOCK_BASE: TFixture = {
+  a: { x: faker.lorem.word(), y: faker.lorem.word() },
+  b: faker.lorem.word(),
 };
+const MOCK_FIRST_X = faker.string.uuid();
+const MOCK_FIRST_B = faker.string.uuid();
+const MOCK_SECOND_X = faker.string.uuid();
 
 describe(deepMergePartial, () => {
-  it("replaces only the leaf keys an override's nested partial sets, leaving sibling keys untouched", () => {
-    const result = deepMergePartial(base, { a: { x: 'x-override' } });
+  it('replaces only the nested leaf an override sets', () => {
+    const result = deepMergePartial(MOCK_BASE, { a: { x: MOCK_FIRST_X } });
 
-    expect(result.a.x).toBe('x-override');
-    expect(result.a.y).toBe('y-base');
-    expect(result.b).toBe('b-base');
+    expect(result).toEqual({
+      ...MOCK_BASE,
+      a: { ...MOCK_BASE.a, x: MOCK_FIRST_X },
+    });
   });
 
   it('applies multiple overrides left-to-right, each later one winning', () => {
     const result = deepMergePartial(
-      base,
-      { a: { x: 'x-first' }, b: 'b-first' },
-      { a: { x: 'x-second' } },
+      MOCK_BASE,
+      { a: { x: MOCK_FIRST_X }, b: MOCK_FIRST_B },
+      { a: { x: MOCK_SECOND_X } },
     );
 
-    expect(result.a.x).toBe('x-second');
-    expect(result.a.y).toBe('y-base');
-    expect(result.b).toBe('b-first');
+    expect(result).toEqual({
+      a: { ...MOCK_BASE.a, x: MOCK_SECOND_X },
+      b: MOCK_FIRST_B,
+    });
   });
 
-  it('leaves base fully unchanged when an override has no matching top-level key', () => {
-    const result = deepMergePartial(base, {} as Partial<TFixture>);
-
-    expect(result).toEqual(base);
-  });
-
-  it('is a no-op, not a crash, when an override argument is undefined', () => {
-    const result = deepMergePartial(base, undefined);
-
-    expect(result).toEqual(base);
+  it.each<[string, TDeepPartial<TFixture> | undefined]>([
+    ['an empty override', {}],
+    ['an undefined override', undefined],
+  ])('returns the base unchanged for %s', (_label, override) => {
+    expect(deepMergePartial(MOCK_BASE, override)).toEqual(MOCK_BASE);
   });
 });

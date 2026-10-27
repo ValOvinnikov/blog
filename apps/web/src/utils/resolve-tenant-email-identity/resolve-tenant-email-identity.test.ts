@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -20,33 +21,38 @@ vi.mock('@blog/db', () => ({
   queries: { tenants: { getTenantById: vi.fn() } },
 }));
 
-const TENANT_NAME = 'Zeta Times';
-const ACCENT_HUE = 40;
+faker.seed(6012);
+
+const MOCK_TENANT_NAME = faker.company.name();
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 360 });
 
 describe(resolveTenantEmailIdentity, () => {
   beforeEach(() => {
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue({
-      name: TENANT_NAME,
+      name: MOCK_TENANT_NAME,
     } as never);
   });
 
-  it("resolves the tenant's own brand and name on success", async () => {
+  it("resolves the tenant's own brand and name", async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(
-      okResult({ preset: PRESET_ID.CONSOLE, accentHue: ACCENT_HUE } as never),
+      okResult({
+        preset: PRESET_ID.CONSOLE,
+        accentHue: MOCK_ACCENT_HUE,
+      } as never),
     );
 
     const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
 
-    expect(identity.brandName).toBe(TENANT_NAME);
+    expect(identity.brandName).toBe(MOCK_TENANT_NAME);
     expect(identity.brand).toEqual(
       resolveTenantEmailBrand({
         preset: PRESET_ID.CONSOLE,
-        accentHue: ACCENT_HUE,
+        accentHue: MOCK_ACCENT_HUE,
       }),
     );
   });
 
-  it('falls back to the default brand and logs when the site config fails', async () => {
+  it('falls back to the default brand and warns when site config fails', async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
@@ -65,7 +71,7 @@ describe(resolveTenantEmailIdentity, () => {
     );
   });
 
-  it('falls back to the default name and logs when the tenant row is missing', async () => {
+  it('falls back to the default name and warns when the tenant is missing', async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(okResult());
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
 

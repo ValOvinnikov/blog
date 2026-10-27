@@ -2,6 +2,7 @@ import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LEAD_LOG, LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { MOCK_LEAD_ID } from '@platform/testing/leads/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -25,7 +26,6 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const MOCK_LEAD_ID = faker.string.uuid();
 const MOCK_LEAD_KEY = { tenantId: MOCK_TENANT_ID, id: MOCK_LEAD_ID };
 const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 const MOCK_NOT_FOUND = new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
