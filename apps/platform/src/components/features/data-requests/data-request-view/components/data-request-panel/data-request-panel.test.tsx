@@ -74,6 +74,12 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     await user.click(findButton);
   };
 
+  const exportAs = async (button: typeof EXPORT_CSV_BUTTON) => {
+    const exportButton = await screen.findByRole('button', button);
+    await user.click(exportButton);
+    return screen.findByRole('button', { ...button, busy: false });
+  };
+
   const openEraseDialog = async () => {
     const eraseButton = await screen.findByRole('button', ERASE_BUTTON);
     await user.click(eraseButton);
@@ -158,8 +164,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
   it('downloads the JSON export for the searched email', async () => {
     await lookUp();
 
-    const exportButton = await screen.findByRole('button', EXPORT_JSON_BUTTON);
-    await user.click(exportButton);
+    await exportAs(EXPORT_JSON_BUTTON);
 
     const [, fileName, content] = downloadFileMock.mock.lastCall ?? [];
 
@@ -175,8 +180,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
   it('downloads the CSV export for the searched email', async () => {
     await lookUp();
 
-    const exportButton = await screen.findByRole('button', EXPORT_CSV_BUTTON);
-    await user.click(exportButton);
+    await exportAs(EXPORT_CSV_BUTTON);
 
     const [, fileName, content] = downloadFileMock.mock.lastCall ?? [];
 
@@ -193,14 +197,13 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     });
     await lookUp();
 
-    const exportButton = await screen.findByRole('button', EXPORT_CSV_BUTTON);
-    await user.click(exportButton);
-
+    const exportButton = await exportAs(EXPORT_CSV_BUTTON);
     const toast = await screen.findByText(
       "Couldn't prepare the export — try again.",
     );
 
     expect(toast).toBeVisible();
+    expect(exportButton).toBeEnabled();
     expect(downloadFileMock).not.toHaveBeenCalled();
   });
 
