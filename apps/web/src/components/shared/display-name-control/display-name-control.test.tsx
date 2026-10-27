@@ -1,16 +1,21 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import { ToastProvider } from '@web/context/toast-provider';
+import { customRender, screen } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
 
-import { DisplayNameControl } from './display-name-control';
+import {
+  DisplayNameControl,
+  type TDisplayNameControlProps,
+} from './display-name-control';
 
-const { routerRefreshMock, updateDisplayNameActionMock, toastPromiseMock } =
-  vi.hoisted(() => ({
-    routerRefreshMock: vi.fn(),
-    updateDisplayNameActionMock: vi.fn(),
-    toastPromiseMock: vi.fn((promise: Promise<unknown>) => promise),
-  }));
+faker.seed(6007);
+
+const { routerRefreshMock, updateDisplayNameActionMock } = vi.hoisted(() => ({
+  routerRefreshMock: vi.fn(),
+  updateDisplayNameActionMock: vi.fn(),
+}));
 
 vi.mocked(useRouter).mockReturnValue({
   push: vi.fn(),
@@ -25,88 +30,89 @@ vi.mock('@web/server/account/identity-actions/identity-actions', () => ({
   updateDisplayNameAction: updateDisplayNameActionMock,
 }));
 
-vi.mock('@web/context/toast-provider', () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-    error: vi.fn(),
-    promise: toastPromiseMock,
-    dismiss: vi.fn(),
-  }),
-}));
+const {
+  displayNameAriaLabel: NAME_FIELD_LABEL,
+  saveButton: SAVE_LABEL,
+  saveToastSuccessMessage: SAVE_SUCCESS_MESSAGE,
+  saveError: SAVE_ERROR_MESSAGE,
+} = SITE_MESSAGES.accountPage.identity;
 
-const setup = customRender(DisplayNameControl, {
-  initialName: 'Jane Doe',
-  email: 'jane@icloud.com',
+const MOCK_FIRST_NAME = faker.person.firstName();
+const MOCK_LAST_NAME = faker.person.lastName();
+const MOCK_NAME = `${MOCK_FIRST_NAME} ${MOCK_LAST_NAME}`;
+const MOCK_INITIALS = `${MOCK_FIRST_NAME[0]}${MOCK_LAST_NAME[0]}`.toUpperCase();
+const MOCK_EMAIL = faker.internet.email();
+const MOCK_NEW_NAME = faker.person.fullName();
+
+const WithToasts = (props: TDisplayNameControlProps) => (
+  <ToastProvider>
+    <DisplayNameControl {...props} />
+  </ToastProvider>
+);
+
+const setup = customRender(WithToasts, {
+  initialName: MOCK_NAME,
+  email: MOCK_EMAIL,
   image: null,
 });
 
-let user: UserEvent;
-
 describe(`<${DisplayNameControl.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     routerRefreshMock.mockReset();
     updateDisplayNameActionMock.mockReset();
-    toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
     user = userEvent.setup();
     setup();
   });
 
   it('renders the current display name in the field and avatar initials', () => {
-    expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
-      'Jane Doe',
-    );
-    expect(screen.getByText('JD')).toBeVisible();
-    expect(screen.getByTestId('display-name-prompt-icon')).toBeVisible();
+    const nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
+    const initials = screen.getByText(MOCK_INITIALS);
+    const promptIcon = screen.getByTestId('display-name-prompt-icon');
+
+    expect(nameField).toHaveValue(MOCK_NAME);
+    expect(initials).toBeVisible();
+    expect(promptIcon).toBeVisible();
   });
 
-  it('saves the edited name through toast.promise and refreshes the router on success', async () => {
+  it('saves the edited name, announces it and refreshes the page', async () => {
     updateDisplayNameActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    const input = screen.getByRole('textbox', { name: 'Display name' });
-    await user.clear(input);
-    await user.type(input, 'New Name');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
+    const saveButton = screen.getByRole('button', { name: SAVE_LABEL });
+    await user.clear(nameField);
+    await user.type(nameField, MOCK_NEW_NAME);
+    await user.click(saveButton);
 
-    await waitFor(() => {
-      expect(updateDisplayNameActionMock).toHaveBeenCalledWith('New Name');
-    });
-    await waitFor(() => {
-      expect(routerRefreshMock).toHaveBeenCalledTimes(1);
-    });
+    const successToast = await screen.findByRole('status');
 
-    expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
-      loading: { message: 'Saving your display name…' },
-      success: { message: 'Display name updated.' },
-      error: { message: "Couldn't update your display name. Try again." },
-    });
+    expect(successToast).toHaveTextContent(SAVE_SUCCESS_MESSAGE);
+    expect(updateDisplayNameActionMock).toHaveBeenCalledWith(MOCK_NEW_NAME);
+    expect(routerRefreshMock).toHaveBeenCalledTimes(1);
   });
 
   it('disables the save button when the name is cleared to empty', async () => {
-    const input = screen.getByRole('textbox', { name: 'Display name' });
-    await user.clear(input);
+    const nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
+    await user.clear(nameField);
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    const saveButton = screen.getByRole('button', { name: SAVE_LABEL });
+
+    expect(saveButton).toBeDisabled();
     expect(updateDisplayNameActionMock).not.toHaveBeenCalled();
   });
 
-  it('does not refresh the router when the save fails', async () => {
+  it('explains the failure and keeps the page when the save fails', async () => {
     updateDisplayNameActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const saveButton = screen.getByRole('button', { name: SAVE_LABEL });
+    await user.click(saveButton);
 
-    await waitFor(() => {
-      expect(toastPromiseMock).toHaveBeenCalled();
-    });
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
-        'aria-busy',
-        'false',
-      );
-    });
+    const errorToast = await screen.findByRole('alert');
+
+    expect(errorToast).toHaveTextContent(SAVE_ERROR_MESSAGE);
     expect(routerRefreshMock).not.toHaveBeenCalled();
   });
 });

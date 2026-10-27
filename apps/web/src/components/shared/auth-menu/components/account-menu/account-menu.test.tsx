@@ -1,3 +1,4 @@
+import { routes, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePopover } from '@web/hooks/use-popover';
@@ -14,7 +15,13 @@ import { AccountMenu, type TAccountMenuProps } from './account-menu';
 
 faker.seed(5960);
 
-const ACCOUNT_MENU_LABEL = 'Account menu';
+const {
+  accountMenuAriaLabel: ACCOUNT_MENU_LABEL,
+  accountHeading: ACCOUNT_LABEL,
+  myBookmarks: BOOKMARKS_LABEL,
+  accountSettings: SETTINGS_LABEL,
+  signOut: SIGN_OUT_LABEL,
+} = SITE_MESSAGES.authMenu;
 const MOCK_FIRST_NAME = faker.person.firstName();
 const MOCK_LAST_NAME = faker.person.lastName();
 const MOCK_NAME = `${MOCK_FIRST_NAME} ${MOCK_LAST_NAME}`;
@@ -72,7 +79,7 @@ describe(`<${AccountMenu.name}/>`, () => {
     expect(triggerInitials).toBeVisible();
   });
 
-  it('also falls back to initials in the panel body avatar, since it shares the same failure state as the trigger', async () => {
+  it('falls back to initials in the panel avatar once the trigger image fails', async () => {
     const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     const triggerImage = within(trigger).getByRole('presentation');
     fireEvent.error(triggerImage);
@@ -103,30 +110,34 @@ describe(`<${AccountMenu.name}/>`, () => {
     expect(newImage).toBeVisible();
   });
 
-  it('renders a plain "Account" label — not a heading — and the session name/email', async () => {
+  it('renders a plain label, not a heading, with the reader name, email and links', async () => {
     const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
     await user.click(trigger);
 
     const panel = screen.getByRole('menu');
     const heading = within(panel).queryByRole('heading');
-    const accountLabel = within(panel).getByText('Account');
+    const accountLabel = within(panel).getByText(ACCOUNT_LABEL);
     const name = within(panel).getByText(MOCK_NAME);
     const email = within(panel).getByText(MOCK_EMAIL);
     const bookmarksItem = within(panel).getByRole('menuitem', {
-      name: 'My bookmarks',
+      name: BOOKMARKS_LABEL,
+    });
+    const settingsItem = within(panel).getByRole('menuitem', {
+      name: SETTINGS_LABEL,
     });
     const signOutItem = within(panel).getByRole('menuitem', {
-      name: 'Sign out',
+      name: SIGN_OUT_LABEL,
     });
     expect(heading).not.toBeInTheDocument();
     expect(accountLabel).toBeVisible();
     expect(name).toBeVisible();
     expect(email).toBeVisible();
-    expect(bookmarksItem).toBeVisible();
+    expect(bookmarksItem).toHaveAttribute('href', routes.bookmarks());
+    expect(settingsItem).toHaveAttribute('href', routes.account());
     expect(signOutItem).toBeVisible();
   });
 
-  it('shows the handle on the name line and the email once when the reader has no name', async () => {
+  it('shows the handle and the email once when the reader has no name', async () => {
     rerender(<Wrapper name={null} email={MOCK_EMAIL} image={null} />);
 
     const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
