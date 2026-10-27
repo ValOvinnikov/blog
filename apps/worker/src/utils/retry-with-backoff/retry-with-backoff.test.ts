@@ -1,24 +1,43 @@
+import { faker } from '@faker-js/faker';
 import type { Mock } from 'vitest';
 
-import { retryWithBackoff } from './retry-with-backoff';
+import {
+  retryWithBackoff,
+  type TRetryWithBackoffOptions,
+} from './retry-with-backoff';
+
+faker.seed(6025);
+
+const MOCK_RESULT = faker.lorem.word();
+const MOCK_FAILURE = faker.lorem.sentence();
+const BASE_DELAY_MS = 10;
 
 describe(retryWithBackoff, () => {
   let sleep: Mock<(ms: number) => Promise<void>>;
+
+  function retry(
+    fn: () => Promise<string>,
+    overrides: Partial<TRetryWithBackoffOptions> = {},
+  ) {
+    return retryWithBackoff(fn, {
+      maxAttempts: 3,
+      baseDelayMs: BASE_DELAY_MS,
+      isRetryable: () => true,
+      sleep,
+      ...overrides,
+    });
+  }
 
   beforeEach(() => {
     sleep = vi.fn().mockResolvedValue(undefined);
   });
 
   it('returns the result on the first successful attempt without sleeping', async () => {
-    const fn = vi.fn().mockResolvedValue('ok');
-    const result = await retryWithBackoff(fn, {
-      maxAttempts: 3,
-      baseDelayMs: 10,
-      isRetryable: () => true,
-      sleep,
-    });
+    const fn = vi.fn().mockResolvedValue(MOCK_RESULT);
 
-    expect(result).toBe('ok');
+    const result = await retry(fn);
+
+    expect(result).toBe(MOCK_RESULT);
     expect(fn).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
   });
@@ -26,51 +45,36 @@ describe(retryWithBackoff, () => {
   it('retries a retryable failure with doubling backoff until it succeeds', async () => {
     const fn = vi
       .fn()
-      .mockRejectedValueOnce(new Error('nope'))
-      .mockRejectedValueOnce(new Error('nope'))
-      .mockResolvedValueOnce('ok');
-    const result = await retryWithBackoff(fn, {
-      maxAttempts: 5,
-      baseDelayMs: 10,
-      isRetryable: () => true,
-      sleep,
-    });
+      .mockRejectedValueOnce(new Error(MOCK_FAILURE))
+      .mockRejectedValueOnce(new Error(MOCK_FAILURE))
+      .mockResolvedValueOnce(MOCK_RESULT);
 
-    expect(result).toBe('ok');
+    const result = await retry(fn, { maxAttempts: 5 });
+
+    expect(result).toBe(MOCK_RESULT);
     expect(fn).toHaveBeenCalledTimes(3);
-    expect(sleep).toHaveBeenNthCalledWith(1, 10);
-    expect(sleep).toHaveBeenNthCalledWith(2, 20);
+    expect(sleep).toHaveBeenNthCalledWith(1, BASE_DELAY_MS);
+    expect(sleep).toHaveBeenNthCalledWith(2, BASE_DELAY_MS * 2);
   });
 
   it('rethrows once maxAttempts is exhausted', async () => {
-    const failure = new Error('always fails');
+    const failure = new Error(MOCK_FAILURE);
     const fn = vi.fn().mockRejectedValue(failure);
-    await expect(
-      retryWithBackoff(fn, {
-        maxAttempts: 3,
-        baseDelayMs: 10,
-        isRetryable: () => true,
-        sleep,
-      }),
-    ).rejects.toThrow(failure);
+
+    await expect(retry(fn)).rejects.toThrow(failure);
 
     expect(fn).toHaveBeenCalledTimes(3);
     expect(sleep).toHaveBeenCalledTimes(2);
   });
 
   it('rethrows immediately when the error is not retryable', async () => {
-    const failure = new Error('not our error');
+    const failure = new Error(MOCK_FAILURE);
     const fn = vi.fn().mockRejectedValue(failure);
     const isRetryable = vi.fn().mockReturnValue(false);
 
-    await expect(
-      retryWithBackoff(fn, {
-        maxAttempts: 5,
-        baseDelayMs: 10,
-        isRetryable,
-        sleep,
-      }),
-    ).rejects.toThrow(failure);
+    await expect(retry(fn, { maxAttempts: 5, isRetryable })).rejects.toThrow(
+      failure,
+    );
 
     expect(fn).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();

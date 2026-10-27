@@ -2,6 +2,12 @@ import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
+import {
+  OWNER_ACCESS_FAST_POLL_INTERVAL,
+  OWNER_ACCESS_FAST_POLL_TICKS,
+  OWNER_ACCESS_HOOK_TOKEN_PREFIX,
+  OWNER_ACCESS_SLOW_POLL_INTERVAL,
+} from '@worker/constants/owner-access';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { checkOwnerAccess } from '@worker/units/check-owner-access';
 import { createHook, type Hook, sleep } from 'workflow';
@@ -11,17 +17,13 @@ import { ensureOwnerAccess } from './ensure-owner-access';
 const { PENDING_ACCEPTANCE, ELEVATED, STALLED } = ELEVATE_TENANT_OWNER_OUTCOME;
 
 vi.mock('@worker/units/check-owner-access');
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
-  createHook: vi.fn(),
-  sleep: vi.fn(),
-}));
+vi.mock('workflow');
 
 function fakeHook(options: { conflict?: boolean; wakes?: number } = {}) {
   const { conflict = false, wakes = 0 } = options;
   let remainingWakes = wakes;
   const hook = {
-    token: 'owner-access:token',
+    token: `${OWNER_ACCESS_HOOK_TOKEN_PREFIX}${MOCK_TENANT_ID}`,
     getConflict: vi.fn(async () => (conflict ? ({} as never) : null)),
     dispose: vi.fn(),
     [Symbol.asyncIterator]: () => ({
@@ -64,15 +66,22 @@ describe(ensureOwnerAccess, () => {
     await expect(ensureOwnerAccess(MOCK_TENANT_ID)).resolves.toBe(STALLED);
   });
 
-  it('checks every minute for the first 30 checks, then hourly', async () => {
-    const pending = Array.from({ length: 31 }, () => PENDING_ACCEPTANCE);
+  it('checks every minute for the fast-poll window, then hourly', async () => {
+    const pending = Array.from(
+      { length: OWNER_ACCESS_FAST_POLL_TICKS + 1 },
+      () => PENDING_ACCEPTANCE,
+    );
     checksReturn(...pending, ELEVATED);
 
     await ensureOwnerAccess(MOCK_TENANT_ID);
 
     const intervals = vi.mocked(sleep).mock.calls.map(([interval]) => interval);
-    expect(intervals.slice(0, 30)).toEqual(Array(30).fill('1m'));
-    expect(intervals[30]).toBe('1h');
+    expect(intervals.slice(0, OWNER_ACCESS_FAST_POLL_TICKS)).toEqual(
+      Array(OWNER_ACCESS_FAST_POLL_TICKS).fill(OWNER_ACCESS_FAST_POLL_INTERVAL),
+    );
+    expect(intervals[OWNER_ACCESS_FAST_POLL_TICKS]).toBe(
+      OWNER_ACCESS_SLOW_POLL_INTERVAL,
+    );
   });
 
   it('releases the hook when it finishes', async () => {
@@ -101,7 +110,9 @@ describe(ensureOwnerAccess, () => {
 
       await ensureOwnerAccess(MOCK_TENANT_ID);
 
-      expect(vi.mocked(sleep).mock.calls.at(-1)?.[0]).toBe('1m');
+      expect(vi.mocked(sleep).mock.calls.at(-1)?.[0]).toBe(
+        OWNER_ACCESS_FAST_POLL_INTERVAL,
+      );
     });
   });
 

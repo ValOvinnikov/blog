@@ -14,5 +14,3 @@ export const MOCK_PROVISION_ENV: TProvisionEnv = {
 
 export const MOCK_REVALIDATE_WEBHOOK_URL =
   'https://web.example.com/api/revalidate';
-
-export const getProvisionEnv = vi.fn((): TProvisionEnv => MOCK_PROVISION_ENV);

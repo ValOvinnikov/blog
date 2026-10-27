@@ -1,5 +1,6 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import {
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
@@ -8,6 +9,7 @@ import { errorResult } from '@blog/utils/result';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { FatalError, getStepMetadata } from 'workflow';
 
 import { runReportedStep } from './run-reported-step';
@@ -16,21 +18,8 @@ const STEP = TENANT_PROVISIONING_STEP.CREATE_WEBHOOK;
 const SANITY_TIMED_OUT = 'sanity timed out';
 const STILL_DOWN = 'still down';
 
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
-  getStepMetadata: vi.fn(),
-}));
-
-function atAttempt(attempt: number): void {
-  vi.mocked(getStepMetadata).mockReturnValue({
-    attempt,
-  } as ReturnType<typeof getStepMetadata>);
-}
+vi.mock('@blog/db/queries/tenants');
+vi.mock('workflow');
 
 function reportedStatuses(): string[] {
   return vi
@@ -40,7 +29,7 @@ function reportedStatuses(): string[] {
 
 describe(runReportedStep, () => {
   beforeEach(() => {
-    atAttempt(1);
+    atStepAttempt(1);
     vi.mocked(updateProvisioningStep).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
@@ -63,13 +52,15 @@ describe(runReportedStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.DONE,
     ]);
-    expect(updateProvisioningStep).toHaveBeenCalledWith(
-      expect.objectContaining({ tenantId: MOCK_TENANT_ID, step: STEP }),
-    );
+    expect(updateProvisioningStep).toHaveBeenCalledWith({
+      tenantId: MOCK_TENANT_ID,
+      step: STEP,
+      status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+    });
   });
 
   it('rethrows a failure within the retry budget without recording FAILED', async () => {
-    atAttempt(PROVISIONING_UNIT_MAX_RETRIES);
+    atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES);
     const failure = new Error(SANITY_TIMED_OUT);
 
     await expect(run(() => Promise.reject(failure))).rejects.toBe(failure);
@@ -80,7 +71,7 @@ describe(runReportedStep, () => {
   });
 
   it('records FAILED once on the final attempt and names the failed step', async () => {
-    atAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
+    atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
 
     const result = await run(() => Promise.reject(new Error(STILL_DOWN)));
 
@@ -89,9 +80,13 @@ describe(runReportedStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
     ]);
-    expect(updateProvisioningStep).toHaveBeenLastCalledWith(
-      expect.objectContaining({ error: expect.stringContaining(STILL_DOWN) }),
-    );
+    expect(updateProvisioningStep).toHaveBeenLastCalledWith({
+      tenantId: MOCK_TENANT_ID,
+      step: STEP,
+      status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+      error: STILL_DOWN,
+    });
   });
 
   it('records FAILED immediately for a fatal error on the first attempt', async () => {
@@ -106,14 +101,14 @@ describe(runReportedStep, () => {
     ]);
   });
 
-  it('records FAILED on the first failure of a one-shot run outside a durable step', async () => {
+  it('records FAILED on the first failure of a one-shot run', async () => {
     vi.mocked(getStepMetadata).mockImplementation(() => {
       throw new Error('not in a step context');
     });
 
     const result = await runReportedStep({
       tenantId: MOCK_TENANT_ID,
-      ctx: { runId: 'cli-run', isOneShot: true },
+      ctx: { ...MOCK_RUN_CONTEXT, isOneShot: true },
       step: STEP,
       run: () => Promise.reject(new Error(SANITY_TIMED_OUT)),
     });
@@ -123,11 +118,5 @@ describe(runReportedStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
     ]);
-  });
-
-  it('still completes the step when recording its progress fails', async () => {
-    const result = await run(async () => {});
-
-    expect(result).toEqual({ ok: true, data: undefined });
   });
 });

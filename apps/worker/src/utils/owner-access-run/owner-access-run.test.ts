@@ -1,3 +1,4 @@
+import { OWNER_ACCESS_HOOK_TOKEN_PREFIX } from '@worker/constants/owner-access';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { ensureOwnerAccess } from '@worker/workflows/ensure-owner-access';
@@ -6,10 +7,10 @@ import { HookNotFoundError } from 'workflow/errors';
 
 import { wakeOwnerAccess } from './owner-access-run';
 
-vi.mock('@worker/workflows/ensure-owner-access', () => ({
-  ensureOwnerAccess: vi.fn(),
-}));
-vi.mock('workflow/api', () => ({ resumeHook: vi.fn(), start: vi.fn() }));
+vi.mock('@worker/workflows/ensure-owner-access');
+vi.mock('workflow/api');
+
+const HOOK_TOKEN = `${OWNER_ACCESS_HOOK_TOKEN_PREFIX}${MOCK_TENANT_ID}`;
 
 describe(wakeOwnerAccess, () => {
   it('wakes the run already checking the tenant', async () => {
@@ -17,17 +18,12 @@ describe(wakeOwnerAccess, () => {
 
     await wakeOwnerAccess(MOCK_TENANT_ID);
 
-    expect(resumeHook).toHaveBeenCalledWith(
-      `owner-access:${MOCK_TENANT_ID}`,
-      null,
-    );
+    expect(resumeHook).toHaveBeenCalledWith(HOOK_TOKEN, null);
     expect(start).not.toHaveBeenCalled();
   });
 
   it('starts a new run when none is checking the tenant', async () => {
-    vi.mocked(resumeHook).mockRejectedValue(
-      new HookNotFoundError(`owner-access:${MOCK_TENANT_ID}`),
-    );
+    vi.mocked(resumeHook).mockRejectedValue(new HookNotFoundError(HOOK_TOKEN));
 
     await wakeOwnerAccess(MOCK_TENANT_ID);
 

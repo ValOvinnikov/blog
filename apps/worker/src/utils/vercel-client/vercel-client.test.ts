@@ -1,4 +1,6 @@
 import { HTTP_STATUS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_DOMAIN } from '@worker/testing/tenant/fixtures';
 
 import {
@@ -6,11 +8,20 @@ import {
   listVercelProjectDomains,
 } from './vercel-client';
 
+faker.seed(6025);
+
+const MOCK_BAD_REQUEST_BODY = faker.lorem.sentence();
+const { vercelToken, vercelTeamId, vercelWebProjectId } = MOCK_PROVISION_ENV;
+const PROJECT = {
+  token: vercelToken,
+  teamId: vercelTeamId,
+  projectId: vercelWebProjectId,
+};
+
 const fetchMock = vi.fn();
 
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
-  fetchMock.mockReset();
 });
 
 afterEach(() => {
@@ -26,15 +37,13 @@ describe(listVercelProjectDomains, () => {
       ),
     );
 
-    const result = await listVercelProjectDomains({
-      token: 'tok',
-      teamId: undefined,
-      projectId: 'prj_1',
-    });
+    const result = await listVercelProjectDomains(PROJECT);
 
-    expect(result).toEqual([{ name: MOCK_TENANT_DOMAIN }]);
     const [url] = fetchMock.mock.calls[0] as [string];
-    expect(url).toBe('https://api.vercel.com/v9/projects/prj_1/domains');
+    expect(result).toEqual([{ name: MOCK_TENANT_DOMAIN }]);
+    expect(url).toBe(
+      `https://api.vercel.com/v9/projects/${vercelWebProjectId}/domains`,
+    );
   });
 
   it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
@@ -42,11 +51,7 @@ describe(listVercelProjectDomains, () => {
       new Response(JSON.stringify({ domains: [] }), { status: HTTP_STATUS.OK }),
     );
 
-    await listVercelProjectDomains({
-      token: 'tok',
-      teamId: undefined,
-      projectId: 'prj_1',
-    });
+    await listVercelProjectDomains(PROJECT);
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(init.signal).toBeInstanceOf(AbortSignal);
@@ -61,15 +66,12 @@ describe(addVercelProjectDomain, () => {
       }),
     );
 
-    await addVercelProjectDomain({
-      token: 'tok',
-      teamId: undefined,
-      projectId: 'prj_1',
-      domain: MOCK_TENANT_DOMAIN,
-    });
+    await addVercelProjectDomain({ ...PROJECT, domain: MOCK_TENANT_DOMAIN });
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.vercel.com/v10/projects/prj_1/domains');
+    expect(url).toBe(
+      `https://api.vercel.com/v10/projects/${vercelWebProjectId}/domains`,
+    );
     expect(JSON.parse(init.body as string)).toEqual({
       name: MOCK_TENANT_DOMAIN,
     });
@@ -77,16 +79,11 @@ describe(addVercelProjectDomain, () => {
 
   it('throws with the response status and body on failure', async () => {
     fetchMock.mockResolvedValue(
-      new Response('bad request', { status: HTTP_STATUS.BAD_REQUEST }),
+      new Response(MOCK_BAD_REQUEST_BODY, { status: HTTP_STATUS.BAD_REQUEST }),
     );
 
     await expect(
-      addVercelProjectDomain({
-        token: 'tok',
-        teamId: undefined,
-        projectId: 'prj_1',
-        domain: MOCK_TENANT_DOMAIN,
-      }),
-    ).rejects.toThrow(/400/);
+      addVercelProjectDomain({ ...PROJECT, domain: MOCK_TENANT_DOMAIN }),
+    ).rejects.toThrow(`${HTTP_STATUS.BAD_REQUEST} ${MOCK_BAD_REQUEST_BODY}`);
   });
 });

@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { listSuperadminEmails } from '@blog/db/queries/admins';
 import { sendEmail } from '@blog/email';
 import {
@@ -21,14 +20,9 @@ import { alertOperatorsToDeleteSanityProject } from './sanity-project-deletion-a
 
 const ARCHIVED_TENANT = mockProvisionedTenant();
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
-
-vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
+vi.mock('@worker/utils/env/env');
 vi.mock('@blog/db/queries/admins');
-vi.mock(import('@blog/email'), async (importOriginal) => ({
-  ...(await importOriginal()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email/transport/send-email');
 
 function sentTo(): string[] {
   return vi.mocked(sendEmail).mock.calls.map(([input]) => input.to);
@@ -40,17 +34,14 @@ describe(alertOperatorsToDeleteSanityProject, () => {
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
-  it('sends every super admin one email naming the project to delete in Sanity Manage', async () => {
+  it('emails every super admin the project to delete in Sanity Manage', async () => {
     await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
 
+    const [email] = vi.mocked(sendEmail).mock.calls.map(([input]) => input);
     expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
-    expect(sendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({
-        from: DEFAULT_OPERATOR_ALERT_FROM_ADDRESS,
-        html: expect.stringContaining(
-          `href="${SANITY_MANAGE_PROJECT_URL}${MOCK_SANITY_PROJECT_ID}"`,
-        ),
-      }),
+    expect(email?.from).toBe(DEFAULT_OPERATOR_ALERT_FROM_ADDRESS);
+    expect(email?.html).toContain(
+      `href="${SANITY_MANAGE_PROJECT_URL}${MOCK_SANITY_PROJECT_ID}"`,
     );
   });
 

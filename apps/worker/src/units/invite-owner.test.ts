@@ -10,6 +10,7 @@ import {
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import { okResult } from '@blog/utils/result';
+import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
   MOCK_INVITE_SENT_AT,
@@ -23,9 +24,9 @@ import {
   MOCK_TENANT_ID,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
+import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { logger } from '@worker/utils/logger/logger';
 import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
-import { getStepMetadata } from 'workflow';
 
 import { inviteOwner } from './invite-owner';
 
@@ -35,25 +36,13 @@ vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
-vi.mock(
-  '@worker/utils/provision-env/provision-env',
-  () => import('@worker/testing/provision-env/fake-provision-env'),
-);
-vi.mock(import('workflow'), async (importOriginal) => ({
-  ...(await importOriginal()),
-  getStepMetadata: vi.fn(),
-}));
+vi.mock('@blog/db/queries/tenants');
+vi.mock('@worker/utils/provision-env/provision-env');
+vi.mock('workflow');
 
 describe(inviteOwner, () => {
   beforeEach(() => {
-    vi.mocked(getStepMetadata).mockReturnValue({
-      attempt: 1,
-    } as ReturnType<typeof getStepMetadata>);
+    atStepAttempt(1);
     vi.mocked(getTenantById).mockResolvedValue(INVITED_TENANT);
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
@@ -109,9 +98,7 @@ describe(inviteOwner, () => {
     });
 
     it('logs and lets provisioning carry on once the last attempt fails', async () => {
-      vi.mocked(getStepMetadata).mockReturnValue({
-        attempt: 99,
-      } as ReturnType<typeof getStepMetadata>);
+      atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
 
       const result = await inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 

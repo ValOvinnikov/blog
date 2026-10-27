@@ -10,11 +10,13 @@ import {
 } from '@blog/db/queries/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
 import { errorResult, okResult } from '@blog/utils/result';
+import { faker } from '@faker-js/faker';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
 import { createTenantSanityProject } from '@worker/steps/create-sanity-project';
 import { mapTenantDomain } from '@worker/steps/map-domain';
 import { persistTenantSanityToken } from '@worker/steps/persist-sanity-token';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import {
   MOCK_SANITY_DATASET,
@@ -23,39 +25,26 @@ import {
   mockProvisionedTenant,
   mockTenant,
 } from '@worker/testing/tenant/fixtures';
-import { FatalError, getStepMetadata } from 'workflow';
+import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
+import { FatalError } from 'workflow';
 
 import { ensureInfrastructure } from './ensure-infrastructure';
 
-const EXISTING_PROJECT_ID = 'proj-existing';
+faker.seed(6025);
 
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+const MOCK_EXISTING_PROJECT_ID = faker.string.alphanumeric(8);
+
+vi.mock('@blog/db/queries/tenants');
 vi.mock(
   '@blog/db/utils/sanity-management-client/sanity-project-lifecycle',
   () => ({ unarchiveSanityProject: vi.fn() }),
 );
-vi.mock(
-  '@worker/utils/provision-env/provision-env',
-  () => import('@worker/testing/provision-env/fake-provision-env'),
-);
+vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/create-revalidate-webhook');
 vi.mock('@worker/steps/create-sanity-project');
 vi.mock('@worker/steps/map-domain');
 vi.mock('@worker/steps/persist-sanity-token');
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
-  getStepMetadata: vi.fn(),
-}));
-
-function atAttempt(attempt: number): void {
-  vi.mocked(getStepMetadata).mockReturnValue({
-    attempt,
-  } as ReturnType<typeof getStepMetadata>);
-}
+vi.mock('workflow');
 
 function runningSteps(): string[] {
   return vi
@@ -68,7 +57,7 @@ function runningSteps(): string[] {
 
 describe(ensureInfrastructure, () => {
   beforeEach(() => {
-    atAttempt(1);
+    atStepAttempt(1);
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(reactivateTenant).mockResolvedValue(okResult(mockTenant()));
     vi.mocked(createTenantSanityProject).mockResolvedValue({
@@ -95,17 +84,15 @@ describe(ensureInfrastructure, () => {
   it('hands the project created for the tenant to the later steps', async () => {
     await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    expect(persistTenantSanityToken).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sanityProjectId: MOCK_SANITY_PROJECT_ID,
-        sanityDataset: MOCK_SANITY_DATASET,
-      }),
-      expect.anything(),
-    );
-    expect(mapTenantDomain).toHaveBeenCalledWith(
-      expect.objectContaining({ sanityProjectId: MOCK_SANITY_PROJECT_ID }),
-      expect.anything(),
-    );
+    const [persistedTenant, persistEnv] =
+      vi.mocked(persistTenantSanityToken).mock.lastCall ?? [];
+    const [mappedTenant, mapEnv] =
+      vi.mocked(mapTenantDomain).mock.lastCall ?? [];
+    expect(persistedTenant?.sanityProjectId).toBe(MOCK_SANITY_PROJECT_ID);
+    expect(persistedTenant?.sanityDataset).toBe(MOCK_SANITY_DATASET);
+    expect(mappedTenant?.sanityProjectId).toBe(MOCK_SANITY_PROJECT_ID);
+    expect(persistEnv).toBe(MOCK_PROVISION_ENV);
+    expect(mapEnv).toBe(MOCK_PROVISION_ENV);
   });
 
   it('does not unarchive when the tenant has no Sanity project yet', async () => {
@@ -118,7 +105,7 @@ describe(ensureInfrastructure, () => {
     vi.mocked(reactivateTenant).mockResolvedValue(
       okResult(
         mockTenant({
-          sanityProjectId: EXISTING_PROJECT_ID,
+          sanityProjectId: MOCK_EXISTING_PROJECT_ID,
           sanityDataset: MOCK_SANITY_DATASET,
         }),
       ),
@@ -126,9 +113,10 @@ describe(ensureInfrastructure, () => {
 
     await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    expect(unarchiveSanityProject).toHaveBeenCalledWith(
-      expect.objectContaining({ projectId: EXISTING_PROJECT_ID }),
-    );
+    expect(unarchiveSanityProject).toHaveBeenCalledWith({
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      projectId: MOCK_EXISTING_PROJECT_ID,
+    });
   });
 
   it('succeeds again on a second run against the project the first created', async () => {
@@ -140,14 +128,13 @@ describe(ensureInfrastructure, () => {
 
     expect(first).toEqual({ ok: true, data: undefined });
     expect(second).toEqual({ ok: true, data: undefined });
-    expect(createTenantSanityProject).toHaveBeenLastCalledWith(
-      expect.objectContaining({ sanityProjectId: MOCK_SANITY_PROJECT_ID }),
-      expect.anything(),
-    );
+    const [projectTenant] =
+      vi.mocked(createTenantSanityProject).mock.lastCall ?? [];
+    expect(projectTenant?.sanityProjectId).toBe(MOCK_SANITY_PROJECT_ID);
   });
 
   it('stops at the first failing step on its final attempt', async () => {
-    atAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
+    atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
     vi.mocked(persistTenantSanityToken).mockRejectedValue(
       new Error('token mint refused'),
     );
@@ -170,11 +157,10 @@ describe(ensureInfrastructure, () => {
       ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT),
     ).rejects.toBe(failure);
 
-    expect(updateProvisioningStep).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      }),
-    );
+    const statuses = vi
+      .mocked(updateProvisioningStep)
+      .mock.calls.map(([input]) => input.status);
+    expect(statuses).not.toContain(TENANT_PROVISIONING_STEP_STATUS.FAILED);
   });
 
   it('fails the project step when the tenant cannot be reactivated', async () => {

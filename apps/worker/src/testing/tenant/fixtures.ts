@@ -4,6 +4,8 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 
+faker.seed(6025);
+
 export const MOCK_TENANT_ID = faker.string.uuid();
 export const MOCK_TENANT_DOMAIN = 'acme.example.com';
 export const MOCK_SANITY_PROJECT_ID = 'sanity-project-1';

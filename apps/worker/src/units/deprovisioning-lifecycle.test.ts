@@ -6,6 +6,9 @@ import {
 } from '@blog/db/queries/tenants';
 import { errorResult, okResult } from '@blog/utils/result';
 import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
+import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
+import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { alertOperatorsToDeleteSanityProject } from '@worker/utils/operator-email/sanity-project-deletion-alert';
@@ -15,16 +18,10 @@ import {
   finishDeprovisioning,
 } from './deprovisioning-lifecycle';
 
-const CTX = { runId: 'deprovision-lifecycle-run' };
-const CRASH = 'lost the database';
-const ARCHIVED_TENANT = mockTenant({ deprovisionedAt: new Date(0) });
+const ARCHIVED_TENANT = mockTenant({ deprovisionedAt: MOCK_NOW });
 
 vi.mock('@worker/utils/operator-email/sanity-project-deletion-alert');
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+vi.mock('@blog/db/queries/tenants');
 
 describe(beginDeprovisioning, () => {
   beforeEach(() => {
@@ -57,10 +54,10 @@ describe(finishDeprovisioning, () => {
     );
   });
 
-  it('records the run finish and alerts the operators after a successful run', async () => {
+  it('records the run finish and alerts operators after a successful run', async () => {
     await finishDeprovisioning(
       MOCK_TENANT_ID,
-      CTX,
+      MOCK_RUN_CONTEXT,
       okResult({ skipped: false }),
     );
 
@@ -75,7 +72,7 @@ describe(finishDeprovisioning, () => {
   it('alerts nobody after a failed step', async () => {
     await finishDeprovisioning(
       MOCK_TENANT_ID,
-      CTX,
+      MOCK_RUN_CONTEXT,
       errorResult({ failedStep: DEPROVISIONING_STEP.ARCHIVE_TENANT }),
     );
 
@@ -87,14 +84,14 @@ describe(finishDeprovisioning, () => {
   it('logs a run that failed outside any step', async () => {
     await finishDeprovisioning(
       MOCK_TENANT_ID,
-      CTX,
-      errorResult({ message: CRASH }),
+      MOCK_RUN_CONTEXT,
+      errorResult({ message: MOCK_DB_DOWN }),
     );
 
     expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_RUN_FAILED_EVENT, {
       tenantId: MOCK_TENANT_ID,
-      runId: CTX.runId,
-      error: CRASH,
+      runId: MOCK_RUN_CONTEXT.runId,
+      error: MOCK_DB_DOWN,
     });
     expect(alertOperatorsToDeleteSanityProject).not.toHaveBeenCalled();
   });

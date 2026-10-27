@@ -1,7 +1,19 @@
-import { buildStarterDocuments, SANITY_ROBOT_ROLE } from '@blog/config';
+import {
+  buildStarterDocuments,
+  SANITY_ROBOT_ROLE,
+  type TStarterSiteType,
+} from '@blog/config';
 import { SITE_TYPE } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { faker } from '@faker-js/faker';
+import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
+import {
+  MOCK_DB_DOWN,
+  MOCK_SANITY_OUTAGE,
+} from '@worker/testing/outage/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
@@ -17,25 +29,33 @@ import type { Mock } from 'vitest';
 
 import { seedTenantContent, type TSeedContentDeps } from './seed-content';
 
-const { setTenantSanityWriteTokenAndSeededAtMock } = vi.hoisted(() => ({
-  setTenantSanityWriteTokenAndSeededAtMock: vi.fn(),
-}));
+faker.seed(6025);
 
-vi.mock('@blog/db/queries/tenants', () => ({
-  setTenantSanityWriteTokenAndSeededAt:
-    setTenantSanityWriteTokenAndSeededAtMock,
-}));
+vi.mock('@blog/db/queries/tenants');
 
-const WRITE_TOKEN = 'sk-write';
-const ROBOT_ID = 'robot-1';
+const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);
+const MOCK_ROBOT_ID = faker.string.uuid();
+const MOCK_EXISTING_SETTINGS_SITE_ID = faker.string.uuid();
 const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
-const COMMIT_FAILED = 'commit failed';
-const PERSIST_FAILED = 'persist failed';
+const REVOKED_TOKEN = {
+  token: MOCK_PROVISION_ENV.sanityManagementToken,
+  projectId: MOCK_SANITY_PROJECT_ID,
+  robotId: MOCK_ROBOT_ID,
+};
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return mockProvisionedTenant({
     provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     ...overrides,
+  });
+}
+
+function starterDocumentsFor(siteType: TStarterSiteType, tenant: TTenant) {
+  return buildStarterDocuments({
+    siteType,
+    siteName: tenant.name,
+    locale: tenant.locale,
+    publishedAt: MOCK_NOW.toISOString(),
   });
 }
 
@@ -63,10 +83,6 @@ function createClientStub(
   };
 }
 
-beforeEach(() => {
-  setTenantSanityWriteTokenAndSeededAtMock.mockReset();
-});
-
 describe(seedTenantContent, () => {
   let tenant: TTenant;
   let commit: ReturnType<typeof vi.fn>;
@@ -78,7 +94,24 @@ describe(seedTenantContent, () => {
   let revokeWriteToken: Mock<TSeedContentDeps['revokeWriteToken']>;
   let sleep: Mock<TSeedContentDeps['sleep']>;
 
+  function seed(
+    options: {
+      tenant?: TTenant;
+      siteType?: TStarterSiteType;
+      deps?: Partial<TSeedContentDeps>;
+    } = {},
+  ) {
+    const { siteType = SITE_TYPE.BLANK, deps } = options;
+    return seedTenantContent(
+      options.tenant ?? tenant,
+      siteType,
+      MOCK_PROVISION_ENV,
+      { createClient, mintWriteToken, revokeWriteToken, sleep, ...deps },
+    );
+  }
+
   beforeEach(() => {
+    freezeClock();
     tenant = baseTenant();
     commit = vi.fn().mockResolvedValue(undefined);
     createIfNotExists = vi.fn();
@@ -89,81 +122,48 @@ describe(seedTenantContent, () => {
     } = createClientStub({ createIfNotExists, commit }));
     mintWriteToken = vi
       .fn()
-      .mockResolvedValue({ id: ROBOT_ID, token: WRITE_TOKEN });
+      .mockResolvedValue({ id: MOCK_ROBOT_ID, token: MOCK_WRITE_TOKEN });
     revokeWriteToken = vi.fn().mockResolvedValue(undefined);
     sleep = vi.fn().mockResolvedValue(undefined);
   });
 
-  it('seeds when the dataset lacks settings_site even though seededAt is already set', async () => {
-    const seededTenant = baseTenant({ seededAt: new Date() });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-    await seedTenantContent(seededTenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-    });
+  it('seeds when the dataset lacks settings_site though seededAt is set', async () => {
+    const seededTenant = baseTenant({ seededAt: MOCK_NOW });
+
+    await seed({ tenant: seededTenant });
 
     expect(clientFetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
-    expect(createIfNotExists).toHaveBeenCalledTimes(
-      buildStarterDocuments({
-        siteType: SITE_TYPE.BLANK,
-        siteName: seededTenant.name,
-        locale: seededTenant.locale,
-        publishedAt: new Date().toISOString(),
-      }).length,
-    );
     expect(commit).toHaveBeenCalledTimes(1);
-    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      WRITE_TOKEN,
-      expect.any(Date),
-    );
-    expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
   it('seeds the documents of the site type it is given', async () => {
-    await seedTenantContent(tenant, SITE_TYPE.BLOG, MOCK_PROVISION_ENV, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-    });
+    await seed({ siteType: SITE_TYPE.BLOG });
 
-    expect(
-      createIfNotExists.mock.calls.map(([document]) => document._id),
-    ).toEqual(
-      buildStarterDocuments({
-        siteType: SITE_TYPE.BLOG,
-        siteName: tenant.name,
-        locale: tenant.locale,
-        publishedAt: new Date().toISOString(),
-      }).map(({ _id }) => _id),
+    const seededIds = createIfNotExists.mock.calls.map(
+      ([document]) => document._id,
+    );
+    expect(seededIds).toEqual(
+      starterDocumentsFor(SITE_TYPE.BLOG, tenant).map(({ _id }) => _id),
     );
   });
 
   it('skips seeding when the dataset already has settings_site', async () => {
     const existingSiteClient = createClientStub(
       { createIfNotExists, commit },
-      { fetchResult: 'existing-settings-site-id' },
+      { fetchResult: MOCK_EXISTING_SETTINGS_SITE_ID },
     );
 
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-      createClient: existingSiteClient.createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-    });
+    await seed({ deps: { createClient: existingSiteClient.createClient } });
 
     expect(existingSiteClient.fetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
     expect(createIfNotExists).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
-    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      robotId: ROBOT_ID,
-    });
+    expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
+    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
   });
 
   it('throws when the Sanity project has not been created yet', async () => {
@@ -171,71 +171,57 @@ describe(seedTenantContent, () => {
       sanityProjectId: null,
       sanityDataset: null,
     });
-    const deps: TSeedContentDeps = {
-      createClient: vi.fn(),
-      mintWriteToken: vi.fn(),
-      revokeWriteToken: vi.fn(),
-      sleep: vi.fn().mockResolvedValue(undefined),
-    };
 
-    await expect(
-      seedTenantContent(
-        unprovisionedTenant,
-        SITE_TYPE.BLANK,
-        MOCK_PROVISION_ENV,
-        deps,
-      ),
-    ).rejects.toThrow(/has no Sanity project yet/);
+    await expect(seed({ tenant: unprovisionedTenant })).rejects.toThrow(
+      /has no Sanity project yet/,
+    );
   });
 
-  it('mints an editor token, uploads no assets, commits a transaction, and persists the token and seededAt together instead of revoking', async () => {
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-    });
+  it('mints an editor token for the tenant project', async () => {
+    await seed();
 
     expect(mintWriteToken).toHaveBeenCalledWith({
       token: MOCK_PROVISION_ENV.sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
-      label: expect.any(String),
+      label: SANITY_WRITE_TOKEN_LABEL,
       role: SANITY_ROBOT_ROLE.EDITOR,
     });
-    expect(createClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectId: MOCK_SANITY_PROJECT_ID,
-        dataset: MOCK_SANITY_DATASET,
-        token: WRITE_TOKEN,
-        useCdn: false,
-      }),
-    );
+  });
+
+  it('seeds through a client authenticated with the minted token', async () => {
+    await seed();
+
+    const [clientOptions] = vi.mocked(createClient).mock.lastCall ?? [];
+    expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
+    expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
+    expect(clientOptions?.token).toBe(MOCK_WRITE_TOKEN);
+    expect(clientOptions?.useCdn).toBe(false);
+  });
+
+  it('commits every starter document in one transaction, uploading no assets', async () => {
+    await seed();
+
     expect(assetsUpload).not.toHaveBeenCalled();
     expect(createIfNotExists).toHaveBeenCalledTimes(
-      buildStarterDocuments({
-        siteType: SITE_TYPE.BLANK,
-        siteName: tenant.name,
-        locale: tenant.locale,
-        publishedAt: new Date().toISOString(),
-      }).length,
+      starterDocumentsFor(SITE_TYPE.BLANK, tenant).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
-    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
+  });
+
+  it('persists the token and seededAt together instead of revoking', async () => {
+    await seed();
+
+    expect(setTenantSanityWriteTokenAndSeededAt).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      WRITE_TOKEN,
-      expect.any(Date),
+      MOCK_WRITE_TOKEN,
+      MOCK_NOW,
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
-  it('the committed starter documents contain no defaultOgImage on the site settings', async () => {
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken: vi.fn().mockResolvedValue(undefined),
-      sleep: vi.fn().mockResolvedValue(undefined),
-    });
+  it('commits no defaultOgImage on the site settings', async () => {
+    await seed();
 
     const committedDocuments = createIfNotExists.mock.calls.map(
       ([document]) => document as Record<string, unknown>,
@@ -248,109 +234,60 @@ describe(seedTenantContent, () => {
   });
 
   it('still revokes the transient token when seeding fails', async () => {
-    commit.mockRejectedValue(new Error(COMMIT_FAILED));
+    commit.mockRejectedValue(new Error(MOCK_SANITY_OUTAGE));
 
-    await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-        createClient,
-        mintWriteToken,
-        revokeWriteToken,
-        sleep,
-      }),
-    ).rejects.toThrow(COMMIT_FAILED);
+    await expect(seed()).rejects.toThrow(MOCK_SANITY_OUTAGE);
 
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      robotId: ROBOT_ID,
-    });
-    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
+    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
   });
 
-  it('regression: revokes the token when persisting the token+seededAt fails, so a crash/retry window never orphans a live Editor-scoped token or mints a second one on retry', async () => {
-    setTenantSanityWriteTokenAndSeededAtMock.mockRejectedValue(
-      new Error(PERSIST_FAILED),
+  it('revokes the token when persisting the token and seededAt fails', async () => {
+    vi.mocked(setTenantSanityWriteTokenAndSeededAt).mockRejectedValue(
+      new Error(MOCK_DB_DOWN),
     );
 
-    await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-        createClient,
-        mintWriteToken,
-        revokeWriteToken,
-        sleep,
-      }),
-    ).rejects.toThrow(PERSIST_FAILED);
+    await expect(seed()).rejects.toThrow(MOCK_DB_DOWN);
 
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      robotId: ROBOT_ID,
-    });
+    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
   });
 
   it('retries a grant-propagation failure once and succeeds', async () => {
     const grantError = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
     commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
-    await seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-    });
+    await seed();
 
     expect(commit).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
-    expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
+    expect(setTenantSanityWriteTokenAndSeededAt).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      WRITE_TOKEN,
-      expect.any(Date),
+      MOCK_WRITE_TOKEN,
+      MOCK_NOW,
     );
     expect(revokeWriteToken).not.toHaveBeenCalled();
   });
 
-  it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists it or seededAt', async () => {
+  it('revokes the token and persists nothing once grant retries run out', async () => {
     const grantError = new Error(MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE);
     commit.mockRejectedValue(grantError);
 
-    await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-        createClient,
-        mintWriteToken,
-        revokeWriteToken,
-        sleep,
-      }),
-    ).rejects.toThrow(grantError);
+    await expect(seed()).rejects.toThrow(grantError);
 
     expect(commit.mock.calls.length).toBeGreaterThan(1);
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      robotId: ROBOT_ID,
-    });
-    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
+    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
   });
 
   it('does not retry a non-grant-propagation commit failure', async () => {
     const otherError = new Error(MOCK_MALFORMED_DOCUMENT_MESSAGE);
     commit.mockRejectedValue(otherError);
 
-    await expect(
-      seedTenantContent(tenant, SITE_TYPE.BLANK, MOCK_PROVISION_ENV, {
-        createClient,
-        mintWriteToken,
-        revokeWriteToken,
-        sleep,
-      }),
-    ).rejects.toThrow(otherError);
+    await expect(seed()).rejects.toThrow(otherError);
 
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      robotId: ROBOT_ID,
-    });
-    expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
+    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
   });
 });

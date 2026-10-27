@@ -1,4 +1,9 @@
-import { AUDIT_ACTION, ERROR_CODE } from '@blog/config/constants';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  WORKER_AUDIT_ACTOR_ID,
+} from '@blog/config/constants';
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -24,30 +29,37 @@ import {
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { deleteVercelProjectDomain } from '@blog/db/utils/vercel-client/vercel-project-domains';
 import { errorResult, okResult } from '@blog/utils/result';
+import { faker } from '@faker-js/faker';
 import {
+  DEPROVISIONING_AUDIT_VIA,
   DEPROVISIONING_STEP_FAILED_EVENT,
   DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
 } from '@worker/constants/deprovisioning';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
+import { MOCK_DEPROVISION_ENV } from '@worker/testing/deprovision-env/fake-deprovision-env';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
+import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
   mockTenant,
 } from '@worker/testing/tenant/fixtures';
-import { getDeprovisionEnv } from '@worker/utils/deprovision-env/deprovision-env';
+import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { logger } from '@worker/utils/logger/logger';
-import { getStepMetadata } from 'workflow';
 
 import { runDeprovisioningStep } from './run-deprovisioning-step';
 
-const CTX = { runId: 'deprovision-step-run' };
-const SECRET_MISMATCH = 'revalidation refused';
+faker.seed(6025);
+
+const MOCK_REVALIDATION_REFUSED = 'revalidation refused';
 const PROVISIONED_TENANT = mockProvisionedTenant();
-const READ_ROBOT_ID = 'provisioned-read-robot';
-const WRITE_ROBOT_ID = 'provisioned-write-robot';
-const READER_DATA_COUNTS = {
+const MOCK_READ_ROBOT_ID = faker.string.uuid();
+const MOCK_WRITE_ROBOT_ID = faker.string.uuid();
+const MOCK_OTHER_ROBOT_ID = faker.string.uuid();
+const MOCK_OTHER_ROBOT_LABEL = faker.lorem.word();
+const MOCK_READER_DATA_COUNTS = {
   subscribers: 3,
   bookmarks: 5,
   membershipInvites: 1,
@@ -60,28 +72,15 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-project-lifecycle');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-robot-tokens');
 vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
 vi.mock('@blog/db/utils/vercel-client/vercel-project-domains');
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+vi.mock('@blog/db/queries/tenants');
 vi.mock(
   '@worker/utils/deprovision-env/deprovision-env',
   () => import('@worker/testing/deprovision-env/fake-deprovision-env'),
 );
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
-  getStepMetadata: vi.fn(),
-}));
-
-function onAttempt(attempt: number): void {
-  vi.mocked(getStepMetadata).mockReturnValue({
-    attempt,
-  } as ReturnType<typeof getStepMetadata>);
-}
+vi.mock('workflow');
 
 function run(step: TDeprovisioningStep) {
-  return runDeprovisioningStep(MOCK_TENANT_ID, CTX, step);
+  return runDeprovisioningStep(MOCK_TENANT_ID, MOCK_RUN_CONTEXT, step);
 }
 
 function reportedStatuses(): string[] {
@@ -92,14 +91,14 @@ function reportedStatuses(): string[] {
 
 describe(runDeprovisioningStep, () => {
   beforeEach(() => {
-    onAttempt(1);
+    atStepAttempt(1);
     vi.mocked(getTenantById).mockResolvedValue(PROVISIONED_TENANT);
     vi.mocked(updateDeprovisioningStep).mockResolvedValue(
       okResult(PROVISIONED_TENANT),
     );
     vi.mocked(archiveTenant).mockResolvedValue(okResult(PROVISIONED_TENANT));
     vi.mocked(listSanityRobotTokens).mockResolvedValue([]);
-    vi.mocked(purgeTenantReaderData).mockResolvedValue(READER_DATA_COUNTS);
+    vi.mocked(purgeTenantReaderData).mockResolvedValue(MOCK_READER_DATA_COUNTS);
   });
 
   it("removes the tenant's domain from the web project and reports the step done", async () => {
@@ -109,9 +108,9 @@ describe(runDeprovisioningStep, () => {
     });
 
     expect(deleteVercelProjectDomain).toHaveBeenCalledWith({
-      token: getDeprovisionEnv().vercelToken,
-      teamId: undefined,
-      projectId: getDeprovisionEnv().vercelWebProjectId,
+      token: MOCK_DEPROVISION_ENV.vercelToken,
+      teamId: MOCK_DEPROVISION_ENV.vercelTeamId,
+      projectId: MOCK_DEPROVISION_ENV.vercelWebProjectId,
       domain: PROVISIONED_TENANT.primaryDomain,
     });
     expect(reportedStatuses()).toEqual([
@@ -124,7 +123,7 @@ describe(runDeprovisioningStep, () => {
     await run(DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT);
 
     expect(archiveSanityProject).toHaveBeenCalledWith({
-      token: getDeprovisionEnv().sanityManagementToken,
+      token: MOCK_DEPROVISION_ENV.sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
     });
   });
@@ -141,9 +140,9 @@ describe(runDeprovisioningStep, () => {
 
   it('revokes only the provisioned Sanity robot tokens', async () => {
     vi.mocked(listSanityRobotTokens).mockResolvedValue([
-      { id: READ_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
-      { id: WRITE_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL },
-      { id: 'robot-other', label: 'hand-made' },
+      { id: MOCK_READ_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
+      { id: MOCK_WRITE_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL },
+      { id: MOCK_OTHER_ROBOT_ID, label: MOCK_OTHER_ROBOT_LABEL },
     ]);
 
     await run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS);
@@ -152,7 +151,7 @@ describe(runDeprovisioningStep, () => {
       vi
         .mocked(deleteSanityRobotToken)
         .mock.calls.map(([input]) => input.robotId),
-    ).toEqual([READ_ROBOT_ID, WRITE_ROBOT_ID]);
+    ).toEqual([MOCK_READ_ROBOT_ID, MOCK_WRITE_ROBOT_ID]);
   });
 
   it('logs and still succeeds when the tokens cannot be revoked', async () => {
@@ -178,21 +177,22 @@ describe(runDeprovisioningStep, () => {
     );
   });
 
-  it('archives the tenant row and records the deprovisioned audit event', async () => {
+  it('archives the tenant row and audits the deprovisioning', async () => {
     await run(DEPROVISIONING_STEP.ARCHIVE_TENANT);
 
     expect(archiveTenant).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(insertAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: AUDIT_ACTION.DEPROVISIONED,
-        targetId: MOCK_TENANT_ID,
-      }),
-    );
+    expect(insertAuditEvent).toHaveBeenCalledWith({
+      actorId: WORKER_AUDIT_ACTOR_ID,
+      action: AUDIT_ACTION.DEPROVISIONED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { via: DEPROVISIONING_AUDIT_VIA, runId: MOCK_RUN_CONTEXT.runId },
+    });
   });
 
   it('leaves an already-archived tenant row as it is', async () => {
     vi.mocked(getTenantById).mockResolvedValue(
-      mockTenant({ deprovisionedAt: new Date(0) }),
+      mockTenant({ deprovisionedAt: MOCK_NOW }),
     );
 
     await run(DEPROVISIONING_STEP.ARCHIVE_TENANT);
@@ -205,20 +205,25 @@ describe(runDeprovisioningStep, () => {
     await run(DEPROVISIONING_STEP.PURGE_READER_DATA);
 
     expect(purgeTenantReaderData).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(insertAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: AUDIT_ACTION.READER_DATA_PURGED,
-        details: expect.objectContaining(READER_DATA_COUNTS),
-      }),
-    );
+    expect(insertAuditEvent).toHaveBeenCalledWith({
+      actorId: WORKER_AUDIT_ACTOR_ID,
+      action: AUDIT_ACTION.READER_DATA_PURGED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: {
+        via: DEPROVISIONING_AUDIT_VIA,
+        runId: MOCK_RUN_CONTEXT.runId,
+        ...MOCK_READER_DATA_COUNTS,
+      },
+    });
   });
 
   it("purges the tenant's site cache", async () => {
     await run(DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE);
 
     expect(requestTenantCacheInvalidation).toHaveBeenCalledWith({
-      webAppUrl: getDeprovisionEnv().webAppBaseUrl,
-      secret: getDeprovisionEnv().siteConfigRevalidateSecret,
+      webAppUrl: MOCK_DEPROVISION_ENV.webAppBaseUrl,
+      secret: MOCK_DEPROVISION_ENV.siteConfigRevalidateSecret,
       tenantId: MOCK_TENANT_ID,
     });
   });
@@ -234,9 +239,9 @@ describe(runDeprovisioningStep, () => {
   });
 
   it('reports the step failed on its final attempt', async () => {
-    onAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
+    atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
     vi.mocked(requestTenantCacheInvalidation).mockRejectedValue(
-      new Error(SECRET_MISMATCH),
+      new Error(MOCK_REVALIDATION_REFUSED),
     );
 
     await expect(
@@ -254,9 +259,9 @@ describe(runDeprovisioningStep, () => {
       DEPROVISIONING_STEP_FAILED_EVENT,
       {
         tenantId: MOCK_TENANT_ID,
-        runId: CTX.runId,
+        runId: MOCK_RUN_CONTEXT.runId,
         step: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
-        error: SECRET_MISMATCH,
+        error: MOCK_REVALIDATION_REFUSED,
       },
     );
   });

@@ -12,38 +12,36 @@ import {
   listSanityProjectUsers,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import { okResult } from '@blog/utils/result';
-import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
+import { faker } from '@faker-js/faker';
 import {
   MOCK_INVITE_SENT_AT,
   MOCK_OWNER_EMAIL,
+  mockPendingInvite,
   mockSanityOwner,
 } from '@worker/testing/owner-access/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
 import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
-import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 
 import { resendOwnerInvite } from './resend-owner-invite';
 
-const OLD_INVITE_ID = 'invite-old';
-const NEW_INVITE_ID = 'invite-new';
+faker.seed(6025);
+
+const MOCK_OLD_INVITE_ID = faker.string.uuid();
+const MOCK_NEW_INVITE_ID = faker.string.uuid();
+const MOCK_OTHER_INVITE_ID = faker.string.uuid();
+const MOCK_OTHER_INVITEE_EMAIL = faker.internet.email();
 
 vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
-vi.mock(
-  '@worker/utils/provision-env/provision-env',
-  () => import('@worker/testing/provision-env/fake-provision-env'),
-);
+vi.mock('@blog/db/queries/tenants');
+vi.mock('@worker/utils/provision-env/provision-env');
 
 describe(resendOwnerInvite, () => {
   beforeEach(() => {
@@ -53,25 +51,13 @@ describe(resendOwnerInvite, () => {
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
     vi.mocked(listSanityProjectInvites)
       .mockResolvedValueOnce([
-        {
-          id: OLD_INVITE_ID,
-          email: MOCK_OWNER_EMAIL,
-          status: SANITY_PENDING_INVITE_STATUS,
-        },
-        {
-          id: 'invite-other',
-          email: 'other@example.com',
-          status: SANITY_PENDING_INVITE_STATUS,
-        },
+        mockPendingInvite({ id: MOCK_OLD_INVITE_ID }),
+        mockPendingInvite({
+          id: MOCK_OTHER_INVITE_ID,
+          email: MOCK_OTHER_INVITEE_EMAIL,
+        }),
       ])
-      .mockResolvedValueOnce([
-        {
-          id: NEW_INVITE_ID,
-          email: MOCK_OWNER_EMAIL,
-          status: SANITY_PENDING_INVITE_STATUS,
-          createdAt: MOCK_INVITE_SENT_AT,
-        },
-      ]);
+      .mockResolvedValueOnce([mockPendingInvite({ id: MOCK_NEW_INVITE_ID })]);
     vi.mocked(setTenantOwnerAccess).mockResolvedValue(okResult({} as never));
   });
 
@@ -80,9 +66,9 @@ describe(resendOwnerInvite, () => {
 
     expect(deleteSanityProjectInvite).toHaveBeenCalledOnce();
     expect(deleteSanityProjectInvite).toHaveBeenCalledWith({
-      token: getProvisionEnv().sanityManagementToken,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
-      inviteId: OLD_INVITE_ID,
+      inviteId: MOCK_OLD_INVITE_ID,
     });
   });
 
@@ -90,7 +76,7 @@ describe(resendOwnerInvite, () => {
     await resendOwnerInvite(MOCK_TENANT_ID);
 
     expect(createSanityProjectInvite).toHaveBeenCalledWith({
-      token: getProvisionEnv().sanityManagementToken,
+      token: MOCK_PROVISION_ENV.sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
       email: MOCK_OWNER_EMAIL,
       role: SANITY_PROJECT_ROLE.VIEWER,
@@ -106,7 +92,7 @@ describe(resendOwnerInvite, () => {
     await resendOwnerInvite(MOCK_TENANT_ID);
 
     expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      sanityInviteId: NEW_INVITE_ID,
+      sanityInviteId: MOCK_NEW_INVITE_ID,
       inviteSentAt: new Date(MOCK_INVITE_SENT_AT),
       inviteAcceptedAt: null,
       inviteHeadsUpSentAt: null,
@@ -118,10 +104,9 @@ describe(resendOwnerInvite, () => {
     await resendOwnerInvite(MOCK_TENANT_ID);
 
     expect(sendOwnerEmailOnce).toHaveBeenCalledOnce();
-    expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
-      expect.objectContaining({ ownerEmail: MOCK_OWNER_EMAIL }),
-      TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
-    );
+    const [target, kind] = vi.mocked(sendOwnerEmailOnce).mock.lastCall ?? [];
+    expect(target?.ownerEmail).toBe(MOCK_OWNER_EMAIL);
+    expect(kind).toBe(TENANT_OWNER_EMAIL.INVITE_HEADS_UP);
     expect(
       vi.mocked(setTenantOwnerAccess).mock.invocationCallOrder[0],
     ).toBeLessThan(

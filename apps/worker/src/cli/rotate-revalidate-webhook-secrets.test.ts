@@ -1,28 +1,25 @@
 import { listTenants } from '@blog/db/queries/tenants';
 import { faker } from '@faker-js/faker';
 import { createTenantRevalidateWebhook } from '@worker/steps/create-revalidate-webhook';
+import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
+import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import { mockTenant } from '@worker/testing/tenant/fixtures';
 
 import { rotateRevalidateWebhookSecrets } from './rotate-revalidate-webhook-secrets';
 
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
-vi.mock(
-  '@worker/utils/provision-env/provision-env',
-  () => import('@worker/testing/provision-env/fake-provision-env'),
-);
+vi.mock('@blog/db/queries/tenants');
+vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/create-revalidate-webhook');
 
-const ENCRYPTED_SECRET = 'encrypted-secret';
+faker.seed(6025);
+
+const MOCK_ENCRYPTED_WEBHOOK_SECRET = faker.string.alphanumeric(32);
 
 function provisionedTenant(overrides: Parameters<typeof mockTenant>[0] = {}) {
   return mockTenant({
     id: faker.string.uuid(),
     sanityProjectId: faker.string.alphanumeric(8),
-    webhookCreatedAt: new Date(),
+    webhookCreatedAt: MOCK_NOW,
     ...overrides,
   });
 }
@@ -44,7 +41,9 @@ describe(rotateRevalidateWebhookSecrets, () => {
   it.each([
     {
       case: 'is already rotated, so a re-run changes nothing',
-      overrides: { revalidateWebhookSecretEncrypted: ENCRYPTED_SECRET },
+      overrides: {
+        revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_WEBHOOK_SECRET,
+      },
     },
     { case: 'has no Sanity project', overrides: { sanityProjectId: null } },
     { case: 'has no webhook yet', overrides: { webhookCreatedAt: null } },
@@ -63,7 +62,7 @@ describe(rotateRevalidateWebhookSecrets, () => {
     vi.mocked(listTenants).mockResolvedValue([failing, healthy]);
     vi.mocked(createTenantRevalidateWebhook).mockImplementation(
       async (tenant) => {
-        if (tenant.id === failing.id) throw new Error('Sanity said no');
+        if (tenant.id === failing.id) throw new Error(MOCK_SANITY_OUTAGE);
       },
     );
 

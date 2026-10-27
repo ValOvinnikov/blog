@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { INACTIVITY_STAGE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { RETENTION_KIND } from '@worker/constants/retention';
@@ -8,6 +8,7 @@ import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_FORGED_SECRET } from '@worker/testing/enqueue/fixtures';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
 import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
+import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { runInactivitySweep } from '@worker/utils/inactivity-sweep/run-inactivity-sweep';
 import { logger } from '@worker/utils/logger/logger';
@@ -16,7 +17,9 @@ import { runRetentionCleanups } from '@worker/utils/retention/run-retention-clea
 import { GET } from './route';
 
 const SWEEP_URL = 'https://worker.example.com/api/inactivity-sweep';
-const CRON_SECRET = 'cron-secret';
+faker.seed(6025);
+
+const MOCK_CRON_SECRET = faker.string.alphanumeric(32);
 const SWEEP_ENV = mockInactivitySweepEnv();
 const ADVANCED = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: 2,
@@ -26,14 +29,12 @@ const ADVANCED = {
 };
 const DELETED = { [RETENTION_KIND.LEADS]: 4, [RETENTION_KIND.SESSIONS]: 9 };
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
-
-vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
+vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/inactivity-sweep/inactivity-sweep-env');
 vi.mock('@worker/utils/inactivity-sweep/run-inactivity-sweep');
 vi.mock('@worker/utils/retention/run-retention-cleanups');
 
-function cronRequest(secret: string = CRON_SECRET): Request {
+function cronRequest(secret: string = MOCK_CRON_SECRET): Request {
   return new Request(SWEEP_URL, {
     headers: { Authorization: `Bearer ${secret}` },
   });
@@ -42,7 +43,7 @@ function cronRequest(secret: string = CRON_SECRET): Request {
 describe('GET /api/inactivity-sweep', () => {
   beforeEach(() => {
     freezeClock();
-    mockEnv.CRON_SECRET = CRON_SECRET;
+    mockEnv.CRON_SECRET = MOCK_CRON_SECRET;
     vi.mocked(getInactivitySweepEnv).mockReturnValue(SWEEP_ENV);
     vi.mocked(runInactivitySweep).mockResolvedValue(ADVANCED);
     vi.mocked(runRetentionCleanups).mockResolvedValue(DELETED);
@@ -52,7 +53,7 @@ describe('GET /api/inactivity-sweep', () => {
     vi.useRealTimers();
   });
 
-  it('runs the sweep and the retention cleanups for now and answers with both results', async () => {
+  it('runs the sweep and retention cleanups for now and answers with both results', async () => {
     const response = await GET(cronRequest());
 
     expect(response.status).toBe(HTTP_STATUS.OK);
