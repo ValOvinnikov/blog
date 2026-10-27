@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { REQUEST_LOG } from '@platform/constants/request';
 import {
   MOCK_RENDER_ERROR_MESSAGE,
+  MOCK_RENDER_ROUTE_PATH,
   mockErrorContext,
   mockErrorRequest,
 } from '@platform/testing/request-errors/fixtures';
@@ -25,7 +26,7 @@ describe(logRequestError, () => {
     expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error).toHaveBeenCalledWith(REQUEST_LOG.UNHANDLED_ERROR, {
       error,
-      routePath: context.routePath,
+      routePath: MOCK_RENDER_ROUTE_PATH,
       routeType: context.routeType,
       method: request.method,
       path: request.path,
