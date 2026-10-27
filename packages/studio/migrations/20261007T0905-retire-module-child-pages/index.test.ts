@@ -1,8 +1,9 @@
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import { del } from 'sanity/migrate';
 
@@ -25,10 +26,12 @@ const mockSectionPages = (_id: string, title?: string) =>
 describe('retire-module-child-pages', () => {
   it('deletes child pages once their section-pages counterpart is safe to delete', async () => {
     const childPages = mockChildPages(MOCK_CHILD_PAGES_ID);
-    const context = mockMigrationContext([
-      childPages,
-      mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE),
-    ]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        childPages,
+        mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE),
+      ]),
+    });
 
     const mutations = await runDocumentMigration(
       migration,
@@ -41,10 +44,12 @@ describe('retire-module-child-pages', () => {
 
   it('deletes a draft module_childPages when its draft counterpart exists', async () => {
     const childPages = mockChildPages(MOCK_DRAFT_CHILD_PAGES_ID);
-    const context = mockMigrationContext([
-      childPages,
-      mockSectionPages(MOCK_DRAFT_SECTION_PAGES_ID, MOCK_TITLE),
-    ]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        childPages,
+        mockSectionPages(MOCK_DRAFT_SECTION_PAGES_ID, MOCK_TITLE),
+      ]),
+    });
 
     const mutations = await runDocumentMigration(
       migration,
@@ -57,7 +62,9 @@ describe('retire-module-child-pages', () => {
 
   it('rejects when the counterpart does not exist', async () => {
     const childPages = mockChildPages(MOCK_CHILD_PAGES_ID);
-    const context = mockMigrationContext([childPages]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([childPages]),
+    });
 
     await expect(
       runDocumentMigration(migration, childPages, context),
@@ -72,11 +79,13 @@ describe('retire-module-child-pages', () => {
       _type: 'template_landing',
       modules: [{ _type: 'module_childPages', _ref: MOCK_CHILD_PAGES_ID }],
     });
-    const context = mockMigrationContext([
-      childPages,
-      mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE),
-      referrer,
-    ]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        childPages,
+        mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE),
+        referrer,
+      ]),
+    });
 
     await expect(
       runDocumentMigration(migration, childPages, context),
@@ -91,7 +100,7 @@ describe('retire-module-child-pages', () => {
     const mutations = await runDocumentMigration(
       migration,
       sectionPages,
-      mockMigrationContext([sectionPages]),
+      mockMigrationContext({ fetch: mockGroqFetch([sectionPages]) }),
     );
 
     expect(mutations).toEqual([]);

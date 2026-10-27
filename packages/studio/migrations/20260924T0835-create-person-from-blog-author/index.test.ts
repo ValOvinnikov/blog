@@ -1,8 +1,9 @@
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import type { SanityDocument } from 'sanity';
 import { at, createOrReplace, patch, set } from 'sanity/migrate';
@@ -43,7 +44,7 @@ describe('create-person-from-blog-author', () => {
   describe('blog_author documents', () => {
     it('creates the matching person, carrying every field across', async () => {
       const author = mockAuthor(MOCK_AUTHOR_ID);
-      const context = mockMigrationContext([author]);
+      const context = mockMigrationContext({ fetch: mockGroqFetch([author]) });
 
       const mutations = await runDocumentMigration(migration, author, context);
 
@@ -58,7 +59,7 @@ describe('create-person-from-blog-author', () => {
 
     it('maps a draft blog_author onto a draft person', async () => {
       const author = mockAuthor(MOCK_DRAFT_AUTHOR_ID);
-      const context = mockMigrationContext([author]);
+      const context = mockMigrationContext({ fetch: mockGroqFetch([author]) });
 
       const mutations = await runDocumentMigration(migration, author, context);
 
@@ -77,12 +78,12 @@ describe('create-person-from-blog-author', () => {
       const firstRun = await runDocumentMigration(
         migration,
         author,
-        mockMigrationContext([author]),
+        mockMigrationContext({ fetch: mockGroqFetch([author]) }),
       );
       const secondRun = await runDocumentMigration(
         migration,
         author,
-        mockMigrationContext([author]),
+        mockMigrationContext({ fetch: mockGroqFetch([author]) }),
       );
 
       expect(secondRun).toEqual(firstRun);
@@ -90,7 +91,9 @@ describe('create-person-from-blog-author', () => {
   });
 
   describe('reference rewriting', () => {
-    const context = mockMigrationContext([mockAuthor(MOCK_AUTHOR_ID)]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([mockAuthor(MOCK_AUTHOR_ID)]),
+    });
 
     it.each(['page_post', 'blog_post', 'module_heroProfile'])(
       'rewrites %s.author pointing at a migrated author',
@@ -137,7 +140,9 @@ describe('create-person-from-blog-author', () => {
       const otherRunMutations = await runDocumentMigration(
         migration,
         post,
-        mockMigrationContext([mockAuthor(MOCK_OTHER_AUTHOR_ID)]),
+        mockMigrationContext({
+          fetch: mockGroqFetch([mockAuthor(MOCK_OTHER_AUTHOR_ID)]),
+        }),
       );
 
       expect(otherRunMutations).toEqual([]);

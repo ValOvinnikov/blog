@@ -1,8 +1,9 @@
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import { del } from 'sanity/migrate';
 
@@ -62,10 +63,12 @@ describe('retire-newsletter-settings', () => {
     'deletes %s once every module carries the copied cues',
     async (id) => {
       const settings = mockSettings(id);
-      const context = mockMigrationContext([
-        mockSettings(MOCK_SETTINGS_ID),
-        mockNewsletterModule([MOCK_COPIED_CUE]),
-      ]);
+      const context = mockMigrationContext({
+        fetch: mockGroqFetch([
+          mockSettings(MOCK_SETTINGS_ID),
+          mockNewsletterModule([MOCK_COPIED_CUE]),
+        ]),
+      });
 
       const mutations = await runDocumentMigration(
         migration,
@@ -79,7 +82,9 @@ describe('retire-newsletter-settings', () => {
 
   it('keeps the settings while a module still lacks the copied cues', async () => {
     const settings = mockSettings(MOCK_SETTINGS_ID);
-    const context = mockMigrationContext([settings, mockNewsletterModule()]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([settings, mockNewsletterModule()]),
+    });
 
     const mutations = await runDocumentMigration(migration, settings, context);
 

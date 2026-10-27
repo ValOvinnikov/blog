@@ -1,5 +1,4 @@
 import { LINK_TYPE, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
-import { mockMigrationContext } from '@blog/studio/testing/migrations/migration-document';
 import {
   MOCK_EXTERNAL_HOSTNAME,
   MOCK_EXTERNAL_LABEL,
@@ -12,6 +11,8 @@ import {
   mockRawHrefMarkDef,
   mockSpan,
 } from '@blog/studio/testing/migrations/portable-text-links';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import { mockMigrationContext } from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 
 import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
@@ -73,7 +74,9 @@ describe(deriveExternalLabel, () => {
 });
 
 describe(resolveRawHrefDestination, () => {
-  const postContext = mockMigrationContext([MOCK_POST]);
+  const postContext = mockMigrationContext({
+    fetch: mockGroqFetch([MOCK_POST]),
+  });
 
   it('resolves a /blog/<slug> href to the matching page_post', async () => {
     const destination = await resolveRawHrefDestination(
@@ -95,7 +98,9 @@ describe(resolveRawHrefDestination, () => {
       _id: `drafts.${MOCK_POST._id}`,
       title: faker.lorem.words(3),
     };
-    const context = mockMigrationContext([draft, MOCK_POST]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([draft, MOCK_POST]),
+    });
 
     const destination = await resolveRawHrefDestination(
       context,
@@ -148,7 +153,7 @@ describe(resolveInlineLinkDestination, () => {
     }) as TInlineLinkMarkDef;
 
     const destination = await resolveInlineLinkDestination(
-      mockMigrationContext([MOCK_POST]),
+      mockMigrationContext({ fetch: mockGroqFetch([MOCK_POST]) }),
       markDef,
     );
 
@@ -167,7 +172,7 @@ describe(resolveInlineLinkDestination, () => {
     }) as TInlineLinkMarkDef;
 
     const destination = await resolveInlineLinkDestination(
-      mockMigrationContext(),
+      mockMigrationContext({ fetch: mockGroqFetch([]) }),
       markDef,
     );
 
@@ -185,7 +190,7 @@ describe(resolveInlineLinkDestination, () => {
     }) as TInlineLinkMarkDef;
 
     const destination = await resolveInlineLinkDestination(
-      mockMigrationContext(),
+      mockMigrationContext({ fetch: mockGroqFetch([]) }),
       markDef,
     );
 

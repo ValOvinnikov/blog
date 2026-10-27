@@ -1,7 +1,7 @@
 import {
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import { del } from 'sanity/migrate';
 

@@ -1,8 +1,9 @@
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import { del } from 'sanity/migrate';
 
@@ -25,10 +26,9 @@ const mockPerson = (_id: string, name?: string) =>
 describe('retire-blog-author', () => {
   it('deletes a blog_author once its person counterpart is verified deletable', async () => {
     const author = mockAuthor(MOCK_AUTHOR_ID);
-    const context = mockMigrationContext([
-      author,
-      mockPerson(MOCK_PERSON_ID, MOCK_NAME),
-    ]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([author, mockPerson(MOCK_PERSON_ID, MOCK_NAME)]),
+    });
 
     const mutations = await runDocumentMigration(migration, author, context);
 
@@ -37,10 +37,12 @@ describe('retire-blog-author', () => {
 
   it('deletes a draft blog_author when its draft person counterpart exists', async () => {
     const author = mockAuthor(MOCK_DRAFT_AUTHOR_ID);
-    const context = mockMigrationContext([
-      author,
-      mockPerson(MOCK_DRAFT_PERSON_ID, MOCK_NAME),
-    ]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        author,
+        mockPerson(MOCK_DRAFT_PERSON_ID, MOCK_NAME),
+      ]),
+    });
 
     const mutations = await runDocumentMigration(migration, author, context);
 
@@ -49,7 +51,7 @@ describe('retire-blog-author', () => {
 
   it('rejects when the person counterpart does not exist', async () => {
     const author = mockAuthor(MOCK_AUTHOR_ID);
-    const context = mockMigrationContext([author]);
+    const context = mockMigrationContext({ fetch: mockGroqFetch([author]) });
 
     await expect(
       runDocumentMigration(migration, author, context),
@@ -60,10 +62,9 @@ describe('retire-blog-author', () => {
 
   it('rejects when only the published person exists for a draft blog_author', async () => {
     const author = mockAuthor(MOCK_DRAFT_AUTHOR_ID);
-    const context = mockMigrationContext([
-      author,
-      mockPerson(MOCK_PERSON_ID, MOCK_NAME),
-    ]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([author, mockPerson(MOCK_PERSON_ID, MOCK_NAME)]),
+    });
 
     await expect(
       runDocumentMigration(migration, author, context),
@@ -78,7 +79,7 @@ describe('retire-blog-author', () => {
     const mutations = await runDocumentMigration(
       migration,
       person,
-      mockMigrationContext([person]),
+      mockMigrationContext({ fetch: mockGroqFetch([person]) }),
     );
 
     expect(mutations).toEqual([]);

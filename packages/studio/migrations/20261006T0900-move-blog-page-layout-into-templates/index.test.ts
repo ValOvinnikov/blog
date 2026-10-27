@@ -1,8 +1,9 @@
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import { at, createIfNotExists, patch, set, unset } from 'sanity/migrate';
 
@@ -41,7 +42,7 @@ describe('move-blog-page-layout-into-templates', () => {
       const mutations = await runDocumentMigration(
         migration,
         page,
-        mockMigrationContext([page]),
+        mockMigrationContext({ fetch: mockGroqFetch([page]) }),
       );
 
       expect(mutations).toEqual([
@@ -74,7 +75,9 @@ describe('move-blog-page-layout-into-templates', () => {
       hero: MOCK_HERO,
       modules: MOCK_MODULES,
     });
-    const context = mockMigrationContext([design, travel]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([design, travel]),
+    });
 
     const [designCreate] = (await runDocumentMigration(
       migration,

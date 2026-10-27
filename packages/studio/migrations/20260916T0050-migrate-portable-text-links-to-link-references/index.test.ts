@@ -1,10 +1,5 @@
 import { LINK_TYPE, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
 import {
-  mockMigrationContext,
-  mockMigrationDocument,
-  runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
-import {
   isCreateIfNotExistsMutation,
   isPatchMutation,
 } from '@blog/studio/testing/migrations/mutation-guards';
@@ -18,6 +13,12 @@ import {
   mockRawHrefMarkDef,
   mockSpan,
 } from '@blog/studio/testing/migrations/portable-text-links';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import type { SanityDocument } from 'sanity';
 import {
@@ -45,7 +46,7 @@ const migrate = async (
   (await runDocumentMigration(
     migration,
     document,
-    mockMigrationContext(dataset),
+    mockMigrationContext({ fetch: mockGroqFetch(dataset) }),
   )) as unknown[];
 
 const toBlockPath = (blockKey: string, field: string): Path => [

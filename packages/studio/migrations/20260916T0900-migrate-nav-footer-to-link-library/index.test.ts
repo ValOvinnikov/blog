@@ -1,10 +1,11 @@
 import { LINK_TYPE, SOCIAL_PLATFORMS } from '@blog/config/constants';
+import { isCreateIfNotExistsMutation } from '@blog/studio/testing/migrations/mutation-guards';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
-import { isCreateIfNotExistsMutation } from '@blog/studio/testing/migrations/mutation-guards';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import {
   at,
@@ -73,7 +74,7 @@ const migrate = async (
   (await runDocumentMigration(
     migration,
     document,
-    mockMigrationContext(dataset),
+    mockMigrationContext({ fetch: mockGroqFetch(dataset) }),
   )) as Mutation[];
 
 const readLinkIds = (mutations: Mutation[]): string[] =>

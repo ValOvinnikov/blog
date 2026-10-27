@@ -1,9 +1,10 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
 import {
   mockMigrationContext,
   mockMigrationDocument,
   runDocumentMigration,
-} from '@blog/studio/testing/migrations/migration-document';
+} from '@blog/studio/testing/mock-migration';
 import { faker } from '@faker-js/faker';
 import { at, createIfNotExists, patch, set, unset } from 'sanity/migrate';
 
@@ -74,7 +75,9 @@ describe('move-page-layout-into-templates', () => {
   const group = mockTranslationGroup(MOCK_ENGLISH_ID, MOCK_DUTCH_ID);
 
   it("points a translated page at its default-language page's template", async () => {
-    const context = mockMigrationContext([english, dutch, group]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([english, dutch, group]),
+    });
 
     const mutations = await runDocumentMigration(migration, dutch, context);
 
@@ -85,7 +88,9 @@ describe('move-page-layout-into-templates', () => {
   });
 
   it('moves the default-language page onto the same template', async () => {
-    const context = mockMigrationContext([english, dutch, group]);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([english, dutch, group]),
+    });
 
     const mutations = await runDocumentMigration(migration, english, context);
 
@@ -107,7 +112,7 @@ describe('move-page-layout-into-templates', () => {
     const mutations = await runDocumentMigration(
       migration,
       home,
-      mockMigrationContext([home]),
+      mockMigrationContext({ fetch: mockGroqFetch([home]) }),
     );
 
     expect(mutations).toEqual([
@@ -135,7 +140,7 @@ describe('move-page-layout-into-templates', () => {
     const mutations = await runDocumentMigration(
       migration,
       migrated,
-      mockMigrationContext([migrated, group]),
+      mockMigrationContext({ fetch: mockGroqFetch([migrated, group]) }),
     );
 
     expect(mutations).toEqual([]);
@@ -149,7 +154,7 @@ describe('move-page-layout-into-templates', () => {
     const mutations = await runDocumentMigration(
       migration,
       chosen,
-      mockMigrationContext([english, chosen, group]),
+      mockMigrationContext({ fetch: mockGroqFetch([english, chosen, group]) }),
     );
 
     expect(mutations).toEqual([patch(MOCK_DUTCH_ID, [at('modules', unset())])]);
