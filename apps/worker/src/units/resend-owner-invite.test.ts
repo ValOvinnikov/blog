@@ -18,6 +18,7 @@ import { okResult } from '@blog/utils/result';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_INVITE_SENT_AT,
+  MOCK_MIXED_CASE_OWNER_EMAIL,
   MOCK_OWNER_EMAIL,
   MOCK_SANITY_USER_ID,
   mockPendingInvite,
@@ -237,6 +238,83 @@ describe(resendOwnerInvite, () => {
         MOCK_TENANT_ID,
         expect.objectContaining({ sanityInviteId: MOCK_NEW_INVITE_ID }),
       );
+    });
+  });
+
+  describe('with a former owner email given', () => {
+    beforeEach(() => {
+      vi.mocked(listSanityProjectInvites)
+        .mockReset()
+        .mockResolvedValueOnce([
+          mockPendingInvite({
+            id: MOCK_FORMER_INVITE_ID,
+            email: MOCK_FORMER_OWNER_EMAIL,
+          }),
+          mockPendingInvite({
+            id: MOCK_OTHER_INVITE_ID,
+            email: MOCK_OTHER_INVITEE_EMAIL,
+          }),
+        ])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([mockPendingInvite({ id: MOCK_NEW_INVITE_ID })]);
+      vi.mocked(listSanityProjectUsers).mockResolvedValue([mockFormerOwner()]);
+      vi.mocked(listSanityProjectAcl).mockResolvedValue([
+        {
+          projectUserId: MOCK_FORMER_PROJECT_USER_ID,
+          roles: [{ name: SANITY_PROJECT_ROLE.VIEWER }],
+          isRobot: false,
+        },
+      ]);
+    });
+
+    it('removes the role of a never-recorded old owner who accepted the invite', async () => {
+      await resendOwnerInvite(MOCK_TENANT_ID, MOCK_FORMER_OWNER_EMAIL);
+
+      expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        projectUserId: MOCK_FORMER_PROJECT_USER_ID,
+        roleName: SANITY_PROJECT_ROLE.VIEWER,
+      });
+    });
+
+    it('deletes the pending invites to the former address and only those', async () => {
+      await resendOwnerInvite(
+        MOCK_TENANT_ID,
+        ` ${MOCK_FORMER_OWNER_EMAIL.toUpperCase()} `,
+      );
+
+      expect(deleteSanityProjectInvite).toHaveBeenCalledExactlyOnceWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        inviteId: MOCK_FORMER_INVITE_ID,
+      });
+    });
+
+    it("revokes nothing when the former address is the owner's own", async () => {
+      vi.mocked(listSanityProjectUsers).mockResolvedValue([mockSanityOwner()]);
+
+      await resendOwnerInvite(MOCK_TENANT_ID, MOCK_MIXED_CASE_OWNER_EMAIL);
+
+      expect(deleteSanityProjectInvite).not.toHaveBeenCalled();
+      expect(revokeSanityProjectRole).not.toHaveBeenCalled();
+      expect(setTenantOwnerAccess).not.toHaveBeenCalled();
+    });
+  });
+
+  it('clears a recorded Sanity user who is no longer in the project', async () => {
+    vi.mocked(getTenantById).mockResolvedValue(
+      mockProvisionedTenant({ ownerSanityUserId: MOCK_FORMER_SANITY_USER_ID }),
+    );
+    vi.mocked(listSanityProjectInvites).mockReset().mockResolvedValue([]);
+
+    await resendOwnerInvite(MOCK_TENANT_ID);
+
+    expect(revokeSanityProjectRole).not.toHaveBeenCalled();
+    expect(setTenantOwnerAccess).toHaveBeenNthCalledWith(1, MOCK_TENANT_ID, {
+      sanityUserId: null,
+      loginProvider: null,
+      sanityRole: null,
     });
   });
 

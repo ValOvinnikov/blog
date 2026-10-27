@@ -1,5 +1,8 @@
 import type { TMaybeUndefined } from '@blog/config/types';
-import { setTenantOwnerAccess } from '@blog/db/queries/tenants';
+import {
+  setTenantOwnerAccess,
+  type TSetTenantOwnerAccessInput,
+} from '@blog/db/queries/tenants';
 import {
   deleteSanityProjectInvite,
   listSanityProjectAcl,
@@ -20,9 +23,11 @@ function findFormerEmails(
   target: TOwnerAccessTarget,
   invites: TSanityInvite[],
   users: TSanityUser[],
+  formerOwnerEmail: TMaybeUndefined<string>,
 ): Set<string> {
   const { ownerSanityInviteId, ownerSanityUserId } = target.tenant;
-  const recordedEmails = [
+  const candidateEmails = [
+    formerOwnerEmail,
     ownerSanityInviteId &&
       invites.find(({ id }) => id === ownerSanityInviteId)?.email,
     ownerSanityUserId &&
@@ -30,7 +35,7 @@ function findFormerEmails(
         ?.profile.email,
   ];
   return new Set(
-    recordedEmails.flatMap((email) =>
+    candidateEmails.flatMap((email) =>
       email && !hasOwnerEmail(target, email) ? [normalizeEmail(email)] : [],
     ),
   );
@@ -64,19 +69,51 @@ async function revokeFormerRoles(
   }
 }
 
+async function clearOwnerAccess(
+  tenantId: string,
+  access: TSetTenantOwnerAccessInput,
+): Promise<void> {
+  const cleared = await setTenantOwnerAccess(tenantId, access);
+  if (!cleared.ok) {
+    throw new Error(
+      `Tenant "${tenantId}"'s former owner access could not be cleared (${cleared.error}).`,
+    );
+  }
+}
+
 export async function revokeFormerOwnerAccess(
   target: TOwnerAccessTarget,
+  formerOwnerEmail?: string,
 ): Promise<void> {
   const { tenant, projectId, env } = target;
-  if (!tenant.ownerSanityInviteId && !tenant.ownerSanityUserId) return;
+  const { ownerSanityInviteId, ownerSanityUserId } = tenant;
+  if (!ownerSanityInviteId && !ownerSanityUserId && !formerOwnerEmail) return;
 
   const token = env.sanityManagementToken;
   const [invites, users] = await Promise.all([
     listSanityProjectInvites({ token, projectId }),
     listSanityProjectUsers({ token, projectId }),
   ]);
-  const formerEmails = findFormerEmails(target, invites, users);
-  if (formerEmails.size === 0) return;
+  const formerEmails = findFormerEmails(
+    target,
+    invites,
+    users,
+    formerOwnerEmail,
+  );
+
+  if (formerEmails.size === 0) {
+    const isRecordedUserGone =
+      !!ownerSanityUserId &&
+      !users.some(({ sanityUserId }) => sanityUserId === ownerSanityUserId);
+    if (isRecordedUserGone) {
+      await clearOwnerAccess(tenant.id, {
+        sanityUserId: null,
+        loginProvider: null,
+        sanityRole: null,
+      });
+    }
+    return;
+  }
 
   for (const { id, email, status } of invites) {
     if (
@@ -92,16 +129,11 @@ export async function revokeFormerOwnerAccess(
     users.filter(({ profile }) => isFormerEmail(formerEmails, profile.email)),
   );
 
-  const cleared = await setTenantOwnerAccess(tenant.id, {
+  await clearOwnerAccess(tenant.id, {
     sanityInviteId: null,
     inviteAcceptedAt: null,
     sanityUserId: null,
     loginProvider: null,
     sanityRole: null,
   });
-  if (!cleared.ok) {
-    throw new Error(
-      `Tenant "${tenant.id}"'s former owner access could not be cleared (${cleared.error}).`,
-    );
-  }
 }
