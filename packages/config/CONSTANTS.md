@@ -38,6 +38,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BRAND_TAGLINE_SEPARATORS**: `DOT`, `PIPE`, `BULLET`, `SLASH`
 
+### `@blog/config/constants` — `packages/config/src/constants/busy-button.ts`
+
+- **BUSY_BUTTON_STYLE**: `LABEL`, `KEPT`, `EDGE`
+- **SPINNER_STYLE**: `PRESET`, `BRAILLE`, `RING`, `DOTS`, `PULSE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/capability.ts`
 
 - **CAPABILITY**: `COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`

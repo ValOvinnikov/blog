@@ -8,19 +8,21 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BUSY_BUTTON_STYLE,
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
   HUE_MAX,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   PRESET_ID,
+  SPINNER_STYLE,
 } from '@blog/config/constants';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
-  DEFAULT_ACCOUNT_CONTROLS,
+  DEFAULT_CONTROL_STYLES,
   MOCK_ACCENT_HUE,
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
@@ -104,6 +106,8 @@ const STYLE_FIELDS = [
   { field: 'accountButtonStyle', value: ACCOUNT_BUTTON_STYLE.CIRCLE },
   { field: 'accountPanelStyle', value: ACCOUNT_PANEL_STYLE.HUB },
   { field: 'accountPhonePlacement', value: ACCOUNT_PHONE_PLACEMENT.MENU },
+  { field: 'busyButtonStyle', value: BUSY_BUTTON_STYLE.EDGE },
+  { field: 'spinnerStyle', value: SPINNER_STYLE.BRAILLE },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -168,6 +172,20 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       accountPhonePlacement:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['accountPhonePlacement'],
+    },
+  ],
+  [
+    'an unknown busy button style',
+    {
+      busyButtonStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['busyButtonStyle'],
+    },
+  ],
+  [
+    'an unknown spinner style',
+    {
+      spinnerStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['spinnerStyle'],
     },
   ],
   [
@@ -327,20 +345,20 @@ describe(upsertSiteConfig, () => {
     });
 
     it.each(Object.values(PRESET_ID))(
-      'gives a new %s config the default account controls',
+      'gives a new %s config the default control styles',
       async (preset) => {
         const result = expectOk(await save({ preset }));
 
-        expect(result).toMatchObject(DEFAULT_ACCOUNT_CONTROLS);
+        expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
       },
     );
 
-    it('keeps the default account controls across a preset change', async () => {
+    it('keeps the default control styles across a preset change', async () => {
       await save();
 
       const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
 
-      expect(result).toMatchObject(DEFAULT_ACCOUNT_CONTROLS);
+      expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
     });
   });
 

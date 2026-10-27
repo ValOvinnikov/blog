@@ -8,6 +8,12 @@ import {
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
 } from './account-control';
+import {
+  BUSY_BUTTON_STYLE,
+  SPINNER_STYLE,
+  type TBusyButtonStyle,
+  type TSpinnerStyle,
+} from './busy-button';
 import { type TCapability, CAPABILITY } from './capability';
 import { type TCardStyle, CARD_STYLE } from './card-style';
 import {
@@ -84,6 +90,8 @@ export type TPresetBundle = {
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;
+  busyButtonStyle: TBusyButtonStyle;
+  spinnerStyle: TSpinnerStyle;
   featureDefaults: Record<TCapability, boolean>;
 };
 
@@ -101,6 +109,8 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
     accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
+    busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
+    spinnerStyle: SPINNER_STYLE.PRESET,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
@@ -124,6 +134,8 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
     accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
+    busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
+    spinnerStyle: SPINNER_STYLE.PRESET,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,

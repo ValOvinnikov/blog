@@ -548,6 +548,70 @@
         "file": "packages/config/src/constants/brand-tagline.ts"
       }
     ],
+    "LABEL": [
+      {
+        "ref": "BUSY_BUTTON_STYLE.LABEL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "KEPT": [
+      {
+        "ref": "BUSY_BUTTON_STYLE.KEPT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "EDGE": [
+      {
+        "ref": "BUSY_BUTTON_STYLE.EDGE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "PRESET": [
+      {
+        "ref": "SPINNER_STYLE.PRESET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "BRAILLE": [
+      {
+        "ref": "SPINNER_STYLE.BRAILLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "RING": [
+      {
+        "ref": "SPINNER_STYLE.RING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "DOTS": [
+      {
+        "ref": "SPINNER_STYLE.DOTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
+    "PULSE": [
+      {
+        "ref": "SPINNER_STYLE.PULSE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/busy-button.ts"
+      }
+    ],
     "COMMENTS": [
       {
         "ref": "CAPABILITY.COMMENTS",

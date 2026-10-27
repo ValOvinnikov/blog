@@ -1,30 +1,5 @@
 import type { TVoiceFieldFailuresByLocale } from '@blog/config';
-import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-  CARD_STYLE,
-  DENSITY,
-  LANGUAGE_SWITCHER_STYLE,
-  FONT_CHOICE,
-  HEADER_CONTROL_STYLE,
-  HUE_MAX,
-  HUE_MIN,
-  PRESET_ID,
-  PRESET_REGISTRY,
-  RADIUS_SCALE,
-  type TAccountButtonStyle,
-  type TAccountPanelStyle,
-  type TAccountPhonePlacement,
-  type TCardStyle,
-  type TDensity,
-  type THeaderControlStyle,
-  type TLanguageSwitcherStyle,
-  type TFontChoice,
-  type TLocaleIsoCode,
-  type TPresetId,
-  type TRadiusScale,
-} from '@blog/config/constants';
+import { PRESET_REGISTRY, type TLocaleIsoCode } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
@@ -39,133 +14,30 @@ import { tenants } from '@blog/db/schema/tenants';
 import { okResult, type TResult } from '@blog/utils';
 import { isUndefined } from '@blog/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
-import { z } from 'zod';
 
 import {
   assertKnownLocales,
   parseVoiceOverridesByLocale,
-  type TVoiceOverridesByLocaleInput,
 } from './parse-voice-overrides';
+import {
+  presentOptionalFields,
+  type TUpdateSiteConfigInput,
+  updateSiteConfigInputSchema,
+} from './site-config-input';
 
 export type {
   TVoiceOverridesByLocaleInput,
   TVoiceOverridesInput,
 } from './parse-voice-overrides';
-
-const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
+export {
+  type TUpdateSiteConfigInput,
+  updateSiteConfigInputSchema,
+} from './site-config-input';
 
 export type TUpsertSiteConfigResult = TResult<
   TSiteConfigResult,
   TVoiceFieldFailuresByLocale
 >;
-
-// A field absent from the input is left untouched on `UPDATE` — Look and
-// Voice are saved from separate admin-panel tabs, so a Look save must never
-// wipe Voice data (or vice versa). `logoHue`/`logoAssetUrl`/`faviconAssetUrl`
-// additionally accept an explicit `null` to clear them, since `undefined`
-// alone can't express "unset this". A Voice save replaces the map of each
-// locale it carries (even with `{}`) and leaves every other locale's map untouched.
-export const updateSiteConfigInputSchema = z.object({
-  preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
-  accentHue: hueSchema,
-  logoHue: hueSchema.nullable().optional(),
-  headingFont: z.enum(
-    Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],
-  ),
-  bodyFont: z.enum(
-    Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],
-  ),
-  radiusScale: z.enum(
-    Object.values(RADIUS_SCALE) as [TRadiusScale, ...TRadiusScale[]],
-  ),
-  density: z.enum(Object.values(DENSITY) as [TDensity, ...TDensity[]]),
-  languageSwitcherStyle: z
-    .enum(
-      Object.values(LANGUAGE_SWITCHER_STYLE) as [
-        TLanguageSwitcherStyle,
-        ...TLanguageSwitcherStyle[],
-      ],
-    )
-    .optional(),
-  cardStyle: z
-    .enum(Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]])
-    .optional(),
-  headerControlStyle: z
-    .enum(
-      Object.values(HEADER_CONTROL_STYLE) as [
-        THeaderControlStyle,
-        ...THeaderControlStyle[],
-      ],
-    )
-    .optional(),
-  accountButtonStyle: z
-    .enum(
-      Object.values(ACCOUNT_BUTTON_STYLE) as [
-        TAccountButtonStyle,
-        ...TAccountButtonStyle[],
-      ],
-    )
-    .optional(),
-  accountPanelStyle: z
-    .enum(
-      Object.values(ACCOUNT_PANEL_STYLE) as [
-        TAccountPanelStyle,
-        ...TAccountPanelStyle[],
-      ],
-    )
-    .optional(),
-  accountPhonePlacement: z
-    .enum(
-      Object.values(ACCOUNT_PHONE_PLACEMENT) as [
-        TAccountPhonePlacement,
-        ...TAccountPhonePlacement[],
-      ],
-    )
-    .optional(),
-  logoAssetUrl: z.string().trim().url().nullable().optional(),
-  faviconAssetUrl: z.string().trim().url().nullable().optional(),
-});
-
-export type TUpdateSiteConfigInput = z.input<
-  typeof updateSiteConfigInputSchema
-> & {
-  voiceOverridesByLocale?: TVoiceOverridesByLocaleInput;
-};
-
-type TSiteConfigWritable = Partial<typeof siteConfig.$inferInsert>;
-
-// An `undefined` key is left out entirely, which keeps an omitted column out of both `INSERT` and `UPDATE ... SET`.
-function presentOptionalFields(
-  parsed: z.output<typeof updateSiteConfigInputSchema>,
-): TSiteConfigWritable {
-  const fields: TSiteConfigWritable = {};
-
-  if (!isUndefined(parsed.logoHue)) fields.logoHue = parsed.logoHue;
-  if (!isUndefined(parsed.languageSwitcherStyle)) {
-    fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
-  }
-  if (!isUndefined(parsed.cardStyle)) fields.cardStyle = parsed.cardStyle;
-  if (!isUndefined(parsed.headerControlStyle)) {
-    fields.headerControlStyle = parsed.headerControlStyle;
-  }
-  if (!isUndefined(parsed.accountButtonStyle)) {
-    fields.accountButtonStyle = parsed.accountButtonStyle;
-  }
-  if (!isUndefined(parsed.accountPanelStyle)) {
-    fields.accountPanelStyle = parsed.accountPanelStyle;
-  }
-  if (!isUndefined(parsed.accountPhonePlacement)) {
-    fields.accountPhonePlacement = parsed.accountPhonePlacement;
-  }
-  if (!isUndefined(parsed.logoAssetUrl)) {
-    fields.logoAssetUrl = parsed.logoAssetUrl;
-  }
-  if (!isUndefined(parsed.faviconAssetUrl)) {
-    fields.faviconAssetUrl = parsed.faviconAssetUrl;
-  }
-
-  return fields;
-}
 
 async function getTenantLocale(tenantId: string): Promise<TLocaleIsoCode> {
   const [tenant] = await getDb()
@@ -217,6 +89,8 @@ export async function upsertSiteConfig(
       accountButtonStyle: presetBundle.accountButtonStyle,
       accountPanelStyle: presetBundle.accountPanelStyle,
       accountPhonePlacement: presetBundle.accountPhonePlacement,
+      busyButtonStyle: presetBundle.busyButtonStyle,
+      spinnerStyle: presetBundle.spinnerStyle,
       ...required,
       ...optional,
       ...(voicePatch && { voiceOverridesByLocale: voicePatch }),
