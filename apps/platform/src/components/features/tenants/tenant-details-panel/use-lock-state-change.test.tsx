@@ -11,8 +11,8 @@ const LIVE_REGION_TEST_ID = 'live-region';
 const MOCK_PANEL_ID = 'mock-panel';
 const MOCK_LOCKED_ANNOUNCEMENT = 'mock locked announcement';
 const MOCK_UNLOCKED_ANNOUNCEMENT = 'mock unlocked announcement';
-const INSIDE_INPUT_LABEL = 'inside';
-const OUTSIDE_BUTTON_LABEL = 'outside';
+const MOCK_INSIDE_INPUT_LABEL = 'inside';
+const MOCK_OUTSIDE_BUTTON_LABEL = 'outside';
 
 const NO_LOCKS: TTenantFieldLocks = {};
 const NAME_LOCKED: TTenantFieldLocks = { name: { kind: 'running' } };
@@ -42,7 +42,7 @@ const Harness = ({ fieldLocks, onFieldsLocked = () => {} }: THarnessProps) => {
         {lockAnnouncement}
       </span>
       <div ref={fieldsContainerRef} tabIndex={-1} role="group">
-        <input aria-label={INSIDE_INPUT_LABEL} />
+        <input aria-label={MOCK_INSIDE_INPUT_LABEL} />
       </div>
     </div>
   );
@@ -51,7 +51,7 @@ const Harness = ({ fieldLocks, onFieldsLocked = () => {} }: THarnessProps) => {
 const OutsideHarness = (props: THarnessProps) => {
   return (
     <>
-      <button type="button">{OUTSIDE_BUTTON_LABEL}</button>
+      <button type="button">{MOCK_OUTSIDE_BUTTON_LABEL}</button>
       <Harness {...props} />
     </>
   );
@@ -135,7 +135,7 @@ describe(useLockStateChange, () => {
   it('moves focus to the fields container when a field locks under focus', async () => {
     const { rerender } = setup();
     const insideInput = screen.getByRole('textbox', {
-      name: INSIDE_INPUT_LABEL,
+      name: MOCK_INSIDE_INPUT_LABEL,
     });
     await user.click(insideInput);
     expect(insideInput).toHaveFocus();
@@ -149,7 +149,7 @@ describe(useLockStateChange, () => {
   it('does not steal focus when a field locks while focus is outside', async () => {
     const { rerender } = setupOutside();
     const outsideButton = screen.getByRole('button', {
-      name: OUTSIDE_BUTTON_LABEL,
+      name: MOCK_OUTSIDE_BUTTON_LABEL,
     });
     await user.click(outsideButton);
 
@@ -161,7 +161,7 @@ describe(useLockStateChange, () => {
   it('keeps focus in place on a re-render that leaves the locked set unchanged', async () => {
     const { rerender } = setup();
     const insideInput = screen.getByRole('textbox', {
-      name: INSIDE_INPUT_LABEL,
+      name: MOCK_INSIDE_INPUT_LABEL,
     });
     await user.click(insideInput);
 

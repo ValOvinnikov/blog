@@ -186,6 +186,16 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(saveButton).toBeDisabled();
     });
 
+    it('exposes the fields as a named group', () => {
+      setup();
+
+      const fieldsGroup = screen.getByRole('group', {
+        name: tenantDetailsPanel.fieldsGroupLabel,
+      });
+
+      expect(fieldsGroup).toBeVisible();
+    });
+
     it('saves the edited values and refreshes on success', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
