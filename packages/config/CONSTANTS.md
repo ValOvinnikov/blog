@@ -7,6 +7,12 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## config
 
+### `@blog/config/constants` — `packages/config/src/constants/account-control.ts`
+
+- **ACCOUNT_BUTTON_STYLE**: `PILL`, `CIRCLE`
+- **ACCOUNT_PANEL_STYLE**: `CARD`, `PROFILE`, `HUB`
+- **ACCOUNT_PHONE_PLACEMENT**: `BAR`, `MENU`
+
 ### `@blog/config/constants` — `packages/config/src/constants/action-outcome.ts`
 
 - **ACTION_OUTCOME**: `SUCCESS`, `INVALID`, `BLOCKED`, `RATE_LIMITED`, `UNAVAILABLE`, `REFUSED`, `SERVER_ERROR`

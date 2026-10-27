@@ -3,6 +3,7 @@ import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
+  DEFAULT_ACCOUNT_CONTROLS,
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
 } from '@blog/db/testing/site-config/fixtures';
@@ -52,6 +53,16 @@ describe(getSiteConfig, () => {
       faviconAssetUrl: undefined,
       voiceOverrides: {},
     });
+  });
+
+  it('reads the default account controls for a row stored without them', async () => {
+    await db()
+      .insert(schema.siteConfig)
+      .values({ tenantId, ...MOCK_SITE_CONFIG_FIELDS });
+
+    const result = await getSiteConfig(tenantId);
+
+    expect(result).toMatchObject(DEFAULT_ACCOUNT_CONTROLS);
   });
 
   it("returns every language's overrides and the default language's slice", async () => {

@@ -1,5 +1,8 @@
 import type { TVoiceFieldFailuresByLocale } from '@blog/config';
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
@@ -10,6 +13,9 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
+  type TAccountButtonStyle,
+  type TAccountPanelStyle,
+  type TAccountPhonePlacement,
   type TCardStyle,
   type TDensity,
   type THeaderControlStyle,
@@ -19,6 +25,7 @@ import {
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
   toSiteConfigResult,
@@ -30,6 +37,7 @@ import {
 } from '@blog/db/schema/site-config';
 import { tenants } from '@blog/db/schema/tenants';
 import { okResult, type TResult } from '@blog/utils';
+import { isUndefined } from '@blog/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -90,6 +98,30 @@ export const updateSiteConfigInputSchema = z.object({
       ],
     )
     .optional(),
+  accountButtonStyle: z
+    .enum(
+      Object.values(ACCOUNT_BUTTON_STYLE) as [
+        TAccountButtonStyle,
+        ...TAccountButtonStyle[],
+      ],
+    )
+    .optional(),
+  accountPanelStyle: z
+    .enum(
+      Object.values(ACCOUNT_PANEL_STYLE) as [
+        TAccountPanelStyle,
+        ...TAccountPanelStyle[],
+      ],
+    )
+    .optional(),
+  accountPhonePlacement: z
+    .enum(
+      Object.values(ACCOUNT_PHONE_PLACEMENT) as [
+        TAccountPhonePlacement,
+        ...TAccountPhonePlacement[],
+      ],
+    )
+    .optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -108,18 +140,27 @@ function presentOptionalFields(
 ): TSiteConfigWritable {
   const fields: TSiteConfigWritable = {};
 
-  if (parsed.logoHue !== undefined) fields.logoHue = parsed.logoHue;
-  if (parsed.languageSwitcherStyle !== undefined) {
+  if (!isUndefined(parsed.logoHue)) fields.logoHue = parsed.logoHue;
+  if (!isUndefined(parsed.languageSwitcherStyle)) {
     fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
   }
-  if (parsed.cardStyle !== undefined) fields.cardStyle = parsed.cardStyle;
-  if (parsed.headerControlStyle !== undefined) {
+  if (!isUndefined(parsed.cardStyle)) fields.cardStyle = parsed.cardStyle;
+  if (!isUndefined(parsed.headerControlStyle)) {
     fields.headerControlStyle = parsed.headerControlStyle;
   }
-  if (parsed.logoAssetUrl !== undefined) {
+  if (!isUndefined(parsed.accountButtonStyle)) {
+    fields.accountButtonStyle = parsed.accountButtonStyle;
+  }
+  if (!isUndefined(parsed.accountPanelStyle)) {
+    fields.accountPanelStyle = parsed.accountPanelStyle;
+  }
+  if (!isUndefined(parsed.accountPhonePlacement)) {
+    fields.accountPhonePlacement = parsed.accountPhonePlacement;
+  }
+  if (!isUndefined(parsed.logoAssetUrl)) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
   }
-  if (parsed.faviconAssetUrl !== undefined) {
+  if (!isUndefined(parsed.faviconAssetUrl)) {
     fields.faviconAssetUrl = parsed.faviconAssetUrl;
   }
 
@@ -148,8 +189,8 @@ export async function upsertSiteConfig(
   const parsed = updateSiteConfigInputSchema.parse(rest);
   const defaultLocale = await getTenantLocale(tenantId);
 
-  let voicePatch: TVoiceOverridesByLocale | undefined;
-  if (voiceOverridesByLocale !== undefined) {
+  let voicePatch: TMaybeUndefined<TVoiceOverridesByLocale>;
+  if (!isUndefined(voiceOverridesByLocale)) {
     assertKnownLocales(voiceOverridesByLocale);
     const result = parseVoiceOverridesByLocale(voiceOverridesByLocale);
     if (!result.ok) return result;
@@ -173,6 +214,9 @@ export async function upsertSiteConfig(
       tenantId,
       cardStyle: presetBundle.cardStyle,
       headerControlStyle: presetBundle.headerControlStyle,
+      accountButtonStyle: presetBundle.accountButtonStyle,
+      accountPanelStyle: presetBundle.accountPanelStyle,
+      accountPhonePlacement: presetBundle.accountPhonePlacement,
       ...required,
       ...optional,
       ...(voicePatch && { voiceOverridesByLocale: voicePatch }),

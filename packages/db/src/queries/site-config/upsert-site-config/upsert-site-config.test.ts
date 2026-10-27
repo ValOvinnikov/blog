@@ -5,6 +5,9 @@ import {
   type TVoiceFieldFailuresByLocale,
 } from '@blog/config';
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
   HUE_MAX,
@@ -17,6 +20,7 @@ import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
+  DEFAULT_ACCOUNT_CONTROLS,
   MOCK_ACCENT_HUE,
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
@@ -97,6 +101,9 @@ const STYLE_FIELDS = [
   { field: 'languageSwitcherStyle', value: LANGUAGE_SWITCHER_STYLE.CODES },
   { field: 'cardStyle', value: CARD_STYLE.OUTLINED },
   { field: 'headerControlStyle', value: HEADER_CONTROL_STYLE.SOFT },
+  { field: 'accountButtonStyle', value: ACCOUNT_BUTTON_STYLE.CIRCLE },
+  { field: 'accountPanelStyle', value: ACCOUNT_PANEL_STYLE.HUB },
+  { field: 'accountPhonePlacement', value: ACCOUNT_PHONE_PLACEMENT.MENU },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -140,6 +147,27 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       headerControlStyle:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerControlStyle'],
+    },
+  ],
+  [
+    'an unknown account button style',
+    {
+      accountButtonStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['accountButtonStyle'],
+    },
+  ],
+  [
+    'an unknown account panel style',
+    {
+      accountPanelStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['accountPanelStyle'],
+    },
+  ],
+  [
+    'an unknown account phone placement',
+    {
+      accountPhonePlacement:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['accountPhonePlacement'],
     },
   ],
   [
@@ -296,6 +324,23 @@ describe(upsertSiteConfig, () => {
       const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
 
       expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
+    });
+
+    it.each(Object.values(PRESET_ID))(
+      'gives a new %s config the default account controls',
+      async (preset) => {
+        const result = expectOk(await save({ preset }));
+
+        expect(result).toMatchObject(DEFAULT_ACCOUNT_CONTROLS);
+      },
+    );
+
+    it('keeps the default account controls across a preset change', async () => {
+      await save();
+
+      const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
+
+      expect(result).toMatchObject(DEFAULT_ACCOUNT_CONTROLS);
     });
   });
 

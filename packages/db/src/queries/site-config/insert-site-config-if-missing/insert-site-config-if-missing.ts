@@ -7,8 +7,14 @@ export async function insertSiteConfigIfMissing(
   preset: TPresetId,
   accentHue?: number,
 ): Promise<void> {
-  const { themeTokens, cardStyle, headerControlStyle } =
-    PRESET_REGISTRY[preset];
+  const {
+    themeTokens,
+    cardStyle,
+    headerControlStyle,
+    accountButtonStyle,
+    accountPanelStyle,
+    accountPhonePlacement,
+  } = PRESET_REGISTRY[preset];
 
   await getDb()
     .insert(siteConfig)
@@ -22,6 +28,9 @@ export async function insertSiteConfigIfMissing(
       density: themeTokens.density,
       cardStyle,
       headerControlStyle,
+      accountButtonStyle,
+      accountPanelStyle,
+      accountPhonePlacement,
     })
     .onConflictDoNothing({ target: siteConfig.tenantId });
 }

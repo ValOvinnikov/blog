@@ -1,4 +1,7 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   DENSITY,
   FONT_CHOICE,
   HUE_MAX,
@@ -28,3 +31,9 @@ export const MOCK_SITE_CONFIG_FIELDS = {
   radiusScale: RADIUS_SCALE.MD,
   density: DENSITY.DEFAULT,
 } satisfies TUpdateSiteConfigInput;
+
+export const DEFAULT_ACCOUNT_CONTROLS = {
+  accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+  accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
+  accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
+} satisfies Partial<TUpdateSiteConfigInput>;

@@ -1,5 +1,8 @@
 import type { TVoicePortableText } from '@blog/config';
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -7,6 +10,9 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  type TAccountButtonStyle,
+  type TAccountPanelStyle,
+  type TAccountPhonePlacement,
   type TCardStyle,
   type TDensity,
   type TFontChoice,
@@ -70,6 +76,30 @@ export const headerControlStyleEnum = pgEnum(
   ],
 );
 
+export const accountButtonStyleEnum = pgEnum(
+  'account_button_style',
+  Object.values(ACCOUNT_BUTTON_STYLE) as [
+    TAccountButtonStyle,
+    ...TAccountButtonStyle[],
+  ],
+);
+
+export const accountPanelStyleEnum = pgEnum(
+  'account_panel_style',
+  Object.values(ACCOUNT_PANEL_STYLE) as [
+    TAccountPanelStyle,
+    ...TAccountPanelStyle[],
+  ],
+);
+
+export const accountPhonePlacementEnum = pgEnum(
+  'account_phone_placement',
+  Object.values(ACCOUNT_PHONE_PLACEMENT) as [
+    TAccountPhonePlacement,
+    ...TAccountPhonePlacement[],
+  ],
+);
+
 export type TVoiceOverrideValue = string | TVoicePortableText;
 
 export type TVoiceOverrides = Record<string, TVoiceOverrideValue>;
@@ -101,6 +131,15 @@ export const siteConfig = pgTable('site_config', {
   headerControlStyle: headerControlStyleEnum('header_control_style')
     .notNull()
     .default(HEADER_CONTROL_STYLE.OUTLINED),
+  accountButtonStyle: accountButtonStyleEnum('account_button_style')
+    .notNull()
+    .default(ACCOUNT_BUTTON_STYLE.PILL),
+  accountPanelStyle: accountPanelStyleEnum('account_panel_style')
+    .notNull()
+    .default(ACCOUNT_PANEL_STYLE.CARD),
+  accountPhonePlacement: accountPhonePlacementEnum('account_phone_placement')
+    .notNull()
+    .default(ACCOUNT_PHONE_PLACEMENT.BAR),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverridesByLocale: jsonb('voice_overrides')
