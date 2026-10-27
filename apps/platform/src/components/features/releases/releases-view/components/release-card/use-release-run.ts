@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 
 type TReleaseRunResult = TReleaseResult<TMaybeUndefined<TReleaseRun>>;
 
-const POLL_INTERVAL_MS = 10_000;
+export const POLL_INTERVAL_MS = 10_000;
 // 90 minutes: outlasts the gate, the tenant fan-out and both deploys.
 const MAX_POLL_TICKS = (90 * 60_000) / POLL_INTERVAL_MS;
 // Tolerates the browser's clock running ahead of GitHub's.

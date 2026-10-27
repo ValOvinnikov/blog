@@ -15,6 +15,7 @@ import {
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReleaseCard } from './release-card';
+import { POLL_INTERVAL_MS } from './use-release-run';
 
 faker.seed(5994);
 
@@ -54,7 +55,7 @@ const setup = customRender(ReleaseCard, {
 
 const advancePoll = async () => {
   await act(async () => {
-    await vi.advanceTimersByTimeAsync(10_000);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
   });
 };
 
