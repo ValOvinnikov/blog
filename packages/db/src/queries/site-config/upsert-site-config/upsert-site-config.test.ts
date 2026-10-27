@@ -10,7 +10,10 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   HUE_MAX,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
@@ -108,6 +111,9 @@ const STYLE_FIELDS = [
   { field: 'accountPhonePlacement', value: ACCOUNT_PHONE_PLACEMENT.MENU },
   { field: 'busyButtonStyle', value: BUSY_BUTTON_STYLE.EDGE },
   { field: 'spinnerStyle', value: SPINNER_STYLE.BRAILLE },
+  { field: 'headerLayout', value: HEADER_LAYOUT.CENTRED_BRAND },
+  { field: 'headerSubmenuStyle', value: HEADER_SUBMENU_STYLE.WIDE_PANEL },
+  { field: 'headerBarStyle', value: HEADER_BAR_STYLE.FLOATING },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -186,6 +192,27 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       spinnerStyle:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['spinnerStyle'],
+    },
+  ],
+  [
+    'an unknown header layout',
+    {
+      headerLayout:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerLayout'],
+    },
+  ],
+  [
+    'an unknown header sub-menu style',
+    {
+      headerSubmenuStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerSubmenuStyle'],
+    },
+  ],
+  [
+    'an unknown header bar style',
+    {
+      headerBarStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerBarStyle'],
     },
   ],
   [
