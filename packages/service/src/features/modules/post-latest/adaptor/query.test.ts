@@ -12,15 +12,16 @@ import { postLatestModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const moduleDocument = mockModuleDocument({
+const MOCK_LIMIT = 3;
+const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   _type: 'module_postLatest',
-  limit: 3,
+  limit: MOCK_LIMIT,
 });
 
 async function runPostLatest(locale: string) {
   const raw = await evaluateGroqExpression(
     postLatestModuleQuery.query,
-    [moduleDocument],
+    [MOCK_MODULE_DOCUMENT],
     undefined,
     { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -42,15 +43,12 @@ describe('postLatestModuleQuery', () => {
     expect(displayMode).toBe(DISPLAY_MODE.GRID);
   });
 
-  it('picks the heading in the visitor language', async () => {
-    const { headingBlock } = await runPostLatest(NL);
+  it.each([
+    [NL, MOCK_DUTCH_MODULE_HEADING],
+    [FR, MOCK_ENGLISH_MODULE_HEADING],
+  ])('resolves the heading text for a %s visitor', async (locale, expected) => {
+    const { headingBlock } = await runPostLatest(locale);
 
-    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
-  });
-
-  it('falls back to the default language for the heading', async () => {
-    const { headingBlock } = await runPostLatest(FR);
-
-    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
+    expect(headingBlock.heading).toBe(expected);
   });
 });

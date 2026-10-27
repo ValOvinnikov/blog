@@ -23,12 +23,16 @@ async function run(limit: number, locale: string): Promise<string[]> {
   );
 }
 
-describe('postLatestModulePostsQuery', () => {
-  it('lists published posts in the request language, newest first, up to the limit', async () => {
-    expect(await run(2, EN)).toEqual([
-      MOCK_ONLY_EN_POST_ID,
-      MOCK_DESIGN_EN_POST_ID,
-    ]);
-    expect(await run(3, NL)).toEqual([MOCK_DESIGN_NL_POST_ID]);
-  });
+describe(postLatestModulePostsQuery, () => {
+  it.each([
+    [2, EN, [MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID]],
+    [3, NL, [MOCK_DESIGN_NL_POST_ID]],
+  ])(
+    'lists up to %i newest published posts in the %s language',
+    async (limit, locale, expected) => {
+      const ids = await run(limit, locale);
+
+      expect(ids).toEqual(expected);
+    },
+  );
 });
