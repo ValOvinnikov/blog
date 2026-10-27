@@ -4,6 +4,13 @@ import {
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_CUSTOM_BODY,
+  MOCK_CUSTOM_SUBJECT,
+  MOCK_FRENCH_SUBJECT,
+  MOCK_GERMAN_SUBJECT,
+  MOCK_LOGO_URL,
+} from '@blog/db/testing/email-templates/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -11,16 +18,11 @@ import { getEmailTemplate } from './get-email-template';
 
 vi.mock('@blog/db/client');
 
-const MOCK_CUSTOM_SUBJECT = 'Custom sign-in subject';
-const MOCK_NEWSLETTER_LOGO_URL = 'https://blob.example.com/newsletter-logo.png';
-const MOCK_GERMAN_SUBJECT = 'Deutscher Betreff';
-const MOCK_FRENCH_SUBJECT = 'Sujet français';
-const MOCK_LOGO_URL = 'https://blob.example.com/logo.png';
-
 const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.emailTemplates);
+  await db().delete(schema.emailTemplateLogos);
   await db().delete(schema.tenants);
 });
 
@@ -31,7 +33,7 @@ describe(getEmailTemplate, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns full product defaults when no row exists for the template type', async () => {
+  it('returns full product defaults when no row exists for the type', async () => {
     const result = await getEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -64,27 +66,11 @@ describe(getEmailTemplate, () => {
   });
 
   it('renders the default subject when only the body has been authored', async () => {
-    const customBody = [
-      {
-        _type: 'block',
-        _key: 'custom-1',
-        style: 'normal',
-        markDefs: [],
-        children: [
-          {
-            _type: 'span',
-            _key: 'custom-1-span',
-            text: 'Custom body.',
-            marks: [],
-          },
-        ],
-      },
-    ];
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       locale: LOCALE_ISO_CODES.EN,
-      body: customBody,
+      body: MOCK_CUSTOM_BODY,
     });
 
     const result = await getEmailTemplate(
@@ -93,28 +79,35 @@ describe(getEmailTemplate, () => {
     );
 
     expect(result.subject).toBe(EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.subject);
-    expect(result.body).toEqual(customBody);
+    expect(result.body).toEqual(MOCK_CUSTOM_BODY);
   });
 
-  it('returns the authored logoAssetUrl when set, and undefined when not', async () => {
-    await db().insert(schema.emailTemplateLogos).values({
-      tenantId,
-      templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-      logoAssetUrl: MOCK_NEWSLETTER_LOGO_URL,
+  describe('logo override', () => {
+    beforeEach(async () => {
+      await db().insert(schema.emailTemplateLogos).values({
+        tenantId,
+        templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+        logoAssetUrl: MOCK_LOGO_URL,
+      });
     });
 
-    const result = await getEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-    );
+    it('returns the authored logoAssetUrl for its template type', async () => {
+      const result = await getEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+      );
 
-    expect(result.logoAssetUrl).toBe(MOCK_NEWSLETTER_LOGO_URL);
+      expect(result.logoAssetUrl).toBe(MOCK_LOGO_URL);
+    });
 
-    const other = await getEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
-    );
-    expect(other.logoAssetUrl).toBeUndefined();
+    it('returns no logoAssetUrl for a template type without one', async () => {
+      const result = await getEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
+      );
+
+      expect(result.logoAssetUrl).toBeUndefined();
+    });
   });
 });
 
@@ -154,7 +147,7 @@ describe('per-language fallback', () => {
     expect(result.subject).toBe(MOCK_FRENCH_SUBJECT);
   });
 
-  it("falls back to the tenant's default language when the requested one has none", async () => {
+  it("falls back to the tenant's default language when none is authored", async () => {
     const result = await getEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -164,7 +157,7 @@ describe('per-language fallback', () => {
     expect(result.subject).toBe(MOCK_GERMAN_SUBJECT);
   });
 
-  it('falls back to the product default in the requested language when neither has the field', async () => {
+  it('falls back to the product default in the requested language', async () => {
     const result = await getEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
