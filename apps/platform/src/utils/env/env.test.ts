@@ -1,42 +1,48 @@
 import { KEY_ENCODING } from '@blog/utils/encryption';
 import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { faker } from '@faker-js/faker';
 import {
   MOCK_WEB_APP_URL,
   MOCK_REVALIDATE_SECRET,
 } from '@platform/testing/env/fixtures';
 
-const RESEND_KEY = 'resend-key';
-const GITHUB_REPO = 'acme-org/acme-repo';
-const WORKER_URL = 'https://worker-dev.example.com';
-const BLOB_TOKEN = 'vercel_blob_rw_store_token';
-const GITHUB_TOKEN = 'ghp_token';
-const VERCEL_TOKEN = 'vercel-token';
-const VERCEL_PROJECT = 'prj_123';
-const VERCEL_TEAM = 'team_123';
+faker.seed(1);
+
+const MOCK_RESEND_KEY = faker.string.alphanumeric(24);
+const MOCK_GITHUB_REPO = `${faker.lorem.word()}/${faker.lorem.word()}`;
+const MOCK_WORKER_URL = faker.internet.url();
+const MOCK_BLOB_TOKEN = faker.string.alphanumeric(24);
+const MOCK_GITHUB_TOKEN = faker.string.alphanumeric(24);
+const MOCK_VERCEL_TOKEN = faker.string.alphanumeric(24);
+const MOCK_VERCEL_PROJECT = faker.string.alphanumeric(12);
+const MOCK_VERCEL_TEAM = faker.string.alphanumeric(12);
+const MOCK_AUTH_SECRET = faker.string.alphanumeric(24);
+const MOCK_INVALID_GITHUB_REPO = faker.lorem.word();
+const MOCK_INVALID_URL = faker.lorem.word();
 const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 
 const OPTIONAL_VALID_VALUE = {
-  RESEND_API_KEY: RESEND_KEY,
-  BLOB_READ_WRITE_TOKEN: BLOB_TOKEN,
+  RESEND_API_KEY: MOCK_RESEND_KEY,
+  BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN,
   WEB_APP_URL: MOCK_WEB_APP_URL,
   SITE_CONFIG_REVALIDATE_SECRET: MOCK_REVALIDATE_SECRET,
-  TENANT_PROVISIONING_GITHUB_TOKEN: GITHUB_TOKEN,
-  TENANT_PROVISIONING_GITHUB_REPO: GITHUB_REPO,
-  VERCEL_API_TOKEN: VERCEL_TOKEN,
-  VERCEL_PROJECT_ID_WEB: VERCEL_PROJECT,
-  VERCEL_TEAM_ID: VERCEL_TEAM,
+  TENANT_PROVISIONING_GITHUB_TOKEN: MOCK_GITHUB_TOKEN,
+  TENANT_PROVISIONING_GITHUB_REPO: MOCK_GITHUB_REPO,
+  VERCEL_API_TOKEN: MOCK_VERCEL_TOKEN,
+  VERCEL_PROJECT_ID_WEB: MOCK_VERCEL_PROJECT,
+  VERCEL_TEAM_ID: MOCK_VERCEL_TEAM,
 } as const;
 
 const VALID_VALUE = {
   ...OPTIONAL_VALID_VALUE,
-  WORKER_ENQUEUE_URL: WORKER_URL,
+  WORKER_ENQUEUE_URL: MOCK_WORKER_URL,
 } as const;
 
 const INVALID_VALUE = {
   PERSONAL_DATA_INDEX_KEY: SHORT_KEY,
   PERSONAL_DATA_ENCRYPTION_KEY: `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`,
-  TENANT_PROVISIONING_GITHUB_REPO: 'acme-repo',
-  WORKER_ENQUEUE_URL: 'worker-dev',
+  TENANT_PROVISIONING_GITHUB_REPO: MOCK_INVALID_GITHUB_REPO,
+  WORKER_ENQUEUE_URL: MOCK_INVALID_URL,
 } as const;
 
 const ENV_KEYS = [
@@ -81,7 +87,7 @@ const importEnvOnServer = async (): Promise<typeof import('./env')> => {
 
 describe('env', () => {
   beforeEach(() => {
-    process.env['AUTH_SECRET'] = 'test-auth-secret';
+    process.env['AUTH_SECRET'] = MOCK_AUTH_SECRET;
     delete process.env['SKIP_ENV_VALIDATION'];
   });
 

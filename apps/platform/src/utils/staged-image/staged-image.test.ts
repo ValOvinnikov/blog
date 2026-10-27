@@ -1,27 +1,37 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { UPLOAD_OPERATION, UPLOAD_REFUSAL } from '@platform/constants/upload';
 
 import { persistStagedImage } from './staged-image';
 
-const STORED_URL = 'https://cdn/a';
-const LOCAL_URL = 'blob:local';
+faker.seed(6006);
 
-describe('persistStagedImage', () => {
+const MOCK_STORED_URL = faker.internet.url();
+const MOCK_LOCAL_URL = `blob:${faker.internet.url()}`;
+const MOCK_FILE = new File(
+  [faker.lorem.word()],
+  faker.system.commonFileName('png'),
+  {
+    type: 'image/png',
+  },
+);
+
+describe(persistStagedImage, () => {
   it('uploads a staged file and returns the stored url', async () => {
-    const file = new File(['x'], 'logo.png', { type: 'image/png' });
     const upload = vi.fn().mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
-      url: STORED_URL,
+      url: MOCK_STORED_URL,
     });
     const clear = vi.fn();
 
     const result = await persistStagedImage(
-      { url: LOCAL_URL, file },
+      { url: MOCK_LOCAL_URL, file: MOCK_FILE },
       { upload, clear },
     );
 
-    expect(result).toEqual({ ok: true, data: { url: STORED_URL } });
-    expect(upload.mock.calls[0]?.[0].get('file')).toBe(file);
+    const [formData] = upload.mock.calls[0] ?? [];
+    expect(result).toEqual({ ok: true, data: { url: MOCK_STORED_URL } });
+    expect(formData.get('file')).toBe(MOCK_FILE);
     expect(clear).not.toHaveBeenCalled();
   });
 
@@ -41,33 +51,26 @@ describe('persistStagedImage', () => {
   });
 
   it('passes an upload refusal through as an upload failure', async () => {
-    const file = new File(['x'], 'logo.png', { type: 'image/png' });
-    const upload = vi.fn().mockResolvedValue({
+    const refusal = {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: UPLOAD_REFUSAL.FILE_MISSING,
-    });
+    };
+    const upload = vi.fn().mockResolvedValue(refusal);
 
     const result = await persistStagedImage(
-      { url: LOCAL_URL, file },
+      { url: MOCK_LOCAL_URL, file: MOCK_FILE },
       { upload, clear: vi.fn() },
     );
 
     expect(result).toEqual({
       ok: false,
-      error: {
-        failure: {
-          outcome: ACTION_OUTCOME.REFUSED,
-          reason: UPLOAD_REFUSAL.FILE_MISSING,
-        },
-        operation: UPLOAD_OPERATION.UPLOAD,
-      },
+      error: { failure: refusal, operation: UPLOAD_OPERATION.UPLOAD },
     });
   });
 
   it('passes a clear error through as a clear failure', async () => {
-    const clear = vi
-      .fn()
-      .mockResolvedValue({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    const serverError = { outcome: ACTION_OUTCOME.SERVER_ERROR };
+    const clear = vi.fn().mockResolvedValue(serverError);
 
     const result = await persistStagedImage(
       { url: undefined },
@@ -76,10 +79,7 @@ describe('persistStagedImage', () => {
 
     expect(result).toEqual({
       ok: false,
-      error: {
-        failure: { outcome: ACTION_OUTCOME.SERVER_ERROR },
-        operation: UPLOAD_OPERATION.CLEAR,
-      },
+      error: { failure: serverError, operation: UPLOAD_OPERATION.CLEAR },
     });
   });
 });

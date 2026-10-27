@@ -10,6 +10,7 @@ import type {
   TTenant,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -21,18 +22,23 @@ import {
 
 import { ownerStudioAccessFor } from './owner-studio-access';
 
+faker.seed(1);
+
 const owner = mockMembership();
-const invitedAt = new Date('2026-10-18T09:00:00.000Z');
-const acceptedAt = new Date('2026-10-18T10:00:00.000Z');
-const beforeStall = new Date(
-  invitedAt.getTime() + OWNER_ACCESS_STALL_AFTER_MS - 1,
+const MOCK_INVITED_AT = new Date('2026-10-18T09:00:00.000Z');
+const MOCK_ACCEPTED_AT = new Date('2026-10-18T10:00:00.000Z');
+const MOCK_BEFORE_STALL = new Date(
+  MOCK_INVITED_AT.getTime() + OWNER_ACCESS_STALL_AFTER_MS - 1,
 );
-const atStall = new Date(invitedAt.getTime() + OWNER_ACCESS_STALL_AFTER_MS);
-const sanityUserId = 'sanity-user-1';
+const MOCK_AT_STALL = new Date(
+  MOCK_INVITED_AT.getTime() + OWNER_ACCESS_STALL_AFTER_MS,
+);
+const MOCK_SANITY_USER_ID = faker.string.uuid();
+const MOCK_UNKNOWN_OWNER_CHECK = faker.string.alpha(12);
 
 const invitedTenant = (overrides: Partial<TTenant> = {}) =>
   mockReadyTenant({
-    ownerInviteSentAt: invitedAt,
+    ownerInviteSentAt: MOCK_INVITED_AT,
     ...overrides,
   });
 
@@ -48,15 +54,15 @@ const ownerCheckSteps = (detail: string) =>
 const stalledSteps = ownerCheckSteps(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
 
 const joined = {
-  ownerInviteAcceptedAt: acceptedAt,
-  ownerSanityUserId: sanityUserId,
+  ownerInviteAcceptedAt: MOCK_ACCEPTED_AT,
+  ownerSanityUserId: MOCK_SANITY_USER_ID,
 };
 
 describe(ownerStudioAccessFor, () => {
   it('is INVITE_SENT while the invite waits for the owner', () => {
-    expect(ownerStudioAccessFor(invitedTenant(), owner, beforeStall)).toBe(
-      OWNER_STUDIO_ACCESS.INVITE_SENT,
-    );
+    expect(
+      ownerStudioAccessFor(invitedTenant(), owner, MOCK_BEFORE_STALL),
+    ).toBe(OWNER_STUDIO_ACCESS.INVITE_SENT);
   });
 
   it('is STALLED once the owner check reports a stall', () => {
@@ -67,8 +73,8 @@ describe(ownerStudioAccessFor, () => {
     );
   });
 
-  it('is ACTIVATING while the Sanity user is known but acceptance is not recorded', () => {
-    const tenant = invitedTenant({ ownerSanityUserId: sanityUserId });
+  it('is ACTIVATING once the Sanity user is known but acceptance is not recorded', () => {
+    const tenant = invitedTenant({ ownerSanityUserId: MOCK_SANITY_USER_ID });
 
     expect(ownerStudioAccessFor(tenant, owner)).toBe(
       OWNER_STUDIO_ACCESS.ACTIVATING,
@@ -100,17 +106,17 @@ describe(ownerStudioAccessFor, () => {
     { record: 'no recorded', provisioningSteps: mockIdleProvisioningSteps() },
     {
       record: 'an unrecognised',
-      provisioningSteps: ownerCheckSteps('NOT_AN_OUTCOME'),
+      provisioningSteps: ownerCheckSteps(MOCK_UNKNOWN_OWNER_CHECK),
     },
   ])(
-    'is STALLED once the invite reaches the stall threshold with $record owner check outcome',
+    'is STALLED at the stall threshold with $record owner check outcome',
     ({ provisioningSteps }) => {
       const tenant = invitedTenant({ provisioningSteps });
 
-      expect(ownerStudioAccessFor(tenant, owner, atStall)).toBe(
+      expect(ownerStudioAccessFor(tenant, owner, MOCK_AT_STALL)).toBe(
         OWNER_STUDIO_ACCESS.STALLED,
       );
-      expect(ownerStudioAccessFor(tenant, owner, beforeStall)).toBe(
+      expect(ownerStudioAccessFor(tenant, owner, MOCK_BEFORE_STALL)).toBe(
         OWNER_STUDIO_ACCESS.INVITE_SENT,
       );
     },
@@ -123,7 +129,7 @@ describe(ownerStudioAccessFor, () => {
       ),
     });
 
-    expect(ownerStudioAccessFor(tenant, owner, atStall)).toBe(
+    expect(ownerStudioAccessFor(tenant, owner, MOCK_AT_STALL)).toBe(
       OWNER_STUDIO_ACCESS.INVITE_SENT,
     );
   });

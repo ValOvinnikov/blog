@@ -10,69 +10,70 @@ import {
 import { toPersonalDataExportCsv } from './personal-data-export-csv';
 
 const ROW_SEPARATOR = '\r\n';
+const KIND_COLUMN_INDEX = 3;
 
 const toRows = (csv: string) => csv.trim().split(ROW_SEPARATOR);
 
+const mockEmptyPersonalDataExport = () => ({
+  ...mockPersonalDataExport(),
+  subscribers: [],
+  leads: [],
+  membershipInvites: [],
+  readerAccount: undefined,
+  blockedSignupIdentities: [],
+  auditEvents: [],
+});
+
 describe(toPersonalDataExportCsv, () => {
-  it('writes one row per exported record, each kind named', () => {
-    const [, ...rows] = toRows(
-      toPersonalDataExportCsv(mockPersonalDataExport()),
-    );
+  describe('with every kind of record stored', () => {
+    let csv: string;
 
-    const kinds = rows.map((row) => row.split(',')[3]);
+    beforeEach(() => {
+      csv = toPersonalDataExportCsv(mockPersonalDataExport());
+    });
 
-    expect(kinds).toEqual([
-      DATA_REQUEST_MATCH_KIND.SUBSCRIBER,
-      DATA_REQUEST_MATCH_KIND.LEAD,
-      DATA_REQUEST_MATCH_KIND.INVITE,
-      DATA_REQUEST_MATCH_KIND.READER_ACCOUNT,
-      DATA_REQUEST_MATCH_KIND.BOOKMARK,
-      DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
-      DATA_REQUEST_MATCH_KIND.AUDIT_EVENT,
-    ]);
-  });
+    it('writes one row per exported record, each kind named', () => {
+      const [, ...rows] = toRows(csv);
 
-  it('starts every row with when it was made, the searched email and the operator', () => {
-    const [, ...rows] = toRows(
-      toPersonalDataExportCsv(mockPersonalDataExport()),
-    );
+      const kinds = rows.map((row) => row.split(',')[KIND_COLUMN_INDEX]);
 
-    const leading = `${MOCK_EXPORT_GENERATED_AT.toISOString()},${MOCK_DATA_REQUEST_EMAIL},${mockAdmin().userId},`;
+      expect(kinds).toEqual([
+        DATA_REQUEST_MATCH_KIND.SUBSCRIBER,
+        DATA_REQUEST_MATCH_KIND.LEAD,
+        DATA_REQUEST_MATCH_KIND.INVITE,
+        DATA_REQUEST_MATCH_KIND.READER_ACCOUNT,
+        DATA_REQUEST_MATCH_KIND.BOOKMARK,
+        DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
+        DATA_REQUEST_MATCH_KIND.AUDIT_EVENT,
+      ]);
+    });
 
-    expect(rows.every((row) => row.startsWith(leading))).toBe(true);
-  });
+    it('starts every row with its time, the searched email and the operator', () => {
+      const [, ...rows] = toRows(csv);
+      const leading = `${MOCK_EXPORT_GENERATED_AT.toISOString()},${MOCK_DATA_REQUEST_EMAIL},${mockAdmin().userId},`;
 
-  it('writes dates as ISO times', () => {
-    const csv = toPersonalDataExportCsv(mockPersonalDataExport());
+      const startsWithLeading = rows.map((row) => row.startsWith(leading));
 
-    const { createdAt } = mockPersonalDataExport().leads[0] ?? {};
+      expect(startsWithLeading).toEqual(rows.map(() => true));
+    });
 
-    expect(csv).toContain(createdAt?.toISOString());
+    it('writes dates as ISO times', () => {
+      const { createdAt } = mockPersonalDataExport().leads[0] ?? {};
+
+      expect(csv).toContain(createdAt?.toISOString());
+    });
   });
 
   it('writes only the header row when nothing is stored', () => {
-    const csv = toPersonalDataExportCsv({
-      ...mockPersonalDataExport(),
-      subscribers: [],
-      leads: [],
-      membershipInvites: [],
-      readerAccount: undefined,
-      blockedSignupIdentities: [],
-      auditEvents: [],
-    });
+    const csv = toPersonalDataExportCsv(mockEmptyPersonalDataExport());
 
     expect(toRows(csv)).toHaveLength(1);
   });
 
   it('lists a reader account without bookmarks as a single row', () => {
     const csv = toPersonalDataExportCsv({
-      ...mockPersonalDataExport(),
-      subscribers: [],
-      leads: [],
-      membershipInvites: [],
+      ...mockEmptyPersonalDataExport(),
       readerAccount: mockPersonalDataReaderAccount({ bookmarks: [] }),
-      blockedSignupIdentities: [],
-      auditEvents: [],
     });
 
     expect(toRows(csv)).toHaveLength(2);

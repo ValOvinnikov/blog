@@ -1,18 +1,23 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@platform/testing/custom-render';
 
 import { useRelativeTimeTick } from './use-relative-time-tick';
 
 describe(useRelativeTimeTick, () => {
-  it('clears its interval on unmount, leaving no timer behind', () => {
+  beforeEach(() => {
     vi.useFakeTimers();
-    expect(vi.getTimerCount()).toBe(0);
+  });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('clears its interval on unmount, leaving no timer behind', () => {
     const { unmount } = renderHook(() => useRelativeTimeTick());
+
     expect(vi.getTimerCount()).toBe(1);
 
     unmount();
-    expect(vi.getTimerCount()).toBe(0);
 
-    vi.useRealTimers();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

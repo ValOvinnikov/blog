@@ -1,4 +1,5 @@
 import { ADMIN_ROLE } from '@blog/db/constants';
+import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -7,265 +8,19 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 
 import {
   dashboardNavSections,
+  EVERY_PLAN_PAGE,
+  navLabelForPathname,
   operatorNavSections,
   tenantNavSections,
 } from './nav-sections';
 
 const t = makeEnTranslator('navSections');
 
-const BLOCKED_SIGNUPS_LABEL = 'Blocked sign-ups';
-const DATA_REQUESTS_LABEL = 'Data requests';
-const COMING_SOON_LABEL = 'Coming soon';
-const PLATFORM_BADGE_LABEL = 'platform';
-const PROVISIONING_LABEL = 'Provisioning';
-const DANGER_ZONE_LABEL = 'Danger zone';
-
-describe('operatorNavSections', () => {
-  it('gives both Tenants and Add tenant real hrefs', () => {
-    const [platform] = operatorNavSections(t, ADMIN_ROLE.ADMIN);
-    const tenants = platform!.items.find((item) => item.label === 'Tenants');
-    const addTenant = platform!.items.find(
-      (item) => item.label === 'Add tenant',
-    );
-
-    expect(tenants).toMatchObject({ href: adminRoutes.tenants() });
-    expect(addTenant).toMatchObject({ href: adminRoutes.newTenant() });
-    expect(addTenant?.badge).toBeUndefined();
-  });
-
-  it('gives Findings a real href, unbadged', () => {
-    const [platform] = operatorNavSections(t, ADMIN_ROLE.ADMIN);
-    const findings = platform!.items.find((item) => item.label === 'Findings');
-
-    expect(findings).toMatchObject({ href: '/findings' });
-    expect(findings?.badge).toBeUndefined();
-  });
-
-  it('gives a SUPERADMIN a Releases entry', () => {
-    const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
-
-    expect(
-      platform!.items.find((item) => item.label === 'Releases'),
-    ).toMatchObject({ href: '/releases' });
-  });
-
-  it.each([
-    [BLOCKED_SIGNUPS_LABEL, adminRoutes.blockedSignups()],
-    [DATA_REQUESTS_LABEL, adminRoutes.dataRequests()],
-  ])('gives a SUPERADMIN a %s entry', (label, href) => {
-    const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
-
-    expect(platform!.items.find((item) => item.label === label)).toMatchObject({
-      href,
-    });
-  });
-
-  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    'omits the Blocked sign-ups and Data requests entries for a %s',
-    (role) => {
-      const [platform] = operatorNavSections(t, role);
-      const labels = platform!.items.map((item) => item.label);
-
-      expect(labels).not.toContain(BLOCKED_SIGNUPS_LABEL);
-      expect(labels).not.toContain(DATA_REQUESTS_LABEL);
-    },
-  );
-
-  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    'omits the Releases entry for a %s',
-    (role) => {
-      const [platform] = operatorNavSections(t, role);
-
-      expect(platform!.items.map((item) => item.label)).not.toContain(
-        'Releases',
-      );
-    },
-  );
-});
-
-describe('tenantNavSections', () => {
-  it("labels the main section with the tenant's name, not its id", () => {
-    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
-
-    expect(tenant!.label).toBe(`Tenant · ${MOCK_TENANT_NAME}`);
-    expect(tenant!.label).not.toContain(MOCK_TENANT_ID);
-  });
-
-  it('gives the main, content, configuration and platform sections distinct labels', () => {
-    const [tenant, content, configuration, platform] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    );
-    const labels = [
-      tenant!.label,
-      content!.label,
-      configuration!.label,
-      platform!.label,
-    ];
-
-    expect(new Set(labels).size).toBe(labels.length);
-    expect(content!.label).toBe('Content');
-    expect(configuration!.label).toBe('Configuration');
-  });
-
-  it('gives Overview a real href as the only item in the main section', () => {
-    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
-
-    expect(tenant!.items.map((item) => item.label)).toEqual(['Overview']);
-    expect(tenant!.items[0]).toMatchObject({
-      label: 'Overview',
-      href: adminRoutes.tenantOverview(MOCK_TENANT_ID),
-    });
-  });
-
-  it('puts Studio alone in the Content section, with a real href and no badge', () => {
-    const [, content] = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
-
-    expect(content!.items.map((item) => item.label)).toEqual(['Studio']);
-    expect(content!.items[0]).toMatchObject({
-      href: adminRoutes.tenantStudio(MOCK_TENANT_ID),
-    });
-    expect(content!.items[0]?.badge).toBeUndefined();
-  });
-
-  it('gives Look, Voice, Features, Domain and Email distinct real hrefs in the Configuration section', () => {
-    const [, , configuration] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    );
-    const look = configuration!.items.find((item) => item.label === 'Look');
-    const voice = configuration!.items.find((item) => item.label === 'Voice');
-    const features = configuration!.items.find(
-      (item) => item.label === 'Features',
-    );
-    const domain = configuration!.items.find((item) => item.label === 'Domain');
-    const email = configuration!.items.find((item) => item.label === 'Email');
-
-    expect(look?.href).toBe(adminRoutes.look(MOCK_TENANT_ID));
-    expect(voice?.href).toBe(adminRoutes.voice(MOCK_TENANT_ID));
-    expect(features?.href).toBe(adminRoutes.features(MOCK_TENANT_ID));
-    expect(
-      configuration!.items.find((item) => item.label === 'Leads')?.href,
-    ).toBe(adminRoutes.leads(MOCK_TENANT_ID));
-    expect(domain?.href).toBe(adminRoutes.tenantDomain(MOCK_TENANT_ID));
-    expect(email?.href).toBe(adminRoutes.email(MOCK_TENANT_ID));
-    expect(look?.href).not.toBe(voice?.href);
-  });
-
-  it('leaves Look, Voice, Features, Languages, Domain and Email unbadged', () => {
-    const shippedLabels = [
-      'Look',
-      'Voice',
-      'Features',
-      'Languages',
-      'Domain',
-      'Email',
-    ];
-    const [, , configuration] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    );
-    const shipped = configuration!.items.filter((item) =>
-      shippedLabels.includes(item.label),
-    );
-
-    expect(shipped.map((item) => item.label)).toEqual(shippedLabels);
-    for (const item of shipped) {
-      expect(item.badge).toBeUndefined();
-    }
-  });
-
-  it('shows Subscribers, Comments and Team as non-interactive "Coming soon" entries', () => {
-    const [, , configuration] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    );
-    const comingSoon = configuration!.items.filter(
-      (item) => item.badge?.label === COMING_SOON_LABEL,
-    );
-
-    expect(comingSoon.map((item) => item.label)).toEqual([
-      'Subscribers',
-      'Comments',
-      'Team',
-    ]);
-    for (const item of comingSoon) {
-      expect(item.href).toBeUndefined();
-    }
-  });
-
-  it('carries no "this milestone" or "later" badge on any entry', () => {
-    const labels = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    ).flatMap((section) => section.items.map((item) => item.badge?.label));
-
-    expect(labels).not.toContain('this milestone');
-    expect(labels).not.toContain('later');
-  });
-
-  it('lists the ten Configuration destinations, Look through Team, with no Studio', () => {
-    const [, , configuration] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    );
-
-    expect(configuration!.items.map((item) => item.label)).toEqual([
-      'Look',
-      'Voice',
-      'Features',
-      'Leads',
-      'Languages',
-      'Domain',
-      'Email',
-      'Subscribers',
-      'Comments',
-      'Team',
-    ]);
-  });
-
-  it('gives Provisioning and Danger zone real hrefs in the platform-only section, each badged "platform"', () => {
-    const [, , , platform] = tenantNavSections(
-      t,
-      MOCK_TENANT_ID,
-      MOCK_TENANT_NAME,
-    );
-
-    expect(platform!.items.map((item) => item.label)).toEqual([
-      PROVISIONING_LABEL,
-      DANGER_ZONE_LABEL,
-    ]);
-    expect(platform!.items[0]).toMatchObject({
-      href: adminRoutes.tenantProvisioning(MOCK_TENANT_ID),
-      badge: { label: PLATFORM_BADGE_LABEL, tone: 'neutral', hasDot: false },
-    });
-    expect(platform!.items[1]).toMatchObject({
-      href: adminRoutes.tenantDanger(MOCK_TENANT_ID),
-      badge: { label: PLATFORM_BADGE_LABEL, tone: 'neutral', hasDot: false },
-    });
-  });
-});
-
-const EVERY_PAGE: TPlanPageAccess = {
-  languages: true,
-  email: true,
-  leads: true,
-  subscribers: true,
-  comments: true,
-  team: true,
-};
-
-const NO_PAGE: TPlanPageAccess = {
+const NO_PLAN_PAGE: TPlanPageAccess = {
   languages: false,
   email: false,
   leads: false,
@@ -274,128 +29,332 @@ const NO_PAGE: TPlanPageAccess = {
   team: false,
 };
 
-const configurationLabels = (access: TPlanPageAccess) => {
-  const [, , configuration] = dashboardNavSections(t, access);
-  return configuration!.items.map((item) => item.label);
-};
+const CONFIGURATION_KEYS = [
+  'look',
+  'voice',
+  'features',
+  'leads',
+  'languages',
+  'domain',
+  'email',
+  'subscribers',
+  'comments',
+  'team',
+];
+const COMING_SOON_KEYS = ['subscribers', 'comments', 'team'];
+const ALWAYS_AVAILABLE_KEYS = ['look', 'voice', 'features', 'domain'];
+const SUPERADMIN_ONLY_KEYS = ['releases', 'blockedSignups', 'dataRequests'];
+const MOCK_UNREAD_LEADS_COUNT = 3;
 
-describe('dashboardNavSections', () => {
-  it("badges the Studio link with the owner's access state", () => {
-    const [, content] = dashboardNavSections(
-      t,
-      EVERY_PAGE,
-      OWNER_STUDIO_ACCESS.STALLED,
-    );
+const translated = (keys: string[]) => keys.map((key) => t(key));
+const labelsOf = (section: TSidebarNavSection) =>
+  section.items.map((item) => item.label);
+const itemKeyed = (section: TSidebarNavSection, key: string) =>
+  section.items.find((item) => item.label === t(key));
+const configurationOfDashboard = (access: TPlanPageAccess = EVERY_PLAN_PAGE) =>
+  dashboardNavSections(t, access)[2]!;
 
-    expect(content!.items[0]?.badge?.label).toBe('Action needed');
-  });
+describe(operatorNavSections, () => {
+  it.each([
+    ['tenants', adminRoutes.tenants()],
+    ['addTenant', adminRoutes.newTenant()],
+    ['findings', adminRoutes.findings()],
+  ])('links %s to its page for every admin', (key, href) => {
+    const [platform] = operatorNavSections(t, ADMIN_ROLE.ADMIN);
 
-  it('opens with a Dashboard section whose only item is Overview, at /dashboard', () => {
-    const [dashboard] = dashboardNavSections(t, EVERY_PAGE);
-    const [overview, ...rest] = dashboard!.items;
+    const item = itemKeyed(platform!, key);
 
-    expect(dashboard!.label).toBe('Dashboard');
-    expect(overview!.label).toBe('Overview');
-    expect(overview!.href).toBe(adminRoutes.dashboard());
-    expect(rest).toEqual([]);
-  });
-
-  it('lists Content (Studio) and Configuration, with every page the plan can use', () => {
-    const [, content, configuration] = dashboardNavSections(t, EVERY_PAGE);
-
-    expect(content!.label).toBe('Content');
-    expect(configuration!.label).toBe('Configuration');
-    expect(content!.items.map((item) => item.label)).toEqual(['Studio']);
-    expect(configurationLabels(EVERY_PAGE)).toEqual([
-      'Look',
-      'Voice',
-      'Features',
-      'Leads',
-      'Languages',
-      'Domain',
-      'Email',
-      'Subscribers',
-      'Comments',
-      'Team',
-    ]);
-  });
-
-  it('keeps only the pages every plan can use when the plan allows none of the gated ones', () => {
-    expect(configurationLabels(NO_PAGE)).toEqual([
-      'Look',
-      'Voice',
-      'Features',
-      'Domain',
-    ]);
+    expect(item?.href).toBe(href);
   });
 
   it.each([
-    ['languages', 'Languages'],
-    ['email', 'Email'],
-    ['leads', 'Leads'],
-    ['subscribers', 'Subscribers'],
-    ['comments', 'Comments'],
-    ['team', 'Team'],
-  ] as const)('shows %s only when the plan can use it', (page, label) => {
-    expect(configurationLabels({ ...NO_PAGE, [page]: true })).toContain(label);
-    expect(configurationLabels({ ...EVERY_PAGE, [page]: false })).not.toContain(
-      label,
-    );
+    ['releases', adminRoutes.releases()],
+    ['blockedSignups', adminRoutes.blockedSignups()],
+    ['dataRequests', adminRoutes.dataRequests()],
+  ])('links %s to its page for a SUPERADMIN', (key, href) => {
+    const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
+
+    const item = itemKeyed(platform!, key);
+
+    expect(item?.href).toBe(href);
   });
 
-  it('shows Subscribers, Comments and Team as non-interactive entries on the dashboard', () => {
-    const [, , configuration] = dashboardNavSections(t, EVERY_PAGE);
-    const comingSoon = configuration!.items.filter(
-      (item) => item.badge?.label === COMING_SOON_LABEL,
+  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+    'omits the SUPERADMIN-only entries for a %s',
+    (role) => {
+      const [platform] = operatorNavSections(t, role);
+
+      const labels = labelsOf(platform!);
+
+      for (const key of SUPERADMIN_ONLY_KEYS) {
+        expect(labels).not.toContain(t(key));
+      }
+    },
+  );
+});
+
+describe(tenantNavSections, () => {
+  let tenant: TSidebarNavSection;
+  let content: TSidebarNavSection;
+  let configuration: TSidebarNavSection;
+  let platform: TSidebarNavSection;
+
+  beforeEach(() => {
+    const sections = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
+    tenant = sections[0]!;
+    content = sections[1]!;
+    configuration = sections[2]!;
+    platform = sections[3]!;
+  });
+
+  it("labels the main section with the tenant's name, not its id", () => {
+    expect(tenant.label).toBe(
+      t('tenantLabel', { tenantName: MOCK_TENANT_NAME }),
+    );
+    expect(tenant.label).not.toContain(MOCK_TENANT_ID);
+  });
+
+  it('gives the four sections distinct labels', () => {
+    const labels = [tenant, content, configuration, platform].map(
+      (section) => section.label,
     );
 
-    expect(comingSoon.map((item) => item.label)).toEqual([
-      'Subscribers',
-      'Comments',
-      'Team',
-    ]);
-    for (const item of comingSoon) {
+    expect(new Set(labels).size).toBe(labels.length);
+  });
+
+  it('puts only Overview in the main section, linked to the tenant', () => {
+    const [overview, ...rest] = tenant.items;
+
+    expect(overview?.label).toBe(t('overview'));
+    expect(overview?.href).toBe(adminRoutes.tenantOverview(MOCK_TENANT_ID));
+    expect(rest).toEqual([]);
+  });
+
+  it('puts only Studio in the Content section, linked to the tenant', () => {
+    const [studio, ...rest] = content.items;
+
+    expect(studio?.label).toBe(t('studio'));
+    expect(studio?.href).toBe(adminRoutes.tenantStudio(MOCK_TENANT_ID));
+    expect(rest).toEqual([]);
+  });
+
+  it('lists every Configuration destination, Look through Team', () => {
+    expect(labelsOf(configuration)).toEqual(translated(CONFIGURATION_KEYS));
+  });
+
+  it.each([
+    ['look', adminRoutes.look(MOCK_TENANT_ID)],
+    ['voice', adminRoutes.voice(MOCK_TENANT_ID)],
+    ['features', adminRoutes.features(MOCK_TENANT_ID)],
+    ['leads', adminRoutes.leads(MOCK_TENANT_ID)],
+    ['languages', adminRoutes.languages(MOCK_TENANT_ID)],
+    ['domain', adminRoutes.tenantDomain(MOCK_TENANT_ID)],
+    ['email', adminRoutes.email(MOCK_TENANT_ID)],
+  ])('links Configuration %s to the tenant page', (key, href) => {
+    const item = itemKeyed(configuration, key);
+
+    expect(item?.href).toBe(href);
+  });
+
+  it('marks only Subscribers, Comments and Team as unlinked coming soon', () => {
+    const badged = configuration.items.filter((item) => item.badge);
+
+    expect(badged.map((item) => item.label)).toEqual(
+      translated(COMING_SOON_KEYS),
+    );
+    for (const item of badged) {
+      expect(item.badge?.label).toBe(t('badgeComingSoon'));
       expect(item.href).toBeUndefined();
     }
   });
 
-  it('gives Look, Voice, Features, Languages, Domain, Email and Studio their /dashboard hrefs', () => {
-    const [, content, configuration] = dashboardNavSections(t, EVERY_PAGE);
-    const hrefOf = (label: string) =>
-      configuration!.items.find((item) => item.label === label)?.href;
+  it('links Provisioning and Danger zone, each badged as platform-only', () => {
+    expect(labelsOf(platform)).toEqual([t('provisioning'), t('dangerZone')]);
+    const [provisioning, dangerZone] = platform.items;
 
-    expect(hrefOf('Look')).toBe(adminRoutes.dashboardLook());
-    expect(hrefOf('Voice')).toBe(adminRoutes.dashboardVoice());
-    expect(hrefOf('Features')).toBe(adminRoutes.dashboardFeatures());
-    expect(hrefOf('Leads')).toBe(adminRoutes.dashboardLeads());
-    expect(hrefOf('Languages')).toBe(adminRoutes.dashboardLanguages());
-    expect(hrefOf('Domain')).toBe(adminRoutes.dashboardDomain());
-    expect(hrefOf('Email')).toBe(adminRoutes.dashboardEmail());
-    expect(content!.items[0]).toMatchObject({
-      href: adminRoutes.dashboardStudio(),
-    });
-    expect(content!.items[0]?.badge).toBeUndefined();
+    expect(provisioning?.href).toBe(
+      adminRoutes.tenantProvisioning(MOCK_TENANT_ID),
+    );
+    expect(provisioning?.badge?.label).toBe(t('badgePlatform'));
+    expect(dangerZone?.href).toBe(adminRoutes.tenantDanger(MOCK_TENANT_ID));
+    expect(dangerZone?.badge?.label).toBe(t('badgePlatform'));
   });
 
-  it('never includes Provisioning, Danger zone or a "Tenant · …" label', () => {
-    const sections = dashboardNavSections(t, EVERY_PAGE);
+  it('shows the unread lead count on the Leads entry', () => {
+    const [, , unreadConfiguration] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      MOCK_TENANT_NAME,
+      MOCK_UNREAD_LEADS_COUNT,
+    );
+
+    const leads = itemKeyed(unreadConfiguration!, 'leads');
+
+    expect(leads?.badge?.label).toBe(
+      t('badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
+    );
+  });
+});
+
+describe(dashboardNavSections, () => {
+  it("badges the Studio link with the owner's access state", () => {
+    const [, content] = dashboardNavSections(
+      t,
+      EVERY_PLAN_PAGE,
+      OWNER_STUDIO_ACCESS.STALLED,
+    );
+
+    expect(content!.items[0]?.badge?.label).toBe(
+      t(`studioAccess.${OWNER_STUDIO_ACCESS.STALLED}`),
+    );
+  });
+
+  it('opens with a Dashboard section holding only Overview', () => {
+    const [dashboard] = dashboardNavSections(t, EVERY_PLAN_PAGE);
+    const [overview, ...rest] = dashboard!.items;
+
+    expect(dashboard!.label).toBe(t('dashboardLabel'));
+    expect(overview?.label).toBe(t('overview'));
+    expect(overview?.href).toBe(adminRoutes.dashboard());
+    expect(rest).toEqual([]);
+  });
+
+  it('links Studio in the Content section', () => {
+    const [, content] = dashboardNavSections(t, EVERY_PLAN_PAGE);
+    const [studio, ...rest] = content!.items;
+
+    expect(studio?.label).toBe(t('studio'));
+    expect(studio?.href).toBe(adminRoutes.dashboardStudio());
+    expect(rest).toEqual([]);
+  });
+
+  it('lists every Configuration page when the plan can use them all', () => {
+    expect(labelsOf(configurationOfDashboard())).toEqual(
+      translated(CONFIGURATION_KEYS),
+    );
+  });
+
+  it('keeps only the always-available pages when the plan gates the rest', () => {
+    expect(labelsOf(configurationOfDashboard(NO_PLAN_PAGE))).toEqual(
+      translated(ALWAYS_AVAILABLE_KEYS),
+    );
+  });
+
+  it.each([
+    'languages',
+    'email',
+    'leads',
+    'subscribers',
+    'comments',
+    'team',
+  ] as const)('shows %s only when the plan can use it', (page) => {
+    const withPage = configurationOfDashboard({
+      ...NO_PLAN_PAGE,
+      [page]: true,
+    });
+    const withoutPage = configurationOfDashboard({
+      ...EVERY_PLAN_PAGE,
+      [page]: false,
+    });
+
+    expect(labelsOf(withPage)).toContain(t(page));
+    expect(labelsOf(withoutPage)).not.toContain(t(page));
+  });
+
+  it('badges only Subscribers, Comments and Team as coming soon', () => {
+    const badged = configurationOfDashboard().items.filter(
+      (item) => item.badge,
+    );
+
+    expect(badged.map((item) => item.label)).toEqual(
+      translated(COMING_SOON_KEYS),
+    );
+    for (const item of badged) {
+      expect(item.badge?.label).toBe(t('badgeComingSoon'));
+      expect(item.href).toBeUndefined();
+    }
+  });
+
+  it.each([
+    ['look', adminRoutes.dashboardLook()],
+    ['voice', adminRoutes.dashboardVoice()],
+    ['features', adminRoutes.dashboardFeatures()],
+    ['leads', adminRoutes.dashboardLeads()],
+    ['languages', adminRoutes.dashboardLanguages()],
+    ['domain', adminRoutes.dashboardDomain()],
+    ['email', adminRoutes.dashboardEmail()],
+  ])('links Configuration %s to its dashboard page', (key, href) => {
+    const item = itemKeyed(configurationOfDashboard(), key);
+
+    expect(item?.href).toBe(href);
+  });
+
+  it('badges Leads with the unread count when there are unread leads', () => {
+    const [, , configuration] = dashboardNavSections(
+      t,
+      EVERY_PLAN_PAGE,
+      undefined,
+      MOCK_UNREAD_LEADS_COUNT,
+    );
+
+    const leads = itemKeyed(configuration!, 'leads');
+
+    expect(leads?.badge?.label).toBe(
+      t('badgeUnreadLeads', { count: MOCK_UNREAD_LEADS_COUNT }),
+    );
+  });
+
+  it('never includes the platform-only entries or a tenant label', () => {
+    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
     const labels = [
       ...sections.map((section) => section.label),
-      ...sections.flatMap((section) => section.items.map((item) => item.label)),
+      ...sections.flatMap(labelsOf),
     ];
+    const tenantLabelPrefix = t('tenantLabel', { tenantName: '' });
 
-    expect(labels).not.toContain(PROVISIONING_LABEL);
-    expect(labels).not.toContain(DANGER_ZONE_LABEL);
-    expect(labels.filter((label) => label.startsWith('Tenant'))).toEqual([]);
+    expect(labels).not.toContain(t('provisioning'));
+    expect(labels).not.toContain(t('dangerZone'));
+    expect(
+      labels.filter((label) => label.startsWith(tenantLabelPrefix)),
+    ).toEqual([]);
+  });
+});
+
+describe(navLabelForPathname, () => {
+  it('finds the item whose href is the pathname', () => {
+    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
+
+    const label = navLabelForPathname(sections, adminRoutes.dashboardLook());
+
+    expect(label).toBe(t('look'));
+  });
+
+  it('finds the Studio item for a path below the Studio segment', () => {
+    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
+
+    const label = navLabelForPathname(
+      sections,
+      `${adminRoutes.dashboardStudio()}/${STUDIO_SEGMENT}`,
+    );
+
+    expect(label).toBe(t('studio'));
+  });
+
+  it('finds nothing for a path no item links to', () => {
+    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
+
+    const label = navLabelForPathname(sections, '/nowhere');
+
+    expect(label).toBeUndefined();
   });
 });
 
 describe('nav section icons', () => {
-  it('has a registered glyph for every icon a nav item references', () => {
+  it('registers a glyph for every icon a nav item references', () => {
     const items = [
       ...operatorNavSections(t, ADMIN_ROLE.SUPERADMIN),
       ...tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME),
-      ...dashboardNavSections(t, EVERY_PAGE),
+      ...dashboardNavSections(t, EVERY_PLAN_PAGE),
     ].flatMap((section) => section.items);
 
     const missing = items

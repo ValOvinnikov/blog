@@ -1,3 +1,4 @@
+import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
@@ -11,35 +12,39 @@ const renderInProvider = (isArchived: boolean, isPending: boolean) => {
     <SettingsFormProvider
       isArchived={isArchived}
       isPending={isPending}
-      archivedNoticeId="notice"
+      archivedNoticeId={ARCHIVED_NOTICE_ID}
     >
       {children}
     </SettingsFormProvider>
   );
+
   return renderHook(() => useSettingsFormState(), { wrapper: Wrapper }).result
     .current;
 };
 
-describe(SettingsFormProvider, () => {
+describe(`<${SettingsFormProvider.name}/>`, () => {
   it('throws when read outside a provider', () => {
     expect(() => renderHook(() => useSettingsFormState())).toThrow(
       'useSettingsFormState must be used within a SettingsFormProvider',
     );
   });
 
-  it('points fields at the archived notice while archived', () => {
-    expect(renderInProvider(true, false)).toEqual({
+  it.each([
+    {
+      title: 'points fields at the archived notice while archived',
       isArchived: true,
       isPending: false,
-      archivedDescribedBy: 'notice',
-    });
-  });
-
-  it('describes no field by the notice while the tenant is live', () => {
-    expect(renderInProvider(false, true)).toEqual({
+      archivedDescribedBy: ARCHIVED_NOTICE_ID,
+    },
+    {
+      title: 'describes no field by the notice while the tenant is live',
       isArchived: false,
       isPending: true,
       archivedDescribedBy: undefined,
-    });
+    },
+  ])('$title', ({ isArchived, isPending, archivedDescribedBy }) => {
+    const state = renderInProvider(isArchived, isPending);
+
+    expect(state).toEqual({ isArchived, isPending, archivedDescribedBy });
   });
 });

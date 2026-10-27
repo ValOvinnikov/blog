@@ -9,6 +9,8 @@ const { EN, FR } = LOCALE_ISO_CODES;
 
 export const MOCK_EMAIL_DRAFT_LIVE_LOCALES = [EN, FR];
 
+export const MOCK_EMAIL_SUBJECT = 'Sign in';
+
 export const MOCK_EMAIL_BODY: TEmailTemplateBlock[] = [
   {
     _type: 'block',
@@ -32,7 +34,7 @@ export const mockEmailDraft = (): TEmailDraft =>
       {
         templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
         locale: EN,
-        subject: 'Sign in',
+        subject: MOCK_EMAIL_SUBJECT,
         body: null,
       },
     ],

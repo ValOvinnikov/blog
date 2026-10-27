@@ -4,7 +4,28 @@ import {
   clampToEntitlement,
   featureDefaultsToValues,
   keepStoredOutOfPlan,
+  type TSettingsFeaturesValues,
 } from './settings-features-fields';
+
+const ALL_OFF: TSettingsFeaturesValues = {
+  commentsEnabled: false,
+  ratingsEnabled: false,
+  bookmarksEnabled: false,
+  newsletterEnabled: false,
+  analyticsEnabled: false,
+  consentBannerEnabled: false,
+  contactFormEnabled: false,
+};
+
+const ALL_ON: TSettingsFeaturesValues = {
+  commentsEnabled: true,
+  ratingsEnabled: true,
+  bookmarksEnabled: true,
+  newsletterEnabled: true,
+  analyticsEnabled: true,
+  consentBannerEnabled: true,
+  contactFormEnabled: true,
+};
 
 describe(featureDefaultsToValues, () => {
   it('converts a capability-keyed defaults map into the column-keyed view model', () => {
@@ -19,103 +40,69 @@ describe(featureDefaultsToValues, () => {
     };
 
     expect(featureDefaultsToValues(defaults)).toEqual({
+      ...ALL_OFF,
       commentsEnabled: true,
       ratingsEnabled: true,
-      bookmarksEnabled: false,
-      newsletterEnabled: false,
       analyticsEnabled: true,
-      consentBannerEnabled: false,
       contactFormEnabled: true,
     });
   });
 });
 
 describe(clampToEntitlement, () => {
-  it('forces every out-of-plan capability to false, leaving entitled ones untouched', () => {
-    const values = {
-      commentsEnabled: true,
-      ratingsEnabled: true,
-      bookmarksEnabled: true,
-      newsletterEnabled: true,
-      analyticsEnabled: true,
-      consentBannerEnabled: true,
-      contactFormEnabled: true,
-    };
+  it('forces every out-of-plan capability to false, leaving entitled ones', () => {
+    const clamped = clampToEntitlement(ALL_ON, [
+      CAPABILITY.COMMENTS,
+      CAPABILITY.RATINGS,
+      CAPABILITY.BOOKMARKS,
+    ]);
 
-    expect(
-      clampToEntitlement(values, [
-        CAPABILITY.COMMENTS,
-        CAPABILITY.RATINGS,
-        CAPABILITY.BOOKMARKS,
-      ]),
-    ).toEqual({
+    expect(clamped).toEqual({
+      ...ALL_OFF,
       commentsEnabled: true,
       ratingsEnabled: true,
       bookmarksEnabled: true,
-      newsletterEnabled: false,
-      analyticsEnabled: false,
-      consentBannerEnabled: false,
-      contactFormEnabled: false,
     });
   });
 
   it('is a no-op when every capability is entitled', () => {
     const values = {
-      commentsEnabled: true,
+      ...ALL_ON,
       ratingsEnabled: false,
-      bookmarksEnabled: true,
-      newsletterEnabled: true,
       analyticsEnabled: false,
-      consentBannerEnabled: true,
-      contactFormEnabled: true,
     };
 
-    expect(
-      clampToEntitlement(values, [
-        CAPABILITY.COMMENTS,
-        CAPABILITY.RATINGS,
-        CAPABILITY.BOOKMARKS,
-        CAPABILITY.NEWSLETTER,
-        CAPABILITY.ANALYTICS,
-        CAPABILITY.CONSENT_BANNER,
-        CAPABILITY.CONTACT_FORM,
-      ]),
-    ).toEqual(values);
+    const clamped = clampToEntitlement(values, Object.values(CAPABILITY));
+
+    expect(clamped).toEqual(values);
   });
 });
 
 describe(keepStoredOutOfPlan, () => {
-  it('takes every out-of-plan toggle from the stored values, leaving entitled ones as submitted', () => {
-    const submitted = {
+  it('takes out-of-plan toggles from the stored values, entitled ones as submitted', () => {
+    const submitted: TSettingsFeaturesValues = {
+      ...ALL_OFF,
       commentsEnabled: true,
-      ratingsEnabled: false,
-      bookmarksEnabled: false,
-      newsletterEnabled: false,
-      analyticsEnabled: false,
       consentBannerEnabled: true,
-      contactFormEnabled: false,
     };
-    const stored = {
-      commentsEnabled: false,
+    const stored: TSettingsFeaturesValues = {
+      ...ALL_OFF,
       ratingsEnabled: true,
       bookmarksEnabled: true,
-      newsletterEnabled: false,
       analyticsEnabled: true,
-      consentBannerEnabled: false,
       contactFormEnabled: true,
     };
 
-    expect(
-      keepStoredOutOfPlan(submitted, stored, [
-        CAPABILITY.COMMENTS,
-        CAPABILITY.RATINGS,
-        CAPABILITY.CONSENT_BANNER,
-      ]),
-    ).toEqual({
+    const kept = keepStoredOutOfPlan(submitted, stored, [
+      CAPABILITY.COMMENTS,
+      CAPABILITY.RATINGS,
+      CAPABILITY.CONSENT_BANNER,
+    ]);
+
+    expect(kept).toEqual({
+      ...ALL_OFF,
       commentsEnabled: true,
-      ratingsEnabled: false,
       bookmarksEnabled: true,
-      newsletterEnabled: false,
       analyticsEnabled: true,
       consentBannerEnabled: true,
       contactFormEnabled: true,
