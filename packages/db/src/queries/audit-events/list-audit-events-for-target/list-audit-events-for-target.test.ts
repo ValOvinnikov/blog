@@ -1,8 +1,6 @@
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  type TAuditAction,
-  type TAuditTargetType,
   WORKER_AUDIT_ACTOR_ID,
 } from '@blog/config/constants';
 import {
@@ -10,7 +8,12 @@ import {
   PERSONAL_DATA_OWNER,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { MOCK_OPERATOR_EMAIL, insertTestUser } from '@blog/db/testing/fixtures';
+import type { TAuditEvent } from '@blog/db/schema/audit-events';
+import {
+  MOCK_OPERATOR_EMAIL,
+  insertTestAuditEvent,
+  insertTestUser,
+} from '@blog/db/testing/fixtures';
 import {
   usePersonalDataFallbackListener,
   usePersonalDataKeys,
@@ -24,7 +27,7 @@ import {
   type TListAuditEventsForTargetOptions,
 } from './list-audit-events-for-target';
 
-faker.seed(5783);
+faker.seed(602104);
 
 vi.mock('@blog/db/client');
 
@@ -39,24 +42,15 @@ function dayOfJanuary(day: number): Date {
   return new Date(2026, 0, day);
 }
 
-async function insertEvent(
-  overrides: {
-    targetType?: TAuditTargetType;
-    targetId?: string;
-    createdAt?: Date;
-    action?: TAuditAction;
-    actorId?: string;
-  } = {},
-): Promise<void> {
-  await db()
-    .insert(schema.auditEvents)
-    .values({
-      actorId: overrides.actorId ?? faker.string.uuid(),
-      action: overrides.action ?? AUDIT_ACTION.DEPROVISIONED,
-      targetType: overrides.targetType ?? AUDIT_TARGET_TYPE.TENANT,
-      targetId: overrides.targetId ?? MOCK_TARGET_ID,
-      createdAt: overrides.createdAt ?? MOCK_FIRST_DAY,
-    });
+function insertEvent(
+  overrides: Partial<typeof schema.auditEvents.$inferInsert> = {},
+): Promise<TAuditEvent> {
+  return insertTestAuditEvent(db(), {
+    action: AUDIT_ACTION.DEPROVISIONED,
+    targetId: MOCK_TARGET_ID,
+    createdAt: MOCK_FIRST_DAY,
+    ...overrides,
+  });
 }
 
 async function insertDailyEvents(count: number): Promise<void> {

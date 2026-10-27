@@ -8,8 +8,11 @@ import {
 } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestAdmin } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { removeBlockedIdentity } from './remove-blocked-identity';
+
+faker.seed(602107);
 
 vi.mock('@blog/db/client');
 
@@ -40,7 +43,7 @@ describe(removeBlockedIdentity, () => {
   });
 
   it('reports DB_NOT_FOUND when no entry has that id', async () => {
-    const result = await removeBlockedIdentity(crypto.randomUUID());
+    const result = await removeBlockedIdentity(faker.string.uuid());
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });
