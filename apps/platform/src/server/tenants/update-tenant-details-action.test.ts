@@ -17,6 +17,7 @@ import {
 } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
@@ -55,6 +56,10 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
+vi.mock('@platform/server/tenants/send-owner-invite-email', () => ({
+  sendOwnerInviteEmail: vi.fn(),
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
@@ -69,6 +74,7 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
+const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);
 
 const {
   UPDATED,
@@ -104,6 +110,7 @@ describe('updateTenantDetailsAction', () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    sendOwnerInviteEmailMock.mockReset();
     ({ updateTenantDetailsAction } =
       await import('./update-tenant-details-action'));
   });
@@ -176,7 +183,11 @@ describe('updateTenantDetailsAction', () => {
 
   it('passes a supplied ownerEmail to updateTenantDetails and returns the tenant', async () => {
     const tenant = mockTenant({ name: MOCK_TENANT_NAME });
-    updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant,
+      ownerEmailChanged: false,
+    });
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
       ...validInput,
@@ -192,7 +203,11 @@ describe('updateTenantDetailsAction', () => {
 
   it('does not forward an ownerEmail key when the input omits it', async () => {
     const tenant = mockTenant({ name: MOCK_TENANT_NAME });
-    updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant,
+      ownerEmailChanged: false,
+    });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
 
@@ -284,7 +299,11 @@ describe('updateTenantDetailsAction', () => {
 
   it('succeeds on a rename that resends the current owner email after they joined', async () => {
     const tenant = mockTenant({ name: MOCK_RENAMED_TENANT_NAME });
-    updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant,
+      ownerEmailChanged: false,
+    });
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
       ...validInput,
@@ -304,6 +323,7 @@ describe('updateTenantDetailsAction', () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: mockTenant(),
+      ownerEmailChanged: false,
     });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
@@ -313,7 +333,11 @@ describe('updateTenantDetailsAction', () => {
 
   it('records a SETTINGS_UPDATED audit event for the tenant with the operator as actor', async () => {
     const tenant = mockTenant({ name: MOCK_TENANT_NAME });
-    updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant,
+      ownerEmailChanged: false,
+    });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
 
@@ -328,7 +352,11 @@ describe('updateTenantDetailsAction', () => {
 
   it("records that the owner's invite email changed without recording the address", async () => {
     const tenant = mockTenant({ name: MOCK_TENANT_NAME });
-    updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant,
+      ownerEmailChanged: true,
+    });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {
       ...validInput,
@@ -343,9 +371,59 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
+  it('sends a fresh owner invite to the new address when the owner email changed', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant: mockTenant(),
+      ownerEmailChanged: true,
+    });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
+    });
+
+    expect(sendOwnerInviteEmailMock).toHaveBeenCalledExactlyOnceWith(
+      MOCK_TENANT_ID,
+      MOCK_NEW_OWNER_EMAIL,
+    );
+  });
+
+  it('sends no owner invite when the owner email is resubmitted unchanged', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant: mockTenant(),
+      ownerEmailChanged: false,
+    });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_OWNER_EMAIL,
+    });
+
+    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('sends no owner invite when the update is refused', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: OWNER_ALREADY_JOINED,
+    });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
+    });
+
+    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
+  });
+
   it('still returns the updated tenant when the audit write fails, and logs it', async () => {
     const tenant = mockTenant({ name: MOCK_TENANT_NAME });
-    updateTenantDetailsMock.mockResolvedValue({ outcome: UPDATED, tenant });
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant,
+      ownerEmailChanged: false,
+    });
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);

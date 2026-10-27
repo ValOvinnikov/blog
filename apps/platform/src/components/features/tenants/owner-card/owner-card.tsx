@@ -16,7 +16,6 @@ export const OwnerCard = ({ owner }: TOwnerCardProps) => {
   const tRole = useTranslations('roleLabel');
   const locale = useLocale();
   const ownerEmail = owner?.email;
-  const joinedAt = owner?.joinedAt;
 
   return (
     <Card>
@@ -41,11 +40,21 @@ export const OwnerCard = ({ owner }: TOwnerCardProps) => {
               {tRole(MEMBERSHIP_ROLE.OWNER)}
             </StatusBadge>
           </DetailList.Row>
-          {joinedAt && (
+          {owner?.hasSignedIn && (
             <DetailList.Row label={t('joinedLabel')}>
-              <time dateTime={joinedAt.toISOString()}>
-                {formatDate(joinedAt, locale)}
+              <time dateTime={owner.joinedAt.toISOString()}>
+                {formatDate(owner.joinedAt, locale)}
               </time>
+            </DetailList.Row>
+          )}
+          {owner?.hasSignedIn === false && (
+            <DetailList.Row label={t('invitedLabel')}>
+              {t.rich('ownerNotSignedInYet', {
+                date: formatDate(owner.invitedAt, locale),
+                time: (chunks) => (
+                  <time dateTime={owner.invitedAt.toISOString()}>{chunks}</time>
+                ),
+              })}
             </DetailList.Row>
           )}
         </DetailList>

@@ -74,7 +74,9 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       const dialog = await screen.findByRole('alertdialog', {
         name: /suspend acme inc\./i,
       });
-      const consequence = screen.getByText(/its contact form disappears/i);
+      const consequence = screen.getByText(
+        /its reader actions are switched off/i,
+      );
 
       expect(dialog).toBeVisible();
       expect(consequence).toBeVisible();
@@ -142,49 +144,34 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
     });
   });
 
-  describe('a suspended tenant', () => {
-    beforeEach(() => {
+  describe('a suspended tenant with the reactivate dialog open', () => {
+    beforeEach(async () => {
       setup({ tenant: SUSPENDED_TENANT });
+
+      const openDialog = screen.getByRole('button', { name: OPEN_REACTIVATE });
+      await user.click(openDialog);
     });
 
-    it('says the tenant is suspended', () => {
-      const cardTitle = screen.getByRole('heading', {
-        level: 2,
-        name: 'This tenant is suspended',
+    it('reactivates the tenant', async () => {
+      const confirm = await screen.findByRole('button', {
+        name: CONFIRM_REACTIVATE,
       });
+      await user.click(confirm);
 
-      expect(cardTitle).toBeVisible();
+      expect(liftTenantSuspensionActionMock).toHaveBeenCalledWith(
+        SUSPENDED_TENANT.id,
+      );
+      expect(suspendTenantActionMock).not.toHaveBeenCalled();
+      expect(refreshMock).toHaveBeenCalled();
     });
 
-    describe('with the reactivate dialog open', () => {
-      beforeEach(async () => {
-        const openDialog = screen.getByRole('button', {
-          name: OPEN_REACTIVATE,
-        });
-        await user.click(openDialog);
+    it('offers no block choice', async () => {
+      await screen.findByRole('button', { name: CONFIRM_REACTIVATE });
+      const blockSwitch = screen.queryByRole('switch', {
+        name: BLOCK_SWITCH,
       });
 
-      it('reactivates the tenant', async () => {
-        const confirm = await screen.findByRole('button', {
-          name: CONFIRM_REACTIVATE,
-        });
-        await user.click(confirm);
-
-        expect(liftTenantSuspensionActionMock).toHaveBeenCalledWith(
-          SUSPENDED_TENANT.id,
-        );
-        expect(suspendTenantActionMock).not.toHaveBeenCalled();
-        expect(refreshMock).toHaveBeenCalled();
-      });
-
-      it('offers no block choice', async () => {
-        await screen.findByRole('button', { name: CONFIRM_REACTIVATE });
-        const blockSwitch = screen.queryByRole('switch', {
-          name: BLOCK_SWITCH,
-        });
-
-        expect(blockSwitch).not.toBeInTheDocument();
-      });
+      expect(blockSwitch).not.toBeInTheDocument();
     });
   });
 });

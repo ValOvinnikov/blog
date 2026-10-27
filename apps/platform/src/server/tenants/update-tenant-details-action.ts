@@ -21,6 +21,7 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
@@ -116,18 +117,19 @@ export const updateTenantDetailsAction = async (
     switch (result.outcome) {
       case TENANT_DETAILS_UPDATE_OUTCOME.UPDATED: {
         const { ownerEmail, ...auditedDetails } = parsed.data;
+        const { tenant: updatedTenant, ownerEmailChanged } = result;
         await revalidateSiteConfig(tenantId);
+        if (ownerEmailChanged && !isUndefined(ownerEmail)) {
+          await sendOwnerInviteEmail(tenantId, ownerEmail);
+        }
         await recordAuditEvent({
           logEvent: TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED,
           action: AUDIT_ACTION.SETTINGS_UPDATED,
           targetType: AUDIT_TARGET_TYPE.TENANT,
           targetId: tenantId,
-          details: {
-            ...auditedDetails,
-            ownerEmailUpdated: !isUndefined(ownerEmail),
-          },
+          details: { ...auditedDetails, ownerEmailUpdated: ownerEmailChanged },
         });
-        return { outcome: ACTION_OUTCOME.SUCCESS, tenant: result.tenant };
+        return { outcome: ACTION_OUTCOME.SUCCESS, tenant: updatedTenant };
       }
       case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN:
         return {

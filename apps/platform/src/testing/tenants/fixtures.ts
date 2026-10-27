@@ -7,6 +7,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
+import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import type {
   TDeprovisioningStepState,
   TProvisioningStepState,
@@ -129,6 +130,23 @@ export const MOCK_NEW_OWNER_EMAIL = 'incoming-owner@example.com';
 export const MOCK_RENAMED_TENANT_NAME = 'Acme Renamed';
 export const INVITED_PENDING_TEXT = 'Invited, pending';
 export const MOCK_OWNER_JOINED_AT = new Date('2026-08-12T09:00:00.000Z');
+export const MOCK_OWNER_INVITED_AT = new Date('2026-08-10T09:00:00.000Z');
+
+export const mockJoinedOwner = (
+  email = MOCK_OWNER_EMAIL,
+): TTenantOwnerMembership => ({
+  email,
+  hasSignedIn: true,
+  joinedAt: MOCK_OWNER_JOINED_AT,
+});
+
+export const mockInvitedOwner = (
+  email = MOCK_INVITED_OWNER_EMAIL,
+): TTenantOwnerMembership => ({
+  email,
+  hasSignedIn: false,
+  invitedAt: MOCK_OWNER_INVITED_AT,
+});
 export const MOCK_ARCHIVED_AT = new Date('2026-08-26T09:00:00.000Z');
 export const MOCK_RUN_STARTED_AT = '2026-08-12T14:18:30.000Z';
 export const MOCK_RUN_PLUS_1_MIN_AT = '2026-08-12T14:19:30.000Z';

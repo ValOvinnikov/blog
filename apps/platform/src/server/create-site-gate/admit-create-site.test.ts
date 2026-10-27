@@ -1,7 +1,16 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
-import { MOCK_BLOCKED_OWNER_EMAIL } from '@platform/testing/blocked-signups/fixtures';
+import {
+  MOCK_BLOCKED_ADDRESS_HASH,
+  MOCK_BLOCKED_OWNER_EMAIL,
+} from '@platform/testing/blocked-signups/fixtures';
+import {
+  MOCK_POSTGRES_ERROR_CODE,
+  MOCK_QUERY_ERROR_NAME,
+  mockQueryError,
+} from '@platform/testing/loggable-error/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -25,9 +34,12 @@ vi.mock('@blog/db', async () => ({
 const takeSlotMock = vi.mocked(takeCreateSiteSlot);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const CLIENT_KEY = '203.0.113.7';
-const NOW = new Date('2026-10-21T09:00:00Z');
-const SIGN_UP = { clientKey: CLIENT_KEY, email: MOCK_BLOCKED_OWNER_EMAIL };
+const MOCK_CLIENT_KEY = '203.0.113.7';
+const MOCK_NOW = new Date('2026-10-21T09:00:00Z');
+const MOCK_SIGN_UP = {
+  clientKey: MOCK_CLIENT_KEY,
+  email: MOCK_BLOCKED_OWNER_EMAIL,
+};
 
 describe(admitCreateSite, () => {
   beforeEach(() => {
@@ -37,17 +49,17 @@ describe(admitCreateSite, () => {
   });
 
   it('admits an email that is not blocked while a slot is free', async () => {
-    const admitted = await admitCreateSite({ ...SIGN_UP, now: NOW });
+    const admitted = await admitCreateSite({ ...MOCK_SIGN_UP, now: MOCK_NOW });
 
     expect(admitted).toBe(true);
     expect(isSignupBlockedMock).toHaveBeenCalledWith(MOCK_BLOCKED_OWNER_EMAIL);
-    expect(takeSlotMock).toHaveBeenCalledWith(CLIENT_KEY, NOW);
+    expect(takeSlotMock).toHaveBeenCalledWith(MOCK_CLIENT_KEY, MOCK_NOW);
   });
 
   it('refuses a blocked email without taking a slot', async () => {
     isSignupBlockedMock.mockResolvedValue(okResult(true));
 
-    const admitted = await admitCreateSite(SIGN_UP);
+    const admitted = await admitCreateSite(MOCK_SIGN_UP);
 
     expect(admitted).toBe(false);
     expect(takeSlotMock).not.toHaveBeenCalled();
@@ -56,33 +68,44 @@ describe(admitCreateSite, () => {
   it('refuses an email that is not blocked once the daily limits are spent', async () => {
     takeSlotMock.mockResolvedValue(false);
 
-    const admitted = await admitCreateSite(SIGN_UP);
+    const admitted = await admitCreateSite(MOCK_SIGN_UP);
 
     expect(admitted).toBe(false);
   });
 
-  it('refuses and logs when the blocklist lookup fails', async () => {
-    isSignupBlockedMock.mockResolvedValue(
-      errorResult(ERROR_CODE.DB_INVALID_EMAIL),
-    );
+  it.each([
+    [
+      'fails',
+      () =>
+        isSignupBlockedMock.mockResolvedValue(
+          errorResult(ERROR_CODE.DB_INVALID_EMAIL),
+        ),
+      { errorCode: ERROR_CODE.DB_INVALID_EMAIL },
+    ],
+    [
+      'throws',
+      () =>
+        isSignupBlockedMock.mockRejectedValue(
+          mockQueryError(MOCK_BLOCKED_OWNER_EMAIL, MOCK_BLOCKED_ADDRESS_HASH),
+        ),
+      {
+        errorName: MOCK_QUERY_ERROR_NAME,
+        errorCode: MOCK_POSTGRES_ERROR_CODE,
+      },
+    ],
+  ])(
+    'refuses and logs only the error name and code when the lookup %s',
+    async (_, failLookup, logged) => {
+      failLookup();
 
-    const admitted = await admitCreateSite(SIGN_UP);
-    const [, context] = loggerErrorMock.mock.calls[0] ?? [];
+      const admitted = await admitCreateSite(MOCK_SIGN_UP);
 
-    expect(admitted).toBe(false);
-    expect(takeSlotMock).not.toHaveBeenCalled();
-    expect(context).toEqual({ error: ERROR_CODE.DB_INVALID_EMAIL });
-  });
-
-  it('refuses and logs when the blocklist lookup throws', async () => {
-    const failure = new Error('db down');
-    isSignupBlockedMock.mockRejectedValue(failure);
-
-    const admitted = await admitCreateSite(SIGN_UP);
-    const [, context] = loggerErrorMock.mock.calls[0] ?? [];
-
-    expect(admitted).toBe(false);
-    expect(takeSlotMock).not.toHaveBeenCalled();
-    expect(context).toEqual({ error: failure });
-  });
+      expect(admitted).toBe(false);
+      expect(takeSlotMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
+        CREATE_SITE_GATE_LOG.BLOCK_CHECK_FAILED,
+        logged,
+      );
+    },
+  );
 });

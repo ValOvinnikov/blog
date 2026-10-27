@@ -377,6 +377,8 @@
     "roleLabel": "Rôle",
     "ownerInvitedPendingBadge": "Invité, en attente",
     "joinedLabel": "Inscrit le",
+    "invitedLabel": "Invité le",
+    "ownerNotSignedInYet": "<time>{date}</time>, pas encore connecté",
     "contentWorkspaceCardTitle": "Espace de contenu",
     "platformBadge": "plateforme",
     "sanityProjectLabel": "Projet Sanity",
@@ -1066,27 +1068,26 @@
     "confirmingButton": "Lancement…"
   },
   "tenantSuspensionControl": {
+    "cardTitle": "Suspension",
     "ACTIVE": {
-      "cardTitle": "Suspendre ce locataire",
-      "description": "Met en pause les fonctions d'écriture du site public — formulaire de contact, inscriptions à la newsletter et favoris — tandis que ses pages restent en ligne. Vous pouvez le réactiver à tout moment.",
+      "description": "Met en pause les actions des lecteurs sur le site public, comme les formulaires, les inscriptions et les éléments enregistrés, tandis que ses pages restent en ligne. Vous pouvez le réactiver à tout moment.",
       "triggerButton": "Suspendre le locataire",
       "dialogTitle": "Suspendre {name}",
-      "dialogDescription": "Le site reste en ligne, mais son formulaire de contact disparaît et les nouvelles inscriptions à la newsletter et les favoris sont refusés dès le prochain chargement de page, jusqu'à la réactivation.",
+      "dialogDescription": "Le site reste en ligne, mais les actions de ses lecteurs sont désactivées dès le prochain chargement de page, jusqu'à la réactivation.",
       "confirmButton": "Suspendre",
       "confirmingButton": "Suspension…"
     },
     "SUSPENDED": {
-      "cardTitle": "Ce locataire est suspendu",
-      "description": "Le formulaire de contact, les inscriptions à la newsletter et les favoris du site public sont désactivés. La réactivation les rétablit dès le prochain chargement de page.",
+      "description": "Les actions des lecteurs du site public sont désactivées. La réactivation les rétablit dès le prochain chargement de page.",
       "triggerButton": "Réactiver le locataire",
       "dialogTitle": "Réactiver {name}",
-      "dialogDescription": "Le formulaire de contact, les inscriptions à la newsletter et les favoris du site reviennent dès le prochain chargement de page.",
+      "dialogDescription": "Les actions des lecteurs du site reviennent dès le prochain chargement de page.",
       "confirmButton": "Réactiver",
       "confirmingButton": "Réactivation…"
     },
     "blockOwner": {
       "switchLabel": "Bloquer aussi l’adresse e-mail du propriétaire",
-      "description": "Le propriétaire ne pourra plus s’inscrire ni créer de site avec cette adresse. Vous pourrez retirer le blocage plus tard depuis Inscriptions bloquées.",
+      "description": "Le propriétaire ne pourra plus s’inscrire ni créer de site avec cette adresse e-mail. Vous pourrez retirer le blocage plus tard depuis Inscriptions bloquées.",
       "reasonLabel": "Motif du blocage",
       "reasonHint": "Les opérateurs le voient sur la page Inscriptions bloquées.",
       "switchOn": "Activé",

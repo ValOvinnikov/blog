@@ -8,21 +8,25 @@ import {
   readPersonalValue,
   reportPlainPersonalRead,
 } from '@blog/db/utils/personal-data/personal-data';
+import { userHasSignedIn } from '@blog/db/utils/user-has-signed-in/user-has-signed-in';
 import { and, eq, isNull } from 'drizzle-orm';
 
-export type TTenantOwnerMembership = {
-  email: string;
-  joinedAt?: Date;
-};
+export type TTenantOwnerMembership =
+  | { email: string; hasSignedIn: true; joinedAt: Date }
+  | { email: string; hasSignedIn: false; invitedAt: Date };
 
-// Until the owner first signs in, their grant is a pending invite rather than a membership.
+// Until the owner first signs in, their grant is a pending invite, or a membership made for an account that has never signed in.
 export async function getTenantOwnerMembership(
   tenantId: string,
 ): Promise<TMaybeUndefined<TTenantOwnerMembership>> {
   const db = getDb();
 
   const [owner] = await db
-    .select({ email: users.email, joinedAt: memberships.createdAt })
+    .select({
+      email: users.email,
+      createdAt: memberships.createdAt,
+      hasSignedIn: userHasSignedIn(),
+    })
     .from(memberships)
     .innerJoin(users, eq(memberships.userId, users.id))
     .where(
@@ -31,12 +35,18 @@ export async function getTenantOwnerMembership(
         eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
       ),
     );
-  if (owner?.email) return { email: owner.email, joinedAt: owner.joinedAt };
+  if (owner?.email) {
+    const { email, createdAt, hasSignedIn } = owner;
+    return hasSignedIn
+      ? { email, hasSignedIn, joinedAt: createdAt }
+      : { email, hasSignedIn, invitedAt: createdAt };
+  }
 
   const [invite] = await db
     .select({
       email: membershipInvites.email,
       emailEncrypted: membershipInvites.emailEncrypted,
+      createdAt: membershipInvites.createdAt,
     })
     .from(membershipInvites)
     .where(
@@ -49,7 +59,11 @@ export async function getTenantOwnerMembership(
 
   if (!invite) return undefined;
 
-  const { email, emailEncrypted } = invite;
+  const { email, emailEncrypted, createdAt } = invite;
   reportPlainPersonalRead(PERSONAL_DATA_OWNER.INVITE, emailEncrypted);
-  return { email: readPersonalValue(emailEncrypted, email) };
+  return {
+    email: readPersonalValue(emailEncrypted, email),
+    hasSignedIn: false,
+    invitedAt: createdAt,
+  };
 }

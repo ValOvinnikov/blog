@@ -23,7 +23,7 @@ const readSignatureTimestamp = (signature: string): TMaybeUndefined<number> => {
   }
 };
 
-// Resolves the signing tenant's id; a tenant with no stored secret yet still signs with the shared one.
+// Only a project no tenant owns verifies against the shared secret; a tenant with no stored secret is refused.
 export const verifyRevalidateSignature = async ({
   rawBody,
   signature,
@@ -46,11 +46,12 @@ export const verifyRevalidateSignature = async ({
     ? await queries.tenants.getTenantRevalidateWebhookSecret(projectId)
     : undefined;
 
-  const valid = await isValidSignature(
-    rawBody,
-    signature,
-    tenant?.secret ?? sharedSecret,
-  );
+  const secret = tenant ? tenant.secret : sharedSecret;
+  if (!secret) {
+    return errorResult(SIGNATURE_REFUSED_REASON);
+  }
+
+  const valid = await isValidSignature(rawBody, signature, secret);
 
   return valid
     ? okResult(tenant?.tenantId)

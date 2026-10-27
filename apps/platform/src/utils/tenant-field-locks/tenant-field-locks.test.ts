@@ -7,6 +7,8 @@ import {
   mockIdleProvisioningSteps,
   mockDoneProvisioningSteps,
   mockFirstStepRunningProvisioningSteps,
+  mockInvitedOwner,
+  mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 
 import { computeTenantFieldLocks, lockAllFields } from './tenant-field-locks';
@@ -17,12 +19,13 @@ describe(computeTenantFieldLocks, () => {
       computeTenantFieldLocks(
         mockIdleProvisioningSteps(),
         TENANT_PROVISIONING_STATUS.PENDING,
+        undefined,
       ),
     ).toEqual({});
   });
 
   it('locks nothing when provisioningSteps is null and provisioningStatus is null', () => {
-    expect(computeTenantFieldLocks(null, null)).toEqual({});
+    expect(computeTenantFieldLocks(null, null, undefined)).toEqual({});
   });
 
   it('locks nothing once MAP_DOMAIN is DONE — MAP_DOMAIN itself failing leaves primaryDomain editable (the real 409 case)', () => {
@@ -42,6 +45,7 @@ describe(computeTenantFieldLocks, () => {
       computeTenantFieldLocks(
         failedAtMapDomain,
         TENANT_PROVISIONING_STATUS.FAILED,
+        undefined,
       ),
     ).toEqual({});
   });
@@ -68,7 +72,11 @@ describe(computeTenantFieldLocks, () => {
     };
 
     expect(
-      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.FAILED),
+      computeTenantFieldLocks(
+        steps,
+        TENANT_PROVISIONING_STATUS.FAILED,
+        undefined,
+      ),
     ).toEqual({
       primaryDomain: {
         kind: 'step',
@@ -77,11 +85,12 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
-  it('locks every field with a "running" reason while a step is RUNNING', () => {
+  it('locks every field with a "running" reason while a step is RUNNING, the owner email included', () => {
     expect(
       computeTenantFieldLocks(
         mockFirstStepRunningProvisioningSteps(),
         TENANT_PROVISIONING_STATUS.PROVISIONING,
+        mockInvitedOwner(),
       ),
     ).toEqual({
       name: { kind: 'running' },
@@ -92,11 +101,12 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
-  it('locks every field with a "succeeded" reason once every step is DONE', () => {
+  it('locks every field with a "succeeded" reason once every step is DONE and the owner has signed in', () => {
     expect(
       computeTenantFieldLocks(
         mockDoneProvisioningSteps(),
         TENANT_PROVISIONING_STATUS.READY,
+        mockJoinedOwner(),
       ),
     ).toEqual({
       name: { kind: 'succeeded' },
@@ -107,12 +117,28 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
+  it('leaves the owner email editable after every step is DONE until the owner signs in', () => {
+    expect(
+      computeTenantFieldLocks(
+        mockDoneProvisioningSteps(),
+        TENANT_PROVISIONING_STATUS.READY,
+        mockInvitedOwner(),
+      ),
+    ).toEqual({
+      name: { kind: 'succeeded' },
+      primaryDomain: { kind: 'succeeded' },
+      plan: { kind: 'succeeded' },
+      locale: { kind: 'succeeded' },
+    });
+  });
+
   it('excludes OWNER_ELEVATION from the fold entirely — a 7th key never changes the result, even with a status the core sequence never produces', () => {
     const coreStepsDone = mockDoneProvisioningSteps();
 
     const withoutOwnerElevation = computeTenantFieldLocks(
       coreStepsDone,
       TENANT_PROVISIONING_STATUS.READY,
+      undefined,
     );
 
     const withFailedOwnerElevation = computeTenantFieldLocks(
@@ -124,6 +150,7 @@ describe(computeTenantFieldLocks, () => {
         },
       },
       TENANT_PROVISIONING_STATUS.READY,
+      undefined,
     );
 
     expect(withoutOwnerElevation).toEqual({
@@ -141,6 +168,7 @@ describe(computeTenantFieldLocks, () => {
       computeTenantFieldLocks(
         mockIdleProvisioningSteps(),
         TENANT_PROVISIONING_STATUS.PROVISIONING,
+        undefined,
       ),
     ).toEqual({
       name: { kind: 'running' },

@@ -10,8 +10,8 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
   MOCK_CUSTOM_DOMAIN_URL,
-  MOCK_OWNER_JOINED_AT,
   MOCK_SITE_NAME,
+  mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
@@ -32,10 +32,7 @@ const defaultProps: TOwnerHomeViewProps = {
   domainVerificationStatus: Promise.resolve(
     DOMAIN_VERIFICATION_STATUS.VERIFIED,
   ),
-  owner: {
-    email: 'sam@northwind.dev',
-    joinedAt: MOCK_OWNER_JOINED_AT,
-  },
+  owner: mockJoinedOwner('sam@northwind.dev'),
 };
 
 const renderView = customRender(OwnerHomeView, defaultProps);

@@ -1,9 +1,12 @@
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import {
+  PROVISIONING_STATE,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
+import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
 
@@ -37,16 +40,17 @@ export const lockAllFields = (
 };
 
 export const computeTenantFieldLocks = (
-  steps: TTenantProvisioningState | null,
-  provisioningStatus: TTenantProvisioningStatus | null,
+  steps: TMaybeNull<TTenantProvisioningState>,
+  provisioningStatus: TMaybeNull<TTenantProvisioningStatus>,
+  owner: TMaybeUndefined<TTenantOwnerMembership>,
 ): TTenantFieldLocks => {
   const state = deriveProvisioningState(provisioningStatus, steps);
 
-  if (state === 'IDLE') {
+  if (state === PROVISIONING_STATE.IDLE) {
     return {};
   }
 
-  if (state === 'FAILED') {
+  if (state === PROVISIONING_STATE.FAILED) {
     const locks: TTenantFieldLocks = {};
 
     if (
@@ -62,7 +66,10 @@ export const computeTenantFieldLocks = (
     return locks;
   }
 
-  return lockAllFields(
-    state === 'SUCCEEDED' ? { kind: 'succeeded' } : { kind: 'running' },
-  );
+  if (state === PROVISIONING_STATE.SUCCEEDED) {
+    const { ownerEmail, ...locks } = lockAllFields({ kind: 'succeeded' });
+    return owner?.hasSignedIn === false ? locks : { ...locks, ownerEmail };
+  }
+
+  return lockAllFields({ kind: 'running' });
 };

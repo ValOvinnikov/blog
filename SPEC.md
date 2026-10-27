@@ -2331,8 +2331,9 @@ Cache tags are always tenant-scoped (`t:<projectId>:<tag>`); the revalidation
 webhook purges both that form and the legacy unprefixed one per publish, keyed
 off Sanity's own `sanity-project-id` webhook header. That header is unsigned,
 so it only picks the secret: a tenant's delivery verifies against that
-tenant's own stored webhook secret alone, while a tenant with none stored yet
-and the platform's own projects verify against `SANITY_REVALIDATE_SECRET`. A
+tenant's own stored webhook secret alone, a tenant with none stored is
+refused, and only the platform's own projects, which no tenant owns, verify
+against `SANITY_REVALIDATE_SECRET`. A
 signature timestamped more than five minutes from now is refused, and every
 refusal is the same unlogged 401. Tag expiry alone does not
 invalidate a prerendered route on Vercel, so the webhook also purges resolved,

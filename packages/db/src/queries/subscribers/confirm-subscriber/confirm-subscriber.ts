@@ -2,7 +2,6 @@ import { SUBSCRIBER_OUTCOME, type TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { hasSubscriberStatus } from '@blog/db/utils/subscriber-status/subscriber-status';
 import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq } from 'drizzle-orm';
@@ -29,7 +28,7 @@ export async function confirmSubscriber(
       and(
         eq(subscribers.tenantId, tenantId),
         eq(subscribers.confirmationTokenHash, tokenHash),
-        hasSubscriberStatus(SUBSCRIBER_STATUS.PENDING),
+        eq(subscribers.status, SUBSCRIBER_STATUS.PENDING),
       ),
     )
     .returning({ id: subscribers.id });
