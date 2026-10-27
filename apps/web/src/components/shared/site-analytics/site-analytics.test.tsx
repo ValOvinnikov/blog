@@ -1,57 +1,72 @@
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { CAPABILITY } from '@blog/config';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
-import type { ReactElement } from 'react';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { SiteAnalytics } from './site-analytics';
 
+const { mockEnv, ANALYTICS_TEXT, SPEED_INSIGHTS_TEXT } = vi.hoisted(() => ({
+  mockEnv: { WEB_ANALYTICS_ENABLED: 'true' },
+  ANALYTICS_TEXT: 'Vercel Analytics',
+  SPEED_INSIGHTS_TEXT: 'Vercel Speed Insights',
+}));
+
+vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
+
 vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
-  () => ({
-    isCapabilityEnabled: vi.fn(),
-  }),
+  () => ({ isCapabilityEnabled: vi.fn() }),
 );
 
-vi.mock('@web/utils/is-web-analytics-enabled', () => ({
-  isWebAnalyticsEnabled: vi.fn(),
+vi.mock('@vercel/analytics/next', () => ({
+  Analytics: () => <p>{ANALYTICS_TEXT}</p>,
+}));
+
+vi.mock('@vercel/speed-insights/next', () => ({
+  SpeedInsights: () => <p>{SPEED_INSIGHTS_TEXT}</p>,
 }));
 
 const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
-const isWebAnalyticsEnabledMock = vi.mocked(isWebAnalyticsEnabled);
 
-const typesOf = (node: ReactElement | null): unknown[] =>
-  node === null
-    ? []
-    : [
-        (node.props as { children: ReactElement[] }).children.map(
-          (child) => child.type,
-        ),
-      ].flat();
-
-const setup = async () =>
-  (await SiteAnalytics()) as ReactElement<{ children: ReactElement[] }> | null;
+const setup = customRenderAsync(SiteAnalytics, {});
 
 describe(SiteAnalytics, () => {
   beforeEach(() => {
-    isWebAnalyticsEnabledMock.mockReturnValue(true);
+    mockEnv.WEB_ANALYTICS_ENABLED = 'true';
     isCapabilityEnabledMock.mockResolvedValue(true);
   });
 
-  it('mounts Analytics and SpeedInsights when enabled and the capability is entitled', async () => {
-    expect(typesOf(await setup())).toEqual([SpeedInsights, Analytics]);
+  it('mounts Analytics and SpeedInsights when enabled and entitled', async () => {
+    await setup();
+
+    const analytics = screen.getByText(ANALYTICS_TEXT);
+    const speedInsights = screen.getByText(SPEED_INSIGHTS_TEXT);
+
+    expect(analytics).toBeVisible();
+    expect(speedInsights).toBeVisible();
   });
 
   it('renders nothing when web analytics is not enabled', async () => {
-    isWebAnalyticsEnabledMock.mockReturnValue(false);
+    mockEnv.WEB_ANALYTICS_ENABLED = 'false';
 
-    expect(await setup()).toBeNull();
+    await setup();
+
+    const analytics = screen.queryByText(ANALYTICS_TEXT);
+    const speedInsights = screen.queryByText(SPEED_INSIGHTS_TEXT);
+
+    expect(analytics).not.toBeInTheDocument();
+    expect(speedInsights).not.toBeInTheDocument();
   });
 
   it('renders nothing when the ANALYTICS capability is not entitled', async () => {
     isCapabilityEnabledMock.mockResolvedValue(false);
 
-    expect(await setup()).toBeNull();
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith('ANALYTICS');
+    await setup();
+
+    const analytics = screen.queryByText(ANALYTICS_TEXT);
+    const speedInsights = screen.queryByText(SPEED_INSIGHTS_TEXT);
+
+    expect(analytics).not.toBeInTheDocument();
+    expect(speedInsights).not.toBeInTheDocument();
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.ANALYTICS);
   });
 });
