@@ -32,7 +32,7 @@ describe(`<${BrandMark.name}/>`, () => {
       setup({ src: MOCK_SRC });
     });
 
-    it('shows the uploaded image instead of the polygon mark', () => {
+    it('shows only the uploaded image', () => {
       const image = screen.getByRole('presentation');
 
       expect(image).toHaveAttribute('src', MOCK_SRC);

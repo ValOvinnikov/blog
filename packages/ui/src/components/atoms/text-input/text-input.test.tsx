@@ -105,14 +105,12 @@ describe(`<${TextInput.name}/>`, () => {
     const trailingGlyph = screen.getByText(MOCK_TRAILING_GLYPH);
     const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
 
-    expect(
-      leadingGlyph.compareDocumentPosition(textbox) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      textbox.compareDocumentPosition(trailingGlyph) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expect(leadingGlyph.compareDocumentPosition(textbox)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(textbox.compareDocumentPosition(trailingGlyph)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 
   it('marks the field invalid when isInvalid is true', () => {

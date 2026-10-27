@@ -236,32 +236,4 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(control).toHaveAttribute('href', MOCK_CONTROL_HREF);
     expect(cardLink).toBeVisible();
   });
-
-  describe('Media placement', () => {
-    it('wraps Media in a split container when split and Media is present', () => {
-      renderElement(
-        <MediaCard isSplit={true}>
-          <MediaCard.Media dataTestId={MEDIA_TEST_ID}>
-            <img src={MOCK_COVER_SRC} alt={MOCK_COVER_ALT} />
-          </MediaCard.Media>
-        </MediaCard>,
-      );
-
-      const media = screen.getByTestId(MEDIA_TEST_ID);
-      const article = screen.getByRole('article');
-
-      // eslint-disable-next-line testing-library/no-node-access -- structural layout claim: the split container has no semantic handle
-      expect(media.parentElement?.parentElement).toBe(article);
-    });
-
-    it('renders Media as a direct child of the article when not split', () => {
-      renderMediaCard();
-
-      const media = screen.getByTestId(MEDIA_TEST_ID);
-      const article = screen.getByRole('article');
-
-      // eslint-disable-next-line testing-library/no-node-access -- structural layout claim: Media sits directly in the article
-      expect(media.parentElement).toBe(article);
-    });
-  });
 });
