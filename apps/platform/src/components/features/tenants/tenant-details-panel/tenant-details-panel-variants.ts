@@ -9,7 +9,6 @@ export const tenantDetailsPanelVariants = tv({
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
     ],
     lockAnnouncementLive: ['sr-only'],
-    wideField: ['lg:col-span-2'],
     footerActions: ['ml-auto flex items-center gap-2.5'],
   },
 });
