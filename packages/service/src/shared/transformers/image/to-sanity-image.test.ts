@@ -5,6 +5,9 @@ import {
 
 import { toSanityImage } from './to-sanity-image';
 
+const MOCK_HOTSPOT = { x: 0.5, y: 0.4, height: 0.8, width: 0.7 };
+const MOCK_CROP = { top: 0.1, bottom: 0.2, left: 0.3, right: 0.05 };
+
 describe(toSanityImage, () => {
   it('maps all fields from raw input', () => {
     const result = toSanityImage(mockRawSanityImage());
@@ -13,54 +16,38 @@ describe(toSanityImage, () => {
   });
 
   it('maps hotspot and crop when present', () => {
-    const raw = {
+    const result = toSanityImage({
       ...mockRawSanityImage(),
-      hotspot: {
-        _type: 'sanity.imageHotspot' as const,
-        x: 0.5,
-        y: 0.5,
-        height: 0.8,
-        width: 0.8,
-      },
-      crop: {
-        _type: 'sanity.imageCrop' as const,
-        top: 0.1,
-        bottom: 0.1,
-        left: 0.1,
-        right: 0.1,
-      },
-    };
-
-    const result = toSanityImage(raw);
-
-    expect(result?.hotspot).toEqual({
-      x: 0.5,
-      y: 0.5,
-      height: 0.8,
-      width: 0.8,
+      hotspot: { _type: 'sanity.imageHotspot', ...MOCK_HOTSPOT },
+      crop: { _type: 'sanity.imageCrop', ...MOCK_CROP },
     });
-    expect(result?.crop).toEqual({
-      top: 0.1,
-      bottom: 0.1,
-      left: 0.1,
-      right: 0.1,
+
+    expect(result).toEqual({
+      ...mockSanityImageView(),
+      hotspot: MOCK_HOTSPOT,
+      crop: MOCK_CROP,
     });
   });
 
   it('maps a missing alt text to an empty string', () => {
     const result = toSanityImage({ ...mockRawSanityImage(), alt: null });
 
-    expect(result?.alt).toBe('');
+    expect(result).toEqual(mockSanityImageView(''));
   });
 
   it('returns undefined lqip and dimensions when metadata is absent', () => {
     const image = mockRawSanityImage();
-    const raw = { ...image, asset: { ...image.asset, metadata: null } };
 
-    const result = toSanityImage(raw);
+    const result = toSanityImage({
+      ...image,
+      asset: { ...image.asset, metadata: null },
+    });
 
-    expect(result?.lqip).toBeUndefined();
-    expect(result?.dimensions).toBeUndefined();
+    expect(result).toEqual({
+      ...mockSanityImageView(),
+      lqip: undefined,
+      dimensions: undefined,
+    });
   });
 
   it.each([

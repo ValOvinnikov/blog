@@ -18,15 +18,21 @@ import {
   mockLocalizedParagraphText,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { personCardFragment, personDetailFragment } from './person';
 
+faker.seed(6018);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const ENGLISH_ALT = 'Jane smiling';
-const DUTCH_ALT = 'Jane lacht';
-const ENGLISH_BIO = 'Writes about design.';
-const DUTCH_BIO = 'Schrijft over ontwerp.';
+const MOCK_PERSON_ID = faker.string.uuid();
+const MOCK_ENGLISH_ALT = faker.lorem.sentence();
+const MOCK_DUTCH_ALT = faker.lorem.sentence();
+const MOCK_ENGLISH_ROLE = faker.person.jobTitle();
+const MOCK_DUTCH_ROLE = faker.person.jobTitle();
+const MOCK_ENGLISH_BIO = faker.lorem.sentence();
+const MOCK_DUTCH_BIO = faker.lorem.sentence();
 
 const authorCardDocQuery = q.star
   .filterByType('person')
@@ -39,25 +45,19 @@ const authorDetailDocQuery = q.star
   .project(personDetailFragment);
 
 const rawCard = mockRawPersonCard();
-const { name } = rawCard;
 const rawDetail = mockRawAuthor({ image: null, role: null });
 
 describe('personCardFragment', () => {
-  it('leaves image null for an author with no image', () => {
-    const author = authorCardDocQuery.parse(rawCard);
-
-    expect(author?.image).toBeNull();
-  });
-
-  it('parses an author with an image present', () => {
-    const image = mockRawSanityImage();
-
+  it.each([
+    { state: 'missing', image: null },
+    { state: 'present', image: mockRawSanityImage() },
+  ])('keeps the author image when it is $state', ({ image }) => {
     const author = authorCardDocQuery.parse({ ...rawCard, image });
 
     expect(author?.image).toEqual(image);
   });
 
-  it('parses a profilePage through the shared link document fragment', () => {
+  it('keeps the profile page link through a real parse', () => {
     const profileLink = mockRawExternalLinkDocument();
 
     const author = authorCardDocQuery.parse({
@@ -73,27 +73,22 @@ describe('personDetailFragment', () => {
   it('parses an author with every optional detail empty', () => {
     const author = authorDetailDocQuery.parse(rawDetail);
 
-    expect(author?.image).toBeNull();
+    expect(author).toEqual(rawDetail);
   });
 
-  it('keeps a bio linkRef mark through a real parse', () => {
+  it('keeps a bio link mark through a real parse', () => {
+    const markDef = mockRawPortableTextMarkDef();
+
     const author = authorDetailDocQuery.parse({
       ...rawDetail,
-      bio: [
-        {
-          _type: 'block',
-          _key: MOCK_BIO_BLOCK_KEY,
-          markDefs: [mockRawPortableTextMarkDef()],
-        },
-      ],
+      bio: [{ _type: 'block', _key: MOCK_BIO_BLOCK_KEY, markDefs: [markDef] }],
     });
 
-    expect(author?.bio?.[0]).toMatchObject({
-      markDefs: [{ link: { url: 'https://example.com' } }],
-    });
+    const [bioBlock] = author?.bio ?? [];
+    expect(bioBlock?.markDefs).toEqual([markDef]);
   });
 
-  it('parses socialLinks through the shared social profile fragment', () => {
+  it('keeps the social links through a real parse', () => {
     const socialProfile = mockRawSocialProfile();
 
     const author = authorDetailDocQuery.parse({
@@ -107,12 +102,18 @@ describe('personDetailFragment', () => {
 
 describe('personDetailFragment per language', () => {
   const personDocument = {
-    _id: 'person-1',
+    _id: MOCK_PERSON_ID,
     _type: 'person',
-    name,
-    image: mockLocalizedImage({ [EN]: ENGLISH_ALT, [NL]: DUTCH_ALT }),
-    role: mockLocalizedStrings({ [EN]: 'Founder', [NL]: 'Oprichter' }),
-    bio: mockLocalizedParagraphText({ [EN]: ENGLISH_BIO, [NL]: DUTCH_BIO }),
+    name: rawCard.name,
+    image: mockLocalizedImage({ [EN]: MOCK_ENGLISH_ALT, [NL]: MOCK_DUTCH_ALT }),
+    role: mockLocalizedStrings({
+      [EN]: MOCK_ENGLISH_ROLE,
+      [NL]: MOCK_DUTCH_ROLE,
+    }),
+    bio: mockLocalizedParagraphText({
+      [EN]: MOCK_ENGLISH_BIO,
+      [NL]: MOCK_DUTCH_BIO,
+    }),
   };
 
   async function runPerson(locale: string) {
@@ -126,25 +127,34 @@ describe('personDetailFragment per language', () => {
     return authorDetailDocQuery.parse(raw);
   }
 
-  it('picks the role, bio and photo alt in the visitor language', async () => {
-    const person = await runPerson(NL);
+  it.each([
+    {
+      behaviour: 'picks the role, bio and photo alt in the visitor language',
+      locale: NL,
+      expected: {
+        role: MOCK_DUTCH_ROLE,
+        bio: MOCK_DUTCH_BIO,
+        alt: MOCK_DUTCH_ALT,
+      },
+    },
+    {
+      behaviour: 'falls back to the default language for the role, bio and alt',
+      locale: FR,
+      expected: {
+        role: MOCK_ENGLISH_ROLE,
+        bio: MOCK_ENGLISH_BIO,
+        alt: MOCK_ENGLISH_ALT,
+      },
+    },
+  ])('$behaviour', async ({ locale, expected }) => {
+    const person = await runPerson(locale);
 
-    expect(person).toMatchObject({
-      name,
-      role: 'Oprichter',
-      bio: [{ children: [{ text: DUTCH_BIO }] }],
-      image: { alt: DUTCH_ALT },
-    });
-  });
+    const [bioBlock] = person?.bio ?? [];
+    const [bioSpan] = bioBlock?.children ?? [];
 
-  it('falls back to the default language for the role, bio and photo alt', async () => {
-    const person = await runPerson(FR);
-
-    expect(person).toMatchObject({
-      name,
-      role: 'Founder',
-      bio: [{ children: [{ text: ENGLISH_BIO }] }],
-      image: { alt: ENGLISH_ALT },
-    });
+    expect(person?.name).toBe(rawCard.name);
+    expect(person?.role).toBe(expected.role);
+    expect(bioSpan?.text).toBe(expected.bio);
+    expect(person?.image?.alt).toBe(expected.alt);
   });
 });

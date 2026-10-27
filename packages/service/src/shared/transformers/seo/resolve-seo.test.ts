@@ -3,21 +3,24 @@ import {
   mockRawSeo,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { resolveSeo, type TRawSeo } from './resolve-seo';
 
-const AUTHORED_TITLE = 'Authored title';
-const AUTHORED_DESCRIPTION = 'Authored description';
-const AUTHORED_OG_TITLE = 'Authored OG title';
-const AUTHORED_OG_DESCRIPTION = 'Authored OG description';
+faker.seed(6016);
+
+const MOCK_TITLE = faker.lorem.sentence();
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_OG_TITLE = faker.lorem.sentence();
+const MOCK_OG_DESCRIPTION = faker.lorem.sentence();
 
 function mockAuthoredSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
   return mockRawSeo({
-    metaTitle: AUTHORED_TITLE,
-    metaDescription: AUTHORED_DESCRIPTION,
+    metaTitle: MOCK_TITLE,
+    metaDescription: MOCK_DESCRIPTION,
     openGraph: {
-      ogTitle: AUTHORED_OG_TITLE,
-      ogDescription: AUTHORED_OG_DESCRIPTION,
+      ogTitle: MOCK_OG_TITLE,
+      ogDescription: MOCK_OG_DESCRIPTION,
       ogImage: mockRawSanityImage(),
     },
     ...overrides,
@@ -29,18 +32,20 @@ describe(resolveSeo, () => {
     const result = resolveSeo(mockAuthoredSeo());
 
     expect(result).toEqual({
-      title: AUTHORED_TITLE,
-      description: AUTHORED_DESCRIPTION,
-      ogTitle: AUTHORED_OG_TITLE,
-      ogDescription: AUTHORED_OG_DESCRIPTION,
+      title: MOCK_TITLE,
+      description: MOCK_DESCRIPTION,
+      ogTitle: MOCK_OG_TITLE,
+      ogDescription: MOCK_OG_DESCRIPTION,
       ogImage: mockSanityImageView(),
     });
   });
 
-  it('leaves metaDescription undefined when unauthored, with no fallback', () => {
-    const result = resolveSeo(mockAuthoredSeo({ metaDescription: null }));
+  it('leaves an unauthored description undefined with no fallback', () => {
+    const { description } = resolveSeo(
+      mockAuthoredSeo({ metaDescription: null }),
+    );
 
-    expect(result.description).toBeUndefined();
+    expect(description).toBeUndefined();
   });
 
   it.each([
@@ -50,7 +55,7 @@ describe(resolveSeo, () => {
     },
     { openGraphState: 'an absent', openGraph: null },
   ])(
-    'leaves every og field unset for $openGraphState openGraph, with no fallback',
+    'leaves every og field unset for $openGraphState openGraph',
     ({ openGraph }) => {
       const { ogTitle, ogDescription, ogImage } = resolveSeo(
         mockAuthoredSeo({ openGraph }),

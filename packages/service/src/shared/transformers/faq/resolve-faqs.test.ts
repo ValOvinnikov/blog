@@ -27,38 +27,36 @@ describe(resolveFaqs, () => {
       }),
     ]);
 
-    expect(faqs.map(({ id }) => id)).toEqual([
-      MOCK_FAQ_QUESTION_ID,
-      MOCK_SECOND_FAQ_QUESTION_ID,
+    expect(faqs).toEqual([
+      mockFaqView(),
+      { ...mockFaqView(), id: MOCK_SECOND_FAQ_QUESTION_ID },
     ]);
   });
 
-  it('turns the answer blocks into plain text', () => {
-    const [faq] = resolveFaqs([mockRawFaqModuleQuestions()]);
-
-    expect(faq).toEqual(mockFaqView());
-  });
-
-  it('dedupes a question referenced by two modules, keeping its first occurrence', () => {
+  it('dedupes a question referenced by two modules, keeping one occurrence', () => {
     const module = mockRawFaqModuleQuestions();
 
     const faqs = resolveFaqs([module, module]);
 
-    expect(faqs).toHaveLength(1);
+    expect(faqs).toEqual([mockFaqView()]);
   });
 
-  it('drops a question with no text in either language', () => {
+  it.each([
+    {
+      missing: 'its question',
+      question: mockRawFaqQuestionItem({ question: null as never }),
+    },
+    {
+      missing: 'its answer',
+      question: mockRawFaqQuestionItem({ answer: null as never }),
+    },
+    {
+      missing: 'any answer block',
+      question: mockRawFaqQuestionItem({ answer: [] }),
+    },
+  ])('drops a question missing $missing', ({ question }) => {
     const faqs = resolveFaqs([
-      mockRawFaqModuleQuestions({
-        questions: [
-          mockRawFaqQuestionItem({
-            _id: 'no-question',
-            question: null as never,
-          }),
-          mockRawFaqQuestionItem({ _id: 'no-answer', answer: null as never }),
-          mockRawFaqQuestionItem({ _id: 'empty-answer', answer: [] }),
-        ],
-      }),
+      mockRawFaqModuleQuestions({ questions: [question] }),
     ]);
 
     expect(faqs).toEqual([]);
