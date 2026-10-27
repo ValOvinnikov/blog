@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { themeBootstrapScript } from '@web/config/theme-script';
+import { SANITY_IMAGE_CDN_PRECONNECT_TEST_ID } from '@web/constants/document-shell';
 import { renderElement, within } from '@web/testing/custom-render';
 
 import { DocumentShell } from './document-shell';
@@ -8,6 +9,7 @@ faker.seed(6007);
 
 const MOCK_CONTENT = faker.lorem.sentence();
 const MOCK_LANGUAGE = faker.location.countryCode().toLowerCase();
+const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
 
 describe(`<${DocumentShell.name}/>`, () => {
   beforeEach(() => {
@@ -37,8 +39,12 @@ describe(`<${DocumentShell.name}/>`, () => {
   });
 
   it('preconnects to the Sanity image CDN without crossorigin', () => {
-    expect(document.head).toContainHTML(
-      '<link rel="preconnect" href="https://cdn.sanity.io">',
+    const preconnect = within(document.head).getByTestId(
+      SANITY_IMAGE_CDN_PRECONNECT_TEST_ID,
     );
+
+    expect(preconnect).toHaveAttribute('rel', 'preconnect');
+    expect(preconnect).toHaveAttribute('href', SANITY_IMAGE_CDN_ORIGIN);
+    expect(preconnect).not.toHaveAttribute('crossorigin');
   });
 });

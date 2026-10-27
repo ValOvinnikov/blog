@@ -1,10 +1,10 @@
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
 import { env } from '@web/utils/env/env';
+import { PRODUCTION_DATASET } from '@web/utils/is-production-environment';
 
 import robots from './robots';
 
-const PRODUCTION_DATASET = 'production';
 const STAGING_DATASET = 'development';
 const SITEMAP_PATH = '/sitemap.xml';
 const ALLOW_ALL_RULES = { userAgent: '*', allow: '/' };

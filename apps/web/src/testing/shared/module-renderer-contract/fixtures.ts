@@ -1,6 +1,8 @@
 import type { TModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61052);
+
 export const MOCK_POST_LIST_ID = faker.string.uuid();
 
 export const MOCK_TAXONOMY_LIST_ID = faker.string.uuid();

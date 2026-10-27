@@ -8,6 +8,8 @@ import {
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
 
+faker.seed(61060);
+
 type TTenantSanityCredentials = NonNullable<
   ReturnType<typeof queries.tenants.toTenantSanityCredentials>
 >;

@@ -184,7 +184,7 @@ describe(`<${LocaleLayout.name}/>`, () => {
       settingsFailure();
     });
 
-    it('calls notFound() instead of rendering a broken shell', async () => {
+    it('calls notFound() when the site settings fail to load', async () => {
       await expect(renderLayout()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );

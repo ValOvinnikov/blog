@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -15,6 +16,7 @@ import {
   resolveTenant,
   resolveTenantById,
   resolveTenantId,
+  resolveTenantRouting,
 } from './resolve-tenant';
 
 faker.seed(7301);
@@ -28,11 +30,17 @@ vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
   queries: {
     tenantDomains: { getTenantByDomain: vi.fn() },
-    tenants: { listTenants: vi.fn(), getTenantById: vi.fn() },
+    tenants: {
+      listTenants: vi.fn(),
+      getTenantById: vi.fn(),
+      selectLiveLocales: vi.fn(),
+    },
   },
 }));
 
 const MOCK_UNKNOWN_HOST = faker.internet.domainName();
+
+const MOCK_LIVE_LOCALES = [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.DE];
 
 const MOCK_TENANT = mockServableTenant();
 
@@ -276,5 +284,36 @@ describe(resolveTenantId, () => {
 
     await expect(resolveTenantId(null)).resolves.toBe(MOCK_TENANT_ID);
     expect(queries.tenantDomains.getTenantByDomain).not.toHaveBeenCalled();
+  });
+});
+
+describe(resolveTenantRouting, () => {
+  it('resolves the routing for the tenant owning the host', async () => {
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      MOCK_TENANT,
+    );
+    vi.mocked(queries.tenants.selectLiveLocales).mockReturnValue(
+      MOCK_LIVE_LOCALES,
+    );
+
+    await expect(resolveTenantRouting(MOCK_TENANT_HOST)).resolves.toEqual({
+      tenant: MOCK_TENANT,
+      tenantId: MOCK_TENANT_ID,
+      defaultLocale: MOCK_TENANT.locale,
+      liveLocales: MOCK_LIVE_LOCALES,
+    });
+    expect(queries.tenants.selectLiveLocales).toHaveBeenCalledWith(MOCK_TENANT);
+  });
+
+  it('resolves undefined when no tenant resolves for the host', async () => {
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      undefined,
+    );
+    vi.mocked(queries.tenants.listTenants).mockResolvedValue([]);
+
+    await expect(
+      resolveTenantRouting(MOCK_UNKNOWN_HOST),
+    ).resolves.toBeUndefined();
+    expect(queries.tenants.selectLiveLocales).not.toHaveBeenCalled();
   });
 });

@@ -60,7 +60,7 @@ const MOCK_ASIDE_CONTEXT_TEXT = faker.lorem.sentence();
 const MOCK_NESTED_LINK_TEXT = faker.lorem.words(2);
 const MOCK_BOLD_TEXT = faker.lorem.words(2);
 const MOCK_CUSTOM_CODE_TEXT = faker.lorem.words(2);
-const MOCK_HOST_TEST_ID = faker.string.uuid();
+const MOCK_SECOND_PARAGRAPH_TEXT = faker.lorem.sentence();
 const CODE_REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
 
 const RESOLVED_LINK_REF = {
@@ -275,24 +275,26 @@ describe(`<${PortableText.name}/>`, () => {
     expect(text).toBeVisible();
   });
 
-  it('renders sibling blocks as direct children of the host, with no wrapper', () => {
-    const value: TPortableTextBody = [
-      mockPortableTextBlock(MOCK_SECTION_HEADING, { style: 'h2' }),
-      mockPortableTextBlock(faker.lorem.sentence()),
-      mockPortableTextBlock(faker.lorem.sentence()),
-    ];
+  it('renders sibling blocks in their authored order', () => {
+    setup({
+      value: [
+        mockPortableTextBlock(MOCK_SECTION_HEADING, { style: 'h2' }),
+        mockPortableTextBlock(MOCK_PARAGRAPH_TEXT),
+        mockPortableTextBlock(MOCK_SECOND_PARAGRAPH_TEXT),
+      ],
+    });
 
-    renderElement(
-      <div data-testid={MOCK_HOST_TEST_ID}>
-        <PortableText value={value} />
-      </div>,
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: MOCK_SECTION_HEADING,
+    });
+    const [firstParagraph, secondParagraph] = screen.getAllByRole('paragraph');
+
+    expect(firstParagraph).toHaveTextContent(MOCK_PARAGRAPH_TEXT);
+    expect(secondParagraph).toHaveTextContent(MOCK_SECOND_PARAGRAPH_TEXT);
+    expect(heading.compareDocumentPosition(firstParagraph!)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
     );
-
-    const host = screen.getByTestId(MOCK_HOST_TEST_ID);
-    // eslint-disable-next-line testing-library/no-node-access -- structural claim: the blocks are the host's direct children, which has no semantic handle
-    const tagNames = Array.from(host.children, (child) => child.tagName);
-
-    expect(tagNames).toEqual(['H2', 'P', 'P']);
   });
 
   it('renders a code block with its filename and source', () => {

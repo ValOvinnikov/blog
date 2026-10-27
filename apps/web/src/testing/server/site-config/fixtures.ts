@@ -16,6 +16,8 @@ import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-co
 import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
+faker.seed(61063);
+
 const MOCK_SITE_CONFIG_CREATED_AT = faker.date.past();
 
 export const mockSiteConfig = (

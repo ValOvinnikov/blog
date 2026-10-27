@@ -1,6 +1,8 @@
 import type { TTeamMember } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61043);
+
 export const MOCK_TEAM_MEMBER_NAME = 'Jordan Reyes';
 
 export const MOCK_TEAM_MEMBER_INITIALS = 'JR';

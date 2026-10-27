@@ -1,1 +1,5 @@
-export { readRememberedLanguage, rememberLanguage } from './language-cookie';
+export {
+  LANGUAGE_COOKIE_NAME,
+  readRememberedLanguage,
+  rememberLanguage,
+} from './language-cookie';

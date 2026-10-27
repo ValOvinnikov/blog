@@ -14,8 +14,6 @@ import {
 } from '@web/server/tenant/constants/constants';
 import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { LANGUAGE_COOKIE_NAME } from '@web/testing/shared/language-cookie/fixtures';
-import { PRODUCTION_DATASET } from '@web/testing/shared/sanity-dataset/fixtures';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
@@ -23,6 +21,8 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
+import { PRODUCTION_DATASET } from '@web/utils/is-production-environment';
+import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { logger } from '@web/utils/logger/logger';
 import { NextRequest, NextResponse } from 'next/server';
 

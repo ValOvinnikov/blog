@@ -3,6 +3,8 @@ import { faker } from '@faker-js/faker';
 import { MOCK_TEAM_MEMBER_NAME } from '@web/testing/modules/team/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
+faker.seed(61040);
+
 export const MOCK_TESTIMONIAL_MODULE_ID = 'testimonial-1';
 
 export const MOCK_TESTIMONIAL_QUOTE =

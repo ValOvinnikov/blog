@@ -55,7 +55,7 @@ describe(`<${TeamMemberCard.name}/>`, () => {
     });
   });
 
-  it('renders the photo instead of the initials when the member has one', () => {
+  it('shows the photo and hides the initials when the member has one', () => {
     setup({ member: mockTeamMember({ image: mockSanityImage() }) });
 
     const photo = screen.getByRole('img');

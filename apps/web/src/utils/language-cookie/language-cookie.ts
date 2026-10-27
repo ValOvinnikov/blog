@@ -1,8 +1,7 @@
 import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
+import { ONE_YEAR_IN_SECONDS } from '@web/constants/time';
 
-const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
-
-const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
+export const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
 
 type TCookieReader = {
   get: (name: string) => TMaybeUndefined<{ value: string }>;

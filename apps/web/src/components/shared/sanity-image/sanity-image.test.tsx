@@ -80,7 +80,7 @@ describe(`<${SanityImage.name}/>`, () => {
     expect(img.getAttribute('srcset')).toContain(MOCK_OTHER_PROJECT_PATH);
   });
 
-  it('uses the provided alt override instead of the image alt', () => {
+  it('names the image by the provided alt override', () => {
     setup({ alt: MOCK_ALT });
 
     const overridden = screen.getByRole('img', { name: MOCK_ALT });
@@ -90,12 +90,13 @@ describe(`<${SanityImage.name}/>`, () => {
     expect(original).not.toBeInTheDocument();
   });
 
-  it('forwards sizes to the rendered element', () => {
-    setup({ sizes: MOCK_SIZES });
+  it('forwards sizes and loading to the rendered element', () => {
+    setup({ sizes: MOCK_SIZES, loading: 'lazy' });
 
     const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
 
     expect(img).toHaveAttribute('sizes', MOCK_SIZES);
+    expect(img).toHaveAttribute('loading', 'lazy');
   });
 
   it('marks a priority image as high fetch priority', () => {

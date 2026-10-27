@@ -1,26 +1,19 @@
+import { ONE_YEAR_IN_SECONDS } from '@web/constants/time';
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
 import { cookies } from 'next/headers';
-
-// ~1 year — long-lived so a reader who already subscribed doesn't see the
-// form again on a later visit.
-const NEWSLETTER_SUBSCRIBED_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export const markNewsletterSubscribed = async (): Promise<void> => {
   const cookieStore = await cookies();
 
   cookieStore.set(NEWSLETTER_SUBSCRIBED_COOKIE_NAME, '1', {
-    maxAge: NEWSLETTER_SUBSCRIBED_COOKIE_MAX_AGE_SECONDS,
+    maxAge: ONE_YEAR_IN_SECONDS,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
     httpOnly: false,
   });
 };
 
-/**
- * Counterpart to `markNewsletterSubscribed`. No options are passed to
- * `delete` — the setter above sets no explicit `path`/`domain` either, so
- * both default alike and this targets the exact cookie the setter created.
- */
+// No options: the setter sets no `path`/`domain` either, so both default alike.
 export const clearNewsletterSubscribedCookie = async (): Promise<void> => {
   const cookieStore = await cookies();
 

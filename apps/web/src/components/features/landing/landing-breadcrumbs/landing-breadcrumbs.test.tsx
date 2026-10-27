@@ -53,6 +53,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getLandingPageMock,
     setup,
     eventFragment: 'landing_breadcrumbs.fetch_failed',
+    logContext: { path: MOCK_LANDING_PATH },
   });
   testBreadcrumbsTrail({
     pageLoaderMock: getLandingPageMock,

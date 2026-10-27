@@ -491,7 +491,7 @@ describe(POST, () => {
       );
     });
 
-    it('purges each derived path instead of the whole site', async () => {
+    it('purges each derived path', async () => {
       deriveRevalidatePathsMock.mockResolvedValue(
         okResult([MOCK_TENANT_HOME_PATH, MOCK_TENANT_POST_PATH]),
       );

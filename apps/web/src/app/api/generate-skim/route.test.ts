@@ -181,7 +181,7 @@ describe(POST, () => {
     );
   });
 
-  it('patches the same draft on every run instead of appending', async () => {
+  it('patches the same draft on every run', async () => {
     await POST(postRequest());
     await POST(postRequest());
 

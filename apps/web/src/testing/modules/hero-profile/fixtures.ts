@@ -10,6 +10,8 @@ import { faker } from '@faker-js/faker';
 import { MOCK_TEAM_MEMBER_NAME } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
+faker.seed(61041);
+
 export const MOCK_HERO_PROFILE_MODULE_ID = faker.string.uuid();
 
 export const MOCK_HERO_PROFILE_AVATAR_NAME = MOCK_TEAM_MEMBER_NAME;

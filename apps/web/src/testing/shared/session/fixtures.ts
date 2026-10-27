@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import type { Session } from 'next-auth';
 
+faker.seed(61056);
+
 export const MOCK_USER_ID = faker.string.uuid();
 
 const MOCK_SESSION_EXPIRES = faker.date.future().toISOString();

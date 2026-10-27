@@ -1,1 +1,4 @@
-export { isProductionEnvironment } from './is-production-environment';
+export {
+  isProductionEnvironment,
+  PRODUCTION_DATASET,
+} from './is-production-environment';

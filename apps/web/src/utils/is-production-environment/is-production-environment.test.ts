@@ -1,7 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { PRODUCTION_DATASET } from '@web/testing/shared/sanity-dataset/fixtures';
 
-import { isProductionEnvironment } from './is-production-environment';
+import {
+  isProductionEnvironment,
+  PRODUCTION_DATASET,
+} from './is-production-environment';
 
 faker.seed(119);
 

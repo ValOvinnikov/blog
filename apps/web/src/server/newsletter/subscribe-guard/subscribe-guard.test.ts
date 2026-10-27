@@ -3,6 +3,8 @@ import { faker } from '@faker-js/faker';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
+import { isSubscribeAttemptRefused } from './subscribe-guard';
+
 const { checkBotIdMock, headersMock, createRedisRateLimitStoreMock } =
   vi.hoisted(() => ({
     checkBotIdMock: vi.fn(),
@@ -41,11 +43,14 @@ const loadGuard = async ({ withKvStore = false } = {}) => {
     });
   }
   const { logger } = await import('@web/utils/logger/logger');
-  const { isSubscribeAttemptRefused } = await import('./subscribe-guard');
-  return { isSubscribeAttemptRefused, warnMock: vi.mocked(logger.warn) };
+  const guard = await import('./subscribe-guard');
+  return {
+    isRefused: guard.isSubscribeAttemptRefused,
+    warnMock: vi.mocked(logger.warn),
+  };
 };
 
-describe('isSubscribeAttemptRefused', () => {
+describe(isSubscribeAttemptRefused, () => {
   beforeEach(() => {
     vi.useFakeTimers();
     checkBotIdMock.mockResolvedValue({ isBot: false });
@@ -57,34 +62,32 @@ describe('isSubscribeAttemptRefused', () => {
   });
 
   it('allows five attempts from one address and refuses the sixth', async () => {
-    const { isSubscribeAttemptRefused } = await loadGuard();
+    const { isRefused } = await loadGuard();
 
     const refusals: boolean[] = [];
     for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
-      refusals.push(await isSubscribeAttemptRefused(MOCK_TENANT_ID));
+      refusals.push(await isRefused(MOCK_TENANT_ID));
     }
 
     expect(refusals).toEqual([false, false, false, false, false, true]);
   });
 
   it('counts each address separately', async () => {
-    const { isSubscribeAttemptRefused } = await loadGuard();
+    const { isRefused } = await loadGuard();
     for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
-      await isSubscribeAttemptRefused(MOCK_TENANT_ID);
+      await isRefused(MOCK_TENANT_ID);
     }
 
     headersMock.mockResolvedValue(clientHeaders(MOCK_OTHER_CLIENT_IP));
 
-    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(
-      false,
-    );
+    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(false);
   });
 
   it('refuses a bot without counting it against the address, and logs it', async () => {
-    const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
+    const { isRefused, warnMock } = await loadGuard();
     checkBotIdMock.mockResolvedValue({ isBot: true });
 
-    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'bot',
     });
@@ -92,10 +95,10 @@ describe('isSubscribeAttemptRefused', () => {
   });
 
   it('refuses and logs, without counting against the address, when BotID errors', async () => {
-    const { isSubscribeAttemptRefused, warnMock } = await loadGuard();
+    const { isRefused, warnMock } = await loadGuard();
     checkBotIdMock.mockRejectedValue(MOCK_ERROR);
 
-    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'bot_check_unavailable',
       error: MOCK_ERROR,
@@ -107,11 +110,11 @@ describe('isSubscribeAttemptRefused', () => {
     createRedisRateLimitStoreMock.mockReturnValue({
       increment: vi.fn().mockRejectedValue(MOCK_ERROR),
     });
-    const { isSubscribeAttemptRefused, warnMock } = await loadGuard({
+    const { isRefused, warnMock } = await loadGuard({
       withKvStore: true,
     });
 
-    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'rate_limit_store_unavailable',
       error: MOCK_ERROR,
@@ -122,11 +125,11 @@ describe('isSubscribeAttemptRefused', () => {
     createRedisRateLimitStoreMock.mockImplementation(() => {
       throw MOCK_ERROR;
     });
-    const { isSubscribeAttemptRefused, warnMock } = await loadGuard({
+    const { isRefused, warnMock } = await loadGuard({
       withKvStore: true,
     });
 
-    await expect(isSubscribeAttemptRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
     expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
       reason: 'rate_limit_store_unavailable',
       error: MOCK_ERROR,
@@ -137,11 +140,11 @@ describe('isSubscribeAttemptRefused', () => {
     createRedisRateLimitStoreMock.mockReturnValue({
       increment: vi.fn(() => new Promise<number>(() => {})),
     });
-    const { isSubscribeAttemptRefused } = await loadGuard({
+    const { isRefused } = await loadGuard({
       withKvStore: true,
     });
 
-    const refused = isSubscribeAttemptRefused(MOCK_TENANT_ID);
+    const refused = isRefused(MOCK_TENANT_ID);
     await vi.advanceTimersByTimeAsync(STORE_TIMEOUT_MS);
 
     await expect(refused).resolves.toBe(true);

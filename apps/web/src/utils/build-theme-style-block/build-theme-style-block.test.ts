@@ -6,6 +6,7 @@ import {
   CARD_STYLE,
   CARD_STYLE_DECLARATIONS,
   DENSITY,
+  DENSITY_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   PRESET_ID,
@@ -65,7 +66,7 @@ const SPACING_TOKENS = [
   '--spacing-card-y',
   '--spacing-card-gap',
   '--spacing-band',
-];
+] as const;
 
 const DARK_EXCLUDED_PREFIXES = [
   '--radius',
@@ -292,7 +293,9 @@ describe(buildThemeStyleBlock, () => {
     const compactDeclaration = compactCss.match(declaration)?.[0];
     const defaultDeclaration = defaultCss.match(declaration)?.[0];
 
-    expect(compactDeclaration).toBeDefined();
+    expect(compactDeclaration).toBe(
+      `${token}: ${DENSITY_DECLARATIONS[DENSITY.COMPACT][token]};`,
+    );
     expect(compactDeclaration).not.toBe(defaultDeclaration);
   });
 

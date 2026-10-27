@@ -195,7 +195,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
       bioText.compareDocumentPosition(action) &
       Node.DOCUMENT_POSITION_FOLLOWING;
 
-    expect(bioFollowsSupportingText).toBeTruthy();
-    expect(actionFollowsBio).toBeTruthy();
+    expect(bioFollowsSupportingText).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(actionFollowsBio).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 });

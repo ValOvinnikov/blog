@@ -6,6 +6,8 @@ import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import type { Mock } from 'vitest';
 
+faker.seed(61064);
+
 export const MOCK_CONFIRMATION_TOKEN = faker.string.alphanumeric(16);
 
 export const MOCK_UNSUBSCRIBE_TOKEN = faker.string.alphanumeric(16);

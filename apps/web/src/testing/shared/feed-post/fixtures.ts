@@ -1,6 +1,8 @@
 import type { TFeedPost } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61055);
+
 export const MOCK_FEED_POST_SLUG = faker.lorem.slug();
 
 export const mockFeedPost = (overrides: Partial<TFeedPost> = {}): TFeedPost => {

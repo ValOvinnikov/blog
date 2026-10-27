@@ -11,6 +11,7 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
+import { PRODUCTION_DATASET } from '@web/utils/is-production-environment';
 import { setRequestLocale } from 'next-intl/server';
 
 import {
@@ -49,7 +50,6 @@ vi.mock('@blog/service', () => ({
 }));
 vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
 
-const PRODUCTION_DATASET = 'production';
 const DEVELOPMENT_DATASET = 'development';
 const NOT_FOUND_TENANT_LOAD_FAILED_EVENT =
   'request_context.not_found_tenant_load_failed';

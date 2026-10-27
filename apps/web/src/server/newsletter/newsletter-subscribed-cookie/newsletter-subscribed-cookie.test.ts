@@ -1,3 +1,4 @@
+import { ONE_YEAR_IN_SECONDS } from '@web/constants/time';
 import {
   mockCookieStore,
   stubCookieStore,
@@ -10,8 +11,6 @@ import {
 } from './newsletter-subscribed-cookie';
 
 vi.mock('next/headers');
-
-const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 let cookieStore: ReturnType<typeof mockCookieStore>;
 
@@ -34,7 +33,7 @@ describe(markNewsletterSubscribed, () => {
       NEWSLETTER_SUBSCRIBED_COOKIE_NAME,
       '1',
       {
-        maxAge: ONE_YEAR_SECONDS,
+        maxAge: ONE_YEAR_IN_SECONDS,
         sameSite: 'lax',
         secure: false,
         httpOnly: false,
@@ -51,7 +50,7 @@ describe(markNewsletterSubscribed, () => {
       NEWSLETTER_SUBSCRIBED_COOKIE_NAME,
       '1',
       {
-        maxAge: ONE_YEAR_SECONDS,
+        maxAge: ONE_YEAR_IN_SECONDS,
         sameSite: 'lax',
         secure: true,
         httpOnly: false,
