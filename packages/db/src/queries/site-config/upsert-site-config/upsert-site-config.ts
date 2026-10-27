@@ -25,6 +25,7 @@ import {
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
   toSiteConfigResult,
@@ -36,6 +37,7 @@ import {
 } from '@blog/db/schema/site-config';
 import { tenants } from '@blog/db/schema/tenants';
 import { okResult, type TResult } from '@blog/utils';
+import { isUndefined } from '@blog/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -138,27 +140,27 @@ function presentOptionalFields(
 ): TSiteConfigWritable {
   const fields: TSiteConfigWritable = {};
 
-  if (parsed.logoHue !== undefined) fields.logoHue = parsed.logoHue;
-  if (parsed.languageSwitcherStyle !== undefined) {
+  if (!isUndefined(parsed.logoHue)) fields.logoHue = parsed.logoHue;
+  if (!isUndefined(parsed.languageSwitcherStyle)) {
     fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
   }
-  if (parsed.cardStyle !== undefined) fields.cardStyle = parsed.cardStyle;
-  if (parsed.headerControlStyle !== undefined) {
+  if (!isUndefined(parsed.cardStyle)) fields.cardStyle = parsed.cardStyle;
+  if (!isUndefined(parsed.headerControlStyle)) {
     fields.headerControlStyle = parsed.headerControlStyle;
   }
-  if (parsed.accountButtonStyle !== undefined) {
+  if (!isUndefined(parsed.accountButtonStyle)) {
     fields.accountButtonStyle = parsed.accountButtonStyle;
   }
-  if (parsed.accountPanelStyle !== undefined) {
+  if (!isUndefined(parsed.accountPanelStyle)) {
     fields.accountPanelStyle = parsed.accountPanelStyle;
   }
-  if (parsed.accountPhonePlacement !== undefined) {
+  if (!isUndefined(parsed.accountPhonePlacement)) {
     fields.accountPhonePlacement = parsed.accountPhonePlacement;
   }
-  if (parsed.logoAssetUrl !== undefined) {
+  if (!isUndefined(parsed.logoAssetUrl)) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
   }
-  if (parsed.faviconAssetUrl !== undefined) {
+  if (!isUndefined(parsed.faviconAssetUrl)) {
     fields.faviconAssetUrl = parsed.faviconAssetUrl;
   }
 
@@ -187,8 +189,8 @@ export async function upsertSiteConfig(
   const parsed = updateSiteConfigInputSchema.parse(rest);
   const defaultLocale = await getTenantLocale(tenantId);
 
-  let voicePatch: TVoiceOverridesByLocale | undefined;
-  if (voiceOverridesByLocale !== undefined) {
+  let voicePatch: TMaybeUndefined<TVoiceOverridesByLocale>;
+  if (!isUndefined(voiceOverridesByLocale)) {
     assertKnownLocales(voiceOverridesByLocale);
     const result = parseVoiceOverridesByLocale(voiceOverridesByLocale);
     if (!result.ok) return result;
