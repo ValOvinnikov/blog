@@ -23,14 +23,12 @@ import {
   MOCK_MISSING_ID,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
 
 import { getTaxonomyList } from './loader';
 import { taxonomyListModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
-
-const tenant = mockTenant();
 
 describe(getTaxonomyList, () => {
   beforeEach(() => {
@@ -43,7 +41,10 @@ describe(getTaxonomyList, () => {
   });
 
   it('resolves topic entries from an authored taxonomy', async () => {
-    const module = await getTaxonomyList(MOCK_TAXONOMY_LIST_MODULE_ID, tenant);
+    const module = await getTaxonomyList(
+      MOCK_TAXONOMY_LIST_MODULE_ID,
+      MOCK_TENANT,
+    );
 
     expect(module.taxonomy).toBe(TAXONOMY_KIND.TOPICS);
     expect(module.entries).toEqual([
@@ -61,15 +62,17 @@ describe(getTaxonomyList, () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getTaxonomyList(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(
+      getTaxonomyList(MOCK_MISSING_ID, MOCK_TENANT),
+    ).rejects.toThrow();
   });
 
   it('scopes the cache tags to the module id, both taxonomy kinds, and posts', async () => {
-    await getTaxonomyList(MOCK_TAXONOMY_LIST_MODULE_ID, tenant);
+    await getTaxonomyList(MOCK_TAXONOMY_LIST_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(taxonomyListModuleQuery, {
       parameters: { id: MOCK_TAXONOMY_LIST_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
