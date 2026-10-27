@@ -1,29 +1,45 @@
-import { del, type MigrationContext } from 'sanity/migrate';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
+import { del } from 'sanity/migrate';
 
 import migration, { findModulesMissingCopiedCues } from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
+faker.seed(19000);
+
+const MOCK_SETTINGS_ID = faker.string.uuid();
+const MOCK_DRAFT_SETTINGS_ID = `drafts.${MOCK_SETTINGS_ID}`;
+const MOCK_TRUST_CUE = faker.lorem.words(2);
+const MOCK_COPIED_CUE = {
+  _key: faker.string.alphanumeric(12),
+  _type: 'newsletterTrustCue',
 };
 
-const copiedCue = { _key: 'trust-cue-1', _type: 'newsletterTrustCue' };
+const mockSettings = (_id: string) =>
+  mockMigrationDocument({
+    _id,
+    _type: 'settings_newsletter',
+    trustCues: [MOCK_TRUST_CUE],
+  });
 
-const createContext = (result: unknown): MigrationContext =>
-  ({ client: { fetch: async () => result } }) as unknown as MigrationContext;
+const mockNewsletterModule = (trustCues?: unknown[]) =>
+  mockMigrationDocument({ _type: 'module_newsletter', trustCues });
 
 describe(findModulesMissingCopiedCues, () => {
   it('reports a module without cues while the settings still carry some', () => {
-    expect(
-      findModulesMissingCopiedCues({
-        settingsTrustCues: ['No spam'],
-        modules: [
-          { _id: 'newsletter-1', trustCues: [copiedCue] },
-          { _id: 'newsletter-2' },
-        ],
-      }),
-    ).toEqual(['newsletter-2']);
+    const copied = { _id: faker.string.uuid(), trustCues: [MOCK_COPIED_CUE] };
+    const missing = { _id: faker.string.uuid() };
+
+    const result = findModulesMissingCopiedCues({
+      settingsTrustCues: [MOCK_TRUST_CUE],
+      modules: [copied, missing],
+    });
+
+    expect(result).toEqual([missing._id]);
   });
 
   it.each([
@@ -32,41 +48,46 @@ describe(findModulesMissingCopiedCues, () => {
   ])(
     'reports nothing when there are %s to lose',
     (_label, settingsTrustCues) => {
-      expect(
-        findModulesMissingCopiedCues({
-          settingsTrustCues,
-          modules: [{ _id: 'newsletter-1' }],
-        }),
-      ).toEqual([]);
+      const result = findModulesMissingCopiedCues({
+        settingsTrustCues,
+        modules: [{ _id: faker.string.uuid() }],
+      });
+
+      expect(result).toEqual([]);
     },
   );
 });
 
-describe('retire-newsletter-settings migration', () => {
-  it.each(['settings-newsletter', 'drafts.settings-newsletter'])(
+describe('retire-newsletter-settings', () => {
+  it.each([MOCK_SETTINGS_ID, MOCK_DRAFT_SETTINGS_ID])(
     'deletes %s once every module carries the copied cues',
     async (id) => {
-      const doc = { ...baseDoc, _id: id, _type: 'settings_newsletter' };
-      const context = createContext({
-        settingsTrustCues: ['No spam'],
-        modules: [{ _id: 'newsletter-1', trustCues: [copiedCue] }],
+      const settings = mockSettings(id);
+      const context = mockMigrationContext({
+        fetch: mockGroqFetch([
+          mockSettings(MOCK_SETTINGS_ID),
+          mockNewsletterModule([MOCK_COPIED_CUE]),
+        ]),
       });
 
-      expect(await migration.migrate.document(doc, context)).toEqual([del(id)]);
+      const mutations = await runDocumentMigration(
+        migration,
+        settings,
+        context,
+      );
+
+      expect(mutations).toEqual([del(id)]);
     },
   );
 
   it('keeps the settings while a module still lacks the copied cues', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'settings-newsletter',
-      _type: 'settings_newsletter',
-    };
-    const context = createContext({
-      settingsTrustCues: ['No spam'],
-      modules: [{ _id: 'newsletter-1' }],
+    const settings = mockSettings(MOCK_SETTINGS_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([settings, mockNewsletterModule()]),
     });
 
-    expect(await migration.migrate.document(doc, context)).toEqual([]);
+    const mutations = await runDocumentMigration(migration, settings, context);
+
+    expect(mutations).toEqual([]);
   });
 });

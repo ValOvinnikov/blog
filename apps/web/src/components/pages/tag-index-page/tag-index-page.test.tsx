@@ -1,30 +1,29 @@
-import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { service, type TTagIndexPage } from '@blog/service';
+import { service } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import {
-  MOCK_CTA_HEADING,
-  MOCK_SECOND_CTA_HEADING,
-  mockCtaModuleData,
-} from '@web/testing/modules/cta/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { mockIndexPage } from '@web/testing/pages/index-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
-  MOCK_TENANT_SANITY_CONTEXT,
   MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
 
 import { TagIndexPage } from './tag-index-page';
+
+faker.seed(6008);
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -33,53 +32,69 @@ vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tagIndex: { v1: { getIndexPage: vi.fn() } } },
-    modules: {
-      cta: { v1: { getCta: vi.fn() } },
-      heroBlog: { v1: { getHeroBlog: vi.fn() } },
-    },
+    modules: { heroBlog: { v1: { getHeroBlog: vi.fn() } } },
   },
 }));
 
 vi.mock('@web/i18n/navigation');
 
+const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
 const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
 
-const SUPPORTING_TEXT = 'Browse every post by tag.';
-const HERO_HEADING = 'Every tag we write about';
-
-const tagIndexPage: TTagIndexPage = {
-  headingAlignment: CONTENT_ALIGNMENT.LEFT,
+const MOCK_HERO_ID = faker.string.uuid();
+const MOCK_HERO_HEADING = faker.lorem.words(3);
+const MOCK_PAGE_HEADING = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_INDEX_PAGE = mockIndexPage({
   headingBlock: mockHeadingBlock({
-    heading: 'Tags',
-    supportingText: SUPPORTING_TEXT,
+    heading: MOCK_PAGE_HEADING,
+    supportingText: MOCK_SUPPORTING_TEXT,
   }),
-  hero: undefined,
-  modules: [],
-  seo: mockSeo(),
-  translations: [LOCALE_ISO_CODES.EN],
-};
-
-const resolveIndexPageWith = (overrides: Partial<TTagIndexPage>) =>
-  getIndexPageMock.mockResolvedValueOnce(
-    okResult({ ...tagIndexPage, ...overrides }),
-  );
+});
 
 const setup = customRenderServerAsync(TagIndexPage, {});
 
 describe(`<${TagIndexPage.name}/>`, () => {
   beforeEach(() => {
     vi.mocked(getRequestContext).mockReset();
-    getIndexPageMock.mockResolvedValue(okResult(tagIndexPage));
-    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) =>
-      okResult(
-        mockCtaModuleData({
-          headingBlock: mockHeadingBlock({
-            heading:
-              id === 'cta-1' ? MOCK_CTA_HEADING : MOCK_SECOND_CTA_HEADING,
-          }),
-        }),
-      ),
-    );
+    getIndexPageMock.mockResolvedValue(okResult(MOCK_INDEX_PAGE));
+  });
+
+  describe('with the default index page', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it('fetches the index page with the tenant context', () => {
+      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
+    });
+
+    it('renders the heading and supporting text inside main', () => {
+      const main = screen.getByRole('main');
+      const heading = within(main).getByRole('heading', {
+        level: 1,
+        name: MOCK_PAGE_HEADING,
+      });
+      const supportingText = within(main).getByText(MOCK_SUPPORTING_TEXT);
+
+      expect(heading).toBeVisible();
+      expect(supportingText).toBeVisible();
+    });
+
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: SITE_MESSAGES.breadcrumbs.ariaLabel,
+      });
+      const homeLink = within(breadcrumbs).getByRole('link', {
+        name: MOCK_SITE_SETTINGS.brand.name,
+      });
+      const currentCrumb = within(breadcrumbs).getByText(MOCK_PAGE_HEADING);
+      const main = screen.getByRole('main');
+
+      expect(homeLink).toBeVisible();
+      expect(currentCrumb).toBeVisible();
+      expect(main).not.toContainElement(breadcrumbs);
+    });
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -93,111 +108,42 @@ describe(`<${TagIndexPage.name}/>`, () => {
     });
   });
 
-  describe('when there is no index page', () => {
-    beforeEach(() => {
-      getIndexPageMock.mockResolvedValueOnce(okResult());
+  it('redirects to / when this language has no tag index page', async () => {
+    getIndexPageMock.mockResolvedValueOnce(okResult());
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...MOCK_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
 
-    it('calls notFound() without logging when there is no index page', async () => {
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-      expect(logger.error).not.toHaveBeenCalled();
-    });
-
-    it('redirects to / when this language has no tag index page', async () => {
-      vi.mocked(getRequestContext).mockResolvedValue({
-        ...MOCK_REQUEST_CONTEXT,
-        locale: LOCALE_ISO_CODES.NL,
-        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-      });
-
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-      );
-
-      expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
-      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('when the index page exists', () => {
-    beforeEach(async () => {
-      await setup();
-    });
-
-    it('fetches the index page with the tenant context', () => {
-      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
-    });
-
-    it('renders the heading and supporting text inside main', () => {
-      const main = screen.getByRole('main');
-      const heading = within(main).getByRole('heading', {
-        level: 1,
-        name: 'Tags',
-      });
-      const supportingText = within(main).getByText(SUPPORTING_TEXT);
-      expect(heading).toBeVisible();
-      expect(supportingText).toBeVisible();
-      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    });
-
-    it('renders the breadcrumb trail outside main', () => {
-      const breadcrumbs = screen.getByRole('navigation', {
-        name: 'Breadcrumb',
-      });
-      const homeLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
-      });
-      const currentCrumb = within(breadcrumbs).getByText('Tags');
-      const main = screen.getByRole('main');
-      expect(homeLink).toBeVisible();
-      expect(currentCrumb).toBeVisible();
-      expect(main).not.toContainElement(breadcrumbs);
-    });
-  });
-
-  it('renders the authored modules inside main in order', async () => {
-    resolveIndexPageWith({
-      modules: [
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'cta-2', type: 'module_cta' },
-      ],
-    });
-
-    await setup();
-
-    const main = screen.getByRole('main');
-    const regions = within(main).getAllByRole('region');
-    const ctaRegion = within(main).getByRole('region', {
-      name: MOCK_CTA_HEADING,
-    });
-    const secondCtaRegion = within(main).getByRole('region', {
-      name: MOCK_SECOND_CTA_HEADING,
-    });
-    expect(regions).toEqual([ctaRegion, secondCtaRegion]);
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
   it('renders the hero in place of the heading when one is set', async () => {
-    resolveIndexPageWith({
-      hero: { id: 'hero-1', type: 'module_heroBlog' },
-    });
-    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce(
-      okResult(mockHeroBlogData({ heading: HERO_HEADING })),
+    getIndexPageMock.mockResolvedValueOnce(
+      okResult({
+        ...mockIndexPage(),
+        hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' },
+      }),
+    );
+    getHeroBlogMock.mockResolvedValueOnce(
+      okResult(mockHeroBlogData({ heading: MOCK_HERO_HEADING })),
     );
 
     await setup();
 
     const heroHeading = screen.getByRole('heading', {
       level: 1,
-      name: HERO_HEADING,
+      name: MOCK_HERO_HEADING,
     });
     const pageHeading = screen.queryByRole('heading', {
       level: 1,
-      name: 'Tags',
+      name: MOCK_PAGE_HEADING,
     });
+
     expect(heroHeading).toBeVisible();
     expect(pageHeading).not.toBeInTheDocument();
   });

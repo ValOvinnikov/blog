@@ -1,40 +1,62 @@
+import { faker } from '@faker-js/faker';
 import { at, unset } from 'sanity/migrate';
 
 import { dropPricingTierIsHighlighted } from './index';
+
+faker.seed(10120);
+
+const MOCK_TIER_KEY = faker.string.alphanumeric(12);
+const MOCK_OTHER_TIER_KEY = faker.string.alphanumeric(12);
+const MOCK_HIGHLIGHT_LABEL = faker.lorem.words(2);
+
+const tierPath = (field: string) => ['tiers', { _key: MOCK_TIER_KEY }, field];
 
 describe(dropPricingTierIsHighlighted, () => {
   it('removes isHighlighted and clears the label of an unhighlighted tier', () => {
     const result = dropPricingTierIsHighlighted({
       tiers: [
-        { _key: 'a', isHighlighted: false, highlightLabel: 'Most popular' },
+        {
+          _key: MOCK_TIER_KEY,
+          isHighlighted: false,
+          highlightLabel: MOCK_HIGHLIGHT_LABEL,
+        },
       ],
     });
 
     expect(result).toEqual([
-      at(['tiers', { _key: 'a' }, 'isHighlighted'], unset()),
-      at(['tiers', { _key: 'a' }, 'highlightLabel'], unset()),
+      at(tierPath('isHighlighted'), unset()),
+      at(tierPath('highlightLabel'), unset()),
     ]);
   });
 
   it('removes isHighlighted but keeps the label of a highlighted tier', () => {
     const result = dropPricingTierIsHighlighted({
-      tiers: [{ _key: 'a', isHighlighted: true, highlightLabel: 'Best value' }],
+      tiers: [
+        {
+          _key: MOCK_TIER_KEY,
+          isHighlighted: true,
+          highlightLabel: MOCK_HIGHLIGHT_LABEL,
+        },
+      ],
     });
 
-    expect(result).toEqual([
-      at(['tiers', { _key: 'a' }, 'isHighlighted'], unset()),
-    ]);
+    expect(result).toEqual([at(tierPath('isHighlighted'), unset())]);
   });
 
-  it('is idempotent — a document with no isHighlighted on any tier is left alone', () => {
-    expect(
-      dropPricingTierIsHighlighted({
-        tiers: [{ _key: 'a', highlightLabel: 'Best value' }, { _key: 'b' }],
-      }),
-    ).toBeUndefined();
+  it('leaves a document with no isHighlighted on any tier alone', () => {
+    const result = dropPricingTierIsHighlighted({
+      tiers: [
+        { _key: MOCK_TIER_KEY, highlightLabel: MOCK_HIGHLIGHT_LABEL },
+        { _key: MOCK_OTHER_TIER_KEY },
+      ],
+    });
+
+    expect(result).toBeUndefined();
   });
 
   it('leaves a document without tiers alone', () => {
-    expect(dropPricingTierIsHighlighted({})).toBeUndefined();
+    const result = dropPricingTierIsHighlighted({});
+
+    expect(result).toBeUndefined();
   });
 });

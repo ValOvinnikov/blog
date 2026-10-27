@@ -1,17 +1,27 @@
+import { faker } from '@faker-js/faker';
+
 import { toSectionPagesId } from './id';
+
+faker.seed(9000);
+
+const MOCK_CHILD_PAGES_ID = faker.string.uuid();
 
 describe(toSectionPagesId, () => {
   it('prefixes a published module_childPages id', () => {
-    expect(toSectionPagesId('abc123')).toBe('sectionPages-abc123');
-  });
-
-  it('keeps the drafts. prefix outermost', () => {
-    expect(toSectionPagesId('drafts.abc123')).toBe(
-      'drafts.sectionPages-abc123',
+    expect(toSectionPagesId(MOCK_CHILD_PAGES_ID)).toBe(
+      `sectionPages-${MOCK_CHILD_PAGES_ID}`,
     );
   });
 
-  it('is idempotent for an already-migrated id', () => {
-    expect(toSectionPagesId('sectionPages-abc123')).toBe('sectionPages-abc123');
+  it('keeps the drafts. prefix outermost', () => {
+    expect(toSectionPagesId(`drafts.${MOCK_CHILD_PAGES_ID}`)).toBe(
+      `drafts.sectionPages-${MOCK_CHILD_PAGES_ID}`,
+    );
+  });
+
+  it('leaves an already-migrated id unchanged', () => {
+    const sectionPagesId = `sectionPages-${MOCK_CHILD_PAGES_ID}`;
+
+    expect(toSectionPagesId(sectionPagesId)).toBe(sectionPagesId);
   });
 });

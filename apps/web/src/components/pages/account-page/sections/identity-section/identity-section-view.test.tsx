@@ -3,88 +3,92 @@ import { mockIdentitySectionView } from '@web/testing/pages/account-page/identit
 
 import { IdentitySectionView } from './identity-section-view';
 
-const setup = customRender(IdentitySectionView, mockIdentitySectionView());
+const MOCK_PROPS = mockIdentitySectionView();
+const LINKED_STATUS = 'Linked';
+const LAST_METHOD_NOTICE = "Last remaining method — can't unlink";
+const UNLINK_BUTTON = 'Unlink';
+
+const setup = customRender(IdentitySectionView, MOCK_PROPS);
 
 describe(`<${IdentitySectionView.name}/>`, () => {
-  describe('with default props', () => {
-    beforeEach(() => {
+  it('renders the panel heading as a level-2 heading', () => {
+    setup();
+
+    const sectionHeading = screen.getByRole('heading', {
+      level: 2,
+      name: MOCK_PROPS.heading,
+    });
+
+    expect(sectionHeading).toBeVisible();
+  });
+
+  it.each(MOCK_PROPS.providerRows.map(({ label }) => [label]))(
+    'renders %s as a level-3 heading',
+    (label) => {
       setup();
-    });
 
-    it('renders the panel heading as a level-2 heading', () => {
-      const connectedAccountsHeading = screen.getByRole('heading', {
-        level: 2,
-        name: /Connected accounts/,
-      });
-
-      expect(connectedAccountsHeading).toBeVisible();
-    });
-
-    it('renders each provider name as a level-3 heading', () => {
-      const gitHubHeading = screen.getByRole('heading', {
+      const providerHeading = screen.getByRole('heading', {
         level: 3,
-        name: 'GitHub',
-      });
-      const googleHeading = screen.getByRole('heading', {
-        level: 3,
-        name: 'Google',
-      });
-      const emailLinkHeading = screen.getByRole('heading', {
-        level: 3,
-        name: 'Email link',
+        name: label,
       });
 
-      expect(gitHubHeading).toBeVisible();
-      expect(googleHeading).toBeVisible();
-      expect(emailLinkHeading).toBeVisible();
-    });
+      expect(providerHeading).toBeVisible();
+    },
+  );
 
-    it('shows the linked-status label for a linked row', () => {
-      const linkedLabels = screen.getAllByText('Linked');
+  it('shows the linked-status label once per linked row', () => {
+    setup();
 
-      expect(linkedLabels.length).toBeGreaterThan(0);
-    });
+    const linkedLabels = screen.getAllByText(LINKED_STATUS);
+    const linkedRowCount = MOCK_PROPS.providerRows.filter(
+      ({ isLinked }) => isLinked,
+    ).length;
 
-    it('renders the given control for a row that is not the last remaining method', () => {
-      const unlinkButton = screen.getByRole('button', { name: 'Unlink' });
-
-      expect(unlinkButton).toBeVisible();
-    });
-
-    it('renders the given display-name control inside the display-name row', () => {
-      const displayNameText = screen.getByText('Display name');
-      const saveButton = screen.getByRole('button', { name: 'Save' });
-
-      expect(displayNameText).toBeVisible();
-      expect(saveButton).toBeVisible();
-    });
+    expect(linkedLabels).toHaveLength(linkedRowCount);
   });
 
-  it('shows no linked-status label for a row that is not linked', () => {
+  it('shows no linked-status label when no row is linked', () => {
     setup({
-      providerRows: mockIdentitySectionView().providerRows.map((row) =>
-        row.id === 'google' ? { ...row, isLinked: false } : row,
+      providerRows: MOCK_PROPS.providerRows.map((row) => ({
+        ...row,
+        isLinked: false,
+      })),
+    });
+
+    const linkedLabel = screen.queryByText(LINKED_STATUS);
+
+    expect(linkedLabel).not.toBeInTheDocument();
+  });
+
+  it('renders the given control for a row that is not the last method', () => {
+    setup();
+
+    const unlinkButton = screen.getByRole('button', { name: UNLINK_BUTTON });
+
+    expect(unlinkButton).toBeVisible();
+  });
+
+  it('renders the display-name label and control', () => {
+    setup();
+
+    const displayNameLabel = screen.getByText(MOCK_PROPS.displayNameLabel);
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+
+    expect(displayNameLabel).toBeVisible();
+    expect(saveButton).toBeVisible();
+  });
+
+  it('shows the last-method notice instead of the control for the last method', () => {
+    setup({
+      providerRows: MOCK_PROPS.providerRows.map((row, index) =>
+        index === 0 ? { ...row, isLastMethod: true } : row,
       ),
     });
 
-    const googleHeading = screen.getByRole('heading', { name: 'Google' });
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(googleHeading.parentElement).not.toHaveTextContent('Linked');
-  });
+    const lastMethodNotice = screen.getByText(LAST_METHOD_NOTICE);
+    const unlinkButton = screen.queryByRole('button', { name: UNLINK_BUTTON });
 
-  it('renders the last-method notice instead of the control when isLastMethod is true', () => {
-    setup({
-      providerRows: mockIdentitySectionView().providerRows.map((row) =>
-        row.id === 'github' ? { ...row, isLastMethod: true } : row,
-      ),
-    });
-
-    const lastRemainingMethodText = screen.getByText(
-      "Last remaining method — can't unlink",
-    );
-    const unlinkButton = screen.queryByRole('button', { name: 'Unlink' });
-
-    expect(lastRemainingMethodText).toBeVisible();
+    expect(lastMethodNotice).toBeVisible();
     expect(unlinkButton).not.toBeInTheDocument();
   });
 });

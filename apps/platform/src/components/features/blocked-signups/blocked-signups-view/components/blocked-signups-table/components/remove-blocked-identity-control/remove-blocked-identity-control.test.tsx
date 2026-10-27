@@ -1,90 +1,90 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
+import messages from '@platform/i18n/messages/en.json';
+import { removeBlockedIdentityAction } from '@platform/server/signup-block/remove-blocked-identity-action';
 import {
   MOCK_BLOCKED_DOMAIN,
   mockBlockedSignupEntry,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RemoveBlockedIdentityControl } from './remove-blocked-identity-control';
 
-const { removeBlockedIdentityActionMock } = vi.hoisted(() => ({
-  removeBlockedIdentityActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/signup-block/remove-blocked-identity-action');
 
-vi.mock('@platform/server/signup-block/remove-blocked-identity-action', () => ({
-  removeBlockedIdentityAction: removeBlockedIdentityActionMock,
-}));
+const { removeBlockedIdentityControl } = messages;
+const t = makeEnTranslator('removeBlockedIdentityControl');
 
-const ENTRY = mockBlockedSignupEntry();
-const CONFIRM_BUTTON = { name: 'Remove block' };
+const MOCK_ENTRY = mockBlockedSignupEntry();
+const CONFIRM_BUTTON = { name: removeBlockedIdentityControl.confirmButton };
 
-const setup = customRender(RemoveBlockedIdentityControl, { entry: ENTRY });
+const setup = customRender(RemoveBlockedIdentityControl, {
+  entry: MOCK_ENTRY,
+});
 
 describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
-  const refreshMock = vi.fn();
   let user: UserEvent;
+  let refresh: ReturnType<typeof mockRouterRefresh>;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    removeBlockedIdentityActionMock.mockReset().mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    refreshMock.mockReset();
-    mockRouterRefresh(refreshMock);
+    refresh = mockRouterRefresh();
     setup();
 
     const openDialog = screen.getByRole('button', {
-      name: `Remove block ${MOCK_BLOCKED_DOMAIN}`,
+      name: t('triggerAriaLabel', { value: MOCK_BLOCKED_DOMAIN }),
     });
     await user.click(openDialog);
   });
 
   it('removes the entry only after the operator confirms', async () => {
     const dialog = await screen.findByRole('alertdialog', {
-      name: 'Remove this block?',
+      name: removeBlockedIdentityControl.dialogTitle,
     });
 
     expect(dialog).toBeVisible();
-    expect(removeBlockedIdentityActionMock).not.toHaveBeenCalled();
+    expect(removeBlockedIdentityAction).not.toHaveBeenCalled();
 
     const confirm = screen.getByRole('button', CONFIRM_BUTTON);
     await user.click(confirm);
 
-    expect(removeBlockedIdentityActionMock).toHaveBeenCalledWith(ENTRY.id);
-    expect(refreshMock).toHaveBeenCalled();
+    expect(removeBlockedIdentityAction).toHaveBeenCalledWith(MOCK_ENTRY.id);
+    expect(refresh).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps the dialog open with the refusal for an entry already removed', async () => {
-    removeBlockedIdentityActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SIGNUP_BLOCK_REFUSAL.ENTRY_NOT_FOUND,
-    });
+  it.each([
+    {
+      failure: 'an entry already removed',
+      result: {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: SIGNUP_BLOCK_REFUSAL.ENTRY_NOT_FOUND,
+      },
+      message: removeBlockedIdentityControl.alreadyRemoved,
+    },
+    {
+      failure: 'a failed removal',
+      result: { outcome: ACTION_OUTCOME.SERVER_ERROR },
+      message: removeBlockedIdentityControl.removalFailed,
+    },
+  ] as const)(
+    'keeps the dialog open with the error for $failure',
+    async ({ result, message }) => {
+      vi.mocked(removeBlockedIdentityAction).mockResolvedValueOnce(result);
 
-    const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
-    await user.click(confirm);
+      const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+      await user.click(confirm);
 
-    const refusal = await screen.findByText('This block was already removed.');
+      const error = await screen.findByText(message);
+      const dialog = screen.getByRole('alertdialog', {
+        name: removeBlockedIdentityControl.dialogTitle,
+      });
 
-    expect(refusal).toBeVisible();
-    expect(refreshMock).not.toHaveBeenCalled();
-  });
-
-  it('keeps the dialog open with an error when removal fails', async () => {
-    removeBlockedIdentityActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-
-    const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
-    await user.click(confirm);
-
-    const error = await screen.findByText(
-      "Couldn't remove the block — try again.",
-    );
-
-    expect(error).toBeVisible();
-    expect(refreshMock).not.toHaveBeenCalled();
-  });
+      expect(error).toBeVisible();
+      expect(dialog).toBeVisible();
+      expect(refresh).not.toHaveBeenCalled();
+    },
+  );
 });

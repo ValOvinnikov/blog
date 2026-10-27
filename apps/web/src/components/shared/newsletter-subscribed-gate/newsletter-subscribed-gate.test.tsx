@@ -1,49 +1,51 @@
-import {
-  customRender,
-  renderElement,
-  screen,
-} from '@web/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@web/testing/custom-render';
+import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
 
 import { NewsletterSubscribedGate } from './newsletter-subscribed-gate';
 
+faker.seed(6007);
+
+const MOCK_CHILD_TEXT = faker.lorem.sentence();
+
 const setup = customRender(NewsletterSubscribedGate, {
-  children: <p>Subscribe here</p>,
+  children: <p>{MOCK_CHILD_TEXT}</p>,
 });
 
 describe(`<${NewsletterSubscribedGate.name}/>`, () => {
   afterEach(() => {
-    document.cookie =
-      'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+    document.cookie = `${NEWSLETTER_SUBSCRIBED_COOKIE_NAME}=; Max-Age=0; Path=/`;
   });
 
   it('renders its children when the subscribed cookie is absent', () => {
     setup();
 
-    expect(screen.getByText('Subscribe here')).toBeVisible();
+    const child = screen.getByText(MOCK_CHILD_TEXT);
+
+    expect(child).toBeVisible();
   });
 
   it('renders nothing when the subscribed cookie is present', () => {
-    document.cookie = 'newsletter_subscribed=1';
+    document.cookie = `${NEWSLETTER_SUBSCRIBED_COOKIE_NAME}=1`;
 
     setup();
 
-    expect(screen.queryByText('Subscribe here')).not.toBeInTheDocument();
+    const child = screen.queryByText(MOCK_CHILD_TEXT);
+
+    expect(child).not.toBeInTheDocument();
   });
 
-  it('keeps its children visible when the cookie is set after the first render', () => {
-    const { rerender } = renderElement(
-      <NewsletterSubscribedGate>
-        <p>Subscribe here</p>
-      </NewsletterSubscribedGate>,
-    );
+  it('keeps its children visible when the cookie is set after first render', () => {
+    const { rerender } = setup();
 
-    document.cookie = 'newsletter_subscribed=1';
+    document.cookie = `${NEWSLETTER_SUBSCRIBED_COOKIE_NAME}=1`;
     rerender(
       <NewsletterSubscribedGate>
-        <p>Subscribe here</p>
+        <p>{MOCK_CHILD_TEXT}</p>
       </NewsletterSubscribedGate>,
     );
 
-    expect(screen.getByText('Subscribe here')).toBeVisible();
+    const child = screen.getByText(MOCK_CHILD_TEXT);
+    expect(child).toBeVisible();
   });
 });

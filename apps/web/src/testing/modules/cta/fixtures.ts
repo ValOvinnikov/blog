@@ -13,10 +13,6 @@ import {
   mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
-export const MOCK_CTA_HEADING = 'Join the list';
-
-export const MOCK_SECOND_CTA_HEADING = 'Write for us';
-
 export const MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL =
   'Learn more about our subscription plans';
 

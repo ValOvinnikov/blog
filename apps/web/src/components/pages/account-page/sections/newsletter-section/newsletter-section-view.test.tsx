@@ -4,50 +4,52 @@ import { mockNewsletterSectionView } from '@web/testing/pages/account-page/newsl
 
 import { NewsletterSectionView } from './newsletter-section-view';
 
-const defaultProps = mockNewsletterSectionView();
+const MOCK_PROPS = mockNewsletterSectionView();
 
-const setup = customRender(NewsletterSectionView, defaultProps);
+const setup = customRender(NewsletterSectionView, MOCK_PROPS);
 
 describe(`<${NewsletterSectionView.name}/>`, () => {
-  describe('with default props', () => {
+  describe('with an active subscription', () => {
     beforeEach(() => {
       setup();
     });
 
     it('renders the panel heading as a level-2 heading', () => {
-      const heading = screen.getByRole('heading', {
+      const sectionHeading = screen.getByRole('heading', {
         level: 2,
-        name: defaultProps.heading,
+        name: MOCK_PROPS.heading,
       });
 
-      expect(heading).toBeVisible();
+      expect(sectionHeading).toBeVisible();
     });
 
-    it('renders the active state with the subscribed badge, email, and control', () => {
-      const badge = screen.getByText(defaultProps.activeBadgeLabel);
-      const email = screen.getByText(defaultProps.email);
-      const control = screen.getByRole('button', { name: 'Unsubscribe' });
+    it('renders the subscribed badge, the email and the control', () => {
+      const badge = screen.getByText(MOCK_PROPS.activeBadgeLabel);
+      const email = screen.getByText(MOCK_PROPS.email);
+      const unsubscribeButton = screen.getByRole('button', {
+        name: 'Unsubscribe',
+      });
 
       expect(badge).toBeVisible();
       expect(email).toBeVisible();
-      expect(control).toBeVisible();
+      expect(unsubscribeButton).toBeVisible();
     });
   });
 
-  it('renders the pending state with the pending badge, no email, and control', () => {
+  it('renders the pending badge and control, without the email', () => {
     setup({
       status: SUBSCRIBER_STATUS.PENDING,
       control: <button type="button">Resend</button>,
     });
 
-    const badge = screen.getByText(defaultProps.pendingBadgeLabel);
-    const description = screen.getByText(defaultProps.pendingDescription);
-    const email = screen.queryByText(defaultProps.email);
-    const control = screen.getByRole('button', { name: 'Resend' });
+    const badge = screen.getByText(MOCK_PROPS.pendingBadgeLabel);
+    const description = screen.getByText(MOCK_PROPS.pendingDescription);
+    const email = screen.queryByText(MOCK_PROPS.email);
+    const resendButton = screen.getByRole('button', { name: 'Resend' });
 
     expect(badge).toBeVisible();
     expect(description).toBeVisible();
     expect(email).not.toBeInTheDocument();
-    expect(control).toBeVisible();
+    expect(resendButton).toBeVisible();
   });
 });

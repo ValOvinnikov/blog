@@ -1,21 +1,30 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { DeadEndView } from './dead-end-view';
 
-describe(DeadEndView, () => {
-  it('renders the title as the page heading with its description and action', () => {
-    renderWithIntl(
-      <DeadEndView
-        title="Page not found"
-        description="This page doesn't exist."
-        action={<button type="button">Go back</button>}
-      />,
-    );
+faker.seed(2404);
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Page not found' }),
-    ).toBeVisible();
-    expect(screen.getByText("This page doesn't exist.")).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Go back' })).toBeVisible();
+const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_ACTION_LABEL = faker.lorem.words(2);
+
+const setup = customRender(DeadEndView, {
+  title: MOCK_TITLE,
+  description: MOCK_DESCRIPTION,
+  action: <button type="button">{MOCK_ACTION_LABEL}</button>,
+});
+
+describe(`<${DeadEndView.name}/>`, () => {
+  it('renders the title as the page heading with its description and action', () => {
+    setup();
+
+    const heading = screen.getByRole('heading', { level: 1, name: MOCK_TITLE });
+    const description = screen.getByText(MOCK_DESCRIPTION);
+    const action = screen.getByRole('button', { name: MOCK_ACTION_LABEL });
+
+    expect(heading).toBeVisible();
+    expect(description).toBeVisible();
+    expect(action).toBeVisible();
   });
 });

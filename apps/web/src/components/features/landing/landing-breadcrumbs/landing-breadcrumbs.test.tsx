@@ -1,8 +1,11 @@
+import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   mockLandingSectionNavigation,
   MOCK_LANDING_PAGE,
   MOCK_SECTION_FAQ_TITLE,
+  MOCK_SECTION_ROOT_PATH,
   MOCK_SECTION_ROOT_TITLE,
 } from '@web/testing/pages/landing-page/fixtures';
 import {
@@ -31,10 +34,13 @@ vi.mock('@web/server/landing/get-landing-page/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 
+faker.seed(5776);
+
+const MOCK_LANDING_PATH = faker.lorem.slug();
 const HOME_LINK_STEP = { label: MOCK_SITE_SETTINGS.brand.name, href: '/' };
 
 const setup = customRenderAsync(LandingBreadcrumbs, {
-  path: 'about-us',
+  path: MOCK_LANDING_PATH,
 });
 
 describe(`<${LandingBreadcrumbs.name}/>`, () => {
@@ -59,7 +65,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getLandingPageMock,
     setup,
     successData: MOCK_LANDING_PAGE,
-    itemPath: '/about-us',
+    itemPath: routes.landingPage(MOCK_LANDING_PATH),
   });
   testNoJsonLdWithoutBaseUrl({
     pageLoaderMock: getLandingPageMock,
@@ -71,7 +77,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     setup,
     successData: MOCK_LANDING_PAGE,
     description: 'forwards the path to getLandingPage',
-    expectedArgs: ['about-us'],
+    expectedArgs: [MOCK_LANDING_PATH],
   });
 
   describe('inside a section', () => {
@@ -84,7 +90,10 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
       },
       linkSteps: [
         HOME_LINK_STEP,
-        { label: MOCK_SECTION_ROOT_TITLE, href: '/modules' },
+        {
+          label: MOCK_SECTION_ROOT_TITLE,
+          href: routes.landingPage(MOCK_SECTION_ROOT_PATH),
+        },
       ],
       currentLabel: MOCK_SECTION_FAQ_TITLE,
     });

@@ -1,84 +1,118 @@
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  SPACING_SCALE,
+} from '@blog/config/constants';
+import {
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { at, createIfNotExists, set } from 'sanity/migrate';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+faker.seed(9001);
 
-const childPages = {
-  ...baseDoc,
-  _id: 'abc123',
-  _type: 'module_childPages',
-  title: 'Section pages',
-  brandVariant: 'PRIMARY',
-  headingBlock: { _type: 'moduleHeadingBlock', heading: 'In this section' },
-  alignment: 'CENTER',
-  layout: { _type: 'wideLayout', spacing: 'DEFAULT' },
+const MOCK_CHILD_PAGES_ID = faker.string.uuid();
+const MOCK_OTHER_CHILD_PAGES_ID = faker.string.uuid();
+const MOCK_SECTION_PAGES_ID = `sectionPages-${MOCK_CHILD_PAGES_ID}`;
+const MOCK_CHILD_PAGES_FIELDS = {
+  title: faker.lorem.words(2),
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: {
+    _type: 'moduleHeadingBlock',
+    heading: faker.lorem.words(3),
+  },
+  alignment: CONTENT_ALIGNMENT.CENTER,
+  layout: { _type: 'wideLayout', spacingTop: SPACING_SCALE.MD },
 };
+const MOCK_CTA_ITEM = {
+  _key: faker.string.alphanumeric(12),
+  _type: 'module_cta',
+  _ref: faker.string.uuid(),
+};
+const MOCK_CHILD_PAGES_KEY = faker.string.alphanumeric(12);
+const MOCK_WEAK_CHILD_PAGES_KEY = faker.string.alphanumeric(12);
 
-describe('create-module-section-pages-from-child-pages migration', () => {
+const mockChildPages = (_id: string) =>
+  mockMigrationDocument({
+    _id,
+    _type: 'module_childPages',
+    ...MOCK_CHILD_PAGES_FIELDS,
+  });
+
+const mockLandingTemplate = (modules?: unknown[]) =>
+  mockMigrationDocument({ _type: 'template_landing', modules });
+
+describe('create-module-section-pages-from-child-pages', () => {
   describe('module_childPages documents', () => {
-    it('creates a module_sectionPages carrying every field across', () => {
-      expect(migration.migrate.document(childPages)).toEqual([
+    it('creates a module_sectionPages carrying every field across', async () => {
+      const mutations = await runDocumentMigration(
+        migration,
+        mockChildPages(MOCK_CHILD_PAGES_ID),
+      );
+
+      expect(mutations).toEqual([
         createIfNotExists({
-          _id: 'sectionPages-abc123',
+          _id: MOCK_SECTION_PAGES_ID,
           _type: 'module_sectionPages',
-          title: childPages.title,
-          brandVariant: childPages.brandVariant,
-          headingBlock: childPages.headingBlock,
-          alignment: childPages.alignment,
-          layout: childPages.layout,
+          ...MOCK_CHILD_PAGES_FIELDS,
         }),
       ]);
     });
 
-    it('lands a draft module_childPages on the draft module_sectionPages', () => {
-      const [mutation] = migration.migrate.document({
-        ...childPages,
-        _id: 'drafts.abc123',
-      }) as ReturnType<typeof createIfNotExists>[];
+    it('lands a draft module_childPages on the draft module_sectionPages', async () => {
+      const mutations = await runDocumentMigration(
+        migration,
+        mockChildPages(`drafts.${MOCK_CHILD_PAGES_ID}`),
+      );
 
-      expect(mutation?.document._id).toBe('drafts.sectionPages-abc123');
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: `drafts.${MOCK_SECTION_PAGES_ID}`,
+          _type: 'module_sectionPages',
+          ...MOCK_CHILD_PAGES_FIELDS,
+        }),
+      ]);
     });
   });
 
   describe('template_landing documents', () => {
-    it('repoints every module_childPages item in modules[], leaving other modules alone', () => {
-      const template = {
-        ...baseDoc,
-        _id: 'template-1',
-        _type: 'template_landing',
-        modules: [
-          { _key: 'key1', _type: 'module_childPages', _ref: 'abc123' },
-          { _key: 'key2', _type: 'module_cta', _ref: 'cta-1' },
-          {
-            _key: 'key3',
-            _type: 'module_childPages',
-            _ref: 'def456',
-            _weak: true,
-            _strengthenOnPublish: { type: 'module_childPages' },
-          },
-        ],
-      };
+    it('repoints every module_childPages item in modules[], leaving other modules alone', async () => {
+      const template = mockLandingTemplate([
+        {
+          _key: MOCK_CHILD_PAGES_KEY,
+          _type: 'module_childPages',
+          _ref: MOCK_CHILD_PAGES_ID,
+        },
+        MOCK_CTA_ITEM,
+        {
+          _key: MOCK_WEAK_CHILD_PAGES_KEY,
+          _type: 'module_childPages',
+          _ref: MOCK_OTHER_CHILD_PAGES_ID,
+          _weak: true,
+          _strengthenOnPublish: { type: 'module_childPages' },
+        },
+      ]);
 
-      expect(migration.migrate.document(template)).toEqual([
+      const mutations = await runDocumentMigration(migration, template);
+
+      expect(mutations).toEqual([
         at(
-          ['modules', { _key: 'key1' }],
+          ['modules', { _key: MOCK_CHILD_PAGES_KEY }],
           set({
-            _key: 'key1',
+            _key: MOCK_CHILD_PAGES_KEY,
             _type: 'module_sectionPages',
-            _ref: 'sectionPages-abc123',
+            _ref: MOCK_SECTION_PAGES_ID,
           }),
         ),
         at(
-          ['modules', { _key: 'key3' }],
+          ['modules', { _key: MOCK_WEAK_CHILD_PAGES_KEY }],
           set({
-            _key: 'key3',
+            _key: MOCK_WEAK_CHILD_PAGES_KEY,
             _type: 'module_sectionPages',
-            _ref: 'sectionPages-def456',
+            _ref: `sectionPages-${MOCK_OTHER_CHILD_PAGES_ID}`,
             _weak: true,
             _strengthenOnPublish: { type: 'module_sectionPages' },
           }),
@@ -86,42 +120,26 @@ describe('create-module-section-pages-from-child-pages migration', () => {
       ]);
     });
 
-    it('produces no patches for a template without a module_childPages item', () => {
-      const template = {
-        ...baseDoc,
-        _id: 'template-1',
-        _type: 'template_landing',
-        modules: [{ _key: 'key2', _type: 'module_cta', _ref: 'cta-1' }],
-      };
-
-      expect(migration.migrate.document(template)).toBeUndefined();
-    });
-
-    it('produces no patches for a template with no modules field', () => {
-      const template = {
-        ...baseDoc,
-        _id: 'template-1',
-        _type: 'template_landing',
-      };
-
-      expect(migration.migrate.document(template)).toBeUndefined();
-    });
-
-    it('is idempotent — an already repointed template is left alone', () => {
-      const template = {
-        ...baseDoc,
-        _id: 'template-1',
-        _type: 'template_landing',
+    it.each([
+      { title: 'without a module_childPages item', modules: [MOCK_CTA_ITEM] },
+      { title: 'with no modules field', modules: undefined },
+      {
+        title: 'whose items already point at module_sectionPages',
         modules: [
           {
-            _key: 'key1',
+            _key: MOCK_CHILD_PAGES_KEY,
             _type: 'module_sectionPages',
-            _ref: 'sectionPages-abc123',
+            _ref: MOCK_SECTION_PAGES_ID,
           },
         ],
-      };
+      },
+    ])('leaves a template $title alone', async ({ modules }) => {
+      const mutations = await runDocumentMigration(
+        migration,
+        mockLandingTemplate(modules),
+      );
 
-      expect(migration.migrate.document(template)).toBeUndefined();
+      expect(mutations).toBeUndefined();
     });
   });
 });

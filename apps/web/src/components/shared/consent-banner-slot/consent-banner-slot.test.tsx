@@ -1,95 +1,99 @@
+import { CONSENT_CATEGORY } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import {
   customRender,
   renderElement,
   screen,
 } from '@web/testing/custom-render';
+import {
+  clearConsentCookie,
+  grantConsent,
+  readGrantedConsent,
+} from '@web/testing/shared/consent/consent-cookie';
+import {
+  PREFERENCES_OPEN_TEXT,
+  PreferencesState,
+} from '@web/testing/shared/consent/consent-preferences-probes';
 
 import { ConsentBannerSlot } from './consent-banner-slot';
 
+const BANNER_HEADING = 'Cookies on this site';
+
 const setup = customRender(ConsentBannerSlot, { isEnabled: true });
 
-const clearConsentCookie = () => {
-  document.cookie = 'consent=; Max-Age=0; Path=/';
-};
-
-const PreferencesState = () => {
-  const { isOpen } = useConsentPreferences();
-  return <p>{isOpen ? 'Preferences open' : 'Preferences closed'}</p>;
-};
-
-let user: UserEvent;
-
 describe(`<${ConsentBannerSlot.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     clearConsentCookie();
     user = userEvent.setup();
   });
+
   afterEach(clearConsentCookie);
 
   it('renders nothing when the banner is disabled', () => {
     setup({ isEnabled: false });
 
-    expect(
-      screen.queryByRole('heading', { name: 'Cookies on this site' }),
-    ).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading', { name: BANNER_HEADING });
+
+    expect(heading).not.toBeInTheDocument();
   });
 
   it('renders nothing once a choice has been made', () => {
-    document.cookie = 'consent=1.; Path=/';
+    grantConsent([]);
 
     setup();
 
-    expect(
-      screen.queryByRole('heading', { name: 'Cookies on this site' }),
-    ).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading', { name: BANNER_HEADING });
+
+    expect(heading).not.toBeInTheDocument();
   });
 
   describe('while consent is unanswered', () => {
     beforeEach(() => {
-      setup();
+      renderElement(
+        <>
+          <ConsentBannerSlot isEnabled={true} />
+          <PreferencesState />
+        </>,
+      );
     });
 
-    it('offers the choice while consent is unanswered', () => {
-      expect(
-        screen.getByRole('heading', { name: 'Cookies on this site' }),
-      ).toBeVisible();
+    it('offers the choice', () => {
+      const heading = screen.getByRole('heading', { name: BANNER_HEADING });
+
+      expect(heading).toBeVisible();
     });
 
     it('hides and remembers the choice on accept all', async () => {
-      await user.click(screen.getByRole('button', { name: 'Accept all' }));
+      const acceptButton = screen.getByRole('button', { name: 'Accept all' });
 
-      expect(
-        screen.queryByRole('heading', { name: 'Cookies on this site' }),
-      ).not.toBeInTheDocument();
-      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+      await user.click(acceptButton);
+
+      const heading = screen.queryByRole('heading', { name: BANNER_HEADING });
+      expect(heading).not.toBeInTheDocument();
+      expect(readGrantedConsent()).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
     });
 
     it('hides and remembers the choice on reject all', async () => {
-      await user.click(screen.getByRole('button', { name: 'Reject all' }));
+      const rejectButton = screen.getByRole('button', { name: 'Reject all' });
 
-      expect(
-        screen.queryByRole('heading', { name: 'Cookies on this site' }),
-      ).not.toBeInTheDocument();
-      expect(document.cookie).not.toContain('EXTERNAL_MEDIA');
-      expect(document.cookie).toContain('consent=1.');
+      await user.click(rejectButton);
+
+      const heading = screen.queryByRole('heading', { name: BANNER_HEADING });
+      expect(heading).not.toBeInTheDocument();
+      expect(readGrantedConsent()).toEqual([]);
     });
-  });
 
-  it('opens the preferences from settings and keeps the banner', async () => {
-    renderElement(
-      <>
-        <ConsentBannerSlot isEnabled={true} />
-        <PreferencesState />
-      </>,
-    );
+    it('opens the preferences from settings and keeps the banner', async () => {
+      const settingsButton = screen.getByRole('button', { name: 'Settings' });
 
-    await user.click(screen.getByRole('button', { name: 'Settings' }));
+      await user.click(settingsButton);
 
-    expect(screen.getByText('Preferences open')).toBeVisible();
-    expect(
-      screen.getByRole('heading', { name: 'Cookies on this site' }),
-    ).toBeVisible();
+      const openState = screen.getByText(PREFERENCES_OPEN_TEXT);
+      const heading = screen.getByRole('heading', { name: BANNER_HEADING });
+      expect(openState).toBeVisible();
+      expect(heading).toBeVisible();
+    });
   });
 });

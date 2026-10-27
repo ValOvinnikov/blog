@@ -1,4 +1,6 @@
+import { routes, SITE_MESSAGES } from '@blog/config';
 import { okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import {
@@ -12,12 +14,6 @@ import {
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
-
-const POST_SLUG = MOCK_POST_DETAIL.slug;
-const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
-const TOPIC_HREF = `/topics/${MOCK_POST_DETAIL.topic.slug}`;
-const POST_TITLE = MOCK_POST_DETAIL.title;
-const TOPIC_TITLE = MOCK_POST_DETAIL.topic.title;
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -33,6 +29,23 @@ vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
+faker.seed(5776);
+
+const MOCK_TOPIC_SLUG = faker.lorem.slug();
+const MOCK_POST = {
+  ...MOCK_POST_DETAIL,
+  topic: { ...MOCK_POST_DETAIL.topic, slug: MOCK_TOPIC_SLUG },
+};
+
+const POST_SLUG = MOCK_POST.slug;
+const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
+const HOME_HREF = routes.home();
+const TOPIC_HREF = routes.topic(MOCK_TOPIC_SLUG);
+const POST_HREF = routes.post(POST_SLUG);
+const BREADCRUMB_NAV_NAME = SITE_MESSAGES.breadcrumbs.ariaLabel;
+const POST_TITLE = MOCK_POST.title;
+const TOPIC_TITLE = MOCK_POST.topic.title;
+
 const setup = customRenderAsync(PostBreadcrumbs, {
   slug: POST_SLUG,
 });
@@ -47,9 +60,9 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
   testBreadcrumbsTrail({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: MOCK_POST_DETAIL,
+    successData: MOCK_POST,
     linkSteps: [
-      { label: SITE_NAME, href: '/' },
+      { label: SITE_NAME, href: HOME_HREF },
       { label: TOPIC_TITLE, href: TOPIC_HREF },
     ],
     currentLabel: POST_TITLE,
@@ -57,23 +70,23 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: MOCK_POST_DETAIL,
+    successData: MOCK_POST,
     itemPath: TOPIC_HREF,
   });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: MOCK_POST_DETAIL,
+    successData: MOCK_POST,
     expectedTrail: [
-      { name: SITE_NAME, path: '/' },
+      { name: SITE_NAME, path: HOME_HREF },
       { name: TOPIC_TITLE, path: TOPIC_HREF },
-      { name: POST_TITLE, path: `/blog/${POST_SLUG}` },
+      { name: POST_TITLE, path: POST_HREF },
     ],
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getPostPageMock,
     setup,
-    successData: MOCK_POST_DETAIL,
+    successData: MOCK_POST,
     description: 'forwards the slug to getPostPage',
     expectedArgs: [POST_SLUG],
   });
@@ -82,14 +95,16 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     it('omits the topic crumb', async () => {
       getPostPageMock.mockResolvedValue(
         okResult({
-          ...MOCK_POST_DETAIL,
-          topic: { ...MOCK_POST_DETAIL.topic, slug: undefined },
+          ...MOCK_POST,
+          topic: { ...MOCK_POST.topic, slug: undefined },
         }),
       );
 
       await setup();
 
-      const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+      const nav = screen.getByRole('navigation', {
+        name: BREADCRUMB_NAV_NAME,
+      });
       const siteNameLink = within(nav).getByRole('link', { name: SITE_NAME });
       const topicTitleText = within(nav).queryByText(TOPIC_TITLE);
 

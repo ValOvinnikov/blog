@@ -1,12 +1,27 @@
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+  routes,
+} from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
+import { CtaModule } from '@web/modules/cta/cta-module';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_FAQ_PAGE_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
+import {
+  MOCK_CTA_STUB_TEST_ID,
+  MOCK_HERO_STUB_TEST_ID,
+  mockModule,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -16,23 +31,10 @@ import { notFound, redirect } from 'next/navigation';
 
 import { HomePage } from './home-page';
 
-const { getHomePageMock, homeModuleRendererMock } = vi.hoisted(() => ({
+faker.seed(5189);
+
+const { getHomePageMock } = vi.hoisted(() => ({
   getHomePageMock: vi.fn(),
-  homeModuleRendererMock: vi.fn(
-    ({
-      hero,
-      headingBlock,
-      modules,
-    }: {
-      hero?: { id: string };
-      headingBlock: { heading: string };
-      modules: { id: string }[];
-    }) => (
-      <div data-testid={HOME_MODULE_RENDERER_TEST_ID}>
-        {hero ? hero.id : headingBlock.heading} — {modules.length} modules
-      </div>
-    ),
-  ),
 }));
 
 vi.mock('@web/server/request-context/request-context');
@@ -45,24 +47,25 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('./home-module-renderer', () => ({
-  HomeModuleRenderer: homeModuleRendererMock,
-}));
+vi.mock('@web/modules/hero-blog/hero-blog-module');
+vi.mock('@web/modules/cta/cta-module');
 
-const setup = customRenderAsync(HomePage, {});
+const setup = customRenderServerAsync(HomePage, {});
 
-const MOCK_HEADING = 'Welcome to the blog';
-const HOME_MODULE_RENDERER_TEST_ID = 'home-module-renderer';
+const MOCK_HEADING = faker.lorem.sentence();
 const MOCK_HOME_PAGE_ID = faker.string.uuid();
-
-const MOCK_HERO = { id: 'hero-1', type: 'module_hero' };
-const MOCK_CONTENT_MODULE = { id: 'module-1', type: 'module_content' };
+const MOCK_FAQ = {
+  id: faker.string.uuid(),
+  question: faker.lorem.sentence(),
+  answer: faker.lorem.sentence(),
+};
 
 const resolveHomePageWith = (overrides: Record<string, unknown> = {}) =>
   getHomePageMock.mockResolvedValue(
     okResult({
       id: MOCK_HOME_PAGE_ID,
       headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
+      headingAlignment: CONTENT_ALIGNMENT.LEFT,
       hero: undefined,
       modules: [],
       faqs: [],
@@ -103,7 +106,7 @@ describe(`<${HomePage.name}/>`, () => {
     });
   });
 
-  it('redirects to / when this language has no Home of its own', async () => {
+  it('redirects home when this language has no Home of its own', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
       ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
@@ -113,60 +116,51 @@ describe(`<${HomePage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith(routes.home());
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  describe('with a hero and modules', () => {
-    beforeEach(async () => {
-      resolveHomePageWith({
-        hero: MOCK_HERO,
-        modules: [MOCK_CONTENT_MODULE],
-      });
-
-      await setup();
-    });
-
-    it('renders the module renderer inside a single main landmark', () => {
-      const main = screen.getByRole('main');
-      const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
-
-      expect(main).toContainElement(renderer);
-    });
-
-    it("dispatches the module renderer with the page's id, hero, heading, modules", () => {
-      const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
-
-      expect(homeModuleRendererMock).toHaveBeenCalledWith(
-        {
-          homePageId: MOCK_HOME_PAGE_ID,
-          hero: MOCK_HERO,
-          headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
-          modules: [MOCK_CONTENT_MODULE],
-        },
-        undefined,
-      );
-      expect(renderer).toHaveTextContent(`${MOCK_HERO.id} — 1 modules`);
-    });
-  });
-
-  it('dispatches the module renderer with no hero when the page has none', async () => {
+  it('renders the page heading inside main when the page has no hero', async () => {
     resolveHomePageWith();
 
     await setup();
 
-    const renderer = screen.getByTestId(HOME_MODULE_RENDERER_TEST_ID);
+    const main = screen.getByRole('main');
+    const heading = within(main).getByRole('heading', {
+      level: 1,
+      name: MOCK_HEADING,
+    });
 
-    expect(homeModuleRendererMock).toHaveBeenCalledWith(
-      {
-        homePageId: MOCK_HOME_PAGE_ID,
-        hero: undefined,
-        headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
-        modules: [],
-      },
+    expect(heading).toBeVisible();
+  });
+
+  it('renders the hero and the modules inside main', async () => {
+    const hero = mockModule('module_heroBlog');
+    const ctaModule = mockModule('module_cta');
+    resolveHomePageWith({ hero, modules: [ctaModule] });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    const heroStub = within(main).getByTestId(MOCK_HERO_STUB_TEST_ID);
+    const ctaStub = within(main).getByTestId(MOCK_CTA_STUB_TEST_ID);
+    const pageHeading = screen.queryByRole('heading', { name: MOCK_HEADING });
+
+    expect(heroStub).toHaveTextContent(hero.id);
+    expect(ctaStub).toHaveTextContent(ctaModule.id);
+    expect(pageHeading).not.toBeInTheDocument();
+  });
+
+  it('hands the home page id to its modules as context', async () => {
+    const ctaModule = mockModule('module_cta');
+    resolveHomePageWith({ modules: [ctaModule] });
+
+    await setup();
+
+    expect(CtaModule).toHaveBeenCalledWith(
+      { id: ctaModule.id, context: { homePage: { id: MOCK_HOME_PAGE_ID } } },
       undefined,
     );
-    expect(renderer).toHaveTextContent(`${MOCK_HEADING} — 0 modules`);
   });
 
   it('forwards the request context Sanity context to getHomePage', async () => {
@@ -188,15 +182,7 @@ describe(`<${HomePage.name}/>`, () => {
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    resolveHomePageWith({
-      faqs: [
-        {
-          id: 'faq-1',
-          question: 'Do you offer a free trial?',
-          answer: 'Yes.',
-        },
-      ],
-    });
+    resolveHomePageWith({ faqs: [MOCK_FAQ] });
 
     await setup();
 

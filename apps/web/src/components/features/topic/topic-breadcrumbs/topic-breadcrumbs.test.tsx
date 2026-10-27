@@ -1,3 +1,5 @@
+import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testBreadcrumbsJsonLdSchema,
@@ -14,9 +16,6 @@ import { mockTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
-const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
-const TOPIC_HREF = '/topics/news';
-
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
@@ -31,11 +30,20 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-const topic = mockTopic({ title: 'News', slug: 'news' });
-const successData = { topic, modules: [], seo: mockSeo() };
+faker.seed(5776);
+
+const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
+const MOCK_TOPIC_SLUG = faker.lorem.slug();
+const MOCK_TOPIC = mockTopic({
+  id: faker.string.uuid(),
+  title: faker.lorem.words(2),
+  slug: MOCK_TOPIC_SLUG,
+});
+const TOPIC_HREF = routes.topic(MOCK_TOPIC_SLUG);
+const MOCK_PAGE = { topic: MOCK_TOPIC, modules: [], seo: mockSeo() };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {
-  slug: 'news',
+  slug: MOCK_TOPIC_SLUG,
 });
 
 describe(`<${TopicBreadcrumbs.name}/>`, () => {
@@ -52,35 +60,35 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   testBreadcrumbsTrail({
     pageLoaderMock: getTopicPageMock,
     setup,
-    successData,
-    linkSteps: [{ label: SITE_NAME, href: '/' }],
-    currentLabel: 'News',
+    successData: MOCK_PAGE,
+    linkSteps: [{ label: SITE_NAME, href: routes.home() }],
+    currentLabel: MOCK_TOPIC.title,
   });
   testBreadcrumbsJsonLdSchema({
     pageLoaderMock: getTopicPageMock,
     setup,
-    successData,
+    successData: MOCK_PAGE,
     itemPath: TOPIC_HREF,
   });
   testBreadcrumbsJsonLdTrail({
     pageLoaderMock: getTopicPageMock,
     setup,
-    successData,
+    successData: MOCK_PAGE,
     expectedTrail: [
-      { name: SITE_NAME, path: '/' },
-      { name: 'News', path: TOPIC_HREF },
+      { name: SITE_NAME, path: routes.home() },
+      { name: MOCK_TOPIC.title, path: TOPIC_HREF },
     ],
   });
   testNoJsonLdWithoutBaseUrl({
     pageLoaderMock: getTopicPageMock,
     setup,
-    successData,
+    successData: MOCK_PAGE,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getTopicPageMock,
     setup,
-    successData,
+    successData: MOCK_PAGE,
     description: 'forwards the slug to getTopicPage',
-    expectedArgs: ['news'],
+    expectedArgs: [MOCK_TOPIC_SLUG],
   });
 });

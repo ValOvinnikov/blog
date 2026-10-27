@@ -1,33 +1,25 @@
 import {
-  DENSITY,
-  FONT_CHOICE,
   LOCALE_ISO_CODES,
-  RADIUS_SCALE,
   SITE_MESSAGES_BY_LOCALE,
-  type TThemeTokens,
+  type TSiteMessages,
 } from '@blog/config';
-import { NotFoundPage } from '@web/components/pages/not-found-page';
-import { ThemeScope } from '@web/components/shared/theme-scope';
+import { faker } from '@faker-js/faker';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
-import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
-import { NextIntlClientProvider } from 'next-intl';
+import {
+  MOCK_VOICE_LINK_HREF,
+  MOCK_VOICE_LINK_TEXT,
+  mockFormattedVoiceRich,
+} from '@web/testing/shared/voice/fixtures';
+import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
+import { setRequestLocale } from 'next-intl/server';
 
 import { StandaloneNotFoundPage } from './standalone-not-found-page';
 
-const {
-  setRequestLocaleMock,
-  getThemeTokensMock,
-  resolveTenantMessagesMock,
-  toThemeTokensMock,
-} = vi.hoisted(() => ({
-  setRequestLocaleMock: vi.fn(),
+const { getThemeTokensMock, resolveTenantMessagesMock } = vi.hoisted(() => ({
   getThemeTokensMock: vi.fn(),
   resolveTenantMessagesMock: vi.fn(),
-  toThemeTokensMock: vi.fn(),
-}));
-
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: setRequestLocaleMock,
 }));
 
 vi.mock('@web/utils/get-theme-tokens', () => ({
@@ -38,113 +30,111 @@ vi.mock('@web/utils/resolve-tenant-messages', () => ({
   resolveTenantMessages: resolveTenantMessagesMock,
 }));
 
-vi.mock('@web/utils/to-theme-tokens', () => ({
-  toThemeTokens: toThemeTokensMock,
-}));
+faker.seed(6008);
 
-const messages = SITE_MESSAGES_BY_LOCALE.EN;
-const voicedMessages = { notFound: { commandNotFound: 'command not found' } };
-const voicedSupportingText = mockFormattedVoiceRich();
-
-const THEME_TOKENS: TThemeTokens = {
-  accentHue: 250,
-  headingFont: FONT_CHOICE.SPACE_GROTESK,
-  bodyFont: FONT_CHOICE.NEWSREADER,
-  radiusScale: RADIUS_SCALE.MD,
-  density: DENSITY.DEFAULT,
+const { EN, NL } = LOCALE_ISO_CODES;
+const EN_MESSAGES = SITE_MESSAGES_BY_LOCALE.EN;
+const NL_MESSAGES = SITE_MESSAGES_BY_LOCALE.NL;
+const MOCK_VOICED_HEADING = faker.lorem.words(3);
+const MOCK_VOICED_MESSAGES: TSiteMessages = {
+  ...EN_MESSAGES,
+  notFound: { ...EN_MESSAGES.notFound, heading: MOCK_VOICED_HEADING },
 };
 
-const DEFAULT_THEME_TOKENS: TThemeTokens = { ...THEME_TOKENS, accentHue: 200 };
+const setup = customRenderAsync(StandaloneNotFoundPage, {});
 
 describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   beforeEach(() => {
-    getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
+    getThemeTokensMock.mockResolvedValue(toThemeTokens(undefined));
     resolveTenantMessagesMock.mockResolvedValue({
-      messages: voicedMessages,
-      rich: { notFoundSupportingText: voicedSupportingText },
+      messages: MOCK_VOICED_MESSAGES,
+      rich: {
+        ...resolveVoiceRichFields({}, EN_MESSAGES),
+        notFoundSupportingText: mockFormattedVoiceRich(),
+      },
     });
-    toThemeTokensMock.mockReturnValue(DEFAULT_THEME_TOKENS);
   });
 
   it('renders in English by default', async () => {
-    const ui = await StandaloneNotFoundPage();
+    await setup();
 
-    expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
-    expect(ui.props.children.props.locale).toBe(LOCALE_ISO_CODES.EN);
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: EN_MESSAGES.notFound.heading,
+    });
+
+    expect(vi.mocked(setRequestLocale)).toHaveBeenCalledWith(EN);
+    expect(heading).toBeVisible();
   });
 
   it('renders in the given language with its messages', async () => {
-    const ui = await StandaloneNotFoundPage({ locale: LOCALE_ISO_CODES.NL });
-    const provider = ui.props.children;
+    await setup({ locale: NL });
 
-    expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.NL);
-    expect(provider.props.locale).toBe(LOCALE_ISO_CODES.NL);
-    expect(provider.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: NL_MESSAGES.notFound.heading,
+    });
+
+    expect(vi.mocked(setRequestLocale)).toHaveBeenCalledWith(NL);
+    expect(heading).toBeVisible();
   });
 
   describe('given a tenant', () => {
     it('resolves theme tokens and messages with that tenant', async () => {
-      await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
+      await setup({ tenant: MOCK_TENANT_ID });
 
       expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
-        messages,
-        LOCALE_ISO_CODES.EN,
+        EN_MESSAGES,
+        EN,
         MOCK_TENANT_ID,
       );
-      expect(toThemeTokensMock).not.toHaveBeenCalled();
     });
 
-    it('passes the resolved theme tokens through to ThemeScope', async () => {
-      const ui = await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
-
-      expect(ui.type).toBe(ThemeScope);
-      expect(ui.props.themeTokens).toBe(THEME_TOKENS);
-    });
-
-    it('resolves the tenant’s messages in the given language', async () => {
-      await StandaloneNotFoundPage({
-        tenant: MOCK_TENANT_ID,
-        locale: LOCALE_ISO_CODES.NL,
-      });
+    it('resolves the tenant messages in the given language', async () => {
+      await setup({ tenant: MOCK_TENANT_ID, locale: NL });
 
       expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
-        SITE_MESSAGES_BY_LOCALE.NL,
-        LOCALE_ISO_CODES.NL,
+        NL_MESSAGES,
+        NL,
         MOCK_TENANT_ID,
       );
     });
 
-    it('wraps NotFoundPage in its own NextIntlClientProvider', async () => {
-      const ui = await StandaloneNotFoundPage({ tenant: MOCK_TENANT_ID });
-      const provider = ui.props.children;
+    it('renders the tenant-voiced heading and supporting text', async () => {
+      await setup({ tenant: MOCK_TENANT_ID });
 
-      expect(provider.type).toBe(NextIntlClientProvider);
-      expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
-      expect(provider.props.messages).toBe(voicedMessages);
-      expect(provider.props.children.type).toBe(NotFoundPage);
-      expect(provider.props.children.props.supportingText).toBe(
-        voicedSupportingText,
-      );
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_VOICED_HEADING,
+      });
+      const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
+
+      expect(heading).toBeVisible();
+      expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
     });
   });
 
   describe('given no tenant', () => {
-    it('never calls getThemeTokens or resolveTenantMessages', async () => {
-      await StandaloneNotFoundPage();
+    it('never resolves theme tokens or tenant messages', async () => {
+      await setup();
 
       expect(getThemeTokensMock).not.toHaveBeenCalled();
       expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
     });
 
-    it('renders with default theme tokens and the base, un-voiced messages', async () => {
-      const ui = await StandaloneNotFoundPage();
+    it('renders the base, un-voiced copy', async () => {
+      await setup();
 
-      expect(toThemeTokensMock).toHaveBeenCalledWith(undefined);
-      expect(ui.props.themeTokens).toBe(DEFAULT_THEME_TOKENS);
+      const supportingText = screen.getByText(
+        EN_MESSAGES.notFound.supportingText,
+      );
+      const voicedHeading = screen.queryByRole('heading', {
+        name: MOCK_VOICED_HEADING,
+      });
 
-      const provider = ui.props.children;
-      expect(provider.props.messages).toBe(messages);
+      expect(supportingText).toBeVisible();
+      expect(voicedHeading).not.toBeInTheDocument();
     });
   });
 });

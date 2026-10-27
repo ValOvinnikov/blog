@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_VOICE_BOLD_TEXT,
@@ -11,7 +11,7 @@ import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 
 import { NotFoundPage } from './not-found-page';
 
-const RETURN_HOME = 'Return home';
+const { eyebrow, heading, supportingText, returnHome } = SITE_MESSAGES.notFound;
 
 const setup = customRender(NotFoundPage, {
   supportingText: resolveVoiceRichFields({}, SITE_MESSAGES)
@@ -25,36 +25,31 @@ describe(`<${NotFoundPage.name}/>`, () => {
     });
 
     it('renders the eyebrow', () => {
-      const eyebrow = screen.getByText('404');
+      const eyebrowText = screen.getByText(eyebrow);
 
-      expect(eyebrow).toBeVisible();
+      expect(eyebrowText).toBeVisible();
     });
 
-    it('renders a single h1 landmark heading', () => {
-      const heading = screen.getByRole('heading', {
-        level: 1,
-        name: 'Page not found',
-      });
+    it('renders a single h1 heading', () => {
+      const h1 = screen.getByRole('heading', { level: 1, name: heading });
 
-      expect(heading).toBeVisible();
+      expect(h1).toBeVisible();
     });
 
     it('renders the supporting text', () => {
-      const supportingText = screen.getByText(
-        "The page you're looking for doesn't exist.",
-      );
+      const supportingParagraph = screen.getByText(supportingText);
 
-      expect(supportingText).toBeVisible();
+      expect(supportingParagraph).toBeVisible();
     });
 
     it('renders a link back home', () => {
-      const link = screen.getByRole('link', { name: RETURN_HOME });
+      const link = screen.getByRole('link', { name: returnHome });
 
-      expect(link).toHaveAttribute('href', '/');
+      expect(link).toHaveAttribute('href', routes.home());
     });
 
     it('renders the decorative arrow icon inside the link', () => {
-      const link = screen.getByRole('link', { name: RETURN_HOME });
+      const link = screen.getByRole('link', { name: returnHome });
       const icon = within(link).getByTestId('not-found-arrow-icon');
 
       expect(icon).toBeVisible();

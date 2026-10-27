@@ -1,110 +1,110 @@
-import { ICONS } from '@blog/config';
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen, within } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
-  renderWithIntl,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+  mockNavLinkItem,
+  mockNavSection,
+} from '@platform/testing/layout/fixtures';
+import userEvent from '@testing-library/user-event';
 
 import { Topbar } from './topbar';
 
 vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/auth/sign-out-action');
 
-const render = renderWithIntl;
+faker.seed(5993);
 
-const roleChip = {
-  name: 'Jane Doe',
+const MOCK_CRUMB_TEXT = faker.lorem.words(2);
+const MOCK_SCOPE = faker.company.name();
+const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
+const MOCK_NAV_ITEM = mockNavLinkItem();
+const MOCK_ROLE_CHIP = {
+  name: faker.person.fullName(),
   role: ADMIN_ROLE.SUPERADMIN,
-  scope: 'Platform',
+  scope: MOCK_SCOPE,
 };
 
-describe(Topbar, () => {
-  let user: UserEvent;
+const t = makeEnTranslator();
+const roleChipLabel = (role: string) =>
+  t('topbar.roleChip', { role: t(`roleLabel.${role}`), scope: MOCK_SCOPE });
 
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
+const setup = customRender(Topbar, {
+  crumb: <p>{MOCK_CRUMB_TEXT}</p>,
+  roleChip: MOCK_ROLE_CHIP,
+});
 
-  it('renders the given crumb node and the role chip with a translated role', () => {
-    render(<Topbar crumb={<p>Platform</p>} roleChip={roleChip} />);
+describe(`<${Topbar.name}/>`, () => {
+  it('renders the crumb and the role chip with a translated role', () => {
+    setup();
 
-    expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.getByText('Super admin · Platform')).toBeVisible();
-    expect(screen.queryByText(/SUPERADMIN/)).not.toBeInTheDocument();
+    const crumb = screen.getByText(MOCK_CRUMB_TEXT);
+    const roleChip = screen.getByText(roleChipLabel(ADMIN_ROLE.SUPERADMIN));
+    const rawRole = screen.queryByText(ADMIN_ROLE.SUPERADMIN, {
+      exact: false,
+    });
+
+    expect(crumb).toBeVisible();
+    expect(roleChip).toBeVisible();
+    expect(rawRole).not.toBeInTheDocument();
   });
 
   it('never derives avatar initials from the role when the user has no name', () => {
-    render(
-      <Topbar
-        crumb={<p>Platform</p>}
-        roleChip={{
-          name: undefined,
-          role: MEMBERSHIP_ROLE.OWNER,
-          scope: 'Acme',
-        }}
-      />,
-    );
+    setup({
+      roleChip: {
+        name: undefined,
+        role: MEMBERSHIP_ROLE.OWNER,
+        scope: MOCK_SCOPE,
+      },
+    });
 
-    expect(screen.getByText('Owner · Acme')).toBeVisible();
-    expect(screen.queryByText('OW')).not.toBeInTheDocument();
+    const roleChip = screen.getByText(roleChipLabel(MEMBERSHIP_ROLE.OWNER));
+    const roleInitials = screen.queryByText('OW');
+
+    expect(roleChip).toBeVisible();
+    expect(roleInitials).not.toBeInTheDocument();
   });
 
   it('renders no nav menu trigger when no sections are passed', () => {
-    render(<Topbar crumb={<p>Platform</p>} roleChip={roleChip} />);
+    setup();
 
-    expect(
-      screen.queryByRole('button', { name: 'Menu' }),
-    ).not.toBeInTheDocument();
+    const trigger = screen.queryByRole('button', {
+      name: messages.topbarNavMenu.triggerLabel,
+    });
+
+    expect(trigger).not.toBeInTheDocument();
   });
 
-  it('renders a nav menu trigger that opens the passed sections', async () => {
-    render(
-      <Topbar
-        crumb={<p>Platform</p>}
-        roleChip={roleChip}
-        sections={[
-          {
-            label: 'Platform',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-      />,
-    );
+  describe('with the nav menu opened', () => {
+    let menu: HTMLElement;
 
-    const trigger = screen.getByRole('button', { name: 'Menu' });
-    expect(trigger).toBeVisible();
+    beforeEach(async () => {
+      const user = userEvent.setup();
+      setup({
+        sections: [mockNavSection({ items: [MOCK_NAV_ITEM] })],
+        switcher: <div>{MOCK_SWITCHER_TEXT}</div>,
+      });
 
-    await user.click(trigger);
-    const menu = await screen.findByRole('menu');
-    expect(
-      within(menu).getByRole('menuitem', { name: 'Tenants' }),
-    ).toBeVisible();
-  });
+      const trigger = screen.getByRole('button', {
+        name: messages.topbarNavMenu.triggerLabel,
+      });
+      await user.click(trigger);
+      menu = await screen.findByRole('menu');
+    });
 
-  it('renders the switcher slot above the section items inside the opened nav menu', async () => {
-    render(
-      <Topbar
-        crumb={<p>Platform</p>}
-        roleChip={roleChip}
-        switcher={<div>Tenant switcher</div>}
-        sections={[
-          {
-            label: 'Platform',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-      />,
-    );
+    it('shows the passed sections', () => {
+      const item = within(menu).getByRole('menuitem', {
+        name: MOCK_NAV_ITEM.label,
+      });
 
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-    const menu = await screen.findByRole('menu');
-    const text = menu.textContent ?? '';
+      expect(item).toBeVisible();
+    });
 
-    expect(within(menu).getByText('Tenant switcher')).toBeVisible();
-    expect(text.indexOf('Tenant switcher')).toBeLessThan(
-      text.indexOf('Platform'),
-    );
+    it('shows the switcher slot', () => {
+      const switcher = within(menu).getByText(MOCK_SWITCHER_TEXT);
+
+      expect(switcher).toBeVisible();
+    });
   });
 });

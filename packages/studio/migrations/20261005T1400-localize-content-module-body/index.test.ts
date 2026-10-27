@@ -1,68 +1,52 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockInEnglish,
+  mockParagraph,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeContentModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(14);
 
-const body = [
-  {
-    _type: 'block',
-    _key: 'block-1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'span', text: 'Read on.', marks: [] }],
-    markDefs: [],
-  },
+const ARTICLE_TEXT_TYPE = 'internationalizedArrayArticleTextValue';
+const MOCK_BODY = [
+  ...mockParagraph(),
   {
     _type: 'bodyImage',
-    _key: 'image-1',
-    asset: { _type: 'reference', _ref: 'image-abc123-800x600-jpg' },
-    alt: 'A diagram',
+    _key: faker.string.alphanumeric(12),
+    asset: { _type: 'reference', _ref: faker.string.uuid() },
+    alt: faker.lorem.words(3),
     layout: 'FULL_BLEED',
   },
   {
     _type: 'code',
-    _key: 'code-1',
+    _key: faker.string.alphanumeric(12),
     language: 'ts',
-    code: 'const x = 1;',
+    code: faker.lorem.sentence(),
   },
   {
     _type: 'aside',
-    _key: 'aside-1',
+    _key: faker.string.alphanumeric(12),
     kind: 'CONTEXT',
-    body: [
-      {
-        _type: 'block',
-        _key: 'aside-block-1',
-        style: 'normal',
-        children: [{ _type: 'span', _key: 'span', text: 'Aside.', marks: [] }],
-        markDefs: [],
-      },
-    ],
-  },
-];
-
-const localizedBody = [
-  {
-    _key: EN,
-    _type: 'internationalizedArrayArticleTextValue',
-    language: EN,
-    value: body,
+    body: mockParagraph(),
   },
 ];
 
 describe(localizeContentModule, () => {
   it('moves the body, embedded blocks included, into the default language', () => {
-    expect(localizeContentModule({ body })).toEqual([
-      at('body', set(localizedBody)),
+    expect(localizeContentModule({ body: MOCK_BODY })).toEqual([
+      at('body', set(mockInEnglish(ARTICLE_TEXT_TYPE, MOCK_BODY))),
     ]);
   });
 
-  it('is idempotent — an already localized body is left alone', () => {
-    expect(localizeContentModule({ body: localizedBody })).toBeUndefined();
-  });
-
-  it('leaves a module without a body alone', () => {
-    expect(localizeContentModule({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized body',
+      doc: { body: mockInEnglish(ARTICLE_TEXT_TYPE, MOCK_BODY) },
+    },
+    { name: 'a module without a body', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeContentModule(doc)).toBeUndefined();
   });
 });

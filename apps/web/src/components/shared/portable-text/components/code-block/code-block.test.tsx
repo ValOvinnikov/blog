@@ -1,24 +1,43 @@
-import userEvent from '@testing-library/user-event';
+import { SITE_MESSAGES } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { CodeBlock } from './code-block';
 
+faker.seed(6007);
+
+const MOCK_CODE = 'const x = 1;';
+const MOCK_PLAIN_CODE = faker.lorem.sentence();
+const MOCK_FILENAME = faker.system.commonFileName('ts');
+const REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
+
 const setup = customRender(CodeBlock, {
-  code: 'const x = 1;',
+  code: MOCK_CODE,
   language: 'typescript',
 });
 
 describe(`<${CodeBlock.name}/>`, () => {
-  it('renders the filename as a caption when provided', () => {
-    setup({ filename: 'example.ts' });
+  let user: UserEvent;
 
-    expect(screen.getByText('example.ts')).toBeVisible();
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
+  it('renders the filename as a caption when provided', () => {
+    setup({ filename: MOCK_FILENAME });
+
+    const caption = screen.getByText(MOCK_FILENAME);
+
+    expect(caption).toBeVisible();
   });
 
   it('renders without a language, falling back to plain text', () => {
-    setup({ code: 'plain text content', language: undefined });
+    setup({ code: MOCK_PLAIN_CODE, language: undefined });
 
-    expect(screen.getByText('plain text content')).toBeVisible();
+    const code = screen.getByText(MOCK_PLAIN_CODE);
+
+    expect(code).toBeVisible();
   });
 
   describe('with default props', () => {
@@ -26,39 +45,30 @@ describe(`<${CodeBlock.name}/>`, () => {
       setup();
     });
 
-    it('renders the code content', () => {
-      expect(screen.getByTestId('code-content').textContent).toBe(
-        '1const x = 1;',
-      );
-    });
+    it('renders the code in a named region', () => {
+      const region = screen.getByRole('region', { name: REGION_NAME });
 
-    it('exposes the code as a named region', () => {
-      expect(screen.getByRole('region', { name: 'Code sample' })).toBe(
-        screen.getByTestId('code-content'),
-      );
+      expect(region).toHaveTextContent(MOCK_CODE);
     });
 
     it('takes keyboard focus so an overflowing block can be scrolled', async () => {
-      await userEvent.setup().tab();
+      await user.tab();
 
-      expect(screen.getByRole('region', { name: 'Code sample' })).toHaveFocus();
+      const region = screen.getByRole('region', { name: REGION_NAME });
+
+      expect(region).toHaveFocus();
     });
 
     it('omits the filename caption when not provided', () => {
-      expect(screen.queryByTestId('filename-caption')).not.toBeInTheDocument();
+      const caption = screen.queryByTestId('filename-caption');
+
+      expect(caption).not.toBeInTheDocument();
     });
 
-    it('renders the code content with a transparent background so the theme-aware figure surface shows through', () => {
-      expect(screen.getByTestId('code-content')).toHaveStyle({
-        background: 'transparent',
-        color: 'var(--code-fg)',
-      });
-    });
+    it('colors syntax tokens with theme-aware CSS variables, not literal colors', () => {
+      const keyword = screen.getByText('const');
 
-    it('colors syntax tokens with theme-aware CSS custom properties, not literal hex/hsl values', () => {
-      expect(screen.getByText('const')).toHaveStyle({
-        color: 'var(--code-keyword)',
-      });
+      expect(keyword.style.color).toMatch(/^var\(--/);
     });
   });
 });

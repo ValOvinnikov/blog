@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES, routes } from '@blog/config';
+import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -6,6 +6,9 @@ import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { NewsletterUnsubscribePage } from './newsletter-unsubscribe-page';
 
 vi.mock('@web/server/request-context/request-context');
+
+const { confirmTitle, confirmMessage, confirmButtonLabel, returnHome } =
+  SITE_MESSAGES.newsletterUnsubscribe;
 
 const setup = customRenderServerAsync(NewsletterUnsubscribePage, {});
 
@@ -21,21 +24,19 @@ describe(`<${NewsletterUnsubscribePage.name}/>`, () => {
   it('asks the reader to confirm, with a link home', () => {
     const heading = screen.getByRole('heading', {
       level: 1,
-      name: 'Unsubscribe from our newsletter',
+      name: confirmTitle,
     });
-    const message = screen.getByText(
-      'Click the button below to confirm you no longer want to receive newsletter emails from us.',
-    );
-    const homeLink = screen.getByRole('link', { name: 'Return home' });
+    const message = screen.getByText(confirmMessage);
+    const homeLink = screen.getByRole('link', { name: returnHome });
 
     expect(heading).toBeVisible();
     expect(message).toBeVisible();
-    expect(homeLink).toHaveAttribute('href', '/');
+    expect(homeLink).toHaveAttribute('href', routes.home());
   });
 
   it('posts to the page-language unsubscribe endpoint with no token in the URL', () => {
     const form = screen.getByTestId('newsletter-unsubscribe-form');
-    const button = screen.getByRole('button', { name: 'Confirm unsubscribe' });
+    const button = screen.getByRole('button', { name: confirmButtonLabel });
 
     expect(form).toContainElement(button);
     expect(button).toHaveAttribute('type', 'submit');

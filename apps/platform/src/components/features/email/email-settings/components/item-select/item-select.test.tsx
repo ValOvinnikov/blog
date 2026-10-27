@@ -1,107 +1,127 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ItemSelect } from './item-select';
 
+faker.seed(5993);
+
+const MOCK_LABEL = faker.lorem.word();
+const ARIA_SELECTED = 'aria-selected';
+
+const MOCK_SENDER_OPTION = {
+  value: EMAIL_SENDER_ITEM,
+  label: faker.lorem.words(2),
+  group: undefined,
+  description: faker.lorem.sentence(),
+  status: 'default' as const,
+  statusLabel: faker.lorem.word(),
+};
+
+const MOCK_TEMPLATE_OPTION = {
+  value: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+  label: faker.lorem.words(2),
+  group: faker.lorem.word(),
+  description: faker.lorem.sentence(),
+  status: 'unsaved' as const,
+  statusLabel: faker.lorem.word(),
+};
+
+const optionName = ({
+  label,
+  description,
+  statusLabel,
+}: typeof MOCK_SENDER_OPTION | typeof MOCK_TEMPLATE_OPTION) =>
+  `${label} ${description}${statusLabel}`;
+
+const onSelect = vi.fn();
+
 const setup = customRender(ItemSelect, {
-  items: [
-    {
-      value: EMAIL_SENDER_ITEM,
-      label: 'Sender',
-      group: undefined,
-      description: 'Who emails come from',
-      status: 'default',
-      statusLabel: 'Default',
-    },
-    {
-      value: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      label: 'Sign-in link',
-      group: 'Template',
-      description: 'The magic link email',
-      status: 'unsaved',
-      statusLabel: 'Unsaved',
-    },
-  ],
+  items: [MOCK_SENDER_OPTION, MOCK_TEMPLATE_OPTION],
   selected: EMAIL_SENDER_ITEM,
-  onSelect: vi.fn(),
-  label: 'Editing',
+  onSelect,
+  label: MOCK_LABEL,
 });
 
 describe(`<${ItemSelect.name}/>`, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
-  it('names the trigger after its label and shows the selected item with its status', () => {
-    setup();
+  it.each([
+    {
+      selected: MOCK_SENDER_OPTION.value,
+      text: `${MOCK_SENDER_OPTION.label}${MOCK_SENDER_OPTION.statusLabel}`,
+    },
+    {
+      selected: MOCK_TEMPLATE_OPTION.value,
+      text: `${MOCK_TEMPLATE_OPTION.label}${MOCK_TEMPLATE_OPTION.group} · ${MOCK_TEMPLATE_OPTION.statusLabel}`,
+    },
+  ])(
+    'shows the selected $selected item and its status in the trigger',
+    ({ selected, text }) => {
+      setup({ selected });
 
-    expect(screen.getByRole('combobox', { name: 'Editing' })).toHaveTextContent(
-      'SenderDefault',
-    );
-  });
+      const trigger = screen.getByRole('combobox', { name: MOCK_LABEL });
 
-  it('shows the group of a selected template beside its status', () => {
-    setup({ selected: EMAIL_TEMPLATE_TYPE.MAGIC_LINK });
+      expect(trigger).toHaveTextContent(text);
+    },
+  );
 
-    expect(screen.getByRole('combobox', { name: 'Editing' })).toHaveTextContent(
-      'Sign-in linkTemplate · Unsaved',
-    );
-  });
+  describe('with the sender selected', () => {
+    let trigger: HTMLElement;
 
-  it('lists every item with its description and status, marking the selected one', async () => {
-    setup();
+    beforeEach(() => {
+      setup();
+      trigger = screen.getByRole('combobox', { name: MOCK_LABEL });
+    });
 
-    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
+    it('lists every item with its description and status, marking the selected', async () => {
+      await user.click(trigger);
 
-    expect(
-      await screen.findByRole('option', {
-        name: /^Sender.*Who emails come from.*Default$/,
-      }),
-    ).toHaveAttribute('aria-selected', 'true');
-    expect(
-      screen.getByRole('option', {
-        name: /^Sign-in link.*The magic link email.*Unsaved$/,
-      }),
-    ).toHaveAttribute('aria-selected', 'false');
-  });
+      const senderOption = await screen.findByRole('option', {
+        name: optionName(MOCK_SENDER_OPTION),
+      });
+      const templateOption = screen.getByRole('option', {
+        name: optionName(MOCK_TEMPLATE_OPTION),
+      });
 
-  it('selects an item by pointer', async () => {
-    const onSelect = vi.fn();
-    setup({ onSelect });
+      expect(senderOption).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(templateOption).toHaveAttribute(ARIA_SELECTED, 'false');
+    });
 
-    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
-    await user.click(
-      await screen.findByRole('option', { name: /^Sign-in link/ }),
-    );
+    it('selects an item by pointer', async () => {
+      await user.click(trigger);
+      const templateOption = await screen.findByRole('option', {
+        name: optionName(MOCK_TEMPLATE_OPTION),
+      });
+      await user.click(templateOption);
 
-    expect(onSelect).toHaveBeenCalledWith(EMAIL_TEMPLATE_TYPE.MAGIC_LINK);
-  });
+      expect(onSelect).toHaveBeenCalledWith(MOCK_TEMPLATE_OPTION.value);
+    });
 
-  it('selects an item with the arrow keys and Enter', async () => {
-    const onSelect = vi.fn();
-    setup({ onSelect });
+    it('selects an item with the arrow keys and Enter', async () => {
+      await user.tab();
+      await user.keyboard('{ArrowDown}');
+      await screen.findByRole('listbox');
+      await user.keyboard('{ArrowDown}{Enter}');
 
-    screen.getByRole('combobox', { name: 'Editing' }).focus();
-    await user.keyboard('{ArrowDown}');
-    await screen.findByRole('listbox');
-    await user.keyboard('{ArrowDown}{Enter}');
+      expect(onSelect).toHaveBeenCalledWith(MOCK_TEMPLATE_OPTION.value);
+    });
 
-    expect(onSelect).toHaveBeenCalledWith(EMAIL_TEMPLATE_TYPE.MAGIC_LINK);
-  });
+    it('closes on Escape without changing the selection', async () => {
+      await user.click(trigger);
+      await screen.findByRole('listbox');
+      await user.keyboard('{Escape}');
 
-  it('closes on Escape without changing the selection', async () => {
-    const onSelect = vi.fn();
-    setup({ onSelect });
+      const listbox = screen.queryByRole('listbox');
 
-    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
-    await screen.findByRole('listbox');
-    await user.keyboard('{Escape}');
-
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-    expect(onSelect).not.toHaveBeenCalled();
+      expect(listbox).not.toBeInTheDocument();
+      expect(onSelect).not.toHaveBeenCalled();
+    });
   });
 });

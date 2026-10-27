@@ -1,110 +1,93 @@
 import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
+import { faker } from '@faker-js/faker';
+import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { customRender, screen } from '@web/testing/custom-render';
-import { MOCK_TAXONOMY_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
+import {
+  MOCK_CTA_STUB_TEST_ID,
+  MOCK_NEWSLETTER_STUB_TEST_ID,
+  MOCK_POST_LATEST_STUB_TEST_ID,
+  MOCK_POST_RELATED_STUB_TEST_ID,
+  MOCK_TAXONOMY_LIST_STUB_TEST_ID,
+  mockModule,
+} from '@web/testing/shared/module-renderer-contract/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
 
-const {
-  ctaModuleMock,
-  newsletterModuleMock,
-  postRelatedModuleMock,
-  postLatestModuleMock,
-  taxonomyListModuleMock,
-} = vi.hoisted(() => ({
-  taxonomyListModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-taxonomy-list">{id}</div>
-  )),
-  postLatestModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-post-latest">{id}</div>
-  )),
-  ctaModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-cta">{id}</div>
-  )),
-  newsletterModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-newsletter">{id}</div>
-  )),
-  postRelatedModuleMock: vi.fn(
-    ({ id, context }: { id: string; context?: { post?: { id: string } } }) => (
-      <div data-testid="stub-post-related">
-        {id}:{context?.post?.id}
-      </div>
-    ),
-  ),
-}));
+faker.seed(8143);
 
-vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
-vi.mock('@web/modules/newsletter/newsletter-module', () => ({
-  NewsletterModule: newsletterModuleMock,
-}));
+vi.mock('@web/modules/cta/cta-module');
+vi.mock('@web/modules/newsletter/newsletter-module');
+vi.mock('@web/modules/post-latest/post-latest-module');
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module');
 vi.mock('@web/modules/post-related/post-related-module', () => ({
-  PostRelatedModule: postRelatedModuleMock,
+  PostRelatedModule: vi.fn(({ id, context }: TModuleComponentProps) => (
+    <div data-testid={MOCK_POST_RELATED_STUB_TEST_ID}>
+      {id}:{context?.post?.id}
+    </div>
+  )),
 }));
 
-vi.mock('@web/modules/post-latest/post-latest-module', () => ({
-  PostLatestModule: postLatestModuleMock,
-}));
-
-vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
-  TaxonomyListModule: taxonomyListModuleMock,
-}));
-
-const loggerWarnMock = vi.mocked(logger.warn);
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_UNKNOWN_MODULE_TYPE = 'module_hero';
 
 const setup = customRender(BlogPostModuleRenderer, {
   modules: [] as TModule<TPagePostType>[],
 });
 
-const POST_RELATED_TEST_ID = 'stub-post-related';
-
 describe(`<${BlogPostModuleRenderer.name}/>`, () => {
-  it('renders every allowed module keyed by its id, in the given order', () => {
+  it('renders every allowed module, in the given order', () => {
     setup({
       modules: [
-        { id: 'related-1', type: 'module_postRelated' },
-        { id: 'newsletter-1', type: 'module_newsletter' },
-        { id: 'cta-1', type: 'module_cta' },
-        { id: 'post-latest-1', type: 'module_postLatest' },
-        { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
+        mockModule('module_postRelated'),
+        mockModule('module_newsletter'),
+        mockModule('module_cta'),
+        mockModule('module_postLatest'),
+        mockModule('module_taxonomyList'),
       ],
     });
 
     const stubs = screen.getAllByTestId(/^stub-/);
-    expect(stubs.map((node) => node.getAttribute('data-testid'))).toEqual([
-      POST_RELATED_TEST_ID,
-      'stub-newsletter',
-      'stub-cta',
-      'stub-post-latest',
-      'stub-taxonomy-list',
+    const stubTestIds = stubs.map((stub) => stub.getAttribute('data-testid'));
+
+    expect(stubTestIds).toEqual([
+      MOCK_POST_RELATED_STUB_TEST_ID,
+      MOCK_NEWSLETTER_STUB_TEST_ID,
+      MOCK_CTA_STUB_TEST_ID,
+      MOCK_POST_LATEST_STUB_TEST_ID,
+      MOCK_TAXONOMY_LIST_STUB_TEST_ID,
     ]);
   });
 
-  it('renders nothing and warns once for a module absent from the post page allow-list', () => {
-    setup({
-      modules: [
-        { id: 'hero-1', type: 'module_hero' },
-      ] as unknown as TModule<TPagePostType>[],
-    });
+  it('warns once and renders nothing for a module outside the allow-list', () => {
+    const unknownModule = mockModule(MOCK_UNKNOWN_MODULE_TYPE);
 
-    const heroText = screen.queryByText('hero-1');
+    // @ts-expect-error -- module_hero is not in the post page allow-list
+    setup({ modules: [unknownModule] });
 
-    expect(heroText).not.toBeInTheDocument();
-    expect(loggerWarnMock).toHaveBeenCalledTimes(1);
-    expect(loggerWarnMock).toHaveBeenCalledWith(
+    const unknownModuleText = screen.queryByText(unknownModule.id);
+
+    expect(unknownModuleText).not.toBeInTheDocument();
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+    expect(logger.warn).toHaveBeenCalledWith(
       'module_renderer.unknown_module_type',
-      { moduleType: 'module_hero' },
+      { moduleType: MOCK_UNKNOWN_MODULE_TYPE },
     );
   });
 
   it('forwards the post context to a module that reads it', () => {
+    const relatedModule = mockModule('module_postRelated');
+
     setup({
-      modules: [{ id: 'related-1', type: 'module_postRelated' }],
-      context: { post: { id: 'post-1' } },
+      modules: [relatedModule],
+      context: { post: { id: MOCK_POST_ID } },
     });
 
-    const relatedPosts = screen.getByTestId(POST_RELATED_TEST_ID);
+    const relatedPosts = screen.getByTestId(MOCK_POST_RELATED_STUB_TEST_ID);
 
-    expect(relatedPosts).toHaveTextContent('related-1:post-1');
+    expect(relatedPosts).toHaveTextContent(
+      `${relatedModule.id}:${MOCK_POST_ID}`,
+    );
   });
 });

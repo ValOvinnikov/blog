@@ -1,5 +1,6 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@blog/config';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   mockLandingSectionNavigation,
@@ -15,10 +16,14 @@ import { SectionNavigation } from './section-navigation';
 
 vi.mock('@web/i18n/navigation');
 
-const NAV_NAME = SITE_MESSAGES.sectionNavigation.label;
-const AUTHORED_TITLE = 'Guides';
-const PARENT_TITLE = 'Library';
-const BACK_LINK_NAME = `Back to ${PARENT_TITLE}`;
+faker.seed(5776);
+
+const { label: NAV_NAME, backTo: BACK_TO_TEMPLATE } =
+  SITE_MESSAGES.sectionNavigation;
+const MOCK_AUTHORED_TITLE = faker.lorem.words(2);
+const MOCK_PARENT_TITLE = faker.lorem.words(2);
+const MOCK_PARENT_PATH = faker.lorem.slug();
+const BACK_LINK_NAME = BACK_TO_TEMPLATE.replace('{title}', MOCK_PARENT_TITLE);
 
 const setup = customRender(SectionNavigation, {
   sectionNavigation: mockLandingSectionNavigation(),
@@ -30,21 +35,24 @@ describe(`<${SectionNavigation.name}/>`, () => {
       setup();
     });
 
-    it('renders an "In this section" nav landmark', () => {
+    it('labels the nav landmark with the default section label', () => {
       const nav = screen.getByRole('navigation', { name: NAV_NAME });
 
       expect(nav).toBeVisible();
     });
 
-    it('links the section root first, then its pages in the given order', () => {
+    it('links the section root first, then its pages, with no back link', () => {
       const links = screen
         .getAllByRole('link')
         .map((link) => [link.textContent, link.getAttribute('href')]);
 
       expect(links).toEqual([
-        [MOCK_SECTION_ROOT_TITLE, `/${MOCK_SECTION_ROOT_PATH}`],
-        [MOCK_SECTION_FAQ_TITLE, `/${MOCK_SECTION_FAQ_PATH}`],
-        [MOCK_SECTION_PRICING_TITLE, `/${MOCK_SECTION_PRICING_PATH}`],
+        [MOCK_SECTION_ROOT_TITLE, routes.landingPage(MOCK_SECTION_ROOT_PATH)],
+        [MOCK_SECTION_FAQ_TITLE, routes.landingPage(MOCK_SECTION_FAQ_PATH)],
+        [
+          MOCK_SECTION_PRICING_TITLE,
+          routes.landingPage(MOCK_SECTION_PRICING_PATH),
+        ],
       ]);
     });
 
@@ -106,18 +114,18 @@ describe(`<${SectionNavigation.name}/>`, () => {
     beforeEach(() => {
       setup({
         sectionNavigation: mockLandingSectionNavigation({
-          title: AUTHORED_TITLE,
+          title: MOCK_AUTHORED_TITLE,
         }),
       });
     });
 
     it('names the nav landmark with the authored title', () => {
-      const nav = screen.getByRole('navigation', { name: AUTHORED_TITLE });
+      const nav = screen.getByRole('navigation', { name: MOCK_AUTHORED_TITLE });
 
       expect(nav).toBeVisible();
     });
 
-    it('does not fall back to "In this section"', () => {
+    it('does not fall back to the default section label', () => {
       const defaultNav = screen.queryByRole('navigation', { name: NAV_NAME });
 
       expect(defaultNav).not.toBeInTheDocument();
@@ -128,7 +136,7 @@ describe(`<${SectionNavigation.name}/>`, () => {
     beforeEach(() => {
       setup({
         sectionNavigation: mockLandingSectionNavigation({
-          parentSection: { title: PARENT_TITLE, path: 'library' },
+          parentSection: { title: MOCK_PARENT_TITLE, path: MOCK_PARENT_PATH },
         }),
       });
     });
@@ -144,19 +152,10 @@ describe(`<${SectionNavigation.name}/>`, () => {
     it("points the back link at the parent section's path", () => {
       const backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
 
-      expect(backLink).toHaveAttribute('href', '/library');
-    });
-  });
-
-  describe('in a top-level section', () => {
-    beforeEach(() => {
-      setup();
-    });
-
-    it('renders no back link', () => {
-      const backLink = screen.queryByRole('link', { name: /^Back to/ });
-
-      expect(backLink).not.toBeInTheDocument();
+      expect(backLink).toHaveAttribute(
+        'href',
+        routes.landingPage(MOCK_PARENT_PATH),
+      );
     });
   });
 });

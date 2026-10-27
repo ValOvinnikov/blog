@@ -1,7 +1,7 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import {
   mockEmailDraft,
-  MOCK_EMAIL_SUBJECT,
+  MOCK_EMAIL_DRAFT_SUBJECT,
 } from '@platform/testing/email-draft';
 
 import { buildEmailDraft } from './email-draft';
@@ -16,7 +16,7 @@ describe(buildEmailDraft, () => {
     const draft = mockEmailDraft();
 
     expect(draft.copies[MAGIC_LINK][EN]).toEqual({
-      subject: MOCK_EMAIL_SUBJECT,
+      subject: MOCK_EMAIL_DRAFT_SUBJECT,
       body: null,
     });
     expect(draft.copies[MAGIC_LINK][FR]).toEqual(MOCK_BLANK_COPY);

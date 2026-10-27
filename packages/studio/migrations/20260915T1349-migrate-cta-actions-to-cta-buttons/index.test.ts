@@ -1,336 +1,285 @@
 import {
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+  LINK_TYPE,
+} from '@blog/config/constants';
+import { isCreateIfNotExistsMutation } from '@blog/studio/testing/migrations/mutation-guards';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
+import {
   at,
+  createIfNotExists,
   patch,
   set,
   unset,
-  type CreateIfNotExistsMutation,
-  type MigrationContext,
+  type Mutation,
 } from 'sanity/migrate';
 
 import migration from './index';
 
-const documentHandler = migration.migrate.document;
+faker.seed(6019);
 
-if (!documentHandler) {
-  throw new Error('Expected the migration to define a document() handler.');
-}
+const MODULE_CTA_TYPE = 'module_cta';
+const LINK_DOCUMENT_TYPE = 'link';
+const CTA_BUTTON_TYPE = 'ctaButton';
+const REFERENCE_TYPE = 'reference';
+const PAGE_TYPE = 'page_landing';
 
-const createMockContext = (
-  titlesByRef: Record<string, string | undefined> = {},
-): MigrationContext => {
-  const fetch = async (_query: string, params: unknown) => {
-    const ref = (params as { ref: string }).ref;
+const MOCK_FIRST_KEY = faker.string.uuid();
+const MOCK_SECOND_KEY = faker.string.uuid();
+const MOCK_PAGE_ID = faker.string.uuid();
+const MOCK_PAGE_TITLE = faker.lorem.words(2);
+const MOCK_START_LABEL = faker.lorem.words(2);
+const MOCK_START_URL = faker.internet.url();
+const MOCK_SHARED_LABEL = faker.lorem.words(2);
+const MOCK_SHARED_URL = faker.internet.url();
+const MOCK_INTERNAL_LABEL = faker.lorem.words(2);
 
-    return { title: titlesByRef[ref] };
-  };
-
-  return { client: { fetch } } as unknown as MigrationContext;
-};
-
-type TLinkDocument = {
-  _id: string;
-  _type: string;
-  title?: string;
-  label?: string;
-  linkType?: string;
-  openInNewTab?: boolean;
-  internalReference?: { _ref: string };
-  url?: string;
-};
-
-const isCreateIfNotExists = (
-  mutation: unknown,
-): mutation is CreateIfNotExistsMutation<TLinkDocument> =>
-  typeof mutation === 'object' &&
-  mutation !== null &&
-  (mutation as { type?: string }).type === 'createIfNotExists';
-
-const isPatch = (mutation: unknown): mutation is ReturnType<typeof patch> =>
-  typeof mutation === 'object' &&
-  mutation !== null &&
-  (mutation as { type?: string }).type === 'patch';
-
-type TTestDocument = {
-  _id: string;
-  _type: string;
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  [key: string]: unknown;
-};
-
-const runMigration = async (
-  doc: TTestDocument,
-  context: MigrationContext,
-): Promise<unknown[]> =>
-  ((await documentHandler(doc, context)) ?? []) as unknown[];
-
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-  _type: 'module_cta',
-};
-
-describe('migrate-cta-actions-to-cta-buttons wiring', () => {
-  let context: MigrationContext;
-  let sharedLink: {
-    label: string;
-    linkType: 'EXTERNAL';
-    url: string;
-  };
-
-  beforeEach(() => {
-    context = createMockContext();
-    sharedLink = {
-      label: 'Contact sales',
-      linkType: 'EXTERNAL',
-      url: 'https://example.com/contact',
-    };
+const mockCtaDocument = (actions?: unknown[]) =>
+  mockMigrationDocument({
+    _type: MODULE_CTA_TYPE,
+    ...(actions ? { actions: { actions } } : {}),
   });
 
+const mockExternalAction = (
+  fields: Record<string, unknown> & { _key: string },
+) => ({
+  link: {
+    label: MOCK_SHARED_LABEL,
+    linkType: LINK_TYPE.EXTERNAL,
+    url: MOCK_SHARED_URL,
+  },
+  ...fields,
+});
+
+const migrate = async (
+  document: ReturnType<typeof mockCtaDocument>,
+  dataset: unknown[] = [],
+) =>
+  (await runDocumentMigration(
+    migration,
+    document,
+    mockMigrationContext({ fetch: mockGroqFetch(dataset) }),
+  )) as Mutation[];
+
+const readLinkIds = (mutations: Mutation[]): string[] =>
+  mutations
+    .filter(isCreateIfNotExistsMutation)
+    .map((linkMutation) => linkMutation.document._id);
+
+const readLinkId = (mutations: Mutation[]): string => {
+  const [linkId] = readLinkIds(mutations);
+
+  if (!linkId) throw new Error('Expected a createIfNotExists mutation.');
+
+  return linkId;
+};
+
+const ctaButtonsPatch = (documentId: string, ctaButtons: unknown[]) =>
+  patch(documentId, [
+    at('ctaButtons', set(ctaButtons)),
+    at('actions', unset()),
+  ]);
+
+describe('migrate-cta-actions-to-cta-buttons', () => {
   it('returns nothing for a CTA with no actions at all', async () => {
-    const doc = { ...baseDoc, _id: 'cta-1' };
+    const document = mockCtaDocument();
 
-    const mutations = await runMigration(doc, context);
-
-    expect(mutations).toEqual([]);
+    expect(await migrate(document)).toEqual([]);
   });
 
   it('returns nothing for a CTA already migrated to ctaButtons', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'cta-1',
+    const document = mockMigrationDocument({
+      _type: MODULE_CTA_TYPE,
       ctaButtons: [],
       actions: { actions: [] },
-    };
-
-    const mutations = await runMigration(doc, context);
-
-    expect(mutations).toEqual([]);
-  });
-
-  it('migrates a single-button CTA with an external link', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'cta-1',
-      actions: {
-        actions: [
-          {
-            _key: 'action-1',
-            variant: 'PRIMARY',
-            appearance: 'CONTAINED',
-            link: {
-              label: 'Get started',
-              linkType: 'EXTERNAL',
-              url: 'https://example.com/start',
-              openInNewTab: true,
-            },
-          },
-        ],
-      },
-    };
-
-    const mutations = await runMigration(doc, context);
-    const createMutations = mutations.filter(isCreateIfNotExists);
-    const patchMutation = mutations.find(isPatch);
-
-    expect(createMutations).toHaveLength(1);
-
-    const [createMutation] = createMutations;
-
-    if (!createMutation)
-      throw new Error('Expected a createIfNotExists mutation.');
-
-    expect(createMutation.document).toMatchObject({
-      _type: 'link',
-      label: 'Get started',
-      linkType: 'EXTERNAL',
-      url: 'https://example.com/start',
-      openInNewTab: true,
     });
 
-    const linkId = createMutation.document._id;
+    expect(await migrate(document)).toEqual([]);
+  });
 
-    expect(patchMutation).toEqual(
-      patch('cta-1', [
-        at(
-          'ctaButtons',
-          set([
-            {
-              _key: 'action-1',
-              _type: 'ctaButton',
-              variant: 'PRIMARY',
-              appearance: 'CONTAINED',
-              link: { _type: 'reference', _ref: linkId },
-            },
-          ]),
-        ),
-        at('actions', unset()),
+  it('migrates a single external-link button to a link document and ctaButton', async () => {
+    const document = mockCtaDocument([
+      {
+        _key: MOCK_FIRST_KEY,
+        variant: CTA_ACTION_VARIANT.PRIMARY,
+        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+        link: {
+          label: MOCK_START_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_START_URL,
+          openInNewTab: true,
+        },
+      },
+    ]);
+
+    const mutations = await migrate(document);
+    const linkId = readLinkId(mutations);
+
+    expect(mutations).toEqual([
+      createIfNotExists({
+        _id: linkId,
+        _type: LINK_DOCUMENT_TYPE,
+        title: `Link to ${MOCK_START_URL}`,
+        label: MOCK_START_LABEL,
+        linkType: LINK_TYPE.EXTERNAL,
+        openInNewTab: true,
+        url: MOCK_START_URL,
+      }),
+      ctaButtonsPatch(document._id, [
+        {
+          _key: MOCK_FIRST_KEY,
+          _type: CTA_BUTTON_TYPE,
+          variant: CTA_ACTION_VARIANT.PRIMARY,
+          appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+          link: { _type: REFERENCE_TYPE, _ref: linkId },
+        },
       ]),
-    );
+    ]);
   });
 
-  it('migrates a two-button CTA preserving original order', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'cta-2',
-      actions: {
-        actions: [
-          {
-            _key: 'action-1',
-            variant: 'PRIMARY',
-            appearance: 'CONTAINED',
-            link: {
-              label: 'Sign up',
-              linkType: 'EXTERNAL',
-              url: 'https://example.com/signup',
-            },
-          },
-          {
-            _key: 'action-2',
-            variant: 'SECONDARY',
-            appearance: 'INLINE',
-            link: {
-              label: 'Learn more',
-              linkType: 'INTERNAL',
-              internalReference: { _ref: 'page-landing-1' },
-            },
-          },
-        ],
+  it('migrates two buttons in their original order, each to its own link', async () => {
+    const document = mockCtaDocument([
+      mockExternalAction({
+        _key: MOCK_FIRST_KEY,
+        variant: CTA_ACTION_VARIANT.PRIMARY,
+        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+      }),
+      {
+        _key: MOCK_SECOND_KEY,
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+        appearance: CTA_ACTION_APPEARANCE.INLINE,
+        link: {
+          label: MOCK_INTERNAL_LABEL,
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: { _ref: MOCK_PAGE_ID },
+        },
       },
-    };
-
-    const mutations = await runMigration(
-      doc,
-      createMockContext({ 'page-landing-1': 'About Us' }),
-    );
-    const patchMutation = mutations.find(isPatch);
-
-    if (!patchMutation) throw new Error('Expected a patch mutation.');
-
-    const ctaButtonsPatch = patchMutation.patches[0] as {
-      op: { type: string; value: { _key: string; link: { _ref: string } }[] };
-    };
-    const ctaButtons = ctaButtonsPatch.op.value;
-
-    expect(ctaButtons.map((button) => button._key)).toEqual([
-      'action-1',
-      'action-2',
     ]);
 
-    const [firstButton, secondButton] = ctaButtons;
+    const mutations = await migrate(document, [
+      { _id: MOCK_PAGE_ID, _type: PAGE_TYPE, title: MOCK_PAGE_TITLE },
+    ]);
+    const [externalLinkId = '', internalLinkId = ''] = readLinkIds(mutations);
 
-    if (!firstButton || !secondButton) {
-      throw new Error('Expected two ctaButtons entries.');
-    }
-
-    expect(firstButton.link._ref).not.toBe(secondButton.link._ref);
+    expect(mutations).toEqual([
+      createIfNotExists({
+        _id: externalLinkId,
+        _type: LINK_DOCUMENT_TYPE,
+        title: `Link to ${MOCK_SHARED_URL}`,
+        label: MOCK_SHARED_LABEL,
+        linkType: LINK_TYPE.EXTERNAL,
+        url: MOCK_SHARED_URL,
+      }),
+      createIfNotExists({
+        _id: internalLinkId,
+        _type: LINK_DOCUMENT_TYPE,
+        title: `Link to ${MOCK_PAGE_TITLE}`,
+        label: MOCK_INTERNAL_LABEL,
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: REFERENCE_TYPE, _ref: MOCK_PAGE_ID },
+      }),
+      ctaButtonsPatch(document._id, [
+        {
+          _key: MOCK_FIRST_KEY,
+          _type: CTA_BUTTON_TYPE,
+          variant: CTA_ACTION_VARIANT.PRIMARY,
+          appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+          link: { _type: REFERENCE_TYPE, _ref: externalLinkId },
+        },
+        {
+          _key: MOCK_SECOND_KEY,
+          _type: CTA_BUTTON_TYPE,
+          variant: CTA_ACTION_VARIANT.SECONDARY,
+          appearance: CTA_ACTION_APPEARANCE.INLINE,
+          link: { _type: REFERENCE_TYPE, _ref: internalLinkId },
+        },
+      ]),
+    ]);
+    expect(externalLinkId).not.toBe(internalLinkId);
   });
 
-  it('resolves an internal-reference link title and reference from the target document', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'cta-3',
-      actions: {
-        actions: [
-          {
-            _key: 'action-1',
-            variant: 'PRIMARY',
-            link: {
-              label: 'Read the post',
-              linkType: 'INTERNAL',
-              internalReference: { _ref: 'page-post-42' },
-            },
-          },
-        ],
+  it('titles an internal link after its reference when the target is missing', async () => {
+    const document = mockCtaDocument([
+      {
+        _key: MOCK_FIRST_KEY,
+        link: {
+          label: MOCK_INTERNAL_LABEL,
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: { _ref: MOCK_PAGE_ID },
+        },
       },
-    };
-
-    const mutations = await runMigration(
-      doc,
-      createMockContext({ 'page-post-42': 'Understanding GROQ' }),
-    );
-    const createMutation = mutations.find(isCreateIfNotExists);
-
-    expect(createMutation?.document).toMatchObject({
-      _type: 'link',
-      title: 'Link to Understanding GROQ',
-      linkType: 'INTERNAL',
-      internalReference: { _type: 'reference', _ref: 'page-post-42' },
-    });
-    expect(createMutation?.document).not.toHaveProperty('url');
-  });
-
-  it('builds a title from the raw url for an external link', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'cta-5',
-      actions: {
-        actions: [
-          {
-            _key: 'action-1',
-            variant: 'PRIMARY',
-            link: {
-              label: 'Visit',
-              linkType: 'EXTERNAL',
-              url: 'https://example.com/pricing',
-            },
-          },
-        ],
-      },
-    };
-
-    const mutations = await runMigration(doc, context);
-    const createMutation = mutations.find(isCreateIfNotExists);
-
-    expect(createMutation?.document.title).toBe(
-      'Link to https://example.com/pricing',
-    );
-  });
-
-  it('collapses two CTAs sharing one destination onto a single link document', async () => {
-    const docA = {
-      ...baseDoc,
-      _id: 'cta-a',
-      actions: {
-        actions: [{ _key: 'action-1', variant: 'PRIMARY', link: sharedLink }],
-      },
-    };
-    const docB = {
-      ...baseDoc,
-      _id: 'cta-b',
-      actions: {
-        actions: [{ _key: 'action-1', variant: 'SECONDARY', link: sharedLink }],
-      },
-    };
-
-    const [mutationsA, mutationsB] = await Promise.all([
-      runMigration(docA, context),
-      runMigration(docB, context),
     ]);
 
-    const linkIdA = mutationsA.filter(isCreateIfNotExists)[0]?.document._id;
-    const linkIdB = mutationsB.filter(isCreateIfNotExists)[0]?.document._id;
+    const mutations = await migrate(document);
+    const [linkMutation] = mutations.filter(isCreateIfNotExistsMutation);
 
-    expect(linkIdA).toBeDefined();
+    expect(linkMutation?.document.title).toBe(`Link to ${MOCK_PAGE_ID}`);
+  });
+
+  it('collapses two CTAs sharing one destination onto the same link id', async () => {
+    const documentA = mockCtaDocument([
+      mockExternalAction({
+        _key: MOCK_FIRST_KEY,
+        variant: CTA_ACTION_VARIANT.PRIMARY,
+      }),
+    ]);
+    const documentB = mockCtaDocument([
+      mockExternalAction({
+        _key: MOCK_FIRST_KEY,
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+      }),
+    ]);
+
+    const linkIdA = readLinkId(await migrate(documentA));
+    const linkIdB = readLinkId(await migrate(documentB));
+
     expect(linkIdA).toBe(linkIdB);
   });
 
-  it('dedupes a single CTA whose two buttons share one destination into one link document', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'cta-4',
-      actions: {
-        actions: [
-          { _key: 'action-1', variant: 'PRIMARY', link: sharedLink },
-          { _key: 'action-2', variant: 'SECONDARY', link: sharedLink },
-        ],
-      },
-    };
+  it('creates one link when both buttons of a CTA share a destination', async () => {
+    const document = mockCtaDocument([
+      mockExternalAction({
+        _key: MOCK_FIRST_KEY,
+        variant: CTA_ACTION_VARIANT.PRIMARY,
+      }),
+      mockExternalAction({
+        _key: MOCK_SECOND_KEY,
+        variant: CTA_ACTION_VARIANT.SECONDARY,
+      }),
+    ]);
 
-    const mutations = await runMigration(doc, context);
+    const mutations = await migrate(document);
+    const linkId = readLinkId(mutations);
 
-    expect(mutations.filter(isCreateIfNotExists)).toHaveLength(1);
+    expect(mutations).toEqual([
+      createIfNotExists({
+        _id: linkId,
+        _type: LINK_DOCUMENT_TYPE,
+        title: `Link to ${MOCK_SHARED_URL}`,
+        label: MOCK_SHARED_LABEL,
+        linkType: LINK_TYPE.EXTERNAL,
+        url: MOCK_SHARED_URL,
+      }),
+      ctaButtonsPatch(document._id, [
+        {
+          _key: MOCK_FIRST_KEY,
+          _type: CTA_BUTTON_TYPE,
+          variant: CTA_ACTION_VARIANT.PRIMARY,
+          link: { _type: REFERENCE_TYPE, _ref: linkId },
+        },
+        {
+          _key: MOCK_SECOND_KEY,
+          _type: CTA_BUTTON_TYPE,
+          variant: CTA_ACTION_VARIANT.SECONDARY,
+          link: { _type: REFERENCE_TYPE, _ref: linkId },
+        },
+      ]),
+    ]);
   });
 });

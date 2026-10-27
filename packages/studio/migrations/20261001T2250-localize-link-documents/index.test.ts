@@ -1,45 +1,38 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeLinkDocument } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(1);
 
-const localized = (value: string) => [
-  {
-    _key: EN,
-    _type: 'internationalizedArrayStringValue',
-    language: EN,
-    value,
-  },
-];
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_URL = faker.internet.url();
 
 describe(localizeLinkDocument, () => {
   it('moves a plain label into the default language', () => {
-    expect(localizeLinkDocument({ label: 'About us' })).toEqual([
-      at('label', set(localized('About us'))),
+    expect(localizeLinkDocument({ label: MOCK_LABEL })).toEqual([
+      at('label', set(mockEnglishString(MOCK_LABEL))),
     ]);
   });
 
   it('moves a plain url into the default language alongside the label', () => {
-    expect(
-      localizeLinkDocument({ label: 'Docs', url: 'https://example.com' }),
-    ).toEqual([
-      at('label', set(localized('Docs'))),
-      at('url', set(localized('https://example.com'))),
+    expect(localizeLinkDocument({ label: MOCK_LABEL, url: MOCK_URL })).toEqual([
+      at('label', set(mockEnglishString(MOCK_LABEL))),
+      at('url', set(mockEnglishString(MOCK_URL))),
     ]);
   });
 
-  it('is idempotent — an already localized link is left alone', () => {
-    expect(
-      localizeLinkDocument({
-        label: localized('About us'),
-        url: localized('https://example.com'),
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a link without a label or url alone', () => {
-    expect(localizeLinkDocument({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized link',
+      doc: {
+        label: mockEnglishString(MOCK_LABEL),
+        url: mockEnglishString(MOCK_URL),
+      },
+    },
+    { name: 'a link without a label or url', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeLinkDocument(doc)).toBeUndefined();
   });
 });

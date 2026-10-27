@@ -1,5 +1,8 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import type { TEmailConfig } from '@blog/db/schema/email-config';
+import { faker } from '@faker-js/faker';
+import en from '@platform/i18n/messages/en.json';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
@@ -17,6 +20,8 @@ import {
 import userEvent from '@testing-library/user-event';
 
 import { EmailPageContent } from './email-page-content';
+
+faker.seed(5993);
 
 const {
   getSiteConfigMock,
@@ -68,41 +73,49 @@ vi.mock('@platform/server/email/clear-email-logo-action', () => ({
   clearEmailLogoAction: vi.fn(),
 }));
 
-vi.mock('@platform/server/email/send-test-email-action', () => ({
-  sendTestEmailAction: vi.fn(),
-}));
+vi.mock('@platform/server/email/send-test-email-action');
 
-const tenant = mockReadyTenant();
+const { senderNameLabel, replyToLabel } = en.emailSettingsForm;
 
-const TEMPLATE_LOGO_URLS = {
-  [EMAIL_TEMPLATE_TYPE.MAGIC_LINK]: undefined,
-  [EMAIL_TEMPLATE_TYPE.TENANT_INVITE]: undefined,
-  [EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION]: undefined,
-};
+const MOCK_TENANT = mockReadyTenant();
+const MOCK_GROWTH_TENANT = { ...MOCK_TENANT, plan: TENANT_PLAN.GROWTH };
+const MOCK_INVITE_SUBJECT = faker.lorem.sentence();
+const MOCK_CONFIG_DATE = faker.date.past();
 
-const setup = customRenderAsync(EmailPageContent, { tenant });
+const mockEmailConfig = (
+  overrides: Partial<TEmailConfig> = {},
+): TEmailConfig => ({
+  id: faker.string.uuid(),
+  tenantId: MOCK_TENANT_ID,
+  logoAssetUrl: null,
+  senderName: faker.company.name(),
+  replyToAddress: faker.internet.email(),
+  footerPostalAddress: faker.location.streetAddress(),
+  contactRecipient: null,
+  createdAt: MOCK_CONFIG_DATE,
+  updatedAt: MOCK_CONFIG_DATE,
+  ...overrides,
+});
 
-const YOURE_INVITED_ACME_CO = "You're invited to Acme Co";
-const SUPPORT_ACME_EXAMPLE = 'support@acme.example';
+const setup = customRenderAsync(EmailPageContent, { tenant: MOCK_TENANT });
 
 describe(`<${EmailPageContent.name}/>`, () => {
   beforeEach(() => {
-    getSiteConfigMock.mockReset();
-    getEmailConfigMock.mockReset();
-    listEmailTemplateLogoUrlsMock.mockReset();
     getSiteConfigMock.mockResolvedValue(undefined);
     getEmailConfigMock.mockResolvedValue(undefined);
-    listEmailTemplateLogoUrlsMock.mockResolvedValue(TEMPLATE_LOGO_URLS);
-    listAuthoredEmailTemplatesMock.mockReset();
+    listEmailTemplateLogoUrlsMock.mockResolvedValue({
+      [EMAIL_TEMPLATE_TYPE.MAGIC_LINK]: undefined,
+      [EMAIL_TEMPLATE_TYPE.TENANT_INVITE]: undefined,
+      [EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION]: undefined,
+    });
     listAuthoredEmailTemplatesMock.mockResolvedValue([
       {
         templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
         locale: LOCALE_ISO_CODES.EN,
-        subject: YOURE_INVITED_ACME_CO,
+        subject: MOCK_INVITE_SUBJECT,
         body: null,
       },
     ]);
-    selectLiveLocalesMock.mockReset();
     selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
@@ -112,14 +125,16 @@ describe(`<${EmailPageContent.name}/>`, () => {
     });
 
     it('renders the Email page heading', () => {
-      const heading = screen.getByRole('heading', { name: 'Email' });
+      const heading = screen.getByRole('heading', {
+        name: en.emailForm.pageHeading,
+      });
 
       expect(heading).toBeVisible();
     });
 
-    it('renders blank settings fields when the tenant has no saved email_config row yet', () => {
-      const senderNameInput = screen.getByLabelText('Sender name');
-      const replyToInput = screen.getByLabelText('Reply-to address');
+    it('renders blank sender fields when the tenant has saved none yet', () => {
+      const senderNameInput = screen.getByLabelText(senderNameLabel);
+      const replyToInput = screen.getByLabelText(replyToLabel);
 
       expect(senderNameInput).toHaveValue('');
       expect(replyToInput).toHaveValue('');
@@ -135,48 +150,42 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     it("shows each template's authored copy in the tenant's default language", async () => {
       const user = userEvent.setup();
-      const editingCombobox = screen.getByRole('combobox', { name: 'Editing' });
+      const editingCombobox = screen.getByRole('combobox', {
+        name: en.emailForm.editingLabel,
+      });
       await user.click(editingCombobox);
       const teamInviteOption = await screen.findByRole('option', {
-        name: /^Team invite/,
+        name: new RegExp(
+          `^${en.emailTemplateEditor.templateTypeLabel.TENANT_INVITE}`,
+        ),
       });
       await user.click(teamInviteOption);
 
-      const subjectInput = screen.getByDisplayValue(YOURE_INVITED_ACME_CO);
+      const subjectInput = screen.getByDisplayValue(MOCK_INVITE_SUBJECT);
 
       expect(subjectInput).toBeVisible();
     });
   });
 
-  it("renders the tenant's saved email_config row when one exists", async () => {
-    getEmailConfigMock.mockResolvedValue({
-      id: 'config-1',
-      tenantId: MOCK_TENANT_ID,
-      senderName: 'Acme Co',
-      replyToAddress: SUPPORT_ACME_EXAMPLE,
-      footerPostalAddress: '123 Main St',
-      logoAssetUrl: undefined,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+  it("renders the tenant's saved sender settings", async () => {
+    const emailConfig = mockEmailConfig();
+    getEmailConfigMock.mockResolvedValueOnce(emailConfig);
 
     await setup();
 
-    const senderNameInput = screen.getByDisplayValue('Acme Co');
-    const replyToInput = screen.getByDisplayValue(SUPPORT_ACME_EXAMPLE);
+    const senderNameInput = screen.getByLabelText(senderNameLabel);
+    const replyToInput = screen.getByLabelText(replyToLabel);
 
-    expect(senderNameInput).toBeVisible();
-    expect(replyToInput).toBeVisible();
+    expect(senderNameInput).toHaveValue(emailConfig.senderName);
+    expect(replyToInput).toHaveValue(emailConfig.replyToAddress);
   });
 
   it('shows the stored contact recipient on a plan with the contact form', async () => {
-    getEmailConfigMock.mockResolvedValue({
-      senderName: 'Acme Co',
-      contactRecipient: MOCK_CONTACT_RECIPIENT,
-      updatedAt: new Date(),
-    });
+    getEmailConfigMock.mockResolvedValueOnce(
+      mockEmailConfig({ contactRecipient: MOCK_CONTACT_RECIPIENT }),
+    );
 
-    await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
+    await setup({ tenant: MOCK_GROWTH_TENANT });
 
     const contactRecipientInput = screen.getByLabelText(
       SEND_CONTACT_MESSAGES_TO,
@@ -194,7 +203,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
       }),
     }));
 
-    await setup({ tenant: { ...tenant, plan: TENANT_PLAN.GROWTH } });
+    await setup({ tenant: MOCK_GROWTH_TENANT });
 
     const contactRecipientInput = screen.queryByLabelText(
       SEND_CONTACT_MESSAGES_TO,
@@ -203,12 +212,9 @@ describe(`<${EmailPageContent.name}/>`, () => {
     expect(contactRecipientInput).not.toBeInTheDocument();
   });
 
-  it('passes the archived date through for a deprovisioned tenant', async () => {
+  it('shows the archived notice for a deprovisioned tenant', async () => {
     await setup({
-      tenant: {
-        ...tenant,
-        deprovisionedAt: MOCK_ARCHIVED_AT,
-      },
+      tenant: { ...MOCK_TENANT, deprovisionedAt: MOCK_ARCHIVED_AT },
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);

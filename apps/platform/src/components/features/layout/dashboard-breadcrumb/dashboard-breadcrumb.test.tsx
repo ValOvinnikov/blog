@@ -1,25 +1,40 @@
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { DashboardBreadcrumb } from './dashboard-breadcrumb';
 
 vi.mock('@platform/i18n/navigation');
 
-const render = renderWithIntl;
+faker.seed(2406);
 
-const DASHBOARD_LABEL = 'Dashboard';
-const FEATURES_LABEL = 'Features';
+const MOCK_UNLISTED_PATHNAME = `${adminRoutes.dashboard()}/${faker.lorem.slug()}`;
+const MOCK_STUDIO_SUB_PATHNAME = `${adminRoutes.dashboardStudio()}/${faker.lorem.slug()}`;
+
+const {
+  dashboardLabel,
+  overview,
+  look,
+  features,
+  voice,
+  languages,
+  domain,
+  email,
+  studio,
+} = messages.navSections;
+
+const setup = customRender(DashboardBreadcrumb, {});
 
 describe(`<${DashboardBreadcrumb.name}/>`, () => {
-  it('renders the single, non-clickable Dashboard item on the dashboard home route', () => {
-    vi.mocked(usePathname).mockReturnValue(adminRoutes.dashboard());
+  it('shows only an unlinked Dashboard on the dashboard home route', () => {
+    vi.mocked(usePathname).mockReturnValueOnce(adminRoutes.dashboard());
+    setup();
 
-    render(<DashboardBreadcrumb />);
-
-    const dashboardItem = screen.getByText(DASHBOARD_LABEL);
-    const dashboardLink = screen.queryByRole('link', { name: DASHBOARD_LABEL });
-    const overviewItem = screen.queryByText('Overview');
+    const dashboardItem = screen.getByText(dashboardLabel);
+    const dashboardLink = screen.queryByRole('link', { name: dashboardLabel });
+    const overviewItem = screen.queryByText(overview);
 
     expect(dashboardItem).toBeVisible();
     expect(dashboardLink).not.toBeInTheDocument();
@@ -27,53 +42,49 @@ describe(`<${DashboardBreadcrumb.name}/>`, () => {
   });
 
   it('links Dashboard back home and shows Look as current on the look route', () => {
-    vi.mocked(usePathname).mockReturnValue(adminRoutes.dashboardLook());
+    vi.mocked(usePathname).mockReturnValueOnce(adminRoutes.dashboardLook());
+    setup();
 
-    render(<DashboardBreadcrumb />);
-
-    const dashboardLink = screen.getByRole('link', { name: DASHBOARD_LABEL });
-    const lookItem = screen.getByText('Look');
+    const dashboardLink = screen.getByRole('link', { name: dashboardLabel });
+    const lookItem = screen.getByText(look);
 
     expect(dashboardLink).toHaveAttribute('href', adminRoutes.dashboard());
     expect(lookItem).toBeVisible();
   });
 
   it('shows Features as current on the features route', () => {
-    vi.mocked(usePathname).mockReturnValue(adminRoutes.dashboardFeatures());
+    vi.mocked(usePathname).mockReturnValueOnce(adminRoutes.dashboardFeatures());
+    setup();
 
-    render(<DashboardBreadcrumb />);
-
-    const featuresItem = screen.getByText(FEATURES_LABEL);
+    const featuresItem = screen.getByText(features);
 
     expect(featuresItem).toBeVisible();
   });
 
   it.each([
-    ['/dashboard/voice', 'Voice'],
-    ['/dashboard/languages', 'Languages'],
-    ['/dashboard/domain', 'Domain'],
-    ['/dashboard/email', 'Email'],
-    ['/dashboard/studio', 'Studio'],
-    ['/dashboard/studio/structure/post', 'Studio'],
+    [adminRoutes.dashboardVoice(), voice],
+    [adminRoutes.dashboardLanguages(), languages],
+    [adminRoutes.dashboardDomain(), domain],
+    [adminRoutes.dashboardEmail(), email],
+    [adminRoutes.dashboardStudio(), studio],
+    [MOCK_STUDIO_SUB_PATHNAME, studio],
   ])('ends %s with its own page name, %s', (pathname, label) => {
-    vi.mocked(usePathname).mockReturnValue(pathname);
-
-    render(<DashboardBreadcrumb />);
+    vi.mocked(usePathname).mockReturnValueOnce(pathname);
+    setup();
 
     const leafItem = screen.getByText(label);
-    const featuresItem = screen.queryByText(FEATURES_LABEL);
+    const featuresItem = screen.queryByText(features);
 
     expect(leafItem).toBeVisible();
     expect(featuresItem).not.toBeInTheDocument();
   });
 
   it('shows no leaf on a route the nav does not list', () => {
-    vi.mocked(usePathname).mockReturnValue('/dashboard/unlisted');
+    vi.mocked(usePathname).mockReturnValueOnce(MOCK_UNLISTED_PATHNAME);
+    setup();
 
-    render(<DashboardBreadcrumb />);
-
-    const dashboardItem = screen.getByText(DASHBOARD_LABEL);
-    const featuresItem = screen.queryByText(FEATURES_LABEL);
+    const dashboardItem = screen.getByText(dashboardLabel);
+    const featuresItem = screen.queryByText(features);
 
     expect(dashboardItem).toBeVisible();
     expect(featuresItem).not.toBeInTheDocument();

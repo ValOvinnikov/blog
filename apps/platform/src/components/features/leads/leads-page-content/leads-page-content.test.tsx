@@ -1,5 +1,6 @@
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import {
   customRenderAsync,
   screen,
@@ -31,6 +32,8 @@ vi.mock('@platform/server/leads/get-lead-page-title-action');
 
 vi.mock('@platform/server/leads/set-lead-read-action');
 
+const { leadsInbox, leadsView } = messages;
+
 const MOCK_NEWEST_LEAD = mockLead({
   id: faker.string.uuid(),
   name: faker.person.fullName(),
@@ -39,7 +42,6 @@ const MOCK_OLDEST_LEAD = mockLead({
   id: faker.string.uuid(),
   name: faker.person.fullName(),
 });
-const CONTACT_FORM_NOT_INCLUDED = 'Contact form not included in your plan';
 
 const setup = customRenderAsync(LeadsPageContent, {
   tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
@@ -65,33 +67,33 @@ describe(`<${LeadsPageContent.name}/>`, () => {
     });
 
     it('says so when there are no messages yet', () => {
-      const emptyState = screen.getByText(/No messages yet/);
+      const emptyState = screen.getByText(leadsInbox.empty);
 
       expect(emptyState).toBeVisible();
     });
 
     it('states that each message was also emailed', () => {
-      const description = screen.getByText(/also emailed to you/);
+      const description = screen.getByText(leadsView.description);
 
       expect(description).toBeVisible();
     });
 
     it('shows no plan notice while the plan includes the contact form', () => {
-      const planNotice = screen.queryByText(CONTACT_FORM_NOT_INCLUDED);
+      const planNotice = screen.queryByText(leadsView.downgradedTitle);
 
       expect(planNotice).not.toBeInTheDocument();
     });
   });
 
   it('lists the leads newest first, as returned', async () => {
-    listLeadsByCursorMock.mockResolvedValue({
+    listLeadsByCursorMock.mockResolvedValueOnce({
       leads: [MOCK_NEWEST_LEAD, MOCK_OLDEST_LEAD],
       nextCursor: undefined,
     });
 
     await setup();
 
-    const list = screen.getByRole('list', { name: 'Messages' });
+    const list = screen.getByRole('list', { name: leadsInbox.listLabel });
     const [newest, oldest] = within(list).getAllByRole('listitem');
 
     expect(newest).toHaveTextContent(MOCK_NEWEST_LEAD.name);
@@ -99,7 +101,7 @@ describe(`<${LeadsPageContent.name}/>`, () => {
   });
 
   it('keeps the leads and warns when the plan no longer has the contact form', async () => {
-    listLeadsByCursorMock.mockResolvedValue({
+    listLeadsByCursorMock.mockResolvedValueOnce({
       leads: [MOCK_NEWEST_LEAD],
       nextCursor: undefined,
     });
@@ -108,10 +110,8 @@ describe(`<${LeadsPageContent.name}/>`, () => {
       tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE }),
     });
 
-    const planNotice = screen.getByText(CONTACT_FORM_NOT_INCLUDED);
-    const keptNotice = screen.getByText(
-      /messages you already received are kept/,
-    );
+    const planNotice = screen.getByText(leadsView.downgradedTitle);
+    const keptNotice = screen.getByText(leadsView.downgradedDescription);
     const leadRow = screen.getByRole('button', {
       name: new RegExp(MOCK_NEWEST_LEAD.name),
     });

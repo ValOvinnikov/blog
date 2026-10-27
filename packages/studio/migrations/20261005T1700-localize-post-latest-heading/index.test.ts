@@ -1,57 +1,38 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizePostLatestHeading } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(18);
 
-const inEnglish = (type: string, value: unknown) => [
-  { _key: EN, _type: type, language: EN, value },
-];
+const MOCK_HEADING = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 
 describe(localizePostLatestHeading, () => {
   it('moves the heading block into the default language', () => {
     expect(
       localizePostLatestHeading({
-        headingBlock: {
-          _type: 'headingBlock',
-          heading: 'Latest posts',
-          supportingText: 'Fresh from the blog.',
-        },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
       }),
     ).toEqual([
       at(
         'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish(
-            'internationalizedArrayStringValue',
-            'Latest posts',
-          ),
-          supportingText: inEnglish(
-            'internationalizedArrayTextValue',
-            'Fresh from the blog.',
-          ),
-        }),
+        set(mockLocalizedHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT)),
       ),
     ]);
   });
 
-  it('is idempotent — an already localized heading block is left alone', () => {
-    expect(
-      localizePostLatestHeading({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish(
-            'internationalizedArrayStringValue',
-            'Latest posts',
-          ),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a module without a heading block alone', () => {
-    expect(localizePostLatestHeading({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized heading block',
+      doc: { headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING) },
+    },
+    { name: 'a module without a heading block', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizePostLatestHeading(doc)).toBeUndefined();
   });
 });

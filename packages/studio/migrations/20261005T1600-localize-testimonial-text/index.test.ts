@@ -1,38 +1,40 @@
+import {
+  mockImageAsset,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockPlainHeadingBlock,
+  mockPlainImage,
+  mockEnglishString,
+  mockInEnglish,
+  mockParagraph,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
-
-import { inDefaultLocale, localizedString } from '../lib/in-default-locale';
 
 import { localizeTestimonialDocument } from './index';
 
-const paragraph = (text: string) => [
-  { _type: 'block', _key: text, children: [{ _type: 'span', text }] },
-];
+faker.seed(17);
 
-const localizedQuote = (text: string) =>
-  inDefaultLocale('internationalizedArrayListedTextValue', paragraph(text));
-
-const asset = { _type: 'reference', _ref: 'image-1' };
+const LISTED_TEXT_TYPE = 'internationalizedArrayListedTextValue';
+const MOCK_QUOTE = mockParagraph();
+const MOCK_ROLE = faker.person.jobTitle();
+const MOCK_ALT = faker.lorem.words(3);
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_ASSET = mockImageAsset();
 
 describe(localizeTestimonialDocument, () => {
   it("moves a testimonial's quote, role and photo alt into the default language", () => {
     expect(
       localizeTestimonialDocument({
         _type: 'block_testimonial',
-        quote: paragraph('They shipped on time.'),
-        role: 'Founder, Acme',
-        image: { _type: 'imageWithAlt', asset, alt: 'Jane smiling' },
+        quote: MOCK_QUOTE,
+        role: MOCK_ROLE,
+        image: mockPlainImage(MOCK_ASSET, MOCK_ALT),
       }),
     ).toEqual([
-      at('quote', set(localizedQuote('They shipped on time.'))),
-      at('role', set(localizedString('Founder, Acme'))),
-      at(
-        'image',
-        set({
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: localizedString('Jane smiling'),
-        }),
-      ),
+      at('quote', set(mockInEnglish(LISTED_TEXT_TYPE, MOCK_QUOTE))),
+      at('role', set(mockEnglishString(MOCK_ROLE))),
+      at('image', set(mockLocalizedImage(MOCK_ASSET, MOCK_ALT))),
     ]);
   });
 
@@ -40,16 +42,10 @@ describe(localizeTestimonialDocument, () => {
     expect(
       localizeTestimonialDocument({
         _type: 'module_testimonial',
-        headingBlock: { _type: 'headingBlock', heading: 'What people say' },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING),
       }),
     ).toEqual([
-      at(
-        'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('What people say'),
-        }),
-      ),
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_HEADING))),
     ]);
   });
 
@@ -57,42 +53,38 @@ describe(localizeTestimonialDocument, () => {
     expect(
       localizeTestimonialDocument({
         _type: 'block_testimonial',
-        quote: localizedQuote('They shipped on time.'),
-        role: 'Founder, Acme',
+        quote: mockInEnglish(LISTED_TEXT_TYPE, MOCK_QUOTE),
+        role: MOCK_ROLE,
       }),
-    ).toEqual([at('role', set(localizedString('Founder, Acme')))]);
+    ).toEqual([at('role', set(mockEnglishString(MOCK_ROLE)))]);
   });
 
-  it('is idempotent — already localized documents are left alone', () => {
-    expect(
-      localizeTestimonialDocument({
-        _type: 'block_testimonial',
-        quote: localizedQuote('They shipped on time.'),
-        role: localizedString('Founder, Acme'),
-        image: {
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: localizedString('Jane smiling'),
-        },
-      }),
-    ).toBeUndefined();
-    expect(
-      localizeTestimonialDocument({
-        _type: 'module_testimonial',
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('What people say'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves documents without text alone', () => {
-    expect(
-      localizeTestimonialDocument({ _type: 'block_testimonial' }),
-    ).toBeUndefined();
-    expect(
-      localizeTestimonialDocument({ _type: 'module_testimonial' }),
-    ).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized testimonial',
+      doc: {
+        _type: 'block_testimonial' as const,
+        quote: mockInEnglish(LISTED_TEXT_TYPE, MOCK_QUOTE),
+        role: mockEnglishString(MOCK_ROLE),
+        image: mockLocalizedImage(MOCK_ASSET, MOCK_ALT),
+      },
+    },
+    {
+      name: 'an already localized Testimonials module',
+      doc: {
+        _type: 'module_testimonial' as const,
+        headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
+      },
+    },
+    {
+      name: 'a testimonial without text',
+      doc: { _type: 'block_testimonial' as const },
+    },
+    {
+      name: 'a Testimonials module without text',
+      doc: { _type: 'module_testimonial' as const },
+    },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeTestimonialDocument(doc)).toBeUndefined();
   });
 });
