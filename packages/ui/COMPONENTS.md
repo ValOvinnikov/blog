@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_65 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_68 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -159,6 +159,18 @@ Variants: isIconFromThemeClass: (boolean)
 
 ## Molecules
 
+### AccountPanel — `components/molecules/account-panel/account-panel.tsx`
+
+The signed-in reader's account menu, in one of three layouts a site owner picks: a compact card, a profile header, or a hub of described tiles.
+Props: appearance: NonNullable<TAccountPanelVariants['appearance']> · user: IAccountPanelUser · onImageError?: () => void · links: IAccountPanelLinks · linkAs?: TAnchorElementType · signOut: IAccountPanelSignOut · panel: IAccountPanelSurface · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
+Variants: appearance: ACCOUNT_PANEL_STYLE.CARD|ACCOUNT_PANEL_STYLE.PROFILE|ACCOUNT_PANEL_STYLE.HUB
+
+### AccountTrigger — `components/molecules/account-trigger/account-trigger.tsx`
+
+The header button that opens the account panel when signed in and the sign-in panel when signed out, holding one footprint across both states.
+Props: appearance: NonNullable<TAccountTriggerVariants['appearance']> · labels: IAccountTriggerLabels · user?: IAccountTriggerUser · onImageError?: () => void · isOpen: boolean · panelId: string · onClick?: MouseEventHandler<HTMLButtonElement> · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+Variants: appearance: ACCOUNT_BUTTON_STYLE.PILL|ACCOUNT_BUTTON_STYLE.CIRCLE
+
 ### ActionList — `components/molecules/action-list/action-list.tsx`
 
 Flex wrapper for hero CTA buttons.
@@ -256,7 +268,7 @@ Slots:
 
 - **PopoverMenu.Trigger** — Icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · variant?: TIconButtonVariants['variant'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
 - **PopoverMenu.Panel** — The non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Item** — A single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered
+- **PopoverMenu.Item** — A single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered|outlined|tile
 - **PopoverMenu.Separator** — A thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
 ### PostMeta — `components/molecules/post-meta/post-meta.tsx`
@@ -309,6 +321,11 @@ Variants: tone: default|danger
 
 A single external share action (e.g. "Share on X"), rendered through `LinkButton` with `target="_blank"` and `rel="noopener noreferrer"` baked in, since every share link opens the target platform in a new tab.
 Props: as?: TAnchorElementType _(extends IShareLinkItem, IWithClassName, IWithDataTestId)_
+
+### SignInPanel — `components/molecules/sign-in-panel/sign-in-panel.tsx`
+
+The signed-out reader's sign-in dialog, offering every provider and the email link at once and reporting each step of the attempt.
+Props: panel: ISignInPanelSurface · labels: ISignInPanelLabels · providers: ISignInPanelProvider[] · pendingProviderId?: string · emailForm: ISignInPanelEmailForm · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
 
 ### TagList — `components/molecules/tag-list/tag-list.tsx`
 

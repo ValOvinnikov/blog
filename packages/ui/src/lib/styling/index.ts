@@ -12,4 +12,5 @@ export {
   LINK_UNDERLINE_EMPHASIS,
 } from './link-underline';
 export { BRAND_PILL } from './pill';
+export { POPOVER_SURFACE } from './popover-surface';
 export { tv } from './tv';

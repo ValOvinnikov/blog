@@ -1,9 +1,5 @@
-import { tv } from '@blog/ui/lib/styling';
+import { POPOVER_SURFACE, tv } from '@blog/ui/lib/styling';
 
 export const popoverMenuPanelVariants = tv({
-  base: [
-    'absolute top-full right-0 z-20 mt-2 min-w-[200px]',
-    'flex flex-col gap-1 rounded-card p-4',
-    'bg-surface surface-card border border-border shadow-float',
-  ],
+  base: [POPOVER_SURFACE],
 });
