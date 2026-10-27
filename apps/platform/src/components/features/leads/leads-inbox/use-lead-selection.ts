@@ -1,8 +1,9 @@
 import {
-  ACTION_OUTCOME,
+  isOutcomeSuccess,
   type TMaybeNull,
   type TMaybeUndefined,
 } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import { useToast } from '@platform/context/toast-provider';
 import { setLeadReadAction } from '@platform/server/leads/set-lead-read-action';
@@ -13,11 +14,13 @@ import { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 
 type TUseLeadSelectionInput = {
+  leads: TInboxLead[];
   updateLead: (id: string, change: Partial<TInboxLead>) => void;
   removeLead: (id: string) => void;
 };
 
 export const useLeadSelection = ({
+  leads,
   updateLead,
   removeLead,
 }: TUseLeadSelectionInput) => {
@@ -27,7 +30,15 @@ export const useLeadSelection = ({
   const toast = useToast();
   const [selectedId, setSelectedId] = useState<TMaybeUndefined<string>>();
   const paneHeadingRef = useRef<HTMLSpanElement>(null);
-  const openerRef = useRef<TMaybeNull<HTMLButtonElement>>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const rowsRef = useRef(new Map<string, HTMLButtonElement>());
+
+  const rowRef = (id: string) => (row: TMaybeNull<HTMLButtonElement>) => {
+    if (row) rowsRef.current.set(id, row);
+    return () => {
+      rowsRef.current.delete(id);
+    };
+  };
 
   const showPane = (id: string) => {
     flushSync(() => setSelectedId(id));
@@ -36,7 +47,7 @@ export const useLeadSelection = ({
 
   const close = () => {
     flushSync(() => setSelectedId(undefined));
-    openerRef.current?.focus();
+    if (!isUndefined(selectedId)) rowsRef.current.get(selectedId)?.focus();
   };
 
   const setReadState = async (
@@ -45,7 +56,7 @@ export const useLeadSelection = ({
   ) => {
     updateLead(id, { isRead });
     const result = await setLeadReadAction(tenantId, id, isRead);
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+    if (isOutcomeSuccess(result)) {
       router.refresh();
       return;
     }
@@ -53,8 +64,7 @@ export const useLeadSelection = ({
     toast.error({ message: t('readStateFailed') });
   };
 
-  const open = (lead: TInboxLead, opener: HTMLButtonElement) => {
-    openerRef.current = opener;
+  const open = (lead: TInboxLead) => {
     showPane(lead.id);
     if (!lead.isRead) void setReadState(lead, true);
   };
@@ -65,15 +75,22 @@ export const useLeadSelection = ({
   };
 
   const handleDeleted = (id: string) => {
-    removeLead(id);
-    setSelectedId(undefined);
-    openerRef.current = null;
+    const index = leads.findIndex((lead) => lead.id === id);
+    const neighbour = leads[index + 1] ?? leads[index - 1];
+    flushSync(() => {
+      removeLead(id);
+      setSelectedId(undefined);
+    });
+    const neighbourRow = neighbour && rowsRef.current.get(neighbour.id);
+    (neighbourRow ?? listRef.current)?.focus();
     router.refresh();
   };
 
   return {
     selectedId,
     paneHeadingRef,
+    listRef,
+    rowRef,
     open,
     markUnread,
     close,

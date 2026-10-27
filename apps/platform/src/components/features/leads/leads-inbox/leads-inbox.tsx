@@ -16,8 +16,16 @@ export type TLeadsInboxProps = {
 
 export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
   const { leads, loading, updateLead, removeLead } = useLeadsPages(initialPage);
-  const { selectedId, paneHeadingRef, open, markUnread, close, handleDeleted } =
-    useLeadSelection({ updateLead, removeLead });
+  const {
+    selectedId,
+    paneHeadingRef,
+    listRef,
+    rowRef,
+    open,
+    markUnread,
+    close,
+    handleDeleted,
+  } = useLeadSelection({ leads, updateLead, removeLead });
   const selectedLead = leads.find(({ id }) => id === selectedId);
   const { root, listColumn, paneColumn } = leadsInboxVariants({
     hasSelection: !isUndefined(selectedLead),
@@ -25,10 +33,16 @@ export const LeadsInbox = ({ initialPage }: TLeadsInboxProps) => {
 
   return (
     <div className={root()}>
-      <div className={listColumn()}>
+      <div
+        ref={listRef}
+        tabIndex={-1}
+        className={listColumn()}
+        data-testid="leads-list-column"
+      >
         <LeadsList
           leads={leads}
           selectedId={selectedId}
+          rowRef={rowRef}
           onOpen={open}
           loading={loading}
         />

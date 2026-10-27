@@ -2,16 +2,18 @@ import { Button } from '@platform/components/shared/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { formatShortDateTime } from '@platform/utils/format-short-date-time/format-short-date-time';
 import { useLocale, useNow, useTranslations } from 'next-intl';
+import type { Ref } from 'react';
 
 import { leadRowVariants } from './lead-row-variants';
 
 export type TLeadRowProps = {
   lead: TInboxLead;
   isSelected: boolean;
-  onOpen: (lead: TInboxLead, opener: HTMLButtonElement) => void;
+  onOpen: (lead: TInboxLead) => void;
+  ref: Ref<HTMLButtonElement>;
 };
 
-export const LeadRow = ({ lead, isSelected, onOpen }: TLeadRowProps) => {
+export const LeadRow = ({ lead, isSelected, onOpen, ref }: TLeadRowProps) => {
   const t = useTranslations('leadsInbox');
   const locale = useLocale();
   const now = useNow();
@@ -20,10 +22,11 @@ export const LeadRow = ({ lead, isSelected, onOpen }: TLeadRowProps) => {
 
   return (
     <Button
+      ref={ref}
       variant="unstyled"
       className={styles.row()}
       aria-current={isSelected ? 'true' : undefined}
-      onClick={(event) => onOpen(lead, event.currentTarget)}
+      onClick={() => onOpen(lead)}
     >
       <span className={styles.top()}>
         {!isRead && (

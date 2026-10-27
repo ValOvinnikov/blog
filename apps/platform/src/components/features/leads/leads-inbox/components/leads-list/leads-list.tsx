@@ -7,6 +7,7 @@ import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { useTranslations } from 'next-intl';
+import type { Ref } from 'react';
 
 import { LeadRow } from './components/lead-row';
 import { leadsListVariants } from './leads-list-variants';
@@ -15,13 +16,15 @@ import { useLoadMoreSentinel } from './use-load-more-sentinel';
 export type TLeadsListProps = {
   leads: TInboxLead[];
   selectedId: TMaybeUndefined<string>;
-  onOpen: (lead: TInboxLead, opener: HTMLButtonElement) => void;
+  rowRef: (leadId: string) => Ref<HTMLButtonElement>;
+  onOpen: (lead: TInboxLead) => void;
   loading: TLeadsLoading;
 };
 
 export const LeadsList = ({
   leads,
   selectedId,
+  rowRef,
   onOpen,
   loading,
 }: TLeadsListProps) => {
@@ -50,6 +53,7 @@ export const LeadsList = ({
         {leads.map((lead) => (
           <li key={lead.id}>
             <LeadRow
+              ref={rowRef(lead.id)}
               lead={lead}
               isSelected={lead.id === selectedId}
               onOpen={onOpen}

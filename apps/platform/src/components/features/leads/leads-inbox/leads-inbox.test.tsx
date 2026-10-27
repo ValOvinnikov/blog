@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
+import { deleteLeadAction } from '@platform/server/leads/delete-lead-action';
 import {
   renderWithIntl,
   screen,
@@ -39,6 +40,8 @@ vi.mock('@platform/server/leads/delete-lead-action');
 
 const MOCK_OLDER_LEAD_ID = faker.string.uuid();
 const MOCK_OLDER_LEAD_NAME = faker.person.fullName();
+const MOCK_OLDEST_LEAD_ID = faker.string.uuid();
+const MOCK_OLDEST_LEAD_NAME = faker.person.fullName();
 const MOCK_NEXT_CURSOR = {
   createdAt: '2026-04-01 09:30:00.123456+00',
   id: MOCK_OLDER_LEAD_ID,
@@ -46,6 +49,8 @@ const MOCK_NEXT_CURSOR = {
 const MOCK_UNREAD_LABEL = 'Unread';
 const MOCK_BACK_LABEL = 'Back to messages';
 const MOCK_MARK_UNREAD_LABEL = 'Mark unread';
+const MOCK_CONFIRM_DELETE_LABEL = 'Delete message';
+const MOCK_LIST_COLUMN_TEST_ID = 'leads-list-column';
 
 class EndOfListInView {
   constructor(private readonly callback: IntersectionObserverCallback) {}
@@ -83,6 +88,18 @@ const getRow = (name: string) => {
 describe(`<${LeadsInbox.name}/>`, () => {
   let user: UserEvent;
   let refresh: ReturnType<typeof mockRouterRefresh>;
+
+  const deleteLead = async (name: string) => {
+    await user.click(getRow(name));
+    const deleteTrigger = screen.getByRole('button', {
+      name: `Delete the message from ${name}`,
+    });
+    await user.click(deleteTrigger);
+    const confirmButton = await screen.findByRole('button', {
+      name: MOCK_CONFIRM_DELETE_LABEL,
+    });
+    await user.click(confirmButton);
+  };
 
   beforeEach(() => {
     user = userEvent.setup();
@@ -206,6 +223,57 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
         expect(row).toHaveFocus();
       });
+    });
+  });
+
+  describe('after deleting the open lead', () => {
+    beforeEach(() => {
+      vi.mocked(deleteLeadAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+    });
+
+    describe('with leads either side of it', () => {
+      beforeEach(() => {
+        renderInbox({
+          leads: [
+            mockInboxLead(),
+            mockInboxLead({
+              id: MOCK_OLDER_LEAD_ID,
+              name: MOCK_OLDER_LEAD_NAME,
+            }),
+            mockInboxLead({
+              id: MOCK_OLDEST_LEAD_ID,
+              name: MOCK_OLDEST_LEAD_NAME,
+            }),
+          ],
+        });
+      });
+
+      it('moves focus to the next lead', async () => {
+        const nextRow = getRow(MOCK_OLDER_LEAD_NAME);
+
+        await deleteLead(MOCK_LEAD_NAME);
+
+        await waitFor(() => expect(nextRow).toHaveFocus());
+      });
+
+      it('moves focus to the previous lead when the deleted lead was last', async () => {
+        const previousRow = getRow(MOCK_OLDER_LEAD_NAME);
+
+        await deleteLead(MOCK_OLDEST_LEAD_NAME);
+
+        await waitFor(() => expect(previousRow).toHaveFocus());
+      });
+    });
+
+    it('moves focus to the list when no leads are left', async () => {
+      renderInbox();
+
+      await deleteLead(MOCK_LEAD_NAME);
+
+      const listColumn = await screen.findByTestId(MOCK_LIST_COLUMN_TEST_ID);
+      await waitFor(() => expect(listColumn).toHaveFocus());
     });
   });
 
