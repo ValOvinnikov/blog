@@ -21,6 +21,7 @@ import {
   grantSanityProjectRole,
   listSanityProjectAcl,
   listSanityProjectInvites,
+  revokeSanityProjectRole,
 } from './sanity-project-access';
 
 const MOCK_CREATE_INVITE_INPUT = mockSanityProjectInput({
@@ -30,6 +31,10 @@ const MOCK_CREATE_INVITE_INPUT = mockSanityProjectInput({
 const MOCK_GRANT_ROLE_INPUT = mockSanityProjectInput({
   projectUserId: MOCK_SANITY_PROJECT_USER_ID,
   role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+});
+const MOCK_REVOKE_ROLE_INPUT = mockSanityProjectInput({
+  projectUserId: MOCK_SANITY_PROJECT_USER_ID,
+  roleName: SANITY_PROJECT_ROLE.VIEWER,
 });
 
 const fetchMock = useFetchFake();
@@ -178,5 +183,38 @@ describe(grantSanityProjectRole, () => {
     await expect(grantSanityProjectRole(MOCK_GRANT_ROLE_INPUT)).rejects.toThrow(
       new RegExp(`${HTTP_STATUS.FORBIDDEN}`),
     );
+  });
+});
+
+describe(revokeSanityProjectRole, () => {
+  it('DELETEs the roleName from the legacy acl endpoint keyed on projectUserId', async () => {
+    fetchMock.mockResolvedValue(emptyResponse(HTTP_STATUS.NO_CONTENT));
+
+    await revokeSanityProjectRole(MOCK_REVOKE_ROLE_INPUT);
+
+    const { url, body, method } = firstFetchCall(fetchMock);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.aclEntry);
+    expect(method).toBe(HTTP_METHOD.DELETE);
+    expect(body).toEqual({ roleName: MOCK_REVOKE_ROLE_INPUT.roleName });
+  });
+
+  it('treats a member who is already gone as revoked', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.NOT_FOUND),
+    );
+
+    await expect(
+      revokeSanityProjectRole(MOCK_REVOKE_ROLE_INPUT),
+    ).resolves.toBeUndefined();
+  });
+
+  it('throws when the revoke fails for any other reason', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.FORBIDDEN),
+    );
+
+    await expect(
+      revokeSanityProjectRole(MOCK_REVOKE_ROLE_INPUT),
+    ).rejects.toThrow(new RegExp(`${HTTP_STATUS.FORBIDDEN}`));
   });
 });
