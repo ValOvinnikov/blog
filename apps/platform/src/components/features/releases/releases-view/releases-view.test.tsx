@@ -200,7 +200,7 @@ describe(`<${ReleasesView.name}/>`, () => {
     expect(refresh).toHaveBeenCalledOnce();
   });
 
-  it('reports an incomplete tag list instead of a latest release', () => {
+  it('reports an incomplete tag list', () => {
     setup({ result: errorResult(RELEASE_FAILURE.TAG_LIST_INCOMPLETE) });
 
     const notice = screen.getByText(/too long to read in full/);

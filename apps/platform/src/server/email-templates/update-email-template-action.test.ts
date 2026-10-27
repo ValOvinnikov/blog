@@ -135,7 +135,7 @@ describe(updateEmailTemplateAction, () => {
     expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
-  it('rejects an empty subject rather than storing a blank', async () => {
+  it('rejects an empty subject', async () => {
     const result = await updateEmailTemplateAction(
       MOCK_TENANT_ID,
       MAGIC_LINK,

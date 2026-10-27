@@ -416,10 +416,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
     });
 
     afterEach(async () => {
-      await act(async () => {
-        resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
-        await Promise.resolve();
-      });
+      resolveDispatch?.({ outcome: ACTION_OUTCOME.SUCCESS });
+      await advance(0);
     });
 
     it('hides Start and shows the run as running at once', async () => {

@@ -118,6 +118,12 @@ const setup = customRenderAsync(TenantOverviewView, {
   tenant: mockTenant(),
 });
 
+const advancePoll = async () => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+  });
+};
+
 const TENANT_DETAILS = 'Tenant details';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   'Locked while provisioning is running.';
@@ -267,9 +273,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       LOCKED_WHILE_PROVISIONING_IS_RUNNING,
     );
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-    });
+    await advancePoll();
 
     const doneBanner = screen.getByText('Provisioned');
     const lockedNameInput = screen.getByRole('textbox', { name: 'Name' });

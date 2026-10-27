@@ -1,26 +1,39 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
-import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
+import { Suspense } from 'react';
 
-import { DomainVerificationCard } from './domain-verification-card';
+import {
+  DomainVerificationCard,
+  type TDomainVerificationCardProps,
+} from './domain-verification-card';
 
 const AWAITING_DNS = 'Awaiting DNS';
 const CHECKED_JUST_NOW = 'Checked just now';
 const CNAME_RECORD_VALUE = 'cname.vercel-dns.com';
 
+const SuspendedDomainVerificationCard = (
+  props: TDomainVerificationCardProps,
+) => (
+  <Suspense>
+    <DomainVerificationCard {...props} />
+  </Suspense>
+);
+
+const renderCard = customRenderAsync(SuspendedDomainVerificationCard, {
+  domain: MOCK_CUSTOM_DOMAIN,
+  projectDomain: Promise.resolve({
+    status: DOMAIN_VERIFICATION_STATUS.PENDING,
+    dnsRecords: [],
+  }),
+});
+
 const setup = (projectDomain: TProjectDomain) =>
-  act(async () => {
-    renderWithIntl(
-      <DomainVerificationCard
-        domain={MOCK_CUSTOM_DOMAIN}
-        projectDomain={Promise.resolve(projectDomain)}
-      />,
-    );
-  });
+  renderCard({ projectDomain: Promise.resolve(projectDomain) });
 
 describe(`<${DomainVerificationCard.name}/>`, () => {
   it('shows the status badge in the card header beside the domain', async () => {
@@ -68,7 +81,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
       });
     });
 
-    it('shows the verified empty state instead of the table once verified', async () => {
+    it('shows the verified empty state with no records table', async () => {
       const verifiedBadge = await screen.findByText('Verified');
       const emptyState = screen.getByText(
         "This domain is verified — there's nothing left to configure.",
