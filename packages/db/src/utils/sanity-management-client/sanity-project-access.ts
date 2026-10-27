@@ -8,6 +8,7 @@ import {
   sanityAccessRequest,
   sanityAccessResponse,
   sanityManagementRequest,
+  sanityManagementResponse,
 } from '@blog/db/utils/sanity-management-client/sanity-api-request';
 
 export type TSanityInvite = {
@@ -95,5 +96,23 @@ export async function grantSanityProjectRole(input: {
     SANITY_API_PATH.projectAclEntry(input.projectId, input.projectUserId),
     input.token,
     { method: HTTP_METHOD.PUT, body: JSON.stringify({ roleName: input.role }) },
+  );
+}
+
+// A member whose last role is removed leaves the project.
+export async function revokeSanityProjectRole(input: {
+  token: string;
+  projectId: string;
+  projectUserId: string;
+  roleName: string;
+}): Promise<void> {
+  await sanityManagementResponse(
+    SANITY_API_PATH.projectAclEntry(input.projectId, input.projectUserId),
+    input.token,
+    {
+      method: HTTP_METHOD.DELETE,
+      body: JSON.stringify({ roleName: input.roleName }),
+    },
+    [HTTP_STATUS.NOT_FOUND],
   );
 }
