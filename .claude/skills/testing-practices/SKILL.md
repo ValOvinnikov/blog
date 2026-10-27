@@ -77,7 +77,13 @@ not to test", and treats "nothing to add" as a complete outcome.
   `faker.lorem.sentence()`) held in a `MOCK_<THING>` const or a builder's
   default — not a hand-typed `'user-1'`, `'Title'` or `'jane@example.com'`.
   A test file that uses it calls `faker.seed(<number>)` at module top, so
-  every run draws the same values; stories may leave it unseeded. A value the
+  every run draws the same values; stories may leave it unseeded. A shared
+  fixture file (`testing/`, `__mocks__/`) that draws at module scope never
+  calls `faker.seed`: it draws from its own instance,
+  `const mockFaker = createMockFaker(<seed>)` from the workspace's
+  `testing/mock-faker.ts`, so importing it never shifts the global stream a
+  test seeded. A builder that draws when called uses the global `faker`, so
+  the calling test's seed governs it. A value the
   code reads by meaning — a status, locale, route or `_type` — is its const,
   never faker. An id compared only for equality, a Sanity document id
   included, is still `faker.string.uuid()`; an id whose shape the code reads
