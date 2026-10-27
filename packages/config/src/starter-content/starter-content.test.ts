@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
@@ -6,8 +8,11 @@ import type { TStarterDocumentUnion } from './starter-document';
 
 type TStarterType = TStarterDocumentUnion['_type'];
 
-const SITE_NAME = 'Acme Corporation';
-const PUBLISHED_AT = '2026-10-21T09:00:00.000Z';
+faker.seed(6028);
+
+const MOCK_SITE_NAME = faker.company.name();
+const MOCK_OTHER_SITE_NAME = faker.company.name();
+const MOCK_PUBLISHED_AT = '2026-10-21T09:00:00.000Z';
 const STARTER_SITE_TYPES = [
   SITE_TYPE.BLOG,
   SITE_TYPE.PORTFOLIO,
@@ -18,13 +23,13 @@ const LOCALES = Object.values(LOCALE_ISO_CODES);
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
   locale: (typeof LOCALES)[number] = LOCALE_ISO_CODES.EN,
-  siteName = SITE_NAME,
+  siteName = MOCK_SITE_NAME,
 ) =>
   buildStarterDocuments({
     siteType,
     siteName,
     locale,
-    publishedAt: PUBLISHED_AT,
+    publishedAt: MOCK_PUBLISHED_AT,
   });
 
 function findByType<TType extends TStarterType>(
@@ -54,7 +59,9 @@ const everyCombination = STARTER_SITE_TYPES.flatMap((siteType) =>
 
 describe(buildStarterDocuments, () => {
   it('builds the Blank site from the base documents only', () => {
-    expect(build().map((doc) => doc._type)).toEqual([
+    const types = build().map(({ _type }) => _type);
+
+    expect(types).toEqual([
       'settings_navigation',
       'settings_footer',
       'settings_site',
@@ -66,49 +73,71 @@ describe(buildStarterDocuments, () => {
   });
 
   it.each(everyCombination)(
-    '%s in %s builds unique, published ids whose references all resolve',
+    '%s in %s builds unique ids',
     (siteType, locale) => {
-      const documents = build(siteType, locale);
-      const ids = documents.map((doc) => doc._id);
+      const ids = build(siteType, locale).map(({ _id }) => _id);
 
       expect(new Set(ids).size).toBe(ids.length);
-      expect(ids.filter((id) => id.startsWith('drafts.'))).toEqual([]);
-      expect(
-        referencedIds(documents).filter((id) => !ids.includes(id)),
-      ).toEqual([]);
+    },
+  );
+
+  it.each(everyCombination)(
+    '%s in %s builds published documents only',
+    (siteType, locale) => {
+      const draftIds = build(siteType, locale)
+        .map(({ _id }) => _id)
+        .filter((id) => id.startsWith('drafts.'));
+
+      expect(draftIds).toEqual([]);
+    },
+  );
+
+  it.each(everyCombination)(
+    '%s in %s builds references that all resolve',
+    (siteType, locale) => {
+      const documents = build(siteType, locale);
+      const ids = documents.map(({ _id }) => _id);
+
+      const dangling = referencedIds(documents).filter(
+        (id) => !ids.includes(id),
+      );
+
+      expect(dangling).toEqual([]);
     },
   );
 
   it.each(STARTER_SITE_TYPES)(
-    '%s builds the same ids for every site name and locale, so a re-seed targets the documents it created',
+    '%s builds the same ids whatever the site name and locale',
     (siteType) => {
-      const [acmeIds, globexIds] = [
-        build(siteType, LOCALE_ISO_CODES.EN, 'Acme'),
-        build(siteType, LOCALE_ISO_CODES.DE, 'Globex'),
+      const [firstIds, secondIds] = [
+        build(siteType, LOCALE_ISO_CODES.EN, MOCK_SITE_NAME),
+        build(siteType, LOCALE_ISO_CODES.DE, MOCK_OTHER_SITE_NAME),
       ].map((documents) => documents.map(({ _id }) => _id));
 
-      expect(acmeIds).toEqual(globexIds);
+      expect(firstIds).toEqual(secondIds);
     },
   );
 
   it('the Blog site keeps every base document id the Blank site seeds', () => {
     const blogIds = build(SITE_TYPE.BLOG).map(({ _id }) => _id);
 
-    expect(
-      build()
-        .map(({ _id }) => _id)
-        .filter((id) => !blogIds.includes(id)),
-    ).toEqual([]);
+    const missing = build()
+      .map(({ _id }) => _id)
+      .filter((id) => !blogIds.includes(id));
+
+    expect(missing).toEqual([]);
   });
 
   it('the Blank home template has no hero and no modules', () => {
-    const template = findByType(build(), 'template_home');
+    const { hero, modules } = findByType(build(), 'template_home');
 
-    expect(template).not.toHaveProperty('hero');
-    expect(template).not.toHaveProperty('modules');
+    expect({ hero, modules }).toStrictEqual({
+      hero: undefined,
+      modules: undefined,
+    });
   });
 
-  it('the Blog home opens with a blog hero pinning a post, then latest posts, topics and a call to action', () => {
+  it('opens the Blog home with a hero pinning a post, then posts, topics and a CTA', () => {
     const documents = build(SITE_TYPE.BLOG);
     const byId = (id?: string) => documents.find(({ _id }) => _id === id);
     const { hero, modules = [] } = findByType(documents, 'template_home');
@@ -118,11 +147,13 @@ describe(buildStarterDocuments, () => {
         ? byId(heroDocument.post?._ref)
         : undefined;
 
-    expect(
-      [heroDocument, pinned, ...modules.map(({ _ref }) => byId(_ref))].map(
-        (document) => ({ _type: document?._type }),
-      ),
-    ).toEqual([
+    const sequence = [
+      heroDocument,
+      pinned,
+      ...modules.map(({ _ref }) => byId(_ref)),
+    ].map((document) => ({ _type: document?._type }));
+
+    expect(sequence).toEqual([
       { _type: 'module_heroBlog' },
       { _type: 'page_post' },
       { _type: 'module_postLatest' },
@@ -136,24 +167,22 @@ describe(buildStarterDocuments, () => {
       'parent' in document && document.parent ? [document.parent._ref] : [],
     );
 
-    expect(parents).toHaveLength(2);
-    expect(new Set(parents).size).toBe(1);
+    expect(parents).toEqual([parents[0], parents[0]]);
   });
 
   it('the site settings brand carries the site name', () => {
-    expect(
-      findByType(
-        build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.EN, 'Globex'),
-        'settings_site',
-      ).brand?.name,
-    ).toBe('Globex');
+    const { brand } = findByType(build(), 'settings_site');
+
+    expect(brand?.name).toBe(MOCK_SITE_NAME);
   });
 
   it('the NL home page takes its copy from the Dutch catalogue', () => {
-    expect(
-      findByType(build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL), 'page_home')
-        .headingBlock.heading,
-    ).toBe(STARTER_COPY_BY_LOCALE.NL.home.heading);
+    const { headingBlock } = findByType(
+      build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL),
+      'page_home',
+    );
+
+    expect(headingBlock.heading).toBe(STARTER_COPY_BY_LOCALE.NL.home.heading);
   });
 
   it.each(LOCALES)(

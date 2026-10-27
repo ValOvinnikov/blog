@@ -1,24 +1,24 @@
+import { faker } from '@faker-js/faker';
+
 import { DOMAIN_LABEL_PATTERN, DOMAIN_PATTERN } from './path';
+
+faker.seed(6028);
+
+const MOCK_LABEL = faker.internet.domainWord();
+const MOCK_DOMAIN = `${MOCK_LABEL}.com`;
 
 describe('DOMAIN_PATTERN', () => {
   it('matches a valid domain', () => {
-    expect(DOMAIN_PATTERN.test('acme.com')).toBe(true);
+    expect(DOMAIN_PATTERN.test(MOCK_DOMAIN)).toBe(true);
   });
 
-  it('rejects a scheme-prefixed value', () => {
-    expect(DOMAIN_PATTERN.test('https://acme.com')).toBe(false);
-  });
-
-  it('rejects a trailing-slash value', () => {
-    expect(DOMAIN_PATTERN.test('acme.com/')).toBe(false);
-  });
-
-  it('rejects a whitespace-padded value', () => {
-    expect(DOMAIN_PATTERN.test(' acme.com ')).toBe(false);
-  });
-
-  it('rejects a single label', () => {
-    expect(DOMAIN_PATTERN.test('acme')).toBe(false);
+  it.each([
+    ['scheme-prefixed', `https://${MOCK_DOMAIN}`],
+    ['trailing-slash', `${MOCK_DOMAIN}/`],
+    ['whitespace-padded', ` ${MOCK_DOMAIN} `],
+    ['single-label', MOCK_LABEL],
+  ])('rejects a %s value', (_kind, value) => {
+    expect(DOMAIN_PATTERN.test(value)).toBe(false);
   });
 });
 
