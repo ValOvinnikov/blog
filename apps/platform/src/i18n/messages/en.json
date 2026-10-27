@@ -1066,27 +1066,26 @@
     "confirmingButton": "Dispatching…"
   },
   "tenantSuspensionControl": {
+    "cardTitle": "Suspension",
     "ACTIVE": {
-      "cardTitle": "Suspend this tenant",
-      "description": "Pauses the reader-facing write features on the live site — the contact form, newsletter sign-ups and bookmarks — while its pages stay online. Reactivate it at any time.",
+      "description": "Pauses the reader actions on the live site, such as forms, sign-ups and saved items, while its pages stay online. Reactivate it at any time.",
       "triggerButton": "Suspend tenant",
       "dialogTitle": "Suspend {name}",
-      "dialogDescription": "The site stays online, but its contact form disappears and new newsletter sign-ups and bookmarks are refused from the next page load until you reactivate it.",
+      "dialogDescription": "The site stays online, but its reader actions are switched off from the next page load until you reactivate it.",
       "confirmButton": "Suspend",
       "confirmingButton": "Suspending…"
     },
     "SUSPENDED": {
-      "cardTitle": "This tenant is suspended",
-      "description": "The live site's contact form, newsletter sign-ups and bookmarks are switched off. Reactivating restores them from the next page load.",
+      "description": "The live site's reader actions are switched off. Reactivating restores them from the next page load.",
       "triggerButton": "Reactivate tenant",
       "dialogTitle": "Reactivate {name}",
-      "dialogDescription": "The site's contact form, newsletter sign-ups and bookmarks come back from the next page load.",
+      "dialogDescription": "The site's reader actions come back from the next page load.",
       "confirmButton": "Reactivate",
       "confirmingButton": "Reactivating…"
     },
     "blockOwner": {
       "switchLabel": "Also block this owner's email",
-      "description": "The owner can no longer sign up or create a site with this address. You can remove the block later from Blocked sign-ups.",
+      "description": "The owner can no longer sign up or create a site with this email address. You can remove the block later from Blocked sign-ups.",
       "reasonLabel": "Reason for blocking",
       "reasonHint": "Operators see this on the Blocked sign-ups page.",
       "switchOn": "On",

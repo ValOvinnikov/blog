@@ -1066,27 +1066,26 @@
     "confirmingButton": "Wird gestartet…"
   },
   "tenantSuspensionControl": {
+    "cardTitle": "Sperrung",
     "ACTIVE": {
-      "cardTitle": "Diesen Mandanten sperren",
-      "description": "Pausiert die schreibenden Funktionen der Live-Website — Kontaktformular, Newsletter-Anmeldungen und Lesezeichen —, während ihre Seiten online bleiben. Eine Reaktivierung ist jederzeit möglich.",
+      "description": "Pausiert die Aktionen der Leser auf der Live-Website, etwa Formulare, Anmeldungen und gemerkte Inhalte, während ihre Seiten online bleiben. Eine Reaktivierung ist jederzeit möglich.",
       "triggerButton": "Mandanten sperren",
       "dialogTitle": "{name} sperren",
-      "dialogDescription": "Die Website bleibt online, aber ab dem nächsten Seitenaufruf verschwindet ihr Kontaktformular und neue Newsletter-Anmeldungen und Lesezeichen werden abgelehnt, bis Sie sie reaktivieren.",
+      "dialogDescription": "Die Website bleibt online, aber die Aktionen ihrer Leser sind ab dem nächsten Seitenaufruf abgeschaltet, bis Sie sie reaktivieren.",
       "confirmButton": "Sperren",
       "confirmingButton": "Wird gesperrt…"
     },
     "SUSPENDED": {
-      "cardTitle": "Dieser Mandant ist gesperrt",
-      "description": "Kontaktformular, Newsletter-Anmeldungen und Lesezeichen der Live-Website sind abgeschaltet. Eine Reaktivierung stellt sie ab dem nächsten Seitenaufruf wieder her.",
+      "description": "Die Aktionen der Leser auf der Live-Website sind abgeschaltet. Eine Reaktivierung stellt sie ab dem nächsten Seitenaufruf wieder her.",
       "triggerButton": "Mandanten reaktivieren",
       "dialogTitle": "{name} reaktivieren",
-      "dialogDescription": "Kontaktformular, Newsletter-Anmeldungen und Lesezeichen der Website sind ab dem nächsten Seitenaufruf wieder da.",
+      "dialogDescription": "Die Aktionen der Leser auf der Website sind ab dem nächsten Seitenaufruf wieder da.",
       "confirmButton": "Reaktivieren",
       "confirmingButton": "Wird reaktiviert…"
     },
     "blockOwner": {
       "switchLabel": "E-Mail-Adresse des Inhabers ebenfalls sperren",
-      "description": "Der Inhaber kann sich mit dieser Adresse nicht mehr registrieren und keine Website erstellen. Die Sperre lässt sich später unter „Gesperrte Registrierungen“ aufheben.",
+      "description": "Der Inhaber kann sich mit dieser E-Mail-Adresse nicht mehr registrieren und keine Website erstellen. Die Sperre lässt sich später unter „Gesperrte Registrierungen“ aufheben.",
       "reasonLabel": "Grund der Sperre",
       "reasonHint": "Betreiber sehen ihn auf der Seite „Gesperrte Registrierungen“.",
       "switchOn": "An",
