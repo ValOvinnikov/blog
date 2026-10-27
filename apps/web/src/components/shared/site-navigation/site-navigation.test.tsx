@@ -1,7 +1,7 @@
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
-import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
+import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import {
   MOCK_ABOUT_LINK,
   MOCK_BLOG_LINK,
@@ -19,15 +19,17 @@ const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;
 
 const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_ABOUT_LINK];
 
-const getToggle = () => screen.getByRole('button', { name: TOGGLE_NAME });
+const setup = customRender(SiteNavigation, {
+  links,
+});
 
 describe(`<${SiteNavigation.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(usePathname).mockReturnValue(MOCK_HOME_LINK.href);
+    vi.mocked(usePathname).mockReset();
   });
 
   it('marks the Home item active only on the exact root path', () => {
-    renderElement(<SiteNavigation links={links} />);
+    setup();
 
     const homeLink = screen.getByRole('link', { name: MOCK_HOME_LINK.label });
     const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
@@ -40,7 +42,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
   it('does not mark Home active on a nested route', () => {
     vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-    renderElement(<SiteNavigation links={links} />);
+    setup();
 
     const homeLink = screen.getByRole('link', { name: MOCK_HOME_LINK.label });
 
@@ -49,7 +51,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
   it('marks a section item active via prefix match on nested routes', () => {
     vi.mocked(usePathname).mockReturnValue(BLOG_POST_PATH);
-    renderElement(<SiteNavigation links={links} />);
+    setup();
 
     const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
     const aboutLink = screen.getByRole('link', { name: MOCK_ABOUT_LINK.label });
@@ -62,7 +64,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
     vi.mocked(usePathname).mockReturnValue(
       `/${MOCK_TENANT_ID}/EN${BLOG_POST_PATH}`,
     );
-    renderElement(<SiteNavigation links={links} />);
+    setup();
 
     const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
 
@@ -71,7 +73,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
   it('marks Home active on the prerendered tenant-scoped home path', () => {
     vi.mocked(usePathname).mockReturnValue(`/${MOCK_TENANT_ID}/EN`);
-    renderElement(<SiteNavigation links={links} />);
+    setup();
 
     const homeLink = screen.getByRole('link', { name: MOCK_HOME_LINK.label });
 
@@ -80,7 +82,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
   it('does not match a path that merely shares the section prefix', () => {
     vi.mocked(usePathname).mockReturnValue('/blogging');
-    renderElement(<SiteNavigation links={links} />);
+    setup();
 
     const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
 
@@ -88,9 +90,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
   });
 
   it('renders the actions slot', () => {
-    renderElement(
-      <SiteNavigation links={links} actions={<button>Toggle</button>} />,
-    );
+    setup({ actions: <button>Toggle</button> });
 
     const actionButton = screen.getByRole('button', { name: 'Toggle' });
 
@@ -99,17 +99,13 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
   describe('mobile toggle', () => {
     let user: UserEvent;
-    let view: ReturnType<typeof renderElement>;
     let toggle: HTMLElement;
+    let view: ReturnType<typeof setup>;
 
     beforeEach(() => {
       user = userEvent.setup();
-      view = renderElement(<SiteNavigation links={links} />);
-      toggle = getToggle();
-    });
-
-    it('passes a real, non-generic accessible name for the toggle', () => {
-      expect(toggle).toHaveAccessibleName(TOGGLE_NAME);
+      view = setup();
+      toggle = screen.getByRole('button', { name: TOGGLE_NAME });
     });
 
     it('opens the panel on toggle click and reflects it via aria-expanded', async () => {
@@ -123,7 +119,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
     it('closes on Escape and returns focus to the toggle', async () => {
       await user.click(toggle);
 
-      fireEvent.keyDown(document, { key: 'Escape' });
+      await user.keyboard('{Escape}');
 
       expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
       expect(toggle).toHaveFocus();
@@ -144,7 +140,9 @@ describe(`<${SiteNavigation.name}/>`, () => {
       vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
       view.rerender(<SiteNavigation links={links} />);
 
-      const rerenderedToggle = getToggle();
+      const rerenderedToggle = screen.getByRole('button', {
+        name: TOGGLE_NAME,
+      });
 
       expect(rerenderedToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
     });

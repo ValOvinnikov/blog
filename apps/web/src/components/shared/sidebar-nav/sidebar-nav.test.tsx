@@ -58,11 +58,7 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('shows the active item in the mobile selector', () => {
-      const selector = screen.getByRole('button', {
-        name: MOCK_SIDEBAR_NAV_TRIGGER_NAME,
-      });
-
-      expect(selector).toBeVisible();
+      expect(trigger).toBeVisible();
     });
 
     it('renders every item as a link to its href in the desktop list, in order', () => {
@@ -75,15 +71,12 @@ describe(`<${SidebarNav.name}/>`, () => {
 
     it('marks only the item whose href matches activeKey with aria-current', () => {
       const activeLink = screen.getByRole('link', { name: PRICING_LABEL });
+      const currentLinks = screen
+        .getAllByRole('link')
+        .filter((link) => link.hasAttribute(ARIA_CURRENT));
 
       expect(activeLink).toHaveAttribute(ARIA_CURRENT, 'page');
-      MOCK_SIDEBAR_NAV_ITEMS.filter(
-        ({ label }) => label !== PRICING_LABEL,
-      ).forEach(({ label }) => {
-        const link = screen.getByRole('link', { name: label });
-
-        expect(link).not.toHaveAttribute(ARIA_CURRENT);
-      });
+      expect(currentLinks).toEqual([activeLink]);
     });
 
     it('starts with the mobile disclosure closed and its links hidden', () => {
@@ -118,20 +111,21 @@ describe(`<${SidebarNav.name}/>`, () => {
       const lastLinkInPanel = screen
         .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(-1)?.label })
         .at(-1);
-      const firstDesktopLink = screen
-        .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
-        .at(0);
-      lastLinkInPanel?.focus();
+      for (let tabs = 0; tabs < ITEM_COUNT - 1; tabs += 1) {
+        await user.tab();
+      }
+
+      expect(lastLinkInPanel).toHaveFocus();
 
       await user.tab();
 
       expect(lastLinkInPanel).not.toHaveFocus();
-      expect(firstDesktopLink).not.toHaveFocus();
+      expect(document.body).toHaveFocus();
     });
 
     it('closes the mobile disclosure on Escape', async () => {
       await user.click(trigger);
-      fireEvent.keyDown(document, { key: 'Escape' });
+      await user.keyboard('{Escape}');
 
       const links = screen.getAllByRole('link');
 
@@ -181,11 +175,11 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('marks no item current', () => {
-      const links = screen.getAllByRole('link');
+      const currentLinks = screen
+        .getAllByRole('link')
+        .filter((link) => link.hasAttribute(ARIA_CURRENT));
 
-      links.forEach((link) => {
-        expect(link).not.toHaveAttribute(ARIA_CURRENT);
-      });
+      expect(currentLinks).toHaveLength(0);
     });
   });
 });
