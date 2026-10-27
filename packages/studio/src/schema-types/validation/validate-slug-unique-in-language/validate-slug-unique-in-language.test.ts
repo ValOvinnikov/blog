@@ -1,111 +1,97 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
 import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { MOCK_FETCH_ERROR } from '@blog/studio/testing/mock-fetch-error';
 import { mockGroqValidationContext } from '@blog/studio/testing/mock-validation-context';
-import type { SlugValidationContext } from 'sanity';
+import { faker } from '@faker-js/faker';
+import {
+  getDraftId,
+  type SanityDocument,
+  type SlugValidationContext,
+} from 'sanity';
+
+faker.seed(6024);
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const OTHER_DRAFT_ID = 'drafts.other';
+const MOCK_ENGLISH_PAGE_ID = faker.string.uuid();
+const MOCK_DRAFT_ID = getDraftId(faker.string.uuid());
+const MOCK_UNLOCALIZED_PAGE_ID = faker.string.uuid();
+const MOCK_SLUG = faker.lorem.slug(2);
+
+const englishPage = mockLandingPage({
+  _id: MOCK_ENGLISH_PAGE_ID,
+  language: EN,
+  slug: MOCK_SLUG,
+});
+
+const englishDraft = mockLandingPage({
+  _id: MOCK_DRAFT_ID,
+  language: EN,
+  slug: MOCK_SLUG,
+});
+
+const validate = (
+  dataset: unknown[],
+  document: TMaybeUndefined<SanityDocument>,
+  fetchError?: Error,
+) =>
+  validateSlugUniqueInLanguage(
+    MOCK_SLUG,
+    mockGroqValidationContext<SlugValidationContext>(dataset, {
+      document,
+      fetchError,
+    }),
+  );
 
 describe(validateSlugUniqueInLanguage, () => {
-  const englishAbout = mockLandingPage({
-    _id: 'about-en',
-    language: EN,
-    slug: 'about',
-  });
-
   it('allows the same slug in another language', async () => {
-    const dutch = mockLandingPage({
-      _id: 'drafts.about-nl',
+    const dutchDraft = mockLandingPage({
+      _id: MOCK_DRAFT_ID,
       language: NL,
-      slug: 'about',
+      slug: MOCK_SLUG,
     });
 
-    await expect(
-      validateSlugUniqueInLanguage(
-        'about',
-        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
-          document: dutch,
-        }),
-      ),
-    ).resolves.toBe(true);
+    await expect(validate([englishPage], dutchDraft)).resolves.toBe(true);
   });
 
   it('rejects a slug another page uses in the same language', async () => {
-    const other = mockLandingPage({
-      _id: OTHER_DRAFT_ID,
-      language: EN,
-      slug: 'about',
-    });
-
-    await expect(
-      validateSlugUniqueInLanguage(
-        'about',
-        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
-          document: other,
-        }),
-      ),
-    ).resolves.toBe(false);
+    await expect(validate([englishPage], englishDraft)).resolves.toBe(false);
   });
 
   it('does not count the draft of the same page as a clash', async () => {
-    const draft = mockLandingPage({
-      _id: 'drafts.about-en',
+    const ownDraft = mockLandingPage({
+      _id: getDraftId(MOCK_ENGLISH_PAGE_ID),
       language: EN,
-      slug: 'about',
+      slug: MOCK_SLUG,
     });
 
-    await expect(
-      validateSlugUniqueInLanguage(
-        'about',
-        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
-          document: draft,
-        }),
-      ),
-    ).resolves.toBe(true);
+    await expect(validate([englishPage], ownDraft)).resolves.toBe(true);
   });
 
   it('treats pages without a language as one language', async () => {
-    const legacy = mockLandingPage({ _id: 'legacy', slug: 'contact' });
-    const other = mockLandingPage({ _id: OTHER_DRAFT_ID, slug: 'contact' });
+    const unlocalizedPage = mockLandingPage({
+      _id: MOCK_UNLOCALIZED_PAGE_ID,
+      slug: MOCK_SLUG,
+    });
+    const unlocalizedDraft = mockLandingPage({
+      _id: MOCK_DRAFT_ID,
+      slug: MOCK_SLUG,
+    });
 
-    await expect(
-      validateSlugUniqueInLanguage(
-        'contact',
-        mockGroqValidationContext<SlugValidationContext>([legacy], {
-          document: other,
-        }),
-      ),
-    ).resolves.toBe(false);
+    await expect(validate([unlocalizedPage], unlocalizedDraft)).resolves.toBe(
+      false,
+    );
   });
 
   it('passes when there is no document', async () => {
-    await expect(
-      validateSlugUniqueInLanguage(
-        'about',
-        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
-          document: undefined,
-        }),
-      ),
-    ).resolves.toBe(true);
+    await expect(validate([englishPage], undefined)).resolves.toBe(true);
   });
 
   it('passes when the fetch fails', async () => {
-    const other = mockLandingPage({
-      _id: 'other',
-      language: EN,
-      slug: 'about',
-    });
-
     await expect(
-      validateSlugUniqueInLanguage(
-        'about',
-        mockGroqValidationContext<SlugValidationContext>([englishAbout], {
-          document: other,
-          fetchError: new Error('network down'),
-        }),
-      ),
+      validate([englishPage], englishDraft, MOCK_FETCH_ERROR),
     ).resolves.toBe(true);
   });
 });
