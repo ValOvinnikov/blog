@@ -10,6 +10,8 @@ import { faker } from '@faker-js/faker';
 
 import { getContrastFinding } from './get-contrast-finding';
 
+faker.seed(6021001);
+
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
@@ -44,6 +46,8 @@ describe(getContrastFinding, () => {
   );
 
   it('returns undefined for a SHA with no run', async () => {
-    expect(await getContrastFinding(faker.git.commitSha())).toBeUndefined();
+    const finding = await getContrastFinding(faker.git.commitSha());
+
+    expect(finding).toBeUndefined();
   });
 });

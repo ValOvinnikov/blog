@@ -3,33 +3,38 @@ import {
   FINDING_SEVERITY,
   FINDING_SOURCE,
 } from '@blog/config/constants';
-import { openFinding } from '@blog/db/queries/findings/open-finding';
 import { recordContrastResult } from '@blog/db/queries/findings/record-contrast-result';
 import { resolveFinding } from '@blog/db/queries/findings/resolve-finding';
 import * as schema from '@blog/db/schema';
-import { mockContrastResult } from '@blog/db/testing/findings/fixtures';
+import {
+  mockContrastResult,
+  mockOpenFindingInput,
+  mockReleaseTag,
+  openTestFinding,
+} from '@blog/db/testing/findings/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { listOpenFindings } from './list-open-findings';
+
+faker.seed(6021006);
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
-const MOCK_PLATFORM_FINDING_IDENTIFIER = 'platform-wide';
-const MOCK_TENANT_NAME = 'Acme';
+const MOCK_TENANT_NAME = faker.company.name();
 
-async function openPlatformWideFinding(
-  details?: Record<string, unknown>,
-): Promise<void> {
-  await openFinding({
-    source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-    kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
-    severity: FINDING_SEVERITY.INFO,
-    identifier: MOCK_PLATFORM_FINDING_IDENTIFIER,
-    details,
-  });
+function openPlatformWideFinding(details?: Record<string, unknown>) {
+  return openTestFinding(
+    mockOpenFindingInput({
+      source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+      kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
+      severity: FINDING_SEVERITY.INFO,
+      details,
+    }),
+  );
 }
 
 afterEach(async () => {
@@ -41,76 +46,66 @@ describe(listOpenFindings, () => {
   it('returns open findings across every tenant, excluding resolved ones', async () => {
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
-    const resolved = await openFinding({
-      tenantId: tenantOneId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: 'resolved-one',
-    });
-    await openFinding({
-      tenantId: tenantTwoId,
-      source: FINDING_SOURCE.TENANT_PROVISIONING,
-      kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
-      severity: FINDING_SEVERITY.CRITICAL,
-      identifier: 'still-open',
-    });
-    await openPlatformWideFinding();
-    expect(resolved.ok).toBe(true);
-    if (!resolved.ok) return;
-    await resolveFinding(resolved.data.finding.id);
+    const resolved = await openTestFinding(
+      mockOpenFindingInput({ tenantId: tenantOneId }),
+    );
+    const tenantFinding = await openTestFinding(
+      mockOpenFindingInput({
+        tenantId: tenantTwoId,
+        source: FINDING_SOURCE.TENANT_PROVISIONING,
+        kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
+        severity: FINDING_SEVERITY.CRITICAL,
+      }),
+    );
+    const platformFinding = await openPlatformWideFinding();
+    await resolveFinding(resolved.id);
 
     const result = await listOpenFindings();
 
-    expect(result).toHaveLength(2);
-    expect(
-      result.some((finding) => finding.id === resolved.data.finding.id),
-    ).toBe(false);
+    expect(result.map(({ id }) => id).sort()).toEqual(
+      [tenantFinding.id, platformFinding.id].sort(),
+    );
   });
 
   it('joins each finding to its tenant name and leaves details out', async () => {
     const { id: tenantId } = await insertTestTenant(db(), {
       name: MOCK_TENANT_NAME,
     });
-    await openFinding({
-      tenantId,
-      source: FINDING_SOURCE.DOCUMENT_VALIDATION,
-      kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: 'tenant-scoped',
-      details: { invalidDocumentCount: 1 },
-    });
-    await openPlatformWideFinding();
+    const tenantScoped = await openTestFinding(
+      mockOpenFindingInput({
+        tenantId,
+        source: FINDING_SOURCE.DOCUMENT_VALIDATION,
+        kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
+        details: { invalidDocumentCount: 1 },
+      }),
+    );
+    const platformWide = await openPlatformWideFinding();
 
     const result = await listOpenFindings();
 
-    const tenantScoped = result.find(
-      (finding) => finding.tenantId === tenantId,
-    );
-    const platformWide = result.find((finding) => finding.tenantId === null);
-    expect(result).toHaveLength(2);
-    expect(tenantScoped?.tenantName).toBe(MOCK_TENANT_NAME);
-    expect(tenantScoped?.hasDetails).toBe(true);
-    expect(platformWide?.tenantName).toBeNull();
-    expect(platformWide?.hasDetails).toBe(false);
-    expect(result.every((finding) => !('details' in finding))).toBe(true);
+    const tenantRow = result.find(({ id }) => id === tenantScoped.id);
+    const platformRow = result.find(({ id }) => id === platformWide.id);
+    const columns = result.flatMap((finding) => Object.keys(finding));
+    expect(tenantRow?.tenantName).toBe(MOCK_TENANT_NAME);
+    expect(tenantRow?.hasDetails).toBe(true);
+    expect(platformRow?.tenantName).toBeNull();
+    expect(platformRow?.hasDetails).toBe(false);
+    expect(columns).not.toContain('details');
   });
 
   it('carries the contrast result on a contrast finding and on no other', async () => {
-    const failingRun = mockContrastResult({ tag: 'v1.2.0' });
-    await recordContrastResult(failingRun);
-    await openPlatformWideFinding({ reason: 'two owners' });
+    const failingRun = mockContrastResult({ tag: mockReleaseTag() });
+    const contrastFinding = await recordContrastResult(failingRun);
+    const ownerCheck = await openPlatformWideFinding({
+      reason: faker.lorem.sentence(),
+    });
 
     const result = await listOpenFindings();
 
-    const contrast = result.find(
-      (finding) => finding.source === FINDING_SOURCE.CONTRAST_CHECK,
-    );
-    const ownerCheck = result.find(
-      (finding) => finding.source === FINDING_SOURCE.RECHECK_TENANT_OWNERS,
-    );
-    expect(contrast?.contrastResult).toEqual(failingRun);
-    expect(ownerCheck?.contrastResult).toBeNull();
+    const contrastRow = result.find(({ id }) => id === contrastFinding.id);
+    const ownerCheckRow = result.find(({ id }) => id === ownerCheck.id);
+    expect(contrastRow?.contrastResult).toEqual(failingRun);
+    expect(ownerCheckRow?.contrastResult).toBeNull();
   });
 
   it('returns an empty array when nothing is open', async () => {
