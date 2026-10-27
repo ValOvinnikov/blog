@@ -11,6 +11,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
+import { faker } from '@faker-js/faker';
 
 import {
   decryptPersonalValue,
@@ -18,11 +19,15 @@ import {
   encryptPersonalValue,
   readOptionalPersonalValue,
   readPersonalValue,
+  readReportedPersonalValue,
   reportPlainPersonalRead,
   requireEmailIndex,
 } from './personal-data';
 
+faker.seed(5765);
+
 const MOCK_CIPHERTEXT = 'v1:ciphertext';
+const MOCK_PLAIN_EMAIL = faker.internet.email().toLowerCase();
 
 const fallbackListener = usePersonalDataFallbackListener();
 
@@ -67,6 +72,42 @@ describe('with both personal data keys configured', () => {
 
   it('reads no value when neither form holds one', () => {
     expect(readOptionalPersonalValue(null, null)).toBeNull();
+  });
+
+  it('reads an encrypted value over the plain one and reports nothing', () => {
+    const value = readReportedPersonalValue(
+      PERSONAL_DATA_OWNER.USER,
+      encryptPersonalValue(MOCK_USER_EMAIL),
+      MOCK_PLAIN_EMAIL,
+    );
+
+    expect(value).toBe(MOCK_USER_EMAIL);
+    expect(fallbackListener).not.toHaveBeenCalled();
+  });
+
+  it('reads the plain value of a row not yet encrypted and reports it', () => {
+    const value = readReportedPersonalValue(
+      PERSONAL_DATA_OWNER.USER,
+      null,
+      MOCK_PLAIN_EMAIL,
+    );
+
+    expect(value).toBe(MOCK_PLAIN_EMAIL);
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.USER,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
+  });
+
+  it('reads no value and reports nothing when neither form holds one', () => {
+    const value = readReportedPersonalValue(
+      PERSONAL_DATA_OWNER.USER,
+      null,
+      null,
+    );
+
+    expect(value).toBeNull();
+    expect(fallbackListener).not.toHaveBeenCalled();
   });
 
   it('reports a row not yet encrypted', () => {

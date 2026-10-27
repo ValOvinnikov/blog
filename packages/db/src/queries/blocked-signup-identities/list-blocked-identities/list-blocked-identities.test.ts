@@ -2,20 +2,46 @@ import {
   ADMIN_ROLE,
   BLOCKED_IDENTITY_KIND,
   GRANTED_VIA,
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
 } from '@blog/db/constants';
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_ADDRESS_DOMAIN,
+  MOCK_BLOCKED_DOMAIN,
+} from '@blog/db/testing/blocked-signup-identities/fixtures';
 import {
   MOCK_OPERATOR_EMAIL,
   insertTestAdmin,
   insertTestUser,
 } from '@blog/db/testing/fixtures';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
-import { listBlockedIdentities } from './list-blocked-identities';
+import {
+  listBlockedIdentities,
+  type TBlockedIdentityListing,
+} from './list-blocked-identities';
 
 vi.mock('@blog/db/client');
 
+faker.seed(5765);
+
+const MOCK_OLDER_REASON = 'Older';
+const MOCK_NEWER_REASON = 'Newer';
+const MOCK_OLDER_AT = faker.date.past();
+const MOCK_NEWER_AT = new Date(MOCK_OLDER_AT.getTime() + 1);
+const MOCK_ADMIN_NAME = faker.person.fullName();
+
 const db = useQueryTestDb();
+usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
 
 afterEach(async () => {
   await db().delete(schema.blockedSignupIdentities);
@@ -23,95 +49,109 @@ afterEach(async () => {
   await db().delete(schema.users);
 });
 
-const OLDER_REASON = 'Older';
-const NEWER_REASON = 'Newer';
-const ADMIN_NAME = 'Operator';
-const OLDER_DOMAIN = 'older.example';
-const NEWER_DOMAIN = 'newer.example';
+async function insertBlockedDomain(
+  overrides: Partial<typeof schema.blockedSignupIdentities.$inferInsert> = {},
+): Promise<void> {
+  await db()
+    .insert(schema.blockedSignupIdentities)
+    .values({
+      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
+      value: MOCK_BLOCKED_DOMAIN,
+      reason: MOCK_BLOCK_REASON,
+      ...overrides,
+    });
+}
+
+async function insertAdmin(
+  user: Partial<typeof schema.users.$inferInsert>,
+): Promise<string> {
+  const { id: userId } = await insertTestUser(db(), user);
+  const [admin] = await db()
+    .insert(schema.admins)
+    .values({
+      userId,
+      role: ADMIN_ROLE.ADMIN,
+      grantedVia: GRANTED_VIA.PROMOTION,
+    })
+    .returning();
+  if (!admin) throw new Error('failed to seed an admin row');
+  return admin.id;
+}
+
+async function listEntries(): Promise<TBlockedIdentityListing[]> {
+  const result = await listBlockedIdentities();
+  if (!result.ok) throw new Error('failed to list blocked identities');
+  return result.data;
+}
 
 describe(listBlockedIdentities, () => {
   it('returns an empty list when nothing is blocked', async () => {
     expect(await listBlockedIdentities()).toEqual({ ok: true, data: [] });
   });
 
-  describe('with entries added by an admin', () => {
-    let createdByAdminId: string;
-
-    beforeEach(async () => {
-      ({ id: createdByAdminId } = await insertTestAdmin(db()));
+  it('lists entries newest first', async () => {
+    const { id: createdByAdminId } = await insertTestAdmin(db());
+    await insertBlockedDomain({
+      value: MOCK_BLOCKED_ADDRESS_DOMAIN,
+      reason: MOCK_OLDER_REASON,
+      createdByAdminId,
+      createdAt: MOCK_OLDER_AT,
+    });
+    await insertBlockedDomain({
+      reason: MOCK_NEWER_REASON,
+      createdByAdminId,
+      createdAt: MOCK_NEWER_AT,
     });
 
-    it('lists entries newest first', async () => {
-      const now = Date.now();
-      await db()
-        .insert(schema.blockedSignupIdentities)
-        .values([
-          {
-            kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-            value: OLDER_DOMAIN,
-            reason: OLDER_REASON,
-            createdByAdminId,
-            createdAt: new Date(now - 1),
-          },
-          {
-            kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-            value: NEWER_DOMAIN,
-            reason: NEWER_REASON,
-            createdByAdminId,
-            createdAt: new Date(now),
-          },
-        ]);
+    const entries = await listEntries();
 
-      const result = await listBlockedIdentities();
-
-      expect(result.ok && result.data.map(({ reason }) => reason)).toEqual([
-        NEWER_REASON,
-        OLDER_REASON,
-      ]);
-    });
-
-    it('still lists an entry whose admin is gone, with no email', async () => {
-      await db().insert(schema.blockedSignupIdentities).values({
-        kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-        value: OLDER_DOMAIN,
-        reason: OLDER_REASON,
-        createdByAdminId,
-      });
-      await db().delete(schema.admins);
-
-      const result = await listBlockedIdentities();
-
-      expect(result.ok && result.data).toHaveLength(1);
-      expect(result.ok && result.data[0]?.addedByEmail).toBeNull();
-    });
+    expect(entries.map(({ reason }) => reason)).toEqual([
+      MOCK_NEWER_REASON,
+      MOCK_OLDER_REASON,
+    ]);
   });
 
-  it('lists the adding admin email and nothing else from the user', async () => {
-    const { id: userId } = await insertTestUser(db(), {
-      email: MOCK_OPERATOR_EMAIL,
-      name: ADMIN_NAME,
-    });
-    const [admin] = await db()
-      .insert(schema.admins)
-      .values({
-        userId,
-        role: ADMIN_ROLE.ADMIN,
-        grantedVia: GRANTED_VIA.PROMOTION,
-      })
-      .returning();
-    await db().insert(schema.blockedSignupIdentities).values({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      value: OLDER_DOMAIN,
-      reason: OLDER_REASON,
-      createdByAdminId: admin?.id,
+  describe('the adding admin email', () => {
+    it('lists the decrypted email and nothing else from the user', async () => {
+      const createdByAdminId = await insertAdmin({
+        name: MOCK_ADMIN_NAME,
+        ...userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
+      });
+      await insertBlockedDomain({ createdByAdminId });
+
+      const [entry] = await listEntries();
+
+      expect(entry?.addedByEmail).toBe(MOCK_OPERATOR_EMAIL);
+      expect(JSON.stringify(entry)).not.toContain(MOCK_ADMIN_NAME);
+      expect(fallbackListener).not.toHaveBeenCalled();
     });
 
-    const result = await listBlockedIdentities();
+    it('lists the plain email of an admin not yet backfilled, and reports it', async () => {
+      const createdByAdminId = await insertAdmin({
+        email: MOCK_OPERATOR_EMAIL,
+      });
+      await insertBlockedDomain({ createdByAdminId });
 
-    expect(result.ok && result.data[0]).toMatchObject({
-      reason: OLDER_REASON,
-      addedByEmail: MOCK_OPERATOR_EMAIL,
+      const [entry] = await listEntries();
+
+      expect(entry?.addedByEmail).toBe(MOCK_OPERATOR_EMAIL);
+      expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+        owner: PERSONAL_DATA_OWNER.USER,
+        reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+      });
     });
-    expect(JSON.stringify(result)).not.toContain(ADMIN_NAME);
+
+    it('is null and reports nothing once the admin is gone', async () => {
+      const createdByAdminId = await insertAdmin(
+        userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
+      );
+      await insertBlockedDomain({ createdByAdminId });
+      await db().delete(schema.admins);
+
+      const entries = await listEntries();
+
+      expect(entries.map(({ addedByEmail }) => addedByEmail)).toEqual([null]);
+      expect(fallbackListener).not.toHaveBeenCalled();
+    });
   });
 });
