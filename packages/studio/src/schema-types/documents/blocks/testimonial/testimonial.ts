@@ -1,4 +1,4 @@
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -51,13 +51,9 @@ export const blockTestimonialSchema = defineType({
       description:
         'An image for this testimonial — not necessarily a portrait of the person. Without one, the site shows their initials.',
     }),
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'reference',
+    linkReferenceField({
       description:
         'Optional. Makes the name a link — their site, or the case study.',
-      to: [{ type: linkSchema.name }],
     }),
   ],
   preview: {

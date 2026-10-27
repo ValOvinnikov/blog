@@ -1,13 +1,12 @@
+import type { BrandTagline, TNullable } from '@blog/config';
 import { at, defineMigration, set } from 'sanity/migrate';
 
-type TBrandTagline = { items?: unknown[] };
-
-type TNavigationSettingsDoc = { tagline?: TBrandTagline };
+type TNavigationSettingsDoc = { tagline?: unknown };
 
 const SITE_TAGLINE_QUERY = `*[_type == "settings_site" && !(_id in path("drafts.**"))][0].brand.tagline`;
 
-const isFilledTagline = (tagline: unknown): tagline is TBrandTagline => {
-  const items = (tagline as TBrandTagline | null | undefined)?.items;
+const isFilledTagline = (tagline: unknown): tagline is BrandTagline => {
+  const items = (tagline as TNullable<BrandTagline>)?.items;
 
   return Array.isArray(items) && items.length > 0;
 };

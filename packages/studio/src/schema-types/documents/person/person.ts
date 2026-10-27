@@ -1,4 +1,4 @@
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { localizedParagraphTextField } from '@blog/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
@@ -60,12 +60,10 @@ export const personSchema = defineType({
         "Links to social profiles shown as icons on this person's profile hero and their team card.",
       of: [defineArrayMember({ type: socialProfileSchema.name })],
     }),
-    defineField({
+    linkReferenceField({
       name: 'profilePage',
       title: 'Profile Page',
-      type: 'reference',
       description: "Optional page this person's byline links to.",
-      to: [{ type: linkSchema.name }],
     }),
   ],
   preview: {

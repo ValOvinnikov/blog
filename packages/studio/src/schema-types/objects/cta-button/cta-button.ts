@@ -4,7 +4,7 @@ import {
   CTA_ACTION_VARIANT,
   type TCtaActionVariant,
 } from '@blog/config/constants';
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { toTitleCase } from '@blog/utils/primitives';
 import { MousePointerClick } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -65,13 +65,9 @@ const buildCtaButtonSchema = ({
         },
         initialValue: CTA_ACTION_APPEARANCE.CONTAINED,
       }),
-      defineField({
-        name: 'link',
-        title: 'Link',
-        type: 'reference',
+      linkReferenceField({
         description: 'Where this action goes.',
-        to: [{ type: linkSchema.name }],
-        validation: linkRequired ? (rule) => rule.required() : undefined,
+        isRequired: linkRequired,
       }),
     ],
     preview: {

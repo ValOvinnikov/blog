@@ -3,7 +3,7 @@ import {
   SOCIAL_PLATFORM_LABEL,
   type TSocialPlatform,
 } from '@blog/config/constants';
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { Share2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -15,13 +15,9 @@ export const socialProfileSchema = defineType({
     'One social platform icon, linked to that profile via a reusable link.',
   icon: Share2,
   fields: [
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'reference',
+    linkReferenceField({
       description: 'The link document this social profile points at.',
-      to: [{ type: linkSchema.name }],
-      validation: (rule) => rule.required(),
+      isRequired: true,
     }),
     defineField({
       name: 'platform',

@@ -1,4 +1,4 @@
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -34,13 +34,9 @@ export const logoItemSchema = defineType({
       description:
         'Optional. Shown instead of the logo in dark mode — add one when the logo would disappear on a dark tile, e.g. a black or dark wordmark.',
     }),
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'reference',
+    linkReferenceField({
       description:
         'Optional. Makes the tile a link — their site, or the case study.',
-      to: [{ type: linkSchema.name }],
     }),
   ],
   preview: {

@@ -1,4 +1,8 @@
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
+import {
+  linkReferencePreviewSelect,
+  toLinkReferencePreviewTitle,
+} from '@blog/studio/schema-types/fields/link-reference-field/link-reference-preview';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { toToolbarIcon } from '@blog/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import { ListTree } from 'lucide-react';
@@ -11,13 +15,9 @@ export const linkRefWithSubItemsSchema = defineType({
   description: 'A link that opens a list of further links.',
   icon: toToolbarIcon(ListTree),
   fields: [
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'reference',
+    linkReferenceField({
       description: 'The link document this points at.',
-      to: [{ type: linkSchema.name }],
-      validation: (rule) => rule.required(),
+      isRequired: true,
     }),
     defineField({
       name: 'subItems',
@@ -29,16 +29,12 @@ export const linkRefWithSubItemsSchema = defineType({
     }),
   ],
   preview: {
-    select: {
-      title: 'link.title',
-      label: 'link.label.0.value',
-      subItems: 'subItems',
-    },
-    prepare({ title, label, subItems }) {
+    select: { ...linkReferencePreviewSelect, subItems: 'subItems' },
+    prepare({ subItems, ...value }) {
       const count = Array.isArray(subItems) ? subItems.length : 0;
 
       return {
-        title: String(title ?? label ?? 'No link selected'),
+        title: toLinkReferencePreviewTitle(value),
         subtitle: `${String(count)} sub-item${count === 1 ? '' : 's'}`,
       };
     },
