@@ -161,6 +161,8 @@ export function mockIndexPageDocument({
   };
 }
 
+export const HEADING_TEXT_PATH = 'headingBlock.heading';
+
 export function mockSlugPageDocument({
   _id = faker.string.uuid(),
   _type,

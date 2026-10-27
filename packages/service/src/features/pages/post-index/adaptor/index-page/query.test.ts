@@ -1,12 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
+  HEADING_TEXT_PATH,
   MOCK_TEMPLATE_REFERENCE,
   mockIndexPageDocument,
   mockRawBlogPage,
   mockRawHeroRef,
   mockRawPostLatestRef,
-  mockTemplateLayoutDocuments,
   mockTemplatedPageDocument,
+  mockTemplateLayoutDocuments,
 } from '@blog/service/testing/pages/fixtures';
 import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
@@ -14,8 +15,6 @@ import { faker } from '@faker-js/faker';
 import { blogPageQuery } from './query';
 
 faker.seed(6023);
-
-const HEADING_TEXT_PATH = 'headingBlock.heading';
 
 describe('blogPageQuery', () => {
   it.each([

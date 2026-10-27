@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
+  HEADING_TEXT_PATH,
   MOCK_TAG_INDEX_HEADING,
   MOCK_TEMPLATE_REFERENCE,
   mockIndexPageDocument,
@@ -8,8 +9,8 @@ import {
   mockRawPostLatestRef,
   mockRawTagIndexPage,
   mockRawTaxonomyListRef,
-  mockTemplateLayoutDocuments,
   mockTemplatedPageDocument,
+  mockTemplateLayoutDocuments,
 } from '@blog/service/testing/pages/fixtures';
 import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
@@ -22,8 +23,6 @@ faker.seed(601508);
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 const MOCK_EN_HEADING = faker.lorem.words(2);
 const MOCK_NL_HEADING = faker.lorem.words(2);
-
-const HEADING_TEXT_PATH = 'headingBlock.heading';
 
 describe('tagIndexPageQuery', () => {
   it.each([

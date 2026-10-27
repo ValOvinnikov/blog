@@ -4,6 +4,7 @@ import {
   MOCK_CTA_MODULE_ID,
 } from '@blog/service/testing/modules/fixtures';
 import {
+  HEADING_TEXT_PATH,
   MOCK_ABOUT_PAGE_TITLE,
   MOCK_HERO_MODULE_ID,
   mockRawContentRef,
@@ -50,8 +51,6 @@ function runAtPath(dataset: unknown[], segments: string[]): Promise<unknown> {
     defaultLocale: EN,
   });
 }
-
-const HEADING_TEXT_PATH = 'headingBlock.heading';
 
 describe('landingPageQuery', () => {
   it.each([

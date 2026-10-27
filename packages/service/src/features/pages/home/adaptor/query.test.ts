@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
+  HEADING_TEXT_PATH,
   MOCK_HERO_MODULE_ID,
   MOCK_POST_LATEST_MODULE_ID,
   mockRawHomePage,
@@ -26,8 +27,6 @@ function run(dataset: unknown[], locale: string): Promise<unknown> {
     defaultLocale: EN,
   });
 }
-
-const HEADING_TEXT_PATH = 'headingBlock.heading';
 
 describe('homePageQuery', () => {
   it.each([
