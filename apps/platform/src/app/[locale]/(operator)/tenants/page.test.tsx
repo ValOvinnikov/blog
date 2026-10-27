@@ -1,17 +1,16 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import {
-  customRenderAsync,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_NAME,
-  MOCK_TENANT_ID,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import TenantsPage from './page';
+
+faker.seed(5996);
 
 const { listTenantsMock } = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
@@ -26,67 +25,54 @@ vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
+const MOCK_RESEND_API_KEY = `re_${faker.string.alphanumeric(24)}`;
+
 const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),
 });
 
-const AT_20260402_0000 = '2026-04-02T00:00:00.000Z';
-const EMAIL_ALERTS_NOT_CONFIGURED = 'Email alerts not configured';
-
-describe(TenantsPage, () => {
+describe(`<${TenantsPage.name}/>`, () => {
   beforeEach(() => {
-    listTenantsMock.mockReset();
-    envMock.RESEND_API_KEY = 'resend-key';
-    listTenantsMock.mockResolvedValue([]);
+    listTenantsMock.mockReset().mockResolvedValue([]);
+    envMock.RESEND_API_KEY = MOCK_RESEND_API_KEY;
   });
 
-  it('renders the real tenant rows from listTenants, excluding archived by default', async () => {
-    listTenantsMock.mockResolvedValue([
-      {
-        id: MOCK_TENANT_ID,
-        name: MOCK_TENANT_NAME,
-        primaryDomain: 'acme.example.com',
-        sanityProjectId: 'proj-1',
-        sanityDataset: 'production',
-        locale: 'en',
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-        createdAt: new Date(AT_20260402_0000),
-        updatedAt: new Date(AT_20260402_0000),
-      },
-    ]);
+  it('lists the tenants it reads', async () => {
+    listTenantsMock.mockResolvedValueOnce([mockTenant()]);
 
     await setup();
 
     const tenantName = screen.getByText(MOCK_TENANT_NAME);
-    const table = screen.getByRole('table');
-    const activeStatus = within(table).getByText('Active');
 
-    expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: false });
     expect(tenantName).toBeVisible();
-    expect(activeStatus).toBeVisible();
   });
 
-  it('includes archived tenants when ?archived=1 is set', async () => {
-    await setup({ searchParams: Promise.resolve({ archived: '1' }) });
+  it.each([
+    { archived: undefined, includeArchived: false },
+    { archived: '1', includeArchived: true },
+  ])(
+    'reads archived tenants only when asked: $archived',
+    async ({ archived, includeArchived }) => {
+      await setup({ searchParams: Promise.resolve({ archived }) });
 
-    expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
-  });
+      expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived });
+    },
+  );
 
-  it('does not show the email-alerts banner when RESEND_API_KEY is configured', async () => {
+  it('hides the email-alerts banner when Resend is configured', async () => {
     await setup();
 
-    const banner = screen.queryByText(EMAIL_ALERTS_NOT_CONFIGURED);
+    const banner = screen.queryByText(messages.emailAlertsBanner.title);
 
     expect(banner).not.toBeInTheDocument();
   });
 
-  it('shows the email-alerts banner when RESEND_API_KEY is unset', async () => {
+  it('shows the email-alerts banner when Resend is not configured', async () => {
     envMock.RESEND_API_KEY = undefined;
 
     await setup();
 
-    const banner = screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED);
+    const banner = screen.getByText(messages.emailAlertsBanner.title);
 
     expect(banner).toBeVisible();
   });

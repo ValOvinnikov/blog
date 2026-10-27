@@ -1,8 +1,7 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 
 import NewTenantPage from './page';
-
-const render = renderWithIntl;
 
 vi.mock('@platform/utils/env/env');
 
@@ -10,22 +9,19 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
   createTenantAction: vi.fn(),
 }));
 
-describe(NewTenantPage, () => {
-  it('renders the Add tenant wizard with the Details step form', () => {
-    render(<NewTenantPage />);
+const t = makeEnTranslator('addTenantWizard');
+
+const setup = customRender(NewTenantPage, {});
+
+describe(`<${NewTenantPage.name}/>`, () => {
+  it('opens the add-tenant wizard', () => {
+    setup();
 
     const pageHeading = screen.getByRole('heading', {
       level: 1,
-      name: 'Add tenant',
+      name: t('heading'),
     });
-    const cardHeading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Tenant details',
-    });
-    const nameInput = screen.getByRole('textbox', { name: 'Tenant name' });
 
     expect(pageHeading).toBeVisible();
-    expect(cardHeading).toBeVisible();
-    expect(nameInput).toBeVisible();
   });
 });

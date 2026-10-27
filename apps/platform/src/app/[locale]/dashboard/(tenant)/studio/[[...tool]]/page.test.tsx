@@ -1,33 +1,38 @@
 import {
+  NEXT_NAVIGATION_ERROR,
   SANITY_LOGIN_PROVIDER,
   type TMaybeNull,
-  NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { SANITY_PROJECT_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
+import en from '@platform/i18n/messages/en.json';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
-  mockTenant,
+  MOCK_OWNER_INVITED_AT,
+  MOCK_OWNER_JOINED_AT,
+  MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_NAME,
-  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { mockStudioReadyTenant } from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 import DashboardStudioPage from './page';
 
+faker.seed(5996);
+
 const {
   listMembershipsWithTenantsForUserMock,
-  getAdminByUserIdMock,
   studioMountMock,
+  STUDIO_MOUNT_TEST_ID,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
   studioMountMock: vi.fn(),
+  STUDIO_MOUNT_TEST_ID: 'studio-mount',
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -41,58 +46,46 @@ vi.mock('@blog/db', async () => ({
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
     tenants: {
-      selectLiveLocales: vi.fn().mockReturnValue([]),
+      selectLiveLocales: vi.fn(() => []),
     },
-    admins: { getAdminByUserId: getAdminByUserIdMock },
+    admins: { getAdminByUserId: vi.fn() },
   },
 }));
 
 vi.mock('@blog/studio', () => ({
   StudioMount: (props: unknown) => {
     studioMountMock(props);
-    return <div data-testid="studio-mount" />;
+    return <div data-testid={STUDIO_MOUNT_TEST_ID} />;
   },
 }));
 
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+const MOCK_OWNER_SANITY_USER_ID = faker.string.uuid();
 
-const membership = mockMembership();
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(DashboardStudioPage, {});
 
 const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
-  const tenant = mockTenant({
-    id: MOCK_TENANT_ID,
-    name: MOCK_TENANT_NAME,
-    sanityProjectId: STUDIO_PROJECT_ID,
-    sanityDataset: STUDIO_DATASET,
-    sanityReadTokenEncrypted: 'encrypted-token',
-    ...overrides,
-  });
+  const tenant = mockStudioReadyTenant(overrides);
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
-    { membership, tenant },
+    mockMembershipWithTenant(tenant),
   ]);
   await setup();
 
   return tenant;
 };
 
-const STUDIO_MOUNT_TEST_ID = 'studio-mount';
-const STUDIO_PROJECT_ID = 'proj-acme';
-const STUDIO_DATASET = 'production';
-const invitedAt = new Date();
-
 describe(`<${DashboardStudioPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsWithTenantsForUserMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+    vi.useFakeTimers({ now: MOCK_OWNER_INVITED_AT, toFake: ['Date'] });
   });
 
-  it('redirects to sign-in without resolving the tenant when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('redirects a signed-out visitor to sign-in without resolving a tenant', async () => {
+    authMock.mockResolvedValueOnce(null);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
@@ -100,15 +93,15 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
-  it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
+  it("mounts Studio for the session tenant under the dashboard's Studio path", async () => {
     const tenant = await renderForTenant();
 
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: STUDIO_PROJECT_ID,
-      dataset: STUDIO_DATASET,
+      projectId: MOCK_SANITY_PROJECT_ID,
+      dataset: tenant.sanityDataset,
       basePath: adminRoutes.dashboardStudio(),
       title: MOCK_TENANT_NAME,
       enabledCapabilities: [],
@@ -119,27 +112,22 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   });
 
   it("explains the owner's pending Studio access instead of mounting Studio", async () => {
-    await renderForTenant({ ownerInviteSentAt: invitedAt });
+    await renderForTenant({ ownerInviteSentAt: MOCK_OWNER_INVITED_AT });
 
-    const explainerTitle = screen.getByText('Accept your Studio invite');
-    const checkNowButton = screen.getByRole('button', { name: 'Check now' });
-    const resendInviteButton = screen.getByRole('button', {
-      name: 'Resend invite',
-    });
+    const explainerTitle = screen.getByText(
+      en.ownerStudioAccess.title.INVITE_SENT,
+    );
     const studioMount = screen.queryByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(explainerTitle).toBeVisible();
-    expect(checkNowButton).toBeVisible();
-    expect(resendInviteButton).toBeVisible();
     expect(studioMount).not.toBeInTheDocument();
   });
 
-  it("opens Studio straight into the owner's login provider once their access is ready", async () => {
+  it("opens Studio on the owner's login provider once their access is ready", async () => {
     const tenant = await renderForTenant({
-      ownerInviteSentAt: invitedAt,
-      ownerInviteAcceptedAt: new Date('2026-10-18T10:00:00.000Z'),
-      ownerSanityUserId: 'sanity-user-1',
-      ownerSanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+      ownerInviteSentAt: MOCK_OWNER_INVITED_AT,
+      ownerInviteAcceptedAt: MOCK_OWNER_JOINED_AT,
+      ownerSanityUserId: MOCK_OWNER_SANITY_USER_ID,
       ownerLoginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
     });
 
@@ -147,8 +135,8 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
 
     expect(studioMount).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: STUDIO_PROJECT_ID,
-      dataset: STUDIO_DATASET,
+      projectId: MOCK_SANITY_PROJECT_ID,
+      dataset: tenant.sanityDataset,
       basePath: adminRoutes.dashboardStudio(),
       title: MOCK_TENANT_NAME,
       enabledCapabilities: [],

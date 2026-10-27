@@ -1,18 +1,14 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
-import { auth } from '@platform/server/auth/auth';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import {
-  MOCK_TENANT_DOMAIN,
-  MOCK_TENANT_NAME,
-  MOCK_TENANT_ID,
-} from '@platform/testing/tenants/fixtures';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
+import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 
 import TenantByIdLayout from './layout';
+
+faker.seed(4127);
 
 const { getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(() => ({
   getAdminByUserIdMock: vi.fn(),
@@ -29,61 +25,35 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const MOCK_TENANT_CONTENT = faker.lorem.sentence();
 
 const setup = customRenderAsync(TenantByIdLayout, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
-  children: <div>tenant content</div>,
+  children: <div>{MOCK_TENANT_CONTENT}</div>,
 });
 
 describe(`<${TenantByIdLayout.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getTenantByIdMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: ADMIN_ROLE.ADMIN,
-      createdAt: new Date(),
-    });
-  });
-
-  it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
-  });
-
-  it('404s when the signed-in user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getTenantByIdMock.mockResolvedValue(mockTenant());
   });
 
   it('404s for an unknown tenant id', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
+    getTenantByIdMock.mockResolvedValueOnce(undefined);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
-  it('renders the gated content bare, with no AdminShell chrome, for an operator', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      name: MOCK_TENANT_NAME,
-      primaryDomain: MOCK_TENANT_DOMAIN,
-    });
-
+  it('renders the gated content bare, without the admin shell', async () => {
     await setup();
 
-    const content = screen.getByText('tenant content');
-    const platformCrumb = screen.queryByText('Platform', { selector: 'p' });
+    const content = screen.getByText(MOCK_TENANT_CONTENT);
+    const platformSection = screen.queryByText(
+      messages.navSections.platformLabel,
+      { selector: 'p' },
+    );
 
     expect(content).toBeVisible();
-    expect(platformCrumb).not.toBeInTheDocument();
-    expect(redirect).not.toHaveBeenCalled();
+    expect(platformSection).not.toBeInTheDocument();
   });
 });

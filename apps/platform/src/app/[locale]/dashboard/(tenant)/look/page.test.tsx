@@ -1,28 +1,26 @@
 import {
-  type TMaybeNull,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
+  type TMaybeNull,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import en from '@platform/i18n/messages/en.json';
 import { auth } from '@platform/server/auth/auth';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 import DashboardLookPage from './page';
 
-const {
-  listMembershipsWithTenantsForUserMock,
-  getAdminByUserIdMock,
-  getSiteConfigMock,
-} = vi.hoisted(() => ({
-  listMembershipsWithTenantsForUserMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
-}));
+const { listMembershipsWithTenantsForUserMock, getSiteConfigMock } = vi.hoisted(
+  () => ({
+    listMembershipsWithTenantsForUserMock: vi.fn(),
+    getSiteConfigMock: vi.fn(),
+  }),
+);
 
 vi.mock('@platform/server/auth/auth');
 
@@ -35,53 +33,39 @@ vi.mock('@blog/db', async () => ({
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
     tenants: {
-      selectLiveLocales: vi.fn().mockReturnValue([LOCALE_ISO_CODES.EN]),
+      selectLiveLocales: vi.fn(() => [LOCALE_ISO_CODES.EN]),
     },
-    admins: { getAdminByUserId: getAdminByUserIdMock },
+    admins: { getAdminByUserId: vi.fn() },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const membership = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: MOCK_TENANT_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-};
-
 const setup = customRenderAsync(DashboardLookPage, {});
 
 describe(`<${DashboardLookPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    listMembershipsWithTenantsForUserMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getSiteConfigMock.mockReset();
-
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: { id: MOCK_TENANT_ID } },
+      mockMembershipWithTenant(),
     ]);
   });
 
-  it('redirects to sign-in without a session', async () => {
-    authMock.mockResolvedValue(null);
+  it('redirects a signed-out visitor to sign-in', async () => {
+    authMock.mockResolvedValueOnce(null);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it("renders the resolved tenant's Look form", async () => {
-    getSiteConfigMock.mockResolvedValue(undefined);
-
+  it("renders the session tenant's Look settings", async () => {
     await setup();
 
+    const heading = screen.getByRole('heading', { name: en.lookForm.heading });
+
+    expect(heading).toBeVisible();
     expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(screen.getByRole('heading', { name: 'Look' })).toBeVisible();
   });
 });

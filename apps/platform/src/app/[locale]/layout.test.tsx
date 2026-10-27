@@ -3,89 +3,74 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import realMessages from '@platform/i18n/messages/en.json';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { notFound } from 'next/navigation';
+import { setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import LocaleLayout, { generateStaticParams } from './layout';
 
+faker.seed(5996);
+
 type TAnyElement = ReactElement<Record<string, unknown>>;
+
+const MOCK_CONTENT = faker.lorem.sentence();
+const MOCK_UNSUPPORTED_LOCALE = 'PT';
 
 const firstChildOf = (node: TAnyElement): TAnyElement =>
   [
-    // eslint-disable-next-line testing-library/no-node-access -- reads React element props, not a DOM node
+    // eslint-disable-next-line testing-library/no-node-access -- a root layout returns <html>, which jsdom cannot mount, so its element props are read
     (node.props as { children: TAnyElement | TAnyElement[] }).children,
   ].flat()[0] as TAnyElement;
 
-const { getMessagesMock, setRequestLocaleMock } = vi.hoisted(() => ({
-  getMessagesMock: vi.fn(),
-  setRequestLocaleMock: vi.fn(),
-}));
-
-vi.mock('next-intl/server', () => ({
-  getMessages: getMessagesMock,
-  getTranslations: vi.fn(),
-  setRequestLocale: setRequestLocaleMock,
-}));
-
-const setup = customRenderAsync(LocaleLayout, {
-  children: <div>content</div>,
+const defaultProps = {
+  children: <p>{MOCK_CONTENT}</p>,
   params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
+};
+
+const setup = customRenderAsync(LocaleLayout, defaultProps);
+
+describe(generateStaticParams, () => {
+  it('returns params for every supported locale', () => {
+    expect(generateStaticParams()).toEqual(
+      Object.values(LOCALE_ISO_CODES).map((locale) => ({ locale })),
+    );
+  });
 });
 
-describe('LocaleLayout', () => {
-  beforeEach(() => {
-    getMessagesMock.mockResolvedValue(realMessages);
-  });
-
-  describe('generateStaticParams', () => {
-    it('returns params for every supported locale', () => {
-      expect(generateStaticParams()).toEqual(
-        Object.values(LOCALE_ISO_CODES).map((locale) => ({ locale })),
-      );
-    });
-  });
-
+describe(`<${LocaleLayout.name}/>`, () => {
   it('404s on an unsupported locale without ever pinning it', async () => {
     await expect(
-      LocaleLayout({
-        children: <div>content</div>,
-        params: Promise.resolve({ locale: 'PT' }),
-      }),
+      setup({ params: Promise.resolve({ locale: MOCK_UNSUPPORTED_LOCALE }) }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(notFound).toHaveBeenCalledTimes(1);
-    expect(setRequestLocaleMock).not.toHaveBeenCalled();
+    expect(setRequestLocale).not.toHaveBeenCalled();
   });
 
-  it('passes real messages and the resolved locale to NextIntlClientProvider', async () => {
-    const provider = firstChildOf(
-      firstChildOf(
-        await LocaleLayout({
-          children: <div>content</div>,
-          params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
-        }),
-      ),
-    );
+  it('provides the messages for the requested locale', async () => {
+    const htmlElement = await LocaleLayout(defaultProps);
+    const provider = firstChildOf(firstChildOf(htmlElement as TAnyElement));
 
-    expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
+    expect(setRequestLocale).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
     expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
-    expect(provider.props.messages).toBe(realMessages);
+    expect(provider.props.messages).toEqual(messages);
   });
 
   it('declares the admin language on the document', async () => {
-    const document = await LocaleLayout({
-      children: <div>content</div>,
+    const htmlElement = await LocaleLayout({
+      ...defaultProps,
       params: Promise.resolve({ locale: LOCALE_ISO_CODES.NL }),
     });
 
-    expect(document.props.lang).toBe(LOCALE_BCP47_TAGS.NL);
+    expect((htmlElement as TAnyElement).props.lang).toBe(LOCALE_BCP47_TAGS.NL);
   });
 
-  it('renders children', async () => {
+  it('renders its children', async () => {
     await setup();
 
-    expect(screen.getByText('content')).toBeVisible();
+    const content = screen.getByText(MOCK_CONTENT);
+
+    expect(content).toBeVisible();
   });
 });

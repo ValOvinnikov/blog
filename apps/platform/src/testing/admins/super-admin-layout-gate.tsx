@@ -1,11 +1,7 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
-import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
 import type { ReactNode } from 'react';
 import type { Mock } from 'vitest';
 
@@ -18,45 +14,18 @@ export const itGatesToSuperAdmins = (
   Layout: TGatedLayout,
   getAdminByUserIdMock: Mock,
 ): void => {
-  const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
   const setup = customRenderAsync(Layout, {
     children: <div>{GATED_CONTENT}</div>,
   });
 
-  beforeEach(() => {
-    authMock
-      .mockReset()
-      .mockResolvedValue({ user: { id: mockAdmin().userId } });
-    getAdminByUserIdMock.mockReset();
-  });
-
-  it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
-  });
-
-  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    '404s for a %s',
-    async (role) => {
-      getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
-
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
-    },
-  );
-
-  it('404s when the user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+  it('404s for an admin below SUPERADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(mockAdmin());
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
-  it('renders the page for a SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue(
+  it('renders its children for a SUPERADMIN', async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(
       mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
     );
 

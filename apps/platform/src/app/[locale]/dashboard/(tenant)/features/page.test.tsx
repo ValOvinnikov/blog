@@ -1,10 +1,12 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import en from '@platform/i18n/messages/en.json';
 import { auth } from '@platform/server/auth/auth';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockUnsavedSettingsFeaturesAndPreset } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -12,11 +14,9 @@ import DashboardFeaturesPage from './page';
 
 const {
   listMembershipsWithTenantsForUserMock,
-  getAdminByUserIdMock,
   getSettingsFeaturesAndPresetMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
   getSettingsFeaturesAndPresetMock: vi.fn(),
 }));
 
@@ -28,58 +28,46 @@ vi.mock('@blog/db', async () => ({
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
-    admins: { getAdminByUserId: getAdminByUserIdMock },
+    admins: { getAdminByUserId: vi.fn() },
     settingsFeatures: {
       getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
     },
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-
-const membership = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: MOCK_TENANT_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-};
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(DashboardFeaturesPage, {});
 
 describe(`<${DashboardFeaturesPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    listMembershipsWithTenantsForUserMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getSettingsFeaturesAndPresetMock.mockReset();
-
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant: { id: MOCK_TENANT_ID, plan: TENANT_PLAN.FREE } },
+      mockMembershipWithTenant(),
     ]);
+    getSettingsFeaturesAndPresetMock.mockResolvedValue(
+      mockUnsavedSettingsFeaturesAndPreset(),
+    );
   });
 
-  it('redirects to sign-in without a session', async () => {
-    authMock.mockResolvedValue(null);
+  it('redirects a signed-out visitor to sign-in', async () => {
+    authMock.mockResolvedValueOnce(null);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
     expect(getSettingsFeaturesAndPresetMock).not.toHaveBeenCalled();
   });
 
-  it("renders the resolved tenant's Features form", async () => {
-    getSettingsFeaturesAndPresetMock.mockResolvedValue({
-      features: undefined,
-      preset: undefined,
-    });
-
+  it("renders the session tenant's Features settings", async () => {
     await setup();
 
+    const heading = screen.getByRole('heading', {
+      name: en.featuresSettings.heading,
+    });
+
+    expect(heading).toBeVisible();
     expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
     );
-    expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
   });
 });

@@ -1,9 +1,23 @@
-import { HTTP_STATUS } from '@blog/config';
-import { MEMBERSHIP_ROLE, ADMIN_ROLE } from '@blog/db/constants';
+import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_SIGN_IN_USER_ID } from '@platform/testing/auth/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
+import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Session } from 'next-auth';
+
+import { GET } from './route';
+
+faker.seed(5998);
 
 const { getMembershipMock, getAdminByUserIdMock, listTenantsByIdsMock } =
   vi.hoisted(() => ({
@@ -23,126 +37,115 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
-const ADMIN_ACTIVE_TENANT = 'admin-active-tenant';
-const DASHBOARD_URL = 'https://admin.example.com/dashboard';
+const MOCK_ORIGIN = faker.internet.url();
+const DASHBOARD_URL = new URL(adminRoutes.dashboard(), MOCK_ORIGIN).href;
 
-describe('GET /api/dashboard/select-tenant', () => {
-  let GET: typeof import('./route').GET;
+const getSelectTenant = (tenantId: string) =>
+  GET(
+    new Request(
+      new URL(adminRoutes.dashboardSelectTenantHref(tenantId), MOCK_ORIGIN),
+    ),
+  );
 
-  beforeEach(async () => {
+describe(GET, () => {
+  beforeEach(() => {
     authMock.mockReset();
-    getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    listTenantsByIdsMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getMembershipMock.mockResolvedValue(undefined);
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-    ({ GET } = await import('./route'));
   });
 
-  it('redirects to sign-in without checking membership when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('redirects to sign-in without checking membership when signed out', async () => {
+    authMock.mockResolvedValueOnce(null);
 
-    const response = await GET(
-      new Request(
-        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
-      ),
-    );
+    const response = await getSelectTenant(MOCK_TENANT_ID);
+    const location = response.headers.get('location');
 
     expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
-    expect(response.headers.get('location')).toBe(
-      `https://admin.example.com/sign-in?callbackUrl=%2Fapi%2Fdashboard%2Fselect-tenant%3FtenantId%3D${MOCK_TENANT_ID}`,
+    expect(location).toBe(
+      new URL(
+        adminRoutes.signIn(
+          adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
+        ),
+        MOCK_ORIGIN,
+      ).href,
     );
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to the picker when no tenantId is given', async () => {
-    const response = await GET(
-      new Request('https://admin.example.com/api/dashboard/select-tenant'),
+  it('redirects to the picker when no tenant is named', async () => {
+    const requestUrl = new URL(
+      adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
+      MOCK_ORIGIN,
     );
+    requestUrl.search = '';
 
-    expect(response.headers.get('location')).toBe(
-      'https://admin.example.com/dashboard/select-tenant',
+    const response = await GET(new Request(requestUrl));
+    const location = response.headers.get('location');
+
+    expect(location).toBe(
+      new URL(adminRoutes.dashboardSelectTenant(), MOCK_ORIGIN).href,
     );
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
 
-  it('returns 404 with no cookie for a non-SUPERADMIN with no membership on the tenant', async () => {
-    const response = await GET(
-      new Request(
-        'https://admin.example.com/api/dashboard/select-tenant?tenantId=someone-elses-tenant',
-      ),
-    );
+  it('returns 404 without a cookie for a non-member who is not a superadmin', async () => {
+    authMock.mockResolvedValueOnce({ user: { id: MOCK_SIGN_IN_USER_ID } });
+
+    const response = await getSelectTenant(MOCK_OTHER_TENANT_ID);
+    const location = response.headers.get('location');
+    const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
 
     expect(getMembershipMock).toHaveBeenCalledWith(
-      'user-1',
-      'someone-elses-tenant',
+      MOCK_SIGN_IN_USER_ID,
+      MOCK_OTHER_TENANT_ID,
     );
     expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-    expect(response.headers.get('location')).toBeNull();
-    expect(response.cookies.get(ADMIN_ACTIVE_TENANT)).toBeUndefined();
+    expect(location).toBeNull();
+    expect(cookie).toBeUndefined();
   });
 
-  it('sets the active-tenant cookie and redirects to /dashboard for a membership', async () => {
-    getMembershipMock.mockResolvedValue({
-      id: 'm-1',
-      userId: 'user-1',
-      tenantId: MOCK_TENANT_ID,
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+  it('sets the active-tenant cookie and opens the dashboard for a member', async () => {
+    getMembershipMock.mockResolvedValueOnce(mockMembership());
 
-    const response = await GET(
-      new Request(
-        `https://admin.example.com/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
-      ),
-    );
+    const response = await getSelectTenant(MOCK_TENANT_ID);
+    const location = response.headers.get('location');
+    const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
 
-    expect(response.headers.get('location')).toBe(DASHBOARD_URL);
-    expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(
-      MOCK_TENANT_ID,
-    );
+    expect(location).toBe(DASHBOARD_URL);
+    expect(cookie?.value).toBe(MOCK_TENANT_ID);
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  describe('for a SUPERADMIN with no membership', () => {
+  describe('for a superadmin with no membership', () => {
     beforeEach(() => {
-      authMock.mockResolvedValue({ user: { id: 'super-1' } });
-      getAdminByUserIdMock.mockResolvedValue({
-        id: 'admin-1',
-        role: ADMIN_ROLE.SUPERADMIN,
-      });
+      getAdminByUserIdMock.mockResolvedValue(
+        mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      );
     });
 
-    it('returns 404 when a SUPERADMIN names a tenant that does not exist', async () => {
-      listTenantsByIdsMock.mockResolvedValue([]);
+    it('returns 404 without a cookie for a tenant that does not exist', async () => {
+      listTenantsByIdsMock.mockResolvedValueOnce([]);
 
-      const response = await GET(
-        new Request(
-          'https://admin.example.com/api/dashboard/select-tenant?tenantId=ghost-tenant',
-        ),
-      );
+      const response = await getSelectTenant(MOCK_OTHER_TENANT_ID);
+      const location = response.headers.get('location');
+      const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
 
       expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-      expect(response.headers.get('location')).toBeNull();
-      expect(response.cookies.get(ADMIN_ACTIVE_TENANT)).toBeUndefined();
+      expect(location).toBeNull();
+      expect(cookie).toBeUndefined();
     });
 
-    it('sets the cookie and redirects to /dashboard for a SUPERADMIN with no membership', async () => {
-      listTenantsByIdsMock.mockResolvedValue([{ id: MOCK_TENANT_ID }]);
+    it('sets the active-tenant cookie and opens the dashboard', async () => {
+      listTenantsByIdsMock.mockResolvedValueOnce([mockTenant()]);
 
-      const response = await GET(
-        new Request(
-          `https://admin.example.com/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
-        ),
-      );
+      const response = await getSelectTenant(MOCK_TENANT_ID);
+      const location = response.headers.get('location');
+      const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
 
       expect(listTenantsByIdsMock).toHaveBeenCalledWith([MOCK_TENANT_ID]);
-      expect(response.headers.get('location')).toBe(DASHBOARD_URL);
-      expect(response.cookies.get(ADMIN_ACTIVE_TENANT)?.value).toBe(
-        MOCK_TENANT_ID,
-      );
+      expect(location).toBe(DASHBOARD_URL);
+      expect(cookie?.value).toBe(MOCK_TENANT_ID);
     });
   });
 });

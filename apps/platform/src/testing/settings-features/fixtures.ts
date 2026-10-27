@@ -1,3 +1,4 @@
+import type { TSettingsFeaturesAndPreset } from '@blog/db/queries/settings-features';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 
 export const mockSettingsFeaturesValues = (
@@ -12,3 +13,10 @@ export const mockSettingsFeaturesValues = (
   contactFormEnabled: false,
   ...overrides,
 });
+
+export const mockUnsavedSettingsFeaturesAndPreset =
+  (): TSettingsFeaturesAndPreset => ({
+    features: undefined,
+    updatedAt: undefined,
+    preset: undefined,
+  });
