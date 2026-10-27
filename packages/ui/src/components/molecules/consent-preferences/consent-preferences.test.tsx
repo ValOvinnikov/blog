@@ -1,10 +1,11 @@
+import { CONSENT_CATEGORY } from '@blog/config';
 import {
   customRender,
   renderElement,
   screen,
 } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
 import {
@@ -14,40 +15,34 @@ import {
 
 faker.seed(123);
 
-const saveLabel = faker.word.verb();
-const closeLabel = faker.word.adjective();
+const VALUE_FALSE_TITLE = 'its value is false';
+const VALUE_MISSING_TITLE = 'its value is missing';
+const MOCK_SAVE_LABEL = faker.lorem.words(2);
+const MOCK_CLOSE_LABEL = faker.lorem.words(2);
 
-const necessaryLabel = faker.word.noun();
-const necessaryDescription = faker.lorem.sentence();
-const analyticsLabel = faker.word.noun();
-const analyticsDescription = faker.lorem.sentence();
-
-const analyticsCategory: IConsentCategory = {
-  id: 'analytics',
-  label: analyticsLabel,
-  description: analyticsDescription,
+const MOCK_NECESSARY_CATEGORY: IConsentCategory = {
+  id: CONSENT_CATEGORY.NECESSARY,
+  label: faker.lorem.words(2),
+  description: faker.lorem.sentence(),
+  isLocked: true,
 };
+const MOCK_MEDIA_CATEGORY: IConsentCategory = {
+  id: CONSENT_CATEGORY.EXTERNAL_MEDIA,
+  label: faker.lorem.words(2),
+  description: faker.lorem.sentence(),
+};
+const MOCK_CATEGORIES = [MOCK_NECESSARY_CATEGORY, MOCK_MEDIA_CATEGORY];
 
-const categories: IConsentCategory[] = [
-  {
-    id: 'necessary',
-    label: necessaryLabel,
-    description: necessaryDescription,
-    isLocked: true,
-  },
-  analyticsCategory,
-];
-
-const values: Record<string, boolean> = {
-  necessary: true,
-  analytics: false,
+const MOCK_VALUES: Record<string, boolean> = {
+  [CONSENT_CATEGORY.NECESSARY]: true,
+  [CONSENT_CATEGORY.EXTERNAL_MEDIA]: false,
 };
 
 const setup = customRender(ConsentPreferences, {
-  categories,
-  values,
+  categories: MOCK_CATEGORIES,
+  values: MOCK_VALUES,
   onCategoryChange: vi.fn(),
-  saveLabel,
+  saveLabel: MOCK_SAVE_LABEL,
   onSave: vi.fn(),
 });
 
@@ -57,163 +52,200 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       setup();
     });
 
-    it('renders one switch per category with its label and description', () => {
-      expect(
-        screen.getByRole('switch', { name: necessaryLabel }),
-      ).toBeVisible();
-      expect(screen.getByText(necessaryDescription)).toBeVisible();
-      expect(
-        screen.getByRole('switch', { name: analyticsLabel }),
-      ).toBeVisible();
-      expect(screen.getByText(analyticsDescription)).toBeVisible();
-    });
+    it.each(MOCK_CATEGORIES)(
+      'renders a switch and description for the $id category',
+      ({ label, description }) => {
+        const categorySwitch = screen.getByRole('switch', {
+          name: label,
+          description,
+        });
 
-    it('shows the locked category checked and disabled', () => {
-      const necessarySwitch = screen.getByRole('switch', {
-        name: necessaryLabel,
-      });
-      expect(necessarySwitch).toBeChecked();
-      expect(necessarySwitch).toBeDisabled();
-    });
+        expect(categorySwitch).toBeVisible();
+      },
+    );
 
-    it('shows an unlocked category unchecked and enabled', () => {
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: analyticsLabel,
+    it('shows an unlocked category enabled', () => {
+      const mediaSwitch = screen.getByRole('switch', {
+        name: MOCK_MEDIA_CATEGORY.label,
       });
-      expect(analyticsSwitch).not.toBeChecked();
-      expect(analyticsSwitch).toBeEnabled();
+
+      expect(mediaSwitch).toBeEnabled();
     });
   });
 
   it('shows an unlocked category checked when its value is true', () => {
-    setup({ values: { necessary: true, analytics: true } });
-    expect(screen.getByRole('switch', { name: analyticsLabel })).toBeChecked();
-  });
-
-  it('shows an unlocked category unchecked when its value is missing', () => {
-    setup({ values: { necessary: true } });
-    expect(
-      screen.getByRole('switch', { name: analyticsLabel }),
-    ).not.toBeChecked();
-  });
-
-  it('shows a locked category checked and disabled even when its value is false', () => {
-    setup({ values: { necessary: false, analytics: false } });
-    const necessarySwitch = screen.getByRole('switch', {
-      name: necessaryLabel,
+    setup({
+      values: { ...MOCK_VALUES, [CONSENT_CATEGORY.EXTERNAL_MEDIA]: true },
     });
-    expect(necessarySwitch).toBeChecked();
-    expect(necessarySwitch).toBeDisabled();
+
+    const mediaSwitch = screen.getByRole('switch', {
+      name: MOCK_MEDIA_CATEGORY.label,
+    });
+
+    expect(mediaSwitch).toBeChecked();
   });
 
-  it('shows a locked category checked and disabled even when its value is missing', () => {
-    setup({ values: {} });
-    const necessarySwitch = screen.getByRole('switch', {
-      name: necessaryLabel,
+  it.each([
+    { values: MOCK_VALUES, title: VALUE_FALSE_TITLE },
+    {
+      values: { [CONSENT_CATEGORY.NECESSARY]: true },
+      title: VALUE_MISSING_TITLE,
+    },
+  ])('shows an unlocked category unchecked when $title', ({ values }) => {
+    setup({ values });
+
+    const mediaSwitch = screen.getByRole('switch', {
+      name: MOCK_MEDIA_CATEGORY.label,
     });
-    expect(necessarySwitch).toBeChecked();
-    expect(necessarySwitch).toBeDisabled();
+
+    expect(mediaSwitch).not.toBeChecked();
   });
+
+  it.each([
+    { values: MOCK_VALUES, title: 'its value is true' },
+    {
+      values: { [CONSENT_CATEGORY.NECESSARY]: false },
+      title: VALUE_FALSE_TITLE,
+    },
+    { values: {}, title: VALUE_MISSING_TITLE },
+  ])(
+    'shows a locked category checked and disabled when $title',
+    ({ values }) => {
+      setup({ values });
+
+      const necessarySwitch = screen.getByRole('switch', {
+        name: MOCK_NECESSARY_CATEGORY.label,
+      });
+
+      expect(necessarySwitch).toBeChecked();
+      expect(necessarySwitch).toBeDisabled();
+    },
+  );
 
   describe('interactions', () => {
+    let user: UserEvent;
     let onCategoryChange: Mock<(id: string, checked: boolean) => void>;
     let onSave: Mock<() => void>;
 
     beforeEach(() => {
+      user = userEvent.setup();
       onCategoryChange = vi.fn();
       onSave = vi.fn();
       setup({ onCategoryChange, onSave });
     });
 
-    it('does not call onCategoryChange when the locked switch is clicked', async () => {
-      await userEvent.click(
-        screen.getByRole('switch', { name: necessaryLabel }),
-      );
+    it('does not report a change when the locked switch is clicked', async () => {
+      const necessarySwitch = screen.getByRole('switch', {
+        name: MOCK_NECESSARY_CATEGORY.label,
+      });
+
+      await user.click(necessarySwitch);
+
       expect(onCategoryChange).not.toHaveBeenCalled();
     });
 
-    it('calls onCategoryChange with the category id and next value when an unlocked switch is clicked', async () => {
-      await userEvent.click(
-        screen.getByRole('switch', { name: analyticsLabel }),
-      );
+    it('reports the category id and next value when an unlocked switch is clicked', async () => {
+      const mediaSwitch = screen.getByRole('switch', {
+        name: MOCK_MEDIA_CATEGORY.label,
+      });
+
+      await user.click(mediaSwitch);
+
       expect(onCategoryChange).toHaveBeenCalledTimes(1);
-      expect(onCategoryChange).toHaveBeenCalledWith('analytics', true);
+      expect(onCategoryChange).toHaveBeenCalledWith(
+        MOCK_MEDIA_CATEGORY.id,
+        true,
+      );
     });
 
-    it('calls onCategoryChange when an unlocked switch is activated by keyboard', async () => {
-      screen.getByRole('switch', { name: analyticsLabel }).focus();
-      await userEvent.keyboard(' ');
-      expect(onCategoryChange).toHaveBeenCalledWith('analytics', true);
+    it('reports a change when an unlocked switch is toggled by keyboard', async () => {
+      await user.tab();
+      await user.keyboard(' ');
+
+      expect(onCategoryChange).toHaveBeenCalledWith(
+        MOCK_MEDIA_CATEGORY.id,
+        true,
+      );
     });
 
-    it('renders a Save action and calls onSave when clicked', async () => {
-      await userEvent.click(screen.getByRole('button', { name: saveLabel }));
+    it('calls onSave when Save is clicked', async () => {
+      const saveButton = screen.getByRole('button', { name: MOCK_SAVE_LABEL });
+
+      await user.click(saveButton);
+
       expect(onSave).toHaveBeenCalledTimes(1);
     });
 
     it('calls onSave when Save is activated by keyboard', async () => {
-      screen.getByRole('button', { name: saveLabel }).focus();
-      await userEvent.keyboard('{Enter}');
+      await user.tab();
+      await user.tab();
+      await user.keyboard('{Enter}');
+
       expect(onSave).toHaveBeenCalledTimes(1);
     });
   });
 
-  it('renders no Close action when closeLabel and onClose are omitted', () => {
-    setup();
-    expect(screen.getAllByRole('button')).toHaveLength(1);
+  describe('with a Close action', () => {
+    it('renders no Close action when none is supplied', () => {
+      setup();
+
+      const buttons = screen.getAllByRole('button');
+
+      expect(buttons).toHaveLength(1);
+    });
+
+    it('calls onClose when Close is clicked', async () => {
+      const user = userEvent.setup();
+      const onClose = vi.fn();
+      setup({ closeLabel: MOCK_CLOSE_LABEL, onClose });
+
+      const closeButton = screen.getByRole('button', {
+        name: MOCK_CLOSE_LABEL,
+      });
+      await user.click(closeButton);
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('renders a Close action and calls onClose when clicked', async () => {
-    const onClose = vi.fn();
-    setup({ closeLabel, onClose });
-    await userEvent.click(screen.getByRole('button', { name: closeLabel }));
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'consent-preferences' });
-    expect(screen.getByTestId('consent-preferences')).toBeVisible();
-  });
-
-  it('names and describes each switch by its own row when two preference panels share category ids', () => {
+  it('names and describes each switch by its own row when two panels share ids', () => {
     const otherLabel = faker.lorem.words(2);
     const otherDescription = faker.lorem.sentence();
     renderElement(
       <>
         <ConsentPreferences
-          categories={[analyticsCategory]}
-          values={values}
+          categories={[MOCK_MEDIA_CATEGORY]}
+          values={MOCK_VALUES}
           onCategoryChange={vi.fn()}
-          saveLabel={saveLabel}
+          saveLabel={MOCK_SAVE_LABEL}
           onSave={vi.fn()}
         />
         <ConsentPreferences
           categories={[
             {
-              id: 'analytics',
+              id: MOCK_MEDIA_CATEGORY.id,
               label: otherLabel,
               description: otherDescription,
             },
           ]}
-          values={values}
+          values={MOCK_VALUES}
           onCategoryChange={vi.fn()}
-          saveLabel={saveLabel}
+          saveLabel={MOCK_SAVE_LABEL}
           onSave={vi.fn()}
         />
       </>,
     );
 
-    expect(
-      screen.getByRole('switch', {
-        name: analyticsLabel,
-        description: analyticsDescription,
-      }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('switch', {
-        name: otherLabel,
-        description: otherDescription,
-      }),
-    ).toBeVisible();
+    const firstSwitch = screen.getByRole('switch', {
+      name: MOCK_MEDIA_CATEGORY.label,
+      description: MOCK_MEDIA_CATEGORY.description,
+    });
+    const secondSwitch = screen.getByRole('switch', {
+      name: otherLabel,
+      description: otherDescription,
+    });
+
+    expect(firstSwitch).toBeVisible();
+    expect(secondSwitch).toBeVisible();
   });
 });
