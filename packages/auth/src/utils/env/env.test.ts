@@ -63,8 +63,12 @@ describe('env', () => {
 
     it('skips validation when SKIP_ENV_VALIDATION is set', async () => {
       vi.stubEnv('SKIP_ENV_VALIDATION', 'true');
+      vi.stubEnv('MAGIC_LINK_FROM_ADDRESS', MOCK_FROM_ADDRESS);
 
-      await expect(importEnv()).resolves.toBeDefined();
+      const { env } = await importEnv();
+
+      expect(env.AUTH_SECRET).toBeUndefined();
+      expect(env.MAGIC_LINK_FROM_ADDRESS).toBe(MOCK_FROM_ADDRESS);
     });
   });
 });
