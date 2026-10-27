@@ -1,2 +1,2 @@
-export type { TNavigation } from './adaptor/types';
+export type { TNavigation, TNavigationItem } from './adaptor/types';
 export { createNavigationService } from './application/service';

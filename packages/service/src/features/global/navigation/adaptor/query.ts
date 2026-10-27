@@ -1,8 +1,24 @@
+import type { LinkRef } from '@blog/config';
 import { q } from '@blog/service/sanity/query/query';
+import { brandTaglineFragment } from '@blog/service/shared/fragments/brand-tagline/brand-tagline';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
-export const navigationQuery = q.star
-  .filterByType('settings_navigation')
+// An inline `.project()` on `subItems[]` inside `conditionalByType` types `link` as `never`.
+const subItemFragment = q
+  .parameters<TLocaleQueryParams>()
+  .fragment<LinkRef>()
+  .project((subItem) => ({
+    link: subItem
+      .field('link')
+      .deref()
+      .project(linkDocumentFragment)
+      .nullable(true),
+  }));
+
+export const navigationQuery = q
+  .parameters<TLocaleQueryParams>()
+  .star.filterByType('settings_navigation')
   .slice(0)
   .project((sub) => ({
     items: sub
@@ -13,8 +29,17 @@ export const navigationQuery = q.star
           .deref()
           .project(linkDocumentFragment)
           .notNull(),
+        ...item.conditionalByType({
+          linkRefWithSubItems: (group) => ({
+            subItems: group
+              .field('subItems[]')
+              .project(subItemFragment)
+              .notNull(),
+          }),
+        }),
       }))
       .nullable(true),
+    tagline: sub.field('tagline').project(brandTaglineFragment).nullable(true),
     showLanguageSwitcher: sub.field('showLanguageSwitcher').nullable(true),
   }))
   .notNull();
