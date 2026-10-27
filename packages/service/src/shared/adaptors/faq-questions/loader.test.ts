@@ -10,24 +10,30 @@ import {
   MOCK_MODULES_FAQ_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getFaqQuestions } from './loader';
 import { faqQuestionsQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const SECOND_ID = 'faq-2';
-const tenant = mockTenant();
+faker.seed(6020);
+
+const MOCK_SECOND_FAQ_MODULE_ID = faker.string.uuid();
+const MOCK_TENANT = mockTenant();
 
 describe(getFaqQuestions, () => {
   it('queries the ids once with cache tags scoped to the tenant', async () => {
     mockRun.mockResolvedValueOnce([]);
 
-    await getFaqQuestions([MOCK_FAQ_MODULE_ID, SECOND_ID], tenant);
+    await getFaqQuestions(
+      [MOCK_FAQ_MODULE_ID, MOCK_SECOND_FAQ_MODULE_ID],
+      MOCK_TENANT,
+    );
 
     expect(mockRun).toHaveBeenCalledExactlyOnceWith(faqQuestionsQuery, {
-      parameters: { ids: [MOCK_FAQ_MODULE_ID, SECOND_ID] },
-      tenant,
+      parameters: { ids: [MOCK_FAQ_MODULE_ID, MOCK_SECOND_FAQ_MODULE_ID] },
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
@@ -42,17 +48,15 @@ describe(getFaqQuestions, () => {
   it('returns the modules in the order of the given ids', async () => {
     mockRun.mockResolvedValueOnce([
       mockRawFaqModuleQuestions({ _id: MOCK_FAQ_MODULE_ID }),
-      mockRawFaqModuleQuestions({ _id: SECOND_ID }),
+      mockRawFaqModuleQuestions({ _id: MOCK_SECOND_FAQ_MODULE_ID }),
     ]);
 
     const result = await getFaqQuestions(
-      [SECOND_ID, MOCK_FAQ_MODULE_ID],
-      tenant,
+      [MOCK_SECOND_FAQ_MODULE_ID, MOCK_FAQ_MODULE_ID],
+      MOCK_TENANT,
     );
+    const ids = result.map((module) => module._id);
 
-    expect(result.map((module) => module._id)).toEqual([
-      SECOND_ID,
-      MOCK_FAQ_MODULE_ID,
-    ]);
+    expect(ids).toEqual([MOCK_SECOND_FAQ_MODULE_ID, MOCK_FAQ_MODULE_ID]);
   });
 });
