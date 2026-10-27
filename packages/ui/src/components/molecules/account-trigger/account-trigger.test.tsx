@@ -2,6 +2,7 @@ import { ACCOUNT_BUTTON_STYLE } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { AccountTrigger } from './account-trigger';
 
@@ -21,42 +22,43 @@ const setup = customRender(AccountTrigger, {
 });
 
 describe.each(Object.values(ACCOUNT_BUTTON_STYLE))(
-  `<${AccountTrigger.name}/> as %s`,
+  `<${AccountTrigger.name}/> as %s while signed out`,
   (appearance) => {
-    it('is named for signing in and opens a dialog while signed out', () => {
-      setup({ appearance });
+    let onClick: Mock<() => void>;
+    let button: HTMLElement;
 
-      const button = screen.getByRole('button', { name: MOCK_SIGN_IN_LABEL });
+    beforeEach(() => {
+      onClick = vi.fn();
+      setup({ appearance, onClick });
+      button = screen.getByRole('button', { name: MOCK_SIGN_IN_LABEL });
+    });
 
+    it('is named for signing in and opens a dialog', () => {
       expect(button).toHaveAttribute(HASPOPUP_ATTRIBUTE, 'dialog');
     });
 
-    it('is named for the account and opens a menu while signed in', () => {
+    it('reports whether its panel is open and which panel it controls', () => {
+      expect(button).toHaveAttribute('aria-expanded', 'false');
+      expect(button).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
+    });
+
+    it('calls onClick when pressed', async () => {
+      await userEvent.click(button);
+
+      expect(onClick).toHaveBeenCalledOnce();
+    });
+  },
+);
+
+describe.each(Object.values(ACCOUNT_BUTTON_STYLE))(
+  `<${AccountTrigger.name}/> as %s while signed in`,
+  (appearance) => {
+    it('is named for the account and opens a menu', () => {
       setup({ appearance, user: MOCK_USER });
 
       const button = screen.getByRole('button', { name: MOCK_ACCOUNT_LABEL });
 
       expect(button).toHaveAttribute(HASPOPUP_ATTRIBUTE, 'menu');
-    });
-
-    it('reports whether its panel is open and which panel it controls', () => {
-      setup({ appearance, isOpen: true });
-
-      const button = screen.getByRole('button', { name: MOCK_SIGN_IN_LABEL });
-
-      expect(button).toHaveAttribute('aria-expanded', 'true');
-      expect(button).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
-    });
-
-    it('calls onClick when pressed', async () => {
-      const onClick = vi.fn();
-      setup({ appearance, onClick });
-
-      await userEvent.click(
-        screen.getByRole('button', { name: MOCK_SIGN_IN_LABEL }),
-      );
-
-      expect(onClick).toHaveBeenCalledOnce();
     });
   },
 );

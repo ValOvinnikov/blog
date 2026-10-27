@@ -57,17 +57,22 @@ const setup = customRender(SignInPanel, {
 });
 
 describe(`<${SignInPanel.name}/>`, () => {
-  it('is a dialog named by its title', () => {
-    setup();
+  let providers: ReturnType<typeof mockProviders>;
+  let emailForm: ReturnType<typeof mockEmailForm>;
 
+  beforeEach(() => {
+    providers = mockProviders();
+    emailForm = mockEmailForm();
+    setup({ providers, emailForm });
+  });
+
+  it('is a dialog named by its title', () => {
     const dialog = screen.getByRole('dialog', { name: MOCK_LABELS.title });
 
     expect(dialog).toBeVisible();
   });
 
   it('shows every provider and the email field at once', () => {
-    setup();
-
     const github = screen.getByRole('button', { name: MOCK_GITHUB.label });
     const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
     const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
@@ -78,9 +83,6 @@ describe(`<${SignInPanel.name}/>`, () => {
   });
 
   it('continues with the provider the reader picks', async () => {
-    const providers = mockProviders();
-    setup({ providers });
-
     await userEvent.click(
       screen.getByRole('button', { name: MOCK_GOOGLE.label }),
     );
@@ -89,9 +91,6 @@ describe(`<${SignInPanel.name}/>`, () => {
   });
 
   it('sends the link when the form is submitted', async () => {
-    const emailForm = mockEmailForm();
-    setup({ emailForm });
-
     await userEvent.click(
       screen.getByRole('button', { name: MOCK_LABELS.submit }),
     );
@@ -100,18 +99,17 @@ describe(`<${SignInPanel.name}/>`, () => {
   });
 
   it('passes each keystroke in the email field to onChange', async () => {
-    const emailForm = mockEmailForm({ value: '' });
-    setup({ emailForm });
-
     await userEvent.type(
       screen.getByRole('textbox', { name: MOCK_LABELS.email }),
       'a',
     );
 
-    expect(emailForm.onChange).toHaveBeenCalledWith('a');
+    expect(emailForm.onChange).toHaveBeenCalledWith(`${MOCK_EMAIL}a`);
   });
+});
 
-  it('hides the email divider when there are no providers', () => {
+describe(`<${SignInPanel.name}/> without providers`, () => {
+  it('hides the email divider', () => {
     setup({ providers: [] });
 
     const divider = screen.queryByText(MOCK_LABELS.or);
