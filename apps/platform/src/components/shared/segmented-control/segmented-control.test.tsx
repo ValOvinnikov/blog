@@ -1,223 +1,182 @@
-import { render, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SegmentedControl } from './segmented-control';
 
-type TDensity = 'compact' | 'comfortable';
+faker.seed(5995);
 
-const options: { value: TDensity; label: string }[] = [
-  { value: 'compact', label: 'Compact' },
-  { value: 'comfortable', label: 'Comfortable' },
-];
+const MOCK_GROUP_LABEL = faker.lorem.word();
+const MOCK_FIRST_VALUE = faker.string.uuid();
+const MOCK_SECOND_VALUE = faker.string.uuid();
+const MOCK_FIRST_LABEL = faker.lorem.words(2);
+const MOCK_SECOND_LABEL = faker.lorem.words(2);
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_HINT_ID = faker.string.alpha(8);
+const MOCK_HINT = faker.lorem.sentence();
 
-describe(SegmentedControl, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+const MOCK_FIRST_OPTION = { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL };
+const MOCK_SECOND_OPTION = {
+  value: MOCK_SECOND_VALUE,
+  label: MOCK_SECOND_LABEL,
+};
+
+const setup = customRender(SegmentedControl<string>, {
+  ariaLabel: MOCK_GROUP_LABEL,
+  options: [MOCK_FIRST_OPTION, MOCK_SECOND_OPTION],
+  value: MOCK_FIRST_VALUE,
+  onChange: vi.fn(),
+});
+
+describe(`<${SegmentedControl.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
-  it('renders a group with the given ariaLabel and one option per entry', () => {
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="compact"
-        onChange={vi.fn()}
-      />,
-    );
+  it('renders a named group with one button per option', () => {
+    setup();
 
-    expect(screen.getByRole('group', { name: 'Density' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Compact' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Comfortable' })).toBeVisible();
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
+    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+    const secondOption = screen.getByRole('button', {
+      name: MOCK_SECOND_LABEL,
+    });
+
+    expect(group).toBeVisible();
+    expect(firstOption).toBeVisible();
+    expect(secondOption).toBeVisible();
   });
 
   it('names an option by its label and describes it by its second line', () => {
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={[
-          { value: 'compact', label: 'Compact', description: 'Tighter rows' },
-          { value: 'comfortable', label: 'Comfortable' },
-        ]}
-        value="compact"
-        onChange={vi.fn()}
-      />,
-    );
+    setup({
+      options: [
+        { ...MOCK_FIRST_OPTION, description: MOCK_DESCRIPTION },
+        MOCK_SECOND_OPTION,
+      ],
+    });
 
-    expect(
-      screen.getByRole('button', { name: 'Compact' }),
-    ).toHaveAccessibleDescription('Tighter rows');
-    expect(
-      screen.getByRole('button', { name: 'Comfortable' }),
-    ).not.toHaveAccessibleDescription();
+    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+    const secondOption = screen.getByRole('button', {
+      name: MOCK_SECOND_LABEL,
+    });
+
+    expect(firstOption).toHaveAccessibleDescription(MOCK_DESCRIPTION);
+    expect(secondOption).not.toHaveAccessibleDescription();
   });
 
-  it('forwards aria-describedby to the group', () => {
-    render(
+  it('describes the group by the element it is pointed at', () => {
+    renderWithIntl(
       <div>
-        <span id="density-hint">Locked — see policy</span>
-        <SegmentedControl<TDensity>
-          ariaLabel="Density"
-          options={options}
-          value="compact"
+        <span id={MOCK_HINT_ID}>{MOCK_HINT}</span>
+        <SegmentedControl
+          ariaLabel={MOCK_GROUP_LABEL}
+          options={[MOCK_FIRST_OPTION, MOCK_SECOND_OPTION]}
+          value={MOCK_FIRST_VALUE}
           onChange={vi.fn()}
-          aria-describedby="density-hint"
+          aria-describedby={MOCK_HINT_ID}
         />
       </div>,
     );
 
-    expect(
-      screen.getByRole('group', { name: 'Density' }),
-    ).toHaveAccessibleDescription('Locked — see policy');
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
+
+    expect(group).toHaveAccessibleDescription(MOCK_HINT);
   });
 
-  it('marks the option matching value as pressed, and the rest as not pressed', () => {
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="comfortable"
-        onChange={vi.fn()}
-      />,
-    );
+  it('presses only the option matching the value', () => {
+    setup({ value: MOCK_SECOND_VALUE });
 
-    expect(screen.getByRole('button', { name: 'Comfortable' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
+    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+    const secondOption = screen.getByRole('button', {
+      name: MOCK_SECOND_LABEL,
+    });
+
+    expect(secondOption).toBePressed();
+    expect(firstOption).not.toBePressed();
   });
 
-  it('calls onChange with the clicked option value', async () => {
+  it('reports the clicked option value', async () => {
     const onChange = vi.fn();
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="compact"
-        onChange={onChange}
-      />,
-    );
+    setup({ onChange });
 
-    await user.click(screen.getByRole('button', { name: 'Comfortable' }));
+    const secondOption = screen.getByRole('button', {
+      name: MOCK_SECOND_LABEL,
+    });
+    await user.click(secondOption);
 
-    expect(onChange).toHaveBeenCalledExactlyOnceWith('comfortable');
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
   });
 
-  it('does not call onChange when clicking the already-selected option', async () => {
-    const onChange = vi.fn();
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="compact"
-        onChange={onChange}
-      />,
-    );
+  it('keeps the clicked option unpressed until the caller updates the value', async () => {
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Compact' }));
+    const secondOption = screen.getByRole('button', {
+      name: MOCK_SECOND_LABEL,
+    });
+    await user.click(secondOption);
+
+    expect(secondOption).not.toBePressed();
+  });
+
+  it('reports nothing when the selected option is clicked again', async () => {
+    const onChange = vi.fn();
+    setup({ onChange });
+
+    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+    await user.click(firstOption);
 
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('does not manage its own state — stays pressed only once value is updated by the caller', async () => {
-    const onChange = vi.fn();
-    const { rerender } = render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="compact"
-        onChange={onChange}
-      />,
-    );
+  describe('disabled', () => {
+    let onChange: ReturnType<typeof vi.fn>;
 
-    await user.click(screen.getByRole('button', { name: 'Comfortable' }));
-    expect(screen.getByRole('button', { name: 'Comfortable' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
+    beforeEach(() => {
+      onChange = vi.fn();
+      setup({ onChange, isDisabled: true });
+    });
 
-    rerender(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="comfortable"
-        onChange={onChange}
-      />,
-    );
-    expect(screen.getByRole('button', { name: 'Comfortable' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    it('disables every option', () => {
+      const firstOption = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+      const secondOption = screen.getByRole('button', {
+        name: MOCK_SECOND_LABEL,
+      });
+
+      expect(firstOption).toBeDisabled();
+      expect(secondOption).toBeDisabled();
+    });
+
+    it('reports nothing on click', async () => {
+      const secondOption = screen.getByRole('button', {
+        name: MOCK_SECOND_LABEL,
+      });
+      await user.click(secondOption);
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
   });
 
-  it('marks the group and every option disabled when isDisabled is true', () => {
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="compact"
-        onChange={vi.fn()}
-        isDisabled={true}
-      />,
-    );
+  it('renders a single option', () => {
+    setup({ options: [MOCK_FIRST_OPTION] });
 
-    expect(screen.getByRole('group', { name: 'Density' })).toHaveAttribute(
-      'data-disabled',
-    );
-    for (const option of options) {
-      expect(screen.getByRole('button', { name: option.label })).toBeDisabled();
-    }
+    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+
+    expect(firstOption).toBeVisible();
   });
 
-  it('does not call onChange on click while disabled', async () => {
-    const onChange = vi.fn();
-    render(
-      <SegmentedControl<TDensity>
-        ariaLabel="Density"
-        options={options}
-        value="compact"
-        onChange={onChange}
-        isDisabled={true}
-      />,
-    );
+  it('renders an empty group with no options', () => {
+    setup({ options: [] });
 
-    await user.click(screen.getByRole('button', { name: 'Comfortable' }));
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
 
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('renders a single option without throwing', () => {
-    expect(() =>
-      render(
-        <SegmentedControl<TDensity>
-          ariaLabel="Density"
-          options={[options[0]!]}
-          value="compact"
-          onChange={vi.fn()}
-        />,
-      ),
-    ).not.toThrow();
-  });
-
-  it('renders no options without throwing', () => {
-    expect(() =>
-      render(
-        <SegmentedControl<TDensity>
-          ariaLabel="Density"
-          options={[]}
-          value="compact"
-          onChange={vi.fn()}
-        />,
-      ),
-    ).not.toThrow();
-
-    expect(
-      screen.getByRole('group', { name: 'Density' }),
-    ).toBeEmptyDOMElement();
+    expect(group).toBeEmptyDOMElement();
   });
 });

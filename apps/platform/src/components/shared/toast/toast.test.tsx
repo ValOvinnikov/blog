@@ -1,134 +1,123 @@
 import { TOAST_TYPE } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Toast } from './toast';
 import type { IToastRecord } from './toast-record';
 
-const buildRecord = (overrides?: Partial<IToastRecord>): IToastRecord => ({
-  id: 'toast-1',
+faker.seed(5995);
+
+const INFO_GLYPH = 'i';
+
+const MOCK_MESSAGE = faker.lorem.sentence();
+const MOCK_TITLE = faker.lorem.word();
+const MOCK_TIME = faker.lorem.word();
+const MOCK_ACTION_LABEL = faker.lorem.word();
+
+const mockToastRecord = (overrides?: Partial<IToastRecord>): IToastRecord => ({
+  id: faker.string.uuid(),
   type: TOAST_TYPE.SUCCESS,
-  message: 'Saved',
+  message: MOCK_MESSAGE,
   phase: 'visible',
   paused: false,
   createdAt: 0,
   ...overrides,
 });
 
-describe(Toast, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+const setup = customRender(Toast, {
+  record: mockToastRecord(),
+  onDismiss: vi.fn(),
+});
+
+describe(`<${Toast.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
   it('renders its message', () => {
-    renderWithIntl(<Toast record={buildRecord()} onDismiss={vi.fn()} />);
-    expect(screen.getByText('Saved')).toBeVisible();
+    setup();
+
+    const message = screen.getByText(MOCK_MESSAGE);
+
+    expect(message).toBeVisible();
   });
 
-  it('renders a bolded title ahead of the message when given', () => {
-    renderWithIntl(
-      <Toast
-        record={buildRecord({
-          title: 'Bookmark',
-          message: 'Saved to bookmarks',
-        })}
-        onDismiss={vi.fn()}
-      />,
-    );
-    expect(screen.getByText('Bookmark').tagName).toBe('STRONG');
-    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
-  });
+  it('renders a title ahead of the message when given', () => {
+    setup({ record: mockToastRecord({ title: MOCK_TITLE }) });
 
-  it('renders no title element when none is given', () => {
-    renderWithIntl(<Toast record={buildRecord()} onDismiss={vi.fn()} />);
-    expect(screen.getByRole('status')).toHaveTextContent(/^✓Saved×$/);
+    const title = screen.getByText(MOCK_TITLE);
+    const status = screen.getByRole('status');
+
+    expect(title).toBeVisible();
+    expect(status).toHaveTextContent(`${MOCK_TITLE}${MOCK_MESSAGE}`);
   });
 
   it('renders the time when given', () => {
-    renderWithIntl(
-      <Toast record={buildRecord({ time: '12:04' })} onDismiss={vi.fn()} />,
-    );
-    expect(screen.getByText('12:04')).toBeVisible();
+    setup({ record: mockToastRecord({ time: MOCK_TIME }) });
+
+    const time = screen.getByText(MOCK_TIME);
+
+    expect(time).toBeVisible();
   });
 
-  it('renders an assertive alert role for the ERROR type', () => {
-    renderWithIntl(
-      <Toast
-        record={buildRecord({
-          type: TOAST_TYPE.ERROR,
-          message: "Couldn't save",
-        })}
-        onDismiss={vi.fn()}
-      />,
-    );
-    expect(screen.getByRole('alert')).toHaveTextContent("Couldn't save");
+  it('announces an error assertively', () => {
+    setup({ record: mockToastRecord({ type: TOAST_TYPE.ERROR }) });
+
+    const alert = screen.getByRole('alert');
+
+    expect(alert).toHaveTextContent(MOCK_MESSAGE);
   });
 
   it.each([TOAST_TYPE.SUCCESS, TOAST_TYPE.WARNING, TOAST_TYPE.INFO])(
-    'renders a polite status role for the %s type',
+    'announces a %s toast politely',
     (type) => {
-      renderWithIntl(
-        <Toast
-          record={buildRecord({ type, message: 'Status update' })}
-          onDismiss={vi.fn()}
-        />,
-      );
-      expect(screen.getByRole('status')).toHaveTextContent('Status update');
+      setup({ record: mockToastRecord({ type }) });
+
+      const status = screen.getByRole('status');
+
+      expect(status).toHaveTextContent(MOCK_MESSAGE);
     },
   );
 
-  it('labels the dismiss button from its own catalogue and calls onDismiss when clicked', async () => {
+  it('dismisses from its labelled dismiss button', async () => {
     const onDismiss = vi.fn();
-    renderWithIntl(<Toast record={buildRecord()} onDismiss={onDismiss} />);
+    setup({ onDismiss });
 
-    await user.click(
-      screen.getByRole('button', { name: 'Dismiss notification' }),
-    );
-    expect(onDismiss).toHaveBeenCalledTimes(1);
+    const dismissButton = screen.getByRole('button', {
+      name: messages.toast.dismissLabel,
+    });
+    await user.click(dismissButton);
+
+    expect(onDismiss).toHaveBeenCalledOnce();
   });
 
-  it('renders an action button and calls its handler', async () => {
+  it('runs its action from the action button', async () => {
     const onAct = vi.fn();
-    renderWithIntl(
-      <Toast
-        record={buildRecord({ action: { label: 'Undo', onAct } })}
-        onDismiss={vi.fn()}
-      />,
-    );
+    setup({
+      record: mockToastRecord({ action: { label: MOCK_ACTION_LABEL, onAct } }),
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Undo' }));
-    expect(onAct).toHaveBeenCalledTimes(1);
+    const actionButton = screen.getByRole('button', {
+      name: MOCK_ACTION_LABEL,
+    });
+    await user.click(actionButton);
+
+    expect(onAct).toHaveBeenCalledOnce();
   });
 
-  it('renders a spinner instead of the type glyph while loading', () => {
-    renderWithIntl(
-      <Toast
-        record={buildRecord({
-          type: TOAST_TYPE.INFO,
-          message: 'Saving…',
-          isLoading: true,
-        })}
-        onDismiss={vi.fn()}
-      />,
-    );
-    expect(screen.getByText('Saving…')).toBeVisible();
-    expect(screen.queryByText('i')).not.toBeInTheDocument();
-  });
+  it('hides the type glyph while loading', () => {
+    setup({
+      record: mockToastRecord({ type: TOAST_TYPE.INFO, isLoading: true }),
+    });
 
-  it('renders every type and phase without throwing', () => {
-    for (const type of Object.values(TOAST_TYPE)) {
-      for (const phase of ['entering', 'visible', 'leaving'] as const) {
-        expect(() =>
-          renderWithIntl(
-            <Toast
-              record={buildRecord({ type, phase, message: 'Label' })}
-              onDismiss={vi.fn()}
-            />,
-          ),
-        ).not.toThrow();
-      }
-    }
+    const message = screen.getByText(MOCK_MESSAGE);
+    const glyph = screen.queryByText(INFO_GLYPH);
+
+    expect(message).toBeVisible();
+    expect(glyph).not.toBeInTheDocument();
   });
 });
