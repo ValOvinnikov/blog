@@ -1,87 +1,65 @@
+import { faker } from '@faker-js/faker';
+
 import { sanitizeHref } from './sanitize-href';
 
-describe('sanitizeHref', () => {
-  it('allows http, https and mailto urls through', () => {
-    expect(sanitizeHref('http://example.com/x')).toBe('http://example.com/x');
-    expect(sanitizeHref('https://example.com/x?y=1')).toBe(
-      'https://example.com/x?y=1',
-    );
-    expect(sanitizeHref('mailto:someone@example.com')).toBe(
-      'mailto:someone@example.com',
-    );
+faker.seed(6029);
+
+const MOCK_DOMAIN = faker.internet.domainName();
+const MOCK_TRUSTED_DOMAIN = faker.internet.domainName();
+const MOCK_PATH = faker.lorem.slug();
+const MOCK_USERNAME = faker.internet.username().toLowerCase();
+const MOCK_PASSWORD = faker.internet.password();
+const MOCK_MAILTO = `mailto:${MOCK_USERNAME}@${MOCK_DOMAIN}`;
+
+describe(sanitizeHref, () => {
+  it.each([
+    ['an http url', `http://${MOCK_DOMAIN}/${MOCK_PATH}`],
+    ['an https url with a query', `https://${MOCK_DOMAIN}/${MOCK_PATH}?y=1`],
+    ['a mailto url', MOCK_MAILTO],
+  ])('allows %s through unchanged', (_label, href) => {
+    expect(sanitizeHref(href)).toBe(href);
   });
 
-  it('rejects a javascript: url', () => {
-    expect(sanitizeHref('javascript:alert(document.cookie)')).toBeNull();
+  it.each([
+    ['a javascript: url', 'javascript:alert(document.cookie)'],
+    ['a javascript: url disguised with case', 'JavaScript:alert(1)'],
+    ['a javascript: url with a tab in the scheme', 'java\tscript:alert(1)'],
+    ['a javascript: url with a newline in the scheme', 'java\nscript:alert(1)'],
+    ['a javascript: url with leading whitespace', '   javascript:alert(1)'],
+    [
+      'a javascript: url with a leading control character',
+      '\u0001javascript:alert(1)',
+    ],
+    ['a data: url', 'data:text/html,<script>alert(1)</script>'],
+    ['a vbscript: url', 'vbscript:msgbox(1)'],
+    ['a scheme-relative url', `//${MOCK_DOMAIN}/${MOCK_PATH}`],
+    ['an unparseable value', 'not a url at all'],
+    ['an empty value', ''],
+    ['a percent-encoded javascript scheme', 'javascript%3Aalert(1)'],
+    ['an entity-encoded scheme', '&#106;avascript:alert(1)'],
+    [
+      'an http url carrying userinfo',
+      `http://${MOCK_USERNAME}@${MOCK_DOMAIN}/`,
+    ],
+    [
+      'an https url carrying userinfo with a password',
+      `https://${MOCK_USERNAME}:${MOCK_PASSWORD}@${MOCK_DOMAIN}/`,
+    ],
+    [
+      'an https url whose userinfo looks like a trusted domain',
+      `https://${MOCK_TRUSTED_DOMAIN}@${MOCK_DOMAIN}/`,
+    ],
+  ])('rejects %s', (_label, href) => {
+    expect(sanitizeHref(href)).toBeNull();
   });
 
-  it('rejects a javascript: url disguised with case', () => {
-    expect(sanitizeHref('JavaScript:alert(document.cookie)')).toBeNull();
-  });
-
-  it('rejects a javascript: url with a tab hidden inside the scheme', () => {
-    expect(sanitizeHref('java\tscript:alert(document.cookie)')).toBeNull();
-  });
-
-  it('rejects a javascript: url with a newline hidden inside the scheme', () => {
-    expect(sanitizeHref('java\nscript:alert(document.cookie)')).toBeNull();
-  });
-
-  it('rejects a javascript: url with leading whitespace/control characters', () => {
-    expect(sanitizeHref('   javascript:alert(document.cookie)')).toBeNull();
-    expect(sanitizeHref(' javascript:alert(1)')).toBeNull();
-  });
-
-  it('rejects a data: url', () => {
-    expect(sanitizeHref('data:text/html,<script>alert(1)</script>')).toBeNull();
-  });
-
-  it('rejects a vbscript: url', () => {
-    expect(sanitizeHref('vbscript:msgbox(1)')).toBeNull();
-  });
-
-  it('rejects a scheme-relative url', () => {
-    expect(sanitizeHref('//evil.example/x')).toBeNull();
-  });
-
-  it('rejects an unparseable value', () => {
-    expect(sanitizeHref('not a url at all')).toBeNull();
-    expect(sanitizeHref('')).toBeNull();
-  });
-
-  it('rejects a percent-encoded javascript scheme, since it never parses as one', () => {
-    expect(sanitizeHref('javascript%3Aalert(1)')).toBeNull();
-  });
-
-  it('rejects an entity-encoded scheme, since it never parses as one', () => {
-    expect(sanitizeHref('&#106;avascript:alert(1)')).toBeNull();
-  });
-
-  it('strips a mailto query string containing percent-encoded CR/LF header injection', () => {
-    const result = sanitizeHref(
-      'mailto:a@b.com?subject=x%0d%0aBcc:evil@example.com',
-    );
-    expect(result).toBe('mailto:a@b.com');
-    expect(result).not.toMatch(/%0d%0a/i);
-  });
-
-  it('strips a benign mailto query string too', () => {
-    expect(sanitizeHref('mailto:someone@example.com?subject=hello')).toBe(
-      'mailto:someone@example.com',
-    );
-  });
-
-  it('rejects an http url carrying userinfo', () => {
-    expect(sanitizeHref('http://user@evil.example/')).toBeNull();
-  });
-
-  it('rejects an https url carrying userinfo with a password', () => {
-    expect(sanitizeHref('https://user:pass@evil.example/')).toBeNull();
-  });
-
-  it('rejects an https url whose userinfo looks like a trusted domain', () => {
-    expect(
-      sanitizeHref('https://trusted-looking.example@evil.example/'),
-    ).toBeNull();
+  it.each([
+    [
+      'percent-encoded CR/LF header injection',
+      `${MOCK_MAILTO}?subject=x%0d%0aBcc:${MOCK_USERNAME}@${MOCK_TRUSTED_DOMAIN}`,
+    ],
+    ['a benign subject', `${MOCK_MAILTO}?subject=hello`],
+  ])('strips a mailto query string holding %s', (_label, href) => {
+    expect(sanitizeHref(href)).toBe(MOCK_MAILTO);
   });
 });
