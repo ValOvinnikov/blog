@@ -23,12 +23,23 @@ import {
   MOCK_PRICING_NL_SLUG,
   MOCK_PRICING_SLUG,
 } from '@blog/service/testing/shared/translated-pages-dataset';
+import { faker } from '@faker-js/faker';
 
 import { landingPageQuery } from './query';
 
+faker.seed(6015108);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-const TEMPLATE_ID = 'template-about';
-const FAQ_PATH = 'modules/faq';
+const MOCK_TEMPLATE_ID = faker.string.uuid();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_EN_HEADING = faker.lorem.words(2);
+const MOCK_NL_HEADING = faker.lorem.words(3);
+const MOCK_LEGACY_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_SECTION_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_FAQ_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_ANSWERS_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_SIDEBAR_TITLE = faker.lorem.words(2);
+const MOCK_FAQ_PATH = `${MOCK_SECTION_SLUG}/${MOCK_FAQ_SLUG}`;
 
 function runAtPath(dataset: unknown[], segments: string[]): Promise<unknown> {
   return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
@@ -52,7 +63,7 @@ describe('landingPageQuery', () => {
       'with a headingBlock heading and supportingText',
       mockRawLandingPage({
         headingBlock: mockRawHeadingBlock(MOCK_ABOUT_PAGE_TITLE, {
-          supportingText: 'Who we are',
+          supportingText: MOCK_SUPPORTING_TEXT,
         }),
       }),
     ],
@@ -73,13 +84,13 @@ describe('landingPageQuery', () => {
     expect(landingPageQuery.parse(raw)?.translations).toBeNull();
   });
 
-  it('parses null as no matching page_landing document, rather than throwing', () => {
+  it('parses null as no matching page_landing document', () => {
     expect(landingPageQuery.parse(null)).toBeNull();
   });
 });
 
 describe('landingPageQuery language scoping', () => {
-  function landing(
+  function mockLandingDocument(
     id: string,
     slug: string,
     heading: string,
@@ -95,9 +106,23 @@ describe('landingPageQuery language scoping', () => {
   }
 
   const dataset = [
-    landing(MOCK_ABOUT_EN_PAGE_ID, MOCK_ABOUT_SLUG, 'About', EN),
-    landing(MOCK_ABOUT_NL_PAGE_ID, MOCK_ABOUT_SLUG, 'Over ons', NL),
-    landing('legacy', 'legacy', 'Legacy'),
+    mockLandingDocument(
+      MOCK_ABOUT_EN_PAGE_ID,
+      MOCK_ABOUT_SLUG,
+      MOCK_EN_HEADING,
+      EN,
+    ),
+    mockLandingDocument(
+      MOCK_ABOUT_NL_PAGE_ID,
+      MOCK_ABOUT_SLUG,
+      MOCK_NL_HEADING,
+      NL,
+    ),
+    mockLandingDocument(
+      faker.string.uuid(),
+      MOCK_LEGACY_SLUG,
+      faker.lorem.words(2),
+    ),
     MOCK_ABOUT_TRANSLATION_METADATA,
   ];
 
@@ -112,10 +137,10 @@ describe('landingPageQuery language scoping', () => {
 
   it('resolves the same slug to a different page per language', async () => {
     expect(await run(MOCK_ABOUT_SLUG, EN)).toMatchObject({
-      headingBlock: { heading: 'About' },
+      headingBlock: { heading: MOCK_EN_HEADING },
     });
     expect(await run(MOCK_ABOUT_SLUG, NL)).toMatchObject({
-      headingBlock: { heading: 'Over ons' },
+      headingBlock: { heading: MOCK_NL_HEADING },
     });
   });
 
@@ -124,8 +149,8 @@ describe('landingPageQuery language scoping', () => {
   });
 
   it('resolves nothing for a page with no language', async () => {
-    expect(await run('legacy', EN)).toBeNull();
-    expect(await run('legacy', NL)).toBeNull();
+    expect(await run(MOCK_LEGACY_SLUG, EN)).toBeNull();
+    expect(await run(MOCK_LEGACY_SLUG, NL)).toBeNull();
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
@@ -139,7 +164,11 @@ describe('landingPageQuery language scoping', () => {
 });
 
 describe('landingPageQuery template layout', () => {
-  function landing(id: string, language: string, template?: string) {
+  function mockLandingDocument(
+    id: string,
+    language: string,
+    template?: string,
+  ) {
     return {
       _id: id,
       _type: 'page_landing',
@@ -151,10 +180,10 @@ describe('landingPageQuery template layout', () => {
   }
 
   const dataset = [
-    landing(MOCK_ABOUT_EN_PAGE_ID, EN, TEMPLATE_ID),
-    landing(MOCK_ABOUT_NL_PAGE_ID, NL, TEMPLATE_ID),
+    mockLandingDocument(MOCK_ABOUT_EN_PAGE_ID, EN, MOCK_TEMPLATE_ID),
+    mockLandingDocument(MOCK_ABOUT_NL_PAGE_ID, NL, MOCK_TEMPLATE_ID),
     {
-      _id: TEMPLATE_ID,
+      _id: MOCK_TEMPLATE_ID,
       _type: 'template_landing',
       hero: mockReference(MOCK_HERO_MODULE_ID),
       modules: [
@@ -187,7 +216,9 @@ describe('landingPageQuery template layout', () => {
   );
 
   it('resolves no hero and no modules for a page without a template', async () => {
-    expect(await run([landing(MOCK_ABOUT_EN_PAGE_ID, EN)], EN)).toMatchObject({
+    const withoutTemplate = [mockLandingDocument(MOCK_ABOUT_EN_PAGE_ID, EN)];
+
+    expect(await run(withoutTemplate, EN)).toMatchObject({
       hero: null,
       modules: null,
     });
@@ -195,7 +226,7 @@ describe('landingPageQuery template layout', () => {
 });
 
 describe('landingPageQuery nested paths', () => {
-  function landing(id: string, slug: string, parent?: string) {
+  function mockLandingDocument(id: string, slug: string, parent?: string) {
     return {
       _id: id,
       _type: 'page_landing',
@@ -207,25 +238,29 @@ describe('landingPageQuery nested paths', () => {
   }
 
   const dataset = [
-    landing('modules', 'modules'),
-    landing('faq', 'faq', 'modules'),
-    landing(MOCK_PRICING_SLUG, MOCK_PRICING_SLUG),
+    mockLandingDocument(MOCK_SECTION_SLUG, MOCK_SECTION_SLUG),
+    mockLandingDocument(MOCK_FAQ_SLUG, MOCK_FAQ_SLUG, MOCK_SECTION_SLUG),
+    mockLandingDocument(MOCK_PRICING_SLUG, MOCK_PRICING_SLUG),
   ];
 
   it('resolves a nested page at its full path', async () => {
-    expect(await runAtPath(dataset, ['modules', 'faq'])).toMatchObject({
-      _id: 'faq',
-      path: FAQ_PATH,
-      headingBlock: { heading: 'faq' },
+    expect(
+      await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
+    ).toMatchObject({
+      _id: MOCK_FAQ_SLUG,
+      path: MOCK_FAQ_PATH,
+      headingBlock: { heading: MOCK_FAQ_SLUG },
     });
   });
 
   it('resolves nothing for a nested page at its bare slug', async () => {
-    expect(await runAtPath(dataset, ['faq'])).toBeNull();
+    expect(await runAtPath(dataset, [MOCK_FAQ_SLUG])).toBeNull();
   });
 
   it('resolves nothing for a top-level page under a parent it does not have', async () => {
-    expect(await runAtPath(dataset, ['modules', MOCK_PRICING_SLUG])).toBeNull();
+    expect(
+      await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_PRICING_SLUG]),
+    ).toBeNull();
   });
 
   it('resolves a top-level page at its slug', async () => {
@@ -236,7 +271,7 @@ describe('landingPageQuery nested paths', () => {
 });
 
 describe('landingPageQuery section chain', () => {
-  function landing(
+  function mockLandingDocument(
     id: string,
     {
       parent,
@@ -266,46 +301,65 @@ describe('landingPageQuery section chain', () => {
   }
 
   const dataset = [
-    landing('modules', {
+    mockLandingDocument(MOCK_SECTION_SLUG, {
       sectionNavigation: true,
-      sectionNavigationTitle: 'Guides',
+      sectionNavigationTitle: MOCK_SIDEBAR_TITLE,
     }),
-    landing(MOCK_PRICING_SLUG, { parent: 'modules', orderRank: '0|b' }),
-    landing('faq', { parent: 'modules', orderRank: '0|a' }),
-    landing(MOCK_PRICING_NL_SLUG, {
-      parent: 'modules',
+    mockLandingDocument(MOCK_PRICING_SLUG, {
+      parent: MOCK_SECTION_SLUG,
+      orderRank: '0|b',
+    }),
+    mockLandingDocument(MOCK_FAQ_SLUG, {
+      parent: MOCK_SECTION_SLUG,
+      orderRank: '0|a',
+    }),
+    mockLandingDocument(MOCK_PRICING_NL_SLUG, {
+      parent: MOCK_SECTION_SLUG,
       orderRank: '0|0',
       language: NL,
     }),
-    landing('answers', { parent: 'faq' }),
+    mockLandingDocument(MOCK_ANSWERS_SLUG, { parent: MOCK_FAQ_SLUG }),
   ];
 
   it('returns the page and its ancestors, nearest first', async () => {
     expect(
-      await runAtPath(dataset, ['modules', 'faq', 'answers']),
+      await runAtPath(dataset, [
+        MOCK_SECTION_SLUG,
+        MOCK_FAQ_SLUG,
+        MOCK_ANSWERS_SLUG,
+      ]),
     ).toMatchObject({
       sectionChain: [
-        { _id: 'answers', path: `${FAQ_PATH}/answers` },
-        { _id: 'faq', path: FAQ_PATH },
-        { _id: 'modules', path: 'modules' },
+        {
+          _id: MOCK_ANSWERS_SLUG,
+          path: `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`,
+        },
+        { _id: MOCK_FAQ_SLUG, path: MOCK_FAQ_PATH },
+        { _id: MOCK_SECTION_SLUG, path: MOCK_SECTION_SLUG },
       ],
     });
   });
 
   it("returns a section root's children in drag order, in the page's language", async () => {
-    expect(await runAtPath(dataset, ['modules', 'faq'])).toMatchObject({
+    expect(
+      await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
+    ).toMatchObject({
       sectionChain: [
-        { _id: 'faq', sectionNavigation: false, children: null },
+        { _id: MOCK_FAQ_SLUG, sectionNavigation: false, children: null },
         {
-          _id: 'modules',
-          title: 'modules heading',
+          _id: MOCK_SECTION_SLUG,
+          title: `${MOCK_SECTION_SLUG} heading`,
           sectionNavigation: true,
           children: [
-            { _id: 'faq', title: 'faq heading', path: FAQ_PATH },
+            {
+              _id: MOCK_FAQ_SLUG,
+              title: `${MOCK_FAQ_SLUG} heading`,
+              path: MOCK_FAQ_PATH,
+            },
             {
               _id: MOCK_PRICING_SLUG,
-              title: 'pricing heading',
-              path: 'modules/pricing',
+              title: `${MOCK_PRICING_SLUG} heading`,
+              path: `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`,
             },
           ],
         },
@@ -314,10 +368,12 @@ describe('landingPageQuery section chain', () => {
   });
 
   it("returns each page's sidebar title, or null where none is set", async () => {
-    expect(await runAtPath(dataset, ['modules', 'faq'])).toMatchObject({
+    expect(
+      await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
+    ).toMatchObject({
       sectionChain: [
-        { _id: 'faq', sectionNavigationTitle: null },
-        { _id: 'modules', sectionNavigationTitle: 'Guides' },
+        { _id: MOCK_FAQ_SLUG, sectionNavigationTitle: null },
+        { _id: MOCK_SECTION_SLUG, sectionNavigationTitle: MOCK_SIDEBAR_TITLE },
       ],
     });
   });

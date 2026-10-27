@@ -1,8 +1,9 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import {
+  MOCK_TOPIC_DESCRIPTION,
+  MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
   MOCK_TOPIC_TITLE,
-  mockRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
@@ -14,23 +15,26 @@ import {
 } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_PAGE_TOPIC_CACHE_TAG,
-  MOCK_TEMPLATE_TOPIC_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  MOCK_TEMPLATE_TOPIC_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
+  MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getTopicPageDocument } from './loader';
 import { topicPageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const DESCRIPTION = 'Posts about engineering.';
-const CURATED_HEADING = 'Engineering, curated';
-const ENTITY = { ...mockRawTopic(), description: DESCRIPTION };
+faker.seed(601601);
+
+const MOCK_CURATED_HEADING = faker.lorem.words(3);
+const MOCK_META_TITLE = faker.lorem.sentence();
 
 const tenant = mockTenant();
 
@@ -49,31 +53,29 @@ describe(getTopicPageDocument, () => {
     mockRun.mockResolvedValue(mockRawTopicPage());
   });
 
-  it('loads a topic page with no list module in modules[]', async () => {
-    mockRun.mockResolvedValueOnce(mockRawTopicPage({ modules: [] }));
+  it('maps a page with no modules to an empty module list', async () => {
+    const { modules } = await loadPage({ modules: null });
 
-    const result = await getTopicPageDocument(MOCK_TOPIC_SLUG, tenant);
-
-    expect(result).toBeDefined();
+    expect(modules).toEqual([]);
   });
 
   it('takes the topic from the referenced topic document', async () => {
-    const result = await loadPage({ topic: ENTITY });
+    const { topic } = await loadPage();
 
-    expect(result.topic).toEqual({
-      id: ENTITY._id,
+    expect(topic).toEqual({
+      id: MOCK_TOPIC_ID,
       title: MOCK_TOPIC_TITLE,
       slug: MOCK_TOPIC_SLUG,
-      description: DESCRIPTION,
+      description: MOCK_TOPIC_DESCRIPTION,
     });
   });
 
-  it('resolves seo from the authored value, with no unauthored description fallback', async () => {
+  it('leaves the seo description unset when none is authored', async () => {
     const { seo } = await loadPage({
-      seo: mockRawSeo({ metaTitle: MOCK_TOPIC_TITLE, metaDescription: null }),
+      seo: mockRawSeo({ metaTitle: MOCK_META_TITLE, metaDescription: null }),
     });
 
-    expect(seo.title).toBe(MOCK_TOPIC_TITLE);
+    expect(seo.title).toBe(MOCK_META_TITLE);
     expect(seo.description).toBeUndefined();
   });
 
@@ -84,18 +86,19 @@ describe(getTopicPageDocument, () => {
       MOCK_CURATED_SUPPORTING_TEXT,
     ],
     [
-      'leaves an unset supportingText undefined, never the topic description',
+      'leaves an unset supportingText undefined without using the topic description',
       null,
       undefined,
     ],
   ])('%s', async (_, supportingText, expected) => {
     const { headingBlock } = await loadPage({
-      topic: ENTITY,
-      headingBlock: mockRawHeadingBlock(CURATED_HEADING, { supportingText }),
+      headingBlock: mockRawHeadingBlock(MOCK_CURATED_HEADING, {
+        supportingText,
+      }),
     });
 
     expect(headingBlock).toEqual({
-      heading: CURATED_HEADING,
+      heading: MOCK_CURATED_HEADING,
       supportingText: expected,
     });
   });
@@ -115,9 +118,7 @@ describe(getTopicPageDocument, () => {
 
   it('rejects when page_topic.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      mockRawTopicPage({
-        hero: mockRawCtaRef() as never,
-      }),
+      mockRawTopicPage({ hero: mockRawCtaRef() as never }),
     );
 
     await expect(
@@ -128,7 +129,7 @@ describe(getTopicPageDocument, () => {
   it('resolves undefined when no page_topic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getTopicPageDocument('nonexistent', tenant);
+    const result = await getTopicPageDocument(MOCK_MISSING_ID, tenant);
 
     expect(result).toBeUndefined();
   });

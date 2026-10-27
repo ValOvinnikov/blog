@@ -17,15 +17,31 @@ import {
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { mockTranslationLink } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { postPageQuery } from './query';
 
-const EN_SLUG = 'my-article';
-const NL_SLUG = 'mijn-artikel';
-const EN_ID = 'article-en';
-const NL_ID = 'article-nl';
+faker.seed(6016);
+
+const MOCK_EN_SLUG = faker.lorem.slug();
+const MOCK_NL_SLUG = faker.lorem.slug();
+const MOCK_SCHEDULED_SLUG = faker.lorem.slug();
+const MOCK_EN_ID = faker.string.uuid();
+const MOCK_NL_ID = faker.string.uuid();
+const MOCK_SCHEDULED_ID = faker.string.uuid();
+const MOCK_METADATA_ID = faker.string.uuid();
+const MOCK_RICH_BLOCK_KEY = faker.string.uuid();
+const MOCK_LINK_MARK_KEY = faker.string.uuid();
+const MOCK_SPAN_KEY = faker.string.uuid();
+const MOCK_SPAN_TEXT = faker.lorem.words(2);
+const MOCK_ASIDE_KEY = faker.string.uuid();
+const MOCK_ASIDE_BLOCK_KEY = faker.string.uuid();
+const MOCK_ASIDE_SPAN_KEY = faker.string.uuid();
+const MOCK_ASIDE_TEXT = faker.lorem.sentence();
+const MOCK_PUBLISHED_AT = '2026-01-01T00:00:00Z';
+const MOCK_SCHEDULED_AT = '2999-01-01T00:00:00Z';
 const MODULE_REFS: TRawPostDetail['modules'] = [
-  { _id: 'related-1', _type: 'module_postRelated' },
+  { _id: faker.string.uuid(), _type: 'module_postRelated' },
 ];
 
 function parseBody(body: unknown[]) {
@@ -80,7 +96,7 @@ describe('postPageQuery', () => {
     expect(parseBody([block])).toEqual([block]);
   });
 
-  it('parses null as no matching page_post document, rather than throwing', () => {
+  it('parses null as no matching post', () => {
     expect(postPageQuery.parse(null)).toBeNull();
   });
 
@@ -106,19 +122,24 @@ describe('postPageQuery', () => {
   it('keeps every field of a rich text block intact', () => {
     const richBlock = {
       _type: 'block',
-      _key: 'block-1',
+      _key: MOCK_RICH_BLOCK_KEY,
       style: 'h2',
       listItem: 'bullet',
       level: 1,
       markDefs: [
         {
           _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-          _key: 'link-1',
+          _key: MOCK_LINK_MARK_KEY,
           link: mockRawExternalLinkDocument(),
         },
       ],
       children: [
-        { _type: 'span', _key: 'span-1', text: 'Hello', marks: ['strong'] },
+        {
+          _type: 'span',
+          _key: MOCK_SPAN_KEY,
+          text: MOCK_SPAN_TEXT,
+          marks: ['strong'],
+        },
       ],
     };
 
@@ -128,14 +149,16 @@ describe('postPageQuery', () => {
   it('keeps a rich aside block intact alongside a bodyImage block', () => {
     const asideBlock = {
       _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-      _key: 'aside-1',
+      _key: MOCK_ASIDE_KEY,
       kind: ASIDE_KIND.WHY_NOT,
       body: [
         {
           _type: 'block',
-          _key: 'aside-block-1',
+          _key: MOCK_ASIDE_BLOCK_KEY,
           style: 'normal',
-          children: [{ _type: 'span', _key: 'aside-span-1', text: 'Because.' }],
+          children: [
+            { _type: 'span', _key: MOCK_ASIDE_SPAN_KEY, text: MOCK_ASIDE_TEXT },
+          ],
           markDefs: null,
         },
       ],
@@ -156,7 +179,7 @@ describe('postPageQuery language scoping', () => {
     id: string,
     slug: string,
     language: string,
-    publishedAt = '2026-01-01T00:00:00Z',
+    publishedAt = MOCK_PUBLISHED_AT,
   ) {
     return {
       _id: id,
@@ -168,15 +191,15 @@ describe('postPageQuery language scoping', () => {
   }
 
   const dataset = [
-    post(EN_ID, EN_SLUG, EN),
-    post(NL_ID, NL_SLUG, NL),
-    post('scheduled-nl', 'later', NL, '2999-01-01T00:00:00Z'),
+    post(MOCK_EN_ID, MOCK_EN_SLUG, EN),
+    post(MOCK_NL_ID, MOCK_NL_SLUG, NL),
+    post(MOCK_SCHEDULED_ID, MOCK_SCHEDULED_SLUG, NL, MOCK_SCHEDULED_AT),
     {
-      _id: 'meta-article',
+      _id: MOCK_METADATA_ID,
       _type: 'translation.metadata',
       translations: [
-        mockTranslationLink(EN, EN_ID),
-        mockTranslationLink(NL, NL_ID),
+        mockTranslationLink(EN, MOCK_EN_ID),
+        mockTranslationLink(NL, MOCK_NL_ID),
       ],
     },
   ];
@@ -190,20 +213,20 @@ describe('postPageQuery language scoping', () => {
   }
 
   it('resolves a slug only in the language the post is authored in', async () => {
-    expect(await run(NL_SLUG, NL)).toMatchObject({ _id: NL_ID });
-    expect(await run(NL_SLUG, EN)).toBeNull();
-    expect(await run(EN_SLUG, FR)).toBeNull();
+    expect(await run(MOCK_NL_SLUG, NL)).toMatchObject({ _id: MOCK_NL_ID });
+    expect(await run(MOCK_NL_SLUG, EN)).toBeNull();
+    expect(await run(MOCK_EN_SLUG, FR)).toBeNull();
   });
 
-  it('hard-404s a scheduled post', async () => {
-    expect(await run('later', NL)).toBeNull();
+  it('resolves nothing for a scheduled post', async () => {
+    expect(await run(MOCK_SCHEDULED_SLUG, NL)).toBeNull();
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run(NL_SLUG, NL)).toMatchObject({
+    expect(await run(MOCK_NL_SLUG, NL)).toMatchObject({
       translations: [
-        { language: EN, slug: EN_SLUG },
-        { language: NL, slug: NL_SLUG },
+        { language: EN, slug: MOCK_EN_SLUG },
+        { language: NL, slug: MOCK_NL_SLUG },
       ],
     });
   });

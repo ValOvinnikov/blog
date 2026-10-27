@@ -3,14 +3,23 @@ import {
   MOCK_TOPIC_ID,
   MOCK_TOPIC_SLUG,
 } from '@blog/service/testing/entities/fixtures';
-import { mockListModuleRefs } from '@blog/service/testing/pages/fixtures';
+import {
+  mockListModuleRefs,
+  mockSlugPageDocument,
+} from '@blog/service/testing/pages/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { MOCK_TRANSLATED_POST_DOCUMENTS } from '@blog/service/testing/shared/translated-posts-dataset';
+import { faker } from '@faker-js/faker';
 
 import { topicPaginationParamsQuery } from './query';
 
+faker.seed(601605);
+
 const { EN, NL } = LOCALE_ISO_CODES;
+const MOCK_EN_SLUG = faker.lorem.slug();
+const MOCK_NL_SLUG = faker.lorem.slug();
+const MOCK_EMPTY_SLUG = faker.lorem.slug();
 
 describe('topicPaginationParamsQuery', () => {
   it.each([
@@ -26,7 +35,7 @@ describe('topicPaginationParamsQuery', () => {
     ],
     [
       'with no modules and zero posts',
-      [{ slug: 'empty', moduleRefs: null, postCount: 0 }],
+      [{ slug: MOCK_EMPTY_SLUG, moduleRefs: null, postCount: 0 }],
     ],
   ])('parses a topic page %s', (_, raw) => {
     expect(() => topicPaginationParamsQuery.parse(raw)).not.toThrow();
@@ -35,34 +44,30 @@ describe('topicPaginationParamsQuery', () => {
   it('counts the published posts on the topic in the topic page language', async () => {
     const dataset = [
       ...MOCK_TRANSLATED_POST_DOCUMENTS,
-      {
-        _id: 'page-en',
+      mockSlugPageDocument({
         _type: 'page_topic',
         topic: mockReference(MOCK_TOPIC_ID),
-        slug: { current: 'design' },
+        slug: MOCK_EN_SLUG,
         language: EN,
-      },
-      {
-        _id: 'page-nl',
+      }),
+      mockSlugPageDocument({
         _type: 'page_topic',
         topic: mockReference(MOCK_TOPIC_ID),
-        slug: { current: 'ontwerp' },
+        slug: MOCK_NL_SLUG,
         language: NL,
-      },
+      }),
     ];
 
-    expect(
-      await evaluateGroqExpression(
-        topicPaginationParamsQuery.query,
-        dataset,
-        null,
-        {
-          locales: [EN, NL],
-        },
-      ),
-    ).toMatchObject([
-      { slug: 'design', language: EN, postCount: 3 },
-      { slug: 'ontwerp', language: NL, postCount: 1 },
+    const result = await evaluateGroqExpression(
+      topicPaginationParamsQuery.query,
+      dataset,
+      null,
+      { locales: [EN, NL] },
+    );
+
+    expect(result).toMatchObject([
+      { slug: MOCK_EN_SLUG, language: EN, postCount: 3 },
+      { slug: MOCK_NL_SLUG, language: NL, postCount: 1 },
     ]);
   });
 });

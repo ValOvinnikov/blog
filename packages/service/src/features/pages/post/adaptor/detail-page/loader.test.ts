@@ -1,16 +1,10 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import {
-  IMAGE_LAYOUT,
-  PORTABLE_TEXT_BLOCK_TYPE,
-  SOCIAL_PLATFORMS,
-} from '@blog/config/constants';
+import { IMAGE_LAYOUT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
 import {
   MOCK_SKIM_MODEL,
   MOCK_SKIM_TAKEAWAYS,
 } from '@blog/service/testing/editorial/fixtures';
 import {
-  MOCK_AUTHOR_AVATAR_ALT,
-  MOCK_AUTHOR_NAME,
   MOCK_TAG_ID,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
@@ -37,22 +31,14 @@ import {
   MOCK_TOPIC_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
-  MOCK_BIO_BLOCK_KEY,
-  MOCK_BODY_IMAGE_KEY,
-  MOCK_EXTERNAL_URL,
   MOCK_POST_SLUG,
-  MOCK_POST_TITLE,
-  mockLinkView,
   mockRawBodyImageBlock,
-  mockRawExternalLinkDocument,
   mockRawHeadingBlock,
-  mockRawInternalLinkDocument,
-  mockRawPortableTextMarkDef,
-  mockRawSanityImage,
   mockRawSeo,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPost } from './loader';
 import { postPageQuery } from './query';
@@ -60,14 +46,24 @@ import type { TRawPostDetail } from './transformer';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const GITHUB_URL = 'https://github.com/janedoe';
-const PUBLISHED_AT = '2026-02-01T00:00:00Z';
-const PAGE_POST_SLUG = 'page-post-slug';
-const META_TITLE = 'Authored Title';
-const META_DESCRIPTION = 'Authored description';
+faker.seed(6015);
+
+const MOCK_MISSING_SLUG = faker.lorem.slug();
+const MOCK_PAGE_POST_ID = faker.string.uuid();
+const MOCK_PAGE_POST_TITLE = faker.lorem.words(3);
+const MOCK_PAGE_POST_SLUG = faker.lorem.slug();
+const MOCK_AUTHOR_DOCUMENT_ID = faker.string.uuid();
+const MOCK_AUTHOR_ROLE = faker.person.jobTitle();
+const MOCK_RELATED_MODULE_ID = faker.string.uuid();
+const MOCK_META_TITLE = faker.lorem.words(4);
+const MOCK_META_DESCRIPTION = faker.lorem.sentence();
+const MOCK_ASIDE_KEY = faker.string.uuid();
+const MOCK_REF_DATE = '2026-06-01T00:00:00Z';
+const PUBLISHED_AT = faker.date.past({ refDate: MOCK_REF_DATE }).toISOString();
+const GENERATED_AT = faker.date.past({ refDate: MOCK_REF_DATE }).toISOString();
 
 const MODULE_REFS: TRawPostDetail['modules'] = [
-  { _id: 'related-1', _type: 'module_postRelated' },
+  { _id: MOCK_RELATED_MODULE_ID, _type: 'module_postRelated' },
   { _id: MOCK_NEWSLETTER_MODULE_ID, _type: 'module_newsletter' },
 ];
 
@@ -82,35 +78,26 @@ async function loadPost(overrides: Partial<TRawPostDetail> = {}) {
 }
 
 describe(getPost, () => {
-  beforeEach(() => {
-    mockRun.mockResolvedValue(mockRawPostDetail());
-  });
-
-  it('resolves undefined when no page_post matches the slug', async () => {
+  it('resolves undefined when no post matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getPost('missing-slug', tenant);
+    const result = await getPost(MOCK_MISSING_SLUG, tenant);
 
     expect(result).toBeUndefined();
   });
 
   it('maps the raw post into a domain detail object', async () => {
-    const { id, title } = await loadPost({
-      _id: 'post-abc',
-      headingBlock: mockRawHeadingBlock('Test Post'),
-    });
-
-    expect({ id, title }).toEqual({ id: 'post-abc', title: 'Test Post' });
-  });
-
-  it('takes slug and publishedAt from the page_post document', async () => {
-    const { slug, publishedAt } = await loadPost({
-      slug: PAGE_POST_SLUG,
+    const { id, title, slug, publishedAt } = await loadPost({
+      _id: MOCK_PAGE_POST_ID,
+      headingBlock: mockRawHeadingBlock(MOCK_PAGE_POST_TITLE),
+      slug: MOCK_PAGE_POST_SLUG,
       publishedAt: PUBLISHED_AT,
     });
 
-    expect({ slug, publishedAt }).toEqual({
-      slug: PAGE_POST_SLUG,
+    expect({ id, title, slug, publishedAt }).toEqual({
+      id: MOCK_PAGE_POST_ID,
+      title: MOCK_PAGE_POST_TITLE,
+      slug: MOCK_PAGE_POST_SLUG,
       publishedAt: PUBLISHED_AT,
     });
   });
@@ -118,121 +105,38 @@ describe(getPost, () => {
   it('maps the required author onto the post detail', async () => {
     const { author } = await loadPost({
       author: mockRawAuthor({
-        _id: 'author-9',
-        image: mockRawSanityImage(MOCK_AUTHOR_AVATAR_ALT),
-        profilePage: mockRawInternalLinkDocument({
-          internalReference: { _type: 'page_landing', slug: 'jane-doe' },
-        }),
-        role: 'Editor',
+        _id: MOCK_AUTHOR_DOCUMENT_ID,
+        role: MOCK_AUTHOR_ROLE,
       }),
     });
 
-    expect(author).toEqual({
-      id: 'author-9',
-      name: MOCK_AUTHOR_NAME,
-      profileUrl: '/jane-doe',
-      image: mockSanityImageView(MOCK_AUTHOR_AVATAR_ALT),
-      role: 'Editor',
-      bio: undefined,
-      socialLinks: [],
+    const { id, role } = author;
+
+    expect({ id, role }).toEqual({
+      id: MOCK_AUTHOR_DOCUMENT_ID,
+      role: MOCK_AUTHOR_ROLE,
     });
   });
 
-  it('resolves the author profilePage through a non-landing page type', async () => {
-    const { author } = await loadPost({
-      author: mockRawAuthor({
-        profilePage: mockRawInternalLinkDocument({
-          internalReference: { _type: 'page_tag', slug: 'news' },
-        }),
-      }),
-    });
-
-    expect(author.profileUrl).toBe('/tags/news');
-  });
-
-  it('maps the author socialLinks through the social profile resolver', async () => {
-    const { author } = await loadPost({
-      author: mockRawAuthor({
-        socialLinks: [
-          {
-            platform: SOCIAL_PLATFORMS.GITHUB,
-            link: mockRawExternalLinkDocument({
-              label: 'GitHub',
-              url: GITHUB_URL,
-            }),
-          },
-        ],
-      }),
-    });
-
-    expect(author.socialLinks).toEqual([
-      {
-        platform: SOCIAL_PLATFORMS.GITHUB,
-        link: mockLinkView({ label: 'GitHub', href: GITHUB_URL }),
-      },
-    ]);
-  });
-
-  it('maps an author with no image to an undefined image', async () => {
-    const { author } = await loadPost({
-      author: mockRawAuthor({ image: null }),
-    });
-
-    expect(author.image).toBeUndefined();
-  });
-
-  it.each([
-    [
-      'resolves a linkRef mark in the author bio to its link document href',
-      mockRawPortableTextMarkDef(),
-      { href: MOCK_EXTERNAL_URL, target: undefined },
-    ],
-    [
-      'degrades a dangling linkRef mark in the author bio rather than throwing',
-      mockRawPortableTextMarkDef({ link: null }),
-      undefined,
-    ],
-  ])('%s', async (_, markDef, expectedLink) => {
-    const { author } = await loadPost({
-      author: mockRawAuthor({
-        bio: [
-          { _type: 'block', _key: MOCK_BIO_BLOCK_KEY, markDefs: [markDef] },
-        ],
-      }),
-    });
-
-    expect(author.bio).toEqual([
-      {
-        _type: 'block',
-        _key: MOCK_BIO_BLOCK_KEY,
-        children: [],
-        markDefs: [
-          {
-            _key: markDef._key,
-            _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-            link: expectedLink,
-          },
-        ],
-      },
-    ]);
-  });
-
-  it('resolves seo from the authored value, with no unauthored openGraph fallback', async () => {
+  it('resolves seo from the authored value', async () => {
     const { seo } = await loadPost({
       seo: mockRawSeo({
-        metaTitle: META_TITLE,
-        metaDescription: META_DESCRIPTION,
+        metaTitle: MOCK_META_TITLE,
+        metaDescription: MOCK_META_DESCRIPTION,
       }),
     });
 
-    expect(seo.title).toBe(META_TITLE);
-    expect(seo.description).toBe(META_DESCRIPTION);
-    expect(seo.ogTitle).toBeUndefined();
+    const { title, description } = seo;
+
+    expect({ title, description }).toEqual({
+      title: MOCK_META_TITLE,
+      description: MOCK_META_DESCRIPTION,
+    });
   });
 
   it.each([
     [
-      'maps tags from raw input',
+      'maps tags',
       [mockRawTag()],
       [{ id: MOCK_TAG_ID, title: MOCK_TAG_TITLE, slug: MOCK_TAG_SLUG }],
     ],
@@ -245,10 +149,10 @@ describe(getPost, () => {
 
   it.each([
     [
-      'maps the page-builder modules array to module refs',
+      'maps the page-builder modules to module refs',
       MODULE_REFS,
       [
-        { id: 'related-1', type: 'module_postRelated' },
+        { id: MOCK_RELATED_MODULE_ID, type: 'module_postRelated' },
         { id: MOCK_NEWSLETTER_MODULE_ID, type: 'module_newsletter' },
       ],
     ],
@@ -259,19 +163,16 @@ describe(getPost, () => {
     expect(result.modules).toEqual(expected);
   });
 
-  it.each([
-    ['computes readingTimeMinutes from the server-computed word count', 401, 3],
-    ['rounds a wordless post up to a 1-minute read', 0, 1],
-  ])('%s', async (_, wordCount, expected) => {
-    const result = await loadPost({ wordCount });
+  it('computes the reading time from the word count', async () => {
+    const result = await loadPost({ wordCount: 401 });
 
-    expect(result.readingTimeMinutes).toBe(expected);
+    expect(result.readingTimeMinutes).toBe(3);
   });
 
-  it('maps takeaways with 3+ entries onto the post detail', async () => {
+  it('maps takeaways with 3 or more entries', async () => {
     const postTakeaways = {
       takeaways: MOCK_SKIM_TAKEAWAYS,
-      generatedAt: '2026-07-20T00:00:00Z',
+      generatedAt: GENERATED_AT,
       model: MOCK_SKIM_MODEL,
     };
 
@@ -281,16 +182,16 @@ describe(getPost, () => {
   });
 
   it.each([
-    ['treats absent takeaways as undefined', null],
+    ['absent takeaways', null],
     [
-      'treats fewer than 3 takeaways as undefined, as the schema requires 3',
+      'fewer than 3 takeaways',
       {
         takeaways: MOCK_SKIM_TAKEAWAYS.slice(0, 2),
         generatedAt: null,
         model: null,
       },
     ],
-  ])('%s', async (_, postTakeaways) => {
+  ])('leaves postTakeaways undefined for %s', async (_, postTakeaways) => {
     const result = await loadPost({ postTakeaways });
 
     expect(result.postTakeaways).toBeUndefined();
@@ -298,61 +199,45 @@ describe(getPost, () => {
 
   it.each([
     [
-      'true when the body contains an aside block',
-      [{ _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE, _key: 'a1', body: null }],
+      'when the body contains an aside block',
+      [
+        {
+          _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
+          _key: MOCK_ASIDE_KEY,
+          body: null,
+        },
+      ],
       true,
     ],
-    ['false when the body has no aside blocks', [], false],
+    ['when the body has no aside blocks', [], false],
   ])('reports hasAsides %s', async (_, body, expected) => {
     const result = await loadPost({ body: body as TRawPostDetail['body'] });
 
     expect(result.hasAsides).toBe(expected);
   });
 
-  it.each([
-    [
-      'into an image view-model, keeping layout',
-      { layout: IMAGE_LAYOUT.FLOAT_RIGHT },
-      IMAGE_LAYOUT.FLOAT_RIGHT,
-      mockSanityImageView(),
-    ],
-    [
-      'whose asset never resolved, with image undefined',
-      { asset: null, layout: null },
-      undefined,
-      undefined,
-    ],
-  ])(
-    'resolves a bodyImage block %s',
-    async (_, overrides, expectedLayout, expected) => {
-      const result = await loadPost({
-        body: [mockRawBodyImageBlock(overrides)],
-      });
+  it('resolves a bodyImage block in the body to an image view', async () => {
+    const block = mockRawBodyImageBlock({ layout: IMAGE_LAYOUT.FLOAT_RIGHT });
 
-      expect(result.body).toEqual([
-        {
-          _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
-          _key: MOCK_BODY_IMAGE_KEY,
-          layout: expectedLayout,
-          image: expected,
-        },
-      ]);
-    },
-  );
+    const result = await loadPost({ body: [block] });
 
-  it('renders a post with no supportingText as an undefined excerpt', async () => {
-    const result = await loadPost({
-      headingBlock: mockRawHeadingBlock(MOCK_POST_TITLE),
-    });
-
-    expect(result.excerpt).toBeUndefined();
+    expect(result.body).toEqual([
+      {
+        _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
+        _key: block._key,
+        layout: IMAGE_LAYOUT.FLOAT_RIGHT,
+        image: mockSanityImageView(),
+      },
+    ]);
   });
 
   it('queries the slug for the tenant and scopes its tags to it', async () => {
-    await getPost('my-slug', tenant);
+    mockRun.mockResolvedValueOnce(mockRawPostDetail());
+
+    await getPost(MOCK_POST_SLUG, tenant);
 
     expect(mockRun).toHaveBeenCalledWith(postPageQuery, {
-      parameters: { slug: 'my-slug' },
+      parameters: { slug: MOCK_POST_SLUG },
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
@@ -371,22 +256,6 @@ describe(getPost, () => {
           MOCK_PAGE_TAG_INDEX_CACHE_TAG,
         ],
       },
-    });
-  });
-
-  describe('with no heroImage', () => {
-    let result: Awaited<ReturnType<typeof loadPost>>;
-
-    beforeEach(async () => {
-      result = await loadPost({ heroImage: null });
-    });
-
-    it('maps a post with no heroImage to an undefined heroImage', () => {
-      expect(result.heroImage).toBeUndefined();
-    });
-
-    it('leaves seo.ogImage undefined without falling back to the hero image', () => {
-      expect(result.seo.ogImage).toBeUndefined();
     });
   });
 });

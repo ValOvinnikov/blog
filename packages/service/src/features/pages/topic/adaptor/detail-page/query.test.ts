@@ -1,22 +1,29 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import {
-  MOCK_TOPIC_SLUG,
-  MOCK_TOPIC_TITLE,
-} from '@blog/service/testing/entities/fixtures';
+import { MOCK_TOPIC_TITLE } from '@blog/service/testing/entities/fixtures';
 import {
   MOCK_TEMPLATE_REFERENCE,
   mockRawCtaRef,
   mockRawHeroRef,
   mockRawPostLatestRef,
   mockRawTopicPage,
+  mockSlugPageDocument,
   mockTemplateLayoutDocuments,
   mockTemplatedPageDocument,
+  mockTranslatedSlugPageDocuments,
 } from '@blog/service/testing/pages/fixtures';
 import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
-import { mockTranslationLink } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { topicPageQuery } from './query';
+
+faker.seed(601603);
+
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+const MOCK_PAGE_SLUG = faker.lorem.slug();
+const MOCK_POST_LIST_MODULE_ID = faker.string.uuid();
+const MOCK_EN_HEADING = faker.lorem.words(2);
+const MOCK_NL_HEADING = faker.lorem.words(2);
 
 describe('topicPageQuery', () => {
   it.each([
@@ -25,7 +32,7 @@ describe('topicPageQuery', () => {
       'with a list module alongside other modules, and SEO',
       mockRawTopicPage({
         modules: [
-          { _id: 'post-list-1', _type: 'module_postList' },
+          { _id: MOCK_POST_LIST_MODULE_ID, _type: 'module_postList' },
           mockRawCtaRef(),
         ],
         seo: {
@@ -51,110 +58,82 @@ describe('topicPageQuery', () => {
     expect(() => topicPageQuery.parse(raw)).toThrow();
   });
 
-  it('parses null as no matching page_topic document, rather than throwing', () => {
+  it('parses null as no matching page_topic document', () => {
     expect(topicPageQuery.parse(null)).toBeNull();
   });
 });
 
 describe('topicPageQuery template layout', () => {
-  const templateRef = MOCK_TEMPLATE_REFERENCE;
-  const templatedPageFields = {
-    slug: { current: MOCK_TOPIC_SLUG },
-    language: LOCALE_ISO_CODES.EN,
-  };
   const dataset = mockTemplateLayoutDocuments({ _type: 'template_topic' });
+  const pageFields = { slug: MOCK_PAGE_SLUG, language: EN };
 
   function run(data: unknown[]): Promise<unknown> {
     return evaluateGroqExpression(topicPageQuery.query, data, null, {
-      slug: MOCK_TOPIC_SLUG,
-      locale: LOCALE_ISO_CODES.EN,
+      slug: MOCK_PAGE_SLUG,
+      locale: EN,
     });
   }
 
   it('resolves the hero and modules of the template the topic page references', async () => {
-    expect(
-      await run([
-        mockTemplatedPageDocument({
-          _type: 'page_topic',
-          template: templateRef,
-          ...templatedPageFields,
-        }),
-        ...dataset,
-      ]),
-    ).toMatchObject({
+    const page = mockTemplatedPageDocument({
+      ...mockSlugPageDocument({ _type: 'page_topic', ...pageFields }),
+      template: MOCK_TEMPLATE_REFERENCE,
+    });
+
+    const result = await run([page, ...dataset]);
+
+    expect(result).toMatchObject({
       hero: mockRawHeroRef(),
       modules: [mockRawPostLatestRef()],
     });
   });
 
   it('resolves no hero and no modules for a topic page without a template', async () => {
-    expect(
-      await run([
-        mockTemplatedPageDocument({
-          _type: 'page_topic',
-          ...templatedPageFields,
-        }),
-        ...dataset,
-      ]),
-    ).toMatchObject({
-      hero: null,
-      modules: null,
-    });
+    const page = mockSlugPageDocument({ _type: 'page_topic', ...pageFields });
+
+    const result = await run([page, ...dataset]);
+
+    expect(result).toMatchObject({ hero: null, modules: null });
   });
 });
 
 describe('topicPageQuery language scoping', () => {
-  const { EN, NL, FR } = LOCALE_ISO_CODES;
-
-  function page(id: string, heading: string, language: string) {
-    return {
-      _id: id,
-      _type: 'page_topic',
-      slug: { current: 'design' },
-      headingBlock: { heading },
-      language,
-    };
-  }
-
-  const dataset = [
-    page('design-en', 'Design', EN),
-    page('design-nl', 'Ontwerp', NL),
-    {
-      _id: 'meta-design',
-      _type: 'translation.metadata',
-      translations: [
-        mockTranslationLink(EN, 'design-en'),
-        mockTranslationLink(NL, 'design-nl'),
-      ],
-    },
-  ];
+  const dataset = mockTranslatedSlugPageDocuments({
+    _type: 'page_topic',
+    slug: MOCK_PAGE_SLUG,
+    headings: { [EN]: MOCK_EN_HEADING, [NL]: MOCK_NL_HEADING },
+  });
 
   function run(locale: string): Promise<unknown> {
     return evaluateGroqExpression(topicPageQuery.query, dataset, null, {
-      slug: 'design',
+      slug: MOCK_PAGE_SLUG,
       locale,
       defaultLocale: EN,
     });
   }
 
-  it('resolves the same slug to a different page per language', async () => {
-    expect(await run(EN)).toMatchObject({
-      headingBlock: { heading: 'Design' },
-    });
-    expect(await run(NL)).toMatchObject({
-      headingBlock: { heading: 'Ontwerp' },
-    });
+  it.each([
+    [EN, MOCK_EN_HEADING],
+    [NL, MOCK_NL_HEADING],
+  ])('resolves the %s page for the same slug', async (locale, heading) => {
+    const result = await run(locale);
+
+    expect(result).toMatchObject({ headingBlock: { heading } });
   });
 
   it('resolves nothing for a language the page is not authored in', async () => {
-    expect(await run(FR)).toBeNull();
+    const result = await run(FR);
+
+    expect(result).toBeNull();
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run(NL)).toMatchObject({
+    const result = await run(NL);
+
+    expect(result).toMatchObject({
       translations: [
-        { language: EN, slug: 'design' },
-        { language: NL, slug: 'design' },
+        { language: EN, slug: MOCK_PAGE_SLUG },
+        { language: NL, slug: MOCK_PAGE_SLUG },
       ],
     });
   });
