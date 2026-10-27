@@ -41,6 +41,7 @@ describe(`<${PageShell.name}/>`, () => {
     );
 
     const main = screen.getByRole('main');
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(Array.from(main.children).map((el) => el.tagName)).toEqual([
       'H1',
       'P',
@@ -69,7 +70,9 @@ describe(`<${PageShell.name}/>`, () => {
     );
 
     const main = screen.getByRole('main');
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(main.children).toHaveLength(1);
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(screen.getByTestId('content').parentElement).toBe(main);
   });
 
@@ -83,6 +86,7 @@ describe(`<${PageShell.name}/>`, () => {
     );
 
     const main = screen.getByRole('main');
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(main.children).toHaveLength(1);
   });
 
@@ -114,7 +118,9 @@ describe(`<${PageShell.name}/>`, () => {
     );
 
     const main = screen.getByRole('main');
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(screen.getByTestId('heading').parentElement).toBe(main);
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(screen.getByTestId('content').parentElement).toBe(main);
   });
 

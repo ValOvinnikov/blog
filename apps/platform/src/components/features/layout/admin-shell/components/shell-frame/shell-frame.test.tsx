@@ -3,6 +3,9 @@ import { useSelectedLayoutSegment } from 'next/navigation';
 
 import { ShellFrame } from './shell-frame';
 
+const CONTRAST_NOTICE = 'Contrast check due';
+const DATA_COLLAPSED = 'data-collapsed';
+
 describe(ShellFrame, () => {
   afterEach(() => {
     vi.mocked(useSelectedLayoutSegment).mockReturnValue(null);
@@ -45,9 +48,9 @@ describe(ShellFrame, () => {
       </ShellFrame>,
     );
 
-    expect(screen.getByText('Contrast check due')).toBeVisible();
+    expect(screen.getByText(CONTRAST_NOTICE)).toBeVisible();
     expect(screen.getByRole('main')).not.toContainElement(
-      screen.getByText('Contrast check due'),
+      screen.getByText(CONTRAST_NOTICE),
     );
   });
 
@@ -62,8 +65,9 @@ describe(ShellFrame, () => {
       </ShellFrame>,
     );
 
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #5993
     const boundary = screen.getByText('Sidebar').parentElement;
-    expect(boundary).toHaveAttribute('data-collapsed', 'true');
+    expect(boundary).toHaveAttribute(DATA_COLLAPSED, 'true');
   });
 
   it('defaults the sidebar-collapse boundary to expanded when the prop is omitted', () => {
@@ -73,7 +77,8 @@ describe(ShellFrame, () => {
       </ShellFrame>,
     );
 
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #5993
     const boundary = screen.getByText('Sidebar').parentElement;
-    expect(boundary).not.toHaveAttribute('data-collapsed');
+    expect(boundary).not.toHaveAttribute(DATA_COLLAPSED);
   });
 });

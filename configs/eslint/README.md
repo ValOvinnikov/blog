@@ -115,6 +115,15 @@
   wrapped call is what the rule sees.) Verify any change to this list by
   editing it and running `pnpm lint` from root — it should stay green.
 
+  `no-node-access` also reports only in a file that imports an official
+  `@testing-library/*` module or the `testing-library/utils-module`, so that
+  setting is `testing/custom-render` — the plugin matches it as an import
+  suffix, which covers `@blog/ui/`, `@web/` and `@platform/testing/custom-render`
+  at once. Without it the rule is silent in every test importing `screen`
+  from a wrapper. The setting also turns off aggressive module detection for
+  the other two rules, which is harmless here because every test imports
+  `screen` from one of those wrappers or from `@testing-library/react`.
+
   Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
   were baselined the same way as `no-class-assertions` while epics #3461
   and #3522 drained them; that drain is complete, no

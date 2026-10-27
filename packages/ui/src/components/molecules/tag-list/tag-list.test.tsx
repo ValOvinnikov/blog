@@ -24,6 +24,7 @@ describe(`<${TagList.name}/>`, () => {
 
   it('returns null when tags is empty', () => {
     const { container } = setup({ tags: [] });
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
     expect(container.firstChild).toBeNull();
   });
 

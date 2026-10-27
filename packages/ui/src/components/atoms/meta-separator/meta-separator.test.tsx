@@ -13,16 +13,19 @@ describe(`<${MetaSeparator.name}/>`, () => {
     });
 
     it('renders the default · character', () => {
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       expect(container.firstChild).toHaveTextContent('·');
     });
 
     it('has aria-hidden="true"', () => {
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       expect(container.firstChild).toHaveAttribute('aria-hidden', 'true');
     });
   });
 
   it('renders a custom separator', () => {
     const { container } = setup({ separator: '/' });
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
     expect(container.firstChild).toHaveTextContent('/');
   });
 });

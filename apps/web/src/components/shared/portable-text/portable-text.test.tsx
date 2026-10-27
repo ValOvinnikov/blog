@@ -273,6 +273,7 @@ describe(`<${PortableText.name}/>`, () => {
     );
 
     const host = screen.getByTestId(HOST_TEST_ID);
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6007
     const tagNames = Array.from(host.children, (child) => child.tagName);
 
     expect(tagNames).toEqual(['H2', 'P', 'P']);

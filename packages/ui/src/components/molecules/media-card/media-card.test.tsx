@@ -256,9 +256,12 @@ describe(`<${MediaCard.name}/>`, () => {
     const article = screen.getByRole('article');
 
     if (isSplit) {
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       expect(media.parentElement).not.toBe(article);
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       expect(media.parentElement?.parentElement).toBe(article);
     } else {
+      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
       expect(media.parentElement).toBe(article);
     }
   });

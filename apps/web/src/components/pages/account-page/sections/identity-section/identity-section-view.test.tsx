@@ -68,6 +68,7 @@ describe(`<${IdentitySectionView.name}/>`, () => {
     });
 
     const googleHeading = screen.getByRole('heading', { name: 'Google' });
+    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
     expect(googleHeading.parentElement).not.toHaveTextContent('Linked');
   });
 

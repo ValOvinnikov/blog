@@ -115,6 +115,7 @@ export default [
       'testing-library': testingLibrary,
     },
     settings: {
+      'testing-library/utils-module': 'testing/custom-render',
       'testing-library/custom-renders': [
         'setup',
         'customRender',
