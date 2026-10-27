@@ -1,118 +1,78 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TTenant } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { eq } from 'drizzle-orm';
+import {
+  MOCK_IDLE_PROVISIONING_STEPS,
+  MOCK_SEEDED_AT,
+} from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { clearTenantProvisioningArtifacts } from './clear-tenant-provisioning-artifacts';
 
 vi.mock('@blog/db/client');
 
-const MOCK_ACME_DOMAIN = 'acme.example.com';
+faker.seed(6020);
 
 const db = useQueryTestDb();
+useFrozenClock();
 
-async function insertProvisionedTenant(): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: MOCK_ACME_DOMAIN,
-      sanityProjectId: 'proj123',
-      sanityDataset: 'production',
-      sanityReadTokenEncrypted: 'encrypted-token',
-      sanityWriteTokenEncrypted: 'encrypted-write-token',
-      seededAt: new Date('2026-08-15T12:00:00.000Z'),
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      provisioningSteps: {
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        },
-      },
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
+const MOCK_DONE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
 
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(clearTenantProvisioningArtifacts, () => {
-  let tenantId: string;
+  let tenant: TTenant;
+  let cleared: TTenant;
 
   beforeEach(async () => {
-    tenantId = await insertProvisionedTenant();
-  });
-
-  it('nulls every provisioning column except sanityProjectId/sanityDataset — the archived project still exists', async () => {
-    await clearTenantProvisioningArtifacts(tenantId);
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row).toMatchObject({
-      sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+    tenant = await insertTestTenant(db(), {
+      sanityReadTokenEncrypted: faker.string.alphanumeric(32),
+      sanityWriteTokenEncrypted: faker.string.alphanumeric(32),
+      seededAt: MOCK_SEEDED_AT,
+      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      provisioningSteps: {
+        ...MOCK_IDLE_PROVISIONING_STEPS,
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: MOCK_DONE_STEP,
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: MOCK_DONE_STEP,
+        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: MOCK_DONE_STEP,
+        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: MOCK_DONE_STEP,
+        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: MOCK_DONE_STEP,
+        [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: MOCK_DONE_STEP,
+      },
+    });
+    cleared = {
+      ...tenant,
       sanityReadTokenEncrypted: null,
       sanityWriteTokenEncrypted: null,
       provisioningStatus: null,
       provisioningSteps: null,
       seededAt: null,
-    });
+      updatedAt: MOCK_NOW,
+    };
   });
 
-  it('leaves identity columns untouched', async () => {
-    await clearTenantProvisioningArtifacts(tenantId);
+  it('nulls every provisioning column but keeps the archived Sanity project', async () => {
+    await clearTenantProvisioningArtifacts(tenant.id);
 
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row).toMatchObject({
-      name: 'Acme',
-      primaryDomain: MOCK_ACME_DOMAIN,
-    });
+    const rows = await db().select().from(schema.tenants);
+    expect(rows).toEqual([cleared]);
   });
 
   it('is safe to call again once already cleared', async () => {
-    await clearTenantProvisioningArtifacts(tenantId);
-    await expect(
-      clearTenantProvisioningArtifacts(tenantId),
-    ).resolves.toBeUndefined();
+    await clearTenantProvisioningArtifacts(tenant.id);
+
+    await clearTenantProvisioningArtifacts(tenant.id);
+
+    const rows = await db().select().from(schema.tenants);
+    expect(rows).toEqual([cleared]);
   });
 });

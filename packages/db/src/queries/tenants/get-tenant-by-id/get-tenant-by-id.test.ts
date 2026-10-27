@@ -1,14 +1,16 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_DEPROVISIONED_AT,
+  MOCK_MISSING_TENANT_ID,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantById } from './get-tenant-by-id';
 
 vi.mock('@blog/db/client');
-
-const MOCK_ACME_DOMAIN = 'acme.example.com';
-const NO_TENANT_ROW = 'setup: tenant insert returned no row.';
 
 const db = useQueryTestDb();
 
@@ -18,63 +20,38 @@ afterEach(async () => {
 
 describe(getTenantById, () => {
   it('returns the row for an existing id', async () => {
-    const [inserted] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Acme',
-        primaryDomain: MOCK_ACME_DOMAIN,
-        sanityProjectId: 'abc123',
-        sanityDataset: 'production',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-      })
-      .returning();
-    if (!inserted) throw new Error(NO_TENANT_ROW);
+    const tenant = await insertTestTenant(db());
 
-    const result = await getTenantById(inserted.id);
+    const result = await getTenantById(tenant.id);
 
-    expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
+    expect(result).toEqual(tenant);
   });
 
   describe('a deprovisioned tenant', () => {
-    let inserted: typeof schema.tenants.$inferSelect;
+    let tenant: TTenant;
 
     beforeEach(async () => {
-      const [row] = await db()
-        .insert(schema.tenants)
-        .values({
-          name: 'Acme',
-          primaryDomain: MOCK_ACME_DOMAIN,
-          sanityProjectId: 'abc123',
-          sanityDataset: 'production',
-          locale: LOCALE_ISO_CODES.EN,
-          plan: TENANT_PLAN.FREE,
-          status: TENANT_STATUS.ARCHIVED,
-          deprovisionedAt: new Date(),
-        })
-        .returning();
-      if (!row) throw new Error(NO_TENANT_ROW);
-      inserted = row;
+      tenant = await insertTestTenant(db(), {
+        status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: MOCK_DEPROVISIONED_AT,
+      });
     });
 
     it('excludes a deprovisioned tenant by default', async () => {
-      const result = await getTenantById(inserted.id);
+      const result = await getTenantById(tenant.id);
 
       expect(result).toBeUndefined();
     });
 
     it('returns a deprovisioned tenant when includeArchived is true', async () => {
-      const result = await getTenantById(inserted.id, {
-        includeArchived: true,
-      });
+      const result = await getTenantById(tenant.id, { includeArchived: true });
 
-      expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
+      expect(result).toEqual(tenant);
     });
   });
 
   it('returns undefined for an id with no row', async () => {
-    const result = await getTenantById('00000000-0000-0000-0000-000000000000');
+    const result = await getTenantById(MOCK_MISSING_TENANT_ID);
 
     expect(result).toBeUndefined();
   });

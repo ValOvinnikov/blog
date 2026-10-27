@@ -4,7 +4,9 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
@@ -21,22 +23,17 @@ import { startProvisioningRun } from './start-provisioning-run';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock(new Date(MOCK_RUN_AT));
 
-const DONE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-
-beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(new Date(MOCK_RUN_AT));
-});
+const MOCK_DONE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
 
 afterEach(async () => {
   await db().delete(schema.tenants);
-  vi.useRealTimers();
 });
 
 describe(startProvisioningRun, () => {
   describe('a tenant with default steps', () => {
-    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
+    let tenant: TTenant;
 
     beforeEach(async () => {
       tenant = await insertTestTenant(db());
@@ -66,7 +63,7 @@ describe(startProvisioningRun, () => {
       expect(provisioningSteps?.run).toEqual({ startedAt: MOCK_RUN_AT });
     });
 
-    it('replaces a previous run wholesale rather than merging', async () => {
+    it('replaces a previous run wholesale', async () => {
       await startProvisioningRun({
         tenantId: tenant.id,
         registry: MOCK_PROVISIONING_REGISTRY,
@@ -86,7 +83,7 @@ describe(startProvisioningRun, () => {
     const tenant = await insertTestTenant(db(), {
       provisioningSteps: {
         ...MOCK_IDLE_PROVISIONING_STEPS,
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: DONE_STEP,
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: MOCK_DONE_STEP,
       },
     });
 
@@ -96,7 +93,7 @@ describe(startProvisioningRun, () => {
 
     expect(
       provisioningSteps?.[TENANT_PROVISIONING_STEP.SANITY_PROJECT],
-    ).toEqual(DONE_STEP);
+    ).toEqual(MOCK_DONE_STEP);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

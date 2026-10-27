@@ -8,6 +8,7 @@ import {
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_IDLE_PROVISIONING_STEPS,
@@ -22,20 +23,15 @@ import { updateProvisioningStep } from './update-provisioning-step';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock(new Date(MOCK_RUN_AT));
 
 const { SANITY_PROJECT, SEED_CONTENT, MAP_DOMAIN, OWNER_ELEVATION } =
   TENANT_PROVISIONING_STEP;
 const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 const { STALLED } = ELEVATE_TENANT_OWNER_OUTCOME;
 
-beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(new Date(MOCK_RUN_AT));
-});
-
 afterEach(async () => {
   await db().delete(schema.tenants);
-  vi.useRealTimers();
 });
 
 describe(updateProvisioningStep, () => {

@@ -65,7 +65,7 @@ describe(setTenantRevalidateWebhookSecret, () => {
       .from(tenants)
       .where(eq(tenants.id, other.id));
 
-    expect(row?.revalidateWebhookSecretEncrypted).toBeNull();
+    expect(row).toEqual(other);
   });
 
   it('throws when the encryption key is not configured', async () => {
