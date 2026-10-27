@@ -90,7 +90,7 @@ export const createTenantAction = async (
   const { name, slug, plan, ownerEmail, confirmOwnerInviteToken } = parsed.data;
   const domain = `${slug}.${rootDomain}`;
 
-  const owner = await queries.users.getUserByEmail(ownerEmail);
+  const owner = await queries.users.findUserByEmail(ownerEmail);
   if (!owner && !verifyOwnerInviteToken(ownerEmail, confirmOwnerInviteToken)) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,

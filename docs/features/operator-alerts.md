@@ -52,8 +52,8 @@ the email in the platform's own look, and sends it.
     `isCritical`.
     It carries no address, tenant name or HTML. The route validates it with Zod
     and looks the tenant up itself.
-- Recipients: `listSuperadminEmails`, the `users.email` of every `admins` row
-  with role SUPERADMIN.
+- Recipients: `listSuperadminEmails`, the decrypted account email of every
+  `admins` row with role SUPERADMIN.
 - Dedupe state lives with the sender, not the route:
   `tenants.lastNotifiedOwnerElevationOutcome` for owner elevation, and the
   finding's `isNewlyOpened` for document validation (see

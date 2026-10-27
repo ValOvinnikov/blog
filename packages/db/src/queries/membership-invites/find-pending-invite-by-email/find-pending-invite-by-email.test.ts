@@ -1,27 +1,45 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  PERSONAL_DATA_FALLBACK_REASON,
+  PERSONAL_DATA_OWNER,
+} from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import {
+  usePersonalDataFallbackListener,
+  usePersonalDataKeys,
+} from '@blog/db/testing/personal-data';
+import { taggedMixedCaseAddress } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { findPendingInviteByEmail } from './find-pending-invite-by-email';
 
 vi.mock('@blog/db/client');
 
+faker.seed(5765);
+
 const db = useQueryTestDb();
+usePersonalDataKeys();
+const fallbackListener = usePersonalDataFallbackListener();
+
+const MOCK_TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);
+const MOCK_CONSUMED_AT = faker.date.past();
 
 async function insertInvite(
-  tenantId: string,
-  email: string,
-  consumed = false,
-): Promise<void> {
+  overrides: Partial<typeof schema.membershipInvites.$inferInsert> = {},
+): Promise<string> {
+  const { id: tenantId } = await insertTestTenant(db());
   await db()
     .insert(schema.membershipInvites)
     .values({
       tenantId,
-      email,
+      ...inviteEmailColumns(MOCK_INVITE_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
-      consumedAt: consumed ? new Date() : null,
+      ...overrides,
     });
+  return tenantId;
 }
 
 afterEach(async () => {
@@ -30,57 +48,99 @@ afterEach(async () => {
 });
 
 describe(findPendingInviteByEmail, () => {
-  let tenantId: string;
+  it('returns every pending invite across tenants, skipping consumed ones', async () => {
+    const pendingTenantId = await insertInvite();
+    const secondPendingTenantId = await insertInvite();
+    await insertInvite({ consumedAt: MOCK_CONSUMED_AT });
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('returns a pending invite matching the normalized email', async () => {
-    await insertInvite(tenantId, MOCK_INVITE_EMAIL);
-
-    const results = await findPendingInviteByEmail(
+    const invites = await findPendingInviteByEmail(
       MOCK_INVITE_EMAIL.toUpperCase(),
     );
 
-    expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ tenantId, email: MOCK_INVITE_EMAIL });
-  });
-
-  it('matches an email padded with leading/trailing whitespace', async () => {
-    await insertInvite(tenantId, MOCK_INVITE_EMAIL);
-
-    const results = await findPendingInviteByEmail(`  ${MOCK_INVITE_EMAIL}  `);
-
-    expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({ tenantId, email: MOCK_INVITE_EMAIL });
-  });
-
-  it('excludes already-consumed invites', async () => {
-    await insertInvite(tenantId, MOCK_INVITE_EMAIL, true);
-
-    const results = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
-
-    expect(results).toHaveLength(0);
-  });
-
-  it('returns every pending invite across multiple tenants for the same email', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await insertInvite(tenantOneId, MOCK_INVITE_EMAIL);
-    await insertInvite(tenantTwoId, MOCK_INVITE_EMAIL);
-
-    const results = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
-
-    expect(results).toHaveLength(2);
-    expect(results.map((invite) => invite.tenantId).sort()).toEqual(
-      [tenantOneId, tenantTwoId].sort(),
+    expect(invites.map(({ tenantId }) => tenantId).sort()).toEqual(
+      [pendingTenantId, secondPendingTenantId].sort(),
     );
   });
 
-  it('returns an empty array when no invite matches', async () => {
-    const results = await findPendingInviteByEmail('nobody@example.com');
+  it('matches an address padded with whitespace', async () => {
+    const tenantId = await insertInvite();
 
-    expect(results).toEqual([]);
+    const invites = await findPendingInviteByEmail(`  ${MOCK_INVITE_EMAIL}  `);
+
+    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+  });
+
+  it('finds an invite sent to a +tag address by that exact address', async () => {
+    const tenantId = await insertInvite(
+      inviteEmailColumns(MOCK_TAGGED_INVITE_EMAIL),
+    );
+
+    const invites = await findPendingInviteByEmail(MOCK_TAGGED_INVITE_EMAIL);
+
+    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+  });
+
+  it.each([
+    [
+      'a +tag variant of an invited address',
+      MOCK_INVITE_EMAIL,
+      MOCK_TAGGED_INVITE_EMAIL,
+    ],
+    [
+      'the plain address of an invited +tag variant',
+      MOCK_TAGGED_INVITE_EMAIL,
+      MOCK_INVITE_EMAIL,
+    ],
+  ])('finds nothing for %s', async (_label, sentTo, requested) => {
+    await insertInvite(inviteEmailColumns(sentTo));
+
+    await expect(findPendingInviteByEmail(requested)).resolves.toEqual([]);
+  });
+
+  it('matches an invite not yet backfilled by its plain email, and reports it', async () => {
+    const tenantId = await insertInvite({
+      emailEncrypted: null,
+      emailIndex: null,
+    });
+
+    const invites = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
+
+    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.INVITE,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
+    });
+  });
+
+  it('returns nothing for an address with no invite', async () => {
+    await insertInvite();
+
+    await expect(
+      findPendingInviteByEmail(faker.internet.email()),
+    ).resolves.toEqual([]);
+  });
+
+  describe('while the index key is unset', () => {
+    beforeEach(() => {
+      vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
+    });
+
+    it.each([
+      ['a re-cased address', MOCK_INVITE_EMAIL.toUpperCase()],
+      ['a padded address', `  ${MOCK_INVITE_EMAIL}  `],
+    ])(
+      'matches an invite by its plain email for %s, and reports it',
+      async (_label, email) => {
+        const tenantId = await insertInvite();
+
+        const invites = await findPendingInviteByEmail(email);
+
+        expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+        expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+          owner: PERSONAL_DATA_OWNER.INVITE,
+          reason: PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET,
+        });
+      },
+    );
   });
 });

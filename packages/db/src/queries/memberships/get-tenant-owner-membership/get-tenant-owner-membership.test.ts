@@ -5,6 +5,7 @@ import {
   PERSONAL_DATA_OWNER,
   type TMembershipRole,
 } from '@blog/db/constants';
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import {
   MOCK_EMAIL_VERIFIED_AT,
@@ -20,20 +21,23 @@ import {
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { isNull } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 
 import { getTenantOwnerMembership } from './get-tenant-owner-membership';
 
 vi.mock('@blog/db/client');
 
+faker.seed(5765);
+
 const db = useQueryTestDb();
 usePersonalDataKeys();
 const fallbackListener = usePersonalDataFallbackListener();
 
-const EDITOR_EMAIL = 'editor@example.com';
-const SIGNED_IN_EMAIL = 'signed-in@example.com';
-const INVITED_EMAIL = 'invited@example.com';
-const MEMBER_USER_ID = 'user-1';
+const MOCK_EDITOR_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_SIGNED_IN_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_INVITED_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_MEMBER_USER_ID = faker.string.uuid();
 
 afterEach(async () => {
   await db().delete(schema.memberships);
@@ -49,18 +53,28 @@ describe(getTenantOwnerMembership, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
+  async function insertMembership(
+    role: TMembershipRole,
+  ): Promise<schema.TMembership> {
+    const [membership] = await db()
+      .insert(schema.memberships)
+      .values({ userId: MOCK_MEMBER_USER_ID, tenantId, role })
+      .returning();
+    if (!membership) throw new Error('failed to seed a membership row');
+    return membership;
+  }
+
   async function insertMember(
     email: TMaybeNull<string>,
     role: TMembershipRole,
     emailVerified: TMaybeNull<Date> = MOCK_EMAIL_VERIFIED_AT,
   ): Promise<schema.TMembership> {
-    await insertTestUser(db(), { id: MEMBER_USER_ID, email, emailVerified });
-    const [membership] = await db()
-      .insert(schema.memberships)
-      .values({ userId: MEMBER_USER_ID, tenantId, role })
-      .returning();
-    if (!membership) throw new Error('failed to seed a membership row');
-    return membership;
+    await insertTestUser(db(), {
+      id: MOCK_MEMBER_USER_ID,
+      emailVerified,
+      ...(isNull(email) ? {} : userPersonalColumns({ email })),
+    });
+    return insertMembership(role);
   }
 
   async function insertInvite({
@@ -88,7 +102,7 @@ describe(getTenantOwnerMembership, () => {
     return invite;
   }
 
-  it('returns a signed-in OWNER as joined when the membership row was made', async () => {
+  it('returns a signed-in OWNER as joined, decrypted and without a notice', async () => {
     const membership = await insertMember(
       MOCK_OWNER_EMAIL,
       MEMBERSHIP_ROLE.OWNER,
@@ -100,6 +114,28 @@ describe(getTenantOwnerMembership, () => {
       email: MOCK_OWNER_EMAIL,
       hasSignedIn: true,
       joinedAt: membership.createdAt,
+    });
+    expect(fallbackListener).not.toHaveBeenCalled();
+  });
+
+  it('reads a joined OWNER not yet backfilled from the plain email, and reports it', async () => {
+    await insertTestUser(db(), {
+      id: MOCK_MEMBER_USER_ID,
+      email: MOCK_OWNER_EMAIL,
+      emailVerified: MOCK_EMAIL_VERIFIED_AT,
+    });
+    const membership = await insertMembership(MEMBERSHIP_ROLE.OWNER);
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toEqual({
+      email: MOCK_OWNER_EMAIL,
+      hasSignedIn: true,
+      joinedAt: membership.createdAt,
+    });
+    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
+      owner: PERSONAL_DATA_OWNER.USER,
+      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
     });
   });
 
@@ -125,7 +161,7 @@ describe(getTenantOwnerMembership, () => {
       MEMBERSHIP_ROLE.OWNER,
       null,
     );
-    await insertTestAccount(db(), MEMBER_USER_ID, MOCK_OAUTH_PROVIDER);
+    await insertTestAccount(db(), MOCK_MEMBER_USER_ID, MOCK_OAUTH_PROVIDER);
 
     const result = await getTenantOwnerMembership(tenantId);
 
@@ -137,7 +173,7 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('ignores a non-OWNER membership on the same tenant', async () => {
-    await insertMember(EDITOR_EMAIL, MEMBERSHIP_ROLE.EDITOR);
+    await insertMember(MOCK_EDITOR_EMAIL, MEMBERSHIP_ROLE.EDITOR);
 
     const result = await getTenantOwnerMembership(tenantId);
 
@@ -160,7 +196,7 @@ describe(getTenantOwnerMembership, () => {
     });
   });
 
-  it('reads a pending OWNER invite not yet backfilled from its plain email, and reports it', async () => {
+  it('reads a pending OWNER invite not yet backfilled from plain, and reports it', async () => {
     const [invite] = await db()
       .insert(schema.membershipInvites)
       .values({
@@ -198,8 +234,8 @@ describe(getTenantOwnerMembership, () => {
 
   it('ignores a non-OWNER invite on the same tenant', async () => {
     await insertInvite({
-      email: EDITOR_EMAIL,
-      encryptedEmail: EDITOR_EMAIL,
+      email: MOCK_EDITOR_EMAIL,
+      encryptedEmail: MOCK_EDITOR_EMAIL,
       role: MEMBERSHIP_ROLE.EDITOR,
     });
 
@@ -210,22 +246,40 @@ describe(getTenantOwnerMembership, () => {
 
   it('prefers a real OWNER membership over a pending invite', async () => {
     const membership = await insertMember(
-      SIGNED_IN_EMAIL,
+      MOCK_SIGNED_IN_EMAIL,
       MEMBERSHIP_ROLE.OWNER,
     );
     await insertInvite({
-      email: INVITED_EMAIL,
-      encryptedEmail: INVITED_EMAIL,
+      email: MOCK_INVITED_EMAIL,
+      encryptedEmail: MOCK_INVITED_EMAIL,
       role: MEMBERSHIP_ROLE.OWNER,
     });
 
     const result = await getTenantOwnerMembership(tenantId);
 
     expect(result).toEqual({
-      email: SIGNED_IN_EMAIL,
+      email: MOCK_SIGNED_IN_EMAIL,
       hasSignedIn: true,
       joinedAt: membership.createdAt,
     });
+  });
+
+  it('returns the pending invite when the joined OWNER has no address', async () => {
+    await insertMember(null, MEMBERSHIP_ROLE.OWNER);
+    const invite = await insertInvite({
+      email: MOCK_INVITED_EMAIL,
+      encryptedEmail: MOCK_INVITED_EMAIL,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toEqual({
+      email: MOCK_INVITED_EMAIL,
+      hasSignedIn: false,
+      invitedAt: invite.createdAt,
+    });
+    expect(fallbackListener).not.toHaveBeenCalled();
   });
 
   it('returns undefined when the tenant has no OWNER membership or invite', async () => {
@@ -234,7 +288,7 @@ describe(getTenantOwnerMembership, () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the owner user has no email on file and no invite is pending', async () => {
+  it('returns undefined when the joined OWNER has no address and no invite', async () => {
     await insertMember(null, MEMBERSHIP_ROLE.OWNER);
 
     const result = await getTenantOwnerMembership(tenantId);

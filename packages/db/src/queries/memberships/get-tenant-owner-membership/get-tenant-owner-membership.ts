@@ -6,6 +6,7 @@ import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import {
   readPersonalValue,
+  readReportedPersonalValue,
   reportPlainPersonalRead,
 } from '@blog/db/utils/personal-data/personal-data';
 import { userHasSignedIn } from '@blog/db/utils/user-has-signed-in/user-has-signed-in';
@@ -24,6 +25,7 @@ export async function getTenantOwnerMembership(
   const [owner] = await db
     .select({
       email: users.email,
+      emailEncrypted: users.emailEncrypted,
       createdAt: memberships.createdAt,
       hasSignedIn: userHasSignedIn(),
     })
@@ -35,11 +37,18 @@ export async function getTenantOwnerMembership(
         eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
       ),
     );
-  if (owner?.email) {
-    const { email, createdAt, hasSignedIn } = owner;
-    return hasSignedIn
-      ? { email, hasSignedIn, joinedAt: createdAt }
-      : { email, hasSignedIn, invitedAt: createdAt };
+  if (owner) {
+    const { email: plainEmail, emailEncrypted, createdAt, hasSignedIn } = owner;
+    const email = readReportedPersonalValue(
+      PERSONAL_DATA_OWNER.USER,
+      emailEncrypted,
+      plainEmail,
+    );
+    if (email) {
+      return hasSignedIn
+        ? { email, hasSignedIn, joinedAt: createdAt }
+        : { email, hasSignedIn, invitedAt: createdAt };
+    }
   }
 
   const [invite] = await db
