@@ -353,7 +353,10 @@ never reads state, props, handlers or markup shape.
 
   A React element-tree walk (`ui.props.children`, any read of a returned
   element's props) is the same banned walk one level up: render the element
-  and query the result.
+  and query the result. The one exception is a root layout test: a layout
+  that returns `<html>` cannot mount inside jsdom's container, so it reads
+  the returned element's props under an `eslint-disable-next-line
+testing-library/no-node-access` that gives this reason.
 
   A component that renders nothing is the one sanctioned use of `container`:
   `const { container } = setup(…); expect(container).toBeEmptyDOMElement();`.
