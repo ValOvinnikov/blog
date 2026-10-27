@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config/constants';
 import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo/seo';
@@ -7,11 +8,16 @@ import {
 } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
+import { mockReference } from '@blog/studio/testing/mock-documents';
+import { MOCK_SYSTEM_FIELDS } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTagId, toTagPostListId } from './id';
 
 import migration, { buildTagMetaTitle } from './index';
+
+faker.seed(32);
 
 const metaTitleBounds = getRecordedBounds(getField(seoSchema, 'metaTitle'));
 const SEO_META_TITLE_MIN_LENGTH = metaTitleBounds.min!;
@@ -30,42 +36,45 @@ const PAGE_TEMPLATE_EXEMPTION: TExemptField = {
   reason: 'this migration creates page_tag with no template reference',
 };
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+const TAG_ITEMS_PER_PAGE = 9;
+const MOCK_TAG_ID = faker.string.uuid();
+const MOCK_TAG_TITLE = faker.lorem.word();
+const MOCK_TAG_SLUG = faker.lorem.slug();
+const MOCK_SHORT_TITLE = 'A';
+const MOCK_LONG_TITLE = 'A'.repeat(200);
 
-const tagDoc = {
-  ...baseDoc,
-  _id: 'abc123',
+const mockTagDoc = (fields: Record<string, unknown> = {}) => ({
+  ...MOCK_SYSTEM_FIELDS,
+  _id: MOCK_TAG_ID,
   _type: 'blog_tag',
-  title: 'React',
-  slug: { _type: 'slug', current: 'react' },
-};
+  title: MOCK_TAG_TITLE,
+  slug: { _type: 'slug', current: MOCK_TAG_SLUG },
+  ...fields,
+});
 
 describe('seed-page-tag-for-existing-tags migration', () => {
-  it('creates a module_postList and a page_tag referencing the tag and copying its slug', () => {
-    const postListId = toTagPostListId(tagDoc._id);
-    const pageTagId = toPageTagId(tagDoc._id);
-
+  it('creates a post list and a tag page copying the tag slug', () => {
+    const postListId = toTagPostListId(MOCK_TAG_ID);
     const postListPayload = {
       _id: postListId,
       _type: 'module_postList',
-      title: 'React Archive',
-      brandVariant: 'SECONDARY',
-      limit: 9,
-      pageSize: 9,
+      title: `${MOCK_TAG_TITLE} Archive`,
+      brandVariant: BRAND_VARIANT.SECONDARY,
+      limit: TAG_ITEMS_PER_PAGE,
+      pageSize: TAG_ITEMS_PER_PAGE,
       showImages: true,
     };
     const pageTagPayload = {
-      _id: pageTagId,
+      _id: toPageTagId(MOCK_TAG_ID),
       _type: 'page_tag',
-      title: 'React Tag Page',
-      slug: { _type: 'slug', current: 'react' },
-      tag: { _type: 'reference', _ref: tagDoc._id },
-      postList: { _type: 'reference', _ref: postListId },
-      seo: { _type: 'seo', metaTitle: buildTagMetaTitle('React') },
+      title: `${MOCK_TAG_TITLE} Tag Page`,
+      slug: { _type: 'slug', current: MOCK_TAG_SLUG },
+      tag: mockReference(MOCK_TAG_ID),
+      postList: mockReference(postListId),
+      seo: {
+        _type: 'seo',
+        metaTitle: `Browse every post tagged "${MOCK_TAG_TITLE}" on the blog`,
+      },
     };
 
     assertSatisfiesRequiredFields(
@@ -78,64 +87,36 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       PAGE_TEMPLATE_EXEMPTION,
     ]);
 
-    expect(migration.migrate.document(tagDoc)).toEqual([
+    expect(migration.migrate.document(mockTagDoc())).toEqual([
       createIfNotExists(postListPayload),
       createIfNotExists(pageTagPayload),
     ]);
   });
 
-  it('skips a drafts.blog_tag document, so the pair is not created twice', () => {
-    const draftDoc = { ...tagDoc, _id: `drafts.${tagDoc._id}` };
+  it('skips a draft tag so the pair is not created twice', () => {
+    const draftDoc = mockTagDoc({ _id: `drafts.${MOCK_TAG_ID}` });
 
     expect(migration.migrate.document(draftDoc)).toBeUndefined();
   });
 
-  it('is idempotent — a second run against the same tag returns the same createIfNotExists mutations', () => {
-    expect(migration.migrate.document(tagDoc)).toEqual(
-      migration.migrate.document(tagDoc),
-    );
+  it('returns the same createIfNotExists mutations on every run', () => {
+    const firstRun = migration.migrate.document(mockTagDoc());
+    const secondRun = migration.migrate.document(mockTagDoc());
+
+    expect(secondRun).toEqual(firstRun);
   });
+});
 
-  it('preserves the exact slug value from blog_tag, unmodified', () => {
-    const otherSlugDoc = {
-      ...tagDoc,
-      _id: 'xyz789',
-      title: 'TypeScript',
-      slug: { _type: 'slug', current: 'typescript' },
-    };
-
-    const [, pageTagMutation] = migration.migrate.document(otherSlugDoc)!;
-
-    const pageTagPayload = {
-      _id: toPageTagId(otherSlugDoc._id),
-      _type: 'page_tag',
-      title: 'TypeScript Tag Page',
-      slug: { _type: 'slug', current: 'typescript' },
-      tag: { _type: 'reference', _ref: otherSlugDoc._id },
-      postList: {
-        _type: 'reference',
-        _ref: toTagPostListId(otherSlugDoc._id),
-      },
-      seo: { _type: 'seo', metaTitle: buildTagMetaTitle('TypeScript') },
-    };
-
-    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload, [
-      ...HEADING_BLOCK_EXEMPTION,
-      PAGE_TEMPLATE_EXEMPTION,
-    ]);
-
-    expect(pageTagMutation).toEqual(createIfNotExists(pageTagPayload));
-  });
-
-  it('seeds a seo.metaTitle within bounds for a one-character tag title', () => {
-    const metaTitle = buildTagMetaTitle('A');
+describe(buildTagMetaTitle, () => {
+  it('stays within the bounds for a one-character tag title', () => {
+    const metaTitle = buildTagMetaTitle(MOCK_SHORT_TITLE);
 
     expect(metaTitle.length).toBeGreaterThanOrEqual(SEO_META_TITLE_MIN_LENGTH);
     expect(metaTitle.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
   });
 
-  it('clamps a seo.metaTitle built from a very long tag title to the ceiling', () => {
-    const metaTitle = buildTagMetaTitle('A'.repeat(200));
+  it('clamps a very long tag title to the ceiling', () => {
+    const metaTitle = buildTagMetaTitle(MOCK_LONG_TITLE);
 
     expect(metaTitle.length).toBe(SEO_META_TITLE_MAX_LENGTH);
   });

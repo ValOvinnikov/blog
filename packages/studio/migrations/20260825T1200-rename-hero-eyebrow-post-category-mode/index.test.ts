@@ -3,10 +3,12 @@ import { at, set } from 'sanity/migrate';
 
 import { renameHeroEyebrowPostCategoryMode } from './index';
 
+const LEGACY_POST_CATEGORY_MODE = 'POST_CATEGORY';
+
 describe(renameHeroEyebrowPostCategoryMode, () => {
-  it('renames a legacy POST_CATEGORY value to POST_TOPIC', () => {
+  it('renames the legacy post category mode to the post topic mode', () => {
     const result = renameHeroEyebrowPostCategoryMode({
-      heroEyebrowMode: 'POST_CATEGORY',
+      heroEyebrowMode: LEGACY_POST_CATEGORY_MODE,
     });
 
     expect(result).toEqual([
@@ -14,25 +16,12 @@ describe(renameHeroEyebrowPostCategoryMode, () => {
     ]);
   });
 
-  it('leaves a CUSTOM mode untouched', () => {
-    const result = renameHeroEyebrowPostCategoryMode({
-      heroEyebrowMode: HERO_FIELD_MODE.CUSTOM,
-    });
+  it.each([HERO_FIELD_MODE.CUSTOM, HERO_FIELD_MODE.POST_TOPIC, undefined])(
+    'leaves a %s eyebrow mode alone',
+    (heroEyebrowMode) => {
+      const result = renameHeroEyebrowPostCategoryMode({ heroEyebrowMode });
 
-    expect(result).toBeUndefined();
-  });
-
-  it('leaves an unset heroEyebrowMode untouched', () => {
-    const result = renameHeroEyebrowPostCategoryMode({});
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is idempotent for an already-migrated POST_TOPIC value', () => {
-    const result = renameHeroEyebrowPostCategoryMode({
-      heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
-    });
-
-    expect(result).toBeUndefined();
-  });
+      expect(result).toBeUndefined();
+    },
+  );
 });

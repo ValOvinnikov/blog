@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { at, set, unset } from 'sanity/migrate';
 
 import {
@@ -5,8 +6,14 @@ import {
   renameRequiredHeadingBlockType,
 } from './index';
 
+faker.seed(5105);
+
+const MOCK_HEADING = faker.lorem.words();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_MOVED_HEADING = faker.lorem.words();
+
 describe(renameRequiredHeadingBlockType, () => {
-  it('rewrites headingBlock._type from requiredHeadingBlock to headingBlock', () => {
+  it('rewrites headingBlock._type to headingBlock', () => {
     const result = renameRequiredHeadingBlockType({
       headingBlock: { _type: 'requiredHeadingBlock' },
     });
@@ -14,24 +21,14 @@ describe(renameRequiredHeadingBlockType, () => {
     expect(result).toEqual([at('headingBlock._type', set('headingBlock'))]);
   });
 
-  it('is keyed off headingBlock._type, not the document type — applies the same to page_post, module_cta and module_newsletter shapes', () => {
-    const shape = { headingBlock: { _type: 'requiredHeadingBlock' } };
-
-    expect(renameRequiredHeadingBlockType(shape)).toEqual([
-      at('headingBlock._type', set('headingBlock')),
-    ]);
-  });
-
-  it('is idempotent — a doc already on headingBlock is left alone', () => {
-    const result = renameRequiredHeadingBlockType({
-      headingBlock: { _type: 'headingBlock' },
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is a no-op for a doc with no headingBlock at all', () => {
-    const result = renameRequiredHeadingBlockType({});
+  it.each([
+    [
+      'a doc already on headingBlock',
+      { headingBlock: { _type: 'headingBlock' } },
+    ],
+    ['a doc with no headingBlock', {}],
+  ])('produces no patch for %s', (_name, doc) => {
+    const result = renameRequiredHeadingBlockType(doc);
 
     expect(result).toBeUndefined();
   });
@@ -40,8 +37,8 @@ describe(renameRequiredHeadingBlockType, () => {
 describe(moveHeroStatementHeadingFields, () => {
   it('moves heading and supportingText onto headingBlock, then unsets both', () => {
     const result = moveHeroStatementHeadingFields({
-      heading: 'We build things.',
-      supportingText: 'Carefully, with intent.',
+      heading: MOCK_HEADING,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
 
     expect(result).toEqual([
@@ -49,8 +46,8 @@ describe(moveHeroStatementHeadingFields, () => {
         'headingBlock',
         set({
           _type: 'headingBlock',
-          heading: 'We build things.',
-          supportingText: 'Carefully, with intent.',
+          heading: MOCK_HEADING,
+          supportingText: MOCK_SUPPORTING_TEXT,
         }),
       ),
       at('heading', unset()),
@@ -58,31 +55,26 @@ describe(moveHeroStatementHeadingFields, () => {
     ]);
   });
 
-  it('omits supportingText from the built value and its unset when absent', () => {
-    const result = moveHeroStatementHeadingFields({
-      heading: 'We build things.',
-    });
+  it('leaves supportingText out of the value and the unsets when absent', () => {
+    const result = moveHeroStatementHeadingFields({ heading: MOCK_HEADING });
 
     expect(result).toEqual([
-      at(
-        'headingBlock',
-        set({ _type: 'headingBlock', heading: 'We build things.' }),
-      ),
+      at('headingBlock', set({ _type: 'headingBlock', heading: MOCK_HEADING })),
       at('heading', unset()),
     ]);
   });
 
-  it('is idempotent — a doc already on headingBlock is left alone, even with legacy fields still present', () => {
-    const result = moveHeroStatementHeadingFields({
-      heading: 'Old',
-      headingBlock: { _type: 'headingBlock', heading: 'Already moved' },
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is a no-op for a doc with neither heading nor headingBlock', () => {
-    const result = moveHeroStatementHeadingFields({});
+  it.each([
+    [
+      'a doc already on headingBlock, legacy fields included',
+      {
+        heading: MOCK_HEADING,
+        headingBlock: { _type: 'headingBlock', heading: MOCK_MOVED_HEADING },
+      },
+    ],
+    ['a doc with neither heading nor headingBlock', {}],
+  ])('produces no patch for %s', (_name, doc) => {
+    const result = moveHeroStatementHeadingFields(doc);
 
     expect(result).toBeUndefined();
   });

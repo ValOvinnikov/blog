@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config/constants';
 import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { seoSchema } from '@blog/studio/schema-types/objects/seo/seo';
@@ -7,11 +8,16 @@ import {
 } from '@blog/studio/testing/assert-satisfies-required-fields';
 import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
+import { mockReference } from '@blog/studio/testing/mock-documents';
+import { MOCK_SYSTEM_FIELDS } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { PAGE_TAG_INDEX_ID, TAXONOMY_LIST_TAGS_ID } from './ids';
 
 import migration from './index';
+
+faker.seed(41);
 
 const metaTitleBounds = getRecordedBounds(getField(seoSchema, 'metaTitle'));
 const SEO_META_TITLE_MIN_LENGTH = metaTitleBounds.min!;
@@ -39,19 +45,20 @@ const TAG_INDEX_PAGE_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   },
 ];
 
-const anchorDoc = {
-  _id: 'settings_site',
+const MOCK_ANCHOR_ID = faker.string.uuid();
+
+const mockAnchorDoc = (fields: Record<string, unknown> = {}) => ({
+  ...MOCK_SYSTEM_FIELDS,
+  _id: MOCK_ANCHOR_ID,
   _type: 'settings_site',
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+  ...fields,
+});
 
 const taxonomyListPayload = {
   _id: TAXONOMY_LIST_TAGS_ID,
   _type: 'module_taxonomyList',
   title: 'Tag Index List',
-  brandVariant: 'SECONDARY',
+  brandVariant: BRAND_VARIANT.SECONDARY,
 };
 const pageTagIndexPayload = {
   _id: PAGE_TAG_INDEX_ID,
@@ -59,17 +66,12 @@ const pageTagIndexPayload = {
   title: 'Tag Index Page',
   heading: 'Tags',
   supportingText: 'Browse every post by tag.',
-  taxonomyList: { _type: 'reference', _ref: TAXONOMY_LIST_TAGS_ID },
+  taxonomyList: mockReference(TAXONOMY_LIST_TAGS_ID),
   seo: { _type: 'seo', metaTitle: 'Browse every post by tag on the blog' },
 };
 
-const expectedMutations = [
-  createIfNotExists(taxonomyListPayload),
-  createIfNotExists(pageTagIndexPayload),
-];
-
 describe('seed-page-tag-index migration', () => {
-  it('creates module_taxonomyList and page_tagIndex from a settings_site anchor', () => {
+  it('creates the taxonomy list and the tag index page', () => {
     assertSatisfiesRequiredFields(
       taxonomyListSchema,
       taxonomyListPayload,
@@ -81,30 +83,23 @@ describe('seed-page-tag-index migration', () => {
       TAG_INDEX_PAGE_HEADING_BLOCK_EXEMPTION,
     );
 
-    expect(migration.migrate.document(anchorDoc)).toEqual(expectedMutations);
+    expect(migration.migrate.document(mockAnchorDoc())).toEqual([
+      createIfNotExists(taxonomyListPayload),
+      createIfNotExists(pageTagIndexPayload),
+    ]);
   });
 
-  it('skips a drafts.settings_site anchor, so the pair is not created twice', () => {
-    const draftAnchor = { ...anchorDoc, _id: 'drafts.settings_site' };
+  it('skips a draft anchor so the pair is not created twice', () => {
+    const draftAnchor = mockAnchorDoc({ _id: `drafts.${MOCK_ANCHOR_ID}` });
 
     expect(migration.migrate.document(draftAnchor)).toBeUndefined();
   });
 
-  it('is idempotent — a second run against the same anchor returns the same createIfNotExists mutations', () => {
-    expect(migration.migrate.document(anchorDoc)).toEqual(
-      migration.migrate.document(anchorDoc),
-    );
-  });
+  it('returns the same createIfNotExists mutations on every run', () => {
+    const firstRun = migration.migrate.document(mockAnchorDoc());
+    const secondRun = migration.migrate.document(mockAnchorDoc());
 
-  it('resolves the anchor id regardless of its own document id shape', () => {
-    const differentlyIdAnchor = {
-      ...anchorDoc,
-      _id: 'provisioning.settings.site',
-    };
-
-    expect(migration.migrate.document(differentlyIdAnchor)).toEqual(
-      expectedMutations,
-    );
+    expect(secondRun).toEqual(firstRun);
   });
 
   it('seeds a seo.metaTitle within the required length bounds', () => {

@@ -1,23 +1,47 @@
+import { faker } from '@faker-js/faker';
 import { at, prepend, setIfMissing } from 'sanity/migrate';
 
 import {
   foldTaxonomyListIntoModules,
   toTaxonomyListModuleKey,
-  type TTaxonomyListFoldSource,
 } from './fold-taxonomy-list-into-modules';
 
+faker.seed(11);
+
+const MOCK_LIST_ID = faker.string.uuid();
+const MOCK_OTHER_LIST_ID = faker.string.uuid();
+const MOCK_CTA_ID = faker.string.uuid();
+const TAXONOMY_LIST_MODULE_TYPE = 'module_taxonomyList';
+
+const mockModule = (type: string, ref: string) => ({
+  _key: faker.string.uuid(),
+  _type: type,
+  _ref: ref,
+});
+
 describe(toTaxonomyListModuleKey, () => {
-  it('derives a deterministic key from the ref', () => {
-    expect(toTaxonomyListModuleKey('list-1')).toBe('taxonomyList-list-1');
-    expect(toTaxonomyListModuleKey('list-1')).toBe(
-      toTaxonomyListModuleKey('list-1'),
+  it('derives the same key from the same ref', () => {
+    expect(toTaxonomyListModuleKey(MOCK_LIST_ID)).toBe(
+      toTaxonomyListModuleKey(MOCK_LIST_ID),
+    );
+  });
+
+  it('derives different keys from different refs', () => {
+    expect(toTaxonomyListModuleKey(MOCK_LIST_ID)).not.toBe(
+      toTaxonomyListModuleKey(MOCK_OTHER_LIST_ID),
     );
   });
 });
 
 describe(foldTaxonomyListIntoModules, () => {
-  it('inserts a module_taxonomyList item at index 0 when modules[] is absent', () => {
-    const doc = { taxonomyList: { _ref: 'list-1' } };
+  it.each([
+    ['modules[] is absent', {}],
+    [
+      'modules[] has other entries',
+      { modules: [mockModule('module_cta', MOCK_CTA_ID)] },
+    ],
+  ])('puts the taxonomy list module first when %s', (_label, extraFields) => {
+    const doc = { taxonomyList: { _ref: MOCK_LIST_ID }, ...extraFields };
 
     expect(foldTaxonomyListIntoModules(doc)).toEqual([
       at('modules', setIfMissing([])),
@@ -25,48 +49,25 @@ describe(foldTaxonomyListIntoModules, () => {
         'modules',
         prepend([
           {
-            _key: toTaxonomyListModuleKey('list-1'),
-            _type: 'module_taxonomyList',
-            _ref: 'list-1',
+            _key: toTaxonomyListModuleKey(MOCK_LIST_ID),
+            _type: TAXONOMY_LIST_MODULE_TYPE,
+            _ref: MOCK_LIST_ID,
           },
         ]),
       ),
     ]);
   });
 
-  it('inserts before existing modules[] entries', () => {
+  it('leaves a document whose reference is already in modules[] untouched', () => {
     const doc = {
-      taxonomyList: { _ref: 'list-1' },
-      modules: [{ _key: 'k1', _type: 'module_cta', _ref: 'cta-1' }],
-    };
-
-    expect(foldTaxonomyListIntoModules(doc)).toEqual([
-      at('modules', setIfMissing([])),
-      at(
-        'modules',
-        prepend([
-          {
-            _key: toTaxonomyListModuleKey('list-1'),
-            _type: 'module_taxonomyList',
-            _ref: 'list-1',
-          },
-        ]),
-      ),
-    ]);
-  });
-
-  it('is a no-op when the reference is already in modules[]', () => {
-    const doc = {
-      taxonomyList: { _ref: 'list-1' },
-      modules: [{ _key: 'k1', _type: 'module_taxonomyList', _ref: 'list-1' }],
+      taxonomyList: { _ref: MOCK_LIST_ID },
+      modules: [mockModule(TAXONOMY_LIST_MODULE_TYPE, MOCK_LIST_ID)],
     };
 
     expect(foldTaxonomyListIntoModules(doc)).toBeUndefined();
   });
 
-  it('is a no-op, not an error, when there is no taxonomyList reference', () => {
-    const doc = {} as TTaxonomyListFoldSource;
-
-    expect(foldTaxonomyListIntoModules(doc)).toBeUndefined();
+  it('leaves a document without a taxonomyList reference untouched', () => {
+    expect(foldTaxonomyListIntoModules({})).toBeUndefined();
   });
 });

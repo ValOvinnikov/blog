@@ -1,10 +1,18 @@
 import { schemaTypes } from '@blog/studio/schema-types';
 import { inlineLinkSchema } from '@blog/studio/schema-types/objects/inline-link/inline-link';
+import { faker } from '@faker-js/faker';
 import { set } from 'sanity/migrate';
 
 import migration from './index';
 
-/** The `object()` node handler is the only piece of migration logic under test here. */
+faker.seed(6018);
+
+const LEGACY_LINK_TYPE = 'link';
+const MOCK_LABEL = faker.lorem.words();
+const MOCK_URL = faker.internet.url();
+const MOCK_BLOCK_KEY = faker.string.uuid();
+const MOCK_MARK_KEY = faker.string.uuid();
+
 const objectHandler = migration.migrate.object;
 
 if (!objectHandler) {
@@ -35,7 +43,6 @@ const collectDirectTypeRefs = (nodes: TTypeNode[] | undefined): Set<string> => {
   return refs;
 };
 
-/** Every registered schema type that embeds `targetName`, directly or transitively. */
 const typesEmbedding = (targetName: string): Set<string> => {
   const embedding = new Set([targetName]);
   let changed = true;
@@ -64,36 +71,29 @@ const typesEmbedding = (targetName: string): Set<string> => {
   return embedding;
 };
 
-describe('rename-link-object-to-inline-link migration wiring', () => {
-  it('returns a set() operation for a legacy inline link at a known path', () => {
-    const node = { _type: 'link', label: 'See more', url: '/blog' };
+describe('rename-link-object-to-inline-link migration', () => {
+  it('renames a legacy inline link at a known path', () => {
+    const node = { _type: LEGACY_LINK_TYPE, label: MOCK_LABEL, url: MOCK_URL };
 
     const result = objectHandler(node, ['secondaryAction']);
 
-    expect(result).toEqual(set({ ...node, _type: 'inlineLink' }));
+    expect(result).toEqual(set({ ...node, _type: inlineLinkSchema.name }));
   });
 
-  it('returns undefined for a node outside every known inline-link path', () => {
-    const node = { _type: 'link', href: 'https://example.com' };
+  it('leaves a node outside every known inline-link path alone', () => {
+    const node = { _type: LEGACY_LINK_TYPE, href: MOCK_URL };
 
     const result = objectHandler(node, [
       'body',
-      { _key: 'block1' },
+      { _key: MOCK_BLOCK_KEY },
       'markDefs',
-      { _key: 'mark1' },
+      { _key: MOCK_MARK_KEY },
     ]);
 
     expect(result).toBeUndefined();
   });
 
-  /**
-   * A migration's `documentTypes` targets data as it existed when the
-   * migration was written, not the live schema — so it may keep covering a
-   * document type whose schema embedding of `inlineLink` has since been
-   * removed, but it must never omit a type the schema currently embeds it
-   * in.
-   */
-  it('covers every document type the real schema graph currently embeds inlineLink in', () => {
+  it('covers every document type that embeds inlineLink in the schema', () => {
     const embedding = typesEmbedding(inlineLinkSchema.name);
 
     const derivedDocumentTypes = (schemaTypes as TTypeNode[])

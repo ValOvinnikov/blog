@@ -1,144 +1,108 @@
+import { faker } from '@faker-js/faker';
+import type { Path } from 'sanity/migrate';
+
 import { isInlineLinkPath, renameInlineLinkType } from './transform';
 
+faker.seed(6018);
+
+const LEGACY_LINK_TYPE = 'link';
+const INLINE_LINK_TYPE = 'inlineLink';
+const MOCK_KEY = faker.string.uuid();
+const MOCK_BLOCK_KEY = faker.string.uuid();
+const MOCK_MARK_KEY = faker.string.uuid();
+const MOCK_LABEL = faker.lorem.words();
+const MOCK_URL = faker.internet.url();
+
+const FOOTER_SOCIAL_PATH: Path = ['social', { _key: MOCK_KEY }];
+const HERO_SECONDARY_ACTION_PATH: Path = ['secondaryAction'];
+const CTA_ACTION_LINK_PATH: Path = [
+  'actions',
+  'actions',
+  { _key: MOCK_KEY },
+  'link',
+];
+const HERO_BLOG_SECONDARY_LINK_PATH: Path = ['secondaryAction', 'link'];
+const CTA_CONTENT_ANNOTATION_PATH: Path = [
+  'content',
+  { _key: MOCK_BLOCK_KEY },
+  'markDefs',
+  { _key: MOCK_MARK_KEY },
+];
+const RICH_TEXT_ANNOTATION_PATH: Path = [
+  'body',
+  { _key: MOCK_BLOCK_KEY },
+  'markDefs',
+  { _key: MOCK_MARK_KEY },
+];
+
 describe(isInlineLinkPath, () => {
-  it('is true for a keyed element of settings_footer.social[]', () => {
-    expect(isInlineLinkPath(['social', { _key: 'a1' }])).toBe(true);
+  it.each<[string, Path]>([
+    ['a keyed element of settings_footer.social[]', FOOTER_SOCIAL_PATH],
+    [
+      'a keyed element of settings_navigation.items[]',
+      ['items', { _key: MOCK_KEY }],
+    ],
+    ['module_hero.secondaryAction', HERO_SECONDARY_ACTION_PATH],
+    ['the link of an actionGroup ctaAction', CTA_ACTION_LINK_PATH],
+    ['module_heroBlog.secondaryAction.link', HERO_BLOG_SECONDARY_LINK_PATH],
+    [
+      'a markDef annotation in module_cta.content[]',
+      CTA_CONTENT_ANNOTATION_PATH,
+    ],
+  ])('is true for %s', (_location, path) => {
+    expect(isInlineLinkPath(path)).toBe(true);
   });
 
-  it('is true for a keyed element of settings_navigation.items[]', () => {
-    expect(isInlineLinkPath(['items', { _key: 'a1' }])).toBe(true);
-  });
-
-  it('is true for module_hero.secondaryAction', () => {
-    expect(isInlineLinkPath(['secondaryAction'])).toBe(true);
-  });
-
-  it('is true for a ctaAction link inside an actionGroup actions[] (module_cta, module_heroBlog, module_heroStatement)', () => {
-    expect(
-      isInlineLinkPath(['actions', 'actions', { _key: 'a1' }, 'link']),
-    ).toBe(true);
-  });
-
-  it('is true for module_heroBlog.secondaryAction.link', () => {
-    expect(isInlineLinkPath(['secondaryAction', 'link'])).toBe(true);
-  });
-
-  it('is true for a markDef annotation inside module_cta.content[]', () => {
-    expect(
-      isInlineLinkPath([
-        'content',
-        { _key: 'block1' },
-        'markDefs',
-        { _key: 'mark1' },
-      ]),
-    ).toBe(true);
-  });
-
-  it('is false for a richText/proseText markDefs annotation path (a different field name)', () => {
-    expect(
-      isInlineLinkPath([
-        'body',
-        { _key: 'block1' },
-        'markDefs',
-        { _key: 'mark1' },
-      ]),
-    ).toBe(false);
-  });
-
-  it('is false for a non-array, non-secondaryAction field', () => {
-    expect(isInlineLinkPath(['title'])).toBe(false);
-  });
-
-  it('is false for a path nested deeper than the ctaAction link field itself', () => {
-    expect(
-      isInlineLinkPath(['actions', 'actions', { _key: 'a1' }, 'link', 'label']),
-    ).toBe(false);
+  it.each<[string, Path]>([
+    ['a richText markDefs annotation path', RICH_TEXT_ANNOTATION_PATH],
+    ['a non-array, non-secondaryAction field', ['title']],
+    [
+      'a path nested deeper than the ctaAction link',
+      [...CTA_ACTION_LINK_PATH, 'label'],
+    ],
+  ])('is false for %s', (_location, path) => {
+    expect(isInlineLinkPath(path)).toBe(false);
   });
 });
 
 describe(renameInlineLinkType, () => {
-  it('renames a legacy link node in settings_footer.social[], preserving other fields', () => {
-    const node = {
-      _type: 'link',
-      _key: 'a1',
-      label: 'GitHub',
-      platform: 'GITHUB',
-      url: 'https://github.com',
-      openInNewTab: true,
-    };
+  it.each<[string, Path]>([
+    ['settings_footer.social[]', FOOTER_SOCIAL_PATH],
+    ['module_hero.secondaryAction', HERO_SECONDARY_ACTION_PATH],
+    ['an actionGroup ctaAction link', CTA_ACTION_LINK_PATH],
+    ['module_heroBlog.secondaryAction.link', HERO_BLOG_SECONDARY_LINK_PATH],
+    [
+      'a markDef annotation in module_cta.content[]',
+      CTA_CONTENT_ANNOTATION_PATH,
+    ],
+  ])('renames a legacy link at %s, keeping other fields', (_location, path) => {
+    const node = { _type: LEGACY_LINK_TYPE, label: MOCK_LABEL, url: MOCK_URL };
 
-    const result = renameInlineLinkType(node, ['social', { _key: 'a1' }]);
+    const result = renameInlineLinkType(node, path);
 
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
+    expect(result).toEqual({ ...node, _type: INLINE_LINK_TYPE });
   });
 
-  it('renames a legacy link node at module_hero.secondaryAction', () => {
-    const node = { _type: 'link', label: 'See more', url: '/blog' };
+  it('leaves a node already renamed to inlineLink alone', () => {
+    const node = { _type: INLINE_LINK_TYPE, label: MOCK_LABEL };
 
-    const result = renameInlineLinkType(node, ['secondaryAction']);
-
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
-  });
-
-  it('renames a legacy link node inside a ctaAction held by an actionGroup', () => {
-    const node = { _type: 'link', label: 'Get started', url: '/signup' };
-
-    const result = renameInlineLinkType(node, [
-      'actions',
-      'actions',
-      { _key: 'a1' },
-      'link',
-    ]);
-
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
-  });
-
-  it('renames a legacy link node at module_heroBlog.secondaryAction.link', () => {
-    const node = { _type: 'link', label: 'Learn more', url: '/about' };
-
-    const result = renameInlineLinkType(node, ['secondaryAction', 'link']);
-
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
-  });
-
-  it('renames a legacy link markDef annotation inside module_cta.content[]', () => {
-    const node = { _type: 'link', _key: 'mark1', label: 'Docs', url: '/docs' };
-
-    const result = renameInlineLinkType(node, [
-      'content',
-      { _key: 'block1' },
-      'markDefs',
-      { _key: 'mark1' },
-    ]);
-
-    expect(result).toEqual({ ...node, _type: 'inlineLink' });
-  });
-
-  it('is idempotent — a node already renamed to inlineLink is left alone', () => {
-    const node = { _type: 'inlineLink', label: 'Already migrated' };
-
-    const result = renameInlineLinkType(node, ['secondaryAction']);
+    const result = renameInlineLinkType(node, HERO_SECONDARY_ACTION_PATH);
 
     expect(result).toBeUndefined();
   });
 
-  it('never touches a richText/proseText markDefs default link annotation (different field name)', () => {
-    const node = { _type: 'link', _key: 'mark1', href: 'https://example.com' };
+  it('leaves a richText markDefs link annotation alone', () => {
+    const node = { _type: LEGACY_LINK_TYPE, href: MOCK_URL };
 
-    const result = renameInlineLinkType(node, [
-      'body',
-      { _key: 'block1' },
-      'markDefs',
-      { _key: 'mark1' },
-    ]);
+    const result = renameInlineLinkType(node, RICH_TEXT_ANNOTATION_PATH);
 
     expect(result).toBeUndefined();
   });
 
-  it('leaves unrelated object types at a known link path alone', () => {
-    const node = { _type: 'socialLink', platform: 'X', url: 'https://x.com' };
+  it('leaves an unrelated object type at a known link path alone', () => {
+    const node = { _type: 'socialLink', url: MOCK_URL };
 
-    const result = renameInlineLinkType(node, ['social', { _key: 'a1' }]);
+    const result = renameInlineLinkType(node, FOOTER_SOCIAL_PATH);
 
     expect(result).toBeUndefined();
   });
