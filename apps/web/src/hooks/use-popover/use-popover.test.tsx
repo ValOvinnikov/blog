@@ -1,9 +1,13 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
+  expectMenuClosed,
+  MENU_FIRST_ITEM_NAME,
+  MENU_LAST_ITEM_NAME,
+  MENU_TRIGGER_NAME,
   testArrowUpAndHomeBehavior,
   testCoreDismissibleMenuBehavior,
-} from '@web/testing/shared/dismissible-menu-contract/dismissible-menu-contract';
+} from '@web/testing/hooks/use-dismissible-menu/contract';
 
 import { usePopover } from './use-popover';
 
@@ -18,12 +22,12 @@ const Harness = () => {
         aria-expanded={open}
         onClick={toggle}
       >
-        trigger
+        {MENU_TRIGGER_NAME}
       </button>
       <div ref={panelRef} hidden={!open}>
-        <button type="button">first</button>
+        <button type="button">{MENU_FIRST_ITEM_NAME}</button>
         <button type="button" onClick={close}>
-          second
+          {MENU_LAST_ITEM_NAME}
         </button>
       </div>
     </div>
@@ -33,21 +37,25 @@ const Harness = () => {
 const setup = customRender(Harness, {});
 
 describe(usePopover, () => {
+  let user: UserEvent;
+  const getUser = () => user;
+
   beforeEach(() => {
+    user = userEvent.setup();
     setup();
   });
 
-  testCoreDismissibleMenuBehavior();
-  testArrowUpAndHomeBehavior();
+  testCoreDismissibleMenuBehavior(getUser);
+  testArrowUpAndHomeBehavior(getUser);
 
-  it('exposes a close function that closes the panel and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = screen.getByRole('button', { name: 'trigger' });
-
+  it('closes from inside the panel and returns focus to the trigger', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
     await user.click(trigger);
-    await user.click(screen.getByRole('button', { name: 'second' }));
+    const closeItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await user.click(closeItem);
+
+    expectMenuClosed(trigger);
     expect(trigger).toHaveFocus();
   });
 });

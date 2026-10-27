@@ -1,13 +1,16 @@
 import { CONSENT_CATEGORY } from '@blog/config';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { act, renderHook } from '@web/testing/custom-render';
+import {
+  clearConsentCookie,
+  MOCK_ANSWERED_CONSENT_COOKIE,
+  MOCK_ANSWERED_CONSENT_PAIR,
+  MOCK_MALFORMED_CONSENT_COOKIE,
+  MOCK_OTHER_VERSION_CONSENT_COOKIE,
+} from '@web/testing/hooks/use-consent-store/fixtures';
 import { renderToString } from 'react-dom/server';
 
 import { useConsentStore } from './use-consent-store';
-
-const clearConsentCookie = () => {
-  document.cookie = 'consent=; Max-Age=0; Path=/';
-};
 
 describe(useConsentStore, () => {
   beforeEach(clearConsentCookie);
@@ -21,8 +24,8 @@ describe(useConsentStore, () => {
 
   it.each([
     ['a missing cookie', undefined],
-    ['a cookie of another version', 'consent=0.EXTERNAL_MEDIA; Path=/'],
-    ['a malformed cookie', 'consent=EXTERNAL_MEDIA; Path=/'],
+    ['a cookie of another version', MOCK_OTHER_VERSION_CONSENT_COOKIE],
+    ['a malformed cookie', MOCK_MALFORMED_CONSENT_COOKIE],
   ])('reads %s as unanswered', (_label, cookie) => {
     if (cookie) document.cookie = cookie;
 
@@ -32,8 +35,8 @@ describe(useConsentStore, () => {
     expect(result.current.granted).toEqual([]);
   });
 
-  it('reads a cookie written before the refactor', () => {
-    document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
+  it('reads a stored answer', () => {
+    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
 
     const { result } = renderHook(() => useConsentStore());
 
@@ -42,7 +45,7 @@ describe(useConsentStore, () => {
   });
 
   it('returns the same answer between renders while the cookie is unchanged', () => {
-    document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
+    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
     const { result, rerender } = renderHook(() => useConsentStore());
     const { granted } = result.current;
 
@@ -71,12 +74,12 @@ describe(useConsentStore, () => {
       act(() => result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]));
 
       expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
-      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+      expect(document.cookie).toContain(MOCK_ANSWERED_CONSENT_PAIR);
     });
   });
 
   it('grants nothing on reject all but still counts as answered', () => {
-    document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
+    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
     const { result } = renderHook(() => useConsentStore());
 
     act(() => result.current.rejectAll());
