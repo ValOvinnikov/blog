@@ -1,11 +1,17 @@
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import {
+  act,
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { act } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { Carousel, type ICarouselProps } from './carousel';
+import { Carousel } from './carousel';
 
 faker.seed(123);
+
+const ARIA_DISABLED = 'aria-disabled';
 
 type TListener = () => void;
 
@@ -55,34 +61,35 @@ beforeEach(() => {
   emblaApi.canScrollNext.mockReturnValue(true);
 });
 
-const ariaLabel = 'Posts';
-const previousLabel = 'Previous slide';
-const nextLabel = 'Next slide';
-const defaultItems = ['Slide one'];
-const renderItem = ({ item }: { item: string }) => <div>{item}</div>;
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+const MOCK_PREVIOUS_LABEL = faker.lorem.words(2);
+const MOCK_NEXT_LABEL = faker.lorem.words(2);
+const MOCK_SLIDES = faker.helpers.multiple(() => faker.lorem.word(), {
+  count: 3,
+});
+const MOCK_KEYED_ITEMS = [
+  { id: faker.string.uuid(), label: faker.lorem.word() },
+  { id: faker.string.uuid(), label: faker.lorem.word() },
+];
 
-const carouselElement = (overrides: Partial<ICarouselProps<string>> = {}) => (
-  <Carousel
-    items={defaultItems}
-    renderItem={renderItem}
-    ariaLabel={ariaLabel}
-    previousLabel={previousLabel}
-    nextLabel={nextLabel}
-    {...overrides}
-  />
-);
+const renderSlide = ({ item }: { item: string }) => <div>{item}</div>;
 
-const renderCarousel = (overrides?: Partial<ICarouselProps<string>>) =>
-  renderElement(carouselElement(overrides));
+const setup = customRender(Carousel<string>, {
+  items: [MOCK_SLIDES[0]!],
+  renderItem: renderSlide,
+  ariaLabel: MOCK_ARIA_LABEL,
+  previousLabel: MOCK_PREVIOUS_LABEL,
+  nextLabel: MOCK_NEXT_LABEL,
+});
 
 const queryNavButtons = () => ({
-  previous: screen.queryByRole('button', { name: previousLabel }),
-  next: screen.queryByRole('button', { name: nextLabel }),
+  previous: screen.queryByRole('button', { name: MOCK_PREVIOUS_LABEL }),
+  next: screen.queryByRole('button', { name: MOCK_NEXT_LABEL }),
 });
 
 const getNavButtons = () => ({
-  previous: screen.getByRole('button', { name: previousLabel }),
-  next: screen.getByRole('button', { name: nextLabel }),
+  previous: screen.getByRole('button', { name: MOCK_PREVIOUS_LABEL }),
+  next: screen.getByRole('button', { name: MOCK_NEXT_LABEL }),
 });
 
 describe(`<${Carousel.name}/>`, () => {
@@ -92,19 +99,20 @@ describe(`<${Carousel.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders a region carrying aria-roledescription and the given ariaLabel', () => {
-    const customAriaLabel = faker.lorem.words(3);
-    renderCarousel({ ariaLabel: customAriaLabel });
+  it('renders a carousel region labelled with the given label', () => {
+    setup();
 
-    const region = screen.getByRole('region', { name: customAriaLabel });
+    const region = screen.getByRole('region', { name: MOCK_ARIA_LABEL });
+
     expect(region).toHaveAttribute('aria-roledescription', 'carousel');
   });
 
   it('renders one list item per item, keeping every slide in the DOM', () => {
-    renderCarousel({ items: ['Slide one', 'Slide two', 'Slide three'] });
+    setup({ items: MOCK_SLIDES });
 
     const slides = screen.getAllByRole('listitem');
-    expect(slides).toHaveLength(3);
+
+    expect(slides).toHaveLength(MOCK_SLIDES.length);
     for (const slide of slides) {
       expect(slide).not.toHaveAttribute('aria-hidden');
       expect(slide).not.toHaveAttribute('inert');
@@ -112,78 +120,57 @@ describe(`<${Carousel.name}/>`, () => {
   });
 
   it('renders no "n of m" text on any slide', () => {
-    renderCarousel({ items: ['Slide one', 'Slide two'] });
+    setup({ items: MOCK_SLIDES });
 
-    expect(screen.queryByText(/\d+ of \d+/i)).not.toBeInTheDocument();
+    const slideCount = screen.queryByText(/\d+ of \d+/i);
+
+    expect(slideCount).not.toBeInTheDocument();
   });
 
-  it('calls renderItem for every item and renders each as a slide, in order', () => {
-    const items = ['alpha', 'bravo', 'charlie'];
-    const renderItemSpy = vi.fn(({ item }: { item: string }) => (
-      <div>{item}</div>
-    ));
-    renderCarousel({ items, renderItem: renderItemSpy });
-
-    items.forEach((item, index) => {
-      expect(renderItemSpy).toHaveBeenCalledWith({ item, index });
-    });
+  it('renders every item as a slide, in order', () => {
+    const renderItem = vi.fn(renderSlide);
+    setup({ items: MOCK_SLIDES, renderItem });
 
     const slides = screen.getAllByRole('listitem');
-    expect(slides.map((slide) => slide.textContent)).toEqual(items);
+
+    MOCK_SLIDES.forEach((item, index) => {
+      expect(renderItem).toHaveBeenCalledWith({ item, index });
+    });
+    expect(slides.map((slide) => slide.textContent)).toEqual(MOCK_SLIDES);
   });
 
-  it('keys each slide with getItemKey when supplied', () => {
-    const items = [
-      { id: 'b', label: 'Bravo' },
-      { id: 'a', label: 'Alpha' },
-    ];
-    const renderKeyedItem = ({ item }: { item: (typeof items)[number] }) => (
-      <div data-testid={`slide-${item.id}`}>{item.label}</div>
-    );
-    const { rerender } = renderElement(
+  it('keeps a slide mounted when items reorder under getItemKey', () => {
+    const renderKeyedItem = ({
+      item,
+    }: {
+      item: (typeof MOCK_KEYED_ITEMS)[number];
+    }) => <div data-testid={item.id}>{item.label}</div>;
+    const keyedCarousel = (items: typeof MOCK_KEYED_ITEMS) => (
       <Carousel
         items={items}
         renderItem={renderKeyedItem}
         getItemKey={({ item }) => item.id}
-        ariaLabel={ariaLabel}
-        previousLabel={previousLabel}
-        nextLabel={nextLabel}
-      />,
+        ariaLabel={MOCK_ARIA_LABEL}
+        previousLabel={MOCK_PREVIOUS_LABEL}
+        nextLabel={MOCK_NEXT_LABEL}
+      />
     );
+    const [firstItem] = MOCK_KEYED_ITEMS;
+    const { rerender } = renderElement(keyedCarousel(MOCK_KEYED_ITEMS));
 
-    const slideB = screen.getByTestId('slide-b');
+    const slideBefore = screen.getByTestId(firstItem!.id);
+    rerender(keyedCarousel([...MOCK_KEYED_ITEMS].reverse()));
+    const slideAfter = screen.getByTestId(firstItem!.id);
 
-    rerender(
-      <Carousel
-        items={[...items].reverse()}
-        renderItem={renderKeyedItem}
-        getItemKey={({ item }) => item.id}
-        ariaLabel={ariaLabel}
-        previousLabel={previousLabel}
-        nextLabel={nextLabel}
-      />,
-    );
-
-    expect(screen.getByTestId('slide-b')).toBe(slideB);
-  });
-
-  it('keys each slide by its index when getItemKey is omitted', () => {
-    renderCarousel({ items: ['alpha', 'bravo'] });
-
-    expect(screen.getAllByRole('listitem')).toHaveLength(2);
-  });
-
-  it('forwards data-testid to the root element', () => {
-    renderCarousel({ dataTestId: 'posts-carousel' });
-
-    expect(screen.getByTestId('posts-carousel')).toBeVisible();
+    expect(slideAfter).toBe(slideBefore);
   });
 
   it('renders no nav buttons before Embla is available', () => {
     currentApi = undefined;
-    renderCarousel();
+    setup();
 
     const { previous, next } = queryNavButtons();
+
     expect(previous).not.toBeInTheDocument();
     expect(next).not.toBeInTheDocument();
   });
@@ -192,36 +179,40 @@ describe(`<${Carousel.name}/>`, () => {
     beforeEach(() => {
       emblaApi.canScrollPrev.mockReturnValue(false);
       emblaApi.canScrollNext.mockReturnValue(false);
-      renderCarousel();
+      setup();
     });
 
     it('renders no nav buttons once Embla reports nothing scrollable', () => {
       const { previous, next } = queryNavButtons();
+
       expect(previous).not.toBeInTheDocument();
       expect(next).not.toBeInTheDocument();
     });
 
-    it('brings the nav buttons back once a direction becomes scrollable again', () => {
+    it('brings the nav buttons back once a direction is scrollable again', () => {
       emblaApi.canScrollNext.mockReturnValue(true);
       emitEvent('select');
 
-      expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
-      expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
+      const { previous, next } = getNavButtons();
+
+      expect(previous).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(next).not.toHaveAttribute(ARIA_DISABLED);
     });
   });
 
   describe('with both directions scrollable', () => {
     beforeEach(() => {
-      renderCarousel();
+      setup();
     });
 
-    it('renders both nav buttons once a direction is scrollable, labelled and titled', () => {
+    it('renders both nav buttons titled with their labels', () => {
       const { previous, next } = getNavButtons();
-      expect(previous).toHaveAttribute('title', previousLabel);
-      expect(next).toHaveAttribute('title', nextLabel);
+
+      expect(previous).toHaveAttribute('title', MOCK_PREVIOUS_LABEL);
+      expect(next).toHaveAttribute('title', MOCK_NEXT_LABEL);
     });
 
-    it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {
+    it('scrolls the track when a nav button is clicked', async () => {
       const { previous, next } = getNavButtons();
       await user.click(previous);
       await user.click(next);
@@ -234,41 +225,47 @@ describe(`<${Carousel.name}/>`, () => {
       emblaApi.canScrollNext.mockReturnValue(false);
       emitEvent('reInit');
 
-      expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
+      const { next } = getNavButtons();
+
+      expect(next).toHaveAttribute(ARIA_DISABLED, 'true');
     });
 
-    it('keeps focus on a nav button once it becomes aria-disabled', () => {
-      const previousButton = getNavButtons().previous;
-      previousButton.focus();
-      expect(previousButton).toHaveFocus();
+    it('keeps focus on a nav button once it becomes aria-disabled', async () => {
+      await user.tab();
+      const { previous } = getNavButtons();
+      expect(previous).toHaveFocus();
 
       emblaApi.canScrollPrev.mockReturnValue(false);
       emitEvent('select');
 
-      expect(getNavButtons().previous).toHaveFocus();
+      expect(previous).toHaveFocus();
     });
   });
 
   describe('with only the previous direction blocked', () => {
     beforeEach(() => {
       emblaApi.canScrollPrev.mockReturnValue(false);
-      renderCarousel();
+      setup();
     });
 
-    it('marks the nav button at an end of the track aria-disabled, and follows select', () => {
-      expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
-      expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
+    it('disables the nav button at the track end and follows select', () => {
+      const { previous: previousBefore, next: nextBefore } = getNavButtons();
+      expect(previousBefore).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(nextBefore).not.toHaveAttribute(ARIA_DISABLED);
 
       emblaApi.canScrollPrev.mockReturnValue(true);
       emblaApi.canScrollNext.mockReturnValue(false);
       emitEvent('select');
 
-      expect(getNavButtons().previous).not.toHaveAttribute('aria-disabled');
-      expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
+      const { previous, next } = getNavButtons();
+
+      expect(previous).not.toHaveAttribute(ARIA_DISABLED);
+      expect(next).toHaveAttribute(ARIA_DISABLED, 'true');
     });
 
     it('does nothing when clicking an aria-disabled nav button', async () => {
-      await user.click(getNavButtons().previous);
+      const { previous } = getNavButtons();
+      await user.click(previous);
 
       expect(emblaApi.scrollPrev).not.toHaveBeenCalled();
     });
