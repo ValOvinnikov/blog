@@ -98,33 +98,30 @@ describe(upsertEmailConfig, () => {
       }),
     ).rejects.toThrow();
   });
-});
 
-describe('partial updates', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-    await upsertEmailConfig(tenantId, {
-      footerPostalAddress: MOCK_EMAIL_CONFIG.footerPostalAddress,
-    });
-  });
-
-  it('preserves footerPostalAddress when a later update omits the field', async () => {
-    const result = await upsertEmailConfig(tenantId, {
-      senderName: MOCK_EMAIL_CONFIG.senderName,
+  describe('partial updates', () => {
+    beforeEach(async () => {
+      await upsertEmailConfig(tenantId, {
+        footerPostalAddress: MOCK_EMAIL_CONFIG.footerPostalAddress,
+      });
     });
 
-    expect(result.footerPostalAddress).toBe(
-      MOCK_EMAIL_CONFIG.footerPostalAddress,
-    );
-  });
+    it('preserves footerPostalAddress when a later update omits the field', async () => {
+      const result = await upsertEmailConfig(tenantId, {
+        senderName: MOCK_EMAIL_CONFIG.senderName,
+      });
 
-  it('clears footerPostalAddress when explicitly set to null', async () => {
-    const result = await upsertEmailConfig(tenantId, {
-      footerPostalAddress: null,
+      expect(result.footerPostalAddress).toBe(
+        MOCK_EMAIL_CONFIG.footerPostalAddress,
+      );
     });
 
-    expect(result.footerPostalAddress).toBeUndefined();
+    it('clears footerPostalAddress when explicitly set to null', async () => {
+      const result = await upsertEmailConfig(tenantId, {
+        footerPostalAddress: null,
+      });
+
+      expect(result.footerPostalAddress).toBeUndefined();
+    });
   });
 });

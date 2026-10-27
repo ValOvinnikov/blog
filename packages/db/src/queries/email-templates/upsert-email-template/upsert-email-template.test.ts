@@ -132,78 +132,74 @@ describe(upsertEmailTemplate, () => {
       ),
     ).rejects.toThrow();
   });
-});
 
-describe('partial updates', () => {
-  let tenantId: string;
+  describe('partial updates', () => {
+    beforeEach(async () => {
+      await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
+        subject: MOCK_CUSTOM_SUBJECT,
+      });
+    });
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-    await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
-      subject: MOCK_CUSTOM_SUBJECT,
+    it('preserves subject when a later update omits the field', async () => {
+      const result = await upsertEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        { logoAssetUrl: MOCK_LOGO_URL },
+      );
+
+      expect(result.subject).toBe(MOCK_CUSTOM_SUBJECT);
+    });
+
+    it('restores the default subject when explicitly set to null', async () => {
+      const result = await upsertEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        { subject: null },
+      );
+
+      expect(result.subject).toBe(
+        EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.subject,
+      );
     });
   });
 
-  it('preserves subject when a later update omits the field', async () => {
-    const result = await upsertEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { logoAssetUrl: MOCK_LOGO_URL },
-    );
+  describe('logo override', () => {
+    beforeEach(async () => {
+      await upsertEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        { logoAssetUrl: MOCK_LOGO_URL },
+        LOCALE_ISO_CODES.FR,
+      );
+    });
 
-    expect(result.subject).toBe(MOCK_CUSTOM_SUBJECT);
-  });
+    it('applies a logo written in one language to every language', async () => {
+      const result = await upsertEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        { subject: MOCK_ENGLISH_SUBJECT },
+        LOCALE_ISO_CODES.EN,
+      );
 
-  it('restores the default subject when explicitly set to null', async () => {
-    const result = await upsertEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: null },
-    );
+      expect(result.logoAssetUrl).toBe(MOCK_LOGO_URL);
+    });
 
-    expect(result.subject).toBe(EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.subject);
-  });
-});
+    it('removes the override when the logo is set to null', async () => {
+      const result = await upsertEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        { logoAssetUrl: null },
+      );
 
-describe('logo override', () => {
-  let tenantId: string;
+      const logos = await db().select().from(schema.emailTemplateLogos);
+      expect(result.logoAssetUrl).toBeUndefined();
+      expect(logos).toEqual([]);
+    });
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-    await upsertEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { logoAssetUrl: MOCK_LOGO_URL },
-      LOCALE_ISO_CODES.FR,
-    );
-  });
+    it('creates no per-language row when only the logo changes', async () => {
+      const rows = await db().select().from(schema.emailTemplates);
 
-  it('applies a logo written in one language to every language', async () => {
-    const result = await upsertEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { subject: MOCK_ENGLISH_SUBJECT },
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(result.logoAssetUrl).toBe(MOCK_LOGO_URL);
-  });
-
-  it('removes the override when the logo is set to null', async () => {
-    const result = await upsertEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      { logoAssetUrl: null },
-    );
-
-    const logos = await db().select().from(schema.emailTemplateLogos);
-    expect(result.logoAssetUrl).toBeUndefined();
-    expect(logos).toEqual([]);
-  });
-
-  it('creates no per-language row when only the logo changes', async () => {
-    const rows = await db().select().from(schema.emailTemplates);
-
-    expect(rows).toEqual([]);
+      expect(rows).toEqual([]);
+    });
   });
 });

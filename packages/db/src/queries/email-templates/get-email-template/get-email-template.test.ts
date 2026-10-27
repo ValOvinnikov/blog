@@ -109,95 +109,93 @@ describe(getEmailTemplate, () => {
       expect(result.logoAssetUrl).toBeUndefined();
     });
   });
-});
 
-describe('per-language fallback', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db(), {
-      locale: LOCALE_ISO_CODES.DE,
-      additionalLocales: [LOCALE_ISO_CODES.FR, LOCALE_ISO_CODES.ES],
-    }));
-    await db()
-      .insert(schema.emailTemplates)
-      .values([
-        {
-          tenantId,
-          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          locale: LOCALE_ISO_CODES.DE,
-          subject: MOCK_GERMAN_SUBJECT,
-        },
-        {
-          tenantId,
-          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          locale: LOCALE_ISO_CODES.FR,
-          subject: MOCK_FRENCH_SUBJECT,
-        },
-      ]);
-  });
-
-  it('uses the requested language when it has authored copy', async () => {
-    const result = await getEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.FR,
-    );
-
-    expect(result.subject).toBe(MOCK_FRENCH_SUBJECT);
-  });
-
-  it("falls back to the tenant's default language when none is authored", async () => {
-    const result = await getEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.ES,
-    );
-
-    expect(result.subject).toBe(MOCK_GERMAN_SUBJECT);
-  });
-
-  it('falls back to the product default in the requested language', async () => {
-    const result = await getEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      LOCALE_ISO_CODES.ES,
-    );
-
-    expect(result.body).toEqual(
-      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.ES.MAGIC_LINK.body,
-    );
-  });
-
-  it("reads the tenant's default language when no language is requested", async () => {
-    const result = await getEmailTemplate(
-      tenantId,
-      EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
-    );
-
-    expect(result.subject).toBe(
-      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.DE.TENANT_INVITE.subject,
-    );
-  });
-
-  it('returns the same logo override in every language', async () => {
-    await db().insert(schema.emailTemplateLogos).values({
-      tenantId,
-      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-      logoAssetUrl: MOCK_LOGO_URL,
+  describe('per-language fallback', () => {
+    beforeEach(async () => {
+      ({ id: tenantId } = await insertTestTenant(db(), {
+        locale: LOCALE_ISO_CODES.DE,
+        additionalLocales: [LOCALE_ISO_CODES.FR, LOCALE_ISO_CODES.ES],
+      }));
+      await db()
+        .insert(schema.emailTemplates)
+        .values([
+          {
+            tenantId,
+            templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+            locale: LOCALE_ISO_CODES.DE,
+            subject: MOCK_GERMAN_SUBJECT,
+          },
+          {
+            tenantId,
+            templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+            locale: LOCALE_ISO_CODES.FR,
+            subject: MOCK_FRENCH_SUBJECT,
+          },
+        ]);
     });
 
-    const logos = await Promise.all(
-      Object.values(LOCALE_ISO_CODES).map(async (locale) => {
-        const { logoAssetUrl } = await getEmailTemplate(
-          tenantId,
-          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          locale,
-        );
-        return logoAssetUrl;
-      }),
-    );
+    it('uses the requested language when it has authored copy', async () => {
+      const result = await getEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        LOCALE_ISO_CODES.FR,
+      );
 
-    expect(new Set(logos)).toEqual(new Set([MOCK_LOGO_URL]));
+      expect(result.subject).toBe(MOCK_FRENCH_SUBJECT);
+    });
+
+    it("falls back to the tenant's default language when none is authored", async () => {
+      const result = await getEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        LOCALE_ISO_CODES.ES,
+      );
+
+      expect(result.subject).toBe(MOCK_GERMAN_SUBJECT);
+    });
+
+    it('falls back to the product default in the requested language', async () => {
+      const result = await getEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        LOCALE_ISO_CODES.ES,
+      );
+
+      expect(result.body).toEqual(
+        EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.ES.MAGIC_LINK.body,
+      );
+    });
+
+    it("reads the tenant's default language when no language is requested", async () => {
+      const result = await getEmailTemplate(
+        tenantId,
+        EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
+      );
+
+      expect(result.subject).toBe(
+        EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.DE.TENANT_INVITE.subject,
+      );
+    });
+
+    it('returns the same logo override in every language', async () => {
+      await db().insert(schema.emailTemplateLogos).values({
+        tenantId,
+        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        logoAssetUrl: MOCK_LOGO_URL,
+      });
+
+      const logos = await Promise.all(
+        Object.values(LOCALE_ISO_CODES).map(async (locale) => {
+          const { logoAssetUrl } = await getEmailTemplate(
+            tenantId,
+            EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+            locale,
+          );
+          return logoAssetUrl;
+        }),
+      );
+
+      expect(new Set(logos)).toEqual(new Set([MOCK_LOGO_URL]));
+    });
   });
 });

@@ -86,29 +86,24 @@ describe(addBookmark, () => {
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     selectSpy.mockRestore();
   });
-});
 
-describe('foreign-key cascade', () => {
-  let tenantId: string;
-  let userId: string;
+  describe('foreign-key cascade', () => {
+    beforeEach(async () => {
+      await addBookmark(tenantId, userId, MOCK_POST_ID);
+    });
 
-  beforeEach(async () => {
-    ({ id: userId } = await insertTestUser(db()));
-    ({ id: tenantId } = await insertTestTenant(db()));
-    await addBookmark(tenantId, userId, MOCK_POST_ID);
-  });
+    it('removes a bookmark when its owning user is deleted', async () => {
+      await db().delete(schema.users).where(eq(schema.users.id, userId));
 
-  it('removes a bookmark when its owning user is deleted', async () => {
-    await db().delete(schema.users).where(eq(schema.users.id, userId));
+      const rows = await db().select().from(schema.bookmarks);
+      expect(rows).toHaveLength(0);
+    });
 
-    const rows = await db().select().from(schema.bookmarks);
-    expect(rows).toHaveLength(0);
-  });
+    it('removes a bookmark when its owning tenant is deleted', async () => {
+      await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
 
-  it('removes a bookmark when its owning tenant is deleted', async () => {
-    await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
-
-    const rows = await db().select().from(schema.bookmarks);
-    expect(rows).toHaveLength(0);
+      const rows = await db().select().from(schema.bookmarks);
+      expect(rows).toHaveLength(0);
+    });
   });
 });
