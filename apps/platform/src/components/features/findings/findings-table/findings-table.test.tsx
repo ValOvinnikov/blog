@@ -1,126 +1,111 @@
-import {
-  CONTRAST_CHECK_OUTCOME,
-  FINDING_KIND,
-  FINDING_SEVERITY,
-  FINDING_SOURCE,
-} from '@blog/config/constants';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { FINDING_KIND, FINDING_SOURCE } from '@blog/config/constants';
+import { mockContrastResult } from '@blog/db/testing/findings/fixtures';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   mockFinding,
+  MOCK_COMMIT_SHA,
   MOCK_FINDING_LAST_SEEN_AT,
+  MOCK_SHORT_COMMIT_SHA,
 } from '@platform/testing/findings/fixtures';
 import {
-  MOCK_TENANT_NAME,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { FindingsTable } from './findings-table';
 
-const render = renderWithIntl;
+faker.seed(5993);
 
-const PLATFORM_WIDE = '— platform-wide';
-const WORKFLOW_RUN_URL = 'https://github.com/acme/blog/actions/runs/7';
+const MOCK_FINDING = mockFinding();
+const MOCK_CONTRAST_RESULT = mockContrastResult({ sha: MOCK_COMMIT_SHA });
+
+const {
+  findingsTable,
+  findingsView,
+  findingSourceLabel,
+  findingKindLabel,
+  findingSeverityLabel,
+} = messages;
+const tContrast = makeEnTranslator('contrastFindingDetails');
+
+const setup = customRender(FindingsTable, { findings: [MOCK_FINDING] });
 
 describe(`<${FindingsTable.name}/>`, () => {
-  it('renders one row per finding with its source, kind, severity and last-seen date', () => {
-    render(
-      <FindingsTable
-        findings={[
-          mockFinding({
-            source: FINDING_SOURCE.DOCUMENT_VALIDATION,
-            kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
-            severity: FINDING_SEVERITY.WARNING,
-          }),
-        ]}
-      />,
-    );
+  describe('with a tenant finding', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const source = screen.getByText('Document validation');
-    const kind = screen.getByText('Schema validation error');
-    const severity = screen.getByText('Warning');
-    const lastSeen = screen.getByText('Apr 2, 2026');
+    it("shows the finding's source, kind, severity and last-seen date", () => {
+      const source = screen.getByText(findingSourceLabel[MOCK_FINDING.source]);
+      const kind = screen.getByText(findingKindLabel[MOCK_FINDING.kind]);
+      const severity = screen.getByText(
+        findingSeverityLabel[MOCK_FINDING.severity],
+      );
+      const lastSeen = screen.getByText('Apr 2, 2026');
 
-    expect(source).toBeVisible();
-    expect(kind).toBeVisible();
-    expect(severity).toBeVisible();
-    expect(lastSeen).toHaveAttribute(
-      'dateTime',
-      MOCK_FINDING_LAST_SEEN_AT.toISOString(),
-    );
+      expect(source).toBeVisible();
+      expect(kind).toBeVisible();
+      expect(severity).toBeVisible();
+      expect(lastSeen).toHaveAttribute(
+        'dateTime',
+        MOCK_FINDING_LAST_SEEN_AT.toISOString(),
+      );
+    });
+
+    it('names the scrollable table region after the page', () => {
+      const region = screen.getByRole('region', { name: findingsView.title });
+      const table = screen.getByRole('table');
+
+      expect(region).toContainElement(table);
+    });
+
+    it("links the tenant name to that tenant's overview page", () => {
+      const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+
+      expect(tenantLink).toHaveAttribute(
+        'href',
+        adminRoutes.tenantOverview(MOCK_TENANT_ID),
+      );
+    });
   });
 
-  it('names the scrollable table region after the page', () => {
-    render(<FindingsTable findings={[mockFinding()]} />);
+  it('shows a platform-wide placeholder for a finding with no tenant', () => {
+    setup({ findings: [mockFinding({ tenantId: null, tenantName: null })] });
 
-    const region = screen.getByRole('region', { name: 'Findings' });
-    const table = screen.getByRole('table');
-
-    expect(region).toContainElement(table);
-  });
-
-  it("links a finding's tenant name to that tenant's overview page", () => {
-    render(
-      <FindingsTable findings={[mockFinding({ tenantId: MOCK_TENANT_ID })]} />,
-    );
-
-    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
-
-    expect(tenantLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
-  });
-
-  it('shows a platform-wide placeholder instead of a tenant link for a tenant-less finding', () => {
-    render(
-      <FindingsTable
-        findings={[mockFinding({ tenantId: null, tenantName: null })]}
-      />,
-    );
-
-    const placeholder = screen.getByText(PLATFORM_WIDE);
+    const placeholder = screen.getByText(findingsTable.noTenant);
     const link = screen.queryByRole('link');
 
     expect(placeholder).toBeVisible();
     expect(link).not.toBeInTheDocument();
   });
 
-  it('shows the commit and run of a platform-wide contrast finding', () => {
-    render(
-      <FindingsTable
-        findings={[
-          mockFinding({
-            tenantId: null,
-            tenantName: null,
-            source: FINDING_SOURCE.CONTRAST_CHECK,
-            kind: FINDING_KIND.CONTRAST_REGRESSION,
-            contrastResult: {
-              sha: 'abcdef0123456789abcdef0123456789abcdef01',
-              outcome: CONTRAST_CHECK_OUTCOME.FAIL,
-              failureCount: 1,
-              runUrl: WORKFLOW_RUN_URL,
-            },
-          }),
-        ]}
-      />,
-    );
-
-    const placeholder = screen.getByText(PLATFORM_WIDE);
-    const commit = screen.getByText('abcdef0');
-    const failureCount = screen.getByText('1 failure');
-    const runLink = screen.getByRole('link', {
-      name: 'View the contrast run for commit abcdef0 (opens in new tab)',
+  it('shows the contrast run of a contrast finding', () => {
+    setup({
+      findings: [
+        mockFinding({
+          source: FINDING_SOURCE.CONTRAST_CHECK,
+          kind: FINDING_KIND.CONTRAST_REGRESSION,
+          contrastResult: MOCK_CONTRAST_RESULT,
+        }),
+      ],
     });
 
-    expect(placeholder).toBeVisible();
-    expect(commit).toBeVisible();
-    expect(failureCount).toBeVisible();
-    expect(runLink).toHaveAttribute('href', WORKFLOW_RUN_URL);
+    const runLink = screen.getByRole('link', {
+      name: tContrast('viewRunLabel', { sha: MOCK_SHORT_COMMIT_SHA }),
+    });
+
+    expect(runLink).toHaveAttribute('href', MOCK_CONTRAST_RESULT.runUrl);
   });
 
-  it('renders a healthy empty state instead of an empty table when there are no open findings', () => {
-    render(<FindingsTable findings={[]} />);
+  it('shows a healthy empty state instead of a table with no open findings', () => {
+    setup({ findings: [] });
 
-    const emptyMessage = screen.getByText(
-      "No open findings. Everything's healthy.",
-    );
+    const emptyMessage = screen.getByText(findingsTable.empty);
     const table = screen.queryByRole('table');
 
     expect(emptyMessage).toBeVisible();

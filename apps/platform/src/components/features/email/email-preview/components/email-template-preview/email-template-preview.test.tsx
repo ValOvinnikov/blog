@@ -1,16 +1,23 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { EmailTemplatePreview } from './email-template-preview';
 
-const render = renderWithIntl;
+faker.seed(5993);
 
-describe(EmailTemplatePreview, () => {
-  it('renders the preview iframe with an empty sandbox attribute', () => {
-    render(
-      <EmailTemplatePreview html="<p>Hi there</p>" title="Email preview" />,
-    );
+const MOCK_TITLE = faker.lorem.words(2);
 
-    const iframe = screen.getByTitle('Email preview');
-    expect(iframe).toHaveAttribute('sandbox', '');
+const setup = customRender(EmailTemplatePreview, {
+  html: `<p>${faker.lorem.sentence()}</p>`,
+  title: MOCK_TITLE,
+});
+
+describe(`<${EmailTemplatePreview.name}/>`, () => {
+  it('sandboxes the preview frame with every capability withheld', () => {
+    setup();
+
+    const frame = screen.getByTitle(MOCK_TITLE);
+
+    expect(frame).toHaveAttribute('sandbox', '');
   });
 });

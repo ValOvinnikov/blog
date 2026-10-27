@@ -1,29 +1,22 @@
-import {
-  CAPABILITY,
-  PRESET_ID,
-  LOCALE_ISO_CODES,
-  FONT_CHOICE,
-  RADIUS_SCALE,
-  DENSITY,
-  LANGUAGE_SWITCHER_STYLE,
-} from '@blog/config';
+import { CAPABILITY, LOCALE_ISO_CODES, PRESET_ID } from '@blog/config';
+import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
-  mockReadyTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
+  mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock, selectLiveLocalesMock, getEnabledCapabilitiesMock } =
-  vi.hoisted(() => ({
-    getSiteConfigMock: vi.fn(),
-    selectLiveLocalesMock: vi.fn(),
-    getEnabledCapabilitiesMock: vi.fn(),
-  }));
+const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
+  getSiteConfigMock: vi.fn(),
+  selectLiveLocalesMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -33,94 +26,80 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/auth/auth');
+vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
-vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
-  getEnabledCapabilities: getEnabledCapabilitiesMock,
-}));
+const MOCK_ACCENT_HUE = 28;
+const SIGN_IN = 'Sign in';
+
+const tLogoHue = makeEnTranslator('logoHueField');
 
 const tenant = mockReadyTenant();
 
 const setup = customRenderAsync(LookPageContent, { tenant });
 
-const ARIA_CHECKED = 'aria-checked';
-
 describe(`<${LookPageContent.name}/>`, () => {
   beforeEach(() => {
-    getSiteConfigMock.mockReset();
     getSiteConfigMock.mockResolvedValue(undefined);
     selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
-    getEnabledCapabilitiesMock.mockReset();
-    getEnabledCapabilitiesMock.mockResolvedValue([]);
   });
 
-  it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
+  it('renders the Console defaults when the tenant has no saved look yet', async () => {
     await setup();
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     const heading = screen.getByRole('heading', { name: 'Look' });
     const consoleRadio = screen.getByRole('radio', { name: 'Console' });
 
+    expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(heading).toBeVisible();
-    expect(consoleRadio).toHaveAttribute(ARIA_CHECKED, 'true');
+    expect(consoleRadio).toBeChecked();
   });
 
-  it('previews Sign in when a reader feature is on', async () => {
-    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.BOOKMARKS]);
+  it("renders the tenant's saved look when one exists", async () => {
+    getSiteConfigMock.mockResolvedValue(
+      mockSiteConfig({
+        preset: PRESET_ID.EDITORIAL,
+        accentHue: MOCK_ACCENT_HUE,
+      }),
+    );
 
     await setup();
 
-    const signInButton = screen.getByRole('button', { name: 'Sign in' });
+    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+    const hueValue = screen.getByText(
+      tLogoHue('hueValue', { hue: MOCK_ACCENT_HUE }),
+    );
+
+    expect(editorialRadio).toBeChecked();
+    expect(hueValue).toBeVisible();
+  });
+
+  it('previews Sign in when a reader feature is on', async () => {
+    vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
+      CAPABILITY.BOOKMARKS,
+    ]);
+
+    await setup();
+
+    const signInButton = screen.getByRole('button', { name: SIGN_IN });
 
     expect(signInButton).toBeVisible();
   });
 
   it('previews no Sign in when only non-reader features are on', async () => {
-    getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.ANALYTICS]);
+    vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
+      CAPABILITY.ANALYTICS,
+    ]);
 
     await setup();
 
-    const signInButton = screen.queryByRole('button', { name: 'Sign in' });
+    const signInButton = screen.queryByRole('button', { name: SIGN_IN });
 
     expect(signInButton).not.toBeInTheDocument();
   });
 
-  it('passes the archived date through for a deprovisioned tenant', async () => {
-    await setup({
-      tenant: {
-        ...tenant,
-        deprovisionedAt: MOCK_ARCHIVED_AT,
-      },
-    });
+  it('shows the archived notice for a deprovisioned tenant', async () => {
+    await setup({ tenant: { ...tenant, deprovisionedAt: MOCK_ARCHIVED_AT } });
 
     expectArchivedOffersNoSave();
-  });
-
-  it("renders the tenant's saved site_config row when one exists", async () => {
-    getSiteConfigMock.mockResolvedValue({
-      id: 'config-1',
-      tenantId: MOCK_TENANT_ID,
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      logoHue: undefined,
-      headingFont: FONT_CHOICE.FRAUNCES,
-      bodyFont: FONT_CHOICE.INTER,
-      radiusScale: RADIUS_SCALE.SM,
-      density: DENSITY.COMPACT,
-      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      voiceOverrides: {},
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await setup();
-
-    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
-    const hueLabel = screen.getByText('hue 28°');
-
-    expect(editorialRadio).toHaveAttribute(ARIA_CHECKED, 'true');
-    expect(hueLabel).toBeVisible();
   });
 });

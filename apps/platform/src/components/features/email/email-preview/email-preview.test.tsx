@@ -1,66 +1,81 @@
+import { faker } from '@faker-js/faker';
 import { PREVIEW_WIDTH } from '@platform/constants/preview';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockEmailSender } from '@platform/testing/email-draft';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailPreview } from './email-preview';
 
+faker.seed(5993);
+
+const MOCK_SENDER = mockEmailSender({
+  senderName: faker.company.name(),
+  replyToAddress: faker.internet.email(),
+});
+const MOCK_SUBJECT = faker.lorem.sentence();
+const MOCK_ACTION_LABEL = faker.lorem.word();
+const MOCK_NOTE = faker.lorem.sentence();
+const DATA_WIDTH = 'data-width';
+
 const setup = customRender(EmailPreview, {
-  html: '<p>Bonjour</p>',
-  sender: {
-    senderName: 'Acme Co',
-    replyToAddress: 'hello@acme.example',
-    footerPostalAddress: '',
-    contactRecipient: '',
-  },
-  subject: 'Connexion',
+  html: `<p>${faker.lorem.sentence()}</p>`,
+  sender: MOCK_SENDER,
+  subject: MOCK_SUBJECT,
 });
 
 describe(`<${EmailPreview.name}/>`, () => {
-  let user: UserEvent;
+  describe('with a sender and reply-to address', () => {
+    let user: UserEvent;
 
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
+    beforeEach(() => {
+      user = userEvent.setup();
+      setup();
+    });
 
-  it('shows who the email is from, where replies go and its subject', () => {
-    setup();
+    it('shows who the email is from, where replies go and its subject', () => {
+      const senderName = screen.getByText(MOCK_SENDER.senderName);
+      const replyTo = screen.getByText(MOCK_SENDER.replyToAddress);
+      const subject = screen.getByText(MOCK_SUBJECT);
 
-    expect(screen.getByText('Acme Co')).toBeVisible();
-    expect(screen.getByText('hello@acme.example')).toBeVisible();
-    expect(screen.getByText('Connexion')).toBeVisible();
+      expect(senderName).toBeVisible();
+      expect(replyTo).toBeVisible();
+      expect(subject).toBeVisible();
+    });
+
+    it('switches the preview between desktop and mobile widths', async () => {
+      const frame = screen.getByTitle('Email preview');
+      const mobileButton = screen.getByRole('button', { name: 'Mobile' });
+
+      expect(frame).toHaveAttribute(DATA_WIDTH, PREVIEW_WIDTH.DESKTOP);
+
+      await user.click(mobileButton);
+
+      expect(frame).toHaveAttribute(DATA_WIDTH, PREVIEW_WIDTH.MOBILE);
+    });
   });
 
   it('names the defaults when the sender and reply-to are blank', () => {
-    setup({
-      sender: {
-        senderName: '  ',
-        replyToAddress: '',
-        footerPostalAddress: '',
-        contactRecipient: '',
-      },
-    });
+    setup({ sender: mockEmailSender({ senderName: '  ' }) });
 
-    expect(screen.getByText('Default sender')).toBeVisible();
-    expect(screen.getByText('No reply-to address')).toBeVisible();
-  });
+    const defaultSender = screen.getByText('Default sender');
+    const noReplyTo = screen.getByText('No reply-to address');
 
-  it('switches the preview between desktop and mobile widths', async () => {
-    setup();
-    const frame = screen.getByTitle('Email preview');
-    expect(frame).toHaveAttribute('data-width', PREVIEW_WIDTH.DESKTOP);
-
-    await user.click(screen.getByRole('button', { name: 'Mobile' }));
-
-    expect(frame).toHaveAttribute('data-width', PREVIEW_WIDTH.MOBILE);
+    expect(defaultSender).toBeVisible();
+    expect(noReplyTo).toBeVisible();
   });
 
   it('shows the actions and notes it is given', () => {
     setup({
-      actions: <button type="button">Send</button>,
-      notes: <p>A note</p>,
+      actions: <button type="button">{MOCK_ACTION_LABEL}</button>,
+      notes: <p>{MOCK_NOTE}</p>,
     });
 
-    expect(screen.getByRole('button', { name: 'Send' })).toBeVisible();
-    expect(screen.getByText('A note')).toBeVisible();
+    const actionButton = screen.getByRole('button', {
+      name: MOCK_ACTION_LABEL,
+    });
+    const note = screen.getByText(MOCK_NOTE);
+
+    expect(actionButton).toBeVisible();
+    expect(note).toBeVisible();
   });
 });

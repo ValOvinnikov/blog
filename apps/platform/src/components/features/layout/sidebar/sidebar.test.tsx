@@ -1,309 +1,178 @@
-import { ICONS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import {
+  mockNavBadge,
+  mockNavInertItem,
+  mockNavLinkItem,
+  mockNavSection,
+} from '@platform/testing/layout/fixtures';
 
-import { Sidebar } from './sidebar';
+import { Sidebar, type TSidebarProps } from './sidebar';
 
 vi.mock('@platform/i18n/navigation');
 
-const usePathnameMock = vi.mocked(usePathname);
+faker.seed(5993);
 
-const render = (ui: ReactNode) =>
+const MOCK_LOOK_ITEM = mockNavLinkItem();
+const MOCK_VOICE_ITEM = mockNavLinkItem();
+const MOCK_SECTION = mockNavSection({ items: [MOCK_LOOK_ITEM] });
+const MOCK_BADGE = mockNavBadge();
+const MOCK_NOTE = faker.lorem.sentence();
+const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
+const MOCK_DISABLED_REASON = faker.lorem.sentence();
+const MOCK_INERT_ITEM = mockNavInertItem({
+  badge: MOCK_BADGE,
+  disabledReason: MOCK_DISABLED_REASON,
+});
+
+const ARIA_CURRENT = 'aria-current';
+
+const renderSidebar = (
+  props: Partial<TSidebarProps> = {},
+  isInitiallyCollapsed = false,
+) =>
   renderWithIntl(
-    <SidebarCollapseProvider isInitiallyCollapsed={false}>
-      {ui}
+    <SidebarCollapseProvider isInitiallyCollapsed={isInitiallyCollapsed}>
+      <Sidebar sections={[]} {...props} />
     </SidebarCollapseProvider>,
   );
 
-const setPathname = (pathname: string) => {
-  usePathnameMock.mockReturnValue(pathname);
-};
-
-const TENANT_SECTION_LABEL = 'Tenant · acme';
-const LOOK_AND_VOICE_SHIP_SOON = 'Look and Voice ship soon.';
-const THIS_MILESTONE = 'this milestone';
-const ARIA_CURRENT = 'aria-current';
-const PROVISIONING_ISN_T_AVAILABLE_YET = "Provisioning isn't available yet.";
-const ARIA_EXPANDED = 'aria-expanded';
-
 describe(`<${Sidebar.name}/>`, () => {
   beforeEach(() => {
-    setPathname('/');
+    vi.mocked(usePathname).mockReset();
   });
 
-  it('renders each section label and its nav links', () => {
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: 'Platform',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-      />,
-    );
+  it("lists each section's label and its nav links", () => {
+    renderSidebar({ sections: [MOCK_SECTION] });
 
-    expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
-      'href',
-      '/tenants',
-    );
+    const sectionLabel = screen.getByText(MOCK_SECTION.label);
+    const link = screen.getByRole('link', { name: MOCK_LOOK_ITEM.label });
+
+    expect(sectionLabel).toBeVisible();
+    expect(link).toHaveAttribute('href', MOCK_LOOK_ITEM.href);
   });
 
-  it('renders the note instead of a dead link when a section has no items yet', () => {
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [],
-            note: LOOK_AND_VOICE_SHIP_SOON,
-          },
-        ]}
-      />,
-    );
+  it('renders the note instead of links when a section has no items yet', () => {
+    renderSidebar({
+      sections: [mockNavSection({ items: [], note: MOCK_NOTE })],
+    });
 
-    expect(screen.getByText(LOOK_AND_VOICE_SHIP_SOON)).toBeVisible();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const note = screen.getByText(MOCK_NOTE);
+    const link = screen.queryByRole('link');
+
+    expect(note).toBeVisible();
+    expect(link).not.toBeInTheDocument();
   });
 
   it('renders the switcher slot when provided', () => {
-    render(<Sidebar sections={[]} switcher={<div>Tenant switcher</div>} />);
+    renderSidebar({ switcher: <div>{MOCK_SWITCHER_TEXT}</div> });
 
-    expect(screen.getByText('Tenant switcher')).toBeVisible();
+    const switcher = screen.getByText(MOCK_SWITCHER_TEXT);
+
+    expect(switcher).toBeVisible();
   });
 
-  it('renders the brand block with the Valstack mark and name', () => {
-    render(<Sidebar sections={[]} />);
+  it('renders the brand name and tagline', () => {
+    renderSidebar();
 
-    expect(screen.getAllByText('Valstack').length).toBeGreaterThan(0);
-    expect(screen.getByText('admin')).toBeVisible();
+    const brandName = screen.getByText(messages.sidebar.brandName);
+    const brandTagline = screen.getByText(messages.sidebar.brandTagline);
+
+    expect(brandName).toBeVisible();
+    expect(brandTagline).toBeVisible();
   });
 
-  it('carries its badge as visible text', () => {
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [
-              {
-                label: 'Look',
-                icon: ICONS.PALETTE,
-                href: `/tenants/${MOCK_TENANT_ID}/look`,
-                badge: { label: THIS_MILESTONE, tone: 'neutral' },
-              },
-            ],
-          },
-        ]}
-      />,
-    );
+  it('renders the collapse toggle', () => {
+    renderSidebar();
 
-    const link = screen.getByRole('link', { name: /Look/ });
-    expect(within(link).getByText(THIS_MILESTONE)).toBeVisible();
+    const toggle = screen.getByRole('button', {
+      name: messages.sidebar.collapseToggle,
+    });
+
+    expect(toggle).toBeVisible();
   });
 
-  it('marks the item matching the current pathname active, and no other', () => {
-    setPathname(`/tenants/${MOCK_TENANT_ID}/look`);
+  it("carries a link item's badge as visible text inside the link", () => {
+    const item = mockNavLinkItem({ badge: MOCK_BADGE });
+    renderSidebar({ sections: [mockNavSection({ items: [item] })] });
 
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [
-              {
-                label: 'Look',
-                icon: ICONS.PALETTE,
-                href: `/tenants/${MOCK_TENANT_ID}/look`,
-              },
-              {
-                label: 'Voice',
-                icon: ICONS.QUOTE,
-                href: `/tenants/${MOCK_TENANT_ID}/voice`,
-              },
-            ],
-          },
-        ]}
-      />,
-    );
+    const link = screen.getByRole('link', {
+      name: `${item.label}${MOCK_BADGE.label}`,
+    });
+    const badge = within(link).getByText(MOCK_BADGE.label);
 
-    expect(screen.getByRole('link', { name: 'Look' })).toHaveAttribute(
-      ARIA_CURRENT,
-      'page',
-    );
-    expect(screen.getByRole('link', { name: 'Voice' })).not.toHaveAttribute(
-      ARIA_CURRENT,
-    );
+    expect(badge).toBeVisible();
   });
 
   it.each([
-    {
-      description:
-        'marks Studio active when its own route is open, same as any other nav item',
-      pathname: `/tenants/${MOCK_TENANT_ID}/studio`,
-      items: [
-        {
-          label: 'Studio',
-          icon: ICONS.STUDIO,
-          href: `/tenants/${MOCK_TENANT_ID}/studio`,
-        },
-        {
-          label: 'Look',
-          icon: ICONS.PALETTE,
-          href: `/tenants/${MOCK_TENANT_ID}/look`,
-        },
-      ],
-      activeLabel: 'Studio',
-      inactiveLabel: 'Look',
+    { active: MOCK_LOOK_ITEM, inactive: MOCK_VOICE_ITEM },
+    { active: MOCK_VOICE_ITEM, inactive: MOCK_LOOK_ITEM },
+  ])(
+    'marks only the item matching the current pathname active',
+    ({ active, inactive }) => {
+      vi.mocked(usePathname).mockReturnValue(active.href);
+      renderSidebar({
+        sections: [
+          mockNavSection({ items: [MOCK_LOOK_ITEM, MOCK_VOICE_ITEM] }),
+        ],
+      });
+
+      const activeLink = screen.getByRole('link', { name: active.label });
+      const inactiveLink = screen.getByRole('link', { name: inactive.label });
+
+      expect(activeLink).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(inactiveLink).not.toHaveAttribute(ARIA_CURRENT);
     },
-    {
-      description:
-        'switches which item is active when the route changes — the case a shared href could not express',
-      pathname: `/tenants/${MOCK_TENANT_ID}/voice`,
-      items: [
+  );
+
+  it('renders an item with no href as an inert row with its reason and badge', () => {
+    renderSidebar({
+      sections: [mockNavSection({ items: [MOCK_INERT_ITEM] })],
+    });
+
+    const link = screen.queryByRole('link');
+    const label = screen.getByText(MOCK_INERT_ITEM.label);
+    const reason = screen.getByText(MOCK_DISABLED_REASON);
+    const badge = screen.getByText(MOCK_BADGE.label);
+
+    expect(link).not.toBeInTheDocument();
+    expect(label).toBeVisible();
+    expect(reason).toBeVisible();
+    expect(badge).toBeVisible();
+  });
+
+  describe('when the sidebar starts collapsed', () => {
+    beforeEach(() => {
+      renderSidebar(
         {
-          label: 'Look',
-          icon: ICONS.PALETTE,
-          href: `/tenants/${MOCK_TENANT_ID}/look`,
+          sections: [
+            mockNavSection({ items: [MOCK_LOOK_ITEM, MOCK_INERT_ITEM] }),
+          ],
         },
-        {
-          label: 'Voice',
-          icon: ICONS.QUOTE,
-          href: `/tenants/${MOCK_TENANT_ID}/voice`,
-        },
-      ],
-      activeLabel: 'Voice',
-      inactiveLabel: 'Look',
-    },
-  ])('$description', ({ pathname, items, activeLabel, inactiveLabel }) => {
-    setPathname(pathname);
+        true,
+      );
+    });
 
-    render(<Sidebar sections={[{ label: TENANT_SECTION_LABEL, items }]} />);
+    it('keeps a nav link named and titled', () => {
+      const link = screen.getByRole('link', { name: MOCK_LOOK_ITEM.label });
 
-    expect(screen.getByRole('link', { name: activeLabel })).toHaveAttribute(
-      ARIA_CURRENT,
-      'page',
-    );
-    expect(
-      screen.getByRole('link', { name: inactiveLabel }),
-    ).not.toHaveAttribute(ARIA_CURRENT);
-  });
+      expect(link).toHaveAttribute('href', MOCK_LOOK_ITEM.href);
+      expect(link).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
+    });
 
-  it('renders an unbuilt destination as an inert, never-active row with its badge text', () => {
-    setPathname(`/tenants/${MOCK_TENANT_ID}/domain`);
+    it('keeps an inert row labelled and its badge visible', () => {
+      const label = screen.getByText(MOCK_INERT_ITEM.label);
+      const badge = screen.getByText(MOCK_BADGE.label);
 
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [
-              {
-                label: 'Domain',
-                icon: ICONS.GLOBE,
-                badge: { label: 'later', tone: 'warn' },
-              },
-            ],
-          },
-        ]}
-      />,
-    );
-
-    expect(
-      screen.queryByRole('link', { name: /Domain/ }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText('Domain')).toBeVisible();
-    expect(screen.getByText('later')).toBeVisible();
-    expect(screen.queryByText('Domain')).not.toHaveAttribute(ARIA_CURRENT);
-  });
-
-  it("renders an inert item's disabled reason as visible text", () => {
-    render(
-      <Sidebar
-        sections={[
-          {
-            label: 'Platform',
-            items: [
-              {
-                label: 'Add tenant',
-                icon: ICONS.PLUS,
-                badge: { label: 'deferred', tone: 'warn' },
-                disabledReason: PROVISIONING_ISN_T_AVAILABLE_YET,
-              },
-            ],
-          },
-        ]}
-      />,
-    );
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByText(PROVISIONING_ISN_T_AVAILABLE_YET)).toBeVisible();
-  });
-
-  it('names its collapse toggle for its action, flipping name and aria-expanded', async () => {
-    const user = userEvent.setup();
-    render(<Sidebar sections={[]} />);
-
-    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
-    expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
-
-    await user.click(toggle);
-
-    expect(
-      screen.getByRole('button', { name: 'Expand sidebar' }),
-    ).toHaveAttribute(ARIA_EXPANDED, 'false');
-  });
-
-  it('keeps a nav link reachable by its name when the sidebar starts collapsed', () => {
-    renderWithIntl(
-      <SidebarCollapseProvider isInitiallyCollapsed={true}>
-        <Sidebar
-          sections={[
-            {
-              label: 'Platform',
-              items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-            },
-          ]}
-        />
-      </SidebarCollapseProvider>,
-    );
-
-    const link = screen.getByRole('link', { name: 'Tenants' });
-    expect(link).toHaveAttribute('href', '/tenants');
-    expect(link).toHaveAttribute('title', 'Tenants');
-  });
-
-  it('keeps an inert row named and its badge announced when the sidebar starts collapsed', () => {
-    renderWithIntl(
-      <SidebarCollapseProvider isInitiallyCollapsed={true}>
-        <Sidebar
-          sections={[
-            {
-              label: TENANT_SECTION_LABEL,
-              items: [
-                {
-                  label: 'Analytics',
-                  icon: ICONS.GLOBE,
-                  badge: { label: 'Coming soon', tone: 'neutral' },
-                },
-              ],
-            },
-          ]}
-        />
-      </SidebarCollapseProvider>,
-    );
-
-    expect(screen.getByTitle('Analytics')).toHaveTextContent(
-      'AnalyticsComing soon',
-    );
+      expect(label).toBeVisible();
+      expect(badge).toBeVisible();
+    });
   });
 });

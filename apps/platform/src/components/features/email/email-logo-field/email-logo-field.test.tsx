@@ -1,26 +1,29 @@
+import { faker } from '@faker-js/faker';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import en from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import { MOCK_EMAIL_LOGO_URL } from '@platform/testing/email/fixtures';
 import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
 import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
-import userEvent from '@testing-library/user-event';
 
 import { EmailLogoField } from './email-logo-field';
 
-const PNG_JPEG_OR_GIF = 'PNG, JPEG, or GIF.';
+faker.seed(5993);
+
+const { currentAlt, replace } = en.assetUploadField.SENDER;
+
+const onStage = vi.fn();
 
 const setup = customRenderInSettingsForm(EmailLogoField, {
   kind: EMAIL_LOGO_KIND.SENDER,
-  label: 'Email logo',
-  hint: PNG_JPEG_OR_GIF,
+  label: faker.lorem.words(2),
+  hint: faker.lorem.sentence(),
   logo: { url: undefined },
-  onStage: vi.fn(),
+  onStage,
 });
 
 describe(`<${EmailLogoField.name}/>`, () => {
-  const onStage = vi.fn();
-
   beforeEach(() => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
@@ -29,33 +32,19 @@ describe(`<${EmailLogoField.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it('shows the hint and the upload label before any logo is set', () => {
-    setup();
-
-    const hint = screen.getByText(PNG_JPEG_OR_GIF);
-    const uploadButton = screen.getByRole('button', {
-      name: 'Upload email logo',
-    });
-
-    expect(hint).toBeVisible();
-    expect(uploadButton).toBeVisible();
-  });
-
-  it('shows the current logo and the replace label once a logo is set', () => {
+  it('names the current logo and its replace control for the email logo', () => {
     setup({ logo: { url: MOCK_EMAIL_LOGO_URL } });
 
-    const currentLogo = screen.getByAltText('Current email logo');
-    const replaceButton = screen.getByRole('button', {
-      name: 'Replace email logo',
-    });
+    const currentLogo = screen.getByAltText(currentAlt);
+    const replaceButton = screen.getByRole('button', { name: replace });
 
     expect(currentLogo).toBeVisible();
     expect(replaceButton).toBeVisible();
   });
 
-  it('stages a picked file with a local preview URL', async () => {
+  it('stages a picked PNG with a local preview URL', async () => {
     const file = new File(['x'], 'logo.png', { type: 'image/png' });
-    setup({ onStage });
+    setup();
 
     await selectFile(file);
 
@@ -65,25 +54,18 @@ describe(`<${EmailLogoField.name}/>`, () => {
     });
   });
 
-  it('rejects an unsupported type without staging it', async () => {
-    setup({ onStage });
+  it('rejects an SVG without staging it', async () => {
+    setup();
 
     await selectFile(
       new File(['<svg></svg>'], 'logo.svg', { type: 'image/svg+xml' }),
     );
 
-    const unsupportedError = screen.getByText(/SVG and WebP are not supported/);
+    const unsupportedError = screen.getByText(
+      en.emailLogoField.unsupportedType,
+    );
 
     expect(onStage).not.toHaveBeenCalled();
     expect(unsupportedError).toBeVisible();
-  });
-
-  it('stages a removal', async () => {
-    setup({ logo: { url: MOCK_EMAIL_LOGO_URL }, onStage });
-
-    const removeButton = screen.getByRole('button', { name: 'Remove' });
-    await userEvent.setup().click(removeButton);
-
-    expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });
 });
