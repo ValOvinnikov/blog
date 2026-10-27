@@ -1,5 +1,6 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
@@ -10,6 +11,7 @@ import {
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,
+  TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
 
 import { POST } from './route';
@@ -38,7 +40,6 @@ vi.mock('@blog/db', () => ({
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
 const AUTHORIZATION_HEADER = 'authorization';
-const WHOLE_SITE_PURGE_EVENT = 'revalidate_site_config.whole_site_purge';
 const MOCK_REVALIDATE_URL = faker.internet.url();
 const MOCK_REVALIDATE_SECRET = faker.string.alphanumeric(32);
 const MOCK_WRONG_SECRET = faker.string.alphanumeric(32);
@@ -79,7 +80,7 @@ describe(POST, () => {
     vi.mocked(logger.warn).mockReset();
   });
 
-  it('revalidates only the given tenant’s scoped tags when a tenantId is given', async () => {
+  it('revalidates the given tenant’s scoped tags and the host lookups when a tenantId is given', async () => {
     const request = makeRequest(
       BEARER_SECRET,
       JSON.stringify({ tenantId: MOCK_TENANT_ID }),
@@ -87,20 +88,25 @@ describe(POST, () => {
     const response = await POST(request);
     const json = await response.json();
 
+    const expectedTags = [
+      ...tagsForTenant(MOCK_TENANT_ID),
+      TENANT_BY_HOST_CACHE_TAG,
+    ];
+
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(json).toEqual({
-      revalidated: tagsForTenant(MOCK_TENANT_ID),
-      pathPurged: true,
-    });
+    expect(json).toEqual({ revalidated: expectedTags, pathPurged: true });
     expect(revalidateTagMock.mock.calls).toEqual(
-      tagsForTenant(MOCK_TENANT_ID).map((tag) => [tag, { expire: 0 }]),
+      expectedTags.map((tag) => [tag, { expire: 0 }]),
     );
     expect(listTenantsMock).not.toHaveBeenCalled();
     expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
-    expect(logger.warn).toHaveBeenCalledWith(WHOLE_SITE_PURGE_EVENT, {
-      tenantIds: [MOCK_TENANT_ID],
-      requestedTenantId: MOCK_TENANT_ID,
-    });
+    expect(logger.warn).toHaveBeenCalledWith(
+      REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE,
+      {
+        tenantIds: [MOCK_TENANT_ID],
+        requestedTenantId: MOCK_TENANT_ID,
+      },
+    );
   });
 
   it.each([
@@ -110,25 +116,32 @@ describe(POST, () => {
       body: JSON.stringify({ tenantId: '' }),
     },
     { case: 'the body is malformed JSON', body: MALFORMED_JSON_BODY },
-  ])('revalidates every tenant’s scoped tags when $case', async ({ body }) => {
-    const request = makeRequest(BEARER_SECRET, body);
-    const response = await POST(request);
-    const json = await response.json();
+  ])(
+    'revalidates every tenant’s scoped tags and the host lookups when $case',
+    async ({ body }) => {
+      const request = makeRequest(BEARER_SECRET, body);
+      const response = await POST(request);
+      const json = await response.json();
 
-    const expectedTags = [
-      ...tagsForTenant(MOCK_TENANT_ID),
-      ...tagsForTenant(MOCK_OTHER_TENANT_ID),
-    ];
+      const expectedTags = [
+        ...tagsForTenant(MOCK_TENANT_ID),
+        ...tagsForTenant(MOCK_OTHER_TENANT_ID),
+        TENANT_BY_HOST_CACHE_TAG,
+      ];
 
-    expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(json).toEqual({ revalidated: expectedTags, pathPurged: true });
-    expect(purgedTags()).toEqual(expectedTags);
-    expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
-    expect(logger.warn).toHaveBeenCalledWith(WHOLE_SITE_PURGE_EVENT, {
-      tenantIds: [MOCK_TENANT_ID, MOCK_OTHER_TENANT_ID],
-      requestedTenantId: undefined,
-    });
-  });
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(json).toEqual({ revalidated: expectedTags, pathPurged: true });
+      expect(purgedTags()).toEqual(expectedTags);
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+      expect(logger.warn).toHaveBeenCalledWith(
+        REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE,
+        {
+          tenantIds: [MOCK_TENANT_ID, MOCK_OTHER_TENANT_ID],
+          requestedTenantId: undefined,
+        },
+      );
+    },
+  );
 
   it.each([
     {

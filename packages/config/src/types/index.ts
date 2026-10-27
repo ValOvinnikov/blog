@@ -12,6 +12,15 @@ export type TMaybeNull<T> = T | null;
 
 export type TNullable<T> = T | null | undefined;
 
+/** A row that may have been through `JSON.stringify` and back, so each `Date` field may arrive as its ISO string. */
+export type TMaybeJsonDates<T> = {
+  [K in keyof T]: T[K] extends Date
+    ? Date | string
+    : T[K] extends TMaybeNull<Date>
+      ? TMaybeNull<Date | string>
+      : T[K];
+};
+
 export type TByLocale<V> = Record<TLocaleIsoCode, V>;
 
 export type TPartialByLocale<V> = Partial<TByLocale<V>>;

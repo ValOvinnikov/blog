@@ -71,7 +71,7 @@ const RESULTS_TABLE = { name: dataRequestMatchesTable.regionLabel };
 const READER_ACCOUNT_CHECKBOX = {
   name: dataRequestEraseDialog.includesReaderAccount,
 };
-const EXPORT_SETTLE_TIMEOUT_MS = 5_000;
+const ACTION_SETTLE_TIMEOUT_MS = 5_000;
 const MOCK_GENERATED_AT = '2026-10-27T10:29:42.123Z';
 const EXPORT_FILE_STEM = `${DATA_REQUEST_EXPORT_FILE_PREFIX}-2026-10-27T10-29-42Z`;
 const MOCK_ERASED_COUNT = 2;
@@ -104,7 +104,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     return screen.findByRole(
       'button',
       { ...button, busy: false },
-      { timeout: EXPORT_SETTLE_TIMEOUT_MS },
+      { timeout: ACTION_SETTLE_TIMEOUT_MS },
     );
   };
 
@@ -167,6 +167,9 @@ describe(`<${DataRequestPanel.name}/>`, () => {
   describe('after a lookup that finds records', () => {
     beforeEach(async () => {
       await lookUp();
+      await screen.findByRole('region', RESULTS_TABLE, {
+        timeout: ACTION_SETTLE_TIMEOUT_MS,
+      });
     });
 
     it('searches for the entered email and lists every match by kind and site', async () => {
