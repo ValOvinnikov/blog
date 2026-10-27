@@ -12,75 +12,84 @@ import { TeamSpotlight } from './team-spotlight';
 
 vi.mock('@web/i18n/navigation');
 
-const member = mockTeamMember();
-
-const MEMBER_ROLE = 'Staff Engineer';
+const MOCK_MEMBER = mockTeamMember();
+const MOCK_MEMBER_ROLE = 'Staff Engineer';
+const MEMBER_INITIALS = 'JR';
 
 const setup = customRender(TeamSpotlight, {
-  member,
+  member: MOCK_MEMBER,
   imageShape: CARD_IMAGE_SHAPE.CIRCLE,
 });
 
 describe(`<${TeamSpotlight.name}/>`, () => {
-  describe('with the default member', () => {
-    let unmount: () => void;
-
+  describe('a member with no photo or profile page', () => {
     beforeEach(() => {
-      ({ unmount } = setup());
+      setup();
     });
 
-    it('renders initials, never an empty frame, when the member has no photo', () => {
+    it('renders initials, never an empty frame', () => {
       const missingPhoto = screen.queryByRole('img');
-      const initials = screen.getByText('JR');
+      const initials = screen.getByText(MEMBER_INITIALS);
+
       expect(missingPhoto).not.toBeInTheDocument();
       expect(initials).toBeVisible();
-      unmount();
-
-      setup({ member: mockTeamMember({ image: mockSanityImage() }) });
-
-      const photo = screen.getByRole('img');
-      const hiddenInitials = screen.queryByText('JR');
-      expect(photo).toBeVisible();
-      expect(hiddenInitials).not.toBeInTheDocument();
     });
 
-    it("links the person's name only when a profile page is set", () => {
-      const missingLink = screen.queryByRole('link', { name: member.name });
+    it("renders the person's name as an unlinked heading", () => {
+      const missingLink = screen.queryByRole('link', {
+        name: MOCK_MEMBER.name,
+      });
       const heading = screen.getByRole('heading', {
         level: 3,
-        name: member.name,
+        name: MOCK_MEMBER.name,
       });
+
       expect(missingLink).not.toBeInTheDocument();
       expect(heading).toBeVisible();
-      unmount();
-
-      setup({
-        member: mockTeamMember({ profileUrl: MOCK_TEAM_MEMBER_PROFILE_URL }),
-      });
-
-      const profileLink = screen.getByRole('link', { name: member.name });
-      expect(profileLink).toHaveAttribute('href', MOCK_TEAM_MEMBER_PROFILE_URL);
     });
   });
 
-  it('renders the role and bio only when supplied', () => {
-    const { unmount } = setup({ member: mockTeamMember({ role: undefined }) });
+  it('renders the photo instead of the initials when the member has one', () => {
+    setup({ member: mockTeamMember({ image: mockSanityImage() }) });
 
-    const missingRole = screen.queryByText(MEMBER_ROLE);
+    const photo = screen.getByRole('img');
+    const hiddenInitials = screen.queryByText(MEMBER_INITIALS);
+
+    expect(photo).toBeVisible();
+    expect(hiddenInitials).not.toBeInTheDocument();
+  });
+
+  it("links the person's name when a profile page is set", () => {
+    setup({
+      member: mockTeamMember({ profileUrl: MOCK_TEAM_MEMBER_PROFILE_URL }),
+    });
+
+    const profileLink = screen.getByRole('link', { name: MOCK_MEMBER.name });
+
+    expect(profileLink).toHaveAttribute('href', MOCK_TEAM_MEMBER_PROFILE_URL);
+  });
+
+  it('renders no role or bio when none are supplied', () => {
+    setup({ member: mockTeamMember({ role: undefined }) });
+
+    const missingRole = screen.queryByText(MOCK_MEMBER_ROLE);
     const missingBio = screen.queryByText(MOCK_TEAM_MEMBER_BIO);
+
     expect(missingRole).not.toBeInTheDocument();
     expect(missingBio).not.toBeInTheDocument();
-    unmount();
+  });
 
+  it('renders the role and bio when supplied', () => {
     setup({
       member: mockTeamMember({
-        role: MEMBER_ROLE,
+        role: MOCK_MEMBER_ROLE,
         bio: [mockPortableTextBlock(MOCK_TEAM_MEMBER_BIO)],
       }),
     });
 
-    const role = screen.getByText(MEMBER_ROLE);
+    const role = screen.getByText(MOCK_MEMBER_ROLE);
     const bio = screen.getByText(MOCK_TEAM_MEMBER_BIO);
+
     expect(role).toBeVisible();
     expect(bio).toBeVisible();
   });

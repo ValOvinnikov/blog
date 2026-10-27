@@ -9,6 +9,8 @@ import { TeamCarousel } from './team-carousel';
 
 vi.mock('@web/i18n/navigation');
 
+const CAROUSEL_LABEL = `${MOCK_TEAM_HEADING} carousel`;
+
 const setup = customRender(TeamCarousel, {
   members: MOCK_TEAM_MEMBERS,
   imageShape: CARD_IMAGE_SHAPE.CIRCLE,
@@ -18,25 +20,36 @@ const setup = customRender(TeamCarousel, {
 });
 
 describe(`<${TeamCarousel.name}/>`, () => {
-  it('renders a labelled carousel with one card per member', async () => {
+  beforeEach(() => {
     setup();
+  });
 
-    const region = screen.getByRole('region', {
-      name: `${MOCK_TEAM_HEADING} carousel`,
-    });
-    const cardHeadings = within(region).getAllByRole('heading', { level: 3 });
-    expect(cardHeadings).toHaveLength(MOCK_TEAM_MEMBERS.length);
-    MOCK_TEAM_MEMBERS.forEach((member) => {
+  it.each(MOCK_TEAM_MEMBERS.map(({ name }) => name))(
+    'renders %s as a card in the labelled carousel',
+    (memberName) => {
+      const region = screen.getByRole('region', { name: CAROUSEL_LABEL });
       const cardHeading = within(region).getByRole('heading', {
         level: 3,
-        name: member.name,
+        name: memberName,
       });
+
       expect(cardHeading).toBeVisible();
-    });
+    },
+  );
+
+  it('renders exactly one card per member', () => {
+    const region = screen.getByRole('region', { name: CAROUSEL_LABEL });
+    const cardHeadings = within(region).getAllByRole('heading', { level: 3 });
+
+    expect(cardHeadings).toHaveLength(MOCK_TEAM_MEMBERS.length);
+  });
+
+  it('renders previous and next slide controls', async () => {
     const previousButton = await screen.findByRole('button', {
       name: 'Previous slide',
     });
     const nextButton = screen.getByRole('button', { name: 'Next slide' });
+
     expect(previousButton).toBeVisible();
     expect(nextButton).toBeVisible();
   });
