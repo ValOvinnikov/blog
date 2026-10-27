@@ -1,4 +1,4 @@
-import { SIZE } from '@blog/config';
+import { BUSY_BUTTON_STYLE, SIZE } from '@blog/config';
 import {
   FOCUS_RING,
   LINK_UNDERLINE,
@@ -13,7 +13,7 @@ export const buttonVariants = tv({
     'rounded-sm border',
     'font-display font-medium',
     TRANSITION_COLORS,
-    'cursor-pointer',
+    'relative cursor-pointer aria-busy:cursor-progress',
     FOCUS_RING,
     'disabled:pointer-events-none disabled:opacity-50',
   ],
@@ -45,3 +45,54 @@ export const buttonVariants = tv({
 });
 
 export type TButtonVariants = VariantProps<typeof buttonVariants>;
+
+const FACE = [
+  'col-start-1 row-start-1',
+  'inline-flex items-center justify-center gap-[0.6ch]',
+];
+
+export const buttonBusyVariants = tv({
+  slots: {
+    faces: ['grid'],
+    idleFace: FACE,
+    keptFace: FACE,
+    busyFace: FACE,
+    edge: [
+      'pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]',
+      'before:absolute before:bottom-0 before:left-0 before:h-0.5 before:w-1/3 before:bg-current',
+      'before:animate-[busy-edge_1.2s_ease-in-out_infinite]',
+      'motion-reduce:before:w-full motion-reduce:before:animate-none',
+    ],
+    status: ['sr-only'],
+  },
+  variants: {
+    busyStyle: {
+      [BUSY_BUTTON_STYLE.LABEL]: {},
+      [BUSY_BUTTON_STYLE.KEPT]: {},
+      [BUSY_BUTTON_STYLE.EDGE]: {},
+    },
+    isBusy: {
+      true: {},
+      false: { keptFace: ['invisible'], busyFace: ['invisible'] },
+    },
+  },
+  compoundVariants: [
+    {
+      isBusy: true,
+      busyStyle: [BUSY_BUTTON_STYLE.LABEL, BUSY_BUTTON_STYLE.EDGE],
+      class: { idleFace: ['invisible'], keptFace: ['invisible'] },
+    },
+    {
+      isBusy: true,
+      busyStyle: BUSY_BUTTON_STYLE.KEPT,
+      class: {
+        idleFace: ['invisible'],
+        keptFace: ['motion-reduce:invisible'],
+        busyFace: ['invisible motion-reduce:visible'],
+      },
+    },
+  ],
+  defaultVariants: { busyStyle: BUSY_BUTTON_STYLE.LABEL, isBusy: false },
+});
+
+export type TButtonBusyVariants = VariantProps<typeof buttonBusyVariants>;

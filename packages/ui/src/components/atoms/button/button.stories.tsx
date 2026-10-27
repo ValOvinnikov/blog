@@ -1,10 +1,12 @@
 import { SIZE } from '@blog/config';
+import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
+import { ReducedMotion } from '@blog/ui/testing/reduced-motion';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within } from 'storybook/test';
 
 import { Button } from './button';
-import { buttonVariants } from './button-variants';
+import { buttonBusyVariants, buttonVariants } from './button-variants';
 
 const meta: Meta<typeof Button> = {
   title: 'Atoms/Button',
@@ -18,6 +20,14 @@ const meta: Meta<typeof Button> = {
     size: {
       control: 'select',
       options: objectKeys(buttonVariants.variants.size),
+    },
+    busyStyle: {
+      control: 'select',
+      options: objectKeys(buttonBusyVariants.variants.busyStyle),
+    },
+    spinnerVariant: {
+      control: 'select',
+      options: objectKeys(spinnerVariants.variants.variant),
     },
   },
 };
@@ -53,12 +63,14 @@ export const LinkDescendersAndWrapping: TStory = {
   ),
 };
 
+const DANGER_LABEL = 'delete account';
+
 export const Danger: TStory = {
-  args: { children: 'delete account', variant: 'danger' },
+  args: { children: DANGER_LABEL, variant: 'danger' },
 };
 
 export const DangerDisabled: TStory = {
-  args: { children: 'delete account', variant: 'danger', isDisabled: true },
+  args: { children: DANGER_LABEL, variant: 'danger', isDisabled: true },
 };
 
 export const Small: TStory = {
@@ -100,6 +112,87 @@ const OnBrandPrimary = () => (
 export const OnBrandPrimaryBackgroundFocused: TStory = {
   name: 'On a Brand-primary background, focused',
   render: OnBrandPrimary,
+  play: ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole('button').focus();
+  },
+};
+
+export const Busy: TStory = {
+  args: {
+    children: 'Subscribe',
+    busyLabel: 'Subscribing…',
+    isBusy: true,
+  },
+};
+
+const BUSY_STYLES = objectKeys(buttonBusyVariants.variants.busyStyle);
+const BUTTON_VARIANTS = objectKeys(buttonVariants.variants.variant);
+const SPINNER_VARIANTS = objectKeys(spinnerVariants.variants.variant);
+
+const BusyStyles = () => (
+  <div className="flex flex-col gap-4">
+    {BUSY_STYLES.map((busyStyle) => (
+      <div key={busyStyle} className="flex flex-wrap items-center gap-4">
+        {BUTTON_VARIANTS.map((variant) => (
+          <Button
+            key={variant}
+            variant={variant}
+            busyStyle={busyStyle}
+            busyLabel="Sending…"
+            isBusy={true}
+          >
+            Send
+          </Button>
+        ))}
+        <Button busyStyle={busyStyle} busyLabel="Sending…">
+          Send
+        </Button>
+      </div>
+    ))}
+  </div>
+);
+
+export const BusyStylesOnEveryVariant: TStory = {
+  name: 'Busy styles on every variant, beside an idle button',
+  render: () => <BusyStyles />,
+};
+
+export const BusyStylesWithReducedMotion: TStory = {
+  name: 'Busy styles with reduced motion',
+  render: () => (
+    <ReducedMotion>
+      <BusyStyles />
+    </ReducedMotion>
+  ),
+};
+
+export const SpinnersOnEveryVariant: TStory = {
+  name: 'Each spinner on every variant',
+  render: () => (
+    <div className="flex flex-col gap-4">
+      {SPINNER_VARIANTS.map((spinnerVariant) => (
+        <div key={spinnerVariant} className="flex flex-wrap items-center gap-4">
+          {BUTTON_VARIANTS.map((variant) => (
+            <Button
+              key={variant}
+              variant={variant}
+              spinnerVariant={spinnerVariant}
+              busyLabel="Saving…"
+              isBusy={true}
+            >
+              Save
+            </Button>
+          ))}
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const BusyFocused: TStory = {
+  name: 'Busy, focused',
+  args: Busy.args,
   play: ({ canvasElement }) => {
     const canvas = within(canvasElement);
     canvas.getByRole('button').focus();

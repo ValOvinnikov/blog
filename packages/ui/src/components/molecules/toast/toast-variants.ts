@@ -18,7 +18,7 @@ export const toastVariants = tv({
       'font-ui text-label text-text',
     ],
     icon: ['shrink-0'],
-    spinner: ['shrink-0'],
+    spinner: ['shrink-0', 'text-brand-primary'],
     titleText: ['font-semibold'],
     time: ['shrink-0 text-label text-subtle'],
     dismiss: ['shrink-0 hover:text-error'],

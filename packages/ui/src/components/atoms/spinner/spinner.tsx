@@ -7,6 +7,7 @@ export type TSpinnerProps = IWithClassName &
   IWithDataTestId & {
     label: string;
     hasLabel?: boolean;
+    variant?: TSpinnerVariants['variant'];
     size?: TSpinnerVariants['size'];
     'aria-hidden'?: AriaAttributes['aria-hidden'];
   };
@@ -15,12 +16,13 @@ export type TSpinnerProps = IWithClassName &
 export const Spinner = ({
   label,
   hasLabel = false,
+  variant,
   size,
   className,
   dataTestId,
   'aria-hidden': ariaHidden,
 }: TSpinnerProps) => {
-  const { root, glyph, text } = spinnerVariants({ size });
+  const { root, glyph, text } = spinnerVariants({ variant, size });
 
   return (
     <span
