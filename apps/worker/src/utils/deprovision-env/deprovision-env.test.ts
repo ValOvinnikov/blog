@@ -1,41 +1,30 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { MOCK_DEPROVISION_ENV } from '@worker/testing/deprovision-env/fake-deprovision-env';
+import { MOCK_WORKER_ENV } from '@worker/testing/worker-env/mock-worker-env';
+import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { FatalError } from 'workflow';
 
 import { getDeprovisionEnv } from './deprovision-env';
 
-const { mockEnv, REQUIRED_ENV } = vi.hoisted(() => {
-  const required = {
-    SANITY_MANAGEMENT_TOKEN: 'deprovision-management-token',
-    VERCEL_TOKEN: 'deprovision-vercel-token',
-    VERCEL_PROJECT_ID_WEB: 'prj_deprovision_web',
-    WEB_APP_URL: 'https://deprovision-web.example.com',
-    SITE_CONFIG_REVALIDATE_SECRET: 'deprovision-site-config-secret',
-  };
-  return {
-    REQUIRED_ENV: required,
-    mockEnv: { ...required } as Record<string, TMaybeUndefined<string>>,
-  };
-});
+vi.mock('@worker/utils/env/env');
 
-vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
+const REQUIRED_ENV_NAMES = [
+  'SANITY_MANAGEMENT_TOKEN',
+  'VERCEL_TOKEN',
+  'VERCEL_PROJECT_ID_WEB',
+  'WEB_APP_URL',
+  'SITE_CONFIG_REVALIDATE_SECRET',
+];
 
 describe(getDeprovisionEnv, () => {
-  afterEach(() => {
-    Object.assign(mockEnv, REQUIRED_ENV);
+  beforeEach(() => {
+    Object.assign(mockEnv, MOCK_WORKER_ENV);
   });
 
   it('maps the worker env onto the deprovisioning env', () => {
-    expect(getDeprovisionEnv()).toEqual({
-      sanityManagementToken: REQUIRED_ENV.SANITY_MANAGEMENT_TOKEN,
-      vercelToken: REQUIRED_ENV.VERCEL_TOKEN,
-      vercelTeamId: undefined,
-      vercelWebProjectId: REQUIRED_ENV.VERCEL_PROJECT_ID_WEB,
-      webAppBaseUrl: REQUIRED_ENV.WEB_APP_URL,
-      siteConfigRevalidateSecret: REQUIRED_ENV.SITE_CONFIG_REVALIDATE_SECRET,
-    });
+    expect(getDeprovisionEnv()).toEqual(MOCK_DEPROVISION_ENV);
   });
 
-  it.each(Object.keys(REQUIRED_ENV))(
+  it.each(REQUIRED_ENV_NAMES)(
     'fails permanently when %s is missing',
     (name) => {
       mockEnv[name] = undefined;

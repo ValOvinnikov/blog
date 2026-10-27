@@ -8,33 +8,22 @@ import {
   updateProvisioningStep,
 } from '@blog/db/queries/tenants';
 import { errorResult } from '@blog/utils/result';
+import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { verifyTenantSeededContent } from '@worker/steps/verify-seeded-content';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
-import { getStepMetadata } from 'workflow';
+import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 
 import { verifyTenant } from './verify-tenant';
 
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
-vi.mock(
-  '@worker/utils/provision-env/provision-env',
-  () => import('@worker/testing/provision-env/fake-provision-env'),
-);
+vi.mock('@blog/db/queries/tenants');
+vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/verify-seeded-content');
-vi.mock('workflow', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('workflow')>()),
-  getStepMetadata: vi.fn(),
-}));
+vi.mock('workflow');
 
 describe(verifyTenant, () => {
   beforeEach(() => {
-    vi.mocked(getStepMetadata).mockReturnValue({
-      attempt: 1,
-    } as ReturnType<typeof getStepMetadata>);
+    atStepAttempt(1);
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(updateProvisioningStep).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
@@ -44,20 +33,15 @@ describe(verifyTenant, () => {
   it('verifies the seeded content and reports VERIFY_CONTENT done', async () => {
     const result = await verifyTenant(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
+    const [report] = vi.mocked(updateProvisioningStep).mock.lastCall ?? [];
     expect(result).toEqual({ ok: true, data: undefined });
     expect(verifyTenantSeededContent).toHaveBeenCalledOnce();
-    expect(updateProvisioningStep).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        step: TENANT_PROVISIONING_STEP.VERIFY_CONTENT,
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-      }),
-    );
+    expect(report?.step).toBe(TENANT_PROVISIONING_STEP.VERIFY_CONTENT);
+    expect(report?.status).toBe(TENANT_PROVISIONING_STEP_STATUS.DONE);
   });
 
   it('reports the failed step when verification keeps failing', async () => {
-    vi.mocked(getStepMetadata).mockReturnValue({
-      attempt: 99,
-    } as ReturnType<typeof getStepMetadata>);
+    atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
     vi.mocked(verifyTenantSeededContent).mockRejectedValue(
       new Error('webhook missing'),
     );

@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
@@ -6,35 +5,29 @@ import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   MOCK_FORGED_SECRET,
   MOCK_ENQUEUE_SECRET,
+  MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_RUN_ID } from '@worker/testing/run/fixtures';
 import { mockTenant, MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { logger } from '@worker/utils/logger/logger';
 import { deprovisionTenant } from '@worker/workflows/deprovision-tenant';
 import { start } from 'workflow/api';
 
 import { POST } from './route';
 
-const DEPROVISION_URL = 'https://worker.example.com/api/deprovision';
-const RUN_ID = 'deprovision-run';
+const MOCK_DEPROVISION_URL = `${MOCK_WORKER_ORIGIN}/api/deprovision`;
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({}));
-
-vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-vi.mock('@worker/workflows/deprovision-tenant', () => ({
-  deprovisionTenant: vi.fn(),
-}));
-vi.mock('workflow/api', () => ({ start: vi.fn() }));
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+vi.mock('@worker/utils/env/env');
+vi.mock('@worker/workflows/deprovision-tenant');
+vi.mock('workflow/api');
+vi.mock('@blog/db/queries/tenants');
 
 function deprovisionRequest(secret: string = MOCK_ENQUEUE_SECRET): Request {
   return mockSignedRequest(
-    DEPROVISION_URL,
+    MOCK_DEPROVISION_URL,
     JSON.stringify({ tenantId: MOCK_TENANT_ID }),
     { secret },
   );
@@ -44,14 +37,14 @@ describe('POST /api/deprovision', () => {
   beforeEach(() => {
     mockEnv.WORKER_ENQUEUE_SECRET = MOCK_ENQUEUE_SECRET;
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
-    vi.mocked(start).mockResolvedValue({ runId: RUN_ID } as never);
+    vi.mocked(start).mockResolvedValue({ runId: MOCK_RUN_ID } as never);
   });
 
   it('starts the deprovisioning run and answers with its id', async () => {
     const response = await POST(deprovisionRequest());
 
     expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
-    await expect(response.json()).resolves.toEqual({ runId: RUN_ID });
+    await expect(response.json()).resolves.toEqual({ runId: MOCK_RUN_ID });
     expect(start).toHaveBeenCalledWith(deprovisionTenant, [MOCK_TENANT_ID]);
   });
 

@@ -16,11 +16,7 @@ import { runProvisioningSequence } from '@worker/workflows/provisioning-sequence
 import { provisionTenantOnce } from './provision-tenant';
 
 vi.mock('@worker/workflows/provisioning-sequence');
-vi.mock(import('@blog/db/queries/tenants'), async (importOriginal) =>
-  (
-    await import('@worker/testing/tenants-queries/fake-tenants-queries')
-  ).withFakeTenantsQueries(await importOriginal()),
-);
+vi.mock('@blog/db/queries/tenants');
 
 describe(provisionTenantOnce, () => {
   beforeEach(() => {
@@ -34,10 +30,11 @@ describe(provisionTenantOnce, () => {
     const result = await provisionTenantOnce(MOCK_TENANT_ID);
 
     expect(result).toBe(PROVISION_CLI_RESULT.SUCCEEDED);
-    expect(runProvisioningSequence).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      runId: expect.stringMatching(/^cli-/),
-      isOneShot: true,
-    });
+    const [tenantId, ctx] =
+      vi.mocked(runProvisioningSequence).mock.lastCall ?? [];
+    expect(tenantId).toBe(MOCK_TENANT_ID);
+    expect(ctx?.runId).toMatch(/^cli-/);
+    expect(ctx?.isOneShot).toBe(true);
   });
 
   it('reports a failed run when a unit fails', async () => {

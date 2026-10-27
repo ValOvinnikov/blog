@@ -1,48 +1,36 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
+import { MOCK_WORKER_ENV } from '@worker/testing/worker-env/mock-worker-env';
+import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { FatalError } from 'workflow';
 
 import { getProvisionEnv } from './provision-env';
 
-const mockEnv = vi.hoisted((): Record<string, TMaybeUndefined<string>> => ({
-  SANITY_MANAGEMENT_TOKEN: 'secret-management-token',
-  SANITY_ORGANIZATION_ID: 'org-1',
-  VERCEL_TOKEN: 'secret-vercel-token',
-  VERCEL_TEAM_ID: undefined,
-  VERCEL_PROJECT_ID_WEB: 'prj_web',
-  PLATFORM_APP_BASE_URL: 'https://admin.example.com',
-  TENANT_SANITY_DATASET: 'production',
-  WEB_APP_URL: 'https://web.example.com',
-  SANITY_REVALIDATE_SECRET: 'secret-revalidate',
-}));
+vi.mock('@worker/utils/env/env');
 
-vi.mock('@worker/utils/env/env', () => ({ env: mockEnv }));
-
-const REQUIRED = Object.entries(mockEnv)
-  .filter(([, value]) => value !== undefined)
-  .map(([name]) => name);
+const REQUIRED_ENV_NAMES = [
+  'SANITY_MANAGEMENT_TOKEN',
+  'SANITY_ORGANIZATION_ID',
+  'VERCEL_TOKEN',
+  'VERCEL_PROJECT_ID_WEB',
+  'PLATFORM_APP_BASE_URL',
+  'TENANT_SANITY_DATASET',
+  'WEB_APP_URL',
+  'SANITY_REVALIDATE_SECRET',
+];
 
 describe(getProvisionEnv, () => {
-  const original = { ...mockEnv };
-
-  afterEach(() => {
-    Object.assign(mockEnv, original);
+  beforeEach(() => {
+    Object.assign(mockEnv, MOCK_WORKER_ENV);
   });
 
   it('maps the worker env onto the provisioning env', () => {
-    const provisionEnv = getProvisionEnv();
-
-    expect(provisionEnv).toMatchObject({
-      sanityManagementToken: mockEnv.SANITY_MANAGEMENT_TOKEN,
-      vercelToken: mockEnv.VERCEL_TOKEN,
-      webAppBaseUrl: mockEnv.WEB_APP_URL,
-      vercelTeamId: undefined,
-    });
+    expect(getProvisionEnv()).toEqual(MOCK_PROVISION_ENV);
   });
 
-  it.each(REQUIRED)(
+  it.each(REQUIRED_ENV_NAMES)(
     'throws a fatal error naming %s when it is unset',
     (name) => {
-      Object.assign(mockEnv, { [name]: undefined });
+      mockEnv[name] = undefined;
 
       expect(() => getProvisionEnv()).toThrow(FatalError);
       expect(() => getProvisionEnv()).toThrow(name);
@@ -50,8 +38,14 @@ describe(getProvisionEnv, () => {
   );
 
   it('never puts another variable value in the error', () => {
-    Object.assign(mockEnv, { WEB_APP_URL: undefined });
+    mockEnv.WEB_APP_URL = undefined;
 
-    expect(() => getProvisionEnv()).not.toThrow(/secret-/);
+    expect(() => getProvisionEnv()).toThrow(FatalError);
+    expect(() => getProvisionEnv()).not.toThrow(
+      MOCK_PROVISION_ENV.sanityManagementToken,
+    );
+    expect(() => getProvisionEnv()).not.toThrow(
+      MOCK_PROVISION_ENV.revalidateSecret,
+    );
   });
 });
