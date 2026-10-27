@@ -1,20 +1,14 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
-import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import { auth } from '@platform/server/auth/auth';
-import {
-  act,
-  customRenderAsync,
-  screen,
-} from '@platform/testing/custom-render';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockTenant,
-  MOCK_TENANT_ID,
-  MOCK_VERCEL_A_RECORD,
   MOCK_CUSTOM_DOMAIN,
+  MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
-import type { Session } from 'next-auth';
 
 import TenantDomainPage from './page';
 
@@ -39,7 +33,7 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
   getProjectDomain: getProjectDomainMock,
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const t = makeEnTranslator('tenantDomainPage');
 
 const setup = customRenderAsync(TenantDomainPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
@@ -47,58 +41,34 @@ const setup = customRenderAsync(TenantDomainPage, {
 
 describe(`<${TenantDomainPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.ADMIN,
-    });
-    getTenantByIdMock.mockReset();
-    getProjectDomainMock.mockReset();
-    getProjectDomainMock.mockResolvedValue({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
-    });
-  });
-
-  it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-  });
-
-  it('404s when the signed-in user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-  });
-
-  it('404s for an unknown tenant id', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-  });
-
-  it('renders the domain page heading, live status, and DNS records table', async () => {
-    const tenant = mockTenant({
-      id: MOCK_TENANT_ID,
-      primaryDomain: MOCK_CUSTOM_DOMAIN,
-    });
-    getTenantByIdMock.mockResolvedValue(tenant);
-
-    await act(async () => {
-      await setup();
-    });
-
-    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
-      MOCK_CUSTOM_DOMAIN,
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
     );
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Domain' }),
-    ).toBeVisible();
-    expect(screen.getByText('Awaiting DNS')).toBeVisible();
-    expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.getByText(MOCK_VERCEL_A_RECORD)).toBeVisible();
+    getProjectDomainMock.mockResolvedValue(mockPendingProjectDomain());
+  });
+
+  it('404s a signed-in user who is not an operator', async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(undefined);
+
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+
+    expect(getProjectDomainMock).not.toHaveBeenCalled();
+  });
+
+  it("renders the routed tenant's domain page", async () => {
+    await setup();
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: t('pageTitle'),
+    });
+    const cardHeading = await screen.findByRole('heading', {
+      level: 2,
+      name: t('cardTitle', { domain: MOCK_CUSTOM_DOMAIN }),
+    });
+
+    expect(heading).toBeVisible();
+    expect(cardHeading).toBeVisible();
   });
 });

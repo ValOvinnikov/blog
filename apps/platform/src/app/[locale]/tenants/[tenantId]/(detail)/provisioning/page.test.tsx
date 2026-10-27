@@ -1,9 +1,10 @@
+import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
-  INVITED_PENDING_TEXT,
-  mockTenant,
+  MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import TenantProvisioningPage from './page';
@@ -28,45 +29,52 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
+const { provisioningStatusView, deprovisionTenantControl } = messages;
+
 const setup = customRenderAsync(TenantProvisioningPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
-describe(TenantProvisioningPage, () => {
-  let tenant: ReturnType<typeof mockTenant>;
-
+describe(`<${TenantProvisioningPage.name}/>`, () => {
   beforeEach(() => {
-    requireTenantByIdMock.mockReset();
-    tenant = mockTenant();
-    requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
-    getTenantOwnerEmailMock.mockReset();
-    getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
+    requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
+    getTenantOwnerEmailMock.mockResolvedValue(MOCK_OWNER_EMAIL);
   });
 
-  it('renders the provisioning status view for the resolved tenant, with no deprovisioning control', async () => {
-    await setup();
-
-    expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
-    const provisioningHeading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Provisioning',
-    });
-    const deprovisionButton = screen.queryByRole('button', {
-      name: 'Deprovision',
+  describe('with a resolved owner', () => {
+    beforeEach(async () => {
+      await setup();
     });
 
-    expect(provisioningHeading).toBeVisible();
-    expect(deprovisionButton).not.toBeInTheDocument();
+    it('renders the provisioning status of the requested tenant', () => {
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: provisioningStatusView.pageTitle,
+      });
+
+      expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(heading).toBeVisible();
+    });
+
+    it('offers no deprovisioning control', () => {
+      const deprovisionButton = screen.queryByRole('button', {
+        name: deprovisionTenantControl.triggerButton,
+      });
+
+      expect(deprovisionButton).not.toBeInTheDocument();
+    });
   });
 
-  it("shows the invited-pending owner badge when the tenant's owner has not resolved to a real user yet", async () => {
-    getTenantOwnerEmailMock.mockResolvedValue(undefined);
+  it('shows the invited-pending owner badge while the owner is unresolved', async () => {
+    getTenantOwnerEmailMock.mockResolvedValueOnce(undefined);
 
     await setup();
 
-    const invitedPendingText = screen.getByText(INVITED_PENDING_TEXT);
+    const invitedPendingBadge = screen.getByText(
+      provisioningStatusView.ownerInvitedPendingBadge,
+    );
 
-    expect(invitedPendingText).toBeVisible();
+    expect(invitedPendingBadge).toBeVisible();
   });
 });

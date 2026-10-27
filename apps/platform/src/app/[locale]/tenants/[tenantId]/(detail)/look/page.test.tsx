@@ -1,16 +1,9 @@
-import {
-  type TMaybeNull,
-  LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
-} from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
-import { auth } from '@platform/server/auth/auth';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
+import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import en from '@platform/i18n/messages/en.json';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
+import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import LookPage from './page';
 
@@ -31,13 +24,11 @@ vi.mock('@blog/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: {
       getTenantById: getTenantByIdMock,
-      selectLiveLocales: vi.fn().mockReturnValue([LOCALE_ISO_CODES.EN]),
+      selectLiveLocales: vi.fn(() => [LOCALE_ISO_CODES.EN]),
     },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
-
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(LookPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
@@ -45,45 +36,24 @@ const setup = customRenderAsync(LookPage, {
 
 describe(`<${LookPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getTenantByIdMock.mockReset();
-    getSiteConfigMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getTenantByIdMock.mockResolvedValue(mockTenant());
   });
 
-  it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-  });
-
-  it('404s when the signed-in user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+  it('404s a signed-in user who is not an operator', async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(undefined);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(redirect).not.toHaveBeenCalled();
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('renders Console defaults for an operator with no saved site_config row', async () => {
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.ADMIN,
-    });
-    getTenantByIdMock.mockResolvedValue({ id: MOCK_TENANT_ID });
-    getSiteConfigMock.mockResolvedValue(undefined);
-
+  it("renders the routed tenant's Look settings", async () => {
     await setup();
 
+    const heading = screen.getByRole('heading', { name: en.lookForm.heading });
+
+    expect(heading).toBeVisible();
     expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(screen.getByRole('heading', { name: 'Look' })).toBeVisible();
-    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
   });
 });

@@ -4,23 +4,32 @@ import {
   OPERATOR_ALERT_KIND,
 } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import {
+  buildDocumentValidationAlertEmail,
+  buildOwnerElevationAlertEmail,
+  sendEmail,
+} from '@blog/email';
+import { faker } from '@faker-js/faker';
 import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { MOCK_BEARER_SECRET } from '@platform/testing/internal-api/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { mockTenant } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
-const { getTenantByIdMock, listSuperadminEmailsMock, sendEmailMock } =
-  vi.hoisted(() => ({
-    getTenantByIdMock: vi.fn(),
-    listSuperadminEmailsMock: vi.fn(),
-    sendEmailMock: vi.fn(),
-  }));
+import { POST } from './route';
+
+faker.seed(5996);
+
+const { getTenantByIdMock, listSuperadminEmailsMock } = vi.hoisted(() => ({
+  getTenantByIdMock: vi.fn(),
+  listSuperadminEmailsMock: vi.fn(),
+}));
 
 vi.mock('@platform/utils/env/env');
-
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -32,101 +41,100 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@blog/email', async (importOriginal) => ({
   ...(await importOriginal()),
-  sendEmail: sendEmailMock,
+  sendEmail: vi.fn(),
 }));
 
+const envMock: Partial<Record<keyof typeof env, string>> = env;
+const sendEmailMock = vi.mocked(sendEmail);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const ENDPOINT = 'https://admin.example.com/api/internal/operator-alert';
-const SUPERADMIN_ONE = 'super-one@example.com';
-const SUPERADMIN_TWO = 'super-two@example.com';
-const SEND_FAILURE_MESSAGE = 'Failed to send email via Resend: rejected';
+const MOCK_ENDPOINT = faker.internet.url();
+const MOCK_WRONG_SECRET = faker.string.alphanumeric(24);
+const MOCK_FROM_ADDRESS = faker.internet.email();
+const MOCK_SUPERADMIN_EMAIL = faker.internet.email();
+const MOCK_OTHER_SUPERADMIN_EMAIL = faker.internet.email();
+const MOCK_SEND_ERROR = new Error(faker.lorem.sentence());
+const MOCK_INVALID_DOCUMENT_COUNT = 3;
+const MULTI_STATUS = 207;
 
-const postRequest = (
-  body: unknown,
-  { authorization }: { authorization?: string } = {
-    authorization: `Bearer ${MOCK_BEARER_SECRET}`,
-  },
+const MOCK_TENANT = mockTenant();
+const { id: MOCK_TENANT_ID, name: MOCK_TENANT_NAME } = MOCK_TENANT;
+
+const OWNER_ELEVATION_BODY = {
+  kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
+  tenantId: MOCK_TENANT_ID,
+  outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+};
+
+const OWNER_ELEVATION_EMAIL = buildOwnerElevationAlertEmail({
+  tenantName: MOCK_TENANT_NAME,
+  tenantId: MOCK_TENANT_ID,
+  outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+});
+
+const SEND_FAILED_CONTEXT = {
+  tenantId: MOCK_TENANT_ID,
+  kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
+  error: MOCK_SEND_ERROR,
+};
+
+const postRawRequest = (
+  rawBody: string,
+  authorization = `Bearer ${MOCK_BEARER_SECRET}`,
 ): Request =>
-  new Request(ENDPOINT, {
+  new Request(MOCK_ENDPOINT, {
     method: HTTP_METHOD.POST,
-    headers: authorization ? { authorization } : {},
-    body: JSON.stringify(body),
+    headers: { authorization },
+    body: rawBody,
   });
 
-describe('POST /api/internal/operator-alert', () => {
-  let POST: typeof import('./route').POST;
+const postRequest = (body: unknown, authorization?: string): Request =>
+  postRawRequest(JSON.stringify(body), authorization);
 
-  beforeEach(async () => {
+describe(POST, () => {
+  beforeEach(() => {
     envMock.OPERATOR_ALERT_SECRET = MOCK_BEARER_SECRET;
-    getTenantByIdMock.mockReset();
-    listSuperadminEmailsMock.mockReset().mockResolvedValue([]);
-    sendEmailMock.mockReset().mockResolvedValue(undefined);
-    loggerErrorMock.mockReset();
-    getTenantByIdMock.mockResolvedValue(mockTenant({ id: 't1', name: 'Acme' }));
-    ({ POST } = await import('./route'));
+    envMock.OPERATOR_ALERT_FROM_ADDRESS = MOCK_FROM_ADDRESS;
+    getTenantByIdMock.mockResolvedValue(MOCK_TENANT);
+    listSuperadminEmailsMock.mockResolvedValue([MOCK_SUPERADMIN_EMAIL]);
   });
 
   it('rejects a request with the wrong secret', async () => {
     const response = await POST(
-      postRequest(
-        {
-          kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-          tenantId: 't1',
-          outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-        },
-        { authorization: 'Bearer wrong-secret-value' },
-      ),
+      postRequest(OWNER_ELEVATION_BODY, `Bearer ${MOCK_WRONG_SECRET}`),
     );
 
     expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('returns 500 and never calls isSecretMatch when the secret is not configured', async () => {
+  it('logs and returns 500 when the secret is not configured', async () => {
     envMock.OPERATOR_ALERT_SECRET = undefined;
 
-    const response = await POST(
-      postRequest({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: 't1',
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
-    );
+    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      OPERATOR_ALERT_LOG.SECRET_MISSING,
+    );
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('returns 400 for a malformed body even with a valid secret', async () => {
-    const response = await POST(postRequest({ kind: 'NOT_A_REAL_KIND' }));
+  it.each([
+    ['a body that is not valid JSON', '{not valid json'],
+    ['an unknown alert kind', JSON.stringify({ kind: faker.lorem.word() })],
+  ])('returns 400 for %s', async (_label, rawBody) => {
+    const response = await POST(postRawRequest(rawBody));
 
     expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('returns 400 for a body that is not valid JSON, instead of throwing', async () => {
-    const request = new Request(ENDPOINT, {
-      method: HTTP_METHOD.POST,
-      headers: { authorization: `Bearer ${MOCK_BEARER_SECRET}` },
-      body: '{not valid json',
-    });
-
-    const response = await POST(request);
-
-    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
-  });
-
-  it('returns 404 and sends nothing for an unknown tenantId', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
+  it('returns 404 and sends nothing for an unknown tenant', async () => {
+    getTenantByIdMock.mockResolvedValueOnce(undefined);
 
     const response = await POST(
-      postRequest({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: 'ghost-tenant',
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
+      postRequest({ ...OWNER_ELEVATION_BODY, tenantId: MOCK_OTHER_TENANT_ID }),
     );
 
     expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
@@ -134,125 +142,96 @@ describe('POST /api/internal/operator-alert', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('sends one email per superadmin recipient for a valid OWNER_ELEVATION alert', async () => {
-    listSuperadminEmailsMock.mockResolvedValue([
-      SUPERADMIN_ONE,
-      SUPERADMIN_TWO,
+  it('sends the owner-elevation alert to every superadmin', async () => {
+    listSuperadminEmailsMock.mockResolvedValueOnce([
+      MOCK_SUPERADMIN_EMAIL,
+      MOCK_OTHER_SUPERADMIN_EMAIL,
     ]);
 
-    const response = await POST(
-      postRequest({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: 't1',
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
-    );
+    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(sendEmailMock).toHaveBeenCalledTimes(2);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: SUPERADMIN_ONE,
-        subject: expect.stringContaining('Acme'),
-      }),
-    );
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({ to: SUPERADMIN_TWO }),
-    );
+    expect(sendEmailMock.mock.calls).toEqual([
+      [
+        {
+          to: MOCK_SUPERADMIN_EMAIL,
+          from: MOCK_FROM_ADDRESS,
+          ...OWNER_ELEVATION_EMAIL,
+        },
+      ],
+      [
+        {
+          to: MOCK_OTHER_SUPERADMIN_EMAIL,
+          from: MOCK_FROM_ADDRESS,
+          ...OWNER_ELEVATION_EMAIL,
+        },
+      ],
+    ]);
   });
 
-  it('returns 200 and sends nothing when there are zero superadmins', async () => {
-    listSuperadminEmailsMock.mockResolvedValue([]);
+  it('returns 200 and sends nothing when there are no superadmins', async () => {
+    listSuperadminEmailsMock.mockResolvedValueOnce([]);
 
-    const response = await POST(
-      postRequest({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: 't1',
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
-    );
+    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('sends the document-validation subject for a valid DOCUMENT_VALIDATION alert', async () => {
-    listSuperadminEmailsMock.mockResolvedValue([SUPERADMIN_ONE]);
-
+  it('sends the document-validation alert for that kind', async () => {
     const response = await POST(
       postRequest({
         kind: OPERATOR_ALERT_KIND.DOCUMENT_VALIDATION,
-        tenantId: 't1',
-        invalidDocumentCount: 3,
+        tenantId: MOCK_TENANT_ID,
+        invalidDocumentCount: MOCK_INVALID_DOCUMENT_COUNT,
         isCritical: true,
       }),
     );
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject: 'Tenant "Acme" (t1) has invalid Sanity documents',
+    expect(sendEmailMock).toHaveBeenCalledWith({
+      to: MOCK_SUPERADMIN_EMAIL,
+      from: MOCK_FROM_ADDRESS,
+      ...buildDocumentValidationAlertEmail({
+        tenantName: MOCK_TENANT_NAME,
+        tenantId: MOCK_TENANT_ID,
+        invalidDocumentCount: MOCK_INVALID_DOCUMENT_COUNT,
+        isCritical: true,
       }),
-    );
+    });
   });
 
   it('logs a failed send and still sends to the other recipient', async () => {
-    listSuperadminEmailsMock.mockResolvedValue([
-      SUPERADMIN_ONE,
-      SUPERADMIN_TWO,
+    listSuperadminEmailsMock.mockResolvedValueOnce([
+      MOCK_SUPERADMIN_EMAIL,
+      MOCK_OTHER_SUPERADMIN_EMAIL,
     ]);
-    const sendError = new Error(SEND_FAILURE_MESSAGE);
-    sendEmailMock.mockImplementation(({ to }: { to: string }) =>
-      to === SUPERADMIN_ONE
-        ? Promise.reject(sendError)
-        : Promise.resolve(undefined),
-    );
+    sendEmailMock.mockRejectedValueOnce(MOCK_SEND_ERROR);
 
-    const response = await POST(
-      postRequest({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: 't1',
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
-    );
+    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
+    const responseBody = await response.json();
+    const recipients = sendEmailMock.mock.calls.map(([{ to }]) => to);
 
-    expect(sendEmailMock).toHaveBeenCalledTimes(2);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({ to: SUPERADMIN_TWO }),
-    );
+    expect(recipients).toEqual([
+      MOCK_SUPERADMIN_EMAIL,
+      MOCK_OTHER_SUPERADMIN_EMAIL,
+    ]);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       OPERATOR_ALERT_LOG.SEND_FAILED,
-      {
-        tenantId: 't1',
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        error: sendError,
-      },
+      SEND_FAILED_CONTEXT,
     );
-    expect(response.status).toBe(207);
-    const responseBody = await response.json();
+    expect(response.status).toBe(MULTI_STATUS);
     expect(responseBody).toEqual({ sent: 1, failed: 1 });
   });
 
   it('logs every failure and returns 502 when every send fails', async () => {
-    listSuperadminEmailsMock.mockResolvedValue([SUPERADMIN_ONE]);
-    const sendError = new Error(SEND_FAILURE_MESSAGE);
-    sendEmailMock.mockRejectedValue(sendError);
+    sendEmailMock.mockRejectedValueOnce(MOCK_SEND_ERROR);
 
-    const response = await POST(
-      postRequest({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: 't1',
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
-    );
+    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
       OPERATOR_ALERT_LOG.SEND_FAILED,
-      {
-        tenantId: 't1',
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        error: sendError,
-      },
+      SEND_FAILED_CONTEXT,
     );
     expect(response.status).toBe(HTTP_STATUS.BAD_GATEWAY);
   });

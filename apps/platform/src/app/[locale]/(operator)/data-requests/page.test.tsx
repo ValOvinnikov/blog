@@ -1,17 +1,11 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import messages from '@platform/i18n/messages/en.json';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { notFound } from 'next/navigation';
 
 import DataRequestsPage from './page';
 
-const { requireSuperAdminMock } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
-}));
-
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/data-requests/look-up-personal-data-action', () => ({
   lookUpPersonalDataAction: vi.fn(),
@@ -27,15 +21,11 @@ vi.mock('@platform/server/data-requests/erase-personal-data-action', () => ({
 
 const setup = customRenderAsync(DataRequestsPage, {});
 
-describe(DataRequestsPage, () => {
-  beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
-  });
-
+describe(`<${DataRequestsPage.name}/>`, () => {
   it('404s for anyone who is not a super admin', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      notFound();
-    });
+    vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
@@ -43,10 +33,15 @@ describe(DataRequestsPage, () => {
   it('offers a search by email address', async () => {
     await setup();
 
-    const heading = screen.getByRole('heading', { level: 1 });
-    const emailField = screen.getByRole('textbox', { name: 'Email address' });
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: messages.dataRequestView.title,
+    });
+    const emailField = screen.getByRole('textbox', {
+      name: messages.dataRequestSearchCard.emailLabel,
+    });
 
-    expect(heading).toHaveTextContent('Data requests');
+    expect(heading).toBeVisible();
     expect(emailField).toBeVisible();
   });
 });

@@ -1,26 +1,25 @@
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 
 import SignInErrorPage from './page';
+
+const t = makeEnTranslator('signInErrorPage');
 
 const setup = customRenderAsync(SignInErrorPage, {
   searchParams: Promise.resolve({}),
 });
 
-describe(SignInErrorPage, () => {
+describe(`<${SignInErrorPage.name}/>`, () => {
   it('explains a used or expired sign-in link and offers a new one', async () => {
     await setup({ searchParams: Promise.resolve({ error: 'Verification' }) });
 
     const heading = screen.getByRole('heading', {
       level: 1,
-      name: 'This sign-in link no longer works',
+      name: t('linkSpentHeading'),
     });
-    const description = screen.getByText(
-      'Each sign-in link works once and expires after a while. This one has already been used or has expired. Ask for a new one to sign in.',
-    );
-    const newLinkLink = screen.getByRole('link', {
-      name: 'Get a new sign-in link',
-    });
+    const description = screen.getByText(t('linkSpentDescription'));
+    const newLinkLink = screen.getByRole('link', { name: t('requestNewLink') });
 
     expect(heading).toBeVisible();
     expect(description).toBeVisible();
@@ -28,18 +27,16 @@ describe(SignInErrorPage, () => {
   });
 
   it.each(['Configuration', 'AccessDenied', undefined])(
-    'shows a readable message and a way back to sign-in for the %s error',
+    'offers a way back to sign-in for the %s error',
     async (error) => {
       await setup({ searchParams: Promise.resolve({ error }) });
 
       const heading = screen.getByRole('heading', {
         level: 1,
-        name: "We couldn't sign you in",
+        name: t('heading'),
       });
-      const description = screen.getByText(
-        'Something went wrong while signing you in. Go back to sign-in and try again.',
-      );
-      const backLink = screen.getByRole('link', { name: 'Back to sign-in' });
+      const description = screen.getByText(t('description'));
+      const backLink = screen.getByRole('link', { name: t('backToSignIn') });
 
       expect(heading).toBeVisible();
       expect(description).toBeVisible();

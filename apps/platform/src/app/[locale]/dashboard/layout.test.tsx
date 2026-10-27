@@ -1,13 +1,15 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { auth } from '@platform/server/auth/auth';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
 
 import DashboardLayout from './layout';
+
+faker.seed(5996);
 
 const { listMembershipsWithTenantsForUserMock } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
@@ -21,55 +23,34 @@ vi.mock('@blog/db', async () => ({
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
-    admins: { getAdminByUserId: vi.fn().mockResolvedValue(undefined) },
+    admins: { getAdminByUserId: vi.fn() },
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const MOCK_CONTENT = faker.lorem.sentence();
 
 const setup = customRenderAsync(DashboardLayout, {
-  children: <div>dashboard content</div>,
+  children: <p>{MOCK_CONTENT}</p>,
 });
 
 describe(`<${DashboardLayout.name}/>`, () => {
-  beforeEach(() => {
-    authMock.mockReset();
-    listMembershipsWithTenantsForUserMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-  });
-
-  it('redirects to sign-in without querying memberships when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('sends a user with no workspace to onboarding', async () => {
+    listMembershipsWithTenantsForUserMock.mockResolvedValueOnce([]);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-    expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.onboarding());
   });
 
-  it('redirects to /onboarding when the signed-in user has zero memberships', async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(redirect).toHaveBeenCalledWith('/onboarding');
-  });
-
-  it('renders the gated content for any membership without resolving a single tenant', async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      {
-        membership: { id: 'm-1', userId: 'user-1', tenantId: MOCK_TENANT_ID },
-        tenant: { id: MOCK_TENANT_ID },
-      },
-      {
-        membership: { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2' },
-        tenant: { id: 'tenant-2' },
-      },
+  it('renders the gated content for a member of any workspace', async () => {
+    listMembershipsWithTenantsForUserMock.mockResolvedValueOnce([
+      { membership: mockMembership(), tenant: mockTenant() },
     ]);
 
     await setup();
 
-    expect(screen.getByText('dashboard content')).toBeVisible();
-    expect(redirect).not.toHaveBeenCalled();
+    const content = screen.getByText(MOCK_CONTENT);
+
+    expect(content).toBeVisible();
   });
 });

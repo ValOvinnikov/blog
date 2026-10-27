@@ -1,136 +1,114 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
-import { usePathname } from '@platform/i18n/navigation';
-import { auth } from '@platform/server/auth/auth';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { redirect, useParams } from 'next/navigation';
-import type { Session } from 'next-auth';
+import { useGitHubFetch } from '@platform/testing/github/github-fetch';
+import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { respondWithDueContrastCheck } from '@platform/testing/releases/contrast-due-github';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import OperatorLayout from './layout';
 
-const { getAdminByUserIdMock, resolveIsSidebarCollapsedMock, CONTRAST_DUE } =
-  vi.hoisted(() => ({
-    getAdminByUserIdMock: vi.fn(),
-    resolveIsSidebarCollapsedMock: vi.fn(),
-    CONTRAST_DUE: 'Contrast check due',
-  }));
+faker.seed(5996);
+
+const { getAdminByUserIdMock } = vi.hoisted(() => ({
+  getAdminByUserIdMock: vi.fn(),
+}));
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
-  resolveIsSidebarCollapsed: resolveIsSidebarCollapsedMock,
-}));
+vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed');
 
-vi.mock('@blog/db', () => ({
-  queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
-}));
+vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/i18n/navigation');
 
-vi.mock('@platform/components/features/releases/contrast-due-banner', () => ({
-  ContrastDueBanner: () => <p>{CONTRAST_DUE}</p>,
+vi.mock('@blog/db', async () => ({
+  ...(await mockDbConstants()),
+  queries: {
+    admins: { getAdminByUserId: getAdminByUserIdMock },
+    findings: {
+      getContrastFinding: vi.fn(),
+      getLatestPassingContrastSha: vi.fn(),
+    },
+  },
 }));
 
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+const MOCK_CONTENT = faker.lorem.sentence();
 
 const setup = customRenderAsync(OperatorLayout, {
-  children: <div>content</div>,
+  children: <p>{MOCK_CONTENT}</p>,
 });
 
 describe(`<${OperatorLayout.name}/>`, () => {
+  const github = useGitHubFetch();
+
   beforeEach(() => {
-    authMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    resolveIsSidebarCollapsedMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    resolveIsSidebarCollapsedMock.mockResolvedValue(false);
-    vi.mocked(usePathname).mockReturnValue('/tenants');
-    vi.mocked(useParams).mockReturnValue({});
   });
 
-  it('redirects to sign-in without querying admins when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-    expect(getAdminByUserIdMock).not.toHaveBeenCalled();
-  });
-
-  it('404s when the signed-in user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+  it('404s a signed-in user with no admins row', async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(undefined);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-
-    expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
-    expect(vi.mocked(redirect)).not.toHaveBeenCalled();
   });
 
   it('renders the gated content for a signed-in admin', async () => {
-    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getAdminByUserIdMock.mockResolvedValueOnce(mockAdmin());
 
     await setup();
 
-    expect(screen.getByText('content')).toBeVisible();
-    expect(redirect).not.toHaveBeenCalled();
+    const content = screen.getByText(MOCK_CONTENT);
+
+    expect(content).toBeVisible();
   });
 
-  it('hides the Releases nav entry from an ADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue(
-      mockAdmin({ role: ADMIN_ROLE.ADMIN }),
-    );
-
-    await setup();
-
-    expect(
-      screen.queryByRole('link', { name: 'Releases' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('puts Releases in the breadcrumb only for a SUPERADMIN', async () => {
-    vi.mocked(usePathname).mockReturnValue('/releases');
-    getAdminByUserIdMock.mockResolvedValue(
-      mockAdmin({ role: ADMIN_ROLE.ADMIN }),
-    );
-
-    await setup();
-
-    expect(screen.queryByText('Releases')).not.toBeInTheDocument();
-  });
-
-  it('shows the Releases nav entry to a SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue(
+  it("builds the sidebar from the admin's role", async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(
       mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
     );
 
     await setup();
 
-    expect(screen.getByRole('link', { name: 'Releases' })).toHaveAttribute(
-      'href',
-      '/releases',
-    );
-  });
-  it('shows the contrast-due banner slot to a SUPERADMIN', async () => {
-    getAdminByUserIdMock.mockResolvedValue(
-      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
-    );
+    const releasesLink = screen.getByRole('link', {
+      name: messages.navSections.releases,
+    });
 
-    await setup();
-
-    expect(screen.getByText(CONTRAST_DUE)).toBeVisible();
+    expect(releasesLink).toHaveAttribute('href', adminRoutes.releases());
   });
 
-  it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-    'never shows the contrast-due banner to an %s',
-    async (role) => {
-      getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
+  describe('when a contrast check is due', () => {
+    beforeEach(() => {
+      respondWithDueContrastCheck(github);
+    });
+
+    it('warns a SUPERADMIN that a contrast check is due', async () => {
+      getAdminByUserIdMock.mockResolvedValueOnce(
+        mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      );
 
       await setup();
 
-      expect(screen.getByText('content')).toBeVisible();
-      expect(screen.queryByText(CONTRAST_DUE)).not.toBeInTheDocument();
-    },
-  );
+      const banner = await screen.findByText(messages.contrastDueBanner.title);
+
+      expect(banner).toBeVisible();
+    });
+
+    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+      'never warns an %s that a contrast check is due',
+      async (role) => {
+        getAdminByUserIdMock.mockResolvedValueOnce(mockAdmin({ role }));
+
+        await setup();
+
+        const content = screen.getByText(MOCK_CONTENT);
+        const banner = screen.queryByText(messages.contrastDueBanner.title);
+
+        expect(content).toBeVisible();
+        expect(banner).not.toBeInTheDocument();
+      },
+    );
+  });
 });

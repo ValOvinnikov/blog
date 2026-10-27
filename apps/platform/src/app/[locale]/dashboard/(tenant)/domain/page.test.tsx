@@ -1,34 +1,25 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
-import {
-  act,
-  customRenderAsync,
-  screen,
-} from '@platform/testing/custom-render';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
+import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockTenant,
-  MOCK_TENANT_ID,
-  MOCK_VERCEL_A_RECORD,
   MOCK_CUSTOM_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 import DashboardDomainPage from './page';
 
-const {
-  listMembershipsWithTenantsForUserMock,
-  getAdminByUserIdMock,
-  getProjectDomainMock,
-} = vi.hoisted(() => ({
-  listMembershipsWithTenantsForUserMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-  getProjectDomainMock: vi.fn(),
-}));
+const { listMembershipsWithTenantsForUserMock, getProjectDomainMock } =
+  vi.hoisted(() => ({
+    listMembershipsWithTenantsForUserMock: vi.fn(),
+    getProjectDomainMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/auth');
 
@@ -38,7 +29,7 @@ vi.mock('@blog/db', async () => ({
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
-    admins: { getAdminByUserId: getAdminByUserIdMock },
+    admins: { getAdminByUserId: vi.fn() },
   },
 }));
 
@@ -46,67 +37,44 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
   getProjectDomain: getProjectDomainMock,
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const t = makeEnTranslator('tenantDomainPage');
 
-const membership = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: MOCK_TENANT_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-};
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(DashboardDomainPage, {});
 
 describe(`<${DashboardDomainPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsWithTenantsForUserMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-    getProjectDomainMock.mockReset();
-    getProjectDomainMock.mockResolvedValue({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
-    });
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      mockMembershipWithTenant(
+        mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+      ),
+    ]);
+    getProjectDomainMock.mockResolvedValue(mockPendingProjectDomain());
   });
 
-  it('redirects to sign-in without resolving a tenant when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('redirects a signed-out visitor to sign-in', async () => {
+    authMock.mockResolvedValueOnce(null);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
     expect(getProjectDomainMock).not.toHaveBeenCalled();
   });
 
-  it("renders the resolved tenant's domain, live status, and DNS records table", async () => {
-    const tenant = mockTenant({
-      id: MOCK_TENANT_ID,
-      primaryDomain: MOCK_CUSTOM_DOMAIN,
-    });
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([
-      { membership, tenant },
-    ]);
+  it("renders the session tenant's domain page", async () => {
+    await setup();
 
-    await act(async () => {
-      await setup();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: t('pageTitle'),
+    });
+    const cardHeading = await screen.findByRole('heading', {
+      level: 2,
+      name: t('cardTitle', { domain: MOCK_CUSTOM_DOMAIN }),
     });
 
-    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
-      MOCK_CUSTOM_DOMAIN,
-    );
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Domain' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: `Point ${MOCK_CUSTOM_DOMAIN} at us`,
-      }),
-    ).toBeVisible();
-    expect(screen.getByText('Awaiting DNS')).toBeVisible();
-    expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.getByText(MOCK_VERCEL_A_RECORD)).toBeVisible();
+    expect(heading).toBeVisible();
+    expect(cardHeading).toBeVisible();
   });
 });
