@@ -4,7 +4,10 @@ import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 
 import { reviveCachedTenant } from './revive-cached-tenant';
 
-const MOCK_TENANT = mockServableTenant({ suspendedAt: new Date() });
+const MOCK_TENANT = mockServableTenant({
+  suspendedAt: new Date(),
+  contentMigrationFailedAt: new Date(),
+});
 
 describe(reviveCachedTenant, () => {
   it('restores the timestamps of a JSON round-tripped tenant', () => {

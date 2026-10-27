@@ -45,6 +45,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 - **Migration id list.** `STUDIO_MIGRATION_IDS` in `@blog/config` is generated from the folders in `packages/studio/migrations/`, in run order, by `pnpm gen:migration-ids`. `apps/worker` reads it, since it cannot import `@blog/studio`.
 - **Tenant selection.** `listActiveTenants` returns tenants that are `status = ACTIVE` with a null `deprovisionedAt`. A single-tenant run uses `getTenantById`.
 - **Credentials.** `getTenantSanityWriteCredentials` decrypts the tenant's own `sanityWriteTokenEncrypted` for each run. A tenant with no write token, or one that is not ACTIVE, is counted as skipped.
+- **Failure record.** `tenants.content_migration_failed_at` holds when the tenant's last content migration failed. A failed deploy, export or ledger read sets it with `recordTenantContentMigrationFailure`. The tenant's next successful deploy or backfill, in a full or single-tenant run, clears it with `clearTenantContentMigrationFailure`. A skipped tenant, or one outside the run, keeps its value. If writing the record fails, the run still counts the original failure and exits 1.
 - **No caching.** Migrations write straight to Content Lake. Published changes reach the site through the normal revalidation webhook ([rendering and caching](./rendering-and-caching.md)).
 
 ## Configuration
@@ -80,6 +81,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 ## Entry points
 
 - `packages/db/scripts/migrate-tenant-content/run.ts`
+- `packages/db/scripts/migrate-tenant-content/lib/migrate-tenant.ts`
 - `packages/db/scripts/migrate-tenant-content/lib/read-tenant-migration-ledger.ts`
 - `packages/db/scripts/migrate-tenant-content/lib/run-tenant-migrate-script.ts`
 - `packages/studio/scripts/migrate.mjs`

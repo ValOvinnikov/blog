@@ -71,6 +71,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   suspendedAt: null,
   deletionNotifiedAt: null,
   suspensionReason: null,
+  contentMigrationFailedAt: null,
   createdAt: MOCK_TENANT_CREATED_AT,
   updatedAt: MOCK_TENANT_CREATED_AT,
   ...overrides,

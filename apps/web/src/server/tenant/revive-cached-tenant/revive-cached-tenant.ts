@@ -22,6 +22,7 @@ export const reviveCachedTenant = (
   inactivityWarnedAt: toMaybeDate(tenant.inactivityWarnedAt),
   suspendedAt: toMaybeDate(tenant.suspendedAt),
   deletionNotifiedAt: toMaybeDate(tenant.deletionNotifiedAt),
+  contentMigrationFailedAt: toMaybeDate(tenant.contentMigrationFailedAt),
   createdAt: toDate(tenant.createdAt),
   updatedAt: toDate(tenant.updatedAt),
 });

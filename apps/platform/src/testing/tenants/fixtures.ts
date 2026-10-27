@@ -193,6 +193,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     suspendedAt: null,
     deletionNotifiedAt: null,
     suspensionReason: null,
+    contentMigrationFailedAt: null,
     lastNotifiedOwnerElevationOutcome: null,
     seededAt: null,
     webhookCreatedAt: null,
