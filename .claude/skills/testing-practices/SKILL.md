@@ -173,8 +173,9 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   title", not "composes the region label from the carousel.regionLabel Voice
   key rather than passing the title straight through". A title that needs
   "rather than" or "instead of" is arguing with an implementation nobody
-  wrote. Shorten long existing titles when the file is touched, never in a
-  sweep.
+  wrote, and `vitest/valid-title` fails it on a touched file
+  (`configs/eslint/base.js`). Shorten long existing titles when the file is
+  touched, never in a sweep.
 - **Suite naming — never a hand-written string when a symbol names the
   suite.** Vitest takes the label from the reference's `.name`, so a rename
   follows and a deletion is a compile error.
@@ -343,9 +344,9 @@ never reads state, props, handlers or markup shape.
 
   `testing-library/no-container`, `no-node-access` and
   `prefer-screen-queries` are errors in every `*.test.{ts,tsx}`
-  (`configs/eslint/base.js`). A **chained** walk (`container.children[0]`,
-  `el.parentElement.id`) slips past `no-node-access`; it is the same banned
-  walk, caught by `code-review-practices` §0. The one legitimate
+  (`configs/eslint/base.js`), and this repo's `no-node-access` also fails a
+  chained walk (`container.children[0]`, `el.parentElement.id`). The one
+  legitimate
   `eslint-disable-next-line testing-library/no-node-access` is a
   structural-layout claim with no semantic handle (an image being a direct
   child of its frame), on that single line, with the reason in the `it`

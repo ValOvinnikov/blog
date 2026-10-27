@@ -14,3 +14,11 @@ export const ROLE_QUERY_CALLEES = new Set([
   'findByRole',
   'findAllByRole',
 ]);
+export const ATTRIBUTE_NAME_CALLEES = new Set([
+  'getAttribute',
+  'hasAttribute',
+  'removeAttribute',
+  'setAttribute',
+  'toggleAttribute',
+  'toHaveAttribute',
+]);

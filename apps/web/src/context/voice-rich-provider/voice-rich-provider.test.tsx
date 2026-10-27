@@ -1,5 +1,6 @@
 import type { TVoicePortableText } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { render, renderElement, screen } from '@web/testing/custom-render';
 import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
@@ -16,10 +17,9 @@ const VALUES = {
   blogListEmpty: MOCK_OVERRIDE_VALUE,
 } as unknown as Record<TVoiceRichFieldId, TVoicePortableText>;
 
-const ReadVoiceRich = ({ id }: { id: TVoiceRichFieldId }) => {
-  const value = useVoiceRich(id);
-  return <span data-testid="voice-rich">{value[0]?.children[0]?.text}</span>;
-};
+const ReadVoiceRich = ({ id }: { id: TVoiceRichFieldId }) => (
+  <VoiceRichText value={useVoiceRich(id)} />
+);
 
 describe(`<${VoiceRichProvider.name}/>`, () => {
   afterEach(() => {
@@ -45,9 +45,9 @@ describe(`<${VoiceRichProvider.name}/>`, () => {
       </VoiceRichProvider>,
     );
 
-    const voiceRich = screen.getByTestId('voice-rich');
+    const voiceRich = screen.getByText(MOCK_OVERRIDE_TEXT);
 
-    expect(voiceRich).toHaveTextContent(MOCK_OVERRIDE_TEXT);
+    expect(voiceRich).toBeVisible();
   });
 
   it('throws when read outside its provider', () => {

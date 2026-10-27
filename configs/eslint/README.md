@@ -69,6 +69,8 @@
   workspace may import count: `@blog/config`'s outside `utils`/`insight`/
   `email`, `@blog/db`'s in `db`, `auth` and the three apps, and an app's own
   in that app. Exempt: import and `vi.mock` paths, directives, property keys,
+  HTML attribute names passed to `getAttribute`/`toHaveAttribute` and their
+  siblings,
   `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, the
   const files themselves, and `0`/`1`/`-1`. Co-located
   `prefer-shared-constant.test.js`.
@@ -86,6 +88,10 @@
   nobody edits keeps its existing violations; turbo's strict env mode strips
   the variable even if a shell exports it.
 
+- `@vitest/eslint-plugin`'s `vitest/valid-title` — touched test files only
+  (the same `BLOG_LINT_TOUCHED=1` gate), with `mustNotMatch` failing an
+  `it`/`test` title that says "instead of" or "rather than" in any case.
+
 - `eslint-plugin-testing-library` — registered in `base.js`'s
   `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,
   with exactly three rules as `error` (no `recommended` preset):
@@ -93,11 +99,12 @@
   `container.querySelectorAll` in favor of a `screen` query;
   `testing-library/no-node-access` bans reaching into the DOM/React-element
   tree with `.parentElement`/`.closest()`/`.children`/`.firstChild` and
-  similar — known gap (#3561): it flags a bare node-property access
-  (`container.children`, `el.firstChild`) but not a chained one
-  (`container.children[0]`, `el.firstChild.textContent`), since the rule
-  skips a property access that is itself the object of another; the chained
-  form is caught in review instead (`code-review-practices` §0);
+  similar. Upstream skips a property access that is itself the object of
+  another, so `no-node-access.js` wraps the rule under the same name to also
+  report the chained form (`container.children[0]`,
+  `el.firstChild.textContent`) — an existing
+  `eslint-disable-next-line testing-library/no-node-access` covers both.
+  Co-located `no-node-access.test.js`;
   `testing-library/prefer-screen-queries` bans destructuring a
   query off `render()`'s return value instead of using `screen`.
 

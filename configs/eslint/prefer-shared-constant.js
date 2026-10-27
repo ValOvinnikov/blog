@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 
+import { ATTRIBUTE_NAME_CALLEES } from './literal-vocabulary.js';
+
 const INDEX_URL = new URL(
   '../../packages/config/const-index.json',
   import.meta.url,
@@ -133,9 +135,19 @@ const isJsxChild = (node) =>
   node.parent.type === 'JSXExpressionContainer' &&
   node.parent.parent.type === 'JSXElement';
 
+const isAttributeName = (node) => {
+  const { parent } = node;
+  return (
+    parent.type === 'CallExpression' &&
+    parent.arguments[0] === node &&
+    ATTRIBUTE_NAME_CALLEES.has(calleeName(parent.callee))
+  );
+};
+
 const isExemptString = (node) =>
   node.parent.type === 'ExpressionStatement' ||
   isModulePath(node) ||
+  isAttributeName(node) ||
   isKey(node) ||
   isClassString(node) ||
   isJsxChild(node);
