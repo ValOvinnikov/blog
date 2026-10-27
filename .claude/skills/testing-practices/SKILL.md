@@ -196,7 +196,11 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   A string is right only when no single symbol names the suite — a registry,
   a route module, a group of behaviours, a type alias (it has no runtime
   value; a suite named for one usually means describe the function under
-  test instead). Existing string titles migrate when
+  test instead). A const `describe` cannot take — one with no runtime
+  `.name`, such as a groqd query object — is named by its exact identifier
+  as a string (`describe('ctaModuleQuery', …)`); a sub-behaviour is a nested
+  `describe`, never a suffix on that string
+  (❌ `'heroBlogModuleQuery language scoping'`). Existing string titles migrate when
   the file is touched, never in a mass rename; a bare symbol on a component
   is fixed whenever the file is touched and never written new.
 
@@ -435,7 +439,12 @@ userEvent.setup()`), then `await user.click(…)`, `user.type(…)`,
     `useSyncExternalStore`) that re-renders on every store update — select
     the primitive it shows instead.
     A test double that fires callbacks itself (a fake observer) wraps them in
-    `act` inside the double, never in the test body.
+    `act` inside the double, never in the test body. Advancing fake timers
+    that update React state goes through one `act`-wrapped helper per test
+    file — `const advanceTimers = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));`
+    — because the update lands during the advance, and `findBy*`/`waitFor`
+    only run after it. Wrapping a render in `act` stays banned
+    (`customRenderAsync` covers it).
 - **Each case calls `setup(overrides)` and discards its return** — there is
   no `container` to reach into, except to assert an empty render.
 - **Assert the observable the prop changes** — `aria-current`, `disabled`, a

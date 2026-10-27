@@ -29,6 +29,10 @@ const MOCK_BIO_TEXT = faker.lorem.sentence();
 
 describe(toTeamModule, () => {
   it('maps a full module', () => {
+    const bioBlock = mockRawPersonBioBlock({
+      _key: MOCK_BIO_BLOCK_KEY,
+      text: MOCK_BIO_TEXT,
+    });
     const raw = mockRawTeamModule({
       showBios: true,
       showSocialLinks: true,
@@ -38,12 +42,7 @@ describe(toTeamModule, () => {
       members: [
         mockRawTeamMember({
           role: MOCK_ROLE,
-          bio: [
-            mockRawPersonBioBlock({
-              _key: MOCK_BIO_BLOCK_KEY,
-              text: MOCK_BIO_TEXT,
-            }),
-          ],
+          bio: [bioBlock],
           socialLinks: [
             mockRawSocialProfile({
               platform: SOCIAL_PLATFORMS.GITHUB,
@@ -55,11 +54,11 @@ describe(toTeamModule, () => {
       ],
     });
 
-    const module = toTeamModule(raw);
+    const [member] = toTeamModule(raw).members;
 
-    expect(module.members[0]?.profileUrl).toBe(MOCK_PROFILE_URL);
-    expect(module.members[0]?.bio).toBeDefined();
-    expect(module.members[0]?.socialLinks).toHaveLength(1);
+    expect(member?.profileUrl).toBe(MOCK_PROFILE_URL);
+    expect(member?.bio).toEqual([{ ...bioBlock, markDefs: undefined }]);
+    expect(member?.socialLinks).toHaveLength(1);
   });
 
   it('keeps the members in authored order', () => {
@@ -92,9 +91,9 @@ describe(toTeamModule, () => {
       ],
     });
 
-    const module = toTeamModule(raw);
+    const [member] = toTeamModule(raw).members;
 
-    expect(module.members[0]?.bio).toBeUndefined();
-    expect(module.members[0]?.socialLinks).toEqual([]);
+    expect(member?.bio).toBeUndefined();
+    expect(member?.socialLinks).toEqual([]);
   });
 });
