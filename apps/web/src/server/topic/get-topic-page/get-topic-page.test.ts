@@ -1,10 +1,16 @@
-import { okResult } from '@blog/utils';
-import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { faker } from '@faker-js/faker';
+import { mockPageLoaderResult } from '@web/testing/server/page-loaders/fixtures';
+import {
+  importWithMemoizingCache,
+  restoreReactCache,
+} from '@web/testing/server/page-loaders/import-with-memoizing-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTopicPage } from './get-topic-page';
 
-const TOPIC_SLUG = 'engineering';
+faker.seed(6011);
+
+const MOCK_TOPIC_SLUG = faker.lorem.slug();
 
 const { getTopicPageMock } = vi.hoisted(() => ({ getTopicPageMock: vi.fn() }));
 
@@ -15,45 +21,35 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 describe(getTopicPage, () => {
-  beforeEach(() => {
-    getTopicPageMock.mockReset();
-  });
+  it('loads the topic page by slug for the resolved tenant', async () => {
+    getTopicPageMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-  it('forwards the slug and the resolved tenant context to the topic page service', async () => {
-    getTopicPageMock.mockResolvedValue(okResult());
-
-    await getTopicPage(TOPIC_SLUG);
+    await getTopicPage(MOCK_TOPIC_SLUG);
 
     expect(getTopicPageMock).toHaveBeenCalledWith(
-      TOPIC_SLUG,
+      MOCK_TOPIC_SLUG,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
-  it('returns the raw TResult from getTopicPage unchanged', async () => {
-    const result = okResult({ topic: { title: 'Engineering' } });
-    getTopicPageMock.mockResolvedValue(result);
+  it('returns the service result unchanged', async () => {
+    const result = mockPageLoaderResult();
+    getTopicPageMock.mockResolvedValueOnce(result);
 
-    await expect(getTopicPage(TOPIC_SLUG)).resolves.toBe(result);
+    await expect(getTopicPage(MOCK_TOPIC_SLUG)).resolves.toBe(result);
   });
 
   describe('memoization', () => {
-    afterEach(() => {
-      vi.doUnmock('react');
-      vi.resetModules();
-    });
+    afterEach(restoreReactCache);
 
-    it('dedupes the topic-page query across one render pass with the same arguments', async () => {
-      getTopicPageMock.mockResolvedValue(okResult());
+    it('queries once per render pass for the same slug', async () => {
+      getTopicPageMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-      vi.doMock('react', withMemoizingReactCache);
-      vi.resetModules();
+      const { getTopicPage: memoizedGetTopicPage } =
+        await importWithMemoizingCache(() => import('./get-topic-page'));
 
-      const { getTopicPage: freshGetTopicPage } =
-        await import('./get-topic-page');
-
-      await freshGetTopicPage(TOPIC_SLUG);
-      await freshGetTopicPage(TOPIC_SLUG);
+      await memoizedGetTopicPage(MOCK_TOPIC_SLUG);
+      await memoizedGetTopicPage(MOCK_TOPIC_SLUG);
 
       expect(getTopicPageMock).toHaveBeenCalledTimes(1);
     });
