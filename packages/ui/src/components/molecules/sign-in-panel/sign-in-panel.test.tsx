@@ -158,6 +158,20 @@ describe(`<${SignInPanel.name}/> while the link is sending`, () => {
     expect(submit).toHaveAttribute('aria-busy', 'true');
   });
 
+  it('keeps the send button focusable', () => {
+    const submit = screen.getByRole('button', { name: MOCK_LABELS.sending });
+
+    submit.focus();
+
+    expect(submit).toHaveFocus();
+  });
+
+  it('announces that the link is sending', () => {
+    const status = screen.getByRole('status');
+
+    expect(status).toHaveTextContent(MOCK_LABELS.sending);
+  });
+
   it('does not send a second time', async () => {
     await userEvent.click(
       screen.getByRole('button', { name: MOCK_LABELS.sending }),

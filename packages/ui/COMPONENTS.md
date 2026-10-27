@@ -325,7 +325,7 @@ Props: as?: TAnchorElementType _(extends IShareLinkItem, IWithClassName, IWithDa
 ### SignInPanel — `components/molecules/sign-in-panel/sign-in-panel.tsx`
 
 The signed-out reader's sign-in dialog, offering every provider and the email link at once and reporting each step of the attempt.
-Props: panel: ISignInPanelSurface · labels: ISignInPanelLabels · providers: ISignInPanelProvider[] · pendingProviderId?: string · emailForm: ISignInPanelEmailForm · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
+Props: panel: ISignInPanelSurface · labels: ISignInPanelLabels · providers: ISignInPanelProvider[] · pendingProviderId?: string · emailForm: ISignInPanelEmailForm · busyStyle?: TButtonProps['busyStyle'] · spinnerVariant?: TButtonProps['spinnerVariant'] · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
 
 ### TagList — `components/molecules/tag-list/tag-list.tsx`
 
@@ -345,7 +345,7 @@ Slots:
 ### Toast — `components/molecules/toast/toast.tsx`
 
 A single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> _(extends IWithClassName, IWithDataTestId)_
+Props: type: TToastType · isLoading?: boolean · spinnerVariant?: TSpinnerProps['variant'] · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> _(extends IWithClassName, IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ## Organisms
@@ -447,8 +447,8 @@ A controlled subscribe form in two densities: `Full`, a pitch pane beside the fo
 
 Compound component:
 
-- **NewsletterSignup.Full** — A panel that sets a heading, pitch and trust cues beside the subscribe form. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading?: string · headingId?: string · headingLevel?: THeadingLevel · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — A single-row subscribe strip with an inline label in place of a heading. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading?: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Full** — A panel that sets a heading, pitch and trust cues beside the subscribe form. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading?: string · headingId?: string · headingLevel?: THeadingLevel · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] · busyStyle?: TButtonProps['busyStyle'] · spinnerVariant?: TButtonProps['spinnerVariant'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A single-row subscribe strip with an inline label in place of a heading. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading?: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] · busyStyle?: TButtonProps['busyStyle'] · spinnerVariant?: TButtonProps['spinnerVariant'] _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 

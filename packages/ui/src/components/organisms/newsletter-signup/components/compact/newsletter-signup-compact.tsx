@@ -8,6 +8,7 @@ import {
   FORM_STATUS,
 } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
+import type { TButtonProps } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import {
@@ -32,6 +33,8 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     emailAriaLabel: string;
     placeholder?: string;
     align?: TNewsletterSignupVariants['align'];
+    busyStyle?: TButtonProps['busyStyle'];
+    spinnerVariant?: TButtonProps['spinnerVariant'];
   };
 
 /** A single-row subscribe strip with an inline label in place of a heading. */
@@ -50,6 +53,8 @@ export const NewsletterSignupCompact = ({
   emailAriaLabel,
   placeholder,
   align,
+  busyStyle,
+  spinnerVariant,
   className,
   dataTestId,
 }: TNewsletterSignupCompactProps) => {
@@ -93,6 +98,8 @@ export const NewsletterSignupCompact = ({
             />
           }
           variant="compact"
+          busyStyle={busyStyle}
+          spinnerVariant={spinnerVariant}
         />
       )}
     </div>

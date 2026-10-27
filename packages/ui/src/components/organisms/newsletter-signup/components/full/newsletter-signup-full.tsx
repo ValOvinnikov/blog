@@ -8,6 +8,7 @@ import {
   FORM_STATUS,
 } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
+import type { TButtonProps } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { Panel } from '@blog/ui/components/molecules/panel';
@@ -42,6 +43,8 @@ export type TNewsletterSignupFullProps = IWithClassName &
     placeholder?: string;
     trustCues?: INewsletterSignupTrustCue[];
     align?: TNewsletterSignupVariants['align'];
+    busyStyle?: TButtonProps['busyStyle'];
+    spinnerVariant?: TButtonProps['spinnerVariant'];
   };
 
 /** A panel that sets a heading, pitch and trust cues beside the subscribe form. */
@@ -62,6 +65,8 @@ export const NewsletterSignupFull = ({
   placeholder,
   trustCues,
   align,
+  busyStyle,
+  spinnerVariant,
   className,
   dataTestId,
 }: TNewsletterSignupFullProps) => {
@@ -119,6 +124,8 @@ export const NewsletterSignupFull = ({
                 />
               }
               variant="full"
+              busyStyle={busyStyle}
+              spinnerVariant={spinnerVariant}
             />
           )}
         </div>

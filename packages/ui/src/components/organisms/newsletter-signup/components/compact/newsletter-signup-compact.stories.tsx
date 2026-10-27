@@ -1,4 +1,6 @@
 import { CONTENT_ALIGNMENT, FORM_STATUS } from '@blog/config';
+import { buttonBusyVariants } from '@blog/ui/components/atoms/button/button-variants';
+import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { objectKeys } from '@blog/utils/primitives';
@@ -6,6 +8,9 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 faker.seed(123);
+
+const BUSY_STYLES = objectKeys(buttonBusyVariants.variants.busyStyle);
+const SPINNER_VARIANTS = objectKeys(spinnerVariants.variants.variant);
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',
@@ -21,6 +26,8 @@ const meta = {
       control: 'select',
       options: objectKeys(newsletterSignupVariants.variants.align),
     },
+    busyStyle: { control: 'select', options: BUSY_STYLES },
+    spinnerVariant: { control: 'select', options: SPINNER_VARIANTS },
   },
   args: {
     email: '',
@@ -44,6 +51,38 @@ export const Default: TStory = {};
 
 export const Submitting: TStory = {
   args: { status: FORM_STATUS.SUBMITTING, email: faker.internet.email() },
+};
+
+export const SubmittingInEveryBusyStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      {BUSY_STYLES.map((busyStyle) => (
+        <NewsletterSignup.Compact
+          key={busyStyle}
+          {...args}
+          email={faker.internet.email()}
+          status={FORM_STATUS.SUBMITTING}
+          busyStyle={busyStyle}
+        />
+      ))}
+    </div>
+  ),
+};
+
+export const SubmittingInEverySpinnerStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      {SPINNER_VARIANTS.map((spinnerVariant) => (
+        <NewsletterSignup.Compact
+          key={spinnerVariant}
+          {...args}
+          email={faker.internet.email()}
+          status={FORM_STATUS.SUBMITTING}
+          spinnerVariant={spinnerVariant}
+        />
+      ))}
+    </div>
+  ),
 };
 
 export const Success: TStory = {
