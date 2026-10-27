@@ -26,6 +26,8 @@ import {
 
 vi.mock('@blog/db/client');
 
+faker.seed(1);
+
 const MOCK_UNDECRYPTABLE_CIPHERTEXT = 'not-a-ciphertext';
 const STORED_EMAIL_CASES = [
   ['the exact address', MOCK_SUBSCRIBER_EMAIL],
@@ -72,21 +74,27 @@ describe(findUserSubscriber, () => {
   it('finds nothing for a +tag sibling of the account address', async () => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL);
 
-    expect(await findUserSubscriber(tenantId, userId)).toBeUndefined();
+    const subscriber = await findUserSubscriber(tenantId, userId);
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds nothing for a +tag account whose plain address is subscribed', async () => {
     const { id } = await insertTestReader(db(), MOCK_SUBSCRIBER_TAGGED_EMAIL);
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(await findUserSubscriber(tenantId, id)).toBeUndefined();
+    const subscriber = await findUserSubscriber(tenantId, id);
+
+    expect(subscriber).toBeUndefined();
   });
 
   it("finds nothing for the account's address on another tenant", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await insertTestSubscriber(db(), otherTenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(await findUserSubscriber(tenantId, userId)).toBeUndefined();
+    const subscriber = await findUserSubscriber(tenantId, userId);
+
+    expect(subscriber).toBeUndefined();
   });
 
   it.each([
@@ -95,7 +103,9 @@ describe(findUserSubscriber, () => {
   ])('finds nothing for %s', async (_case, user) => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(await findUserSubscriber(tenantId, await user())).toBeUndefined();
+    const subscriber = await findUserSubscriber(tenantId, await user());
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds the subscriber of a user not yet backfilled, and reports the user', async () => {
@@ -106,7 +116,9 @@ describe(findUserSubscriber, () => {
       MOCK_USER_EMAIL,
     );
 
-    expect(await findUserSubscriber(tenantId, id)).toEqual({
+    const subscriber = await findUserSubscriber(tenantId, id);
+
+    expect(subscriber).toEqual({
       id: subscriberId,
       status,
       email: MOCK_USER_EMAIL,
@@ -175,18 +187,24 @@ describe(findSubscriberByExactEmail, () => {
   it('finds nothing when only a +tag sibling is stored', async () => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL);
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toBeUndefined();
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds nothing for the same address on another tenant', async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await insertTestSubscriber(db(), otherTenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toBeUndefined();
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toBeUndefined();
   });
 
   it.each(STORED_EMAIL_CASES)(
@@ -199,9 +217,12 @@ describe(findSubscriberByExactEmail, () => {
         { emailEncrypted: null, emailIndex: null },
       );
 
-      expect(
-        await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-      ).toEqual({ id, status, email: storedEmail });
+      const subscriber = await findSubscriberByExactEmail(
+        tenantId,
+        MOCK_SUBSCRIBER_EMAIL,
+      );
+
+      expect(subscriber).toEqual({ id, status, email: storedEmail });
       expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
         owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
         reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
@@ -215,9 +236,12 @@ describe(findSubscriberByExactEmail, () => {
       emailIndex: null,
     });
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toBeUndefined();
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds a row by its plain email when the index key is unset, and reports it', async () => {
@@ -228,9 +252,12 @@ describe(findSubscriberByExactEmail, () => {
     );
     vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toEqual({ id, status, email: MOCK_SUBSCRIBER_EMAIL });
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toEqual({ id, status, email: MOCK_SUBSCRIBER_EMAIL });
     expect(fallbackListener).toHaveBeenCalledWith({
       owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
       reason: PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET,

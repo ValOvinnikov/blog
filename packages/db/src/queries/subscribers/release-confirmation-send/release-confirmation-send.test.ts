@@ -1,5 +1,8 @@
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestTenant,
+  MOCK_SUBSCRIBER_EMAIL,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
 
@@ -8,6 +11,7 @@ import { releaseConfirmationSend } from './release-confirmation-send';
 vi.mock('@blog/db/client');
 
 const MOCK_CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
+const MOCK_NEWER_CLAIMED_AT = new Date('2026-10-15T10:20:00.000Z');
 
 const db = useQueryTestDb();
 
@@ -26,7 +30,7 @@ describe(releaseConfirmationSend, () => {
   async function insertSubscriberSentAt(confirmationSentAt: Date) {
     const [subscriber] = await db()
       .insert(schema.subscribers)
-      .values({ tenantId, email: 'reader@example.com', confirmationSentAt })
+      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, confirmationSentAt })
       .returning();
     if (!subscriber) throw new Error('failed to seed a subscriber row');
     return subscriber;
@@ -49,11 +53,10 @@ describe(releaseConfirmationSend, () => {
   });
 
   it('leaves a newer claim in place', async () => {
-    const newerClaim = new Date('2026-10-15T10:20:00.000Z');
-    const { id } = await insertSubscriberSentAt(newerClaim);
+    const { id } = await insertSubscriberSentAt(MOCK_NEWER_CLAIMED_AT);
 
     await releaseConfirmationSend(id, MOCK_CLAIMED_AT);
 
-    await expect(readSentAt(id)).resolves.toEqual(newerClaim);
+    await expect(readSentAt(id)).resolves.toEqual(MOCK_NEWER_CLAIMED_AT);
   });
 });

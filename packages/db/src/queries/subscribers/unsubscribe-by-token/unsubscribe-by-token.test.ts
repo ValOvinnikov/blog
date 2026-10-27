@@ -16,6 +16,8 @@ import { unsubscribeByToken } from './unsubscribe-by-token';
 
 vi.mock('@blog/db/client');
 
+faker.seed(1);
+
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
@@ -56,9 +58,10 @@ describe(unsubscribeByToken, () => {
     );
 
     const result = await unsubscribeByToken(tenantId, MOCK_UNSUBSCRIBE_TOKEN);
+    const remainingIds = await readSubscriberIds();
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
-    expect(await readSubscriberIds()).toEqual([siblingId]);
+    expect(remainingIds).toEqual([siblingId]);
   });
 
   it.each([
@@ -73,9 +76,10 @@ describe(unsubscribeByToken, () => {
     'returns not-found for %s and deletes nothing',
     async (_case, tenant, token) => {
       const result = await unsubscribeByToken(tenant(), token());
+      const remainingIds = await readSubscriberIds();
 
       expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
-      expect(await readSubscriberIds()).toEqual([subscriberId]);
+      expect(remainingIds).toEqual([subscriberId]);
     },
   );
 });
