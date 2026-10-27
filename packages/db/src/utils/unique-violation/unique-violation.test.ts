@@ -1,33 +1,41 @@
+import { faker } from '@faker-js/faker';
+
 import {
   UNIQUE_VIOLATION_CODE,
   uniqueViolationConstraint,
 } from './unique-violation';
 
-const CONSTRAINT = 'some_unique_idx';
+faker.seed(6607);
+
+const MOCK_CONSTRAINT = faker.lorem.slug(3);
 const FOREIGN_KEY_VIOLATION_CODE = '23503';
-const UNIQUE_VIOLATION = {
+const MOCK_UNIQUE_VIOLATION = {
   code: UNIQUE_VIOLATION_CODE,
-  constraint: CONSTRAINT,
+  constraint: MOCK_CONSTRAINT,
 };
 
 describe(uniqueViolationConstraint, () => {
   it('reads the constraint off a driver error', () => {
-    expect(uniqueViolationConstraint(UNIQUE_VIOLATION)).toBe(CONSTRAINT);
+    expect(uniqueViolationConstraint(MOCK_UNIQUE_VIOLATION)).toBe(
+      MOCK_CONSTRAINT,
+    );
   });
 
   it('reads the constraint off the cause of a wrapped error', () => {
-    const wrapped = new Error(CONSTRAINT, { cause: UNIQUE_VIOLATION });
+    const wrapped = new Error(MOCK_CONSTRAINT, {
+      cause: MOCK_UNIQUE_VIOLATION,
+    });
 
-    expect(uniqueViolationConstraint(wrapped)).toBe(CONSTRAINT);
+    expect(uniqueViolationConstraint(wrapped)).toBe(MOCK_CONSTRAINT);
   });
 
   it('is undefined for a different Postgres error code', () => {
-    expect(
-      uniqueViolationConstraint({
-        code: FOREIGN_KEY_VIOLATION_CODE,
-        constraint: CONSTRAINT,
-      }),
-    ).toBeUndefined();
+    const foreignKeyViolation = {
+      code: FOREIGN_KEY_VIOLATION_CODE,
+      constraint: MOCK_CONSTRAINT,
+    };
+
+    expect(uniqueViolationConstraint(foreignKeyViolation)).toBeUndefined();
   });
 
   it('is undefined for a violation that names no constraint', () => {
@@ -36,7 +44,7 @@ describe(uniqueViolationConstraint, () => {
     ).toBeUndefined();
   });
 
-  it.each([null, undefined, CONSTRAINT])(
+  it.each([null, undefined, MOCK_CONSTRAINT])(
     'is undefined for the non-error value %s',
     (error) => {
       expect(uniqueViolationConstraint(error)).toBeUndefined();
