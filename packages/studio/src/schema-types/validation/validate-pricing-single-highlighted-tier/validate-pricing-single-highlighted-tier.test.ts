@@ -1,48 +1,65 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { validatePricingSingleHighlightedTier } from '@blog/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
+import { mockLocalizedValue } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
+
+faker.seed(6023);
+
+const { EN, NL } = LOCALE_ISO_CODES;
 
 const SINGLE_HIGHLIGHTED_TIER_MESSAGE = 'Only one tier can be highlighted.';
 
-const label = (entries: Record<string, string>) =>
-  Object.entries(entries).map(([language, value]) => ({
-    _key: language,
-    language,
-    value,
-  }));
+const MOCK_ENGLISH_LABEL = faker.lorem.words();
+const MOCK_OTHER_ENGLISH_LABEL = faker.lorem.words();
+const MOCK_DUTCH_LABEL = faker.lorem.words();
+
+const mockHighlightedTier = (
+  ...labels: ReturnType<typeof mockLocalizedValue<string>>[]
+) => ({ highlightLabel: labels });
 
 describe(validatePricingSingleHighlightedTier, () => {
   it.each([
-    ['no tiers are given', undefined],
-    ['no tier has a label', [{ highlightLabel: label({ EN: '' }) }, {}]],
+    ['passes when no tiers are given', undefined, true],
     [
-      'a label is only whitespace',
-      [{ highlightLabel: label({ EN: '   ' }) }, {}],
+      'passes when no tier has a label',
+      [mockHighlightedTier(mockLocalizedValue(EN, '')), {}],
+      true,
     ],
     [
-      'exactly one tier has a label',
+      'passes when a label is only whitespace',
+      [mockHighlightedTier(mockLocalizedValue(EN, '   ')), {}],
+      true,
+    ],
+    [
+      'passes when exactly one tier has a label',
       [
-        { highlightLabel: label({ EN: 'Most popular' }) },
-        { highlightLabel: label({ EN: ' ' }) },
+        mockHighlightedTier(mockLocalizedValue(EN, MOCK_ENGLISH_LABEL)),
+        mockHighlightedTier(mockLocalizedValue(EN, ' ')),
         {},
       ],
+      true,
     ],
     [
-      'a second tier has a label only in another language',
+      'passes when a second tier has a label only in another language',
       [
-        { highlightLabel: label({ EN: 'Most popular' }) },
-        { highlightLabel: label({ NL: 'Beste keuze' }) },
+        mockHighlightedTier(mockLocalizedValue(EN, MOCK_ENGLISH_LABEL)),
+        mockHighlightedTier(mockLocalizedValue(NL, MOCK_DUTCH_LABEL)),
       ],
+      true,
     ],
-  ])('passes when %s', (_description, tiers) => {
-    expect(validatePricingSingleHighlightedTier(tiers)).toBe(true);
-  });
-
-  it('fails with the single-highlighted message when two tiers have a default-language label', () => {
-    expect(
-      validatePricingSingleHighlightedTier([
-        { highlightLabel: label({ EN: 'Most popular' }) },
-        { highlightLabel: label({ EN: 'Best value', NL: 'Beste keuze' }) },
+    [
+      'fails when two tiers have a default-language label',
+      [
+        mockHighlightedTier(mockLocalizedValue(EN, MOCK_ENGLISH_LABEL)),
+        mockHighlightedTier(
+          mockLocalizedValue(EN, MOCK_OTHER_ENGLISH_LABEL),
+          mockLocalizedValue(NL, MOCK_DUTCH_LABEL),
+        ),
         {},
-      ]),
-    ).toBe(SINGLE_HIGHLIGHTED_TIER_MESSAGE);
+      ],
+      SINGLE_HIGHLIGHTED_TIER_MESSAGE,
+    ],
+  ])('%s', (_description, tiers, expected) => {
+    expect(validatePricingSingleHighlightedTier(tiers)).toBe(expected);
   });
 });

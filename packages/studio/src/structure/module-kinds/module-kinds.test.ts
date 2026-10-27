@@ -8,59 +8,69 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 
-import { moduleInsertMenuGroups, sortModulesByKind } from './module-kinds';
+import {
+  moduleInsertMenuGroups,
+  moduleKinds,
+  sortModulesByKind,
+} from './module-kinds';
 
-describe('sortModulesByKind', () => {
-  it('orders by kind, then by title within a kind', () => {
-    expect(
-      sortModulesByKind([
+const [, , CONVERSION_KIND, POSTS_KIND] = moduleKinds;
+
+describe(sortModulesByKind, () => {
+  it.each([
+    {
+      case: 'orders by kind, then by title within a kind',
+      names: [
         postListSchema.name,
         newsletterSchema.name,
         faqSchema.name,
         statsSchema.name,
         postLatestSchema.name,
         contentSchema.name,
-      ]),
-    ).toEqual([
-      contentSchema.name,
-      faqSchema.name,
-      statsSchema.name,
-      newsletterSchema.name,
-      postLatestSchema.name,
-      postListSchema.name,
-    ]);
-  });
-
-  it('puts modules without a kind last, by title', () => {
-    expect(
-      sortModulesByKind([
-        heroStatementSchema.name,
-        heroBlogSchema.name,
-        ctaSchema.name,
-      ]),
-    ).toEqual([ctaSchema.name, heroBlogSchema.name, heroStatementSchema.name]);
+      ],
+      expected: [
+        contentSchema.name,
+        faqSchema.name,
+        statsSchema.name,
+        newsletterSchema.name,
+        postLatestSchema.name,
+        postListSchema.name,
+      ],
+    },
+    {
+      case: 'puts modules without a kind last, by title',
+      names: [heroStatementSchema.name, heroBlogSchema.name, ctaSchema.name],
+      expected: [ctaSchema.name, heroBlogSchema.name, heroStatementSchema.name],
+    },
+  ])('$case', ({ names, expected }) => {
+    expect(sortModulesByKind(names)).toEqual(expected);
   });
 });
 
-describe('moduleInsertMenuGroups', () => {
-  it('builds one group per kind with an allowed module, skipping empty kinds', () => {
-    expect(
-      moduleInsertMenuGroups([
-        postListSchema.name,
-        newsletterSchema.name,
-        ctaSchema.name,
-      ]),
-    ).toEqual([
-      {
-        name: 'conversion',
-        title: 'Conversion',
-        of: [ctaSchema.name, newsletterSchema.name],
-      },
-      { name: 'posts', title: 'Posts', of: [postListSchema.name] },
-    ]);
-  });
-
-  it('leaves modules without a kind out of every group', () => {
-    expect(moduleInsertMenuGroups([heroBlogSchema.name])).toEqual([]);
+describe(moduleInsertMenuGroups, () => {
+  it.each([
+    {
+      case: 'builds one group per kind with an allowed module, skipping empty kinds',
+      names: [postListSchema.name, newsletterSchema.name, ctaSchema.name],
+      expected: [
+        {
+          name: CONVERSION_KIND?.name,
+          title: CONVERSION_KIND?.title,
+          of: [ctaSchema.name, newsletterSchema.name],
+        },
+        {
+          name: POSTS_KIND?.name,
+          title: POSTS_KIND?.title,
+          of: [postListSchema.name],
+        },
+      ],
+    },
+    {
+      case: 'leaves modules without a kind out of every group',
+      names: [heroBlogSchema.name],
+      expected: [],
+    },
+  ])('$case', ({ names, expected }) => {
+    expect(moduleInsertMenuGroups(names)).toEqual(expected);
   });
 });

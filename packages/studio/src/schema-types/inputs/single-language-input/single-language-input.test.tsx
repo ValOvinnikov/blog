@@ -1,75 +1,77 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import { createSingleLanguageInput } from '@blog/studio/schema-types/inputs/single-language-input/single-language-input';
 import { ArrayOfObjectsInputMember, type InputProps } from 'sanity';
-
-import { createSingleLanguageInput } from './single-language-input';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const itemMember = (language: string) => ({
+const LOCALIZED_STRING_SCHEMA_TYPE = {
+  name: 'internationalizedArrayString',
+  jsonType: 'array',
+  of: [{ name: 'internationalizedArrayStringValue', jsonType: 'object' }],
+};
+const STRING_SCHEMA_TYPE = { name: 'string', jsonType: 'string' };
+
+const mockItemMember = (language: TLocaleIsoCode) => ({
   kind: 'item',
   key: language,
   item: { value: { _key: language, language } },
 });
 
-const localizedInputProps = (members: unknown[]) => {
+const mockInputProps = (schemaType: object, members?: unknown[]) => {
   const renderDefault = vi.fn(() => null);
 
   return {
-    props: {
-      schemaType: {
-        name: 'internationalizedArrayString',
-        jsonType: 'array',
-        of: [{ name: 'internationalizedArrayStringValue', jsonType: 'object' }],
-      },
-      members,
-      renderDefault,
-    } as unknown as InputProps,
+    props: { schemaType, members, renderDefault } as unknown as InputProps,
     renderDefault,
   };
 };
 
 describe(createSingleLanguageInput, () => {
   it('renders the default language value as a plain field with one live language', () => {
-    const defaultMember = itemMember(EN);
-    const { props, renderDefault } = localizedInputProps([defaultMember]);
+    const defaultMember = mockItemMember(EN);
+    const { props, renderDefault } = mockInputProps(
+      LOCALIZED_STRING_SCHEMA_TYPE,
+      [defaultMember],
+    );
 
     const rendered = createSingleLanguageInput([EN], EN)(props);
+    const {
+      type: renderedType,
+      props: { member: renderedMember },
+    } = rendered as { type: unknown; props: { member: unknown } };
 
     expect(renderDefault).not.toHaveBeenCalled();
-    expect(rendered).toMatchObject({
-      type: ArrayOfObjectsInputMember,
-      props: { member: defaultMember },
-    });
+    expect(renderedType).toBe(ArrayOfObjectsInputMember);
+    expect(renderedMember).toBe(defaultMember);
   });
 
-  it('renders the translated input with two live languages', () => {
-    const { props, renderDefault } = localizedInputProps([
-      itemMember(EN),
-      itemMember(NL),
-    ]);
+  it.each([
+    {
+      behaviour: 'with two live languages',
+      liveLocales: [EN, NL],
+      schemaType: LOCALIZED_STRING_SCHEMA_TYPE,
+      members: [mockItemMember(EN), mockItemMember(NL)],
+    },
+    {
+      behaviour: 'until the default language value exists',
+      liveLocales: [EN],
+      schemaType: LOCALIZED_STRING_SCHEMA_TYPE,
+      members: [],
+    },
+    {
+      behaviour: 'for an untranslated field with one live language',
+      liveLocales: [EN],
+      schemaType: STRING_SCHEMA_TYPE,
+      members: undefined,
+    },
+  ])(
+    'renders the standard input $behaviour',
+    ({ liveLocales, schemaType, members }) => {
+      const { props, renderDefault } = mockInputProps(schemaType, members);
 
-    createSingleLanguageInput([EN, NL], EN)(props);
+      createSingleLanguageInput(liveLocales, EN)(props);
 
-    expect(renderDefault).toHaveBeenCalledWith(props);
-  });
-
-  it('renders the translated input until the default language value exists', () => {
-    const { props, renderDefault } = localizedInputProps([]);
-
-    createSingleLanguageInput([EN], EN)(props);
-
-    expect(renderDefault).toHaveBeenCalledWith(props);
-  });
-
-  it('leaves untranslated fields alone with one live language', () => {
-    const renderDefault = vi.fn(() => null);
-    const props = {
-      schemaType: { name: 'string', jsonType: 'string' },
-      renderDefault,
-    } as unknown as InputProps;
-
-    createSingleLanguageInput([EN], EN)(props);
-
-    expect(renderDefault).toHaveBeenCalledWith(props);
-  });
+      expect(renderDefault).toHaveBeenCalledWith(props);
+    },
+  );
 });
