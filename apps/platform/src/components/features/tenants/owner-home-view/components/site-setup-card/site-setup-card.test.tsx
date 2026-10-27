@@ -38,6 +38,8 @@ const failedTenant = mockClientTenant({
   },
 });
 
+const notStartedTenant = mockClientTenant();
+
 const setup = customRender(SiteSetupCard, {
   tenant: failedTenant,
   canRetry: true,
@@ -73,54 +75,59 @@ describe(`<${SiteSetupCard.name}/>`, () => {
       name: /Setting up your site/,
     });
     const setupStoppedText = screen.queryByText(YOUR_SITES_SETUP_STOPPED);
+    const notStartedText = screen.queryByText(SETUP_NOT_STARTED);
 
     expect(settingUpYourSiteHeading).toBeVisible();
     expect(setupStoppedText).not.toBeInTheDocument();
-    expect(screen.queryByText(SETUP_NOT_STARTED)).not.toBeInTheDocument();
+    expect(notStartedText).not.toBeInTheDocument();
   });
 
-  describe('when the setup never started', () => {
-    const notStartedTenant = mockClientTenant();
+  it('points a viewer who cannot start setup at their platform contact', () => {
+    setup({ tenant: notStartedTenant, canRetry: false });
 
-    it('says so', () => {
+    const contactText = screen.getByText(
+      "We couldn't start setting up your site. Ask your platform contact to start it.",
+    );
+    const startSetupButton = screen.queryByRole('button', {
+      name: START_SETUP,
+    });
+
+    expect(contactText).toBeVisible();
+    expect(startSetupButton).not.toBeInTheDocument();
+  });
+
+  describe('when the viewer can start a setup that never started', () => {
+    const clickStartSetup = async () => {
+      const startSetupButton = screen.getByRole('button', {
+        name: START_SETUP,
+      });
+      await user.click(startSetupButton);
+    };
+
+    beforeEach(() => {
       setup({ tenant: notStartedTenant });
+    });
 
+    it('says the setup has not started', () => {
       const notStartedText = screen.getByText(SETUP_NOT_STARTED);
 
       expect(notStartedText).toBeVisible();
     });
 
     it('starts it once on Start setup', async () => {
-      setup({ tenant: notStartedTenant });
-
-      await user.click(screen.getByRole('button', { name: START_SETUP }));
+      await clickStartSetup();
 
       expect(retryProvisioningStepActionMock).toHaveBeenCalledExactlyOnceWith(
         MOCK_TENANT_ID,
       );
     });
 
-    it('points a viewer who cannot start it at their platform contact', () => {
-      setup({ tenant: notStartedTenant, canRetry: false });
-
-      const contactText = screen.getByText(
-        "We couldn't start setting up your site. Ask your platform contact to start it.",
-      );
-      const startSetupButton = screen.queryByRole('button', {
-        name: START_SETUP,
-      });
-
-      expect(contactText).toBeVisible();
-      expect(startSetupButton).not.toBeInTheDocument();
-    });
-
     it('reports a start that failed again', async () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
-      setup({ tenant: notStartedTenant });
 
-      await user.click(screen.getByRole('button', { name: START_SETUP }));
+      await clickStartSetup();
 
       const couldNotRestartText = await screen.findByText(
         COULDNT_RESTART_SETUP_TRY,
