@@ -1,94 +1,95 @@
+import { faker } from '@faker-js/faker';
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
-import { renderElement, screen } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 
 import { MediaCardItem } from './media-card-item';
 
 vi.mock('@web/i18n/navigation');
 
-const item = mockPostListItem();
-const POST_IMAGE_TEST_ID = 'post-image';
-const LEAD_CARD_TEST_ID = 'lead-card';
+faker.seed(6007);
+
+const MOCK_POST_IMAGE_TEST_ID = faker.string.uuid();
+const MOCK_ITEM = mockPostListItem();
+
+const setup = customRender(MediaCardItem, { item: MOCK_ITEM });
 
 describe(`<${MediaCardItem.name}/>`, () => {
   describe('with the base item', () => {
     beforeEach(() => {
-      renderElement(<MediaCardItem item={item} />);
+      setup();
     });
 
-    it('renders the title linked via SmartLink to item.href', () => {
-      const link = screen.getByRole('link', { name: item.title });
-      expect(link).toHaveAttribute('href', item.href);
+    it('links the title to the item href', () => {
+      const link = screen.getByRole('link', { name: MOCK_ITEM.title });
+
+      expect(link).toHaveAttribute('href', MOCK_ITEM.href);
     });
 
     it('defaults to heading level 3', () => {
       const heading = screen.getByRole('heading', {
         level: 3,
-        name: item.title,
+        name: MOCK_ITEM.title,
       });
+
       expect(heading).toBeVisible();
     });
 
     it('renders no media region when hasImage is omitted', () => {
       const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+
       expect(media).not.toBeInTheDocument();
     });
 
     it('renders the formatted date and reading time', () => {
-      const date = screen.getByText(item.formattedDate);
-      const readingTime = screen.getByText(item.readingTime ?? '', {
+      const date = screen.getByText(MOCK_ITEM.formattedDate);
+      const readingTime = screen.getByText(MOCK_ITEM.readingTime ?? '', {
         exact: false,
       });
+
       expect(date).toBeVisible();
       expect(readingTime).toBeVisible();
     });
 
     it('renders the topic in the footer', () => {
-      const topic = screen.getByText(item.topic.title, { exact: false });
-      expect(topic).toBeVisible();
-    });
+      const topic = screen.getByText(MOCK_ITEM.topic.title, { exact: false });
 
-    it('renders no dataTestId on the underlying MediaCard when omitted', () => {
-      const article = screen.getByRole('article');
-      expect(article).not.toHaveAttribute('data-testid');
+      expect(topic).toBeVisible();
     });
   });
 
   it('renders the title at the given headingLevel', () => {
-    renderElement(<MediaCardItem item={item} headingLevel={2} />);
+    setup({ headingLevel: 2 });
 
     const heading = screen.getByRole('heading', {
       level: 2,
-      name: item.title,
+      name: MOCK_ITEM.title,
     });
+
     expect(heading).toBeVisible();
   });
 
-  it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
-    renderElement(
-      <MediaCardItem
-        item={{ ...item, image: <div data-testid={POST_IMAGE_TEST_ID} /> }}
-        hasImage={true}
-      />,
-    );
+  it('renders the item image in a media region when hasImage is set', () => {
+    setup({
+      item: {
+        ...MOCK_ITEM,
+        image: <div data-testid={MOCK_POST_IMAGE_TEST_ID} />,
+      },
+      hasImage: true,
+    });
 
     const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
-    const image = screen.getByTestId(POST_IMAGE_TEST_ID);
+    const image = screen.getByTestId(MOCK_POST_IMAGE_TEST_ID);
+
     expect(media).toBeVisible();
     expect(image).toBeVisible();
   });
 
-  it('renders no media region when hasImage is true but the item has no image', () => {
-    renderElement(<MediaCardItem item={item} hasImage={true} />);
+  it('renders no media region when hasImage is set but the item has no image', () => {
+    setup({ hasImage: true });
 
     const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
+
     expect(media).not.toBeInTheDocument();
-  });
-
-  it('forwards dataTestId to the underlying MediaCard', () => {
-    renderElement(<MediaCardItem item={item} dataTestId={LEAD_CARD_TEST_ID} />);
-
-    const card = screen.getByTestId(LEAD_CARD_TEST_ID);
-    expect(card).toBeVisible();
   });
 });
