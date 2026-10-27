@@ -18,6 +18,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
@@ -32,8 +33,8 @@ import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 type TAnyElement = ReactElement<Record<string, unknown>>;
 
 const childrenOf = (node: TAnyElement): TAnyElement[] => {
-  const props = node.props as { children?: TAnyElement | TAnyElement[] };
-  return [props.children ?? []].flat();
+  const { children } = node.props as { children?: TAnyElement | TAnyElement[] };
+  return [children ?? []].flat();
 };
 
 const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
@@ -57,7 +58,7 @@ const enterRequestContextMock = vi.mocked(enterRequestContext);
 const getRequestContextMock = vi.mocked(getRequestContext);
 const getSiteSettingsMock = vi.mocked(getSiteSettings);
 
-const THEME_TOKENS = {
+const MOCK_THEME_TOKENS = {
   accentHue: 250,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
   bodyFont: FONT_CHOICE.NEWSREADER,
@@ -65,101 +66,93 @@ const THEME_TOKENS = {
   density: DENSITY.DEFAULT,
 };
 
+const NOINDEX_ROBOTS = { index: false, follow: false };
+
+const SETTINGS_FAILURE_SUITE = 'when site settings fail to load';
+
 const makeParams = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
   Promise.resolve({ tenant: MOCK_TENANT_ID, locale });
 
-const renderLayout = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) =>
+const renderLayout = () =>
   LocaleLayout({
     children: <div>content</div>,
-    params: makeParams(locale),
+    params: makeParams(),
   }) as unknown as Promise<TAnyElement>;
 
 const settingsFailure = () =>
-  getSiteSettingsMock.mockResolvedValueOnce(errorResult('boom') as never);
+  getSiteSettingsMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-describe('LocaleLayout', () => {
-  beforeEach(() => {
-    getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
-    isProductionEnvironmentMock.mockReturnValue(true);
+beforeEach(() => {
+  getThemeTokensMock.mockResolvedValue(MOCK_THEME_TOKENS);
+  isProductionEnvironmentMock.mockReturnValue(true);
+});
+
+describe(generateStaticParams, () => {
+  it('returns params for every supported locale', () => {
+    expect(generateStaticParams()).toEqual([{ locale: LOCALE_ISO_CODES.EN }]);
+  });
+});
+
+describe(generateMetadata, () => {
+  it('builds the title from site settings and stays indexable in production', async () => {
+    const metadata = await generateMetadata({ params: makeParams() });
+
+    expect(metadata).toEqual({
+      metadataBase: MOCK_REQUEST_CONTEXT.metadataBase,
+      title: {
+        default: MOCK_SITE_SETTINGS.brand.name,
+        template: `%s | ${MOCK_SITE_SETTINGS.brand.name}`,
+      },
+    });
   });
 
-  describe('generateStaticParams', () => {
-    it('returns params for every supported locale', () => {
-      expect(generateStaticParams()).toEqual([{ locale: LOCALE_ISO_CODES.EN }]);
-    });
+  it('adds noindex, nofollow robots metadata outside production', async () => {
+    isProductionEnvironmentMock.mockReturnValue(false);
+
+    const { robots } = await generateMetadata({ params: makeParams() });
+
+    expect(robots).toEqual(NOINDEX_ROBOTS);
   });
 
-  describe('generateMetadata', () => {
-    it('builds title from site settings and emits no description', async () => {
-      const metadata = await generateMetadata({ params: makeParams() });
+  it('enters the request context from its route params', async () => {
+    const params = makeParams();
 
-      expect(metadata).toEqual(
-        expect.objectContaining({
-          title: {
-            default: MOCK_SITE_SETTINGS.brand.name,
-            template: `%s | ${MOCK_SITE_SETTINGS.brand.name}`,
-          },
-        }),
-      );
-      expect(metadata).not.toHaveProperty('description');
+    await generateMetadata({ params });
+
+    expect(enterRequestContextMock).toHaveBeenCalledWith(params);
+  });
+
+  describe(SETTINGS_FAILURE_SUITE, () => {
+    beforeEach(() => {
+      settingsFailure();
     });
 
-    it('omits robots restrictions in production (indexable)', async () => {
+    it('falls back to metadataBase only', async () => {
       const metadata = await generateMetadata({ params: makeParams() });
 
-      expect(metadata).not.toHaveProperty('robots');
+      expect(metadata).toEqual({
+        metadataBase: MOCK_REQUEST_CONTEXT.metadataBase,
+      });
     });
 
-    it('adds noindex, nofollow robots metadata outside production', async () => {
+    it('still applies noindex, nofollow outside production', async () => {
       isProductionEnvironmentMock.mockReturnValue(false);
 
-      const metadata = await generateMetadata({ params: makeParams() });
+      const { robots } = await generateMetadata({ params: makeParams() });
 
-      expect(metadata.robots).toEqual({ index: false, follow: false });
-    });
-
-    it('enters the request context from its route params', async () => {
-      const params = makeParams();
-
-      await generateMetadata({ params });
-
-      expect(enterRequestContextMock).toHaveBeenCalledWith(params);
-    });
-
-    it("sets metadataBase to the tenant's base URL", async () => {
-      const metadata = await generateMetadata({ params: makeParams() });
-
-      expect(metadata.metadataBase).toBe(MOCK_REQUEST_CONTEXT.metadataBase);
-    });
-
-    describe('when site settings fail to load the metadata', () => {
-      beforeEach(() => {
-        settingsFailure();
-      });
-
-      it('falls back to metadataBase only when site settings fail', async () => {
-        const metadata = await generateMetadata({ params: makeParams() });
-
-        expect(metadata).not.toHaveProperty('title');
-      });
-
-      it('still applies noindex, nofollow outside production when site settings fail', async () => {
-        isProductionEnvironmentMock.mockReturnValue(false);
-
-        const metadata = await generateMetadata({ params: makeParams() });
-
-        expect(metadata.robots).toEqual({ index: false, follow: false });
-      });
+      expect(robots).toEqual(NOINDEX_ROBOTS);
     });
   });
+});
 
+describe(`<${LocaleLayout.name}/>`, () => {
   it('declares the served language on the document', async () => {
     getRequestContextMock.mockResolvedValueOnce({
       ...MOCK_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
     });
 
-    const document = await renderLayout(LOCALE_ISO_CODES.NL);
+    const document = await renderLayout();
 
     expect(document.props.lang).toBe(LOCALE_BCP47_TAGS.NL);
   });
@@ -168,7 +161,7 @@ describe('LocaleLayout', () => {
     const [themeScope] = childrenOf(await renderLayout());
 
     expect(themeScope?.type).toBe(ThemeScope);
-    expect(themeScope?.props.themeTokens).toBe(THEME_TOKENS);
+    expect(themeScope?.props.themeTokens).toBe(MOCK_THEME_TOKENS);
   });
 
   it('forwards the entered tenant to the theme token loader', async () => {
@@ -177,7 +170,7 @@ describe('LocaleLayout', () => {
     expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it('composes the providers around the header, page content and footer, with analytics beside them', async () => {
+  it('composes providers around header, content and footer, with analytics', async () => {
     const [themeScope] = childrenOf(await renderLayout());
     const [providers, analytics] = childrenOf(themeScope as TAnyElement);
     const [page] = childrenOf(providers as TAnyElement);
@@ -189,12 +182,12 @@ describe('LocaleLayout', () => {
     expect(footer?.type).toBe(SiteFooter);
   });
 
-  describe('when site settings fail to load the layout', () => {
+  describe(SETTINGS_FAILURE_SUITE, () => {
     beforeEach(() => {
       settingsFailure();
     });
 
-    it('calls the real Next.js notFound() instead of rendering a broken shell', async () => {
+    it('calls notFound() instead of rendering a broken shell', async () => {
       await expect(renderLayout()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );
@@ -202,12 +195,12 @@ describe('LocaleLayout', () => {
       expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     });
 
-    it('preserves the site_settings.layout_fetch_failed log call', async () => {
+    it('logs the layout fetch failure', async () => {
       await expect(renderLayout()).rejects.toThrow();
 
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'site_settings.layout_fetch_failed',
-        expect.anything(),
+        { error: MOCK_ERROR },
       );
     });
 
