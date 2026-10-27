@@ -1,125 +1,103 @@
 import { ICONS } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
-import {
-  renderWithIntl,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen, within } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
+import { adminRoutes } from '@platform/utils/routes/routes';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { AdminShell } from './admin-shell';
 
 vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/auth/sign-out-action');
 
-const render = renderWithIntl;
+faker.seed(2401);
 
-const roleChip = {
-  name: 'Jane Doe',
-  role: ADMIN_ROLE.ADMIN,
-  scope: 'Platform',
-};
+const MOCK_SECTION_LABEL = faker.lorem.words(2);
+const MOCK_NAV_ITEM_LABEL = faker.lorem.word();
+const MOCK_CRUMB = faker.lorem.words(3);
+const MOCK_SCOPE = faker.company.name();
+const MOCK_PAGE_CONTENT = faker.lorem.sentence();
+const MOCK_SWITCHER = faker.lorem.words(2);
 
-describe(AdminShell, () => {
-  afterEach(() => {
-    vi.mocked(useSelectedLayoutSegment).mockReturnValue(null);
+const setup = customRender(AdminShell, {
+  sections: [
+    {
+      label: MOCK_SECTION_LABEL,
+      items: [
+        {
+          label: MOCK_NAV_ITEM_LABEL,
+          icon: ICONS.GRID,
+          href: adminRoutes.tenants(),
+        },
+      ],
+    },
+  ],
+  crumb: <p>{MOCK_CRUMB}</p>,
+  roleChip: {
+    name: faker.person.fullName(),
+    role: ADMIN_ROLE.ADMIN,
+    scope: MOCK_SCOPE,
+  },
+  children: <p>{MOCK_PAGE_CONTENT}</p>,
+});
+
+describe(`<${AdminShell.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
   });
 
   it('renders the sidebar, topbar and page content together', () => {
-    render(
-      <AdminShell
-        sections={[
-          {
-            label: 'Platform section',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-        crumb={<p>Platform</p>}
-        roleChip={roleChip}
-      >
-        <p>Tenants page</p>
-      </AdminShell>,
-    );
+    setup();
 
-    expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
-    expect(screen.getByText('Platform section')).toBeVisible();
-    expect(screen.getByText('Platform', { selector: 'p' })).toBeVisible();
-    expect(screen.getByText('Admin · Platform')).toBeVisible();
-    expect(screen.getByText('Tenants page')).toBeVisible();
+    const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
+    const sectionLabel = screen.getByText(MOCK_SECTION_LABEL);
+    const crumb = screen.getByText(MOCK_CRUMB);
+    const roleChipLabel = screen.getByText(
+      makeEnTranslator('topbar')('roleChip', {
+        role: messages.roleLabel.ADMIN,
+        scope: MOCK_SCOPE,
+      }),
+    );
+    const pageContent = screen.getByText(MOCK_PAGE_CONTENT);
+
+    expect(navLink).toBeVisible();
+    expect(sectionLabel).toBeVisible();
+    expect(crumb).toBeVisible();
+    expect(roleChipLabel).toBeVisible();
+    expect(pageContent).toBeVisible();
   });
 
-  it('threads sections and switcher into the Topbar nav menu as well as the Sidebar', async () => {
-    const user = userEvent.setup();
-    render(
-      <AdminShell
-        sections={[
-          {
-            label: 'Platform section',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-        switcher={<div>Tenant switcher</div>}
-        crumb={<p>Platform</p>}
-        roleChip={roleChip}
-      >
-        <p>Tenants page</p>
-      </AdminShell>,
-    );
+  it('lists the nav items and the switcher in the topbar menu', async () => {
+    setup({ switcher: <div>{MOCK_SWITCHER}</div> });
 
-    const trigger = screen.getByRole('button', { name: 'Menu' });
-    expect(trigger).toBeVisible();
+    const menuTrigger = screen.getByRole('button', {
+      name: messages.topbarNavMenu.triggerLabel,
+    });
+    await user.click(menuTrigger);
 
-    await user.click(trigger);
     const menu = await screen.findByRole('menu');
-    expect(
-      within(menu).getByRole('menuitem', { name: 'Tenants' }),
-    ).toBeVisible();
-    expect(within(menu).getByText('Tenant switcher')).toBeVisible();
+    const menuNavItem = within(menu).getByRole('menuitem', {
+      name: MOCK_NAV_ITEM_LABEL,
+    });
+    const menuSwitcher = within(menu).getByText(MOCK_SWITCHER);
+
+    expect(menuNavItem).toBeVisible();
+    expect(menuSwitcher).toBeVisible();
   });
 
-  it('renders the sidebar, topbar and page content full-bleed on the studio route', () => {
-    vi.mocked(useSelectedLayoutSegment).mockReturnValue('studio');
+  it('can open with the sidebar collapsed', () => {
+    setup({ isSidebarInitiallyCollapsed: true });
 
-    render(
-      <AdminShell
-        sections={[
-          {
-            label: 'Platform section',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-        crumb={<p>Platform</p>}
-        roleChip={roleChip}
-      >
-        <p>Studio content</p>
-      </AdminShell>,
-    );
+    const expandToggle = screen.getByRole('button', {
+      name: messages.sidebar.expandToggle,
+    });
+    const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
 
-    expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
-    expect(screen.getByText('Studio content')).toBeVisible();
-  });
-
-  it('seeds the sidebar as collapsed when isSidebarInitiallyCollapsed is true', () => {
-    render(
-      <AdminShell
-        sections={[
-          {
-            label: 'Platform section',
-            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-          },
-        ]}
-        isSidebarInitiallyCollapsed={true}
-        crumb={<p>Platform</p>}
-        roleChip={roleChip}
-      >
-        <p>Tenants page</p>
-      </AdminShell>,
-    );
-
-    expect(
-      screen.getByRole('button', { name: 'Expand sidebar' }),
-    ).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
+    expect(expandToggle).toHaveAttribute('aria-expanded', 'false');
+    expect(navLink).toBeVisible();
   });
 });
