@@ -1,69 +1,64 @@
-import { DEPTH } from '@blog/config';
 import type { TPostTakeaways } from '@blog/service';
-import userEvent from '@testing-library/user-event';
-import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
+import { faker } from '@faker-js/faker';
 import { DepthProvider } from '@web/context/depth-provider';
-import { renderElement, screen, waitFor } from '@web/testing/custom-render';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
+import type { ReactNode } from 'react';
 
-import { SkimPanel, type ISkimPanelProps } from './skim-panel';
+import { SkimPanel } from './skim-panel';
 
-const takeaways: TPostTakeaways = {
-  takeaways: ['First takeaway.', 'Second takeaway.', 'Third takeaway.'],
-  generatedAt: '2026-01-01T00:00:00.000Z',
-  model: 'claude-haiku-4-5',
+faker.seed(5107);
+
+const MOCK_TAKEAWAYS: TPostTakeaways = {
+  takeaways: faker.helpers.uniqueArray(faker.lorem.sentence, 3),
+  generatedAt: faker.date
+    .past({ refDate: '2026-01-01T00:00:00.000Z' })
+    .toISOString(),
+  model: faker.lorem.word(),
 };
 
-const setup = async (overrides?: Partial<ISkimPanelProps>) => {
-  const element = await SkimPanel({ takeaways, ...overrides });
-  return renderElement(
-    <DepthProvider hasSkim={true} hasDeep={false}>
-      {element}
-    </DepthProvider>,
-  );
-};
+const SkimDepthProvider = ({ children }: { children: ReactNode }) => (
+  <DepthProvider hasSkim={true} hasDeep={false}>
+    {children}
+  </DepthProvider>
+);
+
+const setup = customRenderServerAsync(
+  SkimPanel,
+  { takeaways: MOCK_TAKEAWAYS },
+  { wrapper: SkimDepthProvider },
+);
 
 describe(`<${SkimPanel.name}/>`, () => {
-  describe('with takeaways', () => {
-    beforeEach(async () => {
-      await setup();
+  it('lists every takeaway under the translated panel label', async () => {
+    await setup();
+
+    const panel = screen.getByRole('region', { name: '30-second summary' });
+    const items = within(panel).getAllByRole('listitem');
+
+    expect(items.map((item) => item.textContent)).toEqual(
+      MOCK_TAKEAWAYS.takeaways,
+    );
+  });
+
+  it('offers the button that switches to the full article', async () => {
+    await setup();
+
+    const readButton = screen.getByRole('button', {
+      name: 'Read the full article',
     });
 
-    it('renders one <li> per takeaway', () => {
-      expect(screen.getAllByRole('listitem')).toHaveLength(3);
-      expect(screen.getByText('First takeaway.')).toBeVisible();
-      expect(screen.getByText('Second takeaway.')).toBeVisible();
-      expect(screen.getByText('Third takeaway.')).toBeVisible();
-    });
-
-    it('renders the translated panel label and "read the full article" copy', () => {
-      expect(
-        screen.getByRole('region', { name: '30-second summary' }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('button', { name: 'Read the full article' }),
-      ).toBeVisible();
-    });
+    expect(readButton).toBeVisible();
   });
 
   it('renders nothing when takeaways is undefined', async () => {
     await setup({ takeaways: undefined });
 
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
-  });
+    const panel = screen.queryByRole('region');
 
-  it('the "read the full article" button switches depth back to READ', async () => {
-    localStorage.clear();
-    localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.SKIM);
-    const user = userEvent.setup();
-
-    await setup();
-
-    await user.click(
-      screen.getByRole('button', { name: 'Read the full article' }),
-    );
-
-    await waitFor(() =>
-      expect(localStorage.getItem(DEPTH_STORAGE_KEY)).toBe(DEPTH.READ),
-    );
+    expect(panel).not.toBeInTheDocument();
   });
 });

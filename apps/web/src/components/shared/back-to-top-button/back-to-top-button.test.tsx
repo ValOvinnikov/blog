@@ -1,5 +1,5 @@
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { customRender, fireEvent, screen } from '@web/testing/custom-render';
+import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
 import {
   getFakeIntersectionObserver,
   stubFakeIntersectionObserver,
@@ -9,9 +9,15 @@ import { BackToTopButton } from './back-to-top-button';
 
 const BACK_TO_TOP_LABEL = 'Back to top';
 const SITE_FOOTER_TEST_ID = 'site-footer';
-const SITE_FOOTER_HTML = `<footer data-testid="${SITE_FOOTER_TEST_ID}"></footer>`;
 
-const setup = customRender(BackToTopButton, {});
+const setup = (hasEarlierFooter = false) =>
+  renderElement(
+    <>
+      {hasEarlierFooter ? <footer /> : null}
+      <footer data-testid={SITE_FOOTER_TEST_ID} />
+      <BackToTopButton />
+    </>,
+  );
 
 const setScrollY = (value: number) => {
   Object.defineProperty(window, 'scrollY', {
@@ -21,12 +27,8 @@ const setScrollY = (value: number) => {
   });
 };
 
-const getHiddenButton = () =>
-  screen.getByRole('button', { hidden: true, name: BACK_TO_TOP_LABEL });
-
 describe(`<${BackToTopButton.name}/>`, () => {
   beforeEach(() => {
-    document.body.innerHTML = SITE_FOOTER_HTML;
     stubFakeIntersectionObserver();
   });
 
@@ -44,7 +46,10 @@ describe(`<${BackToTopButton.name}/>`, () => {
     });
 
     it('is hidden while scrolled less than one viewport height', () => {
-      const button = getHiddenButton();
+      const button = screen.getByRole('button', {
+        hidden: true,
+        name: BACK_TO_TOP_LABEL,
+      });
 
       expect(button).toHaveAttribute('inert');
     });
@@ -88,7 +93,10 @@ describe(`<${BackToTopButton.name}/>`, () => {
       it('hides once the footer scrolls into view', () => {
         getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
 
-        const button = getHiddenButton();
+        const button = screen.getByRole('button', {
+          hidden: true,
+          name: BACK_TO_TOP_LABEL,
+        });
 
         expect(button).toHaveAttribute('inert');
       });
@@ -120,8 +128,7 @@ describe(`<${BackToTopButton.name}/>`, () => {
   });
 
   it('observes the site footer, not an earlier article footer', () => {
-    document.body.innerHTML = `<footer></footer>${SITE_FOOTER_HTML}`;
-    setup();
+    setup(true);
 
     const siteFooter = screen.getByTestId(SITE_FOOTER_TEST_ID);
 

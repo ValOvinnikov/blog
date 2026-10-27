@@ -1,42 +1,44 @@
+import { faker } from '@faker-js/faker';
+import { themeBootstrapScript } from '@web/config/theme-script';
+import { renderElement, within } from '@web/testing/custom-render';
+
 import { DocumentShell } from './document-shell';
 
-const renderShell = (lang = 'en', children = <div>content</div>) =>
-  DocumentShell({ lang, children });
+faker.seed(6007);
 
-const headChildren = (html: ReturnType<typeof renderShell>) => {
-  const [head] = html.props.children;
-  return [head.props.children].flat();
-};
+const MOCK_CONTENT = faker.lorem.sentence();
+const MOCK_LANGUAGE = faker.location.countryCode().toLowerCase();
 
 describe(`<${DocumentShell.name}/>`, () => {
+  beforeEach(() => {
+    renderElement(
+      <DocumentShell lang={MOCK_LANGUAGE}>
+        <div>{MOCK_CONTENT}</div>
+      </DocumentShell>,
+    );
+  });
+
   it('declares the given language on the document', () => {
-    expect(renderShell('nl').props.lang).toBe('nl');
+    expect(document.documentElement).toHaveAttribute('lang', MOCK_LANGUAGE);
   });
 
   it('mounts children in the body', () => {
-    const children = <div>content</div>;
-    const [, body] = renderShell('en', children).props.children;
+    const content = within(document.body).getByText(MOCK_CONTENT);
 
-    expect(body.props.children).toBe(children);
+    expect(content).toBeVisible();
+  });
+
+  it('runs the theme bootstrap script from the head', () => {
+    const script = within(document.head).getByText(themeBootstrapScript, {
+      ignore: false,
+    });
+
+    expect(script).toBeInstanceOf(HTMLScriptElement);
   });
 
   it('preconnects to the Sanity image CDN without crossorigin', () => {
-    const preconnect = headChildren(renderShell()).find(
-      (child: React.ReactElement<{ rel?: string }>) =>
-        child?.type === 'link' && child.props.rel === 'preconnect',
-    );
-
-    expect(preconnect.props.href).toBe('https://cdn.sanity.io');
-    expect(preconnect.props.crossOrigin).toBeUndefined();
-  });
-
-  it('renders the dark-mode bootstrap script in the head', () => {
-    const script = headChildren(renderShell()).find(
-      (child: React.ReactElement) => child?.type === 'script',
-    );
-
-    expect(script.props.dangerouslySetInnerHTML.__html).toContain(
-      "localStorage.getItem('theme')",
+    expect(document.head).toContainHTML(
+      '<link rel="preconnect" href="https://cdn.sanity.io">',
     );
   });
 });

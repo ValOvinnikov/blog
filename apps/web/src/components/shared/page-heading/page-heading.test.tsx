@@ -1,12 +1,16 @@
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { PageHeading } from './page-heading';
 
+faker.seed(5201);
+
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+
 const setup = customRender(PageHeading, {
-  headingBlock: {
-    heading: 'Notes on building things',
-    supportingText: undefined,
-  },
+  headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
   align: undefined,
 });
 
@@ -17,29 +21,31 @@ describe(`<${PageHeading.name}/>`, () => {
     });
 
     it('renders the heading as an h1', () => {
-      expect(
-        screen.getByRole('heading', {
-          level: 1,
-          name: 'Notes on building things',
-        }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_HEADING,
+      });
+
+      expect(heading).toBeVisible();
     });
 
     it('renders no supporting paragraph when supportingText is absent', () => {
-      expect(
-        screen.queryByText(/./, { selector: 'p' }),
-      ).not.toBeInTheDocument();
+      const paragraph = screen.queryByText(/./, { selector: 'p' });
+
+      expect(paragraph).not.toBeInTheDocument();
     });
   });
 
   it('renders the supporting text when given', () => {
     setup({
-      headingBlock: {
-        heading: 'Notes on building things',
-        supportingText: 'Essays and notes from the team.',
-      },
+      headingBlock: mockHeadingBlock({
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
+      }),
     });
 
-    expect(screen.getByText('Essays and notes from the team.')).toBeVisible();
+    const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);
+
+    expect(supportingText).toBeVisible();
   });
 });

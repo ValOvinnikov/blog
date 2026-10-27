@@ -1,9 +1,11 @@
 import {
   ASIDE_KIND,
   PORTABLE_TEXT_BLOCK_TYPE,
+  SITE_MESSAGES,
   type TPortableTextBlock,
 } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
+import { faker } from '@faker-js/faker';
 import {
   customRender,
   renderElement,
@@ -20,6 +22,8 @@ import { PortableText } from './portable-text';
 
 vi.mock('@web/i18n/navigation');
 
+faker.seed(6007);
+
 const setup = customRender(PortableText, {
   value: [],
 });
@@ -34,25 +38,35 @@ type TBodyImageBlock = Extract<
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE }
 >;
 
-const LINK_HREF = 'https://example.com';
-const LINK_KEY = 'link-1';
-const PARAGRAPH_TEXT = 'Hello world';
-const SECTION_HEADING = 'Getting started';
-const SUBSECTION_HEADING = 'Prerequisites';
-const FIRST_OVERVIEW_KEY = 'overview-1';
-const SECOND_OVERVIEW_KEY = 'overview-2';
-const DANGLING_LINK_TEXT = 'incomplete link';
-const CODE_FILENAME = 'example.ts';
-const CODE_SOURCE = 'const x = 1;';
-const IMAGE_ALT = 'A scenic mountain range';
-const ASIDE_BODY_TEXT = 'Because Y.';
-const NESTED_LINK_TEXT = 'a nested link';
-const HOST_TEST_ID = 'portable-text-host';
+const MOCK_LINK_HREF = faker.internet.url();
+const MOCK_LINK_KEY = faker.string.uuid();
+const MOCK_LINK_TEXT = faker.lorem.words(2);
+const MOCK_PARAGRAPH_TEXT = faker.lorem.sentence();
+const MOCK_SECTION_HEADING = faker.lorem.words(2);
+const MOCK_SUBSECTION_HEADING = faker.lorem.words(2);
+const MOCK_OVERVIEW_HEADING = faker.lorem.words(2);
+const MOCK_FIRST_OVERVIEW_KEY = faker.string.uuid();
+const MOCK_SECOND_OVERVIEW_KEY = faker.string.uuid();
+const MOCK_SECTION_KEY = faker.string.uuid();
+const MOCK_SUBSECTION_KEY = faker.string.uuid();
+const MOCK_DANGLING_LINK_TEXT = faker.lorem.words(2);
+const MOCK_QUOTE_TEXT = faker.lorem.sentence();
+const MOCK_CODE_FILENAME = faker.system.commonFileName('ts');
+const MOCK_CODE_SOURCE = 'const x = 1;';
+const MOCK_IMAGE_ALT = faker.lorem.words(3);
+const MOCK_ASIDE_BODY_TEXT = faker.lorem.sentence();
+const MOCK_ASIDE_KIND_BODY_TEXT = faker.lorem.sentence();
+const MOCK_ASIDE_CONTEXT_TEXT = faker.lorem.sentence();
+const MOCK_NESTED_LINK_TEXT = faker.lorem.words(2);
+const MOCK_BOLD_TEXT = faker.lorem.words(2);
+const MOCK_CUSTOM_CODE_TEXT = faker.lorem.words(2);
+const MOCK_HOST_TEST_ID = faker.string.uuid();
+const CODE_REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
 
 const RESOLVED_LINK_REF = {
   _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-  _key: LINK_KEY,
-  link: { href: LINK_HREF, target: undefined },
+  _key: MOCK_LINK_KEY,
+  link: { href: MOCK_LINK_HREF, target: undefined },
 } as const;
 
 const mockAsideBlock = (
@@ -74,26 +88,41 @@ const mockBodyImageBlock = (
   image,
 });
 
+const MARK_CASES = [
+  { mark: 'strong', element: 'strong' },
+  { mark: 'em', element: 'em' },
+  { mark: 'code', element: 'code' },
+  { mark: 'sub', element: 'sub' },
+  { mark: 'sup', element: 'sup' },
+];
+
+const LIST_CASES = [
+  { listItem: 'bullet', element: 'UL' },
+  { listItem: 'number', element: 'OL' },
+] as const;
+
 describe(`<${PortableText.name}/>`, () => {
   it('renders a normal-style block as a paragraph', () => {
-    const value: TPortableTextBody = [mockPortableTextBlock(PARAGRAPH_TEXT)];
+    const value: TPortableTextBody = [
+      mockPortableTextBlock(MOCK_PARAGRAPH_TEXT),
+    ];
 
     setup({ value });
 
-    const paragraph = screen.getByText(PARAGRAPH_TEXT, { selector: 'p' });
+    const paragraph = screen.getByText(MOCK_PARAGRAPH_TEXT, { selector: 'p' });
     expect(paragraph).toBeVisible();
   });
 
   it('downgrades an h1-style block to a level 2 heading', () => {
     const value: TPortableTextBody = [
-      mockPortableTextBlock('Heading 1', { style: 'h1' }),
+      mockPortableTextBlock(MOCK_SECTION_HEADING, { style: 'h1' }),
     ];
 
     setup({ value });
 
     const heading = screen.getByRole('heading', {
       level: 2,
-      name: 'Heading 1',
+      name: MOCK_SECTION_HEADING,
     });
     const pageHeading = screen.queryByRole('heading', { level: 1 });
     expect(heading).toBeVisible();
@@ -104,7 +133,7 @@ describe(`<${PortableText.name}/>`, () => {
     'renders an h%i-style block as a heading of that level',
     (level) => {
       const value: TPortableTextBody = [
-        mockPortableTextBlock(`Heading ${level}`, {
+        mockPortableTextBlock(MOCK_SECTION_HEADING, {
           style: `h${level}` as TPortableTextBlock['style'],
         }),
       ];
@@ -113,7 +142,7 @@ describe(`<${PortableText.name}/>`, () => {
 
       const heading = screen.getByRole('heading', {
         level,
-        name: `Heading ${level}`,
+        name: MOCK_SECTION_HEADING,
       });
       expect(heading).toBeVisible();
     },
@@ -121,10 +150,13 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('gives every h2/h3 block a stable id from its own _key', () => {
     const value: TPortableTextBody = [
-      mockPortableTextBlock(SECTION_HEADING, { style: 'h2', key: 'section-1' }),
-      mockPortableTextBlock(SUBSECTION_HEADING, {
+      mockPortableTextBlock(MOCK_SECTION_HEADING, {
+        style: 'h2',
+        key: MOCK_SECTION_KEY,
+      }),
+      mockPortableTextBlock(MOCK_SUBSECTION_HEADING, {
         style: 'h3',
-        key: 'section-2',
+        key: MOCK_SUBSECTION_KEY,
       }),
     ];
 
@@ -132,180 +164,164 @@ describe(`<${PortableText.name}/>`, () => {
 
     const sectionHeading = screen.getByRole('heading', {
       level: 2,
-      name: SECTION_HEADING,
+      name: MOCK_SECTION_HEADING,
     });
     const subsectionHeading = screen.getByRole('heading', {
       level: 3,
-      name: SUBSECTION_HEADING,
+      name: MOCK_SUBSECTION_HEADING,
     });
-    expect(sectionHeading).toHaveAttribute('id', 'section-1');
-    expect(subsectionHeading).toHaveAttribute('id', 'section-2');
+    expect(sectionHeading).toHaveAttribute('id', MOCK_SECTION_KEY);
+    expect(subsectionHeading).toHaveAttribute('id', MOCK_SUBSECTION_KEY);
   });
 
   it('keeps heading ids distinct across two PortableText instances', () => {
     const firstBody: TPortableTextBody = [
-      mockPortableTextBlock('Overview', {
+      mockPortableTextBlock(MOCK_OVERVIEW_HEADING, {
         style: 'h2',
-        key: FIRST_OVERVIEW_KEY,
+        key: MOCK_FIRST_OVERVIEW_KEY,
       }),
     ];
     const secondBody: TPortableTextBody = [
-      mockPortableTextBlock('Overview', {
+      mockPortableTextBlock(MOCK_OVERVIEW_HEADING, {
         style: 'h2',
-        key: SECOND_OVERVIEW_KEY,
+        key: MOCK_SECOND_OVERVIEW_KEY,
       }),
     ];
 
     renderElement(<PortableText value={firstBody} />);
     renderElement(<PortableText value={secondBody} />);
 
-    const headings = screen.getAllByRole('heading', { level: 2 });
-
-    expect(headings).toHaveLength(2);
-    expect(headings[0]).toHaveAttribute('id', FIRST_OVERVIEW_KEY);
-    expect(headings[1]).toHaveAttribute('id', SECOND_OVERVIEW_KEY);
+    const [firstHeading, secondHeading, ...otherHeadings] = screen.getAllByRole(
+      'heading',
+      { level: 2 },
+    );
+    expect(firstHeading).toHaveAttribute('id', MOCK_FIRST_OVERVIEW_KEY);
+    expect(secondHeading).toHaveAttribute('id', MOCK_SECOND_OVERVIEW_KEY);
+    expect(otherHeadings).toHaveLength(0);
   });
 
   it('renders a blockquote-style block as a blockquote', () => {
     const value: TPortableTextBody = [
-      mockPortableTextBlock('A quote', { style: 'blockquote' }),
+      mockPortableTextBlock(MOCK_QUOTE_TEXT, { style: 'blockquote' }),
     ];
 
     setup({ value });
 
-    const quote = screen.getByText('A quote', { selector: 'blockquote' });
+    const quote = screen.getByText(MOCK_QUOTE_TEXT, {
+      selector: 'blockquote',
+    });
     expect(quote).toBeVisible();
   });
 
-  it.each([
-    { mark: 'strong', text: 'bold text' },
-    { mark: 'em', text: 'italic text' },
-    { mark: 'code', text: 'const x = 1' },
-  ])('renders the $mark mark as a $mark element', ({ mark, text }) => {
-    const value: TPortableTextBody = [
-      mockPortableTextBlock([mockPortableTextSpan(text, [mark])]),
-    ];
+  it.each(MARK_CASES)(
+    'renders the $mark mark as a $element element',
+    ({ mark, element }) => {
+      const markedText = faker.lorem.words(2);
+      const value: TPortableTextBody = [
+        mockPortableTextBlock([mockPortableTextSpan(markedText, [mark])]),
+      ];
 
-    setup({ value });
+      setup({ value });
 
-    const markedText = screen.getByText(text, { selector: mark });
-    expect(markedText).toBeVisible();
-  });
+      const markedElement = screen.getByText(markedText, { selector: element });
+      expect(markedElement).toBeVisible();
+    },
+  );
 
-  it('renders the sub mark as subscript and the sup mark as superscript', () => {
-    const value: TPortableTextBody = [
-      mockPortableTextBlock([
-        mockPortableTextSpan('H'),
-        mockPortableTextSpan('2', ['sub']),
-        mockPortableTextSpan('O and x'),
-        mockPortableTextSpan('n', ['sup']),
-      ]),
-    ];
+  it.each(LIST_CASES)(
+    'renders $listItem items as a list of that kind',
+    ({ listItem, element }) => {
+      const value: TPortableTextBody = [
+        mockPortableTextBlock(faker.lorem.words(2), { listItem }),
+        mockPortableTextBlock(faker.lorem.words(2), { listItem }),
+      ];
 
-    setup({ value });
+      setup({ value });
 
-    const subscript = screen.getByText('2');
-    const superscript = screen.getByText('n');
-    expect(subscript.tagName).toBe('SUB');
-    expect(superscript.tagName).toBe('SUP');
-  });
-
-  it('renders bullet and numbered lists', () => {
-    const value: TPortableTextBody = [
-      mockPortableTextBlock([mockPortableTextSpan('First bullet')], {
-        listItem: 'bullet',
-      }),
-      mockPortableTextBlock([mockPortableTextSpan('Second bullet')], {
-        listItem: 'bullet',
-      }),
-    ];
-
-    setup({ value });
-
-    const list = screen.getByRole('list');
-    const listItems = screen.getAllByRole('listitem');
-    expect(list.tagName).toBe('UL');
-    expect(listItems).toHaveLength(2);
-  });
+      const list = screen.getByRole('list');
+      const listItems = screen.getAllByRole('listitem');
+      expect(list.tagName).toBe(element);
+      expect(listItems).toHaveLength(value.length);
+    },
+  );
 
   it('renders a resolved linkRef annotation as a link', () => {
     const value: TPortableTextBody = [
-      mockPortableTextBlock([mockPortableTextSpan('a link', [LINK_KEY])], {
-        markDefs: [RESOLVED_LINK_REF],
-      }),
+      mockPortableTextBlock(
+        [mockPortableTextSpan(MOCK_LINK_TEXT, [MOCK_LINK_KEY])],
+        { markDefs: [RESOLVED_LINK_REF] },
+      ),
     ];
 
     setup({ value });
 
-    const link = screen.getByRole('link', { name: 'a link' });
-    expect(link).toHaveAttribute('href', LINK_HREF);
+    const link = screen.getByRole('link', { name: MOCK_LINK_TEXT });
+    expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
   });
 
   it('renders a dangling linkRef annotation as plain text', () => {
     const value: TPortableTextBody = [
       mockPortableTextBlock(
-        [mockPortableTextSpan(DANGLING_LINK_TEXT, [LINK_KEY])],
-        {
-          markDefs: [{ ...RESOLVED_LINK_REF, link: undefined }],
-        },
+        [mockPortableTextSpan(MOCK_DANGLING_LINK_TEXT, [MOCK_LINK_KEY])],
+        { markDefs: [{ ...RESOLVED_LINK_REF, link: undefined }] },
       ),
     ];
 
     setup({ value });
 
     const link = screen.queryByRole('link');
-    const text = screen.getByText(DANGLING_LINK_TEXT);
+    const text = screen.getByText(MOCK_DANGLING_LINK_TEXT);
     expect(link).not.toBeInTheDocument();
     expect(text).toBeVisible();
   });
 
-  it('renders sibling blocks bare, with no wrapper of its own', () => {
+  it('renders sibling blocks as direct children of the host, with no wrapper', () => {
     const value: TPortableTextBody = [
-      mockPortableTextBlock('Section', { style: 'h2' }),
-      mockPortableTextBlock('First paragraph'),
-      mockPortableTextBlock('Second paragraph'),
+      mockPortableTextBlock(MOCK_SECTION_HEADING, { style: 'h2' }),
+      mockPortableTextBlock(faker.lorem.sentence()),
+      mockPortableTextBlock(faker.lorem.sentence()),
     ];
 
     renderElement(
-      <div data-testid={HOST_TEST_ID}>
+      <div data-testid={MOCK_HOST_TEST_ID}>
         <PortableText value={value} />
       </div>,
     );
 
-    const host = screen.getByTestId(HOST_TEST_ID);
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6007
+    const host = screen.getByTestId(MOCK_HOST_TEST_ID);
+    // eslint-disable-next-line testing-library/no-node-access -- structural claim: the blocks are the host's direct children, which has no semantic handle
     const tagNames = Array.from(host.children, (child) => child.tagName);
 
     expect(tagNames).toEqual(['H2', 'P', 'P']);
   });
 
-  it('renders a code block with syntax highlighting', () => {
+  it('renders a code block with its filename and source', () => {
     const value: TPortableTextBody = [
       {
         _type: 'code',
-        _key: 'code-1',
+        _key: faker.string.uuid(),
         language: 'typescript',
-        filename: CODE_FILENAME,
-        code: CODE_SOURCE,
+        filename: MOCK_CODE_FILENAME,
+        code: MOCK_CODE_SOURCE,
       },
     ];
 
     setup({ value });
 
-    const filename = screen.getByText(CODE_FILENAME);
-    const codeContent = screen.getByTestId('code-content');
+    const filename = screen.getByText(MOCK_CODE_FILENAME);
+    const codeRegion = screen.getByRole('region', { name: CODE_REGION_NAME });
     expect(filename).toBeVisible();
-    expect(codeContent.textContent).toContain(CODE_SOURCE);
+    expect(codeRegion).toHaveTextContent(MOCK_CODE_SOURCE);
   });
 
   it('renders a bodyImage block as an img with the CMS alt text', () => {
-    const sanityImage = mockSanityImage({ alt: IMAGE_ALT });
+    const sanityImage = mockSanityImage({ alt: MOCK_IMAGE_ALT });
     const [, assetHash] = /^image-(\w+)-/.exec(sanityImage.assetId) ?? [];
     const value: TPortableTextBody = [mockBodyImageBlock(sanityImage)];
 
     setup({ value });
 
-    const img = screen.getByRole('img', { name: IMAGE_ALT });
+    const img = screen.getByRole('img', { name: MOCK_IMAGE_ALT });
     expect(img.getAttribute('src')).toContain(
       `${STATIC_SANITY_IMAGE_BASE_URL}${assetHash}`,
     );
@@ -323,7 +339,7 @@ describe(`<${PortableText.name}/>`, () => {
   it('renders an aside block with its body through the same components', () => {
     const value: TPortableTextBody = [
       mockAsideBlock(
-        [mockPortableTextBlock(ASIDE_BODY_TEXT)],
+        [mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)],
         ASIDE_KIND.WHY_NOT,
       ),
     ];
@@ -331,7 +347,7 @@ describe(`<${PortableText.name}/>`, () => {
     setup({ value });
 
     const aside = screen.getByRole('note');
-    const asideBody = screen.getByText(ASIDE_BODY_TEXT);
+    const asideBody = screen.getByText(MOCK_ASIDE_BODY_TEXT);
     expect(aside).toBeVisible();
     expect(asideBody).toBeVisible();
   });
@@ -339,7 +355,7 @@ describe(`<${PortableText.name}/>`, () => {
   it('labels an aside with its raw kind when no override supplies a label', () => {
     const value: TPortableTextBody = [
       mockAsideBlock(
-        [mockPortableTextBlock('A tangent.')],
+        [mockPortableTextBlock(MOCK_ASIDE_KIND_BODY_TEXT)],
         ASIDE_KIND.DIGRESSION,
       ),
     ];
@@ -352,7 +368,7 @@ describe(`<${PortableText.name}/>`, () => {
 
   it('labels an aside with no kind as CONTEXT', () => {
     const value: TPortableTextBody = [
-      mockAsideBlock([mockPortableTextBlock('Some context.')]),
+      mockAsideBlock([mockPortableTextBlock(MOCK_ASIDE_CONTEXT_TEXT)]),
     ];
 
     setup({ value });
@@ -366,10 +382,8 @@ describe(`<${PortableText.name}/>`, () => {
       mockAsideBlock(
         [
           mockPortableTextBlock(
-            [mockPortableTextSpan(NESTED_LINK_TEXT, [LINK_KEY])],
-            {
-              markDefs: [RESOLVED_LINK_REF],
-            },
+            [mockPortableTextSpan(MOCK_NESTED_LINK_TEXT, [MOCK_LINK_KEY])],
+            { markDefs: [RESOLVED_LINK_REF] },
           ),
         ],
         ASIDE_KIND.CONTEXT,
@@ -378,16 +392,16 @@ describe(`<${PortableText.name}/>`, () => {
 
     setup({ value });
 
-    const link = screen.getByRole('link', { name: NESTED_LINK_TEXT });
-    expect(link).toHaveAttribute('href', LINK_HREF);
+    const link = screen.getByRole('link', { name: MOCK_NESTED_LINK_TEXT });
+    expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
   });
 
   it('keeps the default strong mark when a caller overrides the code mark', () => {
     const value: TPortableTextBody = [
       mockPortableTextBlock([
-        mockPortableTextSpan('bold text', ['strong']),
+        mockPortableTextSpan(MOCK_BOLD_TEXT, ['strong']),
         mockPortableTextSpan(' and '),
-        mockPortableTextSpan('code text', ['code']),
+        mockPortableTextSpan(MOCK_CUSTOM_CODE_TEXT, ['code']),
       ]),
     ];
 
@@ -395,16 +409,16 @@ describe(`<${PortableText.name}/>`, () => {
       value,
       components: {
         marks: {
-          code: ({ children }) => (
-            <mark data-testid="custom-code">{children}</mark>
-          ),
+          code: ({ children }) => <mark>{children}</mark>,
         },
       },
     });
 
-    const boldText = screen.getByText('bold text');
-    const customCode = screen.getByTestId('custom-code');
-    expect(boldText.tagName).toBe('STRONG');
-    expect(customCode).toHaveTextContent('code text');
+    const boldText = screen.getByText(MOCK_BOLD_TEXT, { selector: 'strong' });
+    const customCode = screen.getByText(MOCK_CUSTOM_CODE_TEXT, {
+      selector: 'mark',
+    });
+    expect(boldText).toBeVisible();
+    expect(customCode).toBeVisible();
   });
 });

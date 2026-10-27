@@ -1,51 +1,62 @@
+import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
 import { BrandLockupLink } from './brand-lockup-link';
 
-const LOGO_URL = 'https://blob.example.com/tenants/tenant-a/logo.svg';
+faker.seed(5301);
 
-const setup = customRender(BrandLockupLink, { logoUrl: LOGO_URL });
+const MOCK_LOGO_URL = faker.image.url();
+const MOCK_TAGLINE = faker.lorem.words(3);
+const HOME_LINK_NAME = 'Home';
+
+const setup = customRender(BrandLockupLink, { logoUrl: MOCK_LOGO_URL });
 
 describe(`<${BrandLockupLink.name}/>`, () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('renders a link home labelled "Home" wrapping the brand lockup', () => {
+  it('renders a link home labelled "Home" wrapping the logo', () => {
     setup();
 
-    const link = screen.getByRole('link', { name: 'Home' });
-    expect(link).toHaveAttribute('href', '/');
-    expect(screen.getByRole('presentation')).toHaveAttribute('src', LOGO_URL);
+    const link = screen.getByRole('link', { name: HOME_LINK_NAME });
+    const logo = screen.getByRole('presentation');
+
+    expect(link).toHaveAttribute('href', routes.home());
+    expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
   });
 
   it('falls through to the polygon mark when no logo is uploaded', () => {
     setup({ logoUrl: undefined });
 
-    expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Home' }),
-    ).not.toBeEmptyDOMElement();
+    const logo = screen.queryByRole('presentation');
+    const link = screen.getByRole('link', { name: HOME_LINK_NAME });
+
+    expect(logo).not.toBeInTheDocument();
+    expect(link).not.toBeEmptyDOMElement();
   });
 
   it('falls back to the polygon mark when the logo fails to load', async () => {
     vi.spyOn(HTMLImageElement.prototype, 'decode').mockRejectedValue(
-      new Error('broken image'),
+      new Error(faker.lorem.sentence()),
     );
 
     setup();
 
     await waitFor(() => {
-      expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
+      const logo = screen.queryByRole('presentation');
+      expect(logo).not.toBeInTheDocument();
     });
-    expect(
-      screen.getByRole('link', { name: 'Home' }),
-    ).not.toBeEmptyDOMElement();
+    const link = screen.getByRole('link', { name: HOME_LINK_NAME });
+    expect(link).not.toBeEmptyDOMElement();
   });
 
-  it('passes the tagline through to the brand lockup when set', () => {
-    setup({ tagline: 'Est. 2026 · Berlin' });
+  it('shows the tagline when set', () => {
+    setup({ tagline: MOCK_TAGLINE });
 
-    expect(screen.getByText('Est. 2026 · Berlin')).toBeVisible();
+    const tagline = screen.getByText(MOCK_TAGLINE);
+
+    expect(tagline).toBeVisible();
   });
 });

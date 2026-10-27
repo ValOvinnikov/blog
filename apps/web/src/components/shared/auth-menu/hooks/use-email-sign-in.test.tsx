@@ -3,11 +3,14 @@ import {
   HTTP_STATUS,
   MAGIC_LINK_SIGN_IN_CODE,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useState } from 'react';
 
 import { useEmailSignIn } from './use-email-sign-in';
+
+faker.seed(6007);
 
 const { signInMock } = vi.hoisted(() => ({
   signInMock: vi.fn(),
@@ -19,7 +22,9 @@ vi.mock('next-auth/react', () => ({
 
 const CONTINUE_WITH_EMAIL = 'continue with email';
 const EMAIL_FIELD = 'Email address';
-const READER_EMAIL = 'reader@example.com';
+const SEND_LABEL = 'send';
+const TOGGLE_OPEN_LABEL = 'toggle open';
+const MOCK_READER_EMAIL = faker.internet.email();
 
 const Harness = () => {
   const [open, setOpen] = useState(true);
@@ -38,7 +43,7 @@ const Harness = () => {
   return (
     <div>
       <button type="button" onClick={() => setOpen((current) => !current)}>
-        toggle open
+        {TOGGLE_OPEN_LABEL}
       </button>
       {!isEmailFormOpen && (
         <button type="button" onClick={openEmailForm}>
@@ -58,7 +63,7 @@ const Harness = () => {
             disabled={isSubmitting}
             onClick={handleEmailSubmit}
           >
-            {isSubmitting ? 'sending' : 'send'}
+            {isSubmitting ? 'sending' : SEND_LABEL}
           </button>
         </form>
       )}
@@ -85,12 +90,12 @@ describe(useEmailSignIn, () => {
   const typeEmail = async () => {
     await expandEmailForm();
     const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
-    await user.type(emailField, READER_EMAIL);
+    await user.type(emailField, MOCK_READER_EMAIL);
   };
 
   const submitEmail = async () => {
     await typeEmail();
-    const sendButton = screen.getByRole('button', { name: 'send' });
+    const sendButton = screen.getByRole('button', { name: SEND_LABEL });
     await user.click(sendButton);
   };
 
@@ -136,7 +141,7 @@ describe(useEmailSignIn, () => {
     await submitEmail();
 
     expect(signInMock).toHaveBeenCalledWith('email', {
-      email: READER_EMAIL,
+      email: MOCK_READER_EMAIL,
       redirect: false,
     });
     const sentNotice = await screen.findByRole('status');
@@ -163,7 +168,7 @@ describe(useEmailSignIn, () => {
 
   it('resets to collapsed once the popover itself closes', async () => {
     await typeEmail();
-    const toggleOpen = screen.getByRole('button', { name: 'toggle open' });
+    const toggleOpen = screen.getByRole('button', { name: TOGGLE_OPEN_LABEL });
     await user.click(toggleOpen);
 
     const continueWithEmail = screen.getByRole('button', {
