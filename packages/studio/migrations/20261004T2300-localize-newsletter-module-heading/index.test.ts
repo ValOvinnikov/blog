@@ -1,54 +1,38 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+} from '@blog/studio/testing/migrations/localize';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeNewsletterModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(4);
 
-const inEnglish = (type: string, value: unknown) => [
-  { _key: EN, _type: type, language: EN, value },
-];
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 
 describe(localizeNewsletterModule, () => {
   it('moves the heading block into the default language', () => {
     expect(
       localizeNewsletterModule({
-        headingBlock: {
-          _type: 'headingBlock',
-          heading: 'Stay in the loop',
-          supportingText: 'New posts weekly.',
-        },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
       }),
     ).toEqual([
       at(
         'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish(
-            'internationalizedArrayStringValue',
-            'Stay in the loop',
-          ),
-          supportingText: inEnglish(
-            'internationalizedArrayTextValue',
-            'New posts weekly.',
-          ),
-        }),
+        set(mockLocalizedHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT)),
       ),
     ]);
   });
 
-  it('is idempotent — an already localized Newsletter is left alone', () => {
-    expect(
-      localizeNewsletterModule({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish('internationalizedArrayStringValue', 'Subscribe'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a Newsletter without a heading block alone', () => {
-    expect(localizeNewsletterModule({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized Newsletter',
+      doc: { headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING) },
+    },
+    { name: 'a Newsletter without a heading block', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeNewsletterModule(doc)).toBeUndefined();
   });
 });

@@ -1,80 +1,85 @@
+import {
+  mockImageAsset,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockPlainHeadingBlock,
+  mockPlainImage,
+} from '@blog/studio/testing/migrations/localize';
+import {
+  mockEnglishString,
+  mockInEnglish,
+  mockParagraph,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
-
-import { inDefaultLocale, localizedString } from '../lib/in-default-locale';
 
 import { localizeFeatureHighlightsModule } from './index';
 
-const asset = { _type: 'reference', _ref: 'image-1' };
+faker.seed(6);
 
-const paragraph = (text: string) => [
-  { _type: 'block', _key: text, children: [{ _type: 'span', text }] },
+const LISTED_TEXT_TYPE = 'internationalizedArrayListedTextValue';
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_ASSET = mockImageAsset();
+const MOCK_FIRST_KEY = faker.string.uuid();
+const MOCK_SECOND_KEY = faker.string.uuid();
+const MOCK_FIRST_HEADING = faker.lorem.words(2);
+const MOCK_SECOND_HEADING = faker.lorem.words(2);
+const MOCK_FIRST_BODY = mockParagraph();
+const MOCK_SECOND_BODY = mockParagraph();
+const MOCK_FIRST_ALT = faker.lorem.words(2);
+const MOCK_SECOND_ALT = faker.lorem.words(2);
+
+const rowPath = (key: string, field: string) => [
+  'highlights',
+  { _key: key },
+  field,
 ];
-
-const row = (key: string) => ['highlights', { _key: key }];
 
 describe(localizeFeatureHighlightsModule, () => {
   it('moves the heading block and every row into the default language', () => {
     expect(
       localizeFeatureHighlightsModule({
-        headingBlock: { _type: 'headingBlock', heading: 'Why teams switch' },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING),
         highlights: [
           {
-            _key: 'row-1',
-            heading: 'Ship faster',
-            body: paragraph('Less friction.'),
-            image: { _type: 'imageWithAlt', asset, alt: 'A rocket' },
+            _key: MOCK_FIRST_KEY,
+            heading: MOCK_FIRST_HEADING,
+            body: MOCK_FIRST_BODY,
+            image: mockPlainImage(MOCK_ASSET, MOCK_FIRST_ALT),
           },
           {
-            _key: 'row-2',
-            heading: 'Sleep better',
-            body: paragraph('Fewer pages.'),
-            image: { _type: 'imageWithAlt', asset, alt: 'A moon' },
+            _key: MOCK_SECOND_KEY,
+            heading: MOCK_SECOND_HEADING,
+            body: MOCK_SECOND_BODY,
+            image: mockPlainImage(MOCK_ASSET, MOCK_SECOND_ALT),
           },
         ],
       }),
     ).toEqual([
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_HEADING))),
       at(
-        'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('Why teams switch'),
-        }),
-      ),
-      at([...row('row-1'), 'heading'], set(localizedString('Ship faster'))),
-      at(
-        [...row('row-1'), 'body'],
-        set(
-          inDefaultLocale(
-            'internationalizedArrayListedTextValue',
-            paragraph('Less friction.'),
-          ),
-        ),
+        rowPath(MOCK_FIRST_KEY, 'heading'),
+        set(mockEnglishString(MOCK_FIRST_HEADING)),
       ),
       at(
-        [...row('row-1'), 'image'],
-        set({
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: localizedString('A rocket'),
-        }),
-      ),
-      at([...row('row-2'), 'heading'], set(localizedString('Sleep better'))),
-      at(
-        [...row('row-2'), 'body'],
-        set(
-          inDefaultLocale(
-            'internationalizedArrayListedTextValue',
-            paragraph('Fewer pages.'),
-          ),
-        ),
+        rowPath(MOCK_FIRST_KEY, 'body'),
+        set(mockInEnglish(LISTED_TEXT_TYPE, MOCK_FIRST_BODY)),
       ),
       at(
-        [...row('row-2'), 'image'],
-        set({
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: localizedString('A moon'),
-        }),
+        rowPath(MOCK_FIRST_KEY, 'image'),
+        set(mockLocalizedImage(MOCK_ASSET, MOCK_FIRST_ALT)),
+      ),
+      at(
+        rowPath(MOCK_SECOND_KEY, 'heading'),
+        set(mockEnglishString(MOCK_SECOND_HEADING)),
+      ),
+      at(
+        rowPath(MOCK_SECOND_KEY, 'body'),
+        set(mockInEnglish(LISTED_TEXT_TYPE, MOCK_SECOND_BODY)),
+      ),
+      at(
+        rowPath(MOCK_SECOND_KEY, 'image'),
+        set(mockLocalizedImage(MOCK_ASSET, MOCK_SECOND_ALT)),
       ),
     ]);
   });
@@ -84,49 +89,42 @@ describe(localizeFeatureHighlightsModule, () => {
       localizeFeatureHighlightsModule({
         highlights: [
           {
-            _key: 'row-1',
-            heading: localizedString('Ship faster'),
-            image: { _type: 'localizedImageWithAlt', asset },
+            _key: MOCK_FIRST_KEY,
+            heading: mockEnglishString(MOCK_FIRST_HEADING),
+            image: mockLocalizedImage(MOCK_ASSET, MOCK_FIRST_ALT),
           },
           {
-            _key: 'row-2',
-            heading: 'Sleep better',
-            image: { _type: 'localizedImageWithAlt', asset },
+            _key: MOCK_SECOND_KEY,
+            heading: MOCK_SECOND_HEADING,
+            image: mockLocalizedImage(MOCK_ASSET, MOCK_SECOND_ALT),
           },
         ],
       }),
     ).toEqual([
-      at([...row('row-2'), 'heading'], set(localizedString('Sleep better'))),
+      at(
+        rowPath(MOCK_SECOND_KEY, 'heading'),
+        set(mockEnglishString(MOCK_SECOND_HEADING)),
+      ),
     ]);
   });
 
-  it('is idempotent — an already localized module is left alone', () => {
-    expect(
-      localizeFeatureHighlightsModule({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('Why teams switch'),
-        },
+  it.each([
+    {
+      name: 'an already localized module',
+      doc: {
+        headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
         highlights: [
           {
-            _key: 'row-1',
-            heading: localizedString('Ship faster'),
-            body: inDefaultLocale(
-              'internationalizedArrayListedTextValue',
-              paragraph('Less friction.'),
-            ),
-            image: {
-              _type: 'localizedImageWithAlt',
-              asset,
-              alt: localizedString('A rocket'),
-            },
+            _key: MOCK_FIRST_KEY,
+            heading: mockEnglishString(MOCK_FIRST_HEADING),
+            body: mockInEnglish(LISTED_TEXT_TYPE, MOCK_FIRST_BODY),
+            image: mockLocalizedImage(MOCK_ASSET, MOCK_FIRST_ALT),
           },
         ],
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a module without text alone', () => {
-    expect(localizeFeatureHighlightsModule({})).toBeUndefined();
+      },
+    },
+    { name: 'a module without text', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeFeatureHighlightsModule(doc)).toBeUndefined();
   });
 });

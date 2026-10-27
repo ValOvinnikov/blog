@@ -1,51 +1,38 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+} from '@blog/studio/testing/migrations/localize';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeLogoWallModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(8);
 
-const inEnglish = (type: string, value: unknown) => [
-  { _key: EN, _type: type, language: EN, value },
-];
+const MOCK_HEADING = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 
 describe(localizeLogoWallModule, () => {
   it('moves the heading block into the default language', () => {
     expect(
       localizeLogoWallModule({
-        headingBlock: {
-          _type: 'headingBlock',
-          heading: 'Trusted by',
-          supportingText: 'Teams of every size.',
-        },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
       }),
     ).toEqual([
       at(
         'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish('internationalizedArrayStringValue', 'Trusted by'),
-          supportingText: inEnglish(
-            'internationalizedArrayTextValue',
-            'Teams of every size.',
-          ),
-        }),
+        set(mockLocalizedHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT)),
       ),
     ]);
   });
 
-  it('is idempotent — an already localized Logo Wall is left alone', () => {
-    expect(
-      localizeLogoWallModule({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: inEnglish('internationalizedArrayStringValue', 'Trusted by'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a Logo Wall without a heading block alone', () => {
-    expect(localizeLogoWallModule({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized Logo Wall',
+      doc: { headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING) },
+    },
+    { name: 'a Logo Wall without a heading block', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeLogoWallModule(doc)).toBeUndefined();
   });
 });

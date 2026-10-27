@@ -1,61 +1,94 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+} from '@blog/studio/testing/migrations/localize';
+import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeStatsModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(5);
 
-const inEnglish = (type: string, value: unknown) => [
-  { _key: EN, _type: type, language: EN, value },
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_FOOTNOTE = faker.lorem.sentence();
+const MOCK_FIRST_KEY = faker.string.uuid();
+const MOCK_SECOND_KEY = faker.string.uuid();
+const MOCK_THIRD_KEY = faker.string.uuid();
+const MOCK_FIRST_VALUE = faker.string.numeric(2);
+const MOCK_SECOND_VALUE = faker.string.numeric(3);
+const MOCK_THIRD_VALUE = faker.string.numeric(1);
+const MOCK_FIRST_LABEL = faker.lorem.word();
+const MOCK_SECOND_LABEL = faker.lorem.word();
+const MOCK_THIRD_LABEL = faker.lorem.word();
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+
+const statPath = (key: string, field: string) => [
+  'stats',
+  { _key: key },
+  field,
 ];
-
-const strings = (value: string) =>
-  inEnglish('internationalizedArrayStringValue', value);
 
 describe(localizeStatsModule, () => {
   it('moves the heading, supporting text, footnote and every stat into the default language', () => {
     expect(
       localizeStatsModule({
-        headingBlock: {
-          _type: 'headingBlock',
-          heading: 'By the numbers',
-          supportingText: 'A year in figures.',
-        },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT),
         stats: [
           {
-            _key: 'stat-1',
-            value: '98%',
-            label: 'Uptime',
-            description: 'Last twelve months',
+            _key: MOCK_FIRST_KEY,
+            value: MOCK_FIRST_VALUE,
+            label: MOCK_FIRST_LABEL,
+            description: MOCK_DESCRIPTION,
           },
-          { _key: 'stat-2', value: '1.2M', label: 'Readers' },
-          { _key: 'stat-3', value: '40', label: 'Countries' },
+          {
+            _key: MOCK_SECOND_KEY,
+            value: MOCK_SECOND_VALUE,
+            label: MOCK_SECOND_LABEL,
+          },
+          {
+            _key: MOCK_THIRD_KEY,
+            value: MOCK_THIRD_VALUE,
+            label: MOCK_THIRD_LABEL,
+          },
         ],
-        footnote: 'Figures as of June.',
+        footnote: MOCK_FOOTNOTE,
       }),
     ).toEqual([
       at(
         'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: strings('By the numbers'),
-          supportingText: inEnglish(
-            'internationalizedArrayTextValue',
-            'A year in figures.',
-          ),
-        }),
+        set(mockLocalizedHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT)),
       ),
-      at(['stats', { _key: 'stat-1' }, 'value'], set(strings('98%'))),
-      at(['stats', { _key: 'stat-1' }, 'label'], set(strings('Uptime'))),
       at(
-        ['stats', { _key: 'stat-1' }, 'description'],
-        set(strings('Last twelve months')),
+        statPath(MOCK_FIRST_KEY, 'value'),
+        set(mockEnglishString(MOCK_FIRST_VALUE)),
       ),
-      at(['stats', { _key: 'stat-2' }, 'value'], set(strings('1.2M'))),
-      at(['stats', { _key: 'stat-2' }, 'label'], set(strings('Readers'))),
-      at(['stats', { _key: 'stat-3' }, 'value'], set(strings('40'))),
-      at(['stats', { _key: 'stat-3' }, 'label'], set(strings('Countries'))),
-      at('footnote', set(strings('Figures as of June.'))),
+      at(
+        statPath(MOCK_FIRST_KEY, 'label'),
+        set(mockEnglishString(MOCK_FIRST_LABEL)),
+      ),
+      at(
+        statPath(MOCK_FIRST_KEY, 'description'),
+        set(mockEnglishString(MOCK_DESCRIPTION)),
+      ),
+      at(
+        statPath(MOCK_SECOND_KEY, 'value'),
+        set(mockEnglishString(MOCK_SECOND_VALUE)),
+      ),
+      at(
+        statPath(MOCK_SECOND_KEY, 'label'),
+        set(mockEnglishString(MOCK_SECOND_LABEL)),
+      ),
+      at(
+        statPath(MOCK_THIRD_KEY, 'value'),
+        set(mockEnglishString(MOCK_THIRD_VALUE)),
+      ),
+      at(
+        statPath(MOCK_THIRD_KEY, 'label'),
+        set(mockEnglishString(MOCK_THIRD_LABEL)),
+      ),
+      at('footnote', set(mockEnglishString(MOCK_FOOTNOTE))),
     ]);
   });
 
@@ -63,31 +96,43 @@ describe(localizeStatsModule, () => {
     expect(
       localizeStatsModule({
         stats: [
-          { _key: 'stat-1', value: strings('98%'), label: strings('Uptime') },
-          { _key: 'stat-2', value: '1.2M', label: strings('Readers') },
+          {
+            _key: MOCK_FIRST_KEY,
+            value: mockEnglishString(MOCK_FIRST_VALUE),
+            label: mockEnglishString(MOCK_FIRST_LABEL),
+          },
+          {
+            _key: MOCK_SECOND_KEY,
+            value: MOCK_SECOND_VALUE,
+            label: mockEnglishString(MOCK_SECOND_LABEL),
+          },
         ],
       }),
     ).toEqual([
-      at(['stats', { _key: 'stat-2' }, 'value'], set(strings('1.2M'))),
+      at(
+        statPath(MOCK_SECOND_KEY, 'value'),
+        set(mockEnglishString(MOCK_SECOND_VALUE)),
+      ),
     ]);
   });
 
-  it('is idempotent — an already localized module is left alone', () => {
-    expect(
-      localizeStatsModule({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: strings('By the numbers'),
-        },
+  it.each([
+    {
+      name: 'an already localized module',
+      doc: {
+        headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
         stats: [
-          { _key: 'stat-1', value: strings('98%'), label: strings('Uptime') },
+          {
+            _key: MOCK_FIRST_KEY,
+            value: mockEnglishString(MOCK_FIRST_VALUE),
+            label: mockEnglishString(MOCK_FIRST_LABEL),
+          },
         ],
-        footnote: strings('Figures as of June.'),
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a module without text alone', () => {
-    expect(localizeStatsModule({})).toBeUndefined();
+        footnote: mockEnglishString(MOCK_FOOTNOTE),
+      },
+    },
+    { name: 'a module without text', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeStatsModule(doc)).toBeUndefined();
   });
 });

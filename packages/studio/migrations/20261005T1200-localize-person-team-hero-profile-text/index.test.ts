@@ -1,52 +1,44 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockImageAsset,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockPlainHeadingBlock,
+  mockPlainImage,
+} from '@blog/studio/testing/migrations/localize';
+import {
+  mockEnglishString,
+  mockInEnglish,
+  mockParagraph,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizePersonTeamHeroProfile } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(12);
 
-const inEnglish = (type: string, value: unknown) => [
-  { _key: EN, _type: type, language: EN, value },
-];
-
-const strings = (value: string) =>
-  inEnglish('internationalizedArrayStringValue', value);
-
-const paragraph = (text: string) => [
-  {
-    _type: 'block',
-    _key: text,
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'span', text, marks: [] }],
-    markDefs: [],
-  },
-];
-
-const paragraphs = (text: string) =>
-  inEnglish('internationalizedArrayParagraphTextValue', paragraph(text));
-
-const asset = { _type: 'reference', _ref: 'image-1' };
+const PARAGRAPH_TEXT_TYPE = 'internationalizedArrayParagraphTextValue';
+const MOCK_ROLE = faker.person.jobTitle();
+const MOCK_BIO = mockParagraph();
+const MOCK_PERSON_ALT = faker.lorem.words(3);
+const MOCK_PROFILE_ALT = faker.lorem.words(3);
+const MOCK_TEAM_HEADING = faker.lorem.words(2);
+const MOCK_PROFILE_HEADING = faker.lorem.words(2);
+const MOCK_ASSET = mockImageAsset();
 
 describe(localizePersonTeamHeroProfile, () => {
   it("moves a person's role, bio and photo alt into the default language", () => {
     expect(
       localizePersonTeamHeroProfile({
         _type: 'person',
-        role: 'Founder',
-        bio: paragraph('Writes about design.'),
-        image: { _type: 'imageWithAlt', asset, alt: 'Jane smiling' },
+        role: MOCK_ROLE,
+        bio: MOCK_BIO,
+        image: mockPlainImage(MOCK_ASSET, MOCK_PERSON_ALT),
       }),
     ).toEqual([
-      at('role', set(strings('Founder'))),
-      at('bio', set(paragraphs('Writes about design.'))),
-      at(
-        'image',
-        set({
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: strings('Jane smiling'),
-        }),
-      ),
+      at('role', set(mockEnglishString(MOCK_ROLE))),
+      at('bio', set(mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_BIO))),
+      at('image', set(mockLocalizedImage(MOCK_ASSET, MOCK_PERSON_ALT))),
     ]);
   });
 
@@ -54,13 +46,10 @@ describe(localizePersonTeamHeroProfile, () => {
     expect(
       localizePersonTeamHeroProfile({
         _type: 'module_team',
-        headingBlock: { _type: 'headingBlock', heading: 'Our team' },
+        headingBlock: mockPlainHeadingBlock(MOCK_TEAM_HEADING),
       }),
     ).toEqual([
-      at(
-        'headingBlock',
-        set({ _type: 'localizedHeadingBlock', heading: strings('Our team') }),
-      ),
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_TEAM_HEADING))),
     ]);
   });
 
@@ -68,50 +57,37 @@ describe(localizePersonTeamHeroProfile, () => {
     expect(
       localizePersonTeamHeroProfile({
         _type: 'module_heroProfile',
-        headingBlock: { _type: 'headingBlock', heading: 'Meet Jane' },
-        image: { _type: 'imageWithAlt', asset, alt: 'Jane at work' },
+        headingBlock: mockPlainHeadingBlock(MOCK_PROFILE_HEADING),
+        image: mockPlainImage(MOCK_ASSET, MOCK_PROFILE_ALT),
       }),
     ).toEqual([
-      at(
-        'headingBlock',
-        set({ _type: 'localizedHeadingBlock', heading: strings('Meet Jane') }),
-      ),
-      at(
-        'image',
-        set({
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: strings('Jane at work'),
-        }),
-      ),
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_PROFILE_HEADING))),
+      at('image', set(mockLocalizedImage(MOCK_ASSET, MOCK_PROFILE_ALT))),
     ]);
   });
 
-  it('is idempotent — already localized documents are left alone', () => {
-    expect(
-      localizePersonTeamHeroProfile({
-        _type: 'person',
-        role: strings('Founder'),
-        bio: paragraphs('Writes about design.'),
-        image: {
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: strings('Jane smiling'),
-        },
-      }),
-    ).toBeUndefined();
-    expect(
-      localizePersonTeamHeroProfile({
-        _type: 'module_heroProfile',
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: strings('Meet Jane'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a person without role, bio or photo alone', () => {
-    expect(localizePersonTeamHeroProfile({ _type: 'person' })).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized person',
+      doc: {
+        _type: 'person' as const,
+        role: mockEnglishString(MOCK_ROLE),
+        bio: mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_BIO),
+        image: mockLocalizedImage(MOCK_ASSET, MOCK_PERSON_ALT),
+      },
+    },
+    {
+      name: 'an already localized Profile Hero',
+      doc: {
+        _type: 'module_heroProfile' as const,
+        headingBlock: mockLocalizedHeadingBlock(MOCK_PROFILE_HEADING),
+      },
+    },
+    {
+      name: 'a person without role, bio or photo',
+      doc: { _type: 'person' as const },
+    },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizePersonTeamHeroProfile(doc)).toBeUndefined();
   });
 });

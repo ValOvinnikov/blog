@@ -1,53 +1,47 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeBrandTaglineItems } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(19);
 
-const item = (key: string, text: string) => ({
+const MOCK_FIRST_TEXT = faker.lorem.words(2);
+const MOCK_SECOND_TEXT = faker.lorem.word();
+
+const mockItem = (key: string, text: string) => ({
   _key: key,
   _type: 'brandTaglineItem',
-  text: [
-    {
-      _key: EN,
-      _type: 'internationalizedArrayStringValue',
-      language: EN,
-      value: text,
-    },
-  ],
+  text: mockEnglishString(text),
 });
 
-const itemsPath = ['brand', 'tagline', 'items'];
+const MOCK_FIRST_ITEM = mockItem('item-1', MOCK_FIRST_TEXT);
+const MOCK_SECOND_ITEM = mockItem('item-2', MOCK_SECOND_TEXT);
 
 describe(localizeBrandTaglineItems, () => {
   it('turns each tagline item into an item object with its text in the default language', () => {
     expect(
       localizeBrandTaglineItems({
-        brand: { tagline: { items: ['build 2026.07', 'online'] } },
+        brand: { tagline: { items: [MOCK_FIRST_TEXT, MOCK_SECOND_TEXT] } },
       }),
     ).toEqual([
       at(
-        itemsPath,
-        set([item('item-1', 'build 2026.07'), item('item-2', 'online')]),
+        ['brand', 'tagline', 'items'],
+        set([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM]),
       ),
     ]);
   });
 
-  it('is idempotent — already localized items are left alone', () => {
-    expect(
-      localizeBrandTaglineItems({
-        brand: {
-          tagline: {
-            items: [item('item-1', 'build 2026.07'), item('item-2', 'online')],
-          },
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves settings without a tagline alone', () => {
-    expect(localizeBrandTaglineItems({ brand: {} })).toBeUndefined();
-    expect(localizeBrandTaglineItems({})).toBeUndefined();
+  it.each([
+    {
+      name: 'already localized items',
+      doc: {
+        brand: { tagline: { items: [MOCK_FIRST_ITEM, MOCK_SECOND_ITEM] } },
+      },
+    },
+    { name: 'settings with an empty brand', doc: { brand: {} } },
+    { name: 'settings without a brand', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeBrandTaglineItems(doc)).toBeUndefined();
   });
 });

@@ -1,65 +1,82 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+} from '@blog/studio/testing/migrations/localize';
+import {
+  mockEnglishString,
+  mockInEnglish,
+  mockParagraph,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeTimelineModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(7);
 
-const inEnglish = (type: string, value: unknown) => [
-  { _key: EN, _type: type, language: EN, value },
+const PARAGRAPH_TEXT_TYPE = 'internationalizedArrayParagraphTextValue';
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_FIRST_KEY = faker.string.uuid();
+const MOCK_SECOND_KEY = faker.string.uuid();
+const MOCK_THIRD_KEY = faker.string.uuid();
+const MOCK_MARKER = faker.lorem.words(2);
+const MOCK_FIRST_HEADING = faker.lorem.words(2);
+const MOCK_SECOND_HEADING = faker.lorem.words(2);
+const MOCK_THIRD_HEADING = faker.lorem.words(2);
+const MOCK_FIRST_BODY = mockParagraph();
+const MOCK_THIRD_BODY = mockParagraph();
+
+const itemPath = (key: string, field: string) => [
+  'items',
+  { _key: key },
+  field,
 ];
-
-const strings = (value: string) =>
-  inEnglish('internationalizedArrayStringValue', value);
-
-const paragraph = (text: string) => [
-  {
-    _type: 'block',
-    _key: text,
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'span', text, marks: [] }],
-    markDefs: [],
-  },
-];
-
-const paragraphs = (text: string) =>
-  inEnglish('internationalizedArrayParagraphTextValue', paragraph(text));
 
 describe(localizeTimelineModule, () => {
   it('moves the heading block and every item into the default language', () => {
     expect(
       localizeTimelineModule({
-        headingBlock: { _type: 'headingBlock', heading: 'How it works' },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING),
         items: [
           {
-            _key: 'item-1',
-            marker: 'Week 1',
-            heading: 'Kick off',
-            body: paragraph('The project begins.'),
+            _key: MOCK_FIRST_KEY,
+            marker: MOCK_MARKER,
+            heading: MOCK_FIRST_HEADING,
+            body: MOCK_FIRST_BODY,
           },
-          { _key: 'item-2', heading: 'Build' },
-          { _key: 'item-3', heading: 'Ship', body: paragraph('It goes live.') },
+          { _key: MOCK_SECOND_KEY, heading: MOCK_SECOND_HEADING },
+          {
+            _key: MOCK_THIRD_KEY,
+            heading: MOCK_THIRD_HEADING,
+            body: MOCK_THIRD_BODY,
+          },
         ],
       }),
     ).toEqual([
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_HEADING))),
       at(
-        'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: strings('How it works'),
-        }),
+        itemPath(MOCK_FIRST_KEY, 'marker'),
+        set(mockEnglishString(MOCK_MARKER)),
       ),
-      at(['items', { _key: 'item-1' }, 'marker'], set(strings('Week 1'))),
-      at(['items', { _key: 'item-1' }, 'heading'], set(strings('Kick off'))),
       at(
-        ['items', { _key: 'item-1' }, 'body'],
-        set(paragraphs('The project begins.')),
+        itemPath(MOCK_FIRST_KEY, 'heading'),
+        set(mockEnglishString(MOCK_FIRST_HEADING)),
       ),
-      at(['items', { _key: 'item-2' }, 'heading'], set(strings('Build'))),
-      at(['items', { _key: 'item-3' }, 'heading'], set(strings('Ship'))),
       at(
-        ['items', { _key: 'item-3' }, 'body'],
-        set(paragraphs('It goes live.')),
+        itemPath(MOCK_FIRST_KEY, 'body'),
+        set(mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_FIRST_BODY)),
+      ),
+      at(
+        itemPath(MOCK_SECOND_KEY, 'heading'),
+        set(mockEnglishString(MOCK_SECOND_HEADING)),
+      ),
+      at(
+        itemPath(MOCK_THIRD_KEY, 'heading'),
+        set(mockEnglishString(MOCK_THIRD_HEADING)),
+      ),
+      at(
+        itemPath(MOCK_THIRD_KEY, 'body'),
+        set(mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_THIRD_BODY)),
       ),
     ]);
   });
@@ -69,42 +86,42 @@ describe(localizeTimelineModule, () => {
       localizeTimelineModule({
         items: [
           {
-            _key: 'item-1',
-            heading: strings('Kick off'),
-            body: paragraphs('The project begins.'),
+            _key: MOCK_FIRST_KEY,
+            heading: mockEnglishString(MOCK_FIRST_HEADING),
+            body: mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_FIRST_BODY),
           },
           {
-            _key: 'item-2',
-            heading: strings('Ship'),
-            body: paragraph('Live.'),
+            _key: MOCK_THIRD_KEY,
+            heading: mockEnglishString(MOCK_THIRD_HEADING),
+            body: MOCK_THIRD_BODY,
           },
         ],
       }),
     ).toEqual([
-      at(['items', { _key: 'item-2' }, 'body'], set(paragraphs('Live.'))),
+      at(
+        itemPath(MOCK_THIRD_KEY, 'body'),
+        set(mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_THIRD_BODY)),
+      ),
     ]);
   });
 
-  it('is idempotent — an already localized module is left alone', () => {
-    expect(
-      localizeTimelineModule({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: strings('How it works'),
-        },
+  it.each([
+    {
+      name: 'an already localized module',
+      doc: {
+        headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
         items: [
           {
-            _key: 'item-1',
-            marker: strings('Week 1'),
-            heading: strings('Kick off'),
-            body: paragraphs('The project begins.'),
+            _key: MOCK_FIRST_KEY,
+            marker: mockEnglishString(MOCK_MARKER),
+            heading: mockEnglishString(MOCK_FIRST_HEADING),
+            body: mockInEnglish(PARAGRAPH_TEXT_TYPE, MOCK_FIRST_BODY),
           },
         ],
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a module without text alone', () => {
-    expect(localizeTimelineModule({})).toBeUndefined();
+      },
+    },
+    { name: 'a module without text', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeTimelineModule(doc)).toBeUndefined();
   });
 });
