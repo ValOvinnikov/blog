@@ -17,6 +17,7 @@ import { tagPaginationParamsQuery } from './query';
 vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL } = LOCALE_ISO_CODES;
+const MOCK_POST_COUNT = 20;
 const tenant = mockTenant();
 
 describe(getTagPaginatedPages, () => {
@@ -30,7 +31,7 @@ describe(getTagPaginatedPages, () => {
         slug: MOCK_TAG_SLUG,
         language: EN,
         moduleRefs: mockListModuleRefs(),
-        postCount: 20,
+        postCount: MOCK_POST_COUNT,
       },
     ];
     mockRun.mockResolvedValueOnce(pages);

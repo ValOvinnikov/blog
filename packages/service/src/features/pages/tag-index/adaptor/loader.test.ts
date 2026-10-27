@@ -20,14 +20,17 @@ import {
   mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getIndexPage } from './loader';
 import { tagIndexPageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const SUPPORTING_TEXT = 'Find posts by keyword.';
-const META_TITLE = 'Tags — Blog';
+faker.seed(601507);
+
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_META_TITLE = faker.lorem.sentence();
 
 const tenant = mockTenant();
 
@@ -43,22 +46,28 @@ async function loadIndexPage(
 
 describe(getIndexPage, () => {
   it('exposes the headingBlock from the page_tagIndex singleton', async () => {
-    const { headingBlock, seo } = await loadIndexPage({
+    const { headingBlock } = await loadIndexPage({
       headingBlock: mockRawHeadingBlock(MOCK_TAG_INDEX_HEADING, {
-        supportingText: SUPPORTING_TEXT,
-      }),
-      seo: mockRawSeo({
-        metaTitle: META_TITLE,
-        metaDescription: SUPPORTING_TEXT,
+        supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
 
     expect(headingBlock).toEqual({
       heading: MOCK_TAG_INDEX_HEADING,
-      supportingText: SUPPORTING_TEXT,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
-    expect(seo.title).toBe(META_TITLE);
-    expect(seo.description).toBe(SUPPORTING_TEXT);
+  });
+
+  it('resolves seo from the authored meta fields', async () => {
+    const { seo } = await loadIndexPage({
+      seo: mockRawSeo({
+        metaTitle: MOCK_META_TITLE,
+        metaDescription: MOCK_SUPPORTING_TEXT,
+      }),
+    });
+
+    expect(seo.title).toBe(MOCK_META_TITLE);
+    expect(seo.description).toBe(MOCK_SUPPORTING_TEXT);
   });
 
   it.each([
@@ -89,9 +98,7 @@ describe(getIndexPage, () => {
 
   it('rejects when page_tagIndex.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      mockRawTagIndexPage({
-        hero: mockRawCtaRef() as never,
-      }),
+      mockRawTagIndexPage({ hero: mockRawCtaRef() as never }),
     );
 
     await expect(getIndexPage(tenant)).rejects.toThrow();

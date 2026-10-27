@@ -1,18 +1,21 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_MISSING_ID,
+  MOCK_POST_ID,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPublishedPostBody } from './loader';
 import { publishedPostBodyQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const POST_ID = 'post-abc';
+faker.seed(6015101);
 
-const tenant = mockTenant();
+const MOCK_TENANT = mockTenant();
+const MOCK_BODY = [{ _type: 'block', _key: faker.string.uuid(), children: [] }];
 
 describe(getPublishedPostBody, () => {
   beforeEach(() => {
@@ -20,20 +23,19 @@ describe(getPublishedPostBody, () => {
   });
 
   it('returns the post body from the raw query result', async () => {
-    const body = [{ _type: 'block', _key: 'b1', children: [] }];
-    mockRun.mockResolvedValueOnce({ body });
+    mockRun.mockResolvedValueOnce({ body: MOCK_BODY });
 
-    const result = await getPublishedPostBody(POST_ID, tenant);
+    const result = await getPublishedPostBody(MOCK_POST_ID, MOCK_TENANT);
 
-    expect(result).toEqual(body);
+    expect(result).toEqual(MOCK_BODY);
   });
 
   it('queries the post id with tenant context and no ISR tags', async () => {
-    await getPublishedPostBody(POST_ID, tenant);
+    await getPublishedPostBody(MOCK_POST_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(publishedPostBodyQuery, {
-      parameters: { id: POST_ID },
-      tenant,
+      parameters: { id: MOCK_POST_ID },
+      tenant: MOCK_TENANT,
     });
   });
 
@@ -41,7 +43,7 @@ describe(getPublishedPostBody, () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
     await expect(
-      getPublishedPostBody(MOCK_MISSING_ID, tenant),
+      getPublishedPostBody(MOCK_MISSING_ID, MOCK_TENANT),
     ).rejects.toThrow();
   });
 });

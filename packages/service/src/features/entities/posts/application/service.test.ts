@@ -3,6 +3,7 @@ import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
 import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { createPostsService } from './service';
 
@@ -27,28 +28,32 @@ vi.mock(
   }),
 );
 
+faker.seed(6104);
+
+const MOCK_POST_IDS = [faker.string.uuid(), faker.string.uuid()];
+
 const tenant = mockTenant();
 
 describe(createPostsService, () => {
-  it('threads tenant context through to the id-list loader', async () => {
+  beforeEach(() => {
     vi.mocked(getPostsByIds).mockResolvedValue([]);
+    vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
+    vi.mocked(getAllPublishedPosts).mockResolvedValue([]);
+  });
 
-    await createPostsService().v1.getPostsByIds(['a'], tenant);
+  it('threads tenant context through to the id-list loader', async () => {
+    await createPostsService().v1.getPostsByIds(MOCK_POST_IDS, tenant);
 
-    expect(getPostsByIds).toHaveBeenCalledWith(['a'], tenant);
+    expect(getPostsByIds).toHaveBeenCalledWith(MOCK_POST_IDS, tenant);
   });
 
   it('threads tenant context through to the tag-scoped loader', async () => {
-    vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
-
     await createPostsService().v1.getPublishedPostsByTag(MOCK_TAG_ID, tenant);
 
     expect(getPublishedPostsByTag).toHaveBeenCalledWith(MOCK_TAG_ID, tenant);
   });
 
-  it('threads tenant context through to getAllPublishedPosts', async () => {
-    vi.mocked(getAllPublishedPosts).mockResolvedValue([]);
-
+  it('threads tenant context through to the all-published loader', async () => {
     await createPostsService().v1.getAllPublishedPosts(tenant);
 
     expect(getAllPublishedPosts).toHaveBeenCalledWith(tenant);

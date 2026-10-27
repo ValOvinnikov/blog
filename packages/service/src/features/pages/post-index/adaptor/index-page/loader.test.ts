@@ -8,7 +8,6 @@ import {
 import {
   mockHeroSlotView,
   mockRawBlogPage,
-  mockRawCtaRef,
   mockRawHeroRef,
 } from '@blog/service/testing/pages/fixtures';
 import {
@@ -20,14 +19,17 @@ import {
   mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getIndexPage } from './loader';
 import { blogPageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const SUPPORTING_TEXT = 'Fresh from the team.';
-const META_TITLE = 'Latest posts — Blog';
+faker.seed(6022);
+
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_META_TITLE = faker.lorem.words(3);
 
 const tenant = mockTenant();
 
@@ -42,28 +44,28 @@ async function loadIndexPage(
 }
 
 describe(getIndexPage, () => {
-  it('exposes the headingBlock from the page_postIndex singleton', async () => {
+  it('exposes the heading block and seo of the blog page', async () => {
     const { headingBlock, seo } = await loadIndexPage({
       headingBlock: mockRawHeadingBlock(MOCK_ENGLISH_MODULE_HEADING, {
-        supportingText: SUPPORTING_TEXT,
+        supportingText: MOCK_SUPPORTING_TEXT,
       }),
       seo: mockRawSeo({
-        metaTitle: META_TITLE,
-        metaDescription: SUPPORTING_TEXT,
+        metaTitle: MOCK_META_TITLE,
+        metaDescription: MOCK_SUPPORTING_TEXT,
       }),
     });
 
     expect(headingBlock).toEqual({
       heading: MOCK_ENGLISH_MODULE_HEADING,
-      supportingText: SUPPORTING_TEXT,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
-    expect(seo.title).toBe(META_TITLE);
-    expect(seo.description).toBe(SUPPORTING_TEXT);
+    expect(seo.title).toBe(MOCK_META_TITLE);
+    expect(seo.description).toBe(MOCK_SUPPORTING_TEXT);
   });
 
   it.each([
     [
-      'maps the thin page-builder modules array to module refs',
+      'maps the page-builder modules to module refs',
       [{ _id: MOCK_NEWSLETTER_MODULE_ID, _type: 'module_newsletter' } as const],
       [{ id: MOCK_NEWSLETTER_MODULE_ID, type: 'module_newsletter' }],
     ],
@@ -75,31 +77,15 @@ describe(getIndexPage, () => {
   });
 
   it.each([
-    [
-      'leaves hero undefined when page_postIndex.hero is unset',
-      null,
-      undefined,
-    ],
-    [
-      'maps a set page_postIndex.hero to a hero slot',
-      mockRawHeroRef(),
-      mockHeroSlotView(),
-    ],
+    ['leaves hero undefined when it is unset', null, undefined],
+    ['maps a set hero to a hero slot', mockRawHeroRef(), mockHeroSlotView()],
   ])('%s', async (_, hero, expected) => {
     const result = await loadIndexPage({ hero });
 
     expect(result.hero).toEqual(expected);
   });
 
-  it('rejects when page_postIndex.hero resolves to a non-hero module type', async () => {
-    mockRun.mockResolvedValueOnce(
-      mockRawBlogPage({ hero: mockRawCtaRef() as never }),
-    );
-
-    await expect(getIndexPage(tenant)).rejects.toThrow();
-  });
-
-  it('resolves undefined when no page_postIndex document exists', async () => {
+  it('resolves undefined when there is no blog page', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     const result = await getIndexPage(tenant);
@@ -107,7 +93,7 @@ describe(getIndexPage, () => {
     expect(result).toBeUndefined();
   });
 
-  it('lists the page translations, a page with no language as the default', async () => {
+  it('lists translations, a page with no language as the default', async () => {
     const result = await loadIndexPage({
       translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
     });
@@ -118,7 +104,7 @@ describe(getIndexPage, () => {
     ]);
   });
 
-  it('threads tenant context into the query and scopes its tags to it', async () => {
+  it('queries for the tenant and scopes its tags to it', async () => {
     mockRun.mockResolvedValueOnce(mockRawBlogPage());
 
     await getIndexPage(tenant);

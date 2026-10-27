@@ -6,8 +6,8 @@ import { mockListModuleRefs } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_PAGE_TOPIC_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
-  MOCK_TEMPLATE_TOPIC_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  MOCK_TEMPLATE_TOPIC_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
 
@@ -17,6 +17,7 @@ import { topicPaginationParamsQuery } from './query';
 vi.mock('@blog/service/sanity/query/query');
 
 const { EN, NL } = LOCALE_ISO_CODES;
+const MOCK_POST_COUNT = 20;
 const tenant = mockTenant();
 
 describe(getTopicPaginatedPages, () => {
@@ -30,7 +31,7 @@ describe(getTopicPaginatedPages, () => {
         slug: MOCK_TOPIC_SLUG,
         language: EN,
         moduleRefs: mockListModuleRefs(),
-        postCount: 20,
+        postCount: MOCK_POST_COUNT,
       },
     ];
     mockRun.mockResolvedValueOnce(pages);
