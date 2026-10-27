@@ -5,6 +5,7 @@ import {
   PRESET_REGISTRY,
   SITE_TYPE,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
@@ -28,11 +29,23 @@ vi.mock('@platform/server/onboarding/check-site-address-action', () => ({
 const createSiteMock = vi.mocked(createSiteAction);
 const checkSiteAddressMock = vi.mocked(checkSiteAddressAction);
 
-const MOCK_SLUG = 'my-site';
+faker.seed(5994);
+
+const MOCK_SLUG = faker.helpers.slugify(faker.lorem.words(2));
 const MOCK_NAME_FIELD = { name: 'Site name' };
 const MOCK_ADDRESS_FIELD = { name: 'Site address' };
 const MOCK_ACCEPTANCE = { name: /I agree to the Terms of Service/ };
 const MOCK_CREATE = { name: 'Create site' };
+
+const MOCK_CREATE_SITE_INPUT = {
+  siteType: SITE_TYPE.BLOG,
+  name: MOCK_TENANT_NAME,
+  slug: MOCK_SLUG,
+  locale: LOCALE_ISO_CODES.EN,
+  preset: PRESET_ID.CONSOLE,
+  accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
+  hasAcceptedTerms: true,
+};
 
 const setup = customRender(OnboardingView, {
   rootDomain: MOCK_TENANT_ROOT_DOMAIN,
@@ -69,15 +82,7 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('creates the site from the values the user entered', async () => {
     await fillAndCreate();
 
-    expect(createSiteMock).toHaveBeenCalledWith({
-      siteType: SITE_TYPE.BLOG,
-      name: MOCK_TENANT_NAME,
-      slug: MOCK_SLUG,
-      locale: LOCALE_ISO_CODES.EN,
-      preset: PRESET_ID.CONSOLE,
-      accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
-      hasAcceptedTerms: true,
-    });
+    expect(createSiteMock).toHaveBeenCalledWith(MOCK_CREATE_SITE_INPUT);
   });
 
   it('starts from the accent of the preset the user picks', async () => {
@@ -85,12 +90,11 @@ describe(`<${OnboardingView.name}/>`, () => {
     await user.click(editorialPreset);
     await fillAndCreate();
 
-    expect(createSiteMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        preset: PRESET_ID.EDITORIAL,
-        accentHue: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
-      }),
-    );
+    expect(createSiteMock).toHaveBeenCalledWith({
+      ...MOCK_CREATE_SITE_INPUT,
+      preset: PRESET_ID.EDITORIAL,
+      accentHue: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
+    });
   });
 
   it('creates the site type the user picks', async () => {
@@ -102,9 +106,10 @@ describe(`<${OnboardingView.name}/>`, () => {
     await user.click(portfolioOption);
     await fillAndCreate();
 
-    expect(createSiteMock).toHaveBeenCalledWith(
-      expect.objectContaining({ siteType: SITE_TYPE.PORTFOLIO }),
-    );
+    expect(createSiteMock).toHaveBeenCalledWith({
+      ...MOCK_CREATE_SITE_INPUT,
+      siteType: SITE_TYPE.PORTFOLIO,
+    });
   });
 
   it('says the address is free once it has been checked', async () => {
@@ -131,7 +136,7 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(addressField).toBeInvalid();
   });
 
-  it('shows the neutral refusal when site creation is refused', async () => {
+  it('shows the neutral refusal when creation is refused', async () => {
     createSiteMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,

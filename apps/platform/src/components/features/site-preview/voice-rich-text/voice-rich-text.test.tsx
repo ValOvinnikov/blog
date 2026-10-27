@@ -1,7 +1,12 @@
 import type { TVoicePortableText } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { VoiceRichText } from './voice-rich-text';
+
+faker.seed(5994);
+
+const MOCK_TOPIC = faker.lorem.word();
 
 const marked: TVoicePortableText = [
   {
@@ -18,54 +23,54 @@ const marked: TVoicePortableText = [
   },
 ];
 
-describe(VoiceRichText, () => {
-  it('renders bold, italic and link marks', () => {
-    render(<VoiceRichText value={marked} params={{ name: 'Design' }} />);
+const setup = customRender(VoiceRichText, {
+  value: marked,
+  params: { name: MOCK_TOPIC },
+});
 
-    expect(screen.getByText('Design').tagName).toBe('STRONG');
-    expect(screen.getByText('yet', { exact: false }).tagName).toBe('EM');
-    expect(screen.getByRole('link', { name: '— browse' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
+describe(`<${VoiceRichText.name}/>`, () => {
+  it('renders bold, italic and link marks', () => {
+    setup();
+
+    const bold = screen.getByText(MOCK_TOPIC);
+    const italic = screen.getByText('yet', { exact: false });
+    const link = screen.getByRole('link', { name: '— browse' });
+
+    expect(bold.tagName).toBe('STRONG');
+    expect(italic.tagName).toBe('EM');
+    expect(link).toHaveAttribute('href', '/blog');
   });
 
   it('fills a placeholder in plain text and leaves an unknown one as typed', () => {
-    render(
-      <p>
-        <VoiceRichText
-          value="No posts in {name} for {year}"
-          params={{ name: 'Design' }}
-        />
-      </p>,
-    );
+    setup({ value: 'No posts in {name} for {year}' });
 
-    expect(screen.getByText('No posts in Design for {year}')).toBeVisible();
+    const text = screen.getByText(`No posts in ${MOCK_TOPIC} for {year}`);
+
+    expect(text).toBeVisible();
   });
 
   it('renders every paragraph of a multi-paragraph value', () => {
-    render(
-      <p>
-        <VoiceRichText
-          value={[
-            {
-              _type: 'block',
-              _key: 'a',
-              style: 'normal',
-              children: [{ _type: 'span', _key: 'a1', text: 'First' }],
-            },
-            {
-              _type: 'block',
-              _key: 'b',
-              style: 'normal',
-              children: [{ _type: 'span', _key: 'b1', text: 'Second' }],
-            },
-          ]}
-        />
-      </p>,
-    );
+    setup({
+      value: [
+        {
+          _type: 'block',
+          _key: 'a',
+          style: 'normal',
+          children: [{ _type: 'span', _key: 'a1', text: 'First' }],
+        },
+        {
+          _type: 'block',
+          _key: 'b',
+          style: 'normal',
+          children: [{ _type: 'span', _key: 'b1', text: 'Second' }],
+        },
+      ],
+    });
 
-    expect(screen.getByText('First')).toBeVisible();
-    expect(screen.getByText('Second')).toBeVisible();
+    const first = screen.getByText('First');
+    const second = screen.getByText('Second');
+
+    expect(first).toBeVisible();
+    expect(second).toBeVisible();
   });
 });

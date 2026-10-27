@@ -39,7 +39,7 @@ const setup = customRenderAsync(TenantActivityPageContent, {
   page: 1,
 });
 
-describe(TenantActivityPageContent, () => {
+describe(`<${TenantActivityPageContent.name}/>`, () => {
   beforeEach(() => {
     listAuditEventsForTargetMock.mockResolvedValue([
       mockAuditEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),

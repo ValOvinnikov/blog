@@ -1,37 +1,48 @@
-import type { TTenantFieldKey } from '@platform/utils/tenant-field-locks/tenant-field-locks';
-import { render, screen } from '@testing-library/react';
+import { customRender, screen } from '@platform/testing/custom-render';
+import type {
+  TTenantFieldKey,
+  TTenantFieldLocks,
+} from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { useLockStateChange } from './use-lock-state-change';
 
-const NO_LOCKS = {};
-const NAME_LOCKED = { name: { kind: 'running' as const } };
-const DOMAIN_LOCKED = { primaryDomain: { kind: 'running' as const } };
-const BOTH_LOCKED = {
-  name: { kind: 'running' as const },
-  primaryDomain: { kind: 'running' as const },
+const LIVE_REGION_TEST_ID = 'live-region';
+const MOCK_PANEL_ID = 'mock-panel';
+const MOCK_LOCKED_ANNOUNCEMENT = 'mock locked announcement';
+const MOCK_UNLOCKED_ANNOUNCEMENT = 'mock unlocked announcement';
+const INSIDE_INPUT_LABEL = 'inside';
+const OUTSIDE_BUTTON_LABEL = 'outside';
+
+const NO_LOCKS: TTenantFieldLocks = {};
+const NAME_LOCKED: TTenantFieldLocks = { name: { kind: 'running' } };
+const DOMAIN_LOCKED: TTenantFieldLocks = { primaryDomain: { kind: 'running' } };
+const BOTH_LOCKED: TTenantFieldLocks = {
+  name: { kind: 'running' },
+  primaryDomain: { kind: 'running' },
 };
 
 type THarnessProps = {
-  fieldLocks: typeof NO_LOCKS | typeof NAME_LOCKED | typeof DOMAIN_LOCKED;
+  fieldLocks: TTenantFieldLocks;
   onFieldsLocked?: (keys: TTenantFieldKey[]) => void;
 };
 
 const Harness = ({ fieldLocks, onFieldsLocked = () => {} }: THarnessProps) => {
   const { lockAnnouncement, fieldsContainerRef } = useLockStateChange({
-    panelId: 'test-panel',
+    panelId: MOCK_PANEL_ID,
     fieldLocks,
-    lockedAnnouncement: 'locked!',
-    unlockedAnnouncement: 'unlocked!',
+    lockedAnnouncement: MOCK_LOCKED_ANNOUNCEMENT,
+    unlockedAnnouncement: MOCK_UNLOCKED_ANNOUNCEMENT,
     onFieldsLocked,
   });
 
   return (
-    <div data-tenant-details-panel="test-panel">
-      <span data-testid="live-region" aria-live="assertive">
+    <div data-tenant-details-panel={MOCK_PANEL_ID}>
+      <span data-testid={LIVE_REGION_TEST_ID} aria-live="assertive">
         {lockAnnouncement}
       </span>
       <div ref={fieldsContainerRef} tabIndex={-1} role="group">
-        <input aria-label="inside" />
+        <input aria-label={INSIDE_INPUT_LABEL} />
       </div>
     </div>
   );
@@ -40,100 +51,119 @@ const Harness = ({ fieldLocks, onFieldsLocked = () => {} }: THarnessProps) => {
 const OutsideHarness = (props: THarnessProps) => {
   return (
     <>
-      <button type="button">outside</button>
+      <button type="button">{OUTSIDE_BUTTON_LABEL}</button>
       <Harness {...props} />
     </>
   );
 };
 
-describe(useLockStateChange, () => {
-  it('starts with an empty announcement and does not move focus on mount', () => {
-    render(<Harness fieldLocks={NO_LOCKS} />);
+const setup = customRender(Harness, { fieldLocks: NO_LOCKS });
+const setupOutside = customRender(OutsideHarness, { fieldLocks: NO_LOCKS });
 
-    expect(screen.getByTestId('live-region')).toHaveTextContent('');
+describe(useLockStateChange, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
+  it('starts with an empty announcement and does not move focus on mount', () => {
+    setup();
+
+    const liveRegion = screen.getByTestId(LIVE_REGION_TEST_ID);
+
+    expect(liveRegion).toBeEmptyDOMElement();
     expect(document.body).toHaveFocus();
   });
 
   it('announces a lock once a field newly locks, not on an unrelated re-render', () => {
-    const { rerender } = render(<Harness fieldLocks={NO_LOCKS} />);
-    const liveRegion = screen.getByTestId('live-region');
-    expect(liveRegion).toHaveTextContent('');
+    const { rerender } = setup();
+    const liveRegion = screen.getByTestId(LIVE_REGION_TEST_ID);
 
     rerender(<Harness fieldLocks={NO_LOCKS} />);
-    expect(liveRegion).toHaveTextContent('');
+    expect(liveRegion).toBeEmptyDOMElement();
 
     rerender(<Harness fieldLocks={NAME_LOCKED} />);
-    expect(liveRegion).toHaveTextContent('locked!');
+    expect(liveRegion).toHaveTextContent(MOCK_LOCKED_ANNOUNCEMENT);
   });
 
   it('announces an unlock once a field becomes editable again', () => {
-    const { rerender } = render(<Harness fieldLocks={NAME_LOCKED} />);
-    const liveRegion = screen.getByTestId('live-region');
+    const { rerender } = setup({ fieldLocks: NAME_LOCKED });
+    const liveRegion = screen.getByTestId(LIVE_REGION_TEST_ID);
 
     rerender(<Harness fieldLocks={NO_LOCKS} />);
-    expect(liveRegion).toHaveTextContent('unlocked!');
+
+    expect(liveRegion).toHaveTextContent(MOCK_UNLOCKED_ANNOUNCEMENT);
   });
 
-  it('announces a lock, not nothing, on a same-count swap of which field is locked', () => {
-    const { rerender } = render(<Harness fieldLocks={NAME_LOCKED} />);
-    const liveRegion = screen.getByTestId('live-region');
+  it('announces a lock on a same-count swap of which field is locked', () => {
+    const { rerender } = setup({ fieldLocks: NAME_LOCKED });
+    const liveRegion = screen.getByTestId(LIVE_REGION_TEST_ID);
 
     rerender(<Harness fieldLocks={DOMAIN_LOCKED} />);
-    expect(liveRegion).toHaveTextContent('locked!');
+
+    expect(liveRegion).toHaveTextContent(MOCK_LOCKED_ANNOUNCEMENT);
   });
 
-  it('calls onFieldsLocked with the newly-locked keys only', () => {
+  it('reports only the newly locked keys', () => {
     const onFieldsLocked = vi.fn();
-    const { rerender } = render(
-      <Harness fieldLocks={NAME_LOCKED} onFieldsLocked={onFieldsLocked} />,
-    );
+    const { rerender } = setup({
+      fieldLocks: NAME_LOCKED,
+      onFieldsLocked,
+    });
     expect(onFieldsLocked).not.toHaveBeenCalled();
 
     rerender(
       <Harness fieldLocks={BOTH_LOCKED} onFieldsLocked={onFieldsLocked} />,
     );
+
     expect(onFieldsLocked).toHaveBeenCalledWith(['primaryDomain']);
   });
 
-  it('does not call onFieldsLocked when a lock transition only unlocks fields', () => {
+  it('reports nothing when a transition only unlocks fields', () => {
     const onFieldsLocked = vi.fn();
-    const { rerender } = render(
-      <Harness fieldLocks={NAME_LOCKED} onFieldsLocked={onFieldsLocked} />,
-    );
+    const { rerender } = setup({
+      fieldLocks: NAME_LOCKED,
+      onFieldsLocked,
+    });
 
     rerender(<Harness fieldLocks={NO_LOCKS} onFieldsLocked={onFieldsLocked} />);
+
     expect(onFieldsLocked).not.toHaveBeenCalled();
   });
 
-  it('moves focus to the fields container when a field newly locks while focus was inside', () => {
-    const { rerender } = render(<Harness fieldLocks={NO_LOCKS} />);
-
-    const insideInput = screen.getByRole('textbox', { name: 'inside' });
-    insideInput.focus();
+  it('moves focus to the fields container when a field locks under focus', async () => {
+    const { rerender } = setup();
+    const insideInput = screen.getByRole('textbox', {
+      name: INSIDE_INPUT_LABEL,
+    });
+    await user.click(insideInput);
     expect(insideInput).toHaveFocus();
 
     rerender(<Harness fieldLocks={NAME_LOCKED} />);
 
-    expect(screen.getByRole('group')).toHaveFocus();
+    const fieldsContainer = screen.getByRole('group');
+    expect(fieldsContainer).toHaveFocus();
   });
 
-  it('does not steal focus when a locking transition fires while focus was outside', () => {
-    const { rerender } = render(<OutsideHarness fieldLocks={NO_LOCKS} />);
-
-    const outsideButton = screen.getByRole('button', { name: 'outside' });
-    outsideButton.focus();
-    expect(outsideButton).toHaveFocus();
+  it('does not steal focus when a field locks while focus is outside', async () => {
+    const { rerender } = setupOutside();
+    const outsideButton = screen.getByRole('button', {
+      name: OUTSIDE_BUTTON_LABEL,
+    });
+    await user.click(outsideButton);
 
     rerender(<OutsideHarness fieldLocks={NAME_LOCKED} />);
 
     expect(outsideButton).toHaveFocus();
   });
 
-  it('does not move focus on an unrelated re-render while the locked set stays the same', () => {
-    const { rerender } = render(<Harness fieldLocks={NO_LOCKS} />);
-
-    const insideInput = screen.getByRole('textbox', { name: 'inside' });
-    insideInput.focus();
+  it('keeps focus in place on a re-render that leaves the locked set unchanged', async () => {
+    const { rerender } = setup();
+    const insideInput = screen.getByRole('textbox', {
+      name: INSIDE_INPUT_LABEL,
+    });
+    await user.click(insideInput);
 
     rerender(<Harness fieldLocks={NO_LOCKS} />);
 
