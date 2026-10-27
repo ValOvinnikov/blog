@@ -9,7 +9,7 @@ import {
   MENU_TRIGGER_NAME,
   testArrowUpAndHomeBehavior,
   testCoreDismissibleMenuBehavior,
-} from '@web/testing/hooks/use-dismissible-menu/contract';
+} from '@web/testing/shared/dismissible-menu-contract/dismissible-menu-contract';
 import { useCallback, useRef } from 'react';
 
 import {

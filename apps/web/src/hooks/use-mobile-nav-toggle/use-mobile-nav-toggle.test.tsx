@@ -7,7 +7,7 @@ import {
   MENU_SIBLING_ACTION_NAME,
   MENU_TRIGGER_NAME,
   testCoreDismissibleMenuBehavior,
-} from '@web/testing/hooks/use-dismissible-menu/contract';
+} from '@web/testing/shared/dismissible-menu-contract/dismissible-menu-contract';
 import { useId } from 'react';
 
 import { useMobileNavToggle } from './use-mobile-nav-toggle';
