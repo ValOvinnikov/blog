@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkTenantSlug } from '@platform/server/tenants/check-tenant-slug';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
@@ -18,6 +19,10 @@ vi.mock('@platform/server/tenants/check-tenant-slug', () => ({
 
 const checkTenantSlugMock = vi.mocked(checkTenantSlug);
 
+faker.seed(6104);
+
+const MOCK_SITE_SLUG = faker.lorem.word().toLowerCase();
+
 describe(checkSiteAddressAction, () => {
   beforeEach(() => {
     Object.assign(env, { TENANT_ROOT_DOMAIN: MOCK_TENANT_ROOT_DOMAIN });
@@ -26,12 +31,14 @@ describe(checkSiteAddressAction, () => {
   it('checks the address the user typed under the root domain', async () => {
     checkTenantSlugMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
 
-    await expect(checkSiteAddressAction(' My-Site ')).resolves.toBe(
-      TENANT_FIELD_ERROR.SLUG_TAKEN,
+    const result = await checkSiteAddressAction(
+      ` ${MOCK_SITE_SLUG.toUpperCase()} `,
     );
+
+    expect(result).toBe(TENANT_FIELD_ERROR.SLUG_TAKEN);
     expect(requireOnboardingUser).toHaveBeenCalled();
     expect(checkTenantSlugMock).toHaveBeenCalledWith(
-      'my-site',
+      MOCK_SITE_SLUG,
       MOCK_TENANT_ROOT_DOMAIN,
     );
   });
@@ -39,7 +46,9 @@ describe(checkSiteAddressAction, () => {
   it('reports nothing without a root domain to check against', async () => {
     Object.assign(env, { TENANT_ROOT_DOMAIN: undefined });
 
-    await expect(checkSiteAddressAction('my-site')).resolves.toBeUndefined();
+    const result = await checkSiteAddressAction(MOCK_SITE_SLUG);
+
+    expect(result).toBeUndefined();
     expect(checkTenantSlugMock).not.toHaveBeenCalled();
   });
 });

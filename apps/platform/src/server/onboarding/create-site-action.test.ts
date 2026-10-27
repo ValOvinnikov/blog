@@ -1,6 +1,8 @@
 import {
   ACTION_OUTCOME,
   ERROR_CODE,
+  HUE_MAX,
+  HUE_MIN,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   PRESET_ID,
@@ -8,6 +10,7 @@ import {
   TERMS_VERSION,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { ONBOARDING_LOG } from '@platform/constants/onboarding';
 import {
   SIGN_UP_FIELD_ERROR,
@@ -56,10 +59,6 @@ const {
 vi.mock('@platform/server/auth/auth');
 vi.mock('@platform/utils/env/env');
 
-vi.mock('next/headers', () => ({
-  headers: vi.fn(async () => new Headers()),
-}));
-
 vi.mock('./require-onboarding-user', async () => {
   const { MOCK_SIGN_IN_USER_ID } =
     await import('@platform/testing/auth/fixtures');
@@ -95,9 +94,11 @@ const admitCreateSiteMock = vi.mocked(admitCreateSite);
 const startProvisioningMock = vi.mocked(startProvisioning);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const MOCK_SLUG = 'my-site';
+faker.seed(6103);
+
+const MOCK_SLUG = faker.lorem.word().toLowerCase();
 const MOCK_DOMAIN = `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
-const MOCK_ACCENT_HUE = 120;
+const MOCK_ACCENT_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
 const MOCK_INPUT: TCreateSiteInput = {
   siteType: SITE_TYPE.PORTFOLIO,
   name: MOCK_TENANT_NAME,

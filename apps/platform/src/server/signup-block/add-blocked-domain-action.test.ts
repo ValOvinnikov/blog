@@ -2,7 +2,11 @@ import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
-import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
+import { faker } from '@faker-js/faker';
+import {
+  SIGNUP_BLOCK_FIELD_ERROR,
+  SIGNUP_BLOCK_LOG,
+} from '@platform/constants/signup-block';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
   MOCK_BLOCK_REASON,
@@ -27,43 +31,45 @@ vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   addSignupBlock: addSignupBlockMock,
 }));
 
-const ADMIN = mockAdmin();
-const INPUT = {
+faker.seed(6106);
+
+const MOCK_ADMIN = mockAdmin();
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
+const MOCK_INPUT = {
   domain: ` ${MOCK_BLOCKED_DOMAIN} `,
   reason: ` ${MOCK_BLOCK_REASON} `,
 };
 
 describe(addBlockedDomainAction, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(ADMIN);
+    requireSuperAdminMock.mockReset().mockResolvedValue(MOCK_ADMIN);
     addSignupBlockMock
       .mockReset()
       .mockResolvedValue(
         okResult({ entry: mockBlockedIdentity(), created: true }),
       );
-    vi.mocked(logger.error).mockReset();
   });
 
-  it('rejects a caller who is not a super admin before touching the list', async () => {
+  it('rejects a caller who is not a super admin', async () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
 
-    await expect(addBlockedDomainAction(INPUT)).rejects.toThrow(
+    await expect(addBlockedDomainAction(MOCK_INPUT)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
     expect(addSignupBlockMock).not.toHaveBeenCalled();
   });
 
   it('adds the trimmed domain with the trimmed reason as the admin', async () => {
-    const result = await addBlockedDomainAction(INPUT);
+    const result = await addBlockedDomainAction(MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(addSignupBlockMock).toHaveBeenCalledWith({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
       identity: MOCK_BLOCKED_DOMAIN,
       reason: MOCK_BLOCK_REASON,
-      admin: ADMIN,
+      admin: MOCK_ADMIN,
     });
   });
 
@@ -85,7 +91,7 @@ describe(addBlockedDomainAction, () => {
       errorResult(ERROR_CODE.DB_INVALID_DOMAIN),
     );
 
-    const result = await addBlockedDomainAction(INPUT);
+    const result = await addBlockedDomainAction(MOCK_INPUT);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -98,18 +104,24 @@ describe(addBlockedDomainAction, () => {
   it('returns a server error and logs when the write fails', async () => {
     addSignupBlockMock.mockResolvedValue(errorResult(ERROR_CODE.DB_NOT_FOUND));
 
-    const result = await addBlockedDomainAction(INPUT);
-    const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
+    const result = await addBlockedDomainAction(MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(context).toEqual({ error: ERROR_CODE.DB_NOT_FOUND });
+    expect(logger.error).toHaveBeenCalledWith(
+      SIGNUP_BLOCK_LOG.ADD_DOMAIN_FAILED,
+      { error: ERROR_CODE.DB_NOT_FOUND },
+    );
   });
 
   it('returns a server error when the write throws', async () => {
-    addSignupBlockMock.mockRejectedValue(new Error('db down'));
+    addSignupBlockMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await addBlockedDomainAction(INPUT);
+    const result = await addBlockedDomainAction(MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(
+      SIGNUP_BLOCK_LOG.ADD_DOMAIN_FAILED,
+      { error: MOCK_DB_ERROR },
+    );
   });
 });

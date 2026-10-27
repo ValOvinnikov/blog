@@ -7,7 +7,11 @@ import {
 import { ERROR_CODE } from '@blog/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
-import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
+import { faker } from '@faker-js/faker';
+import {
+  SIGNUP_BLOCK_LOG,
+  SIGNUP_BLOCK_REFUSAL,
+} from '@platform/constants/signup-block';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -16,6 +20,7 @@ import {
   mockBlockedAddressIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { removeBlockedIdentityAction } from './remove-blocked-identity-action';
@@ -50,7 +55,10 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const DOMAIN_ENTRY = mockBlockedIdentity();
+faker.seed(6107);
+
+const MOCK_DOMAIN_ENTRY = mockBlockedIdentity();
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 
 describe(removeBlockedIdentityAction, () => {
   beforeEach(() => {
@@ -58,35 +66,37 @@ describe(removeBlockedIdentityAction, () => {
     listBlockedIdentitiesMock
       .mockReset()
       .mockResolvedValue(
-        okResult([DOMAIN_ENTRY, mockBlockedAddressIdentity()]),
+        okResult([MOCK_DOMAIN_ENTRY, mockBlockedAddressIdentity()]),
       );
     removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     recordAuditEventMock.mockReset();
   });
 
-  it('rejects a caller who is not a super admin before touching the list', async () => {
+  it('rejects a caller who is not a super admin', async () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
 
-    await expect(removeBlockedIdentityAction(DOMAIN_ENTRY.id)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(
+      removeBlockedIdentityAction(MOCK_DOMAIN_ENTRY.id),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
   });
 
   it('removes a domain entry and audits it with the domain', async () => {
-    const result = await removeBlockedIdentityAction(DOMAIN_ENTRY.id);
+    const result = await removeBlockedIdentityAction(MOCK_DOMAIN_ENTRY.id);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(removeBlockedIdentityMock).toHaveBeenCalledWith(DOMAIN_ENTRY.id);
+    expect(removeBlockedIdentityMock).toHaveBeenCalledWith(
+      MOCK_DOMAIN_ENTRY.id,
+    );
     expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
       action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
       targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-      targetId: DOMAIN_ENTRY.id,
+      targetId: MOCK_DOMAIN_ENTRY.id,
       details: {
         kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-        domain: DOMAIN_ENTRY.value,
+        domain: MOCK_DOMAIN_ENTRY.value,
       },
     });
   });
@@ -103,7 +113,7 @@ describe(removeBlockedIdentityAction, () => {
   });
 
   it('refuses an entry that is not on the list and records nothing', async () => {
-    const result = await removeBlockedIdentityAction(`${DOMAIN_ENTRY.id}-gone`);
+    const result = await removeBlockedIdentityAction(faker.string.uuid());
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -118,7 +128,7 @@ describe(removeBlockedIdentityAction, () => {
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await removeBlockedIdentityAction(DOMAIN_ENTRY.id);
+    const result = await removeBlockedIdentityAction(MOCK_DOMAIN_ENTRY.id);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -128,11 +138,14 @@ describe(removeBlockedIdentityAction, () => {
   });
 
   it('returns a server error without an audit event when the delete throws', async () => {
-    removeBlockedIdentityMock.mockRejectedValue(new Error('db down'));
+    removeBlockedIdentityMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await removeBlockedIdentityAction(DOMAIN_ENTRY.id);
+    const result = await removeBlockedIdentityAction(MOCK_DOMAIN_ENTRY.id);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(SIGNUP_BLOCK_LOG.REMOVE_FAILED, {
+      error: MOCK_DB_ERROR,
+    });
     expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
 });
