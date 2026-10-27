@@ -5,18 +5,22 @@ import {
 } from '@blog/config';
 import {
   CARD_STYLE,
-  DENSITY,
-  FONT_CHOICE,
   HEADER_CONTROL_STYLE,
+  HUE_MAX,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   PRESET_ID,
-  RADIUS_SCALE,
 } from '@blog/config/constants';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_ACCENT_HUE,
+  MOCK_NOT_FOUND_HEADING,
+  MOCK_SITE_CONFIG_FIELDS,
+} from '@blog/db/testing/site-config/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   upsertSiteConfig,
@@ -24,6 +28,8 @@ import {
   type TUpsertSiteConfigResult,
   type TVoiceOverridesInput,
 } from './upsert-site-config';
+
+faker.seed(6022);
 
 const { SYNTHETIC_MULTILINE_FIELD_ID, SYNTHETIC_MULTILINE_FIELD_MAX } =
   vi.hoisted(() => ({
@@ -53,23 +59,96 @@ vi.mock('@blog/config', async (importOriginal) => {
 
 const db = useQueryTestDb();
 
-const CUSTOM_HEADING = 'Custom heading';
-const UNSAFE_HREF = 'javascript:alert(1)';
-const SUPPORTING_TEXT = 'Try the homepage instead.';
-const TOPIC_EMPTY_TEXT = 'Nothing published under this topic yet.';
-const LOGO_ASSET_URL = 'https://blob.example.com/logo.png';
-const LOST_THE_PLOT = 'Lost the plot?';
-const NICHT_GEFUNDEN = 'Nicht gefunden';
-const MULTILINE_TEXT = 'Line one\nLine two';
+const NOT_FOUND_HEADING_MAX = 100;
+const SUPPORTING_TEXT_MAX = 300;
+const CHANGED_ACCENT_HUE = MOCK_ACCENT_HUE - 1;
+const MOCK_LOGO_HUE = MOCK_ACCENT_HUE - 2;
+const MOCK_UNKNOWN_VALUE = faker.lorem.word();
+const MOCK_MISSING_TENANT_ID = faker.string.uuid();
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_FR_HEADING = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_TOPIC_EMPTY_TEXT = faker.lorem.sentence();
+const MOCK_UNKNOWN_PLACEHOLDER_TEXT = `${faker.lorem.words(2)} {${MOCK_UNKNOWN_VALUE}}`;
+const MOCK_LOGO_ASSET_URL = faker.internet.url();
+const MOCK_FAVICON_ASSET_URL = faker.internet.url();
+const MOCK_LINK_HREF = faker.internet.url();
+const MOCK_MULTILINE_TEXT = `${faker.lorem.word()}\n${faker.lorem.word()}`;
+const MOCK_UNSAFE_HREF = 'javascript:alert(1)';
+const MOCK_RICH_LINK_KEY = faker.string.uuid();
+const MOCK_RICH_BLOCK_KEY = faker.string.uuid();
+const MOCK_RICH_SPAN_KEY = faker.string.uuid();
+const MOCK_NON_RICH_TEXT_VALUE = faker.number.int();
+const NAME_PLACEHOLDER = '{name}';
 
-const baseInput: TUpdateSiteConfigInput = {
-  preset: PRESET_ID.CONSOLE,
-  accentHue: 250,
-  headingFont: FONT_CHOICE.SPACE_GROTESK,
-  bodyFont: FONT_CHOICE.NEWSREADER,
-  radiusScale: RADIUS_SCALE.MD,
-  density: DENSITY.DEFAULT,
-};
+const baseInput: TUpdateSiteConfigInput = MOCK_SITE_CONFIG_FIELDS;
+
+const STYLE_FIELDS = [
+  { field: 'languageSwitcherStyle', chosen: LANGUAGE_SWITCHER_STYLE.CODES },
+  { field: 'cardStyle', chosen: CARD_STYLE.OUTLINED },
+  { field: 'headerControlStyle', chosen: HEADER_CONTROL_STYLE.SOFT },
+] as const;
+
+const NEW_CONFIG_DEFAULTS = [
+  {
+    preset: PRESET_ID.CONSOLE,
+    field: 'cardStyle',
+    expected: CARD_STYLE.ACCENT_BAR,
+  },
+  {
+    preset: PRESET_ID.EDITORIAL,
+    field: 'cardStyle',
+    expected: CARD_STYLE.OUTLINED,
+  },
+  {
+    preset: PRESET_ID.CONSOLE,
+    field: 'languageSwitcherStyle',
+    expected: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+  },
+  {
+    preset: PRESET_ID.CONSOLE,
+    field: 'headerControlStyle',
+    expected: HEADER_CONTROL_STYLE.OUTLINED,
+  },
+] as const;
+
+const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
+  ['an accent hue above the maximum', { accentHue: HUE_MAX + 1 }],
+  [
+    'an unknown language switcher style',
+    {
+      languageSwitcherStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['languageSwitcherStyle'],
+    },
+  ],
+  [
+    'an unknown card style',
+    { cardStyle: MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['cardStyle'] },
+  ],
+  [
+    'an unknown header control style',
+    {
+      headerControlStyle:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerControlStyle'],
+    },
+  ],
+  [
+    'an unknown voice override key',
+    {
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.EN]: {
+          [MOCK_UNKNOWN_VALUE]: MOCK_HEADING,
+        } as TVoiceOverridesInput,
+      },
+    },
+  ],
+];
+
+const OPTIONAL_COLUMNS = [
+  { field: 'logoHue', value: MOCK_LOGO_HUE },
+  { field: 'logoAssetUrl', value: MOCK_LOGO_ASSET_URL },
+  { field: 'faviconAssetUrl', value: MOCK_FAVICON_ASSET_URL },
+] as const;
 
 function expectOk(result: TUpsertSiteConfigResult): TSiteConfigResult {
   if (!result.ok) {
@@ -89,24 +168,24 @@ function expectFieldErrors(
   return result.error;
 }
 
-function richTextOf(
+function mockRichText(
   text: string,
   options?: { marks?: string[]; style?: string; href?: string },
 ) {
   const markDefs = options?.href
-    ? [{ _type: 'link', _key: 'link-1', href: options.href }]
+    ? [{ _type: 'link', _key: MOCK_RICH_LINK_KEY, href: options.href }]
     : undefined;
 
   return [
     {
       _type: 'block',
-      _key: 'block-1',
+      _key: MOCK_RICH_BLOCK_KEY,
       style: options?.style ?? 'normal',
       ...(markDefs ? { markDefs } : {}),
       children: [
         {
           _type: 'span',
-          _key: 'span-1',
+          _key: MOCK_RICH_SPAN_KEY,
           text,
           ...(options?.marks ? { marks: options.marks } : {}),
         },
@@ -127,785 +206,449 @@ describe(upsertSiteConfig, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('inserts a new row when the tenant has no config yet', async () => {
-    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
+  function save(overrides: Partial<TUpdateSiteConfigInput> = {}) {
+    return upsertSiteConfig(tenantId, { ...baseInput, ...overrides });
+  }
 
-    expect(result).toMatchObject({
-      tenantId,
-      preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
+  function saveVoice(overrides: TVoiceOverridesInput) {
+    return save({
+      voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: overrides },
+    });
+  }
+
+  it('inserts a new row when the tenant has no config yet', async () => {
+    const result = expectOk(await save());
+
+    const [row] = await db().select().from(schema.siteConfig);
+    expect(result).toEqual({
+      ...row,
       logoHue: undefined,
+      logoAssetUrl: undefined,
+      faviconAssetUrl: undefined,
       voiceOverrides: {},
     });
   });
 
-  it('updates the existing row in place rather than inserting a second one', async () => {
-    await upsertSiteConfig(tenantId, baseInput);
+  it('updates the existing row in place', async () => {
+    await save();
 
     const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
+      await save({
         preset: PRESET_ID.EDITORIAL,
-        accentHue: 28,
+        accentHue: CHANGED_ACCENT_HUE,
       }),
     );
 
-    expect(result.preset).toBe(PRESET_ID.EDITORIAL);
-    expect(result.accentHue).toBe(28);
     const rows = await db().select().from(schema.siteConfig);
+    expect(result.preset).toBe(PRESET_ID.EDITORIAL);
+    expect(result.accentHue).toBe(CHANGED_ACCENT_HUE);
     expect(rows).toHaveLength(1);
-  });
-
-  it('rejects an accentHue outside the 0–360 range', async () => {
-    await expect(
-      upsertSiteConfig(tenantId, { ...baseInput, accentHue: 400 }),
-    ).rejects.toThrow();
-  });
-
-  it('gives a new config the menu-with-code language switcher style', async () => {
-    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
-
-    expect(result.languageSwitcherStyle).toBe(
-      LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-    );
-  });
-
-  it('stores a chosen language switcher style', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      }),
-    );
-
-    expect(result.languageSwitcherStyle).toBe(LANGUAGE_SWITCHER_STYLE.CODES);
-  });
-
-  it('keeps the language switcher style when a save omits it', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, accentHue: 28 }),
-    );
-
-    expect(result.languageSwitcherStyle).toBe(
-      LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
-    );
-  });
-
-  it('rejects an unknown language switcher style', async () => {
-    const languageSwitcherStyle =
-      'DROPDOWN' as TUpdateSiteConfigInput['languageSwitcherStyle'];
-
-    await expect(
-      upsertSiteConfig(tenantId, { ...baseInput, languageSwitcherStyle }),
-    ).rejects.toThrow();
-  });
-
-  it('gives a new Console config the accent-bar card style', async () => {
-    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
-
-    expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
-  });
-
-  it('gives a new Editorial config the outlined card style', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        preset: PRESET_ID.EDITORIAL,
-      }),
-    );
-
-    expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
-  });
-
-  it('stores a chosen card style over the preset default', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        cardStyle: CARD_STYLE.OUTLINED,
-      }),
-    );
-
-    expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
-  });
-
-  it('keeps the card style when a later save omits it, even across a preset change', async () => {
-    await upsertSiteConfig(tenantId, baseInput);
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        preset: PRESET_ID.EDITORIAL,
-      }),
-    );
-
-    expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
-  });
-
-  it('rejects an unknown card style', async () => {
-    const cardStyle = 'SHADOWED' as TUpdateSiteConfigInput['cardStyle'];
-
-    await expect(
-      upsertSiteConfig(tenantId, { ...baseInput, cardStyle }),
-    ).rejects.toThrow();
-  });
-
-  it('gives a new config the outlined header control style', async () => {
-    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
-
-    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.OUTLINED);
-  });
-
-  it('stores a chosen header control style', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
-      }),
-    );
-
-    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.SOFT);
-  });
-
-  it('keeps the header control style when a later save omits it', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
-    });
-
-    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
-
-    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.PLAIN);
-  });
-
-  it('rejects an unknown header control style', async () => {
-    const headerControlStyle =
-      'GHOST' as TUpdateSiteConfigInput['headerControlStyle'];
-
-    await expect(
-      upsertSiteConfig(tenantId, { ...baseInput, headerControlStyle }),
-    ).rejects.toThrow();
   });
 
   it('rejects a tenantId with no matching tenants row', async () => {
     await expect(
-      upsertSiteConfig('00000000-0000-0000-0000-000000000000', baseInput),
+      upsertSiteConfig(MOCK_MISSING_TENANT_ID, baseInput),
     ).rejects.toThrow();
   });
 
-  it('rejects an unknown voice override key', async () => {
-    const voiceOverrides = {
-      thisIsNotARegisteredField: 'x',
-    } as TVoiceOverridesInput;
-
-    await expect(
-      upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: voiceOverrides },
-      }),
-    ).rejects.toThrow();
-  });
-});
-
-describe('voice overrides — TEXT fields', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
+  it.each(INVALID_INPUTS)('rejects %s', async (_title, overrides) => {
+    await expect(save(overrides)).rejects.toThrow();
   });
 
-  it('stores a trimmed TEXT override', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundHeading: `  ${LOST_THE_PLOT}  ` },
-        },
-      }),
-    );
+  describe('style columns', () => {
+    it.each(NEW_CONFIG_DEFAULTS)(
+      'gives a new $preset config the default $field',
+      async ({ preset, field, expected }) => {
+        const result = expectOk(await save({ preset }));
 
-    expect(result.voiceOverrides).toEqual({
-      notFoundHeading: LOST_THE_PLOT,
-    });
-  });
-
-  it('rejects a TEXT override longer than its field-specific cap', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'x'.repeat(101) },
-        },
-      }),
-    );
-
-    expect(fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading).toEqual({
-      reason: VOICE_FIELD_ERROR.TOO_LONG,
-      values: { max: 100 },
-    });
-  });
-
-  it('rejects a TEXT override containing a line break', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost\nthe plot?' },
-        },
-      }),
-    );
-
-    expect(fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading).toEqual({
-      reason: VOICE_FIELD_ERROR.LINE_BREAK,
-    });
-  });
-
-  it('clears a previously-set TEXT override when resubmitted blank', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesByLocale: {
-        [LOCALE_ISO_CODES.EN]: { notFoundHeading: CUSTOM_HEADING },
+        expect(result[field]).toBe(expected);
       },
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundHeading: '   ' },
-        },
-      }),
     );
 
-    expect(result.voiceOverrides).toEqual({});
-    expect(
-      Object.prototype.hasOwnProperty.call(
-        result.voiceOverrides,
-        'notFoundHeading',
-      ),
-    ).toBe(false);
-  });
-});
+    it.each(STYLE_FIELDS)(
+      'stores a chosen $field',
+      async ({ field, chosen }) => {
+        const result = expectOk(await save({ [field]: chosen }));
 
-describe('voice overrides — MULTILINE fields', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('stores a trimmed MULTILINE override without rejecting line breaks', async () => {
-    const overrides = {
-      [SYNTHETIC_MULTILINE_FIELD_ID]: `  ${MULTILINE_TEXT}  `,
-    } as TVoiceOverridesInput;
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: overrides },
-      }),
-    );
-
-    expect(result.voiceOverrides).toEqual({
-      [SYNTHETIC_MULTILINE_FIELD_ID]: MULTILINE_TEXT,
-    });
-  });
-
-  it('rejects a MULTILINE override longer than its field-specific cap', async () => {
-    const overrides = {
-      [SYNTHETIC_MULTILINE_FIELD_ID]: 'x'.repeat(
-        SYNTHETIC_MULTILINE_FIELD_MAX + 1,
-      ),
-    } as TVoiceOverridesInput;
-
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: overrides },
-      }),
-    );
-
-    expect(fieldErrorsByLocale[LOCALE_ISO_CODES.EN]).toEqual({
-      [SYNTHETIC_MULTILINE_FIELD_ID]: {
-        reason: VOICE_FIELD_ERROR.TOO_LONG,
-        values: { max: SYNTHETIC_MULTILINE_FIELD_MAX },
+        expect(result[field]).toBe(chosen);
       },
-    });
-  });
-});
-
-describe('voice overrides — RICH fields', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('stores a valid rich-text override with allowed marks and a link', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: richTextOf('Bold and a link', {
-              marks: ['strong'],
-              href: 'https://example.com/help',
-            }),
-          },
-        },
-      }),
     );
 
-    expect(result.voiceOverrides.notFoundSupportingText).toBeDefined();
-  });
+    it.each(STYLE_FIELDS)(
+      'keeps $field when a later save omits it',
+      async ({ field, chosen }) => {
+        await save({ [field]: chosen });
 
-  it('rejects rich text carrying a disallowed mark', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: richTextOf('Underlined text', {
-              marks: ['underline'],
-            }),
-          },
-        },
-      }),
+        const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+
+        expect(result[field]).toBe(chosen);
+      },
     );
 
-    expect(
-      fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toEqual({
-      reason: VOICE_FIELD_ERROR.DISALLOWED_CONTENT,
+    it('keeps the card style across a preset change when a save omits it', async () => {
+      await save();
+
+      const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
+
+      expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
     });
   });
 
-  it('rejects rich text carrying a disallowed style', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: richTextOf('A heading', { style: 'h2' }),
-          },
-        },
-      }),
-    );
+  describe('TEXT voice fields', () => {
+    it('stores a trimmed override', async () => {
+      const result = expectOk(
+        await saveVoice({ notFoundHeading: `  ${MOCK_HEADING}  ` }),
+      );
 
-    expect(
-      fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toEqual({
-      reason: VOICE_FIELD_ERROR.DISALLOWED_CONTENT,
+      expect(result.voiceOverrides).toEqual({ notFoundHeading: MOCK_HEADING });
     });
-  });
 
-  it('rejects rich text whose link href does not pass sanitizeHref', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: richTextOf('Click here', {
-              marks: ['link-1'],
-              href: UNSAFE_HREF,
-            }),
-          },
-        },
-      }),
-    );
+    it('rejects an override longer than its field cap', async () => {
+      const errors = expectFieldErrors(
+        await saveVoice({
+          notFoundHeading: 'x'.repeat(NOT_FOUND_HEADING_MAX + 1),
+        }),
+      );
 
-    expect(
-      fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toEqual({
-      reason: VOICE_FIELD_ERROR.INVALID_LINK_URL,
-      values: { url: UNSAFE_HREF },
-    });
-  });
-
-  it('clears a previously-set rich override when resubmitted empty', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesByLocale: {
+      expect(errors).toEqual({
         [LOCALE_ISO_CODES.EN]: {
-          notFoundSupportingText: richTextOf('Custom description.'),
-        },
-      },
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: [] },
-        },
-      }),
-    );
-
-    expect(result.voiceOverrides).toEqual({});
-  });
-});
-
-describe('voice overrides — RICH fields accept a plain string', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('normalizes a plain string into a single normal block', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: SUPPORTING_TEXT,
+          notFoundHeading: {
+            reason: VOICE_FIELD_ERROR.TOO_LONG,
+            values: { max: NOT_FOUND_HEADING_MAX },
           },
         },
-      }),
-    );
+      });
+    });
 
-    expect(result.voiceOverrides.notFoundSupportingText).toEqual([
-      expect.objectContaining({
-        _type: 'block',
-        style: 'normal',
-        children: [
-          expect.objectContaining({
-            _type: 'span',
-            text: SUPPORTING_TEXT,
+    it('rejects an override containing a line break', async () => {
+      const errors = expectFieldErrors(
+        await saveVoice({ notFoundHeading: MOCK_MULTILINE_TEXT }),
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundHeading: { reason: VOICE_FIELD_ERROR.LINE_BREAK },
+        },
+      });
+    });
+
+    it('clears a set override when resubmitted blank', async () => {
+      await saveVoice({ notFoundHeading: MOCK_HEADING });
+
+      const result = expectOk(await saveVoice({ notFoundHeading: '   ' }));
+
+      expect(result.voiceOverrides).toEqual({});
+    });
+
+    it('rejects a placeholder token the registry does not declare', async () => {
+      const errors = expectFieldErrors(
+        await saveVoice({ notFoundHeading: MOCK_UNKNOWN_PLACEHOLDER_TEXT }),
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundHeading: {
+            reason: VOICE_FIELD_ERROR.UNKNOWN_PLACEHOLDER,
+            values: { placeholders: `{${MOCK_UNKNOWN_VALUE}}`, count: 1 },
+          },
+        },
+      });
+    });
+  });
+
+  describe('MULTILINE voice fields', () => {
+    it('stores a trimmed override and keeps its line breaks', async () => {
+      const result = expectOk(
+        await saveVoice({
+          [SYNTHETIC_MULTILINE_FIELD_ID]: `  ${MOCK_MULTILINE_TEXT}  `,
+        } as TVoiceOverridesInput),
+      );
+
+      expect(result.voiceOverrides).toEqual({
+        [SYNTHETIC_MULTILINE_FIELD_ID]: MOCK_MULTILINE_TEXT,
+      });
+    });
+
+    it('rejects an override longer than its field cap', async () => {
+      const errors = expectFieldErrors(
+        await saveVoice({
+          [SYNTHETIC_MULTILINE_FIELD_ID]: 'x'.repeat(
+            SYNTHETIC_MULTILINE_FIELD_MAX + 1,
+          ),
+        } as TVoiceOverridesInput),
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          [SYNTHETIC_MULTILINE_FIELD_ID]: {
+            reason: VOICE_FIELD_ERROR.TOO_LONG,
+            values: { max: SYNTHETIC_MULTILINE_FIELD_MAX },
+          },
+        },
+      });
+    });
+  });
+
+  describe('RICH voice fields', () => {
+    it('stores rich text with an allowed mark and a link', async () => {
+      const richText = mockRichText(MOCK_SUPPORTING_TEXT, {
+        marks: ['strong', MOCK_RICH_LINK_KEY],
+        href: MOCK_LINK_HREF,
+      });
+
+      const result = expectOk(
+        await saveVoice({ notFoundSupportingText: richText }),
+      );
+
+      expect(result.voiceOverrides).toEqual({
+        notFoundSupportingText: richText,
+      });
+    });
+
+    it.each([
+      ['a disallowed mark', { marks: ['underline'] }],
+      ['a disallowed style', { style: 'h2' }],
+    ])('rejects rich text carrying %s', async (_title, options) => {
+      const errors = expectFieldErrors(
+        await saveVoice({
+          notFoundSupportingText: mockRichText(MOCK_SUPPORTING_TEXT, options),
+        }),
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundSupportingText: {
+            reason: VOICE_FIELD_ERROR.DISALLOWED_CONTENT,
+          },
+        },
+      });
+    });
+
+    it('rejects rich text with an unsafe link href', async () => {
+      const errors = expectFieldErrors(
+        await saveVoice({
+          notFoundSupportingText: mockRichText(MOCK_SUPPORTING_TEXT, {
+            marks: [MOCK_RICH_LINK_KEY],
+            href: MOCK_UNSAFE_HREF,
           }),
-        ],
-      }),
-    ]);
-  });
-
-  it('drops the key for a blank/whitespace-only string', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: '   ' },
-        },
-      }),
-    );
-
-    expect(result.voiceOverrides).toEqual({});
-  });
-
-  it('rejects a string exceeding the field cap, same message as authored rich text', async () => {
-    const overlong = 'x'.repeat(301);
-
-    const coerced = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: overlong },
-        },
-      }),
-    );
-    const authored = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: richTextOf(overlong),
-          },
-        },
-      }),
-    );
-
-    expect(coerced[LOCALE_ISO_CODES.EN]?.notFoundSupportingText).toEqual(
-      authored[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    );
-  });
-
-  it('catches a placeholder violation in a coerced string', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            topicEmpty: TOPIC_EMPTY_TEXT,
-          },
-        },
-      }),
-    );
-
-    expect(fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toEqual({
-      reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
-      values: { placeholders: '{name}', count: 1 },
-    });
-  });
-
-  it('still rejects a non-string, non-array value', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: 42 as unknown as string,
-          },
-        },
-      }),
-    );
-
-    expect(
-      fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toEqual({
-      reason: VOICE_FIELD_ERROR.NOT_RICH_TEXT,
-    });
-  });
-
-  it('trims a whitespace-padded string before storing it', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            notFoundSupportingText: `  ${SUPPORTING_TEXT}  \n`,
-          },
-        },
-      }),
-    );
-
-    expect(result.voiceOverrides.notFoundSupportingText).toEqual([
-      expect.objectContaining({
-        children: [expect.objectContaining({ text: SUPPORTING_TEXT })],
-      }),
-    ]);
-  });
-
-  it('accepts a string that only exceeds the cap because of its padding', async () => {
-    const atCap = 'x'.repeat(300);
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: `  ${atCap}  ` },
-        },
-      }),
-    );
-
-    expect(result.voiceOverrides.notFoundSupportingText).toEqual([
-      expect.objectContaining({
-        children: [expect.objectContaining({ text: atCap })],
-      }),
-    ]);
-  });
-
-  it('still rejects a string exceeding the cap after trimming', async () => {
-    const overCap = 'x'.repeat(301);
-
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: `  ${overCap}  ` },
-        },
-      }),
-    );
-
-    expect(
-      fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
-    ).toEqual({
-      reason: VOICE_FIELD_ERROR.TOO_LONG,
-      values: { max: 300 },
-    });
-  });
-});
-
-describe('voice overrides — placeholders', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('rejects a value missing a placeholder the registry declares', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            topicEmpty: richTextOf(TOPIC_EMPTY_TEXT),
-          },
-        },
-      }),
-    );
-
-    expect(fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toEqual({
-      reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
-      values: { placeholders: '{name}', count: 1 },
-    });
-  });
-
-  it('rejects a value carrying a placeholder token the registry does not declare', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost, {name}?' },
-        },
-      }),
-    );
-
-    expect(fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading).toEqual({
-      reason: VOICE_FIELD_ERROR.UNKNOWN_PLACEHOLDER,
-      values: { placeholders: '{name}', count: 1 },
-    });
-  });
-
-  it('accepts a value that includes every placeholder the registry declares', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: {
-            topicEmpty: richTextOf('Nothing published under {name} yet.'),
-          },
-        },
-      }),
-    );
-
-    expect(result.voiceOverrides.topicEmpty).toBeDefined();
-  });
-});
-
-describe('per-language voice overrides', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db(), {
-      locale: LOCALE_ISO_CODES.EN,
-    }));
-  });
-
-  it('stores each language a save carries under that language', async () => {
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.DE]: { notFoundHeading: `  ${NICHT_GEFUNDEN}  ` },
-          [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
-        },
-      }),
-    );
-
-    expect(result.voiceOverridesByLocale).toEqual({
-      [LOCALE_ISO_CODES.DE]: { notFoundHeading: NICHT_GEFUNDEN },
-      [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
-    });
-    expect(result.voiceOverrides).toEqual({});
-  });
-
-  it('returns field errors per language and writes nothing', async () => {
-    const fieldErrorsByLocale = expectFieldErrors(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'x'.repeat(101) },
-          [LOCALE_ISO_CODES.DE]: { topicEmpty: 'Keine Beiträge in {topic}' },
-          [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
-        },
-      }),
-    );
-
-    expect(fieldErrorsByLocale).toEqual({
-      [LOCALE_ISO_CODES.EN]: {
-        notFoundHeading: expect.objectContaining({
-          reason: VOICE_FIELD_ERROR.TOO_LONG,
         }),
-      },
-      [LOCALE_ISO_CODES.DE]: {
-        topicEmpty: expect.objectContaining({
-          reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundSupportingText: {
+            reason: VOICE_FIELD_ERROR.INVALID_LINK_URL,
+            values: { url: MOCK_UNSAFE_HREF },
+          },
+        },
+      });
+    });
+
+    it.each([
+      ['an empty array', []],
+      ['a blank string', '   '],
+    ])('clears a set override resubmitted as %s', async (_title, blank) => {
+      await saveVoice({
+        notFoundSupportingText: mockRichText(MOCK_SUPPORTING_TEXT),
+      });
+
+      const result = expectOk(
+        await saveVoice({ notFoundSupportingText: blank }),
+      );
+
+      expect(result.voiceOverrides).toEqual({});
+    });
+
+    it('rejects a value that is neither a string nor an array', async () => {
+      const errors = expectFieldErrors(
+        await saveVoice({ notFoundSupportingText: MOCK_NON_RICH_TEXT_VALUE }),
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundSupportingText: { reason: VOICE_FIELD_ERROR.NOT_RICH_TEXT },
+        },
+      });
+    });
+
+    it.each([
+      ['a plain string', MOCK_SUPPORTING_TEXT, MOCK_SUPPORTING_TEXT],
+      [
+        'a whitespace-padded string',
+        `  ${MOCK_SUPPORTING_TEXT}  \n`,
+        MOCK_SUPPORTING_TEXT,
+      ],
+      [
+        'a string over the cap only because of its padding',
+        `  ${'x'.repeat(SUPPORTING_TEXT_MAX)}  `,
+        'x'.repeat(SUPPORTING_TEXT_MAX),
+      ],
+    ])('stores %s as one normal block', async (_title, input, text) => {
+      const result = expectOk(
+        await saveVoice({ notFoundSupportingText: input }),
+      );
+
+      const stored = result.voiceOverrides.notFoundSupportingText;
+      const [block] = Array.isArray(stored) ? stored : [];
+      const [span] = block?.children ?? [];
+      expect(stored).toEqual([
+        {
+          _type: 'block',
+          _key: block?._key,
+          style: 'normal',
+          children: [{ _type: 'span', _key: span?._key, text }],
+        },
+      ]);
+    });
+
+    it.each([
+      ['a string', 'x'.repeat(SUPPORTING_TEXT_MAX + 1)],
+      ['a padded string', `  ${'x'.repeat(SUPPORTING_TEXT_MAX + 1)}  `],
+      ['rich text', mockRichText('x'.repeat(SUPPORTING_TEXT_MAX + 1))],
+    ])('rejects %s over the cap', async (_title, input) => {
+      const errors = expectFieldErrors(
+        await saveVoice({ notFoundSupportingText: input }),
+      );
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundSupportingText: {
+            reason: VOICE_FIELD_ERROR.TOO_LONG,
+            values: { max: SUPPORTING_TEXT_MAX },
+          },
+        },
+      });
+    });
+  });
+
+  describe('voice placeholders', () => {
+    it.each([
+      ['a string', MOCK_TOPIC_EMPTY_TEXT],
+      ['rich text', mockRichText(MOCK_TOPIC_EMPTY_TEXT)],
+    ])('rejects %s missing a declared placeholder', async (_title, input) => {
+      const errors = expectFieldErrors(await saveVoice({ topicEmpty: input }));
+
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          topicEmpty: {
+            reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+            values: { placeholders: NAME_PLACEHOLDER, count: 1 },
+          },
+        },
+      });
+    });
+
+    it('stores a value that includes every declared placeholder', async () => {
+      const richText = mockRichText(
+        `${MOCK_TOPIC_EMPTY_TEXT} ${NAME_PLACEHOLDER}`,
+      );
+
+      const result = expectOk(await saveVoice({ topicEmpty: richText }));
+
+      expect(result.voiceOverrides).toEqual({ topicEmpty: richText });
+    });
+  });
+
+  describe('per-language voice overrides', () => {
+    it('stores each language a save carries under that language', async () => {
+      const result = expectOk(
+        await save({
+          voiceOverridesByLocale: {
+            [LOCALE_ISO_CODES.DE]: {
+              notFoundHeading: `  ${MOCK_NOT_FOUND_HEADING}  `,
+            },
+            [LOCALE_ISO_CODES.FR]: { notFoundHeading: MOCK_FR_HEADING },
+          },
         }),
+      );
+
+      expect(result.voiceOverridesByLocale).toEqual({
+        [LOCALE_ISO_CODES.DE]: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
+        [LOCALE_ISO_CODES.FR]: { notFoundHeading: MOCK_FR_HEADING },
+      });
+    });
+
+    it('leaves the default language slice empty when it is not carried', async () => {
+      const result = expectOk(
+        await save({
+          voiceOverridesByLocale: {
+            [LOCALE_ISO_CODES.DE]: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
+          },
+        }),
+      );
+
+      expect(result.voiceOverrides).toEqual({});
+    });
+
+    it('returns field errors per language and writes nothing', async () => {
+      const errors = expectFieldErrors(
+        await save({
+          voiceOverridesByLocale: {
+            [LOCALE_ISO_CODES.EN]: {
+              notFoundHeading: 'x'.repeat(NOT_FOUND_HEADING_MAX + 1),
+            },
+            [LOCALE_ISO_CODES.DE]: { topicEmpty: MOCK_TOPIC_EMPTY_TEXT },
+            [LOCALE_ISO_CODES.FR]: { notFoundHeading: MOCK_FR_HEADING },
+          },
+        }),
+      );
+
+      const rows = await db().select().from(schema.siteConfig);
+      expect(errors).toEqual({
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundHeading: {
+            reason: VOICE_FIELD_ERROR.TOO_LONG,
+            values: { max: NOT_FOUND_HEADING_MAX },
+          },
+        },
+        [LOCALE_ISO_CODES.DE]: {
+          topicEmpty: {
+            reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+            values: { placeholders: NAME_PLACEHOLDER, count: 1 },
+          },
+        },
+      });
+      expect(rows).toEqual([]);
+    });
+  });
+
+  describe('partial updates', () => {
+    it('keeps voice overrides when a later save omits them', async () => {
+      await saveVoice({ notFoundHeading: MOCK_HEADING });
+
+      const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+
+      expect(result.voiceOverrides).toEqual({ notFoundHeading: MOCK_HEADING });
+    });
+
+    it('clears a language voice overrides when saved with {}', async () => {
+      await saveVoice({ notFoundHeading: MOCK_HEADING });
+
+      const result = expectOk(await saveVoice({}));
+
+      expect(result.voiceOverrides).toEqual({});
+    });
+
+    it.each(OPTIONAL_COLUMNS)(
+      'keeps $field when a later save omits it',
+      async ({ field, value }) => {
+        await save({ [field]: value });
+
+        const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+
+        expect(result[field]).toBe(value);
       },
-    });
-    expect(await db().select().from(schema.siteConfig)).toEqual([]);
-  });
-});
+    );
 
-describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
-  let tenantId: string;
+    it.each(OPTIONAL_COLUMNS)(
+      'clears $field when explicitly saved as null',
+      async ({ field, value }) => {
+        await save({ [field]: value });
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
+        const result = expectOk(await save({ [field]: null }));
 
-  it('preserves voice overrides when a later update omits the field entirely', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesByLocale: {
-        [LOCALE_ISO_CODES.EN]: { notFoundHeading: CUSTOM_HEADING },
+        expect(result[field]).toBeUndefined();
       },
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, accentHue: 28 }),
     );
-
-    expect(result.voiceOverrides).toEqual({
-      notFoundHeading: CUSTOM_HEADING,
-    });
-  });
-
-  it('clears every voice override when explicitly updated with {}', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesByLocale: {
-        [LOCALE_ISO_CODES.EN]: { notFoundHeading: CUSTOM_HEADING },
-      },
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: {} },
-      }),
-    );
-
-    expect(result.voiceOverrides).toEqual({});
-  });
-
-  it('preserves logoHue when a later update omits the field', async () => {
-    await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, accentHue: 28 }),
-    );
-
-    expect(result.logoHue).toBe(200);
-  });
-
-  it('clears logoHue back to "follow accentHue" when explicitly set to null', async () => {
-    await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, logoHue: null }),
-    );
-
-    expect(result.logoHue).toBeUndefined();
-  });
-
-  it('preserves logoAssetUrl on omission and clears it on explicit null', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      logoAssetUrl: LOGO_ASSET_URL,
-    });
-
-    const survived = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, accentHue: 28 }),
-    );
-    expect(survived.logoAssetUrl).toBe(LOGO_ASSET_URL);
-
-    const cleared = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, logoAssetUrl: null }),
-    );
-    expect(cleared.logoAssetUrl).toBeUndefined();
   });
 });
