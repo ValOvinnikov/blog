@@ -2,12 +2,14 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BUSY_BUTTON_STYLE,
   DENSITY,
   FONT_CHOICE,
   HUE_MAX,
   HUE_MIN,
   PRESET_ID,
   RADIUS_SCALE,
+  SPINNER_STYLE,
 } from '@blog/config/constants';
 import type { TUpdateSiteConfigInput } from '@blog/db/queries/site-config/upsert-site-config';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
@@ -32,8 +34,10 @@ export const MOCK_SITE_CONFIG_FIELDS = {
   density: DENSITY.DEFAULT,
 } satisfies TUpdateSiteConfigInput;
 
-export const DEFAULT_ACCOUNT_CONTROLS = {
+export const DEFAULT_CONTROL_STYLES = {
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
+  busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
+  spinnerStyle: SPINNER_STYLE.PRESET,
 } satisfies Partial<TUpdateSiteConfigInput>;

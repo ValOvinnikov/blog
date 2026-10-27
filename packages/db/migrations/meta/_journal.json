@@ -435,6 +435,13 @@
       "when": 1793111301931,
       "tag": "0061_add_site_config_account_control",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1793117269562,
+      "tag": "0062_add_site_config_busy_button",
+      "breakpoints": true
     }
   ]
 }

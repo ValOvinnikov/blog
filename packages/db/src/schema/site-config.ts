@@ -3,6 +3,7 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BUSY_BUTTON_STYLE,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -10,9 +11,11 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  SPINNER_STYLE,
   type TAccountButtonStyle,
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
+  type TBusyButtonStyle,
   type TCardStyle,
   type TDensity,
   type TFontChoice,
@@ -21,6 +24,7 @@ import {
   type TLocaleIsoCode,
   type TPresetId,
   type TRadiusScale,
+  type TSpinnerStyle,
 } from '@blog/config/constants';
 import {
   integer,
@@ -100,6 +104,16 @@ export const accountPhonePlacementEnum = pgEnum(
   ],
 );
 
+export const busyButtonStyleEnum = pgEnum(
+  'busy_button_style',
+  Object.values(BUSY_BUTTON_STYLE) as [TBusyButtonStyle, ...TBusyButtonStyle[]],
+);
+
+export const spinnerStyleEnum = pgEnum(
+  'spinner_style',
+  Object.values(SPINNER_STYLE) as [TSpinnerStyle, ...TSpinnerStyle[]],
+);
+
 export type TVoiceOverrideValue = string | TVoicePortableText;
 
 export type TVoiceOverrides = Record<string, TVoiceOverrideValue>;
@@ -140,6 +154,12 @@ export const siteConfig = pgTable('site_config', {
   accountPhonePlacement: accountPhonePlacementEnum('account_phone_placement')
     .notNull()
     .default(ACCOUNT_PHONE_PLACEMENT.BAR),
+  busyButtonStyle: busyButtonStyleEnum('busy_button_style')
+    .notNull()
+    .default(BUSY_BUTTON_STYLE.LABEL),
+  spinnerStyle: spinnerStyleEnum('spinner_style')
+    .notNull()
+    .default(SPINNER_STYLE.PRESET),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverridesByLocale: jsonb('voice_overrides')

@@ -2,6 +2,7 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BUSY_BUTTON_STYLE,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -9,6 +10,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  SPINNER_STYLE,
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 import { faker } from '@faker-js/faker';
@@ -48,6 +50,8 @@ export const mockSiteConfig = (
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
+  busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
+  spinnerStyle: SPINNER_STYLE.PRESET,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
   logoAssetUrl: undefined,
   faviconAssetUrl: undefined,
