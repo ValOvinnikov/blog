@@ -1,49 +1,59 @@
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
   getCustomValidator,
   getCustomValidatorWithLevel,
   getRecordedBounds,
   getRecordedValidators,
 } from '@blog/studio/testing/create-mock-validation-rule';
+import { faker } from '@faker-js/faker';
 import { defineField, defineType } from 'sanity';
 
-type TStringCustomFn = (value: string | undefined) => string | true;
+type TStringCustomFn = (value: TMaybeUndefined<string>) => string | true;
 
-const singleRuleField = defineField({
+faker.seed(6017);
+
+const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_REQUIRED_MESSAGE = faker.lorem.sentence();
+const MOCK_RECOMMENDED_MESSAGE = faker.lorem.sentence();
+const MOCK_DOCUMENT_ERROR = faker.lorem.sentence();
+const MOCK_DOCUMENT_WARNING = faker.lorem.sentence();
+
+const MOCK_SINGLE_RULE_FIELD = defineField({
   name: 'title',
   title: 'Title',
   type: 'string',
   validation: (rule) =>
-    rule.custom((value: string | undefined) =>
-      value ? true : 'Title is required.',
+    rule.custom((value: TMaybeUndefined<string>) =>
+      value ? true : MOCK_REQUIRED_MESSAGE,
     ),
 });
 
-const severityRuleField = defineField({
+const MOCK_WARNING_RULE_FIELD = defineField({
   name: 'note',
   title: 'Note',
   type: 'string',
   validation: (rule) =>
     rule
-      .custom((value: string | undefined) =>
-        value ? true : 'A note is recommended.',
+      .custom((value: TMaybeUndefined<string>) =>
+        value ? true : MOCK_RECOMMENDED_MESSAGE,
       )
       .warning(),
 });
 
-const noValidationField = defineField({
+const MOCK_NO_VALIDATION_FIELD = defineField({
   name: 'plain',
   title: 'Plain',
   type: 'string',
 });
 
-const boundedField = defineField({
+const MOCK_BOUNDED_FIELD = defineField({
   name: 'summary',
   title: 'Summary',
   type: 'string',
   validation: (rule) => rule.required().min(3).max(10),
 });
 
-const uniqueArrayField = defineField({
+const MOCK_UNIQUE_ARRAY_FIELD = defineField({
   name: 'tags',
   title: 'Tags',
   type: 'array',
@@ -51,87 +61,86 @@ const uniqueArrayField = defineField({
   validation: (rule) => rule.unique().min(1).max(8),
 });
 
-const independentRulesArrayField = defineField({
+const MOCK_INDEPENDENT_RULES_ARRAY_FIELD = defineField({
   name: 'cards',
   title: 'Cards',
   type: 'array',
   of: [{ type: 'string' }],
   validation: (rule) => [
-    rule.required().error('Add at least two cards.'),
-    rule.unique().error('Each card can only appear once.'),
-    rule.min(2).error('Needs at least two cards.'),
-    rule.max(8).error('Holds at most eight cards.'),
+    rule.required().error(faker.lorem.sentence()),
+    rule.unique().error(faker.lorem.sentence()),
+    rule.min(2).error(faker.lorem.sentence()),
+    rule.max(8).error(faker.lorem.sentence()),
   ],
 });
 
-const documentType = defineType({
+const MOCK_DOCUMENT_TYPE = defineType({
   name: 'testing_document',
   title: 'Testing Document',
   type: 'document',
   validation: (rule) => [
-    rule.custom(() => 'first error'),
-    rule.custom(() => 'second warning').warning(),
+    rule.custom(() => MOCK_DOCUMENT_ERROR),
+    rule.custom(() => MOCK_DOCUMENT_WARNING).warning(),
   ],
-  fields: [singleRuleField],
+  fields: [MOCK_SINGLE_RULE_FIELD],
 });
 
 describe(getRecordedValidators, () => {
   it('records every custom() callback in registration order, with its level', () => {
-    const validators = getRecordedValidators<TStringCustomFn>(documentType);
+    const validators =
+      getRecordedValidators<TStringCustomFn>(MOCK_DOCUMENT_TYPE);
 
-    expect(validators).toHaveLength(2);
-    expect(validators[0]!.level).toBe('error');
-    expect(validators[1]!.level).toBe('warning');
+    expect(validators.map(({ level }) => level)).toEqual(['error', 'warning']);
   });
 
   it('throws when the source defines no validation builder', () => {
     expect(() =>
-      getRecordedValidators<TStringCustomFn>(noValidationField),
+      getRecordedValidators<TStringCustomFn>(MOCK_NO_VALIDATION_FIELD),
     ).toThrow(/validation/);
   });
 });
 
 describe(getRecordedBounds, () => {
-  it('captures the numeric arguments passed to min() and max()', () => {
-    expect(getRecordedBounds(boundedField)).toEqual({
-      required: true,
-      min: 3,
-      max: 10,
-    });
+  it.each([
+    {
+      chain: 'required(), min() and max()',
+      field: MOCK_BOUNDED_FIELD,
+      bounds: { required: true, min: 3, max: 10 },
+    },
+    {
+      chain: 'unique(), min() and max()',
+      field: MOCK_UNIQUE_ARRAY_FIELD,
+      bounds: { unique: true, min: 1, max: 8 },
+    },
+    {
+      chain: 'no bound',
+      field: MOCK_SINGLE_RULE_FIELD,
+      bounds: {},
+    },
+    {
+      chain: 'an array of independent rules',
+      field: MOCK_INDEPENDENT_RULES_ARRAY_FIELD,
+      bounds: { required: true, unique: true, min: 2, max: 8 },
+    },
+  ])('captures the bounds of $chain', ({ field, bounds }) => {
+    expect(getRecordedBounds(field)).toEqual(bounds);
   });
 
-  it('captures whether unique() was chained', () => {
-    expect(getRecordedBounds(uniqueArrayField)).toEqual({
-      unique: true,
-      min: 1,
-      max: 8,
-    });
-  });
-
-  it('leaves a bound unset when the chain never calls it', () => {
-    expect(getRecordedBounds(singleRuleField)).toEqual({});
-  });
-
-  it('captures every rule when validation returns an array of independent rules', () => {
-    expect(getRecordedBounds(independentRulesArrayField)).toEqual({
-      required: true,
-      unique: true,
-      min: 2,
-      max: 8,
-    });
-  });
-
-  it('throws when the source defines no validation builder', () => {
-    expect(() => getRecordedBounds(noValidationField)).toThrow(/validation/);
+  it('throws for a field with no validation builder', () => {
+    expect(() => getRecordedBounds(MOCK_NO_VALIDATION_FIELD)).toThrow(
+      /validation/,
+    );
   });
 });
 
 describe(getCustomValidator, () => {
   it('returns the single registered callback', () => {
-    const validate = getCustomValidator<TStringCustomFn>(singleRuleField);
+    const validate = getCustomValidator<TStringCustomFn>(
+      MOCK_SINGLE_RULE_FIELD,
+    );
 
-    expect(validate(undefined)).toBe('Title is required.');
-    expect(validate('Hello')).toBe(true);
+    expect(validate(undefined)).toBe(MOCK_REQUIRED_MESSAGE);
+    expect(validate(MOCK_TITLE)).toBe(true);
   });
 
   it('throws when no custom() rule was registered', () => {
@@ -148,25 +157,27 @@ describe(getCustomValidator, () => {
   });
 
   it('throws when more than one custom() rule was registered', () => {
-    expect(() => getCustomValidator<TStringCustomFn>(documentType)).toThrow(
-      /exactly one/,
-    );
+    expect(() =>
+      getCustomValidator<TStringCustomFn>(MOCK_DOCUMENT_TYPE),
+    ).toThrow(/exactly one/);
   });
 });
 
 describe(getCustomValidatorWithLevel, () => {
   it('reports error severity by default', () => {
-    const { isWarning } =
-      getCustomValidatorWithLevel<TStringCustomFn>(singleRuleField);
+    const { isWarning } = getCustomValidatorWithLevel<TStringCustomFn>(
+      MOCK_SINGLE_RULE_FIELD,
+    );
 
     expect(isWarning).toBe(false);
   });
 
   it('reports warning severity when .warning() is chained', () => {
-    const { fn, isWarning } =
-      getCustomValidatorWithLevel<TStringCustomFn>(severityRuleField);
+    const { fn, isWarning } = getCustomValidatorWithLevel<TStringCustomFn>(
+      MOCK_WARNING_RULE_FIELD,
+    );
 
     expect(isWarning).toBe(true);
-    expect(fn(undefined)).toBe('A note is recommended.');
+    expect(fn(undefined)).toBe(MOCK_RECOMMENDED_MESSAGE);
   });
 });
