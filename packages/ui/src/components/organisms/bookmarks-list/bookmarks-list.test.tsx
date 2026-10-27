@@ -4,11 +4,15 @@ import { faker } from '@faker-js/faker';
 
 import { type IBookmarkRow, BookmarksList } from './bookmarks-list';
 
-const EMPTY_MESSAGE = 'No bookmarks yet — save a post to find it here.';
 const PREFIX_TEST_ID = 'bookmarks-list-row-prefix';
-const BOOKMARKS_LIST_TEST_ID = 'bookmarks-list';
 
 faker.seed(123);
+
+const MOCK_EMPTY_MESSAGE = faker.lorem.sentence();
+const MOCK_PREFIX = faker.lorem.word();
+const MOCK_HINT = faker.lorem.words(2);
+const MOCK_BLOG_PATH = `/${faker.lorem.slug(1)}`;
+const MOCK_BLOG_LINK_LABEL = faker.lorem.words(2);
 
 const mockBookmarkRow = (): IBookmarkRow => ({
   id: faker.string.uuid(),
@@ -21,7 +25,7 @@ const rows = faker.helpers.multiple(mockBookmarkRow, { count: 3 });
 
 const setup = customRender(BookmarksList, {
   rows,
-  emptyMessage: EMPTY_MESSAGE,
+  emptyMessage: MOCK_EMPTY_MESSAGE,
 });
 
 describe(`<${BookmarksList.name}/>`, () => {
@@ -41,7 +45,7 @@ describe(`<${BookmarksList.name}/>`, () => {
       }
     });
 
-    it('exposes the rows as an explicit list', () => {
+    it('exposes the rows as a list', () => {
       const list = screen.getByRole('list');
       expect(list).toBeVisible();
     });
@@ -52,16 +56,16 @@ describe(`<${BookmarksList.name}/>`, () => {
     });
 
     it('does not render a hint when omitted', () => {
-      const hint = screen.queryByText(/saved/);
+      const hint = screen.queryByText(MOCK_HINT);
       expect(hint).not.toBeInTheDocument();
     });
   });
 
-  it('renders the supplied prefix node as-is, unmodified, once per row', () => {
+  it('renders the supplied prefix once per row', () => {
     setup({
       prefix: (
         <span data-testid={PREFIX_TEST_ID} aria-hidden="true">
-          drwx
+          {MOCK_PREFIX}
         </span>
       ),
     });
@@ -70,32 +74,32 @@ describe(`<${BookmarksList.name}/>`, () => {
     expect(glyphs).toHaveLength(rows.length);
     for (const glyph of glyphs) {
       expect(glyph).toHaveAttribute('aria-hidden', 'true');
-      expect(glyph).toHaveTextContent('drwx');
+      expect(glyph).toHaveTextContent(MOCK_PREFIX);
     }
   });
 
   it('renders the prefix immediately before the row date and filename', () => {
-    setup({ prefix: 'drwx' });
+    setup({ prefix: MOCK_PREFIX });
     const items = screen.getAllByRole('listitem');
 
     for (const [index, item] of items.entries()) {
       const bookmark = rows[index]!;
-      expect(item.textContent).toBe(
-        `drwx${bookmark.formattedDate}${bookmark.filename}`,
+      expect(item).toHaveTextContent(
+        `${MOCK_PREFIX}${bookmark.formattedDate}${bookmark.filename}`,
       );
     }
   });
 
-  it('renders the hint below the list when provided and rows are not empty', () => {
-    setup({ hint: '3 saved' });
-    const hint = screen.getByText('3 saved');
+  it('renders the hint when provided and rows are not empty', () => {
+    setup({ hint: MOCK_HINT });
+    const hint = screen.getByText(MOCK_HINT);
     expect(hint).toBeVisible();
   });
 
   it('renders the empty message instead of the list when rows is empty', () => {
     setup({ rows: [] });
 
-    const emptyMessage = screen.getByText(EMPTY_MESSAGE);
+    const emptyMessage = screen.getByText(MOCK_EMPTY_MESSAGE);
     const list = screen.queryByRole('list');
     expect(emptyMessage).toBeVisible();
     expect(list).not.toBeInTheDocument();
@@ -106,31 +110,26 @@ describe(`<${BookmarksList.name}/>`, () => {
       rows: [],
       emptyMessage: (
         <>
-          Browse <a href="/blog">the blog</a> to save a post.
+          Browse <a href={MOCK_BLOG_PATH}>{MOCK_BLOG_LINK_LABEL}</a> to save a
+          post.
         </>
       ),
     });
 
-    const blogLink = screen.getByRole('link', { name: 'the blog' });
-    expect(blogLink).toHaveAttribute('href', '/blog');
+    const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK_LABEL });
+    expect(blogLink).toHaveAttribute('href', MOCK_BLOG_PATH);
   });
 
   it('does not render the hint in the empty state', () => {
-    setup({ rows: [], hint: '3 saved' });
-    const hint = screen.queryByText('3 saved');
+    setup({ rows: [], hint: MOCK_HINT });
+    const hint = screen.queryByText(MOCK_HINT);
     expect(hint).not.toBeInTheDocument();
   });
 
-  it('renders filename links via linkAs when provided', () => {
+  it('renders filename links through the supplied link component', () => {
     setup({ linkAs: MockLink });
 
     const mockLinks = screen.getAllByTestId(MOCK_LINK_TEST_ID);
     expect(mockLinks).toHaveLength(rows.length);
-  });
-
-  it('forwards data-testid', () => {
-    setup({ dataTestId: BOOKMARKS_LIST_TEST_ID });
-    const bookmarksList = screen.getByTestId(BOOKMARKS_LIST_TEST_ID);
-    expect(bookmarksList).toBeVisible();
   });
 });

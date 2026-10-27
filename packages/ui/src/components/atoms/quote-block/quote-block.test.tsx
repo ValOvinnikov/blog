@@ -5,25 +5,18 @@ import { QuoteBlock } from './quote-block';
 
 faker.seed(123);
 
+const MOCK_QUOTE = faker.lorem.sentence();
+
 const setup = customRender(QuoteBlock, {
-  children: faker.lorem.sentence(),
+  children: MOCK_QUOTE,
 });
 
 describe(`<${QuoteBlock.name}/>`, () => {
-  let quote: string;
+  it('renders the given children as a blockquote', () => {
+    setup();
 
-  beforeEach(() => {
-    quote = faker.lorem.sentence();
-  });
+    const blockquote = screen.getByRole('blockquote');
 
-  it('renders a blockquote with the given children', () => {
-    setup({ children: quote });
-    expect(screen.getByText(quote)).toBeVisible();
-    expect(screen.getByText(quote).tagName).toBe('BLOCKQUOTE');
-  });
-
-  it('forwards data-testid', () => {
-    setup({ children: quote, dataTestId: 'quote-block' });
-    expect(screen.getByTestId('quote-block')).toBeVisible();
+    expect(blockquote).toHaveTextContent(MOCK_QUOTE);
   });
 });

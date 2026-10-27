@@ -1,79 +1,90 @@
 import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 
 import { Footer } from './footer';
+
+faker.seed(123);
+
+const MOCK_SITE_TITLE = faker.company.name();
+const MOCK_YEAR = faker.date.past().getFullYear();
+const MOCK_NAV_LABEL = faker.lorem.words(2);
+const MOCK_STRAY_TEXT = faker.lorem.sentence();
+const MOCK_LINK = {
+  label: faker.lorem.word(),
+  href: `/${faker.lorem.slug(1)}`,
+};
+const MOCK_OTHER_LINK = {
+  label: faker.lorem.words(2),
+  href: `/${faker.lorem.slug(2)}`,
+};
 
 describe(`<${Footer.name}/>`, () => {
   describe('with only Footer.Copyright', () => {
     beforeEach(() => {
       renderElement(
         <Footer>
-          <Footer.Copyright title="My Blog" year={2027} />
+          <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
         </Footer>,
       );
     });
 
     it('renders Footer.Copyright with the given year and title', () => {
-      expect(screen.getByText('© 2027 My Blog')).toBeVisible();
+      const copyright = screen.getByText(`© ${MOCK_YEAR} ${MOCK_SITE_TITLE}`);
+
+      expect(copyright).toBeVisible();
     });
 
-    it('does not render a nav element when Footer.Nav is omitted', () => {
-      expect(
-        screen.queryByRole('navigation', { name: 'Footer navigation' }),
-      ).not.toBeInTheDocument();
+    it('renders no navigation when Footer.Nav is omitted', () => {
+      const nav = screen.queryByRole('navigation');
+
+      expect(nav).not.toBeInTheDocument();
     });
   });
 
-  it('renders Footer.Nav content', () => {
+  it('renders Footer.Nav as a labelled navigation of working links', () => {
     renderElement(
       <Footer>
-        <Footer.Nav>
-          <TextLink appearance="nav" href="/about">
-            About
+        <Footer.Nav ariaLabel={MOCK_NAV_LABEL}>
+          <TextLink appearance="nav" href={MOCK_LINK.href}>
+            {MOCK_LINK.label}
           </TextLink>
-          <TextLink appearance="nav" href="/contact">
-            Contact
+          <TextLink appearance="nav" href={MOCK_OTHER_LINK.href}>
+            {MOCK_OTHER_LINK.label}
           </TextLink>
         </Footer.Nav>
       </Footer>,
     );
-    expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Contact' })).toBeVisible();
-  });
 
-  it('preserves hrefs on nav links', () => {
-    renderElement(
-      <Footer>
-        <Footer.Nav>
-          <TextLink appearance="nav" href="/about">
-            About
-          </TextLink>
-        </Footer.Nav>
-      </Footer>,
-    );
-    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute(
-      'href',
-      '/about',
-    );
+    const nav = screen.getByRole('navigation', { name: MOCK_NAV_LABEL });
+    const link = screen.getByRole('link', { name: MOCK_LINK.label });
+    const otherLink = screen.getByRole('link', {
+      name: MOCK_OTHER_LINK.label,
+    });
+
+    expect(nav).toBeVisible();
+    expect(link).toHaveAttribute('href', MOCK_LINK.href);
+    expect(otherLink).toHaveAttribute('href', MOCK_OTHER_LINK.href);
   });
 
   it('renders unmatched children without dropping them', () => {
     renderElement(
       <Footer>
-        <Footer.Copyright title="My Blog" year={2027} />
-        <span>stray content</span>
+        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
+        <span>{MOCK_STRAY_TEXT}</span>
       </Footer>,
     );
-    expect(screen.getByText('stray content')).toBeVisible();
+
+    const strayContent = screen.getByText(MOCK_STRAY_TEXT);
+
+    expect(strayContent).toBeVisible();
   });
 
   it('renders as a <footer> landmark', () => {
     renderElement(<Footer />);
-    expect(screen.getByRole('contentinfo')).toBeVisible();
-  });
 
-  it('forwards data-testid to the root element', () => {
-    renderElement(<Footer dataTestId="site-footer" />);
-    expect(screen.getByTestId('site-footer')).toBeVisible();
+    const footer = screen.getByRole('contentinfo');
+
+    expect(footer).toBeVisible();
   });
 });

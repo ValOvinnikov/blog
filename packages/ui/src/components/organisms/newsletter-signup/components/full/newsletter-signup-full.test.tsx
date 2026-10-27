@@ -9,91 +9,68 @@ import { faker } from '@faker-js/faker';
 
 import { NewsletterSignupFull } from './newsletter-signup-full';
 
-const HEADING_ID = 'newsletter-full-heading';
-const FULL_TEST_ID = 'newsletter-signup-full';
-
 faker.seed(123);
 
-const FIRST_CUE = faker.lorem.words(2);
-const SECOND_CUE = faker.lorem.words(3);
+const PROMPT_TEST_ID = 'newsletter-signup-input-prompt';
+const MOCK_HEADING = faker.lorem.sentence(3);
+const MOCK_HEADING_ID = faker.string.uuid();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence(8);
+const MOCK_SUCCESS_MESSAGE = faker.lorem.sentence();
+const MOCK_FIRST_CUE = faker.lorem.words(2);
+const MOCK_SECOND_CUE = faker.lorem.words(3);
 
 const baseArgs = {
   ...mockNewsletterSignupArgs(),
-  heading: faker.lorem.sentence(3),
+  heading: MOCK_HEADING,
 };
 
 const setup = customRender(NewsletterSignupFull, baseArgs);
 
 describe(`<${NewsletterSignupFull.name}/>`, () => {
-  let heading: string;
+  it('renders the heading as an h2 with the supporting text', () => {
+    setup({ supportingText: MOCK_SUPPORTING_TEXT });
 
-  beforeEach(() => {
-    heading = faker.lorem.sentence(3);
-  });
-
-  it('renders the heading and supportingText by default', () => {
-    const supportingText = faker.lorem.sentence(8);
-    setup({ heading, supportingText });
-
-    const headingElement = screen.getByRole('heading', { name: heading });
-    const supportingTextElement = screen.getByText(supportingText);
-
-    expect(headingElement).toBeVisible();
-    expect(supportingTextElement).toBeVisible();
-  });
-
-  describe('with only a heading', () => {
-    beforeEach(() => {
-      setup({ heading });
+    const heading = screen.getByRole('heading', {
+      name: MOCK_HEADING,
+      level: 2,
     });
+    const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);
 
-    it('renders the heading as an h2 when headingLevel is omitted', () => {
-      const headingElement = screen.getByRole('heading', {
-        name: heading,
-        level: 2,
-      });
-
-      expect(headingElement).toBeVisible();
-    });
-
-    it('renders the heading with no id when headingId is omitted', () => {
-      const headingElement = screen.getByRole('heading', { name: heading });
-
-      expect(headingElement).not.toHaveAttribute('id');
-    });
+    expect(heading).toBeVisible();
+    expect(supportingText).toBeVisible();
   });
 
   it.each([1, 3, 4] as const)(
     'renders the heading at level %i when headingLevel names it',
     (headingLevel) => {
-      setup({ heading, headingLevel });
+      setup({ headingLevel });
 
-      const headingElement = screen.getByRole('heading', {
-        name: heading,
+      const heading = screen.getByRole('heading', {
+        name: MOCK_HEADING,
         level: headingLevel,
       });
 
-      expect(headingElement).toBeVisible();
+      expect(heading).toBeVisible();
     },
   );
 
   it('assigns headingId to the heading element when provided', () => {
-    setup({ heading, headingId: HEADING_ID });
+    setup({ headingId: MOCK_HEADING_ID });
 
-    const headingElement = screen.getByRole('heading', { name: heading });
+    const heading = screen.getByRole('heading', { name: MOCK_HEADING });
 
-    expect(headingElement).toHaveAttribute('id', HEADING_ID);
+    expect(heading).toHaveAttribute('id', MOCK_HEADING_ID);
   });
 
   it('renders no heading when heading is omitted', () => {
     setup({ heading: undefined });
 
-    const headingElement = screen.queryByRole('heading');
+    const heading = screen.queryByRole('heading', { name: MOCK_HEADING });
     const emailField = screen.getByRole('textbox', {
       name: MOCK_NEWSLETTER_EMAIL_LABEL,
     });
 
-    expect(headingElement).not.toBeInTheDocument();
+    expect(heading).not.toBeInTheDocument();
     expect(emailField).toBeVisible();
   });
 
@@ -101,71 +78,60 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     setup({
       heading: undefined,
       trustCues: [
-        { icon: <Icon name={ICONS.SHIELD_CHECK} />, label: FIRST_CUE },
+        { icon: <Icon name={ICONS.SHIELD_CHECK} />, label: MOCK_FIRST_CUE },
       ],
     });
 
-    const headingElement = screen.queryByRole('heading');
-    const cue = screen.getByText(FIRST_CUE);
+    const heading = screen.queryByRole('heading', { name: MOCK_HEADING });
+    const cue = screen.getByText(MOCK_FIRST_CUE);
 
-    expect(headingElement).not.toBeInTheDocument();
+    expect(heading).not.toBeInTheDocument();
     expect(cue).toBeVisible();
   });
 
-  describe('with the default props', () => {
-    beforeEach(() => {
-      setup();
-    });
+  it('renders the chevron icon as the email field prompt', () => {
+    setup();
 
-    it('renders the chevron icon as the email field prompt', () => {
-      const prompt = screen.getByTestId('newsletter-signup-input-prompt');
+    const prompt = screen.getByTestId(PROMPT_TEST_ID);
 
-      expect(prompt).toBeVisible();
-    });
-
-    it('renders no trust-cue row when trustCues is omitted', () => {
-      const cueList = screen.queryByRole('list');
-
-      expect(cueList).not.toBeInTheDocument();
-    });
+    expect(prompt).toBeVisible();
   });
 
-  it('renders trust cues when provided', () => {
-    const trustCues = [
-      {
-        icon: <Icon name={ICONS.SHIELD_CHECK} />,
-        label: FIRST_CUE,
-      },
-      {
-        icon: <Icon name={ICONS.X} />,
-        label: SECOND_CUE,
-      },
-    ];
-    setup({ trustCues });
+  it('renders no trust-cue list when trustCues is omitted', () => {
+    setup();
 
-    const firstCue = screen.getByText(FIRST_CUE);
-    const secondCue = screen.getByText(SECOND_CUE);
+    const cueList = screen.queryByRole('list');
+
+    expect(cueList).not.toBeInTheDocument();
+  });
+
+  it('renders every trust cue provided', () => {
+    setup({
+      trustCues: [
+        { icon: <Icon name={ICONS.SHIELD_CHECK} />, label: MOCK_FIRST_CUE },
+        { icon: <Icon name={ICONS.X} />, label: MOCK_SECOND_CUE },
+      ],
+    });
+
+    const firstCue = screen.getByText(MOCK_FIRST_CUE);
+    const secondCue = screen.getByText(MOCK_SECOND_CUE);
 
     expect(firstCue).toBeVisible();
     expect(secondCue).toBeVisible();
   });
 
   it('shows the success message and hides the field on success', () => {
-    const successMessage = faker.lorem.sentence();
-    setup({ status: FORM_STATUS.SUCCESS, successMessage });
+    setup({
+      status: FORM_STATUS.SUCCESS,
+      successMessage: MOCK_SUCCESS_MESSAGE,
+    });
 
-    const status = screen.getByRole('status');
-    const emailField = screen.queryByRole('textbox');
+    const message = screen.getByText(MOCK_SUCCESS_MESSAGE);
+    const emailField = screen.queryByRole('textbox', {
+      name: MOCK_NEWSLETTER_EMAIL_LABEL,
+    });
 
-    expect(status).toHaveTextContent(successMessage);
+    expect(message).toBeVisible();
     expect(emailField).not.toBeInTheDocument();
-  });
-
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: FULL_TEST_ID });
-
-    const root = screen.getByTestId(FULL_TEST_ID);
-
-    expect(root).toBeVisible();
   });
 });

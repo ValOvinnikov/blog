@@ -5,89 +5,96 @@ import { LogoTile } from './logo-tile';
 
 faker.seed(123);
 
+const MOCK_LOGO_ALT = faker.company.name();
+const MOCK_DARK_LOGO_ALT = faker.company.name();
+const MOCK_LOGO_SRC = faker.image.url();
+const MOCK_DARK_LOGO_SRC = faker.image.url();
+const MOCK_LINK_LABEL = faker.lorem.words(2);
+const MOCK_HREF = faker.internet.url();
+const MOCK_TEXT = faker.lorem.words(2);
+const LOGO_TILE_TEST_ID = 'logo-tile';
+
+const setup = customRender(LogoTile, {});
+
 describe(`<${LogoTile.name}/>`, () => {
   it('renders its logo', () => {
-    const alt = faker.company.name();
-    const setup = customRender(LogoTile, {
+    setup({
       children: (
         <LogoTile.Logo>
-          <img src={faker.image.url()} alt={alt} />
+          <img src={MOCK_LOGO_SRC} alt={MOCK_LOGO_ALT} />
         </LogoTile.Logo>
       ),
     });
 
-    setup();
+    const logo = screen.getByRole('img', { name: MOCK_LOGO_ALT });
 
-    expect(screen.getByRole('img', { name: alt })).toBeVisible();
+    expect(logo).toBeVisible();
   });
 
   it('renders LogoTile.Link as the one link, named by its label', () => {
-    const href = faker.internet.url();
-    const setup = customRender(LogoTile, {
+    setup({
       isInteractive: true,
       children: [
         <LogoTile.Logo key="logo">
-          <img src={faker.image.url()} alt="" />
+          <img src={MOCK_LOGO_SRC} alt="" />
         </LogoTile.Logo>,
         <LogoTile.DarkLogo key="dark-logo">
-          <img src={faker.image.url()} alt="" />
+          <img src={MOCK_DARK_LOGO_SRC} alt="" />
         </LogoTile.DarkLogo>,
-        <LogoTile.Link key="link" href={href} ariaLabel="Visit Acme" />,
+        <LogoTile.Link
+          key="link"
+          href={MOCK_HREF}
+          ariaLabel={MOCK_LINK_LABEL}
+        />,
       ],
     });
 
-    setup();
+    const links = screen.getAllByRole('link');
+    const link = screen.getByRole('link', { name: MOCK_LINK_LABEL });
 
-    expect(screen.getAllByRole('link')).toHaveLength(1);
-    expect(screen.getByRole('link', { name: 'Visit Acme' })).toHaveAttribute(
-      'href',
-      href,
-    );
+    expect(links).toHaveLength(1);
+    expect(link).toHaveAttribute('href', MOCK_HREF);
   });
 
   it('adds no accessible name of its own', () => {
-    const setup = customRender(LogoTile, {
+    setup({
+      dataTestId: LOGO_TILE_TEST_ID,
       children: (
         <LogoTile.Logo>
-          <img src={faker.image.url()} alt={faker.company.name()} />
+          <img src={MOCK_LOGO_SRC} alt={MOCK_LOGO_ALT} />
         </LogoTile.Logo>
       ),
-      dataTestId: 'logo-tile',
     });
 
-    setup();
+    const tile = screen.getByTestId(LOGO_TILE_TEST_ID);
 
-    expect(screen.getByTestId('logo-tile')).not.toHaveAccessibleName();
+    expect(tile).not.toHaveAccessibleName();
   });
 
   it('renders both the regular and the dark-background logo, each named', () => {
-    const regularAlt = faker.company.name();
-    const darkAlt = faker.company.name();
-    const setup = customRender(LogoTile, {
+    setup({
       children: [
         <LogoTile.Logo key="logo">
-          <img src={faker.image.url()} alt={regularAlt} />
+          <img src={MOCK_LOGO_SRC} alt={MOCK_LOGO_ALT} />
         </LogoTile.Logo>,
         <LogoTile.DarkLogo key="dark-logo">
-          <img src={faker.image.url()} alt={darkAlt} />
+          <img src={MOCK_DARK_LOGO_SRC} alt={MOCK_DARK_LOGO_ALT} />
         </LogoTile.DarkLogo>,
       ],
     });
 
-    setup();
+    const logo = screen.getByRole('img', { name: MOCK_LOGO_ALT });
+    const darkLogo = screen.getByRole('img', { name: MOCK_DARK_LOGO_ALT });
 
-    expect(screen.getByRole('img', { name: regularAlt })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: darkAlt })).toBeInTheDocument();
+    expect(logo).toBeVisible();
+    expect(darkLogo).toBeVisible();
   });
 
   it('keeps a child that is not one of its parts', () => {
-    const text = faker.company.name();
-    const setup = customRender(LogoTile, {
-      children: <span>{text}</span>,
-    });
+    setup({ children: <span>{MOCK_TEXT}</span> });
 
-    setup();
+    const text = screen.getByText(MOCK_TEXT);
 
-    expect(screen.getByText(text)).toBeVisible();
+    expect(text).toBeVisible();
   });
 });
