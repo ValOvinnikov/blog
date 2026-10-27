@@ -32,3 +32,6 @@ export const mockFinding = (
     ...overrides,
   };
 };
+
+export const MOCK_COMMIT_SHA = 'abcdef0123456789abcdef0123456789abcdef01';
+export const MOCK_SHORT_COMMIT_SHA = 'abcdef0';
