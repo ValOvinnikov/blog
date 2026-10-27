@@ -1,43 +1,52 @@
 import { CAPABILITY } from '@blog/config/constants';
+import { markCapabilityOffTypes } from '@blog/studio/schema-types/inputs/capability-warning-input/mark-capability-off-types';
+import { faker } from '@faker-js/faker';
 
-import { markCapabilityOffTypes } from './mark-capability-off-types';
+faker.seed(4107);
 
-const cta = { name: 'module_cta', title: 'CTA' };
-const newsletter = { name: 'module_newsletter', title: 'Newsletter' };
-const types = [cta, newsletter];
+const MOCK_CTA_TITLE = faker.lorem.word();
+const MOCK_NEWSLETTER_TITLE = faker.lorem.word();
+const MOCK_CTA_TYPE = { name: 'module_cta', title: MOCK_CTA_TITLE };
+const MOCK_NEWSLETTER_TYPE = {
+  name: 'module_newsletter',
+  title: MOCK_NEWSLETTER_TITLE,
+};
+const MOCK_TYPES = [MOCK_CTA_TYPE, MOCK_NEWSLETTER_TYPE];
 
 describe(markCapabilityOffTypes, () => {
   it('marks a gated type whose capability is off', () => {
-    const marked = markCapabilityOffTypes(types, [CAPABILITY.COMMENTS]);
+    const marked = markCapabilityOffTypes(MOCK_TYPES, [CAPABILITY.COMMENTS]);
 
     expect(marked?.map(({ name, title }) => [name, title])).toEqual([
-      ['module_cta', 'CTA'],
-      ['module_newsletter', 'Newsletter (off in Features)'],
+      [MOCK_CTA_TYPE.name, MOCK_CTA_TITLE],
+      [MOCK_NEWSLETTER_TYPE.name, `${MOCK_NEWSLETTER_TITLE} (off in Features)`],
     ]);
   });
 
   it('keeps every other property of the marked type', () => {
-    const [, marked] =
+    const [marked] =
       markCapabilityOffTypes(
-        [cta, { ...newsletter, jsonType: 'object' }],
+        [{ ...MOCK_NEWSLETTER_TYPE, jsonType: 'object' }],
         [],
       ) ?? [];
 
-    expect(marked).toMatchObject({
-      name: 'module_newsletter',
-      jsonType: 'object',
-    });
+    expect(marked?.name).toBe(MOCK_NEWSLETTER_TYPE.name);
+    expect(marked?.jsonType).toBe('object');
   });
 
-  it('returns null when the capability is on', () => {
-    expect(markCapabilityOffTypes(types, [CAPABILITY.NEWSLETTER])).toBeNull();
-  });
-
-  it('returns null when no capabilities are given', () => {
-    expect(markCapabilityOffTypes(types, undefined)).toBeNull();
-  });
-
-  it('returns null when no type is gated', () => {
-    expect(markCapabilityOffTypes([cta], [])).toBeNull();
+  it.each([
+    {
+      behaviour: 'the capability is on',
+      types: MOCK_TYPES,
+      enabled: [CAPABILITY.NEWSLETTER],
+    },
+    {
+      behaviour: 'no capabilities are given',
+      types: MOCK_TYPES,
+      enabled: undefined,
+    },
+    { behaviour: 'no type is gated', types: [MOCK_CTA_TYPE], enabled: [] },
+  ])('returns null when $behaviour', ({ types, enabled }) => {
+    expect(markCapabilityOffTypes(types, enabled)).toBeNull();
   });
 });
