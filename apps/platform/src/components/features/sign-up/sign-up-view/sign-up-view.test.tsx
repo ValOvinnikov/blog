@@ -5,7 +5,7 @@ import {
 } from '@platform/constants/sign-up';
 import { acceptSignupTermsAction } from '@platform/server/auth/accept-signup-terms-action';
 import { customRender, screen } from '@platform/testing/custom-render';
-import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
+import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 

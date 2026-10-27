@@ -9,7 +9,7 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TOAST_EXIT_BUFFER_MS } from '@platform/testing/toast/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { useToast } from './toast-provider';
+import { ToastProvider, useToast } from './toast-provider';
 
 faker.seed(5);
 
@@ -89,7 +89,7 @@ const runAllTimers = () =>
     await vi.runAllTimersAsync();
   });
 
-describe('ToastProvider', () => {
+describe(`<${ToastProvider.name}/>`, () => {
   let user: UserEvent;
 
   const tabTimes = async (count: number) => {

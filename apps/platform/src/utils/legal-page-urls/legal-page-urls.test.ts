@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
+import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { tenantSiteUrl } from '@platform/utils/routes/routes';
 
 import { toLegalPageUrls } from './legal-page-urls';
