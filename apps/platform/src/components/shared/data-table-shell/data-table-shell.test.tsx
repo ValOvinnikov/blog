@@ -120,7 +120,10 @@ describe(`<${DataTableShell.name}/>`, () => {
       const header = screen.getByRole('columnheader', {
         name: MOCK_COLUMN_LABEL,
       });
-      await user.click(screen.getByRole('button', { name: MOCK_COLUMN_LABEL }));
+      const sortButton = screen.getByRole('button', {
+        name: MOCK_COLUMN_LABEL,
+      });
+      await user.click(sortButton);
 
       expect(header).toHaveAttribute('aria-sort', SORT_DIRECTION.ASCENDING);
       expect(onSort).toHaveBeenCalledOnce();

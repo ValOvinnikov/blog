@@ -42,12 +42,18 @@ const RECORDED_COLUMN = { name: dataRequestMatchesTable.columnRecorded };
 const SITE_COLUMN = { name: dataRequestMatchesTable.columnSite };
 const RESULTS_TABLE = { name: dataRequestMatchesTable.regionLabel };
 
+const SEARCH_FIELD = { name: dataRequestMatchesTable.searchLabel };
+const KIND_FILTER = { name: dataRequestMatchesTable.kindFilterLabel };
+const LEAD_OPTION = { name: dataRequestMatchKind.LEAD };
+const NEXT_BUTTON = { name: pagination.next };
+
 const setup = customRender(DataRequestMatchesTable, { matches: MATCHES });
 
-const bodyRows = () =>
-  within(screen.getByRole('region', RESULTS_TABLE))
-    .getAllByRole('row')
-    .slice(1);
+const bodyRows = () => {
+  const table = screen.getByRole('region', RESULTS_TABLE);
+  const [, ...rows] = within(table).getAllByRole('row');
+  return rows;
+};
 
 describe(`<${DataRequestMatchesTable.name}/>`, () => {
   let user: UserEvent;
@@ -58,10 +64,11 @@ describe(`<${DataRequestMatchesTable.name}/>`, () => {
   });
 
   it('shows one page of rows, newest first', () => {
-    const [firstRow] = bodyRows();
+    const rows = bodyRows();
+    const [firstRow] = rows;
     const recordedHeader = screen.getByRole('columnheader', RECORDED_COLUMN);
 
-    expect(bodyRows()).toHaveLength(DATA_REQUEST_MATCHES_PAGE_SIZE);
+    expect(rows).toHaveLength(DATA_REQUEST_MATCHES_PAGE_SIZE);
     expect(firstRow).toHaveTextContent(NEWEST_SITE_NAME);
     expect(recordedHeader).toHaveAttribute(
       'aria-sort',
@@ -70,18 +77,21 @@ describe(`<${DataRequestMatchesTable.name}/>`, () => {
   });
 
   it('pages through the rest', async () => {
-    await user.click(screen.getByRole('button', { name: pagination.next }));
+    const nextButton = screen.getByRole('button', NEXT_BUTTON);
+    await user.click(nextButton);
 
+    const rows = bodyRows();
     const status = screen.getByText(
       t('pagination.status', { page: 2, totalPages: 2 }),
     );
 
-    expect(bodyRows()).toHaveLength(EXTRA_ROWS);
+    expect(rows).toHaveLength(EXTRA_ROWS);
     expect(status).toBeVisible();
   });
 
   it('sorts oldest first when the recorded header is clicked', async () => {
-    await user.click(screen.getByRole('button', RECORDED_COLUMN));
+    const recordedSort = screen.getByRole('button', RECORDED_COLUMN);
+    await user.click(recordedSort);
 
     const [firstRow] = bodyRows();
 
@@ -89,51 +99,44 @@ describe(`<${DataRequestMatchesTable.name}/>`, () => {
   });
 
   it('sorts by site when its header is clicked', async () => {
-    await user.click(screen.getByRole('button', SITE_COLUMN));
+    const siteSort = screen.getByRole('button', SITE_COLUMN);
+    await user.click(siteSort);
 
     const siteHeader = screen.getByRole('columnheader', SITE_COLUMN);
-    const firstSite = SITE_NAMES.toSorted(
+    const [firstRow] = bodyRows();
+    const [firstSite] = SITE_NAMES.toSorted(
       new Intl.Collator('en', { sensitivity: 'base' }).compare,
-    ).at(0);
+    );
 
     expect(siteHeader).toHaveAttribute('aria-sort', SORT_DIRECTION.ASCENDING);
-    expect(bodyRows()[0]).toHaveTextContent(firstSite ?? '');
+    expect(firstRow).toHaveTextContent(firstSite ?? '');
   });
 
   it('narrows the rows to those matching the search', async () => {
-    await user.type(
-      screen.getByRole('searchbox', {
-        name: dataRequestMatchesTable.searchLabel,
-      }),
-      OLDEST_SITE_NAME,
-    );
+    const searchField = screen.getByRole('searchbox', SEARCH_FIELD);
+    await user.type(searchField, OLDEST_SITE_NAME);
+
+    const rows = bodyRows();
+    const [onlyRow] = rows;
+
+    expect(rows).toHaveLength(1);
+    expect(onlyRow).toHaveTextContent(dataRequestMatchKind.LEAD);
+  });
+
+  it('shows only the chosen kind', async () => {
+    const kindFilter = screen.getByRole('combobox', KIND_FILTER);
+    await user.click(kindFilter);
+    const leadOption = await screen.findByRole('option', LEAD_OPTION);
+    await user.click(leadOption);
 
     const rows = bodyRows();
 
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toHaveTextContent(dataRequestMatchKind.LEAD);
-  });
-
-  it('shows only the chosen kind', async () => {
-    await user.click(
-      screen.getByRole('combobox', {
-        name: dataRequestMatchesTable.kindFilterLabel,
-      }),
-    );
-    await user.click(
-      await screen.findByRole('option', { name: dataRequestMatchKind.LEAD }),
-    );
-
-    expect(bodyRows()).toHaveLength(1);
   });
 
   it('says so when nothing matches the search', async () => {
-    await user.type(
-      screen.getByRole('searchbox', {
-        name: dataRequestMatchesTable.searchLabel,
-      }),
-      faker.string.uuid(),
-    );
+    const searchField = screen.getByRole('searchbox', SEARCH_FIELD);
+    await user.type(searchField, faker.string.uuid());
 
     const noResults = screen.getByText(dataRequestMatchesTable.noResults);
 

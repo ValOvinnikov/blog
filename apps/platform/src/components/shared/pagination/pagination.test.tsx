@@ -77,7 +77,8 @@ describe(`<${Pagination.name}/>`, () => {
       const user = userEvent.setup();
       setup({ pageHref: undefined, onPageChange });
 
-      await user.click(screen.getByRole('button', { name: NEXT }));
+      const nextButton = screen.getByRole('button', { name: NEXT });
+      await user.click(nextButton);
 
       expect(onPageChange).toHaveBeenCalledWith(3);
     });
