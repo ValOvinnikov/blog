@@ -1,486 +1,461 @@
+import { LINK_TYPE, SOCIAL_PLATFORMS } from '@blog/config/constants';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/migrations/migration-document';
+import { isCreateIfNotExistsMutation } from '@blog/studio/testing/migrations/mutation-guards';
+import { faker } from '@faker-js/faker';
 import {
   at,
+  createIfNotExists,
   patch,
   set,
-  type CreateIfNotExistsMutation,
-  type MigrationContext,
+  type Mutation,
 } from 'sanity/migrate';
 import type { MockInstance } from 'vitest';
 
+import { LINK_REF_TYPE, SOCIAL_PROFILE_TYPE } from './transform';
+
 import migration from './index';
 
-const documentHandler = migration.migrate.document;
+faker.seed(6019);
 
-if (!documentHandler) {
-  throw new Error('Expected the migration to define a document() handler.');
-}
+const NAVIGATION_TYPE = 'settings_navigation';
+const FOOTER_TYPE = 'settings_footer';
+const LINK_DOCUMENT_TYPE = 'link';
+const INLINE_LINK_TYPE = 'inlineLink';
+const REFERENCE_TYPE = 'reference';
+const PAGE_TYPE = 'page_postIndex';
+const UNTOUCHED_SUFFIX =
+  'The document was left untouched — fix this entry in Studio, then re-run the migration.';
 
-const createMockContext = (
-  titlesByRef: Record<string, string | undefined> = {},
-): MigrationContext => {
-  const fetch = async (_query: string, params: unknown) => {
-    const ref = (params as { ref: string }).ref;
+const MOCK_PAGE_ID = faker.string.uuid();
+const MOCK_PAGE_TITLE = faker.lorem.words(2);
+const MOCK_FIRST_KEY = faker.string.uuid();
+const MOCK_SECOND_KEY = faker.string.uuid();
+const MOCK_EXISTING_LINK_ID = faker.string.uuid();
+const MOCK_FIRST_LABEL = faker.lorem.words(2);
+const MOCK_SECOND_LABEL = faker.lorem.words(2);
+const MOCK_FIRST_URL = faker.internet.url();
+const MOCK_SECOND_URL = faker.internet.url();
+const MOCK_RELATIVE_URL = `/${faker.lorem.word()}`;
+const MOCK_ACCESSIBLE_LABEL = faker.lorem.words(3);
+const MOCK_UNKNOWN_TYPE = faker.lorem.word();
 
-    return { title: titlesByRef[ref] };
-  };
+const mockLegacyLink = (
+  fields: Record<string, unknown> & { _key: string },
+) => ({
+  _type: LINK_DOCUMENT_TYPE,
+  label: MOCK_FIRST_LABEL,
+  linkType: LINK_TYPE.EXTERNAL,
+  url: MOCK_FIRST_URL,
+  ...fields,
+});
 
-  return { client: { fetch } } as unknown as MigrationContext;
-};
+const mockLinkRef = (key: string) => ({
+  _key: key,
+  _type: LINK_REF_TYPE,
+  link: { _type: REFERENCE_TYPE, _ref: MOCK_EXISTING_LINK_ID },
+});
 
-type TLinkDocument = {
-  _id: string;
-  _type: string;
-  title?: string;
-  label?: string;
-  linkType?: string;
-  openInNewTab?: boolean;
-  internalReference?: { _ref: string };
-  url?: string;
-};
+const mockSocialProfile = (key: string) => ({
+  _key: key,
+  _type: SOCIAL_PROFILE_TYPE,
+  platform: SOCIAL_PLATFORMS.LINKEDIN,
+  link: { _type: REFERENCE_TYPE, _ref: MOCK_EXISTING_LINK_ID },
+});
 
-const isCreateIfNotExists = (
-  mutation: unknown,
-): mutation is CreateIfNotExistsMutation<TLinkDocument> =>
-  typeof mutation === 'object' &&
-  mutation !== null &&
-  (mutation as { type?: string }).type === 'createIfNotExists';
+const migrate = async (
+  document: ReturnType<typeof mockMigrationDocument>,
+  dataset: unknown[] = [],
+) =>
+  (await runDocumentMigration(
+    migration,
+    document,
+    mockMigrationContext(dataset),
+  )) as Mutation[];
 
-const isPatch = (mutation: unknown): mutation is ReturnType<typeof patch> =>
-  typeof mutation === 'object' &&
-  mutation !== null &&
-  (mutation as { type?: string }).type === 'patch';
+const readLinkIds = (mutations: Mutation[]): string[] =>
+  mutations
+    .filter(isCreateIfNotExistsMutation)
+    .map((linkMutation) => linkMutation.document._id);
 
-type TTestDocument = {
-  _id: string;
-  _type: string;
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  [key: string]: unknown;
-};
+const skippedWarning = (documentId: string, issue: string) =>
+  `${documentId}: ${issue}. ${UNTOUCHED_SUFFIX}`;
 
-const runMigration = async (
-  doc: TTestDocument,
-  context: MigrationContext = createMockContext(),
-): Promise<unknown[]> =>
-  ((await documentHandler(doc, context)) ?? []) as unknown[];
+describe('migrate-nav-footer-to-link-library', () => {
+  let warnSpy: MockInstance<typeof console.warn>;
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
-
-describe('migrate-nav-footer-to-link-library wiring', () => {
-  it('returns nothing for an unrelated document type', async () => {
-    const doc = { ...baseDoc, _id: 'other-1', _type: 'module_cta' };
-
-    expect(await runMigration(doc)).toEqual([]);
+  beforeEach(() => {
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
-  describe('settings_navigation', () => {
-    it('returns nothing when there is no items field', async () => {
-      const doc = { ...baseDoc, _id: 'nav-1', _type: 'settings_navigation' };
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
 
-      expect(await runMigration(doc)).toEqual([]);
-    });
+  it('returns nothing for an unrelated document type', async () => {
+    const document = mockMigrationDocument({ _type: 'module_cta' });
 
-    it('returns nothing when items is empty', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'nav-1',
-        _type: 'settings_navigation',
-        items: [],
-      };
+    expect(await migrate(document)).toEqual([]);
+  });
 
-      expect(await runMigration(doc)).toEqual([]);
-    });
-
-    it('returns nothing when every item is already a linkRef', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'nav-1',
-        _type: 'settings_navigation',
-        items: [
-          {
-            _key: 'nav-1',
-            _type: 'linkRef',
-            link: { _type: 'reference', _ref: 'link-existing' },
-          },
-        ],
-      };
-
-      expect(await runMigration(doc)).toEqual([]);
-    });
-
-    it('migrates the live Blog entry to a linkRef and creates its link document', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'settings-navigation-singleton',
-        _type: 'settings_navigation',
-        items: [
-          {
-            _key: '8da0244eb0cc',
-            _type: 'link',
-            label: 'Blog',
-            linkType: 'INTERNAL',
-            internalReference: { _ref: 'page_postIndex' },
-            openInNewTab: false,
-          },
-        ],
-      };
-
-      const mutations = await runMigration(
-        doc,
-        createMockContext({ page_postIndex: 'Blog' }),
-      );
-
-      const createMutation = mutations.find(isCreateIfNotExists);
-      const patchMutation = mutations.find(isPatch);
-
-      expect(createMutation?.document).toEqual({
-        _id: expect.stringMatching(/^link-[a-f0-9]{16}$/) as string,
-        _type: 'link',
-        title: 'Link to Blog',
-        label: 'Blog',
-        linkType: 'INTERNAL',
-        openInNewTab: false,
-        internalReference: { _type: 'reference', _ref: 'page_postIndex' },
+  describe(NAVIGATION_TYPE, () => {
+    it.each([
+      { title: 'there is no items field', fields: {} },
+      { title: 'items is empty', fields: { items: [] } },
+      {
+        title: 'every item is already a linkRef',
+        fields: { items: [mockLinkRef(MOCK_FIRST_KEY)] },
+      },
+    ])('returns nothing when $title', async ({ fields }) => {
+      const document = mockMigrationDocument({
+        _type: NAVIGATION_TYPE,
+        ...fields,
       });
 
-      const linkId = createMutation?.document._id;
+      expect(await migrate(document)).toEqual([]);
+    });
 
-      expect(patchMutation).toEqual(
-        patch('settings-navigation-singleton', [
+    it('migrates an internal entry to a linkRef and creates its link document', async () => {
+      const document = mockMigrationDocument({
+        _type: NAVIGATION_TYPE,
+        items: [
+          mockLegacyLink({
+            _key: MOCK_FIRST_KEY,
+            linkType: LINK_TYPE.INTERNAL,
+            internalReference: { _ref: MOCK_PAGE_ID },
+            url: undefined,
+            openInNewTab: false,
+          }),
+        ],
+      });
+
+      const mutations = await migrate(document, [
+        { _id: MOCK_PAGE_ID, _type: PAGE_TYPE, title: MOCK_PAGE_TITLE },
+      ]);
+      const [linkId = ''] = readLinkIds(mutations);
+
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_PAGE_TITLE}`,
+          label: MOCK_FIRST_LABEL,
+          linkType: LINK_TYPE.INTERNAL,
+          openInNewTab: false,
+          internalReference: { _type: REFERENCE_TYPE, _ref: MOCK_PAGE_ID },
+        }),
+        patch(document._id, [
           at(
             'items',
             set([
               {
-                _key: '8da0244eb0cc',
-                _type: 'linkRef',
-                link: { _type: 'reference', _ref: linkId },
+                _key: MOCK_FIRST_KEY,
+                _type: LINK_REF_TYPE,
+                link: { _type: REFERENCE_TYPE, _ref: linkId },
               },
             ]),
           ),
         ]),
-      );
+      ]);
     });
 
-    it('accepts a pre-rename "link" and a post-rename "inlineLink" item side by side', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'nav-2',
-        _type: 'settings_navigation',
+    it('accepts a pre-rename link and a post-rename inlineLink side by side', async () => {
+      const document = mockMigrationDocument({
+        _type: NAVIGATION_TYPE,
         items: [
-          {
-            _key: 'item-1',
-            _type: 'link',
-            label: 'Blog',
-            linkType: 'EXTERNAL',
-            url: 'https://example.com/blog',
-          },
-          {
-            _key: 'item-2',
-            _type: 'inlineLink',
-            label: 'Pricing',
-            linkType: 'EXTERNAL',
-            url: 'https://example.com/pricing',
-          },
+          mockLegacyLink({ _key: MOCK_FIRST_KEY }),
+          mockLegacyLink({
+            _key: MOCK_SECOND_KEY,
+            _type: INLINE_LINK_TYPE,
+            label: MOCK_SECOND_LABEL,
+            url: MOCK_SECOND_URL,
+          }),
         ],
-      };
+      });
 
-      const mutations = await runMigration(doc);
+      const mutations = await migrate(document);
+      const [firstLinkId = '', secondLinkId = ''] = readLinkIds(mutations);
 
-      expect(mutations.filter(isCreateIfNotExists)).toHaveLength(2);
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: firstLinkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_FIRST_URL}`,
+          label: MOCK_FIRST_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_FIRST_URL,
+        }),
+        createIfNotExists({
+          _id: secondLinkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_SECOND_URL}`,
+          label: MOCK_SECOND_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_SECOND_URL,
+        }),
+        patch(document._id, [
+          at(
+            'items',
+            set([
+              {
+                _key: MOCK_FIRST_KEY,
+                _type: LINK_REF_TYPE,
+                link: { _type: REFERENCE_TYPE, _ref: firstLinkId },
+              },
+              {
+                _key: MOCK_SECOND_KEY,
+                _type: LINK_REF_TYPE,
+                link: { _type: REFERENCE_TYPE, _ref: secondLinkId },
+              },
+            ]),
+          ),
+        ]),
+      ]);
     });
 
-    it('passes an already-migrated item through unchanged alongside a legacy one', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'nav-3',
-        _type: 'settings_navigation',
-        items: [
-          {
-            _key: 'existing',
-            _type: 'linkRef',
-            link: { _type: 'reference', _ref: 'link-existing' },
-          },
-          {
-            _key: 'legacy',
-            _type: 'link',
-            label: 'Contact',
-            linkType: 'EXTERNAL',
-            url: 'https://example.com/contact',
-          },
-        ],
-      };
-
-      const mutations = await runMigration(doc);
-      const patchMutation = mutations.find(isPatch);
-
-      if (!patchMutation) throw new Error('Expected a patch mutation.');
-
-      const itemsPatch = patchMutation.patches[0] as {
-        op: { value: { _key: string }[] };
-      };
-      const nextItems = itemsPatch.op.value;
-
-      expect(nextItems[0]).toEqual({
-        _key: 'existing',
-        _type: 'linkRef',
-        link: { _type: 'reference', _ref: 'link-existing' },
+    it('keeps an already-migrated item as is alongside a legacy one', async () => {
+      const existingItem = mockLinkRef(MOCK_FIRST_KEY);
+      const document = mockMigrationDocument({
+        _type: NAVIGATION_TYPE,
+        items: [existingItem, mockLegacyLink({ _key: MOCK_SECOND_KEY })],
       });
-      expect(nextItems[1]).toMatchObject({
-        _key: 'legacy',
-        _type: 'linkRef',
-      });
+
+      const mutations = await migrate(document);
+      const [linkId = ''] = readLinkIds(mutations);
+
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_FIRST_URL}`,
+          label: MOCK_FIRST_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_FIRST_URL,
+        }),
+        patch(document._id, [
+          at(
+            'items',
+            set([
+              existingItem,
+              {
+                _key: MOCK_SECOND_KEY,
+                _type: LINK_REF_TYPE,
+                link: { _type: REFERENCE_TYPE, _ref: linkId },
+              },
+            ]),
+          ),
+        ]),
+      ]);
     });
 
     describe('with unresolvable items', () => {
-      let warnSpy: MockInstance<typeof console.warn>;
+      it.each([
+        {
+          title: 'an item has an unrecognized _type',
+          item: mockLegacyLink({
+            _key: MOCK_FIRST_KEY,
+            _type: MOCK_UNKNOWN_TYPE,
+          }),
+          issue: `a link entry (key "${MOCK_FIRST_KEY}") has _type "${MOCK_UNKNOWN_TYPE}", neither "link" nor "inlineLink"`,
+        },
+        {
+          title: 'an item has no resolvable destination',
+          item: mockLegacyLink({
+            _key: MOCK_FIRST_KEY,
+            linkType: undefined,
+            url: undefined,
+          }),
+          issue: `a link entry (key "${MOCK_FIRST_KEY}") has no resolvable destination (neither internalReference nor url set)`,
+        },
+        {
+          title: 'an item url is a relative path',
+          item: mockLegacyLink({
+            _key: MOCK_FIRST_KEY,
+            url: MOCK_RELATIVE_URL,
+          }),
+          issue: `a link entry (key "${MOCK_FIRST_KEY}")'s url "${MOCK_RELATIVE_URL}" is not a full http(s) address with a host — the new link.url requires one`,
+        },
+      ])(
+        'warns and leaves the document untouched when $title',
+        async ({ item, issue }) => {
+          const document = mockMigrationDocument({
+            _type: NAVIGATION_TYPE,
+            items: [item],
+          });
 
-      beforeEach(() => {
-        warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      });
+          const mutations = await migrate(document);
 
-      afterEach(() => {
-        warnSpy.mockRestore();
-      });
+          expect(mutations).toEqual([]);
+          expect(warnSpy).toHaveBeenCalledExactlyOnceWith(
+            skippedWarning(document._id, issue),
+          );
+        },
+      );
 
-      it('warns and leaves the document untouched when an item has an unrecognized _type', async () => {
-        const doc = {
-          ...baseDoc,
-          _id: 'nav-5',
-          _type: 'settings_navigation',
+      it('leaves the whole document untouched when only one entry is unresolvable', async () => {
+        const document = mockMigrationDocument({
+          _type: NAVIGATION_TYPE,
           items: [
-            {
-              _key: 'legacy',
-              _type: 'someOtherType',
-              label: 'Mystery',
-            },
+            mockLegacyLink({ _key: MOCK_FIRST_KEY }),
+            mockLegacyLink({
+              _key: MOCK_SECOND_KEY,
+              url: MOCK_RELATIVE_URL,
+            }),
           ],
-        };
+        });
 
-        const mutations = await runMigration(doc);
+        const mutations = await migrate(document);
 
         expect(mutations).toEqual([]);
-        expect(warnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('neither "link" nor "inlineLink"'),
+        expect(warnSpy).toHaveBeenCalledExactlyOnceWith(
+          skippedWarning(
+            document._id,
+            `a link entry (key "${MOCK_SECOND_KEY}")'s url "${MOCK_RELATIVE_URL}" is not a full http(s) address with a host — the new link.url requires one`,
+          ),
         );
-        expect(warnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('The document was left untouched'),
-        );
-      });
-
-      it('warns and leaves the document untouched when an item has no resolvable destination', async () => {
-        const doc = {
-          ...baseDoc,
-          _id: 'nav-6',
-          _type: 'settings_navigation',
-          items: [
-            {
-              _key: 'legacy',
-              _type: 'link',
-              label: 'Nowhere',
-            },
-          ],
-        };
-
-        const mutations = await runMigration(doc);
-
-        expect(mutations).toEqual([]);
-        expect(warnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('no resolvable destination'),
-        );
-        expect(warnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('The document was left untouched'),
-        );
-      });
-
-      it('warns and leaves the document untouched when an item has a url that is a relative path rather than a full address', async () => {
-        const doc = {
-          ...baseDoc,
-          _id: 'nav-4',
-          _type: 'settings_navigation',
-          items: [
-            {
-              _key: 'legacy',
-              _type: 'link',
-              label: 'Old Blog',
-              linkType: 'EXTERNAL',
-              url: '/blog',
-            },
-          ],
-        };
-
-        const mutations = await runMigration(doc);
-
-        expect(mutations).toEqual([]);
-        expect(warnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('is not a full http(s) address'),
-        );
-        expect(warnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('The document was left untouched'),
-        );
-      });
-
-      it('leaves the whole document untouched even when only one of several entries is unresolvable', async () => {
-        const doc = {
-          ...baseDoc,
-          _id: 'nav-7',
-          _type: 'settings_navigation',
-          items: [
-            {
-              _key: 'good',
-              _type: 'link',
-              label: 'Contact',
-              linkType: 'EXTERNAL',
-              url: 'https://example.com/contact',
-            },
-            {
-              _key: 'bad',
-              _type: 'link',
-              label: 'Old Blog',
-              linkType: 'EXTERNAL',
-              url: '/blog',
-            },
-          ],
-        };
-
-        const mutations = await runMigration(doc);
-
-        expect(mutations).toEqual([]);
       });
     });
   });
 
-  describe('settings_footer', () => {
-    it('returns nothing when there is no social field', async () => {
-      const doc = { ...baseDoc, _id: 'footer-1', _type: 'settings_footer' };
+  describe(FOOTER_TYPE, () => {
+    it.each([
+      { title: 'there is no social field', fields: {} },
+      {
+        title: 'every entry is already a socialProfile',
+        fields: { social: [mockSocialProfile(MOCK_FIRST_KEY)] },
+      },
+    ])('returns nothing when $title', async ({ fields }) => {
+      const document = mockMigrationDocument({ _type: FOOTER_TYPE, ...fields });
 
-      expect(await runMigration(doc)).toEqual([]);
+      expect(await migrate(document)).toEqual([]);
     });
 
-    it('returns nothing when every entry is already a socialProfile', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'footer-1',
-        _type: 'settings_footer',
+    it('migrates a social entry to a socialProfile and warns about the dropped accessibleLabel', async () => {
+      const document = mockMigrationDocument({
+        _type: FOOTER_TYPE,
         social: [
-          {
-            _key: 'social-1',
-            _type: 'socialProfile',
-            platform: 'LINKEDIN',
-            link: { _type: 'reference', _ref: 'link-existing' },
-          },
-        ],
-      };
-
-      expect(await runMigration(doc)).toEqual([]);
-    });
-
-    it('migrates the live Linkedin entry to a socialProfile, dropping accessibleLabel', async () => {
-      const doc = {
-        ...baseDoc,
-        _id: 'settings-footer-singleton',
-        _type: 'settings_footer',
-        social: [
-          {
-            _key: 'decf174815c0',
-            _type: 'link',
-            label: 'Linkedin',
-            accessibleLabel: 'Linkedin profile',
-            linkType: 'EXTERNAL',
-            url: 'https://www.linkedin.com/in/val-ovinnikov',
+          mockLegacyLink({
+            _key: MOCK_FIRST_KEY,
+            accessibleLabel: MOCK_ACCESSIBLE_LABEL,
             openInNewTab: true,
-            platform: 'LINKEDIN',
-          },
+            platform: SOCIAL_PLATFORMS.LINKEDIN,
+          }),
         ],
-      };
-
-      const mutations = await runMigration(doc);
-      const createMutation = mutations.find(isCreateIfNotExists);
-      const patchMutation = mutations.find(isPatch);
-
-      expect(createMutation?.document).toEqual({
-        _id: expect.stringMatching(/^link-[a-f0-9]{16}$/) as string,
-        _type: 'link',
-        title: 'Link to https://www.linkedin.com/in/val-ovinnikov',
-        label: 'Linkedin',
-        linkType: 'EXTERNAL',
-        openInNewTab: true,
-        url: 'https://www.linkedin.com/in/val-ovinnikov',
       });
-      expect(createMutation?.document).not.toHaveProperty('accessibleLabel');
 
-      const linkId = createMutation?.document._id;
+      const mutations = await migrate(document);
+      const [linkId = ''] = readLinkIds(mutations);
 
-      expect(patchMutation).toEqual(
-        patch('settings-footer-singleton', [
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_FIRST_URL}`,
+          label: MOCK_FIRST_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          openInNewTab: true,
+          url: MOCK_FIRST_URL,
+        }),
+        patch(document._id, [
           at(
             'social',
             set([
               {
-                _key: 'decf174815c0',
-                _type: 'socialProfile',
-                platform: 'LINKEDIN',
-                link: { _type: 'reference', _ref: linkId },
+                _key: MOCK_FIRST_KEY,
+                _type: SOCIAL_PROFILE_TYPE,
+                platform: SOCIAL_PLATFORMS.LINKEDIN,
+                link: { _type: REFERENCE_TYPE, _ref: linkId },
               },
             ]),
           ),
         ]),
+      ]);
+      expect(warnSpy).toHaveBeenCalledExactlyOnceWith(
+        `${document._id}: link entry accessibleLabel "${MOCK_ACCESSIBLE_LABEL}" has no field on the link document and was dropped.`,
       );
     });
 
-    it('dedupes two social entries sharing one destination and label onto a single link document', async () => {
-      const sharedFields = {
-        label: 'Linkedin',
-        linkType: 'EXTERNAL' as const,
-        url: 'https://www.linkedin.com/in/val-ovinnikov',
-        platform: 'LINKEDIN',
-      };
-
-      const doc = {
-        ...baseDoc,
-        _id: 'footer-2',
-        _type: 'settings_footer',
+    it('creates one link for two social entries sharing a destination and label', async () => {
+      const sharedFields = { platform: SOCIAL_PLATFORMS.LINKEDIN };
+      const document = mockMigrationDocument({
+        _type: FOOTER_TYPE,
         social: [
-          { _key: 'social-1', _type: 'link', ...sharedFields },
-          { _key: 'social-2', _type: 'link', ...sharedFields },
+          mockLegacyLink({ _key: MOCK_FIRST_KEY, ...sharedFields }),
+          mockLegacyLink({ _key: MOCK_SECOND_KEY, ...sharedFields }),
         ],
-      };
+      });
 
-      const mutations = await runMigration(doc);
+      const mutations = await migrate(document);
+      const [linkId = ''] = readLinkIds(mutations);
 
-      expect(mutations.filter(isCreateIfNotExists)).toHaveLength(1);
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_FIRST_URL}`,
+          label: MOCK_FIRST_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_FIRST_URL,
+        }),
+        patch(document._id, [
+          at(
+            'social',
+            set([
+              {
+                _key: MOCK_FIRST_KEY,
+                _type: SOCIAL_PROFILE_TYPE,
+                platform: SOCIAL_PLATFORMS.LINKEDIN,
+                link: { _type: REFERENCE_TYPE, _ref: linkId },
+              },
+              {
+                _key: MOCK_SECOND_KEY,
+                _type: SOCIAL_PROFILE_TYPE,
+                platform: SOCIAL_PLATFORMS.LINKEDIN,
+                link: { _type: REFERENCE_TYPE, _ref: linkId },
+              },
+            ]),
+          ),
+        ]),
+      ]);
     });
 
     it('warns when platform is missing but still migrates the entry', async () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const document = mockMigrationDocument({
+        _type: FOOTER_TYPE,
+        social: [mockLegacyLink({ _key: MOCK_FIRST_KEY })],
+      });
 
-      const doc = {
-        ...baseDoc,
-        _id: 'footer-3',
-        _type: 'settings_footer',
-        social: [
-          {
-            _key: 'social-1',
-            _type: 'link',
-            label: 'Mystery',
-            linkType: 'EXTERNAL',
-            url: 'https://example.com/mystery',
-          },
-        ],
-      };
+      const mutations = await migrate(document);
+      const [linkId = ''] = readLinkIds(mutations);
 
-      const mutations = await runMigration(doc);
-
-      expect(mutations.filter(isCreateIfNotExists)).toHaveLength(1);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('has no platform set'),
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: LINK_DOCUMENT_TYPE,
+          title: `Link to ${MOCK_FIRST_URL}`,
+          label: MOCK_FIRST_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_FIRST_URL,
+        }),
+        patch(document._id, [
+          at(
+            'social',
+            set([
+              {
+                _key: MOCK_FIRST_KEY,
+                _type: SOCIAL_PROFILE_TYPE,
+                link: { _type: REFERENCE_TYPE, _ref: linkId },
+              },
+            ]),
+          ),
+        ]),
+      ]);
+      expect(warnSpy).toHaveBeenCalledExactlyOnceWith(
+        `${document._id}: a social link entry has no platform set — the new socialProfile.platform is required and was left empty.`,
       );
-
-      warnSpy.mockRestore();
     });
   });
 });

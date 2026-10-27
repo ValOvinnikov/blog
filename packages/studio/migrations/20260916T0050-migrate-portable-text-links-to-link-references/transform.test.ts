@@ -1,4 +1,18 @@
-import type { MigrationContext } from 'sanity/migrate';
+import { LINK_TYPE } from '@blog/config/constants';
+import { mockMigrationContext } from '@blog/studio/testing/migrations/migration-document';
+import {
+  MOCK_EXTERNAL_HOSTNAME,
+  MOCK_EXTERNAL_LABEL,
+  MOCK_EXTERNAL_PATH,
+  MOCK_EXTERNAL_URL,
+  mockInlineLinkMarkDef,
+  mockLinkRefMarkDef,
+  mockPagePost,
+  mockPortableTextBlock,
+  mockRawHrefMarkDef,
+  mockSpan,
+} from '@blog/studio/testing/migrations/portable-text-links';
+import { faker } from '@faker-js/faker';
 
 import { LINK_LABEL_MAX_LENGTH } from '../lib/link-label-max-length';
 
@@ -10,382 +24,362 @@ import {
   findLegacyLinkBlocks,
   resolveInlineLinkDestination,
   resolveRawHrefDestination,
-  type TBlock,
   type TInlineLinkMarkDef,
 } from './transform';
 
-const createMockContext = (
-  postsBySlug: Record<string, { _id: string; title?: string } | undefined> = {},
-  titlesByRef: Record<string, string | undefined> = {},
-): MigrationContext => {
-  const fetch = async (query: string, params: unknown) => {
-    if (query.includes('slug.current')) {
-      const slug = (params as { slug: string }).slug;
-      const post = postsBySlug[slug];
+faker.seed(6019);
 
-      return post ? [post] : [];
-    }
+const MOCK_POST = mockPagePost();
+const MOCK_CONTENT_FIELD = 'content';
+const MOCK_LINK_REF_TYPE = 'linkRef';
 
-    const ref = (params as { ref: string }).ref;
-
-    return { title: titlesByRef[ref] };
-  };
-
-  return { client: { fetch } } as unknown as MigrationContext;
-};
+const toLinkRefMarkDef = (key: string, linkId: string) => ({
+  _key: key,
+  _type: MOCK_LINK_REF_TYPE,
+  link: { _type: 'reference', _ref: linkId },
+});
 
 describe(deriveExternalLabel, () => {
-  it('joins hostname and pathname, dropping a leading www.', () => {
-    expect(deriveExternalLabel('https://www.example.com/pricing')).toBe(
-      'example.com/pricing',
-    );
-  });
+  const MOCK_NOT_A_URL = faker.lorem.word();
 
-  it('drops the pathname when it is just the root', () => {
-    expect(deriveExternalLabel('https://example.com/')).toBe('example.com');
-  });
-
-  it('falls back to the hostname when the full label is too long', () => {
-    const url = `https://example.com/${'a'.repeat(LINK_LABEL_MAX_LENGTH)}`;
-
-    expect(deriveExternalLabel(url)).toBe('example.com');
+  it.each([
+    {
+      name: 'joins hostname and pathname',
+      url: MOCK_EXTERNAL_URL,
+      label: MOCK_EXTERNAL_LABEL,
+    },
+    {
+      name: 'drops a leading www.',
+      url: `https://www.${MOCK_EXTERNAL_HOSTNAME}${MOCK_EXTERNAL_PATH}`,
+      label: MOCK_EXTERNAL_LABEL,
+    },
+    {
+      name: 'drops a root-only pathname',
+      url: `https://${MOCK_EXTERNAL_HOSTNAME}/`,
+      label: MOCK_EXTERNAL_HOSTNAME,
+    },
+    {
+      name: 'falls back to the hostname when the full label is too long',
+      url: `https://${MOCK_EXTERNAL_HOSTNAME}/${'a'.repeat(LINK_LABEL_MAX_LENGTH)}`,
+      label: MOCK_EXTERNAL_HOSTNAME,
+    },
+    {
+      name: 'uses the input itself when it is not a URL',
+      url: MOCK_NOT_A_URL,
+      label: MOCK_NOT_A_URL,
+    },
+  ])('$name', ({ url, label }) => {
+    expect(deriveExternalLabel(url)).toBe(label);
   });
 });
 
 describe(resolveRawHrefDestination, () => {
-  let context: MigrationContext;
-
-  beforeEach(() => {
-    context = createMockContext();
-  });
+  const postContext = mockMigrationContext([MOCK_POST]);
 
   it('resolves a /blog/<slug> href to the matching page_post', async () => {
-    const postContext = createMockContext({
-      'understanding-groq': { _id: 'page-post-1', title: 'Understanding GROQ' },
-    });
-
     const destination = await resolveRawHrefDestination(
       postContext,
-      '/blog/understanding-groq',
+      `/blog/${MOCK_POST.slug.current}`,
     );
 
     expect(destination).toEqual({
-      linkType: 'INTERNAL',
-      internalReference: { _ref: 'page-post-1' },
-      title: 'Link to Understanding GROQ',
-      label: 'Understanding GROQ',
+      linkType: LINK_TYPE.INTERNAL,
+      internalReference: { _ref: MOCK_POST._id },
+      title: `Link to ${MOCK_POST.title}`,
+      label: MOCK_POST.title,
     });
   });
 
-  it('is undefined for a /blog/<slug> href matching no page_post', async () => {
+  it('prefers the published page_post over its draft', async () => {
+    const draft = {
+      ...MOCK_POST,
+      _id: `drafts.${MOCK_POST._id}`,
+      title: faker.lorem.words(3),
+    };
+    const context = mockMigrationContext([draft, MOCK_POST]);
+
     const destination = await resolveRawHrefDestination(
       context,
-      '/blog/nothing-merges-on-vibes',
+      `/blog/${MOCK_POST.slug.current}`,
     );
 
-    expect(destination).toBeUndefined();
+    expect(destination).toEqual({
+      linkType: LINK_TYPE.INTERNAL,
+      internalReference: { _ref: MOCK_POST._id },
+      title: `Link to ${MOCK_POST.title}`,
+      label: MOCK_POST.title,
+    });
   });
 
   it('resolves a full https:// URL to an external destination', async () => {
     const destination = await resolveRawHrefDestination(
-      context,
-      'https://github.com/FormidableLabs/groqd',
+      postContext,
+      MOCK_EXTERNAL_URL,
     );
 
     expect(destination).toEqual({
-      linkType: 'EXTERNAL',
-      url: 'https://github.com/FormidableLabs/groqd',
-      title: 'Link to https://github.com/FormidableLabs/groqd',
-      label: 'github.com/FormidableLabs/groqd',
+      linkType: LINK_TYPE.EXTERNAL,
+      url: MOCK_EXTERNAL_URL,
+      title: `Link to ${MOCK_EXTERNAL_URL}`,
+      label: MOCK_EXTERNAL_LABEL,
     });
   });
 
-  it('is undefined for an empty href', async () => {
-    expect(await resolveRawHrefDestination(context, undefined)).toBeUndefined();
+  it.each([
+    {
+      name: 'a /blog/<slug> href matching no page_post',
+      href: `/blog/${faker.lorem.slug(3)}`,
+    },
+    { name: 'an empty href', href: undefined },
+    { name: 'a relative path that is not a blog post', href: '/about' },
+  ])('is undefined for $name', async ({ href }) => {
+    const destination = await resolveRawHrefDestination(postContext, href);
+
+    expect(destination).toBeUndefined();
   });
 });
 
 describe(resolveInlineLinkDestination, () => {
-  let context: MigrationContext;
-
-  beforeEach(() => {
-    context = createMockContext();
-  });
-
   it('resolves an internal inlineLink, preferring its own label', async () => {
-    const titledContext = createMockContext(
-      {},
-      { 'page-post-1': 'Understanding GROQ' },
-    );
-    const markDef: TInlineLinkMarkDef = {
-      _key: 'mark-1',
-      _type: 'inlineLink',
-      label: 'Read this',
-      linkType: 'INTERNAL',
-      internalReference: { _ref: 'page-post-1' },
-    };
+    const label = faker.lorem.words(2);
+    const markDef = mockInlineLinkMarkDef({
+      label,
+      linkType: LINK_TYPE.INTERNAL,
+      internalReference: { _ref: MOCK_POST._id },
+    }) as TInlineLinkMarkDef;
 
     const destination = await resolveInlineLinkDestination(
-      titledContext,
+      mockMigrationContext([MOCK_POST]),
       markDef,
     );
 
     expect(destination).toEqual({
-      linkType: 'INTERNAL',
-      internalReference: { _ref: 'page-post-1' },
-      title: 'Link to Understanding GROQ',
-      label: 'Read this',
+      linkType: LINK_TYPE.INTERNAL,
+      internalReference: { _ref: MOCK_POST._id },
+      title: `Link to ${MOCK_POST.title}`,
+      label,
     });
   });
 
   it('resolves an external inlineLink, deriving a label when none is set', async () => {
-    const markDef: TInlineLinkMarkDef = {
-      _key: 'mark-1',
-      _type: 'inlineLink',
-      linkType: 'EXTERNAL',
-      url: 'https://example.com/pricing',
-    };
+    const markDef = mockInlineLinkMarkDef({
+      linkType: LINK_TYPE.EXTERNAL,
+      url: MOCK_EXTERNAL_URL,
+    }) as TInlineLinkMarkDef;
 
-    const destination = await resolveInlineLinkDestination(context, markDef);
+    const destination = await resolveInlineLinkDestination(
+      mockMigrationContext(),
+      markDef,
+    );
 
     expect(destination).toEqual({
-      linkType: 'EXTERNAL',
-      url: 'https://example.com/pricing',
-      title: 'Link to https://example.com/pricing',
-      label: 'example.com/pricing',
+      linkType: LINK_TYPE.EXTERNAL,
+      url: MOCK_EXTERNAL_URL,
+      title: `Link to ${MOCK_EXTERNAL_URL}`,
+      label: MOCK_EXTERNAL_LABEL,
     });
   });
 
   it('is undefined for an internal inlineLink with no internalReference', async () => {
-    const markDef: TInlineLinkMarkDef = {
-      _key: 'mark-1',
-      _type: 'inlineLink',
-      linkType: 'INTERNAL',
-    };
+    const markDef = mockInlineLinkMarkDef({
+      linkType: LINK_TYPE.INTERNAL,
+    }) as TInlineLinkMarkDef;
 
-    expect(
-      await resolveInlineLinkDestination(context, markDef),
-    ).toBeUndefined();
+    const destination = await resolveInlineLinkDestination(
+      mockMigrationContext(),
+      markDef,
+    );
+
+    expect(destination).toBeUndefined();
   });
 });
 
 describe(buildLinkDocumentFields, () => {
-  it('carries internalReference for an INTERNAL destination', () => {
-    const fields = buildLinkDocumentFields('link-abc123', {
-      linkType: 'INTERNAL',
-      internalReference: { _ref: 'page-post-1' },
-      title: 'Link to Understanding GROQ',
-      label: 'Understanding GROQ',
-    });
+  const linkId = faker.string.uuid();
+  const internalTitle = `Link to ${MOCK_POST.title}`;
+  const externalTitle = `Link to ${MOCK_EXTERNAL_URL}`;
 
-    expect(fields).toEqual({
-      _id: 'link-abc123',
-      _type: 'link',
-      title: 'Link to Understanding GROQ',
-      label: 'Understanding GROQ',
-      linkType: 'INTERNAL',
-      internalReference: { _type: 'reference', _ref: 'page-post-1' },
-    });
-  });
-
-  it('carries url for an EXTERNAL destination', () => {
-    const fields = buildLinkDocumentFields('link-def456', {
-      linkType: 'EXTERNAL',
-      url: 'https://github.com/FormidableLabs/groqd',
-      title: 'Link to https://github.com/FormidableLabs/groqd',
-      label: 'github.com/FormidableLabs/groqd',
-    });
-
-    expect(fields).toEqual({
-      _id: 'link-def456',
-      _type: 'link',
-      title: 'Link to https://github.com/FormidableLabs/groqd',
-      label: 'github.com/FormidableLabs/groqd',
-      linkType: 'EXTERNAL',
-      url: 'https://github.com/FormidableLabs/groqd',
-    });
+  it.each([
+    {
+      name: 'carries internalReference for an INTERNAL destination',
+      destination: {
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _ref: MOCK_POST._id },
+        title: internalTitle,
+        label: MOCK_POST.title,
+      },
+      expected: {
+        _id: linkId,
+        _type: 'link',
+        title: internalTitle,
+        label: MOCK_POST.title,
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: 'reference', _ref: MOCK_POST._id },
+      },
+    },
+    {
+      name: 'carries url for an EXTERNAL destination',
+      destination: {
+        linkType: LINK_TYPE.EXTERNAL,
+        url: MOCK_EXTERNAL_URL,
+        title: externalTitle,
+        label: MOCK_EXTERNAL_LABEL,
+      },
+      expected: {
+        _id: linkId,
+        _type: 'link',
+        title: externalTitle,
+        label: MOCK_EXTERNAL_LABEL,
+        linkType: LINK_TYPE.EXTERNAL,
+        url: MOCK_EXTERNAL_URL,
+      },
+    },
+  ])('$name', ({ destination, expected }) => {
+    expect(buildLinkDocumentFields(linkId, destination)).toEqual(expected);
   });
 });
 
 describe(describeMarkDef, () => {
-  it('describes a raw-href markDef by its href', () => {
-    expect(
-      describeMarkDef({ _key: 'mark-1', _type: 'link', href: '/blog/missing' }),
-    ).toBe('/blog/missing');
-  });
+  const internalRef = faker.string.uuid();
 
-  it('describes an inlineLink markDef by its url', () => {
-    expect(
-      describeMarkDef({
-        _key: 'mark-1',
-        _type: 'inlineLink',
-        linkType: 'EXTERNAL',
-        url: 'https://example.com',
+  it.each([
+    {
+      name: 'a raw-href markDef by its href',
+      markDef: mockRawHrefMarkDef(MOCK_EXTERNAL_URL),
+      description: MOCK_EXTERNAL_URL,
+    },
+    {
+      name: 'an inlineLink markDef by its url',
+      markDef: mockInlineLinkMarkDef({ url: MOCK_EXTERNAL_URL }),
+      description: MOCK_EXTERNAL_URL,
+    },
+    {
+      name: 'an inlineLink markDef by its internal reference',
+      markDef: mockInlineLinkMarkDef({
+        internalReference: { _ref: internalRef },
       }),
-    ).toBe('https://example.com');
-  });
-
-  it('falls back when neither href nor url/internalReference is set', () => {
-    expect(describeMarkDef({ _key: 'mark-1', _type: 'link' })).toBe(
-      '(no href set)',
-    );
+      description: internalRef,
+    },
+    {
+      name: 'a raw-href markDef with no href',
+      markDef: mockRawHrefMarkDef(),
+      description: '(no href set)',
+    },
+    {
+      name: 'an inlineLink markDef with no destination',
+      markDef: mockInlineLinkMarkDef(),
+      description: '(no destination set)',
+    },
+  ])('describes $name', ({ markDef, description }) => {
+    expect(describeMarkDef(markDef)).toBe(description);
   });
 });
 
 describe(findLegacyLinkBlocks, () => {
   it('finds a block with a legacy markDef at a top-level field', () => {
-    const doc = {
-      _id: 'post-1',
-      _type: 'page_post',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [{ _key: 'mark-1', _type: 'link', href: '/blog/a' }],
-          children: [],
-        },
-      ],
-    };
+    const block = mockPortableTextBlock({ markDefs: [mockRawHrefMarkDef()] });
+    const document = { [MOCK_CONTENT_FIELD]: [block] };
 
-    const locations = findLegacyLinkBlocks(doc);
+    const locations = findLegacyLinkBlocks(document);
 
-    expect(locations).toHaveLength(1);
-    expect(locations[0]?.path).toEqual(['content', { _key: 'block-1' }]);
-  });
-
-  it('finds a block nested inside an aside object', () => {
-    const doc = {
-      _id: 'post-1',
-      _type: 'page_post',
-      content: [
-        {
-          _key: 'aside-1',
-          _type: 'aside',
-          kind: 'tip',
-          body: [
-            {
-              _key: 'block-1',
-              _type: 'block',
-              markDefs: [{ _key: 'mark-1', _type: 'link', href: '/blog/a' }],
-              children: [],
-            },
-          ],
-        },
-      ],
-    };
-
-    const locations = findLegacyLinkBlocks(doc);
-
-    expect(locations).toHaveLength(1);
-    expect(locations[0]?.path).toEqual([
-      'content',
-      { _key: 'aside-1' },
-      'body',
-      { _key: 'block-1' },
+    expect(locations).toEqual([
+      { path: [MOCK_CONTENT_FIELD, { _key: block._key }], block },
     ]);
   });
 
-  it('ignores a block whose markDefs are already linkRef', () => {
-    const doc = {
-      _id: 'post-1',
-      _type: 'page_post',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            {
-              _key: 'mark-1',
-              _type: 'linkRef',
-              link: { _type: 'reference', _ref: 'link-1' },
-            },
-          ],
-          children: [],
-        },
-      ],
+  it('finds a block nested inside an aside object', () => {
+    const block = mockPortableTextBlock({ markDefs: [mockRawHrefMarkDef()] });
+    const asideKey = faker.string.alphanumeric(12);
+    const document = {
+      [MOCK_CONTENT_FIELD]: [{ _key: asideKey, _type: 'aside', body: [block] }],
     };
 
-    expect(findLegacyLinkBlocks(doc)).toEqual([]);
+    const locations = findLegacyLinkBlocks(document);
+
+    expect(locations).toEqual([
+      {
+        path: [
+          MOCK_CONTENT_FIELD,
+          { _key: asideKey },
+          'body',
+          { _key: block._key },
+        ],
+        block,
+      },
+    ]);
   });
 
-  it('ignores a block with no markDefs at all', () => {
-    const doc = {
-      _id: 'author-1',
-      _type: 'blog_author',
-      bio: [{ _key: 'block-1', _type: 'block', markDefs: [], children: [] }],
-    };
+  it.each([
+    {
+      name: 'whose markDefs are already linkRef',
+      block: mockPortableTextBlock({
+        markDefs: [mockLinkRefMarkDef(faker.string.uuid())],
+      }),
+    },
+    { name: 'with no markDefs', block: mockPortableTextBlock() },
+  ])('ignores a block $name', ({ block }) => {
+    const locations = findLegacyLinkBlocks({ [MOCK_CONTENT_FIELD]: [block] });
 
-    expect(findLegacyLinkBlocks(doc)).toEqual([]);
+    expect(locations).toEqual([]);
   });
 });
 
 describe(applyMarkDefOutcomes, () => {
-  const block: TBlock = {
-    _key: 'block-1',
-    _type: 'block',
-    markDefs: [
-      { _key: 'mark-1', _type: 'link', href: '/blog/a' },
-      { _key: 'mark-2', _type: 'link', href: '/blog/broken' },
-    ],
-    children: [
-      { _key: 'span-1', _type: 'span', text: 'a', marks: ['mark-1'] },
-      { _key: 'span-2', _type: 'span', text: 'b', marks: ['mark-2'] },
-      { _key: 'span-3', _type: 'span', text: 'c', marks: ['mark-1', 'mark-2'] },
-    ],
-  };
+  const keptMarkDef = mockRawHrefMarkDef();
+  const brokenMarkDef = mockRawHrefMarkDef();
+  const keptSpan = mockSpan(faker.lorem.word(), [keptMarkDef._key]);
+  const brokenSpan = mockSpan(faker.lorem.word(), [brokenMarkDef._key]);
+  const sharedSpan = mockSpan(faker.lorem.word(), [
+    keptMarkDef._key,
+    brokenMarkDef._key,
+  ]);
+  const block = mockPortableTextBlock({
+    markDefs: [keptMarkDef, brokenMarkDef],
+    children: [keptSpan, brokenSpan, sharedSpan],
+  });
+  const keptLinkId = faker.string.uuid();
+  const brokenLinkId = faker.string.uuid();
 
   it('converts a resolved markDef to linkRef, leaving its marks untouched', () => {
-    const { markDefs } = applyMarkDefOutcomes(block, [
-      { outcome: 'CONVERTED', key: 'mark-1', linkId: 'link-1' },
-      { outcome: 'CONVERTED', key: 'mark-2', linkId: 'link-2' },
+    const { markDefs, children } = applyMarkDefOutcomes(block, [
+      { outcome: 'CONVERTED', key: keptMarkDef._key, linkId: keptLinkId },
+      { outcome: 'CONVERTED', key: brokenMarkDef._key, linkId: brokenLinkId },
     ]);
 
     expect(markDefs).toEqual([
-      {
-        _key: 'mark-1',
-        _type: 'linkRef',
-        link: { _type: 'reference', _ref: 'link-1' },
-      },
-      {
-        _key: 'mark-2',
-        _type: 'linkRef',
-        link: { _type: 'reference', _ref: 'link-2' },
-      },
+      toLinkRefMarkDef(keptMarkDef._key, keptLinkId),
+      toLinkRefMarkDef(brokenMarkDef._key, brokenLinkId),
     ]);
+    expect(children).toEqual(block.children);
   });
 
   it('removes a stripped markDef and its mark reference from every span', () => {
     const { markDefs, children } = applyMarkDefOutcomes(block, [
-      { outcome: 'CONVERTED', key: 'mark-1', linkId: 'link-1' },
-      { outcome: 'STRIPPED', key: 'mark-2' },
+      { outcome: 'CONVERTED', key: keptMarkDef._key, linkId: keptLinkId },
+      { outcome: 'STRIPPED', key: brokenMarkDef._key },
     ]);
 
-    expect(markDefs).toEqual([
-      {
-        _key: 'mark-1',
-        _type: 'linkRef',
-        link: { _type: 'reference', _ref: 'link-1' },
-      },
-    ]);
+    expect(markDefs).toEqual([toLinkRefMarkDef(keptMarkDef._key, keptLinkId)]);
     expect(children).toEqual([
-      { _key: 'span-1', _type: 'span', text: 'a', marks: ['mark-1'] },
-      { _key: 'span-2', _type: 'span', text: 'b', marks: [] },
-      { _key: 'span-3', _type: 'span', text: 'c', marks: ['mark-1'] },
+      keptSpan,
+      { ...brokenSpan, marks: [] },
+      { ...sharedSpan, marks: [keptMarkDef._key] },
     ]);
   });
 
   it('leaves a span with no marks array untouched', () => {
-    const noMarksBlock: TBlock = {
-      _key: 'block-2',
-      _type: 'block',
-      markDefs: [],
-      children: [{ _key: 'span-1', _type: 'span', text: 'plain' }],
+    const spanWithoutMarks = {
+      _key: faker.string.alphanumeric(12),
+      _type: 'span',
+      text: faker.lorem.word(),
     };
+    const plainBlock = mockPortableTextBlock({ markDefs: [] });
 
-    const { children } = applyMarkDefOutcomes(noMarksBlock, []);
+    const { children } = applyMarkDefOutcomes(
+      { ...plainBlock, children: [spanWithoutMarks] },
+      [],
+    );
 
-    expect(children).toEqual([
-      { _key: 'span-1', _type: 'span', text: 'plain' },
-    ]);
+    expect(children).toEqual([spanWithoutMarks]);
   });
 });

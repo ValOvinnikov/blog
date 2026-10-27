@@ -1,389 +1,333 @@
+import { LINK_TYPE } from '@blog/config/constants';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/migrations/migration-document';
+import {
+  isCreateIfNotExistsMutation,
+  isPatchMutation,
+} from '@blog/studio/testing/migrations/mutation-guards';
+import {
+  MOCK_EXTERNAL_LABEL,
+  MOCK_EXTERNAL_URL,
+  mockInlineLinkMarkDef,
+  mockLinkRefMarkDef,
+  mockPagePost,
+  mockPortableTextBlock,
+  mockRawHrefMarkDef,
+  mockSpan,
+} from '@blog/studio/testing/migrations/portable-text-links';
+import { faker } from '@faker-js/faker';
+import type { SanityDocument } from 'sanity';
 import {
   at,
+  createIfNotExists,
   patch,
   set,
-  type CreateIfNotExistsMutation,
-  type MigrationContext,
+  type NodePatch,
+  type Path,
 } from 'sanity/migrate';
+import type { MockInstance } from 'vitest';
 
 import migration from './index';
 
-const documentHandler = migration.migrate.document;
+faker.seed(6019);
 
-if (!documentHandler) {
-  throw new Error('Expected the migration to define a document() handler.');
-}
+const MOCK_CONTENT_FIELD = 'content';
+const MARK_DEFS_FIELD = 'markDefs';
+const CHILDREN_FIELD = 'children';
 
-const createMockContext = (
-  postsBySlug: Record<string, { _id: string; title?: string } | undefined> = {},
-): MigrationContext => {
-  const fetch = async (query: string, params: unknown) => {
-    if (query.includes('slug.current')) {
-      const slug = (params as { slug: string }).slug;
-      const post = postsBySlug[slug];
-
-      return post ? [post] : [];
-    }
-
-    return { title: undefined };
-  };
-
-  return { client: { fetch } } as unknown as MigrationContext;
-};
-
-type TLinkDocument = {
-  _id: string;
-  _type: string;
-  title?: string;
-  label?: string;
-  linkType?: string;
-  internalReference?: { _ref: string };
-  url?: string;
-};
-
-const isCreateIfNotExists = (
-  mutation: unknown,
-): mutation is CreateIfNotExistsMutation<TLinkDocument> =>
-  typeof mutation === 'object' &&
-  mutation !== null &&
-  (mutation as { type?: string }).type === 'createIfNotExists';
-
-const isPatch = (mutation: unknown): mutation is ReturnType<typeof patch> =>
-  typeof mutation === 'object' &&
-  mutation !== null &&
-  (mutation as { type?: string }).type === 'patch';
-
-type TTestDocument = {
-  _id: string;
-  _type: string;
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  [key: string]: unknown;
-};
-
-const runMigration = async (
-  doc: TTestDocument,
-  context: MigrationContext,
+const migrate = async (
+  document: SanityDocument,
+  dataset: unknown[] = [],
 ): Promise<unknown[]> =>
-  ((await documentHandler(doc, context)) ?? []) as unknown[];
+  (await runDocumentMigration(
+    migration,
+    document,
+    mockMigrationContext(dataset),
+  )) as unknown[];
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-  _type: 'page_post',
+const toBlockPath = (blockKey: string, field: string): Path => [
+  MOCK_CONTENT_FIELD,
+  { _key: blockKey },
+  field,
+];
+
+const toLinkRefMarkDef = (key: string, linkId: string) => ({
+  _key: key,
+  _type: 'linkRef',
+  link: { _type: 'reference', _ref: linkId },
+});
+
+const getCreatedLinkId = (mutations: unknown[]): string => {
+  const createMutation = mutations.find(isCreateIfNotExistsMutation);
+
+  if (!createMutation)
+    throw new Error('Expected a createIfNotExists mutation.');
+
+  return createMutation.document._id;
 };
 
-describe('migrate-portable-text-links-to-link-references wiring', () => {
-  it('returns nothing for a document with no Portable Text field at all', async () => {
-    const doc = { ...baseDoc, _id: 'post-1' };
+describe('migrate-portable-text-links-to-link-references', () => {
+  let warnSpy: MockInstance;
 
-    expect(await runMigration(doc, createMockContext())).toEqual([]);
+  beforeEach(() => {
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
   });
 
-  it('returns nothing for a document whose blocks carry no markDefs', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
-      content: [
-        { _key: 'block-1', _type: 'block', markDefs: [], children: [] },
-      ],
-    };
-
-    expect(await runMigration(doc, createMockContext())).toEqual([]);
+  afterEach(() => {
+    warnSpy.mockRestore();
   });
 
-  it('is a no-op on a document already migrated to linkRef', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
+  it.each([
+    {
+      name: 'has no Portable Text field',
+      content: undefined,
+    },
+    {
+      name: 'has blocks carrying no markDefs',
+      content: [mockPortableTextBlock()],
+    },
+    {
+      name: 'is already migrated to linkRef',
       content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            {
-              _key: 'mark-1',
-              _type: 'linkRef',
-              link: { _type: 'reference', _ref: 'link-1' },
-            },
-          ],
-          children: [
-            { _key: 'span-1', _type: 'span', text: 'a', marks: ['mark-1'] },
-          ],
-        },
+        mockPortableTextBlock({
+          markDefs: [mockLinkRefMarkDef(faker.string.uuid())],
+        }),
       ],
-    };
-
-    expect(await runMigration(doc, createMockContext())).toEqual([]);
-  });
-
-  it('converts a resolvable /blog/<slug> href to a linkRef, seeding a link document', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            { _key: 'mark-1', _type: 'link', href: '/blog/understanding-groq' },
-          ],
-          children: [
-            {
-              _key: 'span-1',
-              _type: 'span',
-              text: 'read this',
-              marks: ['mark-1'],
-            },
-          ],
-        },
-      ],
-    };
-
-    const mutations = await runMigration(
-      doc,
-      createMockContext({
-        'understanding-groq': {
-          _id: 'page-post-1',
-          title: 'Understanding GROQ',
-        },
-      }),
-    );
-
-    const createMutations = mutations.filter(isCreateIfNotExists);
-    const patchMutation = mutations.find(isPatch);
-
-    expect(createMutations).toHaveLength(1);
-    expect(createMutations[0]?.document).toMatchObject({
-      _type: 'link',
-      title: 'Link to Understanding GROQ',
-      label: 'Understanding GROQ',
-      linkType: 'INTERNAL',
-      internalReference: { _type: 'reference', _ref: 'page-post-1' },
+    },
+  ])('leaves a document alone when it $name', async ({ content }) => {
+    const document = mockMigrationDocument({
+      _type: 'page_post',
+      [MOCK_CONTENT_FIELD]: content,
     });
 
-    const linkId = createMutations[0]?.document._id;
+    const mutations = await migrate(document);
 
-    if (!patchMutation) throw new Error('Expected a patch mutation.');
-
-    expect(patchMutation).toEqual(
-      patch('post-1', [
-        at(
-          ['content', { _key: 'block-1' }, 'markDefs'],
-          set([
-            {
-              _key: 'mark-1',
-              _type: 'linkRef',
-              link: { _type: 'reference', _ref: linkId },
-            },
-          ]),
-        ),
-        at(
-          ['content', { _key: 'block-1' }, 'children'],
-          set([
-            {
-              _key: 'span-1',
-              _type: 'span',
-              text: 'read this',
-              marks: ['mark-1'],
-            },
-          ]),
-        ),
-      ]),
-    );
+    expect(mutations).toEqual([]);
   });
 
-  it('strips a href resolving to no page_post, leaving the span text plain', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            {
-              _key: 'mark-1',
-              _type: 'link',
-              href: '/blog/nothing-merges-on-vibes',
-            },
-          ],
-          children: [
-            { _key: 'span-1', _type: 'span', text: 'gone', marks: ['mark-1'] },
-          ],
-        },
-      ],
-    };
+  describe('with a /blog/<slug> href', () => {
+    const post = mockPagePost();
+    const markDef = mockRawHrefMarkDef(`/blog/${post.slug.current}`);
+    const span = mockSpan(faker.lorem.words(2), [markDef._key]);
+    const block = mockPortableTextBlock({
+      markDefs: [markDef],
+      children: [span],
+    });
+    const document = mockMigrationDocument({
+      _type: 'page_post',
+      [MOCK_CONTENT_FIELD]: [block],
+    });
 
-    const mutations = await runMigration(doc, createMockContext());
+    it('seeds an internal link document and points the markDef at it', async () => {
+      const mutations = await migrate(document, [post]);
 
-    expect(mutations.filter(isCreateIfNotExists)).toHaveLength(0);
+      const linkId = getCreatedLinkId(mutations);
 
-    const patchMutation = mutations.find(isPatch);
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: 'link',
+          title: `Link to ${post.title}`,
+          label: post.title,
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: { _type: 'reference', _ref: post._id },
+        }),
+        patch(document._id, [
+          at(
+            toBlockPath(block._key, MARK_DEFS_FIELD),
+            set([toLinkRefMarkDef(markDef._key, linkId)]),
+          ),
+          at(toBlockPath(block._key, CHILDREN_FIELD), set([span])),
+        ]),
+      ]);
+    });
 
-    if (!patchMutation) throw new Error('Expected a patch mutation.');
+    it('warns about the link document it seeds', async () => {
+      const mutations = await migrate(document, [post]);
 
-    expect(patchMutation).toEqual(
-      patch('post-1', [
-        at(['content', { _key: 'block-1' }, 'markDefs'], set([])),
-        at(
-          ['content', { _key: 'block-1' }, 'children'],
-          set([{ _key: 'span-1', _type: 'span', text: 'gone', marks: [] }]),
-        ),
-      ]),
-    );
-  });
+      const linkId = getCreatedLinkId(mutations);
 
-  it('converts an external https:// href to a linkRef', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            {
-              _key: 'mark-1',
-              _type: 'link',
-              href: 'https://github.com/FormidableLabs/groqd',
-            },
-          ],
-          children: [
-            { _key: 'span-1', _type: 'span', text: 'groqd', marks: ['mark-1'] },
-          ],
-        },
-      ],
-    };
+      expect(warnSpy).toHaveBeenCalledWith(
+        `Seeding link "${linkId}" — label: "${post.title}", title: "Link to ${post.title}".`,
+      );
+    });
 
-    const mutations = await runMigration(doc, createMockContext());
-    const createMutation = mutations.find(isCreateIfNotExists);
+    it('strips the link when no post has that slug', async () => {
+      const mutations = await migrate(document);
 
-    expect(createMutation?.document).toMatchObject({
-      _type: 'link',
-      title: 'Link to https://github.com/FormidableLabs/groqd',
-      label: 'github.com/FormidableLabs/groqd',
-      linkType: 'EXTERNAL',
-      url: 'https://github.com/FormidableLabs/groqd',
+      expect(mutations).toEqual([
+        patch(document._id, [
+          at(toBlockPath(block._key, MARK_DEFS_FIELD), set([])),
+          at(
+            toBlockPath(block._key, CHILDREN_FIELD),
+            set([{ ...span, marks: [] }]),
+          ),
+        ]),
+      ]);
+    });
+
+    it('warns about the link it strips', async () => {
+      await migrate(document);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        `${document._id}: stripped a link with no resolvable destination (/blog/${post.slug.current}) — left as plain text.`,
+      );
+    });
+
+    it('seeds one link document for two blocks sharing the destination', async () => {
+      const secondMarkDef = mockRawHrefMarkDef(`/blog/${post.slug.current}`);
+      const secondSpan = mockSpan(faker.lorem.words(2), [secondMarkDef._key]);
+      const secondBlock = mockPortableTextBlock({
+        markDefs: [secondMarkDef],
+        children: [secondSpan],
+      });
+      const twoBlockDocument = mockMigrationDocument({
+        _type: 'page_post',
+        [MOCK_CONTENT_FIELD]: [block, secondBlock],
+      });
+
+      const mutations = await migrate(twoBlockDocument, [post]);
+
+      const linkId = getCreatedLinkId(mutations);
+
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: linkId,
+          _type: 'link',
+          title: `Link to ${post.title}`,
+          label: post.title,
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: { _type: 'reference', _ref: post._id },
+        }),
+        patch(twoBlockDocument._id, [
+          at(
+            toBlockPath(block._key, MARK_DEFS_FIELD),
+            set([toLinkRefMarkDef(markDef._key, linkId)]),
+          ),
+          at(toBlockPath(block._key, CHILDREN_FIELD), set([span])),
+          at(
+            toBlockPath(secondBlock._key, MARK_DEFS_FIELD),
+            set([toLinkRefMarkDef(secondMarkDef._key, linkId)]),
+          ),
+          at(toBlockPath(secondBlock._key, CHILDREN_FIELD), set([secondSpan])),
+        ]),
+      ]);
     });
   });
 
-  it('dedupes two blocks in one document sharing one destination onto one link document', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            { _key: 'mark-1', _type: 'link', href: '/blog/understanding-groq' },
-          ],
-          children: [
-            { _key: 'span-1', _type: 'span', text: 'a', marks: ['mark-1'] },
-          ],
-        },
-        {
-          _key: 'block-2',
-          _type: 'block',
-          markDefs: [
-            { _key: 'mark-2', _type: 'link', href: '/blog/understanding-groq' },
-          ],
-          children: [
-            { _key: 'span-2', _type: 'span', text: 'b', marks: ['mark-2'] },
-          ],
-        },
-      ],
-    };
+  describe('with an external href', () => {
+    it('seeds an external link document', async () => {
+      const markDef = mockRawHrefMarkDef(MOCK_EXTERNAL_URL);
+      const document = mockMigrationDocument({
+        _type: 'page_post',
+        [MOCK_CONTENT_FIELD]: [
+          mockPortableTextBlock({
+            markDefs: [markDef],
+            children: [mockSpan(faker.lorem.word(), [markDef._key])],
+          }),
+        ],
+      });
 
-    const mutations = await runMigration(
-      doc,
-      createMockContext({
-        'understanding-groq': {
-          _id: 'page-post-1',
-          title: 'Understanding GROQ',
-        },
-      }),
-    );
+      const mutations = await migrate(document);
 
-    expect(mutations.filter(isCreateIfNotExists)).toHaveLength(1);
-  });
+      const linkId = getCreatedLinkId(mutations);
+      const [createMutation] = mutations;
 
-  it('converts a legacy structured inlineLink markDef too', async () => {
-    const doc = {
-      ...baseDoc,
-      _type: 'module_cta',
-      _id: 'cta-1',
-      content: [
-        {
-          _key: 'block-1',
-          _type: 'block',
-          markDefs: [
-            {
-              _key: 'mark-1',
-              _type: 'inlineLink',
-              label: 'Get started',
-              linkType: 'EXTERNAL',
-              url: 'https://example.com/start',
-            },
-          ],
-          children: [
-            { _key: 'span-1', _type: 'span', text: 'go', marks: ['mark-1'] },
-          ],
-        },
-      ],
-    };
-
-    const mutations = await runMigration(doc, createMockContext());
-    const createMutation = mutations.find(isCreateIfNotExists);
-
-    expect(createMutation?.document).toMatchObject({
-      _type: 'link',
-      label: 'Get started',
-      linkType: 'EXTERNAL',
-      url: 'https://example.com/start',
+      expect(createMutation).toEqual(
+        createIfNotExists({
+          _id: linkId,
+          _type: 'link',
+          title: `Link to ${MOCK_EXTERNAL_URL}`,
+          label: MOCK_EXTERNAL_LABEL,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_EXTERNAL_URL,
+        }),
+      );
     });
   });
 
-  it('resolves a block nested inside an aside object', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'post-1',
-      content: [
-        {
-          _key: 'aside-1',
-          _type: 'aside',
-          kind: 'tip',
-          body: [
-            {
-              _key: 'block-1',
-              _type: 'block',
-              markDefs: [
-                { _key: 'mark-1', _type: 'link', href: 'https://example.com' },
-              ],
-              children: [
-                { _key: 'span-1', _type: 'span', text: 'a', marks: ['mark-1'] },
-              ],
-            },
-          ],
-        },
-      ],
-    };
+  describe('with a structured inlineLink markDef', () => {
+    it('seeds a link document carrying the markDef label', async () => {
+      const label = faker.lorem.words(2);
+      const markDef = mockInlineLinkMarkDef({
+        label,
+        linkType: LINK_TYPE.EXTERNAL,
+        url: MOCK_EXTERNAL_URL,
+      });
+      const document = mockMigrationDocument({
+        _type: 'module_cta',
+        [MOCK_CONTENT_FIELD]: [
+          mockPortableTextBlock({
+            markDefs: [markDef],
+            children: [mockSpan(faker.lorem.word(), [markDef._key])],
+          }),
+        ],
+      });
 
-    const mutations = await runMigration(doc, createMockContext());
-    const patchMutation = mutations.find(isPatch);
+      const mutations = await migrate(document);
 
-    if (!patchMutation) throw new Error('Expected a patch mutation.');
+      const linkId = getCreatedLinkId(mutations);
+      const [createMutation] = mutations;
 
-    const paths = patchMutation.patches.map(
-      (nodePatch: { path: unknown }) => nodePatch.path,
-    );
+      expect(createMutation).toEqual(
+        createIfNotExists({
+          _id: linkId,
+          _type: 'link',
+          title: `Link to ${MOCK_EXTERNAL_URL}`,
+          label,
+          linkType: LINK_TYPE.EXTERNAL,
+          url: MOCK_EXTERNAL_URL,
+        }),
+      );
+    });
+  });
 
-    expect(paths).toEqual([
-      ['content', { _key: 'aside-1' }, 'body', { _key: 'block-1' }, 'markDefs'],
-      ['content', { _key: 'aside-1' }, 'body', { _key: 'block-1' }, 'children'],
-    ]);
+  describe('with a block nested inside an aside object', () => {
+    it('patches the nested block at its full path', async () => {
+      const markDef = mockRawHrefMarkDef(MOCK_EXTERNAL_URL);
+      const block = mockPortableTextBlock({
+        markDefs: [markDef],
+        children: [mockSpan(faker.lorem.word(), [markDef._key])],
+      });
+      const asideKey = faker.string.alphanumeric(12);
+      const document = mockMigrationDocument({
+        _type: 'page_post',
+        [MOCK_CONTENT_FIELD]: [
+          {
+            _key: asideKey,
+            _type: 'aside',
+            kind: faker.lorem.word(),
+            body: [block],
+          },
+        ],
+      });
+
+      const mutations = await migrate(document);
+
+      const patchMutation = mutations.find(isPatchMutation);
+      const paths = patchMutation?.patches.map(
+        (nodePatch: NodePatch) => nodePatch.path,
+      );
+
+      expect(paths).toEqual([
+        [
+          MOCK_CONTENT_FIELD,
+          { _key: asideKey },
+          'body',
+          { _key: block._key },
+          MARK_DEFS_FIELD,
+        ],
+        [
+          MOCK_CONTENT_FIELD,
+          { _key: asideKey },
+          'body',
+          { _key: block._key },
+          CHILDREN_FIELD,
+        ],
+      ]);
+    });
   });
 });
