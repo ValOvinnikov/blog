@@ -2,24 +2,29 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRawTagWithPostCount } from '@blog/service/testing/entities/fixtures';
 import { evaluateGroqIds } from '@blog/service/testing/shared/groq';
 import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { tagsQuery } from './query';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const BRAVO_TAG_ID = 'tag-bravo';
-const APEX_TAG_ID = 'tag-apex';
+faker.seed(6106);
+
+const MOCK_BRAVO_TAG_ID = faker.string.uuid();
+const MOCK_APEX_TAG_ID = faker.string.uuid();
+const MOCK_BRAVO_TITLES = { [EN]: 'Bravo', [NL]: 'Alef' };
+const MOCK_APEX_TITLES = { [EN]: 'Apex', [NL]: 'Zeta' };
 
 const TAG_DOCUMENTS = [
   {
-    _id: BRAVO_TAG_ID,
+    _id: MOCK_BRAVO_TAG_ID,
     _type: 'blog_tag',
-    title: mockLocalizedStrings({ [EN]: 'Bravo', [NL]: 'Alef' }),
+    title: mockLocalizedStrings(MOCK_BRAVO_TITLES),
   },
   {
-    _id: APEX_TAG_ID,
+    _id: MOCK_APEX_TAG_ID,
     _type: 'blog_tag',
-    title: mockLocalizedStrings({ [EN]: 'Apex', [NL]: 'Zeta' }),
+    title: mockLocalizedStrings(MOCK_APEX_TITLES),
   },
 ];
 
@@ -38,8 +43,12 @@ describe('tagsQuery', () => {
     expect(() => tagsQuery.parse([tag])).not.toThrow();
   });
 
-  it('orders tags by their title in the requested language', async () => {
-    expect(await idsIn(EN)).toEqual([APEX_TAG_ID, BRAVO_TAG_ID]);
-    expect(await idsIn(NL)).toEqual([BRAVO_TAG_ID, APEX_TAG_ID]);
+  it.each([
+    [EN, [MOCK_APEX_TAG_ID, MOCK_BRAVO_TAG_ID]],
+    [NL, [MOCK_BRAVO_TAG_ID, MOCK_APEX_TAG_ID]],
+  ])('orders tags by their %s title', async (locale, expectedIds) => {
+    const ids = await idsIn(locale);
+
+    expect(ids).toEqual(expectedIds);
   });
 });
