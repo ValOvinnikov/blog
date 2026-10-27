@@ -3,6 +3,10 @@ import { renderElement, screen, within } from '@web/testing/custom-render';
 
 import { DepthToggle } from './depth-toggle';
 
+const SKIM_OPTION = '30s';
+const READ_OPTION = 'Read';
+const DEEP_OPTION = 'Deep';
+
 const setup = (hasSkim: boolean, hasDeep: boolean) =>
   renderElement(
     <DepthProvider hasSkim={hasSkim} hasDeep={hasDeep}>
@@ -14,35 +18,36 @@ describe(`<${DepthToggle.name}/>`, () => {
   it('renders nothing when the post has neither a skim nor asides', () => {
     setup(false, false);
 
-    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    const group = screen.queryByRole('radiogroup');
+
+    expect(group).not.toBeInTheDocument();
   });
 
-  it('renders only Read and Deep when the post has no approved skim', () => {
-    setup(false, true);
+  it.each([
+    {
+      title: 'only Read and Deep when the post has no approved skim',
+      hasSkim: false,
+      hasDeep: true,
+      options: [READ_OPTION, DEEP_OPTION],
+    },
+    {
+      title: 'only Skim and Read when the post has no asides',
+      hasSkim: true,
+      hasDeep: false,
+      options: [SKIM_OPTION, READ_OPTION],
+    },
+    {
+      title: 'all three when the post has both a skim and asides',
+      hasSkim: true,
+      hasDeep: true,
+      options: [SKIM_OPTION, READ_OPTION, DEEP_OPTION],
+    },
+  ])('offers $title', ({ hasSkim, hasDeep, options }) => {
+    setup(hasSkim, hasDeep);
 
     const group = screen.getByRole('radiogroup', { name: 'Reading depth' });
-    expect(
-      screen.queryByRole('radio', { name: '30s' }),
-    ).not.toBeInTheDocument();
-    expect(within(group).getByRole('radio', { name: 'Read' })).toBeVisible();
-    expect(within(group).getByRole('radio', { name: 'Deep' })).toBeVisible();
-  });
+    const radios = within(group).getAllByRole('radio');
 
-  it('renders only Skim and Read when the post has no asides', () => {
-    setup(true, false);
-
-    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
-    expect(screen.getByRole('radio', { name: 'Read' })).toBeVisible();
-    expect(
-      screen.queryByRole('radio', { name: 'Deep' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders all three options when the post has both a skim and asides', () => {
-    setup(true, true);
-
-    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
-    expect(screen.getByRole('radio', { name: 'Read' })).toBeVisible();
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeVisible();
+    expect(radios.map((radio) => radio.textContent)).toEqual(options);
   });
 });

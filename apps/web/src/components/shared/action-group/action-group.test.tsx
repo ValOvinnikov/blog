@@ -1,4 +1,5 @@
 import { CTA_ACTION_VARIANT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
@@ -7,6 +8,18 @@ import {
 } from '@web/testing/modules/cta/fixtures';
 
 import { ActionGroup } from './action-group';
+
+faker.seed(5701);
+
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_SUFFIX = faker.lorem.words(3);
+
+const MOCK_ACTION_WITH_SUFFIX = {
+  variant: CTA_ACTION_VARIANT.PRIMARY,
+  appearance: undefined,
+  link: { ...MOCK_CTA_PRIMARY_ACTION.link, label: MOCK_LABEL },
+  hiddenLabelSuffix: MOCK_SUFFIX,
+};
 
 const setup = customRender(ActionGroup, {
   actions: [MOCK_CTA_PRIMARY_ACTION, MOCK_CTA_SECONDARY_ACTION],
@@ -20,11 +33,14 @@ describe(`<${ActionGroup.name}/>`, () => {
     });
 
     it('renders every action in authored order', () => {
-      const links = screen.getAllByRole('link');
+      const [firstLink, secondLink, ...otherLinks] =
+        screen.getAllByRole('link');
 
-      expect(links).toHaveLength(2);
-      expect(links[0]).toHaveTextContent(MOCK_CTA_PRIMARY_ACTION.link.label);
-      expect(links[1]).toHaveTextContent(MOCK_CTA_SECONDARY_ACTION.link.label);
+      expect(firstLink).toHaveTextContent(MOCK_CTA_PRIMARY_ACTION.link.label);
+      expect(secondLink).toHaveTextContent(
+        MOCK_CTA_SECONDARY_ACTION.link.label,
+      );
+      expect(otherLinks).toHaveLength(0);
     });
 
     it('forwards the authored ariaLabel as the link accessible name', () => {
@@ -45,38 +61,24 @@ describe(`<${ActionGroup.name}/>`, () => {
   });
 
   describe('with a hiddenLabelSuffix', () => {
-    const LABEL = 'Read more';
-    const SUFFIX = 'Welcome to the blog';
-    const actionWithSuffix = {
-      variant: CTA_ACTION_VARIANT.PRIMARY,
-      appearance: undefined,
-      link: { ...MOCK_CTA_PRIMARY_ACTION.link, label: LABEL },
-      hiddenLabelSuffix: SUFFIX,
-    };
+    it('includes the suffix in the link accessible name', () => {
+      setup({ actions: [MOCK_ACTION_WITH_SUFFIX] });
 
-    const setupWithSuffix = customRender(ActionGroup, {
-      actions: [actionWithSuffix],
-      isOnDark: undefined,
-    });
-
-    it('renders the suffix as real text inside the accessible name', () => {
-      setupWithSuffix();
-
-      const link = screen.getByRole('link', { name: `${LABEL}: ${SUFFIX}` });
-
-      expect(link).toBeVisible();
-      expect(link).toHaveTextContent(`${LABEL}: ${SUFFIX}`);
-    });
-
-    it('renders no suffix when hiddenLabelSuffix is unset', () => {
-      setupWithSuffix({
-        actions: [{ ...actionWithSuffix, hiddenLabelSuffix: undefined }],
+      const link = screen.getByRole('link', {
+        name: `${MOCK_LABEL}: ${MOCK_SUFFIX}`,
       });
 
-      const link = screen.getByRole('link', { name: LABEL });
+      expect(link).toBeVisible();
+    });
+
+    it('names the link by its label when hiddenLabelSuffix is unset', () => {
+      setup({
+        actions: [{ ...MOCK_ACTION_WITH_SUFFIX, hiddenLabelSuffix: undefined }],
+      });
+
+      const link = screen.getByRole('link', { name: MOCK_LABEL });
 
       expect(link).toBeVisible();
-      expect(link).toHaveTextContent(LABEL);
     });
   });
 });

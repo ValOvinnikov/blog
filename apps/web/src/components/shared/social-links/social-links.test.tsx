@@ -15,13 +15,12 @@ describe(`<${SocialLinks.name}/>`, () => {
     setup();
 
     const list = screen.getByRole('list', { name: LIST_NAME });
-
     const listitems = within(list).queryAllByRole('listitem');
 
     expect(listitems).toHaveLength(0);
   });
 
-  it('renders one list item per profile, each exposing its own accessible name', () => {
+  it('renders one list item per profile', () => {
     setup({ profiles: [MOCK_GITHUB_PROFILE, MOCK_LINKEDIN_PROFILE] });
 
     const list = screen.getByRole('list', { name: LIST_NAME });
@@ -31,7 +30,6 @@ describe(`<${SocialLinks.name}/>`, () => {
     const linkedInLink = within(list).getByRole('link', {
       name: 'LinkedIn profile',
     });
-
     const listitems = within(list).getAllByRole('listitem');
 
     expect(listitems).toHaveLength(2);

@@ -14,23 +14,13 @@ const setup = customRender(SocialLink, MOCK_LINKEDIN_PROFILE);
 describe(`<${SocialLink.name}/>`, () => {
   it.each([
     {
-      description:
-        'a mapped platform from SOCIAL_PLATFORM_LABEL, not a naive title-case',
       profile: MOCK_LINKEDIN_PROFILE,
       expectedName: LINKEDIN_PROFILE_NAME,
     },
-    {
-      description: 'GitHub with corrected casing',
-      profile: MOCK_GITHUB_PROFILE,
-      expectedName: 'GitHub profile',
-    },
-    {
-      description: 'a platform outside the original 6-key set, translated',
-      profile: MOCK_MASTODON_PROFILE,
-      expectedName: 'Mastodon profile',
-    },
+    { profile: MOCK_GITHUB_PROFILE, expectedName: 'GitHub profile' },
+    { profile: MOCK_MASTODON_PROFILE, expectedName: 'Mastodon profile' },
   ])(
-    'derives the accessible name for $description',
+    'names the $expectedName link and shows its platform icon',
     ({ profile: { platform, link }, expectedName }) => {
       setup({ platform, link });
 

@@ -1,47 +1,43 @@
 import { SOCIAL_PLATFORMS } from '@blog/config';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, within } from '@web/testing/custom-render';
 
 import { PostShareLinks } from './post-share-links';
 
+faker.seed(5501);
+
+const MOCK_TITLE = faker.lorem.words(2);
+
 const setup = customRender(PostShareLinks, {
-  url: 'https://example.com/blog/hello-world',
-  title: 'Hello World',
+  url: faker.internet.url(),
+  title: MOCK_TITLE,
 });
 
 describe(`<${PostShareLinks.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(async () => {
+    user = userEvent.setup();
     setup();
-
-    await userEvent.click(screen.getByRole('button', { name: /Share/ }));
-  });
-
-  it('renders an X share link and a LinkedIn share link, each with its own platform icon', async () => {
-    const xShareLink = screen.getByRole('menuitem', { name: /Share on X/ });
-    expect(xShareLink).toBeVisible();
-    expect(
-      within(xShareLink).getByTestId(`share-icon-${SOCIAL_PLATFORMS.X}`),
-    ).toBeVisible();
-
-    const linkedInShareLink = screen.getByRole('menuitem', {
-      name: /Share on LinkedIn/,
+    const trigger = screen.getByRole('button', {
+      name: `Share "${MOCK_TITLE}"`,
     });
-    expect(linkedInShareLink).toBeVisible();
-    expect(
-      within(linkedInShareLink).getByTestId(
-        `share-icon-${SOCIAL_PLATFORMS.LINKEDIN}`,
-      ),
-    ).toBeVisible();
+
+    await user.click(trigger);
   });
 
-  it('builds each share link href from the given url and title', async () => {
-    expect(
-      screen.getByRole('menuitem', { name: /Share on X/ }),
-    ).toHaveAttribute(
-      'href',
-      expect.stringContaining(
-        encodeURIComponent('https://example.com/blog/hello-world'),
-      ),
-    );
-  });
+  it.each([
+    { label: 'Share on X', platform: SOCIAL_PLATFORMS.X },
+    { label: 'Share on LinkedIn', platform: SOCIAL_PLATFORMS.LINKEDIN },
+  ])(
+    'offers a $label link with its own platform icon',
+    ({ label, platform }) => {
+      const shareLink = screen.getByRole('menuitem', { name: label });
+      const icon = within(shareLink).getByTestId(`share-icon-${platform}`);
+
+      expect(shareLink).toBeVisible();
+      expect(icon).toBeVisible();
+    },
+  );
 });

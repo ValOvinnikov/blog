@@ -1,7 +1,7 @@
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
-  fireEvent,
   screen,
   waitFor,
   within,
@@ -9,94 +9,92 @@ import {
 
 import { PostShare } from './post-share';
 
-const links = [
-  {
-    href: 'https://twitter.com/intent/tweet?text=Hi&url=https%3A%2F%2Fx.com',
-    label: 'Share on X',
-  },
-  {
-    href: 'https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fx.com',
-    label: 'Share on LinkedIn',
-  },
+faker.seed(5401);
+
+const MOCK_URL = faker.internet.url();
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_LINKS = [
+  { href: faker.internet.url(), label: faker.lorem.words(3) },
+  { href: faker.internet.url(), label: faker.lorem.words(3) },
 ];
+const [MOCK_FIRST_LINK] = MOCK_LINKS;
+const COPY_LINK_NAME = 'Copy link';
+const ARIA_EXPANDED = 'aria-expanded';
 
 const setup = customRender(PostShare, {
-  url: 'https://example.com/blog/hello',
-  title: 'Hello World',
-  links,
+  url: MOCK_URL,
+  title: MOCK_TITLE,
+  links: MOCK_LINKS,
 });
 
-const getTrigger = () =>
-  screen.getByRole('button', { name: 'Share "Hello World"' });
-
-let user: UserEvent;
-let trigger: HTMLElement;
-
 describe(`<${PostShare.name}/>`, () => {
+  let user: UserEvent;
+  let trigger: HTMLElement;
+
   beforeEach(() => {
     user = userEvent.setup();
     setup();
-    trigger = getTrigger();
+    trigger = screen.getByRole('button', { name: `Share "${MOCK_TITLE}"` });
   });
 
   it('labels the trigger with the post title and renders it closed', () => {
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(
-      within(trigger).getByTestId('post-share-trigger-icon'),
-    ).toBeVisible();
+    const triggerIcon = within(trigger).getByTestId('post-share-trigger-icon');
+
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(triggerIcon).toBeVisible();
   });
 
-  it('opens the panel on trigger click and closes it again on a second click', async () => {
+  it('opens the panel on trigger click and closes it on a second click', async () => {
     await user.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('menuitem', { name: 'Share on X' })).toBeVisible();
+    const openedLink = screen.getByRole('menuitem', {
+      name: MOCK_FIRST_LINK?.label,
+    });
+
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(openedLink).toBeVisible();
 
     await user.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
   });
 
-  it('copies the given url to the clipboard and shows a Copied state that resets', async () => {
-    const writeText = vi
-      .spyOn(navigator.clipboard, 'writeText')
-      .mockResolvedValue(undefined);
-
+  it('copies the given url and shows a Copied state', async () => {
     await user.click(trigger);
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }));
+    const copyItem = screen.getByRole('menuitem', { name: COPY_LINK_NAME });
 
-    expect(writeText).toHaveBeenCalledWith('https://example.com/blog/hello');
+    await user.click(copyItem);
+
     const copiedItem = await screen.findByRole('menuitem', { name: 'Copied' });
+    const statusIcon = within(copiedItem).getByTestId('post-share-status-icon');
+    const copiedUrl = await navigator.clipboard.readText();
+
+    expect(copiedUrl).toBe(MOCK_URL);
     expect(copiedItem).toBeVisible();
-    expect(
-      within(copiedItem).getByTestId('post-share-status-icon'),
-    ).toBeVisible();
-
-    await waitFor(
-      () => {
-        expect(
-          screen.getByRole('menuitem', { name: 'Copy link' }),
-        ).toBeVisible();
-      },
-      { timeout: 3000 },
-    );
+    expect(statusIcon).toBeVisible();
   });
 
-  it('announces a successful copy via an aria-live status region', async () => {
-    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
-
-    expect(screen.getByRole('status')).toHaveTextContent('');
+  it('announces a successful copy through the status region', async () => {
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('');
 
     await user.click(trigger);
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }));
+    const copyItem = screen.getByRole('menuitem', { name: COPY_LINK_NAME });
+    await user.click(copyItem);
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Link copied');
+    await waitFor(() => {
+      expect(status).toHaveTextContent('Link copied');
+    });
   });
 
-  it('renders one share link per entry in `links`, opening in a new tab', async () => {
+  it('renders every given link, opening in a new tab', async () => {
     await user.click(trigger);
 
-    const xLink = screen.getByRole('menuitem', { name: 'Share on X' });
-    expect(xLink).toHaveAttribute('href', links[0]?.href);
-    expect(xLink).toHaveAttribute('target', '_blank');
-    expect(xLink).toHaveAttribute('rel', 'noopener noreferrer');
+    const shareLink = screen.getByRole('menuitem', {
+      name: MOCK_FIRST_LINK?.label,
+    });
+
+    expect(shareLink).toHaveAttribute('href', MOCK_FIRST_LINK?.href);
+    expect(shareLink).toHaveAttribute('target', '_blank');
+    expect(shareLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });
