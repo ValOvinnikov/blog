@@ -14,12 +14,15 @@ import {
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { deleteResolvedFindingsPastRetention } from './delete-resolved-findings-past-retention';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+
+faker.seed(6022);
 
 const CUTOFF = daysBefore(MOCK_RETENTION_NOW, RESOLVED_FINDING_RETENTION_DAYS);
 
@@ -38,7 +41,7 @@ describe(deleteResolvedFindingsPastRetention, () => {
         kind: FINDING_KIND.DOMAIN_NOT_ADDED,
         severity: FINDING_SEVERITY.WARNING,
         status: FINDING_STATUS.RESOLVED,
-        dedupeKey: crypto.randomUUID(),
+        dedupeKey: faker.string.uuid(),
         ...overrides,
       })
       .returning({ id: schema.findings.id });
@@ -57,13 +60,14 @@ describe(deleteResolvedFindingsPastRetention, () => {
     await insertFinding({ resolvedAt: justPast(CUTOFF) });
     const recentId = await insertFinding({ resolvedAt: justWithin(CUTOFF) });
 
-    await expect(
-      deleteResolvedFindingsPastRetention(
-        MOCK_RETENTION_NOW,
-        MOCK_RETENTION_LIMIT,
-      ),
-    ).resolves.toBe(1);
-    expect(await remainingIds()).toEqual([recentId]);
+    const deleted = await deleteResolvedFindingsPastRetention(
+      MOCK_RETENTION_NOW,
+      MOCK_RETENTION_LIMIT,
+    );
+    const remaining = await remainingIds();
+
+    expect(deleted).toBe(1);
+    expect(remaining).toEqual([recentId]);
   });
 
   it('never deletes an open finding, however old', async () => {
@@ -73,23 +77,28 @@ describe(deleteResolvedFindingsPastRetention, () => {
       lastSeenAt: justPast(CUTOFF),
     });
 
-    await expect(
-      deleteResolvedFindingsPastRetention(
-        MOCK_RETENTION_NOW,
-        MOCK_RETENTION_LIMIT,
-      ),
-    ).resolves.toBe(0);
-    expect(await remainingIds()).toEqual([openId]);
+    const deleted = await deleteResolvedFindingsPastRetention(
+      MOCK_RETENTION_NOW,
+      MOCK_RETENTION_LIMIT,
+    );
+    const remaining = await remainingIds();
+
+    expect(deleted).toBe(0);
+    expect(remaining).toEqual([openId]);
   });
 
   it('deletes at most the given number of findings per call', async () => {
     await insertFinding({ resolvedAt: justPast(CUTOFF) });
     await insertFinding({ resolvedAt: justPast(CUTOFF) });
 
-    await expect(
-      deleteResolvedFindingsPastRetention(MOCK_RETENTION_NOW, 1),
-    ).resolves.toBe(1);
-    expect(await remainingIds()).toHaveLength(1);
+    const deleted = await deleteResolvedFindingsPastRetention(
+      MOCK_RETENTION_NOW,
+      1,
+    );
+    const remaining = await remainingIds();
+
+    expect(deleted).toBe(1);
+    expect(remaining).toHaveLength(1);
   });
 
   it('deletes nothing when run a second time', async () => {
