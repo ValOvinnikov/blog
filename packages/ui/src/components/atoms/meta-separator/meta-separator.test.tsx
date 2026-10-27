@@ -15,7 +15,7 @@ describe(`<${MetaSeparator.name}/>`, () => {
 
     const separator = screen.getByText(MOCK_SEPARATOR);
 
-    expect(separator).toBeInTheDocument();
+    expect(separator).toBeVisible();
   });
 
   it('hides the separator from assistive tech', () => {

@@ -13,44 +13,47 @@ const TAILWIND_BUILT_IN_SIZES = [
   '4xl',
 ];
 
+const FONT_DISPLAY = 'font-display';
+const FONT_MONO = 'font-mono';
+const PY_SECTION = 'py-section';
+const PY_ZERO = 'py-0';
+const TEXT_COPY = 'text-copy';
+const TEXT_CONTRAST = 'text-brand-primary-contrast';
+
 const customSizeTokens = tokensByCategory.typography
   .map(({ name }) => name)
   .filter((name) => !TAILWIND_BUILT_IN_SIZES.includes(name));
 
 describe(tv, () => {
   it.each([
-    { base: 'font-display', added: 'font-mono', merged: 'font-mono' },
-    { base: 'font-mono', added: 'font-display', merged: 'font-display' },
-    { base: 'font-body', added: 'font-read', merged: 'font-read' },
-    { base: 'py-section', added: 'py-0', merged: 'py-0' },
-    {
-      base: 'tracking-tight',
-      added: 'tracking-label',
-      merged: 'tracking-label',
-    },
-    {
-      base: 'tracking-eyebrow',
-      added: 'tracking-tight-card',
-      merged: 'tracking-tight-card',
-    },
-  ])('lets $added replace the conflicting $base', ({ base, added, merged }) => {
+    { base: FONT_DISPLAY, added: FONT_MONO },
+    { base: FONT_MONO, added: FONT_DISPLAY },
+    { base: 'font-body', added: 'font-read' },
+    { base: PY_SECTION, added: PY_ZERO },
+    { base: 'tracking-tight', added: 'tracking-label' },
+    { base: 'tracking-eyebrow', added: 'tracking-tight-card' },
+  ])('lets $added replace the conflicting $base', ({ base, added }) => {
     const styles = tv({ base });
 
-    expect(styles({ class: added })).toBe(merged);
+    expect(styles({ class: added })).toBe(added);
   });
 
   it.each([
     {
-      base: 'text-copy',
-      added: 'text-brand-primary-contrast',
-      merged: 'text-copy text-brand-primary-contrast',
+      base: TEXT_COPY,
+      added: TEXT_CONTRAST,
+      merged: `${TEXT_COPY} ${TEXT_CONTRAST}`,
     },
     {
-      base: 'text-brand-primary-contrast',
-      added: 'text-copy',
-      merged: 'text-brand-primary-contrast text-copy',
+      base: TEXT_CONTRAST,
+      added: TEXT_COPY,
+      merged: `${TEXT_CONTRAST} ${TEXT_COPY}`,
     },
-    { base: 'py-section px-gutter', added: 'py-0', merged: 'px-gutter py-0' },
+    {
+      base: `${PY_SECTION} px-gutter`,
+      added: PY_ZERO,
+      merged: `px-gutter ${PY_ZERO}`,
+    },
   ])(
     'keeps $added alongside the unrelated $base',
     ({ base, added, merged }) => {

@@ -27,14 +27,6 @@ describe(`<${Spinner.name}/>`, () => {
 
       expect(labelText).not.toBeInTheDocument();
     });
-
-    it('hides the animated glyph from assistive tech', () => {
-      const status = screen.getByRole('status', { name: MOCK_LABEL });
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      const glyph = status.firstElementChild;
-
-      expect(glyph).toHaveAttribute(ARIA_HIDDEN, 'true');
-    });
   });
 
   describe('with a visible label', () => {

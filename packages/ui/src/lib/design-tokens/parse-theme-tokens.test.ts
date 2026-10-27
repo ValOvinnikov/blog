@@ -28,6 +28,7 @@ h2 {
 
 const CSS_VAR_COLOR_BG = '--color-bg';
 const CSS_VAR_ACCENT_SOLID = '--color-accent-solid';
+const CSS_VAR_RADIUS_SM = '--radius-sm';
 
 describe(parseThemeTokens, () => {
   describe('with the sample stylesheet', () => {
@@ -47,7 +48,7 @@ describe(parseThemeTokens, () => {
 
     it.each([
       [CSS_VAR_COLOR_BG, 'var(--bg)'],
-      ['--radius-sm', '3px'],
+      [CSS_VAR_RADIUS_SM, '3px'],
     ])('captures the declared value of %s', (cssVar, value) => {
       const token = findToken(cssVar);
 
@@ -69,7 +70,7 @@ describe(parseThemeTokens, () => {
     it.each([
       [CSS_VAR_COLOR_BG, 'color'],
       ['--font-mono', 'font'],
-      ['--radius-sm', 'radius'],
+      [CSS_VAR_RADIUS_SM, 'radius'],
       ['--spacing-gutter', 'spacing'],
       ['--container-content', 'layout'],
       ['--text-xl', 'typography'],

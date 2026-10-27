@@ -13,6 +13,7 @@ const MOCK_VALUE = faker.internet.email();
 const MOCK_TYPED_CHARACTER = faker.string.alpha(1);
 const MOCK_LEADING_GLYPH = faker.string.symbol(1);
 const MOCK_TRAILING_GLYPH = faker.string.symbol(1);
+const ARIA_HIDDEN = 'aria-hidden';
 const LEADING_ICON_TEST_ID = 'leading-icon';
 const TRAILING_ICON_TEST_ID = 'trailing-icon';
 
@@ -66,7 +67,7 @@ describe(`<${TextInput.name}/>`, () => {
     const leadingGlyph = screen.getByText(MOCK_LEADING_GLYPH);
 
     expect(leadingGlyph).toBeVisible();
-    expect(leadingGlyph).toHaveAttribute('aria-hidden', 'true');
+    expect(leadingGlyph).toHaveAttribute(ARIA_HIDDEN, 'true');
   });
 
   it('renders a decorative trailing glyph hidden from assistive tech', () => {
@@ -75,7 +76,7 @@ describe(`<${TextInput.name}/>`, () => {
     const trailingGlyph = screen.getByText(MOCK_TRAILING_GLYPH);
 
     expect(trailingGlyph).toBeVisible();
-    expect(trailingGlyph).toHaveAttribute('aria-hidden', 'true');
+    expect(trailingGlyph).toHaveAttribute(ARIA_HIDDEN, 'true');
   });
 
   it('renders an icon element as the leading icon', () => {

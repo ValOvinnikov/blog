@@ -10,6 +10,7 @@ import { mapCompoundSlots } from './compound';
 
 faker.seed(123);
 
+const UNMATCHED_ITEM_TEST_ID = 'unmatched-item';
 const MOCK_FIRST = faker.lorem.sentence();
 const MOCK_SECOND = faker.lorem.sentence();
 const MOCK_STRAY = faker.lorem.sentence();
@@ -42,7 +43,7 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
       <div data-testid="slot-beta">{slots.beta}</div>
       <div data-testid="unmatched">
         {unmatched.map((node, i) => (
-          <span key={i} data-testid="unmatched-item">
+          <span key={i} data-testid={UNMATCHED_ITEM_TEST_ID}>
             {node}
           </span>
         ))}
@@ -89,7 +90,9 @@ describe(mapCompoundSlots, () => {
     );
 
     const unmatched = screen.getByTestId('unmatched');
-    const unknownItems = within(unmatched).getAllByTestId('unmatched-item');
+    const unknownItems = within(unmatched).getAllByTestId(
+      UNMATCHED_ITEM_TEST_ID,
+    );
     const unknown = within(unmatched).getByText(MOCK_UNKNOWN);
 
     expect(unknownItems).toHaveLength(1);
@@ -116,7 +119,7 @@ describe(mapCompoundSlots, () => {
     const slotAlpha = screen.getByTestId('slot-alpha');
     const unmatched = screen.getByTestId('unmatched');
     const matchedAlpha = within(slotAlpha).getByTestId('alpha');
-    const unmatchedItem = within(unmatched).getByTestId('unmatched-item');
+    const unmatchedItem = within(unmatched).getByTestId(UNMATCHED_ITEM_TEST_ID);
 
     expect(matchedAlpha).toHaveTextContent(MOCK_FIRST);
     expect(unmatchedItem).toHaveTextContent(MOCK_SECOND);
@@ -134,7 +137,7 @@ describe(mapCompoundSlots, () => {
 
     const alpha = screen.getByTestId('alpha');
     const beta = screen.getByTestId('beta');
-    const unmatchedItems = screen.queryAllByTestId('unmatched-item');
+    const unmatchedItems = screen.queryAllByTestId(UNMATCHED_ITEM_TEST_ID);
 
     expect(alpha).toHaveTextContent(MOCK_FIRST);
     expect(beta).toHaveTextContent(MOCK_SECOND);
@@ -151,7 +154,7 @@ describe(mapCompoundSlots, () => {
       </TestHarness>,
     );
 
-    const unmatchedItems = screen.queryAllByTestId('unmatched-item');
+    const unmatchedItems = screen.queryAllByTestId(UNMATCHED_ITEM_TEST_ID);
 
     expect(unmatchedItems).toHaveLength(0);
   });
