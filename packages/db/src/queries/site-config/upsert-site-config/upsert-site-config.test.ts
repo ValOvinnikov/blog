@@ -80,6 +80,8 @@ const MOCK_RICH_BLOCK_KEY = faker.string.uuid();
 const MOCK_RICH_SPAN_KEY = faker.string.uuid();
 const MOCK_NON_RICH_TEXT_VALUE = faker.number.int();
 const NAME_PLACEHOLDER = '{name}';
+const KEEPS_FIELD_TITLE = 'keeps $field when a later save omits it';
+const REJECTS_OVER_CAP_TITLE = 'rejects an override longer than its field cap';
 
 const baseInput: TUpdateSiteConfigInput = MOCK_SITE_CONFIG_FIELDS;
 
@@ -274,16 +276,13 @@ describe(upsertSiteConfig, () => {
       },
     );
 
-    it.each(STYLE_FIELDS)(
-      'keeps $field when a later save omits it',
-      async ({ field, chosen }) => {
-        await save({ [field]: chosen });
+    it.each(STYLE_FIELDS)(KEEPS_FIELD_TITLE, async ({ field, chosen }) => {
+      await save({ [field]: chosen });
 
-        const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+      const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
 
-        expect(result[field]).toBe(chosen);
-      },
-    );
+      expect(result[field]).toBe(chosen);
+    });
 
     it('keeps the card style across a preset change when a save omits it', async () => {
       await save();
@@ -303,7 +302,7 @@ describe(upsertSiteConfig, () => {
       expect(result.voiceOverrides).toEqual({ notFoundHeading: MOCK_HEADING });
     });
 
-    it('rejects an override longer than its field cap', async () => {
+    it(REJECTS_OVER_CAP_TITLE, async () => {
       const errors = expectFieldErrors(
         await saveVoice({
           notFoundHeading: 'x'.repeat(NOT_FOUND_HEADING_MAX + 1),
@@ -369,7 +368,7 @@ describe(upsertSiteConfig, () => {
       });
     });
 
-    it('rejects an override longer than its field cap', async () => {
+    it(REJECTS_OVER_CAP_TITLE, async () => {
       const errors = expectFieldErrors(
         await saveVoice({
           [SYNTHETIC_MULTILINE_FIELD_ID]: 'x'.repeat(
@@ -629,16 +628,13 @@ describe(upsertSiteConfig, () => {
       expect(result.voiceOverrides).toEqual({});
     });
 
-    it.each(OPTIONAL_COLUMNS)(
-      'keeps $field when a later save omits it',
-      async ({ field, value }) => {
-        await save({ [field]: value });
+    it.each(OPTIONAL_COLUMNS)(KEEPS_FIELD_TITLE, async ({ field, value }) => {
+      await save({ [field]: value });
 
-        const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+      const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
 
-        expect(result[field]).toBe(value);
-      },
-    );
+      expect(result[field]).toBe(value);
+    });
 
     it.each(OPTIONAL_COLUMNS)(
       'clears $field when explicitly saved as null',
