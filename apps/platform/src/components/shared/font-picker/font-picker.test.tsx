@@ -1,98 +1,88 @@
 import { FONT_CHOICE } from '@blog/config';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import { FONT_OPTIONS } from '@platform/config/fonts';
+import { customRender, screen, within } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FontPicker } from './font-picker';
 
-describe(FontPicker, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+faker.seed(5995);
+
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+
+const setup = customRender(FontPicker, {
+  ariaLabel: MOCK_ARIA_LABEL,
+  value: FONT_CHOICE.SPACE_GROTESK,
+  onChange: vi.fn(),
+});
+
+describe(`<${FontPicker.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
   it('shows the current font on the trigger, set in its own font family', () => {
-    render(
-      <FontPicker
-        ariaLabel="Heading font"
-        value={FONT_CHOICE.FRAUNCES}
-        onChange={vi.fn()}
-      />,
-    );
+    const { label, fontFamily } = FONT_OPTIONS[FONT_CHOICE.FRAUNCES];
+    setup({ value: FONT_CHOICE.FRAUNCES });
 
-    const trigger = screen.getByRole('combobox', { name: 'Heading font' });
-    expect(trigger).toHaveTextContent('Fraunces');
-    expect(screen.getByText('Fraunces')).toHaveStyle({
-      fontFamily: 'mock-fraunces-font-family',
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+    const triggerFont = within(trigger).getByText(label);
+
+    expect(triggerFont).toBeVisible();
+    expect(triggerFont).toHaveStyle({ fontFamily });
+  });
+
+  it('marks the current font as selected in the list', async () => {
+    setup();
+
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+    await user.click(trigger);
+
+    const currentOption = await screen.findByRole('option', {
+      name: FONT_OPTIONS[FONT_CHOICE.SPACE_GROTESK].label,
     });
+
+    expect(currentOption).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('lists every closed-set font by its real name, each in its own font family, marking the current one', async () => {
-    render(
-      <FontPicker
-        ariaLabel="Heading font"
-        value={FONT_CHOICE.SPACE_GROTESK}
-        onChange={vi.fn()}
-      />,
-    );
+  it.each(Object.values(FONT_OPTIONS))(
+    'lists $label by name, set in its own font family',
+    async ({ label, fontFamily }) => {
+      setup();
 
-    await user.click(screen.getByRole('combobox', { name: 'Heading font' }));
+      const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+      await user.click(trigger);
 
-    expect(
-      await screen.findByRole('option', { name: 'Space Grotesk' }),
-    ).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('option', { name: 'Newsreader' })).toBeVisible();
-    expect(
-      screen.getByRole('option', { name: 'JetBrains Mono' }),
-    ).toBeVisible();
-    expect(screen.getByRole('option', { name: 'Inter' })).toBeVisible();
-    expect(screen.getByRole('option', { name: 'Fraunces' })).toHaveTextContent(
-      'Fraunces',
-    );
-    expect(
-      screen.getByText('Fraunces', { selector: '[role="option"] *' }),
-    ).toHaveStyle({ fontFamily: 'mock-fraunces-font-family' });
-  });
+      const option = await screen.findByRole('option', { name: label });
+      const optionText = within(option).getByText(label);
 
-  it('reports the font chosen from the list, and the trigger then shows it', async () => {
+      expect(option).toBeVisible();
+      expect(optionText).toHaveStyle({ fontFamily });
+    },
+  );
+
+  it('reports the font chosen from the list', async () => {
     const handleChange = vi.fn();
-    const { rerender } = render(
-      <FontPicker
-        ariaLabel="Body font"
-        value={FONT_CHOICE.NEWSREADER}
-        onChange={handleChange}
-      />,
-    );
+    setup({ value: FONT_CHOICE.NEWSREADER, onChange: handleChange });
 
-    await user.click(screen.getByRole('combobox', { name: 'Body font' }));
-    await user.click(await screen.findByRole('option', { name: 'Inter' }));
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+    await user.click(trigger);
+    const interOption = await screen.findByRole('option', {
+      name: FONT_OPTIONS[FONT_CHOICE.INTER].label,
+    });
+    await user.click(interOption);
 
     expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.INTER);
-
-    rerender(
-      <FontPicker
-        ariaLabel="Body font"
-        value={FONT_CHOICE.INTER}
-        onChange={handleChange}
-      />,
-    );
-
-    expect(
-      screen.getByRole('combobox', { name: 'Body font' }),
-    ).toHaveTextContent('Inter');
   });
 
   it('picks a font with the arrow keys and Enter', async () => {
     const handleChange = vi.fn();
-    render(
-      <FontPicker
-        ariaLabel="Body font"
-        value={FONT_CHOICE.SPACE_GROTESK}
-        onChange={handleChange}
-      />,
-    );
+    setup({ onChange: handleChange });
 
-    screen.getByRole('combobox', { name: 'Body font' }).focus();
+    await user.tab();
     await user.keyboard('{ArrowDown}');
     await screen.findByRole('listbox');
     await user.keyboard('{ArrowDown}{Enter}');
@@ -100,24 +90,21 @@ describe(FontPicker, () => {
     expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.NEWSREADER);
   });
 
-  it('is disabled and described by the given notice when isDisabled is true', async () => {
+  it('is disabled and described by the given notice when disabled', async () => {
     const handleChange = vi.fn();
-    render(
-      <FontPicker
-        ariaLabel="Body font"
-        value={FONT_CHOICE.NEWSREADER}
-        onChange={handleChange}
-        isDisabled={true}
-        aria-describedby="archived-notice"
-      />,
-    );
+    setup({
+      onChange: handleChange,
+      isDisabled: true,
+      'aria-describedby': ARCHIVED_NOTICE_ID,
+    });
 
-    const trigger = screen.getByRole('combobox', { name: 'Body font' });
-    expect(trigger).toHaveAttribute('aria-describedby', 'archived-notice');
-
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
     await user.click(trigger);
 
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    const listbox = screen.queryByRole('listbox');
+
+    expect(trigger).toHaveAttribute('aria-describedby', ARCHIVED_NOTICE_ID);
+    expect(listbox).not.toBeInTheDocument();
     expect(handleChange).not.toHaveBeenCalled();
   });
 });

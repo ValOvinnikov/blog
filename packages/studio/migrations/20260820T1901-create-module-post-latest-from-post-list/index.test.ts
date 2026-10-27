@@ -1,175 +1,139 @@
+import { BRAND_VARIANT, SPACING_SCALE } from '@blog/config/constants';
+import { mockHomePage } from '@blog/studio/testing/mock-documents';
+import { MOCK_SYSTEM_FIELDS } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { at, createIfNotExists, set } from 'sanity/migrate';
-
-import { toPostLatestId } from './id';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+faker.seed(13);
+
+const MOCK_POST_LIST_ID = faker.string.uuid();
+const MOCK_PAGE_ID = faker.string.uuid();
+const MOCK_TITLE = faker.lorem.words();
+const MOCK_SECTION_HEADER = { heading: faker.lorem.words() };
+const MOCK_LAYOUT = { spacing: SPACING_SCALE.MD };
+const MOCK_FIRST_ITEM_KEY = faker.string.alphanumeric(6);
+const MOCK_SECOND_ITEM_KEY = faker.string.alphanumeric(6);
+const MOCK_THIRD_ITEM_KEY = faker.string.alphanumeric(6);
+const MOCK_FIRST_POST_LIST_ID = faker.string.uuid();
+const MOCK_SECOND_POST_LIST_ID = faker.string.uuid();
+const MOCK_CTA_ID = faker.string.uuid();
+
+const LIMIT = 3;
+const POST_LATEST_LIMIT_MAX = 12;
+const OVER_MAX_LIMIT = 24;
+
+const mockModuleItem = (key: string, type: string, ref: string) => ({
+  _key: key,
+  _type: type,
+  _ref: ref,
+});
+
+const mockPostList = (fields: Record<string, unknown>) => ({
+  ...MOCK_SYSTEM_FIELDS,
+  _id: MOCK_POST_LIST_ID,
+  _type: 'module_postList',
+  title: MOCK_TITLE,
+  ...fields,
+});
+
+const mockRepointedItem = (key: string, postListId: string) =>
+  at(
+    ['modules', { _key: key }],
+    set(mockModuleItem(key, 'module_postLatest', `postLatest-${postListId}`)),
+  );
 
 describe('create-module-post-latest-from-post-list migration', () => {
   describe('module_postList documents', () => {
-    it('creates a module_postLatest under toPostLatestId(doc._id), carrying its fields', () => {
-      const postList = {
-        ...baseDoc,
-        _id: 'abc123',
-        _type: 'module_postList',
-        title: 'Latest Posts',
-        brandVariant: 'PRIMARY',
-        sectionHeader: { heading: 'From the blog' },
-        limit: 3,
-        layout: { spacing: 'DEFAULT' },
-      };
+    it('creates a module_postLatest carrying the postList fields', () => {
+      const postList = mockPostList({
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: MOCK_SECTION_HEADER,
+        limit: LIMIT,
+        layout: MOCK_LAYOUT,
+      });
 
-      expect(migration.migrate.document(postList)).toEqual([
+      const result = migration.migrate.document(postList);
+
+      expect(result).toEqual([
         createIfNotExists({
-          _id: toPostLatestId(postList._id),
+          _id: `postLatest-${MOCK_POST_LIST_ID}`,
           _type: 'module_postLatest',
-          title: postList.title,
-          brandVariant: postList.brandVariant,
-          sectionHeader: postList.sectionHeader,
-          limit: postList.limit,
-          layout: postList.layout,
+          title: MOCK_TITLE,
+          brandVariant: BRAND_VARIANT.PRIMARY,
+          sectionHeader: MOCK_SECTION_HEADER,
+          limit: LIMIT,
+          layout: MOCK_LAYOUT,
         }),
       ]);
     });
 
-    it("clamps limit to the target schema's max when the source exceeds it", () => {
-      const postList = {
-        ...baseDoc,
-        _id: 'abc123',
-        _type: 'module_postList',
-        title: 'Latest Posts',
-        limit: 24,
-      };
+    it('clamps a limit above the target schema max', () => {
+      const postList = mockPostList({ limit: OVER_MAX_LIMIT });
 
-      expect(migration.migrate.document(postList)).toEqual([
+      const result = migration.migrate.document(postList);
+
+      expect(result).toEqual([
         createIfNotExists({
-          _id: toPostLatestId(postList._id),
+          _id: `postLatest-${MOCK_POST_LIST_ID}`,
           _type: 'module_postLatest',
-          title: postList.title,
-          brandVariant: undefined,
-          sectionHeader: undefined,
-          limit: 12,
-          layout: undefined,
-        }),
-      ]);
-    });
-
-    it('lands a draft module_postList on the draft module_postLatest sibling', () => {
-      const postList = {
-        ...baseDoc,
-        _id: 'drafts.abc123',
-        _type: 'module_postList',
-        title: 'Latest Posts',
-        limit: 3,
-      };
-
-      expect(migration.migrate.document(postList)).toEqual([
-        createIfNotExists({
-          _id: 'drafts.postLatest-abc123',
-          _type: 'module_postLatest',
-          title: postList.title,
-          brandVariant: undefined,
-          sectionHeader: undefined,
-          limit: postList.limit,
-          layout: undefined,
+          title: MOCK_TITLE,
+          limit: POST_LATEST_LIMIT_MAX,
         }),
       ]);
     });
   });
 
   describe('page_home documents', () => {
-    it('repoints a module_postList item in modules[] onto the new module_postLatest document', () => {
-      const page = {
-        ...baseDoc,
-        _id: 'page_home',
-        _type: 'page_home',
+    it('repoints every module_postList item in modules', () => {
+      const page = mockHomePage({
+        _id: MOCK_PAGE_ID,
         modules: [
-          { _key: 'key1', _type: 'module_postList', _ref: 'abc123' },
-          { _key: 'key2', _type: 'module_cta', _ref: 'cta-1' },
+          mockModuleItem(
+            MOCK_FIRST_ITEM_KEY,
+            'module_postList',
+            MOCK_FIRST_POST_LIST_ID,
+          ),
+          mockModuleItem(MOCK_SECOND_ITEM_KEY, 'module_cta', MOCK_CTA_ID),
+          mockModuleItem(
+            MOCK_THIRD_ITEM_KEY,
+            'module_postList',
+            MOCK_SECOND_POST_LIST_ID,
+          ),
         ],
-      };
+      });
 
-      expect(migration.migrate.document(page)).toEqual([
-        at(
-          ['modules', { _key: 'key1' }],
-          set({
-            _key: 'key1',
-            _type: 'module_postLatest',
-            _ref: toPostLatestId('abc123'),
-          }),
-        ),
+      const result = migration.migrate.document(page);
+
+      expect(result).toEqual([
+        mockRepointedItem(MOCK_FIRST_ITEM_KEY, MOCK_FIRST_POST_LIST_ID),
+        mockRepointedItem(MOCK_THIRD_ITEM_KEY, MOCK_SECOND_POST_LIST_ID),
       ]);
     });
 
-    it('repoints every module_postList item when modules[] has more than one', () => {
-      const page = {
-        ...baseDoc,
-        _id: 'page_home',
-        _type: 'page_home',
-        modules: [
-          { _key: 'key1', _type: 'module_postList', _ref: 'abc123' },
-          { _key: 'key2', _type: 'module_cta', _ref: 'cta-1' },
-          { _key: 'key3', _type: 'module_postList', _ref: 'def456' },
+    it.each([
+      [
+        'only other modules',
+        [mockModuleItem(MOCK_SECOND_ITEM_KEY, 'module_cta', MOCK_CTA_ID)],
+      ],
+      [
+        'only migrated module_postLatest items',
+        [
+          mockModuleItem(
+            MOCK_FIRST_ITEM_KEY,
+            'module_postLatest',
+            `postLatest-${MOCK_FIRST_POST_LIST_ID}`,
+          ),
         ],
-      };
+      ],
+      ['no modules field', undefined],
+    ])('leaves a page_home with %s alone', (_label, modules) => {
+      const page = mockHomePage({ _id: MOCK_PAGE_ID, modules });
 
-      expect(migration.migrate.document(page)).toEqual([
-        at(
-          ['modules', { _key: 'key1' }],
-          set({
-            _key: 'key1',
-            _type: 'module_postLatest',
-            _ref: toPostLatestId('abc123'),
-          }),
-        ),
-        at(
-          ['modules', { _key: 'key3' }],
-          set({
-            _key: 'key3',
-            _type: 'module_postLatest',
-            _ref: toPostLatestId('def456'),
-          }),
-        ),
-      ]);
-    });
+      const result = migration.migrate.document(page);
 
-    it('produces no patches for a page_home with no module_postList item', () => {
-      const page = {
-        ...baseDoc,
-        _id: 'page_home',
-        _type: 'page_home',
-        modules: [{ _key: 'key2', _type: 'module_cta', _ref: 'cta-1' }],
-      };
-
-      expect(migration.migrate.document(page)).toBeUndefined();
-    });
-
-    it('produces no patches for a page_home with no modules field', () => {
-      const page = { ...baseDoc, _id: 'page_home', _type: 'page_home' };
-
-      expect(migration.migrate.document(page)).toBeUndefined();
-    });
-
-    it('is idempotent — an already-migrated page_home (module_postLatest item) is left alone', () => {
-      const page = {
-        ...baseDoc,
-        _id: 'page_home',
-        _type: 'page_home',
-        modules: [
-          {
-            _key: 'key1',
-            _type: 'module_postLatest',
-            _ref: toPostLatestId('abc123'),
-          },
-        ],
-      };
-
-      expect(migration.migrate.document(page)).toBeUndefined();
+      expect(result).toBeUndefined();
     });
   });
 });

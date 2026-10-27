@@ -31,11 +31,11 @@ import {
 
 vi.mock('@blog/db/client');
 
-faker.seed(5765);
+faker.seed(602108);
 
-const MOCK_OLDER_REASON = 'Older';
-const MOCK_NEWER_REASON = 'Newer';
-const MOCK_OLDER_AT = faker.date.past();
+const MOCK_OLDER_REASON = faker.lorem.sentence();
+const MOCK_NEWER_REASON = faker.lorem.sentence();
+const MOCK_OLDER_AT = faker.date.past({ refDate: new Date(2026, 0, 1) });
 const MOCK_NEWER_AT = new Date(MOCK_OLDER_AT.getTime() + 1);
 const MOCK_ADMIN_NAME = faker.person.fullName();
 

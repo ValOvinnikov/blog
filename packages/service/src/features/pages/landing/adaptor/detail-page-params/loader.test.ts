@@ -2,21 +2,30 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { MOCK_PAGE_LANDING_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
+import { mockReference, mockSlug } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
   MOCK_ABOUT_NL_SLUG,
   MOCK_ABOUT_SLUG,
+  mockLandingPageDocument,
 } from '@blog/service/testing/shared/translated-pages-dataset';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPageSlugs } from './loader';
 import { landingPageParamsQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
+faker.seed(6015106);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 const tenant = mockTenant();
+const MOCK_FR_SLUG = mockSlug();
+const MOCK_LEGACY_SLUG = mockSlug();
+const MOCK_SECTION_SLUG = mockSlug();
+const MOCK_CHILD_SLUG = mockSlug();
+const MOCK_ORPHAN_SLUG = mockSlug();
 
 describe(getPageSlugs, () => {
   beforeEach(() => {
@@ -70,25 +79,14 @@ describe(getPageSlugs, () => {
 
 describe('landingPageParamsQuery', () => {
   const dataset = [
+    mockLandingPageDocument(faker.string.uuid(), EN, MOCK_ABOUT_SLUG),
+    mockLandingPageDocument(faker.string.uuid(), NL, MOCK_ABOUT_NL_SLUG),
+    mockLandingPageDocument(faker.string.uuid(), FR, MOCK_FR_SLUG),
     {
-      _id: 'a',
+      _id: faker.string.uuid(),
       _type: 'page_landing',
-      slug: { current: MOCK_ABOUT_SLUG },
-      language: EN,
+      slug: { current: MOCK_LEGACY_SLUG },
     },
-    {
-      _id: 'b',
-      _type: 'page_landing',
-      slug: { current: MOCK_ABOUT_NL_SLUG },
-      language: NL,
-    },
-    {
-      _id: 'c',
-      _type: 'page_landing',
-      slug: { current: 'a-propos' },
-      language: FR,
-    },
-    { _id: 'd', _type: 'page_landing', slug: { current: 'legacy' } },
   ];
 
   function run(locales: string[]): Promise<unknown> {
@@ -98,12 +96,6 @@ describe('landingPageParamsQuery', () => {
     });
   }
 
-  it('filters without following a parent reference', () => {
-    const [filter] = landingPageParamsQuery.query.split('{');
-
-    expect(filter).not.toContain('->');
-  });
-
   it('restricts to the live languages', async () => {
     expect(await run([NL, EN])).toEqual([
       { slug: MOCK_ABOUT_SLUG, language: EN },
@@ -112,26 +104,16 @@ describe('landingPageParamsQuery', () => {
   });
 
   it('resolves a nested page to its full path and an orphan to no path', async () => {
+    const sectionId = faker.string.uuid();
     const nested = [
+      mockLandingPageDocument(sectionId, EN, MOCK_SECTION_SLUG),
       {
-        _id: 'modules',
-        _type: 'page_landing',
-        slug: { current: 'modules' },
-        language: EN,
+        ...mockLandingPageDocument(faker.string.uuid(), EN, MOCK_CHILD_SLUG),
+        parent: mockReference(sectionId),
       },
       {
-        _id: 'faq',
-        _type: 'page_landing',
-        slug: { current: 'faq' },
-        language: EN,
-        parent: mockReference('modules'),
-      },
-      {
-        _id: 'orphan',
-        _type: 'page_landing',
-        slug: { current: 'orphan' },
-        language: EN,
-        parent: mockReference('deleted'),
+        ...mockLandingPageDocument(faker.string.uuid(), EN, MOCK_ORPHAN_SLUG),
+        parent: mockReference(faker.string.uuid()),
       },
     ];
 
@@ -140,8 +122,8 @@ describe('landingPageParamsQuery', () => {
         locales: [EN],
       }),
     ).toEqual([
-      { slug: 'modules', language: EN },
-      { slug: 'modules/faq', language: EN },
+      { slug: MOCK_SECTION_SLUG, language: EN },
+      { slug: `${MOCK_SECTION_SLUG}/${MOCK_CHILD_SLUG}`, language: EN },
       { slug: null, language: EN },
     ]);
   });

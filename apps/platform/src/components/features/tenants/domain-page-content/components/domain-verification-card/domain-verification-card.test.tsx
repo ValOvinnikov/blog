@@ -12,7 +12,7 @@ const AWAITING_DNS = 'Awaiting DNS';
 const CHECKED_JUST_NOW = 'Checked just now';
 const CNAME_RECORD_VALUE = 'cname.vercel-dns.com';
 
-const render = (projectDomain: TProjectDomain) =>
+const setup = (projectDomain: TProjectDomain) =>
   act(async () => {
     renderWithIntl(
       <DomainVerificationCard
@@ -24,7 +24,7 @@ const render = (projectDomain: TProjectDomain) =>
 
 describe(`<${DomainVerificationCard.name}/>`, () => {
   it('shows the status badge in the card header beside the domain', async () => {
-    await render({
+    await setup({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [],
     });
@@ -39,11 +39,11 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     expect(heading).toBeVisible();
     expect(statusBadge).toBeVisible();
     expect(checkedAt).toBeVisible();
-    expect(heading.textContent).not.toContain(AWAITING_DNS);
+    expect(heading).not.toHaveTextContent(AWAITING_DNS);
   });
 
   it('renders the DNS records table when pending with known records', async () => {
-    await render({
+    await setup({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [
         { type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD },
@@ -62,7 +62,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
 
   describe('once verified', () => {
     beforeEach(async () => {
-      await render({
+      await setup({
         status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
         dnsRecords: [],
       });
@@ -91,7 +91,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
   });
 
   it('asks for the records only alongside the table', async () => {
-    await render({
+    await setup({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
     });
@@ -111,7 +111,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
   ] as const)(
     'shows the %s badge and only the records fallback when no records are known',
     async (status, badge) => {
-      await render({ status, dnsRecords: [] });
+      await setup({ status, dnsRecords: [] });
 
       const statusBadge = await screen.findByText(badge);
       const fallback = screen.getByText(
@@ -133,7 +133,7 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     DOMAIN_VERIFICATION_STATUS.ERROR,
     DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
   ])('claims no check for %s', async (status) => {
-    await render({ status, dnsRecords: [] });
+    await setup({ status, dnsRecords: [] });
 
     const heading = await screen.findByRole('heading', { level: 2 });
     const checkedAt = screen.queryByText(CHECKED_JUST_NOW);

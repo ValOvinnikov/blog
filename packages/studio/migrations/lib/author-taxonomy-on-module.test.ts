@@ -1,54 +1,45 @@
 import { TAXONOMY_KIND } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { authorTaxonomyOnModule } from './author-taxonomy-on-module';
 
+faker.seed(2);
+
+const MOCK_LIST_ID = faker.string.uuid();
+const MOCK_OTHER_LIST_ID = faker.string.uuid();
+const REFERENCED_IDS = new Set([MOCK_LIST_ID]);
+
 describe(authorTaxonomyOnModule, () => {
-  it('sets the given taxonomy kind on a referenced module with no taxonomy field', () => {
-    const doc = { _id: 'list-1' };
+  it.each([
+    ['no taxonomy field', { _id: MOCK_LIST_ID }],
+    ['a null taxonomy', { _id: MOCK_LIST_ID, taxonomy: null }],
+    ['a draft of the referenced id', { _id: `drafts.${MOCK_LIST_ID}` }],
+  ])(
+    'sets the given taxonomy kind on a referenced module with %s',
+    (_label, doc) => {
+      expect(
+        authorTaxonomyOnModule(doc, REFERENCED_IDS, TAXONOMY_KIND.TOPICS),
+      ).toEqual([at('taxonomy', set(TAXONOMY_KIND.TOPICS))]);
+    },
+  );
+
+  it.each([TAXONOMY_KIND.TOPICS, TAXONOMY_KIND.TAGS])(
+    'leaves an already-authored %s taxonomy untouched',
+    (taxonomy) => {
+      const doc = { _id: MOCK_LIST_ID, taxonomy };
+
+      expect(
+        authorTaxonomyOnModule(doc, REFERENCED_IDS, TAXONOMY_KIND.TOPICS),
+      ).toBeUndefined();
+    },
+  );
+
+  it('leaves a module no index page references untouched', () => {
+    const doc = { _id: MOCK_OTHER_LIST_ID };
 
     expect(
-      authorTaxonomyOnModule(doc, new Set(['list-1']), TAXONOMY_KIND.TOPICS),
-    ).toEqual([at('taxonomy', set(TAXONOMY_KIND.TOPICS))]);
-  });
-
-  it('sets the given taxonomy kind on a referenced module whose taxonomy is null', () => {
-    const doc = { _id: 'list-1', taxonomy: null };
-
-    expect(
-      authorTaxonomyOnModule(doc, new Set(['list-1']), TAXONOMY_KIND.TAGS),
-    ).toEqual([at('taxonomy', set(TAXONOMY_KIND.TAGS))]);
-  });
-
-  it('matches a draft document against its canonical referenced id', () => {
-    const doc = { _id: 'drafts.list-1' };
-
-    expect(
-      authorTaxonomyOnModule(doc, new Set(['list-1']), TAXONOMY_KIND.TOPICS),
-    ).toEqual([at('taxonomy', set(TAXONOMY_KIND.TOPICS))]);
-  });
-
-  it('leaves an already-authored taxonomy untouched', () => {
-    const doc = { _id: 'list-1', taxonomy: TAXONOMY_KIND.TOPICS };
-
-    expect(
-      authorTaxonomyOnModule(doc, new Set(['list-1']), TAXONOMY_KIND.TOPICS),
-    ).toBeUndefined();
-  });
-
-  it('leaves an already-authored taxonomy set to the other kind untouched', () => {
-    const doc = { _id: 'list-1', taxonomy: TAXONOMY_KIND.TAGS };
-
-    expect(
-      authorTaxonomyOnModule(doc, new Set(['list-1']), TAXONOMY_KIND.TOPICS),
-    ).toBeUndefined();
-  });
-
-  it('is a no-op for a module no index page references', () => {
-    const doc = { _id: 'list-2' };
-
-    expect(
-      authorTaxonomyOnModule(doc, new Set(['list-1']), TAXONOMY_KIND.TOPICS),
+      authorTaxonomyOnModule(doc, REFERENCED_IDS, TAXONOMY_KIND.TOPICS),
     ).toBeUndefined();
   });
 });

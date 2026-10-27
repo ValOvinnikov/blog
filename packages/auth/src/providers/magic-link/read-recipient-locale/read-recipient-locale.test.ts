@@ -4,32 +4,30 @@ import {
   MOCK_TOKEN,
 } from '@blog/auth/testing/magic-link-fixtures';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 
 import { readRecipientLocale } from './read-recipient-locale';
 
+faker.seed(6027);
+
+const MOCK_ORIGIN = faker.internet.url({ appendSlash: false });
 const LIVE_LOCALES = [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR];
 
 const magicLinkTo = (callbackUrl: string) =>
-  `https://acme.example.com/api/auth/callback/email?${new URLSearchParams({
+  `${MOCK_ORIGIN}/api/auth/callback/email?${new URLSearchParams({
     callbackUrl,
     token: MOCK_TOKEN,
     email: MOCK_READER_EMAIL,
   })}`;
 
 describe(readRecipientLocale, () => {
-  it('reads the language from the return-to path prefix', () => {
+  it.each([
+    ['an absolute', `${MOCK_ORIGIN}${MOCK_FRENCH_PATH}`],
+    ['an upper-case', `${MOCK_ORIGIN}/FR`],
+    ['a relative', MOCK_FRENCH_PATH],
+  ])('reads the language from %s return-to path prefix', (_, callbackUrl) => {
     const locale = readRecipientLocale(
-      magicLinkTo('https://acme.example.com/fr/blog/bonjour'),
-      LIVE_LOCALES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(locale).toBe(LOCALE_ISO_CODES.FR);
-  });
-
-  it('matches the prefix regardless of case', () => {
-    const locale = readRecipientLocale(
-      magicLinkTo('https://acme.example.com/FR'),
+      magicLinkTo(callbackUrl),
       LIVE_LOCALES,
       LOCALE_ISO_CODES.EN,
     );
@@ -38,50 +36,19 @@ describe(readRecipientLocale, () => {
   });
 
   it.each([
-    ['an unprefixed path', 'https://acme.example.com/blog/hello'],
-    ['the site root', 'https://acme.example.com/'],
-    [
-      'a language the tenant does not offer',
-      'https://acme.example.com/de/blog',
-    ],
-    ['an unknown prefix', 'https://acme.example.com/xx/blog'],
-  ])("falls back to the tenant's default language for %s", (_, callbackUrl) => {
+    ['an unprefixed path', magicLinkTo(`${MOCK_ORIGIN}/blog/hello`)],
+    ['the site root', magicLinkTo(`${MOCK_ORIGIN}/`)],
+    ['a language the tenant does not offer', magicLinkTo(`${MOCK_ORIGIN}/de`)],
+    ['an unknown prefix', magicLinkTo(`${MOCK_ORIGIN}/xx/blog`)],
+    ['a link with no return-to path', `${MOCK_ORIGIN}/api/auth/callback/email`],
+    ['a link that is not a url', 'not a url'],
+  ])("falls back to the tenant's default language for %s", (_, magicLink) => {
     const locale = readRecipientLocale(
-      magicLinkTo(callbackUrl),
+      magicLink,
       LIVE_LOCALES,
       LOCALE_ISO_CODES.EN,
     );
 
     expect(locale).toBe(LOCALE_ISO_CODES.EN);
-  });
-
-  it('reads a relative return-to path', () => {
-    const locale = readRecipientLocale(
-      magicLinkTo(MOCK_FRENCH_PATH),
-      LIVE_LOCALES,
-      LOCALE_ISO_CODES.EN,
-    );
-
-    expect(locale).toBe(LOCALE_ISO_CODES.FR);
-  });
-
-  it("falls back to the tenant's default language when the link has no return-to path", () => {
-    const locale = readRecipientLocale(
-      'https://acme.example.com/api/auth/callback/email?token=abc',
-      LIVE_LOCALES,
-      LOCALE_ISO_CODES.FR,
-    );
-
-    expect(locale).toBe(LOCALE_ISO_CODES.FR);
-  });
-
-  it("falls back to the tenant's default language when the link is not a url", () => {
-    const locale = readRecipientLocale(
-      'not a url',
-      LIVE_LOCALES,
-      LOCALE_ISO_CODES.FR,
-    );
-
-    expect(locale).toBe(LOCALE_ISO_CODES.FR);
   });
 });

@@ -14,36 +14,39 @@ const topicDocQuery = q.star
   .project(topicFragment);
 
 describe('topicFragment', () => {
-  it('accepts a fully-projected topic (title and resolved slug present)', () => {
-    const projected = {
-      _id: MOCK_TOPIC_ID,
-      title: MOCK_TOPIC_TITLE,
-      slug: MOCK_TOPIC_SLUG,
-      description: MOCK_TOPIC_DESCRIPTION,
-    };
+  it.each([
+    {
+      behaviour: 'accepts a topic with a title and a resolved page slug',
+      projected: {
+        _id: MOCK_TOPIC_ID,
+        title: MOCK_TOPIC_TITLE,
+        slug: MOCK_TOPIC_SLUG,
+        description: MOCK_TOPIC_DESCRIPTION,
+      },
+    },
+    {
+      behaviour: 'accepts a topic with no topic page as a null slug',
+      projected: {
+        _id: MOCK_TOPIC_ID,
+        title: MOCK_TOPIC_TITLE,
+        slug: null,
+        description: null,
+      },
+    },
+  ])('$behaviour', ({ projected }) => {
+    const topic = topicDocQuery.parse(projected);
 
-    expect(topicDocQuery.parse(projected)).toEqual(projected);
+    expect(topic).toEqual(projected);
   });
 
   it('throws when the required title is missing', () => {
     const projected = {
-      _id: 'topic-2',
+      _id: MOCK_TOPIC_ID,
       title: null,
-      slug: 'no-title',
+      slug: MOCK_TOPIC_SLUG,
       description: null,
     };
 
     expect(() => topicDocQuery.parse(projected)).toThrow();
-  });
-
-  it('accepts a topic with no topic page as a null slug', () => {
-    const projected = {
-      _id: 'topic-3',
-      title: 'No Page',
-      slug: null,
-      description: null,
-    };
-
-    expect(topicDocQuery.parse(projected)).toEqual(projected);
   });
 });

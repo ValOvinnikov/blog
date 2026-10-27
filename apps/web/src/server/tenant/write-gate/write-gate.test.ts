@@ -31,7 +31,12 @@ vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
 }));
 
-const MOCK_SITE = 'newsletter.subscribe';
+const MOCK_SITE = faker.lorem.slug();
+
+const MOCK_DEPROVISIONED_AT = faker.date.between({
+  from: '2024-01-01',
+  to: '2025-01-01',
+});
 
 const MOCK_ACTIVE_ROW: [boolean, string, TTenant] = [
   true,
@@ -45,14 +50,14 @@ const MOCK_SUSPENDED_ROW: [boolean, string, TTenant] = [
 ];
 
 describe(resolveWritableTenant, () => {
-  it('returns the tenant id for an ACTIVE tenant', async () => {
+  it('returns the tenant id for an active tenant', async () => {
     await expect(resolveWritableTenant(MOCK_SITE)).resolves.toEqual(
       okResult(MOCK_TENANT_ID),
     );
   });
 
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
-    'refuses a %s tenant as INACTIVE without logging',
+    'refuses a %s tenant as inactive without logging',
     async (status) => {
       vi.mocked(resolveRequestTenant).mockResolvedValueOnce(
         mockTenant({ status }),
@@ -66,7 +71,7 @@ describe(resolveWritableTenant, () => {
     },
   );
 
-  it('refuses an unresolved tenant as UNRESOLVED and logs the site', async () => {
+  it('refuses an unresolved tenant and logs the site', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
     await expect(resolveWritableTenant(MOCK_SITE)).resolves.toEqual(
@@ -77,7 +82,7 @@ describe(resolveWritableTenant, () => {
     });
   });
 
-  it('resolves the tenant row exactly once', async () => {
+  it('looks the request tenant up once', async () => {
     await resolveWritableTenant(MOCK_SITE);
 
     expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
@@ -96,7 +101,7 @@ describe(isTenantActive, () => {
     [
       false,
       'a deprovisioned tenant still marked active',
-      mockTenant({ deprovisionedAt: faker.date.past() }),
+      mockTenant({ deprovisionedAt: MOCK_DEPROVISIONED_AT }),
     ],
   ])('returns %s for %s', (expected, _, tenant) => {
     expect(isTenantActive(tenant)).toBe(expected);

@@ -8,21 +8,28 @@ import { POST_COUNT_EXPRESSION, postCountParser } from './post-count';
 const { EN, NL } = LOCALE_ISO_CODES;
 
 describe('POST_COUNT_EXPRESSION', () => {
-  it('counts published posts referencing the document in the request language', async () => {
-    function count(locale: string): Promise<unknown> {
-      return evaluateGroqExpression(
+  it.each([
+    { locale: EN, expected: 3 },
+    { locale: NL, expected: 1 },
+  ])(
+    'counts the published posts referencing the document in $locale',
+    async ({ locale, expected }) => {
+      const count = await evaluateGroqExpression(
         `*[_id == "${MOCK_TOPIC_ID}"][0]{ "count": ${POST_COUNT_EXPRESSION} }.count`,
         MOCK_TRANSLATED_POST_DOCUMENTS,
         null,
         { locale },
       );
-    }
 
-    expect(await count(EN)).toBe(3);
-    expect(await count(NL)).toBe(1);
-  });
+      expect(count).toBe(expected);
+    },
+  );
+});
 
-  it('parses to a number', () => {
-    expect(postCountParser.parse(5)).toBe(5);
+describe('postCountParser', () => {
+  it('parses a count through as a number', () => {
+    const count = postCountParser.parse(5);
+
+    expect(count).toBe(5);
   });
 });

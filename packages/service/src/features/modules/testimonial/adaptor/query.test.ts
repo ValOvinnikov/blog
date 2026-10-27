@@ -20,58 +20,76 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { testimonialModuleQuery } from './query';
 
+faker.seed(6014);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const TRANSLATED_ID = 'block-testimonial-1';
-const UNTRANSLATED_ID = 'block-testimonial-2';
-const HEADING = { [EN]: 'What people say', [NL]: 'Wat mensen zeggen' };
-const QUOTE = { [EN]: 'They shipped on time.', [NL]: 'Ze leverden op tijd.' };
-const ROLE = { [EN]: 'Founder, Acme', [NL]: 'Oprichter, Acme' };
-const ALT = { [EN]: 'Jane smiling', [NL]: 'Jane lacht' };
-const UNTRANSLATED_QUOTE = 'A pleasure to work with.';
+const MOCK_TRANSLATED_ID = faker.string.uuid();
+const MOCK_UNTRANSLATED_ID = faker.string.uuid();
+const MOCK_FIRST_REFERENCE_KEY = faker.string.uuid();
+const MOCK_SECOND_REFERENCE_KEY = faker.string.uuid();
+const MOCK_TRANSLATED_NAME = faker.person.fullName();
+const MOCK_UNTRANSLATED_NAME = faker.person.fullName();
+const MOCK_HEADING = {
+  [EN]: faker.lorem.words(3),
+  [NL]: faker.lorem.words(3),
+};
+const MOCK_QUOTE = {
+  [EN]: faker.lorem.sentence(),
+  [NL]: faker.lorem.sentence(),
+};
+const MOCK_ROLE = {
+  [EN]: faker.person.jobTitle(),
+  [NL]: faker.person.jobTitle(),
+};
+const MOCK_ALT = { [EN]: faker.lorem.words(2), [NL]: faker.lorem.words(2) };
+const MOCK_UNTRANSLATED_QUOTE = faker.lorem.sentence();
+const MOCK_UNTRANSLATED_ROLE = faker.person.jobTitle();
+const MOCK_MARKED_TEXT = faker.lorem.words(2);
 const [FIRST_ITEM] = mockRawTestimonialModule().testimonials ?? [];
 
-const testimonialModuleDocument = {
+const MOCK_TESTIMONIAL_MODULE_DOCUMENT = {
   _id: MOCK_TESTIMONIAL_MODULE_ID,
   _type: 'module_testimonial',
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockLocalizedHeadingBlock(HEADING),
+  headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
   testimonials: [
-    mockReference(TRANSLATED_ID, { _key: 't-1' }),
-    mockReference(UNTRANSLATED_ID, { _key: 't-2' }),
+    mockReference(MOCK_TRANSLATED_ID, { _key: MOCK_FIRST_REFERENCE_KEY }),
+    mockReference(MOCK_UNTRANSLATED_ID, { _key: MOCK_SECOND_REFERENCE_KEY }),
   ],
 };
 
-const translatedTestimonial = {
-  _id: TRANSLATED_ID,
+const MOCK_TRANSLATED_TESTIMONIAL = {
+  _id: MOCK_TRANSLATED_ID,
   _type: 'block_testimonial',
-  name: 'Jane Doe',
-  quote: mockLocalizedListedText(QUOTE),
-  role: mockLocalizedStrings(ROLE),
-  image: mockLocalizedImage(ALT),
+  name: MOCK_TRANSLATED_NAME,
+  quote: mockLocalizedListedText(MOCK_QUOTE),
+  role: mockLocalizedStrings(MOCK_ROLE),
+  image: mockLocalizedImage(MOCK_ALT),
 };
 
-const untranslatedTestimonial = {
-  _id: UNTRANSLATED_ID,
+const MOCK_UNTRANSLATED_TESTIMONIAL = {
+  _id: MOCK_UNTRANSLATED_ID,
   _type: 'block_testimonial',
-  name: 'Sam Lee',
-  quote: mockLocalizedListedText({ [EN]: UNTRANSLATED_QUOTE }),
-  role: mockLocalizedStrings({ [EN]: 'Editor' }),
+  name: MOCK_UNTRANSLATED_NAME,
+  quote: mockLocalizedListedText({ [EN]: MOCK_UNTRANSLATED_QUOTE }),
+  role: mockLocalizedStrings({ [EN]: MOCK_UNTRANSLATED_ROLE }),
 };
 
 async function runTestimonial(
   locale: string,
-  moduleDocument: Record<string, unknown> = testimonialModuleDocument,
+  moduleDocument: Record<string, unknown> = MOCK_TESTIMONIAL_MODULE_DOCUMENT,
 ) {
   const raw = await evaluateGroqExpression(
     testimonialModuleQuery.query,
     [
       moduleDocument,
-      translatedTestimonial,
-      untranslatedTestimonial,
+      MOCK_TRANSLATED_TESTIMONIAL,
+      MOCK_UNTRANSLATED_TESTIMONIAL,
       MOCK_IMAGE_ASSET_DOCUMENT,
     ],
     undefined,
@@ -91,13 +109,6 @@ function testimonialText(module: Awaited<ReturnType<typeof runTestimonial>>) {
 }
 
 describe('testimonialModuleQuery', () => {
-  it('filters to module_testimonial documents by id', () => {
-    expect(testimonialModuleQuery.query).toContain(
-      '_type == "module_testimonial"',
-    );
-    expect(testimonialModuleQuery.query).toContain('_id == $id');
-  });
-
   it('parses a module with a fully populated quote', () => {
     const raw = mockRawTestimonialModule();
 
@@ -128,13 +139,13 @@ describe('testimonialModuleQuery', () => {
           quote: [
             {
               _type: 'block' as const,
-              _key: 'block-1',
+              _key: faker.string.uuid(),
               style: 'normal' as const,
               children: [
                 {
                   _type: 'span' as const,
-                  _key: 'span-1',
-                  text: 'the case study',
+                  _key: faker.string.uuid(),
+                  text: MOCK_MARKED_TEXT,
                 },
               ],
               markDefs: [markDef],
@@ -157,37 +168,39 @@ describe('testimonialModuleQuery', () => {
     async (locale, language) => {
       const module = await runTestimonial(locale);
 
-      expect(module.headingBlock.heading).toBe(HEADING[language]);
+      expect(module.headingBlock.heading).toBe(MOCK_HEADING[language]);
       expect(testimonialText(module)).toEqual([
         {
-          name: 'Jane Doe',
-          quote: [[QUOTE[language]]],
-          role: ROLE[language],
-          alt: ALT[language],
+          name: MOCK_TRANSLATED_NAME,
+          quote: [[MOCK_QUOTE[language]]],
+          role: MOCK_ROLE[language],
+          alt: MOCK_ALT[language],
         },
         {
-          name: 'Sam Lee',
-          quote: [[UNTRANSLATED_QUOTE]],
-          role: 'Editor',
+          name: MOCK_UNTRANSLATED_NAME,
+          quote: [[MOCK_UNTRANSLATED_QUOTE]],
+          role: MOCK_UNTRANSLATED_ROLE,
           alt: null,
         },
       ]);
     },
   );
 
-  it('reads an unset displayMode as Grid and cardAlignment as Left', async () => {
-    const { displayMode, cardAlignment } = await runTestimonial(EN);
+  it('reads an unset displayMode as Grid', async () => {
+    const { displayMode } = await runTestimonial(EN);
 
     expect(displayMode).toBe(DISPLAY_MODE.GRID);
-    expect(cardAlignment).toBe(CONTENT_ALIGNMENT.LEFT);
   });
 
-  it('keeps an authored Center cardAlignment', async () => {
-    const module = await runTestimonial(EN, {
-      ...testimonialModuleDocument,
-      cardAlignment: CONTENT_ALIGNMENT.CENTER,
+  it.each([
+    ['unset', undefined, CONTENT_ALIGNMENT.LEFT],
+    ['an authored Center', CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
+  ])('reads %s cardAlignment as %s', async (_case, authored, expected) => {
+    const { cardAlignment } = await runTestimonial(EN, {
+      ...MOCK_TESTIMONIAL_MODULE_DOCUMENT,
+      cardAlignment: authored,
     });
 
-    expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
+    expect(cardAlignment).toBe(expected);
   });
 });

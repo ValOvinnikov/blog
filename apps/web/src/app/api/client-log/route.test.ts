@@ -1,10 +1,11 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
+import { faker } from '@faker-js/faker';
 import { CLIENT_LOG_LOG } from '@web/constants/client-log';
 import type * as TRateLimiterModule from '@web/server/rate-limit/rate-limiter/rate-limiter';
 import { logger } from '@web/utils/logger/logger';
 
-import type * as TRoute from './route';
+import { POST } from './route';
 
 const { createRateLimiterSpy } = vi.hoisted(() => ({
   createRateLimiterSpy: vi.fn(),
@@ -19,213 +20,173 @@ vi.mock(
   },
 );
 
-let loggerErrorMock = vi.mocked(logger.error);
+faker.seed(6009);
 
-const CLIENT_LOG_URL = 'https://example.com/api/client-log';
+const PAYLOAD_TOO_LARGE_STATUS = 413;
+const PAYLOAD_CAP_BYTES = 8 * 1024;
+const REPORTS_PER_MINUTE = 20;
 const CONTENT_LENGTH_HEADER = 'content-length';
-const CLIENT_IP = '203.0.113.5';
+const MOCK_CLIENT_LOG_URL = faker.internet.url({ appendSlash: false });
 
-const validPayload = {
-  event: 'copy_to_clipboard.write_failed',
-  message: 'clipboard write denied',
+const MOCK_PAYLOAD = {
+  event: `${faker.lorem.word()}.${faker.lorem.word()}`,
+  message: faker.lorem.sentence(),
 };
 
-const postRequest = (
-  body: unknown,
-  init?: { headers?: Record<string, string>; raw?: string },
-) => {
-  const rawBody = init?.raw ?? JSON.stringify(body);
+const MOCK_FORGED_ENTRY = JSON.stringify({
+  level: 'error',
+  event: faker.lorem.word(),
+});
+const MOCK_PATH = `/${faker.lorem.word()}/${faker.lorem.word()}`;
+const MOCK_QUERY = `token=${faker.string.alphanumeric(12)}`;
 
-  return new Request(CLIENT_LOG_URL, {
-    method: HTTP_METHOD.POST,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-    body: rawBody,
-  });
-};
-
-const postStreamRequest = (byteLength: number) => {
-  const stream = new ReadableStream<Uint8Array>({
+const streamOf = (bytes: Uint8Array): ReadableStream<Uint8Array> =>
+  new ReadableStream<Uint8Array>({
     start(controller) {
-      controller.enqueue(new Uint8Array(byteLength).fill(97));
+      controller.enqueue(bytes);
       controller.close();
     },
   });
 
-  return new Request(CLIENT_LOG_URL, {
-    method: HTTP_METHOD.POST,
-    headers: { 'Content-Type': 'application/json' },
-    body: stream,
-    duplex: 'half',
-  } as RequestInit);
-};
+describe(POST, () => {
+  let clientIp: string;
 
-const freshRoute = async () => {
-  vi.resetModules();
-  const fresh = await import('@web/utils/logger/logger');
-  loggerErrorMock = vi.mocked(fresh.logger.error);
-  return import('./route');
-};
+  const buildRequest = (
+    body: BodyInit,
+    headers: Record<string, string> = {},
+  ): Request =>
+    new Request(MOCK_CLIENT_LOG_URL, {
+      method: HTTP_METHOD.POST,
+      headers: {
+        'Content-Type': 'application/json',
+        [FORWARDED_FOR_HEADER]: clientIp,
+        ...headers,
+      },
+      body,
+      ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+    } as RequestInit);
 
-describe('POST /api/client-log', () => {
-  let POST: typeof TRoute.POST;
+  const jsonRequest = (
+    payload: unknown = MOCK_PAYLOAD,
+    headers?: Record<string, string>,
+  ): Request => buildRequest(JSON.stringify(payload), headers);
 
-  beforeEach(async () => {
-    loggerErrorMock.mockReset();
-    ({ POST } = await freshRoute());
+  beforeEach(() => {
+    clientIp = faker.internet.ipv4();
   });
 
-  it('builds no rate limiter until the first request, so importing the route reads no KV credentials', async () => {
+  it('builds no rate limiter until the first request, and then only one', async () => {
+    vi.resetModules();
     createRateLimiterSpy.mockClear();
-    const { POST: freshPost } = await freshRoute();
+    const { POST: freshPost } = await import('./route');
 
     expect(createRateLimiterSpy).not.toHaveBeenCalled();
 
-    await freshPost(postRequest(validPayload));
-    await freshPost(postRequest(validPayload));
+    await freshPost(jsonRequest());
+    await freshPost(jsonRequest());
 
     expect(createRateLimiterSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('accepts a valid payload and logs through the shared logger with source: client', async () => {
-    const response = await POST(postRequest(validPayload));
+  it('accepts a valid payload and logs it with source: client', async () => {
+    const response = await POST(jsonRequest());
 
     expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      CLIENT_LOG_LOG.REPORT_RECEIVED,
-      {
-        message: validPayload.message,
-        clientEvent: validPayload.event,
-        source: 'client',
-      },
-    );
+    expect(logger.error).toHaveBeenCalledWith(CLIENT_LOG_LOG.REPORT_RECEIVED, {
+      message: MOCK_PAYLOAD.message,
+      clientEvent: MOCK_PAYLOAD.event,
+      source: 'client',
+    });
   });
 
-  it('rejects a payload with an unknown key', async () => {
+  it('logs the sanitized report so a payload cannot forge a log line', async () => {
     const response = await POST(
-      postRequest({ ...validPayload, extra: 'nope' }),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(loggerErrorMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects malformed JSON', async () => {
-    const response = await POST(postRequest(undefined, { raw: '{not json' }));
-
-    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(loggerErrorMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects an oversized payload declared via Content-Length', async () => {
-    const response = await POST(
-      postRequest(validPayload, {
-        headers: { 'Content-Length': String(9 * 1024) },
+      jsonRequest({
+        ...MOCK_PAYLOAD,
+        message: `${MOCK_PAYLOAD.message}\r\n${MOCK_FORGED_ENTRY}`,
+        url: `${MOCK_PATH}?${MOCK_QUERY}`,
       }),
     );
+    const [, loggedContext] = vi.mocked(logger.error).mock.calls[0] ?? [];
 
-    expect(response.status).toBe(413);
-    expect(loggerErrorMock).not.toHaveBeenCalled();
+    expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
+    expect(loggedContext?.['message']).not.toMatch(/[\r\n]/);
+    expect(loggedContext?.['url']).toBe(MOCK_PATH);
   });
 
-  it('rejects an oversized payload even without a Content-Length header', async () => {
-    const response = await POST(
-      postRequest({ ...validPayload, message: 'a'.repeat(9000) }),
-    );
+  it.each([
+    [
+      'a payload with an unknown key',
+      () => jsonRequest({ ...MOCK_PAYLOAD, extra: 'x' }),
+    ],
+    ['malformed JSON', () => buildRequest('{not json')],
+  ])('rejects %s', async (_case, createRequest) => {
+    const response = await POST(createRequest());
 
-    expect(response.status).toBe(413);
-    expect(loggerErrorMock).not.toHaveBeenCalled();
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('rejects an oversized streamed body with no Content-Length, without buffering it', async () => {
-    const request = postStreamRequest(9 * 1024);
-    expect(request.headers.get(CONTENT_LENGTH_HEADER)).toBeNull();
+  it.each([
+    [
+      'declared via Content-Length',
+      () =>
+        jsonRequest(MOCK_PAYLOAD, {
+          'Content-Length': String(PAYLOAD_CAP_BYTES + 1),
+        }),
+    ],
+    [
+      'without a Content-Length header',
+      () =>
+        jsonRequest({
+          ...MOCK_PAYLOAD,
+          message: faker.string.alpha(PAYLOAD_CAP_BYTES + 1),
+        }),
+    ],
+    [
+      'streamed with no Content-Length',
+      () => buildRequest(streamOf(new Uint8Array(PAYLOAD_CAP_BYTES + 1))),
+    ],
+  ])('rejects an oversized payload %s', async (_case, createRequest) => {
+    const request = createRequest();
 
     const response = await POST(request);
 
-    expect(response.status).toBe(413);
-    expect(loggerErrorMock).not.toHaveBeenCalled();
+    expect(response.status).toBe(PAYLOAD_TOO_LARGE_STATUS);
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('accepts a streamed body with no Content-Length that is within the payload cap', async () => {
-    const body = JSON.stringify(validPayload);
-    const stream = new ReadableStream<Uint8Array>({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode(body));
-        controller.close();
-      },
-    });
-    const request = new Request(CLIENT_LOG_URL, {
-      method: HTTP_METHOD.POST,
-      headers: { 'Content-Type': 'application/json' },
-      body: stream,
-      duplex: 'half',
-    } as RequestInit);
-    expect(request.headers.get(CONTENT_LENGTH_HEADER)).toBeNull();
+  it('accepts a streamed body with no Content-Length within the payload cap', async () => {
+    const request = buildRequest(
+      streamOf(new TextEncoder().encode(JSON.stringify(MOCK_PAYLOAD))),
+    );
 
     const response = await POST(request);
 
+    expect(request.headers.get(CONTENT_LENGTH_HEADER)).toBeNull();
     expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
   });
 
-  it('strips control characters from the message so a payload cannot forge a log line', async () => {
-    const forgedSuffix = JSON.stringify({
-      level: 'error',
-      event: 'fake.forged_entry',
-    });
-
-    const response = await POST(
-      postRequest({
-        ...validPayload,
-        message: `real error\r\n${forgedSuffix}`,
-      }),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
-    const loggedContext = loggerErrorMock.mock.calls[0]?.[1] as {
-      message: string;
-    };
-    expect(loggedContext.message).not.toMatch(/[\r\n]/);
-  });
-
-  it('strips the query string from a reported url before logging', async () => {
-    await POST(
-      postRequest({
-        ...validPayload,
-        url: '/blog/hello?token=super-secret',
-      }),
-    );
-
-    const loggedContext = loggerErrorMock.mock.calls[0]?.[1] as {
-      url: string;
-    };
-    expect(loggedContext.url).toBe('/blog/hello');
-  });
-
-  it('accepts 20 reports per client per minute and refuses the 21st', async () => {
-    const headers = { [FORWARDED_FOR_HEADER]: CLIENT_IP };
-
+  it('refuses a client once it exceeds the per-minute report limit', async () => {
     const statuses: number[] = [];
-    for (let i = 0; i < 21; i += 1) {
-      statuses.push(
-        (await POST(postRequest(validPayload, { headers }))).status,
-      );
+    for (let i = 0; i <= REPORTS_PER_MINUTE; i += 1) {
+      statuses.push((await POST(jsonRequest())).status);
     }
 
-    expect(statuses).toEqual([...Array<number>(20).fill(204), 429]);
+    expect(statuses).toEqual([
+      ...Array<number>(REPORTS_PER_MINUTE).fill(HTTP_STATUS.NO_CONTENT),
+      HTTP_STATUS.TOO_MANY_REQUESTS,
+    ]);
   });
 
   it('tracks rate limiting per client key, not globally', async () => {
-    for (let i = 0; i < 21; i += 1) {
-      await POST(
-        postRequest(validPayload, {
-          headers: { [FORWARDED_FOR_HEADER]: CLIENT_IP },
-        }),
-      );
+    for (let i = 0; i <= REPORTS_PER_MINUTE; i += 1) {
+      await POST(jsonRequest());
     }
 
     const otherClientResponse = await POST(
-      postRequest(validPayload, {
-        headers: { [FORWARDED_FOR_HEADER]: '203.0.113.9' },
+      jsonRequest(MOCK_PAYLOAD, {
+        [FORWARDED_FOR_HEADER]: faker.internet.ipv4(),
       }),
     );
 

@@ -1,49 +1,48 @@
+import { faker } from '@faker-js/faker';
+
 import {
   headingFieldsToSectionHeader,
   postListTitleToSectionHeader,
 } from './transform';
 
+faker.seed(7);
+
+const MOCK_HEADING = faker.lorem.words();
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_TITLE = faker.lorem.words();
+
 describe(headingFieldsToSectionHeader, () => {
-  it('maps module_cta heading + text onto heading + supportingText', () => {
-    const result = headingFieldsToSectionHeader({
-      heading: 'Get Started',
-      text: 'Join the newsletter today.',
-    });
+  it.each(['text', 'description'])(
+    'maps heading and %s onto heading and supportingText',
+    (supportingField) => {
+      const result = headingFieldsToSectionHeader({
+        heading: MOCK_HEADING,
+        [supportingField]: MOCK_SUPPORTING_TEXT,
+      });
 
-    expect(result).toEqual({
-      heading: 'Get Started',
-      supportingText: 'Join the newsletter today.',
-    });
+      expect(result).toEqual({
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
+      });
+    },
+  );
+
+  it('omits supportingText when there is no text or description', () => {
+    const result = headingFieldsToSectionHeader({ heading: MOCK_HEADING });
+
+    expect(result).toEqual({ heading: MOCK_HEADING });
   });
 
-  it('maps module_newsletter heading + description onto heading + supportingText', () => {
+  it('leaves a doc that already has sectionHeader alone', () => {
     const result = headingFieldsToSectionHeader({
-      heading: 'Stay in the loop',
-      description: 'One email a week, no spam.',
-    });
-
-    expect(result).toEqual({
-      heading: 'Stay in the loop',
-      supportingText: 'One email a week, no spam.',
-    });
-  });
-
-  it('omits supportingText when neither text nor description is set', () => {
-    const result = headingFieldsToSectionHeader({ heading: 'Get Started' });
-
-    expect(result).toEqual({ heading: 'Get Started' });
-  });
-
-  it('is idempotent — a doc that already has sectionHeader is left alone', () => {
-    const result = headingFieldsToSectionHeader({
-      heading: 'Get Started',
-      sectionHeader: { heading: 'Get Started' },
+      heading: MOCK_HEADING,
+      sectionHeader: { heading: MOCK_HEADING },
     });
 
     expect(result).toBeUndefined();
   });
 
-  it('documents the known edge case: neither heading nor text/description leaves nothing to move', () => {
+  it('returns undefined when there is nothing to move', () => {
     const result = headingFieldsToSectionHeader({});
 
     expect(result).toBeUndefined();
@@ -51,22 +50,22 @@ describe(headingFieldsToSectionHeader, () => {
 });
 
 describe(postListTitleToSectionHeader, () => {
-  it('copies title onto sectionHeader.heading', () => {
-    const result = postListTitleToSectionHeader({ title: 'Latest Posts' });
+  it('copies title onto the section header heading', () => {
+    const result = postListTitleToSectionHeader({ title: MOCK_TITLE });
 
-    expect(result).toEqual({ heading: 'Latest Posts' });
+    expect(result).toEqual({ heading: MOCK_TITLE });
   });
 
-  it('is idempotent — a doc that already has sectionHeader is left alone', () => {
+  it('leaves a doc that already has sectionHeader alone', () => {
     const result = postListTitleToSectionHeader({
-      title: 'Latest Posts',
-      sectionHeader: { heading: 'Latest Posts' },
+      title: MOCK_TITLE,
+      sectionHeader: { heading: MOCK_TITLE },
     });
 
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined for a doc with no title', () => {
+  it('returns undefined for a doc without a title', () => {
     const result = postListTitleToSectionHeader({});
 
     expect(result).toBeUndefined();

@@ -1,16 +1,15 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { mockMembershipInvite } from '@blog/db/testing/membership-invites/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-
-import { createMembershipInvite } from '../create-membership-invite';
+import { faker } from '@faker-js/faker';
 
 import { countMembershipInvitesForTenant } from './count-membership-invites-for-tenant';
 
 vi.mock('@blog/db/client');
 
-const MOCK_FIRST_EMAIL = 'one@example.com';
-const MOCK_SECOND_EMAIL = 'two@example.com';
+faker.seed(6022);
 
 const db = useQueryTestDb();
 
@@ -27,28 +26,26 @@ describe(countMembershipInvitesForTenant, () => {
   });
 
   it('counts every invite row for the tenant', async () => {
-    await createMembershipInvite(
-      tenantId,
-      MOCK_FIRST_EMAIL,
-      MEMBERSHIP_ROLE.EDITOR,
-    );
-    await createMembershipInvite(
-      tenantId,
-      MOCK_SECOND_EMAIL,
-      MEMBERSHIP_ROLE.READER,
-    );
+    await mockMembershipInvite(db(), tenantId, {
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
+    await mockMembershipInvite(db(), tenantId, {
+      role: MEMBERSHIP_ROLE.READER,
+    });
 
-    await expect(countMembershipInvitesForTenant(tenantId)).resolves.toBe(2);
+    const count = await countMembershipInvitesForTenant(tenantId);
+
+    expect(count).toBe(2);
   });
 
   it("does not count another tenant's invites", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await createMembershipInvite(
-      otherTenantId,
-      MOCK_FIRST_EMAIL,
-      MEMBERSHIP_ROLE.EDITOR,
-    );
+    await mockMembershipInvite(db(), otherTenantId, {
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
 
-    await expect(countMembershipInvitesForTenant(tenantId)).resolves.toBe(0);
+    const count = await countMembershipInvitesForTenant(tenantId);
+
+    expect(count).toBe(0);
   });
 });

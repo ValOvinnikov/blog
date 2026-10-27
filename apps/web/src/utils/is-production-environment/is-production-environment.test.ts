@@ -1,27 +1,23 @@
-export {};
+import { faker } from '@faker-js/faker';
+import { PRODUCTION_DATASET } from '@web/testing/shared/sanity-dataset/fixtures';
 
-describe('isProductionEnvironment', () => {
-  afterEach(() => {
-    vi.resetModules();
-  });
+import { isProductionEnvironment } from './is-production-environment';
 
-  it('returns true when NEXT_PUBLIC_SANITY_DATASET is production', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { NEXT_PUBLIC_SANITY_DATASET: 'production' },
-    }));
-    const { isProductionEnvironment } =
-      await import('./is-production-environment');
+faker.seed(119);
 
-    expect(isProductionEnvironment()).toBe(true);
-  });
+const MOCK_OTHER_DATASET = faker.lorem.word();
 
-  it('returns false for any non-production dataset', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { NEXT_PUBLIC_SANITY_DATASET: 'development' },
-    }));
-    const { isProductionEnvironment } =
-      await import('./is-production-environment');
+const mockEnv = vi.hoisted(() => ({ NEXT_PUBLIC_SANITY_DATASET: '' }));
 
-    expect(isProductionEnvironment()).toBe(false);
+vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
+
+describe(isProductionEnvironment, () => {
+  it.each([
+    { dataset: PRODUCTION_DATASET, expected: true },
+    { dataset: MOCK_OTHER_DATASET, expected: false },
+  ])('is $expected for the $dataset dataset', ({ dataset, expected }) => {
+    mockEnv.NEXT_PUBLIC_SANITY_DATASET = dataset;
+
+    expect(isProductionEnvironment()).toBe(expected);
   });
 });

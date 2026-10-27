@@ -1,13 +1,13 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { MakeItYoursCard } from './make-it-yours-card';
 
-const render = renderWithIntl;
+const setup = customRender(MakeItYoursCard, {});
 
-describe(MakeItYoursCard, () => {
+describe(`<${MakeItYoursCard.name}/>`, () => {
   beforeEach(() => {
-    render(<MakeItYoursCard />);
+    setup();
   });
 
   it('links to Look, Voice and Features', () => {

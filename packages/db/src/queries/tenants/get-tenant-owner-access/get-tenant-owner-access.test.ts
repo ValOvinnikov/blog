@@ -21,13 +21,18 @@ describe(getTenantOwnerAccess, () => {
   it('reads every field as undefined for a tenant with no owner access recorded', async () => {
     const { id } = await insertTestTenant(db());
 
-    expect(await getTenantOwnerAccess(id)).toEqual({
+    const result = await getTenantOwnerAccess(id);
+
+    expect(result).toEqual({
       sanityInviteId: undefined,
       inviteSentAt: undefined,
       inviteAcceptedAt: undefined,
       sanityUserId: undefined,
       loginProvider: undefined,
       sanityRole: undefined,
+      inviteHeadsUpSentAt: undefined,
+      inviteNudgeSentAt: undefined,
+      siteReadySentAt: undefined,
     });
   });
 
@@ -38,10 +43,14 @@ describe(getTenantOwnerAccess, () => {
       toTenantOwnerAccessColumns(ownerAccess),
     );
 
-    expect(await getTenantOwnerAccess(id)).toEqual(ownerAccess);
+    const result = await getTenantOwnerAccess(id);
+
+    expect(result).toEqual(ownerAccess);
   });
 
   it('returns undefined for a tenant id that does not exist', async () => {
-    expect(await getTenantOwnerAccess(MOCK_MISSING_TENANT_ID)).toBeUndefined();
+    const result = await getTenantOwnerAccess(MOCK_MISSING_TENANT_ID);
+
+    expect(result).toBeUndefined();
   });
 });

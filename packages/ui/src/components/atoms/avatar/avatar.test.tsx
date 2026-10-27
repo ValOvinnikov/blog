@@ -4,11 +4,15 @@ import {
   screen,
 } from '@blog/ui/testing/custom-render';
 import { MOCK_PERSON_NAME } from '@blog/ui/testing/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { Avatar } from './avatar';
 
-const PHOTO_SRC = '/photo.jpg';
-const PHOTO_ALT = 'Profile photo';
+faker.seed(123);
+
+const MOCK_PHOTO_SRC = faker.image.url();
+const MOCK_PHOTO_ALT = faker.lorem.words(2);
+const MOCK_PERSON_INITIALS = 'JD';
 
 const setup = customRender(Avatar, {
   alt: MOCK_PERSON_NAME,
@@ -21,20 +25,24 @@ describe(`<${Avatar.name}/>`, () => {
       setup();
     });
 
-    it('renders initials when no src', () => {
-      const initials = screen.getByText('JD');
+    it('renders initials when there is no src', () => {
+      const initials = screen.getByText(MOCK_PERSON_INITIALS);
+
       expect(initials).toBeVisible();
     });
 
-    it('renders a text alternative for the initials fallback when alt is provided', () => {
+    it('gives the initials a text alternative from alt', () => {
       const textAlternative = screen.getByText(MOCK_PERSON_NAME);
+
       expect(textAlternative).toBeVisible();
     });
   });
 
-  it('renders img when src is provided', () => {
-    setup({ src: PHOTO_SRC, alt: PHOTO_ALT });
-    const photo = screen.getByRole('img', { name: PHOTO_ALT });
+  it('renders the image when src is provided', () => {
+    setup({ src: MOCK_PHOTO_SRC, alt: MOCK_PHOTO_ALT });
+
+    const photo = screen.getByRole('img', { name: MOCK_PHOTO_ALT });
+
     expect(photo).toBeVisible();
   });
 
@@ -45,33 +53,35 @@ describe(`<${Avatar.name}/>`, () => {
     { case: 'a single token', name: 'madonna', initials: 'MA' },
   ])('derives 2 initials from $case', ({ name, initials }) => {
     setup({ alt: name, name });
+
     const derivedInitials = screen.getByText(initials);
+
     expect(derivedInitials).toBeVisible();
   });
 
-  it('renders no accessible name on the image when alt is empty', () => {
-    setup({ src: PHOTO_SRC, alt: '' });
+  it('renders no image when alt is empty', () => {
+    setup({ src: MOCK_PHOTO_SRC, alt: '' });
+
     const photo = screen.queryByRole('img');
+
     expect(photo).not.toBeInTheDocument();
   });
 
-  it('renders no sr-only name alongside the initials fallback when alt is empty', () => {
+  it('renders no text alternative beside the initials when alt is empty', () => {
     setup({ alt: '' });
-    const initials = screen.getByText('JD');
+
+    const initials = screen.getByText(MOCK_PERSON_INITIALS);
     const textAlternative = screen.queryByText(MOCK_PERSON_NAME);
+
     expect(initials).toBeVisible();
     expect(textAlternative).not.toBeInTheDocument();
   });
 
   it('calls onImageError when the image fails to load', () => {
     const onImageError = vi.fn();
-    setup({
-      src: '/broken-photo.jpg',
-      alt: PHOTO_ALT,
-      onImageError,
-    });
+    setup({ src: MOCK_PHOTO_SRC, alt: MOCK_PHOTO_ALT, onImageError });
 
-    const image = screen.getByRole('img', { name: PHOTO_ALT });
+    const image = screen.getByRole('img', { name: MOCK_PHOTO_ALT });
     fireEvent.error(image);
 
     expect(onImageError).toHaveBeenCalledOnce();

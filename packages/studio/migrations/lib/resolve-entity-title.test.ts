@@ -1,41 +1,49 @@
-import type { MigrationContext } from 'sanity/migrate';
+import type { TMaybeNull } from '@blog/config/types';
+import { mockMigrationContext } from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 
 import { resolveEntityTitle } from './resolve-entity-title';
 
-const fakeContext = (
-  entities: Record<string, unknown> = {},
-): MigrationContext =>
-  ({
-    client: {
-      fetch: async (_query: string, params: { ref?: string }) =>
-        entities[params.ref ?? ''] ?? null,
-    },
-  }) as unknown as MigrationContext;
+faker.seed(16);
+
+const MOCK_REF = faker.string.uuid();
+const MOCK_TITLE = faker.lorem.words();
+
+const mockContext = (entity: TMaybeNull<{ title?: string }>) => {
+  const fetch = vi.fn().mockResolvedValue(entity);
+
+  return { fetch, context: mockMigrationContext({ fetch }) };
+};
 
 describe(resolveEntityTitle, () => {
   it('returns undefined without a ref, performing no lookup', async () => {
-    const fetch = vi.fn(async () => null);
-    const context = { client: { fetch } } as unknown as MigrationContext;
+    const { context, fetch } = mockContext(null);
 
-    expect(await resolveEntityTitle(context, undefined)).toBeUndefined();
+    const title = await resolveEntityTitle(context, undefined);
+
+    expect(title).toBeUndefined();
     expect(fetch).not.toHaveBeenCalled();
   });
 
   it('returns the trimmed title of the referenced entity', async () => {
-    const context = fakeContext({ 'blog_tag-1': { title: '  TypeScript  ' } });
+    const { context } = mockContext({ title: `  ${MOCK_TITLE}  ` });
 
-    expect(await resolveEntityTitle(context, 'blog_tag-1')).toBe('TypeScript');
+    const title = await resolveEntityTitle(context, MOCK_REF);
+
+    expect(title).toBe(MOCK_TITLE);
   });
 
-  it('returns undefined when the referenced entity has no title', async () => {
-    const context = fakeContext({ 'blog_tag-1': { title: '' } });
+  it.each([
+    ['has no title', { title: '' }],
+    ['cannot be found', null],
+  ])(
+    'returns undefined when the referenced entity %s',
+    async (_label, entity) => {
+      const { context } = mockContext(entity);
 
-    expect(await resolveEntityTitle(context, 'blog_tag-1')).toBeUndefined();
-  });
+      const title = await resolveEntityTitle(context, MOCK_REF);
 
-  it('returns undefined when the referenced entity cannot be found', async () => {
-    const context = fakeContext({});
-
-    expect(await resolveEntityTitle(context, 'missing')).toBeUndefined();
-  });
+      expect(title).toBeUndefined();
+    },
+  );
 });

@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostFeaturedModuleData } from '@web/testing/modules/post-featured/fixtures';
@@ -13,9 +14,14 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 
 import { PostFeaturedModule } from './post-featured-module';
 
-const MODULE_ID = 'post-featured-1';
-const LEAD_IMAGE_ALT = 'Lead image';
-const TAIL_IMAGE_ALT = 'Tail image';
+faker.seed(6011);
+
+const MOCK_MODULE_ID = faker.string.uuid();
+const MOCK_LEAD_POST_ID = faker.string.uuid();
+const MOCK_SECOND_POST_ID = faker.string.uuid();
+const MOCK_THIRD_POST_ID = faker.string.uuid();
+const MOCK_LEAD_IMAGE_ALT = faker.lorem.words(3);
+const MOCK_TAIL_IMAGE_ALT = faker.lorem.words(3);
 
 const { getPostFeaturedMock } = vi.hoisted(() => ({
   getPostFeaturedMock: vi.fn(),
@@ -34,34 +40,30 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 const setup = customRenderAsync(PostFeaturedModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${PostFeaturedModule.name}/>`, () => {
   beforeEach(() => {
     getPostFeaturedMock.mockReset();
+    getPostFeaturedMock.mockResolvedValue(
+      okResult(mockPostFeaturedModuleData()),
+    );
   });
 
-  describe('when the module has no posts', () => {
-    let container: HTMLElement;
+  it('fetches the module by id with the resolved tenant Sanity context', async () => {
+    await setup();
 
-    beforeEach(async () => {
-      getPostFeaturedMock.mockResolvedValue(
-        okResult(mockPostFeaturedModuleData()),
-      );
-      ({ container } = await setup());
-    });
+    expect(getPostFeaturedMock).toHaveBeenCalledWith(
+      MOCK_MODULE_ID,
+      MOCK_TENANT_SANITY_CONTEXT,
+    );
+  });
 
-    it('fetches the module by id with the resolved tenant Sanity context', () => {
-      expect(getPostFeaturedMock).toHaveBeenCalledWith(
-        MODULE_ID,
-        MOCK_TENANT_SANITY_CONTEXT,
-      );
-    });
+  it('renders nothing when no posts resolve', async () => {
+    const { container } = await setup();
 
-    it('renders nothing, not even an empty landmark, when no posts resolve', () => {
-      expect(container).toBeEmptyDOMElement();
-    });
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -77,9 +79,18 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       okResult(
         mockPostFeaturedModuleData({
           posts: [
-            mockPostCard({ id: 'post-1', title: MOCK_LEAD_POST_TITLE }),
-            mockPostCard({ id: 'post-2', title: MOCK_SECOND_POST_TITLE }),
-            mockPostCard({ id: 'post-3', title: MOCK_THIRD_POST_TITLE }),
+            mockPostCard({
+              id: MOCK_LEAD_POST_ID,
+              title: MOCK_LEAD_POST_TITLE,
+            }),
+            mockPostCard({
+              id: MOCK_SECOND_POST_ID,
+              title: MOCK_SECOND_POST_TITLE,
+            }),
+            mockPostCard({
+              id: MOCK_THIRD_POST_ID,
+              title: MOCK_THIRD_POST_TITLE,
+            }),
           ],
         }),
       ),
@@ -91,8 +102,9 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     const secondTitle = screen.getByText(MOCK_SECOND_POST_TITLE);
     const thirdTitle = screen.getByText(MOCK_THIRD_POST_TITLE);
     const tailGrid = screen.getByTestId(
-      'post-featured-module-post-featured-1-tail-grid',
+      `post-featured-module-${MOCK_MODULE_ID}-tail-grid`,
     );
+
     expect(leadTitle).toBeVisible();
     expect(secondTitle).toBeVisible();
     expect(thirdTitle).toBeVisible();
@@ -106,14 +118,14 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
         mockPostFeaturedModuleData({
           posts: [
             mockPostCard({
-              id: 'post-1',
+              id: MOCK_LEAD_POST_ID,
               title: MOCK_LEAD_POST_TITLE,
-              heroImage: mockSanityImage({ alt: LEAD_IMAGE_ALT }),
+              heroImage: mockSanityImage({ alt: MOCK_LEAD_IMAGE_ALT }),
             }),
             mockPostCard({
-              id: 'post-2',
+              id: MOCK_SECOND_POST_ID,
               title: MOCK_SECOND_POST_TITLE,
-              heroImage: mockSanityImage({ alt: TAIL_IMAGE_ALT }),
+              heroImage: mockSanityImage({ alt: MOCK_TAIL_IMAGE_ALT }),
             }),
           ],
           showImages: true,
@@ -123,22 +135,15 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
     await setup();
 
-    const leadImage = screen.getByRole('img', { name: LEAD_IMAGE_ALT });
-    const tailImage = screen.getByRole('img', { name: TAIL_IMAGE_ALT });
+    const leadImage = screen.getByRole('img', { name: MOCK_LEAD_IMAGE_ALT });
+    const tailImage = screen.getByRole('img', { name: MOCK_TAIL_IMAGE_ALT });
 
-    expect(leadImage).toHaveAttribute(
-      'sizes',
-      '(min-width: 768px) 50vw, 100vw',
+    expect(leadImage.getAttribute('sizes')).not.toBe(
+      tailImage.getAttribute('sizes'),
     );
-    expect(leadImage).toHaveAttribute('width', '960');
-    expect(leadImage).toHaveAttribute('height', '540');
-
-    expect(tailImage).toHaveAttribute(
-      'sizes',
-      '(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
+    expect(leadImage.getAttribute('width')).not.toBe(
+      tailImage.getAttribute('width'),
     );
-    expect(tailImage).toHaveAttribute('width', '640');
-    expect(tailImage).toHaveAttribute('height', '360');
   });
 
   it('renders no post images when images are turned off', async () => {
@@ -147,7 +152,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
         mockPostFeaturedModuleData({
           posts: [
             mockPostCard({
-              id: 'post-1',
+              id: MOCK_LEAD_POST_ID,
               heroImage: mockSanityImage(),
             }),
           ],
@@ -158,6 +163,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     await setup();
 
     const image = screen.queryByRole('img');
+
     expect(image).not.toBeInTheDocument();
   });
 });

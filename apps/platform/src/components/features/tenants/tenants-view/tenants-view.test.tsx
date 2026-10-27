@@ -1,4 +1,4 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import {
   mockTenant,
   MOCK_TENANT_NAME,
@@ -7,28 +7,24 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { TenantsView } from './tenants-view';
 
-const render = renderWithIntl;
-
-const tenant = mockTenant();
+const setup = customRender(TenantsView, {
+  tenants: [mockTenant()],
+  shouldShowArchived: false,
+  isEmailAlertingConfigured: true,
+});
 
 const ARIA_PRESSED = 'aria-pressed';
 const PRESSED = 'true';
 const CODE_TAG = 'code';
 const EMAIL_ALERTS_NOT_CONFIGURED = 'Email alerts not configured';
 
-describe(TenantsView, () => {
-  describe('with default props', () => {
+describe(`<${TenantsView.name}/>`, () => {
+  describe('with email alerting configured', () => {
     beforeEach(() => {
-      render(
-        <TenantsView
-          tenants={[tenant]}
-          shouldShowArchived={false}
-          isEmailAlertingConfigured={true}
-        />,
-      );
+      setup();
     });
 
-    it('renders the real tenant row', () => {
+    it('lists the tenants under the page heading', () => {
       const heading = screen.getByRole('heading', { name: 'Tenants' });
       const tenantName = screen.getByText(MOCK_TENANT_NAME);
 
@@ -36,7 +32,7 @@ describe(TenantsView, () => {
       expect(tenantName).toBeVisible();
     });
 
-    it("renders the description's code chunk as a real <code> element", () => {
+    it("marks the description's tenants term as code", () => {
       const code = screen.getByText('tenants', { selector: CODE_TAG });
 
       expect(code.localName).toBe(CODE_TAG);
@@ -48,41 +44,29 @@ describe(TenantsView, () => {
       expect(addTenant).toHaveAttribute('href', adminRoutes.newTenant());
     });
 
-    it('shows the archived-tenants toggle set to Active by default', () => {
+    it('filters to active tenants by default', () => {
       const activeButton = screen.getByRole('button', { name: 'Active' });
 
       expect(activeButton).toHaveAttribute(ARIA_PRESSED, PRESSED);
     });
 
-    it('renders no email-alerts banner when email alerting is configured', () => {
+    it('hides the email-alerts banner when alerting is configured', () => {
       const banner = screen.queryByText(EMAIL_ALERTS_NOT_CONFIGURED);
 
       expect(banner).not.toBeInTheDocument();
     });
   });
 
-  it('shows the archived-tenants toggle set to All when shouldShowArchived is true', () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={true}
-        isEmailAlertingConfigured={true}
-      />,
-    );
+  it('filters to all tenants when archived tenants are included', () => {
+    setup({ shouldShowArchived: true });
 
     const allButton = screen.getByRole('button', { name: 'All' });
 
     expect(allButton).toHaveAttribute(ARIA_PRESSED, PRESSED);
   });
 
-  it('renders the email-alerts banner when email alerting is not configured', () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={false}
-        isEmailAlertingConfigured={false}
-      />,
-    );
+  it('warns when email alerting is not configured', () => {
+    setup({ isEmailAlertingConfigured: false });
 
     const banner = screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED);
     const bannerDescription = screen.getByText(

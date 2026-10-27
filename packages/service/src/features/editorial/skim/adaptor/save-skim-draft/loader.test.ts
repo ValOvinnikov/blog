@@ -6,6 +6,7 @@ import {
 } from '@blog/service/testing/editorial/fixtures';
 import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { saveSkimDraft } from './loader';
 
@@ -13,24 +14,26 @@ vi.mock('@blog/service/sanity/write-client/write-client', () => ({
   getWriteClient: vi.fn(),
 }));
 
-const DRAFT_ID = `drafts.${MOCK_POST_ID}`;
-const NOW = '2026-07-20T00:00:00.000Z';
-const SKIM_INPUT = mockSkimDraftInput();
-const PUBLISHED_POST = {
+faker.seed(6015102);
+
+const MOCK_DRAFT_ID = `drafts.${MOCK_POST_ID}`;
+const MOCK_NOW = '2026-07-20T00:00:00.000Z';
+const MOCK_SKIM_INPUT = mockSkimDraftInput();
+const MOCK_PUBLISHED_POST = {
   _id: MOCK_POST_ID,
   _type: 'page_post',
-  title: 'Hello',
+  title: faker.lorem.sentence(),
 };
+const MOCK_TENANT = mockTenant();
 
 const mockGetWriteClient = vi.mocked(getWriteClient);
-const tenant = mockTenant();
 
 function mockWriteClient() {
   const commit = vi.fn().mockResolvedValue(undefined);
   const patch = vi.fn().mockReturnValue({ commit });
   const createIfNotExists = vi.fn().mockReturnValue({ patch });
   const transaction = vi.fn().mockReturnValue({ createIfNotExists });
-  const getDocument = vi.fn().mockResolvedValue(PUBLISHED_POST);
+  const getDocument = vi.fn().mockResolvedValue(MOCK_PUBLISHED_POST);
 
   return { getDocument, transaction, createIfNotExists, patch, commit };
 }
@@ -40,7 +43,7 @@ describe(saveSkimDraft, () => {
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date(NOW));
+    vi.setSystemTime(new Date(MOCK_NOW));
     client = mockWriteClient();
     mockGetWriteClient.mockReturnValue(client as never);
   });
@@ -49,46 +52,47 @@ describe(saveSkimDraft, () => {
     vi.useRealTimers();
   });
 
-  it('throws when there is no published post for the id', async () => {
+  it('throws naming the post when no published post exists', async () => {
     client.getDocument.mockResolvedValue(undefined);
 
-    await expect(saveSkimDraft(SKIM_INPUT, tenant)).rejects.toThrow(
-      /no published post/,
+    await expect(saveSkimDraft(MOCK_SKIM_INPUT, MOCK_TENANT)).rejects.toThrow(
+      MOCK_POST_ID,
     );
   });
 
-  it('propagates when the write client is missing its write token', async () => {
+  it('propagates a failure creating the write client', async () => {
+    const error = new Error(faker.lorem.sentence());
     mockGetWriteClient.mockImplementation(() => {
-      throw new Error('getWriteClient: SANITY_API_WRITE_TOKEN is not set');
+      throw error;
     });
 
-    await expect(saveSkimDraft(SKIM_INPUT, tenant)).rejects.toThrow(
-      /SANITY_API_WRITE_TOKEN/,
+    await expect(saveSkimDraft(MOCK_SKIM_INPUT, MOCK_TENANT)).rejects.toBe(
+      error,
     );
   });
 
   it.each([
     ['a published id', MOCK_POST_ID],
-    ['an already-draft id', DRAFT_ID],
+    ['an already-draft id', MOCK_DRAFT_ID],
   ])(
     'drafts the published doc and patches only the draft, given %s',
     async (_, postId) => {
-      await saveSkimDraft({ ...SKIM_INPUT, postId }, tenant);
+      await saveSkimDraft({ ...MOCK_SKIM_INPUT, postId }, MOCK_TENANT);
 
       expect(client.getDocument).toHaveBeenCalledWith(MOCK_POST_ID);
       expect(client.createIfNotExists).toHaveBeenCalledWith({
-        ...PUBLISHED_POST,
-        _id: DRAFT_ID,
+        ...MOCK_PUBLISHED_POST,
+        _id: MOCK_DRAFT_ID,
       });
       expect(client.patch.mock.calls).toEqual([
         [
-          DRAFT_ID,
+          MOCK_DRAFT_ID,
           {
             set: {
               postTakeaways: {
                 _type: 'postTakeaways',
                 takeaways: MOCK_SKIM_TAKEAWAYS,
-                generatedAt: NOW,
+                generatedAt: MOCK_NOW,
                 model: MOCK_SKIM_MODEL,
               },
             },
@@ -99,9 +103,9 @@ describe(saveSkimDraft, () => {
     },
   );
 
-  it('passes the tenant context through to getWriteClient', async () => {
-    await saveSkimDraft(SKIM_INPUT, tenant);
+  it('creates the write client for the tenant', async () => {
+    await saveSkimDraft(MOCK_SKIM_INPUT, MOCK_TENANT);
 
-    expect(mockGetWriteClient).toHaveBeenCalledWith(tenant);
+    expect(mockGetWriteClient).toHaveBeenCalledWith(MOCK_TENANT);
   });
 });

@@ -1,6 +1,7 @@
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 
 import { upsertSettingsFeatures } from './upsert-settings-features';
 
@@ -20,31 +21,37 @@ describe(upsertSettingsFeatures, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('inserts a new row falling back to column defaults for omitted toggles', async () => {
+  it('inserts a row with column defaults for omitted toggles', async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    const [defaults] = await db()
+      .insert(schema.settingsFeatures)
+      .values({ tenantId: otherTenantId })
+      .returning();
+
     const result = await upsertSettingsFeatures(tenantId, {
       newsletterEnabled: true,
     });
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
+      ...defaults,
+      id: result.id,
       tenantId,
-      commentsEnabled: true,
-      ratingsEnabled: true,
-      bookmarksEnabled: true,
       newsletterEnabled: true,
-      analyticsEnabled: false,
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
     });
   });
 
-  it('updates the existing row in place rather than inserting a second one', async () => {
+  it('updates the existing row in place', async () => {
     await upsertSettingsFeatures(tenantId, {});
 
     const result = await upsertSettingsFeatures(tenantId, {
       commentsEnabled: false,
     });
 
-    expect(result.commentsEnabled).toBe(false);
     const rows = await db().select().from(schema.settingsFeatures);
-    expect(rows).toHaveLength(1);
+    expect(rows).toEqual([result]);
+    expect(result.commentsEnabled).toBe(false);
   });
 
   it('leaves an omitted toggle untouched on a later update', async () => {
@@ -58,11 +65,11 @@ describe(upsertSettingsFeatures, () => {
     expect(result.commentsEnabled).toBe(false);
   });
 
-  it('rejects a tenantId with no matching tenants row', async () => {
-    await expect(
-      upsertSettingsFeatures('00000000-0000-0000-0000-000000000000', {
-        commentsEnabled: false,
-      }),
-    ).rejects.toThrow();
+  it('rejects a tenant that does not exist', async () => {
+    const upsert = upsertSettingsFeatures(MOCK_MISSING_TENANT_ID, {
+      commentsEnabled: false,
+    });
+
+    await expect(upsert).rejects.toThrow();
   });
 });

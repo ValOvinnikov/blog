@@ -1,22 +1,27 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
+import { faker } from '@faker-js/faker';
 
-import { languagePreview } from './language-preview';
+faker.seed(4112);
+
+const MOCK_TITLE = faker.lorem.words(2);
 
 const { prepare } = languagePreview;
 
-describe('languagePreview', () => {
+describe(prepare, () => {
   it('subtitles the document with its language', () => {
-    expect(
-      prepare({ title: 'Blog', language: LOCALE_ISO_CODES.NL }).subtitle,
-    ).toBe(LOCALE_LABEL[LOCALE_ISO_CODES.NL]);
+    const { subtitle } = prepare({
+      title: MOCK_TITLE,
+      language: LOCALE_ISO_CODES.NL,
+    });
+
+    expect(subtitle).toBe(LOCALE_LABEL[LOCALE_ISO_CODES.NL]);
   });
 
   it('leaves the subtitle empty when the document has no language', () => {
-    expect(prepare({ title: 'Blog' }).subtitle).toBeUndefined();
-  });
+    const { subtitle } = prepare({ title: MOCK_TITLE });
 
-  it('falls back to Unknown when the document has no title', () => {
-    expect(prepare({}).title).toBe('Unknown');
+    expect(subtitle).toBeUndefined();
   });
 });

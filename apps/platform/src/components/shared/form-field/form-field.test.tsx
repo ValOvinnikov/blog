@@ -1,126 +1,140 @@
+import { faker } from '@faker-js/faker';
 import { TextInput } from '@platform/components/shared/text-input';
-import { render, screen } from '@testing-library/react';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
+import {
+  ARCHIVED_NOTICE_ID,
+  ARCHIVED_NOTICE_TEXT,
+} from '@platform/testing/render-in-settings-form';
 
-import { FormField } from './form-field';
+import { FormField, type TFormFieldProps } from './form-field';
 
-describe(FormField, () => {
+faker.seed(5995);
+
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_HINT = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_FOOTER = faker.lorem.sentence();
+const MOCK_ACTION = faker.lorem.word();
+const MOCK_CONTROL_ID = faker.lorem.slug();
+
+const TextFormField = (props: Omit<TFormFieldProps, 'children'>) => (
+  <FormField {...props}>
+    <TextInput value="" onChange={vi.fn()} />
+  </FormField>
+);
+
+const setup = customRender(TextFormField, { label: MOCK_LABEL });
+
+describe(`<${FormField.name}/>`, () => {
   it('names the control by its label', () => {
-    render(
-      <FormField label="Tenant name">
-        <TextInput value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+    setup();
 
-    expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toBeVisible();
   });
 
   it('renders the label as a plain span when the control names itself', () => {
-    render(
-      <FormField label="Plan" control={{ hasOwnAccessibleName: true }}>
-        <input aria-label="Plan" />
+    renderWithIntl(
+      <FormField label={MOCK_LABEL} control={{ hasOwnAccessibleName: true }}>
+        <input aria-label={MOCK_LABEL} />
       </FormField>,
     );
 
-    expect(screen.getByText('Plan').tagName).toBe('SPAN');
+    const label = screen.getByText(MOCK_LABEL);
+
+    expect(label.tagName).toBe('SPAN');
   });
 
   it('describes the control with its hint, then its error', () => {
-    render(
-      <FormField label="Slug" hint="Used in the URL" error="Already in use">
-        <TextInput value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+    setup({ hint: MOCK_HINT, error: MOCK_ERROR });
 
-    const input = screen.getByRole('textbox', { name: 'Slug' });
-    expect(input).toHaveAccessibleDescription('Used in the URL Already in use');
-    expect(input).toHaveAttribute('aria-invalid', 'true');
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toHaveAccessibleDescription(`${MOCK_HINT} ${MOCK_ERROR}`);
+    expect(input).toBeInvalid();
   });
 
-  it('leaves the control undescribed and valid when there is no hint or error', () => {
-    render(
-      <FormField label="Slug">
-        <TextInput value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+  it('leaves the control undescribed and valid with no hint or error', () => {
+    setup();
 
-    const input = screen.getByRole('textbox', { name: 'Slug' });
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
     expect(input).toHaveAccessibleDescription('');
-    expect(input).not.toHaveAttribute('aria-invalid');
+    expect(input).not.toBeInvalid();
   });
 
   it('gives two fields with the same label distinct controls', () => {
-    render(
+    renderWithIntl(
       <>
-        <FormField label="Slug" error="Already in use">
+        <FormField label={MOCK_LABEL} error={MOCK_ERROR}>
           <TextInput value="" onChange={vi.fn()} />
         </FormField>
-        <FormField label="Slug">
+        <FormField label={MOCK_LABEL}>
           <TextInput value="" onChange={vi.fn()} />
         </FormField>
       </>,
     );
 
-    const [first, second] = screen.getAllByRole('textbox', { name: 'Slug' });
-    expect(first).toHaveAccessibleDescription('Already in use');
+    const [first, second] = screen.getAllByRole('textbox', {
+      name: MOCK_LABEL,
+    });
+
+    expect(first).toHaveAccessibleDescription(MOCK_ERROR);
     expect(second).toHaveAccessibleDescription('');
   });
 
-  it('disables its control and describes it with an outside description before its hint', () => {
-    render(
+  it('disables its control and describes it with an outside notice first', () => {
+    renderWithIntl(
       <>
-        <p id="archived-notice">This tenant is archived</p>
+        <p id={ARCHIVED_NOTICE_ID}>{ARCHIVED_NOTICE_TEXT}</p>
         <FormField
-          label="Slug"
-          hint="Used in the URL"
-          control={{ isDisabled: true, describedBy: 'archived-notice' }}
+          label={MOCK_LABEL}
+          hint={MOCK_HINT}
+          control={{ isDisabled: true, describedBy: ARCHIVED_NOTICE_ID }}
         >
           <TextInput value="" onChange={vi.fn()} />
         </FormField>
       </>,
     );
 
-    const input = screen.getByRole('textbox', { name: 'Slug' });
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
     expect(input).toBeDisabled();
     expect(input).toHaveAccessibleDescription(
-      'This tenant is archived Used in the URL',
+      `${ARCHIVED_NOTICE_TEXT} ${MOCK_HINT}`,
     );
   });
 
   it('gives its control the id it is given', () => {
-    render(
-      <FormField label="Slug" control={{ id: 'slug-field' }}>
-        <TextInput value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+    setup({ control: { id: MOCK_CONTROL_ID } });
 
-    expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveAttribute(
-      'id',
-      'slug-field',
-    );
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toHaveAttribute('id', MOCK_CONTROL_ID);
   });
 
-  it('renders actions in the label row', () => {
-    render(
-      <FormField label="Subject" actions={<button type="button">Reset</button>}>
-        <TextInput value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+  it('renders actions beside the control', () => {
+    setup({ actions: <button type="button">{MOCK_ACTION}</button> });
 
-    expect(screen.getByRole('button', { name: 'Reset' })).toBeVisible();
-    expect(screen.getByRole('textbox', { name: 'Subject' })).toBeVisible();
+    const actionButton = screen.getByRole('button', { name: MOCK_ACTION });
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(actionButton).toBeVisible();
+    expect(input).toBeVisible();
   });
 
-  it('renders footer content after the error message', () => {
-    render(
-      <FormField
-        label="Owner email"
-        error="Invalid email"
-        footer={<span data-testid="footer">Confirmation sent</span>}
-      >
-        <TextInput value="" onChange={vi.fn()} />
-      </FormField>,
-    );
+  it('renders footer content alongside the error message', () => {
+    setup({ error: MOCK_ERROR, footer: <span>{MOCK_FOOTER}</span> });
 
-    expect(screen.getByTestId('footer')).toBeVisible();
+    const footer = screen.getByText(MOCK_FOOTER);
+    const error = screen.getByText(MOCK_ERROR);
+
+    expect(footer).toBeVisible();
+    expect(error).toBeVisible();
   });
 });

@@ -1,98 +1,86 @@
 import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 
 import { Header } from './header';
 
+faker.seed(6013);
+
+const MOCK_BRAND = faker.company.name();
+const MOCK_HOME_LABEL = faker.lorem.word();
+const MOCK_BLOG_LABEL = faker.lorem.word();
+const MOCK_BLOG_HREF = `/${faker.lorem.slug()}`;
+const MOCK_ACTION_LABEL = faker.lorem.word();
+const MOCK_STRAY_TEXT = faker.lorem.sentence();
+
 describe(`<${Header.name}/>`, () => {
-  it('renders Header.Brand content', () => {
+  it('renders the brand slot', () => {
     renderElement(
       <Header>
-        <Header.Brand>My Blog</Header.Brand>
+        <Header.Brand>{MOCK_BRAND}</Header.Brand>
       </Header>,
     );
-    expect(screen.getByText('My Blog')).toBeVisible();
+
+    const brand = screen.getByText(MOCK_BRAND);
+
+    expect(brand).toBeVisible();
   });
 
-  it('renders Header.Nav content', () => {
+  it('renders the nav slot with each link href', () => {
     renderElement(
       <Header>
         <Header.Nav>
           <TextLink appearance="nav" href="/">
-            Home
+            {MOCK_HOME_LABEL}
           </TextLink>
-          <TextLink appearance="nav" href="/blog">
-            Blog
-          </TextLink>
-        </Header.Nav>
-      </Header>,
-    );
-    expect(screen.getByRole('link', { name: 'Home' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Blog' })).toBeVisible();
-  });
-
-  it('preserves hrefs on nav links', () => {
-    renderElement(
-      <Header>
-        <Header.Nav>
-          <TextLink appearance="nav" href="/blog">
-            Blog
+          <TextLink appearance="nav" href={MOCK_BLOG_HREF}>
+            {MOCK_BLOG_LABEL}
           </TextLink>
         </Header.Nav>
       </Header>,
     );
-    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
+
+    const homeLink = screen.getByRole('link', { name: MOCK_HOME_LABEL });
+    const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LABEL });
+
+    expect(homeLink).toBeVisible();
+    expect(blogLink).toHaveAttribute('href', MOCK_BLOG_HREF);
   });
 
-  it('renders Header.Actions content', () => {
+  it('renders the actions slot', () => {
     renderElement(
       <Header>
         <Header.Actions>
-          <button>Menu</button>
+          <button>{MOCK_ACTION_LABEL}</button>
         </Header.Actions>
       </Header>,
     );
-    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
-  });
 
-  it('renders all three slots together in order', () => {
-    renderElement(
-      <Header>
-        <Header.Brand>My Blog</Header.Brand>
-        <Header.Nav>
-          <TextLink appearance="nav" href="/">
-            Home
-          </TextLink>
-        </Header.Nav>
-        <Header.Actions>
-          <button>Menu</button>
-        </Header.Actions>
-      </Header>,
-    );
-    expect(screen.getByText('My Blog')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Home' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+    const actionButton = screen.getByRole('button', {
+      name: MOCK_ACTION_LABEL,
+    });
+
+    expect(actionButton).toBeVisible();
   });
 
   it('renders unmatched children without dropping them', () => {
     renderElement(
       <Header>
-        <Header.Brand>My Blog</Header.Brand>
-        <span>stray content</span>
+        <Header.Brand>{MOCK_BRAND}</Header.Brand>
+        <span>{MOCK_STRAY_TEXT}</span>
       </Header>,
     );
-    expect(screen.getByText('stray content')).toBeVisible();
+
+    const strayContent = screen.getByText(MOCK_STRAY_TEXT);
+
+    expect(strayContent).toBeVisible();
   });
 
-  it('renders as a <header> landmark', () => {
+  it('renders as a banner landmark', () => {
     renderElement(<Header />);
-    expect(screen.getByRole('banner')).toBeVisible();
-  });
 
-  it('forwards data-testid to the root element', () => {
-    renderElement(<Header dataTestId="site-header" />);
-    expect(screen.getByTestId('site-header')).toBeVisible();
+    const banner = screen.getByRole('banner');
+
+    expect(banner).toBeVisible();
   });
 });

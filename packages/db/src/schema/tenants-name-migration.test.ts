@@ -1,83 +1,37 @@
-import type * as schema from '@blog/db/schema';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
-  applyMigrationFile,
-  listMigrationFiles,
+  insertReplayLegacyTenant,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  replayMigrationsAround,
 } from '@blog/db/testing/migration-files';
-import { sql } from 'drizzle-orm';
-import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { tenants } from './tenants';
 
 const BACKFILL_MIGRATION = '0009_quick_jazinda.sql';
+const NAMES_BY_SLUG = {
+  acme: 'Acme',
+  'acme-corp': 'Acme Corp',
+  foo_bar: 'Foo Bar',
+};
 
-describe('0009_quick_jazinda (tenants name backfill)', () => {
-  let db: PgliteDatabase<typeof schema>;
-
-  beforeEach(async () => {
-    db = await createEmptyTestDb();
-  }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
-
+describe(`${BACKFILL_MIGRATION} (tenants name backfill)`, () => {
   it(
     'backfills pre-existing tenant rows to a title-cased version of their slug',
     async () => {
-      const migrationFiles = listMigrationFiles();
-      const priorMigrations = migrationFiles.filter(
-        (file) => file < BACKFILL_MIGRATION,
-      );
-      const laterMigrations = migrationFiles.filter(
-        (file) => file > BACKFILL_MIGRATION,
-      );
+      const db = await createEmptyTestDb();
+      const namesByDomain: Record<string, string> = {};
 
-      for (const file of priorMigrations) {
-        await applyMigrationFile(db, file);
-      }
-
-      await db.execute(
-        sql.raw(`
-        insert into "tenants"
-          ("slug", "primary_domain", "sanity_project_id", "sanity_dataset", "locale", "plan", "status")
-        values
-          ('acme', 'acme.example.com', 'p1', 'production', 'en', 'FREE', 'ACTIVE'),
-          ('acme-corp', 'acme-corp.example.com', 'p2', 'production', 'en', 'FREE', 'ACTIVE'),
-          ('foo_bar', 'foo-bar.example.com', 'p3', 'production', 'en', 'FREE', 'ACTIVE')
-      `),
-      );
-
-      await applyMigrationFile(db, BACKFILL_MIGRATION);
-
-      for (const file of laterMigrations) {
-        await applyMigrationFile(db, file);
-      }
-
-      const rows = await db
-        .select()
-        .from(tenants)
-        .orderBy(tenants.primaryDomain);
-      const namesByDomain = Object.fromEntries(
-        rows.map((row) => [row.primaryDomain, row.name]),
-      );
-
-      expect(namesByDomain).toEqual({
-        'acme.example.com': 'Acme',
-        'acme-corp.example.com': 'Acme Corp',
-        'foo-bar.example.com': 'Foo Bar',
+      await replayMigrationsAround(db, BACKFILL_MIGRATION, async () => {
+        for (const [slug, name] of Object.entries(NAMES_BY_SLUG)) {
+          const { primaryDomain } = await insertReplayLegacyTenant(db, slug);
+          namesByDomain[primaryDomain] = name;
+        }
       });
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'still applies cleanly against an empty tenants table',
-    async () => {
-      for (const file of listMigrationFiles()) {
-        await applyMigrationFile(db, file);
-      }
 
       const rows = await db.select().from(tenants);
-
-      expect(rows).toHaveLength(0);
+      expect(
+        Object.fromEntries(rows.map((row) => [row.primaryDomain, row.name])),
+      ).toEqual(namesByDomain);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );

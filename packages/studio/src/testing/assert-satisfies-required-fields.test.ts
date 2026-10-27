@@ -1,19 +1,32 @@
 import { assertSatisfiesRequiredFields } from '@blog/studio/testing/assert-satisfies-required-fields';
+import { faker } from '@faker-js/faker';
 import { defineField, defineType } from 'sanity';
 
-const fixtureSchema = defineType({
+faker.seed(6017);
+
+const TITLE_FIELD = 'title';
+const PAGE_SIZE_FIELD = 'pageSize';
+
+const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_PAGE_SIZE = faker.number.int({ min: 1, max: 24 });
+const MOCK_PAGE_SIZE_EXEMPTION = {
+  name: PAGE_SIZE_FIELD,
+  reason: faker.lorem.sentence(),
+};
+
+const MOCK_SCHEMA = defineType({
   name: 'testing_fixture',
   title: 'Testing Fixture',
   type: 'document',
   fields: [
     defineField({
-      name: 'title',
+      name: TITLE_FIELD,
       title: 'Title',
       type: 'string',
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'pageSize',
+      name: PAGE_SIZE_FIELD,
       title: 'Page Size',
       type: 'number',
       validation: (rule) => rule.required().integer().min(1).max(24),
@@ -26,63 +39,50 @@ const fixtureSchema = defineType({
   ],
 });
 
-describe('assertSatisfiesRequiredFields', () => {
-  it('passes when every required field is present in the payload', () => {
+const MOCK_NO_VALIDATION_SCHEMA = defineType({
+  name: 'testing_no_validation',
+  title: 'Testing No Validation',
+  type: 'document',
+  fields: [defineField({ name: 'note', title: 'Note', type: 'string' })],
+});
+
+describe(assertSatisfiesRequiredFields, () => {
+  it('passes when every required field is set and an optional one is omitted', () => {
     expect(() =>
-      assertSatisfiesRequiredFields(fixtureSchema, {
-        title: 'Hello',
-        pageSize: 9,
+      assertSatisfiesRequiredFields(MOCK_SCHEMA, {
+        [TITLE_FIELD]: MOCK_TITLE,
+        [PAGE_SIZE_FIELD]: MOCK_PAGE_SIZE,
       }),
     ).not.toThrow();
   });
 
-  it('throws when a required field is missing from the payload', () => {
+  it('throws naming a required field missing from the payload', () => {
     expect(() =>
-      assertSatisfiesRequiredFields(fixtureSchema, { title: 'Hello' }),
-    ).toThrow(/pageSize/);
-  });
-
-  it('ignores optional fields entirely — omitting one never throws', () => {
-    expect(() =>
-      assertSatisfiesRequiredFields(fixtureSchema, {
-        title: 'Hello',
-        pageSize: 9,
-      }),
-    ).not.toThrow();
+      assertSatisfiesRequiredFields(MOCK_SCHEMA, { [TITLE_FIELD]: MOCK_TITLE }),
+    ).toThrow(PAGE_SIZE_FIELD);
   });
 
   it('treats a field with no validation function as never required', () => {
-    const noValidationSchema = defineType({
-      name: 'testing_no_validation',
-      title: 'Testing No Validation',
-      type: 'document',
-      fields: [defineField({ name: 'note', title: 'Note', type: 'string' })],
-    });
-
     expect(() =>
-      assertSatisfiesRequiredFields(noValidationSchema, {}),
+      assertSatisfiesRequiredFields(MOCK_NO_VALIDATION_SCHEMA, {}),
     ).not.toThrow();
   });
 
-  it('does not throw when a missing required field is named in exemptFields', () => {
+  it('passes when the missing required field is exempt', () => {
     expect(() =>
-      assertSatisfiesRequiredFields(fixtureSchema, { title: 'Hello' }, [
-        {
-          name: 'pageSize',
-          reason: 'became required after this fixture was written',
-        },
-      ]),
+      assertSatisfiesRequiredFields(
+        MOCK_SCHEMA,
+        { [TITLE_FIELD]: MOCK_TITLE },
+        [MOCK_PAGE_SIZE_EXEMPTION],
+      ),
     ).not.toThrow();
   });
 
-  it('an exemption never masks a different, non-exempt missing required field', () => {
+  it('still throws for a missing required field that is not exempt', () => {
     expect(() =>
-      assertSatisfiesRequiredFields(fixtureSchema, {}, [
-        {
-          name: 'pageSize',
-          reason: 'became required after this fixture was written',
-        },
+      assertSatisfiesRequiredFields(MOCK_SCHEMA, {}, [
+        MOCK_PAGE_SIZE_EXEMPTION,
       ]),
-    ).toThrow(/title/);
+    ).toThrow(TITLE_FIELD);
   });
 });

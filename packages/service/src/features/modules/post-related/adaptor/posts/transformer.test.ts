@@ -1,4 +1,5 @@
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   toRelatedPosts,
@@ -6,15 +7,23 @@ import {
   type TRawRelatedByTopic,
 } from './transformer';
 
-const TAG_A = 'tag-a';
-const TAG_B = 'tag-b';
-const PUBLISHED_AT = '2026-01-01T00:00:00Z';
-const ONE_SHARED_ID = 'one-shared';
-const TWO_SHARED_ID = 'two-shared';
-const NEWER_ONE_SHARED_ID = 'newer-one-shared';
-const TOPIC_ONLY_ID = 'topic-only';
+faker.seed(14);
 
-function byTagsPost(
+const MOCK_TAG_A_ID = faker.string.uuid();
+const MOCK_TAG_B_ID = faker.string.uuid();
+const MOCK_PUBLISHED_AT = faker.date.past().toISOString();
+const MOCK_NEWER_PUBLISHED_AT = faker.date
+  .soon({ refDate: MOCK_PUBLISHED_AT })
+  .toISOString();
+const MOCK_ONE_SHARED_ID = faker.string.uuid();
+const MOCK_TWO_SHARED_ID = faker.string.uuid();
+const MOCK_NEWER_ONE_SHARED_ID = faker.string.uuid();
+const MOCK_SHARED_ID = faker.string.uuid();
+const MOCK_TOPIC_A_ID = faker.string.uuid();
+const MOCK_TOPIC_B_ID = faker.string.uuid();
+const MOCK_TOPIC_ONLY_ID = faker.string.uuid();
+
+function mockByTagsPost(
   overrides: Partial<Omit<TRawRelatedByTags[number], 'tagIds'>> & {
     tagIds?: { _id: string }[] | null;
   } = {},
@@ -26,7 +35,7 @@ function byTagsPost(
   };
 }
 
-function byTopicPost(
+function mockByTopicPost(
   overrides: Partial<TRawRelatedByTopic[number]> = {},
 ): TRawRelatedByTopic[number] {
   return mockRawPostCard(overrides);
@@ -38,39 +47,42 @@ describe(toRelatedPosts, () => {
   let topicOnlyB: TRawRelatedByTopic[number];
 
   beforeEach(() => {
-    shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: TAG_A }] });
-    topicOnlyA = byTopicPost({ _id: 'topic-a' });
-    topicOnlyB = byTopicPost({ _id: 'topic-b' });
+    shared = mockByTagsPost({
+      _id: MOCK_SHARED_ID,
+      tagIds: [{ _id: MOCK_TAG_A_ID }],
+    });
+    topicOnlyA = mockByTopicPost({ _id: MOCK_TOPIC_A_ID });
+    topicOnlyB = mockByTopicPost({ _id: MOCK_TOPIC_B_ID });
   });
 
   it('ranks candidates by shared-tag count desc, then publishedAt desc', () => {
-    const oneShared = byTagsPost({
-      _id: ONE_SHARED_ID,
-      publishedAt: PUBLISHED_AT,
-      tagIds: [{ _id: TAG_A }],
+    const oneShared = mockByTagsPost({
+      _id: MOCK_ONE_SHARED_ID,
+      publishedAt: MOCK_PUBLISHED_AT,
+      tagIds: [{ _id: MOCK_TAG_A_ID }],
     });
-    const twoShared = byTagsPost({
-      _id: TWO_SHARED_ID,
-      publishedAt: PUBLISHED_AT,
-      tagIds: [{ _id: TAG_A }, { _id: TAG_B }],
+    const twoShared = mockByTagsPost({
+      _id: MOCK_TWO_SHARED_ID,
+      publishedAt: MOCK_PUBLISHED_AT,
+      tagIds: [{ _id: MOCK_TAG_A_ID }, { _id: MOCK_TAG_B_ID }],
     });
-    const newerOneShared = byTagsPost({
-      _id: NEWER_ONE_SHARED_ID,
-      publishedAt: '2026-02-01T00:00:00Z',
-      tagIds: [{ _id: TAG_A }],
+    const newerOneShared = mockByTagsPost({
+      _id: MOCK_NEWER_ONE_SHARED_ID,
+      publishedAt: MOCK_NEWER_PUBLISHED_AT,
+      tagIds: [{ _id: MOCK_TAG_A_ID }],
     });
 
     const result = toRelatedPosts(
       [oneShared, newerOneShared, twoShared],
       [],
-      [TAG_A, TAG_B],
+      [MOCK_TAG_A_ID, MOCK_TAG_B_ID],
       3,
     );
 
     expect(result.map((post) => post.id)).toEqual([
-      TWO_SHARED_ID,
-      NEWER_ONE_SHARED_ID,
-      ONE_SHARED_ID,
+      MOCK_TWO_SHARED_ID,
+      MOCK_NEWER_ONE_SHARED_ID,
+      MOCK_ONE_SHARED_ID,
     ]);
   });
 
@@ -78,11 +90,14 @@ describe(toRelatedPosts, () => {
     [5, 3],
     [8, 6],
   ])('caps %i candidates at a limit of %i', (candidateCount, limit) => {
-    const byTags = Array.from({ length: candidateCount }, (_, i) =>
-      byTagsPost({ _id: `post-${i}`, tagIds: [{ _id: TAG_A }] }),
+    const byTags = Array.from({ length: candidateCount }, () =>
+      mockByTagsPost({
+        _id: faker.string.uuid(),
+        tagIds: [{ _id: MOCK_TAG_A_ID }],
+      }),
     );
 
-    const result = toRelatedPosts(byTags, [], [TAG_A], limit);
+    const result = toRelatedPosts(byTags, [], [MOCK_TAG_A_ID], limit);
 
     expect(result).toHaveLength(limit);
   });
@@ -91,30 +106,41 @@ describe(toRelatedPosts, () => {
     const result = toRelatedPosts(
       [shared],
       [topicOnlyA, topicOnlyB],
-      [TAG_A],
+      [MOCK_TAG_A_ID],
       3,
     );
 
     expect(result.map((post) => post.id)).toEqual([
-      'shared',
-      'topic-a',
-      'topic-b',
+      MOCK_SHARED_ID,
+      MOCK_TOPIC_A_ID,
+      MOCK_TOPIC_B_ID,
     ]);
   });
 
   it('excludes posts from the topic backfill that were already tag-ranked', () => {
-    const duplicate = byTopicPost({ _id: 'shared' });
-    const topicOnly = byTopicPost({ _id: TOPIC_ONLY_ID });
+    const duplicate = mockByTopicPost({ _id: MOCK_SHARED_ID });
+    const topicOnly = mockByTopicPost({ _id: MOCK_TOPIC_ONLY_ID });
 
-    const result = toRelatedPosts([shared], [duplicate, topicOnly], [TAG_A], 3);
+    const result = toRelatedPosts(
+      [shared],
+      [duplicate, topicOnly],
+      [MOCK_TAG_A_ID],
+      3,
+    );
 
-    expect(result.map((post) => post.id)).toEqual(['shared', TOPIC_ONLY_ID]);
+    expect(result.map((post) => post.id)).toEqual([
+      MOCK_SHARED_ID,
+      MOCK_TOPIC_ONLY_ID,
+    ]);
   });
 
   it('fills entirely from the topic pool when the post has no tags', () => {
     const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], 3);
 
-    expect(result.map((post) => post.id)).toEqual(['topic-a', 'topic-b']);
+    expect(result.map((post) => post.id)).toEqual([
+      MOCK_TOPIC_A_ID,
+      MOCK_TOPIC_B_ID,
+    ]);
   });
 
   it('returns an empty array when nothing qualifies', () => {

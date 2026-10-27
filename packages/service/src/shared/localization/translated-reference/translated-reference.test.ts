@@ -9,10 +9,14 @@ import {
   MOCK_ABOUT_TRANSLATION_METADATA,
   mockLandingPageDocument,
 } from '@blog/service/testing/shared/translated-pages-dataset';
+import { faker } from '@faker-js/faker';
 
 import { translatedReference } from './translated-reference';
 
-const CONTACT_EN_PAGE_ID = 'contact-en';
+faker.seed(6016);
+
+const MOCK_CONTACT_EN_PAGE_ID = faker.string.uuid();
+const MOCK_LINK_ID = faker.string.uuid();
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const localeQ = q.parameters<TLocaleQueryParams>();
@@ -49,10 +53,10 @@ const query = localeQ.star
     ),
   }));
 
-const dataset = [
+const MOCK_PAGES_DATASET = [
   mockLandingPageDocument(MOCK_ABOUT_EN_PAGE_ID, EN),
   mockLandingPageDocument(MOCK_ABOUT_NL_PAGE_ID, NL),
-  mockLandingPageDocument(CONTACT_EN_PAGE_ID, EN),
+  mockLandingPageDocument(MOCK_CONTACT_EN_PAGE_ID, EN),
   MOCK_ABOUT_TRANSLATION_METADATA,
 ];
 
@@ -61,11 +65,11 @@ function resolveId(pageId: string, locale: string): Promise<unknown> {
     query.query,
     [
       {
-        _id: 'link-1',
+        _id: MOCK_LINK_ID,
         _type: 'link',
         internalReference: mockReference(pageId),
       },
-      ...dataset,
+      ...MOCK_PAGES_DATASET,
     ],
     undefined,
     { locale, defaultLocale: EN },
@@ -73,27 +77,34 @@ function resolveId(pageId: string, locale: string): Promise<unknown> {
 }
 
 describe(translatedReference, () => {
-  it('resolves to the translation in the requested language', async () => {
-    expect(await resolveId(MOCK_ABOUT_EN_PAGE_ID, NL)).toMatchObject({
-      target: { _id: MOCK_ABOUT_NL_PAGE_ID },
-    });
-  });
+  it.each([
+    {
+      behaviour: 'resolves to the translation in the requested language',
+      pageId: MOCK_ABOUT_EN_PAGE_ID,
+      locale: NL,
+      expectedId: MOCK_ABOUT_NL_PAGE_ID,
+    },
+    {
+      behaviour: 'falls back to the default-language page with no translation',
+      pageId: MOCK_ABOUT_EN_PAGE_ID,
+      locale: FR,
+      expectedId: MOCK_ABOUT_EN_PAGE_ID,
+    },
+    {
+      behaviour: 'resolves from a translation back to the requested language',
+      pageId: MOCK_ABOUT_NL_PAGE_ID,
+      locale: EN,
+      expectedId: MOCK_ABOUT_EN_PAGE_ID,
+    },
+    {
+      behaviour: 'resolves to the referenced page when it has no translations',
+      pageId: MOCK_CONTACT_EN_PAGE_ID,
+      locale: NL,
+      expectedId: MOCK_CONTACT_EN_PAGE_ID,
+    },
+  ])('$behaviour', async ({ pageId, locale, expectedId }) => {
+    const result = await resolveId(pageId, locale);
 
-  it('falls back to the default-language page when no translation exists', async () => {
-    expect(await resolveId(MOCK_ABOUT_EN_PAGE_ID, FR)).toMatchObject({
-      target: { _id: MOCK_ABOUT_EN_PAGE_ID },
-    });
-  });
-
-  it('resolves from a translation back to the requested language', async () => {
-    expect(await resolveId(MOCK_ABOUT_NL_PAGE_ID, EN)).toMatchObject({
-      target: { _id: MOCK_ABOUT_EN_PAGE_ID },
-    });
-  });
-
-  it('resolves to the referenced page when it has no translations at all', async () => {
-    expect(await resolveId(CONTACT_EN_PAGE_ID, NL)).toMatchObject({
-      target: { _id: CONTACT_EN_PAGE_ID },
-    });
+    expect(result).toEqual({ target: { _id: expectedId } });
   });
 });

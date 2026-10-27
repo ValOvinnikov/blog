@@ -1,8 +1,8 @@
-import type { TPortableTextContent } from '@blog/email/portable-text';
+import type { TPortableTextNode } from '@blog/email/portable-text';
 
 const LINK_KEY = 'linked-link';
 
-export function mockPortableTextBody(text: string): TPortableTextContent {
+export function mockPortableTextBody(text: string): TPortableTextNode[] {
   return [
     {
       _type: 'block',
@@ -15,7 +15,7 @@ export function mockPortableTextBody(text: string): TPortableTextContent {
 export function mockLinkedPortableTextBody(
   text: string,
   href: string,
-): TPortableTextContent {
+): TPortableTextNode[] {
   return [
     {
       _type: 'block',

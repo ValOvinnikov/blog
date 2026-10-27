@@ -1,24 +1,24 @@
-import {
-  ERROR_CODE,
-  FINDING_KIND,
-  FINDING_SEVERITY,
-  FINDING_SOURCE,
-  FINDING_STATUS,
-} from '@blog/config/constants';
+import { ERROR_CODE, FINDING_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_FINDING_NOW,
+  mockOpenFindingInput,
+  openTestFinding,
+} from '@blog/db/testing/findings/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
-
-import { openFinding } from '../open-finding';
+import { faker } from '@faker-js/faker';
 
 import { resolveFinding } from './resolve-finding';
+
+faker.seed(6021007);
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.findings);
   await db().delete(schema.tenants);
 });
@@ -28,71 +28,44 @@ describe(resolveFinding, () => {
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
+    vi.useFakeTimers({ now: MOCK_FINDING_NOW, toFake: ['Date'] });
   });
 
   it('marks an open finding resolved and stamps resolvedAt', async () => {
-    const opened = await openFinding({
-      tenantId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: MOCK_TENANT_DOMAIN,
-    });
-    expect(opened.ok).toBe(true);
-    if (!opened.ok) return;
+    const opened = await openTestFinding(mockOpenFindingInput({ tenantId }));
 
-    const result = await resolveFinding(opened.data.finding.id);
+    const result = await resolveFinding(opened.id);
 
     expect(result).toEqual({
       ok: true,
-      data: expect.objectContaining({
-        id: opened.data.finding.id,
+      data: {
+        ...opened,
         status: FINDING_STATUS.RESOLVED,
-        resolvedAt: expect.any(Date),
-      }),
+        resolvedAt: MOCK_FINDING_NOW,
+      },
     });
   });
 
-  it('allows the same condition to reopen after being resolved', async () => {
-    const input = {
-      tenantId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: MOCK_TENANT_DOMAIN,
-    };
-    const opened = await openFinding(input);
-    expect(opened.ok).toBe(true);
-    if (!opened.ok) return;
-    await resolveFinding(opened.data.finding.id);
+  it.each([
+    {
+      finding: 'an id that does not exist',
+      arrangeId: async () => faker.string.uuid(),
+    },
+    {
+      finding: 'a finding that is already resolved',
+      arrangeId: async () => {
+        const opened = await openTestFinding(
+          mockOpenFindingInput({ tenantId }),
+        );
+        await resolveFinding(opened.id);
 
-    const reopened = await openFinding(input);
+        return opened.id;
+      },
+    },
+  ])('returns DB_NOT_FOUND for $finding', async ({ arrangeId }) => {
+    const id = await arrangeId();
 
-    expect(reopened).toEqual({
-      ok: true,
-      data: { finding: expect.anything(), isNewlyOpened: true },
-    });
-  });
-
-  it('returns DB_NOT_FOUND for an id that does not exist', async () => {
-    const result = await resolveFinding('00000000-0000-0000-0000-000000000000');
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
-  });
-
-  it('returns DB_NOT_FOUND when the finding is already resolved', async () => {
-    const opened = await openFinding({
-      tenantId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: MOCK_TENANT_DOMAIN,
-    });
-    expect(opened.ok).toBe(true);
-    if (!opened.ok) return;
-    await resolveFinding(opened.data.finding.id);
-
-    const result = await resolveFinding(opened.data.finding.id);
+    const result = await resolveFinding(id);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });

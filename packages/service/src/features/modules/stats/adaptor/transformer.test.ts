@@ -5,18 +5,21 @@ import {
   mockRawStatItem,
   mockRawStatsModule,
 } from '@blog/service/testing/modules/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toStatsModule } from './transformer';
 
-const DESCRIPTION = 'Year over year';
-const STAT_ITEMS = Array.from({ length: 6 }, (_, index) => ({
-  id: `stat-${index + 1}`,
-  value: `${index + 1}`,
-  label: `Stat ${index + 1}`,
+faker.seed(3);
+
+const MOCK_DESCRIPTION = faker.lorem.words(2);
+const MOCK_STAT_ITEMS = Array.from({ length: 6 }, () => ({
+  id: faker.string.uuid(),
+  value: faker.string.numeric(3),
+  label: faker.lorem.words(2),
 }));
 
 describe(toStatsModule, () => {
-  it('maps brandVariant straight through', () => {
+  it('maps the brand variant', () => {
     const raw = mockRawStatsModule({ brandVariant: BRAND_VARIANT.SECONDARY });
 
     const module = toStatsModule(raw);
@@ -24,7 +27,7 @@ describe(toStatsModule, () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves footnote, contentAlignment and layout undefined when unset', () => {
+  it('leaves footnote, alignment and layout undefined when unset', () => {
     const raw = mockRawStatsModule({
       footnote: null,
       contentAlignment: null,
@@ -38,9 +41,9 @@ describe(toStatsModule, () => {
     expect(module.layout).toBeUndefined();
   });
 
-  it('keeps the stats in authored order across the full 2-to-6 range', () => {
+  it('keeps the stats in authored order up to the maximum of six', () => {
     const raw = mockRawStatsModule({
-      stats: STAT_ITEMS.map(({ id, value, label }) =>
+      stats: MOCK_STAT_ITEMS.map(({ id, value, label }) =>
         mockRawStatItem({ _key: id, value, label }),
       ),
     });
@@ -49,12 +52,12 @@ describe(toStatsModule, () => {
 
     expect(
       module.stats.map(({ id, value, label }) => ({ id, value, label })),
-    ).toEqual(STAT_ITEMS);
+    ).toEqual(MOCK_STAT_ITEMS);
   });
 
   it.each([
     [null, undefined],
-    [DESCRIPTION, DESCRIPTION],
+    [MOCK_DESCRIPTION, MOCK_DESCRIPTION],
   ])('maps a stat description of %s to %s', (description, expected) => {
     const raw = mockRawStatsModule({
       stats: [mockRawStatItem({ description })],
@@ -65,7 +68,7 @@ describe(toStatsModule, () => {
     expect(module.stats[0]?.description).toBe(expected);
   });
 
-  it('folds an empty stats array to empty', () => {
+  it('maps an empty stats array to an empty list', () => {
     const raw = mockRawStatsModule({ stats: [] });
 
     const module = toStatsModule(raw);
@@ -73,7 +76,7 @@ describe(toStatsModule, () => {
     expect(module.stats).toEqual([]);
   });
 
-  it('returns an empty array for an absent ctaButtons field', () => {
+  it('maps absent ctaButtons to an empty list', () => {
     const raw = mockRawStatsModule({ ctaButtons: null });
 
     const module = toStatsModule(raw);

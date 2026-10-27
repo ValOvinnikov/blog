@@ -1,11 +1,16 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LANGUAGE_SWITCHER_FIELD_NAME } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
+import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
+import { faker } from '@faker-js/faker';
 import type { FieldProps } from 'sanity';
 
-import { createLanguageSwitcherField } from './language-switcher-field';
+faker.seed(4105);
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const fieldProps = (name: string) => {
+const MOCK_FIELD_NAME = faker.lorem.word();
+
+const mockFieldProps = (name: string) => {
   const renderDefault = vi.fn(() => null);
 
   return {
@@ -15,32 +20,36 @@ const fieldProps = (name: string) => {
 };
 
 describe(createLanguageSwitcherField, () => {
-  describe('showLanguageSwitcher field', () => {
-    let props: FieldProps;
-    let renderDefault: ReturnType<typeof fieldProps>['renderDefault'];
+  let props: FieldProps;
+  let renderDefault: ReturnType<typeof mockFieldProps>['renderDefault'];
 
+  describe('the language switcher toggle', () => {
     beforeEach(() => {
-      ({ props, renderDefault } = fieldProps('showLanguageSwitcher'));
+      ({ props, renderDefault } = mockFieldProps(LANGUAGE_SWITCHER_FIELD_NAME));
     });
 
-    it('hides the language switcher toggle with one live language', () => {
+    it('is hidden with one live language', () => {
       createLanguageSwitcherField([EN])(props);
 
       expect(renderDefault).not.toHaveBeenCalled();
     });
 
-    it('shows the language switcher toggle with two live languages', () => {
+    it('is shown with two live languages', () => {
       createLanguageSwitcherField([EN, NL])(props);
 
       expect(renderDefault).toHaveBeenCalledWith(props);
     });
   });
 
-  it('leaves other fields alone with one live language', () => {
-    const { props, renderDefault } = fieldProps('title');
+  describe('any other field', () => {
+    beforeEach(() => {
+      ({ props, renderDefault } = mockFieldProps(MOCK_FIELD_NAME));
+    });
 
-    createLanguageSwitcherField([EN])(props);
+    it('is shown with one live language', () => {
+      createLanguageSwitcherField([EN])(props);
 
-    expect(renderDefault).toHaveBeenCalledWith(props);
+      expect(renderDefault).toHaveBeenCalledWith(props);
+    });
   });
 });

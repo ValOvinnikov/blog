@@ -12,35 +12,32 @@ import {
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { logger } from '@platform/utils/logger/logger';
+import { z } from 'zod';
 
 import { fetchGitHub, fetchGitHubJson, recoverNotFound } from './fetch-github';
 
+faker.seed(5998);
+
 vi.mock('@platform/utils/env/env');
 
-const loggerErrorMock = vi.mocked(logger.error);
-const loggerWarnMock = vi.mocked(logger.warn);
+const MOCK_FALLBACK = faker.lorem.word();
+const MOCK_PATH = `/${faker.lorem.slug()}`;
 
 describe(fetchGitHub, () => {
   const github = useGitHubFetch();
-  const path = `/${faker.lorem.slug()}`;
-
-  beforeEach(() => {
-    loggerErrorMock.mockReset();
-    loggerWarnMock.mockReset();
-  });
 
   it('returns the response for a 2xx', async () => {
-    github.respond(path, () => mockGitHubResponse({}));
+    github.respond(MOCK_PATH, () => mockGitHubResponse({}));
 
-    expect(await fetchGitHub(path)).toEqual(
-      expect.objectContaining({ ok: true }),
-    );
+    const result = await fetchGitHub(MOCK_PATH);
+
+    expect(result.ok).toBe(true);
   });
 
   it('returns NOT_CONFIGURED without calling GitHub when no token is set', async () => {
     github.unsetToken();
 
-    expect(await fetchGitHub(path)).toEqual({
+    expect(await fetchGitHub(MOCK_PATH)).toEqual({
       ok: false,
       error: GITHUB_FAILURE.NOT_CONFIGURED,
     });
@@ -48,16 +45,16 @@ describe(fetchGitHub, () => {
   });
 
   it('returns NOT_FOUND for a 404 without logging it', async () => {
-    expect(await fetchGitHub(path)).toEqual({
+    expect(await fetchGitHub(MOCK_PATH)).toEqual({
       ok: false,
       error: GITHUB_FAILURE.NOT_FOUND,
     });
-    expect(loggerErrorMock).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('returns RATE_LIMITED for an exhausted quota and logs it at warn', async () => {
-    github.respond(
-      path,
+  it.each([
+    [
+      'an exhausted quota',
       () =>
         new Response(null, {
           status: HTTP_STATUS.FORBIDDEN,
@@ -65,42 +62,39 @@ describe(fetchGitHub, () => {
             [GITHUB_RATE_LIMIT_REMAINING_HEADER]: GITHUB_RATE_LIMIT_EXHAUSTED,
           },
         }),
-    );
-
-    expect(await fetchGitHub(path)).toEqual({
-      ok: false,
-      error: GITHUB_FAILURE.RATE_LIMITED,
-    });
-    expect(loggerWarnMock).toHaveBeenCalledWith(GITHUB_LOG.RATE_LIMITED, {
-      path,
-    });
-    expect(loggerErrorMock).not.toHaveBeenCalled();
-  });
-
-  it('returns RATE_LIMITED for a 429', async () => {
-    github.respond(
-      path,
+    ],
+    [
+      'a 429',
       () => new Response(null, { status: HTTP_STATUS.TOO_MANY_REQUESTS }),
-    );
+    ],
+  ])(
+    'returns RATE_LIMITED for %s and logs it at warn',
+    async (_label, respond) => {
+      github.respond(MOCK_PATH, respond);
 
-    expect(await fetchGitHub(path)).toEqual({
-      ok: false,
-      error: GITHUB_FAILURE.RATE_LIMITED,
-    });
-  });
+      expect(await fetchGitHub(MOCK_PATH)).toEqual({
+        ok: false,
+        error: GITHUB_FAILURE.RATE_LIMITED,
+      });
+      expect(logger.warn).toHaveBeenCalledWith(GITHUB_LOG.RATE_LIMITED, {
+        path: MOCK_PATH,
+      });
+      expect(logger.error).not.toHaveBeenCalled();
+    },
+  );
 
   it('returns GITHUB_ERROR for a server error and logs its status', async () => {
     github.respond(
-      path,
+      MOCK_PATH,
       () => new Response(null, { status: HTTP_STATUS.BAD_GATEWAY }),
     );
 
-    expect(await fetchGitHub(path)).toEqual({
+    expect(await fetchGitHub(MOCK_PATH)).toEqual({
       ok: false,
       error: GITHUB_FAILURE.GITHUB_ERROR,
     });
-    expect(loggerErrorMock).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_FAILED, {
-      path,
+    expect(logger.error).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_FAILED, {
+      path: MOCK_PATH,
       responseStatus: HTTP_STATUS.BAD_GATEWAY,
     });
   });
@@ -109,12 +103,12 @@ describe(fetchGitHub, () => {
     const thrown = new Error(faker.lorem.sentence());
     github.fetchMock.mockRejectedValue(thrown);
 
-    expect(await fetchGitHub(path)).toEqual({
+    expect(await fetchGitHub(MOCK_PATH)).toEqual({
       ok: false,
       error: GITHUB_FAILURE.GITHUB_ERROR,
     });
-    expect(loggerErrorMock).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_ERROR, {
-      path,
+    expect(logger.error).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_ERROR, {
+      path: MOCK_PATH,
       error: thrown,
     });
   });
@@ -122,22 +116,23 @@ describe(fetchGitHub, () => {
 
 describe(fetchGitHubJson, () => {
   const github = useGitHubFetch();
-  const path = `/${faker.lorem.slug()}`;
-
   it('returns the parsed body', async () => {
     const value = faker.lorem.word();
-    github.respond(path, () => mockGitHubResponse({ value }));
+    github.respond(MOCK_PATH, () => mockGitHubResponse({ value }));
 
-    expect(
-      await fetchGitHubJson(path, (body) => (body as { value: string }).value),
-    ).toEqual({ ok: true, data: value });
+    const result = await fetchGitHubJson(
+      MOCK_PATH,
+      (body) => z.object({ value: z.string() }).parse(body).value,
+    );
+
+    expect(result).toEqual({ ok: true, data: value });
   });
 
   it('returns GITHUB_ERROR when the body does not parse', async () => {
-    github.respond(path, () => mockGitHubResponse({}));
+    github.respond(MOCK_PATH, () => mockGitHubResponse({}));
 
     expect(
-      await fetchGitHubJson(path, () => {
+      await fetchGitHubJson(MOCK_PATH, () => {
         throw new Error(faker.lorem.sentence());
       }),
     ).toEqual({ ok: false, error: GITHUB_FAILURE.GITHUB_ERROR });
@@ -145,17 +140,15 @@ describe(fetchGitHubJson, () => {
 });
 
 describe(recoverNotFound, () => {
-  const fallback = faker.lorem.word();
-
-  it('turns a missing resource into the fallback', () => {
+  it('turns a missing resource into the MOCK_FALLBACK', () => {
     expect(
-      recoverNotFound(errorResult(GITHUB_FAILURE.NOT_FOUND), fallback),
-    ).toEqual(okResult(fallback));
+      recoverNotFound(errorResult(GITHUB_FAILURE.NOT_FOUND), MOCK_FALLBACK),
+    ).toEqual(okResult(MOCK_FALLBACK));
   });
 
   it('passes any other failure through', () => {
     const failure = errorResult(GITHUB_FAILURE.RATE_LIMITED);
 
-    expect(recoverNotFound(failure, fallback)).toBe(failure);
+    expect(recoverNotFound(failure, MOCK_FALLBACK)).toBe(failure);
   });
 });

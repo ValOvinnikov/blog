@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
@@ -8,6 +9,8 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 import { logger } from '@web/utils/logger/logger';
 
 import { PostRelatedModule } from './post-related-module';
+
+faker.seed(6011);
 
 const { getPostRelatedMock } = vi.hoisted(() => ({
   getPostRelatedMock: vi.fn(),
@@ -27,13 +30,13 @@ vi.mock('@web/server/request-context/request-context');
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
-const FIRST_POST_TITLE = 'First post';
-const POST_RELATED_ID = 'post-related-1';
-const ANCHOR_POST_ID = 'anchor-post-1';
+const MOCK_FIRST_POST_TITLE = faker.lorem.words(3);
+const MOCK_POST_RELATED_ID = faker.string.uuid();
+const MOCK_ANCHOR_POST_ID = faker.string.uuid();
 
 const setup = customRenderAsync(PostRelatedModule, {
-  id: POST_RELATED_ID,
-  context: { post: { id: ANCHOR_POST_ID } },
+  id: MOCK_POST_RELATED_ID,
+  context: { post: { id: MOCK_ANCHOR_POST_ID } },
 });
 
 describe(`<${PostRelatedModule.name}/>`, () => {
@@ -46,22 +49,31 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     await setup();
 
     expect(getPostRelatedMock).toHaveBeenCalledWith(
-      POST_RELATED_ID,
-      ANCHOR_POST_ID,
+      MOCK_POST_RELATED_ID,
+      MOCK_ANCHOR_POST_ID,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
-  it('renders nothing and warns once without an anchor post', async () => {
-    const { container } = await setup({ context: undefined });
+  describe('without an anchor post', () => {
+    let container: HTMLElement;
 
-    expect(container).toBeEmptyDOMElement();
-    expect(getPostRelatedMock).not.toHaveBeenCalled();
-    expect(loggerWarnMock).toHaveBeenCalledTimes(1);
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'post_related_module.missing_post_context',
-      { id: POST_RELATED_ID },
-    );
+    beforeEach(async () => {
+      ({ container } = await setup({ context: undefined }));
+    });
+
+    it('renders nothing and skips the fetch', () => {
+      expect(container).toBeEmptyDOMElement();
+      expect(getPostRelatedMock).not.toHaveBeenCalled();
+    });
+
+    it('warns once about the missing post context', () => {
+      expect(loggerWarnMock).toHaveBeenCalledTimes(1);
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'post_related_module.missing_post_context',
+        { id: MOCK_POST_RELATED_ID },
+      );
+    });
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -82,15 +94,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
-          posts: [mockPostCard({ title: FIRST_POST_TITLE })],
+          posts: [mockPostCard({ title: MOCK_FIRST_POST_TITLE })],
         }),
       ),
     );
 
     await setup();
 
-    const postTitle = screen.getByText(FIRST_POST_TITLE);
+    const postTitle = screen.getByText(MOCK_FIRST_POST_TITLE);
     const pagination = screen.queryByRole('navigation');
+
     expect(postTitle).toBeVisible();
     expect(pagination).not.toBeInTheDocument();
   });
@@ -109,6 +122,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     await setup();
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
+
     expect(image).toBeVisible();
   });
 
@@ -124,15 +138,16 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     await setup();
 
     const image = screen.queryByRole('img');
+
     expect(image).not.toBeInTheDocument();
   });
 
-  it('renders a related post whose excerpt is absent, without throwing', async () => {
+  it('renders a related post that has no excerpt', async () => {
     getPostRelatedMock.mockResolvedValue(
       okResult(
         mockPostRelatedModuleData({
           posts: [
-            mockPostCard({ title: FIRST_POST_TITLE, excerpt: undefined }),
+            mockPostCard({ title: MOCK_FIRST_POST_TITLE, excerpt: undefined }),
           ],
         }),
       ),
@@ -140,7 +155,8 @@ describe(`<${PostRelatedModule.name}/>`, () => {
 
     await setup();
 
-    const postTitle = screen.getByText(FIRST_POST_TITLE);
+    const postTitle = screen.getByText(MOCK_FIRST_POST_TITLE);
+
     expect(postTitle).toBeVisible();
   });
 });

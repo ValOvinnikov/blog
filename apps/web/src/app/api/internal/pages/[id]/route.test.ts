@@ -8,6 +8,7 @@ import {
   ENQUEUE_MAX_AGE_MS,
 } from '@blog/utils/enqueue-signature';
 import { isUndefined } from '@blog/utils/primitives';
+import { faker } from '@faker-js/faker';
 import {
   INTERNAL_PAGES_SECRET_MISSING_EVENT,
   INTERNAL_PAGES_TITLE_FETCH_FAILED_EVENT,
@@ -39,11 +40,20 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
-const MOCK_SECRET = 'internal-pages-secret';
-const MOCK_PAGE_ID = 'contact-page';
-const MOCK_PAGE_TITLE = 'Get in touch';
-const MOCK_ROUTE_URL = `https://example.com/api/internal/pages/${MOCK_PAGE_ID}`;
-const { NL } = LOCALE_ISO_CODES;
+faker.seed(6009);
+
+const { NL, FR } = LOCALE_ISO_CODES;
+const UNSUPPORTED_LOCALE = 'IT';
+const MOCK_NOW = faker.date.recent().getTime();
+const MOCK_SECRET = faker.string.alphanumeric(24);
+const MOCK_OTHER_SECRET = faker.string.alphanumeric(24);
+const MOCK_PAGE_ID = faker.lorem.slug();
+const MOCK_OTHER_PAGE_ID = faker.lorem.slug();
+const MOCK_PAGE_TITLE = faker.lorem.words(3);
+const MOCK_ERROR = new Error(faker.lorem.sentence());
+const MOCK_ROUTE_ORIGIN = faker.internet.url({ appendSlash: false });
+const buildRoutePath = (id: string): string => `/api/internal/pages/${id}`;
+const MOCK_ROUTE_URL = `${MOCK_ROUTE_ORIGIN}${buildRoutePath(MOCK_PAGE_ID)}`;
 
 const MOCK_CREDENTIALS = {
   ...MOCK_TENANT_SANITY_CONTEXT,
@@ -60,7 +70,7 @@ const signedRequest = (
   const {
     secret = MOCK_SECRET,
     now,
-    path = new URL(MOCK_ROUTE_URL).pathname,
+    path = buildRoutePath(MOCK_PAGE_ID),
   } = options;
   return new Request(MOCK_ROUTE_URL, {
     method: HTTP_METHOD.POST,
@@ -74,14 +84,25 @@ const signedRequest = (
   });
 };
 
-const callRoute = (request: Request, id = MOCK_PAGE_ID) =>
-  POST(request, { params: Promise.resolve({ id }) });
+const unsignedRequest = (): Request =>
+  new Request(MOCK_ROUTE_URL, {
+    method: HTTP_METHOD.POST,
+    body: requestBody(),
+  });
 
-describe('POST /api/internal/pages/[id]', () => {
+const callRoute = (request: Request) =>
+  POST(request, { params: Promise.resolve({ id: MOCK_PAGE_ID }) });
+
+describe(POST, () => {
   beforeEach(() => {
+    vi.useFakeTimers({ now: MOCK_NOW });
     envMock.INTERNAL_PAGES_SECRET = MOCK_SECRET;
     getTenantSanityCredentialsMock.mockResolvedValue(MOCK_CREDENTIALS);
     getPageTitleMock.mockResolvedValue({ ok: true, data: MOCK_PAGE_TITLE });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("returns the page's title in the requested language", async () => {
@@ -98,72 +119,51 @@ describe('POST /api/internal/pages/[id]', () => {
     });
   });
 
-  it('refuses an unsigned request without reading the page', async () => {
-    const request = new Request(MOCK_ROUTE_URL, {
-      method: HTTP_METHOD.POST,
-      body: requestBody(),
-    });
-
-    const response = await callRoute(request);
+  it.each([
+    ['unsigned', () => unsignedRequest()],
+    [
+      'signed with another secret',
+      () => signedRequest(requestBody(), { secret: MOCK_OTHER_SECRET }),
+    ],
+    [
+      'changed after signing',
+      () =>
+        new Request(MOCK_ROUTE_URL, {
+          method: HTTP_METHOD.POST,
+          headers: signedRequest(requestBody()).headers,
+          body: requestBody({ locale: FR }),
+        }),
+    ],
+    [
+      'signed for another page',
+      () =>
+        signedRequest(requestBody(), {
+          path: buildRoutePath(MOCK_OTHER_PAGE_ID),
+        }),
+    ],
+    [
+      'expired',
+      () =>
+        signedRequest(requestBody(), {
+          now: MOCK_NOW - ENQUEUE_MAX_AGE_MS - 1,
+        }),
+    ],
+  ])('refuses a request that is %s', async (_case, createRequest) => {
+    const response = await callRoute(createRequest());
 
     expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(getPageTitleMock).not.toHaveBeenCalled();
   });
 
-  it('refuses a request signed with another secret', async () => {
-    const response = await callRoute(
-      signedRequest(requestBody(), { secret: 'another-secret' }),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-  });
-
-  it('refuses a request whose body was changed after signing', async () => {
-    const signed = signedRequest(requestBody());
-    const tampered = new Request(MOCK_ROUTE_URL, {
-      method: HTTP_METHOD.POST,
-      headers: signed.headers,
-      body: requestBody({ locale: LOCALE_ISO_CODES.FR }),
-    });
-
-    const response = await callRoute(tampered);
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-  });
-
-  it('refuses a request signed for another page', async () => {
-    const response = await callRoute(
-      signedRequest(requestBody(), {
-        path: '/api/internal/pages/another-page',
-      }),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-  });
-
-  it('refuses an expired request', async () => {
-    const response = await callRoute(
-      signedRequest(requestBody(), {
-        now: Date.now() - ENQUEUE_MAX_AGE_MS - 1,
-      }),
-    );
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-  });
-
-  it('refuses an unsigned request for an unknown page the same way as a known one', async () => {
+  it('refuses an unsigned request for an unknown page like a known one', async () => {
     getPageTitleMock.mockResolvedValue({ ok: true, data: undefined });
-    const request = new Request(MOCK_ROUTE_URL, {
-      method: HTTP_METHOD.POST,
-      body: requestBody(),
-    });
 
-    const response = await callRoute(request);
+    const response = await callRoute(unsignedRequest());
 
     expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
   });
 
-  it('returns 404 for an unknown page', async () => {
+  it('answers not found for an unknown page', async () => {
     getPageTitleMock.mockResolvedValue({ ok: true, data: undefined });
 
     const response = await callRoute(signedRequest(requestBody()));
@@ -171,7 +171,7 @@ describe('POST /api/internal/pages/[id]', () => {
     expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
   });
 
-  it('returns 404 for an unknown tenant', async () => {
+  it('answers not found for an unknown tenant without reading the page', async () => {
     getTenantSanityCredentialsMock.mockResolvedValue(undefined);
 
     const response = await callRoute(signedRequest(requestBody()));
@@ -182,38 +182,38 @@ describe('POST /api/internal/pages/[id]', () => {
 
   it.each([
     ['a tenant id that is not a uuid', requestBody({ tenantId: 'not-a-uuid' })],
-    ['an unsupported locale', requestBody({ locale: 'IT' })],
+    ['an unsupported locale', requestBody({ locale: UNSUPPORTED_LOCALE })],
     ['a body that is not JSON', 'not json'],
-  ])('returns 400 for %s', async (_case, rawBody) => {
+  ])('rejects %s', async (_case, rawBody) => {
     const response = await callRoute(signedRequest(rawBody));
 
     expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
   });
 
-  it('logs and returns 500 when the title read fails', async () => {
-    const error = new Error('sanity down');
-    getPageTitleMock.mockResolvedValue({ ok: false, error });
+  it('logs and fails when the title read fails', async () => {
+    getPageTitleMock.mockResolvedValue({ ok: false, error: MOCK_ERROR });
 
     const response = await callRoute(signedRequest(requestBody()));
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
       INTERNAL_PAGES_TITLE_FETCH_FAILED_EVENT,
-      expect.objectContaining({
+      {
         tenantId: MOCK_TENANT_ID,
         id: MOCK_PAGE_ID,
-        error,
-      }),
+        locale: NL,
+        error: MOCK_ERROR,
+      },
     );
   });
 
-  it('logs and returns 500 when the secret is not configured', async () => {
+  it('logs and fails when the secret is not configured', async () => {
     envMock.INTERNAL_PAGES_SECRET = undefined;
 
     const response = await callRoute(signedRequest(requestBody()));
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
       INTERNAL_PAGES_SECRET_MISSING_EVENT,
     );
   });

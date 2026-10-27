@@ -12,6 +12,7 @@ describe(`<${RunStatusBadge.name}/>`, () => {
     setup();
 
     const liveRegion = screen.getByTestId('run-status-live');
+
     expect(liveRegion).toHaveAttribute('aria-live', 'polite');
     expect(liveRegion).toHaveTextContent('Running…');
   });
@@ -19,13 +20,18 @@ describe(`<${RunStatusBadge.name}/>`, () => {
   it('reads Failed for a failed run', () => {
     setup({ status: TENANT_PROVISIONING_STEP_STATUS.FAILED });
 
-    expect(screen.getByText('Failed')).toBeVisible();
+    const failed = screen.getByText('Failed');
+
+    expect(failed).toBeVisible();
   });
 
   it('reads Starting before the run has written any step', () => {
     setup({ status: TENANT_PROVISIONING_STEP_STATUS.IDLE, isPreRun: true });
 
-    expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.queryByText('Not started')).not.toBeInTheDocument();
+    const starting = screen.getByText('Starting…');
+    const notStarted = screen.queryByText('Not started');
+
+    expect(starting).toBeVisible();
+    expect(notStarted).not.toBeInTheDocument();
   });
 });

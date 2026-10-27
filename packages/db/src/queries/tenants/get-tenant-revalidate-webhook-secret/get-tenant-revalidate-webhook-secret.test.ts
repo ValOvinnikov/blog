@@ -8,7 +8,10 @@ import {
   MISSING_TENANT_TOKEN_KEY_ERROR,
   useTenantTokenEncryptionKey,
 } from '@blog/db/testing/tenant-token-encryption-key';
-import { MOCK_REVALIDATE_WEBHOOK_SECRET } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_REVALIDATE_WEBHOOK_SECRET,
+  MOCK_UNKNOWN_SANITY_PROJECT_ID,
+} from '@blog/db/testing/tenants/fixtures';
 
 import { getTenantRevalidateWebhookSecret } from './get-tenant-revalidate-webhook-secret';
 
@@ -40,9 +43,11 @@ describe(getTenantRevalidateWebhookSecret, () => {
     });
 
     it('resolves the tenant id and the decrypted secret for its project id', async () => {
-      await expect(
-        getTenantRevalidateWebhookSecret(MOCK_SANITY_PROJECT_ID),
-      ).resolves.toEqual({
+      const result = await getTenantRevalidateWebhookSecret(
+        MOCK_SANITY_PROJECT_ID,
+      );
+
+      expect(result).toEqual({
         tenantId: tenant.id,
         secret: MOCK_REVALIDATE_WEBHOOK_SECRET,
       });
@@ -58,14 +63,18 @@ describe(getTenantRevalidateWebhookSecret, () => {
   });
 
   it('resolves the tenant id with no secret when none is stored', async () => {
-    await expect(
-      getTenantRevalidateWebhookSecret(MOCK_SANITY_PROJECT_ID),
-    ).resolves.toEqual({ tenantId: tenant.id, secret: undefined });
+    const result = await getTenantRevalidateWebhookSecret(
+      MOCK_SANITY_PROJECT_ID,
+    );
+
+    expect(result).toEqual({ tenantId: tenant.id, secret: undefined });
   });
 
   it('resolves undefined for a project id no tenant owns', async () => {
-    await expect(
-      getTenantRevalidateWebhookSecret('unknown-project'),
-    ).resolves.toBeUndefined();
+    const result = await getTenantRevalidateWebhookSecret(
+      MOCK_UNKNOWN_SANITY_PROJECT_ID,
+    );
+
+    expect(result).toBeUndefined();
   });
 });

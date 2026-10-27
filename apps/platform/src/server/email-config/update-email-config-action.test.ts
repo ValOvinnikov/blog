@@ -4,14 +4,23 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { queries } from '@blog/db';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
+  type TMembershipRole,
   type TTenantPlan,
 } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import {
+  MOCK_OPERATOR_ID,
+  MOCK_OPERATOR_SESSION,
+} from '@platform/testing/admins/operator';
+import { mockedAuth } from '@platform/testing/auth/mocked-auth';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   mockReadyTenant,
   MOCK_TENANT_ID,
@@ -23,72 +32,71 @@ import {
   type TUpdateEmailConfigInput,
 } from './update-email-config-action';
 
-const { upsertEmailConfigMock, insertAuditEventMock } = vi.hoisted(() => ({
-  upsertEmailConfigMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-}));
-
-vi.mock('@platform/server/auth/require-tenant-membership');
-
-vi.mock('@platform/server/auth/auth');
-
 vi.mock('@blog/db', () => ({
   queries: {
-    emailConfig: { upsertEmailConfig: upsertEmailConfigMock },
-    auditEvents: { insertAuditEvent: insertAuditEventMock },
+    emailConfig: { upsertEmailConfig: vi.fn() },
+    auditEvents: { insertAuditEvent: vi.fn() },
   },
 }));
 
-const REPLY_TO_ADDRESS = 'support@acme.example';
-const CONTACT_RECIPIENT = 'leads@acme.example';
-const INVALID_EMAIL = 'not-an-email';
-const MEMBERSHIP_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
+vi.mock('@platform/server/auth/require-tenant-membership');
+vi.mock('@platform/server/auth/auth');
+
+faker.seed(5998);
+
+const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
+const MOCK_INVALID_EMAIL = faker.lorem.word();
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 
 const VALID_INPUT: TUpdateEmailConfigInput = {
-  senderName: 'Acme Co',
-  replyToAddress: REPLY_TO_ADDRESS,
-  contactRecipient: CONTACT_RECIPIENT,
-  footerPostalAddress: '123 Main St, Springfield',
+  senderName: faker.lorem.words(2),
+  replyToAddress: MOCK_REPLY_TO_ADDRESS,
+  contactRecipient: faker.internet.email(),
+  footerPostalAddress: faker.location.streetAddress(),
 };
 
-const { contactRecipient, ...EDITOR_SAVED_INPUT } = VALID_INPUT;
+const NON_RECIPIENT_INPUT: TUpdateEmailConfigInput = {
+  senderName: VALID_INPUT.senderName,
+  replyToAddress: VALID_INPUT.replyToAddress,
+  footerPostalAddress: VALID_INPUT.footerPostalAddress,
+};
 
-const mockTenantOnPlan = (plan: TTenantPlan) =>
+const ALL_NULL_INPUT: TUpdateEmailConfigInput = {
+  senderName: null,
+  replyToAddress: null,
+  footerPostalAddress: null,
+  contactRecipient: null,
+};
+
+const { upsertEmailConfig } = queries.emailConfig;
+const { insertAuditEvent } = queries.auditEvents;
+
+const mockMemberOnPlan = (plan: TTenantPlan, role: TMembershipRole) =>
   vi.mocked(requireTenantMembership).mockResolvedValue({
     tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
-    membership: {
-      id: 'membership-1',
-      userId: 'user-1',
-      tenantId: MOCK_TENANT_ID,
-      role: MEMBERSHIP_ROLE.OWNER,
-      createdAt: MEMBERSHIP_CREATED_AT,
-    },
+    membership: mockMembership({ role }),
   });
 
 describe(updateEmailConfigAction, () => {
   beforeEach(() => {
-    mockTenantOnPlan(TENANT_PLAN.GROWTH);
-    upsertEmailConfigMock.mockReset();
-    upsertEmailConfigMock.mockResolvedValue({});
-    insertAuditEventMock.mockReset();
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
+    vi.mocked(requireTenantMembership).mockReset();
+    vi.mocked(upsertEmailConfig).mockReset();
+    vi.mocked(insertAuditEvent).mockReset();
+    mockMemberOnPlan(TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER);
   });
 
-  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
+  it('writes the settings for the tenant resolved from the session', async () => {
     const result = await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
 
-    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      VALID_INPUT,
-    );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, VALID_INPUT);
   });
 
-  it('rejects an invalid reply-to address without ever calling the tenant gate', async () => {
+  it('rejects an invalid reply-to address before the tenant gate', async () => {
     const result = await updateEmailConfigAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
-      replyToAddress: INVALID_EMAIL,
+      replyToAddress: MOCK_INVALID_EMAIL,
     });
 
     expect(result).toEqual({
@@ -100,29 +108,26 @@ describe(updateEmailConfigAction, () => {
 
   it.each([
     'Acme <evil@attacker.example>',
-    REPLY_TO_ADDRESS,
+    MOCK_REPLY_TO_ADDRESS,
     'Acme\r\nBcc: victim@example.com',
     'Acme "Support"',
     'Acme, Inc',
     'Acme; Support',
-  ])(
-    'rejects %j as a sender name with a field error explaining it is a display name, and writes nothing',
-    async (senderName) => {
-      const result = await updateEmailConfigAction(MOCK_TENANT_ID, {
-        ...VALID_INPUT,
-        senderName,
-      });
+  ])('rejects %j as a sender name and writes nothing', async (senderName) => {
+    const result = await updateEmailConfigAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      senderName,
+    });
 
-      expect(result).toEqual({
-        outcome: ACTION_OUTCOME.INVALID,
-        fieldErrors: {
-          senderName: { reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID },
-        },
-      });
-      expect(requireTenantMembership).not.toHaveBeenCalled();
-      expect(upsertEmailConfigMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        senderName: { reason: EMAIL_SENDER_FIELD_ERROR.SENDER_NAME_INVALID },
+      },
+    });
+    expect(requireTenantMembership).not.toHaveBeenCalled();
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
+  });
 
   it.each(["Acme & Co's Newsletter", 'Café Müller', 'Acme (Support)'])(
     'accepts %j as a sender name',
@@ -136,27 +141,23 @@ describe(updateEmailConfigAction, () => {
     },
   );
 
-  it('accepts explicit nulls as "revert to product default"', async () => {
-    const result = await updateEmailConfigAction(MOCK_TENANT_ID, {
-      senderName: null,
-      replyToAddress: null,
-      footerPostalAddress: null,
-      contactRecipient: null,
-    });
+  it('writes explicit nulls so each setting reverts to the product default', async () => {
+    const result = await updateEmailConfigAction(
+      MOCK_TENANT_ID,
+      ALL_NULL_INPUT,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      senderName: null,
-      replyToAddress: null,
-      footerPostalAddress: null,
-      contactRecipient: null,
-    });
+    expect(upsertEmailConfig).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      ALL_NULL_INPUT,
+    );
   });
 
-  it('rejects an invalid contact recipient with a field error, and writes nothing', async () => {
+  it('rejects an invalid contact recipient and writes nothing', async () => {
     const result = await updateEmailConfigAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
-      contactRecipient: INVALID_EMAIL,
+      contactRecipient: MOCK_INVALID_EMAIL,
     });
 
     expect(result).toEqual({
@@ -168,85 +169,58 @@ describe(updateEmailConfigAction, () => {
       },
     });
     expect(requireTenantMembership).not.toHaveBeenCalled();
-    expect(upsertEmailConfigMock).not.toHaveBeenCalled();
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
   });
 
-  it('leaves the stored contact recipient untouched on a plan without the contact form', async () => {
-    mockTenantOnPlan(TENANT_PLAN.FREE);
+  it.each([
+    [
+      'a plan without the contact form',
+      TENANT_PLAN.FREE,
+      MEMBERSHIP_ROLE.OWNER,
+    ],
+    ['an editor', TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.EDITOR],
+  ])(
+    'leaves the stored contact recipient untouched for %s',
+    async (_caller, plan, role) => {
+      mockMemberOnPlan(plan, role);
+      mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
 
-    await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
+      await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
 
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      expect.objectContaining({ contactRecipient: undefined }),
-    );
-  });
+      expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+        ...NON_RECIPIENT_INPUT,
+        contactRecipient: undefined,
+      });
+      expect(insertAuditEvent).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+        targetId: MOCK_TENANT_ID,
+        details: { fields: Object.keys(NON_RECIPIENT_INPUT) },
+      });
+    },
+  );
 
-  it('leaves the stored contact recipient untouched when an editor saves', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValue({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-      membership: {
-        id: 'membership-2',
-        userId: 'user-2',
-        tenantId: MOCK_TENANT_ID,
-        role: MEMBERSHIP_ROLE.EDITOR,
-        createdAt: MEMBERSHIP_CREATED_AT,
-      },
-    });
-
-    await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
-
-    expect(upsertEmailConfigMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      expect.objectContaining({ contactRecipient: undefined }),
-    );
-    expect(insertAuditEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        details: { fields: Object.keys(EDITOR_SAVED_INPUT) },
-      }),
-    );
-  });
-
-  it('saves a contact recipient and clears it again with null', async () => {
-    await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
-    await updateEmailConfigAction(MOCK_TENANT_ID, {
-      ...VALID_INPUT,
-      contactRecipient: null,
-    });
-
-    expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
-      1,
-      MOCK_TENANT_ID,
-      expect.objectContaining({ contactRecipient }),
-    );
-    expect(upsertEmailConfigMock).toHaveBeenNthCalledWith(
-      2,
-      MOCK_TENANT_ID,
-      expect.objectContaining({ contactRecipient: null }),
-    );
-  });
-
-  it('reports failure instead of throwing when the write itself fails, and records no audit event', async () => {
-    upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
+  it('reports failure and records no audit event when the write fails', async () => {
+    vi.mocked(upsertEmailConfig).mockRejectedValue(MOCK_DB_ERROR);
 
     const result = await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith(
-      EMAIL_CONFIG_LOG.UPDATE_FAILED,
-      expect.objectContaining({
-        tenantId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
-    );
+    expect(insertAuditEvent).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(EMAIL_CONFIG_LOG.UPDATE_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      error: MOCK_DB_ERROR,
+    });
   });
 
-  it('records a SETTINGS_UPDATED audit event naming the saved fields, never their addresses', async () => {
+  it('audits the saved field names, never their values', async () => {
+    mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
+
     await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
 
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'user-1',
+    expect(insertAuditEvent).toHaveBeenCalledWith({
+      actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
@@ -254,29 +228,35 @@ describe(updateEmailConfigAction, () => {
     });
   });
 
-  it('still succeeds when the audit write fails, and logs the failure', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
+  it('still succeeds and logs when the audit write fails', async () => {
+    vi.mocked(insertAuditEvent).mockRejectedValue(MOCK_DB_ERROR);
 
     const result = await updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(logger.error).toHaveBeenCalledWith(
+      EMAIL_CONFIG_LOG.UPDATE_AUDIT_FAILED,
+      {
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+        targetId: MOCK_TENANT_ID,
+        error: MOCK_DB_ERROR,
+      },
+    );
   });
 
   it.each([
     NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-  ])(
-    'propagates the %s the tenant gate throws without writing',
-    async (gateError) => {
-      vi.mocked(requireTenantMembership).mockRejectedValueOnce(
-        new Error(gateError),
-      );
+  ])('propagates the %s the tenant gate throws', async (gateError) => {
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
+      new Error(gateError),
+    );
 
-      await expect(
-        updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT),
-      ).rejects.toThrow(gateError);
+    await expect(
+      updateEmailConfigAction(MOCK_TENANT_ID, VALID_INPUT),
+    ).rejects.toThrow(gateError);
 
-      expect(upsertEmailConfigMock).not.toHaveBeenCalled();
-    },
-  );
+    expect(upsertEmailConfig).not.toHaveBeenCalled();
+  });
 });

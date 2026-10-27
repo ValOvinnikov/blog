@@ -1,10 +1,11 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
+  MOCK_CTA_ACTIONS,
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
-  MOCK_CTA_ACTIONS,
 } from '@web/testing/modules/cta/fixtures';
 import {
   MOCK_TESTIMONIAL_HEADING,
@@ -17,10 +18,11 @@ import { TestimonialModuleView } from './testimonial-module-view';
 
 vi.mock('@web/i18n/navigation');
 
-const TITLE_ID = 'testimonial-title';
-const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
+faker.seed(22);
 
-const dataTestId = 'testimonial-module-testimonial-1';
+const MOCK_TITLE_ID = faker.string.uuid();
+const MOCK_DATA_TEST_ID = faker.string.uuid();
+const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
 
 const setup = customRender(TestimonialModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -31,12 +33,12 @@ const setup = customRender(TestimonialModuleView, {
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
   layout: undefined,
-  titleId: TITLE_ID,
-  dataTestId,
+  titleId: MOCK_TITLE_ID,
+  dataTestId: MOCK_DATA_TEST_ID,
 });
 
 describe(`<${TestimonialModuleView.name}/>`, () => {
-  describe('two testimonials in a grid with no actions', () => {
+  describe('several testimonials in a grid with no actions', () => {
     beforeEach(() => {
       setup();
     });
@@ -49,24 +51,35 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       const section = screen.getByRole('region', {
         name: MOCK_TESTIMONIAL_HEADING,
       });
-      expect(heading).toHaveAttribute('id', TITLE_ID);
-      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
-      expect(section).toHaveAttribute('data-testid', dataTestId);
+
+      expect(heading).toBeVisible();
+      expect(section).toBeVisible();
     });
 
-    it('renders several testimonials as blockquotes in a grid', () => {
+    it('renders each testimonial as a blockquote', () => {
       const quotes = screen.getAllByRole('blockquote');
-      expect(quotes).toHaveLength(2);
-      MOCK_TESTIMONIAL_ITEMS.forEach((item) => {
-        const name = screen.getByText(item.name, { ignore: '.sr-only' });
+
+      expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
+    });
+
+    it.each(MOCK_TESTIMONIAL_ITEMS.map(({ name }) => name))(
+      'renders the name %s',
+      (itemName) => {
+        const name = screen.getByText(itemName, { ignore: '.sr-only' });
+
         expect(name).toBeVisible();
-      });
+      },
+    );
+
+    it('renders no carousel', () => {
       const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+
       expect(carousel).not.toBeInTheDocument();
     });
 
     it('renders no action group when there are no cta buttons', () => {
       const links = screen.queryAllByRole('link');
+
       expect(links).toHaveLength(0);
     });
   });
@@ -79,6 +92,7 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
 
     const quotes = screen.getAllByRole('blockquote');
     const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+
     expect(quotes).toHaveLength(1);
     expect(carousel).not.toBeInTheDocument();
   });
@@ -88,6 +102,7 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
 
     const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
     const quotes = within(carousel).getAllByRole('blockquote');
+
     expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
   });
 
@@ -100,6 +115,7 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     const secondaryLink = screen.getByRole('link', {
       name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
     });
+
     expect(primaryLink).toHaveAttribute(
       'href',
       MOCK_CTA_PRIMARY_ACTION.link.href,

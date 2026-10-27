@@ -1,15 +1,27 @@
+import { faker } from '@faker-js/faker';
+
 import { toTopicId } from './id';
 
-describe('toTopicId', () => {
-  it('prefixes a published category id', () => {
-    expect(toTopicId('abc123')).toBe('topic-abc123');
-  });
+faker.seed(8);
 
-  it('keeps the drafts. prefix outermost', () => {
-    expect(toTopicId('drafts.abc123')).toBe('drafts.topic-abc123');
-  });
+const MOCK_CATEGORY_ID = faker.string.uuid();
 
-  it('is idempotent for an already-migrated id', () => {
-    expect(toTopicId('topic-abc123')).toBe('topic-abc123');
+describe(toTopicId, () => {
+  it.each([
+    ['a published id', MOCK_CATEGORY_ID, `topic-${MOCK_CATEGORY_ID}`],
+    [
+      'a draft id, keeping the drafts prefix outermost',
+      `drafts.${MOCK_CATEGORY_ID}`,
+      `drafts.topic-${MOCK_CATEGORY_ID}`,
+    ],
+    [
+      'an already migrated id',
+      `topic-${MOCK_CATEGORY_ID}`,
+      `topic-${MOCK_CATEGORY_ID}`,
+    ],
+  ])('converts %s', (_label, categoryId, expected) => {
+    const result = toTopicId(categoryId);
+
+    expect(result).toBe(expected);
   });
 });

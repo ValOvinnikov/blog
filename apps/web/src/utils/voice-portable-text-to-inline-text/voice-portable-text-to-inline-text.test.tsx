@@ -1,53 +1,59 @@
-import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type TVoicePortableText,
-} from '@blog/config';
+import type { TVoicePortableText } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { PortableText } from '@web/components/shared/portable-text';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { voicePortableTextToInlineText } from './voice-portable-text-to-inline-text';
 
-const DOCS_HREF = 'https://example.com/docs';
+faker.seed(6012);
 
-const VOICE_VALUE: TVoicePortableText = [
+const MOCK_LINK_TEXT = faker.lorem.word();
+const MOCK_LEADING_TEXT = `${faker.lorem.words(2)} `;
+const MOCK_TRAILING_TEXT = ` ${faker.lorem.words(2)}.`;
+const MOCK_HREF = faker.internet.url();
+const MOCK_LINK_KEY = faker.string.uuid();
+
+const MOCK_VOICE_VALUE: TVoicePortableText = [
   {
     _type: 'block',
-    _key: 'b1',
+    _key: faker.string.uuid(),
     style: 'normal',
     children: [
-      { _type: 'span', _key: 's1', text: 'Read the ', marks: [] },
-      { _type: 'span', _key: 's2', text: 'docs', marks: ['link-1'] },
-      { _type: 'span', _key: 's3', text: ' for more.', marks: [] },
+      {
+        _type: 'span',
+        _key: faker.string.uuid(),
+        text: MOCK_LEADING_TEXT,
+        marks: [],
+      },
+      {
+        _type: 'span',
+        _key: faker.string.uuid(),
+        text: MOCK_LINK_TEXT,
+        marks: [MOCK_LINK_KEY],
+      },
+      {
+        _type: 'span',
+        _key: faker.string.uuid(),
+        text: MOCK_TRAILING_TEXT,
+        marks: [],
+      },
     ],
-    markDefs: [{ _key: 'link-1', _type: 'link', href: DOCS_HREF }],
+    markDefs: [{ _key: MOCK_LINK_KEY, _type: 'link', href: MOCK_HREF }],
   },
 ];
 
-describe(voicePortableTextToInlineText, () => {
-  it('wraps a link markDef as a resolved linkRef mark', () => {
-    const result = voicePortableTextToInlineText(VOICE_VALUE);
+const setup = customRender(PortableText, {
+  value: voicePortableTextToInlineText(MOCK_VOICE_VALUE),
+});
 
-    expect(result[0]?.markDefs).toEqual([
-      {
-        _key: 'link-1',
-        _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-        link: { href: DOCS_HREF, target: undefined },
-      },
-    ]);
-    // eslint-disable-next-line testing-library/no-node-access -- reads Portable Text block children, not a DOM node
-    expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
+describe(voicePortableTextToInlineText, () => {
+  beforeEach(() => {
+    setup();
   });
 
   it('produces a value PortableText renders as a working anchor', () => {
-    const setup = customRender(PortableText, {
-      value: voicePortableTextToInlineText(VOICE_VALUE),
-    });
+    const link = screen.getByRole('link', { name: MOCK_LINK_TEXT });
 
-    setup();
-
-    expect(screen.getByRole('link', { name: 'docs' })).toHaveAttribute(
-      'href',
-      DOCS_HREF,
-    );
+    expect(link).toHaveAttribute('href', MOCK_HREF);
   });
 });

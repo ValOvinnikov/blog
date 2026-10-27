@@ -1,64 +1,74 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
-import userEvent from '@testing-library/user-event';
-import type { Mock } from 'vitest';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { IconButton } from './icon-button';
 
+faker.seed(123);
+
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+const MOCK_ICON_TEXT = faker.lorem.word();
+
 const setup = customRender(IconButton, {
-  ariaLabel: 'Toggle theme',
-  children: <span>icon</span>,
+  ariaLabel: MOCK_ARIA_LABEL,
+  children: <span>{MOCK_ICON_TEXT}</span>,
 });
 
 describe(`<${IconButton.name}/>`, () => {
-  let onClick: Mock<() => void>;
+  let user: UserEvent;
 
   beforeEach(() => {
-    onClick = vi.fn();
+    user = userEvent.setup();
   });
 
-  it('renders as a button with aria-label', () => {
+  it('renders a button with the given accessible name', () => {
     setup();
-    expect(screen.getByRole('button', { name: 'Toggle theme' })).toBeVisible();
+
+    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+
+    expect(button).toBeVisible();
   });
 
   it('calls onClick when clicked', async () => {
-    setup({ ariaLabel: 'click', onClick, children: <span /> });
-    await userEvent.click(screen.getByRole('button'));
+    const onClick = vi.fn();
+    setup({ onClick });
+
+    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+    await user.click(button);
+
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('forwards disabled attribute', () => {
-    setup({ ariaLabel: 'Toggle theme', isDisabled: true, children: <span /> });
-    expect(screen.getByRole('button', { name: 'Toggle theme' })).toBeDisabled();
+  it('is disabled when isDisabled is set', () => {
+    setup({ isDisabled: true });
+
+    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+
+    expect(button).toBeDisabled();
   });
 
-  it('renders aria-disabled instead of disabled when isFocusableWhenDisabled is set, and stays focusable', () => {
-    setup({
-      ariaLabel: 'Toggle theme',
-      isDisabled: true,
-      isFocusableWhenDisabled: true,
-      children: <span />,
+  describe('when disabled but focusable', () => {
+    let onClick: () => void;
+
+    beforeEach(() => {
+      onClick = vi.fn();
+      setup({ isDisabled: true, isFocusableWhenDisabled: true, onClick });
     });
 
-    const button = screen.getByRole('button', { name: 'Toggle theme' });
-    expect(button).toBeEnabled();
-    expect(button).toHaveAttribute('aria-disabled', 'true');
+    it('is aria-disabled rather than disabled, and takes focus', async () => {
+      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+      await user.tab();
 
-    button.focus();
-    expect(button).toHaveFocus();
-  });
-
-  it('does not call onClick when aria-disabled', async () => {
-    setup({
-      ariaLabel: 'Toggle theme',
-      isDisabled: true,
-      isFocusableWhenDisabled: true,
-      onClick,
-      children: <span />,
+      expect(button).toBeEnabled();
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).toHaveFocus();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Toggle theme' }));
+    it('does not call onClick when clicked', async () => {
+      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+      await user.click(button);
 
-    expect(onClick).not.toHaveBeenCalled();
+      expect(onClick).not.toHaveBeenCalled();
+    });
   });
 });

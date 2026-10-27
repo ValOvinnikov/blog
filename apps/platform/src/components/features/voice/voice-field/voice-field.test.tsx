@@ -6,6 +6,7 @@ import {
   type TVoiceFieldId,
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { screen } from '@platform/testing/custom-render';
 import {
@@ -23,10 +24,14 @@ import {
 
 import { VoiceField, type TVoiceFieldProps } from './voice-field';
 
+faker.seed(5994);
+
 const { EN } = LOCALE_ISO_CODES;
 const HEADING = 'Heading';
 const SUPPORTING_TEXT = 'Supporting text';
 const ARIA_INVALID = 'aria-invalid';
+const MOCK_FIELD_ID_PREFIX = faker.lorem.word();
+const MOCK_ERROR = faker.lorem.sentence();
 
 const fieldById = (id: TVoiceFieldId) =>
   VOICE_FIELDS.find((field) => field.id === id)!;
@@ -48,7 +53,7 @@ const VoiceFieldInEditor = ({
   return (
     <VoiceEditorProvider
       locale={EN}
-      fieldIdPrefix="voice-field"
+      fieldIdPrefix={MOCK_FIELD_ID_PREFIX}
       values={values}
       savedValues={values}
       errors={errors}
@@ -73,6 +78,7 @@ describe(`<${VoiceField.name}/>`, () => {
     setup();
 
     const input = screen.getByRole('textbox', { name: HEADING });
+
     expect(input).toHaveAttribute(
       'placeholder',
       SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
@@ -88,23 +94,29 @@ describe(`<${VoiceField.name}/>`, () => {
       },
     });
 
-    expect(screen.getByRole('textbox', { name: HEADING })).toBeVisible();
+    const input = screen.getByRole('textbox', { name: HEADING });
+
+    expect(input).toBeVisible();
   });
 
   it('names a rich list field without a visible label for screen readers', () => {
     setup({ field: fieldById('tagEmpty'), value: null });
 
-    expect(screen.getByRole('textbox', { name: 'Tag page' })).toBeVisible();
-    expect(screen.queryByText('Tag page')).not.toBeInTheDocument();
+    const editor = screen.getByRole('textbox', { name: 'Tag page' });
+    const visibleLabel = screen.queryByText('Tag page');
+
+    expect(editor).toBeVisible();
+    expect(visibleLabel).not.toBeInTheDocument();
   });
 
-  it('edits a rich field in the rich text editor with only bold, italic and link', () => {
+  it('edits a rich field with only bold, italic and link controls', () => {
     setup({ field: fieldById('notFoundSupportingText'), value: null });
 
-    expect(
-      screen.getByRole('textbox', { name: SUPPORTING_TEXT }),
-    ).toBeVisible();
-    expect(screen.getAllByRole('button')).toHaveLength(3);
+    const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT });
+    const controls = screen.getAllByRole('button');
+
+    expect(editor).toBeVisible();
+    expect(controls).toHaveLength(3);
   });
 
   it('edits a multiline field in a plain text area', () => {
@@ -117,43 +129,45 @@ describe(`<${VoiceField.name}/>`, () => {
       },
     });
 
-    expect(
-      screen.getByRole('textbox', { name: 'Blog index page' }),
-    ).toHaveAttribute('rows', '3');
+    const textArea = screen.getByRole('textbox', { name: 'Blog index page' });
+
+    expect(textArea).toHaveAttribute('rows', '3');
   });
 
   it('describes an invalid field with its error and gives it its input id', () => {
-    setup({ errors: { notFoundHeading: 'Must be 100 characters or fewer.' } });
+    setup({ errors: { notFoundHeading: MOCK_ERROR } });
 
     const input = screen.getByRole('textbox', { name: HEADING });
+
     expect(input).toHaveAttribute(ARIA_INVALID, 'true');
-    expect(input).toHaveAttribute('id', 'voice-field-notFoundHeading');
+    expect(input).toHaveAttribute(
+      'id',
+      `${MOCK_FIELD_ID_PREFIX}-notFoundHeading`,
+    );
     expect(input).toHaveAccessibleDescription(
-      'Also the browser tab title Must be 100 characters or fewer.',
+      `Also the browser tab title ${MOCK_ERROR}`,
     );
   });
 
   it('notes the placeholder a field must keep', () => {
     setup({ field: fieldById('topicEmpty'), value: null });
 
-    expect(
-      screen.getByRole('textbox', { name: 'Topic page' }),
-    ).toHaveAccessibleDescription(
+    const editor = screen.getByRole('textbox', { name: 'Topic page' });
+
+    expect(editor).toHaveAccessibleDescription(
       'A topic with no posts yet Keep {name} — the site fills it in.',
     );
   });
 
   it('announces a read-only rich field as read-only, with no editing controls', () => {
     setup(
-      {
-        field: fieldById('notFoundSupportingText'),
-        value: null,
-      },
+      { field: fieldById('notFoundSupportingText'), value: null },
       { isArchived: true },
     );
 
     const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT });
     const editingControl = screen.queryByRole('button');
+
     expect(editingControl).not.toBeInTheDocument();
     expect(editor).toHaveAttribute('aria-readonly', 'true');
     expect(editor).not.toHaveAttribute('aria-disabled');
@@ -167,7 +181,9 @@ describe(`<${VoiceField.name}/>`, () => {
     (_kind, id, name) => {
       setup({ field: fieldById(id), value: null }, { isArchived: true });
 
-      expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
+      const input = screen.getByRole('textbox', { name });
+
+      expect(input).toHaveAccessibleDescription(
         new RegExp(`^${ARCHIVED_NOTICE_TEXT}`),
       );
     },
@@ -177,11 +193,15 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({
       field: fieldById('notFoundSupportingText'),
       value: null,
-      errors: { notFoundSupportingText: 'Must be 300 characters or fewer.' },
+      errors: { notFoundSupportingText: MOCK_ERROR },
     });
 
     const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT });
-    expect(editor).toHaveAttribute('id', 'voice-field-notFoundSupportingText');
+
+    expect(editor).toHaveAttribute(
+      'id',
+      `${MOCK_FIELD_ID_PREFIX}-notFoundSupportingText`,
+    );
     expect(editor).toHaveAttribute(ARIA_INVALID, 'true');
   });
 });

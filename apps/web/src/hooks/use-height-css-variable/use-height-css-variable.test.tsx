@@ -1,27 +1,25 @@
+import { faker } from '@faker-js/faker';
 import { customRender } from '@web/testing/custom-render';
 
 import { useHeightCssVariable } from './use-height-css-variable';
 
-const VARIABLE = '--test-height';
+faker.seed(6012);
+
+const MOCK_HEIGHT_PX = faker.number.int({ min: 40, max: 200 });
+const MOCK_VARIABLE_NAME = `--${faker.lorem.word()}-height` as const;
 
 const Harness = () => {
-  const ref = useHeightCssVariable<HTMLDivElement>(VARIABLE);
+  const ref = useHeightCssVariable<HTMLDivElement>(MOCK_VARIABLE_NAME);
 
   return <div ref={ref} />;
 };
 
 const setup = customRender(Harness, {});
 
-const readVariable = () =>
-  document.documentElement.style.getPropertyValue(VARIABLE);
-
 describe(useHeightCssVariable, () => {
-  let height = 0;
-
   beforeEach(() => {
-    height = 72;
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
-      () => DOMRect.fromRect({ height }),
+      () => DOMRect.fromRect({ height: MOCK_HEIGHT_PX }),
     );
     vi.stubGlobal(
       'ResizeObserver',
@@ -36,10 +34,17 @@ describe(useHeightCssVariable, () => {
     );
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
   it('sets the variable to the element height on the root element', () => {
     setup();
 
-    expect(readVariable()).toBe('72px');
+    const value =
+      document.documentElement.style.getPropertyValue(MOCK_VARIABLE_NAME);
+    expect(value).toBe(`${MOCK_HEIGHT_PX}px`);
   });
 
   it('removes the variable on unmount', () => {
@@ -47,6 +52,8 @@ describe(useHeightCssVariable, () => {
 
     unmount();
 
-    expect(readVariable()).toBe('');
+    const value =
+      document.documentElement.style.getPropertyValue(MOCK_VARIABLE_NAME);
+    expect(value).toBe('');
   });
 });

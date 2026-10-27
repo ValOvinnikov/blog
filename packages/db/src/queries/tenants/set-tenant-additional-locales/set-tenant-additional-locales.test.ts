@@ -3,14 +3,12 @@ import {
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
-import {
-  TENANT_PLAN,
-  TENANT_STATUS,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantAdditionalLocales } from './set-tenant-additional-locales';
@@ -25,19 +23,11 @@ async function insertTenant(
   plan: TTenantPlan,
   additionalLocales: TLocaleIsoCode[] = [],
 ): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      locale: EN,
-      additionalLocales,
-      plan,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
+  const tenant = await insertTestTenant(db(), {
+    locale: EN,
+    additionalLocales,
+    plan,
+  });
 
   return tenant.id;
 }
@@ -66,18 +56,20 @@ describe(setTenantAdditionalLocales, () => {
     it('saves additional locales within the plan limit', async () => {
       const result = await setTenantAdditionalLocales(tenantId, [NL, FR]);
 
+      const stored = await storedAdditionalLocales(tenantId);
       expect(result).toEqual({ ok: true, data: [NL, FR] });
-      expect(await storedAdditionalLocales(tenantId)).toEqual([NL, FR]);
+      expect(stored).toEqual([NL, FR]);
     });
 
     it('rejects more locales than the plan allows, counting the default', async () => {
       const result = await setTenantAdditionalLocales(tenantId, [NL, FR, DE]);
 
+      const stored = await storedAdditionalLocales(tenantId);
       expect(result).toEqual({
         ok: false,
         error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
       });
-      expect(await storedAdditionalLocales(tenantId)).toEqual([]);
+      expect(stored).toEqual([]);
     });
 
     it('rejects the default locale among the additional ones', async () => {
@@ -100,8 +92,9 @@ describe(setTenantAdditionalLocales, () => {
 
       const result = await setTenantAdditionalLocales(tenantId, []);
 
+      const stored = await storedAdditionalLocales(tenantId);
       expect(result).toEqual({ ok: true, data: [] });
-      expect(await storedAdditionalLocales(tenantId)).toEqual([]);
+      expect(stored).toEqual([]);
     });
   });
 
@@ -121,8 +114,9 @@ describe(setTenantAdditionalLocales, () => {
 
     const result = await setTenantAdditionalLocales(tenantId, [DE, NL, FR]);
 
+    const stored = await storedAdditionalLocales(tenantId);
     expect(result).toEqual({ ok: true, data: [DE, NL, FR] });
-    expect(await storedAdditionalLocales(tenantId)).toEqual([DE, NL, FR]);
+    expect(stored).toEqual([DE, NL, FR]);
   });
 
   it('rejects adding a new locale while over the limit', async () => {
@@ -130,18 +124,18 @@ describe(setTenantAdditionalLocales, () => {
 
     const result = await setTenantAdditionalLocales(tenantId, [NL, ES]);
 
+    const stored = await storedAdditionalLocales(tenantId);
     expect(result).toEqual({
       ok: false,
       error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
     });
-    expect(await storedAdditionalLocales(tenantId)).toEqual([NL, FR]);
+    expect(stored).toEqual([NL, FR]);
   });
 
   it('reports a missing tenant as not found', async () => {
-    const result = await setTenantAdditionalLocales(
-      '00000000-0000-0000-0000-000000000000',
-      [NL],
-    );
+    const result = await setTenantAdditionalLocales(MOCK_MISSING_TENANT_ID, [
+      NL,
+    ]);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });

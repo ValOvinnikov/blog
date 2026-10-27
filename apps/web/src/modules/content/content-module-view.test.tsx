@@ -12,12 +12,11 @@ const setup = customRender(ContentModuleView, {
 });
 
 describe(`<${ContentModuleView.name}/>`, () => {
-  it('leaves the section landmark without an accessible name', () => {
+  it('exposes no region landmark because the module renders no heading', () => {
     setup();
 
-    const section = screen.getByTestId(
-      `content-module-${MOCK_CONTENT_MODULE_ID}`,
-    );
-    expect(section).not.toHaveAttribute('aria-labelledby');
+    const region = screen.queryByRole('region');
+
+    expect(region).not.toBeInTheDocument();
   });
 });

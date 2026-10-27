@@ -1,23 +1,23 @@
+import { faker } from '@faker-js/faker';
+
 import { isSecretMatch } from './is-secret-match';
 
-describe('isSecretMatch', () => {
-  it('returns true when the provided secret matches exactly', () => {
-    expect(isSecretMatch('test-secret', 'test-secret')).toBe(true);
+faker.seed(6029);
+
+const MOCK_SECRET = faker.string.alphanumeric(32);
+const MOCK_WRONG_SECRET = faker.string.alphanumeric(32);
+
+describe(isSecretMatch, () => {
+  it('accepts a secret that matches exactly', () => {
+    expect(isSecretMatch(MOCK_SECRET, MOCK_SECRET)).toBe(true);
   });
 
-  it('returns false when the provided secret does not match', () => {
-    expect(isSecretMatch('wrong-secret', 'test-secret')).toBe(false);
-  });
-
-  it('returns false when the provided secret is null', () => {
-    expect(isSecretMatch(null, 'test-secret')).toBe(false);
-  });
-
-  it('returns false when the provided secret is an empty string', () => {
-    expect(isSecretMatch('', 'test-secret')).toBe(false);
-  });
-
-  it('returns false when the provided secret has a different length', () => {
-    expect(isSecretMatch('short', 'a-much-longer-secret')).toBe(false);
+  it.each([
+    ['a different secret of the same length', MOCK_WRONG_SECRET],
+    ['a longer secret that starts with the expected one', `${MOCK_SECRET}x`],
+    ['null', null],
+    ['an empty string', ''],
+  ])('rejects %s', (_label, provided) => {
+    expect(isSecretMatch(provided, MOCK_SECRET)).toBe(false);
   });
 });

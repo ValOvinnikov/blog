@@ -2,29 +2,32 @@ import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
-  applyMigrationFile,
-  listMigrationFiles,
+  insertReplayTenant,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  replayMigrationsAround,
 } from '@blog/db/testing/migration-files';
+import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 
 import { emailTemplateLogos, emailTemplates } from './email-templates';
 
-const CUSTOM_SUBJECT = 'Eigener Betreff';
-const MAGIC_LINK_LOGO_URL = 'https://blob.example.com/magic-link.png';
-const LOCALE_MIGRATION = '0035_massive_lucky_pierre.sql';
+faker.seed(6023);
 
-const customBody = [
+const LOCALE_MIGRATION = '0035_massive_lucky_pierre.sql';
+const MOCK_CUSTOM_SUBJECT = faker.lorem.words(2);
+const MOCK_INVITE_SUBJECT = faker.lorem.words(2);
+const MOCK_MAGIC_LINK_LOGO_URL = faker.internet.url();
+const MOCK_CUSTOM_BODY = [
   {
     _type: 'block',
-    _key: 'custom-1',
+    _key: faker.string.alphanumeric(8),
     style: 'normal',
     markDefs: [],
     children: [
       {
         _type: 'span',
-        _key: 'custom-1-span',
-        text: 'Eigener Text.',
+        _key: faker.string.alphanumeric(8),
+        text: faker.lorem.sentence(),
         marks: [],
       },
     ],
@@ -40,27 +43,16 @@ async function migrateGermanTenantTemplates(
   }[],
 ) {
   const db = await createEmptyTestDb();
-  const migrationFiles = listMigrationFiles();
 
-  for (const file of migrationFiles.filter((f) => f < LOCALE_MIGRATION)) {
-    await applyMigrationFile(db, file);
-  }
+  await replayMigrationsAround(db, LOCALE_MIGRATION, async () => {
+    const tenant = await insertReplayTenant(db, LOCALE_ISO_CODES.DE);
 
-  const [tenant] = await db
-    .execute<{ id: string }>(
-      sql`insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values ('Tenant', 't.example.com', ${LOCALE_ISO_CODES.DE}, 'FREE', 'ACTIVE') returning "id"`,
-    )
-    .then((result) => result.rows);
-
-  for (const { templateType, subject, body, logoAssetUrl } of legacyRows) {
-    await db.execute(
-      sql`insert into "email_templates" ("tenant_id", "template_type", "subject", "body", "logo_asset_url") values (${tenant?.id}, ${templateType}, ${subject}, ${JSON.stringify(body)}::jsonb, ${logoAssetUrl ?? null})`,
-    );
-  }
-
-  for (const file of migrationFiles.filter((f) => f >= LOCALE_MIGRATION)) {
-    await applyMigrationFile(db, file);
-  }
+    for (const { templateType, subject, body, logoAssetUrl } of legacyRows) {
+      await db.execute(
+        sql`insert into "email_templates" ("tenant_id", "template_type", "subject", "body", "logo_asset_url") values (${tenant.id}, ${templateType}, ${subject}, ${JSON.stringify(body)}::jsonb, ${logoAssetUrl ?? null})`,
+      );
+    }
+  });
 
   const templates = await db
     .select({
@@ -82,20 +74,20 @@ async function migrateGermanTenantTemplates(
   return { templates, logos };
 }
 
-describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per language)', () => {
+describe(`${LOCALE_MIGRATION} (email templates per language)`, () => {
   it(
     "clears seeded defaults and keeps edited copy under the tenant's default language",
     async () => {
       const { templates } = await migrateGermanTenantTemplates([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          subject: CUSTOM_SUBJECT,
+          subject: MOCK_CUSTOM_SUBJECT,
           body: EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.body,
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
           subject: EMAIL_TEMPLATE_DEFAULT_COPY.NEWSLETTER_CONFIRMATION.subject,
-          body: customBody,
+          body: MOCK_CUSTOM_BODY,
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
@@ -108,14 +100,14 @@ describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per lang
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.DE,
-          subject: CUSTOM_SUBJECT,
+          subject: MOCK_CUSTOM_SUBJECT,
           body: null,
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
           locale: LOCALE_ISO_CODES.DE,
           subject: null,
-          body: customBody,
+          body: MOCK_CUSTOM_BODY,
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
@@ -134,21 +126,21 @@ describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per lang
       const { logos } = await migrateGermanTenantTemplates([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          subject: CUSTOM_SUBJECT,
-          body: customBody,
-          logoAssetUrl: MAGIC_LINK_LOGO_URL,
+          subject: MOCK_CUSTOM_SUBJECT,
+          body: MOCK_CUSTOM_BODY,
+          logoAssetUrl: MOCK_MAGIC_LINK_LOGO_URL,
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
-          subject: 'Einladung',
-          body: customBody,
+          subject: MOCK_INVITE_SUBJECT,
+          body: MOCK_CUSTOM_BODY,
         },
       ]);
 
       expect(logos).toEqual([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          logoAssetUrl: MAGIC_LINK_LOGO_URL,
+          logoAssetUrl: MOCK_MAGIC_LINK_LOGO_URL,
         },
       ]);
     },

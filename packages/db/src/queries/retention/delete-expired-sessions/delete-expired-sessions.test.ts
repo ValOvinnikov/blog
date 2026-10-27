@@ -7,12 +7,15 @@ import {
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { deleteExpiredSessions } from './delete-expired-sessions';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+
+faker.seed(6022);
 
 afterEach(async () => {
   await db().delete(schema.sessions);
@@ -23,7 +26,7 @@ describe(deleteExpiredSessions, () => {
   let userId: string;
 
   async function insertSession(expires: Date): Promise<string> {
-    const sessionToken = crypto.randomUUID();
+    const sessionToken = faker.string.uuid();
     await db()
       .insert(schema.sessions)
       .values({ sessionToken, userId, expires });

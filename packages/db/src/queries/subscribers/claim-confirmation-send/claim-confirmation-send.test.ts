@@ -1,23 +1,32 @@
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { eq } from 'drizzle-orm';
+import {
+  MOCK_CONFIRMATION_NOW,
+  readTestSubscriber,
+} from '@blog/db/testing/subscribers/fixtures';
 
 import { claimConfirmationSend } from './claim-confirmation-send';
 
-const NO_CLAIM_ERROR = 'expected a claim';
-
 vi.mock('@blog/db/client');
-
-const db = useQueryTestDb();
 
 const COOLDOWN_MS = 15 * 60_000;
 
+const db = useQueryTestDb();
+usePersonalDataKeys();
+
+beforeEach(() => {
+  vi.useFakeTimers({ now: MOCK_CONFIRMATION_NOW, toFake: ['Date'] });
+});
+
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.subscribers);
   await db().delete(schema.tenants);
 });
@@ -29,75 +38,55 @@ describe(claimConfirmationSend, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  async function insertSubscriber(
-    overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
-  ): Promise<schema.TSubscriber> {
-    const [subscriber] = await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, ...overrides })
-      .returning();
-    if (!subscriber) throw new Error('failed to seed a subscriber row');
-    return subscriber;
-  }
-
-  async function readRow(id: string) {
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, id));
-    if (!row) throw new Error('subscriber row missing');
-    return row;
-  }
-
   describe('with a pending subscriber', () => {
     let subscriber: schema.TSubscriber;
 
     beforeEach(async () => {
-      subscriber = await insertSubscriber();
+      subscriber = await insertTestSubscriber(
+        db(),
+        tenantId,
+        MOCK_SUBSCRIBER_EMAIL,
+      );
     });
 
-    it('claims a pending subscriber that has never been sent a confirmation', async () => {
+    it('claims a pending subscriber never sent a confirmation', async () => {
       const claim = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
 
-      expect(claim?.claimedAt).toBeInstanceOf(Date);
-      expect((await readRow(subscriber.id)).confirmationSentAt).toEqual(
-        claim?.claimedAt,
-      );
+      const row = await readTestSubscriber(db(), subscriber.id);
+      expect(claim?.claimedAt).toEqual(MOCK_CONFIRMATION_NOW);
+      expect(row.confirmationSentAt).toEqual(MOCK_CONFIRMATION_NOW);
     });
 
     it('leaves the stored token hashes untouched', async () => {
       const { id, confirmationTokenHash, unsubscribeTokenHash } = subscriber;
 
-      const claim = await claimConfirmationSend(id, COOLDOWN_MS);
+      await claimConfirmationSend(id, COOLDOWN_MS);
 
-      expect(claim?.confirmationToken).toBeTypeOf('string');
-      const row = await readRow(id);
+      const row = await readTestSubscriber(db(), id);
       expect(row.confirmationTokenHash).toBe(confirmationTokenHash);
       expect(row.unsubscribeTokenHash).toBe(unsubscribeTokenHash);
     });
 
-    it('refuses a second claim inside the cooldown and keeps the first send time', async () => {
-      const first = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
-      if (!first) throw new Error(NO_CLAIM_ERROR);
-
-      await expect(
-        claimConfirmationSend(subscriber.id, COOLDOWN_MS),
-      ).resolves.toBeNull();
-      expect((await readRow(subscriber.id)).confirmationSentAt).toEqual(
-        first.claimedAt,
-      );
-    });
-
-    it('claims again with a fresh token once the last send is older than the cooldown', async () => {
-      const first = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
-      await db()
-        .update(schema.subscribers)
-        .set({ confirmationSentAt: new Date(Date.now() - COOLDOWN_MS - 1000) })
-        .where(eq(schema.subscribers.id, subscriber.id));
+    it('refuses a second claim inside the cooldown', async () => {
+      await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
 
       const second = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
 
-      expect(second?.claimedAt).toBeInstanceOf(Date);
+      const row = await readTestSubscriber(db(), subscriber.id);
+      expect(second).toBeNull();
+      expect(row.confirmationSentAt).toEqual(MOCK_CONFIRMATION_NOW);
+    });
+
+    it('claims again with a fresh token once the cooldown has passed', async () => {
+      const first = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
+      const afterCooldown = new Date(
+        MOCK_CONFIRMATION_NOW.getTime() + COOLDOWN_MS + 1,
+      );
+      vi.setSystemTime(afterCooldown);
+
+      const second = await claimConfirmationSend(subscriber.id, COOLDOWN_MS);
+
+      expect(second?.claimedAt).toEqual(afterCooldown);
       expect(second?.confirmationToken).not.toBe(first?.confirmationToken);
     });
 
@@ -107,17 +96,26 @@ describe(claimConfirmationSend, () => {
         claimConfirmationSend(subscriber.id, COOLDOWN_MS),
       ]);
 
-      expect(results.filter((result) => result !== null)).toHaveLength(1);
+      const claims = results.filter((result) => result !== null);
+      expect(claims).toHaveLength(1);
     });
   });
 
   it('never claims an active subscriber', async () => {
-    const { id } = await insertSubscriber({
-      status: SUBSCRIBER_STATUS.ACTIVE,
-      confirmedAt: new Date(),
-    });
+    const { id } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+      {
+        status: SUBSCRIBER_STATUS.ACTIVE,
+        confirmedAt: MOCK_CONFIRMATION_NOW,
+      },
+    );
 
-    await expect(claimConfirmationSend(id, COOLDOWN_MS)).resolves.toBeNull();
-    expect((await readRow(id)).confirmationSentAt).toBeNull();
+    const claim = await claimConfirmationSend(id, COOLDOWN_MS);
+
+    const row = await readTestSubscriber(db(), id);
+    expect(claim).toBeNull();
+    expect(row.confirmationSentAt).toBeNull();
   });
 });

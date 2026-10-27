@@ -1,31 +1,52 @@
-import { HTTP_STATUS, HTTP_METHOD } from '@blog/config';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
 
 vi.mock('@platform/utils/env/env');
 
+faker.seed(5997);
+
 const envMock: Partial<Record<keyof typeof env, string>> = env;
+
+const fetchMock = vi.fn();
+
+const MOCK_GITHUB_TOKEN = faker.string.alphanumeric(32);
+const MOCK_GITHUB_OWNER = faker.internet.username();
+const MOCK_GITHUB_REPO = faker.lorem.slug(2);
+const MOCK_DATASET = faker.lorem.word();
+const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
+const WORKFLOW_DISPATCH_URL = `https://api.github.com/repos/${MOCK_GITHUB_OWNER}/${MOCK_GITHUB_REPO}/actions/workflows/deprovision-tenant.yml/dispatches`;
+const WORKFLOW_REF = 'main';
 
 const DISPATCH_INPUT = {
   tenantId: MOCK_TENANT_ID,
-  confirm: 'acme',
+  confirm: MOCK_TENANT_NAME,
   dryRun: true,
 };
 
-describe(dispatchDeprovisioningWorkflow, () => {
-  const fetchMock = vi.fn();
+const dispatchedCall = () => {
+  const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+  const { Authorization } = init.headers as Record<string, string>;
 
+  return { url, method: init.method, Authorization, body: init.body };
+};
+
+describe(dispatchDeprovisioningWorkflow, () => {
   beforeEach(() => {
     fetchMock.mockReset();
-    vi.stubGlobal('fetch', fetchMock);
-    envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
-    envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
-    envMock.TENANT_PROVISIONING_DATASET = undefined;
     fetchMock.mockResolvedValue(
       new Response(null, { status: HTTP_STATUS.NO_CONTENT }),
     );
+    vi.stubGlobal('fetch', fetchMock);
+    envMock.TENANT_PROVISIONING_GITHUB_TOKEN = MOCK_GITHUB_TOKEN;
+    envMock.TENANT_PROVISIONING_GITHUB_REPO = `${MOCK_GITHUB_OWNER}/${MOCK_GITHUB_REPO}`;
+    envMock.TENANT_PROVISIONING_DATASET = undefined;
   });
 
   afterEach(() => {
@@ -50,66 +71,65 @@ describe(dispatchDeprovisioningWorkflow, () => {
   it('POSTs a workflow_dispatch with tenantId, confirm and dryRun, and returns true', async () => {
     const result = await dispatchDeprovisioningWorkflow(DISPATCH_INPUT);
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/deprovision-tenant.yml/dispatches',
-      expect.objectContaining({
-        method: HTTP_METHOD.POST,
-        headers: expect.objectContaining({
-          Authorization: 'Bearer ghp_token',
-        }),
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: { tenantId: MOCK_TENANT_ID, confirm: 'acme', dryRun: 'true' },
-        }),
+    expect(dispatchedCall()).toEqual({
+      url: WORKFLOW_DISPATCH_URL,
+      method: HTTP_METHOD.POST,
+      Authorization: `Bearer ${MOCK_GITHUB_TOKEN}`,
+      body: JSON.stringify({
+        ref: WORKFLOW_REF,
+        inputs: {
+          tenantId: MOCK_TENANT_ID,
+          confirm: MOCK_TENANT_NAME,
+          dryRun: 'true',
+        },
       }),
-    );
+    });
     expect(result).toBe(true);
   });
 
   it('sends environment from TENANT_PROVISIONING_DATASET when configured', async () => {
-    envMock.TENANT_PROVISIONING_DATASET = 'development';
+    envMock.TENANT_PROVISIONING_DATASET = MOCK_DATASET;
+
     await dispatchDeprovisioningWorkflow(DISPATCH_INPUT);
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: {
-            tenantId: MOCK_TENANT_ID,
-            confirm: 'acme',
-            dryRun: 'true',
-            environment: 'development',
-          },
-        }),
+    expect(dispatchedCall().body).toBe(
+      JSON.stringify({
+        ref: WORKFLOW_REF,
+        inputs: {
+          tenantId: MOCK_TENANT_ID,
+          confirm: MOCK_TENANT_NAME,
+          dryRun: 'true',
+          environment: MOCK_DATASET,
+        },
       }),
     );
   });
 
   it.each([
-    [
-      'the dispatch responds non-2xx',
-      () =>
+    {
+      scenario: 'the dispatch responds non-2xx',
+      arrange: () =>
         fetchMock.mockResolvedValue(
           new Response(null, { status: HTTP_STATUS.NOT_FOUND }),
         ),
-    ],
-    [
-      'the request itself fails',
-      () => fetchMock.mockRejectedValue(new Error('network down')),
-    ],
-    [
-      'the request times out',
-      () =>
+    },
+    {
+      scenario: 'the request itself fails',
+      arrange: () =>
+        fetchMock.mockRejectedValue(new Error(MOCK_NETWORK_ERROR_MESSAGE)),
+    },
+    {
+      scenario: 'the request times out',
+      arrange: () =>
         fetchMock.mockRejectedValue(
-          new DOMException('The operation timed out.', 'TimeoutError'),
+          new DOMException(MOCK_NETWORK_ERROR_MESSAGE, 'TimeoutError'),
         ),
-    ],
-  ])('returns false without throwing when %s', async (_case, arrange) => {
+    },
+  ])('returns false without throwing when $scenario', async ({ arrange }) => {
     arrange();
 
-    await expect(dispatchDeprovisioningWorkflow(DISPATCH_INPUT)).resolves.toBe(
-      false,
-    );
+    const result = await dispatchDeprovisioningWorkflow(DISPATCH_INPUT);
+
+    expect(result).toBe(false);
   });
 });

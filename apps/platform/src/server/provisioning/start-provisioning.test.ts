@@ -1,39 +1,31 @@
 import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { enqueueProvisioning } from '@platform/server/provisioning/enqueue-provisioning';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { startProvisioning } from './start-provisioning';
 
-const { enqueueProvisioningMock } = vi.hoisted(() => ({
-  enqueueProvisioningMock: vi.fn(),
-}));
-
-vi.mock('./enqueue-provisioning', () => ({
-  enqueueProvisioning: enqueueProvisioningMock,
+vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
+  enqueueProvisioning: vi.fn(),
 }));
 
 const loggerErrorMock = vi.mocked(logger.error);
 
 describe(startProvisioning, () => {
-  beforeEach(() => {
-    loggerErrorMock.mockReset();
-    enqueueProvisioningMock.mockReset();
-  });
-
   it('succeeds when the worker accepts the run', async () => {
-    enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
+    vi.mocked(enqueueProvisioning).mockResolvedValueOnce(HTTP_STATUS.ACCEPTED);
 
     const result = await startProvisioning(MOCK_TENANT_ID);
 
-    expect(enqueueProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(enqueueProvisioning).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(loggerErrorMock).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('refuses as already in progress, without logging, when a run is in progress', async () => {
-    enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.CONFLICT);
+    vi.mocked(enqueueProvisioning).mockResolvedValueOnce(HTTP_STATUS.CONFLICT);
 
     const result = await startProvisioning(MOCK_TENANT_ID);
 
@@ -45,7 +37,7 @@ describe(startProvisioning, () => {
   });
 
   it('refuses as not found and logs when the worker cannot find the tenant', async () => {
-    enqueueProvisioningMock.mockResolvedValue(HTTP_STATUS.NOT_FOUND);
+    vi.mocked(enqueueProvisioning).mockResolvedValueOnce(HTTP_STATUS.NOT_FOUND);
 
     const result = await startProvisioning(MOCK_TENANT_ID);
 
@@ -66,7 +58,7 @@ describe(startProvisioning, () => {
   ])(
     'logs and returns a server error when the worker answers %i',
     async (responseStatus) => {
-      enqueueProvisioningMock.mockResolvedValue(responseStatus);
+      vi.mocked(enqueueProvisioning).mockResolvedValueOnce(responseStatus);
 
       const result = await startProvisioning(MOCK_TENANT_ID);
 
@@ -79,7 +71,7 @@ describe(startProvisioning, () => {
   );
 
   it('returns a server error without a second log when the enqueue never arrived', async () => {
-    enqueueProvisioningMock.mockResolvedValue(null);
+    vi.mocked(enqueueProvisioning).mockResolvedValueOnce(null);
 
     const result = await startProvisioning(MOCK_TENANT_ID);
 

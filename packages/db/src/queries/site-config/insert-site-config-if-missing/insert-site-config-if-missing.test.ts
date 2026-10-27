@@ -1,55 +1,68 @@
-import { PRESET_ID } from '@blog/config/constants';
+import { HUE_MAX, HUE_MIN, PRESET_ID } from '@blog/config/constants';
+import { getSiteConfig } from '@blog/db/queries/site-config/get-site-config';
 import * as schema from '@blog/db/schema';
-import { siteConfig } from '@blog/db/schema/site-config';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
-
-import { getSiteConfig } from '../get-site-config';
 
 import { insertSiteConfigIfMissing } from './insert-site-config-if-missing';
 
+faker.seed(6022);
+
 vi.mock('@blog/db/client');
 
-const db = useQueryTestDb();
+const MOCK_CUSTOM_ACCENT_HUE = faker.number.int({
+  min: HUE_MIN + 1,
+  max: HUE_MAX,
+});
 
-const CUSTOM_ACCENT_HUE = 123;
+const db = useQueryTestDb();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(insertSiteConfigIfMissing, () => {
-  it('gives a tenant with no site config the preset it is seeded with', async () => {
-    const { id } = await insertTestTenant(db());
+  let tenantId: string;
 
-    await insertSiteConfigIfMissing(id, PRESET_ID.EDITORIAL);
-
-    expect((await getSiteConfig(id))?.preset).toBe(PRESET_ID.EDITORIAL);
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('seeds the accent hue it is given instead of the preset default', async () => {
-    const { id } = await insertTestTenant(db());
+  it('seeds a tenant with no site config with the given preset', async () => {
+    await insertSiteConfigIfMissing(tenantId, PRESET_ID.EDITORIAL);
 
-    await insertSiteConfigIfMissing(id, PRESET_ID.CONSOLE, CUSTOM_ACCENT_HUE);
+    const config = await getSiteConfig(tenantId);
 
-    expect((await getSiteConfig(id))?.accentHue).toBe(CUSTOM_ACCENT_HUE);
+    expect(config?.preset).toBe(PRESET_ID.EDITORIAL);
+  });
+
+  it('seeds the accent hue it is given', async () => {
+    await insertSiteConfigIfMissing(
+      tenantId,
+      PRESET_ID.CONSOLE,
+      MOCK_CUSTOM_ACCENT_HUE,
+    );
+
+    const config = await getSiteConfig(tenantId);
+
+    expect(config?.accentHue).toBe(MOCK_CUSTOM_ACCENT_HUE);
   });
 
   it('leaves an existing site config untouched', async () => {
-    const { id } = await insertTestTenant(db());
-    await insertSiteConfigIfMissing(id, PRESET_ID.CONSOLE);
+    await insertSiteConfigIfMissing(tenantId, PRESET_ID.CONSOLE);
     const [before] = await db()
       .select()
-      .from(siteConfig)
-      .where(eq(siteConfig.tenantId, id));
+      .from(schema.siteConfig)
+      .where(eq(schema.siteConfig.tenantId, tenantId));
 
-    await insertSiteConfigIfMissing(id, PRESET_ID.EDITORIAL);
+    await insertSiteConfigIfMissing(tenantId, PRESET_ID.EDITORIAL);
 
     const [after] = await db()
       .select()
-      .from(siteConfig)
-      .where(eq(siteConfig.tenantId, id));
+      .from(schema.siteConfig)
+      .where(eq(schema.siteConfig.tenantId, tenantId));
     expect(after).toEqual(before);
   });
 });

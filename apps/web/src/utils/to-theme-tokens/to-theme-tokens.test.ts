@@ -1,23 +1,20 @@
 import {
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
-  isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { toThemeTokens } from './to-theme-tokens';
 
-vi.mock('@blog/config', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/config')>()),
-  isAccentHueAccessible: vi.fn(),
-}));
+faker.seed(6012);
 
 const CONSOLE = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 const EDITORIAL = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
-const ACCENT_HUE = 65;
-const LOGO_HUE = 274;
-const INACCESSIBLE_HUE = 310;
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 360 });
+const MOCK_LOGO_HUE = faker.number.int({ min: 0, max: 360 });
+const MOCK_UNUSABLE_ACCENT_HUE = Number.NaN;
 
 const CONSOLE_ROW = {
   preset: PRESET_ID.CONSOLE,
@@ -33,16 +30,8 @@ const EDITORIAL_ROW = {
   headerControlStyle: EDITORIAL.headerControlStyle,
 };
 
-const mockedIsAccentHueAccessible = vi.mocked(isAccentHueAccessible);
-
-beforeEach(async () => {
-  const actual =
-    await vi.importActual<typeof import('@blog/config')>('@blog/config');
-  mockedIsAccentHueAccessible.mockImplementation(actual.isAccentHueAccessible);
-});
-
 describe(toThemeTokens, () => {
-  it('falls back to the console preset when there is no site_config row', () => {
+  it('falls back to the console preset when there is no site config row', () => {
     const result = toThemeTokens(undefined);
 
     expect(result).toEqual({
@@ -82,23 +71,21 @@ describe(toThemeTokens, () => {
     expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.SOFT);
   });
 
-  it('resolves accentHue and logoHue independently (Indigo reproduction)', () => {
+  it('resolves the accent hue and the logo hue independently', () => {
     const result = toThemeTokens({
       ...CONSOLE_ROW,
-      accentHue: ACCENT_HUE,
-      logoHue: LOGO_HUE,
+      accentHue: MOCK_ACCENT_HUE,
+      logoHue: MOCK_LOGO_HUE,
     });
 
-    expect(result.accentHue).toBe(ACCENT_HUE);
-    expect(result.logoHue).toBe(LOGO_HUE);
+    expect(result.accentHue).toBe(MOCK_ACCENT_HUE);
+    expect(result.logoHue).toBe(MOCK_LOGO_HUE);
   });
 
-  it('falls back to the preset accentHue when the row accentHue fails the AA guard', () => {
-    mockedIsAccentHueAccessible.mockReturnValue(false);
-
+  it("falls back to the preset's accent hue when the row's hue is unusable", () => {
     const result = toThemeTokens({
       ...EDITORIAL_ROW,
-      accentHue: INACCESSIBLE_HUE,
+      accentHue: MOCK_UNUSABLE_ACCENT_HUE,
     });
 
     expect(result.accentHue).toBe(EDITORIAL.themeTokens.accentHue);

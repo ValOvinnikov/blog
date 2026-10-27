@@ -3,51 +3,64 @@ import {
   mockRawSectionPage,
 } from '@blog/service/testing/modules/fixtures';
 import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toSectionPageCards } from './transformer';
 
-const TITLE = 'FAQ';
+faker.seed(33);
+
+const MOCK_PAGE_ID = faker.string.uuid();
+const MOCK_PAGE_SLUG = faker.lorem.slug();
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_SUMMARY = faker.lorem.sentence();
+const MOCK_FIRST_ID = faker.string.uuid();
+const MOCK_SECOND_ID = faker.string.uuid();
 
 describe(toSectionPageCards, () => {
   it('maps each page to a card titled by its heading, summarised by its text', () => {
     const [card] = toSectionPageCards(
-      [mockRawSectionPage()],
+      [
+        mockRawSectionPage({
+          _id: MOCK_PAGE_ID,
+          slug: MOCK_PAGE_SLUG,
+          headingBlock: mockRawHeadingBlock(MOCK_TITLE, {
+            supportingText: MOCK_SUMMARY,
+          }),
+        }),
+      ],
       MOCK_SECTION_PAGES_PARENT_PATH,
     );
     const { image, ...fields } = card ?? {};
 
     expect(fields).toEqual({
-      id: 'page-faq',
-      title: TITLE,
-      summary: 'Answers to common questions.',
-      path: 'section-home/faq',
+      id: MOCK_PAGE_ID,
+      title: MOCK_TITLE,
+      summary: MOCK_SUMMARY,
+      path: `${MOCK_SECTION_PAGES_PARENT_PATH}/${MOCK_PAGE_SLUG}`,
     });
     expect(image).toBeDefined();
   });
 
-  it('builds each nested path from the hosting page path and the child slug', () => {
-    const [card] = toSectionPageCards(
-      [mockRawSectionPage({ slug: 'billing' })],
-      'guides/faq',
-    );
-
-    expect(card?.path).toBe('guides/faq/billing');
-  });
-
   it('keeps the children in the order they were returned', () => {
     const cards = toSectionPageCards(
-      [mockRawSectionPage({ _id: 'b' }), mockRawSectionPage({ _id: 'a' })],
+      [
+        mockRawSectionPage({ _id: MOCK_SECOND_ID }),
+        mockRawSectionPage({ _id: MOCK_FIRST_ID }),
+      ],
       MOCK_SECTION_PAGES_PARENT_PATH,
     );
 
-    expect(cards.map((card) => card.id)).toEqual(['b', 'a']);
+    expect(cards.map((card) => card.id)).toEqual([
+      MOCK_SECOND_ID,
+      MOCK_FIRST_ID,
+    ]);
   });
 
   it('leaves the summary and image undefined when the child has neither', () => {
     const [card] = toSectionPageCards(
       [
         mockRawSectionPage({
-          headingBlock: mockRawHeadingBlock(TITLE),
+          headingBlock: mockRawHeadingBlock(MOCK_TITLE),
           image: null,
         }),
       ],

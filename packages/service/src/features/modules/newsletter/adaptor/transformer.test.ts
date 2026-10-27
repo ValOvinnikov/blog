@@ -3,64 +3,107 @@ import {
   CONTENT_ALIGNMENT,
   NEWSLETTER_VARIANT,
 } from '@blog/config/constants';
-import {
-  MOCK_NEWSLETTER_HEADING,
-  mockRawNewsletterModule,
-} from '@blog/service/testing/modules/fixtures';
+import { mockRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
 import {
   mockRawHeadingBlock,
   mockRawWideLayout,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toNewsletterModule } from './transformer';
 
+faker.seed(9);
+
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_CONTENT = faker.lorem.sentence();
+const MOCK_FIRST_TRUST_CUE = faker.lorem.words(2);
+const MOCK_SECOND_TRUST_CUE = faker.lorem.words(2);
+
+type TNewsletterModule = ReturnType<typeof toNewsletterModule>;
+
 describe(toNewsletterModule, () => {
   it('maps headingBlock straight through', () => {
-    const raw = mockRawNewsletterModule();
+    const raw = mockRawNewsletterModule({
+      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+        supportingText: MOCK_SUPPORTING_TEXT,
+      }),
+    });
 
     const module = toNewsletterModule(raw);
 
     expect(module.headingBlock).toEqual({
-      heading: MOCK_NEWSLETTER_HEADING,
-      supportingText: 'Get new posts in your inbox.',
+      heading: MOCK_HEADING,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
   });
 
   it.each([
-    { brandVariant: BRAND_VARIANT.SECONDARY },
-    { variant: NEWSLETTER_VARIANT.COMPACT },
-    { content: 'A note from the editor.' },
-    { contentAlignment: CONTENT_ALIGNMENT.CENTER },
-  ])('maps an authored %o straight through', (authored) => {
+    [
+      'brandVariant',
+      { brandVariant: BRAND_VARIANT.SECONDARY },
+      (module: TNewsletterModule) => module.brandVariant,
+      BRAND_VARIANT.SECONDARY,
+    ],
+    [
+      'variant',
+      { variant: NEWSLETTER_VARIANT.COMPACT },
+      (module: TNewsletterModule) => module.variant,
+      NEWSLETTER_VARIANT.COMPACT,
+    ],
+    [
+      'content',
+      { content: MOCK_CONTENT },
+      (module: TNewsletterModule) => module.content,
+      MOCK_CONTENT,
+    ],
+    [
+      'contentAlignment',
+      { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+      (module: TNewsletterModule) => module.contentAlignment,
+      CONTENT_ALIGNMENT.CENTER,
+    ],
+  ])('maps an authored %s straight through', (_, authored, read, expected) => {
     const module = toNewsletterModule(mockRawNewsletterModule(authored));
 
-    expect(module).toMatchObject(authored);
+    expect(read(module)).toBe(expected);
   });
 
   it('flattens the trust cues to their text, skipping a cue with none', () => {
     const raw = mockRawNewsletterModule({
-      trustCues: [{ text: 'No spam' }, { text: null }, { text: 'Weekly' }],
+      trustCues: [
+        { text: MOCK_FIRST_TRUST_CUE },
+        { text: null },
+        { text: MOCK_SECOND_TRUST_CUE },
+      ],
     });
 
     const module = toNewsletterModule(raw);
 
-    expect(module.trustCues).toEqual(['No spam', 'Weekly']);
+    expect(module.trustCues).toEqual([
+      MOCK_FIRST_TRUST_CUE,
+      MOCK_SECOND_TRUST_CUE,
+    ]);
   });
 
   it.each([
-    [{ trustCues: null }, { trustCues: undefined }],
-    [{ content: null }, { content: undefined }],
-    [{ contentAlignment: null }, { contentAlignment: undefined }],
-    [{ layout: null }, { layout: undefined }],
-  ])('maps an unset %o to %o', (unset, expected) => {
+    ['trustCues', { trustCues: null }, (m: TNewsletterModule) => m.trustCues],
+    ['content', { content: null }, (m: TNewsletterModule) => m.content],
+    [
+      'contentAlignment',
+      { contentAlignment: null },
+      (m: TNewsletterModule) => m.contentAlignment,
+    ],
+    ['layout', { layout: null }, (m: TNewsletterModule) => m.layout],
+  ])('leaves an unset %s undefined', (_, unset, read) => {
     const module = toNewsletterModule(mockRawNewsletterModule(unset));
 
-    expect(module).toMatchObject(expected);
+    expect(read(module)).toBeUndefined();
   });
 
   it('leaves supportingText undefined when not set', () => {
     const raw = mockRawNewsletterModule({
-      headingBlock: mockRawHeadingBlock(MOCK_NEWSLETTER_HEADING),
+      headingBlock: mockRawHeadingBlock(MOCK_HEADING),
     });
 
     const module = toNewsletterModule(raw);

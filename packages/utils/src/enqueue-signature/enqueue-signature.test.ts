@@ -1,38 +1,52 @@
+import { faker } from '@faker-js/faker';
+
 import {
   buildEnqueueHeaders,
+  ENQUEUE_MAX_AGE_MS,
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
   signEnqueuePayload,
 } from './enqueue-signature';
 
-const SECRET = 'shared-secret';
-const NOW = 1_700_000_000_000;
-const BODY = '{"tenantId":"3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b"}';
-const PATH = '/api/owner-access/check';
+faker.seed(6029);
+
+const MOCK_SECRET = faker.string.alphanumeric(32);
+const MOCK_OTHER_SECRET = faker.string.alphanumeric(32);
+const MOCK_NOW = 1_700_000_000_000;
+const MOCK_TIMESTAMP = String(MOCK_NOW);
+const MOCK_BODY = JSON.stringify({ tenantId: faker.string.uuid() });
+const MOCK_PATH = `/api/${faker.lorem.slug()}`;
+const MOCK_OTHER_PATH = `/api/${faker.lorem.slug()}`;
 
 function sign(
-  secret: string,
-  timestamp: string,
-  rawBody: string,
-  path: string = PATH,
+  timestamp: string = MOCK_TIMESTAMP,
+  secret: string = MOCK_SECRET,
 ): string {
-  return signEnqueuePayload({ secret, timestamp, path, rawBody });
+  return signEnqueuePayload({
+    secret,
+    timestamp,
+    path: MOCK_PATH,
+    rawBody: MOCK_BODY,
+  });
 }
 
 function validate(
   overrides: Partial<Parameters<typeof isValidEnqueueSignature>[0]> = {},
 ): boolean {
-  const timestamp = String(NOW);
   return isValidEnqueueSignature({
-    secret: SECRET,
-    timestamp,
-    signature: sign(SECRET, timestamp, BODY),
-    path: PATH,
-    rawBody: BODY,
-    now: NOW,
+    secret: MOCK_SECRET,
+    timestamp: MOCK_TIMESTAMP,
+    signature: sign(),
+    path: MOCK_PATH,
+    rawBody: MOCK_BODY,
+    now: MOCK_NOW,
     ...overrides,
   });
+}
+
+function validateSentAt(timestamp: string): boolean {
+  return validate({ timestamp, signature: sign(timestamp) });
 }
 
 describe(isValidEnqueueSignature, () => {
@@ -41,23 +55,21 @@ describe(isValidEnqueueSignature, () => {
   });
 
   it('rejects a body changed after signing', () => {
-    expect(validate({ rawBody: `${BODY} ` })).toBe(false);
+    expect(validate({ rawBody: `${MOCK_BODY} ` })).toBe(false);
   });
 
   it('rejects a signature replayed against another route', () => {
-    expect(validate({ path: '/api/owner-access/resend' })).toBe(false);
+    expect(validate({ path: MOCK_OTHER_PATH })).toBe(false);
   });
 
   it('rejects a signature made with another secret', () => {
-    expect(
-      validate({ signature: sign('other-secret', String(NOW), BODY) }),
-    ).toBe(false);
+    const signature = sign(MOCK_TIMESTAMP, MOCK_OTHER_SECRET);
+
+    expect(validate({ signature })).toBe(false);
   });
 
   it('rejects a signature reused with a different timestamp', () => {
-    const signature = sign(SECRET, String(NOW), BODY);
-
-    expect(validate({ timestamp: String(NOW + 1), signature })).toBe(false);
+    expect(validate({ timestamp: String(MOCK_NOW + 1) })).toBe(false);
   });
 
   it.each([
@@ -69,59 +81,43 @@ describe(isValidEnqueueSignature, () => {
   });
 
   it.each([
-    ['without the prefix', sign(SECRET, String(NOW), BODY).slice(7)],
-    ['truncated', sign(SECRET, String(NOW), BODY).slice(0, 20)],
+    ['without the prefix', sign().slice(7)],
+    ['truncated', sign().slice(0, 20)],
     ['not hex', 'sha256=not-a-digest'],
   ])('rejects a malformed signature (%s)', (_label, signature) => {
     expect(validate({ signature })).toBe(false);
   });
 
-  it('rejects a timestamp that is not an integer', () => {
-    const timestamp = 'yesterday';
-
-    expect(
-      validate({ timestamp, signature: sign(SECRET, timestamp, BODY) }),
-    ).toBe(false);
-  });
-
   it.each([
-    ['stale', NOW - 5 * 60_000 - 1],
-    ['from the future', NOW + 5 * 60_000 + 1],
-  ])('rejects a timestamp more than five minutes %s', (_label, sentAt) => {
-    const timestamp = String(sentAt);
-
-    expect(
-      validate({ timestamp, signature: sign(SECRET, timestamp, BODY) }),
-    ).toBe(false);
+    ['that is not an integer', 'yesterday'],
+    ['more than five minutes stale', String(MOCK_NOW - ENQUEUE_MAX_AGE_MS - 1)],
+    [
+      'more than five minutes in the future',
+      String(MOCK_NOW + ENQUEUE_MAX_AGE_MS + 1),
+    ],
+  ])('rejects a timestamp %s', (_label, timestamp) => {
+    expect(validateSentAt(timestamp)).toBe(false);
   });
 
   it('accepts a timestamp exactly five minutes old', () => {
-    const timestamp = String(NOW - 5 * 60_000);
-
-    expect(
-      validate({ timestamp, signature: sign(SECRET, timestamp, BODY) }),
-    ).toBe(true);
+    expect(validateSentAt(String(MOCK_NOW - ENQUEUE_MAX_AGE_MS))).toBe(true);
   });
 });
 
 describe(buildEnqueueHeaders, () => {
   it('produces headers the verifier accepts for the same path and body', () => {
     const headers = buildEnqueueHeaders({
-      secret: SECRET,
-      path: PATH,
-      rawBody: BODY,
-      now: NOW,
+      secret: MOCK_SECRET,
+      path: MOCK_PATH,
+      rawBody: MOCK_BODY,
+      now: MOCK_NOW,
     });
 
-    expect(
-      isValidEnqueueSignature({
-        secret: SECRET,
-        timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
-        signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
-        path: PATH,
-        rawBody: BODY,
-        now: NOW,
-      }),
-    ).toBe(true);
+    const isValid = validate({
+      timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
+      signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
+    });
+
+    expect(isValid).toBe(true);
   });
 });

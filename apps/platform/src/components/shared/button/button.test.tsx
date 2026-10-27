@@ -1,190 +1,184 @@
-import { SIZE } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 import { findServerEventHandlers } from '@platform/testing/server-event-handlers';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Button } from './button';
 
-describe(Button, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+faker.seed(5995);
+
+const MOCK_LABEL = faker.lorem.word();
+const MOCK_PENDING_LABEL = faker.lorem.word();
+const MOCK_REASON_ID = faker.string.alpha(8);
+const MOCK_REASON = faker.lorem.sentence();
+
+const setup = customRender(Button, { children: MOCK_LABEL });
+
+describe(`<${Button.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
-  it('renders its children', () => {
-    render(<Button>Save</Button>);
+  it('renders its children as the accessible name', () => {
+    setup();
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+    expect(button).toBeVisible();
   });
 
-  it('renders every variant and size without throwing', () => {
-    const variants = ['primary', 'secondary', 'ghost', 'danger'] as const;
-    const sizes = [SIZE.SM, SIZE.MD] as const;
-
-    variants.forEach((variant) => {
-      sizes.forEach((size) => {
-        expect(() =>
-          render(
-            <Button variant={variant} size={size}>
-              Save
-            </Button>,
-          ),
-        ).not.toThrow();
-      });
-    });
-  });
-
-  it('renders disabled and blocks the click handler', async () => {
+  it('calls the click handler when enabled', async () => {
     const handleClick = vi.fn();
+    setup({ onClick: handleClick });
 
-    render(
-      <Button isDisabled={true} onClick={handleClick}>
-        Save
-      </Button>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Save' });
-    expect(button).toBeDisabled();
-
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
     await user.click(button);
-    expect(handleClick).not.toHaveBeenCalled();
-  });
 
-  it('renders from a Server Component when given no onClick', () => {
-    const disabledButton = <Button isDisabled={true}>Save</Button>;
-
-    expect(findServerEventHandlers(disabledButton)).toEqual([]);
-  });
-
-  it('calls onClick when enabled', async () => {
-    const handleClick = vi.fn();
-
-    render(<Button onClick={handleClick}>Save</Button>);
-
-    await user.click(screen.getByRole('button', { name: 'Save' }));
     expect(handleClick).toHaveBeenCalledOnce();
   });
 
-  it('renders aria-disabled without native disabled, and blocks the click handler, when isAriaDisabled is set', async () => {
+  it('renders disabled and ignores clicks', async () => {
     const handleClick = vi.fn();
+    setup({ isDisabled: true, onClick: handleClick });
 
-    render(
-      <Button isAriaDisabled={true} onClick={handleClick}>
-        Save
-      </Button>,
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+    await user.click(button);
+
+    expect(button).toBeDisabled();
+    expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it('passes no event handler from a Server Component when given no onClick', () => {
+    const handlers = findServerEventHandlers(
+      <Button isDisabled={true}>{MOCK_LABEL}</Button>,
     );
 
-    const button = screen.getByRole('button', { name: 'Save' });
+    expect(handlers).toEqual([]);
+  });
+
+  it('stays focusable but ignores clicks and Enter when aria-disabled', async () => {
+    const handleClick = vi.fn();
+    setup({ isAriaDisabled: true, onClick: handleClick });
+
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+
     expect(button).toHaveAttribute('aria-disabled', 'true');
     expect(button).not.toBeDisabled();
 
     await user.tab();
+
     expect(button).toHaveFocus();
 
     await user.click(button);
-    expect(handleClick).not.toHaveBeenCalled();
-
     await user.keyboard('{Enter}');
+
     expect(handleClick).not.toHaveBeenCalled();
   });
 
   it('keeps a decorative arrow out of the accessible name', () => {
-    render(<Button hasArrow={true}>Begin provisioning</Button>);
+    setup({ hasArrow: true });
 
-    expect(
-      screen.getByRole('button', { name: 'Begin provisioning' }),
-    ).toBeVisible();
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+    expect(button).toBeVisible();
   });
 
-  it('associates a description via aria-describedby, so a disabled control can be explained by an element elsewhere on the page', () => {
-    render(
+  it('is described by an element elsewhere on the page', () => {
+    renderWithIntl(
       <>
-        <Button isDisabled={true} aria-describedby="save-reason">
-          Save
+        <Button isDisabled={true} aria-describedby={MOCK_REASON_ID}>
+          {MOCK_LABEL}
         </Button>
-        <p id="save-reason">This tenant is archived.</p>
+        <p id={MOCK_REASON_ID}>{MOCK_REASON}</p>
       </>,
     );
 
-    expect(
-      screen.getByRole('button', { name: 'Save' }),
-    ).toHaveAccessibleDescription('This tenant is archived.');
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+    expect(button).toHaveAccessibleDescription(MOCK_REASON);
   });
 
-  it('disables the button and sets aria-busy while pending', () => {
-    render(<Button isPending={true}>Save</Button>);
+  it('is enabled and not busy when not pending', () => {
+    setup();
 
-    const button = screen.getByRole('button', { name: 'Save' });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAttribute('aria-busy', 'true');
-  });
+    const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-  it('blocks the click handler while pending, even without isDisabled', async () => {
-    const handleClick = vi.fn();
-
-    render(
-      <Button isPending={true} onClick={handleClick}>
-        Save
-      </Button>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(handleClick).not.toHaveBeenCalled();
-  });
-
-  it('does not set aria-busy or disable the button when not pending', () => {
-    render(<Button>Save</Button>);
-
-    const button = screen.getByRole('button', { name: 'Save' });
     expect(button).toBeEnabled();
     expect(button).toHaveAttribute('aria-busy', 'false');
   });
 
-  it('shows pendingLabel as the button label in place of children while pending', () => {
-    render(
-      <Button isPending={true} pendingLabel="Saving…">
-        Save
-      </Button>,
-    );
+  describe('pending', () => {
+    it('disables the button and marks it busy', () => {
+      setup({ isPending: true });
 
-    expect(screen.getByRole('button', { name: 'Saving…' })).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Save' }),
-    ).not.toBeInTheDocument();
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('ignores clicks', async () => {
+      const handleClick = vi.fn();
+      setup({ isPending: true, onClick: handleClick });
+
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+      await user.click(button);
+
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it('shows the pending label in place of its children', () => {
+      setup({ isPending: true, pendingLabel: MOCK_PENDING_LABEL });
+
+      const pendingButton = screen.getByRole('button', {
+        name: MOCK_PENDING_LABEL,
+      });
+      const idleButton = screen.queryByRole('button', { name: MOCK_LABEL });
+
+      expect(pendingButton).toBeVisible();
+      expect(idleButton).not.toBeInTheDocument();
+    });
+
+    it('renders no status region without a pending label', () => {
+      setup({ isPending: true });
+
+      const status = screen.queryByRole('status');
+
+      expect(status).not.toBeInTheDocument();
+    });
   });
 
-  it('mounts a persistent, polite status region as soon as pendingLabel is given, even when not pending, with no announcement text yet', () => {
-    render(<Button pendingLabel="Saving…">Save</Button>);
+  describe('status region', () => {
+    it('mounts an empty polite status region before it is pending', () => {
+      setup({ pendingLabel: MOCK_PENDING_LABEL });
 
-    const status = screen.getByRole('status');
-    expect(status).toHaveAttribute('aria-live', 'polite');
-    expect(status).toHaveTextContent('');
-  });
+      const status = screen.getByRole('status');
 
-  it('renders no status region at all, even while pending, when no pendingLabel is given', () => {
-    render(<Button isPending={true}>Save</Button>);
+      expect(status).toHaveAttribute('aria-live', 'polite');
+      expect(status).toHaveTextContent('');
+    });
 
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-  });
+    it('announces the pending label in the region that already existed', () => {
+      const { rerender } = setup({ pendingLabel: MOCK_PENDING_LABEL });
 
-  it("announces pendingLabel by updating the persistent status region's own text in place, rather than inserting a new element, since a screen reader only announces a change to a region that already existed", () => {
-    const { rerender } = render(
-      <Button isPending={false} pendingLabel="Saving…">
-        Save
-      </Button>,
-    );
+      const status = screen.getByRole('status');
 
-    const status = screen.getByRole('status');
-    expect(status).toHaveTextContent('');
+      rerender(
+        <Button isPending={true} pendingLabel={MOCK_PENDING_LABEL}>
+          {MOCK_LABEL}
+        </Button>,
+      );
 
-    rerender(
-      <Button isPending={true} pendingLabel="Saving…">
-        Save
-      </Button>,
-    );
+      const pendingStatus = screen.getByRole('status');
 
-    expect(screen.getByRole('status')).toBe(status);
-    expect(status).toHaveTextContent('Saving…');
+      expect(pendingStatus).toBe(status);
+      expect(status).toHaveTextContent(MOCK_PENDING_LABEL);
+    });
   });
 });

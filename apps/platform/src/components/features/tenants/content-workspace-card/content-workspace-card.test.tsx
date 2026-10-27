@@ -1,4 +1,5 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 import {
   mockClientTenant,
   MOCK_SANITY_PROJECT_ID,
@@ -7,11 +8,18 @@ import {
 
 import { ContentWorkspaceCard } from './content-workspace-card';
 
-const render = renderWithIntl;
+faker.seed(5994);
+
+const MOCK_SANITY_DATASET = faker.word.noun();
+const MOCK_ENCRYPTED_TOKEN = faker.string.alphanumeric(24);
+
+const setup = customRender(ContentWorkspaceCard, {
+  tenant: mockClientTenant(),
+});
 
 describe(`<${ContentWorkspaceCard.name}/>`, () => {
   it("nests the card's title one level under the page's own h1", () => {
-    render(<ContentWorkspaceCard tenant={mockClientTenant()} />);
+    setup();
 
     const heading = screen.getByRole('heading', {
       level: 2,
@@ -21,34 +29,32 @@ describe(`<${ContentWorkspaceCard.name}/>`, () => {
     expect(heading).toBeVisible();
   });
 
-  it("shows 'Not set' for content-workspace fields the tenant has not been provisioned with yet", () => {
-    const tenant = mockClientTenant({
-      sanityProjectId: null,
-      sanityDataset: null,
-      sanityReadTokenEncrypted: null,
-      webhookCreatedAt: null,
-    });
-    render(<ContentWorkspaceCard tenant={tenant} />);
+  it('shows Not set for every field of an unprovisioned tenant', () => {
+    setup();
 
     const notSetTexts = screen.getAllByText('Not set');
-    expect(notSetTexts.length).toBeGreaterThan(0);
+
+    expect(notSetTexts).toHaveLength(4);
   });
 
-  it('shows Stored/Active badges once the token and webhook exist', () => {
-    const tenant = mockClientTenant({
-      sanityProjectId: MOCK_SANITY_PROJECT_ID,
-      sanityDataset: 'production',
-      sanityReadTokenEncrypted: 'encrypted-value',
-      webhookCreatedAt: MOCK_TENANT_CREATED_AT,
+  it('shows the project, dataset and Stored/Active badges once provisioned', () => {
+    setup({
+      tenant: mockClientTenant({
+        sanityProjectId: MOCK_SANITY_PROJECT_ID,
+        sanityDataset: MOCK_SANITY_DATASET,
+        sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN,
+        webhookCreatedAt: MOCK_TENANT_CREATED_AT,
+      }),
     });
-    render(<ContentWorkspaceCard tenant={tenant} />);
 
+    const projectId = screen.getByText(MOCK_SANITY_PROJECT_ID);
+    const dataset = screen.getByText(MOCK_SANITY_DATASET);
     const storedBadge = screen.getByText('Stored');
     const activeBadge = screen.getByText('Active');
-    const projectId = screen.getByText(MOCK_SANITY_PROJECT_ID);
 
+    expect(projectId).toBeVisible();
+    expect(dataset).toBeVisible();
     expect(storedBadge).toBeVisible();
     expect(activeBadge).toBeVisible();
-    expect(projectId).toBeVisible();
   });
 });

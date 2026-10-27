@@ -1,12 +1,30 @@
 import {
+  MOCK_PREVIOUS_TOKEN,
+  MOCK_ROTATED_TOKEN,
   MOCK_TENANT_DATASET,
   MOCK_TENANT_PROJECT_ID,
 } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { createProjectCache } from './project-cache';
 
-function project(projectId: string) {
-  return { projectId, dataset: MOCK_TENANT_DATASET };
+faker.seed(6016);
+
+const CACHE_CAPACITY = 20;
+const MOCK_OTHER_DATASET = faker.lorem.word();
+const MOCK_OVERFLOW_PROJECT_ID = faker.string.uuid();
+const MOCK_PROJECT_IDS = Array.from({ length: CACHE_CAPACITY }, () =>
+  faker.string.uuid(),
+);
+const [MOCK_OLDEST_PROJECT_ID = '', MOCK_SECOND_PROJECT_ID = ''] =
+  MOCK_PROJECT_IDS;
+
+function isRotated(entry: { token: string }) {
+  return entry.token === MOCK_ROTATED_TOKEN;
+}
+
+function mockProject(projectId: string, dataset = MOCK_TENANT_DATASET) {
+  return { projectId, dataset };
 }
 
 describe(createProjectCache, () => {
@@ -19,20 +37,17 @@ describe(createProjectCache, () => {
   });
 
   it('returns the cached entry for a repeated project', () => {
-    const first = getOrCreate(project(MOCK_TENANT_PROJECT_ID), create);
-    const second = getOrCreate(project(MOCK_TENANT_PROJECT_ID), create);
+    const first = getOrCreate(mockProject(MOCK_TENANT_PROJECT_ID), create);
+    const second = getOrCreate(mockProject(MOCK_TENANT_PROJECT_ID), create);
 
     expect(second).toBe(first);
     expect(create).toHaveBeenCalledTimes(1);
   });
 
   it('keeps projects with the same id but different datasets apart', () => {
+    getOrCreate(mockProject(MOCK_TENANT_PROJECT_ID), create);
     getOrCreate(
-      { projectId: MOCK_TENANT_PROJECT_ID, dataset: MOCK_TENANT_DATASET },
-      create,
-    );
-    getOrCreate(
-      { projectId: MOCK_TENANT_PROJECT_ID, dataset: 'staging' },
+      mockProject(MOCK_TENANT_PROJECT_ID, MOCK_OTHER_DATASET),
       create,
     );
 
@@ -42,32 +57,43 @@ describe(createProjectCache, () => {
   it('replaces an entry that is no longer reusable', () => {
     const getOrCreateToken = createProjectCache<{ token: string }>();
 
-    getOrCreateToken(project(MOCK_TENANT_PROJECT_ID), () => ({ token: 'old' }));
+    getOrCreateToken(mockProject(MOCK_TENANT_PROJECT_ID), () => ({
+      token: MOCK_PREVIOUS_TOKEN,
+    }));
     const replaced = getOrCreateToken(
-      project(MOCK_TENANT_PROJECT_ID),
-      () => ({ token: 'new' }),
-      (entry) => entry.token === 'new',
+      mockProject(MOCK_TENANT_PROJECT_ID),
+      () => ({ token: MOCK_ROTATED_TOKEN }),
+      isRotated,
     );
     const reused = getOrCreateToken(
-      project(MOCK_TENANT_PROJECT_ID),
-      () => ({ token: 'newer' }),
-      (entry) => entry.token === 'new',
+      mockProject(MOCK_TENANT_PROJECT_ID),
+      () => ({ token: MOCK_PREVIOUS_TOKEN }),
+      isRotated,
     );
 
-    expect(replaced.token).toBe('new');
+    expect(replaced.token).toBe(MOCK_ROTATED_TOKEN);
     expect(reused).toBe(replaced);
   });
 
-  it('evicts the least recently used project once 20 are cached', () => {
-    for (let i = 0; i < 20; i++) getOrCreate(project(`tenant-${i}`), create);
-    getOrCreate(project('tenant-0'), create);
-    getOrCreate(project('tenant-overflow'), create);
-    expect(create).toHaveBeenCalledTimes(21);
+  describe('once full', () => {
+    beforeEach(() => {
+      for (const projectId of MOCK_PROJECT_IDS) {
+        getOrCreate(mockProject(projectId), create);
+      }
+      getOrCreate(mockProject(MOCK_OLDEST_PROJECT_ID), create);
+      getOrCreate(mockProject(MOCK_OVERFLOW_PROJECT_ID), create);
+    });
 
-    getOrCreate(project('tenant-0'), create);
-    expect(create).toHaveBeenCalledTimes(21);
+    it('keeps a recently used project cached', () => {
+      getOrCreate(mockProject(MOCK_OLDEST_PROJECT_ID), create);
 
-    getOrCreate(project('tenant-1'), create);
-    expect(create).toHaveBeenCalledTimes(22);
+      expect(create).toHaveBeenCalledTimes(CACHE_CAPACITY + 1);
+    });
+
+    it('evicts the least recently used project', () => {
+      getOrCreate(mockProject(MOCK_SECOND_PROJECT_ID), create);
+
+      expect(create).toHaveBeenCalledTimes(CACHE_CAPACITY + 2);
+    });
   });
 });

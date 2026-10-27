@@ -1,61 +1,52 @@
+import { execFileSync } from 'node:child_process';
+
 import {
   MOCK_TENANT_MIGRATE_CLI_ENV,
   MOCK_TENANT_MIGRATE_PARAMS,
 } from '@blog/db/testing/migrate-tenant-content/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   exportTenantDataset,
   runTenantMigrationDeploy,
 } from './run-tenant-migrate-script';
 
-const { execFileSyncMock } = vi.hoisted(() => ({ execFileSyncMock: vi.fn() }));
+vi.mock('node:child_process');
 
-vi.mock('node:child_process', () => ({ execFileSync: execFileSyncMock }));
+faker.seed(5806);
+
+const MIGRATE_SCRIPT = 'scripts/migrate.mjs';
+const MOCK_EXPORT_DESTINATION = faker.system.filePath();
+const MOCK_DEPLOY_FAILURE = faker.lorem.sentence();
+
+function lastExecCall() {
+  const [command, args, options] = vi.mocked(execFileSync).mock.lastCall ?? [];
+
+  return { command, args, env: options?.env, stdio: options?.stdio };
+}
 
 const EXEC_OPTIONS = {
   env: { ...process.env, ...MOCK_TENANT_MIGRATE_CLI_ENV },
   stdio: 'inherit',
 };
 
-function lastExecCall() {
-  const [command, args, { env, stdio }] = execFileSyncMock.mock.lastCall ?? [];
-
-  return { command, args, env, stdio };
-}
-const MIGRATE_SCRIPT = 'scripts/migrate.mjs';
-const MOCK_EXPORT_DESTINATION = '/tmp/exports/t1.tar.gz';
-
-beforeEach(() => {
-  execFileSyncMock.mockReset();
-});
-
 describe(runTenantMigrationDeploy, () => {
-  it('runs a normal deploy without --backfill', () => {
-    runTenantMigrationDeploy({
-      ...MOCK_TENANT_MIGRATE_PARAMS,
-      backfill: false,
-    });
+  it.each([
+    ['runs a normal deploy without --backfill', false, []],
+    ['adds --backfill for a tenant with an empty ledger', true, ['--backfill']],
+  ])('%s', (_case, backfill, extraArgs) => {
+    runTenantMigrationDeploy({ ...MOCK_TENANT_MIGRATE_PARAMS, backfill });
 
     expect(lastExecCall()).toEqual({
       command: 'node',
-      args: [MIGRATE_SCRIPT, 'deploy', '--yes'],
-      ...EXEC_OPTIONS,
-    });
-  });
-
-  it('adds --backfill for a tenant with an empty ledger', () => {
-    runTenantMigrationDeploy({ ...MOCK_TENANT_MIGRATE_PARAMS, backfill: true });
-
-    expect(lastExecCall()).toEqual({
-      command: 'node',
-      args: [MIGRATE_SCRIPT, 'deploy', '--yes', '--backfill'],
+      args: [MIGRATE_SCRIPT, 'deploy', '--yes', ...extraArgs],
       ...EXEC_OPTIONS,
     });
   });
 
   it('propagates a failed deploy', () => {
-    const error = new Error('migration run failed');
-    execFileSyncMock.mockImplementation(() => {
+    const error = new Error(MOCK_DEPLOY_FAILURE);
+    vi.mocked(execFileSync).mockImplementation(() => {
       throw error;
     });
 

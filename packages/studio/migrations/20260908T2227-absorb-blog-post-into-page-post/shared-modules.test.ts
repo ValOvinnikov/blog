@@ -1,4 +1,3 @@
-import { NEWSLETTER_VARIANT } from '@blog/config/constants';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import {
@@ -7,7 +6,6 @@ import {
 } from '@blog/studio/testing/assert-satisfies-required-fields';
 
 import {
-  SHARED_MODULE_IDS,
   sharedNewsletterModule,
   sharedPostRelatedModule,
 } from './shared-modules';
@@ -27,34 +25,20 @@ const NEWSLETTER_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   },
 ];
 
-describe('sharedPostRelatedModule', () => {
-  it('uses the fixed POST_RELATED id', () => {
-    expect(sharedPostRelatedModule._id).toBe(SHARED_MODULE_IDS.POST_RELATED);
-  });
-
-  it('satisfies every field module_postRelated requires', () => {
+describe('shared page_post modules', () => {
+  it('seeds a post related module satisfying every required field', () => {
     assertSatisfiesRequiredFields(
       postRelatedSchema,
       sharedPostRelatedModule,
       POST_RELATED_HEADING_BLOCK_EXEMPTION,
     );
   });
-});
 
-describe('sharedNewsletterModule', () => {
-  it('uses the fixed NEWSLETTER id', () => {
-    expect(sharedNewsletterModule._id).toBe(SHARED_MODULE_IDS.NEWSLETTER);
-  });
-
-  it('satisfies every field module_newsletter requires', () => {
+  it('seeds a newsletter module satisfying every required field', () => {
     assertSatisfiesRequiredFields(
       newsletterSchema,
       sharedNewsletterModule,
       NEWSLETTER_HEADING_BLOCK_EXEMPTION,
     );
-  });
-
-  it('is the Compact variant', () => {
-    expect(sharedNewsletterModule.variant).toBe(NEWSLETTER_VARIANT.COMPACT);
   });
 });

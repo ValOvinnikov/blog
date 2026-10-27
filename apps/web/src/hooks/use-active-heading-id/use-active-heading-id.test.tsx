@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   FakeIntersectionObserver,
@@ -6,6 +7,13 @@ import {
 } from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 
 import { useActiveHeadingId } from './use-active-heading-id';
+
+faker.seed(6012);
+
+const MOCK_FIRST_ID = 'a' + faker.string.alpha(8);
+const MOCK_SECOND_ID = 'b' + faker.string.alpha(8);
+const MOCK_THIRD_ID = 'c' + faker.string.alpha(8);
+const MOCK_HEADING_IDS = [MOCK_FIRST_ID, MOCK_SECOND_ID, MOCK_THIRD_ID];
 
 const ACTIVE_ID_TEST_ID = 'active-id';
 const NO_ACTIVE_ID = 'none';
@@ -48,7 +56,7 @@ describe(useActiveHeadingId, () => {
 
   describe('with three headings', () => {
     beforeEach(() => {
-      setup({ ids: ['one', 'two', 'three'] });
+      setup({ ids: MOCK_HEADING_IDS });
     });
 
     it('has no active heading before any heading has intersected', () => {
@@ -60,20 +68,20 @@ describe(useActiveHeadingId, () => {
     it.each([
       {
         title: 'marks the intersecting heading active',
-        entries: () => [headingEntry('one', true, 10)],
-        expected: 'one',
+        entries: () => [headingEntry(MOCK_FIRST_ID, true, 10)],
+        expected: MOCK_FIRST_ID,
       },
       {
         title: 'marks the topmost of several intersecting headings active',
         entries: () => [
-          headingEntry('two', true, 50),
-          headingEntry('one', true, 5),
+          headingEntry(MOCK_SECOND_ID, true, 50),
+          headingEntry(MOCK_FIRST_ID, true, 5),
         ],
-        expected: 'one',
+        expected: MOCK_FIRST_ID,
       },
       {
         title: 'ignores a heading that is not intersecting',
-        entries: () => [headingEntry('one', false, 5)],
+        entries: () => [headingEntry(MOCK_FIRST_ID, false, 5)],
         expected: NO_ACTIVE_ID,
       },
     ])('$title', ({ entries, expected }) => {
@@ -86,7 +94,7 @@ describe(useActiveHeadingId, () => {
   });
 
   it('observes nothing for an empty id list', () => {
-    setup({ ids: [] });
+    setup();
 
     const activeId = screen.getByTestId(ACTIVE_ID_TEST_ID);
 

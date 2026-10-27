@@ -7,6 +7,7 @@ import {
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { deleteExpiredVerificationTokens } from './delete-expired-verification-tokens';
 
@@ -14,13 +15,15 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
+faker.seed(6022);
+
 afterEach(async () => {
   await db().delete(schema.verificationTokens);
 });
 
 describe(deleteExpiredVerificationTokens, () => {
   async function insertToken(expires: Date): Promise<string> {
-    const token = crypto.randomUUID();
+    const token = faker.string.uuid();
     await db()
       .insert(schema.verificationTokens)
       .values({ identifier: MOCK_USER_EMAIL, token, expires });

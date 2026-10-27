@@ -1,43 +1,52 @@
-import { classifyReleaseChanges } from './classify-release-changes';
+import { RELEASE_CHANGE } from '@blog/config';
+import { mockChangedFile } from '@platform/testing/github/fixtures';
 
-const modified = (filename: string) => ({ filename, status: 'modified' });
+import { classifyReleaseChanges } from './classify-release-changes';
 
 describe(classifyReleaseChanges, () => {
   it('reports no change for a docs-only file list', () => {
-    expect(
-      classifyReleaseChanges([modified('docs/features/README.md')], false),
-    ).toEqual({
-      RENDERING: false,
-      DB_MIGRATION: false,
-      SANITY_MIGRATION: false,
-      ENV: false,
+    const changes = classifyReleaseChanges(
+      [mockChangedFile('docs/features/README.md')],
+      false,
+    );
+
+    expect(changes).toEqual({
+      [RELEASE_CHANGE.RENDERING]: false,
+      [RELEASE_CHANGE.DB_MIGRATION]: false,
+      [RELEASE_CHANGE.SANITY_MIGRATION]: false,
+      [RELEASE_CHANGE.ENV]: false,
     });
   });
 
   it('reports each set a file list touches', () => {
-    expect(
-      classifyReleaseChanges(
-        [
-          modified('packages/ui/src/atoms/button/button.tsx'),
-          modified('packages/db/migrations/0042_add_things.sql'),
-          modified('apps/platform/.env.example'),
-        ],
-        false,
-      ),
-    ).toEqual({
-      RENDERING: true,
-      DB_MIGRATION: true,
-      SANITY_MIGRATION: false,
-      ENV: true,
+    const changes = classifyReleaseChanges(
+      [
+        mockChangedFile('packages/ui/src/atoms/button/button.tsx'),
+        mockChangedFile('packages/db/migrations/0042_add_things.sql'),
+        mockChangedFile('apps/platform/.env.example'),
+      ],
+      false,
+    );
+
+    expect(changes).toEqual({
+      [RELEASE_CHANGE.RENDERING]: true,
+      [RELEASE_CHANGE.DB_MIGRATION]: true,
+      [RELEASE_CHANGE.SANITY_MIGRATION]: false,
+      [RELEASE_CHANGE.ENV]: true,
     });
   });
 
   it('reports every set as changed when the file list was truncated', () => {
-    expect(classifyReleaseChanges([modified('docs/README.md')], true)).toEqual({
-      RENDERING: true,
-      DB_MIGRATION: true,
-      SANITY_MIGRATION: true,
-      ENV: true,
+    const changes = classifyReleaseChanges(
+      [mockChangedFile('docs/README.md')],
+      true,
+    );
+
+    expect(changes).toEqual({
+      [RELEASE_CHANGE.RENDERING]: true,
+      [RELEASE_CHANGE.DB_MIGRATION]: true,
+      [RELEASE_CHANGE.SANITY_MIGRATION]: true,
+      [RELEASE_CHANGE.ENV]: true,
     });
   });
 });

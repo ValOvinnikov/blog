@@ -1,15 +1,19 @@
 import type { TVoicePortableText } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { render, renderElement, screen } from '@web/testing/custom-render';
 import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
 
 import { useVoiceRich, VoiceRichProvider } from './voice-rich-provider';
 
-const OVERRIDE_TEXT = 'Nothing published yet.';
-const OVERRIDE_VALUE = mockVoiceRichText(OVERRIDE_TEXT);
+faker.seed(6012);
+
+const MOCK_OVERRIDE_TEXT = faker.lorem.sentence();
+const MOCK_BODY_TEXT = faker.lorem.sentence();
+const MOCK_OVERRIDE_VALUE = mockVoiceRichText(MOCK_OVERRIDE_TEXT);
 
 const VALUES = {
-  blogListEmpty: OVERRIDE_VALUE,
+  blogListEmpty: MOCK_OVERRIDE_VALUE,
 } as unknown as Record<TVoiceRichFieldId, TVoicePortableText>;
 
 const ReadVoiceRich = ({ id }: { id: TVoiceRichFieldId }) => {
@@ -18,19 +22,23 @@ const ReadVoiceRich = ({ id }: { id: TVoiceRichFieldId }) => {
 };
 
 describe(`<${VoiceRichProvider.name}/>`, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('renders children', () => {
     renderElement(
       <VoiceRichProvider values={VALUES}>
-        <p>Article body</p>
+        <p>{MOCK_BODY_TEXT}</p>
       </VoiceRichProvider>,
     );
 
-    const body = screen.getByText('Article body');
+    const body = screen.getByText(MOCK_BODY_TEXT);
 
     expect(body).toBeVisible();
   });
 
-  it('exposes the resolved value for a given voice field id, unflattened', () => {
+  it('exposes the resolved value for a voice field id', () => {
     renderElement(
       <VoiceRichProvider values={VALUES}>
         <ReadVoiceRich id="blogListEmpty" />
@@ -39,18 +47,14 @@ describe(`<${VoiceRichProvider.name}/>`, () => {
 
     const voiceRich = screen.getByTestId('voice-rich');
 
-    expect(voiceRich).toHaveTextContent(OVERRIDE_TEXT);
+    expect(voiceRich).toHaveTextContent(MOCK_OVERRIDE_TEXT);
   });
 
-  it('throws when read outside a VoiceRichProvider', () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+  it('throws when read outside its provider', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     expect(() => render(<ReadVoiceRich id="blogListEmpty" />)).toThrow(
       'useVoiceRich must be used within a VoiceRichProvider',
     );
-
-    consoleErrorSpy.mockRestore();
   });
 });

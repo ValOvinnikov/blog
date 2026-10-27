@@ -1,12 +1,13 @@
 import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { CSSProperties } from 'react';
 
 import { LookSample } from './look-sample';
 
-const render = renderWithIntl;
+faker.seed(5994);
 
 const SUBSCRIBE = 'Subscribe';
 const SIGN_IN = 'Sign in';
@@ -18,21 +19,21 @@ const LANGUAGE_ENGLISH = 'Language: English';
 const CHARTING_THE_NEXT_SEASON = 'Charting the next season';
 const ENGLISH_CODE = LOCALE_ISO_CODES.EN.toUpperCase();
 const FRENCH_CODE = LOCALE_ISO_CODES.FR.toUpperCase();
-const DARK_ACCENT = 'oklch(0.7 0.16 28)';
-const LOGO_URL = 'https://cdn.example.com/logo.svg';
+const MOCK_DARK_ACCENT = 'oklch(0.7 0.16 28)';
+const MOCK_LOGO_URL = faker.image.url();
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 
-const BASE_PROPS = {
+const setup = customRender(LookSample, {
   tenantName: MOCK_TENANT_NAME,
   logoSrc: undefined,
   theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
   hasReaderAccounts: true,
-};
+});
 
-describe(LookSample, () => {
+describe(`<${LookSample.name}/>`, () => {
   let staticDarkRamp: HTMLStyleElement;
 
   beforeEach(() => {
@@ -48,10 +49,10 @@ describe(LookSample, () => {
 
   describe('with the default values', () => {
     beforeEach(() => {
-      render(<LookSample {...BASE_PROPS} />);
+      setup();
     });
 
-    it('renders the tenant name and a @blog/ui Button primitive', () => {
+    it('shows the tenant name and a Subscribe button', () => {
       const tenantNames = screen.getAllByText(MOCK_TENANT_NAME);
       const subscribeButton = screen.getByRole('button', { name: SUBSCRIBE });
 
@@ -124,41 +125,32 @@ describe(LookSample, () => {
   });
 
   it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
-    render(
-      <LookSample
-        {...BASE_PROPS}
-        theme={{
-          ...MOCK_SITE_PREVIEW_THEME,
-          isDark: true,
-          tokenStyle: {
-            '--brand-primary': DARK_ACCENT,
-          } as CSSProperties,
-        }}
-      />,
-    );
+    setup({
+      theme: {
+        ...MOCK_SITE_PREVIEW_THEME,
+        isDark: true,
+        tokenStyle: { '--brand-primary': MOCK_DARK_ACCENT } as CSSProperties,
+      },
+    });
 
     const button = screen.getByRole('button', { name: SUBSCRIBE });
 
-    expect(getComputedStyle(button).getPropertyValue('--brand-primary')).toBe(
-      DARK_ACCENT,
-    );
+    const brandPrimary =
+      getComputedStyle(button).getPropertyValue('--brand-primary');
+
+    expect(brandPrimary).toBe(MOCK_DARK_ACCENT);
   });
 
   it('renders the uploaded logo in place of the generated mark', () => {
-    render(<LookSample {...BASE_PROPS} logoSrc={LOGO_URL} />);
+    setup({ logoSrc: MOCK_LOGO_URL });
 
     const logo = screen.getByRole('img', { name: MOCK_TENANT_NAME });
 
-    expect(logo).toHaveAttribute('src', LOGO_URL);
+    expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
   });
 
   it('offers the light theme from a dark preview', () => {
-    render(
-      <LookSample
-        {...BASE_PROPS}
-        theme={{ ...MOCK_SITE_PREVIEW_THEME, isDark: true }}
-      />,
-    );
+    setup({ theme: { ...MOCK_SITE_PREVIEW_THEME, isDark: true } });
 
     const themeToggle = screen.getByRole('button', {
       name: 'Switch to light theme',
@@ -168,7 +160,7 @@ describe(LookSample, () => {
   });
 
   it('shows no Sign in when the site has no reader accounts', () => {
-    render(<LookSample {...BASE_PROPS} hasReaderAccounts={false} />);
+    setup({ hasReaderAccounts: false });
 
     const signInButton = screen.queryByRole('button', { name: SIGN_IN });
 
@@ -176,7 +168,7 @@ describe(LookSample, () => {
   });
 
   it('shows the brand, the person circle and the menu button on a narrow preview', () => {
-    render(<LookSample {...BASE_PROPS} isNarrow={true} />);
+    setup({ isNarrow: true });
 
     const header = screen.getByRole('banner');
     const signInButton = screen.getByRole('button', { name: SIGN_IN });
@@ -192,9 +184,7 @@ describe(LookSample, () => {
   });
 
   it('keeps the narrow bar to the brand and the menu button without reader accounts', () => {
-    render(
-      <LookSample {...BASE_PROPS} isNarrow={true} hasReaderAccounts={false} />,
-    );
+    setup({ isNarrow: true, hasReaderAccounts: false });
 
     const menuButton = screen.getByRole('button', { name: MENU });
     const signInButton = screen.queryByRole('button', { name: SIGN_IN });
@@ -204,12 +194,7 @@ describe(LookSample, () => {
   });
 
   it('shows a menu pill with the current code for menu with code', () => {
-    render(
-      <LookSample
-        {...BASE_PROPS}
-        languageSwitcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_CODE}
-      />,
-    );
+    setup({ languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE });
 
     const languageMenu = screen.getByRole('button', { name: LANGUAGE_ENGLISH });
     const frenchLink = screen.queryByRole('link', { name: FRANCAIS });
@@ -219,31 +204,23 @@ describe(LookSample, () => {
   });
 
   it('shows a globe menu without a code for menu with globe', () => {
-    render(
-      <LookSample
-        {...BASE_PROPS}
-        languageSwitcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_GLOBE}
-      />,
-    );
+    setup({ languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE });
 
     const languageMenu = screen.getByRole('button', { name: LANGUAGE_ENGLISH });
 
     expect(languageMenu).not.toHaveTextContent(ENGLISH_CODE);
   });
 
-  it('falls back to the code menu when compact codes would show more than four languages', () => {
-    render(
-      <LookSample
-        {...BASE_PROPS}
-        liveLocales={[
-          LOCALE_ISO_CODES.EN,
-          LOCALE_ISO_CODES.FR,
-          LOCALE_ISO_CODES.DE,
-          LOCALE_ISO_CODES.ES,
-          LOCALE_ISO_CODES.NL,
-        ]}
-      />,
-    );
+  it('falls back to the code menu when more than four languages are live', () => {
+    setup({
+      liveLocales: [
+        LOCALE_ISO_CODES.EN,
+        LOCALE_ISO_CODES.FR,
+        LOCALE_ISO_CODES.DE,
+        LOCALE_ISO_CODES.ES,
+        LOCALE_ISO_CODES.NL,
+      ],
+    });
 
     const languageMenu = screen.getByRole('button', { name: LANGUAGE_ENGLISH });
 
@@ -251,13 +228,10 @@ describe(LookSample, () => {
   });
 
   it('shows no switcher with one live language', () => {
-    render(
-      <LookSample
-        {...BASE_PROPS}
-        liveLocales={[LOCALE_ISO_CODES.EN]}
-        languageSwitcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_GLOBE}
-      />,
-    );
+    setup({
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
+    });
 
     const languageMenu = screen.queryByRole('button', { name: /^Language/ });
     const englishLink = screen.queryByRole('link', { name: ENGLISH });

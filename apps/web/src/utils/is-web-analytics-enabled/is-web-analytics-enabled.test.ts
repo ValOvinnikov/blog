@@ -1,37 +1,24 @@
-export {};
+import type { TMaybeUndefined } from '@blog/config';
 
-describe('isWebAnalyticsEnabled', () => {
-  afterEach(() => {
-    vi.resetModules();
-  });
+import { isWebAnalyticsEnabled } from './is-web-analytics-enabled';
 
-  it('returns true when WEB_ANALYTICS_ENABLED is "true"', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { WEB_ANALYTICS_ENABLED: 'true' },
-    }));
-    const { isWebAnalyticsEnabled } =
-      await import('./is-web-analytics-enabled');
+const mockEnv = vi.hoisted(() => ({
+  WEB_ANALYTICS_ENABLED: undefined as TMaybeUndefined<string>,
+}));
 
-    expect(isWebAnalyticsEnabled()).toBe(true);
-  });
+vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
 
-  it('returns false when WEB_ANALYTICS_ENABLED is "false"', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { WEB_ANALYTICS_ENABLED: 'false' },
-    }));
-    const { isWebAnalyticsEnabled } =
-      await import('./is-web-analytics-enabled');
+describe(isWebAnalyticsEnabled, () => {
+  it.each([
+    { value: 'true', expected: true },
+    { value: 'false', expected: false },
+    { value: undefined, expected: false },
+  ])(
+    'is $expected when WEB_ANALYTICS_ENABLED is $value',
+    ({ value, expected }) => {
+      mockEnv.WEB_ANALYTICS_ENABLED = value;
 
-    expect(isWebAnalyticsEnabled()).toBe(false);
-  });
-
-  it('returns false when WEB_ANALYTICS_ENABLED is unset', async () => {
-    vi.doMock('@web/utils/env/env', () => ({
-      env: { WEB_ANALYTICS_ENABLED: undefined },
-    }));
-    const { isWebAnalyticsEnabled } =
-      await import('./is-web-analytics-enabled');
-
-    expect(isWebAnalyticsEnabled()).toBe(false);
-  });
+      expect(isWebAnalyticsEnabled()).toBe(expected);
+    },
+  );
 });

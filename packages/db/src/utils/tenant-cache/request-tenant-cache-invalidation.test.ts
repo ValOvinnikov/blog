@@ -1,51 +1,50 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import {
+  emptyResponse,
+  firstFetchCall,
+  textResponse,
+  useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import { faker } from '@faker-js/faker';
 
 import { requestTenantCacheInvalidation } from './request-tenant-cache-invalidation';
 
-const originalFetch = globalThis.fetch;
-const fetchMock = vi.fn();
+faker.seed(3318);
 
-const REQUEST = {
-  webAppUrl: 'https://cache-host.example.com',
-  secret: 'cache-purge-secret',
-  tenantId: 'cache-tenant',
+const REVALIDATE_ENDPOINT_PATH = '/api/revalidate-site-config';
+const MOCK_REFUSAL_BODY = faker.lorem.words(2);
+const MOCK_REQUEST = {
+  webAppUrl: faker.internet.url({ appendSlash: false }),
+  secret: faker.string.alphanumeric(16),
+  tenantId: faker.string.uuid(),
 };
 
-beforeEach(() => {
-  globalThis.fetch = fetchMock;
-  fetchMock
-    .mockReset()
-    .mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
-});
+const fetchMock = useFetchFake();
 
-afterEach(() => {
-  globalThis.fetch = originalFetch;
+beforeEach(() => {
+  fetchMock.mockResolvedValue(emptyResponse());
 });
 
 describe(requestTenantCacheInvalidation, () => {
   it('POSTs the tenant id to the revalidation endpoint with the bearer secret', async () => {
-    await requestTenantCacheInvalidation(REQUEST);
+    await requestTenantCacheInvalidation(MOCK_REQUEST);
 
-    const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
-    expect(url.toString()).toBe(
-      `${REQUEST.webAppUrl}/api/revalidate-site-config`,
+    const { url, method, headers, body } = firstFetchCall(fetchMock);
+    expect(String(url)).toBe(
+      `${MOCK_REQUEST.webAppUrl}${REVALIDATE_ENDPOINT_PATH}`,
     );
-    expect(init.method).toBe(HTTP_METHOD.POST);
-    expect(init.headers).toEqual({
-      Authorization: `Bearer ${REQUEST.secret}`,
-    });
-    expect(init.body).toBe(JSON.stringify({ tenantId: REQUEST.tenantId }));
+    expect(method).toBe(HTTP_METHOD.POST);
+    expect(headers).toEqual({ Authorization: `Bearer ${MOCK_REQUEST.secret}` });
+    expect(body).toEqual({ tenantId: MOCK_REQUEST.tenantId });
   });
 
   it('throws with the status when the endpoint responds non-2xx', async () => {
     fetchMock.mockResolvedValue(
-      new Response('revalidation refused', {
-        status: HTTP_STATUS.UNAUTHORIZED,
-      }),
+      textResponse(MOCK_REFUSAL_BODY, HTTP_STATUS.UNAUTHORIZED),
     );
 
-    await expect(requestTenantCacheInvalidation(REQUEST)).rejects.toThrow(
-      `Tenant cache invalidation failed for tenant "${REQUEST.tenantId}": 401 revalidation refused`,
+    await expect(requestTenantCacheInvalidation(MOCK_REQUEST)).rejects.toThrow(
+      `Tenant cache invalidation failed for tenant "${MOCK_REQUEST.tenantId}": ${HTTP_STATUS.UNAUTHORIZED} ${MOCK_REFUSAL_BODY}`,
     );
   });
 });

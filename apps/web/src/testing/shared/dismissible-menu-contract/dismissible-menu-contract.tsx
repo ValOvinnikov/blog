@@ -1,145 +1,160 @@
-import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 import { fireEvent, screen } from '@web/testing/custom-render';
 
-const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
+const ARIA_EXPANDED = 'aria-expanded';
+export const MENU_TRIGGER_NAME = 'trigger';
+export const MENU_FIRST_ITEM_NAME = 'first';
+export const MENU_LAST_ITEM_NAME = 'second';
+export const MENU_SIBLING_ACTION_NAME = 'sibling action';
 
-/** The open/close/focus contract every dismissible-menu-style hook shares. */
-export const testCoreDismissibleMenuBehavior = () => {
+export const expectMenuClosed = (trigger: HTMLElement) => {
+  expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+};
+
+export const expectMenuOpen = (trigger: HTMLElement) => {
+  expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+};
+
+const KEY_ARROW_DOWN = '{ArrowDown}';
+
+type TGetUser = () => UserEvent;
+
+export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
   it('starts closed, with the panel contents unreachable', () => {
-    expect(getTrigger()).toHaveAttribute('aria-expanded', 'false');
-    expect(
-      screen.queryByRole('button', { name: 'first' }),
-    ).not.toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    const firstItem = screen.queryByRole('button', {
+      name: MENU_FIRST_ITEM_NAME,
+    });
+
+    expectMenuClosed(trigger);
+    expect(firstItem).not.toBeInTheDocument();
   });
 
-  it('opens on toggle and moves focus to the first focusable item in the panel', async () => {
-    const user = userEvent.setup();
+  it('opens on toggle and focuses the first item in the panel', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
 
-    await user.click(getTrigger());
+    await getUser().click(trigger);
 
-    expect(getTrigger()).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('button', { name: 'first' })).toHaveFocus();
+    const firstItem = screen.getByRole('button', {
+      name: MENU_FIRST_ITEM_NAME,
+    });
+    expectMenuOpen(trigger);
+    expect(firstItem).toHaveFocus();
   });
 
   it('closes on a second toggle and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
 
-    await user.click(trigger);
-    await user.click(trigger);
+    await getUser().click(trigger);
+    await getUser().click(trigger);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expectMenuClosed(trigger);
     expect(trigger).toHaveFocus();
   });
 
   it('closes on Escape and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
-    await user.click(trigger);
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    await getUser().keyboard('{Escape}');
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expectMenuClosed(trigger);
     expect(trigger).toHaveFocus();
   });
 
   it('closes on an outside pointer-down and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
-    await user.click(trigger);
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
 
     fireEvent.mouseDown(document.body);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expectMenuClosed(trigger);
     expect(trigger).toHaveFocus();
   });
 
   it('stays open on a pointer-down inside the panel', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
-    await user.click(trigger);
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
 
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'second' }));
+    const lastItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
+    fireEvent.mouseDown(lastItem);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expectMenuOpen(trigger);
   });
 
-  it('traps Tab, wrapping focus from the last item back to the first', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+  it('wraps Tab from the last item back to the first', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
+    const firstItem = screen.getByRole('button', {
+      name: MENU_FIRST_ITEM_NAME,
+    });
+    await getUser().keyboard('{End}');
 
-    const first = screen.getByRole('button', { name: 'first' });
-    const last = screen.getByRole('button', { name: 'second' });
-    last.focus();
+    await getUser().tab();
 
-    fireEvent.keyDown(document, { key: 'Tab' });
-
-    expect(first).toHaveFocus();
+    expect(firstItem).toHaveFocus();
   });
 
-  it('moves focus to the next item on ArrowDown, wrapping from the last back to the first', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+  it('moves focus down with ArrowDown, wrapping from the last to the first', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
+    const firstItem = screen.getByRole('button', {
+      name: MENU_FIRST_ITEM_NAME,
+    });
+    const lastItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
 
-    const first = screen.getByRole('button', { name: 'first' });
-    const last = screen.getByRole('button', { name: 'second' });
+    await getUser().keyboard(KEY_ARROW_DOWN);
+    expect(lastItem).toHaveFocus();
 
-    fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(last).toHaveFocus();
-
-    fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(first).toHaveFocus();
+    await getUser().keyboard(KEY_ARROW_DOWN);
+    expect(firstItem).toHaveFocus();
   });
 
   it('focuses the last item on End', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
+    const lastItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
 
-    const last = screen.getByRole('button', { name: 'second' });
+    await getUser().keyboard('{End}');
 
-    fireEvent.keyDown(document, { key: 'End' });
-
-    expect(last).toHaveFocus();
+    expect(lastItem).toHaveFocus();
   });
 };
 
-/**
- * The roving-focus behaviours `usePopover` and `useDismissibleMenu`'s
- * default options share beyond the core contract above — not exercised by
- * `useMobileNavToggle`'s own test suite.
- */
-export const testArrowUpAndHomeBehavior = () => {
-  it.each([
-    {
-      name: 'moves focus to the previous item on ArrowUp, wrapping from the first to the last',
-      key: 'ArrowUp',
-      focusLastFirst: false,
-      expected: 'last',
-    },
-    {
-      name: 'moves focus to the previous item on ArrowUp when not on the first item',
-      key: 'ArrowUp',
-      focusLastFirst: true,
-      expected: 'first',
-    },
-    {
-      name: 'focuses the first item on Home',
-      key: 'Home',
-      focusLastFirst: true,
-      expected: 'first',
-    },
-  ] as const)('$name', async ({ key, focusLastFirst, expected }) => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
+  it('wraps ArrowUp from the first item to the last', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
+    const lastItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
 
-    const first = screen.getByRole('button', { name: 'first' });
-    const last = screen.getByRole('button', { name: 'second' });
-    if (focusLastFirst) {
-      last.focus();
-    }
+    await getUser().keyboard('{ArrowUp}');
 
-    fireEvent.keyDown(document, { key });
+    expect(lastItem).toHaveFocus();
+  });
 
-    expect(expected === 'first' ? first : last).toHaveFocus();
+  it('moves focus up with ArrowUp from the last item', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
+    const firstItem = screen.getByRole('button', {
+      name: MENU_FIRST_ITEM_NAME,
+    });
+    await getUser().keyboard('{End}');
+
+    await getUser().keyboard('{ArrowUp}');
+
+    expect(firstItem).toHaveFocus();
+  });
+
+  it('focuses the first item on Home', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+    await getUser().click(trigger);
+    const firstItem = screen.getByRole('button', {
+      name: MENU_FIRST_ITEM_NAME,
+    });
+    await getUser().keyboard('{End}');
+
+    await getUser().keyboard('{Home}');
+
+    expect(firstItem).toHaveFocus();
   });
 };

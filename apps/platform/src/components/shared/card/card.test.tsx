@@ -1,102 +1,85 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 
 import { Card } from './card';
+import type { TCardHeaderProps } from './components/header/card-header';
 
-describe(Card, () => {
+faker.seed(5995);
+
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_ACTION = faker.lorem.word();
+const MOCK_BODY = faker.lorem.sentence();
+const MOCK_FOOTER = faker.lorem.sentence();
+
+const HeaderCard = (props: TCardHeaderProps) => (
+  <Card>
+    <Card.Header {...props} />
+  </Card>
+);
+
+const setup = customRender(HeaderCard, { title: MOCK_TITLE });
+
+describe(`<${Card.name}/>`, () => {
   it('renders the header title at a caller-supplied heading level', () => {
-    render(
-      <Card>
-        <Card.Header title="Tenant details" headingLevel={3} />
-      </Card>,
-    );
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Tenant details' }),
-    ).toBeVisible();
+    setup({ headingLevel: 3 });
+
+    const heading = screen.getByRole('heading', { level: 3, name: MOCK_TITLE });
+
+    expect(heading).toBeVisible();
   });
 
   it('renders a header description when provided', () => {
-    render(
-      <Card>
-        <Card.Header
-          title="Tenant details"
-          supportingText="Core identity and status."
-        />
-      </Card>,
-    );
-    expect(screen.getByText('Core identity and status.')).toBeVisible();
-  });
+    setup({ supportingText: MOCK_SUPPORTING_TEXT });
 
-  it('omits the header description when not provided', () => {
-    render(
-      <Card>
-        <Card.Header title="Tenant details" />
-      </Card>,
-    );
-    expect(screen.queryByText(/core identity/i)).toBeNull();
+    const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);
+
+    expect(supportingText).toBeVisible();
   });
 
   it('renders header actions when provided', () => {
-    render(
-      <Card>
-        <Card.Header
-          title="Tenant details"
-          actions={<button type="button">Edit</button>}
-        />
-      </Card>,
-    );
-    expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
+    setup({ actions: <button type="button">{MOCK_ACTION}</button> });
+
+    const actionButton = screen.getByRole('button', { name: MOCK_ACTION });
+
+    expect(actionButton).toBeVisible();
   });
 
-  it('omits header actions when not provided', () => {
-    render(
-      <Card>
-        <Card.Header title="Tenant details" />
-      </Card>,
-    );
-    expect(screen.queryByRole('button')).toBeNull();
+  it('omits the header description and actions when not provided', () => {
+    setup();
+
+    const supportingText = screen.queryByText(MOCK_SUPPORTING_TEXT);
+    const actionButton = screen.queryByRole('button');
+
+    expect(supportingText).not.toBeInTheDocument();
+    expect(actionButton).not.toBeInTheDocument();
   });
 
-  it('renders body content', () => {
-    render(
+  it('renders header, body and footer in that order whatever the JSX order', () => {
+    renderWithIntl(
       <Card>
-        <Card.Body>Body copy goes here.</Card.Body>
+        <Card.Footer>{MOCK_FOOTER}</Card.Footer>
+        <Card.Body>{MOCK_BODY}</Card.Body>
+        <Card.Header title={MOCK_TITLE} />
       </Card>,
     );
-    expect(screen.getByText('Body copy goes here.')).toBeVisible();
-  });
 
-  it('renders footer content', () => {
-    render(
-      <Card>
-        <Card.Footer>
-          <button type="button">Save</button>
-        </Card.Footer>
-      </Card>,
+    const heading = screen.getByRole('heading', { name: MOCK_TITLE });
+    const body = screen.getByText(MOCK_BODY);
+    const footer = screen.getByText(MOCK_FOOTER);
+
+    expect(heading).toBeVisible();
+    expect(body).toBeVisible();
+    expect(footer).toBeVisible();
+    expect(heading.compareDocumentPosition(body)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
     );
-    expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
-  });
-
-  it('renders header, body, and footer together regardless of JSX order', () => {
-    render(
-      <Card>
-        <Card.Footer>Footer text</Card.Footer>
-        <Card.Body>Body text</Card.Body>
-        <Card.Header title="Ordered card" />
-      </Card>,
+    expect(body.compareDocumentPosition(footer)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
     );
-    expect(screen.getByRole('heading', { name: 'Ordered card' })).toBeVisible();
-    expect(screen.getByText('Body text')).toBeVisible();
-    expect(screen.getByText('Footer text')).toBeVisible();
-  });
-
-  it('renders with only a body, without throwing', () => {
-    expect(() =>
-      render(
-        <Card>
-          <Card.Body>Just a body.</Card.Body>
-        </Card>,
-      ),
-    ).not.toThrow();
-    expect(screen.getByText('Just a body.')).toBeVisible();
   });
 });

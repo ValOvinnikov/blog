@@ -1,7 +1,13 @@
 import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { type TPostDetail } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  MOCK_DUTCH_REQUEST_CONTEXT,
+  NL_PATH_PREFIX,
+  mockMetadataSeo,
+} from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -9,12 +15,7 @@ import {
   MOCK_EN_POST_SLUG,
   MOCK_NL_POST_SLUG,
 } from '@web/testing/shared/post/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import {
-  MOCK_OG_IMAGE,
-  MOCK_OG_IMAGE_URL,
-} from '@web/testing/shared/seo/og-image-fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildPostMetadata } from './build-post-metadata';
@@ -29,28 +30,18 @@ vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const {
-  title: TITLE,
-  slug: SLUG,
-  excerpt: EXCERPT,
-  publishedAt,
-  author,
-} = MOCK_POST_DETAIL;
-const OG_TITLE = 'Hello World OG';
-const OG_DESCRIPTION = 'A sufficiently long excerpt for the card OG.';
-const NL_POST_PATH = `/nl${routes.post(MOCK_NL_POST_SLUG)}`;
-const EN_POST_PATH = routes.post(MOCK_EN_POST_SLUG);
+faker.seed(5205);
 
-const basePost: TPostDetail = {
-  ...MOCK_POST_DETAIL,
-  seo: mockSeo({
-    title: TITLE,
-    description: EXCERPT,
-    ogTitle: OG_TITLE,
-    ogDescription: OG_DESCRIPTION,
-    ogImage: MOCK_OG_IMAGE,
-  }),
-};
+const { slug: SLUG, publishedAt, author } = MOCK_POST_DETAIL;
+const { EN, NL, DE } = LOCALE_ISO_CODES;
+const NL_POST_PATH = `${NL_PATH_PREFIX}${routes.post(MOCK_NL_POST_SLUG)}`;
+const EN_POST_PATH = routes.post(MOCK_EN_POST_SLUG);
+const MOCK_MISSING_SLUG = faker.lorem.slug();
+
+const MOCK_SEO = mockMetadataSeo();
+const { title, description, ogTitle, ogDescription } = MOCK_SEO;
+
+const basePost: TPostDetail = { ...MOCK_POST_DETAIL, seo: MOCK_SEO };
 
 describe(buildPostMetadata, () => {
   beforeEach(() => {
@@ -63,7 +54,7 @@ describe(buildPostMetadata, () => {
       getPostPageMock.mockResolvedValue(okResult(basePost));
     });
 
-    it('reads the same post the post page renders', async () => {
+    it('reads the post the post page renders', async () => {
       await buildPostMetadata(SLUG);
 
       expect(getPostPageMock).toHaveBeenCalledWith(SLUG);
@@ -72,28 +63,24 @@ describe(buildPostMetadata, () => {
     it('builds the metadata from the resolved seo', async () => {
       const metadata = await buildPostMetadata(SLUG);
 
-      expect(metadata.title).toBe(TITLE);
-      expect(metadata.description).toBe(EXCERPT);
+      expect(metadata.title).toBe(title);
+      expect(metadata.description).toBe(description);
       expect(metadata.alternates?.canonical).toBe(routes.post(SLUG));
-      expect(metadata.openGraph?.title).toBe(OG_TITLE);
-      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
+      expect(metadata.openGraph?.title).toBe(ogTitle);
+      expect(metadata.openGraph?.description).toBe(ogDescription);
       expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
     });
 
-    it('sets the OG published time from the publish date', async () => {
+    it('sets the OG published time and authors from the post', async () => {
       const metadata = await buildPostMetadata(SLUG);
 
-      expect(
-        (metadata.openGraph as { publishedTime?: string })?.publishedTime,
-      ).toBe(publishedAt);
-    });
+      const { publishedTime, authors } = metadata.openGraph as {
+        publishedTime?: string;
+        authors?: string[];
+      };
 
-    it('sets the OG authors from the author name', async () => {
-      const metadata = await buildPostMetadata(SLUG);
-
-      expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
-        author.name,
-      ]);
+      expect(publishedTime).toBe(publishedAt);
+      expect(authors).toEqual([author.name]);
     });
   });
 
@@ -101,30 +88,30 @@ describe(buildPostMetadata, () => {
     it('returns empty metadata without logging when no post matches', async () => {
       getPostPageMock.mockResolvedValue(okResult());
 
-      const metadata = await buildPostMetadata('missing');
+      const metadata = await buildPostMetadata(MOCK_MISSING_SLUG);
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
     });
 
-    it('returns empty metadata when the post fetch fails', async () => {
+    it('returns empty metadata and logs when the post fetch fails', async () => {
       getPostPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
       const metadata = await buildPostMetadata(SLUG);
 
       expect(metadata).toEqual({});
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'post_metadata.fetch_failed',
+        { slug: SLUG, error: MOCK_ERROR },
+      );
     });
   });
 
   describe('for a Dutch-language request', () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-
     beforeEach(() => {
-      vi.mocked(getRequestContext).mockResolvedValue({
-        ...MOCK_REQUEST_CONTEXT,
-        locale: NL,
-        liveLocales: [EN, NL],
-      });
+      vi.mocked(getRequestContext).mockResolvedValue(
+        MOCK_DUTCH_REQUEST_CONTEXT,
+      );
       getPostPageMock.mockResolvedValue(
         okResult({
           ...basePost,

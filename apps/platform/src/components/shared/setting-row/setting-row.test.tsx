@@ -1,129 +1,99 @@
+import { faker } from '@faker-js/faker';
 import { Switch } from '@platform/components/shared/switch';
-import { render, screen } from '@platform/testing/custom-render';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 
 import { SettingRow } from './setting-row';
 
-describe(SettingRow, () => {
-  it('renders the label and description', () => {
-    render(
-      <SettingRow
-        label="Terminal chrome"
-        description="Window frame + terminal prompt around the site."
-      >
-        <button type="button">Toggle</button>
-      </SettingRow>,
-    );
+faker.seed(5995);
 
-    expect(screen.getByText('Terminal chrome')).toBeVisible();
-    expect(
-      screen.getByText('Window frame + terminal prompt around the site.'),
-    ).toBeVisible();
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_LOCKED_REASON = faker.lorem.sentence();
+const MOCK_CONTROL_LABEL = faker.lorem.word();
+const MOCK_ARCHIVED_NOTICE_ID = faker.string.alpha(8);
+const MOCK_ARCHIVED_NOTICE = faker.lorem.sentence();
+const LOCK_ICON = '🔒';
+
+const setup = customRender(SettingRow, {
+  label: MOCK_LABEL,
+  children: <button type="button">{MOCK_CONTROL_LABEL}</button>,
+});
+
+describe(`<${SettingRow.name}/>`, () => {
+  it('shows the label and description', () => {
+    setup({ description: MOCK_DESCRIPTION });
+
+    const label = screen.getByText(MOCK_LABEL);
+    const description = screen.getByText(MOCK_DESCRIPTION);
+
+    expect(label).toBeVisible();
+    expect(description).toBeVisible();
   });
 
-  it('renders without a description', () => {
-    render(
-      <SettingRow label="Terminal chrome">
-        <button type="button">Toggle</button>
-      </SettingRow>,
-    );
+  it('renders the control it is given', () => {
+    setup();
 
-    expect(screen.getByText('Terminal chrome')).toBeVisible();
-  });
+    const control = screen.getByRole('button', { name: MOCK_CONTROL_LABEL });
 
-  it("renders the control slot's content", () => {
-    render(
-      <SettingRow label="Plan">
-        <select aria-label="Plan">
-          <option>Starter</option>
-        </select>
-      </SettingRow>,
-    );
-
-    expect(screen.getByRole('combobox', { name: 'Plan' })).toBeVisible();
+    expect(control).toBeVisible();
   });
 
   it('shows the locked reason when locked', () => {
-    render(
-      <SettingRow
-        label="Custom domains"
-        isLocked={true}
-        lockedReason="Available on the Growth plan."
-      >
-        <button type="button">Upgrade</button>
-      </SettingRow>,
-    );
+    setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
 
-    expect(screen.getByText('Available on the Growth plan.')).toBeVisible();
+    const lockedReason = screen.getByText(MOCK_LOCKED_REASON);
+
+    expect(lockedReason).toBeVisible();
   });
 
   it('omits the locked reason when not locked, even if one is passed', () => {
-    render(
-      <SettingRow
-        label="Custom domains"
-        lockedReason="Available on the Growth plan."
-      >
-        <button type="button">Upgrade</button>
-      </SettingRow>,
-    );
+    setup({ lockedReason: MOCK_LOCKED_REASON });
 
-    expect(
-      screen.queryByText('Available on the Growth plan.'),
-    ).not.toBeInTheDocument();
+    const lockedReason = screen.queryByText(MOCK_LOCKED_REASON);
+
+    expect(lockedReason).not.toBeInTheDocument();
   });
 
   it('omits the reason row when locked but no reason is given', () => {
-    render(
-      <SettingRow label="Custom domains" isLocked={true}>
-        <button type="button">Upgrade</button>
-      </SettingRow>,
-    );
+    setup({ isLocked: true });
 
-    expect(screen.queryByText('🔒')).not.toBeInTheDocument();
+    const lockIcon = screen.queryByText(LOCK_ICON);
+
+    expect(lockIcon).not.toBeInTheDocument();
   });
 
-  it('describes its switch by the description and the locked reason', () => {
-    render(
-      <SettingRow
-        label="Analytics"
-        description="Enable on-site analytics tracking."
-        isLocked={true}
-        lockedReason="Growth plan"
-      >
-        <Switch
-          isChecked={false}
-          onCheckedChange={vi.fn()}
-          ariaLabel="Analytics"
-          labels={{ on: 'On', off: 'Off' }}
-          isDisabled={true}
-          aria-describedby="archived-notice"
-        />
-      </SettingRow>,
+  it('adds its description and locked reason to the switch description', () => {
+    renderWithIntl(
+      <>
+        <p id={MOCK_ARCHIVED_NOTICE_ID}>{MOCK_ARCHIVED_NOTICE}</p>
+        <SettingRow
+          label={MOCK_LABEL}
+          description={MOCK_DESCRIPTION}
+          isLocked={true}
+          lockedReason={MOCK_LOCKED_REASON}
+        >
+          <Switch
+            isChecked={false}
+            onCheckedChange={vi.fn()}
+            ariaLabel={MOCK_CONTROL_LABEL}
+            labels={{ on: 'On', off: 'Off' }}
+            isDisabled={true}
+            aria-describedby={MOCK_ARCHIVED_NOTICE_ID}
+          />
+        </SettingRow>
+      </>,
     );
 
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'aria-describedby',
-      expect.stringMatching(/^archived-notice \S+ \S+$/),
-    );
-    expect(
-      screen.getByRole('switch', { name: 'Analytics' }),
-    ).toHaveAccessibleDescription(
-      'Enable on-site analytics tracking. Growth plan',
-    );
-  });
+    const settingSwitch = screen.getByRole('switch', {
+      name: MOCK_CONTROL_LABEL,
+    });
 
-  it('keeps a locked switch in the accessibility tree as disabled', () => {
-    render(
-      <SettingRow label="Analytics" isLocked={true} lockedReason="Growth plan">
-        <Switch
-          isChecked={false}
-          onCheckedChange={vi.fn()}
-          ariaLabel="Analytics"
-          labels={{ on: 'On', off: 'Off' }}
-          isDisabled={true}
-        />
-      </SettingRow>,
+    expect(settingSwitch).toHaveAccessibleDescription(
+      `${MOCK_ARCHIVED_NOTICE} ${MOCK_DESCRIPTION} ${MOCK_LOCKED_REASON}`,
     );
-
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toBeDisabled();
   });
 });

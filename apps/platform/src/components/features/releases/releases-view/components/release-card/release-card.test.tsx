@@ -1,18 +1,22 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import type * as releaseConstants from '@platform/constants/release';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
+  MOCK_LAST_TAG,
   mockReleaseCandidate,
   mockReleaseRun,
   MOCK_RELEASE_RUN_URL,
 } from '@platform/testing/releases/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReleaseCard } from './release-card';
+
+faker.seed(5994);
 
 const ARIA_DISABLED = 'aria-disabled';
 
@@ -38,8 +42,10 @@ vi.mock('@platform/server/releases/get-release-run-action', () => ({
   getReleaseRunAction: getReleaseRunActionMock,
 }));
 
+const MOCK_VERSION = `v${faker.system.semver()}`;
+
 const setup = customRender(ReleaseCard, {
-  lastTag: 'v1.4.0',
+  lastTag: MOCK_LAST_TAG,
   hasChanges: true,
   migrations: mockReleaseCandidate().migrations,
   isOverrideRequired: false,
@@ -48,8 +54,10 @@ const setup = customRender(ReleaseCard, {
 
 describe(`<${ReleaseCard.name}/>`, () => {
   let refresh: ReturnType<typeof mockRouterRefresh>;
+  let user: UserEvent;
 
   beforeEach(() => {
+    user = userEvent.setup();
     refresh = mockRouterRefresh();
     releaseSwitch.isEnabled = true;
     startReleaseActionMock
@@ -74,7 +82,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     setup({ releaseRun: okResult(mockReleaseRun()) });
 
     const status = screen.getByText('Succeeded');
-    const runTitle = screen.getByText('Release v1.4.0');
+    const runTitle = screen.getByText(mockReleaseRun().title);
     const runLink = screen.getByRole('link', { name: /View the run/ });
 
     expect(status).toBeVisible();
@@ -82,7 +90,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     expect(runLink).toHaveAttribute('href', MOCK_RELEASE_RUN_URL);
   });
 
-  it('says the deploy did not run and points to the tenant retry when a tenant migration failed', () => {
+  it('points to the tenant retry when a tenant migration failed', () => {
     setup({
       releaseRun: okResult(
         mockReleaseRun({
@@ -134,13 +142,13 @@ describe(`<${ReleaseCard.name}/>`, () => {
     setup({ hasChanges: false });
 
     const noChangesNotice = screen.getByText(
-      'Nothing has changed since v1.4.0.',
+      `Nothing has changed since ${MOCK_LAST_TAG}.`,
     );
 
     expect(noChangesNotice).toBeVisible();
   });
 
-  it('says the release state is unavailable when GitHub cannot be read', () => {
+  it('says release status is unavailable when GitHub cannot be read', () => {
     setup({ releaseRun: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
     const unavailableNotice = screen.getByText('Release status is unavailable');
@@ -149,7 +157,6 @@ describe(`<${ReleaseCard.name}/>`, () => {
   });
 
   it('shows the release as dispatched as soon as it starts', async () => {
-    const user = userEvent.setup();
     setup({ releaseRun: okResult(mockReleaseRun()) });
 
     const openButton = screen.getByRole('button', { name: 'Release' });
@@ -157,7 +164,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     const versionInput = await screen.findByRole('textbox', {
       name: 'Version',
     });
-    await user.type(versionInput, 'v1.5.0');
+    await user.type(versionInput, MOCK_VERSION);
     const startButton = screen.getByRole('button', { name: 'Start release' });
     await user.click(startButton);
 

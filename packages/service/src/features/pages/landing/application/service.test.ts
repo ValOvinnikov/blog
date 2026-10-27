@@ -7,6 +7,7 @@ import {
 import { mockRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { createLandingPageService } from './service';
 
@@ -14,15 +15,18 @@ vi.mock('@blog/service/sanity/query/query');
 
 vi.mock('@blog/service/shared/adaptors/faq-questions/loader');
 
+faker.seed(6015104);
+
 const mockFaqQuestions = vi.mocked(getFaqQuestions);
 const tenant = mockTenant();
+const MOCK_FAQ_MODULE_ID = faker.string.uuid();
 
 describe(createLandingPageService, () => {
   describe('v1.getPage', () => {
     it("adds the faqs of the page's FAQ modules to the page", async () => {
       mockRun.mockResolvedValueOnce(
         mockRawLandingPage({
-          modules: [{ _id: 'faq-a', _type: 'module_faq' }],
+          modules: [{ _id: MOCK_FAQ_MODULE_ID, _type: 'module_faq' }],
         }),
       );
       mockFaqQuestions.mockResolvedValueOnce([mockRawFaqModuleQuestions()]);
@@ -34,7 +38,7 @@ describe(createLandingPageService, () => {
       if (!result.ok || !result.data) throw new Error('expected a page');
 
       expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
-        ['faq-a'],
+        [MOCK_FAQ_MODULE_ID],
         tenant,
       );
       expect(result.data.faqs).toEqual([mockFaqView()]);

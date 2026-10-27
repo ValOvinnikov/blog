@@ -1,10 +1,16 @@
-import type { createRateLimiter as TCreateRateLimiter } from './rate-limiter';
+import { faker } from '@faker-js/faker';
+import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
+
+import { createRateLimiter } from './rate-limiter';
+
+faker.seed(6010);
 
 const { redisCounts, redisConstructor } = vi.hoisted(() => ({
   redisCounts: new Map<string, number>(),
   redisConstructor: vi.fn(),
 }));
 
+vi.mock('@web/utils/env/env');
 vi.mock('@upstash/redis', () => ({
   Redis: class {
     constructor(config: unknown) {
@@ -30,25 +36,27 @@ vi.mock('@upstash/redis', () => ({
   },
 }));
 
-const REDIS_ENV = {
-  KV_REST_API_URL: 'https://redis.example.com',
-  KV_REST_API_TOKEN: 'token',
+const MOCK_REDIS_ENV = {
+  KV_REST_API_URL: faker.internet.url(),
+  KV_REST_API_TOKEN: faker.string.alphanumeric(24),
 };
-
-const CLIENT_A = { tenantKey: 'acme.example.com', clientKey: '203.0.113.5' };
-
-const loadFactory = async (
-  env: Record<string, string>,
-): Promise<typeof TCreateRateLimiter> => {
-  vi.doMock('@web/utils/env/env', () => ({ env }));
-  vi.resetModules();
-  return (await import('./rate-limiter')).createRateLimiter;
+const MOCK_CLIENT = {
+  tenantKey: faker.internet.domainName(),
+  clientKey: faker.internet.ipv4(),
 };
+const MOCK_OTHER_TENANT_KEY = faker.internet.domainName();
+const MOCK_OTHER_CLIENT_KEY = faker.internet.ipv4();
+const MOCK_WINDOW_MS = faker.number.int({ min: 30_000, max: 120_000 });
+const MOCK_LIMITER_NAME = faker.lorem.word();
+const MOCK_STRICT_LIMITER_NAME = `${MOCK_LIMITER_NAME}-strict`;
+const MOCK_LOOSE_LIMITER_NAME = `${MOCK_LIMITER_NAME}-loose`;
+const MOCK_LOOSE_MAX_REQUESTS = faker.number.int({ min: 5, max: 9 });
+const MOCK_MAX_REQUESTS = faker.number.int({ min: 2, max: 4 });
 
 const hitTimes = async (
-  isLimited: (key: typeof CLIENT_A) => Promise<boolean>,
+  isLimited: (key: typeof MOCK_CLIENT) => Promise<boolean>,
   times: number,
-  key = CLIENT_A,
+  key = MOCK_CLIENT,
 ): Promise<boolean[]> => {
   const results: boolean[] = [];
   for (let i = 0; i < times; i += 1) {
@@ -57,12 +65,12 @@ const hitTimes = async (
   return results;
 };
 
-describe('createRateLimiter', () => {
+describe(createRateLimiter, () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
     redisCounts.clear();
     redisConstructor.mockReset();
+    setMockEnv({});
   });
 
   afterEach(() => {
@@ -70,99 +78,113 @@ describe('createRateLimiter', () => {
   });
 
   describe('without Redis configured', () => {
-    let createRateLimiter: typeof TCreateRateLimiter;
-
-    beforeEach(async () => {
-      createRateLimiter = await loadFactory({});
-    });
-
     it('allows the maximum within a window and refuses the next request', async () => {
       const { isLimited } = createRateLimiter({
-        name: 'test',
-        windowMs: 60_000,
-        maxRequests: 3,
+        name: MOCK_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
+        maxRequests: MOCK_MAX_REQUESTS,
       });
 
-      expect(await hitTimes(isLimited, 4)).toEqual([false, false, false, true]);
+      const results = await hitTimes(isLimited, MOCK_MAX_REQUESTS + 1);
+
+      expect(results).toEqual([
+        ...Array.from({ length: MOCK_MAX_REQUESTS }, () => false),
+        true,
+      ]);
       expect(redisConstructor).not.toHaveBeenCalled();
     });
 
     it('allows the client again once the window elapses', async () => {
       const { isLimited } = createRateLimiter({
-        name: 'test',
-        windowMs: 60_000,
+        name: MOCK_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
         maxRequests: 1,
       });
       await hitTimes(isLimited, 2);
 
-      vi.advanceTimersByTime(60_001);
+      vi.advanceTimersByTime(MOCK_WINDOW_MS + 1);
 
-      expect(await isLimited(CLIENT_A)).toBe(false);
+      expect(await isLimited(MOCK_CLIENT)).toBe(false);
     });
 
-    it('counts each client and each tenant separately', async () => {
+    it.each([
+      ['client', { ...MOCK_CLIENT, clientKey: MOCK_OTHER_CLIENT_KEY }],
+      ['tenant', { ...MOCK_CLIENT, tenantKey: MOCK_OTHER_TENANT_KEY }],
+    ])('counts each %s separately', async (_label, otherKey) => {
       const { isLimited } = createRateLimiter({
-        name: 'test',
-        windowMs: 60_000,
+        name: MOCK_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
         maxRequests: 1,
       });
       await hitTimes(isLimited, 2);
 
-      expect(await isLimited({ ...CLIENT_A, clientKey: '203.0.113.9' })).toBe(
-        false,
-      );
-      expect(await isLimited({ ...CLIENT_A, tenantKey: 'other.example' })).toBe(
-        false,
-      );
+      expect(await isLimited(otherKey)).toBe(false);
     });
 
     it('keeps separate counts for limiters with different numbers', async () => {
       const strict = createRateLimiter({
-        name: 'strict',
-        windowMs: 60_000,
+        name: MOCK_STRICT_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
         maxRequests: 1,
       });
       const loose = createRateLimiter({
-        name: 'loose',
-        windowMs: 60_000,
-        maxRequests: 5,
+        name: MOCK_LOOSE_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
+        maxRequests: MOCK_LOOSE_MAX_REQUESTS,
       });
       await hitTimes(strict.isLimited, 2);
 
-      expect(await hitTimes(loose.isLimited, 5)).not.toContain(true);
-      expect(await strict.isLimited(CLIENT_A)).toBe(true);
+      const looseResults = await hitTimes(
+        loose.isLimited,
+        MOCK_LOOSE_MAX_REQUESTS,
+      );
+
+      expect(looseResults).not.toContain(true);
+      expect(await strict.isLimited(MOCK_CLIENT)).toBe(true);
     });
   });
 
   describe('with Redis configured', () => {
+    beforeEach(() => {
+      setMockEnv(MOCK_REDIS_ENV);
+    });
+
     it('shares one allowance between instances of the app', async () => {
-      const options = { name: 'test', windowMs: 60_000, maxRequests: 2 };
-      const firstInstance = (await loadFactory(REDIS_ENV))(options);
-      const secondInstance = (await loadFactory(REDIS_ENV))(options);
+      const options = {
+        name: MOCK_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
+        maxRequests: MOCK_MAX_REQUESTS,
+      };
+      const firstInstance = createRateLimiter(options);
+      const secondInstance = createRateLimiter(options);
 
-      await hitTimes(firstInstance.isLimited, 2);
+      await hitTimes(firstInstance.isLimited, MOCK_MAX_REQUESTS);
 
-      expect(await secondInstance.isLimited(CLIENT_A)).toBe(true);
+      expect(await secondInstance.isLimited(MOCK_CLIENT)).toBe(true);
       expect(redisConstructor).toHaveBeenCalledWith({
-        url: 'https://redis.example.com',
-        token: 'token',
+        url: MOCK_REDIS_ENV.KV_REST_API_URL,
+        token: MOCK_REDIS_ENV.KV_REST_API_TOKEN,
       });
     });
   });
 
-  it('refuses to create a limiter in production without Redis', async () => {
-    const createRateLimiter = await loadFactory({ VERCEL_ENV: 'production' });
+  it('refuses to create a limiter in production without Redis', () => {
+    setMockEnv({ VERCEL_ENV: 'production' });
 
     expect(() =>
-      createRateLimiter({ name: 'test', windowMs: 60_000, maxRequests: 1 }),
+      createRateLimiter({
+        name: MOCK_LIMITER_NAME,
+        windowMs: MOCK_WINDOW_MS,
+        maxRequests: 1,
+      }),
     ).toThrow(/KV_REST_API_URL/);
   });
 
   it('falls back to in-memory counts on a preview deployment', async () => {
-    const createRateLimiter = await loadFactory({ VERCEL_ENV: 'preview' });
+    setMockEnv({ VERCEL_ENV: 'preview' });
     const { isLimited } = createRateLimiter({
-      name: 'test',
-      windowMs: 60_000,
+      name: MOCK_LIMITER_NAME,
+      windowMs: MOCK_WINDOW_MS,
       maxRequests: 1,
     });
 

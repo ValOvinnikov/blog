@@ -1,25 +1,15 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_HERO_STATEMENT_HEADING,
   MOCK_HERO_STATEMENT_MODULE_ID,
+  mockHeroStatementModule,
 } from '@web/testing/modules/hero-statement/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
 const setup = customRender(HeroStatementModuleView, {
   id: MOCK_HERO_STATEMENT_MODULE_ID,
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
-  eyebrow: undefined,
-  headingBlock: mockHeadingBlock({ heading: MOCK_HERO_STATEMENT_HEADING }),
-  sanityImage: undefined,
-  ctaButtons: [],
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
-  layout: undefined,
+  ...mockHeroStatementModule(),
 });
 
 describe(`<${HeroStatementModuleView.name}/>`, () => {
@@ -33,6 +23,7 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
     const region = screen.getByRole('region', {
       name: MOCK_HERO_STATEMENT_HEADING,
     });
+
     expect(heading).toBeVisible();
     expect(region).toBeVisible();
   });
@@ -41,15 +32,15 @@ describe(`<${HeroStatementModuleView.name}/>`, () => {
     setup();
     setup();
 
-    const headingIds = screen
-      .getAllByRole('heading', {
-        level: 1,
-        name: MOCK_HERO_STATEMENT_HEADING,
-      })
-      .map(({ id }) => id);
+    const headings = screen.getAllByRole('heading', {
+      level: 1,
+      name: MOCK_HERO_STATEMENT_HEADING,
+    });
     const regions = screen.getAllByRole('region', {
       name: MOCK_HERO_STATEMENT_HEADING,
     });
+    const headingIds = headings.map(({ id }) => id);
+
     expect(new Set(headingIds).size).toBe(2);
     expect(regions).toHaveLength(2);
   });

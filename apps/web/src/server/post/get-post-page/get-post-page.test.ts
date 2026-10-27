@@ -1,10 +1,16 @@
-import { okResult } from '@blog/utils';
-import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { faker } from '@faker-js/faker';
+import { mockPageLoaderResult } from '@web/testing/server/page-loaders/fixtures';
+import {
+  importWithMemoizingCache,
+  restoreReactCache,
+} from '@web/testing/server/page-loaders/import-with-memoizing-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostPage } from './get-post-page';
 
-const POST_SLUG = 'hello-world';
+faker.seed(6010);
+
+const MOCK_POST_SLUG = faker.lorem.slug();
 
 const { getPostMock } = vi.hoisted(() => ({ getPostMock: vi.fn() }));
 
@@ -15,44 +21,35 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 describe(getPostPage, () => {
-  beforeEach(() => {
-    getPostMock.mockReset();
-  });
+  it('loads the post by slug for the resolved tenant', async () => {
+    getPostMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-  it('forwards the slug and the resolved tenant context to the post service', async () => {
-    getPostMock.mockResolvedValue(okResult());
-
-    await getPostPage(POST_SLUG);
+    await getPostPage(MOCK_POST_SLUG);
 
     expect(getPostMock).toHaveBeenCalledWith(
-      POST_SLUG,
+      MOCK_POST_SLUG,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
 
-  it('returns the raw TResult from getPost unchanged', async () => {
-    const result = okResult({ id: 'post-1' });
-    getPostMock.mockResolvedValue(result);
+  it('returns the service result unchanged', async () => {
+    const result = mockPageLoaderResult();
+    getPostMock.mockResolvedValueOnce(result);
 
-    await expect(getPostPage(POST_SLUG)).resolves.toBe(result);
+    await expect(getPostPage(MOCK_POST_SLUG)).resolves.toBe(result);
   });
 
   describe('memoization', () => {
-    afterEach(() => {
-      vi.doUnmock('react');
-      vi.resetModules();
-    });
+    afterEach(restoreReactCache);
 
-    it('dedupes the post query across one render pass with the same arguments', async () => {
-      getPostMock.mockResolvedValue(okResult());
+    it('queries once per render pass for the same slug', async () => {
+      getPostMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-      vi.doMock('react', withMemoizingReactCache);
-      vi.resetModules();
+      const { getPostPage: memoizedGetPostPage } =
+        await importWithMemoizingCache(() => import('./get-post-page'));
 
-      const { getPostPage: freshGetPostPage } = await import('./get-post-page');
-
-      await freshGetPostPage(POST_SLUG);
-      await freshGetPostPage(POST_SLUG);
+      await memoizedGetPostPage(MOCK_POST_SLUG);
+      await memoizedGetPostPage(MOCK_POST_SLUG);
 
       expect(getPostMock).toHaveBeenCalledTimes(1);
     });

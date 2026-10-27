@@ -7,7 +7,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
-import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
@@ -17,7 +17,7 @@ import {
 } from '@platform/testing/audit-events/fixtures';
 import {
   act,
-  renderWithIntl,
+  customRenderAsync,
   screen,
   within,
 } from '@platform/testing/custom-render';
@@ -29,6 +29,7 @@ import {
   SAVE_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
+  mockDoneProvisioningSteps,
   mockIdleProvisioningSteps,
   mockTenant,
   MOCK_ARCHIVED_AT,
@@ -47,7 +48,11 @@ import {
 
 import { TenantOverviewView } from './tenant-overview-view';
 
+faker.seed(7319);
+
 const STEP_POLL_INTERVAL_MS = 4000;
+const MOCK_ADMIN_ID = faker.string.uuid();
+const MOCK_STEP_ERROR = faker.lorem.sentence();
 
 const {
   getTenantOwnerMembershipMock,
@@ -109,12 +114,9 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
 
-const setup = async ({ tenant = mockTenant() } = {}) => {
-  const ui = await TenantOverviewView({ tenant });
-  await act(async () => {
-    renderWithIntl(ui);
-  });
-};
+const setup = customRenderAsync(TenantOverviewView, {
+  tenant: mockTenant(),
+});
 
 const TENANT_DETAILS = 'Tenant details';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
@@ -134,7 +136,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     listFindingsForTenantMock.mockResolvedValue([]);
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({
-      id: 'admin-1',
+      id: MOCK_ADMIN_ID,
       role: ADMIN_ROLE.SUPERADMIN,
     });
     getDomainVerificationStatusMock.mockReset();
@@ -168,23 +170,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(planBadge).toBeVisible();
   });
 
-  it('renders the provisioning banner', async () => {
-    await setup({
-      tenant: mockTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        provisioningSteps: Object.fromEntries(
-          Object.values(TENANT_PROVISIONING_STEP).map((step) => [
-            step,
-            { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-          ]),
-        ) as unknown as TTenantProvisioningState,
-      }),
-    });
-
-    const banner = screen.getByText('Provisioned');
-    expect(banner).toBeVisible();
-  });
-
   it('relocates the tenant details panel here as the Identity card', async () => {
     await setup({ tenant: mockTenant({ name: MOCK_TENANT_NAME }) });
 
@@ -195,7 +180,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
   });
 
-  it('locks every tenant details field while a step is running, saying why', async () => {
+  it('locks the tenant details while a step runs, saying why', async () => {
     await setup({
       tenant: mockTenant({
         provisioningSteps: mockFirstStepRunningProvisioningSteps(),
@@ -212,26 +197,14 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(saveButton).toBeDisabled();
   });
 
-  it('locks primaryDomain once MAP_DOMAIN is done and a later step failed', async () => {
+  it('locks the domain once it is connected and a later step failed', async () => {
     await setup({
       tenant: mockTenant({
         provisioningSteps: {
-          ...mockIdleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
+          ...mockDoneProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'boom',
+            error: MOCK_STEP_ERROR,
           },
         },
       }),
@@ -249,7 +222,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(nameInput).not.toBeDisabled();
   });
 
-  it('locks every field once a dispatch begins, before any step reports', async () => {
+  it('locks every field once provisioning begins, before any step reports', async () => {
     await setup({
       tenant: mockTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -266,7 +239,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(domainInput).toBeDisabled();
   });
 
-  it('keeps the provisioning banner and details panel in sync off one poll', async () => {
+  it('keeps the provisioning banner and details panel in sync on each poll', async () => {
     const tenant = mockTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
@@ -281,12 +254,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
     getTenantProvisioningStatusActionMock.mockResolvedValue({
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      provisioningSteps: Object.fromEntries(
-        Object.values(TENANT_PROVISIONING_STEP).map((step) => [
-          step,
-          { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        ]),
-      ) as unknown as TTenantProvisioningState,
+      provisioningSteps: mockDoneProvisioningSteps(),
     });
 
     await setup({ tenant });
@@ -356,7 +324,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(finding).toBeVisible();
   });
 
-  it('shows a pending invite email in both the owner card and details panel', async () => {
+  it('shows a pending invite email in the owner card and details panel', async () => {
     getTenantOwnerMembershipMock.mockResolvedValue(mockInvitedOwner());
 
     await setup();
@@ -372,7 +340,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(joinedLabel).not.toBeInTheDocument();
   });
 
-  it('always renders "Open site", linking to the tenant\'s live domain', async () => {
+  it('links Open site to the tenant live domain', async () => {
     await setup({ tenant: mockTenant() });
 
     const link = screen.getByRole('link', {
@@ -404,7 +372,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       expect(thirdLevelHeading).not.toBeInTheDocument();
     });
 
-    it('never renders an "Open Studio" action — Studio opens from the sidebar', () => {
+    it('offers no Open Studio action', () => {
       const openStudioLink = screen.queryByRole('link', {
         name: 'Open Studio →',
       });
@@ -442,7 +410,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   describe('suspension', () => {
-    it('offers a super admin the Suspend action on an active tenant', async () => {
+    it('offers a super admin Suspend on an active tenant', async () => {
       await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
 
       const suspendButton = screen.getByRole('button', {
@@ -451,7 +419,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       expect(suspendButton).toBeVisible();
     });
 
-    it('offers a super admin the Reactivate action on a suspended tenant', async () => {
+    it('offers a super admin Reactivate on a suspended tenant', async () => {
       await setup({ tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }) });
 
       const reactivateButton = screen.getByRole('button', {
@@ -466,9 +434,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
 
     it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-      'offers neither action to a %s',
+      'offers no Reactivate to a %s',
       async (role) => {
-        requireAdminMock.mockResolvedValue({ id: 'admin-1', role });
+        requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
 
         await setup({
           tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }),

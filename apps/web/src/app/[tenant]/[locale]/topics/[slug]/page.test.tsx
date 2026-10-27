@@ -1,10 +1,18 @@
-import {
-  CONTENT_ROUTE_REVALIDATE_SECONDS,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
+import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { buildTopicMetadata } from '@web/metadata/topic-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
+import { mockRouteParams } from '@web/testing/app/route-params';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import TopicDetailPage, { generateMetadata, revalidate } from './page';
+
+faker.seed(6009);
+
+const MOCK_SLUG = faker.lorem.slug();
+const MOCK_METADATA = { title: faker.lorem.words(2) };
+
+const params = mockRouteParams({ slug: MOCK_SLUG });
 
 vi.mock('@web/server/request-context/request-context');
 
@@ -15,62 +23,46 @@ vi.mock('@web/components/pages/topic-page', () => ({
 }));
 
 vi.mock('@web/metadata/topic-metadata', () => ({
-  buildTopicMetadata: vi.fn().mockResolvedValue({ title: 'Engineering' }),
+  buildTopicMetadata: vi.fn(),
 }));
 
-describe('TopicDetailPage', () => {
+const setup = customRenderAsync(TopicDetailPage, { params });
+
+describe(`<${TopicDetailPage.name}/>`, () => {
+  beforeEach(async () => {
+    await setup();
+  });
+
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  it('enters the request context with the route params', async () => {
-    const params = Promise.resolve({
-      tenant: 'tenant-1',
-      locale: LOCALE_ISO_CODES.EN,
-      slug: 'a-slug',
-    });
-
-    await TopicDetailPage({ params });
-
+  it('enters the request context with the route params', () => {
     expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 
-  describe('generateMetadata', () => {
-    it('delegates to buildTopicMetadata with the resolved slug', async () => {
-      const metadata = await generateMetadata({
-        params: Promise.resolve({
-          tenant: 'tenant-1',
-          locale: 'EN',
-          slug: 'engineering',
-        }),
-      });
+  it('renders TopicPage with the resolved slug', () => {
+    const topicPage = screen.getByTestId('topic-page');
 
-      expect(metadata).toEqual({ title: 'Engineering' });
-    });
+    expect(topicPage).toHaveTextContent(MOCK_SLUG);
+  });
+});
 
-    it('enters the request context with the route params', async () => {
-      const params: Parameters<typeof generateMetadata>[0]['params'] =
-        Promise.resolve({
-          tenant: 'tenant-1',
-          locale: 'EN',
-          slug: 'engineering',
-        });
-
-      await generateMetadata({ params });
-
-      expect(enterRequestContext).toHaveBeenCalledWith(params);
-    });
+describe(generateMetadata, () => {
+  beforeEach(() => {
+    vi.mocked(buildTopicMetadata).mockResolvedValue(MOCK_METADATA);
   });
 
-  it('renders TopicPage with the resolved slug', async () => {
-    const ui = await TopicDetailPage({
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: 'EN',
-        slug: 'engineering',
-      }),
-    });
+  it('returns the topic metadata built for the resolved slug', async () => {
+    const metadata = await generateMetadata({ params });
 
-    expect(ui.props.slug).toBe('engineering');
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildTopicMetadata).toHaveBeenCalledWith(MOCK_SLUG);
+  });
+
+  it('enters the request context before building the metadata', async () => {
+    await generateMetadata({ params });
+
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 });

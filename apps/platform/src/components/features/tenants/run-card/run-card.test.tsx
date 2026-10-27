@@ -1,4 +1,5 @@
 import type { TProvisioningRun } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
   MOCK_RUN_PLUS_4_MIN_AT,
@@ -8,7 +9,10 @@ import {
 
 import { RunCard } from './run-card';
 
-const WORKFLOW_RUN_URL = 'https://github.com/example/actions/runs/1';
+faker.seed(5994);
+
+const MOCK_WORKFLOW_RUN_URL = faker.internet.url();
+const MOCK_REGISTRY = faker.lorem.word();
 
 const setup = customRender(RunCard, {
   run: { startedAt: MOCK_RUN_STARTED_AT } as TProvisioningRun,
@@ -23,21 +27,20 @@ describe(`<${RunCard.name}/>`, () => {
     vi.useRealTimers();
   });
 
-  it('renders the started and finished times as relative and absolute UTC together when the run has finished', () => {
+  it('shows relative and absolute UTC times for a finished run', () => {
     vi.setSystemTime(new Date(MOCK_RUN_PLUS_6_MIN_AT));
 
     setup({
       run: {
         startedAt: MOCK_RUN_STARTED_AT,
         finishedAt: MOCK_RUN_PLUS_4_MIN_AT,
-        registry: 'production',
-        workflowRunUrl: WORKFLOW_RUN_URL,
+        registry: MOCK_REGISTRY,
       } as TProvisioningRun,
     });
 
     const started = screen.getByText('6m ago · Aug 12, 2026, 2:18 PM UTC');
     const finished = screen.getByText('2m ago · Aug 12, 2026, 2:22 PM UTC');
-    const registry = screen.getByText('production');
+    const registry = screen.getByText(MOCK_REGISTRY);
 
     expect(started.tagName).toBe('TIME');
     expect(started).toHaveAttribute('dateTime', MOCK_RUN_STARTED_AT);
@@ -46,7 +49,7 @@ describe(`<${RunCard.name}/>`, () => {
     expect(registry).toBeVisible();
   });
 
-  it('shows a waiting-to-start placeholder for Started when the run has been admitted but has not yet begun, with no <time> element', () => {
+  it('shows a waiting placeholder for a run admitted but not yet started', () => {
     setup({
       run: {
         admittedAt: MOCK_RUN_STARTED_AT,
@@ -54,29 +57,21 @@ describe(`<${RunCard.name}/>`, () => {
     });
 
     const placeholder = screen.getByText('Waiting for the run to start…');
+
     expect(placeholder).toBeVisible();
     expect(placeholder.tagName).not.toBe('TIME');
   });
 
-  describe('with a run still in flight', () => {
-    beforeEach(() => {
-      setup();
-    });
+  it('shows a dash placeholder for Finished while the run is in flight', () => {
+    setup();
 
-    it('shows an em-dash placeholder for Finished while the run is still in flight, with no <time> element', () => {
-      const placeholder = screen.getByText('—');
-      expect(placeholder).toBeVisible();
-      expect(placeholder.tagName).not.toBe('TIME');
-    });
+    const placeholder = screen.getByText('—');
 
-    it('nests the card title one level under the page heading', () => {
-      const heading = screen.getByRole('heading', { level: 2, name: 'Run' });
-
-      expect(heading).toBeVisible();
-    });
+    expect(placeholder).toBeVisible();
+    expect(placeholder.tagName).not.toBe('TIME');
   });
 
-  it('renders no workflow log link when the run has no workflowRunUrl', () => {
+  it('offers no workflow log link when the run has none', () => {
     setup({
       run: {
         startedAt: MOCK_RUN_STARTED_AT,
@@ -89,21 +84,30 @@ describe(`<${RunCard.name}/>`, () => {
     expect(workflowLink).not.toBeInTheDocument();
   });
 
-  it('links out to the workflow run when workflowRunUrl is present', () => {
+  it('links out to the workflow run in a new tab', () => {
     setup({
       run: {
         startedAt: MOCK_RUN_STARTED_AT,
-        workflowRunUrl: WORKFLOW_RUN_URL,
+        workflowRunUrl: MOCK_WORKFLOW_RUN_URL,
       } as TProvisioningRun,
     });
 
     const link = screen.getByRole('link', { name: /workflow log/i });
-    expect(link).toHaveAttribute('href', WORKFLOW_RUN_URL);
+
+    expect(link).toHaveAttribute('href', MOCK_WORKFLOW_RUN_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('takes the heading level it is given', () => {
+  it('titles the card with a level-2 heading by default', () => {
+    setup();
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Run' });
+
+    expect(heading).toBeVisible();
+  });
+
+  it('titles the card at the heading level it is given', () => {
     setup({ headingLevel: 3 });
 
     const heading = screen.getByRole('heading', { level: 3, name: 'Run' });

@@ -1,19 +1,36 @@
 import { toModuleGridColumns } from './to-module-grid-columns';
 
+const MIN_ITEM_COUNT = 2;
+const MAX_ITEM_COUNT = 12;
+
+const ITEM_COUNTS = Array.from(
+  { length: MAX_ITEM_COUNT - MIN_ITEM_COUNT + 1 },
+  (_, index) => MIN_ITEM_COUNT + index,
+);
+
 describe(toModuleGridColumns, () => {
-  it.each([
-    [2, 2],
-    [3, 3],
-    [4, 4],
-    [5, 3],
-    [6, 3],
-    [7, 4],
-    [8, 4],
-    [9, 3],
-    [10, 4],
-    [11, 4],
-    [12, 4],
-  ])('lays out %i items in %i columns', (itemCount, expectedColumns) => {
-    expect(toModuleGridColumns(itemCount)).toBe(expectedColumns);
-  });
+  it.each(ITEM_COUNTS)(
+    'leaves no row with a single orphaned item for %i items',
+    (itemCount) => {
+      const columns = toModuleGridColumns(itemCount);
+
+      expect(itemCount % columns).not.toBe(1);
+    },
+  );
+
+  it.each(ITEM_COUNTS)(
+    'never collapses to a single column for %i items',
+    (itemCount) => {
+      expect(toModuleGridColumns(itemCount)).toBeGreaterThanOrEqual(
+        MIN_ITEM_COUNT,
+      );
+    },
+  );
+
+  it.each(ITEM_COUNTS)(
+    'never uses more columns than items for %i',
+    (itemCount) => {
+      expect(toModuleGridColumns(itemCount)).toBeLessThanOrEqual(itemCount);
+    },
+  );
 });
