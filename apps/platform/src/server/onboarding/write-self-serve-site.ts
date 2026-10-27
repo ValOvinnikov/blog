@@ -7,6 +7,7 @@ import { errorResult, okResult, type TResult } from '@blog/utils';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { ONBOARDING_LOG } from '@platform/constants/onboarding';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 import type { TCreateSiteResult } from './create-site-input';
@@ -34,9 +35,15 @@ export const writeSelfServeSite = async (
     const refusal = RESULT_BY_ERROR_CODE[result.error];
     if (refusal) return errorResult(refusal);
 
-    logger.error(ONBOARDING_LOG.CREATE_FAILED, { domain, error: result.error });
+    logger.error(ONBOARDING_LOG.CREATE_FAILED, {
+      domain,
+      errorCode: result.error,
+    });
   } catch (error) {
-    logger.error(ONBOARDING_LOG.CREATE_FAILED, { domain, error });
+    logger.error(ONBOARDING_LOG.CREATE_FAILED, {
+      domain,
+      ...toLoggableError(error),
+    });
   }
 
   return errorResult(toOutcome(ACTION_OUTCOME.SERVER_ERROR));

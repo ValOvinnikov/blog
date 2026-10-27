@@ -17,12 +17,18 @@ import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { admitCreateSite } from '@platform/server/create-site-gate/admit-create-site';
 import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
+import { UNKNOWN_CLIENT_KEY } from '@platform/server/rate-limit/resolve-client-key';
 import { checkTenantSlug } from '@platform/server/tenants/check-tenant-slug';
 import {
   MOCK_SIGN_IN_EMAIL,
   MOCK_SIGN_IN_USER_ID,
 } from '@platform/testing/auth/fixtures';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
+import {
+  MOCK_POSTGRES_ERROR_CODE,
+  MOCK_QUERY_ERROR_NAME,
+  mockQueryError,
+} from '@platform/testing/loggable-error/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_ID,
@@ -90,6 +96,7 @@ const startProvisioningMock = vi.mocked(startProvisioning);
 const loggerErrorMock = vi.mocked(logger.error);
 
 const MOCK_SLUG = 'my-site';
+const MOCK_DOMAIN = `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
 const MOCK_ACCENT_HUE = 120;
 const MOCK_INPUT: TCreateSiteInput = {
   siteType: SITE_TYPE.PORTFOLIO,
@@ -131,7 +138,7 @@ describe(createSiteAction, () => {
 
     expect(createSelfServeTenantMock).toHaveBeenCalledWith({
       name: MOCK_TENANT_NAME,
-      domain: `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`,
+      domain: MOCK_DOMAIN,
       locale: LOCALE_ISO_CODES.NL,
       siteType: SITE_TYPE.PORTFOLIO,
       preset: PRESET_ID.EDITORIAL,
@@ -217,52 +224,89 @@ describe(createSiteAction, () => {
       reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,
     });
     expect(admitCreateSiteMock).toHaveBeenCalledWith({
-      clientKey: expect.any(String),
+      clientKey: UNKNOWN_CLIENT_KEY,
       email: MOCK_SIGN_IN_EMAIL,
     });
     expect(recordTermsAcceptanceMock).not.toHaveBeenCalled();
     expect(createSelfServeTenantMock).not.toHaveBeenCalled();
   });
 
-  it('reports a concurrent submit of the same address on its field', async () => {
-    createSelfServeTenantMock.mockResolvedValue(
-      errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN),
-    );
+  it.each([
+    [
+      'an address taken by a concurrent submit',
+      ERROR_CODE.DB_DUPLICATE_DOMAIN,
+      {
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
+      },
+    ],
+    [
+      'a second free site',
+      ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT,
+      {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,
+      },
+    ],
+  ])('answers %s the database turned away', async (_, errorCode, expected) => {
+    createSelfServeTenantMock.mockResolvedValue(errorResult(errorCode));
 
     const result = await createSiteAction(MOCK_INPUT);
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
-    });
+    expect(result).toEqual(expected);
     expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
-  it('refuses a second free site the database turned away', async () => {
-    createSelfServeTenantMock.mockResolvedValue(
-      errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT),
+  it.each([
+    [
+      'fails',
+      () =>
+        createSelfServeTenantMock.mockResolvedValue(
+          errorResult(ERROR_CODE.DB_INVALID_EMAIL),
+        ),
+      { domain: MOCK_DOMAIN, errorCode: ERROR_CODE.DB_INVALID_EMAIL },
+    ],
+    [
+      'throws',
+      () =>
+        createSelfServeTenantMock.mockRejectedValue(
+          mockQueryError(MOCK_SIGN_IN_EMAIL),
+        ),
+      {
+        domain: MOCK_DOMAIN,
+        errorName: MOCK_QUERY_ERROR_NAME,
+        errorCode: MOCK_POSTGRES_ERROR_CODE,
+      },
+    ],
+  ])(
+    'reports a write that %s and logs only its name and code',
+    async (_, failWrite, logged) => {
+      failWrite();
+
+      const result = await createSiteAction(MOCK_INPUT);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
+        ONBOARDING_LOG.CREATE_FAILED,
+        logged,
+      );
+      expect(startProvisioningMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reports a failed free-site lookup and logs only its code', async () => {
+    ownsFreeTenantMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_INVALID_EMAIL),
     );
-
-    const result = await createSiteAction(MOCK_INPUT);
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.OWNER_HAS_FREE_TENANT,
-    });
-  });
-
-  it('logs and reports a failed write', async () => {
-    const error = new Error('connection lost');
-    createSelfServeTenantMock.mockRejectedValue(error);
 
     const result = await createSiteAction(MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(loggerErrorMock).toHaveBeenCalledWith(ONBOARDING_LOG.CREATE_FAILED, {
-      domain: `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`,
-      error,
-    });
-    expect(startProvisioningMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
+      ONBOARDING_LOG.OWNS_FREE_TENANT_CHECK_FAILED,
+      { errorCode: ERROR_CODE.DB_INVALID_EMAIL },
+    );
+    expect(admitCreateSiteMock).not.toHaveBeenCalled();
   });
 
   it('logs and reports a missing root domain', async () => {

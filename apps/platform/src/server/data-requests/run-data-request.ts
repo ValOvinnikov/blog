@@ -14,6 +14,7 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import { DATA_REQUEST_LOG } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -45,10 +46,6 @@ type TDataRequestStep<TData extends { emailIndex: string }> = {
   auditDetails: (data: TData) => Record<string, number>;
 };
 
-// A failed query's message lists its bound parameters, the email among them, so only its name is logged.
-const errorName = (error: unknown): string =>
-  error instanceof Error ? error.name : typeof error;
-
 export const runDataRequest = async <TData extends { emailIndex: string }>(
   input: TDataRequestInput,
   { run, action, auditDetails }: TDataRequestStep<TData>,
@@ -78,7 +75,7 @@ export const runDataRequest = async <TData extends { emailIndex: string }>(
   } catch (error) {
     logger.error(DATA_REQUEST_LOG.FAILED, {
       action,
-      errorName: errorName(error),
+      ...toLoggableError(error),
     });
   }
 
