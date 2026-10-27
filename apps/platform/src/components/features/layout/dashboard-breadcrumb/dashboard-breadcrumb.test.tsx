@@ -17,9 +17,13 @@ describe(`<${DashboardBreadcrumb.name}/>`, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText(DASHBOARD_LABEL)).toBeVisible();
-    expect(screen.queryByRole('link', { name: DASHBOARD_LABEL })).toBeNull();
-    expect(screen.queryByText('Overview')).not.toBeInTheDocument();
+    const dashboardItem = screen.getByText(DASHBOARD_LABEL);
+    const dashboardLink = screen.queryByRole('link', { name: DASHBOARD_LABEL });
+    const overviewItem = screen.queryByText('Overview');
+
+    expect(dashboardItem).toBeVisible();
+    expect(dashboardLink).not.toBeInTheDocument();
+    expect(overviewItem).not.toBeInTheDocument();
   });
 
   it('links Dashboard back home and shows Look as current on the look route', () => {
@@ -27,11 +31,11 @@ describe(`<${DashboardBreadcrumb.name}/>`, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByRole('link', { name: DASHBOARD_LABEL })).toHaveAttribute(
-      'href',
-      adminRoutes.dashboard(),
-    );
-    expect(screen.getByText('Look')).toBeVisible();
+    const dashboardLink = screen.getByRole('link', { name: DASHBOARD_LABEL });
+    const lookItem = screen.getByText('Look');
+
+    expect(dashboardLink).toHaveAttribute('href', adminRoutes.dashboard());
+    expect(lookItem).toBeVisible();
   });
 
   it('shows Features as current on the features route', () => {
@@ -39,7 +43,9 @@ describe(`<${DashboardBreadcrumb.name}/>`, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText(FEATURES_LABEL)).toBeVisible();
+    const featuresItem = screen.getByText(FEATURES_LABEL);
+
+    expect(featuresItem).toBeVisible();
   });
 
   it.each([
@@ -54,8 +60,11 @@ describe(`<${DashboardBreadcrumb.name}/>`, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText(label)).toBeVisible();
-    expect(screen.queryByText(FEATURES_LABEL)).not.toBeInTheDocument();
+    const leafItem = screen.getByText(label);
+    const featuresItem = screen.queryByText(FEATURES_LABEL);
+
+    expect(leafItem).toBeVisible();
+    expect(featuresItem).not.toBeInTheDocument();
   });
 
   it('shows no leaf on a route the nav does not list', () => {
@@ -63,7 +72,10 @@ describe(`<${DashboardBreadcrumb.name}/>`, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText(DASHBOARD_LABEL)).toBeVisible();
-    expect(screen.queryByText(FEATURES_LABEL)).not.toBeInTheDocument();
+    const dashboardItem = screen.getByText(DASHBOARD_LABEL);
+    const featuresItem = screen.queryByText(FEATURES_LABEL);
+
+    expect(dashboardItem).toBeVisible();
+    expect(featuresItem).not.toBeInTheDocument();
   });
 });
