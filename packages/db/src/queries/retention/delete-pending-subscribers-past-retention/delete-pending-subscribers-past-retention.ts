@@ -6,8 +6,7 @@ import {
 import { isInBatch } from '@blog/db/queries/retention/retention-batch';
 import { daysBefore } from '@blog/db/queries/retention/retention-cutoff';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { hasSubscriberStatus } from '@blog/db/utils/subscriber-status/subscriber-status';
-import { and, isNull, lt, or } from 'drizzle-orm';
+import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
 export async function deletePendingSubscribersPastRetention(
   now: Date,
@@ -20,7 +19,7 @@ export async function deletePendingSubscribersPastRetention(
     .from(subscribers)
     .where(
       and(
-        hasSubscriberStatus(SUBSCRIBER_STATUS.PENDING),
+        eq(subscribers.status, SUBSCRIBER_STATUS.PENDING),
         or(
           lt(subscribers.confirmationSentAt, cutoff),
           and(
