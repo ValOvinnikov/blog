@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Administration",
     "tenants": "Locataires · Administration",
-    "ownerHome": "Votre site · Administration",
+    "ownerHome": "Tableau de bord · Administration",
     "look": "Apparence · Administration",
     "voice": "Voix · Administration",
     "selectTenant": "Choisir un espace de travail · Administration",
@@ -174,7 +174,7 @@
     "READER": "Lecteur"
   },
   "navSections": {
-    "yourSiteLabel": "Votre site",
+    "dashboardLabel": "Tableau de bord",
     "platformLabel": "Plateforme",
     "platformSectionLabel": "Actions de la plateforme",
     "contentSectionLabel": "Contenu",
@@ -311,12 +311,10 @@
   "ownerHomePage": {
     "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",
     "yourSiteCardTitle": "Votre site",
-    "readOnlyBadge": "lecture seule",
     "nameLabel": "Nom",
     "publicDomainLabel": "Domaine public",
     "planLabel": "Formule",
     "localeLabel": "Langue",
-    "openPublicDomainAriaLabel": "Ouvrir {domain} dans un nouvel onglet",
     "readOnlyHint": "Besoin de modifier l'une de ces valeurs ? Contactez votre interlocuteur sur la plateforme — elles sont liées à l'hébergement de votre site.",
     "makeItYoursCardTitle": "Personnalisez-le",
     "makeItYoursSupportingText": "les modifications sont appliquées immédiatement",

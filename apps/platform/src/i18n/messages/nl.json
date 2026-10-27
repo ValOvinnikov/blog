@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Tenants · Admin",
-    "ownerHome": "Uw site · Admin",
+    "ownerHome": "Dashboard · Admin",
     "look": "Uiterlijk · Admin",
     "voice": "Toon · Admin",
     "selectTenant": "Kies een werkruimte · Admin",
@@ -174,7 +174,7 @@
     "READER": "Lezer"
   },
   "navSections": {
-    "yourSiteLabel": "Uw site",
+    "dashboardLabel": "Dashboard",
     "platformLabel": "Platform",
     "platformSectionLabel": "Platformacties",
     "contentSectionLabel": "Content",
@@ -311,12 +311,10 @@
   "ownerHomePage": {
     "description": "Uw site in één oogopslag. Alles hier is live.",
     "yourSiteCardTitle": "Uw site",
-    "readOnlyBadge": "alleen-lezen",
     "nameLabel": "Naam",
     "publicDomainLabel": "Openbaar domein",
     "planLabel": "Abonnement",
     "localeLabel": "Taal",
-    "openPublicDomainAriaLabel": "{domain} openen in een nieuw tabblad",
     "readOnlyHint": "Moet een van deze waarden worden gewijzigd? Vraag het uw contactpersoon bij het platform — deze waarden zijn gekoppeld aan de hosting van uw site.",
     "makeItYoursCardTitle": "Maak het eigen",
     "makeItYoursSupportingText": "wijzigingen zijn direct live",

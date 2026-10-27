@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Mandanten · Admin",
-    "ownerHome": "Ihre Website · Admin",
+    "ownerHome": "Dashboard · Admin",
     "look": "Erscheinungsbild · Admin",
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
@@ -174,7 +174,7 @@
     "READER": "Leser"
   },
   "navSections": {
-    "yourSiteLabel": "Ihre Website",
+    "dashboardLabel": "Dashboard",
     "platformLabel": "Plattform",
     "platformSectionLabel": "Plattformaktionen",
     "contentSectionLabel": "Inhalte",
@@ -311,12 +311,10 @@
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",
     "yourSiteCardTitle": "Ihre Website",
-    "readOnlyBadge": "schreibgeschützt",
     "nameLabel": "Name",
     "publicDomainLabel": "Öffentliche Domain",
     "planLabel": "Tarif",
     "localeLabel": "Sprache",
-    "openPublicDomainAriaLabel": "{domain} in neuem Tab öffnen",
     "readOnlyHint": "Soll einer dieser Werte geändert werden? Wenden Sie sich an Ihren Plattform-Ansprechpartner — diese Werte sind fest im Hosting Ihrer Website hinterlegt.",
     "makeItYoursCardTitle": "Passen Sie sie an",
     "makeItYoursSupportingText": "Änderungen sind sofort live",

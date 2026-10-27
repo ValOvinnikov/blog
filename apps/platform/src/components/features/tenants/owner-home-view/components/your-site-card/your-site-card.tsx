@@ -1,11 +1,8 @@
-import { SIZE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
-import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
-import { tenantSiteUrl } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 import { yourSiteCardVariants } from './your-site-card-variants';
@@ -14,46 +11,19 @@ export type TYourSiteCardProps = {
   tenant: TTenant;
 };
 
-/**
- * The owner's read-only counterpart to the platform tenant details panel —
- * values, never disabled form inputs. Whatever needs changing here goes
- * through the platform contact instead.
- */
 export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
   const t = useTranslations('ownerHomePage');
   const tTenantsTable = useTranslations('tenantsTable');
   const tLanguage = useTranslations('languageNames');
   const { hint } = yourSiteCardVariants();
-  const openDomainLabel = t('openPublicDomainAriaLabel', {
-    domain: tenant.primaryDomain,
-  });
 
   return (
     <Card>
-      <Card.Header
-        title={t('yourSiteCardTitle')}
-        actions={
-          <StatusBadge tone="neutral" hasDot={false}>
-            {t('readOnlyBadge')}
-          </StatusBadge>
-        }
-      />
+      <Card.Header title={t('yourSiteCardTitle')} />
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('nameLabel')}>{tenant.name}</DetailList.Row>
-          <DetailList.Row
-            label={t('publicDomainLabel')}
-            isMono={true}
-            action={
-              <ExternalLinkButton
-                href={tenantSiteUrl(tenant.primaryDomain)}
-                variant="ghost"
-                size={SIZE.SM}
-                ariaLabel={openDomainLabel}
-                title={openDomainLabel}
-              />
-            }
-          >
+          <DetailList.Row label={t('publicDomainLabel')} isMono={true}>
             {tenant.primaryDomain}
           </DetailList.Row>
           <DetailList.Row label={t('planLabel')}>

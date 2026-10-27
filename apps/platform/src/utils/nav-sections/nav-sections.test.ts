@@ -2,7 +2,10 @@ import { ADMIN_ROLE } from '@blog/db/constants';
 import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
@@ -14,7 +17,6 @@ import {
 
 const t = makeEnTranslator('navSections');
 
-const TENANT_NAME = 'Acme Co';
 const BLOCKED_SIGNUPS_LABEL = 'Blocked sign-ups';
 const DATA_REQUESTS_LABEL = 'Data requests';
 const COMING_SOON_LABEL = 'Coming soon';
@@ -87,9 +89,9 @@ describe('operatorNavSections', () => {
 
 describe('tenantNavSections', () => {
   it("labels the main section with the tenant's name, not its id", () => {
-    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
+    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
 
-    expect(tenant!.label).toBe('Tenant · Acme Co');
+    expect(tenant!.label).toBe(`Tenant · ${MOCK_TENANT_NAME}`);
     expect(tenant!.label).not.toContain(MOCK_TENANT_ID);
   });
 
@@ -97,7 +99,7 @@ describe('tenantNavSections', () => {
     const [tenant, content, configuration, platform] = tenantNavSections(
       t,
       MOCK_TENANT_ID,
-      TENANT_NAME,
+      MOCK_TENANT_NAME,
     );
     const labels = [
       tenant!.label,
@@ -112,7 +114,7 @@ describe('tenantNavSections', () => {
   });
 
   it('gives Overview a real href as the only item in the main section', () => {
-    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
+    const [tenant] = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
 
     expect(tenant!.items.map((item) => item.label)).toEqual(['Overview']);
     expect(tenant!.items[0]).toMatchObject({
@@ -122,7 +124,7 @@ describe('tenantNavSections', () => {
   });
 
   it('puts Studio alone in the Content section, with a real href and no badge', () => {
-    const [, content] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
+    const [, content] = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
 
     expect(content!.items.map((item) => item.label)).toEqual(['Studio']);
     expect(content!.items[0]).toMatchObject({
@@ -135,7 +137,7 @@ describe('tenantNavSections', () => {
     const [, , configuration] = tenantNavSections(
       t,
       MOCK_TENANT_ID,
-      TENANT_NAME,
+      MOCK_TENANT_NAME,
     );
     const look = configuration!.items.find((item) => item.label === 'Look');
     const voice = configuration!.items.find((item) => item.label === 'Voice');
@@ -168,7 +170,7 @@ describe('tenantNavSections', () => {
     const [, , configuration] = tenantNavSections(
       t,
       MOCK_TENANT_ID,
-      TENANT_NAME,
+      MOCK_TENANT_NAME,
     );
     const shipped = configuration!.items.filter((item) =>
       shippedLabels.includes(item.label),
@@ -184,7 +186,7 @@ describe('tenantNavSections', () => {
     const [, , configuration] = tenantNavSections(
       t,
       MOCK_TENANT_ID,
-      TENANT_NAME,
+      MOCK_TENANT_NAME,
     );
     const comingSoon = configuration!.items.filter(
       (item) => item.badge?.label === COMING_SOON_LABEL,
@@ -201,9 +203,11 @@ describe('tenantNavSections', () => {
   });
 
   it('carries no "this milestone" or "later" badge on any entry', () => {
-    const labels = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME).flatMap(
-      (section) => section.items.map((item) => item.badge?.label),
-    );
+    const labels = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      MOCK_TENANT_NAME,
+    ).flatMap((section) => section.items.map((item) => item.badge?.label));
 
     expect(labels).not.toContain('this milestone');
     expect(labels).not.toContain('later');
@@ -213,7 +217,7 @@ describe('tenantNavSections', () => {
     const [, , configuration] = tenantNavSections(
       t,
       MOCK_TENANT_ID,
-      TENANT_NAME,
+      MOCK_TENANT_NAME,
     );
 
     expect(configuration!.items.map((item) => item.label)).toEqual([
@@ -231,7 +235,11 @@ describe('tenantNavSections', () => {
   });
 
   it('gives Provisioning and Danger zone real hrefs in the platform-only section, each badged "platform"', () => {
-    const [, , , platform] = tenantNavSections(t, MOCK_TENANT_ID, TENANT_NAME);
+    const [, , , platform] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      MOCK_TENANT_NAME,
+    );
 
     expect(platform!.items.map((item) => item.label)).toEqual([
       PROVISIONING_LABEL,
@@ -282,16 +290,14 @@ describe('dashboardNavSections', () => {
     expect(content!.items[0]?.badge?.label).toBe('Action needed');
   });
 
-  it('opens with a "Your site" section whose only item is Overview, linking to /dashboard', () => {
-    const [yourSite] = dashboardNavSections(t, EVERY_PAGE);
+  it('opens with a Dashboard section whose only item is Overview, at /dashboard', () => {
+    const [dashboard] = dashboardNavSections(t, EVERY_PAGE);
+    const [overview, ...rest] = dashboard!.items;
 
-    expect(yourSite!.label).toBe('Your site');
-    expect(yourSite!.items).toEqual([
-      expect.objectContaining({
-        label: 'Overview',
-        href: adminRoutes.dashboard(),
-      }),
-    ]);
+    expect(dashboard!.label).toBe('Dashboard');
+    expect(overview!.label).toBe('Overview');
+    expect(overview!.href).toBe(adminRoutes.dashboard());
+    expect(rest).toEqual([]);
   });
 
   it('lists Content (Studio) and Configuration, with every page the plan can use', () => {
@@ -388,7 +394,7 @@ describe('nav section icons', () => {
   it('has a registered glyph for every icon a nav item references', () => {
     const items = [
       ...operatorNavSections(t, ADMIN_ROLE.SUPERADMIN),
-      ...tenantNavSections(t, MOCK_TENANT_ID, 'Acme'),
+      ...tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME),
       ...dashboardNavSections(t, EVERY_PAGE),
     ].flatMap((section) => section.items);
 

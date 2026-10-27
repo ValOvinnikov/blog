@@ -1,5 +1,6 @@
 import { usePathname } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { DashboardBreadcrumb } from './dashboard-breadcrumb';
 
@@ -7,46 +8,48 @@ vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
-describe(DashboardBreadcrumb, () => {
-  it('renders the single, non-clickable "Your site" item on the dashboard home route', () => {
-    vi.mocked(usePathname).mockReturnValue('/dashboard');
+const DASHBOARD_LABEL = 'Dashboard';
+const FEATURES_LABEL = 'Features';
+
+describe(`<${DashboardBreadcrumb.name}/>`, () => {
+  it('renders the single, non-clickable Dashboard item on the dashboard home route', () => {
+    vi.mocked(usePathname).mockReturnValue(adminRoutes.dashboard());
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText('Your site')).toBeVisible();
-    expect(screen.queryByRole('link', { name: 'Your site' })).toBeNull();
-    expect(screen.queryByText('Overview')).not.toBeInTheDocument();
+    const dashboardItem = screen.getByText(DASHBOARD_LABEL);
+    const dashboardLink = screen.queryByRole('link', { name: DASHBOARD_LABEL });
+    const overviewItem = screen.queryByText('Overview');
+
+    expect(dashboardItem).toBeVisible();
+    expect(dashboardLink).not.toBeInTheDocument();
+    expect(overviewItem).not.toBeInTheDocument();
   });
 
-  it('links "Your site" back to /dashboard and shows Look as current on the look route', () => {
-    vi.mocked(usePathname).mockReturnValue('/dashboard/look');
+  it('links Dashboard back home and shows Look as current on the look route', () => {
+    vi.mocked(usePathname).mockReturnValue(adminRoutes.dashboardLook());
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByRole('link', { name: 'Your site' })).toHaveAttribute(
-      'href',
-      '/dashboard',
-    );
-    expect(screen.getByText('Look')).toBeVisible();
-  });
+    const dashboardLink = screen.getByRole('link', { name: DASHBOARD_LABEL });
+    const lookItem = screen.getByText('Look');
 
-  it('shows Voice as current on the voice route', () => {
-    vi.mocked(usePathname).mockReturnValue('/dashboard/voice');
-
-    render(<DashboardBreadcrumb />);
-
-    expect(screen.getByText('Voice')).toBeVisible();
+    expect(dashboardLink).toHaveAttribute('href', adminRoutes.dashboard());
+    expect(lookItem).toBeVisible();
   });
 
   it('shows Features as current on the features route', () => {
-    vi.mocked(usePathname).mockReturnValue('/dashboard/features');
+    vi.mocked(usePathname).mockReturnValue(adminRoutes.dashboardFeatures());
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText('Features')).toBeVisible();
+    const featuresItem = screen.getByText(FEATURES_LABEL);
+
+    expect(featuresItem).toBeVisible();
   });
 
   it.each([
+    ['/dashboard/voice', 'Voice'],
     ['/dashboard/languages', 'Languages'],
     ['/dashboard/domain', 'Domain'],
     ['/dashboard/email', 'Email'],
@@ -57,8 +60,11 @@ describe(DashboardBreadcrumb, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText(label)).toBeVisible();
-    expect(screen.queryByText('Features')).not.toBeInTheDocument();
+    const leafItem = screen.getByText(label);
+    const featuresItem = screen.queryByText(FEATURES_LABEL);
+
+    expect(leafItem).toBeVisible();
+    expect(featuresItem).not.toBeInTheDocument();
   });
 
   it('shows no leaf on a route the nav does not list', () => {
@@ -66,7 +72,10 @@ describe(DashboardBreadcrumb, () => {
 
     render(<DashboardBreadcrumb />);
 
-    expect(screen.getByText('Your site')).toBeVisible();
-    expect(screen.queryByText('Features')).not.toBeInTheDocument();
+    const dashboardItem = screen.getByText(DASHBOARD_LABEL);
+    const featuresItem = screen.queryByText(FEATURES_LABEL);
+
+    expect(dashboardItem).toBeVisible();
+    expect(featuresItem).not.toBeInTheDocument();
   });
 });
