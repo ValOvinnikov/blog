@@ -1,27 +1,31 @@
+import { MOCK_POST_LIST_PAGE_SIZE } from '@blog/service/testing/modules/fixtures';
+
 import { toIndexPageParams } from './transformer';
 
-describe('toIndexPageParams', () => {
-  it('returns pages 2..totalPages for a full corpus', () => {
-    expect(
-      toIndexPageParams({ blogPosts: { total: 20 }, pageSize: 9 }),
-    ).toEqual([{ page: '2' }, { page: '3' }]);
+describe(toIndexPageParams, () => {
+  it.each([
+    [
+      'pages 2 through the last for a full corpus',
+      20,
+      [{ page: '2' }, { page: '3' }],
+    ],
+    ['no pages when the corpus fits on one page', MOCK_POST_LIST_PAGE_SIZE, []],
+    ['no pages when there is no content', 0, []],
+  ])('returns %s', (_, total, expected) => {
+    const params = toIndexPageParams({
+      blogPosts: { total },
+      pageSize: MOCK_POST_LIST_PAGE_SIZE,
+    });
+
+    expect(params).toEqual(expected);
   });
 
-  it('returns an empty array when the corpus fits on one page', () => {
-    expect(toIndexPageParams({ blogPosts: { total: 9 }, pageSize: 9 })).toEqual(
-      [],
-    );
-  });
+  it('returns no pages without a page size, however large the corpus', () => {
+    const params = toIndexPageParams({
+      blogPosts: { total: 200 },
+      pageSize: null,
+    });
 
-  it('returns an empty array when there is no content', () => {
-    expect(toIndexPageParams({ blogPosts: { total: 0 }, pageSize: 9 })).toEqual(
-      [],
-    );
-  });
-
-  it('returns an empty array when modules[] has no module_postList entry, regardless of corpus size', () => {
-    expect(
-      toIndexPageParams({ blogPosts: { total: 200 }, pageSize: null }),
-    ).toEqual([]);
+    expect(params).toEqual([]);
   });
 });

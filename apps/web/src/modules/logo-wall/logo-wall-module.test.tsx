@@ -1,16 +1,20 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_LOGO_ITEMS,
   MOCK_LOGO_WALL_HEADING,
 } from '@web/testing/modules/logo-wall/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { LogoWallModule } from './logo-wall-module';
 
-const MODULE_ID = 'logo-wall-1';
+faker.seed(6011);
+
+const MOCK_MODULE_ID = faker.string.uuid();
 
 const { getLogoWallModuleMock } = vi.hoisted(() => ({
   getLogoWallModuleMock: vi.fn(),
@@ -28,7 +32,7 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const baseModule = {
+const MOCK_BASE_MODULE = {
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockHeadingBlock({ heading: MOCK_LOGO_WALL_HEADING }),
   ctaButtons: [],
@@ -38,7 +42,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(LogoWallModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${LogoWallModule.name}/>`, () => {
@@ -49,7 +53,7 @@ describe(`<${LogoWallModule.name}/>`, () => {
   describe('when the module resolves', () => {
     beforeEach(async () => {
       getLogoWallModuleMock.mockResolvedValue(
-        okResult({ ...baseModule, logos: MOCK_LOGO_ITEMS }),
+        okResult({ ...MOCK_BASE_MODULE, logos: MOCK_LOGO_ITEMS }),
       );
 
       await setup();
@@ -57,7 +61,7 @@ describe(`<${LogoWallModule.name}/>`, () => {
 
     it('fetches the module by id with the tenant Sanity context', () => {
       expect(getLogoWallModuleMock).toHaveBeenCalledWith(
-        MODULE_ID,
+        MOCK_MODULE_ID,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
@@ -70,10 +74,8 @@ describe(`<${LogoWallModule.name}/>`, () => {
     });
   });
 
-  it('renders nothing when a logo image fails to resolve', async () => {
-    getLogoWallModuleMock.mockResolvedValue(
-      errorResult(new Error('Logo "Acme Corp"\'s image failed to resolve.')),
-    );
+  it('renders nothing when the fetch fails', async () => {
+    getLogoWallModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 

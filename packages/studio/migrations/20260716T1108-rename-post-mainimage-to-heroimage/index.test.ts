@@ -1,14 +1,23 @@
+import { faker } from '@faker-js/faker';
 import { at, set, unset } from 'sanity/migrate';
 
 import { renamePostMainImageToHeroImage } from './index';
 
+faker.seed(1);
+
+const MOCK_ASSET_REF = faker.string.uuid();
+const MOCK_ALT = faker.lorem.words();
+const MOCK_OTHER_ALT = faker.lorem.words();
+
+const mockImage = (alt: string) => ({
+  _type: 'imageWithAlt',
+  asset: { _type: 'reference', _ref: MOCK_ASSET_REF },
+  alt,
+});
+
 describe(renamePostMainImageToHeroImage, () => {
   it('moves mainImage onto heroImage and unsets mainImage', () => {
-    const mainImage = {
-      _type: 'imageWithAlt',
-      asset: { _type: 'reference', _ref: 'image-abc123-800x600-jpg' },
-      alt: 'A description',
-    };
+    const mainImage = mockImage(MOCK_ALT);
 
     const result = renamePostMainImageToHeroImage({ mainImage });
 
@@ -18,29 +27,25 @@ describe(renamePostMainImageToHeroImage, () => {
     ]);
   });
 
-  it('is a no-op for a doc that never had mainImage (optional field)', () => {
+  it('is a no-op for a doc that never had mainImage', () => {
     const result = renamePostMainImageToHeroImage({});
 
     expect(result).toBeUndefined();
   });
 
-  it('is idempotent — a doc already migrated to heroImage is left alone', () => {
-    const heroImage = {
-      _type: 'imageWithAlt',
-      asset: { _type: 'reference', _ref: 'image-abc123-800x600-jpg' },
-      alt: 'A description',
-    };
-
-    const result = renamePostMainImageToHeroImage({ heroImage });
+  it('leaves a doc already migrated to heroImage alone', () => {
+    const result = renamePostMainImageToHeroImage({
+      heroImage: mockImage(MOCK_ALT),
+    });
 
     expect(result).toBeUndefined();
   });
 
-  it('is idempotent — a doc with both fields set is left alone, not clobbered', () => {
-    const mainImage = { _type: 'imageWithAlt', alt: 'Old' };
-    const heroImage = { _type: 'imageWithAlt', alt: 'Already migrated' };
-
-    const result = renamePostMainImageToHeroImage({ mainImage, heroImage });
+  it('leaves a doc with both fields set alone', () => {
+    const result = renamePostMainImageToHeroImage({
+      mainImage: mockImage(MOCK_OTHER_ALT),
+      heroImage: mockImage(MOCK_ALT),
+    });
 
     expect(result).toBeUndefined();
   });

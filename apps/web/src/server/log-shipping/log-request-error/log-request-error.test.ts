@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { REQUEST_LOG } from '@web/constants/request';
 import {
   MOCK_RENDER_ERROR_MESSAGE,
@@ -9,7 +10,10 @@ import { logger } from '@web/utils/logger/logger';
 
 import { logRequestError } from './log-request-error';
 
-const CALLBACK_PATH = '/api/auth/callback';
+faker.seed(6010);
+
+const MOCK_ROUTE_PATH = `/api/${faker.lorem.word()}/callback`;
+const MOCK_QUERY_STRING = `?code=${faker.string.alphanumeric(8)}&token=${faker.string.alphanumeric(16)}`;
 
 describe(logRequestError, () => {
   it('logs one error-level line carrying the route', async () => {
@@ -18,29 +22,24 @@ describe(logRequestError, () => {
     await logRequestError(error, mockErrorRequest(), mockErrorContext());
 
     expect(logger.error).toHaveBeenCalledOnce();
-    expect(logger.error).toHaveBeenCalledWith(
-      REQUEST_LOG.UNHANDLED_ERROR,
-      expect.objectContaining({
-        error,
-        routePath: MOCK_RENDER_ROUTE_PATH,
-      }),
-    );
+    const [event, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
+    expect(event).toBe(REQUEST_LOG.UNHANDLED_ERROR);
+    expect(context?.error).toBe(error);
+    expect(context?.routePath).toBe(MOCK_RENDER_ROUTE_PATH);
   });
 
   it('logs the path without its query string', async () => {
     await logRequestError(
       new Error(MOCK_RENDER_ERROR_MESSAGE),
-      mockErrorRequest({ path: `${CALLBACK_PATH}?code=abc&token=secret` }),
+      mockErrorRequest({ path: `${MOCK_ROUTE_PATH}${MOCK_QUERY_STRING}` }),
       mockErrorContext({
-        routePath: CALLBACK_PATH,
+        routePath: MOCK_ROUTE_PATH,
         routeType: 'route',
         renderSource: undefined,
       }),
     );
 
-    expect(logger.error).toHaveBeenCalledWith(
-      REQUEST_LOG.UNHANDLED_ERROR,
-      expect.objectContaining({ path: CALLBACK_PATH }),
-    );
+    const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
+    expect(context?.path).toBe(MOCK_ROUTE_PATH);
   });
 });

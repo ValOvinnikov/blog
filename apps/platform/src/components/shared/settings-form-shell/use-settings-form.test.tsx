@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@platform/testing/custom-render';
 
 import {
   useSettingsForm,
@@ -11,22 +11,27 @@ type TValues = { name: string };
 type TResult = { outcome: TActionOutcome };
 type TArgs = TUseSettingsFormArgs<TValues, TResult>;
 
-const SAVED: TValues = { name: faker.person.fullName() };
-const EDITED: TValues = { name: faker.person.fullName() };
+faker.seed(5995);
+
+const MOCK_SAVED_VALUES: TValues = { name: faker.person.fullName() };
+const MOCK_EDITED_VALUES: TValues = { name: faker.person.fullName() };
+const MOCK_UPLOADED_VALUES: TValues = { name: faker.person.fullName() };
+const MOCK_FIELD_ID = faker.lorem.slug();
+const MOCK_DRAFT = {
+  tenantId: faker.string.uuid(),
+  page: faker.lorem.word(),
+  fields: [],
+};
 
 const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
   renderHook(() =>
     useSettingsForm<TValues, TResult>({
-      initialValues: SAVED,
+      initialValues: MOCK_SAVED_VALUES,
       archivedAt: undefined,
       onSubmit: async () => ({ outcome: ACTION_OUTCOME.SUCCESS }),
       countChanges: (values, savedValues) =>
         values.name === savedValues.name ? 0 : 1,
-      draft: {
-        tenantId: faker.string.uuid(),
-        page: faker.lorem.word(),
-        fields: [],
-      },
+      draft: MOCK_DRAFT,
       ...overrides,
     }),
   );
@@ -34,7 +39,7 @@ const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
 const editAndSave = async (
   result: ReturnType<typeof renderSettingsForm>['result'],
 ) => {
-  act(() => result.current.setValues(EDITED));
+  act(() => result.current.setValues(MOCK_EDITED_VALUES));
   let isSaved = false;
   await act(async () => {
     isSaved = await result.current.form.save();
@@ -46,7 +51,7 @@ describe(useSettingsForm, () => {
   it('counts the edits made since the last save', () => {
     const { result } = renderSettingsForm();
 
-    act(() => result.current.setValues(EDITED));
+    act(() => result.current.setValues(MOCK_EDITED_VALUES));
 
     expect(result.current.form.changeCount).toBe(1);
   });
@@ -58,9 +63,11 @@ describe(useSettingsForm, () => {
     const isSaved = await editAndSave(result);
 
     expect(isSaved).toBe(true);
-    await waitFor(() => expect(result.current.savedValues).toEqual(EDITED));
+    await waitFor(() =>
+      expect(result.current.savedValues).toEqual(MOCK_EDITED_VALUES),
+    );
     expect(result.current.form.changeCount).toBe(0);
-    expect(onSuccess).toHaveBeenCalledWith(EDITED, {
+    expect(onSuccess).toHaveBeenCalledWith(MOCK_EDITED_VALUES, {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
   });
@@ -73,23 +80,24 @@ describe(useSettingsForm, () => {
     const isSaved = await editAndSave(result);
 
     expect(isSaved).toBe(false);
-    expect(result.current.savedValues).toEqual(SAVED);
+    expect(result.current.savedValues).toEqual(MOCK_SAVED_VALUES);
     expect(result.current.form.changeCount).toBe(1);
     expect(result.current.status).toBe(FORM_STATUS.ERROR);
   });
 
   it('keeps saved values a save wrote for itself', async () => {
-    const UPLOADED: TValues = { name: faker.person.fullName() };
     const { result } = renderSettingsForm({
       onSubmit: async () => {
-        result.current.setSavedValues(UPLOADED);
+        result.current.setSavedValues(MOCK_UPLOADED_VALUES);
         return { outcome: ACTION_OUTCOME.SUCCESS };
       },
     });
 
     await editAndSave(result);
 
-    await waitFor(() => expect(result.current.savedValues).toEqual(UPLOADED));
+    await waitFor(() =>
+      expect(result.current.savedValues).toEqual(MOCK_UPLOADED_VALUES),
+    );
   });
 
   it('does not submit while the values cannot be saved', async () => {
@@ -107,25 +115,24 @@ describe(useSettingsForm, () => {
   it('returns to the saved values and calls onDiscard on discard', () => {
     const onDiscard = vi.fn();
     const { result } = renderSettingsForm({ onDiscard });
-    act(() => result.current.setValues(EDITED));
+    act(() => result.current.setValues(MOCK_EDITED_VALUES));
 
     act(() => result.current.form.discard());
 
-    expect(result.current.values).toEqual(SAVED);
+    expect(result.current.values).toEqual(MOCK_SAVED_VALUES);
     expect(onDiscard).toHaveBeenCalledTimes(1);
   });
 
   it('reports the invalid controls for the current values', () => {
-    const fieldId = faker.lorem.slug();
     const { result } = renderSettingsForm({
       invalidControls: ({ name }) => ({
-        ids: name === EDITED.name ? [fieldId] : [],
+        ids: name === MOCK_EDITED_VALUES.name ? [MOCK_FIELD_ID] : [],
       }),
     });
 
-    act(() => result.current.setValues(EDITED));
+    act(() => result.current.setValues(MOCK_EDITED_VALUES));
 
-    expect(result.current.form.invalidControls?.ids).toEqual([fieldId]);
+    expect(result.current.form.invalidControls?.ids).toEqual([MOCK_FIELD_ID]);
   });
 
   it('is archived when the tenant has an archive date', () => {

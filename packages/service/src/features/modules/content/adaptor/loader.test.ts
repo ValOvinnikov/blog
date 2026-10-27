@@ -20,22 +20,20 @@ import {
   MOCK_MISSING_ID,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
 
 import { getContent } from './loader';
 import { contentModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const tenant = mockTenant();
-
-describe('getContent', () => {
+describe(getContent, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(mockRawContentModule());
   });
 
   it('maps the content module document', async () => {
-    const content = await getContent(MOCK_CONTENT_MODULE_ID, tenant);
+    const content = await getContent(MOCK_CONTENT_MODULE_ID, MOCK_TENANT);
 
     expect(content.body).toHaveLength(1);
   });
@@ -43,15 +41,15 @@ describe('getContent', () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getContent(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(getContent(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toThrow();
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getContent(MOCK_CONTENT_MODULE_ID, tenant);
+  it('queries with the tenant and the cache tags scoped to it', async () => {
+    await getContent(MOCK_CONTENT_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(contentModuleQuery, {
       parameters: { id: MOCK_CONTENT_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

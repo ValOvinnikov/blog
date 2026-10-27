@@ -10,60 +10,66 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { faqModuleQuery } from './query';
 
+faker.seed(7);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const TRANSLATED_QUESTION_ID = 'question-1';
-const UNTRANSLATED_QUESTION_ID = 'question-2';
-const UNTRANSLATED_QUESTION = 'What does it cost?';
-const UNTRANSLATED_ANSWER = 'It depends on scope.';
+const MOCK_TRANSLATED_QUESTION_ID = faker.string.uuid();
+const MOCK_UNTRANSLATED_QUESTION_ID = faker.string.uuid();
+const MOCK_UNTRANSLATED_QUESTION = faker.lorem.sentence();
+const MOCK_UNTRANSLATED_ANSWER = faker.lorem.sentence();
+const MOCK_FRENCH_ONLY_ANSWER = faker.lorem.sentence();
 
-const EN_COPY = {
-  heading: 'Questions',
-  question: 'How long does it take?',
-  answer: 'About six weeks.',
+const MOCK_EN_COPY = {
+  heading: faker.lorem.words(2),
+  question: faker.lorem.sentence(),
+  answer: faker.lorem.sentence(),
 };
 
-const NL_COPY = {
-  heading: 'Vragen',
-  question: 'Hoe lang duurt het?',
-  answer: 'Ongeveer zes weken.',
+const MOCK_NL_COPY = {
+  heading: faker.lorem.words(2),
+  question: faker.lorem.sentence(),
+  answer: faker.lorem.sentence(),
 };
 
-const faqModuleDocument = {
+const MOCK_FAQ_MODULE_DOCUMENT = {
   _id: MOCK_FAQ_MODULE_ID,
   _type: 'module_faq',
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockLocalizedHeadingBlock({
-    [EN]: EN_COPY.heading,
-    [NL]: NL_COPY.heading,
+    [EN]: MOCK_EN_COPY.heading,
+    [NL]: MOCK_NL_COPY.heading,
   }),
   questions: [
-    mockReference(TRANSLATED_QUESTION_ID, { _key: 'q-1' }),
-    mockReference(UNTRANSLATED_QUESTION_ID, { _key: 'q-2' }),
+    mockReference(MOCK_TRANSLATED_QUESTION_ID, { _key: faker.string.uuid() }),
+    mockReference(MOCK_UNTRANSLATED_QUESTION_ID, {
+      _key: faker.string.uuid(),
+    }),
   ],
 };
 
-const translatedQuestion = {
-  _id: TRANSLATED_QUESTION_ID,
+const MOCK_TRANSLATED_QUESTION = {
+  _id: MOCK_TRANSLATED_QUESTION_ID,
   _type: 'block_faq',
   question: mockLocalizedStrings({
-    [EN]: EN_COPY.question,
-    [NL]: NL_COPY.question,
+    [EN]: MOCK_EN_COPY.question,
+    [NL]: MOCK_NL_COPY.question,
   }),
   answer: mockLocalizedListedText({
-    [EN]: EN_COPY.answer,
-    [NL]: NL_COPY.answer,
+    [EN]: MOCK_EN_COPY.answer,
+    [NL]: MOCK_NL_COPY.answer,
   }),
 };
 
-const untranslatedQuestion = {
-  _id: UNTRANSLATED_QUESTION_ID,
+const MOCK_UNTRANSLATED_QUESTION_DOCUMENT = {
+  _id: MOCK_UNTRANSLATED_QUESTION_ID,
   _type: 'block_faq',
-  question: mockLocalizedStrings({ [EN]: UNTRANSLATED_QUESTION }),
-  answer: mockLocalizedListedText({ [EN]: UNTRANSLATED_ANSWER }),
+  question: mockLocalizedStrings({ [EN]: MOCK_UNTRANSLATED_QUESTION }),
+  answer: mockLocalizedListedText({ [EN]: MOCK_UNTRANSLATED_ANSWER }),
 };
 
 async function runFaq(dataset: Record<string, unknown>[], locale: string) {
@@ -124,23 +130,30 @@ describe('faqModuleQuery', () => {
     [
       'picks the heading and each question in the visitor language',
       NL,
-      NL_COPY,
+      MOCK_NL_COPY,
     ],
     [
       'falls back to the default language for the heading and each question',
       FR,
-      EN_COPY,
+      MOCK_EN_COPY,
     ],
   ])('%s', async (_, locale, copy) => {
     const module = await runFaq(
-      [faqModuleDocument, translatedQuestion, untranslatedQuestion],
+      [
+        MOCK_FAQ_MODULE_DOCUMENT,
+        MOCK_TRANSLATED_QUESTION,
+        MOCK_UNTRANSLATED_QUESTION_DOCUMENT,
+      ],
       locale,
     );
 
     expect(module.headingBlock.heading).toBe(copy.heading);
     expect(questionText(module)).toEqual([
       { question: copy.question, answer: [[copy.answer]] },
-      { question: UNTRANSLATED_QUESTION, answer: [[UNTRANSLATED_ANSWER]] },
+      {
+        question: MOCK_UNTRANSLATED_QUESTION,
+        answer: [[MOCK_UNTRANSLATED_ANSWER]],
+      },
     ]);
   });
 
@@ -148,11 +161,11 @@ describe('faqModuleQuery', () => {
     await expect(
       runFaq(
         [
-          faqModuleDocument,
-          translatedQuestion,
+          MOCK_FAQ_MODULE_DOCUMENT,
+          MOCK_TRANSLATED_QUESTION,
           {
-            ...untranslatedQuestion,
-            answer: mockLocalizedListedText({ [FR]: 'Cela dépend.' }),
+            ...MOCK_UNTRANSLATED_QUESTION_DOCUMENT,
+            answer: mockLocalizedListedText({ [FR]: MOCK_FRENCH_ONLY_ANSWER }),
           },
         ],
         NL,

@@ -1,7 +1,9 @@
 import { getDb } from '@blog/db/client';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 
 import { listTenantsByIds } from './list-tenants-by-ids';
 
@@ -14,32 +16,28 @@ afterEach(async () => {
 });
 
 describe(listTenantsByIds, () => {
-  describe('with an Acme tenant', () => {
-    let acmeId: string;
+  describe('with a tenant stored', () => {
+    let tenant: TTenant;
 
     beforeEach(async () => {
-      ({ id: acmeId } = await insertTestTenant(db(), { name: 'Acme' }));
+      tenant = await insertTestTenant(db());
     });
 
     it('silently omits ids with no matching row', async () => {
       const result = await listTenantsByIds([
-        acmeId,
-        '00000000-0000-0000-0000-000000000000',
+        tenant.id,
+        MOCK_MISSING_TENANT_ID,
       ]);
 
-      expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({ name: 'Acme' });
+      expect(result).toEqual([tenant]);
     });
 
     it('resolves multiple ids to their tenants', async () => {
-      const { id: zetaId } = await insertTestTenant(db(), { name: 'Zeta' });
+      const otherTenant = await insertTestTenant(db());
 
-      const result = await listTenantsByIds([acmeId, zetaId]);
+      const result = await listTenantsByIds([tenant.id, otherTenant.id]);
 
-      expect(result.map((tenant) => tenant.name).sort()).toEqual([
-        'Acme',
-        'Zeta',
-      ]);
+      expect(new Set(result)).toEqual(new Set([tenant, otherTenant]));
     });
   });
 

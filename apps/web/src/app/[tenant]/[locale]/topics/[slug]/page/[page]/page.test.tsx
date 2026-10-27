@@ -4,104 +4,104 @@ import {
   NEXT_NAVIGATION_ERROR,
   routes,
 } from '@blog/config';
-import { okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { permanentRedirect } from '@web/i18n/navigation';
+import { buildTopicMetadata } from '@web/metadata/topic-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
-import { customRenderAsync } from '@web/testing/custom-render';
-import {
-  MOCK_TENANT_ID,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
-import {
-  mockTopic,
-  mockTopicDetailPage,
-} from '@web/testing/shared/topic/fixtures';
+import { mockRouteParams } from '@web/testing/app/route-params';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
 import TopicNumberedPage, { generateMetadata, revalidate } from './page';
 
-const { getTopicPageMock } = vi.hoisted(() => ({
-  getTopicPageMock: vi.fn(),
-}));
+faker.seed(6009);
+
+const MOCK_TOPIC_SLUG = faker.lorem.slug();
+const MOCK_METADATA = { title: faker.lorem.words(2) };
+const FIRST_PAGE = '1';
+const SECOND_PAGE = '2';
+const NON_CANONICAL_PAGES = ['abc', '02'];
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@blog/service', () => ({
-  service: {
-    pages: {
-      topic: {
-        v1: {
-          getTopicPage: getTopicPageMock,
-        },
-      },
-    },
-  },
-}));
-
 vi.mock('@web/i18n/navigation');
 
-const permanentRedirectMock = vi.mocked(permanentRedirect);
+vi.mock('@web/metadata/topic-metadata', () => ({
+  buildTopicMetadata: vi.fn(),
+}));
 
-const SLUG = 'engineering';
-const { title: TITLE } = mockTopic({ slug: SLUG });
+vi.mock('@web/components/pages/topic-page', () => ({
+  TopicPage: ({ slug, page }: { slug: string; page: number }) => (
+    <div data-testid="topic-page">{`${slug}:${page}`}</div>
+  ),
+}));
 
 const paramsFor = (page: string) =>
-  Promise.resolve({
-    tenant: MOCK_TENANT_ID,
-    locale: LOCALE_ISO_CODES.EN,
-    slug: SLUG,
-    page,
-  });
+  mockRouteParams({ slug: MOCK_TOPIC_SLUG, page });
 
-const setup = customRenderAsync(TopicNumberedPage, { params: paramsFor('1') });
+const firstPageParams = paramsFor(FIRST_PAGE);
 
-describe('TopicNumberedPage', () => {
+const setup = customRenderAsync(TopicNumberedPage, {
+  params: firstPageParams,
+});
+
+describe(`<${TopicNumberedPage.name}/>`, () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  describe('generateMetadata', () => {
-    it.each(['1', 'abc'])(
-      'returns empty metadata without a fetch for page param %s',
-      async (page) => {
-        const metadata = await generateMetadata({ params: paramsFor(page) });
+  it('renders TopicPage for the requested slug and page', async () => {
+    await setup({ params: paramsFor(SECOND_PAGE) });
 
-        expect(metadata).toEqual({});
-        expect(getTopicPageMock).not.toHaveBeenCalled();
-      },
-    );
+    const topicPage = screen.getByTestId('topic-page');
 
-    it('builds metadata for page 2', async () => {
-      getTopicPageMock.mockResolvedValue(okResult(mockTopicDetailPage()));
-
-      const metadata = await generateMetadata({ params: paramsFor('2') });
-
-      expect(metadata.title).toBe(`${TITLE} – Page 2`);
-      expect(getTopicPageMock).toHaveBeenCalledWith(
-        SLUG,
-        MOCK_TENANT_SANITY_CONTEXT,
-      );
-    });
+    expect(topicPage).toHaveTextContent(`${MOCK_TOPIC_SLUG}:${SECOND_PAGE}`);
   });
 
   it('redirects page 1 to the canonical topic URL', async () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(enterRequestContext).toHaveBeenCalled();
-    expect(permanentRedirectMock).toHaveBeenCalledWith({
-      href: routes.topic(SLUG),
+    expect(enterRequestContext).toHaveBeenCalledWith(firstPageParams);
+    expect(permanentRedirect).toHaveBeenCalledWith({
+      href: routes.topic(MOCK_TOPIC_SLUG, 1),
       locale: LOCALE_ISO_CODES.EN,
     });
   });
 
-  it.each(['abc', '02'])(
+  it.each(NON_CANONICAL_PAGES)(
     'hard-404s a non-canonical page param (%s)',
-    async (raw) => {
-      await expect(setup({ params: paramsFor(raw) })).rejects.toThrow(
+    async (page) => {
+      await expect(setup({ params: paramsFor(page) })).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
       );
 
-      expect(vi.mocked(notFound)).toHaveBeenCalled();
+      expect(notFound).toHaveBeenCalledTimes(1);
+    },
+  );
+});
+
+describe(generateMetadata, () => {
+  beforeEach(() => {
+    vi.mocked(buildTopicMetadata).mockResolvedValue(MOCK_METADATA);
+  });
+
+  it('builds the topic metadata for page 2', async () => {
+    const metadata = await generateMetadata({ params: paramsFor(SECOND_PAGE) });
+
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildTopicMetadata).toHaveBeenCalledWith(
+      MOCK_TOPIC_SLUG,
+      Number(SECOND_PAGE),
+    );
+  });
+
+  it.each([FIRST_PAGE, ...NON_CANONICAL_PAGES])(
+    'returns empty metadata without building any for page param %s',
+    async (page) => {
+      const metadata = await generateMetadata({ params: paramsFor(page) });
+
+      expect(metadata).toEqual({});
+      expect(buildTopicMetadata).not.toHaveBeenCalled();
     },
   );
 });

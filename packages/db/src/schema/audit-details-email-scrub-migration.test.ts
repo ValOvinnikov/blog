@@ -12,28 +12,25 @@ import { findings } from '@blog/db/schema/findings';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
-  listMigrationFiles,
-  MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  applyMigrationsBefore,
   insertReplayTenant,
+  MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-const SCRUB_MIGRATION = '0053_scrub_emails_from_audit_and_findings_details.sql';
-const ACTOR_ID = 'operator-1';
-const OWNER_EMAIL = 'owner@acme.example';
-const TENANT_NAME = faker.company.name();
-const TENANT_DOMAIN = faker.internet.domainName();
-const SENDER_NAME = 'Acme Co';
-const EMAIL_REMOVED = '[email removed]';
+faker.seed(6023);
 
-async function migrateUpToScrub(db: PgliteDatabase<typeof schema>) {
-  for (const file of listMigrationFiles()) {
-    if (file >= SCRUB_MIGRATION) break;
-    await applyMigrationFile(db, file);
-  }
-}
+const SCRUB_MIGRATION = '0053_scrub_emails_from_audit_and_findings_details.sql';
+const EMAIL_REMOVED = '[email removed]';
+const MOCK_ACTOR_ID = faker.string.uuid();
+const MOCK_OWNER_EMAIL = faker.internet.email();
+const MOCK_TENANT_NAME = faker.company.name();
+const MOCK_TENANT_DOMAIN = faker.internet.domainName();
+const MOCK_SENDER_NAME = faker.company.name();
+const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
+const MOCK_CONTACT_RECIPIENT = faker.internet.email();
 
 async function insertAuditEvent(
   db: PgliteDatabase<typeof schema>,
@@ -44,7 +41,7 @@ async function insertAuditEvent(
 ) {
   const [inserted] = await db
     .insert(auditEvents)
-    .values({ actorId: ACTOR_ID, ...values })
+    .values({ actorId: MOCK_ACTOR_ID, ...values })
     .returning();
   if (!inserted) throw new Error('failed to seed an audit event');
   return inserted;
@@ -58,13 +55,13 @@ async function readAuditEvent(db: PgliteDatabase<typeof schema>, id: string) {
   return row;
 }
 
-describe('0053_scrub_emails_from_audit_and_findings_details', () => {
+describe(`${SCRUB_MIGRATION} (emails scrubbed from audit and findings details)`, () => {
   let db: PgliteDatabase<typeof schema>;
   let tenant: Awaited<ReturnType<typeof insertReplayTenant>>;
 
   beforeEach(async () => {
     db = await createEmptyTestDb();
-    await migrateUpToScrub(db);
+    await applyMigrationsBefore(db, SCRUB_MIGRATION);
     tenant = await insertReplayTenant(db);
   }, MIGRATION_REPLAY_TEST_TIMEOUT_MS);
 
@@ -76,9 +73,9 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: tenant.id,
         details: {
-          name: TENANT_NAME,
-          domain: TENANT_DOMAIN,
-          ownerEmail: OWNER_EMAIL,
+          name: MOCK_TENANT_NAME,
+          domain: MOCK_TENANT_DOMAIN,
+          ownerEmail: MOCK_OWNER_EMAIL,
         },
       });
 
@@ -86,7 +83,7 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
 
       expect(await readAuditEvent(db, created.id)).toEqual({
         ...created,
-        details: { name: TENANT_NAME, domain: TENANT_DOMAIN },
+        details: { name: MOCK_TENANT_NAME, domain: MOCK_TENANT_DOMAIN },
       });
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -99,13 +96,13 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: tenant.id,
-        details: { name: TENANT_NAME, ownerEmail: OWNER_EMAIL },
+        details: { name: MOCK_TENANT_NAME, ownerEmail: MOCK_OWNER_EMAIL },
       });
 
       await applyMigrationFile(db, SCRUB_MIGRATION);
 
       expect((await readAuditEvent(db, updated.id))?.details).toEqual({
-        name: TENANT_NAME,
+        name: MOCK_TENANT_NAME,
         ownerEmailUpdated: true,
       });
     },
@@ -120,9 +117,9 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
         targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
         targetId: tenant.id,
         details: {
-          senderName: SENDER_NAME,
-          replyToAddress: faker.internet.email(),
-          contactRecipient: faker.internet.email(),
+          senderName: MOCK_SENDER_NAME,
+          replyToAddress: MOCK_REPLY_TO_ADDRESS,
+          contactRecipient: MOCK_CONTACT_RECIPIENT,
           footerPostalAddress: null,
         },
       });
@@ -155,8 +152,8 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
           dedupeKey: faker.string.uuid(),
           details: {
             invalidDocumentCount: 1,
-            contact: OWNER_EMAIL,
-            documents: [{ message: `Write to ${OWNER_EMAIL} for help` }],
+            contact: MOCK_OWNER_EMAIL,
+            documents: [{ message: `Write to ${MOCK_OWNER_EMAIL} for help` }],
           },
         })
         .returning();
@@ -183,13 +180,16 @@ describe('0053_scrub_emails_from_audit_and_findings_details', () => {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: tenant.id,
-        details: { ownerEmail: OWNER_EMAIL },
+        details: { ownerEmail: MOCK_OWNER_EMAIL },
       });
       await insertAuditEvent(db, {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
         targetId: tenant.id,
-        details: { senderName: SENDER_NAME, replyToAddress: OWNER_EMAIL },
+        details: {
+          senderName: MOCK_SENDER_NAME,
+          replyToAddress: MOCK_OWNER_EMAIL,
+        },
       });
 
       await applyMigrationFile(db, SCRUB_MIGRATION);

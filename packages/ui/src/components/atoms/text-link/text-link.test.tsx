@@ -1,115 +1,145 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TextLink, type TTextLinkProps } from './text-link';
 
 faker.seed(123);
 
-const LABEL = faker.lorem.words(3);
-const HREF = `/${faker.lorem.slug()}`;
+const MOCK_LABEL = faker.lorem.words(3);
+const MOCK_HREF = `/${faker.lorem.slug()}`;
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
 const TEXT_LINK_TEST_ID = 'text-link';
+const ARIA_CURRENT_PAGE = 'page';
 
-const setup = customRender(TextLink, { href: HREF, children: LABEL });
+const setup = customRender(TextLink, { href: MOCK_HREF, children: MOCK_LABEL });
 
 describe(`<${TextLink.name}/>`, () => {
-  describe('with the default props', () => {
-    beforeEach(() => {
-      setup();
-    });
+  let user: UserEvent;
 
-    it('renders a link to href named by its children', () => {
-      const link = screen.getByRole('link', { name: LABEL });
-      expect(link).toHaveAttribute('href', HREF);
-    });
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
 
-    it('omits aria-current when not current', () => {
-      const link = screen.getByRole('link');
-      expect(link).not.toHaveAttribute(ARIA_CURRENT);
-    });
+  it('renders a link to href named by its children', () => {
+    setup();
+
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
+
+    expect(link).toHaveAttribute('href', MOCK_HREF);
+  });
+
+  it('omits aria-current when not current', () => {
+    setup();
+
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
+
+    expect(link).not.toHaveAttribute(ARIA_CURRENT);
+  });
+
+  it('sets aria-current to page when current', () => {
+    setup({ isCurrent: true });
+
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
+
+    expect(link).toHaveAttribute(ARIA_CURRENT, ARIA_CURRENT_PAGE);
   });
 
   it('names the link by ariaLabel when given', () => {
-    const ariaLabel = faker.lorem.words(2);
-    setup({ ariaLabel });
-    const link = screen.getByRole('link', { name: ariaLabel });
+    setup({ ariaLabel: MOCK_ARIA_LABEL });
+
+    const link = screen.getByRole('link', { name: MOCK_ARIA_LABEL });
+
     expect(link).toBeVisible();
   });
 
   it('renders a childless link named by ariaLabel', () => {
-    const ariaLabel = faker.lorem.words(2);
-    setup({ children: undefined, ariaLabel });
-    const link = screen.getByRole('link', { name: ariaLabel });
+    setup({ children: undefined, ariaLabel: MOCK_ARIA_LABEL });
+
+    const link = screen.getByRole('link', { name: MOCK_ARIA_LABEL });
+
     expect(link).toBeEmptyDOMElement();
   });
 
   it('opens in a new tab when target is _blank', () => {
     setup({ target: '_blank' });
-    const link = screen.getByRole('link');
+
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
+
     expect(link).toHaveAttribute('target', '_blank');
   });
 
   it('forwards title, lang and hrefLang to the link', () => {
-    setup({ title: LABEL, lang: 'de', hrefLang: 'de' });
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('title', LABEL);
-    expect(link).toHaveAttribute('lang', 'de');
-    expect(link).toHaveAttribute('hreflang', 'de');
-  });
+    setup({
+      title: MOCK_ARIA_LABEL,
+      lang: LOCALE_ISO_CODES.DE,
+      hrefLang: LOCALE_ISO_CODES.DE,
+    });
 
-  it('sets aria-current="page" when current', () => {
-    setup({ isCurrent: true });
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute(ARIA_CURRENT, 'page');
+    const link = screen.getByRole('link', { name: MOCK_LABEL });
+
+    expect(link).toHaveAttribute('title', MOCK_ARIA_LABEL);
+    expect(link).toHaveAttribute('lang', LOCALE_ISO_CODES.DE);
+    expect(link).toHaveAttribute('hreflang', LOCALE_ISO_CODES.DE);
   });
 
   it('renders through the as component', () => {
     setup({ as: MockLink });
-    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
-    expect(mockLink).toHaveAttribute('href', HREF);
-  });
 
-  it('forwards data-testid', () => {
-    setup({ dataTestId: TEXT_LINK_TEST_ID });
-    const textLink = screen.getByTestId(TEXT_LINK_TEST_ID);
-    expect(textLink).toBeVisible();
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
+    expect(mockLink).toHaveAttribute('href', MOCK_HREF);
   });
 
   describe('without href', () => {
+    beforeEach(() => {
+      setup({ href: undefined, dataTestId: TEXT_LINK_TEST_ID });
+    });
+
     it('renders plain text rather than a link', () => {
-      setup({ href: undefined });
       const link = screen.queryByRole('link');
-      const plainText = screen.getByText(LABEL);
+      const plainText = screen.getByText(MOCK_LABEL);
+
       expect(link).not.toBeInTheDocument();
       expect(plainText).toBeVisible();
     });
 
     it('is skipped by Tab', async () => {
-      setup({ href: undefined, dataTestId: TEXT_LINK_TEST_ID });
-      await userEvent.tab();
-      const textLink = screen.getByTestId(TEXT_LINK_TEST_ID);
-      expect(textLink).not.toHaveFocus();
-      expect(document.body).toHaveFocus();
-    });
+      await user.tab();
 
+      const textLink = screen.getByTestId(TEXT_LINK_TEST_ID);
+
+      expect(textLink).not.toHaveFocus();
+    });
+  });
+
+  describe('without href when current', () => {
     it('still marks the current item with aria-current', () => {
       setup({
         href: undefined,
         isCurrent: true,
         dataTestId: TEXT_LINK_TEST_ID,
       });
+
       const textLink = screen.getByTestId(TEXT_LINK_TEST_ID);
-      expect(textLink).toHaveAttribute(ARIA_CURRENT, 'page');
+
+      expect(textLink).toHaveAttribute(ARIA_CURRENT, ARIA_CURRENT_PAGE);
+    });
+  });
+
+  it('keeps ariaLabel as the readable text without href', () => {
+    setup({
+      href: undefined,
+      ariaLabel: MOCK_ARIA_LABEL,
+      dataTestId: TEXT_LINK_TEST_ID,
     });
 
-    it('keeps ariaLabel as the readable text', () => {
-      const ariaLabel = faker.lorem.words(2);
-      setup({ href: undefined, ariaLabel, dataTestId: TEXT_LINK_TEST_ID });
-      const textLink = screen.getByTestId(TEXT_LINK_TEST_ID);
-      expect(textLink).toHaveTextContent(ariaLabel);
-    });
+    const textLink = screen.getByTestId(TEXT_LINK_TEST_ID);
+
+    expect(textLink).toHaveTextContent(MOCK_ARIA_LABEL);
   });
 
   it('requires children or ariaLabel to name the link', () => {

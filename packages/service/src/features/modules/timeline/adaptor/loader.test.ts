@@ -15,44 +15,52 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getTimelineModule } from './loader';
 import { timelineModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HEADING = 'Our story';
-const tenant = mockTenant();
+faker.seed(1);
+
+const MOCK_HEADING = faker.lorem.words(3);
 
 describe(getTimelineModule, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
-      mockRawTimelineModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
+      mockRawTimelineModule({
+        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+      }),
     );
   });
 
   it('resolves the module in a single round trip', async () => {
-    const timeline = await getTimelineModule(MOCK_TIMELINE_MODULE_ID, tenant);
+    const timeline = await getTimelineModule(
+      MOCK_TIMELINE_MODULE_ID,
+      MOCK_TENANT,
+    );
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(timeline.headingBlock.heading).toBe(HEADING);
+    expect(timeline.headingBlock.heading).toBe(MOCK_HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getTimelineModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(
+      getTimelineModule(MOCK_MISSING_ID, MOCK_TENANT),
+    ).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
-  it('threads tenant context and scopes cache tags to it', async () => {
-    await getTimelineModule(MOCK_TIMELINE_MODULE_ID, tenant);
+  it('queries with the tenant and the cache tags scoped to it', async () => {
+    await getTimelineModule(MOCK_TIMELINE_MODULE_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
     expect(mockRun).toHaveBeenCalledWith(timelineModuleQuery, {
       parameters: { id: MOCK_TIMELINE_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

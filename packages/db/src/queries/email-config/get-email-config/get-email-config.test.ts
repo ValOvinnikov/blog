@@ -1,18 +1,11 @@
 import * as schema from '@blog/db/schema';
+import { MOCK_EMAIL_CONFIG } from '@blog/db/testing/email-config/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getEmailConfig } from './get-email-config';
 
 vi.mock('@blog/db/client');
-
-const MOCK_EMAIL_CONFIG = {
-  logoAssetUrl: 'https://blob.example.com/email-logo.png',
-  senderName: 'Acme Weekly',
-  replyToAddress: 'support@example.com',
-  footerPostalAddress: '123 Main St, Springfield',
-  contactRecipient: 'leads@example.com',
-};
 
 const db = useQueryTestDb();
 
@@ -56,6 +49,6 @@ describe(getEmailConfig, () => {
 
     const result = await getEmailConfig(tenantId);
 
-    expect(result).toMatchObject(MOCK_EMAIL_CONFIG);
+    expect(result).toMatchObject({ tenantId, ...MOCK_EMAIL_CONFIG });
   });
 });

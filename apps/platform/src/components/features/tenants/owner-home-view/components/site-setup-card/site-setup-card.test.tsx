@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
@@ -22,6 +23,10 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
+faker.seed(4417);
+
+const MOCK_STEP_ERROR = faker.lorem.sentence();
+
 const retryProvisioningStepActionMock = vi.mocked(retryProvisioningStepAction);
 const getTenantProvisioningStatusActionMock = vi.mocked(
   getTenantProvisioningStatusAction,
@@ -33,7 +38,7 @@ const failedTenant = mockClientTenant({
     ...mockIdleProvisioningSteps(),
     [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      error: 'boom',
+      error: MOCK_STEP_ERROR,
     },
   },
 });

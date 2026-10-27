@@ -6,11 +6,13 @@ import { Alert } from './alert';
 
 faker.seed(123);
 
-const message = faker.lorem.sentence();
+const MOCK_MESSAGE = faker.lorem.sentence();
+const MOCK_ALERT_ID = faker.string.uuid();
+const ALERT_ICON_TEST_ID = 'alert-icon';
 
 const setup = customRender(Alert, {
   type: ALERT_TYPE.INFO,
-  message,
+  message: MOCK_MESSAGE,
 });
 
 describe(`<${Alert.name}/>`, () => {
@@ -20,50 +22,50 @@ describe(`<${Alert.name}/>`, () => {
     });
 
     it('renders the given message', () => {
-      expect(screen.getByText(message)).toBeVisible();
+      const message = screen.getByText(MOCK_MESSAGE);
+
+      expect(message).toBeVisible();
     });
 
     it('has no id attribute on the root element when none is given', () => {
-      expect(screen.getByRole('status')).not.toHaveAttribute('id');
+      const status = screen.getByRole('status');
+
+      expect(status).not.toHaveAttribute('id');
     });
 
-    it('renders a type icon by default', () => {
-      expect(screen.getByTestId('alert-icon')).toBeInTheDocument();
+    it('renders a type icon', () => {
+      const icon = screen.getByTestId(ALERT_ICON_TEST_ID);
+
+      expect(icon).toBeVisible();
     });
   });
 
-  it('renders an assertive alert for the ERROR type', () => {
-    setup({ type: ALERT_TYPE.ERROR });
-    expect(screen.getByRole('alert')).toHaveTextContent(message);
-  });
+  it.each([
+    { type: ALERT_TYPE.ERROR, role: 'alert' },
+    { type: ALERT_TYPE.SUCCESS, role: 'status' },
+    { type: ALERT_TYPE.WARNING, role: 'status' },
+    { type: ALERT_TYPE.INFO, role: 'status' },
+  ])('announces the $type type as $role', ({ type, role }) => {
+    setup({ type });
 
-  it('renders a polite status for the SUCCESS type', () => {
-    setup({ type: ALERT_TYPE.SUCCESS });
-    expect(screen.getByRole('status')).toHaveTextContent(message);
-  });
+    const alert = screen.getByRole(role);
 
-  it('renders a polite status for the WARNING type', () => {
-    setup({ type: ALERT_TYPE.WARNING });
-    expect(screen.getByRole('status')).toHaveTextContent(message);
-  });
-
-  it('renders a polite status for the INFO type', () => {
-    setup({ type: ALERT_TYPE.INFO });
-    expect(screen.getByRole('status')).toHaveTextContent(message);
-  });
-
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'alert' });
-    expect(screen.getByTestId('alert')).toBeVisible();
+    expect(alert).toHaveTextContent(MOCK_MESSAGE);
   });
 
   it('forwards id to the root element', () => {
-    setup({ id: 'alert-id' });
-    expect(screen.getByRole('status')).toHaveAttribute('id', 'alert-id');
+    setup({ id: MOCK_ALERT_ID });
+
+    const status = screen.getByRole('status');
+
+    expect(status).toHaveAttribute('id', MOCK_ALERT_ID);
   });
 
   it('renders no icon when hasIcon is false', () => {
     setup({ hasIcon: false });
-    expect(screen.queryByTestId('alert-icon')).not.toBeInTheDocument();
+
+    const icon = screen.queryByTestId(ALERT_ICON_TEST_ID);
+
+    expect(icon).not.toBeInTheDocument();
   });
 });

@@ -6,6 +6,17 @@ import { listAppliedMigrationTimestamps } from './list-applied-migration-timesta
 
 vi.mock('@blog/db/client');
 
+faker.seed(6022);
+
+const MOCK_EARLIER_TIMESTAMP = faker.number.int({
+  min: 1_000_000_000_000,
+  max: 1_500_000_000_000,
+});
+const MOCK_LATER_TIMESTAMP = faker.number.int({
+  min: 1_600_000_000_000,
+  max: 2_000_000_000_000,
+});
+
 const db = useQueryTestDb();
 
 beforeAll(async () => {
@@ -21,22 +32,23 @@ afterEach(async () => {
 
 describe(listAppliedMigrationTimestamps, () => {
   it('returns the journal timestamp of every applied migration', async () => {
-    const timestamps = [
-      faker.date.past().getTime(),
-      faker.date.recent().getTime(),
-    ];
-    for (const createdAt of timestamps) {
+    for (const createdAt of [MOCK_EARLIER_TIMESTAMP, MOCK_LATER_TIMESTAMP]) {
       await db().execute(
         sql`insert into drizzle.__drizzle_migrations (hash, created_at) values (${faker.git.commitSha()}, ${createdAt})`,
       );
     }
 
-    expect(await listAppliedMigrationTimestamps()).toEqual(
-      expect.arrayContaining(timestamps),
-    );
+    const result = await listAppliedMigrationTimestamps();
+
+    expect([...result].sort((a, b) => a - b)).toEqual([
+      MOCK_EARLIER_TIMESTAMP,
+      MOCK_LATER_TIMESTAMP,
+    ]);
   });
 
   it('returns an empty list when no migration has been applied', async () => {
-    expect(await listAppliedMigrationTimestamps()).toEqual([]);
+    const result = await listAppliedMigrationTimestamps();
+
+    expect(result).toEqual([]);
   });
 });

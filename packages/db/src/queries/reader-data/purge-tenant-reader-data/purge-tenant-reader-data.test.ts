@@ -9,6 +9,7 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import {
   countTenantReaderData,
@@ -18,6 +19,10 @@ import {
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+
+faker.seed(6022);
+
+const MOCK_POST_ID = faker.string.uuid();
 
 const ONE_OF_EACH = {
   subscribers: 1,
@@ -32,7 +37,7 @@ async function seedReaderData(tenantId: string): Promise<void> {
   await db()
     .insert(schema.subscribers)
     .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
-  await addBookmark(tenantId, user.id, 'purged-post');
+  await addBookmark(tenantId, user.id, MOCK_POST_ID);
   await createMembershipInvite(
     tenantId,
     MOCK_SUBSCRIBER_EMAIL,
@@ -58,16 +63,20 @@ describe(purgeTenantReaderData, () => {
     await seedReaderData(tenantId);
   });
 
-  it('deletes the subscribers, bookmarks, invites and leads and returns the counts', async () => {
-    await expect(purgeTenantReaderData(tenantId)).resolves.toEqual(ONE_OF_EACH);
+  it('purges the tenant reader data and returns the counts', async () => {
+    const purged = await purgeTenantReaderData(tenantId);
+    const remaining = await countTenantReaderData(tenantId);
 
-    await expect(countTenantReaderData(tenantId)).resolves.toEqual(NONE);
+    expect(purged).toEqual(ONE_OF_EACH);
+    expect(remaining).toEqual(NONE);
   });
 
   it('deletes nothing on a second run', async () => {
     await purgeTenantReaderData(tenantId);
 
-    await expect(purgeTenantReaderData(tenantId)).resolves.toEqual(NONE);
+    const secondRun = await purgeTenantReaderData(tenantId);
+
+    expect(secondRun).toEqual(NONE);
   });
 
   it("leaves another tenant's reader data untouched", async () => {
@@ -76,8 +85,8 @@ describe(purgeTenantReaderData, () => {
 
     await purgeTenantReaderData(tenantId);
 
-    await expect(countTenantReaderData(otherTenantId)).resolves.toEqual(
-      ONE_OF_EACH,
-    );
+    const otherTenantCounts = await countTenantReaderData(otherTenantId);
+
+    expect(otherTenantCounts).toEqual(ONE_OF_EACH);
   });
 });

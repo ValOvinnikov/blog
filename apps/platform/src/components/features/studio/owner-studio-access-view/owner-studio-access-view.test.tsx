@@ -79,7 +79,8 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
     });
 
     it('checks the access now, confirms it and refreshes the page', async () => {
-      await user.click(screen.getByRole('button', { name: 'Check now' }));
+      const checkNowButton = screen.getByRole('button', { name: 'Check now' });
+      await user.click(checkNowButton);
 
       const checkStartedText = await screen.findByText(
         'Checking your access now. Refresh in a minute to see the result.',
@@ -91,7 +92,10 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
     });
 
     it('resends the invite and confirms it', async () => {
-      await user.click(screen.getByRole('button', { name: RESEND_INVITE }));
+      const resendInviteButton = screen.getByRole('button', {
+        name: RESEND_INVITE,
+      });
+      await user.click(resendInviteButton);
 
       const inviteResentText = await screen.findByText(
         'A new invite is on its way to your inbox.',
@@ -106,7 +110,10 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
 
-      await user.click(screen.getByRole('button', { name: RESEND_INVITE }));
+      const resendInviteButton = screen.getByRole('button', {
+        name: RESEND_INVITE,
+      });
+      await user.click(resendInviteButton);
 
       const requestFailedText = await screen.findByText(
         "Couldn't reach the setup service — try again.",

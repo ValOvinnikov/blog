@@ -20,19 +20,26 @@ import {
   mockRawHeroLayout,
   mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toHeroProfileModule, type TRawHeroProfileModule } from './transformer';
 
+faker.seed(6014);
+
 type TRawProfileAuthor = TRawHeroProfileModule['author'];
 
-const AUTHOR_BIO: TRawProfileAuthor['bio'] = [
+const MOCK_AUTHOR_BIO: TRawProfileAuthor['bio'] = [
   { _type: 'block', _key: MOCK_BIO_BLOCK_KEY, markDefs: null },
 ];
 
-const AUTHOR_ROLE = 'Staff Engineer';
-const AUTHOR_PHOTO_ALT = 'Author photo';
-const PROFILE_HEADING = 'Meet the author';
-const GITHUB_LINK = { label: 'GitHub', url: 'https://github.com/val' };
+const MOCK_AUTHOR_ROLE = faker.person.jobTitle();
+const MOCK_AUTHOR_NAME = faker.person.fullName();
+const MOCK_AUTHOR_PHOTO_ALT = faker.lorem.words(2);
+const MOCK_PROFILE_HEADING = faker.lorem.words(3);
+const MOCK_GITHUB_LINK = {
+  label: faker.lorem.word(),
+  url: faker.internet.url(),
+};
 
 function mockRawProfileAuthor(
   overrides: Partial<TRawProfileAuthor> = {},
@@ -41,11 +48,11 @@ function mockRawProfileAuthor(
 }
 
 describe(toHeroProfileModule, () => {
-  it('maps brandVariant, variant and headingBlock straight through', () => {
+  it('keeps the authored brand variant, variant and heading block', () => {
     const raw = mockRawHeroProfileModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
-      headingBlock: mockRawHeadingBlock(PROFILE_HEADING),
+      headingBlock: mockRawHeadingBlock(MOCK_PROFILE_HEADING),
     });
 
     const hero = toHeroProfileModule(raw);
@@ -53,7 +60,7 @@ describe(toHeroProfileModule, () => {
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.variant).toBe(HERO_VARIANT.BANNER);
     expect(hero.headingBlock).toEqual({
-      heading: PROFILE_HEADING,
+      heading: MOCK_PROFILE_HEADING,
       supportingText: undefined,
     });
   });
@@ -63,14 +70,14 @@ describe(toHeroProfileModule, () => {
       'the author role when showRole is on, ignoring a typed eyebrow',
       true,
       MOCK_HERO_EYEBROW,
-      AUTHOR_ROLE,
-      AUTHOR_ROLE,
+      MOCK_AUTHOR_ROLE,
+      MOCK_AUTHOR_ROLE,
     ],
     [
       'the typed eyebrow when showRole is off',
       false,
       MOCK_HERO_EYEBROW,
-      AUTHOR_ROLE,
+      MOCK_AUTHOR_ROLE,
       MOCK_HERO_EYEBROW,
     ],
     [
@@ -103,7 +110,7 @@ describe(toHeroProfileModule, () => {
     [
       'maps the author bio blocks when showBio is on',
       true,
-      AUTHOR_BIO,
+      MOCK_AUTHOR_BIO,
       [
         {
           _type: 'block',
@@ -116,7 +123,7 @@ describe(toHeroProfileModule, () => {
     [
       'leaves bio undefined when showBio is off, even if the author has one',
       false,
-      AUTHOR_BIO,
+      MOCK_AUTHOR_BIO,
       undefined,
     ],
     [
@@ -136,14 +143,14 @@ describe(toHeroProfileModule, () => {
     expect(hero.bio).toEqual(expected);
   });
 
-  it("maps avatarName from the author's name, straight through", () => {
+  it("takes the avatar name from the author's name", () => {
     const raw = mockRawHeroProfileModule({
-      author: mockRawProfileAuthor({ name: 'Alex Chen' }),
+      author: mockRawProfileAuthor({ name: MOCK_AUTHOR_NAME }),
     });
 
     const hero = toHeroProfileModule(raw);
 
-    expect(hero.avatarName).toBe('Alex Chen');
+    expect(hero.avatarName).toBe(MOCK_AUTHOR_NAME);
   });
 
   it.each([
@@ -151,15 +158,15 @@ describe(toHeroProfileModule, () => {
       "uses the hero's own image over the author photo",
       HERO_VARIANT.SPLIT,
       MOCK_HERO_IMAGE_ALT,
-      AUTHOR_PHOTO_ALT,
+      MOCK_AUTHOR_PHOTO_ALT,
       MOCK_HERO_IMAGE_ALT,
     ],
     [
       "falls back to the author's photo",
       HERO_VARIANT.SPLIT,
       null,
-      AUTHOR_PHOTO_ALT,
-      AUTHOR_PHOTO_ALT,
+      MOCK_AUTHOR_PHOTO_ALT,
+      MOCK_AUTHOR_PHOTO_ALT,
     ],
     [
       'leaves sanityImage undefined when neither has a photo',
@@ -172,14 +179,14 @@ describe(toHeroProfileModule, () => {
       'on Banner, ignores the author photo',
       HERO_VARIANT.BANNER,
       null,
-      AUTHOR_PHOTO_ALT,
+      MOCK_AUTHOR_PHOTO_ALT,
       undefined,
     ],
     [
       'on Banner, keeps the custom image',
       HERO_VARIANT.BANNER,
       MOCK_HERO_IMAGE_ALT,
-      AUTHOR_PHOTO_ALT,
+      MOCK_AUTHOR_PHOTO_ALT,
       MOCK_HERO_IMAGE_ALT,
     ],
   ])('%s', (_, variant, imageAlt, authorPhotoAlt, expectedAlt) => {
@@ -203,7 +210,7 @@ describe(toHeroProfileModule, () => {
         socialLinks: [
           {
             platform: SOCIAL_PLATFORMS.GITHUB,
-            link: mockRawExternalLinkDocument(GITHUB_LINK),
+            link: mockRawExternalLinkDocument(MOCK_GITHUB_LINK),
           },
         ],
       }),
@@ -214,7 +221,10 @@ describe(toHeroProfileModule, () => {
     expect(hero.socialLinks).toEqual([
       {
         platform: SOCIAL_PLATFORMS.GITHUB,
-        link: mockLinkView({ label: GITHUB_LINK.label, href: GITHUB_LINK.url }),
+        link: mockLinkView({
+          label: MOCK_GITHUB_LINK.label,
+          href: MOCK_GITHUB_LINK.url,
+        }),
       },
     ]);
   });
@@ -255,7 +265,7 @@ describe(toHeroProfileModule, () => {
     expect(hero.ctaButtons).toEqual([mockCtaButtonView()]);
   });
 
-  it('takes contentPosition and mediaOrder from the Split keys', () => {
+  it('takes content position and media order from the Split fields', () => {
     const raw = mockRawHeroProfileModule({
       variant: HERO_VARIANT.SPLIT,
       contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
@@ -269,7 +279,7 @@ describe(toHeroProfileModule, () => {
     expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
 
-  it('leaves mediaOrder undefined on Stacked, which authors no order of its own', () => {
+  it('leaves mediaOrder undefined on Stacked, which has no order of its own', () => {
     const raw = mockRawHeroProfileModule({
       variant: HERO_VARIANT.STACKED,
       mediaOrderSplit: MEDIA_ORDER.FIRST,

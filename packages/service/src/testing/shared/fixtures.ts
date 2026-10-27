@@ -21,6 +21,7 @@ import type { TRawPortableTextBody } from '@blog/service/shared/transformers/por
 import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { TRawSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { TRawSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
+import { faker } from '@faker-js/faker';
 import type { InferFragmentType } from 'groqd';
 
 type TRawPostLink = InferFragmentType<typeof postLinkFragment>;
@@ -44,6 +45,10 @@ export const MOCK_BIO_BLOCK_KEY = 'bio-block-1';
 export const MOCK_BODY_IMAGE_KEY = 'body-image-1';
 
 const IMAGE_LQIP = 'data:image/png;base64,abc123';
+
+export function mockSlug() {
+  return faker.string.alpha({ length: 8, casing: 'lower' });
+}
 
 function mockImageDimensions() {
   return { width: 800, height: 600, aspectRatio: 1.333 };

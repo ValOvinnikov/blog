@@ -4,43 +4,53 @@ import {
 } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { siteSettingsQuery } from './query';
 
+faker.seed(6015105);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const BUILD_ITEM = 'build 2026.07';
+const MOCK_FIRST_ITEM_KEY = faker.string.uuid();
+const MOCK_SECOND_ITEM_KEY = faker.string.uuid();
+const MOCK_ENGLISH_ITEM = faker.lorem.word();
+const MOCK_DUTCH_ITEM = faker.lorem.word();
+const MOCK_UNTRANSLATED_ITEM = faker.lorem.word();
 
-const siteSettingsDocument = {
-  _id: 'settings_site',
+const MOCK_SITE_SETTINGS_DOCUMENT = {
+  _id: faker.string.uuid(),
   _type: 'settings_site',
   brand: {
     _type: 'brand',
-    name: 'Awesome Blog',
+    name: faker.company.name(),
     tagline: {
       _type: 'brandTagline',
       items: [
         {
-          _key: 'item-1',
+          _key: MOCK_FIRST_ITEM_KEY,
           _type: 'brandTaglineItem',
-          text: mockLocalizedStrings({ [EN]: 'online', [NL]: 'actief' }),
+          text: mockLocalizedStrings({
+            [EN]: MOCK_ENGLISH_ITEM,
+            [NL]: MOCK_DUTCH_ITEM,
+          }),
         },
         {
-          _key: 'item-2',
+          _key: MOCK_SECOND_ITEM_KEY,
           _type: 'brandTaglineItem',
-          text: mockLocalizedStrings({ [EN]: BUILD_ITEM }),
+          text: mockLocalizedStrings({ [EN]: MOCK_UNTRANSLATED_ITEM }),
         },
       ],
       separator: BRAND_TAGLINE_SEPARATORS.DOT,
     },
   },
-  currency: 'USD',
+  currency: 'EUR',
 };
 
 async function runSiteSettings(locale: string) {
   const raw = await evaluateGroqExpression(
     siteSettingsQuery.query,
-    [siteSettingsDocument],
+    [MOCK_SITE_SETTINGS_DOCUMENT],
     undefined,
     { locale, defaultLocale: EN },
   );
@@ -53,8 +63,8 @@ describe('siteSettingsQuery', () => {
     const settings = await runSiteSettings(NL);
 
     expect(settings.brand.tagline?.items).toEqual([
-      { _key: 'item-1', text: 'actief' },
-      { _key: 'item-2', text: BUILD_ITEM },
+      { _key: MOCK_FIRST_ITEM_KEY, text: MOCK_DUTCH_ITEM },
+      { _key: MOCK_SECOND_ITEM_KEY, text: MOCK_UNTRANSLATED_ITEM },
     ]);
   });
 
@@ -62,8 +72,8 @@ describe('siteSettingsQuery', () => {
     const settings = await runSiteSettings(FR);
 
     expect(settings.brand.tagline?.items).toEqual([
-      { _key: 'item-1', text: 'online' },
-      { _key: 'item-2', text: BUILD_ITEM },
+      { _key: MOCK_FIRST_ITEM_KEY, text: MOCK_ENGLISH_ITEM },
+      { _key: MOCK_SECOND_ITEM_KEY, text: MOCK_UNTRANSLATED_ITEM },
     ]);
   });
 });

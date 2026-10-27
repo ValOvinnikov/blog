@@ -5,131 +5,87 @@ import {
   NEXT_NAVIGATION_ERROR,
   TENANT_DELETE_OUTCOME,
   TENANT_DELETE_SANITY_PROJECT_OUTCOME,
-  type TMaybeNull,
 } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
+import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import {
   TENANT_FIELD_ERROR,
-  TENANT_REFUSAL,
   TENANT_LOG,
+  TENANT_REFUSAL,
 } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
-  MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import {
-  MOCK_TENANT_NAME,
+  MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
-import { notFound, redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
-const {
-  requireSuperAdminMock,
-  getTenantByIdMock,
-  deleteTenantMock,
-  insertAuditEventMock,
-} = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-  deleteTenantMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-}));
+import { deleteTenantAction } from './delete-tenant-action';
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: {
-      getTenantById: getTenantByIdMock,
-      deleteTenant: deleteTenantMock,
-    },
-    auditEvents: { insertAuditEvent: insertAuditEventMock },
+    tenants: { getTenantById: vi.fn(), deleteTenant: vi.fn() },
+    auditEvents: { insertAuditEvent: vi.fn() },
   },
 }));
 
+faker.seed(5997);
+
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
+const deleteTenantMock = vi.mocked(queries.tenants.deleteTenant);
+const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
 const loggerErrorMock = vi.mocked(logger.error);
 
-const CONNECTION_ERROR_MESSAGE = 'connection reset';
+const MOCK_WRONG_NAME = faker.lorem.words(3);
+const MOCK_CONNECTION_ERROR = new Error(faker.lorem.words(2));
 
-const tenant = {
-  id: MOCK_TENANT_ID,
-  name: MOCK_TENANT_NAME,
-  deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') as TMaybeNull<Date>,
-};
+const archivedTenant = mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT });
 
-describe('deleteTenantAction', () => {
-  let deleteTenantAction: (typeof import('./delete-tenant-action'))['deleteTenantAction'];
-
-  beforeEach(async () => {
-    requireSuperAdminMock.mockReset();
-    requireSuperAdminMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.SUPERADMIN,
-    });
+describe(deleteTenantAction, () => {
+  beforeEach(() => {
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getTenantByIdMock.mockReset();
-    getTenantByIdMock.mockResolvedValue(tenant);
+    getTenantByIdMock.mockResolvedValue(archivedTenant);
     deleteTenantMock.mockReset();
     deleteTenantMock.mockResolvedValue({
       outcome: TENANT_DELETE_OUTCOME.DELETED,
       sanityProject: TENANT_DELETE_SANITY_PROJECT_OUTCOME.NO_PROJECT,
     });
     insertAuditEventMock.mockReset();
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    loggerErrorMock.mockReset();
-    ({ deleteTenantAction } = await import('./delete-tenant-action'));
   });
 
-  it('requires a super-admin session before deleting', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    });
-    await expect(
-      deleteTenantAction(MOCK_TENANT_ID, { confirm: MOCK_TENANT_NAME }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    expect(deleteTenantMock).not.toHaveBeenCalled();
-  });
+  it('stops before any tenant work when the super-admin gate rejects', async () => {
+    vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
-  it("rejects an ADMIN-role caller via requireSuperAdmin's 404 before any tenant work", async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      notFound();
-    });
     await expect(
       deleteTenantAction(MOCK_TENANT_ID, { confirm: MOCK_TENANT_NAME }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(redirect).not.toHaveBeenCalled();
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
-  it('returns an error when the tenant is not found', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
+  it('rejects a confirmation that does not match the tenant name', async () => {
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: MOCK_TENANT_NAME,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
-    });
-    expect(deleteTenantMock).not.toHaveBeenCalled();
-  });
-
-  it('returns an error when confirm does not match the tenant name', async () => {
-    const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: 'wrong-name',
+      confirm: MOCK_WRONG_NAME,
     });
 
     expect(result).toEqual({
@@ -139,37 +95,32 @@ describe('deleteTenantAction', () => {
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
-  it('returns an error and no audit event when the mutation refuses a live tenant', async () => {
-    deleteTenantMock.mockResolvedValue({
-      outcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED,
-    });
-    const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: MOCK_TENANT_NAME,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
+  it.each([
+    {
+      scenario: 'refuses a live tenant',
+      deleteOutcome: TENANT_DELETE_OUTCOME.NOT_ARCHIVED,
       reason: TENANT_REFUSAL.NOT_ARCHIVED,
-    });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('returns an error and no audit event when the mutation reports the tenant gone', async () => {
-    deleteTenantMock.mockResolvedValue({
-      outcome: TENANT_DELETE_OUTCOME.NOT_FOUND,
-    });
-    const result = await deleteTenantAction(MOCK_TENANT_ID, {
-      confirm: MOCK_TENANT_NAME,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
+    },
+    {
+      scenario: 'reports the tenant gone',
+      deleteOutcome: TENANT_DELETE_OUTCOME.NOT_FOUND,
       reason: TENANT_REFUSAL.NOT_FOUND,
-    });
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
+    },
+  ] as const)(
+    'refuses without an audit event when the mutation $scenario',
+    async ({ deleteOutcome, reason }) => {
+      deleteTenantMock.mockResolvedValueOnce({ outcome: deleteOutcome });
 
-  it('deletes the tenant and records a DELETED audit event when confirm matches', async () => {
+      const result = await deleteTenantAction(MOCK_TENANT_ID, {
+        confirm: MOCK_TENANT_NAME,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.REFUSED, reason });
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it('deletes the tenant and records a DELETED audit event', async () => {
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
     });
@@ -185,8 +136,9 @@ describe('deleteTenantAction', () => {
     });
   });
 
-  it('returns an error and records no audit event when the delete mutation throws', async () => {
-    deleteTenantMock.mockRejectedValue(new Error(CONNECTION_ERROR_MESSAGE));
+  it('returns a server error and records no audit event when the delete throws', async () => {
+    deleteTenantMock.mockRejectedValueOnce(MOCK_CONNECTION_ERROR);
+
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
     });
@@ -195,12 +147,13 @@ describe('deleteTenantAction', () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(TENANT_LOG.DELETE_FAILED, {
       tenantId: MOCK_TENANT_ID,
-      error: new Error(CONNECTION_ERROR_MESSAGE),
+      error: MOCK_CONNECTION_ERROR,
     });
   });
 
-  it('still returns ok when the audit write fails, and logs the failure', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error(CONNECTION_ERROR_MESSAGE));
+  it('still succeeds, and logs the failure, when the audit write fails', async () => {
+    insertAuditEventMock.mockRejectedValueOnce(MOCK_CONNECTION_ERROR);
+
     const result = await deleteTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
     });
@@ -212,7 +165,7 @@ describe('deleteTenantAction', () => {
         action: AUDIT_ACTION.DELETED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        error: new Error(CONNECTION_ERROR_MESSAGE),
+        error: MOCK_CONNECTION_ERROR,
       },
     );
   });

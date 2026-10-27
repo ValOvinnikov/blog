@@ -3,7 +3,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import {
@@ -11,59 +11,63 @@ import {
   type TProvisioningBannerProps,
 } from './provisioning-banner';
 
-const idleStepStatuses = () =>
-  Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
+const { IDLE, RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
 
 type TPoll = TProvisioningBannerProps['poll'];
 
-const idlePoll: TPoll = {
+const IDLE_POLL: TPoll = {
   provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-  stepStatuses: idleStepStatuses(),
+  stepStatuses: [IDLE, IDLE, IDLE, IDLE, IDLE, IDLE],
   isOverallFailed: false,
   isProvisioningRunning: false,
   errorKind: undefined,
   ownerElevationOutcome: undefined,
 };
 
-const setup = (poll: Partial<TPoll> = {}) =>
-  renderWithIntl(
-    <ProvisioningBanner
-      tenantId={MOCK_TENANT_ID}
-      poll={{ ...idlePoll, ...poll }}
-    />,
-  );
-
-const READY_STEP_STATUSES = Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE);
+const READY_POLL: TPoll = {
+  ...IDLE_POLL,
+  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+  stepStatuses: [DONE, DONE, DONE, DONE, DONE, DONE],
+};
 
 const VIEW_STEPS = 'View steps';
+const PROVISIONED = 'Provisioned';
 const OWNER_INVITE_STALLED = 'Owner invite stalled';
 const OWNER_MEMBERSHIP_UNCLEAR = 'Owner membership unclear';
+
+const customSetup = customRender(ProvisioningBanner, {
+  tenantId: MOCK_TENANT_ID,
+  poll: IDLE_POLL,
+});
+
+const setup = (poll: Partial<TPoll> = {}) =>
+  customSetup({ poll: { ...IDLE_POLL, ...poll } });
 
 describe(`<${ProvisioningBanner.name}/>`, () => {
   it('renders nothing for a tenant that has not started provisioning', () => {
     setup();
 
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    const status = screen.queryByRole('status');
+    const alert = screen.queryByRole('alert');
+    const link = screen.queryByRole('link');
+
+    expect(status).not.toBeInTheDocument();
+    expect(alert).not.toBeInTheDocument();
+    expect(link).not.toBeInTheDocument();
   });
 
-  it('shows the current step and a link to the provisioning page while running', () => {
+  it('shows the current step and a link to the steps while running', () => {
     setup({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      stepStatuses: [
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        TENANT_PROVISIONING_STEP_STATUS.IDLE,
-      ],
+      stepStatuses: [DONE, DONE, RUNNING, IDLE, IDLE, IDLE],
       isProvisioningRunning: true,
     });
 
-    expect(screen.getByText('Provisioning — step 3 of 6')).toBeVisible();
-    expect(screen.getByRole('link', { name: VIEW_STEPS })).toHaveAttribute(
+    const progress = screen.getByText('Provisioning — step 3 of 6');
+    const viewStepsLink = screen.getByRole('link', { name: VIEW_STEPS });
+
+    expect(progress).toBeVisible();
+    expect(viewStepsLink).toHaveAttribute(
       'href',
       `/tenants/${MOCK_TENANT_ID}/provisioning`,
     );
@@ -72,34 +76,28 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
   it('shows the failed step and its classified error while stuck', () => {
     setup({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      stepStatuses: [
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-        TENANT_PROVISIONING_STEP_STATUS.DONE,
-        TENANT_PROVISIONING_STEP_STATUS.FAILED,
-        TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        TENANT_PROVISIONING_STEP_STATUS.IDLE,
-      ],
+      stepStatuses: [DONE, DONE, DONE, FAILED, IDLE, IDLE],
       isOverallFailed: true,
       errorKind: 'duplicate',
     });
 
-    expect(
-      screen.getByText('Provisioning failed at step 4 of 6'),
-    ).toBeVisible();
-    expect(
-      screen.getByText('Connect domain — Already in use by another tenant'),
-    ).toBeVisible();
+    const failure = screen.getByText('Provisioning failed at step 4 of 6');
+    const error = screen.getByText(
+      'Connect domain — Already in use by another tenant',
+    );
+
+    expect(failure).toBeVisible();
+    expect(error).toBeVisible();
   });
 
   it('shows a one-line confirmation and a link to the steps when ready', () => {
-    setup({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      stepStatuses: READY_STEP_STATUSES,
-    });
+    setup(READY_POLL);
 
-    expect(screen.getByText('Provisioned')).toBeVisible();
-    expect(screen.getByRole('link', { name: VIEW_STEPS })).toBeVisible();
+    const confirmation = screen.getByText(PROVISIONED);
+    const viewStepsLink = screen.getByRole('link', { name: VIEW_STEPS });
+
+    expect(confirmation).toBeVisible();
+    expect(viewStepsLink).toBeVisible();
   });
 
   it.each([
@@ -116,18 +114,19 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
         "More than one membership matches this tenant's owner — resolve it manually in Sanity Manage.",
     },
   ])(
-    'shows a status-role owner-elevation row for a $outcome outcome when ready',
+    'explains a $outcome owner elevation without raising an alert',
     ({ outcome, heading, description }) => {
-      setup({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        stepStatuses: READY_STEP_STATUSES,
-        ownerElevationOutcome: outcome,
-      });
+      setup({ ...READY_POLL, ownerElevationOutcome: outcome });
 
-      expect(screen.getByText(heading)).toBeVisible();
-      expect(screen.getByText(description)).toBeVisible();
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(screen.getAllByRole('status')).toHaveLength(2);
+      const headingElement = screen.getByText(heading);
+      const descriptionElement = screen.getByText(description);
+      const alert = screen.queryByRole('alert');
+      const statusRows = screen.getAllByRole('status');
+
+      expect(headingElement).toBeVisible();
+      expect(descriptionElement).toBeVisible();
+      expect(alert).not.toBeInTheDocument();
+      expect(statusRows).toHaveLength(2);
     },
   );
 
@@ -135,50 +134,41 @@ describe(`<${ProvisioningBanner.name}/>`, () => {
     ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
     ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR,
     ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
-  ] as const)(
-    'renders nothing extra for a %s outcome when ready',
-    (outcome) => {
-      setup({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-        stepStatuses: READY_STEP_STATUSES,
-        ownerElevationOutcome: outcome,
-      });
+  ])('shows only the confirmation for a %s owner elevation', (outcome) => {
+    setup({ ...READY_POLL, ownerElevationOutcome: outcome });
 
-      expect(screen.getByText('Provisioned')).toBeVisible();
-      expect(screen.getAllByRole('status')).toHaveLength(1);
-    },
-  );
+    const confirmation = screen.getByText(PROVISIONED);
+    const statusRows = screen.getAllByRole('status');
+
+    expect(confirmation).toBeVisible();
+    expect(statusRows).toHaveLength(1);
+  });
 
   it.each([
     {
-      stepStatus: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      stepStatus: RUNNING,
       poll: { isProvisioningRunning: true },
       outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
       heading: OWNER_INVITE_STALLED,
     },
     {
-      stepStatus: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      stepStatus: FAILED,
       poll: { isOverallFailed: true, errorKind: 'duplicate' as const },
       outcome: ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
       heading: OWNER_MEMBERSHIP_UNCLEAR,
     },
   ])(
-    'never renders the owner-elevation row while the step is $stepStatus',
+    'hides the owner elevation while a step is $stepStatus',
     ({ stepStatus, poll, outcome, heading }) => {
       setup({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        stepStatuses: [
-          TENANT_PROVISIONING_STEP_STATUS.DONE,
-          stepStatus,
-          TENANT_PROVISIONING_STEP_STATUS.IDLE,
-          TENANT_PROVISIONING_STEP_STATUS.IDLE,
-          TENANT_PROVISIONING_STEP_STATUS.IDLE,
-        ],
+        stepStatuses: [DONE, stepStatus, IDLE, IDLE, IDLE, IDLE],
         ...poll,
         ownerElevationOutcome: outcome,
       });
 
       const elevationRow = screen.queryByText(heading);
+
       expect(elevationRow).not.toBeInTheDocument();
     },
   );

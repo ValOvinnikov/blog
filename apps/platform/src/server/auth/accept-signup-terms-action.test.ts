@@ -4,6 +4,7 @@ import {
   SIGNUP_TERMS_COOKIE_NAME,
   TERMS_VERSION,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_LOG,
@@ -16,30 +17,34 @@ import { redirect } from 'next/navigation';
 
 import { acceptSignupTermsAction } from './accept-signup-terms-action';
 
-const { setCookieMock, mockBotIdVerdict } = vi.hoisted(() => ({
-  setCookieMock: vi.fn(),
-  mockBotIdVerdict: (isBot: boolean) => ({
-    isHuman: !isBot,
-    isBot,
-    isVerifiedBot: false,
-    bypassed: false,
-  }),
-}));
+const setCookieMock = vi.hoisted(() => vi.fn());
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ set: setCookieMock })),
 }));
 
-vi.mock('botid/server', () => ({
-  checkBotId: vi.fn(async () => mockBotIdVerdict(false)),
-}));
+vi.mock('botid/server', () => ({ checkBotId: vi.fn() }));
 
+faker.seed(5997);
+
+const MOCK_BOT_CHECK_ERROR = new Error(faker.lorem.sentence());
 const MOCK_REFUSED_RESULT = {
   outcome: ACTION_OUTCOME.REFUSED,
   reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,
 };
 
+const mockBotIdVerdict = (isBot: boolean) => ({
+  isHuman: !isBot,
+  isBot,
+  isVerifiedBot: false,
+  bypassed: false,
+});
+
 describe(acceptSignupTermsAction, () => {
+  beforeEach(() => {
+    vi.mocked(checkBotId).mockResolvedValue(mockBotIdVerdict(false));
+  });
+
   it('records the current terms version and sends the visitor on to sign in', async () => {
     await expect(
       acceptSignupTermsAction({ hasAcceptedTerms: true }),
@@ -80,15 +85,14 @@ describe(acceptSignupTermsAction, () => {
   });
 
   it('refuses and logs when the bot check itself fails', async () => {
-    const error = new Error('BotID unreachable');
-    vi.mocked(checkBotId).mockRejectedValueOnce(error);
+    vi.mocked(checkBotId).mockRejectedValueOnce(MOCK_BOT_CHECK_ERROR);
 
     const result = await acceptSignupTermsAction({ hasAcceptedTerms: true });
 
     expect(result).toEqual(MOCK_REFUSED_RESULT);
     expect(setCookieMock).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(SIGN_UP_LOG.BOT_CHECK_FAILED, {
-      error,
+      error: MOCK_BOT_CHECK_ERROR,
     });
   });
 });

@@ -6,8 +6,8 @@ import {
   mockHeroSlotView,
   mockRawCtaRef,
   mockRawHeroRef,
-  mockRawTaxonomyListRef,
   mockRawTopicIndexPage,
+  mockRawTaxonomyListRef,
   mockTaxonomyListSlotView,
 } from '@blog/service/testing/pages/fixtures';
 import {
@@ -20,14 +20,17 @@ import {
   mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getIndexPage } from './loader';
 import { topicIndexPageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const SUPPORTING_TEXT = 'Find posts by subject.';
-const META_TITLE = 'Topics — Blog';
+faker.seed(601607);
+
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_META_TITLE = faker.lorem.sentence();
 
 const tenant = mockTenant();
 
@@ -43,22 +46,28 @@ async function loadIndexPage(
 
 describe(getIndexPage, () => {
   it('exposes the headingBlock from the page_topicIndex singleton', async () => {
-    const { headingBlock, seo } = await loadIndexPage({
+    const { headingBlock } = await loadIndexPage({
       headingBlock: mockRawHeadingBlock(MOCK_TOPIC_INDEX_HEADING, {
-        supportingText: SUPPORTING_TEXT,
-      }),
-      seo: mockRawSeo({
-        metaTitle: META_TITLE,
-        metaDescription: SUPPORTING_TEXT,
+        supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
 
     expect(headingBlock).toEqual({
       heading: MOCK_TOPIC_INDEX_HEADING,
-      supportingText: SUPPORTING_TEXT,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
-    expect(seo.title).toBe(META_TITLE);
-    expect(seo.description).toBe(SUPPORTING_TEXT);
+  });
+
+  it('resolves seo from the authored meta fields', async () => {
+    const { seo } = await loadIndexPage({
+      seo: mockRawSeo({
+        metaTitle: MOCK_META_TITLE,
+        metaDescription: MOCK_SUPPORTING_TEXT,
+      }),
+    });
+
+    expect(seo.title).toBe(MOCK_META_TITLE);
+    expect(seo.description).toBe(MOCK_SUPPORTING_TEXT);
   });
 
   it.each([
@@ -93,9 +102,7 @@ describe(getIndexPage, () => {
 
   it('rejects when page_topicIndex.hero resolves to a non-hero module type', async () => {
     mockRun.mockResolvedValueOnce(
-      mockRawTopicIndexPage({
-        hero: mockRawCtaRef() as never,
-      }),
+      mockRawTopicIndexPage({ hero: mockRawCtaRef() as never }),
     );
 
     await expect(getIndexPage(tenant)).rejects.toThrow();

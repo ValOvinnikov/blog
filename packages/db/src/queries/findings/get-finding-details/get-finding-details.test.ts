@@ -1,15 +1,14 @@
-import {
-  FINDING_KIND,
-  FINDING_SEVERITY,
-  FINDING_SOURCE,
-} from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import { mockOpenFindingInput } from '@blog/db/testing/findings/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { openFinding } from '../open-finding';
 
 import { getFindingDetails } from './get-finding-details';
+
+faker.seed(6021002);
 
 vi.mock('@blog/db/client');
 
@@ -23,17 +22,14 @@ afterEach(async () => {
 describe(getFindingDetails, () => {
   let tenantId: string;
   let findingId: string;
+  let details: Record<string, unknown>;
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
-    const opened = await openFinding({
-      tenantId,
-      source: FINDING_SOURCE.DOCUMENT_VALIDATION,
-      kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: 'doc-1',
-      details: { invalidDocumentCount: 2 },
-    });
+    details = { invalidDocumentCount: faker.number.int({ min: 1, max: 50 }) };
+    const opened = await openFinding(
+      mockOpenFindingInput({ tenantId, details }),
+    );
     if (!opened.ok) throw new Error('openFinding failed');
     findingId = opened.data.finding.id;
   });
@@ -41,7 +37,7 @@ describe(getFindingDetails, () => {
   it("returns the finding's details for its own tenant", async () => {
     const result = await getFindingDetails(tenantId, findingId);
 
-    expect(result).toEqual({ invalidDocumentCount: 2 });
+    expect(result).toEqual(details);
   });
 
   it("returns null for another tenant's finding", async () => {
@@ -53,10 +49,7 @@ describe(getFindingDetails, () => {
   });
 
   it('returns null for an unknown finding', async () => {
-    const result = await getFindingDetails(
-      tenantId,
-      '00000000-0000-0000-0000-000000000000',
-    );
+    const result = await getFindingDetails(tenantId, faker.string.uuid());
 
     expect(result).toBeNull();
   });

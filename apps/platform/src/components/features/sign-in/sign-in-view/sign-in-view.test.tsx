@@ -3,7 +3,7 @@ import { SIGN_IN_ERROR } from '@platform/constants/sign-in';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInView } from './sign-in-view';
 
@@ -26,6 +26,12 @@ const setup = customRender(SignInView, {
 });
 
 describe(`<${SignInView.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   describe('with every provider and no error', () => {
     beforeEach(() => {
       setup();
@@ -72,7 +78,6 @@ describe(`<${SignInView.name}/>`, () => {
   });
 
   it('starts the chosen provider sign-in for the requested page', async () => {
-    const user = userEvent.setup();
     setup({ providerIds: [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] });
 
     const google = screen.getByRole('button', MOCK_GOOGLE_BUTTON);

@@ -1,129 +1,109 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
+import { requireAdmin } from '@platform/server/auth/require-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
 
-import { auth } from './auth';
 import { requireTenantById } from './require-tenant-by-id';
 
-const { getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(() => ({
-  getAdminByUserIdMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-}));
+vi.mock('@platform/server/auth/require-admin');
 
-vi.mock('./auth');
+vi.mock('@blog/db', async () => {
+  const { mockDbConstants } =
+    await import('@platform/testing/mock-db-constants');
 
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: {
-    admins: { getAdminByUserId: getAdminByUserIdMock },
-    tenants: { getTenantById: getTenantByIdMock },
-  },
-}));
+  return {
+    ...(await mockDbConstants()),
+    queries: { tenants: { getTenantById: vi.fn() } },
+  };
+});
 
-const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
+faker.seed(5997);
 
-const USER_ID = 'user-1';
-const INVALID_INPUT_SYNTAX = 'invalid input syntax';
-const NOT_A_UUID = 'not-a-uuid';
-const UNKNOWN_TENANT_ID = 'ghost';
+const MOCK_READ_ERROR_MESSAGE = faker.lorem.sentence();
+const MOCK_MALFORMED_TENANT_ID = faker.lorem.slug();
+const MOCK_UNKNOWN_TENANT_ID = faker.string.uuid();
 
-const admin = mockAdmin({ userId: USER_ID });
+const getTenantById = vi.mocked(queries.tenants.getTenantById);
+
 const tenant = mockTenant();
 
 const TENANT_READS = [
   {
     tenantCase: 'an existing tenant',
     tenantId: MOCK_TENANT_ID,
-    arrangeRead: () => getTenantByIdMock.mockResolvedValue(tenant),
+    arrangeRead: () => getTenantById.mockResolvedValue(tenant),
   },
   {
     tenantCase: 'a malformed id whose read fails',
-    tenantId: NOT_A_UUID,
+    tenantId: MOCK_MALFORMED_TENANT_ID,
     arrangeRead: () =>
-      getTenantByIdMock.mockRejectedValue(new Error(INVALID_INPUT_SYNTAX)),
+      getTenantById.mockRejectedValue(new Error(MOCK_READ_ERROR_MESSAGE)),
   },
 ];
 
-describe('requireTenantById', () => {
+const LIVE_AND_ARCHIVED_TENANTS = [
+  { tenantCase: 'a live tenant', resolvedTenant: tenant },
+  {
+    tenantCase: 'an archived tenant',
+    resolvedTenant: mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+  },
+];
+
+describe(requireTenantById, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getTenantByIdMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
-    getAdminByUserIdMock.mockResolvedValue(admin);
+    getTenantById.mockReset();
   });
 
   it.each(TENANT_READS)(
-    'redirects a signed-out visitor to sign-in for $tenantCase',
+    'surfaces the admin gate failure for $tenantCase',
     async ({ tenantId, arrangeRead }) => {
-      authMock.mockResolvedValue(null);
+      vi.mocked(requireAdmin).mockRejectedValueOnce(
+        new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
+      );
       arrangeRead();
 
       await expect(requireTenantById(tenantId)).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
       );
-
-      expect(redirect).toHaveBeenCalledWith(adminRoutes.signIn());
-      expect(getAdminByUserIdMock).not.toHaveBeenCalled();
-    },
-  );
-
-  it.each(TENANT_READS)(
-    '404s a signed-in user with no admins row for $tenantCase',
-    async ({ tenantId, arrangeRead }) => {
-      getAdminByUserIdMock.mockResolvedValue(undefined);
-      arrangeRead();
-
-      await expect(requireTenantById(tenantId)).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
-
-      expect(getAdminByUserIdMock).toHaveBeenCalledWith(USER_ID);
-      expect(redirect).not.toHaveBeenCalled();
     },
   );
 
   it('surfaces a failed tenant read for an admin', async () => {
-    getTenantByIdMock.mockRejectedValue(new Error(INVALID_INPUT_SYNTAX));
+    getTenantById.mockRejectedValue(new Error(MOCK_READ_ERROR_MESSAGE));
 
-    await expect(requireTenantById(NOT_A_UUID)).rejects.toThrow(
-      INVALID_INPUT_SYNTAX,
+    await expect(requireTenantById(MOCK_MALFORMED_TENANT_ID)).rejects.toThrow(
+      MOCK_READ_ERROR_MESSAGE,
     );
   });
 
   it('404s for an unknown tenant id', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
+    getTenantById.mockResolvedValue(undefined);
 
-    await expect(requireTenantById(UNKNOWN_TENANT_ID)).rejects.toThrow(
+    await expect(requireTenantById(MOCK_UNKNOWN_TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith(UNKNOWN_TENANT_ID, {
+    expect(getTenantById).toHaveBeenCalledWith(MOCK_UNKNOWN_TENANT_ID, {
       includeArchived: true,
     });
   });
 
-  it.each([
-    { tenantCase: 'a live tenant', resolvedTenant: tenant },
-    {
-      tenantCase: 'an archived tenant',
-      resolvedTenant: mockTenant({
-        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-      }),
-    },
-  ])(
+  it.each(LIVE_AND_ARCHIVED_TENANTS)(
     'returns $tenantCase and the admin without checking membership',
     async ({ resolvedTenant }) => {
-      getTenantByIdMock.mockResolvedValue(resolvedTenant);
+      getTenantById.mockResolvedValue(resolvedTenant);
 
       const result = await requireTenantById(MOCK_TENANT_ID);
 
-      expect(result).toEqual({ tenant: resolvedTenant, admin });
-      expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+      expect(result).toEqual({ tenant: resolvedTenant, admin: mockAdmin() });
+      expect(getTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         includeArchived: true,
       });
       expect(redirect).not.toHaveBeenCalled();

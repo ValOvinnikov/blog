@@ -7,12 +7,17 @@ import {
   THEME_DOCUMENT_TYPE,
 } from './transform';
 
+const INDIGO_SITE = { brand: { variant: 'INDIGO' } };
+
+const THEME_PATCH = patch(THEME_DOCUMENT_ID, [
+  at('preset', set(INDIGO_THEME_TARGET.preset)),
+  at('accentHue', set(INDIGO_THEME_TARGET.accentHue)),
+  at('logoHue', set(INDIGO_THEME_TARGET.logoHue)),
+]);
+
 describe(indigoThemeMutations, () => {
-  it('creates/updates settings_theme for a settings_site with brand.variant INDIGO', () => {
-    const result = indigoThemeMutations(
-      { brand: { variant: 'INDIGO' } },
-      undefined,
-    );
+  it('creates and patches the theme for an INDIGO site', () => {
+    const result = indigoThemeMutations(INDIGO_SITE, undefined);
 
     expect(result).toEqual([
       createIfNotExists({
@@ -20,50 +25,33 @@ describe(indigoThemeMutations, () => {
         _type: THEME_DOCUMENT_TYPE,
         ...INDIGO_THEME_TARGET,
       }),
-      patch(THEME_DOCUMENT_ID, [
-        at('preset', set(INDIGO_THEME_TARGET.preset)),
-        at('accentHue', set(INDIGO_THEME_TARGET.accentHue)),
-        at('logoHue', set(INDIGO_THEME_TARGET.logoHue)),
-      ]),
+      THEME_PATCH,
     ]);
   });
 
-  it('converges an existing settings_theme with different values to the target', () => {
-    const result = indigoThemeMutations(
-      { brand: { variant: 'INDIGO' } },
-      { preset: 'EDITORIAL', accentHue: 28, logoHue: 28 },
-    );
+  it('converges an existing theme with different values to the target', () => {
+    const result = indigoThemeMutations(INDIGO_SITE, {
+      preset: 'EDITORIAL',
+      accentHue: 28,
+      logoHue: 28,
+    });
 
-    expect(result).toBeDefined();
-    expect(result).toContainEqual(
-      patch(THEME_DOCUMENT_ID, [
-        at('preset', set(INDIGO_THEME_TARGET.preset)),
-        at('accentHue', set(INDIGO_THEME_TARGET.accentHue)),
-        at('logoHue', set(INDIGO_THEME_TARGET.logoHue)),
-      ]),
-    );
+    expect(result?.at(-1)).toEqual(THEME_PATCH);
   });
 
-  it('is a no-op for brand.variant CONSOLE', () => {
-    const result = indigoThemeMutations(
-      { brand: { variant: 'CONSOLE' } },
-      undefined,
-    );
+  it.each([
+    ['a CONSOLE site', { brand: { variant: 'CONSOLE' } }],
+    ['a site without a brand variant', { brand: {} }],
+  ])('returns undefined for %s', (_label, site) => {
+    const result = indigoThemeMutations(site, undefined);
 
     expect(result).toBeUndefined();
   });
 
-  it('is a no-op when brand.variant is unset', () => {
-    const result = indigoThemeMutations({ brand: {} }, undefined);
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is idempotent — settings_theme already matching the target is left alone', () => {
-    const result = indigoThemeMutations(
-      { brand: { variant: 'INDIGO' } },
-      { ...INDIGO_THEME_TARGET },
-    );
+  it('leaves a theme that already matches the target alone', () => {
+    const result = indigoThemeMutations(INDIGO_SITE, {
+      ...INDIGO_THEME_TARGET,
+    });
 
     expect(result).toBeUndefined();
   });

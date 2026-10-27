@@ -1,11 +1,18 @@
 import { LOG_LEVEL } from '@blog/insight/logger/logger';
 import { MOCK_EVENT, MOCK_SERVICE } from '@blog/insight/testing/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { createLokiSink } from './loki-sink';
 
-const PUSH_URL = 'https://logs-prod-012.grafana.net/loki/api/v1/push';
+faker.seed(6030);
 
-const LINE = {
+const MOCK_PUSH_URL = faker.internet.url();
+const MOCK_USER = '123456';
+const MOCK_TOKEN = 'glc_token';
+
+const MOCK_LINE_NANOSECONDS = '1792065600000000000';
+
+const MOCK_LINE = {
   service: MOCK_SERVICE,
   level: LOG_LEVEL.ERROR,
   event: MOCK_EVENT,
@@ -28,9 +35,9 @@ describe(createLokiSink, () => {
       .mockResolvedValue(new Response(null, { status: 204 }));
     vi.stubGlobal('fetch', fetchMock);
     const sink = createLokiSink({
-      url: PUSH_URL,
-      user: '123456',
-      token: 'glc_token',
+      url: MOCK_PUSH_URL,
+      user: MOCK_USER,
+      token: MOCK_TOKEN,
     });
     if (!sink) {
       throw new Error('expected a sink');
@@ -44,20 +51,19 @@ describe(createLokiSink, () => {
   });
 
   it.each([
-    { user: '123\u201d', token: 'glc_token' },
-    { user: '123456', token: '\u201cglc_token\u201d' },
-  ])(
-    'creates no sink when the credentials cannot be encoded',
-    (credentials) => {
-      expect(createLokiSink({ url: PUSH_URL, ...credentials })).toBeUndefined();
-    },
-  );
+    ['user', { user: '123\u201d', token: MOCK_TOKEN }],
+    ['token', { user: MOCK_USER, token: '\u201cglc_token\u201d' }],
+  ])('creates no sink when the %s cannot be encoded', (_field, credentials) => {
+    expect(
+      createLokiSink({ url: MOCK_PUSH_URL, ...credentials }),
+    ).toBeUndefined();
+  });
 
   it('posts the line to the push URL with basic auth', async () => {
-    await push(LINE);
+    await push(MOCK_LINE);
 
     const [url, init] = fetchMock.mock.calls[0] ?? [];
-    expect(url).toBe(PUSH_URL);
+    expect(url).toBe(MOCK_PUSH_URL);
     expect(init?.method).toBe('POST');
     expect(init?.headers).toEqual({
       Authorization: 'Basic MTIzNDU2OmdsY190b2tlbg==',
@@ -66,37 +72,42 @@ describe(createLokiSink, () => {
   });
 
   it('sends one stream labelled by service and level, carrying the whole line', async () => {
-    await push(LINE);
+    await push(MOCK_LINE);
 
     expect(sentBody()).toEqual({
       streams: [
         {
           stream: { service: MOCK_SERVICE, level: LOG_LEVEL.ERROR },
-          values: [['1792065600000000000', JSON.stringify(LINE)]],
+          values: [[MOCK_LINE_NANOSECONDS, JSON.stringify(MOCK_LINE)]],
         },
       ],
     });
   });
 
   it('leaves out a service label the line does not carry', async () => {
-    await push({ ...LINE, service: undefined });
+    const lineWithoutService = { ...MOCK_LINE, service: undefined };
+    await push(lineWithoutService);
 
-    expect(sentBody()).toMatchObject({
-      streams: [{ stream: { level: LOG_LEVEL.ERROR } }],
+    expect(sentBody()).toEqual({
+      streams: [
+        {
+          stream: { level: LOG_LEVEL.ERROR },
+          values: [[MOCK_LINE_NANOSECONDS, JSON.stringify(lineWithoutService)]],
+        },
+      ],
     });
-    expect(JSON.stringify(sentBody())).not.toContain('"service"');
   });
 
   it('resolves when Loki answers with a non-2xx status', async () => {
     fetchMock.mockResolvedValue(new Response('quota', { status: 429 }));
 
-    await expect(push(LINE)).resolves.toBeUndefined();
+    await expect(push(MOCK_LINE)).resolves.toBeUndefined();
   });
 
   it('resolves when the request itself fails', async () => {
     fetchMock.mockRejectedValue(new TypeError('fetch failed'));
 
-    await expect(push(LINE)).resolves.toBeUndefined();
+    await expect(push(MOCK_LINE)).resolves.toBeUndefined();
   });
 
   it('releases a push Loki never answers after five seconds, not before', async () => {
@@ -111,7 +122,7 @@ describe(createLokiSink, () => {
     );
     let settled = false;
 
-    const pushed = push(LINE).then(() => {
+    const pushed = push(MOCK_LINE).then(() => {
       settled = true;
     });
     await vi.advanceTimersByTimeAsync(4_999);

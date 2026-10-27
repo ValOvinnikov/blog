@@ -1,5 +1,10 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_ENGLISH_SUBJECT,
+  MOCK_FRENCH_SUBJECT,
+  MOCK_SECOND_SUBJECT,
+} from '@blog/db/testing/email-templates/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -33,35 +38,33 @@ describe(listAuthoredEmailTemplates, () => {
           tenantId,
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.EN,
-          subject: 'Sign in',
+          subject: MOCK_ENGLISH_SUBJECT,
         },
         {
           tenantId,
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.FR,
-          subject: 'Connexion',
+          subject: MOCK_FRENCH_SUBJECT,
         },
       ]);
 
     const rows = await listAuthoredEmailTemplates(tenantId);
 
-    expect(rows).toHaveLength(2);
-    expect(rows).toEqual(
-      expect.arrayContaining([
-        {
-          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          locale: LOCALE_ISO_CODES.EN,
-          subject: 'Sign in',
-          body: null,
-        },
-        {
-          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          locale: LOCALE_ISO_CODES.FR,
-          subject: 'Connexion',
-          body: null,
-        },
-      ]),
-    );
+    const sortedRows = rows.sort((a, b) => a.locale.localeCompare(b.locale));
+    expect(sortedRows).toEqual([
+      {
+        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        locale: LOCALE_ISO_CODES.EN,
+        subject: MOCK_ENGLISH_SUBJECT,
+        body: null,
+      },
+      {
+        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        locale: LOCALE_ISO_CODES.FR,
+        subject: MOCK_FRENCH_SUBJECT,
+        body: null,
+      },
+    ]);
   });
 
   it("leaves out another tenant's rows", async () => {
@@ -70,7 +73,7 @@ describe(listAuthoredEmailTemplates, () => {
       tenantId: otherTenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       locale: LOCALE_ISO_CODES.EN,
-      subject: 'Not mine',
+      subject: MOCK_SECOND_SUBJECT,
     });
 
     await expect(listAuthoredEmailTemplates(tenantId)).resolves.toEqual([]);

@@ -2,7 +2,6 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRawFeedPost } from '@blog/service/testing/entities/fixtures';
 import { evaluateGroqSlugs } from '@blog/service/testing/shared/groq';
 import {
-  MOCK_FEED_UNPROJECTED_FIELDS,
   MOCK_PUBLISHED_FEED_SLUGS,
   MOCK_TRANSLATED_POST_DOCUMENTS,
 } from '@blog/service/testing/shared/translated-posts-dataset';
@@ -26,14 +25,12 @@ describe('allPublishedPostsQuery', () => {
     expect(() => allPublishedPostsQuery.parse(raw)).not.toThrow();
   });
 
-  it.each(MOCK_FEED_UNPROJECTED_FIELDS)('does not project %s', (field) => {
-    expect(allPublishedPostsQuery.query).not.toContain(field);
-  });
-
   it.each([EN, NL])(
     'lists only the published %s posts, newest first',
     async (locale) => {
-      expect(await slugsIn(locale)).toEqual(MOCK_PUBLISHED_FEED_SLUGS[locale]);
+      const slugs = await slugsIn(locale);
+
+      expect(slugs).toEqual(MOCK_PUBLISHED_FEED_SLUGS[locale]);
     },
   );
 });

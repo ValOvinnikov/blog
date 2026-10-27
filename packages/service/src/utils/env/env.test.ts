@@ -1,27 +1,12 @@
-export {};
+import { faker } from '@faker-js/faker';
 
-const ENV_KEYS = [
-  'NEXT_PUBLIC_SANITY_PROJECT_ID',
-  'NEXT_PUBLIC_SANITY_DATASET',
-  'SANITY_API_READ_TOKEN',
-  'SANITY_API_WRITE_TOKEN',
-  'SKIP_ENV_VALIDATION',
-] as const;
+faker.seed(6016);
 
-const originalEnv = Object.fromEntries(
-  ENV_KEYS.map((key) => [key, process.env[key]]),
-) as Record<(typeof ENV_KEYS)[number], string | undefined>;
-
-function restoreEnv(): void {
-  for (const key of ENV_KEYS) {
-    const value = originalEnv[key];
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
-  }
-}
+const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
+const MOCK_DATASET = faker.lorem.word();
+const MOCK_OTHER_DATASET = faker.lorem.word();
+const MOCK_READ_TOKEN = faker.string.alphanumeric(32);
+const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);
 
 async function importEnv(): Promise<typeof import('./env')> {
   vi.resetModules();
@@ -30,30 +15,25 @@ async function importEnv(): Promise<typeof import('./env')> {
 
 describe('env', () => {
   beforeEach(() => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+    vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
+    vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', MOCK_PROJECT_ID);
+    vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', MOCK_DATASET);
   });
 
   afterEach(() => {
-    restoreEnv();
+    vi.unstubAllEnvs();
   });
 
-  it('leaves SANITY_API_READ_TOKEN undefined when absent', async () => {
-    delete process.env['SANITY_API_READ_TOKEN'];
+  it.each(['SANITY_API_READ_TOKEN', 'SANITY_API_WRITE_TOKEN'] as const)(
+    'leaves %s undefined when absent',
+    async (key) => {
+      vi.stubEnv(key, undefined);
 
-    const { env } = await importEnv();
+      const { env } = await importEnv();
 
-    expect(env.SANITY_API_READ_TOKEN).toBeUndefined();
-  });
-
-  it('leaves SANITY_API_WRITE_TOKEN undefined when absent', async () => {
-    delete process.env['SANITY_API_WRITE_TOKEN'];
-
-    const { env } = await importEnv();
-
-    expect(env.SANITY_API_WRITE_TOKEN).toBeUndefined();
-  });
+      expect(env[key]).toBeUndefined();
+    },
+  );
 
   describe('validation failures', () => {
     beforeEach(() => {
@@ -65,35 +45,35 @@ describe('env', () => {
     });
 
     it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
-      delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
+      vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', undefined);
 
       await expect(importEnv()).rejects.toThrow();
     });
 
-    it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
+    it('throws when NEXT_PUBLIC_SANITY_DATASET is empty', async () => {
+      vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', '');
 
       await expect(importEnv()).rejects.toThrow();
     });
   });
 
-  describe('with a staging dataset and both tokens', () => {
+  describe('with both tokens set', () => {
     beforeEach(() => {
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
-      process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
-      process.env['SANITY_API_WRITE_TOKEN'] = 'secret-write-token';
+      vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', MOCK_OTHER_DATASET);
+      vi.stubEnv('SANITY_API_READ_TOKEN', MOCK_READ_TOKEN);
+      vi.stubEnv('SANITY_API_WRITE_TOKEN', MOCK_WRITE_TOKEN);
     });
 
-    it('parses a valid environment and exposes typed values', async () => {
+    it('exposes the parsed environment', async () => {
       const { env } = await importEnv();
 
-      expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
-      expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
-      expect(env.SANITY_API_READ_TOKEN).toBe('secret-token');
-      expect(env.SANITY_API_WRITE_TOKEN).toBe('secret-write-token');
+      expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe(MOCK_PROJECT_ID);
+      expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe(MOCK_OTHER_DATASET);
+      expect(env.SANITY_API_READ_TOKEN).toBe(MOCK_READ_TOKEN);
+      expect(env.SANITY_API_WRITE_TOKEN).toBe(MOCK_WRITE_TOKEN);
     });
 
-    describe('as if window is defined', () => {
+    describe('in the browser', () => {
       beforeEach(() => {
         vi.stubGlobal('window', {});
       });
@@ -102,14 +82,14 @@ describe('env', () => {
         vi.unstubAllGlobals();
       });
 
-      it('reads NEXT_PUBLIC_SANITY_PROJECT_ID/DATASET', async () => {
+      it('reads the public project id and dataset', async () => {
         const { env } = await importEnv();
 
-        expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
-        expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
+        expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe(MOCK_PROJECT_ID);
+        expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe(MOCK_OTHER_DATASET);
       });
 
-      it('throws when SANITY_API_READ_TOKEN is accessed', async () => {
+      it('throws when a server-only token is read', async () => {
         const { env } = await importEnv();
 
         expect(() => env.SANITY_API_READ_TOKEN).toThrow(

@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 
+import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
@@ -19,7 +21,7 @@ import {
   STATUS_RAMP_LIGHT,
 } from './theme-ramps';
 
-const CONSOLE_HUE = 250;
+const CONSOLE_HUE = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue;
 
 const readRepoFile = (path: string): string =>
   readFileSync(new URL(`../../../../${path}`, import.meta.url), 'utf8');

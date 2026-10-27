@@ -9,6 +9,8 @@ import {
 
 import { getLatestReleaseTag } from './get-latest-release-tag';
 
+faker.seed(5998);
+
 vi.mock('@platform/utils/env/env');
 
 const tagRefs = (...tags: string[]) =>

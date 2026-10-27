@@ -18,12 +18,15 @@ import {
   mockLocalizedValues,
   mockParagraphBlocks,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { contentModuleQuery } from './query';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-const contentDocument = {
+faker.seed(11);
+
+const MOCK_CONTENT_DOCUMENT = {
   _id: MOCK_CONTENT_MODULE_ID,
   _type: 'module_content',
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -36,7 +39,7 @@ const contentDocument = {
 async function runContent(locale: string) {
   const raw = await evaluateGroqExpression(
     contentModuleQuery.query,
-    [contentDocument],
+    [MOCK_CONTENT_DOCUMENT],
     undefined,
     { id: MOCK_CONTENT_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -46,38 +49,44 @@ async function runContent(locale: string) {
 
 describe('contentModuleQuery', () => {
   it('resolves the body in the requested language', async () => {
-    expect((await runContent(NL)).body).toMatchObject([
-      { children: [{ text: MOCK_DUTCH_TEXT }] },
-    ]);
+    const { body } = await runContent(NL);
+
+    expect(body).toEqual(mockParagraphBlocks(MOCK_DUTCH_TEXT));
   });
 
   it.each([
     ['no asset selected and no layout', { asset: null, layout: null }],
     ['no alt text', { alt: null }],
-  ])('allows a bodyImage body block with %s', (_, overrides) => {
-    const raw = mockRawContentModule({
-      body: [mockRawBodyImageBlock(overrides)],
-    });
+  ])('allows a body image block with %s', (_, overrides) => {
+    const block = mockRawBodyImageBlock(overrides);
+    const raw = mockRawContentModule({ body: [block] });
 
-    expect(contentModuleQuery.parse(raw).body[0]).toMatchObject(overrides);
+    const { body } = contentModuleQuery.parse(raw);
+
+    expect(body).toEqual([block]);
   });
 
-  it('keeps every field of a rich text block intact', () => {
+  it('keeps every field of a rich text block', () => {
     const richBlock = {
       _type: 'block',
-      _key: 'block-1',
+      _key: faker.string.uuid(),
       style: 'h2',
       listItem: 'bullet',
       level: 1,
       markDefs: [
         {
           _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-          _key: 'link-1',
+          _key: faker.string.uuid(),
           link: mockRawExternalLinkDocument(),
         },
       ],
       children: [
-        { _type: 'span', _key: 'span-1', text: 'Hello', marks: ['strong'] },
+        {
+          _type: 'span',
+          _key: faker.string.uuid(),
+          text: faker.lorem.word(),
+          marks: ['strong'],
+        },
       ],
     };
 
@@ -89,13 +98,13 @@ describe('contentModuleQuery', () => {
     expect(parsed.body[0]).toEqual(richBlock);
   });
 
-  it('keeps a rich code block intact alongside a resolved bodyImage block', () => {
+  it('keeps a code block alongside a resolved body image block', () => {
     const codeBlock = {
       _type: 'code',
-      _key: 'code-1',
+      _key: faker.string.uuid(),
       language: 'ts',
-      filename: 'file.ts',
-      code: 'const x = 1;',
+      filename: faker.system.commonFileName('ts'),
+      code: faker.lorem.sentence(),
       highlightedLines: [1],
     };
     const bodyImageBlock = mockRawBodyImageBlock();

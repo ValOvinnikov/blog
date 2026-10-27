@@ -21,11 +21,17 @@ import { exportAccountData } from './export-account-data';
 
 vi.mock('@blog/db/client');
 
+faker.seed(602202);
+
+const MOCK_REF_DATE = new Date(Date.UTC(2026, 0, 1));
+
 const MOCK_UNKNOWN_USER_ID = faker.string.uuid();
-const MOCK_OLDER_POST_ID = 'post-older';
-const MOCK_NEWER_POST_ID = 'post-newer';
-const MOCK_OTHER_POST_ID = 'post-other';
-const MOCK_AVATAR_URL = 'https://example.com/avatar.png';
+const MOCK_OLDER_POST_ID = faker.string.uuid();
+const MOCK_NEWER_POST_ID = faker.string.uuid();
+const MOCK_OTHER_POST_ID = faker.string.uuid();
+const MOCK_AVATAR_URL = faker.internet.url();
+const MOCK_OLDER_BOOKMARKED_AT = faker.date.past({ refDate: MOCK_REF_DATE });
+const MOCK_NEWER_BOOKMARKED_AT = faker.date.future({ refDate: MOCK_REF_DATE });
 
 const db = useQueryTestDb();
 usePersonalDataKeys();
@@ -65,13 +71,13 @@ describe(exportAccountData, () => {
           tenantId,
           userId,
           postId: MOCK_OLDER_POST_ID,
-          createdAt: new Date(2026, 0, 1),
+          createdAt: MOCK_OLDER_BOOKMARKED_AT,
         },
         {
           tenantId,
           userId,
           postId: MOCK_NEWER_POST_ID,
-          createdAt: new Date(2026, 0, 2),
+          createdAt: MOCK_NEWER_BOOKMARKED_AT,
         },
         { tenantId, userId: otherUserId, postId: MOCK_OTHER_POST_ID },
         { tenantId: otherTenantId, userId, postId: MOCK_OTHER_POST_ID },
@@ -88,8 +94,8 @@ describe(exportAccountData, () => {
         image: MOCK_AVATAR_URL,
       },
       bookmarks: [
-        { postId: MOCK_NEWER_POST_ID, createdAt: new Date(2026, 0, 2) },
-        { postId: MOCK_OLDER_POST_ID, createdAt: new Date(2026, 0, 1) },
+        { postId: MOCK_NEWER_POST_ID, createdAt: MOCK_NEWER_BOOKMARKED_AT },
+        { postId: MOCK_OLDER_POST_ID, createdAt: MOCK_OLDER_BOOKMARKED_AT },
       ],
     });
   });

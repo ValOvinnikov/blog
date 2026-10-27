@@ -15,6 +15,8 @@ vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
   startContrastCheckAction: startContrastCheckActionMock,
 }));
 
+const RUN_CONTRAST_CHECK = { name: 'Run contrast check' };
+
 const setup = customRender(ReleaseContrastCard, {
   status: CONTRAST_STATUS.DUE,
 });
@@ -30,23 +32,27 @@ describe(`<${ReleaseContrastCard.name}/>`, () => {
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
-  const start = () =>
-    user.click(screen.getByRole('button', { name: 'Run contrast check' }));
+  const start = async () => {
+    const runButton = screen.getByRole('button', RUN_CONTRAST_CHECK);
+    await user.click(runButton);
+  };
 
   it.each([CONTRAST_STATUS.DUE, CONTRAST_STATUS.NONE])(
-    'shows Running and disables the button once a start from %s succeeds',
+    'shows Running and disables the button after starting from %s',
     async (status) => {
       setup({ status });
 
       await start();
 
-      expect(await screen.findByText('Running')).toBeVisible();
-      expect(
-        screen.getByText('A contrast check is running for the latest commit.'),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('button', { name: 'Run contrast check' }),
-      ).toBeDisabled();
+      const runningStatus = await screen.findByText('Running');
+      const runningNotice = screen.getByText(
+        'A contrast check is running for the latest commit.',
+      );
+      const runButton = screen.getByRole('button', RUN_CONTRAST_CHECK);
+
+      expect(runningStatus).toBeVisible();
+      expect(runningNotice).toBeVisible();
+      expect(runButton).toBeDisabled();
     },
   );
 
@@ -57,25 +63,29 @@ describe(`<${ReleaseContrastCard.name}/>`, () => {
 
       await start();
 
-      expect(await screen.findByText('Running')).toBeVisible();
-      expect(
-        screen.getByRole('button', { name: 'Run contrast check' }),
-      ).toBeDisabled();
+      const runningStatus = await screen.findByText('Running');
+      const runButton = screen.getByRole('button', RUN_CONTRAST_CHECK);
+
+      expect(runningStatus).toBeVisible();
+      expect(runButton).toBeDisabled();
     },
   );
 
-  it('lets a changed server status take over from the optimistic Running', async () => {
+  it('lets a changed server status replace the optimistic Running', async () => {
     const { rerender } = setup();
     await start();
     await screen.findByText('Running');
 
     rerender(<ReleaseContrastCard status={CONTRAST_STATUS.GREEN} />);
 
-    expect(screen.getByText('Passed')).toBeVisible();
-    expect(screen.queryByText('Running')).not.toBeInTheDocument();
+    const passedStatus = screen.getByText('Passed');
+    const runningStatus = screen.queryByText('Running');
+
+    expect(passedStatus).toBeVisible();
+    expect(runningStatus).not.toBeInTheDocument();
   });
 
-  it('does not flip back to Running when the server returns to the start status', async () => {
+  it('does not flip back to Running when the server returns to its old status', async () => {
     const { rerender } = setup();
     await start();
     await screen.findByText('Running');
@@ -83,8 +93,11 @@ describe(`<${ReleaseContrastCard.name}/>`, () => {
     rerender(<ReleaseContrastCard status={CONTRAST_STATUS.GREEN} />);
     rerender(<ReleaseContrastCard status={CONTRAST_STATUS.DUE} />);
 
-    expect(screen.getByText('Due')).toBeVisible();
-    expect(screen.queryByText('Running')).not.toBeInTheDocument();
+    const dueStatus = screen.getByText('Due');
+    const runningStatus = screen.queryByText('Running');
+
+    expect(dueStatus).toBeVisible();
+    expect(runningStatus).not.toBeInTheDocument();
   });
 
   it.each([
@@ -101,9 +114,13 @@ describe(`<${ReleaseContrastCard.name}/>`, () => {
 
       await start();
 
-      await screen.findByRole('button', { name: 'Run contrast check' });
-      expect(screen.getByText('Due')).toBeVisible();
-      expect(screen.queryByText('Running')).not.toBeInTheDocument();
+      await screen.findByRole('button', RUN_CONTRAST_CHECK);
+
+      const dueStatus = screen.getByText('Due');
+      const runningStatus = screen.queryByText('Running');
+
+      expect(dueStatus).toBeVisible();
+      expect(runningStatus).not.toBeInTheDocument();
     },
   );
 });

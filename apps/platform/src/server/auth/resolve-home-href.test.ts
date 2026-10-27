@@ -1,7 +1,10 @@
+import { queries } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Session } from 'next-auth';
 
@@ -9,51 +12,59 @@ import { resolveHomeHref } from './resolve-home-href';
 
 vi.mock('@platform/server/auth/auth');
 
-const { getAdminByUserIdMock, listMembershipsWithTenantsForUserMock } =
-  vi.hoisted(() => ({
-    getAdminByUserIdMock: vi.fn(),
-    listMembershipsWithTenantsForUserMock: vi.fn(),
-  }));
+vi.mock('@blog/db', async () => {
+  const { mockDbConstants } =
+    await import('@platform/testing/mock-db-constants');
 
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: {
-    admins: { getAdminByUserId: getAdminByUserIdMock },
-    memberships: {
-      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+  return {
+    ...(await mockDbConstants()),
+    queries: {
+      admins: { getAdminByUserId: vi.fn() },
+      memberships: { listMembershipsWithTenantsForUser: vi.fn() },
     },
-  },
-}));
+  };
+});
+
+faker.seed(5997);
+
+const MOCK_USER_ID = faker.string.uuid();
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-const MOCK_USER_ID = 'user-1';
+const getAdminByUserId = vi.mocked(queries.admins.getAdminByUserId);
+const listMembershipsWithTenantsForUser = vi.mocked(
+  queries.memberships.listMembershipsWithTenantsForUser,
+);
 
 describe(resolveHomeHref, () => {
   beforeEach(() => {
-    authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
-    getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-    listMembershipsWithTenantsForUserMock.mockReset();
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
+    getAdminByUserId.mockReset();
+    getAdminByUserId.mockResolvedValue(undefined);
+    listMembershipsWithTenantsForUser.mockReset();
+    listMembershipsWithTenantsForUser.mockResolvedValue([]);
   });
 
   it('links to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+    authMock.mockResolvedValueOnce(null);
 
     await expect(resolveHomeHref()).resolves.toBe(MOCK_SIGN_IN_HREF);
-    expect(getAdminByUserIdMock).not.toHaveBeenCalled();
+    expect(getAdminByUserId).not.toHaveBeenCalled();
   });
 
   it('links an admin to the tenants list', async () => {
-    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getAdminByUserId.mockResolvedValue(mockAdmin({ userId: MOCK_USER_ID }));
 
     await expect(resolveHomeHref()).resolves.toBe(adminRoutes.tenants());
-    expect(getAdminByUserIdMock).toHaveBeenCalledWith(MOCK_USER_ID);
+    expect(getAdminByUserId).toHaveBeenCalledWith(MOCK_USER_ID);
   });
 
   it('links a member to the dashboard', async () => {
-    listMembershipsWithTenantsForUserMock.mockResolvedValue([{}]);
+    listMembershipsWithTenantsForUser.mockResolvedValue([
+      {
+        membership: mockMembership({ userId: MOCK_USER_ID }),
+        tenant: mockTenant(),
+      },
+    ]);
 
     await expect(resolveHomeHref()).resolves.toBe(adminRoutes.dashboard());
   });

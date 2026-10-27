@@ -3,7 +3,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
   mockDoneDeprovisioningSteps,
   mockIdleDeprovisioningSteps,
@@ -14,33 +14,28 @@ import {
   MOCK_RUN_STARTED_AT,
 } from '@platform/testing/tenants/fixtures';
 import { useDeprovisioningPoll } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisioningStatusView } from './deprovisioning-status-view';
 
 const REMOVE_DOMAIN_LABEL = 'Remove domain';
-const ARCHIVE_SANITY_PROJECT = 'Archive Sanity project';
 const REVOKE_SANITY_TOKENS_LABEL = 'Revoke Sanity tokens';
-const CLEAR_PROVISIONING_ARTIFACTS = 'Clear provisioning artifacts';
-const ARCHIVE_TENANT = 'Archive tenant';
-const PURGE_READER_DATA = 'Purge reader data';
-const INVALIDATE_CACHED_PAGES = 'Invalidate cached pages';
 const ARIA_EXPANDED = 'aria-expanded';
 const STARTING_BADGE = 'Starting…';
 const QUEUED_BADGE = 'Queued';
 const STEP_LABELS = [
   REMOVE_DOMAIN_LABEL,
-  ARCHIVE_SANITY_PROJECT,
+  'Archive Sanity project',
   REVOKE_SANITY_TOKENS_LABEL,
-  CLEAR_PROVISIONING_ARTIFACTS,
-  ARCHIVE_TENANT,
-  PURGE_READER_DATA,
-  INVALIDATE_CACHED_PAGES,
+  'Clear provisioning artifacts',
+  'Archive tenant',
+  'Purge reader data',
+  'Invalidate cached pages',
 ];
-
-const render = renderWithIntl;
-
 const STEP_POLL_INTERVAL_MS = 4000;
+const MOCK_RECOGNISED_ERROR =
+  'Sanity Access API POST /access/project/xxxxx000/tokens failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to revoke tokens."}';
+const MOCK_UNRECOGNISED_ERROR = 'CORS API is down';
 
 const { getTenantDeprovisioningStatusActionMock } = vi.hoisted(() => ({
   getTenantDeprovisioningStatusActionMock: vi.fn(),
@@ -72,13 +67,12 @@ const Wrapper = ({
   return <DeprovisioningStatusView poll={poll} headingLevel={headingLevel} />;
 };
 
-const renderView = (
+const setup = customRender(Wrapper, { tenant: mockClientTenant() });
+
+const setupSteps = (
   deprovisioningSteps: TClientTenant['deprovisioningSteps'],
   props: Omit<TWrapperProps, 'tenant'> = {},
-) =>
-  render(
-    <Wrapper tenant={mockClientTenant({ deprovisioningSteps })} {...props} />,
-  );
+) => setup({ tenant: mockClientTenant({ deprovisioningSteps }), ...props });
 
 const idleRunSteps = () => ({
   ...mockIdleDeprovisioningSteps(),
@@ -100,8 +94,29 @@ const doneRunSteps = () => ({
   },
 });
 
+const failedRunSteps = (error: string) => ({
+  ...mockIdleDeprovisioningSteps(),
+  [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
+    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    error,
+  },
+  run: {
+    startedAt: MOCK_RUN_STARTED_AT,
+    finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
+  },
+});
+
+const advance = async (ms: number) => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+};
+
 describe(`<${DeprovisioningStatusView.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     getTenantDeprovisioningStatusActionMock.mockReset();
     getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
@@ -113,22 +128,17 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
 
   describe('before any run exists', () => {
     beforeEach(() => {
-      renderView(null);
+      setupSteps(null);
     });
 
-    it('says no run has started yet in the Run card before any run exists', () => {
+    it('says no run has started yet in the Run card', () => {
       const emptyRun = screen.getByText('No run has started yet.');
 
       expect(emptyRun).toBeVisible();
     });
 
-    it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
+    it('shows every step as queued under the Starting badge', () => {
       const startingBadge = screen.getByText(STARTING_BADGE);
-      const stepLabels = STEP_LABELS.map((label) => screen.getByText(label));
-
-      for (const stepLabel of stepLabels) {
-        expect(stepLabel).toBeVisible();
-      }
       const queuedBadges = screen.getAllByText(QUEUED_BADGE);
       const notStartedBadge = screen.queryByText('Not started');
 
@@ -137,30 +147,25 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       expect(notStartedBadge).not.toBeInTheDocument();
     });
 
-    it('renders a fallback Run card header carrying the overall status badge when no run exists yet', () => {
+    it('lists every step in the steps card', () => {
+      const stepLabels = STEP_LABELS.map((label) => screen.getByText(label));
+
+      for (const stepLabel of stepLabels) {
+        expect(stepLabel).toBeVisible();
+      }
+    });
+
+    it('still renders the Run card heading', () => {
       const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-      const startingBadge = screen.getByText(STARTING_BADGE);
 
       expect(runHeading).toBeVisible();
-      expect(startingBadge).toBeVisible();
     });
   });
 
-  it('shows the Starting badge and full step list, not the old failure, for a retry dispatched after a FAILED run', () => {
-    renderView(
-      {
-        ...mockIdleDeprovisioningSteps(),
-        [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Sanity Access API returned 403',
-        },
-        run: {
-          startedAt: MOCK_RUN_STARTED_AT,
-          finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
-        },
-      },
-      { deprovisionRequestedAt: MOCK_RUN_PLUS_7_MIN_AT },
-    );
+  it('shows Starting, not the old failure, for a retry after a failed run', () => {
+    setupSteps(failedRunSteps(MOCK_RECOGNISED_ERROR), {
+      deprovisionRequestedAt: MOCK_RUN_PLUS_7_MIN_AT,
+    });
 
     const startingBadge = screen.getByText(STARTING_BADGE);
     const queuedBadges = screen.getAllByText(QUEUED_BADGE);
@@ -173,25 +178,24 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
 
   describe('with an idle run', () => {
     beforeEach(() => {
-      renderView(idleRunSteps());
+      setupSteps(idleRunSteps());
     });
 
-    it('titles the card "Deprovisioning progress" and renders every step in order', () => {
+    it('titles the card "Deprovisioning progress" and renders every step', () => {
       const progressHeading = screen.getByRole('heading', {
         level: 2,
         name: /^Deprovisioning progress/,
       });
-
-      expect(progressHeading).toBeVisible();
       const stepLabels = STEP_LABELS.map((label) => screen.getByText(label));
 
+      expect(progressHeading).toBeVisible();
       for (const stepLabel of stepLabels) {
         expect(stepLabel).toBeVisible();
       }
     });
 
-    it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
-      const doneBadge = screen.getByText('0 of 7 done');
+    it('shows nothing done in the steps card summary', () => {
+      const doneBadge = screen.getByText(`0 of ${STEP_LABELS.length} done`);
 
       expect(doneBadge).toBeVisible();
     });
@@ -204,7 +208,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('nests the steps and run headings at a caller-supplied level', () => {
-    renderView(idleRunSteps(), { headingLevel: 3 });
+    setupSteps(idleRunSteps(), { headingLevel: 3 });
 
     const progressHeading = screen.getByRole('heading', {
       level: 3,
@@ -219,7 +223,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('shows the Running badge while a step is in progress, with no error card', () => {
-    renderView(runningSteps());
+    setupSteps(runningSteps());
 
     const runningBadges = screen.getAllByText('Running…');
     const errorCard = screen.queryByRole('alert');
@@ -229,7 +233,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('shows the Complete badge once every step is done', () => {
-    renderView(doneRunSteps());
+    setupSteps(doneRunSteps());
 
     const completeBadges = screen.getAllByText('Complete');
     const errorCard = screen.queryByRole('alert');
@@ -239,23 +243,8 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   describe('a failed step', () => {
-    const renderFailed = (error: string) =>
-      renderView({
-        ...mockIdleDeprovisioningSteps(),
-        [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error,
-        },
-        run: {
-          startedAt: MOCK_RUN_STARTED_AT,
-          finishedAt: MOCK_RUN_PLUS_1_MIN_AT,
-        },
-      });
-
-    it('shows the Failed badge, the failing step, and the raw error under Technical details', () => {
-      const rawError =
-        'Sanity Access API POST /access/project/xxxxx000/tokens failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to revoke tokens."}';
-      renderFailed(rawError);
+    it('shows the Failed badge, the failing step and the raw error', () => {
+      setupSteps(failedRunSteps(MOCK_RECOGNISED_ERROR));
 
       const failedBadges = screen.getAllByText('Failed');
       const failureHeading = screen.getByRole('heading', {
@@ -265,7 +254,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         `Failed while running "${REVOKE_SANITY_TOKENS_LABEL}".`,
       );
       const technicalDetails = screen.getByText('Technical details');
-      const rawErrorText = screen.getByText(rawError);
+      const rawErrorText = screen.getByText(MOCK_RECOGNISED_ERROR);
 
       expect(failedBadges.length).toBeGreaterThan(0);
       expect(failureHeading).toBeVisible();
@@ -274,16 +263,16 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       expect(rawErrorText).not.toBeVisible();
     });
 
-    it('renders no retry button', () => {
-      renderFailed('fetch failed');
+    it('offers no retry button', () => {
+      setupSteps(failedRunSteps(MOCK_RECOGNISED_ERROR));
 
       const retryButton = screen.queryByRole('button', { name: /retry/i });
 
       expect(retryButton).not.toBeInTheDocument();
     });
 
-    it('falls back to a generic headline for an unrecognised failure shape', () => {
-      renderFailed('CORS API is down');
+    it('falls back to a generic headline for an unrecognised failure', () => {
+      setupSteps(failedRunSteps(MOCK_UNRECOGNISED_ERROR));
 
       const failureHeading = screen.getByRole('heading', {
         name: 'This step failed',
@@ -293,50 +282,49 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     });
   });
 
-  describe('steps disclosure collapse', () => {
+  describe('steps disclosure', () => {
     const getStepsToggle = () =>
       screen.getByRole('button', { name: /Deprovisioning progress/ });
 
-    it('is expanded while the run is not done', () => {
-      renderView(runningSteps());
-
-      const stepsToggle = getStepsToggle();
-
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('is collapsed by default once every step is already done on mount', () => {
-      renderView(doneRunSteps());
-
-      const stepsToggle = getStepsToggle();
-
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
-    });
-
-    it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
+    const completeRunWhileMounted = async () => {
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: doneRunSteps(),
         deprovisionedAt: new Date(MOCK_RUN_PLUS_2_MIN_AT),
       });
-      const user = userEvent.setup();
-      renderView(runningSteps());
+      setupSteps(runningSteps());
+      await advance(STEP_POLL_INTERVAL_MS);
+    };
+
+    it('is expanded while the run is not done', () => {
+      setupSteps(runningSteps());
 
       const stepsToggle = getStepsToggle();
 
       expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
 
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
+    it('is collapsed by default when every step is already done on mount', () => {
+      setupSteps(doneRunSteps());
+
+      const stepsToggle = getStepsToggle();
 
       expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('collapses by itself once the run completes', async () => {
+      await completeRunWhileMounted();
+
+      const stepsToggle = getStepsToggle();
+
+      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('stays open after a user reopens it and the poll refreshes', async () => {
+      await completeRunWhileMounted();
+      const stepsToggle = getStepsToggle();
 
       await user.click(stepsToggle);
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(60_000);
-      });
+      await advance(STEP_POLL_INTERVAL_MS * 3);
 
       expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
     });

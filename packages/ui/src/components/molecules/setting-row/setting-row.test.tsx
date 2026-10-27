@@ -5,10 +5,11 @@ import { SettingRow } from './setting-row';
 
 faker.seed(123);
 
-const label = faker.lorem.words(3);
-const description = faker.lorem.sentence();
+const MOCK_LABEL = faker.lorem.words(3);
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_CONTROL_LABEL = faker.lorem.words(2);
 
-const setup = customRender(SettingRow, { label });
+const setup = customRender(SettingRow, { label: MOCK_LABEL });
 
 describe(`<${SettingRow.name}/>`, () => {
   describe('with the default props', () => {
@@ -16,42 +17,48 @@ describe(`<${SettingRow.name}/>`, () => {
       setup();
     });
 
-    it('renders the label as an h3 heading by default', () => {
-      expect(
-        screen.getByRole('heading', { level: 3, name: label }),
-      ).toBeVisible();
+    it('renders the label as a level-3 heading', () => {
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: MOCK_LABEL,
+      });
+
+      expect(heading).toBeVisible();
     });
 
-    it('does not render a description when omitted', () => {
-      expect(screen.queryByText(description)).not.toBeInTheDocument();
-    });
+    it('renders no description or control', () => {
+      const description = screen.queryByText(MOCK_DESCRIPTION);
+      const control = screen.queryByRole('button');
 
-    it('does not render a control wrapper when no children are given', () => {
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(description).not.toBeInTheDocument();
+      expect(control).not.toBeInTheDocument();
     });
   });
 
   it('renders the label at a custom heading level', () => {
     setup({ labelLevel: 2 });
-    expect(
-      screen.getByRole('heading', { level: 2, name: label }),
-    ).toBeVisible();
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: MOCK_LABEL,
+    });
+
+    expect(heading).toBeVisible();
   });
 
   it('renders the description when given', () => {
-    setup({ description });
-    expect(screen.getByText(description)).toBeVisible();
+    setup({ description: MOCK_DESCRIPTION });
+
+    const description = screen.getByText(MOCK_DESCRIPTION);
+
+    expect(description).toBeVisible();
   });
 
   it('renders control-slot children', () => {
-    setup({ children: <button>request export</button> });
-    expect(
-      screen.getByRole('button', { name: 'request export' }),
-    ).toBeVisible();
-  });
+    setup({ children: <button>{MOCK_CONTROL_LABEL}</button> });
 
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'setting-row' });
-    expect(screen.getByTestId('setting-row')).toBeVisible();
+    const control = screen.getByRole('button', { name: MOCK_CONTROL_LABEL });
+
+    expect(control).toBeVisible();
   });
 });

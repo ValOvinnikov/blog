@@ -16,15 +16,21 @@ import {
   mockLinkView,
   mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toFeatureListModule } from './transformer';
 
-const FIRST_CARD_ID = 'card-b';
-const SECOND_CARD_ID = 'card-a';
-const ILLUSTRATION_ALT = 'A feature illustration';
-const CARD_LINK = { label: 'Learn more', url: 'https://example.com' };
+faker.seed(3);
 
-describe('toFeatureListModule', () => {
+const MOCK_FIRST_CARD_ID = faker.string.uuid();
+const MOCK_SECOND_CARD_ID = faker.string.uuid();
+const MOCK_ILLUSTRATION_ALT = faker.lorem.words(3);
+const MOCK_CARD_LINK = {
+  label: faker.lorem.words(2),
+  url: faker.internet.url(),
+};
+
+describe(toFeatureListModule, () => {
   it('maps brandVariant, imageShape, displayMode and cardAlignment straight through', () => {
     const raw = mockRawFeatureListModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
@@ -41,7 +47,7 @@ describe('toFeatureListModule', () => {
     expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
-  it('leaves contentAlignment and layout undefined when unset (no faked default)', () => {
+  it('leaves contentAlignment and layout undefined when unset', () => {
     const raw = mockRawFeatureListModule({
       contentAlignment: null,
       layout: null,
@@ -56,16 +62,16 @@ describe('toFeatureListModule', () => {
   it('keeps the cards in authored order', () => {
     const raw = mockRawFeatureListModule({
       features: [
-        mockRawFeatureListItem({ _id: FIRST_CARD_ID }),
-        mockRawFeatureListItem({ _id: SECOND_CARD_ID }),
+        mockRawFeatureListItem({ _id: MOCK_FIRST_CARD_ID }),
+        mockRawFeatureListItem({ _id: MOCK_SECOND_CARD_ID }),
       ],
     });
 
     const module = toFeatureListModule(raw);
 
     expect(module.items.map((item) => item.id)).toEqual([
-      FIRST_CARD_ID,
-      SECOND_CARD_ID,
+      MOCK_FIRST_CARD_ID,
+      MOCK_SECOND_CARD_ID,
     ]);
   });
 
@@ -83,13 +89,19 @@ describe('toFeatureListModule', () => {
 
   it.each([
     ['only an icon', ICONS.ROCKET, null, ICONS.ROCKET, undefined],
-    ['only an image', null, ILLUSTRATION_ALT, undefined, ILLUSTRATION_ALT],
+    [
+      'only an image',
+      null,
+      MOCK_ILLUSTRATION_ALT,
+      undefined,
+      MOCK_ILLUSTRATION_ALT,
+    ],
     [
       'an icon and an image',
       ICONS.ROCKET,
-      ILLUSTRATION_ALT,
+      MOCK_ILLUSTRATION_ALT,
       ICONS.ROCKET,
-      ILLUSTRATION_ALT,
+      MOCK_ILLUSTRATION_ALT,
     ],
     ['neither icon nor image', null, null, undefined, undefined],
   ])(
@@ -117,9 +129,9 @@ describe('toFeatureListModule', () => {
       features: [
         mockRawFeatureListItem({
           link: {
-            label: CARD_LINK.label,
+            label: MOCK_CARD_LINK.label,
             linkType: LINK_TYPE.EXTERNAL,
-            url: CARD_LINK.url,
+            url: MOCK_CARD_LINK.url,
             internalReference: null,
             openInNewTab: null,
           },
@@ -131,7 +143,7 @@ describe('toFeatureListModule', () => {
     const module = toFeatureListModule(raw);
 
     expect(module.items[0]?.link).toEqual(
-      mockLinkView({ label: CARD_LINK.label, href: CARD_LINK.url }),
+      mockLinkView({ label: MOCK_CARD_LINK.label, href: MOCK_CARD_LINK.url }),
     );
   });
 
@@ -142,7 +154,6 @@ describe('toFeatureListModule', () => {
 
     const module = toFeatureListModule(raw);
 
-    expect(module.ctaButtons).toHaveLength(1);
-    expect(module.ctaButtons[0]).toEqual(mockCtaButtonView());
+    expect(module.ctaButtons).toEqual([mockCtaButtonView()]);
   });
 });

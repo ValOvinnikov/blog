@@ -1,176 +1,167 @@
+import { mockReference } from '@blog/studio/testing/mock-documents';
+import { faker } from '@faker-js/faker';
 import { at, patch, set } from 'sanity/migrate';
 
 import { collectRefRewritePatches, rewriteRefsDeep } from './rewrite-refs';
 
+faker.seed(18);
+
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_PAGE_POST_ID = faker.string.uuid();
+const MOCK_OTHER_POST_ID = faker.string.uuid();
+const MOCK_OTHER_PAGE_POST_ID = faker.string.uuid();
+const MOCK_AUTHOR_ID = faker.string.uuid();
+const MOCK_PERSON_ID = faker.string.uuid();
+const MOCK_DOC_ID = faker.string.uuid();
+const MOCK_BLOCK_KEY = faker.string.uuid();
+const MOCK_MARK_KEY = faker.string.uuid();
+const MOCK_ITEM_KEY = faker.string.uuid();
+const MOCK_OTHER_ITEM_KEY = faker.string.uuid();
+
+const idMap = new Map([[MOCK_POST_ID, MOCK_PAGE_POST_ID]]);
+
+const mockPortableText = (ref: string) => [
+  {
+    _type: 'block',
+    _key: MOCK_BLOCK_KEY,
+    markDefs: [
+      {
+        _type: 'link',
+        _key: MOCK_MARK_KEY,
+        internalReference: mockReference(ref),
+      },
+    ],
+    children: [],
+  },
+];
+
 describe(rewriteRefsDeep, () => {
-  describe('with a post-1 id map', () => {
-    let idMap: Map<string, string>;
+  it('rewrites a top-level reference found in the id map', () => {
+    expect(rewriteRefsDeep(mockReference(MOCK_POST_ID), idMap)).toEqual(
+      mockReference(MOCK_PAGE_POST_ID),
+    );
+  });
 
-    beforeEach(() => {
-      idMap = new Map([['post-1', 'page_post-post-1']]);
-    });
-
-    it('rewrites a top-level reference found in the id map', () => {
-      expect(
-        rewriteRefsDeep({ _type: 'reference', _ref: 'post-1' }, idMap),
-      ).toEqual({ _type: 'reference', _ref: 'page_post-post-1' });
-    });
-
-    it('leaves references absent from the id map unchanged', () => {
-      expect(
-        rewriteRefsDeep({ _type: 'reference', _ref: 'author-1' }, idMap),
-      ).toEqual({ _type: 'reference', _ref: 'author-1' });
-    });
+  it('leaves references absent from the id map unchanged', () => {
+    expect(rewriteRefsDeep(mockReference(MOCK_AUTHOR_ID), idMap)).toEqual(
+      mockReference(MOCK_AUTHOR_ID),
+    );
   });
 
   it('rewrites a reference nested inside a Portable Text markDef', () => {
-    const idMap = new Map([['post-2', 'page_post-post-2']]);
-    const body = [
-      {
-        _type: 'block',
-        _key: 'block-1',
-        markDefs: [
-          {
-            _type: 'link',
-            _key: 'mark-1',
-            internalReference: { _type: 'reference', _ref: 'post-2' },
-          },
-        ],
-        children: [{ _type: 'span', _key: 'span-1', text: 'hello' }],
-      },
-    ];
-
-    const rewritten = rewriteRefsDeep(body, idMap) as typeof body;
-
-    expect(
-      (rewritten[0]!.markDefs[0] as { internalReference: { _ref: string } })
-        .internalReference._ref,
-    ).toBe('page_post-post-2');
+    expect(rewriteRefsDeep(mockPortableText(MOCK_POST_ID), idMap)).toEqual(
+      mockPortableText(MOCK_PAGE_POST_ID),
+    );
   });
 
-  it('leaves primitives unchanged', () => {
-    const idMap = new Map<string, string>();
-
-    expect(rewriteRefsDeep('hello', idMap)).toBe('hello');
-    expect(rewriteRefsDeep(3, idMap)).toBe(3);
-    expect(rewriteRefsDeep(undefined, idMap)).toBeUndefined();
-  });
+  it.each([faker.lorem.word(), faker.number.int(), undefined])(
+    'leaves the primitive %s unchanged',
+    (value) => {
+      expect(rewriteRefsDeep(value, idMap)).toBe(value);
+    },
+  );
 });
 
 describe(collectRefRewritePatches, () => {
-  describe('with a post-1 id map', () => {
-    let idMap: Map<string, string>;
+  it('returns undefined when no ref in the document matches the id map', () => {
+    const doc = {
+      _id: MOCK_DOC_ID,
+      _type: 'module_hero',
+      title: faker.lorem.words(),
+    };
 
-    beforeEach(() => {
-      idMap = new Map([['post-1', 'page_post-post-1']]);
-    });
-
-    it('returns undefined when no ref in the document matches the id map', () => {
-      const doc = { _id: 'doc-1', _type: 'module_hero', title: 'Hero' };
-
-      expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
-    });
-
-    it('rewrites a top-level reference field', () => {
-      const doc = {
-        _id: 'hero-1',
-        _type: 'module_hero',
-        featuredPost: { _type: 'reference', _ref: 'post-1' },
-      };
-
-      expect(collectRefRewritePatches(doc, idMap)).toEqual(
-        patch('hero-1', [
-          at(['featuredPost', '_ref'], set('page_post-post-1')),
-        ]),
-      );
-    });
-
-    it('rewrites a reference nested inside a Portable Text markDef', () => {
-      const doc = {
-        _id: 'cta-1',
-        _type: 'module_cta',
-        content: [
-          {
-            _type: 'block',
-            _key: 'block-1',
-            markDefs: [
-              {
-                _type: 'link',
-                _key: 'mark-1',
-                internalReference: { _type: 'reference', _ref: 'post-1' },
-              },
-            ],
-            children: [],
-          },
-        ],
-      };
-
-      expect(collectRefRewritePatches(doc, idMap)).toEqual(
-        patch('cta-1', [
-          at(
-            [
-              'content',
-              { _key: 'block-1' },
-              'markDefs',
-              { _key: 'mark-1' },
-              'internalReference',
-              '_ref',
-            ],
-            set('page_post-post-1'),
-          ),
-        ]),
-      );
-    });
-
-    it('returns undefined when a reference already points at its mapped id', () => {
-      const doc = {
-        _id: 'page_post-post-2',
-        _type: 'page_post',
-        author: { _type: 'reference', _ref: 'page_post-post-1' },
-      };
-
-      expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
-    });
+    expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
   });
 
-  it('rewrites every matching reference across distinct top-level fields', () => {
-    const idMap = new Map([
-      ['post-1', 'page_post-post-1'],
-      ['author-1', 'person-author-1'],
-    ]);
+  it('rewrites a top-level reference field', () => {
     const doc = {
-      _id: 'doc-1',
-      _type: 'module_postFeatured',
-      relatedPost: { _type: 'reference', _ref: 'post-1' },
-      author: { _type: 'reference', _ref: 'author-1' },
+      _id: MOCK_DOC_ID,
+      _type: 'module_hero',
+      featuredPost: mockReference(MOCK_POST_ID),
     };
 
     expect(collectRefRewritePatches(doc, idMap)).toEqual(
-      patch('doc-1', [
-        at(['relatedPost', '_ref'], set('page_post-post-1')),
-        at(['author', '_ref'], set('person-author-1')),
+      patch(MOCK_DOC_ID, [
+        at(['featuredPost', '_ref'], set(MOCK_PAGE_POST_ID)),
+      ]),
+    );
+  });
+
+  it('rewrites a reference nested inside a Portable Text markDef', () => {
+    const doc = {
+      _id: MOCK_DOC_ID,
+      _type: 'module_cta',
+      content: mockPortableText(MOCK_POST_ID),
+    };
+
+    expect(collectRefRewritePatches(doc, idMap)).toEqual(
+      patch(MOCK_DOC_ID, [
+        at(
+          [
+            'content',
+            { _key: MOCK_BLOCK_KEY },
+            'markDefs',
+            { _key: MOCK_MARK_KEY },
+            'internalReference',
+            '_ref',
+          ],
+          set(MOCK_PAGE_POST_ID),
+        ),
+      ]),
+    );
+  });
+
+  it('returns undefined when a reference already points at its mapped id', () => {
+    const doc = {
+      _id: MOCK_DOC_ID,
+      _type: 'page_post',
+      author: mockReference(MOCK_PAGE_POST_ID),
+    };
+
+    expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
+  });
+
+  it('rewrites every matching reference across distinct top-level fields', () => {
+    const fieldsIdMap = new Map([
+      [MOCK_POST_ID, MOCK_PAGE_POST_ID],
+      [MOCK_AUTHOR_ID, MOCK_PERSON_ID],
+    ]);
+    const doc = {
+      _id: MOCK_DOC_ID,
+      _type: 'module_postFeatured',
+      relatedPost: mockReference(MOCK_POST_ID),
+      author: mockReference(MOCK_AUTHOR_ID),
+    };
+
+    expect(collectRefRewritePatches(doc, fieldsIdMap)).toEqual(
+      patch(MOCK_DOC_ID, [
+        at(['relatedPost', '_ref'], set(MOCK_PAGE_POST_ID)),
+        at(['author', '_ref'], set(MOCK_PERSON_ID)),
       ]),
     );
   });
 
   it('rewrites every matching reference in an array field', () => {
-    const idMap = new Map([
-      ['post-1', 'page_post-post-1'],
-      ['post-2', 'page_post-post-2'],
+    const arrayIdMap = new Map([
+      [MOCK_POST_ID, MOCK_PAGE_POST_ID],
+      [MOCK_OTHER_POST_ID, MOCK_OTHER_PAGE_POST_ID],
     ]);
     const doc = {
-      _id: 'featured-1',
+      _id: MOCK_DOC_ID,
       _type: 'module_postFeatured',
       posts: [
-        { _type: 'reference', _key: 'a', _ref: 'post-1' },
-        { _type: 'reference', _key: 'b', _ref: 'post-2' },
+        { ...mockReference(MOCK_POST_ID), _key: MOCK_ITEM_KEY },
+        { ...mockReference(MOCK_OTHER_POST_ID), _key: MOCK_OTHER_ITEM_KEY },
       ],
     };
 
-    expect(collectRefRewritePatches(doc, idMap)).toEqual(
-      patch('featured-1', [
-        at(['posts', { _key: 'a' }, '_ref'], set('page_post-post-1')),
-        at(['posts', { _key: 'b' }, '_ref'], set('page_post-post-2')),
+    expect(collectRefRewritePatches(doc, arrayIdMap)).toEqual(
+      patch(MOCK_DOC_ID, [
+        at(['posts', { _key: MOCK_ITEM_KEY }, '_ref'], set(MOCK_PAGE_POST_ID)),
+        at(
+          ['posts', { _key: MOCK_OTHER_ITEM_KEY }, '_ref'],
+          set(MOCK_OTHER_PAGE_POST_ID),
+        ),
       ]),
     );
   });

@@ -1,92 +1,65 @@
 import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { queries } from '@blog/db';
 import { ADMIN_ROLE } from '@blog/db/constants';
-import type { TAdmin } from '@blog/db/schema/admins';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
+import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { notFound, redirect } from 'next/navigation';
+import {
+  MOCK_ARCHIVED_AT,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
 
-const {
-  requireTenantOwnerOrAdminMock,
-  startProvisioningMock,
-  getTenantByIdMock,
-} = vi.hoisted(() => ({
-  requireTenantOwnerOrAdminMock: vi.fn(),
-  startProvisioningMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-}));
+import { retryProvisioningStepAction } from './retry-provisioning-step-action';
 
-vi.mock('@platform/server/auth/require-tenant-owner-or-admin', () => ({
-  requireTenantOwnerOrAdmin: requireTenantOwnerOrAdminMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-owner-or-admin');
 
-vi.mock('./start-provisioning', () => ({
-  startProvisioning: startProvisioningMock,
-}));
+vi.mock('@platform/server/provisioning/start-provisioning');
 
 vi.mock('@blog/db', () => ({
-  queries: {
-    tenants: {
-      getTenantById: getTenantByIdMock,
-    },
-  },
+  queries: { tenants: { getTenantById: vi.fn() } },
 }));
 
-describe('retryProvisioningStepAction', () => {
-  let retryProvisioningStepAction: typeof import('./retry-provisioning-step-action').retryProvisioningStepAction;
+const requireTenantOwnerOrAdminMock = vi.mocked(requireTenantOwnerOrAdmin);
+const startProvisioningMock = vi.mocked(startProvisioning);
+const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
 
-  beforeEach(async () => {
-    requireTenantOwnerOrAdminMock.mockReset();
-    requireTenantOwnerOrAdminMock.mockResolvedValue(undefined);
-    startProvisioningMock.mockReset();
-    startProvisioningMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
+describe(retryProvisioningStepAction, () => {
+  beforeEach(() => {
     getTenantByIdMock.mockReset();
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      deprovisionedAt: null,
-    });
-    ({ retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action'));
+    getTenantByIdMock.mockResolvedValue(mockTenant());
   });
 
-  it('requires a session before dispatching', async () => {
-    requireTenantOwnerOrAdminMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    });
-
-    await expect(retryProvisioningStepAction(MOCK_TENANT_ID)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+  it('stops before touching provisioning when the owner-or-admin gate rejects', async () => {
+    requireTenantOwnerOrAdminMock.mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
     );
-    expect(startProvisioningMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects a caller who is neither the owner nor a super-admin, before touching provisioning', async () => {
-    requireTenantOwnerOrAdminMock.mockImplementation(() => {
-      notFound();
-    });
 
     await expect(retryProvisioningStepAction(MOCK_TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
-    expect(redirect).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
-  it("admits only the tenant's owner or a super-admin", async () => {
-    await retryProvisioningStepAction(MOCK_TENANT_ID);
+  it.each([
+    { role: ADMIN_ROLE.SUPERADMIN, permitted: true },
+    { role: ADMIN_ROLE.ADMIN, permitted: false },
+  ])(
+    'lets the gate admit a $role admin: $permitted',
+    async ({ role, permitted }) => {
+      await retryProvisioningStepAction(MOCK_TENANT_ID);
 
-    const [tenantId, isAdminPermitted] = requireTenantOwnerOrAdminMock.mock
-      .calls[0] as [string, (admin: TAdmin) => boolean];
+      const [tenantId, isAdminPermitted] =
+        requireTenantOwnerOrAdminMock.mock.calls[0] ?? [];
 
-    expect(tenantId).toBe(MOCK_TENANT_ID);
-    expect(isAdminPermitted(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
-      true,
-    );
-    expect(isAdminPermitted(mockAdmin())).toBe(false);
-  });
+      expect(tenantId).toBe(MOCK_TENANT_ID);
+      expect(isAdminPermitted?.(mockAdmin({ role }))).toBe(permitted);
+    },
+  );
 
   it.each([
     { outcome: ACTION_OUTCOME.SUCCESS },
@@ -96,21 +69,24 @@ describe('retryProvisioningStepAction', () => {
     },
     { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
     { outcome: ACTION_OUTCOME.SERVER_ERROR },
-  ])('starts provisioning and returns its result %o', async (started) => {
-    startProvisioningMock.mockResolvedValue(started);
+  ] as const)(
+    'starts provisioning and returns its result %o',
+    async (started) => {
+      startProvisioningMock.mockResolvedValueOnce(started);
 
-    const result = await retryProvisioningStepAction(MOCK_TENANT_ID);
+      const result = await retryProvisioningStepAction(MOCK_TENANT_ID);
 
-    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(result).toEqual(started);
-  });
+      expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(result).toEqual(started);
+    },
+  );
 
-  it('refuses as not found without starting provisioning when the tenant does not exist', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
+  it('refuses as not found without starting provisioning for an unknown tenant', async () => {
+    getTenantByIdMock.mockResolvedValueOnce(undefined);
 
-    const result = await retryProvisioningStepAction('ghost');
+    const result = await retryProvisioningStepAction(MOCK_OTHER_TENANT_ID);
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith('ghost', {
+    expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_OTHER_TENANT_ID, {
       includeArchived: true,
     });
     expect(startProvisioningMock).not.toHaveBeenCalled();
@@ -120,11 +96,10 @@ describe('retryProvisioningStepAction', () => {
     });
   });
 
-  it('rejects a start/retry against an archived tenant server-side, without starting provisioning', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-    });
+  it('refuses an archived tenant without starting provisioning', async () => {
+    getTenantByIdMock.mockResolvedValueOnce(
+      mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+    );
 
     const result = await retryProvisioningStepAction(MOCK_TENANT_ID);
 

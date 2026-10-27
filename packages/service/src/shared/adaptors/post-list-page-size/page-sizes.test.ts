@@ -1,41 +1,62 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getFirstPostListPageSizes } from './page-sizes';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HERO_ID = 'hero';
-const LIST_A_ID = 'list-a';
-const LIST_B_ID = 'list-b';
-const tenant = mockTenant();
+faker.seed(6017);
+
+const MOCK_HERO_ID = faker.string.uuid();
+const MOCK_LIST_A_ID = faker.string.uuid();
+const MOCK_LIST_B_ID = faker.string.uuid();
+const MOCK_LIST_A_PAGE_SIZE = 5;
+const MOCK_LIST_B_PAGE_SIZE = 9;
+const MOCK_TENANT = mockTenant();
 
 describe(getFirstPostListPageSizes, () => {
-  it('fetches every page in one request and maps each page to its size', async () => {
-    mockRun.mockResolvedValueOnce([
-      { _id: LIST_A_ID, pageSize: 5 },
-      { _id: LIST_B_ID, pageSize: 9 },
-    ]);
+  describe('with post lists on some pages', () => {
+    let sizes: Awaited<ReturnType<typeof getFirstPostListPageSizes>>;
 
-    const sizes = await getFirstPostListPageSizes(
-      [
-        [{ _ref: HERO_ID }, { _ref: LIST_A_ID }],
-        [{ _ref: HERO_ID }],
+    beforeEach(async () => {
+      mockRun.mockResolvedValueOnce([
+        { _id: MOCK_LIST_A_ID, pageSize: MOCK_LIST_A_PAGE_SIZE },
+        { _id: MOCK_LIST_B_ID, pageSize: MOCK_LIST_B_PAGE_SIZE },
+      ]);
+
+      sizes = await getFirstPostListPageSizes(
+        [
+          [{ _ref: MOCK_HERO_ID }, { _ref: MOCK_LIST_A_ID }],
+          [{ _ref: MOCK_HERO_ID }],
+          null,
+          [{ _ref: MOCK_LIST_B_ID }, { _ref: MOCK_LIST_A_ID }],
+        ],
+        MOCK_TENANT,
+      );
+    });
+
+    it("maps each page to its first post list's page size", () => {
+      expect(sizes).toEqual([
+        MOCK_LIST_A_PAGE_SIZE,
         null,
-        [{ _ref: LIST_B_ID }, { _ref: LIST_A_ID }],
-      ],
-      tenant,
-    );
+        null,
+        MOCK_LIST_B_PAGE_SIZE,
+      ]);
+    });
 
-    const parameters = mockRun.mock.calls[0]?.[1]?.parameters;
+    it('fetches every distinct module id in one request', () => {
+      const parameters = mockRun.mock.lastCall?.[1]?.parameters;
 
-    expect(sizes).toEqual([5, null, null, 9]);
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(parameters).toEqual({ ids: [HERO_ID, LIST_A_ID, LIST_B_ID] });
+      expect(mockRun).toHaveBeenCalledTimes(1);
+      expect(parameters).toEqual({
+        ids: [MOCK_HERO_ID, MOCK_LIST_A_ID, MOCK_LIST_B_ID],
+      });
+    });
   });
 
   it('makes no request when no page has modules', async () => {
-    const sizes = await getFirstPostListPageSizes([null, []], tenant);
+    const sizes = await getFirstPostListPageSizes([null, []], MOCK_TENANT);
 
     expect(sizes).toEqual([null, null]);
     expect(mockRun).not.toHaveBeenCalled();

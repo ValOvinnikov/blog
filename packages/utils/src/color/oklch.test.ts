@@ -4,21 +4,17 @@ import {
   WCAG_AA_CONTRAST_MIN,
 } from './oklch';
 
-describe('oklchToHex', () => {
-  it('reproduces the Console light --logo-1 hex from theme.css', () => {
-    expect(oklchToHex(0.52, 0.17, 250)).toBe('#006ac5');
-  });
-
-  it('reproduces the Console dark --logo-3 hex from theme.css', () => {
-    expect(oklchToHex(0.8, 0.14, 250)).toBe('#73c3ff');
-  });
-
-  it('converts a high-chroma indigo stop to its hex', () => {
-    expect(oklchToHex(0.58, 0.21, 274)).toBe('#5966f3');
+describe(oklchToHex, () => {
+  it.each([
+    ['the Console light --logo-1', 0.52, 0.17, 250, '#006ac5'],
+    ['the Console dark --logo-3', 0.8, 0.14, 250, '#73c3ff'],
+    ['a high-chroma indigo stop', 0.58, 0.21, 274, '#5966f3'],
+  ])('converts %s colour to its hex', (_label, l, c, h, hex) => {
+    expect(oklchToHex(l, c, h)).toBe(hex);
   });
 });
 
-describe('renderedContrastRatio', () => {
+describe(renderedContrastRatio, () => {
   const black = { l: 0, c: 0, h: 0 };
   const white = { l: 1, c: 0, h: 0 };
 
@@ -27,15 +23,18 @@ describe('renderedContrastRatio', () => {
   });
 
   it('composites a translucent foreground over its background', () => {
-    expect(
-      renderedContrastRatio({ ...white, alpha: 0.5 }, [black]),
-    ).toBeCloseTo(5.28, 2);
+    const ratio = renderedContrastRatio({ ...white, alpha: 0.5 }, [black]);
+
+    expect(ratio).toBeCloseTo(5.28, 2);
   });
 
   it('composites a translucent background layer over the one beneath it', () => {
-    expect(
-      renderedContrastRatio(black, [white, { ...black, alpha: 0.25 }]),
-    ).toBeCloseTo(11.45, 1);
+    const ratio = renderedContrastRatio(black, [
+      white,
+      { ...black, alpha: 0.25 },
+    ]);
+
+    expect(ratio).toBeCloseTo(11.45, 1);
   });
 
   it('measures an out-of-gamut teal below the AA floor on white', () => {

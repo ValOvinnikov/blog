@@ -6,28 +6,33 @@ import {
   RELEASE_CHANGE,
   type TMaybeNull,
 } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import {
   CONTRAST_STATUS,
+  RELEASE_FAILURE,
   RELEASE_FIELD_ERROR,
   RELEASE_REFUSAL,
   RELEASE_RUN_STATUS,
-  RELEASE_FAILURE,
 } from '@platform/constants/release';
 import { auth } from '@platform/server/auth/auth';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
-  MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
-import { mockReleaseRun } from '@platform/testing/releases/fixtures';
+import {
+  MOCK_RELEASE_LAST_TAG,
+  mockReleaseRun,
+} from '@platform/testing/releases/fixtures';
 import type { Session } from 'next-auth';
 
+import { startReleaseAction } from './start-release-action';
+
+faker.seed(5998);
+
 const {
-  requireSuperAdminMock,
   getCandidateComparisonMock,
   getReleaseRunMock,
   resolveContrastStatusMock,
@@ -35,7 +40,6 @@ const {
   insertAuditEventMock,
   releaseSwitch,
 } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
   getCandidateComparisonMock: vi.fn(),
   getReleaseRunMock: vi.fn(),
   resolveContrastStatusMock: vi.fn(),
@@ -51,9 +55,7 @@ vi.mock('@platform/constants/release', async (importOriginal) => ({
   },
 }));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
 
@@ -75,14 +77,15 @@ vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 
-const OVERRIDE_REASON = 'Hotfix for a broken checkout';
+const MOCK_NEXT_VERSION = 'v1.5.0';
+const MOCK_OVERRIDE_REASON = faker.lorem.sentence();
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const candidate = (isRenderingChanged: boolean, headSha: string) =>
   okResult({
     headSha,
-    lastTag: 'v1.4.0',
+    lastTag: MOCK_RELEASE_LAST_TAG,
     changes: {
       [RELEASE_CHANGE.RENDERING]: isRenderingChanged,
       [RELEASE_CHANGE.DB_MIGRATION]: false,
@@ -91,16 +94,12 @@ const candidate = (isRenderingChanged: boolean, headSha: string) =>
     },
   });
 
-describe('startReleaseAction', () => {
-  let startReleaseAction: (typeof import('./start-release-action'))['startReleaseAction'];
+describe(startReleaseAction, () => {
   let headSha: string;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     headSha = faker.git.commitSha();
     releaseSwitch.isEnabled = true;
-    requireSuperAdminMock
-      .mockReset()
-      .mockResolvedValue(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }));
     authMock.mockReset().mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
@@ -112,8 +111,7 @@ describe('startReleaseAction', () => {
       .mockReset()
       .mockResolvedValue(okResult(CONTRAST_STATUS.NONE));
     dispatchReleaseWorkflowMock.mockReset().mockResolvedValue(true);
-    insertAuditEventMock.mockReset().mockResolvedValue({ id: 'event-1' });
-    ({ startReleaseAction } = await import('./start-release-action'));
+    insertAuditEventMock.mockReset();
   });
 
   const overrideNeeded = () => {
@@ -122,22 +120,22 @@ describe('startReleaseAction', () => {
   };
 
   it('requires a super-admin before reading or dispatching anything', async () => {
-    requireSuperAdminMock.mockRejectedValue(
+    vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
       new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
     );
 
-    await expect(startReleaseAction({ version: 'v1.5.0' })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(
+      startReleaseAction({ version: MOCK_NEXT_VERSION }),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getCandidateComparisonMock).not.toHaveBeenCalled();
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
   });
 
-  it('refuses while production releases are paused, reading, dispatching and recording nothing', async () => {
+  it('refuses while production releases are paused, touching nothing', async () => {
     releaseSwitch.isEnabled = false;
 
-    const result = await startReleaseAction({ version: 'v1.5.0' });
+    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -149,11 +147,13 @@ describe('startReleaseAction', () => {
   });
 
   it('dispatches the release without an override and records who started it', async () => {
-    const result = await startReleaseAction({ version: ' v1.5.0 ' });
+    const result = await startReleaseAction({
+      version: ` ${MOCK_NEXT_VERSION} `,
+    });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
-      version: 'v1.5.0',
+      version: MOCK_NEXT_VERSION,
       isOverride: false,
     });
     expect(insertAuditEventMock).toHaveBeenCalledOnce();
@@ -161,22 +161,22 @@ describe('startReleaseAction', () => {
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.RELEASE_STARTED,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
-      targetId: 'v1.5.0',
+      targetId: MOCK_NEXT_VERSION,
       details: { headSha, isOverride: false },
     });
   });
 
-  it('releases a passing candidate without an override even when rendering changed', async () => {
+  it('releases a passing candidate without an override when rendering changed', async () => {
     getCandidateComparisonMock.mockResolvedValue(candidate(true, headSha));
     resolveContrastStatusMock.mockResolvedValue(
       okResult(CONTRAST_STATUS.GREEN),
     );
 
-    expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
+    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
-      version: 'v1.5.0',
+      version: MOCK_NEXT_VERSION,
       isOverride: false,
     });
   });
@@ -185,24 +185,24 @@ describe('startReleaseAction', () => {
     overrideNeeded();
 
     const result = await startReleaseAction({
-      version: 'v1.5.0',
-      overrideReason: OVERRIDE_REASON,
+      version: MOCK_NEXT_VERSION,
+      overrideReason: MOCK_OVERRIDE_REASON,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(dispatchReleaseWorkflowMock).toHaveBeenCalledWith({
-      version: 'v1.5.0',
+      version: MOCK_NEXT_VERSION,
       isOverride: true,
     });
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.RELEASE_OVERRIDE,
       targetType: AUDIT_TARGET_TYPE.RELEASE,
-      targetId: 'v1.5.0',
+      targetId: MOCK_NEXT_VERSION,
       details: {
         headSha,
         contrastStatus: CONTRAST_STATUS.DUE,
-        reason: OVERRIDE_REASON,
+        reason: MOCK_OVERRIDE_REASON,
       },
     });
   });
@@ -213,7 +213,7 @@ describe('startReleaseAction', () => {
       overrideNeeded();
 
       const result = await startReleaseAction({
-        version: 'v1.5.0',
+        version: MOCK_NEXT_VERSION,
         overrideReason,
       });
 
@@ -231,14 +231,16 @@ describe('startReleaseAction', () => {
   it.each([
     ['1.5.0', RELEASE_FIELD_ERROR.VERSION_MALFORMED],
     ['v1.5', RELEASE_FIELD_ERROR.VERSION_MALFORMED],
-    ['v1.4.0', RELEASE_FIELD_ERROR.VERSION_NOT_GREATER],
+    [MOCK_RELEASE_LAST_TAG, RELEASE_FIELD_ERROR.VERSION_NOT_GREATER],
     ['v1.3.9', RELEASE_FIELD_ERROR.VERSION_NOT_GREATER],
   ])('refuses version %s naming the last tag', async (version, reason) => {
     const result = await startReleaseAction({ version });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { version: { reason, values: { lastTag: 'v1.4.0' } } },
+      fieldErrors: {
+        version: { reason, values: { lastTag: MOCK_RELEASE_LAST_TAG } },
+      },
     });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
   });
@@ -248,7 +250,7 @@ describe('startReleaseAction', () => {
     async (status) => {
       getReleaseRunMock.mockResolvedValue(okResult(mockReleaseRun({ status })));
 
-      const result = await startReleaseAction({ version: 'v1.5.0' });
+      const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
 
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.REFUSED,
@@ -263,9 +265,9 @@ describe('startReleaseAction', () => {
       errorResult(GITHUB_FAILURE.RATE_LIMITED),
     );
 
-    expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
-      outcome: ACTION_OUTCOME.UNAVAILABLE,
-    });
+    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -274,9 +276,9 @@ describe('startReleaseAction', () => {
       errorResult(RELEASE_FAILURE.DB_ERROR),
     );
 
-    expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
-      outcome: ACTION_OUTCOME.UNAVAILABLE,
-    });
+    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.UNAVAILABLE });
     expect(dispatchReleaseWorkflowMock).not.toHaveBeenCalled();
   });
 
@@ -285,8 +287,8 @@ describe('startReleaseAction', () => {
     dispatchReleaseWorkflowMock.mockResolvedValue(false);
 
     const result = await startReleaseAction({
-      version: 'v1.5.0',
-      overrideReason: 'Hotfix',
+      version: MOCK_NEXT_VERSION,
+      overrideReason: MOCK_OVERRIDE_REASON,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
@@ -294,10 +296,10 @@ describe('startReleaseAction', () => {
   });
 
   it('still succeeds when the audit write is lost', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error('connection lost'));
+    insertAuditEventMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
-    expect(await startReleaseAction({ version: 'v1.5.0' })).toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
+    const result = await startReleaseAction({ version: MOCK_NEXT_VERSION });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 });

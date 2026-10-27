@@ -4,87 +4,76 @@ import {
   MOCK_JAVASCRIPT_URL,
   MOCK_SCRIPT_MARKUP,
   MOCK_TAB_SPLIT_JAVASCRIPT_URL,
+  MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
 
 import { serializePortableText } from './serialize-portable-text';
 import type { TPortableTextNode } from './types';
 
-function span(text: string, marks?: string[]): TPortableTextNode {
+const LINK_KEY = 'link-1';
+const LINK_TEXT = 'Click';
+const ANCHOR_OPEN = '<a ';
+
+function mockSpan(text: string, marks?: string[]): TPortableTextNode {
   return { _type: 'span', text, marks };
 }
 
-function block(
+function mockBlock(
   overrides: Partial<TPortableTextNode> & { children?: TPortableTextNode[] },
 ): TPortableTextNode {
   return { _type: 'block', style: 'normal', ...overrides };
 }
 
-function linkBlock(href: string, text = 'Click'): TPortableTextNode {
-  return {
-    _type: 'block',
-    style: 'normal',
-    children: [span(text, ['link-1'])],
-    markDefs: [{ _key: 'link-1', _type: 'link', href }],
-  };
+function mockLinkBlock(href: string): TPortableTextNode {
+  return mockBlock({
+    children: [mockSpan(LINK_TEXT, [LINK_KEY])],
+    markDefs: [{ _key: LINK_KEY, _type: 'link', href }],
+  });
 }
 
-describe('serializePortableText', () => {
-  it('returns an empty string for null, undefined and empty content', () => {
-    expect(serializePortableText(null)).toBe('');
-    expect(serializePortableText(undefined)).toBe('');
-    expect(serializePortableText([])).toBe('');
-  });
+describe(serializePortableText, () => {
+  it.each([null, undefined, []])(
+    'returns an empty string for %j',
+    (content) => {
+      expect(serializePortableText(content)).toBe('');
+    },
+  );
 
   it('renders a normal-style block as a paragraph', () => {
     const html = serializePortableText([
-      block({ children: [span('Hello there.')] }),
+      mockBlock({ children: [mockSpan('Hello there.')] }),
     ]);
 
     expect(html).toBe('<p style="margin:0 0 16px;">Hello there.</p>');
   });
 
-  it('renders h2/h3/h4 blocks as heading tags', () => {
-    const html = serializePortableText([
-      block({ style: 'h2', children: [span('Section')] }),
-    ]);
+  it.each(['h2', 'h3', 'h4'])(
+    'renders an %s block as that heading',
+    (style) => {
+      const html = serializePortableText([
+        mockBlock({ style, children: [mockSpan('Section')] }),
+      ]);
 
-    expect(html).toContain('<h2 ');
-    expect(html).toContain('>Section</h2>');
-  });
+      expect(html).toContain(`<${style} `);
+      expect(html).toContain(`>Section</${style}>`);
+    },
+  );
 
   it('renders strong and em marks', () => {
     const html = serializePortableText([
-      block({ children: [span('bold', ['strong']), span('italic', ['em'])] }),
+      mockBlock({
+        children: [mockSpan('bold', ['strong']), mockSpan('italic', ['em'])],
+      }),
     ]);
 
     expect(html).toContain('<strong>bold</strong>');
     expect(html).toContain('<em>italic</em>');
   });
 
-  it('renders a link mark using the matching markDef href', () => {
+  it('groups consecutive bullet list items into one list', () => {
     const html = serializePortableText([
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [span('Confirm', ['link-1'])],
-        markDefs: [
-          {
-            _key: 'link-1',
-            _type: 'link',
-            href: 'https://example.com/confirm',
-          },
-        ],
-      },
-    ]);
-
-    expect(html).toContain('<a href="https://example.com/confirm"');
-    expect(html).toContain('>Confirm</a>');
-  });
-
-  it('groups consecutive bullet list items into one <ul>', () => {
-    const html = serializePortableText([
-      block({ listItem: 'bullet', children: [span('One')] }),
-      block({ listItem: 'bullet', children: [span('Two')] }),
+      mockBlock({ listItem: 'bullet', children: [mockSpan('One')] }),
+      mockBlock({ listItem: 'bullet', children: [mockSpan('Two')] }),
     ]);
 
     expect(html.match(/<ul/g)).toHaveLength(1);
@@ -94,8 +83,8 @@ describe('serializePortableText', () => {
 
   it('starts a new list when the list type changes', () => {
     const html = serializePortableText([
-      block({ listItem: 'bullet', children: [span('One')] }),
-      block({ listItem: 'number', children: [span('Two')] }),
+      mockBlock({ listItem: 'bullet', children: [mockSpan('One')] }),
+      mockBlock({ listItem: 'number', children: [mockSpan('Two')] }),
     ]);
 
     expect(html.match(/<ul/g)).toHaveLength(1);
@@ -104,8 +93,8 @@ describe('serializePortableText', () => {
 
   it('closes an open list when a non-list block follows', () => {
     const html = serializePortableText([
-      block({ listItem: 'bullet', children: [span('One')] }),
-      block({ children: [span('After the list.')] }),
+      mockBlock({ listItem: 'bullet', children: [mockSpan('One')] }),
+      mockBlock({ children: [mockSpan('After the list.')] }),
     ]);
 
     expect(html.indexOf('</ul>')).toBeLessThan(html.indexOf('<p'));
@@ -113,7 +102,7 @@ describe('serializePortableText', () => {
 
   it('escapes every interpolated text node', () => {
     const html = serializePortableText([
-      block({ children: [span(MOCK_SCRIPT_MARKUP)] }),
+      mockBlock({ children: [mockSpan(MOCK_SCRIPT_MARKUP)] }),
     ]);
 
     expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
@@ -122,80 +111,56 @@ describe('serializePortableText', () => {
 
   it('escapes a malicious link href', () => {
     const html = serializePortableText([
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [span('Click', ['link-1'])],
-        markDefs: [
-          {
-            _key: 'link-1',
-            _type: 'link',
-            href: '"><script>alert(1)</script>',
-          },
-        ],
-      },
+      mockLinkBlock(`">${MOCK_SCRIPT_MARKUP}`),
     ]);
 
     expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
   });
 
-  it('allows http, https and mailto link hrefs through unchanged', () => {
-    expect(serializePortableText([linkBlock('http://example.com/x')])).toBe(
-      '<p style="margin:0 0 16px;"><a href="http://example.com/x" style="color:inherit;text-decoration:underline;">Click</a></p>',
+  it('wraps a link mark in an anchor to its markDef href', () => {
+    const href = `${MOCK_URL}/confirm`;
+
+    const html = serializePortableText([mockLinkBlock(href)]);
+
+    expect(html).toBe(
+      `<p style="margin:0 0 16px;"><a href="${href}" style="color:inherit;text-decoration:underline;">${LINK_TEXT}</a></p>`,
     );
-    expect(
-      serializePortableText([linkBlock('https://example.com/x')]),
-    ).toContain('<a href="https://example.com/x"');
-    expect(
-      serializePortableText([linkBlock('mailto:someone@example.com')]),
-    ).toContain('<a href="mailto:someone@example.com"');
-  });
-
-  it('drops the link wrapper for a javascript: href', () => {
-    const html = serializePortableText([linkBlock(MOCK_JAVASCRIPT_URL)]);
-
-    expect(html).not.toContain('<a ');
-    expect(html).not.toContain('javascript:');
-    expect(html).toBe('<p style="margin:0 0 16px;">Click</p>');
   });
 
   it.each([
+    'http://example.com/x',
+    `${MOCK_URL}/x`,
+    'mailto:someone@example.com',
+  ])('lets the safe href %s through unchanged', (href) => {
+    const html = serializePortableText([mockLinkBlock(href)]);
+
+    expect(html).toContain(`<a href="${href}"`);
+  });
+
+  it('keeps the text of a link whose href it drops', () => {
+    const html = serializePortableText([mockLinkBlock(MOCK_JAVASCRIPT_URL)]);
+
+    expect(html).toBe(`<p style="margin:0 0 16px;">${LINK_TEXT}</p>`);
+  });
+
+  it.each([
+    ['a javascript:', MOCK_JAVASCRIPT_URL],
     ['a data:', MOCK_DATA_URL],
     ['a vbscript:', 'vbscript:msgbox(1)'],
-    [
-      'a javascript: href disguised with case',
-      'JavaScript:alert(document.cookie)',
-    ],
-    [
-      'a javascript: href with a tab inside the scheme',
-      MOCK_TAB_SPLIT_JAVASCRIPT_URL,
-    ],
-    [
-      'a javascript: href with a newline inside the scheme',
-      'java\nscript:alert(document.cookie)',
-    ],
-    [
-      'a javascript: href with leading whitespace',
-      '   javascript:alert(document.cookie)',
-    ],
+    ['a mixed-case javascript:', 'JavaScript:alert(document.cookie)'],
+    ['a tab-split javascript:', MOCK_TAB_SPLIT_JAVASCRIPT_URL],
+    ['a newline-split javascript:', 'java\nscript:alert(document.cookie)'],
+    ['a space-led javascript:', '   javascript:alert(document.cookie)'],
+    ['a percent-encoded javascript:', 'javascript%3Aalert(1)'],
     ['a scheme-relative', '//evil.example/x'],
+    ['an unparseable', 'not a url at all'],
   ])('drops the link wrapper for %s href', (_name, href) => {
-    expect(serializePortableText([linkBlock(href)])).not.toContain('<a ');
+    const html = serializePortableText([mockLinkBlock(href)]);
+
+    expect(html).not.toContain(ANCHOR_OPEN);
   });
 
-  it('drops the link wrapper for an unparseable href', () => {
-    const html = serializePortableText([linkBlock('not a url at all')]);
-
-    expect(html).not.toContain('<a ');
-  });
-
-  it('drops the link wrapper for a percent-encoded javascript scheme', () => {
-    const html = serializePortableText([linkBlock('javascript%3Aalert(1)')]);
-
-    expect(html).not.toContain('<a ');
-  });
-
-  it('drops a block whose _type is not "block", rather than passing it through', () => {
+  it('drops a block whose type is not a text block', () => {
     const unsupported: TPortableTextNode = {
       _type: 'image',
       asset: { url: 'https://example.com/tracking-pixel.png' },
@@ -203,31 +168,17 @@ describe('serializePortableText', () => {
     };
 
     const html = serializePortableText([
-      block({ children: [span('Kept paragraph.')] }),
+      mockBlock({ children: [mockSpan('Kept paragraph.')] }),
       unsupported,
     ]);
 
     expect(html).toBe('<p style="margin:0 0 16px;">Kept paragraph.</p>');
-    expect(html).not.toContain('img');
-    expect(html).not.toContain('onerror');
-    expect(html).not.toContain('evil.example');
   });
 
-  it('drops a block style outside the supported set (e.g. blockquote), rather than passing it through', () => {
+  it('drops a block style outside the supported set', () => {
     const html = serializePortableText([
-      block({ style: 'blockquote', children: [span('A quote.')] }),
+      mockBlock({ style: 'blockquote', children: [mockSpan('A quote.')] }),
     ]);
-
-    expect(html).toBe('');
-  });
-
-  it('would fail loudly if unsupported blocks were ever passed through unstyled', () => {
-    const futureBlockType: TPortableTextNode = {
-      _type: 'futureEditorCapability',
-      rawMarkup: '<div class="unstyled">not sanitized for email</div>',
-    };
-
-    const html = serializePortableText([futureBlockType]);
 
     expect(html).toBe('');
   });

@@ -1,39 +1,26 @@
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
+  COPYRIGHT_ENTITY,
+  DOCTYPE,
   MOCK_BODY_HTML,
+  MOCK_ESCAPED_SCRIPT_MARKUP,
   MOCK_LINK_HTML,
+  MOCK_NOW,
+  MOCK_SCRIPT_MARKUP,
+  OPERATOR_BRAND_NAME,
+  PREHEADER_STYLE,
 } from '@blog/email/testing/email-fixtures';
+import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
 
 import { buildOperatorShell } from './operator-shell';
 
-const DOCTYPE = '<!doctype html>';
-const PREHEADER_STYLE = 'display:none';
-
-describe('buildOperatorShell', () => {
-  it('wraps the given body HTML in a full HTML document', () => {
-    const html = buildOperatorShell({ bodyHtml: MOCK_BODY_HTML });
-
-    expect(html).toContain(DOCTYPE);
-    expect(html).toContain('<html lang="en">');
-    expect(html).toContain(MOCK_BODY_HTML);
+describe(buildOperatorShell, () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: MOCK_NOW });
   });
 
-  it('passes bodyHtml through unescaped, since callers already escape their own interpolated values', () => {
-    const html = buildOperatorShell({
-      bodyHtml: `<p>${MOCK_LINK_HTML}</p>`,
-    });
-
-    expect(html).toContain(MOCK_LINK_HTML);
-  });
-
-  it('includes a hidden preheader with the escaped preview text when given', () => {
-    const html = buildOperatorShell({
-      previewText: 'Needs <attention>',
-      bodyHtml: MOCK_BODY_HTML,
-    });
-
-    expect(html).toContain(PREHEADER_STYLE);
-    expect(html).toContain('Needs &lt;attention&gt;');
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('with only body HTML', () => {
@@ -43,33 +30,52 @@ describe('buildOperatorShell', () => {
       html = buildOperatorShell({ bodyHtml: MOCK_BODY_HTML });
     });
 
-    it('names the platform in the header and footer', () => {
-      expect(html).toContain('Tenant Alerts');
+    it('wraps the body in a full English HTML document', () => {
+      expect(html).toContain(DOCTYPE);
+      expect(html).toContain('<html lang="en">');
+      expect(html).toContain(MOCK_BODY_HTML);
+    });
+
+    it('names the operator and the current year in the copyright line', () => {
       expect(html).toContain(
-        `&copy; ${new Date().getFullYear()} Tenant Alerts`,
+        `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${OPERATOR_BRAND_NAME}`,
       );
     });
 
-    it('omits the preheader block entirely when no preview text is given', () => {
+    it('omits the preheader when no preview text is given', () => {
       expect(html).not.toContain(PREHEADER_STYLE);
     });
 
-    it('inlines the fixed platform hex tokens rather than referencing CSS custom properties', () => {
+    it('inlines the platform palette as hex values', () => {
       expect(html).toContain(PLATFORM_EMAIL_BRAND.surface);
       expect(html).toContain(PLATFORM_EMAIL_BRAND.border);
       expect(html).not.toContain('var(--');
     });
   });
 
-  it('cannot be passed a tenant brand at compile time', () => {
+  it('leaves the body HTML unescaped', () => {
+    const html = buildOperatorShell({ bodyHtml: `<p>${MOCK_LINK_HTML}</p>` });
+
+    expect(html).toContain(MOCK_LINK_HTML);
+  });
+
+  it('renders the escaped preview text in a hidden preheader', () => {
     const html = buildOperatorShell({
-      // @ts-expect-error -- buildOperatorShell has no brand parameter, so a
-      // resolved tenant palette must not be assignable to it.
-      brand: { surface: '#ffffff' },
-      previewText: 'Alert',
+      previewText: MOCK_SCRIPT_MARKUP,
       bodyHtml: MOCK_BODY_HTML,
     });
 
-    expect(html).toContain(DOCTYPE);
+    expect(html).toContain(PREHEADER_STYLE);
+    expect(html).toContain(MOCK_ESCAPED_SCRIPT_MARKUP);
+  });
+
+  it('cannot be passed a tenant brand at compile time', () => {
+    const html = buildOperatorShell({
+      // @ts-expect-error -- the operator shell takes no brand, so a resolved tenant palette is not assignable to it.
+      brand: MOCK_TENANT_EMAIL_BRAND,
+      bodyHtml: MOCK_BODY_HTML,
+    });
+
+    expect(html).not.toContain(MOCK_TENANT_EMAIL_BRAND.surface2);
   });
 });

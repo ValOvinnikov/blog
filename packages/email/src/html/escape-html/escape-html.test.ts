@@ -5,23 +5,18 @@ import {
 
 import { escapeHtml } from './escape-html';
 
-describe('escapeHtml', () => {
-  it('escapes ampersands', () => {
-    expect(escapeHtml('Tom & Jerry')).toBe('Tom &amp; Jerry');
-  });
-
-  it('escapes angle brackets', () => {
-    expect(escapeHtml(MOCK_SCRIPT_MARKUP)).toBe(MOCK_ESCAPED_SCRIPT_MARKUP);
-  });
-
-  it('escapes double and single quotes', () => {
-    expect(escapeHtml(`"quoted" and 'single'`)).toBe(
+describe(escapeHtml, () => {
+  it.each([
+    ['an ampersand', 'Tom & Jerry', 'Tom &amp; Jerry'],
+    ['angle brackets', MOCK_SCRIPT_MARKUP, MOCK_ESCAPED_SCRIPT_MARKUP],
+    [
+      'double and single quotes',
+      `"quoted" and 'single'`,
       '&quot;quoted&quot; and &#39;single&#39;',
-    );
-  });
-
-  it('escapes ampersands before other entities so escaping is not double-applied', () => {
-    expect(escapeHtml('&lt;')).toBe('&amp;lt;');
+    ],
+    ['an existing entity, escaping it once more', '&lt;', '&amp;lt;'],
+  ])('escapes %s', (_name, input, expected) => {
+    expect(escapeHtml(input)).toBe(expected);
   });
 
   it('leaves plain text untouched', () => {

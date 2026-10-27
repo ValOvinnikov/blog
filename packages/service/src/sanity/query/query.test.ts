@@ -1,14 +1,17 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
-import {
-  MOCK_TENANT_DATASET,
-  MOCK_TENANT_PROJECT_ID,
-} from '@blog/service/testing/tenant';
+import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 import type { IGroqBuilder } from 'groqd';
 
 import { q, runQuery, type TSlugQueryParams } from './query';
 
+faker.seed(6016);
+
+const MOCK_MISSING_SLUG = faker.lorem.slug();
 const SLUG_FILTER = 'slug.current == $slug';
+const NO_STORE = 'no-store';
+
 const { mockFetch, getClientMock } = vi.hoisted(() => {
   const mockFetch = vi.fn();
   const getClientMock = vi.fn(() => ({ fetch: mockFetch }));
@@ -21,17 +24,15 @@ vi.mock('@blog/service/sanity/client/client', () => ({
 
 const { NL, DE } = LOCALE_ISO_CODES;
 
-const testTenant = {
-  projectId: MOCK_TENANT_PROJECT_ID,
-  dataset: MOCK_TENANT_DATASET,
-  token: 'tok',
-};
-
 describe(runQuery, () => {
-  it('rejects when the fetch for a single non-null query resolves null', async () => {
-    mockFetch.mockResolvedValue(null);
+  const query = q.star.filterByType('page_post').slice(0);
 
-    const query = q
+  beforeEach(() => {
+    mockFetch.mockResolvedValue(null);
+  });
+
+  it('rejects when a non-null single-document query resolves null', async () => {
+    const slugQuery = q
       .parameters<TSlugQueryParams>()
       .star.filterByType('page_post')
       .filterBy(SLUG_FILTER)
@@ -39,51 +40,11 @@ describe(runQuery, () => {
       .project((sub) => ({ title: sub.field('title').notNull() }));
 
     await expect(
-      runQuery(query, {
-        parameters: { slug: 'nonexistent' },
-        tenant: testTenant,
+      runQuery(slugQuery, {
+        parameters: { slug: MOCK_MISSING_SLUG },
+        tenant: mockTenant(),
       }),
     ).rejects.toThrow();
-  });
-});
-
-describe('runQuery injected locale parameters', () => {
-  const localizedQuery = q
-    .parameters<TSlugQueryParams & { locale: TLocaleIsoCode }>()
-    .star.filterByType('page_landing')
-    .filterBy(SLUG_FILTER)
-    .filterBy('language == $locale')
-    .slice(0)
-    .project((sub) => ({ slug: sub.field('slug.current').notNull() }))
-    .nullable(true);
-
-  it('runs a query that declares locale without the caller passing it', () => {
-    function run() {
-      return runQuery(localizedQuery, {
-        parameters: { slug: MOCK_ABOUT_SLUG },
-        tenant: testTenant,
-      });
-    }
-
-    expectTypeOf(run).returns.resolves.toEqualTypeOf<{
-      slug: string;
-    } | null>();
-  });
-
-  it('still requires the parameters the tenant does not inject', () => {
-    type TConfig =
-      typeof localizedQuery extends IGroqBuilder<unknown, infer C> ? C : never;
-    type TOptions = Parameters<typeof runQuery<unknown, TConfig>>[1];
-
-    expectTypeOf<TOptions['parameters']>().toEqualTypeOf<{ slug: string }>();
-  });
-});
-
-describe('runQuery tenant threading', () => {
-  const query = q.star.filterByType('page_post').slice(0);
-
-  beforeEach(() => {
-    mockFetch.mockResolvedValue(null);
   });
 
   it('rejects a call site that omits tenant context at compile time', async () => {
@@ -91,47 +52,75 @@ describe('runQuery tenant threading', () => {
     await runQuery(query, {}).catch(() => {});
   });
 
-  it('passes the tenant context through to getClient', async () => {
-    await runQuery(query, { tenant: testTenant }).catch(() => {});
+  it('reads through the client of the given tenant', async () => {
+    await runQuery(query, { tenant: mockTenant() }).catch(() => {});
 
-    expect(getClientMock).toHaveBeenCalledWith(testTenant);
+    expect(getClientMock).toHaveBeenCalledWith(mockTenant());
   });
 
-  it("sends the tenant's request and default language as query params", async () => {
-    await runQuery(query, {
-      tenant: { ...testTenant, locale: NL, defaultLocale: DE },
-    }).catch(() => {});
+  it.each([
+    {
+      case: 'the request and default language',
+      tenant: { locale: NL, defaultLocale: DE },
+      expected: { locale: NL, defaultLocale: DE },
+    },
+    {
+      case: 'the default language for a request without one',
+      tenant: { defaultLocale: DE },
+      expected: { locale: DE, defaultLocale: DE },
+    },
+  ])('sends $case as query params', async ({ tenant, expected }) => {
+    await runQuery(query, { tenant: mockTenant(tenant) }).catch(() => {});
+
     const [, params, options] = mockFetch.mock.lastCall ?? [];
 
-    expect(params).toEqual({ locale: NL, defaultLocale: DE });
+    expect(params).toEqual(expected);
     expect(options).toBeUndefined();
   });
 
-  it('defaults the request language to the default language', async () => {
-    await runQuery(query, {
-      tenant: { ...testTenant, defaultLocale: DE },
-    }).catch(() => {});
-    const [, params, options] = mockFetch.mock.lastCall ?? [];
-
-    expect(params).toEqual({ locale: DE, defaultLocale: DE });
-    expect(options).toBeUndefined();
-  });
-});
-
-describe('runQuery fetch cache options', () => {
-  const query = q.star.filterByType('page_post').slice(0);
-
-  beforeEach(() => {
-    mockFetch.mockResolvedValue(null);
-  });
-
-  it('forwards no-store to the client fetch instead of the tagged cache', async () => {
-    await runQuery(query, { cache: 'no-store', tenant: testTenant }).catch(
+  it('forwards no-store to the client fetch', async () => {
+    await runQuery(query, { cache: NO_STORE, tenant: mockTenant() }).catch(
       () => {},
     );
 
     const [, , options] = mockFetch.mock.lastCall ?? [];
 
-    expect(options).toEqual({ cache: 'no-store' });
+    expect(options).toEqual({ cache: NO_STORE });
+  });
+
+  describe('with a query that declares a locale', () => {
+    const localizedQuery = q
+      .parameters<TSlugQueryParams & { locale: TLocaleIsoCode }>()
+      .star.filterByType('page_landing')
+      .filterBy(SLUG_FILTER)
+      .filterBy('language == $locale')
+      .slice(0)
+      .project((sub) => ({ slug: sub.field('slug.current').notNull() }))
+      .nullable(true);
+
+    it('runs without the caller passing the locale', () => {
+      function run() {
+        return runQuery(localizedQuery, {
+          parameters: { slug: MOCK_ABOUT_SLUG },
+          tenant: mockTenant(),
+        });
+      }
+
+      expectTypeOf(run).returns.resolves.toEqualTypeOf<{
+        slug: string;
+      } | null>();
+    });
+
+    it('still requires the parameters the tenant does not inject', () => {
+      type TConfig =
+        typeof localizedQuery extends IGroqBuilder<unknown, infer C>
+          ? C
+          : never;
+      type TOptions = Parameters<typeof runQuery<unknown, TConfig>>[1];
+
+      expectTypeOf<TOptions['parameters']>().toEqualTypeOf<{
+        slug: string;
+      }>();
+    });
   });
 });

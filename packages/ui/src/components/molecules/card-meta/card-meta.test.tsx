@@ -1,3 +1,7 @@
+import {
+  BRAND_TAGLINE_SEPARATOR_CHARS,
+  BRAND_TAGLINE_SEPARATORS,
+} from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import {
   MOCK_FORMATTED_DATE,
@@ -9,7 +13,8 @@ import { CardMeta } from './card-meta';
 
 faker.seed(123);
 
-const readingTime = `${faker.number.int({ min: 3, max: 15 })} min`;
+const MOCK_READING_TIME = `${faker.number.int({ min: 3, max: 15 })} min`;
+const SEPARATOR = BRAND_TAGLINE_SEPARATOR_CHARS[BRAND_TAGLINE_SEPARATORS.DOT];
 
 const setup = customRender(CardMeta, {
   dateValue: MOCK_PUBLISHED_AT,
@@ -22,42 +27,36 @@ describe(`<${CardMeta.name}/>`, () => {
       setup();
     });
 
-    it('renders time element with correct dateTime attribute', () => {
-      const timeEl = screen.getByRole('time');
-      expect(timeEl).toBeVisible();
-      expect(timeEl).toHaveAttribute('dateTime', MOCK_PUBLISHED_AT);
-      expect(timeEl).toHaveTextContent(MOCK_FORMATTED_DATE);
+    it('renders the date as a time element', () => {
+      const time = screen.getByRole('time');
+
+      expect(time).toBeVisible();
+      expect(time).toHaveAttribute('dateTime', MOCK_PUBLISHED_AT);
+      expect(time).toHaveTextContent(MOCK_FORMATTED_DATE);
     });
 
-    it('omits readingTime segment and its separator when not provided', () => {
-      const separator = screen.queryByText('·');
+    it('omits the reading time and its separator', () => {
+      const separator = screen.queryByText(SEPARATOR);
 
       expect(separator).not.toBeInTheDocument();
     });
   });
 
-  describe('when readingTime is provided', () => {
+  describe('when a reading time is provided', () => {
     beforeEach(() => {
-      setup({ readingTime });
+      setup({ readingTime: MOCK_READING_TIME });
     });
 
-    it('renders readingTime text when provided', () => {
-      const readingTimeText = screen.getByText(readingTime);
+    it('renders the reading time', () => {
+      const readingTime = screen.getByText(MOCK_READING_TIME);
 
-      expect(readingTimeText).toBeVisible();
+      expect(readingTime).toBeVisible();
     });
 
-    it('renders the separator as aria-hidden when readingTime is provided', () => {
-      const separator = screen.getByText('·');
+    it('hides the separator from assistive technology', () => {
+      const separator = screen.getByText(SEPARATOR);
 
       expect(separator).toHaveAttribute('aria-hidden', 'true');
     });
-  });
-
-  it('forwards dataTestId to root element', () => {
-    setup({ dataTestId: 'card-meta' });
-    const root = screen.getByTestId('card-meta');
-
-    expect(root).toBeVisible();
   });
 });

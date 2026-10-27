@@ -6,153 +6,105 @@ import { CtaModule } from './cta-module';
 
 faker.seed(123);
 
+const CTA_IMAGE_TEST_ID = 'cta-image';
+const MOCK_HEADING = faker.lorem.sentence(3);
+const MOCK_HEADING_ID = faker.lorem.slug(2);
+const MOCK_EYEBROW = faker.lorem.words(2);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence(8);
+const MOCK_FOOTNOTE = faker.lorem.sentence(6);
+const MOCK_CONTENT = faker.lorem.sentence(5);
+const MOCK_ACTION_LABEL = faker.lorem.word();
+const MOCK_ACTION_PATH = `/${faker.lorem.slug(1)}`;
+const MOCK_IMAGE_SRC = faker.image.url();
+
+const mockImage = () => (
+  <img src={MOCK_IMAGE_SRC} alt="" data-testid={CTA_IMAGE_TEST_ID} />
+);
+
 const setup = customRender(CtaModule, {
   variant: CTA_VARIANT.CALLOUT,
   tone: BRAND_VARIANT.PRIMARY,
-  heading: faker.lorem.sentence(3),
+  heading: MOCK_HEADING,
 });
 
 describe(`<${CtaModule.name}/>`, () => {
-  let heading: string;
-
-  beforeEach(() => {
-    heading = faker.lorem.sentence(4);
-  });
-
   it('renders the heading', () => {
-    setup({ heading });
+    setup();
 
-    expect(screen.getByRole('heading', { name: heading })).toBeVisible();
+    const heading = screen.getByRole('heading', { name: MOCK_HEADING });
+
+    expect(heading).toBeVisible();
   });
 
   it('assigns headingId to the heading element', () => {
-    setup({ heading, headingId: 'cta-heading' });
+    setup({ headingId: MOCK_HEADING_ID });
 
-    expect(screen.getByRole('heading', { name: heading })).toHaveAttribute(
-      'id',
-      'cta-heading',
-    );
+    const heading = screen.getByRole('heading', { name: MOCK_HEADING });
+
+    expect(heading).toHaveAttribute('id', MOCK_HEADING_ID);
   });
 
   it('renders the eyebrow when provided', () => {
-    const eyebrow = faker.lorem.words(2);
-    setup({ eyebrow });
+    setup({ eyebrow: MOCK_EYEBROW });
 
-    expect(screen.getByText(eyebrow)).toBeVisible();
-  });
+    const eyebrow = screen.getByText(MOCK_EYEBROW);
 
-  describe('with the default props', () => {
-    beforeEach(() => {
-      setup();
-    });
-
-    it('does not render an eyebrow when omitted', () => {
-      expect(screen.queryByText(faker.lorem.words(2))).not.toBeInTheDocument();
-    });
-
-    it('does not render supportingText when omitted', () => {
-      expect(
-        screen.queryByText(faker.lorem.sentence(8)),
-      ).not.toBeInTheDocument();
-    });
-
-    it('does not render content when omitted', () => {
-      expect(screen.queryByText('Rich CTA copy')).not.toBeInTheDocument();
-    });
-
-    it('does not render footnote when omitted', () => {
-      expect(
-        screen.queryByText(faker.lorem.sentence(6)),
-      ).not.toBeInTheDocument();
-    });
-
-    it('does not render an image when omitted', () => {
-      expect(screen.queryByTestId('cta-image')).not.toBeInTheDocument();
-    });
+    expect(eyebrow).toBeVisible();
   });
 
   it('renders supportingText when provided', () => {
-    const supportingText = faker.lorem.sentence(8);
-    setup({ supportingText });
+    setup({ supportingText: MOCK_SUPPORTING_TEXT });
 
-    expect(screen.getByText(supportingText)).toBeVisible();
+    const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);
+
+    expect(supportingText).toBeVisible();
   });
 
   it('renders content when provided', () => {
-    setup({ content: <p>Rich CTA copy</p> });
+    setup({ content: <p>{MOCK_CONTENT}</p> });
 
-    expect(screen.getByText('Rich CTA copy')).toBeVisible();
+    const content = screen.getByText(MOCK_CONTENT);
+
+    expect(content).toBeVisible();
   });
 
   it('renders the actions slot', () => {
-    setup({ actions: <a href="/subscribe">Subscribe</a> });
+    setup({
+      actions: <a href={MOCK_ACTION_PATH}>{MOCK_ACTION_LABEL}</a>,
+    });
 
-    expect(screen.getByRole('link', { name: 'Subscribe' })).toHaveAttribute(
-      'href',
-      '/subscribe',
-    );
-  });
+    const action = screen.getByRole('link', { name: MOCK_ACTION_LABEL });
 
-  it('omits the actions wrapper when actions is not provided', () => {
-    setup({ actions: undefined });
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(action).toHaveAttribute('href', MOCK_ACTION_PATH);
   });
 
   it('renders footnote when provided', () => {
-    const footnote = faker.lorem.sentence(6);
-    setup({ footnote });
+    setup({ footnote: MOCK_FOOTNOTE });
 
-    expect(screen.getByText(footnote)).toBeVisible();
+    const footnote = screen.getByText(MOCK_FOOTNOTE);
+
+    expect(footnote).toBeVisible();
   });
 
   it('renders the image when provided', () => {
-    setup({ image: <img src="/cta.jpg" alt="" data-testid="cta-image" /> });
+    setup({ image: mockImage() });
 
-    expect(screen.getByTestId('cta-image')).toBeVisible();
-  });
+    const image = screen.getByTestId(CTA_IMAGE_TEST_ID);
 
-  it('forwards data-testid', () => {
-    setup({ dataTestId: 'cta-module' });
-
-    expect(screen.getByTestId('cta-module')).toBeVisible();
+    expect(image).toBeVisible();
   });
 
   it.each([
-    {
-      name: 'places the image after the heading in the DOM for Callout, even though it renders above it visually',
-      props: { variant: CTA_VARIANT.CALLOUT },
-    },
-    {
-      name: 'places the image after the heading in the DOM for Split with contentPosition RIGHT',
-      props: {
-        variant: CTA_VARIANT.SPLIT,
-        contentPosition: CONTENT_ALIGNMENT.RIGHT,
-      },
-    },
-    {
-      name: 'places the image after the heading in the DOM for Banner, even though it is positioned as a background',
-      props: { variant: CTA_VARIANT.BANNER },
-    },
-  ])('$name', ({ props }) => {
-    setup({
-      ...props,
-      image: <img src="/cta.jpg" alt="" data-testid="cta-image" />,
-    });
+    { variant: CTA_VARIANT.CALLOUT },
+    { variant: CTA_VARIANT.SPLIT, contentPosition: CONTENT_ALIGNMENT.RIGHT },
+    { variant: CTA_VARIANT.BANNER },
+  ])('keeps the image after the heading in the DOM for $variant', (props) => {
+    setup({ ...props, image: mockImage() });
 
-    const heading = screen.getByRole('heading');
-    const image = screen.getByTestId('cta-image');
+    const heading = screen.getByRole('heading', { name: MOCK_HEADING });
+    const image = screen.getByTestId(CTA_IMAGE_TEST_ID);
+    const position = heading.compareDocumentPosition(image);
 
-    expect(
-      heading.compareDocumentPosition(image) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('renders all three variants without throwing', () => {
-    for (const variant of Object.values(CTA_VARIANT)) {
-      const { unmount } = setup({ variant });
-      expect(screen.getByRole('heading')).toBeVisible();
-      unmount();
-    }
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

@@ -16,6 +16,8 @@ export const mockPostCardTopic = (
   };
 };
 
+export const MOCK_POST_IMAGE_TEST_ID = 'post-image';
+
 export const mockPostCard = (overrides: Partial<TPostCard> = {}): TPostCard => {
   return {
     id: 'post-1',

@@ -3,8 +3,11 @@ import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
+import { startDeprovisioningRun } from '@blog/db/queries/tenants/start-deprovisioning-run';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_IDLE_DEPROVISIONING_STEPS,
@@ -16,32 +19,25 @@ import {
   unwrapOk,
 } from '@blog/db/testing/tenants/fixtures';
 
-import { startDeprovisioningRun } from '../start-deprovisioning-run';
-
 import { finishDeprovisioningRun } from './finish-deprovisioning-run';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock(new Date(MOCK_RUN_AT));
 
-const FAILED_STEP = {
+const MOCK_FAILED_STEP = {
   status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
   error: MOCK_STEP_ERROR,
 };
 
-beforeEach(() => {
-  vi.useFakeTimers();
-  vi.setSystemTime(new Date(MOCK_RUN_AT));
-});
-
 afterEach(async () => {
   await db().delete(schema.tenants);
-  vi.useRealTimers();
 });
 
 describe(finishDeprovisioningRun, () => {
   describe('a tenant with no run recorded', () => {
-    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
+    let tenant: TTenant;
 
     beforeEach(async () => {
       tenant = await insertTestTenant(db());
@@ -65,7 +61,7 @@ describe(finishDeprovisioningRun, () => {
       });
     });
 
-    it('sets finishedAt on an absent run rather than throwing', async () => {
+    it('sets finishedAt on an absent run', async () => {
       const { deprovisioningSteps } = unwrapOk(
         await finishDeprovisioningRun({ tenantId: tenant.id }),
       );
@@ -78,7 +74,7 @@ describe(finishDeprovisioningRun, () => {
     const tenant = await insertTestTenant(db(), {
       deprovisioningSteps: {
         ...MOCK_IDLE_DEPROVISIONING_STEPS,
-        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: FAILED_STEP,
+        [DEPROVISIONING_STEP.REMOVE_DOMAIN]: MOCK_FAILED_STEP,
       },
     });
 
@@ -87,7 +83,7 @@ describe(finishDeprovisioningRun, () => {
     );
 
     expect(deprovisioningSteps?.[DEPROVISIONING_STEP.REMOVE_DOMAIN]).toEqual(
-      FAILED_STEP,
+      MOCK_FAILED_STEP,
     );
   });
 

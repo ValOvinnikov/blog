@@ -16,7 +16,7 @@ describe(toCtaButton, () => {
   it('leaves appearance undefined when unset', () => {
     const button = toCtaButton(mockRawCtaButton({ appearance: null }));
 
-    expect(button?.appearance).toBeUndefined();
+    expect(button).toEqual(mockCtaButtonView({ appearance: undefined }));
   });
 
   it('returns undefined when the link cannot resolve to an href', () => {

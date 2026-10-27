@@ -28,7 +28,8 @@ describe(setTenantOwnerAccess, () => {
 
     await setTenantOwnerAccess(id, ownerAccess);
 
-    expect(await getTenantOwnerAccess(id)).toEqual(ownerAccess);
+    const stored = await getTenantOwnerAccess(id);
+    expect(stored).toEqual(ownerAccess);
   });
 
   it('keeps fields the input leaves out', async () => {
@@ -84,7 +85,8 @@ describe(setTenantOwnerAccess, () => {
         siteReadySentAt: null,
       });
 
-      expect(await getTenantOwnerAccess(id)).toEqual({
+      const stored = await getTenantOwnerAccess(id);
+      expect(stored).toEqual({
         ...ownerAccess,
         sanityInviteId,
         inviteAcceptedAt: undefined,
@@ -93,10 +95,9 @@ describe(setTenantOwnerAccess, () => {
     });
 
     it('leaves every owner access field untouched given an empty input', async () => {
-      expect(await setTenantOwnerAccess(id, {})).toEqual({
-        ok: true,
-        data: ownerAccess,
-      });
+      const result = await setTenantOwnerAccess(id, {});
+
+      expect(result).toEqual({ ok: true, data: ownerAccess });
     });
   });
 

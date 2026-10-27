@@ -4,10 +4,12 @@ export const MOCK_FIRST_TOPIC_POST_TITLE = 'Shipping the new build pipeline';
 
 export const MOCK_SECOND_TOPIC_POST_TITLE = 'Why we rewrote our test runner';
 
+export const MOCK_TOPIC_DESCRIPTION = 'Posts about building things.';
+
 export const MOCK_TOPIC_LIST_ITEM: ITaxonomyListModuleItem = {
   id: 'topic-1',
   title: 'Engineering',
-  description: 'Posts about building things.',
+  description: MOCK_TOPIC_DESCRIPTION,
   postCountLabel: '5 posts',
   href: '/topics/engineering',
   posts: [

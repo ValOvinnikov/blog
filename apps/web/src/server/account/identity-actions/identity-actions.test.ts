@@ -1,144 +1,139 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { queries } from '@blog/db';
+import { toOutcome } from '@blog/utils/to-outcome';
+import { faker } from '@faker-js/faker';
 import {
   DISPLAY_NAME_UPDATE_FAILED_EVENT,
   PROVIDER_UNLINK_FAILED_EVENT,
 } from '@web/constants/account';
 import { FIELD_ERROR } from '@web/constants/field-error';
+import { auth } from '@web/server/auth/auth';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { arrangeNoSessionOnce } from '@web/testing/shared/session/arrange-no-session-once';
+import { MOCK_USER_ID } from '@web/testing/shared/session/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
-import type * as TIdentityActions from './identity-actions';
+import {
+  type TLinkableProvider,
+  unlinkProviderAction,
+  updateDisplayNameAction,
+} from './identity-actions';
 
-const { authMock, unlinkProviderMock, updateDisplayNameMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    unlinkProviderMock: vi.fn(),
-    updateDisplayNameMock: vi.fn(),
-  }),
-);
-
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@web/server/auth/auth');
 
 vi.mock('@blog/db', () => ({
   queries: {
-    account: {
-      unlinkProvider: unlinkProviderMock,
-      updateDisplayName: updateDisplayNameMock,
-    },
+    account: { unlinkProvider: vi.fn(), updateDisplayName: vi.fn() },
   },
 }));
 
-const PROVIDER = 'github';
+faker.seed(6010);
 
-const session = {
-  user: { id: 'user-1', email: 'jane@icloud.com' },
-};
+const MOCK_PROVIDER: TLinkableProvider = 'github';
+const MOCK_OTHER_PROVIDER: TLinkableProvider = 'google';
+const MOCK_UNSUPPORTED_PROVIDER =
+  `${faker.lorem.word()};--` as TLinkableProvider;
+const MOCK_DISPLAY_NAME = faker.person.fullName();
 
-describe('unlinkProviderAction', () => {
-  let unlinkProviderAction: (typeof TIdentityActions)['unlinkProviderAction'];
+describe(unlinkProviderAction, () => {
+  it('answers server-error without unlinking when there is no session', async () => {
+    arrangeNoSessionOnce();
 
-  beforeEach(async () => {
-    authMock.mockReset();
-    unlinkProviderMock.mockReset();
-    authMock.mockResolvedValue(session);
-    ({ unlinkProviderAction } = await import('./identity-actions'));
+    const result = await unlinkProviderAction(MOCK_PROVIDER);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(queries.account.unlinkProvider).not.toHaveBeenCalled();
   });
 
-  it('returns SERVER_ERROR without unlinking when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('rejects an unsupported provider without signing in, logging or querying', async () => {
+    const result = await unlinkProviderAction(MOCK_UNSUPPORTED_PROVIDER);
 
-    await expect(unlinkProviderAction(PROVIDER)).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(unlinkProviderMock).not.toHaveBeenCalled();
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(auth).not.toHaveBeenCalled();
+    expect(queries.account.unlinkProvider).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('rejects a provider that is not literally "github" or "google" at runtime, without logging or querying it', async () => {
-    await expect(
-      unlinkProviderAction('DROP TABLE accounts;--' as typeof PROVIDER),
-    ).resolves.toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-
-    expect(authMock).not.toHaveBeenCalled();
-    expect(unlinkProviderMock).not.toHaveBeenCalled();
-    expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
-  });
-
-  it("unlinks the session user's provider and returns SUCCESS", async () => {
-    unlinkProviderMock.mockResolvedValue({ outcome: 'unlinked' });
-
-    await expect(unlinkProviderAction(PROVIDER)).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    expect(unlinkProviderMock).toHaveBeenCalledWith('user-1', PROVIDER);
-  });
-
-  it('returns BLOCKED when the db rejects the unlink', async () => {
-    unlinkProviderMock.mockResolvedValue({ outcome: 'last-method' });
-
-    await expect(unlinkProviderAction('google')).resolves.toEqual({
-      outcome: ACTION_OUTCOME.BLOCKED,
-    });
-  });
-
-  it('returns SERVER_ERROR and logs when the unlink write throws', async () => {
-    const error = new Error('boom');
-    unlinkProviderMock.mockRejectedValue(error);
-
-    await expect(unlinkProviderAction(PROVIDER)).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      PROVIDER_UNLINK_FAILED_EVENT,
-      { provider: PROVIDER, error },
+  it("unlinks the session user's provider and answers success", async () => {
+    vi.mocked(queries.account.unlinkProvider).mockResolvedValueOnce(
+      toOutcome('unlinked'),
     );
+
+    const result = await unlinkProviderAction(MOCK_PROVIDER);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(queries.account.unlinkProvider).toHaveBeenCalledWith(
+      MOCK_USER_ID,
+      MOCK_PROVIDER,
+    );
+  });
+
+  it('answers blocked when the last sign-in method would be removed', async () => {
+    vi.mocked(queries.account.unlinkProvider).mockResolvedValueOnce(
+      toOutcome('last-method'),
+    );
+
+    const result = await unlinkProviderAction(MOCK_OTHER_PROVIDER);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
+  });
+
+  it('answers server-error and logs when the unlink write throws', async () => {
+    vi.mocked(queries.account.unlinkProvider).mockRejectedValueOnce(MOCK_ERROR);
+
+    const result = await unlinkProviderAction(MOCK_PROVIDER);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(PROVIDER_UNLINK_FAILED_EVENT, {
+      provider: MOCK_PROVIDER,
+      error: MOCK_ERROR,
+    });
   });
 });
 
-describe('updateDisplayNameAction', () => {
-  let updateDisplayNameAction: (typeof TIdentityActions)['updateDisplayNameAction'];
+describe(updateDisplayNameAction, () => {
+  it('answers server-error without updating when there is no session', async () => {
+    arrangeNoSessionOnce();
 
-  beforeEach(async () => {
-    authMock.mockReset();
-    updateDisplayNameMock.mockReset();
-    authMock.mockResolvedValue(session);
-    ({ updateDisplayNameAction } = await import('./identity-actions'));
+    const result = await updateDisplayNameAction(MOCK_DISPLAY_NAME);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(queries.account.updateDisplayName).not.toHaveBeenCalled();
   });
 
-  it('returns SERVER_ERROR without updating when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('names the field invalid without updating when the trimmed name is empty', async () => {
+    const result = await updateDisplayNameAction('   ');
 
-    await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(updateDisplayNameMock).not.toHaveBeenCalled();
-  });
-
-  it('returns INVALID for the name without updating when the trimmed name is empty', async () => {
-    await expect(updateDisplayNameAction('   ')).resolves.toEqual({
+    expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: { name: { reason: FIELD_ERROR.INVALID } },
     });
-    expect(updateDisplayNameMock).not.toHaveBeenCalled();
+    expect(queries.account.updateDisplayName).not.toHaveBeenCalled();
   });
 
-  it('trims the name, updates it, and returns SUCCESS', async () => {
-    updateDisplayNameMock.mockResolvedValue(undefined);
+  it('trims the name, updates it and answers success', async () => {
+    const result = await updateDisplayNameAction(`  ${MOCK_DISPLAY_NAME}  `);
 
-    await expect(updateDisplayNameAction('  Jane Doe  ')).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SUCCESS,
-    });
-    expect(updateDisplayNameMock).toHaveBeenCalledWith('user-1', 'Jane Doe');
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(queries.account.updateDisplayName).toHaveBeenCalledWith(
+      MOCK_USER_ID,
+      MOCK_DISPLAY_NAME,
+    );
   });
 
-  it('returns SERVER_ERROR and logs when the db write throws', async () => {
-    const error = new Error('boom');
-    updateDisplayNameMock.mockRejectedValue(error);
+  it('answers server-error and logs when the db write throws', async () => {
+    vi.mocked(queries.account.updateDisplayName).mockRejectedValueOnce(
+      MOCK_ERROR,
+    );
 
-    await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+    const result = await updateDisplayNameAction(MOCK_DISPLAY_NAME);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(
       DISPLAY_NAME_UPDATE_FAILED_EVENT,
-      { error },
+      {
+        error: MOCK_ERROR,
+      },
     );
   });
 });

@@ -1,67 +1,92 @@
-import { PRESET_ID } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { PRESET_ID, type TPresetId } from '@blog/config';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { PresetPicker } from './preset-picker';
 
-const render = renderWithIntl;
+const {
+  ariaLabel: PRESET_GROUP,
+  console: CONSOLE,
+  editorial: EDITORIAL,
+  editorialDescription: EDITORIAL_DESCRIPTION,
+} = messages.presetPicker;
 
-describe(PresetPicker, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+const setup = customRender(PresetPicker, {
+  value: PRESET_ID.EDITORIAL,
+  onChange: vi.fn(),
+});
+
+describe(`<${PresetPicker.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
-  it('renders both presets and marks the current value selected', () => {
-    render(<PresetPicker value={PRESET_ID.EDITORIAL} onChange={vi.fn()} />);
+  describe('with the editorial preset selected', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
-    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
-  });
+    it.each([
+      [EDITORIAL, 'true'],
+      [CONSOLE, 'false'],
+    ])('marks %s checked: %s', (name, checked) => {
+      const preset = screen.getByRole('radio', { name });
 
-  it('names each preset by its name alone and describes it with its description', () => {
-    render(<PresetPicker value={PRESET_ID.EDITORIAL} onChange={vi.fn()} />);
+      expect(preset).toHaveAttribute('aria-checked', checked);
+    });
 
-    expect(
-      screen.getByRole('radio', { name: 'Editorial' }),
-    ).toHaveAccessibleDescription('Serif, warm and magazine-like.');
+    it('describes each preset with its description', () => {
+      const editorial = screen.getByRole('radio', { name: EDITORIAL });
+
+      expect(editorial).toHaveAccessibleDescription(EDITORIAL_DESCRIPTION);
+    });
   });
 
   it('reports the newly picked preset on click', async () => {
     const handleChange = vi.fn();
-    render(<PresetPicker value={PRESET_ID.CONSOLE} onChange={handleChange} />);
+    setup({ value: PRESET_ID.CONSOLE, onChange: handleChange });
 
-    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+    const editorial = screen.getByRole('radio', { name: EDITORIAL });
+    await user.click(editorial);
 
     expect(handleChange).toHaveBeenCalledWith(PRESET_ID.EDITORIAL);
   });
 
-  it('disables every option and stops reporting clicks when isDisabled is true', async () => {
-    const handleChange = vi.fn();
-    render(
-      <PresetPicker
-        value={PRESET_ID.CONSOLE}
-        onChange={handleChange}
-        isDisabled={true}
-        aria-describedby="archived-notice"
-      />,
-    );
+  describe('when disabled', () => {
+    let handleChange: Mock<(value: TPresetId) => void>;
 
-    const editorial = screen.getByRole('radio', { name: 'Editorial' });
-    expect(editorial).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('radiogroup')).toHaveAttribute(
-      'aria-describedby',
-      'archived-notice',
-    );
+    beforeEach(() => {
+      handleChange = vi.fn();
+      setup({
+        value: PRESET_ID.CONSOLE,
+        onChange: handleChange,
+        isDisabled: true,
+        'aria-describedby': ARCHIVED_NOTICE_ID,
+      });
+    });
 
-    await user.click(editorial);
-    expect(handleChange).not.toHaveBeenCalled();
+    it('disables every option', () => {
+      const editorial = screen.getByRole('radio', { name: EDITORIAL });
+
+      expect(editorial).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('points the group at the reason it is disabled', () => {
+      const group = screen.getByRole('radiogroup', { name: PRESET_GROUP });
+
+      expect(group).toHaveAttribute('aria-describedby', ARCHIVED_NOTICE_ID);
+    });
+
+    it('stops reporting clicks', async () => {
+      const editorial = screen.getByRole('radio', { name: EDITORIAL });
+      await user.click(editorial);
+
+      expect(handleChange).not.toHaveBeenCalled();
+    });
   });
 });

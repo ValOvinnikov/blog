@@ -4,7 +4,6 @@ import {
   LOCALE_ISO_CODES,
 } from '@blog/config/constants';
 import {
-  MOCK_LOGO_WALL_MODULE_ID,
   mockRawLogoItem,
   mockRawLogoWallModule,
 } from '@blog/service/testing/modules/fixtures';
@@ -15,27 +14,31 @@ import {
   MOCK_IMAGE_ASSET_DOCUMENT_ID,
   mockLocalizedHeadingBlock,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { logoWallModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const ENGLISH_HEADING = 'Trusted by';
-const DUTCH_HEADING = 'Vertrouwd door';
+faker.seed(6014);
 
-const logoWallDocument = {
-  _id: MOCK_LOGO_WALL_MODULE_ID,
+const MOCK_LOGO_WALL_ID = faker.string.uuid();
+const MOCK_ENGLISH_HEADING = faker.lorem.words(3);
+const MOCK_DUTCH_HEADING = faker.lorem.words(3);
+
+const MOCK_LOGO_WALL_DOCUMENT = {
+  _id: MOCK_LOGO_WALL_ID,
   _type: 'module_logoWall',
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockLocalizedHeadingBlock({
-    [EN]: ENGLISH_HEADING,
-    [NL]: DUTCH_HEADING,
+    [EN]: MOCK_ENGLISH_HEADING,
+    [NL]: MOCK_DUTCH_HEADING,
   }),
   logos: [
     {
-      _key: 'logo-1',
+      _key: faker.string.uuid(),
       _type: 'logoItem',
-      name: 'Acme',
+      name: faker.company.name(),
       image: {
         _type: 'image',
         asset: mockReference(MOCK_IMAGE_ASSET_DOCUMENT_ID),
@@ -47,9 +50,9 @@ const logoWallDocument = {
 async function runLogoWall(locale: string) {
   const raw = await evaluateGroqExpression(
     logoWallModuleQuery.query,
-    [logoWallDocument, MOCK_IMAGE_ASSET_DOCUMENT],
+    [MOCK_LOGO_WALL_DOCUMENT, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: MOCK_LOGO_WALL_MODULE_ID, locale, defaultLocale: EN },
+    { id: MOCK_LOGO_WALL_ID, locale, defaultLocale: EN },
   );
 
   return logoWallModuleQuery.parse(raw);
@@ -102,13 +105,13 @@ describe('logoWallModuleQuery', () => {
   it('picks the heading in the visitor language', async () => {
     const { headingBlock } = await runLogoWall(NL);
 
-    expect(headingBlock.heading).toBe(DUTCH_HEADING);
+    expect(headingBlock.heading).toBe(MOCK_DUTCH_HEADING);
   });
 
   it('falls back to the default language for the heading', async () => {
     const { headingBlock } = await runLogoWall(FR);
 
-    expect(headingBlock.heading).toBe(ENGLISH_HEADING);
+    expect(headingBlock.heading).toBe(MOCK_ENGLISH_HEADING);
   });
 
   it('reads a logo name the same in every language', async () => {

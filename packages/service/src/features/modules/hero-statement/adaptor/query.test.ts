@@ -9,47 +9,50 @@ import {
   mockLocalizedStrings,
   mockLocalizedValues,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { heroStatementModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const EN_COPY = {
-  eyebrow: 'Welcome',
-  heading: 'Build calmly',
-  supportingText: 'Notes on making things.',
-  alt: 'A desk',
+faker.seed(7);
+
+const MOCK_EN_COPY = {
+  eyebrow: faker.lorem.word(),
+  heading: faker.lorem.words(3),
+  supportingText: faker.lorem.sentence(),
+  alt: faker.lorem.words(2),
 };
 
-const NL_COPY = {
-  eyebrow: 'Welkom',
-  heading: 'Bouw rustig',
-  supportingText: 'Notities over maken.',
-  alt: 'Een bureau',
+const MOCK_NL_COPY = {
+  eyebrow: faker.lorem.word(),
+  heading: faker.lorem.words(3),
+  supportingText: faker.lorem.sentence(),
+  alt: faker.lorem.words(2),
 };
 
-const heroDocument = {
+const MOCK_HERO_DOCUMENT = {
   _id: MOCK_HERO_MODULE_ID,
   _type: 'module_heroStatement',
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   headingBlock: mockLocalizedHeadingBlock(
     {
-      [EN]: EN_COPY.heading,
-      [NL]: NL_COPY.heading,
+      [EN]: MOCK_EN_COPY.heading,
+      [NL]: MOCK_NL_COPY.heading,
     },
     {
       supportingText: mockLocalizedValues('internationalizedArrayTextValue', {
-        [EN]: EN_COPY.supportingText,
-        [NL]: NL_COPY.supportingText,
+        [EN]: MOCK_EN_COPY.supportingText,
+        [NL]: MOCK_NL_COPY.supportingText,
       }),
     },
   ),
   eyebrow: mockLocalizedStrings({
-    [EN]: EN_COPY.eyebrow,
-    [NL]: NL_COPY.eyebrow,
+    [EN]: MOCK_EN_COPY.eyebrow,
+    [NL]: MOCK_NL_COPY.eyebrow,
   }),
-  image: mockLocalizedImage({ [EN]: EN_COPY.alt, [NL]: NL_COPY.alt }),
+  image: mockLocalizedImage({ [EN]: MOCK_EN_COPY.alt, [NL]: MOCK_NL_COPY.alt }),
 };
 
 async function runHero(document: Record<string, unknown>, locale: string) {
@@ -65,45 +68,47 @@ async function runHero(document: Record<string, unknown>, locale: string) {
 
 describe('heroStatementModuleQuery', () => {
   it.each([
-    ['picks the copy in the visitor language', NL, NL_COPY],
+    ['picks the copy in the visitor language', NL, MOCK_NL_COPY],
     [
       'falls back to the default language when the visitor language is missing',
       FR,
-      EN_COPY,
+      MOCK_EN_COPY,
     ],
   ])('%s', async (_, locale, copy) => {
-    const hero = await runHero(heroDocument, locale);
+    const { eyebrow, headingBlock, image } = await runHero(
+      MOCK_HERO_DOCUMENT,
+      locale,
+    );
 
-    expect(hero).toMatchObject({
-      eyebrow: copy.eyebrow,
-      headingBlock: {
-        heading: copy.heading,
-        supportingText: copy.supportingText,
-      },
-      image: { alt: copy.alt },
+    expect(eyebrow).toBe(copy.eyebrow);
+    expect(headingBlock).toEqual({
+      heading: copy.heading,
+      supportingText: copy.supportingText,
     });
+    expect(image?.alt).toBe(copy.alt);
   });
 
   it('leaves the eyebrow and supporting text null when no language has a value', async () => {
-    const hero = await runHero(
+    const { eyebrow, headingBlock } = await runHero(
       {
-        ...heroDocument,
+        ...MOCK_HERO_DOCUMENT,
         eyebrow: undefined,
-        headingBlock: mockLocalizedHeadingBlock({ [EN]: EN_COPY.heading }),
+        headingBlock: mockLocalizedHeadingBlock({ [EN]: MOCK_EN_COPY.heading }),
       },
       NL,
     );
 
-    expect(hero).toMatchObject({
-      eyebrow: null,
-      headingBlock: { supportingText: null },
-    });
+    expect(eyebrow).toBeNull();
+    expect(headingBlock.supportingText).toBeNull();
   });
 
   it('fails when the heading is missing in every language', async () => {
     await expect(
       runHero(
-        { ...heroDocument, headingBlock: { _type: 'moduleHeadingBlock' } },
+        {
+          ...MOCK_HERO_DOCUMENT,
+          headingBlock: { _type: 'moduleHeadingBlock' },
+        },
         NL,
       ),
     ).rejects.toThrow();
