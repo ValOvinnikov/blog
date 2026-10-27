@@ -6,7 +6,12 @@ import {
 } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  act,
+  customRender,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_SITE_NAME,
@@ -100,7 +105,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
   const exportAs = async (button: typeof EXPORT_CSV_BUTTON) => {
     const exportButton = await screen.findByRole('button', button);
-    await user.click(exportButton);
+    await act(() => user.click(exportButton));
     return screen.findByRole(
       'button',
       { ...button, busy: false },
