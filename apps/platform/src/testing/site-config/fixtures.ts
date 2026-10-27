@@ -29,7 +29,7 @@ export const MOCK_THEME_FIELDS = {
   density: DENSITY.DEFAULT,
 };
 
-export const MOCK_SITE_CONFIG_UPDATED_AT = new Date('2026-08-20T09:00:00.000Z');
+const MOCK_SITE_CONFIG_UPDATED_AT = new Date('2026-08-20T09:00:00.000Z');
 
 export const mockSiteConfig = (
   overrides: Partial<TSiteConfigResult> = {},
