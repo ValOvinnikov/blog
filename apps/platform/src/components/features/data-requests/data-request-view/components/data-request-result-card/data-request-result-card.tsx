@@ -56,28 +56,28 @@ export const DataRequestResultCard = ({
       <Card.Header
         title={t('title', { email })}
         actions={
-          <div className={actions()}>
-            <Button
-              type="button"
-              variant="secondary"
-              size={SIZE.SM}
-              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
-              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
-              pendingLabel={t('exporting')}
-            >
-              {t('exportJson')}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size={SIZE.SM}
-              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
-              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
-              pendingLabel={t('exporting')}
-            >
-              {t('exportCsv')}
-            </Button>
-            {matchCount > 0 && (
+          matchCount > 0 && (
+            <div className={actions()}>
+              <Button
+                type="button"
+                variant="secondary"
+                size={SIZE.SM}
+                onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
+                isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
+                pendingLabel={t('exporting')}
+              >
+                {t('exportJson')}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size={SIZE.SM}
+                onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
+                isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
+                pendingLabel={t('exporting')}
+              >
+                {t('exportCsv')}
+              </Button>
               <DataRequestEraseDialog
                 email={email}
                 hasReaderAccount={hasReaderAccount}
@@ -85,8 +85,8 @@ export const DataRequestResultCard = ({
                 onErase={onErase}
                 onErased={onErased}
               />
-            )}
-          </div>
+            </div>
+          )
         }
       />
       <Card.Body>

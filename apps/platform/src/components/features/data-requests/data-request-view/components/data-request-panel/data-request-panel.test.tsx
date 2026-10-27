@@ -6,7 +6,12 @@ import {
 } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  act,
+  customRender,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_SITE_NAME,
@@ -100,7 +105,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
 
   const exportAs = async (button: typeof EXPORT_CSV_BUTTON) => {
     const exportButton = await screen.findByRole('button', button);
-    await user.click(exportButton);
+    await act(() => user.click(exportButton));
     return screen.findByRole(
       'button',
       { ...button, busy: false },
@@ -144,7 +149,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(table).not.toBeInTheDocument();
   });
 
-  it('says so when nothing is stored, and offers no erasure', async () => {
+  it('says in one line that nothing is held, with no table, export or erasure', async () => {
     lookUpPersonalDataActionMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SUCCESS,
       matches: [],
@@ -156,11 +161,13 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     const summary = await screen.findByText(
       t('dataRequestResultCard.matchCount', { count: 0 }),
     );
-    const empty = screen.getByText(dataRequestMatchesTable.empty);
+    const table = screen.queryByRole('region', RESULTS_TABLE);
+    const exportButton = screen.queryByRole('button', EXPORT_JSON_BUTTON);
     const eraseButton = screen.queryByRole('button', ERASE_BUTTON);
 
     expect(summary).toBeVisible();
-    expect(empty).toBeVisible();
+    expect(table).not.toBeInTheDocument();
+    expect(exportButton).not.toBeInTheDocument();
     expect(eraseButton).not.toBeInTheDocument();
   });
 

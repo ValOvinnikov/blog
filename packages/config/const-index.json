@@ -506,6 +506,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/auth-app.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_COLUMN.SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
     "PLATFORM": [
@@ -3908,6 +3914,38 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
+    "ALL": [
+      {
+        "ref": "DATA_REQUEST_KIND_FILTER.ALL",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "KIND": [
+      {
+        "ref": "DATA_REQUEST_MATCH_COLUMN.KIND",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "EMAIL": [
+      {
+        "ref": "DATA_REQUEST_MATCH_COLUMN.EMAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "RECORDED": [
+      {
+        "ref": "DATA_REQUEST_MATCH_COLUMN.RECORDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "JSON": [
       {
         "ref": "DATA_REQUEST_EXPORT_FORMAT.JSON",
@@ -4938,6 +4976,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/site-config",
         "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "ascending": [
+      {
+        "ref": "SORT_DIRECTION.ASCENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/sort",
+        "file": "apps/platform/src/constants/sort.ts"
+      }
+    ],
+    "descending": [
+      {
+        "ref": "SORT_DIRECTION.DESCENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/sort",
+        "file": "apps/platform/src/constants/sort.ts"
       }
     ],
     "UPCOMING": [

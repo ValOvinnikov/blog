@@ -6,43 +6,67 @@ import { useTranslations } from 'next-intl';
 
 import { paginationVariants } from './pagination-variants';
 
+type TPaginationTarget =
+  | { pageHref: (page: number) => string; onPageChange?: never }
+  | { onPageChange: (page: number) => void; pageHref?: never };
+
 export type TPaginationProps = {
   page: number;
   totalPages: number;
-  pageHref: (page: number) => string;
-};
+} & TPaginationTarget;
 
 export const Pagination = ({
   page,
   totalPages,
   pageHref,
+  onPageChange,
 }: TPaginationProps) => {
   const t = useTranslations('pagination');
   const { root } = paginationVariants();
 
   if (totalPages <= 1) return null;
 
+  const renderStep = (target: number, label: string) => {
+    const isAvailable = target >= 1 && target <= totalPages;
+
+    if (isAvailable && pageHref) {
+      return (
+        <LinkButton href={pageHref(target)} size={SIZE.SM}>
+          {label}
+        </LinkButton>
+      );
+    }
+
+    if (onPageChange) {
+      return (
+        <Button
+          size={SIZE.SM}
+          isAriaDisabled={!isAvailable}
+          onClick={() => onPageChange(target)}
+        >
+          {label}
+        </Button>
+      );
+    }
+
+    return (
+      <Button size={SIZE.SM} isDisabled={true}>
+        {label}
+      </Button>
+    );
+  };
+
+  const Root = onPageChange ? 'div' : 'nav';
+
   return (
-    <nav className={root()} aria-label={t('ariaLabel')}>
-      {page > 1 ? (
-        <LinkButton href={pageHref(page - 1)} size={SIZE.SM}>
-          {t('previous')}
-        </LinkButton>
-      ) : (
-        <Button size={SIZE.SM} isDisabled={true}>
-          {t('previous')}
-        </Button>
-      )}
+    <Root
+      className={root()}
+      role={onPageChange ? 'group' : undefined}
+      aria-label={t('ariaLabel')}
+    >
+      {renderStep(page - 1, t('previous'))}
       <Text variant="meta">{t('status', { page, totalPages })}</Text>
-      {page < totalPages ? (
-        <LinkButton href={pageHref(page + 1)} size={SIZE.SM}>
-          {t('next')}
-        </LinkButton>
-      ) : (
-        <Button size={SIZE.SM} isDisabled={true}>
-          {t('next')}
-        </Button>
-      )}
-    </nav>
+      {renderStep(page + 1, t('next'))}
+    </Root>
   );
 };

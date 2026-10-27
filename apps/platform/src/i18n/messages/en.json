@@ -1461,7 +1461,7 @@
   },
   "dataRequestResultCard": {
     "title": "Data held for {email}",
-    "matchCount": "{count, plural, =0 {No records found.} one {# record found.} other {# records found.}}",
+    "matchCount": "{count, plural, =0 {No data held for this address.} one {# record found.} other {# records found.}}",
     "exportJson": "Download JSON",
     "exportCsv": "Download CSV",
     "exporting": "Preparing…"
@@ -1501,9 +1501,12 @@
     "columnRecorded": "Recorded",
     "platformWide": "Platform",
     "emailHashed": "Stored as a hash",
-    "empty": "Nothing is stored for this address.",
+    "noResults": "No records match.",
     "regionLabel": "Stored records",
-    "notRecorded": "Not recorded"
+    "notRecorded": "Not recorded",
+    "searchLabel": "Search records",
+    "kindFilterLabel": "Kind",
+    "allKinds": "All kinds"
   },
   "dataRequestMatchKind": {
     "SUBSCRIBER": "Subscriber",

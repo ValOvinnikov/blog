@@ -11,6 +11,7 @@ import type { FormEvent } from 'react';
 
 const dataRequestSearchCardVariants = tv({
   slots: {
+    emailField: ['max-w-md'],
     footerActions: ['ml-auto flex items-center gap-2'],
   },
 });
@@ -31,7 +32,7 @@ export const DataRequestSearchCard = ({
   onSubmit,
 }: TDataRequestSearchCardProps) => {
   const t = useTranslations('dataRequestSearchCard');
-  const { footerActions } = dataRequestSearchCardVariants();
+  const { emailField, footerActions } = dataRequestSearchCardVariants();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,15 +44,17 @@ export const DataRequestSearchCard = ({
       <Card>
         <Card.Header title={t('title')} supportingText={t('supportingText')} />
         <Card.Body>
-          <FormTextInput
-            type="email"
-            label={t('emailLabel')}
-            hint={t('emailHint')}
-            placeholder={t('emailPlaceholder')}
-            error={error}
-            value={email}
-            onChange={onEmailChange}
-          />
+          <div className={emailField()}>
+            <FormTextInput
+              type="email"
+              label={t('emailLabel')}
+              hint={t('emailHint')}
+              placeholder={t('emailPlaceholder')}
+              error={error}
+              value={email}
+              onChange={onEmailChange}
+            />
+          </div>
         </Card.Body>
         <Card.Footer>
           <div className={footerActions()}>

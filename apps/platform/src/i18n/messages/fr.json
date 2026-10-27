@@ -1461,7 +1461,7 @@
   },
   "dataRequestResultCard": {
     "title": "Données conservées pour {email}",
-    "matchCount": "{count, plural, =0 {Aucun enregistrement trouvé.} one {# enregistrement trouvé.} other {# enregistrements trouvés.}}",
+    "matchCount": "{count, plural, =0 {Aucune donnée conservée pour cette adresse.} one {# enregistrement trouvé.} other {# enregistrements trouvés.}}",
     "exportJson": "Télécharger en JSON",
     "exportCsv": "Télécharger en CSV",
     "exporting": "Préparation…"
@@ -1501,9 +1501,12 @@
     "columnRecorded": "Enregistré",
     "platformWide": "Plateforme",
     "emailHashed": "Conservé sous forme de hash",
-    "empty": "Rien n’est conservé pour cette adresse.",
+    "noResults": "Aucun enregistrement ne correspond.",
     "regionLabel": "Enregistrements conservés",
-    "notRecorded": "Non enregistré"
+    "notRecorded": "Non enregistré",
+    "searchLabel": "Rechercher dans les enregistrements",
+    "kindFilterLabel": "Type",
+    "allKinds": "Tous les types"
   },
   "dataRequestMatchKind": {
     "SUBSCRIBER": "Abonné",
