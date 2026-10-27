@@ -1,6 +1,6 @@
 import { tv } from '@blog/ui/lib/styling';
 
-export const SHEET_BELOW_LG = [
+const SHEET_BELOW_LG = [
   'max-lg:fixed max-lg:inset-x-gutter max-lg:mt-0 max-lg:w-auto max-lg:max-w-none',
   'max-lg:top-[calc(var(--site-header-height,4.5rem)+0.5rem)]',
   'max-lg:max-h-[calc(100dvh-var(--site-header-height,4.5rem)-1rem)] max-lg:overflow-y-auto',
