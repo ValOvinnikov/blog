@@ -1,28 +1,41 @@
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 
-faker.seed(7741);
+const sanityManagementClientFaker = createMockFaker(7741);
 
-export const MOCK_SANITY_ERROR_BODY = faker.lorem.words(2);
-export const MOCK_SANITY_TOKEN = faker.string.alphanumeric(12);
-export const MOCK_SANITY_PROJECT_ID = faker.string.alphanumeric(8);
-export const MOCK_SANITY_DATASET = faker.string.alpha({
+export const MOCK_SANITY_ERROR_BODY =
+  sanityManagementClientFaker.lorem.words(2);
+export const MOCK_SANITY_TOKEN =
+  sanityManagementClientFaker.string.alphanumeric(12);
+export const MOCK_SANITY_PROJECT_ID =
+  sanityManagementClientFaker.string.alphanumeric(8);
+export const MOCK_SANITY_DATASET = sanityManagementClientFaker.string.alpha({
   length: 10,
   casing: 'lower',
 });
-export const MOCK_SANITY_ROBOT_ID = faker.string.alphanumeric(10);
-export const MOCK_SANITY_MINTED_TOKEN = faker.string.alphanumeric(24);
-export const MOCK_SANITY_PROJECT_USER_ID = faker.string.alphanumeric(8);
-export const MOCK_SANITY_INVITE_EMAIL = faker.internet.email();
-export const MOCK_SANITY_INVITE_ID = faker.string.alphanumeric(10);
-export const MOCK_SANITY_USER_ID = `g${faker.string.alphanumeric(10)}`;
-export const MOCK_SANITY_ORGANIZATION_ID = `o${faker.string.alphanumeric(8)}`;
-export const MOCK_SANITY_CORS_ORIGIN = faker.internet.url({
-  appendSlash: false,
-});
-export const MOCK_SANITY_WEBHOOK_URL = faker.internet.url({
-  appendSlash: false,
-});
-export const MOCK_SANITY_WEBHOOK_ID = faker.string.alphanumeric(10);
+export const MOCK_SANITY_ROBOT_ID =
+  sanityManagementClientFaker.string.alphanumeric(10);
+export const MOCK_SANITY_MINTED_TOKEN =
+  sanityManagementClientFaker.string.alphanumeric(24);
+export const MOCK_SANITY_PROJECT_USER_ID =
+  sanityManagementClientFaker.string.alphanumeric(8);
+export const MOCK_SANITY_INVITE_EMAIL =
+  sanityManagementClientFaker.internet.email();
+export const MOCK_SANITY_INVITE_ID =
+  sanityManagementClientFaker.string.alphanumeric(10);
+export const MOCK_SANITY_USER_ID = `g${sanityManagementClientFaker.string.alphanumeric(10)}`;
+export const MOCK_SANITY_ORGANIZATION_ID = `o${sanityManagementClientFaker.string.alphanumeric(8)}`;
+export const MOCK_SANITY_CORS_ORIGIN = sanityManagementClientFaker.internet.url(
+  {
+    appendSlash: false,
+  },
+);
+export const MOCK_SANITY_WEBHOOK_URL = sanityManagementClientFaker.internet.url(
+  {
+    appendSlash: false,
+  },
+);
+export const MOCK_SANITY_WEBHOOK_ID =
+  sanityManagementClientFaker.string.alphanumeric(10);
 
 export const MOCK_SANITY_EXPECTED_URL = {
   projects: 'https://api.sanity.io/v2021-06-07/projects',
