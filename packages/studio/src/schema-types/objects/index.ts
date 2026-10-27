@@ -14,6 +14,7 @@ import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
 import { linkRefSchema } from './link-ref/link-ref';
+import { linkRefWithSubItemsSchema } from './link-ref-with-sub-items/link-ref-with-sub-items';
 import { localizedImageWithAltSchema } from './localized-image-with-alt/localized-image-with-alt';
 import { logoItemSchema } from './logo-item/logo-item';
 import { moduleHeadingBlockSchema } from './module-heading-block/module-heading-block';
@@ -43,6 +44,7 @@ export const objects = [
   asideSchema,
   inlineLinkSchema,
   linkRefSchema,
+  linkRefWithSubItemsSchema,
   logoItemSchema,
   socialProfileSchema,
   ctaButtonSchema,

@@ -824,6 +824,16 @@ export type SanityImageHotspot = {
   width?: number;
 };
 
+export type LinkRefWithSubItems = {
+  _type: 'linkRefWithSubItems';
+  link?: LinkReference;
+  subItems?: Array<
+    {
+      _key: string;
+    } & LinkRef
+  >;
+};
+
 export type LinkRef = {
   _type: 'linkRef';
   link?: LinkReference;
@@ -907,10 +917,14 @@ export type Settings_navigation = {
   _rev: string;
   title?: string;
   items?: Array<
-    {
-      _key: string;
-    } & LinkRef
+    | ({
+        _key: string;
+      } & LinkRef)
+    | ({
+        _key: string;
+      } & LinkRefWithSubItems)
   >;
+  tagline?: BrandTagline;
   showLanguageSwitcher?: boolean;
 };
 
@@ -2265,6 +2279,7 @@ export type AllSanitySchemaTypes =
   | LogoItem
   | SanityImageCrop
   | SanityImageHotspot
+  | LinkRefWithSubItems
   | LinkRef
   | Aside
   | BodyImage
