@@ -2,9 +2,9 @@ import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { NL_TAGS_INDEX_PATH } from '@web/testing/metadata/index-paths/fixtures';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,
-  NL_PATH_PREFIX,
   mockMetadataSeo,
 } from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -28,7 +28,6 @@ faker.seed(5206);
 
 const { EN, NL, DE } = LOCALE_ISO_CODES;
 const INDEX_PATH = routes.tags();
-const NL_INDEX_PATH = `${NL_PATH_PREFIX}${INDEX_PATH}`;
 
 const MOCK_SEO = mockMetadataSeo();
 const { title, description, ogTitle, ogDescription } = MOCK_SEO;
@@ -97,10 +96,10 @@ describe(buildTagIndexMetadata, () => {
     const metadata = await buildTagIndexMetadata();
 
     expect(metadata.alternates).toEqual({
-      canonical: NL_INDEX_PATH,
+      canonical: NL_TAGS_INDEX_PATH,
       languages: {
         en: INDEX_PATH,
-        nl: NL_INDEX_PATH,
+        nl: NL_TAGS_INDEX_PATH,
         'x-default': INDEX_PATH,
       },
     });

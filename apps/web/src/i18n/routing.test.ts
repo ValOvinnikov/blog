@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LANGUAGE_COOKIE_NAME } from '@web/testing/shared/language-cookie/fixtures';
 import { NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
@@ -8,7 +9,6 @@ import { buildTenantRouting } from './routing';
 faker.seed(6012);
 
 const MOCK_SITE_URL = `https://${faker.internet.domainName()}`;
-const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
 const ENGLISH_PAGE_URL = `${MOCK_SITE_URL}/about`;
 const DUTCH_PAGE_URL = `${MOCK_SITE_URL}/nl/over`;
 

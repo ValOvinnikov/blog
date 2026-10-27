@@ -13,6 +13,8 @@ import {
 } from '@web/server/tenant/constants/constants';
 import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { LANGUAGE_COOKIE_NAME } from '@web/testing/shared/language-cookie/fixtures';
+import { PRODUCTION_DATASET } from '@web/testing/shared/sanity-dataset/fixtures';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
@@ -70,10 +72,8 @@ const ABOUT_PATH = '/about';
 const DUTCH_ABOUT_PATH = '/nl/over-ons';
 const REWRITE_HEADER = 'x-middleware-rewrite';
 const FORWARDED_TENANT_HEADER = `x-middleware-request-${TENANT_ID_HEADER}`;
-const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
 const ACCEPT_DUTCH = 'nl-NL,nl;q=0.9,en;q=0.8';
 const DEVELOPMENT_DATASET = 'development';
-const PRODUCTION_DATASET = 'production';
 
 const MOCK_TRANSLATION_MAP: TTranslationMap = {
   homeLanguages: [],

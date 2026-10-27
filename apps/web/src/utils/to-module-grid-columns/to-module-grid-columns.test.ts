@@ -19,6 +19,15 @@ describe(toModuleGridColumns, () => {
   );
 
   it.each(ITEM_COUNTS)(
+    'never collapses to a single column for %i items',
+    (itemCount) => {
+      expect(toModuleGridColumns(itemCount)).toBeGreaterThanOrEqual(
+        MIN_ITEM_COUNT,
+      );
+    },
+  );
+
+  it.each(ITEM_COUNTS)(
     'never uses more columns than items for %i',
     (itemCount) => {
       expect(toModuleGridColumns(itemCount)).toBeLessThanOrEqual(itemCount);

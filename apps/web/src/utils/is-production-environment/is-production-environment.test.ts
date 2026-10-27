@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
+import { PRODUCTION_DATASET } from '@web/testing/shared/sanity-dataset/fixtures';
 
 import { isProductionEnvironment } from './is-production-environment';
 
 faker.seed(119);
 
-const PRODUCTION_DATASET = 'production';
 const MOCK_OTHER_DATASET = faker.lorem.word();
 
 const mockEnv = vi.hoisted(() => ({ NEXT_PUBLIC_SANITY_DATASET: '' }));

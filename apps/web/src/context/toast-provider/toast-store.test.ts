@@ -175,7 +175,7 @@ describe(createToastStore, () => {
       expect(visibleIds(store)).toEqual([...ids.slice(1), overflowId]);
     });
 
-    it('queues a new toast instead of evicting when every slot holds an error', () => {
+    it('queues a new toast when every slot holds an error', () => {
       const cap = discoverQueueCap();
       const errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
 

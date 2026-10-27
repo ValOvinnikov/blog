@@ -9,7 +9,7 @@ const { EN, NL, FR } = LOCALE_ISO_CODES;
 const MOCK_SLUG = faker.lorem.slug();
 const MOCK_FOREIGN_HOST = faker.internet.domainName();
 const MOCK_IN_SITE_PATH = `/${LOCALE_BCP47_TAGS.NL}/${MOCK_SLUG}`;
-const QUERY_AND_FRAGMENT = '?page=2#top';
+const MOCK_QUERY_AND_FRAGMENT = '?page=2#top';
 
 const parse = (query: Record<string, string>) =>
   parseSwitchLanguageRequest(new URLSearchParams(query), [EN, NL]);
@@ -24,7 +24,7 @@ describe(parseSwitchLanguageRequest, () => {
   it('drops the query string and fragment of the current page', () => {
     const request = parse({
       to: NL,
-      from: `${routes.blogIndex()}${QUERY_AND_FRAGMENT}`,
+      from: `${routes.blogIndex()}${MOCK_QUERY_AND_FRAGMENT}`,
     });
 
     expect(request).toEqual({ to: NL, from: routes.blogIndex() });

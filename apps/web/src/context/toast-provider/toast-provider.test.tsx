@@ -239,7 +239,7 @@ describe(`<${ToastProvider.name}/>`, () => {
       expect(errorMessage).toBeVisible();
     });
 
-    it('dismisses the focused toast on Escape instead of the newest', async () => {
+    it('dismisses the focused toast on Escape', async () => {
       const { fireSuccessButton, fireErrorButton } = getFireButtons();
       await user.click(fireErrorButton);
       await user.click(fireSuccessButton);

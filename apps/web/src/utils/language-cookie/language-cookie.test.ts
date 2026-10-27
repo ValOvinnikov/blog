@@ -1,5 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  LANGUAGE_COOKIE_NAME,
+  ONE_YEAR_IN_SECONDS,
+} from '@web/testing/shared/language-cookie/fixtures';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { readRememberedLanguage, rememberLanguage } from './language-cookie';
@@ -7,8 +11,6 @@ import { readRememberedLanguage, rememberLanguage } from './language-cookie';
 faker.seed(122);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
-const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
 const MOCK_NOW = faker.date.recent({ refDate: '2026-06-01T00:00:00Z' });
 const LIVE_LOCALES = [EN, NL];
 const MOCK_OTHER_COOKIE = `${faker.lorem.word()}=${faker.lorem.word()}`;
