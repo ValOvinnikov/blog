@@ -14,10 +14,18 @@ import {
   mockRawPersonBioBlock,
   mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toTeamModule } from './transformer';
 
-const PROFILE_URL = 'https://example.com/team/jamie';
+faker.seed(9);
+
+const MOCK_PROFILE_URL = faker.internet.url();
+const MOCK_SOCIAL_URL = faker.internet.url();
+const MOCK_FIRST_MEMBER_ID = faker.string.uuid();
+const MOCK_SECOND_MEMBER_ID = faker.string.uuid();
+const MOCK_ROLE = faker.person.jobTitle();
+const MOCK_BIO_TEXT = faker.lorem.sentence();
 
 describe(toTeamModule, () => {
   it('maps a full module', () => {
@@ -29,29 +37,27 @@ describe(toTeamModule, () => {
       cardAlignment: CONTENT_ALIGNMENT.LEFT,
       members: [
         mockRawTeamMember({
-          role: 'Staff Engineer',
+          role: MOCK_ROLE,
           bio: [
             mockRawPersonBioBlock({
               _key: MOCK_BIO_BLOCK_KEY,
-              text: 'Builds things.',
+              text: MOCK_BIO_TEXT,
             }),
           ],
           socialLinks: [
             mockRawSocialProfile({
               platform: SOCIAL_PLATFORMS.GITHUB,
-              link: mockRawExternalLinkDocument({
-                url: 'https://github.com/jamie',
-              }),
+              link: mockRawExternalLinkDocument({ url: MOCK_SOCIAL_URL }),
             }),
           ],
-          profilePage: mockRawExternalLinkDocument({ url: PROFILE_URL }),
+          profilePage: mockRawExternalLinkDocument({ url: MOCK_PROFILE_URL }),
         }),
       ],
     });
 
     const module = toTeamModule(raw);
 
-    expect(module.members[0]?.profileUrl).toBe(PROFILE_URL);
+    expect(module.members[0]?.profileUrl).toBe(MOCK_PROFILE_URL);
     expect(module.members[0]?.bio).toBeDefined();
     expect(module.members[0]?.socialLinks).toHaveLength(1);
   });
@@ -59,16 +65,16 @@ describe(toTeamModule, () => {
   it('keeps the members in authored order', () => {
     const raw = mockRawTeamModule({
       members: [
-        mockRawTeamMember(),
-        mockRawTeamMember({ _id: 'person-3', name: 'Sam Okafor' }),
+        mockRawTeamMember({ _id: MOCK_FIRST_MEMBER_ID }),
+        mockRawTeamMember({ _id: MOCK_SECOND_MEMBER_ID }),
       ],
     });
 
     const module = toTeamModule(raw);
 
     expect(module.members.map((member) => member.id)).toEqual([
-      'person-1',
-      'person-3',
+      MOCK_FIRST_MEMBER_ID,
+      MOCK_SECOND_MEMBER_ID,
     ]);
   });
 
@@ -78,7 +84,7 @@ describe(toTeamModule, () => {
       showSocialLinks: false,
       members: [
         mockRawTeamMember({
-          bio: [mockRawPersonBioBlock({ text: 'Hi.' })],
+          bio: [mockRawPersonBioBlock({ text: MOCK_BIO_TEXT })],
           socialLinks: [
             mockRawSocialProfile({ platform: SOCIAL_PLATFORMS.GITHUB }),
           ],
