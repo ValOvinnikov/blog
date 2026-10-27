@@ -16,6 +16,9 @@ export async function insertSiteConfigIfMissing(
     accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
+    headerLayout,
+    headerSubmenuStyle,
+    headerBarStyle,
   } = PRESET_REGISTRY[preset];
 
   await getDb()
@@ -35,6 +38,9 @@ export async function insertSiteConfigIfMissing(
       accountPhonePlacement,
       busyButtonStyle,
       spinnerStyle,
+      headerLayout,
+      headerSubmenuStyle,
+      headerBarStyle,
     })
     .onConflictDoNothing({ target: siteConfig.tenantId });
 }

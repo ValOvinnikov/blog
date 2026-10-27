@@ -20,6 +20,7 @@ export * from './error';
 export * from './finding';
 export * from './form-status';
 export * from './header-control-style';
+export * from './header-layout';
 export * from './html-tag';
 export * from './http-methods';
 export * from './http-statuses';

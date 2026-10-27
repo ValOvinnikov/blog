@@ -1218,6 +1218,86 @@
         "file": "packages/config/src/constants/header-control-style.ts"
       }
     ],
+    "CLASSIC": [
+      {
+        "ref": "HEADER_LAYOUT.CLASSIC",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "LINKS_BESIDE_BRAND": [
+      {
+        "ref": "HEADER_LAYOUT.LINKS_BESIDE_BRAND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "CENTRED_LINKS": [
+      {
+        "ref": "HEADER_LAYOUT.CENTRED_LINKS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "TWO_ROWS": [
+      {
+        "ref": "HEADER_LAYOUT.TWO_ROWS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "CENTRED_BRAND": [
+      {
+        "ref": "HEADER_LAYOUT.CENTRED_BRAND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "MENU_BUTTON": [
+      {
+        "ref": "HEADER_LAYOUT.MENU_BUTTON",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "DROPDOWN": [
+      {
+        "ref": "HEADER_SUBMENU_STYLE.DROPDOWN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "WIDE_PANEL": [
+      {
+        "ref": "HEADER_SUBMENU_STYLE.WIDE_PANEL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "FULL_WIDTH": [
+      {
+        "ref": "HEADER_BAR_STYLE.FULL_WIDTH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "FLOATING": [
+      {
+        "ref": "HEADER_BAR_STYLE.FLOATING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
     "GET": [
       {
         "ref": "HTTP_METHOD.GET",

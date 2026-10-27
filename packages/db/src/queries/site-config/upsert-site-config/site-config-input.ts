@@ -7,7 +7,10 @@ import {
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   HUE_MAX,
   HUE_MIN,
   PRESET_ID,
@@ -44,6 +47,9 @@ export const updateSiteConfigInputSchema = z.object({
   accountPhonePlacement: z.enum(ACCOUNT_PHONE_PLACEMENT).optional(),
   busyButtonStyle: z.enum(BUSY_BUTTON_STYLE).optional(),
   spinnerStyle: z.enum(SPINNER_STYLE).optional(),
+  headerLayout: z.enum(HEADER_LAYOUT).optional(),
+  headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE).optional(),
+  headerBarStyle: z.enum(HEADER_BAR_STYLE).optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -84,6 +90,15 @@ export function presentOptionalFields(
   }
   if (!isUndefined(parsed.spinnerStyle)) {
     fields.spinnerStyle = parsed.spinnerStyle;
+  }
+  if (!isUndefined(parsed.headerLayout)) {
+    fields.headerLayout = parsed.headerLayout;
+  }
+  if (!isUndefined(parsed.headerSubmenuStyle)) {
+    fields.headerSubmenuStyle = parsed.headerSubmenuStyle;
+  }
+  if (!isUndefined(parsed.headerBarStyle)) {
+    fields.headerBarStyle = parsed.headerBarStyle;
   }
   if (!isUndefined(parsed.logoAssetUrl)) {
     fields.logoAssetUrl = parsed.logoAssetUrl;

@@ -7,7 +7,10 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
@@ -19,7 +22,10 @@ import {
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type THeaderBarStyle,
   type THeaderControlStyle,
+  type THeaderLayout,
+  type THeaderSubmenuStyle,
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
   type TPresetId,
@@ -114,6 +120,24 @@ export const spinnerStyleEnum = pgEnum(
   Object.values(SPINNER_STYLE) as [TSpinnerStyle, ...TSpinnerStyle[]],
 );
 
+export const headerLayoutEnum = pgEnum(
+  'header_layout',
+  Object.values(HEADER_LAYOUT) as [THeaderLayout, ...THeaderLayout[]],
+);
+
+export const headerSubmenuStyleEnum = pgEnum(
+  'header_submenu_style',
+  Object.values(HEADER_SUBMENU_STYLE) as [
+    THeaderSubmenuStyle,
+    ...THeaderSubmenuStyle[],
+  ],
+);
+
+export const headerBarStyleEnum = pgEnum(
+  'header_bar_style',
+  Object.values(HEADER_BAR_STYLE) as [THeaderBarStyle, ...THeaderBarStyle[]],
+);
+
 export type TVoiceOverrideValue = string | TVoicePortableText;
 
 export type TVoiceOverrides = Record<string, TVoiceOverrideValue>;
@@ -160,6 +184,15 @@ export const siteConfig = pgTable('site_config', {
   spinnerStyle: spinnerStyleEnum('spinner_style')
     .notNull()
     .default(SPINNER_STYLE.PRESET),
+  headerLayout: headerLayoutEnum('header_layout')
+    .notNull()
+    .default(HEADER_LAYOUT.CLASSIC),
+  headerSubmenuStyle: headerSubmenuStyleEnum('header_submenu_style')
+    .notNull()
+    .default(HEADER_SUBMENU_STYLE.DROPDOWN),
+  headerBarStyle: headerBarStyleEnum('header_bar_style')
+    .notNull()
+    .default(HEADER_BAR_STYLE.FULL_WIDTH),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverridesByLocale: jsonb('voice_overrides')

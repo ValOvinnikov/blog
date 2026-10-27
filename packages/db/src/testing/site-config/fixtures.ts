@@ -5,6 +5,9 @@ import {
   BUSY_BUTTON_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   HUE_MAX,
   HUE_MIN,
   PRESET_ID,
@@ -40,4 +43,7 @@ export const DEFAULT_CONTROL_STYLES = {
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
   spinnerStyle: SPINNER_STYLE.PRESET,
+  headerLayout: HEADER_LAYOUT.CLASSIC,
+  headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
+  headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
 } satisfies Partial<TUpdateSiteConfigInput>;

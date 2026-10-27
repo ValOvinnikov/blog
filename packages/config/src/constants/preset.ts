@@ -20,6 +20,14 @@ import {
   type THeaderControlStyle,
   HEADER_CONTROL_STYLE,
 } from './header-control-style';
+import {
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
+  type THeaderBarStyle,
+  type THeaderLayout,
+  type THeaderSubmenuStyle,
+} from './header-layout';
 
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
@@ -92,6 +100,9 @@ export type TPresetBundle = {
   accountPhonePlacement: TAccountPhonePlacement;
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
+  headerLayout: THeaderLayout;
+  headerSubmenuStyle: THeaderSubmenuStyle;
+  headerBarStyle: THeaderBarStyle;
   featureDefaults: Record<TCapability, boolean>;
 };
 
@@ -111,6 +122,9 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
     busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
     spinnerStyle: SPINNER_STYLE.PRESET,
+    headerLayout: HEADER_LAYOUT.CLASSIC,
+    headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
+    headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
@@ -136,6 +150,9 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
     busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
     spinnerStyle: SPINNER_STYLE.PRESET,
+    headerLayout: HEADER_LAYOUT.CLASSIC,
+    headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
+    headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,

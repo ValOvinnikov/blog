@@ -101,6 +101,12 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **HEADER_CONTROL_STYLE**: `OUTLINED`, `SOFT`, `PLAIN`
 
+### `@blog/config/constants` — `packages/config/src/constants/header-layout.ts`
+
+- **HEADER_LAYOUT**: `CLASSIC`, `LINKS_BESIDE_BRAND`, `CENTRED_LINKS`, `TWO_ROWS`, `CENTRED_BRAND`, `MENU_BUTTON`
+- **HEADER_SUBMENU_STYLE**: `DROPDOWN`, `WIDE_PANEL`
+- **HEADER_BAR_STYLE**: `FULL_WIDTH`, `FLOATING`
+
 ### `@blog/config/constants` — `packages/config/src/constants/http-methods.ts`
 
 - **HTTP_METHOD**: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`
