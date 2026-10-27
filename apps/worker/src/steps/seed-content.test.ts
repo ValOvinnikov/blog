@@ -209,7 +209,7 @@ describe(seedTenantContent, () => {
     expect(sleep).not.toHaveBeenCalled();
   });
 
-  it('persists the token and seededAt together instead of revoking', async () => {
+  it('persists the token and seededAt together', async () => {
     await seed();
 
     expect(setTenantSanityWriteTokenAndSeededAt).toHaveBeenCalledWith(

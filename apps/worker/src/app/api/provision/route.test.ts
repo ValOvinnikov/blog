@@ -224,7 +224,7 @@ describe('POST /api/provision', () => {
       });
     });
 
-    it('marks the tenant failed instead of leaving it in progress', async () => {
+    it('marks the tenant failed', async () => {
       await POST(enqueueRequest());
 
       const [failure] = vi.mocked(updateProvisioningStep).mock.lastCall ?? [];

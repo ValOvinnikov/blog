@@ -46,7 +46,7 @@ describe(listVercelProjectDomains, () => {
     );
   });
 
-  it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+  it('sends an abort signal so a hung call fails', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ domains: [] }), { status: HTTP_STATUS.OK }),
     );
