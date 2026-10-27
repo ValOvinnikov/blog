@@ -16,7 +16,7 @@ import {
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_SELF_SERVE_OTHER_EMAIL,
-  MOCK_SELF_SERVE_OWNER_EMAIL as OWNER_EMAIL,
+  MOCK_SELF_SERVE_OWNER_EMAIL,
   MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL,
   MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
@@ -35,7 +35,7 @@ const OWNS_NONE = okResult(false);
 async function seedMember(
   overrides: Partial<typeof schema.tenants.$inferInsert> = {},
   role: TMembershipRole = MEMBERSHIP_ROLE.OWNER,
-  email = OWNER_EMAIL,
+  email = MOCK_SELF_SERVE_OWNER_EMAIL,
 ): Promise<void> {
   const user = await insertTestUser(db(), {
     email,
@@ -56,11 +56,13 @@ afterEach(async () => {
 
 describe(ownsFreeTenant, () => {
   it('is false for a person with no tenant', async () => {
-    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_NONE);
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
+
+    expect(result).toEqual(OWNS_NONE);
   });
 
   it.each([
-    ['the owner address itself', OWNER_EMAIL],
+    ['the owner address itself', MOCK_SELF_SERVE_OWNER_EMAIL],
     ['a differently cased variant', MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL],
     ['a +tag variant of the owner address', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
   ])(
@@ -68,20 +70,22 @@ describe(ownsFreeTenant, () => {
     async (_, email) => {
       await seedMember();
 
-      expect(await ownsFreeTenant(email)).toEqual(OWNS_ONE);
+      const result = await ownsFreeTenant(email);
+
+      expect(result).toEqual(OWNS_ONE);
     },
   );
 
   it.each([
     [
       'a +tag variant of the address that self-served it',
-      OWNER_EMAIL,
+      MOCK_SELF_SERVE_OWNER_EMAIL,
       MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
     ],
     [
       'the plain address when a +tag variant self-served it',
       MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
-      OWNER_EMAIL,
+      MOCK_SELF_SERVE_OWNER_EMAIL,
     ],
   ])(
     'is true for %s, as the database guard is',
@@ -90,35 +94,43 @@ describe(ownsFreeTenant, () => {
         selfServeOwnerEmailIndex: testPersonalEmailIndex(ownerEmail),
       });
 
-      expect(await ownsFreeTenant(email)).toEqual(OWNS_ONE);
+      const result = await ownsFreeTenant(email);
+
+      expect(result).toEqual(OWNS_ONE);
     },
   );
 
-  it('is false for the plain address when an operator-created Free tenant is owned by a +tag variant', async () => {
+  it('is false for the plain address when only a +tag variant owns a Free tenant', async () => {
     await seedMember(
       {},
       MEMBERSHIP_ROLE.OWNER,
       MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL,
     );
 
-    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_NONE);
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
+
+    expect(result).toEqual(OWNS_NONE);
   });
 
   it("is false for a +tag variant when the owner's only Free tenant is archived", async () => {
     await seedMember({
       status: TENANT_STATUS.ARCHIVED,
-      selfServeOwnerEmailIndex: testPersonalEmailIndex(OWNER_EMAIL),
+      selfServeOwnerEmailIndex: testPersonalEmailIndex(
+        MOCK_SELF_SERVE_OWNER_EMAIL,
+      ),
     });
 
-    expect(await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL)).toEqual(
-      OWNS_NONE,
-    );
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL);
+
+    expect(result).toEqual(OWNS_NONE);
   });
 
   it('is true for a suspended Free tenant', async () => {
     await seedMember({ status: TENANT_STATUS.SUSPENDED });
 
-    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_ONE);
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
+
+    expect(result).toEqual(OWNS_ONE);
   });
 
   it.each([
@@ -136,7 +148,9 @@ describe(ownsFreeTenant, () => {
   ])('is false when %s', async (_, overrides, role) => {
     await seedMember(overrides, role);
 
-    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_NONE);
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
+
+    expect(result).toEqual(OWNS_NONE);
   });
 
   it('is false for a person whose OWNER invite on a Free tenant is still unaccepted', async () => {
@@ -145,25 +159,27 @@ describe(ownsFreeTenant, () => {
       .insert(schema.membershipInvites)
       .values({
         tenantId: tenant.id,
-        email: OWNER_EMAIL,
-        emailIndex: testPersonalEmailIndex(OWNER_EMAIL),
+        email: MOCK_SELF_SERVE_OWNER_EMAIL,
+        emailIndex: testPersonalEmailIndex(MOCK_SELF_SERVE_OWNER_EMAIL),
         role: MEMBERSHIP_ROLE.OWNER,
       });
 
-    expect(await ownsFreeTenant(OWNER_EMAIL)).toEqual(OWNS_NONE);
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
+
+    expect(result).toEqual(OWNS_NONE);
   });
 
   it('is false for a different person than the owner', async () => {
     await seedMember();
 
-    expect(await ownsFreeTenant(MOCK_SELF_SERVE_OTHER_EMAIL)).toEqual(
-      OWNS_NONE,
-    );
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OTHER_EMAIL);
+
+    expect(result).toEqual(OWNS_NONE);
   });
 
   it('fails with DB_INVALID_EMAIL for a value that is not an address', async () => {
-    expect(await ownsFreeTenant(MOCK_NOT_AN_ADDRESS)).toEqual(
-      errorResult(ERROR_CODE.DB_INVALID_EMAIL),
-    );
+    const result = await ownsFreeTenant(MOCK_NOT_AN_ADDRESS);
+
+    expect(result).toEqual(errorResult(ERROR_CODE.DB_INVALID_EMAIL));
   });
 });

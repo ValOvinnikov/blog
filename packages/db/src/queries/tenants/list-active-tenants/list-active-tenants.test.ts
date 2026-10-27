@@ -2,7 +2,7 @@ import { TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_TENANT_VALUES } from '@blog/db/testing/tenants/fixtures';
+import { MOCK_DEPROVISIONED_AT } from '@blog/db/testing/tenants/fixtures';
 
 import { listActiveTenants } from './list-active-tenants';
 
@@ -10,29 +10,17 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
-async function insertTenant(
-  overrides: Parameters<typeof insertTestTenant>[1] = {},
-) {
-  await insertTestTenant(db(), {
-    ...MOCK_TENANT_VALUES,
-    status: TENANT_STATUS.ACTIVE,
-    ...overrides,
-  });
-}
-
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(listActiveTenants, () => {
   it('includes an ACTIVE, non-deprovisioned tenant', async () => {
-    await insertTenant();
+    const tenant = await insertTestTenant(db());
 
     const result = await listActiveTenants();
 
-    expect(result.map((tenant) => tenant.name)).toEqual([
-      MOCK_TENANT_VALUES.name,
-    ]);
+    expect(result).toEqual([tenant]);
   });
 
   it.each([
@@ -40,10 +28,10 @@ describe(listActiveTenants, () => {
     ['an ARCHIVED tenant', { status: TENANT_STATUS.ARCHIVED }],
     [
       'a deprovisioned tenant whose status still reads ACTIVE',
-      { status: TENANT_STATUS.ACTIVE, deprovisionedAt: new Date() },
+      { status: TENANT_STATUS.ACTIVE, deprovisionedAt: MOCK_DEPROVISIONED_AT },
     ],
   ])('excludes %s', async (_description, overrides) => {
-    await insertTenant(overrides);
+    await insertTestTenant(db(), overrides);
 
     const result = await listActiveTenants();
 

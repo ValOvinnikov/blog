@@ -1,87 +1,53 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
+import type { TTenant } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { eq } from 'drizzle-orm';
+import {
+  MOCK_SANITY_DATASET,
+  MOCK_SANITY_PROJECT_ID,
+} from '@blog/db/testing/sanity-management-client/fixtures';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 
 import { setTenantSanityProject } from './set-tenant-sanity-project';
 
 vi.mock('@blog/db/client');
 
-const MOCK_ACME_DOMAIN = 'acme.example.com';
-
 const db = useQueryTestDb();
+useFrozenClock();
 
-async function insertDraftTenant(): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: MOCK_ACME_DOMAIN,
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
+const MOCK_SANITY_PROJECT = {
+  sanityProjectId: MOCK_SANITY_PROJECT_ID,
+  sanityDataset: MOCK_SANITY_DATASET,
+};
 
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(setTenantSanityProject, () => {
-  let tenantId: string;
+  let tenant: TTenant;
 
   beforeEach(async () => {
-    tenantId = await insertDraftTenant();
-  });
-
-  it('sets the Sanity project id and dataset', async () => {
-    await setTenantSanityProject(tenantId, {
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-    });
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row).toMatchObject({
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
+    tenant = await insertTestTenant(db(), {
+      sanityProjectId: null,
+      sanityDataset: null,
     });
   });
 
-  it('leaves every other column untouched', async () => {
-    await setTenantSanityProject(tenantId, {
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-    });
+  it('sets the Sanity project id and dataset, leaving every other column untouched', async () => {
+    await setTenantSanityProject(tenant.id, MOCK_SANITY_PROJECT);
 
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row).toMatchObject({
-      name: 'Acme',
-      primaryDomain: MOCK_ACME_DOMAIN,
-      seededAt: null,
-    });
+    const rows = await db().select().from(schema.tenants);
+    expect(rows).toEqual([
+      { ...tenant, ...MOCK_SANITY_PROJECT, updatedAt: MOCK_NOW },
+    ]);
   });
 
-  it('resolves without updating any row for a tenant id that does not exist', async () => {
-    await expect(
-      setTenantSanityProject('00000000-0000-0000-0000-000000000000', {
-        sanityProjectId: 'abc123',
-        sanityDataset: 'production',
-      }),
-    ).resolves.toBeUndefined();
+  it('updates no row for a tenant id that does not exist', async () => {
+    await setTenantSanityProject(MOCK_MISSING_TENANT_ID, MOCK_SANITY_PROJECT);
+
+    const rows = await db().select().from(schema.tenants);
+    expect(rows).toEqual([tenant]);
   });
 });
