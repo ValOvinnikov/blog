@@ -1,4 +1,4 @@
-import { CAPABILITY, LOCALE_ISO_CODES, type TCapability } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import type { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import type { TContactMessageSource } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
@@ -19,18 +19,5 @@ export const mockLeadInput = (
   ...MOCK_CONTACT_MESSAGE,
   sourcePath: MOCK_LEAD_SOURCE_PATH,
   ...MOCK_LEAD_SOURCE,
-  ...overrides,
-});
-
-export const mockEffectiveFeatures = (
-  overrides: Partial<Record<TCapability, boolean>> = {},
-): Record<TCapability, boolean> => ({
-  [CAPABILITY.COMMENTS]: false,
-  [CAPABILITY.RATINGS]: false,
-  [CAPABILITY.BOOKMARKS]: false,
-  [CAPABILITY.NEWSLETTER]: false,
-  [CAPABILITY.ANALYTICS]: false,
-  [CAPABILITY.CONSENT_BANNER]: false,
-  [CAPABILITY.CONTACT_FORM]: false,
   ...overrides,
 });

@@ -1,9 +1,7 @@
 import { queries } from '@blog/db';
 import { sendEmail } from '@blog/email';
 import type * as TEmail from '@blog/email';
-import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';
 import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
 import {
@@ -19,14 +17,18 @@ vi.mock('@web/utils/env/env');
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
-  getSiteConfig: vi.fn(),
-}));
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 vi.mock('@blog/db', () => ({
   queries: {
     emailConfig: { getContactRecipient: vi.fn(), getEmailConfig: vi.fn() },
     tenants: { getTenantById: vi.fn() },
+    siteConfig: { getSiteConfig: vi.fn() },
   },
 }));
 
@@ -48,7 +50,7 @@ describe(sendContactNotification, () => {
       PLATFORM_APP_URL: MOCK_PLATFORM_URL,
       NEWSLETTER_FROM_ADDRESS: MOCK_FROM_ADDRESS,
     });
-    vi.mocked(getSiteConfig).mockResolvedValue(okResult(undefined));
+    vi.mocked(queries.siteConfig.getSiteConfig).mockResolvedValue(undefined);
     vi.mocked(queries.tenants.getTenantById).mockResolvedValue(mockTenant());
     vi.mocked(queries.emailConfig.getContactRecipient).mockResolvedValue(
       MOCK_RECIPIENT,

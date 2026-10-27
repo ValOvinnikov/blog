@@ -1,23 +1,26 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { okResult } from '@blog/utils';
+import { sendEmail } from '@blog/email';
+import type * as TEmail from '@blog/email';
+import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
 import { faker } from '@faker-js/faker';
 import { FIELD_ERROR } from '@web/constants/field-error';
-import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
-import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
-import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
 import {
   MOCK_LEAD_SOURCE,
   MOCK_LEAD_SOURCE_PATH,
-  mockEffectiveFeatures,
   mockLeadInput,
 } from '@web/testing/server/contact-form/fixtures';
+import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
+import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import {
@@ -25,49 +28,50 @@ import {
   type TContactMessageInput,
 } from './contact-form-actions';
 
-const { isLimited, checkBotId } = vi.hoisted(() => ({
-  isLimited: vi.fn<(input: { tenantKey: string }) => Promise<boolean>>(
-    async () => false,
-  ),
-  checkBotId: vi.fn(async () => ({ isBot: false })),
+const { checkBotId, headersMock } = vi.hoisted(() => ({
+  checkBotId: vi.fn(),
+  headersMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/server/tenant/write-gate/write-gate');
 
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
+
+vi.mock('@web/utils/env/env');
+
 vi.mock('botid/server', () => ({ checkBotId }));
 
-vi.mock('next/headers', () => ({ headers: vi.fn(async () => new Headers()) }));
+vi.mock('next/headers', () => ({ headers: headersMock }));
 
-vi.mock('@web/server/rate-limit/rate-limiter/rate-limiter', () => ({
-  createRateLimiter: () => ({ isLimited }),
-}));
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
-  queries: { leads: { createLead: vi.fn() } },
+  queries: {
+    leads: { createLead: vi.fn() },
+    tenants: { getTenantById: vi.fn() },
+    settingsFeatures: { getSettingsFeatures: vi.fn() },
+    siteConfig: { getSiteConfig: vi.fn() },
+    emailConfig: { getContactRecipient: vi.fn(), getEmailConfig: vi.fn() },
+  },
 }));
 
-vi.mock(
-  '@web/server/contact-form/contact-notification-send/contact-notification-send',
-  () => ({ sendContactNotification: vi.fn() }),
-);
-
-vi.mock(
-  '@web/server/settings-features/get-tenant-plan/get-tenant-plan',
-  () => ({ getTenantPlan: vi.fn() }),
-);
-
-vi.mock(
-  '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features',
-  () => ({ getEffectiveSettingsFeatures: vi.fn() }),
-);
+vi.mock('@blog/email', async (importOriginal) => ({
+  ...(await importOriginal<typeof TEmail>()),
+  sendEmail: vi.fn(),
+}));
 
 faker.seed(6010);
 
 const MOCK_LEAD_ID = faker.string.uuid();
+const MOCK_RECIPIENT = faker.internet.email();
 const NOTIFICATION_SEND_FAILED_EVENT = 'contact_form.notification_send_failed';
+const ATTEMPTS_BEFORE_REFUSAL = 5;
 
 const mockInput = (
   overrides: Partial<TContactMessageInput> = {},
@@ -83,33 +87,50 @@ const submit = (input: TContactMessageInput = mockInput()) =>
 
 describe(submitContactMessage, () => {
   beforeEach(() => {
-    vi.mocked(getTenantPlan).mockResolvedValue(okResult(TENANT_PLAN.GROWTH));
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue(
-      okResult(mockEffectiveFeatures({ [CAPABILITY.CONTACT_FORM]: true })),
+    checkBotId.mockResolvedValue({ isBot: false });
+    headersMock.mockResolvedValue(
+      new Headers({ [FORWARDED_FOR_HEADER]: faker.internet.ipv4() }),
     );
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
+      mockTenant({ plan: TENANT_PLAN.GROWTH }),
+    );
+    vi.mocked(queries.settingsFeatures.getSettingsFeatures).mockResolvedValue(
+      mockSettingsFeaturesRowEnabling([CAPABILITY.CONTACT_FORM]),
+    );
+    vi.mocked(queries.siteConfig.getSiteConfig).mockResolvedValue(undefined);
     vi.mocked(queries.leads.createLead).mockResolvedValue({ id: MOCK_LEAD_ID });
+    vi.mocked(queries.emailConfig.getContactRecipient).mockResolvedValue(
+      MOCK_RECIPIENT,
+    );
+    vi.mocked(queries.emailConfig.getEmailConfig).mockResolvedValue(undefined);
   });
 
-  it('stores the lead with its source, notifies the owner and succeeds', async () => {
+  it('stores the lead with its source and succeeds', async () => {
     const result = await submit();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(queries.leads.createLead).toHaveBeenCalledWith(mockLeadInput());
-    expect(sendContactNotification).toHaveBeenCalledWith(mockLeadInput());
   });
 
-  it('checks the rate limit and capability against the resolved tenant', async () => {
+  it('emails the tenant recipient with Reply-To set to the visitor', async () => {
     await submit();
 
-    const tenantKeys = isLimited.mock.calls.map(([{ tenantKey }]) => tenantKey);
-    expect(tenantKeys).toEqual([MOCK_TENANT_ID]);
-    expect(getTenantPlan).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    const { to, replyTo } = firstSentEmail(vi.mocked(sendEmail));
+    expect(sendEmail).toHaveBeenCalledOnce();
+    expect(to).toBe(MOCK_RECIPIENT);
+    expect(replyTo).toBe(MOCK_CONTACT_MESSAGE.email);
+  });
+
+  it('reads the capability toggles of the resolved tenant', async () => {
+    await submit();
+
+    expect(queries.settingsFeatures.getSettingsFeatures).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+    );
   });
 
   it.each([
     ['a bot', () => checkBotId.mockResolvedValueOnce({ isBot: true })],
-    ['a rate-limited address', () => isLimited.mockResolvedValueOnce(true)],
     [
       'an inactive tenant',
       () => vi.mocked(isTenantActive).mockReturnValueOnce(false),
@@ -118,15 +139,15 @@ describe(submitContactMessage, () => {
       'a plan that does not entitle the contact form',
       () =>
         vi
-          .mocked(getTenantPlan)
-          .mockResolvedValueOnce(okResult(TENANT_PLAN.FREE)),
+          .mocked(queries.tenants.getTenantById)
+          .mockResolvedValueOnce(mockTenant({ plan: TENANT_PLAN.FREE })),
     ],
     [
       'the contact form capability switched off',
       () =>
         vi
-          .mocked(getEffectiveSettingsFeatures)
-          .mockResolvedValueOnce(okResult(mockEffectiveFeatures())),
+          .mocked(queries.settingsFeatures.getSettingsFeatures)
+          .mockResolvedValueOnce(mockSettingsFeaturesRowEnabling([])),
     ],
   ])('blocks %s without storing or sending', async (_, arrange) => {
     arrange();
@@ -135,16 +156,44 @@ describe(submitContactMessage, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
     expect(queries.leads.createLead).not.toHaveBeenCalled();
-    expect(sendContactNotification).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
-  it('blocks a filled honeypot before the rate limit, without storing or sending', async () => {
+  it('refuses the sixth submission from one address', async () => {
+    const outcomes = [];
+    for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
+      outcomes.push((await submit()).outcome);
+    }
+
+    expect(outcomes).toEqual([
+      ACTION_OUTCOME.SUCCESS,
+      ACTION_OUTCOME.SUCCESS,
+      ACTION_OUTCOME.SUCCESS,
+      ACTION_OUTCOME.SUCCESS,
+      ACTION_OUTCOME.SUCCESS,
+      ACTION_OUTCOME.BLOCKED,
+    ]);
+    expect(queries.leads.createLead).toHaveBeenCalledTimes(
+      ATTEMPTS_BEFORE_REFUSAL,
+    );
+  });
+
+  it('blocks a filled honeypot without storing or sending', async () => {
     const result = await submit(mockInput({ website: faker.internet.url() }));
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.BLOCKED });
-    expect(isLimited).not.toHaveBeenCalled();
     expect(queries.leads.createLead).not.toHaveBeenCalled();
-    expect(sendContactNotification).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('does not count honeypot submissions against the rate limit', async () => {
+    for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
+      await submit(mockInput({ website: faker.internet.url() }));
+    }
+
+    const result = await submit();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('answers server-error when no tenant resolves', async () => {
@@ -173,6 +222,7 @@ describe(submitContactMessage, () => {
       },
     });
     expect(queries.leads.createLead).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it('treats a field that is not text as empty', async () => {
@@ -208,7 +258,7 @@ describe(submitContactMessage, () => {
   });
 
   it('still succeeds and logs once when the notification email fails', async () => {
-    vi.mocked(sendContactNotification).mockRejectedValueOnce(MOCK_ERROR);
+    vi.mocked(sendEmail).mockRejectedValueOnce(MOCK_ERROR);
 
     const result = await submit();
 
@@ -226,6 +276,6 @@ describe(submitContactMessage, () => {
     const result = await submit();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(sendContactNotification).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 });
