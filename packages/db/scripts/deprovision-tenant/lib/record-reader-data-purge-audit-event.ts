@@ -3,6 +3,7 @@ import {
   AUDIT_TARGET_TYPE,
   GITHUB_AUDIT_ACTOR_ID_PREFIX,
 } from '@blog/config/constants';
+import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@blog/db/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
 import type { TTenantReaderDataCounts } from '@blog/db/queries/reader-data';
 import { sanitizeLogMessage } from '@blog/insight';
@@ -28,7 +29,7 @@ export async function recordReaderDataPurgeAuditEvent(
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
       details: {
-        via: 'deprovision-tenant-workflow',
+        via: DEPROVISIONING_WORKFLOW_AUDIT_VIA,
         runId: env.githubRunId,
         ...counts,
       },

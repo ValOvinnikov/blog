@@ -10,6 +10,8 @@ export const DEPROVISIONING_STEP = {
   INVALIDATE_TENANT_CACHE: 'INVALIDATE_TENANT_CACHE',
 } as const;
 
+export const DEPROVISIONING_WORKFLOW_AUDIT_VIA = 'deprovision-tenant-workflow';
+
 export type TDeprovisioningStep = TValueOf<typeof DEPROVISIONING_STEP>;
 
 // Every step `scripts/deprovision-tenant/run.ts`'s `STEPS` array runs, in

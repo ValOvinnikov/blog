@@ -64,7 +64,7 @@ describe(deleteSanityProject, () => {
       fetchMock.mockResolvedValue(emptyResponse());
     });
 
-    it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+    it('sends an abort signal so a hung call fails', async () => {
       await deleteSanityProject(MOCK_INPUT);
 
       const { init } = firstFetchCall(fetchMock);
@@ -81,7 +81,7 @@ describe(deleteSanityProject, () => {
     });
   });
 
-  it('treats a 404 as already gone rather than an error', async () => {
+  it('treats a 404 as already gone', async () => {
     fetchMock.mockResolvedValue(
       textResponse(MOCK_NOT_FOUND_BODY, HTTP_STATUS.NOT_FOUND),
     );
@@ -149,7 +149,7 @@ describe.each([
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
-    it('treats a 404 on the GET as already gone rather than an error', async () => {
+    it('treats a 404 on the GET as already gone', async () => {
       fetchMock.mockResolvedValueOnce(
         textResponse(MOCK_NOT_FOUND_BODY, HTTP_STATUS.NOT_FOUND),
       );

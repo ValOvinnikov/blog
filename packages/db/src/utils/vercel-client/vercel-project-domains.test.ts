@@ -53,7 +53,7 @@ describe(deleteVercelProjectDomain, () => {
     expect(url).toBe(`${VERCEL_API_BASE}${DOMAIN_PATH}?teamId=${MOCK_TEAM_ID}`);
   });
 
-  it('treats a 404 as already gone rather than an error', async () => {
+  it('treats a 404 as already gone', async () => {
     fetchMock.mockResolvedValue(
       textResponse(MOCK_FAILURE_BODY, HTTP_STATUS.NOT_FOUND),
     );

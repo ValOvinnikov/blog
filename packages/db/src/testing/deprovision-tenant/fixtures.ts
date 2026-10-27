@@ -1,4 +1,5 @@
 import { GITHUB_AUDIT_ACTOR_ID_PREFIX } from '@blog/config/constants';
+import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 
 export const MOCK_DEPROVISION_ENV = {
@@ -32,7 +33,7 @@ export const MOCK_DEPROVISION_DRY_RUN_ENV = {
 };
 
 export const MOCK_DEPROVISION_AUDIT_DETAILS = {
-  via: 'deprovision-tenant-workflow',
+  via: DEPROVISIONING_WORKFLOW_AUDIT_VIA,
   runId: MOCK_DEPROVISION_ENV.githubRunId,
 };
 
