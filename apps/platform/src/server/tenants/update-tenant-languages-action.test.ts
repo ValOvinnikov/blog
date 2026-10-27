@@ -157,7 +157,7 @@ describe(updateTenantLanguagesAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       TENANT_LOG.UPDATE_LANGUAGES_FAILED,
-      { tenantId: MOCK_TENANT_ID, error: MOCK_SAVE_ERROR },
+      { tenantId: MOCK_TENANT_ID, errorName: MOCK_SAVE_ERROR.name },
     );
   });
 });

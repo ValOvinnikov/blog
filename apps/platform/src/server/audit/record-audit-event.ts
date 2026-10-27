@@ -3,6 +3,7 @@ import 'server-only';
 import type { TAuditAction, TAuditTargetType } from '@blog/config';
 import { queries } from '@blog/db';
 import { auth } from '@platform/server/auth/auth';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 export type TRecordAuditEventInput = {
@@ -44,6 +45,11 @@ export const recordAuditEvent = async ({
       details,
     });
   } catch (error) {
-    logger.error(logEvent, { action, targetType, targetId, error });
+    logger.error(logEvent, {
+      action,
+      targetType,
+      targetId,
+      ...toLoggableError(error),
+    });
   }
 };

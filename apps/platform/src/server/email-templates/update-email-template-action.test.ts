@@ -240,7 +240,7 @@ describe(updateEmailTemplateAction, () => {
         tenantId: MOCK_TENANT_ID,
         templateType: MAGIC_LINK,
         locale: EN,
-        error: MOCK_DB_ERROR,
+        errorName: MOCK_DB_ERROR.name,
       },
     );
   });

@@ -15,6 +15,7 @@ import {
 } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { z } from 'zod';
 
@@ -58,7 +59,10 @@ export const deleteTenantAction = async (
   try {
     result = await queries.tenants.deleteTenant(tenantId);
   } catch (error) {
-    logger.error(TENANT_LOG.DELETE_FAILED, { tenantId, error });
+    logger.error(TENANT_LOG.DELETE_FAILED, {
+      tenantId,
+      ...toLoggableError(error),
+    });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

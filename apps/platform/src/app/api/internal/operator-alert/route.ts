@@ -14,6 +14,7 @@ import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -122,7 +123,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     logger.error(OPERATOR_ALERT_LOG.SEND_FAILED, {
       tenantId: tenant.id,
       kind: parsed.data.kind,
-      error: failure.reason,
+      ...toLoggableError(failure.reason),
     });
   });
 

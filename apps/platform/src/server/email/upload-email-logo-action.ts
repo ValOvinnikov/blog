@@ -19,6 +19,7 @@ import {
   emailLogoTargetSchema,
   type TEmailLogoTarget,
 } from '@platform/utils/email-logo-target/email-logo-target';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { put } from '@vercel/blob';
 
@@ -77,7 +78,7 @@ export const uploadEmailLogoAction = async (
     logger.error(EMAIL_LOGO_LOG.UPLOAD_FAILED, {
       tenantId: tenant.id,
       target: logoTarget,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

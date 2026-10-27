@@ -9,6 +9,7 @@ import {
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
 import { LEAD_LOG } from '@platform/constants/lead';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -66,7 +67,10 @@ export const fetchPageTitle = async ({
     const parsed = pageTitleResponseSchema.safeParse(await response.json());
     return parsed.success ? parsed.data.title : undefined;
   } catch (error) {
-    logger.error(LEAD_LOG.PAGE_TITLE_ERROR, { tenantId, error });
+    logger.error(LEAD_LOG.PAGE_TITLE_ERROR, {
+      tenantId,
+      ...toLoggableError(error),
+    });
     return undefined;
   }
 };

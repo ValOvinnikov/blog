@@ -18,6 +18,7 @@ import { TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -84,7 +85,7 @@ export const updateTenantLanguagesAction = async (
   } catch (error) {
     logger.error(TENANT_LOG.UPDATE_LANGUAGES_FAILED, {
       tenantId: tenant.id,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

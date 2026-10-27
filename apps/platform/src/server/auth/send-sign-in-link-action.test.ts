@@ -76,7 +76,7 @@ describe(sendSignInLinkAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(SIGN_IN_LOG.LINK_FAILED, {
-      error,
+      errorName: error.name,
     });
   });
 

@@ -85,7 +85,7 @@ describe(alertSelfServeLimit, () => {
 
     expect(logger.error).toHaveBeenCalledWith(
       CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED,
-      { day: MOCK_DAY, error: sendError },
+      { day: MOCK_DAY, errorName: sendError.name },
     );
   });
 
@@ -99,7 +99,7 @@ describe(alertSelfServeLimit, () => {
 
     expect(logger.error).toHaveBeenCalledWith(
       CREATE_SITE_GATE_LOG.ALERT_FAILED,
-      { day: MOCK_DAY, error: lookupError },
+      { day: MOCK_DAY, errorName: lookupError.name },
     );
   });
 });

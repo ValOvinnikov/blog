@@ -15,6 +15,7 @@ import {
 } from '@platform/constants/signup-block';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -77,7 +78,7 @@ export const removeBlockedIdentityAction = async (
       },
     });
   } catch (error) {
-    logger.error(SIGNUP_BLOCK_LOG.REMOVE_FAILED, { error });
+    logger.error(SIGNUP_BLOCK_LOG.REMOVE_FAILED, toLoggableError(error));
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

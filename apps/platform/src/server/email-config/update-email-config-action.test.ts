@@ -210,7 +210,7 @@ describe(updateEmailConfigAction, () => {
     expect(insertAuditEvent).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(EMAIL_CONFIG_LOG.UPDATE_FAILED, {
       tenantId: MOCK_TENANT_ID,
-      error: MOCK_DB_ERROR,
+      errorName: MOCK_DB_ERROR.name,
     });
   });
 
@@ -240,7 +240,7 @@ describe(updateEmailConfigAction, () => {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
         targetId: MOCK_TENANT_ID,
-        error: MOCK_DB_ERROR,
+        errorName: MOCK_DB_ERROR.name,
       },
     );
   });

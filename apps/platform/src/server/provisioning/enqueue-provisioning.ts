@@ -2,6 +2,7 @@ import { HTTP_METHOD, type TMaybeNull } from '@blog/config';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 const PROVISION_PATH = '/api/provision';
@@ -41,7 +42,11 @@ export const enqueueWorkerRequest = async (
     });
     return response.status;
   } catch (error) {
-    logger.error(WORKER_LOG.ENQUEUE_ERROR, { tenantId, path, error });
+    logger.error(WORKER_LOG.ENQUEUE_ERROR, {
+      tenantId,
+      path,
+      ...toLoggableError(error),
+    });
     return null;
   }
 };

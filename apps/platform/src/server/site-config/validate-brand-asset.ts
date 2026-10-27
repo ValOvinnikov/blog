@@ -16,6 +16,7 @@ import {
   maxUploadMbLabel,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { imageSize } from 'image-size';
 
@@ -28,11 +29,7 @@ const IMAGE_FORMAT_BY_DETECTED_TYPE: Record<string, TImageFormat> = {
   svg: { contentType: 'image/svg+xml', extension: 'svg' },
 };
 
-/**
- * SVG has no raster grid, so the pixel bounds don't apply; `image-size`
- * derives its width/height from the root `width`/`height` or `viewBox`
- * aspect ratio, which is what a browser tab renders the favicon at.
- */
+// `image-size` reads an SVG's size from its root `width`/`height` or `viewBox`, which is what a browser tab renders the favicon at.
 const validateSvgAsset = async (
   buffer: Buffer,
   kind: TBrandAssetKind,
@@ -42,7 +39,10 @@ const validateSvgAsset = async (
   try {
     sanitized = await sanitizeSvgMarkup(buffer.toString('utf-8'));
   } catch (error) {
-    logger.error(SITE_CONFIG_LOG.SVG_SANITIZE_FAILED, { kind, error });
+    logger.error(SITE_CONFIG_LOG.SVG_SANITIZE_FAILED, {
+      kind,
+      ...toLoggableError(error),
+    });
     return errorResult(toOutcome(ACTION_OUTCOME.SERVER_ERROR));
   }
   if (!sanitized) {

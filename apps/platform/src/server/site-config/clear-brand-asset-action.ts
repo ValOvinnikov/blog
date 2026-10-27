@@ -17,6 +17,7 @@ import {
   brandAssetKindSchema,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 export const clearBrandAssetAction = async (
@@ -55,7 +56,7 @@ export const clearBrandAssetAction = async (
     logger.error(SITE_CONFIG_LOG.BRAND_ASSET_CLEAR_FAILED, {
       tenantId: tenant.id,
       kind: targetKind,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

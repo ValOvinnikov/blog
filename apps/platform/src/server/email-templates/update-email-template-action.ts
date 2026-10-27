@@ -24,6 +24,7 @@ import {
   emailTemplateCopyInputSchema,
   emailTemplateTypeSchema,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -93,7 +94,7 @@ export const updateEmailTemplateAction = async (
       tenantId: tenant.id,
       templateType: parsedTemplateType.data,
       locale: parsedLocale.data,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

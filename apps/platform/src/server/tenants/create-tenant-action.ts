@@ -33,6 +33,7 @@ import {
   type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
@@ -139,7 +140,10 @@ export const createTenantAction = async (
 
     tenantId = result.data.id;
   } catch (error) {
-    logger.error(TENANT_LOG.CREATE_DRAFT_FAILED, { domain, error });
+    logger.error(TENANT_LOG.CREATE_DRAFT_FAILED, {
+      domain,
+      ...toLoggableError(error),
+    });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

@@ -385,7 +385,7 @@ describe('tenant suspension actions', () => {
         [
           'rejects',
           () => removeBlockedIdentityMock.mockRejectedValue(MOCK_UNDO_FAILURE),
-          { error: MOCK_UNDO_FAILURE },
+          { errorName: MOCK_UNDO_FAILURE.name },
         ],
       ])(
         'logs once without the address and keeps the failure when the undo %s',

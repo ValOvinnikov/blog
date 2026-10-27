@@ -159,7 +159,7 @@ describe(sendTestEmailAction, () => {
     expect(logger.error).toHaveBeenCalledWith(EMAIL_TEST_LOG.SEND_FAILED, {
       tenantId: MOCK_TENANT_ID,
       templateType: INPUT.templateType,
-      error: sendError,
+      errorName: sendError.name,
     });
   });
 

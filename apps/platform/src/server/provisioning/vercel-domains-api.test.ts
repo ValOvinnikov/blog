@@ -128,7 +128,7 @@ describe(getProjectDomain, () => {
     });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       PROVISIONING_LOG.DOMAIN_CHECK_ERROR,
-      { domain: MOCK_DOMAIN, error },
+      { domain: MOCK_DOMAIN, errorName: error.name },
     );
   });
 

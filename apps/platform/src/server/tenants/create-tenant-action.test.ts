@@ -337,7 +337,7 @@ describe(createTenantAction, () => {
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_LOG.CREATE_DRAFT_FAILED,
-      { domain: MOCK_TENANT_DOMAIN, error: MOCK_DRAFT_INSERT_ERROR },
+      { domain: MOCK_TENANT_DOMAIN, errorName: MOCK_DRAFT_INSERT_ERROR.name },
     );
   });
 
@@ -422,7 +422,7 @@ describe(createTenantAction, () => {
         action: AUDIT_ACTION.CREATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        error: MOCK_AUDIT_WRITE_ERROR,
+        errorName: MOCK_AUDIT_WRITE_ERROR.name,
       },
     );
   });

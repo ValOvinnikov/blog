@@ -139,7 +139,7 @@ describe(saveVoiceOverridesAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       SITE_CONFIG_LOG.VOICE_SAVE_FAILED,
-      { tenantId: MOCK_TENANT_ID, error: dbError },
+      { tenantId: MOCK_TENANT_ID, errorName: dbError.name },
     );
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();

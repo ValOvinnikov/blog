@@ -5,6 +5,7 @@ import {
   type TGitHubFailure,
 } from '@platform/constants/github';
 import { RELEASE_FAILURE, RELEASE_LOG } from '@platform/constants/release';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 export type TReleaseCandidateFailureReason =
@@ -26,7 +27,7 @@ export const readDb = async <T>(
   try {
     return okResult(await read());
   } catch (error) {
-    logger.error(RELEASE_LOG.DB_READ_FAILED, { error });
+    logger.error(RELEASE_LOG.DB_READ_FAILED, toLoggableError(error));
     return errorResult(RELEASE_FAILURE.DB_ERROR);
   }
 };

@@ -26,6 +26,7 @@ import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -185,7 +186,10 @@ export const updateTenantDetailsAction = async (
       }
     }
   } catch (error) {
-    logger.error(TENANT_LOG.UPDATE_DETAILS_FAILED, { tenantId, error });
+    logger.error(TENANT_LOG.UPDATE_DETAILS_FAILED, {
+      tenantId,
+      ...toLoggableError(error),
+    });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 };

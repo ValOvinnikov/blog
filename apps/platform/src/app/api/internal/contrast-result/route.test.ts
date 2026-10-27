@@ -134,7 +134,7 @@ describe(POST, () => {
       {
         sha: MOCK_SHA,
         outcome: CONTRAST_CHECK_OUTCOME.FAIL,
-        error: MOCK_RECORD_ERROR,
+        errorName: MOCK_RECORD_ERROR.name,
       },
     );
   });

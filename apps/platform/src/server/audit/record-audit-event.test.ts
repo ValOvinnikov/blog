@@ -78,7 +78,7 @@ describe(recordAuditEvent, () => {
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
-      error: MOCK_INSERT_ERROR,
+      errorName: MOCK_INSERT_ERROR.name,
     });
   });
 

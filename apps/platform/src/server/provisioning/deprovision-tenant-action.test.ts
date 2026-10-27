@@ -180,7 +180,7 @@ describe(deprovisionTenantAction, () => {
         action: AUDIT_ACTION.DEPROVISION_REQUESTED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        error: MOCK_CONNECTION_ERROR,
+        errorName: MOCK_CONNECTION_ERROR.name,
       },
     );
   });

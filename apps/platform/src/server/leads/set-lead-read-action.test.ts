@@ -100,7 +100,7 @@ describe(setLeadReadAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(LEAD_LOG.READ_STATE_FAILED, {
       tenantId: MOCK_TENANT_ID,
-      error: MOCK_DB_ERROR,
+      errorName: MOCK_DB_ERROR.name,
     });
   });
 });

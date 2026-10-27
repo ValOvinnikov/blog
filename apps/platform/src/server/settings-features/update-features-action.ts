@@ -18,6 +18,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
   CAPABILITY_TOGGLES,
@@ -96,7 +97,7 @@ export const updateFeaturesAction = async (
   } catch (error) {
     logger.error(SETTINGS_FEATURES_LOG.UPDATE_FAILED, {
       tenantId: tenant.id,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

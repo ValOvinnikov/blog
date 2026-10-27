@@ -7,6 +7,7 @@ import {
   type TGitHubFailure,
   GITHUB_LOG,
 } from '@platform/constants/github';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 import { readGitHubCredentials } from './read-github-credentials';
@@ -63,7 +64,7 @@ export const fetchGitHub = async (
     });
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   } catch (error) {
-    logger.error(GITHUB_LOG.REQUEST_ERROR, { path, error });
+    logger.error(GITHUB_LOG.REQUEST_ERROR, { path, ...toLoggableError(error) });
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   }
 };
@@ -79,7 +80,10 @@ export const fetchGitHubJson = async <T>(
   try {
     return okResult(parse(await result.data.json()));
   } catch (error) {
-    logger.error(GITHUB_LOG.UNEXPECTED_RESPONSE, { path, error });
+    logger.error(GITHUB_LOG.UNEXPECTED_RESPONSE, {
+      path,
+      ...toLoggableError(error),
+    });
     return errorResult(GITHUB_FAILURE.GITHUB_ERROR);
   }
 };
