@@ -333,7 +333,12 @@
     "siteSetupRetry": "Try again",
     "siteSetupRetrying": "Restarting…",
     "siteSetupRetryFailed": "Couldn't restart the setup — try again.",
-    "siteSetupRetryRefused": "Couldn't restart the setup — refresh the page and try again."
+    "siteSetupRetryRefused": "Couldn't restart the setup — refresh the page and try again.",
+    "siteSetupNotStartedTitle": "Your site's setup hasn't started",
+    "siteSetupNotStartedDescription": "We couldn't start setting up your site. Start it now — nothing is lost.",
+    "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
+    "siteSetupStart": "Start setup",
+    "siteSetupStarting": "Starting…"
   },
   "provisioningBanner": {
     "readyTitle": "Provisioned",
@@ -372,6 +377,8 @@
     "roleLabel": "Role",
     "ownerInvitedPendingBadge": "Invited, pending",
     "joinedLabel": "Joined",
+    "invitedLabel": "Invited",
+    "ownerNotSignedInYet": "<time>{date}</time>, not signed in yet",
     "contentWorkspaceCardTitle": "Content workspace",
     "platformBadge": "platform",
     "sanityProjectLabel": "Sanity project",

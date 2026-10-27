@@ -333,7 +333,12 @@
     "siteSetupRetry": "Réessayer",
     "siteSetupRetrying": "Relance…",
     "siteSetupRetryFailed": "Impossible de relancer la configuration. Réessayez.",
-    "siteSetupRetryRefused": "Impossible de relancer la configuration. Actualisez la page et réessayez."
+    "siteSetupRetryRefused": "Impossible de relancer la configuration. Actualisez la page et réessayez.",
+    "siteSetupNotStartedTitle": "La configuration de votre site n'a pas commencé",
+    "siteSetupNotStartedDescription": "Nous n'avons pas pu lancer la configuration de votre site. Lancez-la maintenant : rien n'est perdu.",
+    "siteSetupNotStartedContactDescription": "Nous n'avons pas pu lancer la configuration de votre site. Demandez à votre contact plateforme de la lancer.",
+    "siteSetupStart": "Lancer la configuration",
+    "siteSetupStarting": "Lancement…"
   },
   "provisioningBanner": {
     "readyTitle": "Provisionné",
@@ -372,6 +377,8 @@
     "roleLabel": "Rôle",
     "ownerInvitedPendingBadge": "Invité, en attente",
     "joinedLabel": "Inscrit le",
+    "invitedLabel": "Invité le",
+    "ownerNotSignedInYet": "<time>{date}</time>, pas encore connecté",
     "contentWorkspaceCardTitle": "Espace de contenu",
     "platformBadge": "plateforme",
     "sanityProjectLabel": "Projet Sanity",

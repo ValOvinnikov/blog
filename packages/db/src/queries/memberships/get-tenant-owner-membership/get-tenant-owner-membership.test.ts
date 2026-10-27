@@ -7,7 +7,10 @@ import {
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
+  MOCK_EMAIL_VERIFIED_AT,
+  MOCK_OAUTH_PROVIDER,
   MOCK_OWNER_EMAIL,
+  insertTestAccount,
   insertTestTenant,
   insertTestUser,
 } from '@blog/db/testing/fixtures';
@@ -49,8 +52,9 @@ describe(getTenantOwnerMembership, () => {
   async function insertMember(
     email: TMaybeNull<string>,
     role: TMembershipRole,
+    emailVerified: TMaybeNull<Date> = MOCK_EMAIL_VERIFIED_AT,
   ): Promise<schema.TMembership> {
-    await insertTestUser(db(), { id: MEMBER_USER_ID, email });
+    await insertTestUser(db(), { id: MEMBER_USER_ID, email, emailVerified });
     const [membership] = await db()
       .insert(schema.memberships)
       .values({ userId: MEMBER_USER_ID, tenantId, role })
@@ -69,8 +73,8 @@ describe(getTenantOwnerMembership, () => {
     encryptedEmail: string;
     role: TMembershipRole;
     consumedAt?: TMaybeNull<Date>;
-  }): Promise<void> {
-    await db()
+  }): Promise<schema.TMembershipInvite> {
+    const [invite] = await db()
       .insert(schema.membershipInvites)
       .values({
         tenantId,
@@ -78,10 +82,13 @@ describe(getTenantOwnerMembership, () => {
         emailEncrypted: encryptPersonalValue(encryptedEmail),
         role,
         consumedAt,
-      });
+      })
+      .returning();
+    if (!invite) throw new Error('failed to seed an invite row');
+    return invite;
   }
 
-  it('returns the OWNER membership email and joinedAt for the tenant', async () => {
+  it('returns a signed-in OWNER as joined when the membership row was made', async () => {
     const membership = await insertMember(
       MOCK_OWNER_EMAIL,
       MEMBERSHIP_ROLE.OWNER,
@@ -91,6 +98,40 @@ describe(getTenantOwnerMembership, () => {
 
     expect(result).toEqual({
       email: MOCK_OWNER_EMAIL,
+      hasSignedIn: true,
+      joinedAt: membership.createdAt,
+    });
+  });
+
+  it('returns an OWNER account that has never signed in as invited', async () => {
+    const membership = await insertMember(
+      MOCK_OWNER_EMAIL,
+      MEMBERSHIP_ROLE.OWNER,
+      null,
+    );
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toEqual({
+      email: MOCK_OWNER_EMAIL,
+      hasSignedIn: false,
+      invitedAt: membership.createdAt,
+    });
+  });
+
+  it('counts a linked OAuth account as a sign-in', async () => {
+    const membership = await insertMember(
+      MOCK_OWNER_EMAIL,
+      MEMBERSHIP_ROLE.OWNER,
+      null,
+    );
+    await insertTestAccount(db(), MEMBER_USER_ID, MOCK_OAUTH_PROVIDER);
+
+    const result = await getTenantOwnerMembership(tenantId);
+
+    expect(result).toEqual({
+      email: MOCK_OWNER_EMAIL,
+      hasSignedIn: true,
       joinedAt: membership.createdAt,
     });
   });
@@ -104,7 +145,7 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('falls back to a pending OWNER invite, reading its encrypted email', async () => {
-    await insertInvite({
+    const invite = await insertInvite({
       email: faker.internet.email(),
       encryptedEmail: MOCK_OWNER_EMAIL,
       role: MEMBERSHIP_ROLE.OWNER,
@@ -112,19 +153,30 @@ describe(getTenantOwnerMembership, () => {
 
     const result = await getTenantOwnerMembership(tenantId);
 
-    expect(result).toEqual({ email: MOCK_OWNER_EMAIL });
+    expect(result).toEqual({
+      email: MOCK_OWNER_EMAIL,
+      hasSignedIn: false,
+      invitedAt: invite.createdAt,
+    });
   });
 
   it('reads a pending OWNER invite not yet backfilled from its plain email, and reports it', async () => {
-    await db().insert(schema.membershipInvites).values({
-      tenantId,
-      email: MOCK_OWNER_EMAIL,
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+    const [invite] = await db()
+      .insert(schema.membershipInvites)
+      .values({
+        tenantId,
+        email: MOCK_OWNER_EMAIL,
+        role: MEMBERSHIP_ROLE.OWNER,
+      })
+      .returning();
 
     const result = await getTenantOwnerMembership(tenantId);
 
-    expect(result).toEqual({ email: MOCK_OWNER_EMAIL });
+    expect(result).toEqual({
+      email: MOCK_OWNER_EMAIL,
+      hasSignedIn: false,
+      invitedAt: invite?.createdAt,
+    });
     expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
       owner: PERSONAL_DATA_OWNER.INVITE,
       reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
@@ -171,6 +223,7 @@ describe(getTenantOwnerMembership, () => {
 
     expect(result).toEqual({
       email: SIGNED_IN_EMAIL,
+      hasSignedIn: true,
       joinedAt: membership.createdAt,
     });
   });

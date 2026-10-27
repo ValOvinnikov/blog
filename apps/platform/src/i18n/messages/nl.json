@@ -333,7 +333,12 @@
     "siteSetupRetry": "Opnieuw proberen",
     "siteSetupRetrying": "Wordt opnieuw gestart…",
     "siteSetupRetryFailed": "Het inrichten kon niet opnieuw worden gestart. Probeer het opnieuw.",
-    "siteSetupRetryRefused": "Het inrichten kon niet opnieuw worden gestart. Vernieuw de pagina en probeer het opnieuw."
+    "siteSetupRetryRefused": "Het inrichten kon niet opnieuw worden gestart. Vernieuw de pagina en probeer het opnieuw.",
+    "siteSetupNotStartedTitle": "Het inrichten van je site is niet begonnen",
+    "siteSetupNotStartedDescription": "We konden het inrichten van je site niet starten. Start het nu; er gaat niets verloren.",
+    "siteSetupNotStartedContactDescription": "We konden het inrichten van je site niet starten. Vraag je platformcontactpersoon het te starten.",
+    "siteSetupStart": "Inrichten starten",
+    "siteSetupStarting": "Wordt gestart…"
   },
   "provisioningBanner": {
     "readyTitle": "Ingericht",
@@ -372,6 +377,8 @@
     "roleLabel": "Rol",
     "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting",
     "joinedLabel": "Lid sinds",
+    "invitedLabel": "Uitgenodigd",
+    "ownerNotSignedInYet": "<time>{date}</time>, nog niet aangemeld",
     "contentWorkspaceCardTitle": "Contentwerkruimte",
     "platformBadge": "platform",
     "sanityProjectLabel": "Sanity-project",

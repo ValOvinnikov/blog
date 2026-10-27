@@ -2,7 +2,6 @@ import type { TMaybeUndefined, TOutcome } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
-  MEMBERSHIP_ROLE,
   PROVISIONING_STATE,
   TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PROVISIONING_STEP,
@@ -10,20 +9,22 @@ import {
   type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
-import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
-import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
-import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
-import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { and, eq, isNull, ne } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+
+import {
+  applyOwnerEmailChange,
+  findOwnerEmailChange,
+  type TOwnerEmailChange,
+  type TOwnerEmailRefusal,
+} from './owner-email-change';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -51,10 +52,24 @@ function tenantDetailsFields(
   };
 }
 
+function changesTenantDetails(
+  next: TTenantDetailsFields,
+  existing: TTenant,
+): boolean {
+  const current = tenantDetailsFields(existing);
+  return (Object.keys(next) as (keyof TTenantDetailsFields)[]).some(
+    (key) => next[key] !== current[key],
+  );
+}
+
 const OUTCOME = TENANT_DETAILS_UPDATE_OUTCOME;
 
 export type TUpdateTenantDetailsResult =
-  | { outcome: typeof OUTCOME.UPDATED; tenant: TTenant }
+  | {
+      outcome: typeof OUTCOME.UPDATED;
+      tenant: TTenant;
+      ownerEmailChanged: boolean;
+    }
   | TOutcome<typeof OUTCOME.DOMAIN_TAKEN>
   | {
       outcome: typeof OUTCOME.DOMAIN_LOCKED;
@@ -62,8 +77,7 @@ export type TUpdateTenantDetailsResult =
     }
   | TOutcome<typeof OUTCOME.DOMAIN_INVALID>
   | TOutcome<typeof OUTCOME.PROVISIONING_STARTED>
-  | TOutcome<typeof OUTCOME.OWNER_ALREADY_JOINED>
-  | TOutcome<typeof OUTCOME.OWNER_EMAIL_TAKEN>
+  | TOwnerEmailRefusal
   | TOutcome<typeof OUTCOME.OWNS_FREE_TENANT>;
 
 // Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
@@ -119,9 +133,15 @@ export async function updateTenantDetails(
     existing.provisioningSteps,
   );
 
+  const details = tenantDetailsFields({
+    ...input,
+    locale: normalizeLocaleCode(input.locale),
+  });
+
   if (
     provisioningState === PROVISIONING_STATE.RUNNING ||
-    provisioningState === PROVISIONING_STATE.SUCCEEDED
+    (provisioningState === PROVISIONING_STATE.SUCCEEDED &&
+      changesTenantDetails(details, existing))
   ) {
     return toOutcome(OUTCOME.PROVISIONING_STARTED);
   }
@@ -144,79 +164,19 @@ export async function updateTenantDetails(
     }
   }
 
-  let ownerInviteUpdate: TMaybeUndefined<{ id: string; email: string }>;
+  let ownerEmailChange: TMaybeUndefined<TOwnerEmailChange>;
 
   if (!isUndefined(input.ownerEmail)) {
-    const normalizedOwnerEmail = normalizeEmail(input.ownerEmail);
-
-    const currentOwnerEmail = await getTenantOwnerEmail(tenantId);
-    const normalizedCurrentOwnerEmail = isUndefined(currentOwnerEmail)
-      ? undefined
-      : normalizeEmail(currentOwnerEmail);
-    const ownerEmailChanged =
-      normalizedCurrentOwnerEmail !== normalizedOwnerEmail;
-
-    if (ownerEmailChanged) {
-      const [joinedOwner] = await db
-        .select({ id: memberships.id })
-        .from(memberships)
-        .where(
-          and(
-            eq(memberships.tenantId, tenantId),
-            eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
-          ),
-        );
-
-      if (joinedOwner) {
-        return toOutcome(OUTCOME.OWNER_ALREADY_JOINED);
-      }
-
-      const [pendingInvite] = await db
-        .select({ id: membershipInvites.id })
-        .from(membershipInvites)
-        .where(
-          and(
-            eq(membershipInvites.tenantId, tenantId),
-            eq(membershipInvites.role, MEMBERSHIP_ROLE.OWNER),
-            isNull(membershipInvites.consumedAt),
-          ),
-        );
-
-      if (!pendingInvite) {
-        throw new Error(
-          `updateTenantDetails: no pending owner invite found for tenant "${tenantId}".`,
-        );
-      }
-
-      const [emailConflict] = await db
-        .select({ id: membershipInvites.id })
-        .from(membershipInvites)
-        .where(
-          and(
-            eq(membershipInvites.tenantId, tenantId),
-            eq(membershipInvites.email, normalizedOwnerEmail),
-            ne(membershipInvites.id, pendingInvite.id),
-          ),
-        );
-
-      if (emailConflict) {
-        return toOutcome(OUTCOME.OWNER_EMAIL_TAKEN);
-      }
-
-      ownerInviteUpdate = { id: pendingInvite.id, email: normalizedOwnerEmail };
-    }
+    const found = await findOwnerEmailChange(tenantId, input.ownerEmail);
+    if (found && 'outcome' in found) return found;
+    ownerEmailChange = found;
   }
 
   let tenant: TMaybeUndefined<TTenant>;
   try {
     [tenant] = await db
       .update(tenants)
-      .set(
-        tenantDetailsFields({
-          ...input,
-          locale: normalizeLocaleCode(input.locale),
-        }),
-      )
+      .set(details)
       .where(eq(tenants.id, tenantId))
       .returning();
   } catch (error) {
@@ -263,19 +223,9 @@ export async function updateTenantDetails(
     }
   }
 
-  if (ownerInviteUpdate) {
+  if (ownerEmailChange) {
     try {
-      const [inviteRow] = await db
-        .update(membershipInvites)
-        .set(inviteEmailColumns(ownerInviteUpdate.email))
-        .where(eq(membershipInvites.id, ownerInviteUpdate.id))
-        .returning();
-
-      if (!inviteRow) {
-        throw new Error(
-          `updateTenantDetails: owner invite update for tenant "${tenantId}" returned no row.`,
-        );
-      }
+      await applyOwnerEmailChange(ownerEmailChange);
     } catch (error) {
       if (domainChanged) {
         await db
@@ -293,5 +243,9 @@ export async function updateTenantDetails(
     }
   }
 
-  return { outcome: OUTCOME.UPDATED, tenant };
+  return {
+    outcome: OUTCOME.UPDATED,
+    tenant,
+    ownerEmailChanged: Boolean(ownerEmailChange),
+  };
 }
