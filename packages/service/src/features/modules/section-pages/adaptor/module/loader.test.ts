@@ -10,14 +10,12 @@ import {
   MOCK_MISSING_ID,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
 
 import { getSectionPagesModuleDocument } from './loader';
 import { sectionPagesModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
-
-const tenant = mockTenant();
 
 describe(getSectionPagesModuleDocument, () => {
   beforeEach(() => {
@@ -27,18 +25,21 @@ describe(getSectionPagesModuleDocument, () => {
   it('resolves the module document fields', async () => {
     const module = await getSectionPagesModuleDocument(
       MOCK_SECTION_PAGES_MODULE_ID,
-      tenant,
+      MOCK_TENANT,
     );
 
     expect(module.headingBlock?.heading).toBe(MOCK_SECTION_PAGES_HEADING);
   });
 
-  it('scopes the module cache tags to the tenant', async () => {
-    await getSectionPagesModuleDocument(MOCK_SECTION_PAGES_MODULE_ID, tenant);
+  it('queries the module by id for the tenant with its cache tags', async () => {
+    await getSectionPagesModuleDocument(
+      MOCK_SECTION_PAGES_MODULE_ID,
+      MOCK_TENANT,
+    );
 
     expect(mockRun).toHaveBeenCalledWith(sectionPagesModuleQuery, {
       parameters: { id: MOCK_SECTION_PAGES_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
@@ -53,7 +54,7 @@ describe(getSectionPagesModuleDocument, () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
     await expect(
-      getSectionPagesModuleDocument(MOCK_MISSING_ID, tenant),
+      getSectionPagesModuleDocument(MOCK_MISSING_ID, MOCK_TENANT),
     ).rejects.toThrow();
   });
 });
