@@ -14,7 +14,7 @@ const BACKFILL_MIGRATION = '0007_wide_silver_samurai.sql';
 
 describe(`${BACKFILL_MIGRATION} (granted_via backfill)`, () => {
   it(
-    'backfills a pre-existing admin row to BREAK_GLASS instead of failing NOT NULL',
+    'backfills a pre-existing admin row to BREAK_GLASS',
     async () => {
       const db = await createEmptyTestDb();
       await applyMigrationsBefore(db, BACKFILL_MIGRATION);

@@ -19,9 +19,9 @@ import {
   type TTenant,
   type TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
 import {
   MOCK_EMAIL_VERIFIED_AT,
-  MOCK_OAUTH_PROVIDER,
   MOCK_OWNER_EMAIL,
   insertTestAccount,
   insertTestTenant,
@@ -445,7 +445,7 @@ describe(updateTenantDetails, () => {
       });
 
       it('returns owner-already-joined once the owner has linked an OAuth account', async () => {
-        await insertTestAccount(db(), ownerUserId, MOCK_OAUTH_PROVIDER);
+        await insertTestAccount(db(), ownerUserId, GITHUB_PROVIDER);
 
         const result = await updateTenantDetails(tenantId, {
           ...MOCK_VALID_INPUT,

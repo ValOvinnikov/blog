@@ -58,7 +58,7 @@ describe(reportDeprovisioningRunStart, () => {
     });
   });
 
-  it('logs instead of throwing on a start for an unknown tenant', async () => {
+  it('logs a start for an unknown tenant and resolves', async () => {
     await expect(
       reportDeprovisioningRunStart({ tenantId: MOCK_MISSING_TENANT_ID }),
     ).resolves.toBeUndefined();
@@ -82,7 +82,7 @@ describe(reportDeprovisioningRunFinish, () => {
     });
   });
 
-  it('logs instead of throwing on a finish for an unknown tenant', async () => {
+  it('logs a finish for an unknown tenant and resolves', async () => {
     await expect(
       reportDeprovisioningRunFinish(MOCK_MISSING_TENANT_ID),
     ).resolves.toBeUndefined();

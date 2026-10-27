@@ -3,19 +3,14 @@ import {
   AUDIT_TARGET_TYPE,
   GITHUB_AUDIT_ACTOR_ID_PREFIX,
 } from '@blog/config/constants';
+import { DEPROVISIONING_WORKFLOW_AUDIT_VIA } from '@blog/db/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import type { TDeprovisionEnv } from './env';
 
-/**
- * Records exactly one `DEPROVISIONED`/`TENANT` audit event after a real
- * archive — the outcome half of the pair the platform app opens with
- * `DEPROVISION_REQUESTED`. Never throws: the archive itself already
- * succeeded by the time this runs, so a lost audit write is logged and
- * swallowed rather than failing a step whose destructive work is already
- * done.
- */
+// Never throws: the archive has already succeeded, so a lost audit write is
+// logged and swallowed.
 export async function recordDeprovisionAuditEvent(
   tenantId: string,
   env: TDeprovisionEnv,
@@ -33,7 +28,10 @@ export async function recordDeprovisionAuditEvent(
       action: AUDIT_ACTION.DEPROVISIONED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: tenantId,
-      details: { via: 'deprovision-tenant-workflow', runId: env.githubRunId },
+      details: {
+        via: DEPROVISIONING_WORKFLOW_AUDIT_VIA,
+        runId: env.githubRunId,
+      },
     });
   } catch (error) {
     console.error(

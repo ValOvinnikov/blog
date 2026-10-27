@@ -7,12 +7,12 @@ import {
 } from '@blog/db/constants';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
+import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
 import {
   insertTestAccount,
   insertTestTenant,
   insertTestUser,
   MOCK_EMAIL_VERIFIED_AT,
-  MOCK_OAUTH_PROVIDER,
   MOCK_OWNER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
@@ -157,7 +157,7 @@ describe(getTenantOwnerMembership, () => {
       MEMBERSHIP_ROLE.OWNER,
       null,
     );
-    await insertTestAccount(db(), MOCK_MEMBER_USER_ID, MOCK_OAUTH_PROVIDER);
+    await insertTestAccount(db(), MOCK_MEMBER_USER_ID, GITHUB_PROVIDER);
 
     const result = await getTenantOwnerMembership(tenantId);
 

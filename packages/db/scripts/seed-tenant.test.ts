@@ -63,7 +63,7 @@ describe(resolveOrCreateTenant, () => {
     expect(result.id).toBe(created.id);
   });
 
-  it('reuses the existing tenant for the domain instead of creating a duplicate', async () => {
+  it('reuses the existing tenant for the domain', async () => {
     const existing = mockSeededTenant();
     getTenantByDomainMock.mockResolvedValue(existing);
 

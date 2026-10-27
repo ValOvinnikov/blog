@@ -82,7 +82,7 @@ describe(reportDeprovisioningStepStatus, () => {
     });
   });
 
-  it('logs instead of throwing for an unknown tenant id', async () => {
+  it('logs an unknown tenant id and resolves', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(

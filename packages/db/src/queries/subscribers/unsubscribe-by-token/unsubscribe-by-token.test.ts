@@ -8,6 +8,7 @@ import {
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { readSubscriberIds } from '@blog/db/testing/subscribers/fixtures';
 import { sha256Hex } from '@blog/utils/hash';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
@@ -24,11 +25,6 @@ usePersonalDataKeys();
 const MOCK_UNSUBSCRIBE_TOKEN = faker.string.uuid();
 const MOCK_UNKNOWN_TOKEN = faker.string.uuid();
 const MOCK_UNSUBSCRIBE_TOKEN_HASH = sha256Hex(MOCK_UNSUBSCRIBE_TOKEN);
-
-async function readSubscriberIds(): Promise<string[]> {
-  const rows = await db().select().from(schema.subscribers);
-  return rows.map(({ id }) => id).sort();
-}
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -59,7 +55,7 @@ describe(unsubscribeByToken, () => {
     );
 
     const result = await unsubscribeByToken(tenantId, MOCK_UNSUBSCRIBE_TOKEN);
-    const remainingIds = await readSubscriberIds();
+    const remainingIds = await readSubscriberIds(db());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
     expect(remainingIds).toEqual([siblingId]);
@@ -77,7 +73,7 @@ describe(unsubscribeByToken, () => {
     'returns not-found for %s and deletes nothing',
     async (_case, tenant, token) => {
       const result = await unsubscribeByToken(tenant(), token());
-      const remainingIds = await readSubscriberIds();
+      const remainingIds = await readSubscriberIds(db());
 
       expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
       expect(remainingIds).toEqual([subscriberId]);

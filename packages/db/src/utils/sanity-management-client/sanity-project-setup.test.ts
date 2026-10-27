@@ -67,7 +67,7 @@ describe(createSanityProject, () => {
       expect(headers['Authorization']).toBe(`Bearer ${MOCK_SANITY_TOKEN}`);
     });
 
-    it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
+    it('sends an abort signal so a hung call fails', async () => {
       await createSanityProject(MOCK_CREATE_PROJECT_INPUT);
 
       expect(firstFetchCall(fetchMock).init.signal).toBeInstanceOf(AbortSignal);

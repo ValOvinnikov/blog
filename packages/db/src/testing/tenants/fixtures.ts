@@ -18,30 +18,38 @@ import type {
   TTenantDeprovisioningState,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 import type { TResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 
-export const MOCK_REVALIDATE_WEBHOOK_SECRET = 'whsec-tenant-secret-value';
-export const MOCK_TENANT_DOMAIN = faker.internet.domainName();
-export const MOCK_MISSING_TENANT_ID = faker.string.uuid();
-export const MOCK_TENANT_READ_TOKEN = 'sk-real-token-value';
-export const MOCK_TENANT_WRITE_TOKEN = 'sk-real-write-token-value';
-export const MOCK_DEPROVISIONED_AT = faker.date.past();
-export const MOCK_SEEDED_AT = faker.date.past();
-export const MOCK_UNKNOWN_SANITY_PROJECT_ID = faker.string.alphanumeric(8);
-const RUN_AT = faker.date.recent();
-const RUN_FINISHED_AT = faker.date.soon({ refDate: RUN_AT });
+const tenantsFaker = createMockFaker(60224);
+
+export const MOCK_REVALIDATE_WEBHOOK_SECRET =
+  tenantsFaker.string.alphanumeric(32);
+export const MOCK_TENANT_DOMAIN = tenantsFaker.internet.domainName();
+export const MOCK_MISSING_TENANT_ID = tenantsFaker.string.uuid();
+export const MOCK_TENANT_READ_TOKEN = tenantsFaker.string.alphanumeric(32);
+export const MOCK_TENANT_WRITE_TOKEN = tenantsFaker.string.alphanumeric(32);
+export const MOCK_DEPROVISIONED_AT = tenantsFaker.date.past({
+  refDate: MOCK_NOW,
+});
+export const MOCK_SEEDED_AT = tenantsFaker.date.past({ refDate: MOCK_NOW });
+export const MOCK_UNKNOWN_SANITY_PROJECT_ID =
+  tenantsFaker.string.alphanumeric(8);
+const RUN_AT = tenantsFaker.date.recent({ refDate: MOCK_NOW });
+const RUN_FINISHED_AT = tenantsFaker.date.soon({ refDate: RUN_AT });
 export const MOCK_RUN_AT = RUN_AT.toISOString();
 export const MOCK_RUN_FINISHED_AT = RUN_FINISHED_AT.toISOString();
-export const MOCK_RERUN_AT = faker.date
+export const MOCK_RERUN_AT = tenantsFaker.date
   .soon({ refDate: RUN_FINISHED_AT })
   .toISOString();
 
 export const MOCK_TENANT_VALUES = {
-  name: faker.company.name(),
+  name: tenantsFaker.company.name(),
   primaryDomain: MOCK_TENANT_DOMAIN,
-  sanityProjectId: faker.string.alphanumeric(8),
-  sanityDataset: faker.word.noun(),
+  sanityProjectId: tenantsFaker.string.alphanumeric(8),
+  sanityDataset: tenantsFaker.word.noun(),
   locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
 };
@@ -127,9 +135,9 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
   };
 }
 
-export const MOCK_WORKFLOW_RUN_URL = faker.internet.url();
-export const MOCK_PROVISIONING_REGISTRY = 'development';
-export const MOCK_STEP_ERROR = 'Sanity Projects API returned 429';
+export const MOCK_WORKFLOW_RUN_URL = tenantsFaker.internet.url();
+export const MOCK_PROVISIONING_REGISTRY = tenantsFaker.word.noun();
+export const MOCK_STEP_ERROR = tenantsFaker.lorem.sentence();
 
 const MOCK_IDLE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.IDLE };
 

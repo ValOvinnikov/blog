@@ -8,6 +8,7 @@ import {
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { readSubscriberIds } from '@blog/db/testing/subscribers/fixtures';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
 
@@ -21,11 +22,6 @@ const MOCK_UNKNOWN_SUBSCRIBER_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 usePersonalDataKeys();
-
-async function readSubscriberIds(): Promise<string[]> {
-  const rows = await db().select().from(schema.subscribers);
-  return rows.map(({ id }) => id).sort();
-}
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -55,7 +51,7 @@ describe(unsubscribeById, () => {
     );
 
     const result = await unsubscribeById(tenantId, subscriberId);
-    const remainingIds = await readSubscriberIds();
+    const remainingIds = await readSubscriberIds(db());
 
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.UNSUBSCRIBED));
     expect(remainingIds).toEqual([siblingId]);
@@ -68,7 +64,7 @@ describe(unsubscribeById, () => {
     'returns not-found for %s and deletes nothing',
     async (_case, tenant, id) => {
       const result = await unsubscribeById(tenant(), id());
-      const remainingIds = await readSubscriberIds();
+      const remainingIds = await readSubscriberIds(db());
 
       expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.NOT_FOUND));
       expect(remainingIds).toEqual([subscriberId]);

@@ -5,6 +5,7 @@ import {
 } from '@blog/config/constants';
 import { DAY_MS, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
 import {
   MOCK_BLOCK_REASON,
   MOCK_NOT_AN_ADDRESS,
@@ -13,7 +14,6 @@ import {
   insertTestAccount,
   insertTestTenant,
   MOCK_INVITE_EMAIL,
-  MOCK_OAUTH_PROVIDER,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
@@ -152,7 +152,7 @@ describe(findPersonalData, () => {
       vi.useFakeTimers({ toFake: ['Date'] });
       vi.setSystemTime(MOCK_NOW);
       userId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-      await insertTestAccount(db(), userId, MOCK_OAUTH_PROVIDER);
+      await insertTestAccount(db(), userId, GITHUB_PROVIDER);
       await db()
         .insert(schema.bookmarks)
         .values({ tenantId, userId, postId: MOCK_BOOKMARKED_POST_ID });
