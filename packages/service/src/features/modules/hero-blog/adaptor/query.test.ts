@@ -114,93 +114,97 @@ describe('heroBlogModuleQuery', () => {
       runHero({ primaryActionLabel: undefined }, NL),
     ).rejects.toThrow();
   });
-});
 
-describe('heroBlogModuleQuery language scoping', () => {
-  async function runRaw(module: Record<string, unknown>, locale: string) {
-    return (await evaluateHero(module, locale, MOCK_PINNED_POST_DOCUMENTS)) as {
-      post: { _id: string } | null;
-      hasPinnedPost: boolean;
-    };
-  }
+  describe('language scoping', () => {
+    async function runRaw(module: Record<string, unknown>, locale: string) {
+      return (await evaluateHero(
+        module,
+        locale,
+        MOCK_PINNED_POST_DOCUMENTS,
+      )) as {
+        post: { _id: string } | null;
+        hasPinnedPost: boolean;
+      };
+    }
 
-  async function runPost(module: Record<string, unknown>, locale: string) {
-    const raw = await runRaw(module, locale);
+    async function runPost(module: Record<string, unknown>, locale: string) {
+      const raw = await runRaw(module, locale);
 
-    return raw.post?._id ?? null;
-  }
+      return raw.post?._id ?? null;
+    }
 
-  function pinned(id: string) {
-    return {
-      postSource: POST_SOURCE.PINNED,
-      post: mockReference(id),
-    };
-  }
+    function pinned(id: string) {
+      return {
+        postSource: POST_SOURCE.PINNED,
+        post: mockReference(id),
+      };
+    }
 
-  it.each([
-    [
-      'shows the pinned post in its own language',
-      MOCK_DESIGN_EN_POST_ID,
-      EN,
-      MOCK_DESIGN_EN_POST_ID,
-    ],
-    [
-      'swaps the pinned post for its translation',
-      MOCK_DESIGN_EN_POST_ID,
-      NL,
-      MOCK_DESIGN_NL_POST_ID,
-    ],
-    [
-      'shows no post when the pinned one has no translation',
-      MOCK_ONLY_EN_POST_ID,
-      NL,
-      null,
-    ],
-    [
-      'shows a group-less pinned post in its own language',
-      MOCK_SOLO_NL_POST_ID,
-      NL,
-      MOCK_SOLO_NL_POST_ID,
-    ],
-    [
-      'shows no post for a group-less pinned post in another language',
-      MOCK_SOLO_NL_POST_ID,
-      EN,
-      null,
-    ],
-  ])('%s', async (_, pinnedId, locale, expected) => {
-    const postId = await runPost(pinned(pinnedId), locale);
-
-    expect(postId).toBe(expected);
-  });
-
-  it.each([
-    [EN, MOCK_ONLY_EN_POST_ID],
-    [NL, MOCK_DESIGN_NL_POST_ID],
-  ])(
-    'falls back to the newest featured post in %s',
-    async (locale, expected) => {
-      const postId = await runPost({}, locale);
+    it.each([
+      [
+        'shows the pinned post in its own language',
+        MOCK_DESIGN_EN_POST_ID,
+        EN,
+        MOCK_DESIGN_EN_POST_ID,
+      ],
+      [
+        'swaps the pinned post for its translation',
+        MOCK_DESIGN_EN_POST_ID,
+        NL,
+        MOCK_DESIGN_NL_POST_ID,
+      ],
+      [
+        'shows no post when the pinned one has no translation',
+        MOCK_ONLY_EN_POST_ID,
+        NL,
+        null,
+      ],
+      [
+        'shows a group-less pinned post in its own language',
+        MOCK_SOLO_NL_POST_ID,
+        NL,
+        MOCK_SOLO_NL_POST_ID,
+      ],
+      [
+        'shows no post for a group-less pinned post in another language',
+        MOCK_SOLO_NL_POST_ID,
+        EN,
+        null,
+      ],
+    ])('%s', async (_, pinnedId, locale, expected) => {
+      const postId = await runPost(pinned(pinnedId), locale);
 
       expect(postId).toBe(expected);
-    },
-  );
+    });
 
-  it.each([
-    [
-      'as existing when it has no version in the request language',
-      pinned(MOCK_ONLY_EN_POST_ID),
-      true,
-    ],
-    [
-      'as absent when the reference points at a missing document',
-      pinned(MOCK_DELETED_POST_ID),
-      false,
-    ],
-    ['as absent in newest-featured mode', {}, false],
-  ])('reports the pinned post %s', async (_, module, expected) => {
-    const { hasPinnedPost } = await runRaw(module, NL);
+    it.each([
+      [EN, MOCK_ONLY_EN_POST_ID],
+      [NL, MOCK_DESIGN_NL_POST_ID],
+    ])(
+      'falls back to the newest featured post in %s',
+      async (locale, expected) => {
+        const postId = await runPost({}, locale);
 
-    expect(hasPinnedPost).toBe(expected);
+        expect(postId).toBe(expected);
+      },
+    );
+
+    it.each([
+      [
+        'as existing when it has no version in the request language',
+        pinned(MOCK_ONLY_EN_POST_ID),
+        true,
+      ],
+      [
+        'as absent when the reference points at a missing document',
+        pinned(MOCK_DELETED_POST_ID),
+        false,
+      ],
+      ['as absent in newest-featured mode', {}, false],
+    ])('reports the pinned post %s', async (_, module, expected) => {
+      const { hasPinnedPost } = await runRaw(module, NL);
+
+      expect(hasPinnedPost).toBe(expected);
+    });
   });
 });

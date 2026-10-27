@@ -57,118 +57,118 @@ describe('tagIndexPageQuery', () => {
   it('parses null as no matching page_tagIndex document', () => {
     expect(tagIndexPageQuery.parse(null)).toBeNull();
   });
-});
 
-describe('tagIndexPageQuery template layout', () => {
-  const dataset = mockTemplateLayoutDocuments({ _type: 'template_tagIndex' });
+  describe('template layout', () => {
+    const dataset = mockTemplateLayoutDocuments({ _type: 'template_tagIndex' });
 
-  it('resolves the hero and modules of the template the tag index page references', async () => {
-    const page = mockTemplatedPageDocument({
-      _type: 'page_tagIndex',
-      template: MOCK_TEMPLATE_REFERENCE,
+    it('resolves the hero and modules of the template the tag index page references', async () => {
+      const page = mockTemplatedPageDocument({
+        _type: 'page_tagIndex',
+        template: MOCK_TEMPLATE_REFERENCE,
+      });
+
+      const result = await evaluateGroqInLocale(tagIndexPageQuery.query, [
+        page,
+        ...dataset,
+      ]);
+
+      expect(result).toHaveProperty('hero', mockRawHeroRef());
+      expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
     });
 
-    const result = await evaluateGroqInLocale(tagIndexPageQuery.query, [
-      page,
-      ...dataset,
-    ]);
+    it('resolves no hero and no modules for a tag index page without a template', async () => {
+      const page = mockTemplatedPageDocument({ _type: 'page_tagIndex' });
 
-    expect(result).toHaveProperty('hero', mockRawHeroRef());
-    expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
+      const result = await evaluateGroqInLocale(tagIndexPageQuery.query, [
+        page,
+        ...dataset,
+      ]);
+
+      expect(result).toHaveProperty('hero', null);
+      expect(result).toHaveProperty('modules', null);
+    });
   });
 
-  it('resolves no hero and no modules for a tag index page without a template', async () => {
-    const page = mockTemplatedPageDocument({ _type: 'page_tagIndex' });
-
-    const result = await evaluateGroqInLocale(tagIndexPageQuery.query, [
-      page,
-      ...dataset,
-    ]);
-
-    expect(result).toHaveProperty('hero', null);
-    expect(result).toHaveProperty('modules', null);
-  });
-});
-
-describe('tagIndexPageQuery language scoping', () => {
-  const dataset = [
-    mockIndexPageDocument({
-      _type: 'page_tagIndex',
-      heading: MOCK_EN_HEADING,
-      language: EN,
-    }),
-    mockIndexPageDocument({
-      _type: 'page_tagIndex',
-      heading: MOCK_NL_HEADING,
-      language: NL,
-    }),
-  ];
-
-  it.each([
-    [EN, MOCK_EN_HEADING],
-    [NL, MOCK_NL_HEADING],
-  ])(
-    'resolves the %s tag index page for its own language',
-    async (locale, heading) => {
-      const result = await evaluateGroqInLocale(
-        tagIndexPageQuery.query,
-        dataset,
-        locale,
-      );
-
-      expect(result).toHaveProperty(HEADING_TEXT_PATH, heading);
-    },
-  );
-
-  it('resolves nothing for a language without a tag index page', async () => {
-    const result = await evaluateGroqInLocale(
-      tagIndexPageQuery.query,
-      dataset,
-      FR,
-    );
-
-    expect(result).toBeNull();
-  });
-
-  describe('a tag index page with no language', () => {
-    const legacy = [
+  describe('language scoping', () => {
+    const dataset = [
       mockIndexPageDocument({
         _type: 'page_tagIndex',
         heading: MOCK_EN_HEADING,
+        language: EN,
+      }),
+      mockIndexPageDocument({
+        _type: 'page_tagIndex',
+        heading: MOCK_NL_HEADING,
+        language: NL,
       }),
     ];
 
-    it('resolves for the default language', async () => {
+    it.each([
+      [EN, MOCK_EN_HEADING],
+      [NL, MOCK_NL_HEADING],
+    ])(
+      'resolves the %s tag index page for its own language',
+      async (locale, heading) => {
+        const result = await evaluateGroqInLocale(
+          tagIndexPageQuery.query,
+          dataset,
+          locale,
+        );
+
+        expect(result).toHaveProperty(HEADING_TEXT_PATH, heading);
+      },
+    );
+
+    it('resolves nothing for a language without a tag index page', async () => {
       const result = await evaluateGroqInLocale(
         tagIndexPageQuery.query,
-        legacy,
-        EN,
-      );
-
-      expect(result).toHaveProperty(HEADING_TEXT_PATH, MOCK_EN_HEADING);
-    });
-
-    it('resolves nothing for any other language', async () => {
-      const result = await evaluateGroqInLocale(
-        tagIndexPageQuery.query,
-        legacy,
-        NL,
+        dataset,
+        FR,
       );
 
       expect(result).toBeNull();
     });
-  });
 
-  it('lists the language of every tag index page as its translations', async () => {
-    const result = await evaluateGroqInLocale(
-      tagIndexPageQuery.query,
-      dataset,
-      NL,
-    );
+    describe('a tag index page with no language', () => {
+      const legacy = [
+        mockIndexPageDocument({
+          _type: 'page_tagIndex',
+          heading: MOCK_EN_HEADING,
+        }),
+      ];
 
-    expect(result).toHaveProperty('translations', [
-      { language: EN },
-      { language: NL },
-    ]);
+      it('resolves for the default language', async () => {
+        const result = await evaluateGroqInLocale(
+          tagIndexPageQuery.query,
+          legacy,
+          EN,
+        );
+
+        expect(result).toHaveProperty(HEADING_TEXT_PATH, MOCK_EN_HEADING);
+      });
+
+      it('resolves nothing for any other language', async () => {
+        const result = await evaluateGroqInLocale(
+          tagIndexPageQuery.query,
+          legacy,
+          NL,
+        );
+
+        expect(result).toBeNull();
+      });
+    });
+
+    it('lists the language of every tag index page as its translations', async () => {
+      const result = await evaluateGroqInLocale(
+        tagIndexPageQuery.query,
+        dataset,
+        NL,
+      );
+
+      expect(result).toHaveProperty('translations', [
+        { language: EN },
+        { language: NL },
+      ]);
+    });
   });
 });

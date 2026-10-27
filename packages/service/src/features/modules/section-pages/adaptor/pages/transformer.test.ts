@@ -2,7 +2,10 @@ import {
   MOCK_SECTION_PAGES_PARENT_PATH,
   mockRawSectionPage,
 } from '@blog/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import {
+  mockRawHeadingBlock,
+  mockSanityImageView,
+} from '@blog/service/testing/shared/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { toSectionPageCards } from './transformer';
@@ -30,15 +33,14 @@ describe(toSectionPageCards, () => {
       ],
       MOCK_SECTION_PAGES_PARENT_PATH,
     );
-    const { image, ...fields } = card ?? {};
 
-    expect(fields).toEqual({
+    expect(card).toEqual({
       id: MOCK_PAGE_ID,
       title: MOCK_TITLE,
       summary: MOCK_SUMMARY,
+      image: mockSanityImageView(),
       path: `${MOCK_SECTION_PAGES_PARENT_PATH}/${MOCK_PAGE_SLUG}`,
     });
-    expect(image).toBeDefined();
   });
 
   it('keeps the children in the order they were returned', () => {

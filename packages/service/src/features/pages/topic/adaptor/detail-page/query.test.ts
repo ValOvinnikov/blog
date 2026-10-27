@@ -61,77 +61,77 @@ describe('topicPageQuery', () => {
   it('parses null as no matching page_topic document', () => {
     expect(topicPageQuery.parse(null)).toBeNull();
   });
-});
 
-describe('topicPageQuery template layout', () => {
-  const dataset = mockTemplateLayoutDocuments({ _type: 'template_topic' });
-  const pageFields = { slug: MOCK_PAGE_SLUG, language: EN };
+  describe('template layout', () => {
+    const dataset = mockTemplateLayoutDocuments({ _type: 'template_topic' });
+    const pageFields = { slug: MOCK_PAGE_SLUG, language: EN };
 
-  function run(data: unknown[]): Promise<unknown> {
-    return evaluateGroqExpression(topicPageQuery.query, data, null, {
+    function run(data: unknown[]): Promise<unknown> {
+      return evaluateGroqExpression(topicPageQuery.query, data, null, {
+        slug: MOCK_PAGE_SLUG,
+        locale: EN,
+      });
+    }
+
+    it('resolves the hero and modules of the template the topic page references', async () => {
+      const page = mockTemplatedPageDocument({
+        ...mockSlugPageDocument({ _type: 'page_topic', ...pageFields }),
+        template: MOCK_TEMPLATE_REFERENCE,
+      });
+
+      const result = await run([page, ...dataset]);
+
+      expect(result).toHaveProperty('hero', mockRawHeroRef());
+      expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
+    });
+
+    it('resolves no hero and no modules for a topic page without a template', async () => {
+      const page = mockSlugPageDocument({ _type: 'page_topic', ...pageFields });
+
+      const result = await run([page, ...dataset]);
+
+      expect(result).toHaveProperty('hero', null);
+      expect(result).toHaveProperty('modules', null);
+    });
+  });
+
+  describe('language scoping', () => {
+    const dataset = mockTranslatedSlugPageDocuments({
+      _type: 'page_topic',
       slug: MOCK_PAGE_SLUG,
-      locale: EN,
-    });
-  }
-
-  it('resolves the hero and modules of the template the topic page references', async () => {
-    const page = mockTemplatedPageDocument({
-      ...mockSlugPageDocument({ _type: 'page_topic', ...pageFields }),
-      template: MOCK_TEMPLATE_REFERENCE,
+      headings: { [EN]: MOCK_EN_HEADING, [NL]: MOCK_NL_HEADING },
     });
 
-    const result = await run([page, ...dataset]);
+    function run(locale: string): Promise<unknown> {
+      return evaluateGroqExpression(topicPageQuery.query, dataset, null, {
+        slug: MOCK_PAGE_SLUG,
+        locale,
+        defaultLocale: EN,
+      });
+    }
 
-    expect(result).toHaveProperty('hero', mockRawHeroRef());
-    expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
-  });
+    it.each([
+      [EN, MOCK_EN_HEADING],
+      [NL, MOCK_NL_HEADING],
+    ])('resolves the %s page for the same slug', async (locale, heading) => {
+      const result = await run(locale);
 
-  it('resolves no hero and no modules for a topic page without a template', async () => {
-    const page = mockSlugPageDocument({ _type: 'page_topic', ...pageFields });
-
-    const result = await run([page, ...dataset]);
-
-    expect(result).toHaveProperty('hero', null);
-    expect(result).toHaveProperty('modules', null);
-  });
-});
-
-describe('topicPageQuery language scoping', () => {
-  const dataset = mockTranslatedSlugPageDocuments({
-    _type: 'page_topic',
-    slug: MOCK_PAGE_SLUG,
-    headings: { [EN]: MOCK_EN_HEADING, [NL]: MOCK_NL_HEADING },
-  });
-
-  function run(locale: string): Promise<unknown> {
-    return evaluateGroqExpression(topicPageQuery.query, dataset, null, {
-      slug: MOCK_PAGE_SLUG,
-      locale,
-      defaultLocale: EN,
+      expect(result).toHaveProperty('headingBlock.heading', heading);
     });
-  }
 
-  it.each([
-    [EN, MOCK_EN_HEADING],
-    [NL, MOCK_NL_HEADING],
-  ])('resolves the %s page for the same slug', async (locale, heading) => {
-    const result = await run(locale);
+    it('resolves nothing for a language the page is not authored in', async () => {
+      const result = await run(FR);
 
-    expect(result).toHaveProperty('headingBlock.heading', heading);
-  });
+      expect(result).toBeNull();
+    });
 
-  it('resolves nothing for a language the page is not authored in', async () => {
-    const result = await run(FR);
+    it('returns the linked translations with their languages and slugs', async () => {
+      const result = await run(NL);
 
-    expect(result).toBeNull();
-  });
-
-  it('returns the linked translations with their languages and slugs', async () => {
-    const result = await run(NL);
-
-    expect(result).toHaveProperty('translations', [
-      { language: EN, slug: MOCK_PAGE_SLUG },
-      { language: NL, slug: MOCK_PAGE_SLUG },
-    ]);
+      expect(result).toHaveProperty('translations', [
+        { language: EN, slug: MOCK_PAGE_SLUG },
+        { language: NL, slug: MOCK_PAGE_SLUG },
+      ]);
+    });
   });
 });
