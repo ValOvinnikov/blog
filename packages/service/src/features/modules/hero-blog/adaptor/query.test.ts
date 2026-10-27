@@ -67,7 +67,11 @@ async function evaluateHero(
 ) {
   return evaluateGroqExpression(
     heroBlogModuleQuery.query,
-    [{ ...MOCK_HERO_DOCUMENT, ...module }, MOCK_IMAGE_ASSET_DOCUMENT, ...dataset],
+    [
+      { ...MOCK_HERO_DOCUMENT, ...module },
+      MOCK_IMAGE_ASSET_DOCUMENT,
+      ...dataset,
+    ],
     undefined,
     { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -114,11 +118,10 @@ describe('heroBlogModuleQuery', () => {
 
 describe('heroBlogModuleQuery language scoping', () => {
   async function runRaw(module: Record<string, unknown>, locale: string) {
-    return (await evaluateHero(
-      module,
-      locale,
-      MOCK_PINNED_POST_DOCUMENTS,
-    )) as { post: { _id: string } | null; hasPinnedPost: boolean };
+    return (await evaluateHero(module, locale, MOCK_PINNED_POST_DOCUMENTS)) as {
+      post: { _id: string } | null;
+      hasPinnedPost: boolean;
+    };
   }
 
   async function runPost(module: Record<string, unknown>, locale: string) {

@@ -26,7 +26,7 @@ import { toHeroProfileModule, type TRawHeroProfileModule } from './transformer';
 
 faker.seed(6014);
 
-type TRawProfileAuthor =TRawHeroProfileModule['author'];
+type TRawProfileAuthor = TRawHeroProfileModule['author'];
 
 const MOCK_AUTHOR_BIO: TRawProfileAuthor['bio'] = [
   { _type: 'block', _key: MOCK_BIO_BLOCK_KEY, markDefs: null },
@@ -221,7 +221,10 @@ describe(toHeroProfileModule, () => {
     expect(hero.socialLinks).toEqual([
       {
         platform: SOCIAL_PLATFORMS.GITHUB,
-        link: mockLinkView({ label: MOCK_GITHUB_LINK.label, href: MOCK_GITHUB_LINK.url }),
+        link: mockLinkView({
+          label: MOCK_GITHUB_LINK.label,
+          href: MOCK_GITHUB_LINK.url,
+        }),
       },
     ]);
   });

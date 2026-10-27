@@ -178,7 +178,10 @@ describe(toHeroBlogModule, () => {
     expect(secondary).toEqual({
       variant: CTA_ACTION_VARIANT.SECONDARY,
       appearance: undefined,
-      link: mockLinkView({ label: MOCK_SECONDARY_LABEL, href: routes.blogIndex() }),
+      link: mockLinkView({
+        label: MOCK_SECONDARY_LABEL,
+        href: routes.blogIndex(),
+      }),
     });
   });
 
