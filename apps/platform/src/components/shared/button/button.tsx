@@ -2,7 +2,7 @@ import { ICONS, SIZE } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
-import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
+import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
 
@@ -25,6 +25,7 @@ export type TButtonProps = {
   'aria-label'?: AriaAttributes['aria-label'];
   title?: string;
   hasArrow?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 };
 
 export const Button = ({
@@ -46,6 +47,7 @@ export const Button = ({
   'aria-label': ariaLabel,
   title,
   hasArrow,
+  ref,
 }: TButtonProps) => {
   const { root, srOnlyStatus } = buttonVariants({ variant, size });
   const hasPendingLabel = !isUndefined(pendingLabel);
@@ -65,6 +67,7 @@ export const Button = ({
   return (
     <>
       <button
+        ref={ref}
         id={id}
         type={type}
         disabled={isDisabled || isPending}
