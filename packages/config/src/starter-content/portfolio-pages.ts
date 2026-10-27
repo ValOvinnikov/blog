@@ -1,5 +1,4 @@
 import type {
-  Module_content,
   Module_sectionPages,
   Page_landing,
   Template_landing,
@@ -17,13 +16,13 @@ import type {
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import {
   keyedReference,
-  localizedArticleText,
   moduleHeadingBlock,
   pageHeadingBlock,
   reference,
   seo,
   slug,
 } from './starter-fields';
+import { buildContentModule } from './starter-modules';
 
 type TProjectCopy = TStarterCopy['portfolio']['projects'][number];
 
@@ -39,13 +38,12 @@ function buildProject(
   const bodyId = `${pageId}Body`;
 
   return [
-    {
-      _id: bodyId,
-      _type: 'module_content',
+    buildContentModule({
+      id: bodyId,
       title: `${project.title} Body`,
-      brandVariant: BRAND_VARIANT.PRIMARY,
-      body: localizedArticleText(locale, project.body),
-    } satisfies TStarterModule<Module_content>,
+      locale,
+      body: project.body,
+    }),
     {
       _id: templateId,
       _type: 'template_landing',

@@ -59,6 +59,7 @@ describe(applySiteTemplate, () => {
   it.each([
     [SITE_TYPE.BLOG, SITE_TYPE.BLOG, PRESET_ID.EDITORIAL],
     [SITE_TYPE.PORTFOLIO, SITE_TYPE.PORTFOLIO, PRESET_ID.EDITORIAL],
+    [SITE_TYPE.PERSONAL, SITE_TYPE.PERSONAL, PRESET_ID.EDITORIAL],
     [null, SITE_TYPE.BLANK, PRESET_ID.CONSOLE],
   ])(
     'seeds site type %s as %s with the %s preset and the template version',
