@@ -1,5 +1,6 @@
 import { MagicLinkSendLimitedError } from '@blog/auth/providers/magic-link/magic-link-send-limited-error/magic-link-send-limited-error';
 import {
+  MOCK_COMMA_NAME,
   MOCK_DB_ERROR_MESSAGE,
   MOCK_FRENCH_PATH,
   MOCK_FROM_ADDRESS,
@@ -448,7 +449,7 @@ describe(buildMagicLinkProvider, () => {
       await sendVerificationRequestFor(provider);
 
       const { from, replyTo } = sentEmail();
-      expect(from).toBe(`${MOCK_SENDER_NAME} <${MOCK_FROM_EMAIL}>`);
+      expect(from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_FROM_EMAIL}>`);
       expect(replyTo).toBe(MOCK_REPLY_TO);
     });
 
@@ -473,6 +474,13 @@ describe(buildMagicLinkProvider, () => {
     it.each([
       ['has no sender name', () => {}],
       [
+        'has a sender name of only spaces',
+        () =>
+          getEmailConfigMock.mockResolvedValue(
+            mockEmailConfig({ senderName: '   ' }),
+          ),
+      ],
+      [
         'email config lookup fails',
         () =>
           getEmailConfigMock.mockRejectedValue(
@@ -487,10 +495,22 @@ describe(buildMagicLinkProvider, () => {
         await sendVerificationRequestFor(provider);
 
         const { from, replyTo } = sentEmail();
-        expect(from).toBe(`${MOCK_TENANT_NAME} <${MOCK_FROM_EMAIL}>`);
+        expect(from).toBe(`"${MOCK_TENANT_NAME}" <${MOCK_FROM_EMAIL}>`);
         expect(replyTo).toBeUndefined();
       },
     );
+
+    it("keeps a comma in the site's name inside the From display name", async () => {
+      getTenantByDomainMock.mockResolvedValue(
+        mockTenant({ name: MOCK_COMMA_NAME }),
+      );
+
+      await sendVerificationRequestFor(provider);
+
+      expect(sentEmail().from).toBe(
+        `"${MOCK_COMMA_NAME}" <${MOCK_FROM_EMAIL}>`,
+      );
+    });
 
     it('still delivers with product defaults when the email-template lookup fails', async () => {
       getEmailConfigMock.mockResolvedValue(
@@ -501,7 +521,7 @@ describe(buildMagicLinkProvider, () => {
       await sendVerificationRequestFor(provider);
 
       const { from, subject } = sentEmail();
-      expect(from).toBe(`${MOCK_SENDER_NAME} <${MOCK_FROM_EMAIL}>`);
+      expect(from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_FROM_EMAIL}>`);
       expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
     });
 
