@@ -49,6 +49,12 @@ not to test", and treats "nothing to add" as a complete outcome.
   const TAGGED_EMAIL = 'reader+news@example.com'; // ❌ in a test file
   ```
 
+  A fake value is one invented to stand in for runtime data — an id (a
+  Sanity document id included), a name, an email, a URL, copy fed in as a
+  prop. A value that mirrors the code is not fake and takes no prefix: a
+  `*_TEST_ID` matching the component's `data-testid`, a real migration
+  filename, real copy the component renders.
+
   Render and setup helpers (`customRender`, `renderElement`,
   `renderWithIntl`) are not fixtures and keep their names. Existing `make…`,
   `get…` and `test…` fixtures are renamed when their workspace's rename
@@ -73,7 +79,9 @@ not to test", and treats "nothing to add" as a complete outcome.
   A test file that uses it calls `faker.seed(<number>)` at module top, so
   every run draws the same values; stories may leave it unseeded. A value the
   code reads by meaning — a status, locale, route or `_type` — is its const,
-  never faker.
+  never faker. An id compared only for equality, a Sanity document id
+  included, is still `faker.string.uuid()`; an id whose shape the code reads
+  (a `drafts.` prefix, a fixed singleton id) is its const.
 - **No `@faker-js/faker` in the workspace's `package.json` → ask before
   adding it.** Check the workspace's own `package.json`, not the root's. If
   the dependency is missing, put the question to the user — a subagent reports
@@ -88,6 +96,9 @@ not to test", and treats "nothing to add" as a complete outcome.
   touched test files too.
   Using a const is not asserting it: `expect(HTTP_STATUS.NOT_FOUND).toBe(404)`
   still falls under "What not to test".
+  `@blog/insight`'s own tests are exempt from the `<DOMAIN>_LOG` rule: the
+  event names they hand the logger are arbitrary inputs, held in `MOCK_`
+  consts.
 - **Run:** `pnpm test`, `pnpm --filter <pkg> test`, `pnpm test:watch`. Run
   `pnpm --filter <pkg> type-check` after each group of files and the full
   suite once, when implementation is complete.
@@ -183,13 +194,18 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   ```
 
   A string is right only when no single symbol names the suite — a registry,
-  a route module, a group of behaviours. Existing string titles migrate when
+  a route module, a group of behaviours, a type alias (it has no runtime
+  value; a suite named for one usually means describe the function under
+  test instead). Existing string titles migrate when
   the file is touched, never in a mass rename; a bare symbol on a component
   is fixed whenever the file is touched and never written new.
 
 - **Deterministic:** no real dates, network or unseeded randomness — inject
   or freeze. Seeded `faker` ("Where tests live") is the fake-data source, not
-  an exception.
+  an exception. No real timers either, a pure utility's test included:
+  `vi.useFakeTimers()` and advance them. A `console.*` spy is allowed only
+  where the console line is the behaviour asserted (a Studio migration's
+  warning); one that only silences output is restored in `afterEach`.
 - **No nested `expect` — assert exact values.** Never an asymmetric matcher
   inside an assertion: `expect.objectContaining`, `expect.any`,
   `expect.anything`, `expect.stringContaining`, `expect.arrayContaining` or
@@ -241,11 +257,15 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
     `customRenderAsync(Page, {…})`, then `await setup(…)` — or
     `await expect(setup({…})).rejects.toThrow(…)` for a page that throws. In
     `apps/web`, a tree that nests further async Server Components needs
-    `customRenderServerAsync`.
+    `customRenderServerAsync`. Never call `await Page({…})` and inspect the
+    returned element.
   - **Ad-hoc JSX** (compound children, a polymorphic `as`, a pre-built
     element) → `renderElement(<…>)`, or `renderWithIntl(<…>)` in
     `apps/platform`.
-  - **A platform hook that reads its providers** → `renderHookWithIntl`.
+  - **A platform hook that reads its providers** → `renderHookWithIntl`; a
+    hook that reads none → plain `renderHook`. A hook test calls a
+    `result.current` function inside `act(() => …)` — the one place `act`
+    is written by hand, since `userEvent` cannot reach a hook.
   - **A platform component that reads `useSettingsFormState()`** →
     `customRenderInSettingsForm` (`@platform/testing/render-in-settings-form`,
     which wraps `SettingsFormProvider`) — never a stand-in provider written
@@ -331,6 +351,16 @@ never reads state, props, handlers or markup shape.
   child of its frame), on that single line, with the reason in the `it`
   title.
 
+  A React element-tree walk (`ui.props.children`, any read of a returned
+  element's props) is the same banned walk one level up: render the element
+  and query the result. The one exception is a root layout test: a layout
+  that returns `<html>` cannot mount inside jsdom's container, so it reads
+  the returned element's props under an `eslint-disable-next-line
+testing-library/no-node-access` that gives this reason.
+
+  A component that renders nothing is the one sanctioned use of `container`:
+  `const { container } = setup(…); expect(container).toBeEmptyDOMElement();`.
+
 - **Presence is `.toBeVisible()`; absence is `screen.queryBy*` +
   `.not.toBeInTheDocument()`.** Never `.toBeInTheDocument()` for presence
   (hidden still passes), never `getBy*` for absence (it throws first).
@@ -385,11 +415,14 @@ never reads state, props, handlers or markup shape.
 
 - **Interaction is `userEvent`, set up in `beforeEach`** (`user =
 userEvent.setup()`), then `await user.click(…)`, `user.type(…)`,
-  `user.keyboard('{Escape}')`. `fireEvent` only for an event `userEvent`
-  cannot produce, such as an outside `mousedown` on `document.body`; a
-  `fireEvent.click` is a finding.
-- **Async is `findBy*` or `waitFor`**, never a manual `act` or a
-  `setTimeout`. An `act` warning fails the test (each app's setup turns it
+  `user.keyboard('{Escape}')`. Never the static API (`userEvent.click(…)`).
+  A keydown listener on `document` is reached with `user.keyboard`, which
+  bubbles from the focused element or `body`. `fireEvent` only for an event
+  `userEvent` cannot produce, such as an outside `mousedown` on
+  `document.body`; a `fireEvent.click` is a finding.
+- **Async is `findBy*` or `waitFor`**, never a manual `act` (a hook test's
+  `result.current` call is the one exception, "Rendering and arrangement")
+  or a `setTimeout`. An `act` warning fails the test (each app's setup turns it
   into an error). Its usual causes:
   - a missing `await` on a `userEvent` call, or no `findBy*`/`waitFor` for an
     update a promise triggers after the last step;
@@ -404,7 +437,7 @@ userEvent.setup()`), then `await user.click(…)`, `user.type(…)`,
     A test double that fires callbacks itself (a fake observer) wraps them in
     `act` inside the double, never in the test body.
 - **Each case calls `setup(overrides)` and discards its return** — there is
-  no `container` to reach into.
+  no `container` to reach into, except to assert an empty render.
 - **Assert the observable the prop changes** — `aria-current`, `disabled`, a
   rendered element, visible text. A prop whose only effect is styling has no
   test surface ("What not to test"). Never a snapshot.
@@ -480,7 +513,7 @@ and our context providers render for real. This holds in both apps.
   `vi.mocked(Carousel).mock.calls.at(-1)[0]` tests wiring, not the result.
   Asserting an edge was called (`expect(getCta).toHaveBeenCalledWith('cta-1',
 tenant)`) is fine: that call is the contract with the outside.
-- **Two exceptions, both thin dispatchers whose children have their own
+- **Three exceptions, all thin dispatchers whose children have their own
   tests:**
   - **A per-page module renderer** (`apps/web`'s `*-module-renderer.tsx`,
     which maps `_type` to a module and calls `renderModules` from
@@ -489,6 +522,9 @@ tenant)`) is fine: that call is the contract with the outside.
   - **A route file** (`src/app/**/page.tsx`, `not-found.tsx`, either app) may
     stub the page component it renders and assert the params and props it
     hands over.
+  - **A Workflow orchestrator** (`apps/worker`'s `src/workflows/`) may stub
+    the units it runs and assert their order and how it handles each
+    outcome.
 - **A shared edge fake lives in `__mocks__/` beside the module it
   replaces** (`server/tenant/tenant-base-url/__mocks__/tenant-base-url.ts`;
   `apps/platform`'s `server/auth/__mocks__/auth.ts`). Where one exists, a
@@ -527,7 +563,11 @@ tenant)`) is fine: that call is the contract with the outside.
   contract. **If the expected value is a literal copied out of the file under
   test, delete the test.** Typegen, `type-check` and the Studio guard the
   shapes and the diff reviews the copy. If a field having _some_ description
-  matters, assert it is non-empty, never its words.
+  matters, assert it is non-empty, never its words. Fixed copy the code
+  outputs (an email subject, a platform message) is asserted against the
+  exported const or i18n message it comes from, never a retyped literal. A
+  sync guard comparing two sources that must agree (TS ramps against the CSS
+  that mirrors them) copies no literal and is allowed.
 - **A Studio schema definition gets no test at all.** Everything under
   `packages/studio/src/schema-types/{documents,objects,modules,fields}/` is
   declaration, its logic included: `required()`, a min/max, a `rule.custom`
@@ -553,8 +593,10 @@ tenant)`) is fine: that call is the contract with the outside.
   `no-class-assertions` rule (`configs/eslint/base.js`)
   fails `toHaveClass`, `.className`/`.classList` reads and `class`-attribute
   assertions in every `*.test.{ts,tsx}`, with no suppression baseline left.
-- **No comments in a test file** other than the `@vitest-environment`
-  docblock ("Per-package setup"). A "why this case exists" belongs in the
+- **No comments in a test file** other than directives: the
+  `@vitest-environment` docblock ("Per-package setup"), the sanctioned
+  `eslint-disable-next-line`, and `// @ts-expect-error -- <reason>` where a
+  case passes deliberately invalid input (never `@ts-ignore`). A "why this case exists" belongs in the
   `it` title, a "why this mock" in the helper's name. The one-line-gotcha
   exception of the general comment rule does not apply: a test with a gotcha
   worth a sentence has the wrong title or fixture. Every other added comment
@@ -570,7 +612,9 @@ tenant)`) is fine: that call is the contract with the outside.
 Test files carry no size budget, so this pass is what keeps them small.
 Every test file a diff creates or edits is pruned in that diff — the whole
 file, not only the cases the change adds. A test file the diff does not touch
-is left alone; this is never a sweep.
+is left alone; this is never a sweep. A cleanup ticket that names test
+files in its scope touches each of them, so every touch-time rule (pruning,
+title shortening, suite renames) applies to them in full.
 
 - **A duplicate is deleted** — a test asserting the same behaviour as
   another test in the file, however its arrangement differs.
