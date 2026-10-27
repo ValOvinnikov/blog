@@ -1,13 +1,17 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   type TMaybeNull,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { AccountRow, AuthMenu } from '@web/components/shared/auth-menu';
+import { AccountMenuGroup, AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
+import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import {
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
@@ -74,11 +78,35 @@ const headerControls = {
       <ThemeToggleButton />
     </>
   ),
-  drawerActions: <AccountRow />,
-  actions: <AuthMenu oauthProviderIds={['github']} />,
+  actions: (
+    <AuthMenu
+      oauthProviderIds={['github']}
+      accountControl={MOCK_ACCOUNT_CONTROL}
+    />
+  ),
+};
+
+const ACCOUNT_IN_MENU = {
+  ...MOCK_ACCOUNT_CONTROL,
+  panelStyle: ACCOUNT_PANEL_STYLE.HUB,
+  phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+};
+
+const headerControlsWithAccountInMenu = {
+  ...headerControls,
+  drawerActions: (
+    <AccountMenuGroup
+      oauthProviderIds={['github']}
+      panelStyle={ACCOUNT_IN_MENU.panelStyle}
+    />
+  ),
+  actions: (
+    <AuthMenu oauthProviderIds={['github']} accountControl={ACCOUNT_IN_MENU} />
+  ),
 };
 
 const SESSION_EXPIRES = '2099-01-01';
+const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 
 const withSession = (
   session: TMaybeNull<Session>,
@@ -131,7 +159,7 @@ export const AccountMenuLongEmail: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
-      await canvas.findByRole('button', { name: 'Account menu' }),
+      await canvas.findByRole('button', { name: 'Account' }),
     );
   },
 };
@@ -183,11 +211,61 @@ export const MobileSignInSheetOpen: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
+      await canvas.findByRole('button', { name: 'Sign in' }),
+    );
+  },
+};
+
+export const HubPanelFromCircle: TStory = {
+  globals: { viewport: 'desktop' },
+  decorators: withSignedInSession,
+  args: {
+    ...headerControls,
+    actions: (
+      <AuthMenu
+        oauthProviderIds={['github']}
+        accountControl={{
+          ...MOCK_ACCOUNT_CONTROL,
+          buttonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+          panelStyle: ACCOUNT_PANEL_STYLE.HUB,
+        }}
+      />
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Account' }),
+    );
+  },
+};
+
+export const MobileAccountInMenu: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedInSession,
+  args: headerControlsWithAccountInMenu,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
       canvas.getByRole('button', { name: /Toggle navigation menu/ }),
     );
-    const drawerActions = await canvas.findByTestId(
-      'primary-navigation-drawer-actions',
+    const drawerActions = await canvas.findByTestId(DRAWER_ACTIONS_TEST_ID);
+    await userEvent.click(
+      within(drawerActions).getByRole('button', { name: 'Account' }),
     );
+  },
+};
+
+export const MobileSignInInMenu: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: headerControlsWithAccountInMenu,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
+    );
+    const drawerActions = await canvas.findByTestId(DRAWER_ACTIONS_TEST_ID);
     await userEvent.click(
       within(drawerActions).getByRole('button', { name: 'Sign in' }),
     );

@@ -1,13 +1,22 @@
-import { HTTP_STATUS, SITE_MESSAGES } from '@blog/config';
+import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
+  HTTP_STATUS,
+  MAGIC_LINK_SIGN_IN_CODE,
+  SITE_MESSAGES,
+} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
 import { customRender, screen, within } from '@web/testing/custom-render';
+import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
 
 import { AuthMenu } from './auth-menu';
 
-faker.seed(6007);
+faker.seed(6061);
 
 const { useSessionMock, signInMock, signOutMock } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),
@@ -24,16 +33,21 @@ vi.mock('next-auth/react', () => ({
 const PROVIDER = { GITHUB: 'github', GOOGLE: 'google' } as const;
 const {
   signIn: SIGN_IN_LABEL,
+  accountHeading: ACCOUNT_LABEL,
   accountMenuAriaLabel: ACCOUNT_MENU_LABEL,
   signOut: SIGN_OUT_LABEL,
-  continueWithGithub: GITHUB_ITEM,
-  continueWithGoogle: GOOGLE_ITEM,
-  continueWithEmail: EMAIL_ITEM,
+  continueWithGithub: GITHUB_BUTTON,
+  continueWithGoogle: GOOGLE_BUTTON,
+  continuingWithGithub: GITHUB_PENDING,
   emailAriaLabel: EMAIL_FIELD,
-  sendLink: SEND_LINK_LABEL,
-  checkYourInbox: CHECK_YOUR_INBOX,
+  sendSignInLink: SEND_LINK_LABEL,
+  sending: SENDING_LABEL,
+  sentTitle: SENT_TITLE,
+  useDifferentEmail: USE_DIFFERENT_EMAIL,
   emailError: EMAIL_ERROR,
+  sendLimited: SEND_LIMITED,
   oauthError: OAUTH_ERROR,
+  myBookmarksDescription: BOOKMARKS_DESCRIPTION,
 } = SITE_MESSAGES.authMenu;
 
 const MOCK_NAME = faker.person.fullName();
@@ -41,9 +55,14 @@ const MOCK_EMAIL = faker.internet.email();
 const MOCK_READER_EMAIL = faker.internet.email();
 const MOCK_SESSION_EXPIRES = '2099-01-01T00:00:00.000Z';
 const MOCK_OAUTH_ERROR = faker.string.alpha(12);
+const CIRCLE_IN_BAR = {
+  ...MOCK_ACCOUNT_CONTROL,
+  buttonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+};
 
 const setup = customRender(AuthMenu, {
   oauthProviderIds: [PROVIDER.GITHUB, PROVIDER.GOOGLE],
+  accountControl: CIRCLE_IN_BAR,
 });
 
 const setLocationSearch = (search: string) => {
@@ -56,27 +75,50 @@ const hasSignedInHint = () =>
 const mockSession = (status: string, data: object | null = null) =>
   useSessionMock.mockReturnValue({ data, status });
 
-const mockSignInResult = (ok: boolean, httpStatus: number) =>
+const mockSignedIn = () =>
+  mockSession(SESSION_STATUS.AUTHENTICATED, {
+    user: { name: MOCK_NAME, email: MOCK_EMAIL, image: null },
+    expires: MOCK_SESSION_EXPIRES,
+  });
+
+const mockSignInResult = (ok: boolean, code?: string) =>
   signInMock.mockResolvedValue({
     ok,
     error: ok ? undefined : 'EmailSignin',
-    code: undefined,
-    status: httpStatus,
+    code,
+    status: ok ? HTTP_STATUS.OK : HTTP_STATUS.UNAUTHORIZED,
     url: null,
   });
+
+const BUTTON_AND_PANEL_COMBINATIONS = Object.values(
+  ACCOUNT_BUTTON_STYLE,
+).flatMap((buttonStyle) =>
+  Object.values(ACCOUNT_PANEL_STYLE).map((panelStyle) => ({
+    buttonStyle,
+    panelStyle,
+  })),
+);
 
 describe(`<${AuthMenu.name}/>`, () => {
   let user: UserEvent;
 
-  const openSignInMenu = async () => {
+  const openSignInPanel = async () => {
     const trigger = screen.getByRole('button', { name: SIGN_IN_LABEL });
     await user.click(trigger);
+    return screen.getByRole('dialog', { name: SIGN_IN_LABEL });
   };
 
-  const openEmailForm = async () => {
-    await openSignInMenu();
-    const emailItem = screen.getByRole('menuitem', { name: EMAIL_ITEM });
-    await user.click(emailItem);
+  const sendLink = async () => {
+    const panel = await openSignInPanel();
+    const emailField = within(panel).getByRole('textbox', {
+      name: EMAIL_FIELD,
+    });
+    await user.type(emailField, MOCK_READER_EMAIL);
+    const sendButton = within(panel).getByRole('button', {
+      name: SEND_LINK_LABEL,
+    });
+    await user.click(sendButton);
+    return panel;
   };
 
   beforeEach(() => {
@@ -110,6 +152,86 @@ describe(`<${AuthMenu.name}/>`, () => {
     });
   });
 
+  describe.each(BUTTON_AND_PANEL_COMBINATIONS)(
+    'with the $buttonStyle button and the $panelStyle panel',
+    ({ buttonStyle, panelStyle }) => {
+      const accountControl = { ...CIRCLE_IN_BAR, buttonStyle, panelStyle };
+
+      it('opens the account panel and returns focus to the trigger on Escape', async () => {
+        mockSignedIn();
+        setup({ accountControl });
+        const [trigger] = screen.getAllByRole('button', {
+          name: ACCOUNT_LABEL,
+        });
+        await user.click(trigger!);
+        const panel = screen.getByRole('menu', { name: ACCOUNT_MENU_LABEL });
+
+        expect(panel).toBeVisible();
+
+        await user.keyboard('{Escape}');
+
+        expect(panel).not.toBeVisible();
+        expect(trigger).toHaveFocus();
+      });
+
+      it('opens the sign-in panel and returns focus to the trigger on Escape', async () => {
+        mockSession(SESSION_STATUS.UNAUTHENTICATED);
+        setup({ accountControl });
+        const [trigger] = screen.getAllByRole('button', {
+          name: SIGN_IN_LABEL,
+        });
+        await user.click(trigger!);
+        const panel = screen.getByRole('dialog', { name: SIGN_IN_LABEL });
+
+        expect(panel).toBeVisible();
+
+        await user.keyboard('{Escape}');
+
+        expect(panel).not.toBeVisible();
+        expect(trigger).toHaveFocus();
+      });
+    },
+  );
+
+  describe('with the pill in the bar on phones', () => {
+    beforeEach(() => {
+      mockSession(SESSION_STATUS.UNAUTHENTICATED);
+      setup({
+        accountControl: {
+          ...CIRCLE_IN_BAR,
+          buttonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+        },
+      });
+    });
+
+    it('opens one panel from either the pill or the phone circle', async () => {
+      const [pill, phoneCircle] = screen.getAllByRole('button', {
+        name: SIGN_IN_LABEL,
+      });
+      await user.click(phoneCircle!);
+      const panel = screen.getByRole('dialog', { name: SIGN_IN_LABEL });
+
+      expect(panel).toBeVisible();
+      expect(pill).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(phoneCircle).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
+  });
+
+  it('adds no phone circle when the account sits in the phone menu', () => {
+    mockSession(SESSION_STATUS.UNAUTHENTICATED);
+    setup({
+      accountControl: {
+        ...CIRCLE_IN_BAR,
+        buttonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+        phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+      },
+    });
+
+    const triggers = screen.getAllByRole('button', { name: SIGN_IN_LABEL });
+
+    expect(triggers).toHaveLength(1);
+  });
+
   describe('logged out', () => {
     beforeEach(() => {
       mockSession(SESSION_STATUS.UNAUTHENTICATED);
@@ -119,141 +241,133 @@ describe(`<${AuthMenu.name}/>`, () => {
       {
         title: 'every provider is enabled',
         providers: [PROVIDER.GITHUB, PROVIDER.GOOGLE],
-        itemNames: [GITHUB_ITEM, GOOGLE_ITEM, EMAIL_ITEM],
+        buttonNames: [GITHUB_BUTTON, GOOGLE_BUTTON, SEND_LINK_LABEL],
       },
       {
         title: 'only GitHub is enabled',
         providers: [PROVIDER.GITHUB],
-        itemNames: [GITHUB_ITEM, EMAIL_ITEM],
-      },
-      {
-        title: 'only Google is enabled',
-        providers: [PROVIDER.GOOGLE],
-        itemNames: [GOOGLE_ITEM, EMAIL_ITEM],
+        buttonNames: [GITHUB_BUTTON, SEND_LINK_LABEL],
       },
       {
         title: 'no OAuth provider is enabled',
         providers: [],
-        itemNames: [EMAIL_ITEM],
+        buttonNames: [SEND_LINK_LABEL],
       },
     ])(
-      'offers exactly the enabled sign-in items when $title',
-      async ({ providers, itemNames }) => {
+      'offers exactly the enabled providers and the email link when $title',
+      async ({ providers, buttonNames }) => {
         setup({ oauthProviderIds: providers });
-        await openSignInMenu();
+        const panel = await openSignInPanel();
 
-        const items = screen.getAllByRole('menuitem');
+        const buttons = within(panel).getAllByRole('button');
+        const namedButtons = buttonNames.map((name) =>
+          within(panel).getByRole('button', { name }),
+        );
 
-        expect(items.map((item) => item.textContent)).toEqual(itemNames);
+        expect(buttons).toEqual(namedButtons);
       },
     );
 
-    it('renders a plain label, not a heading, plus the provider prompt', async () => {
+    it('shows the email field at once, with no row to open first', async () => {
       setup();
-      await openSignInMenu();
+      const panel = await openSignInPanel();
 
-      const panel = screen.getByRole('menu');
+      const emailField = within(panel).getByRole('textbox', {
+        name: EMAIL_FIELD,
+      });
       const heading = within(panel).queryByRole('heading');
-      const label = within(panel).getByText(SIGN_IN_LABEL);
-      const prompt = within(panel).getByText(
-        SITE_MESSAGES.authMenu.chooseProviderPrompt,
-      );
-      const redirectHint = within(panel).getByText(
-        SITE_MESSAGES.authMenu.redirectHint,
-      );
 
+      expect(emailField).toBeVisible();
       expect(heading).not.toBeInTheDocument();
-      expect(label).toBeVisible();
-      expect(prompt).toBeVisible();
-      expect(redirectHint).toBeVisible();
+    });
+
+    it('signs in with GitHub and says where the pressed row is going', async () => {
+      setup();
+      const panel = await openSignInPanel();
+      const githubButton = within(panel).getByRole('button', {
+        name: GITHUB_BUTTON,
+      });
+      await user.click(githubButton);
+
+      const pendingRow = within(panel).getByText(GITHUB_PENDING);
+
+      expect(signInMock).toHaveBeenCalledWith(PROVIDER.GITHUB);
+      expect(pendingRow).toBeVisible();
+    });
+
+    it('shows Sending on the button while the link is on its way', async () => {
+      signInMock.mockReturnValue(new Promise(() => {}));
+      setup();
+      const panel = await sendLink();
+
+      const sendingButton = within(panel).getByRole('button', {
+        name: SENDING_LABEL,
+      });
+
+      expect(sendingButton).toHaveAttribute('aria-busy', 'true');
+    });
+
+    describe('when the email link is sent', () => {
+      beforeEach(() => {
+        mockSignInResult(true);
+        setup();
+      });
+
+      it('replaces the whole form with Check your inbox', async () => {
+        const panel = await sendLink();
+
+        const status = await within(panel).findByRole('status');
+        const title = within(panel).getByText(SENT_TITLE);
+        const emailField = within(panel).queryByRole('textbox');
+
+        expect(signInMock).toHaveBeenCalledWith('email', {
+          email: MOCK_READER_EMAIL,
+          redirect: false,
+        });
+        expect(title).toBeVisible();
+        expect(status).toHaveTextContent(MOCK_READER_EMAIL);
+        expect(emailField).not.toBeInTheDocument();
+      });
+
+      it('brings the empty form back with focus on the field for a different email', async () => {
+        const panel = await sendLink();
+        const resetButton = await within(panel).findByRole('button', {
+          name: USE_DIFFERENT_EMAIL,
+        });
+        await user.click(resetButton);
+
+        const emailField = within(panel).getByRole('textbox', {
+          name: EMAIL_FIELD,
+        });
+
+        expect(emailField).toHaveValue('');
+        expect(emailField).toHaveFocus();
+      });
     });
 
     it.each([
-      { provider: PROVIDER.GITHUB, itemName: GITHUB_ITEM },
-      { provider: PROVIDER.GOOGLE, itemName: GOOGLE_ITEM },
+      { title: 'fails', code: undefined, message: EMAIL_ERROR },
+      {
+        title: 'is over the send limit',
+        code: MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED,
+        message: SEND_LIMITED,
+      },
     ])(
-      'signs in with $provider when its item is chosen',
-      async ({ provider, itemName }) => {
+      'shows the error under the field when the send $title',
+      async ({ code, message }) => {
+        mockSignInResult(false, code);
         setup();
-        await openSignInMenu();
+        const panel = await sendLink();
 
-        const providerItem = screen.getByRole('menuitem', { name: itemName });
-        await user.click(providerItem);
+        const error = await within(panel).findByText(message);
+        const emailField = within(panel).getByRole('textbox', {
+          name: EMAIL_FIELD,
+        });
 
-        expect(signInMock).toHaveBeenCalledWith(provider);
+        expect(error).toBeVisible();
+        expect(emailField).toHaveAccessibleDescription(message);
       },
     );
-
-    it('expands the email item in place into a field and submit button', async () => {
-      setup();
-      await openEmailForm();
-
-      const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
-      const sendButton = screen.getByRole('button', { name: SEND_LINK_LABEL });
-      const collapsedEmailItem = screen.queryByRole('menuitem', {
-        name: EMAIL_ITEM,
-      });
-      const promptIcon = screen.getByTestId('sign-in-prompt-icon');
-
-      expect(emailField).toBeVisible();
-      expect(sendButton).toBeVisible();
-      expect(collapsedEmailItem).not.toBeInTheDocument();
-      expect(promptIcon).toBeVisible();
-    });
-
-    describe('when the email sign-in succeeds', () => {
-      beforeEach(() => {
-        mockSignInResult(true, HTTP_STATUS.OK);
-        setup();
-      });
-
-      it('submits the email and confirms with a check-your-inbox notice', async () => {
-        await openEmailForm();
-        const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
-        await user.type(emailField, MOCK_READER_EMAIL);
-        const sendButton = screen.getByRole('button', {
-          name: SEND_LINK_LABEL,
-        });
-        await user.click(sendButton);
-
-        const confirmation = await screen.findByRole('status');
-
-        expect(signInMock).toHaveBeenCalledWith('email', {
-          email: MOCK_READER_EMAIL,
-          redirect: false,
-        });
-        expect(confirmation).toHaveTextContent(CHECK_YOUR_INBOX);
-      });
-
-      it('also submits on Enter in the email field', async () => {
-        await openEmailForm();
-        const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
-        await user.type(emailField, `${MOCK_READER_EMAIL}{Enter}`);
-
-        const confirmation = await screen.findByText(CHECK_YOUR_INBOX);
-
-        expect(signInMock).toHaveBeenCalledWith('email', {
-          email: MOCK_READER_EMAIL,
-          redirect: false,
-        });
-        expect(confirmation).toBeVisible();
-      });
-    });
-
-    it('shows an inline error and keeps the field open when the email sign-in fails', async () => {
-      mockSignInResult(false, HTTP_STATUS.UNAUTHORIZED);
-      setup();
-      await openEmailForm();
-      const emailField = screen.getByRole('textbox', { name: EMAIL_FIELD });
-      await user.type(emailField, MOCK_READER_EMAIL);
-      const sendButton = screen.getByRole('button', { name: SEND_LINK_LABEL });
-      await user.click(sendButton);
-
-      const errorNotice = await screen.findByRole('status');
-
-      expect(errorNotice).toHaveTextContent(EMAIL_ERROR);
-      expect(emailField).toBeVisible();
-    });
 
     it('forgets a remembered sign-in once the session resolves signed out', () => {
       document.cookie = `${SIGNED_IN_HINT_COOKIE_NAME}=1; Path=/`;
@@ -262,7 +376,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(hasSignedInHint()).toBe(false);
     });
 
-    it('shows an inline OAuth error notice when the URL carries an error param', async () => {
+    it('shows an alert when the reader comes back from a failed sign-in', async () => {
       setLocationSearch(`?error=${MOCK_OAUTH_ERROR}`);
       setup();
 
@@ -270,20 +384,18 @@ describe(`<${AuthMenu.name}/>`, () => {
       const trigger = screen.getByRole('button', { name: SIGN_IN_LABEL });
 
       expect(notice).toHaveTextContent(OAUTH_ERROR);
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
   });
 
   describe('logged in', () => {
     beforeEach(() => {
-      mockSession(SESSION_STATUS.AUTHENTICATED, {
-        user: { name: MOCK_NAME, email: MOCK_EMAIL, image: null },
-        expires: MOCK_SESSION_EXPIRES,
-      });
-      setup();
+      mockSignedIn();
     });
 
-    it('exposes the account menu as the only button, with no Sign in control', () => {
+    it('exposes the account button as the only button', () => {
+      setup();
+
       const buttons = screen.getAllByRole('button');
       const signInButton = screen.queryByRole('button', {
         name: SIGN_IN_LABEL,
@@ -293,29 +405,43 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(signInButton).not.toBeInTheDocument();
     });
 
-    it('shows the signed-in reader in the account menu', async () => {
-      const trigger = screen.getByRole('button', { name: ACCOUNT_MENU_LABEL });
+    it('shows the signed-in reader in the account panel', async () => {
+      setup();
+      const trigger = screen.getByRole('button', { name: ACCOUNT_LABEL });
       await user.click(trigger);
 
-      const panel = screen.getByRole('menu');
+      const panel = screen.getByRole('menu', { name: ACCOUNT_MENU_LABEL });
       const email = within(panel).getByText(MOCK_EMAIL);
-      const signOutItem = within(panel).getByRole('menuitem', {
-        name: SIGN_OUT_LABEL,
-      });
 
       expect(email).toBeVisible();
-      expect(signOutItem).toBeVisible();
+    });
+
+    it('describes each tile in the Hub panel', async () => {
+      setup({
+        accountControl: {
+          ...CIRCLE_IN_BAR,
+          panelStyle: ACCOUNT_PANEL_STYLE.HUB,
+        },
+      });
+      const trigger = screen.getByRole('button', { name: ACCOUNT_LABEL });
+      await user.click(trigger);
+
+      const panel = screen.getByRole('menu', { name: ACCOUNT_MENU_LABEL });
+      const description = within(panel).getByText(BOOKMARKS_DESCRIPTION);
+
+      expect(description).toBeVisible();
     });
 
     it('remembers the sign-in for the next page load', () => {
+      setup();
+
       expect(hasSignedInHint()).toBe(true);
     });
 
     describe('when Sign out is chosen', () => {
       beforeEach(async () => {
-        const trigger = screen.getByRole('button', {
-          name: ACCOUNT_MENU_LABEL,
-        });
+        setup();
+        const trigger = screen.getByRole('button', { name: ACCOUNT_LABEL });
         await user.click(trigger);
         const signOutItem = screen.getByRole('menuitem', {
           name: SIGN_OUT_LABEL,

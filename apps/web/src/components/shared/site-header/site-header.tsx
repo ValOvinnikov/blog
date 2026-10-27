@@ -1,14 +1,17 @@
 import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
+import { ACCOUNT_PHONE_PLACEMENT } from '@blog/config';
 import { service } from '@blog/service';
 import { Header } from '@blog/ui/components/organisms/header';
-import { AccountRow, AuthMenu } from '@web/components/shared/auth-menu';
+import { AccountMenuGroup, AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
+import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
@@ -27,19 +30,21 @@ export const SiteHeader = async () => {
     hasReaderAccounts,
     switcherStyle,
     brandLogoUrl,
+    accountControl,
   ] = await Promise.all([
     getSiteSettings(),
     service.global.navigation.v1.getNavigation(sanityContext),
     isReaderAccountEnabled(),
     getLanguageSwitcherStyle(siteConfigTenant),
     getBrandLogoUrl(siteConfigTenant),
+    getAccountControl(siteConfigTenant),
   ]);
 
   if (!settingsResult.ok) {
     return null;
   }
   if (!navResult.ok) {
-    logger.error('navigation.layout_fetch_failed', {
+    logger.error(NAVIGATION_LOG.LAYOUT_FETCH_FAILED, {
       error: navResult.error,
     });
   }
@@ -48,6 +53,10 @@ export const SiteHeader = async () => {
   const navItems = navResult.ok ? navResult.data.items : [];
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
+  const oauthProviderIds = getEnabledOAuthProviderIds();
+  const hasAccountInPhoneMenu =
+    hasReaderAccounts &&
+    accountControl.phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU;
 
   return (
     <StickyHeaderFrame>
@@ -70,12 +79,22 @@ export const SiteHeader = async () => {
               </>
             )
           }
-          drawerActions={hasReaderAccounts && <AccountRow />}
+          drawerActions={
+            hasAccountInPhoneMenu && (
+              <AccountMenuGroup
+                oauthProviderIds={oauthProviderIds}
+                panelStyle={accountControl.panelStyle}
+              />
+            )
+          }
           actions={
             <>
               {!hasLanguageSwitcher && <ThemeToggleButton />}
               {hasReaderAccounts && (
-                <AuthMenu oauthProviderIds={getEnabledOAuthProviderIds()} />
+                <AuthMenu
+                  oauthProviderIds={oauthProviderIds}
+                  accountControl={accountControl}
+                />
               )}
             </>
           }

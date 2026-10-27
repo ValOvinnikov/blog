@@ -22,10 +22,10 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 ## Surfaces and routes
 
-- **Header** — `AuthMenu` renders only when the site has a reader account (see [reader-account](./reader-account.md)). Signed out, it is a round "Sign in" pill with a person glyph from `lg`, and a 44px person circle below it, opening the sign-in panel; signed in, the avatar sits in a round frame matching the other header controls and opens the account menu: the reader's name, or their handle when they have none, above their email, then My bookmarks, Account settings and Sign out. Pages are statically rendered, so the slot is sized before first paint from a `signed_in_hint` cookie: a non-HttpOnly, non-secret flag the client writes with the session's expiry once the session resolves signed in, and clears when it resolves signed out or the reader signs out or deletes their account. A pre-hydration `<head>` script (the theme script's pattern) marks `<html data-signed-in>` when the hint is present, and while the session loads the slot shows the empty outline of the hinted control — the avatar frame, or the "Sign in" pill from `lg` (the 44px frame below it) — with only the "loading account status" announcement. The real `useSession()` result still decides what renders; a wrong hint costs at most one shift. The resolved control fades in over `duration-fast` (opacity only, none under reduced motion). The phone menu's account row opens the same panel.
-- **Sign-in panel** — a 320px popover from `lg`; below it, a sheet anchored to the header (gutter to gutter, 8px under the header, scrolling inside the viewport), as is the account panel and the OAuth error notice. One button per configured OAuth provider, then "Continue with email", which expands into an email field and a "check your inbox" state.
+- **Header** — `AuthMenu` renders only when the site has a reader account (see [reader-account](./reader-account.md)). Its look follows three Look settings on `site_config` (`getAccountControl`): the account button (Pill with label, the default, or Circle), the account panel (Card, the default, Profile or Hub) and where the account sits on phones (In the bar, the default, or In the menu). From `lg` the bar shows the chosen button — the pill holds one width signed in and signed out, a person glyph and "Sign in" or the avatar and "Account" — and any panel opens from either button. Below `lg`, In the bar shows a 44px circle that opens the panel as a sheet under the bar; In the menu shows no account control in the bar, and the phone menu ends with an account row ("Sign in" or "Account") that opens the same panel in place, like a sub-menu, without closing the menu. Signed in, the panel shows the reader's name, or their handle when they have none, and their email, then My bookmarks, Account settings and a neutral Sign out; Hub lays the two links out as tiles with one fixed line each. The settings are read as stored on every plan until the Look plan fallback lands. Pages are statically rendered, so while the session loads the slot shows the empty outline of the chosen button with only the "loading account status" announcement; the client still writes the `signed_in_hint` cookie (a non-HttpOnly, non-secret flag carrying the session's expiry), which a pre-hydration `<head>` script turns into `<html data-signed-in>`. The real `useSession()` result decides what renders. The resolved control fades in over `duration-fast` (opacity only, none under reduced motion).
+- **Sign-in panel** — a 320px dialog from `lg`; below it, a sheet anchored to the header (gutter to gutter, 8px under the header, scrolling inside the viewport), as is the account panel and the OAuth error notice. One button per configured OAuth provider, "or", then the email field and "Email me a sign-in link", all visible at once. A pressed provider row says where it is taking the reader while the others wait; the send button shows "Sending…" while busy; a sent link replaces the whole form with "Check your inbox", the address and "Use a different email"; a failed send shows the error under the field.
 - `/api/auth/*` — the Auth.js handlers (`GET`/`POST`).
-- There is no `/login` page. A failed OAuth callback redirects to `/` with `?error=`; `useOAuthErrorParam` reads it, strips it from the URL and the popover shows an inline error.
+- There is no `/login` page. A failed OAuth callback redirects to `/` with `?error=`; `useOAuthErrorParam` reads it, strips it from the URL and the header shows an alert beside the account control.
 - The platform builds its own `NextAuth()` from the same `buildAuthConfig` (see [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md)).
 
 ## Data
@@ -40,7 +40,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - **Operator (env)** — an OAuth provider is registered only when both its id and secret are set; the header advertises exactly the registered set (`getEnabledOAuthProviderIds`). The magic-link provider is always registered.
 - **Owner (platform Email page)** — the magic-link and invite email subject, body, logo, sender name, reply-to and footer postal address (see [email](./email.md)).
 - **Plan / capability** — no capability of its own. The sign-in entry point exists only while bookmarks, comments or newsletter is enabled, so a `FREE` site shows no sign-in.
-- **Look** — the email brand follows the tenant's preset, accent and logo hue (`resolveTenantEmailBrand`). Popover copy is fixed (`authMenu.*`), not Voice.
+- **Look** — the account button, account panel and phone placement (Growth-only on the Look page) shape the header control; the email brand follows the tenant's preset, accent and logo hue (`resolveTenantEmailBrand`). Panel copy is fixed (`authMenu.*`), not Voice, including Hub's two tile lines.
 
 ## Constraints and invariants
 
@@ -70,15 +70,17 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.ts`
 - `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.error: '/'`
 - `apps/web/src/components/shared/auth-menu/auth-menu.tsx`
-- `apps/web/src/components/shared/auth-menu/hooks/use-email-sign-in.ts`
+- `apps/web/src/components/shared/auth-menu/components/account-menu-group/account-menu-group.tsx` — the phone menu's account row
+- `apps/web/src/components/shared/auth-menu/hooks/use-sign-in-attempt.ts`
+- `apps/web/src/server/site-config/get-account-control/get-account-control.ts`
 - `apps/web/src/components/shared/site-header/site-header.tsx`
 
 ## Tests and stories
 
 - `packages/auth/src/**/*.test.ts` (config, providers, env, invite consumption).
-- `apps/web/src/components/shared/auth-menu/**/*.test.tsx`, `use-oauth-error-param.test.ts`.
+- `apps/web/src/components/shared/auth-menu/**/*.test.tsx`, `site-header.test.tsx`, `get-account-control.test.ts`, `use-oauth-error-param.test.ts`.
 - `packages/email/src/templates/tenant/magic-link-*/**/*.test.ts`.
-- No story of its own; the header appears in `site-navigation.stories.tsx`.
+- The `@blog/ui` stories `AccountTrigger`, `AccountPanel` and `SignInPanel` draw every variant and state; the composed header appears in `site-navigation.stories.tsx`, including the account in the phone menu.
 
 ## Related
 
