@@ -1,39 +1,87 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  routes,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import type { TTranslationMap } from '@blog/service';
+import { faker } from '@faker-js/faker';
 
 import { findTranslatedPath } from './find-translated-path';
 
-const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
+faker.seed(116);
 
-const translationMap: TTranslationMap = {
+const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
+const NL_PREFIX = `/${LOCALE_BCP47_TAGS.NL}`;
+const LANDING_TYPE = 'page_landing';
+const TOPIC_TYPE = 'page_topic';
+const TAG_TYPE = 'page_tag';
+const POST_TYPE = 'page_post';
+
+const slugs = faker.helpers.uniqueArray(faker.lorem.slug, 11);
+const [
+  EN_LANDING,
+  NL_LANDING,
+  EN_NESTED_LEAF,
+  NL_NESTED_LEAF,
+  EN_TOPIC,
+  NL_TOPIC,
+  EN_TAG,
+  NL_TAG,
+  EN_POST,
+  NL_POST,
+  MOCK_UNKNOWN_SLUG,
+] = slugs as [
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+];
+const NESTED_SEGMENT = faker.lorem.word();
+const EN_NESTED = `${NESTED_SEGMENT}/${EN_NESTED_LEAF}`;
+const NL_NESTED = `${NESTED_SEGMENT}/${NL_NESTED_LEAF}`;
+const DE_LANDING = `über-${faker.lorem.word()}`;
+const MOCK_EXTRA_SEGMENT = faker.lorem.word();
+
+const MOCK_TRANSLATION_MAP: TTranslationMap = {
   homeLanguages: [EN, NL],
   postIndexLanguages: [EN, NL],
   topicIndexLanguages: [EN, NL],
   tagIndexLanguages: [EN],
   groups: [
     [
-      { documentType: 'page_landing', language: EN, slug: 'about' },
-      { documentType: 'page_landing', language: NL, slug: 'over-ons' },
-      { documentType: 'page_landing', language: DE, slug: 'über-uns' },
+      { documentType: LANDING_TYPE, language: EN, slug: EN_LANDING },
+      { documentType: LANDING_TYPE, language: NL, slug: NL_LANDING },
+      { documentType: LANDING_TYPE, language: DE, slug: DE_LANDING },
     ],
     [
-      { documentType: 'page_landing', language: EN, slug: 'modules/faq' },
-      { documentType: 'page_landing', language: NL, slug: 'modules/vragen' },
+      { documentType: LANDING_TYPE, language: EN, slug: EN_NESTED },
+      { documentType: LANDING_TYPE, language: NL, slug: NL_NESTED },
     ],
     [
-      { documentType: 'page_topic', language: EN, slug: 'design' },
-      { documentType: 'page_topic', language: NL, slug: 'ontwerp' },
+      { documentType: TOPIC_TYPE, language: EN, slug: EN_TOPIC },
+      { documentType: TOPIC_TYPE, language: NL, slug: NL_TOPIC },
     ],
     [
-      { documentType: 'page_tag', language: EN, slug: 'typescript' },
-      { documentType: 'page_tag', language: NL, slug: 'typescript-nl' },
+      { documentType: TAG_TYPE, language: EN, slug: EN_TAG },
+      { documentType: TAG_TYPE, language: NL, slug: NL_TAG },
     ],
     [
-      { documentType: 'page_post', language: EN, slug: 'my-article' },
-      { documentType: 'page_post', language: NL, slug: 'mijn-artikel' },
+      { documentType: POST_TYPE, language: EN, slug: EN_POST },
+      { documentType: POST_TYPE, language: NL, slug: NL_POST },
     ],
   ],
 };
+
+const nlPath = (path: string) =>
+  path === routes.home() ? NL_PREFIX : `${NL_PREFIX}${path}`;
 
 const find = (
   pathname: string,
@@ -41,7 +89,7 @@ const find = (
   toLocale: TLocaleIsoCode = NL,
 ) =>
   findTranslatedPath({
-    translationMap,
+    translationMap: MOCK_TRANSLATION_MAP,
     pathname,
     fromLocale,
     toLocale,
@@ -49,103 +97,140 @@ const find = (
   });
 
 describe(findTranslatedPath, () => {
-  it("finds a default-language page's translation under its language prefix", () => {
-    expect(find('/about')).toBe('/nl/over-ons');
+  it.each([
+    {
+      case: "a default-language page's translation under its prefix",
+      pathname: routes.landingPage(EN_LANDING),
+      expected: nlPath(routes.landingPage(NL_LANDING)),
+    },
+    {
+      case: "a nested page's translation under its full path",
+      pathname: routes.landingPage(EN_NESTED),
+      expected: nlPath(routes.landingPage(NL_NESTED)),
+    },
+    {
+      case: "a Topic page's translation under its own slug",
+      pathname: routes.topic(EN_TOPIC),
+      expected: nlPath(routes.topic(NL_TOPIC)),
+    },
+    {
+      case: "a Tag page's translation under its own slug",
+      pathname: routes.tag(EN_TAG),
+      expected: nlPath(routes.tag(NL_TAG)),
+    },
+    {
+      case: "a post's translation under its own slug",
+      pathname: routes.post(EN_POST),
+      expected: nlPath(routes.post(NL_POST)),
+    },
+    {
+      case: 'the first page of the translation from a numbered archive page',
+      pathname: routes.topic(EN_TOPIC, 3),
+      expected: nlPath(routes.topic(NL_TOPIC)),
+    },
+    {
+      case: "another language's list page under its prefix",
+      pathname: routes.topics(),
+      expected: nlPath(routes.topics()),
+    },
+    {
+      case: 'the first blog list page from a numbered blog list page',
+      pathname: routes.blogIndex(2),
+      expected: nlPath(routes.blogIndex()),
+    },
+    {
+      case: "another language's Home under its prefix",
+      pathname: routes.home(),
+      expected: nlPath(routes.home()),
+    },
+  ])('finds $case', ({ pathname, expected }) => {
+    expect(find(pathname)).toBe(expected);
   });
 
-  it('finds the default-language page without a prefix', () => {
-    expect(find('/over-ons', NL, EN)).toBe('/about');
+  it.each([
+    {
+      case: 'the default-language page without a prefix',
+      pathname: routes.landingPage(NL_LANDING),
+      expected: routes.landingPage(EN_LANDING),
+    },
+    {
+      case: "a nested page's default-language translation",
+      pathname: routes.landingPage(NL_NESTED),
+      expected: routes.landingPage(EN_NESTED),
+    },
+    {
+      case: "a Topic page's default-language translation",
+      pathname: routes.topic(NL_TOPIC),
+      expected: routes.topic(EN_TOPIC),
+    },
+    {
+      case: "a post's default-language translation",
+      pathname: routes.post(NL_POST),
+      expected: routes.post(EN_POST),
+    },
+    {
+      case: 'the default-language list page without a prefix',
+      pathname: routes.topics(),
+      expected: routes.topics(),
+    },
+    {
+      case: 'the default-language Home without a prefix',
+      pathname: routes.home(),
+      expected: routes.home(),
+    },
+  ])('finds $case when switching back', ({ pathname, expected }) => {
+    expect(find(pathname, NL, EN)).toBe(expected);
   });
 
   it('finds a translation through an encoded slug', () => {
-    expect(find('/%C3%BCber-uns', DE, NL)).toBe('/nl/over-ons');
-  });
+    const pathname = routes.landingPage(encodeURIComponent(DE_LANDING));
 
-  it("finds a nested page's translation under its full path", () => {
-    expect(find('/modules/faq')).toBe('/nl/modules/vragen');
-    expect(find('/modules/vragen', NL, EN)).toBe('/modules/faq');
-  });
-
-  it('is undefined when the page has no translation in that language', () => {
-    expect(find('/about', EN, FR)).toBeUndefined();
-  });
-
-  it("finds a Topic page's translation under its own slug", () => {
-    expect(find('/topics/design')).toBe('/nl/topics/ontwerp');
-    expect(find('/topics/ontwerp', NL, EN)).toBe('/topics/design');
-  });
-
-  it("finds a Tag page's translation under its own slug", () => {
-    expect(find('/tags/typescript')).toBe('/nl/tags/typescript-nl');
-  });
-
-  it('finds the first page of the translation from a numbered archive page', () => {
-    expect(find('/topics/design/page/3')).toBe('/nl/topics/ontwerp');
-  });
-
-  it("finds a post's translation under its own slug", () => {
-    expect(find('/blog/my-article')).toBe('/nl/blog/mijn-artikel');
-    expect(find('/blog/mijn-artikel', NL, EN)).toBe('/blog/my-article');
-  });
-
-  it('is undefined for a post with no translation in that language', () => {
-    expect(find('/blog/my-article', EN, FR)).toBeUndefined();
-  });
-
-  it('does not match a post slug against a landing page', () => {
-    expect(find('/my-article')).toBeUndefined();
-  });
-
-  it('is undefined for a Topic page with no translation in that language', () => {
-    expect(find('/topics/design', EN, FR)).toBeUndefined();
-  });
-
-  it('does not match a Topic slug against a landing page or Tag page', () => {
-    expect(find('/design')).toBeUndefined();
-    expect(find('/tags/design')).toBeUndefined();
-  });
-
-  it('is undefined for a path below an archive page that is not a page number', () => {
-    expect(find('/topics/design/extra')).toBeUndefined();
-  });
-
-  it('is undefined for a page outside the map', () => {
-    expect(find('/blog/about')).toBeUndefined();
-  });
-
-  it("finds another language's list page under its prefix", () => {
-    expect(find('/blog')).toBe('/nl/blog');
-    expect(find('/topics')).toBe('/nl/topics');
-  });
-
-  it('finds the default-language list page without a prefix', () => {
-    expect(find('/blog', NL, EN)).toBe('/blog');
-    expect(find('/topics', NL, EN)).toBe('/topics');
-  });
-
-  it('finds the first page of the blog list from a numbered blog list page', () => {
-    expect(find('/blog/page/2')).toBe('/nl/blog');
-  });
-
-  it('is undefined for a language without that list page', () => {
-    expect(find('/tags')).toBeUndefined();
-    expect(find('/blog', EN, FR)).toBeUndefined();
-    expect(find('/blog/page/2', EN, FR)).toBeUndefined();
-  });
-
-  it("finds another language's Home under its prefix", () => {
-    expect(find('/')).toBe('/nl');
-  });
-
-  it('finds the default-language Home without a prefix', () => {
-    expect(find('/', NL, EN)).toBe('/');
-  });
-
-  it('is undefined for a language without a Home', () => {
-    expect(find('/', EN, FR)).toBeUndefined();
+    expect(find(pathname, DE, NL)).toBe(nlPath(routes.landingPage(NL_LANDING)));
   });
 
   it('keeps the same page when the language does not change', () => {
-    expect(find('/blog', NL, NL)).toBe('/nl/blog');
+    expect(find(routes.blogIndex(), NL, NL)).toBe(nlPath(routes.blogIndex()));
+  });
+
+  it.each([
+    { case: 'a page', pathname: routes.landingPage(EN_LANDING) },
+    { case: 'a post', pathname: routes.post(EN_POST) },
+    { case: 'a Topic page', pathname: routes.topic(EN_TOPIC) },
+    { case: 'the blog list page', pathname: routes.blogIndex() },
+    { case: 'a numbered blog list page', pathname: routes.blogIndex(2) },
+    { case: 'Home', pathname: routes.home() },
+  ])(
+    'is undefined for $case with no translation in that language',
+    ({ pathname }) => {
+      expect(find(pathname, EN, FR)).toBeUndefined();
+    },
+  );
+
+  it.each([
+    {
+      case: 'a post slug as a landing page',
+      pathname: routes.landingPage(EN_POST),
+    },
+    {
+      case: 'a Topic slug as a landing page',
+      pathname: routes.landingPage(EN_TOPIC),
+    },
+    { case: 'a Topic slug as a Tag page', pathname: routes.tag(EN_TOPIC) },
+    { case: 'a landing slug as a post', pathname: routes.post(EN_LANDING) },
+    {
+      case: 'a path below an archive page that is not a page number',
+      pathname: `${routes.topic(EN_TOPIC)}/${MOCK_EXTRA_SEGMENT}`,
+    },
+    {
+      case: 'a page outside the map',
+      pathname: routes.landingPage(MOCK_UNKNOWN_SLUG),
+    },
+    {
+      case: 'a post outside the map',
+      pathname: routes.post(MOCK_UNKNOWN_SLUG),
+    },
+    { case: 'a list page the language lacks', pathname: routes.tags() },
+  ])('is undefined for $case', ({ pathname }) => {
+    expect(find(pathname)).toBeUndefined();
   });
 });

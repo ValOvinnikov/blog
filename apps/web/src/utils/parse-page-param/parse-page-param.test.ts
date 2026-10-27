@@ -1,15 +1,24 @@
+import { faker } from '@faker-js/faker';
+
 import { parsePageParam } from './parse-page-param';
 
-describe('parsePageParam', () => {
-  it('parses canonical positive integers', () => {
-    expect(parsePageParam('1')).toBe(1);
-    expect(parsePageParam('2')).toBe(2);
-    expect(parsePageParam('10')).toBe(10);
+faker.seed(123);
+
+const MOCK_PAGE = faker.number.int({ min: 2, max: 999 });
+const MOCK_WORD = faker.lorem.word();
+
+describe(parsePageParam, () => {
+  it.each([
+    { raw: '1', expected: 1 },
+    { raw: String(MOCK_PAGE), expected: MOCK_PAGE },
+  ])('parses the canonical page $raw', ({ raw, expected }) => {
+    expect(parsePageParam(raw)).toBe(expected);
   });
 
-  it('rejects non-canonical or non-numeric values', () => {
-    for (const raw of ['0', '02', '-1', '1.5', 'abc', '', ' 2', '1e2', '2 ']) {
+  it.each(['0', '02', '-1', '1.5', MOCK_WORD, '', ' 2', '1e2', '2 '])(
+    'rejects the non-canonical value %j',
+    (raw) => {
       expect(parsePageParam(raw)).toBeNull();
-    }
-  });
+    },
+  );
 });

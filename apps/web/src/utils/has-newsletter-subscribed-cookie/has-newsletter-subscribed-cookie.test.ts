@@ -1,27 +1,31 @@
+import { faker } from '@faker-js/faker';
+import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
+
 import { hasNewsletterSubscribedCookie } from './has-newsletter-subscribed-cookie';
 
-describe('hasNewsletterSubscribedCookie', () => {
-  it('returns true when the cookie is present alone', () => {
-    expect(hasNewsletterSubscribedCookie('newsletter_subscribed=1')).toBe(true);
-  });
+faker.seed(118);
 
-  it('returns true when the cookie is present among others', () => {
-    expect(
-      hasNewsletterSubscribedCookie('theme=dark; newsletter_subscribed=1'),
-    ).toBe(true);
-  });
+const MOCK_COOKIE_VALUE = faker.string.alphanumeric(6);
+const MOCK_OTHER_COOKIE = `${faker.lorem.word()}=${faker.string.alphanumeric(6)}`;
+const SUBSCRIBED_COOKIE = `${NEWSLETTER_SUBSCRIBED_COOKIE_NAME}=${MOCK_COOKIE_VALUE}`;
+const PREFIX_SHARING_COOKIE = `${NEWSLETTER_SUBSCRIBED_COOKIE_NAME}_${faker.lorem.word()}=${MOCK_COOKIE_VALUE}`;
 
-  it('returns false when the cookie is absent', () => {
-    expect(hasNewsletterSubscribedCookie('theme=dark')).toBe(false);
-  });
-
-  it('returns false for an empty cookie string', () => {
-    expect(hasNewsletterSubscribedCookie('')).toBe(false);
-  });
-
-  it('does not match a cookie name that merely starts with the same prefix', () => {
-    expect(hasNewsletterSubscribedCookie('newsletter_subscribed_other=1')).toBe(
-      false,
-    );
+describe(hasNewsletterSubscribedCookie, () => {
+  it.each([
+    { case: 'present alone', cookies: SUBSCRIBED_COOKIE, expected: true },
+    {
+      case: 'present among others',
+      cookies: `${MOCK_OTHER_COOKIE}; ${SUBSCRIBED_COOKIE}`,
+      expected: true,
+    },
+    { case: 'absent', cookies: MOCK_OTHER_COOKIE, expected: false },
+    { case: 'an empty cookie string', cookies: '', expected: false },
+    {
+      case: 'only a cookie sharing its name as a prefix',
+      cookies: PREFIX_SHARING_COOKIE,
+      expected: false,
+    },
+  ])('is $expected when the cookie is $case', ({ cookies, expected }) => {
+    expect(hasNewsletterSubscribedCookie(cookies)).toBe(expected);
   });
 });

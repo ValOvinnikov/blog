@@ -1,49 +1,62 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { readRememberedLanguage, rememberLanguage } from './language-cookie';
 
-const { EN, NL, FR } = LOCALE_ISO_CODES;
+faker.seed(122);
 
-const requestWithCookie = (cookie: string) =>
-  new NextRequest('https://example.com/', { headers: { cookie } });
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
+const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
+const MOCK_NOW = faker.date.recent({ refDate: '2026-06-01T00:00:00Z' });
+const LIVE_LOCALES = [EN, NL];
+const MOCK_OTHER_COOKIE = `${faker.lorem.word()}=${faker.lorem.word()}`;
+
+const cookiesOf = (cookie: string) =>
+  new NextRequest(faker.internet.url(), { headers: { cookie } }).cookies;
 
 describe(readRememberedLanguage, () => {
   it('reads a remembered live language', () => {
-    expect(
-      readRememberedLanguage(requestWithCookie('NEXT_LOCALE=NL').cookies, [
-        EN,
-        NL,
-      ]),
-    ).toBe(NL);
+    const cookies = cookiesOf(`${LANGUAGE_COOKIE_NAME}=${NL}`);
+
+    expect(readRememberedLanguage(cookies, LIVE_LOCALES)).toBe(NL);
   });
 
   it('ignores a remembered language the tenant no longer serves', () => {
-    expect(
-      readRememberedLanguage(requestWithCookie('NEXT_LOCALE=FR').cookies, [
-        EN,
-        NL,
-      ]),
-    ).toBeUndefined();
+    const cookies = cookiesOf(`${LANGUAGE_COOKIE_NAME}=${FR}`);
+
+    expect(readRememberedLanguage(cookies, LIVE_LOCALES)).toBeUndefined();
   });
 
   it('is undefined without the cookie', () => {
-    expect(
-      readRememberedLanguage(requestWithCookie('theme=dark').cookies, [EN, NL]),
-    ).toBeUndefined();
+    const cookies = cookiesOf(MOCK_OTHER_COOKIE);
+
+    expect(readRememberedLanguage(cookies, LIVE_LOCALES)).toBeUndefined();
   });
 });
 
 describe(rememberLanguage, () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(MOCK_NOW);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('remembers the language for a year across the whole site', () => {
     const response = NextResponse.next();
 
     rememberLanguage(response.cookies, FR);
 
-    expect(response.cookies.get('NEXT_LOCALE')).toMatchObject({
+    expect(response.cookies.get(LANGUAGE_COOKIE_NAME)).toEqual({
+      name: LANGUAGE_COOKIE_NAME,
       value: FR,
       path: '/',
-      maxAge: 31536000,
+      maxAge: ONE_YEAR_IN_SECONDS,
+      expires: new Date(MOCK_NOW.getTime() + ONE_YEAR_IN_SECONDS * 1000),
       sameSite: 'lax',
     });
   });
