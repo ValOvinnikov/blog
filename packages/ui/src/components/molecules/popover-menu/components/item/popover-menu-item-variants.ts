@@ -18,6 +18,15 @@ export const popoverMenuItemVariants = tv({
         'font-mono text-label text-text',
         'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
       ],
+      outlined: [
+        'justify-center rounded-sm border border-border-strong bg-transparent',
+        'font-medium',
+        'hover:border-brand-primary hover:bg-transparent',
+      ],
+      tile: [
+        'flex-col items-start gap-1.5 rounded-md border border-border p-3',
+        'hover:border-brand-primary hover:bg-surface',
+      ],
     },
   },
 });
