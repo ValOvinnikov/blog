@@ -124,7 +124,8 @@ Free site.
   mapping `DB_DUPLICATE_DOMAIN` to a taken address and
   `DB_ALREADY_OWNS_FREE_TENANT` to the one-site refusal; then
   `startProvisioning` and `/dashboard`, even when the enqueue failed, since
-  the dashboard shows the run's state.
+  the dashboard shows the run's state: a site still PENDING with every step
+  idle gets a "setup hasn't started" notice with **Start setup**.
 - One Free tenant per person: `ownsFreeTenant(email)` is the pre-check. It
   strips the `+tag` (`normalizeEmailIdentity`) and matches a FREE,
   non-archived tenant whose `self_serve_owner_email_index` is that address's
