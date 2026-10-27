@@ -1,9 +1,12 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { formatShortDateTime } from './format-short-date-time';
 
+faker.seed(6006);
+
 const MOCK_NOW = new Date('2026-10-24T15:00:00.000Z');
-const MOCK_YESTERDAY_LABEL = 'Yesterday';
+const MOCK_YESTERDAY_LABEL = faker.lorem.word();
 const MOCK_EARLIER_THIS_YEAR = '2026-10-19T12:00:00.000Z';
 
 describe(formatShortDateTime, () => {

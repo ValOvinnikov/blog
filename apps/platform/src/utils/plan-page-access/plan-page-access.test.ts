@@ -1,14 +1,15 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
+import type * as DbConstants from '@blog/db/constants';
 import { TENANT_PLAN } from '@blog/db/constants';
 
-import { planPageAccess } from './plan-page-access';
+import { planPageAccess, type TPlanPage } from './plan-page-access';
 
 const { registry } = vi.hoisted(() => ({
   registry: {} as Record<string, TCapability[]>,
 }));
 
 vi.mock('@blog/db/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/db/constants')>()),
+  ...(await importOriginal<typeof DbConstants>()),
   PLAN_REGISTRY: registry,
 }));
 
@@ -16,7 +17,13 @@ const withFreeCapabilities = (capabilities: TCapability[]) => {
   registry[TENANT_PLAN.FREE] = capabilities;
 };
 
-describe('planPageAccess', () => {
+const CAPABILITY_GATED_PAGES: { page: TPlanPage; capability: TCapability }[] = [
+  { page: 'leads', capability: CAPABILITY.CONTACT_FORM },
+  { page: 'subscribers', capability: CAPABILITY.NEWSLETTER },
+  { page: 'comments', capability: CAPABILITY.COMMENTS },
+];
+
+describe(planPageAccess, () => {
   beforeEach(() => {
     registry[TENANT_PLAN.FREE] = [
       CAPABILITY.RATINGS,
@@ -33,8 +40,10 @@ describe('planPageAccess', () => {
     ];
   });
 
-  it('gives a FREE tenant with no email-sending capability none of the gated pages', () => {
-    expect(planPageAccess(TENANT_PLAN.FREE)).toEqual({
+  it('gives a FREE tenant with no email capability none of the gated pages', () => {
+    const access = planPageAccess(TENANT_PLAN.FREE);
+
+    expect(access).toEqual({
       languages: false,
       email: false,
       leads: false,
@@ -45,7 +54,9 @@ describe('planPageAccess', () => {
   });
 
   it('gives a GROWTH tenant every gated page', () => {
-    expect(planPageAccess(TENANT_PLAN.GROWTH)).toEqual({
+    const access = planPageAccess(TENANT_PLAN.GROWTH);
+
+    expect(access).toEqual({
       languages: true,
       email: true,
       leads: true,
@@ -55,13 +66,27 @@ describe('planPageAccess', () => {
     });
   });
 
-  it('opens Leads only with the contact form', () => {
-    withFreeCapabilities([CAPABILITY.COMMENTS]);
-    expect(planPageAccess(TENANT_PLAN.FREE).leads).toBe(false);
+  it.each(CAPABILITY_GATED_PAGES)(
+    'opens $page when the plan holds $capability',
+    ({ page, capability }) => {
+      withFreeCapabilities([capability]);
 
-    withFreeCapabilities([CAPABILITY.CONTACT_FORM]);
-    expect(planPageAccess(TENANT_PLAN.FREE).leads).toBe(true);
-  });
+      const access = planPageAccess(TENANT_PLAN.FREE);
+
+      expect(access[page]).toBe(true);
+    },
+  );
+
+  it.each(CAPABILITY_GATED_PAGES)(
+    'keeps $page closed without $capability',
+    ({ page }) => {
+      withFreeCapabilities([CAPABILITY.RATINGS]);
+
+      const access = planPageAccess(TENANT_PLAN.FREE);
+
+      expect(access[page]).toBe(false);
+    },
+  );
 
   it.each([
     CAPABILITY.BOOKMARKS,
@@ -71,29 +96,17 @@ describe('planPageAccess', () => {
   ])('opens Email when the plan holds %s', (capability) => {
     withFreeCapabilities([capability]);
 
-    expect(planPageAccess(TENANT_PLAN.FREE).email).toBe(true);
-  });
+    const { email } = planPageAccess(TENANT_PLAN.FREE);
 
-  it('opens Subscribers only with newsletter and Comments only with comments', () => {
-    withFreeCapabilities([CAPABILITY.NEWSLETTER]);
-    expect(planPageAccess(TENANT_PLAN.FREE)).toMatchObject({
-      subscribers: true,
-      comments: false,
-    });
-
-    withFreeCapabilities([CAPABILITY.COMMENTS]);
-    expect(planPageAccess(TENANT_PLAN.FREE)).toMatchObject({
-      subscribers: false,
-      comments: true,
-    });
+    expect(email).toBe(true);
   });
 
   it('keeps Languages and Team closed on FREE whatever its capabilities', () => {
     withFreeCapabilities([CAPABILITY.COMMENTS, CAPABILITY.NEWSLETTER]);
 
-    expect(planPageAccess(TENANT_PLAN.FREE)).toMatchObject({
-      languages: false,
-      team: false,
-    });
+    const { languages, team } = planPageAccess(TENANT_PLAN.FREE);
+
+    expect(languages).toBe(false);
+    expect(team).toBe(false);
   });
 });

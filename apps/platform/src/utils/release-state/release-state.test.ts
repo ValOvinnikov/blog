@@ -7,35 +7,20 @@ import { isReleaseOverrideRequired, isReleaseRunActive } from './release-state';
 
 describe(isReleaseOverrideRequired, () => {
   it.each([
-    CONTRAST_STATUS.DUE,
-    CONTRAST_STATUS.FAILED,
-    CONTRAST_STATUS.RUNNING,
+    [true, CONTRAST_STATUS.DUE, true],
+    [true, CONTRAST_STATUS.FAILED, true],
+    [true, CONTRAST_STATUS.RUNNING, true],
+    [true, CONTRAST_STATUS.GREEN, false],
+    [true, CONTRAST_STATUS.NONE, false],
+    [false, CONTRAST_STATUS.FAILED, false],
   ])(
-    'requires an override when rendering changed and contrast is %s',
-    (contrastStatus) => {
+    'with rendering changed %s and contrast %s, an override is required: %s',
+    (isRenderingChanged, contrastStatus, isRequired) => {
       expect(
-        isReleaseOverrideRequired({ isRenderingChanged: true, contrastStatus }),
-      ).toBe(true);
+        isReleaseOverrideRequired({ isRenderingChanged, contrastStatus }),
+      ).toBe(isRequired);
     },
   );
-
-  it.each([CONTRAST_STATUS.GREEN, CONTRAST_STATUS.NONE])(
-    'needs no override when contrast is %s',
-    (contrastStatus) => {
-      expect(
-        isReleaseOverrideRequired({ isRenderingChanged: true, contrastStatus }),
-      ).toBe(false);
-    },
-  );
-
-  it('needs no override when no rendering path changed, whatever contrast says', () => {
-    expect(
-      isReleaseOverrideRequired({
-        isRenderingChanged: false,
-        contrastStatus: CONTRAST_STATUS.FAILED,
-      }),
-    ).toBe(false);
-  });
 });
 
 describe(isReleaseRunActive, () => {

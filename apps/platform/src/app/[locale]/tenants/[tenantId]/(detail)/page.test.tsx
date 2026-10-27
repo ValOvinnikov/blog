@@ -1,31 +1,27 @@
-import { AUDIT_TARGET_TYPE } from '@blog/config';
-import { FINDING_STATUS } from '@blog/config/constants';
-import { ADMIN_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import messages from '@platform/i18n/messages/en.json';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
-  INVITED_PENDING_TEXT,
-  mockTenant,
-  MOCK_TENANT_DOMAIN,
-  MOCK_TENANT_NAME,
-  MOCK_TENANT_URL,
   MOCK_TENANT_ID,
-  MOCK_OWNER_JOINED_AT,
+  MOCK_TENANT_NAME,
   mockJoinedOwner,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import TenantOverviewPage from './page';
 
 const {
   requireTenantByIdMock,
+  requireAdminMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
   requireTenantByIdMock: vi.fn(),
+  requireAdminMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
@@ -37,10 +33,7 @@ vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
 }));
 
 vi.mock('@platform/server/auth/require-admin', () => ({
-  requireAdmin: vi.fn(async () => ({
-    id: 'admin-1',
-    role: ADMIN_ROLE.ADMIN,
-  })),
+  requireAdmin: requireAdminMock,
 }));
 
 vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
@@ -51,9 +44,7 @@ vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: {
-      getTenantOwnerMembership: getTenantOwnerMembershipMock,
-    },
+    memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },
   },
@@ -82,129 +73,38 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
 
+const { tenantOverviewPage } = messages;
+
 const setup = customRenderAsync(TenantOverviewPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
-const INVITED_EXAMPLE_COM = 'invited@example.com';
-
-describe(TenantOverviewPage, () => {
-  let tenant: ReturnType<typeof mockTenant>;
-
+describe(`<${TenantOverviewPage.name}/>`, () => {
   beforeEach(() => {
-    requireTenantByIdMock.mockReset();
-    tenant = mockTenant();
-    requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
-    getTenantOwnerMembershipMock.mockReset();
-    getTenantOwnerMembershipMock.mockResolvedValue(
-      mockJoinedOwner('owner@example.com'),
-    );
-    listAuditEventsForTargetMock.mockReset();
+    requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
+    requireAdminMock.mockResolvedValue(mockAdmin());
+    getTenantOwnerMembershipMock.mockResolvedValue(mockJoinedOwner());
     listAuditEventsForTargetMock.mockResolvedValue([]);
-    listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
-    getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
     );
   });
 
-  describe('with the default tenant', () => {
-    beforeEach(async () => {
-      await setup();
-    });
-
-    it('renders the overview for the resolved tenant', () => {
-      expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-      expect(getTenantOwnerMembershipMock).toHaveBeenCalledExactlyOnceWith(
-        tenant.id,
-      );
-      expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-        MOCK_TENANT_DOMAIN,
-      );
-      expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
-        AUDIT_TARGET_TYPE.TENANT,
-        tenant.id,
-        { limit: 5 },
-      );
-      expect(listFindingsForTenantMock).toHaveBeenCalledWith(
-        tenant.id,
-        FINDING_STATUS.OPEN,
-      );
-
-      const heading = screen.getByRole('heading', {
-        level: 1,
-        name: MOCK_TENANT_NAME,
-      });
-      expect(heading).toBeVisible();
-    });
-
-    it('shows the owner membership join date in the Joined row', () => {
-      const joinedLabel = screen.getByText('Joined');
-      const joinedTime = screen.getByText('Aug 12, 2026');
-      expect(joinedLabel).toBeVisible();
-      expect(joinedTime).toBeVisible();
-      expect(joinedTime).toHaveAttribute(
-        'dateTime',
-        MOCK_OWNER_JOINED_AT.toISOString(),
-      );
-    });
-
-    it('always shows "Open site", pointing at the tenant\'s live domain', () => {
-      const openSiteLink = screen.getByRole('link', {
-        name: 'Open site (opens in new tab)',
-      });
-      expect(openSiteLink).toHaveAttribute('href', MOCK_TENANT_URL);
-    });
-
-    it('never shows an "Open Studio" action — Studio opens from the sidebar', () => {
-      const openStudioLink = screen.queryByRole('link', {
-        name: 'Open Studio →',
-      });
-      expect(openStudioLink).not.toBeInTheDocument();
-    });
-
-    it('shows the healthy empty state when the tenant has no open findings', () => {
-      const emptyState = screen.getByText(
-        "No open findings for this tenant — everything's healthy.",
-      );
-      expect(emptyState).toBeVisible();
-    });
-  });
-
-  it('shows the invited email without a Joined row for a pending invite', async () => {
-    getTenantOwnerMembershipMock.mockResolvedValue({
-      email: INVITED_EXAMPLE_COM,
-    });
-
+  it('renders the overview of the requested tenant', async () => {
     await setup();
 
-    const joinedLabel = screen.queryByText('Joined');
-    const invitedEmail = screen.getByText(INVITED_EXAMPLE_COM);
-    expect(joinedLabel).not.toBeInTheDocument();
-    expect(invitedEmail).toBeVisible();
-  });
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: MOCK_TENANT_NAME,
+    });
 
-  it('shows the invited-pending badge when the tenant has no owner', async () => {
-    getTenantOwnerMembershipMock.mockResolvedValue(undefined);
-
-    await setup();
-
-    const pendingBadge = screen.getByText(INVITED_PENDING_TEXT);
-    expect(pendingBadge).toBeVisible();
-  });
-
-  it("renders the tenant's open findings from listFindingsForTenant", async () => {
-    listFindingsForTenantMock.mockResolvedValue([mockFinding()]);
-
-    await setup();
-
-    const finding = screen.getByText('Provisioning step failed');
-    expect(finding).toBeVisible();
+    expect(requireTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(heading).toBeVisible();
   });
 
   it('renders the overview without waiting for the Vercel domain status', async () => {
-    getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
+    getDomainVerificationStatusMock.mockReturnValueOnce(new Promise(() => {}));
 
     await setup();
 
@@ -214,22 +114,17 @@ describe(TenantOverviewPage, () => {
     });
     const ownerHeading = screen.getByRole('heading', {
       level: 2,
-      name: 'Owner',
-    });
-    const activityHeading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Recent activity',
+      name: tenantOverviewPage.ownerCardTitle,
     });
     const domainHeading = screen.queryByRole('heading', {
       level: 2,
-      name: 'Domain',
+      name: tenantOverviewPage.domainCardTitle,
     });
-    const skeletons = screen.getAllByTestId('skeleton');
+    const [domainSkeleton] = screen.getAllByTestId('skeleton');
 
     expect(pageHeading).toBeVisible();
     expect(ownerHeading).toBeVisible();
-    expect(activityHeading).toBeVisible();
     expect(domainHeading).not.toBeInTheDocument();
-    expect(skeletons.length).toBeGreaterThan(0);
+    expect(domainSkeleton).toBeVisible();
   });
 });

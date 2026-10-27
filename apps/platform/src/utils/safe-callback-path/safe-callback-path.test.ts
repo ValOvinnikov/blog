@@ -3,11 +3,12 @@ import {
   MOCK_OFF_ORIGIN_PATH,
   MOCK_OFF_ORIGIN_URL,
 } from '@platform/testing/auth/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { toSafeCallbackPath } from './safe-callback-path';
 
-const MOCK_TENANT_ID = faker.string.uuid();
+faker.seed(6006);
 
 describe(toSafeCallbackPath, () => {
   it.each([

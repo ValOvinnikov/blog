@@ -1,13 +1,29 @@
-import { render, screen, within } from '@testing-library/react';
+import { faker } from '@faker-js/faker';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { mapCompoundSlots } from './compound';
+
+faker.seed(1);
+
+const MOCK_FIRST_TEXT = faker.lorem.words(2);
+const MOCK_SECOND_TEXT = faker.lorem.words(3);
+const MOCK_UNKNOWN_TEXT = faker.lorem.words(4);
+const MOCK_STRAY_TEXT = faker.lorem.words(5);
+const UNMATCHED_ITEM_TEST_ID = 'unmatched-item';
 
 const Alpha = ({ children }: ComponentPropsWithoutRef<'span'>) => (
   <span data-testid="alpha">{children}</span>
 );
 const Beta = ({ children }: ComponentPropsWithoutRef<'span'>) => (
   <span data-testid="beta">{children}</span>
+);
+const Unknown = ({ children }: ComponentPropsWithoutRef<'span'>) => (
+  <span>{children}</span>
 );
 
 const TestHarness = ({ children }: { children: ReactNode }) => {
@@ -21,7 +37,7 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
       <div data-testid="slot-beta">{slots.beta}</div>
       <div data-testid="unmatched">
         {unmatched.map((node, i) => (
-          <span key={i} data-testid="unmatched-item">
+          <span key={i} data-testid={UNMATCHED_ITEM_TEST_ID}>
             {node}
           </span>
         ))}
@@ -32,83 +48,104 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
 
 describe(mapCompoundSlots, () => {
   it('matches a single known slot', () => {
-    render(
+    renderWithIntl(
       <TestHarness>
-        <Alpha>one</Alpha>
+        <Alpha>{MOCK_FIRST_TEXT}</Alpha>
       </TestHarness>,
     );
-    expect(screen.getByTestId('alpha')).toBeVisible();
-    expect(screen.getByTestId('alpha')).toHaveTextContent('one');
+
+    const alpha = screen.getByTestId('alpha');
+
+    expect(alpha).toBeVisible();
+    expect(alpha).toHaveTextContent(MOCK_FIRST_TEXT);
   });
 
   it('matches multiple different known slots', () => {
-    render(
+    renderWithIntl(
       <TestHarness>
-        <Alpha>one</Alpha>
-        <Beta>two</Beta>
+        <Alpha>{MOCK_FIRST_TEXT}</Alpha>
+        <Beta>{MOCK_SECOND_TEXT}</Beta>
       </TestHarness>,
     );
-    expect(screen.getByTestId('alpha')).toHaveTextContent('one');
-    expect(screen.getByTestId('beta')).toHaveTextContent('two');
+
+    const alpha = screen.getByTestId('alpha');
+    const beta = screen.getByTestId('beta');
+
+    expect(alpha).toHaveTextContent(MOCK_FIRST_TEXT);
+    expect(beta).toHaveTextContent(MOCK_SECOND_TEXT);
   });
 
   it('routes an unknown component to unmatched', () => {
-    const Unknown = () => <span>unknown</span>;
-    render(
+    renderWithIntl(
       <TestHarness>
-        <Alpha>one</Alpha>
-        <Unknown />
+        <Alpha>{MOCK_FIRST_TEXT}</Alpha>
+        <Unknown>{MOCK_UNKNOWN_TEXT}</Unknown>
       </TestHarness>,
     );
-    expect(screen.getAllByTestId('unmatched-item')).toHaveLength(1);
-    expect(screen.getByText('unknown')).toBeVisible();
+
+    const unmatchedItems = screen.getAllByTestId(UNMATCHED_ITEM_TEST_ID);
+    const unknown = screen.getByText(MOCK_UNKNOWN_TEXT);
+
+    expect(unmatchedItems).toHaveLength(1);
+    expect(unknown).toBeVisible();
   });
 
   it('routes stray text children to unmatched', () => {
-    render(<TestHarness>stray text</TestHarness>);
-    expect(screen.getByText('stray text')).toBeVisible();
+    renderWithIntl(<TestHarness>{MOCK_STRAY_TEXT}</TestHarness>);
+
+    const strayText = screen.getByText(MOCK_STRAY_TEXT);
+
+    expect(strayText).toBeVisible();
   });
 
-  it('routes a duplicate slot (second occurrence) to unmatched', () => {
-    render(
+  it('routes a second occurrence of a slot to unmatched', () => {
+    renderWithIntl(
       <TestHarness>
-        <Alpha>first</Alpha>
-        <Alpha>second</Alpha>
+        <Alpha>{MOCK_FIRST_TEXT}</Alpha>
+        <Alpha>{MOCK_SECOND_TEXT}</Alpha>
       </TestHarness>,
     );
-    const slotAlphaContainer = screen.getByTestId('slot-alpha');
-    const unmatchedContainer = screen.getByTestId('unmatched');
-    expect(within(slotAlphaContainer).getByTestId('alpha')).toHaveTextContent(
-      'first',
-    );
-    expect(
-      within(unmatchedContainer).getByTestId('unmatched-item'),
-    ).toHaveTextContent('second');
+
+    const slotAlpha = screen.getByTestId('slot-alpha');
+    const unmatched = screen.getByTestId('unmatched');
+    const matchedAlpha = within(slotAlpha).getByTestId('alpha');
+    const unmatchedItem = within(unmatched).getByTestId(UNMATCHED_ITEM_TEST_ID);
+
+    expect(matchedAlpha).toHaveTextContent(MOCK_FIRST_TEXT);
+    expect(unmatchedItem).toHaveTextContent(MOCK_SECOND_TEXT);
   });
 
   it('matches slots wrapped in a single Fragment', () => {
-    render(
+    renderWithIntl(
       <TestHarness>
         <>
-          <Alpha>one</Alpha>
-          <Beta>two</Beta>
+          <Alpha>{MOCK_FIRST_TEXT}</Alpha>
+          <Beta>{MOCK_SECOND_TEXT}</Beta>
         </>
       </TestHarness>,
     );
-    expect(screen.getByTestId('alpha')).toHaveTextContent('one');
-    expect(screen.getByTestId('beta')).toHaveTextContent('two');
-    expect(screen.queryAllByTestId('unmatched-item')).toHaveLength(0);
+
+    const alpha = screen.getByTestId('alpha');
+    const beta = screen.getByTestId('beta');
+    const unmatchedItems = screen.queryAllByTestId(UNMATCHED_ITEM_TEST_ID);
+
+    expect(alpha).toHaveTextContent(MOCK_FIRST_TEXT);
+    expect(beta).toHaveTextContent(MOCK_SECOND_TEXT);
+    expect(unmatchedItems).toHaveLength(0);
   });
 
-  it('ignores false/null/undefined children without adding them to unmatched', () => {
-    render(
+  it('ignores false, null and undefined children', () => {
+    renderWithIntl(
       <TestHarness>
-        <Alpha>one</Alpha>
+        <Alpha>{MOCK_FIRST_TEXT}</Alpha>
         {false}
         {null}
         {undefined}
       </TestHarness>,
     );
-    expect(screen.queryAllByTestId('unmatched-item')).toHaveLength(0);
+
+    const unmatchedItems = screen.queryAllByTestId(UNMATCHED_ITEM_TEST_ID);
+
+    expect(unmatchedItems).toHaveLength(0);
   });
 });

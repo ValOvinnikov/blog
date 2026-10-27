@@ -1,16 +1,15 @@
 import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   HEADER_CONTROL_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
+  PRESET_REGISTRY,
   RADIUS_SCALE,
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
+import { faker } from '@faker-js/faker';
 import {
   MOCK_LOGO_URL,
   MOCK_FAVICON_URL,
@@ -23,18 +22,48 @@ import {
   toLookFormValues,
 } from './default-look-values';
 
+faker.seed(6006);
+
+const MOCK_REF_DATE = '2026-10-19T10:00:00.000Z';
+
+const MOCK_SITE_CONFIG: TSiteConfigResult = {
+  id: faker.string.uuid(),
+  tenantId: MOCK_TENANT_ID,
+  preset: PRESET_ID.EDITORIAL,
+  accentHue: faker.number.int({ min: 0, max: 360 }),
+  logoHue: faker.number.int({ min: 0, max: 360 }),
+  headingFont: FONT_CHOICE.FRAUNCES,
+  bodyFont: FONT_CHOICE.INTER,
+  radiusScale: RADIUS_SCALE.LG,
+  density: DENSITY.COMPACT,
+  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+  cardStyle: CARD_STYLE.OUTLINED,
+  headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+  logoAssetUrl: MOCK_LOGO_URL,
+  faviconAssetUrl: MOCK_FAVICON_URL,
+  voiceOverridesByLocale: {},
+  voiceOverrides: {},
+  createdAt: faker.date.past({ refDate: MOCK_REF_DATE }),
+  updatedAt: faker.date.past({ refDate: MOCK_REF_DATE }),
+};
+
 describe(defaultLookFormValues, () => {
-  it('matches the Console preset registry defaults, with logo hue following accent', () => {
-    expect(defaultLookFormValues()).toEqual({
+  it('follows the Console preset, leaving the logo hue unset', () => {
+    const { themeTokens, cardStyle, headerControlStyle } =
+      PRESET_REGISTRY[PRESET_ID.CONSOLE];
+
+    const values = defaultLookFormValues();
+
+    expect(values).toEqual({
       preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
+      accentHue: themeTokens.accentHue,
       logoHue: undefined,
-      headingFont: FONT_CHOICE.SPACE_GROTESK,
-      bodyFont: FONT_CHOICE.NEWSREADER,
-      radiusScale: RADIUS_SCALE.MD,
-      density: DENSITY.DEFAULT,
-      cardStyle: CARD_STYLE.ACCENT_BAR,
-      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+      headingFont: themeTokens.headingFont,
+      bodyFont: themeTokens.bodyFont,
+      radiusScale: themeTokens.radiusScale,
+      density: themeTokens.density,
+      cardStyle,
+      headerControlStyle,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logo: { url: undefined },
       favicon: { url: undefined },
@@ -44,41 +73,19 @@ describe(defaultLookFormValues, () => {
 
 describe(toLookFormValues, () => {
   it('carries every stored column through unchanged', () => {
-    const siteConfig: TSiteConfigResult = {
-      id: 'config-1',
-      tenantId: MOCK_TENANT_ID,
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 40,
-      logoHue: 90,
-      headingFont: FONT_CHOICE.FRAUNCES,
-      bodyFont: FONT_CHOICE.INTER,
-      radiusScale: RADIUS_SCALE.LG,
-      density: DENSITY.COMPACT,
-      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      cardStyle: CARD_STYLE.OUTLINED,
-      headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
-      accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
-      accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
-      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
-      logoAssetUrl: MOCK_LOGO_URL,
-      faviconAssetUrl: MOCK_FAVICON_URL,
-      voiceOverridesByLocale: {},
-      voiceOverrides: {},
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const values = toLookFormValues(MOCK_SITE_CONFIG);
 
-    expect(toLookFormValues(siteConfig)).toEqual({
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 40,
-      logoHue: 90,
-      headingFont: FONT_CHOICE.FRAUNCES,
-      bodyFont: FONT_CHOICE.INTER,
-      radiusScale: RADIUS_SCALE.LG,
-      density: DENSITY.COMPACT,
-      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      cardStyle: CARD_STYLE.OUTLINED,
-      headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+    expect(values).toEqual({
+      preset: MOCK_SITE_CONFIG.preset,
+      accentHue: MOCK_SITE_CONFIG.accentHue,
+      logoHue: MOCK_SITE_CONFIG.logoHue,
+      headingFont: MOCK_SITE_CONFIG.headingFont,
+      bodyFont: MOCK_SITE_CONFIG.bodyFont,
+      radiusScale: MOCK_SITE_CONFIG.radiusScale,
+      density: MOCK_SITE_CONFIG.density,
+      languageSwitcherStyle: MOCK_SITE_CONFIG.languageSwitcherStyle,
+      cardStyle: MOCK_SITE_CONFIG.cardStyle,
+      headerControlStyle: MOCK_SITE_CONFIG.headerControlStyle,
       logo: { url: MOCK_LOGO_URL },
       favicon: { url: MOCK_FAVICON_URL },
     });
@@ -87,8 +94,14 @@ describe(toLookFormValues, () => {
 
 describe(lookFormValuesOrDefaults, () => {
   it('falls back to the defaults when there is no saved row', () => {
-    expect(lookFormValuesOrDefaults(undefined)).toEqual(
-      defaultLookFormValues(),
-    );
+    const values = lookFormValuesOrDefaults(undefined);
+
+    expect(values).toEqual(defaultLookFormValues());
+  });
+
+  it('reads the saved row when there is one', () => {
+    const values = lookFormValuesOrDefaults(MOCK_SITE_CONFIG);
+
+    expect(values).toEqual(toLookFormValues(MOCK_SITE_CONFIG));
   });
 });

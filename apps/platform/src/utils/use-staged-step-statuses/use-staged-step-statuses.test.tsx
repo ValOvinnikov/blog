@@ -2,7 +2,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import { act, renderHookWithIntl } from '@platform/testing/custom-render';
+import { act, renderHook } from '@testing-library/react';
 
 import { useStagedStepStatuses } from './use-staged-step-statuses';
 
@@ -26,7 +26,7 @@ describe(useStagedStepStatuses, () => {
   });
 
   const setup = (initial: TTenantProvisioningStepStatus[]) =>
-    renderHookWithIntl(({ target }) => useStagedStepStatuses(target), {
+    renderHook(({ target }) => useStagedStepStatuses(target), {
       initialProps: { target: initial },
     });
 

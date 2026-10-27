@@ -1,4 +1,5 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import {
   mockEmailDraft,
   MOCK_EMAIL_BODY,
@@ -19,8 +20,16 @@ import {
   resolveItemStatus,
 } from './email-draft-changes';
 
+faker.seed(1);
+
 const { EN, FR } = LOCALE_ISO_CODES;
 const { MAGIC_LINK, TENANT_INVITE } = EMAIL_TEMPLATE_TYPE;
+
+const MOCK_SUBJECT = faker.lorem.sentence();
+const MOCK_SENDER_NAME = faker.person.fullName();
+const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
+const MOCK_LOGO_BLOB_URL = faker.internet.url();
+const MOCK_LOGO_FILE = new File([faker.lorem.word()], faker.system.fileName());
 
 describe('change tracking', () => {
   let saved: TEmailDraft;
@@ -30,23 +39,39 @@ describe('change tracking', () => {
   });
 
   it('reports no changes for an untouched draft', () => {
-    expect(
-      countEmailDraftChanges(saved, saved, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
-    ).toBe(0);
-    expect(
-      listCopyChanges(saved, saved, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
-    ).toEqual([]);
+    const total = countEmailDraftChanges(
+      saved,
+      saved,
+      MOCK_EMAIL_DRAFT_LIVE_LOCALES,
+    );
+    const copyChanges = listCopyChanges(
+      saved,
+      saved,
+      MOCK_EMAIL_DRAFT_LIVE_LOCALES,
+    );
+
+    expect(total).toBe(0);
+    expect(copyChanges).toEqual([]);
   });
 
   it('counts subject and body edits per language', () => {
     const draft = withCopy(
       saved,
       { templateType: MAGIC_LINK, locale: FR },
-      { subject: 'Connexion', body: MOCK_EMAIL_BODY },
+      { subject: MOCK_SUBJECT, body: MOCK_EMAIL_BODY },
     );
 
     expect(countLanguageChanges(saved, draft, FR)).toBe(2);
     expect(countLanguageChanges(saved, draft, EN)).toBe(0);
+  });
+
+  it('lists the template and language of each copy edit', () => {
+    const draft = withCopy(
+      saved,
+      { templateType: MAGIC_LINK, locale: FR },
+      { subject: MOCK_SUBJECT, body: MOCK_EMAIL_BODY },
+    );
+
     expect(
       listCopyChanges(saved, draft, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
     ).toEqual([{ templateType: MAGIC_LINK, locale: FR }]);
@@ -54,9 +79,12 @@ describe('change tracking', () => {
 
   it('counts sender fields and staged logos', () => {
     const draft = withLogo(
-      { ...saved, sender: { ...saved.sender, senderName: 'Acme' } },
+      {
+        ...saved,
+        sender: { ...saved.sender, senderName: MOCK_SENDER_NAME },
+      },
       EMAIL_SENDER_ITEM,
-      { url: 'blob:logo', file: new File(['x'], 'logo.png') },
+      { url: MOCK_LOGO_BLOB_URL, file: MOCK_LOGO_FILE },
     );
 
     expect(
@@ -66,52 +94,70 @@ describe('change tracking', () => {
 
   it('adds up shared and per-language changes to the total', () => {
     const draft = withCopy(
-      { ...saved, sender: { ...saved.sender, senderName: 'Acme' } },
+      {
+        ...saved,
+        sender: { ...saved.sender, senderName: MOCK_SENDER_NAME },
+      },
       { templateType: TENANT_INVITE, locale: FR },
-      { subject: 'Invitation', body: null },
+      { subject: MOCK_SUBJECT, body: null },
     );
 
-    expect(countSharedChanges(saved, draft)).toBe(1);
-    expect(
+    const parts =
       countSharedChanges(saved, draft) +
-        countLanguageChanges(saved, draft, EN) +
-        countLanguageChanges(saved, draft, FR),
-    ).toBe(countEmailDraftChanges(saved, draft, MOCK_EMAIL_DRAFT_LIVE_LOCALES));
+      countLanguageChanges(saved, draft, EN) +
+      countLanguageChanges(saved, draft, FR);
+
+    expect(parts).toBe(
+      countEmailDraftChanges(saved, draft, MOCK_EMAIL_DRAFT_LIVE_LOCALES),
+    );
   });
 });
 
-describe('resolveItemStatus', () => {
+describe(resolveItemStatus, () => {
   let saved: TEmailDraft;
+  let copyEditedDraft: TEmailDraft;
 
   beforeEach(() => {
     saved = mockEmailDraft();
+    copyEditedDraft = withCopy(
+      saved,
+      { templateType: TENANT_INVITE, locale: FR },
+      { subject: MOCK_SUBJECT, body: null },
+    );
   });
 
-  it('marks a template customised only in the languages it was written in', () => {
+  it('marks a template customised in the language it was written in', () => {
     expect(resolveItemStatus(saved, saved, MAGIC_LINK, EN)).toBe('customised');
+  });
+
+  it('marks a template default in a language it was not written in', () => {
     expect(resolveItemStatus(saved, saved, MAGIC_LINK, FR)).toBe('default');
   });
 
   it('marks a template unsaved while it has an edit in the selected language', () => {
-    const draft = withCopy(
-      saved,
-      { templateType: TENANT_INVITE, locale: FR },
-      { subject: 'Invitation', body: null },
+    expect(resolveItemStatus(saved, copyEditedDraft, TENANT_INVITE, FR)).toBe(
+      'unsaved',
     );
+  });
 
-    expect(resolveItemStatus(saved, draft, TENANT_INVITE, FR)).toBe('unsaved');
-    expect(resolveItemStatus(saved, draft, TENANT_INVITE, EN)).toBe('default');
+  it('leaves a template default in a language without edits', () => {
+    expect(resolveItemStatus(saved, copyEditedDraft, TENANT_INVITE, EN)).toBe(
+      'default',
+    );
+  });
+
+  it('marks the sender item default while nothing is set', () => {
+    expect(resolveItemStatus(saved, saved, EMAIL_SENDER_ITEM, EN)).toBe(
+      'default',
+    );
   });
 
   it('marks the sender item unsaved after a sender edit', () => {
     const draft = {
       ...saved,
-      sender: { ...saved.sender, replyToAddress: 'hi@acme.example' },
+      sender: { ...saved.sender, replyToAddress: MOCK_REPLY_TO_ADDRESS },
     };
 
-    expect(resolveItemStatus(saved, saved, EMAIL_SENDER_ITEM, EN)).toBe(
-      'default',
-    );
     expect(resolveItemStatus(saved, draft, EMAIL_SENDER_ITEM, EN)).toBe(
       'unsaved',
     );

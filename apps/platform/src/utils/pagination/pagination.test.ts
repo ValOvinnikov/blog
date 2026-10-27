@@ -23,13 +23,16 @@ describe(parsePage, () => {
 });
 
 describe(countPages, () => {
-  it('keeps one page for no items', () => {
-    expect(countPages(0, MOCK_PAGE_SIZE)).toBe(1);
-  });
-
-  it('fills a page before starting the next', () => {
-    expect(countPages(MOCK_PAGE_SIZE, MOCK_PAGE_SIZE)).toBe(1);
-    expect(countPages(MOCK_PAGE_SIZE + 1, MOCK_PAGE_SIZE)).toBe(2);
+  it.each([
+    { name: 'keeps one page for no items', total: 0, pages: 1 },
+    { name: 'fits a full page on one page', total: MOCK_PAGE_SIZE, pages: 1 },
+    {
+      name: 'starts the next page past a full one',
+      total: MOCK_PAGE_SIZE + 1,
+      pages: 2,
+    },
+  ])('$name', ({ total, pages }) => {
+    expect(countPages(total, MOCK_PAGE_SIZE)).toBe(pages);
   });
 });
 
@@ -54,6 +57,6 @@ describe(resolveTotalPages, () => {
       NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
     );
 
-    expect(redirect).toHaveBeenCalledWith('/items?page=2');
+    expect(redirect).toHaveBeenCalledWith(pageHref(2));
   });
 });

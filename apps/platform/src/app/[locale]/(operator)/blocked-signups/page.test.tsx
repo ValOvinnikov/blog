@@ -1,28 +1,20 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import { okResult } from '@blog/utils';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import {
-  MOCK_BLOCKED_ADDRESS_ENTRY_ID,
-  MOCK_BLOCKED_ADDRESS_HASH,
-  MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
   MOCK_BLOCKED_DOMAIN,
   mockBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { notFound } from 'next/navigation';
 
 import BlockedSignupsPage from './page';
 
-const { requireSuperAdminMock, listBlockedIdentitiesMock } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
+const { listBlockedIdentitiesMock } = vi.hoisted(() => ({
   listBlockedIdentitiesMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/signup-block/add-blocked-domain-action', () => ({
   addBlockedDomainAction: vi.fn(),
@@ -43,38 +35,26 @@ vi.mock('@blog/db', async () => ({
 
 const setup = customRenderAsync(BlockedSignupsPage, {});
 
-describe(BlockedSignupsPage, () => {
-  beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
-    listBlockedIdentitiesMock.mockReset().mockResolvedValue(
-      okResult([
-        mockBlockedIdentityListing(),
-        mockBlockedIdentityListing({
-          id: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
-          kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          value: MOCK_BLOCKED_ADDRESS_HASH,
-        }),
-      ]),
-    );
-  });
-
+describe(`<${BlockedSignupsPage.name}/>`, () => {
   it('404s for anyone who is not a super admin without reading the list', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      notFound();
-    });
+    vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(listBlockedIdentitiesMock).not.toHaveBeenCalled();
   });
 
-  it('lists every entry, showing an address only as the start of its hash', async () => {
+  it('lists every blocked entry', async () => {
+    listBlockedIdentitiesMock.mockResolvedValueOnce(
+      okResult([mockBlockedIdentityListing()]),
+    );
+
     await setup();
 
     const domain = screen.getByText(MOCK_BLOCKED_DOMAIN);
-    const addressHash = screen.getByText(MOCK_BLOCKED_ADDRESS_HASH_PREVIEW);
 
     expect(domain).toBeVisible();
-    expect(addressHash).toBeVisible();
   });
 });

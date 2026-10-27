@@ -1,12 +1,15 @@
 import {
+  HUE_MAX,
+  HUE_MIN,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import {
-  MOCK_STAGED_LOGO_BLOB_URL,
   MOCK_LOGO_URL,
+  MOCK_STAGED_LOGO_BLOB_URL,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
@@ -17,17 +20,25 @@ import {
   listLostStagedFiles,
 } from './look-form-values';
 
-const LOGO_FILE = new File(['bytes'], 'logo.png', { type: 'image/png' });
+faker.seed(1);
+
+const MOCK_LOGO_FILE = new File([faker.lorem.word()], faker.system.fileName(), {
+  type: 'image/png',
+});
+const MOCK_STAGED_FAVICON_URL = faker.internet.url();
+const MOCK_ACCENT_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
+const MOCK_LOGO_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
 
 describe(applyPresetDefaults, () => {
   it("takes the preset's theme tokens and clears the logo hue", () => {
     const current = {
       ...defaultLookFormValues(),
-      accentHue: 12,
-      logoHue: 90,
+      accentHue: MOCK_ACCENT_HUE,
+      logoHue: MOCK_LOGO_HUE,
       radiusScale: RADIUS_SCALE.XL,
     };
-    const { themeTokens, cardStyle } = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
+    const { themeTokens, cardStyle, headerControlStyle } =
+      PRESET_REGISTRY[PRESET_ID.EDITORIAL];
 
     expect(applyPresetDefaults(PRESET_ID.EDITORIAL, current)).toMatchObject({
       preset: PRESET_ID.EDITORIAL,
@@ -38,11 +49,12 @@ describe(applyPresetDefaults, () => {
       radiusScale: themeTokens.radiusScale,
       density: themeTokens.density,
       cardStyle,
+      headerControlStyle,
     });
   });
 
   it('keeps the language switcher style and both brand images', () => {
-    const logo = { url: MOCK_STAGED_LOGO_BLOB_URL, file: LOGO_FILE };
+    const logo = { url: MOCK_STAGED_LOGO_BLOB_URL, file: MOCK_LOGO_FILE };
     const favicon = { url: MOCK_LOGO_URL };
     const current = {
       ...defaultLookFormValues(),
@@ -60,14 +72,20 @@ describe(applyPresetDefaults, () => {
 });
 
 describe(isFieldChanged, () => {
-  it('compares a plain field by value', () => {
+  it('treats an equal plain field as unchanged', () => {
     const a = defaultLookFormValues();
 
     expect(isFieldChanged('accentHue', a, { ...a })).toBe(false);
-    expect(isFieldChanged('accentHue', a, { ...a, accentHue: 12 })).toBe(true);
   });
 
-  it('treats a brand image with the same url and file as unchanged, even as a new object', () => {
+  it('treats a different plain field as changed', () => {
+    const a = defaultLookFormValues();
+    const b = { ...a, accentHue: a.accentHue + 1 };
+
+    expect(isFieldChanged('accentHue', a, b)).toBe(true);
+  });
+
+  it('treats a brand image with the same url and file as unchanged', () => {
     const a = { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } };
     const b = { ...a, logo: { url: MOCK_LOGO_URL } };
 
@@ -76,7 +94,7 @@ describe(isFieldChanged, () => {
 
   it('treats a newly staged file as a change', () => {
     const a = { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } };
-    const b = { ...a, logo: { url: MOCK_LOGO_URL, file: LOGO_FILE } };
+    const b = { ...a, logo: { url: MOCK_LOGO_URL, file: MOCK_LOGO_FILE } };
 
     expect(isFieldChanged('logo', a, b)).toBe(true);
   });
@@ -93,9 +111,9 @@ describe(countChanges, () => {
     const a = defaultLookFormValues();
     const b = {
       ...a,
-      accentHue: 12,
+      accentHue: a.accentHue + 1,
       radiusScale: RADIUS_SCALE.XL,
-      favicon: { url: 'blob:staged-favicon', file: LOGO_FILE },
+      favicon: { url: MOCK_STAGED_FAVICON_URL, file: MOCK_LOGO_FILE },
     };
 
     expect(countChanges(a, b)).toBe(3);
@@ -106,7 +124,7 @@ describe(listLostStagedFiles, () => {
   it('lists every brand image that was staged as a file', () => {
     const draft = {
       ...defaultLookFormValues(),
-      logo: { url: 'blob:dead', file: {} as File },
+      logo: { url: MOCK_STAGED_LOGO_BLOB_URL, file: {} as File },
       favicon: { url: MOCK_LOGO_URL },
     };
 

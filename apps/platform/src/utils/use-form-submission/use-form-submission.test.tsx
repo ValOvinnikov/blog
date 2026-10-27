@@ -1,212 +1,102 @@
 import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, renderHook } from '@platform/testing/custom-render';
 
 import { useFormSubmission } from './use-form-submission';
 
 type TValues = { name: string };
 type TResult = { outcome: TActionOutcome };
 
-type THarnessProps = {
-  onOutcome?: (isSaved: boolean) => void;
-  initialValues: TValues | (() => TValues);
-  onSubmit: (values: TValues) => Promise<TResult>;
-  onSuccess?: (values: TValues, result: TResult) => void;
-};
+faker.seed(6006);
 
-const INITIAL_NAME = faker.person.fullName();
-const EDITED_NAME = faker.person.fullName();
-const EDIT_LABEL = faker.lorem.word();
-const SUBMIT_LABEL = faker.lorem.words(2);
+const MOCK_INITIAL_NAME = faker.person.fullName();
+const MOCK_EDITED_NAME = faker.person.fullName();
+const SUCCESS_RESULT: TResult = { outcome: ACTION_OUTCOME.SUCCESS };
+const SERVER_ERROR_RESULT: TResult = { outcome: ACTION_OUTCOME.SERVER_ERROR };
 
-const Harness = ({
-  initialValues,
-  onSubmit,
-  onSuccess,
-  onOutcome,
-}: THarnessProps) => {
-  const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<TValues, TResult>({
-      initialValues,
-      onSubmit,
-      onSuccess,
-    });
-
-  return (
-    <div>
-      <span data-testid="name">{values.name}</span>
-      <span data-testid="status">{status}</span>
-      <span data-testid="pending">{String(isPending)}</span>
-      <button
-        type="button"
-        onClick={() => setValues((prev) => ({ ...prev, name: EDITED_NAME }))}
-      >
-        {EDIT_LABEL}
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          void handleSubmit().then((isSaved) => onOutcome?.(isSaved))
-        }
-      >
-        {SUBMIT_LABEL}
-      </button>
-    </div>
+const setup = (
+  onSubmit: (values: TValues) => Promise<TResult>,
+  onSuccess?: (values: TValues, result: TResult) => void,
+  initialValues: TValues | (() => TValues) = { name: MOCK_INITIAL_NAME },
+) =>
+  renderHook(() =>
+    useFormSubmission<TValues, TResult>({ initialValues, onSubmit, onSuccess }),
   );
-};
 
 describe(useFormSubmission, () => {
-  let user: ReturnType<typeof userEvent.setup>;
-
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
-
   it('starts idle with the given initial values', () => {
-    render(
-      <Harness
-        initialValues={{ name: INITIAL_NAME }}
-        onSubmit={vi
-          .fn()
-          .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS })}
-      />,
-    );
+    const { result } = setup(vi.fn().mockResolvedValue(SUCCESS_RESULT));
 
-    const name = screen.getByTestId('name');
-    const status = screen.getByTestId('status');
-
-    expect(name).toHaveTextContent(INITIAL_NAME);
-    expect(status).toHaveTextContent(FORM_STATUS.IDLE);
+    expect(result.current.values).toEqual({ name: MOCK_INITIAL_NAME });
+    expect(result.current.status).toBe(FORM_STATUS.IDLE);
   });
 
-  it('accepts a lazy initializer, matching useState', () => {
+  it('accepts a lazy initializer', () => {
     const lazyName = faker.person.fullName();
-    const buildInitialValues = vi.fn(() => ({ name: lazyName }));
-    render(
-      <Harness
-        initialValues={buildInitialValues}
-        onSubmit={vi
-          .fn()
-          .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS })}
-      />,
+    const { result } = setup(
+      vi.fn().mockResolvedValue(SUCCESS_RESULT),
+      undefined,
+      () => ({ name: lazyName }),
     );
 
-    const name = screen.getByTestId('name');
-
-    expect(name).toHaveTextContent(lazyName);
+    expect(result.current.values).toEqual({ name: lazyName });
   });
 
-  it('sets status to success and calls onSuccess with the submitted values', async () => {
-    const onSubmit = vi
-      .fn()
-      .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
+  it('submits the edited values and reports success', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(SUCCESS_RESULT);
     const onSuccess = vi.fn();
-    render(
-      <Harness
-        initialValues={{ name: INITIAL_NAME }}
-        onSubmit={onSubmit}
-        onSuccess={onSuccess}
-      />,
-    );
-    const editButton = screen.getByRole('button', { name: EDIT_LABEL });
-    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+    const { result } = setup(onSubmit, onSuccess);
+    let isSaved = false;
 
-    await user.click(editButton);
-    await user.click(submitButton);
+    act(() => {
+      result.current.setValues({ name: MOCK_EDITED_NAME });
+    });
+    await act(async () => {
+      isSaved = await result.current.handleSubmit();
+    });
 
-    const status = await screen.findByTestId('status');
-
-    expect(status).toHaveTextContent(FORM_STATUS.SUCCESS);
-    expect(onSubmit).toHaveBeenCalledWith({ name: EDITED_NAME });
+    expect(isSaved).toBe(true);
+    expect(result.current.status).toBe(FORM_STATUS.SUCCESS);
+    expect(onSubmit).toHaveBeenCalledWith({ name: MOCK_EDITED_NAME });
     expect(onSuccess).toHaveBeenCalledWith(
-      { name: EDITED_NAME },
-      { outcome: ACTION_OUTCOME.SUCCESS },
+      { name: MOCK_EDITED_NAME },
+      SUCCESS_RESULT,
     );
-  });
-
-  it('sets status to error and does not call onSuccess when the submit fails', async () => {
-    const onSubmit = vi
-      .fn()
-      .mockResolvedValue({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    const onSuccess = vi.fn();
-    render(
-      <Harness
-        initialValues={{ name: INITIAL_NAME }}
-        onSubmit={onSubmit}
-        onSuccess={onSuccess}
-      />,
-    );
-    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
-
-    await user.click(submitButton);
-
-    const status = await screen.findByTestId('status');
-
-    expect(status).toHaveTextContent(FORM_STATUS.ERROR);
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('sets status to error and resolves false when the submit throws', async () => {
-    const onSubmit = vi.fn().mockRejectedValue(new Error(faker.lorem.words()));
-    const onSuccess = vi.fn();
-    const onOutcome = vi.fn();
-    render(
-      <Harness
-        initialValues={{ name: INITIAL_NAME }}
-        onSubmit={onSubmit}
-        onSuccess={onSuccess}
-        onOutcome={onOutcome}
-      />,
-    );
-    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
-
-    await user.click(submitButton);
-
-    await waitFor(() => expect(onOutcome).toHaveBeenCalledWith(false));
-    const status = screen.getByTestId('status');
-    expect(status).toHaveTextContent(FORM_STATUS.ERROR);
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('clears a shown status back to idle as soon as the values change again', async () => {
-    const onSubmit = vi
-      .fn()
-      .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
-    render(
-      <Harness initialValues={{ name: INITIAL_NAME }} onSubmit={onSubmit} />,
-    );
-    const editButton = screen.getByRole('button', { name: EDIT_LABEL });
-    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
-
-    await user.click(submitButton);
-    const status = await screen.findByTestId('status');
-    expect(status).toHaveTextContent(FORM_STATUS.SUCCESS);
-
-    await user.click(editButton);
-
-    expect(status).toHaveTextContent(FORM_STATUS.IDLE);
   });
 
   it.each([
-    [true, { outcome: ACTION_OUTCOME.SUCCESS }],
-    [false, { outcome: ACTION_OUTCOME.SERVER_ERROR }],
+    [
+      'resolves with an error outcome',
+      vi.fn().mockResolvedValue(SERVER_ERROR_RESULT),
+    ],
+    ['throws', vi.fn().mockRejectedValue(new Error(faker.lorem.words()))],
   ])(
-    'resolves the submit with %s once the save settles',
-    async (isSaved, result) => {
-      const onOutcome = vi.fn();
-      render(
-        <Harness
-          initialValues={{ name: INITIAL_NAME }}
-          onSubmit={vi.fn().mockResolvedValue(result)}
-          onOutcome={onOutcome}
-        />,
-      );
-      const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+    'reports an error and skips onSuccess when the submit %s',
+    async (_, onSubmit) => {
+      const onSuccess = vi.fn();
+      const { result } = setup(onSubmit, onSuccess);
+      let isSaved = true;
 
-      await user.click(submitButton);
+      await act(async () => {
+        isSaved = await result.current.handleSubmit();
+      });
 
-      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith(isSaved));
+      expect(isSaved).toBe(false);
+      expect(result.current.status).toBe(FORM_STATUS.ERROR);
+      expect(onSuccess).not.toHaveBeenCalled();
     },
   );
+
+  it('returns to idle as soon as the values change after a save', async () => {
+    const { result } = setup(vi.fn().mockResolvedValue(SUCCESS_RESULT));
+
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+    act(() => {
+      result.current.setValues({ name: MOCK_EDITED_NAME });
+    });
+
+    expect(result.current.status).toBe(FORM_STATUS.IDLE);
+  });
 });

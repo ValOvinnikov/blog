@@ -1,89 +1,85 @@
+import { faker } from '@faker-js/faker';
 import { REQUESTED_PATH_HEADER } from '@platform/utils/requested-path/requested-path';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { NextRequest } from 'next/server';
 
-const { handleI18nRoutingMock } = vi.hoisted(() => ({
-  handleI18nRoutingMock: vi.fn(),
+const { mockHandleI18nRouting } = vi.hoisted(() => ({
+  mockHandleI18nRouting: vi.fn(),
 }));
 
 vi.mock('next-intl/middleware', () => ({
-  default: vi.fn(() => handleI18nRoutingMock),
+  default: vi.fn(() => mockHandleI18nRouting),
 }));
 
 const { config, default: proxy } = await import('./proxy');
 
-const buildMatcherRegExp = () => {
-  return new RegExp(`^${config.matcher}$`);
-};
+faker.seed(6006);
+
+const MOCK_TENANT_ID = faker.string.uuid();
+const MOCK_ORIGIN = faker.internet.url({ appendSlash: false });
+const MOCK_STRUCTURE_ID = 'blog;page_post;page_post-provisioning.post.starter';
+const BOT_ID_CHALLENGE_PATH =
+  '/149e9513-01fa-4fb0-aad4-566afd725d1b/a-4-a/c.js';
+const MOCK_EVIL_URL = faker.internet.url();
+
+const MATCHER = new RegExp(`^${config.matcher}$`);
 
 describe('proxy matcher', () => {
-  let matcher: RegExp;
-
-  beforeEach(() => {
-    matcher = buildMatcherRegExp();
+  it.each([
+    adminRoutes.home(),
+    adminRoutes.tenants(),
+    adminRoutes.look(MOCK_TENANT_ID),
+    adminRoutes.workspacePending(),
+    adminRoutes.dashboard(),
+    adminRoutes.dashboardLook(),
+    adminRoutes.dashboardSelectTenant(),
+  ])('rewrites the content route %s through locale middleware', (path) => {
+    expect(MATCHER.test(path)).toBe(true);
   });
 
-  it('rewrites real content routes through locale middleware', () => {
-    expect(matcher.test('/')).toBe(true);
-    expect(matcher.test('/tenants')).toBe(true);
-    expect(matcher.test('/tenants/tenant-1/look')).toBe(true);
-    expect(matcher.test('/workspace-pending')).toBe(true);
-    expect(matcher.test('/dashboard')).toBe(true);
-    expect(matcher.test('/dashboard/look')).toBe(true);
-    expect(matcher.test('/dashboard/select-tenant')).toBe(true);
-  });
-
-  it('rewrites Studio routes whose structure ids contain dots', () => {
-    expect(
-      matcher.test(
-        '/tenants/tenant-1/studio/structure/blog;page_post;page_post-provisioning.post.starter',
-      ),
-    ).toBe(true);
-    expect(
-      matcher.test(
-        '/dashboard/studio/structure/blog;page_post;page_post-provisioning.post.starter',
-      ),
-    ).toBe(true);
-    expect(
-      matcher.test('/tenants/tenant-1/studio/structure/settings.site'),
-    ).toBe(true);
+  it.each([
+    `${adminRoutes.tenantStudio(MOCK_TENANT_ID)}/structure/${MOCK_STRUCTURE_ID}`,
+    `${adminRoutes.dashboardStudio()}/structure/${MOCK_STRUCTURE_ID}`,
+    `${adminRoutes.tenantStudio(MOCK_TENANT_ID)}/structure/settings.site`,
+  ])('rewrites the Studio route %s whose structure id has dots', (path) => {
+    expect(MATCHER.test(path)).toBe(true);
   });
 
   it("leaves BotID's challenge path to BotID", () => {
-    expect(
-      matcher.test('/149e9513-01fa-4fb0-aad4-566afd725d1b/a-4-a/c.js'),
-    ).toBe(false);
+    expect(MATCHER.test(BOT_ID_CHALLENGE_PATH)).toBe(false);
   });
 
-  it('excludes api, _next, _vercel, and root-level dotted paths', () => {
-    expect(matcher.test('/api/auth/signin')).toBe(false);
-    expect(matcher.test('/_next/static/chunk.js')).toBe(false);
-    expect(matcher.test('/_vercel/insights')).toBe(false);
-    expect(matcher.test('/favicon.ico')).toBe(false);
-    expect(matcher.test('/robots.txt')).toBe(false);
+  it.each([
+    '/api/auth/signin',
+    '/_next/static/chunk.js',
+    '/_vercel/insights',
+    '/favicon.ico',
+    '/robots.txt',
+  ])('excludes the api, _next, _vercel or dotted path %s', (path) => {
+    expect(MATCHER.test(path)).toBe(false);
   });
 });
 
 describe(proxy, () => {
   it('records the requested page for the sign-in gate, then routes the locale', () => {
-    const request = new NextRequest(
-      'https://admin.example.com/dashboard/leads?page=2',
-    );
+    const requestedPath = `${adminRoutes.dashboardLeads()}?page=2`;
+    const request = new NextRequest(`${MOCK_ORIGIN}${requestedPath}`);
 
     proxy(request);
 
-    expect(request.headers.get(REQUESTED_PATH_HEADER)).toBe(
-      '/dashboard/leads?page=2',
-    );
-    expect(handleI18nRoutingMock).toHaveBeenCalledWith(request);
+    expect(request.headers.get(REQUESTED_PATH_HEADER)).toBe(requestedPath);
+    expect(mockHandleI18nRouting).toHaveBeenCalledWith(request);
   });
 
   it('overwrites a requested path the client sent itself', () => {
-    const request = new NextRequest('https://admin.example.com/tenants', {
-      headers: { [REQUESTED_PATH_HEADER]: 'https://evil.example.com' },
+    const request = new NextRequest(`${MOCK_ORIGIN}${adminRoutes.tenants()}`, {
+      headers: { [REQUESTED_PATH_HEADER]: MOCK_EVIL_URL },
     });
 
     proxy(request);
 
-    expect(request.headers.get(REQUESTED_PATH_HEADER)).toBe('/tenants');
+    expect(request.headers.get(REQUESTED_PATH_HEADER)).toBe(
+      adminRoutes.tenants(),
+    );
   });
 });

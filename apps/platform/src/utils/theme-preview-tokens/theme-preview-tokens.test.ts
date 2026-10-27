@@ -1,10 +1,18 @@
 import {
+  ACCENT_RAMP_DARK,
+  ACCENT_RAMP_LIGHT,
   CARD_STYLE,
   DENSITY,
+  formatOklchRamp,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
+  HUE_MAX,
+  HUE_MIN,
+  LOGO_RAMP_DARK,
+  LOGO_RAMP_LIGHT,
   RADIUS_SCALE,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
@@ -14,79 +22,68 @@ import {
   buildLogoPreviewTokens,
   buildSitePreviewTheme,
   buildThemePreviewStyle,
+  type TThemePreviewValues,
 } from './theme-preview-tokens';
 
-describe('buildAccentPreviewTokens', () => {
-  it('matches the light-mode ramp from build-theme-style-block.ts', () => {
-    expect(buildAccentPreviewTokens(250, false)).toEqual({
-      '--brand-primary': 'oklch(0.45 0.17 250)',
-      '--brand-primary-hover': 'oklch(0.39 0.17 250)',
-      '--brand-primary-muted': 'oklch(0.95 0.03 250)',
-      '--brand-primary-contrast': 'oklch(0.99 0 0)',
-      '--brand-primary-solid': 'oklch(0.51 0.17 250)',
-      '--brand-primary-solid-hover': 'oklch(0.45 0.17 250)',
-    });
-  });
+faker.seed(1);
 
-  it('matches the dark-mode ramp, including the constant contrast token', () => {
-    expect(buildAccentPreviewTokens(28, true)).toEqual({
-      '--brand-primary': 'oklch(0.7 0.16 28)',
-      '--brand-primary-hover': 'oklch(0.76 0.16 28)',
-      '--brand-primary-muted': 'oklch(0.3 0.06 28)',
-      '--brand-primary-contrast': 'oklch(0.16 0.006 250)',
-      '--brand-primary-solid': 'oklch(0.7 0.16 28)',
-      '--brand-primary-solid-hover': 'oklch(0.76 0.16 28)',
-    });
-  });
-});
+const MOCK_ACCENT_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
+const MOCK_LOGO_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
 
-describe('buildLogoPreviewTokens', () => {
-  it('matches the light-mode logo ramp', () => {
-    expect(buildLogoPreviewTokens(250, false)).toEqual({
-      '--logo-1': 'oklch(0.52 0.17 250)',
-      '--logo-2': 'oklch(0.63 0.16 250)',
-      '--logo-3': 'oklch(0.73 0.13 250)',
-    });
-  });
-
-  it('matches the dark-mode logo ramp', () => {
-    expect(buildLogoPreviewTokens(250, true)).toEqual({
-      '--logo-1': 'oklch(0.58 0.17 250)',
-      '--logo-2': 'oklch(0.68 0.16 250)',
-      '--logo-3': 'oklch(0.8 0.14 250)',
-    });
-  });
-});
-
-describe(accentHueGradient, () => {
-  it('samples the fixed light-mode formula across the full hue range', () => {
-    const gradient = accentHueGradient();
-
-    expect(gradient.startsWith('linear-gradient(90deg,')).toBe(true);
-    expect(gradient).toContain('oklch(0.45 0.17 0)');
-    expect(gradient).toContain('oklch(0.45 0.17 180)');
-    expect(gradient).toContain('oklch(0.45 0.17 360)');
-  });
-});
-
-const SHAPE_VALUES = {
+const MOCK_PREVIEW_VALUES: TThemePreviewValues = {
   radiusScale: RADIUS_SCALE.SM,
   density: DENSITY.COMPACT,
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  accentHue: MOCK_ACCENT_HUE,
+  logoHue: undefined,
 };
 
-describe('buildThemePreviewStyle', () => {
+describe(buildAccentPreviewTokens, () => {
+  it.each([
+    { mode: 'light', isDark: false, ramp: ACCENT_RAMP_LIGHT },
+    { mode: 'dark', isDark: true, ramp: ACCENT_RAMP_DARK },
+  ])('formats the $mode accent ramp at the hue', ({ isDark, ramp }) => {
+    expect(buildAccentPreviewTokens(MOCK_ACCENT_HUE, isDark)).toEqual(
+      formatOklchRamp(ramp, MOCK_ACCENT_HUE),
+    );
+  });
+});
+
+describe(buildLogoPreviewTokens, () => {
+  it.each([
+    { mode: 'light', isDark: false, ramp: LOGO_RAMP_LIGHT },
+    { mode: 'dark', isDark: true, ramp: LOGO_RAMP_DARK },
+  ])('formats the $mode logo ramp at the hue', ({ isDark, ramp }) => {
+    expect(buildLogoPreviewTokens(MOCK_LOGO_HUE, isDark)).toEqual(
+      formatOklchRamp(ramp, MOCK_LOGO_HUE),
+    );
+  });
+});
+
+describe(accentHueGradient, () => {
+  it('samples the light-mode accent across the full hue range', () => {
+    const gradient = accentHueGradient();
+    const { '--brand-primary': firstStop } = buildAccentPreviewTokens(
+      HUE_MIN,
+      false,
+    );
+    const { '--brand-primary': lastStop } = buildAccentPreviewTokens(
+      HUE_MAX,
+      false,
+    );
+
+    expect(gradient).toContain(firstStop);
+    expect(gradient).toContain(lastStop);
+  });
+});
+
+describe(buildThemePreviewStyle, () => {
   it.each(Object.values(HEADER_CONTROL_STYLE))(
     'carries the %s header control tokens onto the preview',
     (headerControlStyle) => {
       const style = buildThemePreviewStyle(
-        {
-          ...SHAPE_VALUES,
-          accentHue: 28,
-          logoHue: undefined,
-          headerControlStyle,
-        },
+        { ...MOCK_PREVIEW_VALUES, headerControlStyle },
         false,
       );
 
@@ -97,31 +94,20 @@ describe('buildThemePreviewStyle', () => {
   );
 
   it('colours the logo ramp from the accent hue when no logo hue is set', () => {
-    const style = buildThemePreviewStyle(
-      {
-        ...SHAPE_VALUES,
-        accentHue: 28,
-        logoHue: undefined,
-      },
-      false,
-    );
+    const style = buildThemePreviewStyle(MOCK_PREVIEW_VALUES, false);
 
-    expect(style).toMatchObject(buildLogoPreviewTokens(28, false));
+    expect(style).toMatchObject(buildLogoPreviewTokens(MOCK_ACCENT_HUE, false));
   });
 
   it('switches every ramp to its dark values in dark mode', () => {
     const style = buildThemePreviewStyle(
-      {
-        ...SHAPE_VALUES,
-        accentHue: 250,
-        logoHue: 120,
-      },
+      { ...MOCK_PREVIEW_VALUES, logoHue: MOCK_LOGO_HUE },
       true,
     );
 
     expect(style).toMatchObject({
-      ...buildAccentPreviewTokens(250, true),
-      ...buildLogoPreviewTokens(120, true),
+      ...buildAccentPreviewTokens(MOCK_ACCENT_HUE, true),
+      ...buildLogoPreviewTokens(MOCK_LOGO_HUE, true),
     });
   });
 });

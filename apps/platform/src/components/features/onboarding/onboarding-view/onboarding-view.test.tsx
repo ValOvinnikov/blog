@@ -11,8 +11,10 @@ import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
 import { customRender, screen } from '@platform/testing/custom-render';
-import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
-import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_ROOT_DOMAIN,
+} from '@platform/testing/tenants/fixtures';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 

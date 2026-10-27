@@ -14,6 +14,6 @@ vi.mock('@blog/db', async () => ({
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
 }));
 
-describe(ReleasesLayout, () => {
+describe(`<${ReleasesLayout.name}/>`, () => {
   itGatesToSuperAdmins(ReleasesLayout, getAdminByUserIdMock);
 });

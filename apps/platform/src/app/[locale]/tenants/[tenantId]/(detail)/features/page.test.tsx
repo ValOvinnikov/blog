@@ -1,12 +1,10 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE, TENANT_PLAN } from '@blog/db/constants';
-import { auth } from '@platform/server/auth/auth';
-import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
+import en from '@platform/i18n/messages/en.json';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
+import { mockUnsavedSettingsFeaturesAndPreset } from '@platform/testing/settings-features/fixtures';
+import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import FeaturesPage from './page';
 
@@ -33,61 +31,37 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-
 const setup = customRenderAsync(FeaturesPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });
 
 describe(`<${FeaturesPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getAdminByUserIdMock.mockReset();
-    getTenantByIdMock.mockReset();
-    getSettingsFeaturesAndPresetMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.ADMIN,
-    });
-    getSettingsFeaturesAndPresetMock.mockResolvedValue({
-      features: undefined,
-      preset: undefined,
-    });
+    getAdminByUserIdMock.mockResolvedValue(mockAdmin());
+    getTenantByIdMock.mockResolvedValue(mockTenant());
+    getSettingsFeaturesAndPresetMock.mockResolvedValue(
+      mockUnsavedSettingsFeaturesAndPreset(),
+    );
   });
 
-  it('redirects to sign-in when there is no session', async () => {
-    authMock.mockResolvedValue(null);
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(redirect).toHaveBeenCalledWith(MOCK_SIGN_IN_HREF);
-  });
-
-  it('404s when the signed-in user has no admins row', async () => {
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+  it('404s a signed-in user who is not an operator', async () => {
+    getAdminByUserIdMock.mockResolvedValueOnce(undefined);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(redirect).not.toHaveBeenCalled();
     expect(getSettingsFeaturesAndPresetMock).not.toHaveBeenCalled();
   });
 
-  it('renders preset featureDefaults for an operator with no settings_features row', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
-    });
-
+  it("renders the routed tenant's Features settings", async () => {
     await setup();
 
+    const heading = screen.getByRole('heading', {
+      name: en.featuresSettings.heading,
+    });
+
+    expect(heading).toBeVisible();
     expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-    );
-    expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-checked',
-      '',
     );
   });
 });

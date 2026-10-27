@@ -1,47 +1,37 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook } from '@platform/testing/custom-render';
 
 import { useCollapseOnDone } from './use-collapse-on-done';
 
-describe(useCollapseOnDone, () => {
-  it('starts open when not done', () => {
-    const { result } = renderHook(() => useCollapseOnDone(false));
-
-    expect(result.current.isOpen).toBe(true);
+const renderCollapse = (isDone: boolean) =>
+  renderHook(({ isDone: done }) => useCollapseOnDone(done), {
+    initialProps: { isDone },
   });
 
-  it('starts collapsed when already done on mount', () => {
-    const { result } = renderHook(() => useCollapseOnDone(true));
+describe(useCollapseOnDone, () => {
+  it.each([
+    { name: 'open when not done', isDone: false, isOpen: true },
+    { name: 'collapsed when already done', isDone: true, isOpen: false },
+  ])('starts $name', ({ isDone, isOpen }) => {
+    const { result } = renderCollapse(isDone);
 
-    expect(result.current.isOpen).toBe(false);
+    expect(result.current.isOpen).toBe(isOpen);
   });
 
   it('auto-collapses the first time isDone flips to true', () => {
-    const { result, rerender } = renderHook(
-      ({ isDone }) => useCollapseOnDone(isDone),
-      { initialProps: { isDone: false } },
-    );
-
-    expect(result.current.isOpen).toBe(true);
+    const { result, rerender } = renderCollapse(false);
 
     rerender({ isDone: true });
 
     expect(result.current.isOpen).toBe(false);
   });
 
-  it('does not re-collapse a user-reopened panel on a later render with isDone unchanged', () => {
-    const { result, rerender } = renderHook(
-      ({ isDone }) => useCollapseOnDone(isDone),
-      { initialProps: { isDone: false } },
-    );
-
+  it('keeps a user-reopened panel open while isDone stays true', () => {
+    const { result, rerender } = renderCollapse(false);
     rerender({ isDone: true });
-    expect(result.current.isOpen).toBe(false);
 
     act(() => {
       result.current.onOpenChange(true);
     });
-    expect(result.current.isOpen).toBe(true);
-
     rerender({ isDone: true });
 
     expect(result.current.isOpen).toBe(true);

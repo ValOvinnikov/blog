@@ -26,7 +26,6 @@ import {
   MOCK_SIGN_IN_EMAIL,
   MOCK_SIGN_IN_USER_ID,
 } from '@platform/testing/auth/fixtures';
-import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/env/fixtures';
 import {
   MOCK_POSTGRES_ERROR_CODE,
   MOCK_QUERY_ERROR_NAME,
@@ -36,6 +35,7 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
+  MOCK_TENANT_ROOT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
