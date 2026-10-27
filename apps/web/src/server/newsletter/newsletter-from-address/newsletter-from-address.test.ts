@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 
-import { resolveNewsletterFromAddress } from './newsletter-from-address';
+import {
+  DEFAULT_NEWSLETTER_FROM_ADDRESS,
+  resolveNewsletterFromAddress,
+} from './newsletter-from-address';
 
 faker.seed(6010);
 
@@ -15,9 +18,9 @@ describe(resolveNewsletterFromAddress, () => {
     expect(fromAddress).toBe(MOCK_CONFIGURED_FROM_ADDRESS);
   });
 
-  it('falls back to a default sender when unset', () => {
+  it('falls back to the default sender when unset', () => {
     const fromAddress = resolveNewsletterFromAddress(undefined);
 
-    expect(fromAddress).toBeTruthy();
+    expect(fromAddress).toBe(DEFAULT_NEWSLETTER_FROM_ADDRESS);
   });
 });

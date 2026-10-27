@@ -1,12 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import {
-  LANGUAGE_COOKIE_NAME,
-  ONE_YEAR_IN_SECONDS,
-} from '@web/testing/shared/language-cookie/fixtures';
+import { ONE_YEAR_IN_SECONDS } from '@web/constants/time';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { readRememberedLanguage, rememberLanguage } from './language-cookie';
+import {
+  LANGUAGE_COOKIE_NAME,
+  readRememberedLanguage,
+  rememberLanguage,
+} from './language-cookie';
 
 faker.seed(122);
 

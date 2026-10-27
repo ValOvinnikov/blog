@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -30,7 +31,10 @@ vi.mock('@blog/service', () => ({
   service: { global: { footer: { v1: { getFooter: getFooterMock } } } },
 }));
 
+faker.seed(6103);
+
 const RSS_LINK_NAME = SITE_MESSAGES.rss.feedLinkLabel;
+const MOCK_NOW = faker.date.future({ refDate: '2026-01-01T00:00:00Z' });
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 
@@ -38,9 +42,15 @@ const setup = customRenderAsync(SiteFooter, {});
 
 describe(`<${SiteFooter.name}/>`, () => {
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(MOCK_NOW);
     getFooterMock.mockResolvedValue(
       okResult({ social: [], showRssFeed: true }),
     );
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('with the default footer', () => {
@@ -58,7 +68,7 @@ describe(`<${SiteFooter.name}/>`, () => {
       const footer = screen.getByRole('contentinfo');
 
       expect(footer).toHaveTextContent(MOCK_SITE_SETTINGS.brand.name);
-      expect(footer).toHaveTextContent(String(new Date().getFullYear()));
+      expect(footer).toHaveTextContent(String(MOCK_NOW.getFullYear()));
     });
 
     it('adds a visible RSS feed link to the footer nav', () => {

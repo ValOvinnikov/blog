@@ -2,6 +2,7 @@ import '../../../../index.css';
 
 import { signedInHintBootstrapScript } from '@web/config/signed-in-hint-script';
 import { themeBootstrapScript } from '@web/config/theme-script';
+import { SANITY_IMAGE_CDN_PRECONNECT_TEST_ID } from '@web/constants/document-shell';
 import type { ReactNode } from 'react';
 
 type TDocumentShellProps = {
@@ -18,7 +19,11 @@ export const DocumentShell = ({ lang, children }: TDocumentShellProps) => (
   <html lang={lang} suppressHydrationWarning={true}>
     {/* eslint-disable-next-line @next/next/no-head-element -- an App Router document shell, which the pages-router rule can't tell apart from a page */}
     <head>
-      <link rel="preconnect" href={SANITY_IMAGE_CDN_ORIGIN} />
+      <link
+        rel="preconnect"
+        href={SANITY_IMAGE_CDN_ORIGIN}
+        data-testid={SANITY_IMAGE_CDN_PRECONNECT_TEST_ID}
+      />
       <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       <script
         dangerouslySetInnerHTML={{ __html: signedInHintBootstrapScript }}

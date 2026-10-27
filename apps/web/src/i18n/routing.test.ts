@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { LANGUAGE_COOKIE_NAME } from '@web/testing/shared/language-cookie/fixtures';
+import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 

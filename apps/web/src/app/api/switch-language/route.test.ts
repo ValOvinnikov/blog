@@ -6,6 +6,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockTenant } from '@web/testing/shared/tenant/fixtures';
+import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NextRequest } from 'next/server';
 
 faker.seed(6009);
@@ -88,7 +89,7 @@ describe(GET, () => {
     expect(response.headers.get('location')).toBe(
       `${MOCK_ORIGIN}/nl/${MOCK_TRANSLATED_SLUG}`,
     );
-    expect(response.cookies.get('NEXT_LOCALE')?.value).toBe(NL);
+    expect(response.cookies.get(LANGUAGE_COOKIE_NAME)?.value).toBe(NL);
     expect(getTenantTranslationMapMock).toHaveBeenCalledWith(tenant);
   });
 
@@ -119,7 +120,7 @@ describe(GET, () => {
     const response = await switchTo(FR, MOCK_PAGE_PATH);
 
     expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(response.cookies.get('NEXT_LOCALE')).toBeUndefined();
+    expect(response.cookies.get(LANGUAGE_COOKIE_NAME)).toBeUndefined();
   });
 
   it('rejects a current page off this site', async () => {
