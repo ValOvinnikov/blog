@@ -1,3 +1,4 @@
+import { ConnectedDomainDetails } from '@platform/components/features/tenants/domain-page-content/components/connected-domain-details/connected-domain-details';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -18,11 +19,13 @@ const UNCHECKED_STATUSES: ReadonlySet<TDomainVerificationStatus> = new Set([
 
 export type TDomainVerificationCardProps = {
   domain: string;
+  isPlatformAddress: boolean;
   projectDomain: Promise<TProjectDomain>;
 };
 
 export const DomainVerificationCard = ({
   domain,
+  isPlatformAddress,
   projectDomain,
 }: TDomainVerificationCardProps) => {
   const t = useTranslations('tenantDomainPage');
@@ -33,23 +36,28 @@ export const DomainVerificationCard = ({
   return (
     <Card>
       <Card.Header
-        title={t(isVerified ? 'verifiedCardTitle' : 'cardTitle', { domain })}
+        title={t('cardTitle')}
         actions={
-          <>
-            <StatusBadge tone={domainVerificationTone(status)}>
-              {t(`dnsStatus.${status}`)}
-            </StatusBadge>
-            {wasChecked && (
-              <Text variant="meta" as="span">
-                {t('checkedHint')}
-              </Text>
-            )}
-          </>
+          !isVerified && (
+            <>
+              <StatusBadge tone={domainVerificationTone(status)}>
+                {t(`dnsStatus.${status}`)}
+              </StatusBadge>
+              {wasChecked && (
+                <Text variant="meta" as="span">
+                  {t('checkedHint')}
+                </Text>
+              )}
+            </>
+          )
         }
       />
       <Card.Body>
         {isVerified ? (
-          <Text variant="supporting">{t('verifiedEmptyState')}</Text>
+          <ConnectedDomainDetails
+            domain={domain}
+            isPlatformAddress={isPlatformAddress}
+          />
         ) : dnsRecords.length > 0 ? (
           <>
             <Text variant="muted">{t('bodyCopy')}</Text>

@@ -21,6 +21,8 @@ const { getAdminByUserIdMock, getTenantByIdMock, getProjectDomainMock } =
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/utils/env/env');
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
