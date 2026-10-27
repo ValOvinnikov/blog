@@ -3,21 +3,29 @@ import { FIELD_ERROR } from '@web/constants/field-error';
 
 import { validateContactMessage } from './validate-contact-message';
 
-const VALID = {
+faker.seed(6012);
+
+const NAME_MAX_LENGTH = 100;
+const MESSAGE_MIN_LENGTH = 10;
+const MESSAGE_MAX_LENGTH = 5_000;
+
+const MOCK_VALID_FIELDS = {
   name: faker.person.fullName(),
   email: faker.internet.email(),
   message: faker.lorem.sentences(2),
 };
 
-describe('validateContactMessage', () => {
+describe(validateContactMessage, () => {
   it('accepts a complete message and trims each field', () => {
+    const { name, email, message } = MOCK_VALID_FIELDS;
+
     expect(
       validateContactMessage({
-        name: `  ${VALID.name} `,
-        email: ` ${VALID.email} `,
-        message: ` ${VALID.message} `,
+        name: `  ${name} `,
+        email: ` ${email} `,
+        message: ` ${message} `,
       }),
-    ).toEqual({ ok: true, data: VALID });
+    ).toEqual({ ok: true, data: MOCK_VALID_FIELDS });
   });
 
   it('joins the lines of a multi-line name', () => {
@@ -25,40 +33,66 @@ describe('validateContactMessage', () => {
     const lastName = faker.person.lastName();
 
     expect(
-      validateContactMessage({ ...VALID, name: `${firstName}\r\n${lastName}` }),
+      validateContactMessage({
+        ...MOCK_VALID_FIELDS,
+        name: `${firstName}\r\n${lastName}`,
+      }),
     ).toEqual({
       ok: true,
-      data: { ...VALID, name: `${firstName} ${lastName}` },
+      data: { ...MOCK_VALID_FIELDS, name: `${firstName} ${lastName}` },
     });
   });
 
   it.each([
-    ['an empty name', { name: '   ' }, 'name'],
-    ['a 101-character name', { name: faker.string.alpha(101) }, 'name'],
-    ['a malformed email', { email: `${faker.internet.username()}@` }, 'email'],
-    ['a 9-character message', { message: faker.string.alpha(9) }, 'message'],
-    [
-      'a 5,001-character message',
-      { message: faker.string.alpha(5_001) },
-      'message',
-    ],
-  ] as const)('rejects %s', (_, overrides, field) => {
-    expect(validateContactMessage({ ...VALID, ...overrides })).toEqual({
+    { case: 'an empty name', overrides: { name: '   ' }, field: 'name' },
+    {
+      case: 'a name over the limit',
+      overrides: { name: faker.string.alpha(NAME_MAX_LENGTH + 1) },
+      field: 'name',
+    },
+    {
+      case: 'a malformed email',
+      overrides: { email: `${faker.internet.username()}@` },
+      field: 'email',
+    },
+    {
+      case: 'a message under the minimum',
+      overrides: { message: faker.string.alpha(MESSAGE_MIN_LENGTH - 1) },
+      field: 'message',
+    },
+    {
+      case: 'a message over the limit',
+      overrides: { message: faker.string.alpha(MESSAGE_MAX_LENGTH + 1) },
+      field: 'message',
+    },
+  ])('rejects $case', ({ overrides, field }) => {
+    expect(
+      validateContactMessage({ ...MOCK_VALID_FIELDS, ...overrides }),
+    ).toEqual({
       ok: false,
       error: { [field]: { reason: FIELD_ERROR.INVALID } },
     });
   });
 
-  it('accepts the length limits themselves', () => {
-    expect(
-      validateContactMessage({
-        ...VALID,
-        name: faker.string.alpha(100),
-        message: faker.string.alpha(5_000),
-      }).ok,
-    ).toBe(true);
-    expect(
-      validateContactMessage({ ...VALID, message: faker.string.alpha(10) }).ok,
-    ).toBe(true);
+  it.each([
+    {
+      case: 'a name at the limit',
+      overrides: { name: faker.string.alpha(NAME_MAX_LENGTH) },
+    },
+    {
+      case: 'a message at the minimum',
+      overrides: { message: faker.string.alpha(MESSAGE_MIN_LENGTH) },
+    },
+    {
+      case: 'a message at the limit',
+      overrides: { message: faker.string.alpha(MESSAGE_MAX_LENGTH) },
+    },
+  ])('accepts $case', ({ overrides }) => {
+    const result = validateContactMessage({
+      ...MOCK_VALID_FIELDS,
+      ...overrides,
+    });
+
+    expect(result.ok).toBe(true);
   });
 });
