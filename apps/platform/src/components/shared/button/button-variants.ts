@@ -9,9 +9,17 @@ const STYLED_VARIANTS: ('primary' | 'secondary' | 'ghost' | 'danger')[] = [
   'danger',
 ];
 
+const FACE = [
+  'col-start-1 row-start-1 inline-flex items-center justify-center gap-[7px]',
+];
+
 export const buttonVariants = tv({
   slots: {
     root: [],
+    faces: [],
+    idleFace: [],
+    busyFace: [],
+    busyGlyph: ['text-current'],
     srOnlyStatus: ['sr-only'],
   },
   variants: {
@@ -42,6 +50,10 @@ export const buttonVariants = tv({
       [SIZE.SM]: {},
       [SIZE.MD]: {},
     },
+    isPending: {
+      true: { idleFace: ['invisible'] },
+      false: { busyFace: ['invisible'] },
+    },
   },
   compoundVariants: [
     {
@@ -50,10 +62,13 @@ export const buttonVariants = tv({
         root: [
           'inline-flex items-center gap-[7px]',
           'rounded-admin-control border font-medium no-underline',
-          'cursor-pointer',
+          'cursor-pointer aria-busy:cursor-progress',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
           'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
         ],
+        faces: ['grid'],
+        idleFace: FACE,
+        busyFace: FACE,
       },
     },
     {
@@ -74,6 +89,7 @@ export const buttonVariants = tv({
   defaultVariants: {
     variant: 'secondary',
     size: SIZE.MD,
+    isPending: false,
   },
 });
 

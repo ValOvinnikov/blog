@@ -177,7 +177,7 @@ describe(`<${ConfirmDialog.name}/>`, () => {
       const pendingButton = await findConfirmButton(MOCK_CONFIRMING_LABEL);
       const status = screen.getByRole('status');
 
-      expect(pendingButton).toBeDisabled();
+      expect(pendingButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(pendingButton).toHaveAttribute('aria-busy', 'true');
       expect(status).toHaveTextContent(MOCK_CONFIRMING_LABEL);
     });

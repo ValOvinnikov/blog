@@ -20,6 +20,7 @@ code:
   - apps/platform/src/utils/tenant-switcher-items/**
   - apps/platform/src/context/unsaved-changes-provider/**
   - apps/platform/src/components/shared/guarded-link/**
+  - apps/platform/src/components/shared/button/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
 epics: [4979, 4980, 4840, 4959]
@@ -110,6 +111,12 @@ The Studio segment switches the content column to full-bleed (see
   the browser's language, falling back to English.
 - `apps/platform` owns its own primitives on Base UI and never imports
   `@blog/ui` outside `components/features/site-preview/`.
+- A busy platform `Button` stays at full colour and keeps focus: it is
+  `aria-disabled` and `aria-busy`, never `disabled`, and ignores clicks and
+  form submission until it settles. It shows a ring spinner in its text colour
+  beside its busy label, and holds the wider of its idle and busy widths so it
+  never resizes. This is fixed, not a setting; the `unstyled` variant keeps
+  its own layout and does not hold its width.
 
 ## Dependencies
 

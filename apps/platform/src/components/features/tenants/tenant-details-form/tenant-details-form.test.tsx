@@ -26,6 +26,7 @@ const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
 const MOCK_EMAIL_EDIT_SUFFIX = `.${faker.string.alpha({ length: 2, casing: 'lower' })}`;
 const MOCK_MIXED_CASE_OWNER_EMAIL = 'John.Doe@Example.com';
 const MOCK_NORMALIZED_OWNER_EMAIL = MOCK_MIXED_CASE_OWNER_EMAIL.toLowerCase();
+const ARIA_DISABLED = 'aria-disabled';
 const OWNER_INVITE_CONFIRMATION = t('ownerInviteConfirmation', {
   email: MOCK_OWNER_EMAIL,
 });
@@ -222,7 +223,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     const inertForm = screen.getByTestId('tenant-details-form-inert');
 
     expect(overlay).toBeVisible();
-    expect(submitButton).toBeDisabled();
+    expect(submitButton).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
     expect(inertForm).toHaveAttribute('inert');
 
@@ -277,7 +278,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       });
 
       expect(overlay).toBeVisible();
-      expect(submitButton).toBeDisabled();
+      expect(submitButton).toHaveAttribute(ARIA_DISABLED, 'true');
 
       resolveWithServerError();
       await waitFor(() => {
