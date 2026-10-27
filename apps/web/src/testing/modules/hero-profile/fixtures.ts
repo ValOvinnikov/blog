@@ -7,11 +7,12 @@ import {
 } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { MOCK_TEAM_MEMBER_NAME } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const MOCK_HERO_PROFILE_MODULE_ID = faker.string.uuid();
 
-export const MOCK_HERO_PROFILE_AVATAR_NAME = 'Jamie Rivera';
+export const MOCK_HERO_PROFILE_AVATAR_NAME = MOCK_TEAM_MEMBER_NAME;
 
 export const MOCK_HERO_PROFILE_HEADING = faker.company.catchPhrase();
 

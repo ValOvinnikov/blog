@@ -7,6 +7,7 @@ import {
   mockPostListItem,
 } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -21,7 +22,6 @@ const MOCK_PAGER_LABEL = faker.lorem.words(2);
 const MOCK_PREVIOUS_LABEL = faker.lorem.words(2);
 const MOCK_NEXT_LABEL = faker.lorem.words(2);
 const MOCK_ARCHIVE_SLUG = faker.lorem.slug(2);
-const POST_IMAGE_TEST_ID = 'post-image';
 
 const post = mockPostListItem();
 
@@ -121,11 +121,13 @@ describe(`<${PostListModuleView.name}/>`, () => {
   it('renders a media region for each item when hasImages is true', () => {
     setup({
       hasImages: true,
-      items: [{ ...post, image: <div data-testid={POST_IMAGE_TEST_ID} /> }],
+      items: [
+        { ...post, image: <div data-testid={MOCK_POST_IMAGE_TEST_ID} /> },
+      ],
     });
 
     const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
-    const image = screen.getByTestId(POST_IMAGE_TEST_ID);
+    const image = screen.getByTestId(MOCK_POST_IMAGE_TEST_ID);
 
     expect(media).toBeVisible();
     expect(image).toBeVisible();

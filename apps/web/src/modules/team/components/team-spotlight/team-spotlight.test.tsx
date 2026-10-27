@@ -1,8 +1,10 @@
 import { CARD_IMAGE_SHAPE } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   MOCK_TEAM_MEMBER_BIO,
+  MOCK_TEAM_MEMBER_INITIALS,
   MOCK_TEAM_MEMBER_PROFILE_URL,
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
@@ -12,9 +14,10 @@ import { TeamSpotlight } from './team-spotlight';
 
 vi.mock('@web/i18n/navigation');
 
+faker.seed(6011);
+
 const MOCK_MEMBER = mockTeamMember();
-const MOCK_MEMBER_ROLE = 'Staff Engineer';
-const MEMBER_INITIALS = 'JR';
+const MOCK_MEMBER_ROLE = faker.person.jobTitle();
 
 const setup = customRender(TeamSpotlight, {
   member: MOCK_MEMBER,
@@ -29,7 +32,7 @@ describe(`<${TeamSpotlight.name}/>`, () => {
 
     it('renders initials, never an empty frame', () => {
       const missingPhoto = screen.queryByRole('img');
-      const initials = screen.getByText(MEMBER_INITIALS);
+      const initials = screen.getByText(MOCK_TEAM_MEMBER_INITIALS);
 
       expect(missingPhoto).not.toBeInTheDocument();
       expect(initials).toBeVisible();
@@ -53,7 +56,7 @@ describe(`<${TeamSpotlight.name}/>`, () => {
     setup({ member: mockTeamMember({ image: mockSanityImage() }) });
 
     const photo = screen.getByRole('img');
-    const hiddenInitials = screen.queryByText(MEMBER_INITIALS);
+    const hiddenInitials = screen.queryByText(MOCK_TEAM_MEMBER_INITIALS);
 
     expect(photo).toBeVisible();
     expect(hiddenInitials).not.toBeInTheDocument();

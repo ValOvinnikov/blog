@@ -3,6 +3,7 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   MOCK_TEAM_MEMBER_BIO,
+  MOCK_TEAM_MEMBER_INITIALS,
   MOCK_TEAM_MEMBER_PROFILE_URL,
   mockTeamMember,
 } from '@web/testing/modules/team/fixtures';
@@ -14,7 +15,6 @@ import { TeamMemberCard } from './team-member-card';
 vi.mock('@web/i18n/navigation');
 
 const MOCK_MEMBER = mockTeamMember();
-const MEMBER_INITIALS = 'JR';
 
 const setup = customRender(TeamMemberCard, {
   member: MOCK_MEMBER,
@@ -30,7 +30,7 @@ describe(`<${TeamMemberCard.name}/>`, () => {
 
     it('renders initials, never an empty avatar', () => {
       const missingPhoto = screen.queryByRole('img');
-      const initials = screen.getByText(MEMBER_INITIALS);
+      const initials = screen.getByText(MOCK_TEAM_MEMBER_INITIALS);
 
       expect(missingPhoto).not.toBeInTheDocument();
       expect(initials).toBeVisible();
@@ -59,7 +59,7 @@ describe(`<${TeamMemberCard.name}/>`, () => {
     setup({ member: mockTeamMember({ image: mockSanityImage() }) });
 
     const photo = screen.getByRole('img');
-    const hiddenInitials = screen.queryByText(MEMBER_INITIALS);
+    const hiddenInitials = screen.queryByText(MOCK_TEAM_MEMBER_INITIALS);
 
     expect(photo).toBeVisible();
     expect(hiddenInitials).not.toBeInTheDocument();

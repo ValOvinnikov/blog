@@ -10,6 +10,7 @@ import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-r
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
+import { ARIA_LABELLEDBY_ATTRIBUTE } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
@@ -53,29 +54,29 @@ const MOCK_TAG = mockTag();
 const MOCK_HEADING = faker.lorem.words(3);
 const MOCK_LINK_TEXT = faker.lorem.words(2);
 
-const TOPIC_ARCHIVE = {
+const MOCK_TOPIC_ARCHIVE = {
   id: MOCK_TOPIC.id,
   kind: TAXONOMY_KIND.TOPICS,
   slug: MOCK_TOPIC_SLUG,
   name: MOCK_TOPIC.title,
 };
-const TAG_ARCHIVE = {
+const MOCK_TAG_ARCHIVE = {
   id: MOCK_TAG.id,
   kind: TAXONOMY_KIND.TAGS,
   slug: MOCK_TAG.slug!,
   name: MOCK_TAG.title,
 };
 
-const ARCHIVE_CASES = [
+const MOCK_ARCHIVE_CASES = [
   {
     kind: TAXONOMY_KIND.TOPICS,
-    archive: TOPIC_ARCHIVE,
+    archive: MOCK_TOPIC_ARCHIVE,
     messages: SITE_MESSAGES.topicPage,
     createHref: routes.topic,
   },
   {
     kind: TAXONOMY_KIND.TAGS,
-    archive: TAG_ARCHIVE,
+    archive: MOCK_TAG_ARCHIVE,
     messages: SITE_MESSAGES.tagPage,
     createHref: routes.tag,
   },
@@ -220,7 +221,24 @@ describe(`<${PostListModule.name}/>`, () => {
     },
   );
 
-  it.each(ARCHIVE_CASES)(
+  it.each([{ kind: 'blog', archive: undefined }, ...MOCK_ARCHIVE_CASES])(
+    'labels the $kind region with its heading',
+    async ({ archive }) => {
+      getPostListMock.mockResolvedValue(mockPagedResult());
+
+      await setup({ context: { page: 1, archive } });
+
+      const region = screen.getByRole('region', { name: MOCK_HEADING });
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_HEADING,
+      });
+
+      expect(region).toHaveAttribute(ARIA_LABELLEDBY_ATTRIBUTE, heading.id);
+    },
+  );
+
+  it.each(MOCK_ARCHIVE_CASES)(
     'fetches only the posts of a $kind archive',
     async ({ archive }) => {
       await setup({ context: { page: 1, archive } });
@@ -234,7 +252,7 @@ describe(`<${PostListModule.name}/>`, () => {
     },
   );
 
-  it.each(ARCHIVE_CASES)(
+  it.each(MOCK_ARCHIVE_CASES)(
     'derives the pager label and hrefs from a $kind archive',
     async ({ archive, messages, createHref }) => {
       getPostListMock.mockResolvedValue(mockPagedResult());
@@ -253,7 +271,7 @@ describe(`<${PostListModule.name}/>`, () => {
     },
   );
 
-  it.each(ARCHIVE_CASES)(
+  it.each(MOCK_ARCHIVE_CASES)(
     'derives the empty message from a $kind archive',
     async ({ archive, messages }) => {
       await setup({ context: { archive } });

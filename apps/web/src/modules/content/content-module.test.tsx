@@ -6,6 +6,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_CONTENT_MODULE_ID } from '@web/testing/modules/content/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { SANITY_CDN_HOST } from '@web/testing/shared/sanity-image/constants';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
@@ -27,7 +28,6 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 const MOCK_IMAGE_ALT = faker.lorem.words(3);
-const SANITY_CDN_HOST = 'cdn.sanity.io';
 
 const setup = customRenderAsync(ContentModule, {
   id: MOCK_CONTENT_MODULE_ID,

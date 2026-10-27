@@ -17,6 +17,7 @@ import {
   MOCK_HERO_PROFILE_MODULE_ID,
   mockHeroProfileModule,
 } from '@web/testing/modules/hero-profile/fixtures';
+import { MOCK_TEAM_MEMBER_INITIALS } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
@@ -27,7 +28,6 @@ faker.seed(6011);
 
 const MOCK_BIO_TEXT = faker.lorem.sentence();
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
-const MOCK_AUTHOR_INITIALS = 'JR';
 const MOCK_HEADING_INITIALS = MOCK_HERO_PROFILE_HEADING.split(' ')
   .slice(0, 2)
   .map(([initial]) => initial?.toUpperCase())
@@ -108,7 +108,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     setup({ variant: HERO_VARIANT.STACKED, sanityImage: undefined });
 
     const image = screen.queryByRole('img');
-    const authorInitials = screen.getByText(MOCK_AUTHOR_INITIALS);
+    const authorInitials = screen.getByText(MOCK_TEAM_MEMBER_INITIALS);
     const headingInitials = screen.queryByText(MOCK_HEADING_INITIALS);
     const avatarName = screen.getByText(MOCK_HERO_PROFILE_AVATAR_NAME);
 
@@ -135,7 +135,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
 
     const image = screen.queryByRole('img');
-    const initials = screen.queryByText(MOCK_AUTHOR_INITIALS);
+    const initials = screen.queryByText(MOCK_TEAM_MEMBER_INITIALS);
     const avatarName = screen.getByText(MOCK_HERO_PROFILE_AVATAR_NAME);
 
     expect(image).not.toBeInTheDocument();

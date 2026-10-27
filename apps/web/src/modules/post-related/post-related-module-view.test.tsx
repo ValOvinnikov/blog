@@ -5,6 +5,7 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { MOCK_POST_RELATED_HEADING } from '@web/testing/modules/post-related/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -14,7 +15,6 @@ faker.seed(6011);
 
 const MOCK_TITLE_ID = faker.lorem.slug();
 const MOCK_DATA_TEST_ID = faker.lorem.slug();
-const POST_IMAGE_TEST_ID = 'post-image';
 
 const MOCK_POST_ITEM = mockPostListItem({ id: faker.string.uuid() });
 
@@ -76,12 +76,15 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
     setup({
       hasImages: true,
       items: [
-        { ...MOCK_POST_ITEM, image: <div data-testid={POST_IMAGE_TEST_ID} /> },
+        {
+          ...MOCK_POST_ITEM,
+          image: <div data-testid={MOCK_POST_IMAGE_TEST_ID} />,
+        },
       ],
     });
 
     const media = screen.getByTestId(MEDIA_CARD_MEDIA_TEST_ID);
-    const image = screen.getByTestId(POST_IMAGE_TEST_ID);
+    const image = screen.getByTestId(MOCK_POST_IMAGE_TEST_ID);
 
     expect(media).toBeVisible();
     expect(image).toBeVisible();

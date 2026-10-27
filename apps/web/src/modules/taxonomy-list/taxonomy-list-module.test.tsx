@@ -16,6 +16,7 @@ import {
   MOCK_FIRST_TOPIC_POST_TITLE,
   MOCK_SECOND_TOPIC_POST_TITLE,
 } from '@web/testing/modules/taxonomy-list/fixtures';
+import { ARIA_LABELLEDBY_ATTRIBUTE } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TAXONOMY_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
@@ -93,7 +94,7 @@ const MOCK_TOPIC_SLUG = faker.lorem.slug(2);
 const MOCK_TOPIC = mockTopic({ slug: MOCK_TOPIC_SLUG });
 const MOCK_TAG = mockTag();
 
-const entry: TTaxonomyEntry = {
+const MOCK_TOPIC_ENTRY: TTaxonomyEntry = {
   ...MOCK_TOPIC,
   postCount: MOCK_POST_COUNT,
   latestPosts: [
@@ -132,7 +133,9 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
   describe('with one topic entry', () => {
     beforeEach(async () => {
-      getTaxonomyListMock.mockResolvedValue(mockTopicsResult([entry]));
+      getTaxonomyListMock.mockResolvedValue(
+        mockTopicsResult([MOCK_TOPIC_ENTRY]),
+      );
 
       await setup();
     });
@@ -144,9 +147,9 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     });
 
     it('links each latest post to its detail page, newest first', () => {
-      const [firstPost, secondPost] = entry.latestPosts;
+      const [firstPost, secondPost] = MOCK_TOPIC_ENTRY.latestPosts;
       const list = screen.getByRole('list', {
-        name: topicsT('latestPostsLabel', { name: entry.title }),
+        name: topicsT('latestPostsLabel', { name: MOCK_TOPIC_ENTRY.title }),
       });
       const [firstLink, secondLink] = within(list).getAllByRole('link');
 
@@ -160,9 +163,9 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
   it('omits an entry with no archive page', async () => {
     getTaxonomyListMock.mockResolvedValue(
       mockTopicsResult([
-        entry,
+        MOCK_TOPIC_ENTRY,
         {
-          ...entry,
+          ...MOCK_TOPIC_ENTRY,
           id: faker.string.uuid(),
           title: MOCK_OMITTED_TITLE,
           slug: undefined,
@@ -172,7 +175,9 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
     await setup();
 
-    const link = screen.getByRole('link', { name: new RegExp(entry.title) });
+    const link = screen.getByRole('link', {
+      name: new RegExp(MOCK_TOPIC_ENTRY.title),
+    });
     const omittedEntry = screen.queryByText(MOCK_OMITTED_TITLE);
 
     expect(link).toBeVisible();
@@ -182,8 +187,8 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
   it.each([
     {
       kind: TAXONOMY_KIND.TOPICS,
-      result: mockTopicsResult([entry]),
-      title: entry.title,
+      result: mockTopicsResult([MOCK_TOPIC_ENTRY]),
+      title: MOCK_TOPIC_ENTRY.title,
       href: routes.topic(MOCK_TOPIC_SLUG),
       postCountLabel: topicsT('postsCount', { count: MOCK_POST_COUNT }),
       heading: MOCK_TOPICS_HEADING,
@@ -192,7 +197,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       kind: TAXONOMY_KIND.TAGS,
       result: mockTagsResult([
         {
-          ...entry,
+          ...MOCK_TOPIC_ENTRY,
           id: MOCK_TAG.id,
           slug: MOCK_TAG_SLUG,
           title: MOCK_TAG.title,
@@ -279,13 +284,44 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     );
   });
 
+  it('labels each module region with its own heading', async () => {
+    const otherId = faker.string.uuid();
+    getTaxonomyListMock
+      .mockResolvedValueOnce(mockTopicsResult())
+      .mockResolvedValueOnce(mockTagsResult());
+
+    await setup();
+    await setup({ id: otherId });
+
+    const topicsRegion = screen.getByRole('region', {
+      name: MOCK_TOPICS_HEADING,
+    });
+    const tagsRegion = screen.getByRole('region', { name: MOCK_TAGS_HEADING });
+    const topicsHeading = within(topicsRegion).getByRole('heading', {
+      level: 2,
+    });
+    const tagsHeading = within(tagsRegion).getByRole('heading', { level: 2 });
+
+    expect(topicsRegion).toHaveAttribute(
+      ARIA_LABELLEDBY_ATTRIBUTE,
+      topicsHeading.id,
+    );
+    expect(tagsRegion).toHaveAttribute(
+      ARIA_LABELLEDBY_ATTRIBUTE,
+      tagsHeading.id,
+    );
+    expect(topicsHeading.id).not.toBe(tagsHeading.id);
+  });
+
   it('omits the latest-posts list when latest posts are switched off', async () => {
-    getTaxonomyListMock.mockResolvedValue(mockTopicsResult([entry], false));
+    getTaxonomyListMock.mockResolvedValue(
+      mockTopicsResult([MOCK_TOPIC_ENTRY], false),
+    );
 
     await setup();
 
     const list = screen.queryByRole('list', {
-      name: topicsT('latestPostsLabel', { name: entry.title }),
+      name: topicsT('latestPostsLabel', { name: MOCK_TOPIC_ENTRY.title }),
     });
 
     expect(list).not.toBeInTheDocument();

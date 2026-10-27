@@ -9,6 +9,7 @@ import {
   mockUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { SANITY_CDN_HOST } from '@web/testing/shared/sanity-image/constants';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -117,6 +118,9 @@ describe(`<${HeroBlogModule.name}/>`, () => {
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
 
+    const source = image.getAttribute('src');
+
     expect(image).toBeVisible();
+    expect(source).toContain(SANITY_CDN_HOST);
   });
 });

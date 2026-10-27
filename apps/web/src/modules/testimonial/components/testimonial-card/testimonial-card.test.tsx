@@ -2,6 +2,7 @@ import { BRAND_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_TEAM_MEMBER_INITIALS } from '@web/testing/modules/team/fixtures';
 import {
   MOCK_TESTIMONIAL_QUOTE,
   MOCK_TESTIMONIAL_ROLE,
@@ -15,7 +16,6 @@ vi.mock('@web/i18n/navigation');
 faker.seed(21);
 
 const MOCK_ITEM = mockTestimonialItem();
-const MEMBER_INITIALS = 'JR';
 
 const MOCK_NEW_TAB_LINK = {
   label: faker.company.name(),
@@ -53,7 +53,7 @@ describe(`<${TestimonialCard.name}/>`, () => {
 
     it('renders the initials, never an empty avatar', () => {
       const image = screen.queryByRole('img');
-      const initials = screen.getByText(MEMBER_INITIALS);
+      const initials = screen.getByText(MOCK_TEAM_MEMBER_INITIALS);
 
       expect(image).not.toBeInTheDocument();
       expect(initials).toBeVisible();
@@ -70,7 +70,7 @@ describe(`<${TestimonialCard.name}/>`, () => {
     setup({ item: mockTestimonialItem({ image: mockSanityImage() }) });
 
     const image = screen.getByRole('img');
-    const initials = screen.queryByText(MEMBER_INITIALS);
+    const initials = screen.queryByText(MOCK_TEAM_MEMBER_INITIALS);
 
     expect(image).toBeVisible();
     expect(initials).not.toBeInTheDocument();
