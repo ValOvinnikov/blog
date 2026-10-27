@@ -4,6 +4,7 @@ export * from './constants';
 export * from './portable-text';
 export * from './routes';
 export * from './sanity/generated/types';
+export * from './sanity/studio-migration-ids';
 export * from './starter-content';
 export * from './theme';
 export * from './types';

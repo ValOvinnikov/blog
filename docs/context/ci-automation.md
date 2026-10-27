@@ -216,6 +216,10 @@ The step names are the job names they replaced, in this order:
 - **Const index** — `pnpm gen:const-index:check`: drift of
   `packages/config/CONSTANTS.md` and `packages/config/const-index.json`, the
   value→const map the touched-file `prefer-shared-constant` rule reads.
+- **Migration id list** — `pnpm gen:migration-ids:check`: drift of
+  `packages/config/src/sanity/studio-migration-ids.ts` against the folders in
+  `packages/studio/migrations/`; provisioning writes that list into a fresh
+  tenant's migration ledger.
 - **Required env classification** — `pnpm check:required-env` with no
   environment, which runs only the classification half (see "Required env
   vars" below).
@@ -520,7 +524,7 @@ Root `pnpm verify` is one `&&` chain over every required or gating CI check
 that has a local equivalent, in this order: `type-check`, `lint`, `test`,
 `knip`, `check:client-graph`, `check:revalidate-tags-sync`,
 `check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`,
-`gen:const-index:check`, `check:touched-lint`. The
+`gen:const-index:check`, `gen:migration-ids:check`, `check:touched-lint`. The
 chain stops at the first failure, so a red step is reported once rather than
 buried under later output. It is the sequence `develop-feature` §5 hands to
 `verify-runner`, the `## Verify` line of every issue body, and — minus
@@ -542,6 +546,7 @@ threshold at which it would have stayed out).
 | **Migration index** (gating)        | `pnpm check:migration-index` — in `pnpm verify`. Compares against the local `origin/main` ref and never fetches, so it is only as current as the `git fetch origin` that opens `develop-feature` §5.                                                                                                                                                     |
 | **UI index** (gating)               | `pnpm gen:ui-index:check` — in `pnpm verify`. CI also runs the generator's own fixture tests in Verify's Script helper tests step; those only change when `scripts/gen-ui-index.mjs` does.                                                                                                                                                               |
 | **Const index** (gating)            | `pnpm gen:const-index:check` — in `pnpm verify`. Regenerate with `pnpm gen:const-index` after adding or changing a key/value const.                                                                                                                                                                                                                      |
+| **Migration id list** (gating)      | `pnpm gen:migration-ids:check` — in `pnpm verify`. Regenerate with `pnpm gen:migration-ids` after adding, renaming or removing a migration folder.                                                                                                                                                                                                       |
 | Touched-file lint (local only)      | `pnpm check:touched-lint` — in `pnpm verify`; no CI step. Lints the `.ts`/`.tsx` files changed since the merge-base with `origin/main` with `BLOG_LINT_TOUCHED=1`, which adds `prefer-shared-constant` and `no-duplicate-string`.                                                                                                                        |
 | **Build** (via CI)                  | No routine mirror — `pnpm build` is CI-only by `CLAUDE.md`'s rule; run it locally only to reproduce an actual CI build failure (`open-pull-request` Gate 5a).                                                                                                                                                                                            |
 | **Workflow security** (required)    | Zizmor and actionlint have no local script. When the diff touches `.claude/hooks/**` or `scripts/*.sh`, run the shellcheck + guard-test block in `develop-feature` §5 by hand.                                                                                                                                                                           |

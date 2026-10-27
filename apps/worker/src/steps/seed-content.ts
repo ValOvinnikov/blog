@@ -14,6 +14,10 @@ import {
 import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { createClient } from '@sanity/client';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
+import {
+  buildAppliedMigrationLedger,
+  type TMigrationLedger,
+} from '@worker/utils/migration-ledger/migration-ledger';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { retryWithBackoff } from '@worker/utils/retry-with-backoff/retry-with-backoff';
 
@@ -75,17 +79,21 @@ export async function seedTenantContent(
 
     if (alreadySeeded) return;
 
+    const now = new Date().toISOString();
     const documents = buildStarterDocuments({
       siteType,
       siteName: tenant.name,
       locale: tenant.locale,
-      publishedAt: new Date().toISOString(),
+      publishedAt: now,
     });
 
     const transaction = client.transaction();
     for (const document of documents) {
       transaction.createIfNotExists<TStarterDocumentUnion>(document);
     }
+    transaction.createIfNotExists<TMigrationLedger>(
+      buildAppliedMigrationLedger(now),
+    );
 
     await retryWithBackoff(() => transaction.commit(), retryOptions);
 
