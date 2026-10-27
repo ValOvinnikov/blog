@@ -167,17 +167,18 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     const exportButton = await screen.findByRole('button', EXPORT_BUTTON);
     await user.click(exportButton);
     await waitFor(() => {
-      expect(screen.getByRole('button', EXPORT_BUTTON)).toBeEnabled();
+      const settledExportButton = screen.getByRole('button', EXPORT_BUTTON);
+      expect(settledExportButton).toBeEnabled();
     });
+
+    const [link, fileName, exported] = downloadJsonMock.mock.lastCall ?? [];
 
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
     });
-    expect(downloadJsonMock).toHaveBeenCalledWith(
-      expect.any(HTMLAnchorElement),
-      DATA_REQUEST_EXPORT_FILE_NAME,
-      { email: MOCK_DATA_REQUEST_EMAIL, ...data },
-    );
+    expect(link).toBeInstanceOf(HTMLAnchorElement);
+    expect(fileName).toBe(DATA_REQUEST_EXPORT_FILE_NAME);
+    expect(exported).toEqual({ email: MOCK_DATA_REQUEST_EMAIL, ...data });
   });
 
   it("shows the reader account's sign-in methods, sessions and bookmarks", async () => {

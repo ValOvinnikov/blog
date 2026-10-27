@@ -161,17 +161,21 @@ describe(getTenantOwnerMembership, () => {
   });
 
   it('reads a pending OWNER invite not yet backfilled from its plain email, and reports it', async () => {
-    await db().insert(schema.membershipInvites).values({
-      tenantId,
-      email: MOCK_OWNER_EMAIL,
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
+    const [invite] = await db()
+      .insert(schema.membershipInvites)
+      .values({
+        tenantId,
+        email: MOCK_OWNER_EMAIL,
+        role: MEMBERSHIP_ROLE.OWNER,
+      })
+      .returning();
 
     const result = await getTenantOwnerMembership(tenantId);
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       email: MOCK_OWNER_EMAIL,
       hasSignedIn: false,
+      invitedAt: invite?.createdAt,
     });
     expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
       owner: PERSONAL_DATA_OWNER.INVITE,
