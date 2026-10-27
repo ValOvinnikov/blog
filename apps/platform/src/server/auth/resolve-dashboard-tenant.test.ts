@@ -1,58 +1,72 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR, type TMaybeUndefined } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 
 import { resolveDashboardTenant } from './resolve-dashboard-tenant';
 
-const { listSessionTenantsMock, cookiesMock } = vi.hoisted(() => ({
-  listSessionTenantsMock: vi.fn(),
-  cookiesMock: vi.fn(),
-}));
+const cookiesMock = vi.hoisted(() => vi.fn());
 
-vi.mock('./list-session-tenants', () => ({
-  listSessionTenants: listSessionTenantsMock,
+vi.mock('@platform/server/auth/list-session-tenants', () => ({
+  listSessionTenants: vi.fn(),
 }));
 
 vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
-const tenant1 = { id: MOCK_TENANT_ID };
-const tenant2 = { id: 'tenant-2' };
-const membership1 = {
-  id: 'm-1',
-  userId: 'user-1',
-  tenantId: MOCK_TENANT_ID,
-  role: MEMBERSHIP_ROLE.OWNER,
-};
-const membership2 = {
-  id: 'm-2',
-  userId: 'user-1',
-  tenantId: 'tenant-2',
-  role: MEMBERSHIP_ROLE.OWNER,
-};
+faker.seed(5997);
 
-const mockCookie = (value: string | undefined) => {
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_REVOKED_TENANT_ID = faker.string.uuid();
+const MOCK_OTHER_MEMBERSHIP_ID = faker.string.uuid();
+
+const tenant1 = mockTenant({ id: MOCK_TENANT_ID });
+const tenant2 = mockTenant({ id: MOCK_OTHER_TENANT_ID });
+const membership1 = mockMembership({
+  userId: MOCK_USER_ID,
+  tenantId: MOCK_TENANT_ID,
+});
+const membership2 = mockMembership({
+  id: MOCK_OTHER_MEMBERSHIP_ID,
+  userId: MOCK_USER_ID,
+  tenantId: MOCK_OTHER_TENANT_ID,
+});
+
+const MISSING_ACTIVE_TENANT_COOKIES = [
+  { cookieCase: 'no active-tenant cookie', value: undefined },
+  {
+    cookieCase: 'a cookie naming a tenant without a membership',
+    value: MOCK_REVOKED_TENANT_ID,
+  },
+];
+
+const mockCookie = (value: TMaybeUndefined<string>) => {
   cookiesMock.mockResolvedValue({
     get: vi.fn(() => (value === undefined ? undefined : { value })),
   });
 };
 
-const DASHBOARD_SELECT_TENANT = '/dashboard/select-tenant';
-
 describe(resolveDashboardTenant, () => {
   beforeEach(() => {
-    listSessionTenantsMock.mockReset();
     cookiesMock.mockReset();
-    listSessionTenantsMock.mockResolvedValue({
-      userId: 'user-1',
+    vi.mocked(listSessionTenants).mockResolvedValue({
+      userId: MOCK_USER_ID,
+      admin: undefined,
       memberships: [membership1, membership2],
       tenants: [tenant1, tenant2],
     });
   });
 
   it('404s when the single membership points at a tenant that no longer exists', async () => {
-    listSessionTenantsMock.mockResolvedValue({
-      userId: 'user-1',
+    vi.mocked(listSessionTenants).mockResolvedValue({
+      userId: MOCK_USER_ID,
+      admin: undefined,
       memberships: [membership1],
       tenants: [],
     });
@@ -65,9 +79,10 @@ describe(resolveDashboardTenant, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('resolves directly with exactly one membership, without reading the active-tenant cookie', async () => {
-    listSessionTenantsMock.mockResolvedValue({
-      userId: 'user-1',
+  it('resolves directly with exactly one membership, without reading the cookie', async () => {
+    vi.mocked(listSessionTenants).mockResolvedValue({
+      userId: MOCK_USER_ID,
+      admin: undefined,
       memberships: [membership1],
       tenants: [tenant1],
     });
@@ -83,8 +98,8 @@ describe(resolveDashboardTenant, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('resolves the tenant named by a valid active-tenant cookie when there are multiple memberships', async () => {
-    mockCookie('tenant-2');
+  it('resolves the tenant named by a valid cookie when there are multiple memberships', async () => {
+    mockCookie(MOCK_OTHER_TENANT_ID);
 
     const result = await resolveDashboardTenant();
 
@@ -96,23 +111,18 @@ describe(resolveDashboardTenant, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('redirects to the picker when there are multiple memberships and no active-tenant cookie', async () => {
-    mockCookie(undefined);
+  it.each(MISSING_ACTIVE_TENANT_COOKIES)(
+    'redirects to the picker with multiple memberships and $cookieCase',
+    async ({ value }) => {
+      mockCookie(value);
 
-    await expect(resolveDashboardTenant()).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
+      await expect(resolveDashboardTenant()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
 
-    expect(redirect).toHaveBeenCalledWith(DASHBOARD_SELECT_TENANT);
-  });
-
-  it('redirects to the picker when the cookie names a tenant the session no longer has a membership for', async () => {
-    mockCookie('tenant-revoked');
-
-    await expect(resolveDashboardTenant()).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(redirect).toHaveBeenCalledWith(DASHBOARD_SELECT_TENANT);
-  });
+      expect(redirect).toHaveBeenCalledWith(
+        adminRoutes.dashboardSelectTenant(),
+      );
+    },
+  );
 });

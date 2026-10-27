@@ -1,14 +1,11 @@
+import { recordOwnerSignInActivity } from '@platform/server/tenants/record-owner-sign-in-activity';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import type { NextAuthConfig } from 'next-auth';
 
 import { withOwnerSignInActivity } from './with-owner-sign-in-activity';
 
-const { recordOwnerSignInActivityMock } = vi.hoisted(() => ({
-  recordOwnerSignInActivityMock: vi.fn(),
-}));
-
 vi.mock('@platform/server/tenants/record-owner-sign-in-activity', () => ({
-  recordOwnerSignInActivity: recordOwnerSignInActivityMock,
+  recordOwnerSignInActivity: vi.fn(),
 }));
 
 type TSignInMessage = Parameters<
@@ -24,7 +21,7 @@ describe(withOwnerSignInActivity, () => {
 
     await events?.signIn?.(MESSAGE);
 
-    expect(recordOwnerSignInActivityMock).toHaveBeenCalledWith(USER_ID);
+    expect(recordOwnerSignInActivity).toHaveBeenCalledWith(USER_ID);
   });
 
   it('still runs the shared config sign-in event', async () => {
@@ -44,6 +41,6 @@ describe(withOwnerSignInActivity, () => {
 
     await events?.signIn?.({ user: {}, account: null });
 
-    expect(recordOwnerSignInActivityMock).not.toHaveBeenCalled();
+    expect(recordOwnerSignInActivity).not.toHaveBeenCalled();
   });
 });

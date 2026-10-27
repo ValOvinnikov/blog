@@ -5,9 +5,16 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
-import { BLOCKED_IDENTITY_KIND, TENANT_STATUS } from '@blog/db/constants';
+import {
+  ADMIN_ROLE,
+  BLOCKED_IDENTITY_KIND,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -17,12 +24,18 @@ import {
   mockBlockedAddressIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
+import {
+  liftTenantSuspensionAction,
+  suspendTenantAction,
+} from './tenant-suspension-actions';
+
+faker.seed(4417);
+
 const {
-  requireSuperAdminMock,
   getTenantByIdMock,
   setTenantSuspensionMock,
   getTenantOwnerEmailMock,
@@ -30,9 +43,7 @@ const {
   recordSignupBlockAddedMock,
   removeBlockedIdentityMock,
   recordAuditEventMock,
-  revalidateSiteConfigMock,
 } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   setTenantSuspensionMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
@@ -40,7 +51,6 @@ const {
   recordSignupBlockAddedMock: vi.fn(),
   removeBlockedIdentityMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
-  revalidateSiteConfigMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/signup-block/add-signup-block', () => ({
@@ -48,17 +58,13 @@ vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   recordSignupBlockAdded: recordSignupBlockAddedMock,
 }));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
 }));
 
-vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
-  revalidateSiteConfig: revalidateSiteConfigMock,
-}));
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -74,23 +80,21 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const ADMIN = mockAdmin();
-const OWNER_EMAIL = MOCK_BLOCKED_OWNER_EMAIL;
-const UNDO_FAILURE = new Error('delete failed');
+const requireSuperAdminMock = vi.mocked(requireSuperAdmin);
+const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 
-const ACTIVE_TENANT = {
-  id: MOCK_TENANT_ID,
-  name: 'Acme',
-  status: TENANT_STATUS.ACTIVE,
-  deprovisionedAt: null,
-};
+const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
+const OWNER_EMAIL = MOCK_BLOCKED_OWNER_EMAIL;
+const MOCK_UNDO_FAILURE = new Error(faker.lorem.sentence());
+const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
+const MOCK_CACHE_ERROR = new Error(faker.lorem.sentence());
+const MOCK_ARCHIVED_AT = faker.date.past();
+
+const ACTIVE_TENANT = mockTenant();
 
 describe('tenant suspension actions', () => {
-  let actions: typeof import('./tenant-suspension-actions');
-
-  beforeEach(async () => {
+  beforeEach(() => {
     requireSuperAdminMock.mockReset();
-    requireSuperAdminMock.mockResolvedValue(ADMIN);
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(ACTIVE_TENANT);
     setTenantSuspensionMock.mockReset();
@@ -106,15 +110,14 @@ describe('tenant suspension actions', () => {
     vi.mocked(logger.error).mockReset();
     recordAuditEventMock.mockReset();
     revalidateSiteConfigMock.mockReset();
-    actions = await import('./tenant-suspension-actions');
   });
 
   it('requires a super-admin session before reading the tenant', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
+    requireSuperAdminMock.mockImplementationOnce(() => {
       notFound();
     });
 
-    await expect(actions.suspendTenantAction(ACTIVE_TENANT.id)).rejects.toThrow(
+    await expect(suspendTenantAction(ACTIVE_TENANT.id)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -122,7 +125,7 @@ describe('tenant suspension actions', () => {
   });
 
   it('suspends the tenant, purges its cached site and records the operator action', async () => {
-    const result = await actions.suspendTenantAction(ACTIVE_TENANT.id);
+    const result = await suspendTenantAction(ACTIVE_TENANT.id);
 
     expect(setTenantSuspensionMock).toHaveBeenCalledWith(
       ACTIVE_TENANT.id,
@@ -145,7 +148,7 @@ describe('tenant suspension actions', () => {
       status: TENANT_STATUS.SUSPENDED,
     });
 
-    const result = await actions.liftTenantSuspensionAction(ACTIVE_TENANT.id);
+    const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
 
     expect(setTenantSuspensionMock).toHaveBeenCalledWith(
       ACTIVE_TENANT.id,
@@ -164,7 +167,7 @@ describe('tenant suspension actions', () => {
   it('refuses an unknown tenant', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    const result = await actions.suspendTenantAction(ACTIVE_TENANT.id);
+    const result = await suspendTenantAction(ACTIVE_TENANT.id);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -177,14 +180,14 @@ describe('tenant suspension actions', () => {
     { status: TENANT_STATUS.ARCHIVED, deprovisionedAt: null },
     {
       status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: new Date('2026-08-26T00:00:00Z'),
+      deprovisionedAt: MOCK_ARCHIVED_AT,
     },
   ])(
     'refuses an archived tenant ($status, deprovisionedAt $deprovisionedAt)',
     async (archived) => {
       getTenantByIdMock.mockResolvedValue({ ...ACTIVE_TENANT, ...archived });
 
-      const result = await actions.liftTenantSuspensionAction(ACTIVE_TENANT.id);
+      const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
 
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.REFUSED,
@@ -200,7 +203,7 @@ describe('tenant suspension actions', () => {
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await actions.suspendTenantAction(ACTIVE_TENANT.id);
+    const result = await suspendTenantAction(ACTIVE_TENANT.id);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -211,9 +214,9 @@ describe('tenant suspension actions', () => {
   });
 
   it('returns a server error without an audit event when the write throws', async () => {
-    setTenantSuspensionMock.mockRejectedValue(new Error('db down'));
+    setTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await actions.suspendTenantAction(ACTIVE_TENANT.id);
+    const result = await suspendTenantAction(ACTIVE_TENANT.id);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(recordAuditEventMock).not.toHaveBeenCalled();
@@ -225,14 +228,11 @@ describe('tenant suspension actions', () => {
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
       identity: OWNER_EMAIL,
       reason: MOCK_BLOCK_REASON,
-      admin: ADMIN,
+      admin: MOCK_SUPER_ADMIN,
     };
 
     it('blocks the owner address as the admin, suspends, then audits the block', async () => {
-      const result = await actions.suspendTenantAction(
-        ACTIVE_TENANT.id,
-        OWNER_BLOCK,
-      );
+      const result = await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
       expect(saveSignupBlockMock).toHaveBeenCalledWith(SAVED_BLOCK);
       expect(setTenantSuspensionMock).toHaveBeenCalledWith(
@@ -248,7 +248,7 @@ describe('tenant suspension actions', () => {
     });
 
     it('trims the reason before storing it', async () => {
-      await actions.suspendTenantAction(ACTIVE_TENANT.id, {
+      await suspendTenantAction(ACTIVE_TENANT.id, {
         reason: `  ${MOCK_BLOCK_REASON}  `,
       });
 
@@ -260,17 +260,14 @@ describe('tenant suspension actions', () => {
         okResult({ entry: mockBlockedAddressIdentity(), created: false }),
       );
 
-      const result = await actions.suspendTenantAction(
-        ACTIVE_TENANT.id,
-        OWNER_BLOCK,
-      );
+      const result = await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
       expect(recordSignupBlockAddedMock).not.toHaveBeenCalled();
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     });
 
     it('rejects a blank reason without blocking or suspending', async () => {
-      const result = await actions.suspendTenantAction(ACTIVE_TENANT.id, {
+      const result = await suspendTenantAction(ACTIVE_TENANT.id, {
         reason: '   ',
       });
 
@@ -285,10 +282,7 @@ describe('tenant suspension actions', () => {
     it('refuses without suspending when the owner has no email on record', async () => {
       getTenantOwnerEmailMock.mockResolvedValue(undefined);
 
-      const result = await actions.suspendTenantAction(
-        ACTIVE_TENANT.id,
-        OWNER_BLOCK,
-      );
+      const result = await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.REFUSED,
@@ -303,10 +297,7 @@ describe('tenant suspension actions', () => {
         errorResult(ERROR_CODE.DB_INVALID_EMAIL),
       );
 
-      const result = await actions.suspendTenantAction(
-        ACTIVE_TENANT.id,
-        OWNER_BLOCK,
-      );
+      const result = await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
       expect(setTenantSuspensionMock).not.toHaveBeenCalled();
@@ -316,7 +307,7 @@ describe('tenant suspension actions', () => {
     it('blocks nothing for an unknown tenant', async () => {
       getTenantByIdMock.mockResolvedValue(undefined);
 
-      await actions.suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
+      await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
       expect(saveSignupBlockMock).not.toHaveBeenCalled();
     });
@@ -333,7 +324,7 @@ describe('tenant suspension actions', () => {
         ],
         [
           'fails with an exception',
-          () => setTenantSuspensionMock.mockRejectedValue(new Error('db down')),
+          () => setTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR),
           { outcome: ACTION_OUTCOME.SERVER_ERROR },
         ],
       ])(
@@ -341,7 +332,7 @@ describe('tenant suspension actions', () => {
         async (_, failSuspension, expected) => {
           failSuspension();
 
-          const result = await actions.suspendTenantAction(
+          const result = await suspendTenantAction(
             ACTIVE_TENANT.id,
             OWNER_BLOCK,
           );
@@ -356,12 +347,9 @@ describe('tenant suspension actions', () => {
       );
 
       it('keeps the block and audits it once when only the cache purge fails', async () => {
-        revalidateSiteConfigMock.mockRejectedValue(new Error('cache down'));
+        revalidateSiteConfigMock.mockRejectedValue(MOCK_CACHE_ERROR);
 
-        const result = await actions.suspendTenantAction(
-          ACTIVE_TENANT.id,
-          OWNER_BLOCK,
-        );
+        const result = await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
         expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
         expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
@@ -380,7 +368,7 @@ describe('tenant suspension actions', () => {
           errorResult(ERROR_CODE.DB_NOT_FOUND),
         );
 
-        await actions.suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
+        await suspendTenantAction(ACTIVE_TENANT.id, OWNER_BLOCK);
 
         expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
       });
@@ -396,8 +384,8 @@ describe('tenant suspension actions', () => {
         ],
         [
           'rejects',
-          () => removeBlockedIdentityMock.mockRejectedValue(UNDO_FAILURE),
-          { error: UNDO_FAILURE },
+          () => removeBlockedIdentityMock.mockRejectedValue(MOCK_UNDO_FAILURE),
+          { error: MOCK_UNDO_FAILURE },
         ],
       ])(
         'logs once without the address and keeps the failure when the undo %s',
@@ -407,7 +395,7 @@ describe('tenant suspension actions', () => {
           );
           failUndo();
 
-          const result = await actions.suspendTenantAction(
+          const result = await suspendTenantAction(
             ACTIVE_TENANT.id,
             OWNER_BLOCK,
           );
