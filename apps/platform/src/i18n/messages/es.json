@@ -1454,7 +1454,8 @@
   "dataRequestResultCard": {
     "title": "Datos guardados de {email}",
     "matchCount": "{count, plural, =0 {No se encontró ningún registro.} one {# registro encontrado.} other {# registros encontrados.}}",
-    "export": "Descargar exportación",
+    "exportJson": "Descargar JSON",
+    "exportCsv": "Descargar CSV",
     "exporting": "Preparando…"
   },
   "dataRequestEraseDialog": {

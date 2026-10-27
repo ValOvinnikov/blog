@@ -8,6 +8,7 @@ code:
   - apps/platform/src/server/data-requests/**
   - apps/platform/src/components/features/data-requests/**
   - apps/platform/src/constants/data-request.ts
+  - apps/platform/src/utils/personal-data-export-csv/**
 epics: [5653]
 ---
 
@@ -16,7 +17,7 @@ epics: [5653]
 ## What it does
 
 A SUPERADMIN finds every record still held about a person from their email
-address, downloads all of it as one JSON file, and erases it. It answers a
+address, downloads all of it as one JSON or CSV file, and erases it. It answers a
 request for access to or erasure of personal data, including after the person's
 account is deleted, when the remaining records are linked only by email.
 Whether the platform answers such a request itself, or forwards a site's
@@ -35,8 +36,19 @@ page (#5090). The page serves either answer.
   platform-wide record), the stored email ("Stored as a hash" for a sign-up
   block) and when it was recorded ("Not recorded" for an account whose email
   was never verified).
-- "Download export" saves `personal-data-export.json`, the reader account
-  included. "Erase" opens a confirmation dialog that needs the email typed in
+- "Download JSON" and "Download CSV" save
+  `personal-data-export-<generatedAt>.json` / `.csv` (colons as dashes, no
+  milliseconds, e.g. `personal-data-export-2026-10-27T10-29-42Z.csv`), both with
+  the same records, the reader account
+  included. Each starts with `generatedAt` (ISO time, set on the server),
+  `searchedEmail` and `operatorId` (the operator's user id, never their
+  email): the JSON as its first keys, the CSV as its first three columns on
+  every row. The CSV is one table with a `kind` column (`SUBSCRIBER`, `LEAD`,
+  `INVITE`, `READER_ACCOUNT`, `BOOKMARK`, `SIGNUP_BLOCK`, `AUDIT_EVENT`) and
+  one column per field, empty where a kind has none; dates are ISO times and
+  the sign-in methods a JSON object. It is UTF-8 with a byte-order mark, quotes
+  cells per RFC 4180, and prefixes a text cell that starts with `=`, `+`, `-`
+  or `@` with `'` so a spreadsheet never runs it. "Erase" opens a confirmation dialog that needs the email typed in
   full. When the address has a reader account the dialog has "Also delete the
   reader account", ticked by default; unticked, the account, its sessions and
   bookmarks are left alone (a narrower request, such as newsletter only). When
@@ -103,7 +115,8 @@ Nothing is configurable. Both personal-data keys must be set: without
 
 - `@blog/db` (`findPersonalData`, `erasePersonalData`, `findUserByEmail`,
   `getLinkedProviders`, `deleteAccount`), `@blog/utils`
-  (`normalizeEmailIdentity`, `personalDataIndex`, `decryptPersonalData`),
+  (`normalizeEmailIdentity`, `personalDataIndex`, `decryptPersonalData`,
+  `toCsv`),
   `@blog/config` (`AUDIT_ACTION`, `AUDIT_TARGET_TYPE`).
 - Features: [tenant-access](./tenant-access.md),
   [audit-and-findings](./audit-and-findings.md),
@@ -123,6 +136,7 @@ Nothing is configurable. Both personal-data keys must be set: without
 
 - `packages/db/src/queries/personal-data/*/*.test.ts`
 - `apps/platform/src/server/data-requests/*.test.ts`
+- `apps/platform/src/utils/personal-data-export-csv/personal-data-export-csv.test.ts`
 - `apps/platform/src/components/features/data-requests/data-request-view/components/data-request-panel/data-request-panel.test.tsx`
 - `apps/platform/src/app/[locale]/(operator)/data-requests/*.test.tsx`
 

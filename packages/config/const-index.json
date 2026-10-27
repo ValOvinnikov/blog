@@ -3712,6 +3712,22 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
+    "JSON": [
+      {
+        "ref": "DATA_REQUEST_EXPORT_FORMAT.JSON",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "CSV": [
+      {
+        "ref": "DATA_REQUEST_EXPORT_FORMAT.CSV",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "data_request.audit_failed": [
       {
         "ref": "DATA_REQUEST_LOG.AUDIT_FAILED",

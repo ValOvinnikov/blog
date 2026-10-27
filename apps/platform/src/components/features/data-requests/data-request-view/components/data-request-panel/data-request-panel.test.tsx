@@ -1,15 +1,7 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import {
-  DATA_REQUEST_EXPORT_FILE_NAME,
-  DATA_REQUEST_MATCH_KIND,
-} from '@platform/constants/data-request';
+import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
-import {
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@platform/testing/custom-render';
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_SITE_NAME,
@@ -25,12 +17,12 @@ const {
   lookUpPersonalDataActionMock,
   exportPersonalDataActionMock,
   erasePersonalDataActionMock,
-  downloadJsonMock,
+  downloadFileMock,
 } = vi.hoisted(() => ({
   lookUpPersonalDataActionMock: vi.fn(),
   exportPersonalDataActionMock: vi.fn(),
   erasePersonalDataActionMock: vi.fn(),
-  downloadJsonMock: vi.fn(),
+  downloadFileMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/data-requests/look-up-personal-data-action', () => ({
@@ -45,15 +37,18 @@ vi.mock('@platform/server/data-requests/erase-personal-data-action', () => ({
   erasePersonalDataAction: erasePersonalDataActionMock,
 }));
 
-vi.mock('@platform/utils/download-json/download-json', () => ({
-  downloadJson: downloadJsonMock,
+vi.mock('@platform/utils/download-file/download-file', () => ({
+  downloadFile: downloadFileMock,
 }));
 
 const EMAIL_FIELD = { name: 'Email address' };
 const FIND_BUTTON = { name: 'Find data' };
 const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
-const EXPORT_BUTTON = { name: 'Download export' };
+const EXPORT_JSON_BUTTON = { name: 'Download JSON' };
+const EXPORT_CSV_BUTTON = { name: 'Download CSV' };
+const EXPORT_GENERATED_AT = '2026-10-27T10:29:42.123Z';
+const EXPORT_SETTLE_TIMEOUT_MS = 5_000;
 const RESULTS_TABLE = { name: 'Stored records' };
 const READER_ACCOUNT_CHECKBOX = { name: 'Also delete the reader account' };
 const SIGNUP_BLOCK_KEPT =
@@ -78,6 +73,16 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     await user.click(findButton);
   };
 
+  const exportAs = async (button: typeof EXPORT_CSV_BUTTON) => {
+    const exportButton = await screen.findByRole('button', button);
+    await user.click(exportButton);
+    return screen.findByRole(
+      'button',
+      { ...button, busy: false },
+      { timeout: EXPORT_SETTLE_TIMEOUT_MS },
+    );
+  };
+
   const openEraseDialog = async () => {
     const eraseButton = await screen.findByRole('button', ERASE_BUTTON);
     await user.click(eraseButton);
@@ -97,9 +102,12 @@ describe(`<${DataRequestPanel.name}/>`, () => {
       matches: [mockDataRequestMatch(), BLOCK_MATCH],
       readerAccount: mockPersonalDataReaderAccount(),
     });
-    exportPersonalDataActionMock.mockReset();
+    exportPersonalDataActionMock.mockReset().mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      data: mockPersonalDataExport(),
+    });
     erasePersonalDataActionMock.mockReset();
-    downloadJsonMock.mockReset();
+    downloadFileMock.mockReset();
     setup();
   });
 
@@ -156,29 +164,63 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(eraseButton).not.toBeInTheDocument();
   });
 
-  it('downloads the export for the searched email', async () => {
-    const data = mockPersonalDataExport();
+  it('downloads the JSON export for the searched email, named by when it was made', async () => {
     exportPersonalDataActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
-      data,
+      data: { ...mockPersonalDataExport(), generatedAt: EXPORT_GENERATED_AT },
     });
     await lookUp();
 
-    const exportButton = await screen.findByRole('button', EXPORT_BUTTON);
-    await user.click(exportButton);
-    await waitFor(() => {
-      const settledExportButton = screen.getByRole('button', EXPORT_BUTTON);
-      expect(settledExportButton).toBeEnabled();
-    });
+    await exportAs(EXPORT_JSON_BUTTON);
 
-    const [link, fileName, exported] = downloadJsonMock.mock.lastCall ?? [];
+    const [, fileName, content] = downloadFileMock.mock.lastCall ?? [];
 
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
     });
-    expect(link).toBeInstanceOf(HTMLAnchorElement);
-    expect(fileName).toBe(DATA_REQUEST_EXPORT_FILE_NAME);
-    expect(exported).toEqual({ email: MOCK_DATA_REQUEST_EMAIL, ...data });
+    expect(fileName).toBe('personal-data-export-2026-10-27T10-29-42Z.json');
+    expect(JSON.parse(content)).toEqual(
+      JSON.parse(
+        JSON.stringify({
+          ...mockPersonalDataExport(),
+          generatedAt: EXPORT_GENERATED_AT,
+        }),
+      ),
+    );
+  });
+
+  it('downloads the CSV export for the searched email, named by when it was made', async () => {
+    exportPersonalDataActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      data: { ...mockPersonalDataExport(), generatedAt: EXPORT_GENERATED_AT },
+    });
+    await lookUp();
+
+    await exportAs(EXPORT_CSV_BUTTON);
+
+    const [, fileName, content] = downloadFileMock.mock.lastCall ?? [];
+
+    expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
+      email: MOCK_DATA_REQUEST_EMAIL,
+    });
+    expect(fileName).toBe('personal-data-export-2026-10-27T10-29-42Z.csv');
+    expect(content).toContain(DATA_REQUEST_MATCH_KIND.SUBSCRIBER);
+  });
+
+  it('says so when the export fails, and downloads nothing', async () => {
+    exportPersonalDataActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
+    await lookUp();
+
+    const exportButton = await exportAs(EXPORT_CSV_BUTTON);
+    const toast = await screen.findByText(
+      "Couldn't prepare the export — try again.",
+    );
+
+    expect(toast).toBeVisible();
+    expect(exportButton).toBeEnabled();
+    expect(downloadFileMock).not.toHaveBeenCalled();
   });
 
   it("shows the reader account's sign-in methods, sessions and bookmarks", async () => {
