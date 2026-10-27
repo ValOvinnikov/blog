@@ -5,122 +5,124 @@ import {
 } from '@blog/config/constants';
 import {
   MOCK_BODY_IMAGE_KEY,
+  MOCK_EXTERNAL_URL,
   mockRawBodyImageBlock,
   mockRawPortableTextMarkDef,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   toPortableTextBody,
   type TRawPortableTextBody,
 } from './to-portable-text-body';
 
-const ASIDE_KEY = 'aside-1';
-const ASIDE_BLOCK_KEY = 'aside-block-1';
+faker.seed(6018);
+
+const MOCK_ASIDE_KEY = faker.string.uuid();
+const MOCK_BLOCK_KEY = faker.string.uuid();
+const MOCK_MARK_KEY = faker.string.uuid();
+const MOCK_CODE_KEY = faker.string.uuid();
+const MOCK_CODE = faker.lorem.word();
+
+const MOCK_RESOLVED_BLOCK = {
+  _type: 'block',
+  _key: MOCK_BLOCK_KEY,
+  children: [],
+  markDefs: [
+    {
+      _key: MOCK_MARK_KEY,
+      _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+      link: { href: MOCK_EXTERNAL_URL, target: undefined },
+    },
+  ],
+};
+
+function mockRawLinkedBlock() {
+  return {
+    _type: 'block' as const,
+    _key: MOCK_BLOCK_KEY,
+    markDefs: [mockRawPortableTextMarkDef({ _key: MOCK_MARK_KEY })],
+  };
+}
+
+function mockRawAsideBlock(body: unknown) {
+  return {
+    _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
+    _key: MOCK_ASIDE_KEY,
+    kind: ASIDE_KIND.CONTEXT,
+    body,
+  };
+}
 
 describe(toPortableTextBody, () => {
-  const markDef = mockRawPortableTextMarkDef();
-
   it.each([
     {
       behaviour: 'resolves a bodyImage block into an image view-model',
       overrides: {},
+      layout: IMAGE_LAYOUT.FULL_BLEED,
       image: mockSanityImageView(),
     },
     {
-      behaviour:
-        'keeps a bodyImage block whose asset never resolved, with image undefined',
+      behaviour: 'keeps a bodyImage block whose asset never resolved',
       overrides: { asset: null },
+      layout: IMAGE_LAYOUT.FULL_BLEED,
       image: undefined,
     },
-  ])('$behaviour', ({ overrides, image }) => {
+    {
+      behaviour: 'maps a missing bodyImage layout to undefined',
+      overrides: { layout: null },
+      layout: undefined,
+      image: mockSanityImageView(),
+    },
+  ])('$behaviour', ({ overrides, layout, image }) => {
     const result = toPortableTextBody([mockRawBodyImageBlock(overrides)]);
 
     expect(result).toEqual([
       {
         _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
         _key: MOCK_BODY_IMAGE_KEY,
-        layout: IMAGE_LAYOUT.FULL_BLEED,
+        layout,
         image,
       },
     ]);
   });
 
-  it('maps a missing layout to undefined', () => {
-    const result = toPortableTextBody([
-      mockRawBodyImageBlock({ layout: null }),
-    ]);
-
-    expect(result[0]).toMatchObject({ layout: undefined });
-  });
-
   it('passes a code block through unchanged', () => {
-    const block = { _type: 'code' as const, _key: 'code-1', code: 'a();' };
+    const block = {
+      _type: 'code' as const,
+      _key: MOCK_CODE_KEY,
+      code: MOCK_CODE,
+    };
 
     const result = toPortableTextBody([block] as TRawPortableTextBody);
 
     expect(result).toEqual([block]);
   });
 
-  it("resolves a block's linkRef mark to its link document href", () => {
-    const raw = [
-      { _type: 'block' as const, _key: 'block-1', markDefs: [markDef] },
-    ] as TRawPortableTextBody;
+  it('resolves the link marks of a top-level text block', () => {
+    const result = toPortableTextBody([
+      mockRawLinkedBlock(),
+    ] as TRawPortableTextBody);
 
-    const result = toPortableTextBody(raw);
-
-    expect(result[0]).toMatchObject({
-      markDefs: [
-        {
-          _key: markDef._key,
-          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-          link: { href: markDef.link?.url },
-        },
-      ],
-    });
+    expect(result).toEqual([MOCK_RESOLVED_BLOCK]);
   });
 
-  it("resolves an aside block's nested body markDefs the same way", () => {
-    const raw = [
-      {
-        _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-        _key: ASIDE_KEY,
-        kind: ASIDE_KIND.CONTEXT,
-        body: [
-          {
-            _type: 'block' as const,
-            _key: ASIDE_BLOCK_KEY,
-            markDefs: [markDef],
-          },
-        ],
-      },
-    ] as TRawPortableTextBody;
+  it('resolves the link marks of the text blocks inside an aside', () => {
+    const result = toPortableTextBody([
+      mockRawAsideBlock([mockRawLinkedBlock()]),
+    ] as TRawPortableTextBody);
 
-    const result = toPortableTextBody(raw);
-
-    expect(result[0]).toMatchObject({
-      _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-      body: [
-        {
-          _key: ASIDE_BLOCK_KEY,
-          markDefs: [{ link: { href: markDef.link?.url } }],
-        },
-      ],
-    });
+    expect(result).toEqual([
+      { ...mockRawAsideBlock(undefined), body: [MOCK_RESOLVED_BLOCK] },
+    ]);
   });
 
-  it('leaves an aside block with no body blocks undefined', () => {
-    const raw = [
-      {
-        _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-        _key: ASIDE_KEY,
-        kind: ASIDE_KIND.CONTEXT,
-        body: null,
-      },
-    ] as TRawPortableTextBody;
+  it('leaves the body of an aside with no blocks undefined', () => {
+    const result = toPortableTextBody([
+      mockRawAsideBlock(null),
+    ] as TRawPortableTextBody);
 
-    const result = toPortableTextBody(raw);
-
-    expect(result[0]).toMatchObject({ body: undefined });
+    expect(result).toEqual([mockRawAsideBlock(undefined)]);
   });
 });
