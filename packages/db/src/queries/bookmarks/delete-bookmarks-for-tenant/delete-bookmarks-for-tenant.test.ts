@@ -1,4 +1,8 @@
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_OTHER_POST_ID,
+  MOCK_POST_ID,
+} from '@blog/db/testing/bookmarks/fixtures';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { eq } from 'drizzle-orm';
@@ -24,25 +28,26 @@ describe(deleteBookmarksForTenant, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('deletes every bookmark row for the tenant, across users, and returns the count', async () => {
+  it('deletes every bookmark for the tenant, across users, and counts them', async () => {
     const user1 = await insertTestUser(db());
     const user2 = await insertTestUser(db());
-    await addBookmark(tenantId, user1.id, 'post-1');
-    await addBookmark(tenantId, user2.id, 'post-2');
+    await addBookmark(tenantId, user1.id, MOCK_POST_ID);
+    await addBookmark(tenantId, user2.id, MOCK_OTHER_POST_ID);
 
-    await expect(deleteBookmarksForTenant(tenantId)).resolves.toBe(2);
+    const deleted = await deleteBookmarksForTenant(tenantId);
 
     const rows = await db()
       .select()
       .from(schema.bookmarks)
       .where(eq(schema.bookmarks.tenantId, tenantId));
+    expect(deleted).toBe(2);
     expect(rows).toHaveLength(0);
   });
 
   it("leaves another tenant's bookmarks untouched", async () => {
     const user = await insertTestUser(db());
     const { id: otherTenantId } = await insertTestTenant(db());
-    await addBookmark(otherTenantId, user.id, 'post-1');
+    await addBookmark(otherTenantId, user.id, MOCK_POST_ID);
 
     await deleteBookmarksForTenant(tenantId);
 
@@ -53,7 +58,7 @@ describe(deleteBookmarksForTenant, () => {
     expect(rows).toHaveLength(1);
   });
 
-  it('is idempotent — returns 0 when nothing matches', async () => {
+  it('returns 0 when the tenant has no bookmarks', async () => {
     await expect(deleteBookmarksForTenant(tenantId)).resolves.toBe(0);
   });
 });
