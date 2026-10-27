@@ -11,6 +11,7 @@ import { retryProvisioningStepAction } from '@platform/server/provisioning/retry
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   act,
+  fireEvent,
   renderHookWithIntl,
   screen,
   waitFor,
@@ -233,9 +234,7 @@ describe(useProvisioningPoll, () => {
 
       it('resumes polling once the tab is visible again', async () => {
         visibility.mockReturnValue('visible');
-        act(() => {
-          document.dispatchEvent(new Event('visibilitychange'));
-        });
+        fireEvent(document, new Event('visibilitychange'));
         await advance(STEP_POLL_INTERVAL_MS);
 
         expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);

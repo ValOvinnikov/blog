@@ -4,7 +4,7 @@ import {
 } from '@blog/db/constants';
 import type { TTenantDeprovisioningState } from '@blog/db/schema/tenants';
 import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
-import { act, renderHook } from '@platform/testing/custom-render';
+import { act, fireEvent, renderHook } from '@platform/testing/custom-render';
 import {
   mockDoneDeprovisioningSteps,
   mockIdleDeprovisioningSteps,
@@ -360,10 +360,8 @@ describe(useDeprovisioningPoll, () => {
 
       it('resumes polling once the tab is visible again', async () => {
         visibility.mockReturnValue('visible');
-        await act(async () => {
-          document.dispatchEvent(new Event('visibilitychange'));
-          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-        });
+        fireEvent(document, new Event('visibilitychange'));
+        await advance(STEP_POLL_INTERVAL_MS);
 
         expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
           1,
