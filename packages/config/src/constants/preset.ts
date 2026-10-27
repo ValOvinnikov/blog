@@ -1,5 +1,13 @@
 import type { TValueOf } from '@blog/config/utils';
 
+import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
+  type TAccountButtonStyle,
+  type TAccountPanelStyle,
+  type TAccountPhonePlacement,
+} from './account-control';
 import { type TCapability, CAPABILITY } from './capability';
 import { type TCardStyle, CARD_STYLE } from './card-style';
 import {
@@ -73,6 +81,9 @@ export type TPresetBundle = {
   themeTokens: TThemeTokens;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  accountButtonStyle: TAccountButtonStyle;
+  accountPanelStyle: TAccountPanelStyle;
+  accountPhonePlacement: TAccountPhonePlacement;
   featureDefaults: Record<TCapability, boolean>;
 };
 
@@ -87,6 +98,9 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     },
     cardStyle: CARD_STYLE.ACCENT_BAR,
     headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+    accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+    accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
+    accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
@@ -107,6 +121,9 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     },
     cardStyle: CARD_STYLE.OUTLINED,
     headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+    accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+    accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
+    accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,

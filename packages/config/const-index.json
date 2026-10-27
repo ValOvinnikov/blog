@@ -1,5 +1,73 @@
 {
   "strings": {
+    "PILL": [
+      {
+        "ref": "ACCOUNT_BUTTON_STYLE.PILL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      }
+    ],
+    "CIRCLE": [
+      {
+        "ref": "ACCOUNT_BUTTON_STYLE.CIRCLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "CARD_IMAGE_SHAPE.CIRCLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-image-shape.ts"
+      }
+    ],
+    "CARD": [
+      {
+        "ref": "ACCOUNT_PANEL_STYLE.CARD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      }
+    ],
+    "PROFILE": [
+      {
+        "ref": "ACCOUNT_PANEL_STYLE.PROFILE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      }
+    ],
+    "HUB": [
+      {
+        "ref": "ACCOUNT_PANEL_STYLE.HUB",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      }
+    ],
+    "BAR": [
+      {
+        "ref": "ACCOUNT_PHONE_PLACEMENT.BAR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      }
+    ],
+    "MENU": [
+      {
+        "ref": "ACCOUNT_PHONE_PLACEMENT.MENU",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "ICONS.MENU",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "SUCCESS": [
       {
         "ref": "ACTION_OUTCOME.SUCCESS",
@@ -553,14 +621,6 @@
     "SQUARE": [
       {
         "ref": "CARD_IMAGE_SHAPE.SQUARE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/card-image-shape.ts"
-      }
-    ],
-    "CIRCLE": [
-      {
-        "ref": "CARD_IMAGE_SHAPE.CIRCLE",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
@@ -1201,14 +1261,6 @@
     "EXTERNAL_LINK": [
       {
         "ref": "ICONS.EXTERNAL_LINK",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/icon.ts"
-      }
-    ],
-    "MENU": [
-      {
-        "ref": "ICONS.MENU",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"

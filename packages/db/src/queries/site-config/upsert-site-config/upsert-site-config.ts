@@ -1,5 +1,8 @@
 import type { TVoiceFieldFailuresByLocale } from '@blog/config';
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
@@ -10,6 +13,9 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
+  type TAccountButtonStyle,
+  type TAccountPanelStyle,
+  type TAccountPhonePlacement,
   type TCardStyle,
   type TDensity,
   type THeaderControlStyle,
@@ -90,6 +96,30 @@ export const updateSiteConfigInputSchema = z.object({
       ],
     )
     .optional(),
+  accountButtonStyle: z
+    .enum(
+      Object.values(ACCOUNT_BUTTON_STYLE) as [
+        TAccountButtonStyle,
+        ...TAccountButtonStyle[],
+      ],
+    )
+    .optional(),
+  accountPanelStyle: z
+    .enum(
+      Object.values(ACCOUNT_PANEL_STYLE) as [
+        TAccountPanelStyle,
+        ...TAccountPanelStyle[],
+      ],
+    )
+    .optional(),
+  accountPhonePlacement: z
+    .enum(
+      Object.values(ACCOUNT_PHONE_PLACEMENT) as [
+        TAccountPhonePlacement,
+        ...TAccountPhonePlacement[],
+      ],
+    )
+    .optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -115,6 +145,15 @@ function presentOptionalFields(
   if (parsed.cardStyle !== undefined) fields.cardStyle = parsed.cardStyle;
   if (parsed.headerControlStyle !== undefined) {
     fields.headerControlStyle = parsed.headerControlStyle;
+  }
+  if (parsed.accountButtonStyle !== undefined) {
+    fields.accountButtonStyle = parsed.accountButtonStyle;
+  }
+  if (parsed.accountPanelStyle !== undefined) {
+    fields.accountPanelStyle = parsed.accountPanelStyle;
+  }
+  if (parsed.accountPhonePlacement !== undefined) {
+    fields.accountPhonePlacement = parsed.accountPhonePlacement;
   }
   if (parsed.logoAssetUrl !== undefined) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
@@ -173,6 +212,9 @@ export async function upsertSiteConfig(
       tenantId,
       cardStyle: presetBundle.cardStyle,
       headerControlStyle: presetBundle.headerControlStyle,
+      accountButtonStyle: presetBundle.accountButtonStyle,
+      accountPanelStyle: presetBundle.accountPanelStyle,
+      accountPhonePlacement: presetBundle.accountPhonePlacement,
       ...required,
       ...optional,
       ...(voicePatch && { voiceOverridesByLocale: voicePatch }),

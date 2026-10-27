@@ -1,4 +1,7 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -28,6 +31,9 @@ export const mockSiteConfig = (
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+  accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
+  accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
   logoAssetUrl: undefined,
   faviconAssetUrl: undefined,
   voiceOverridesByLocale: {},

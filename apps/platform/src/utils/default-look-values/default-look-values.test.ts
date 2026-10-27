@@ -1,4 +1,7 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -54,6 +57,9 @@ describe(toLookFormValues, () => {
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       cardStyle: CARD_STYLE.OUTLINED,
       headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+      accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
+      accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
+      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
       logoAssetUrl: MOCK_LOGO_URL,
       faviconAssetUrl: MOCK_FAVICON_URL,
       voiceOverridesByLocale: {},
