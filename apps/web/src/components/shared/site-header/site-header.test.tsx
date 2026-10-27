@@ -10,6 +10,7 @@ import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -79,7 +80,6 @@ const setup = customRenderAsync(SiteHeader, {});
 
 const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const LANGUAGE_ENGLISH = 'Language: English';
-const LANGUAGE_NAV_NAME = 'Language';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 const SIGN_IN = 'Sign in';
 const SIGN_IN_OPTIONS = 'Sign in options';

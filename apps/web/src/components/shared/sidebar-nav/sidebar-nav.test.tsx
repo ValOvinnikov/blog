@@ -1,6 +1,7 @@
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import {
   MOCK_SIDEBAR_NAV_ITEMS,
   MOCK_SIDEBAR_NAV_LABEL,
@@ -12,7 +13,6 @@ import { SidebarNav } from './sidebar-nav';
 
 vi.mock('@web/i18n/navigation');
 
-const ARIA_EXPANDED = 'aria-expanded';
 const ITEM_COUNT = MOCK_SIDEBAR_NAV_ITEMS.length;
 const PRICING_LABEL = MOCK_SIDEBAR_NAV_PRICING_ITEM.label;
 

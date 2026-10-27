@@ -1,14 +1,11 @@
 import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { ToastProvider } from '@web/context/toast-provider';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import { withToastProvider } from '@web/testing/providers';
 import { useRouter } from 'next/navigation';
 
-import {
-  ProviderLinkControl,
-  type TProviderLinkControlProps,
-} from './provider-link-control';
+import { ProviderLinkControl } from './provider-link-control';
 
 faker.seed(6007);
 
@@ -44,13 +41,7 @@ const {
   unlinkLastMethodError: LAST_METHOD_ERROR_MESSAGE,
 } = SITE_MESSAGES.accountPage.identity;
 
-const WithToasts = (props: TProviderLinkControlProps) => (
-  <ToastProvider>
-    <ProviderLinkControl {...props} />
-  </ToastProvider>
-);
-
-const setup = customRender(WithToasts, {
+const setup = customRender(withToastProvider(ProviderLinkControl), {
   provider: PROVIDER,
   action: 'link',
 });

@@ -1,13 +1,10 @@
 import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { ToastProvider } from '@web/context/toast-provider';
 import { customRender, screen } from '@web/testing/custom-render';
+import { withToastProvider } from '@web/testing/providers';
 
-import {
-  DeleteAccountControl,
-  type TDeleteAccountControlProps,
-} from './delete-account-control';
+import { DeleteAccountControl } from './delete-account-control';
 
 faker.seed(6007);
 
@@ -33,13 +30,9 @@ const {
 const MOCK_HANDLE = faker.internet.username();
 const MOCK_WRONG_HANDLE = `${MOCK_HANDLE}-${faker.string.alpha(4)}`;
 
-const WithToasts = (props: TDeleteAccountControlProps) => (
-  <ToastProvider>
-    <DeleteAccountControl {...props} />
-  </ToastProvider>
-);
-
-const setup = customRender(WithToasts, { handle: MOCK_HANDLE });
+const setup = customRender(withToastProvider(DeleteAccountControl), {
+  handle: MOCK_HANDLE,
+});
 
 describe(`<${DeleteAccountControl.name}/>`, () => {
   let user: UserEvent;

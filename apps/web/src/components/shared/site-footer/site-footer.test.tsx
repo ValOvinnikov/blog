@@ -3,6 +3,7 @@ import { errorResult, okResult } from '@blog/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_LINKEDIN_PROFILE,
@@ -30,7 +31,6 @@ vi.mock('@blog/service', () => ({
 }));
 
 const RSS_LINK_NAME = SITE_MESSAGES.rss.feedLinkLabel;
-const LANGUAGE_NAV_NAME = 'Language';
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 

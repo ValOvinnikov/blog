@@ -2,6 +2,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import { withToastProvider } from '@web/testing/providers';
 import { useRouter } from 'next/navigation';
 
 import { NewsletterSubscriptionControl } from './newsletter-subscription-control';
@@ -53,7 +54,7 @@ const ACTION_CASES = [
   },
 ];
 
-const setup = customRender(NewsletterSubscriptionControl, {
+const setup = customRender(withToastProvider(NewsletterSubscriptionControl), {
   action: NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE,
 });
 

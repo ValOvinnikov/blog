@@ -6,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@web/testing/custom-render';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 
 import { PostShare } from './post-share';
 
@@ -19,7 +20,6 @@ const MOCK_LINKS = [
 ];
 const [MOCK_FIRST_LINK] = MOCK_LINKS;
 const COPY_LINK_NAME = 'Copy link';
-const ARIA_EXPANDED = 'aria-expanded';
 
 const setup = customRender(PostShare, {
   url: MOCK_URL,

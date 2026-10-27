@@ -1,14 +1,11 @@
 import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { ToastProvider } from '@web/context/toast-provider';
 import { customRender, screen } from '@web/testing/custom-render';
+import { withToastProvider } from '@web/testing/providers';
 import { useRouter } from 'next/navigation';
 
-import {
-  DisplayNameControl,
-  type TDisplayNameControlProps,
-} from './display-name-control';
+import { DisplayNameControl } from './display-name-control';
 
 faker.seed(6007);
 
@@ -44,13 +41,7 @@ const MOCK_INITIALS = `${MOCK_FIRST_NAME[0]}${MOCK_LAST_NAME[0]}`.toUpperCase();
 const MOCK_EMAIL = faker.internet.email();
 const MOCK_NEW_NAME = faker.person.fullName();
 
-const WithToasts = (props: TDisplayNameControlProps) => (
-  <ToastProvider>
-    <DisplayNameControl {...props} />
-  </ToastProvider>
-);
-
-const setup = customRender(WithToasts, {
+const setup = customRender(withToastProvider(DisplayNameControl), {
   initialName: MOCK_NAME,
   email: MOCK_EMAIL,
   image: null,

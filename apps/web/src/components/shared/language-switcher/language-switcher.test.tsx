@@ -10,6 +10,8 @@ import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import { customRender, screen, within } from '@web/testing/custom-render';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
+import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { LanguageSwitcher } from './language-switcher';
@@ -18,12 +20,10 @@ vi.mock('@web/i18n/navigation');
 
 const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 
-const LANGUAGE_NAV_NAME = 'Language';
 const DESKTOP_TEST_ID = 'language-switcher-desktop';
 const MOBILE_TEST_ID = 'language-switcher-mobile';
 const CURRENT_CODE_TEST_ID = 'language-code-current';
 const BLOG_PATH = '/blog';
-const ARIA_EXPANDED = 'aria-expanded';
 
 const nativeLabel = (locale: TLocaleIsoCode) => LOCALE_NATIVE_LABEL[locale];
 const triggerName = (locale: TLocaleIsoCode) =>

@@ -12,6 +12,7 @@ import {
   type TSetBookmarkResult,
 } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
+import { ARIA_PRESSED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { reportClientError } from '@web/utils/report-client-error';
@@ -38,7 +39,6 @@ const REMOVE_BOOKMARK = 'Remove bookmark';
 const SIGN_IN_PANEL = 'Sign in options';
 const UNDO = 'Undo';
 const RETRY = /^Retry/;
-const ARIA_PRESSED = 'aria-pressed';
 const SAVED_MESSAGE = 'Saved to bookmarks';
 const REMOVED_MESSAGE = 'Removed from bookmarks';
 const REVERTED_MESSAGE = 'Reverted';

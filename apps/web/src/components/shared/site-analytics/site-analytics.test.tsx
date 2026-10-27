@@ -48,25 +48,17 @@ describe(SiteAnalytics, () => {
   it('renders nothing when web analytics is not enabled', async () => {
     mockEnv.WEB_ANALYTICS_ENABLED = 'false';
 
-    await setup();
+    const { container } = await setup();
 
-    const analytics = screen.queryByText(ANALYTICS_TEXT);
-    const speedInsights = screen.queryByText(SPEED_INSIGHTS_TEXT);
-
-    expect(analytics).not.toBeInTheDocument();
-    expect(speedInsights).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders nothing when the ANALYTICS capability is not entitled', async () => {
     isCapabilityEnabledMock.mockResolvedValue(false);
 
-    await setup();
+    const { container } = await setup();
 
-    const analytics = screen.queryByText(ANALYTICS_TEXT);
-    const speedInsights = screen.queryByText(SPEED_INSIGHTS_TEXT);
-
-    expect(analytics).not.toBeInTheDocument();
-    expect(speedInsights).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
     expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.ANALYTICS);
   });
 });
