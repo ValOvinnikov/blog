@@ -67,7 +67,7 @@ export function applyMigrationsBefore(db: TDb, file: string): Promise<void> {
   );
 }
 
-export function applyMigrationsFrom(db: TDb, file: string): Promise<void> {
+function applyMigrationsFrom(db: TDb, file: string): Promise<void> {
   return applyMigrationFiles(
     db,
     listMigrationFiles().filter((name) => name >= file),

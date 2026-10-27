@@ -9,7 +9,7 @@ type TMockSanityValidationResult = {
   markers: { level: TMockValidationLevel; message: string }[];
 };
 
-export const MOCK_DOCUMENT_TYPE = 'page_post';
+const MOCK_DOCUMENT_TYPE = 'page_post';
 
 export function mockSanityValidationResult(
   overrides: Partial<TMockSanityValidationResult> = {},
