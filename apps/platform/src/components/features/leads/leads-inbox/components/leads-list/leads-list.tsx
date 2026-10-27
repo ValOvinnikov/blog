@@ -6,23 +6,12 @@ import { Card } from '@platform/components/shared/card';
 import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
 
 import { LeadRow } from './components/lead-row';
+import { leadsListVariants } from './leads-list-variants';
 import { useLoadMoreSentinel } from './use-load-more-sentinel';
-
-const leadsListVariants = tv({
-  slots: {
-    list: ['flex flex-col'],
-    sentinel: ['h-px'],
-    footer: [
-      'flex justify-center',
-      'border-t border-admin-line-2 px-[18px] py-3',
-    ],
-  },
-});
 
 export type TLeadsListProps = {
   leads: TInboxLead[];

@@ -2,33 +2,13 @@
 
 import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
-import { tv } from '@platform/utils/tv/tv';
 
 import { LeadReadingPane } from './components/lead-reading-pane';
 import { LeadsList } from './components/leads-list';
 import { NoLeadSelected } from './components/no-lead-selected';
+import { leadsInboxVariants } from './leads-inbox-variants';
 import { useLeadSelection } from './use-lead-selection';
 import { useLeadsPages } from './use-leads-pages';
-
-const leadsInboxVariants = tv({
-  slots: {
-    root: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
-    listColumn: [
-      'min-w-0 rounded-admin',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-    ],
-    paneColumn: [
-      'min-w-0',
-      'lg:sticky lg:top-admin-topbar lg:max-h-[calc(100dvh-160px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain',
-    ],
-  },
-  variants: {
-    hasSelection: {
-      true: { listColumn: ['hidden lg:block'] },
-      false: { paneColumn: ['hidden lg:block'] },
-    },
-  },
-});
 
 export type TLeadsInboxProps = {
   initialPage: TInboxLeadsPage;
