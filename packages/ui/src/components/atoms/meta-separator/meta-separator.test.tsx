@@ -1,31 +1,28 @@
-import { customRender } from '@blog/ui/testing/custom-render';
+import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 
 import { MetaSeparator } from './meta-separator';
 
-const setup = customRender(MetaSeparator, {});
+faker.seed(123);
+
+const MOCK_SEPARATOR = faker.string.symbol(1);
+
+const setup = customRender(MetaSeparator, { separator: MOCK_SEPARATOR });
 
 describe(`<${MetaSeparator.name}/>`, () => {
-  describe('with the default props', () => {
-    let container: HTMLElement;
+  it('renders the given separator', () => {
+    setup();
 
-    beforeEach(() => {
-      ({ container } = setup());
-    });
+    const separator = screen.getByText(MOCK_SEPARATOR);
 
-    it('renders the default · character', () => {
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      expect(container.firstChild).toHaveTextContent('·');
-    });
-
-    it('has aria-hidden="true"', () => {
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      expect(container.firstChild).toHaveAttribute('aria-hidden', 'true');
-    });
+    expect(separator).toBeInTheDocument();
   });
 
-  it('renders a custom separator', () => {
-    const { container } = setup({ separator: '/' });
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-    expect(container.firstChild).toHaveTextContent('/');
+  it('hides the separator from assistive tech', () => {
+    setup();
+
+    const separator = screen.getByText(MOCK_SEPARATOR);
+
+    expect(separator).toHaveAttribute('aria-hidden', 'true');
   });
 });

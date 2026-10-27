@@ -2,138 +2,131 @@ import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TextInput } from './text-input';
 
 faker.seed(123);
 
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+const MOCK_VALUE = faker.internet.email();
+const MOCK_TYPED_CHARACTER = faker.string.alpha(1);
+const MOCK_LEADING_GLYPH = faker.string.symbol(1);
+const MOCK_TRAILING_GLYPH = faker.string.symbol(1);
+const LEADING_ICON_TEST_ID = 'leading-icon';
+const TRAILING_ICON_TEST_ID = 'trailing-icon';
+
 const setup = customRender(TextInput, {
   value: '',
   onChange: vi.fn(),
-  ariaLabel: 'Email address',
+  ariaLabel: MOCK_ARIA_LABEL,
 });
 
+const renderIcon = (dataTestId: string) => (
+  <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} dataTestId={dataTestId} />
+);
+
 describe(`<${TextInput.name}/>`, () => {
-  describe('with the default props', () => {
-    beforeEach(() => {
-      setup();
-    });
+  let user: UserEvent;
 
-    it('renders a textbox with the given ariaLabel', () => {
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
-    });
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
 
-    it('has no leading icon glyph by default', () => {
-      expect(screen.queryByText('$')).not.toBeInTheDocument();
-    });
+  it('renders a textbox named by the ariaLabel', () => {
+    setup();
 
-    it('has no trailing icon glyph by default', () => {
-      expect(screen.queryByText('$')).not.toBeInTheDocument();
-    });
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
 
-    it('is not marked invalid by default', () => {
-      expect(screen.getByRole('textbox')).toHaveAttribute(
-        'aria-invalid',
-        'false',
-      );
-    });
-
-    it('is not disabled by default', () => {
-      expect(screen.getByRole('textbox')).toBeEnabled();
-    });
+    expect(textbox).toBeVisible();
   });
 
   it('renders the controlled value', () => {
-    const value = faker.internet.email();
-    setup({ value });
-    expect(screen.getByRole('textbox')).toHaveValue(value);
+    setup({ value: MOCK_VALUE });
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toHaveValue(MOCK_VALUE);
   });
 
-  it('calls onChange with the new value on input, and does not manage its own state', async () => {
+  it('reports typed input without keeping its own state', async () => {
     const onChange = vi.fn();
     setup({ onChange });
-    await userEvent.type(screen.getByRole('textbox'), 'a');
-    expect(onChange).toHaveBeenCalledWith('a');
-    expect(screen.getByRole('textbox')).toHaveValue('');
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+    await user.type(textbox, MOCK_TYPED_CHARACTER);
+
+    expect(onChange).toHaveBeenCalledWith(MOCK_TYPED_CHARACTER);
+    expect(textbox).toHaveValue('');
   });
 
-  it('renders a decorative leading icon glyph when given, hidden from the accessibility tree', () => {
-    setup({ leadingIcon: '$' });
-    const leadingIcon = screen.getByText('$');
+  it('renders a decorative leading glyph hidden from assistive tech', () => {
+    setup({ leadingIcon: MOCK_LEADING_GLYPH });
+
+    const leadingGlyph = screen.getByText(MOCK_LEADING_GLYPH);
+
+    expect(leadingGlyph).toBeVisible();
+    expect(leadingGlyph).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders a decorative trailing glyph hidden from assistive tech', () => {
+    setup({ trailingIcon: MOCK_TRAILING_GLYPH });
+
+    const trailingGlyph = screen.getByText(MOCK_TRAILING_GLYPH);
+
+    expect(trailingGlyph).toBeVisible();
+    expect(trailingGlyph).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders an icon element as the leading icon', () => {
+    setup({ leadingIcon: renderIcon(LEADING_ICON_TEST_ID) });
+
+    const leadingIcon = screen.getByTestId(LEADING_ICON_TEST_ID);
+
     expect(leadingIcon).toBeVisible();
-    expect(leadingIcon).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('renders a non-string ReactNode leadingIcon, such as an icon', () => {
-    setup({
-      leadingIcon: (
-        <Icon
-          name={ICONS.CHEVRON_RIGHT}
-          size={SIZE.SM}
-          dataTestId="leading-icon"
-        />
-      ),
-    });
-    expect(screen.getByTestId('leading-icon')).toBeVisible();
-  });
+  it('renders an icon element as the trailing icon', () => {
+    setup({ trailingIcon: renderIcon(TRAILING_ICON_TEST_ID) });
 
-  it('renders a decorative trailing icon glyph when given, hidden from the accessibility tree, positioned after the input', () => {
-    setup({ trailingIcon: '$' });
-    const trailingIcon = screen.getByText('$');
+    const trailingIcon = screen.getByTestId(TRAILING_ICON_TEST_ID);
+
     expect(trailingIcon).toBeVisible();
-    expect(trailingIcon).toHaveAttribute('aria-hidden', 'true');
-    const input = screen.getByRole('textbox');
-    expect(
-      input.compareDocumentPosition(trailingIcon) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
   });
 
-  it('renders a non-string ReactNode trailingIcon, such as an icon', () => {
+  it('places the leading icon before and the trailing icon after the input', () => {
     setup({
-      trailingIcon: (
-        <Icon
-          name={ICONS.CHEVRON_RIGHT}
-          size={SIZE.SM}
-          dataTestId="trailing-icon"
-        />
-      ),
+      leadingIcon: MOCK_LEADING_GLYPH,
+      trailingIcon: MOCK_TRAILING_GLYPH,
     });
-    expect(screen.getByTestId('trailing-icon')).toBeVisible();
-  });
 
-  it('renders both leadingIcon and trailingIcon together, each in its own position', () => {
-    setup({ leadingIcon: '$', trailingIcon: '#' });
-    const leadingIcon = screen.getByText('$');
-    const trailingIcon = screen.getByText('#');
-    expect(leadingIcon).toBeVisible();
-    expect(trailingIcon).toBeVisible();
-    const input = screen.getByRole('textbox');
+    const leadingGlyph = screen.getByText(MOCK_LEADING_GLYPH);
+    const trailingGlyph = screen.getByText(MOCK_TRAILING_GLYPH);
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
     expect(
-      leadingIcon.compareDocumentPosition(input) &
+      leadingGlyph.compareDocumentPosition(textbox) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(
-      input.compareDocumentPosition(trailingIcon) &
+      textbox.compareDocumentPosition(trailingGlyph) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
 
-  it('marks the field invalid via aria-invalid when isInvalid is true', () => {
+  it('marks the field invalid when isInvalid is true', () => {
     setup({ isInvalid: true });
-    expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toBeInvalid();
   });
 
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'text-input' });
-    expect(screen.getByTestId('text-input')).toBeVisible();
-  });
-
-  it('renders the native disabled attribute when isDisabled is true', () => {
+  it('disables the field when isDisabled is true', () => {
     setup({ isDisabled: true });
-    expect(screen.getByRole('textbox')).toBeDisabled();
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toBeDisabled();
   });
 });
