@@ -1,10 +1,13 @@
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Checkbox } from './checkbox';
 
-const MOCK_LABEL = 'I agree to the terms';
-const MOCK_ERROR = 'Accept the terms to continue.';
+faker.seed(5995);
+
+const MOCK_LABEL = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
 
 const setup = customRender(Checkbox, {
   isChecked: false,
@@ -24,7 +27,6 @@ describe(`<${Checkbox.name}/>`, () => {
     setup({ onCheckedChange });
 
     const label = screen.getByText(MOCK_LABEL);
-
     await user.click(label);
 
     const [isChecked] = onCheckedChange.mock.calls[0] ?? [];

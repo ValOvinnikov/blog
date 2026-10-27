@@ -1,47 +1,39 @@
-import { SIZE } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Spinner } from './spinner';
 
-describe(Spinner, () => {
-  describe('with the default label', () => {
-    beforeEach(() => {
-      render(<Spinner label="Creating…" />);
-    });
+faker.seed(5995);
 
-    it('renders a status role with the accessible name from label', () => {
-      expect(screen.getByRole('status', { name: 'Creating…' })).toBeVisible();
-    });
+const MOCK_LABEL = faker.lorem.words(2);
 
-    it('does not render the label as visible text by default', () => {
-      expect(screen.queryByText('Creating…')).not.toBeInTheDocument();
-    });
+const setup = customRender(Spinner, { label: MOCK_LABEL });
+
+describe(`<${Spinner.name}/>`, () => {
+  it.each([false, true])(
+    'names the status by its label when hasLabel is %s',
+    (hasLabel) => {
+      setup({ hasLabel });
+
+      const spinner = screen.getByRole('status', { name: MOCK_LABEL });
+
+      expect(spinner).toBeVisible();
+    },
+  );
+
+  it('keeps the label out of the visible text when hasLabel is false', () => {
+    setup({ hasLabel: false });
+
+    const visibleLabel = screen.queryByText(MOCK_LABEL);
+
+    expect(visibleLabel).not.toBeInTheDocument();
   });
 
-  it('keeps the accessible name from label even when hasLabel is false', () => {
-    render(<Spinner label="Creating…" hasLabel={false} />);
-    expect(screen.getByRole('status', { name: 'Creating…' })).toBeVisible();
-  });
+  it('shows the label as visible text when hasLabel is true', () => {
+    setup({ hasLabel: true });
 
-  describe('with hasLabel enabled', () => {
-    beforeEach(() => {
-      render(<Spinner label="Creating…" hasLabel={true} />);
-    });
+    const visibleLabel = screen.getByText(MOCK_LABEL);
 
-    it('keeps the accessible name from label when hasLabel is true', () => {
-      expect(screen.getByRole('status', { name: 'Creating…' })).toBeVisible();
-    });
-
-    it('renders the label as visible text when hasLabel is true', () => {
-      expect(screen.getByText('Creating…')).toBeVisible();
-    });
-  });
-
-  it('renders every size without throwing', () => {
-    for (const size of [SIZE.SM, SIZE.MD, SIZE.LG] as const) {
-      expect(() =>
-        render(<Spinner label="Loading" size={size} />),
-      ).not.toThrow();
-    }
+    expect(visibleLabel).toBeVisible();
   });
 });

@@ -1,87 +1,88 @@
-import { render, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Switch } from './switch';
 
-describe(Switch, () => {
+faker.seed(5995);
+
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+const MOCK_ON = faker.lorem.word();
+const MOCK_OFF = faker.lorem.words(2);
+const MOCK_CAPTION = faker.lorem.words(3);
+
+const onCheckedChange = vi.fn();
+
+const setup = customRender(Switch, {
+  isChecked: false,
+  onCheckedChange,
+  ariaLabel: MOCK_ARIA_LABEL,
+  labels: { caption: MOCK_CAPTION },
+});
+
+const reportedStates = () =>
+  onCheckedChange.mock.calls.map(([checked]) => checked);
+
+describe(`<${Switch.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('names the switch by its aria label, not by the visible state text', () => {
-    render(
-      <Switch
-        isChecked={true}
-        onCheckedChange={vi.fn()}
-        ariaLabel="Bookmarks"
-        labels={{ on: 'Activée', off: 'Désactivée' }}
-      />,
-    );
+    setup({ isChecked: true, labels: { on: MOCK_ON, off: MOCK_OFF } });
 
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toBeChecked();
+    const toggle = screen.getByRole('switch', { name: MOCK_ARIA_LABEL });
+
+    expect(toggle).toBeChecked();
   });
 
-  it('toggles when its state text is clicked', async () => {
-    const onCheckedChange = vi.fn();
-    render(
-      <Switch
-        isChecked={false}
-        onCheckedChange={onCheckedChange}
-        ariaLabel="Bookmarks"
-        labels={{ on: 'On', off: 'Off' }}
-      />,
-    );
+  it.each([
+    {
+      target: 'state text',
+      isChecked: false,
+      labels: { on: MOCK_ON, off: MOCK_OFF },
+      text: MOCK_OFF,
+      expected: true,
+    },
+    {
+      target: 'caption',
+      isChecked: true,
+      labels: { caption: MOCK_CAPTION },
+      text: MOCK_CAPTION,
+      expected: false,
+    },
+  ])(
+    'toggles when its $target is clicked',
+    async ({ isChecked, labels, text, expected }) => {
+      setup({ isChecked, labels });
 
-    await userEvent.click(screen.getByText('Off'));
+      const label = screen.getByText(text);
+      await user.click(label);
 
-    expect(onCheckedChange).toHaveBeenCalledTimes(1);
-    expect(onCheckedChange).toHaveBeenCalledWith(true, expect.anything());
-  });
-
-  it('toggles when its caption is clicked', async () => {
-    const onCheckedChange = vi.fn();
-    render(
-      <Switch
-        isChecked={true}
-        onCheckedChange={onCheckedChange}
-        ariaLabel="Dry run"
-        labels={{ caption: 'Dry run' }}
-      />,
-    );
-
-    await userEvent.click(screen.getByText('Dry run'));
-
-    expect(onCheckedChange).toHaveBeenCalledTimes(1);
-    expect(onCheckedChange).toHaveBeenCalledWith(false, expect.anything());
-  });
+      expect(reportedStates()).toEqual([expected]);
+    },
+  );
 
   it('toggles once when the track itself is clicked', async () => {
-    const onCheckedChange = vi.fn();
-    render(
-      <Switch
-        isChecked={false}
-        onCheckedChange={onCheckedChange}
-        ariaLabel="Dry run"
-        labels={{ caption: 'Dry run' }}
-      />,
-    );
+    setup();
 
-    await userEvent.click(screen.getByRole('switch', { name: 'Dry run' }));
+    const toggle = screen.getByRole('switch', { name: MOCK_ARIA_LABEL });
+    await user.click(toggle);
 
-    expect(onCheckedChange).toHaveBeenCalledTimes(1);
+    expect(reportedStates()).toEqual([true]);
   });
 
   it('ignores clicks on its caption while disabled', async () => {
-    const onCheckedChange = vi.fn();
-    render(
-      <Switch
-        isChecked={false}
-        onCheckedChange={onCheckedChange}
-        ariaLabel="Dry run"
-        labels={{ caption: 'Dry run' }}
-        isDisabled={true}
-      />,
-    );
+    setup({ isDisabled: true });
 
-    await userEvent.click(screen.getByText('Dry run'));
+    const caption = screen.getByText(MOCK_CAPTION);
+    await user.click(caption);
+
+    const toggle = screen.getByRole('switch', { name: MOCK_ARIA_LABEL });
 
     expect(onCheckedChange).not.toHaveBeenCalled();
-    expect(screen.getByRole('switch', { name: 'Dry run' })).toBeDisabled();
+    expect(toggle).toBeDisabled();
   });
 });

@@ -1,140 +1,132 @@
 import { ALERT_TYPE } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
-import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 
 import { Alert } from './alert';
 
-const PROVISIONED = 'Provisioned';
+faker.seed(5995);
 
-describe(Alert, () => {
+const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_PARAGRAPH = faker.lorem.sentence();
+const MOCK_SUMMARY = faker.lorem.words(3);
+const MOCK_ACTION_LABEL = faker.lorem.words(2);
+const MOCK_ALERT_ID = faker.string.alpha(8);
+const MOCK_CONTROL_LABEL = faker.lorem.word();
+
+const setup = customRender(Alert, {
+  type: ALERT_TYPE.INFO,
+  title: MOCK_TITLE,
+});
+
+describe(`<${Alert.name}/>`, () => {
   it('renders its title and description', () => {
-    render(
-      <Alert
-        type={ALERT_TYPE.INFO}
-        title="Not provisioned yet"
-        description="Details are still fully editable."
-      />,
-    );
+    setup({ description: MOCK_DESCRIPTION });
 
-    const title = screen.getByText('Not provisioned yet');
-    const description = screen.getByText('Details are still fully editable.');
+    const title = screen.getByText(MOCK_TITLE);
+    const description = screen.getByText(MOCK_DESCRIPTION);
 
     expect(title).toBeVisible();
     expect(description).toBeVisible();
   });
 
-  it('renders without a description', () => {
-    render(<Alert type={ALERT_TYPE.SUCCESS} title={PROVISIONED} />);
-
-    const title = screen.getByText(PROVISIONED);
-
-    expect(title).toBeVisible();
-  });
-
   it('renders a description without a title', () => {
-    render(
-      <Alert type={ALERT_TYPE.INFO} description="Labels are translated." />,
-    );
+    setup({ title: undefined, description: MOCK_DESCRIPTION });
 
     const status = screen.getByRole('status');
 
-    expect(status).toHaveTextContent('Labels are translated.');
+    expect(status).toHaveTextContent(MOCK_DESCRIPTION);
   });
 
   it('renders rich content in its description', () => {
-    render(
-      <Alert
-        type={ALERT_TYPE.WARNING}
-        title="Unsaved changes"
-        description={
-          <>
-            <p>They were kept on this device.</p>
-            <details>
-              <summary>Review the differences</summary>
-            </details>
-          </>
-        }
-      />,
-    );
+    setup({
+      description: (
+        <>
+          <p>{MOCK_PARAGRAPH}</p>
+          <details>
+            <summary>{MOCK_SUMMARY}</summary>
+          </details>
+        </>
+      ),
+    });
 
-    const paragraph = screen.getByText('They were kept on this device.');
-    const summary = screen.getByText('Review the differences');
+    const paragraph = screen.getByText(MOCK_PARAGRAPH);
+    const summary = screen.getByText(MOCK_SUMMARY);
 
     expect(paragraph).toBeVisible();
     expect(summary).toBeVisible();
   });
 
   it('renders its action', () => {
-    render(
-      <Alert
-        type={ALERT_TYPE.SUCCESS}
-        title={PROVISIONED}
-        action={<button type="button">View steps</button>}
-      />,
-    );
+    setup({ action: <button type="button">{MOCK_ACTION_LABEL}</button> });
 
-    const actionButton = screen.getByRole('button', { name: 'View steps' });
+    const actionButton = screen.getByRole('button', {
+      name: MOCK_ACTION_LABEL,
+    });
 
     expect(actionButton).toBeVisible();
   });
 
-  it('renders an assertive alert role for the ERROR type', () => {
-    render(<Alert type={ALERT_TYPE.ERROR} title="Provisioning failed" />);
+  it('announces an error assertively', () => {
+    setup({ type: ALERT_TYPE.ERROR });
 
     const alert = screen.getByRole('alert');
 
-    expect(alert).toHaveTextContent('Provisioning failed');
+    expect(alert).toHaveTextContent(MOCK_TITLE);
   });
 
   it.each([ALERT_TYPE.SUCCESS, ALERT_TYPE.WARNING, ALERT_TYPE.INFO])(
-    'renders a polite status role for the %s type',
+    'announces a %s alert politely',
     (type) => {
-      render(<Alert type={type} title="Status update" />);
+      setup({ type });
 
       const status = screen.getByRole('status');
 
-      expect(status).toHaveTextContent('Status update');
+      expect(status).toHaveTextContent(MOCK_TITLE);
     },
   );
 
   it('takes an explicit role over the one its type implies', () => {
-    render(
-      <Alert type={ALERT_TYPE.ERROR} role="status" title="Draft differs" />,
-    );
+    setup({ type: ALERT_TYPE.ERROR, role: 'status' });
 
     const status = screen.getByRole('status');
     const alert = screen.queryByRole('alert');
 
-    expect(status).toHaveTextContent('Draft differs');
+    expect(status).toHaveTextContent(MOCK_TITLE);
     expect(alert).not.toBeInTheDocument();
   });
 
-  it('carries an id, so a control elsewhere can point aria-describedby at it', () => {
-    render(
+  it('describes a control elsewhere on the page that points at it', () => {
+    renderWithIntl(
       <>
         <Alert
-          id="archived-notice"
+          id={MOCK_ALERT_ID}
           type={ALERT_TYPE.WARNING}
-          title={ARCHIVED_NOTICE_TEXT}
+          title={MOCK_TITLE}
         />
-        <button type="button" aria-describedby="archived-notice">
-          Save
+        <button type="button" aria-describedby={MOCK_ALERT_ID}>
+          {MOCK_CONTROL_LABEL}
         </button>
       </>,
     );
 
-    const saveButton = screen.getByRole('button', { name: 'Save' });
+    const control = screen.getByRole('button', { name: MOCK_CONTROL_LABEL });
 
-    expect(saveButton).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
+    expect(control).toHaveAccessibleDescription(MOCK_TITLE);
   });
 
-  it('renders a decorative icon for every type', () => {
-    for (const type of Object.values(ALERT_TYPE)) {
-      const { unmount } = render(<Alert type={type} title="Label" />);
+  it.each(Object.values(ALERT_TYPE))(
+    'renders a decorative icon for a %s alert',
+    (type) => {
+      setup({ type });
+
       const icon = screen.getByTestId('icon');
 
       expect(icon).toHaveAttribute('aria-hidden', 'true');
-      unmount();
-    }
-  });
+    },
+  );
 });

@@ -1,23 +1,32 @@
 import {
   FINDING_KIND,
-  FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import {
+  MOCK_FINDING_LATER_AT,
+  MOCK_FINDING_LATEST_AT,
+  MOCK_FINDING_NOW,
+  mockOpenFindingInput,
+  openTestFinding,
+} from '@blog/db/testing/findings/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
-import { openFinding } from '../open-finding';
 import { resolveFinding } from '../resolve-finding';
 
 import { listFindingsForTenant } from './list-findings-for-tenant';
+
+faker.seed(6021005);
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
 afterEach(async () => {
+  vi.useRealTimers();
   await db().delete(schema.findings);
   await db().delete(schema.tenants);
 });
@@ -29,51 +38,24 @@ describe(listFindingsForTenant, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('returns only the given tenant’s findings, most recently seen first', async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    const olderInput = {
-      tenantId: tenantOneId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: 'older',
-    };
-    const newerInput = { ...olderInput, identifier: 'newer' };
-    await openFinding(olderInput);
-    await openFinding(newerInput);
-    await openFinding({
-      ...olderInput,
-      tenantId: tenantTwoId,
-      identifier: 'other-tenant',
-    });
+  it('returns only the tenant’s findings, most recently seen first', async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    vi.useFakeTimers({ now: MOCK_FINDING_NOW, toFake: ['Date'] });
+    const older = await openTestFinding(mockOpenFindingInput({ tenantId }));
+    vi.setSystemTime(MOCK_FINDING_LATER_AT);
+    const newer = await openTestFinding(mockOpenFindingInput({ tenantId }));
+    vi.setSystemTime(MOCK_FINDING_LATEST_AT);
+    await openTestFinding(mockOpenFindingInput({ tenantId: otherTenantId }));
 
-    const result = await listFindingsForTenant(tenantOneId);
+    const result = await listFindingsForTenant(tenantId);
 
-    expect(result).toHaveLength(2);
-    expect(result.every((finding) => finding.tenantId === tenantOneId)).toBe(
-      true,
-    );
+    expect(result.map(({ id }) => id)).toEqual([newer.id, older.id]);
   });
 
   it('filters by status when given', async () => {
-    const opened = await openFinding({
-      tenantId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: 'to-resolve',
-    });
-    await openFinding({
-      tenantId,
-      source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-      kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-      severity: FINDING_SEVERITY.WARNING,
-      identifier: 'stays-open',
-    });
-    expect(opened.ok).toBe(true);
-    if (!opened.ok) return;
-    await resolveFinding(opened.data.finding.id);
+    const toResolve = await openTestFinding(mockOpenFindingInput({ tenantId }));
+    const staysOpen = await openTestFinding(mockOpenFindingInput({ tenantId }));
+    await resolveFinding(toResolve.id);
 
     const openOnly = await listFindingsForTenant(tenantId, FINDING_STATUS.OPEN);
     const resolvedOnly = await listFindingsForTenant(
@@ -81,9 +63,8 @@ describe(listFindingsForTenant, () => {
       FINDING_STATUS.RESOLVED,
     );
 
-    expect(openOnly).toHaveLength(1);
-    expect(resolvedOnly).toHaveLength(1);
-    expect(resolvedOnly[0]?.id).toBe(opened.data.finding.id);
+    expect(openOnly.map(({ id }) => id)).toEqual([staysOpen.id]);
+    expect(resolvedOnly.map(({ id }) => id)).toEqual([toResolve.id]);
   });
 
   it('leaves details out and reports whether each finding has them', async () => {
@@ -91,22 +72,23 @@ describe(listFindingsForTenant, () => {
       tenantId,
       source: FINDING_SOURCE.DOCUMENT_VALIDATION,
       kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
-      severity: FINDING_SEVERITY.WARNING,
     };
-    await openFinding({
-      ...base,
-      identifier: 'with-details',
-      details: { invalidDocumentCount: 1 },
-    });
-    await openFinding({ ...base, identifier: 'without-details' });
+    const withDetails = await openTestFinding(
+      mockOpenFindingInput({ ...base, details: { invalidDocumentCount: 1 } }),
+    );
+    const withoutDetails = await openTestFinding(mockOpenFindingInput(base));
 
     const result = await listFindingsForTenant(tenantId);
 
-    expect(result.every((finding) => !('details' in finding))).toBe(true);
-    expect(result.map((finding) => finding.hasDetails).sort()).toEqual([
-      false,
-      true,
-    ]);
+    const hasDetailsById = Object.fromEntries(
+      result.map(({ id, hasDetails }) => [id, hasDetails]),
+    );
+    const columns = result.flatMap((finding) => Object.keys(finding));
+    expect(hasDetailsById).toEqual({
+      [withDetails.id]: true,
+      [withoutDetails.id]: false,
+    });
+    expect(columns).not.toContain('details');
   });
 
   it('returns an empty array for a tenant with no findings', async () => {

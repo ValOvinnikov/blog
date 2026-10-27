@@ -15,27 +15,27 @@ afterEach(async () => {
 });
 
 describe(getAdminByUserId, () => {
+  let userId: string;
+
   beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
+    ({ id: userId } = await insertTestUser(db()));
   });
 
   it('returns the row for an existing admin user', async () => {
     await db().insert(schema.admins).values({
-      userId: 'user-1',
+      userId,
       role: ADMIN_ROLE.SUPERADMIN,
       grantedVia: GRANTED_VIA.BREAK_GLASS,
     });
 
-    const result = await getAdminByUserId('user-1');
+    const result = await getAdminByUserId(userId);
 
-    expect(result).toMatchObject({
-      userId: 'user-1',
-      role: ADMIN_ROLE.SUPERADMIN,
-    });
+    expect(result?.userId).toBe(userId);
+    expect(result?.role).toBe(ADMIN_ROLE.SUPERADMIN);
   });
 
   it('returns undefined when the user is not an admin', async () => {
-    const result = await getAdminByUserId('user-1');
+    const result = await getAdminByUserId(userId);
 
     expect(result).toBeUndefined();
   });

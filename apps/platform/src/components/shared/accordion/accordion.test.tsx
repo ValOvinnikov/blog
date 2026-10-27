@@ -1,109 +1,122 @@
-import { render, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { faker } from '@faker-js/faker';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
 import { Accordion } from './accordion';
 
+faker.seed(5995);
+
+const ARIA_EXPANDED = 'aria-expanded';
+const FIRST = 'first';
+const SECOND = 'second';
+const MOCK_FIRST_ROW = faker.lorem.words(2);
+const MOCK_FIRST_BODY = faker.lorem.sentence();
+const MOCK_SECOND_ROW = faker.lorem.words(3);
+const MOCK_SECOND_BODY = faker.lorem.sentence();
+const MOCK_NOTE = faker.lorem.sentence();
+
+type TRowValue = typeof FIRST | typeof SECOND;
+
 const ControlledAccordion = ({
   initialValue,
 }: {
-  initialValue?: 'first' | 'second';
+  initialValue?: TRowValue;
 }) => {
   const [openValue, setOpenValue] = useState(initialValue);
   return (
     <Accordion openValue={openValue} onOpenValueChange={setOpenValue}>
-      <Accordion.Item value="first">
-        <Accordion.Trigger>First row</Accordion.Trigger>
-        <Accordion.Panel>First body</Accordion.Panel>
+      <Accordion.Item value={FIRST}>
+        <Accordion.Trigger>{MOCK_FIRST_ROW}</Accordion.Trigger>
+        <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
       </Accordion.Item>
-      <Accordion.Item value="second">
-        <Accordion.Trigger>Second row</Accordion.Trigger>
-        <Accordion.Panel>Second body</Accordion.Panel>
+      <Accordion.Item value={SECOND}>
+        <Accordion.Trigger>{MOCK_SECOND_ROW}</Accordion.Trigger>
+        <Accordion.Panel>{MOCK_SECOND_BODY}</Accordion.Panel>
       </Accordion.Item>
     </Accordion>
   );
 };
 
-describe('Accordion', () => {
-  let user: ReturnType<typeof userEvent.setup>;
+const setup = customRender(ControlledAccordion, {});
+
+describe(`<${Accordion.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
-  it('reports the open row through aria-expanded', () => {
-    render(<ControlledAccordion initialValue="first" />);
+  describe('with the first row open', () => {
+    let firstTrigger: HTMLElement;
+    let secondTrigger: HTMLElement;
 
-    expect(screen.getByRole('button', { name: 'First row' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    expect(screen.getByRole('button', { name: 'Second row' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-    expect(screen.getByText('First body')).toBeVisible();
+    beforeEach(() => {
+      setup({ initialValue: FIRST });
+      firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
+      secondTrigger = screen.getByRole('button', { name: MOCK_SECOND_ROW });
+    });
+
+    it('reports the open row through aria-expanded', () => {
+      const firstBody = screen.getByText(MOCK_FIRST_BODY);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(firstBody).toBeVisible();
+    });
+
+    it('closes the open row when another one opens', async () => {
+      await user.click(secondTrigger);
+
+      const secondBody = screen.getByText(MOCK_SECOND_BODY);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondBody).toBeVisible();
+    });
+
+    it('closes the open row from its own header', async () => {
+      await user.click(firstTrigger);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
   });
 
-  it('closes the open row when another one opens', async () => {
-    render(<ControlledAccordion initialValue="first" />);
+  it('opens a row with the keyboard', async () => {
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Second row' }));
+    await user.tab();
+    await user.keyboard('{Enter}');
 
-    expect(screen.getByRole('button', { name: 'First row' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-    expect(screen.getByRole('button', { name: 'Second row' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    expect(screen.getByText('Second body')).toBeVisible();
-  });
+    const firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
 
-  it('closes the open row from its own header', async () => {
-    render(<ControlledAccordion initialValue="first" />);
-
-    await user.click(screen.getByRole('button', { name: 'First row' }));
-
-    expect(screen.getByRole('button', { name: 'First row' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
+    expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
   });
 
   it('renders a row header before its body whatever order they are written in', () => {
-    render(
-      <Accordion openValue="only" onOpenValueChange={() => {}}>
-        <Accordion.Item value="only">
-          <Accordion.Panel>Only body</Accordion.Panel>
-          <Accordion.Note>Only note</Accordion.Note>
-          <Accordion.Trigger>Only row</Accordion.Trigger>
+    renderWithIntl(
+      <Accordion openValue={FIRST} onOpenValueChange={vi.fn()}>
+        <Accordion.Item value={FIRST}>
+          <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
+          <Accordion.Note>{MOCK_NOTE}</Accordion.Note>
+          <Accordion.Trigger>{MOCK_FIRST_ROW}</Accordion.Trigger>
         </Accordion.Item>
       </Accordion>,
     );
 
-    const trigger = screen.getByRole('button', { name: 'Only row' });
-    const note = screen.getByText('Only note');
-    const body = screen.getByText('Only body');
+    const trigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
+    const note = screen.getByText(MOCK_NOTE);
+    const body = screen.getByText(MOCK_FIRST_BODY);
 
     expect(trigger.compareDocumentPosition(note)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
     expect(note.compareDocumentPosition(body)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-  });
-
-  it('opens a row with the keyboard', async () => {
-    render(<ControlledAccordion />);
-
-    await user.tab();
-    await user.keyboard('{Enter}');
-
-    expect(screen.getByRole('button', { name: 'First row' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
     );
   });
 });

@@ -1,19 +1,18 @@
 import * as schema from '@blog/db/schema';
+import { MOCK_EMAIL_CONFIG } from '@blog/db/testing/email-config/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { upsertEmailConfig } from './upsert-email-config';
 
 vi.mock('@blog/db/client');
 
-const MOCK_SENDER_NAME = 'Acme Weekly';
-const MOCK_REPLY_TO = 'support@example.com';
-const MOCK_INVALID_EMAIL = 'not-an-email';
-const MOCK_CONTACT_RECIPIENT = 'leads@example.com';
-const MOCK_POSTAL_ADDRESS = '123 Main St, Springfield';
+faker.seed(61013);
 
-const MOCK_UPDATED_SENDER_NAME = 'Acme Digest';
+const MOCK_INVALID_EMAIL = faker.lorem.word();
+const MOCK_UPDATED_SENDER_NAME = faker.company.name();
 
 const db = useQueryTestDb();
 
@@ -30,29 +29,33 @@ describe(upsertEmailConfig, () => {
   });
 
   it('inserts a new row when the tenant has no email config yet', async () => {
+    const { senderName, replyToAddress } = MOCK_EMAIL_CONFIG;
+
     const result = await upsertEmailConfig(tenantId, {
-      senderName: MOCK_SENDER_NAME,
-      replyToAddress: MOCK_REPLY_TO,
+      senderName,
+      replyToAddress,
     });
 
     expect(result).toMatchObject({
       tenantId,
-      senderName: MOCK_SENDER_NAME,
-      replyToAddress: MOCK_REPLY_TO,
+      senderName,
+      replyToAddress,
       logoAssetUrl: undefined,
       footerPostalAddress: undefined,
     });
   });
 
-  it('updates the existing row in place rather than inserting a second one', async () => {
-    await upsertEmailConfig(tenantId, { senderName: MOCK_SENDER_NAME });
+  it('updates the existing row, leaving one row per tenant', async () => {
+    await upsertEmailConfig(tenantId, {
+      senderName: MOCK_EMAIL_CONFIG.senderName,
+    });
 
     const result = await upsertEmailConfig(tenantId, {
       senderName: MOCK_UPDATED_SENDER_NAME,
     });
 
-    expect(result.senderName).toBe(MOCK_UPDATED_SENDER_NAME);
     const rows = await db().select().from(schema.emailConfig);
+    expect(result.senderName).toBe(MOCK_UPDATED_SENDER_NAME);
     expect(rows).toHaveLength(1);
   });
 
@@ -62,16 +65,24 @@ describe(upsertEmailConfig, () => {
     ).rejects.toThrow();
   });
 
-  it('stores and clears the contact recipient override', async () => {
-    const set = await upsertEmailConfig(tenantId, {
-      contactRecipient: MOCK_CONTACT_RECIPIENT,
+  it('stores the contact recipient override', async () => {
+    const result = await upsertEmailConfig(tenantId, {
+      contactRecipient: MOCK_EMAIL_CONFIG.contactRecipient,
     });
-    const cleared = await upsertEmailConfig(tenantId, {
+
+    expect(result.contactRecipient).toBe(MOCK_EMAIL_CONFIG.contactRecipient);
+  });
+
+  it('clears the contact recipient override when set to null', async () => {
+    await upsertEmailConfig(tenantId, {
+      contactRecipient: MOCK_EMAIL_CONFIG.contactRecipient,
+    });
+
+    const result = await upsertEmailConfig(tenantId, {
       contactRecipient: null,
     });
 
-    expect(set.contactRecipient).toBe(MOCK_CONTACT_RECIPIENT);
-    expect(cleared.contactRecipient).toBeUndefined();
+    expect(result.contactRecipient).toBeUndefined();
   });
 
   it('rejects a malformed contact recipient', async () => {
@@ -83,40 +94,34 @@ describe(upsertEmailConfig, () => {
   it('rejects a tenantId with no matching tenants row', async () => {
     await expect(
       upsertEmailConfig(MOCK_MISSING_TENANT_ID, {
-        senderName: MOCK_SENDER_NAME,
+        senderName: MOCK_EMAIL_CONFIG.senderName,
       }),
     ).rejects.toThrow();
   });
-});
 
-describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('preserves footerPostalAddress when a later update omits the field', async () => {
-    await upsertEmailConfig(tenantId, {
-      footerPostalAddress: MOCK_POSTAL_ADDRESS,
+  describe('partial updates', () => {
+    beforeEach(async () => {
+      await upsertEmailConfig(tenantId, {
+        footerPostalAddress: MOCK_EMAIL_CONFIG.footerPostalAddress,
+      });
     });
 
-    const result = await upsertEmailConfig(tenantId, {
-      senderName: MOCK_SENDER_NAME,
+    it('preserves footerPostalAddress when a later update omits the field', async () => {
+      const result = await upsertEmailConfig(tenantId, {
+        senderName: MOCK_EMAIL_CONFIG.senderName,
+      });
+
+      expect(result.footerPostalAddress).toBe(
+        MOCK_EMAIL_CONFIG.footerPostalAddress,
+      );
     });
 
-    expect(result.footerPostalAddress).toBe(MOCK_POSTAL_ADDRESS);
-  });
+    it('clears footerPostalAddress when explicitly set to null', async () => {
+      const result = await upsertEmailConfig(tenantId, {
+        footerPostalAddress: null,
+      });
 
-  it('clears footerPostalAddress when explicitly set to null', async () => {
-    await upsertEmailConfig(tenantId, {
-      footerPostalAddress: MOCK_POSTAL_ADDRESS,
+      expect(result.footerPostalAddress).toBeUndefined();
     });
-
-    const result = await upsertEmailConfig(tenantId, {
-      footerPostalAddress: null,
-    });
-
-    expect(result.footerPostalAddress).toBeUndefined();
   });
 });

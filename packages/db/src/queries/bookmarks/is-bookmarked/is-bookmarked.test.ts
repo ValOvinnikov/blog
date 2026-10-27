@@ -1,4 +1,5 @@
 import * as schema from '@blog/db/schema';
+import { MOCK_POST_ID } from '@blog/db/testing/bookmarks/fixtures';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -18,27 +19,33 @@ afterEach(async () => {
 
 describe(isBookmarked, () => {
   let tenantId: string;
+  let userId: string;
 
   beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
+    ({ id: userId } = await insertTestUser(db()));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it('returns true when the tuple exists', async () => {
-    await addBookmark(tenantId, 'user-1', 'post-1');
+    await addBookmark(tenantId, userId, MOCK_POST_ID);
 
-    expect(await isBookmarked(tenantId, 'user-1', 'post-1')).toBe(true);
+    await expect(isBookmarked(tenantId, userId, MOCK_POST_ID)).resolves.toBe(
+      true,
+    );
   });
 
   it('returns false when the tuple does not exist', async () => {
-    expect(await isBookmarked(tenantId, 'user-1', 'post-1')).toBe(false);
+    await expect(isBookmarked(tenantId, userId, MOCK_POST_ID)).resolves.toBe(
+      false,
+    );
   });
 
-  it("returns false for another tenant's bookmark on the same user and post", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await addBookmark(tenantOneId, 'user-1', 'post-1');
+  it("returns false for another tenant's bookmark of the same post", async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await addBookmark(otherTenantId, userId, MOCK_POST_ID);
 
-    expect(await isBookmarked(tenantTwoId, 'user-1', 'post-1')).toBe(false);
+    await expect(isBookmarked(tenantId, userId, MOCK_POST_ID)).resolves.toBe(
+      false,
+    );
   });
 });

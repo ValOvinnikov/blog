@@ -17,6 +17,7 @@ import {
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { faker } from '@faker-js/faker';
 import { eq, sql } from 'drizzle-orm';
 
 import { listLeadsByCursor } from './list-leads-by-cursor';
@@ -30,9 +31,18 @@ const fallbackListener = usePersonalDataFallbackListener();
 const MOCK_LEAD_COUNT = LEADS_PAGE_SIZE + 5;
 const MINUTE_MS = 60_000;
 const MOCK_START = Date.UTC(2026, 0, 1);
-const MOCK_EARLIER_MICROSECOND_NAME = 'Earlier microsecond';
-const MOCK_LATER_MICROSECOND_NAME = 'Later microsecond';
-const MOCK_LATE_LEAD_NAME = 'Arrived later';
+const MOCK_EARLIER_MICROSECOND_AT = '2025-12-31 00:00:00.000100+00';
+const MOCK_LATER_MICROSECOND_AT = '2025-12-31 00:00:00.000200+00';
+
+faker.seed(6025);
+
+const MOCK_EARLIER_MICROSECOND_NAME = faker.person.fullName();
+const MOCK_LATER_MICROSECOND_NAME = faker.person.fullName();
+const MOCK_LATE_LEAD_NAME = faker.person.fullName();
+const MOCK_LEAD_NAMES = faker.helpers.uniqueArray(
+  () => faker.person.fullName(),
+  MOCK_LEAD_COUNT,
+);
 
 function insertEncryptedLead(
   tenantId: string,
@@ -48,14 +58,10 @@ function insertEncryptedLead(
   });
 }
 
-function leadName(index: number) {
-  return `Lead ${index}`;
-}
-
 async function insertLeadsOneMinuteApart(tenantId: string, count: number) {
   for (let index = 0; index < count; index += 1) {
     await insertEncryptedLead(tenantId, {
-      name: leadName(index),
+      name: MOCK_LEAD_NAMES[index],
       createdAt: new Date(MOCK_START + index * MINUTE_MS),
     });
   }
@@ -74,9 +80,7 @@ async function insertLeadAtExactTime(
 }
 
 function newestFirstNames(count: number) {
-  return Array.from({ length: count }, (_, index) =>
-    leadName(count - 1 - index),
-  );
+  return MOCK_LEAD_NAMES.slice(0, count).reverse();
 }
 
 afterEach(async () => {
@@ -195,12 +199,12 @@ describe(listLeadsByCursor, () => {
     await insertLeadAtExactTime(
       tenantId,
       MOCK_EARLIER_MICROSECOND_NAME,
-      '2025-12-31 00:00:00.000100+00',
+      MOCK_EARLIER_MICROSECOND_AT,
     );
     await insertLeadAtExactTime(
       tenantId,
       MOCK_LATER_MICROSECOND_NAME,
-      '2025-12-31 00:00:00.000200+00',
+      MOCK_LATER_MICROSECOND_AT,
     );
 
     const first = await listLeadsByCursor({ tenantId });
@@ -215,10 +219,12 @@ describe(listLeadsByCursor, () => {
     ]);
   });
 
-  it('orders leads created at the same moment by id, still listing each once', async () => {
+  it('lists leads created at the same moment once each, highest id first', async () => {
     const createdAt = new Date(MOCK_START);
+    const insertedIds: string[] = [];
     for (let index = 0; index < MOCK_LEAD_COUNT; index += 1) {
-      await insertEncryptedLead(tenantId, { createdAt });
+      const { id } = await insertEncryptedLead(tenantId, { createdAt });
+      insertedIds.push(id);
     }
 
     const first = await listLeadsByCursor({ tenantId });
@@ -228,7 +234,7 @@ describe(listLeadsByCursor, () => {
     });
 
     const ids = [...first.leads, ...second.leads].map(({ id }) => id);
-    expect(new Set(ids).size).toBe(MOCK_LEAD_COUNT);
+    expect(ids).toEqual([...insertedIds].sort().reverse());
   });
 
   it("never returns another tenant's leads", async () => {
