@@ -3,9 +3,11 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   CARD_STYLE,
-  HEADER_CONTROL_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_CONTROL_STYLE,
+  HUE_MAX,
+  HUE_MIN,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   NEXT_NAVIGATION_ERROR,
@@ -13,20 +15,22 @@ import {
   RADIUS_SCALE,
   type TMaybeNull,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
-  MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
 import { updateLookAction, type TUpdateLookInput } from './update-look-action';
+
+faker.seed(5998);
 
 const { upsertSiteConfigMock, insertAuditEventMock } = vi.hoisted(() => ({
   upsertSiteConfigMock: vi.fn(),
@@ -51,16 +55,14 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const requireTenantMembershipMock = vi.mocked<
-  (tenantId: string) => Promise<unknown>
->(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
-const loggerErrorMock = vi.mocked(logger.error);
-const isAccentHueAccessibleMock = vi.mocked(isAccentHueAccessible);
+
+const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
+const UNSUPPORTED_CARD_STYLE = 'SHADOWED';
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
-  accentHue: 28,
+  accentHue: faker.number.int({ min: HUE_MIN, max: HUE_MAX }),
   logoHue: null,
   headingFont: FONT_CHOICE.FRAUNCES,
   bodyFont: FONT_CHOICE.INTER,
@@ -71,34 +73,21 @@ const VALID_INPUT: TUpdateLookInput = {
   headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
 };
 
-const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
-
 describe(updateLookAction, () => {
   beforeEach(() => {
-    requireTenantMembershipMock.mockReset();
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: MOCK_TENANT_ID },
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
-    });
-    authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     upsertSiteConfigMock.mockReset();
-    upsertSiteConfigMock.mockResolvedValue({});
-    revalidateSiteConfigMock.mockReset();
-    revalidateSiteConfigMock.mockResolvedValue(undefined);
     insertAuditEventMock.mockReset();
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    loggerErrorMock.mockReset();
-    isAccentHueAccessibleMock.mockReset();
-    isAccentHueAccessibleMock.mockReturnValue(true);
+    vi.mocked(isAccentHueAccessible).mockReset();
+    vi.mocked(isAccentHueAccessible).mockReturnValue(true);
   });
 
-  it('re-resolves the tenant from the session against the routed id before writing', async () => {
+  it('re-resolves the tenant from the session before writing', async () => {
     const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       VALID_INPUT,
@@ -106,29 +95,30 @@ describe(updateLookAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
-  it('calls the site-config revalidation webhook after a successful save', async () => {
+  it('revalidates the site config after a successful save', async () => {
     await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
-    expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
+    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it('rejects a payload with an out-of-range hue without ever calling the tenant gate', async () => {
+  it('rejects an out-of-range hue before reaching the tenant gate', async () => {
     const result = await updateLookAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
-      accentHue: 999,
+      accentHue: HUE_MAX + 1,
     });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+    expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
   it('rejects a card style the site has no tokens for without writing it', async () => {
     const result = await updateLookAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
-      cardStyle: 'SHADOWED' as TUpdateLookInput['cardStyle'],
+      // @ts-expect-error -- an unsupported card style is the invalid input under test
+      cardStyle: UNSUPPORTED_CARD_STYLE,
     });
 
     expect(result).toEqual({
@@ -139,7 +129,7 @@ describe(updateLookAction, () => {
   });
 
   it('rejects an accent hue the site would replace without writing it', async () => {
-    isAccentHueAccessibleMock.mockReturnValue(false);
+    vi.mocked(isAccentHueAccessible).mockReturnValue(false);
 
     const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
@@ -151,12 +141,12 @@ describe(updateLookAction, () => {
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {
-    upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
+    upsertSiteConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
     const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
+    expect(revalidateSiteConfig).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
@@ -173,39 +163,33 @@ describe(updateLookAction, () => {
   });
 
   it('still succeeds when the audit write fails, and logs the failure', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
+    const auditError = new Error(MOCK_DB_ERROR_MESSAGE);
+    insertAuditEventMock.mockRejectedValue(auditError);
 
     const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(loggerErrorMock).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
       SITE_CONFIG_LOG.LOOK_AUDIT_FAILED,
-      expect.objectContaining({
+      {
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
         targetId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
+        error: auditError,
+      },
     );
   });
 
-  it('propagates the sign-in redirect the tenant gate throws when unauthenticated', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+  it.each([
+    NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+    NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+  ])('propagates the %s the tenant gate throws', async (navigationError) => {
+    vi.mocked(requireTenantMembership).mockImplementationOnce(() => {
+      throw new Error(navigationError);
     });
 
     await expect(updateLookAction(MOCK_TENANT_ID, VALID_INPUT)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-  });
-
-  it('propagates the 404 the tenant gate throws when the session has no membership', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    });
-
-    await expect(updateLookAction(MOCK_TENANT_ID, VALID_INPUT)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      navigationError,
     );
 
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();

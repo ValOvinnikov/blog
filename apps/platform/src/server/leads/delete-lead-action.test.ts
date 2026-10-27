@@ -3,6 +3,7 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { LEAD_LOG, LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { MOCK_LEAD_ID } from '@platform/testing/leads/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   mockReadyTenant,
@@ -22,7 +23,6 @@ vi.mock('@blog/db', () => ({
   queries: { leads: { deleteLead: deleteLeadMock } },
 }));
 
-const MOCK_LEAD_ID = faker.string.uuid();
 const MOCK_NOT_A_UUID = faker.lorem.word();
 const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 const MOCK_NOT_FOUND = new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);

@@ -1,10 +1,15 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
-import { MOCK_OPERATOR_EMAIL } from '@platform/testing/admins/operator';
+import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
+
+import { recordAuditEvent } from './record-audit-event';
+
+faker.seed(5998);
 
 const { insertAuditEventMock } = vi.hoisted(() => ({
   insertAuditEventMock: vi.fn(),
@@ -16,82 +21,76 @@ vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
 
-const LOG_EVENT = 'test.audit_failed';
+const MOCK_LOG_EVENT = faker.lorem.slug();
+const MOCK_SESSION_EXPIRES = faker.date.future().toISOString();
+const MOCK_AUDIT_EVENT_ID = faker.string.uuid();
+const MOCK_INSERT_ERROR = new Error(faker.lorem.sentence());
+const MOCK_DETAILS = {
+  previousPlan: TENANT_PLAN.FREE,
+  plan: TENANT_PLAN.GROWTH,
+};
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-const loggerErrorMock = vi.mocked(logger.error);
+const authMock = vi.mocked<() => Promise<Session | null>>(auth);
 
-describe('recordAuditEvent', () => {
+const AUDITED_TENANT_CREATION = {
+  logEvent: MOCK_LOG_EVENT,
+  action: AUDIT_ACTION.CREATED,
+  targetType: AUDIT_TARGET_TYPE.TENANT,
+  targetId: MOCK_TENANT_ID,
+};
+
+describe(recordAuditEvent, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    authMock.mockResolvedValue({
-      user: { id: 'user-1', email: MOCK_OPERATOR_EMAIL },
-    });
     insertAuditEventMock.mockReset();
-    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-    loggerErrorMock.mockReset();
+    insertAuditEventMock.mockResolvedValue({ id: MOCK_AUDIT_EVENT_ID });
   });
 
-  it('inserts the actor id, action, target, and details exactly as given, with no actor email', async () => {
-    const { recordAuditEvent } = await import('./record-audit-event');
+  it('inserts the session actor with the action, target and details as given', async () => {
+    authMock.mockResolvedValueOnce({
+      user: { id: MOCK_OPERATOR_ID },
+      expires: MOCK_SESSION_EXPIRES,
+    });
 
     await recordAuditEvent({
-      logEvent: LOG_EVENT,
+      ...AUDITED_TENANT_CREATION,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: MOCK_TENANT_ID,
-      details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
+      details: MOCK_DETAILS,
     });
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: 'user-1',
+      actorId: MOCK_OPERATOR_ID,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
-      details: { previousPlan: TENANT_PLAN.FREE, plan: 'PRO' },
+      details: MOCK_DETAILS,
     });
-    expect(loggerErrorMock).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('swallows an insert failure, logging under the caller-supplied event name', async () => {
-    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
-    const { recordAuditEvent } = await import('./record-audit-event');
+  it('logs an insert failure under the caller event name and resolves', async () => {
+    insertAuditEventMock.mockRejectedValue(MOCK_INSERT_ERROR);
 
     await expect(
-      recordAuditEvent({
-        logEvent: LOG_EVENT,
-        action: AUDIT_ACTION.CREATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-      }),
+      recordAuditEvent(AUDITED_TENANT_CREATION),
     ).resolves.toBeUndefined();
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      LOG_EVENT,
-      expect.objectContaining({
-        action: AUDIT_ACTION.CREATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        error: expect.any(Error),
-      }),
-    );
-  });
-
-  it('swallows a missing session actor without ever calling the insert', async () => {
-    authMock.mockResolvedValue(null);
-    const { recordAuditEvent } = await import('./record-audit-event');
-
-    await recordAuditEvent({
-      logEvent: LOG_EVENT,
+    expect(logger.error).toHaveBeenCalledWith(MOCK_LOG_EVENT, {
       action: AUDIT_ACTION.CREATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
+      error: MOCK_INSERT_ERROR,
     });
+  });
+
+  it('logs a missing session actor without calling the insert', async () => {
+    authMock.mockResolvedValueOnce(null);
+
+    await recordAuditEvent(AUDITED_TENANT_CREATION);
+
+    const [loggedEvent, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
 
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      LOG_EVENT,
-      expect.objectContaining({ targetId: MOCK_TENANT_ID }),
-    );
+    expect(loggedEvent).toBe(MOCK_LOG_EVENT);
+    expect(context?.['targetId']).toBe(MOCK_TENANT_ID);
   });
 });

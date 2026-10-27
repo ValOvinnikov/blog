@@ -1,8 +1,9 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import {
-  MOCK_WEB_APP_URL,
   MOCK_REVALIDATE_SECRET,
+  MOCK_WEB_APP_URL,
 } from '@platform/testing/env/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
@@ -10,109 +11,100 @@ import { logger } from '@platform/utils/logger/logger';
 
 import { revalidateSiteConfig } from './revalidate-site-config';
 
+faker.seed(5998);
+
 vi.mock('@platform/utils/env/env');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
-const NETWORK_ERROR_MESSAGE = 'network down';
-
-const loggerErrorMock = vi.mocked(logger.error);
+const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
 
 describe(revalidateSiteConfig, () => {
-  const fetchMock = vi.fn();
+  const fetchMock = vi.fn<typeof fetch>();
 
   beforeEach(() => {
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
-    envMock.WEB_APP_URL = undefined;
-    envMock.SITE_CONFIG_REVALIDATE_SECRET = undefined;
-  });
-
-  it('POSTs the tenant id with the bearer secret and a timeout to the revalidate route', async () => {
     envMock.WEB_APP_URL = MOCK_WEB_APP_URL;
     envMock.SITE_CONFIG_REVALIDATE_SECRET = MOCK_REVALIDATE_SECRET;
     fetchMock.mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
+  });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('POSTs the tenant id with the bearer secret to the revalidate route', async () => {
     await revalidateSiteConfig(MOCK_TENANT_ID);
 
-    expect(fetchMock).toHaveBeenCalledWith(
+    const [url, requestInit] = fetchMock.mock.calls[0] ?? [];
+    const { signal, ...init } = requestInit ?? {};
+
+    expect(url).toEqual(
       new URL(`${MOCK_WEB_APP_URL}/api/revalidate-site-config`),
-      {
-        method: HTTP_METHOD.POST,
-        headers: {
-          Authorization: `Bearer ${MOCK_REVALIDATE_SECRET}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
-        signal: expect.any(AbortSignal),
+    );
+    expect(init).toEqual({
+      method: HTTP_METHOD.POST,
+      headers: {
+        Authorization: `Bearer ${MOCK_REVALIDATE_SECRET}`,
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
+    });
+    expect(signal).toBeInstanceOf(AbortSignal);
   });
 
-  it('logs and skips the call when WEB_APP_URL is not configured', async () => {
-    envMock.SITE_CONFIG_REVALIDATE_SECRET = MOCK_REVALIDATE_SECRET;
+  it.each(['WEB_APP_URL', 'SITE_CONFIG_REVALIDATE_SECRET'] as const)(
+    'logs and skips the call when %s is not configured',
+    async (missingKey) => {
+      envMock[missingKey] = undefined;
 
-    await revalidateSiteConfig(MOCK_TENANT_ID);
+      await revalidateSiteConfig(MOCK_TENANT_ID);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      SITE_CONFIG_LOG.REVALIDATE_SKIPPED,
-    );
-  });
-
-  it('logs and skips the call when SITE_CONFIG_REVALIDATE_SECRET is not configured', async () => {
-    envMock.WEB_APP_URL = MOCK_WEB_APP_URL;
-
-    await revalidateSiteConfig(MOCK_TENANT_ID);
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      SITE_CONFIG_LOG.REVALIDATE_SKIPPED,
-    );
-  });
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(
+        SITE_CONFIG_LOG.REVALIDATE_SKIPPED,
+      );
+    },
+  );
 
   it('logs but does not throw when the response is not ok', async () => {
-    envMock.WEB_APP_URL = MOCK_WEB_APP_URL;
-    envMock.SITE_CONFIG_REVALIDATE_SECRET = MOCK_REVALIDATE_SECRET;
     fetchMock.mockResolvedValue(
       new Response(null, { status: HTTP_STATUS.UNAUTHORIZED }),
     );
 
     await expect(revalidateSiteConfig(MOCK_TENANT_ID)).resolves.toBeUndefined();
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
       SITE_CONFIG_LOG.REVALIDATE_FAILED,
       { responseStatus: HTTP_STATUS.UNAUTHORIZED },
     );
   });
 
-  it('logs but does not throw when fetch itself rejects', async () => {
-    envMock.WEB_APP_URL = MOCK_WEB_APP_URL;
-    envMock.SITE_CONFIG_REVALIDATE_SECRET = MOCK_REVALIDATE_SECRET;
-    fetchMock.mockRejectedValue(new Error(NETWORK_ERROR_MESSAGE));
+  it.each([
+    {
+      cause: 'a network failure',
+      error: new Error(MOCK_NETWORK_ERROR_MESSAGE),
+    },
+    {
+      cause: 'a timeout',
+      error: new DOMException('The signal timed out', 'TimeoutError'),
+    },
+  ])(
+    'logs but does not throw when fetch rejects with $cause',
+    async ({ error }) => {
+      fetchMock.mockRejectedValue(error);
 
-    await expect(revalidateSiteConfig(MOCK_TENANT_ID)).resolves.toBeUndefined();
+      await expect(
+        revalidateSiteConfig(MOCK_TENANT_ID),
+      ).resolves.toBeUndefined();
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      SITE_CONFIG_LOG.REVALIDATE_ERROR,
-      {
-        error: new Error(NETWORK_ERROR_MESSAGE),
-      },
-    );
-  });
-
-  it('logs but does not throw (and never hangs the caller) when the call times out', async () => {
-    envMock.WEB_APP_URL = MOCK_WEB_APP_URL;
-    envMock.SITE_CONFIG_REVALIDATE_SECRET = MOCK_REVALIDATE_SECRET;
-    fetchMock.mockRejectedValue(
-      new DOMException('The signal timed out', 'TimeoutError'),
-    );
-
-    await expect(revalidateSiteConfig(MOCK_TENANT_ID)).resolves.toBeUndefined();
-
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      SITE_CONFIG_LOG.REVALIDATE_ERROR,
-      expect.objectContaining({ error: expect.any(DOMException) }),
-    );
-  });
+      expect(logger.error).toHaveBeenCalledWith(
+        SITE_CONFIG_LOG.REVALIDATE_ERROR,
+        {
+          error,
+        },
+      );
+    },
+  );
 });

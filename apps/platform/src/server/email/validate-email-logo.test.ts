@@ -1,8 +1,21 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
-import { MAX_EMAIL_LOGO_BYTES } from '@platform/utils/email-logo-limits/email-logo-limits';
+import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
+import {
+  EMAIL_LOGO_MAX_DIMENSION_PX,
+  MAX_EMAIL_LOGO_BYTES,
+  maxEmailLogoKbLabel,
+} from '@platform/utils/email-logo-limits/email-logo-limits';
 
 import { validateEmailLogoUpload } from './validate-email-logo';
+
+const MOCK_WIDTH_PX = 200;
+const MOCK_HEIGHT_PX = 100;
+const MOCK_FILE_NAME = 'upload';
+const MOCK_SVG_MARKUP =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"></svg>';
+const MOCK_UNREADABLE_BYTES = new Uint8Array([1, 2, 3, 4]);
+const BINARY_MIME = 'application/octet-stream';
 
 const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
@@ -16,32 +29,12 @@ const buildPngBuffer = (width: number, height: number): Buffer => {
   return buffer;
 };
 
-const pngFile = (width: number, height: number, sizeOverrideBytes?: number) => {
-  const bytes = buildPngBuffer(width, height);
-  const padded = sizeOverrideBytes
-    ? Buffer.concat([bytes, Buffer.alloc(sizeOverrideBytes)])
-    : bytes;
-  return new File([new Uint8Array(padded)], 'upload.png', {
-    type: 'image/png',
-  });
-};
-
 const buildGifBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(10);
   buffer.write('GIF89a', 0, 'latin1');
   buffer.writeUInt16LE(width, 6);
   buffer.writeUInt16LE(height, 8);
   return buffer;
-};
-
-const gifFile = (width: number, height: number) => {
-  return new File(
-    [new Uint8Array(buildGifBuffer(width, height))],
-    'upload.gif',
-    {
-      type: 'image/gif',
-    },
-  );
 };
 
 const buildWebpBuffer = (width: number, height: number): Buffer => {
@@ -54,128 +47,136 @@ const buildWebpBuffer = (width: number, height: number): Buffer => {
   return buffer;
 };
 
-const webpFile = (width: number, height: number) => {
-  return new File(
-    [new Uint8Array(buildWebpBuffer(width, height))],
-    'upload.webp',
-    { type: 'image/webp' },
-  );
-};
+const toFile = (bytes: Buffer, extension: string, type: string) =>
+  new File([new Uint8Array(bytes)], `${MOCK_FILE_NAME}.${extension}`, {
+    type,
+  });
 
-const svgFile = (markup: string) => {
-  return new File([markup], 'upload.svg', { type: 'image/svg+xml' });
-};
+const pngBytes = (width: number, height: number, paddingBytes = 0) =>
+  Buffer.concat([buildPngBuffer(width, height), Buffer.alloc(paddingBytes)]);
+
+const refused = (reason: string, values?: Record<string, unknown>) => ({
+  ok: false,
+  error: { outcome: ACTION_OUTCOME.REFUSED, reason, ...(values && { values }) },
+});
 
 describe(validateEmailLogoUpload, () => {
-  it('accepts a PNG within the size ceiling', async () => {
-    const result = await validateEmailLogoUpload(pngFile(200, 100));
+  it.each([
+    [
+      'PNG',
+      buildPngBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX),
+      'png',
+      MOCK_MIME_TYPE.PNG,
+    ],
+    [
+      'GIF',
+      buildGifBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX),
+      'gif',
+      MOCK_MIME_TYPE.GIF,
+    ],
+  ])(
+    'accepts a %s within the limits',
+    async (_format, bytes, extension, mime) => {
+      const result = await validateEmailLogoUpload(
+        toFile(bytes, extension, mime),
+      );
+
+      expect(result).toEqual({
+        ok: true,
+        data: { buffer: bytes, contentType: mime, extension },
+      });
+    },
+  );
+
+  it('accepts an image exactly at the dimension ceiling', async () => {
+    const bytes = buildPngBuffer(
+      EMAIL_LOGO_MAX_DIMENSION_PX,
+      EMAIL_LOGO_MAX_DIMENSION_PX,
+    );
+
+    const result = await validateEmailLogoUpload(
+      toFile(bytes, 'png', MOCK_MIME_TYPE.PNG),
+    );
 
     expect(result).toEqual({
       ok: true,
       data: {
-        buffer: expect.any(Buffer),
-        contentType: 'image/png',
+        buffer: bytes,
+        contentType: MOCK_MIME_TYPE.PNG,
         extension: 'png',
       },
     });
   });
 
-  it('accepts a GIF within the size ceiling', async () => {
-    const result = await validateEmailLogoUpload(gifFile(200, 100));
-
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        buffer: expect.any(Buffer),
-        contentType: 'image/gif',
-        extension: 'gif',
-      },
-    });
-  });
-
-  it('accepts a JPEG-sized PNG stand-in within the dimension ceiling', async () => {
-    const result = await validateEmailLogoUpload(pngFile(400, 400));
-
-    expect(result.ok).toBe(true);
-  });
-
-  it('rejects an SVG even though it is well-formed and safe, unlike the site-logo validator', async () => {
+  it('rejects an SVG even though the site-logo validator accepts it', async () => {
     const result = await validateEmailLogoUpload(
-      svgFile(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"></svg>',
-      ),
+      new File([MOCK_SVG_MARKUP], `${MOCK_FILE_NAME}.svg`, {
+        type: MOCK_MIME_TYPE.SVG,
+      }),
     );
 
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.EMAIL_LOGO_SVG,
-      },
-    });
+    expect(result).toEqual(refused(UPLOAD_REFUSAL.EMAIL_LOGO_SVG));
   });
 
   it('rejects a WebP image', async () => {
-    const result = await validateEmailLogoUpload(webpFile(200, 100));
+    const result = await validateEmailLogoUpload(
+      toFile(
+        buildWebpBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX),
+        'webp',
+        MOCK_MIME_TYPE.WEBP,
+      ),
+    );
 
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.EMAIL_LOGO_WEBP,
-      },
-    });
+    expect(result).toEqual(refused(UPLOAD_REFUSAL.EMAIL_LOGO_WEBP));
   });
 
   it('rejects a file over the byte ceiling', async () => {
     const result = await validateEmailLogoUpload(
-      pngFile(100, 100, MAX_EMAIL_LOGO_BYTES),
+      toFile(
+        pngBytes(MOCK_HEIGHT_PX, MOCK_HEIGHT_PX, MAX_EMAIL_LOGO_BYTES),
+        'png',
+        MOCK_MIME_TYPE.PNG,
+      ),
     );
 
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
-        values: { limit: '100 KB' },
-      },
-    });
+    expect(result).toEqual(
+      refused(UPLOAD_REFUSAL.FILE_TOO_LARGE, { limit: maxEmailLogoKbLabel() }),
+    );
   });
 
-  it('rejects an image over the dimension ceiling', async () => {
-    const result = await validateEmailLogoUpload(pngFile(500, 200));
+  it.each([
+    [EMAIL_LOGO_MAX_DIMENSION_PX + 1, MOCK_HEIGHT_PX],
+    [MOCK_HEIGHT_PX, EMAIL_LOGO_MAX_DIMENSION_PX + 1],
+  ])(
+    'rejects a %i by %i image over the dimension ceiling',
+    async (width, height) => {
+      const result = await validateEmailLogoUpload(
+        toFile(buildPngBuffer(width, height), 'png', MOCK_MIME_TYPE.PNG),
+      );
 
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.IMAGE_TOO_LARGE,
-        values: { size: 400 },
-      },
-    });
-  });
+      expect(result).toEqual(
+        refused(UPLOAD_REFUSAL.IMAGE_TOO_LARGE, {
+          size: EMAIL_LOGO_MAX_DIMENSION_PX,
+        }),
+      );
+    },
+  );
 
   it('rejects an empty file', async () => {
     const result = await validateEmailLogoUpload(
-      new File([], 'empty.png', { type: 'image/png' }),
+      new File([], `${MOCK_FILE_NAME}.png`, { type: MOCK_MIME_TYPE.PNG }),
     );
 
-    expect(result).toEqual({
-      ok: false,
-      error: {
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_MISSING,
-      },
-    });
+    expect(result).toEqual(refused(UPLOAD_REFUSAL.FILE_MISSING));
   });
 
   it('rejects an unreadable file', async () => {
     const result = await validateEmailLogoUpload(
-      new File([new Uint8Array([1, 2, 3, 4])], 'upload.bin', {
-        type: 'application/octet-stream',
+      new File([MOCK_UNREADABLE_BYTES], `${MOCK_FILE_NAME}.bin`, {
+        type: BINARY_MIME,
       }),
     );
 
-    expect(result.ok).toBe(false);
+    expect(result).toEqual(refused(UPLOAD_REFUSAL.UNREADABLE_IMAGE));
   });
 });
