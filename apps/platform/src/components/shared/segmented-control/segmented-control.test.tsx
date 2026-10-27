@@ -5,6 +5,7 @@ import {
   screen,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { SegmentedControl } from './segmented-control';
 
@@ -135,7 +136,7 @@ describe(`<${SegmentedControl.name}/>`, () => {
   });
 
   describe('disabled', () => {
-    let onChange: ReturnType<typeof vi.fn>;
+    let onChange: Mock<(value: string) => void>;
 
     beforeEach(() => {
       onChange = vi.fn();

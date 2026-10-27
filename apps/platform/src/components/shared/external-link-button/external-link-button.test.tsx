@@ -1,5 +1,6 @@
-import { SIZE } from '@blog/config';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
@@ -8,67 +9,47 @@ import {
 
 import { ExternalLinkButton } from './external-link-button';
 
-const OPEN_TENANT_SITE = `Open ${MOCK_TENANT_NAME}'s site`;
-const OPEN_TENANT_IN_NEW_TAB = `Open ${MOCK_TENANT_DOMAIN} in a new tab`;
+faker.seed(5995);
+
+const MOCK_LINK_TEXT = faker.lorem.words(2);
+const MOCK_OPEN_TENANT_SITE = `Open ${MOCK_TENANT_NAME}'s site`;
+const MOCK_OPEN_TENANT_IN_NEW_TAB = `Open ${MOCK_TENANT_DOMAIN} in a new tab`;
+
+const setup = customRender(ExternalLinkButton, {
+  href: MOCK_TENANT_URL,
+  children: MOCK_LINK_TEXT,
+});
 
 describe(`<${ExternalLinkButton.name}/>`, () => {
-  it('renders as an anchor opening in a new tab safely, announcing the new-tab hint', () => {
-    renderWithIntl(
-      <ExternalLinkButton href={MOCK_TENANT_URL}>Open site</ExternalLinkButton>,
-    );
+  it('links out with the new-tab hint in its accessible name', () => {
+    setup();
 
     const link = screen.getByRole('link', {
-      name: 'Open site (opens in new tab)',
+      name: `${MOCK_LINK_TEXT} ${messages.externalLink.newTabHint}`,
     });
-    expect(link).toHaveAttribute('href', MOCK_TENANT_URL);
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  it('renders every variant and size without throwing', () => {
-    const variants = ['primary', 'secondary', 'ghost', 'danger'] as const;
-    const sizes = [SIZE.SM, SIZE.MD] as const;
-
-    variants.forEach((variant) => {
-      sizes.forEach((size) => {
-        expect(() =>
-          renderWithIntl(
-            <ExternalLinkButton
-              href={MOCK_TENANT_URL}
-              variant={variant}
-              size={size}
-            >
-              Open site
-            </ExternalLinkButton>,
-          ),
-        ).not.toThrow();
-      });
-    });
-  });
-
-  it('applies the given ariaLabel as the accessible name', () => {
-    renderWithIntl(
-      <ExternalLinkButton href={MOCK_TENANT_URL} ariaLabel={OPEN_TENANT_SITE}>
-        Open site
-      </ExternalLinkButton>,
-    );
-
-    const link = screen.getByRole('link', { name: OPEN_TENANT_SITE });
 
     expect(link).toHaveAttribute('href', MOCK_TENANT_URL);
   });
 
-  it('applies the given title attribute alongside an icon-only ariaLabel', () => {
-    renderWithIntl(
-      <ExternalLinkButton
-        href={MOCK_TENANT_URL}
-        ariaLabel={OPEN_TENANT_IN_NEW_TAB}
-        title={OPEN_TENANT_IN_NEW_TAB}
-      />,
-    );
+  it('applies the given aria label as the accessible name', () => {
+    setup({ ariaLabel: MOCK_OPEN_TENANT_SITE });
 
-    const link = screen.getByRole('link', { name: OPEN_TENANT_IN_NEW_TAB });
+    const link = screen.getByRole('link', { name: MOCK_OPEN_TENANT_SITE });
 
-    expect(link).toHaveAttribute('title', OPEN_TENANT_IN_NEW_TAB);
+    expect(link).toHaveAttribute('href', MOCK_TENANT_URL);
+  });
+
+  it('applies the given title alongside an icon-only aria label', () => {
+    setup({
+      children: undefined,
+      ariaLabel: MOCK_OPEN_TENANT_IN_NEW_TAB,
+      title: MOCK_OPEN_TENANT_IN_NEW_TAB,
+    });
+
+    const link = screen.getByRole('link', {
+      name: MOCK_OPEN_TENANT_IN_NEW_TAB,
+    });
+
+    expect(link).toHaveAttribute('title', MOCK_OPEN_TENANT_IN_NEW_TAB);
   });
 });

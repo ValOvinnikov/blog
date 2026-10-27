@@ -1,8 +1,9 @@
-import { PRESET_ID } from '@blog/config';
+import { PRESET_ID, type TPresetId } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { PresetPicker } from './preset-picker';
 
@@ -57,7 +58,7 @@ describe(`<${PresetPicker.name}/>`, () => {
   });
 
   describe('when disabled', () => {
-    let handleChange: ReturnType<typeof vi.fn>;
+    let handleChange: Mock<(value: TPresetId) => void>;
 
     beforeEach(() => {
       handleChange = vi.fn();

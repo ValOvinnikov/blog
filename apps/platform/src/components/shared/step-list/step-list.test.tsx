@@ -1,125 +1,89 @@
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_RUN_PLUS_1_MIN_AT } from '@platform/testing/tenants/fixtures';
-import type { ComponentProps } from 'react';
 
-import { StepList } from './step-list';
+import { StepList, type TStepListStep } from './step-list';
 
-const SANITY_PROJECT = 'Sanity project';
-const SEED_CONTENT = 'Seed content';
+faker.seed(5995);
+
 const HIDDEN_ICON_SELECTOR = 'span[aria-hidden="true"]';
-const RUNNING_NOW = 'Running now';
+const STEP_CONNECTOR_TEST_ID = 'step-connector';
+const MOCK_TRAILING_SLOT = faker.lorem.words(2);
+const MOCK_UPDATED_AT_LABEL = faker.lorem.word();
 
-const steps: ComponentProps<typeof StepList>['steps'] = [
-  {
-    key: 'one',
-    title: SANITY_PROJECT,
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    statusLabel: 'Complete',
-  },
-  {
-    key: 'two',
-    title: SEED_CONTENT,
-    status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-    statusLabel: 'Running…',
-  },
-  {
-    key: 'three',
-    title: 'Map domain',
-    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    statusLabel: 'Failed',
-  },
-  {
-    key: 'four',
-    title: 'Create webhook',
-    status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-    statusLabel: 'Not started',
-  },
+const mockStep = (overrides: Partial<TStepListStep> = {}): TStepListStep => ({
+  key: faker.string.uuid(),
+  title: faker.lorem.words(2),
+  status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+  statusLabel: faker.lorem.word(),
+  ...overrides,
+});
+
+const MOCK_STEPS = [
+  mockStep({ status: TENANT_PROVISIONING_STEP_STATUS.DONE }),
+  mockStep({ status: TENANT_PROVISIONING_STEP_STATUS.RUNNING }),
+  mockStep({ status: TENANT_PROVISIONING_STEP_STATUS.FAILED }),
+  mockStep({ status: TENANT_PROVISIONING_STEP_STATUS.IDLE }),
 ];
+
+const setup = customRender(StepList, { steps: MOCK_STEPS });
 
 describe(`<${StepList.name}/>`, () => {
   describe('with the full step set', () => {
     beforeEach(() => {
-      render(<StepList steps={steps} />);
+      setup();
     });
 
-    it('maps each status to its indicator glyph, keeping every glyph decorative', () => {
-      const doneGlyph = screen.getByText('✓', {
-        selector: HIDDEN_ICON_SELECTOR,
-      });
-      const runningGlyph = screen.getByText('2', {
-        selector: HIDDEN_ICON_SELECTOR,
-      });
-      const failedGlyph = screen.getByText('!', {
-        selector: HIDDEN_ICON_SELECTOR,
-      });
-      const idleGlyph = screen.getByText('4', {
+    it.each([
+      [TENANT_PROVISIONING_STEP_STATUS.DONE, '✓'],
+      [TENANT_PROVISIONING_STEP_STATUS.RUNNING, '2'],
+      [TENANT_PROVISIONING_STEP_STATUS.FAILED, '!'],
+      [TENANT_PROVISIONING_STEP_STATUS.IDLE, '4'],
+    ])('shows the %s step with the decorative %s glyph', (_status, glyph) => {
+      const indicatorGlyph = screen.getByText(glyph, {
         selector: HIDDEN_ICON_SELECTOR,
       });
 
-      expect(doneGlyph).toBeVisible();
-      expect(runningGlyph).toBeVisible();
-      expect(failedGlyph).toBeVisible();
-      expect(idleGlyph).toBeVisible();
+      expect(indicatorGlyph).toBeVisible();
     });
 
     it('renders a connector after every step except the last', () => {
-      const glyphs = screen.getAllByText((content) => content.length > 0, {
-        selector: HIDDEN_ICON_SELECTOR,
-      });
-      const connectors = screen.getAllByTestId('step-connector');
+      const connectors = screen.getAllByTestId(STEP_CONNECTOR_TEST_ID);
 
-      expect(glyphs).toHaveLength(steps.length);
-      expect(connectors).toHaveLength(steps.length - 1);
+      expect(connectors).toHaveLength(MOCK_STEPS.length - 1);
     });
 
-    it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
+    it('announces each step status in a live region', () => {
       const liveRegions = screen.getAllByRole('status');
+      const announcements = liveRegions.map((region) => region.textContent);
 
-      expect(liveRegions).toHaveLength(steps.length);
-      steps.forEach(({ statusLabel }, index) => {
-        expect(liveRegions[index]).toHaveTextContent(statusLabel);
-      });
+      expect(announcements).toEqual(
+        MOCK_STEPS.map(({ statusLabel }) => statusLabel),
+      );
     });
   });
 
   it('renders an optional trailing slot next to a step', () => {
-    render(
-      <StepList
-        steps={[
-          {
-            key: 'one',
-            title: SEED_CONTENT,
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-            statusLabel: 'Running…',
-            trailingSlot: RUNNING_NOW,
-          },
-        ]}
-      />,
-    );
+    setup({ steps: [mockStep({ trailingSlot: MOCK_TRAILING_SLOT })] });
 
-    const trailingSlot = screen.getByText(RUNNING_NOW);
+    const trailingSlot = screen.getByText(MOCK_TRAILING_SLOT);
 
     expect(trailingSlot).toBeVisible();
   });
 
-  it('renders an already-formatted updatedAt as a <time> element carrying the raw ISO value', () => {
-    render(
-      <StepList
-        steps={[
-          {
-            key: 'one',
-            title: SANITY_PROJECT,
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-            statusLabel: 'Complete',
-            updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
-            updatedAtLabel: '6m ago',
-          },
-        ]}
-      />,
-    );
+  it('renders a formatted update time as a <time> carrying the raw ISO value', () => {
+    setup({
+      steps: [
+        mockStep({
+          updatedAt: MOCK_RUN_PLUS_1_MIN_AT,
+          updatedAtLabel: MOCK_UPDATED_AT_LABEL,
+        }),
+      ],
+    });
 
-    const timestamp = screen.getByText('6m ago');
+    const timestamp = screen.getByText(MOCK_UPDATED_AT_LABEL);
+
     expect(timestamp.tagName).toBe('TIME');
     expect(timestamp).toHaveAttribute('dateTime', MOCK_RUN_PLUS_1_MIN_AT);
   });

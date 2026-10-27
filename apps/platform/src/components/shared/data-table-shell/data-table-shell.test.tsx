@@ -10,11 +10,15 @@ type TItem = { id: string; name: string };
 const MOCK_EMPTY_MESSAGE = faker.lorem.sentence();
 const MOCK_ARIA_LABEL = faker.lorem.word();
 const MOCK_COLUMN_LABEL = faker.lorem.word();
-const MOCK_ITEMS: TItem[] = [
-  { id: faker.string.uuid(), name: faker.company.name() },
-  { id: faker.string.uuid(), name: faker.company.name() },
-];
-const [MOCK_FIRST_ITEM, MOCK_SECOND_ITEM] = MOCK_ITEMS;
+const MOCK_FIRST_ITEM: TItem = {
+  id: faker.string.uuid(),
+  name: faker.company.name(),
+};
+const MOCK_SECOND_ITEM: TItem = {
+  id: faker.string.uuid(),
+  name: faker.company.name(),
+};
+const MOCK_ITEMS = [MOCK_FIRST_ITEM, MOCK_SECOND_ITEM];
 
 const renderTable = (items: TItem[]) =>
   renderWithIntl(

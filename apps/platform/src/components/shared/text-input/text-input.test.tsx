@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { FormField } from '@platform/components/shared/form-field';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { TextInput, type TTextInputProps } from './text-input';
 
@@ -54,7 +55,7 @@ describe(`<${TextInput.name}/>`, () => {
   });
 
   describe('when read-only', () => {
-    let handleChange: ReturnType<typeof vi.fn>;
+    let handleChange: Mock<(value: string) => void>;
 
     beforeEach(() => {
       handleChange = vi.fn();
