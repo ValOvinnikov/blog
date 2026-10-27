@@ -9,5 +9,7 @@ export const MOCK_SYSTEM_FIELDS = {
 };
 
 export const mockMigrationContext = (
-  client: Partial<MigrationContext['client']>,
+  client: Partial<
+    Record<keyof MigrationContext['client'], (...args: never[]) => unknown>
+  >,
 ) => ({ client }) as unknown as MigrationContext;

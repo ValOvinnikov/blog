@@ -1,9 +1,19 @@
+import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
+import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
+import { faker } from '@faker-js/faker';
 import { at, set, setIfMissing, unset } from 'sanity/migrate';
 
 import migration, {
   buildLegacyIndexHeadingPatches,
   type TLegacyIndexHeadingDoc,
 } from './index';
+
+faker.seed(6018);
+
+const MOCK_DOCUMENT_ID = faker.string.uuid();
+const MOCK_HEADING = faker.lorem.words();
+const MOCK_SUPPORTING_TEXT = faker.lorem.words();
+const MOCK_LEGACY_COPY = faker.lorem.words();
 
 const runDocument = (doc: Record<string, unknown>) =>
   migration.migrate.document?.(
@@ -12,66 +22,63 @@ const runDocument = (doc: Record<string, unknown>) =>
   );
 
 describe(buildLegacyIndexHeadingPatches, () => {
-  it('moves an orphaned heading into headingBlock.heading, then unsets it', () => {
-    const doc: TLegacyIndexHeadingDoc = { heading: 'Browse by tag' };
+  it('moves an orphaned heading into headingBlock, then unsets it', () => {
+    const doc: TLegacyIndexHeadingDoc = { heading: MOCK_HEADING };
 
     expect(buildLegacyIndexHeadingPatches(doc)).toEqual([
       at('headingBlock', setIfMissing({})),
-      at('headingBlock.heading', set('Browse by tag')),
+      at('headingBlock.heading', set(MOCK_HEADING)),
       at('heading', unset()),
     ]);
   });
 
-  it('moves an orphaned supportingText into headingBlock.supportingText, then unsets it', () => {
+  it('moves an orphaned supportingText into headingBlock, then unsets it', () => {
     const doc: TLegacyIndexHeadingDoc = {
-      supportingText: 'Find posts by keyword.',
+      supportingText: MOCK_SUPPORTING_TEXT,
     };
 
     expect(buildLegacyIndexHeadingPatches(doc)).toEqual([
       at('headingBlock', setIfMissing({})),
-      at('headingBlock.supportingText', set('Find posts by keyword.')),
+      at('headingBlock.supportingText', set(MOCK_SUPPORTING_TEXT)),
       at('supportingText', unset()),
     ]);
   });
 
   it('moves both fields across in one pass when both are orphaned', () => {
     const doc: TLegacyIndexHeadingDoc = {
-      heading: 'Browse by tag',
-      supportingText: 'Find posts by keyword.',
+      heading: MOCK_HEADING,
+      supportingText: MOCK_SUPPORTING_TEXT,
     };
 
     expect(buildLegacyIndexHeadingPatches(doc)).toEqual([
       at('headingBlock', setIfMissing({})),
-      at('headingBlock.heading', set('Browse by tag')),
-      at('headingBlock.supportingText', set('Find posts by keyword.')),
+      at('headingBlock.heading', set(MOCK_HEADING)),
+      at('headingBlock.supportingText', set(MOCK_SUPPORTING_TEXT)),
       at('heading', unset()),
       at('supportingText', unset()),
     ]);
   });
 
-  it('only unsets the legacy heading when headingBlock.heading already has its own value', () => {
-    const doc: TLegacyIndexHeadingDoc = {
-      heading: 'Old copy, never read',
-      headingBlock: { heading: 'Browse by tag' },
-    };
+  it.each<[string, TLegacyIndexHeadingDoc]>([
+    [
+      'heading',
+      { heading: MOCK_LEGACY_COPY, headingBlock: { heading: MOCK_HEADING } },
+    ],
+    [
+      'supportingText',
+      {
+        supportingText: MOCK_LEGACY_COPY,
+        headingBlock: { supportingText: MOCK_SUPPORTING_TEXT },
+      },
+    ],
+  ])(
+    'only unsets the legacy %s when headingBlock already has its own value',
+    (field, doc) => {
+      expect(buildLegacyIndexHeadingPatches(doc)).toEqual([at(field, unset())]);
+    },
+  );
 
-    expect(buildLegacyIndexHeadingPatches(doc)).toEqual([
-      at('heading', unset()),
-    ]);
-  });
-
-  it('only unsets the legacy supportingText when headingBlock.supportingText already has its own value', () => {
-    const doc: TLegacyIndexHeadingDoc = {
-      supportingText: 'Old copy, never read',
-      headingBlock: { supportingText: 'Find posts by keyword.' },
-    };
-
-    expect(buildLegacyIndexHeadingPatches(doc)).toEqual([
-      at('supportingText', unset()),
-    ]);
-  });
-
-  it('never moves a blank legacy heading — unsets it without touching headingBlock', () => {
+  it('unsets a blank legacy heading without touching headingBlock', () => {
     const doc: TLegacyIndexHeadingDoc = { heading: '' };
 
     expect(buildLegacyIndexHeadingPatches(doc)).toEqual([
@@ -81,68 +88,38 @@ describe(buildLegacyIndexHeadingPatches, () => {
 
   it('produces no patches once both legacy fields are already absent', () => {
     const doc: TLegacyIndexHeadingDoc = {
-      headingBlock: { heading: 'Browse by tag' },
+      headingBlock: { heading: MOCK_HEADING },
     };
 
     expect(buildLegacyIndexHeadingPatches(doc)).toEqual([]);
   });
 });
 
-describe('drop deprecated index heading fields document() wiring', () => {
-  it('page_tagIndex: moves an orphaned heading across before unsetting it', () => {
-    const result = runDocument({
-      _id: 'page_tagIndex',
-      _type: 'page_tagIndex',
-      heading: 'Browse by tag',
-    });
+describe('drop-deprecated-index-heading-fields migration', () => {
+  it.each([PAGE_TAG_INDEX_TYPE, PAGE_TOPIC_INDEX_TYPE])(
+    'moves an orphaned %s heading across before unsetting it',
+    (type) => {
+      const result = runDocument({
+        _id: MOCK_DOCUMENT_ID,
+        _type: type,
+        heading: MOCK_HEADING,
+      });
 
-    expect(result).toEqual([
-      at('headingBlock', setIfMissing({})),
-      at('headingBlock.heading', set('Browse by tag')),
-      at('heading', unset()),
-    ]);
-  });
-
-  it('page_topicIndex: moves an orphaned heading across before unsetting it', () => {
-    const result = runDocument({
-      _id: 'page_topicIndex',
-      _type: 'page_topicIndex',
-      heading: 'Browse by topic',
-    });
-
-    expect(result).toEqual([
-      at('headingBlock', setIfMissing({})),
-      at('headingBlock.heading', set('Browse by topic')),
-      at('heading', unset()),
-    ]);
-  });
-
-  it('unsets both legacy fields with no move when headingBlock already carries its own copy', () => {
-    const result = runDocument({
-      _id: 'page_tagIndex',
-      _type: 'page_tagIndex',
-      heading: 'Old copy, never read',
-      supportingText: 'Old copy, never read',
-      headingBlock: {
-        heading: 'Browse by tag',
-        supportingText: 'Find posts by keyword.',
-      },
-    });
-
-    expect(result).toEqual([
-      at('heading', unset()),
-      at('supportingText', unset()),
-    ]);
-  });
+      expect(result).toEqual([
+        at('headingBlock', setIfMissing({})),
+        at('headingBlock.heading', set(MOCK_HEADING)),
+        at('heading', unset()),
+      ]);
+    },
+  );
 
   it('is a clean no-op once already migrated', () => {
-    const migrated = {
-      _id: 'page_tagIndex',
-      _type: 'page_tagIndex',
-      headingBlock: { heading: 'Browse by tag' },
-    };
+    const result = runDocument({
+      _id: MOCK_DOCUMENT_ID,
+      _type: PAGE_TAG_INDEX_TYPE,
+      headingBlock: { heading: MOCK_HEADING },
+    });
 
-    expect(runDocument(migrated)).toEqual([]);
-    expect(runDocument(migrated)).toEqual([]);
+    expect(result).toEqual([]);
   });
 });

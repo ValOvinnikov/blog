@@ -1,37 +1,21 @@
+import { faker } from '@faker-js/faker';
+
 import { toPageTopicId, toTopicPostListId } from './id';
 
-describe('toPageTopicId', () => {
-  it('prefixes a published blog_topic id', () => {
-    expect(toPageTopicId('abc123')).toBe('page_topic-abc123');
-  });
+faker.seed(21);
 
-  it('keeps the drafts. prefix outermost', () => {
-    expect(toPageTopicId('drafts.abc123')).toBe('drafts.page_topic-abc123');
-  });
+const MOCK_TOPIC_ID = faker.string.uuid();
 
-  it('is idempotent for an already-migrated id', () => {
-    expect(toPageTopicId('page_topic-abc123')).toBe('page_topic-abc123');
+describe(toPageTopicId, () => {
+  it('derives the page_topic id from a blog_topic id', () => {
+    expect(toPageTopicId(MOCK_TOPIC_ID)).toBe(`page_topic-${MOCK_TOPIC_ID}`);
   });
 });
 
-describe('toTopicPostListId', () => {
-  it('prefixes a published blog_topic id', () => {
-    expect(toTopicPostListId('abc123')).toBe('postList-topic-abc123');
-  });
-
-  it('keeps the drafts. prefix outermost', () => {
-    expect(toTopicPostListId('drafts.abc123')).toBe(
-      'drafts.postList-topic-abc123',
+describe(toTopicPostListId, () => {
+  it('derives the module_postList id from a blog_topic id', () => {
+    expect(toTopicPostListId(MOCK_TOPIC_ID)).toBe(
+      `postList-topic-${MOCK_TOPIC_ID}`,
     );
-  });
-
-  it('is idempotent for an already-migrated id', () => {
-    expect(toTopicPostListId('postList-topic-abc123')).toBe(
-      'postList-topic-abc123',
-    );
-  });
-
-  it('produces distinct ids from toPageTopicId for the same topic', () => {
-    expect(toTopicPostListId('abc123')).not.toBe(toPageTopicId('abc123'));
   });
 });

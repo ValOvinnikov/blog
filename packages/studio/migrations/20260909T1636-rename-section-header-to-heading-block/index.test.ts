@@ -1,69 +1,76 @@
+import { faker } from '@faker-js/faker';
 import { at, set, unset } from 'sanity/migrate';
 
 import { renameSectionHeaderToHeadingBlock } from './index';
 
+faker.seed(1636);
+
+const LEGACY_TYPE = 'sectionHeader';
+const HEADING_BLOCK_TYPE = 'headingBlock';
+const MOCK_HEADING = faker.lorem.words();
+const MOCK_SUPPORTING_TEXT = faker.lorem.words();
+const MOCK_MIGRATED_HEADING = faker.lorem.words();
+
 describe(renameSectionHeaderToHeadingBlock, () => {
-  it('moves a plain sectionHeader onto headingBlock and rewrites its _type', () => {
-    const sectionHeader = {
-      _type: 'sectionHeader',
-      heading: 'Latest posts',
-      supportingText: 'Fresh from the blog',
-    };
+  it.each([
+    {
+      name: 'a plain sectionHeader',
+      legacyType: LEGACY_TYPE,
+      expectedType: HEADING_BLOCK_TYPE,
+    },
+    {
+      name: 'a requiredHeadingSectionHeader',
+      legacyType: 'requiredHeadingSectionHeader',
+      expectedType: 'requiredHeadingBlock',
+    },
+  ])(
+    'moves $name onto headingBlock with the renamed _type',
+    ({ legacyType, expectedType }) => {
+      const sectionHeader = {
+        _type: legacyType,
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
+      };
 
-    const result = renameSectionHeaderToHeadingBlock({ sectionHeader });
+      const result = renameSectionHeaderToHeadingBlock({ sectionHeader });
 
-    expect(result).toEqual([
-      at(
-        'headingBlock',
-        set({
-          _type: 'headingBlock',
-          heading: 'Latest posts',
-          supportingText: 'Fresh from the blog',
-        }),
-      ),
-      at('sectionHeader', unset()),
-    ]);
-  });
+      expect(result).toEqual([
+        at(
+          HEADING_BLOCK_TYPE,
+          set({
+            _type: expectedType,
+            heading: MOCK_HEADING,
+            supportingText: MOCK_SUPPORTING_TEXT,
+          }),
+        ),
+        at(LEGACY_TYPE, unset()),
+      ]);
+    },
+  );
 
-  it('moves a requiredHeadingSectionHeader onto headingBlock as requiredHeadingBlock', () => {
-    const sectionHeader = {
-      _type: 'requiredHeadingSectionHeader',
-      heading: 'Get in touch',
-    };
-
-    const result = renameSectionHeaderToHeadingBlock({ sectionHeader });
-
-    expect(result).toEqual([
-      at(
-        'headingBlock',
-        set({ _type: 'requiredHeadingBlock', heading: 'Get in touch' }),
-      ),
-      at('sectionHeader', unset()),
-    ]);
-  });
-
-  it('is idempotent — a doc already migrated to headingBlock is left alone', () => {
-    const headingBlock = { _type: 'headingBlock', heading: 'Already moved' };
-
-    const result = renameSectionHeaderToHeadingBlock({ headingBlock });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is idempotent — a doc with both fields set is left alone, not clobbered', () => {
-    const sectionHeader = { _type: 'sectionHeader', heading: 'Old' };
-    const headingBlock = { _type: 'headingBlock', heading: 'Already moved' };
-
-    const result = renameSectionHeaderToHeadingBlock({
-      sectionHeader,
-      headingBlock,
-    });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('is a no-op for a doc that never had a sectionHeader', () => {
-    const result = renameSectionHeaderToHeadingBlock({});
+  it.each([
+    {
+      name: 'a doc already migrated to headingBlock',
+      doc: {
+        headingBlock: {
+          _type: HEADING_BLOCK_TYPE,
+          heading: MOCK_MIGRATED_HEADING,
+        },
+      },
+    },
+    {
+      name: 'a doc with both fields set',
+      doc: {
+        sectionHeader: { _type: LEGACY_TYPE, heading: MOCK_HEADING },
+        headingBlock: {
+          _type: HEADING_BLOCK_TYPE,
+          heading: MOCK_MIGRATED_HEADING,
+        },
+      },
+    },
+    { name: 'a doc that never had a sectionHeader', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    const result = renameSectionHeaderToHeadingBlock(doc);
 
     expect(result).toBeUndefined();
   });
