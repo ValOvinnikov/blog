@@ -182,10 +182,14 @@ None new. The Look columns ride on the `site_config` row the site already reads
 per request; the footer and navigation loaders project a few more fields; the
 module and the floating button run in the browser with no new requests.
 
-## Proposed split
+## Epics
 
-See the PR split put to the owner on 2026-10-27; it is recorded in the epics
-once approved.
+- #6056 — account button, panel, phone placement and sign-in panel.
+- #6065 — busy buttons and spinner.
+- #6073 — header layout, sub-menus, bar and the tagline move.
+- #6082 — footer content, layout, background, surface and the three cookie-settings entry points; reworks #5086, #5087, #3726 and #5101 (still under #5085), and #5021.
+
+Each epic's Order is the PR sequence, one layer per PR, each merged before the next.
 
 ## Done when
 
