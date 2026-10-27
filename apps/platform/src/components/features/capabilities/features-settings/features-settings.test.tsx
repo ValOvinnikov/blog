@@ -319,7 +319,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       name: saveBar.saving,
     });
 
-    expect(savingButton).toBeDisabled();
+    expect(savingButton).toHaveAttribute('aria-disabled', 'true');
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 

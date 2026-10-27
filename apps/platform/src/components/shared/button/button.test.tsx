@@ -15,6 +15,7 @@ const MOCK_LABEL = faker.lorem.word();
 const MOCK_PENDING_LABEL = faker.lorem.word();
 const MOCK_REASON_ID = faker.string.alpha(8);
 const MOCK_REASON = faker.lorem.sentence();
+const ARIA_DISABLED = 'aria-disabled';
 
 const setup = customRender(Button, { children: MOCK_LABEL });
 
@@ -68,7 +69,7 @@ describe(`<${Button.name}/>`, () => {
 
     const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(button).not.toBeDisabled();
 
     await user.tab();
@@ -114,13 +115,46 @@ describe(`<${Button.name}/>`, () => {
   });
 
   describe('pending', () => {
-    it('disables the button and marks it busy', () => {
+    it('stays enabled, marked busy and aria-disabled', () => {
       setup({ isPending: true });
 
       const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-      expect(button).toBeDisabled();
+      expect(button).toBeEnabled();
       expect(button).toHaveAttribute('aria-busy', 'true');
+      expect(button).toHaveAttribute(ARIA_DISABLED, 'true');
+    });
+
+    it('keeps focus when it turns busy', async () => {
+      const { rerender } = setup({ pendingLabel: MOCK_PENDING_LABEL });
+
+      await user.tab();
+
+      rerender(
+        <Button isPending={true} pendingLabel={MOCK_PENDING_LABEL}>
+          {MOCK_LABEL}
+        </Button>,
+      );
+
+      const button = screen.getByRole('button', { name: MOCK_PENDING_LABEL });
+
+      expect(button).toHaveFocus();
+    });
+
+    it('does not submit its form', async () => {
+      const handleSubmit = vi.fn();
+      renderWithIntl(
+        <form onSubmit={handleSubmit}>
+          <Button type="submit" isPending={true}>
+            {MOCK_LABEL}
+          </Button>
+        </form>,
+      );
+
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+      await user.click(button);
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
 
     it('ignores clicks', async () => {
@@ -143,6 +177,19 @@ describe(`<${Button.name}/>`, () => {
 
       expect(pendingButton).toBeVisible();
       expect(idleButton).not.toBeInTheDocument();
+    });
+
+    it('takes its name from its children again once idle', () => {
+      const { rerender } = setup({
+        isPending: true,
+        pendingLabel: MOCK_PENDING_LABEL,
+      });
+
+      rerender(<Button pendingLabel={MOCK_PENDING_LABEL}>{MOCK_LABEL}</Button>);
+
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+      expect(button).toBeEnabled();
     });
 
     it('renders no status region without a pending label', () => {

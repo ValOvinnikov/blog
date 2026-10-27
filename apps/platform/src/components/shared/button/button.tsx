@@ -49,20 +49,31 @@ export const Button = ({
   hasArrow,
   ref,
 }: TButtonProps) => {
-  const { root, srOnlyStatus } = buttonVariants({ variant, size });
+  const { root, faces, idleFace, busyFace, busyGlyph, srOnlyStatus } =
+    buttonVariants({ variant, size, isPending });
   const hasPendingLabel = !isUndefined(pendingLabel);
   const isPendingWithLabel = isPending && hasPendingLabel;
-  const label = isPendingWithLabel ? pendingLabel : children;
+  const isBlocked = isAriaDisabled || isPending;
+  const isUnstyled = variant === 'unstyled';
 
-  const hasClickBehaviour = !isUndefined(onClick) || isAriaDisabled;
+  const hasClickBehaviour = !isUndefined(onClick) || isBlocked;
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
-    if (isAriaDisabled) {
+    if (isBlocked) {
       event.preventDefault();
       return;
     }
     onClick?.(event);
   };
+
+  const busyContent = (
+    <>
+      <span aria-hidden="true">
+        <Spinner label="" size={SIZE.SM} className={busyGlyph()} />
+      </span>
+      {pendingLabel ?? children}
+    </>
+  );
 
   return (
     <>
@@ -70,8 +81,8 @@ export const Button = ({
         ref={ref}
         id={id}
         type={type}
-        disabled={isDisabled || isPending}
-        aria-disabled={isAriaDisabled || undefined}
+        disabled={isDisabled}
+        aria-disabled={isBlocked || undefined}
         aria-busy={isPending}
         onClick={hasClickBehaviour ? handleClick : undefined}
         className={root({ class: className })}
@@ -82,12 +93,18 @@ export const Button = ({
         aria-label={ariaLabel}
         title={title}
       >
-        {isPending && (
-          <span aria-hidden="true">
-            <Spinner label="" size={SIZE.SM} />
+        {isUnstyled ? (
+          <>{isPending ? busyContent : children}</>
+        ) : (
+          <span className={faces()}>
+            <span className={idleFace()} aria-hidden={isPending || undefined}>
+              {children}
+            </span>
+            <span className={busyFace()} aria-hidden={!isPending || undefined}>
+              {busyContent}
+            </span>
           </span>
         )}
-        {label}
         {hasArrow && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
       </button>
       {hasPendingLabel && (

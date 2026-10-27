@@ -84,7 +84,7 @@ describe(`<${SaveBar.name}/>`, () => {
     const savingButton = screen.getByRole('button', { name: 'Saving…' });
     const discardButton = screen.getByRole('button', { name: DISCARD });
 
-    expect(savingButton).toBeDisabled();
+    expect(savingButton).toHaveAttribute('aria-disabled', 'true');
     expect(discardButton).toBeDisabled();
   });
 

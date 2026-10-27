@@ -537,7 +537,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     const saveButton = await screen.findByRole('button', { name: SAVING });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    expect(saveButton).toBeDisabled();
+    expect(saveButton).toHaveAttribute(ARIA_DISABLED, 'true');
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
     await screen.findByText(ALL_CHANGES_SAVED);
