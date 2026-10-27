@@ -1,8 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import {
-  DATA_REQUEST_EXPORT_FILE_NAME,
-  DATA_REQUEST_MATCH_KIND,
-} from '@platform/constants/data-request';
+import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
@@ -50,6 +47,8 @@ const ERASE_BUTTON = { name: 'Erase' };
 const ERASE_CONFIRM_BUTTON = { name: 'Erase data' };
 const EXPORT_JSON_BUTTON = { name: 'Download JSON' };
 const EXPORT_CSV_BUTTON = { name: 'Download CSV' };
+const EXPORT_GENERATED_AT = '2026-10-27T10:29:42.123Z';
+const EXPORT_SETTLE_TIMEOUT_MS = 5_000;
 const RESULTS_TABLE = { name: 'Stored records' };
 const READER_ACCOUNT_CHECKBOX = { name: 'Also delete the reader account' };
 const SIGNUP_BLOCK_KEPT =
@@ -77,7 +76,11 @@ describe(`<${DataRequestPanel.name}/>`, () => {
   const exportAs = async (button: typeof EXPORT_CSV_BUTTON) => {
     const exportButton = await screen.findByRole('button', button);
     await user.click(exportButton);
-    return screen.findByRole('button', { ...button, busy: false });
+    return screen.findByRole(
+      'button',
+      { ...button, busy: false },
+      { timeout: EXPORT_SETTLE_TIMEOUT_MS },
+    );
   };
 
   const openEraseDialog = async () => {
@@ -161,7 +164,11 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(eraseButton).not.toBeInTheDocument();
   });
 
-  it('downloads the JSON export for the searched email', async () => {
+  it('downloads the JSON export for the searched email, named by when it was made', async () => {
+    exportPersonalDataActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      data: { ...mockPersonalDataExport(), generatedAt: EXPORT_GENERATED_AT },
+    });
     await lookUp();
 
     await exportAs(EXPORT_JSON_BUTTON);
@@ -171,13 +178,22 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
     });
-    expect(fileName).toBe(DATA_REQUEST_EXPORT_FILE_NAME.JSON);
+    expect(fileName).toBe('personal-data-export-2026-10-27T10-29-42Z.json');
     expect(JSON.parse(content)).toEqual(
-      JSON.parse(JSON.stringify(mockPersonalDataExport())),
+      JSON.parse(
+        JSON.stringify({
+          ...mockPersonalDataExport(),
+          generatedAt: EXPORT_GENERATED_AT,
+        }),
+      ),
     );
   });
 
-  it('downloads the CSV export for the searched email', async () => {
+  it('downloads the CSV export for the searched email, named by when it was made', async () => {
+    exportPersonalDataActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      data: { ...mockPersonalDataExport(), generatedAt: EXPORT_GENERATED_AT },
+    });
     await lookUp();
 
     await exportAs(EXPORT_CSV_BUTTON);
@@ -187,7 +203,7 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(exportPersonalDataActionMock).toHaveBeenCalledWith({
       email: MOCK_DATA_REQUEST_EMAIL,
     });
-    expect(fileName).toBe(DATA_REQUEST_EXPORT_FILE_NAME.CSV);
+    expect(fileName).toBe('personal-data-export-2026-10-27T10-29-42Z.csv');
     expect(content).toContain(DATA_REQUEST_MATCH_KIND.SUBSCRIBER);
   });
 

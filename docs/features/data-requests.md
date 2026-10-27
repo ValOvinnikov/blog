@@ -36,8 +36,10 @@ page (#5090). The page serves either answer.
   platform-wide record), the stored email ("Stored as a hash" for a sign-up
   block) and when it was recorded ("Not recorded" for an account whose email
   was never verified).
-- "Download JSON" saves `personal-data-export.json` and "Download CSV" saves
-  `personal-data-export.csv`, both with the same records, the reader account
+- "Download JSON" and "Download CSV" save
+  `personal-data-export-<generatedAt>.json` / `.csv` (colons as dashes, no
+  milliseconds, e.g. `personal-data-export-2026-10-27T10-29-42Z.csv`), both with
+  the same records, the reader account
   included. Each starts with `generatedAt` (ISO time, set on the server),
   `searchedEmail` and `operatorId` (the operator's user id, never their
   email): the JSON as its first keys, the CSV as its first three columns on

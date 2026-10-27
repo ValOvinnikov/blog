@@ -21,10 +21,7 @@ export type TDataRequestExportFormat = TValueOf<
   typeof DATA_REQUEST_EXPORT_FORMAT
 >;
 
-export const DATA_REQUEST_EXPORT_FILE_NAME = {
-  JSON: 'personal-data-export.json',
-  CSV: 'personal-data-export.csv',
-} as const satisfies Record<TDataRequestExportFormat, string>;
+export const DATA_REQUEST_EXPORT_FILE_PREFIX = 'personal-data-export';
 
 export const DATA_REQUEST_LOG = {
   AUDIT_FAILED: 'data_request.audit_failed',

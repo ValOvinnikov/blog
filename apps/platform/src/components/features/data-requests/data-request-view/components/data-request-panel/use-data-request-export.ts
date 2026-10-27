@@ -2,7 +2,7 @@
 
 import { isOutcomeSuccess, type TMaybeUndefined } from '@blog/config';
 import {
-  DATA_REQUEST_EXPORT_FILE_NAME,
+  DATA_REQUEST_EXPORT_FILE_PREFIX,
   DATA_REQUEST_EXPORT_FORMAT,
   type TDataRequestExportFormat,
 } from '@platform/constants/data-request';
@@ -26,6 +26,16 @@ const SERIALIZE = {
   (data: TPersonalDataExport) => string
 >;
 
+// Windows refuses a colon in a file name.
+const toFileTimestamp = (isoTime: string): string =>
+  isoTime.replace(/\.\d+Z$/, 'Z').replaceAll(':', '-');
+
+const toExportFileName = (
+  format: TDataRequestExportFormat,
+  { generatedAt }: TPersonalDataExport,
+): string =>
+  `${DATA_REQUEST_EXPORT_FILE_PREFIX}-${toFileTimestamp(generatedAt)}.${format.toLowerCase()}`;
+
 export const useDataRequestExport = (exportFailed: string) => {
   const toast = useToast();
   const [isExporting, startExport] = useTransition();
@@ -45,7 +55,7 @@ export const useDataRequestExport = (exportFailed: string) => {
       if (isOutcomeSuccess(result)) {
         downloadFile(
           link,
-          DATA_REQUEST_EXPORT_FILE_NAME[requestedFormat],
+          toExportFileName(requestedFormat, result.data),
           SERIALIZE[requestedFormat](result.data),
         );
         return;

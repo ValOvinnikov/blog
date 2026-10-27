@@ -1,3 +1,5 @@
+import { isNull, isString, isUndefined } from '@blog/utils/primitives';
+
 export type TCsvCell = string | number | boolean | null | undefined;
 
 // A spreadsheet runs a text cell starting with one of these as a formula.
@@ -8,8 +10,8 @@ const ROW_SEPARATOR = '\r\n';
 const UTF8_BOM = '﻿';
 
 function toCsvCell(value: TCsvCell): string {
-  if (value === null || value === undefined) return '';
-  if (typeof value !== 'string') return String(value);
+  if (isNull(value) || isUndefined(value)) return '';
+  if (!isString(value)) return String(value);
 
   const text = FORMULA_TRIGGER.test(value) ? `'${value}` : value;
   return NEEDS_QUOTES.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
