@@ -4,23 +4,20 @@ import { renameModuleHeadingBlockType } from './index';
 
 describe(renameModuleHeadingBlockType, () => {
   it('renames a localizedHeadingBlock to moduleHeadingBlock', () => {
-    expect(
-      renameModuleHeadingBlockType({
-        _type: 'localizedHeadingBlock',
-        heading: [],
-      }),
-    ).toEqual(at('_type', set('moduleHeadingBlock')));
+    const result = renameModuleHeadingBlockType({
+      _type: 'localizedHeadingBlock',
+      heading: [],
+    });
+
+    expect(result).toEqual(at('_type', set('moduleHeadingBlock')));
   });
 
-  it('is idempotent — a moduleHeadingBlock is left alone', () => {
-    expect(
-      renameModuleHeadingBlockType({ _type: 'moduleHeadingBlock' }),
-    ).toBeUndefined();
-  });
+  it.each(['moduleHeadingBlock', 'headingBlock'])(
+    'leaves a %s alone',
+    (type) => {
+      const result = renameModuleHeadingBlockType({ _type: type });
 
-  it('leaves every other object alone', () => {
-    expect(
-      renameModuleHeadingBlockType({ _type: 'headingBlock' }),
-    ).toBeUndefined();
-  });
+      expect(result).toBeUndefined();
+    },
+  );
 });

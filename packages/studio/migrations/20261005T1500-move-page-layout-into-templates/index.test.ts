@@ -1,163 +1,162 @@
-import type { MigrationContext } from 'sanity/migrate';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
+import { at, createIfNotExists, patch, set, unset } from 'sanity/migrate';
 
-import { migratePageDocument } from './index';
+import migration from './index';
 
-const hero = { _type: 'reference', _ref: 'hero-1' };
-const modules = [{ _key: 'm1', _type: 'module_cta', _ref: 'cta-1' }];
+faker.seed(15000);
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
-
-type TPage = Record<string, unknown> & { _id: string; _type: string };
-
-const createContext = (
-  pages: TPage[],
-  groups: { pageIds: string[] }[] = [],
-): MigrationContext =>
-  ({
-    client: {
-      fetch: async (query: string) => {
-        if (query.includes('translation.metadata')) return groups;
-        if (query.includes('_type in $types')) return pages;
-        throw new Error(`Unexpected query in test: ${query}`);
-      },
-    },
-  }) as unknown as MigrationContext;
-
-const run = (doc: TPage, context: MigrationContext) =>
-  migratePageDocument({ ...baseDoc, ...doc }, context);
-
-const englishAbout: TPage = {
-  _id: 'about-en',
-  _type: 'page_landing',
-  language: 'EN',
-  title: 'About',
-  hero,
-  modules,
-};
-const dutchAbout: TPage = {
-  _id: 'about-nl',
-  _type: 'page_landing',
-  language: 'NL',
-  title: 'Over ons',
-  modules: [],
-};
-const aboutGroup = [{ pageIds: ['about-en', 'about-nl'] }];
-
-const templateCreate = {
-  type: 'createIfNotExists',
-  document: {
-    _id: 'template-about-en',
-    _type: 'template_landing',
-    title: 'About',
-    hero,
-    modules,
+const MOCK_HERO = { _type: 'reference', _ref: faker.string.uuid() };
+const MOCK_MODULES = [
+  {
+    _key: faker.string.alphanumeric(12),
+    _type: 'module_cta',
+    _ref: faker.string.uuid(),
   },
-};
+];
+const MOCK_ENGLISH_TITLE = faker.lorem.words(2);
+const MOCK_DUTCH_TITLE = faker.lorem.words(2);
+const MOCK_ENGLISH_ID = faker.string.uuid();
+const MOCK_DUTCH_ID = faker.string.uuid();
+const MOCK_TEMPLATE_ID = `template-${MOCK_ENGLISH_ID}`;
 
-const pagePatch = (id: string, withHero: boolean) => ({
-  type: 'patch',
-  id,
-  patches: [
-    {
-      path: ['template'],
-      op: {
-        type: 'set',
-        value: { _type: 'reference', _ref: 'template-about-en' },
-      },
-    },
-    ...(withHero ? [{ path: ['hero'], op: { type: 'unset' } }] : []),
-    { path: ['modules'], op: { type: 'unset' } },
-  ],
-});
+const mockReference = (ref: string) => ({ _type: 'reference', _ref: ref });
 
-describe('move-page-layout-into-templates migration', () => {
-  let context: MigrationContext;
-
-  beforeEach(() => {
-    context = createContext([englishAbout, dutchAbout], aboutGroup);
+const mockTranslationGroup = (...pageIds: string[]) =>
+  mockMigrationDocument({
+    _type: 'translation.metadata',
+    translations: pageIds.map((id) => ({ value: mockReference(id) })),
   });
 
-  it("points a translated page at the template built from its default-language page's layout", async () => {
-    await expect(run(dutchAbout, context)).resolves.toEqual([
-      templateCreate,
-      pagePatch('about-nl', false),
+const mockEnglishPage = () =>
+  mockMigrationDocument({
+    _id: MOCK_ENGLISH_ID,
+    _type: 'page_landing',
+    language: LOCALE_ISO_CODES.EN,
+    title: MOCK_ENGLISH_TITLE,
+    hero: MOCK_HERO,
+    modules: MOCK_MODULES,
+  });
+
+const mockDutchPage = (fields: Record<string, unknown> = {}) =>
+  mockMigrationDocument({
+    _id: MOCK_DUTCH_ID,
+    _type: 'page_landing',
+    language: LOCALE_ISO_CODES.NL,
+    title: MOCK_DUTCH_TITLE,
+    modules: [],
+    ...fields,
+  });
+
+const expectedTemplateCreate = createIfNotExists({
+  _id: MOCK_TEMPLATE_ID,
+  _type: 'template_landing',
+  title: MOCK_ENGLISH_TITLE,
+  hero: MOCK_HERO,
+  modules: MOCK_MODULES,
+});
+
+const expectedPagePatch = (pageId: string, withHero: boolean) =>
+  patch(pageId, [
+    at('template', set(mockReference(MOCK_TEMPLATE_ID))),
+    ...(withHero ? [at('hero', unset())] : []),
+    at('modules', unset()),
+  ]);
+
+describe('move-page-layout-into-templates', () => {
+  const english = mockEnglishPage();
+  const dutch = mockDutchPage();
+  const group = mockTranslationGroup(MOCK_ENGLISH_ID, MOCK_DUTCH_ID);
+
+  it("points a translated page at its default-language page's template", async () => {
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([english, dutch, group]),
+    });
+
+    const mutations = await runDocumentMigration(migration, dutch, context);
+
+    expect(mutations).toEqual([
+      expectedTemplateCreate,
+      expectedPagePatch(MOCK_DUTCH_ID, false),
     ]);
   });
 
   it('moves the default-language page onto the same template', async () => {
-    await expect(run(englishAbout, context)).resolves.toEqual([
-      templateCreate,
-      pagePatch('about-en', true),
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([english, dutch, group]),
+    });
+
+    const mutations = await runDocumentMigration(migration, english, context);
+
+    expect(mutations).toEqual([
+      expectedTemplateCreate,
+      expectedPagePatch(MOCK_ENGLISH_ID, true),
     ]);
   });
 
   it('builds a standalone page a template of its own', async () => {
-    const home: TPage = {
-      _id: 'page_home',
+    const home = mockMigrationDocument({
       _type: 'page_home',
-      title: 'Home',
-      modules,
-    };
+      title: MOCK_ENGLISH_TITLE,
+      hero: MOCK_HERO,
+      modules: MOCK_MODULES,
+    });
+    const templateId = `template-${home._id}`;
 
-    await expect(run(home, createContext([home]))).resolves.toEqual([
-      {
-        type: 'createIfNotExists',
-        document: {
-          _id: 'template-page_home',
-          _type: 'template_home',
-          title: 'Home',
-          modules,
-        },
-      },
-      {
-        type: 'patch',
-        id: 'page_home',
-        patches: [
-          {
-            path: ['template'],
-            op: {
-              type: 'set',
-              value: { _type: 'reference', _ref: 'template-page_home' },
-            },
-          },
-          { path: ['modules'], op: { type: 'unset' } },
-        ],
-      },
+    const mutations = await runDocumentMigration(
+      migration,
+      home,
+      mockMigrationContext({ fetch: mockGroqFetch([home]) }),
+    );
+
+    expect(mutations).toEqual([
+      createIfNotExists({
+        _id: templateId,
+        _type: 'template_home',
+        title: MOCK_ENGLISH_TITLE,
+        hero: MOCK_HERO,
+        modules: MOCK_MODULES,
+      }),
+      patch(home._id, [
+        at('template', set(mockReference(templateId))),
+        at('hero', unset()),
+        at('modules', unset()),
+      ]),
     ]);
   });
 
   it('leaves an already-migrated page untouched on a second run', async () => {
-    const migrated: TPage = {
-      _id: 'about-nl',
-      _type: 'page_landing',
-      language: 'NL',
-      title: 'Over ons',
-      template: { _type: 'reference', _ref: 'template-about-en' },
-    };
+    const migrated = mockDutchPage({
+      modules: undefined,
+      template: mockReference(MOCK_TEMPLATE_ID),
+    });
 
-    await expect(
-      run(migrated, createContext([migrated], aboutGroup)),
-    ).resolves.toEqual([]);
+    const mutations = await runDocumentMigration(
+      migration,
+      migrated,
+      mockMigrationContext({ fetch: mockGroqFetch([migrated, group]) }),
+    );
+
+    expect(mutations).toEqual([]);
   });
 
   it('keeps a template an editor already chose while clearing the old layout', async () => {
-    const chosen: TPage = {
-      ...dutchAbout,
-      template: { _type: 'reference', _ref: 'template-custom' },
-    };
+    const chosen = mockDutchPage({
+      template: mockReference(faker.string.uuid()),
+    });
 
-    await expect(
-      run(chosen, createContext([englishAbout, chosen], aboutGroup)),
-    ).resolves.toEqual([
-      {
-        type: 'patch',
-        id: 'about-nl',
-        patches: [{ path: ['modules'], op: { type: 'unset' } }],
-      },
-    ]);
+    const mutations = await runDocumentMigration(
+      migration,
+      chosen,
+      mockMigrationContext({ fetch: mockGroqFetch([english, chosen, group]) }),
+    );
+
+    expect(mutations).toEqual([patch(MOCK_DUTCH_ID, [at('modules', unset())])]);
   });
 });

@@ -1,18 +1,25 @@
+import {
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
 import { del } from 'sanity/migrate';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-  _type: 'settings_voice',
-};
+faker.seed(18060);
 
-describe('delete-orphaned-settings-voice migration', () => {
-  it.each(['settings-voice', 'drafts.settings-voice'])('deletes %s', (id) => {
-    expect(migration.migrate.document({ ...baseDoc, _id: id })).toEqual([
-      del(id),
-    ]);
-  });
+const MOCK_VOICE_ID = faker.string.uuid();
+
+describe('delete-orphaned-settings-voice', () => {
+  it.each([MOCK_VOICE_ID, `drafts.${MOCK_VOICE_ID}`])(
+    'deletes %s',
+    async (id) => {
+      const voice = mockMigrationDocument({ _id: id, _type: 'settings_voice' });
+
+      const mutations = await runDocumentMigration(migration, voice);
+
+      expect(mutations).toEqual([del(id)]);
+    },
+  );
 });

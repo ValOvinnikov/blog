@@ -1,26 +1,31 @@
+import {
+  mockImageAsset,
+  mockLocalizedHeadingBlock,
+  mockLocalizedImage,
+  mockPlainHeadingBlock,
+  mockPlainImage,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
-
-import { localizedString } from '../lib/in-default-locale';
 
 import { localizeFeatureListText } from './index';
 
-const asset = { _type: 'reference', _ref: 'image-1' };
+faker.seed(11);
+
+const MOCK_MODULE_HEADING = faker.lorem.words(3);
+const MOCK_FEATURE_HEADING = faker.lorem.words(2);
+const MOCK_ALT = faker.lorem.words(2);
+const MOCK_ASSET = mockImageAsset();
 
 describe(localizeFeatureListText, () => {
   it('moves a Feature List module heading block into the default language', () => {
     expect(
       localizeFeatureListText({
         _type: 'module_featureList',
-        headingBlock: { _type: 'headingBlock', heading: 'What you get' },
+        headingBlock: mockPlainHeadingBlock(MOCK_MODULE_HEADING),
       }),
     ).toEqual([
-      at(
-        'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('What you get'),
-        }),
-      ),
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_MODULE_HEADING))),
     ]);
   });
 
@@ -28,46 +33,29 @@ describe(localizeFeatureListText, () => {
     expect(
       localizeFeatureListText({
         _type: 'block_feature',
-        headingBlock: { _type: 'headingBlock', heading: 'Fast' },
-        image: { _type: 'imageWithAlt', asset, alt: 'A rocket' },
+        headingBlock: mockPlainHeadingBlock(MOCK_FEATURE_HEADING),
+        image: mockPlainImage(MOCK_ASSET, MOCK_ALT),
       }),
     ).toEqual([
-      at(
-        'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('Fast'),
-        }),
-      ),
-      at(
-        'image',
-        set({
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: localizedString('A rocket'),
-        }),
-      ),
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_FEATURE_HEADING))),
+      at('image', set(mockLocalizedImage(MOCK_ASSET, MOCK_ALT))),
     ]);
   });
 
-  it('is idempotent — an already localized feature is left alone', () => {
-    expect(
-      localizeFeatureListText({
+  it.each([
+    {
+      name: 'an already localized feature',
+      doc: {
         _type: 'block_feature',
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('Fast'),
-        },
-        image: {
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: localizedString('A rocket'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a feature with only an icon and no heading block alone', () => {
-    expect(localizeFeatureListText({ _type: 'block_feature' })).toBeUndefined();
+        headingBlock: mockLocalizedHeadingBlock(MOCK_FEATURE_HEADING),
+        image: mockLocalizedImage(MOCK_ASSET, MOCK_ALT),
+      },
+    },
+    {
+      name: 'a feature with only an icon and no heading block',
+      doc: { _type: 'block_feature' },
+    },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeFeatureListText(doc)).toBeUndefined();
   });
 });
