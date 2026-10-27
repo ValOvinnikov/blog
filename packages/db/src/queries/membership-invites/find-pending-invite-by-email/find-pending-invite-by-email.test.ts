@@ -1,11 +1,15 @@
 import {
-  MEMBERSHIP_ROLE,
   PERSONAL_DATA_FALLBACK_REASON,
   PERSONAL_DATA_OWNER,
 } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
+import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
 import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import {
+  MOCK_INVITE_CONSUMED_AT,
+  mockMembershipInvite,
+} from '@blog/db/testing/membership-invites/fixtures';
 import {
   usePersonalDataFallbackListener,
   usePersonalDataKeys,
@@ -25,21 +29,21 @@ usePersonalDataKeys();
 const fallbackListener = usePersonalDataFallbackListener();
 
 const MOCK_TAGGED_INVITE_EMAIL = taggedMixedCaseAddress(MOCK_INVITE_EMAIL);
-const MOCK_CONSUMED_AT = faker.date.past();
+const MOCK_UNINVITED_EMAIL = faker.internet.email();
 
 async function insertInvite(
   overrides: Partial<typeof schema.membershipInvites.$inferInsert> = {},
 ): Promise<string> {
   const { id: tenantId } = await insertTestTenant(db());
-  await db()
-    .insert(schema.membershipInvites)
-    .values({
-      tenantId,
-      ...inviteEmailColumns(MOCK_INVITE_EMAIL),
-      role: MEMBERSHIP_ROLE.OWNER,
-      ...overrides,
-    });
+  await mockMembershipInvite(db(), tenantId, {
+    ...inviteEmailColumns(MOCK_INVITE_EMAIL),
+    ...overrides,
+  });
   return tenantId;
+}
+
+function tenantIdsOf(invites: TMembershipInvite[]): string[] {
+  return invites.map(({ tenantId }) => tenantId);
 }
 
 afterEach(async () => {
@@ -51,13 +55,13 @@ describe(findPendingInviteByEmail, () => {
   it('returns every pending invite across tenants, skipping consumed ones', async () => {
     const pendingTenantId = await insertInvite();
     const secondPendingTenantId = await insertInvite();
-    await insertInvite({ consumedAt: MOCK_CONSUMED_AT });
+    await insertInvite({ consumedAt: MOCK_INVITE_CONSUMED_AT });
 
     const invites = await findPendingInviteByEmail(
       MOCK_INVITE_EMAIL.toUpperCase(),
     );
 
-    expect(invites.map(({ tenantId }) => tenantId).sort()).toEqual(
+    expect(tenantIdsOf(invites).sort()).toEqual(
       [pendingTenantId, secondPendingTenantId].sort(),
     );
   });
@@ -67,7 +71,7 @@ describe(findPendingInviteByEmail, () => {
 
     const invites = await findPendingInviteByEmail(`  ${MOCK_INVITE_EMAIL}  `);
 
-    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    expect(tenantIdsOf(invites)).toEqual([tenantId]);
   });
 
   it('finds an invite sent to a +tag address by that exact address', async () => {
@@ -77,7 +81,7 @@ describe(findPendingInviteByEmail, () => {
 
     const invites = await findPendingInviteByEmail(MOCK_TAGGED_INVITE_EMAIL);
 
-    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    expect(tenantIdsOf(invites)).toEqual([tenantId]);
   });
 
   it.each([
@@ -94,7 +98,9 @@ describe(findPendingInviteByEmail, () => {
   ])('finds nothing for %s', async (_label, sentTo, requested) => {
     await insertInvite(inviteEmailColumns(sentTo));
 
-    await expect(findPendingInviteByEmail(requested)).resolves.toEqual([]);
+    const invites = await findPendingInviteByEmail(requested);
+
+    expect(invites).toEqual([]);
   });
 
   it('matches an invite not yet backfilled by its plain email, and reports it', async () => {
@@ -105,7 +111,7 @@ describe(findPendingInviteByEmail, () => {
 
     const invites = await findPendingInviteByEmail(MOCK_INVITE_EMAIL);
 
-    expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+    expect(tenantIdsOf(invites)).toEqual([tenantId]);
     expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
       owner: PERSONAL_DATA_OWNER.INVITE,
       reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
@@ -115,9 +121,9 @@ describe(findPendingInviteByEmail, () => {
   it('returns nothing for an address with no invite', async () => {
     await insertInvite();
 
-    await expect(
-      findPendingInviteByEmail(faker.internet.email()),
-    ).resolves.toEqual([]);
+    const invites = await findPendingInviteByEmail(MOCK_UNINVITED_EMAIL);
+
+    expect(invites).toEqual([]);
   });
 
   describe('while the index key is unset', () => {
@@ -135,7 +141,7 @@ describe(findPendingInviteByEmail, () => {
 
         const invites = await findPendingInviteByEmail(email);
 
-        expect(invites.map((invite) => invite.tenantId)).toEqual([tenantId]);
+        expect(tenantIdsOf(invites)).toEqual([tenantId]);
         expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
           owner: PERSONAL_DATA_OWNER.INVITE,
           reason: PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET,

@@ -2,11 +2,17 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { createMembership } from './create-membership';
 
 vi.mock('@blog/db/client');
+
+faker.seed(6022);
+
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_MISSING_USER_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 
@@ -20,19 +26,23 @@ describe(createMembership, () => {
   let tenantId: string;
 
   beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
+    await insertTestUser(db(), { id: MOCK_USER_ID });
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it('inserts a new membership row', async () => {
     const membership = await createMembership(
-      'user-1',
+      MOCK_USER_ID,
       tenantId,
       MEMBERSHIP_ROLE.OWNER,
     );
 
-    expect(membership).toMatchObject({
-      userId: 'user-1',
+    const rows = await db().select().from(schema.memberships);
+    expect(rows).toEqual([membership]);
+    expect(membership).toEqual({
+      id: membership.id,
+      createdAt: membership.createdAt,
+      userId: MOCK_USER_ID,
       tenantId,
       role: MEMBERSHIP_ROLE.OWNER,
     });
@@ -40,28 +50,28 @@ describe(createMembership, () => {
 
   it('is idempotent when the (userId, tenantId) pair already has a membership', async () => {
     const first = await createMembership(
-      'user-1',
+      MOCK_USER_ID,
       tenantId,
       MEMBERSHIP_ROLE.OWNER,
     );
 
     const second = await createMembership(
-      'user-1',
+      MOCK_USER_ID,
       tenantId,
       MEMBERSHIP_ROLE.EDITOR,
     );
 
-    expect(second).toEqual(first);
     const rows = await db().select().from(schema.memberships);
-    expect(rows).toHaveLength(1);
+    expect(second).toEqual(first);
+    expect(rows).toEqual([first]);
   });
 
   it('allows the same user to hold memberships on different tenants', async () => {
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
 
-    await createMembership('user-1', tenantOneId, MEMBERSHIP_ROLE.OWNER);
-    await createMembership('user-1', tenantTwoId, MEMBERSHIP_ROLE.READER);
+    await createMembership(MOCK_USER_ID, tenantOneId, MEMBERSHIP_ROLE.OWNER);
+    await createMembership(MOCK_USER_ID, tenantTwoId, MEMBERSHIP_ROLE.READER);
 
     const rows = await db().select().from(schema.memberships);
     expect(rows).toHaveLength(2);
@@ -69,34 +79,27 @@ describe(createMembership, () => {
 
   it('rejects a membership for a user that does not exist', async () => {
     await expect(
-      createMembership('missing-user', tenantId, MEMBERSHIP_ROLE.OWNER),
+      createMembership(MOCK_MISSING_USER_ID, tenantId, MEMBERSHIP_ROLE.OWNER),
     ).rejects.toThrow();
   });
-});
 
-describe('foreign-key cascade', () => {
-  let tenantId: string;
+  describe('foreign-key cascade', () => {
+    beforeEach(async () => {
+      await createMembership(MOCK_USER_ID, tenantId, MEMBERSHIP_ROLE.OWNER);
+    });
 
-  beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
+    it('removes a membership when its owning user is deleted', async () => {
+      await db().delete(schema.users).where(eq(schema.users.id, MOCK_USER_ID));
 
-  it('removes a membership when its owning user is deleted', async () => {
-    await createMembership('user-1', tenantId, MEMBERSHIP_ROLE.OWNER);
+      const rows = await db().select().from(schema.memberships);
+      expect(rows).toEqual([]);
+    });
 
-    await db().delete(schema.users).where(eq(schema.users.id, 'user-1'));
+    it('removes a membership when its owning tenant is deleted', async () => {
+      await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
 
-    const rows = await db().select().from(schema.memberships);
-    expect(rows).toHaveLength(0);
-  });
-
-  it('removes a membership when its owning tenant is deleted', async () => {
-    await createMembership('user-1', tenantId, MEMBERSHIP_ROLE.OWNER);
-
-    await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
-
-    const rows = await db().select().from(schema.memberships);
-    expect(rows).toHaveLength(0);
+      const rows = await db().select().from(schema.memberships);
+      expect(rows).toEqual([]);
+    });
   });
 });
