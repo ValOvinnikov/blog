@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -9,18 +10,21 @@ import { LogoWallTile } from './logo-wall-tile';
 
 vi.mock('@web/i18n/navigation');
 
-const LINK_ARIA_LABEL = 'Visit the Acme Corp website';
+faker.seed(6011);
+
+const MOCK_LINK_ARIA_LABEL = faker.lorem.sentence();
+const MOCK_ASPECT_RATIO = 2400 / 1260;
 const LOGO_TEST_ID = 'logo-wall-tile-logo';
 const LOGO_ASPECT_PROPERTY = '--logo-aspect';
 
-const item = mockLogoItem();
+const MOCK_LOGO = mockLogoItem();
 
-const darkImage = mockSanityImage({
+const MOCK_DARK_IMAGE = mockSanityImage({
   assetId: 'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
-  alt: item.name,
+  alt: MOCK_LOGO.name,
 });
 
-const setup = customRender(LogoWallTile, { logo: item });
+const setup = customRender(LogoWallTile, { logo: MOCK_LOGO });
 
 describe(`<${LogoWallTile.name}/>`, () => {
   describe('with the default logo', () => {
@@ -29,7 +33,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
     });
 
     it('renders the logo image with the company name as its alt', () => {
-      const logoImage = screen.getByRole('img', { name: item.name });
+      const logoImage = screen.getByRole('img', { name: MOCK_LOGO.name });
       expect(logoImage).toBeVisible();
     });
 
@@ -42,12 +46,12 @@ describe(`<${LogoWallTile.name}/>`, () => {
   it('names the link by its aria label override when one is set', () => {
     setup({
       logo: mockLogoItem({
-        link: { ...MOCK_LOGO_LINK, ariaLabel: LINK_ARIA_LABEL },
+        link: { ...MOCK_LOGO_LINK, ariaLabel: MOCK_LINK_ARIA_LABEL },
       }),
     });
 
     const link = screen.getByRole('link', {
-      name: LINK_ARIA_LABEL,
+      name: MOCK_LINK_ARIA_LABEL,
     });
     expect(link).toHaveAttribute('href', MOCK_LOGO_LINK.href);
   });
@@ -58,7 +62,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
     });
 
     it('names the link by the company when it has no aria label override', () => {
-      const link = screen.getByRole('link', { name: item.name });
+      const link = screen.getByRole('link', { name: MOCK_LOGO.name });
       expect(link).toHaveAttribute('href', MOCK_LOGO_LINK.href);
     });
 
@@ -72,15 +76,19 @@ describe(`<${LogoWallTile.name}/>`, () => {
     setup({
       logo: mockLogoItem({
         image: mockSanityImage({
-          dimensions: { width: 2400, height: 1260, aspectRatio: 2400 / 1260 },
+          dimensions: {
+            width: 2400,
+            height: 1260,
+            aspectRatio: MOCK_ASPECT_RATIO,
+          },
         }),
       }),
     });
 
     const logo = screen.getByTestId(LOGO_TEST_ID);
-    expect(logo.style.getPropertyValue(LOGO_ASPECT_PROPERTY)).toBe(
-      String(2400 / 1260),
-    );
+    const aspectRatio = logo.style.getPropertyValue(LOGO_ASPECT_PROPERTY);
+
+    expect(aspectRatio).toBe(String(MOCK_ASPECT_RATIO));
   });
 
   it.each([
@@ -97,19 +105,21 @@ describe(`<${LogoWallTile.name}/>`, () => {
     setup({ logo: mockLogoItem({ image: mockSanityImage({ dimensions }) }) });
 
     const logo = screen.getByTestId(LOGO_TEST_ID);
-    expect(logo.style.getPropertyValue(LOGO_ASPECT_PROPERTY)).toBe('');
+    const aspectRatio = logo.style.getPropertyValue(LOGO_ASPECT_PROPERTY);
+
+    expect(aspectRatio).toBe('');
   });
 
   it('renders the dark-background logo beside the regular one when set', () => {
-    setup({ logo: mockLogoItem({ imageDark: darkImage }) });
+    setup({ logo: mockLogoItem({ imageDark: MOCK_DARK_IMAGE }) });
 
-    const logoImages = screen.getAllByRole('img', { name: item.name });
+    const logoImages = screen.getAllByRole('img', { name: MOCK_LOGO.name });
     expect(logoImages).toHaveLength(2);
   });
 
   it('renders one link for a linked item with a dark-background logo', () => {
     setup({
-      logo: mockLogoItem({ imageDark: darkImage, link: MOCK_LOGO_LINK }),
+      logo: mockLogoItem({ imageDark: MOCK_DARK_IMAGE, link: MOCK_LOGO_LINK }),
     });
 
     const links = screen.getAllByRole('link');

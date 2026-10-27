@@ -1,5 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
+import type { TFaqModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockFaqQuestion } from '@web/testing/modules/faq/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -7,9 +9,6 @@ import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
-
-const REFUNDS_QUESTION = 'Do you offer refunds?';
-const TRIAL_QUESTION = 'Is there a free trial?';
 
 const { getFaqModuleMock } = vi.hoisted(() => ({
   getFaqModuleMock: vi.fn(),
@@ -27,32 +26,37 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const baseModule = {
+faker.seed(31);
+
+const MOCK_FAQ_MODULE_ID = faker.string.uuid();
+const MOCK_FIRST_QUESTION = faker.lorem.sentence();
+const MOCK_SECOND_QUESTION = faker.lorem.sentence();
+
+const mockFaqModule = (overrides: Partial<TFaqModule> = {}): TFaqModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock({ heading: 'Frequently asked questions' }),
+  headingBlock: mockHeadingBlock(),
+  questions: [],
   ctaButtons: [],
   contentAlignment: undefined,
   layout: undefined,
-};
+  ...overrides,
+});
 
 const setup = customRenderAsync(FaqModule, {
-  id: 'faq-1',
+  id: MOCK_FAQ_MODULE_ID,
 });
 
 describe(`<${FaqModule.name}/>`, () => {
   beforeEach(() => {
     getFaqModuleMock.mockReset();
+    getFaqModuleMock.mockResolvedValue(okResult(mockFaqModule()));
   });
 
   it('fetches the module by id with the tenant Sanity context', async () => {
-    getFaqModuleMock.mockResolvedValue(
-      okResult({ ...baseModule, questions: [] }),
-    );
-
     await setup();
 
     expect(getFaqModuleMock).toHaveBeenCalledWith(
-      'faq-1',
+      MOCK_FAQ_MODULE_ID,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
@@ -66,19 +70,33 @@ describe(`<${FaqModule.name}/>`, () => {
   });
 
   it('renders the resolved questions as accordion triggers', async () => {
-    const questions = [
-      mockFaqQuestion({ id: 'faq-a', question: REFUNDS_QUESTION }),
-      mockFaqQuestion({ id: 'faq-b', question: TRIAL_QUESTION }),
-    ];
-    getFaqModuleMock.mockResolvedValue(okResult({ ...baseModule, questions }));
+    getFaqModuleMock.mockResolvedValue(
+      okResult(
+        mockFaqModule({
+          questions: [
+            mockFaqQuestion({
+              id: faker.string.uuid(),
+              question: MOCK_FIRST_QUESTION,
+            }),
+            mockFaqQuestion({
+              id: faker.string.uuid(),
+              question: MOCK_SECOND_QUESTION,
+            }),
+          ],
+        }),
+      ),
+    );
 
     await setup();
 
-    const refundsTrigger = screen.getByRole('button', {
-      name: REFUNDS_QUESTION,
+    const firstTrigger = screen.getByRole('button', {
+      name: MOCK_FIRST_QUESTION,
     });
-    const trialTrigger = screen.getByRole('button', { name: TRIAL_QUESTION });
-    expect(refundsTrigger).toBeVisible();
-    expect(trialTrigger).toBeVisible();
+    const secondTrigger = screen.getByRole('button', {
+      name: MOCK_SECOND_QUESTION,
+    });
+
+    expect(firstTrigger).toBeVisible();
+    expect(secondTrigger).toBeVisible();
   });
 });

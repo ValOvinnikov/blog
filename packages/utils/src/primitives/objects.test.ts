@@ -11,15 +11,15 @@ describe(objectKeys, () => {
 });
 
 describe(toTitleCase, () => {
-  it('title-cases a single word', () => {
-    expect(toTitleCase('CONSOLE')).toBe('Console');
-  });
-
-  it('title-cases an underscore-separated multi-word value', () => {
-    expect(toTitleCase('POST_CATEGORY')).toBe('Post Category');
-  });
-
-  it('title-cases a single-letter value', () => {
-    expect(toTitleCase('X')).toBe('X');
+  it.each([
+    ['a single word', 'CONSOLE', 'Console'],
+    [
+      'an underscore-separated multi-word value',
+      'POST_CATEGORY',
+      'Post Category',
+    ],
+    ['a single-letter value', 'X', 'X'],
+  ])('title-cases %s', (_label, value, expected) => {
+    expect(toTitleCase(value)).toBe(expected);
   });
 });

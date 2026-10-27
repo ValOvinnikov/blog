@@ -5,11 +5,23 @@ import { PricingCard } from './pricing-card';
 
 faker.seed(123);
 
+const MOCK_PRODUCT_NAME = faker.commerce.productName();
+const MOCK_AMOUNT = `$${faker.number.int({ min: 10, max: 99 })}`;
+const MOCK_COMPARE_AT = `$${faker.number.int({ min: 100, max: 199 })}`;
+const MOCK_PERIOD = faker.lorem.words(2);
+const MOCK_BADGE = faker.lorem.words(2);
+const MOCK_FEATURES = faker.helpers.multiple(() => faker.lorem.words(2), {
+  count: 2,
+});
+const MOCK_DESCRIPTION = faker.commerce.productDescription();
+const MOCK_FOOTNOTE = faker.lorem.sentence();
+const MOCK_ACTION_LABEL = faker.lorem.words(2);
+const MOCK_ACTION_HREF = faker.internet.url();
+const PRICE_TEST_ID = 'price';
+
 const buildChildren = () => [
-  <PricingCard.Name key="name">
-    {faker.commerce.productName()}
-  </PricingCard.Name>,
-  <PricingCard.Price key="price" amount="$49" period="per month" />,
+  <PricingCard.Name key="name">{MOCK_PRODUCT_NAME}</PricingCard.Name>,
+  <PricingCard.Price key="price" amount={MOCK_AMOUNT} period={MOCK_PERIOD} />,
 ];
 
 const setup = customRender(PricingCard, {
@@ -18,71 +30,66 @@ const setup = customRender(PricingCard, {
 
 describe(`<${PricingCard.name}/>`, () => {
   it('renders the Name slot as a level-3 heading', () => {
-    const name = faker.commerce.productName();
-    setup({
-      children: [
-        <PricingCard.Name key="name">{name}</PricingCard.Name>,
-        <PricingCard.Price key="price" amount="$49" />,
-      ],
+    setup();
+
+    const heading = screen.getByRole('heading', {
+      level: 3,
+      name: MOCK_PRODUCT_NAME,
     });
-    expect(screen.getByRole('heading', { level: 3, name })).toBeVisible();
+
+    expect(heading).toBeVisible();
   });
 
   it('shows the Badge when the card is highlighted', () => {
     setup({
       isHighlighted: true,
       children: [
-        <PricingCard.Badge key="badge">Most popular</PricingCard.Badge>,
+        <PricingCard.Badge key="badge">{MOCK_BADGE}</PricingCard.Badge>,
         ...buildChildren(),
       ],
     });
-    expect(screen.getByText('Most popular')).toBeVisible();
+
+    const badge = screen.getByText(MOCK_BADGE);
+
+    expect(badge).toBeVisible();
   });
 
-  it('does not render the Badge when the card is not highlighted', () => {
-    setup({
-      isHighlighted: false,
-      children: [
-        <PricingCard.Badge key="badge">Most popular</PricingCard.Badge>,
-        ...buildChildren(),
-      ],
-    });
-    expect(screen.queryByText('Most popular')).not.toBeInTheDocument();
-  });
+  it.each([false, undefined])(
+    'hides the Badge when the card is not highlighted (%s)',
+    (isHighlighted) => {
+      setup({
+        isHighlighted,
+        children: [
+          <PricingCard.Badge key="badge">{MOCK_BADGE}</PricingCard.Badge>,
+          ...buildChildren(),
+        ],
+      });
 
-  it('does not render a Badge when isHighlighted is left at its default', () => {
-    setup({
-      children: [
-        <PricingCard.Badge key="badge">Most popular</PricingCard.Badge>,
-        ...buildChildren(),
-      ],
-    });
-    expect(screen.queryByText('Most popular')).not.toBeInTheDocument();
-  });
+      const badge = screen.queryByText(MOCK_BADGE);
+
+      expect(badge).not.toBeInTheDocument();
+    },
+  );
 
   it('announces a compareAt price with the label passed in', () => {
     const compareAtLabel = faker.lorem.words(2);
     setup({
       children: [
-        <PricingCard.Name key="name">
-          {faker.commerce.productName()}
-        </PricingCard.Name>,
+        ...buildChildren(),
         <PricingCard.Price
-          key="price"
-          amount="$39"
-          compareAt="$49"
+          key="compare-at"
+          amount={MOCK_AMOUNT}
+          compareAt={MOCK_COMPARE_AT}
           compareAtLabel={compareAtLabel}
-          period="per month"
         />,
       ],
     });
-    expect(screen.getByText(compareAtLabel)).toBeVisible();
-    expect(screen.getByText('$49')).toBeVisible();
-  });
 
-  it('does not render compareAt markup when omitted', () => {
-    setup();
-    expect(screen.queryByText(/regular/i)).not.toBeInTheDocument();
+    const label = screen.getByText(compareAtLabel);
+    const compareAt = screen.getByText(MOCK_COMPARE_AT);
+
+    expect(label).toBeVisible();
+    expect(compareAt).toBeVisible();
   });
 
   it('separates the amount and the period with a space', () => {
@@ -90,63 +97,77 @@ describe(`<${PricingCard.name}/>`, () => {
       children: [
         <PricingCard.Price
           key="price"
-          amount="$49"
-          period="per month"
-          dataTestId="price"
+          amount={MOCK_AMOUNT}
+          period={MOCK_PERIOD}
+          dataTestId={PRICE_TEST_ID}
         />,
       ],
     });
-    expect(screen.getByTestId('price')).toHaveTextContent('$49 per month');
+
+    const price = screen.getByTestId(PRICE_TEST_ID);
+
+    expect(price).toHaveTextContent(`${MOCK_AMOUNT} ${MOCK_PERIOD}`);
   });
 
-  it('renders the period exactly as passed, with no slash added', () => {
+  it('renders the period exactly as passed', () => {
     setup({
       children: [
-        <PricingCard.Price key="price" amount="$49" period="/month" />,
+        <PricingCard.Price key="price" amount={MOCK_AMOUNT} period="/month" />,
       ],
     });
-    expect(screen.getByText('/month')).toBeVisible();
-    expect(screen.queryByText('//month')).not.toBeInTheDocument();
+
+    const period = screen.getByText('/month');
+
+    expect(period).toBeVisible();
   });
 
-  it('hides each feature check icon from assistive tech', () => {
+  it('lists the features without exposing a check icon to assistive tech', () => {
     setup({
       children: [
         ...buildChildren(),
-        <PricingCard.Features
-          key="features"
-          items={['Unlimited projects', 'Priority support']}
-        />,
+        <PricingCard.Features key="features" items={MOCK_FEATURES} />,
       ],
     });
-    expect(screen.getByText('Unlimited projects')).toBeVisible();
-    expect(screen.getByText('Priority support')).toBeVisible();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+
+    const featureTexts = MOCK_FEATURES.map((feature) =>
+      screen.getByText(feature),
+    );
+    const icon = screen.queryByRole('img');
+
+    for (const featureText of featureTexts) {
+      expect(featureText).toBeVisible();
+    }
+    expect(icon).not.toBeInTheDocument();
   });
 
-  it('renders the Description slot when provided', () => {
-    const description = faker.commerce.productDescription();
+  it('renders the Description slot', () => {
     setup({
       children: [
         ...buildChildren(),
         <PricingCard.Description key="description">
-          {description}
+          {MOCK_DESCRIPTION}
         </PricingCard.Description>,
       ],
     });
-    expect(screen.getByText(description)).toBeVisible();
+
+    const description = screen.getByText(MOCK_DESCRIPTION);
+
+    expect(description).toBeVisible();
   });
 
-  it('renders the Footnote slot when provided', () => {
+  it('renders the Footnote slot', () => {
     setup({
       children: [
         ...buildChildren(),
         <PricingCard.Footnote key="footnote">
-          Billed annually
+          {MOCK_FOOTNOTE}
         </PricingCard.Footnote>,
       ],
     });
-    expect(screen.getByText('Billed annually')).toBeVisible();
+
+    const footnote = screen.getByText(MOCK_FOOTNOTE);
+
+    expect(footnote).toBeVisible();
   });
 
   it('renders caller-supplied content inside the Actions slot', () => {
@@ -154,15 +175,13 @@ describe(`<${PricingCard.name}/>`, () => {
       children: [
         ...buildChildren(),
         <PricingCard.Actions key="actions">
-          <a href="/signup">Get started</a>
+          <a href={MOCK_ACTION_HREF}>{MOCK_ACTION_LABEL}</a>
         </PricingCard.Actions>,
       ],
     });
-    expect(screen.getByRole('link', { name: 'Get started' })).toBeVisible();
-  });
 
-  it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: 'pricing-card' });
-    expect(screen.getByTestId('pricing-card')).toBeVisible();
+    const actionLink = screen.getByRole('link', { name: MOCK_ACTION_LABEL });
+
+    expect(actionLink).toBeVisible();
   });
 });

@@ -9,6 +9,8 @@ import type { TReleaseRun } from '@platform/server/releases/get-release-run';
 
 const RELEASE_AT = '2026-04-02T10:00:00.000Z';
 
+export const MOCK_RELEASE_LAST_TAG = 'v1.4.0';
+
 export const mockComparedCommit = (
   overrides: Partial<TComparedCommit> = {},
 ): TComparedCommit => ({
@@ -23,7 +25,7 @@ export const mockReleaseCandidate = (
   overrides: Partial<TReleaseCandidate> = {},
 ): TReleaseCandidate => ({
   headSha: '1234567abcdef1234567abcdef1234567abcdef',
-  lastTag: 'v1.4.0',
+  lastTag: MOCK_RELEASE_LAST_TAG,
   commits: [mockComparedCommit()],
   totalCommits: 1,
   isFileListTruncated: false,
@@ -56,3 +58,5 @@ export const mockReleaseRun = (
   isTenantMigrationFailed: false,
   ...overrides,
 });
+
+export const MOCK_LAST_TAG = mockReleaseCandidate().lastTag;

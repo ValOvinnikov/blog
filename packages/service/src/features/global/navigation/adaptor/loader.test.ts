@@ -10,13 +10,18 @@ import {
   mockRawExternalLinkDocument,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getNavigation } from './loader';
 import { navigationQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const tenant = mockTenant();
+faker.seed(6015106);
+
+const MOCK_LINK_LABEL = faker.lorem.word();
+const MOCK_LINK_URL = faker.internet.url();
+const MOCK_TENANT = mockTenant();
 
 describe(getNavigation, () => {
   beforeEach(() => {
@@ -26,13 +31,13 @@ describe(getNavigation, () => {
   it('throws when the navigation document does not exist', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await expect(getNavigation(tenant)).rejects.toThrow();
+    await expect(getNavigation(MOCK_TENANT)).rejects.toThrow();
   });
 
   it('defaults items to an empty array when none are set', async () => {
     mockRun.mockResolvedValueOnce(mockRawNavigation({ items: null }));
 
-    const result = await getNavigation(tenant);
+    const result = await getNavigation(MOCK_TENANT);
 
     expect(result.items).toEqual([]);
   });
@@ -43,18 +48,18 @@ describe(getNavigation, () => {
         items: [
           {
             link: mockRawExternalLinkDocument({
-              label: 'Blog',
-              url: '/blog',
+              label: MOCK_LINK_LABEL,
+              url: MOCK_LINK_URL,
             }),
           },
         ],
       }),
     );
 
-    const result = await getNavigation(tenant);
+    const result = await getNavigation(MOCK_TENANT);
 
     expect(result.items).toEqual([
-      mockLinkView({ label: 'Blog', href: '/blog' }),
+      mockLinkView({ label: MOCK_LINK_LABEL, href: MOCK_LINK_URL }),
     ]);
   });
 
@@ -66,17 +71,17 @@ describe(getNavigation, () => {
     async (_, overrides, expected) => {
       mockRun.mockResolvedValueOnce(mockRawNavigation(overrides));
 
-      const result = await getNavigation(tenant);
+      const result = await getNavigation(MOCK_TENANT);
 
       expect(result.showLanguageSwitcher).toBe(expected);
     },
   );
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getNavigation(tenant);
+    await getNavigation(MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(navigationQuery, {
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [mockCacheTag('navigation'), ...MOCK_LINKED_PAGE_CACHE_TAGS],

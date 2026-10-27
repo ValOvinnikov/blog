@@ -5,6 +5,7 @@ import {
   DISPLAY_MODE,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_TEAM_HEADING,
@@ -15,8 +16,6 @@ import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TeamModule } from './team-module';
-
-const MODULE_ID = 'team-1';
 
 const { getTeamModuleMock } = vi.hoisted(() => ({
   getTeamModuleMock: vi.fn(),
@@ -34,7 +33,11 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const baseModule = {
+faker.seed(12);
+
+const MOCK_MODULE_ID = faker.string.uuid();
+
+const MOCK_TEAM_MODULE = {
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockHeadingBlock({ heading: MOCK_TEAM_HEADING }),
   ctaButtons: [],
@@ -45,10 +48,11 @@ const baseModule = {
   showBios: false,
   showSocialLinks: false,
   layout: undefined,
+  members: MOCK_TEAM_MEMBERS,
 };
 
 const setup = customRenderAsync(TeamModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${TeamModule.name}/>`, () => {
@@ -58,23 +62,22 @@ describe(`<${TeamModule.name}/>`, () => {
 
   describe('when the module resolves', () => {
     beforeEach(async () => {
-      getTeamModuleMock.mockResolvedValue(
-        okResult({ ...baseModule, members: MOCK_TEAM_MEMBERS }),
-      );
+      getTeamModuleMock.mockResolvedValue(okResult(MOCK_TEAM_MODULE));
 
       await setup();
     });
 
     it('fetches the module by id with the tenant Sanity context', () => {
       expect(getTeamModuleMock).toHaveBeenCalledWith(
-        MODULE_ID,
+        MOCK_MODULE_ID,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
     it('renders the resolved team member cards', () => {
       const articles = screen.getAllByRole('article');
-      expect(articles).toHaveLength(2);
+
+      expect(articles).toHaveLength(MOCK_TEAM_MEMBERS.length);
     });
   });
 

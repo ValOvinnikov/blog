@@ -5,13 +5,17 @@ import {
 } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
+import { faker } from '@faker-js/faker';
 import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { mockTenant } from '@platform/testing/tenants/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { checkOwnerAccessAction } from './check-owner-access-action';
+import { requestOwnerAccess } from './request-owner-access';
 import { resendOwnerInviteAction } from './resend-owner-invite-action';
+
+faker.seed(6105);
 
 const { requireTenantOwnerOrAdminMock, enqueueWorkerRequestMock } = vi.hoisted(
   () => ({
@@ -28,24 +32,14 @@ vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
   enqueueWorkerRequest: enqueueWorkerRequestMock,
 }));
 
-const { id: tenantId } = mockTenant();
+const MOCK_WORKER_PATH = `/${faker.lorem.slug()}`;
 
-const loggerErrorMock = vi.mocked(logger.error);
-
-describe.each([
-  ['checkOwnerAccessAction', checkOwnerAccessAction, '/api/owner-access/check'],
-  [
-    'resendOwnerInviteAction',
-    resendOwnerInviteAction,
-    '/api/owner-access/resend',
-  ],
-] as const)('%s', (_name, action, path) => {
+describe(requestOwnerAccess, () => {
   beforeEach(() => {
     requireTenantOwnerOrAdminMock.mockReset();
     requireTenantOwnerOrAdminMock.mockResolvedValue(undefined);
     enqueueWorkerRequestMock.mockReset();
     enqueueWorkerRequestMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
-    loggerErrorMock.mockReset();
   });
 
   it('calls nothing on the worker for a caller the gate refuses', async () => {
@@ -53,20 +47,20 @@ describe.each([
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
-    await expect(action(tenantId)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(
+      requestOwnerAccess(MOCK_WORKER_PATH, MOCK_TENANT_ID),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(enqueueWorkerRequestMock).not.toHaveBeenCalled();
   });
 
   it("admits only the tenant's owner or a super-admin", async () => {
-    await action(tenantId);
+    await requestOwnerAccess(MOCK_WORKER_PATH, MOCK_TENANT_ID);
 
     const [gatedTenantId, isAdminPermitted] = requireTenantOwnerOrAdminMock.mock
       .calls[0] as [string, (admin: TAdmin) => boolean];
 
-    expect(gatedTenantId).toBe(tenantId);
+    expect(gatedTenantId).toBe(MOCK_TENANT_ID);
     expect(isAdminPermitted(mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }))).toBe(
       true,
     );
@@ -74,30 +68,60 @@ describe.each([
   });
 
   it('succeeds once the worker accepts the request', async () => {
-    const result = await action(tenantId);
+    const result = await requestOwnerAccess(MOCK_WORKER_PATH, MOCK_TENANT_ID);
 
-    expect(enqueueWorkerRequestMock).toHaveBeenCalledWith(path, tenantId);
+    expect(enqueueWorkerRequestMock).toHaveBeenCalledWith(
+      MOCK_WORKER_PATH,
+      MOCK_TENANT_ID,
+    );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('logs and fails when the worker answers anything else', async () => {
     enqueueWorkerRequestMock.mockResolvedValue(HTTP_STATUS.CONFLICT);
 
-    const result = await action(tenantId);
+    const result = await requestOwnerAccess(MOCK_WORKER_PATH, MOCK_TENANT_ID);
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      OWNER_ACCESS_LOG.REQUEST_FAILED,
-      { tenantId, path, responseStatus: HTTP_STATUS.CONFLICT },
-    );
+    expect(logger.error).toHaveBeenCalledWith(OWNER_ACCESS_LOG.REQUEST_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      path: MOCK_WORKER_PATH,
+      responseStatus: HTTP_STATUS.CONFLICT,
+    });
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
   });
 
-  it('fails without a second log when the request never reached the worker', async () => {
+  it('fails without a log when the request never reached the worker', async () => {
     enqueueWorkerRequestMock.mockResolvedValue(null);
 
-    const result = await action(tenantId);
+    const result = await requestOwnerAccess(MOCK_WORKER_PATH, MOCK_TENANT_ID);
 
-    expect(loggerErrorMock).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+  });
+});
+
+describe('the owner-access actions', () => {
+  beforeEach(() => {
+    requireTenantOwnerOrAdminMock.mockReset();
+    enqueueWorkerRequestMock.mockReset();
+    enqueueWorkerRequestMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
+  });
+
+  it.each([
+    [
+      checkOwnerAccessAction.name,
+      checkOwnerAccessAction,
+      '/api/owner-access/check',
+    ],
+    [
+      resendOwnerInviteAction.name,
+      resendOwnerInviteAction,
+      '/api/owner-access/resend',
+    ],
+  ])('%s requests its own worker path', async (_name, action, path) => {
+    const result = await action(MOCK_TENANT_ID);
+
+    expect(enqueueWorkerRequestMock).toHaveBeenCalledWith(path, MOCK_TENANT_ID);
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 });

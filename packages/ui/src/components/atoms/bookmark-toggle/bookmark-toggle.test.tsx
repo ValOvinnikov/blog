@@ -1,81 +1,88 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
-import userEvent from '@testing-library/user-event';
-import type { Mock } from 'vitest';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { BookmarkToggle } from './bookmark-toggle';
+
+faker.seed(123);
+
+const MOCK_LABEL = faker.lorem.word();
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
 
 const setup = customRender(BookmarkToggle, {
   isBookmarked: false,
   onToggle: vi.fn(),
-  label: 'save',
-  ariaLabel: 'Save post',
+  label: MOCK_LABEL,
+  ariaLabel: MOCK_ARIA_LABEL,
 });
 
 describe(`<${BookmarkToggle.name}/>`, () => {
-  let onToggle: Mock<() => void>;
+  let user: UserEvent;
 
   beforeEach(() => {
-    onToggle = vi.fn();
+    user = userEvent.setup();
   });
 
-  describe('when not bookmarked', () => {
+  describe('with the default props', () => {
     beforeEach(() => {
       setup();
     });
 
     it('renders a button with the given accessible name', () => {
-      expect(screen.getByRole('button', { name: 'Save post' })).toBeVisible();
+      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+
+      expect(button).toBeVisible();
     });
 
-    it('sets title to the same accessible name as aria-label', () => {
-      expect(screen.getByRole('button')).toHaveAttribute('title', 'Save post');
+    it('uses the accessible name as the title', () => {
+      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+
+      expect(button).toHaveAttribute('title', MOCK_ARIA_LABEL);
     });
 
     it('renders the visible label text', () => {
-      expect(screen.getByText('save')).toBeVisible();
-    });
+      const label = screen.getByText(MOCK_LABEL);
 
-    it('reflects aria-pressed="false"', () => {
-      expect(screen.getByRole('button')).toHaveAttribute(
-        'aria-pressed',
-        'false',
-      );
+      expect(label).toBeVisible();
     });
   });
 
-  describe('when bookmarked', () => {
-    beforeEach(() => {
-      setup({
-        isBookmarked: true,
-        label: 'saved',
-        ariaLabel: 'Remove bookmark',
-      });
-    });
+  it.each([true, false])(
+    'reflects aria-pressed when isBookmarked is %s',
+    (isBookmarked) => {
+      setup({ isBookmarked });
 
-    it('renders the given label', () => {
-      expect(screen.getByText('saved')).toBeVisible();
-    });
+      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
 
-    it('reflects aria-pressed="true"', () => {
-      const button = screen.getByRole('button', { name: 'Remove bookmark' });
-      expect(button).toHaveAttribute('aria-pressed', 'true');
-    });
-  });
+      expect(button).toHaveAttribute('aria-pressed', String(isBookmarked));
+    },
+  );
 
   it('calls onToggle when clicked', async () => {
+    const onToggle = vi.fn();
     setup({ onToggle });
-    await userEvent.click(screen.getByRole('button'));
+
+    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+    await user.click(button);
+
     expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
-  it('forwards the disabled attribute', () => {
+  it('is disabled when isDisabled is set', () => {
     setup({ isDisabled: true });
-    expect(screen.getByRole('button')).toBeDisabled();
+
+    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+
+    expect(button).toBeDisabled();
   });
 
   it('does not call onToggle when disabled', async () => {
+    const onToggle = vi.fn();
     setup({ isDisabled: true, onToggle });
-    await userEvent.click(screen.getByRole('button'));
+
+    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+    await user.click(button);
+
     expect(onToggle).not.toHaveBeenCalled();
   });
 });

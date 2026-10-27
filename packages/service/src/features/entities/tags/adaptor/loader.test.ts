@@ -10,13 +10,16 @@ import {
   MOCK_TAGS_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getTags } from './loader';
 import { tagsQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const DESCRIPTION = 'All things TypeScript';
+faker.seed(6105);
+
+const MOCK_TAG_DESCRIPTION = faker.lorem.sentence();
 
 const tenant = mockTenant();
 
@@ -44,12 +47,12 @@ describe(getTags, () => {
 
   it('carries a tag description through when authored', async () => {
     mockRun.mockResolvedValueOnce([
-      mockRawTagWithPostCount({ description: DESCRIPTION }),
+      mockRawTagWithPostCount({ description: MOCK_TAG_DESCRIPTION }),
     ]);
 
     const result = await getTags(tenant);
 
-    expect(result[0]?.description).toBe(DESCRIPTION);
+    expect(result[0]?.description).toBe(MOCK_TAG_DESCRIPTION);
   });
 
   it('normalises a missing description to undefined', async () => {
@@ -68,7 +71,7 @@ describe(getTags, () => {
     expect(result).toEqual([]);
   });
 
-  it('queries for the tenant with tenant-scoped tags', async () => {
+  it('queries for the tenant with tenant-scoped cache tags', async () => {
     await getTags(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(tagsQuery, {

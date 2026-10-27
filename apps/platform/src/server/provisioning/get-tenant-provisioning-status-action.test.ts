@@ -1,66 +1,50 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { queries } from '@blog/db';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
+import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+  MOCK_TENANT_ID,
+  mockFirstStepRunningProvisioningSteps,
+} from '@platform/testing/tenants/fixtures';
 
-const { requireTenantOwnerOrAdminMock, getTenantProvisioningStatusMock } =
-  vi.hoisted(() => ({
-    requireTenantOwnerOrAdminMock: vi.fn(),
-    getTenantProvisioningStatusMock: vi.fn(),
-  }));
+import { getTenantProvisioningStatusAction } from './get-tenant-provisioning-status-action';
 
-vi.mock('@platform/server/auth/require-tenant-owner-or-admin', () => ({
-  requireTenantOwnerOrAdmin: requireTenantOwnerOrAdminMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-owner-or-admin');
 
 vi.mock('@blog/db', () => ({
-  queries: {
-    tenants: { getTenantProvisioningStatus: getTenantProvisioningStatusMock },
-  },
+  queries: { tenants: { getTenantProvisioningStatus: vi.fn() } },
 }));
 
-describe('getTenantProvisioningStatusAction', () => {
-  beforeEach(() => {
-    requireTenantOwnerOrAdminMock.mockReset();
-    requireTenantOwnerOrAdminMock.mockResolvedValue(undefined);
-    getTenantProvisioningStatusMock.mockReset();
-  });
+const getTenantProvisioningStatusMock = vi.mocked(
+  queries.tenants.getTenantProvisioningStatus,
+);
 
+describe(getTenantProvisioningStatusAction, () => {
   it("requires the tenant's owner or an admin before querying", async () => {
-    requireTenantOwnerOrAdminMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    });
-    const { getTenantProvisioningStatusAction } =
-      await import('./get-tenant-provisioning-status-action');
+    vi.mocked(requireTenantOwnerOrAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT),
+    );
 
     await expect(
       getTenantProvisioningStatusAction(MOCK_TENANT_ID),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-    expect(requireTenantOwnerOrAdminMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+
+    expect(requireTenantOwnerOrAdmin).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(getTenantProvisioningStatusMock).not.toHaveBeenCalled();
   });
 
   it('returns the fresh status and step map for the given tenant id', async () => {
-    const result = {
+    const status = {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps: {
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      },
+      provisioningSteps: mockFirstStepRunningProvisioningSteps(),
     };
-    getTenantProvisioningStatusMock.mockResolvedValue(result);
-    const { getTenantProvisioningStatusAction } =
-      await import('./get-tenant-provisioning-status-action');
+    getTenantProvisioningStatusMock.mockResolvedValueOnce(status);
 
-    await expect(
-      getTenantProvisioningStatusAction(MOCK_TENANT_ID),
-    ).resolves.toEqual(result);
+    const result = await getTenantProvisioningStatusAction(MOCK_TENANT_ID);
+
     expect(getTenantProvisioningStatusMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
     );
+    expect(result).toEqual(status);
   });
 });

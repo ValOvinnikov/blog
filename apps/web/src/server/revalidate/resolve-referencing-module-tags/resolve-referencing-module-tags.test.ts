@@ -38,7 +38,6 @@ const MOCK_CTA_MODULE_ID = faker.string.uuid();
 describe(resolveReferencingModuleTags, () => {
   beforeEach(() => {
     getReferencingModuleIdsMock.mockReset();
-    loggerErrorMock.mockReset();
     getReferencingModuleIdsMock.mockResolvedValue(okResult([]));
   });
 

@@ -1,108 +1,81 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  routes,
+  type TLocaleIsoCode,
+} from '@blog/config';
+import { queries } from '@blog/db';
+import { service, type TTranslationMap } from '@blog/service';
 import type * as TService from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { routing } from '@web/i18n/routing';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
+import {
+  MOCK_TENANT_BASE_URL,
+  MOCK_TENANT_SANITY_CONTEXT,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
 
-const FIRST_POST_SLUG = 'first-post';
-const FIRST_UPDATED_AT = '2026-01-01T00:00:00.000Z';
-const SECOND_UPDATED_AT = '2026-01-02T00:00:00.000Z';
-const HOME_URL = 'https://example.com/';
-const BLOG_URL = 'https://example.com/blog';
-const TOPICS_URL = 'https://example.com/topics';
-const TAGS_URL = 'https://example.com/tags';
-const FIRST_POST_URL = 'https://example.com/blog/first-post';
-const NEWS_TOPIC_URL = 'https://example.com/topics/news';
-const ABOUT_URL = 'https://example.com/about';
-const NL_ABOUT_URL = 'https://example.com/nl/over-ons';
-const PRICING_URL = 'https://example.com/pricing';
-const NL_HOME_URL = 'https://example.com/nl';
-const NL_BLOG_URL = 'https://example.com/nl/blog';
-const DESIGN_TOPIC_URL = 'https://example.com/topics/design';
-const NL_DESIGN_TOPIC_URL = 'https://example.com/nl/topics/ontwerp';
-const NL_TYPESCRIPT_TAG_URL = 'https://example.com/nl/tags/typescript-nl';
-const ARTICLE_SLUG = 'my-article';
-const NL_ARTICLE_SLUG = 'mijn-artikel';
-const ARTICLE_URL = 'https://example.com/blog/my-article';
-const NL_ARTICLE_URL = 'https://example.com/nl/blog/mijn-artikel';
+import sitemap from './sitemap';
 
-const {
-  getPostParamsMock,
-  getTopicParamsMock,
-  getTopicPaginationParamsMock,
-  getTagParamsMock,
-  getTagPaginationParamsMock,
-  getIndexPageParamsMock,
-  getPageSlugsMock,
-  getHostTenantSanityContextMock,
-  resolveRequestTenantMock,
-  selectLiveLocalesMock,
-  getTranslationMapMock,
-} = vi.hoisted(() => ({
-  getPostParamsMock: vi.fn(),
-  getTopicParamsMock: vi.fn(),
-  getTopicPaginationParamsMock: vi.fn(),
-  getTagParamsMock: vi.fn(),
-  getTagPaginationParamsMock: vi.fn(),
-  getIndexPageParamsMock: vi.fn(),
-  getPageSlugsMock: vi.fn(),
-  getHostTenantSanityContextMock: vi.fn(),
-  resolveRequestTenantMock: vi.fn(),
-  selectLiveLocalesMock: vi.fn(),
-  getTranslationMapMock: vi.fn(),
-}));
+faker.seed(6009);
 
-vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
-  resolveRequestTenant: resolveRequestTenantMock,
-}));
+const { EN, NL, DE } = LOCALE_ISO_CODES;
+const X_DEFAULT = 'x-default';
+const NL_PREFIX = `/${LOCALE_BCP47_TAGS.NL}`;
+const DE_PREFIX = `/${LOCALE_BCP47_TAGS.DE}`;
+const PUBLISHED_AT_REF_DATE = '2026-01-01T00:00:00.000Z';
+const MOCK_FIRST_PUBLISHED_AT = faker.date
+  .past({ refDate: PUBLISHED_AT_REF_DATE })
+  .toISOString();
+const MOCK_SECOND_PUBLISHED_AT = faker.date
+  .past({ refDate: PUBLISHED_AT_REF_DATE })
+  .toISOString();
+const MOCK_FETCH_ERROR = new Error(faker.lorem.sentence());
 
-vi.mock('@blog/db', () => ({
-  queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
-}));
+const mockSlug = () => faker.string.alpha({ length: 10, casing: 'lower' });
 
-vi.mock(
-  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
-  () => ({
-    getHostTenantSanityContext: getHostTenantSanityContextMock,
-  }),
-);
+const MOCK_POST_SLUG = mockSlug();
+const MOCK_NL_POST_SLUG = mockSlug();
+const MOCK_TOPIC_SLUG = mockSlug();
+const MOCK_NL_TOPIC_SLUG = mockSlug();
+const MOCK_TAG_SLUG = mockSlug();
+const MOCK_NL_TAG_SLUG = mockSlug();
+const MOCK_LANDING_SLUG = mockSlug();
+const MOCK_NL_LANDING_SLUG = mockSlug();
+const MOCK_UNTRANSLATED_LANDING_SLUG = mockSlug();
 
-vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
+const HOME_URL = `${MOCK_TENANT_BASE_URL}${routes.home()}`;
+const NL_HOME_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}`;
+const BLOG_URL = `${MOCK_TENANT_BASE_URL}${routes.blogIndex()}`;
+const NL_BLOG_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}${routes.blogIndex()}`;
+const TOPICS_URL = `${MOCK_TENANT_BASE_URL}${routes.topics()}`;
+const NL_TOPICS_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}${routes.topics()}`;
+const TAGS_URL = `${MOCK_TENANT_BASE_URL}${routes.tags()}`;
 
-vi.mock('@blog/service', async (importOriginal) => ({
-  service: {
-    global: {
-      translationMap: {
-        v1: {
-          getTranslationMap: getTranslationMapMock,
-          findTranslationGroup: (await importOriginal<typeof TService>())
-            .service.global.translationMap.v1.findTranslationGroup,
-        },
-      },
-    },
-    pages: {
-      post: { v1: { getPostParams: getPostParamsMock } },
-      topic: {
-        v1: {
-          getTopicParams: getTopicParamsMock,
-          getTopicPaginationParams: getTopicPaginationParamsMock,
-        },
-      },
-      tag: {
-        v1: {
-          getTagParams: getTagParamsMock,
-          getTagPaginationParams: getTagPaginationParamsMock,
-        },
-      },
-      blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
-      landing: { v1: { getPageSlugs: getPageSlugsMock } },
-    },
-  },
-}));
+const toUrl = (path: string, prefix = '') =>
+  `${MOCK_TENANT_BASE_URL}${prefix}${path}`;
 
-let getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
+const toOwnAlternate = (language: TLocaleIsoCode, url: string) => ({
+  [LOCALE_BCP47_TAGS[language]]: url,
+});
 
-const makeTranslationMap = (overrides = {}) => ({
+const toAlternates = (
+  urlByLanguage: ReadonlyArray<readonly [TLocaleIsoCode, string]>,
+  defaultUrl: string,
+) => ({
+  ...Object.fromEntries(
+    urlByLanguage.map(([language, url]) => [LOCALE_BCP47_TAGS[language], url]),
+  ),
+  [X_DEFAULT]: defaultUrl,
+});
+
+const mockTranslationMap = (
+  overrides: Partial<TTranslationMap> = {},
+): TTranslationMap => ({
   groups: [],
   homeLanguages: [],
   postIndexLanguages: [routing.defaultLocale],
@@ -111,676 +84,599 @@ const makeTranslationMap = (overrides = {}) => ({
   ...overrides,
 });
 
-const mockAllEmpty = () => {
-  getPostParamsMock.mockResolvedValue(okResult([]));
-  getTopicParamsMock.mockResolvedValue(okResult([]));
-  getTopicPaginationParamsMock.mockResolvedValue(okResult([]));
-  getTagParamsMock.mockResolvedValue(okResult([]));
-  getTagPaginationParamsMock.mockResolvedValue(okResult([]));
-  getIndexPageParamsMock.mockResolvedValue(okResult([]));
-  getPageSlugsMock.mockResolvedValue(okResult([]));
-  getTranslationMapMock.mockResolvedValue(okResult(makeTranslationMap()));
+const mockTranslationGroup = (
+  documentType: string,
+  translations: ReadonlyArray<readonly [TLocaleIsoCode, string]>,
+) => translations.map(([language, slug]) => ({ documentType, language, slug }));
+
+const POPULATED_URLS = [
+  HOME_URL,
+  BLOG_URL,
+  TOPICS_URL,
+  TAGS_URL,
+  toUrl(routes.blogIndex(2)),
+  toUrl(routes.blogIndex(3)),
+  toUrl(routes.post(MOCK_POST_SLUG)),
+  toUrl(routes.topic(MOCK_TOPIC_SLUG)),
+  toUrl(routes.topic(MOCK_TOPIC_SLUG, 2)),
+  toUrl(routes.tag(MOCK_TAG_SLUG)),
+  toUrl(routes.tag(MOCK_TAG_SLUG, 2)),
+  toUrl(routes.tag(MOCK_TAG_SLUG, 3)),
+  toUrl(routes.landingPage(MOCK_LANDING_SLUG)),
+];
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
+
+vi.mock(
+  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
+  () => ({
+    getHostTenantSanityContext: vi.fn(),
+  }),
+);
+
+vi.mock('@blog/db', () => ({
+  queries: { tenants: { selectLiveLocales: vi.fn() } },
+}));
+
+vi.mock('@blog/service', async (importOriginal) => ({
+  service: {
+    global: {
+      translationMap: {
+        v1: {
+          getTranslationMap: vi.fn(),
+          findTranslationGroup: (await importOriginal<typeof TService>())
+            .service.global.translationMap.v1.findTranslationGroup,
+        },
+      },
+    },
+    pages: {
+      post: { v1: { getPostParams: vi.fn() } },
+      topic: {
+        v1: { getTopicParams: vi.fn(), getTopicPaginationParams: vi.fn() },
+      },
+      tag: { v1: { getTagParams: vi.fn(), getTagPaginationParams: vi.fn() } },
+      blog: { v1: { getIndexPageParams: vi.fn() } },
+      landing: { v1: { getPageSlugs: vi.fn() } },
+    },
+  },
+}));
+
+const selectLiveLocales = vi.mocked(queries.tenants.selectLiveLocales);
+const getPostParams = vi.mocked(service.pages.post.v1.getPostParams);
+const getTopicParams = vi.mocked(service.pages.topic.v1.getTopicParams);
+const getTopicPaginationParams = vi.mocked(
+  service.pages.topic.v1.getTopicPaginationParams,
+);
+const getTagParams = vi.mocked(service.pages.tag.v1.getTagParams);
+const getTagPaginationParams = vi.mocked(
+  service.pages.tag.v1.getTagPaginationParams,
+);
+const getIndexPageParams = vi.mocked(service.pages.blog.v1.getIndexPageParams);
+const getPageSlugs = vi.mocked(service.pages.landing.v1.getPageSlugs);
+const getTranslationMap = vi.mocked(
+  service.global.translationMap.v1.getTranslationMap,
+);
+
+const mockPopulatedLoaders = () => {
+  getPostParams.mockResolvedValue(
+    okResult([
+      {
+        slug: MOCK_POST_SLUG,
+        language: EN,
+        publishedAt: MOCK_FIRST_PUBLISHED_AT,
+      },
+    ]),
+  );
+  getTopicParams.mockResolvedValue(
+    okResult([{ slug: MOCK_TOPIC_SLUG, language: EN }]),
+  );
+  getTopicPaginationParams.mockResolvedValue(
+    okResult([{ slug: MOCK_TOPIC_SLUG, language: EN, page: '2' }]),
+  );
+  getTagParams.mockResolvedValue(
+    okResult([{ slug: MOCK_TAG_SLUG, language: EN }]),
+  );
+  getTagPaginationParams.mockResolvedValue(
+    okResult([
+      { slug: MOCK_TAG_SLUG, language: EN, page: '2' },
+      { slug: MOCK_TAG_SLUG, language: EN, page: '3' },
+    ]),
+  );
+  getIndexPageParams.mockResolvedValue(
+    okResult([{ page: '2' }, { page: '3' }]),
+  );
+  getPageSlugs.mockResolvedValue(
+    okResult([{ slug: MOCK_LANDING_SLUG, language: EN }]),
+  );
 };
 
-describe('sitemap', () => {
-  let sitemap: typeof import('./sitemap').default;
+const getUrls = async () => (await sitemap()).map(({ url }) => url);
 
-  beforeEach(async () => {
-    const fresh =
-      await import('@web/server/tenant/tenant-base-url/tenant-base-url');
-    getTenantBaseUrlMock = vi.mocked(fresh.getTenantBaseUrl);
-    getHostTenantSanityContextMock.mockResolvedValue({
+describe(sitemap, () => {
+  beforeEach(() => {
+    vi.mocked(getHostTenantSanityContext).mockResolvedValue({
       isResolvable: true,
-      tenant: undefined,
+      tenant: MOCK_TENANT_SANITY_CONTEXT,
     });
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: LOCALE_ISO_CODES.EN,
+    selectLiveLocales.mockReturnValue([EN]);
+    getPostParams.mockResolvedValue(okResult([]));
+    getTopicParams.mockResolvedValue(okResult([]));
+    getTopicPaginationParams.mockResolvedValue(okResult([]));
+    getTagParams.mockResolvedValue(okResult([]));
+    getTagPaginationParams.mockResolvedValue(okResult([]));
+    getIndexPageParams.mockResolvedValue(okResult([]));
+    getPageSlugs.mockResolvedValue(okResult([]));
+    getTranslationMap.mockResolvedValue(okResult(mockTranslationMap()));
+  });
+
+  it('lists the static, post, topic, tag, pagination and landing entries', async () => {
+    mockPopulatedLoaders();
+
+    const urls = await getUrls();
+
+    expect(urls).toEqual(POPULATED_URLS);
+  });
+
+  it('returns an empty sitemap without querying content when the host is unresolvable', async () => {
+    vi.mocked(getHostTenantSanityContext).mockResolvedValueOnce({
+      isResolvable: false,
     });
-    selectLiveLocalesMock.mockReturnValue(['en']);
-    mockAllEmpty();
-    sitemap = (await import('./sitemap')).default;
-  });
-
-  afterEach(() => {
-    vi.resetModules();
-    getPostParamsMock.mockReset();
-    getTopicParamsMock.mockReset();
-    getTopicPaginationParamsMock.mockReset();
-    getTagParamsMock.mockReset();
-    getTagPaginationParamsMock.mockReset();
-    getIndexPageParamsMock.mockReset();
-    getPageSlugsMock.mockReset();
-    getHostTenantSanityContextMock.mockReset();
-    resolveRequestTenantMock.mockReset();
-    selectLiveLocalesMock.mockReset();
-    getTranslationMapMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-  });
-
-  it('includes every static, post, topic, tag, blog page and landing page entry', async () => {
-    getPostParamsMock.mockResolvedValue(
-      okResult([
-        {
-          slug: FIRST_POST_SLUG,
-          language: LOCALE_ISO_CODES.EN,
-          publishedAt: FIRST_UPDATED_AT,
-        },
-        {
-          slug: 'second-post',
-          language: LOCALE_ISO_CODES.EN,
-          publishedAt: SECOND_UPDATED_AT,
-        },
-      ]),
-    );
-    getTopicParamsMock.mockResolvedValue(
-      okResult([{ slug: 'news', language: LOCALE_ISO_CODES.EN }]),
-    );
-    getTagParamsMock.mockResolvedValue(
-      okResult([{ slug: 'typescript', language: LOCALE_ISO_CODES.EN }]),
-    );
-    getIndexPageParamsMock.mockResolvedValue(
-      okResult([{ page: '2' }, { page: '3' }]),
-    );
-    getPageSlugsMock.mockResolvedValue(
-      okResult([{ slug: 'about', language: LOCALE_ISO_CODES.EN }]),
-    );
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).toContain(HOME_URL);
-    expect(urls).toContain(BLOG_URL);
-    expect(urls).toContain(TOPICS_URL);
-    expect(urls).toContain(TAGS_URL);
-    expect(urls).toContain('https://example.com/blog/page/2');
-    expect(urls).toContain('https://example.com/blog/page/3');
-    expect(urls).toContain(FIRST_POST_URL);
-    expect(urls).toContain('https://example.com/blog/second-post');
-    expect(urls).toContain(NEWS_TOPIC_URL);
-    expect(urls).toContain('https://example.com/tags/typescript');
-    expect(urls).toContain(ABOUT_URL);
-  });
-
-  it('keeps a single-language tenant landing entry as its own url and language alternate', async () => {
-    selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
-    getPageSlugsMock.mockResolvedValue(
-      okResult([{ slug: 'about', language: LOCALE_ISO_CODES.EN }]),
-    );
 
     const entries = await sitemap();
 
-    expect(entries).toContainEqual({
-      url: ABOUT_URL,
-      alternates: { languages: { en: ABOUT_URL } },
-    });
+    expect(entries).toEqual([]);
+    expect(getPostParams).not.toHaveBeenCalled();
   });
 
-  it('lists each landing page under its own language prefix with that language as its alternate', async () => {
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-    getPageSlugsMock.mockResolvedValue(
-      okResult([
-        { slug: 'about', language: LOCALE_ISO_CODES.EN },
-        { slug: 'over-ons', language: LOCALE_ISO_CODES.NL },
-      ]),
-    );
+  it('returns an empty sitemap when no tenant base URL resolves', async () => {
+    vi.mocked(getTenantBaseUrl).mockResolvedValueOnce(undefined);
 
     const entries = await sitemap();
 
-    expect(entries).toContainEqual(
-      expect.objectContaining({
-        url: ABOUT_URL,
-        alternates: { languages: { en: ABOUT_URL } },
-      }),
-    );
-    expect(entries).toContainEqual(
-      expect.objectContaining({
-        url: NL_ABOUT_URL,
-        alternates: { languages: { nl: NL_ABOUT_URL } },
-      }),
-    );
+    expect(entries).toEqual([]);
+    expect(getPostParams).not.toHaveBeenCalled();
   });
 
-  const aboutTranslations = {
-    homeLanguages: [],
-    groups: [
-      [
-        {
-          documentType: 'page_landing',
-          language: LOCALE_ISO_CODES.EN,
-          slug: 'about',
-        },
-        {
-          documentType: 'page_landing',
-          language: LOCALE_ISO_CODES.NL,
-          slug: 'over-ons',
-        },
-        {
-          documentType: 'page_landing',
-          language: LOCALE_ISO_CODES.DE,
-          slug: 'ueber-uns',
-        },
-      ],
-    ],
-  };
-  const aboutAlternates = {
-    en: ABOUT_URL,
-    nl: NL_ABOUT_URL,
-    'x-default': ABOUT_URL,
-  };
+  describe('loader requests', () => {
+    const MOCK_LIVE_LOCALES = [EN, NL];
 
-  const mockTranslatedAbout = () => {
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-    getPageSlugsMock.mockResolvedValue(
-      okResult([
-        { slug: 'about', language: LOCALE_ISO_CODES.EN },
-        { slug: 'over-ons', language: LOCALE_ISO_CODES.NL },
-        { slug: 'pricing', language: LOCALE_ISO_CODES.EN },
-      ]),
-    );
-    getTranslationMapMock.mockResolvedValue(
-      okResult(makeTranslationMap(aboutTranslations)),
-    );
-  };
-
-  describe('with a translated landing page', () => {
     beforeEach(() => {
-      mockTranslatedAbout();
+      selectLiveLocales.mockReturnValue(MOCK_LIVE_LOCALES);
     });
 
-    it("lists every live translation and the default-language x-default on each translation's entry", async () => {
+    it.each([
+      { name: 'post params', loader: getPostParams },
+      { name: 'topic params', loader: getTopicParams },
+      { name: 'tag params', loader: getTagParams },
+      { name: 'topic pagination params', loader: getTopicPaginationParams },
+      { name: 'tag pagination params', loader: getTagPaginationParams },
+      { name: 'landing page slugs', loader: getPageSlugs },
+    ])(
+      'requests $name with the tenant context and live languages',
+      async ({ loader }) => {
+        await sitemap();
+
+        expect(loader).toHaveBeenCalledWith(
+          MOCK_TENANT_SANITY_CONTEXT,
+          MOCK_LIVE_LOCALES,
+        );
+      },
+    );
+
+    it.each([
+      { name: 'blog page params', loader: getIndexPageParams },
+      { name: 'the translation map', loader: getTranslationMap },
+    ])('requests $name with the tenant context', async ({ loader }) => {
+      await sitemap();
+
+      expect(loader).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
+    });
+
+    it('derives the live languages from the resolved tenant row', async () => {
+      const tenantRow = mockTenant();
+      vi.mocked(resolveRequestTenant).mockResolvedValueOnce(tenantRow);
+
+      await sitemap();
+
+      expect(selectLiveLocales).toHaveBeenCalledWith(tenantRow);
+    });
+
+    it('falls back to the default language when the host has no tenant row', async () => {
+      vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
+
+      const urls = await getUrls();
+
+      expect(selectLiveLocales).not.toHaveBeenCalled();
+      expect(getPageSlugs).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT, [
+        routing.defaultLocale,
+      ]);
+      expect(urls).toContain(HOME_URL);
+    });
+  });
+
+  describe('landing pages', () => {
+    const NL_LANDING_URL = toUrl(
+      routes.landingPage(MOCK_NL_LANDING_SLUG),
+      NL_PREFIX,
+    );
+    const LANDING_URL = toUrl(routes.landingPage(MOCK_LANDING_SLUG));
+    const UNTRANSLATED_URL = toUrl(
+      routes.landingPage(MOCK_UNTRANSLATED_LANDING_SLUG),
+    );
+    const landingAlternates = toAlternates(
+      [
+        [EN, LANDING_URL],
+        [NL, NL_LANDING_URL],
+      ],
+      LANDING_URL,
+    );
+
+    beforeEach(() => {
+      selectLiveLocales.mockReturnValue([EN, NL]);
+      getPageSlugs.mockResolvedValue(
+        okResult([
+          { slug: MOCK_LANDING_SLUG, language: EN },
+          { slug: MOCK_NL_LANDING_SLUG, language: NL },
+          { slug: MOCK_UNTRANSLATED_LANDING_SLUG, language: EN },
+        ]),
+      );
+    });
+
+    it('lists each page under its own language prefix with itself as alternate', async () => {
       const entries = await sitemap();
 
       expect(entries).toContainEqual({
-        url: ABOUT_URL,
-        alternates: { languages: aboutAlternates },
+        url: LANDING_URL,
+        alternates: { languages: toOwnAlternate(EN, LANDING_URL) },
       });
       expect(entries).toContainEqual({
-        url: NL_ABOUT_URL,
-        alternates: { languages: aboutAlternates },
+        url: NL_LANDING_URL,
+        alternates: { languages: toOwnAlternate(NL, NL_LANDING_URL) },
       });
     });
 
-    it('keeps an untranslated landing page entry as its own language alternate', async () => {
+    describe('when translated', () => {
+      beforeEach(() => {
+        getTranslationMap.mockResolvedValue(
+          okResult(
+            mockTranslationMap({
+              groups: [
+                mockTranslationGroup('page_landing', [
+                  [EN, MOCK_LANDING_SLUG],
+                  [NL, MOCK_NL_LANDING_SLUG],
+                  [DE, mockSlug()],
+                ]),
+              ],
+            }),
+          ),
+        );
+      });
+
+      it('lists every live translation and the default-language x-default', async () => {
+        const entries = await sitemap();
+
+        expect(entries).toContainEqual({
+          url: LANDING_URL,
+          alternates: { languages: landingAlternates },
+        });
+        expect(entries).toContainEqual({
+          url: NL_LANDING_URL,
+          alternates: { languages: landingAlternates },
+        });
+      });
+
+      it('keeps an untranslated page as its own language alternate', async () => {
+        const entries = await sitemap();
+
+        expect(entries).toContainEqual({
+          url: UNTRANSLATED_URL,
+          alternates: { languages: toOwnAlternate(EN, UNTRANSLATED_URL) },
+        });
+      });
+
+      it('keeps a single-language tenant page as its own language alternate', async () => {
+        selectLiveLocales.mockReturnValue([EN]);
+        getPageSlugs.mockResolvedValue(
+          okResult([{ slug: MOCK_LANDING_SLUG, language: EN }]),
+        );
+
+        const entries = await sitemap();
+
+        expect(entries).toContainEqual({
+          url: LANDING_URL,
+          alternates: { languages: toOwnAlternate(EN, LANDING_URL) },
+        });
+      });
+
+      it('keeps each page as its own language alternate when the translation map fails', async () => {
+        getTranslationMap.mockResolvedValue(errorResult(MOCK_FETCH_ERROR));
+
+        const entries = await sitemap();
+
+        expect(entries).toContainEqual({
+          url: NL_LANDING_URL,
+          alternates: { languages: toOwnAlternate(NL, NL_LANDING_URL) },
+        });
+      });
+    });
+  });
+
+  describe('Home and list pages', () => {
+    const homeAlternates = toAlternates(
+      [
+        [EN, HOME_URL],
+        [NL, NL_HOME_URL],
+      ],
+      HOME_URL,
+    );
+    const blogAlternates = toAlternates(
+      [
+        [EN, BLOG_URL],
+        [NL, NL_BLOG_URL],
+      ],
+      BLOG_URL,
+    );
+
+    beforeEach(() => {
+      selectLiveLocales.mockReturnValue([EN, NL]);
+    });
+
+    it('lists each live Home with every live Home as an alternate', async () => {
+      getTranslationMap.mockResolvedValue(
+        okResult(mockTranslationMap({ homeLanguages: [EN, NL, DE] })),
+      );
+
       const entries = await sitemap();
+      const urls = entries.map(({ url }) => url);
 
       expect(entries).toContainEqual({
-        url: PRICING_URL,
-        alternates: { languages: { en: PRICING_URL } },
+        url: HOME_URL,
+        alternates: { languages: homeAlternates },
       });
+      expect(entries).toContainEqual({
+        url: NL_HOME_URL,
+        alternates: { languages: homeAlternates },
+      });
+      expect(urls).not.toContain(toUrl('', DE_PREFIX));
     });
 
-    it('keeps a single-language tenant landing entry unchanged when its page has translations', async () => {
-      selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
-      getPageSlugsMock.mockResolvedValue(
-        okResult([{ slug: 'about', language: LOCALE_ISO_CODES.EN }]),
+    it('keeps the default-language Home as its own entry when no other has one', async () => {
+      getTranslationMap.mockResolvedValue(
+        okResult(mockTranslationMap({ homeLanguages: [EN] })),
+      );
+
+      const entries = await sitemap();
+      const urls = entries.map(({ url }) => url);
+
+      expect(entries).toContainEqual({
+        url: HOME_URL,
+        alternates: { languages: toOwnAlternate(EN, HOME_URL) },
+      });
+      expect(urls).not.toContain(NL_HOME_URL);
+    });
+
+    it('lists each live Blog list page with every live Blog list page as an alternate', async () => {
+      getTranslationMap.mockResolvedValue(
+        okResult(mockTranslationMap({ postIndexLanguages: [EN, NL, DE] })),
+      );
+
+      const entries = await sitemap();
+      const urls = entries.map(({ url }) => url);
+
+      expect(entries).toContainEqual({
+        url: BLOG_URL,
+        alternates: { languages: blogAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: NL_BLOG_URL,
+        alternates: { languages: blogAlternates },
+      });
+      expect(urls).not.toContain(toUrl(routes.blogIndex(), DE_PREFIX));
+    });
+
+    it('lists only the languages that have each list page', async () => {
+      getTranslationMap.mockResolvedValue(
+        okResult(
+          mockTranslationMap({
+            postIndexLanguages: [EN],
+            topicIndexLanguages: [NL],
+            tagIndexLanguages: [],
+          }),
+        ),
+      );
+
+      const urls = await getUrls();
+
+      expect(urls).toContain(BLOG_URL);
+      expect(urls).toContain(NL_TOPICS_URL);
+      expect(urls).not.toContain(NL_BLOG_URL);
+      expect(urls).not.toContain(TOPICS_URL);
+      expect(urls).not.toContain(TAGS_URL);
+      expect(urls).not.toContain(toUrl(routes.tags(), NL_PREFIX));
+    });
+  });
+
+  describe('Topics, Tags and posts', () => {
+    beforeEach(() => {
+      selectLiveLocales.mockReturnValue([EN, NL]);
+    });
+
+    it('lists each Topic and Tag under its own language prefix with live translations', async () => {
+      const topicUrl = toUrl(routes.topic(MOCK_TOPIC_SLUG));
+      const nlTopicUrl = toUrl(routes.topic(MOCK_NL_TOPIC_SLUG), NL_PREFIX);
+      const nlTagUrl = toUrl(routes.tag(MOCK_NL_TAG_SLUG), NL_PREFIX);
+      const topicAlternates = toAlternates(
+        [
+          [EN, topicUrl],
+          [NL, nlTopicUrl],
+        ],
+        topicUrl,
+      );
+      getTopicParams.mockResolvedValue(
+        okResult([
+          { slug: MOCK_TOPIC_SLUG, language: EN },
+          { slug: MOCK_NL_TOPIC_SLUG, language: NL },
+        ]),
+      );
+      getTagParams.mockResolvedValue(
+        okResult([{ slug: MOCK_NL_TAG_SLUG, language: NL }]),
+      );
+      getTranslationMap.mockResolvedValue(
+        okResult(
+          mockTranslationMap({
+            groups: [
+              mockTranslationGroup('page_topic', [
+                [EN, MOCK_TOPIC_SLUG],
+                [NL, MOCK_NL_TOPIC_SLUG],
+              ]),
+            ],
+          }),
+        ),
       );
 
       const entries = await sitemap();
 
       expect(entries).toContainEqual({
-        url: ABOUT_URL,
-        alternates: { languages: { en: ABOUT_URL } },
+        url: topicUrl,
+        alternates: { languages: topicAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: nlTopicUrl,
+        alternates: { languages: topicAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: nlTagUrl,
+        alternates: { languages: toOwnAlternate(NL, nlTagUrl) },
       });
     });
 
-    it('keeps each landing page as its own language alternate when the translation map fetch fails', async () => {
-      getTranslationMapMock.mockResolvedValue(errorResult(new Error('boom')));
+    it('lists each post with its publish date and live translations', async () => {
+      const postUrl = toUrl(routes.post(MOCK_POST_SLUG));
+      const nlPostUrl = toUrl(routes.post(MOCK_NL_POST_SLUG), NL_PREFIX);
+      const postAlternates = toAlternates(
+        [
+          [EN, postUrl],
+          [NL, nlPostUrl],
+        ],
+        postUrl,
+      );
+      getPostParams.mockResolvedValue(
+        okResult([
+          {
+            slug: MOCK_POST_SLUG,
+            language: EN,
+            publishedAt: MOCK_FIRST_PUBLISHED_AT,
+          },
+          {
+            slug: MOCK_NL_POST_SLUG,
+            language: NL,
+            publishedAt: MOCK_SECOND_PUBLISHED_AT,
+          },
+        ]),
+      );
+      getTranslationMap.mockResolvedValue(
+        okResult(
+          mockTranslationMap({
+            groups: [
+              mockTranslationGroup('page_post', [
+                [EN, MOCK_POST_SLUG],
+                [NL, MOCK_NL_POST_SLUG],
+              ]),
+            ],
+          }),
+        ),
+      );
 
       const entries = await sitemap();
 
       expect(entries).toContainEqual({
-        url: NL_ABOUT_URL,
-        alternates: { languages: { nl: NL_ABOUT_URL } },
+        url: postUrl,
+        lastModified: MOCK_FIRST_PUBLISHED_AT,
+        alternates: { languages: postAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: nlPostUrl,
+        lastModified: MOCK_SECOND_PUBLISHED_AT,
+        alternates: { languages: postAlternates },
       });
     });
-  });
 
-  const homeAlternates = {
-    en: HOME_URL,
-    nl: NL_HOME_URL,
-    'x-default': HOME_URL,
-  };
+    it('lists numbered Topic pages under their own language prefix', async () => {
+      getTopicPaginationParams.mockResolvedValue(
+        okResult([{ slug: MOCK_NL_TOPIC_SLUG, language: NL, page: '2' }]),
+      );
 
-  const mockHomes = (homeLanguages: string[]) => {
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-    getTranslationMapMock.mockResolvedValue(
-      okResult(makeTranslationMap({ homeLanguages })),
-    );
-  };
+      const urls = await getUrls();
 
-  it('lists each live Home with every live Home as an alternate', async () => {
-    mockHomes([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.DE]);
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: HOME_URL,
-      alternates: { languages: homeAlternates },
+      expect(urls).toContain(
+        toUrl(routes.topic(MOCK_NL_TOPIC_SLUG, 2), NL_PREFIX),
+      );
     });
-    expect(entries).toContainEqual({
-      url: NL_HOME_URL,
-      alternates: { languages: homeAlternates },
+  });
+
+  describe('when a loader fails', () => {
+    const NUMBERED_BLOG_URLS = [
+      toUrl(routes.blogIndex(2)),
+      toUrl(routes.blogIndex(3)),
+    ];
+
+    beforeEach(() => {
+      mockPopulatedLoaders();
     });
-    expect(entries).not.toContainEqual(
-      expect.objectContaining({ url: 'https://example.com/de' }),
-    );
-  });
 
-  it('keeps the default-language Home as its own entry when no other language has one', async () => {
-    mockHomes([LOCALE_ISO_CODES.EN]);
-
-    const entries = await sitemap();
-
-    expect(entries.filter(({ url }) => url.startsWith(NL_HOME_URL))).toEqual(
-      [],
-    );
-    expect(entries).toContainEqual(expect.objectContaining({ url: HOME_URL }));
-  });
-
-  const mockListPages = (
-    postIndexLanguages: string[],
-    topicIndexLanguages: string[] = [],
-    tagIndexLanguages: string[] = [],
-  ) => {
-    mockHomes([LOCALE_ISO_CODES.EN]);
-    getTranslationMapMock.mockResolvedValue(
-      okResult(
-        makeTranslationMap({
-          homeLanguages: [LOCALE_ISO_CODES.EN],
-          postIndexLanguages,
-          topicIndexLanguages,
-          tagIndexLanguages,
-        }),
-      ),
-    );
-  };
-
-  it('lists each live Blog list page with every live Blog list page as an alternate', async () => {
-    mockListPages([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-      LOCALE_ISO_CODES.DE,
-    ]);
-
-    const entries = await sitemap();
-    const blogAlternates = {
-      en: BLOG_URL,
-      nl: NL_BLOG_URL,
-      'x-default': BLOG_URL,
-    };
-
-    expect(entries).toContainEqual({
-      url: BLOG_URL,
-      alternates: { languages: blogAlternates },
-    });
-    expect(entries).toContainEqual({
-      url: NL_BLOG_URL,
-      alternates: { languages: blogAlternates },
-    });
-    expect(entries).not.toContainEqual(
-      expect.objectContaining({ url: 'https://example.com/de/blog' }),
-    );
-  });
-
-  it('lists only the languages that have each list page', async () => {
-    mockListPages([LOCALE_ISO_CODES.EN], [LOCALE_ISO_CODES.NL], []);
-
-    const urls = (await sitemap()).map(({ url }) => url);
-
-    expect(urls).toContain(BLOG_URL);
-    expect(urls).not.toContain(NL_BLOG_URL);
-    expect(urls).toContain('https://example.com/nl/topics');
-    expect(urls).not.toContain(TOPICS_URL);
-    expect(urls).not.toContain(TAGS_URL);
-    expect(urls).not.toContain('https://example.com/nl/tags');
-  });
-
-  it("requests landing page slugs with the tenant's live languages", async () => {
-    const tenantRow = { id: 'tenant-1' };
-    const tenantContext = { projectId: 'p' };
-    resolveRequestTenantMock.mockResolvedValue(tenantRow);
-    getHostTenantSanityContextMock.mockResolvedValue({
-      isResolvable: true,
-      tenant: tenantContext,
-    });
-    selectLiveLocalesMock.mockReturnValue(['en', 'de']);
-
-    await sitemap();
-
-    expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenantRow);
-    expect(getPageSlugsMock).toHaveBeenCalledWith(tenantContext, ['en', 'de']);
-  });
-
-  it('falls back to the default language when the host has no tenant row', async () => {
-    resolveRequestTenantMock.mockResolvedValue(undefined);
-
-    const entries = await sitemap();
-
-    expect(selectLiveLocalesMock).not.toHaveBeenCalled();
-    expect(getPageSlugsMock).toHaveBeenCalledWith(undefined, [
-      routing.defaultLocale,
-    ]);
-    expect(entries.map((entry) => entry.url)).toContain(HOME_URL);
-  });
-
-  it('includes numbered topic and tag pagination pages', async () => {
-    getTopicPaginationParamsMock.mockResolvedValue(
-      okResult([{ slug: 'news', language: LOCALE_ISO_CODES.EN, page: '2' }]),
-    );
-    getTagPaginationParamsMock.mockResolvedValue(
-      okResult([
-        { slug: 'typescript', language: LOCALE_ISO_CODES.EN, page: '2' },
-        { slug: 'typescript', language: LOCALE_ISO_CODES.EN, page: '3' },
-      ]),
-    );
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).toContain('https://example.com/topics/news/page/2');
-    expect(urls).toContain('https://example.com/tags/typescript/page/2');
-    expect(urls).toContain('https://example.com/tags/typescript/page/3');
-  });
-
-  it('lists each Topic and Tag page under its own language prefix, with its live translations as alternates', async () => {
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-    getTopicParamsMock.mockResolvedValue(
-      okResult([
-        { slug: 'design', language: LOCALE_ISO_CODES.EN },
-        { slug: 'ontwerp', language: LOCALE_ISO_CODES.NL },
-      ]),
-    );
-    getTagParamsMock.mockResolvedValue(
-      okResult([{ slug: 'typescript-nl', language: LOCALE_ISO_CODES.NL }]),
-    );
-    getTranslationMapMock.mockResolvedValue(
-      okResult(
-        makeTranslationMap({
-          groups: [
-            [
-              {
-                documentType: 'page_topic',
-                language: LOCALE_ISO_CODES.EN,
-                slug: 'design',
-              },
-              {
-                documentType: 'page_topic',
-                language: LOCALE_ISO_CODES.NL,
-                slug: 'ontwerp',
-              },
-            ],
-          ],
-        }),
-      ),
-    );
-    const topicAlternates = {
-      en: DESIGN_TOPIC_URL,
-      nl: NL_DESIGN_TOPIC_URL,
-      'x-default': DESIGN_TOPIC_URL,
-    };
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: NL_DESIGN_TOPIC_URL,
-      alternates: { languages: topicAlternates },
-    });
-    expect(entries).toContainEqual({
-      url: DESIGN_TOPIC_URL,
-      alternates: { languages: topicAlternates },
-    });
-    expect(entries).toContainEqual({
-      url: NL_TYPESCRIPT_TAG_URL,
-      alternates: {
-        languages: { nl: NL_TYPESCRIPT_TAG_URL },
+    it.each([
+      {
+        name: 'topic pagination pages',
+        loader: getTopicPaginationParams,
+        omittedUrls: [toUrl(routes.topic(MOCK_TOPIC_SLUG, 2))],
       },
+      {
+        name: 'tag pagination pages',
+        loader: getTagPaginationParams,
+        omittedUrls: [
+          toUrl(routes.tag(MOCK_TAG_SLUG, 2)),
+          toUrl(routes.tag(MOCK_TAG_SLUG, 3)),
+        ],
+      },
+      {
+        name: 'numbered blog pages',
+        loader: getIndexPageParams,
+        omittedUrls: NUMBERED_BLOG_URLS,
+      },
+      {
+        name: 'the list pages',
+        loader: getTranslationMap,
+        omittedUrls: [BLOG_URL, TOPICS_URL, TAGS_URL],
+      },
+      {
+        name: 'landing page entries',
+        loader: getPageSlugs,
+        omittedUrls: [toUrl(routes.landingPage(MOCK_LANDING_SLUG))],
+      },
+      {
+        name: 'posts',
+        loader: getPostParams,
+        omittedUrls: [toUrl(routes.post(MOCK_POST_SLUG))],
+      },
+      {
+        name: 'topics',
+        loader: getTopicParams,
+        omittedUrls: [toUrl(routes.topic(MOCK_TOPIC_SLUG))],
+      },
+      {
+        name: 'tags',
+        loader: getTagParams,
+        omittedUrls: [toUrl(routes.tag(MOCK_TAG_SLUG))],
+      },
+    ])('omits only $name', async ({ loader, omittedUrls }) => {
+      loader.mockResolvedValue(errorResult(MOCK_FETCH_ERROR));
+
+      const urls = await getUrls();
+
+      expect(urls).toEqual(
+        POPULATED_URLS.filter((url) => !omittedUrls.includes(url)),
+      );
     });
-  });
-
-  it('lists each post under its own language prefix, with its live translations as alternates', async () => {
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-    getPostParamsMock.mockResolvedValue(
-      okResult([
-        {
-          slug: ARTICLE_SLUG,
-          language: LOCALE_ISO_CODES.EN,
-          publishedAt: FIRST_UPDATED_AT,
-        },
-        {
-          slug: NL_ARTICLE_SLUG,
-          language: LOCALE_ISO_CODES.NL,
-          publishedAt: SECOND_UPDATED_AT,
-        },
-      ]),
-    );
-    getTranslationMapMock.mockResolvedValue(
-      okResult(
-        makeTranslationMap({
-          groups: [
-            [
-              {
-                documentType: 'page_post',
-                language: LOCALE_ISO_CODES.EN,
-                slug: ARTICLE_SLUG,
-              },
-              {
-                documentType: 'page_post',
-                language: LOCALE_ISO_CODES.NL,
-                slug: NL_ARTICLE_SLUG,
-              },
-            ],
-          ],
-        }),
-      ),
-    );
-    const postAlternates = {
-      en: ARTICLE_URL,
-      nl: NL_ARTICLE_URL,
-      'x-default': ARTICLE_URL,
-    };
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: ARTICLE_URL,
-      lastModified: FIRST_UPDATED_AT,
-      alternates: { languages: postAlternates },
-    });
-    expect(entries).toContainEqual({
-      url: NL_ARTICLE_URL,
-      lastModified: SECOND_UPDATED_AT,
-      alternates: { languages: postAlternates },
-    });
-  });
-
-  it('lists numbered Topic pages under their own language prefix', async () => {
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-    getTopicPaginationParamsMock.mockResolvedValue(
-      okResult([{ slug: 'ontwerp', language: LOCALE_ISO_CODES.NL, page: '2' }]),
-    );
-
-    const urls = (await sitemap()).map((entry) => entry.url);
-
-    expect(urls).toContain('https://example.com/nl/topics/ontwerp/page/2');
-  });
-
-  it("requests posts, Topic and Tag pages with the tenant's live languages", async () => {
-    const tenantContext = { projectId: 'p' };
-    resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
-    getHostTenantSanityContextMock.mockResolvedValue({
-      isResolvable: true,
-      tenant: tenantContext,
-    });
-    selectLiveLocalesMock.mockReturnValue([
-      LOCALE_ISO_CODES.EN,
-      LOCALE_ISO_CODES.NL,
-    ]);
-
-    await sitemap();
-
-    [
-      getPostParamsMock,
-      getTopicParamsMock,
-      getTagParamsMock,
-      getTopicPaginationParamsMock,
-      getTagPaginationParamsMock,
-    ].forEach((mock) => {
-      expect(mock).toHaveBeenCalledWith(tenantContext, [
-        LOCALE_ISO_CODES.EN,
-        LOCALE_ISO_CODES.NL,
-      ]);
-    });
-  });
-
-  it('sets lastModified from publishedAt on posts, and not on entries without a date', async () => {
-    getPostParamsMock.mockResolvedValue(
-      okResult([
-        {
-          slug: FIRST_POST_SLUG,
-          language: LOCALE_ISO_CODES.EN,
-          publishedAt: FIRST_UPDATED_AT,
-        },
-      ]),
-    );
-    getTopicParamsMock.mockResolvedValue(
-      okResult([{ slug: 'news', language: LOCALE_ISO_CODES.EN }]),
-    );
-
-    const entries = await sitemap();
-    const postEntry = entries.find((entry) => entry.url === FIRST_POST_URL);
-    const topicEntry = entries.find((entry) => entry.url === NEWS_TOPIC_URL);
-
-    expect(postEntry?.lastModified).toBe(FIRST_UPDATED_AT);
-    expect(topicEntry?.lastModified).toBeUndefined();
-  });
-
-  it('carries a languages alternate for each configured locale', async () => {
-    const [homeEntry] = await sitemap();
-
-    expect(homeEntry?.alternates?.languages).toEqual({
-      en: HOME_URL,
-    });
-  });
-
-  const FAILURE_RESULT = errorResult(new Error('boom'));
-
-  it.each([
-    {
-      name: 'omits topic pagination pages when the fetch resolves to a failure result',
-      getMock: () => getTopicPaginationParamsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/topics/news/page/2'],
-    },
-    {
-      name: 'omits tag pagination pages when the fetch resolves to a failure result',
-      getMock: () => getTagPaginationParamsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/tags/typescript/page/2'],
-    },
-    {
-      name: 'omits numbered blog pages when the params fetch fails',
-      getMock: () => getIndexPageParamsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/blog/page/2'],
-      presentUrls: ['/blog'],
-    },
-    {
-      name: 'omits the list pages when the translation map fetch fails',
-      getMock: () => getTranslationMapMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/blog', '/topics', '/tags'],
-    },
-    {
-      name: 'omits landing pages when the slugs fetch fails',
-      getMock: () => getPageSlugsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/about'],
-    },
-    {
-      name: 'omits posts when the post params fetch resolves to a failure result',
-      getMock: () => getPostParamsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/blog/first-post'],
-      presentUrls: ['/blog'],
-    },
-    {
-      name: 'omits topics when the topic params fetch resolves to a failure result',
-      getMock: () => getTopicParamsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/topics/news'],
-    },
-    {
-      name: 'omits tags when the tag params fetch resolves to a failure result',
-      getMock: () => getTagParamsMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/tags/typescript'],
-    },
-  ])('$name', async ({ getMock, result, missingUrls, presentUrls = [] }) => {
-    getMock().mockResolvedValue(result);
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    missingUrls.forEach((path) => {
-      expect(urls).not.toContain(`https://example.com${path}`);
-    });
-    expect(urls).toContain(HOME_URL);
-    presentUrls.forEach((path) => {
-      expect(urls).toContain(`https://example.com${path}`);
-    });
-  });
-
-  it('forwards the resolved tenant Sanity context to every loader', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getHostTenantSanityContextMock.mockResolvedValue({
-      isResolvable: true,
-      tenant,
-    });
-
-    await sitemap();
-
-    expect(getPostParamsMock).toHaveBeenCalledWith(tenant, expect.any(Array));
-  });
-
-  it('returns an empty sitemap without querying content when the host is unresolvable', async () => {
-    getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
-
-    const entries = await sitemap();
-
-    expect(entries).toEqual([]);
-    expect(getPostParamsMock).not.toHaveBeenCalled();
-  });
-
-  it('returns an empty sitemap when no tenant base URL resolves', async () => {
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
-
-    const entries = await sitemap();
-
-    expect(entries).toEqual([]);
-    expect(getPostParamsMock).not.toHaveBeenCalled();
   });
 });

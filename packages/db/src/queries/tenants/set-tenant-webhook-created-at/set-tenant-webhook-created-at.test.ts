@@ -1,76 +1,40 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { setTenantWebhookCreatedAt } from './set-tenant-webhook-created-at';
 
 vi.mock('@blog/db/client');
 
-const MOCK_WEBHOOK_CREATED_AT_ISO = '2026-08-15T12:00:00.000Z';
+faker.seed(6020);
 
 const db = useQueryTestDb();
+useFrozenClock();
 
-async function insertDraftTenant(): Promise<string> {
-  const [tenant] = await db()
-    .insert(schema.tenants)
-    .values({
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: LOCALE_ISO_CODES.EN,
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    })
-    .returning();
-
-  if (!tenant) throw new Error('setup: tenant insert returned no row.');
-
-  return tenant.id;
-}
+const MOCK_WEBHOOK_CREATED_AT = faker.date.past({ refDate: MOCK_NOW });
 
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
 describe(setTenantWebhookCreatedAt, () => {
-  let tenantId: string;
+  it('records when the webhook was created, leaving every other column untouched', async () => {
+    const tenant = await insertTestTenant(db());
 
-  beforeEach(async () => {
-    tenantId = await insertDraftTenant();
-  });
-
-  it('sets the webhook-created-at timestamp', async () => {
-    const webhookCreatedAt = new Date(MOCK_WEBHOOK_CREATED_AT_ISO);
-
-    await setTenantWebhookCreatedAt(tenantId, webhookCreatedAt);
+    await setTenantWebhookCreatedAt(tenant.id, MOCK_WEBHOOK_CREATED_AT);
 
     const [row] = await db()
       .select()
       .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row?.webhookCreatedAt).toEqual(webhookCreatedAt);
-  });
-
-  it('leaves every other column untouched', async () => {
-    await setTenantWebhookCreatedAt(
-      tenantId,
-      new Date(MOCK_WEBHOOK_CREATED_AT_ISO),
-    );
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row).toMatchObject({
-      name: 'Acme',
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
+      .where(eq(tenants.id, tenant.id));
+    expect(row).toEqual({
+      ...tenant,
+      webhookCreatedAt: MOCK_WEBHOOK_CREATED_AT,
+      updatedAt: MOCK_NOW,
     });
   });
 });

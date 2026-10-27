@@ -11,14 +11,22 @@ import {
   mockLinkView,
   mockRawExternalLinkDocument,
   mockRawInternalLinkDocument,
+  mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toLogoWallModule } from './transformer';
 
-const LOGO_NAME = 'Stripe';
-const DARK_IMAGE_ASSET_ID = 'image-dark-400x100-svg';
-const LOGO_LINK_LABEL = 'Visit site';
-const LOGO_LINK_URL = 'https://acme.example.com';
+faker.seed(6014);
+
+const MOCK_LOGO_NAME = faker.company.name();
+const MOCK_LOGO_KEY = faker.string.uuid();
+const MOCK_DARK_IMAGE_ASSET_ID = faker.string.uuid();
+const MOCK_DARK_IMAGE_WIDTH = 400;
+const MOCK_DARK_IMAGE_HEIGHT = 100;
+const MOCK_DARK_ASPECT_RATIO = MOCK_DARK_IMAGE_WIDTH / MOCK_DARK_IMAGE_HEIGHT;
+const MOCK_LOGO_LINK_LABEL = faker.lorem.words(2);
+const MOCK_LOGO_LINK_URL = faker.internet.url();
 
 describe(toLogoWallModule, () => {
   it('maps brandVariant and displayMode straight through', () => {
@@ -46,7 +54,11 @@ describe(toLogoWallModule, () => {
   });
 
   it('keeps the logos in authored order', () => {
-    const keys = ['block-logo-b', 'block-logo-a', 'block-logo-c'];
+    const keys = [
+      faker.string.uuid(),
+      faker.string.uuid(),
+      faker.string.uuid(),
+    ];
     const raw = mockRawLogoWallModule({
       logos: keys.map((_key) => mockRawLogoItem({ _key })),
     });
@@ -58,26 +70,30 @@ describe(toLogoWallModule, () => {
 
   it("builds the image's alt from the logo's name", () => {
     const raw = mockRawLogoWallModule({
-      logos: [mockRawLogoItem({ name: LOGO_NAME })],
+      logos: [mockRawLogoItem({ name: MOCK_LOGO_NAME })],
     });
 
     const module = toLogoWallModule(raw);
 
-    expect(module.logos[0]?.name).toBe(LOGO_NAME);
-    expect(module.logos[0]?.image?.alt).toBe(LOGO_NAME);
+    expect(module.logos[0]?.name).toBe(MOCK_LOGO_NAME);
+    expect(module.logos[0]?.image?.alt).toBe(MOCK_LOGO_NAME);
   });
 
   it('yields both images, each with its own aspect ratio, for a dark-background logo', () => {
     const raw = mockRawLogoWallModule({
       logos: [
         mockRawLogoItem({
-          name: LOGO_NAME,
+          name: MOCK_LOGO_NAME,
           imageDark: {
             asset: {
-              _id: DARK_IMAGE_ASSET_ID,
+              _id: MOCK_DARK_IMAGE_ASSET_ID,
               metadata: {
                 lqip: null,
-                dimensions: { width: 400, height: 100, aspectRatio: 4 },
+                dimensions: {
+                  width: MOCK_DARK_IMAGE_WIDTH,
+                  height: MOCK_DARK_IMAGE_HEIGHT,
+                  aspectRatio: MOCK_DARK_ASPECT_RATIO,
+                },
               },
             },
             hotspot: null,
@@ -89,11 +105,13 @@ describe(toLogoWallModule, () => {
 
     const [logo] = toLogoWallModule(raw).logos;
 
-    expect(logo?.image.dimensions?.aspectRatio).toBe(1.333);
+    expect(logo?.image.dimensions?.aspectRatio).toBe(
+      mockSanityImageView().dimensions?.aspectRatio,
+    );
     expect(logo?.imageDark).toMatchObject({
-      assetId: DARK_IMAGE_ASSET_ID,
-      alt: LOGO_NAME,
-      dimensions: { aspectRatio: 4 },
+      assetId: MOCK_DARK_IMAGE_ASSET_ID,
+      alt: MOCK_LOGO_NAME,
+      dimensions: { aspectRatio: MOCK_DARK_ASPECT_RATIO },
     });
   });
 
@@ -132,8 +150,8 @@ describe(toLogoWallModule, () => {
       logos: [
         mockRawLogoItem({
           link: mockRawExternalLinkDocument({
-            label: LOGO_LINK_LABEL,
-            url: LOGO_LINK_URL,
+            label: MOCK_LOGO_LINK_LABEL,
+            url: MOCK_LOGO_LINK_URL,
             openInNewTab: true,
           }),
         }),
@@ -144,8 +162,8 @@ describe(toLogoWallModule, () => {
 
     expect(module.logos[0]?.link).toEqual(
       mockLinkView({
-        label: LOGO_LINK_LABEL,
-        href: LOGO_LINK_URL,
+        label: MOCK_LOGO_LINK_LABEL,
+        href: MOCK_LOGO_LINK_URL,
         target: '_blank',
       }),
     );
@@ -155,6 +173,7 @@ describe(toLogoWallModule, () => {
     const raw = mockRawLogoWallModule({
       logos: [
         mockRawLogoItem({
+          _key: MOCK_LOGO_KEY,
           link: mockRawInternalLinkDocument(),
         }),
       ],
@@ -162,7 +181,7 @@ describe(toLogoWallModule, () => {
 
     const module = toLogoWallModule(raw);
 
-    expect(module.logos[0]?.id).toBe('block-logo-1');
+    expect(module.logos[0]?.id).toBe(MOCK_LOGO_KEY);
     expect(module.logos[0]?.link).toBeUndefined();
   });
 
@@ -173,7 +192,6 @@ describe(toLogoWallModule, () => {
 
     const module = toLogoWallModule(raw);
 
-    expect(module.ctaButtons).toHaveLength(1);
-    expect(module.ctaButtons[0]).toEqual(mockCtaButtonView());
+    expect(module.ctaButtons).toEqual([mockCtaButtonView()]);
   });
 });

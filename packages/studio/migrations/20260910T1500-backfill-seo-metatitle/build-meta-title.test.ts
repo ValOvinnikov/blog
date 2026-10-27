@@ -6,161 +6,158 @@ import {
   META_TITLE_MIN_LENGTH,
 } from './build-meta-title';
 
-const BRAND = 'valstack.dev';
-const TAGLINE = 'Field notes on building software';
+const MOCK_BRAND = 'valstack.dev';
+const MOCK_TAGLINE = 'Field notes on building software';
+const MOCK_SHORT_SUBJECT = 'AI';
+const MOCK_SHORT_BRAND = 'X';
+const MOCK_SHORT_HEADING = 'SEO That Generates Itself';
+const MOCK_LONG_HEADING = 'Shipping Heroes Without a Designer';
+const MOCK_LONG_SUBJECT = 'A Subject Long Enough To Need No Padding At All';
 
 describe(buildHeadingMetaTitle, () => {
-  it('uses the heading verbatim once it already clears the floor', () => {
-    expect(
-      buildHeadingMetaTitle('Shipping Heroes Without a Designer', BRAND),
-    ).toBe('Shipping Heroes Without a Designer');
+  it('uses a heading that already clears the floor verbatim', () => {
+    const result = buildHeadingMetaTitle(MOCK_LONG_HEADING, MOCK_BRAND);
+
+    expect(result).toBe(MOCK_LONG_HEADING);
   });
 
-  it('uses a 60-character heading verbatim at the ceiling', () => {
-    const heading =
-      '24 Days, ~1,250 Commits: What the Agents Got Right and Wrong';
+  it('uses a heading at the ceiling verbatim', () => {
+    const heading = 'x'.repeat(META_TITLE_MAX_LENGTH);
 
-    expect(heading).toHaveLength(60);
-    expect(buildHeadingMetaTitle(heading, BRAND)).toBe(heading);
+    const result = buildHeadingMetaTitle(heading, MOCK_BRAND);
+
+    expect(result).toBe(heading);
   });
 
   it('pads a too-short heading with the brand name', () => {
-    expect(buildHeadingMetaTitle('SEO That Generates Itself', BRAND)).toBe(
-      'SEO That Generates Itself — valstack.dev',
-    );
+    const result = buildHeadingMetaTitle(MOCK_SHORT_HEADING, MOCK_BRAND);
+
+    expect(result).toBe(`${MOCK_SHORT_HEADING} — ${MOCK_BRAND}`);
   });
 
   it('trims the heading before measuring it', () => {
-    expect(
-      buildHeadingMetaTitle('  Shipping Heroes Without a Designer  ', BRAND),
-    ).toBe('Shipping Heroes Without a Designer');
+    const result = buildHeadingMetaTitle(
+      `  ${MOCK_LONG_HEADING}  `,
+      MOCK_BRAND,
+    );
+
+    expect(result).toBe(MOCK_LONG_HEADING);
   });
 
   it('truncates a heading longer than the ceiling', () => {
-    const heading = 'x'.repeat(70);
+    const heading = 'x'.repeat(META_TITLE_MAX_LENGTH + 10);
 
-    const result = buildHeadingMetaTitle(heading, BRAND);
+    const result = buildHeadingMetaTitle(heading, MOCK_BRAND);
 
-    expect(result).toBeDefined();
-    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
-    expect(result).toBe('x'.repeat(60));
+    expect(result).toBe('x'.repeat(META_TITLE_MAX_LENGTH));
   });
 
-  it('falls through to the tagline when heading + brand alone is still short', () => {
-    const result = buildHeadingMetaTitle('AI', 'X', TAGLINE);
+  it('falls through to the tagline when heading and brand are still short', () => {
+    const result = buildHeadingMetaTitle(
+      MOCK_SHORT_SUBJECT,
+      MOCK_SHORT_BRAND,
+      MOCK_TAGLINE,
+    );
 
-    expect(result).toBeDefined();
-    expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
-    expect(result).toContain('AI');
-    expect(result).toContain(TAGLINE);
+    expect(result).toBe(
+      `${MOCK_SHORT_SUBJECT} — ${MOCK_SHORT_BRAND} — ${MOCK_TAGLINE}`,
+    );
   });
 
-  it('returns undefined when heading + brand is short and no tagline is available', () => {
-    expect(buildHeadingMetaTitle('AI', 'X')).toBeUndefined();
-  });
+  it.each([
+    ['no tagline is available', undefined],
+    ['the tagline is empty', ''],
+  ])('returns undefined when still short and %s', (_name, tagline) => {
+    const result = buildHeadingMetaTitle(
+      MOCK_SHORT_SUBJECT,
+      MOCK_SHORT_BRAND,
+      tagline,
+    );
 
-  it('returns undefined when every pad is exhausted and still short', () => {
-    expect(buildHeadingMetaTitle('AI', 'X', '')).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 });
 
 describe(buildIndexPageMetaTitle, () => {
-  it('pads a bare singleton heading with the site tagline', () => {
-    expect(buildIndexPageMetaTitle('Blog', TAGLINE)).toBe(
-      'Blog — Field notes on building software',
-    );
-    expect(buildIndexPageMetaTitle('Tags', TAGLINE)).toBe(
-      'Tags — Field notes on building software',
-    );
-    expect(buildIndexPageMetaTitle('Topics', TAGLINE)).toBe(
-      'Topics — Field notes on building software',
-    );
+  it.each(['Blog', 'Tags', 'Topics'])(
+    'pads the bare heading %s with the site tagline',
+    (heading) => {
+      const result = buildIndexPageMetaTitle(heading, MOCK_TAGLINE);
+
+      expect(result).toBe(`${heading} — ${MOCK_TAGLINE}`);
+    },
+  );
+
+  it('uses a heading that already clears the floor verbatim', () => {
+    const result = buildIndexPageMetaTitle(MOCK_LONG_SUBJECT, MOCK_TAGLINE);
+
+    expect(result).toBe(MOCK_LONG_SUBJECT);
   });
 
-  it('uses the heading verbatim once it already clears the floor', () => {
-    const heading = 'A Heading That Is Already Long Enough On Its Own';
+  it.each([
+    ['no brand is given', '', undefined],
+    ['the brand alone cannot clear the floor', '', MOCK_BRAND],
+    ['there is no pad material at all', '', ''],
+  ])(
+    'returns undefined when the tagline is empty and %s',
+    (_name, pad, brand) => {
+      const result = buildIndexPageMetaTitle('Blog', pad, brand);
 
-    expect(buildIndexPageMetaTitle(heading, TAGLINE)).toBe(heading);
-  });
-
-  it('returns undefined when the tagline pad alone is still short and no brand is given', () => {
-    expect(buildIndexPageMetaTitle('Blog', '')).toBeUndefined();
-  });
-
-  it('returns undefined when neither the pad text nor the brand clears the floor', () => {
-    expect(buildIndexPageMetaTitle('Blog', '', BRAND)).toBeUndefined();
-  });
-
-  it('returns undefined when there is no usable pad material at all', () => {
-    expect(buildIndexPageMetaTitle('Blog', '', '')).toBeUndefined();
-  });
+      expect(result).toBeUndefined();
+    },
+  );
 });
 
 describe(buildEntityPageMetaTitle, () => {
-  it('pads a short tag name to clear the floor, at exactly 30 for the shortest tag', () => {
-    const result = buildEntityPageMetaTitle('SEO', BRAND);
+  it('pads a short subject up to exactly the floor', () => {
+    const subject = 'SEO';
 
-    expect(result).toBe('SEO — Articles on valstack.dev');
+    const result = buildEntityPageMetaTitle(subject, MOCK_BRAND);
+
+    expect(result).toBe(`${subject} — Articles on ${MOCK_BRAND}`);
     expect(result).toHaveLength(META_TITLE_MIN_LENGTH);
   });
 
-  it('pads every known page_tag subject within 30–60', () => {
-    const tags = [
-      'Illustration',
-      'CI/CD',
-      'Tailwind',
-      'Claude Code',
-      'Architecture',
-      'AI Agents',
-      'Static Rendering',
-      'Sanity',
-      'SEO',
-      'Monorepo',
-      'groqd',
-      'Typegen',
-      'Next.js',
-      'TypeScript',
-      'Portable Text',
-    ];
+  it('pads a longer short subject the same way', () => {
+    const subject = 'Building with AI';
 
-    for (const tag of tags) {
-      const result = buildEntityPageMetaTitle(tag, BRAND);
+    const result = buildEntityPageMetaTitle(subject, MOCK_BRAND);
 
-      expect(result).toBeDefined();
-      expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-      expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
-    }
+    expect(result).toBe(`${subject} — Articles on ${MOCK_BRAND}`);
   });
 
-  it('trims a trailing space on the source tag title', () => {
-    expect(buildEntityPageMetaTitle('AI Agents ', BRAND)).toBe(
-      'AI Agents — Articles on valstack.dev',
+  it('trims a trailing space on the subject', () => {
+    const subject = 'AI Agents';
+
+    const result = buildEntityPageMetaTitle(`${subject} `, MOCK_BRAND);
+
+    expect(result).toBe(`${subject} — Articles on ${MOCK_BRAND}`);
+  });
+
+  it('uses a subject that already clears the floor verbatim', () => {
+    const result = buildEntityPageMetaTitle(MOCK_LONG_SUBJECT, MOCK_BRAND);
+
+    expect(result).toBe(MOCK_LONG_SUBJECT);
+  });
+
+  it('falls through to the tagline when subject and brand are still short', () => {
+    const result = buildEntityPageMetaTitle(
+      MOCK_SHORT_SUBJECT,
+      MOCK_SHORT_BRAND,
+      MOCK_TAGLINE,
+    );
+
+    expect(result).toBe(
+      `${MOCK_SHORT_SUBJECT} — Articles on ${MOCK_SHORT_BRAND} — ${MOCK_TAGLINE}`,
     );
   });
 
-  it('pads a topic title the same way', () => {
-    expect(buildEntityPageMetaTitle('Building with AI', BRAND)).toBe(
-      'Building with AI — Articles on valstack.dev',
+  it('returns undefined when still short and no tagline is available', () => {
+    const result = buildEntityPageMetaTitle(
+      MOCK_SHORT_SUBJECT,
+      MOCK_SHORT_BRAND,
     );
-  });
 
-  it('uses the subject verbatim once it already clears the floor', () => {
-    const subject = 'A Subject Long Enough To Need No Padding At All';
-
-    expect(buildEntityPageMetaTitle(subject, BRAND)).toBe(subject);
-  });
-
-  it('falls through to the tagline when subject + brand pad is still short', () => {
-    const result = buildEntityPageMetaTitle('AI', 'X', TAGLINE);
-
-    expect(result).toBeDefined();
-    expect(result?.length).toBeGreaterThanOrEqual(META_TITLE_MIN_LENGTH);
-    expect(result?.length).toBeLessThanOrEqual(META_TITLE_MAX_LENGTH);
-    expect(result).toContain(TAGLINE);
-  });
-
-  it('returns undefined when subject + brand pad is short and no tagline is available', () => {
-    expect(buildEntityPageMetaTitle('AI', 'X')).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 });

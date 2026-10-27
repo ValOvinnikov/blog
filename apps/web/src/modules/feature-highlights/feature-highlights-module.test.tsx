@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, MEDIA_ORDER } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_FEATURE_HIGHLIGHT_ITEMS,
@@ -11,7 +12,9 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 
 import { FeatureHighlightsModule } from './feature-highlights-module';
 
-const MODULE_ID = 'feature-highlights-1';
+faker.seed(6011);
+
+const MOCK_MODULE_ID = faker.string.uuid();
 
 const { getFeatureHighlightsModuleMock } = vi.hoisted(() => ({
   getFeatureHighlightsModuleMock: vi.fn(),
@@ -31,7 +34,7 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const baseModule = {
+const MOCK_BASE_MODULE = {
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
   ctaButtons: [],
@@ -41,7 +44,7 @@ const baseModule = {
 };
 
 const setup = customRenderAsync(FeatureHighlightsModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${FeatureHighlightsModule.name}/>`, () => {
@@ -49,16 +52,35 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
     getFeatureHighlightsModuleMock.mockReset();
   });
 
-  it('fetches the module by id with the tenant context', async () => {
-    getFeatureHighlightsModuleMock.mockResolvedValue(
-      okResult({ ...baseModule, highlights: [] }),
-    );
+  describe('when the module resolves', () => {
+    beforeEach(async () => {
+      getFeatureHighlightsModuleMock.mockResolvedValue(
+        okResult({
+          ...MOCK_BASE_MODULE,
+          highlights: MOCK_FEATURE_HIGHLIGHT_ITEMS,
+        }),
+      );
 
-    await setup();
+      await setup();
+    });
 
-    expect(getFeatureHighlightsModuleMock).toHaveBeenCalledWith(
-      MODULE_ID,
-      MOCK_TENANT_SANITY_CONTEXT,
+    it('fetches the module by id with the tenant context', () => {
+      expect(getFeatureHighlightsModuleMock).toHaveBeenCalledWith(
+        MOCK_MODULE_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it.each(MOCK_FEATURE_HIGHLIGHT_ITEMS)(
+      'renders the highlight row titled $heading',
+      ({ heading }) => {
+        const rowHeading = screen.getByRole('heading', {
+          level: 3,
+          name: heading,
+        });
+
+        expect(rowHeading).toBeVisible();
+      },
     );
   });
 
@@ -68,21 +90,5 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders the resolved highlight rows', async () => {
-    getFeatureHighlightsModuleMock.mockResolvedValue(
-      okResult({ ...baseModule, highlights: MOCK_FEATURE_HIGHLIGHT_ITEMS }),
-    );
-
-    await setup();
-
-    MOCK_FEATURE_HIGHLIGHT_ITEMS.forEach((highlight) => {
-      const heading = screen.getByRole('heading', {
-        level: 3,
-        name: highlight.heading,
-      });
-      expect(heading).toBeVisible();
-    });
   });
 });

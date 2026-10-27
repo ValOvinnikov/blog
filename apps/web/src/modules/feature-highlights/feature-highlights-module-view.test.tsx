@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, MEDIA_ORDER, type TMediaOrder } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_FEATURE_HIGHLIGHTS_HEADING,
@@ -10,25 +11,24 @@ import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
 
 vi.mock('@web/i18n/navigation');
 
-const highlights = [
-  mockFeatureHighlightItem({ id: 'highlight-1' }),
-  mockFeatureHighlightItem({ id: 'highlight-2' }),
-  mockFeatureHighlightItem({ id: 'highlight-3' }),
-  mockFeatureHighlightItem({ id: 'highlight-4' }),
-];
+faker.seed(6011);
 
-const dataTestId = 'feature-highlights-module-feature-highlights-1';
+const MOCK_HIGHLIGHTS = Array.from({ length: 4 }, () =>
+  mockFeatureHighlightItem({ id: faker.string.uuid() }),
+);
+const MOCK_DATA_TEST_ID = faker.string.uuid();
+const MOCK_TITLE_ID = faker.string.uuid();
 
 const setup = customRender(FeatureHighlightsModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_HIGHLIGHTS_HEADING }),
-  highlights,
+  highlights: MOCK_HIGHLIGHTS,
   ctaButtons: [],
   mediaOrder: MEDIA_ORDER.FIRST,
   contentAlignment: undefined,
   layout: undefined,
-  titleId: 'feature-highlights-title',
-  dataTestId,
+  titleId: MOCK_TITLE_ID,
+  dataTestId: MOCK_DATA_TEST_ID,
 });
 
 describe(`<${FeatureHighlightsModuleView.name}/>`, () => {
@@ -40,8 +40,10 @@ describe(`<${FeatureHighlightsModuleView.name}/>`, () => {
     (mediaOrder, expectedSides) => {
       setup({ mediaOrder });
 
-      highlights.forEach((highlight, index) => {
-        const row = screen.getByTestId(`${dataTestId}-row-${highlight.id}`);
+      MOCK_HIGHLIGHTS.forEach((highlight, index) => {
+        const row = screen.getByTestId(
+          `${MOCK_DATA_TEST_ID}-row-${highlight.id}`,
+        );
         expect(row).toHaveAttribute('data-media-side', expectedSides[index]);
       });
     },

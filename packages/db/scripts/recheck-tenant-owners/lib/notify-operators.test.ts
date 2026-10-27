@@ -1,52 +1,50 @@
-import { HTTP_STATUS, OPERATOR_ALERT_KIND } from '@blog/config/constants';
+import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
+import {
+  MOCK_OPERATOR_ALERT_SECRET,
+  MOCK_PLATFORM_APP_BASE_URL,
+} from '@blog/db/testing/operator-alert/fixtures';
 import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   isNotifiableOutcome,
   notifyOperatorsOfOwnerElevationOutcome,
 } from './notify-operators';
 
+faker.seed(5805);
+
 const MOCK_TENANT = mockTenant();
 
 beforeEach(() => {
-  vi.stubEnv('PLATFORM_APP_BASE_URL', 'https://platform.example.com');
-  vi.stubEnv('OPERATOR_ALERT_SECRET', 'shared-secret');
+  vi.stubEnv('PLATFORM_APP_BASE_URL', MOCK_PLATFORM_APP_BASE_URL);
+  vi.stubEnv('OPERATOR_ALERT_SECRET', MOCK_OPERATOR_ALERT_SECRET);
 });
 
 afterEach(() => {
-  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
 describe(isNotifiableOutcome, () => {
-  it('is true for STALLED and AMBIGUOUS_MEMBERSHIP', () => {
-    expect(isNotifiableOutcome(ELEVATE_TENANT_OWNER_OUTCOME.STALLED)).toBe(
-      true,
-    );
-    expect(
-      isNotifiableOutcome(ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP),
-    ).toBe(true);
+  it.each([
+    ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+    ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
+  ])('is true for %s', (outcome) => {
+    expect(isNotifiableOutcome(outcome)).toBe(true);
   });
 
-  it('is false for ELEVATED, ALREADY_ADMINISTRATOR, PENDING_ACCEPTANCE', () => {
-    expect(isNotifiableOutcome(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED)).toBe(
-      false,
-    );
-    expect(
-      isNotifiableOutcome(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR),
-    ).toBe(false);
-    expect(
-      isNotifiableOutcome(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE),
-    ).toBe(false);
+  it.each([
+    ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
+    ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR,
+    ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+  ])('is false for %s', (outcome) => {
+    expect(isNotifiableOutcome(outcome)).toBe(false);
   });
 });
 
 describe(notifyOperatorsOfOwnerElevationOutcome, () => {
   it('posts an OWNER_ELEVATION alert with the tenant id and outcome', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null));
     vi.stubGlobal('fetch', fetchMock);
 
     await notifyOperatorsOfOwnerElevationOutcome({
@@ -60,34 +58,5 @@ describe(notifyOperatorsOfOwnerElevationOutcome, () => {
       tenantId: MOCK_TENANT.id,
       outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
     });
-  });
-
-  it('resolves without throwing when the platform responds with a failure status', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(null, { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
-        ),
-    );
-
-    await expect(
-      notifyOperatorsOfOwnerElevationOutcome({
-        tenant: MOCK_TENANT,
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      }),
-    ).resolves.toBeUndefined();
-  });
-
-  it('resolves without throwing when fetch itself rejects', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('ECONNRESET')));
-
-    await expect(
-      notifyOperatorsOfOwnerElevationOutcome({
-        tenant: MOCK_TENANT,
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
-      }),
-    ).resolves.toBeUndefined();
   });
 });

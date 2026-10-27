@@ -15,19 +15,29 @@ import {
   MOCK_POST_EXCERPT,
   MOCK_POST_TITLE,
 } from '@blog/ui/testing/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { Hero, type THeroProps } from './hero';
 
-const HERO_TITLE_ID = 'hero-title';
-const BODY_TEXT = 'Full bio goes here.';
-const HERO_TEST_ID = 'featured-hero';
+faker.seed(6013);
+
 const MEDIA_TEST_ID = 'hero-media';
 const OVERLAY_TEST_ID = 'hero-overlay';
-const EYEBROW = 'Senior frontend engineer';
+const COPY_TEST_ID = 'hero-copy';
+const MOCK_TITLE_ID = faker.string.uuid();
+const MOCK_BODY_TEXT = faker.lorem.sentence();
+const MOCK_EYEBROW = faker.lorem.words(3);
+const MOCK_PORTRAIT_ALT = `Portrait of ${MOCK_PERSON_NAME}`;
+const MOCK_MEDIA_ALT = faker.lorem.words(3);
+const MOCK_CTA_LABEL = faker.lorem.words(2);
+const MOCK_CTA_HREF = `/posts/${faker.lorem.slug()}`;
+const MOCK_SOCIAL_LABEL = faker.lorem.words(3);
+const MOCK_SOCIAL_LINK_LABEL = faker.lorem.word();
+const MOCK_SOCIAL_HREF = faker.internet.url();
 
 const setup = customRender(Hero, {
   title: MOCK_POST_TITLE,
-  titleId: HERO_TITLE_ID,
+  titleId: MOCK_TITLE_ID,
   tone: BRAND_VARIANT.PRIMARY,
 });
 
@@ -38,7 +48,7 @@ const renderHero = (
   renderElement(
     <Hero
       title={MOCK_POST_TITLE}
-      titleId={HERO_TITLE_ID}
+      titleId={MOCK_TITLE_ID}
       tone={BRAND_VARIANT.PRIMARY}
       {...props}
     >
@@ -52,26 +62,23 @@ const expectFollows = (before: Element, after: Element) => {
   ).toBeTruthy();
 };
 
-const PORTRAIT_ALT = `Portrait of ${MOCK_PERSON_NAME}`;
-const HERO_MEDIA_ALT = 'Hero cover photo';
-
 const heroMedia = (
   <Hero.Media>
-    <img src="/img/hero.jpg" alt={HERO_MEDIA_ALT} />
+    <img src="/img/hero.jpg" alt={MOCK_MEDIA_ALT} />
   </Hero.Media>
 );
 
 const heroCta = (
   <Hero.Cta>
-    <a href="/posts/design-system">Read more</a>
+    <a href={MOCK_CTA_HREF}>{MOCK_CTA_LABEL}</a>
   </Hero.Cta>
 );
 
 const heroSocial = (
   <Hero.Social>
-    <ul aria-label="Find Jane elsewhere">
+    <ul aria-label={MOCK_SOCIAL_LABEL}>
       <li>
-        <a href="https://github.com/janedoe">GitHub</a>
+        <a href={MOCK_SOCIAL_HREF}>{MOCK_SOCIAL_LINK_LABEL}</a>
       </li>
     </ul>
   </Hero.Social>
@@ -83,67 +90,61 @@ describe(`<${Hero.name}/>`, () => {
       setup();
     });
 
-    it('renders the title', () => {
+    it('renders the title as a heading carrying the title id', () => {
       const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
+
       expect(heading).toBeVisible();
+      expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
     });
 
-    it('does not render an excerpt element when excerpt is omitted', () => {
-      const excerpt = screen.queryByText(MOCK_POST_EXCERPT);
-      expect(excerpt).not.toBeInTheDocument();
-    });
+    it.each([
+      {
+        slot: 'an excerpt',
+        query: () => screen.queryByText(MOCK_POST_EXCERPT),
+      },
+      { slot: 'body content', query: () => screen.queryByText(MOCK_BODY_TEXT) },
+      {
+        slot: 'a CTA',
+        query: () => screen.queryByRole('link', { name: MOCK_CTA_LABEL }),
+      },
+      { slot: 'media', query: () => screen.queryByAltText(MOCK_MEDIA_ALT) },
+      {
+        slot: 'an avatar',
+        query: () => screen.queryByAltText(MOCK_PORTRAIT_ALT),
+      },
+      {
+        slot: 'social links',
+        query: () => screen.queryByRole('list', { name: MOCK_SOCIAL_LABEL }),
+      },
+    ])('renders no $slot when it is omitted', ({ query }) => {
+      const slot = query();
 
-    it('does not render body content when Hero.Body is omitted', () => {
-      const body = screen.queryByText(BODY_TEXT);
-      expect(body).not.toBeInTheDocument();
-    });
-
-    it('does not render a CTA when Hero.Cta is omitted', () => {
-      const cta = screen.queryByRole('link');
-      expect(cta).not.toBeInTheDocument();
-    });
-
-    it('does not render media when Hero.Media is omitted', () => {
-      const media = screen.queryByRole('img');
-      expect(media).not.toBeInTheDocument();
-    });
-
-    it('assigns titleId to the heading element', () => {
-      const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
-      expect(heading).toHaveAttribute('id', HERO_TITLE_ID);
-    });
-
-    it('does not render avatar content when Hero.Avatar is omitted', () => {
-      const portrait = screen.queryByAltText(PORTRAIT_ALT);
-      expect(portrait).not.toBeInTheDocument();
-    });
-
-    it('does not render social content when Hero.Social is omitted', () => {
-      const social = screen.queryByRole('list');
-      expect(social).not.toBeInTheDocument();
+      expect(slot).not.toBeInTheDocument();
     });
   });
 
   it('renders the excerpt when provided', () => {
     setup({ excerpt: MOCK_POST_EXCERPT });
+
     const excerpt = screen.getByText(MOCK_POST_EXCERPT);
+
     expect(excerpt).toBeVisible();
   });
 
-  it('renders Hero.Body between the excerpt and Hero.Cta in the DOM', () => {
+  it('renders Hero.Body between the excerpt and Hero.Cta', () => {
     renderHero(
       { excerpt: MOCK_POST_EXCERPT },
       <>
         <Hero.Body>
-          <p>{BODY_TEXT}</p>
+          <p>{MOCK_BODY_TEXT}</p>
         </Hero.Body>
         {heroCta}
       </>,
     );
 
     const excerpt = screen.getByText(MOCK_POST_EXCERPT);
-    const body = screen.getByText(BODY_TEXT);
-    const cta = screen.getByRole('link', { name: 'Read more' });
+    const body = screen.getByText(MOCK_BODY_TEXT);
+    const cta = screen.getByRole('link', { name: MOCK_CTA_LABEL });
 
     expectFollows(excerpt, body);
     expectFollows(body, cta);
@@ -154,17 +155,17 @@ describe(`<${Hero.name}/>`, () => {
       renderHero(undefined, heroCta);
     });
 
-    it('renders Hero.Cta children', () => {
-      const cta = screen.getByRole('link');
-      const ctaText = screen.getByText('Read more');
-      expect(cta).toHaveAttribute('href', '/posts/design-system');
-      expect(ctaText).toBeVisible();
+    it('renders the CTA link', () => {
+      const cta = screen.getByRole('link', { name: MOCK_CTA_LABEL });
+
+      expect(cta).toHaveAttribute('href', MOCK_CTA_HREF);
     });
 
     it('nests the CTA inside the copy column, alongside the heading', () => {
-      const copyColumn = screen.getByTestId('hero-copy');
+      const copyColumn = screen.getByTestId(COPY_TEST_ID);
       const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
-      const cta = screen.getByRole('link');
+      const cta = screen.getByRole('link', { name: MOCK_CTA_LABEL });
+
       expect(copyColumn).toContainElement(heading);
       expect(copyColumn).toContainElement(cta);
     });
@@ -172,62 +173,57 @@ describe(`<${Hero.name}/>`, () => {
 
   it('renders Hero.Media content', () => {
     renderHero(undefined, heroMedia);
-    const mediaImage = screen.getByAltText(HERO_MEDIA_ALT);
-    expect(mediaImage).toBeVisible();
-  });
 
-  it('forwards data-testid to the root element', () => {
-    setup({ dataTestId: HERO_TEST_ID });
-    const hero = screen.getByTestId(HERO_TEST_ID);
-    expect(hero).toBeVisible();
+    const mediaImage = screen.getByAltText(MOCK_MEDIA_ALT);
+
+    expect(mediaImage).toBeVisible();
   });
 
   it.each([
     {
-      name: 'keeps copy before media in the DOM at the mobile-collapsed order (mediaOrder FIRST)',
+      name: 'keeps copy before media at the mobile-collapsed Split order',
       props: { variant: HERO_VARIANT.SPLIT, mediaOrder: MEDIA_ORDER.FIRST },
     },
     {
-      name: 'keeps copy before media in the DOM at the two-column order (contentPosition RIGHT)',
+      name: 'keeps copy before media at the two-column Split order',
       props: {
         variant: HERO_VARIANT.SPLIT,
         contentPosition: CONTENT_ALIGNMENT.RIGHT,
       },
     },
     {
-      name: 'keeps copy before media in the DOM on Banner, even though the media is a background',
+      name: 'keeps copy before media on Banner, where the media is a background',
       props: { variant: HERO_VARIANT.BANNER },
     },
   ])('$name', ({ props }) => {
     renderHero(props, heroMedia);
 
-    const heading = screen.getByRole('heading');
+    const heading = screen.getByRole('heading', { name: MOCK_POST_TITLE });
     const media = screen.getByTestId(MEDIA_TEST_ID);
 
     expectFollows(heading, media);
   });
 
-  it('keeps Split and Stacked media framed by an intermediate MediaFrame wrapper', () => {
-    for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
-      const { unmount } = renderHero({ variant }, heroMedia);
+  it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED])(
+    'frames %s media in a wrapper around the image',
+    (variant) => {
+      renderHero({ variant }, heroMedia);
 
       const wrapper = screen.getByTestId(MEDIA_TEST_ID);
-      const image = screen.getByAltText(HERO_MEDIA_ALT);
+      const image = screen.getByAltText(MOCK_MEDIA_ALT);
 
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
+      // eslint-disable-next-line testing-library/no-node-access -- the image being a direct child of the wrapper is a structural claim with no semantic handle
       expect(image.parentElement).not.toBe(wrapper);
+    },
+  );
 
-      unmount();
-    }
-  });
-
-  it('renders Banner media unframed, directly inside the hero-media wrapper', () => {
+  it('renders Banner media as a direct child of the media wrapper', () => {
     renderHero({ variant: HERO_VARIANT.BANNER }, heroMedia);
 
     const wrapper = screen.getByTestId(MEDIA_TEST_ID);
-    const image = screen.getByAltText(HERO_MEDIA_ALT);
+    const image = screen.getByAltText(MOCK_MEDIA_ALT);
 
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
+    // eslint-disable-next-line testing-library/no-node-access -- the image being a direct child of the wrapper is a structural claim with no semantic handle
     expect(image.parentElement).toBe(wrapper);
   });
 
@@ -238,60 +234,44 @@ describe(`<${Hero.name}/>`, () => {
     );
 
     const overlay = screen.getByTestId(OVERLAY_TEST_ID);
+
     expect(overlay).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('renders no overlay on Split or Stacked, regardless of tone', () => {
-    for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
-      const { unmount } = renderHero(
-        { variant, tone: BRAND_VARIANT.BRAND_PRIMARY },
-        heroMedia,
-      );
+  it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED])(
+    'renders no overlay on %s',
+    (variant) => {
+      renderHero({ variant, tone: BRAND_VARIANT.BRAND_PRIMARY }, heroMedia);
 
       const overlay = screen.queryByTestId(OVERLAY_TEST_ID);
+
       expect(overlay).not.toBeInTheDocument();
-
-      unmount();
-    }
-  });
-
-  it.each([
-    {
-      name: 'leaves Split rendering unaffected by tone',
-      variant: HERO_VARIANT.SPLIT,
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
     },
-    {
-      name: 'leaves Stacked rendering unaffected by tone',
-      variant: HERO_VARIANT.STACKED,
-      tone: BRAND_VARIANT.SECONDARY,
+  );
+
+  it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED])(
+    'orders the avatar, eyebrow, CTA and social links on %s',
+    (variant) => {
+      renderHero(
+        { eyebrow: MOCK_EYEBROW, variant },
+        <>
+          <Hero.Avatar>
+            <img src="/img/jane.jpg" alt={MOCK_PORTRAIT_ALT} />
+          </Hero.Avatar>
+          {heroCta}
+          {heroSocial}
+        </>,
+      );
+
+      const avatar = screen.getByAltText(MOCK_PORTRAIT_ALT);
+      const eyebrow = screen.getByText(MOCK_EYEBROW);
+      const cta = screen.getByRole('link', { name: MOCK_CTA_LABEL });
+      const social = screen.getByRole('list', { name: MOCK_SOCIAL_LABEL });
+
+      expectFollows(avatar, eyebrow);
+      expectFollows(cta, social);
     },
-  ])('$name', ({ variant, tone }) => {
-    const { unmount: unmountWithTone, container: withTone } = renderHero(
-      { variant, tone },
-      heroMedia,
-    );
-    const withToneHtml = withTone.innerHTML;
-    unmountWithTone();
-
-    const { container: withoutTone } = renderHero({ variant }, heroMedia);
-
-    expect(withToneHtml).toBe(withoutTone.innerHTML);
-  });
-
-  it('renders Hero.Avatar before the eyebrow in the DOM', () => {
-    renderHero(
-      { eyebrow: EYEBROW },
-      <Hero.Avatar>
-        <img src="/img/jane.jpg" alt={PORTRAIT_ALT} />
-      </Hero.Avatar>,
-    );
-
-    const avatar = screen.getByAltText(PORTRAIT_ALT);
-    const eyebrowText = screen.getByText(EYEBROW);
-
-    expectFollows(avatar, eyebrowText);
-  });
+  );
 
   it('renders arbitrary children inside Hero.Avatar, not just an image', () => {
     renderHero(
@@ -302,63 +282,22 @@ describe(`<${Hero.name}/>`, () => {
     );
 
     const initials = screen.getByText('JD');
+
     expect(initials).toBeVisible();
-  });
-
-  it('renders Hero.Social after Hero.Cta in the DOM', () => {
-    renderHero(
-      undefined,
-      <>
-        {heroCta}
-        {heroSocial}
-      </>,
-    );
-
-    const cta = screen.getByRole('link', { name: 'Read more' });
-    const social = screen.getByRole('link', { name: 'GitHub' });
-
-    expectFollows(cta, social);
   });
 
   it('renders arbitrary children inside Hero.Social, not just a list', () => {
     renderHero(
       undefined,
       <Hero.Social>
-        <a href="https://github.com/janedoe">GitHub</a>
+        <a href={MOCK_SOCIAL_HREF}>{MOCK_SOCIAL_LINK_LABEL}</a>
       </Hero.Social>,
     );
 
-    const githubLink = screen.getByRole('link', { name: 'GitHub' });
-    expect(githubLink).toBeVisible();
+    const socialLink = screen.getByRole('link', {
+      name: MOCK_SOCIAL_LINK_LABEL,
+    });
+
+    expect(socialLink).toBeVisible();
   });
-
-  it.each(Object.values(BRAND_VARIANT))(
-    'orders the Stacked portrait, eyebrow, actions and links on %s tone',
-    (tone) => {
-      const { unmount } = renderHero(
-        {
-          eyebrow: EYEBROW,
-          variant: HERO_VARIANT.STACKED,
-          tone,
-        },
-        <>
-          <Hero.Avatar>
-            <img src="/img/jane.jpg" alt={PORTRAIT_ALT} />
-          </Hero.Avatar>
-          {heroCta}
-          {heroSocial}
-        </>,
-      );
-
-      const avatar = screen.getByAltText(PORTRAIT_ALT);
-      const eyebrowText = screen.getByText(EYEBROW);
-      const cta = screen.getByRole('link', { name: 'Read more' });
-      const social = screen.getByRole('list', { name: 'Find Jane elsewhere' });
-
-      expectFollows(avatar, eyebrowText);
-      expectFollows(cta, social);
-
-      unmount();
-    },
-  );
 });

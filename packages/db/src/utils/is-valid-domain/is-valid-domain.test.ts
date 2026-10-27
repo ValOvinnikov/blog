@@ -1,19 +1,21 @@
+import { faker } from '@faker-js/faker';
+
 import { isValidDomain } from './is-valid-domain';
+
+faker.seed(4471);
+
+const MOCK_DOMAIN = faker.internet.domainName();
 
 describe(isValidDomain, () => {
   it('accepts a plain lowercase domain', () => {
-    expect(isValidDomain('acme.example.com')).toBe(true);
+    expect(isValidDomain(MOCK_DOMAIN)).toBe(true);
   });
 
-  it('rejects a scheme-prefixed value', () => {
-    expect(isValidDomain('https://acme.com')).toBe(false);
-  });
-
-  it('rejects a trailing-slash value', () => {
-    expect(isValidDomain('acme.com/')).toBe(false);
-  });
-
-  it('rejects a value with surrounding whitespace', () => {
-    expect(isValidDomain(' acme.com ')).toBe(false);
+  it.each([
+    ['a scheme-prefixed value', `https://${MOCK_DOMAIN}`],
+    ['a trailing-slash value', `${MOCK_DOMAIN}/`],
+    ['a value with surrounding whitespace', ` ${MOCK_DOMAIN} `],
+  ])('rejects %s', (_, value) => {
+    expect(isValidDomain(value)).toBe(false);
   });
 });

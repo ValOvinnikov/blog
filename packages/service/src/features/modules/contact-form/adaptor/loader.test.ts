@@ -4,50 +4,59 @@ import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures
 import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
+  mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getContactForm } from './loader';
 import { contactFormModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const CONTACT_FORM_ID = 'contact-form-1';
+faker.seed(10);
 
-const tenant = mockTenant();
+const MOCK_CONTACT_FORM_ID = faker.string.uuid();
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUCCESS_MESSAGE = faker.lorem.sentence();
 
-describe('getContactForm', () => {
+describe(getContactForm, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(mockRawContactFormModule());
+    mockRun.mockResolvedValue(
+      mockRawContactFormModule({
+        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+        successMessage: MOCK_SUCCESS_MESSAGE,
+      }),
+    );
   });
 
   it('maps the contact form module document', async () => {
-    const contactForm = await getContactForm(CONTACT_FORM_ID, tenant);
+    const contactForm = await getContactForm(MOCK_CONTACT_FORM_ID, MOCK_TENANT);
 
-    expect(contactForm.headingBlock.heading).toBe('Get in touch');
-    expect(contactForm.successMessage).toBe(
-      "Thanks — I'll reply within two days.",
-    );
+    expect(contactForm.headingBlock.heading).toBe(MOCK_HEADING);
+    expect(contactForm.successMessage).toBe(MOCK_SUCCESS_MESSAGE);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getContactForm(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(
+      getContactForm(MOCK_MISSING_ID, MOCK_TENANT),
+    ).rejects.toThrow();
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getContactForm(CONTACT_FORM_ID, tenant);
+  it('queries with the tenant and the cache tags scoped to it', async () => {
+    await getContactForm(MOCK_CONTACT_FORM_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(contactFormModuleQuery, {
-      parameters: { id: CONTACT_FORM_ID },
-      tenant,
+      parameters: { id: MOCK_CONTACT_FORM_ID },
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
           mockCacheTag('modules:contactForm'),
-          mockCacheTag(`module:${CONTACT_FORM_ID}`),
+          mockCacheTag(`module:${MOCK_CONTACT_FORM_ID}`),
         ],
       },
     });

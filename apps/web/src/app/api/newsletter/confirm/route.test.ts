@@ -46,7 +46,7 @@ const MOCK_UNAVAILABLE_LOCATION = `${MOCK_TENANT_BASE_URL}/newsletter/confirm-un
 const toConfirmRequest = (path: string) =>
   new Request(new URL(path, MOCK_TENANT_BASE_URL));
 
-describe('GET /api/newsletter/confirm', () => {
+describe(GET, () => {
   let request: Request;
 
   beforeEach(() => {

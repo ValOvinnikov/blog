@@ -1,48 +1,35 @@
 import {
   MOCK_FROM_ADDRESS,
-  MOCK_SENDER_FROM_ADDRESS,
+  MOCK_FROM_EMAIL,
   MOCK_SENDER_NAME,
-  MOCK_VERIFIED_DOMAIN_FROM_ADDRESS,
 } from '@blog/auth/testing/magic-link-fixtures';
 
 import { applyTenantSenderName } from './apply-tenant-sender-name';
 
+const MOCK_INJECTED_SENDER_NAME =
+  'Acme <evil@attacker.example>\r\nBcc: victim@example.com';
+
 describe(applyTenantSenderName, () => {
-  it('returns the from address unchanged when no sender name is given', () => {
-    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, undefined)).toBe(
+  it.each([
+    ['no sender name', undefined],
+    ['a sender name that sanitises to nothing', '<>'],
+  ])('returns the from address unchanged for %s', (_, senderName) => {
+    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, senderName)).toBe(
       MOCK_FROM_ADDRESS,
     );
   });
 
   it('overrides the display name, keeping the configured address', () => {
-    expect(
-      applyTenantSenderName(
-        MOCK_VERIFIED_DOMAIN_FROM_ADDRESS,
-        MOCK_SENDER_NAME,
-      ),
-    ).toBe('Acme Support <sign-in@mail.valstack.dev>');
-  });
-
-  it('overrides the display name on the default Resend testing sender', () => {
     expect(applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_SENDER_NAME)).toBe(
-      MOCK_SENDER_FROM_ADDRESS,
+      `${MOCK_SENDER_NAME} <${MOCK_FROM_EMAIL}>`,
     );
   });
 
-  it('strips angle brackets and newlines from the sender name to avoid header injection', () => {
+  it('strips angle brackets and newlines from the sender name', () => {
     expect(
-      applyTenantSenderName(
-        MOCK_FROM_ADDRESS,
-        'Acme <evil@attacker.example>\r\nBcc: victim@example.com',
-      ),
+      applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_INJECTED_SENDER_NAME),
     ).toBe(
-      'Acme evil@attacker.exampleBcc: victim@example.com <onboarding@resend.dev>',
-    );
-  });
-
-  it('falls back to the original from address when the sanitized sender name is empty', () => {
-    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, '<>')).toBe(
-      MOCK_FROM_ADDRESS,
+      `Acme evil@attacker.exampleBcc: victim@example.com <${MOCK_FROM_EMAIL}>`,
     );
   });
 });

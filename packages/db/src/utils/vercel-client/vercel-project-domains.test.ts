@@ -1,66 +1,75 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import {
+  emptyResponse,
+  firstFetchCall,
+  textResponse,
+  useFetchFake,
+} from '@blog/db/testing/sanity-management-client/fetch-fake';
+import { faker } from '@faker-js/faker';
 
-import { deleteVercelProjectDomain } from './vercel-project-domains';
+import {
+  deleteVercelProjectDomain,
+  VERCEL_API_BASE,
+} from './vercel-project-domains';
 
-const originalFetch = globalThis.fetch;
-const fetchMock = vi.fn();
+faker.seed(9042);
 
-const DOMAIN_INPUT = {
-  token: 'tok',
+const MOCK_TEAM_ID = faker.string.alphanumeric(10);
+const MOCK_FAILURE_BODY = faker.lorem.words(2);
+const MOCK_DOMAIN_INPUT = {
+  token: faker.string.alphanumeric(16),
   teamId: undefined,
-  projectId: 'prj_1',
-  domain: 'domain-to-remove.example.com',
+  projectId: faker.string.alphanumeric(12),
+  domain: faker.internet.domainName(),
 };
+const DOMAIN_PATH = `/v9/projects/${MOCK_DOMAIN_INPUT.projectId}/domains/${MOCK_DOMAIN_INPUT.domain}`;
+
+const fetchMock = useFetchFake();
 
 beforeEach(() => {
-  globalThis.fetch = fetchMock;
-  fetchMock
-    .mockReset()
-    .mockResolvedValue(new Response(null, { status: HTTP_STATUS.OK }));
-});
-
-afterEach(() => {
-  globalThis.fetch = originalFetch;
+  fetchMock.mockResolvedValue(emptyResponse());
 });
 
 describe(deleteVercelProjectDomain, () => {
-  it('DELETEs the project domain', async () => {
-    const result = await deleteVercelProjectDomain(DOMAIN_INPUT);
+  it('DELETEs the project domain with the bearer token', async () => {
+    const result = await deleteVercelProjectDomain(MOCK_DOMAIN_INPUT);
 
+    const { url, method, headers } = firstFetchCall(fetchMock);
     expect(result).toEqual({ alreadyGone: false });
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.vercel.com/v9/projects/prj_1/domains/domain-to-remove.example.com',
-    );
-    expect(init.method).toBe(HTTP_METHOD.DELETE);
+    expect(url).toBe(`${VERCEL_API_BASE}${DOMAIN_PATH}`);
+    expect(method).toBe(HTTP_METHOD.DELETE);
+    expect(headers).toEqual({
+      Authorization: `Bearer ${MOCK_DOMAIN_INPUT.token}`,
+    });
   });
 
   it('appends teamId as a query param when supplied', async () => {
-    await deleteVercelProjectDomain({ ...DOMAIN_INPUT, teamId: 'team_1' });
+    await deleteVercelProjectDomain({
+      ...MOCK_DOMAIN_INPUT,
+      teamId: MOCK_TEAM_ID,
+    });
 
-    const [url] = fetchMock.mock.calls[0] as [string];
-    expect(url).toBe(
-      'https://api.vercel.com/v9/projects/prj_1/domains/domain-to-remove.example.com?teamId=team_1',
-    );
+    const { url } = firstFetchCall(fetchMock);
+    expect(url).toBe(`${VERCEL_API_BASE}${DOMAIN_PATH}?teamId=${MOCK_TEAM_ID}`);
   });
 
   it('treats a 404 as already gone rather than an error', async () => {
     fetchMock.mockResolvedValue(
-      new Response('not found', { status: HTTP_STATUS.NOT_FOUND }),
+      textResponse(MOCK_FAILURE_BODY, HTTP_STATUS.NOT_FOUND),
     );
 
-    await expect(deleteVercelProjectDomain(DOMAIN_INPUT)).resolves.toEqual({
-      alreadyGone: true,
-    });
+    await expect(deleteVercelProjectDomain(MOCK_DOMAIN_INPUT)).resolves.toEqual(
+      { alreadyGone: true },
+    );
   });
 
   it('throws with the response status and body on failure', async () => {
     fetchMock.mockResolvedValue(
-      new Response('bad request', { status: HTTP_STATUS.BAD_REQUEST }),
+      textResponse(MOCK_FAILURE_BODY, HTTP_STATUS.BAD_REQUEST),
     );
 
-    await expect(deleteVercelProjectDomain(DOMAIN_INPUT)).rejects.toThrow(
-      /400 bad request/,
+    await expect(deleteVercelProjectDomain(MOCK_DOMAIN_INPUT)).rejects.toThrow(
+      `Vercel API DELETE ${DOMAIN_PATH} failed: ${HTTP_STATUS.BAD_REQUEST} ${MOCK_FAILURE_BODY}`,
     );
   });
 });

@@ -1,64 +1,55 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
-  applyMigrationFile,
-  listMigrationFiles,
+  insertReplayTenant,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  replayMigrationsAround,
 } from '@blog/db/testing/migration-files';
-import { sql } from 'drizzle-orm';
 
 import { tenants } from './tenants';
 
 const LOCALE_MIGRATION = '0032_famous_hawkeye.sql';
+const MOCK_UNSUPPORTED_LOCALE = 'en-US';
+const LOCALES_BY_STORED_VALUE = [
+  { stored: LOCALE_ISO_CODES.EN, normalized: LOCALE_ISO_CODES.EN },
+  { stored: ` ${LOCALE_ISO_CODES.FR} `, normalized: LOCALE_ISO_CODES.FR },
+  { stored: LOCALE_ISO_CODES.DE, normalized: LOCALE_ISO_CODES.DE },
+];
 
-async function migrateWithTenantLocales(locales: string[]) {
-  const db = await createEmptyTestDb();
-  const migrationFiles = listMigrationFiles();
-
-  for (const file of migrationFiles.filter((f) => f < LOCALE_MIGRATION)) {
-    await applyMigrationFile(db, file);
+function causeMessage(error: unknown): string {
+  if (error instanceof Error && error.cause instanceof Error) {
+    return error.cause.message;
   }
-
-  for (const [index, locale] of locales.entries()) {
-    await db.execute(
-      sql`insert into "tenants" ("name", "primary_domain", "locale", "plan", "status") values (${`Tenant ${index}`}, ${`t${index}.example.com`}, ${locale}, 'FREE', 'ACTIVE')`,
-    );
-  }
-
-  async function run() {
-    for (const file of migrationFiles.filter((f) => f >= LOCALE_MIGRATION)) {
-      await applyMigrationFile(db, file);
-    }
-  }
-
-  return { db, run };
+  throw new Error('expected an error carrying an Error cause');
 }
 
-describe('0032_famous_hawkeye (tenants locale codes)', () => {
+describe(`${LOCALE_MIGRATION} (tenants locale codes)`, () => {
   it(
     'normalizes existing locales to supported codes with no additional locales',
     async () => {
-      const { db, run } = await migrateWithTenantLocales([
-        'en',
-        ' fr ',
-        LOCALE_ISO_CODES.DE,
-      ]);
+      const db = await createEmptyTestDb();
+      const tenantIds: string[] = [];
 
-      await run();
+      await replayMigrationsAround(db, LOCALE_MIGRATION, async () => {
+        for (const { stored } of LOCALES_BY_STORED_VALUE) {
+          tenantIds.push((await insertReplayTenant(db, stored)).id);
+        }
+      });
 
       const rows = await db
         .select({
+          id: tenants.id,
           locale: tenants.locale,
           additionalLocales: tenants.additionalLocales,
         })
-        .from(tenants)
-        .orderBy(tenants.primaryDomain);
-
-      expect(rows).toEqual([
-        { locale: LOCALE_ISO_CODES.EN, additionalLocales: [] },
-        { locale: LOCALE_ISO_CODES.FR, additionalLocales: [] },
-        { locale: LOCALE_ISO_CODES.DE, additionalLocales: [] },
-      ]);
+        .from(tenants);
+      expect(tenantIds.map((id) => rows.find((row) => row.id === id))).toEqual(
+        tenantIds.map((id, index) => ({
+          id,
+          locale: LOCALES_BY_STORED_VALUE[index]?.normalized,
+          additionalLocales: [],
+        })),
+      );
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
@@ -66,11 +57,23 @@ describe('0032_famous_hawkeye (tenants locale codes)', () => {
   it(
     'stops with the unsupported values named when a locale does not map',
     async () => {
-      const { run } = await migrateWithTenantLocales(['en', 'en-US']);
+      const db = await createEmptyTestDb();
 
-      await expect(run()).rejects.toMatchObject({
-        cause: { message: expect.stringContaining('EN-US') },
-      });
+      const failure = await replayMigrationsAround(
+        db,
+        LOCALE_MIGRATION,
+        async () => {
+          await insertReplayTenant(db, LOCALE_ISO_CODES.EN);
+          await insertReplayTenant(db, MOCK_UNSUPPORTED_LOCALE);
+        },
+      ).then(
+        () => undefined,
+        (error: unknown) => error,
+      );
+
+      expect(causeMessage(failure)).toContain(
+        MOCK_UNSUPPORTED_LOCALE.toUpperCase(),
+      );
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );

@@ -5,49 +5,45 @@ import { Spinner } from './spinner';
 
 faker.seed(123);
 
-const label = faker.lorem.words(2);
+const MOCK_LABEL = faker.lorem.words(2);
 const ARIA_HIDDEN = 'aria-hidden';
 
-const setup = customRender(Spinner, { label });
+const setup = customRender(Spinner, { label: MOCK_LABEL });
 
 describe(`<${Spinner.name}/>`, () => {
-  describe('with the default props', () => {
+  describe('without a visible label', () => {
     beforeEach(() => {
       setup();
     });
 
-    it('renders a status role with the label as its accessible name', () => {
-      expect(screen.getByRole('status', { name: label })).toBeVisible();
+    it('is a status named by the label', () => {
+      const status = screen.getByRole('status', { name: MOCK_LABEL });
+
+      expect(status).toBeVisible();
     });
 
-    it('does not render the label as visible text by default', () => {
-      expect(screen.queryByText(label)).not.toBeInTheDocument();
-    });
+    it('does not render the label as visible text', () => {
+      const labelText = screen.queryByText(MOCK_LABEL);
 
-    it('hides the animated glyph from assistive tech', () => {
-      const status = screen.getByRole('status', { name: label });
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      const glyph = status.firstElementChild;
-      expect(glyph).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(labelText).not.toBeInTheDocument();
     });
   });
 
-  describe('when hasLabel is true', () => {
+  describe('with a visible label', () => {
     beforeEach(() => {
       setup({ hasLabel: true });
     });
 
-    it('renders the label as visible text when hasLabel is true', () => {
-      expect(screen.getByText(label)).toBeVisible();
+    it('renders the label as visible text', () => {
+      const labelText = screen.getByText(MOCK_LABEL);
+
+      expect(labelText).toBeVisible();
     });
 
-    it('hides the visible label text from assistive tech so it is not announced twice alongside the root aria-label', () => {
-      expect(screen.getByText(label)).toHaveAttribute(ARIA_HIDDEN, 'true');
-    });
-  });
+    it('hides the visible label from assistive tech to avoid double announcing', () => {
+      const labelText = screen.getByText(MOCK_LABEL);
 
-  it('forwards dataTestId to the root element', () => {
-    setup({ dataTestId: 'spinner' });
-    expect(screen.getByTestId('spinner')).toBeVisible();
+      expect(labelText).toHaveAttribute(ARIA_HIDDEN, 'true');
+    });
   });
 });

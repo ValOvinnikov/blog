@@ -23,13 +23,10 @@ const loggerErrorMock = vi.mocked(logger.error);
 const MOCK_ACTIVITY_AT = faker.date.recent();
 
 describe(recordTenantActivity, () => {
-  beforeEach(() => {
-    touchTenantActivityMock.mockReset();
-    loggerErrorMock.mockReset();
-  });
-
   it("moves the tenant's last activity to the given time", async () => {
-    touchTenantActivityMock.mockResolvedValue(okResult({ id: MOCK_TENANT_ID }));
+    touchTenantActivityMock.mockResolvedValueOnce(
+      okResult({ id: MOCK_TENANT_ID }),
+    );
 
     await recordTenantActivity(MOCK_TENANT_ID, MOCK_ACTIVITY_AT);
 
@@ -48,7 +45,7 @@ describe(recordTenantActivity, () => {
       ERROR_CODE.DB_NOT_FOUND,
     ],
   ])('logs and resolves when the update %s', async (_, touch, error) => {
-    touchTenantActivityMock.mockImplementation(touch);
+    touchTenantActivityMock.mockImplementationOnce(touch);
 
     await expect(
       recordTenantActivity(MOCK_TENANT_ID, MOCK_ACTIVITY_AT),

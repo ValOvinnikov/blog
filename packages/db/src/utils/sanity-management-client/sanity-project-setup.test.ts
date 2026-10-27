@@ -9,11 +9,14 @@ import {
 import {
   MOCK_SANITY_CORS_ORIGIN,
   MOCK_SANITY_DATASET,
+  MOCK_SANITY_ERROR_BODY,
   MOCK_SANITY_EXPECTED_URL,
+  MOCK_SANITY_ORGANIZATION_ID,
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_TOKEN,
   mockSanityProjectInput,
 } from '@blog/db/testing/sanity-management-client/fixtures';
+import { faker } from '@faker-js/faker';
 
 import {
   addSanityCorsOrigin,
@@ -23,23 +26,26 @@ import {
   listSanityDatasets,
 } from './sanity-project-setup';
 
-const createProjectInput = {
+faker.seed(5120);
+
+const MOCK_CREATE_PROJECT_INPUT = {
   token: MOCK_SANITY_TOKEN,
-  displayName: 'Acme',
-  organizationId: 'org-abc',
+  displayName: faker.company.name(),
+  organizationId: MOCK_SANITY_ORGANIZATION_ID,
 };
+const MOCK_CORS_ID = faker.string.alphanumeric(8);
 
 const fetchMock = useFetchFake();
 
 describe(createSanityProject, () => {
   it('throws with the response status and body on failure', async () => {
     fetchMock.mockResolvedValue(
-      textResponse('nope', HTTP_STATUS.PAYMENT_REQUIRED),
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.PAYMENT_REQUIRED),
     );
 
-    await expect(createSanityProject(createProjectInput)).rejects.toThrow(
-      new RegExp(`${HTTP_STATUS.PAYMENT_REQUIRED}`),
-    );
+    await expect(
+      createSanityProject(MOCK_CREATE_PROJECT_INPUT),
+    ).rejects.toThrow(new RegExp(`${HTTP_STATUS.PAYMENT_REQUIRED}`));
   });
 
   describe('when Sanity creates the project', () => {
@@ -48,21 +54,21 @@ describe(createSanityProject, () => {
     });
 
     it('POSTs to /projects with the display name and organization id', async () => {
-      const result = await createSanityProject(createProjectInput);
+      const result = await createSanityProject(MOCK_CREATE_PROJECT_INPUT);
 
       const { url, body, headers, method } = firstFetchCall(fetchMock);
       expect(result).toEqual({ id: MOCK_SANITY_PROJECT_ID });
       expect(url).toBe(MOCK_SANITY_EXPECTED_URL.projects);
       expect(method).toBe(HTTP_METHOD.POST);
       expect(body).toEqual({
-        displayName: createProjectInput.displayName,
-        organizationId: createProjectInput.organizationId,
+        displayName: MOCK_CREATE_PROJECT_INPUT.displayName,
+        organizationId: MOCK_CREATE_PROJECT_INPUT.organizationId,
       });
       expect(headers['Authorization']).toBe(`Bearer ${MOCK_SANITY_TOKEN}`);
     });
 
     it('sends an abort signal so a hung call fails instead of stalling the run', async () => {
-      await createSanityProject(createProjectInput);
+      await createSanityProject(MOCK_CREATE_PROJECT_INPUT);
 
       expect(firstFetchCall(fetchMock).init.signal).toBeInstanceOf(AbortSignal);
     });
@@ -122,7 +128,7 @@ describe(addSanityCorsOrigin, () => {
 
 describe(listSanityCorsOrigins, () => {
   it('GETs the project-scoped cors endpoint and returns the list', async () => {
-    const origins = [{ id: 'cors1', origin: MOCK_SANITY_CORS_ORIGIN }];
+    const origins = [{ id: MOCK_CORS_ID, origin: MOCK_SANITY_CORS_ORIGIN }];
     fetchMock.mockResolvedValue(jsonResponse(origins));
 
     const result = await listSanityCorsOrigins(mockSanityProjectInput({}));

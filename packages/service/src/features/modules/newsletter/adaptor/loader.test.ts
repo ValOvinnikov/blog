@@ -4,51 +4,66 @@ import {
 } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
-  MOCK_NEWSLETTER_HEADING,
   MOCK_NEWSLETTER_MODULE_ID,
   mockRawNewsletterModule,
 } from '@blog/service/testing/modules/fixtures';
 import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
+  mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getNewsletter } from './loader';
 import { newsletterModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const tenant = mockTenant();
+faker.seed(10);
+
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 
 describe(getNewsletter, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(mockRawNewsletterModule());
+    mockRun.mockResolvedValue(
+      mockRawNewsletterModule({
+        headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+          supportingText: MOCK_SUPPORTING_TEXT,
+        }),
+        variant: NEWSLETTER_VARIANT.COMPACT,
+      }),
+    );
   });
 
   it('maps the newsletter module document', async () => {
-    const newsletter = await getNewsletter(MOCK_NEWSLETTER_MODULE_ID, tenant);
-
-    expect(newsletter.headingBlock.heading).toBe(MOCK_NEWSLETTER_HEADING);
-    expect(newsletter.headingBlock.supportingText).toBe(
-      'Get new posts in your inbox.',
+    const newsletter = await getNewsletter(
+      MOCK_NEWSLETTER_MODULE_ID,
+      MOCK_TENANT,
     );
-    expect(newsletter.variant).toBe(NEWSLETTER_VARIANT.FULL);
+
+    expect(newsletter.headingBlock.heading).toBe(MOCK_HEADING);
+    expect(newsletter.headingBlock.supportingText).toBe(MOCK_SUPPORTING_TEXT);
+    expect(newsletter.variant).toBe(NEWSLETTER_VARIANT.COMPACT);
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(mockValidationError());
+    const error = mockValidationError();
+    mockRun.mockRejectedValueOnce(error);
 
-    await expect(getNewsletter(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(getNewsletter(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toBe(
+      error,
+    );
   });
 
   it('threads tenant context into the query and scopes the tags to it', async () => {
-    await getNewsletter(MOCK_NEWSLETTER_MODULE_ID, tenant);
+    await getNewsletter(MOCK_NEWSLETTER_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(newsletterModuleQuery, {
       parameters: { id: MOCK_NEWSLETTER_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

@@ -1,5 +1,14 @@
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db';
+import { queries } from '@blog/db';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { faker } from '@faker-js/faker';
+import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
+import {
+  MOCK_OTHER_TENANT_ID,
+  MOCK_TENANT_HOST,
+  MOCK_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
+import { isProductionEnvironment } from '@web/utils/is-production-environment';
 
 import {
   isTenantServable,
@@ -8,324 +17,260 @@ import {
   resolveTenantId,
 } from './resolve-tenant';
 
-const {
-  getTenantByDomainMock,
-  listTenantsMock,
-  getTenantByIdMock,
-  isProductionEnvironmentMock,
-} = vi.hoisted(() => ({
-  getTenantByDomainMock: vi.fn(),
-  listTenantsMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-  isProductionEnvironmentMock: vi.fn(),
-}));
+faker.seed(7301);
 
-vi.mock('@blog/db', () => ({
+vi.mock('@web/utils/is-production-environment');
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
-    tenantDomains: { getTenantByDomain: getTenantByDomainMock },
-    tenants: { listTenants: listTenantsMock, getTenantById: getTenantByIdMock },
-  },
-  TENANT_STATUS: {
-    ACTIVE: 'ACTIVE',
-    SUSPENDED: 'SUSPENDED',
-    ARCHIVED: 'ARCHIVED',
-  },
-  TENANT_PROVISIONING_STATUS: {
-    PENDING: 'PENDING',
-    PROVISIONING: 'PROVISIONING',
-    READY: 'READY',
-    FAILED: 'FAILED',
+    tenantDomains: { getTenantByDomain: vi.fn() },
+    tenants: { listTenants: vi.fn(), getTenantById: vi.fn() },
   },
 }));
 
-vi.mock('@web/utils/is-production-environment', () => ({
-  isProductionEnvironment: isProductionEnvironmentMock,
-}));
+const MOCK_UNKNOWN_HOST = faker.internet.domainName();
 
-const buildServableTenant = (overrides: Partial<TTenant> = {}): TTenant => {
-  return {
-    id: 'tenant-1',
-    primaryDomain: 'acme.example.com',
-    status: TENANT_STATUS.ACTIVE,
-    sanityProjectId: 'proj',
-    sanityDataset: 'production',
-    sanityReadTokenEncrypted: 'encrypted-token',
-    provisioningStatus: 'READY',
-    ...overrides,
-  } as TTenant;
-};
+const MOCK_TENANT = mockServableTenant();
+
+const MOCK_TENANT_WITHOUT_SANITY_CREDENTIALS = mockServableTenant({
+  sanityProjectId: null,
+  sanityDataset: null,
+  sanityReadTokenEncrypted: null,
+});
+
+beforeEach(() => {
+  vi.resetAllMocks();
+});
 
 describe(resolveTenant, () => {
-  let tenant: TTenant;
-
   beforeEach(() => {
-    getTenantByDomainMock.mockReset();
-    listTenantsMock.mockReset();
-    isProductionEnvironmentMock.mockReset();
-    isProductionEnvironmentMock.mockReturnValue(false);
-    tenant = buildServableTenant();
-    getTenantByDomainMock.mockResolvedValue(tenant);
-    listTenantsMock.mockResolvedValue([tenant]);
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      MOCK_TENANT,
+    );
+    vi.mocked(queries.tenants.listTenants).mockResolvedValue([MOCK_TENANT]);
   });
 
-  it('resolves the full tenant row owning the host, without checking the sole-tenant fallback', async () => {
-    await expect(resolveTenant('acme.example.com')).resolves.toEqual(tenant);
-    expect(listTenantsMock).not.toHaveBeenCalled();
+  it('resolves the tenant owning the host without the sole-tenant fallback', async () => {
+    await expect(resolveTenant(MOCK_TENANT_HOST)).resolves.toEqual(MOCK_TENANT);
+    expect(queries.tenants.listTenants).not.toHaveBeenCalled();
   });
 
-  it('falls back to the sole tenant row outside production when there is no host at all', async () => {
-    await expect(resolveTenant(null)).resolves.toEqual(tenant);
-    expect(getTenantByDomainMock).not.toHaveBeenCalled();
-  });
-
-  it('refuses a matched tenant with no Sanity project/dataset/token set yet', async () => {
-    getTenantByDomainMock.mockResolvedValue(
-      buildServableTenant({
-        sanityProjectId: null,
-        sanityDataset: null,
-        sanityReadTokenEncrypted: null,
-      }),
+  it('refuses a matched tenant with no Sanity credentials set yet', async () => {
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      MOCK_TENANT_WITHOUT_SANITY_CREDENTIALS,
     );
 
-    await expect(resolveTenant('draft.example.com')).resolves.toBeUndefined();
-    expect(listTenantsMock).not.toHaveBeenCalled();
+    await expect(resolveTenant(MOCK_TENANT_HOST)).resolves.toBeUndefined();
+    expect(queries.tenants.listTenants).not.toHaveBeenCalled();
   });
 
-  it('resolves a matched SUSPENDED tenant — reads stay allowed while suspended', async () => {
-    const suspendedTenant = buildServableTenant({
+  it('resolves a matched suspended tenant', async () => {
+    const suspendedTenant = mockServableTenant({
       status: TENANT_STATUS.SUSPENDED,
     });
-    getTenantByDomainMock.mockResolvedValue(suspendedTenant);
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      suspendedTenant,
+    );
 
-    await expect(resolveTenant('suspended.example.com')).resolves.toEqual(
+    await expect(resolveTenant(MOCK_TENANT_HOST)).resolves.toEqual(
       suspendedTenant,
     );
   });
 
-  describe('when the host matches no tenant', () => {
-    beforeEach(() => {
-      getTenantByDomainMock.mockResolvedValue(undefined);
-    });
+  it('refuses an archived matched tenant without falling back to the sole tenant', async () => {
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      mockServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+    );
 
-    it('falls back to the sole tenant row outside production when the host has no match', async () => {
-      await expect(resolveTenant('unknown.example.com')).resolves.toEqual(
-        tenant,
-      );
-    });
-
-    it('resolves undefined outside production when zero or multiple tenants exist', async () => {
-      listTenantsMock.mockResolvedValue([]);
-      await expect(
-        resolveTenant('unknown.example.com'),
-      ).resolves.toBeUndefined();
-
-      listTenantsMock.mockResolvedValue([
-        buildServableTenant({ id: 'tenant-1' }),
-        buildServableTenant({ id: 'tenant-2' }),
-      ]);
-      await expect(
-        resolveTenant('unknown.example.com'),
-      ).resolves.toBeUndefined();
-    });
-
-    it('falls back to a sole dev tenant with no provisioningStatus recorded', async () => {
-      const devTenant = buildServableTenant({ provisioningStatus: null });
-      listTenantsMock.mockResolvedValue([devTenant]);
-
-      await expect(resolveTenant('unknown.example.com')).resolves.toEqual(
-        devTenant,
-      );
-    });
+    await expect(resolveTenant(MOCK_TENANT_HOST)).resolves.toBeUndefined();
+    expect(queries.tenants.listTenants).not.toHaveBeenCalled();
   });
 
-  describe('when the matched tenant is archived', () => {
-    beforeEach(() => {
-      getTenantByDomainMock.mockResolvedValue(
-        buildServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+  describe('outside production', () => {
+    it.each([TENANT_PROVISIONING_STATUS.READY, null])(
+      'falls back to the sole tenant when there is no host (provisioning %s)',
+      async (provisioningStatus) => {
+        const soleTenant = mockServableTenant({ provisioningStatus });
+        vi.mocked(queries.tenants.listTenants).mockResolvedValue([soleTenant]);
+
+        await expect(resolveTenant(null)).resolves.toEqual(soleTenant);
+        expect(queries.tenantDomains.getTenantByDomain).not.toHaveBeenCalled();
+      },
+    );
+
+    it('falls back to the sole tenant when the host matches no tenant', async () => {
+      vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+        undefined,
+      );
+
+      await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toEqual(
+        MOCK_TENANT,
       );
     });
 
-    it('refuses an archived matched tenant instead of resolving it', async () => {
-      await expect(
-        resolveTenant('archived.example.com'),
-      ).resolves.toBeUndefined();
-    });
+    it.each([
+      ['no tenant exists', []],
+      [
+        'several tenants exist',
+        [MOCK_TENANT, mockServableTenant({ id: MOCK_OTHER_TENANT_ID })],
+      ],
+    ])(
+      'resolves undefined when the host matches nothing and %s',
+      async (_, tenants: TTenant[]) => {
+        vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+          undefined,
+        );
+        vi.mocked(queries.tenants.listTenants).mockResolvedValue(tenants);
 
-    it('never falls back to the sole tenant when the matched host is archived, even outside production', async () => {
-      listTenantsMock.mockResolvedValue([buildServableTenant()]);
-
-      await expect(
-        resolveTenant('archived.example.com'),
-      ).resolves.toBeUndefined();
-      expect(listTenantsMock).not.toHaveBeenCalled();
-    });
+        await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toBeUndefined();
+      },
+    );
   });
 
   describe('in production', () => {
     beforeEach(() => {
-      isProductionEnvironmentMock.mockReturnValue(true);
+      vi.mocked(isProductionEnvironment).mockReturnValue(true);
     });
 
-    it('never falls back to the sole tenant in production', async () => {
-      getTenantByDomainMock.mockResolvedValue(undefined);
-
-      await expect(
-        resolveTenant('unknown.example.com'),
-      ).resolves.toBeUndefined();
-      expect(listTenantsMock).not.toHaveBeenCalled();
-    });
-
-    it('resolves the matched tenant in production without touching the fallback', async () => {
-      await expect(resolveTenant('acme.example.com')).resolves.toEqual(tenant);
-      expect(listTenantsMock).not.toHaveBeenCalled();
-    });
-
-    it('refuses a matched tenant whose provisioning is not READY in production', async () => {
-      getTenantByDomainMock.mockResolvedValue(
-        buildServableTenant({ provisioningStatus: 'FAILED' }),
+    it('never falls back to the sole tenant', async () => {
+      vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+        undefined,
       );
 
-      await expect(
-        resolveTenant('half-provisioned.example.com'),
-      ).resolves.toBeUndefined();
+      await expect(resolveTenant(MOCK_UNKNOWN_HOST)).resolves.toBeUndefined();
+      expect(queries.tenants.listTenants).not.toHaveBeenCalled();
     });
 
-    it('refuses an archived matched tenant in production', async () => {
-      getTenantByDomainMock.mockResolvedValue(
-        buildServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+    it('resolves the matched tenant without touching the fallback', async () => {
+      await expect(resolveTenant(MOCK_TENANT_HOST)).resolves.toEqual(
+        MOCK_TENANT,
+      );
+      expect(queries.tenants.listTenants).not.toHaveBeenCalled();
+    });
+
+    it('refuses a matched tenant whose provisioning is not ready', async () => {
+      vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+        mockServableTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+        }),
       );
 
-      await expect(
-        resolveTenant('archived.example.com'),
-      ).resolves.toBeUndefined();
+      await expect(resolveTenant(MOCK_TENANT_HOST)).resolves.toBeUndefined();
     });
   });
 });
 
 describe(resolveTenantById, () => {
-  beforeEach(() => {
-    getTenantByIdMock.mockReset();
-  });
+  it('resolves the tenant row by id', async () => {
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(MOCK_TENANT);
 
-  it('resolves the full tenant row by id', async () => {
-    const tenant = buildServableTenant();
-    getTenantByIdMock.mockResolvedValue(tenant);
-
-    await expect(resolveTenantById('tenant-1')).resolves.toEqual(tenant);
-    expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1');
+    await expect(resolveTenantById(MOCK_TENANT_ID)).resolves.toEqual(
+      MOCK_TENANT,
+    );
+    expect(queries.tenants.getTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('resolves undefined when no tenant matches the id', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
 
-    await expect(resolveTenantById('missing')).resolves.toBeUndefined();
+    await expect(resolveTenantById(MOCK_TENANT_ID)).resolves.toBeUndefined();
   });
 
-  it('refuses an archived matched tenant instead of resolving it', async () => {
-    getTenantByIdMock.mockResolvedValue(
-      buildServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+  it('refuses a matched tenant that is not servable', async () => {
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
+      mockServableTenant({ status: TENANT_STATUS.ARCHIVED }),
     );
 
-    await expect(resolveTenantById('tenant-1')).resolves.toBeUndefined();
-  });
-
-  it('refuses a matched tenant with no Sanity project/dataset/token set yet', async () => {
-    getTenantByIdMock.mockResolvedValue(
-      buildServableTenant({
-        sanityProjectId: null,
-        sanityDataset: null,
-        sanityReadTokenEncrypted: null,
-      }),
-    );
-
-    await expect(resolveTenantById('tenant-1')).resolves.toBeUndefined();
+    await expect(resolveTenantById(MOCK_TENANT_ID)).resolves.toBeUndefined();
   });
 });
 
 describe(isTenantServable, () => {
-  beforeEach(() => {
-    isProductionEnvironmentMock.mockReset();
-    isProductionEnvironmentMock.mockReturnValue(false);
-  });
-
-  it('does not require READY outside production', () => {
-    const tenant = buildServableTenant({ provisioningStatus: null });
-
-    expect(isTenantServable(tenant)).toBe(true);
-  });
-
-  it('rejects an archived tenant regardless of provisioning status', () => {
-    const tenant = buildServableTenant({ status: TENANT_STATUS.ARCHIVED });
-
-    expect(isTenantServable(tenant)).toBe(false);
-  });
-
-  describe('in production', () => {
-    beforeEach(() => {
-      isProductionEnvironmentMock.mockReturnValue(true);
-    });
-
-    it('accepts a READY tenant with credentials in production', () => {
-      const tenant = buildServableTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      });
-
-      expect(isTenantServable(tenant)).toBe(true);
-    });
-
-    it('rejects a non-READY tenant in production even with credentials present', () => {
-      const tenant = buildServableTenant({
+  it.each([
+    {
+      name: 'accepts a tenant with no provisioning status outside production',
+      isProduction: false,
+      tenant: mockServableTenant({ provisioningStatus: null }),
+      expected: true,
+    },
+    {
+      name: 'rejects an archived tenant outside production',
+      isProduction: false,
+      tenant: mockServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+      expected: false,
+    },
+    {
+      name: 'rejects a tenant missing Sanity credentials outside production',
+      isProduction: false,
+      tenant: MOCK_TENANT_WITHOUT_SANITY_CREDENTIALS,
+      expected: false,
+    },
+    {
+      name: 'accepts a ready tenant with credentials in production',
+      isProduction: true,
+      tenant: MOCK_TENANT,
+      expected: true,
+    },
+    {
+      name: 'rejects a tenant whose provisioning failed in production',
+      isProduction: true,
+      tenant: mockServableTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      });
+      }),
+      expected: false,
+    },
+    {
+      name: 'rejects a tenant with no provisioning status in production',
+      isProduction: true,
+      tenant: mockServableTenant({ provisioningStatus: null }),
+      expected: false,
+    },
+    {
+      name: 'rejects a ready tenant missing a Sanity project in production',
+      isProduction: true,
+      tenant: mockServableTenant({ sanityProjectId: null }),
+      expected: false,
+    },
+    {
+      name: 'rejects an archived ready tenant in production',
+      isProduction: true,
+      tenant: mockServableTenant({ status: TENANT_STATUS.ARCHIVED }),
+      expected: false,
+    },
+  ])('$name', ({ isProduction, tenant, expected }) => {
+    vi.mocked(isProductionEnvironment).mockReturnValue(isProduction);
 
-      expect(isTenantServable(tenant)).toBe(false);
-    });
-
-    it('rejects a tenant with no provisioningStatus recorded in production', () => {
-      const tenant = buildServableTenant({ provisioningStatus: null });
-
-      expect(isTenantServable(tenant)).toBe(false);
-    });
-
-    it('rejects a tenant missing Sanity credentials regardless of provisioning status', () => {
-      const tenant = buildServableTenant({
-        sanityProjectId: null,
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      });
-
-      expect(isTenantServable(tenant)).toBe(false);
-    });
+    expect(isTenantServable(tenant)).toBe(expected);
   });
 });
 
 describe(resolveTenantId, () => {
-  beforeEach(() => {
-    getTenantByDomainMock.mockReset();
-    listTenantsMock.mockReset();
-    isProductionEnvironmentMock.mockReset();
-    isProductionEnvironmentMock.mockReturnValue(false);
+  it("returns the resolved tenant's id", async () => {
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      MOCK_TENANT,
+    );
+
+    await expect(resolveTenantId(MOCK_TENANT_HOST)).resolves.toBe(
+      MOCK_TENANT_ID,
+    );
+    expect(queries.tenantDomains.getTenantByDomain).toHaveBeenCalledWith(
+      MOCK_TENANT_HOST,
+    );
   });
 
-  it("delegates to resolveTenant and returns the resolved row's id", async () => {
-    getTenantByDomainMock.mockResolvedValue(buildServableTenant());
+  it('resolves undefined when no tenant resolves', async () => {
+    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+      undefined,
+    );
+    vi.mocked(queries.tenants.listTenants).mockResolvedValue([]);
 
-    await expect(resolveTenantId('acme.example.com')).resolves.toBe('tenant-1');
-    expect(getTenantByDomainMock).toHaveBeenCalledWith('acme.example.com');
+    await expect(resolveTenantId(MOCK_UNKNOWN_HOST)).resolves.toBeUndefined();
   });
 
-  it('resolves undefined when resolveTenant resolves no tenant', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
-    listTenantsMock.mockResolvedValue([]);
+  it('resolves the sole tenant for a request without a host', async () => {
+    vi.mocked(queries.tenants.listTenants).mockResolvedValue([MOCK_TENANT]);
 
-    await expect(
-      resolveTenantId('unknown.example.com'),
-    ).resolves.toBeUndefined();
-  });
-
-  it('passes a null host through unchanged', async () => {
-    listTenantsMock.mockResolvedValue([buildServableTenant()]);
-
-    await expect(resolveTenantId(null)).resolves.toBe('tenant-1');
-    expect(getTenantByDomainMock).not.toHaveBeenCalled();
+    await expect(resolveTenantId(null)).resolves.toBe(MOCK_TENANT_ID);
+    expect(queries.tenantDomains.getTenantByDomain).not.toHaveBeenCalled();
   });
 });

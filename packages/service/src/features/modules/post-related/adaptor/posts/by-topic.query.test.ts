@@ -10,35 +10,34 @@ import {
 
 import { relatedByTopicQuery } from './by-topic.query';
 
-describe('relatedByTopicQuery', () => {
-  it('bounds the candidate pool by the given limit', () => {
-    expect(relatedByTopicQuery(6).query).toContain('[0...6]');
-    expect(relatedByTopicQuery(12).query).toContain('[0...12]');
-  });
-});
+const { EN, NL } = LOCALE_ISO_CODES;
+const MOCK_CANDIDATE_LIMIT = 10;
 
-describe('relatedByTopicQuery language scoping', () => {
-  const { EN, NL } = LOCALE_ISO_CODES;
-
+describe(relatedByTopicQuery, () => {
   it('picks topic candidates only in the request language', async () => {
-    expect(
-      toIds(
-        await evaluateRelatedPostsQuery(relatedByTopicQuery(10).query, {
-          topicId: MOCK_TOPIC_ID,
-          locale: EN,
-        }),
-      ),
-    ).toEqual([MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID]);
+    const raw = await evaluateRelatedPostsQuery(
+      relatedByTopicQuery(MOCK_CANDIDATE_LIMIT).query,
+      { topicId: MOCK_TOPIC_ID, locale: EN },
+    );
+
+    expect(toIds(raw)).toEqual([MOCK_ONLY_EN_POST_ID, MOCK_DESIGN_EN_POST_ID]);
   });
 
   it('leaves out a scheduled topic candidate', async () => {
-    expect(
-      toIds(
-        await evaluateRelatedPostsQuery(relatedByTopicQuery(10).query, {
-          topicId: MOCK_TOPIC_ID,
-          locale: NL,
-        }),
-      ),
-    ).toEqual([MOCK_DESIGN_NL_POST_ID]);
+    const raw = await evaluateRelatedPostsQuery(
+      relatedByTopicQuery(MOCK_CANDIDATE_LIMIT).query,
+      { topicId: MOCK_TOPIC_ID, locale: NL },
+    );
+
+    expect(toIds(raw)).toEqual([MOCK_DESIGN_NL_POST_ID]);
+  });
+
+  it('bounds the candidate pool by the given limit', async () => {
+    const raw = await evaluateRelatedPostsQuery(relatedByTopicQuery(1).query, {
+      topicId: MOCK_TOPIC_ID,
+      locale: EN,
+    });
+
+    expect(toIds(raw)).toEqual([MOCK_ONLY_EN_POST_ID]);
   });
 });

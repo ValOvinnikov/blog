@@ -1,38 +1,23 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 
 import { Heading } from './heading';
 
+faker.seed(123);
+
+const MOCK_TITLE = faker.lorem.words(2);
+
 const setup = customRender(Heading, {
   level: 1,
-  children: 'Title',
+  children: MOCK_TITLE,
 });
 
 describe(`<${Heading.name}/>`, () => {
-  it('renders h1 for level 1', () => {
-    setup();
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Title' }),
-    ).toBeVisible();
-  });
+  it.each([1, 2, 3, 4] as const)('renders a level %s heading', (level) => {
+    setup({ level });
 
-  it('renders h2 for level 2', () => {
-    setup({ level: 2, children: 'Subtitle' });
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Subtitle' }),
-    ).toBeVisible();
-  });
+    const heading = screen.getByRole('heading', { level, name: MOCK_TITLE });
 
-  it('renders h3 for level 3', () => {
-    setup({ level: 3, children: 'Section' });
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Section' }),
-    ).toBeVisible();
-  });
-
-  it('renders h4 for level 4', () => {
-    setup({ level: 4, children: 'Subsection' });
-    expect(
-      screen.getByRole('heading', { level: 4, name: 'Subsection' }),
-    ).toBeVisible();
+    expect(heading).toBeVisible();
   });
 });

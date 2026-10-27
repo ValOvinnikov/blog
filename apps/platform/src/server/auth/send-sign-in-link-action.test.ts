@@ -18,6 +18,11 @@ vi.hoisted(() => vi.stubEnv('SKIP_ENV_VALIDATION', 'true'));
 
 vi.mock('@platform/server/auth/auth');
 
+const MOCK_SIGN_IN_INPUT = {
+  email: MOCK_SIGN_IN_EMAIL,
+  callbackPath: adminRoutes.dashboardLeads(),
+};
+
 describe(sendSignInLinkAction, () => {
   beforeEach(() => {
     vi.mocked(signIn).mockReset();
@@ -25,8 +30,8 @@ describe(sendSignInLinkAction, () => {
 
   it('emails a sign-in link that returns to the requested page', async () => {
     const result = await sendSignInLinkAction({
+      ...MOCK_SIGN_IN_INPUT,
       email: ` ${MOCK_SIGN_IN_EMAIL.toUpperCase()} `,
-      callbackPath: adminRoutes.dashboardLeads(),
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -39,7 +44,7 @@ describe(sendSignInLinkAction, () => {
 
   it('returns a link that would leave this origin to home instead', async () => {
     await sendSignInLinkAction({
-      email: MOCK_SIGN_IN_EMAIL,
+      ...MOCK_SIGN_IN_INPUT,
       callbackPath: MOCK_OFF_ORIGIN_PATH,
     });
 
@@ -52,8 +57,8 @@ describe(sendSignInLinkAction, () => {
 
   it('refuses an address that is not an email, sending nothing', async () => {
     const result = await sendSignInLinkAction({
+      ...MOCK_SIGN_IN_INPUT,
       email: MOCK_NOT_AN_EMAIL,
-      callbackPath: adminRoutes.dashboardLeads(),
     });
 
     expect(result).toEqual({
@@ -67,10 +72,7 @@ describe(sendSignInLinkAction, () => {
     const error = new Error();
     vi.mocked(signIn).mockRejectedValueOnce(error);
 
-    const result = await sendSignInLinkAction({
-      email: MOCK_SIGN_IN_EMAIL,
-      callbackPath: adminRoutes.dashboardLeads(),
-    });
+    const result = await sendSignInLinkAction(MOCK_SIGN_IN_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(SIGN_IN_LOG.LINK_FAILED, {
@@ -78,13 +80,10 @@ describe(sendSignInLinkAction, () => {
     });
   });
 
-  it('reports a send refused by the send limit without logging it as a failure', async () => {
+  it('reports a send refused by the send limit without logging a failure', async () => {
     vi.mocked(signIn).mockRejectedValueOnce(new MagicLinkSendLimitedError());
 
-    const result = await sendSignInLinkAction({
-      email: MOCK_SIGN_IN_EMAIL,
-      callbackPath: adminRoutes.dashboardLeads(),
-    });
+    const result = await sendSignInLinkAction(MOCK_SIGN_IN_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
     expect(logger.error).not.toHaveBeenCalled();

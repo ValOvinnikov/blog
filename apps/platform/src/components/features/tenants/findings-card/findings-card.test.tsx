@@ -1,4 +1,5 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { mockFinding } from '@platform/testing/findings/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
@@ -8,50 +9,65 @@ vi.mock('@platform/server/findings/get-finding-details-action', () => ({
   getFindingDetailsAction: vi.fn(),
 }));
 
-const render = renderWithIntl;
+faker.seed(5994);
 
-describe(FindingsCard, () => {
+const MOCK_FINDING_WITH_DETAILS_ID = faker.string.uuid();
+const MOCK_FINDING_WITHOUT_DETAILS_ID = faker.string.uuid();
+
+const setup = customRender(FindingsCard, {
+  tenantId: MOCK_TENANT_ID,
+  findings: [],
+});
+
+describe(`<${FindingsCard.name}/>`, () => {
   describe('with no findings', () => {
     beforeEach(() => {
-      render(<FindingsCard tenantId={MOCK_TENANT_ID} findings={[]} />);
+      setup();
     });
 
     it("nests the card's title one level under the page's own h1", () => {
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Open findings' }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Open findings',
+      });
+
+      expect(heading).toBeVisible();
     });
 
-    it('shows a healthy empty state when there are no open findings', () => {
-      expect(
-        screen.getByText(
-          "No open findings for this tenant — everything's healthy.",
-        ),
-      ).toBeVisible();
+    it('shows a healthy empty state', () => {
+      const emptyState = screen.getByText(
+        "No open findings for this tenant — everything's healthy.",
+      );
+
+      expect(emptyState).toBeVisible();
     });
   });
 
   it('renders a finding with its source, kind and severity', () => {
-    render(
-      <FindingsCard tenantId={MOCK_TENANT_ID} findings={[mockFinding()]} />,
-    );
+    setup({ findings: [mockFinding()] });
 
-    expect(screen.getByText('Tenant provisioning')).toBeVisible();
-    expect(screen.getByText('Provisioning step failed')).toBeVisible();
-    expect(screen.getByText('Critical')).toBeVisible();
+    const source = screen.getByText('Tenant provisioning');
+    const kind = screen.getByText('Provisioning step failed');
+    const severity = screen.getByText('Critical');
+
+    expect(source).toBeVisible();
+    expect(kind).toBeVisible();
+    expect(severity).toBeVisible();
   });
 
-  it('renders a Details disclosure only when the finding carries details', () => {
-    render(
-      <FindingsCard
-        tenantId={MOCK_TENANT_ID}
-        findings={[
-          mockFinding({ id: 'finding-1', hasDetails: true }),
-          mockFinding({ id: 'finding-2', hasDetails: false }),
-        ]}
-      />,
-    );
+  it('offers a Details disclosure only for a finding that carries details', () => {
+    setup({
+      findings: [
+        mockFinding({ id: MOCK_FINDING_WITH_DETAILS_ID, hasDetails: true }),
+        mockFinding({
+          id: MOCK_FINDING_WITHOUT_DETAILS_ID,
+          hasDetails: false,
+        }),
+      ],
+    });
 
-    expect(screen.getAllByText('Details')).toHaveLength(1);
+    const detailsToggles = screen.getAllByText('Details');
+
+    expect(detailsToggles).toHaveLength(1);
   });
 });

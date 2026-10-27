@@ -6,32 +6,35 @@ import {
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
-import { AUTH_APP } from '@blog/config/constants';
+import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { sha256Hex } from '@blog/utils/hash';
+import { faker } from '@faker-js/faker';
 import type { Adapter, AdapterAccount } from 'next-auth/adapters';
 
 import { scopeAdapterToApp } from './app-scoped-adapter';
 
-const user = {
+faker.seed(6027);
+
+const MOCK_USER = {
   id: MOCK_USER_ID,
   email: MOCK_EMAIL,
   name: null,
   emailVerified: null,
 };
-const expires = MOCK_SESSION_EXPIRES;
 const SESSION_TOKEN_HASH = sha256Hex(MOCK_SESSION_TOKEN);
 
 usePersonalDataKeys();
 
-const storedUser = () => ({
-  ...user,
-  ...queries.users.userPersonalColumns(user),
+const mockNewSession = () => ({
+  sessionToken: MOCK_SESSION_TOKEN,
+  userId: MOCK_USER_ID,
+  expires: MOCK_SESSION_EXPIRES,
 });
 
 function buildAdapter(
-  storedApp: string,
+  storedApp: TAuthApp,
 ): Required<
   Pick<
     Adapter,
@@ -46,12 +49,17 @@ function buildAdapter(
     createSession: vi.fn(async (session) => session),
     linkAccount: vi.fn(async () => undefined),
     getSessionAndUser: vi.fn(async (sessionToken) => ({
-      session: { sessionToken, userId: user.id, expires, app: storedApp },
-      user: storedUser(),
+      session: {
+        sessionToken,
+        userId: MOCK_USER_ID,
+        expires: MOCK_SESSION_EXPIRES,
+        app: storedApp,
+      },
+      user: { ...MOCK_USER, ...queries.users.userPersonalColumns(MOCK_USER) },
     })),
     updateSession: vi.fn(async (session) => ({
-      userId: user.id,
-      expires,
+      userId: MOCK_USER_ID,
+      expires: MOCK_SESSION_EXPIRES,
       ...session,
     })),
     deleteSession: vi.fn(async () => {}),
@@ -69,26 +77,17 @@ describe(scopeAdapterToApp, () => {
     });
 
     it('stores each new session under its token hash, stamped with the app', async () => {
-      await scoped.createSession?.({
-        sessionToken: MOCK_SESSION_TOKEN,
-        userId: user.id,
-        expires,
-      });
+      await scoped.createSession?.(mockNewSession());
 
       expect(adapter.createSession).toHaveBeenCalledWith({
+        ...mockNewSession(),
         sessionToken: SESSION_TOKEN_HASH,
-        userId: user.id,
-        expires,
         app: AUTH_APP.PLATFORM,
       });
     });
 
     it('hands the raw token back for the session cookie', async () => {
-      const created = await scoped.createSession?.({
-        sessionToken: MOCK_SESSION_TOKEN,
-        userId: user.id,
-        expires,
-      });
+      const created = await scoped.createSession?.(mockNewSession());
 
       expect(created?.sessionToken).toBe(MOCK_SESSION_TOKEN);
     });
@@ -104,19 +103,19 @@ describe(scopeAdapterToApp, () => {
     it('extends a session by the hash of the cookie token', async () => {
       await scoped.updateSession?.({
         sessionToken: MOCK_SESSION_TOKEN,
-        expires,
+        expires: MOCK_SESSION_EXPIRES,
       });
 
       expect(adapter.updateSession).toHaveBeenCalledWith({
         sessionToken: SESSION_TOKEN_HASH,
-        expires,
+        expires: MOCK_SESSION_EXPIRES,
       });
     });
 
-    it('returns a session the app issued', async () => {
+    it('returns the user of a session the app issued', async () => {
       const found = await scoped.getSessionAndUser?.(MOCK_SESSION_TOKEN);
 
-      expect(found?.user).toMatchObject(user);
+      expect(found?.user).toEqual(MOCK_USER);
     });
 
     it('deletes a session the app issued by its token hash', async () => {
@@ -152,21 +151,26 @@ describe(scopeAdapterToApp, () => {
     const adapter = buildAdapter(AUTH_APP.SITE);
     const scoped = scopeAdapterToApp(adapter, AUTH_APP.SITE);
     const account: AdapterAccount = {
-      userId: user.id,
+      userId: MOCK_USER_ID,
       type: 'oidc',
       provider: MOCK_PROVIDER,
       providerAccountId: MOCK_PROVIDER_ACCOUNT_ID,
       token_type: 'bearer',
-      scope: 'read:user',
+      scope: faker.lorem.word(),
     };
 
     await scoped.linkAccount?.({
       ...account,
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-      id_token: 'id-token',
+      access_token: faker.string.alphanumeric(32),
+      refresh_token: faker.string.alphanumeric(32),
+      id_token: faker.string.alphanumeric(32),
     });
 
-    expect(adapter.linkAccount).toHaveBeenCalledWith(account);
+    expect(adapter.linkAccount).toHaveBeenCalledWith({
+      ...account,
+      access_token: undefined,
+      refresh_token: undefined,
+      id_token: undefined,
+    });
   });
 });

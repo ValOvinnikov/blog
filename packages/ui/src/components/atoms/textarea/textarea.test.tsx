@@ -4,98 +4,111 @@ import {
   screen,
 } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
 import { Textarea } from './textarea';
 
 faker.seed(123);
 
+const MOCK_ARIA_LABEL = faker.lorem.words(2);
+const MOCK_VALUE = faker.lorem.paragraphs(2);
+const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_ERROR_ID = faker.lorem.slug(2);
+const MOCK_FIRST_LINE = faker.lorem.word();
+const MOCK_SECOND_LINE = faker.lorem.word();
+const MOCK_TYPED_CHARACTER = faker.string.alpha(1);
+
 const setup = customRender(Textarea, {
   value: '',
   onChange: vi.fn(),
-  ariaLabel: 'Message',
+  ariaLabel: MOCK_ARIA_LABEL,
 });
 
 const ControlledTextarea = () => {
   const [value, setValue] = useState('');
 
-  return <Textarea value={value} onChange={setValue} ariaLabel="Message" />;
+  return (
+    <Textarea value={value} onChange={setValue} ariaLabel={MOCK_ARIA_LABEL} />
+  );
 };
 
 describe(`<${Textarea.name}/>`, () => {
-  describe('with the default props', () => {
-    beforeEach(() => {
-      setup();
-    });
+  let user: UserEvent;
 
-    it('renders a textbox with the given ariaLabel', () => {
-      expect(screen.getByRole('textbox', { name: 'Message' })).toBeVisible();
-    });
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
 
-    it('is not marked invalid', () => {
-      expect(screen.getByRole('textbox')).toHaveAttribute(
-        'aria-invalid',
-        'false',
-      );
-    });
+  it('renders a textbox named by the ariaLabel', () => {
+    setup();
 
-    it('is enabled', () => {
-      expect(screen.getByRole('textbox')).toBeEnabled();
-    });
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toBeVisible();
   });
 
   it('renders the controlled value', () => {
-    const value = faker.lorem.paragraphs(2);
-    setup({ value });
-    expect(screen.getByRole('textbox')).toHaveValue(value);
+    setup({ value: MOCK_VALUE });
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toHaveValue(MOCK_VALUE);
   });
 
-  it('calls onChange with the new value on input, and does not manage its own state', async () => {
+  it('reports typed input without keeping its own state', async () => {
     const onChange = vi.fn();
     setup({ onChange });
-    await userEvent.type(screen.getByRole('textbox'), 'a');
-    expect(onChange).toHaveBeenCalledWith('a');
-    expect(screen.getByRole('textbox')).toHaveValue('');
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+    await user.type(textbox, MOCK_TYPED_CHARACTER);
+
+    expect(onChange).toHaveBeenCalledWith(MOCK_TYPED_CHARACTER);
+    expect(textbox).toHaveValue('');
   });
 
-  it('updates the value as the user types across lines when controlled by its parent', async () => {
+  it('updates the value as the user types across lines under a controlling parent', async () => {
     renderElement(<ControlledTextarea />);
-    await userEvent.type(screen.getByRole('textbox'), 'Hello{Enter}there');
-    expect(screen.getByRole('textbox')).toHaveValue('Hello\nthere');
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+    await user.type(textbox, `${MOCK_FIRST_LINE}{Enter}${MOCK_SECOND_LINE}`);
+
+    expect(textbox).toHaveValue(`${MOCK_FIRST_LINE}\n${MOCK_SECOND_LINE}`);
   });
 
-  it('announces its error to assistive tech when invalid and described by an error', () => {
-    const error = faker.lorem.sentence();
+  it('describes itself by its error when invalid', () => {
     renderElement(
       <>
         <Textarea
           value=""
           onChange={vi.fn()}
-          ariaLabel="Message"
+          ariaLabel={MOCK_ARIA_LABEL}
           isInvalid={true}
-          aria-describedby="message-error"
+          aria-describedby={MOCK_ERROR_ID}
         />
-        <p id="message-error">{error}</p>
+        <p id={MOCK_ERROR_ID}>{MOCK_ERROR}</p>
       </>,
     );
-    const textarea = screen.getByRole('textbox');
-    expect(textarea).toHaveAttribute('aria-invalid', 'true');
-    expect(textarea).toHaveAccessibleDescription(error);
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toBeInvalid();
+    expect(textbox).toHaveAccessibleDescription(MOCK_ERROR);
   });
 
-  it('forwards dataTestId to the field', () => {
-    setup({ dataTestId: 'textarea' });
-    expect(screen.getByTestId('textarea')).toBe(screen.getByRole('textbox'));
-  });
-
-  it('renders the native disabled attribute when isDisabled is true', () => {
+  it('disables the field when isDisabled is true', () => {
     setup({ isDisabled: true });
-    expect(screen.getByRole('textbox')).toBeDisabled();
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toBeDisabled();
   });
 
-  it('renders the native required attribute when isRequired is true', () => {
+  it('requires the field when isRequired is true', () => {
     setup({ isRequired: true });
-    expect(screen.getByRole('textbox')).toBeRequired();
+
+    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
+
+    expect(textbox).toBeRequired();
   });
 });

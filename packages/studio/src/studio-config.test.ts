@@ -14,19 +14,26 @@ import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/t
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
+import { getCapabilityOffMessage } from '@blog/studio/schema-types/inputs/capability-warning-input/get-missing-capability';
+import { markCapabilityOffTypes } from '@blog/studio/schema-types/inputs/capability-warning-input/mark-capability-off-types';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
-import { createElement } from 'react';
+import { createElement, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   type DocumentActionComponent,
-  type DocumentActionsResolver,
   type DocumentActionsContext,
   type InputProps,
   type ItemProps,
+  type TemplateItem,
 } from 'sanity';
 
-import { buildStudioConfig } from './studio-config';
+import {
+  buildStudioConfig,
+  type TBuildStudioConfigParams,
+} from './studio-config';
 
 vi.mock('sanity/structure');
 vi.mock('sanity-plugin-media');
@@ -35,89 +42,128 @@ vi.mock('@sanity/code-input', () => ({
   codeInput: () => ({ name: 'codeInput' }),
 }));
 
+faker.seed(6017);
+
+const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
+const MOCK_DATASET = faker.lorem.word();
+const MOCK_TITLE = faker.company.name();
+const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
+const MOCK_DOCUMENT_ID = faker.string.uuid();
+const MOCK_UNTRANSLATED_TYPE = faker.lorem.word();
+const MOCK_DEFAULT_INPUT = faker.lorem.words(3);
+const MOCK_MODULE_KEY = faker.string.alphanumeric(12);
+
+const PUBLISH_ACTION = 'publish';
+const TRANSLATIONS_PLUGIN_NAME = '@sanity/document-internationalization';
+const NEWSLETTER_TYPE = newsletterSchema.name;
+const NEWSLETTER_OFF_MARKUP = renderToStaticMarkup(
+  getCapabilityOffMessage(CAPABILITY.NEWSLETTER),
+);
+
+const buildConfig = (overrides: Partial<TBuildStudioConfigParams> = {}) =>
+  buildStudioConfig({
+    projectId: MOCK_PROJECT_ID,
+    dataset: MOCK_DATASET,
+    title: MOCK_TITLE,
+    ...overrides,
+  });
+
+const getFormComponents = (enabledCapabilities: TCapability[]) => {
+  const components = buildConfig({ enabledCapabilities }).form?.components;
+  if (!components?.input || !components.item) {
+    throw new Error('capability components not registered');
+  }
+
+  return { input: components.input, item: components.item };
+};
+
 describe(buildStudioConfig, () => {
   let config: ReturnType<typeof buildStudioConfig>;
 
   beforeEach(() => {
-    config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
+    config = buildConfig();
+  });
+
+  it('builds a config from the given project, dataset and title', () => {
+    const { projectId, dataset, title, basePath } = config;
+
+    expect({ projectId, dataset, title, basePath }).toEqual({
+      projectId: MOCK_PROJECT_ID,
+      dataset: MOCK_DATASET,
+      title: MOCK_TITLE,
+      basePath: undefined,
     });
   });
 
-  it('builds a config from the given projectId/dataset/title', () => {
-    expect(config.name).toBe('default');
-    expect(config.title).toBe('Test Studio');
-    expect(config.projectId).toBe('test-project');
-    expect(config.dataset).toBe('test-dataset');
-    expect(config.basePath).toBeUndefined();
+  it('mounts the Studio under the given base path', () => {
+    const { basePath } = buildConfig({ basePath: MOCK_BASE_PATH });
+
+    expect(basePath).toBe(MOCK_BASE_PATH);
   });
 
-  it('sets basePath when provided', () => {
-    const configWithBasePath = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      basePath: '/dashboard/studio',
-      title: 'Test Studio',
-    });
-
-    expect(configWithBasePath.basePath).toBe('/dashboard/studio');
-  });
-
-  it('leaves the default login providers when no loginProvider is given', () => {
+  it('keeps every login provider when none is chosen', () => {
     expect(config.auth).toBeUndefined();
   });
 
-  it('limits login to the given provider', () => {
-    const configWithLoginProvider = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
+  it('limits login to the chosen provider', () => {
+    const { auth } = buildConfig({
       loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
     });
 
-    expect(configWithLoginProvider.auth?.redirectOnSingle).toBe(true);
+    expect(auth?.redirectOnSingle).toBe(true);
   });
 
   describe('document actions', () => {
-    let actions: DocumentActionsResolver;
+    let actions: (
+      prev: DocumentActionComponent[],
+      schemaType: string,
+    ) => DocumentActionComponent[];
 
     beforeEach(() => {
       const resolver = config.document?.actions;
       if (typeof resolver !== 'function') {
         throw new Error('expected config.document.actions to be a function');
       }
-      actions = resolver;
+      actions = (prev, schemaType) =>
+        resolver(prev, { schemaType } as DocumentActionsContext);
     });
 
-    it('hides the migrationState system ledger from document actions and the new-document menu', () => {
-      const prev: DocumentActionComponent[] = [];
-      const context = {
-        schemaType: migrationStateSchema.name,
-      } as DocumentActionsContext;
-
-      expect(actions(prev, context)).toEqual([]);
+    it('offers no document actions on the migration ledger', () => {
+      expect(actions([], migrationStateSchema.name)).toEqual([]);
     });
 
     it('wraps only the landing page publish action', () => {
       const publish: DocumentActionComponent = () => null;
-      publish.action = 'publish';
+      publish.action = PUBLISH_ACTION;
       const discard: DocumentActionComponent = () => null;
       discard.action = 'discardChanges';
 
-      const [landingPublish, landingDiscard] = actions([publish, discard], {
-        schemaType: PAGE_LANDING_TYPE,
-      } as DocumentActionsContext);
-      const [topicPublish] = actions([publish], {
-        schemaType: PAGE_TOPIC_TYPE,
-      } as DocumentActionsContext);
+      const [landingPublish, landingDiscard] = actions(
+        [publish, discard],
+        PAGE_LANDING_TYPE,
+      );
+      const [topicPublish] = actions([publish], PAGE_TOPIC_TYPE);
 
       expect(landingPublish).not.toBe(publish);
-      expect(landingPublish?.action).toBe('publish');
+      expect(landingPublish?.action).toBe(PUBLISH_ACTION);
       expect(landingDiscard).toBe(discard);
       expect(topicPublish).toBe(publish);
     });
+  });
+
+  it('hides the migration ledger from the new-document menu', () => {
+    const newDocumentOptions = config.document?.newDocumentOptions;
+    if (typeof newDocumentOptions !== 'function') {
+      throw new Error('expected config.document.newDocumentOptions');
+    }
+    const ledgerItem = {
+      templateId: migrationStateSchema.name,
+    } as TemplateItem;
+    const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
+
+    const options = newDocumentOptions([ledgerItem, otherItem]);
+
+    expect(options).toEqual([otherItem]);
   });
 
   it.each([
@@ -140,27 +186,22 @@ describe(buildStudioConfig, () => {
       schemaType,
       value: {},
     });
+    const languageTemplateId = `${type}-${LOCALE_ISO_CODES.EN}`;
 
     const ids = templates([
       template(type, type),
-      template(`${type}-EN`, type),
-      template('blog_topic', 'blog_topic'),
+      template(languageTemplateId, type),
+      template(MOCK_UNTRANSLATED_TYPE, MOCK_UNTRANSLATED_TYPE),
     ]).map(({ id }) => id);
 
-    expect(ids).toEqual([`${type}-EN`, 'blog_topic']);
+    expect(ids).toEqual([languageTemplateId, MOCK_UNTRANSLATED_TYPE]);
   });
 
   describe('translations menu', () => {
-    const languageFilterFor = (liveLocales: TLocaleIsoCode[]) => {
-      const plugin = buildStudioConfig({
-        projectId: 'test-project',
-        dataset: 'test-dataset',
-        title: 'Test Studio',
-        liveLocales,
-      }).plugins?.find(
+    const getLanguageFilterEntries = (liveLocales: TLocaleIsoCode[]) => {
+      const plugin = buildConfig({ liveLocales }).plugins?.find(
         (entry) =>
-          typeof entry === 'object' &&
-          entry.name === '@sanity/document-internationalization',
+          typeof entry === 'object' && entry.name === TRANSLATIONS_PLUGIN_NAME,
       );
       const filter =
         typeof plugin === 'object'
@@ -172,149 +213,133 @@ describe(buildStudioConfig, () => {
 
       return filter([], {
         schemaType: PAGE_HOME_TYPE,
-        documentId: 'homePage',
+        documentId: MOCK_DOCUMENT_ID,
       } as Parameters<typeof filter>[1]);
     };
 
-    it('offers no Translations menu with one live language', () => {
-      expect(languageFilterFor([LOCALE_ISO_CODES.EN])).toHaveLength(0);
-    });
-
-    it('offers the Translations menu with two live languages', () => {
-      expect(
-        languageFilterFor([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL]),
-      ).toHaveLength(1);
-    });
+    it.each([
+      { languages: 'one', liveLocales: [LOCALE_ISO_CODES.EN], entries: 0 },
+      {
+        languages: 'two',
+        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+        entries: 1,
+      },
+    ])(
+      'offers $entries Translations menu entries with $languages live languages',
+      ({ liveLocales, entries }) => {
+        expect(getLanguageFilterEntries(liveLocales)).toHaveLength(entries);
+      },
+    );
   });
 
   describe('capability warning', () => {
-    const componentsFor = (enabledCapabilities: TCapability[]) => {
-      const components = buildStudioConfig({
-        projectId: 'test-project',
-        dataset: 'test-dataset',
-        title: 'Test Studio',
-        enabledCapabilities,
-      }).form?.components;
-      if (!components?.input || !components.item) {
-        throw new Error('capability components not registered');
-      }
-
-      return { input: components.input, item: components.item };
-    };
-
     const renderRootInput = (
-      enabledCapabilities: TCapability[] | undefined,
-      typeName: string,
+      enabledCapabilities: TCapability[],
       path: InputProps['path'] = [],
     ) => {
-      const config = buildStudioConfig({
-        projectId: 'test-project',
-        dataset: 'test-dataset',
-        title: 'Test Studio',
-        enabledCapabilities,
-      });
-      const Input = config.form?.components?.input;
-      if (!Input) {
-        return null;
-      }
+      const { input } = getFormComponents(enabledCapabilities);
       const props = {
         path,
-        schemaType: { name: typeName },
-        renderDefault: () => createElement('div', null, 'default-input'),
+        schemaType: { name: NEWSLETTER_TYPE },
+        renderDefault: () => createElement('div', null, MOCK_DEFAULT_INPUT),
       } as unknown as InputProps;
 
       return renderToStaticMarkup(
         createElement(
           ThemeProvider,
           { theme: buildTheme() },
-          createElement(Input, props),
+          createElement(input, props),
         ),
       );
     };
 
     it('shows the banner above the form when Newsletter is absent', () => {
-      const html = renderRootInput([CAPABILITY.COMMENTS], 'module_newsletter');
+      const html = renderRootInput([CAPABILITY.COMMENTS]);
 
-      expect(html).toContain('Newsletter is turned on in Features');
-      expect(html?.indexOf('Features')).toBeLessThan(
-        html?.indexOf('default-input') ?? 0,
+      expect(html).toContain(NEWSLETTER_OFF_MARKUP);
+      expect(html.indexOf(NEWSLETTER_OFF_MARKUP)).toBeLessThan(
+        html.indexOf(MOCK_DEFAULT_INPUT),
       );
     });
 
     it('shows no banner when Newsletter is present', () => {
-      const html = renderRootInput(
-        [CAPABILITY.NEWSLETTER],
-        'module_newsletter',
-      );
+      const html = renderRootInput([CAPABILITY.NEWSLETTER]);
 
-      expect(html).not.toContain('Features');
-      expect(html).toContain('default-input');
+      expect(html).not.toContain(NEWSLETTER_OFF_MARKUP);
+      expect(html).toContain(MOCK_DEFAULT_INPUT);
     });
 
-    it('registers no input override when no capabilities are given', () => {
-      expect(renderRootInput(undefined, 'module_newsletter')).toBeNull();
+    it('registers no capability warnings when no capabilities are given', () => {
+      expect(config.form?.components).toBeUndefined();
     });
 
     it('shows no banner on nested inputs', () => {
-      const html = renderRootInput([], 'module_newsletter', ['title']);
+      const html = renderRootInput([], ['title']);
 
-      expect(html).not.toContain('Features');
+      expect(html).not.toContain(NEWSLETTER_OFF_MARKUP);
     });
 
     it('marks a gated module in the picker when its capability is off', () => {
-      const { input } = componentsFor([CAPABILITY.COMMENTS]);
-      const renderDefault = vi.fn(() => createElement('div'));
+      const enabledCapabilities = [CAPABILITY.COMMENTS];
+      const { input } = getFormComponents(enabledCapabilities);
+      const of = [{ name: NEWSLETTER_TYPE, title: newsletterSchema.title }];
+      const renderDefault = vi.fn<(props: InputProps) => ReactElement>(() =>
+        createElement('div'),
+      );
       const props = {
         path: ['modules'],
-        schemaType: {
-          name: 'array',
-          jsonType: 'array',
-          of: [{ name: 'module_newsletter', title: 'Newsletter' }],
-        },
+        schemaType: { name: 'array', jsonType: 'array', of },
         renderDefault,
       } as unknown as InputProps;
 
       renderToStaticMarkup(createElement(input, props));
 
-      expect(renderDefault).toHaveBeenCalledWith(
-        expect.objectContaining({
-          schemaType: expect.objectContaining({
-            of: [
-              expect.objectContaining({
-                title: 'Newsletter (off in Features)',
-              }),
-            ],
-          }),
-        }),
-      );
+      const [renderedProps] = renderDefault.mock.calls.map(([props]) => props);
+      const [markedType] = (renderedProps?.schemaType as { of: typeof of }).of;
+      const [expectedType] = markCapabilityOffTypes(of, enabledCapabilities)!;
+
+      expect(markedType?.title).toBe(expectedType?.title);
     });
 
     it.each([
-      ['off', [CAPABILITY.COMMENTS], 1],
-      ['on', [CAPABILITY.NEWSLETTER], 0],
+      {
+        state: 'off',
+        enabledCapabilities: [CAPABILITY.COMMENTS],
+        warned: true,
+      },
+      {
+        state: 'on',
+        enabledCapabilities: [CAPABILITY.NEWSLETTER],
+        warned: false,
+      },
     ])(
-      'adds %s-state warnings to a page item',
-      (_state, enabledCapabilities, expectedWarnings) => {
-        const { item } = componentsFor(enabledCapabilities);
-        const renderDefault = vi.fn(() => createElement('div'));
+      'warns on a page item only when its capability is $state',
+      ({ enabledCapabilities, warned }) => {
+        const { item } = getFormComponents(enabledCapabilities);
+        const path = ['modules', { _key: MOCK_MODULE_KEY }];
+        const renderDefault = vi.fn<(props: ItemProps) => ReactElement>(() =>
+          createElement('div'),
+        );
         const props = {
-          path: ['modules', { _key: 'a' }],
-          schemaType: { name: 'module_newsletter' },
+          path,
+          schemaType: { name: NEWSLETTER_TYPE },
           validation: [],
           renderDefault,
         } as unknown as ItemProps;
 
         renderToStaticMarkup(createElement(item, props));
 
-        expect(renderDefault).toHaveBeenCalledWith(
-          expect.objectContaining({
-            validation: Array.from({ length: expectedWarnings }, () =>
-              expect.objectContaining({
-                level: 'warning',
-                path: ['modules', { _key: 'a' }],
-              }),
-            ),
-          }),
+        const [renderedProps] = renderDefault.mock.calls.map(
+          ([props]) => props,
+        );
+        const expectedWarning = {
+          level: 'warning',
+          message: getCapabilityOffMessage(CAPABILITY.NEWSLETTER),
+          path,
+        };
+
+        expect(renderedProps?.validation).toEqual(
+          warned ? [expectedWarning] : [],
         );
       },
     );

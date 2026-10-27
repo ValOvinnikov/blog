@@ -1,9 +1,44 @@
 import {
   EMPTY_REDIRECT_PLAN,
   planLandingRedirects,
+  type TLandingMove,
 } from '@blog/studio/document-actions/plan-landing-redirects/plan-landing-redirects';
+import { mockUniqueSlugs } from '@blog/studio/testing/mock-unique-slugs';
+import { faker } from '@faker-js/faker';
 
-const move = (from: string, to: string, livePaths: string[] = []) => ({
+faker.seed(6017);
+
+const MOCK_SLUG = mockUniqueSlugs([
+  'FAQ',
+  'HELP',
+  'MODULES',
+  'CATALOG',
+  'OLD_FAQ',
+  'QUESTIONS',
+  'SHOP',
+  'SOMEWHERE',
+  'PRICING',
+]);
+const MOCK_FAQ_PATH = `/${MOCK_SLUG.FAQ}`;
+const MOCK_HELP_PATH = `/${MOCK_SLUG.HELP}`;
+const MOCK_MODULES_PATH = `/${MOCK_SLUG.MODULES}`;
+const MOCK_CATALOG_PATH = `/${MOCK_SLUG.CATALOG}`;
+const MOCK_OLD_FAQ_PATH = `/${MOCK_SLUG.OLD_FAQ}`;
+const MOCK_QUESTIONS_PATH = `/${MOCK_SLUG.QUESTIONS}`;
+const MOCK_SHOP_PATH = `/${MOCK_SLUG.SHOP}`;
+const MOCK_SOMEWHERE_PATH = `/${MOCK_SLUG.SOMEWHERE}`;
+const MOCK_HELP_FAQ_PATH = `${MOCK_HELP_PATH}${MOCK_FAQ_PATH}`;
+const MOCK_MODULES_FAQ_PATH = `${MOCK_MODULES_PATH}${MOCK_FAQ_PATH}`;
+const MOCK_CATALOG_FAQ_PATH = `${MOCK_CATALOG_PATH}${MOCK_FAQ_PATH}`;
+const MOCK_CATALOG_PRICING_PATH = `${MOCK_CATALOG_PATH}/${MOCK_SLUG.PRICING}`;
+const MOCK_REDIRECT_ID = faker.string.uuid();
+const MOCK_OTHER_REDIRECT_ID = faker.string.uuid();
+
+const mockLandingMove = (
+  from: string,
+  to: string,
+  livePaths: string[] = [],
+): TLandingMove => ({
   from,
   to,
   isPrefix: livePaths.length > 0,
@@ -12,14 +47,26 @@ const move = (from: string, to: string, livePaths: string[] = []) => ({
 
 describe(planLandingRedirects, () => {
   it('plans nothing when the path is unchanged', () => {
-    expect(planLandingRedirects(move('/faq', '/faq'), [])).toEqual(
-      EMPTY_REDIRECT_PLAN,
+    const plan = planLandingRedirects(
+      mockLandingMove(MOCK_FAQ_PATH, MOCK_FAQ_PATH),
+      [],
     );
+
+    expect(plan).toEqual(EMPTY_REDIRECT_PLAN);
   });
 
   it('redirects the old path to the new one', () => {
-    expect(planLandingRedirects(move('/faq', '/help/faq'), [])).toEqual({
-      create: { source: '/faq', destination: '/help/faq', isPrefix: false },
+    const plan = planLandingRedirects(
+      mockLandingMove(MOCK_FAQ_PATH, MOCK_HELP_FAQ_PATH),
+      [],
+    );
+
+    expect(plan).toEqual({
+      create: {
+        source: MOCK_FAQ_PATH,
+        destination: MOCK_HELP_FAQ_PATH,
+        isPrefix: false,
+      },
       update: [],
       remove: [],
     });
@@ -27,70 +74,132 @@ describe(planLandingRedirects, () => {
 
   it('makes one prefix redirect when the page has sub-pages', () => {
     const plan = planLandingRedirects(
-      move('/modules', '/catalog', ['/catalog/faq', '/catalog/pricing']),
+      mockLandingMove(MOCK_MODULES_PATH, MOCK_CATALOG_PATH, [
+        MOCK_CATALOG_FAQ_PATH,
+        MOCK_CATALOG_PRICING_PATH,
+      ]),
       [],
     );
 
     expect(plan.create).toEqual({
-      source: '/modules',
-      destination: '/catalog',
+      source: MOCK_MODULES_PATH,
+      destination: MOCK_CATALOG_PATH,
       isPrefix: true,
     });
   });
 
   it('points a redirect that led to the old path at the new one', () => {
-    const plan = planLandingRedirects(move('/faq', '/help/faq'), [
-      { _id: 'r1', source: '/questions', destination: '/faq' },
-    ]);
+    const plan = planLandingRedirects(
+      mockLandingMove(MOCK_FAQ_PATH, MOCK_HELP_FAQ_PATH),
+      [
+        {
+          _id: MOCK_REDIRECT_ID,
+          source: MOCK_QUESTIONS_PATH,
+          destination: MOCK_FAQ_PATH,
+        },
+      ],
+    );
 
-    expect(plan.update).toEqual([{ _id: 'r1', destination: '/help/faq' }]);
+    expect(plan.update).toEqual([
+      { _id: MOCK_REDIRECT_ID, destination: MOCK_HELP_FAQ_PATH },
+    ]);
   });
 
   it('rebases a redirect into the moved subtree', () => {
     const plan = planLandingRedirects(
-      move('/modules', '/catalog', ['/catalog/faq']),
-      [{ _id: 'r1', source: '/old-faq', destination: '/modules/faq' }],
+      mockLandingMove(MOCK_MODULES_PATH, MOCK_CATALOG_PATH, [
+        MOCK_CATALOG_FAQ_PATH,
+      ]),
+      [
+        {
+          _id: MOCK_REDIRECT_ID,
+          source: MOCK_OLD_FAQ_PATH,
+          destination: MOCK_MODULES_FAQ_PATH,
+        },
+      ],
     );
 
-    expect(plan.update).toEqual([{ _id: 'r1', destination: '/catalog/faq' }]);
+    expect(plan.update).toEqual([
+      { _id: MOCK_REDIRECT_ID, destination: MOCK_CATALOG_FAQ_PATH },
+    ]);
   });
 
-  it('leaves a redirect beneath the old path alone when the page has no sub-pages', () => {
-    const plan = planLandingRedirects(move('/modules', '/catalog'), [
-      { _id: 'r1', source: '/old-faq', destination: '/modules/faq' },
-    ]);
+  it('leaves a redirect beneath the old path alone without sub-pages', () => {
+    const plan = planLandingRedirects(
+      mockLandingMove(MOCK_MODULES_PATH, MOCK_CATALOG_PATH),
+      [
+        {
+          _id: MOCK_REDIRECT_ID,
+          source: MOCK_OLD_FAQ_PATH,
+          destination: MOCK_MODULES_FAQ_PATH,
+        },
+      ],
+    );
+    const { update, remove } = plan;
 
-    expect(plan.update).toEqual([]);
-    expect(plan.remove).toEqual([]);
+    expect(update).toEqual([]);
+    expect(remove).toEqual([]);
   });
 
   it('removes a redirect that would loop once the page moves back', () => {
-    const plan = planLandingRedirects(move('/help/faq', '/faq'), [
-      { _id: 'r1', source: '/faq', destination: '/help/faq' },
-    ]);
+    const plan = planLandingRedirects(
+      mockLandingMove(MOCK_HELP_FAQ_PATH, MOCK_FAQ_PATH),
+      [
+        {
+          _id: MOCK_REDIRECT_ID,
+          source: MOCK_FAQ_PATH,
+          destination: MOCK_HELP_FAQ_PATH,
+        },
+      ],
+    );
+    const { update, remove } = plan;
 
-    expect(plan.remove).toEqual(['r1']);
-    expect(plan.update).toEqual([]);
+    expect(remove).toEqual([MOCK_REDIRECT_ID]);
+    expect(update).toEqual([]);
   });
 
   it('removes a redirect whose source is now a live page', () => {
     const plan = planLandingRedirects(
-      move('/modules', '/catalog', ['/catalog/faq']),
+      mockLandingMove(MOCK_MODULES_PATH, MOCK_CATALOG_PATH, [
+        MOCK_CATALOG_FAQ_PATH,
+      ]),
       [
-        { _id: 'r1', source: '/catalog', destination: '/shop' },
-        { _id: 'r2', source: '/catalog/faq', destination: '/help' },
+        {
+          _id: MOCK_REDIRECT_ID,
+          source: MOCK_CATALOG_PATH,
+          destination: MOCK_SHOP_PATH,
+        },
+        {
+          _id: MOCK_OTHER_REDIRECT_ID,
+          source: MOCK_CATALOG_FAQ_PATH,
+          destination: MOCK_HELP_PATH,
+        },
       ],
     );
 
-    expect(plan.remove).toEqual(['r1', 'r2']);
+    expect(plan.remove).toEqual([MOCK_REDIRECT_ID, MOCK_OTHER_REDIRECT_ID]);
   });
 
   it('replaces an existing redirect from the old path', () => {
-    const plan = planLandingRedirects(move('/faq', '/help/faq'), [
-      { _id: 'r1', source: '/faq', destination: '/somewhere' },
-    ]);
+    const plan = planLandingRedirects(
+      mockLandingMove(MOCK_FAQ_PATH, MOCK_HELP_FAQ_PATH),
+      [
+        {
+          _id: MOCK_REDIRECT_ID,
+          source: MOCK_FAQ_PATH,
+          destination: MOCK_SOMEWHERE_PATH,
+        },
+      ],
+    );
 
-    expect(plan.remove).toEqual(['r1']);
-    expect(plan.create?.destination).toBe('/help/faq');
+    expect(plan).toEqual({
+      create: {
+        source: MOCK_FAQ_PATH,
+        destination: MOCK_HELP_FAQ_PATH,
+        isPrefix: false,
+      },
+      update: [],
+      remove: [MOCK_REDIRECT_ID],
+    });
   });
 });

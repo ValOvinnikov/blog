@@ -6,27 +6,30 @@ import { NewsletterSignup } from './newsletter-signup';
 
 faker.seed(123);
 
+const MOCK_HEADING = faker.lorem.sentence(3);
+
 const baseArgs = {
   ...mockNewsletterSignupArgs(),
-  heading: faker.lorem.sentence(3),
+  heading: MOCK_HEADING,
 };
 
-describe('NewsletterSignup', () => {
-  it('wires Full to the rich density that renders the heading as a landmark', () => {
-    const setup = customRender(NewsletterSignup.Full, baseArgs);
-    setup();
+const setupFull = customRender(NewsletterSignup.Full, baseArgs);
+const setupCompact = customRender(NewsletterSignup.Compact, baseArgs);
 
-    const heading = screen.getByRole('heading', { name: baseArgs.heading });
+describe('NewsletterSignup', () => {
+  it('wires Full to the density that renders the heading as a landmark', () => {
+    setupFull();
+
+    const heading = screen.getByRole('heading', { name: MOCK_HEADING });
 
     expect(heading).toBeVisible();
   });
 
   it('wires Compact to the slim density with no heading landmark', () => {
-    const setup = customRender(NewsletterSignup.Compact, baseArgs);
-    setup();
+    setupCompact();
 
-    const heading = screen.queryByRole('heading');
-    const label = screen.getByText(baseArgs.heading);
+    const heading = screen.queryByRole('heading', { name: MOCK_HEADING });
+    const label = screen.getByText(MOCK_HEADING);
 
     expect(heading).not.toBeInTheDocument();
     expect(label).toBeVisible();

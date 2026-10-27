@@ -1,11 +1,15 @@
 import type { TTeamMember } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
+export const MOCK_TEAM_MEMBER_NAME = 'Jordan Reyes';
+
+export const MOCK_TEAM_MEMBER_INITIALS = 'JR';
+
 export const mockTeamMember = (
   overrides: Partial<TTeamMember> = {},
 ): TTeamMember => ({
   id: 'team-member-1',
-  name: 'Jordan Reyes',
+  name: MOCK_TEAM_MEMBER_NAME,
   image: undefined,
   role: 'VP Engineering',
   bio: undefined,

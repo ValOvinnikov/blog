@@ -3,907 +3,592 @@ import {
   LOCALE_NATIVE_LABEL,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
-import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import type { TMaybeUndefined } from '@blog/config/types';
+import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import {
+  mockHomePage,
+  mockLandingPage,
+  mockPage,
+} from '@blog/studio/testing/mock-documents';
+import {
+  asStructureBuilder,
+  matchingIds,
+  mockStructureBuilder,
+  type TMockStructureBuilder,
+} from '@blog/studio/testing/structure/mock-structure-builder';
 import {
   callArgs,
-  mockStructureNode,
   type TMockStructureNode,
 } from '@blog/studio/testing/structure/mock-structure-node';
-import { House, Link2, List, Settings, Tag } from 'lucide-react';
-import type { StructureBuilder } from 'sanity/structure';
+import { faker } from '@faker-js/faker';
+import { House, List } from 'lucide-react';
+import { getDraftId } from 'sanity';
 
 import { buildSections, type TStructureSection } from './build-section';
 
-const MODULE_TWO_TITLE = 'Module Two';
-const LANDING_PAGES_TITLE = 'Landing Pages';
-const UNSET_PAGE_ID = 'unset-page';
-const MODULE_ONE_TITLE = 'Module One';
-const SITE_SETTINGS_TITLE = 'Site Settings';
-const SINGLETON_ITEM_TITLE = 'Singleton Item';
-const LANDING_PAGE_TITLE = 'Landing Page';
-const TYPE_FILTER = '_type == $type';
-const DUTCH_HOME_TEMPLATE_ID = 'homePage-NL';
-const ENGLISH_LANDING_TEMPLATE_ID = 'landingPage-EN';
-const DUTCH_LANDING_TEMPLATE_ID = 'landingPage-NL';
+faker.seed(6017);
 
 vi.mock('@sanity/orderable-document-list', () => ({
   OrderableDocumentList: () => null,
 }));
 
-const LANGUAGE_DATASET = [
-  { _id: 'en-page', _type: 'landingPage', language: LOCALE_ISO_CODES.EN },
-  { _id: 'nl-page', _type: 'landingPage', language: LOCALE_ISO_CODES.NL },
-  { _id: UNSET_PAGE_ID, _type: 'landingPage' },
-  {
-    _id: 'nl-child',
-    _type: 'landingPage',
-    language: LOCALE_ISO_CODES.NL,
-    parent: { _type: 'reference', _ref: 'nl-page' },
-  },
-  { _id: 'nl-post', _type: 'postPage', language: LOCALE_ISO_CODES.NL },
-];
+type TGroup = TStructureSection['groups'][number];
+type TGroupItem = TGroup['items'][number];
 
-const listedIds = async (list: TMockStructureNode) => {
-  const [filter] = callArgs(list, 'filter') as [string];
-  const [params] = callArgs(list, 'params') as [Record<string, unknown>];
-  return mockGroqFetch(LANGUAGE_DATASET)(`*[${filter}]._id`, params);
-};
+const { EN, NL, DE } = LOCALE_ISO_CODES;
+const EVERY_LOCALE = Object.values(LOCALE_ISO_CODES);
+const LIVE_LOCALES = [NL, EN, DE];
 
-const makeMockStructureBuilder = (dataset: Record<string, unknown>[] = []) => ({
-  context: {
-    getClient: () => ({ fetch: mockGroqFetch(dataset) }),
-  },
-  divider: vi.fn(() => mockStructureNode('divider')),
-  listItem: vi.fn(() => mockStructureNode('listItem')),
-  documentTypeListItem: vi.fn((documentType: string) =>
-    mockStructureNode('documentTypeListItem', documentType),
-  ),
-  documentTypeList: vi.fn((documentType: string) =>
-    mockStructureNode('documentTypeList', documentType),
-  ),
-  document: vi.fn(() => mockStructureNode('document')),
-  list: vi.fn(() => mockStructureNode('list')),
-  documentList: vi.fn(() => mockStructureNode('documentList')),
-  initialValueTemplateItem: vi.fn((templateId: string) => ({ templateId })),
+const mockSchema = () => ({
+  name: faker.string.alpha(12),
+  title: faker.lorem.words(2),
+  icon: List,
 });
 
-const asStructureBuilder = (S: ReturnType<typeof makeMockStructureBuilder>) =>
-  S as unknown as StructureBuilder;
+const mockSection = (
+  overrides: Partial<TStructureSection> = {},
+): TStructureSection => ({
+  title: faker.lorem.word(),
+  id: faker.string.alpha(10),
+  icon: House,
+  groups: [{ items: [{ schema: mockSchema() }] }],
+  ...overrides,
+});
 
-const buildOneSection = (
-  S: ReturnType<typeof makeMockStructureBuilder>,
-  section: TStructureSection,
+const MOCK_LIST_ITEM: TGroupItem = { schema: mockSchema() };
+const MOCK_OTHER_LIST_ITEM: TGroupItem = { schema: mockSchema() };
+const MOCK_SINGLETON_ITEM: TGroupItem = {
+  schema: mockSchema(),
+  mode: 'singleton',
+};
+const [MOCK_GROUP_TITLE, MOCK_OTHER_GROUP_TITLE] = [
+  faker.lorem.words(2),
+  faker.lorem.words(2),
+];
+const MOCK_LANDING_SCHEMA = { ...mockSchema(), name: PAGE_LANDING_TYPE };
+const MOCK_HOME_SCHEMA = { ...mockSchema(), name: PAGE_HOME_TYPE };
+
+const MOCK_EN_PAGE = mockLandingPage({
+  _id: faker.string.uuid(),
+  language: EN,
+});
+const MOCK_NL_PAGE = mockLandingPage({
+  _id: faker.string.uuid(),
+  language: NL,
+});
+const MOCK_UNSET_PAGE = mockLandingPage({ _id: faker.string.uuid() });
+const MOCK_NL_CHILD = mockLandingPage({
+  _id: faker.string.uuid(),
+  language: NL,
+  parent: MOCK_NL_PAGE._id,
+});
+const MOCK_LANDING_DATASET = [
+  MOCK_EN_PAGE,
+  MOCK_NL_PAGE,
+  MOCK_UNSET_PAGE,
+  MOCK_NL_CHILD,
+  mockPage({ _id: faker.string.uuid(), _type: PAGE_POST_TYPE, language: NL }),
+];
+
+const MOCK_HOME_NL_ID = faker.string.uuid();
+const MOCK_HOME_EN_ID = faker.string.uuid();
+const MOCK_HOME_UNSET_ID = faker.string.uuid();
+const MOCK_NEW_DOCUMENT_ID = faker.string.uuid() as ReturnType<
+  typeof crypto.randomUUID
+>;
+
+const templateIdOf = (name: string, locale: TLocaleIsoCode) =>
+  `${name}-${locale}`;
+
+const childOf = (node: TMockStructureNode) =>
+  callArgs(node, 'child')?.[0] as TMockStructureNode;
+
+const itemsOf = (node: TMockStructureNode) =>
+  callArgs(node, 'items')?.[0] as TMockStructureNode[];
+
+const titleOf = (node: TMockStructureNode) => callArgs(node, 'title')?.[0];
+
+const kindAndTitle = (node: TMockStructureNode) => [node.kind, titleOf(node)];
+
+const buildNodes = (
+  S: TMockStructureBuilder,
+  sections: TStructureSection[],
   locales?: readonly TLocaleIsoCode[],
-): TMockStructureNode => {
-  const [result] = buildSections(
+) =>
+  buildSections(
     asStructureBuilder(S),
-    [section],
+    sections,
     locales,
   ) as unknown as TMockStructureNode[];
-  return result!;
+
+const buildGroupItems = (
+  S: TMockStructureBuilder,
+  groups: TGroup[],
+  locales?: readonly TLocaleIsoCode[],
+) => {
+  const [section] = buildNodes(S, [mockSection({ groups })], locales);
+  return itemsOf(childOf(section!));
 };
 
-const getGroupItems = (
-  S: ReturnType<typeof makeMockStructureBuilder>,
-  groups: TStructureSection['groups'],
+const buildSingleItem = (
+  S: TMockStructureBuilder,
+  item: TGroupItem,
   locales?: readonly TLocaleIsoCode[],
-): TMockStructureNode[] => {
-  const sectionItem = buildOneSection(
-    S,
-    {
-      title: 'Section',
-      id: 'section',
-      icon: List,
-      groups,
-    },
-    locales,
-  );
-  const childList = callArgs(sectionItem, 'child')?.[0] as TMockStructureNode;
-  return callArgs(childList, 'items')?.[0] as TMockStructureNode[];
+) => {
+  const [node] = buildGroupItems(S, [{ items: [item] }], locales);
+  return node!;
+};
+
+const listedIds = (list: TMockStructureNode) => {
+  const [filter] = callArgs(list, 'filter') as [string];
+  const [params] = callArgs(list, 'params') as [Record<string, unknown>];
+  return matchingIds(MOCK_LANDING_DATASET, filter, params);
 };
 
 describe(buildSections, () => {
-  let S: ReturnType<typeof makeMockStructureBuilder>;
+  let S: TMockStructureBuilder;
 
   beforeEach(() => {
-    S = makeMockStructureBuilder();
+    S = mockStructureBuilder();
   });
 
-  it('flattens 3 groups into divider + items, preserving declared order with no leading/trailing extra divider', () => {
-    const items = getGroupItems(S, [
-      {
-        title: 'Group A',
-        items: [
-          {
-            schema: { name: 'moduleOne', title: MODULE_ONE_TITLE, icon: List },
-          },
-          { schema: { name: 'moduleTwo', title: MODULE_TWO_TITLE, icon: Tag } },
-        ],
-      },
-      {
-        title: 'Group B',
-        items: [
-          {
-            schema: { name: 'homePage', title: 'Home Page', icon: House },
-            mode: 'singleton',
-          },
-        ],
-      },
-      {
-        title: 'Group C',
-        items: [
-          { schema: { name: 'tagPage', title: 'Tag Pages', icon: Tag } },
-          {
-            schema: {
-              name: 'siteSettings',
-              title: SITE_SETTINGS_TITLE,
-              icon: Settings,
-            },
-            mode: 'singleton',
-          },
-        ],
-      },
-    ]);
-
-    expect(items.map((builder) => builder.kind)).toEqual([
-      'divider',
-      'documentTypeListItem',
-      'documentTypeListItem',
-      'divider',
-      'listItem',
-      'divider',
-      'documentTypeListItem',
-      'listItem',
-    ]);
-
-    expect(callArgs(items[0]!, 'title')).toEqual(['Group A']);
-    expect(callArgs(items[3]!, 'title')).toEqual(['Group B']);
-    expect(callArgs(items[5]!, 'title')).toEqual(['Group C']);
-    expect(items.at(-1)?.kind).not.toBe('divider');
-
-    expect(items[1]?.documentType).toBe('moduleOne');
-    expect(items[2]?.documentType).toBe('moduleTwo');
-    expect(items[6]?.documentType).toBe('tagPage');
-    expect(callArgs(items[7]!, 'id')).toEqual(['siteSettings']);
-  });
-
-  it('drops an empty group entirely, including its divider, without crashing', () => {
-    const items = getGroupItems(S, [
-      {
-        title: 'Group A',
-        items: [
-          {
-            schema: { name: 'moduleOne', title: MODULE_ONE_TITLE, icon: List },
-          },
-        ],
-      },
-      { title: 'Group B (empty)', items: [] },
-      {
-        title: 'Group C',
-        items: [
-          { schema: { name: 'moduleTwo', title: MODULE_TWO_TITLE, icon: Tag } },
-        ],
-      },
-    ]);
-
-    expect(items.map((builder) => builder.kind)).toEqual([
-      'divider',
-      'documentTypeListItem',
-      'divider',
-      'documentTypeListItem',
-    ]);
-    expect(callArgs(items[0]!, 'title')).toEqual(['Group A']);
-    expect(callArgs(items[2]!, 'title')).toEqual(['Group C']);
-  });
-
-  it('builds a list item via S.documentTypeListItem() and a singleton item via S.listItem()/S.document()', () => {
-    const items = getGroupItems(S, [
-      {
-        title: 'Group',
-        items: [
-          { schema: { name: 'listType', title: 'List Item', icon: List } },
-          {
-            schema: {
-              name: 'singletonType',
-              title: SINGLETON_ITEM_TITLE,
-              icon: House,
-            },
-            mode: 'singleton',
-          },
-        ],
-      },
-    ]);
-
-    const [, listItemBuilder, singletonBuilder] = items;
-
-    expect(listItemBuilder?.kind).toBe('documentTypeListItem');
-    expect(listItemBuilder?.documentType).toBe('listType');
-    expect(callArgs(listItemBuilder!, 'title')).toEqual(['List Item']);
-    expect(callArgs(listItemBuilder!, 'icon')).toEqual([List]);
-    expect(S.documentTypeListItem).toHaveBeenCalledTimes(1);
-    expect(S.documentTypeListItem).toHaveBeenCalledWith('listType');
-
-    expect(singletonBuilder?.kind).toBe('listItem');
-    expect(callArgs(singletonBuilder!, 'id')).toEqual(['singletonType']);
-    expect(callArgs(singletonBuilder!, 'title')).toEqual([
-      SINGLETON_ITEM_TITLE,
-    ]);
-    expect(callArgs(singletonBuilder!, 'icon')).toEqual([House]);
-
-    const childArgs = callArgs(singletonBuilder!, 'child');
-    const childBuilder = childArgs?.[0] as TMockStructureNode;
-    expect(childBuilder.kind).toBe('document');
-    expect(callArgs(childBuilder, 'schemaType')).toEqual(['singletonType']);
-    expect(callArgs(childBuilder, 'documentId')).toEqual(['singletonType']);
-    expect(S.document).toHaveBeenCalledTimes(1);
-  });
-
-  it('treats an omitted mode the same as an explicit "list" mode', () => {
-    const items = getGroupItems(S, [
-      {
-        title: 'Group',
-        items: [
-          {
-            schema: { name: 'defaultMode', title: 'Default Mode', icon: List },
-          },
-          {
-            schema: { name: 'explicitList', title: 'Explicit List', icon: Tag },
-            mode: 'list',
-          },
-        ],
-      },
-    ]);
-
-    expect(items.map((builder) => builder.kind)).toEqual([
-      'divider',
-      'documentTypeListItem',
-      'documentTypeListItem',
-    ]);
-    expect(S.documentTypeListItem).toHaveBeenCalledTimes(2);
-    expect(S.document).not.toHaveBeenCalled();
-  });
-
-  it('emits an untitled group with no divider while a titled group still gets one', () => {
-    const items = getGroupItems(S, [
-      {
-        items: [
-          {
-            schema: { name: 'homePage', title: 'Home Page', icon: House },
-            mode: 'singleton',
-          },
-          {
-            schema: {
-              name: 'landingPage',
-              title: LANDING_PAGE_TITLE,
-              icon: List,
-            },
-          },
-        ],
-      },
-      {
-        title: 'Settings',
-        items: [
-          {
-            schema: {
-              name: 'siteSettings',
-              title: SITE_SETTINGS_TITLE,
-              icon: Settings,
-            },
-          },
-        ],
-      },
-    ]);
-
-    expect(items.map((builder) => builder.kind)).toEqual([
-      'listItem',
-      'documentTypeListItem',
-      'divider',
-      'documentTypeListItem',
-    ]);
-    expect(S.divider).toHaveBeenCalledTimes(1);
-    expect(callArgs(items[2]!, 'title')).toEqual(['Settings']);
-    expect(callArgs(items[0]!, 'id')).toEqual(['homePage']);
-    expect(callArgs(items[1]!, 'title')).toEqual([LANDING_PAGE_TITLE]);
-  });
-
-  it('emits a bare divider before an untitled group carrying dividerBefore', () => {
-    const items = getGroupItems(S, [
-      {
-        items: [
-          { schema: { name: 'navigation', title: 'Navigation', icon: List } },
-        ],
-      },
-      {
-        dividerBefore: true,
-        items: [
-          {
-            schema: {
-              name: 'siteSettings',
-              title: SITE_SETTINGS_TITLE,
-              icon: Settings,
-            },
-          },
-        ],
-      },
-    ]);
-
-    expect(items.map((builder) => builder.kind)).toEqual([
-      'documentTypeListItem',
-      'divider',
-      'documentTypeListItem',
-    ]);
-    expect(callArgs(items[1]!, 'title')).toBeUndefined();
-  });
-
-  it('builds a listItem with the section title/id/icon and a matching child list', () => {
-    const result = buildOneSection(S, {
-      title: 'Pages',
-      id: 'pages',
-      icon: List,
+  it.each<{ case: string; groups: TGroup[]; expected: unknown[][] }>([
+    {
+      case: 'puts a titled divider before each group, in declared order',
       groups: [
         {
-          items: [
-            { schema: { name: 'homePage', title: 'Home Page', icon: House } },
-          ],
+          title: MOCK_GROUP_TITLE,
+          items: [MOCK_LIST_ITEM, MOCK_SINGLETON_ITEM],
         },
+        { title: MOCK_OTHER_GROUP_TITLE, items: [MOCK_OTHER_LIST_ITEM] },
       ],
-    });
+      expected: [
+        ['divider', MOCK_GROUP_TITLE],
+        ['documentTypeListItem', MOCK_LIST_ITEM.schema.title],
+        ['listItem', MOCK_SINGLETON_ITEM.schema.title],
+        ['divider', MOCK_OTHER_GROUP_TITLE],
+        ['documentTypeListItem', MOCK_OTHER_LIST_ITEM.schema.title],
+      ],
+    },
+    {
+      case: 'drops an empty group along with its divider',
+      groups: [
+        { title: MOCK_GROUP_TITLE, items: [] },
+        { title: MOCK_OTHER_GROUP_TITLE, items: [MOCK_LIST_ITEM] },
+      ],
+      expected: [
+        ['divider', MOCK_OTHER_GROUP_TITLE],
+        ['documentTypeListItem', MOCK_LIST_ITEM.schema.title],
+      ],
+    },
+    {
+      case: 'gives an untitled group no divider',
+      groups: [
+        { items: [MOCK_LIST_ITEM] },
+        { title: MOCK_GROUP_TITLE, items: [MOCK_OTHER_LIST_ITEM] },
+      ],
+      expected: [
+        ['documentTypeListItem', MOCK_LIST_ITEM.schema.title],
+        ['divider', MOCK_GROUP_TITLE],
+        ['documentTypeListItem', MOCK_OTHER_LIST_ITEM.schema.title],
+      ],
+    },
+    {
+      case: 'puts a bare divider before an untitled group marked dividerBefore',
+      groups: [
+        { items: [MOCK_LIST_ITEM] },
+        { dividerBefore: true, items: [MOCK_OTHER_LIST_ITEM] },
+      ],
+      expected: [
+        ['documentTypeListItem', MOCK_LIST_ITEM.schema.title],
+        ['divider', undefined],
+        ['documentTypeListItem', MOCK_OTHER_LIST_ITEM.schema.title],
+      ],
+    },
+  ])('$case', ({ groups, expected }) => {
+    const items = buildGroupItems(S, groups);
 
-    expect(result.kind).toBe('listItem');
-    expect(callArgs(result, 'title')).toEqual(['Pages']);
-    expect(callArgs(result, 'id')).toEqual(['pages']);
-    expect(callArgs(result, 'icon')).toEqual([List]);
-
-    const childArgs = callArgs(result, 'child');
-    const childList = childArgs?.[0] as TMockStructureNode;
-    expect(childList.kind).toBe('list');
-    expect(callArgs(childList, 'title')).toEqual(['Pages']);
-
-    const items = callArgs(childList, 'items')?.[0] as TMockStructureNode[];
-    expect(items.map((item) => item.kind)).toEqual(['documentTypeListItem']);
-    expect(S.list).toHaveBeenCalledTimes(1);
+    expect(items.map(kindAndTitle)).toEqual(expected);
   });
 
-  it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item, keeping the section title rather than the item schema title', () => {
-    const result = buildOneSection(S, {
-      title: 'Links',
-      id: 'links',
-      icon: Link2,
+  it.each<{ case: string; item: TGroupItem }>([
+    { case: 'with no mode', item: MOCK_LIST_ITEM },
+    { case: 'in list mode', item: { ...MOCK_LIST_ITEM, mode: 'list' } },
+  ])('lists every document of a type $case', ({ item }) => {
+    const node = buildSingleItem(S, item);
+    const { name, title, icon } = item.schema;
+
+    expect(node.kind).toBe('documentTypeListItem');
+    expect(node.documentType).toBe(name);
+    expect(callArgs(node, 'title')).toEqual([title]);
+    expect(callArgs(node, 'icon')).toEqual([icon]);
+  });
+
+  it('opens a singleton as the one document whose id is its type', () => {
+    const node = buildSingleItem(S, MOCK_SINGLETON_ITEM);
+    const { name, title, icon } = MOCK_SINGLETON_ITEM.schema;
+    const document = childOf(node);
+
+    expect(callArgs(node, 'id')).toEqual([name]);
+    expect(callArgs(node, 'title')).toEqual([title]);
+    expect(callArgs(node, 'icon')).toEqual([icon]);
+    expect(document.kind).toBe('document');
+    expect(callArgs(document, 'schemaType')).toEqual([name]);
+    expect(callArgs(document, 'documentId')).toEqual([name]);
+  });
+
+  it('nests the groups in a list under the section title, id and icon', () => {
+    const section = mockSection();
+    const [node] = buildNodes(S, [section]);
+    const list = childOf(node!);
+
+    expect(callArgs(node!, 'title')).toEqual([section.title]);
+    expect(callArgs(node!, 'id')).toEqual([section.id]);
+    expect(callArgs(node!, 'icon')).toEqual([section.icon]);
+    expect(list.kind).toBe('list');
+    expect(callArgs(list, 'title')).toEqual([section.title]);
+    expect(itemsOf(list).map((item) => item.kind)).toEqual([
+      'documentTypeListItem',
+    ]);
+  });
+
+  it('opens a flattened section straight on its one type under the section title', () => {
+    const section = mockSection({
       flattenSingleItem: true,
-      groups: [
-        {
-          items: [{ schema: { name: 'link', title: 'Link', icon: Link2 } }],
-        },
-      ],
+      groups: [{ items: [MOCK_LIST_ITEM] }],
     });
+    const [node] = buildNodes(S, [section]);
+    const documentList = childOf(node!);
 
-    expect(result.kind).toBe('listItem');
-    expect(callArgs(result, 'title')).toEqual(['Links']);
-    expect(callArgs(result, 'id')).toEqual(['links']);
-    expect(callArgs(result, 'icon')).toEqual([Link2]);
-
-    const childArgs = callArgs(result, 'child');
-    const childList = childArgs?.[0] as TMockStructureNode;
-    expect(childList.kind).toBe('documentTypeList');
-    expect(childList.documentType).toBe('link');
-    expect(callArgs(childList, 'title')).toEqual(['Links']);
-    expect(S.documentTypeList).toHaveBeenCalledTimes(1);
+    expect(callArgs(node!, 'title')).toEqual([section.title]);
+    expect(callArgs(node!, 'id')).toEqual([section.id]);
+    expect(documentList.kind).toBe('documentTypeList');
+    expect(documentList.documentType).toBe(MOCK_LIST_ITEM.schema.name);
+    expect(callArgs(documentList, 'title')).toEqual([section.title]);
     expect(S.list).not.toHaveBeenCalled();
   });
 
-  it.each<[string, TStructureSection]>([
-    [
-      'the section has more than one item',
-      {
-        title: 'Modules',
-        id: 'modules',
-        icon: List,
-        flattenSingleItem: true,
-        groups: [
-          {
-            items: [
-              {
-                schema: {
-                  name: 'moduleOne',
-                  title: MODULE_ONE_TITLE,
-                  icon: List,
-                },
-              },
-              {
-                schema: {
-                  name: 'moduleTwo',
-                  title: MODULE_TWO_TITLE,
-                  icon: Tag,
-                },
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    [
-      'the single item is a singleton',
-      {
-        title: 'Settings',
-        id: 'settings',
-        icon: Settings,
-        flattenSingleItem: true,
-        groups: [
-          {
-            items: [
-              {
-                schema: {
-                  name: 'siteSettings',
-                  title: SITE_SETTINGS_TITLE,
-                  icon: Settings,
-                },
-                mode: 'singleton',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  ])('throws when flattenSingleItem is set but %s', (_description, section) => {
-    expect(() => buildSections(asStructureBuilder(S), [section])).toThrow(
-      /flattenSingleItem/,
-    );
+  it.each<{ case: string; items: TGroupItem[] }>([
+    {
+      case: 'the section has more than one item',
+      items: [MOCK_LIST_ITEM, MOCK_OTHER_LIST_ITEM],
+    },
+    { case: 'the single item is a singleton', items: [MOCK_SINGLETON_ITEM] },
+  ])('refuses to flatten a section when $case', ({ items }) => {
+    const section = mockSection({
+      flattenSingleItem: true,
+      groups: [{ items }],
+    });
+
+    expect(() => buildNodes(S, [section])).toThrow(/flattenSingleItem/);
   });
 
-  it('places no divider before the first section and none between sections without dividerBefore', () => {
-    const sections: TStructureSection[] = [
-      {
-        title: 'Pages',
-        id: 'pages',
-        icon: List,
-        groups: [
-          {
-            items: [
-              { schema: { name: 'homePage', title: 'Home Page', icon: House } },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'Blog',
-        id: 'blog',
-        icon: Tag,
-        groups: [
-          {
-            items: [
-              { schema: { name: 'blogPage', title: 'Blog Page', icon: Tag } },
-            ],
-          },
-        ],
-      },
-    ];
+  it.each([
+    { dividerBefore: false, expected: ['listItem', 'listItem'] },
+    { dividerBefore: true, expected: ['listItem', 'divider', 'listItem'] },
+  ])(
+    'divides a section from the one before only with dividerBefore ($dividerBefore)',
+    ({ dividerBefore, expected }) => {
+      const nodes = buildNodes(S, [
+        mockSection(),
+        mockSection({ dividerBefore }),
+      ]);
 
-    const result = buildSections(
-      asStructureBuilder(S),
-      sections,
-    ) as unknown as TMockStructureNode[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
-      'listItem',
-      'listItem',
-    ]);
-    expect(S.divider).not.toHaveBeenCalled();
-  });
-
-  it('places a bare divider before a section carrying dividerBefore', () => {
-    const sections: TStructureSection[] = [
-      {
-        title: 'Modules',
-        id: 'modules',
-        icon: List,
-        groups: [
-          { items: [{ schema: { name: 'cta', title: 'CTA', icon: Tag } }] },
-        ],
-      },
-      {
-        title: 'Settings',
-        id: 'settings',
-        icon: Settings,
-        dividerBefore: true,
-        groups: [
-          {
-            items: [
-              {
-                schema: {
-                  name: 'siteSettings',
-                  title: SITE_SETTINGS_TITLE,
-                  icon: Settings,
-                },
-              },
-            ],
-          },
-        ],
-      },
-    ];
-
-    const result = buildSections(
-      asStructureBuilder(S),
-      sections,
-    ) as unknown as TMockStructureNode[];
-
-    expect(result.map((builder) => builder.kind)).toEqual([
-      'listItem',
-      'divider',
-      'listItem',
-    ]);
-    expect(callArgs(result[0]!, 'id')).toEqual(['modules']);
-    expect(callArgs(result[2]!, 'id')).toEqual(['settings']);
-  });
-  const buildLandingItem = (
-    mode: 'byLanguage' | 'pageTree',
-    locales?: readonly TLocaleIsoCode[],
-  ) => {
-    const landingS = makeMockStructureBuilder();
-    const [item] = getGroupItems(
-      landingS,
-      [
-        {
-          items: [
-            {
-              schema: {
-                name: 'landingPage',
-                title: LANDING_PAGES_TITLE,
-                icon: List,
-              },
-              mode,
-            },
-          ],
-        },
-      ],
-      locales,
-    );
-    return { landingS, item: item! };
-  };
+      expect(nodes.map((node) => node.kind)).toEqual(expected);
+    },
+  );
 
   describe('byLanguage items', () => {
-    const buildByLanguageItem = (locales?: readonly TLocaleIsoCode[]) =>
-      buildLandingItem('byLanguage', locales);
-
-    const listOf = (languageItem: TMockStructureNode) =>
-      callArgs(languageItem, 'child')?.[0] as TMockStructureNode;
-
-    const buildLanguageLists = (locales?: readonly TLocaleIsoCode[]) => {
-      const { item } = buildByLanguageItem(locales);
-      return callArgs(listOf(item), 'items')?.[0] as TMockStructureNode[];
-    };
+    const buildLanguageLists = (locales?: readonly TLocaleIsoCode[]) =>
+      itemsOf(
+        childOf(
+          buildSingleItem(
+            S,
+            { schema: MOCK_LANDING_SCHEMA, mode: 'byLanguage' },
+            locales,
+          ),
+        ),
+      );
 
     describe('with one live language', () => {
-      let landingS: ReturnType<typeof makeMockStructureBuilder>;
-      let documentList: TMockStructureNode;
       let item: TMockStructureNode;
+      let documentList: TMockStructureNode;
 
       beforeEach(() => {
-        ({ landingS, item } = buildByLanguageItem([LOCALE_ISO_CODES.NL]));
-        documentList = listOf(item);
+        item = buildSingleItem(
+          S,
+          { schema: MOCK_LANDING_SCHEMA, mode: 'byLanguage' },
+          [NL],
+        );
+        documentList = childOf(item);
       });
 
-      it('shows one plain list of every page, creating pages in it', () => {
-        expect(callArgs(item, 'title')).toEqual([LANDING_PAGES_TITLE]);
+      it('opens one plain list of the type, creating pages in that language', () => {
+        expect(callArgs(item, 'title')).toEqual([MOCK_LANDING_SCHEMA.title]);
         expect(documentList.kind).toBe('documentTypeList');
-        expect(documentList.documentType).toBe('landingPage');
-        expect(callArgs(documentList, 'title')).toEqual([LANDING_PAGES_TITLE]);
-        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-          [{ templateId: DUTCH_LANDING_TEMPLATE_ID }],
+        expect(documentList.documentType).toBe(PAGE_LANDING_TYPE);
+        expect(callArgs(documentList, 'title')).toEqual([
+          MOCK_LANDING_SCHEMA.title,
         ]);
-        expect(landingS.list).toHaveBeenCalledTimes(1);
-        expect(landingS.divider).not.toHaveBeenCalled();
+        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+          [{ templateId: templateIdOf(PAGE_LANDING_TYPE, NL) }],
+        ]);
+        expect(S.list).toHaveBeenCalledTimes(1);
       });
 
       it('lists only default-language pages, and pages with no language', async () => {
-        expect(await listedIds(documentList)).toEqual([
-          'nl-page',
-          UNSET_PAGE_ID,
-          'nl-child',
+        const ids = await listedIds(documentList);
+
+        expect(ids).toEqual([
+          MOCK_NL_PAGE._id,
+          MOCK_UNSET_PAGE._id,
+          MOCK_NL_CHILD._id,
         ]);
       });
     });
 
-    describe('with two live languages', () => {
-      let lists: TMockStructureNode[];
+    it.each<{ case: string; locales: TMaybeUndefined<TLocaleIsoCode[]> }>([
+      { case: 'each live language', locales: [EN, NL] },
+      { case: 'every locale by default', locales: undefined },
+    ])('lists $case by name, then a divider, then all pages', ({ locales }) => {
+      const expectedLocales = locales ?? EVERY_LOCALE;
+      const lists = buildLanguageLists(locales);
 
-      beforeEach(() => {
-        lists = buildLanguageLists([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL]);
-      });
-
-      it('lists the other language again once it is live', async () => {
-        expect(await listedIds(listOf(lists[0]!))).toEqual(['en-page']);
-        expect(await listedIds(listOf(lists.at(-1)!))).toEqual([
-          'en-page',
-          'nl-page',
-          UNSET_PAGE_ID,
-          'nl-child',
-        ]);
-      });
-
-      it('keeps a list per language and all pages', () => {
-        expect(lists.map((list) => list.kind)).toEqual([
-          'listItem',
-          'listItem',
-          'divider',
-          'listItem',
-        ]);
-        expect(
-          lists
-            .filter((list) => list.kind === 'listItem')
-            .map((list) => callArgs(list, 'title')?.[0]),
-        ).toEqual([
-          LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.EN],
-          LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.NL],
-          'All pages',
-        ]);
-      });
+      expect(lists.map((list) => list.kind)).toEqual([
+        ...expectedLocales.map(() => 'listItem'),
+        'divider',
+        'listItem',
+      ]);
+      expect(lists.slice(0, expectedLocales.length).map(titleOf)).toEqual(
+        expectedLocales.map((locale) => LOCALE_NATIVE_LABEL[locale]),
+      );
     });
 
-    describe('with every locale live', () => {
+    describe('with several live languages', () => {
       let lists: TMockStructureNode[];
+      let languageLists: TMockStructureNode[];
 
       beforeEach(() => {
         lists = buildLanguageLists();
+        languageLists = lists.filter((list) => list.kind === 'listItem');
       });
 
-      it('lists every locale by its own name, then a divider, then all pages', () => {
-        expect(lists.map((list) => list.kind)).toEqual([
-          ...Object.values(LOCALE_ISO_CODES).map(() => 'listItem'),
-          'divider',
-          'listItem',
-        ]);
-        expect(
-          lists
-            .filter((list) => list.kind === 'listItem')
-            .map((list) => callArgs(list, 'title')?.[0]),
-        ).toEqual([
-          ...Object.values(LOCALE_ISO_CODES).map(
-            (locale) => LOCALE_NATIVE_LABEL[locale],
-          ),
-          'All pages',
-        ]);
-      });
+      it.each([
+        { locale: EN, expected: [MOCK_EN_PAGE._id] },
+        { locale: NL, expected: [MOCK_NL_PAGE._id, MOCK_NL_CHILD._id] },
+      ])(
+        'lists only the $locale pages in the $locale list',
+        async ({ locale, expected }) => {
+          const ids = await listedIds(
+            childOf(lists[EVERY_LOCALE.indexOf(locale)]!),
+          );
 
-      it('lists every page in all pages and offers a template per language', () => {
-        const documentList = listOf(lists.at(-1)!);
+          expect(ids).toEqual(expected);
+        },
+      );
 
-        expect(callArgs(documentList, 'filter')).toEqual([TYPE_FILTER]);
-        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-          Object.values(LOCALE_ISO_CODES).map((locale) => ({
-            templateId: `landingPage-${locale}`,
-          })),
+      it('lists every page of the type under all pages', async () => {
+        const ids = await listedIds(childOf(lists.at(-1)!));
+
+        expect(ids).toEqual([
+          MOCK_EN_PAGE._id,
+          MOCK_NL_PAGE._id,
+          MOCK_UNSET_PAGE._id,
+          MOCK_NL_CHILD._id,
         ]);
       });
 
-      it('filters each language list to its language and creates pages in it', () => {
-        const documentList = listOf(lists[0]!);
+      it('creates pages in each list language, or in any language from all pages', () => {
+        const templates = languageLists.map((list) =>
+          callArgs(childOf(list), 'initialValueTemplates'),
+        );
 
-        expect(callArgs(documentList, 'filter')).toEqual([
-          '_type == $type && language == $language',
-        ]);
-        expect(callArgs(documentList, 'params')).toEqual([
-          { type: 'landingPage', language: LOCALE_ISO_CODES.EN },
-        ]);
-        expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-          [{ templateId: ENGLISH_LANDING_TEMPLATE_ID }],
+        expect(templates).toEqual([
+          ...EVERY_LOCALE.map((locale) => [
+            [{ templateId: templateIdOf(PAGE_LANDING_TYPE, locale) }],
+          ]),
+          [
+            EVERY_LOCALE.map((locale) => ({
+              templateId: templateIdOf(PAGE_LANDING_TYPE, locale),
+            })),
+          ],
         ]);
       });
 
       it('builds every list from the document type list so it keeps the sort menu', () => {
-        const languageLists = lists.filter((list) => list.kind === 'listItem');
+        const documentLists = languageLists.map(childOf);
 
-        expect(languageLists.map((list) => listOf(list).kind)).toEqual(
-          languageLists.map(() => 'documentTypeList'),
-        );
-        expect(languageLists.map((list) => listOf(list).documentType)).toEqual(
-          languageLists.map(() => 'landingPage'),
+        expect(
+          documentLists.map((list) => [list.kind, list.documentType]),
+        ).toEqual(
+          languageLists.map(() => ['documentTypeList', PAGE_LANDING_TYPE]),
         );
       });
     });
   });
 
   describe('pageTree items', () => {
-    const buildTreeItem = (locales?: readonly TLocaleIsoCode[]) =>
-      buildLandingItem('pageTree', locales).item;
+    const buildTreeList = (locales?: readonly TLocaleIsoCode[]) =>
+      childOf(
+        buildSingleItem(
+          S,
+          { schema: MOCK_LANDING_SCHEMA, mode: 'pageTree' },
+          locales,
+        ),
+      );
 
-    const documentListOf = (item: TMockStructureNode) =>
-      callArgs(item, 'child')?.[0] as TMockStructureNode;
+    it('lists only top-level pages per language and opens each through the tree', async () => {
+      const dutch = itemsOf(buildTreeList())[EVERY_LOCALE.indexOf(NL)]!;
+      const dutchList = childOf(dutch);
 
-    let list: TMockStructureNode;
+      const ids = await listedIds(dutchList);
 
-    beforeEach(() => {
-      list = documentListOf(buildTreeItem());
+      expect(ids).toEqual([MOCK_NL_PAGE._id]);
+      expect(childOf(dutchList)).toBeTypeOf('function');
     });
 
-    it('lists only top-level pages per language and opens each through the tree', () => {
-      const [english] = callArgs(list, 'items')?.[0] as TMockStructureNode[];
-      const englishList = documentListOf(english!);
+    it('keeps all pages as one flat list of every page', async () => {
+      const allPagesList = childOf(itemsOf(buildTreeList()).at(-1)!);
 
-      expect(callArgs(englishList, 'filter')).toEqual([
-        '_type == $type && language == $language && !defined(parent)',
+      const ids = await listedIds(allPagesList);
+
+      expect(ids).toEqual([
+        MOCK_EN_PAGE._id,
+        MOCK_NL_PAGE._id,
+        MOCK_UNSET_PAGE._id,
+        MOCK_NL_CHILD._id,
       ]);
-      expect(callArgs(englishList, 'initialValueTemplates')).toEqual([
-        [{ templateId: ENGLISH_LANDING_TEMPLATE_ID }],
-      ]);
-      expect(callArgs(englishList, 'child')?.[0]).toBeTypeOf('function');
-    });
-
-    it('keeps all pages as one flat list of every page', () => {
-      const allPages = (
-        callArgs(list, 'items')?.[0] as TMockStructureNode[]
-      ).at(-1)!;
-      const allPagesList = documentListOf(allPages);
-
-      expect(callArgs(allPages, 'title')).toEqual(['All pages']);
-      expect(callArgs(allPagesList, 'filter')).toEqual([TYPE_FILTER]);
       expect(callArgs(allPagesList, 'child')).toBeUndefined();
     });
 
     it('lists only top-level default-language pages with one live language', async () => {
-      const documentList = documentListOf(buildTreeItem([LOCALE_ISO_CODES.NL]));
+      const documentList = buildTreeList([NL]);
+
+      const ids = await listedIds(documentList);
 
       expect(documentList.kind).toBe('documentTypeList');
-      expect(await listedIds(documentList)).toEqual(['nl-page', UNSET_PAGE_ID]);
+      expect(ids).toEqual([MOCK_NL_PAGE._id, MOCK_UNSET_PAGE._id]);
       expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
-        [{ templateId: DUTCH_LANDING_TEMPLATE_ID }],
+        [{ templateId: templateIdOf(PAGE_LANDING_TYPE, NL) }],
       ]);
-      expect(callArgs(documentList, 'child')?.[0]).toBeTypeOf('function');
+      expect(childOf(documentList)).toBeTypeOf('function');
     });
   });
 
   describe('onePerLanguage items', () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-
-    const buildHomeEntries = (
+    const buildHomeEntry = (
       dataset: Record<string, unknown>[],
-      locales: readonly TLocaleIsoCode[] = [NL, EN, DE],
-    ) => {
-      const S = makeMockStructureBuilder(dataset);
-      const [section] = buildSections(
-        asStructureBuilder(S),
-        [
-          {
-            title: 'Pages',
-            id: 'pages',
-            icon: List,
-            groups: [
-              {
-                items: [
-                  {
-                    schema: { name: 'homePage', title: 'Home', icon: House },
-                    mode: 'onePerLanguage',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+      locales: readonly TLocaleIsoCode[] = LIVE_LOCALES,
+    ) =>
+      buildSingleItem(
+        mockStructureBuilder(dataset),
+        { schema: MOCK_HOME_SCHEMA, mode: 'onePerLanguage' },
         locales,
-      ) as unknown as TMockStructureNode[];
-      const list = callArgs(section!, 'child')?.[0] as TMockStructureNode;
-      return callArgs(list, 'items')?.[0] as TMockStructureNode[];
-    };
-
-    const buildHomeItems = (dataset: Record<string, unknown>[]) => {
-      const [home] = buildHomeEntries(dataset);
-      const languages = callArgs(home!, 'child')?.[0] as TMockStructureNode;
-      return callArgs(languages, 'items')?.[0] as TMockStructureNode[];
-    };
-
-    const resolveChild = async (item: TMockStructureNode) => {
-      const resolver = callArgs(
-        item,
-        'child',
-      )?.[0] as () => Promise<TMockStructureNode>;
-      return resolver();
-    };
-
-    it('shows one Home entry that opens its language list', () => {
-      const entries = buildHomeEntries([]);
-      const languages = callArgs(
-        entries[0]!,
-        'child',
-      )?.[0] as TMockStructureNode;
-
-      expect(entries).toHaveLength(1);
-      expect(callArgs(entries[0]!, 'title')).toEqual(['Home']);
-      expect(callArgs(entries[0]!, 'id')).toEqual(['homePage']);
-      expect(languages.kind).toBe('list');
-      expect(callArgs(languages, 'title')).toEqual(['Home']);
-    });
-
-    it('opens the default-language Home directly with one live language', async () => {
-      const [home, ...rest] = buildHomeEntries(
-        [{ _id: 'home-nl', _type: 'homePage', language: NL }],
-        [NL],
       );
 
-      const child = await resolveChild(home!);
+    const resolveHome = async (
+      dataset: Record<string, unknown>[],
+      locales: readonly TLocaleIsoCode[],
+      locale: TLocaleIsoCode,
+    ) => {
+      const entry = buildHomeEntry(dataset, locales);
+      const opener =
+        locales.length > 1
+          ? itemsOf(childOf(entry))[locales.indexOf(locale)]!
+          : entry;
+      const resolver = callArgs(
+        opener,
+        'child',
+      )?.[0] as () => Promise<TMockStructureNode>;
+      const document = await resolver();
 
-      expect(rest).toHaveLength(0);
-      expect(callArgs(home!, 'title')).toEqual(['Home']);
-      expect(child.kind).toBe('document');
-      expect(callArgs(child, 'documentId')).toEqual(['home-nl']);
-    });
+      return {
+        kind: document.kind,
+        schemaType: callArgs(document, 'schemaType')?.[0],
+        documentId: callArgs(document, 'documentId')?.[0],
+        template: callArgs(document, 'initialValueTemplate')?.[0],
+      };
+    };
 
-    it('creates the default-language Home with one live language when there is none', async () => {
-      const [home] = buildHomeEntries([], [NL]);
+    it('shows one entry for the type that opens a list of its languages', () => {
+      const entry = buildHomeEntry([]);
+      const languages = childOf(entry);
 
-      const child = await resolveChild(home!);
-
-      expect(callArgs(child, 'documentId')).toEqual(['homePage']);
-      expect(callArgs(child, 'initialValueTemplate')).toEqual([
-        DUTCH_HOME_TEMPLATE_ID,
-      ]);
-    });
-
-    it('keeps one entry per language with two live languages', () => {
-      const [home] = buildHomeEntries([], [NL, EN]);
-      const languages = callArgs(home!, 'child')?.[0] as TMockStructureNode;
-      const items = callArgs(languages, 'items')?.[0] as TMockStructureNode[];
-
+      expect(callArgs(entry, 'title')).toEqual([MOCK_HOME_SCHEMA.title]);
+      expect(callArgs(entry, 'id')).toEqual([PAGE_HOME_TYPE]);
       expect(languages.kind).toBe('list');
-      expect(items.map((item) => callArgs(item, 'title')?.[0])).toEqual([
-        LOCALE_NATIVE_LABEL[NL],
-        LOCALE_NATIVE_LABEL[EN],
-      ]);
+      expect(callArgs(languages, 'title')).toEqual([MOCK_HOME_SCHEMA.title]);
+      expect(itemsOf(languages).map(titleOf)).toEqual(
+        LIVE_LOCALES.map((locale) => LOCALE_NATIVE_LABEL[locale]),
+      );
     });
 
-    it("opens the language's own document by its published id", async () => {
-      const [, english] = buildHomeItems([
-        { _id: 'home-nl', _type: 'homePage', language: NL },
-        { _id: 'drafts.home-en', _type: 'homePage', language: EN },
-      ]);
+    it.each([
+      {
+        case: 'opens the document of the only live language directly',
+        dataset: [mockHomePage({ _id: MOCK_HOME_NL_ID, language: NL })],
+        locales: [NL],
+        locale: NL,
+        expectedId: MOCK_HOME_NL_ID,
+      },
+      {
+        case: 'opens the document of a language by its published id',
+        dataset: [
+          mockHomePage({ _id: MOCK_HOME_NL_ID, language: NL }),
+          mockHomePage({ _id: getDraftId(MOCK_HOME_EN_ID), language: EN }),
+        ],
+        locales: LIVE_LOCALES,
+        locale: EN,
+        expectedId: MOCK_HOME_EN_ID,
+      },
+      {
+        case: 'opens a document without a language under the default language',
+        dataset: [mockHomePage({ _id: MOCK_HOME_UNSET_ID })],
+        locales: LIVE_LOCALES,
+        locale: NL,
+        expectedId: MOCK_HOME_UNSET_ID,
+      },
+    ])('$case', async ({ dataset, locales, locale, expectedId }) => {
+      const document = await resolveHome(dataset, locales, locale);
 
-      const child = await resolveChild(english!);
-
-      expect(child.kind).toBe('document');
-      expect(callArgs(child, 'documentId')).toEqual(['home-en']);
-    });
-
-    it('opens a document without a language under the default language', async () => {
-      const [dutch] = buildHomeItems([{ _id: 'homePage', _type: 'homePage' }]);
-
-      const child = await resolveChild(dutch!);
-
-      expect(callArgs(child, 'documentId')).toEqual(['homePage']);
-    });
-
-    it('opens a new document in a language that has none', async () => {
-      const [, english] = buildHomeItems([
-        { _id: 'homePage', _type: 'homePage', language: NL },
-      ]);
-
-      const child = await resolveChild(english!);
-
-      expect(child.kind).toBe('document');
-      expect(callArgs(child, 'schemaType')).toEqual(['homePage']);
-      expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-EN']);
-      expect(callArgs(child, 'documentId')).not.toEqual(['homePage']);
-    });
-
-    describe('with no Home documents', () => {
-      let items: TMockStructureNode[];
-
-      beforeEach(() => {
-        items = buildHomeItems([]);
+      expect(document).toEqual({
+        kind: 'document',
+        schemaType: PAGE_HOME_TYPE,
+        documentId: expectedId,
+        template: undefined,
       });
+    });
 
-      it('lists one entry per language by its own name, default language first', () => {
-        expect(items.map((item) => callArgs(item, 'title')?.[0])).toEqual([
-          LOCALE_NATIVE_LABEL[NL],
-          LOCALE_NATIVE_LABEL[EN],
-          LOCALE_NATIVE_LABEL[DE],
-        ]);
-      });
+    it.each([{ locales: [NL] }, { locales: LIVE_LOCALES }])(
+      'creates the default-language document under its type id ($locales)',
+      async ({ locales }) => {
+        const document = await resolveHome([], locales, NL);
 
-      it('creates the default-language document in its language when there is none', async () => {
-        const child = await resolveChild(items[0]!);
+        expect(document).toEqual({
+          kind: 'document',
+          schemaType: PAGE_HOME_TYPE,
+          documentId: PAGE_HOME_TYPE,
+          template: templateIdOf(PAGE_HOME_TYPE, NL),
+        });
+      },
+    );
 
-        expect(child.kind).toBe('document');
-        expect(callArgs(child, 'initialValueTemplate')).toEqual([
-          DUTCH_HOME_TEMPLATE_ID,
-        ]);
+    it('creates a new document in a language that has none', async () => {
+      vi.spyOn(crypto, 'randomUUID').mockReturnValueOnce(MOCK_NEW_DOCUMENT_ID);
+
+      const document = await resolveHome(
+        [mockHomePage({ _id: MOCK_HOME_NL_ID, language: NL })],
+        LIVE_LOCALES,
+        EN,
+      );
+
+      expect(document).toEqual({
+        kind: 'document',
+        schemaType: PAGE_HOME_TYPE,
+        documentId: MOCK_NEW_DOCUMENT_ID,
+        template: templateIdOf(PAGE_HOME_TYPE, EN),
       });
     });
   });

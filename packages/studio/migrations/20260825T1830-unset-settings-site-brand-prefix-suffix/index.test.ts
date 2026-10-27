@@ -1,36 +1,32 @@
+import { faker } from '@faker-js/faker';
 import { at, unset } from 'sanity/migrate';
 
 import { removeStaleBrandPrefixSuffix } from './index';
 
+faker.seed(3);
+
+const MOCK_PREFIX = faker.lorem.word();
+const MOCK_SUFFIX = faker.lorem.word();
+
 describe(removeStaleBrandPrefixSuffix, () => {
-  it('unsets both brand.prefix and brand.suffix when both are present', () => {
-    const result = removeStaleBrandPrefixSuffix({
-      brand: { prefix: 'valstack', suffix: '.dev' },
-    });
+  it.each([
+    [{ prefix: MOCK_PREFIX, suffix: MOCK_SUFFIX }, ['prefix', 'suffix']],
+    [{ prefix: MOCK_PREFIX }, ['prefix']],
+    [{ suffix: MOCK_SUFFIX }, ['suffix']],
+  ])('unsets only the stale fields of brand %o', (brand, fields) => {
+    const result = removeStaleBrandPrefixSuffix({ brand });
 
-    expect(result).toEqual([
-      at('brand.prefix', unset()),
-      at('brand.suffix', unset()),
-    ]);
+    expect(result).toEqual(
+      fields.map((field) => at(`brand.${field}`, unset())),
+    );
   });
 
-  it('only unsets whichever field is actually present', () => {
-    const result = removeStaleBrandPrefixSuffix({
-      brand: { prefix: 'valstack' },
-    });
+  it.each([{}, { brand: {} }])(
+    'leaves a doc without stale brand fields alone: %o',
+    (doc) => {
+      const result = removeStaleBrandPrefixSuffix(doc);
 
-    expect(result).toEqual([at('brand.prefix', unset())]);
-  });
-
-  it('is idempotent — a doc with neither field is left alone', () => {
-    const result = removeStaleBrandPrefixSuffix({ brand: {} });
-
-    expect(result).toBeUndefined();
-  });
-
-  it('returns undefined for a doc with no brand at all', () => {
-    const result = removeStaleBrandPrefixSuffix({});
-
-    expect(result).toBeUndefined();
-  });
+      expect(result).toBeUndefined();
+    },
+  );
 });

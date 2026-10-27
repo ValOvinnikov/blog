@@ -1,10 +1,13 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_HERO_BLOG_MODULE_ID } from '@web/testing/modules/hero-blog/fixtures';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
-const HEADING = 'Welcome to the blog';
+faker.seed(6011);
+
+const MOCK_HEADING = faker.lorem.words(3);
 
 const setup = customRender(HeroBlogModuleView, {
   id: MOCK_HERO_BLOG_MODULE_ID,
@@ -12,7 +15,7 @@ const setup = customRender(HeroBlogModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
-  heading: HEADING,
+  heading: MOCK_HEADING,
   supportingText: undefined,
   sanityImage: undefined,
   ctaButtons: [],
@@ -28,9 +31,10 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
 
     const heading = screen.getByRole('heading', {
       level: 1,
-      name: HEADING,
+      name: MOCK_HEADING,
     });
-    const region = screen.getByRole('region', { name: HEADING });
+    const region = screen.getByRole('region', { name: MOCK_HEADING });
+
     expect(heading).toBeVisible();
     expect(region).toBeVisible();
   });
@@ -39,16 +43,14 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
     setup();
     setup();
 
-    const headingIds = screen
-      .getAllByRole('heading', {
-        level: 1,
-        name: HEADING,
-      })
-      .map(({ id }) => id);
-    const regions = screen.getAllByRole('region', {
-      name: HEADING,
+    const headings = screen.getAllByRole('heading', {
+      level: 1,
+      name: MOCK_HEADING,
     });
-    expect(new Set(headingIds).size).toBe(2);
-    expect(regions).toHaveLength(2);
+    const regions = screen.getAllByRole('region', { name: MOCK_HEADING });
+    const headingIds = new Set(headings.map(({ id }) => id));
+
+    expect(headingIds.size).toBe(headings.length);
+    expect(regions).toHaveLength(headings.length);
   });
 });

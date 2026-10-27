@@ -14,6 +14,8 @@ vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
   startContrastCheckAction: startContrastCheckActionMock,
 }));
 
+const RUN_CONTRAST_CHECK = { name: 'Run contrast check' };
+
 const setup = customRender(RunContrastCheckButton, {
   isRunning: false,
   onStarted: vi.fn(),
@@ -22,6 +24,11 @@ const setup = customRender(RunContrastCheckButton, {
 describe(`<${RunContrastCheckButton.name}/>`, () => {
   let user: UserEvent;
   let refresh: ReturnType<typeof mockRouterRefresh>;
+
+  const run = async () => {
+    const runButton = screen.getByRole('button', RUN_CONTRAST_CHECK);
+    await user.click(runButton);
+  };
 
   beforeEach(() => {
     user = userEvent.setup();
@@ -34,12 +41,12 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
   it('starts the check, confirms it and refreshes the page', async () => {
     setup();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Run contrast check' }),
-    );
+    await run();
+
+    const confirmation = await screen.findByText('Contrast check started.');
 
     expect(startContrastCheckActionMock).toHaveBeenCalledOnce();
-    expect(await screen.findByText('Contrast check started.')).toBeVisible();
+    expect(confirmation).toBeVisible();
     expect(refresh).toHaveBeenCalledOnce();
   });
 
@@ -47,14 +54,20 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
     const onStarted = vi.fn();
     setup({ onStarted });
 
-    await user.click(
-      screen.getByRole('button', { name: 'Run contrast check' }),
-    );
+    await run();
 
     await waitFor(() => expect(onStarted).toHaveBeenCalledOnce());
   });
 
-  it('does not tell its parent when the action is refused', async () => {
+  it('cannot be started while a run is in progress', () => {
+    setup({ isRunning: true });
+
+    const runButton = screen.getByRole('button', RUN_CONTRAST_CHECK);
+
+    expect(runButton).toBeDisabled();
+  });
+
+  it('says a check is already running and starts nothing when refused', async () => {
     startContrastCheckActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
@@ -62,68 +75,31 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
     const onStarted = vi.fn();
     setup({ onStarted });
 
-    await user.click(
-      screen.getByRole('button', { name: 'Run contrast check' }),
+    await run();
+
+    const refusal = await screen.findByText(
+      'A contrast check is already running.',
     );
 
-    await screen.findByText('A contrast check is already running.');
+    expect(refusal).toBeVisible();
+    expect(refresh).not.toHaveBeenCalled();
     expect(onStarted).not.toHaveBeenCalled();
   });
 
-  it('cannot be started while a run is in progress', () => {
-    setup({ isRunning: true });
-
-    expect(
-      screen.getByRole('button', { name: 'Run contrast check' }),
-    ).toBeDisabled();
-  });
-
-  it('says a check is already running when the action is refused', async () => {
-    startContrastCheckActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
-    });
+  it.each([
+    [
+      ACTION_OUTCOME.UNAVAILABLE,
+      'GitHub could not be reached. Try again in a moment.',
+    ],
+    [ACTION_OUTCOME.SERVER_ERROR, 'The contrast check could not be started.'],
+  ])('explains a %s answer', async (outcome, message) => {
+    startContrastCheckActionMock.mockResolvedValue({ outcome });
     setup();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Run contrast check' }),
-    );
+    await run();
 
-    expect(
-      await screen.findByText('A contrast check is already running.'),
-    ).toBeVisible();
-    expect(refresh).not.toHaveBeenCalled();
-  });
+    const explanation = await screen.findByText(message);
 
-  it('says GitHub could not be reached when the action is unavailable', async () => {
-    startContrastCheckActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.UNAVAILABLE,
-    });
-    setup();
-
-    await user.click(
-      screen.getByRole('button', { name: 'Run contrast check' }),
-    );
-
-    expect(
-      await screen.findByText(
-        'GitHub could not be reached. Try again in a moment.',
-      ),
-    ).toBeVisible();
-  });
-
-  it('says the check could not be started when the dispatch fails', async () => {
-    startContrastCheckActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
-    });
-    setup();
-
-    await user.click(
-      screen.getByRole('button', { name: 'Run contrast check' }),
-    );
-
-    expect(
-      await screen.findByText('The contrast check could not be started.'),
-    ).toBeVisible();
+    expect(explanation).toBeVisible();
   });
 });

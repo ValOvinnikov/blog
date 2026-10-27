@@ -4,7 +4,8 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { okResult } from '@blog/utils';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_DATA_REQUEST_EMAIL,
@@ -17,20 +18,12 @@ import { notFound } from 'next/navigation';
 
 import { exportPersonalDataAction } from './export-personal-data-action';
 
-const { requireSuperAdminMock, findPersonalDataMock, recordAuditEventMock } =
-  vi.hoisted(() => ({
-    requireSuperAdminMock: vi.fn(),
-    findPersonalDataMock: vi.fn(),
-    recordAuditEventMock: vi.fn(),
-  }));
-
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
+const { findPersonalDataMock } = vi.hoisted(() => ({
+  findPersonalDataMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/audit/record-audit-event', () => ({
-  recordAuditEvent: recordAuditEventMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
+vi.mock('@platform/server/audit/record-audit-event');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -41,11 +34,9 @@ describe(exportPersonalDataAction, () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(MOCK_EXPORT_GENERATED_AT);
-    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
     findPersonalDataMock
       .mockReset()
       .mockResolvedValue(okResult(mockPersonalDataMatches()));
-    recordAuditEventMock.mockReset();
   });
 
   afterEach(() => {
@@ -53,9 +44,7 @@ describe(exportPersonalDataAction, () => {
   });
 
   it('rejects a caller who is not a super admin before reading any data', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      notFound();
-    });
+    vi.mocked(requireSuperAdmin).mockImplementationOnce(async () => notFound());
 
     await expect(
       exportPersonalDataAction({ email: MOCK_DATA_REQUEST_EMAIL }),
@@ -63,7 +52,7 @@ describe(exportPersonalDataAction, () => {
     expect(findPersonalDataMock).not.toHaveBeenCalled();
   });
 
-  it('exports every match without the email index, headed by when, for whom and by which operator', async () => {
+  it('exports every match headed by when, for whom and by which operator', async () => {
     const result = await exportPersonalDataAction({
       email: ` ${MOCK_DATA_REQUEST_EMAIL} `,
     });
@@ -77,8 +66,8 @@ describe(exportPersonalDataAction, () => {
   it('audits the export', async () => {
     await exportPersonalDataAction({ email: MOCK_DATA_REQUEST_EMAIL });
 
-    expect(firstRecordedAuditEvent(recordAuditEventMock)).toMatchObject({
-      action: AUDIT_ACTION.PERSONAL_DATA_EXPORTED,
-    });
+    const { action } = firstRecordedAuditEvent(vi.mocked(recordAuditEvent));
+
+    expect(action).toBe(AUDIT_ACTION.PERSONAL_DATA_EXPORTED);
   });
 });

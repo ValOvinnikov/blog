@@ -1,69 +1,54 @@
+import { faker } from '@faker-js/faker';
+
 import { isBodyArrayItemPath, renameBodyImageType } from './transform';
+
+faker.seed(5);
+
+const MOCK_KEY = faker.string.alphanumeric(6);
+const MOCK_ALT = faker.lorem.words();
+const MOCK_ASSET_REF = faker.string.uuid();
+
+const BODY_ITEM_PATH = ['body', { _key: MOCK_KEY }];
 
 describe(isBodyArrayItemPath, () => {
   it('is true for a keyed element directly under body', () => {
-    expect(isBodyArrayItemPath(['body', { _key: 'a1' }])).toBe(true);
+    expect(isBodyArrayItemPath(BODY_ITEM_PATH)).toBe(true);
   });
 
-  it('is false for the non-array heroImage field', () => {
-    expect(isBodyArrayItemPath(['heroImage'])).toBe(false);
-  });
-
-  it('is false for a path nested deeper than the array member itself', () => {
-    expect(isBodyArrayItemPath(['body', { _key: 'a1' }, 'asset'])).toBe(false);
-  });
-
-  it('is false for an array element under a field named something else', () => {
-    expect(isBodyArrayItemPath(['gallery', { _key: 'a1' }])).toBe(false);
-  });
-
-  it('is false for a non-keyed body path segment', () => {
-    expect(isBodyArrayItemPath(['body', 0])).toBe(false);
+  it.each([
+    ['a non-array field', ['heroImage']],
+    ['a path nested deeper than the member', [...BODY_ITEM_PATH, 'asset']],
+    ['an array under another field', ['gallery', { _key: MOCK_KEY }]],
+    ['a non-keyed body segment', ['body', 0]],
+  ])('is false for %s', (_label, path) => {
+    expect(isBodyArrayItemPath(path)).toBe(false);
   });
 });
 
 describe(renameBodyImageType, () => {
-  it('renames a legacy imageWithAlt body array item to bodyImage, preserving other fields', () => {
+  it('renames a legacy body image to bodyImage, keeping other fields', () => {
     const node = {
       _type: 'imageWithAlt',
-      _key: 'a1',
-      asset: { _type: 'reference', _ref: 'image-abc' },
-      hotspot: {
-        _type: 'sanity.imageHotspot',
-        x: 0.5,
-        y: 0.5,
-        height: 1,
-        width: 1,
-      },
-      crop: { _type: 'sanity.imageCrop', top: 0, bottom: 0, left: 0, right: 0 },
-      alt: 'A description',
+      _key: MOCK_KEY,
+      asset: { _type: 'reference', _ref: MOCK_ASSET_REF },
+      alt: MOCK_ALT,
     };
 
-    const result = renameBodyImageType(node, ['body', { _key: 'a1' }]);
+    const result = renameBodyImageType(node, BODY_ITEM_PATH);
 
     expect(result).toEqual({ ...node, _type: 'bodyImage' });
   });
 
-  it('is idempotent — a node already renamed to bodyImage is left alone', () => {
-    const node = { _type: 'bodyImage', _key: 'a1', alt: 'Already migrated' };
-
-    const result = renameBodyImageType(node, ['body', { _key: 'a1' }]);
-
-    expect(result).toBeUndefined();
-  });
-
-  it('never touches an imageWithAlt node outside a body[] array (e.g. heroImage)', () => {
-    const node = { _type: 'imageWithAlt', alt: 'Hero' };
-
-    const result = renameBodyImageType(node, ['heroImage']);
-
-    expect(result).toBeUndefined();
-  });
-
-  it('leaves unrelated object types under body[] alone', () => {
-    const node = { _type: 'aside', _key: 'a1' };
-
-    const result = renameBodyImageType(node, ['body', { _key: 'a1' }]);
+  it.each([
+    ['a node already renamed', { _type: 'bodyImage' }, BODY_ITEM_PATH],
+    ['an unrelated object type', { _type: 'aside' }, BODY_ITEM_PATH],
+    [
+      'an image outside the body array',
+      { _type: 'imageWithAlt' },
+      ['heroImage'],
+    ],
+  ])('leaves %s alone', (_label, node, path) => {
+    const result = renameBodyImageType(node, path);
 
     expect(result).toBeUndefined();
   });

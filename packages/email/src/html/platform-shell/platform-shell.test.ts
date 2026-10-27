@@ -1,22 +1,27 @@
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
+  COPYRIGHT_ENTITY,
+  DOCTYPE,
   MOCK_BODY_HTML,
   MOCK_EMAIL_SUBJECT,
+  MOCK_ESCAPED_SCRIPT_MARKUP,
+  MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_LINK_HTML,
+  MOCK_NOW,
   MOCK_PLATFORM_BRAND_NAME,
+  MOCK_SCRIPT_MARKUP,
+  MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
 import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
 
 import { buildPlatformShell } from './platform-shell';
-
-const UNSAFE_BRAND_NAME = '<b>Brand</b>';
-const UNSAFE_TITLE = '<i>Title</i>';
 
 describe(buildPlatformShell, () => {
   describe('with a brand name, title and body HTML', () => {
     let html: string;
 
     beforeEach(() => {
+      vi.useFakeTimers({ now: MOCK_NOW });
       html = buildPlatformShell({
         brandName: MOCK_PLATFORM_BRAND_NAME,
         title: MOCK_EMAIL_SUBJECT,
@@ -24,15 +29,19 @@ describe(buildPlatformShell, () => {
       });
     });
 
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     it('wraps the body in a full HTML document titled with the title', () => {
-      expect(html).toContain('<!doctype html>');
+      expect(html).toContain(DOCTYPE);
       expect(html).toContain(`<title>${MOCK_EMAIL_SUBJECT}</title>`);
       expect(html).toContain(MOCK_BODY_HTML);
     });
 
-    it('names the brand in the header and the copyright line', () => {
+    it('names the brand and the current year in the copyright line', () => {
       expect(html).toContain(
-        `&copy; ${new Date().getFullYear()} ${MOCK_PLATFORM_BRAND_NAME}`,
+        `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${MOCK_PLATFORM_BRAND_NAME}`,
       );
     });
 
@@ -44,34 +53,35 @@ describe(buildPlatformShell, () => {
 
   it('escapes the brand name and the title', () => {
     const html = buildPlatformShell({
-      brandName: UNSAFE_BRAND_NAME,
-      title: UNSAFE_TITLE,
+      brandName: MOCK_SCRIPT_MARKUP,
+      title: MOCK_UNSAFE_MARKUP,
       bodyHtml: MOCK_BODY_HTML,
     });
 
-    expect(html).not.toContain(UNSAFE_BRAND_NAME);
-    expect(html).not.toContain(UNSAFE_TITLE);
-    expect(html).toContain('&lt;b&gt;Brand&lt;/b&gt;');
-    expect(html).toContain('&lt;i&gt;Title&lt;/i&gt;');
+    expect(html).not.toContain(MOCK_SCRIPT_MARKUP);
+    expect(html).not.toContain(MOCK_UNSAFE_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_SCRIPT_MARKUP);
+    expect(html).toContain(MOCK_ESCAPED_UNSAFE_MARKUP);
   });
 
   it('renders the action HTML after the body', () => {
     const html = buildPlatformShell({
       brandName: MOCK_PLATFORM_BRAND_NAME,
-      title: 'Title',
+      title: MOCK_EMAIL_SUBJECT,
       bodyHtml: MOCK_BODY_HTML,
       actionHtml: MOCK_LINK_HTML,
     });
 
-    expect(html.indexOf(MOCK_BODY_HTML)).toBeLessThan(
-      html.indexOf(MOCK_LINK_HTML),
-    );
+    const bodyIndex = html.indexOf(MOCK_BODY_HTML);
+    const actionIndex = html.indexOf(MOCK_LINK_HTML);
+
+    expect(bodyIndex).toBeLessThan(actionIndex);
   });
 
   it('cannot be passed a tenant brand at compile time', () => {
     const html = buildPlatformShell({
       brandName: MOCK_PLATFORM_BRAND_NAME,
-      title: 'Title',
+      title: MOCK_EMAIL_SUBJECT,
       // @ts-expect-error -- the platform shell's palette is fixed, so no tenant palette can reach it.
       brand: MOCK_TENANT_EMAIL_BRAND,
       bodyHtml: MOCK_BODY_HTML,

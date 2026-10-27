@@ -23,11 +23,11 @@ vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
 
 const DELETE_TENANT_DIALOG_TITLE = `Delete ${MOCK_TENANT_NAME}`;
 
-const TENANT = mockClientTenant({
+const MOCK_CLIENT_TENANT = mockClientTenant({
   deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 
-const setup = customRender(DeleteTenantControl, { tenant: TENANT });
+const setup = customRender(DeleteTenantControl, { tenant: MOCK_CLIENT_TENANT });
 
 describe(`<${DeleteTenantControl.name}/>`, () => {
   let user: UserEvent;
@@ -44,7 +44,7 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
     setup();
   });
 
-  it('titles the card "Delete this tenant permanently", with no deprovision trigger or badge of its own', () => {
+  it('titles the card and offers no deprovision trigger or badge', () => {
     const heading = screen.getByRole('heading', {
       level: 2,
       name: 'Delete this tenant permanently',
@@ -98,12 +98,15 @@ describe(`<${DeleteTenantControl.name}/>`, () => {
       expect(confirmButton).toBeEnabled();
     });
 
-    it('calls the action with the typed name and navigates to the tenant list', async () => {
+    it('deletes with the typed name, then navigates to the tenant list', async () => {
       await confirmDeletion();
 
-      expect(deleteTenantActionMock).toHaveBeenCalledWith(TENANT.id, {
-        confirm: MOCK_TENANT_NAME,
-      });
+      expect(deleteTenantActionMock).toHaveBeenCalledWith(
+        MOCK_CLIENT_TENANT.id,
+        {
+          confirm: MOCK_TENANT_NAME,
+        },
+      );
       await vi.waitFor(() =>
         expect(pushMock).toHaveBeenCalledWith(adminRoutes.tenants()),
       );

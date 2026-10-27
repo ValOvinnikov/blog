@@ -17,7 +17,7 @@ function shapeOf(copy: object): string {
 
 const { EN, ...translations } = STARTER_COPY_BY_LOCALE;
 
-describe('starter copy', () => {
+describe('STARTER_COPY_BY_LOCALE', () => {
   it.each(Object.entries(translations))(
     '%s has exactly the keys, in order, and paragraph count of EN',
     (_locale, copy) => {

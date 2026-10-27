@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   CONFIRM_TENANT_NAME_LABEL,
@@ -14,6 +14,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ReactivateTenantControl } from './reactivate-tenant-control';
 
 const REACTIVATE_DIALOG_TITLE = `Reactivate ${MOCK_TENANT_NAME}`;
+const REACTIVATE_CONFIRM_LABEL = 'Reactivate';
 
 const { reactivateTenantActionMock } = vi.hoisted(() => ({
   reactivateTenantActionMock: vi.fn(),
@@ -23,17 +24,17 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: reactivateTenantActionMock,
 }));
 
-const ARCHIVED_TENANT = mockClientTenant({
+const MOCK_ARCHIVED_TENANT = mockClientTenant({
   deprovisionedAt: MOCK_ARCHIVED_AT,
 });
 
 const setup = customRender(ReactivateTenantControl, {
-  tenant: ARCHIVED_TENANT,
+  tenant: MOCK_ARCHIVED_TENANT,
 });
 
 describe(`<${ReactivateTenantControl.name}/>`, () => {
-  const refreshMock = vi.fn();
   let user: UserEvent;
+  let refresh: ReturnType<typeof mockRouterRefresh>;
 
   const typeTenantNameToConfirm = async () => {
     const openButton = screen.getByRole('button', {
@@ -44,7 +45,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
     const nameInput = screen.getByRole('textbox', {
       name: CONFIRM_TENANT_NAME_LABEL,
     });
-    await user.type(nameInput, ARCHIVED_TENANT.name);
+    await user.type(nameInput, MOCK_ARCHIVED_TENANT.name);
   };
 
   beforeEach(() => {
@@ -53,8 +54,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
     reactivateTenantActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    refreshMock.mockReset();
-    mockRouterRefresh(refreshMock);
+    refresh = mockRouterRefresh();
     setup();
   });
 
@@ -67,7 +67,7 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
     expect(heading).toBeVisible();
   });
 
-  it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
+  it('asks for the tenant name in a dialog, disabled until it matches', async () => {
     const openButton = screen.getByRole('button', {
       name: REACTIVATE_TENANT_LABEL,
     });
@@ -76,39 +76,47 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
     const dialog = await screen.findByRole('alertdialog', {
       name: REACTIVATE_DIALOG_TITLE,
     });
-    const confirmButton = screen.getByRole('button', { name: 'Reactivate' });
+    const confirmButton = screen.getByRole('button', {
+      name: REACTIVATE_CONFIRM_LABEL,
+    });
 
     expect(dialog).toBeVisible();
     expect(confirmButton).toBeDisabled();
   });
 
-  it('calls the action with the typed name and refreshes on success', async () => {
+  it('reactivates with the typed name and refreshes on success', async () => {
     await typeTenantNameToConfirm();
 
-    const confirmButton = screen.getByRole('button', { name: 'Reactivate' });
+    const confirmButton = screen.getByRole('button', {
+      name: REACTIVATE_CONFIRM_LABEL,
+    });
     expect(confirmButton).toBeEnabled();
 
     await user.click(confirmButton);
 
     expect(reactivateTenantActionMock).toHaveBeenCalledWith(
-      ARCHIVED_TENANT.id,
-      { confirm: ARCHIVED_TENANT.name },
+      MOCK_ARCHIVED_TENANT.id,
+      { confirm: MOCK_ARCHIVED_TENANT.name },
     );
-    await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(refresh).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('shows the error message inline and never refreshes when the action fails', async () => {
+  it('shows the refusal inline and does not refresh when the action fails', async () => {
     reactivateTenantActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ALREADY_IN_PROGRESS,
     });
     await typeTenantNameToConfirm();
-    const confirmButton = screen.getByRole('button', { name: 'Reactivate' });
+    const confirmButton = screen.getByRole('button', {
+      name: REACTIVATE_CONFIRM_LABEL,
+    });
     await user.click(confirmButton);
 
     const refusal = await screen.findByText('Provisioning is already running.');
 
     expect(refusal).toBeVisible();
-    expect(refreshMock).not.toHaveBeenCalled();
+    expect(refresh).not.toHaveBeenCalled();
   });
 });

@@ -1,19 +1,24 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import {
   mockCtaButtonView,
+  mockRawContentBlock,
   mockRawCtaButton,
   mockRawFaqModule,
   mockRawFaqQuestionItem,
 } from '@blog/service/testing/modules/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toFaqModule } from './transformer';
 
-const FIRST_QUESTION_ID = 'question-b';
-const SECOND_QUESTION_ID = 'question-a';
-const PRICING_QUESTION = {
-  _id: 'question-pricing',
-  question: 'How much does it cost?',
+faker.seed(8);
+
+const MOCK_FIRST_QUESTION_ID = faker.string.uuid();
+const MOCK_SECOND_QUESTION_ID = faker.string.uuid();
+const MOCK_QUESTION = {
+  _id: faker.string.uuid(),
+  question: faker.lorem.sentence(),
 };
+const MOCK_ANSWER = faker.lorem.sentence();
 
 describe(toFaqModule, () => {
   it('maps brandVariant straight through', () => {
@@ -38,33 +43,31 @@ describe(toFaqModule, () => {
   it('keeps the questions in authored order', () => {
     const raw = mockRawFaqModule({
       questions: [
-        mockRawFaqQuestionItem({ _id: FIRST_QUESTION_ID }),
-        mockRawFaqQuestionItem({ _id: SECOND_QUESTION_ID }),
+        mockRawFaqQuestionItem({ _id: MOCK_FIRST_QUESTION_ID }),
+        mockRawFaqQuestionItem({ _id: MOCK_SECOND_QUESTION_ID }),
       ],
     });
 
     const module = toFaqModule(raw);
 
     expect(module.questions.map((question) => question.id)).toEqual([
-      FIRST_QUESTION_ID,
-      SECOND_QUESTION_ID,
+      MOCK_FIRST_QUESTION_ID,
+      MOCK_SECOND_QUESTION_ID,
     ]);
   });
 
-  it('maps a dereferenced question to its id, question text and rich-text answer', () => {
+  it('maps a dereferenced question to its id, text and rich-text answer', () => {
+    const answer = [mockRawContentBlock({ text: MOCK_ANSWER })];
     const raw = mockRawFaqModule({
-      questions: [mockRawFaqQuestionItem(PRICING_QUESTION)],
+      questions: [mockRawFaqQuestionItem({ ...MOCK_QUESTION, answer })],
     });
 
     const module = toFaqModule(raw);
 
-    expect(module.questions[0]).toMatchObject({
-      id: PRICING_QUESTION._id,
-      question: PRICING_QUESTION.question,
-    });
-    expect(module.questions[0]?.answer[0]?.children?.[0]?.text).toBe(
-      'Most teams are live within a week.',
-    );
+    const [question] = module.questions;
+    expect(question?.id).toBe(MOCK_QUESTION._id);
+    expect(question?.question).toBe(MOCK_QUESTION.question);
+    expect(question?.answer[0]?.children?.[0]?.text).toBe(MOCK_ANSWER);
   });
 
   it('maps authored ctaButtons', () => {
@@ -72,7 +75,6 @@ describe(toFaqModule, () => {
 
     const module = toFaqModule(raw);
 
-    expect(module.ctaButtons).toHaveLength(1);
-    expect(module.ctaButtons[0]).toEqual(mockCtaButtonView());
+    expect(module.ctaButtons).toEqual([mockCtaButtonView()]);
   });
 });

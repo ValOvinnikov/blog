@@ -1,8 +1,8 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import {
+  MOCK_TAG_ID,
   MOCK_TAG_SLUG,
   MOCK_TAG_TITLE,
-  mockRawTag,
 } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
@@ -19,18 +19,22 @@ import {
   MOCK_TEMPLATE_TAG_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
+  MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getTagPageDocument } from './loader';
 import { tagPageQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const CURATED_HEADING = 'TypeScript, curated';
-const ENTITY = { ...mockRawTag(), description: MOCK_TAG_PAGE_DESCRIPTION };
+faker.seed(601501);
+
+const MOCK_CURATED_HEADING = faker.lorem.words(3);
+const MOCK_META_TITLE = faker.lorem.sentence();
 
 const tenant = mockTenant();
 
@@ -47,31 +51,29 @@ describe(getTagPageDocument, () => {
     mockRun.mockResolvedValue(mockRawTagPage());
   });
 
-  it('loads a tag page with no list module in modules[]', async () => {
-    mockRun.mockResolvedValueOnce(mockRawTagPage({ modules: [] }));
+  it('maps a page with no modules to an empty module list', async () => {
+    const { modules } = await loadPage({ modules: null });
 
-    const result = await getTagPageDocument(MOCK_TAG_SLUG, tenant);
-
-    expect(result).toBeDefined();
+    expect(modules).toEqual([]);
   });
 
   it('takes the tag from the referenced tag document', async () => {
-    const result = await loadPage({ tag: ENTITY });
+    const { tag } = await loadPage();
 
-    expect(result.tag).toEqual({
-      id: ENTITY._id,
+    expect(tag).toEqual({
+      id: MOCK_TAG_ID,
       title: MOCK_TAG_TITLE,
       slug: MOCK_TAG_SLUG,
       description: MOCK_TAG_PAGE_DESCRIPTION,
     });
   });
 
-  it('resolves seo from the authored value, with no unauthored description fallback', async () => {
+  it('leaves the seo description unset when none is authored', async () => {
     const { seo } = await loadPage({
-      seo: mockRawSeo({ metaTitle: MOCK_TAG_TITLE, metaDescription: null }),
+      seo: mockRawSeo({ metaTitle: MOCK_META_TITLE, metaDescription: null }),
     });
 
-    expect(seo.title).toBe(MOCK_TAG_TITLE);
+    expect(seo.title).toBe(MOCK_META_TITLE);
     expect(seo.description).toBeUndefined();
   });
 
@@ -82,18 +84,19 @@ describe(getTagPageDocument, () => {
       MOCK_CURATED_SUPPORTING_TEXT,
     ],
     [
-      'leaves an unset supportingText undefined, never the tag description',
+      'leaves an unset supportingText undefined without using the tag description',
       null,
       undefined,
     ],
   ])('%s', async (_, supportingText, expected) => {
     const { headingBlock } = await loadPage({
-      tag: ENTITY,
-      headingBlock: mockRawHeadingBlock(CURATED_HEADING, { supportingText }),
+      headingBlock: mockRawHeadingBlock(MOCK_CURATED_HEADING, {
+        supportingText,
+      }),
     });
 
     expect(headingBlock).toEqual({
-      heading: CURATED_HEADING,
+      heading: MOCK_CURATED_HEADING,
       supportingText: expected,
     });
   });
@@ -122,7 +125,7 @@ describe(getTagPageDocument, () => {
   it('resolves undefined when no page_tag matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getTagPageDocument('nonexistent', tenant);
+    const result = await getTagPageDocument(MOCK_MISSING_ID, tenant);
 
     expect(result).toBeUndefined();
   });

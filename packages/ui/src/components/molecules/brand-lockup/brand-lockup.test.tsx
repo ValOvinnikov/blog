@@ -5,19 +5,18 @@ import { BrandLockup } from './brand-lockup';
 
 faker.seed(123);
 
+const MOCK_TAGLINE = faker.hacker.phrase();
+const MOCK_SRC = faker.image.url();
+
 const setup = customRender(BrandLockup, {});
 
 describe(`<${BrandLockup.name}/>`, () => {
-  let tagline: string;
-
-  beforeEach(() => {
-    tagline = faker.hacker.phrase();
-  });
-
   it('renders an uploaded image mark when src is provided', () => {
-    const src = faker.image.url();
-    setup({ src });
-    expect(screen.getByRole('presentation')).toHaveAttribute('src', src);
+    setup({ src: MOCK_SRC });
+
+    const mark = screen.getByRole('presentation');
+
+    expect(mark).toHaveAttribute('src', MOCK_SRC);
   });
 
   describe('with the default props', () => {
@@ -25,17 +24,24 @@ describe(`<${BrandLockup.name}/>`, () => {
       setup();
     });
 
-    it('renders the mark decoratively — no accessible role or name', () => {
-      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    it('renders the mark decoratively with no accessible role or name', () => {
+      const image = screen.queryByRole('img');
+
+      expect(image).not.toBeInTheDocument();
     });
 
-    it('does not render a tagline by default', () => {
-      expect(screen.queryByText(tagline)).not.toBeInTheDocument();
+    it('does not render a tagline', () => {
+      const tagline = screen.queryByText(MOCK_TAGLINE);
+
+      expect(tagline).not.toBeInTheDocument();
     });
   });
 
-  it('renders the tagline when tagline is set', () => {
-    setup({ tagline });
-    expect(screen.getByText(tagline)).toBeVisible();
+  it('renders the tagline when one is given', () => {
+    setup({ tagline: MOCK_TAGLINE });
+
+    const tagline = screen.getByText(MOCK_TAGLINE);
+
+    expect(tagline).toBeVisible();
   });
 });

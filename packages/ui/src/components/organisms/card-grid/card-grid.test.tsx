@@ -13,8 +13,11 @@ const setup = customRender(CardGrid, {
 });
 
 describe(`<${CardGrid.name}/>`, () => {
-  it('renders children inside the grid wrapper', () => {
+  it('renders every child', () => {
     setup();
-    expect(screen.getAllByRole('article')).toHaveLength(3);
+
+    const articles = screen.getAllByRole('article');
+
+    expect(articles).toHaveLength(3);
   });
 });

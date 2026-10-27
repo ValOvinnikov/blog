@@ -38,7 +38,9 @@ import {
   mockRawSeo,
   mockReference,
 } from '@blog/service/testing/shared/fixtures';
+import { mockTranslationLink } from '@blog/service/testing/shared/localized';
 import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
+import { faker } from '@faker-js/faker';
 
 export const MOCK_HOME_PAGE_ID = 'home-1';
 export const MOCK_LIST_MODULE_ID = 'list-1';
@@ -157,6 +159,53 @@ export function mockIndexPageDocument({
     headingBlock: { heading },
     ...(language ? { language } : {}),
   };
+}
+
+export const HEADING_TEXT_PATH = 'headingBlock.heading';
+
+export function mockSlugPageDocument({
+  _id = faker.string.uuid(),
+  _type,
+  slug,
+  language,
+  ...fields
+}: {
+  _id?: string;
+  _type: string;
+  slug: string;
+  language: string;
+} & Record<string, unknown>) {
+  return { _id, _type, slug: { current: slug }, language, ...fields };
+}
+
+export function mockTranslatedSlugPageDocuments({
+  _type,
+  slug,
+  headings,
+}: {
+  _type: string;
+  slug: string;
+  headings: Record<string, string>;
+}) {
+  const pages = Object.entries(headings).map(([language, heading]) =>
+    mockSlugPageDocument({
+      _type,
+      slug,
+      language,
+      headingBlock: { heading },
+    }),
+  );
+
+  return [
+    ...pages,
+    {
+      _id: faker.string.uuid(),
+      _type: 'translation.metadata',
+      translations: pages.map(({ _id, language }) =>
+        mockTranslationLink(language, _id),
+      ),
+    },
+  ];
 }
 
 export function mockTemplateLayoutDocuments({ _type }: { _type: string }) {

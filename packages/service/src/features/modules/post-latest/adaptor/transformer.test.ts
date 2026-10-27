@@ -3,10 +3,14 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config/constants';
-import { mockRawPostLatestModule } from '@blog/service/testing/modules/fixtures';
+import {
+  MOCK_RECENT_POSTS_HEADING,
+  mockRawPostLatestModule,
+} from '@blog/service/testing/modules/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
+  mockRawHeadingBlock,
   mockRawWideLayout,
 } from '@blog/service/testing/shared/fixtures';
 
@@ -15,14 +19,18 @@ import {
   type TRawPostLatestModulePosts,
 } from './transformer';
 
-const rawPosts: TRawPostLatestModulePosts = [];
+const MOCK_NO_POSTS: TRawPostLatestModulePosts = [];
 
 describe(toPostLatestModule, () => {
-  it('maps headingBlock straight through', () => {
-    const module = toPostLatestModule(mockRawPostLatestModule(), rawPosts);
+  it('maps the heading block', () => {
+    const raw = mockRawPostLatestModule({
+      headingBlock: mockRawHeadingBlock(MOCK_RECENT_POSTS_HEADING),
+    });
+
+    const module = toPostLatestModule(raw, MOCK_NO_POSTS);
 
     expect(module.headingBlock).toEqual({
-      heading: 'Latest',
+      heading: MOCK_RECENT_POSTS_HEADING,
       supportingText: undefined,
     });
   });
@@ -33,10 +41,10 @@ describe(toPostLatestModule, () => {
     { showImages: true },
     { showImages: false },
     { displayMode: DISPLAY_MODE.CAROUSEL },
-  ])('maps an authored %o straight through', (authored) => {
+  ])('keeps an authored %o', (authored) => {
     const module = toPostLatestModule(
       mockRawPostLatestModule(authored),
-      rawPosts,
+      MOCK_NO_POSTS,
     );
 
     expect(module).toMatchObject(authored);
@@ -46,16 +54,19 @@ describe(toPostLatestModule, () => {
     [{ contentAlignment: null }, { contentAlignment: undefined }],
     [{ layout: null }, { layout: undefined }],
   ])('maps an unset %o to %o', (unset, expected) => {
-    const module = toPostLatestModule(mockRawPostLatestModule(unset), rawPosts);
+    const module = toPostLatestModule(
+      mockRawPostLatestModule(unset),
+      MOCK_NO_POSTS,
+    );
 
     expect(module).toMatchObject(expected);
   });
 
-  it('maps a fully-authored layout object 1:1', () => {
+  it('keeps a fully-authored layout', () => {
     const layout = mockRawWideLayout();
     const raw = mockRawPostLatestModule({ layout });
 
-    const module = toPostLatestModule(raw, rawPosts);
+    const module = toPostLatestModule(raw, MOCK_NO_POSTS);
 
     expect(module.layout).toEqual(layout);
   });
@@ -65,11 +76,11 @@ describe(toPostLatestModule, () => {
       mockRawPostCard(),
     ]);
 
-    expect(module.posts.map((p) => p.id)).toEqual([MOCK_POST_ID]);
+    expect(module.posts.map(({ id }) => id)).toEqual([MOCK_POST_ID]);
   });
 
   it('returns an empty posts array when nothing resolves', () => {
-    const module = toPostLatestModule(mockRawPostLatestModule(), rawPosts);
+    const module = toPostLatestModule(mockRawPostLatestModule(), MOCK_NO_POSTS);
 
     expect(module.posts).toEqual([]);
   });
