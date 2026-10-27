@@ -1,73 +1,92 @@
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { DataTableShell } from './data-table-shell';
 
+faker.seed(5995);
+
 type TItem = { id: string; name: string };
 
-const noItems: TItem[] = [];
-const twoItems: TItem[] = [
-  { id: '1', name: 'Acme' },
-  { id: '2', name: 'Globex' },
+const MOCK_EMPTY_MESSAGE = faker.lorem.sentence();
+const MOCK_ARIA_LABEL = faker.lorem.word();
+const MOCK_COLUMN_LABEL = faker.lorem.word();
+const MOCK_ITEMS: TItem[] = [
+  { id: faker.string.uuid(), name: faker.company.name() },
+  { id: faker.string.uuid(), name: faker.company.name() },
 ];
+const [MOCK_FIRST_ITEM, MOCK_SECOND_ITEM] = MOCK_ITEMS;
+
+const renderTable = (items: TItem[]) =>
+  renderWithIntl(
+    <DataTableShell
+      items={items}
+      emptyMessage={MOCK_EMPTY_MESSAGE}
+      ariaLabel={MOCK_ARIA_LABEL}
+      columns={[
+        { key: 'name', label: MOCK_COLUMN_LABEL },
+        { key: 'actions', label: null },
+      ]}
+      renderRow={(item) => (
+        <tr key={item.id}>
+          <td>{item.name}</td>
+        </tr>
+      )}
+    />,
+  );
 
 describe(`<${DataTableShell.name}/>`, () => {
-  it('shows the empty message and no table when items is empty', () => {
-    render(
-      <DataTableShell
-        items={noItems}
-        emptyMessage="No rows yet."
-        ariaLabel="Accounts"
-        columns={[{ key: 'name', label: 'Name' }]}
-        renderRow={(item) => <tr key={item.id}>{item.name}</tr>}
-      />,
-    );
+  describe('with no items', () => {
+    beforeEach(() => {
+      renderTable([]);
+    });
 
-    expect(screen.getByText('No rows yet.')).toBeVisible();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    it('shows the empty message', () => {
+      const emptyMessage = screen.getByText(MOCK_EMPTY_MESSAGE);
+
+      expect(emptyMessage).toBeVisible();
+    });
+
+    it('renders no table', () => {
+      const table = screen.queryByRole('table');
+
+      expect(table).not.toBeInTheDocument();
+    });
   });
 
-  it('renders a column header per column and one row per item via renderRow', () => {
-    render(
-      <DataTableShell
-        items={twoItems}
-        emptyMessage="No rows yet."
-        ariaLabel="Accounts"
-        columns={[
-          { key: 'name', label: 'Name' },
-          { key: 'actions', label: null },
-        ]}
-        renderRow={(item) => (
-          <tr key={item.id}>
-            <td>{item.name}</td>
-          </tr>
-        )}
-      />,
+  describe('with items', () => {
+    beforeEach(() => {
+      renderTable(MOCK_ITEMS);
+    });
+
+    it('renders a header per labelled column', () => {
+      const columnHeader = screen.getByRole('columnheader', {
+        name: MOCK_COLUMN_LABEL,
+      });
+
+      expect(columnHeader).toBeVisible();
+    });
+
+    it.each([MOCK_FIRST_ITEM, MOCK_SECOND_ITEM])(
+      'renders a row for $name',
+      ({ name }) => {
+        const cell = screen.getByRole('cell', { name });
+
+        expect(cell).toBeVisible();
+      },
     );
 
-    expect(screen.getByRole('columnheader', { name: 'Name' })).toBeVisible();
-    expect(screen.getByText('Acme')).toBeVisible();
-    expect(screen.getByText('Globex')).toBeVisible();
-    expect(screen.queryByText('No rows yet.')).not.toBeInTheDocument();
-  });
+    it('hides the empty message', () => {
+      const emptyMessage = screen.queryByText(MOCK_EMPTY_MESSAGE);
 
-  it('puts the table in a named, keyboard-focusable region so it can scroll sideways', () => {
-    render(
-      <DataTableShell
-        items={twoItems}
-        emptyMessage="No rows yet."
-        ariaLabel="Accounts"
-        columns={[{ key: 'name', label: 'Name' }]}
-        renderRow={(item) => (
-          <tr key={item.id}>
-            <td>{item.name}</td>
-          </tr>
-        )}
-      />,
-    );
+      expect(emptyMessage).not.toBeInTheDocument();
+    });
 
-    const region = screen.getByRole('region', { name: 'Accounts' });
+    it('wraps the table in a named, keyboard-focusable scroll region', () => {
+      const region = screen.getByRole('region', { name: MOCK_ARIA_LABEL });
+      const table = screen.getByRole('table');
 
-    expect(region).toContainElement(screen.getByRole('table'));
-    expect(region).toHaveAttribute('tabindex', '0');
+      expect(region).toContainElement(table);
+      expect(region).toHaveAttribute('tabindex', '0');
+    });
   });
 });

@@ -1,67 +1,78 @@
+import { faker } from '@faker-js/faker';
 import { FormField } from '@platform/components/shared/form-field';
-import { render, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { TextInput } from './text-input';
+import { TextInput, type TTextInputProps } from './text-input';
 
-describe(TextInput, () => {
-  let user: ReturnType<typeof userEvent.setup>;
+faker.seed(5995);
+
+const MOCK_LABEL = faker.lorem.words(2);
+const MOCK_VALUE = faker.lorem.word();
+
+const renderInField = (
+  props: Partial<TTextInputProps> = {},
+  isDisabled = false,
+) =>
+  renderWithIntl(
+    <FormField label={MOCK_LABEL} control={{ isDisabled }}>
+      <TextInput value={MOCK_VALUE} onChange={vi.fn()} {...props} />
+    </FormField>,
+  );
+
+describe(`<${TextInput.name}/>`, () => {
+  let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
   });
 
   it('renders the given value', () => {
-    render(
-      <FormField label="Tenant name">
-        <TextInput value="Acme" onChange={vi.fn()} />
-      </FormField>,
-    );
+    renderInField();
 
-    expect(screen.getByLabelText('Tenant name')).toHaveValue('Acme');
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toHaveValue(MOCK_VALUE);
   });
 
-  it('calls onChange with the new string value on input', async () => {
+  it('calls onChange with the typed value', async () => {
     const handleChange = vi.fn();
+    renderInField({ value: '', onChange: handleChange });
 
-    render(
-      <FormField label="Tenant name">
-        <TextInput value="" onChange={handleChange} />
-      </FormField>,
-    );
-
-    await user.type(screen.getByLabelText('Tenant name'), 'a');
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+    await user.type(input, 'a');
 
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
   it('is disabled when the field it sits in is disabled', () => {
-    render(
-      <FormField label="Slug" control={{ isDisabled: true }}>
-        <TextInput value="locked-slug" onChange={vi.fn()} />
-      </FormField>,
-    );
+    renderInField({}, true);
 
-    expect(screen.getByLabelText('Slug')).toBeDisabled();
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toBeDisabled();
   });
 
-  it('makes the input read-only, not disabled, when isReadOnly is true', async () => {
-    const handleChange = vi.fn();
-    render(
-      <FormField label="Archived field">
-        <TextInput
-          value="authored value"
-          onChange={handleChange}
-          isReadOnly={true}
-        />
-      </FormField>,
-    );
+  describe('when read-only', () => {
+    let handleChange: ReturnType<typeof vi.fn>;
 
-    const input = screen.getByLabelText('Archived field');
-    expect(input).toHaveAttribute('readonly');
-    expect(input).toBeEnabled();
+    beforeEach(() => {
+      handleChange = vi.fn();
+      renderInField({ onChange: handleChange, isReadOnly: true });
+    });
 
-    await user.type(input, 'x');
-    expect(handleChange).not.toHaveBeenCalled();
+    it('stays enabled but read-only', () => {
+      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+      expect(input).toHaveAttribute('readonly');
+      expect(input).toBeEnabled();
+    });
+
+    it('ignores typing', async () => {
+      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+      await user.type(input, 'x');
+
+      expect(handleChange).not.toHaveBeenCalled();
+    });
   });
 });
