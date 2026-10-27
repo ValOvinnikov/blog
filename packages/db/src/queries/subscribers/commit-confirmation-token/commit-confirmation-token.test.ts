@@ -4,13 +4,21 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  insertTestSubscriberRow,
+  MOCK_CONFIRMATION_NOW,
+  readTestSubscriber,
+} from '@blog/db/testing/subscribers/fixtures-confirmation';
 import { sha256Hex } from '@blog/utils/hash';
 import { faker } from '@faker-js/faker';
-import { eq } from 'drizzle-orm';
 
 import { commitConfirmationToken } from './commit-confirmation-token';
 
 vi.mock('@blog/db/client');
+
+faker.seed(5801);
+
+const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
 
 const db = useQueryTestDb();
 
@@ -26,59 +34,42 @@ describe(commitConfirmationToken, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  async function insertSubscriber(
-    overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
-  ): Promise<schema.TSubscriber> {
-    const [subscriber] = await db()
-      .insert(schema.subscribers)
-      .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL, ...overrides })
-      .returning();
-    if (!subscriber) throw new Error('failed to seed a subscriber row');
-    return subscriber;
-  }
-
-  async function readRow(id: string): Promise<schema.TSubscriber> {
-    const [row] = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.id, id));
-    if (!row) throw new Error('subscriber row missing');
-    return row;
-  }
-
   describe('with an unconfirmed subscriber', () => {
     let subscriber: schema.TSubscriber;
 
     beforeEach(async () => {
-      subscriber = await insertSubscriber();
+      subscriber = await insertTestSubscriberRow(db(), {
+        tenantId,
+        email: MOCK_SUBSCRIBER_EMAIL,
+      });
+      await commitConfirmationToken(subscriber.id, MOCK_CONFIRMATION_TOKEN);
     });
 
     it('stores only the hash of the token', async () => {
-      const confirmationToken = faker.string.uuid();
+      const row = await readTestSubscriber(db(), subscriber.id);
 
-      await commitConfirmationToken(subscriber.id, confirmationToken);
-
-      expect((await readRow(subscriber.id)).confirmationTokenHash).toBe(
-        sha256Hex(confirmationToken),
+      expect(row.confirmationTokenHash).toBe(
+        sha256Hex(MOCK_CONFIRMATION_TOKEN),
       );
     });
 
     it('leaves the unsubscribe token hash untouched', async () => {
-      const { id, unsubscribeTokenHash } = subscriber;
+      const row = await readTestSubscriber(db(), subscriber.id);
 
-      await commitConfirmationToken(id, faker.string.uuid());
-
-      expect((await readRow(id)).unsubscribeTokenHash).toBe(
-        unsubscribeTokenHash,
-      );
+      expect(row.unsubscribeTokenHash).toBe(subscriber.unsubscribeTokenHash);
     });
   });
 
   it('never changes a subscriber who has confirmed', async () => {
-    const subscriber = await insertSubscriber({ confirmedAt: new Date() });
+    const subscriber = await insertTestSubscriberRow(db(), {
+      tenantId,
+      email: MOCK_SUBSCRIBER_EMAIL,
+      confirmedAt: MOCK_CONFIRMATION_NOW,
+    });
 
-    await commitConfirmationToken(subscriber.id, faker.string.uuid());
+    await commitConfirmationToken(subscriber.id, MOCK_CONFIRMATION_TOKEN);
 
-    expect(await readRow(subscriber.id)).toEqual(subscriber);
+    const row = await readTestSubscriber(db(), subscriber.id);
+    expect(row).toEqual(subscriber);
   });
 });

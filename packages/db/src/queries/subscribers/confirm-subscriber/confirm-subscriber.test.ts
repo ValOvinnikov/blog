@@ -8,28 +8,29 @@ import {
 } from '@blog/db/testing/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import {
+  MOCK_CONFIRMATION_NOW,
+  readTestSubscriber,
+} from '@blog/db/testing/subscribers/fixtures-confirmation';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
-import { eq } from 'drizzle-orm';
 
 import { confirmSubscriber } from './confirm-subscriber';
 
 vi.mock('@blog/db/client');
 
-const MOCK_CONFIRMED_AT = new Date('2026-10-23T09:00:00Z');
+faker.seed(5802);
+
+const MOCK_UNKNOWN_TOKEN = faker.string.uuid();
+const ONE_HOUR_MS = 60 * 60_000;
 
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
-async function readSubscriber(id: string): Promise<schema.TSubscriber> {
-  const [row] = await db()
-    .select()
-    .from(schema.subscribers)
-    .where(eq(schema.subscribers.id, id));
-  if (!row) throw new Error(`No subscriber "${id}".`);
-  return row;
-}
+beforeEach(() => {
+  vi.useFakeTimers({ now: MOCK_CONFIRMATION_NOW, toFake: ['Date'] });
+});
 
 afterEach(async () => {
   vi.useRealTimers();
@@ -57,29 +58,30 @@ describe(confirmSubscriber, () => {
   });
 
   it('activates a pending subscriber and stamps the confirmation time', async () => {
-    vi.useFakeTimers({ now: MOCK_CONFIRMED_AT });
     const result = await confirmSubscriber(tenantId, confirmationToken);
 
+    const { status, confirmedAt } = await readTestSubscriber(
+      db(),
+      subscriberId,
+    );
     expect(result).toEqual(toOutcome(SUBSCRIBER_OUTCOME.CONFIRMED));
-    const { status, confirmedAt } = await readSubscriber(subscriberId);
     expect(status).toBe(SUBSCRIBER_STATUS.ACTIVE);
-    expect(confirmedAt).toEqual(MOCK_CONFIRMED_AT);
+    expect(confirmedAt).toEqual(MOCK_CONFIRMATION_NOW);
   });
 
   it('reports a second confirm as already confirmed and keeps the first time', async () => {
     await confirmSubscriber(tenantId, confirmationToken);
-    const { confirmedAt } = await readSubscriber(subscriberId);
+    vi.setSystemTime(new Date(MOCK_CONFIRMATION_NOW.getTime() + ONE_HOUR_MS));
 
     const second = await confirmSubscriber(tenantId, confirmationToken);
 
+    const { confirmedAt } = await readTestSubscriber(db(), subscriberId);
     expect(second).toEqual(toOutcome(SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED));
-    expect((await readSubscriber(subscriberId)).confirmedAt).toEqual(
-      confirmedAt,
-    );
+    expect(confirmedAt).toEqual(MOCK_CONFIRMATION_NOW);
   });
 
   it.each([
-    ['an unknown token', () => faker.string.uuid(), () => tenantId],
+    ['an unknown token', () => MOCK_UNKNOWN_TOKEN, () => tenantId],
     ['the stored hash', () => confirmationTokenHash, () => tenantId],
     ["another tenant's token", () => confirmationToken, () => otherTenantId],
   ])('returns not-found for %s', async (_case, token, tenant) => {
@@ -94,7 +96,8 @@ describe(confirmSubscriber, () => {
       confirmSubscriber(tenantId, confirmationToken),
     ]);
 
-    expect(results.map(({ outcome }) => outcome).sort()).toEqual([
+    const outcomes = results.map(({ outcome }) => outcome).sort();
+    expect(outcomes).toEqual([
       SUBSCRIBER_OUTCOME.ALREADY_CONFIRMED,
       SUBSCRIBER_OUTCOME.CONFIRMED,
     ]);

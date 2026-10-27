@@ -1,13 +1,16 @@
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 
 import { countSubscribersForTenant } from './count-subscribers-for-tenant';
 
 vi.mock('@blog/db/client');
 
-const MOCK_FIRST_EMAIL = 'one@example.com';
-const MOCK_SECOND_EMAIL = 'two@example.com';
+faker.seed(5803);
+
+const MOCK_FIRST_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_SECOND_EMAIL = faker.internet.email().toLowerCase();
 
 const db = useQueryTestDb();
 
@@ -31,7 +34,9 @@ describe(countSubscribersForTenant, () => {
         { tenantId, email: MOCK_SECOND_EMAIL },
       ]);
 
-    await expect(countSubscribersForTenant(tenantId)).resolves.toBe(2);
+    const count = await countSubscribersForTenant(tenantId);
+
+    expect(count).toBe(2);
   });
 
   it("does not count another tenant's subscribers", async () => {
@@ -40,6 +45,8 @@ describe(countSubscribersForTenant, () => {
       .insert(schema.subscribers)
       .values({ tenantId: otherTenantId, email: MOCK_FIRST_EMAIL });
 
-    await expect(countSubscribersForTenant(tenantId)).resolves.toBe(0);
+    const count = await countSubscribersForTenant(tenantId);
+
+    expect(count).toBe(0);
   });
 });
