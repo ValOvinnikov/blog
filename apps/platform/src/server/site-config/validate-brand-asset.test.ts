@@ -3,7 +3,10 @@ import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import { MOCK_SVG_CIRCLE } from '@platform/testing/site-config/fixtures';
-import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
+import {
+  buildPngBuffer,
+  MOCK_MIME_TYPE,
+} from '@platform/testing/upload/fixtures';
 import {
   brandAssetKindSchema,
   DIMENSION_BOUNDS_PX,
@@ -29,18 +32,6 @@ const MOCK_WIDE_WIDTH = 300;
 const MOCK_WIDE_HEIGHT = 80;
 const BELOW_MIN_SIZE =
   DIMENSION_BOUNDS_PX[brandAssetKindSchema.enum.logo].min - 1;
-
-const buildPngBuffer = (width: number, height: number): Buffer => {
-  const buffer = Buffer.alloc(33);
-  buffer.write('\x89PNG\r\n\x1a\n', 0, 'latin1');
-  buffer.writeUInt32BE(13, 8);
-  buffer.write('IHDR', 12, 'latin1');
-  buffer.writeUInt32BE(width, 16);
-  buffer.writeUInt32BE(height, 20);
-  buffer[24] = 8;
-  buffer[25] = 6;
-  return buffer;
-};
 
 const mockPngFile = (width: number, height: number, paddingBytes = 0) => {
   const bytes = Buffer.concat([
