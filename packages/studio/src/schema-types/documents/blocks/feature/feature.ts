@@ -1,5 +1,5 @@
 import { FEATURE_ICONS } from '@blog/config/constants';
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
@@ -67,12 +67,8 @@ export const featureBlockSchema = defineType({
         "The image shown for this card, cropped to the shape chosen on the Features module. Takes priority over the card's icon when both are set.",
       validation: (rule) => rule.custom(validateFeatureHasVisual),
     }),
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'reference',
+    linkReferenceField({
       description: 'Where this card links to, if anywhere.',
-      to: [{ type: linkSchema.name }],
     }),
   ],
   preview: {

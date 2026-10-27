@@ -23,12 +23,12 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 ## Surfaces and routes
 
 - **Public site:** every page rendered inside `app/[tenant]/[locale]/layout.tsx`, which mounts `SiteHeader`. The standalone 404 boundaries (`app/global-not-found.tsx`, `app/[tenant]/not-found.tsx`) render above that layout and have no header.
-- **Studio:** Settings → Navigation, the `settings_navigation` singleton — Header Links and Show language switcher.
+- **Studio:** Settings → Navigation, the `settings_navigation` singleton — Header Links, Tagline and Show language switcher.
 - **Platform:** no navigation editor. Look styles the header through the theme tokens and picks the switcher style.
 
 ## Data
 
-- **`settings_navigation`:** `title`, `items[]` (each a `linkRef` — a bare reference to a `link` document), `showLanguageSwitcher` (boolean, initial `false`). Provisioning seeds it with no items, and seed verification requires the singleton and that every item resolves to a `link` document.
+- **`settings_navigation`:** `title`, `items[]` (each a `linkRef` — a bare reference to a `link` document — or a `linkRefWithSubItems`: a `link` reference plus an ordered `subItems[]` of at least one `linkRef`), `tagline` (a `brandTagline`, copied from `settings_site` › `brand.tagline` by the `copy-brand-tagline-into-navigation` migration; Site Settings keeps its own tagline until the contract step), `showLanguageSwitcher` (boolean, initial `false`). Provisioning seeds it with no items, and seed verification requires the singleton and that every item resolves to a `link` document.
 - **Service:** `service.global.navigation.v1.getNavigation(sanityContext)` returns `{ items: ILink[], showLanguageSwitcher? }`. Items resolve through `linkDocumentFragment` and `toLinkDocument` (./links.md) in the request language; an item whose link has no label or no resolvable href is dropped.
 - **Cache:** the query is tagged `navigation`, `link` and every page type (`page_post`, `page_landing`, `page_postIndex`, `homePage`, `page_topic`, `page_topicIndex`, `page_tag`, `page_tagIndex`), tenant-scoped, so a target page's slug change refreshes the header. The publish webhook maps `settings_navigation` → `navigation` and `link` → `link`.
 - **Alongside:** the brand comes from `settings_site` through `getSiteSettings`; the switcher style from `site_config.language_switcher_style`.
@@ -42,7 +42,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 
 ## Constraints and invariants
 
-- A navigation item holds no label or destination of its own — always a `link` document reference. The list is flat (no nesting) and renders in the editor's order.
+- A navigation item holds no label or destination of its own — always a `link` document reference. Studio allows one level of sub-items under a header link; the service and site do not read sub-items or the navigation tagline yet, so the header renders a flat list in the editor's order.
 - An item is current when its href equals the public pathname — no tenant segment and no locale prefix, in prerendered HTML as on the client — or the pathname is under it (`/blog` matches `/blog/post`); `/` matches only itself. The current link carries `aria-current="page"` and the active colour of `TextLink`'s `nav` appearance, plus a cue that reads without the hue (WCAG 1.4.1): in the header and the mobile menu it is bold (`currentStyle="weight"`), while the footer navigation and footer language codes keep a 2px underline in that colour (the default). The `nav` appearance is monospaced, so the bold label keeps its width and switching pages never moves a header link. Hover changes only the colour: another link turns from muted to the text colour, so it never looks current, while the current link deepens to the brand hover shade and stays bold or underlined.
 - The mobile panel closes on every route change; `useMobileNavToggle` handles focus, Escape and outside-click dismissal, scoped to the navigation's own container.
 - `actions` stay in the bar at every width; `panelActions` move into the mobile panel below `lg`. With the switcher on, the switcher and the theme toggle are `panelActions`; with it off, the theme toggle is an `action`. The account menu is always an `action`.

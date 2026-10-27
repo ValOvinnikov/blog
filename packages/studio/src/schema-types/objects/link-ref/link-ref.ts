@@ -1,33 +1,29 @@
-import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
+import { linkReferenceField } from '@blog/studio/schema-types/fields/link-reference-field/link-reference-field';
+import {
+  linkReferencePreviewSelect,
+  toLinkReferencePreviewTitle,
+} from '@blog/studio/schema-types/fields/link-reference-field/link-reference-preview';
 import { toToolbarIcon } from '@blog/studio/schema-types/portable-text/toolbar-icon/toolbar-icon';
 import { Link2 } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 export const linkRefSchema = defineType({
-  name: 'linkRef',
+  name: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
   title: 'Link',
   type: 'object',
   description: 'Points at a reusable link document.',
   icon: toToolbarIcon(Link2),
   fields: [
-    defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'reference',
+    linkReferenceField({
       description: 'The link document this points at.',
-      to: [{ type: linkSchema.name }],
-      validation: (rule) => rule.required(),
+      isRequired: true,
     }),
   ],
   preview: {
-    select: {
-      title: 'link.title',
-      label: 'link.label.0.value',
-    },
-    prepare({ title, label }) {
-      return {
-        title: String(title ?? label ?? 'No link selected'),
-      };
+    select: linkReferencePreviewSelect,
+    prepare(value) {
+      return { title: toLinkReferencePreviewTitle(value) };
     },
   },
 });
