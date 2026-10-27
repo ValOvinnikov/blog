@@ -29,13 +29,19 @@ page (#5090). The page serves either answer.
 - `/data-requests` in the operator tree, listed in the sidebar as "Data
   requests" for a SUPERADMIN only. Its layout and page both call
   `requireSuperAdmin`, so every other role, and every site owner, gets a 404.
-- The page has a search card (one email field), and after a search a result
-  card ("Data held for {email}", with the count), a "Reader account" card when
-  the address has one (name, email, sign-in methods, active sessions,
-  bookmarks) and a table of every match: kind, site ("Platform" for a
-  platform-wide record), the stored email ("Stored as a hash" for a sign-up
-  block) and when it was recorded ("Not recorded" for an account whose email
-  was never verified).
+- The page has a search card (one email field, at most 28rem wide), and after
+  a search a result card ("Data held for {email}", with the count), a "Reader
+  account" card when the address has one (name, email, sign-in methods,
+  active sessions, bookmarks) and a table of every match: kind, site
+  ("Platform" for a platform-wide record), the stored email ("Stored as a
+  hash" for a sign-up block) and when it was recorded ("Not recorded" for an
+  account whose email was never verified). The table shows 25 rows a page,
+  newest first; a column header sorts by that column (again to reverse it), a
+  search box narrows the rows to those whose shown values contain the text,
+  and a kind filter offers each kind the lookup found. All of it runs in the
+  browser over the lookup's results.
+- With no matches the result card says "No data held for this address." and
+  nothing else: no table, downloads or "Erase".
 - "Download JSON" and "Download CSV" save
   `personal-data-export-<generatedAt>.json` / `.csv` (colons as dashes, no
   milliseconds, e.g. `personal-data-export-2026-10-27T10-29-42Z.csv`), both with
@@ -138,6 +144,7 @@ Nothing is configurable. Both personal-data keys must be set: without
 - `apps/platform/src/server/data-requests/*.test.ts`
 - `apps/platform/src/utils/personal-data-export-csv/personal-data-export-csv.test.ts`
 - `apps/platform/src/components/features/data-requests/data-request-view/components/data-request-panel/data-request-panel.test.tsx`
+- `apps/platform/src/components/features/data-requests/data-request-view/components/data-request-matches-table/data-request-matches-table.test.tsx`
 - `apps/platform/src/app/[locale]/(operator)/data-requests/*.test.tsx`
 
 ## Related epics

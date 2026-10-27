@@ -61,7 +61,12 @@ export const DataRequestPanel = () => {
           {lookup.readerAccount && (
             <DataRequestAccountCard readerAccount={lookup.readerAccount} />
           )}
-          <DataRequestMatchesTable matches={lookup.matches} />
+          {lookup.matches.length > 0 && (
+            <DataRequestMatchesTable
+              key={lookup.email}
+              matches={lookup.matches}
+            />
+          )}
         </>
       )}
     </>

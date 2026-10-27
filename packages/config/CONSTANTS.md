@@ -303,6 +303,8 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
 - **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
+- **DATA_REQUEST_KIND_FILTER**: `ALL`
+- **DATA_REQUEST_MATCH_COLUMN**: `KIND`, `SITE`, `EMAIL`, `RECORDED`
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
 - **DATA_REQUEST_LOG**: `AUDIT_FAILED`=`"data_request.audit_failed"`, `FAILED`=`"data_request.failed"`
 
@@ -412,6 +414,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/site-config` — `apps/platform/src/constants/site-config.ts`
 
 - **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
+
+### `@platform/constants/sort` — `apps/platform/src/constants/sort.ts`
+
+- **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
 
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 
