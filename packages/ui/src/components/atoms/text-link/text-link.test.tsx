@@ -99,7 +99,7 @@ describe(`<${TextLink.name}/>`, () => {
       setup({ href: undefined, dataTestId: TEXT_LINK_TEST_ID });
     });
 
-    it('renders plain text rather than a link', () => {
+    it('renders plain text with no link', () => {
       const link = screen.queryByRole('link');
       const plainText = screen.getByText(MOCK_LABEL);
 

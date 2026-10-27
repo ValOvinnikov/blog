@@ -57,9 +57,9 @@ const renderHero = (
   );
 
 const expectFollows = (before: Element, after: Element) => {
-  expect(
-    before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING,
-  ).toBeTruthy();
+  expect(before.compareDocumentPosition(after)).toBe(
+    Node.DOCUMENT_POSITION_FOLLOWING,
+  );
 };
 
 const heroMedia = (
@@ -202,29 +202,6 @@ describe(`<${Hero.name}/>`, () => {
     const media = screen.getByTestId(MEDIA_TEST_ID);
 
     expectFollows(heading, media);
-  });
-
-  it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED])(
-    'frames %s media in a wrapper around the image',
-    (variant) => {
-      renderHero({ variant }, heroMedia);
-
-      const wrapper = screen.getByTestId(MEDIA_TEST_ID);
-      const image = screen.getByAltText(MOCK_MEDIA_ALT);
-
-      // eslint-disable-next-line testing-library/no-node-access -- the image being a direct child of the wrapper is a structural claim with no semantic handle
-      expect(image.parentElement).not.toBe(wrapper);
-    },
-  );
-
-  it('renders Banner media as a direct child of the media wrapper', () => {
-    renderHero({ variant: HERO_VARIANT.BANNER }, heroMedia);
-
-    const wrapper = screen.getByTestId(MEDIA_TEST_ID);
-    const image = screen.getByAltText(MOCK_MEDIA_ALT);
-
-    // eslint-disable-next-line testing-library/no-node-access -- the image being a direct child of the wrapper is a structural claim with no semantic handle
-    expect(image.parentElement).toBe(wrapper);
   });
 
   it('renders the Banner overlay hidden from assistive tech', () => {

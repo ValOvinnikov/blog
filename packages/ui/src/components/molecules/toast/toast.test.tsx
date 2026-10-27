@@ -154,7 +154,7 @@ describe(`<${Toast.name}/>`, () => {
       setup({ isLoading: true });
     });
 
-    it('renders a decorative spinner instead of the icon', () => {
+    it('renders a decorative spinner and no icon', () => {
       const spinner = screen.getByTestId(TOAST_SPINNER_TEST_ID);
       const icon = screen.queryByTestId(TOAST_ICON_TEST_ID);
 

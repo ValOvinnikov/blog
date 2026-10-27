@@ -103,8 +103,9 @@ describe(`<${CtaModule.name}/>`, () => {
 
     const heading = screen.getByRole('heading', { name: MOCK_HEADING });
     const image = screen.getByTestId(CTA_IMAGE_TEST_ID);
-    const position = heading.compareDocumentPosition(image);
 
-    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(heading.compareDocumentPosition(image)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 });
