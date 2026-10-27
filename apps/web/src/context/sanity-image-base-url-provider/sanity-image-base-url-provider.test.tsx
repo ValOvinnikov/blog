@@ -1,12 +1,16 @@
-import { render } from '@testing-library/react';
-import { renderElement, screen } from '@web/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { render, renderElement, screen } from '@web/testing/custom-render';
 
 import {
   SanityImageBaseUrlProvider,
   useSanityImageBaseUrl,
 } from './sanity-image-base-url-provider';
 
-const BASE_URL = 'https://cdn.sanity.io/images/test-project/test-dataset/';
+faker.seed(6012);
+
+const MOCK_BASE_URL = faker.internet.url();
+const MOCK_OTHER_BASE_URL = faker.internet.url();
+const MOCK_BODY_TEXT = faker.lorem.sentence();
 
 const ReadBaseUrl = () => {
   const baseUrl = useSanityImageBaseUrl();
@@ -14,50 +18,53 @@ const ReadBaseUrl = () => {
 };
 
 describe(`<${SanityImageBaseUrlProvider.name}/>`, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('renders children', () => {
     renderElement(
-      <SanityImageBaseUrlProvider baseUrl={BASE_URL}>
-        <p>Article body</p>
+      <SanityImageBaseUrlProvider baseUrl={MOCK_BASE_URL}>
+        <p>{MOCK_BODY_TEXT}</p>
       </SanityImageBaseUrlProvider>,
     );
 
-    expect(screen.getByText('Article body')).toBeVisible();
+    const body = screen.getByText(MOCK_BODY_TEXT);
+
+    expect(body).toBeVisible();
   });
 
-  it('exposes the provided base URL to a descendant reading useSanityImageBaseUrl', () => {
+  it('exposes the provided base URL to descendants', () => {
     renderElement(
-      <SanityImageBaseUrlProvider baseUrl={BASE_URL}>
+      <SanityImageBaseUrlProvider baseUrl={MOCK_BASE_URL}>
         <ReadBaseUrl />
       </SanityImageBaseUrlProvider>,
     );
 
-    expect(screen.getByTestId('base-url')).toHaveTextContent(BASE_URL);
+    const baseUrl = screen.getByTestId('base-url');
+
+    expect(baseUrl).toHaveTextContent(MOCK_BASE_URL);
   });
 
   it('lets a nested provider override the base URL for its own subtree', () => {
-    const OTHER_BASE_URL =
-      'https://cdn.sanity.io/images/other-project/other-dataset/';
-
     renderElement(
-      <SanityImageBaseUrlProvider baseUrl={BASE_URL}>
-        <SanityImageBaseUrlProvider baseUrl={OTHER_BASE_URL}>
+      <SanityImageBaseUrlProvider baseUrl={MOCK_BASE_URL}>
+        <SanityImageBaseUrlProvider baseUrl={MOCK_OTHER_BASE_URL}>
           <ReadBaseUrl />
         </SanityImageBaseUrlProvider>
       </SanityImageBaseUrlProvider>,
     );
 
-    expect(screen.getByTestId('base-url')).toHaveTextContent(OTHER_BASE_URL);
+    const baseUrl = screen.getByTestId('base-url');
+
+    expect(baseUrl).toHaveTextContent(MOCK_OTHER_BASE_URL);
   });
 
-  it('throws when read outside a SanityImageBaseUrlProvider', () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+  it('throws when read outside its provider', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     expect(() => render(<ReadBaseUrl />)).toThrow(
       'useSanityImageBaseUrl must be used within a SanityImageBaseUrlProvider',
     );
-
-    consoleErrorSpy.mockRestore();
   });
 });

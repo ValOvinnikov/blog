@@ -1,12 +1,44 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { createToastStore, type IToastPayload } from './toast-store';
 
+faker.seed(6012);
+
+type TToastStore = ReturnType<typeof createToastStore>;
+
+const MOCK_START_TIME = faker.date.past({ refDate: '2026-01-01T00:00:00Z' });
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_MESSAGE = faker.lorem.sentence();
+const MOCK_COALESCE_KEY = faker.string.uuid();
+const MOCK_CUSTOM_DURATION_MS = faker.number.int({ min: 500, max: 900 });
+const MOCK_ELAPSED_MS = faker.number.int({ min: 500, max: 1500 });
+const MOCK_MERGE_STEP_MS = faker.number.int({ min: 50, max: 300 });
+const MOCK_LONG_DELAY_MS = faker.number.int({ min: 60_000, max: 3_600_000 });
+const MOCK_RESOLVED_VALUE = faker.system.directoryPath();
+const MOCK_PROMISE_MESSAGES = {
+  loading: { title: faker.lorem.words(2), message: faker.lorem.sentence() },
+  success: { title: faker.lorem.words(2), message: faker.lorem.sentence() },
+  error: { title: faker.lorem.words(2), message: faker.lorem.sentence() },
+};
+
 const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
-  title: 'Bookmark',
-  message: 'Saved to bookmarks',
+  title: MOCK_TITLE,
+  message: MOCK_MESSAGE,
   ...overrides,
 });
+
+const buildDistinctPayload = (): IToastPayload =>
+  buildPayload({ message: faker.lorem.sentence() });
+
+const findVisible = (store: TToastStore, id: string) =>
+  store.getState().visible.find((toast) => toast.id === id);
+
+const visibleIds = (store: TToastStore) =>
+  store.getState().visible.map((toast) => toast.id);
+
+const pendingIds = (store: TToastStore) =>
+  store.getState().pending.map((toast) => toast.id);
 
 const measureDefaultLifeMs = (type: TToastType): number => {
   const probe = createToastStore();
@@ -31,10 +63,7 @@ const discoverQueueCap = (): number => {
     i++
   ) {
     previousVisibleCount = probe.getState().visible.length;
-    probe.actions.show(
-      TOAST_TYPE.INFO,
-      buildPayload({ message: `probe-${previousVisibleCount}` }),
-    );
+    probe.actions.show(TOAST_TYPE.INFO, buildDistinctPayload());
   }
   probe.destroy();
   if (i >= DISCOVERY_CEILING) {
@@ -46,95 +75,82 @@ const discoverQueueCap = (): number => {
 };
 
 const fillVisibleToCap = (
-  store: ReturnType<typeof createToastStore>,
+  store: TToastStore,
   type: TToastType,
   cap: number,
 ): string[] =>
-  Array.from({ length: cap }, (_, i) =>
-    store.actions.show(type, buildPayload({ message: `msg-${i}` })),
+  Array.from({ length: cap }, () =>
+    store.actions.show(type, buildDistinctPayload()),
   );
 
-const createLoadingToast = async () => {
-  const store = createToastStore();
+const showLoadingToast = async (store: TToastStore) => {
   let resolvePromise!: (value: string) => void;
   const pending = new Promise<string>((resolve) => {
     resolvePromise = resolve;
   });
 
-  store.actions.promise(pending, {
-    loading: { title: 'Saving', message: 'saving…' },
-    success: { title: 'Saved', message: 'saved' },
-    error: { title: 'Failed', message: 'failed' },
-  });
+  store.actions.promise(pending, MOCK_PROMISE_MESSAGES);
 
   await vi.advanceTimersToNextTimerAsync();
   const loadingId = store.getState().visible[0]!.id;
 
-  return { store, resolvePromise, loadingId };
+  return { resolvePromise, loadingId };
 };
 
 describe(createToastStore, () => {
+  let store: TToastStore;
+
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.setSystemTime(MOCK_START_TIME);
+    store = createToastStore();
   });
 
   afterEach(() => {
+    store.destroy();
     vi.useRealTimers();
   });
 
   describe('show', () => {
-    let store: ReturnType<typeof createToastStore>;
+    it('enqueues a new toast in the entering phase', () => {
+      const successLifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
 
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
-    it('enqueues a new toast in the entering phase with a numeric life', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
-      expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]).toMatchObject({
-        id,
-        type: TOAST_TYPE.SUCCESS,
-        title: 'Bookmark',
-        message: 'Saved to bookmarks',
-        phase: 'entering',
-        paused: false,
-      });
-      expect(store.getState().visible[0]!.durationMs).toEqual(
-        expect.any(Number),
-      );
+      const toast = findVisible(store, id);
+      expect(visibleIds(store)).toEqual([id]);
+      expect(toast?.type).toBe(TOAST_TYPE.SUCCESS);
+      expect(toast?.title).toBe(MOCK_TITLE);
+      expect(toast?.message).toBe(MOCK_MESSAGE);
+      expect(toast?.phase).toBe('entering');
+      expect(toast?.paused).toBe(false);
+      expect(toast?.durationMs).toBe(successLifeMs);
     });
 
-    it('gives warning a longer life than success and leaves error sticky', () => {
+    it('gives warning a longer life than success', () => {
       const warningLifeMs = measureDefaultLifeMs(TOAST_TYPE.WARNING);
       const successLifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
 
-      store.actions.show(TOAST_TYPE.ERROR, buildPayload());
-
       expect(warningLifeMs).toBeGreaterThan(successLifeMs);
-      expect(store.getState().visible[0]!.durationMs).toBeUndefined();
     });
 
-    it('honors an explicit durationMs override', () => {
-      store.actions.show(
+    it('honors an explicit duration override', () => {
+      const id = store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ durationMs: 1000 }),
+        buildPayload({ durationMs: MOCK_CUSTOM_DURATION_MS }),
       );
 
-      expect(store.getState().visible[0]!.durationMs).toBe(1000);
+      expect(findVisible(store, id)?.durationMs).toBe(MOCK_CUSTOM_DURATION_MS);
     });
 
-    it('auto-dismisses after its life elapses, entering leaving then removed', () => {
+    it('auto-dismisses after its life elapses, leaving then removed', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       vi.advanceTimersToNextTimer();
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'leaving',
-      );
+      expect(findVisible(store, id)?.phase).toBe('leaving');
 
       vi.advanceTimersToNextTimer();
-      expect(store.getState().visible.find((t) => t.id === id)).toBeUndefined();
+      expect(findVisible(store, id)).toBeUndefined();
     });
 
     it('never auto-dismisses an error toast', () => {
@@ -142,45 +158,31 @@ describe(createToastStore, () => {
 
       vi.runAllTimers();
 
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'entering',
-      );
+      expect(findVisible(store, id)?.phase).toBe('entering');
     });
   });
 
   describe('cap and eviction', () => {
-    let store: ReturnType<typeof createToastStore>;
-
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
-    it('evicts the oldest non-error toast once one more than the cap is shown', () => {
+    it('evicts the oldest non-error toast when one more than the cap is shown', () => {
       const cap = discoverQueueCap();
       const ids = fillVisibleToCap(store, TOAST_TYPE.INFO, cap);
 
       const overflowId = store.actions.show(
         TOAST_TYPE.INFO,
-        buildPayload({ message: 'msg-overflow' }),
+        buildDistinctPayload(),
       );
 
-      const visibleIds = store.getState().visible.map((t) => t.id);
-      expect(visibleIds).toHaveLength(cap);
-      expect(visibleIds).not.toContain(ids[0]);
-      expect(visibleIds).toContain(overflowId);
+      expect(visibleIds(store)).toEqual([...ids.slice(1), overflowId]);
     });
 
-    it('queues a new toast instead of evicting when every visible slot is an error', () => {
+    it('queues a new toast instead of evicting when every slot holds an error', () => {
       const cap = discoverQueueCap();
-      fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
+      const errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
 
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
-      expect(store.getState().visible).toHaveLength(cap);
-      expect(store.getState().visible.some((t) => t.id === queuedId)).toBe(
-        false,
-      );
-      expect(store.getState().pending.map((t) => t.id)).toContain(queuedId);
+      expect(visibleIds(store)).toEqual(errorIds);
+      expect(pendingIds(store)).toEqual([queuedId]);
     });
 
     it('promotes the oldest pending toast once a visible slot frees up', () => {
@@ -191,339 +193,272 @@ describe(createToastStore, () => {
       store.actions.dismiss(errorIds[0]);
       vi.advanceTimersToNextTimer();
 
-      const visibleIds = store.getState().visible.map((t) => t.id);
-      expect(visibleIds).toContain(queuedId);
-      expect(store.getState().pending).toHaveLength(0);
+      expect(visibleIds(store)).toEqual([...errorIds.slice(1), queuedId]);
+      expect(pendingIds(store)).toEqual([]);
     });
   });
 
   describe('coalescing', () => {
-    let store: ReturnType<typeof createToastStore>;
-
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
-    it('toggle-collapse: a second call with the same coalesceKey replaces the toast in place', () => {
-      const key = 'bookmark:post-1';
+    it('replaces the toast in place when a coalesce key repeats', () => {
+      const secondMessage = faker.lorem.sentence();
 
       const firstId = store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ message: 'Saved', coalesceKey: key }),
+        buildPayload({ coalesceKey: MOCK_COALESCE_KEY }),
       );
       const secondId = store.actions.show(
         TOAST_TYPE.INFO,
-        buildPayload({ message: 'Removed', coalesceKey: key }),
+        buildPayload({
+          message: secondMessage,
+          coalesceKey: MOCK_COALESCE_KEY,
+        }),
       );
 
+      const toast = findVisible(store, firstId);
       expect(secondId).toBe(firstId);
-      expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]).toMatchObject({
-        type: TOAST_TYPE.INFO,
-        message: 'Removed',
-      });
+      expect(visibleIds(store)).toEqual([firstId]);
+      expect(toast?.type).toBe(TOAST_TYPE.INFO);
+      expect(toast?.message).toBe(secondMessage);
     });
 
-    it('toggle-collapse resets the timer to the fresh full duration', () => {
+    it('restarts the full duration when a coalesce key repeats', () => {
       const lifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
-      const key = 'bookmark:post-1';
-
       const id = store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ coalesceKey: key }),
+        buildPayload({ coalesceKey: MOCK_COALESCE_KEY }),
       );
       store.actions.markEntered(id);
-      vi.advanceTimersByTime(lifeMs - 600);
+      vi.advanceTimersByTime(lifeMs - MOCK_ELAPSED_MS);
       store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ coalesceKey: key }),
+        buildPayload({ coalesceKey: MOCK_COALESCE_KEY }),
       );
 
-      vi.advanceTimersByTime(600);
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'visible',
-      );
+      vi.advanceTimersByTime(MOCK_ELAPSED_MS);
+      expect(findVisible(store, id)?.phase).toBe('visible');
 
-      vi.advanceTimersByTime(lifeMs - 600);
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'leaving',
-      );
+      vi.advanceTimersByTime(lifeMs - MOCK_ELAPSED_MS);
+      expect(findVisible(store, id)?.phase).toBe('leaving');
     });
 
-    it('counter-merge: identical success toasts within the merge window collapse with an incrementing count', () => {
+    it('collapses identical success toasts within the merge window into a count', () => {
       const firstId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(MOCK_MERGE_STEP_MS);
       const secondId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(MOCK_MERGE_STEP_MS);
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       expect(secondId).toBe(firstId);
-      expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]!.count).toBe(3);
+      expect(visibleIds(store)).toEqual([firstId]);
+      expect(findVisible(store, firstId)?.count).toBe(3);
     });
 
-    it('counter-merge while paused un-pauses and re-arms a fresh full-duration timer', () => {
+    it('un-pauses and re-arms the timer when a merge hits a paused toast', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       store.actions.pause(id);
-      expect(store.getState().visible[0]!.paused).toBe(true);
+      expect(findVisible(store, id)?.paused).toBe(true);
 
       const mergedId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      expect(mergedId).toBe(id);
 
-      const merged = store.getState().visible.find((t) => t.id === id);
+      const merged = findVisible(store, id);
+      expect(mergedId).toBe(id);
       expect(merged?.paused).toBe(false);
       expect(merged?.count).toBe(2);
 
       vi.advanceTimersToNextTimer();
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'leaving',
-      );
+      expect(findVisible(store, id)?.phase).toBe('leaving');
     });
 
     it('does not merge once a long delay has elapsed', () => {
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
-      vi.setSystemTime(Date.now() + 60 * 60 * 1000);
+      vi.setSystemTime(Date.now() + MOCK_LONG_DELAY_MS);
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
-      expect(store.getState().visible).toHaveLength(2);
+      expect(visibleIds(store)).toHaveLength(2);
     });
 
-    it('never merges error toasts, even when identical within the window', () => {
-      store.actions.show(TOAST_TYPE.ERROR, buildPayload());
-      store.actions.show(TOAST_TYPE.ERROR, buildPayload());
+    it('never merges identical error toasts', () => {
+      const firstId = store.actions.show(TOAST_TYPE.ERROR, buildPayload());
+      const secondId = store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
-      expect(store.getState().visible).toHaveLength(2);
-      expect(store.getState().visible.every((t) => t.count === undefined)).toBe(
-        true,
-      );
+      expect(visibleIds(store)).toEqual([firstId, secondId]);
+      expect(findVisible(store, firstId)?.count).toBeUndefined();
+      expect(findVisible(store, secondId)?.count).toBeUndefined();
     });
   });
 
-  describe('pause / resume', () => {
-    let store: ReturnType<typeof createToastStore>;
-
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
-    it('pauses the auto-dismiss timer and resumes from the exact remaining time', () => {
+  describe('pause and resume', () => {
+    it('resumes auto-dismiss from the exact remaining time', () => {
       const lifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(MOCK_ELAPSED_MS);
       store.actions.pause(id);
 
       vi.advanceTimersByTime(lifeMs);
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'entering',
-      );
-      expect(store.getState().visible.find((t) => t.id === id)?.paused).toBe(
-        true,
-      );
+      expect(findVisible(store, id)?.phase).toBe('entering');
+      expect(findVisible(store, id)?.paused).toBe(true);
 
       store.actions.resume(id);
 
-      vi.advanceTimersByTime(lifeMs - 1000 - 1);
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'entering',
-      );
-      vi.advanceTimersByTime(2);
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'leaving',
-      );
+      vi.advanceTimersByTime(lifeMs - MOCK_ELAPSED_MS - 1);
+      expect(findVisible(store, id)?.phase).toBe('entering');
+      vi.advanceTimersByTime(1);
+      expect(findVisible(store, id)?.phase).toBe('leaving');
     });
 
-    it('is a no-op to pause an already-paused toast or resume a running one', () => {
+    it('ignores a resume on a running toast', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.resume(id);
-      expect(store.getState().visible.find((t) => t.id === id)?.paused).toBe(
-        false,
-      );
+
+      expect(findVisible(store, id)?.paused).toBe(false);
+    });
+
+    it('keeps a toast paused when it is paused twice', () => {
+      const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.pause(id);
       store.actions.pause(id);
-      expect(store.getState().visible.find((t) => t.id === id)?.paused).toBe(
-        true,
-      );
+
+      expect(findVisible(store, id)?.paused).toBe(true);
     });
   });
 
   describe('dismiss', () => {
-    let store: ReturnType<typeof createToastStore>;
-
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
     it('dismisses the given id', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.dismiss(id);
       vi.advanceTimersToNextTimer();
 
-      expect(store.getState().visible).toHaveLength(0);
+      expect(visibleIds(store)).toEqual([]);
     });
 
     it('dismisses the newest toast when no id is given', () => {
-      store.actions.show(
+      const firstId = store.actions.show(
         TOAST_TYPE.SUCCESS,
-        buildPayload({ message: 'first' }),
+        buildDistinctPayload(),
       );
-      const secondId = store.actions.show(
-        TOAST_TYPE.SUCCESS,
-        buildPayload({ message: 'second', coalesceKey: 'irrelevant' }),
-      );
+      store.actions.show(TOAST_TYPE.SUCCESS, buildDistinctPayload());
 
       store.actions.dismiss();
       vi.advanceTimersToNextTimer();
 
-      const visibleIds = store.getState().visible.map((t) => t.id);
-      expect(visibleIds).not.toContain(secondId);
-      expect(store.getState().visible).toHaveLength(1);
+      expect(visibleIds(store)).toEqual([firstId]);
     });
 
-    it('removes a pending (not-yet-visible) toast without a leave animation', () => {
+    it('removes a pending toast without a leave animation', () => {
       const cap = discoverQueueCap();
       fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
 
       store.actions.dismiss(queuedId);
 
-      expect(store.getState().pending).toHaveLength(0);
+      expect(pendingIds(store)).toEqual([]);
     });
 
-    it('is a no-op when the queue is empty', () => {
+    it('does nothing when the queue is empty', () => {
       expect(() => store.actions.dismiss()).not.toThrow();
     });
   });
 
   describe('markEntered', () => {
-    let store: ReturnType<typeof createToastStore>;
-
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
     it('flips an entering toast to visible', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.markEntered(id);
 
-      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
-        'visible',
-      );
+      expect(findVisible(store, id)?.phase).toBe('visible');
     });
   });
 
   describe('promise', () => {
-    describe('with a fresh store', () => {
-      let store: ReturnType<typeof createToastStore>;
+    it('skips loading when the promise settles before the grace period', async () => {
+      const settled = Promise.resolve(MOCK_RESOLVED_VALUE);
 
-      beforeEach(() => {
-        store = createToastStore();
+      const returned = store.actions.promise(settled, {
+        ...MOCK_PROMISE_MESSAGES,
+        success: (value) => ({
+          title: MOCK_PROMISE_MESSAGES.success.title,
+          message: `${MOCK_PROMISE_MESSAGES.success.message} ${value}`,
+        }),
       });
+      await settled;
+      await vi.advanceTimersByTimeAsync(0);
 
-      it('shows the resolved toast directly, skipping loading, when the promise settles before the grace period', async () => {
-        const deferred = Promise.resolve('~/bookmarks');
+      const [toast] = store.getState().visible;
+      expect(returned).toBe(settled);
+      expect(store.getState().visible).toHaveLength(1);
+      expect(toast?.type).toBe(TOAST_TYPE.SUCCESS);
+      expect(toast?.message).toBe(
+        `${MOCK_PROMISE_MESSAGES.success.message} ${MOCK_RESOLVED_VALUE}`,
+      );
+    });
 
-        const returned = store.actions.promise(deferred, {
-          loading: { title: 'Saving', message: 'saving…' },
-          success: (value) => ({
-            title: 'Saved',
-            message: `stashed to ${value}`,
-          }),
-          error: { title: 'Failed', message: '! failed' },
-        });
-
-        expect(returned).toBe(deferred);
-        await deferred;
-        await vi.advanceTimersByTimeAsync(0);
-
-        expect(store.getState().visible).toHaveLength(1);
-        expect(store.getState().visible[0]).toMatchObject({
-          type: TOAST_TYPE.SUCCESS,
-          message: 'stashed to ~/bookmarks',
-        });
+    it('swaps the loading toast to a sticky error on reject', async () => {
+      let rejectPromise!: (reason: unknown) => void;
+      const pending = new Promise<string>((_resolve, reject) => {
+        rejectPromise = reject;
       });
+      store.actions.promise(pending, MOCK_PROMISE_MESSAGES).catch(() => {});
 
-      it('swaps the loading toast to error on reject', async () => {
-        let rejectPromise!: (reason: unknown) => void;
-        const pending = new Promise<string>((_resolve, reject) => {
-          rejectPromise = reject;
-        });
+      await vi.advanceTimersToNextTimerAsync();
+      rejectPromise(new Error(faker.lorem.sentence()));
+      await vi.advanceTimersByTimeAsync(0);
 
-        const returned = store.actions.promise(pending, {
-          loading: { title: 'Saving', message: 'saving…' },
-          success: { title: 'Saved', message: 'saved' },
-          error: { title: 'Failed', message: '! failed' },
-        });
-        returned.catch(() => {});
-
-        await vi.advanceTimersToNextTimerAsync();
-        rejectPromise(new Error('network error'));
-        await vi.advanceTimersByTimeAsync(0);
-
-        expect(store.getState().visible[0]).toMatchObject({
-          type: TOAST_TYPE.ERROR,
-          isLoading: false,
-          title: 'Failed',
-          durationMs: undefined,
-        });
-      });
+      const [toast] = store.getState().visible;
+      expect(toast?.type).toBe(TOAST_TYPE.ERROR);
+      expect(toast?.isLoading).toBe(false);
+      expect(toast?.title).toBe(MOCK_PROMISE_MESSAGES.error.title);
+      expect(toast?.durationMs).toBeUndefined();
     });
 
     describe('with a loading toast on screen', () => {
-      let store: ReturnType<typeof createToastStore>;
       let resolvePromise: (value: string) => void;
       let loadingId: string;
 
       beforeEach(async () => {
-        ({ store, resolvePromise, loadingId } = await createLoadingToast());
+        ({ resolvePromise, loadingId } = await showLoadingToast(store));
       });
 
-      it('shows a loading toast after the grace period, then swaps it in place on resolve', async () => {
-        expect(store.getState().visible).toHaveLength(1);
-        expect(store.getState().visible[0]).toMatchObject({
-          type: TOAST_TYPE.INFO,
-          isLoading: true,
-          durationMs: undefined,
-        });
+      it('shows a sticky loading toast after the grace period', () => {
+        const [toast] = store.getState().visible;
 
-        resolvePromise('done');
+        expect(visibleIds(store)).toEqual([loadingId]);
+        expect(toast?.type).toBe(TOAST_TYPE.INFO);
+        expect(toast?.isLoading).toBe(true);
+        expect(toast?.durationMs).toBeUndefined();
+      });
+
+      it('swaps the loading toast in place when the promise resolves', async () => {
+        const successLifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
+
+        resolvePromise(MOCK_RESOLVED_VALUE);
         await vi.advanceTimersByTimeAsync(0);
 
-        expect(store.getState().visible).toHaveLength(1);
-        expect(store.getState().visible[0]).toMatchObject({
-          id: loadingId,
-          type: TOAST_TYPE.SUCCESS,
-          isLoading: false,
-          title: 'Saved',
-        });
-        expect(store.getState().visible[0]!.durationMs).toEqual(
-          expect.any(Number),
-        );
+        const toast = findVisible(store, loadingId);
+        expect(visibleIds(store)).toEqual([loadingId]);
+        expect(toast?.type).toBe(TOAST_TYPE.SUCCESS);
+        expect(toast?.isLoading).toBe(false);
+        expect(toast?.title).toBe(MOCK_PROMISE_MESSAGES.success.title);
+        expect(toast?.durationMs).toBe(successLifeMs);
       });
 
-      it('does not resurrect a loading toast the reader already dismissed before it settled', async () => {
+      it('does not resurrect a loading toast dismissed before it settled', async () => {
         store.actions.dismiss(loadingId);
         await vi.advanceTimersToNextTimerAsync();
-        expect(store.getState().visible).toHaveLength(0);
+        expect(visibleIds(store)).toEqual([]);
 
-        resolvePromise('done');
+        resolvePromise(MOCK_RESOLVED_VALUE);
         await vi.advanceTimersByTimeAsync(0);
 
-        expect(store.getState().visible).toHaveLength(0);
+        expect(visibleIds(store)).toEqual([]);
       });
     });
   });
+
   describe('destroy', () => {
-    let store: ReturnType<typeof createToastStore>;
-
-    beforeEach(() => {
-      store = createToastStore();
-    });
-
     it('clears pending timers so they never fire after teardown', () => {
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       const listener = vi.fn();
