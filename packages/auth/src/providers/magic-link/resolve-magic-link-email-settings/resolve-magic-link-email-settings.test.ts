@@ -128,7 +128,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     expect(result.logoImageUrl).toBe(expectedLogoUrl);
   });
 
-  it('drops a malformed reply-to address rather than passing it through', async () => {
+  it('drops a malformed reply-to address', async () => {
     getEmailConfigMock.mockResolvedValue(
       mockEmailConfig({ replyToAddress: faker.lorem.word() }),
     );

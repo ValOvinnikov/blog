@@ -86,7 +86,10 @@ describe('oauth-providers', () => {
   it('loads without AUTH_SECRET, so the OAuth buttons never need it', async () => {
     vi.stubEnv('AUTH_SECRET', undefined);
     vi.stubEnv('SKIP_ENV_VALIDATION', undefined);
+    withGitHubCredentials();
 
-    await expect(importOAuthProviders()).resolves.toBeDefined();
+    const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+
+    expect(getEnabledOAuthProviderIds()).toEqual([GITHUB]);
   });
 });
