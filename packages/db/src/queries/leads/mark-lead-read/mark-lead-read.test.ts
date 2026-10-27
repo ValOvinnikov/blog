@@ -13,6 +13,8 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
+faker.seed(6022);
+
 afterEach(async () => {
   await db().delete(schema.leads);
   await db().delete(schema.tenants);

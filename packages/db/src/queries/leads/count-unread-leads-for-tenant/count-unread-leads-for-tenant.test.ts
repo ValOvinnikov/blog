@@ -1,5 +1,9 @@
 import * as schema from '@blog/db/schema';
-import { insertTestLead, insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestLead,
+  insertTestTenant,
+  MOCK_LEAD_READ_AT,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { countUnreadLeadsForTenant } from './count-unread-leads-for-tenant';
@@ -23,7 +27,7 @@ describe(countUnreadLeadsForTenant, () => {
   it('counts only the unread leads for the tenant', async () => {
     await insertTestLead(db(), tenantId);
     await insertTestLead(db(), tenantId);
-    await insertTestLead(db(), tenantId, { readAt: new Date() });
+    await insertTestLead(db(), tenantId, { readAt: MOCK_LEAD_READ_AT });
 
     await expect(countUnreadLeadsForTenant(tenantId)).resolves.toBe(2);
   });
