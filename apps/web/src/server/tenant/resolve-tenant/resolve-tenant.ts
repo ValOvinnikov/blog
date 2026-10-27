@@ -1,11 +1,13 @@
 import {
   TENANT_CONFIG_REVALIDATE_SECONDS,
   type TLocaleIsoCode,
+  type TMaybeJsonDates,
   type TMaybeNull,
   type TMaybeUndefined,
 } from '@blog/config';
 import { queries, TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { reviveCachedTenant } from '@web/server/tenant/revive-cached-tenant/revive-cached-tenant';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { TENANT_BY_HOST_CACHE_TAG } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
@@ -58,15 +60,36 @@ const resolveUncachedTenant = async (
   return resolveSoleTenant();
 };
 
-// A cached row comes back JSON-parsed, so its timestamp fields are ISO strings: read them for presence only.
-export const resolveTenant = unstable_cache(
-  resolveUncachedTenant,
+class UnresolvedHostError extends Error {}
+
+const resolveServableTenantOrThrow = async (
+  host: TMaybeNull<string>,
+): Promise<TMaybeJsonDates<TTenant>> => {
+  const tenant = await resolveUncachedTenant(host);
+  if (!tenant) throw new UnresolvedHostError();
+  return tenant;
+};
+
+// A miss throws so `unstable_cache` never stores it: a host visited before its tenant is READY resolves the moment it is.
+const getCachedTenantByHost = unstable_cache(
+  resolveServableTenantOrThrow,
   [TENANT_BY_HOST_CACHE_TAG],
   {
     tags: [TENANT_BY_HOST_CACHE_TAG],
     revalidate: TENANT_CONFIG_REVALIDATE_SECONDS,
   },
 );
+
+export const resolveTenant = async (
+  host: TMaybeNull<string>,
+): Promise<TMaybeUndefined<TTenant>> => {
+  try {
+    return reviveCachedTenant(await getCachedTenantByHost(host));
+  } catch (error) {
+    if (error instanceof UnresolvedHostError) return undefined;
+    throw error;
+  }
+};
 
 export const resolveTenantById = async (
   tenantId: string,
