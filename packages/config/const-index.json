@@ -5188,6 +5188,14 @@
         "file": "apps/web/src/constants/consent.ts"
       }
     ],
+    "contact_form_module.fetch_failed": [
+      {
+        "ref": "CONTACT_FORM_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/contact-form",
+        "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
     "ALREADY_SUBSCRIBED": [
       {
         "ref": "NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED",
@@ -5207,6 +5215,14 @@
     "RESEND": [
       {
         "ref": "NEWSLETTER_SUBSCRIPTION_ACTION.RESEND",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter_module.fetch_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.MODULE_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/newsletter",
         "file": "apps/web/src/constants/newsletter.ts"
@@ -5434,6 +5450,14 @@
         "scope": "app:web",
         "from": "@web/constants/session",
         "file": "apps/web/src/constants/session.ts"
+      }
+    ],
+    "tenant_write.unresolved": [
+      {
+        "ref": "TENANT_WRITE_LOG.UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/tenant-write",
+        "file": "apps/web/src/constants/tenant-write.ts"
       }
     ],
     "UNAUTHORIZED": [

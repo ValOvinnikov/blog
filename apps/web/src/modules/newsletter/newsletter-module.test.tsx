@@ -2,13 +2,17 @@ import { CAPABILITY } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_NEWSLETTER_MODULE_ID,
   mockNewsletterModule,
 } from '@web/testing/modules/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_SUSPENDED_TENANT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
@@ -25,6 +29,8 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
@@ -63,8 +69,20 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(secondCueElement).toBeVisible();
   });
 
-  it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
+  it.each<[string, () => void]>([
+    [
+      'the NEWSLETTER capability is off',
+      () => vi.mocked(isCapabilityEnabled).mockResolvedValue(false),
+    ],
+    [
+      'the site is suspended',
+      () =>
+        vi
+          .mocked(resolveRequestTenant)
+          .mockResolvedValueOnce(MOCK_SUSPENDED_TENANT),
+    ],
+  ])('renders nothing, without fetching, when %s', async (_, arrange) => {
+    arrange();
 
     const { container } = await setup();
 

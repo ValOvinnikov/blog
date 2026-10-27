@@ -1,14 +1,21 @@
+import { CAPABILITY, SITE_MESSAGES } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import {
   customRenderServerAsync,
   screen,
   waitFor,
 } from '@web/testing/custom-render';
+import { MOCK_SUSPENDED_TENANT } from '@web/testing/shared/tenant/fixtures';
 import { useSession } from 'next-auth/react';
 
 import { BookmarkButtonGate } from './bookmark-button-gate';
+
+faker.seed(5776);
 
 vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
@@ -17,6 +24,10 @@ vi.mock(
   }),
 );
 
+vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+
 vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
@@ -24,45 +35,59 @@ vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
 
 vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
+const MOCK_POST_ID = faker.string.uuid();
+
+const { saveAriaLabel } = SITE_MESSAGES.bookmarkButton;
+
 const setup = customRenderServerAsync(
   BookmarkButtonGate,
-  { postId: 'post-1' },
+  { postId: MOCK_POST_ID },
   { wrapper: ToastProvider },
 );
 
 describe(`<${BookmarkButtonGate.name}/>`, () => {
   beforeEach(() => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     vi.mocked(useSession).mockReturnValue({
-      data: { user: { id: 'user-1' }, expires: '' },
-      status: 'authenticated',
+      data: { user: { id: faker.string.uuid() }, expires: '' },
+      status: SESSION_STATUS.AUTHENTICATED,
       update: vi.fn(),
     });
     vi.mocked(getBookmarkStatus).mockResolvedValue(false);
   });
 
-  it('renders the bookmark toggle when bookmarks are enabled', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
+  it('renders the bookmark toggle for the post when bookmarks are enabled', async () => {
+    await setup();
+
+    const toggle = await screen.findByRole('button', { name: saveAriaLabel });
+    await waitFor(() => expect(toggle).toBeEnabled());
+    expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_ID);
+  });
+
+  it.each<[string, () => void]>([
+    [
+      'bookmarks are not enabled',
+      () => vi.mocked(isCapabilityEnabled).mockResolvedValue(false),
+    ],
+    [
+      'the site is suspended',
+      () =>
+        vi
+          .mocked(resolveRequestTenant)
+          .mockResolvedValueOnce(MOCK_SUSPENDED_TENANT),
+    ],
+  ])('renders no toggle when %s', async (_, arrange) => {
+    arrange();
 
     await setup();
 
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
-    );
-    expect(getBookmarkStatus).toHaveBeenCalledWith('post-1');
+    const toggle = screen.queryByRole('button');
+    expect(toggle).not.toBeInTheDocument();
   });
 
-  describe('when bookmarks are not enabled', () => {
-    beforeEach(async () => {
-      vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
-      await setup();
-    });
+  it('checks the bookmarks capability', async () => {
+    await setup();
 
-    it('renders no toggle when bookmarks are not enabled', async () => {
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    });
-
-    it('checks the bookmarks capability ', async () => {
-      expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS');
-    });
+    expect(isCapabilityEnabled).toHaveBeenCalledWith(CAPABILITY.BOOKMARKS);
   });
 });

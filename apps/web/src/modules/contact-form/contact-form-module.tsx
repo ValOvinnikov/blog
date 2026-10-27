@@ -1,5 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
+import { CONTACT_FORM_LOG } from '@web/constants/contact-form';
 import { routing } from '@web/i18n/routing';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import {
@@ -8,9 +9,7 @@ import {
 } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
-import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
-import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
+import { isRequestTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 
 import { ContactFormModuleView } from './contact-form-module-view';
@@ -22,16 +21,15 @@ export const ContactFormModule = async ({
   context,
 }: TContactFormModuleProps) => {
   const {
-    tenantId,
     sanityContext,
     locale,
     defaultLocale = routing.defaultLocale,
   } = await getRequestContext();
-  const [isEnabled, tenant] = await Promise.all([
+  const [isEnabled, isActive] = await Promise.all([
     isCapabilityEnabled(CAPABILITY.CONTACT_FORM),
-    resolveRequestTenant(tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER),
+    isRequestTenantActive(),
   ]);
-  if (!isEnabled || !tenant || !isTenantActive(tenant)) return null;
+  if (!isEnabled || !isActive) return null;
 
   const result = await service.modules.contactForm.v1.getContactForm(
     id,
@@ -39,7 +37,7 @@ export const ContactFormModule = async ({
   );
 
   if (!result.ok) {
-    logger.error('contact_form_module.fetch_failed', {
+    logger.error(CONTACT_FORM_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });

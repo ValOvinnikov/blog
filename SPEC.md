@@ -1549,7 +1549,9 @@ readable while nothing new lands against it. The first lives in
 `apps/web/src/server/tenant/resolve-tenant/` and the second in
 `write-gate/`, and every tenant-scoped mutation checks it — through
 `resolveWritableTenant` or the host write context's `isActive` — one shared predicate rather than a per-call-site status check, since
-independent predicates drift apart. The asymmetry is the point: a suspended
+independent predicates drift apart. The contact form, the newsletter signup
+and the bookmark button render only when `isRequestTenantActive()` holds, so a
+suspended site never offers them only to refuse the write. The asymmetry is the point: a suspended
 tenant should still be visible, and a frozen or torn-down one should not
 accumulate rows that a later restore would have to reconcile.
 
