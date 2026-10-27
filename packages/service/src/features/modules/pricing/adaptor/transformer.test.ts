@@ -20,8 +20,21 @@ import {
   mockRawPricingPrice,
   mockRawPricingTier,
 } from '@blog/service/testing/modules/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toPricingModule } from './transformer';
+
+faker.seed(6014);
+
+const MOCK_PRICE_KEY = faker.string.uuid();
+const MOCK_PRICE_AMOUNT = faker.number.int({ min: 10, max: 99 });
+const MOCK_COMPARE_AT_AMOUNT = MOCK_PRICE_AMOUNT + 10;
+const MOCK_THIRD_FEATURE_KEY = faker.string.uuid();
+const MOCK_FIRST_TIER_KEY = faker.string.uuid();
+const MOCK_SECOND_TIER_KEY = faker.string.uuid();
+const MOCK_THIRD_TIER_KEY = faker.string.uuid();
+const MOCK_FIRST_TIER_NAME = faker.lorem.word();
+const MOCK_THIRD_TIER_NAME = faker.lorem.word();
 
 describe(toPricingModule, () => {
   it('maps a full module', () => {
@@ -37,10 +50,10 @@ describe(toPricingModule, () => {
           description: MOCK_PRICING_TIER_DESCRIPTION,
           prices: [
             mockRawPricingPrice({
-              _key: 'price-month',
+              _key: MOCK_PRICE_KEY,
               period: PRICE_PERIOD.MONTH,
-              amount: 29,
-              compareAtAmount: 39,
+              amount: MOCK_PRICE_AMOUNT,
+              compareAtAmount: MOCK_COMPARE_AT_AMOUNT,
               isStartingAt: true,
             }),
           ],
@@ -66,7 +79,7 @@ describe(toPricingModule, () => {
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
     expect(module.footnote).toBe(MOCK_PRICING_FOOTNOTE);
-    expect(module.ctaButtons).toHaveLength(1);
+    expect(module.ctaButtons).toEqual([mockCtaButtonView()]);
     expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
     expect(module.tiers).toEqual([
       {
@@ -76,8 +89,8 @@ describe(toPricingModule, () => {
         prices: [
           {
             period: PRICE_PERIOD.MONTH,
-            amount: 29,
-            compareAtAmount: 39,
+            amount: MOCK_PRICE_AMOUNT,
+            compareAtAmount: MOCK_COMPARE_AT_AMOUNT,
             isStartingAt: true,
           },
         ],
@@ -100,7 +113,10 @@ describe(toPricingModule, () => {
               text: MOCK_UNLIMITED_POSTS_FEATURE,
             },
             { _key: MOCK_SECOND_PRICING_FEATURE_KEY, text: null },
-            { _key: 'feature-3', text: MOCK_PRIORITY_SUPPORT_FEATURE },
+            {
+              _key: MOCK_THIRD_FEATURE_KEY,
+              text: MOCK_PRIORITY_SUPPORT_FEATURE,
+            },
           ],
         }),
       ],
@@ -115,23 +131,32 @@ describe(toPricingModule, () => {
   it('keeps tiers in authored order', () => {
     const raw = mockRawPricingModule({
       tiers: [
-        mockRawPricingTier({ _key: 'tier-1', name: 'Starter' }),
-        mockRawPricingTier({ _key: 'tier-2', name: MOCK_PRICING_TIER_NAME }),
-        mockRawPricingTier({ _key: 'tier-3', name: 'Team' }),
+        mockRawPricingTier({
+          _key: MOCK_FIRST_TIER_KEY,
+          name: MOCK_FIRST_TIER_NAME,
+        }),
+        mockRawPricingTier({
+          _key: MOCK_SECOND_TIER_KEY,
+          name: MOCK_PRICING_TIER_NAME,
+        }),
+        mockRawPricingTier({
+          _key: MOCK_THIRD_TIER_KEY,
+          name: MOCK_THIRD_TIER_NAME,
+        }),
       ],
     });
 
     const module = toPricingModule(raw);
 
     expect(module.tiers.map((tier) => tier.id)).toEqual([
-      'tier-1',
-      'tier-2',
-      'tier-3',
+      MOCK_FIRST_TIER_KEY,
+      MOCK_SECOND_TIER_KEY,
+      MOCK_THIRD_TIER_KEY,
     ]);
     expect(module.tiers.map((tier) => tier.name)).toEqual([
-      'Starter',
+      MOCK_FIRST_TIER_NAME,
       MOCK_PRICING_TIER_NAME,
-      'Team',
+      MOCK_THIRD_TIER_NAME,
     ]);
   });
 
@@ -172,7 +197,7 @@ describe(toPricingModule, () => {
     expect(module.tiers[0]?.highlightLabel).toBeUndefined();
   });
 
-  it('folds an absent isStartingAt to false', () => {
+  it('treats a price with no starting-at flag as a fixed price', () => {
     const raw = mockRawPricingModule({
       tiers: [
         mockRawPricingTier({
@@ -186,7 +211,7 @@ describe(toPricingModule, () => {
     expect(module.tiers[0]?.prices[0]?.isStartingAt).toBe(false);
   });
 
-  it('leaves footnote, contentAlignment and layout undefined when unset', () => {
+  it('leaves the optional footnote, alignment and layout undefined when unset', () => {
     const raw = mockRawPricingModule({
       footnote: null,
       contentAlignment: null,

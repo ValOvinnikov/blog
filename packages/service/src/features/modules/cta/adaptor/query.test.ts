@@ -1,9 +1,6 @@
 import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import {
-  MOCK_CTA_MODULE_ID,
-  mockRawCtaModule,
-} from '@blog/service/testing/modules/fixtures';
+import { mockRawCtaModule } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
@@ -15,58 +12,63 @@ import {
   mockLocalizedStrings,
   mockLocalizedValues,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { ctaModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const EN_COPY = {
-  eyebrow: 'Newsletter',
-  heading: 'Subscribe',
-  supportingText: 'New posts weekly.',
-  footnote: 'Unsubscribe any time.',
-  alt: 'A letter',
+faker.seed(6014);
+
+const MOCK_CTA_ID = faker.string.uuid();
+
+const MOCK_EN_COPY = {
+  eyebrow: faker.lorem.words(2),
+  heading: faker.lorem.words(3),
+  supportingText: faker.lorem.sentence(),
+  footnote: faker.lorem.sentence(),
+  alt: faker.lorem.words(2),
   content: MOCK_ENGLISH_TEXT,
 };
 
-const NL_COPY = {
-  eyebrow: 'Nieuwsbrief',
-  heading: 'Abonneer',
-  supportingText: 'Wekelijks nieuwe berichten.',
-  footnote: 'Altijd opzegbaar.',
-  alt: 'Een brief',
+const MOCK_NL_COPY = {
+  eyebrow: faker.lorem.words(2),
+  heading: faker.lorem.words(3),
+  supportingText: faker.lorem.sentence(),
+  footnote: faker.lorem.sentence(),
+  alt: faker.lorem.words(2),
   content: MOCK_DUTCH_TEXT,
 };
 
-const ctaDocument = {
-  _id: MOCK_CTA_MODULE_ID,
+const MOCK_CTA_DOCUMENT = {
+  _id: MOCK_CTA_ID,
   _type: 'module_cta',
   variant: CTA_VARIANT.SPLIT,
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockLocalizedHeadingBlock(
     {
-      [EN]: EN_COPY.heading,
-      [NL]: NL_COPY.heading,
+      [EN]: MOCK_EN_COPY.heading,
+      [NL]: MOCK_NL_COPY.heading,
     },
     {
       supportingText: mockLocalizedValues('internationalizedArrayTextValue', {
-        [EN]: EN_COPY.supportingText,
-        [NL]: NL_COPY.supportingText,
+        [EN]: MOCK_EN_COPY.supportingText,
+        [NL]: MOCK_NL_COPY.supportingText,
       }),
     },
   ),
   footnote: mockLocalizedStrings({
-    [EN]: EN_COPY.footnote,
-    [NL]: NL_COPY.footnote,
+    [EN]: MOCK_EN_COPY.footnote,
+    [NL]: MOCK_NL_COPY.footnote,
   }),
-  image: mockLocalizedImage({ [EN]: EN_COPY.alt, [NL]: NL_COPY.alt }),
+  image: mockLocalizedImage({ [EN]: MOCK_EN_COPY.alt, [NL]: MOCK_NL_COPY.alt }),
   eyebrow: mockLocalizedStrings({
-    [EN]: EN_COPY.eyebrow,
-    [NL]: NL_COPY.eyebrow,
+    [EN]: MOCK_EN_COPY.eyebrow,
+    [NL]: MOCK_NL_COPY.eyebrow,
   }),
   content: mockLocalizedListedText({
-    [EN]: EN_COPY.content,
-    [NL]: NL_COPY.content,
+    [EN]: MOCK_EN_COPY.content,
+    [NL]: MOCK_NL_COPY.content,
   }),
 };
 
@@ -75,7 +77,7 @@ async function runCta(document: Record<string, unknown>, locale: string) {
     ctaModuleQuery.query,
     [document, MOCK_IMAGE_ASSET_DOCUMENT],
     undefined,
-    { id: MOCK_CTA_MODULE_ID, locale, defaultLocale: EN },
+    { id: MOCK_CTA_ID, locale, defaultLocale: EN },
   );
 
   return ctaModuleQuery.parse(raw);
@@ -89,34 +91,31 @@ describe('ctaModuleQuery', () => {
   });
 
   it.each([
-    ['picks them in the visitor language', NL, NL_COPY],
-    ['falls back to the default language', FR, EN_COPY],
-  ])(
-    'eyebrow, heading, footnote, image alt and content: %s',
-    async (_, locale, copy) => {
-      const cta = await runCta(ctaDocument, locale);
+    ['picks them in the visitor language', NL, MOCK_NL_COPY],
+    ['falls back to the default language', FR, MOCK_EN_COPY],
+  ])('localizes every copy field: %s', async (_, locale, copy) => {
+    const cta = await runCta(MOCK_CTA_DOCUMENT, locale);
 
-      expect(cta).toMatchObject({
-        eyebrow: copy.eyebrow,
-        headingBlock: {
-          heading: copy.heading,
-          supportingText: copy.supportingText,
-        },
-        footnote: copy.footnote,
-        image: { alt: copy.alt },
-        content: [{ children: [{ text: copy.content }] }],
-      });
-    },
-  );
+    expect(cta).toMatchObject({
+      eyebrow: copy.eyebrow,
+      headingBlock: {
+        heading: copy.heading,
+        supportingText: copy.supportingText,
+      },
+      footnote: copy.footnote,
+      image: { alt: copy.alt },
+      content: [{ children: [{ text: copy.content }] }],
+    });
+  });
 
   it('leaves optional localized fields null when no language has a value', async () => {
     const cta = await runCta(
       {
-        ...ctaDocument,
+        ...MOCK_CTA_DOCUMENT,
         eyebrow: undefined,
         content: undefined,
         footnote: undefined,
-        headingBlock: mockLocalizedHeadingBlock({ [EN]: EN_COPY.heading }),
+        headingBlock: mockLocalizedHeadingBlock({ [EN]: MOCK_EN_COPY.heading }),
       },
       NL,
     );
@@ -132,8 +131,8 @@ describe('ctaModuleQuery', () => {
   it('loads the image with a null alt when it has no alt in either language', async () => {
     const cta = await runCta(
       {
-        ...ctaDocument,
-        image: { ...ctaDocument.image, alt: undefined },
+        ...MOCK_CTA_DOCUMENT,
+        image: { ...MOCK_CTA_DOCUMENT.image, alt: undefined },
       },
       NL,
     );
@@ -145,7 +144,7 @@ describe('ctaModuleQuery', () => {
     await expect(
       runCta(
         {
-          ...ctaDocument,
+          ...MOCK_CTA_DOCUMENT,
           headingBlock: { _type: 'moduleHeadingBlock' },
         },
         NL,

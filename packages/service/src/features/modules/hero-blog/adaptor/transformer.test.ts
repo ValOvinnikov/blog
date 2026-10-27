@@ -6,6 +6,7 @@ import {
   HERO_VARIANT,
   LINK_TYPE,
   MEDIA_ORDER,
+  routes,
 } from '@blog/config';
 import { MOCK_TOPIC_TITLE } from '@blog/service/testing/entities/fixtures';
 import {
@@ -25,18 +26,21 @@ import {
   mockRawSanityImage,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toHeroBlogModule, type TRawHeroBlogModule } from './transformer';
 
-const SECONDARY_LABEL = 'View all posts';
-const AUTHORED_ACTION_LABEL = 'Discover the story';
+faker.seed(6014);
+
+const MOCK_SECONDARY_LABEL = faker.lorem.words(3);
+const MOCK_AUTHORED_ACTION_LABEL = faker.lorem.words(3);
 
 function rawWithPost(overrides: Partial<TRawHeroBlogModule> = {}) {
   return mockRawHeroBlogModule({ post: mockRawPostCard(), ...overrides });
 }
 
 describe(toHeroBlogModule, () => {
-  it('maps brandVariant and variant straight through', () => {
+  it('keeps the authored brand variant and variant', () => {
     const raw = mockRawHeroBlogModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
@@ -76,7 +80,7 @@ describe(toHeroBlogModule, () => {
     },
   );
 
-  it('reports the post and derives the heading and supporting text from it', () => {
+  it('derives the heading and supporting text from the resolved post', () => {
     const raw = rawWithPost({
       eyebrow: null,
     });
@@ -119,9 +123,9 @@ describe(toHeroBlogModule, () => {
     expect(hero.sanityImage?.alt).toBe(MOCK_HERO_IMAGE_ALT);
   });
 
-  it('builds the primary button from the authored label, linking to the resolved post', () => {
+  it('builds the primary button from the authored label and the post link', () => {
     const raw = rawWithPost({
-      primaryActionLabel: AUTHORED_ACTION_LABEL,
+      primaryActionLabel: MOCK_AUTHORED_ACTION_LABEL,
       primaryActionAppearance: CTA_ACTION_APPEARANCE.CONTAINED,
     });
 
@@ -131,14 +135,14 @@ describe(toHeroBlogModule, () => {
       variant: CTA_ACTION_VARIANT.PRIMARY,
       appearance: CTA_ACTION_APPEARANCE.CONTAINED,
       link: mockLinkView({
-        label: AUTHORED_ACTION_LABEL,
+        label: MOCK_AUTHORED_ACTION_LABEL,
         href: MOCK_POST_HREF,
       }),
     });
   });
 
   it.each([CTA_ACTION_APPEARANCE.CONTAINED, CTA_ACTION_APPEARANCE.INLINE])(
-    'carries the authored primaryActionAppearance %s onto the primary button',
+    'gives the primary button the authored %s appearance',
     (appearance) => {
       const raw = rawWithPost({
         primaryActionAppearance: appearance,
@@ -156,7 +160,7 @@ describe(toHeroBlogModule, () => {
         variant: CTA_ACTION_VARIANT.SECONDARY,
         appearance: null,
         link: {
-          label: SECONDARY_LABEL,
+          label: MOCK_SECONDARY_LABEL,
           linkType: LINK_TYPE.INTERNAL,
           internalReference: { _type: 'page_postIndex', slug: null },
           url: null,
@@ -167,14 +171,17 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
+    const [primary, secondary] = hero.ctaButtons;
+
     expect(hero.ctaButtons).toHaveLength(2);
-    expect(hero.ctaButtons[0]).toMatchObject({
-      variant: CTA_ACTION_VARIANT.PRIMARY,
-    });
-    expect(hero.ctaButtons[1]).toEqual({
+    expect(primary?.variant).toBe(CTA_ACTION_VARIANT.PRIMARY);
+    expect(secondary).toEqual({
       variant: CTA_ACTION_VARIANT.SECONDARY,
       appearance: undefined,
-      link: mockLinkView({ label: SECONDARY_LABEL, href: '/blog' }),
+      link: mockLinkView({
+        label: MOCK_SECONDARY_LABEL,
+        href: routes.blogIndex(),
+      }),
     });
   });
 
@@ -196,7 +203,7 @@ describe(toHeroBlogModule, () => {
     expect(hero.ctaButtons).toEqual([]);
   });
 
-  it('takes contentPosition and mediaOrder from the Split keys', () => {
+  it('takes content position and media order from the Split fields', () => {
     const raw = mockRawHeroBlogModule({
       variant: HERO_VARIANT.SPLIT,
       contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,
@@ -214,7 +221,7 @@ describe(toHeroBlogModule, () => {
   it.each([
     [null, undefined],
     [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
-  ])('maps contentAlignment %s to %s', (contentAlignment, expected) => {
+  ])('maps content alignment %s to %s', (contentAlignment, expected) => {
     const raw = mockRawHeroBlogModule({ contentAlignment });
 
     const hero = toHeroBlogModule(raw);

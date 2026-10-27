@@ -18,3 +18,5 @@ export function mockTenant(
     ...overrides,
   };
 }
+
+export const MOCK_TENANT = mockTenant();

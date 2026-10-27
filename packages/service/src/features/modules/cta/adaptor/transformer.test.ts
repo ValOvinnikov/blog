@@ -13,39 +13,53 @@ import {
   mockRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
+  MOCK_LINK_LABEL,
   MOCK_POST_HREF,
   MOCK_POST_SLUG,
+  mockRawHeadingBlock,
   mockRawSanityImage,
   mockRawWideLayout,
   mockSanityImageView,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toCtaModule } from './transformer';
 
-const AUTHORED_EYEBROW_AND_FOOTNOTE = {
-  eyebrow: 'Limited time',
-  footnote: 'No spam, unsubscribe anytime.',
+faker.seed(6014);
+
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_AUTHORED_EYEBROW_AND_FOOTNOTE = {
+  eyebrow: faker.lorem.words(2),
+  footnote: faker.lorem.sentence(),
 };
 
-describe('toCtaModule', () => {
+describe(toCtaModule, () => {
   it('maps headingBlock', () => {
-    const raw = mockRawCtaModule();
+    const raw = mockRawCtaModule({
+      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+        supportingText: MOCK_SUPPORTING_TEXT,
+      }),
+    });
 
     const cta = toCtaModule(raw);
 
     expect(cta.headingBlock).toEqual({
-      heading: 'Subscribe to the newsletter',
-      supportingText: 'Get new posts in your inbox.',
+      heading: MOCK_HEADING,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
   });
 
-  it('maps brandVariant straight through, including BRAND_PRIMARY', () => {
-    const raw = mockRawCtaModule({ brandVariant: BRAND_VARIANT.BRAND_PRIMARY });
+  it.each([BRAND_VARIANT.SECONDARY, BRAND_VARIANT.BRAND_PRIMARY])(
+    'maps brandVariant %s straight through',
+    (brandVariant) => {
+      const raw = mockRawCtaModule({ brandVariant });
 
-    const cta = toCtaModule(raw);
+      const cta = toCtaModule(raw);
 
-    expect(cta.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-  });
+      expect(cta.brandVariant).toBe(brandVariant);
+    },
+  );
 
   it.each([
     [BRAND_VARIANT.SECONDARY, BRAND_VARIANT.SECONDARY],
@@ -122,7 +136,7 @@ describe('toCtaModule', () => {
       { eyebrow: null, footnote: null },
       { eyebrow: undefined, footnote: undefined },
     ],
-    [AUTHORED_EYEBROW_AND_FOOTNOTE, AUTHORED_EYEBROW_AND_FOOTNOTE],
+    [MOCK_AUTHORED_EYEBROW_AND_FOOTNOTE, MOCK_AUTHORED_EYEBROW_AND_FOOTNOTE],
   ])('maps eyebrow and footnote %o to %o', (authored, expected) => {
     const raw = mockRawCtaModule(authored);
 
@@ -140,28 +154,23 @@ describe('toCtaModule', () => {
   });
 
   it('resolves an internal-document link inside content to a real href', () => {
+    const markDef = mockRawContentMarkDef({
+      link: {
+        label: MOCK_LINK_LABEL,
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: 'page_post', slug: MOCK_POST_SLUG },
+        url: null,
+        openInNewTab: null,
+      },
+    });
     const raw = mockRawCtaModule({
-      content: [
-        mockRawContentBlock({
-          markDefs: [
-            mockRawContentMarkDef({
-              link: {
-                label: 'Learn more',
-                linkType: LINK_TYPE.INTERNAL,
-                internalReference: { _type: 'page_post', slug: MOCK_POST_SLUG },
-                url: null,
-                openInNewTab: null,
-              },
-            }),
-          ],
-        }),
-      ],
+      content: [mockRawContentBlock({ markDefs: [markDef] })],
     });
 
     const cta = toCtaModule(raw);
 
     expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
-      _key: 'mark-1',
+      _key: markDef._key,
       _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
       link: { href: MOCK_POST_HREF },
     });

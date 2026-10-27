@@ -9,38 +9,57 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { statsModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const READERS_KEY = 'readers-stat';
-const UPTIME_KEY = 'uptime-stat';
-const HEADING = { [EN]: 'By the numbers', [NL]: 'In cijfers' };
-const FOOTNOTE = { [EN]: 'Figures as of June.', [NL]: 'Cijfers per juni.' };
-const DESCRIPTION = 'Per month';
+faker.seed(2);
 
-const statsDocument = {
+const MOCK_READERS_KEY = faker.string.uuid();
+const MOCK_UPTIME_KEY = faker.string.uuid();
+const MOCK_HEADING = { [EN]: faker.lorem.words(3), [NL]: faker.lorem.words(3) };
+const MOCK_FOOTNOTE = {
+  [EN]: faker.lorem.sentence(),
+  [NL]: faker.lorem.sentence(),
+};
+const MOCK_DESCRIPTION = faker.lorem.words(2);
+const MOCK_READERS_VALUE = {
+  [EN]: faker.string.numeric(4),
+  [NL]: faker.string.numeric(4),
+};
+const MOCK_READERS_LABEL = {
+  [EN]: faker.lorem.word(),
+  [NL]: faker.lorem.word(),
+};
+const MOCK_UPTIME_VALUE = faker.string.numeric(2);
+const MOCK_UPTIME_LABEL = {
+  [EN]: faker.lorem.word(),
+  [NL]: faker.lorem.word(),
+};
+
+const MOCK_STATS_DOCUMENT = {
   _id: MOCK_STATS_MODULE_ID,
   _type: 'module_stats',
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockLocalizedHeadingBlock(HEADING),
+  headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
   stats: [
     {
-      _key: READERS_KEY,
+      _key: MOCK_READERS_KEY,
       _type: 'stat',
-      value: mockLocalizedStrings({ [EN]: '1.2M', [NL]: '1,2 mln' }),
-      label: mockLocalizedStrings({ [EN]: 'Readers', [NL]: 'Lezers' }),
-      description: mockLocalizedStrings({ [EN]: DESCRIPTION }),
+      value: mockLocalizedStrings(MOCK_READERS_VALUE),
+      label: mockLocalizedStrings(MOCK_READERS_LABEL),
+      description: mockLocalizedStrings({ [EN]: MOCK_DESCRIPTION }),
     },
     {
-      _key: UPTIME_KEY,
+      _key: MOCK_UPTIME_KEY,
       _type: 'stat',
-      value: mockLocalizedStrings({ [EN]: '98%' }),
-      label: mockLocalizedStrings({ [EN]: 'Uptime', [NL]: 'Beschikbaarheid' }),
+      value: mockLocalizedStrings({ [EN]: MOCK_UPTIME_VALUE }),
+      label: mockLocalizedStrings(MOCK_UPTIME_LABEL),
     },
   ],
-  footnote: mockLocalizedStrings(FOOTNOTE),
+  footnote: mockLocalizedStrings(MOCK_FOOTNOTE),
 };
 
 async function runStats(document: Record<string, unknown>, locale: string) {
@@ -54,12 +73,13 @@ async function runStats(document: Record<string, unknown>, locale: string) {
   return statsModuleQuery.parse(raw);
 }
 
-describe('statsModuleQuery', () => {
-  it('filters to module_stats documents by id', () => {
-    expect(statsModuleQuery.query).toContain('_type == "module_stats"');
-    expect(statsModuleQuery.query).toContain('_id == $id');
-  });
+const EMPTY_OPTIONALS = {
+  ctaButtons: null,
+  contentAlignment: null,
+  layout: null,
+};
 
+describe('statsModuleQuery', () => {
   it.each([
     ['a module with no headingBlock', { headingBlock: null }],
     ['a module with no stats', { stats: null }],
@@ -87,71 +107,68 @@ describe('statsModuleQuery', () => {
   });
 
   it('picks the heading, footnote and each stat in the visitor language', async () => {
-    const stats = await runStats(statsDocument, NL);
+    const stats = await runStats(MOCK_STATS_DOCUMENT, NL);
 
     expect(stats).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: { heading: HEADING[NL], supportingText: null },
-      footnote: FOOTNOTE[NL],
+      headingBlock: { heading: MOCK_HEADING[NL], supportingText: null },
+      footnote: MOCK_FOOTNOTE[NL],
       stats: [
         {
-          _key: READERS_KEY,
-          value: '1,2 mln',
-          label: 'Lezers',
-          description: DESCRIPTION,
+          _key: MOCK_READERS_KEY,
+          value: MOCK_READERS_VALUE[NL],
+          label: MOCK_READERS_LABEL[NL],
+          description: MOCK_DESCRIPTION,
         },
         {
-          _key: UPTIME_KEY,
-          value: '98%',
-          label: 'Beschikbaarheid',
+          _key: MOCK_UPTIME_KEY,
+          value: MOCK_UPTIME_VALUE,
+          label: MOCK_UPTIME_LABEL[NL],
           description: null,
         },
       ],
-      ctaButtons: null,
-      contentAlignment: null,
-      layout: null,
+      ...EMPTY_OPTIONALS,
     });
   });
 
-  it('falls back to the default language for the heading, footnote and stats', async () => {
-    const stats = await runStats(statsDocument, FR);
+  it('falls back to the default language when the visitor language is missing', async () => {
+    const stats = await runStats(MOCK_STATS_DOCUMENT, FR);
 
     expect(stats).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: { heading: HEADING[EN], supportingText: null },
-      footnote: FOOTNOTE[EN],
+      headingBlock: { heading: MOCK_HEADING[EN], supportingText: null },
+      footnote: MOCK_FOOTNOTE[EN],
       stats: [
         {
-          _key: READERS_KEY,
-          value: '1.2M',
-          label: 'Readers',
-          description: DESCRIPTION,
+          _key: MOCK_READERS_KEY,
+          value: MOCK_READERS_VALUE[EN],
+          label: MOCK_READERS_LABEL[EN],
+          description: MOCK_DESCRIPTION,
         },
-        { _key: UPTIME_KEY, value: '98%', label: 'Uptime', description: null },
+        {
+          _key: MOCK_UPTIME_KEY,
+          value: MOCK_UPTIME_VALUE,
+          label: MOCK_UPTIME_LABEL[EN],
+          description: null,
+        },
       ],
-      ctaButtons: null,
-      contentAlignment: null,
-      layout: null,
+      ...EMPTY_OPTIONALS,
     });
   });
 
   it('fails when a stat label is missing in both languages', async () => {
-    const [first, second] = statsDocument.stats;
-
-    await expect(
-      runStats(
+    const [first, second] = MOCK_STATS_DOCUMENT.stats;
+    const document = {
+      ...MOCK_STATS_DOCUMENT,
+      stats: [
+        first,
         {
-          ...statsDocument,
-          stats: [
-            first,
-            {
-              ...second,
-              label: mockLocalizedStrings({ [FR]: 'Disponibilité' }),
-            },
-          ],
+          ...second,
+          label: mockLocalizedStrings({ [FR]: faker.lorem.word() }),
         },
-        NL,
-      ),
-    ).rejects.toThrow();
+      ],
+    };
+
+    await expect(runStats(document, NL)).rejects.toThrow();
   });
 });

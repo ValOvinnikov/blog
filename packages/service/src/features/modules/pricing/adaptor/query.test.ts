@@ -24,6 +24,7 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { pricingModuleQuery } from './query';
 
@@ -31,20 +32,28 @@ const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const TIER_TYPE = 'pricingTier';
 const FEATURE_TYPE = 'pricingFeature';
-const ENTERPRISE = 'Enterprise';
-const DUTCH_UNLIMITED_POSTS = 'Onbeperkt berichten';
-const DUTCH_MOST_POPULAR = 'Populairst';
-const CONTACT_US = 'Contact us';
-const DUTCH_CONTACT_US = 'Neem contact op';
-const DUTCH_VAT_FOOTNOTE = 'Prijzen exclusief btw.';
+faker.seed(6014);
 
-const pricingDocument = {
+const MOCK_ENGLISH_HEADING = faker.lorem.words(2);
+const MOCK_DUTCH_HEADING = faker.lorem.words(2);
+const MOCK_DUTCH_TIER_NAME = faker.lorem.word();
+const MOCK_ENTERPRISE_TIER_NAME = faker.lorem.word();
+const MOCK_FRENCH_ENTERPRISE_TIER_NAME = faker.lorem.word();
+const MOCK_DUTCH_UNLIMITED_POSTS = faker.lorem.words(2);
+const MOCK_DUTCH_MOST_POPULAR = faker.lorem.word();
+const MOCK_CONTACT_US = faker.lorem.words(2);
+const MOCK_DUTCH_CONTACT_US = faker.lorem.words(2);
+const MOCK_DUTCH_VAT_FOOTNOTE = faker.lorem.sentence();
+const MOCK_PRICE_KEY = faker.string.uuid();
+const MOCK_ENTERPRISE_TIER_KEY = faker.string.uuid();
+
+const MOCK_PRICING_DOCUMENT = {
   _id: MOCK_PRICING_MODULE_ID,
   _type: 'module_pricing',
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockLocalizedHeadingBlock({
-    [EN]: 'Plans',
-    [NL]: 'Abonnementen',
+    [EN]: MOCK_ENGLISH_HEADING,
+    [NL]: MOCK_DUTCH_HEADING,
   }),
   tiers: [
     {
@@ -52,19 +61,21 @@ const pricingDocument = {
       _type: TIER_TYPE,
       name: mockLocalizedStrings({
         [EN]: MOCK_PRICING_TIER_NAME,
-        [NL]: 'Professioneel',
+        [NL]: MOCK_DUTCH_TIER_NAME,
       }),
       description: mockLocalizedStrings({
         [EN]: MOCK_PRICING_TIER_DESCRIPTION,
       }),
-      prices: [{ _key: 'price-1', period: PRICE_PERIOD.MONTH, amount: 29 }],
+      prices: [
+        { _key: MOCK_PRICE_KEY, period: PRICE_PERIOD.MONTH, amount: 29 },
+      ],
       features: [
         {
           _key: MOCK_PRICING_FEATURE_KEY,
           _type: FEATURE_TYPE,
           text: mockLocalizedStrings({
             [EN]: MOCK_UNLIMITED_POSTS_FEATURE,
-            [NL]: DUTCH_UNLIMITED_POSTS,
+            [NL]: MOCK_DUTCH_UNLIMITED_POSTS,
           }),
         },
         {
@@ -75,23 +86,23 @@ const pricingDocument = {
       ],
       highlightLabel: mockLocalizedStrings({
         [EN]: MOCK_PRICING_HIGHLIGHT_LABEL,
-        [NL]: DUTCH_MOST_POPULAR,
+        [NL]: MOCK_DUTCH_MOST_POPULAR,
       }),
       footnote: mockLocalizedStrings({ [EN]: MOCK_PRICING_TIER_FOOTNOTE }),
     },
     {
-      _key: 'tier-enterprise',
+      _key: MOCK_ENTERPRISE_TIER_KEY,
       _type: TIER_TYPE,
-      name: mockLocalizedStrings({ [EN]: ENTERPRISE }),
+      name: mockLocalizedStrings({ [EN]: MOCK_ENTERPRISE_TIER_NAME }),
       priceLabel: mockLocalizedStrings({
-        [EN]: CONTACT_US,
-        [NL]: DUTCH_CONTACT_US,
+        [EN]: MOCK_CONTACT_US,
+        [NL]: MOCK_DUTCH_CONTACT_US,
       }),
     },
   ],
   footnote: mockLocalizedStrings({
     [EN]: MOCK_PRICING_FOOTNOTE,
-    [NL]: DUTCH_VAT_FOOTNOTE,
+    [NL]: MOCK_DUTCH_VAT_FOOTNOTE,
   }),
 };
 
@@ -152,35 +163,38 @@ describe('pricingModuleQuery', () => {
   });
 
   it('picks the heading, footnote and every tier text in the visitor language', async () => {
-    const pricing = await runPricing(pricingDocument, NL);
+    const pricing = await runPricing(MOCK_PRICING_DOCUMENT, NL);
 
     expect(pricing).toMatchObject({
-      headingBlock: { heading: 'Abonnementen' },
-      footnote: DUTCH_VAT_FOOTNOTE,
+      headingBlock: { heading: MOCK_DUTCH_HEADING },
+      footnote: MOCK_DUTCH_VAT_FOOTNOTE,
       tiers: [
         {
-          name: 'Professioneel',
+          name: MOCK_DUTCH_TIER_NAME,
           description: MOCK_PRICING_TIER_DESCRIPTION,
           features: [
-            { _key: MOCK_PRICING_FEATURE_KEY, text: DUTCH_UNLIMITED_POSTS },
+            {
+              _key: MOCK_PRICING_FEATURE_KEY,
+              text: MOCK_DUTCH_UNLIMITED_POSTS,
+            },
             {
               _key: MOCK_SECOND_PRICING_FEATURE_KEY,
               text: MOCK_PRIORITY_SUPPORT_FEATURE,
             },
           ],
-          highlightLabel: DUTCH_MOST_POPULAR,
+          highlightLabel: MOCK_DUTCH_MOST_POPULAR,
           footnote: MOCK_PRICING_TIER_FOOTNOTE,
         },
-        { name: ENTERPRISE, priceLabel: DUTCH_CONTACT_US },
+        { name: MOCK_ENTERPRISE_TIER_NAME, priceLabel: MOCK_DUTCH_CONTACT_US },
       ],
     });
   });
 
   it('falls back to the default language for the heading, footnote and tiers', async () => {
-    const pricing = await runPricing(pricingDocument, FR);
+    const pricing = await runPricing(MOCK_PRICING_DOCUMENT, FR);
 
     expect(pricing).toMatchObject({
-      headingBlock: { heading: 'Plans' },
+      headingBlock: { heading: MOCK_ENGLISH_HEADING },
       footnote: MOCK_PRICING_FOOTNOTE,
       tiers: [
         {
@@ -197,21 +211,26 @@ describe('pricingModuleQuery', () => {
           ],
           highlightLabel: MOCK_PRICING_HIGHLIGHT_LABEL,
         },
-        { name: ENTERPRISE, priceLabel: CONTACT_US },
+        { name: MOCK_ENTERPRISE_TIER_NAME, priceLabel: MOCK_CONTACT_US },
       ],
     });
   });
 
   it('fails when a tier name is missing in both languages', async () => {
-    const [first, second] = pricingDocument.tiers;
+    const [first, second] = MOCK_PRICING_DOCUMENT.tiers;
 
     await expect(
       runPricing(
         {
-          ...pricingDocument,
+          ...MOCK_PRICING_DOCUMENT,
           tiers: [
             first,
-            { ...second, name: mockLocalizedStrings({ [FR]: 'Entreprise' }) },
+            {
+              ...second,
+              name: mockLocalizedStrings({
+                [FR]: MOCK_FRENCH_ENTERPRISE_TIER_NAME,
+              }),
+            },
           ],
         },
         NL,

@@ -13,7 +13,7 @@ import { postListModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const moduleDocument = mockModuleDocument({
+const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   _type: 'module_postList',
   pageSize: MOCK_POST_LIST_PAGE_SIZE,
 });
@@ -21,7 +21,7 @@ const moduleDocument = mockModuleDocument({
 async function runPostList(locale: string) {
   const raw = await evaluateGroqExpression(
     postListModuleQuery.query,
-    [moduleDocument],
+    [MOCK_MODULE_DOCUMENT],
     undefined,
     { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -52,15 +52,12 @@ describe('postListModuleQuery', () => {
     });
   });
 
-  it('picks the heading in the visitor language', async () => {
-    const { headingBlock } = await runPostList(NL);
+  it.each([
+    [NL, MOCK_DUTCH_MODULE_HEADING],
+    [FR, MOCK_ENGLISH_MODULE_HEADING],
+  ])('resolves the heading text for a %s visitor', async (locale, expected) => {
+    const { headingBlock } = await runPostList(locale);
 
-    expect(headingBlock.heading).toBe(MOCK_DUTCH_MODULE_HEADING);
-  });
-
-  it('falls back to the default language for the heading', async () => {
-    const { headingBlock } = await runPostList(FR);
-
-    expect(headingBlock.heading).toBe(MOCK_ENGLISH_MODULE_HEADING);
+    expect(headingBlock.heading).toBe(expected);
   });
 });

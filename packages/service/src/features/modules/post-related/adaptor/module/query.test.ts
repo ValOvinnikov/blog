@@ -7,22 +7,25 @@ import {
   mockRawPostRelatedModule,
 } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
 
 import { postRelatedModuleQuery } from './query';
 
+faker.seed(22);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const LIMIT = 3;
+const MOCK_LIMIT = faker.number.int({ min: 1, max: 12 });
 
-const moduleDocument = mockModuleDocument({
+const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   _type: 'module_postRelated',
-  limit: LIMIT,
+  limit: MOCK_LIMIT,
 });
 
 async function runPostRelated(locale: string) {
   const raw = await evaluateGroqExpression(
     postRelatedModuleQuery.query,
-    [moduleDocument],
+    [MOCK_MODULE_DOCUMENT],
     undefined,
     { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -48,7 +51,7 @@ describe('postRelatedModuleQuery', () => {
       const { brandVariant, limit } = postRelated;
 
       expect(brandVariant).toBe(BRAND_VARIANT.PRIMARY);
-      expect(limit).toBe(LIMIT);
+      expect(limit).toBe(MOCK_LIMIT);
     });
 
     it('defaults showImages to true for a document authored without it', () => {

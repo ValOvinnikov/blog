@@ -23,7 +23,7 @@ import {
   MOCK_POST_TITLE,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
 
 import { heroFallbackFeaturedPostQuery } from './featured-post.query';
 import { getHero } from './loader';
@@ -37,13 +37,11 @@ const POST_TAGS = [
   MOCK_TOPIC_CACHE_TAG,
 ];
 
-const tenant = mockTenant();
-
-describe('getHero', () => {
+describe(getHero, () => {
   it('propagates when the hero document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getHero(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(getHero(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toThrow();
   });
 
   describe('when the hero document resolves', () => {
@@ -58,18 +56,18 @@ describe('getHero', () => {
     });
 
     it('resolves the hero using the configured featured post', async () => {
-      const hero = await getHero(MOCK_HERO_MODULE_ID, tenant);
+      const hero = await getHero(MOCK_HERO_MODULE_ID, MOCK_TENANT);
 
       expect(hero.title).toBe(MOCK_POST_TITLE);
       expect(hero.primaryAction?.href).toBe(MOCK_POST_HREF);
     });
 
-    it('threads tenant context into both queries and scopes their tags to it', async () => {
-      await getHero(MOCK_HERO_MODULE_ID, tenant);
+    it('queries both sources with the tenant and tenant-scoped cache tags', async () => {
+      await getHero(MOCK_HERO_MODULE_ID, MOCK_TENANT);
 
       expect(mockRun).toHaveBeenNthCalledWith(1, heroModuleQuery, {
         parameters: { id: MOCK_HERO_MODULE_ID },
-        tenant,
+        tenant: MOCK_TENANT,
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
@@ -86,7 +84,7 @@ describe('getHero', () => {
         2,
         heroFallbackFeaturedPostQuery,
         {
-          tenant,
+          tenant: MOCK_TENANT,
           next: {
             revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
             tags: POST_TAGS,

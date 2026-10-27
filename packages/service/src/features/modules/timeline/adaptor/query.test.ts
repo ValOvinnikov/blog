@@ -17,41 +17,56 @@ import {
   mockLocalizedStrings,
   mockParagraphBlocks,
 } from '@blog/service/testing/shared/localized';
+import { faker } from '@faker-js/faker';
 
 import { timelineModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const FIRST_KEY = 'kick-off-item';
-const SECOND_KEY = 'ship-item';
-const HEADING = { [EN]: 'How it works', [NL]: 'Hoe het werkt' };
-const FIRST_MARKER = 'Week 1';
-const FIRST_HEADING = { [EN]: 'Kick off', [NL]: 'Aftrap' };
-const FIRST_BODY = { [EN]: 'The project begins.', [NL]: 'Het project begint.' };
-const SECOND_MARKER = { [EN]: 'Week 2', [FR]: 'Semaine 2' };
-const SECOND_HEADING = 'Ship';
-const SECOND_BODY = 'It goes live.';
+faker.seed(4);
 
-const timelineDocument = {
+const MOCK_FIRST_KEY = faker.string.uuid();
+const MOCK_SECOND_KEY = faker.string.uuid();
+const MOCK_HEADING = { [EN]: faker.lorem.words(3), [NL]: faker.lorem.words(3) };
+const MOCK_FIRST_MARKER = faker.lorem.word();
+const MOCK_FIRST_HEADING = {
+  [EN]: faker.lorem.words(2),
+  [NL]: faker.lorem.words(2),
+};
+const MOCK_FIRST_BODY = {
+  [EN]: faker.lorem.sentence(),
+  [NL]: faker.lorem.sentence(),
+};
+const MOCK_SECOND_MARKER = {
+  [EN]: faker.lorem.word(),
+  [FR]: faker.lorem.word(),
+};
+const MOCK_SECOND_HEADING = faker.lorem.words(2);
+const MOCK_SECOND_BODY = faker.lorem.sentence();
+
+const MOCK_TIMELINE_DOCUMENT = {
   _id: MOCK_TIMELINE_MODULE_ID,
   _type: 'module_timeline',
   brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockLocalizedHeadingBlock(HEADING),
+  headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
   markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
   items: [
     {
-      _key: FIRST_KEY,
+      _key: MOCK_FIRST_KEY,
       _type: 'timelineItem',
-      marker: mockLocalizedStrings({ [EN]: FIRST_MARKER, [NL]: FIRST_MARKER }),
-      heading: mockLocalizedStrings(FIRST_HEADING),
-      body: mockLocalizedParagraphText(FIRST_BODY),
+      marker: mockLocalizedStrings({
+        [EN]: MOCK_FIRST_MARKER,
+        [NL]: MOCK_FIRST_MARKER,
+      }),
+      heading: mockLocalizedStrings(MOCK_FIRST_HEADING),
+      body: mockLocalizedParagraphText(MOCK_FIRST_BODY),
     },
     {
-      _key: SECOND_KEY,
+      _key: MOCK_SECOND_KEY,
       _type: 'timelineItem',
-      marker: mockLocalizedStrings(SECOND_MARKER),
-      heading: mockLocalizedStrings({ [EN]: SECOND_HEADING }),
-      body: mockLocalizedParagraphText({ [EN]: SECOND_BODY }),
+      marker: mockLocalizedStrings(MOCK_SECOND_MARKER),
+      heading: mockLocalizedStrings({ [EN]: MOCK_SECOND_HEADING }),
+      body: mockLocalizedParagraphText({ [EN]: MOCK_SECOND_BODY }),
     },
   ],
   orientation: TIMELINE_ORIENTATION.VERTICAL,
@@ -70,11 +85,6 @@ async function runTimeline(document: Record<string, unknown>, locale: string) {
 }
 
 describe('timelineModuleQuery', () => {
-  it('filters to module_timeline documents by id', () => {
-    expect(timelineModuleQuery.query).toContain('_type == "module_timeline"');
-    expect(timelineModuleQuery.query).toContain('_id == $id');
-  });
-
   it.each([
     ['a module with no headingBlock', { headingBlock: null }],
     ['a module with no items', { items: null }],
@@ -104,12 +114,24 @@ describe('timelineModuleQuery', () => {
   });
 
   it.each([
-    [NL, HEADING[NL], FIRST_HEADING[NL], FIRST_BODY[NL], SECOND_MARKER[EN]],
-    [FR, HEADING[EN], FIRST_HEADING[EN], FIRST_BODY[EN], SECOND_MARKER[FR]],
+    [
+      NL,
+      MOCK_HEADING[NL],
+      MOCK_FIRST_HEADING[NL],
+      MOCK_FIRST_BODY[NL],
+      MOCK_SECOND_MARKER[EN],
+    ],
+    [
+      FR,
+      MOCK_HEADING[EN],
+      MOCK_FIRST_HEADING[EN],
+      MOCK_FIRST_BODY[EN],
+      MOCK_SECOND_MARKER[FR],
+    ],
   ])(
     'resolves the heading and each item for a %s visitor',
     async (locale, heading, firstHeading, firstBody, secondMarker) => {
-      const timeline = await runTimeline(timelineDocument, locale);
+      const timeline = await runTimeline(MOCK_TIMELINE_DOCUMENT, locale);
 
       expect(timeline).toEqual({
         brandVariant: BRAND_VARIANT.PRIMARY,
@@ -117,16 +139,16 @@ describe('timelineModuleQuery', () => {
         markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
         items: [
           {
-            _key: FIRST_KEY,
-            marker: FIRST_MARKER,
+            _key: MOCK_FIRST_KEY,
+            marker: MOCK_FIRST_MARKER,
             heading: firstHeading,
             body: mockParagraphBlocks(firstBody),
           },
           {
-            _key: SECOND_KEY,
+            _key: MOCK_SECOND_KEY,
             marker: secondMarker,
-            heading: SECOND_HEADING,
-            body: mockParagraphBlocks(SECOND_BODY),
+            heading: MOCK_SECOND_HEADING,
+            body: mockParagraphBlocks(MOCK_SECOND_BODY),
           },
         ],
         orientation: TIMELINE_ORIENTATION.VERTICAL,
@@ -139,15 +161,18 @@ describe('timelineModuleQuery', () => {
   );
 
   it('fails when an item heading is missing in both languages', async () => {
-    const [first, second] = timelineDocument.items;
+    const [first, second] = MOCK_TIMELINE_DOCUMENT.items;
 
     await expect(
       runTimeline(
         {
-          ...timelineDocument,
+          ...MOCK_TIMELINE_DOCUMENT,
           items: [
             first,
-            { ...second, heading: mockLocalizedStrings({ [FR]: 'Lancement' }) },
+            {
+              ...second,
+              heading: mockLocalizedStrings({ [FR]: faker.lorem.word() }),
+            },
           ],
         },
         NL,

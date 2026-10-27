@@ -19,7 +19,8 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPostLatest } from './loader';
 import { postLatestModulePostsQuery } from './posts.query';
@@ -27,15 +28,16 @@ import { postLatestModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const LIMIT = 3;
+faker.seed(6014);
 
-const tenant = mockTenant();
+const MOCK_LIMIT = 3;
+const MOCK_POST_CARD_ID = faker.string.uuid();
 
 describe(getPostLatest, () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getPostLatest(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(getPostLatest(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toThrow();
   });
 
   describe('with a resolved module', () => {
@@ -44,33 +46,40 @@ describe(getPostLatest, () => {
         .mockResolvedValueOnce(
           mockRawPostLatestModule({
             headingBlock: mockRawHeadingBlock(MOCK_RECENT_POSTS_HEADING),
-            limit: LIMIT,
+            limit: MOCK_LIMIT,
           }),
         )
-        .mockResolvedValueOnce([mockRawPostCard({ _id: 'a' })]);
+        .mockResolvedValueOnce([mockRawPostCard({ _id: MOCK_POST_CARD_ID })]);
     });
 
-    it('bounds the posts query by the module limit and maps the result', async () => {
+    it('maps the module and its posts', async () => {
       const postLatest = await getPostLatest(
         MOCK_POST_LATEST_MODULE_ID,
-        tenant,
+        MOCK_TENANT,
       );
+
+      expect(postLatest.headingBlock.heading).toBe(MOCK_RECENT_POSTS_HEADING);
+      expect(postLatest.posts.map(({ id }) => id)).toEqual([MOCK_POST_CARD_ID]);
+    });
+
+    it('fetches only as many posts as the module limit allows', async () => {
+      await getPostLatest(MOCK_POST_LATEST_MODULE_ID, MOCK_TENANT);
 
       const [postsQuery] = mockRun.mock.calls[1] ?? [];
 
-      expect(postsQuery.query).toBe(postLatestModulePostsQuery(LIMIT).query);
-      expect(postLatest.headingBlock.heading).toBe(MOCK_RECENT_POSTS_HEADING);
-      expect(postLatest.posts.map((p) => p.id)).toEqual(['a']);
+      expect(postsQuery.query).toBe(
+        postLatestModulePostsQuery(MOCK_LIMIT).query,
+      );
     });
 
-    it('threads tenant context into both queries and scopes their tags to it', async () => {
-      await getPostLatest(MOCK_POST_LATEST_MODULE_ID, tenant);
+    it('queries within the tenant and tags both queries to it', async () => {
+      await getPostLatest(MOCK_POST_LATEST_MODULE_ID, MOCK_TENANT);
 
       const [, postsOptions] = mockRun.mock.calls[1] ?? [];
 
       expect(mockRun).toHaveBeenNthCalledWith(1, postLatestModuleQuery, {
         parameters: { id: MOCK_POST_LATEST_MODULE_ID },
-        tenant,
+        tenant: MOCK_TENANT,
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
@@ -80,7 +89,7 @@ describe(getPostLatest, () => {
         },
       });
       expect(postsOptions).toEqual({
-        tenant,
+        tenant: MOCK_TENANT,
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
