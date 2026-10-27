@@ -105,7 +105,8 @@ Free site.
 
 - The Auth.js tables in Neon (`users`, `accounts`, `sessions`,
   `verification_tokens`) with the `database` session strategy. On sign-in,
-  pending `membership_invites` for the email become `memberships`.
+  pending `membership_invites` for the exact email, found through its keyed
+  index, become `memberships`.
 - `@blog/db`'s `createSelfServeTenant`
   writes a FREE tenant (status ACTIVE, provisioning PENDING, `site_type`),
   the OWNER membership, the `tenant_domains` row for `<slug>.<domain>`,
