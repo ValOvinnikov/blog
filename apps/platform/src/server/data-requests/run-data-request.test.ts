@@ -1,7 +1,9 @@
 import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { ERROR_CODE } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_DATA_REQUEST_EMAIL,
@@ -15,14 +17,11 @@ import { logger } from '@platform/utils/logger/logger';
 import { runDataRequest } from './run-data-request';
 import { countPersonalDataMatches } from './to-data-request-matches';
 
-const { recordAuditEventMock, runMock } = vi.hoisted(() => ({
-  recordAuditEventMock: vi.fn(),
-  runMock: vi.fn(),
-}));
+faker.seed(5998);
 
-vi.mock('@platform/server/audit/record-audit-event', () => ({
-  recordAuditEvent: recordAuditEventMock,
-}));
+vi.mock('@platform/server/audit/record-audit-event');
+
+const runMock = vi.fn();
 
 const STEP = {
   run: runMock,
@@ -41,9 +40,7 @@ const SERVER_ERROR = errorResult({ outcome: ACTION_OUTCOME.SERVER_ERROR });
 
 describe(runDataRequest, () => {
   beforeEach(() => {
-    recordAuditEventMock.mockReset();
     runMock.mockReset().mockResolvedValue(okResult(mockPersonalDataMatches()));
-    vi.mocked(logger.error).mockReset();
   });
 
   it('runs the request for the trimmed email and returns its data', async () => {
@@ -59,7 +56,7 @@ describe(runDataRequest, () => {
   it("audits the request against the email's index with only counts", async () => {
     await runDataRequest({ email: MOCK_DATA_REQUEST_EMAIL }, STEP);
 
-    expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
+    expect(firstRecordedAuditEvent(vi.mocked(recordAuditEvent))).toEqual({
       action: AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP,
       targetType: AUDIT_TARGET_TYPE.PERSONAL_DATA,
       targetId: MOCK_DATA_REQUEST_EMAIL_INDEX,
@@ -72,7 +69,7 @@ describe(runDataRequest, () => {
 
     expect(result).toEqual(INVALID_EMAIL);
     expect(runMock).not.toHaveBeenCalled();
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
+    expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('reports an email the data layer rejects as invalid', async () => {
@@ -84,7 +81,7 @@ describe(runDataRequest, () => {
     );
 
     expect(result).toEqual(INVALID_EMAIL);
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
+    expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('returns a server error and logs when the request fails', async () => {
@@ -101,11 +98,11 @@ describe(runDataRequest, () => {
       action: AUDIT_ACTION.PERSONAL_DATA_LOOKED_UP,
       error: ERROR_CODE.DB_NOT_FOUND,
     });
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
+    expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
-  it('returns a server error without an audit event when the request throws', async () => {
-    runMock.mockRejectedValue(new Error('db down'));
+  it('returns a server error with no audit event when the request throws', async () => {
+    runMock.mockRejectedValue(new Error(faker.lorem.sentence()));
 
     const result = await runDataRequest(
       { email: MOCK_DATA_REQUEST_EMAIL },
@@ -113,7 +110,7 @@ describe(runDataRequest, () => {
     );
 
     expect(result).toEqual(SERVER_ERROR);
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
+    expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('logs a thrown error by name only, never the email in its message', async () => {

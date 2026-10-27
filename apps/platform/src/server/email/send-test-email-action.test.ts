@@ -3,127 +3,120 @@ import {
   EMAIL_TEMPLATE_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { queries } from '@blog/db';
+import { sendEmail } from '@blog/email';
 import type * as BlogEmail from '@blog/email';
+import { faker } from '@faker-js/faker';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
-import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
-import { takeTestEmailSend } from '@platform/server/email/test-email-rate-limit';
-import { MOCK_TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
+import { MOCK_OPERATOR_SESSION } from '@platform/testing/admins/operator';
+import { mockedAuth } from '@platform/testing/auth/mocked-auth';
+import {
+  mockEmailBodyWithLink,
+  mockEmailBodyWithText,
+  mockEmailConfig,
+  mockEmailTemplateResult,
+} from '@platform/testing/email/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
-import type { Session } from 'next-auth';
 
 import {
   sendTestEmailAction,
   type TSendTestEmailInput,
 } from './send-test-email-action';
 
-const { getEmailConfigMock, getEmailTemplateMock, sendEmailMock } = vi.hoisted(
-  () => ({
-    getEmailConfigMock: vi.fn(),
-    getEmailTemplateMock: vi.fn(),
-    sendEmailMock: vi.fn(),
-  }),
-);
-
-vi.mock('@platform/server/auth/require-tenant-membership');
-vi.mock('@platform/server/auth/auth');
-vi.mock('@platform/server/email/load-tenant-email-brand');
-vi.mock('@platform/server/email/test-email-rate-limit');
-vi.mock('@platform/utils/env/env');
-
 vi.mock('@blog/db', () => ({
   queries: {
-    emailConfig: { getEmailConfig: getEmailConfigMock },
-    emailTemplates: { getEmailTemplate: getEmailTemplateMock },
+    emailConfig: { getEmailConfig: vi.fn() },
+    emailTemplates: { getEmailTemplate: vi.fn() },
+    siteConfig: { getSiteConfig: vi.fn() },
   },
 }));
 
 vi.mock('@blog/email', async (importOriginal) => ({
   ...(await importOriginal<typeof BlogEmail>()),
-  sendEmail: sendEmailMock,
+  sendEmail: vi.fn(),
 }));
 
-const requireTenantMembershipMock = vi.mocked<
-  (tenantId: string) => Promise<unknown>
->(requireTenantMembership);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
-const takeTestEmailSendMock = vi.mocked(takeTestEmailSend);
+vi.mock('@platform/server/auth/require-tenant-membership');
+vi.mock('@platform/server/auth/auth');
+vi.mock('@platform/utils/env/env');
 
-const REPLY_TO_ADDRESS = 'hello@acme.example';
-const ADMIN_EMAIL = 'admin@example.com';
+faker.seed(5998);
+
+const SENDS_PER_WINDOW = 5;
+const MOCK_ALERT_ADDRESS = faker.internet.email();
+const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
+const MOCK_SENDER_NAME = faker.lorem.words(2);
+const MOCK_SUBJECT = faker.lorem.sentence();
+const MOCK_BODY_TEXT = faker.lorem.word();
+const MOCK_JAVASCRIPT_HREF = 'javascript:x';
 
 const INPUT: TSendTestEmailInput = {
   templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-  copy: {
-    subject: 'Connexion',
-    body: [
-      {
-        _type: 'block',
-        _key: 'k1',
-        style: 'normal',
-        markDefs: [],
-        children: [{ _type: 'span', _key: 's1', text: 'Bonjour', marks: [] }],
-      },
-    ],
-  },
+  copy: { subject: MOCK_SUBJECT, body: mockEmailBodyWithText(MOCK_BODY_TEXT) },
   sender: {
-    senderName: 'Acme Co',
-    replyToAddress: REPLY_TO_ADDRESS,
-    footerPostalAddress: '1 Rue de Paris',
+    senderName: MOCK_SENDER_NAME,
+    replyToAddress: MOCK_REPLY_TO_ADDRESS,
+    footerPostalAddress: faker.location.streetAddress(),
   },
+};
+
+const signInNewAdmin = () => {
+  const user = { id: faker.string.uuid(), email: faker.internet.email() };
+  mockedAuth.mockResolvedValue({ ...MOCK_OPERATOR_SESSION, user });
+
+  return user;
 };
 
 describe(sendTestEmailAction, () => {
   beforeEach(() => {
-    requireTenantMembershipMock.mockReset();
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: MOCK_TENANT_ID, name: 'Acme Co' },
-      membership: { role: MEMBERSHIP_ROLE.OWNER },
+    Object.assign(env, {
+      OPERATOR_ALERT_FROM_ADDRESS: `Alerts <${MOCK_ALERT_ADDRESS}>`,
     });
-    authMock.mockReset();
-    authMock.mockResolvedValue({
-      user: { id: 'admin-1', email: ADMIN_EMAIL },
-    });
-    takeTestEmailSendMock.mockReset();
-    takeTestEmailSendMock.mockReturnValue(true);
-    vi.mocked(loadTenantEmailBrand).mockResolvedValue(MOCK_TENANT_EMAIL_BRAND);
-    getEmailConfigMock.mockResolvedValue(undefined);
-    getEmailTemplateMock.mockResolvedValue({ logoAssetUrl: undefined });
-    sendEmailMock.mockReset();
-    sendEmailMock.mockResolvedValue(undefined);
-    vi.mocked(logger.error).mockReset();
+    vi.mocked(queries.emailConfig.getEmailConfig).mockResolvedValue(
+      mockEmailConfig(),
+    );
+    vi.mocked(queries.emailTemplates.getEmailTemplate).mockResolvedValue(
+      mockEmailTemplateResult(),
+    );
+    vi.mocked(sendEmail).mockReset();
+    vi.mocked(sendEmail).mockResolvedValue(undefined);
   });
 
   it('emails the draft to the signed-in admin, marked as a test', async () => {
+    const admin = signInNewAdmin();
+    const testSubject = makeEnTranslator('emailPreview')('testSubject', {
+      subject: MOCK_SUBJECT,
+    });
+
     const result = await sendTestEmailAction(MOCK_TENANT_ID, INPUT);
 
+    const [email] = vi.mocked(sendEmail).mock.calls.map(([input]) => input);
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
-      to: ADMIN_EMAIL,
+      to: admin.email,
     });
-    expect(requireTenantMembershipMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: ADMIN_EMAIL,
-        subject: '[Test] Connexion',
-        replyTo: REPLY_TO_ADDRESS,
-        from: expect.stringMatching(/^Acme Co </),
-        html: expect.stringContaining('Bonjour'),
-      }),
-    );
+    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(email?.to).toBe(admin.email);
+    expect(email?.subject).toBe(testSubject);
+    expect(email?.replyTo).toBe(MOCK_REPLY_TO_ADDRESS);
+    expect(email?.from).toBe(`${MOCK_SENDER_NAME} <${MOCK_ALERT_ADDRESS}>`);
+    expect(email?.html).toContain(MOCK_BODY_TEXT);
   });
 
   it('refuses without sending once the admin hits the limit', async () => {
-    takeTestEmailSendMock.mockReturnValue(false);
+    signInNewAdmin();
 
-    const result = await sendTestEmailAction(MOCK_TENANT_ID, INPUT);
+    const results = [];
+    for (let send = 0; send <= SENDS_PER_WINDOW; send += 1) {
+      results.push(await sendTestEmailAction(MOCK_TENANT_ID, INPUT));
+    }
 
-    expect(takeTestEmailSendMock).toHaveBeenCalledWith('admin-1');
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
-    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(results.at(-1)).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
+    expect(sendEmail).toHaveBeenCalledTimes(SENDS_PER_WINDOW);
   });
 
   it('rejects a blank subject without reaching the tenant gate', async () => {
@@ -136,7 +129,7 @@ describe(sendTestEmailAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+    expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
   it('rejects a body carrying an unsafe link', async () => {
@@ -144,14 +137,7 @@ describe(sendTestEmailAction, () => {
       ...INPUT,
       copy: {
         ...INPUT.copy,
-        body: [
-          {
-            _type: 'block',
-            _key: 'k1',
-            markDefs: [{ _type: 'link', _key: 'l1', href: 'javascript:x' }],
-            children: [],
-          },
-        ],
+        body: mockEmailBodyWithLink(MOCK_JAVASCRIPT_HREF),
       },
     });
 
@@ -159,29 +145,33 @@ describe(sendTestEmailAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
-    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it('reports and logs a failed send without throwing', async () => {
-    sendEmailMock.mockRejectedValue(new Error('resend down'));
+    signInNewAdmin();
+    const sendError = new Error(faker.lorem.sentence());
+    vi.mocked(sendEmail).mockRejectedValue(sendError);
 
     const result = await sendTestEmailAction(MOCK_TENANT_ID, INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(
-      EMAIL_TEST_LOG.SEND_FAILED,
-      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
-    );
+    expect(logger.error).toHaveBeenCalledWith(EMAIL_TEST_LOG.SEND_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      templateType: INPUT.templateType,
+      error: sendError,
+    });
   });
 
   it('propagates the tenant gate when the session has no membership', async () => {
-    requireTenantMembershipMock.mockImplementation(() => {
-      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    });
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
     await expect(sendTestEmailAction(MOCK_TENANT_ID, INPUT)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
-    expect(sendEmailMock).not.toHaveBeenCalled();
+
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 });

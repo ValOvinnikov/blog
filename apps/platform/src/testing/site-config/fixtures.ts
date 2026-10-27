@@ -1,4 +1,5 @@
 import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import type { TSiteConfigThemeAndAssets } from '@platform/server/site-config/site-config-or-defaults';
 
 export const MOCK_LOGO_URL =
   'https://example.blob.vercel-storage.com/brand-logo.png';
@@ -17,3 +18,12 @@ export const MOCK_THEME_FIELDS = {
   radiusScale: RADIUS_SCALE.MD,
   density: DENSITY.DEFAULT,
 };
+
+export const mockSiteConfigThemeAndAssets = (
+  overrides: Partial<TSiteConfigThemeAndAssets> = {},
+): TSiteConfigThemeAndAssets => ({
+  ...MOCK_THEME_FIELDS,
+  logoAssetUrl: undefined,
+  faviconAssetUrl: undefined,
+  ...overrides,
+});
