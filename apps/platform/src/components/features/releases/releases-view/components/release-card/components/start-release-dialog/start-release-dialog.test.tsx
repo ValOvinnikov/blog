@@ -1,10 +1,14 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import {
   RELEASE_FIELD_ERROR,
   RELEASE_REFUSAL,
 } from '@platform/constants/release';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
-import { mockReleaseCandidate } from '@platform/testing/releases/fixtures';
+import {
+  MOCK_LAST_TAG,
+  mockReleaseCandidate,
+} from '@platform/testing/releases/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { StartReleaseDialog } from './start-release-dialog';
@@ -18,11 +22,15 @@ vi.mock('@platform/server/releases/start-release-action', () => ({
   startReleaseAction: startReleaseActionMock,
 }));
 
+faker.seed(5994);
+
 const START_RELEASE = 'Start release';
 const RELEASE_RUNNING_REASON = 'A release is running.';
+const MOCK_VERSION = `v${faker.system.semver()}`;
+const MOCK_OVERRIDE_REASON = faker.lorem.sentence();
 
 const setup = customRender(StartReleaseDialog, {
-  lastTag: 'v1.4.0',
+  lastTag: MOCK_LAST_TAG,
   migrations: mockReleaseCandidate().migrations,
   isOverrideRequired: false,
   disabledReason: undefined,
@@ -41,15 +49,20 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
   });
 
   const open = async (name = 'Release') => {
-    await user.click(screen.getByRole('button', { name }));
+    const openButton = screen.getByRole('button', { name });
+    await user.click(openButton);
     return screen.findByRole('alertdialog', { name: 'Release to production' });
   };
 
-  const typeVersion = (version: string) =>
-    user.type(screen.getByRole('textbox', { name: 'Version' }), version);
+  const typeVersion = async (version: string) => {
+    const versionField = screen.getByRole('textbox', { name: 'Version' });
+    await user.type(versionField, version);
+  };
 
-  const confirm = () =>
-    user.click(screen.getByRole('button', { name: START_RELEASE }));
+  const confirm = async () => {
+    const startButton = screen.getByRole('button', { name: START_RELEASE });
+    await user.click(startButton);
+  };
 
   describe('opened for a release that needs no override', () => {
     beforeEach(async () => {
@@ -58,73 +71,82 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
     });
 
     it('starts the release with the typed version and tells its parent', async () => {
-      await typeVersion('v1.5.0');
+      await typeVersion(MOCK_VERSION);
       await confirm();
 
       expect(startReleaseActionMock).toHaveBeenCalledWith({
-        version: 'v1.5.0',
+        version: MOCK_VERSION,
         overrideReason: undefined,
       });
       await waitFor(() => expect(onStartedMock).toHaveBeenCalledOnce());
     });
 
     it('says plainly when the release runs no migrations', () => {
-      expect(
-        screen.getByText('No content migrations, no database migrations.'),
-      ).toBeVisible();
+      const noMigrations = screen.getByText(
+        'No content migrations, no database migrations.',
+      );
+
+      expect(noMigrations).toBeVisible();
     });
 
     it('cannot be confirmed before a version is typed', () => {
-      expect(
-        screen.getByRole('button', { name: START_RELEASE }),
-      ).toBeDisabled();
+      const startButton = screen.getByRole('button', { name: START_RELEASE });
+
+      expect(startButton).toBeDisabled();
     });
 
-    it('shows the refused version against its field, naming the last tag', async () => {
+    it('shows the refused version against its field with the last tag', async () => {
       startReleaseActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.INVALID,
         fieldErrors: {
           version: {
             reason: RELEASE_FIELD_ERROR.VERSION_NOT_GREATER,
-            values: { lastTag: 'v1.4.0' },
+            values: { lastTag: MOCK_LAST_TAG },
           },
         },
       });
 
-      await typeVersion('v1.4.0');
+      await typeVersion(MOCK_LAST_TAG);
       await confirm();
 
-      expect(
-        await screen.findByText(
-          'The version must be greater than the last release, v1.4.0.',
-        ),
-      ).toBeVisible();
+      const versionError = await screen.findByText(
+        `The version must be greater than the last release, ${MOCK_LAST_TAG}.`,
+      );
+
+      expect(versionError).toBeVisible();
     });
 
     it.each([
       [
+        'a server error',
         { outcome: ACTION_OUTCOME.SERVER_ERROR },
         'GitHub did not accept the release, so nothing was started.',
       ],
       [
+        'a running release',
         {
           outcome: ACTION_OUTCOME.REFUSED,
           reason: RELEASE_REFUSAL.RELEASE_RUNNING,
         },
         'A release is already running.',
       ],
-    ])('keeps the dialog open and explains a %o', async (result, message) => {
-      startReleaseActionMock.mockResolvedValue(result);
+    ])(
+      'keeps the dialog open and explains %s',
+      async (_name, result, message) => {
+        startReleaseActionMock.mockResolvedValue(result);
 
-      await typeVersion('v1.5.0');
-      await confirm();
+        await typeVersion(MOCK_VERSION);
+        await confirm();
 
-      expect(await screen.findByText(message)).toBeVisible();
-      expect(onStartedMock).not.toHaveBeenCalled();
-    });
+        const explanation = await screen.findByText(message);
+
+        expect(explanation).toBeVisible();
+        expect(onStartedMock).not.toHaveBeenCalled();
+      },
+    );
   });
 
-  it('states the content migrations, their projects and the database migrations', async () => {
+  it('states the content and database migrations with their projects', async () => {
     setup({
       migrations: {
         contentMigrations: 2,
@@ -136,40 +158,42 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
 
     await open();
 
-    expect(
-      screen.getByText(
-        '2 content migrations across 5 projects, 1 database migration.',
-      ),
-    ).toBeVisible();
+    const summary = screen.getByText(
+      '2 content migrations across 5 projects, 1 database migration.',
+    );
+
+    expect(summary).toBeVisible();
   });
 
   it('asks for a reason before an override can be confirmed', async () => {
     setup({ isOverrideRequired: true });
 
     await open('Release with override');
-    await typeVersion('v1.5.0');
+    await typeVersion(MOCK_VERSION);
 
-    expect(screen.getByRole('button', { name: START_RELEASE })).toBeDisabled();
+    const startButton = screen.getByRole('button', { name: START_RELEASE });
 
-    await user.type(
-      screen.getByRole('textbox', { name: 'Reason for releasing anyway' }),
-      'Hotfix',
-    );
+    expect(startButton).toBeDisabled();
+
+    const reasonField = screen.getByRole('textbox', {
+      name: 'Reason for releasing anyway',
+    });
+    await user.type(reasonField, MOCK_OVERRIDE_REASON);
     await confirm();
 
     expect(startReleaseActionMock).toHaveBeenCalledWith({
-      version: 'v1.5.0',
-      overrideReason: 'Hotfix',
+      version: MOCK_VERSION,
+      overrideReason: MOCK_OVERRIDE_REASON,
     });
   });
 
   it('cannot be opened while it is disabled', () => {
     setup({ disabledReason: RELEASE_RUNNING_REASON });
 
-    expect(screen.getByRole('button', { name: 'Release' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
-    expect(screen.getByText(RELEASE_RUNNING_REASON)).toBeVisible();
+    const releaseButton = screen.getByRole('button', { name: 'Release' });
+    const reason = screen.getByText(RELEASE_RUNNING_REASON);
+
+    expect(releaseButton).toHaveAttribute('aria-disabled', 'true');
+    expect(reason).toBeVisible();
   });
 });

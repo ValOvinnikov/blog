@@ -58,3 +58,5 @@ export const mockReleaseRun = (
   isTenantMigrationFailed: false,
   ...overrides,
 });
+
+export const MOCK_LAST_TAG = mockReleaseCandidate().lastTag;

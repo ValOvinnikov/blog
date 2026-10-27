@@ -1,46 +1,63 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { RunErrorCard } from './run-error-card';
 
-const render = renderWithIntl;
+faker.seed(5994);
 
-const baseProps = {
-  headline: 'This step failed',
-  body: 'Something went wrong.',
-  nextStep: 'Retry.',
-  technicalDetailsLabel: 'Technical details',
-};
+const MOCK_HEADLINE = faker.lorem.sentence();
+const MOCK_BODY = faker.lorem.sentence();
+const MOCK_NEXT_STEP = faker.lorem.sentence();
+const MOCK_FAILED_STEP_LINE = faker.lorem.sentence();
+const MOCK_TECHNICAL_DETAILS = faker.lorem.sentence();
+const TECHNICAL_DETAILS_LABEL = 'Technical details';
 
-describe(RunErrorCard, () => {
+const setup = customRender(RunErrorCard, {
+  headline: MOCK_HEADLINE,
+  body: MOCK_BODY,
+  nextStep: MOCK_NEXT_STEP,
+  technicalDetailsLabel: TECHNICAL_DETAILS_LABEL,
+});
+
+describe(`<${RunErrorCard.name}/>`, () => {
   it('announces the error with its headline as the card heading', () => {
-    render(<RunErrorCard {...baseProps} headingLevel={3} />);
+    setup({ headingLevel: 3 });
 
-    expect(screen.getByRole('alert')).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'This step failed' }),
-    ).toBeVisible();
-    expect(screen.getByText('Something went wrong.')).toBeVisible();
-    expect(screen.getByText('Retry.')).toBeVisible();
+    const alert = screen.getByRole('alert');
+    const heading = screen.getByRole('heading', {
+      level: 3,
+      name: MOCK_HEADLINE,
+    });
+    const body = screen.getByText(MOCK_BODY);
+    const nextStep = screen.getByText(MOCK_NEXT_STEP);
+
+    expect(alert).toBeVisible();
+    expect(heading).toBeVisible();
+    expect(body).toBeVisible();
+    expect(nextStep).toBeVisible();
   });
 
   it('names the failed step when one is given', () => {
-    render(
-      <RunErrorCard
-        {...baseProps}
-        failedStepLine='Failed while running "Seed".'
-      />,
-    );
+    setup({ failedStepLine: MOCK_FAILED_STEP_LINE });
 
-    expect(screen.getByText('Failed while running "Seed".')).toBeVisible();
+    const failedStep = screen.getByText(MOCK_FAILED_STEP_LINE);
+
+    expect(failedStep).toBeVisible();
   });
 
-  it('offers the technical details only when there are some', () => {
-    const { rerender } = render(<RunErrorCard {...baseProps} />);
+  it('offers no technical details when there are none', () => {
+    setup();
 
-    expect(screen.queryByText('Technical details')).not.toBeInTheDocument();
+    const toggle = screen.queryByText(TECHNICAL_DETAILS_LABEL);
 
-    rerender(<RunErrorCard {...baseProps} technicalDetails="500 boom" />);
+    expect(toggle).not.toBeInTheDocument();
+  });
 
-    expect(screen.getByText('Technical details')).toBeVisible();
+  it('offers the technical details when there are some', () => {
+    setup({ technicalDetails: MOCK_TECHNICAL_DETAILS });
+
+    const toggle = screen.getByText(TECHNICAL_DETAILS_LABEL);
+
+    expect(toggle).toBeVisible();
   });
 });

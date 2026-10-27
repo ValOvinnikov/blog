@@ -32,22 +32,16 @@ describe(`<${RecentActivityCard.name}/>`, () => {
 
       expect(viewAllLink).toHaveAttribute(
         'href',
-        `/tenants/${MOCK_TENANT_ID}/activity`,
+        adminRoutes.tenantActivity(MOCK_TENANT_ID),
       );
     });
   });
 
-  describe('with no activity', () => {
-    beforeEach(() => {
-      setup({ events: [] });
-    });
+  it('offers no View all link when there is no activity', () => {
+    setup({ events: [] });
 
-    it('offers no View all link', () => {
-      const viewAllLink = screen.queryByRole('link', {
-        name: VIEW_ALL_ACTIVITY,
-      });
+    const viewAllLink = screen.queryByRole('link', { name: VIEW_ALL_ACTIVITY });
 
-      expect(viewAllLink).not.toBeInTheDocument();
-    });
+    expect(viewAllLink).not.toBeInTheDocument();
   });
 });

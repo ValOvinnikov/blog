@@ -1,6 +1,6 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
-import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   mockTenant,
@@ -17,14 +17,9 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 
 const getProjectDomainMock = vi.mocked(getProjectDomain);
 
-const render = async (
-  tenant = mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
-) => {
-  const ui = await DomainPageContent({ tenant });
-  await act(async () => {
-    renderWithIntl(ui);
-  });
-};
+const setup = customRenderAsync(DomainPageContent, {
+  tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+});
 
 describe(`<${DomainPageContent.name}/>`, () => {
   beforeEach(() => {
@@ -35,10 +30,10 @@ describe(`<${DomainPageContent.name}/>`, () => {
     });
   });
 
-  it('shows the title, description and a card skeleton while Vercel has not answered', async () => {
+  it('shows the title, description and skeleton while Vercel is silent', async () => {
     getProjectDomainMock.mockReturnValue(new Promise(() => {}));
 
-    await render();
+    await setup();
 
     const title = screen.getByRole('heading', { level: 1, name: 'Domain' });
     const description = screen.getByText(
@@ -50,12 +45,12 @@ describe(`<${DomainPageContent.name}/>`, () => {
     expect(title).toBeVisible();
     expect(description).toBeVisible();
     expect(skeletons.length).toBeGreaterThan(0);
-    expect(cardHeading).toBeNull();
+    expect(cardHeading).not.toBeInTheDocument();
   });
 
   describe('for a live tenant', () => {
     beforeEach(async () => {
-      await render();
+      await setup();
     });
 
     it('replaces the skeleton with the domain card once Vercel answers', async () => {
@@ -68,7 +63,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
       expect(cardHeading).toBeVisible();
       expect(statusBadge).toBeVisible();
-      expect(skeleton).toBeNull();
+      expect(skeleton).not.toBeInTheDocument();
     });
 
     it('loads the domain from Vercel exactly once', async () => {
@@ -87,12 +82,12 @@ describe(`<${DomainPageContent.name}/>`, () => {
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {
-    await render(
-      mockTenant({
+    await setup({
+      tenant: mockTenant({
         primaryDomain: MOCK_CUSTOM_DOMAIN,
         deprovisionedAt: MOCK_ARCHIVED_AT,
       }),
-    );
+    });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
 

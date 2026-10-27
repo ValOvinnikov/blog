@@ -1,9 +1,15 @@
-import { TENANT_PROVISIONING_STATUS } from '@blog/db';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  TENANT_PLAN,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
+import type { TTenant } from '@blog/db/schema/tenants';
+import { customRender, screen } from '@platform/testing/custom-render';
 import {
   mockReadyTenant,
+  MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
@@ -12,96 +18,81 @@ import {
 
 import { TenantsTable } from './tenants-table';
 
-const render = renderWithIntl;
+const setup = customRender(TenantsTable, { tenants: [mockReadyTenant()] });
 
-const HARBOR_CO = 'Harbor Co.';
-const HARBOR_DOMAIN = 'harbor.example.com';
-const MANAGE_ACME = `Manage ${MOCK_TENANT_NAME}`;
-const MANAGE_HARBOR_CO = 'Manage Harbor Co.';
+const otherTenant = (overrides: Partial<TTenant> = {}) =>
+  mockReadyTenant({
+    id: MOCK_OTHER_TENANT_ID,
+    name: MOCK_OTHER_TENANT_NAME,
+    primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
+    ...overrides,
+  });
+
+const MANAGE_TENANT = `Manage ${MOCK_TENANT_NAME}`;
+const MANAGE_OTHER_TENANT = `Manage ${MOCK_OTHER_TENANT_NAME}`;
 
 describe(`<${TenantsTable.name}/>`, () => {
-  it('renders one row per tenant with its name, domain, plan and status', () => {
-    render(
-      <TenantsTable
-        tenants={[
-          mockReadyTenant(),
-          mockReadyTenant({
-            id: MOCK_OTHER_TENANT_ID,
-            name: HARBOR_CO,
-            primaryDomain: HARBOR_DOMAIN,
-            plan: TENANT_PLAN.GROWTH,
-            status: TENANT_STATUS.SUSPENDED,
-          }),
-        ]}
-      />,
-    );
+  it("shows each tenant's name, domain, plan and status", () => {
+    setup({
+      tenants: [
+        mockReadyTenant(),
+        otherTenant({
+          plan: TENANT_PLAN.GROWTH,
+          status: TENANT_STATUS.SUSPENDED,
+        }),
+      ],
+    });
 
-    const acmeName = screen.getByText(MOCK_TENANT_NAME);
-    const acmeDomain = screen.getByText(MOCK_TENANT_DOMAIN);
+    const tenantName = screen.getByText(MOCK_TENANT_NAME);
+    const tenantDomain = screen.getByText(MOCK_TENANT_DOMAIN);
     const freePlan = screen.getByText('Free');
     const activeStatus = screen.getByText('Active');
-    const harborName = screen.getByText(HARBOR_CO);
+    const otherName = screen.getByText(MOCK_OTHER_TENANT_NAME);
     const growthPlan = screen.getByText('Growth');
     const suspendedStatus = screen.getByText('Suspended');
 
-    expect(acmeName).toBeVisible();
-    expect(acmeDomain).toBeVisible();
+    expect(tenantName).toBeVisible();
+    expect(tenantDomain).toBeVisible();
     expect(freePlan).toBeVisible();
     expect(activeStatus).toBeVisible();
-    expect(harborName).toBeVisible();
+    expect(otherName).toBeVisible();
     expect(growthPlan).toBeVisible();
     expect(suspendedStatus).toBeVisible();
   });
 
-  it('links a READY tenant\'s "Manage" control to its overview page', () => {
-    render(
-      <TenantsTable
-        tenants={[
-          mockReadyTenant(),
-          mockReadyTenant({
-            id: MOCK_OTHER_TENANT_ID,
-            name: HARBOR_CO,
-            primaryDomain: HARBOR_DOMAIN,
-          }),
-        ]}
-      />,
-    );
+  it('links a ready tenant to its overview page', () => {
+    setup({ tenants: [mockReadyTenant(), otherTenant()] });
 
-    const acmeLink = screen.getByRole('link', { name: MANAGE_ACME });
-    const harborLink = screen.getByRole('link', { name: MANAGE_HARBOR_CO });
+    const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
+    const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
 
-    expect(acmeLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
-    expect(harborLink).toHaveAttribute(
+    expect(tenantLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
+    expect(otherLink).toHaveAttribute(
       'href',
       `/tenants/${MOCK_OTHER_TENANT_ID}`,
     );
   });
 
-  it('links a not-yet-ready tenant\'s "Manage" control to its provisioning page', () => {
-    render(
-      <TenantsTable
-        tenants={[
-          mockReadyTenant({
-            provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-          }),
-          mockReadyTenant({
-            id: MOCK_OTHER_TENANT_ID,
-            name: HARBOR_CO,
-            primaryDomain: HARBOR_DOMAIN,
-            provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-          }),
-        ]}
-      />,
-    );
+  it('links a not-yet-ready tenant to its provisioning page', () => {
+    setup({
+      tenants: [
+        mockReadyTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        }),
+        otherTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+        }),
+      ],
+    });
 
-    const acmeLink = screen.getByRole('link', { name: MANAGE_ACME });
-    const harborLink = screen.getByRole('link', { name: MANAGE_HARBOR_CO });
+    const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
+    const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
 
-    expect(acmeLink).toHaveAttribute(
+    expect(tenantLink).toHaveAttribute(
       'href',
       `/tenants/${MOCK_TENANT_ID}/provisioning`,
     );
-    expect(harborLink).toHaveAttribute(
+    expect(otherLink).toHaveAttribute(
       'href',
       `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`,
     );
@@ -109,10 +100,10 @@ describe(`<${TenantsTable.name}/>`, () => {
 
   describe('with one ready tenant', () => {
     beforeEach(() => {
-      render(<TenantsTable tenants={[mockReadyTenant()]} />);
+      setup();
     });
 
-    it('names the scrollable table region and the actions column for screen readers', () => {
+    it('names the table region and the actions column', () => {
       const region = screen.getByRole('region', { name: 'Tenants' });
       const table = screen.getByRole('table');
       const actionsHeader = screen.getByRole('columnheader', {
@@ -133,8 +124,8 @@ describe(`<${TenantsTable.name}/>`, () => {
     });
   });
 
-  it('renders an empty state instead of an empty table when there are no tenants', () => {
-    render(<TenantsTable tenants={[]} />);
+  it('shows an empty state instead of a table when there are no tenants', () => {
+    setup({ tenants: [] });
 
     const emptyMessage = screen.getByText('No tenants yet.');
     const table = screen.queryByRole('table');
