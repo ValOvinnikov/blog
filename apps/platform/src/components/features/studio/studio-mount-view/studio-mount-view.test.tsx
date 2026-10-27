@@ -68,7 +68,7 @@ describe(`<${StudioMountView.name}/>`, () => {
     selectLiveLocalesMock.mockReset().mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
-  it('shows the archived notice instead of Studio for a deprovisioned tenant', async () => {
+  it('shows only the archived notice for a deprovisioned tenant', async () => {
     await setup({
       tenant: mockProvisionedTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     });

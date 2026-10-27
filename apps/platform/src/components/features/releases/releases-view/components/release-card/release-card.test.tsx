@@ -52,6 +52,12 @@ const setup = customRender(ReleaseCard, {
   releaseRun: okResult(),
 });
 
+const advancePoll = async () => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10_000);
+  });
+};
+
 describe(`<${ReleaseCard.name}/>`, () => {
   let refresh: ReturnType<typeof mockRouterRefresh>;
   let user: UserEvent;
@@ -188,7 +194,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
       ),
     });
 
-    await act(() => vi.advanceTimersByTimeAsync(10_000));
+    await advancePoll();
 
     const status = screen.getByText('Succeeded');
 

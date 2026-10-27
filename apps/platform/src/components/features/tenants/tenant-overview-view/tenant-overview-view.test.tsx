@@ -45,12 +45,12 @@ import {
   mockInvitedOwner,
   mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
+import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 
 import { TenantOverviewView } from './tenant-overview-view';
 
 faker.seed(7319);
 
-const STEP_POLL_INTERVAL_MS = 4000;
 const MOCK_ADMIN_ID = faker.string.uuid();
 const MOCK_STEP_ERROR = faker.lorem.sentence();
 
@@ -117,6 +117,12 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
 const setup = customRenderAsync(TenantOverviewView, {
   tenant: mockTenant(),
 });
+
+const advancePoll = async () => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+  });
+};
 
 const TENANT_DETAILS = 'Tenant details';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
@@ -267,9 +273,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       LOCKED_WHILE_PROVISIONING_IS_RUNNING,
     );
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-    });
+    await advancePoll();
 
     const doneBanner = screen.getByText('Provisioned');
     const lockedNameInput = screen.getByRole('textbox', { name: 'Name' });

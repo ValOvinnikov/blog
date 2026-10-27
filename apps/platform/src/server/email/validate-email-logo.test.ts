@@ -1,6 +1,9 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
-import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
+import {
+  buildPngBuffer,
+  MOCK_MIME_TYPE,
+} from '@platform/testing/upload/fixtures';
 import {
   EMAIL_LOGO_MAX_DIMENSION_PX,
   MAX_EMAIL_LOGO_BYTES,
@@ -16,18 +19,6 @@ const MOCK_SVG_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"></svg>';
 const MOCK_UNREADABLE_BYTES = new Uint8Array([1, 2, 3, 4]);
 const BINARY_MIME = 'application/octet-stream';
-
-const buildPngBuffer = (width: number, height: number): Buffer => {
-  const buffer = Buffer.alloc(33);
-  buffer.write('\x89PNG\r\n\x1a\n', 0, 'latin1');
-  buffer.writeUInt32BE(13, 8);
-  buffer.write('IHDR', 12, 'latin1');
-  buffer.writeUInt32BE(width, 16);
-  buffer.writeUInt32BE(height, 20);
-  buffer[24] = 8;
-  buffer[25] = 6;
-  return buffer;
-};
 
 const buildGifBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(10);

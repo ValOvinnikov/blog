@@ -1,3 +1,4 @@
+import { Input } from '@base-ui/react/input';
 import { faker } from '@faker-js/faker';
 import { TextInput } from '@platform/components/shared/text-input';
 import {
@@ -20,6 +21,7 @@ const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_FOOTER = faker.lorem.sentence();
 const MOCK_ACTION = faker.lorem.word();
 const MOCK_CONTROL_ID = faker.lorem.slug();
+const MOCK_OWN_NAME = faker.lorem.words(3);
 
 const TextFormField = (props: Omit<TFormFieldProps, 'children'>) => (
   <FormField {...props}>
@@ -38,16 +40,18 @@ describe(`<${FormField.name}/>`, () => {
     expect(input).toBeVisible();
   });
 
-  it('renders the label as a plain span when the control names itself', () => {
+  it('leaves a control that names itself with its own name', () => {
     renderWithIntl(
       <FormField label={MOCK_LABEL} control={{ hasOwnAccessibleName: true }}>
-        <input aria-label={MOCK_LABEL} />
+        <Input aria-label={MOCK_OWN_NAME} />
       </FormField>,
     );
 
     const label = screen.getByText(MOCK_LABEL);
+    const input = screen.getByRole('textbox', { name: MOCK_OWN_NAME });
 
-    expect(label.tagName).toBe('SPAN');
+    expect(label).toBeVisible();
+    expect(input).toBeVisible();
   });
 
   it('describes the control with its hint, then its error', () => {

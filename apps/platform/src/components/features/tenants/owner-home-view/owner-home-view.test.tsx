@@ -4,8 +4,7 @@ import {
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import {
-  act,
-  customRender,
+  customRenderAsync,
   screen,
   within,
 } from '@platform/testing/custom-render';
@@ -40,13 +39,11 @@ const defaultProps: TOwnerHomeViewProps = {
   owner: mockJoinedOwner(),
 };
 
-const renderView = customRender(OwnerHomeView, defaultProps);
+const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
+  <OwnerHomeView {...props} />
+);
 
-const setup = async (overrides?: Partial<TOwnerHomeViewProps>) => {
-  await act(async () => {
-    renderView(overrides);
-  });
-};
+const setup = customRenderAsync(OwnerHomeViewElement, defaultProps);
 
 describe(`<${OwnerHomeView.name}/>`, () => {
   describe('for a live tenant', () => {
@@ -78,7 +75,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       expect(archivedNotice).not.toBeInTheDocument();
     });
 
-    it('shows the read-only Your site card instead of an editable form', () => {
+    it('shows the read-only Your site card with no editable fields', () => {
       const yourSiteHeading = screen.getByRole('heading', {
         level: 2,
         name: 'Your site',

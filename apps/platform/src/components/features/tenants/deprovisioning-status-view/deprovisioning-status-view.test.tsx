@@ -13,7 +13,10 @@ import {
   MOCK_RUN_PLUS_7_MIN_AT,
   MOCK_RUN_STARTED_AT,
 } from '@platform/testing/tenants/fixtures';
-import { useDeprovisioningPoll } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
+import {
+  STEP_POLL_INTERVAL_MS,
+  useDeprovisioningPoll,
+} from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisioningStatusView } from './deprovisioning-status-view';
@@ -32,7 +35,6 @@ const STEP_LABELS = [
   'Purge reader data',
   'Invalidate cached pages',
 ];
-const STEP_POLL_INTERVAL_MS = 4000;
 const MOCK_RECOGNISED_ERROR =
   'Sanity Access API POST /access/project/xxxxx000/tokens failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to revoke tokens."}';
 const MOCK_UNRECOGNISED_ERROR = 'CORS API is down';

@@ -30,7 +30,11 @@ export const StepIndicator = ({
 
   return (
     <div className={root()}>
-      <span className={circle()} aria-hidden="true">
+      <span
+        className={circle()}
+        aria-hidden="true"
+        data-testid="step-indicator-glyph"
+      >
         {GLYPH_BY_STATE[state] ?? stepNumber}
       </span>
       {hasConnector && (

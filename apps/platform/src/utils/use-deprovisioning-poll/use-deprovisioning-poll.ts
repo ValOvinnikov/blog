@@ -25,9 +25,9 @@ import {
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
 import { useEffect, useRef, useState } from 'react';
 
-const STEP_POLL_INTERVAL_MS = 4000;
+export const STEP_POLL_INTERVAL_MS = 4000;
 // ~5 minutes: bounds a crashed runner, well past any realistic teardown.
-const MAX_POLL_TICKS = 75;
+export const MAX_POLL_TICKS = 75;
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.RUNNING,

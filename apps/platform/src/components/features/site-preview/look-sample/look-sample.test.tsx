@@ -124,7 +124,7 @@ describe(`<${LookSample.name}/>`, () => {
     });
   });
 
-  it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
+  it('resolves the tenant accent in dark mode', () => {
     setup({
       theme: {
         ...MOCK_SITE_PREVIEW_THEME,

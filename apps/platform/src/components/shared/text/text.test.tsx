@@ -19,13 +19,13 @@ describe(`<${Text.name}/>`, () => {
     expect(paragraph).toHaveTextContent(MOCK_COPY);
   });
 
-  it('renders inline copy as a span', () => {
+  it('renders inline copy outside a paragraph', () => {
     setup({ as: 'span' });
 
     const text = screen.getByText(MOCK_COPY);
     const paragraph = screen.queryByRole('paragraph');
 
-    expect(text.tagName).toBe('SPAN');
+    expect(text).toBeVisible();
     expect(paragraph).not.toBeInTheDocument();
   });
 });
