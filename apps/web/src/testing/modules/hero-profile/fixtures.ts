@@ -6,17 +6,17 @@ import {
   SOCIAL_PLATFORMS,
 } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TEAM_MEMBER_NAME } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-faker.seed(61041);
+const mockFaker = createMockFaker(61041);
 
-export const MOCK_HERO_PROFILE_MODULE_ID = faker.string.uuid();
+export const MOCK_HERO_PROFILE_MODULE_ID = mockFaker.string.uuid();
 
 export const MOCK_HERO_PROFILE_AVATAR_NAME = MOCK_TEAM_MEMBER_NAME;
 
-export const MOCK_HERO_PROFILE_HEADING = faker.company.catchPhrase();
+export const MOCK_HERO_PROFILE_HEADING = mockFaker.company.catchPhrase();
 
 export const MOCK_GITHUB_PROFILE_LINK_NAME =
   SITE_MESSAGES.socialLinks.linkAriaLabel.replace(
