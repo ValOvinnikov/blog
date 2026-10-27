@@ -1,5 +1,6 @@
 import { SIZE } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
+import { ReducedMotion } from '@blog/ui/testing/reduced-motion';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -14,6 +15,10 @@ const meta = {
     label: 'Loading',
   },
   argTypes: {
+    variant: {
+      control: 'select',
+      options: objectKeys(spinnerVariants.variants.variant),
+    },
     size: {
       control: 'select',
       options: objectKeys(spinnerVariants.variants.size),
@@ -24,30 +29,50 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-/** Glyph only — the common case inside a button or a status line, with the accessible name carried by `aria-label`. */
 export const Default: TStory = {};
 
-/** The `label` text is also rendered visibly beside the glyph. */
 export const WithVisibleLabel: TStory = {
   args: { label: 'Posting comment', hasLabel: true },
 };
 
-/** Fits inside a compact footprint, such as beside an `Avatar` at `SIZE.SM`. */
 export const Small: TStory = {
   args: { size: SIZE.SM, hasLabel: true },
 };
 
-/** The larger size for a more prominent standalone loading state. */
 export const Large: TStory = {
   args: { size: SIZE.LG, hasLabel: true },
 };
 
-/** On a solid `Button` fill, the glyph swaps to `text-brand-primary-contrast` via `className` so it reads against the fill. */
+const AllStyles = () => (
+  <div className="flex flex-col gap-4 text-brand-primary">
+    {objectKeys(spinnerVariants.variants.variant).map((variant) => (
+      <Spinner
+        key={variant}
+        label={variant}
+        variant={variant}
+        hasLabel={true}
+      />
+    ))}
+  </div>
+);
+
+export const Styles: TStory = {
+  render: () => <AllStyles />,
+};
+
+export const StylesWithReducedMotion: TStory = {
+  render: () => (
+    <ReducedMotion>
+      <AllStyles />
+    </ReducedMotion>
+  ),
+};
+
 export const OnSolidFill: TStory = {
   args: { label: 'Subscribing', hasLabel: true },
   render: (args) => (
-    <Button variant="primary" isDisabled={true}>
-      <Spinner {...args} className="text-brand-primary-contrast" />
+    <Button variant="primary">
+      <Spinner {...args} />
     </Button>
   ),
 };

@@ -38,8 +38,8 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Button — `components/atoms/button/button.tsx`
 
-The styled `<button>` for in-page actions (submit, toggle, dismiss).
-Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
+The styled `<button>` for in-page actions (submit, toggle, dismiss), which stays focusable and full colour while busy.
+Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isBusy?: boolean · busyLabel?: string · busyStyle?: TButtonBusyVariants['busyStyle'] · spinnerVariant?: TSpinnerProps['variant'] · 'aria-busy'?: AriaAttributes['aria-busy'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
 Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Caption — `components/atoms/caption/caption.tsx`
@@ -107,8 +107,8 @@ Variants: selected: (boolean)
 ### Spinner — `components/atoms/spinner/spinner.tsx`
 
 The shared indeterminate loading indicator for every async state (a submitting button, a session resolving, a region fetching on demand).
-Props: label: string · hasLabel?: boolean · size?: TSpinnerVariants['size'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
-Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
+Props: label: string · hasLabel?: boolean · variant?: TSpinnerVariants['variant'] · size?: TSpinnerVariants['size'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: SPINNER_STYLE.BRAILLE|SPINNER_STYLE.RING|SPINNER_STYLE.DOTS|SPINNER_STYLE.PULSE · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### StatusBadge — `components/atoms/status-badge/status-badge.tsx`
 
