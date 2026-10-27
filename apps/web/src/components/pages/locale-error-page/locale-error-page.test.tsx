@@ -1,8 +1,11 @@
-import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
-import userEvent from '@testing-library/user-event';
+import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
-import { customRender, render, screen } from '@web/testing/custom-render';
-import { AppProviders } from '@web/testing/providers';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@web/testing/custom-render';
 import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';
 import {
   MOCK_ERROR_DIGEST,
@@ -29,6 +32,8 @@ vi.mock('@web/utils/report-client-error', () => ({
 }));
 
 const {
+  title: HEADING,
+  description: DESCRIPTION,
   announcement,
   retry: TRY_AGAIN,
   goHome: GO_HOME,
@@ -39,22 +44,31 @@ const reset = vi.fn();
 
 const setup = customRender(LocaleErrorPage, { error, reset });
 
+const FreshMessagesPage = () => (
+  <NextIntlClientProvider
+    locale={LOCALE_ISO_CODES.EN}
+    messages={{ ...SITE_MESSAGES }}
+  >
+    <LocaleErrorPage error={error} reset={reset} />
+  </NextIntlClientProvider>
+);
+
 describe(`<${LocaleErrorPage.name}/>`, () => {
   describe('when rendered', () => {
     let rerender: ReturnType<typeof setup>['rerender'];
+    let user: UserEvent;
 
     beforeEach(() => {
+      user = userEvent.setup();
       ({ rerender } = setup());
     });
 
     it('renders the translated heading, copy, and actions', () => {
       const heading = screen.getByRole('heading', {
         level: 1,
-        name: 'Something went wrong',
+        name: HEADING,
       });
-      const copy = screen.getByText(
-        'An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.',
-      );
+      const copy = screen.getByText(DESCRIPTION);
       const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
 
       expect(heading).toBeVisible();
@@ -66,7 +80,7 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       const goHomeLink = screen.getByRole('link', { name: GO_HOME });
 
       expect(goHomeLink).toBeVisible();
-      expect(goHomeLink).toHaveAttribute('href', '/');
+      expect(goHomeLink).toHaveAttribute('href', routes.home());
     });
 
     it('announces the error to assistive technology after mount', () => {
@@ -78,13 +92,16 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     });
 
     it('names both actions in the announcement as the controls render them', () => {
-      const tryAgainLabel =
-        screen.getByRole('button', { name: TRY_AGAIN }).textContent ?? '';
-      const goHomeLabel =
-        screen.getByRole('link', { name: GO_HOME }).textContent ?? '';
+      const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
+      const goHomeLink = screen.getByRole('link', { name: GO_HOME });
+      const lowerAnnouncement = announcement.toLowerCase();
 
-      expect(announcement.toLowerCase()).toContain(tryAgainLabel.toLowerCase());
-      expect(announcement.toLowerCase()).toContain(goHomeLabel.toLowerCase());
+      expect(lowerAnnouncement).toContain(
+        (tryAgainButton.textContent ?? '').toLowerCase(),
+      );
+      expect(lowerAnnouncement).toContain(
+        (goHomeLink.textContent ?? '').toLowerCase(),
+      );
     });
 
     it('sets aria-atomic on the live region', () => {
@@ -111,7 +128,6 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     });
 
     it('calls reset when "Try again" is clicked', async () => {
-      const user = userEvent.setup();
       const tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
 
       await user.click(tryAgainButton);
@@ -126,31 +142,16 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     });
   });
 
-  it("does not re-report when `t`'s identity changes but the error does not", () => {
-    const { rerender } = render(
-      <NextIntlClientProvider
-        locale={LOCALE_ISO_CODES.EN}
-        messages={{ ...SITE_MESSAGES }}
-      >
-        <LocaleErrorPage error={error} reset={reset} />
-      </NextIntlClientProvider>,
-      { wrapper: AppProviders },
-    );
+  it('does not re-report when translations refresh but the error is the same', () => {
+    const { rerender } = renderElement(<FreshMessagesPage />);
 
-    rerender(
-      <NextIntlClientProvider
-        locale={LOCALE_ISO_CODES.EN}
-        messages={{ ...SITE_MESSAGES }}
-      >
-        <LocaleErrorPage error={error} reset={reset} />
-      </NextIntlClientProvider>,
-    );
+    rerender(<FreshMessagesPage />);
 
     expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
   });
 
   it('renders the tenant-authored description with its formatting and link', () => {
-    render(
+    renderElement(
       <VoiceRichProvider
         values={{
           ...resolveVoiceRichFields({}, SITE_MESSAGES),
@@ -159,7 +160,6 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       >
         <LocaleErrorPage error={error} reset={reset} />
       </VoiceRichProvider>,
-      { wrapper: AppProviders },
     );
 
     const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });

@@ -1,32 +1,33 @@
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+  mockEnglishString,
+  mockInEnglish,
+  mockParagraph,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
-
-import { inDefaultLocale, localizedString } from '../lib/in-default-locale';
 
 import { localizeFaqDocument } from './index';
 
-const paragraph = (text: string) => [
-  { _type: 'block', _key: text, children: [{ _type: 'span', text }] },
-];
+faker.seed(10);
+
+const LISTED_TEXT_TYPE = 'internationalizedArrayListedTextValue';
+const MOCK_QUESTION = faker.lorem.sentence();
+const MOCK_HEADING = faker.lorem.words(2);
+const MOCK_ANSWER = mockParagraph();
 
 describe(localizeFaqDocument, () => {
   it('moves a question and its answer into the default language', () => {
     expect(
       localizeFaqDocument({
         _type: 'block_faq',
-        question: 'How long does it take?',
-        answer: paragraph('About six weeks.'),
+        question: MOCK_QUESTION,
+        answer: MOCK_ANSWER,
       }),
     ).toEqual([
-      at('question', set(localizedString('How long does it take?'))),
-      at(
-        'answer',
-        set(
-          inDefaultLocale(
-            'internationalizedArrayListedTextValue',
-            paragraph('About six weeks.'),
-          ),
-        ),
-      ),
+      at('question', set(mockEnglishString(MOCK_QUESTION))),
+      at('answer', set(mockInEnglish(LISTED_TEXT_TYPE, MOCK_ANSWER))),
     ]);
   });
 
@@ -34,16 +35,10 @@ describe(localizeFaqDocument, () => {
     expect(
       localizeFaqDocument({
         _type: 'module_faq',
-        headingBlock: { _type: 'headingBlock', heading: 'Questions' },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING),
       }),
     ).toEqual([
-      at(
-        'headingBlock',
-        set({
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('Questions'),
-        }),
-      ),
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_HEADING))),
     ]);
   });
 
@@ -51,46 +46,36 @@ describe(localizeFaqDocument, () => {
     expect(
       localizeFaqDocument({
         _type: 'block_faq',
-        question: localizedString('How long does it take?'),
-        answer: paragraph('About six weeks.'),
+        question: mockEnglishString(MOCK_QUESTION),
+        answer: MOCK_ANSWER,
       }),
     ).toEqual([
-      at(
-        'answer',
-        set(
-          inDefaultLocale(
-            'internationalizedArrayListedTextValue',
-            paragraph('About six weeks.'),
-          ),
-        ),
-      ),
+      at('answer', set(mockInEnglish(LISTED_TEXT_TYPE, MOCK_ANSWER))),
     ]);
   });
 
-  it('is idempotent — already localized documents are left alone', () => {
-    expect(
-      localizeFaqDocument({
-        _type: 'block_faq',
-        question: localizedString('How long does it take?'),
-        answer: inDefaultLocale(
-          'internationalizedArrayListedTextValue',
-          paragraph('About six weeks.'),
-        ),
-      }),
-    ).toBeUndefined();
-    expect(
-      localizeFaqDocument({
-        _type: 'module_faq',
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: localizedString('Questions'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves documents without text alone', () => {
-    expect(localizeFaqDocument({ _type: 'block_faq' })).toBeUndefined();
-    expect(localizeFaqDocument({ _type: 'module_faq' })).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized FAQ block',
+      doc: {
+        _type: 'block_faq' as const,
+        question: mockEnglishString(MOCK_QUESTION),
+        answer: mockInEnglish(LISTED_TEXT_TYPE, MOCK_ANSWER),
+      },
+    },
+    {
+      name: 'an already localized FAQ module',
+      doc: {
+        _type: 'module_faq' as const,
+        headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
+      },
+    },
+    { name: 'an FAQ block without text', doc: { _type: 'block_faq' as const } },
+    {
+      name: 'an FAQ module without text',
+      doc: { _type: 'module_faq' as const },
+    },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeFaqDocument(doc)).toBeUndefined();
   });
 });

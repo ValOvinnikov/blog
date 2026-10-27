@@ -1,26 +1,21 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import { withToastProvider } from '@web/testing/providers';
 import { useRouter } from 'next/navigation';
 
 import { ProviderLinkControl } from './provider-link-control';
 
-const {
-  routerRefreshMock,
-  signInMock,
-  unlinkProviderActionMock,
-  toastPromiseMock,
-} = vi.hoisted(() => ({
-  routerRefreshMock: vi.fn(),
-  signInMock: vi.fn(),
-  unlinkProviderActionMock: vi.fn(),
-  toastPromiseMock: vi.fn((promise: Promise<unknown>) => promise),
-}));
+faker.seed(6007);
 
-type TToastPromiseCallArgs = [
-  promise: Promise<unknown>,
-  messages: { error: (error: unknown) => { message: string } },
-];
+const { routerRefreshMock, signInMock, unlinkProviderActionMock } = vi.hoisted(
+  () => ({
+    routerRefreshMock: vi.fn(),
+    signInMock: vi.fn(),
+    unlinkProviderActionMock: vi.fn(),
+  }),
+);
 
 vi.mocked(useRouter).mockReturnValue({
   push: vi.fn(),
@@ -37,30 +32,27 @@ vi.mock('@web/server/account/identity-actions/identity-actions', () => ({
   unlinkProviderAction: unlinkProviderActionMock,
 }));
 
-vi.mock('@web/context/toast-provider', () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-    error: vi.fn(),
-    promise: toastPromiseMock,
-    dismiss: vi.fn(),
-  }),
-}));
+const PROVIDER = 'github';
+const {
+  linkButton: LINK_LABEL,
+  unlinkButton: UNLINK_LABEL,
+  unlinkToastSuccessMessage: UNLINK_SUCCESS_MESSAGE,
+  unlinkError: UNLINK_ERROR_MESSAGE,
+  unlinkLastMethodError: LAST_METHOD_ERROR_MESSAGE,
+} = SITE_MESSAGES.accountPage.identity;
 
-const setup = customRender(ProviderLinkControl, {
-  provider: 'github' as const,
-  action: 'link' as const,
+const setup = customRender(withToastProvider(ProviderLinkControl), {
+  provider: PROVIDER,
+  action: 'link',
 });
 
-let user: UserEvent;
-
 describe(`<${ProviderLinkControl.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     routerRefreshMock.mockReset();
     signInMock.mockReset();
     unlinkProviderActionMock.mockReset();
-    toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
     user = userEvent.setup();
   });
 
@@ -69,23 +61,18 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
       setup();
     });
 
-    it('renders the link button copy for the "link" action', () => {
-      expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
-    });
-
-    it('calls signIn with the provider and the /account redirect on "link"', async () => {
+    it('starts the provider sign-in that returns to the account page', async () => {
       signInMock.mockResolvedValue(undefined);
+      const linkButton = screen.getByRole('button', { name: LINK_LABEL });
 
-      await user.click(screen.getByRole('button', { name: 'Link' }));
+      await user.click(linkButton);
 
-      await waitFor(() => {
-        expect(signInMock).toHaveBeenCalledWith('github', {
-          redirectTo: '/account',
-        });
+      expect(signInMock).toHaveBeenCalledWith(PROVIDER, {
+        redirectTo: routes.account(),
       });
     });
 
-    it('marks the button aria-busy while the "link" action is pending', async () => {
+    it('marks the button aria-busy only while the link is pending', async () => {
       let resolveSignIn!: () => void;
       signInMock.mockImplementation(
         () =>
@@ -93,18 +80,15 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
             resolveSignIn = resolve;
           }),
       );
+      const linkButton = screen.getByRole('button', { name: LINK_LABEL });
 
-      const button = screen.getByRole('button', { name: 'Link' });
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(button).toHaveAttribute('aria-busy', 'true');
-      });
+      await user.click(linkButton);
+      expect(linkButton).toHaveAttribute('aria-busy', 'true');
 
       resolveSignIn();
 
       await waitFor(() => {
-        expect(button).toHaveAttribute('aria-busy', 'false');
+        expect(linkButton).toHaveAttribute('aria-busy', 'false');
       });
     });
   });
@@ -114,75 +98,45 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
       setup({ action: 'unlink' });
     });
 
-    it('renders the unlink button copy for the "unlink" action', () => {
-      expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
-    });
-
-    it('runs unlinkProviderAction through toast.promise and refreshes the router on success', async () => {
+    it('unlinks the provider, announces it and refreshes the page', async () => {
       unlinkProviderActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
       });
+      const unlinkButton = screen.getByRole('button', { name: UNLINK_LABEL });
 
-      await user.click(screen.getByRole('button', { name: 'Unlink' }));
+      await user.click(unlinkButton);
 
-      await waitFor(() => {
-        expect(unlinkProviderActionMock).toHaveBeenCalledWith('github');
-      });
-      await waitFor(() => {
-        expect(routerRefreshMock).toHaveBeenCalledTimes(1);
-      });
+      const successToast = await screen.findByRole('status');
 
-      expect(toastPromiseMock).toHaveBeenCalledWith(
-        expect.any(Promise),
-        expect.objectContaining({
-          loading: { message: 'Unlinking your account…' },
-          success: { message: 'Account unlinked.' },
-        }),
-      );
+      expect(successToast).toHaveTextContent(UNLINK_SUCCESS_MESSAGE);
+      expect(unlinkProviderActionMock).toHaveBeenCalledWith(PROVIDER);
+      expect(routerRefreshMock).toHaveBeenCalledTimes(1);
     });
 
-    it('does not refresh the router when unlinking fails generically', async () => {
-      unlinkProviderActionMock.mockResolvedValue({
+    it.each([
+      {
+        reason: 'unlinking fails',
         outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
-
-      await user.click(screen.getByRole('button', { name: 'Unlink' }));
-
-      await waitFor(() => {
-        expect(toastPromiseMock).toHaveBeenCalled();
-      });
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Unlink' })).toHaveAttribute(
-          'aria-busy',
-          'false',
-        );
-      });
-      expect(routerRefreshMock).not.toHaveBeenCalled();
-
-      const [, messages] = toastPromiseMock.mock
-        .calls[0] as unknown as TToastPromiseCallArgs;
-      expect(
-        messages.error(new Error(ACTION_OUTCOME.SERVER_ERROR)).message,
-      ).toBe("Couldn't unlink. Try again.");
-    });
-
-    it('surfaces a distinct message when the server rejects the last remaining method', async () => {
-      unlinkProviderActionMock.mockResolvedValue({
+        message: UNLINK_ERROR_MESSAGE,
+      },
+      {
+        reason: 'the server rejects the last remaining method',
         outcome: ACTION_OUTCOME.BLOCKED,
-      });
+        message: LAST_METHOD_ERROR_MESSAGE,
+      },
+    ])(
+      'explains the refusal and keeps the page when $reason',
+      async ({ outcome, message }) => {
+        unlinkProviderActionMock.mockResolvedValue({ outcome });
+        const unlinkButton = screen.getByRole('button', { name: UNLINK_LABEL });
 
-      await user.click(screen.getByRole('button', { name: 'Unlink' }));
+        await user.click(unlinkButton);
 
-      await waitFor(() => {
-        expect(toastPromiseMock).toHaveBeenCalled();
-      });
+        const errorToast = await screen.findByRole('alert');
 
-      const [, messages] = toastPromiseMock.mock
-        .calls[0] as unknown as TToastPromiseCallArgs;
-      expect(messages.error(new Error(ACTION_OUTCOME.BLOCKED)).message).toBe(
-        "That's your only remaining sign-in method — link another before unlinking this one.",
-      );
-      expect(routerRefreshMock).not.toHaveBeenCalled();
-    });
+        expect(errorToast).toHaveTextContent(message);
+        expect(routerRefreshMock).not.toHaveBeenCalled();
+      },
+    );
   });
 });

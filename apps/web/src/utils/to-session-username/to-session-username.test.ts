@@ -1,31 +1,54 @@
+import { faker } from '@faker-js/faker';
+
 import { toSessionUsername } from './to-session-username';
 
+faker.seed(6012);
+
+const MOCK_FIRST_NAME = faker.person.firstName();
+const MOCK_LAST_NAME = faker.person.lastName();
+const MOCK_FULL_NAME = `${MOCK_FIRST_NAME} ${MOCK_LAST_NAME}`;
+const MOCK_NAME_HANDLE = `${MOCK_FIRST_NAME}${MOCK_LAST_NAME}`.toLowerCase();
+const MOCK_EMAIL_LOCAL_PART = faker.lorem.word();
+const MOCK_EMAIL = `${MOCK_EMAIL_LOCAL_PART}@${faker.internet.domainName()}`;
+const MOCK_EMAIL_WITHOUT_LOCAL_PART = `@${faker.internet.domainName()}`;
+const MOCK_BLANK_NAME = '   ';
+const GENERIC_USERNAME = 'user';
+
 describe(toSessionUsername, () => {
-  it('prefers the email local part when email is present', () => {
-    expect(toSessionUsername('Jane Doe', 'jane@example.com')).toBe('jane');
+  it('prefers the email local part', () => {
+    expect(toSessionUsername(MOCK_FULL_NAME, MOCK_EMAIL)).toBe(
+      MOCK_EMAIL_LOCAL_PART,
+    );
   });
 
-  it('falls back to a slug of name when email is absent', () => {
-    expect(toSessionUsername('Jane Doe', undefined)).toBe('janedoe');
+  it.each([
+    { case: 'email is absent', email: undefined },
+    {
+      case: 'the email has an empty local part',
+      email: MOCK_EMAIL_WITHOUT_LOCAL_PART,
+    },
+  ])('falls back to the lowercased name when $case', ({ email }) => {
+    expect(toSessionUsername(MOCK_FULL_NAME, email)).toBe(MOCK_NAME_HANDLE);
   });
 
-  it('falls back to the generic "user" noun when both are absent', () => {
-    expect(toSessionUsername(undefined, undefined)).toBe('user');
-  });
-
-  it('falls through to name when the email has an empty local part', () => {
-    expect(toSessionUsername('Jane Doe', '@example.com')).toBe('janedoe');
-  });
-
-  it('falls through to the "user" fallback when the email local part is empty and name is absent', () => {
-    expect(toSessionUsername(undefined, '@example.com')).toBe('user');
-  });
-
-  it('falls through to the "user" fallback when name is whitespace-only and email is absent', () => {
-    expect(toSessionUsername('   ', undefined)).toBe('user');
-  });
-
-  it('falls through to the "user" fallback when both are empty/whitespace-only', () => {
-    expect(toSessionUsername('   ', '@example.com')).toBe('user');
+  it.each([
+    { case: 'both are absent', name: undefined, email: undefined },
+    {
+      case: 'the email local part is empty and name is absent',
+      name: undefined,
+      email: MOCK_EMAIL_WITHOUT_LOCAL_PART,
+    },
+    {
+      case: 'name is blank and email is absent',
+      name: MOCK_BLANK_NAME,
+      email: undefined,
+    },
+    {
+      case: 'name is blank and the email local part is empty',
+      name: MOCK_BLANK_NAME,
+      email: MOCK_EMAIL_WITHOUT_LOCAL_PART,
+    },
+  ])('falls back to the generic username when $case', ({ name, email }) => {
+    expect(toSessionUsername(name, email)).toBe(GENERIC_USERNAME);
   });
 });

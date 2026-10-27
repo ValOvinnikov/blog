@@ -1,54 +1,47 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockImageAsset,
+  mockLocalizedImage,
+  mockPlainImage,
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeHeroBlogModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(15);
 
-const strings = (value: string) => [
-  {
-    _key: EN,
-    _type: 'internationalizedArrayStringValue',
-    language: EN,
-    value,
-  },
-];
-
-const asset = { _type: 'reference', _ref: 'image-1' };
+const MOCK_EYEBROW = faker.lorem.word();
+const MOCK_ACTION_LABEL = faker.lorem.words(3);
+const MOCK_ALT = faker.lorem.words(2);
+const MOCK_ASSET = mockImageAsset();
 
 describe(localizeHeroBlogModule, () => {
   it('moves the eyebrow, action label and image alt into the default language', () => {
     expect(
       localizeHeroBlogModule({
-        eyebrow: 'Featured',
-        primaryActionLabel: 'Read the post',
-        image: { _type: 'imageWithAlt', asset, alt: 'A desk' },
+        eyebrow: MOCK_EYEBROW,
+        primaryActionLabel: MOCK_ACTION_LABEL,
+        image: mockPlainImage(MOCK_ASSET, MOCK_ALT),
       }),
     ).toEqual([
-      at('eyebrow', set(strings('Featured'))),
-      at('primaryActionLabel', set(strings('Read the post'))),
-      at(
-        'image',
-        set({ _type: 'localizedImageWithAlt', asset, alt: strings('A desk') }),
-      ),
+      at('eyebrow', set(mockEnglishString(MOCK_EYEBROW))),
+      at('primaryActionLabel', set(mockEnglishString(MOCK_ACTION_LABEL))),
+      at('image', set(mockLocalizedImage(MOCK_ASSET, MOCK_ALT))),
     ]);
   });
 
-  it('is idempotent — an already localized hero is left alone', () => {
-    expect(
-      localizeHeroBlogModule({
-        eyebrow: strings('Featured'),
-        primaryActionLabel: strings('Read the post'),
-        image: {
-          _type: 'localizedImageWithAlt',
-          asset,
-          alt: strings('A desk'),
-        },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a hero without text alone', () => {
-    expect(localizeHeroBlogModule({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized hero',
+      doc: {
+        eyebrow: mockEnglishString(MOCK_EYEBROW),
+        primaryActionLabel: mockEnglishString(MOCK_ACTION_LABEL),
+        image: mockLocalizedImage(MOCK_ASSET, MOCK_ALT),
+      },
+    },
+    { name: 'a hero without text', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeHeroBlogModule(doc)).toBeUndefined();
   });
 });

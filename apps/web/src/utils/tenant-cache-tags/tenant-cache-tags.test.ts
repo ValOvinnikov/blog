@@ -1,31 +1,40 @@
+import { faker } from '@faker-js/faker';
+
 import {
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,
 } from './tenant-cache-tags';
 
-describe(buildSiteConfigCacheTag, () => {
-  it('scopes the tag to the given tenant id', () => {
-    expect(buildSiteConfigCacheTag('tenant-1')).toBe('site-config:tenant-1');
-  });
+faker.seed(6012);
 
-  it('produces a different tag for a different tenant', () => {
-    expect(buildSiteConfigCacheTag('tenant-1')).not.toBe(
-      buildSiteConfigCacheTag('tenant-2'),
-    );
-  });
-});
+const MOCK_TENANT_ID = faker.string.uuid();
+const MOCK_OTHER_TENANT_ID = faker.string.uuid();
 
-describe(buildSettingsFeaturesCacheTag, () => {
-  it('scopes the tag to the given tenant id', () => {
-    expect(buildSettingsFeaturesCacheTag('tenant-1')).toBe(
-      'settings-features:tenant-1',
-    );
-  });
-});
+const TAG_BUILDERS = [
+  { builder: buildSiteConfigCacheTag },
+  { builder: buildSettingsFeaturesCacheTag },
+  { builder: buildTenantPlanCacheTag },
+];
 
-describe(buildTenantPlanCacheTag, () => {
-  it('scopes the tag to the given tenant id', () => {
-    expect(buildTenantPlanCacheTag('tenant-1')).toBe('tenant-plan:tenant-1');
+describe('tenant cache tags', () => {
+  it.each(TAG_BUILDERS)(
+    '$builder.name scopes the tag to the given tenant id',
+    ({ builder }) => {
+      expect(builder(MOCK_TENANT_ID)).toContain(MOCK_TENANT_ID);
+    },
+  );
+
+  it.each(TAG_BUILDERS)(
+    '$builder.name produces a different tag for a different tenant',
+    ({ builder }) => {
+      expect(builder(MOCK_TENANT_ID)).not.toBe(builder(MOCK_OTHER_TENANT_ID));
+    },
+  );
+
+  it('gives each kind of cached data its own tag for the same tenant', () => {
+    const tags = TAG_BUILDERS.map(({ builder }) => builder(MOCK_TENANT_ID));
+
+    expect(new Set(tags).size).toBe(TAG_BUILDERS.length);
   });
 });

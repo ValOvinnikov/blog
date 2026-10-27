@@ -1,34 +1,42 @@
-import userEvent from '@testing-library/user-event';
-import { useConsentPreferences } from '@web/context/consent-preferences-provider';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { renderElement, screen } from '@web/testing/custom-render';
+import {
+  PREFERENCES_CLOSED_TEXT,
+  PREFERENCES_OPEN_TEXT,
+  PreferencesState,
+} from '@web/testing/shared/consent/consent-preferences-probes';
 
 import { CookieSettingsButton } from './cookie-settings-button';
 
-const PreferencesState = () => {
-  const { isOpen } = useConsentPreferences();
-  return <p>{isOpen ? 'Preferences open' : 'Preferences closed'}</p>;
-};
+const BUTTON_NAME = 'Cookie settings';
 
 describe(`<${CookieSettingsButton.name}/>`, () => {
-  it('is always available, whatever the consent state', () => {
-    renderElement(<CookieSettingsButton />);
+  let user: UserEvent;
 
-    expect(
-      screen.getByRole('button', { name: 'Cookie settings' }),
-    ).toBeVisible();
-  });
-
-  it('opens the preferences when pressed', async () => {
-    const user = userEvent.setup();
+  beforeEach(() => {
+    user = userEvent.setup();
     renderElement(
       <>
         <CookieSettingsButton />
         <PreferencesState />
       </>,
     );
+  });
 
-    await user.click(screen.getByRole('button', { name: 'Cookie settings' }));
+  it('is always available, whatever the consent state', () => {
+    const settingsButton = screen.getByRole('button', { name: BUTTON_NAME });
 
-    expect(screen.getByText('Preferences open')).toBeVisible();
+    expect(settingsButton).toBeVisible();
+  });
+
+  it('opens the preferences when pressed', async () => {
+    const settingsButton = screen.getByRole('button', { name: BUTTON_NAME });
+    const closedState = screen.getByText(PREFERENCES_CLOSED_TEXT);
+    expect(closedState).toBeVisible();
+
+    await user.click(settingsButton);
+
+    const openState = screen.getByText(PREFERENCES_OPEN_TEXT);
+    expect(openState).toBeVisible();
   });
 });

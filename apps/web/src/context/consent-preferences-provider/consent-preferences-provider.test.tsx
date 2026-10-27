@@ -6,6 +6,10 @@ import {
 } from './consent-preferences-provider';
 
 describe(useConsentPreferences, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('opens and closes the preferences', () => {
     const { result } = renderHook(() => useConsentPreferences(), {
       wrapper: ConsentPreferencesProvider,

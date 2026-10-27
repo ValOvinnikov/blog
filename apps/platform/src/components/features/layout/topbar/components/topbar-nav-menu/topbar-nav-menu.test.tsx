@@ -1,189 +1,144 @@
-import { ICONS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
-  renderWithIntl,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+  mockNavBadge,
+  mockNavInertItem,
+  mockNavLinkItem,
+  mockNavSection,
+} from '@platform/testing/layout/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TopbarNavMenu } from './topbar-nav-menu';
 
 vi.mock('@platform/i18n/navigation');
 
-const usePathnameMock = vi.mocked(usePathname);
+faker.seed(5993);
 
-const render = renderWithIntl;
+const MOCK_LOOK_ITEM = mockNavLinkItem();
+const MOCK_VOICE_ITEM = mockNavLinkItem();
+const MOCK_BADGE = mockNavBadge();
+const MOCK_BADGED_ITEM = mockNavLinkItem({ badge: MOCK_BADGE });
+const MOCK_NOTE = faker.lorem.sentence();
+const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
+const MOCK_SECTION = mockNavSection({ items: [MOCK_LOOK_ITEM] });
 
-const setPathname = (pathname: string) => {
-  usePathnameMock.mockReturnValue(pathname);
-};
-
-const PLATFORM_TENANTS_SECTION = [
-  {
-    label: 'Platform',
-    items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
-  },
-];
-
-const THIS_MILESTONE = 'this milestone';
-const TENANT_SECTION_LABEL = 'Tenant · acme';
-const LOOK_AND_VOICE_SHIP_SOON = 'Look and Voice ship soon.';
 const ARIA_CURRENT = 'aria-current';
-const TENANT_SWITCHER = 'Tenant switcher';
+
+const setup = customRender(TopbarNavMenu, { sections: [MOCK_SECTION] });
 
 describe(`<${TopbarNavMenu.name}/>`, () => {
   let user: UserEvent;
 
+  const openMenu = async () => {
+    const trigger = screen.getByRole('button', {
+      name: messages.topbarNavMenu.triggerLabel,
+    });
+    await user.click(trigger);
+    return screen.findByRole('menu');
+  };
+
   beforeEach(() => {
     user = userEvent.setup();
-    setPathname('/');
+    vi.mocked(usePathname).mockReset();
   });
 
-  it('renders a closed, icon-only trigger by default', () => {
-    render(<TopbarNavMenu sections={[]} />);
+  it('renders a closed trigger by default', () => {
+    setup();
 
-    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-  });
-
-  it('opens the popup on click, showing sections, items, badges and notes', async () => {
-    render(
-      <TopbarNavMenu
-        sections={[
-          {
-            label: 'Platform',
-            items: [
-              {
-                label: 'Tenants',
-                icon: ICONS.GRID,
-                href: '/tenants',
-                badge: { label: THIS_MILESTONE, tone: 'neutral' },
-              },
-            ],
-          },
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [],
-            note: LOOK_AND_VOICE_SHIP_SOON,
-          },
-        ]}
-      />,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-
-    const menu = await screen.findByRole('menu');
-    const tenantsLink = within(menu).getByRole('menuitem', {
-      name: /Tenants/,
+    const trigger = screen.getByRole('button', {
+      name: messages.topbarNavMenu.triggerLabel,
     });
-    expect(tenantsLink).toHaveAttribute('href', '/tenants');
-    expect(within(tenantsLink).getByText(THIS_MILESTONE)).toBeVisible();
-    expect(within(menu).getByText(LOOK_AND_VOICE_SHIP_SOON)).toBeVisible();
+    const menu = screen.queryByRole('menu');
+
+    expect(trigger).toBeVisible();
+    expect(menu).not.toBeInTheDocument();
+  });
+
+  it('opens the popup on click, showing items, badges and notes', async () => {
+    setup({
+      sections: [
+        mockNavSection({ items: [MOCK_BADGED_ITEM] }),
+        mockNavSection({ items: [], note: MOCK_NOTE }),
+      ],
+    });
+
+    const menu = await openMenu();
+    const link = within(menu).getByRole('menuitem', {
+      name: `${MOCK_BADGED_ITEM.label}${MOCK_BADGE.label}`,
+    });
+    const badge = within(link).getByText(MOCK_BADGE.label);
+    const note = within(menu).getByText(MOCK_NOTE);
+
+    expect(link).toHaveAttribute('href', MOCK_BADGED_ITEM.href);
+    expect(badge).toBeVisible();
+    expect(note).toBeVisible();
   });
 
   it('marks only the item matching the current pathname active', async () => {
-    setPathname(`/tenants/${MOCK_TENANT_ID}/look`);
-    render(
-      <TopbarNavMenu
-        sections={[
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [
-              {
-                label: 'Look',
-                icon: ICONS.PALETTE,
-                href: `/tenants/${MOCK_TENANT_ID}/look`,
-              },
-              {
-                label: 'Voice',
-                icon: ICONS.QUOTE,
-                href: `/tenants/${MOCK_TENANT_ID}/voice`,
-              },
-            ],
-          },
-        ]}
-      />,
-    );
+    vi.mocked(usePathname).mockReturnValue(MOCK_LOOK_ITEM.href);
+    setup({
+      sections: [mockNavSection({ items: [MOCK_LOOK_ITEM, MOCK_VOICE_ITEM] })],
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-    const menu = await screen.findByRole('menu');
+    const menu = await openMenu();
+    const activeItem = within(menu).getByRole('menuitem', {
+      name: MOCK_LOOK_ITEM.label,
+    });
+    const inactiveItem = within(menu).getByRole('menuitem', {
+      name: MOCK_VOICE_ITEM.label,
+    });
 
-    expect(
-      within(menu).getByRole('menuitem', { name: 'Look' }),
-    ).toHaveAttribute(ARIA_CURRENT, 'page');
-    expect(
-      within(menu).getByRole('menuitem', { name: 'Voice' }),
-    ).not.toHaveAttribute(ARIA_CURRENT);
+    expect(activeItem).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(inactiveItem).not.toHaveAttribute(ARIA_CURRENT);
   });
 
-  it('renders an item with no href as an inert row that is never marked active', async () => {
-    setPathname(`/tenants/${MOCK_TENANT_ID}/domain`);
-    render(
-      <TopbarNavMenu
-        sections={[
-          {
-            label: TENANT_SECTION_LABEL,
-            items: [
-              {
-                label: 'Domain',
-                icon: ICONS.GLOBE,
-                badge: { label: 'later', tone: 'warn' },
-              },
-            ],
-          },
-        ]}
-      />,
-    );
+  it('renders an item with no href as an inert row with its badge', async () => {
+    const inertItem = mockNavInertItem({ badge: MOCK_BADGE });
+    setup({ sections: [mockNavSection({ items: [inertItem] })] });
 
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-    const menu = await screen.findByRole('menu');
+    const menu = await openMenu();
+    const menuItem = within(menu).queryByRole('menuitem');
+    const label = within(menu).getByText(inertItem.label);
+    const badge = within(menu).getByText(MOCK_BADGE.label);
 
-    expect(
-      within(menu).queryByRole('menuitem', { name: /Domain/ }),
-    ).not.toBeInTheDocument();
-    expect(within(menu).getByText('Domain')).toBeVisible();
-    expect(within(menu).getByText('later')).toBeVisible();
-    expect(within(menu).queryByText('Domain')).not.toHaveAttribute(
-      ARIA_CURRENT,
-    );
+    expect(menuItem).not.toBeInTheDocument();
+    expect(label).toBeVisible();
+    expect(badge).toBeVisible();
   });
 
   it('closes the popup after clicking a link item', async () => {
-    render(<TopbarNavMenu sections={PLATFORM_TENANTS_SECTION} />);
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-    const menu = await screen.findByRole('menu');
-    await user.click(within(menu).getByRole('menuitem', { name: 'Tenants' }));
+    const menu = await openMenu();
+    const link = within(menu).getByRole('menuitem', {
+      name: MOCK_LOOK_ITEM.label,
+    });
+    await user.click(link);
 
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    const closedMenu = screen.queryByRole('menu');
+    expect(closedMenu).not.toBeInTheDocument();
   });
 
   it('renders the switcher slot above the nav sections when provided', async () => {
-    render(
-      <TopbarNavMenu
-        switcher={<div>Tenant switcher</div>}
-        sections={PLATFORM_TENANTS_SECTION}
-      />,
-    );
+    setup({ switcher: <div>{MOCK_SWITCHER_TEXT}</div> });
 
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-    const menu = await screen.findByRole('menu');
-    const text = menu.textContent ?? '';
+    const menu = await openMenu();
+    const switcher = within(menu).getByText(MOCK_SWITCHER_TEXT);
 
-    expect(within(menu).getByText(TENANT_SWITCHER)).toBeVisible();
-    expect(text.indexOf(TENANT_SWITCHER)).toBeLessThan(
-      text.indexOf('Platform'),
+    expect(switcher).toBeVisible();
+    expect(menu).toHaveTextContent(
+      new RegExp(`${MOCK_SWITCHER_TEXT}.*${MOCK_SECTION.label}`),
     );
   });
 
   it('renders no switcher slot when none is provided', async () => {
-    render(<TopbarNavMenu sections={PLATFORM_TENANTS_SECTION} />);
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Menu' }));
-    await screen.findByRole('menu');
+    const menu = await openMenu();
+    const switcher = within(menu).queryByText(MOCK_SWITCHER_TEXT);
 
-    expect(screen.queryByText(TENANT_SWITCHER)).not.toBeInTheDocument();
+    expect(switcher).not.toBeInTheDocument();
   });
 });

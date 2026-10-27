@@ -2,11 +2,16 @@ import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { createAdmin } from './create-admin';
 
 vi.mock('@blog/db/client');
+
+faker.seed(602205);
+
+const MOCK_MISSING_USER_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 
@@ -16,50 +21,50 @@ afterEach(async () => {
 });
 
 describe(createAdmin, () => {
+  let userId: string;
+
   beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
+    ({ id: userId } = await insertTestUser(db()));
   });
 
   it('inserts a new admin row', async () => {
-    const admin = await createAdmin(
-      'user-1',
+    const { userId: adminUserId, role } = await createAdmin(
+      userId,
       ADMIN_ROLE.SUPERADMIN,
       GRANTED_VIA.BREAK_GLASS,
     );
 
-    expect(admin).toMatchObject({
-      userId: 'user-1',
-      role: ADMIN_ROLE.SUPERADMIN,
-    });
+    expect(adminUserId).toBe(userId);
+    expect(role).toBe(ADMIN_ROLE.SUPERADMIN);
   });
 
   it('is idempotent when the user already has an admin row', async () => {
     const first = await createAdmin(
-      'user-1',
+      userId,
       ADMIN_ROLE.SUPERADMIN,
       GRANTED_VIA.BREAK_GLASS,
     );
 
     const second = await createAdmin(
-      'user-1',
+      userId,
       ADMIN_ROLE.SUPERADMIN,
       GRANTED_VIA.BREAK_GLASS,
     );
 
-    expect(second).toEqual(first);
     const rows = await db().select().from(schema.admins);
+    expect(second).toEqual(first);
     expect(rows).toHaveLength(1);
   });
 
-  it('does not change the stored role when re-run with a different role', async () => {
+  it('keeps the stored role when re-run with a different role', async () => {
     const first = await createAdmin(
-      'user-1',
+      userId,
       ADMIN_ROLE.SUPERADMIN,
       GRANTED_VIA.BREAK_GLASS,
     );
 
     const second = await createAdmin(
-      'user-1',
+      userId,
       ADMIN_ROLE.MODERATOR,
       GRANTED_VIA.BREAK_GLASS,
     );
@@ -71,7 +76,7 @@ describe(createAdmin, () => {
   it('rejects an admin grant for a user that does not exist', async () => {
     await expect(
       createAdmin(
-        'missing-user',
+        MOCK_MISSING_USER_ID,
         ADMIN_ROLE.SUPERADMIN,
         GRANTED_VIA.BREAK_GLASS,
       ),
@@ -79,64 +84,62 @@ describe(createAdmin, () => {
   });
 
   it('leaves grantedBy NULL and still sets grantedAt for a break-glass grant', async () => {
-    const admin = await createAdmin(
-      'user-1',
+    const { grantedVia, grantedBy, grantedAt } = await createAdmin(
+      userId,
       ADMIN_ROLE.SUPERADMIN,
       GRANTED_VIA.BREAK_GLASS,
     );
 
-    expect(admin.grantedVia).toBe(GRANTED_VIA.BREAK_GLASS);
-    expect(admin.grantedBy).toBeNull();
-    expect(admin.grantedAt).toBeInstanceOf(Date);
+    expect(grantedVia).toBe(GRANTED_VIA.BREAK_GLASS);
+    expect(grantedBy).toBeNull();
+    expect(grantedAt).toBeInstanceOf(Date);
+  });
+
+  it('removes the admin row when its owning user is deleted', async () => {
+    await createAdmin(userId, ADMIN_ROLE.SUPERADMIN, GRANTED_VIA.BREAK_GLASS);
+
+    await db().delete(schema.users).where(eq(schema.users.id, userId));
+
+    const rows = await db().select().from(schema.admins);
+    expect(rows).toHaveLength(0);
   });
 
   describe('with a granting user', () => {
+    let granterId: string;
+
     beforeEach(async () => {
-      await insertTestUser(db(), { id: 'granter-1' });
+      ({ id: granterId } = await insertTestUser(db()));
     });
 
-    it('records the granting user id, grantedVia, and grantedAt for an in-app promotion', async () => {
-      const admin = await createAdmin(
-        'user-1',
+    it('records the granter, grantedVia and grantedAt for an in-app promotion', async () => {
+      const { grantedVia, grantedBy, grantedAt } = await createAdmin(
+        userId,
         ADMIN_ROLE.SUPERADMIN,
         GRANTED_VIA.PROMOTION,
-        'granter-1',
+        granterId,
       );
 
-      expect(admin.grantedVia).toBe(GRANTED_VIA.PROMOTION);
-      expect(admin.grantedBy).toBe('granter-1');
-      expect(admin.grantedAt).toBeInstanceOf(Date);
+      expect(grantedVia).toBe(GRANTED_VIA.PROMOTION);
+      expect(grantedBy).toBe(granterId);
+      expect(grantedAt).toBeInstanceOf(Date);
     });
 
-    it('keeps grantedVia as PROMOTION even after the granting user is deleted', async () => {
+    it('keeps grantedVia as PROMOTION after the granting user is deleted', async () => {
       const admin = await createAdmin(
-        'user-1',
+        userId,
         ADMIN_ROLE.SUPERADMIN,
         GRANTED_VIA.PROMOTION,
-        'granter-1',
+        granterId,
       );
 
-      await db().delete(schema.users).where(eq(schema.users.id, 'granter-1'));
+      await db().delete(schema.users).where(eq(schema.users.id, granterId));
 
       const [row] = await db()
         .select()
         .from(schema.admins)
         .where(eq(schema.admins.id, admin.id));
-
       expect(row?.grantedBy).toBeNull();
       expect(row?.grantedVia).toBe(GRANTED_VIA.PROMOTION);
     });
-  });
-});
-
-describe('foreign-key cascade', () => {
-  it('removes an admin row when its owning user is deleted', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    await createAdmin('user-1', ADMIN_ROLE.SUPERADMIN, GRANTED_VIA.BREAK_GLASS);
-
-    await db().delete(schema.users).where(eq(schema.users.id, 'user-1'));
-
-    const rows = await db().select().from(schema.admins);
-    expect(rows).toHaveLength(0);
   });
 });

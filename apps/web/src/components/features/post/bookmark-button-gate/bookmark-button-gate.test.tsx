@@ -61,6 +61,8 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
 
     const toggle = await screen.findByRole('button', { name: saveAriaLabel });
     await waitFor(() => expect(toggle).toBeEnabled());
+
+    expect(toggle).toBeVisible();
     expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_ID);
   });
 
@@ -81,7 +83,8 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
 
     await setup();
 
-    const toggle = screen.queryByRole('button');
+    const toggle = screen.queryByRole('button', { name: saveAriaLabel });
+
     expect(toggle).not.toBeInTheDocument();
   });
 

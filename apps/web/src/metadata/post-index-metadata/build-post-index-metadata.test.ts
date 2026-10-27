@@ -1,15 +1,17 @@
 import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { type TBlogIndexPage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  MOCK_DUTCH_REQUEST_CONTEXT,
+  NL_PATH_PREFIX,
+  mockMetadataSeo,
+  toPageSuffix,
+} from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import {
-  MOCK_OG_IMAGE,
-  MOCK_OG_IMAGE_URL,
-} from '@web/testing/shared/seo/og-image-fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildPostIndexMetadata } from './build-post-index-metadata';
@@ -27,29 +29,22 @@ vi.mock(
 
 vi.mock('@web/server/request-context/request-context');
 
-const TITLE = 'The Blog';
-const DESCRIPTION = 'All the posts.';
+faker.seed(5204);
+
+const { EN, NL, DE } = LOCALE_ISO_CODES;
 const BLOG_PATH = routes.blogIndex();
 const RSS_TYPES = { 'application/rss+xml': routes.rssFeed() };
-const OG_DESCRIPTION = 'All the posts OG.';
-const PAGE_TWO_OG_TITLE = 'The Blog OG – Page 2';
-const OG_TITLE = 'The Blog OG';
 
-const seo = mockSeo({
-  title: TITLE,
-  description: DESCRIPTION,
-  ogTitle: OG_TITLE,
-  ogDescription: OG_DESCRIPTION,
-  ogImage: MOCK_OG_IMAGE,
-});
+const MOCK_SEO = mockMetadataSeo();
+const { title, description, ogTitle, ogDescription } = MOCK_SEO;
 
 const resolveIndexPageWith = (overrides: Partial<TBlogIndexPage> = {}) =>
   getPostIndexPageMock.mockResolvedValue(
     okResult({
-      headingBlock: mockHeadingBlock({ heading: 'Blog' }),
-      seo,
+      headingBlock: mockHeadingBlock({ heading: faker.lorem.word() }),
+      seo: MOCK_SEO,
       modules: [],
-      translations: [LOCALE_ISO_CODES.EN],
+      translations: [EN],
       ...overrides,
     }),
   );
@@ -65,30 +60,32 @@ describe(buildPostIndexMetadata, () => {
       resolveIndexPageWith();
     });
 
-    it('reads the same index page the post index renders', async () => {
+    it('reads the index page the post index renders', async () => {
       await buildPostIndexMetadata(1);
 
       expect(getPostIndexPageMock).toHaveBeenCalledWith();
     });
 
-    it('builds page-1 metadata from the seo, canonical to /blog', async () => {
+    it('builds page-1 metadata from the seo, canonical to the blog index', async () => {
       const metadata = await buildPostIndexMetadata(1);
 
-      expect(metadata.title).toBe(TITLE);
-      expect(metadata.description).toBe(DESCRIPTION);
+      expect(metadata.title).toBe(title);
+      expect(metadata.description).toBe(description);
       expect(metadata.alternates?.canonical).toBe(BLOG_PATH);
-      expect(metadata.openGraph?.title).toBe(OG_TITLE);
-      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
+      expect(metadata.openGraph?.title).toBe(ogTitle);
+      expect(metadata.openGraph?.description).toBe(ogDescription);
       expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
       expect(metadata.alternates?.types).toEqual(RSS_TYPES);
     });
 
-    it('suffixes page-N titles with the page, canonical to /blog/page/N', async () => {
+    it('suffixes page-N titles with the page, canonical to that page', async () => {
+      const pageTitle = `${ogTitle} ${toPageSuffix(2)}`;
+
       const metadata = await buildPostIndexMetadata(2);
 
-      expect(metadata.title).toBe(`${TITLE} – Page 2`);
-      expect(metadata.openGraph?.title).toBe(PAGE_TWO_OG_TITLE);
-      expect(metadata.twitter?.title).toBe(PAGE_TWO_OG_TITLE);
+      expect(metadata.title).toBe(`${title} ${toPageSuffix(2)}`);
+      expect(metadata.openGraph?.title).toBe(pageTitle);
+      expect(metadata.twitter?.title).toBe(pageTitle);
       expect(metadata.alternates?.canonical).toBe(routes.blogIndex(2));
       expect(metadata.alternates?.types).toEqual(RSS_TYPES);
     });
@@ -118,47 +115,45 @@ describe(buildPostIndexMetadata, () => {
   });
 
   describe('for a Dutch-language request', () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-
     beforeEach(() => {
-      vi.mocked(getRequestContext).mockResolvedValue({
-        ...MOCK_REQUEST_CONTEXT,
-        locale: NL,
-        liveLocales: [EN, NL],
-      });
+      vi.mocked(getRequestContext).mockResolvedValue(
+        MOCK_DUTCH_REQUEST_CONTEXT,
+      );
     });
 
     it('lists each live translated language as hreflang, canonical to its prefix', async () => {
-      const translations = [EN, NL, DE];
-      resolveIndexPageWith({ translations });
+      resolveIndexPageWith({ translations: [EN, NL, DE] });
 
       const metadata = await buildPostIndexMetadata(1);
 
       expect(metadata.alternates).toEqual({
-        canonical: `/nl${BLOG_PATH}`,
+        canonical: `${NL_PATH_PREFIX}${BLOG_PATH}`,
         languages: {
           en: BLOG_PATH,
-          nl: `/nl${BLOG_PATH}`,
+          nl: `${NL_PATH_PREFIX}${BLOG_PATH}`,
           'x-default': BLOG_PATH,
         },
-        types: { 'application/rss+xml': `/nl${routes.rssFeed()}` },
+        types: {
+          'application/rss+xml': `${NL_PATH_PREFIX}${routes.rssFeed()}`,
+        },
       });
     });
 
     it('lists no hreflang past page 1', async () => {
-      const translations = [EN, NL];
-      resolveIndexPageWith({ translations });
+      resolveIndexPageWith({ translations: [EN, NL] });
 
       const metadata = await buildPostIndexMetadata(2);
 
-      expect(metadata.alternates?.canonical).toBe(`/nl${routes.blogIndex(2)}`);
+      expect(metadata.alternates?.canonical).toBe(
+        `${NL_PATH_PREFIX}${routes.blogIndex(2)}`,
+      );
       expect(metadata.alternates?.languages).toBeUndefined();
     });
   });
 
   it('omits the OG title past page 1 when none is authored', async () => {
     resolveIndexPageWith({
-      seo: mockSeo({ title: TITLE, ogTitle: undefined }),
+      seo: mockMetadataSeo({ ogTitle: undefined }),
     });
 
     const metadata = await buildPostIndexMetadata(2);

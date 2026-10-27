@@ -1,3 +1,4 @@
+import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
@@ -7,101 +8,76 @@ import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event';
 
 import { TenantSwitcher } from './tenant-switcher';
 
 vi.mock('@platform/i18n/navigation');
 
-const tenant: TTenantSwitcherItem = {
+const MOCK_ACTIVE_TENANT: TTenantSwitcherItem = {
   id: MOCK_TENANT_ID,
   name: MOCK_TENANT_NAME,
   primaryDomain: MOCK_TENANT_DOMAIN,
   isArchived: false,
 };
 
-const archivedTenant: TTenantSwitcherItem = {
+const MOCK_ARCHIVED_TENANT: TTenantSwitcherItem = {
   id: MOCK_OTHER_TENANT_ID,
   name: MOCK_OTHER_TENANT_NAME,
   primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
   isArchived: true,
 };
 
-const includesTenantName = (accessibleName: string) =>
-  accessibleName.includes(MOCK_TENANT_NAME);
+const ACTIVE_TENANT_NAME = `${MOCK_TENANT_NAME}${MOCK_TENANT_DOMAIN}`;
+const ARCHIVED_TENANT_NAME = `${MOCK_OTHER_TENANT_NAME}${messages.tenantSwitcher.archived}${MOCK_OTHER_TENANT_DOMAIN}`;
 
 const setup = customRender(TenantSwitcher, {
-  tenants: [tenant],
+  tenants: [MOCK_ACTIVE_TENANT, MOCK_ARCHIVED_TENANT],
   activeTenantId: MOCK_TENANT_ID,
 });
 
 describe(`<${TenantSwitcher.name}/>`, () => {
-  let user: UserEvent;
+  it.each([
+    { activeTenantId: MOCK_TENANT_ID, name: ACTIVE_TENANT_NAME },
+    { activeTenantId: MOCK_OTHER_TENANT_ID, name: ARCHIVED_TENANT_NAME },
+  ])(
+    'names its trigger for the active tenant $name',
+    ({ activeTenantId, name }) => {
+      setup({ activeTenantId });
 
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
+      const trigger = screen.getByRole('button', { name });
 
-  it('shows the active tenant on the trigger', () => {
-    setup();
-
-    const trigger = screen.getByRole('button', { name: includesTenantName });
-
-    expect(trigger).toHaveTextContent(MOCK_TENANT_DOMAIN);
-  });
+      expect(trigger).toBeVisible();
+    },
+  );
 
   describe('with the menu open', () => {
     let menu: HTMLElement;
 
     beforeEach(async () => {
-      setup({ tenants: [tenant, archivedTenant] });
-      const trigger = screen.getByRole('button', { name: includesTenantName });
+      const user = userEvent.setup();
+      setup();
+
+      const trigger = screen.getByRole('button', { name: ACTIVE_TENANT_NAME });
       await user.click(trigger);
-      menu = await screen.findByRole('menu', { name: includesTenantName });
+      menu = await screen.findByRole('menu', { name: ACTIVE_TENANT_NAME });
     });
 
-    it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', () => {
-      const activeItem = within(menu).getByRole('menuitem', {
-        name: includesTenantName,
-      });
-      const otherItem = within(menu).getByRole('menuitem', {
-        name: /globex corp/i,
-      });
+    it.each([
+      { name: ACTIVE_TENANT_NAME, tenantId: MOCK_TENANT_ID },
+      { name: ARCHIVED_TENANT_NAME, tenantId: MOCK_OTHER_TENANT_ID },
+    ])(
+      'links $name through the select-tenant endpoint',
+      ({ name, tenantId }) => {
+        const item = within(menu).getByRole('menuitem', { name });
 
-      expect(activeItem).toHaveAttribute(
-        'href',
-        `/api/dashboard/select-tenant?tenantId=${MOCK_TENANT_ID}`,
-      );
-      expect(otherItem).toHaveAttribute(
-        'href',
-        `/api/dashboard/select-tenant?tenantId=${MOCK_OTHER_TENANT_ID}`,
-      );
-    });
-
-    it('marks an archived tenant in its accessible name and leaves others unmarked', () => {
-      const activeItem = within(menu).getByRole('menuitem', {
-        name: includesTenantName,
-      });
-      const archivedItem = within(menu).getByRole('menuitem', {
-        name: /globex corp.*archived/i,
-      });
-
-      expect(activeItem).not.toHaveAccessibleName(/archived/i);
-      expect(archivedItem).toBeVisible();
-    });
-  });
-
-  it('shows the archived marker on the trigger when the active tenant is archived', () => {
-    setup({
-      tenants: [tenant, archivedTenant],
-      activeTenantId: MOCK_OTHER_TENANT_ID,
-    });
-
-    const trigger = screen.getByRole('button', {
-      name: /globex corp.*archived/i,
-    });
-
-    expect(trigger).toBeVisible();
+        expect(item).toHaveAttribute(
+          'href',
+          adminRoutes.dashboardSelectTenantHref(tenantId),
+        );
+      },
+    );
   });
 });

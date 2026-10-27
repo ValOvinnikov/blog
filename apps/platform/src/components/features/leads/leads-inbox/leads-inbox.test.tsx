@@ -1,13 +1,17 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { LeadsTenantProvider } from '@platform/components/features/leads/leads-tenant-provider';
+import messages from '@platform/i18n/messages/en.json';
 import { deleteLeadAction } from '@platform/server/leads/delete-lead-action';
+import { loadMoreLeadsAction } from '@platform/server/leads/load-more-leads-action';
+import { setLeadReadAction } from '@platform/server/leads/set-lead-read-action';
 import {
   renderWithIntl,
   screen,
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_LEAD_ID,
   MOCK_LEAD_NAME,
@@ -21,36 +25,26 @@ import { LeadsInbox } from './leads-inbox';
 
 faker.seed(5757);
 
-const { setLeadReadActionMock, loadMoreLeadsActionMock } = vi.hoisted(() => ({
-  setLeadReadActionMock: vi.fn(),
-  loadMoreLeadsActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/leads/set-lead-read-action');
 
-vi.mock('@platform/server/leads/set-lead-read-action', () => ({
-  setLeadReadAction: setLeadReadActionMock,
-}));
-
-vi.mock('@platform/server/leads/load-more-leads-action', () => ({
-  loadMoreLeadsAction: loadMoreLeadsActionMock,
-}));
+vi.mock('@platform/server/leads/load-more-leads-action');
 
 vi.mock('@platform/server/leads/get-lead-page-title-action');
 
 vi.mock('@platform/server/leads/delete-lead-action');
 
+const { leadsInbox, deleteLeadControl } = messages;
+const t = makeEnTranslator('deleteLeadControl');
+
+const LIST_COLUMN_TEST_ID = 'leads-list-column';
 const MOCK_OLDER_LEAD_ID = faker.string.uuid();
 const MOCK_OLDER_LEAD_NAME = faker.person.fullName();
 const MOCK_OLDEST_LEAD_ID = faker.string.uuid();
 const MOCK_OLDEST_LEAD_NAME = faker.person.fullName();
 const MOCK_NEXT_CURSOR = {
-  createdAt: '2026-04-01 09:30:00.123456+00',
+  createdAt: faker.date.recent().toISOString(),
   id: MOCK_OLDER_LEAD_ID,
 };
-const MOCK_UNREAD_LABEL = 'Unread';
-const MOCK_BACK_LABEL = 'Back to messages';
-const MOCK_MARK_UNREAD_LABEL = 'Mark unread';
-const MOCK_CONFIRM_DELETE_LABEL = 'Delete message';
-const MOCK_LIST_COLUMN_TEST_ID = 'leads-list-column';
 
 class EndOfListInView {
   constructor(private readonly callback: IntersectionObserverCallback) {}
@@ -79,7 +73,7 @@ const renderInbox = ({
   );
 
 const getRow = (name: string) => {
-  const list = screen.getByRole('list');
+  const list = screen.getByRole('list', { name: leadsInbox.listLabel });
   return within(list).getByRole('button', {
     name: (accessibleName) => accessibleName.includes(name),
   });
@@ -90,13 +84,14 @@ describe(`<${LeadsInbox.name}/>`, () => {
   let refresh: ReturnType<typeof mockRouterRefresh>;
 
   const deleteLead = async (name: string) => {
-    await user.click(getRow(name));
+    const row = getRow(name);
+    await user.click(row);
     const deleteTrigger = screen.getByRole('button', {
-      name: `Delete the message from ${name}`,
+      name: t('triggerAriaLabel', { name }),
     });
     await user.click(deleteTrigger);
     const confirmButton = await screen.findByRole('button', {
-      name: MOCK_CONFIRM_DELETE_LABEL,
+      name: deleteLeadControl.confirmButton,
     });
     await user.click(confirmButton);
   };
@@ -104,11 +99,10 @@ describe(`<${LeadsInbox.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
-    setLeadReadActionMock.mockReset();
-    setLeadReadActionMock.mockResolvedValue({
+    vi.mocked(setLeadReadAction).mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    loadMoreLeadsActionMock.mockReset();
+    vi.mocked(loadMoreLeadsAction).mockReset();
     vi.stubGlobal('IntersectionObserver', EndOfListInView);
   });
 
@@ -125,21 +119,19 @@ describe(`<${LeadsInbox.name}/>`, () => {
     });
 
     it('marks the lead unread in the list', () => {
-      expect(row).toHaveTextContent(MOCK_UNREAD_LABEL);
+      expect(row).toHaveTextContent(leadsInbox.unread);
     });
 
     it('puts the read state back and says so when saving it fails', async () => {
-      setLeadReadActionMock.mockResolvedValue({
+      vi.mocked(setLeadReadAction).mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
 
       await user.click(row);
 
-      const error = await screen.findByText(
-        "Couldn't update the message. Try again.",
-      );
+      const error = await screen.findByText(leadsInbox.readStateFailed);
       expect(error).toBeVisible();
-      expect(row).toHaveTextContent(MOCK_UNREAD_LABEL);
+      expect(row).toHaveTextContent(leadsInbox.unread);
       expect(refresh).not.toHaveBeenCalled();
     });
 
@@ -158,12 +150,12 @@ describe(`<${LeadsInbox.name}/>`, () => {
       });
 
       it('marks the lead read', () => {
-        expect(setLeadReadActionMock).toHaveBeenCalledWith(
+        expect(setLeadReadAction).toHaveBeenCalledWith(
           MOCK_TENANT_ID,
           MOCK_LEAD_ID,
           true,
         );
-        expect(row).not.toHaveTextContent(MOCK_UNREAD_LABEL);
+        expect(row).not.toHaveTextContent(leadsInbox.unread);
       });
 
       it('refreshes the sidebar count', async () => {
@@ -176,52 +168,49 @@ describe(`<${LeadsInbox.name}/>`, () => {
         expect(heading).toBeVisible();
       });
 
-      it('marks the lead unread again from the reading pane', async () => {
-        const markUnreadButton = screen.getByRole('button', {
-          name: MOCK_MARK_UNREAD_LABEL,
+      describe('then marked unread from the reading pane', () => {
+        beforeEach(async () => {
+          const markUnreadButton = screen.getByRole('button', {
+            name: leadsInbox.markUnread,
+          });
+          await user.click(markUnreadButton);
         });
 
-        await user.click(markUnreadButton);
+        it('marks the lead unread again', () => {
+          expect(setLeadReadAction).toHaveBeenLastCalledWith(
+            MOCK_TENANT_ID,
+            MOCK_LEAD_ID,
+            false,
+          );
+          expect(row).toHaveTextContent(leadsInbox.unread);
+        });
 
-        expect(setLeadReadActionMock).toHaveBeenLastCalledWith(
-          MOCK_TENANT_ID,
-          MOCK_LEAD_ID,
-          false,
-        );
-        expect(row).toHaveTextContent(MOCK_UNREAD_LABEL);
+        it('returns focus to the lead it marked unread', () => {
+          expect(row).toHaveFocus();
+        });
       });
 
-      it('shows the list again after going back from the message', async () => {
-        const backButton = screen.getByRole('button', {
-          name: MOCK_BACK_LABEL,
+      describe('then closed with the back button', () => {
+        beforeEach(async () => {
+          const backButton = screen.getByRole('button', {
+            name: leadsInbox.back,
+          });
+          await user.click(backButton);
         });
 
-        await user.click(backButton);
+        it('shows the list again', () => {
+          const placeholder = screen.getByText(leadsInbox.noSelection);
+          const heading = screen.queryByRole('heading', {
+            name: MOCK_LEAD_NAME,
+          });
 
-        const placeholder = screen.getByText('Select a message to read it.');
-        const heading = screen.queryByRole('heading', { name: MOCK_LEAD_NAME });
-        expect(placeholder).toBeVisible();
-        expect(heading).not.toBeInTheDocument();
-      });
-
-      it('returns focus to the lead after going back from the message', async () => {
-        const backButton = screen.getByRole('button', {
-          name: MOCK_BACK_LABEL,
+          expect(placeholder).toBeVisible();
+          expect(heading).not.toBeInTheDocument();
         });
 
-        await user.click(backButton);
-
-        expect(row).toHaveFocus();
-      });
-
-      it('returns focus to the lead after marking it unread', async () => {
-        const markUnreadButton = screen.getByRole('button', {
-          name: MOCK_MARK_UNREAD_LABEL,
+        it('returns focus to the lead it closed', () => {
+          expect(row).toHaveFocus();
         });
-
-        await user.click(markUnreadButton);
-
-        expect(row).toHaveFocus();
       });
     });
   });
@@ -272,7 +261,7 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
       await deleteLead(MOCK_LEAD_NAME);
 
-      const listColumn = await screen.findByTestId(MOCK_LIST_COLUMN_TEST_ID);
+      const listColumn = await screen.findByTestId(LIST_COLUMN_TEST_ID);
       await waitFor(() => expect(listColumn).toHaveFocus());
     });
   });
@@ -283,11 +272,11 @@ describe(`<${LeadsInbox.name}/>`, () => {
 
     await user.click(row);
 
-    expect(setLeadReadActionMock).not.toHaveBeenCalled();
+    expect(setLeadReadAction).not.toHaveBeenCalled();
   });
 
   it('loads the next leads when the end of the list scrolls into view', async () => {
-    loadMoreLeadsActionMock.mockResolvedValue({
+    vi.mocked(loadMoreLeadsAction).mockResolvedValueOnce({
       isLoaded: true,
       page: {
         leads: [
@@ -300,25 +289,25 @@ describe(`<${LeadsInbox.name}/>`, () => {
     renderInbox({ nextCursor: MOCK_NEXT_CURSOR });
 
     const olderLead = await screen.findByText(MOCK_OLDER_LEAD_NAME);
-    const list = screen.getByRole('list');
+    const list = screen.getByRole('list', { name: leadsInbox.listLabel });
     const items = within(list).getAllByRole('listitem');
     expect(olderLead).toBeVisible();
     expect(items).toHaveLength(2);
-    expect(loadMoreLeadsActionMock).toHaveBeenCalledWith(
+    expect(loadMoreLeadsAction).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_NEXT_CURSOR,
     );
   });
 
   it('loads the next leads again when the owner retries a failed load', async () => {
-    loadMoreLeadsActionMock.mockResolvedValue({ isLoaded: false });
+    vi.mocked(loadMoreLeadsAction).mockResolvedValue({ isLoaded: false });
     renderInbox({ nextCursor: MOCK_NEXT_CURSOR });
 
     const retryButton = await screen.findByRole('button', {
-      name: "Couldn't load more messages. Try again",
+      name: leadsInbox.loadMoreFailed,
     });
     await user.click(retryButton);
 
-    expect(loadMoreLeadsActionMock).toHaveBeenCalledTimes(2);
+    expect(loadMoreLeadsAction).toHaveBeenCalledTimes(2);
   });
 });

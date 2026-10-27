@@ -1,62 +1,49 @@
+import {
+  mockEnglishText,
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
-import { inDefaultLocale, localizedString } from '../lib/in-default-locale';
-
 import { localizeTaxonomyText } from './index';
+
+faker.seed(20);
+
+const MOCK_TITLE = faker.lorem.word();
+const MOCK_DESCRIPTION = faker.lorem.sentence();
 
 describe(localizeTaxonomyText, () => {
   it('moves a title and description into the default language', () => {
     expect(
       localizeTaxonomyText({
-        title: 'Design',
-        description: 'Notes on design.',
+        title: MOCK_TITLE,
+        description: MOCK_DESCRIPTION,
       }),
     ).toEqual([
-      at('title', set(localizedString('Design'))),
-      at(
-        'description',
-        set(
-          inDefaultLocale(
-            'internationalizedArrayTextValue',
-            'Notes on design.',
-          ),
-        ),
-      ),
+      at('title', set(mockEnglishString(MOCK_TITLE))),
+      at('description', set(mockEnglishText(MOCK_DESCRIPTION))),
     ]);
   });
 
   it('localizes only the fields still holding plain text', () => {
     expect(
       localizeTaxonomyText({
-        title: localizedString('Design'),
-        description: 'Notes on design.',
+        title: mockEnglishString(MOCK_TITLE),
+        description: MOCK_DESCRIPTION,
       }),
-    ).toEqual([
-      at(
-        'description',
-        set(
-          inDefaultLocale(
-            'internationalizedArrayTextValue',
-            'Notes on design.',
-          ),
-        ),
-      ),
-    ]);
+    ).toEqual([at('description', set(mockEnglishText(MOCK_DESCRIPTION)))]);
   });
 
-  it('is idempotent — already localized documents are left alone', () => {
-    expect(
-      localizeTaxonomyText({
-        title: localizedString('Design'),
-        description: inDefaultLocale(
-          'internationalizedArrayTextValue',
-          'Notes on design.',
-        ),
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves documents without text alone', () => {
-    expect(localizeTaxonomyText({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized document',
+      doc: {
+        title: mockEnglishString(MOCK_TITLE),
+        description: mockEnglishText(MOCK_DESCRIPTION),
+      },
+    },
+    { name: 'a document without text', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeTaxonomyText(doc)).toBeUndefined();
   });
 });

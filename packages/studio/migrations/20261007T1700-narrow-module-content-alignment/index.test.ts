@@ -1,42 +1,58 @@
+import { CONTENT_ALIGNMENT, SPACING_SCALE } from '@blog/config/constants';
 import { at, set } from 'sanity/migrate';
 
 import { toOperations } from './index';
 
-describe('narrow-module-content-alignment migration', () => {
+describe(toOperations, () => {
   it('moves a stored Right to Center on a grid or list module', () => {
-    expect(
-      toOperations({ _type: 'module_postLatest', contentAlignment: 'RIGHT' }),
-    ).toEqual([at('contentAlignment', set('CENTER'))]);
+    const result = toOperations({
+      _type: 'module_postLatest',
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    });
+
+    expect(result).toEqual([
+      at('contentAlignment', set(CONTENT_ALIGNMENT.CENTER)),
+    ]);
   });
 
-  it.each(['LEFT', 'CENTER', undefined])(
+  it.each([CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER, undefined])(
     'leaves a stored %s alone',
     (contentAlignment) => {
-      expect(
-        toOperations({ _type: 'module_sectionPages', contentAlignment }),
-      ).toEqual([]);
+      const result = toOperations({
+        _type: 'module_sectionPages',
+        contentAlignment,
+      });
+
+      expect(result).toEqual([]);
     },
   );
 
   it('keeps Right on a call to action', () => {
-    expect(
-      toOperations({ _type: 'module_cta', contentAlignment: 'RIGHT' }),
-    ).toEqual([]);
+    const result = toOperations({
+      _type: 'module_cta',
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    });
+
+    expect(result).toEqual([]);
   });
 
   it('types an untyped call-to-action layout as ctaLayout', () => {
-    expect(
-      toOperations({
-        _type: 'module_cta',
-        layout: { spacingTop: 'SM' },
-      } as never),
-    ).toEqual([at(['layout', '_type'], set('ctaLayout'))]);
+    const doc = {
+      _type: 'module_cta',
+      layout: { _type: undefined, spacingTop: SPACING_SCALE.SM },
+    };
+
+    const result = toOperations(doc);
+
+    expect(result).toEqual([at(['layout', '_type'], set('ctaLayout'))]);
   });
 
-  it('leaves a call to action with no layout, or an already typed one, alone', () => {
-    expect(toOperations({ _type: 'module_cta' })).toEqual([]);
-    expect(
-      toOperations({ _type: 'module_cta', layout: { _type: 'ctaLayout' } }),
-    ).toEqual([]);
+  it.each([
+    { title: 'no layout', layout: undefined },
+    { title: 'an already typed layout', layout: { _type: 'ctaLayout' } },
+  ])('leaves a call to action with $title alone', ({ layout }) => {
+    const result = toOperations({ _type: 'module_cta', layout });
+
+    expect(result).toEqual([]);
   });
 });

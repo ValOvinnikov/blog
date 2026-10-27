@@ -1,11 +1,12 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
+import { AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import { insertTestAuditEvent } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
 import { countAuditEventsForTarget } from './count-audit-events-for-target';
 
-faker.seed(5783);
+faker.seed(602101);
 
 vi.mock('@blog/db/client');
 
@@ -13,23 +14,14 @@ const db = useQueryTestDb();
 
 const MOCK_TARGET_ID = faker.string.uuid();
 
-async function insertTenantEvent(targetId: string): Promise<void> {
-  await db().insert(schema.auditEvents).values({
-    actorId: faker.string.uuid(),
-    action: AUDIT_ACTION.SETTINGS_UPDATED,
-    targetType: AUDIT_TARGET_TYPE.TENANT,
-    targetId,
-  });
-}
-
 afterEach(async () => {
   await db().delete(schema.auditEvents);
 });
 
 describe(countAuditEventsForTarget, () => {
   it('counts every event recorded against the target', async () => {
-    await insertTenantEvent(MOCK_TARGET_ID);
-    await insertTenantEvent(MOCK_TARGET_ID);
+    await insertTestAuditEvent(db(), { targetId: MOCK_TARGET_ID });
+    await insertTestAuditEvent(db(), { targetId: MOCK_TARGET_ID });
 
     await expect(
       countAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, MOCK_TARGET_ID),
@@ -37,7 +29,7 @@ describe(countAuditEventsForTarget, () => {
   });
 
   it("does not count another target's events", async () => {
-    await insertTenantEvent(faker.string.uuid());
+    await insertTestAuditEvent(db());
 
     await expect(
       countAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, MOCK_TARGET_ID),

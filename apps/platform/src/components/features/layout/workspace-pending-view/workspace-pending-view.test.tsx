@@ -1,31 +1,40 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import messages from '@platform/i18n/messages/en.json';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { WorkspacePendingView } from './workspace-pending-view';
 
 vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/auth/sign-out-action');
 
-describe(WorkspacePendingView, () => {
-  it('renders the heading and description from the messages file', () => {
-    renderWithIntl(<WorkspacePendingView />);
+const setup = customRender(WorkspacePendingView, {});
 
-    expect(
-      screen.getByRole('heading', { name: "Your workspace isn't ready yet" }),
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        'This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening.',
-      ),
-    ).toBeVisible();
+describe(`<${WorkspacePendingView.name}/>`, () => {
+  beforeEach(() => {
+    setup();
+  });
+
+  it('explains that the workspace is not ready yet', () => {
+    const heading = screen.getByRole('heading', {
+      name: messages.workspacePendingPage.heading,
+    });
+    const description = screen.getByText(
+      messages.workspacePendingPage.description,
+    );
+
+    expect(heading).toBeVisible();
+    expect(description).toBeVisible();
   });
 
   it('offers a retry back through the dashboard and a sign out', () => {
-    renderWithIntl(<WorkspacePendingView />);
+    const tryAgainLink = screen.getByRole('link', {
+      name: messages.workspacePendingPage.tryAgain,
+    });
+    const signOutButton = screen.getByRole('button', {
+      name: messages.account.signOut,
+    });
 
-    expect(screen.getByRole('link', { name: 'Try again' })).toHaveAttribute(
-      'href',
-      '/dashboard',
-    );
-    expect(screen.getByRole('button', { name: 'Sign out' })).toBeVisible();
+    expect(tryAgainLink).toHaveAttribute('href', adminRoutes.dashboard());
+    expect(signOutButton).toBeVisible();
   });
 });

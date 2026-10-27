@@ -2,39 +2,17 @@ import { ACTION_OUTCOME } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import { withToastProvider } from '@web/testing/providers';
 import { useRouter } from 'next/navigation';
 
 import { NewsletterSubscriptionControl } from './newsletter-subscription-control';
 
-type TToastPromise = (
-  promise: Promise<unknown>,
-  messages: {
-    loading: { message: string };
-    success: { message: string };
-    error: (failure: unknown) => { message: unknown };
-  },
-) => Promise<unknown>;
-
-const {
-  routerRefreshMock,
-  unsubscribeActionMock,
-  resendConfirmationActionMock,
-  toastPromiseMock,
-} = vi.hoisted(() => ({
-  routerRefreshMock: vi.fn(),
-  unsubscribeActionMock: vi.fn(),
-  resendConfirmationActionMock: vi.fn(),
-  toastPromiseMock: vi.fn<TToastPromise>((promise) => promise),
-}));
-
-vi.mocked(useRouter).mockReturnValue({
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: routerRefreshMock,
-} as unknown as ReturnType<typeof useRouter>);
+const { unsubscribeActionMock, resendConfirmationActionMock } = vi.hoisted(
+  () => ({
+    unsubscribeActionMock: vi.fn(),
+    resendConfirmationActionMock: vi.fn(),
+  }),
+);
 
 vi.mock(
   '@web/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions',
@@ -44,26 +22,16 @@ vi.mock(
   }),
 );
 
-vi.mock('@web/context/toast-provider', () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-    error: vi.fn(),
-    promise: toastPromiseMock,
-    dismiss: vi.fn(),
-  }),
-}));
+const routerRefreshMock = vi.fn();
 
-const resolveErrorMessage = async (): Promise<unknown> => {
-  const { error } = toastPromiseMock.mock.calls[0]![1];
-  const settled = toastPromiseMock.mock.results[0]!.value as Promise<unknown>;
-  const failure = await settled.then(
-    () => undefined,
-    (reason: unknown) => reason,
-  );
-  return error(failure).message;
-};
+vi.mocked(useRouter).mockReturnValue({
+  push: vi.fn(),
+  replace: vi.fn(),
+  prefetch: vi.fn(),
+  back: vi.fn(),
+  forward: vi.fn(),
+  refresh: routerRefreshMock,
+} as unknown as ReturnType<typeof useRouter>);
 
 const RESEND_BUTTON_NAME = 'Resend confirmation';
 
@@ -86,7 +54,7 @@ const ACTION_CASES = [
   },
 ];
 
-const setup = customRender(NewsletterSubscriptionControl, {
+const setup = customRender(withToastProvider(NewsletterSubscriptionControl), {
   action: NEWSLETTER_SUBSCRIPTION_ACTION.UNSUBSCRIBE,
 });
 
@@ -94,10 +62,6 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
-    routerRefreshMock.mockReset();
-    unsubscribeActionMock.mockReset();
-    resendConfirmationActionMock.mockReset();
-    toastPromiseMock.mockImplementation((promise) => promise);
     user = userEvent.setup();
   });
 
@@ -121,39 +85,38 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
         expect(button).toBeVisible();
       });
 
-      it('runs the action with progress toasts and refreshes the page', async () => {
-        actionMock.mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
+      it('announces success and refreshes the page', async () => {
+        actionMock.mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS });
         const button = screen.getByRole('button', { name: buttonName });
 
         await user.click(button);
 
+        const toast = await screen.findByRole('status');
+        expect(toast).toHaveTextContent(successMessage);
+        expect(actionMock).toHaveBeenCalledTimes(1);
         await waitFor(() => {
           expect(routerRefreshMock).toHaveBeenCalledTimes(1);
         });
-        const { loading, success } = toastPromiseMock.mock.calls[0]![1];
-        expect(actionMock).toHaveBeenCalledTimes(1);
-        expect(loading).toEqual({ message: loadingMessage });
-        expect(success).toEqual({ message: successMessage });
       });
 
-      it('shows the error toast and keeps the page when the action fails', async () => {
-        actionMock.mockResolvedValue({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      it('announces the failure and keeps the page when the action fails', async () => {
+        actionMock.mockResolvedValueOnce({
+          outcome: ACTION_OUTCOME.SERVER_ERROR,
+        });
         const button = screen.getByRole('button', { name: buttonName });
 
         await user.click(button);
 
-        await waitFor(() => {
-          expect(button).toHaveAttribute('aria-busy', 'false');
-        });
-        await expect(resolveErrorMessage()).resolves.toBe(errorMessage);
+        const toast = await screen.findByRole('alert');
+        expect(toast).toHaveTextContent(errorMessage);
         expect(routerRefreshMock).not.toHaveBeenCalled();
       });
 
-      it('marks the button busy until the action settles', async () => {
+      it('shows progress and marks the button busy until the action settles', async () => {
         let resolveAction!: (result: {
           outcome: typeof ACTION_OUTCOME.SUCCESS;
         }) => void;
-        actionMock.mockImplementation(
+        actionMock.mockImplementationOnce(
           () =>
             new Promise((resolve) => {
               resolveAction = resolve;
@@ -163,10 +126,12 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
         await user.click(button);
 
-        await waitFor(() => {
-          expect(button).toHaveAttribute('aria-busy', 'true');
-        });
+        const progressToast = await screen.findByRole('status');
+        expect(progressToast).toHaveTextContent(loadingMessage);
+        expect(button).toHaveAttribute('aria-busy', 'true');
+
         resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
+
         await waitFor(() => {
           expect(button).toHaveAttribute('aria-busy', 'false');
         });
@@ -175,7 +140,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
   );
 
   it('says resending is unavailable when the site refuses it', async () => {
-    resendConfirmationActionMock.mockResolvedValue({
+    resendConfirmationActionMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.UNAVAILABLE,
     });
     setup({ action: NEWSLETTER_SUBSCRIPTION_ACTION.RESEND });
@@ -183,10 +148,8 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
     await user.click(button);
 
-    await waitFor(() => {
-      expect(toastPromiseMock).toHaveBeenCalledTimes(1);
-    });
-    await expect(resolveErrorMessage()).resolves.toBe(
+    const toast = await screen.findByRole('alert');
+    expect(toast).toHaveTextContent(
       "Resending isn't available on this site right now.",
     );
   });

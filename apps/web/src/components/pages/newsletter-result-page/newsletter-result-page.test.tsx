@@ -1,42 +1,43 @@
-import { NEWSLETTER_RESULT } from '@blog/config';
+import { NEWSLETTER_RESULT, routes, SITE_MESSAGES } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { NewsletterResultPage } from './newsletter-result-page';
+
+const { newsletterConfirm, newsletterUnsubscribe } = SITE_MESSAGES;
 
 const setup = customRender(NewsletterResultPage, {
   result: NEWSLETTER_RESULT.CONFIRMED,
 });
 
 describe(`<${NewsletterResultPage.name}/>`, () => {
-  it('renders the confirmed result with a link home', () => {
-    setup();
+  it.each([
+    [
+      NEWSLETTER_RESULT.CONFIRMED,
+      newsletterConfirm.confirmedTitle,
+      newsletterConfirm.confirmedMessage,
+    ],
+    [
+      NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID,
+      newsletterUnsubscribe.invalidTitle,
+      newsletterUnsubscribe.invalidMessage,
+    ],
+  ])('renders the copy for the %s result', (result, title, message) => {
+    setup({ result });
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Subscription confirmed',
-    });
-    const message = screen.getByText(
-      'Your subscription is confirmed. Thanks for signing up!',
-    );
-    const homeLink = screen.getByRole('link', { name: 'Return home' });
+    const heading = screen.getByRole('heading', { level: 1, name: title });
+    const messageText = screen.getByText(message);
 
     expect(heading).toBeVisible();
-    expect(message).toBeVisible();
-    expect(homeLink).toHaveAttribute('href', '/');
+    expect(messageText).toBeVisible();
   });
 
-  it('renders the unsubscribe copy for an unsubscribe result', () => {
-    setup({ result: NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID });
+  it('links back home', () => {
+    setup();
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Link no longer valid',
+    const homeLink = screen.getByRole('link', {
+      name: newsletterConfirm.returnHome,
     });
-    const message = screen.getByText(
-      'This unsubscribe link is no longer valid — you may already be unsubscribed.',
-    );
 
-    expect(heading).toBeVisible();
-    expect(message).toBeVisible();
+    expect(homeLink).toHaveAttribute('href', routes.home());
   });
 });

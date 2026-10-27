@@ -1,24 +1,45 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  mockLocalizedHeadingBlock,
+  mockPlainHeadingBlock,
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizePricingModule } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(9);
 
-const strings = (value: string) => [
-  {
-    _key: EN,
-    _type: 'internationalizedArrayStringValue',
-    language: EN,
-    value,
-  },
+const MOCK_HEADING = faker.lorem.words(2);
+const MOCK_PRO_KEY = faker.string.uuid();
+const MOCK_ENTERPRISE_KEY = faker.string.uuid();
+const MOCK_TEAM_KEY = faker.string.uuid();
+const MOCK_PRO_NAME = faker.lorem.word();
+const MOCK_ENTERPRISE_NAME = faker.lorem.word();
+const MOCK_TEAM_NAME = faker.lorem.word();
+const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_PRICE_LABEL = faker.commerce.price();
+const MOCK_HIGHLIGHT_LABEL = faker.lorem.words(2);
+const MOCK_TIER_FOOTNOTE = faker.lorem.sentence();
+const MOCK_FOOTNOTE = faker.lorem.sentence();
+const MOCK_FIRST_FEATURE = faker.lorem.words(2);
+const MOCK_SECOND_FEATURE = faker.lorem.words(2);
+const MOCK_THIRD_FEATURE = faker.lorem.words(2);
+const MOCK_FEATURES = [
+  MOCK_FIRST_FEATURE,
+  MOCK_SECOND_FEATURE,
+  MOCK_THIRD_FEATURE,
 ];
 
-const feature = (key: string, text: string) => ({
+const mockFeature = (key: string, text: string) => ({
   _key: key,
   _type: 'pricingFeature',
-  text: strings(text),
+  text: mockEnglishString(text),
 });
+
+const MOCK_FIRST_FEATURE_ITEM = mockFeature('feature-1', MOCK_FIRST_FEATURE);
+const MOCK_SECOND_FEATURE_ITEM = mockFeature('feature-2', MOCK_SECOND_FEATURE);
+const MOCK_THIRD_FEATURE_ITEM = mockFeature('feature-3', MOCK_THIRD_FEATURE);
 
 const tierPath = (key: string, field: string) => [
   'tiers',
@@ -30,47 +51,56 @@ describe(localizePricingModule, () => {
   it('moves the heading, footnote and every tier text into the default language', () => {
     expect(
       localizePricingModule({
-        headingBlock: { _type: 'headingBlock', heading: 'Plans' },
+        headingBlock: mockPlainHeadingBlock(MOCK_HEADING),
         tiers: [
           {
-            _key: 'tier-pro',
-            name: 'Pro',
-            description: 'For growing teams',
-            features: ['Unlimited posts', 'Priority support', 'Custom domain'],
-            highlightLabel: 'Most popular',
-            footnote: 'Billed annually',
+            _key: MOCK_PRO_KEY,
+            name: MOCK_PRO_NAME,
+            description: MOCK_DESCRIPTION,
+            features: MOCK_FEATURES,
+            highlightLabel: MOCK_HIGHLIGHT_LABEL,
+            footnote: MOCK_TIER_FOOTNOTE,
           },
           {
-            _key: 'tier-enterprise',
-            name: 'Enterprise',
-            priceLabel: 'Contact us',
+            _key: MOCK_ENTERPRISE_KEY,
+            name: MOCK_ENTERPRISE_NAME,
+            priceLabel: MOCK_PRICE_LABEL,
           },
         ],
-        footnote: 'Prices exclude VAT.',
+        footnote: MOCK_FOOTNOTE,
       }),
     ).toEqual([
+      at('headingBlock', set(mockLocalizedHeadingBlock(MOCK_HEADING))),
+      at(tierPath(MOCK_PRO_KEY, 'name'), set(mockEnglishString(MOCK_PRO_NAME))),
       at(
-        'headingBlock',
-        set({ _type: 'localizedHeadingBlock', heading: strings('Plans') }),
-      ),
-      at(tierPath('tier-pro', 'name'), set(strings('Pro'))),
-      at(
-        tierPath('tier-pro', 'description'),
-        set(strings('For growing teams')),
+        tierPath(MOCK_PRO_KEY, 'description'),
+        set(mockEnglishString(MOCK_DESCRIPTION)),
       ),
       at(
-        tierPath('tier-pro', 'features'),
+        tierPath(MOCK_PRO_KEY, 'features'),
         set([
-          feature('feature-1', 'Unlimited posts'),
-          feature('feature-2', 'Priority support'),
-          feature('feature-3', 'Custom domain'),
+          MOCK_FIRST_FEATURE_ITEM,
+          MOCK_SECOND_FEATURE_ITEM,
+          MOCK_THIRD_FEATURE_ITEM,
         ]),
       ),
-      at(tierPath('tier-pro', 'highlightLabel'), set(strings('Most popular'))),
-      at(tierPath('tier-pro', 'footnote'), set(strings('Billed annually'))),
-      at(tierPath('tier-enterprise', 'name'), set(strings('Enterprise'))),
-      at(tierPath('tier-enterprise', 'priceLabel'), set(strings('Contact us'))),
-      at('footnote', set(strings('Prices exclude VAT.'))),
+      at(
+        tierPath(MOCK_PRO_KEY, 'highlightLabel'),
+        set(mockEnglishString(MOCK_HIGHLIGHT_LABEL)),
+      ),
+      at(
+        tierPath(MOCK_PRO_KEY, 'footnote'),
+        set(mockEnglishString(MOCK_TIER_FOOTNOTE)),
+      ),
+      at(
+        tierPath(MOCK_ENTERPRISE_KEY, 'name'),
+        set(mockEnglishString(MOCK_ENTERPRISE_NAME)),
+      ),
+      at(
+        tierPath(MOCK_ENTERPRISE_KEY, 'priceLabel'),
+        set(mockEnglishString(MOCK_PRICE_LABEL)),
+      ),
+      at('footnote', set(mockEnglishString(MOCK_FOOTNOTE))),
     ]);
   });
 
@@ -79,44 +109,43 @@ describe(localizePricingModule, () => {
       localizePricingModule({
         tiers: [
           {
-            _key: 'tier-pro',
-            name: strings('Pro'),
-            features: [feature('feature-1', 'Unlimited posts')],
+            _key: MOCK_PRO_KEY,
+            name: mockEnglishString(MOCK_PRO_NAME),
+            features: [MOCK_FIRST_FEATURE_ITEM],
           },
           {
-            _key: 'tier-team',
-            name: 'Team',
-            features: [feature('feature-1', 'SSO')],
+            _key: MOCK_TEAM_KEY,
+            name: MOCK_TEAM_NAME,
+            features: [MOCK_SECOND_FEATURE_ITEM],
           },
         ],
       }),
-    ).toEqual([at(tierPath('tier-team', 'name'), set(strings('Team')))]);
+    ).toEqual([
+      at(
+        tierPath(MOCK_TEAM_KEY, 'name'),
+        set(mockEnglishString(MOCK_TEAM_NAME)),
+      ),
+    ]);
   });
 
-  it('is idempotent — an already localized module is left alone', () => {
-    expect(
-      localizePricingModule({
-        headingBlock: {
-          _type: 'localizedHeadingBlock',
-          heading: strings('Plans'),
-        },
+  it.each([
+    {
+      name: 'an already localized module',
+      doc: {
+        headingBlock: mockLocalizedHeadingBlock(MOCK_HEADING),
         tiers: [
           {
-            _key: 'tier-pro',
-            name: strings('Pro'),
-            features: [
-              feature('feature-1', 'Unlimited posts'),
-              feature('feature-2', 'Priority support'),
-            ],
-            highlightLabel: strings('Most popular'),
+            _key: MOCK_PRO_KEY,
+            name: mockEnglishString(MOCK_PRO_NAME),
+            features: [MOCK_FIRST_FEATURE_ITEM, MOCK_SECOND_FEATURE_ITEM],
+            highlightLabel: mockEnglishString(MOCK_HIGHLIGHT_LABEL),
           },
         ],
-        footnote: strings('Prices exclude VAT.'),
-      }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a module without text alone', () => {
-    expect(localizePricingModule({})).toBeUndefined();
+        footnote: mockEnglishString(MOCK_FOOTNOTE),
+      },
+    },
+    { name: 'a module without text', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizePricingModule(doc)).toBeUndefined();
   });
 });

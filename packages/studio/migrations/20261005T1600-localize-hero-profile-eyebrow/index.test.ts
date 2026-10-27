@@ -1,28 +1,27 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
 import { localizeHeroProfileEyebrow } from './index';
 
-const { EN } = LOCALE_ISO_CODES;
+faker.seed(16);
 
-const strings = (value: string) => [
-  { _key: EN, _type: 'internationalizedArrayStringValue', language: EN, value },
-];
+const MOCK_EYEBROW = faker.lorem.word();
 
 describe(localizeHeroProfileEyebrow, () => {
   it('moves the eyebrow into the default language', () => {
-    expect(localizeHeroProfileEyebrow({ eyebrow: 'Founder' })).toEqual([
-      at('eyebrow', set(strings('Founder'))),
+    expect(localizeHeroProfileEyebrow({ eyebrow: MOCK_EYEBROW })).toEqual([
+      at('eyebrow', set(mockEnglishString(MOCK_EYEBROW))),
     ]);
   });
 
-  it('is idempotent — an already localized eyebrow is left alone', () => {
-    expect(
-      localizeHeroProfileEyebrow({ eyebrow: strings('Founder') }),
-    ).toBeUndefined();
-  });
-
-  it('leaves a hero without an eyebrow alone', () => {
-    expect(localizeHeroProfileEyebrow({})).toBeUndefined();
+  it.each([
+    {
+      name: 'an already localized eyebrow',
+      doc: { eyebrow: mockEnglishString(MOCK_EYEBROW) },
+    },
+    { name: 'a hero without an eyebrow', doc: {} },
+  ])('leaves $name alone', ({ doc }) => {
+    expect(localizeHeroProfileEyebrow(doc)).toBeUndefined();
   });
 });

@@ -1,30 +1,52 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  routes,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import type { TTranslationMap } from '@blog/service';
+import { faker } from '@faker-js/faker';
 
 import { toSwitchLanguageTarget } from './to-switch-language-target';
 
+faker.seed(6012);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const translationMap: TTranslationMap = {
+const MOCK_PAGE_SLUG_EN = faker.lorem.slug(2);
+const MOCK_PAGE_SLUG_NL = faker.lorem.slug(2);
+const MOCK_POST_SLUG_EN = faker.lorem.slug(2);
+const MOCK_POST_SLUG_NL = faker.lorem.slug(2);
+const MOCK_UNTRANSLATED_POST_EN = faker.lorem.slug(2);
+const MOCK_UNTRANSLATED_POST_NL = faker.lorem.slug(2);
+const MOCK_ARCHIVE_SLUG = faker.lorem.slug(1);
+const MOCK_PAGE_NUMBER = faker.number.int({ min: 2, max: 9 });
+
+const MOCK_TRANSLATION_MAP: TTranslationMap = {
   homeLanguages: [],
   postIndexLanguages: [EN, NL],
   topicIndexLanguages: [EN, NL],
   tagIndexLanguages: [EN, NL],
   groups: [
     [
-      { documentType: 'page_landing', language: EN, slug: 'about' },
-      { documentType: 'page_landing', language: NL, slug: 'over-ons' },
+      { documentType: 'page_landing', language: EN, slug: MOCK_PAGE_SLUG_EN },
+      { documentType: 'page_landing', language: NL, slug: MOCK_PAGE_SLUG_NL },
     ],
     [
-      { documentType: 'page_post', language: EN, slug: 'my-article' },
-      { documentType: 'page_post', language: NL, slug: 'mijn-artikel' },
+      { documentType: 'page_post', language: EN, slug: MOCK_POST_SLUG_EN },
+      { documentType: 'page_post', language: NL, slug: MOCK_POST_SLUG_NL },
     ],
   ],
 };
 
+const inLanguage = (locale: TLocaleIsoCode, href: string) =>
+  `/${LOCALE_BCP47_TAGS[locale]}${href}`;
+
+const homeIn = (locale: TLocaleIsoCode) => `/${LOCALE_BCP47_TAGS[locale]}`;
+
 const target = (from: string, to: TLocaleIsoCode) =>
   toSwitchLanguageTarget({
-    translationMap,
+    translationMap: MOCK_TRANSLATION_MAP,
     from,
     to,
     defaultLocale: EN,
@@ -32,49 +54,144 @@ const target = (from: string, to: TLocaleIsoCode) =>
   });
 
 describe(toSwitchLanguageTarget, () => {
-  it("lands on the current page's translation", () => {
-    expect(target('/about', NL)).toBe('/nl/over-ons');
-    expect(target('/nl/over-ons', EN)).toBe('/about');
-  });
+  it.each([
+    {
+      case: 'into the other language',
+      from: routes.landingPage(MOCK_PAGE_SLUG_EN),
+      to: NL,
+      expected: inLanguage(NL, routes.landingPage(MOCK_PAGE_SLUG_NL)),
+    },
+    {
+      case: 'back into the default language',
+      from: inLanguage(NL, routes.landingPage(MOCK_PAGE_SLUG_NL)),
+      to: EN,
+      expected: routes.landingPage(MOCK_PAGE_SLUG_EN),
+    },
+    {
+      case: 'for a post',
+      from: routes.post(MOCK_POST_SLUG_EN),
+      to: NL,
+      expected: inLanguage(NL, routes.post(MOCK_POST_SLUG_NL)),
+    },
+  ])(
+    "lands on the current page's translation $case",
+    ({ from, to, expected }) => {
+      expect(target(from, to)).toBe(expected);
+    },
+  );
 
-  it("lands on the language's list page", () => {
-    expect(target('/blog', NL)).toBe('/nl/blog');
-    expect(target('/nl/blog', EN)).toBe('/blog');
-    expect(target('/topics', NL)).toBe('/nl/topics');
-    expect(target('/nl/tags', EN)).toBe('/tags');
-    expect(target('/blog/page/2', NL)).toBe('/nl/blog');
-  });
+  it.each([
+    {
+      case: 'the blog',
+      from: routes.blogIndex(),
+      to: NL,
+      expected: inLanguage(NL, routes.blogIndex()),
+    },
+    {
+      case: 'the blog back in the default language',
+      from: inLanguage(NL, routes.blogIndex()),
+      to: EN,
+      expected: routes.blogIndex(),
+    },
+    {
+      case: 'the topics',
+      from: routes.topics(),
+      to: NL,
+      expected: inLanguage(NL, routes.topics()),
+    },
+    {
+      case: 'the tags back in the default language',
+      from: inLanguage(NL, routes.tags()),
+      to: EN,
+      expected: routes.tags(),
+    },
+    {
+      case: 'a later page of the blog',
+      from: routes.blogIndex(MOCK_PAGE_NUMBER),
+      to: NL,
+      expected: inLanguage(NL, routes.blogIndex()),
+    },
+  ])(
+    "lands on the language's list page for $case",
+    ({ from, to, expected }) => {
+      expect(target(from, to)).toBe(expected);
+    },
+  );
 
-  it("lands on the post's translation", () => {
-    expect(target('/blog/my-article', NL)).toBe('/nl/blog/mijn-artikel');
-  });
+  it.each([
+    {
+      case: 'a page',
+      from: routes.landingPage(MOCK_PAGE_SLUG_EN),
+    },
+    { case: 'the blog list', from: inLanguage(NL, routes.blogIndex()) },
+    {
+      case: 'the second page of an untranslated list',
+      from: routes.blogIndex(MOCK_PAGE_NUMBER),
+    },
+    {
+      case: 'a post missing from the language',
+      from: routes.post(MOCK_UNTRANSLATED_POST_EN),
+    },
+    {
+      case: 'an archive page',
+      from: routes.topic(MOCK_ARCHIVE_SLUG, MOCK_PAGE_NUMBER),
+    },
+    { case: 'a tag page', from: routes.tag(MOCK_ARCHIVE_SLUG) },
+  ])(
+    "lands on the language's home page when $case has no counterpart there",
+    ({ from }) => {
+      expect(target(from, FR)).toBe(homeIn(FR));
+    },
+  );
 
-  it("lands on the language's home page when the page has no translation", () => {
-    expect(target('/about', FR)).toBe('/fr');
-    expect(target('/nl/blog', FR)).toBe('/fr');
-    expect(target('/blog/page/2', FR)).toBe('/fr');
-  });
+  it.each([
+    {
+      case: 'an untranslated post',
+      from: routes.post(MOCK_UNTRANSLATED_POST_EN),
+      to: NL,
+      expected: inLanguage(NL, routes.blogIndex()),
+    },
+    {
+      case: 'an untranslated post in the other language',
+      from: inLanguage(NL, routes.post(MOCK_UNTRANSLATED_POST_NL)),
+      to: EN,
+      expected: routes.blogIndex(),
+    },
+    {
+      case: 'an untranslated topic',
+      from: routes.topic(MOCK_ARCHIVE_SLUG),
+      to: NL,
+      expected: inLanguage(NL, routes.topics()),
+    },
+    {
+      case: 'a later topic page',
+      from: routes.topic(MOCK_ARCHIVE_SLUG, MOCK_PAGE_NUMBER),
+      to: NL,
+      expected: inLanguage(NL, routes.topics()),
+    },
+    {
+      case: 'an untranslated tag',
+      from: routes.tag(MOCK_ARCHIVE_SLUG),
+      to: NL,
+      expected: inLanguage(NL, routes.tags()),
+    },
+    {
+      case: 'an untranslated tag back in the default language',
+      from: inLanguage(NL, routes.tag(MOCK_ARCHIVE_SLUG)),
+      to: EN,
+      expected: routes.tags(),
+    },
+  ])(
+    "lands on the language's list page when $case has no translation",
+    ({ from, to, expected }) => {
+      expect(target(from, to)).toBe(expected);
+    },
+  );
 
-  it("lands on the language's blog list when the post has no translation", () => {
-    expect(target('/blog/english-only', NL)).toBe('/nl/blog');
-    expect(target('/nl/blog/alleen-nederlands', EN)).toBe('/blog');
-  });
-
-  it("lands on the language's topics or tags list when the archive page has no translation", () => {
-    expect(target('/topics/design', NL)).toBe('/nl/topics');
-    expect(target('/topics/design/page/2', NL)).toBe('/nl/topics');
-    expect(target('/tags/react', NL)).toBe('/nl/tags');
-    expect(target('/nl/tags/react', EN)).toBe('/tags');
-  });
-
-  it("lands on the language's home page when the untranslated page's list page does not exist there", () => {
-    expect(target('/blog/english-only', FR)).toBe('/fr');
-    expect(target('/topics/design/page/2', FR)).toBe('/fr');
-    expect(target('/tags/react', FR)).toBe('/fr');
-  });
-
-  it('stays on the current page for its own language', () => {
-    expect(target('/nl/blog', NL)).toBe('/nl/blog');
-    expect(target('/blog', EN)).toBe('/blog');
+  it.each([
+    { case: 'a non-default', from: inLanguage(NL, routes.blogIndex()), to: NL },
+    { case: 'the default', from: routes.blogIndex(), to: EN },
+  ])('stays on the current page for $case language', ({ from, to }) => {
+    expect(target(from, to)).toBe(from);
   });
 });

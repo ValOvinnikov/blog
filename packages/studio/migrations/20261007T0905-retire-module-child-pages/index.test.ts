@@ -1,93 +1,107 @@
-import { del, type MigrationContext } from 'sanity/migrate';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
+import { del } from 'sanity/migrate';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+faker.seed(9050);
 
-const createContext = (result: {
-  target: { title?: string } | null;
-  refCount: number;
-}): MigrationContext => {
-  const fetch = async () => result;
+const MOCK_CHILD_PAGES_ID = faker.string.uuid();
+const MOCK_DRAFT_CHILD_PAGES_ID = `drafts.${MOCK_CHILD_PAGES_ID}`;
+const MOCK_SECTION_PAGES_ID = `sectionPages-${MOCK_CHILD_PAGES_ID}`;
+const MOCK_DRAFT_SECTION_PAGES_ID = `drafts.${MOCK_SECTION_PAGES_ID}`;
+const MOCK_TITLE = faker.lorem.words(2);
 
-  return { client: { fetch } } as unknown as MigrationContext;
-};
+const mockChildPages = (_id: string) =>
+  mockMigrationDocument({ _id, _type: 'module_childPages' });
 
-const deletableContext = createContext({
-  target: { title: 'Section pages' },
-  refCount: 0,
-});
+const mockSectionPages = (_id: string, title?: string) =>
+  mockMigrationDocument({ _id, _type: 'module_sectionPages', title });
 
-describe('retire-module-child-pages migration', () => {
-  describe('with a published module_childPages', () => {
-    let doc: typeof baseDoc & { _id: string; _type: string };
-
-    beforeEach(() => {
-      doc = { ...baseDoc, _id: 'abc123', _type: 'module_childPages' };
+describe('retire-module-child-pages', () => {
+  it('deletes child pages once their section-pages counterpart is safe to delete', async () => {
+    const childPages = mockChildPages(MOCK_CHILD_PAGES_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        childPages,
+        mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE),
+      ]),
     });
 
-    it('deletes it once its module_sectionPages counterpart is verified deletable', async () => {
-      const mutations = await migration.migrate.document(doc, deletableContext);
+    const mutations = await runDocumentMigration(
+      migration,
+      childPages,
+      context,
+    );
 
-      expect(mutations).toEqual([del('abc123')]);
-    });
-
-    it('rejects (aborting the run) when the counterpart does not exist', async () => {
-      const context = createContext({ target: null, refCount: 0 });
-
-      await expect(migration.migrate.document(doc, context)).rejects.toThrow(
-        /does not exist/,
-      );
-    });
-
-    it('rejects (aborting the run) while a document still references it', async () => {
-      const context = createContext({
-        target: { title: 'Section pages' },
-        refCount: 1,
-      });
-
-      await expect(migration.migrate.document(doc, context)).rejects.toThrow(
-        /still referenced/,
-      );
-    });
+    expect(mutations).toEqual([del(MOCK_CHILD_PAGES_ID)]);
   });
 
-  it('deletes a draft module_childPages, checking its drafts.sectionPages counterpart', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'drafts.abc123',
-      _type: 'module_childPages',
-    };
-    const fetchCalls: unknown[] = [];
-    const context = {
-      client: {
-        fetch: async (_query: string, params: unknown) => {
-          fetchCalls.push(params);
-          return { target: { title: 'Section pages' }, refCount: 0 };
-        },
-      },
-    } as unknown as MigrationContext;
+  it('deletes a draft module_childPages when its draft counterpart exists', async () => {
+    const childPages = mockChildPages(MOCK_DRAFT_CHILD_PAGES_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        childPages,
+        mockSectionPages(MOCK_DRAFT_SECTION_PAGES_ID, MOCK_TITLE),
+      ]),
+    });
 
-    const mutations = await migration.migrate.document(doc, context);
+    const mutations = await runDocumentMigration(
+      migration,
+      childPages,
+      context,
+    );
 
-    expect(mutations).toEqual([del('drafts.abc123')]);
-    expect(fetchCalls).toEqual([
-      { sectionPagesId: 'drafts.sectionPages-abc123', id: 'drafts.abc123' },
-    ]);
+    expect(mutations).toEqual([del(MOCK_DRAFT_CHILD_PAGES_ID)]);
+  });
+
+  it('rejects when the counterpart does not exist', async () => {
+    const childPages = mockChildPages(MOCK_CHILD_PAGES_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([childPages]),
+    });
+
+    await expect(
+      runDocumentMigration(migration, childPages, context),
+    ).rejects.toThrow(
+      `Cannot delete module_childPages "${MOCK_CHILD_PAGES_ID}": its module_sectionPages counterpart "${MOCK_SECTION_PAGES_ID}" does not exist.`,
+    );
+  });
+
+  it('rejects while a document still references it', async () => {
+    const childPages = mockChildPages(MOCK_CHILD_PAGES_ID);
+    const referrer = mockMigrationDocument({
+      _type: 'template_landing',
+      modules: [{ _type: 'module_childPages', _ref: MOCK_CHILD_PAGES_ID }],
+    });
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        childPages,
+        mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE),
+        referrer,
+      ]),
+    });
+
+    await expect(
+      runDocumentMigration(migration, childPages, context),
+    ).rejects.toThrow(
+      `Cannot delete module_childPages "${MOCK_CHILD_PAGES_ID}": still referenced by 1 document(s).`,
+    );
   });
 
   it('leaves unrelated document types untouched', async () => {
-    const doc = {
-      ...baseDoc,
-      _id: 'sectionPages-abc123',
-      _type: 'module_sectionPages',
-    };
+    const sectionPages = mockSectionPages(MOCK_SECTION_PAGES_ID, MOCK_TITLE);
 
-    const mutations = await migration.migrate.document(doc, deletableContext);
+    const mutations = await runDocumentMigration(
+      migration,
+      sectionPages,
+      mockMigrationContext({ fetch: mockGroqFetch([sectionPages]) }),
+    );
 
     expect(mutations).toEqual([]);
   });

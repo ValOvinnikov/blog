@@ -1,45 +1,55 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { parseSwitchLanguageRequest } from './parse-switch-language-request';
 
-const { EN, NL } = LOCALE_ISO_CODES;
+faker.seed(124);
+
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+const MOCK_SLUG = faker.lorem.slug();
+const MOCK_FOREIGN_HOST = faker.internet.domainName();
+const MOCK_IN_SITE_PATH = `/${LOCALE_BCP47_TAGS.NL}/${MOCK_SLUG}`;
+const MOCK_QUERY_AND_FRAGMENT = '?page=2#top';
 
 const parse = (query: Record<string, string>) =>
   parseSwitchLanguageRequest(new URLSearchParams(query), [EN, NL]);
 
 describe(parseSwitchLanguageRequest, () => {
   it('accepts a live language and a path on this site', () => {
-    expect(parse({ to: NL, from: '/nl/over-ons' })).toEqual({
-      to: NL,
-      from: '/nl/over-ons',
-    });
+    const request = parse({ to: NL, from: MOCK_IN_SITE_PATH });
+
+    expect(request).toEqual({ to: NL, from: MOCK_IN_SITE_PATH });
   });
 
   it('drops the query string and fragment of the current page', () => {
-    expect(parse({ to: NL, from: '/blog?page=2#top' })).toEqual({
+    const request = parse({
       to: NL,
-      from: '/blog',
+      from: `${routes.blogIndex()}${MOCK_QUERY_AND_FRAGMENT}`,
     });
+
+    expect(request).toEqual({ to: NL, from: routes.blogIndex() });
   });
 
-  it.each(['FR', 'nl', ''])('rejects the language %j', (to) => {
-    expect(parse({ to, from: '/' })).toBeUndefined();
+  it.each([FR, NL.toLowerCase(), ''])('rejects the language %j', (to) => {
+    expect(parse({ to, from: routes.home() })).toBeUndefined();
   });
 
   it.each([
-    'https://evil.example/',
-    '//evil.example/',
-    '/\\evil.example/',
-    '/\t/evil.example/',
+    `https://${MOCK_FOREIGN_HOST}/`,
+    `//${MOCK_FOREIGN_HOST}/`,
+    `/\\${MOCK_FOREIGN_HOST}/`,
+    `/\t/${MOCK_FOREIGN_HOST}/`,
     'javascript:alert(1)',
-    'over-ons',
+    MOCK_SLUG,
     '',
   ])('rejects %j as the current page', (from) => {
     expect(parse({ to: NL, from })).toBeUndefined();
   });
 
-  it('rejects a request missing either parameter', () => {
-    expect(parse({ to: NL })).toBeUndefined();
-    expect(parse({ from: '/' })).toBeUndefined();
+  it.each<{ case: string; query: Record<string, string> }>([
+    { case: 'the current page', query: { to: NL } },
+    { case: 'the language', query: { from: routes.home() } },
+  ])('rejects a request missing $case', ({ query }) => {
+    expect(parse(query)).toBeUndefined();
   });
 });

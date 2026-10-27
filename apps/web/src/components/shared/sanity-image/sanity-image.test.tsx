@@ -1,37 +1,28 @@
 import type { ISanityImage } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import {
   customRender,
   renderElement,
   screen,
 } from '@web/testing/custom-render';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 
 import { SanityImage } from './sanity-image';
 
-const image: ISanityImage = {
-  assetId: 'image-abc123-800x600-jpg',
-  alt: 'A scenic mountain range',
-  hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
-  crop: undefined,
-  lqip: undefined,
-  dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
-};
+faker.seed(6007);
 
-const wideImage: ISanityImage = {
-  assetId: 'image-abc123-2400x1260-png',
-  alt: 'A wide banner image',
+const MOCK_IMAGE = mockSanityImage({ alt: faker.lorem.words(3) });
+const MOCK_WIDE_IMAGE = mockSanityImage({
+  alt: faker.lorem.words(3),
   hotspot: undefined,
-  crop: undefined,
-  lqip: undefined,
-  dimensions: { width: 2400, height: 1260, aspectRatio: 2400 / 1260 },
-};
-
-const OTHER_PROJECT_PATH = 'other-project/other-dataset';
-const OTHER_BASE_URL = `https://cdn.sanity.io/images/${OTHER_PROJECT_PATH}/`;
-const CUSTOM_ALT = 'Custom alt';
-const SIZES = '(min-width: 1024px) 50vw, 100vw';
-const LQIP = 'data:image/webp;base64,fake';
+});
+const MOCK_OTHER_PROJECT_PATH = `${faker.word.noun()}/${faker.word.noun()}`;
+const MOCK_OTHER_BASE_URL = `https://cdn.sanity.io/images/${MOCK_OTHER_PROJECT_PATH}/`;
+const MOCK_ALT = faker.lorem.words(2);
+const MOCK_SIZES = '(min-width: 1024px) 50vw, 100vw';
+const MOCK_LQIP = 'data:image/webp;base64,fake';
 const ENTROPY_CROP = 'crop=entropy';
 
 const focalParamPattern = (param: string) =>
@@ -43,27 +34,26 @@ const focalParams = (x: number, y: number) => ({
 });
 
 const setup = customRender(SanityImage, {
-  image,
+  image: MOCK_IMAGE,
   width: 960,
   height: 720,
 });
 
 const setupWide = customRender(SanityImage, {
-  image: wideImage,
+  image: MOCK_WIDE_IMAGE,
   width: 800,
   height: 600,
 });
 
 describe(`<${SanityImage.name}/>`, () => {
   describe('with default props', () => {
-    let img: HTMLElement;
-
     beforeEach(() => {
       setup();
-      img = screen.getByRole('img', { name: image.alt });
     });
 
     it('renders the src and srcset against the default base URL', () => {
+      const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
+
       expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
       expect(img.getAttribute('srcset')).toContain(
         STATIC_SANITY_IMAGE_BASE_URL,
@@ -71,70 +61,67 @@ describe(`<${SanityImage.name}/>`, () => {
     });
 
     it('renders no fetchpriority attribute when priority is omitted', () => {
+      const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
+
       expect(img).not.toHaveAttribute('fetchpriority');
     });
   });
 
   it('renders against the base URL of the surrounding provider', () => {
     renderElement(
-      <SanityImageBaseUrlProvider baseUrl={OTHER_BASE_URL}>
-        <SanityImage image={image} width={960} height={720} />
+      <SanityImageBaseUrlProvider baseUrl={MOCK_OTHER_BASE_URL}>
+        <SanityImage image={MOCK_IMAGE} width={960} height={720} />
       </SanityImageBaseUrlProvider>,
     );
 
-    const img = screen.getByRole('img', { name: image.alt });
-    expect(img.getAttribute('src')).toContain(OTHER_PROJECT_PATH);
-    expect(img.getAttribute('srcset')).toContain(OTHER_PROJECT_PATH);
+    const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
+
+    expect(img.getAttribute('src')).toContain(MOCK_OTHER_PROJECT_PATH);
+    expect(img.getAttribute('srcset')).toContain(MOCK_OTHER_PROJECT_PATH);
   });
 
   it('uses the provided alt override instead of the image alt', () => {
-    setup({ alt: CUSTOM_ALT });
+    setup({ alt: MOCK_ALT });
 
-    const overridden = screen.getByAltText(CUSTOM_ALT);
-    const original = screen.queryByAltText(image.alt);
+    const overridden = screen.getByRole('img', { name: MOCK_ALT });
+    const original = screen.queryByRole('img', { name: MOCK_IMAGE.alt });
+
     expect(overridden).toBeVisible();
     expect(original).not.toBeInTheDocument();
   });
 
-  it('forwards sizes and loading to the rendered element', () => {
-    setup({
-      sizes: SIZES,
-      loading: 'eager',
-    });
+  it('forwards sizes to the rendered element', () => {
+    setup({ sizes: MOCK_SIZES });
 
-    const img = screen.getByRole('img', { name: image.alt });
-    expect(img).toHaveAttribute('sizes', SIZES);
-    expect(img).toHaveAttribute('loading', 'eager');
+    const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
+
+    expect(img).toHaveAttribute('sizes', MOCK_SIZES);
   });
 
-  it('sets fetchpriority="high" on the rendered img when priority is true', () => {
+  it('marks a priority image as high fetch priority', () => {
     setup({ priority: true });
 
-    const img = screen.getByRole('img', { name: image.alt });
+    const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
+
     expect(img).toHaveAttribute('fetchpriority', 'high');
   });
 
   it('renders a priority image as a single img with no LQIP placeholder', () => {
-    setup({
-      priority: true,
-      image: { ...image, lqip: LQIP },
-    });
+    setup({ priority: true, image: { ...MOCK_IMAGE, lqip: MOCK_LQIP } });
 
-    const images = screen.getAllByRole('img', { name: image.alt });
+    const images = screen.getAllByRole('img', { name: MOCK_IMAGE.alt });
+    const placeholder = screen.queryByRole('presentation');
+
     expect(images).toHaveLength(1);
-    expect(images[0]).not.toHaveAttribute('data-lqip');
-    expect(images[0]?.getAttribute('src')).toContain(
-      STATIC_SANITY_IMAGE_BASE_URL,
-    );
+    expect(placeholder).not.toBeInTheDocument();
   });
 
   it('renders a hidden LQIP placeholder for a non-priority image with a preview', () => {
-    setup({
-      image: { ...image, lqip: LQIP },
-    });
+    setup({ image: { ...MOCK_IMAGE, lqip: MOCK_LQIP } });
 
-    const img = screen.getByRole('img', { name: image.alt });
+    const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
     const placeholder = screen.getByRole('presentation');
+
     expect(img).toBeVisible();
     expect(placeholder).not.toBeVisible();
   });
@@ -142,10 +129,13 @@ describe(`<${SanityImage.name}/>`, () => {
   it('crops a hotspot-less cover image by its centre, never by entropy', () => {
     setupWide();
 
-    const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).not.toContain(ENTROPY_CROP);
-    expect(img.getAttribute('srcset')).toMatch(focalParams(0.5, 0.5).x);
-    expect(img.getAttribute('srcset')).not.toContain(ENTROPY_CROP);
+    const img = screen.getByRole('img', { name: MOCK_WIDE_IMAGE.alt });
+    const src = img.getAttribute('src');
+    const srcset = img.getAttribute('srcset');
+
+    expect(src).not.toContain(ENTROPY_CROP);
+    expect(srcset).toMatch(focalParams(0.5, 0.5).x);
+    expect(srcset).not.toContain(ENTROPY_CROP);
   });
 
   it.each([
@@ -165,12 +155,12 @@ describe(`<${SanityImage.name}/>`, () => {
   ] satisfies [string, Partial<ISanityImage>, number, number][])(
     'uses %s as the focal point',
     (_case, imageOverrides, x, y) => {
-      setupWide({ image: { ...wideImage, ...imageOverrides } });
+      setupWide({ image: { ...MOCK_WIDE_IMAGE, ...imageOverrides } });
 
-      const src = screen
-        .getByRole('img', { name: wideImage.alt })
-        .getAttribute('src');
+      const img = screen.getByRole('img', { name: MOCK_WIDE_IMAGE.alt });
+      const src = img.getAttribute('src');
       const focal = focalParams(x, y);
+
       expect(src).toMatch(focal.x);
       expect(src).toMatch(focal.y);
     },

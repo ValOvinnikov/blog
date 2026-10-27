@@ -1,44 +1,39 @@
+import { faker } from '@faker-js/faker';
+
 import { buildPersonFields } from './build-person-fields';
 
+faker.seed(8350);
+
+const MOCK_AUTHOR_ID = faker.string.uuid();
+const MOCK_PERSON_ID = faker.string.uuid();
+const MOCK_PROFILE_PAGE = { _type: 'reference', _ref: faker.string.uuid() };
+const MOCK_NAME = faker.person.fullName();
+
 describe(buildPersonFields, () => {
-  const idMap = new Map<string, string>();
-
   it('carries every blog_author field across unchanged', () => {
-    const author = {
-      _id: 'author-1',
-      name: 'Jane Doe',
-      image: { _type: 'imageWithAlt', alt: 'Jane' },
+    const fields = {
+      name: MOCK_NAME,
+      image: { _type: 'imageWithAlt', alt: faker.lorem.words(2) },
       bio: [{ _type: 'block' }],
-      role: 'Senior Engineer',
-      socialLinks: [{ _type: 'socialProfile', url: 'https://example.com' }],
-      profilePage: { _type: 'reference', _ref: 'link-1' },
+      role: faker.person.jobTitle(),
+      socialLinks: [{ _type: 'socialProfile', url: faker.internet.url() }],
+      profilePage: MOCK_PROFILE_PAGE,
     };
 
-    expect(buildPersonFields(author, idMap)).toEqual({
-      name: 'Jane Doe',
-      image: { _type: 'imageWithAlt', alt: 'Jane' },
-      bio: [{ _type: 'block' }],
-      role: 'Senior Engineer',
-      socialLinks: [{ _type: 'socialProfile', url: 'https://example.com' }],
-      profilePage: { _type: 'reference', _ref: 'link-1' },
-    });
-  });
-
-  it('leaves an unrelated reference (e.g. profilePage) untouched by the author id map', () => {
-    const author = {
-      _id: 'author-1',
-      name: 'Jane Doe',
-      profilePage: { _type: 'reference', _ref: 'link-1' },
-    };
-
-    const fields = buildPersonFields(
-      author,
-      new Map([['author-1', 'person-author-1']]),
+    const result = buildPersonFields(
+      { _id: MOCK_AUTHOR_ID, ...fields },
+      new Map(),
     );
 
-    expect(fields.profilePage).toEqual({
-      _type: 'reference',
-      _ref: 'link-1',
-    });
+    expect(result).toEqual(fields);
+  });
+
+  it('leaves a reference outside the author id map untouched', () => {
+    const result = buildPersonFields(
+      { _id: MOCK_AUTHOR_ID, name: MOCK_NAME, profilePage: MOCK_PROFILE_PAGE },
+      new Map([[MOCK_AUTHOR_ID, MOCK_PERSON_ID]]),
+    );
+
+    expect(result.profilePage).toEqual(MOCK_PROFILE_PAGE);
   });
 });

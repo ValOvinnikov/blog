@@ -1,74 +1,86 @@
-import { del, type MigrationContext } from 'sanity/migrate';
+import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/mock-migration';
+import { faker } from '@faker-js/faker';
+import { del } from 'sanity/migrate';
 
 import migration from './index';
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+faker.seed(8400);
 
-const createContext = (result: {
-  target: { name?: string } | null;
-  refCount: number;
-}): MigrationContext => {
-  const fetch = async () => result;
+const MOCK_AUTHOR_ID = faker.string.uuid();
+const MOCK_DRAFT_AUTHOR_ID = `drafts.${MOCK_AUTHOR_ID}`;
+const MOCK_PERSON_ID = `person-${MOCK_AUTHOR_ID}`;
+const MOCK_DRAFT_PERSON_ID = `drafts.${MOCK_PERSON_ID}`;
+const MOCK_NAME = faker.person.fullName();
 
-  return { client: { fetch } } as unknown as MigrationContext;
-};
+const mockAuthor = (_id: string) =>
+  mockMigrationDocument({ _id, _type: 'blog_author' });
 
-const deletableContext = createContext({
-  target: { name: 'Jane Doe' },
-  refCount: 0,
-});
+const mockPerson = (_id: string, name?: string) =>
+  mockMigrationDocument({ _id, _type: 'person', name });
 
-describe('retire-blog-author migration — blog_author documents', () => {
-  describe('with a published blog_author', () => {
-    let doc: typeof baseDoc & { _id: string; _type: string };
-
-    beforeEach(() => {
-      doc = { ...baseDoc, _id: 'author-1', _type: 'blog_author' };
+describe('retire-blog-author', () => {
+  it('deletes a blog_author once its person counterpart is verified deletable', async () => {
+    const author = mockAuthor(MOCK_AUTHOR_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([author, mockPerson(MOCK_PERSON_ID, MOCK_NAME)]),
     });
 
-    it('deletes a blog_author once its person counterpart is verified deletable', async () => {
-      const mutations = await migration.migrate.document(doc, deletableContext);
+    const mutations = await runDocumentMigration(migration, author, context);
 
-      expect(mutations).toEqual([del('author-1')]);
-    });
-
-    it('rejects (aborting the run) when the precondition fails', async () => {
-      const context = createContext({ target: null, refCount: 0 });
-
-      await expect(migration.migrate.document(doc, context)).rejects.toThrow(
-        /does not exist/,
-      );
-    });
+    expect(mutations).toEqual([del(MOCK_AUTHOR_ID)]);
   });
 
-  it('deletes a draft blog_author, checking its counterpart drafts.person id', async () => {
-    const doc = { ...baseDoc, _id: 'drafts.author-1', _type: 'blog_author' };
-    const fetchCalls: unknown[] = [];
-    const context = {
-      client: {
-        fetch: async (_query: string, params: unknown) => {
-          fetchCalls.push(params);
-          return { target: { name: 'Jane Doe' }, refCount: 0 };
-        },
-      },
-    } as unknown as MigrationContext;
+  it('deletes a draft blog_author when its draft person counterpart exists', async () => {
+    const author = mockAuthor(MOCK_DRAFT_AUTHOR_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([
+        author,
+        mockPerson(MOCK_DRAFT_PERSON_ID, MOCK_NAME),
+      ]),
+    });
 
-    const mutations = await migration.migrate.document(doc, context);
+    const mutations = await runDocumentMigration(migration, author, context);
 
-    expect(mutations).toEqual([del('drafts.author-1')]);
-    expect(fetchCalls).toEqual([
-      { personId: 'drafts.person-author-1', id: 'drafts.author-1' },
-    ]);
+    expect(mutations).toEqual([del(MOCK_DRAFT_AUTHOR_ID)]);
+  });
+
+  it('rejects when the person counterpart does not exist', async () => {
+    const author = mockAuthor(MOCK_AUTHOR_ID);
+    const context = mockMigrationContext({ fetch: mockGroqFetch([author]) });
+
+    await expect(
+      runDocumentMigration(migration, author, context),
+    ).rejects.toThrow(
+      `Cannot delete blog_author "${MOCK_AUTHOR_ID}": its person counterpart "${MOCK_PERSON_ID}" does not exist.`,
+    );
+  });
+
+  it('rejects when only the published person exists for a draft blog_author', async () => {
+    const author = mockAuthor(MOCK_DRAFT_AUTHOR_ID);
+    const context = mockMigrationContext({
+      fetch: mockGroqFetch([author, mockPerson(MOCK_PERSON_ID, MOCK_NAME)]),
+    });
+
+    await expect(
+      runDocumentMigration(migration, author, context),
+    ).rejects.toThrow(
+      `Cannot delete blog_author "${MOCK_DRAFT_AUTHOR_ID}": its person counterpart "${MOCK_DRAFT_PERSON_ID}" does not exist.`,
+    );
   });
 
   it('leaves unrelated document types untouched', async () => {
-    const doc = { ...baseDoc, _id: 'person-author-1', _type: 'person' };
+    const person = mockPerson(MOCK_PERSON_ID, MOCK_NAME);
 
-    const mutations = await migration.migrate.document(doc, deletableContext);
+    const mutations = await runDocumentMigration(
+      migration,
+      person,
+      mockMigrationContext({ fetch: mockGroqFetch([person]) }),
+    );
 
     expect(mutations).toEqual([]);
   });

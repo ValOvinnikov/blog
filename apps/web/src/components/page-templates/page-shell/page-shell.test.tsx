@@ -18,12 +18,11 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    const order = renderedTestIdOrder();
+    const main = screen.getByRole('main');
+    const crumbsInMain = within(main).queryByTestId('crumbs');
+    const contentInMain = within(main).getByTestId('content');
 
-    const main = within(screen.getByRole('main'));
-    const crumbsInMain = main.queryByTestId('crumbs');
-    const contentInMain = main.getByTestId('content');
-    expect(order).toEqual(['crumbs', 'content']);
+    expect(renderedTestIdOrder()).toEqual(['crumbs', 'content']);
     expect(crumbsInMain).not.toBeInTheDocument();
     expect(contentInMain).toBeVisible();
   });
@@ -31,21 +30,25 @@ describe(`<${PageShell.name}/>`, () => {
   it('renders Heading before Content, both inside main', () => {
     renderElement(
       <PageShell>
-        <PageShell.Heading>
-          <h1>Title</h1>
-        </PageShell.Heading>
         <PageShell.Content>
-          <p>Body</p>
+          <p data-testid="content">Body</p>
         </PageShell.Content>
+        <PageShell.Heading>
+          <h1 data-testid="heading">Title</h1>
+        </PageShell.Heading>
       </PageShell>,
     );
 
     const main = screen.getByRole('main');
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(Array.from(main.children).map((el) => el.tagName)).toEqual([
-      'H1',
-      'P',
-    ]);
+    const headingInMain = within(main).getByRole('heading', {
+      level: 1,
+      name: 'Title',
+    });
+    const contentInMain = within(main).getByTestId('content');
+
+    expect(renderedTestIdOrder()).toEqual(['heading', 'content']);
+    expect(headingInMain).toBeVisible();
+    expect(contentInMain).toBeVisible();
   });
 
   it('omits the breadcrumb region when not given', () => {
@@ -57,7 +60,9 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    const navigation = screen.queryByRole('navigation');
+
+    expect(navigation).not.toBeInTheDocument();
   });
 
   it('omits the heading region when not given', () => {
@@ -70,24 +75,28 @@ describe(`<${PageShell.name}/>`, () => {
     );
 
     const main = screen.getByRole('main');
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(main.children).toHaveLength(1);
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(screen.getByTestId('content').parentElement).toBe(main);
+    const heading = screen.queryByRole('heading');
+    const contentInMain = within(main).getByTestId('content');
+
+    expect(heading).not.toBeInTheDocument();
+    expect(contentInMain).toBeVisible();
+    expect(renderedTestIdOrder()).toEqual(['content']);
   });
 
   it('omits the content region when not given', () => {
     renderElement(
       <PageShell>
         <PageShell.Heading>
-          <h1>Title</h1>
+          <h1 data-testid="heading">Title</h1>
         </PageShell.Heading>
       </PageShell>,
     );
 
     const main = screen.getByRole('main');
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(main.children).toHaveLength(1);
+    const headingInMain = within(main).getByTestId('heading');
+
+    expect(headingInMain).toBeVisible();
+    expect(renderedTestIdOrder()).toEqual(['heading']);
   });
 
   it('renders unmatched children after Content, not dropped', () => {
@@ -100,28 +109,7 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    const order = renderedTestIdOrder();
-
-    expect(order).toEqual(['content', 'stray']);
-  });
-
-  it('renders each region as a direct, unwrapped child of main', () => {
-    renderElement(
-      <PageShell>
-        <PageShell.Heading>
-          <div data-testid="heading">Title</div>
-        </PageShell.Heading>
-        <PageShell.Content>
-          <div data-testid="content">Body</div>
-        </PageShell.Content>
-      </PageShell>,
-    );
-
-    const main = screen.getByRole('main');
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(screen.getByTestId('heading').parentElement).toBe(main);
-    // eslint-disable-next-line testing-library/no-node-access -- TODO: #6008
-    expect(screen.getByTestId('content').parentElement).toBe(main);
+    expect(renderedTestIdOrder()).toEqual(['content', 'stray']);
   });
 
   it('renders no heading of its own', () => {
@@ -133,16 +121,17 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    const heading = screen.queryByRole('heading');
+
+    expect(heading).not.toBeInTheDocument();
   });
 
-  it('renders a single main landmark', () => {
-    renderElement(<PageShell />);
-    expect(screen.getByRole('main')).toBeVisible();
-  });
-
-  it('forwards data-testid to the main element', () => {
+  it('forwards data-testid to the main landmark', () => {
     renderElement(<PageShell dataTestId="page-shell" />);
-    expect(screen.getByTestId('page-shell')).toBeVisible();
+
+    const main = screen.getByRole('main');
+    const shell = screen.getByTestId('page-shell');
+
+    expect(main).toBe(shell);
   });
 });

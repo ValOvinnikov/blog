@@ -1,12 +1,13 @@
 import { CONSENT_CATEGORY } from '@blog/config';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { act, renderHook } from '@web/testing/custom-render';
+import {
+  clearConsentCookie,
+  MOCK_ANSWERED_CONSENT_PAIR,
+  MOCK_DECLINED_CONSENT_COOKIE,
+} from '@web/testing/hooks/use-consent-store/fixtures';
 
 import { useConsent } from './use-consent';
-
-const clearConsentCookie = () => {
-  document.cookie = 'consent=; Max-Age=0; Path=/';
-};
 
 describe(useConsent, () => {
   beforeEach(clearConsentCookie);
@@ -31,13 +32,13 @@ describe(useConsent, () => {
       act(() => result.current.grant());
 
       expect(result.current.status).toBe(CONSENT_STATUS.GRANTED);
-      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+      expect(document.cookie).toContain(MOCK_ANSWERED_CONSENT_PAIR);
     });
   });
 
   describe('with a declined answer stored', () => {
     beforeEach(() => {
-      document.cookie = 'consent=1.; Path=/';
+      document.cookie = MOCK_DECLINED_CONSENT_COOKIE;
     });
 
     it('reads a declined cookie as denied', () => {

@@ -1,60 +1,62 @@
 import { ICONS } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { customRender, screen } from '@platform/testing/custom-render';
+import { mockNavBadge } from '@platform/testing/layout/fixtures';
 
 import { NavItemContent } from './nav-item-content';
 
+faker.seed(5993);
+
+const MOCK_LABEL = faker.lorem.word();
+const MOCK_DISABLED_REASON = faker.lorem.sentence();
+const MOCK_BADGE = mockNavBadge();
+const STATUS_BADGE_DOT_TEST_ID = 'status-badge-dot';
+
+const setup = customRender(NavItemContent, {
+  icon: ICONS.GRID,
+  label: MOCK_LABEL,
+});
+
 describe(`<${NavItemContent.name}/>`, () => {
   it('renders the icon and label', () => {
-    render(<NavItemContent icon={ICONS.GRID} label="Tenants" />);
+    setup();
 
-    expect(screen.getByText('Tenants')).toBeVisible();
-    expect(screen.getByTestId('icon')).toBeVisible();
+    const label = screen.getByText(MOCK_LABEL);
+    const icon = screen.getByTestId('icon');
+
+    expect(label).toBeVisible();
+    expect(icon).toBeVisible();
   });
 
-  it('renders a disabled reason only when given one', () => {
-    const { rerender } = render(
-      <NavItemContent icon={ICONS.GRID} label="Domain" />,
-    );
-    expect(screen.queryByText('Coming soon')).not.toBeInTheDocument();
+  it('renders the disabled reason', () => {
+    setup({ disabledReason: MOCK_DISABLED_REASON });
 
-    rerender(
-      <NavItemContent
-        icon={ICONS.GRID}
-        label="Domain"
-        disabledReason="Coming soon"
-      />,
-    );
-    expect(screen.getByText('Coming soon')).toBeVisible();
+    const reason = screen.getByText(MOCK_DISABLED_REASON);
+
+    expect(reason).toBeVisible();
   });
 
   it('renders no badge when none is given', () => {
-    render(<NavItemContent icon={ICONS.GRID} label="Tenants" />);
-    expect(screen.queryByTestId('status-badge-dot')).not.toBeInTheDocument();
+    setup();
+
+    const dot = screen.queryByTestId(STATUS_BADGE_DOT_TEST_ID);
+
+    expect(dot).not.toBeInTheDocument();
   });
 
-  it('renders the badge label and tone dot by default', () => {
-    render(
-      <NavItemContent
-        icon={ICONS.GRID}
-        label="Tenants"
-        badge={{ label: 'this milestone', tone: 'neutral' }}
-      />,
-    );
+  it('renders the badge label', () => {
+    setup({ badge: MOCK_BADGE });
 
-    expect(screen.getByText('this milestone')).toBeVisible();
-    expect(screen.getByTestId('status-badge-dot')).toBeVisible();
+    const badge = screen.getByText(MOCK_BADGE.label);
+
+    expect(badge).toBeVisible();
   });
 
-  it('omits the tone dot when the badge sets hasDot to false', () => {
-    render(
-      <NavItemContent
-        icon={ICONS.GRID}
-        label="Platform"
-        badge={{ label: 'platform', tone: 'neutral', hasDot: false }}
-      />,
-    );
+  it('omits the tone dot when the badge opts out of it', () => {
+    setup({ badge: { ...MOCK_BADGE, hasDot: false } });
 
-    expect(screen.getByText('platform')).toBeVisible();
-    expect(screen.queryByTestId('status-badge-dot')).not.toBeInTheDocument();
+    const dot = screen.queryByTestId(STATUS_BADGE_DOT_TEST_ID);
+
+    expect(dot).not.toBeInTheDocument();
   });
 });

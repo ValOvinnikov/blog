@@ -39,6 +39,14 @@ export const mockFormattedVoiceRich = ({
   },
 ];
 
+export const mockVoiceRichTextBlocks = (texts: string[]): TVoicePortableText =>
+  texts.map((text, index) => ({
+    _type: 'block',
+    _key: `block-${index}`,
+    style: MOCK_PARAGRAPH_STYLE,
+    children: [{ _type: 'span', _key: `span-${index}`, text }],
+  }));
+
 export const mockVoiceRichText = (text: string): TVoicePortableText => [
   {
     _type: 'block',

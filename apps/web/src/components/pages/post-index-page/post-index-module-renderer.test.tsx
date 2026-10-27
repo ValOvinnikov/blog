@@ -1,11 +1,12 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { faker } from '@faker-js/faker';
+import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
+import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockModule } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
-  MOCK_POST_LIST_ID,
-  MOCK_TAXONOMY_LIST_ID,
-} from '@web/testing/shared/module-renderer-contract/fixtures';
-import {
+  testChildrenBetweenHeroAndModules,
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testRendersAllowedModulesInOrder,
@@ -13,141 +14,71 @@ import {
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 import { logger } from '@web/utils/logger/logger';
-import type { ReactNode } from 'react';
 
 import { PostIndexModuleRenderer } from './post-index-module-renderer';
 
-const {
-  ctaModuleMock,
-  newsletterModuleMock,
-  postFeaturedModuleMock,
-  postListModuleMock,
-  taxonomyListModuleMock,
-  heroBlogModuleMock,
-  contentModuleMock,
-  postLatestModuleMock,
-} = vi.hoisted(() => ({
-  postLatestModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-post-latest">{id}</div>
-  )),
-  contentModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-content">{id}</div>
-  )),
-  ctaModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-cta">{id}</div>
-  )),
-  newsletterModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-newsletter">{id}</div>
-  )),
-  postFeaturedModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-post-featured">{id}</div>
-  )),
-  postListModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-post-list">{id}</div>
-  )),
-  taxonomyListModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-taxonomy-list">{id}</div>
-  )),
-  heroBlogModuleMock: vi.fn(
-    async ({ id }: { id: string }): Promise<ReactNode> => (
-      <h1 data-testid="stub-hero">{id}</h1>
-    ),
-  ),
-}));
+faker.seed(2718);
 
-vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
-vi.mock('@web/modules/newsletter/newsletter-module', () => ({
-  NewsletterModule: newsletterModuleMock,
-}));
-vi.mock('@web/modules/post-featured/post-featured-module', () => ({
-  PostFeaturedModule: postFeaturedModuleMock,
-}));
-vi.mock('@web/modules/post-list/post-list-module', () => ({
-  PostListModule: postListModuleMock,
-}));
-vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
-  TaxonomyListModule: taxonomyListModuleMock,
-}));
-vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
-  HeroBlogModule: heroBlogModuleMock,
-}));
-
-vi.mock('@web/modules/content/content-module', () => ({
-  ContentModule: contentModuleMock,
-}));
-
-vi.mock('@web/modules/post-latest/post-latest-module', () => ({
-  PostLatestModule: postLatestModuleMock,
-}));
+vi.mock('@web/modules/cta/cta-module');
+vi.mock('@web/modules/newsletter/newsletter-module');
+vi.mock('@web/modules/post-featured/post-featured-module');
+vi.mock('@web/modules/post-list/post-list-module');
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module');
+vi.mock('@web/modules/hero-blog/hero-blog-module');
+vi.mock('@web/modules/content/content-module');
+vi.mock('@web/modules/post-latest/post-latest-module');
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
-const PAGE_HEADING = 'Notes on building things';
+const MOCK_PAGE_HEADING = faker.lorem.sentence();
+const MOCK_PAGE_NUMBER = faker.number.int({ min: 2, max: 9 });
+
 const setup = customRenderAsync(PostIndexModuleRenderer, {
   hero: undefined,
-  headingBlock: mockHeadingBlock({ heading: PAGE_HEADING }),
+  headingBlock: mockHeadingBlock({ heading: MOCK_PAGE_HEADING }),
   headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 
 describe(`<${PostIndexModuleRenderer.name}/>`, () => {
-  testHeadingWithoutHero({
-    setup,
-    headingText: PAGE_HEADING,
-  });
+  testHeadingWithoutHero({ setup, headingText: MOCK_PAGE_HEADING });
   testResolvedHero({ setup });
   testFallsBackToHeadingWithoutHero({
     setup,
-    heroBlogModuleMock,
-    headingText: PAGE_HEADING,
+    heroBlogModuleMock: vi.mocked(HeroBlogModule),
+    headingText: MOCK_PAGE_HEADING,
   });
-
-  it('renders the given children between the hero and the modules', async () => {
-    await setup({
-      hero: { id: 'hero-1', type: 'module_heroBlog' },
-      modules: [{ id: 'cta-1', type: 'module_cta' }],
-      children: <div data-testid="stub-topic-chips" />,
-    });
-
-    const nodes = screen.getAllByTestId(/^stub-/);
-    expect(nodes.map((node) => node.getAttribute('data-testid'))).toEqual([
-      'stub-hero',
-      'stub-topic-chips',
-      'stub-cta',
-    ]);
-  });
-
+  testChildrenBetweenHeroAndModules({ setup });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'stats-1', type: 'module_stats' },
+    unknownModule: mockModule('module_stats'),
     description:
-      'renders nothing and warns once for a module absent from the post index allow-list',
+      'warns once and renders nothing for a module outside the post index allow-list',
   });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
-      { id: MOCK_POST_LIST_ID, type: 'module_postList' },
-      { id: MOCK_TAXONOMY_LIST_ID, type: 'module_taxonomyList' },
-      { id: 'cta-1', type: 'module_cta' },
-      { id: 'newsletter-1', type: 'module_newsletter' },
-      { id: 'post-featured-1', type: 'module_postFeatured' },
-      { id: 'content-1', type: 'module_content' },
-      { id: 'post-latest-1', type: 'module_postLatest' },
+      mockModule('module_postList'),
+      mockModule('module_taxonomyList'),
+      mockModule('module_cta'),
+      mockModule('module_newsletter'),
+      mockModule('module_postFeatured'),
+      mockModule('module_content'),
+      mockModule('module_postLatest'),
     ],
   });
 
   it('forwards the given context to the modules', async () => {
+    const postListModule = mockModule('module_postList');
+
     await setup({
-      modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
-      context: { page: 2 },
+      modules: [postListModule],
+      context: { page: MOCK_PAGE_NUMBER },
     });
 
-    expect(postListModuleMock).toHaveBeenCalledWith(
-      {
-        id: MOCK_POST_LIST_ID,
-        context: { page: 2 },
-      },
+    expect(PostListModule).toHaveBeenCalledWith(
+      { id: postListModule.id, context: { page: MOCK_PAGE_NUMBER } },
       undefined,
     );
   });

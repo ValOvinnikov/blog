@@ -8,6 +8,8 @@ import {
 
 import { DeepAside } from './deep-aside';
 
+const DEEP_ASIDE_GATE_TEST_ID = 'deep-aside-gate';
+
 const props = {
   kind: ASIDE_KIND.WHY_NOT,
   label: 'Why not X',
@@ -23,14 +25,19 @@ describe(`<${DeepAside.name}/>`, () => {
     });
 
     it('renders the Aside molecule with its label and content', () => {
-      expect(screen.getByRole('note')).toBeVisible();
-      expect(screen.getByText('Why not X')).toBeVisible();
-      expect(screen.getByText('Because Y.')).toBeVisible();
+      const note = screen.getByRole('note');
+      const label = screen.getByText(props.label);
+      const content = screen.getByText('Because Y.');
+
+      expect(note).toBeVisible();
+      expect(label).toBeVisible();
+      expect(content).toBeVisible();
     });
 
-    it('is not gated by depth outside a DepthProvider', () => {
-      expect(screen.getByRole('note')).toBeVisible();
-      expect(screen.queryByTestId('deep-aside-gate')).not.toBeInTheDocument();
+    it('is not gated by depth', () => {
+      const gate = screen.queryByTestId(DEEP_ASIDE_GATE_TEST_ID);
+
+      expect(gate).not.toBeInTheDocument();
     });
   });
 
@@ -41,7 +48,10 @@ describe(`<${DeepAside.name}/>`, () => {
       </DepthProvider>,
     );
 
-    expect(screen.getByTestId('deep-aside-gate')).toBeInTheDocument();
-    expect(screen.getByRole('note')).toBeInTheDocument();
+    const gate = screen.getByTestId(DEEP_ASIDE_GATE_TEST_ID);
+    const note = screen.getByRole('note');
+
+    expect(gate).toBeVisible();
+    expect(note).toBeVisible();
   });
 });

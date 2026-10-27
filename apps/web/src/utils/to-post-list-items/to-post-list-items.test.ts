@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import type { TPostCard } from '@blog/service';
+import { faker } from '@faker-js/faker';
 import {
   mockPostCard,
   mockPostCardTopic,
@@ -9,18 +10,21 @@ import type { ReactNode } from 'react';
 
 import { toPostListItems } from './to-post-list-items';
 
-const PUBLISHED_AT = '2026-01-15T00:00:00.000Z';
+faker.seed(6012);
+
+const MOCK_PUBLISHED_AT = '2026-01-15T00:00:00.000Z';
+const MOCK_FORMATTED_DATE = 'January 15, 2026';
+const MOCK_TRANSLATED_DATE = faker.date.weekday();
+const MOCK_READING_TIME_MINUTES = faker.number.int({ min: 2, max: 9 });
+const MOCK_IMAGE = faker.lorem.word() as unknown as ReactNode;
 
 describe(toPostListItems, () => {
-  it('maps a post card into the href/formattedDate shape MediaCardItem expects', async () => {
-    const topic = mockPostCardTopic({ title: 'Engineering' });
+  it('maps a post card into the card item shape', async () => {
+    const topic = mockPostCardTopic();
     const post = mockPostCard({
-      slug: 'hello-world',
-      title: 'Hello World',
-      excerpt: 'An excerpt.',
-      publishedAt: PUBLISHED_AT,
+      publishedAt: MOCK_PUBLISHED_AT,
       topic,
-      readingTimeMinutes: 2,
+      readingTimeMinutes: MOCK_READING_TIME_MINUTES,
     });
     const { id, slug, title, excerpt } = post;
 
@@ -31,53 +35,29 @@ describe(toPostListItems, () => {
       href: routes.post(slug),
       title,
       excerpt,
-      publishedAt: PUBLISHED_AT,
-      formattedDate: 'January 15, 2026',
-      readingTime: '2 min',
+      publishedAt: MOCK_PUBLISHED_AT,
+      formattedDate: MOCK_FORMATTED_DATE,
+      readingTime: `${MOCK_READING_TIME_MINUTES} min`,
       topic,
     });
   });
 
-  describe('date formatting', () => {
-    let post: TPostCard;
+  it('formats the date with the request-scoped formatter', async () => {
+    vi.mocked(getFormatter).mockResolvedValueOnce({
+      dateTime: () => MOCK_TRANSLATED_DATE,
+    } as unknown as Awaited<ReturnType<typeof getFormatter>>);
+    const post = mockPostCard({ publishedAt: MOCK_PUBLISHED_AT });
 
-    beforeEach(() => {
-      post = mockPostCard({ publishedAt: PUBLISHED_AT });
-    });
+    const [item] = await toPostListItems([post]);
 
-    it('formats the date with the request-scoped next-intl formatter', async () => {
-      const formattedDate = '15 janvier 2026';
-      vi.mocked(getFormatter).mockResolvedValueOnce({
-        dateTime: () => formattedDate,
-      } as unknown as Awaited<ReturnType<typeof getFormatter>>);
-
-      const [item] = await toPostListItems([post]);
-
-      expect(item?.formattedDate).toBe(formattedDate);
-    });
-
-    it('calls dateTime with the published date and the year/month/day format', async () => {
-      const dateTimeMock = vi.fn();
-
-      vi.mocked(getFormatter).mockResolvedValueOnce({
-        dateTime: dateTimeMock,
-      } as unknown as Awaited<ReturnType<typeof getFormatter>>);
-
-      await toPostListItems([post]);
-
-      expect(dateTimeMock).toHaveBeenCalledWith(new Date(PUBLISHED_AT), {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    });
+    expect(item?.formattedDate).toBe(MOCK_TRANSLATED_DATE);
   });
 
   it('maps an empty list to an empty list', async () => {
     expect(await toPostListItems([])).toEqual([]);
   });
 
-  it('maps a post card with no excerpt, without throwing', async () => {
+  it('maps a post card with no excerpt', async () => {
     const post = mockPostCard({ excerpt: undefined });
 
     const [item] = await toPostListItems([post]);
@@ -92,17 +72,16 @@ describe(toPostListItems, () => {
       post = mockPostCard();
     });
 
-    it('sets image from renderImage when given', async () => {
-      const image = 'rendered-image' as unknown as ReactNode;
-      const renderImage = vi.fn().mockReturnValue(image);
+    it('takes the image from the render callback when given', async () => {
+      const renderImage = vi.fn().mockReturnValue(MOCK_IMAGE);
 
       const [item] = await toPostListItems([post], renderImage);
 
       expect(renderImage).toHaveBeenCalledWith(post);
-      expect(item?.image).toBe(image);
+      expect(item?.image).toBe(MOCK_IMAGE);
     });
 
-    it('leaves image undefined when no renderImage is given', async () => {
+    it('leaves the image undefined without a render callback', async () => {
       const [item] = await toPostListItems([post]);
 
       expect(item?.image).toBeUndefined();

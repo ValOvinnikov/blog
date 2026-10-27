@@ -21,11 +21,15 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
+faker.seed(6024);
+
+const MOCK_SOURCE_DOCUMENT_ID = faker.string.uuid();
+
 const MOCK_LEAD = {
   name: MOCK_LEAD_NAME,
   email: MOCK_LEAD_EMAIL,
   message: MOCK_LEAD_MESSAGE,
-  sourcePath: '/en/contact',
+  sourcePath: `/${faker.lorem.slug()}`,
 };
 
 async function readOnlyLead(): Promise<schema.TLead> {
@@ -59,7 +63,7 @@ describe(createLead, () => {
     expect(row.tenantId).toBe(tenantId);
   });
 
-  it('stores the name, email and message encrypted, and the email index', async () => {
+  it('encrypts the name, email and message and indexes the email', async () => {
     await createLead({ tenantId, ...MOCK_LEAD });
 
     const { nameEncrypted, emailEncrypted, messageEncrypted, emailIndex } =
@@ -80,7 +84,10 @@ describe(createLead, () => {
   it.each([
     [
       'stores',
-      { sourceDocumentId: 'page-contact', sourceLocale: LOCALE_BCP47_TAGS.EN },
+      {
+        sourceDocumentId: MOCK_SOURCE_DOCUMENT_ID,
+        sourceLocale: LOCALE_BCP47_TAGS.EN,
+      },
     ],
     ['leaves empty', {}],
   ])('%s the source document and locale', async (_case, source) => {

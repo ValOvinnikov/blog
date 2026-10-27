@@ -1,4 +1,5 @@
 import * as schema from '@blog/db/schema';
+import { MOCK_POST_ID } from '@blog/db/testing/bookmarks/fixtures';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
@@ -19,44 +20,50 @@ afterEach(async () => {
 
 describe(removeBookmark, () => {
   let tenantId: string;
+  let userId: string;
 
   beforeEach(async () => {
-    await insertTestUser(db(), { id: 'user-1' });
+    ({ id: userId } = await insertTestUser(db()));
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
   it('deletes an existing bookmark', async () => {
-    await addBookmark(tenantId, 'user-1', 'post-1');
+    await addBookmark(tenantId, userId, MOCK_POST_ID);
 
-    await removeBookmark(tenantId, 'user-1', 'post-1');
+    await removeBookmark(tenantId, userId, MOCK_POST_ID);
 
-    expect(await isBookmarked(tenantId, 'user-1', 'post-1')).toBe(false);
+    await expect(isBookmarked(tenantId, userId, MOCK_POST_ID)).resolves.toBe(
+      false,
+    );
   });
 
   it('is a no-op when the bookmark does not exist', async () => {
     await expect(
-      removeBookmark(tenantId, 'user-1', 'post-1'),
+      removeBookmark(tenantId, userId, MOCK_POST_ID),
     ).resolves.toBeUndefined();
   });
 
-  it("does not remove another user's bookmark for the same post", async () => {
-    await insertTestUser(db(), { id: 'user-2' });
-    await addBookmark(tenantId, 'user-1', 'post-1');
-    await addBookmark(tenantId, 'user-2', 'post-1');
+  it("leaves another user's bookmark for the same post", async () => {
+    const { id: otherUserId } = await insertTestUser(db());
+    await addBookmark(tenantId, userId, MOCK_POST_ID);
+    await addBookmark(tenantId, otherUserId, MOCK_POST_ID);
 
-    await removeBookmark(tenantId, 'user-1', 'post-1');
+    await removeBookmark(tenantId, userId, MOCK_POST_ID);
 
-    expect(await isBookmarked(tenantId, 'user-2', 'post-1')).toBe(true);
+    await expect(
+      isBookmarked(tenantId, otherUserId, MOCK_POST_ID),
+    ).resolves.toBe(true);
   });
 
-  it("does not remove another tenant's bookmark for the same user and post", async () => {
-    const { id: tenantOneId } = await insertTestTenant(db());
-    const { id: tenantTwoId } = await insertTestTenant(db());
-    await addBookmark(tenantOneId, 'user-1', 'post-1');
-    await addBookmark(tenantTwoId, 'user-1', 'post-1');
+  it("leaves another tenant's bookmark for the same user and post", async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await addBookmark(tenantId, userId, MOCK_POST_ID);
+    await addBookmark(otherTenantId, userId, MOCK_POST_ID);
 
-    await removeBookmark(tenantOneId, 'user-1', 'post-1');
+    await removeBookmark(tenantId, userId, MOCK_POST_ID);
 
-    expect(await isBookmarked(tenantTwoId, 'user-1', 'post-1')).toBe(true);
+    await expect(
+      isBookmarked(otherTenantId, userId, MOCK_POST_ID),
+    ).resolves.toBe(true);
   });
 });

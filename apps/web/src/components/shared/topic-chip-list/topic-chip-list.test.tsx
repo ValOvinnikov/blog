@@ -1,5 +1,6 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@blog/config';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_SECOND_TOPIC,
@@ -10,6 +11,8 @@ import {
 import { TopicChipList } from './topic-chip-list';
 
 vi.mock('@web/i18n/navigation');
+
+faker.seed(5801);
 
 const { ariaLabel: NAV_NAME, all: ALL_CHIP_NAME } = SITE_MESSAGES.topicChipList;
 
@@ -32,7 +35,7 @@ describe(`<${TopicChipList.name}/>`, () => {
     it('renders an "All" chip linking to the blog index', () => {
       const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
 
-      expect(allLink).toHaveAttribute('href', '/blog');
+      expect(allLink).toHaveAttribute('href', routes.blogIndex());
     });
 
     it.each(topics.map((topic, index) => ({ position: index + 1, topic })))(
@@ -40,7 +43,7 @@ describe(`<${TopicChipList.name}/>`, () => {
       ({ topic: { title, slug } }) => {
         const link = screen.getByRole('link', { name: title });
 
-        expect(link).toHaveAttribute('href', `/topics/${slug}`);
+        expect(link).toHaveAttribute('href', routes.topic(slug!));
       },
     );
 
@@ -70,19 +73,19 @@ describe(`<${TopicChipList.name}/>`, () => {
       name: MOCK_ENGINEERING_TOPIC.title,
     });
     const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
-    const designLink = screen.getByRole('link', {
+    const secondLink = screen.getByRole('link', {
       name: MOCK_SECOND_TOPIC.title,
     });
 
     expect(engineeringLink).toHaveAttribute(ARIA_CURRENT, 'page');
     expect(allLink).not.toHaveAttribute(ARIA_CURRENT);
-    expect(designLink).not.toHaveAttribute(ARIA_CURRENT);
+    expect(secondLink).not.toHaveAttribute(ARIA_CURRENT);
   });
 
   it('renders a topic with no archive page as plain text, never current', () => {
     const archivelessTopic = mockTopicWithPostCount({
-      id: 'topic-4',
-      title: 'Culture',
+      id: faker.string.uuid(),
+      title: faker.lorem.word({ length: 12 }),
       slug: undefined,
     });
     setup({ topics: [...topics, archivelessTopic] });
