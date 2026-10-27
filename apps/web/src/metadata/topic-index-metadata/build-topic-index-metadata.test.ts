@@ -1,13 +1,15 @@
 import { LOCALE_ISO_CODES, routes, type TLocaleIsoCode } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  MOCK_OG_IMAGE,
-  MOCK_OG_IMAGE_URL,
-} from '@web/testing/shared/seo/og-image-fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+  MOCK_DUTCH_REQUEST_CONTEXT,
+  NL_PATH_PREFIX,
+  mockMetadataSeo,
+} from '@web/testing/metadata/to-metadata/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { buildTopicIndexMetadata } from './build-topic-index-metadata';
@@ -25,27 +27,20 @@ vi.mock(
 
 vi.mock('@web/server/request-context/request-context');
 
-const TITLE = 'Topics';
+faker.seed(5207);
+
+const { EN, NL, DE } = LOCALE_ISO_CODES;
 const INDEX_PATH = routes.topics();
-const NL_INDEX_PATH = `/nl${INDEX_PATH}`;
-const DESCRIPTION = 'Browse every post by topic.';
-const OG_DESCRIPTION = 'Browse every post by topic OG.';
+const NL_INDEX_PATH = `${NL_PATH_PREFIX}${INDEX_PATH}`;
 
-const seo = mockSeo({
-  title: TITLE,
-  description: DESCRIPTION,
-  ogTitle: 'Topics OG',
-  ogDescription: OG_DESCRIPTION,
-  ogImage: MOCK_OG_IMAGE,
-});
+const MOCK_SEO = mockMetadataSeo();
+const { title, description, ogTitle, ogDescription } = MOCK_SEO;
 
-const resolveIndexPageWith = (
-  translations: TLocaleIsoCode[] = [LOCALE_ISO_CODES.EN],
-) =>
+const resolveIndexPageWith = (translations: TLocaleIsoCode[] = [EN]) =>
   getTopicIndexPageMock.mockResolvedValue(
     okResult({
-      headingBlock: { heading: TITLE },
-      seo,
+      headingBlock: mockHeadingBlock({ heading: title }),
+      seo: MOCK_SEO,
       modules: [],
       translations,
     }),
@@ -55,29 +50,24 @@ describe(buildTopicIndexMetadata, () => {
   beforeEach(() => {
     getTopicIndexPageMock.mockReset();
     vi.mocked(getRequestContext).mockReset();
+    resolveIndexPageWith();
   });
 
-  describe('when the index page resolves', () => {
-    beforeEach(() => {
-      resolveIndexPageWith();
-    });
+  it('reads the index page the topic index renders', async () => {
+    await buildTopicIndexMetadata();
 
-    it('reads the same index page the topic index renders', async () => {
-      await buildTopicIndexMetadata();
+    expect(getTopicIndexPageMock).toHaveBeenCalledWith();
+  });
 
-      expect(getTopicIndexPageMock).toHaveBeenCalledWith();
-    });
+  it('builds metadata from the resolved seo, self-canonical to the topic index', async () => {
+    const metadata = await buildTopicIndexMetadata();
 
-    it('builds metadata from the resolved seo, self-canonical to /topics', async () => {
-      const metadata = await buildTopicIndexMetadata();
-
-      expect(metadata.title).toBe(TITLE);
-      expect(metadata.description).toBe(DESCRIPTION);
-      expect(metadata.alternates?.canonical).toBe(INDEX_PATH);
-      expect(metadata.openGraph?.title).toBe('Topics OG');
-      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
-      expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
-    });
+    expect(metadata.title).toBe(title);
+    expect(metadata.description).toBe(description);
+    expect(metadata.alternates?.canonical).toBe(INDEX_PATH);
+    expect(metadata.openGraph?.title).toBe(ogTitle);
+    expect(metadata.openGraph?.description).toBe(ogDescription);
+    expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
   });
 
   describe('when no metadata can be built', () => {
@@ -104,14 +94,8 @@ describe(buildTopicIndexMetadata, () => {
   });
 
   it('lists each live translated language as hreflang, canonical to its prefix', async () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-    const translations = [EN, NL, DE];
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
-    resolveIndexPageWith(translations);
+    vi.mocked(getRequestContext).mockResolvedValue(MOCK_DUTCH_REQUEST_CONTEXT);
+    resolveIndexPageWith([EN, NL, DE]);
 
     const metadata = await buildTopicIndexMetadata();
 
