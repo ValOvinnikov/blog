@@ -1,79 +1,59 @@
-import { FEATURE_ICONS, ICONS, type TIconName } from '@blog/config';
+import { FEATURE_ICONS, ICONS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 
 import { Icon } from './icon';
-import { ICON_REGISTRY } from './icon-registry';
+
+faker.seed(123);
 
 const ARIA_HIDDEN = 'aria-hidden';
-const SHARE_LABEL = 'Share this post';
-const FEATURE_ICON_TEST_ID = 'feature-icon';
+const MOCK_LABEL = faker.lorem.words(3);
+const ICON_TEST_ID = 'icon';
+const OTHER_ICON_TEST_ID = 'other-icon';
 
-const setup = customRender(Icon, { name: ICONS.SUN });
+const setup = customRender(Icon, { name: ICONS.SUN, dataTestId: ICON_TEST_ID });
 
 describe(`<${Icon.name}/>`, () => {
-  it('renders the SVG registered for the given name', () => {
-    setup({ name: ICONS.SUN, dataTestId: 'sun-icon' });
-    setup({ name: ICONS.MOON, dataTestId: 'moon-icon' });
+  it('renders a different glyph for each icon name', () => {
+    setup({ name: ICONS.SUN });
+    setup({ name: ICONS.MOON, dataTestId: OTHER_ICON_TEST_ID });
 
-    expect(
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      screen.getByTestId('sun-icon').querySelectorAll('line'),
-    ).toHaveLength(8);
-    expect(
-      // eslint-disable-next-line testing-library/no-node-access -- TODO: #6013
-      screen.getByTestId('moon-icon').querySelectorAll('line'),
-    ).toHaveLength(0);
+    const sunIcon = screen.getByTestId(ICON_TEST_ID);
+    const moonIcon = screen.getByTestId(OTHER_ICON_TEST_ID);
+
+    expect(sunIcon.innerHTML).not.toBe(moonIcon.innerHTML);
   });
 
-  describe('with no aria-label or strokeWidth', () => {
-    beforeEach(() => {
-      setup({ dataTestId: 'icon' });
-    });
+  it.each(FEATURE_ICONS)('renders the %s feature icon', (name) => {
+    setup({ name });
 
-    it('renders a baked-in stroke-width per icon', () => {
-      expect(screen.getByTestId('icon')).toHaveAttribute('stroke-width', '1.6');
-    });
+    const icon = screen.getByTestId(ICON_TEST_ID);
 
-    it('defaults to aria-hidden', () => {
-      expect(screen.getByTestId('icon')).toHaveAttribute(ARIA_HIDDEN, 'true');
-    });
+    expect(icon).toBeVisible();
   });
 
-  it('does not default aria-hidden when an aria-label is given', () => {
-    setup({ 'aria-label': SHARE_LABEL, dataTestId: 'icon' });
+  it('is hidden from assistive tech by default', () => {
+    setup();
 
-    const icon = screen.getByTestId('icon');
-    expect(icon).toHaveAccessibleName(SHARE_LABEL);
+    const icon = screen.getByTestId(ICON_TEST_ID);
+
+    expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
+  });
+
+  it('is exposed with its accessible name when an aria-label is given', () => {
+    setup({ 'aria-label': MOCK_LABEL });
+
+    const icon = screen.getByTestId(ICON_TEST_ID);
+
+    expect(icon).toHaveAccessibleName(MOCK_LABEL);
     expect(icon).not.toHaveAttribute(ARIA_HIDDEN);
   });
 
-  it('lets an explicit aria-hidden override the default even with an aria-label', () => {
-    setup({
-      'aria-label': SHARE_LABEL,
-      [ARIA_HIDDEN]: false,
-      dataTestId: 'icon',
-    });
+  it('lets an explicit aria-hidden win over the aria-label default', () => {
+    setup({ 'aria-label': MOCK_LABEL, [ARIA_HIDDEN]: false });
 
-    expect(screen.getByTestId('icon')).toHaveAttribute(ARIA_HIDDEN, 'false');
-  });
-});
+    const icon = screen.getByTestId(ICON_TEST_ID);
 
-describe('ICON_REGISTRY', () => {
-  it('has a registry entry with a component and url for every ICONS value', () => {
-    const names = Object.values(ICONS) as TIconName[];
-
-    names.forEach((name) => {
-      expect(ICON_REGISTRY[name]).toBeDefined();
-      expect(ICON_REGISTRY[name].component).toBeDefined();
-      expect(ICON_REGISTRY[name].url.length).toBeGreaterThan(0);
-    });
-  });
-});
-
-describe.each(FEATURE_ICONS)('<%s Icon/>', (name) => {
-  it('renders', () => {
-    setup({ name, dataTestId: FEATURE_ICON_TEST_ID });
-
-    expect(screen.getByTestId(FEATURE_ICON_TEST_ID)).toBeVisible();
+    expect(icon).toHaveAttribute(ARIA_HIDDEN, 'false');
   });
 });

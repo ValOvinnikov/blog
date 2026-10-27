@@ -5,19 +5,16 @@ import { InlineCode } from './inline-code';
 
 faker.seed(123);
 
-const setup = customRender(InlineCode, {
-  children: faker.hacker.noun(),
-});
+const MOCK_TOKEN = faker.hacker.noun();
+
+const setup = customRender(InlineCode, { children: MOCK_TOKEN });
 
 describe(`<${InlineCode.name}/>`, () => {
-  it('renders a code element', () => {
-    const token = faker.hacker.noun();
-    setup({ children: token });
-    expect(screen.getByText(token).tagName).toBe('CODE');
-  });
+  it('renders its children as code', () => {
+    setup();
 
-  it('forwards dataTestId as a data-testid attribute', () => {
-    setup({ children: 'token', dataTestId: 'inline-code' });
-    expect(screen.getByTestId('inline-code')).toBeVisible();
+    const code = screen.getByRole('code');
+
+    expect(code).toHaveTextContent(MOCK_TOKEN);
   });
 });

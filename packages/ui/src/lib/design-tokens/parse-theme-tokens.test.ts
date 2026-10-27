@@ -1,6 +1,6 @@
 import { parseThemeTokens } from './parse-theme-tokens';
 
-const SAMPLE = `
+const MOCK_STYLESHEET = `
 @theme inline {
   --color-bg: var(--bg); /* @role page background */
   --color-accent-solid: var(--accent-solid);
@@ -26,43 +26,48 @@ h2 {
 }
 `;
 
+const CSS_VAR_COLOR_BG = '--color-bg';
+const CSS_VAR_ACCENT_SOLID = '--color-accent-solid';
+
 describe(parseThemeTokens, () => {
   describe('with the sample stylesheet', () => {
     let tokens: ReturnType<typeof parseThemeTokens>;
+    let findToken: (cssVar: string) => (typeof tokens)[number] | undefined;
 
     beforeEach(() => {
-      tokens = parseThemeTokens(SAMPLE);
+      tokens = parseThemeTokens(MOCK_STYLESHEET);
+      findToken = (cssVar) => tokens.find((token) => token.cssVar === cssVar);
     });
 
-    it('strips the matched prefix from the token name while keeping the full cssVar', () => {
-      const accentSolid = tokens.find(
-        (t) => t.cssVar === '--color-accent-solid',
-      );
-      expect(accentSolid).toBeDefined();
+    it('strips the matched prefix from the name and keeps the full cssVar', () => {
+      const accentSolid = findToken(CSS_VAR_ACCENT_SOLID);
+
       expect(accentSolid?.name).toBe('accent-solid');
     });
 
-    it('captures the declared value', () => {
-      expect(tokens.find((t) => t.cssVar === '--color-bg')?.value).toBe(
-        'var(--bg)',
-      );
-      expect(tokens.find((t) => t.cssVar === '--radius-sm')?.value).toBe('3px');
+    it.each([
+      [CSS_VAR_COLOR_BG, 'var(--bg)'],
+      ['--radius-sm', '3px'],
+    ])('captures the declared value of %s', (cssVar, value) => {
+      const token = findToken(cssVar);
+
+      expect(token?.value).toBe(value);
     });
 
     it('reads an @role comment when present', () => {
-      const bg = tokens.find((t) => t.cssVar === '--color-bg');
+      const bg = findToken(CSS_VAR_COLOR_BG);
+
       expect(bg?.role).toBe('page background');
     });
 
     it('leaves role undefined when no @role comment is present', () => {
-      const accentSolid = tokens.find(
-        (t) => t.cssVar === '--color-accent-solid',
-      );
+      const accentSolid = findToken(CSS_VAR_ACCENT_SOLID);
+
       expect(accentSolid?.role).toBeUndefined();
     });
 
     it.each([
-      ['--color-bg', 'color'],
+      [CSS_VAR_COLOR_BG, 'color'],
       ['--font-mono', 'font'],
       ['--radius-sm', 'radius'],
       ['--spacing-gutter', 'spacing'],
@@ -71,41 +76,50 @@ describe(parseThemeTokens, () => {
       ['--ease-smooth', 'motion'],
       ['--duration-fast', 'motion'],
     ] as const)('maps %s to category %s', (cssVar, category) => {
-      const token = tokens.find((t) => t.cssVar === cssVar);
+      const token = findToken(cssVar);
+
       expect(token?.category).toBe(category);
     });
 
-    it('skips --*--line-height companion lines', () => {
-      expect(
-        tokens.find((t) => t.cssVar === '--text-xl--line-height'),
-      ).toBeUndefined();
-    });
+    it.each(['--text-xl--line-height', '--text-display--letter-spacing'])(
+      'skips the %s companion line',
+      (cssVar) => {
+        const companion = findToken(cssVar);
 
-    it('skips --*--letter-spacing companion lines', () => {
-      expect(
-        tokens.find((t) => t.cssVar === '--text-display--letter-spacing'),
-      ).toBeUndefined();
-    });
+        expect(companion).toBeUndefined();
+      },
+    );
 
     it('ignores non-token lines such as plain CSS rules', () => {
-      expect(tokens.some((t) => t.name === 'family')).toBe(false);
-      expect(tokens).not.toContainEqual(
-        expect.objectContaining({
-          cssVar: expect.stringContaining('color: red'),
-        }),
-      );
+      const cssVars = tokens.map((token) => token.cssVar);
+      const nonTokenVars = cssVars.filter((cssVar) => !cssVar.startsWith('--'));
+
+      expect(nonTokenVars).toHaveLength(0);
     });
   });
 
-  it('only reads @theme blocks, not the raw :root palette', () => {
-    const withRoot = `${SAMPLE}\n:root { --text: oklch(0.2 0 0); --muted: oklch(0.5 0 0); }`;
-    const tokens = parseThemeTokens(withRoot);
-    expect(tokens.find((t) => t.cssVar === '--text')).toBeUndefined();
-    expect(tokens.find((t) => t.cssVar === '--muted')).toBeUndefined();
-  });
+  it.each(['--text', '--muted'])(
+    'does not read %s from the raw :root palette',
+    (cssVar) => {
+      const tokens = parseThemeTokens(
+        `${MOCK_STYLESHEET}\n:root { ${cssVar}: oklch(0.2 0 0); }`,
+      );
+
+      const token = tokens.find((candidate) => candidate.cssVar === cssVar);
+
+      expect(token).toBeUndefined();
+    },
+  );
 
   it('does not duplicate a token seen more than once', () => {
-    const tokens = parseThemeTokens(`${SAMPLE}\n--color-bg: var(--bg);`);
-    expect(tokens.filter((t) => t.cssVar === '--color-bg')).toHaveLength(1);
+    const tokens = parseThemeTokens(
+      `${MOCK_STYLESHEET}\n${CSS_VAR_COLOR_BG}: var(--bg);`,
+    );
+
+    const colorBgTokens = tokens.filter(
+      (token) => token.cssVar === CSS_VAR_COLOR_BG,
+    );
+
+    expect(colorBgTokens).toHaveLength(1);
   });
 });
