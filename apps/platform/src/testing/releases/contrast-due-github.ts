@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { GITHUB_FILE_STATUS } from '@platform/constants/github';
 import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
 import {
   MOCK_GITHUB_MAIN_BRANCH_PATH,
@@ -14,7 +15,7 @@ export const MOCK_LAST_RELEASE_TAG = 'v1.4.0';
 
 const MOCK_RENDERING_FILE = {
   filename: 'apps/web/src/app/page.tsx',
-  status: 'modified',
+  status: GITHUB_FILE_STATUS.MODIFIED,
 };
 
 export const respondWithDueContrastCheck = (

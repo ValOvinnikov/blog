@@ -1,5 +1,9 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  GITHUB_RUN_CONCLUSION,
+  GITHUB_RUN_STATUS,
+} from '@platform/constants/github';
 import { RELEASE_WORKFLOW_FILE } from '@platform/constants/release';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -82,8 +86,8 @@ describe(`<${ReleasesPage.name}/>`, () => {
         workflow_runs: [
           {
             id: faker.number.int(),
-            status: 'completed',
-            conclusion: 'success',
+            status: GITHUB_RUN_STATUS.COMPLETED,
+            conclusion: GITHUB_RUN_CONCLUSION.SUCCESS,
             html_url: faker.internet.url(),
             display_title: MOCK_RELEASE_RUN_TITLE,
             created_at: faker.date.recent().toISOString(),
