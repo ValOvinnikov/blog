@@ -8,7 +8,6 @@ import {
   withExactEmailAddress,
 } from '@blog/db/utils/personal-data/email-address-match';
 import { readReportedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
-import { toSubscriberStatus } from '@blog/db/utils/subscriber-status/subscriber-status';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { isNull } from '@blog/utils/primitives';
 import { and, eq } from 'drizzle-orm';
@@ -51,7 +50,7 @@ export async function findSubscriberByExactEmail(
     row: { id, status },
     address,
   } = found;
-  return { id, status: toSubscriberStatus(status), email: address };
+  return { id, status, email: address };
 }
 
 export async function findUserSubscriber(

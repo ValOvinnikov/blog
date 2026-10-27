@@ -431,6 +431,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CONSENT_STATUS**: `UNKNOWN`, `UNANSWERED`, `ANSWERED`, `GRANTED`, `DENIED`
 
+### `@web/constants/contact-form` — `apps/web/src/constants/contact-form.ts`
+
+- **CONTACT_FORM_LOG**: `MODULE_FETCH_FAILED`=`"contact_form_module.fetch_failed"`
+
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`
@@ -439,7 +443,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
 - **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
-- **NEWSLETTER_LOG**: `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
+- **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
 
 ### `@web/constants/request` — `apps/web/src/constants/request.ts`
 
@@ -456,6 +460,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/sign-in` — `apps/web/src/constants/sign-in.ts`
 
 - **SIGN_IN_LOG**: `LINK_REFUSED`=`"auth.sign_in_link_refused"`
+
+### `@web/constants/tenant-write` — `apps/web/src/constants/tenant-write.ts`
+
+- **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`
 
 ## app:worker
 

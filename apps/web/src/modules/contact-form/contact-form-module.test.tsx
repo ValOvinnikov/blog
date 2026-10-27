@@ -1,14 +1,11 @@
 import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { submitContactMessage } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { fillAndSendContactForm } from '@web/testing/modules/contact-form/contact-form-fields';
@@ -16,10 +13,11 @@ import {
   MOCK_CONTACT_MESSAGE,
   mockContactFormModule,
 } from '@web/testing/modules/contact-form/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
-  mockTenant,
+  MOCK_SUSPENDED_TENANT,
 } from '@web/testing/shared/tenant/fixtures';
 
 import { ContactFormModule } from './contact-form-module';
@@ -36,10 +34,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@blog/db', async () => ({
-  ...(await vi.importActual('@blog/db/constants')),
-}));
-
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/i18n/navigation');
@@ -49,9 +43,7 @@ vi.mock(
   () => ({ isCapabilityEnabled: vi.fn() }),
 );
 
-vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
-  resolveRequestTenant: vi.fn(),
-}));
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock(
   '@web/server/contact-form/contact-form-actions/contact-form-actions',
@@ -71,7 +63,6 @@ const { submitLabel } = SITE_MESSAGES.contactForm;
 describe(`<${ContactFormModule.name}/>`, () => {
   beforeEach(() => {
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
-    vi.mocked(resolveRequestTenant).mockResolvedValue(mockTenant());
     vi.mocked(usePathname).mockReturnValue(MOCK_PATHNAME);
     vi.mocked(submitContactMessage).mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -121,8 +112,20 @@ describe(`<${ContactFormModule.name}/>`, () => {
     },
   );
 
-  it('renders nothing when the contact form capability is off', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
+  it.each<[string, () => void]>([
+    [
+      'the contact form capability is off',
+      () => vi.mocked(isCapabilityEnabled).mockResolvedValue(false),
+    ],
+    [
+      'the site is suspended',
+      () =>
+        vi
+          .mocked(resolveRequestTenant)
+          .mockResolvedValueOnce(MOCK_SUSPENDED_TENANT),
+    ],
+  ])('renders nothing, without fetching, when %s', async (_, arrange) => {
+    arrange();
 
     await setup();
 
@@ -131,50 +134,12 @@ describe(`<${ContactFormModule.name}/>`, () => {
     expect(getContactFormMock).not.toHaveBeenCalled();
   });
 
-  it('renders nothing for a suspended tenant', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue(
-      mockTenant({ status: TENANT_STATUS.SUSPENDED }),
-    );
-
-    await setup();
-
-    const submitButton = screen.queryByRole('button', { name: submitLabel });
-    expect(submitButton).not.toBeInTheDocument();
-  });
-
   it('renders nothing when the module cannot be loaded', async () => {
-    getContactFormMock.mockResolvedValue(
-      errorResult(new Error('contact form unavailable')),
-    );
+    getContactFormMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     await setup();
 
     const heading = screen.queryByRole('heading', { name: MOCK_HEADING });
     expect(heading).not.toBeInTheDocument();
   });
-
-  it.each([
-    {
-      route: 'a resolved tenant',
-      tenantId: MOCK_REQUEST_CONTEXT.tenantId,
-      expected: MOCK_REQUEST_CONTEXT.tenantId,
-    },
-    {
-      route: 'no tenant',
-      tenantId: undefined,
-      expected: UNRESOLVED_TENANT_PLACEHOLDER,
-    },
-  ])(
-    'resolves the expected tenant when the route found $route',
-    async ({ tenantId, expected }) => {
-      vi.mocked(getRequestContext).mockResolvedValueOnce({
-        ...MOCK_REQUEST_CONTEXT,
-        tenantId,
-      });
-
-      await setup();
-
-      expect(resolveRequestTenant).toHaveBeenCalledWith(expected);
-    },
-  );
 });

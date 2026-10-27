@@ -8,6 +8,7 @@ export const NEWSLETTER_SUBSCRIPTION_ACTION = {
 } as const;
 
 export const NEWSLETTER_LOG = {
+  MODULE_FETCH_FAILED: 'newsletter_module.fetch_failed',
   SUBSCRIBE_FAILED: 'newsletter.subscribe_failed',
   SUBSCRIBE_TENANT_NOT_ACTIVE: 'newsletter.subscribe_tenant_not_active',
   SUBSCRIBE_CAPABILITY_DISABLED: 'newsletter.subscribe_capability_disabled',

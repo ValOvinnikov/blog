@@ -21,7 +21,6 @@ import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { personalDataIndex } from '@blog/utils/encryption';
 import type { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
-import { sql } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type TTestDb = PgliteDatabase<typeof schema> & { $client: PGlite };
@@ -43,11 +42,6 @@ export const MOCK_OPERATOR_EMAIL = 'operator@example.com';
 export const MOCK_EMAIL_VERIFIED_AT = faker.date.past();
 export const MOCK_OAUTH_PROVIDER = 'github';
 
-// Seeds one `tenants` row against the given `createTestDb()` instance for a
-// test's `beforeEach`/setup — `name`/`primaryDomain`/`sanityProjectId`
-// (unique-indexed) each default to a fresh random value so unrelated tests
-// never collide; pass any `tenants` column to override a default, or
-// `sanityProjectId: null` for a still-provisioning tenant.
 export async function insertTestTenant(
   db: TTestDb,
   overrides: Partial<typeof schema.tenants.$inferInsert> = {},
@@ -73,9 +67,6 @@ export async function insertTestTenant(
   return tenant;
 }
 
-// Seeds one `users` row — every field is optional (matching how little
-// Auth.js guarantees is populated), so pass `id`/`email`/etc. explicitly
-// whenever a test asserts against them.
 export async function insertTestUser(
   db: TTestDb,
   overrides: Partial<typeof schema.users.$inferInsert> = {},
@@ -117,15 +108,6 @@ export async function insertTestSubscriber(
   return subscriber;
 }
 
-export async function storeLegacySubscriberStatus(
-  db: TTestDb,
-  subscriberId: string,
-): Promise<void> {
-  await db.execute(
-    sql`update ${schema.subscribers} set ${sql.identifier('status')} = lower(${schema.subscribers.status}) where ${schema.subscribers.id} = ${subscriberId}`,
-  );
-}
-
 export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {
   const { id: userId } = await insertTestUser(db);
 
@@ -143,8 +125,6 @@ export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {
   return admin;
 }
 
-// Seeds one `accounts` row linking `userId` to an OAuth `provider` — the
-// shape every account-linking test needs, never a bare token/session row.
 export async function insertTestAccount(
   db: TTestDb,
   userId: string,
