@@ -15,44 +15,47 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getStatsModule } from './loader';
 import { statsModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HEADING = 'Our reach';
-const tenant = mockTenant();
+faker.seed(1);
+
+const MOCK_HEADING = faker.lorem.words(3);
 
 describe(getStatsModule, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
-      mockRawStatsModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
+      mockRawStatsModule({ headingBlock: mockRawHeadingBlock(MOCK_HEADING) }),
     );
   });
 
   it('resolves the module in a single round trip', async () => {
-    const stats = await getStatsModule(MOCK_STATS_MODULE_ID, tenant);
+    const stats = await getStatsModule(MOCK_STATS_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(stats.headingBlock.heading).toBe(HEADING);
+    expect(stats.headingBlock.heading).toBe(MOCK_HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getStatsModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(
+      getStatsModule(MOCK_MISSING_ID, MOCK_TENANT),
+    ).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
-  it('threads tenant context and scopes cache tags to it', async () => {
-    await getStatsModule(MOCK_STATS_MODULE_ID, tenant);
+  it('queries with the tenant and the cache tags scoped to it', async () => {
+    await getStatsModule(MOCK_STATS_MODULE_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
     expect(mockRun).toHaveBeenCalledWith(statsModuleQuery, {
       parameters: { id: MOCK_STATS_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

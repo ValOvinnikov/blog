@@ -16,6 +16,8 @@ import { resendConfirmation } from './resend-confirmation';
 
 vi.mock('@blog/db/client');
 
+faker.seed(1);
+
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
@@ -50,13 +52,15 @@ describe(resendConfirmation, () => {
 
     const result = await resendConfirmation(tenantId, userId);
 
+    const rows = await db().select().from(schema.subscribers);
+
     expect(result).toEqual({
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
       subscriberId: subscriber.id,
       email: MOCK_SUBSCRIBER_EMAIL,
       confirmationToken: MOCK_CONFIRMATION_TOKEN,
     });
-    expect(await db().select().from(schema.subscribers)).toEqual([subscriber]);
+    expect(rows).toEqual([subscriber]);
   });
 
   it('returns not-pending for an already-active subscriber', async () => {
@@ -64,10 +68,14 @@ describe(resendConfirmation, () => {
       status: SUBSCRIBER_STATUS.ACTIVE,
     });
 
-    expect(await resendConfirmation(tenantId, userId)).toEqual(NOT_PENDING);
+    const result = await resendConfirmation(tenantId, userId);
+
+    expect(result).toEqual(NOT_PENDING);
   });
 
   it('returns not-pending when the account has no subscription', async () => {
-    expect(await resendConfirmation(tenantId, userId)).toEqual(NOT_PENDING);
+    const result = await resendConfirmation(tenantId, userId);
+
+    expect(result).toEqual(NOT_PENDING);
   });
 });

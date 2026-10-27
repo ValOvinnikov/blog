@@ -20,7 +20,8 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPostList } from './loader';
 import { postListModulePaginatedPostsQuery } from './posts.query';
@@ -28,15 +29,21 @@ import { postListModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const POST_LIST_ID = 'post-list-1';
+faker.seed(6014);
 
-const tenant = mockTenant();
+const MOCK_POST_LIST_ID = faker.string.uuid();
+const MOCK_POST_CARD_ID = faker.string.uuid();
+const MOCK_TOTAL_POSTS = 25;
+const MOCK_TOTAL_PAGES = 3;
+const MOCK_SECOND_PAGE = 2;
 
 describe(getPostList, () => {
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getPostList(MOCK_MISSING_ID, 1, tenant)).rejects.toThrow();
+    await expect(
+      getPostList(MOCK_MISSING_ID, 1, MOCK_TENANT),
+    ).rejects.toThrow();
   });
 
   describe('with a module of nine posts a page and 25 matches', () => {
@@ -49,25 +56,29 @@ describe(getPostList, () => {
           }),
         )
         .mockResolvedValueOnce({
-          posts: [mockRawPostCard({ _id: 'a' })],
-          total: 25,
+          posts: [mockRawPostCard({ _id: MOCK_POST_CARD_ID })],
+          total: MOCK_TOTAL_POSTS,
         });
     });
 
     it('maps the module and its page of posts', async () => {
-      const postList = await getPostList(POST_LIST_ID, 1, tenant);
+      const postList = await getPostList(MOCK_POST_LIST_ID, 1, MOCK_TENANT);
 
       expect(postList.headingBlock.heading).toBe(MOCK_RECENT_POSTS_HEADING);
-      expect(postList.posts.map((p) => p.id)).toEqual(['a']);
+      expect(postList.posts.map(({ id }) => id)).toEqual([MOCK_POST_CARD_ID]);
     });
 
     it.each([
       [1, undefined],
-      [2, 2],
+      [MOCK_SECOND_PAGE, MOCK_SECOND_PAGE],
     ])(
-      'windows page %i by the module pageSize and counts every page',
+      'loads page %i of the posts and counts every page',
       async (expectedPage, page) => {
-        const postList = await getPostList(POST_LIST_ID, page, tenant);
+        const postList = await getPostList(
+          MOCK_POST_LIST_ID,
+          page,
+          MOCK_TENANT,
+        );
 
         const [postsQuery] = mockRun.mock.calls[1] ?? [];
 
@@ -78,37 +89,39 @@ describe(getPostList, () => {
           ).query,
         );
         expect(postList.currentPage).toBe(expectedPage);
-        expect(postList.totalPages).toBe(3);
+        expect(postList.totalPages).toBe(MOCK_TOTAL_PAGES);
       },
     );
 
-    it('binds the scope term id as a posts-query parameter when scoped', async () => {
-      await getPostList(POST_LIST_ID, 1, tenant, { termId: MOCK_TAG_ID });
+    it('scopes the posts query to the term when one is given', async () => {
+      await getPostList(MOCK_POST_LIST_ID, 1, MOCK_TENANT, {
+        termId: MOCK_TAG_ID,
+      });
 
       const [, postsOptions] = mockRun.mock.calls[1] ?? [];
 
       expect(postsOptions.parameters).toEqual({ termId: MOCK_TAG_ID });
     });
 
-    it('threads tenant context into both queries and scopes their tags to it', async () => {
-      await getPostList(POST_LIST_ID, 1, tenant);
+    it('queries within the tenant and tags both queries to it', async () => {
+      await getPostList(MOCK_POST_LIST_ID, 1, MOCK_TENANT);
 
       const [, postsOptions] = mockRun.mock.calls[1] ?? [];
 
       expect(mockRun).toHaveBeenNthCalledWith(1, postListModuleQuery, {
-        parameters: { id: POST_LIST_ID },
-        tenant,
+        parameters: { id: MOCK_POST_LIST_ID },
+        tenant: MOCK_TENANT,
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [
             MOCK_MODULES_POST_LIST_CACHE_TAG,
-            mockCacheTag(`module:${POST_LIST_ID}`),
+            mockCacheTag(`module:${MOCK_POST_LIST_ID}`),
           ],
         },
       });
       expect(postsOptions).toEqual({
         parameters: {},
-        tenant,
+        tenant: MOCK_TENANT,
         next: {
           revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
           tags: [

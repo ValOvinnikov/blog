@@ -23,20 +23,27 @@ import {
   mockRawPostLink,
   mockRawWideLayout,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toTaxonomyListModule } from './transformer';
 
-const SUPPORTING_TEXT = 'Pick a subject.';
-const ALPHA = 'Alpha';
-const BETA = 'Beta';
-const NEWER_POST_TITLE = 'Newer post';
-const NEWER_POST_SLUG = 'newer-post';
-const OLDER_POST_TITLE = 'Older post';
-const OLDER_POST_SLUG = 'older-post';
-const LAYOUT = mockRawWideLayout();
-const ALPHA_BETA_ENTRIES = [
-  mockRawTaxonomyEntry({ _id: MOCK_TOPIC_ID, title: ALPHA }),
-  mockRawTaxonomyEntry({ _id: 'topic-2', title: BETA }),
+faker.seed(6014);
+
+const [MOCK_FIRST_TITLE, MOCK_SECOND_TITLE, MOCK_THIRD_TITLE] = faker.helpers
+  .uniqueArray(faker.lorem.word, 3)
+  .sort((a, b) => a.localeCompare(b));
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_SECOND_TOPIC_ID = faker.string.uuid();
+const MOCK_THIRD_TOPIC_ID = faker.string.uuid();
+const MOCK_NEWER_POST_ID = faker.string.uuid();
+const MOCK_NEWER_POST_TITLE = faker.lorem.words(3);
+const MOCK_NEWER_POST_SLUG = faker.lorem.slug();
+const MOCK_OLDER_POST_TITLE = faker.lorem.words(3);
+const MOCK_OLDER_POST_SLUG = faker.lorem.slug();
+const MOCK_LAYOUT = mockRawWideLayout();
+const MOCK_FIRST_SECOND_ENTRIES = [
+  mockRawTaxonomyEntry({ _id: MOCK_TOPIC_ID, title: MOCK_FIRST_TITLE }),
+  mockRawTaxonomyEntry({ _id: MOCK_SECOND_TOPIC_ID, title: MOCK_SECOND_TITLE }),
 ];
 
 describe(toTaxonomyListModule, () => {
@@ -53,7 +60,7 @@ describe(toTaxonomyListModule, () => {
   it('maps headingBlock when authored', () => {
     const raw = mockRawTaxonomyListModule({
       headingBlock: mockRawHeadingBlock(MOCK_TOPIC_INDEX_HEADING, {
-        supportingText: SUPPORTING_TEXT,
+        supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
 
@@ -61,7 +68,7 @@ describe(toTaxonomyListModule, () => {
 
     expect(module.headingBlock).toEqual({
       heading: MOCK_TOPIC_INDEX_HEADING,
-      supportingText: SUPPORTING_TEXT,
+      supportingText: MOCK_SUPPORTING_TEXT,
     });
   });
 
@@ -77,7 +84,7 @@ describe(toTaxonomyListModule, () => {
   });
 
   it.each([
-    ['a fully-authored layout 1:1', LAYOUT, LAYOUT],
+    ['a fully-authored layout 1:1', MOCK_LAYOUT, MOCK_LAYOUT],
     ['an unset layout to undefined', null, undefined],
   ])('maps %s', (_case, layout, expected) => {
     const raw = mockRawTaxonomyListModule({ layout });
@@ -123,46 +130,61 @@ describe(toTaxonomyListModule, () => {
     expect(module.entries).toEqual([]);
   });
 
-  it('keeps ALPHABETICAL order as returned by the query', () => {
+  it('keeps the alphabetical order the query returned', () => {
     const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.ALPHABETICAL,
-      entries: ALPHA_BETA_ENTRIES,
+      entries: MOCK_FIRST_SECOND_ENTRIES,
     });
 
     const module = toTaxonomyListModule(raw);
 
-    expect(module.entries.map((entry) => entry.title)).toEqual([ALPHA, BETA]);
+    expect(module.entries.map((entry) => entry.title)).toEqual([
+      MOCK_FIRST_TITLE,
+      MOCK_SECOND_TITLE,
+    ]);
   });
 
-  it('orders MOST_POSTS by postCount descending, ties by title ascending', () => {
+  it('orders most-posts by count descending, ties by title ascending', () => {
     const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.MOST_POSTS,
       entries: [
-        mockRawTaxonomyEntry({ _id: MOCK_TOPIC_ID, title: BETA, postCount: 3 }),
-        mockRawTaxonomyEntry({ _id: 'topic-2', title: 'Gamma', postCount: 5 }),
-        mockRawTaxonomyEntry({ _id: 'topic-3', title: ALPHA, postCount: 3 }),
+        mockRawTaxonomyEntry({
+          _id: MOCK_TOPIC_ID,
+          title: MOCK_SECOND_TITLE,
+          postCount: 3,
+        }),
+        mockRawTaxonomyEntry({
+          _id: MOCK_SECOND_TOPIC_ID,
+          title: MOCK_THIRD_TITLE,
+          postCount: 5,
+        }),
+        mockRawTaxonomyEntry({
+          _id: MOCK_THIRD_TOPIC_ID,
+          title: MOCK_FIRST_TITLE,
+          postCount: 3,
+        }),
       ],
     });
 
     const module = toTaxonomyListModule(raw);
 
     expect(module.entries.map((entry) => entry.title)).toEqual([
-      'Gamma',
-      ALPHA,
-      BETA,
+      MOCK_THIRD_TITLE,
+      MOCK_FIRST_TITLE,
+      MOCK_SECOND_TITLE,
     ]);
   });
 
   it.each([
-    [1, [ALPHA]],
-    [null, [ALPHA, BETA]],
+    [1, [MOCK_FIRST_TITLE]],
+    [null, [MOCK_FIRST_TITLE, MOCK_SECOND_TITLE]],
   ])('cuts the entries to a limit of %s', (limit, titles) => {
     const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       limit,
-      entries: ALPHA_BETA_ENTRIES,
+      entries: MOCK_FIRST_SECOND_ENTRIES,
     });
 
     const module = toTaxonomyListModule(raw);
@@ -170,7 +192,7 @@ describe(toTaxonomyListModule, () => {
     expect(module.entries.map((entry) => entry.title)).toEqual(titles);
   });
 
-  it('maps the latest posts per entry, newest first as returned by the query', () => {
+  it('maps each entry latest posts, newest first as the query returned them', () => {
     const raw = mockRawTaxonomyListModule({
       taxonomy: TAXONOMY_KIND.TOPICS,
       entries: [
@@ -178,14 +200,14 @@ describe(toTaxonomyListModule, () => {
           _id: MOCK_TOPIC_ID,
           latestPosts: [
             mockRawPostLink({
-              _id: 'post-2',
-              headingBlock: { heading: NEWER_POST_TITLE },
-              slug: NEWER_POST_SLUG,
+              _id: MOCK_NEWER_POST_ID,
+              headingBlock: { heading: MOCK_NEWER_POST_TITLE },
+              slug: MOCK_NEWER_POST_SLUG,
             }),
             mockRawPostLink({
               _id: MOCK_POST_ID,
-              headingBlock: { heading: OLDER_POST_TITLE },
-              slug: OLDER_POST_SLUG,
+              headingBlock: { heading: MOCK_OLDER_POST_TITLE },
+              slug: MOCK_OLDER_POST_SLUG,
             }),
           ],
         }),
@@ -195,13 +217,21 @@ describe(toTaxonomyListModule, () => {
     const module = toTaxonomyListModule(raw);
 
     expect(module.entries[0]?.latestPosts).toEqual([
-      { id: 'post-2', title: NEWER_POST_TITLE, slug: NEWER_POST_SLUG },
-      { id: MOCK_POST_ID, title: OLDER_POST_TITLE, slug: OLDER_POST_SLUG },
+      {
+        id: MOCK_NEWER_POST_ID,
+        title: MOCK_NEWER_POST_TITLE,
+        slug: MOCK_NEWER_POST_SLUG,
+      },
+      {
+        id: MOCK_POST_ID,
+        title: MOCK_OLDER_POST_TITLE,
+        slug: MOCK_OLDER_POST_SLUG,
+      },
     ]);
   });
 
   it.each([true, false])(
-    'passes showLatestPosts %s through',
+    'passes the show-latest-posts flag %s through',
     (showLatestPosts) => {
       const raw = mockRawTaxonomyListModule({ showLatestPosts });
 

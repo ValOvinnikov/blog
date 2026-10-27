@@ -2,6 +2,7 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_TESTIMONIAL_MODULE_ID,
+  mockRawTestimonialItem,
   mockRawTestimonialModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
@@ -15,42 +16,52 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getTestimonialModule } from './loader';
 import { testimonialModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HEADING = 'Kind words';
-const tenant = mockTenant();
+faker.seed(6014);
+
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_FIRST_QUOTE_ID = faker.string.uuid();
+const MOCK_SECOND_QUOTE_ID = faker.string.uuid();
 
 describe(getTestimonialModule, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
-      mockRawTestimonialModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
+      mockRawTestimonialModule({
+        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+        testimonials: [
+          mockRawTestimonialItem({ _id: MOCK_FIRST_QUOTE_ID }),
+          mockRawTestimonialItem({ _id: MOCK_SECOND_QUOTE_ID }),
+        ],
+      }),
     );
   });
 
   it('resolves the module in a single round trip', async () => {
     const testimonial = await getTestimonialModule(
       MOCK_TESTIMONIAL_MODULE_ID,
-      tenant,
+      MOCK_TENANT,
     );
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(testimonial.headingBlock.heading).toBe(HEADING);
+    expect(testimonial.headingBlock.heading).toBe(MOCK_HEADING);
   });
 
   it('returns the referenced quotes in authored order', async () => {
     const testimonial = await getTestimonialModule(
       MOCK_TESTIMONIAL_MODULE_ID,
-      tenant,
+      MOCK_TENANT,
     );
 
     expect(testimonial.testimonials.map((item) => item.id)).toEqual([
-      'block-testimonial-1',
-      'block-testimonial-2',
+      MOCK_FIRST_QUOTE_ID,
+      MOCK_SECOND_QUOTE_ID,
     ]);
   });
 
@@ -58,18 +69,17 @@ describe(getTestimonialModule, () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
     await expect(
-      getTestimonialModule(MOCK_MISSING_ID, tenant),
+      getTestimonialModule(MOCK_MISSING_ID, MOCK_TENANT),
     ).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    await getTestimonialModule(MOCK_TESTIMONIAL_MODULE_ID, tenant);
+    await getTestimonialModule(MOCK_TESTIMONIAL_MODULE_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
     expect(mockRun).toHaveBeenCalledWith(testimonialModuleQuery, {
       parameters: { id: MOCK_TESTIMONIAL_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

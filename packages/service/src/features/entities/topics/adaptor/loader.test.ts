@@ -46,7 +46,7 @@ describe(getTopics, () => {
     expect(result).toEqual([]);
   });
 
-  it('queries for the tenant with tenant-scoped tags', async () => {
+  it('queries for the tenant with tenant-scoped cache tags', async () => {
     await getTopics(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(topicsQuery, {

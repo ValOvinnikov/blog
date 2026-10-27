@@ -4,18 +4,21 @@ import {
   mockRawFeatureHighlightsModule,
 } from '@blog/service/testing/modules/fixtures';
 import { mockRawInternalLinkDocument } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toFeatureHighlightsModule } from './transformer';
 
-const HIGHLIGHT_KEYS = [
-  'block-highlight-b',
-  'block-highlight-a',
-  'block-highlight-c',
-];
-const BROKEN_ACTION_ROW_HEADING = 'Row with a broken action';
+faker.seed(5);
 
-describe('toFeatureHighlightsModule', () => {
-  it('leaves contentAlignment and layout undefined when unset (no faked default)', () => {
+const MOCK_HIGHLIGHT_KEYS = [
+  faker.string.uuid(),
+  faker.string.uuid(),
+  faker.string.uuid(),
+];
+const MOCK_BROKEN_ACTION_ROW_HEADING = faker.lorem.words(3);
+
+describe(toFeatureHighlightsModule, () => {
+  it('leaves contentAlignment and layout undefined when unset', () => {
     const raw = mockRawFeatureHighlightsModule({
       contentAlignment: null,
       layout: null,
@@ -29,7 +32,7 @@ describe('toFeatureHighlightsModule', () => {
 
   it('keeps the highlights in authored order', () => {
     const raw = mockRawFeatureHighlightsModule({
-      highlights: HIGHLIGHT_KEYS.map((_key) =>
+      highlights: MOCK_HIGHLIGHT_KEYS.map((_key) =>
         mockRawFeatureHighlightItem({ _key }),
       ),
     });
@@ -37,7 +40,7 @@ describe('toFeatureHighlightsModule', () => {
     const module = toFeatureHighlightsModule(raw);
 
     expect(module.highlights.map((highlight) => highlight.id)).toEqual(
-      HIGHLIGHT_KEYS,
+      MOCK_HIGHLIGHT_KEYS,
     );
   });
 
@@ -55,7 +58,7 @@ describe('toFeatureHighlightsModule', () => {
     const raw = mockRawFeatureHighlightsModule({
       highlights: [
         mockRawFeatureHighlightItem({
-          heading: BROKEN_ACTION_ROW_HEADING,
+          heading: MOCK_BROKEN_ACTION_ROW_HEADING,
           action: mockRawCtaButton({
             link: mockRawInternalLinkDocument(),
           }),
@@ -65,7 +68,7 @@ describe('toFeatureHighlightsModule', () => {
 
     const module = toFeatureHighlightsModule(raw);
 
-    expect(module.highlights[0]?.heading).toBe(BROKEN_ACTION_ROW_HEADING);
+    expect(module.highlights[0]?.heading).toBe(MOCK_BROKEN_ACTION_ROW_HEADING);
     expect(module.highlights[0]?.action).toBeUndefined();
   });
 });

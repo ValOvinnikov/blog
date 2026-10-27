@@ -1,9 +1,11 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures';
 import {
+  mockRawHeadingBlock,
   mockRawParagraphTextBlock,
   mockRawWideLayout,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toContactFormModule, type TRawContactFormModule } from './transformer';
 
@@ -11,19 +13,28 @@ type TRawPrivacyNoteBlock = NonNullable<
   TRawContactFormModule['privacyNote']
 >[number];
 
-const PRIVACY_NOTE_TEXT = 'We only use your details to reply.';
+faker.seed(12);
 
-describe('toContactFormModule', () => {
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+const MOCK_SUCCESS_MESSAGE = faker.lorem.sentence();
+const MOCK_PRIVACY_NOTE_TEXT = faker.lorem.sentence();
+const MOCK_LAYOUT = mockRawWideLayout();
+
+describe(toContactFormModule, () => {
   it('maps a fully authored contact form module', () => {
+    const privacyNoteBlock = mockRawParagraphTextBlock<TRawPrivacyNoteBlock>({
+      text: MOCK_PRIVACY_NOTE_TEXT,
+    });
     const raw = mockRawContactFormModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
-      privacyNote: [
-        mockRawParagraphTextBlock<TRawPrivacyNoteBlock>({
-          text: PRIVACY_NOTE_TEXT,
-        }),
-      ],
+      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+        supportingText: MOCK_SUPPORTING_TEXT,
+      }),
+      successMessage: MOCK_SUCCESS_MESSAGE,
+      privacyNote: [privacyNoteBlock],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
-      layout: mockRawWideLayout(),
+      layout: MOCK_LAYOUT,
     });
 
     const module = toContactFormModule(raw);
@@ -31,27 +42,13 @@ describe('toContactFormModule', () => {
     expect(module).toEqual({
       brandVariant: BRAND_VARIANT.SECONDARY,
       headingBlock: {
-        heading: 'Get in touch',
-        supportingText: 'Questions, ideas or work enquiries.',
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
       },
-      successMessage: "Thanks — I'll reply within two days.",
-      privacyNote: [
-        {
-          _type: 'block',
-          _key: 'block-1',
-          style: 'normal',
-          children: [
-            {
-              _type: 'span',
-              _key: 'span-1',
-              text: PRIVACY_NOTE_TEXT,
-            },
-          ],
-          markDefs: undefined,
-        },
-      ],
+      successMessage: MOCK_SUCCESS_MESSAGE,
+      privacyNote: [{ ...privacyNoteBlock, markDefs: undefined }],
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
-      layout: mockRawWideLayout(),
+      layout: MOCK_LAYOUT,
     });
   });
 

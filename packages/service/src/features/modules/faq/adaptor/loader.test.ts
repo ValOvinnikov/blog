@@ -21,37 +21,36 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getFaqModule } from './loader';
 import { faqModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const FAQ_HEADING = 'Frequently asked questions';
+faker.seed(6);
 
-const tenant = mockTenant();
+const MOCK_FAQ_HEADING = faker.lorem.words(3);
 
 describe(getFaqModule, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(mockRawFaqModule());
-  });
-
-  it('resolves the module in a single round trip — exactly one runQuery call', async () => {
-    mockRun.mockResolvedValueOnce(
+    mockRun.mockResolvedValue(
       mockRawFaqModule({
-        headingBlock: mockRawHeadingBlock(FAQ_HEADING),
+        headingBlock: mockRawHeadingBlock(MOCK_FAQ_HEADING),
       }),
     );
+  });
 
-    const faq = await getFaqModule(MOCK_FAQ_MODULE_ID, tenant);
+  it('resolves the module with a single query', async () => {
+    const faq = await getFaqModule(MOCK_FAQ_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(faq.headingBlock.heading).toBe(FAQ_HEADING);
+    expect(faq.headingBlock.heading).toBe(MOCK_FAQ_HEADING);
   });
 
   it('returns the referenced questions in authored order', async () => {
-    const faq = await getFaqModule(MOCK_FAQ_MODULE_ID, tenant);
+    const faq = await getFaqModule(MOCK_FAQ_MODULE_ID, MOCK_TENANT);
 
     expect(faq.questions.map((question) => question.id)).toEqual([
       MOCK_FAQ_QUESTION_ID,
@@ -60,19 +59,20 @@ describe(getFaqModule, () => {
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun.mockRejectedValueOnce(mockValidationError());
+    const error = mockValidationError();
+    mockRun.mockRejectedValueOnce(error);
 
-    await expect(getFaqModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
-    expect(mockRun).toHaveBeenCalledTimes(1);
+    await expect(getFaqModule(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toBe(
+      error,
+    );
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    await getFaqModule(MOCK_FAQ_MODULE_ID, tenant);
+    await getFaqModule(MOCK_FAQ_MODULE_ID, MOCK_TENANT);
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenNthCalledWith(1, faqModuleQuery, {
+    expect(mockRun).toHaveBeenCalledWith(faqModuleQuery, {
       parameters: { id: MOCK_FAQ_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [

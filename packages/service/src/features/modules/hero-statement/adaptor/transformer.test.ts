@@ -16,18 +16,21 @@ import {
   mockRawHeroLayout,
   mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
 
 import { toHeroStatementModule } from './transformer';
 
-const STATEMENT_HEADING = 'Ship confidently';
-const AUTHORED_SUPPORTING_TEXT = 'Supporting copy.';
+faker.seed(8);
+
+const MOCK_STATEMENT_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 
 describe(toHeroStatementModule, () => {
-  it('maps brandVariant, variant and headingBlock straight through', () => {
+  it('maps the brand variant, variant and heading block', () => {
     const raw = mockRawHeroStatementModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
-      headingBlock: mockRawHeadingBlock(STATEMENT_HEADING),
+      headingBlock: mockRawHeadingBlock(MOCK_STATEMENT_HEADING),
     });
 
     const hero = toHeroStatementModule(raw);
@@ -35,7 +38,7 @@ describe(toHeroStatementModule, () => {
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.variant).toBe(HERO_VARIANT.BANNER);
     expect(hero.headingBlock).toEqual({
-      heading: STATEMENT_HEADING,
+      heading: MOCK_STATEMENT_HEADING,
       supportingText: undefined,
     });
   });
@@ -44,16 +47,16 @@ describe(toHeroStatementModule, () => {
     [null, null, undefined, undefined],
     [
       MOCK_HERO_EYEBROW,
-      AUTHORED_SUPPORTING_TEXT,
+      MOCK_SUPPORTING_TEXT,
       MOCK_HERO_EYEBROW,
-      AUTHORED_SUPPORTING_TEXT,
+      MOCK_SUPPORTING_TEXT,
     ],
   ])(
-    'maps eyebrow %s and supportingText %s to %s and %s',
+    'maps eyebrow %s and supporting text %s to %s and %s',
     (eyebrow, supportingText, expectedEyebrow, expectedSupportingText) => {
       const raw = mockRawHeroStatementModule({
         eyebrow,
-        headingBlock: mockRawHeadingBlock(STATEMENT_HEADING, {
+        headingBlock: mockRawHeadingBlock(MOCK_STATEMENT_HEADING, {
           supportingText,
         }),
       });
@@ -85,7 +88,7 @@ describe(toHeroStatementModule, () => {
     expect(hero.ctaButtons).toEqual([mockCtaButtonView()]);
   });
 
-  it('takes contentPosition and mediaOrder from the Split keys', () => {
+  it('takes content position and media order from the Split variant', () => {
     const raw = mockRawHeroStatementModule({
       variant: HERO_VARIANT.SPLIT,
       contentPositionSplit: CONTENT_ALIGNMENT.RIGHT,

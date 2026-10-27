@@ -1,17 +1,25 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
+  HEADING_TEXT_PATH,
   MOCK_HERO_MODULE_ID,
   MOCK_POST_LATEST_MODULE_ID,
   mockRawHomePage,
 } from '@blog/service/testing/pages/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { faker } from '@faker-js/faker';
 
 import { homePageQuery } from './query';
 
+faker.seed(6015102);
+
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-const EN_HOME_ID = 'en-home';
-const NL_HOME_ID = 'nl-home';
+const MOCK_EN_HOME_ID = faker.string.uuid();
+const MOCK_NL_HOME_ID = faker.string.uuid();
+const MOCK_EN_HEADING = faker.lorem.words(2);
+const MOCK_NL_HEADING = faker.lorem.words(3);
+const MOCK_TEMPLATE_ID = faker.string.uuid();
+const MOCK_META_TITLE = faker.lorem.words(2);
 
 function run(dataset: unknown[], locale: string): Promise<unknown> {
   return evaluateGroqExpression(homePageQuery.query, dataset, null, {
@@ -26,7 +34,7 @@ describe('homePageQuery', () => {
       'whose SEO openGraph has no image',
       mockRawHomePage({
         seo: {
-          metaTitle: 'Home',
+          metaTitle: MOCK_META_TITLE,
           metaDescription: null,
           openGraph: { ogTitle: null, ogDescription: null, ogImage: null },
         },
@@ -44,13 +52,13 @@ describe('homePageQuery', () => {
     expect(() => homePageQuery.parse(raw)).toThrow();
   });
 
-  it('parses null as no matching page_home document, rather than throwing', () => {
+  it('parses null as no matching page_home document', () => {
     expect(homePageQuery.parse(null)).toBeNull();
   });
 });
 
 describe('homePageQuery language scoping', () => {
-  function home(id: string, heading: string, language?: string) {
+  function mockHomeDocument(id: string, heading: string, language?: string) {
     return {
       _id: id,
       _type: 'page_home',
@@ -60,44 +68,44 @@ describe('homePageQuery language scoping', () => {
   }
 
   const dataset = [
-    home(EN_HOME_ID, 'Welcome', EN),
-    home(NL_HOME_ID, 'Welkom', NL),
+    mockHomeDocument(MOCK_EN_HOME_ID, MOCK_EN_HEADING, EN),
+    mockHomeDocument(MOCK_NL_HOME_ID, MOCK_NL_HEADING, NL),
   ];
 
   it.each([
-    [EN, 'Welcome'],
-    [NL, 'Welkom'],
+    [EN, MOCK_EN_HEADING],
+    [NL, MOCK_NL_HEADING],
   ])('resolves the %s Home for its own language', async (locale, heading) => {
-    expect(await run(dataset, locale)).toMatchObject({
-      headingBlock: { heading },
-    });
+    expect(await run(dataset, locale)).toHaveProperty(
+      HEADING_TEXT_PATH,
+      heading,
+    );
   });
 
-  it('resolves nothing for a language without a Home, rather than another language', async () => {
+  it('resolves nothing for a language without a Home', async () => {
     expect(await run(dataset, FR)).toBeNull();
   });
 
   it('resolves a Home with no language for the default language only', async () => {
-    const legacy = [home(EN_HOME_ID, 'Welcome')];
+    const legacy = [mockHomeDocument(MOCK_EN_HOME_ID, MOCK_EN_HEADING)];
 
-    expect(await run(legacy, EN)).toMatchObject({
-      headingBlock: { heading: 'Welcome' },
-    });
+    expect(await run(legacy, EN)).toHaveProperty(
+      HEADING_TEXT_PATH,
+      MOCK_EN_HEADING,
+    );
     expect(await run(legacy, NL)).toBeNull();
   });
 
   it('lists the language of every Home as its translations', async () => {
-    expect(await run(dataset, NL)).toMatchObject({
-      translations: [{ language: EN }, { language: NL }],
-    });
+    expect(await run(dataset, NL)).toHaveProperty('translations', [
+      { language: EN },
+      { language: NL },
+    ]);
   });
 });
 
 describe('homePageQuery template layout', () => {
-  const TEMPLATE_ID = 'template-home';
-  const MODULE_ID = MOCK_POST_LATEST_MODULE_ID;
-
-  function home(id: string, language: string, template?: string) {
+  function mockHomeDocument(id: string, language: string, template?: string) {
     return {
       _id: id,
       _type: 'page_home',
@@ -108,36 +116,43 @@ describe('homePageQuery template layout', () => {
   }
 
   const dataset = [
-    home(EN_HOME_ID, EN, TEMPLATE_ID),
-    home(NL_HOME_ID, NL, TEMPLATE_ID),
+    mockHomeDocument(MOCK_EN_HOME_ID, EN, MOCK_TEMPLATE_ID),
+    mockHomeDocument(MOCK_NL_HOME_ID, NL, MOCK_TEMPLATE_ID),
     {
-      _id: TEMPLATE_ID,
+      _id: MOCK_TEMPLATE_ID,
       _type: 'template_home',
       hero: mockReference(MOCK_HERO_MODULE_ID),
-      modules: [mockReference(MODULE_ID, { _key: 'a' })],
+      modules: [mockReference(MOCK_POST_LATEST_MODULE_ID, { _key: 'a' })],
     },
     { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroBlog' },
-    { _id: MODULE_ID, _type: 'module_postLatest' },
+    { _id: MOCK_POST_LATEST_MODULE_ID, _type: 'module_postLatest' },
   ];
 
   it.each([
-    [EN, EN_HOME_ID],
-    [NL, NL_HOME_ID],
+    [EN, MOCK_EN_HOME_ID],
+    [NL, MOCK_NL_HOME_ID],
   ])(
     'resolves the %s Home with its id and its template hero and modules',
     async (locale, id) => {
-      expect(await run(dataset, locale)).toMatchObject({
-        _id: id,
-        hero: { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroBlog' },
-        modules: [{ _id: MODULE_ID, _type: 'module_postLatest' }],
+      const result = await run(dataset, locale);
+
+      expect(result).toHaveProperty('_id', id);
+      expect(result).toHaveProperty('hero', {
+        _id: MOCK_HERO_MODULE_ID,
+        _type: 'module_heroBlog',
       });
+      expect(result).toHaveProperty('modules', [
+        { _id: MOCK_POST_LATEST_MODULE_ID, _type: 'module_postLatest' },
+      ]);
     },
   );
 
   it('resolves no hero and no modules for a Home without a template', async () => {
-    expect(await run([home(EN_HOME_ID, EN)], EN)).toMatchObject({
-      hero: null,
-      modules: null,
-    });
+    const dataset = [mockHomeDocument(MOCK_EN_HOME_ID, EN)];
+
+    const result = await run(dataset, EN);
+
+    expect(result).toHaveProperty('hero', null);
+    expect(result).toHaveProperty('modules', null);
   });
 });

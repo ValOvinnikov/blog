@@ -18,25 +18,37 @@ const setup = customRender(FeatureListCarousel, {
 });
 
 describe(`<${FeatureListCarousel.name}/>`, () => {
-  it('renders a labelled carousel with one card per item', async () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('renders a labelled carousel with one card per item', () => {
     const region = screen.getByRole('region', {
       name: `${MOCK_FEATURE_LIST_HEADING} carousel`,
     });
     const cardHeadings = within(region).getAllByRole('heading', { level: 3 });
+
     expect(cardHeadings).toHaveLength(MOCK_FEATURE_LIST_ITEMS.length);
-    MOCK_FEATURE_LIST_ITEMS.forEach((item) => {
-      const cardHeading = within(region).getByRole('heading', {
+  });
+
+  it.each(MOCK_FEATURE_LIST_ITEMS)(
+    'renders the card titled $headingBlock.heading',
+    ({ headingBlock }) => {
+      const cardHeading = screen.getByRole('heading', {
         level: 3,
-        name: item.headingBlock.heading,
+        name: headingBlock.heading,
       });
+
       expect(cardHeading).toBeVisible();
-    });
+    },
+  );
+
+  it('renders previous and next slide controls', async () => {
     const previousButton = await screen.findByRole('button', {
       name: 'Previous slide',
     });
     const nextButton = screen.getByRole('button', { name: 'Next slide' });
+
     expect(previousButton).toBeVisible();
     expect(nextButton).toBeVisible();
   });

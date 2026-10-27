@@ -1,19 +1,26 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
+import { MOCK_INVITE_CONSUMED_AT } from '@blog/db/testing/membership-invites/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { createMembershipInvite } from './create-membership-invite';
 
 vi.mock('@blog/db/client');
 
-const ALREADY_PENDING = 'already-pending';
+faker.seed(6022);
+
+const OUTCOME_CREATED = 'created';
+const OUTCOME_ALREADY_PENDING = 'already-pending';
+const OUTCOME_ALREADY_CONSUMED = 'already-consumed';
 
 const db = useQueryTestDb();
 usePersonalDataKeys();
@@ -31,21 +38,26 @@ describe(createMembershipInvite, () => {
   });
 
   it('inserts a new pending invite, normalizing the email', async () => {
-    const result = await createMembershipInvite(
+    const { outcome, invite } = await createMembershipInvite(
       tenantId,
       MOCK_INVITE_EMAIL.toUpperCase(),
       MEMBERSHIP_ROLE.OWNER,
     );
 
-    expect(result.outcome).toBe('created');
-    expect(result.invite).toMatchObject({
+    const rows = await db().select().from(schema.membershipInvites);
+    expect(outcome).toBe(OUTCOME_CREATED);
+    expect(rows).toEqual([invite]);
+    expect(invite).toEqual({
+      id: invite.id,
+      createdAt: invite.createdAt,
       tenantId,
       email: MOCK_INVITE_EMAIL,
+      emailEncrypted: invite.emailEncrypted,
       emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
       consumedAt: null,
     });
-    expect(decryptTestPersonalValue(result.invite.emailEncrypted)).toBe(
+    expect(decryptTestPersonalValue(invite.emailEncrypted)).toBe(
       MOCK_INVITE_EMAIL,
     );
   });
@@ -69,7 +81,7 @@ describe(createMembershipInvite, () => {
       },
       { variant: 'a space-padded', email: `  ${MOCK_INVITE_EMAIL}  ` },
     ])(
-      'returns the pending invite for $variant email instead of a duplicate',
+      'returns the existing pending invite for $variant email',
       async ({ email }) => {
         const second = await createMembershipInvite(
           tenantId,
@@ -77,17 +89,17 @@ describe(createMembershipInvite, () => {
           MEMBERSHIP_ROLE.EDITOR,
         );
 
-        expect(second.outcome).toBe(ALREADY_PENDING);
-        expect(second.invite).toEqual(first.invite);
         const rows = await db().select().from(schema.membershipInvites);
-        expect(rows).toHaveLength(1);
+        expect(second.outcome).toBe(OUTCOME_ALREADY_PENDING);
+        expect(second.invite).toEqual(first.invite);
+        expect(rows).toEqual([first.invite]);
       },
     );
 
-    it('reports already-consumed for a duplicate invite whose original was already consumed', async () => {
+    it('reports already-consumed when the original invite was consumed', async () => {
       await db()
         .update(schema.membershipInvites)
-        .set({ consumedAt: new Date() })
+        .set({ consumedAt: MOCK_INVITE_CONSUMED_AT })
         .where(eq(schema.membershipInvites.id, first.invite.id));
 
       const second = await createMembershipInvite(
@@ -96,7 +108,7 @@ describe(createMembershipInvite, () => {
         MEMBERSHIP_ROLE.OWNER,
       );
 
-      expect(second.outcome).toBe('already-consumed');
+      expect(second.outcome).toBe(OUTCOME_ALREADY_CONSUMED);
     });
   });
 
@@ -122,7 +134,7 @@ describe(createMembershipInvite, () => {
   it('rejects an invite for a tenant that does not exist', async () => {
     await expect(
       createMembershipInvite(
-        '00000000-0000-0000-0000-000000000000',
+        MOCK_MISSING_TENANT_ID,
         MOCK_INVITE_EMAIL,
         MEMBERSHIP_ROLE.OWNER,
       ),

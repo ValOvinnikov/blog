@@ -1,14 +1,17 @@
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
 import { deleteSubscribersForTenant } from './delete-subscribers-for-tenant';
 
 vi.mock('@blog/db/client');
 
-const MOCK_FIRST_EMAIL = 'one@example.com';
-const MOCK_SECOND_EMAIL = 'two@example.com';
+faker.seed(5804);
+
+const MOCK_FIRST_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_SECOND_EMAIL = faker.internet.email().toLowerCase();
 
 const db = useQueryTestDb();
 
@@ -19,6 +22,15 @@ afterEach(async () => {
 
 describe(deleteSubscribersForTenant, () => {
   let tenantId: string;
+
+  async function readTenantSubscribers(
+    forTenantId: string,
+  ): Promise<schema.TSubscriber[]> {
+    return db()
+      .select()
+      .from(schema.subscribers)
+      .where(eq(schema.subscribers.tenantId, forTenantId));
+  }
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
@@ -32,13 +44,11 @@ describe(deleteSubscribersForTenant, () => {
         { tenantId, email: MOCK_SECOND_EMAIL },
       ]);
 
-    await expect(deleteSubscribersForTenant(tenantId)).resolves.toBe(2);
+    const deleted = await deleteSubscribersForTenant(tenantId);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.tenantId, tenantId));
-    expect(rows).toHaveLength(0);
+    const rows = await readTenantSubscribers(tenantId);
+    expect(deleted).toBe(2);
+    expect(rows).toEqual([]);
   });
 
   it("leaves another tenant's subscribers untouched", async () => {
@@ -49,14 +59,13 @@ describe(deleteSubscribersForTenant, () => {
 
     await deleteSubscribersForTenant(tenantId);
 
-    const rows = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.tenantId, otherTenantId));
+    const rows = await readTenantSubscribers(otherTenantId);
     expect(rows).toHaveLength(1);
   });
 
-  it('is idempotent — returns 0 when nothing matches', async () => {
-    await expect(deleteSubscribersForTenant(tenantId)).resolves.toBe(0);
+  it('returns 0 when the tenant has no subscribers', async () => {
+    const deleted = await deleteSubscribersForTenant(tenantId);
+
+    expect(deleted).toBe(0);
   });
 });

@@ -2,7 +2,6 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_CTA_BUTTON_URL,
-  MOCK_CTA_MODULE_ID,
   mockRawCtaButton,
   mockRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
@@ -21,48 +20,56 @@ import {
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
+  mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getCta } from './loader';
 import { ctaModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const tenant = mockTenant();
+faker.seed(6014);
 
-describe('getCta', () => {
+const MOCK_CTA_ID = faker.string.uuid();
+const MOCK_HEADING = faker.lorem.words(3);
+
+describe(getCta, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
-      mockRawCtaModule({ ctaButtons: [mockRawCtaButton()] }),
+      mockRawCtaModule({
+        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+        ctaButtons: [mockRawCtaButton()],
+      }),
     );
   });
 
   it('maps the cta module document', async () => {
-    const cta = await getCta(MOCK_CTA_MODULE_ID, tenant);
+    const cta = await getCta(MOCK_CTA_ID, MOCK_TENANT);
 
-    expect(cta.headingBlock.heading).toBe('Subscribe to the newsletter');
+    expect(cta.headingBlock.heading).toBe(MOCK_HEADING);
     expect(cta.ctaButtons?.[0]?.link.href).toBe(MOCK_CTA_BUTTON_URL);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getCta(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(getCta(MOCK_MISSING_ID, MOCK_TENANT)).rejects.toThrow();
   });
 
-  it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    await getCta(MOCK_CTA_MODULE_ID, tenant);
+  it('fetches for the tenant with tags scoped to the module', async () => {
+    await getCta(MOCK_CTA_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(ctaModuleQuery, {
-      parameters: { id: MOCK_CTA_MODULE_ID },
-      tenant,
+      parameters: { id: MOCK_CTA_ID },
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
           mockCacheTag('modules:cta'),
-          mockCacheTag(`module:${MOCK_CTA_MODULE_ID}`),
+          mockCacheTag(`module:${MOCK_CTA_ID}`),
           MOCK_LINK_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,

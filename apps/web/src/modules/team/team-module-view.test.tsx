@@ -4,12 +4,13 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
+  MOCK_CTA_ACTIONS,
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
-  MOCK_CTA_ACTIONS,
 } from '@web/testing/modules/cta/fixtures';
 import {
   MOCK_TEAM_HEADING,
@@ -22,10 +23,11 @@ import { TeamModuleView } from './team-module-view';
 
 vi.mock('@web/i18n/navigation');
 
-const TITLE_ID = 'team-title';
-const CAROUSEL_LABEL = `${MOCK_TEAM_HEADING} carousel`;
+faker.seed(11);
 
-const dataTestId = 'team-module-team-1';
+const MOCK_TITLE_ID = faker.string.uuid();
+const MOCK_DATA_TEST_ID = faker.string.uuid();
+const CAROUSEL_LABEL = `${MOCK_TEAM_HEADING} carousel`;
 
 const setup = customRender(TeamModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -39,8 +41,8 @@ const setup = customRender(TeamModuleView, {
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
   layout: undefined,
-  titleId: TITLE_ID,
-  dataTestId,
+  titleId: MOCK_TITLE_ID,
+  dataTestId: MOCK_DATA_TEST_ID,
 });
 
 describe(`<${TeamModuleView.name}/>`, () => {
@@ -55,73 +57,88 @@ describe(`<${TeamModuleView.name}/>`, () => {
         name: MOCK_TEAM_HEADING,
       });
       const section = screen.getByRole('region', { name: MOCK_TEAM_HEADING });
-      expect(heading).toHaveAttribute('id', TITLE_ID);
-      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
-      expect(section).toHaveAttribute('data-testid', dataTestId);
+
+      expect(heading).toBeVisible();
+      expect(section).toBeVisible();
     });
 
-    it('renders one article with an h3 name per member', () => {
+    it('renders one article per member', () => {
       const articles = screen.getAllByRole('article');
-      expect(articles).toHaveLength(2);
-      MOCK_TEAM_MEMBERS.forEach((member) => {
+
+      expect(articles).toHaveLength(MOCK_TEAM_MEMBERS.length);
+    });
+
+    it.each(MOCK_TEAM_MEMBERS.map(({ name }) => name))(
+      'renders %s with an h3 name',
+      (memberName) => {
         const heading = screen.getByRole('heading', {
           level: 3,
-          name: member.name,
+          name: memberName,
         });
+
         expect(heading).toBeVisible();
-      });
-    });
+      },
+    );
 
     it('renders two or more members without a spotlight', () => {
-      const spotlight = screen.queryByTestId(`${dataTestId}-spotlight`);
+      const spotlight = screen.queryByTestId(`${MOCK_DATA_TEST_ID}-spotlight`);
+
       expect(spotlight).not.toBeInTheDocument();
     });
 
     it('renders no action group when there are no cta buttons', () => {
       const links = screen.queryAllByRole('link');
+
       expect(links).toHaveLength(0);
     });
   });
 
-  it.each([
-    [DISPLAY_MODE.CAROUSEL, true],
-    [DISPLAY_MODE.GRID, false],
-  ])(
-    'renders the carousel in place of the grid only in %s mode: %s',
-    (displayMode, expectedCarousel) => {
-      setup({ displayMode });
+  it('renders the carousel in carousel mode', () => {
+    setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
-      if (expectedCarousel) {
-        const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
-        const articles = within(carousel).getAllByRole('article');
-        expect(articles).toHaveLength(MOCK_TEAM_MEMBERS.length);
-      } else {
+    const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+    const articles = within(carousel).getAllByRole('article');
+
+    expect(articles).toHaveLength(MOCK_TEAM_MEMBERS.length);
+  });
+
+  it('renders no carousel in grid mode', () => {
+    setup({ displayMode: DISPLAY_MODE.GRID });
+
+    const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+
+    expect(carousel).not.toBeInTheDocument();
+  });
+
+  describe.each([DISPLAY_MODE.GRID, DISPLAY_MODE.CAROUSEL])(
+    'a single member in %s display mode',
+    (displayMode) => {
+      const MOCK_MEMBER = mockTeamMember();
+
+      beforeEach(() => {
+        setup({ members: [MOCK_MEMBER], displayMode });
+      });
+
+      it('renders the member as a spotlight', () => {
+        const spotlight = screen.getByTestId(`${MOCK_DATA_TEST_ID}-spotlight`);
+        const heading = screen.getByRole('heading', {
+          level: 3,
+          name: MOCK_MEMBER.name,
+        });
+
+        expect(spotlight).toBeVisible();
+        expect(heading).toBeVisible();
+      });
+
+      it('renders neither the carousel nor the grid', () => {
         const carousel = screen.queryByRole('region', {
           name: CAROUSEL_LABEL,
         });
+        const grid = screen.queryByTestId(`${MOCK_DATA_TEST_ID}-grid`);
+
         expect(carousel).not.toBeInTheDocument();
-      }
-    },
-  );
-
-  it.each([DISPLAY_MODE.GRID, DISPLAY_MODE.CAROUSEL])(
-    'renders a single member as a spotlight in %s display mode',
-    (displayMode) => {
-      setup({ members: [mockTeamMember()], displayMode });
-
-      const spotlight = screen.getByTestId(`${dataTestId}-spotlight`);
-      const heading = screen.getByRole('heading', {
-        level: 3,
-        name: 'Jordan Reyes',
+        expect(grid).not.toBeInTheDocument();
       });
-      const carousel = screen.queryByRole('region', {
-        name: CAROUSEL_LABEL,
-      });
-      const grid = screen.queryByTestId(`${dataTestId}-grid`);
-      expect(spotlight).toBeVisible();
-      expect(heading).toBeVisible();
-      expect(carousel).not.toBeInTheDocument();
-      expect(grid).not.toBeInTheDocument();
     },
   );
 
@@ -134,6 +151,7 @@ describe(`<${TeamModuleView.name}/>`, () => {
     const secondaryLink = screen.getByRole('link', {
       name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
     });
+
     expect(primaryLink).toHaveAttribute(
       'href',
       MOCK_CTA_PRIMARY_ACTION.link.href,

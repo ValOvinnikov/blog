@@ -3,6 +3,9 @@ import type { TSectionPageCard, TSectionPagesModule } from '@blog/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const MOCK_SECTION_PAGE_TITLE = 'FAQ';
+export const MOCK_SECTION_PAGE_SUMMARY =
+  'Answers to the questions we hear most.';
+export const MOCK_SECTION_PAGE_PATH = 'modules/faq';
 export const MOCK_SECTION_PAGES_HEADING = 'In this section';
 
 export const mockSectionPageCard = (
@@ -10,9 +13,9 @@ export const mockSectionPageCard = (
 ): TSectionPageCard => ({
   id: 'faq',
   title: MOCK_SECTION_PAGE_TITLE,
-  summary: 'Answers to the questions we hear most.',
+  summary: MOCK_SECTION_PAGE_SUMMARY,
   image: undefined,
-  path: 'modules/faq',
+  path: MOCK_SECTION_PAGE_PATH,
   ...overrides,
 });
 

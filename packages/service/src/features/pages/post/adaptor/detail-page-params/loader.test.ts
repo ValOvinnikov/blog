@@ -3,13 +3,18 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { MOCK_PAGE_POST_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPostParams } from './loader';
 import { postParamsQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
+faker.seed(6017);
+
 const { EN, NL } = LOCALE_ISO_CODES;
+const MOCK_EN_PUBLISHED_AT = '2026-01-01T00:00:00Z';
+const MOCK_NL_PUBLISHED_AT = '2026-02-01T00:00:00Z';
 const tenant = mockTenant();
 
 describe(getPostParams, () => {
@@ -17,10 +22,18 @@ describe(getPostParams, () => {
     mockRun.mockResolvedValue([]);
   });
 
-  it('returns the slug, language and publishedAt entries', async () => {
+  it('returns the queried post entries', async () => {
     const entries = [
-      { slug: 'post-a', language: EN, publishedAt: '2026-01-01T00:00:00Z' },
-      { slug: 'artikel-a', language: NL, publishedAt: '2026-02-01T00:00:00Z' },
+      {
+        slug: faker.lorem.slug(),
+        language: EN,
+        publishedAt: MOCK_EN_PUBLISHED_AT,
+      },
+      {
+        slug: faker.lorem.slug(),
+        language: NL,
+        publishedAt: MOCK_NL_PUBLISHED_AT,
+      },
     ];
     mockRun.mockResolvedValueOnce(entries);
 
@@ -35,7 +48,7 @@ describe(getPostParams, () => {
     expect(params).toEqual([]);
   });
 
-  it('queries the live languages for the tenant and scopes the tags to it', async () => {
+  it('queries the live languages for the tenant and scopes its tags to it', async () => {
     await getPostParams(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(postParamsQuery, {

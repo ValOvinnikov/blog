@@ -1,6 +1,8 @@
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
+  MOCK_SECTION_PAGE_PATH,
   MOCK_SECTION_PAGE_TITLE,
   mockSectionPagesModule,
 } from '@web/testing/modules/section-pages/fixtures';
@@ -28,14 +30,17 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const loggerWarnMock = vi.mocked(logger.warn);
-const loggerErrorMock = vi.mocked(logger.error);
+faker.seed(42);
 
-const SECTION_PAGES_ID = 'section-pages-1';
+const MOCK_SECTION_PAGES_ID = faker.string.uuid();
+const MOCK_LANDING_PAGE = {
+  id: faker.string.uuid(),
+  path: faker.lorem.slug(),
+};
 
 const setup = customRenderAsync(SectionPagesModule, {
-  id: SECTION_PAGES_ID,
-  context: { landingPage: { id: 'modules', path: 'modules' } },
+  id: MOCK_SECTION_PAGES_ID,
+  context: { landingPage: MOCK_LANDING_PAGE },
 });
 
 describe(`<${SectionPagesModule.name}/>`, () => {
@@ -51,18 +56,19 @@ describe(`<${SectionPagesModule.name}/>`, () => {
       await setup();
     });
 
-    it('fetches the module for the landing page it sits on', async () => {
+    it('fetches the module for the landing page it sits on', () => {
       expect(getSectionPagesModuleMock).toHaveBeenCalledWith(
-        SECTION_PAGES_ID,
-        'modules',
-        'modules',
+        MOCK_SECTION_PAGES_ID,
+        MOCK_LANDING_PAGE.id,
+        MOCK_LANDING_PAGE.path,
         MOCK_TENANT_SANITY_CONTEXT,
       );
     });
 
-    it('renders a card per section page linking to its full path', async () => {
+    it('renders a card per section page linking to its full path', () => {
       const link = screen.getByRole('link', { name: MOCK_SECTION_PAGE_TITLE });
-      expect(link).toHaveAttribute('href', '/modules/faq');
+
+      expect(link).toHaveAttribute('href', `/${MOCK_SECTION_PAGE_PATH}`);
     });
   });
 
@@ -82,7 +88,7 @@ describe(`<${SectionPagesModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(loggerErrorMock).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledOnce();
   });
 
   it('renders nothing and warns, without fetching, outside a landing page', async () => {
@@ -90,6 +96,6 @@ describe(`<${SectionPagesModule.name}/>`, () => {
 
     expect(container).toBeEmptyDOMElement();
     expect(getSectionPagesModuleMock).not.toHaveBeenCalled();
-    expect(loggerWarnMock).toHaveBeenCalledOnce();
+    expect(logger.warn).toHaveBeenCalledOnce();
   });
 });

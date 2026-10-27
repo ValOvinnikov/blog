@@ -1,15 +1,12 @@
-import { faker } from '@faker-js/faker';
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
+import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
 
 import { MediaCardItem } from './media-card-item';
 
 vi.mock('@web/i18n/navigation');
 
-faker.seed(6007);
-
-const MOCK_POST_IMAGE_TEST_ID = faker.string.uuid();
 const MOCK_ITEM = mockPostListItem();
 
 const setup = customRender(MediaCardItem, { item: MOCK_ITEM });

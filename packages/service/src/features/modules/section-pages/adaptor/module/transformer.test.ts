@@ -12,7 +12,7 @@ describe(toSectionPagesModuleDocument, () => {
     expect(module.headingBlock?.heading).toBe(MOCK_SECTION_PAGES_HEADING);
   });
 
-  it('leaves the heading block, alignment and layout undefined when unset', () => {
+  it('leaves heading block, alignment and layout undefined when unset', () => {
     const module = toSectionPagesModuleDocument(
       mockRawSectionPagesModule({
         headingBlock: null,

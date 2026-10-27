@@ -1,55 +1,46 @@
 import * as schema from '@blog/db/schema';
+import { MOCK_USER_EMAIL, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getUserByEmail } from './get-user-by-email';
 
 vi.mock('@blog/db/client');
 
-const MOCK_JANE_EMAIL = 'jane@example.com';
-const MOCK_MIXED_CASE_EMAIL = 'User@Example.com';
-
 const db = useQueryTestDb();
+
+const MOCK_UPPER_CASE_EMAIL = MOCK_USER_EMAIL.toUpperCase();
 
 afterEach(async () => {
   await db().delete(schema.users);
 });
 
 describe(getUserByEmail, () => {
-  describe('with a stored user jane@example.com', () => {
-    beforeEach(async () => {
-      await db()
-        .insert(schema.users)
-        .values({ id: 'user-1', email: MOCK_JANE_EMAIL });
-    });
+  it.each([
+    {
+      title: 'returns the row for an existing email',
+      storedEmail: MOCK_USER_EMAIL,
+      requestedEmail: MOCK_USER_EMAIL,
+    },
+    {
+      title: 'matches a differently-cased lookup',
+      storedEmail: MOCK_USER_EMAIL,
+      requestedEmail: MOCK_UPPER_CASE_EMAIL,
+    },
+    {
+      title: 'matches against a mixed-case stored email',
+      storedEmail: MOCK_UPPER_CASE_EMAIL,
+      requestedEmail: MOCK_USER_EMAIL,
+    },
+  ])('$title', async ({ storedEmail, requestedEmail }) => {
+    const user = await insertTestUser(db(), { email: storedEmail });
 
-    it('returns the row for an existing email', async () => {
-      const result = await getUserByEmail(MOCK_JANE_EMAIL);
+    const result = await getUserByEmail(requestedEmail);
 
-      expect(result).toMatchObject({ id: 'user-1', email: MOCK_JANE_EMAIL });
-    });
-
-    it('matches case-insensitively', async () => {
-      const result = await getUserByEmail('Jane@Example.com');
-
-      expect(result).toMatchObject({ id: 'user-1' });
-    });
-  });
-
-  it('matches a differently-cased lookup against a mixed-case stored email', async () => {
-    await db()
-      .insert(schema.users)
-      .values({ id: 'user-1', email: MOCK_MIXED_CASE_EMAIL });
-
-    const result = await getUserByEmail('user@example.com');
-
-    expect(result).toMatchObject({
-      id: 'user-1',
-      email: MOCK_MIXED_CASE_EMAIL,
-    });
+    expect(result).toEqual(user);
   });
 
   it('returns undefined for an email with no row', async () => {
-    const result = await getUserByEmail('missing@example.com');
+    const result = await getUserByEmail(MOCK_USER_EMAIL);
 
     expect(result).toBeUndefined();
   });

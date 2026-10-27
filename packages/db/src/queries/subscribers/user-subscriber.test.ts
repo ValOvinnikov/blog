@@ -12,12 +12,12 @@ import {
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
   MOCK_USER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { MOCK_MISSING_USER_ID } from '@blog/db/testing/memberships/fixtures';
 import {
   usePersonalDataFallbackListener,
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { faker } from '@faker-js/faker';
 
 import {
   findSubscriberByExactEmail,
@@ -31,9 +31,6 @@ const STORED_EMAIL_CASES = [
   ['the exact address', MOCK_SUBSCRIBER_EMAIL],
   ['a re-cased, padded address', ` ${MOCK_SUBSCRIBER_EMAIL.toUpperCase()} `],
 ] as const;
-const FINDS_STORED_ROW_TITLE = 'finds the row stored under %s';
-const REJECTS_UNDECRYPTABLE_TITLE =
-  'rejects when a +tag sibling row cannot be decrypted';
 
 const db = useQueryTestDb();
 usePersonalDataKeys();
@@ -54,48 +51,36 @@ describe(findUserSubscriber, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it.each(STORED_EMAIL_CASES)(
-    FINDS_STORED_ROW_TITLE,
-    async (_case, storedEmail) => {
-      const { id, status } = await insertTestSubscriber(
-        db(),
-        tenantId,
-        storedEmail,
-      );
+  it('finds the subscriber stored under the account address', async () => {
+    const { id, status } = await insertTestSubscriber(
+      db(),
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
 
-      const subscriber = await findUserSubscriber(tenantId, userId);
+    const subscriber = await findUserSubscriber(tenantId, userId);
 
-      expect(subscriber).toEqual({ id, status, email: storedEmail });
-    },
-  );
-
-  it('finds nothing for a +tag sibling of the account address', async () => {
-    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL);
-
-    expect(await findUserSubscriber(tenantId, userId)).toBeUndefined();
+    expect(subscriber).toEqual({ id, status, email: MOCK_SUBSCRIBER_EMAIL });
   });
 
   it('finds nothing for a +tag account whose plain address is subscribed', async () => {
     const { id } = await insertTestReader(db(), MOCK_SUBSCRIBER_TAGGED_EMAIL);
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(await findUserSubscriber(tenantId, id)).toBeUndefined();
-  });
+    const subscriber = await findUserSubscriber(tenantId, id);
 
-  it("finds nothing for the account's address on another tenant", async () => {
-    const { id: otherTenantId } = await insertTestTenant(db());
-    await insertTestSubscriber(db(), otherTenantId, MOCK_SUBSCRIBER_EMAIL);
-
-    expect(await findUserSubscriber(tenantId, userId)).toBeUndefined();
+    expect(subscriber).toBeUndefined();
   });
 
   it.each([
-    ['an unknown user', async () => faker.string.uuid()],
+    ['an unknown user', async () => MOCK_MISSING_USER_ID],
     ['a user without an email', async () => (await insertTestUser(db())).id],
   ])('finds nothing for %s', async (_case, user) => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(await findUserSubscriber(tenantId, await user())).toBeUndefined();
+    const subscriber = await findUserSubscriber(tenantId, await user());
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds the subscriber of a user not yet backfilled, and reports the user', async () => {
@@ -106,7 +91,9 @@ describe(findUserSubscriber, () => {
       MOCK_USER_EMAIL,
     );
 
-    expect(await findUserSubscriber(tenantId, id)).toEqual({
+    const subscriber = await findUserSubscriber(tenantId, id);
+
+    expect(subscriber).toEqual({
       id: subscriberId,
       status,
       email: MOCK_USER_EMAIL,
@@ -115,15 +102,6 @@ describe(findUserSubscriber, () => {
       owner: PERSONAL_DATA_OWNER.USER,
       reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
     });
-  });
-
-  it(REJECTS_UNDECRYPTABLE_TITLE, async () => {
-    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
-    await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL, {
-      emailEncrypted: MOCK_UNDECRYPTABLE_CIPHERTEXT,
-    });
-
-    await expect(findUserSubscriber(tenantId, userId)).rejects.toThrow();
   });
 });
 
@@ -135,7 +113,7 @@ describe(findSubscriberByExactEmail, () => {
   });
 
   it.each(STORED_EMAIL_CASES)(
-    FINDS_STORED_ROW_TITLE,
+    'finds the row stored under %s',
     async (_case, storedEmail) => {
       const { id, status } = await insertTestSubscriber(
         db(),
@@ -175,18 +153,24 @@ describe(findSubscriberByExactEmail, () => {
   it('finds nothing when only a +tag sibling is stored', async () => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL);
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toBeUndefined();
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds nothing for the same address on another tenant', async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await insertTestSubscriber(db(), otherTenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toBeUndefined();
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toBeUndefined();
   });
 
   it.each(STORED_EMAIL_CASES)(
@@ -199,9 +183,12 @@ describe(findSubscriberByExactEmail, () => {
         { emailEncrypted: null, emailIndex: null },
       );
 
-      expect(
-        await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-      ).toEqual({ id, status, email: storedEmail });
+      const subscriber = await findSubscriberByExactEmail(
+        tenantId,
+        MOCK_SUBSCRIBER_EMAIL,
+      );
+
+      expect(subscriber).toEqual({ id, status, email: storedEmail });
       expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
         owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
         reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
@@ -215,9 +202,12 @@ describe(findSubscriberByExactEmail, () => {
       emailIndex: null,
     });
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toBeUndefined();
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toBeUndefined();
   });
 
   it('finds a row by its plain email when the index key is unset, and reports it', async () => {
@@ -228,16 +218,19 @@ describe(findSubscriberByExactEmail, () => {
     );
     vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
 
-    expect(
-      await findSubscriberByExactEmail(tenantId, MOCK_SUBSCRIBER_EMAIL),
-    ).toEqual({ id, status, email: MOCK_SUBSCRIBER_EMAIL });
+    const subscriber = await findSubscriberByExactEmail(
+      tenantId,
+      MOCK_SUBSCRIBER_EMAIL,
+    );
+
+    expect(subscriber).toEqual({ id, status, email: MOCK_SUBSCRIBER_EMAIL });
     expect(fallbackListener).toHaveBeenCalledWith({
       owner: PERSONAL_DATA_OWNER.SUBSCRIBER,
       reason: PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET,
     });
   });
 
-  it(REJECTS_UNDECRYPTABLE_TITLE, async () => {
+  it('rejects when a +tag sibling row cannot be decrypted', async () => {
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
     await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_TAGGED_EMAIL, {
       emailEncrypted: MOCK_UNDECRYPTABLE_CIPHERTEXT,

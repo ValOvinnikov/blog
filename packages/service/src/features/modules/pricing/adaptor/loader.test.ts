@@ -15,44 +15,49 @@ import {
   mockRawHeadingBlock,
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getPricingModule } from './loader';
 import { pricingModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
-const HEADING = 'Plans and pricing';
+faker.seed(6014);
 
-const tenant = mockTenant();
+const MOCK_HEADING = faker.lorem.words(3);
 
 describe(getPricingModule, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(mockRawPricingModule());
+  });
+
   it('resolves the module in a single round trip', async () => {
     mockRun.mockResolvedValueOnce(
-      mockRawPricingModule({ headingBlock: mockRawHeadingBlock(HEADING) }),
+      mockRawPricingModule({ headingBlock: mockRawHeadingBlock(MOCK_HEADING) }),
     );
 
-    const pricing = await getPricingModule(MOCK_PRICING_MODULE_ID, tenant);
+    const pricing = await getPricingModule(MOCK_PRICING_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(pricing.headingBlock.heading).toBe(HEADING);
+    expect(pricing.headingBlock.heading).toBe(MOCK_HEADING);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(mockValidationError());
 
-    await expect(getPricingModule(MOCK_MISSING_ID, tenant)).rejects.toThrow();
+    await expect(
+      getPricingModule(MOCK_MISSING_ID, MOCK_TENANT),
+    ).rejects.toThrow();
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    mockRun.mockResolvedValueOnce(mockRawPricingModule());
-
-    await getPricingModule(MOCK_PRICING_MODULE_ID, tenant);
+    await getPricingModule(MOCK_PRICING_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledWith(pricingModuleQuery, {
       parameters: { id: MOCK_PRICING_MODULE_ID },
-      tenant,
+      tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
