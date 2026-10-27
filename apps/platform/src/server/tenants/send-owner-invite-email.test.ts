@@ -7,6 +7,11 @@ import {
   MOCK_VERIFY_REQUEST_URL,
 } from '@platform/testing/auth/fixtures';
 import {
+  MOCK_POSTGRES_ERROR_CODE,
+  MOCK_QUERY_ERROR_NAME,
+  mockQueryError,
+} from '@platform/testing/loggable-error/fixtures';
+import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
@@ -20,9 +25,6 @@ vi.mock('@platform/server/auth/auth');
 
 const signInMock = vi.mocked(signIn);
 const loggerErrorMock = vi.mocked(logger.error);
-
-const loggedContexts = () =>
-  JSON.stringify(loggerErrorMock.mock.calls.map(([, context]) => context));
 
 describe(sendOwnerInviteEmail, () => {
   beforeEach(() => {
@@ -45,7 +47,7 @@ describe(sendOwnerInviteEmail, () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('logs the tenant and the Auth.js error when the send is redirected to the error page', async () => {
+  it('logs the tenant and Auth.js error when the send lands on the error page', async () => {
     signInMock.mockResolvedValue(MOCK_AUTH_ERROR_URL);
 
     await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
@@ -56,32 +58,18 @@ describe(sendOwnerInviteEmail, () => {
     );
   });
 
-  it('logs the tenant and the thrown error when the send throws', async () => {
-    const error = new Error(MOCK_AUTH_ERROR_TYPE);
-    signInMock.mockRejectedValue(error);
+  it('logs the error name and code, never the owner email, when the send throws', async () => {
+    signInMock.mockRejectedValue(mockQueryError(MOCK_OWNER_EMAIL));
 
     await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
 
     expect(loggerErrorMock).toHaveBeenCalledExactlyOnceWith(
       TENANT_LOG.OWNER_INVITE_EMAIL_FAILED,
-      { tenantId: MOCK_TENANT_ID, error },
+      {
+        tenantId: MOCK_TENANT_ID,
+        errorName: MOCK_QUERY_ERROR_NAME,
+        errorCode: MOCK_POSTGRES_ERROR_CODE,
+      },
     );
-  });
-
-  it.each([
-    [
-      'redirected to the error page',
-      () => signInMock.mockResolvedValue(MOCK_AUTH_ERROR_URL),
-    ],
-    [
-      'thrown',
-      () => signInMock.mockRejectedValue(new Error(MOCK_AUTH_ERROR_TYPE)),
-    ],
-  ])('never logs the owner email when the send is %s', async (_, failSend) => {
-    failSend();
-
-    await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
-
-    expect(loggedContexts()).not.toContain(MOCK_OWNER_EMAIL);
   });
 });

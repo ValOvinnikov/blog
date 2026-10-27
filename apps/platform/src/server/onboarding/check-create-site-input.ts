@@ -36,7 +36,7 @@ export const checkCreateSiteInput = async ({
 
   if (!ownsFreeTenant.ok) {
     logger.error(ONBOARDING_LOG.OWNS_FREE_TENANT_CHECK_FAILED, {
-      error: ownsFreeTenant.error,
+      errorCode: ownsFreeTenant.error,
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

@@ -3,6 +3,7 @@ import 'server-only';
 import { queries } from '@blog/db';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { takeCreateSiteSlot } from '@platform/server/create-site-gate/create-site-gate';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 type TAdmitCreateSiteInput = {
@@ -17,10 +18,13 @@ const isEmailBlocked = async (email: string): Promise<boolean> => {
     if (result.ok) return result.data;
 
     logger.error(CREATE_SITE_GATE_LOG.BLOCK_CHECK_FAILED, {
-      error: result.error,
+      errorCode: result.error,
     });
   } catch (error) {
-    logger.error(CREATE_SITE_GATE_LOG.BLOCK_CHECK_FAILED, { error });
+    logger.error(
+      CREATE_SITE_GATE_LOG.BLOCK_CHECK_FAILED,
+      toLoggableError(error),
+    );
   }
 
   return true;

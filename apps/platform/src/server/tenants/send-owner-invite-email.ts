@@ -1,6 +1,7 @@
 import { MAGIC_LINK_PROVIDER_ID } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 const AUTH_ERROR_PARAM = 'error';
@@ -10,7 +11,6 @@ export const sendOwnerInviteEmail = async (
   ownerEmail: string,
 ): Promise<void> => {
   try {
-    // With `redirect: false` Auth.js resolves to the URL it would redirect to, and a failure only shows as its `error` param.
     const redirectUrl: string = await signIn(MAGIC_LINK_PROVIDER_ID, {
       email: ownerEmail,
       redirect: false,
@@ -20,6 +20,9 @@ export const sendOwnerInviteEmail = async (
       logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, { tenantId, reason });
     }
   } catch (error) {
-    logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, { tenantId, error });
+    logger.error(TENANT_LOG.OWNER_INVITE_EMAIL_FAILED, {
+      tenantId,
+      ...toLoggableError(error),
+    });
   }
 };
