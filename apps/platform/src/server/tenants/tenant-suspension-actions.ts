@@ -21,6 +21,7 @@ import {
   type TSavedOwnerEmailBlock,
   undoOwnerEmailBlock,
 } from '@platform/server/tenants/block-tenant-owner-email';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -94,7 +95,7 @@ const setSuspension = async (
     logger.error(TENANT_LOG.SUSPENSION_SAVE_FAILED, {
       tenantId,
       status,
-      error,
+      ...toLoggableError(error),
     });
     if (!isSuspensionSaved) await undoOwnerEmailBlock(ownerBlock);
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);

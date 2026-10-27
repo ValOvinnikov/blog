@@ -75,7 +75,7 @@ const OWNER_ELEVATION_EMAIL = buildOwnerElevationAlertEmail({
 const SEND_FAILED_CONTEXT = {
   tenantId: MOCK_TENANT_ID,
   kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-  error: MOCK_SEND_ERROR,
+  errorName: MOCK_SEND_ERROR.name,
 };
 
 const postRawRequest = (

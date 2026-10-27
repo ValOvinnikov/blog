@@ -93,7 +93,7 @@ describe(loadMoreLeadsAction, () => {
     expect(result).toEqual({ isLoaded: false });
     expect(logger.error).toHaveBeenCalledWith(LEAD_LOG.LOAD_FAILED, {
       tenantId: MOCK_TENANT_ID,
-      error: MOCK_DB_ERROR,
+      errorName: MOCK_DB_ERROR.name,
     });
   });
 });

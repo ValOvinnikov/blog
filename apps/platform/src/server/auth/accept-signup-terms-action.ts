@@ -11,6 +11,7 @@ import {
   SIGN_UP_LOG,
   SIGN_UP_REFUSAL,
 } from '@platform/constants/sign-up';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { checkBotId } from 'botid/server';
@@ -44,7 +45,7 @@ const isBotOrUnverified = async (): Promise<boolean> => {
     }
     return isBot;
   } catch (error) {
-    logger.error(SIGN_UP_LOG.BOT_CHECK_FAILED, { error });
+    logger.error(SIGN_UP_LOG.BOT_CHECK_FAILED, toLoggableError(error));
     return true;
   }
 };

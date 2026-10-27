@@ -148,7 +148,7 @@ describe(dispatchGitHubWorkflow, () => {
     expect(result).toBe(false);
     expect(logger.error).toHaveBeenCalledWith(MOCK_ERROR_EVENT, {
       tenantId: MOCK_TENANT_ID,
-      error: thrown,
+      errorName: thrown.name,
     });
   });
 });

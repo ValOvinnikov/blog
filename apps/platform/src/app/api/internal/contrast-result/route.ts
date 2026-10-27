@@ -4,6 +4,7 @@ import { queries } from '@blog/db';
 import { CONTRAST_RESULT_LOG } from '@platform/constants/contrast-result';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -58,7 +59,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     await queries.findings.recordContrastResult(parsed.data);
   } catch (error) {
-    logger.error(CONTRAST_RESULT_LOG.RECORD_FAILED, { sha, outcome, error });
+    logger.error(CONTRAST_RESULT_LOG.RECORD_FAILED, {
+      sha,
+      outcome,
+      ...toLoggableError(error),
+    });
     return NextResponse.json(
       { message: 'Failed to record contrast result.' },
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },

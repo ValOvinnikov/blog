@@ -16,6 +16,7 @@ import {
   emailLogoTargetSchema,
   type TEmailLogoTarget,
 } from '@platform/utils/email-logo-target/email-logo-target';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 export const clearEmailLogoAction = async (
@@ -52,7 +53,7 @@ export const clearEmailLogoAction = async (
     logger.error(EMAIL_LOGO_LOG.CLEAR_FAILED, {
       tenantId: tenant.id,
       target: logoTarget,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

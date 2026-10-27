@@ -15,6 +15,7 @@ import { startProvisioning } from '@platform/server/provisioning/start-provision
 import { resolveClientKey } from '@platform/server/rate-limit/resolve-client-key';
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { headers } from 'next/headers';
@@ -78,7 +79,7 @@ export const createSiteAction = async (
   try {
     await queries.users.recordTermsAcceptance(userId, TERMS_VERSION);
   } catch (error) {
-    logger.error(ONBOARDING_LOG.TERMS_RECORD_FAILED, { error });
+    logger.error(ONBOARDING_LOG.TERMS_RECORD_FAILED, toLoggableError(error));
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

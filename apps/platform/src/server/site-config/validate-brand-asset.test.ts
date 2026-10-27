@@ -230,7 +230,7 @@ describe(validateBrandAssetUpload, () => {
     expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error).toHaveBeenCalledWith(
       SITE_CONFIG_LOG.SVG_SANITIZE_FAILED,
-      { kind: brandAssetKindSchema.enum.logo, error: cause },
+      { kind: brandAssetKindSchema.enum.logo, errorName: cause.name },
     );
   });
 });

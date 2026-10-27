@@ -129,7 +129,7 @@ describe(fetchPageTitle, () => {
     expect(title).toBeUndefined();
     expect(loggerErrorMock).toHaveBeenCalledWith(LEAD_LOG.PAGE_TITLE_ERROR, {
       tenantId: MOCK_TENANT_ID,
-      error: MOCK_NETWORK_ERROR,
+      errorName: MOCK_NETWORK_ERROR.name,
     });
   });
 

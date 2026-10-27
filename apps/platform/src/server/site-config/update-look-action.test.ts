@@ -175,7 +175,7 @@ describe(updateLookAction, () => {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
         targetId: MOCK_TENANT_ID,
-        error: auditError,
+        errorName: auditError.name,
       },
     );
   });

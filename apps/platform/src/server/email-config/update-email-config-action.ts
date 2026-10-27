@@ -22,6 +22,7 @@ import {
   emailSenderInputSchema,
   SENDER_NAME_INVALID,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type { z } from 'zod';
 
@@ -84,7 +85,7 @@ export const updateEmailConfigAction = async (
   } catch (error) {
     logger.error(EMAIL_CONFIG_LOG.UPDATE_FAILED, {
       tenantId: tenant.id,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

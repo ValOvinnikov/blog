@@ -409,7 +409,7 @@ describe(updateTenantDetailsAction, () => {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        error: MOCK_AUDIT_WRITE_ERROR,
+        errorName: MOCK_AUDIT_WRITE_ERROR.name,
       },
     );
   });

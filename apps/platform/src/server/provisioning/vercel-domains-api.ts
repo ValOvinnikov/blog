@@ -6,6 +6,7 @@ import {
 } from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 export type TDomainDnsRecord = {
@@ -110,7 +111,10 @@ export const getProjectDomain = async (
       })),
     );
   } catch (error) {
-    logger.error(PROVISIONING_LOG.DOMAIN_CHECK_ERROR, { domain, error });
+    logger.error(PROVISIONING_LOG.DOMAIN_CHECK_ERROR, {
+      domain,
+      ...toLoggableError(error),
+    });
     return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
   }
 };

@@ -100,7 +100,7 @@ describe(recordOwnerSignInActivity, () => {
     ).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
       TENANT_LOG.SIGN_IN_ACTIVITY_FAILED,
-      { tenantId: OWNED_TENANT.id, error: MOCK_DB_ERROR },
+      { tenantId: OWNED_TENANT.id, errorName: MOCK_DB_ERROR.name },
     );
   });
 
@@ -112,7 +112,7 @@ describe(recordOwnerSignInActivity, () => {
     ).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
       TENANT_LOG.SIGN_IN_OWNER_LOOKUP_FAILED,
-      { userId: MOCK_USER_ID, error: MOCK_DB_ERROR },
+      { userId: MOCK_USER_ID, errorName: MOCK_DB_ERROR.name },
     );
   });
 });

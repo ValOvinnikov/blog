@@ -19,6 +19,7 @@ import {
   brandAssetKindSchema,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { put } from '@vercel/blob';
 
@@ -80,7 +81,7 @@ export const uploadBrandAssetAction = async (
     logger.error(SITE_CONFIG_LOG.BRAND_ASSET_UPLOAD_FAILED, {
       tenantId: tenant.id,
       kind: targetKind,
-      error,
+      ...toLoggableError(error),
     });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }

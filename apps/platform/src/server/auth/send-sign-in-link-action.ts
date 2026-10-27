@@ -7,6 +7,7 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-callback-path';
 import { z } from 'zod';
@@ -57,7 +58,7 @@ export const sendSignInLinkAction = async (
       return toOutcome(ACTION_OUTCOME.RATE_LIMITED);
     }
 
-    logger.error(SIGN_IN_LOG.LINK_FAILED, { error });
+    logger.error(SIGN_IN_LOG.LINK_FAILED, toLoggableError(error));
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 

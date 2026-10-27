@@ -92,7 +92,7 @@ describe(acceptSignupTermsAction, () => {
     expect(result).toEqual(MOCK_REFUSED_RESULT);
     expect(setCookieMock).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(SIGN_UP_LOG.BOT_CHECK_FAILED, {
-      error: MOCK_BOT_CHECK_ERROR,
+      errorName: MOCK_BOT_CHECK_ERROR.name,
     });
   });
 });

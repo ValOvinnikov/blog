@@ -1,4 +1,4 @@
-import { DOMAIN_PATTERN } from '@blog/config';
+import { DOMAIN_PATTERN, type TMaybeNull } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { isUndefined } from '@blog/utils/primitives';
 import {
@@ -6,54 +6,29 @@ import {
   type TDomainAvailability,
 } from '@platform/constants/domain';
 import { TENANT_LOG } from '@platform/constants/tenant';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 
 import { fetchVercel, readVercelCredentials } from './vercel-domains-api';
 
-// Every tenant domain on this platform lives under the same shared apex
-// (map-domain.ts attaches all of them to the one shared apps/web Vercel
-// project), so this apex's project-domains list grows by at least one
-// entry per tenant and will genuinely paginate as the platform grows. Caps
-// the round trips a single tenant-creation submission can incur: if a
-// conclusive answer (a conflict, or the last page) isn't reached within
-// this many pages, the check returns ERROR rather than guessing
-// AVAILABLE — a false "no conflict" is worse than an inconclusive one,
-// since ERROR still just degrades to "can't tell, let creation proceed."
+// Every tenant domain shares one apex, so its list paginates; past this cap the check returns ERROR rather than guess AVAILABLE.
 const MAX_PROJECT_DOMAINS_PAGES = 5;
 
 type TProjectDomainsPage = {
   projectDomains?: { name: string; projectId: string }[];
-  pagination?: { next: number | null };
+  pagination?: { next: TMaybeNull<number> };
 };
 
-/**
- * Vercel's project-domains-by-apex endpoint takes the registrable ("apex")
- * domain, not the full hostname — `blog-dev.valstack.dev` must be queried
- * as `valstack.dev`, and `blog.example.co.uk` as `example.co.uk`. Derived via
- * the public suffix list (`tldts`) rather than a labels-count heuristic,
- * since the suffix itself can be multi-part. Returns `null` when no
- * registrable domain can be determined (e.g. the input is itself a bare
- * public suffix).
- */
-const deriveApexDomain = (domain: string): string | null => getDomain(domain);
+// The suffix can be multi-part (`example.co.uk`), so the apex comes from the public suffix list, not a label count.
+const deriveApexDomain = (domain: string): TMaybeNull<string> =>
+  getDomain(domain);
 
-// Vercel's own casing/trailing-dot normalization for a returned domain name
-// isn't documented, so both sides are normalized the same way before
-// comparing rather than assuming an exact match.
+// Vercel does not document how it normalises a returned domain name.
 const normalizeDomainName = (name: string): string =>
   name.toLowerCase().replace(/\.$/, '');
 
-/**
- * Advisory pre-check run at tenant-creation time, before provisioning ever
- * starts. Mirrors the rule `mapTenantDomain` (`packages/db`) enforces at
- * provisioning step 4: every tenant domain is added to the one shared
- * `apps/web` Vercel project, so a domain already attached to any *other*
- * project can never be mapped there and would wedge the tenant partway
- * through provisioning. Never a hard blocker — absent credentials, an
- * invalid domain, or any request failure all resolve to a status the
- * caller treats as "can't tell, let creation proceed."
- */
+/** Advisory, never a hard blocker: a domain attached to another Vercel project would wedge provisioning partway through. */
 export const checkDomainAvailability = async (
   domain: string,
 ): Promise<TDomainAvailability> => {
@@ -85,9 +60,7 @@ export const checkDomainAvailability = async (
         isUndefined(until) ? {} : { until: String(until) },
       );
 
-      // A 404 means the apex itself is unknown to the team's Vercel
-      // account — no project can have a domain registered under an apex
-      // the account doesn't hold, so no conflict is possible.
+      // A 404 means the team's account holds no domain under this apex.
       if (response.status === HTTP_STATUS.NOT_FOUND)
         return DOMAIN_AVAILABILITY.AVAILABLE;
 
@@ -122,7 +95,7 @@ export const checkDomainAvailability = async (
   } catch (error) {
     logger.error(TENANT_LOG.DOMAIN_AVAILABILITY_CHECK_ERROR, {
       domain,
-      error,
+      ...toLoggableError(error),
     });
     return DOMAIN_AVAILABILITY.ERROR;
   }

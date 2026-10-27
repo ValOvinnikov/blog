@@ -16,6 +16,7 @@ import {
   recordSignupBlockAdded,
   saveSignupBlock,
 } from '@platform/server/signup-block/add-signup-block';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 type TBlockTenantOwnerEmailFailure =
@@ -77,6 +78,9 @@ export const undoOwnerEmailBlock = async (
       });
     }
   } catch (error) {
-    logger.error(TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED, { entryId, error });
+    logger.error(TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED, {
+      entryId,
+      ...toLoggableError(error),
+    });
   }
 };

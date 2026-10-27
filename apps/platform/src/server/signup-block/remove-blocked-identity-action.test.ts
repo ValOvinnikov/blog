@@ -139,7 +139,7 @@ describe(removeBlockedIdentityAction, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(SIGNUP_BLOCK_LOG.REMOVE_FAILED, {
-      error: MOCK_DB_ERROR,
+      errorName: MOCK_DB_ERROR.name,
     });
     expect(recordAuditEventMock).not.toHaveBeenCalled();
   });

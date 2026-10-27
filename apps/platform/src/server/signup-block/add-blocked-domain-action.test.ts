@@ -119,7 +119,7 @@ describe(addBlockedDomainAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       SIGNUP_BLOCK_LOG.ADD_DOMAIN_FAILED,
-      { error: MOCK_DB_ERROR },
+      { errorName: MOCK_DB_ERROR.name },
     );
   });
 });

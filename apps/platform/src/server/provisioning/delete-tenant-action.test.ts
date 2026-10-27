@@ -147,7 +147,7 @@ describe(deleteTenantAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(TENANT_LOG.DELETE_FAILED, {
       tenantId: MOCK_TENANT_ID,
-      error: MOCK_CONNECTION_ERROR,
+      errorName: MOCK_CONNECTION_ERROR.name,
     });
   });
 
@@ -165,7 +165,7 @@ describe(deleteTenantAction, () => {
         action: AUDIT_ACTION.DELETED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        error: MOCK_CONNECTION_ERROR,
+        errorName: MOCK_CONNECTION_ERROR.name,
       },
     );
   });

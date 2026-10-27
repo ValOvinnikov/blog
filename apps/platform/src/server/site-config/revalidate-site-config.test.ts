@@ -102,7 +102,7 @@ describe(revalidateSiteConfig, () => {
       expect(logger.error).toHaveBeenCalledWith(
         SITE_CONFIG_LOG.REVALIDATE_ERROR,
         {
-          error,
+          errorName: error.name,
         },
       );
     },

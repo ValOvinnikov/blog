@@ -23,6 +23,7 @@ import {
   emailTemplateTypeSchema,
 } from '@platform/utils/email-input-schemas/email-input-schemas';
 import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
@@ -104,7 +105,7 @@ export const sendTestEmailAction = async (
     logger.error(EMAIL_TEST_LOG.SEND_FAILED, {
       tenantId: tenant.id,
       templateType,
-      error,
+      ...toLoggableError(error),
     });
     return SERVER_ERROR;
   }

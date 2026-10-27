@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { TLogContext } from '@blog/insight';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { del } from '@vercel/blob';
 
@@ -16,6 +17,6 @@ export const deleteBlobBestEffort = async (
   try {
     await del(url, { token: env.BLOB_READ_WRITE_TOKEN });
   } catch (error) {
-    logger.error(event, { ...context, error });
+    logger.error(event, { ...context, ...toLoggableError(error) });
   }
 };

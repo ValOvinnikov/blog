@@ -115,7 +115,7 @@ describe(enqueueProvisioning, () => {
     expect(loggerErrorMock).toHaveBeenCalledWith(WORKER_LOG.ENQUEUE_ERROR, {
       tenantId: MOCK_TENANT_ID,
       path: PROVISION_PATH,
-      error,
+      errorName: error.name,
     });
     expect(status).toBeNull();
   });

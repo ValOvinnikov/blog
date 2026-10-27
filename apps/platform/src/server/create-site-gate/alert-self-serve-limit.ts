@@ -5,6 +5,7 @@ import { buildSelfServeLimitAlertEmail, sendEmail } from '@blog/email';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 export const alertSelfServeLimit = async (
@@ -26,11 +27,17 @@ export const alertSelfServeLimit = async (
     await Promise.all(
       recipients.map((to) =>
         sendEmail({ to, from, subject, html }).catch((error: unknown) => {
-          logger.error(CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED, { day, error });
+          logger.error(CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED, {
+            day,
+            ...toLoggableError(error),
+          });
         }),
       ),
     );
   } catch (error) {
-    logger.error(CREATE_SITE_GATE_LOG.ALERT_FAILED, { day, error });
+    logger.error(CREATE_SITE_GATE_LOG.ALERT_FAILED, {
+      day,
+      ...toLoggableError(error),
+    });
   }
 };

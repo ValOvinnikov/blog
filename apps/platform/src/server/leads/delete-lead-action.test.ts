@@ -103,7 +103,7 @@ describe(deleteLeadAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(LEAD_LOG.DELETE_FAILED, {
       tenantId: MOCK_TENANT_ID,
-      error: MOCK_DB_ERROR,
+      errorName: MOCK_DB_ERROR.name,
     });
   });
 });

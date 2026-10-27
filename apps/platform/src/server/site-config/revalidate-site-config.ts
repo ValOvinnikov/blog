@@ -1,6 +1,7 @@
 import { HTTP_METHOD } from '@blog/config/constants';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { env } from '@platform/utils/env/env';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 const REVALIDATE_PATH = '/api/revalidate-site-config';
@@ -31,6 +32,6 @@ export const revalidateSiteConfig = async (tenantId: string): Promise<void> => {
       });
     }
   } catch (error) {
-    logger.error(SITE_CONFIG_LOG.REVALIDATE_ERROR, { error });
+    logger.error(SITE_CONFIG_LOG.REVALIDATE_ERROR, toLoggableError(error));
   }
 };

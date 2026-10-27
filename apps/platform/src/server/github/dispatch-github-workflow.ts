@@ -1,4 +1,5 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { HTTP_METHOD, type TMaybeUndefined } from '@blog/config';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
 import { readGitHubCredentials } from './read-github-credentials';
@@ -41,7 +42,7 @@ export const dispatchGitHubWorkflow = async ({
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowFile}/dispatches`,
       {
-        method: 'POST',
+        method: HTTP_METHOD.POST,
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/vnd.github+json',
@@ -63,7 +64,7 @@ export const dispatchGitHubWorkflow = async ({
 
     return true;
   } catch (error) {
-    logger.error(logEvents.error, { ...logContext, error });
+    logger.error(logEvents.error, { ...logContext, ...toLoggableError(error) });
     return false;
   }
 };

@@ -109,7 +109,7 @@ describe(fetchGitHub, () => {
     });
     expect(logger.error).toHaveBeenCalledWith(GITHUB_LOG.REQUEST_ERROR, {
       path: MOCK_PATH,
-      error: thrown,
+      errorName: thrown.name,
     });
   });
 });

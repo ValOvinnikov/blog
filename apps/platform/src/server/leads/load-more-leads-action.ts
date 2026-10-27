@@ -2,6 +2,7 @@
 
 import { LEAD_LOG } from '@platform/constants/lead';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
@@ -30,7 +31,10 @@ export const loadMoreLeadsAction = async (
       page: await listInboxLeads(tenant.id, parsed.data.after),
     };
   } catch (error) {
-    logger.error(LEAD_LOG.LOAD_FAILED, { tenantId: tenant.id, error });
+    logger.error(LEAD_LOG.LOAD_FAILED, {
+      tenantId: tenant.id,
+      ...toLoggableError(error),
+    });
     return { isLoaded: false };
   }
 };
