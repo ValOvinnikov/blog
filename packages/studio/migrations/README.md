@@ -65,7 +65,10 @@ the import.
    following steps don't need the id. If a migration with a matching slug
    already exists (regardless of its timestamp) it just tracks that one
    instead of creating a duplicate. (You can also `migrate:track <id>` an
-   existing one, or omit the name to track the newest.)
+   existing one, or omit the name to track the newest.) Then run
+   `pnpm gen:migration-ids` from the root and commit the regenerated
+   `packages/config/src/sanity/studio-migration-ids.ts`, which provisioning
+   writes into a fresh tenant's ledger; `pnpm verify` fails until you do.
 2. **Author the transform** in `<slug>/index.ts` using `defineMigration` from
    `sanity/migrate`. Prefer the `migrate.document` / `migrate.node` /
    `migrate.string` etc. node-visitor handlers for straightforward field

@@ -1,6 +1,7 @@
 import {
   buildStarterDocuments,
   SANITY_ROBOT_ROLE,
+  STUDIO_MIGRATION_IDS,
   type TStarterSiteType,
 } from '@blog/config';
 import { SITE_TYPE } from '@blog/config/constants';
@@ -25,6 +26,7 @@ import {
   MOCK_TENANT_ID,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
+import { buildAppliedMigrationLedger } from '@worker/utils/migration-ledger/migration-ledger';
 import type { Mock } from 'vitest';
 
 import { seedTenantContent, type TSeedContentDeps } from './seed-content';
@@ -140,15 +142,26 @@ describe(seedTenantContent, () => {
     expect(commit).toHaveBeenCalledTimes(1);
   });
 
-  it('seeds the documents of the site type it is given', async () => {
+  it('seeds the documents of the site type it is given, then the migration ledger', async () => {
     await seed({ siteType: SITE_TYPE.BLOG });
 
     const seededIds = createIfNotExists.mock.calls.map(
       ([document]) => document._id,
     );
-    expect(seededIds).toEqual(
-      starterDocumentsFor(SITE_TYPE.BLOG, tenant).map(({ _id }) => _id),
+    expect(seededIds).toEqual([
+      ...starterDocumentsFor(SITE_TYPE.BLOG, tenant).map(({ _id }) => _id),
+      buildAppliedMigrationLedger(MOCK_NOW.toISOString())._id,
+    ]);
+  });
+
+  it('records every Studio migration as applied in the seed transaction', async () => {
+    await seed();
+
+    const [ledger] = createIfNotExists.mock.lastCall ?? [];
+    expect(ledger.applied.map(({ id }: { id: string }) => id)).toEqual(
+      STUDIO_MIGRATION_IDS,
     );
+    expect(commit).toHaveBeenCalledTimes(1);
   });
 
   it('skips seeding when the dataset already has settings_site', async () => {
@@ -198,12 +211,12 @@ describe(seedTenantContent, () => {
     expect(clientOptions?.useCdn).toBe(false);
   });
 
-  it('commits every starter document in one transaction, uploading no assets', async () => {
+  it('commits every starter document and the ledger in one transaction, uploading no assets', async () => {
     await seed();
 
     expect(assetsUpload).not.toHaveBeenCalled();
     expect(createIfNotExists).toHaveBeenCalledTimes(
-      starterDocumentsFor(SITE_TYPE.BLANK, tenant).length,
+      starterDocumentsFor(SITE_TYPE.BLANK, tenant).length + 1,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();

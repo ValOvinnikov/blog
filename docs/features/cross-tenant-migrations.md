@@ -1,13 +1,15 @@
 ---
 title: Cross-tenant migrations
 status: built
-layers: [studio, db]
+layers: [studio, db, config, worker]
 code:
   - packages/studio/migrations/**
   - packages/studio/scripts/migrate.mjs
   - packages/studio/scripts/migrate-lib*.mjs
   - packages/studio/src/schema-types/documents/system/migration-state/**
   - packages/db/scripts/migrate-tenant-content/**
+  - packages/config/src/sanity/studio-migration-ids.ts
+  - scripts/gen-migration-ids.mjs
   - .github/workflows/migrate-tenant-content.yml
 epics: [4840]
 ---
@@ -39,6 +41,8 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 - **Ledger.** The ledger is the `migrationState` document (`_id` and `_type` both `migrationState`) in each dataset. Its `applied[]` holds `{ id, runAt, sha }`.
   - It has a declared schema type so validation and typegen see it, but editors can't touch it: document actions are disabled, and it is left out of the desk and the new-document menu.
   - Each dataset keeps its own ledger, so development and production track separately, and so does every tenant.
+  - A freshly provisioned tenant's ledger is written by the seed step ([Site templates](site-templates.md)), every migration marked applied.
+- **Migration id list.** `STUDIO_MIGRATION_IDS` in `@blog/config` is generated from the folders in `packages/studio/migrations/`, in run order, by `pnpm gen:migration-ids`. `apps/worker` reads it, since it cannot import `@blog/studio`.
 - **Tenant selection.** `listActiveTenants` returns tenants that are `status = ACTIVE` with a null `deprovisionedAt`. A single-tenant run uses `getTenantById`.
 - **Credentials.** `getTenantSanityWriteCredentials` decrypts the tenant's own `sanityWriteTokenEncrypted` for each run. A tenant with no write token, or one that is not ACTIVE, is counted as skipped.
 - **No caching.** Migrations write straight to Content Lake. Published changes reach the site through the normal revalidation webhook ([rendering and caching](./rendering-and-caching.md)).
@@ -57,7 +61,8 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 
 - **Changes go expand, then contract.** Tenant projects reach a new schema independently, and there is no atomic cutover. So a change adds the new shape, migrates every tenant, and removes the old shape in a later change, never in one step.
 - **A migration must handle both shapes.** It has to be safe on documents in the old and the new shape, and re-running it on migrated input must be a no-op. A test proves this, either co-located with the migration or on the `migrations/lib/` helper it is built from.
-- **An empty ledger is backfilled, never replayed.** `isTenantMigrationLedgerEmpty` runs before every tenant's deploy. If the ledger is empty, the call switches to `deploy --backfill`, which marks migrations applied without running them. A tenant seeded from starter content is already at the current schema.
+- **An empty ledger is backfilled, never replayed.** `isTenantMigrationLedgerEmpty` runs before every tenant's deploy. If the ledger is empty, the call switches to `deploy --backfill`, which marks migrations applied without running them. A tenant seeded from starter content is already at the current schema; one seeded before the seed step wrote its ledger takes this path.
+- **A new migration folder regenerates the id list.** `pnpm gen:migration-ids:check`, in `pnpm verify` and CI, fails until `pnpm gen:migration-ids` is re-run and committed.
 - **Each tenant uses its own write token.** No organisation-scoped content token exists, so one leaked credential reaches exactly one tenant.
 - **Production runs only from a release or a dispatch.** The production tenant fan-out never runs on a pushed tag. One run rewrites customer content across every project at once.
 - **`deploy` stops at the first failing migration.** For each pending id, in order, it dry-runs, then runs, then appends to the ledger. If one fails it stops there, so the ledger is accurate up to the last migration that succeeded.
@@ -86,6 +91,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 
 - `packages/db/scripts/migrate-tenant-content/run.test.ts` and `lib/*.test.ts`. These mock `execFileSync`, so no Sanity call is made.
 - `packages/studio/scripts/migrate-lib.test.mjs`, covering ledger ordering and pending computation.
+- `scripts/gen-migration-ids.test.mjs`, covering the generated list's run order.
 - A co-located `index.test.ts` in most migration folders. A migration that only wires up a shared helper is covered by that helper's test in `packages/studio/migrations/lib/*.test.ts`.
 - No Storybook; this feature has no UI.
 

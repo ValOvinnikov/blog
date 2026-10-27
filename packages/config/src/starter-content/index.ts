@@ -5,4 +5,7 @@ export {
   toStarterSiteType,
   type TStarterSiteType,
 } from './starter-content';
-export type { TStarterDocumentUnion } from './starter-document';
+export type {
+  TStarterDocument,
+  TStarterDocumentUnion,
+} from './starter-document';

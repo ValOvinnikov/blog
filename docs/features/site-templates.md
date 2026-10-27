@@ -6,6 +6,7 @@ code:
   - packages/config/src/starter-content/**
   - apps/worker/src/units/apply-site-template.ts
   - apps/worker/src/steps/seed-content.ts
+  - apps/worker/src/utils/migration-ledger/**
   - packages/db/src/queries/site-config/insert-site-config-if-missing/**
   - packages/db/src/queries/tenants/set-tenant-site-template-version/**
   - packages/studio/src/starter-content.test.ts
@@ -35,6 +36,7 @@ No route of its own. The seeded documents are what the public site renders and w
 - **`site_config`** — the type's preset (Blog and Portfolio `EDITORIAL`, Blank `CONSOLE`) with that preset's theme tokens, card style and header control style, inserted only when the tenant has no row.
 - **`settings_features`** — provisioning writes no row, so features follow the tenant's current preset defaults ([Plans and entitlements](plans-and-entitlements.md)).
 - **Currency** — Site Settings seeds `DEFAULT_SITE_CURRENCY` (USD); choosing it at signup is #5681.
+- **Migration ledger** — the seed transaction also creates the dataset's `migrationState` ledger, listing every id in `@blog/config`'s generated `STUDIO_MIGRATION_IDS` as applied, so the next cross-tenant run replays none of them on content that is already at the current schema.
 
 ## Constraints and invariants
 
@@ -45,14 +47,14 @@ No route of its own. The seeded documents are what the public site renders and w
 
 ## Dependencies
 
-[Tenant provisioning](tenant-provisioning.md) runs the `applySiteTemplate` unit (`SEED_CONTENT` step). [Cross-tenant migrations](cross-tenant-migrations.md) seeds the index pages for tenants seeded before templates; recording a fresh tenant's migration ledger is #5669.
+[Tenant provisioning](tenant-provisioning.md) runs the `applySiteTemplate` unit (`SEED_CONTENT` step). [Cross-tenant migrations](cross-tenant-migrations.md) seeds the index pages for tenants seeded before templates, and reads the migration ledger the seed writes.
 
 ## Tests
 
 - `packages/studio/src/starter-content.test.ts` — every Blog, Portfolio and Blank document passes Studio validation in every default language.
 - `packages/config/src/starter-content/starter-content.test.ts` — ids are stable and unique, every reference resolves, values carry the requested locale, SEO stays within its bounds.
 - `packages/config/src/starter-content/copy/starter-copy.test.ts` — every locale matches the `en` catalogue's shape.
-- `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`.
+- `apps/worker/src/units/apply-site-template.test.ts`, `apps/worker/src/steps/seed-content.test.ts`, `apps/worker/src/utils/migration-ledger/migration-ledger.test.ts`.
 
 ## Related epics
 

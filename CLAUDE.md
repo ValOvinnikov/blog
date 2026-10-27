@@ -836,9 +836,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
     goes to the user before commit.
   - `apps/platform`'s own UI copy is never Voice.
 - Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
-  `lint`, `test`, `knip`, the six gating scripts (`check:client-graph`,
+  `lint`, `test`, `knip`, the seven gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
-  `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`)
+  `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,
+  `gen:migration-ids:check`)
   and the local-only diff check `check:touched-lint`, so it stops at the first failure and mirrors every required or gating CI check that has a local
   equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
   part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
