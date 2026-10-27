@@ -21,6 +21,7 @@ export const MOCK_READER_EMAIL = faker.internet.exampleEmail();
 export const MOCK_FROM_EMAIL = faker.internet.exampleEmail();
 export const MOCK_FROM_ADDRESS = `${faker.lorem.words(2)} <${MOCK_FROM_EMAIL}>`;
 export const MOCK_SENDER_NAME = faker.lorem.words(2);
+export const MOCK_COMMA_NAME = 'Acme, Inc.';
 export const MOCK_REPLY_TO = faker.internet.exampleEmail();
 export const MOCK_POSTAL_ADDRESS = faker.location.streetAddress();
 export const MOCK_SUBJECT = faker.lorem.sentence();

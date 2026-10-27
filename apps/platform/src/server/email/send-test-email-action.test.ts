@@ -103,7 +103,7 @@ describe(sendTestEmailAction, () => {
     expect(email?.to).toBe(admin.email);
     expect(email?.subject).toBe(testSubject);
     expect(email?.replyTo).toBe(MOCK_REPLY_TO_ADDRESS);
-    expect(email?.from).toBe(`${MOCK_SENDER_NAME} <${MOCK_ALERT_ADDRESS}>`);
+    expect(email?.from).toBe(`"${MOCK_SENDER_NAME}" <${MOCK_ALERT_ADDRESS}>`);
     expect(email?.html).toContain(MOCK_BODY_TEXT);
   });
 

@@ -1,14 +1,14 @@
+import type { TMaybeUndefined } from '@blog/config';
+
 const FROM_WITH_DISPLAY_NAME_PATTERN = /^(.*)<([^<>]+)>\s*$/;
 
 /**
- * Overrides a resolved `from` address's display name with a tenant's
- * configured sender name, keeping the address untouched — a tenant may
- * brand who a sign-in email appears to be from, never which address it
- * actually sends from.
+ * A tenant may brand who a sign-in email appears to be from, never which
+ * address it sends from.
  */
 export function applyTenantSenderName(
   from: string,
-  senderName: string | undefined,
+  senderName: TMaybeUndefined<string>,
 ): string {
   if (!senderName) return from;
 
@@ -17,6 +17,7 @@ export function applyTenantSenderName(
 
   const match = FROM_WITH_DISPLAY_NAME_PATTERN.exec(from);
   const address = match ? match[2]!.trim() : from.trim();
+  const quotedSenderName = sanitizedSenderName.replace(/["\\]/g, '\\$&');
 
-  return `${sanitizedSenderName} <${address}>`;
+  return `"${quotedSenderName}" <${address}>`;
 }
