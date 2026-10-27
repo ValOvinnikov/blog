@@ -9,6 +9,8 @@ import { TestimonialCarousel } from './testimonial-carousel';
 
 vi.mock('@web/i18n/navigation');
 
+const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
+
 const setup = customRender(TestimonialCarousel, {
   items: MOCK_TESTIMONIAL_ITEMS,
   align: 'left',
@@ -17,22 +19,33 @@ const setup = customRender(TestimonialCarousel, {
 });
 
 describe(`<${TestimonialCarousel.name}/>`, () => {
-  it('renders a labelled carousel with one testimonial per item', async () => {
+  beforeEach(() => {
     setup();
+  });
 
-    const region = screen.getByRole('region', {
-      name: `${MOCK_TESTIMONIAL_HEADING} carousel`,
-    });
+  it('renders one testimonial per item in the labelled carousel', () => {
+    const region = screen.getByRole('region', { name: CAROUSEL_LABEL });
     const quotes = within(region).getAllByRole('blockquote');
+
     expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
-    MOCK_TESTIMONIAL_ITEMS.forEach((item) => {
-      const name = within(region).getByText(item.name, { ignore: '.sr-only' });
+  });
+
+  it.each(MOCK_TESTIMONIAL_ITEMS.map(({ name }) => name))(
+    'renders the name %s in the carousel',
+    (itemName) => {
+      const region = screen.getByRole('region', { name: CAROUSEL_LABEL });
+      const name = within(region).getByText(itemName, { ignore: '.sr-only' });
+
       expect(name).toBeVisible();
-    });
+    },
+  );
+
+  it('renders previous and next slide controls', async () => {
     const previousButton = await screen.findByRole('button', {
       name: 'Previous slide',
     });
     const nextButton = screen.getByRole('button', { name: 'Next slide' });
+
     expect(previousButton).toBeVisible();
     expect(nextButton).toBeVisible();
   });

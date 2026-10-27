@@ -4,7 +4,9 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
+import type { TTimelineModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_TIMELINE_HEADING,
@@ -15,8 +17,6 @@ import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TimelineModule } from './timeline-module';
-
-const MODULE_ID = 'timeline-1';
 
 const { getTimelineModuleMock } = vi.hoisted(() => ({
   getTimelineModuleMock: vi.fn(),
@@ -34,35 +34,42 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const baseModule = {
+faker.seed(22);
+
+const MOCK_MODULE_ID = faker.string.uuid();
+const MOCK_FIRST_HEADING = faker.lorem.words(2);
+const MOCK_SECOND_HEADING = faker.lorem.words(3);
+
+const mockTimelineModule = (
+  overrides: Partial<TTimelineModule> = {},
+): TTimelineModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
   headingBlock: mockHeadingBlock({ heading: MOCK_TIMELINE_HEADING }),
   markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
   orientation: TIMELINE_ORIENTATION.VERTICAL,
   itemAlignment: CONTENT_ALIGNMENT.LEFT,
+  items: [],
   ctaButtons: [],
   contentAlignment: undefined,
   layout: undefined,
-};
+  ...overrides,
+});
 
 const setup = customRenderAsync(TimelineModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${TimelineModule.name}/>`, () => {
   beforeEach(() => {
     getTimelineModuleMock.mockReset();
+    getTimelineModuleMock.mockResolvedValue(okResult(mockTimelineModule()));
   });
 
   it('fetches the module with the tenant Sanity context', async () => {
-    getTimelineModuleMock.mockResolvedValue(
-      okResult({ ...baseModule, items: [] }),
-    );
-
     await setup();
 
     expect(getTimelineModuleMock).toHaveBeenCalledWith(
-      MODULE_ID,
+      MOCK_MODULE_ID,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
@@ -77,19 +84,31 @@ describe(`<${TimelineModule.name}/>`, () => {
 
   it('renders the resolved items as headings', async () => {
     getTimelineModuleMock.mockResolvedValue(
-      okResult({
-        ...baseModule,
-        items: [
-          mockTimelineItem({ id: 'a', heading: 'Kick-off' }),
-          mockTimelineItem({ id: 'b', heading: 'Delivery' }),
-        ],
-      }),
+      okResult(
+        mockTimelineModule({
+          items: [
+            mockTimelineItem({
+              id: faker.string.uuid(),
+              heading: MOCK_FIRST_HEADING,
+            }),
+            mockTimelineItem({
+              id: faker.string.uuid(),
+              heading: MOCK_SECOND_HEADING,
+            }),
+          ],
+        }),
+      ),
     );
 
     await setup();
 
-    const firstHeading = screen.getByRole('heading', { name: 'Kick-off' });
-    const secondHeading = screen.getByRole('heading', { name: 'Delivery' });
+    const firstHeading = screen.getByRole('heading', {
+      name: MOCK_FIRST_HEADING,
+    });
+    const secondHeading = screen.getByRole('heading', {
+      name: MOCK_SECOND_HEADING,
+    });
+
     expect(firstHeading).toBeVisible();
     expect(secondHeading).toBeVisible();
   });

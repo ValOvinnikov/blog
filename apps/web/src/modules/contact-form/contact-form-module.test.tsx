@@ -1,7 +1,7 @@
 import { ACTION_OUTCOME, SITE_MESSAGES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { submitContactMessage } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
@@ -50,18 +50,24 @@ vi.mock(
   () => ({ submitContactMessage: vi.fn() }),
 );
 
+faker.seed(6011);
+
 const MOCK_HEADING = faker.company.catchPhrase();
+const MOCK_MODULE_ID = faker.string.uuid();
 const MOCK_PAGE_ID = faker.string.uuid();
 const MOCK_PATHNAME = `/${faker.lorem.slug()}`;
 
 const setup = customRenderAsync(ContactFormModule, {
-  id: faker.string.uuid(),
+  id: MOCK_MODULE_ID,
 });
 
 const { submitLabel } = SITE_MESSAGES.contactForm;
 
 describe(`<${ContactFormModule.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     vi.mocked(usePathname).mockReturnValue(MOCK_PATHNAME);
     vi.mocked(submitContactMessage).mockResolvedValue({
@@ -81,6 +87,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
 
     const heading = screen.getByRole('heading', { name: MOCK_HEADING });
     const submitButton = screen.getByRole('button', { name: submitLabel });
+
     expect(heading).toBeVisible();
     expect(submitButton).toBeVisible();
   });
@@ -96,7 +103,7 @@ describe(`<${ContactFormModule.name}/>`, () => {
     async (_, context) => {
       await setup({ context });
 
-      await fillAndSendContactForm(userEvent.setup(), MOCK_CONTACT_MESSAGE);
+      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 
       expect(submitContactMessage).toHaveBeenCalledWith(
         {
@@ -127,19 +134,17 @@ describe(`<${ContactFormModule.name}/>`, () => {
   ])('renders nothing, without fetching, when %s', async (_, arrange) => {
     arrange();
 
-    await setup();
+    const { container } = await setup();
 
-    const submitButton = screen.queryByRole('button', { name: submitLabel });
-    expect(submitButton).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
     expect(getContactFormMock).not.toHaveBeenCalled();
   });
 
   it('renders nothing when the module cannot be loaded', async () => {
     getContactFormMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-    await setup();
+    const { container } = await setup();
 
-    const heading = screen.queryByRole('heading', { name: MOCK_HEADING });
-    expect(heading).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 });

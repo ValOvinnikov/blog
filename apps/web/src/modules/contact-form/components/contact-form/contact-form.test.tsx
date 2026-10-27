@@ -1,4 +1,9 @@
-import { ACTION_OUTCOME, LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  SITE_MESSAGES,
+} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { FIELD_ERROR } from '@web/constants/field-error';
@@ -10,17 +15,32 @@ import {
   getContactFormFields,
 } from '@web/testing/modules/contact-form/contact-form-fields';
 import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { ContactForm } from './contact-form';
 
 vi.mock('@web/i18n/navigation');
 
+faker.seed(6011);
+
 const { EN, NL } = LOCALE_ISO_CODES;
-const { submitLabel, errorEmail } = SITE_MESSAGES.contactForm;
+const {
+  successTitle,
+  errorName,
+  errorEmail,
+  errorMessage,
+  errorBlocked,
+  errorServer,
+  submitLabel,
+} = SITE_MESSAGES.contactForm;
 
 const MOCK_SUCCESS_MESSAGE = faker.lorem.sentence();
 const MOCK_PRIVACY_NOTE = faker.lorem.sentence();
-const MOCK_PATHNAME = `/${faker.lorem.slug()}`;
+const MOCK_PAGE_SLUG = faker.lorem.slug();
+const MOCK_PATHNAME = `/${MOCK_PAGE_SLUG}`;
+const MOCK_PRERENDERED_PATHNAME = `/${MOCK_TENANT_ID}/${NL}/${MOCK_PAGE_SLUG}`;
+const MOCK_TOO_SHORT_MESSAGE = faker.string.alpha(9);
+const MOCK_INVALID_EMAIL = faker.lorem.word();
 
 const submitMessage = vi.fn<TSubmitContactMessage>();
 
@@ -33,9 +53,6 @@ const setup = customRender(ContactForm, {
 
 const MOCK_SENT_INPUT = { ...MOCK_CONTACT_MESSAGE, website: '' };
 
-const fillAndSend = (user: UserEvent) =>
-  fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
-
 describe(`<${ContactForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -45,66 +62,87 @@ describe(`<${ContactForm.name}/>`, () => {
     submitMessage.mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
-  it('sends the typed message with the page it was sent from', async () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    await fillAndSend(user);
+    it('sends the typed message with the page it was sent from', async () => {
+      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 
-    expect(submitMessage).toHaveBeenCalledWith({
-      ...MOCK_SENT_INPUT,
-      sourcePath: MOCK_PATHNAME,
+      expect(submitMessage).toHaveBeenCalledWith({
+        ...MOCK_SENT_INPUT,
+        sourcePath: MOCK_PATHNAME,
+      });
+    });
+
+    it('replaces the form with the success message once sent', async () => {
+      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
+
+      const heading = await screen.findByRole('heading', {
+        name: successTitle,
+      });
+      const sendButton = screen.queryByRole('button', { name: submitLabel });
+
+      expect(heading).toBeVisible();
+      expect(sendButton).not.toBeInTheDocument();
+    });
+
+    it('announces the success message through a status region', async () => {
+      const status = screen.getByRole('status');
+
+      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
+
+      await waitFor(() =>
+        expect(status).toHaveTextContent(MOCK_SUCCESS_MESSAGE),
+      );
+    });
+
+    it('names each invalid field without sending', async () => {
+      const { nameField, emailField, messageField, sendButton } =
+        getContactFormFields();
+
+      await user.type(messageField, MOCK_TOO_SHORT_MESSAGE);
+      await user.click(sendButton);
+
+      expect(nameField).toHaveAccessibleDescription(errorName);
+      expect(emailField).toHaveAccessibleDescription(errorEmail);
+      expect(messageField).toHaveAccessibleDescription(errorMessage);
+      expect(submitMessage).not.toHaveBeenCalled();
+    });
+
+    it('moves focus to the first invalid field in reading order', async () => {
+      const { nameField, emailField, sendButton } = getContactFormFields();
+
+      await user.type(emailField, MOCK_INVALID_EMAIL);
+      await user.click(sendButton);
+
+      expect(nameField).toHaveFocus();
     });
   });
 
   it('sends the public path with the locale prefix from a prerendered page', async () => {
-    vi.mocked(usePathname).mockReturnValue(
-      '/0262d3a7-27e1-41b6-8b4f-35dae9f7c6ee/NL/contact',
-    );
+    vi.mocked(usePathname).mockReturnValue(MOCK_PRERENDERED_PATHNAME);
     setup({ currentLocale: NL });
 
-    await fillAndSend(user);
+    await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 
     expect(submitMessage).toHaveBeenCalledWith({
       ...MOCK_SENT_INPUT,
-      sourcePath: '/nl/contact',
+      sourcePath: `/${LOCALE_BCP47_TAGS[NL]}${MOCK_PATHNAME}`,
     });
-  });
-
-  it('replaces the form with the success message once sent', async () => {
-    setup();
-
-    await fillAndSend(user);
-
-    const heading = await screen.findByRole('heading', {
-      name: 'Message sent',
-    });
-    const sendButton = screen.queryByRole('button', {
-      name: submitLabel,
-    });
-
-    expect(heading).toBeVisible();
-    expect(sendButton).not.toBeInTheDocument();
-  });
-
-  it('announces the success message through a status region present before sending', async () => {
-    setup();
-    const status = screen.getByRole('status');
-
-    await fillAndSend(user);
-
-    await waitFor(() => expect(status).toHaveTextContent(MOCK_SUCCESS_MESSAGE));
   });
 
   it.each([
-    [ACTION_OUTCOME.SERVER_ERROR, "Your message couldn't be sent."],
-    [ACTION_OUTCOME.BLOCKED, 'Too many attempts.'],
+    [ACTION_OUTCOME.SERVER_ERROR, errorServer],
+    [ACTION_OUTCOME.BLOCKED, errorBlocked],
   ])(
     'shows the %s refusal and keeps what the visitor typed',
     async (outcome, text) => {
       submitMessage.mockResolvedValue({ outcome });
       setup();
 
-      await fillAndSend(user);
+      await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 
       const alert = await screen.findByRole('alert');
       const { nameField, emailField, messageField } = getContactFormFields();
@@ -116,34 +154,6 @@ describe(`<${ContactForm.name}/>`, () => {
     },
   );
 
-  it('names each invalid field without sending', async () => {
-    setup();
-    const { nameField, emailField, messageField, sendButton } =
-      getContactFormFields();
-
-    await user.type(messageField, faker.string.alpha(9));
-    await user.click(sendButton);
-
-    expect(nameField).toHaveAccessibleDescription(
-      'Enter your name, up to 100 characters.',
-    );
-    expect(emailField).toHaveAccessibleDescription(errorEmail);
-    expect(messageField).toHaveAccessibleDescription(
-      'Write a message of 10 to 5,000 characters.',
-    );
-    expect(submitMessage).not.toHaveBeenCalled();
-  });
-
-  it('moves focus to the first invalid field in reading order', async () => {
-    setup();
-    const { nameField, emailField, sendButton } = getContactFormFields();
-
-    await user.type(emailField, faker.lorem.word());
-    await user.click(sendButton);
-
-    expect(nameField).toHaveFocus();
-  });
-
   it('shows and focuses the field the server rejects', async () => {
     submitMessage.mockResolvedValue({
       outcome: ACTION_OUTCOME.INVALID,
@@ -151,7 +161,7 @@ describe(`<${ContactForm.name}/>`, () => {
     });
     setup();
 
-    await fillAndSend(user);
+    await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 
     const { emailField } = getContactFormFields();
 

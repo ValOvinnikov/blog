@@ -1,4 +1,5 @@
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostLatestModuleData } from '@web/testing/modules/post-latest/fixtures';
@@ -8,8 +9,13 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 
 import { PostLatestModule } from './post-latest-module';
 
-const MODULE_ID = 'post-latest-1';
-const POST = mockPostCard();
+faker.seed(6011);
+
+const MOCK_MODULE_ID = faker.string.uuid();
+const MOCK_POST = mockPostCard({
+  id: faker.string.uuid(),
+  title: faker.lorem.words(3),
+});
 
 const { getPostLatestMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
@@ -28,7 +34,7 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 const setup = customRenderAsync(PostLatestModule, {
-  id: MODULE_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${PostLatestModule.name}/>`, () => {
@@ -41,7 +47,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith(
-      MODULE_ID,
+      MOCK_MODULE_ID,
       MOCK_TENANT_SANITY_CONTEXT,
     );
   });
@@ -62,13 +68,14 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
   it('renders the resolved posts and no pagination nav', async () => {
     getPostLatestMock.mockResolvedValue(
-      okResult(mockPostLatestModuleData({ posts: [POST] })),
+      okResult(mockPostLatestModuleData({ posts: [MOCK_POST] })),
     );
 
     await setup();
 
-    const postTitle = screen.getByText(POST.title);
+    const postTitle = screen.getByText(MOCK_POST.title);
     const pagination = screen.queryByRole('navigation');
+
     expect(postTitle).toBeVisible();
     expect(pagination).not.toBeInTheDocument();
   });
@@ -87,6 +94,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     await setup();
 
     const image = screen.getByRole('img', { name: sanityImage.alt });
+
     expect(image).toBeVisible();
   });
 
@@ -103,6 +111,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     await setup();
 
     const image = screen.queryByRole('img');
+
     expect(image).not.toBeInTheDocument();
   });
 });

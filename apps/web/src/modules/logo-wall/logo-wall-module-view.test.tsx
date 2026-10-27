@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
@@ -14,18 +15,13 @@ import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
 
-const { LogoWallCarousel } = vi.hoisted(() => ({
-  LogoWallCarousel: vi.fn(() => <div data-testid="logo-wall-carousel-stub" />),
-}));
-
 vi.mock('@web/i18n/navigation');
 
-vi.mock('./components/logo-wall-carousel/logo-wall-carousel', () => ({
-  LogoWallCarousel,
-}));
+faker.seed(6011);
 
-const dataTestId = 'logo-wall-module-logo-wall-1';
-const TITLE_ID = 'logo-wall-title';
+const MOCK_DATA_TEST_ID = faker.string.uuid();
+const MOCK_TITLE_ID = faker.string.uuid();
+const CAROUSEL_LABEL = `${MOCK_LOGO_WALL_HEADING} carousel`;
 
 const setup = customRender(LogoWallModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -35,8 +31,8 @@ const setup = customRender(LogoWallModuleView, {
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   layout: undefined,
-  titleId: TITLE_ID,
-  dataTestId,
+  titleId: MOCK_TITLE_ID,
+  dataTestId: MOCK_DATA_TEST_ID,
 });
 
 describe(`<${LogoWallModuleView.name}/>`, () => {
@@ -53,9 +49,9 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
       const section = screen.getByRole('region', {
         name: MOCK_LOGO_WALL_HEADING,
       });
-      expect(heading).toHaveAttribute('id', TITLE_ID);
-      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
-      expect(section).toHaveAttribute('data-testid', dataTestId);
+
+      expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
+      expect(section).toHaveAttribute('aria-labelledby', MOCK_TITLE_ID);
     });
 
     it('renders every logo as an image named after the company', () => {
@@ -63,7 +59,12 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
         const logoImage = screen.getByRole('img', { name: logo.name });
         expect(logoImage).toBeVisible();
       });
-      expect(LogoWallCarousel).not.toHaveBeenCalled();
+    });
+
+    it('renders no carousel', () => {
+      const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+
+      expect(carousel).not.toBeInTheDocument();
     });
 
     it('renders no action group when there are no cta buttons', () => {
@@ -75,11 +76,9 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
   it('renders the carousel in place of the row in carousel mode', () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
-    expect(LogoWallCarousel).toHaveBeenCalledTimes(1);
-    const carousel = screen.getByTestId('logo-wall-carousel-stub');
-    const logoImage = screen.queryByRole('img');
+    const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+
     expect(carousel).toBeVisible();
-    expect(logoImage).not.toBeInTheDocument();
   });
 
   it('renders the resolved cta buttons when present', () => {

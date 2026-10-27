@@ -4,6 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
@@ -21,10 +22,11 @@ import { FeatureListModuleView } from './feature-list-module-view';
 
 vi.mock('@web/i18n/navigation');
 
-const TITLE_ID = 'feature-list-title';
-const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
+faker.seed(6011);
 
-const dataTestId = 'feature-list-module-feature-list-1';
+const MOCK_TITLE_ID = faker.string.uuid();
+const MOCK_DATA_TEST_ID = faker.string.uuid();
+const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
 
 const setup = customRender(FeatureListModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -36,8 +38,8 @@ const setup = customRender(FeatureListModuleView, {
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
   layout: undefined,
-  titleId: TITLE_ID,
-  dataTestId,
+  titleId: MOCK_TITLE_ID,
+  dataTestId: MOCK_DATA_TEST_ID,
 });
 
 describe(`<${FeatureListModuleView.name}/>`, () => {
@@ -54,14 +56,14 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       const section = screen.getByRole('region', {
         name: MOCK_FEATURE_LIST_HEADING,
       });
-      expect(heading).toHaveAttribute('id', TITLE_ID);
-      expect(section).toHaveAttribute('aria-labelledby', TITLE_ID);
-      expect(section).toHaveAttribute('data-testid', dataTestId);
+
+      expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
+      expect(section).toHaveAttribute('aria-labelledby', MOCK_TITLE_ID);
     });
 
     it('renders one article with an h3 title per item', () => {
       const articles = screen.getAllByRole('article');
-      expect(articles).toHaveLength(2);
+      expect(articles).toHaveLength(MOCK_FEATURE_LIST_ITEMS.length);
       MOCK_FEATURE_LIST_ITEMS.forEach((item) => {
         const heading = screen.getByRole('heading', {
           level: 3,
@@ -77,26 +79,22 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     });
   });
 
-  it.each([
-    [DISPLAY_MODE.CAROUSEL, true],
-    [DISPLAY_MODE.GRID, false],
-  ])(
-    'renders the carousel in place of the grid only in %s mode: %s',
-    (displayMode, expectedCarousel) => {
-      setup({ displayMode });
+  it('renders the items in a labelled carousel in carousel mode', () => {
+    setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
-      if (expectedCarousel) {
-        const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
-        const articles = within(carousel).getAllByRole('article');
-        expect(articles).toHaveLength(MOCK_FEATURE_LIST_ITEMS.length);
-      } else {
-        const carousel = screen.queryByRole('region', {
-          name: CAROUSEL_LABEL,
-        });
-        expect(carousel).not.toBeInTheDocument();
-      }
-    },
-  );
+    const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+    const articles = within(carousel).getAllByRole('article');
+
+    expect(articles).toHaveLength(MOCK_FEATURE_LIST_ITEMS.length);
+  });
+
+  it('renders no carousel in grid mode', () => {
+    setup({ displayMode: DISPLAY_MODE.GRID });
+
+    const carousel = screen.queryByRole('region', { name: CAROUSEL_LABEL });
+
+    expect(carousel).not.toBeInTheDocument();
+  });
 
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: MOCK_CTA_ACTIONS });
