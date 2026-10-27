@@ -132,8 +132,8 @@ describe(erasePersonalData, () => {
         true,
       ),
     );
-    const readerId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-    expect(readerId).toBeDefined();
+    const keptReaderId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+    expect(keptReaderId).toBe(readerId);
   });
 
   describe('once the mailbox has been erased', () => {
