@@ -82,10 +82,8 @@ describe('topicPageQuery template layout', () => {
 
     const result = await run([page, ...dataset]);
 
-    expect(result).toMatchObject({
-      hero: mockRawHeroRef(),
-      modules: [mockRawPostLatestRef()],
-    });
+    expect(result).toHaveProperty('hero', mockRawHeroRef());
+    expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
   });
 
   it('resolves no hero and no modules for a topic page without a template', async () => {
@@ -93,7 +91,8 @@ describe('topicPageQuery template layout', () => {
 
     const result = await run([page, ...dataset]);
 
-    expect(result).toMatchObject({ hero: null, modules: null });
+    expect(result).toHaveProperty('hero', null);
+    expect(result).toHaveProperty('modules', null);
   });
 });
 
@@ -118,7 +117,7 @@ describe('topicPageQuery language scoping', () => {
   ])('resolves the %s page for the same slug', async (locale, heading) => {
     const result = await run(locale);
 
-    expect(result).toMatchObject({ headingBlock: { heading } });
+    expect(result).toHaveProperty('headingBlock.heading', heading);
   });
 
   it('resolves nothing for a language the page is not authored in', async () => {
@@ -130,11 +129,9 @@ describe('topicPageQuery language scoping', () => {
   it('returns the linked translations with their languages and slugs', async () => {
     const result = await run(NL);
 
-    expect(result).toMatchObject({
-      translations: [
-        { language: EN, slug: MOCK_PAGE_SLUG },
-        { language: NL, slug: MOCK_PAGE_SLUG },
-      ],
-    });
+    expect(result).toHaveProperty('translations', [
+      { language: EN, slug: MOCK_PAGE_SLUG },
+      { language: NL, slug: MOCK_PAGE_SLUG },
+    ]);
   });
 });

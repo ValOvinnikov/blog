@@ -2,6 +2,7 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import { mockSlug } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
@@ -16,22 +17,18 @@ faker.seed(6015107);
 const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = mockTenant();
 
-function mockSegment() {
-  return faker.string.alpha({ length: 8, casing: 'lower' });
-}
-
-const MOCK_EXACT_SEGMENT = mockSegment();
-const MOCK_EXACT_DESTINATION = `/${mockSegment()}`;
-const MOCK_PREFIX_SEGMENT = mockSegment();
-const MOCK_PREFIX_DESTINATION = `/${mockSegment()}`;
-const MOCK_DEEP_SEGMENT = mockSegment();
-const MOCK_DEEP_DESTINATION = `/${mockSegment()}`;
-const MOCK_FLAT_SEGMENT = mockSegment();
-const MOCK_FLAT_DESTINATION = `/${mockSegment()}`;
-const MOCK_HOME_PREFIX_SEGMENT = mockSegment();
-const MOCK_UNKNOWN_SEGMENT = mockSegment();
-const MOCK_LEAF_SEGMENT = mockSegment();
-const MOCK_NESTED_LEAF_SEGMENT = mockSegment();
+const MOCK_EXACT_SEGMENT = mockSlug();
+const MOCK_EXACT_DESTINATION = `/${mockSlug()}`;
+const MOCK_PREFIX_SEGMENT = mockSlug();
+const MOCK_PREFIX_DESTINATION = `/${mockSlug()}`;
+const MOCK_DEEP_SEGMENT = mockSlug();
+const MOCK_DEEP_DESTINATION = `/${mockSlug()}`;
+const MOCK_FLAT_SEGMENT = mockSlug();
+const MOCK_FLAT_DESTINATION = `/${mockSlug()}`;
+const MOCK_HOME_PREFIX_SEGMENT = mockSlug();
+const MOCK_UNKNOWN_SEGMENT = mockSlug();
+const MOCK_LEAF_SEGMENT = mockSlug();
+const MOCK_NESTED_LEAF_SEGMENT = mockSlug();
 const MOCK_EXTERNAL_HOST = faker.internet.domainName();
 
 function mockRedirect(
@@ -43,8 +40,8 @@ function mockRedirect(
   }> = {},
 ) {
   return {
-    source: `/${mockSegment()}`,
-    destination: `/${mockSegment()}`,
+    source: `/${mockSlug()}`,
+    destination: `/${mockSlug()}`,
     isPrefix: false,
     ...overrides,
   };
@@ -129,7 +126,7 @@ describe(getRedirect, () => {
   });
 
   it('prefers an exact source over a prefix that also matches', async () => {
-    const exactDestination = `/${mockSegment()}`;
+    const exactDestination = `/${mockSlug()}`;
     mockRun.mockResolvedValueOnce([
       mockRedirect({
         source: `/${MOCK_PREFIX_SEGMENT}`,
@@ -243,8 +240,8 @@ describe('redirectsQuery', () => {
         _id: faker.string.uuid(),
         _type: 'redirect',
         language: NL,
-        source: `/${mockSegment()}`,
-        destination: `/${mockSegment()}`,
+        source: `/${mockSlug()}`,
+        destination: `/${mockSlug()}`,
       },
       { _id: faker.string.uuid(), _type: 'page_landing', language: EN },
     ];

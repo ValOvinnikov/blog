@@ -2,7 +2,7 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { MOCK_PAGE_LANDING_CACHE_TAG } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockReference } from '@blog/service/testing/shared/fixtures';
+import { mockReference, mockSlug } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
   MOCK_ABOUT_NL_SLUG,
@@ -21,11 +21,11 @@ faker.seed(6015106);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 const tenant = mockTenant();
-const MOCK_FR_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_LEGACY_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_SECTION_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_CHILD_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_ORPHAN_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_FR_SLUG = mockSlug();
+const MOCK_LEGACY_SLUG = mockSlug();
+const MOCK_SECTION_SLUG = mockSlug();
+const MOCK_CHILD_SLUG = mockSlug();
+const MOCK_ORPHAN_SLUG = mockSlug();
 
 describe(getPageSlugs, () => {
   beforeEach(() => {

@@ -8,6 +8,7 @@ import { mockRawTopic } from '@blog/service/testing/entities/fixtures';
 import {
   mockRawAuthor,
   mockRawPostDetail,
+  mockSlugPageDocument,
 } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_POST_TITLE,
@@ -175,25 +176,28 @@ describe('postPageQuery', () => {
 describe('postPageQuery language scoping', () => {
   const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-  function post(
-    id: string,
-    slug: string,
-    language: string,
-    publishedAt = MOCK_PUBLISHED_AT,
-  ) {
-    return {
-      _id: id,
-      _type: 'page_post',
-      slug: { current: slug },
-      language,
-      publishedAt,
-    };
-  }
-
   const dataset = [
-    post(MOCK_EN_ID, MOCK_EN_SLUG, EN),
-    post(MOCK_NL_ID, MOCK_NL_SLUG, NL),
-    post(MOCK_SCHEDULED_ID, MOCK_SCHEDULED_SLUG, NL, MOCK_SCHEDULED_AT),
+    mockSlugPageDocument({
+      _id: MOCK_EN_ID,
+      _type: 'page_post',
+      slug: MOCK_EN_SLUG,
+      language: EN,
+      publishedAt: MOCK_PUBLISHED_AT,
+    }),
+    mockSlugPageDocument({
+      _id: MOCK_NL_ID,
+      _type: 'page_post',
+      slug: MOCK_NL_SLUG,
+      language: NL,
+      publishedAt: MOCK_PUBLISHED_AT,
+    }),
+    mockSlugPageDocument({
+      _id: MOCK_SCHEDULED_ID,
+      _type: 'page_post',
+      slug: MOCK_SCHEDULED_SLUG,
+      language: NL,
+      publishedAt: MOCK_SCHEDULED_AT,
+    }),
     {
       _id: MOCK_METADATA_ID,
       _type: 'translation.metadata',
@@ -213,7 +217,7 @@ describe('postPageQuery language scoping', () => {
   }
 
   it('resolves a slug only in the language the post is authored in', async () => {
-    expect(await run(MOCK_NL_SLUG, NL)).toMatchObject({ _id: MOCK_NL_ID });
+    expect(await run(MOCK_NL_SLUG, NL)).toHaveProperty('_id', MOCK_NL_ID);
     expect(await run(MOCK_NL_SLUG, EN)).toBeNull();
     expect(await run(MOCK_EN_SLUG, FR)).toBeNull();
   });
@@ -223,11 +227,9 @@ describe('postPageQuery language scoping', () => {
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run(MOCK_NL_SLUG, NL)).toMatchObject({
-      translations: [
-        { language: EN, slug: MOCK_EN_SLUG },
-        { language: NL, slug: MOCK_NL_SLUG },
-      ],
-    });
+    expect(await run(MOCK_NL_SLUG, NL)).toHaveProperty('translations', [
+      { language: EN, slug: MOCK_EN_SLUG },
+      { language: NL, slug: MOCK_NL_SLUG },
+    ]);
   });
 });

@@ -59,8 +59,12 @@ const MOCK_META_TITLE = faker.lorem.words(4);
 const MOCK_META_DESCRIPTION = faker.lorem.sentence();
 const MOCK_ASIDE_KEY = faker.string.uuid();
 const MOCK_REF_DATE = '2026-06-01T00:00:00Z';
-const PUBLISHED_AT = faker.date.past({ refDate: MOCK_REF_DATE }).toISOString();
-const GENERATED_AT = faker.date.past({ refDate: MOCK_REF_DATE }).toISOString();
+const MOCK_PUBLISHED_AT = faker.date
+  .past({ refDate: MOCK_REF_DATE })
+  .toISOString();
+const MOCK_GENERATED_AT = faker.date
+  .past({ refDate: MOCK_REF_DATE })
+  .toISOString();
 
 const MODULE_REFS: TRawPostDetail['modules'] = [
   { _id: MOCK_RELATED_MODULE_ID, _type: 'module_postRelated' },
@@ -91,14 +95,14 @@ describe(getPost, () => {
       _id: MOCK_PAGE_POST_ID,
       headingBlock: mockRawHeadingBlock(MOCK_PAGE_POST_TITLE),
       slug: MOCK_PAGE_POST_SLUG,
-      publishedAt: PUBLISHED_AT,
+      publishedAt: MOCK_PUBLISHED_AT,
     });
 
     expect({ id, title, slug, publishedAt }).toEqual({
       id: MOCK_PAGE_POST_ID,
       title: MOCK_PAGE_POST_TITLE,
       slug: MOCK_PAGE_POST_SLUG,
-      publishedAt: PUBLISHED_AT,
+      publishedAt: MOCK_PUBLISHED_AT,
     });
   });
 
@@ -172,7 +176,7 @@ describe(getPost, () => {
   it('maps takeaways with 3 or more entries', async () => {
     const postTakeaways = {
       takeaways: MOCK_SKIM_TAKEAWAYS,
-      generatedAt: GENERATED_AT,
+      generatedAt: MOCK_GENERATED_AT,
       model: MOCK_SKIM_MODEL,
     };
 

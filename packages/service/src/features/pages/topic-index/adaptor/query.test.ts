@@ -23,6 +23,8 @@ const { EN, NL, FR } = LOCALE_ISO_CODES;
 const MOCK_EN_HEADING = faker.lorem.words(2);
 const MOCK_NL_HEADING = faker.lorem.words(2);
 
+const HEADING_TEXT_PATH = 'headingBlock.heading';
+
 describe('topicIndexPageQuery', () => {
   it.each([
     [
@@ -75,10 +77,8 @@ describe('topicIndexPageQuery template layout', () => {
       ...dataset,
     ]);
 
-    expect(result).toMatchObject({
-      hero: mockRawHeroRef(),
-      modules: [mockRawPostLatestRef()],
-    });
+    expect(result).toHaveProperty('hero', mockRawHeroRef());
+    expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
   });
 
   it('resolves no hero and no modules for a topic index page without a template', async () => {
@@ -89,7 +89,8 @@ describe('topicIndexPageQuery template layout', () => {
       ...dataset,
     ]);
 
-    expect(result).toMatchObject({ hero: null, modules: null });
+    expect(result).toHaveProperty('hero', null);
+    expect(result).toHaveProperty('modules', null);
   });
 });
 
@@ -119,7 +120,7 @@ describe('topicIndexPageQuery language scoping', () => {
         locale,
       );
 
-      expect(result).toMatchObject({ headingBlock: { heading } });
+      expect(result).toHaveProperty(HEADING_TEXT_PATH, heading);
     },
   );
 
@@ -148,9 +149,7 @@ describe('topicIndexPageQuery language scoping', () => {
         EN,
       );
 
-      expect(result).toMatchObject({
-        headingBlock: { heading: MOCK_EN_HEADING },
-      });
+      expect(result).toHaveProperty(HEADING_TEXT_PATH, MOCK_EN_HEADING);
     });
 
     it('resolves nothing for any other language', async () => {
@@ -171,8 +170,9 @@ describe('topicIndexPageQuery language scoping', () => {
       NL,
     );
 
-    expect(result).toMatchObject({
-      translations: [{ language: EN }, { language: NL }],
-    });
+    expect(result).toHaveProperty('translations', [
+      { language: EN },
+      { language: NL },
+    ]);
   });
 });

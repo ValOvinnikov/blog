@@ -15,7 +15,7 @@ const MOCK_APEX_TAG_ID = faker.string.uuid();
 const MOCK_BRAVO_TITLES = { [EN]: 'Bravo', [NL]: 'Alef' };
 const MOCK_APEX_TITLES = { [EN]: 'Apex', [NL]: 'Zeta' };
 
-const TAG_DOCUMENTS = [
+const MOCK_TAG_DOCUMENTS = [
   {
     _id: MOCK_BRAVO_TAG_ID,
     _type: 'blog_tag',
@@ -29,7 +29,7 @@ const TAG_DOCUMENTS = [
 ];
 
 function idsIn(locale: string): Promise<string[]> {
-  return evaluateGroqIds(tagsQuery.query, TAG_DOCUMENTS, {
+  return evaluateGroqIds(tagsQuery.query, MOCK_TAG_DOCUMENTS, {
     locale,
     defaultLocale: EN,
   });

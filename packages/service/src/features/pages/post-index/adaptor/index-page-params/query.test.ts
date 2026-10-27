@@ -11,6 +11,7 @@ import { indexPageParamsQuery } from './query';
 faker.seed(6021);
 
 const { EN } = LOCALE_ISO_CODES;
+const MOCK_HEADING = faker.lorem.words(2);
 const MOCK_PUBLISHED_AT = '2026-01-01T00:00:00Z';
 const MOCK_SCHEDULED_AT = '2999-01-01T00:00:00Z';
 
@@ -37,7 +38,7 @@ describe('indexPageParamsQuery', () => {
     const dataset = [
       mockIndexPageDocument({
         _type: 'page_postIndex',
-        heading: faker.lorem.words(2),
+        heading: MOCK_HEADING,
         language: EN,
       }),
       mockPost(MOCK_PUBLISHED_AT),
@@ -47,6 +48,6 @@ describe('indexPageParamsQuery', () => {
 
     expect(
       await evaluateGroqInLocale(indexPageParamsQuery.query, dataset, EN),
-    ).toMatchObject({ blogPosts: { total: 2 } });
+    ).toHaveProperty('blogPosts.total', 2);
   });
 });

@@ -13,6 +13,7 @@ import {
 import {
   mockRawHeadingBlock,
   mockReference,
+  mockSlug,
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
@@ -34,10 +35,10 @@ const MOCK_TEMPLATE_ID = faker.string.uuid();
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_EN_HEADING = faker.lorem.words(2);
 const MOCK_NL_HEADING = faker.lorem.words(3);
-const MOCK_LEGACY_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_SECTION_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_FAQ_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
-const MOCK_ANSWERS_SLUG = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_LEGACY_SLUG = mockSlug();
+const MOCK_SECTION_SLUG = mockSlug();
+const MOCK_FAQ_SLUG = mockSlug();
+const MOCK_ANSWERS_SLUG = mockSlug();
 const MOCK_SIDEBAR_TITLE = faker.lorem.words(2);
 const MOCK_FAQ_PATH = `${MOCK_SECTION_SLUG}/${MOCK_FAQ_SLUG}`;
 
@@ -49,6 +50,8 @@ function runAtPath(dataset: unknown[], segments: string[]): Promise<unknown> {
     defaultLocale: EN,
   });
 }
+
+const HEADING_TEXT_PATH = 'headingBlock.heading';
 
 describe('landingPageQuery', () => {
   it.each([
@@ -136,12 +139,14 @@ describe('landingPageQuery language scoping', () => {
   }
 
   it('resolves the same slug to a different page per language', async () => {
-    expect(await run(MOCK_ABOUT_SLUG, EN)).toMatchObject({
-      headingBlock: { heading: MOCK_EN_HEADING },
-    });
-    expect(await run(MOCK_ABOUT_SLUG, NL)).toMatchObject({
-      headingBlock: { heading: MOCK_NL_HEADING },
-    });
+    expect(await run(MOCK_ABOUT_SLUG, EN)).toHaveProperty(
+      HEADING_TEXT_PATH,
+      MOCK_EN_HEADING,
+    );
+    expect(await run(MOCK_ABOUT_SLUG, NL)).toHaveProperty(
+      HEADING_TEXT_PATH,
+      MOCK_NL_HEADING,
+    );
   });
 
   it('resolves nothing for a language the page is not authored in', async () => {
@@ -154,12 +159,10 @@ describe('landingPageQuery language scoping', () => {
   });
 
   it('returns the linked translations with their languages and slugs', async () => {
-    expect(await run(MOCK_ABOUT_SLUG, NL)).toMatchObject({
-      translations: [
-        { language: EN, slug: MOCK_ABOUT_SLUG },
-        { language: NL, slug: MOCK_ABOUT_SLUG },
-      ],
-    });
+    expect(await run(MOCK_ABOUT_SLUG, NL)).toHaveProperty('translations', [
+      { language: EN, slug: MOCK_ABOUT_SLUG },
+      { language: NL, slug: MOCK_ABOUT_SLUG },
+    ]);
   });
 });
 
@@ -208,20 +211,26 @@ describe('landingPageQuery template layout', () => {
   it.each([EN, NL])(
     'resolves the hero and modules of the template the %s page references',
     async (locale) => {
-      expect(await run(dataset, locale)).toMatchObject({
-        hero: { _id: MOCK_HERO_MODULE_ID, _type: 'module_heroStatement' },
-        modules: [mockRawContentRef(), mockRawCtaRef()],
+      const result = await run(dataset, locale);
+
+      expect(result).toHaveProperty('hero', {
+        _id: MOCK_HERO_MODULE_ID,
+        _type: 'module_heroStatement',
       });
+      expect(result).toHaveProperty('modules', [
+        mockRawContentRef(),
+        mockRawCtaRef(),
+      ]);
     },
   );
 
   it('resolves no hero and no modules for a page without a template', async () => {
     const withoutTemplate = [mockLandingDocument(MOCK_ABOUT_EN_PAGE_ID, EN)];
 
-    expect(await run(withoutTemplate, EN)).toMatchObject({
-      hero: null,
-      modules: null,
-    });
+    const result = await run(withoutTemplate, EN);
+
+    expect(result).toHaveProperty('hero', null);
+    expect(result).toHaveProperty('modules', null);
   });
 });
 
@@ -244,13 +253,11 @@ describe('landingPageQuery nested paths', () => {
   ];
 
   it('resolves a nested page at its full path', async () => {
-    expect(
-      await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
-    ).toMatchObject({
-      _id: MOCK_FAQ_SLUG,
-      path: MOCK_FAQ_PATH,
-      headingBlock: { heading: MOCK_FAQ_SLUG },
-    });
+    const result = await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]);
+
+    expect(result).toHaveProperty('_id', MOCK_FAQ_SLUG);
+    expect(result).toHaveProperty('path', MOCK_FAQ_PATH);
+    expect(result).toHaveProperty(HEADING_TEXT_PATH, MOCK_FAQ_SLUG);
   });
 
   it('resolves nothing for a nested page at its bare slug', async () => {
@@ -264,9 +271,10 @@ describe('landingPageQuery nested paths', () => {
   });
 
   it('resolves a top-level page at its slug', async () => {
-    expect(await runAtPath(dataset, [MOCK_PRICING_SLUG])).toMatchObject({
-      path: MOCK_PRICING_SLUG,
-    });
+    expect(await runAtPath(dataset, [MOCK_PRICING_SLUG])).toHaveProperty(
+      'path',
+      MOCK_PRICING_SLUG,
+    );
   });
 });
 
@@ -321,6 +329,43 @@ describe('landingPageQuery section chain', () => {
     mockLandingDocument(MOCK_ANSWERS_SLUG, { parent: MOCK_FAQ_SLUG }),
   ];
 
+  function mockChainEntry(
+    id: string,
+    path: string,
+    overrides: Record<string, unknown> = {},
+  ) {
+    return {
+      _id: id,
+      path,
+      title: `${id} heading`,
+      sectionNavigation: false,
+      sectionNavigationTitle: null,
+      children: null,
+      ...overrides,
+    };
+  }
+
+  const sectionRootEntry = mockChainEntry(
+    MOCK_SECTION_SLUG,
+    MOCK_SECTION_SLUG,
+    {
+      sectionNavigation: true,
+      sectionNavigationTitle: MOCK_SIDEBAR_TITLE,
+      children: [
+        {
+          _id: MOCK_FAQ_SLUG,
+          title: `${MOCK_FAQ_SLUG} heading`,
+          path: MOCK_FAQ_PATH,
+        },
+        {
+          _id: MOCK_PRICING_SLUG,
+          title: `${MOCK_PRICING_SLUG} heading`,
+          path: `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`,
+        },
+      ],
+    },
+  );
+
   it('returns the page and its ancestors, nearest first', async () => {
     expect(
       await runAtPath(dataset, [
@@ -328,53 +373,22 @@ describe('landingPageQuery section chain', () => {
         MOCK_FAQ_SLUG,
         MOCK_ANSWERS_SLUG,
       ]),
-    ).toMatchObject({
-      sectionChain: [
-        {
-          _id: MOCK_ANSWERS_SLUG,
-          path: `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`,
-        },
-        { _id: MOCK_FAQ_SLUG, path: MOCK_FAQ_PATH },
-        { _id: MOCK_SECTION_SLUG, path: MOCK_SECTION_SLUG },
-      ],
-    });
+    ).toHaveProperty('sectionChain', [
+      mockChainEntry(
+        MOCK_ANSWERS_SLUG,
+        `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`,
+      ),
+      mockChainEntry(MOCK_FAQ_SLUG, MOCK_FAQ_PATH),
+      sectionRootEntry,
+    ]);
   });
 
   it("returns a section root's children in drag order, in the page's language", async () => {
     expect(
       await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
-    ).toMatchObject({
-      sectionChain: [
-        { _id: MOCK_FAQ_SLUG, sectionNavigation: false, children: null },
-        {
-          _id: MOCK_SECTION_SLUG,
-          title: `${MOCK_SECTION_SLUG} heading`,
-          sectionNavigation: true,
-          children: [
-            {
-              _id: MOCK_FAQ_SLUG,
-              title: `${MOCK_FAQ_SLUG} heading`,
-              path: MOCK_FAQ_PATH,
-            },
-            {
-              _id: MOCK_PRICING_SLUG,
-              title: `${MOCK_PRICING_SLUG} heading`,
-              path: `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`,
-            },
-          ],
-        },
-      ],
-    });
-  });
-
-  it("returns each page's sidebar title, or null where none is set", async () => {
-    expect(
-      await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
-    ).toMatchObject({
-      sectionChain: [
-        { _id: MOCK_FAQ_SLUG, sectionNavigationTitle: null },
-        { _id: MOCK_SECTION_SLUG, sectionNavigationTitle: MOCK_SIDEBAR_TITLE },
-      ],
-    });
+    ).toHaveProperty('sectionChain', [
+      mockChainEntry(MOCK_FAQ_SLUG, MOCK_FAQ_PATH),
+      sectionRootEntry,
+    ]);
   });
 });

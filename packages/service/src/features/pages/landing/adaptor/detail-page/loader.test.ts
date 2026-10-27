@@ -17,6 +17,7 @@ import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
   mockRawSeo,
+  mockSlug,
 } from '@blog/service/testing/shared/fixtures';
 import {
   MOCK_ABOUT_SLUG,
@@ -35,10 +36,6 @@ faker.seed(6015109);
 const tenant = mockTenant();
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_SIDEBAR_TITLE = faker.lorem.words(2);
-
-function mockSlug() {
-  return faker.string.alpha({ length: 8, casing: 'lower' });
-}
 
 const MOCK_SECTION_SLUG = mockSlug();
 const MOCK_FAQ_SLUG = mockSlug();

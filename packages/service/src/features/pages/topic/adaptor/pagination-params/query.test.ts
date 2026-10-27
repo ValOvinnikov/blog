@@ -65,9 +65,9 @@ describe('topicPaginationParamsQuery', () => {
       { locales: [EN, NL] },
     );
 
-    expect(result).toMatchObject([
-      { slug: MOCK_EN_SLUG, language: EN, postCount: 3 },
-      { slug: MOCK_NL_SLUG, language: NL, postCount: 1 },
+    expect(result).toEqual([
+      { slug: MOCK_EN_SLUG, language: EN, postCount: 3, moduleRefs: null },
+      { slug: MOCK_NL_SLUG, language: NL, postCount: 1, moduleRefs: null },
     ]);
   });
 });

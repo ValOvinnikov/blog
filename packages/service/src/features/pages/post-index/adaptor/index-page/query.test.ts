@@ -15,6 +15,8 @@ import { blogPageQuery } from './query';
 
 faker.seed(6023);
 
+const HEADING_TEXT_PATH = 'headingBlock.heading';
+
 describe('blogPageQuery', () => {
   it.each([
     ['with no modules set', mockRawBlogPage({ modules: null })],
@@ -40,30 +42,26 @@ describe('blogPageQuery template layout', () => {
   const dataset = mockTemplateLayoutDocuments({ _type: 'template_postIndex' });
 
   it('resolves the hero and modules of the referenced template', async () => {
-    expect(
-      await evaluateGroqInLocale(blogPageQuery.query, [
-        mockTemplatedPageDocument({
-          _type: 'page_postIndex',
-          template: templateRef,
-        }),
-        ...dataset,
-      ]),
-    ).toMatchObject({
-      hero: mockRawHeroRef(),
-      modules: [mockRawPostLatestRef()],
-    });
+    const result = await evaluateGroqInLocale(blogPageQuery.query, [
+      mockTemplatedPageDocument({
+        _type: 'page_postIndex',
+        template: templateRef,
+      }),
+      ...dataset,
+    ]);
+
+    expect(result).toHaveProperty('hero', mockRawHeroRef());
+    expect(result).toHaveProperty('modules', [mockRawPostLatestRef()]);
   });
 
   it('resolves no hero and no modules without a template', async () => {
-    expect(
-      await evaluateGroqInLocale(blogPageQuery.query, [
-        mockTemplatedPageDocument({ _type: 'page_postIndex' }),
-        ...dataset,
-      ]),
-    ).toMatchObject({
-      hero: null,
-      modules: null,
-    });
+    const result = await evaluateGroqInLocale(blogPageQuery.query, [
+      mockTemplatedPageDocument({ _type: 'page_postIndex' }),
+      ...dataset,
+    ]);
+
+    expect(result).toHaveProperty('hero', null);
+    expect(result).toHaveProperty('modules', null);
   });
 });
 
@@ -93,9 +91,7 @@ describe('blogPageQuery language scoping', () => {
     async (locale, heading) => {
       expect(
         await evaluateGroqInLocale(blogPageQuery.query, dataset, locale),
-      ).toMatchObject({
-        headingBlock: { heading },
-      });
+      ).toHaveProperty(HEADING_TEXT_PATH, heading);
     },
   );
 
@@ -115,9 +111,7 @@ describe('blogPageQuery language scoping', () => {
 
     expect(
       await evaluateGroqInLocale(blogPageQuery.query, legacy, EN),
-    ).toMatchObject({
-      headingBlock: { heading: MOCK_EN_HEADING },
-    });
+    ).toHaveProperty(HEADING_TEXT_PATH, MOCK_EN_HEADING);
     expect(
       await evaluateGroqInLocale(blogPageQuery.query, legacy, NL),
     ).toBeNull();
@@ -126,8 +120,6 @@ describe('blogPageQuery language scoping', () => {
   it('lists the language of every blog page as its translations', async () => {
     expect(
       await evaluateGroqInLocale(blogPageQuery.query, dataset, NL),
-    ).toMatchObject({
-      translations: [{ language: EN }, { language: NL }],
-    });
+    ).toHaveProperty('translations', [{ language: EN }, { language: NL }]);
   });
 });
