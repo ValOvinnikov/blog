@@ -71,7 +71,11 @@ describe(`<${PricingModule.name}/>`, () => {
   it.each([
     { title: 'without trailing zeros', amount: 49, formatted: '£49' },
     { title: 'with its fraction', amount: 49.99, formatted: '£49.99' },
-    { title: 'as free', amount: 0, formatted: SITE_MESSAGES.pricingModule.free },
+    {
+      title: 'as free',
+      amount: 0,
+      formatted: SITE_MESSAGES.pricingModule.free,
+    },
   ])(
     'formats a price of $amount in the site currency $title',
     async ({ amount, formatted }) => {

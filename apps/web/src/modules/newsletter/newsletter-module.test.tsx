@@ -43,6 +43,11 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
+faker.seed(6011);
+
+const MOCK_FIRST_CUE = faker.lorem.words(2);
+const MOCK_SECOND_CUE = faker.lorem.words(3);
+
 const setup = customRenderAsync(NewsletterModule, {
   id: MOCK_NEWSLETTER_MODULE_ID,
 });
@@ -55,18 +60,19 @@ describe(`<${NewsletterModule.name}/>`, () => {
   });
 
   it("renders the module's own trust cues in the form", async () => {
-    const firstCue = faker.lorem.words(2);
-    const secondCue = faker.lorem.words(3);
     getNewsletterMock.mockResolvedValue(
-      okResult(mockNewsletterModule({ trustCues: [firstCue, secondCue] })),
+      okResult(
+        mockNewsletterModule({ trustCues: [MOCK_FIRST_CUE, MOCK_SECOND_CUE] }),
+      ),
     );
 
     await setup();
 
-    const firstCueElement = screen.getByText(firstCue);
-    const secondCueElement = screen.getByText(secondCue);
-    expect(firstCueElement).toBeVisible();
-    expect(secondCueElement).toBeVisible();
+    const firstCue = screen.getByText(MOCK_FIRST_CUE);
+    const secondCue = screen.getByText(MOCK_SECOND_CUE);
+
+    expect(firstCue).toBeVisible();
+    expect(secondCue).toBeVisible();
   });
 
   it.each<[string, () => void]>([

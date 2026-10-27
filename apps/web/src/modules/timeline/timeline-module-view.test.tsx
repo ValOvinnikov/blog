@@ -21,10 +21,7 @@ const MOCK_DATA_TEST_ID = faker.lorem.slug();
 const MOCK_TITLE_ID = faker.lorem.slug();
 const MOCK_ITEM_HEADING = faker.lorem.words(3);
 const MOCK_MARKERS = faker.helpers.uniqueArray(faker.lorem.word, 8);
-const MOCK_HEADINGS = faker.helpers.uniqueArray(
-  () => faker.lorem.words(3),
-  8,
-);
+const MOCK_HEADINGS = faker.helpers.uniqueArray(() => faker.lorem.words(3), 8);
 const HORIZONTAL_TIMELINE_TEST_ID = `${MOCK_DATA_TEST_ID}-timeline-horizontal`;
 const VERTICAL_TIMELINE_TEST_ID = `${MOCK_DATA_TEST_ID}-timeline-vertical`;
 const DEFAULT_ITEM_COUNT = 3;
@@ -121,7 +118,9 @@ describe(`<${TimelineModuleView.name}/>`, () => {
 
   it('renders an item without a body', () => {
     setup({
-      items: [mockTimelineItem({ heading: MOCK_ITEM_HEADING, body: undefined })],
+      items: [
+        mockTimelineItem({ heading: MOCK_ITEM_HEADING, body: undefined }),
+      ],
     });
 
     const heading = screen.getByRole('heading', { name: MOCK_ITEM_HEADING });
