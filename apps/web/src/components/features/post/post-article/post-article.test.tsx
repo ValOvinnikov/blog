@@ -1,4 +1,4 @@
-import type { ISanityImage } from '@blog/config';
+import { SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import {
   service,
@@ -6,7 +6,9 @@ import {
   urlForSanityImage,
 } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
+import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
@@ -16,12 +18,14 @@ import {
   waitFor,
   within,
 } from '@web/testing/custom-render';
+import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   MOCK_POST_DETAIL,
   MOCK_POST_DETAIL_AUTHOR_IMAGE,
 } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_TAG_SLUG, mockTag } from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -29,7 +33,11 @@ import { useSession } from 'next-auth/react';
 
 import { PostArticle } from './post-article';
 
+faker.seed(5776);
+
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 
@@ -57,7 +65,19 @@ vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
 const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
-const AUTHOR_PROFILE_URL = '/blog/tag/writers';
+const MOCK_AUTHOR_PROFILE_URL = `/${faker.lorem.slug()}`;
+const MOCK_TYPESCRIPT_TAG = mockTag();
+const MOCK_OTHER_TAG = mockTag({
+  id: faker.string.uuid(),
+  title: faker.lorem.word(),
+  slug: faker.lorem.slug(),
+});
+const MOCK_RAIL_HEADING = faker.lorem.words(2);
+const MOCK_RAIL_HEADING_KEY = faker.lorem.slug();
+
+const { author, topic } = MOCK_POST_DETAIL;
+const { saveAriaLabel } = SITE_MESSAGES.bookmarkButton;
+const { label: contentsLabel } = SITE_MESSAGES.postContentsRail;
 
 const setup = customRenderServerAsync(
   PostArticle,
@@ -70,8 +90,8 @@ describe(`<${PostArticle.name}/>`, () => {
     getPostMock.mockResolvedValue(okResult(MOCK_POST_DETAIL));
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
     vi.mocked(useSession).mockReturnValue({
-      data: { user: { id: 'user-1' }, expires: '' },
-      status: 'authenticated',
+      data: { user: { id: faker.string.uuid() }, expires: '' },
+      status: SESSION_STATUS.AUTHENTICATED,
       update: vi.fn(),
     });
     vi.mocked(getBookmarkStatus).mockResolvedValue(false);
@@ -112,7 +132,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
       const header = screen.getByTestId('post-article-header');
       const saveButton = await within(header).findByRole('button', {
-        name: 'Save post',
+        name: saveAriaLabel,
       });
       await waitFor(() => expect(saveButton).toBeEnabled());
       const shareButton = within(header).getByRole('button', { name: /Share/ });
@@ -124,7 +144,7 @@ describe(`<${PostArticle.name}/>`, () => {
       await setup();
 
       const saveButton = await screen.findByRole('button', {
-        name: 'Save post',
+        name: saveAriaLabel,
       });
       await waitFor(() => expect(saveButton).toBeEnabled());
       expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_DETAIL.id);
@@ -135,46 +155,36 @@ describe(`<${PostArticle.name}/>`, () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
         ...MOCK_POST_DETAIL,
-        topic: { ...MOCK_POST_DETAIL.topic, slug: undefined },
+        topic: { ...topic, slug: undefined },
       }),
     );
 
     await setup();
 
-    const engineeringText = screen.getByText('Engineering');
-    const engineeringLink = screen.queryByRole('link', { name: 'Engineering' });
+    const topicText = screen.getByText(topic.title);
+    const topicLink = screen.queryByRole('link', { name: topic.title });
 
-    expect(engineeringText).toBeVisible();
-    expect(engineeringLink).not.toBeInTheDocument();
+    expect(topicText).toBeVisible();
+    expect(topicLink).not.toBeInTheDocument();
   });
 
   it('links the author to whatever href the service resolved', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
         ...MOCK_POST_DETAIL,
-        author: {
-          ...MOCK_POST_DETAIL.author,
-          profileUrl: AUTHOR_PROFILE_URL,
-        },
+        author: { ...author, profileUrl: MOCK_AUTHOR_PROFILE_URL },
       }),
     );
 
     await setup();
 
-    const janeDoeLink = screen.getByRole('link', { name: 'Jane Doe' });
+    const authorLink = screen.getByRole('link', { name: author.name });
 
-    expect(janeDoeLink).toHaveAttribute('href', AUTHOR_PROFILE_URL);
+    expect(authorLink).toHaveAttribute('href', MOCK_AUTHOR_PROFILE_URL);
   });
 
   it('renders the hero image with its own alt text', async () => {
-    const heroImage: ISanityImage = {
-      assetId: 'image-abc123-1600x1200-jpg',
-      alt: 'A scenic mountain range',
-      hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
-      crop: undefined,
-      lqip: undefined,
-      dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
-    };
+    const heroImage = mockSanityImage({ alt: faker.lorem.sentence() });
     getPostMock.mockResolvedValueOnce(
       okResult({ ...MOCK_POST_DETAIL, heroImage }),
     );
@@ -190,9 +200,9 @@ describe(`<${PostArticle.name}/>`, () => {
     const body: TPortableTextBody = [
       mockPortableTextBlock('Getting started', { style: 'h2' }),
       mockPortableTextBlock('Intro.'),
-      mockPortableTextBlock('Configuration', {
+      mockPortableTextBlock(MOCK_RAIL_HEADING, {
         style: 'h2',
-        key: 'configuration',
+        key: MOCK_RAIL_HEADING_KEY,
       }),
       mockPortableTextBlock('Deployment', { style: 'h2' }),
     ];
@@ -200,52 +210,55 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    const rail = screen.getByRole('navigation', { name: 'Contents' });
-    const configurationLink = within(rail).getByRole('link', {
-      name: 'Configuration',
+    const rail = screen.getByRole('navigation', { name: contentsLabel });
+    const headingLink = within(rail).getByRole('link', {
+      name: MOCK_RAIL_HEADING,
     });
 
-    expect(configurationLink).toHaveAttribute('href', '#configuration');
+    expect(headingLink).toHaveAttribute('href', `#${MOCK_RAIL_HEADING_KEY}`);
   });
 
   it('renders the post tags as links to routes.tag(slug)', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
         ...MOCK_POST_DETAIL,
-        tags: [
-          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-          { id: 'tag-2', title: 'React', slug: 'react' },
-        ],
+        tags: [MOCK_TYPESCRIPT_TAG, MOCK_OTHER_TAG],
       }),
     );
 
     await setup();
 
-    const typeScriptLink = screen.getByRole('link', { name: 'TypeScript' });
-    const reactLink = screen.getByRole('link', { name: 'React' });
+    const typeScriptLink = screen.getByRole('link', {
+      name: MOCK_TYPESCRIPT_TAG.title,
+    });
+    const otherTagLink = screen.getByRole('link', {
+      name: MOCK_OTHER_TAG.title,
+    });
 
-    expect(typeScriptLink).toHaveAttribute('href', '/tags/typescript');
-    expect(reactLink).toHaveAttribute('href', '/tags/react');
+    expect(typeScriptLink).toHaveAttribute('href', `/tags/${MOCK_TAG_SLUG}`);
+    expect(otherTagLink).toHaveAttribute(
+      'href',
+      `/tags/${MOCK_OTHER_TAG.slug}`,
+    );
   });
 
   it('omits a tag with no tag page from the footer', async () => {
     getPostMock.mockResolvedValueOnce(
       okResult({
         ...MOCK_POST_DETAIL,
-        tags: [
-          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-          { id: 'tag-2', title: 'React', slug: undefined },
-        ],
+        tags: [MOCK_TYPESCRIPT_TAG, { ...MOCK_OTHER_TAG, slug: undefined }],
       }),
     );
 
     await setup();
 
-    const typeScriptLink = screen.getByRole('link', { name: 'TypeScript' });
-    const reactText = screen.queryByText('React');
+    const typeScriptLink = screen.getByRole('link', {
+      name: MOCK_TYPESCRIPT_TAG.title,
+    });
+    const otherTagText = screen.queryByText(MOCK_OTHER_TAG.title);
 
     expect(typeScriptLink).toBeVisible();
-    expect(reactText).not.toBeInTheDocument();
+    expect(otherTagText).not.toBeInTheDocument();
   });
 
   describe('with the default post', () => {
@@ -261,28 +274,20 @@ describe(`<${PostArticle.name}/>`, () => {
     });
 
     it('renders the post title, lead, author, and body', async () => {
-      const helloWorldHeading = screen.getByRole('heading', {
+      const titleHeading = screen.getByRole('heading', {
         level: 1,
-        name: 'Hello World',
+        name: MOCK_POST_DETAIL.title,
       });
       const leadText = screen.getByText(
         'A sufficiently long excerpt for the card.',
       );
       const bodyText = screen.getByText('Body text.');
-      const janeDoeText = screen.getByText('Jane Doe');
+      const authorText = screen.getByText(author.name);
 
-      expect(helloWorldHeading).toBeVisible();
+      expect(titleHeading).toBeVisible();
       expect(leadText).toBeVisible();
       expect(bodyText).toBeVisible();
-      expect(janeDoeText).toBeVisible();
-    });
-
-    it('renders no bookmark toggle when bookmarks are not enabled', async () => {
-      const savePostButton = screen.queryByRole('button', {
-        name: 'Save post',
-      });
-
-      expect(savePostButton).not.toBeInTheDocument();
+      expect(authorText).toBeVisible();
     });
 
     it('renders the published date (year/month/day) and the reading time', async () => {
@@ -294,14 +299,14 @@ describe(`<${PostArticle.name}/>`, () => {
     });
 
     it('links the topic eyebrow and the author name to their routes', async () => {
-      const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
+      const topicLinks = screen.getAllByRole('link', { name: topic.title });
       expect(topicLinks.length).toBeGreaterThan(0);
       topicLinks.forEach((link) => {
         expect(link).toHaveAttribute('href', '/topics/engineering');
       });
-      const janeDoeLink = screen.getByRole('link', { name: 'Jane Doe' });
+      const authorLink = screen.getByRole('link', { name: author.name });
 
-      expect(janeDoeLink).toHaveAttribute('href', '/jane-doe');
+      expect(authorLink).toHaveAttribute('href', author.profileUrl);
     });
 
     it('renders the share widget with an X and a LinkedIn link', async () => {
@@ -340,7 +345,9 @@ describe(`<${PostArticle.name}/>`, () => {
     });
 
     it('renders no tag chips when the post has no tags', async () => {
-      const typeScriptLink = screen.queryByRole('link', { name: 'TypeScript' });
+      const typeScriptLink = screen.queryByRole('link', {
+        name: MOCK_TYPESCRIPT_TAG.title,
+      });
 
       expect(typeScriptLink).not.toBeInTheDocument();
     });

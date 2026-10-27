@@ -1,6 +1,8 @@
+import { SITE_MESSAGES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
@@ -9,13 +11,18 @@ import {
 } from '@web/testing/custom-render';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { BlogPostPage } from './blog-post-page';
 
+faker.seed(5776);
+
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
@@ -45,7 +52,15 @@ vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
 
 const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
-const SUMMARY_REGION_NAME = '30-second summary';
+const MOCK_MISSING_SLUG = faker.lorem.slug();
+const MOCK_FIRST_TAKEAWAY = faker.lorem.sentence();
+const MOCK_TAKEAWAYS = [
+  MOCK_FIRST_TAKEAWAY,
+  faker.lorem.sentence(),
+  faker.lorem.sentence(),
+];
+
+const { depthToggle, skimPanel } = SITE_MESSAGES.blogPostPage;
 
 const setup = customRenderServerAsync(BlogPostPage, {
   slug: MOCK_POST_DETAIL.slug,
@@ -73,18 +88,18 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     it('renders the breadcrumb trail outside main', () => {
       const breadcrumbs = screen.getByRole('navigation', {
-        name: 'Breadcrumb',
+        name: SITE_MESSAGES.breadcrumbs.ariaLabel,
       });
-      const northwindJournalLink = within(breadcrumbs).getByRole('link', {
-        name: 'Northwind Journal',
+      const brandLink = within(breadcrumbs).getByRole('link', {
+        name: MOCK_SITE_SETTINGS.brand.name,
       });
-      const engineeringLink = within(breadcrumbs).getByRole('link', {
-        name: 'Engineering',
+      const topicLink = within(breadcrumbs).getByRole('link', {
+        name: MOCK_POST_DETAIL.topic.title,
       });
       const main = screen.getByRole('main');
 
-      expect(northwindJournalLink).toBeVisible();
-      expect(engineeringLink).toBeVisible();
+      expect(brandLink).toBeVisible();
+      expect(topicLink).toBeVisible();
       expect(main).not.toContainElement(breadcrumbs);
     });
 
@@ -114,7 +129,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     it('renders no reading-depth control without a skim or asides', () => {
       const radiogroup = screen.queryByRole('radiogroup');
       const summaryRegion = screen.queryByRole('region', {
-        name: SUMMARY_REGION_NAME,
+        name: skimPanel.label,
       });
 
       expect(radiogroup).not.toBeInTheDocument();
@@ -125,7 +140,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   it('calls notFound() without logging when no page_post matches the slug', async () => {
     getPostMock.mockResolvedValueOnce(okResult());
 
-    await expect(setup({ slug: 'missing' })).rejects.toThrow(
+    await expect(setup({ slug: MOCK_MISSING_SLUG })).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
@@ -152,7 +167,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    const deepRadio = screen.getByRole('radio', { name: 'Deep' });
+    const deepRadio = screen.getByRole('radio', { name: depthToggle.deep });
 
     expect(deepRadio).toBeVisible();
   });
@@ -163,7 +178,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
         ...MOCK_POST_DETAIL,
         modules: [],
         postTakeaways: {
-          takeaways: ['First.', 'Second.', 'Third.'],
+          takeaways: MOCK_TAKEAWAYS,
           generatedAt: '2026-01-01T00:00:00.000Z',
           model: 'claude-haiku-4-5',
         },
@@ -172,14 +187,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    const thirtySecondRadio = screen.getByRole('radio', { name: '30s' });
+    const thirtySecondRadio = screen.getByRole('radio', {
+      name: depthToggle.skim,
+    });
+    const main = screen.getByRole('main');
+    const skim = within(main).getByRole('region', { name: skimPanel.label });
+    const firstText = within(skim).getByText(MOCK_FIRST_TAKEAWAY);
 
     expect(thirtySecondRadio).toBeVisible();
-    const skim = within(screen.getByRole('main')).getByRole('region', {
-      name: SUMMARY_REGION_NAME,
-    });
-    const firstText = within(skim).getByText('First.');
-
     expect(firstText).toBeVisible();
   });
 });
