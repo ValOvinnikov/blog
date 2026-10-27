@@ -1,75 +1,39 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@blog/config';
 import {
   type TPostDetail,
   type TSanityProjectRef,
   urlForSanityImage,
 } from '@blog/service';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
+import { faker } from '@faker-js/faker';
+import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 
 import { buildBlogPostingSchema } from './build-blog-posting-schema';
 
-const POST_TITLE = 'Hello World';
-const POST_EXCERPT = 'A sufficiently long excerpt for the post.';
-const PUBLISHED_AT = '2026-01-15T00:00:00Z';
-const BASE_URL = 'https://example.com';
-const CUSTOM_DOMAIN_URL = 'https://blog.example.com';
-const NL_POST_SLUG = 'mijn-artikel';
+faker.seed(101);
 
-const project: TSanityProjectRef = {
-  projectId: 'test-project',
-  dataset: 'test-dataset',
+const MOCK_NL_POST_SLUG = faker.lorem.slug();
+const MOCK_BASE_URL = faker.internet.url({ appendSlash: false });
+const MOCK_CUSTOM_DOMAIN_URL = faker.internet.url({ appendSlash: false });
+const [MOCK_FIRST_TAG_TITLE, MOCK_SECOND_TAG_TITLE] = faker.helpers.uniqueArray(
+  faker.lorem.word,
+  2,
+);
+
+const MOCK_PROJECT: TSanityProjectRef = {
+  projectId: faker.string.alphanumeric(8),
+  dataset: faker.lorem.word(),
 };
 
 const { EN, NL } = LOCALE_ISO_CODES;
 const DEFAULT_LANGUAGE = { locale: EN, defaultLocale: EN };
 
-const heroImage = mockSanityImage();
-
-const post: TPostDetail = {
-  id: 'post-1',
-  title: POST_TITLE,
-  slug: 'hello-world',
-  excerpt: POST_EXCERPT,
-  publishedAt: PUBLISHED_AT,
-  heroImage,
-  featured: false,
-  body: [],
-  postTakeaways: undefined,
-  hasAsides: false,
-  modules: [],
-  seo: mockSeo({
-    title: POST_TITLE,
-    description: POST_EXCERPT,
-    ogTitle: POST_TITLE,
-    ogDescription: POST_EXCERPT,
-    ogImage: heroImage,
-  }),
-  author: {
-    id: 'author-1',
-    name: 'Jane Doe',
-    profileUrl: '/jane-doe',
-    image: undefined,
-    role: undefined,
-    bio: undefined,
-    socialLinks: [],
-  },
-  topic: {
-    id: 'topic-1',
-    title: 'News',
-    slug: 'news',
-    description: undefined,
-  },
-  tags: [],
-  readingTimeMinutes: 4,
-  translations: [],
-};
+const { title, excerpt, publishedAt, slug, author } = MOCK_POST_DETAIL;
 
 const buildInDefaultLanguage = (overrides: Partial<TPostDetail> = {}) =>
   buildBlogPostingSchema(
-    { ...post, ...overrides },
-    new URL(BASE_URL),
-    project,
+    { ...MOCK_POST_DETAIL, ...overrides },
+    new URL(MOCK_BASE_URL),
+    MOCK_PROJECT,
     DEFAULT_LANGUAGE,
   );
 
@@ -80,15 +44,15 @@ describe(buildBlogPostingSchema, () => {
     expect(schema).toEqual({
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
-      headline: POST_TITLE,
-      description: POST_EXCERPT,
-      image: urlForSanityImage(heroImage, project),
-      datePublished: PUBLISHED_AT,
-      dateModified: PUBLISHED_AT,
-      author: { '@type': 'Person', name: 'Jane Doe' },
-      url: 'https://example.com/blog/hello-world',
+      headline: title,
+      description: excerpt,
+      image: urlForSanityImage(MOCK_POST_DETAIL.heroImage!, MOCK_PROJECT),
+      datePublished: publishedAt,
+      dateModified: publishedAt,
+      author: { '@type': 'Person', name: author.name },
+      url: `${MOCK_BASE_URL}${routes.post(slug)}`,
       keywords: undefined,
-      inLanguage: 'en',
+      inLanguage: LOCALE_BCP47_TAGS.EN,
     });
   });
 
@@ -98,52 +62,64 @@ describe(buildBlogPostingSchema, () => {
     expect(schema?.image).toBeUndefined();
   });
 
-  describe('for a post in a non-default language', () => {
-    let schema: ReturnType<typeof buildBlogPostingSchema>;
+  it('omits description when the post has no excerpt', () => {
+    const schema = buildInDefaultLanguage({ excerpt: undefined });
 
-    beforeEach(() => {
-      schema = buildBlogPostingSchema(
-        { ...post, slug: NL_POST_SLUG },
-        new URL(CUSTOM_DOMAIN_URL),
-        project,
-        { locale: NL, defaultLocale: EN },
-      );
+    expect(schema?.description).toBeUndefined();
+  });
+
+  it('builds comma-separated keywords from the post tags', () => {
+    const schema = buildInDefaultLanguage({
+      tags: [
+        {
+          id: faker.string.uuid(),
+          title: MOCK_FIRST_TAG_TITLE!,
+          slug: faker.lorem.slug(),
+        },
+        {
+          id: faker.string.uuid(),
+          title: MOCK_SECOND_TAG_TITLE!,
+          slug: faker.lorem.slug(),
+        },
+      ],
     });
 
-    it('prefixes the url with the post language when it is not the default', () => {
-      expect(schema?.url).toBe('https://blog.example.com/nl/blog/mijn-artikel');
-    });
-
-    it('sets inLanguage to the language of a non-default post', () => {
-      expect(schema?.inLanguage).toBe('nl');
-    });
+    expect(schema?.keywords).toBe(
+      `${MOCK_FIRST_TAG_TITLE}, ${MOCK_SECOND_TAG_TITLE}`,
+    );
   });
 
   it('returns undefined when there is no base URL', () => {
     const schema = buildBlogPostingSchema(
-      post,
+      MOCK_POST_DETAIL,
       undefined,
-      project,
+      MOCK_PROJECT,
       DEFAULT_LANGUAGE,
     );
 
     expect(schema).toBeUndefined();
   });
 
-  it('builds comma-separated keywords from the post tags', () => {
-    const schema = buildInDefaultLanguage({
-      tags: [
-        { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-        { id: 'tag-2', title: 'React', slug: 'react' },
-      ],
+  describe('for a post in a non-default language', () => {
+    let schema: ReturnType<typeof buildBlogPostingSchema>;
+
+    beforeEach(() => {
+      schema = buildBlogPostingSchema(
+        { ...MOCK_POST_DETAIL, slug: MOCK_NL_POST_SLUG },
+        new URL(MOCK_CUSTOM_DOMAIN_URL),
+        MOCK_PROJECT,
+        { locale: NL, defaultLocale: EN },
+      );
     });
 
-    expect(schema?.keywords).toBe('TypeScript, React');
-  });
+    it('prefixes the url with the post language', () => {
+      expect(schema?.url).toBe(
+        `${MOCK_CUSTOM_DOMAIN_URL}/${LOCALE_BCP47_TAGS.NL}${routes.post(MOCK_NL_POST_SLUG)}`,
+      );
+    });
 
-  it('omits description for a sparse post without throwing', () => {
-    const schema = buildInDefaultLanguage({ excerpt: undefined });
-
-    expect(schema?.description).toBeUndefined();
+    it('sets inLanguage to the post language', () => {
+      expect(schema?.inLanguage).toBe(LOCALE_BCP47_TAGS.NL);
+    });
   });
 });

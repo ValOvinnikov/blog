@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 
@@ -8,20 +9,24 @@ vi.mock('@web/utils/resolve-tenant-messages', () => ({
   resolveTenantMessages: vi.fn(),
 }));
 
-const EN_HEADING = 'Lost at sea';
-const EN_SUPPORTING_TEXT = 'Nothing lives at this address.';
-const NL_HEADING = 'Verdwaald';
-const NL_SUPPORTING_TEXT = 'Hier woont niets.';
+faker.seed(5201);
 
-const withNotFoundOverrides = (
-  heading: string,
-  supportingText: string,
-): Awaited<ReturnType<typeof resolveTenantMessages>> => {
+const MOCK_HEADING = faker.lorem.words(3);
+const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
+
+const withNotFoundOverrides = (): Awaited<
+  ReturnType<typeof resolveTenantMessages>
+> => {
   const base = SITE_MESSAGES_BY_LOCALE.EN;
+
   return {
     messages: {
       ...base,
-      notFound: { ...base.notFound, heading, supportingText },
+      notFound: {
+        ...base.notFound,
+        heading: MOCK_HEADING,
+        supportingText: MOCK_SUPPORTING_TEXT,
+      },
     },
     rich: {} as Awaited<ReturnType<typeof resolveTenantMessages>>['rich'],
   };
@@ -37,22 +42,11 @@ describe(buildNotFoundMetadata, () => {
     expect(resolveTenantMessages).not.toHaveBeenCalled();
   });
 
-  it.each([
-    {
-      locale: LOCALE_ISO_CODES.EN,
-      heading: EN_HEADING,
-      supportingText: EN_SUPPORTING_TEXT,
-    },
-    {
-      locale: LOCALE_ISO_CODES.NL,
-      heading: NL_HEADING,
-      supportingText: NL_SUPPORTING_TEXT,
-    },
-  ])(
-    'uses the tenant’s $locale voice overrides for the title and description',
-    async ({ locale, heading, supportingText }) => {
+  it.each([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL])(
+    'uses the tenant’s %s voice overrides for the title and description',
+    async (locale) => {
       vi.mocked(resolveTenantMessages).mockResolvedValue(
-        withNotFoundOverrides(heading, supportingText),
+        withNotFoundOverrides(),
       );
 
       const metadata = await buildNotFoundMetadata({
@@ -60,7 +54,10 @@ describe(buildNotFoundMetadata, () => {
         locale,
       });
 
-      expect(metadata).toEqual({ title: heading, description: supportingText });
+      expect(metadata).toEqual({
+        title: MOCK_HEADING,
+        description: MOCK_SUPPORTING_TEXT,
+      });
       expect(resolveTenantMessages).toHaveBeenCalledWith(
         SITE_MESSAGES_BY_LOCALE[locale],
         locale,

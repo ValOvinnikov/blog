@@ -1,97 +1,125 @@
 /**
  * @vitest-environment jsdom
  */
+import { faker } from '@faker-js/faker';
 import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
 
-import { buildRssFeed, type TRssItem } from './build-rss-feed';
+import {
+  buildRssFeed,
+  type TRssChannel,
+  type TRssItem,
+} from './build-rss-feed';
 
-const FEED_URL = 'https://example.com/nl/rss.xml';
-const LATEST_PUBLISHED_AT = '2026-03-01T00:00:00Z';
+faker.seed(105);
 
-const channel = {
-  title: 'The Blog',
-  description: 'Latest posts',
-  link: 'https://example.com/nl',
-  language: 'nl',
-  feedUrl: FEED_URL,
+const MOCK_REF_DATE = '2026-06-01T00:00:00Z';
+const MOCK_OLDEST_PUBLISHED_AT = faker.date
+  .past({ refDate: MOCK_REF_DATE })
+  .toISOString();
+const MOCK_ITEM_PUBLISHED_AT = faker.date
+  .soon({ refDate: MOCK_OLDEST_PUBLISHED_AT })
+  .toISOString();
+const MOCK_NEWEST_PUBLISHED_AT = faker.date
+  .soon({ refDate: MOCK_ITEM_PUBLISHED_AT, days: 30 })
+  .toISOString();
+const MOCK_FEED_URL = faker.internet.url();
+
+const MOCK_CHANNEL: TRssChannel = {
+  title: faker.lorem.words(2),
+  description: faker.lorem.sentence(),
+  link: faker.internet.url(),
+  language: faker.location.language().alpha2,
+  feedUrl: MOCK_FEED_URL,
 };
 
-const item: TRssItem = {
-  title: 'Hello World',
-  link: 'https://example.com/blog/hello-world',
-  description: 'A sufficiently long excerpt.',
-  publishedAt: '2026-01-15T00:00:00Z',
+const MOCK_ITEM: TRssItem = {
+  title: faker.lorem.words(3),
+  link: faker.internet.url(),
+  description: faker.lorem.sentence(),
+  publishedAt: MOCK_ITEM_PUBLISHED_AT,
 };
+
+const [MOCK_FIRST_WORD, MOCK_SECOND_WORD] = faker.helpers.uniqueArray(
+  faker.lorem.word,
+  2,
+);
+const MOCK_UNSAFE_TITLE = `${MOCK_FIRST_WORD} & ${MOCK_SECOND_WORD} <script>`;
 
 describe(buildRssFeed, () => {
-  it('builds a valid RSS 2.0 document with channel metadata', () => {
-    const xml = buildRssFeed(channel, [item]);
+  it('writes the channel metadata', () => {
+    const { channel } = parseRssFeed(buildRssFeed(MOCK_CHANNEL, [MOCK_ITEM]));
 
-    expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
-    expect(xml).toContain('<title>The Blog</title>');
-    expect(xml).toContain('<link>https://example.com/nl</link>');
-    expect(xml).toContain('<description>Latest posts</description>');
-    expect(xml).toContain('<language>nl</language>');
+    expect(channel.title).toBe(MOCK_CHANNEL.title);
+    expect(channel.link).toBe(MOCK_CHANNEL.link);
+    expect(channel.description).toBe(MOCK_CHANNEL.description);
+    expect(channel.language).toBe(MOCK_CHANNEL.language);
   });
 
   it('links the channel to its own feed URL', () => {
-    const { selfLink } = parseRssFeed(buildRssFeed(channel, [item]));
+    const { selfLink } = parseRssFeed(buildRssFeed(MOCK_CHANNEL, [MOCK_ITEM]));
 
     expect(selfLink).toEqual({
-      href: FEED_URL,
+      href: MOCK_FEED_URL,
       rel: 'self',
       type: 'application/rss+xml',
     });
   });
 
   it("dates the build to the newest item's publication", () => {
-    const xml = buildRssFeed(channel, [
-      item,
-      { ...item, publishedAt: LATEST_PUBLISHED_AT },
-      { ...item, publishedAt: '2025-12-01T00:00:00Z' },
-    ]);
+    const { channel } = parseRssFeed(
+      buildRssFeed(MOCK_CHANNEL, [
+        MOCK_ITEM,
+        { ...MOCK_ITEM, publishedAt: MOCK_NEWEST_PUBLISHED_AT },
+        { ...MOCK_ITEM, publishedAt: MOCK_OLDEST_PUBLISHED_AT },
+      ]),
+    );
 
-    expect(xml).toContain(
-      `<lastBuildDate>${new Date(LATEST_PUBLISHED_AT).toUTCString()}</lastBuildDate>`,
+    expect(channel.lastBuildDate).toBe(
+      new Date(MOCK_NEWEST_PUBLISHED_AT).toUTCString(),
     );
   });
 
   it('renders each item with title, link, description and pubDate', () => {
-    const xml = buildRssFeed(channel, [item]);
+    const { items } = parseRssFeed(buildRssFeed(MOCK_CHANNEL, [MOCK_ITEM]));
 
-    expect(xml).toContain('<title>Hello World</title>');
-    expect(xml).toContain('<link>https://example.com/blog/hello-world</link>');
-    expect(xml).toContain(
-      '<description>A sufficiently long excerpt.</description>',
+    expect(items).toEqual([
+      {
+        title: MOCK_ITEM.title,
+        link: MOCK_ITEM.link,
+        guid: MOCK_ITEM.link,
+        description: MOCK_ITEM.description,
+        pubDate: new Date(MOCK_ITEM_PUBLISHED_AT).toUTCString(),
+      },
+    ]);
+  });
+
+  it('keeps XML-reserved characters in item titles intact and well-formed', () => {
+    const { isWellFormed, items } = parseRssFeed(
+      buildRssFeed(MOCK_CHANNEL, [{ ...MOCK_ITEM, title: MOCK_UNSAFE_TITLE }]),
     );
-    expect(xml).toContain(new Date(item.publishedAt).toUTCString());
+
+    expect(isWellFormed).toBe(true);
+    expect(items[0]?.title).toBe(MOCK_UNSAFE_TITLE);
   });
 
-  it('escapes XML-reserved characters in item titles', () => {
-    const xml = buildRssFeed(channel, [{ ...item, title: 'A & B <script>' }]);
+  it('omits the description of an item that has none', () => {
+    const { items } = parseRssFeed(
+      buildRssFeed(MOCK_CHANNEL, [{ ...MOCK_ITEM, description: undefined }]),
+    );
 
-    expect(xml).toContain('<title>A &amp; B &lt;script&gt;</title>');
-    expect(xml).not.toContain('<title>A & B <script>');
-  });
-
-  it('omits the description element entirely when an item has none', () => {
-    const xml = buildRssFeed(channel, [{ ...item, description: undefined }]);
-    const itemXml = xml.slice(xml.indexOf('<item>'));
-
-    expect(itemXml).not.toContain('<description>');
+    expect(items[0]?.description).toBeUndefined();
   });
 
   it('produces an empty channel with no build date when there are no items', () => {
-    const xml = buildRssFeed(channel, []);
+    const { channel, items } = parseRssFeed(buildRssFeed(MOCK_CHANNEL, []));
 
-    expect(xml).toContain('<channel>');
-    expect(xml).not.toContain('<item>');
-    expect(xml).not.toContain('<lastBuildDate>');
+    expect(items).toEqual([]);
+    expect(channel.lastBuildDate).toBeUndefined();
   });
 
-  it('is parseable as XML', () => {
+  it('is parseable as an RSS document', () => {
     const { isWellFormed, root, items } = parseRssFeed(
-      buildRssFeed(channel, [item]),
+      buildRssFeed(MOCK_CHANNEL, [MOCK_ITEM]),
     );
 
     expect(isWellFormed).toBe(true);

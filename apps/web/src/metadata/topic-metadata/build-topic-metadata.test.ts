@@ -1,14 +1,16 @@
 import { LOCALE_ISO_CODES, routes } from '@blog/config';
 import { type TTopicDetailPage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockSeo } from '@web/testing/shared/seo/fixtures';
 import {
-  MOCK_OG_IMAGE,
-  MOCK_OG_IMAGE_URL,
-} from '@web/testing/shared/seo/og-image-fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+  MOCK_DUTCH_REQUEST_CONTEXT,
+  NL_PATH_PREFIX,
+  mockMetadataSeo,
+  toPageSuffix,
+} from '@web/testing/metadata/to-metadata/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
 import { mockTopicDetailPage } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -24,27 +26,23 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const TITLE = 'Engineering';
-const SLUG = 'engineering';
-const EN_DESIGN_SLUG = 'design';
-const NL_SLUG = 'ontwerp';
-const DESCRIPTION = 'Posts about building things.';
-const OG_TITLE = `${TITLE} OG`;
-const OG_DESCRIPTION = 'Posts about building things OG.';
-const NL_DESIGN_TOPIC_PATH = `/nl${routes.topic(NL_SLUG)}`;
-const EN_DESIGN_TOPIC_PATH = routes.topic(EN_DESIGN_SLUG);
+faker.seed(5209);
 
-const seo = mockSeo({
-  title: TITLE,
-  description: DESCRIPTION,
-  ogTitle: OG_TITLE,
-  ogDescription: OG_DESCRIPTION,
-  ogImage: MOCK_OG_IMAGE,
-});
+const { EN, NL, DE } = LOCALE_ISO_CODES;
+const MOCK_TOPIC_SLUG = faker.lorem.slug();
+const MOCK_EN_SLUG = faker.lorem.slug();
+const MOCK_NL_SLUG = faker.lorem.slug();
+const MOCK_DE_SLUG = faker.lorem.slug();
+const MOCK_MISSING_SLUG = faker.lorem.slug();
+const NL_TOPIC_PATH = `${NL_PATH_PREFIX}${routes.topic(MOCK_NL_SLUG)}`;
+const EN_TOPIC_PATH = routes.topic(MOCK_EN_SLUG);
+
+const MOCK_SEO = mockMetadataSeo();
+const { title, description, ogTitle, ogDescription } = MOCK_SEO;
 
 const resolveTopicPageWith = (overrides: Partial<TTopicDetailPage> = {}) =>
   getTopicPageMock.mockResolvedValue(
-    okResult(mockTopicDetailPage({ seo, ...overrides })),
+    okResult(mockTopicDetailPage({ seo: MOCK_SEO, ...overrides })),
   );
 
 describe(buildTopicMetadata, () => {
@@ -58,29 +56,33 @@ describe(buildTopicMetadata, () => {
       resolveTopicPageWith();
     });
 
-    it('reads the same topic the topic page renders', async () => {
-      await buildTopicMetadata(SLUG);
+    it('reads the topic the topic page renders', async () => {
+      await buildTopicMetadata(MOCK_TOPIC_SLUG);
 
-      expect(getTopicPageMock).toHaveBeenCalledWith(SLUG);
+      expect(getTopicPageMock).toHaveBeenCalledWith(MOCK_TOPIC_SLUG);
     });
 
     it('builds page-1 metadata from the seo, canonical to the topic', async () => {
-      const metadata = await buildTopicMetadata(SLUG);
+      const metadata = await buildTopicMetadata(MOCK_TOPIC_SLUG);
 
-      expect(metadata.title).toBe(TITLE);
-      expect(metadata.description).toBe(DESCRIPTION);
-      expect(metadata.alternates?.canonical).toBe(routes.topic(SLUG));
-      expect(metadata.openGraph?.title).toBe(OG_TITLE);
-      expect(metadata.openGraph?.description).toBe(OG_DESCRIPTION);
+      expect(metadata.title).toBe(title);
+      expect(metadata.description).toBe(description);
+      expect(metadata.alternates?.canonical).toBe(
+        routes.topic(MOCK_TOPIC_SLUG),
+      );
+      expect(metadata.openGraph?.title).toBe(ogTitle);
+      expect(metadata.openGraph?.description).toBe(ogDescription);
       expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
     });
 
     it('suffixes page-N titles with the page, canonical to that page', async () => {
-      const metadata = await buildTopicMetadata(SLUG, 2);
+      const metadata = await buildTopicMetadata(MOCK_TOPIC_SLUG, 2);
 
-      expect(metadata.title).toBe(`${TITLE} – Page 2`);
-      expect(metadata.openGraph?.title).toBe(`${OG_TITLE} – Page 2`);
-      expect(metadata.alternates?.canonical).toBe(routes.topic(SLUG, 2));
+      expect(metadata.title).toBe(`${title} ${toPageSuffix(2)}`);
+      expect(metadata.openGraph?.title).toBe(`${ogTitle} ${toPageSuffix(2)}`);
+      expect(metadata.alternates?.canonical).toBe(
+        routes.topic(MOCK_TOPIC_SLUG, 2),
+      );
     });
   });
 
@@ -90,22 +92,23 @@ describe(buildTopicMetadata, () => {
     });
 
     it.each([
-      { slug: SLUG, page: undefined, scope: 'the first page' },
-      { slug: 'missing', page: 2, scope: 'page 2' },
-    ])(
-      'returns empty metadata on $scope when the fetch fails',
-      async ({ slug, page }) => {
-        const metadata = await buildTopicMetadata(slug, page);
+      { slug: MOCK_TOPIC_SLUG, page: undefined, scope: 'the first page' },
+      { slug: MOCK_MISSING_SLUG, page: 2, scope: 'page 2' },
+    ])('returns empty metadata and logs for $scope', async ({ slug, page }) => {
+      const metadata = await buildTopicMetadata(slug, page);
 
-        expect(metadata).toEqual({});
-      },
-    );
+      expect(metadata).toEqual({});
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        'topic_metadata.fetch_failed',
+        { slug, error: MOCK_ERROR },
+      );
+    });
   });
 
   it('omits the OG title past page 1 when none is authored', async () => {
-    resolveTopicPageWith({ seo: mockSeo({ ogTitle: undefined }) });
+    resolveTopicPageWith({ seo: mockMetadataSeo({ ogTitle: undefined }) });
 
-    const metadata = await buildTopicMetadata(SLUG, 2);
+    const metadata = await buildTopicMetadata(MOCK_TOPIC_SLUG, 2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -114,48 +117,44 @@ describe(buildTopicMetadata, () => {
   it('returns empty metadata without logging when no topic matches', async () => {
     getTopicPageMock.mockResolvedValue(okResult());
 
-    const metadata = await buildTopicMetadata('missing');
+    const metadata = await buildTopicMetadata(MOCK_MISSING_SLUG);
 
     expect(metadata).toEqual({});
     expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
   });
 
   describe('for a Dutch-language request', () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-
     beforeEach(() => {
-      vi.mocked(getRequestContext).mockResolvedValue({
-        ...MOCK_REQUEST_CONTEXT,
-        locale: NL,
-        liveLocales: [EN, NL],
-      });
+      vi.mocked(getRequestContext).mockResolvedValue(
+        MOCK_DUTCH_REQUEST_CONTEXT,
+      );
       resolveTopicPageWith({
         translations: [
-          { language: EN, slug: EN_DESIGN_SLUG },
-          { language: NL, slug: NL_SLUG },
-          { language: DE, slug: 'gestaltung' },
+          { language: EN, slug: MOCK_EN_SLUG },
+          { language: NL, slug: MOCK_NL_SLUG },
+          { language: DE, slug: MOCK_DE_SLUG },
         ],
       });
     });
 
     it('lists each live translation as hreflang, canonical to its prefix', async () => {
-      const metadata = await buildTopicMetadata(NL_SLUG);
+      const metadata = await buildTopicMetadata(MOCK_NL_SLUG);
 
       expect(metadata.alternates).toEqual({
-        canonical: NL_DESIGN_TOPIC_PATH,
+        canonical: NL_TOPIC_PATH,
         languages: {
-          en: EN_DESIGN_TOPIC_PATH,
-          nl: NL_DESIGN_TOPIC_PATH,
-          'x-default': EN_DESIGN_TOPIC_PATH,
+          en: EN_TOPIC_PATH,
+          nl: NL_TOPIC_PATH,
+          'x-default': EN_TOPIC_PATH,
         },
       });
     });
 
     it('lists no hreflang past page 1', async () => {
-      const metadata = await buildTopicMetadata(NL_SLUG, 2);
+      const metadata = await buildTopicMetadata(MOCK_NL_SLUG, 2);
 
       expect(metadata.alternates?.canonical).toBe(
-        `/nl${routes.topic(NL_SLUG, 2)}`,
+        `${NL_PATH_PREFIX}${routes.topic(MOCK_NL_SLUG, 2)}`,
       );
       expect(metadata.alternates?.languages).toBeUndefined();
     });

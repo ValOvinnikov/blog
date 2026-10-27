@@ -1,20 +1,32 @@
-import { NEWSLETTER_RESULT } from '@blog/config';
+import { NEWSLETTER_RESULT, NEWSLETTER_RESULT_SLUGS } from '@blog/config';
+import { faker } from '@faker-js/faker';
 
 import { toNewsletterResult } from './to-newsletter-result';
 
-describe(toNewsletterResult, () => {
-  it.each([
-    ['confirmed', NEWSLETTER_RESULT.CONFIRMED],
-    ['confirm-unavailable', NEWSLETTER_RESULT.CONFIRM_UNAVAILABLE],
-    ['unsubscribe-invalid', NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID],
-  ])('reads the %s path segment as %s', (slug, result) => {
-    expect(toNewsletterResult(slug)).toBe(result);
-  });
+faker.seed(6012);
 
-  it.each(['', NEWSLETTER_RESULT.CONFIRMED, 'Confirmed', 'subscribed'])(
-    'rejects the unknown segment %j',
-    (slug) => {
-      expect(toNewsletterResult(slug)).toBeUndefined();
+const MOCK_UNKNOWN_SLUG = faker.lorem.word();
+
+describe(toNewsletterResult, () => {
+  it.each(Object.values(NEWSLETTER_RESULT))(
+    'reads the path segment of %s back as that result',
+    (result) => {
+      expect(toNewsletterResult(NEWSLETTER_RESULT_SLUGS[result])).toBe(result);
     },
   );
+
+  it.each([
+    { case: 'empty', slug: '' },
+    {
+      case: 'the result name itself',
+      slug: NEWSLETTER_RESULT.CONFIRMED,
+    },
+    {
+      case: 'differently cased',
+      slug: NEWSLETTER_RESULT_SLUGS[NEWSLETTER_RESULT.CONFIRMED].toUpperCase(),
+    },
+    { case: 'unknown', slug: MOCK_UNKNOWN_SLUG },
+  ])('rejects a segment that is $case', ({ slug }) => {
+    expect(toNewsletterResult(slug)).toBeUndefined();
+  });
 });

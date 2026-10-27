@@ -1,6 +1,13 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
-import { testCoreDismissibleMenuBehavior } from '@web/testing/shared/dismissible-menu-contract/dismissible-menu-contract';
+import {
+  expectMenuOpen,
+  MENU_FIRST_ITEM_NAME,
+  MENU_LAST_ITEM_NAME,
+  MENU_SIBLING_ACTION_NAME,
+  MENU_TRIGGER_NAME,
+  testCoreDismissibleMenuBehavior,
+} from '@web/testing/shared/dismissible-menu-contract/dismissible-menu-contract';
 import { useId } from 'react';
 
 import { useMobileNavToggle } from './use-mobile-nav-toggle';
@@ -17,35 +24,39 @@ const Harness = () => {
         aria-controls={panelId}
         onClick={toggle}
       >
-        trigger
+        {MENU_TRIGGER_NAME}
       </button>
       <div id={panelId} hidden={!open}>
-        <button type="button">first</button>
-        <button type="button">second</button>
+        <button type="button">{MENU_FIRST_ITEM_NAME}</button>
+        <button type="button">{MENU_LAST_ITEM_NAME}</button>
       </div>
-      <button type="button">sibling action</button>
+      <button type="button">{MENU_SIBLING_ACTION_NAME}</button>
     </div>
   );
 };
 
 const setup = customRender(Harness, {});
 
-const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
-
 describe(useMobileNavToggle, () => {
+  let user: UserEvent;
+  const getUser = () => user;
+
   beforeEach(() => {
+    user = userEvent.setup();
     setup();
   });
 
-  testCoreDismissibleMenuBehavior();
+  testCoreDismissibleMenuBehavior(getUser);
 
-  it('stays open on a pointer-down on a sibling element inside the shared container (e.g. the actions slot)', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
+  it('stays open on a pointer-down on a sibling inside the shared container', async () => {
+    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
     await user.click(trigger);
+    const siblingAction = screen.getByRole('button', {
+      name: MENU_SIBLING_ACTION_NAME,
+    });
 
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'sibling action' }));
+    fireEvent.mouseDown(siblingAction);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expectMenuOpen(trigger);
   });
 });

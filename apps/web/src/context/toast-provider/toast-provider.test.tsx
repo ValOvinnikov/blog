@@ -1,16 +1,37 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   act,
-  fireEvent,
-  renderElement,
+  customRender,
   renderHook,
   screen,
+  within,
 } from '@web/testing/custom-render';
 
 import { ToastProvider, useToast } from './toast-provider';
 
-const successAction = vi.fn();
+faker.seed(6012);
 
-const ToastHarness = () => {
+const MOCK_BODY_TEXT = faker.lorem.sentence();
+const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_SUCCESS_MESSAGE = faker.lorem.sentence();
+const MOCK_ERROR_MESSAGE = faker.lorem.sentence();
+const MOCK_LOADING_MESSAGE = faker.lorem.sentence();
+const MOCK_ACTION_LABEL = faker.lorem.word();
+const MOCK_FIRE_SUCCESS_LABEL = `fire ${faker.lorem.words(2)}`;
+const MOCK_FIRE_ERROR_LABEL = `fire ${faker.lorem.words(2)}`;
+const MOCK_FIRE_PROMISE_LABEL = `fire ${faker.lorem.words(2)}`;
+const MOCK_SHORT_WAIT_MS = faker.number.int({ min: 500, max: 1500 });
+const MOCK_HOLD_MS = faker.number.int({ min: 10_000, max: 20_000 });
+const DISMISS_LABEL = SITE_MESSAGES.toastProvider.dismissLabel;
+
+const advanceTime = (ms: number) =>
+  act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+
+const ToastHarness = ({ onAct }: { onAct: () => void }) => {
   const toast = useToast();
 
   return (
@@ -18,230 +39,248 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.success({
-            title: 'Bookmark',
-            message: 'Saved to bookmarks',
-            action: { label: 'Undo', onAct: successAction, keyHint: '⌘Z' },
+            title: MOCK_TITLE,
+            message: MOCK_SUCCESS_MESSAGE,
+            action: { label: MOCK_ACTION_LABEL, onAct },
           })
         }
       >
-        fire-success
+        {MOCK_FIRE_SUCCESS_LABEL}
+      </button>
+      <button onClick={() => toast.error({ message: MOCK_ERROR_MESSAGE })}>
+        {MOCK_FIRE_ERROR_LABEL}
       </button>
       <button
         onClick={() =>
-          toast.error({
-            title: 'Bookmark',
-            message: "couldn't save",
+          toast.promise(Promise.resolve(), {
+            loading: { message: MOCK_LOADING_MESSAGE },
+            success: { message: MOCK_SUCCESS_MESSAGE },
+            error: { message: MOCK_ERROR_MESSAGE },
           })
         }
       >
-        fire-error
-      </button>
-      <button
-        onClick={() =>
-          toast.promise(Promise.resolve('done'), {
-            loading: { message: 'saving…' },
-            success: { message: 'Saved to bookmarks' },
-            error: { message: 'failed' },
-          })
-        }
-      >
-        fire-promise
+        {MOCK_FIRE_PROMISE_LABEL}
       </button>
     </>
   );
 };
 
+const getFireButtons = () => ({
+  fireSuccessButton: screen.getByRole('button', {
+    name: MOCK_FIRE_SUCCESS_LABEL,
+  }),
+  fireErrorButton: screen.getByRole('button', { name: MOCK_FIRE_ERROR_LABEL }),
+  firePromiseButton: screen.getByRole('button', {
+    name: MOCK_FIRE_PROMISE_LABEL,
+  }),
+});
+
+const setup = customRender(ToastProvider, {
+  children: <ToastHarness onAct={vi.fn()} />,
+});
+
 describe(`<${ToastProvider.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       callback(0);
       return 0;
     });
+    user = userEvent.setup({ delay: null });
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
     vi.useRealTimers();
   });
 
   it('renders children', () => {
-    renderElement(
-      <ToastProvider>
-        <p>Article body</p>
-      </ToastProvider>,
-    );
+    setup({ children: <p>{MOCK_BODY_TEXT}</p> });
 
-    expect(screen.getByText('Article body')).toBeVisible();
+    const body = screen.getByText(MOCK_BODY_TEXT);
+
+    expect(body).toBeVisible();
   });
 
   describe('with the toast harness', () => {
+    let onAct: () => void;
+
     beforeEach(() => {
-      renderElement(
-        <ToastProvider>
-          <ToastHarness />
-        </ToastProvider>,
-      );
+      onAct = vi.fn();
+      setup({ children: <ToastHarness onAct={onAct} /> });
     });
 
-    it('renders no toast until one is fired (nothing in the static/initial render)', () => {
-      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    it('renders no toast before one is fired', () => {
+      const status = screen.queryByRole('status');
+
+      expect(status).not.toBeInTheDocument();
     });
 
-    it('shows a success toast with polite status semantics when fired', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    it('shows a fired success toast with its title and message', async () => {
+      const { fireSuccessButton } = getFireButtons();
+      await user.click(fireSuccessButton);
 
-      expect(screen.getByRole('status')).toBeVisible();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      const status = screen.getByRole('status');
+      const title = within(status).getByText(MOCK_TITLE);
+      const message = within(status).getByText(MOCK_SUCCESS_MESSAGE);
+
+      expect(status).toBeVisible();
+      expect(title).toBeVisible();
+      expect(message).toBeVisible();
     });
 
-    it('renders the given title alongside the message', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    it('shows a fired error toast as an alert', async () => {
+      const { fireErrorButton } = getFireButtons();
+      await user.click(fireErrorButton);
 
-      expect(screen.getByText('Bookmark')).toBeVisible();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      const alert = screen.getByRole('alert');
+      const message = within(alert).getByText(MOCK_ERROR_MESSAGE);
+
+      expect(alert).toBeVisible();
+      expect(message).toBeVisible();
     });
 
-    it('shows an error toast with assertive alert semantics when fired', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-error' }));
+    it('dismisses a toast via its close button', async () => {
+      const { fireSuccessButton } = getFireButtons();
+      await user.click(fireSuccessButton);
+      const dismissButton = screen.getByRole('button', { name: DISMISS_LABEL });
+      await user.click(dismissButton);
+      await advanceTime(MOCK_SHORT_WAIT_MS);
 
-      expect(screen.getByRole('alert')).toBeVisible();
-      expect(screen.getByText("couldn't save")).toBeVisible();
+      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+      expect(message).not.toBeInTheDocument();
     });
 
-    it('dismisses a toast via its close button', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Dismiss notification' }),
-      );
-      act(() => {
-        vi.runOnlyPendingTimers();
+    it('runs the action callback and dismisses the toast', async () => {
+      const { fireSuccessButton } = getFireButtons();
+      await user.click(fireSuccessButton);
+      const actionButton = screen.getByRole('button', {
+        name: MOCK_ACTION_LABEL,
       });
+      await user.click(actionButton);
+      await advanceTime(MOCK_SHORT_WAIT_MS);
 
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+      expect(onAct).toHaveBeenCalledTimes(1);
+      expect(message).not.toBeInTheDocument();
     });
 
-    it('running the action callback also dismisses the toast', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-      fireEvent.click(screen.getByRole('button', { name: /^Undo/ }));
-      act(() => {
-        vi.runOnlyPendingTimers();
-      });
+    it('holds a hovered toast open and dismisses it after the pointer leaves', async () => {
+      const { fireSuccessButton } = getFireButtons();
+      await user.click(fireSuccessButton);
+      const status = screen.getByRole('status');
 
-      expect(successAction).toHaveBeenCalledTimes(1);
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      await advanceTime(MOCK_SHORT_WAIT_MS);
+      await user.hover(status);
+      await advanceTime(MOCK_HOLD_MS);
+      const heldMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
+
+      expect(heldMessage).toBeVisible();
+
+      await user.unhover(status);
+      await advanceTime(MOCK_HOLD_MS);
+      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+      expect(message).not.toBeInTheDocument();
     });
 
-    it('pauses auto-dismiss on hover and resumes from the exact remaining time on mouse-leave', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-      const toastEl = screen.getByRole('status');
+    it('keeps a toast open after the pointer leaves while focus is inside it', async () => {
+      const { fireSuccessButton } = getFireButtons();
+      await user.click(fireSuccessButton);
+      const status = screen.getByRole('status');
+      const dismissButton = screen.getByRole('button', { name: DISMISS_LABEL });
 
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-      fireEvent.mouseEnter(toastEl);
+      await user.hover(status);
+      await user.tab();
+      await user.tab();
+      await user.tab();
+      await user.unhover(status);
+      await advanceTime(MOCK_HOLD_MS);
+      const heldMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
 
-      act(() => {
-        vi.advanceTimersByTime(4000);
-      });
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+      expect(dismissButton).toHaveFocus();
+      expect(heldMessage).toBeVisible();
 
-      fireEvent.mouseLeave(toastEl);
-      act(() => {
-        vi.runOnlyPendingTimers();
-      });
-      act(() => {
-        vi.runOnlyPendingTimers();
-      });
+      await user.click(document.body);
+      await advanceTime(MOCK_HOLD_MS);
+      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
 
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      expect(message).not.toBeInTheDocument();
     });
 
-    it('mouse-leave does not resume the timer while focus remains inside the toast', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-      const toastEl = screen.getByRole('status');
-      const dismissButton = screen.getByRole('button', {
-        name: 'Dismiss notification',
-      });
+    it('merges a rapid identical success toast into one with a count', async () => {
+      const { fireSuccessButton } = getFireButtons();
+      await user.click(fireSuccessButton);
+      await user.click(fireSuccessButton);
 
-      fireEvent.mouseEnter(toastEl);
-      act(() => {
-        dismissButton.focus();
-      });
-      fireEvent.mouseLeave(toastEl, { relatedTarget: document.body });
+      const statuses = screen.getAllByRole('status');
+      const message = screen.getByText(`${MOCK_SUCCESS_MESSAGE} ×2`);
 
-      act(() => {
-        vi.advanceTimersByTime(4000);
-      });
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
-
-      act(() => {
-        dismissButton.blur();
-      });
-      act(() => {
-        vi.runOnlyPendingTimers();
-      });
-      act(() => {
-        vi.runOnlyPendingTimers();
-      });
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+      expect(statuses).toHaveLength(1);
+      expect(message).toBeVisible();
     });
 
-    it('collapses a rapid identical success repeat into one toast with a count suffix', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    it('dismisses the newest toast on Escape when none is focused', async () => {
+      const { fireSuccessButton, fireErrorButton } = getFireButtons();
+      await user.click(fireErrorButton);
+      await user.click(fireSuccessButton);
 
-      expect(screen.getAllByRole('status')).toHaveLength(1);
-      expect(screen.getByText('Saved to bookmarks ×2')).toBeVisible();
+      await user.keyboard('{Escape}');
+      await advanceTime(MOCK_SHORT_WAIT_MS);
+      const successMessage = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+      const errorMessage = screen.getByText(MOCK_ERROR_MESSAGE);
+
+      expect(successMessage).not.toBeInTheDocument();
+      expect(errorMessage).toBeVisible();
     });
 
-    it('Esc with no toast focused dismisses the newest toast', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-error' }));
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
-
-      fireEvent.keyDown(document, { key: 'Escape' });
-      act(() => {
-        vi.runOnlyPendingTimers();
+    it('dismisses the focused toast on Escape', async () => {
+      const { fireSuccessButton, fireErrorButton } = getFireButtons();
+      await user.click(fireErrorButton);
+      await user.click(fireSuccessButton);
+      const [errorDismissButton] = screen.getAllByRole('button', {
+        name: DISMISS_LABEL,
       });
 
-      expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
-      expect(screen.getByText("couldn't save")).toBeVisible();
+      await user.tab();
+      await user.tab();
+      await user.tab();
+      expect(errorDismissButton).toHaveFocus();
+
+      await user.keyboard('{Escape}');
+      await advanceTime(MOCK_SHORT_WAIT_MS);
+      const errorMessage = screen.queryByText(MOCK_ERROR_MESSAGE);
+      const successMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
+
+      expect(errorMessage).not.toBeInTheDocument();
+      expect(successMessage).toBeVisible();
     });
 
-    it('Esc with focus inside a toast dismisses that toast, not the newest', () => {
-      fireEvent.click(screen.getByRole('button', { name: 'fire-error' }));
-      fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    it('shows the resolved toast without a loading toast for a quick promise', async () => {
+      const { firePromiseButton } = getFireButtons();
+      await user.click(firePromiseButton);
 
-      const errorDismiss = screen.getAllByRole('button', {
-        name: 'Dismiss notification',
-      })[0]!;
-      act(() => {
-        errorDismiss.focus();
-      });
-      fireEvent.keyDown(document, { key: 'Escape' });
-      act(() => {
-        vi.runOnlyPendingTimers();
-      });
+      const status = screen.getByRole('status');
+      const message = within(status).getByText(MOCK_SUCCESS_MESSAGE);
+      const loadingMessage = screen.queryByText(MOCK_LOADING_MESSAGE);
 
-      expect(screen.queryByText("couldn't save")).not.toBeInTheDocument();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
-    });
-
-    it('toast.promise shows the resolved toast when the promise settles quickly', async () => {
-      await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: 'fire-promise' }));
-        await Promise.resolve();
-      });
-
-      expect(screen.getByRole('status')).toBeVisible();
-      expect(screen.getByText('Saved to bookmarks')).toBeVisible();
-      expect(screen.queryByText('saving…')).not.toBeInTheDocument();
+      expect(message).toBeVisible();
+      expect(loadingMessage).not.toBeInTheDocument();
     });
   });
 
-  it('useToast throws when called outside a ToastProvider', () => {
-    expect(() => renderHook(() => useToast())).toThrow(
-      'useToast must be used within a ToastProvider',
-    );
+  describe(useToast, () => {
+    it('throws outside a ToastProvider', () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      expect(() => renderHook(() => useToast())).toThrow(
+        'useToast must be used within a ToastProvider',
+      );
+    });
   });
 });

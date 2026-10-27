@@ -1,67 +1,67 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
 
 import { getThemeTokens } from './get-theme-tokens';
+
+faker.seed(115);
+
+const SITE_CONFIG_FETCH_FAILED_EVENT = 'theme_tokens.site_config_fetch_failed';
+const {
+  themeTokens: EDITORIAL_TOKENS,
+  cardStyle,
+  headerControlStyle,
+} = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
+const MOCK_ERROR = new Error(faker.lorem.sentence());
+
+const MOCK_SITE_CONFIG_ROW = {
+  preset: PRESET_ID.EDITORIAL,
+  accentHue: EDITORIAL_TOKENS.accentHue,
+  headingFont: EDITORIAL_TOKENS.headingFont,
+  bodyFont: EDITORIAL_TOKENS.bodyFont,
+  radiusScale: EDITORIAL_TOKENS.radiusScale,
+  density: EDITORIAL_TOKENS.density,
+  cardStyle,
+  headerControlStyle,
+};
 
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
 
-describe('getThemeTokens', () => {
-  it('resolves theme tokens from the site_config row on success', async () => {
-    const rowAccentHue =
-      PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue;
-    vi.mocked(getSiteConfig).mockResolvedValue(
-      okResult({
-        preset: PRESET_ID.EDITORIAL,
-        accentHue: rowAccentHue,
-        headingFont:
-          PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.headingFont,
-        bodyFont: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.bodyFont,
-        radiusScale:
-          PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.radiusScale,
-        density: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.density,
-      } as never),
+describe(getThemeTokens, () => {
+  it('resolves theme tokens from the site config row on success', async () => {
+    vi.mocked(getSiteConfig).mockResolvedValueOnce(
+      okResult(MOCK_SITE_CONFIG_ROW as never),
     );
 
     const tokens = await getThemeTokens();
 
-    expect(tokens.accentHue).toBe(rowAccentHue);
-    expect(tokens.logoHue).toBe(rowAccentHue);
+    expect(tokens).toEqual(toThemeTokens(MOCK_SITE_CONFIG_ROW));
   });
 
-  it('forwards an explicitly supplied tenant to getSiteConfig', async () => {
-    vi.mocked(getSiteConfig).mockResolvedValue(
-      okResult({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
-        headingFont: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.headingFont,
-        bodyFont: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.bodyFont,
-        radiusScale: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.radiusScale,
-        density: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.density,
-      } as never),
+  it('reads the site config of the tenant it is given', async () => {
+    vi.mocked(getSiteConfig).mockResolvedValueOnce(
+      okResult(MOCK_SITE_CONFIG_ROW as never),
     );
 
-    await getThemeTokens('tenant-1');
+    await getThemeTokens(MOCK_TENANT_ID);
 
-    expect(getSiteConfig).toHaveBeenCalledWith('tenant-1');
+    expect(getSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it('falls back to the Console preset tokens and logs when the fetch fails', async () => {
-    vi.mocked(getSiteConfig).mockResolvedValue(errorResult(new Error('boom')));
+  it('falls back to the default preset tokens and logs when the fetch fails', async () => {
+    vi.mocked(getSiteConfig).mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     const tokens = await getThemeTokens();
 
-    expect(tokens).toEqual(
-      expect.objectContaining({
-        logoHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
-      }),
-    );
-    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'theme_tokens.site_config_fetch_failed',
-      expect.objectContaining({ error: expect.any(Error) }),
-    );
+    expect(tokens).toEqual(toThemeTokens(undefined));
+    expect(logger.error).toHaveBeenCalledWith(SITE_CONFIG_FETCH_FAILED_EVENT, {
+      error: MOCK_ERROR,
+    });
   });
 });

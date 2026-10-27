@@ -3,7 +3,7 @@ import { CAPABILITY, PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { toEffectiveSettingsFeatures } from './to-effective-settings-features';
 
 describe(toEffectiveSettingsFeatures, () => {
-  it('falls back to the given preset defaults when there is no row', () => {
+  it('falls back to the preset defaults when there is no row', () => {
     const result = toEffectiveSettingsFeatures(undefined, PRESET_ID.EDITORIAL);
 
     expect(result).toEqual(
@@ -36,7 +36,7 @@ describe(toEffectiveSettingsFeatures, () => {
     });
   });
 
-  it('never merges the preset defaults into an existing row (the row always wins whole)', () => {
+  it('lets an existing row win whole over the preset defaults', () => {
     const result = toEffectiveSettingsFeatures(
       {
         commentsEnabled: false,

@@ -1,42 +1,43 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import { renderElement, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
 
 import { renderPostLeadImage } from './render-post-lead-image';
 
-const heroImage = mockSanityImage();
-
-const RenderPostLeadImageHarness = ({
-  post,
-}: {
-  post: ReturnType<typeof mockPostCard>;
-}) => <>{renderPostLeadImage(post)}</>;
-
-const setup = customRender(RenderPostLeadImageHarness, {
-  post: mockPostCard({ heroImage }),
-});
+const MOCK_HERO_IMAGE = mockSanityImage();
 
 describe(renderPostLeadImage, () => {
-  describe('with a hero image', () => {
+  describe('for a post with a hero image', () => {
     beforeEach(() => {
-      setup();
+      renderElement(
+        <>
+          {renderPostLeadImage(mockPostCard({ heroImage: MOCK_HERO_IMAGE }))}
+        </>,
+      );
     });
 
     it('renders the hero image lazily', () => {
-      const image = screen.getByRole('img', { name: heroImage.alt });
+      const image = screen.getByRole('img', { name: MOCK_HERO_IMAGE.alt });
 
-      expect(image).toHaveAttribute('loading', 'lazy');
+      const attributes = Object.fromEntries(
+        Array.from(image.attributes, ({ name, value }) => [name, value]),
+      );
+      const { loading } = attributes;
+
+      expect(loading).toBe('lazy');
     });
 
-    it('never sets priority/fetchpriority on the lead image', () => {
-      const image = screen.getByRole('img', { name: heroImage.alt });
+    it('does not prioritise loading of the lead image', () => {
+      const image = screen.getByRole('img', { name: MOCK_HERO_IMAGE.alt });
 
       expect(image).not.toHaveAttribute('fetchpriority');
     });
   });
 
   it('renders nothing for a post with no hero image', () => {
-    setup({ post: mockPostCard({ heroImage: undefined }) });
+    renderElement(
+      <>{renderPostLeadImage(mockPostCard({ heroImage: undefined }))}</>,
+    );
 
     const image = screen.queryByRole('img');
 
