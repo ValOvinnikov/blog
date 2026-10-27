@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query/query';
+import { brandTaglineFragment } from '@blog/service/shared/fragments/brand-tagline/brand-tagline';
 import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 export const siteSettingsQuery = q
@@ -14,16 +14,7 @@ export const siteSettingsQuery = q
         name: b.field('name').notNull(),
         tagline: b
           .field('tagline')
-          .project((t) => ({
-            items: t
-              .field('items[]')
-              .project((item) => ({
-                _key: true,
-                text: getLocalizedField(item, 'text'),
-              }))
-              .nullable(true),
-            separator: t.field('separator').notNull(),
-          }))
+          .project(brandTaglineFragment)
           .nullable(true),
         logo: b
           .field('logo')

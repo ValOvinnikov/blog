@@ -1,4 +1,4 @@
-import { BRAND_TAGLINE_SEPARATOR_CHARS } from '@blog/config';
+import { toBrandTagline } from '@blog/service/shared/transformers/brand-tagline/to-brand-tagline';
 import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
@@ -10,21 +10,10 @@ export type TRawSiteSettings = NonNullable<
 >;
 
 export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
-  const taglineItems = (raw.brand.tagline?.items ?? []).flatMap((item) =>
-    item.text ? [item.text] : [],
-  );
-  const taglineSeparator = raw.brand.tagline?.separator;
-  const tagline =
-    taglineItems.length && taglineSeparator
-      ? taglineItems.join(
-          ` ${BRAND_TAGLINE_SEPARATOR_CHARS[taglineSeparator]} `,
-        )
-      : undefined;
-
   return {
     brand: {
       name: raw.brand.name,
-      tagline,
+      tagline: toBrandTagline(raw.brand.tagline),
       logo: toSanityImage(raw.brand.logo),
     },
     currency: raw.currency,

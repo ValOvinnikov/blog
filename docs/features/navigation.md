@@ -29,7 +29,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 ## Data
 
 - **`settings_navigation`:** `title`, `items[]` (each a `linkRef` — a bare reference to a `link` document — or a `linkRefWithSubItems`: a `link` reference plus an ordered `subItems[]` of at least one `linkRef`), `tagline` (a `brandTagline`, copied from `settings_site` › `brand.tagline` by the `copy-brand-tagline-into-navigation` migration; Site Settings keeps its own tagline until the contract step), `showLanguageSwitcher` (boolean, initial `false`). Provisioning seeds it with no items, and seed verification requires the singleton and that every item resolves to a `link` document.
-- **Service:** `service.global.navigation.v1.getNavigation(sanityContext)` returns `{ items: ILink[], showLanguageSwitcher? }`. Items resolve through `linkDocumentFragment` and `toLinkDocument` (./links.md) in the request language; an item whose link has no label or no resolvable href is dropped.
+- **Service:** `service.global.navigation.v1.getNavigation(sanityContext)` returns `{ items: TNavigationItem[], tagline, showLanguageSwitcher? }`. Items resolve through `linkDocumentFragment` and `toLinkDocument` (./links.md) in the request language; an item whose link has no label or no resolvable href is dropped. A `TNavigationItem` is an `ILink`, plus `subItems` for a link with sub-items: its own link first, then the sub-items in the editor's order. A sub-item that does not resolve drops only itself; a link none of whose sub-items resolve comes back as a plain link. `tagline` is the header tagline's items joined with their separator character (`toBrandTagline`, shared with `getSiteSettings`), or `undefined` when it has no items.
 - **Cache:** the query is tagged `navigation`, `link` and every page type (`page_post`, `page_landing`, `page_postIndex`, `homePage`, `page_topic`, `page_topicIndex`, `page_tag`, `page_tagIndex`), tenant-scoped, so a target page's slug change refreshes the header. The publish webhook maps `settings_navigation` → `navigation` and `link` → `link`.
 - **Alongside:** the brand comes from `settings_site` through `getSiteSettings`; the switcher style from `site_config.language_switcher_style`.
 
@@ -42,7 +42,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 
 ## Constraints and invariants
 
-- A navigation item holds no label or destination of its own — always a `link` document reference. Studio allows one level of sub-items under a header link; the service and site do not read sub-items or the navigation tagline yet, so the header renders a flat list in the editor's order.
+- A navigation item holds no label or destination of its own — always a `link` document reference. Studio allows one level of sub-items under a header link; the service returns sub-items and the navigation tagline, but the site does not read them yet, so the header renders a flat list in the editor's order.
 - An item is current when its href equals the public pathname — no tenant segment and no locale prefix, in prerendered HTML as on the client — or the pathname is under it (`/blog` matches `/blog/post`); `/` matches only itself. The current link carries `aria-current="page"` and the active colour of `TextLink`'s `nav` appearance, plus a cue that reads without the hue (WCAG 1.4.1): in the header and the mobile menu it is bold (`currentStyle="weight"`), while the footer navigation and footer language codes keep a 2px underline in that colour (the default). The `nav` appearance is monospaced, so the bold label keeps its width and switching pages never moves a header link. Hover changes only the colour: another link turns from muted to the text colour, so it never looks current, while the current link deepens to the brand hover shade and stays bold or underlined.
 - The mobile panel closes on every route change; `useMobileNavToggle` handles focus, Escape and outside-click dismissal, scoped to the navigation's own container.
 - `actions` stay in the bar at every width; `panelActions` move into the mobile panel below `lg`. With the switcher on, the switcher and the theme toggle are `panelActions`; with it off, the theme toggle is an `action`. The account menu is always an `action`.
@@ -72,7 +72,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 
 ## Tests and stories
 
-- `packages/service/src/features/global/navigation/adaptor/loader.test.ts`
+- `packages/service/src/features/global/navigation/adaptor/loader.test.ts`, `query.test.ts`
 - `apps/web/src/components/shared/site-header/site-header.test.tsx`, `site-navigation/site-navigation.test.tsx`, `apps/web/src/hooks/use-mobile-nav-toggle/use-mobile-nav-toggle.test.tsx`
 - `packages/ui`: `header.test.tsx`, `primary-navigation.test.tsx`, `text-link.test.tsx`
 - Stories: `packages/ui/src/components/organisms/header/header.stories.tsx`, `molecules/primary-navigation/primary-navigation.stories.tsx`, `atoms/text-link/text-link.stories.tsx`; `apps/web/src/components/shared/site-navigation/site-navigation.stories.tsx`, `brand-lockup-link/brand-lockup-link.stories.tsx`.
