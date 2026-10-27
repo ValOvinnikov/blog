@@ -1,8 +1,8 @@
 import {
   mockLocalizedHeadingBlock,
   mockPlainHeadingBlock,
-} from '@blog/studio/testing/migrations/localize';
-import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
 import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
@@ -31,7 +31,7 @@ const statPath = (key: string, field: string) => [
 ];
 
 describe(localizeStatsModule, () => {
-  it('moves the heading, supporting text, footnote and every stat into the default language', () => {
+  it('moves the heading block, footnote and every stat into the default language', () => {
     expect(
       localizeStatsModule({
         headingBlock: mockPlainHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT),

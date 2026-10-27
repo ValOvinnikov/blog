@@ -4,8 +4,8 @@ import {
   mockLocalizedImage,
   mockPlainHeadingBlock,
   mockPlainImage,
-} from '@blog/studio/testing/migrations/localize';
-import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
 import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 
@@ -20,7 +20,7 @@ const MOCK_ALT = faker.lorem.words(3);
 const MOCK_ASSET = mockImageAsset();
 
 describe(localizeHeroStatementModule, () => {
-  it('moves the heading, supporting text, eyebrow and image alt into the default language', () => {
+  it('moves every text field and the image alt into the default language', () => {
     expect(
       localizeHeroStatementModule({
         headingBlock: mockPlainHeadingBlock(MOCK_HEADING, MOCK_SUPPORTING_TEXT),

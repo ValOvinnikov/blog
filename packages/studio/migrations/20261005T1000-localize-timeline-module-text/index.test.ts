@@ -1,8 +1,6 @@
 import {
   mockLocalizedHeadingBlock,
   mockPlainHeadingBlock,
-} from '@blog/studio/testing/migrations/localize';
-import {
   mockEnglishString,
   mockInEnglish,
   mockParagraph,

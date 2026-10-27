@@ -1,4 +1,4 @@
-import { LINK_TYPE } from '@blog/config/constants';
+import { LINK_TYPE, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
 import {
   mockMigrationContext,
   mockMigrationDocument,
@@ -56,7 +56,7 @@ const toBlockPath = (blockKey: string, field: string): Path => [
 
 const toLinkRefMarkDef = (key: string, linkId: string) => ({
   _key: key,
-  _type: 'linkRef',
+  _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
   link: { _type: 'reference', _ref: linkId },
 });
 

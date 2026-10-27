@@ -19,7 +19,7 @@ const MOCK_FIRST_ITEM = mockItem('item-1', MOCK_FIRST_TEXT);
 const MOCK_SECOND_ITEM = mockItem('item-2', MOCK_SECOND_TEXT);
 
 describe(localizeBrandTaglineItems, () => {
-  it('turns each tagline item into an item object with its text in the default language', () => {
+  it('turns each tagline item into an object with text in the default language', () => {
     expect(
       localizeBrandTaglineItems({
         brand: { tagline: { items: [MOCK_FIRST_TEXT, MOCK_SECOND_TEXT] } },

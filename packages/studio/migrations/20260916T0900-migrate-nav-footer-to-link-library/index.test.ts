@@ -333,7 +333,7 @@ describe('migrate-nav-footer-to-link-library', () => {
       expect(await migrate(document)).toEqual([]);
     });
 
-    it('migrates a social entry to a socialProfile and warns about the dropped accessibleLabel', async () => {
+    it('migrates a social entry and warns that its accessible label is dropped', async () => {
       const document = mockMigrationDocument({
         _type: FOOTER_TYPE,
         social: [

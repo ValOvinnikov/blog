@@ -4,8 +4,6 @@ import {
   mockLocalizedImage,
   mockPlainHeadingBlock,
   mockPlainImage,
-} from '@blog/studio/testing/migrations/localize';
-import {
   mockEnglishString,
   mockInEnglish,
   mockParagraph,

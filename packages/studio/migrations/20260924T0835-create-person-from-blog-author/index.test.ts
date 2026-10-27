@@ -1,221 +1,146 @@
 import {
-  at,
-  patch,
-  set,
-  type createOrReplace,
-  type MigrationContext,
-} from 'sanity/migrate';
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/migrations/migration-document';
+import { faker } from '@faker-js/faker';
+import type { SanityDocument } from 'sanity';
+import { at, createOrReplace, patch, set } from 'sanity/migrate';
 
 import migration from './index';
 
-const createMockContext = (options: {
-  blogAuthorIds?: string[];
-}): { context: MigrationContext } => {
-  const fetch = async (query: string) => {
-    if (query.includes('_type == $type')) {
-      return options.blogAuthorIds ?? [];
-    }
+faker.seed(8352);
 
-    throw new Error(`Unexpected query in test: ${query}`);
-  };
-
-  return { context: { client: { fetch } } as unknown as MigrationContext };
-};
-
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
-
-const authorDoc = {
-  ...baseDoc,
-  _id: 'author-1',
-  _type: 'blog_author',
-  name: 'Jane Doe',
-  image: { _type: 'imageWithAlt', alt: 'Jane' },
+const MOCK_AUTHOR_ID = faker.string.uuid();
+const MOCK_PERSON_ID = `person-${MOCK_AUTHOR_ID}`;
+const MOCK_DRAFT_AUTHOR_ID = `drafts.${MOCK_AUTHOR_ID}`;
+const MOCK_OTHER_AUTHOR_ID = faker.string.uuid();
+const MOCK_AUTHOR_FIELDS = {
+  name: faker.person.fullName(),
+  image: { _type: 'imageWithAlt', alt: faker.lorem.words(2) },
   bio: [{ _type: 'block' }],
-  role: 'Senior Engineer',
-  socialLinks: [{ _type: 'socialProfile', url: 'https://example.com' }],
+  role: faker.person.jobTitle(),
+  socialLinks: [{ _type: 'socialProfile', url: faker.internet.url() }],
 };
 
-type TCreateOrReplaceMutation = ReturnType<typeof createOrReplace>;
+const mockAuthor = (_id: string) =>
+  mockMigrationDocument({
+    _id,
+    _type: 'blog_author',
+    ...MOCK_AUTHOR_FIELDS,
+  });
 
-const isCreateOrReplace = (
-  mutation: unknown,
-): mutation is TCreateOrReplaceMutation =>
-  Boolean(
-    mutation &&
-    typeof mutation === 'object' &&
-    'type' in mutation &&
-    mutation.type === 'createOrReplace',
-  );
+const mockAuthorReferrer = (type: string, authorId: string) =>
+  mockMigrationDocument({
+    _type: type,
+    author: { _type: 'reference', _ref: authorId },
+  });
 
-const getCreateOrReplace = (mutations: unknown[]): TCreateOrReplaceMutation => {
-  const mutation = mutations.find(isCreateOrReplace);
+const referrerPatch = (document: SanityDocument, personId: string) =>
+  patch(document._id, [at(['author', '_ref'], set(personId))]);
 
-  if (!mutation) {
-    throw new Error('Expected a createOrReplace mutation.');
-  }
+describe('create-person-from-blog-author', () => {
+  describe('blog_author documents', () => {
+    it('creates the matching person, carrying every field across', async () => {
+      const author = mockAuthor(MOCK_AUTHOR_ID);
+      const context = mockMigrationContext([author]);
 
-  return mutation;
-};
+      const mutations = await runDocumentMigration(migration, author, context);
 
-describe('create-person-from-blog-author migration — blog_author documents', () => {
-  it('creates the matching person, carrying every field across', async () => {
-    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
+      expect(mutations).toEqual([
+        createOrReplace({
+          _id: MOCK_PERSON_ID,
+          _type: 'person',
+          ...MOCK_AUTHOR_FIELDS,
+        }),
+      ]);
+    });
 
-    const mutations = (await migration.migrate.document(
-      authorDoc,
-      context,
-    )) as unknown[];
+    it('maps a draft blog_author onto a draft person', async () => {
+      const author = mockAuthor(MOCK_DRAFT_AUTHOR_ID);
+      const context = mockMigrationContext([author]);
 
-    expect(getCreateOrReplace(mutations).document).toMatchObject({
-      _id: 'person-author-1',
-      _type: 'person',
-      name: 'Jane Doe',
-      role: 'Senior Engineer',
+      const mutations = await runDocumentMigration(migration, author, context);
+
+      expect(mutations).toEqual([
+        createOrReplace({
+          _id: `drafts.${MOCK_PERSON_ID}`,
+          _type: 'person',
+          ...MOCK_AUTHOR_FIELDS,
+        }),
+      ]);
+    });
+
+    it('returns the same mutations when run twice against the same input', async () => {
+      const author = mockAuthor(MOCK_AUTHOR_ID);
+
+      const firstRun = await runDocumentMigration(
+        migration,
+        author,
+        mockMigrationContext([author]),
+      );
+      const secondRun = await runDocumentMigration(
+        migration,
+        author,
+        mockMigrationContext([author]),
+      );
+
+      expect(secondRun).toEqual(firstRun);
     });
   });
 
-  it('maps a draft blog_author onto a draft person', async () => {
-    const draftDoc = { ...authorDoc, _id: 'drafts.author-1' };
-    const { context } = createMockContext({
-      blogAuthorIds: ['drafts.author-1'],
-    });
+  describe('reference rewriting', () => {
+    const context = mockMigrationContext([mockAuthor(MOCK_AUTHOR_ID)]);
 
-    const mutations = (await migration.migrate.document(
-      draftDoc,
-      context,
-    )) as unknown[];
+    it.each(['page_post', 'blog_post', 'module_heroProfile'])(
+      'rewrites %s.author pointing at a migrated author',
+      async (type) => {
+        const referrer = mockAuthorReferrer(type, MOCK_AUTHOR_ID);
 
-    expect(getCreateOrReplace(mutations).document._id).toBe(
-      'drafts.person-author-1',
-    );
-  });
+        const mutations = await runDocumentMigration(
+          migration,
+          referrer,
+          context,
+        );
 
-  it('is idempotent — a second run against the same input returns the same mutations', async () => {
-    const { context: firstContext } = createMockContext({
-      blogAuthorIds: ['author-1'],
-    });
-    const firstRun = await migration.migrate.document(authorDoc, firstContext);
-
-    const { context: secondContext } = createMockContext({
-      blogAuthorIds: ['author-1'],
-    });
-    const secondRun = await migration.migrate.document(
-      authorDoc,
-      secondContext,
-    );
-
-    expect(secondRun).toEqual(firstRun);
-  });
-});
-
-describe('create-person-from-blog-author migration — reference rewriting', () => {
-  let context: ReturnType<typeof createMockContext>['context'];
-
-  beforeEach(() => {
-    ({ context } = createMockContext({ blogAuthorIds: ['author-1'] }));
-  });
-
-  it('rewrites page_post.author pointing at a migrated author (development referrer shape)', async () => {
-    const postDoc = {
-      ...baseDoc,
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      author: { _type: 'reference', _ref: 'author-1' },
-    };
-
-    const mutations = await migration.migrate.document(postDoc, context);
-
-    expect(mutations).toEqual([
-      patch('page_post-post-1', [
-        at(['author', '_ref'], set('person-author-1')),
-      ]),
-    ]);
-  });
-
-  it('rewrites blog_post.author pointing at a migrated author (production referrer shape)', async () => {
-    const postDoc = {
-      ...baseDoc,
-      _id: 'post-1',
-      _type: 'blog_post',
-      author: { _type: 'reference', _ref: 'author-1' },
-    };
-
-    const mutations = await migration.migrate.document(postDoc, context);
-
-    expect(mutations).toEqual([
-      patch('post-1', [at(['author', '_ref'], set('person-author-1'))]),
-    ]);
-  });
-
-  it('rewrites module_heroProfile.author pointing at a migrated author', async () => {
-    const heroDoc = {
-      ...baseDoc,
-      _id: 'hero-profile-1',
-      _type: 'module_heroProfile',
-      author: { _type: 'reference', _ref: 'author-1' },
-    };
-
-    const mutations = await migration.migrate.document(heroDoc, context);
-
-    expect(mutations).toEqual([
-      patch('hero-profile-1', [at(['author', '_ref'], set('person-author-1'))]),
-    ]);
-  });
-
-  it('produces no mutations for a document with no matching references', async () => {
-    const otherDoc = {
-      ...baseDoc,
-      _id: 'topic-1',
-      _type: 'blog_topic',
-      name: 'Engineering',
-    };
-
-    const mutations = await migration.migrate.document(otherDoc, context);
-
-    expect(mutations).toEqual([]);
-  });
-
-  it('is idempotent — a reference already pointing at its person id produces no mutations', async () => {
-    const rewrittenPostDoc = {
-      ...baseDoc,
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      author: { _type: 'reference', _ref: 'person-author-1' },
-    };
-
-    const mutations = await migration.migrate.document(
-      rewrittenPostDoc,
-      context,
+        expect(mutations).toEqual([referrerPatch(referrer, MOCK_PERSON_ID)]);
+      },
     );
 
-    expect(mutations).toEqual([]);
-  });
+    it('produces no mutations for a document with no matching references', async () => {
+      const topic = mockMigrationDocument({
+        _type: 'blog_topic',
+        name: faker.lorem.word(),
+      });
 
-  it('scopes the blog_author id map to its own migration run, never leaking across contexts', async () => {
-    const { context: firstContext } = createMockContext({
-      blogAuthorIds: ['author-1'],
+      const mutations = await runDocumentMigration(migration, topic, context);
+
+      expect(mutations).toEqual([]);
     });
-    const postDoc = {
-      ...baseDoc,
-      _id: 'page_post-post-1',
-      _type: 'page_post',
-      author: { _type: 'reference', _ref: 'author-1' },
-    };
 
-    await migration.migrate.document(postDoc, firstContext);
+    it('produces no mutations for a reference already pointing at its person', async () => {
+      const migratedPost = mockAuthorReferrer('page_post', MOCK_PERSON_ID);
 
-    const { context: secondContext } = createMockContext({
-      blogAuthorIds: ['author-2'],
+      const mutations = await runDocumentMigration(
+        migration,
+        migratedPost,
+        context,
+      );
+
+      expect(mutations).toEqual([]);
     });
-    const secondRunMutations = await migration.migrate.document(
-      postDoc,
-      secondContext,
-    );
 
-    expect(secondRunMutations).toEqual([]);
+    it('keeps the author id map scoped to its own migration run', async () => {
+      const post = mockAuthorReferrer('page_post', MOCK_AUTHOR_ID);
+      await runDocumentMigration(migration, post, context);
+
+      const otherRunMutations = await runDocumentMigration(
+        migration,
+        post,
+        mockMigrationContext([mockAuthor(MOCK_OTHER_AUTHOR_ID)]),
+      );
+
+      expect(otherRunMutations).toEqual([]);
+    });
   });
 });

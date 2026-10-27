@@ -1,8 +1,8 @@
 import {
   mockLocalizedHeadingBlock,
   mockPlainHeadingBlock,
-} from '@blog/studio/testing/migrations/localize';
-import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
 import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 

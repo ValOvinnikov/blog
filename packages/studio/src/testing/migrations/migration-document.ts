@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import type { SanityDocument } from 'sanity';
 import type { Migration, MigrationContext } from 'sanity/migrate';
 
-export const MOCK_DOCUMENT_TIMESTAMP = '2026-01-01T00:00:00Z';
+const MOCK_DOCUMENT_TIMESTAMP = '2026-01-01T00:00:00Z';
 
 type TMockMigrationDocumentInput = {
   _id?: string;

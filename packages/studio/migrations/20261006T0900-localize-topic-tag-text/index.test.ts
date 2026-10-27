@@ -1,5 +1,7 @@
-import { mockEnglishText } from '@blog/studio/testing/migrations/localize';
-import { mockEnglishString } from '@blog/studio/testing/migrations/localized';
+import {
+  mockEnglishText,
+  mockEnglishString,
+} from '@blog/studio/testing/migrations/localized';
 import { faker } from '@faker-js/faker';
 import { at, set } from 'sanity/migrate';
 

@@ -1,4 +1,4 @@
-import { LINK_TYPE } from '@blog/config/constants';
+import { LINK_TYPE, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants';
 import { mockMigrationContext } from '@blog/studio/testing/migrations/migration-document';
 import {
   MOCK_EXTERNAL_HOSTNAME,
@@ -31,11 +31,10 @@ faker.seed(6019);
 
 const MOCK_POST = mockPagePost();
 const MOCK_CONTENT_FIELD = 'content';
-const MOCK_LINK_REF_TYPE = 'linkRef';
 
 const toLinkRefMarkDef = (key: string, linkId: string) => ({
   _key: key,
-  _type: MOCK_LINK_REF_TYPE,
+  _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
   link: { _type: 'reference', _ref: linkId },
 });
 

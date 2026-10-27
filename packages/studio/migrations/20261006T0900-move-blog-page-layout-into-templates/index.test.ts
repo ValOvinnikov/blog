@@ -1,33 +1,26 @@
-import type { MigrationContext } from 'sanity/migrate';
+import {
+  mockMigrationContext,
+  mockMigrationDocument,
+  runDocumentMigration,
+} from '@blog/studio/testing/migrations/migration-document';
+import { faker } from '@faker-js/faker';
+import { at, createIfNotExists, patch, set, unset } from 'sanity/migrate';
 
-import { migrateBlogPageDocument } from './index';
+import migration from './index';
 
-const hero = { _type: 'reference', _ref: 'hero-blog-1' };
-const modules = [{ _key: 'm1', _type: 'module_postList', _ref: 'post-list-1' }];
+faker.seed(19001);
 
-const baseDoc = {
-  _createdAt: '2026-01-01T00:00:00Z',
-  _updatedAt: '2026-01-01T00:00:00Z',
-  _rev: 'rev-1',
-};
+const MOCK_HERO = { _type: 'reference', _ref: faker.string.uuid() };
+const MOCK_MODULES = [
+  {
+    _key: faker.string.alphanumeric(12),
+    _type: 'module_postList',
+    _ref: faker.string.uuid(),
+  },
+];
+const MOCK_TITLE = faker.lorem.words(2);
 
-type TPage = Record<string, unknown> & { _id: string; _type: string };
-
-const createContext = (pages: TPage[]): MigrationContext =>
-  ({
-    client: {
-      fetch: async (query: string) => {
-        if (query.includes('translation.metadata')) return [];
-        if (query.includes('_type in $types')) return pages;
-        throw new Error(`Unexpected query in test: ${query}`);
-      },
-    },
-  }) as unknown as MigrationContext;
-
-const run = (doc: TPage, pages: TPage[]) =>
-  migrateBlogPageDocument({ ...baseDoc, ...doc }, createContext(pages));
-
-describe('move-blog-page-layout-into-templates migration', () => {
+describe('move-blog-page-layout-into-templates', () => {
   it.each([
     ['page_postIndex', 'template_postIndex'],
     ['page_topicIndex', 'template_topicIndex'],
@@ -37,56 +30,78 @@ describe('move-blog-page-layout-into-templates migration', () => {
   ])(
     'moves a %s hero and modules into a %s of its own',
     async (pageType, templateType) => {
-      const page: TPage = {
-        _id: 'page-1',
+      const page = mockMigrationDocument({
         _type: pageType,
-        title: 'Design',
-        hero,
-        modules,
-      };
+        title: MOCK_TITLE,
+        hero: MOCK_HERO,
+        modules: MOCK_MODULES,
+      });
+      const templateId = `template-${page._id}`;
 
-      await expect(run(page, [page])).resolves.toEqual([
-        {
-          type: 'createIfNotExists',
-          document: {
-            _id: 'template-page-1',
-            _type: templateType,
-            title: 'Design',
-            hero,
-            modules,
-          },
-        },
-        {
-          type: 'patch',
-          id: 'page-1',
-          patches: [
-            {
-              path: ['template'],
-              op: {
-                type: 'set',
-                value: { _type: 'reference', _ref: 'template-page-1' },
-              },
-            },
-            { path: ['hero'], op: { type: 'unset' } },
-            { path: ['modules'], op: { type: 'unset' } },
-          ],
-        },
+      const mutations = await runDocumentMigration(
+        migration,
+        page,
+        mockMigrationContext([page]),
+      );
+
+      expect(mutations).toEqual([
+        createIfNotExists({
+          _id: templateId,
+          _type: templateType,
+          title: MOCK_TITLE,
+          hero: MOCK_HERO,
+          modules: MOCK_MODULES,
+        }),
+        patch(page._id, [
+          at('template', set({ _type: 'reference', _ref: templateId })),
+          at('hero', unset()),
+          at('modules', unset()),
+        ]),
       ]);
     },
   );
 
   it('gives each Topic page its own template', async () => {
-    const design: TPage = { _id: 'design', _type: 'page_topic', modules };
-    const travel: TPage = { _id: 'travel', _type: 'page_topic', modules };
-
-    const [designCreate] = await run(design, [design, travel]);
-    const [travelCreate] = await run(travel, [design, travel]);
-
-    expect(designCreate).toMatchObject({
-      document: { _id: 'template-design' },
+    const design = mockMigrationDocument({
+      _type: 'page_topic',
+      title: MOCK_TITLE,
+      hero: MOCK_HERO,
+      modules: MOCK_MODULES,
     });
-    expect(travelCreate).toMatchObject({
-      document: { _id: 'template-travel' },
+    const travel = mockMigrationDocument({
+      _type: 'page_topic',
+      title: MOCK_TITLE,
+      hero: MOCK_HERO,
+      modules: MOCK_MODULES,
     });
+    const context = mockMigrationContext([design, travel]);
+
+    const [designCreate] = (await runDocumentMigration(
+      migration,
+      design,
+      context,
+    )) as unknown[];
+    const [travelCreate] = (await runDocumentMigration(
+      migration,
+      travel,
+      context,
+    )) as unknown[];
+
+    expect([designCreate, travelCreate]).toEqual([
+      createIfNotExists({
+        _id: `template-${design._id}`,
+        _type: 'template_topic',
+        title: MOCK_TITLE,
+        hero: MOCK_HERO,
+        modules: MOCK_MODULES,
+      }),
+      createIfNotExists({
+        _id: `template-${travel._id}`,
+        _type: 'template_topic',
+        title: MOCK_TITLE,
+        hero: MOCK_HERO,
+        modules: MOCK_MODULES,
+      }),
+    ]);
   });
 });
