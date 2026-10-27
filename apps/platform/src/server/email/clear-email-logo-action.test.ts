@@ -18,6 +18,8 @@ import {
   MOCK_EMAIL_LOGO_URL,
   mockEmailConfig,
   mockEmailTemplateResult,
+  MOCK_TENANT_LOGO_TARGET,
+  MOCK_TEMPLATE_LOGO_TARGET,
 } from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
@@ -45,11 +47,6 @@ faker.seed(5998);
 
 const MOCK_TEMPLATE_LOGO_URL = faker.internet.url();
 const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
-const TENANT_TARGET = { type: 'tenant' } as const;
-const TEMPLATE_TARGET = {
-  type: 'template',
-  templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-} as const;
 
 const { getEmailConfig, upsertEmailConfig } = queries.emailConfig;
 const { getEmailTemplate, upsertEmailTemplate } = queries.emailTemplates;
@@ -71,7 +68,10 @@ describe(clearEmailLogoAction, () => {
   it('succeeds without writing when the tenant email logo is already unset', async () => {
     vi.mocked(getEmailConfig).mockResolvedValue(undefined);
 
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, TENANT_TARGET);
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailConfig).not.toHaveBeenCalled();
@@ -79,7 +79,10 @@ describe(clearEmailLogoAction, () => {
   });
 
   it('clears the tenant email logo and deletes the blob', async () => {
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, TENANT_TARGET);
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailConfig).toHaveBeenCalledWith(MOCK_TENANT_ID, {
@@ -95,7 +98,10 @@ describe(clearEmailLogoAction, () => {
       mockEmailTemplateResult({ logoAssetUrl: MOCK_TEMPLATE_LOGO_URL }),
     );
 
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, TEMPLATE_TARGET);
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TEMPLATE_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertEmailTemplate).toHaveBeenCalledWith(
@@ -112,7 +118,7 @@ describe(clearEmailLogoAction, () => {
   it('records one settings-updated audit event for the operator', async () => {
     mockedAuth.mockResolvedValueOnce(MOCK_OPERATOR_SESSION);
 
-    await clearEmailLogoAction(MOCK_TENANT_ID, TENANT_TARGET);
+    await clearEmailLogoAction(MOCK_TENANT_ID, MOCK_TENANT_LOGO_TARGET);
 
     expect(insertAuditEvent).toHaveBeenCalledTimes(1);
     expect(insertAuditEvent).toHaveBeenCalledWith({
@@ -120,14 +126,17 @@ describe(clearEmailLogoAction, () => {
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
-      details: { target: TENANT_TARGET, operation: 'clear' },
+      details: { target: MOCK_TENANT_LOGO_TARGET, operation: 'clear' },
     });
   });
 
   it('reports a server error and records no audit event when the write fails', async () => {
     vi.mocked(upsertEmailConfig).mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await clearEmailLogoAction(MOCK_TENANT_ID, TENANT_TARGET);
+    const result = await clearEmailLogoAction(
+      MOCK_TENANT_ID,
+      MOCK_TENANT_LOGO_TARGET,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEvent).not.toHaveBeenCalled();
@@ -142,7 +151,7 @@ describe(clearEmailLogoAction, () => {
     );
 
     await expect(
-      clearEmailLogoAction(MOCK_TENANT_ID, TENANT_TARGET),
+      clearEmailLogoAction(MOCK_TENANT_ID, MOCK_TENANT_LOGO_TARGET),
     ).rejects.toThrow(gateError);
 
     expect(upsertEmailConfig).not.toHaveBeenCalled();

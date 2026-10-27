@@ -16,6 +16,7 @@ import {
   mockEmailBodyWithText,
   mockEmailConfig,
   mockEmailTemplateResult,
+  MOCK_TEST_EMAIL_SENDS_PER_WINDOW,
 } from '@platform/testing/email/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -46,7 +47,6 @@ vi.mock('@platform/utils/env/env');
 
 faker.seed(5998);
 
-const SENDS_PER_WINDOW = 5;
 const MOCK_ALERT_ADDRESS = faker.internet.email();
 const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
 const MOCK_SENDER_NAME = faker.lorem.words(2);
@@ -111,12 +111,12 @@ describe(sendTestEmailAction, () => {
     signInNewAdmin();
 
     const results = [];
-    for (let send = 0; send <= SENDS_PER_WINDOW; send += 1) {
+    for (let send = 0; send <= MOCK_TEST_EMAIL_SENDS_PER_WINDOW; send += 1) {
       results.push(await sendTestEmailAction(MOCK_TENANT_ID, INPUT));
     }
 
     expect(results.at(-1)).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
-    expect(sendEmail).toHaveBeenCalledTimes(SENDS_PER_WINDOW);
+    expect(sendEmail).toHaveBeenCalledTimes(MOCK_TEST_EMAIL_SENDS_PER_WINDOW);
   });
 
   it('rejects a blank subject without reaching the tenant gate', async () => {

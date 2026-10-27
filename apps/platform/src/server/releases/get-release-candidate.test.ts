@@ -1,14 +1,16 @@
 import { FINDING_STATUS, HTTP_STATUS, RELEASE_CHANGE } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { GITHUB_FAILURE } from '@platform/constants/github';
+import {
+  GITHUB_FAILURE,
+  GITHUB_FILE_STATUS,
+  GITHUB_RUN_STATUS,
+} from '@platform/constants/github';
 import {
   CONTRAST_STATUS,
   GITHUB_COMPARE_FILE_LIMIT,
   RELEASE_FAILURE,
 } from '@platform/constants/release';
 import {
-  GITHUB_FILE_STATUS,
-  GITHUB_RUN_STATUS,
   MOCK_GITHUB_CONTRAST_RUNS_PATH,
   MOCK_GITHUB_DB_JOURNAL_PATH,
   MOCK_GITHUB_MAIN_BRANCH_PATH,

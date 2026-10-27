@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { MOCK_SVG_CIRCLE } from '@platform/testing/site-config/fixtures';
 
 import { sanitizeSvgMarkup } from './sanitize-svg-markup';
 
@@ -12,29 +13,30 @@ const JSDOM_MODULE = 'jsdom-commonjs';
 
 const svg = (inner: string, attributes = '') =>
   `<svg viewBox="0 0 24 24"${attributes}>${inner}</svg>`;
-const CIRCLE = '<circle cx="12" cy="12" r="10"/>';
 
 describe(sanitizeSvgMarkup, () => {
   it.each([
     {
       scenario: 'an embedded script element',
-      markup: svg(`<script>${MOCK_SCRIPT_PAYLOAD}</script>${CIRCLE}`),
+      markup: svg(`<script>${MOCK_SCRIPT_PAYLOAD}</script>${MOCK_SVG_CIRCLE}`),
       removed: ['<script', MOCK_SCRIPT_PAYLOAD],
     },
     {
       scenario: 'an onload event-handler attribute',
-      markup: svg(CIRCLE, ` onload="${MOCK_SCRIPT_PAYLOAD}"`),
+      markup: svg(MOCK_SVG_CIRCLE, ` onload="${MOCK_SCRIPT_PAYLOAD}"`),
       removed: ['onload', MOCK_SCRIPT_PAYLOAD],
     },
     {
       scenario: 'a javascript: URI on an anchor href',
-      markup: svg(`<a href="javascript:${MOCK_SCRIPT_PAYLOAD}">${CIRCLE}</a>`),
+      markup: svg(
+        `<a href="javascript:${MOCK_SCRIPT_PAYLOAD}">${MOCK_SVG_CIRCLE}</a>`,
+      ),
       removed: ['javascript:'],
     },
     {
       scenario: 'a reference to an external origin',
       markup: svg(
-        `<a href="https://${MOCK_ATTACKER_HOST}/track">${CIRCLE}</a>`,
+        `<a href="https://${MOCK_ATTACKER_HOST}/track">${MOCK_SVG_CIRCLE}</a>`,
       ),
       removed: [MOCK_ATTACKER_HOST],
     },
@@ -61,7 +63,7 @@ describe(sanitizeSvgMarkup, () => {
   it.each([
     {
       scenario: 'a benign SVG',
-      markup: svg(CIRCLE.replace('/>', ' fill="currentColor"/>')),
+      markup: svg(MOCK_SVG_CIRCLE.replace('/>', ' fill="currentColor"/>')),
       kept: ['<circle', 'fill="currentColor"'],
     },
     {
@@ -93,7 +95,7 @@ describe(sanitizeSvgMarkup, () => {
 
   it('keeps the safe content around a stripped script element', async () => {
     const result = await sanitizeSvgMarkup(
-      svg(`<script>${MOCK_SCRIPT_PAYLOAD}</script>${CIRCLE}`),
+      svg(`<script>${MOCK_SCRIPT_PAYLOAD}</script>${MOCK_SVG_CIRCLE}`),
     );
 
     expect(result).toContain('<circle');

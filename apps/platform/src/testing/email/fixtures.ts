@@ -11,6 +11,12 @@ export const MOCK_EMAIL_LOGO_URL =
   'https://example.blob.vercel-storage.com/sender-logo.png';
 export const SEND_CONTACT_MESSAGES_TO = 'Send contact messages to';
 export const SEND_TEST_TO_ME = 'Send test to me';
+export const MOCK_TEST_EMAIL_SENDS_PER_WINDOW = 5;
+export const MOCK_TENANT_LOGO_TARGET = { type: 'tenant' } as const;
+export const MOCK_TEMPLATE_LOGO_TARGET = {
+  type: 'template',
+  templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+} as const;
 
 const MOCK_EMAIL_CONFIG_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
 

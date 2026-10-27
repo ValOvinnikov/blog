@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
+import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
 import {
   EMAIL_LOGO_MAX_DIMENSION_PX,
   MAX_EMAIL_LOGO_BYTES,
@@ -14,10 +15,6 @@ const MOCK_FILE_NAME = 'upload';
 const MOCK_SVG_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"></svg>';
 const MOCK_UNREADABLE_BYTES = new Uint8Array([1, 2, 3, 4]);
-const PNG_MIME = 'image/png';
-const GIF_MIME = 'image/gif';
-const WEBP_MIME = 'image/webp';
-const SVG_MIME = 'image/svg+xml';
 const BINARY_MIME = 'application/octet-stream';
 
 const buildPngBuffer = (width: number, height: number): Buffer => {
@@ -65,8 +62,18 @@ const refused = (reason: string, values?: Record<string, unknown>) => ({
 
 describe(validateEmailLogoUpload, () => {
   it.each([
-    ['PNG', buildPngBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX), 'png', PNG_MIME],
-    ['GIF', buildGifBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX), 'gif', GIF_MIME],
+    [
+      'PNG',
+      buildPngBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX),
+      'png',
+      MOCK_MIME_TYPE.PNG,
+    ],
+    [
+      'GIF',
+      buildGifBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX),
+      'gif',
+      MOCK_MIME_TYPE.GIF,
+    ],
   ])(
     'accepts a %s within the limits',
     async (_format, bytes, extension, mime) => {
@@ -88,18 +95,24 @@ describe(validateEmailLogoUpload, () => {
     );
 
     const result = await validateEmailLogoUpload(
-      toFile(bytes, 'png', PNG_MIME),
+      toFile(bytes, 'png', MOCK_MIME_TYPE.PNG),
     );
 
     expect(result).toEqual({
       ok: true,
-      data: { buffer: bytes, contentType: PNG_MIME, extension: 'png' },
+      data: {
+        buffer: bytes,
+        contentType: MOCK_MIME_TYPE.PNG,
+        extension: 'png',
+      },
     });
   });
 
   it('rejects an SVG even though the site-logo validator accepts it', async () => {
     const result = await validateEmailLogoUpload(
-      new File([MOCK_SVG_MARKUP], `${MOCK_FILE_NAME}.svg`, { type: SVG_MIME }),
+      new File([MOCK_SVG_MARKUP], `${MOCK_FILE_NAME}.svg`, {
+        type: MOCK_MIME_TYPE.SVG,
+      }),
     );
 
     expect(result).toEqual(refused(UPLOAD_REFUSAL.EMAIL_LOGO_SVG));
@@ -107,7 +120,11 @@ describe(validateEmailLogoUpload, () => {
 
   it('rejects a WebP image', async () => {
     const result = await validateEmailLogoUpload(
-      toFile(buildWebpBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX), 'webp', WEBP_MIME),
+      toFile(
+        buildWebpBuffer(MOCK_WIDTH_PX, MOCK_HEIGHT_PX),
+        'webp',
+        MOCK_MIME_TYPE.WEBP,
+      ),
     );
 
     expect(result).toEqual(refused(UPLOAD_REFUSAL.EMAIL_LOGO_WEBP));
@@ -118,7 +135,7 @@ describe(validateEmailLogoUpload, () => {
       toFile(
         pngBytes(MOCK_HEIGHT_PX, MOCK_HEIGHT_PX, MAX_EMAIL_LOGO_BYTES),
         'png',
-        PNG_MIME,
+        MOCK_MIME_TYPE.PNG,
       ),
     );
 
@@ -134,7 +151,7 @@ describe(validateEmailLogoUpload, () => {
     'rejects a %i by %i image over the dimension ceiling',
     async (width, height) => {
       const result = await validateEmailLogoUpload(
-        toFile(buildPngBuffer(width, height), 'png', PNG_MIME),
+        toFile(buildPngBuffer(width, height), 'png', MOCK_MIME_TYPE.PNG),
       );
 
       expect(result).toEqual(
@@ -147,7 +164,7 @@ describe(validateEmailLogoUpload, () => {
 
   it('rejects an empty file', async () => {
     const result = await validateEmailLogoUpload(
-      new File([], `${MOCK_FILE_NAME}.png`, { type: PNG_MIME }),
+      new File([], `${MOCK_FILE_NAME}.png`, { type: MOCK_MIME_TYPE.PNG }),
     );
 
     expect(result).toEqual(refused(UPLOAD_REFUSAL.FILE_MISSING));

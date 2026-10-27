@@ -1,7 +1,5 @@
-import {
-  GITHUB_FILE_STATUS,
-  mockChangedFile,
-} from '@platform/testing/github/fixtures';
+import { GITHUB_FILE_STATUS } from '@platform/constants/github';
+import { mockChangedFile } from '@platform/testing/github/fixtures';
 
 import {
   countAddedContentMigrations,

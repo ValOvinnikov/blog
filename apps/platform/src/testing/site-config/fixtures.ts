@@ -9,6 +9,7 @@ export const CURRENT_LOGO = 'Current logo';
 export const UPLOAD_LOGO = 'Upload logo';
 export const REPLACE_LOGO = 'Replace logo';
 export const MOCK_STAGED_LOGO_BLOB_URL = 'blob:staged-logo';
+export const MOCK_SVG_CIRCLE = '<circle cx="12" cy="12" r="10"/>';
 
 export const MOCK_THEME_FIELDS = {
   preset: PRESET_ID.CONSOLE,

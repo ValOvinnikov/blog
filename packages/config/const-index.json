@@ -3916,6 +3916,70 @@
         "file": "apps/platform/src/constants/github.ts"
       }
     ],
+    "added": [
+      {
+        "ref": "GITHUB_FILE_STATUS.ADDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "modified": [
+      {
+        "ref": "GITHUB_FILE_STATUS.MODIFIED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "queued": [
+      {
+        "ref": "GITHUB_RUN_STATUS.QUEUED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "in_progress": [
+      {
+        "ref": "GITHUB_RUN_STATUS.IN_PROGRESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "completed": [
+      {
+        "ref": "GITHUB_RUN_STATUS.COMPLETED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "success": [
+      {
+        "ref": "GITHUB_RUN_CONCLUSION.SUCCESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "failure": [
+      {
+        "ref": "GITHUB_RUN_CONCLUSION.FAILURE",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "skipped": [
+      {
+        "ref": "GITHUB_RUN_CONCLUSION.SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/github",
+        "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
     "github.not_configured": [
       {
         "ref": "GITHUB_LOG.NOT_CONFIGURED",

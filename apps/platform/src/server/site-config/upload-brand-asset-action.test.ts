@@ -23,6 +23,8 @@ import {
   mockSiteConfigThemeAndAssets,
 } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
+import { brandAssetKindSchema } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -70,16 +72,12 @@ vi.mock('@vercel/blob', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-const BRAND_ASSET_KIND = { LOGO: 'logo', FAVICON: 'favicon' } as const;
-const LOGO_KIND = BRAND_ASSET_KIND.LOGO;
-const FAVICON_KIND = BRAND_ASSET_KIND.FAVICON;
-const MOCK_CONTENT_TYPE = 'image/png';
 const MOCK_FILE_NAME = faker.system.commonFileName('png');
 const MOCK_UPLOADED_URL = faker.internet.url();
 const MOCK_NEW_URL = faker.internet.url();
 const MOCK_VALIDATED_UPLOAD = {
   buffer: Buffer.from(faker.lorem.word()),
-  contentType: MOCK_CONTENT_TYPE,
+  contentType: MOCK_MIME_TYPE.PNG,
   extension: 'png',
 };
 const MOCK_BLOB_ERROR_MESSAGE = faker.lorem.words(3);
@@ -94,7 +92,7 @@ const mockFormData = (file: TMaybeNull<File>): FormData => {
 };
 
 const mockImageFormData = (): FormData =>
-  mockFormData(new File(['x'], MOCK_FILE_NAME, { type: MOCK_CONTENT_TYPE }));
+  mockFormData(new File(['x'], MOCK_FILE_NAME, { type: MOCK_MIME_TYPE.PNG }));
 
 describe(uploadBrandAssetAction, () => {
   beforeEach(() => {
@@ -117,7 +115,7 @@ describe(uploadBrandAssetAction, () => {
   it('re-resolves the tenant from the session before touching Blob or the db', async () => {
     await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -127,7 +125,7 @@ describe(uploadBrandAssetAction, () => {
   it('rejects when no file is present in the form data', async () => {
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockFormData(null),
     );
 
@@ -149,7 +147,7 @@ describe(uploadBrandAssetAction, () => {
 
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      FAVICON_KIND,
+      brandAssetKindSchema.enum.favicon,
       mockImageFormData(),
     );
 
@@ -166,7 +164,7 @@ describe(uploadBrandAssetAction, () => {
   it('uploads under a unique tenant-scoped name and returns the new logo URL', async () => {
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -175,12 +173,12 @@ describe(uploadBrandAssetAction, () => {
       url: MOCK_UPLOADED_URL,
     });
     expect(putMock).toHaveBeenCalledWith(
-      `tenants/${MOCK_TENANT_ID}/${LOGO_KIND}.${MOCK_VALIDATED_UPLOAD.extension}`,
+      `tenants/${MOCK_TENANT_ID}/${brandAssetKindSchema.enum.logo}.${MOCK_VALIDATED_UPLOAD.extension}`,
       MOCK_VALIDATED_UPLOAD.buffer,
       {
         access: 'public',
         addRandomSuffix: true,
-        contentType: MOCK_CONTENT_TYPE,
+        contentType: MOCK_MIME_TYPE.PNG,
         token: MOCK_BLOB_TOKEN,
       },
     );
@@ -189,7 +187,7 @@ describe(uploadBrandAssetAction, () => {
   it('saves the theme fields plus the new logo URL', async () => {
     await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -202,7 +200,7 @@ describe(uploadBrandAssetAction, () => {
   it('refreshes the public site for the tenant once the new URL is saved', async () => {
     await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      FAVICON_KIND,
+      brandAssetKindSchema.enum.favicon,
       mockImageFormData(),
     );
 
@@ -212,7 +210,7 @@ describe(uploadBrandAssetAction, () => {
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -223,7 +221,7 @@ describe(uploadBrandAssetAction, () => {
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
       details: {
-        asset: LOGO_KIND,
+        asset: brandAssetKindSchema.enum.logo,
         operation: 'upload',
         url: MOCK_UPLOADED_URL,
       },
@@ -239,7 +237,7 @@ describe(uploadBrandAssetAction, () => {
 
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -257,7 +255,7 @@ describe(uploadBrandAssetAction, () => {
 
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -272,7 +270,7 @@ describe(uploadBrandAssetAction, () => {
 
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -286,7 +284,7 @@ describe(uploadBrandAssetAction, () => {
 
     const result = await uploadBrandAssetAction(
       MOCK_TENANT_ID,
-      LOGO_KIND,
+      brandAssetKindSchema.enum.logo,
       mockImageFormData(),
     );
 
@@ -308,7 +306,11 @@ describe(uploadBrandAssetAction, () => {
     });
 
     await expect(
-      uploadBrandAssetAction(MOCK_TENANT_ID, LOGO_KIND, mockImageFormData()),
+      uploadBrandAssetAction(
+        MOCK_TENANT_ID,
+        brandAssetKindSchema.enum.logo,
+        mockImageFormData(),
+      ),
     ).rejects.toThrow(navigationError);
 
     expect(putMock).not.toHaveBeenCalled();

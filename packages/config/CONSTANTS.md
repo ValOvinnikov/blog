@@ -324,6 +324,9 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`
+- **GITHUB_FILE_STATUS**: `ADDED`=`"added"`, `MODIFIED`=`"modified"`
+- **GITHUB_RUN_STATUS**: `QUEUED`=`"queued"`, `IN_PROGRESS`=`"in_progress"`, `COMPLETED`=`"completed"`
+- **GITHUB_RUN_CONCLUSION**: `SUCCESS`=`"success"`, `FAILURE`=`"failure"`, `SKIPPED`=`"skipped"`
 - **GITHUB_LOG**: `NOT_CONFIGURED`=`"github.not_configured"`, `RATE_LIMITED`=`"github.rate_limited"`, `REQUEST_ERROR`=`"github.request_error"`, `REQUEST_FAILED`=`"github.request_failed"`, `TAG_LIST_INCOMPLETE`=`"github.tag_list_incomplete"`, `UNEXPECTED_RESPONSE`=`"github.unexpected_response"`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`

@@ -22,6 +22,7 @@ import {
   mockSiteConfigThemeAndAssets,
 } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { brandAssetKindSchema } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@platform/utils/env/env';
 import type { Session } from 'next-auth';
 
@@ -60,10 +61,6 @@ vi.mock('@platform/utils/env/env');
 
 Object.assign(env, { BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN });
 
-const BRAND_ASSET_KIND = { LOGO: 'logo', FAVICON: 'favicon' } as const;
-const LOGO_KIND = BRAND_ASSET_KIND.LOGO;
-const FAVICON_KIND = BRAND_ASSET_KIND.FAVICON;
-
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
@@ -80,20 +77,23 @@ describe(clearBrandAssetAction, () => {
   });
 
   it('re-resolves the tenant from the session before writing', async () => {
-    await clearBrandAssetAction(MOCK_TENANT_ID, FAVICON_KIND);
+    await clearBrandAssetAction(
+      MOCK_TENANT_ID,
+      brandAssetKindSchema.enum.favicon,
+    );
 
     expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it.each([
     {
-      kind: LOGO_KIND,
+      kind: brandAssetKindSchema.enum.logo,
       stored: { logoAssetUrl: MOCK_LOGO_URL },
       cleared: { logoAssetUrl: null },
       blobUrl: MOCK_LOGO_URL,
     },
     {
-      kind: FAVICON_KIND,
+      kind: brandAssetKindSchema.enum.favicon,
       stored: { faviconAssetUrl: MOCK_FAVICON_URL },
       cleared: { faviconAssetUrl: null },
       blobUrl: MOCK_FAVICON_URL,
@@ -123,7 +123,7 @@ describe(clearBrandAssetAction, () => {
       mockSiteConfigThemeAndAssets({ logoAssetUrl: MOCK_LOGO_URL }),
     );
 
-    await clearBrandAssetAction(MOCK_TENANT_ID, LOGO_KIND);
+    await clearBrandAssetAction(MOCK_TENANT_ID, brandAssetKindSchema.enum.logo);
 
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
@@ -133,7 +133,10 @@ describe(clearBrandAssetAction, () => {
       mockSiteConfigThemeAndAssets({ faviconAssetUrl: MOCK_FAVICON_URL }),
     );
 
-    await clearBrandAssetAction(MOCK_TENANT_ID, FAVICON_KIND);
+    await clearBrandAssetAction(
+      MOCK_TENANT_ID,
+      brandAssetKindSchema.enum.favicon,
+    );
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -141,12 +144,15 @@ describe(clearBrandAssetAction, () => {
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
-      details: { asset: FAVICON_KIND, operation: 'clear' },
+      details: { asset: brandAssetKindSchema.enum.favicon, operation: 'clear' },
     });
   });
 
   it('is a no-op success when the field is already empty', async () => {
-    const result = await clearBrandAssetAction(MOCK_TENANT_ID, FAVICON_KIND);
+    const result = await clearBrandAssetAction(
+      MOCK_TENANT_ID,
+      brandAssetKindSchema.enum.favicon,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
@@ -161,7 +167,10 @@ describe(clearBrandAssetAction, () => {
     );
     upsertSiteConfigMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
 
-    const result = await clearBrandAssetAction(MOCK_TENANT_ID, FAVICON_KIND);
+    const result = await clearBrandAssetAction(
+      MOCK_TENANT_ID,
+      brandAssetKindSchema.enum.favicon,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
@@ -177,7 +186,7 @@ describe(clearBrandAssetAction, () => {
     });
 
     await expect(
-      clearBrandAssetAction(MOCK_TENANT_ID, LOGO_KIND),
+      clearBrandAssetAction(MOCK_TENANT_ID, brandAssetKindSchema.enum.logo),
     ).rejects.toThrow(navigationError);
 
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();

@@ -24,8 +24,11 @@ import {
   MOCK_EMAIL_LOGO_URL,
   mockEmailConfig,
   mockEmailTemplateResult,
+  MOCK_TENANT_LOGO_TARGET,
+  MOCK_TEMPLATE_LOGO_TARGET,
 } from '@platform/testing/email/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_MIME_TYPE } from '@platform/testing/upload/fixtures';
 import { env } from '@platform/utils/env/env';
 import { put } from '@vercel/blob';
 
@@ -53,18 +56,13 @@ faker.seed(5998);
 const MOCK_TEMPLATE_LOGO_URL = faker.internet.url();
 const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 const MOCK_LOGO_FILE = new File([faker.lorem.word()], 'logo.png', {
-  type: 'image/png',
+  type: MOCK_MIME_TYPE.PNG,
 });
 const MOCK_VALID_ASSET = {
   buffer: Buffer.from(faker.lorem.word()),
-  contentType: 'image/png',
+  contentType: MOCK_MIME_TYPE.PNG,
   extension: 'png',
 };
-const TENANT_TARGET = { type: 'tenant' } as const;
-const TEMPLATE_TARGET = {
-  type: 'template',
-  templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-} as const;
 
 const { getEmailConfig, upsertEmailConfig } = queries.emailConfig;
 const { getEmailTemplate, upsertEmailTemplate } = queries.emailTemplates;
@@ -99,7 +97,7 @@ describe(uploadEmailLogoAction, () => {
   it('stores the tenant email logo under a random-suffixed email-logo path', async () => {
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      TENANT_TARGET,
+      MOCK_TENANT_LOGO_TARGET,
       buildLogoFormData(),
     );
 
@@ -129,7 +127,7 @@ describe(uploadEmailLogoAction, () => {
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      TEMPLATE_TARGET,
+      MOCK_TEMPLATE_LOGO_TARGET,
       buildLogoFormData(),
     );
 
@@ -164,7 +162,7 @@ describe(uploadEmailLogoAction, () => {
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      TENANT_TARGET,
+      MOCK_TENANT_LOGO_TARGET,
       buildLogoFormData(),
     );
 
@@ -181,7 +179,7 @@ describe(uploadEmailLogoAction, () => {
 
     await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      TENANT_TARGET,
+      MOCK_TENANT_LOGO_TARGET,
       buildLogoFormData(),
     );
 
@@ -192,7 +190,7 @@ describe(uploadEmailLogoAction, () => {
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: MOCK_TENANT_ID,
       details: {
-        target: TENANT_TARGET,
+        target: MOCK_TENANT_LOGO_TARGET,
         operation: 'upload',
         url: MOCK_EMAIL_LOGO_URL,
       },
@@ -204,7 +202,7 @@ describe(uploadEmailLogoAction, () => {
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      TENANT_TARGET,
+      MOCK_TENANT_LOGO_TARGET,
       buildLogoFormData(),
     );
 
@@ -217,7 +215,7 @@ describe(uploadEmailLogoAction, () => {
 
     const result = await uploadEmailLogoAction(
       MOCK_TENANT_ID,
-      TENANT_TARGET,
+      MOCK_TENANT_LOGO_TARGET,
       buildLogoFormData(),
     );
 
@@ -237,7 +235,11 @@ describe(uploadEmailLogoAction, () => {
     );
 
     await expect(
-      uploadEmailLogoAction(MOCK_TENANT_ID, TENANT_TARGET, buildLogoFormData()),
+      uploadEmailLogoAction(
+        MOCK_TENANT_ID,
+        MOCK_TENANT_LOGO_TARGET,
+        buildLogoFormData(),
+      ),
     ).rejects.toThrow(gateError);
 
     expect(put).not.toHaveBeenCalled();

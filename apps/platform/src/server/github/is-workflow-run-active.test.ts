@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { GITHUB_RUN_STATUS } from '@platform/testing/github/fixtures';
+import { GITHUB_RUN_STATUS } from '@platform/constants/github';
 import {
   mockGitHubResponse,
   useGitHubFetch,

@@ -12,7 +12,7 @@ import {
   SIGNUP_BLOCK_LOG,
   SIGNUP_BLOCK_REFUSAL,
 } from '@platform/constants/signup-block';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_BLOCKED_ADDRESS_ENTRY_ID,
@@ -26,20 +26,16 @@ import { notFound } from 'next/navigation';
 import { removeBlockedIdentityAction } from './remove-blocked-identity-action';
 
 const {
-  requireSuperAdminMock,
   listBlockedIdentitiesMock,
   removeBlockedIdentityMock,
   recordAuditEventMock,
 } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
   listBlockedIdentitiesMock: vi.fn(),
   removeBlockedIdentityMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
@@ -62,7 +58,6 @@ const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
 
 describe(removeBlockedIdentityAction, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(mockAdmin());
     listBlockedIdentitiesMock
       .mockReset()
       .mockResolvedValue(
@@ -73,7 +68,7 @@ describe(removeBlockedIdentityAction, () => {
   });
 
   it('rejects a caller who is not a super admin', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
+    vi.mocked(requireSuperAdmin).mockImplementationOnce(() => {
       notFound();
     });
 

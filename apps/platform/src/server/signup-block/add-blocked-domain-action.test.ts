@@ -7,6 +7,7 @@ import {
   SIGNUP_BLOCK_FIELD_ERROR,
   SIGNUP_BLOCK_LOG,
 } from '@platform/constants/signup-block';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
   MOCK_BLOCK_REASON,
@@ -18,14 +19,11 @@ import { notFound } from 'next/navigation';
 
 import { addBlockedDomainAction } from './add-blocked-domain-action';
 
-const { requireSuperAdminMock, addSignupBlockMock } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
+const { addSignupBlockMock } = vi.hoisted(() => ({
   addSignupBlockMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   addSignupBlock: addSignupBlockMock,
@@ -42,7 +40,6 @@ const MOCK_INPUT = {
 
 describe(addBlockedDomainAction, () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset().mockResolvedValue(MOCK_ADMIN);
     addSignupBlockMock
       .mockReset()
       .mockResolvedValue(
@@ -51,7 +48,7 @@ describe(addBlockedDomainAction, () => {
   });
 
   it('rejects a caller who is not a super admin', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
+    vi.mocked(requireSuperAdmin).mockImplementationOnce(() => {
       notFound();
     });
 
@@ -62,6 +59,7 @@ describe(addBlockedDomainAction, () => {
   });
 
   it('adds the trimmed domain with the trimmed reason as the admin', async () => {
+    vi.mocked(requireSuperAdmin).mockResolvedValueOnce(MOCK_ADMIN);
     const result = await addBlockedDomainAction(MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });

@@ -1,15 +1,15 @@
 import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { GITHUB_FAILURE } from '@platform/constants/github';
+import {
+  GITHUB_FAILURE,
+  GITHUB_RUN_CONCLUSION,
+  GITHUB_RUN_STATUS,
+} from '@platform/constants/github';
 import {
   RELEASE_RUN_STATUS,
   RELEASE_WORKFLOW_FILE,
   TENANT_MIGRATION_JOB_NAME,
 } from '@platform/constants/release';
-import {
-  GITHUB_RUN_CONCLUSION,
-  GITHUB_RUN_STATUS,
-} from '@platform/testing/github/fixtures';
 import {
   mockGitHubResponse,
   useGitHubFetch,
