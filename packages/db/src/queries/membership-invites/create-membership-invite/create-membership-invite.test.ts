@@ -8,6 +8,7 @@ import {
   usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
@@ -20,7 +21,6 @@ faker.seed(6022);
 const OUTCOME_CREATED = 'created';
 const OUTCOME_ALREADY_PENDING = 'already-pending';
 const OUTCOME_ALREADY_CONSUMED = 'already-consumed';
-const MOCK_MISSING_TENANT_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 usePersonalDataKeys();

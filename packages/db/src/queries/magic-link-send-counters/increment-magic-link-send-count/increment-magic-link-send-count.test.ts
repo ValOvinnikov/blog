@@ -10,7 +10,7 @@ faker.seed(6022);
 
 const MOCK_KEY = `email:${faker.string.alphanumeric(16)}`;
 const MOCK_OTHER_KEY = `ip:${faker.string.alphanumeric(16)}`;
-const MOCK_WINDOW_OPENED_AT = faker.date.recent();
+const MOCK_WINDOW_OPENED_AT = new Date('2026-06-15T12:00:00.000Z');
 const WINDOW_MS = 60 * 60_000;
 const SECOND_MS = 1000;
 const AFTER_WINDOW = new Date(

@@ -2,6 +2,12 @@ import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTestDb } from '@blog/db/testing/fixtures';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
+
+const membershipsFaker = createMockFaker(60221);
+
+export const MOCK_USER_ID = membershipsFaker.string.uuid();
+export const MOCK_MISSING_USER_ID = membershipsFaker.string.uuid();
 
 export async function mockMembership(
   db: TTestDb,

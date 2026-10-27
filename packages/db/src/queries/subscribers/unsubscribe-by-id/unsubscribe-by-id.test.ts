@@ -17,6 +17,8 @@ vi.mock('@blog/db/client');
 
 faker.seed(1);
 
+const MOCK_UNKNOWN_SUBSCRIBER_ID = faker.string.uuid();
+
 const db = useQueryTestDb();
 usePersonalDataKeys();
 
@@ -60,7 +62,7 @@ describe(unsubscribeById, () => {
   });
 
   it.each([
-    ['an unknown subscriber', () => tenantId, () => faker.string.uuid()],
+    ['an unknown subscriber', () => tenantId, () => MOCK_UNKNOWN_SUBSCRIBER_ID],
     ["another tenant's subscriber", () => otherTenantId, () => subscriberId],
   ])(
     'returns not-found for %s and deletes nothing',

@@ -1,4 +1,4 @@
-import { PRESET_ID } from '@blog/config/constants';
+import { HUE_MAX, HUE_MIN, PRESET_ID } from '@blog/config/constants';
 import { getSiteConfig } from '@blog/db/queries/site-config/get-site-config';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -12,7 +12,10 @@ faker.seed(6022);
 
 vi.mock('@blog/db/client');
 
-const MOCK_CUSTOM_ACCENT_HUE = faker.number.int({ min: 1, max: 360 });
+const MOCK_CUSTOM_ACCENT_HUE = faker.number.int({
+  min: HUE_MIN + 1,
+  max: HUE_MAX,
+});
 
 const db = useQueryTestDb();
 

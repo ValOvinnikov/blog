@@ -1,14 +1,11 @@
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import {
-  testPersonalEmailIndex,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { insertTestSubscriberRow } from '@blog/db/testing/subscribers/fixtures-confirmation';
 
 import { getSubscriberByEmailIndex } from './get-subscriber-by-email-index';
 
@@ -30,11 +27,11 @@ describe(getSubscriberByEmailIndex, () => {
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
     ({ id: otherTenantId } = await insertTestTenant(db()));
-    subscriber = await insertTestSubscriberRow(db(), {
+    subscriber = await insertTestSubscriber(
+      db(),
       tenantId,
-      email: MOCK_SUBSCRIBER_EMAIL,
-      emailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-    });
+      MOCK_SUBSCRIBER_EMAIL,
+    );
   });
 
   it("finds the tenant's subscriber by the address's index", async () => {

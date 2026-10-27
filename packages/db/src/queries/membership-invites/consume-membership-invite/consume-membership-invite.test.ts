@@ -9,7 +9,11 @@ import {
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
 } from '@blog/db/testing/membership-invites/fixtures';
-import { mockMembership } from '@blog/db/testing/memberships/fixtures';
+import {
+  mockMembership,
+  MOCK_USER_ID,
+  MOCK_MISSING_USER_ID,
+} from '@blog/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -20,8 +24,6 @@ vi.mock('@blog/db/client');
 
 faker.seed(6022);
 
-const MOCK_USER_ID = faker.string.uuid();
-const MOCK_MISSING_USER_ID = faker.string.uuid();
 const MOCK_MISSING_INVITE_ID = faker.string.uuid();
 
 const db = useQueryTestDb();

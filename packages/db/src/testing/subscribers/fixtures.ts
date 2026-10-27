@@ -4,22 +4,6 @@ import { eq } from 'drizzle-orm';
 
 export const MOCK_CONFIRMATION_NOW = new Date('2026-10-23T09:00:00Z');
 
-export async function insertTestSubscriberRow(
-  db: TTestDb,
-  values: typeof schema.subscribers.$inferInsert,
-): Promise<schema.TSubscriber> {
-  const [subscriber] = await db
-    .insert(schema.subscribers)
-    .values(values)
-    .returning();
-
-  if (!subscriber) {
-    throw new Error('insertTestSubscriberRow: insert returned no row.');
-  }
-
-  return subscriber;
-}
-
 export async function readTestSubscriber(
   db: TTestDb,
   id: string,

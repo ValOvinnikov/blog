@@ -1,6 +1,7 @@
 import type * as BlogConfig from '@blog/config';
 import {
   VOICE_FIELD_ERROR,
+  VOICE_FIELDS,
   type TVoiceFieldFailuresByLocale,
 } from '@blog/config';
 import {
@@ -20,6 +21,7 @@ import {
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
 } from '@blog/db/testing/site-config/fixtures';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -59,12 +61,20 @@ vi.mock('@blog/config', async (importOriginal) => {
 
 const db = useQueryTestDb();
 
-const NOT_FOUND_HEADING_MAX = 100;
-const SUPPORTING_TEXT_MAX = 300;
+const NOT_FOUND_HEADING_ID = 'notFoundHeading';
+const SUPPORTING_TEXT_ID = 'notFoundSupportingText';
+
+function voiceFieldMax(id: string): number {
+  const field = VOICE_FIELDS.find((candidate) => candidate.id === id);
+  if (!field) throw new Error(`voiceFieldMax: no voice field "${id}".`);
+  return field.max;
+}
+
+const NOT_FOUND_HEADING_MAX = voiceFieldMax(NOT_FOUND_HEADING_ID);
+const SUPPORTING_TEXT_MAX = voiceFieldMax(SUPPORTING_TEXT_ID);
 const CHANGED_ACCENT_HUE = MOCK_ACCENT_HUE - 1;
 const MOCK_LOGO_HUE = MOCK_ACCENT_HUE - 2;
 const MOCK_UNKNOWN_VALUE = faker.lorem.word();
-const MOCK_MISSING_TENANT_ID = faker.string.uuid();
 const MOCK_HEADING = faker.lorem.words(3);
 const MOCK_FR_HEADING = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
@@ -80,15 +90,13 @@ const MOCK_RICH_BLOCK_KEY = faker.string.uuid();
 const MOCK_RICH_SPAN_KEY = faker.string.uuid();
 const MOCK_NON_RICH_TEXT_VALUE = faker.number.int();
 const NAME_PLACEHOLDER = '{name}';
-const KEEPS_FIELD_TITLE = 'keeps $field when a later save omits it';
-const REJECTS_OVER_CAP_TITLE = 'rejects an override longer than its field cap';
 
 const baseInput: TUpdateSiteConfigInput = MOCK_SITE_CONFIG_FIELDS;
 
 const STYLE_FIELDS = [
-  { field: 'languageSwitcherStyle', chosen: LANGUAGE_SWITCHER_STYLE.CODES },
-  { field: 'cardStyle', chosen: CARD_STYLE.OUTLINED },
-  { field: 'headerControlStyle', chosen: HEADER_CONTROL_STYLE.SOFT },
+  { field: 'languageSwitcherStyle', value: LANGUAGE_SWITCHER_STYLE.CODES },
+  { field: 'cardStyle', value: CARD_STYLE.OUTLINED },
+  { field: 'headerControlStyle', value: HEADER_CONTROL_STYLE.SOFT },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -150,6 +158,12 @@ const OPTIONAL_COLUMNS = [
   { field: 'logoHue', value: MOCK_LOGO_HUE },
   { field: 'logoAssetUrl', value: MOCK_LOGO_ASSET_URL },
   { field: 'faviconAssetUrl', value: MOCK_FAVICON_ASSET_URL },
+] as const;
+
+const OVER_CAP_FIELDS = [
+  { id: NOT_FOUND_HEADING_ID, max: NOT_FOUND_HEADING_MAX },
+  { id: SYNTHETIC_MULTILINE_FIELD_ID, max: SYNTHETIC_MULTILINE_FIELD_MAX },
+  { id: SUPPORTING_TEXT_ID, max: SUPPORTING_TEXT_MAX },
 ] as const;
 
 function expectOk(result: TUpsertSiteConfigResult): TSiteConfigResult {
@@ -269,20 +283,12 @@ describe(upsertSiteConfig, () => {
 
     it.each(STYLE_FIELDS)(
       'stores a chosen $field',
-      async ({ field, chosen }) => {
-        const result = expectOk(await save({ [field]: chosen }));
+      async ({ field, value }) => {
+        const result = expectOk(await save({ [field]: value }));
 
-        expect(result[field]).toBe(chosen);
+        expect(result[field]).toBe(value);
       },
     );
-
-    it.each(STYLE_FIELDS)(KEEPS_FIELD_TITLE, async ({ field, chosen }) => {
-      await save({ [field]: chosen });
-
-      const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
-
-      expect(result[field]).toBe(chosen);
-    });
 
     it('keeps the card style across a preset change when a save omits it', async () => {
       await save();
@@ -293,6 +299,28 @@ describe(upsertSiteConfig, () => {
     });
   });
 
+  describe('voice field caps', () => {
+    it.each(OVER_CAP_FIELDS)(
+      'rejects an override longer than the $id cap',
+      async ({ id, max }) => {
+        const errors = expectFieldErrors(
+          await saveVoice({
+            [id]: 'x'.repeat(max + 1),
+          } as TVoiceOverridesInput),
+        );
+
+        expect(errors).toEqual({
+          [LOCALE_ISO_CODES.EN]: {
+            [id]: {
+              reason: VOICE_FIELD_ERROR.TOO_LONG,
+              values: { max },
+            },
+          },
+        });
+      },
+    );
+  });
+
   describe('TEXT voice fields', () => {
     it('stores a trimmed override', async () => {
       const result = expectOk(
@@ -300,23 +328,6 @@ describe(upsertSiteConfig, () => {
       );
 
       expect(result.voiceOverrides).toEqual({ notFoundHeading: MOCK_HEADING });
-    });
-
-    it(REJECTS_OVER_CAP_TITLE, async () => {
-      const errors = expectFieldErrors(
-        await saveVoice({
-          notFoundHeading: 'x'.repeat(NOT_FOUND_HEADING_MAX + 1),
-        }),
-      );
-
-      expect(errors).toEqual({
-        [LOCALE_ISO_CODES.EN]: {
-          notFoundHeading: {
-            reason: VOICE_FIELD_ERROR.TOO_LONG,
-            values: { max: NOT_FOUND_HEADING_MAX },
-          },
-        },
-      });
     });
 
     it('rejects an override containing a line break', async () => {
@@ -365,25 +376,6 @@ describe(upsertSiteConfig, () => {
 
       expect(result.voiceOverrides).toEqual({
         [SYNTHETIC_MULTILINE_FIELD_ID]: MOCK_MULTILINE_TEXT,
-      });
-    });
-
-    it(REJECTS_OVER_CAP_TITLE, async () => {
-      const errors = expectFieldErrors(
-        await saveVoice({
-          [SYNTHETIC_MULTILINE_FIELD_ID]: 'x'.repeat(
-            SYNTHETIC_MULTILINE_FIELD_MAX + 1,
-          ),
-        } as TVoiceOverridesInput),
-      );
-
-      expect(errors).toEqual({
-        [LOCALE_ISO_CODES.EN]: {
-          [SYNTHETIC_MULTILINE_FIELD_ID]: {
-            reason: VOICE_FIELD_ERROR.TOO_LONG,
-            values: { max: SYNTHETIC_MULTILINE_FIELD_MAX },
-          },
-        },
       });
     });
   });
@@ -501,7 +493,6 @@ describe(upsertSiteConfig, () => {
     });
 
     it.each([
-      ['a string', 'x'.repeat(SUPPORTING_TEXT_MAX + 1)],
       ['a padded string', `  ${'x'.repeat(SUPPORTING_TEXT_MAX + 1)}  `],
       ['rich text', mockRichText('x'.repeat(SUPPORTING_TEXT_MAX + 1))],
     ])('rejects %s over the cap', async (_title, input) => {
@@ -628,13 +619,16 @@ describe(upsertSiteConfig, () => {
       expect(result.voiceOverrides).toEqual({});
     });
 
-    it.each(OPTIONAL_COLUMNS)(KEEPS_FIELD_TITLE, async ({ field, value }) => {
-      await save({ [field]: value });
+    it.each([...STYLE_FIELDS, ...OPTIONAL_COLUMNS])(
+      'keeps $field when a later save omits it',
+      async ({ field, value }) => {
+        await save({ [field]: value });
 
-      const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+        const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
 
-      expect(result[field]).toBe(value);
-    });
+        expect(result[field]).toBe(value);
+      },
+    );
 
     it.each(OPTIONAL_COLUMNS)(
       'clears $field when explicitly saved as null',

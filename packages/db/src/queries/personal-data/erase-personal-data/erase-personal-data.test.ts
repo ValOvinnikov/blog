@@ -35,7 +35,9 @@ usePersonalDataKeys();
 faker.seed(6022);
 
 const MOCK_SESSION_TOKEN = faker.string.uuid();
-const MOCK_SESSION_EXPIRES = faker.date.future();
+const MOCK_SESSION_EXPIRES = faker.date.future({
+  refDate: '2026-03-15T10:00:00.000Z',
+});
 
 const WITH_READER_ACCOUNT = { includesReaderAccount: true };
 const WITHOUT_READER_ACCOUNT = { includesReaderAccount: false };

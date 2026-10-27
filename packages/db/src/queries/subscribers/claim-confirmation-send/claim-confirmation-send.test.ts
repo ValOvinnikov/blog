@@ -1,15 +1,16 @@
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
-  insertTestSubscriberRow,
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
-} from '@blog/db/testing/subscribers/fixtures-confirmation';
+} from '@blog/db/testing/subscribers/fixtures';
 
 import { claimConfirmationSend } from './claim-confirmation-send';
 
@@ -18,6 +19,7 @@ vi.mock('@blog/db/client');
 const COOLDOWN_MS = 15 * 60_000;
 
 const db = useQueryTestDb();
+usePersonalDataKeys();
 
 beforeEach(() => {
   vi.useFakeTimers({ now: MOCK_CONFIRMATION_NOW, toFake: ['Date'] });
@@ -40,10 +42,11 @@ describe(claimConfirmationSend, () => {
     let subscriber: schema.TSubscriber;
 
     beforeEach(async () => {
-      subscriber = await insertTestSubscriberRow(db(), {
+      subscriber = await insertTestSubscriber(
+        db(),
         tenantId,
-        email: MOCK_SUBSCRIBER_EMAIL,
-      });
+        MOCK_SUBSCRIBER_EMAIL,
+      );
     });
 
     it('claims a pending subscriber never sent a confirmation', async () => {
@@ -99,12 +102,15 @@ describe(claimConfirmationSend, () => {
   });
 
   it('never claims an active subscriber', async () => {
-    const { id } = await insertTestSubscriberRow(db(), {
+    const { id } = await insertTestSubscriber(
+      db(),
       tenantId,
-      email: MOCK_SUBSCRIBER_EMAIL,
-      status: SUBSCRIBER_STATUS.ACTIVE,
-      confirmedAt: MOCK_CONFIRMATION_NOW,
-    });
+      MOCK_SUBSCRIBER_EMAIL,
+      {
+        status: SUBSCRIBER_STATUS.ACTIVE,
+        confirmedAt: MOCK_CONFIRMATION_NOW,
+      },
+    );
 
     const claim = await claimConfirmationSend(id, COOLDOWN_MS);
 

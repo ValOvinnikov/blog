@@ -1,22 +1,13 @@
-import {
-  DENSITY,
-  FONT_CHOICE,
-  PRESET_ID,
-  RADIUS_SCALE,
-} from '@blog/config/constants';
+import { PRESET_ID } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mockSettingsFeaturesToggles } from '@blog/db/testing/settings-features/fixtures';
-import { faker } from '@faker-js/faker';
+import { MOCK_SITE_CONFIG_FIELDS } from '@blog/db/testing/site-config/fixtures';
 
 import { getSettingsFeaturesAndPreset } from './get-settings-features-and-preset';
 
 vi.mock('@blog/db/client');
-
-faker.seed(6022);
-
-const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
 
 const NOTHING_SAVED = {
   features: undefined,
@@ -46,15 +37,13 @@ describe(getSettingsFeaturesAndPreset, () => {
   });
 
   it('returns the preset alone when only site config exists', async () => {
-    await db().insert(schema.siteConfig).values({
-      tenantId,
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: MOCK_ACCENT_HUE,
-      headingFont: FONT_CHOICE.FRAUNCES,
-      bodyFont: FONT_CHOICE.INTER,
-      radiusScale: RADIUS_SCALE.SM,
-      density: DENSITY.COMPACT,
-    });
+    await db()
+      .insert(schema.siteConfig)
+      .values({
+        tenantId,
+        ...MOCK_SITE_CONFIG_FIELDS,
+        preset: PRESET_ID.EDITORIAL,
+      });
 
     const result = await getSettingsFeaturesAndPreset(tenantId);
 

@@ -11,7 +11,7 @@ import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
-} from '@blog/db/testing/subscribers/fixtures-confirmation';
+} from '@blog/db/testing/subscribers/fixtures';
 import { mintConfirmationToken } from '@blog/db/utils/subscriber-tokens/subscriber-tokens';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';

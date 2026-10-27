@@ -1,14 +1,15 @@
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
-  insertTestSubscriberRow,
   MOCK_CONFIRMATION_NOW,
   readTestSubscriber,
-} from '@blog/db/testing/subscribers/fixtures-confirmation';
+} from '@blog/db/testing/subscribers/fixtures';
 import { sha256Hex } from '@blog/utils/hash';
 import { faker } from '@faker-js/faker';
 
@@ -21,6 +22,7 @@ faker.seed(5801);
 const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
 
 const db = useQueryTestDb();
+usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -38,10 +40,11 @@ describe(commitConfirmationToken, () => {
     let subscriber: schema.TSubscriber;
 
     beforeEach(async () => {
-      subscriber = await insertTestSubscriberRow(db(), {
+      subscriber = await insertTestSubscriber(
+        db(),
         tenantId,
-        email: MOCK_SUBSCRIBER_EMAIL,
-      });
+        MOCK_SUBSCRIBER_EMAIL,
+      );
       await commitConfirmationToken(subscriber.id, MOCK_CONFIRMATION_TOKEN);
     });
 
@@ -61,11 +64,14 @@ describe(commitConfirmationToken, () => {
   });
 
   it('never changes a subscriber who has confirmed', async () => {
-    const subscriber = await insertTestSubscriberRow(db(), {
+    const subscriber = await insertTestSubscriber(
+      db(),
       tenantId,
-      email: MOCK_SUBSCRIBER_EMAIL,
-      confirmedAt: MOCK_CONFIRMATION_NOW,
-    });
+      MOCK_SUBSCRIBER_EMAIL,
+      {
+        confirmedAt: MOCK_CONFIRMATION_NOW,
+      },
+    );
 
     await commitConfirmationToken(subscriber.id, MOCK_CONFIRMATION_TOKEN);
 

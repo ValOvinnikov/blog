@@ -1,16 +1,24 @@
 import {
   DENSITY,
   FONT_CHOICE,
+  HUE_MAX,
+  HUE_MIN,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config/constants';
 import type { TUpdateSiteConfigInput } from '@blog/db/queries/site-config/upsert-site-config';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 
-faker.seed(6022);
+const siteConfigFaker = createMockFaker(60222);
 
-export const MOCK_ACCENT_HUE = 250;
-export const MOCK_NOT_FOUND_HEADING = faker.lorem.words(3);
+const HUE_HEADROOM_BELOW = 2;
+const HUE_HEADROOM_ABOVE = 1;
+
+export const MOCK_ACCENT_HUE = siteConfigFaker.number.int({
+  min: HUE_MIN + HUE_HEADROOM_BELOW,
+  max: HUE_MAX - HUE_HEADROOM_ABOVE,
+});
+export const MOCK_NOT_FOUND_HEADING = siteConfigFaker.lorem.words(3);
 
 export const MOCK_SITE_CONFIG_FIELDS = {
   preset: PRESET_ID.CONSOLE,

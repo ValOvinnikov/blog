@@ -4,7 +4,10 @@ import {
   insertTestUser,
   MOCK_OWNER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { mockMembership } from '@blog/db/testing/memberships/fixtures';
+import {
+  mockMembership,
+  MOCK_USER_ID,
+} from '@blog/db/testing/memberships/fixtures';
 import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
@@ -14,8 +17,6 @@ import { getTenantOwnerEmail } from './get-tenant-owner-email';
 vi.mock('@blog/db/client');
 
 faker.seed(6022);
-
-const MOCK_USER_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 usePersonalDataKeys();

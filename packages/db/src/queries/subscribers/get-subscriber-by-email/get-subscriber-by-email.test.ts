@@ -1,10 +1,11 @@
 import * as schema from '@blog/db/schema';
 import {
+  insertTestSubscriber,
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { insertTestSubscriberRow } from '@blog/db/testing/subscribers/fixtures-confirmation';
 import { faker } from '@faker-js/faker';
 
 import { getSubscriberByEmail } from './get-subscriber-by-email';
@@ -16,6 +17,7 @@ faker.seed(5805);
 const MOCK_UNKNOWN_EMAIL = faker.internet.email().toLowerCase();
 
 const db = useQueryTestDb();
+usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
@@ -30,10 +32,11 @@ describe(getSubscriberByEmail, () => {
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
     ({ id: otherTenantId } = await insertTestTenant(db()));
-    subscriber = await insertTestSubscriberRow(db(), {
+    subscriber = await insertTestSubscriber(
+      db(),
       tenantId,
-      email: MOCK_SUBSCRIBER_EMAIL,
-    });
+      MOCK_SUBSCRIBER_EMAIL,
+    );
   });
 
   it('returns the row for an existing email', async () => {
