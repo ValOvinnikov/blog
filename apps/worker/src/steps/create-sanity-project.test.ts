@@ -31,7 +31,7 @@ import { logger } from '@worker/utils/logger/logger';
 
 import { createTenantSanityProject } from './create-sanity-project';
 
-faker.seed(6025);
+faker.seed(7004);
 
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/queries/memberships');
@@ -46,16 +46,16 @@ const {
   platformAppBaseUrl,
   tenantSanityDataset,
 } = MOCK_PROVISION_ENV;
-const CREATED_PROJECT = {
+const MOCK_CREATED_PROJECT = {
   sanityProjectId: MOCK_CREATED_PROJECT_ID,
   sanityDataset: tenantSanityDataset,
 };
-const EXISTING_PROJECT = {
+const MOCK_EXISTING_PROJECT = {
   sanityProjectId: MOCK_SANITY_PROJECT_ID,
   sanityDataset: tenantSanityDataset,
 };
-const EXISTING_DATASETS = [{ name: tenantSanityDataset }];
-const EXISTING_CORS_ORIGINS = [
+const MOCK_EXISTING_DATASETS = [{ name: tenantSanityDataset }];
+const MOCK_EXISTING_CORS_ORIGINS = [
   { id: MOCK_CORS_ORIGIN_ID, origin: platformAppBaseUrl },
 ];
 
@@ -110,7 +110,7 @@ describe(createTenantSanityProject, () => {
         origin: platformAppBaseUrl,
         allowCredentials: true,
       });
-      expect(result).toEqual(CREATED_PROJECT);
+      expect(result).toEqual(MOCK_CREATED_PROJECT);
     });
 
     it('persists the project immediately after creating it', async () => {
@@ -124,7 +124,7 @@ describe(createTenantSanityProject, () => {
       const corsAdded = firstCallOrder(vi.mocked(addSanityCorsOrigin).mock);
       expect(setTenantSanityProject).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
-        CREATED_PROJECT,
+        MOCK_CREATED_PROJECT,
       );
       expect(created).toBeLessThan(persisted);
       expect(persisted).toBeLessThan(datasetCreated);
@@ -142,7 +142,7 @@ describe(createTenantSanityProject, () => {
 
       expect(setTenantSanityProject).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
-        CREATED_PROJECT,
+        MOCK_CREATED_PROJECT,
       );
     });
 
@@ -174,7 +174,7 @@ describe(createTenantSanityProject, () => {
 
         expect(listSanityProjectInvites).not.toHaveBeenCalled();
         expect(createSanityProjectInvite).not.toHaveBeenCalled();
-        expect(result).toEqual(CREATED_PROJECT);
+        expect(result).toEqual(MOCK_CREATED_PROJECT);
         expect(logger.error).toHaveBeenCalledWith(
           'provisioning.owner_email_missing',
           { tenantId: MOCK_TENANT_ID },
@@ -193,10 +193,10 @@ describe(createTenantSanityProject, () => {
         );
 
         const [event, context] = vi.mocked(logger.error).mock.lastCall ?? [];
-        expect(result).toEqual(CREATED_PROJECT);
+        expect(result).toEqual(MOCK_CREATED_PROJECT);
         expect(setTenantSanityProject).toHaveBeenCalledWith(
           MOCK_TENANT_ID,
-          CREATED_PROJECT,
+          MOCK_CREATED_PROJECT,
         );
         expect(createSanityDataset).toHaveBeenCalled();
         expect(addSanityCorsOrigin).toHaveBeenCalled();
@@ -216,7 +216,7 @@ describe(createTenantSanityProject, () => {
         );
 
         const [event, context] = vi.mocked(logger.error).mock.lastCall ?? [];
-        expect(result).toEqual(CREATED_PROJECT);
+        expect(result).toEqual(MOCK_CREATED_PROJECT);
         expect(createSanityProjectInvite).not.toHaveBeenCalled();
         expect(event).toBe('provisioning.owner_invites_list_failed');
         expect(context?.tenantId).toBe(MOCK_TENANT_ID);
@@ -235,7 +235,9 @@ describe(createTenantSanityProject, () => {
     });
 
     it('only creates the dataset when the dataset is missing', async () => {
-      vi.mocked(listSanityCorsOrigins).mockResolvedValue(EXISTING_CORS_ORIGINS);
+      vi.mocked(listSanityCorsOrigins).mockResolvedValue(
+        MOCK_EXISTING_CORS_ORIGINS,
+      );
 
       const result = await createTenantSanityProject(
         tenant,
@@ -250,11 +252,11 @@ describe(createTenantSanityProject, () => {
         dataset: tenantSanityDataset,
       });
       expect(addSanityCorsOrigin).not.toHaveBeenCalled();
-      expect(result).toEqual(EXISTING_PROJECT);
+      expect(result).toEqual(MOCK_EXISTING_PROJECT);
     });
 
     it('only adds the CORS origin when the CORS entry is missing', async () => {
-      vi.mocked(listSanityDatasets).mockResolvedValue(EXISTING_DATASETS);
+      vi.mocked(listSanityDatasets).mockResolvedValue(MOCK_EXISTING_DATASETS);
 
       const result = await createTenantSanityProject(
         tenant,
@@ -270,14 +272,14 @@ describe(createTenantSanityProject, () => {
         origin: platformAppBaseUrl,
         allowCredentials: true,
       });
-      expect(result).toEqual(EXISTING_PROJECT);
+      expect(result).toEqual(MOCK_EXISTING_PROJECT);
     });
 
     describe('when the dataset and CORS entry already exist', () => {
       beforeEach(() => {
-        vi.mocked(listSanityDatasets).mockResolvedValue(EXISTING_DATASETS);
+        vi.mocked(listSanityDatasets).mockResolvedValue(MOCK_EXISTING_DATASETS);
         vi.mocked(listSanityCorsOrigins).mockResolvedValue(
-          EXISTING_CORS_ORIGINS,
+          MOCK_EXISTING_CORS_ORIGINS,
         );
       });
 
@@ -295,7 +297,7 @@ describe(createTenantSanityProject, () => {
           MOCK_PROVISION_ENV,
         );
 
-        expect(result).toEqual(EXISTING_PROJECT);
+        expect(result).toEqual(MOCK_EXISTING_PROJECT);
         expect(createSanityProject).not.toHaveBeenCalled();
         expect(setTenantSanityProject).not.toHaveBeenCalled();
         expect(createSanityDataset).not.toHaveBeenCalled();

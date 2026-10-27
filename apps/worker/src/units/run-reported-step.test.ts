@@ -15,8 +15,8 @@ import { FatalError, getStepMetadata } from 'workflow';
 import { runReportedStep } from './run-reported-step';
 
 const STEP = TENANT_PROVISIONING_STEP.CREATE_WEBHOOK;
-const SANITY_TIMED_OUT = 'sanity timed out';
-const STILL_DOWN = 'still down';
+const MOCK_SANITY_TIMED_OUT = 'sanity timed out';
+const MOCK_STILL_DOWN = 'still down';
 
 vi.mock('@blog/db/queries/tenants');
 vi.mock('workflow');
@@ -61,7 +61,7 @@ describe(runReportedStep, () => {
 
   it('rethrows a failure within the retry budget without recording FAILED', async () => {
     atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES);
-    const failure = new Error(SANITY_TIMED_OUT);
+    const failure = new Error(MOCK_SANITY_TIMED_OUT);
 
     await expect(run(() => Promise.reject(failure))).rejects.toBe(failure);
 
@@ -73,7 +73,7 @@ describe(runReportedStep, () => {
   it('records FAILED once on the final attempt and names the failed step', async () => {
     atStepAttempt(PROVISIONING_UNIT_MAX_RETRIES + 1);
 
-    const result = await run(() => Promise.reject(new Error(STILL_DOWN)));
+    const result = await run(() => Promise.reject(new Error(MOCK_STILL_DOWN)));
 
     expect(result).toEqual({ ok: false, error: STEP });
     expect(reportedStatuses()).toEqual([
@@ -85,7 +85,7 @@ describe(runReportedStep, () => {
       step: STEP,
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-      error: STILL_DOWN,
+      error: MOCK_STILL_DOWN,
     });
   });
 
@@ -110,7 +110,7 @@ describe(runReportedStep, () => {
       tenantId: MOCK_TENANT_ID,
       ctx: { ...MOCK_RUN_CONTEXT, isOneShot: true },
       step: STEP,
-      run: () => Promise.reject(new Error(SANITY_TIMED_OUT)),
+      run: () => Promise.reject(new Error(MOCK_SANITY_TIMED_OUT)),
     });
 
     expect(result).toEqual({ ok: false, error: STEP });

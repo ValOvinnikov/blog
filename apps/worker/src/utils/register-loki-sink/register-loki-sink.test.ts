@@ -5,7 +5,7 @@ import { env } from '@worker/utils/env/__mocks__/env';
 
 import { registerLokiSink } from './register-loki-sink';
 
-faker.seed(6025);
+faker.seed(7015);
 
 vi.mock(import('@blog/insight'), async (importOriginal) => ({
   ...(await importOriginal()),
@@ -15,7 +15,7 @@ vi.mock(import('@blog/insight'), async (importOriginal) => ({
 vi.mock('@vercel/functions', () => ({ waitUntil: vi.fn() }));
 vi.mock('@worker/utils/env/env');
 
-const VALID_ENV = {
+const MOCK_VALID_ENV = {
   LOKI_PUSH_URL: faker.internet.url({ protocol: 'https' }),
   LOKI_USER: faker.string.numeric(6),
   LOKI_TOKEN: faker.string.alphanumeric(24),
@@ -28,16 +28,16 @@ describe(registerLokiSink, () => {
   beforeEach(() => {
     vi.mocked(createLokiSink).mockReturnValue(push);
     for (const key of Object.keys(env)) delete env[key];
-    Object.assign(env, VALID_ENV);
+    Object.assign(env, MOCK_VALID_ENV);
   });
 
   it('registers a sink when all three variables are set', () => {
     expect(registerLokiSink()).toBe(true);
 
     expect(createLokiSink).toHaveBeenCalledWith({
-      url: VALID_ENV.LOKI_PUSH_URL,
-      user: VALID_ENV.LOKI_USER,
-      token: VALID_ENV.LOKI_TOKEN,
+      url: MOCK_VALID_ENV.LOKI_PUSH_URL,
+      user: MOCK_VALID_ENV.LOKI_USER,
+      token: MOCK_VALID_ENV.LOKI_TOKEN,
     });
     expect(registerLogSink).toHaveBeenCalledOnce();
   });

@@ -18,7 +18,7 @@ import { logger } from '@worker/utils/logger/logger';
 
 import { alertOperatorsToDeleteSanityProject } from './sanity-project-deletion-alert';
 
-const ARCHIVED_TENANT = mockProvisionedTenant();
+const MOCK_ARCHIVED_TENANT = mockProvisionedTenant();
 
 vi.mock('@worker/utils/env/env');
 vi.mock('@blog/db/queries/admins');
@@ -35,7 +35,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
   });
 
   it('emails every super admin the project to delete in Sanity Manage', async () => {
-    await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
+    await alertOperatorsToDeleteSanityProject(MOCK_ARCHIVED_TENANT);
 
     const [email] = vi.mocked(sendEmail).mock.calls.map(([input]) => input);
     expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
@@ -55,7 +55,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
   it('warns when there is no super admin to tell', async () => {
     vi.mocked(listSuperadminEmails).mockResolvedValue([]);
 
-    await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
+    await alertOperatorsToDeleteSanityProject(MOCK_ARCHIVED_TENANT);
 
     expect(sendEmail).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
@@ -67,7 +67,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
   it('logs a failed send and still sends the rest', async () => {
     vi.mocked(sendEmail).mockRejectedValueOnce(new Error(MOCK_RESEND_DOWN));
 
-    await alertOperatorsToDeleteSanityProject(ARCHIVED_TENANT);
+    await alertOperatorsToDeleteSanityProject(MOCK_ARCHIVED_TENANT);
 
     expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
     expect(logger.error).toHaveBeenCalledWith(

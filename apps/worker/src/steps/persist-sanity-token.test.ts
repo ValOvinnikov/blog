@@ -18,7 +18,7 @@ import {
   type TPersistSanityTokenDeps,
 } from './persist-sanity-token';
 
-faker.seed(6025);
+faker.seed(7006);
 
 const MOCK_PERSISTED_TOKEN = faker.string.alphanumeric(32);
 const MOCK_ROBOT_ID = faker.string.uuid();

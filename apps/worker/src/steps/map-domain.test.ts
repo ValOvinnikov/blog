@@ -15,7 +15,7 @@ import {
 
 import { mapTenantDomain } from './map-domain';
 
-faker.seed(6025);
+faker.seed(7005);
 
 const MOCK_OTHER_TENANT_DOMAIN = faker.internet.domainName();
 const { vercelToken, vercelTeamId, vercelWebProjectId } = MOCK_PROVISION_ENV;

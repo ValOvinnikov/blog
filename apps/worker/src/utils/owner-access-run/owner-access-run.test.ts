@@ -10,7 +10,7 @@ import { wakeOwnerAccess } from './owner-access-run';
 vi.mock('@worker/workflows/ensure-owner-access');
 vi.mock('workflow/api');
 
-const HOOK_TOKEN = `${OWNER_ACCESS_HOOK_TOKEN_PREFIX}${MOCK_TENANT_ID}`;
+const MOCK_HOOK_TOKEN = `${OWNER_ACCESS_HOOK_TOKEN_PREFIX}${MOCK_TENANT_ID}`;
 
 describe(wakeOwnerAccess, () => {
   it('wakes the run already checking the tenant', async () => {
@@ -18,12 +18,14 @@ describe(wakeOwnerAccess, () => {
 
     await wakeOwnerAccess(MOCK_TENANT_ID);
 
-    expect(resumeHook).toHaveBeenCalledWith(HOOK_TOKEN, null);
+    expect(resumeHook).toHaveBeenCalledWith(MOCK_HOOK_TOKEN, null);
     expect(start).not.toHaveBeenCalled();
   });
 
   it('starts a new run when none is checking the tenant', async () => {
-    vi.mocked(resumeHook).mockRejectedValue(new HookNotFoundError(HOOK_TOKEN));
+    vi.mocked(resumeHook).mockRejectedValue(
+      new HookNotFoundError(MOCK_HOOK_TOKEN),
+    );
 
     await wakeOwnerAccess(MOCK_TENANT_ID);
 

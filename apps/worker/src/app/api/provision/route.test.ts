@@ -16,6 +16,7 @@ import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_FORGED_SECRET,
+  MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { MOCK_DB_DOWN, MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
@@ -27,14 +28,14 @@ import { start } from 'workflow/api';
 
 import { POST } from './route';
 
-const PROVISION_URL = 'https://worker.example.com/api/provision';
+const MOCK_PROVISION_URL = `${MOCK_WORKER_ORIGIN}/api/provision`;
 const MOCK_NON_UUID_TENANT_ID = 'not-a-uuid';
 
 function signedRequest(
   rawBody: string,
   overrides: { secret?: string; timestamp?: number } = {},
 ): Request {
-  return mockSignedRequest(PROVISION_URL, rawBody, {
+  return mockSignedRequest(MOCK_PROVISION_URL, rawBody, {
     secret: MOCK_ENQUEUE_SECRET,
     ...overrides,
   });
@@ -69,7 +70,7 @@ describe('POST /api/provision', () => {
     [
       'a tampered body',
       () =>
-        new Request(PROVISION_URL, {
+        new Request(MOCK_PROVISION_URL, {
           method: HTTP_METHOD.POST,
           headers: signedRequest('{}').headers,
           body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
@@ -85,7 +86,7 @@ describe('POST /api/provision', () => {
     [
       'no signature headers',
       () =>
-        new Request(PROVISION_URL, {
+        new Request(MOCK_PROVISION_URL, {
           method: HTTP_METHOD.POST,
           body: JSON.stringify({ tenantId: MOCK_TENANT_ID }),
         }),

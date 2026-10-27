@@ -12,7 +12,7 @@ import type { Mock } from 'vitest';
 
 import { grantPropagationRetryOptions } from './grant-propagation-retry';
 
-faker.seed(6025);
+faker.seed(7012);
 
 const MOCK_RESULT = faker.lorem.word();
 const MOCK_MALFORMED_MUTATION = faker.lorem.sentence();

@@ -62,8 +62,8 @@ import { FatalError } from 'workflow';
 
 import { checkOwnerAccess } from './check-owner-access';
 
-const FOUR_DAYS_AGO = new Date(MOCK_NOW.getTime() - 4 * 24 * 60 * 60_000);
-const WAITING_TENANT = mockProvisionedTenant({
+const MOCK_FOUR_DAYS_AGO = new Date(MOCK_NOW.getTime() - 4 * 24 * 60 * 60_000);
+const MOCK_WAITING_TENANT = mockProvisionedTenant({
   createdAt: MOCK_NOW,
   ownerInviteSentAt: MOCK_NOW,
 });
@@ -89,7 +89,7 @@ describe(checkOwnerAccess, () => {
   beforeEach(() => {
     atStepAttempt(1);
     freezeClock();
-    vi.mocked(getTenantById).mockResolvedValue(WAITING_TENANT);
+    vi.mocked(getTenantById).mockResolvedValue(MOCK_WAITING_TENANT);
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
@@ -151,7 +151,7 @@ describe(checkOwnerAccess, () => {
       await checkOwnerAccess(MOCK_TENANT_ID);
 
       expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
-        mockOwnerAccessTarget(WAITING_TENANT),
+        mockOwnerAccessTarget(MOCK_WAITING_TENANT),
         TENANT_OWNER_EMAIL.SITE_READY,
       );
     });
@@ -184,8 +184,8 @@ describe(checkOwnerAccess, () => {
 
     it('leaves the inactivity clock alone once the acceptance was recorded', async () => {
       vi.mocked(getTenantById).mockResolvedValue({
-        ...WAITING_TENANT,
-        ownerInviteAcceptedAt: FOUR_DAYS_AGO,
+        ...MOCK_WAITING_TENANT,
+        ownerInviteAcceptedAt: MOCK_FOUR_DAYS_AGO,
       });
 
       await checkOwnerAccess(MOCK_TENANT_ID);
@@ -245,7 +245,7 @@ describe(checkOwnerAccess, () => {
     await checkOwnerAccess(MOCK_TENANT_ID);
 
     expect(sendPendingOwnerEmails).toHaveBeenCalledWith(
-      mockOwnerAccessTarget(WAITING_TENANT),
+      mockOwnerAccessTarget(MOCK_WAITING_TENANT),
     );
     expect(sendOwnerEmailOnce).not.toHaveBeenCalled();
   });
@@ -287,7 +287,7 @@ describe(checkOwnerAccess, () => {
     it('measures the wait from the new invite, not from the tenant creation', async () => {
       vi.mocked(getTenantById).mockResolvedValue(
         mockProvisionedTenant({
-          createdAt: FOUR_DAYS_AGO,
+          createdAt: MOCK_FOUR_DAYS_AGO,
         }),
       );
       vi.mocked(listSanityProjectInvites)
@@ -338,7 +338,7 @@ describe(checkOwnerAccess, () => {
       atStepAttempt(99);
       vi.mocked(getTenantById).mockResolvedValue(
         mockProvisionedTenant({
-          ownerInviteSentAt: FOUR_DAYS_AGO,
+          ownerInviteSentAt: MOCK_FOUR_DAYS_AGO,
         }),
       );
 
@@ -367,7 +367,7 @@ describe(checkOwnerAccess, () => {
     beforeEach(() => {
       vi.mocked(getTenantById).mockResolvedValue(
         mockProvisionedTenant({
-          ownerInviteSentAt: FOUR_DAYS_AGO,
+          ownerInviteSentAt: MOCK_FOUR_DAYS_AGO,
         }),
       );
     });
@@ -393,7 +393,7 @@ describe(checkOwnerAccess, () => {
     it('does not alert again once the stall was notified', async () => {
       vi.mocked(getTenantById).mockResolvedValue(
         mockProvisionedTenant({
-          ownerInviteSentAt: FOUR_DAYS_AGO,
+          ownerInviteSentAt: MOCK_FOUR_DAYS_AGO,
           lastNotifiedOwnerElevationOutcome:
             ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
         }),

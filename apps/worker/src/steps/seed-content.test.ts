@@ -29,7 +29,7 @@ import type { Mock } from 'vitest';
 
 import { seedTenantContent, type TSeedContentDeps } from './seed-content';
 
-faker.seed(6025);
+faker.seed(7007);
 
 vi.mock('@blog/db/queries/tenants');
 
@@ -37,7 +37,7 @@ const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);
 const MOCK_ROBOT_ID = faker.string.uuid();
 const MOCK_EXISTING_SETTINGS_SITE_ID = faker.string.uuid();
 const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
-const REVOKED_TOKEN = {
+const MOCK_REVOKED_TOKEN = {
   token: MOCK_PROVISION_ENV.sanityManagementToken,
   projectId: MOCK_SANITY_PROJECT_ID,
   robotId: MOCK_ROBOT_ID,
@@ -163,7 +163,7 @@ describe(seedTenantContent, () => {
     expect(createIfNotExists).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
   });
 
   it('throws when the Sanity project has not been created yet', async () => {
@@ -238,7 +238,7 @@ describe(seedTenantContent, () => {
 
     await expect(seed()).rejects.toThrow(MOCK_SANITY_OUTAGE);
 
-    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
   });
 
@@ -249,7 +249,7 @@ describe(seedTenantContent, () => {
 
     await expect(seed()).rejects.toThrow(MOCK_DB_DOWN);
 
-    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
   });
 
   it('retries a grant-propagation failure once and succeeds', async () => {
@@ -275,7 +275,7 @@ describe(seedTenantContent, () => {
     await expect(seed()).rejects.toThrow(grantError);
 
     expect(commit.mock.calls.length).toBeGreaterThan(1);
-    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
   });
 
@@ -287,7 +287,7 @@ describe(seedTenantContent, () => {
 
     expect(commit).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
-    expect(revokeWriteToken).toHaveBeenCalledWith(REVOKED_TOKEN);
+    expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
   });
 });

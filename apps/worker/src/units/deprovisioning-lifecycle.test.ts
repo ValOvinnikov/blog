@@ -18,7 +18,7 @@ import {
   finishDeprovisioning,
 } from './deprovisioning-lifecycle';
 
-const ARCHIVED_TENANT = mockTenant({ deprovisionedAt: MOCK_NOW });
+const MOCK_ARCHIVED_TENANT = mockTenant({ deprovisionedAt: MOCK_NOW });
 
 vi.mock('@worker/utils/operator-email/sanity-project-deletion-alert');
 vi.mock('@blog/db/queries/tenants');
@@ -38,7 +38,7 @@ describe(beginDeprovisioning, () => {
   });
 
   it('records nothing for an already-deprovisioned tenant', async () => {
-    vi.mocked(getTenantById).mockResolvedValue(ARCHIVED_TENANT);
+    vi.mocked(getTenantById).mockResolvedValue(MOCK_ARCHIVED_TENANT);
 
     await expect(beginDeprovisioning(MOCK_TENANT_ID)).resolves.toBe(false);
 
@@ -48,9 +48,9 @@ describe(beginDeprovisioning, () => {
 
 describe(finishDeprovisioning, () => {
   beforeEach(() => {
-    vi.mocked(getTenantById).mockResolvedValue(ARCHIVED_TENANT);
+    vi.mocked(getTenantById).mockResolvedValue(MOCK_ARCHIVED_TENANT);
     vi.mocked(finishDeprovisioningRun).mockResolvedValue(
-      okResult(ARCHIVED_TENANT),
+      okResult(MOCK_ARCHIVED_TENANT),
     );
   });
 
@@ -65,7 +65,7 @@ describe(finishDeprovisioning, () => {
       tenantId: MOCK_TENANT_ID,
     });
     expect(alertOperatorsToDeleteSanityProject).toHaveBeenCalledWith(
-      ARCHIVED_TENANT,
+      MOCK_ARCHIVED_TENANT,
     );
   });
 

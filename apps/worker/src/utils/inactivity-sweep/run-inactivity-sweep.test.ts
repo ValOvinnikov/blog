@@ -39,11 +39,11 @@ import { start } from 'workflow/api';
 
 import { runInactivitySweep } from './run-inactivity-sweep';
 
-faker.seed(6025);
+faker.seed(7013);
 
-const SWEEP_ENV = mockInactivitySweepEnv();
-const SITE_URL = `https://${MOCK_TENANT_DOMAIN}`;
-const NO_STAGE_ADVANCED = {
+const MOCK_SWEEP_ENV = mockInactivitySweepEnv();
+const MOCK_SITE_URL = `https://${MOCK_TENANT_DOMAIN}`;
+const MOCK_NO_STAGE_ADVANCED = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: 0,
   [INACTIVITY_STAGE.SUSPENSION]: 0,
   [INACTIVITY_STAGE.DELETION_NOTICE]: 0,
@@ -72,7 +72,7 @@ function dueAt(stage: TInactivityStage, tenants: TTenant[]): void {
 }
 
 function sweep() {
-  return runInactivitySweep({ now: MOCK_NOW, env: SWEEP_ENV });
+  return runInactivitySweep({ now: MOCK_NOW, env: MOCK_SWEEP_ENV });
 }
 
 function sentEmails() {
@@ -121,7 +121,7 @@ describe(runInactivitySweep, () => {
         INACTIVITY_STAGE.SUSPENSION_WARNING
       ]({
         siteName: tenant.name,
-        siteUrl: SITE_URL,
+        siteUrl: MOCK_SITE_URL,
         date: '28 octobre 2026',
       });
       const ownerEmails = sentEmails().filter(
@@ -130,7 +130,7 @@ describe(runInactivitySweep, () => {
       expect(ownerEmails).toHaveLength(1);
       expect(ownerEmails[0]?.subject).toBe(subject);
       expect(ownerEmails[0]?.html).toContain(
-        `href="${SWEEP_ENV.platformAppBaseUrl}/dashboard"`,
+        `href="${MOCK_SWEEP_ENV.platformAppBaseUrl}/dashboard"`,
       );
     });
 
@@ -146,7 +146,7 @@ describe(runInactivitySweep, () => {
 
     it('reports the tenant as advanced', async () => {
       await expect(sweep()).resolves.toEqual({
-        ...NO_STAGE_ADVANCED,
+        ...MOCK_NO_STAGE_ADVANCED,
         [INACTIVITY_STAGE.SUSPENSION_WARNING]: 1,
       });
     });
@@ -171,8 +171,8 @@ describe(runInactivitySweep, () => {
       await sweep();
 
       expect(requestTenantCacheInvalidation).toHaveBeenCalledWith({
-        webAppUrl: SWEEP_ENV.webAppBaseUrl,
-        secret: SWEEP_ENV.siteConfigRevalidateSecret,
+        webAppUrl: MOCK_SWEEP_ENV.webAppBaseUrl,
+        secret: MOCK_SWEEP_ENV.siteConfigRevalidateSecret,
         tenantId: MOCK_TENANT_ID,
       });
       expect(sendEmail).not.toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe(runInactivitySweep, () => {
         INACTIVITY_STAGE.DELETION_NOTICE
       ]({
         siteName: tenant.name,
-        siteUrl: SITE_URL,
+        siteUrl: MOCK_SITE_URL,
         date: '31. Oktober 2026',
       });
       expect(sentTo()).toEqual([MOCK_OWNER_EMAIL]);
@@ -227,7 +227,7 @@ describe(runInactivitySweep, () => {
     dueAt(INACTIVITY_STAGE.SUSPENSION_WARNING, [inactiveFor(23)]);
     vi.mocked(stampTenantInactivityStage).mockResolvedValue(null);
 
-    await expect(sweep()).resolves.toEqual(NO_STAGE_ADVANCED);
+    await expect(sweep()).resolves.toEqual(MOCK_NO_STAGE_ADVANCED);
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
@@ -278,7 +278,7 @@ describe(runInactivitySweep, () => {
     );
 
     await expect(sweep()).resolves.toEqual({
-      ...NO_STAGE_ADVANCED,
+      ...MOCK_NO_STAGE_ADVANCED,
       [INACTIVITY_STAGE.SUSPENSION]: 1,
     });
     expect(logger.error).toHaveBeenCalledWith(

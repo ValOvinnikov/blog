@@ -30,9 +30,9 @@ import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access
 import { OWNER_EMAIL_COPY } from './owner-email-copy';
 import { sendOwnerEmailOnce, sendPendingOwnerEmails } from './send-owner-email';
 
-const CLAIMED_AT = MOCK_NOW;
-const TWO_DAYS_AGO = new Date(MOCK_NOW.getTime() - 2 * DAY_MS);
-const AN_HOUR_AGO = new Date(MOCK_NOW.getTime() - DAY_MS / 24);
+const MOCK_CLAIMED_AT = MOCK_NOW;
+const MOCK_TWO_DAYS_AGO = new Date(MOCK_NOW.getTime() - 2 * DAY_MS);
+const MOCK_AN_HOUR_AGO = new Date(MOCK_NOW.getTime() - DAY_MS / 24);
 const { platformAppBaseUrl } = MOCK_PROVISION_ENV;
 
 vi.mock('@blog/db/queries/tenants');
@@ -58,7 +58,7 @@ function sentEmails() {
 
 describe(sendOwnerEmailOnce, () => {
   beforeEach(() => {
-    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(CLAIMED_AT);
+    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(MOCK_CLAIMED_AT);
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
@@ -134,7 +134,7 @@ describe(sendOwnerEmailOnce, () => {
       expect(releaseTenantOwnerEmail).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
-        CLAIMED_AT,
+        MOCK_CLAIMED_AT,
       );
     });
 
@@ -175,7 +175,7 @@ describe(sendOwnerEmailOnce, () => {
 
 describe(sendPendingOwnerEmails, () => {
   beforeEach(() => {
-    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(CLAIMED_AT);
+    vi.mocked(claimTenantOwnerEmail).mockResolvedValue(MOCK_CLAIMED_AT);
     vi.mocked(sendEmail).mockResolvedValue();
   });
 
@@ -187,7 +187,7 @@ describe(sendPendingOwnerEmails, () => {
 
   it('retries a heads-up that has not gone out yet', async () => {
     await sendPendingOwnerEmails(
-      makeTarget({ ownerInviteSentAt: AN_HOUR_AGO }),
+      makeTarget({ ownerInviteSentAt: MOCK_AN_HOUR_AGO }),
     );
 
     expect(claimedEmails()).toEqual([TENANT_OWNER_EMAIL.INVITE_HEADS_UP]);
@@ -196,8 +196,8 @@ describe(sendPendingOwnerEmails, () => {
   it('sends nothing within a day of a heads-up that went out', async () => {
     await sendPendingOwnerEmails(
       makeTarget({
-        ownerInviteSentAt: AN_HOUR_AGO,
-        ownerInviteHeadsUpSentAt: AN_HOUR_AGO,
+        ownerInviteSentAt: MOCK_AN_HOUR_AGO,
+        ownerInviteHeadsUpSentAt: MOCK_AN_HOUR_AGO,
       }),
     );
 
@@ -207,8 +207,8 @@ describe(sendPendingOwnerEmails, () => {
   it('nudges an owner who has not accepted a day after the invite', async () => {
     await sendPendingOwnerEmails(
       makeTarget({
-        ownerInviteSentAt: TWO_DAYS_AGO,
-        ownerInviteHeadsUpSentAt: TWO_DAYS_AGO,
+        ownerInviteSentAt: MOCK_TWO_DAYS_AGO,
+        ownerInviteHeadsUpSentAt: MOCK_TWO_DAYS_AGO,
       }),
     );
 
@@ -218,9 +218,9 @@ describe(sendPendingOwnerEmails, () => {
   it('never nudges twice', async () => {
     await sendPendingOwnerEmails(
       makeTarget({
-        ownerInviteSentAt: TWO_DAYS_AGO,
-        ownerInviteHeadsUpSentAt: TWO_DAYS_AGO,
-        ownerInviteNudgeSentAt: AN_HOUR_AGO,
+        ownerInviteSentAt: MOCK_TWO_DAYS_AGO,
+        ownerInviteHeadsUpSentAt: MOCK_TWO_DAYS_AGO,
+        ownerInviteNudgeSentAt: MOCK_AN_HOUR_AGO,
       }),
     );
 

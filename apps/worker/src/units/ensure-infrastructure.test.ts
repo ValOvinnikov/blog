@@ -30,7 +30,7 @@ import { FatalError } from 'workflow';
 
 import { ensureInfrastructure } from './ensure-infrastructure';
 
-faker.seed(6025);
+faker.seed(7009);
 
 const MOCK_EXISTING_PROJECT_ID = faker.string.alphanumeric(8);
 

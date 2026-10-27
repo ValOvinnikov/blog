@@ -30,7 +30,7 @@ import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 
 import { inviteOwner } from './invite-owner';
 
-const INVITED_TENANT = mockProvisionedTenant();
+const MOCK_INVITED_TENANT = mockProvisionedTenant();
 
 vi.mock('@worker/utils/owner-email/send-owner-email');
 vi.mock('@blog/db/queries/memberships');
@@ -43,7 +43,7 @@ vi.mock('workflow');
 describe(inviteOwner, () => {
   beforeEach(() => {
     atStepAttempt(1);
-    vi.mocked(getTenantById).mockResolvedValue(INVITED_TENANT);
+    vi.mocked(getTenantById).mockResolvedValue(MOCK_INVITED_TENANT);
     vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
     vi.mocked(listSanityProjectUsers).mockResolvedValue([]);
     vi.mocked(listSanityOrganizationUsers).mockResolvedValue([]);
@@ -79,7 +79,7 @@ describe(inviteOwner, () => {
     await inviteOwner(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
     expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
-      mockOwnerAccessTarget(INVITED_TENANT),
+      mockOwnerAccessTarget(MOCK_INVITED_TENANT),
       TENANT_OWNER_EMAIL.INVITE_HEADS_UP,
     );
   });

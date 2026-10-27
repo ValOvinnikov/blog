@@ -5,6 +5,7 @@ import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   MOCK_FORGED_SECRET,
   MOCK_ENQUEUE_SECRET,
+  MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
@@ -17,7 +18,7 @@ import { start } from 'workflow/api';
 
 import { POST } from './route';
 
-const DEPROVISION_URL = 'https://worker.example.com/api/deprovision';
+const MOCK_DEPROVISION_URL = `${MOCK_WORKER_ORIGIN}/api/deprovision`;
 
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/deprovision-tenant');
@@ -26,7 +27,7 @@ vi.mock('@blog/db/queries/tenants');
 
 function deprovisionRequest(secret: string = MOCK_ENQUEUE_SECRET): Request {
   return mockSignedRequest(
-    DEPROVISION_URL,
+    MOCK_DEPROVISION_URL,
     JSON.stringify({ tenantId: MOCK_TENANT_ID }),
     { secret },
   );

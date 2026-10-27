@@ -15,13 +15,13 @@ import { postOperatorAlert } from './operator-alert';
 
 const { platformAppBaseUrl } = MOCK_PROVISION_ENV;
 
-const ALERT = {
+const MOCK_ALERT = {
   kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
   tenantId: MOCK_TENANT_ID,
   outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
 } as const;
 
-faker.seed(6025);
+faker.seed(7014);
 
 vi.mock('@worker/utils/env/env');
 
@@ -42,7 +42,7 @@ describe(postOperatorAlert, () => {
   });
 
   it("posts the alert to the platform's operator-alert route", async () => {
-    await expect(postOperatorAlert(ALERT)).resolves.toBe(true);
+    await expect(postOperatorAlert(MOCK_ALERT)).resolves.toBe(true);
 
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
     expect(String(url)).toBe(
@@ -52,7 +52,7 @@ describe(postOperatorAlert, () => {
     expect(new Headers(init.headers).get('Authorization')).toBe(
       `Bearer ${MOCK_ALERT_SECRET}`,
     );
-    expect(JSON.parse(String(init.body))).toEqual(ALERT);
+    expect(JSON.parse(String(init.body))).toEqual(MOCK_ALERT);
   });
 
   it('reports the alert unsent when the platform rejects it', async () => {
@@ -60,7 +60,7 @@ describe(postOperatorAlert, () => {
       new Response('', { status: HTTP_STATUS.UNAUTHORIZED }),
     );
 
-    await expect(postOperatorAlert(ALERT)).resolves.toBe(false);
+    await expect(postOperatorAlert(MOCK_ALERT)).resolves.toBe(false);
     const [event, context] = vi.mocked(logger.error).mock.lastCall ?? [];
     expect(event).toBe('operator_alert.rejected');
     expect(context?.status).toBe(HTTP_STATUS.UNAUTHORIZED);
@@ -69,13 +69,13 @@ describe(postOperatorAlert, () => {
   it('reports the alert unsent without throwing when the request fails', async () => {
     fetchMock.mockRejectedValue(new Error(MOCK_QUEUE_DOWN));
 
-    await expect(postOperatorAlert(ALERT)).resolves.toBe(false);
+    await expect(postOperatorAlert(MOCK_ALERT)).resolves.toBe(false);
   });
 
   it('sends nothing when the alert secret is not configured', async () => {
     mockEnv.OPERATOR_ALERT_SECRET = undefined;
 
-    await expect(postOperatorAlert(ALERT)).resolves.toBe(false);
+    await expect(postOperatorAlert(MOCK_ALERT)).resolves.toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

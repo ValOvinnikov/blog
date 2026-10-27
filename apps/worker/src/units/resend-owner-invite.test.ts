@@ -29,7 +29,7 @@ import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 
 import { resendOwnerInvite } from './resend-owner-invite';
 
-faker.seed(6025);
+faker.seed(7010);
 
 const MOCK_OLD_INVITE_ID = faker.string.uuid();
 const MOCK_NEW_INVITE_ID = faker.string.uuid();

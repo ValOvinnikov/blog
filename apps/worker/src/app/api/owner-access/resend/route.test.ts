@@ -1,6 +1,9 @@
 import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
-import { MOCK_ENQUEUE_SECRET } from '@worker/testing/enqueue/fixtures';
+import {
+  MOCK_ENQUEUE_SECRET,
+  MOCK_WORKER_ORIGIN,
+} from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
@@ -13,7 +16,7 @@ import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run
 
 import { POST } from './route';
 
-const RESEND_URL = 'https://worker.example.com/api/owner-access/resend';
+const MOCK_RESEND_URL = `${MOCK_WORKER_ORIGIN}/api/owner-access/resend`;
 
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/units/resend-owner-invite');
@@ -22,7 +25,7 @@ vi.mock('@blog/db/queries/tenants');
 
 function resendRequest(): Request {
   return mockSignedRequest(
-    RESEND_URL,
+    MOCK_RESEND_URL,
     JSON.stringify({ tenantId: MOCK_TENANT_ID }),
     { secret: MOCK_ENQUEUE_SECRET },
   );

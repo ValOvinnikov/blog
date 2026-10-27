@@ -51,10 +51,10 @@ import { logger } from '@worker/utils/logger/logger';
 
 import { runDeprovisioningStep } from './run-deprovisioning-step';
 
-faker.seed(6025);
+faker.seed(7011);
 
 const MOCK_REVALIDATION_REFUSED = 'revalidation refused';
-const PROVISIONED_TENANT = mockProvisionedTenant();
+const MOCK_PROVISIONED_TENANT = mockProvisionedTenant();
 const MOCK_READ_ROBOT_ID = faker.string.uuid();
 const MOCK_WRITE_ROBOT_ID = faker.string.uuid();
 const MOCK_OTHER_ROBOT_ID = faker.string.uuid();
@@ -92,11 +92,13 @@ function reportedStatuses(): string[] {
 describe(runDeprovisioningStep, () => {
   beforeEach(() => {
     atStepAttempt(1);
-    vi.mocked(getTenantById).mockResolvedValue(PROVISIONED_TENANT);
+    vi.mocked(getTenantById).mockResolvedValue(MOCK_PROVISIONED_TENANT);
     vi.mocked(updateDeprovisioningStep).mockResolvedValue(
-      okResult(PROVISIONED_TENANT),
+      okResult(MOCK_PROVISIONED_TENANT),
     );
-    vi.mocked(archiveTenant).mockResolvedValue(okResult(PROVISIONED_TENANT));
+    vi.mocked(archiveTenant).mockResolvedValue(
+      okResult(MOCK_PROVISIONED_TENANT),
+    );
     vi.mocked(listSanityRobotTokens).mockResolvedValue([]);
     vi.mocked(purgeTenantReaderData).mockResolvedValue(MOCK_READER_DATA_COUNTS);
   });
@@ -111,7 +113,7 @@ describe(runDeprovisioningStep, () => {
       token: MOCK_DEPROVISION_ENV.vercelToken,
       teamId: MOCK_DEPROVISION_ENV.vercelTeamId,
       projectId: MOCK_DEPROVISION_ENV.vercelWebProjectId,
-      domain: PROVISIONED_TENANT.primaryDomain,
+      domain: MOCK_PROVISIONED_TENANT.primaryDomain,
     });
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,

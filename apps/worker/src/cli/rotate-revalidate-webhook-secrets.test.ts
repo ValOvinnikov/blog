@@ -11,7 +11,7 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('@worker/steps/create-revalidate-webhook');
 
-faker.seed(6025);
+faker.seed(7002);
 
 const MOCK_ENCRYPTED_WEBHOOK_SECRET = faker.string.alphanumeric(32);
 

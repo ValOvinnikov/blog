@@ -1,7 +1,10 @@
+import { faker } from '@faker-js/faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import type { TDeprovisionEnv } from '@worker/utils/deprovision-env/deprovision-env';
 
-export const MOCK_SITE_CONFIG_REVALIDATE_SECRET = 'fake-site-config-secret';
+faker.seed(6027);
+
+export const MOCK_SITE_CONFIG_REVALIDATE_SECRET = faker.string.alphanumeric(32);
 
 const {
   sanityManagementToken,

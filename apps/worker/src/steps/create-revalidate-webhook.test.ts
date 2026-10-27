@@ -36,7 +36,7 @@ import {
   revalidateWebhookUrl,
 } from './create-revalidate-webhook';
 
-faker.seed(6025);
+faker.seed(7003);
 
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-webhooks');

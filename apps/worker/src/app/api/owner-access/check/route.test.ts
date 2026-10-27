@@ -4,6 +4,7 @@ import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_FORGED_SECRET,
+  MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
@@ -17,7 +18,7 @@ import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run
 
 import { POST } from './route';
 
-const CHECK_URL = 'https://worker.example.com/api/owner-access/check';
+const MOCK_CHECK_URL = `${MOCK_WORKER_ORIGIN}/api/owner-access/check`;
 
 vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
@@ -25,7 +26,7 @@ vi.mock('@blog/db/queries/tenants');
 
 function checkRequest(secret: string = MOCK_ENQUEUE_SECRET): Request {
   return mockSignedRequest(
-    CHECK_URL,
+    MOCK_CHECK_URL,
     JSON.stringify({ tenantId: MOCK_TENANT_ID }),
     {
       secret,

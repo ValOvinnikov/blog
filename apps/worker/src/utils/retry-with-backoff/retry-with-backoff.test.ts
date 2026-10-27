@@ -6,11 +6,11 @@ import {
   type TRetryWithBackoffOptions,
 } from './retry-with-backoff';
 
-faker.seed(6025);
+faker.seed(7016);
 
 const MOCK_RESULT = faker.lorem.word();
 const MOCK_FAILURE = faker.lorem.sentence();
-const BASE_DELAY_MS = 10;
+const MOCK_BASE_DELAY_MS = 10;
 
 describe(retryWithBackoff, () => {
   let sleep: Mock<(ms: number) => Promise<void>>;
@@ -21,7 +21,7 @@ describe(retryWithBackoff, () => {
   ) {
     return retryWithBackoff(fn, {
       maxAttempts: 3,
-      baseDelayMs: BASE_DELAY_MS,
+      baseDelayMs: MOCK_BASE_DELAY_MS,
       isRetryable: () => true,
       sleep,
       ...overrides,
@@ -53,8 +53,8 @@ describe(retryWithBackoff, () => {
 
     expect(result).toBe(MOCK_RESULT);
     expect(fn).toHaveBeenCalledTimes(3);
-    expect(sleep).toHaveBeenNthCalledWith(1, BASE_DELAY_MS);
-    expect(sleep).toHaveBeenNthCalledWith(2, BASE_DELAY_MS * 2);
+    expect(sleep).toHaveBeenNthCalledWith(1, MOCK_BASE_DELAY_MS);
+    expect(sleep).toHaveBeenNthCalledWith(2, MOCK_BASE_DELAY_MS * 2);
   });
 
   it('rethrows once maxAttempts is exhausted', async () => {

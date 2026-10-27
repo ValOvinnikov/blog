@@ -28,7 +28,7 @@ import {
   type TVerifyTenantSeededContentDeps,
 } from './verify-seeded-content';
 
-faker.seed(6025);
+faker.seed(7008);
 
 vi.mock('@blog/db/queries/tenants');
 
@@ -54,7 +54,7 @@ const REQUIRED_TYPES = [
   'settings_navigation',
   'settings_footer',
 ];
-const VALID_NAVIGATION_ITEMS = [{ resolved: true }];
+const MOCK_VALID_NAVIGATION_ITEMS = [{ resolved: true }];
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return mockProvisionedTenant({
@@ -80,7 +80,7 @@ function createClientStub(fetch: ReturnType<typeof vi.fn>) {
 function createClientStubResolving(
   foundTypes: string[],
   homePage: unknown = MOCK_VALID_HOME_PAGE,
-  navigationItems: unknown = VALID_NAVIGATION_ITEMS,
+  navigationItems: unknown = MOCK_VALID_NAVIGATION_ITEMS,
 ) {
   return createClientStub(
     vi.fn().mockImplementation((query: string) => {
@@ -119,7 +119,7 @@ function transientThenOk(okValue: unknown) {
     .mockResolvedValueOnce(okValue);
 }
 
-const GRANT_DENIED_READS = [
+const MOCK_GRANT_DENIED_READS = [
   {
     read: 'content',
     transient: () => {
@@ -127,7 +127,7 @@ const GRANT_DENIED_READS = [
         .fn()
         .mockRejectedValueOnce(mockSanityGrantError())
         .mockResolvedValueOnce(REQUIRED_TYPES)
-        .mockResolvedValueOnce(VALID_NAVIGATION_ITEMS)
+        .mockResolvedValueOnce(MOCK_VALID_NAVIGATION_ITEMS)
         .mockResolvedValueOnce(MOCK_VALID_HOME_PAGE);
       return {
         reader,
@@ -324,7 +324,7 @@ describe(verifyTenantSeededContent, () => {
     expect(createClient).not.toHaveBeenCalled();
   });
 
-  it.each(GRANT_DENIED_READS)(
+  it.each(MOCK_GRANT_DENIED_READS)(
     'retries a transient permission-denied $read read once and passes',
     async ({ transient, transientCalls }) => {
       const { reader, deps } = transient();
@@ -336,7 +336,7 @@ describe(verifyTenantSeededContent, () => {
     },
   );
 
-  it.each(GRANT_DENIED_READS)(
+  it.each(MOCK_GRANT_DENIED_READS)(
     'fails with a $read-specific message once permission-denied retries run out',
     async ({ persistent, failure }) => {
       const { reader, deps } = persistent();
