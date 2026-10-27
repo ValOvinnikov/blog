@@ -6,7 +6,6 @@ export const MOCK_TENANT_TOKEN = 'tok-a';
 export const MOCK_PREVIOUS_TOKEN = 'tok-old';
 export const MOCK_ROTATED_TOKEN = 'tok-new';
 export const MOCK_PLATFORM_PROJECT_ID = 'platform-project';
-export const MOCK_ENV_PROJECT_ID = 'env-project';
 
 export function mockTenant(
   overrides: Partial<TTenantSanityContext> = {},
