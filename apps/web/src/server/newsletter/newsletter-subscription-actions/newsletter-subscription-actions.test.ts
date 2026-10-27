@@ -17,6 +17,8 @@ import {
   MOCK_CONFIRMATION_TOKEN,
 } from '@web/testing/server/newsletter/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { arrangeNoSessionOnce } from '@web/testing/shared/session/arrange-no-session-once';
+import { MOCK_USER_ID } from '@web/testing/shared/session/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
@@ -31,13 +33,11 @@ import {
 } from './newsletter-subscription-actions';
 
 const {
-  authMock,
   unsubscribeMock,
   resendConfirmationMock,
   cookiesMock,
   deleteCookieMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
   resendConfirmationMock: vi.fn(),
   cookiesMock: vi.fn(),
@@ -49,7 +49,7 @@ const {
   commitConfirmationToken: commitConfirmationTokenMock,
 } = confirmationEmailEdges;
 
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@web/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await import('@blog/db/constants')),
@@ -87,8 +87,6 @@ vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
 faker.seed(8156);
 
-const MOCK_USER_ID = faker.string.uuid();
-const MOCK_SESSION = { user: { id: MOCK_USER_ID } };
 const MOCK_SUBSCRIBER = mockSubscriber();
 const MOCK_BRAND = resolveTenantEmailBrand({
   preset: PRESET_ID.CONSOLE,
@@ -100,7 +98,6 @@ const UNAVAILABLE = toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 
 describe(unsubscribeAction, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue(MOCK_SESSION);
     unsubscribeMock.mockResolvedValue(undefined);
     cookiesMock.mockResolvedValue({ delete: deleteCookieMock });
   });
@@ -128,7 +125,7 @@ describe(unsubscribeAction, () => {
   );
 
   it.each([
-    ['no session', () => authMock.mockResolvedValue(null)],
+    ['no session', arrangeNoSessionOnce],
     [
       'no tenant',
       () => vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined),
@@ -174,7 +171,6 @@ describe(unsubscribeAction, () => {
 
 describe(resendConfirmationAction, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue(MOCK_SESSION);
     resendConfirmationMock.mockResolvedValue({
       ...toOutcome(SUBSCRIBER_OUTCOME.PENDING),
       subscriberId: MOCK_SUBSCRIBER.id,
@@ -204,11 +200,7 @@ describe(resendConfirmationAction, () => {
   });
 
   it.each([
-    [
-      'server-error with no session',
-      SERVER_ERROR,
-      () => authMock.mockResolvedValue(null),
-    ],
+    ['server-error with no session', SERVER_ERROR, arrangeNoSessionOnce],
     [
       'server-error with no tenant',
       SERVER_ERROR,

@@ -25,9 +25,10 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('next/cache', () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
-}));
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 const enableOnly = (...capabilities: TCapability[]) => {
   vi.mocked(queries.settingsFeatures.getSettingsFeatures).mockResolvedValue(

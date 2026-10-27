@@ -27,9 +27,10 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('next/cache', () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
-}));
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
 

@@ -15,6 +15,7 @@ import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
 import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
 import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
+import { mockSettingsFeaturesRow } from '@web/testing/server/settings-features/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSubscriber } from '@web/testing/shared/subscriber/fixtures';
 import {
@@ -86,9 +87,10 @@ vi.mock('next/headers', () => ({
   headers: headersMock,
 }));
 
-vi.mock('next/cache', () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
-}));
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 vi.mock('botid/server', () => ({ checkBotId: checkBotIdMock }));
 
@@ -104,16 +106,6 @@ const SERVER_ERROR = { outcome: ACTION_OUTCOME.SERVER_ERROR };
 const UNAVAILABLE = { outcome: ACTION_OUTCOME.UNAVAILABLE };
 const RATE_LIMITED = { outcome: ACTION_OUTCOME.RATE_LIMITED };
 const ALREADY_SUBSCRIBED = { outcome: NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED };
-
-const mockSettingsFeaturesRow = (newsletterEnabled = true) => ({
-  commentsEnabled: true,
-  ratingsEnabled: true,
-  bookmarksEnabled: true,
-  newsletterEnabled,
-  analyticsEnabled: true,
-  consentBannerEnabled: true,
-  contactFormEnabled: true,
-});
 
 const resolveSubscriber = (outcome: string) =>
   createPendingSubscriberMock.mockResolvedValue(
@@ -206,7 +198,7 @@ describe(subscribeToNewsletterAction, () => {
       UNAVAILABLE,
       () =>
         getSettingsFeaturesMock.mockResolvedValue(
-          mockSettingsFeaturesRow(false),
+          mockSettingsFeaturesRow({ newsletterEnabled: false }),
         ),
     ],
     [

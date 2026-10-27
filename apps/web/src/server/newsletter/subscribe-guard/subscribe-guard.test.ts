@@ -16,7 +16,7 @@ vi.mock(
   '@web/server/rate-limit/redis-rate-limit-store/redis-rate-limit-store',
   () => ({ createRedisRateLimitStore: createRedisRateLimitStoreMock }),
 );
-vi.mock('@web/utils/env/env', () => ({ env: {} }));
+vi.mock('@web/utils/env/env');
 
 faker.seed(7411);
 

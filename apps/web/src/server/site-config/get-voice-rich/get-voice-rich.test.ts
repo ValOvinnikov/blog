@@ -19,15 +19,15 @@ faker.seed(6010);
 vi.mock('@web/server/request-context/request-context');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@blog/db', () => ({
-  queries: {
-    siteConfig: { getSiteConfig: vi.fn() },
-  },
-}));
+vi.mock(
+  '@blog/db',
+  () => import('@web/testing/server/site-config/site-config-db'),
+);
 
-vi.mock('next/cache', () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
-}));
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 vi.mock('next-intl/server', () => ({
   getMessages: vi.fn(),

@@ -1,23 +1,23 @@
 import { faker } from '@faker-js/faker';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
 import {
   MOCK_TENANT_HOST,
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
-import { env } from '@web/utils/env/env';
 
 import { getTenantBaseUrl } from './tenant-base-url';
 
 faker.seed(4410);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock('@web/utils/env/env', () => ({ env: {} }));
+vi.mock('@web/utils/env/env');
 
 const MOCK_SITE_URL = faker.internet.url();
 
 describe(getTenantBaseUrl, () => {
   beforeEach(() => {
-    Reflect.deleteProperty(env, 'NEXT_PUBLIC_SITE_URL');
+    setMockEnv({});
   });
 
   it("builds an https URL from the resolved tenant's primary domain", async () => {
@@ -28,7 +28,7 @@ describe(getTenantBaseUrl, () => {
 
   describe('with a site URL configured', () => {
     beforeEach(() => {
-      Object.assign(env, { NEXT_PUBLIC_SITE_URL: MOCK_SITE_URL });
+      setMockEnv({ NEXT_PUBLIC_SITE_URL: MOCK_SITE_URL });
     });
 
     it.each([

@@ -11,7 +11,7 @@ vi.mock('@blog/insight', () => ({
   createLokiSink: vi.fn(),
   registerLogSink: vi.fn(),
 }));
-vi.mock('@web/utils/env/env', () => ({ env: {} }));
+vi.mock('@web/utils/env/env');
 
 const MOCK_VALID_ENV = {
   LOKI_PUSH_URL: faker.internet.url({ protocol: 'https' }),

@@ -10,7 +10,7 @@ const { redisCounts, redisConstructor } = vi.hoisted(() => ({
   redisConstructor: vi.fn(),
 }));
 
-vi.mock('@web/utils/env/env', () => ({ env: {} }));
+vi.mock('@web/utils/env/env');
 vi.mock('@upstash/redis', () => ({
   Redis: class {
     constructor(config: unknown) {
