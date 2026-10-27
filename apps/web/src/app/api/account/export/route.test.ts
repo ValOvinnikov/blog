@@ -1,9 +1,12 @@
 import { HTTP_STATUS } from '@blog/config/constants';
+import { faker } from '@faker-js/faker';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
+
+import { GET } from './route';
 
 const { authMock, exportAccountDataMock, resolveTenantIdMock, headersMock } =
   vi.hoisted(() => ({
@@ -25,25 +28,28 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
-const USER_ID = 'user-1';
-const POST_ID = 'post-1';
-const PROFILE = { id: USER_ID, name: 'Jane Doe', email: 'jane@example.com' };
+faker.seed(6009);
 
-describe('GET /api/account/export', () => {
-  let GET: typeof import('./route').GET;
+const MOCK_USER_ID = faker.string.uuid();
+const MOCK_POST_ID = faker.string.uuid();
+const MOCK_PROFILE = {
+  id: MOCK_USER_ID,
+  name: faker.person.fullName(),
+  email: faker.internet.email(),
+};
 
-  beforeEach(async () => {
+describe(GET, () => {
+  beforeEach(() => {
     authMock.mockReset();
-    authMock.mockResolvedValue({ user: { id: USER_ID } });
+    authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
     exportAccountDataMock.mockReset();
     resolveTenantIdMock.mockReset();
     resolveTenantIdMock.mockResolvedValue(MOCK_TENANT_ID);
     headersMock.mockReset();
     headersMock.mockResolvedValue(new Headers({ host: MOCK_TENANT_HOST }));
-    ({ GET } = await import('./route'));
   });
 
-  it('returns 401 without querying the db when there is no session', async () => {
+  it('rejects a request without a session before querying the db', async () => {
     authMock.mockResolvedValue(null);
     const response = await GET();
 
@@ -51,7 +57,7 @@ describe('GET /api/account/export', () => {
     expect(exportAccountDataMock).not.toHaveBeenCalled();
   });
 
-  it('returns 404 when the session user has no matching account row', async () => {
+  it('responds not found when the session user has no account row', async () => {
     exportAccountDataMock.mockResolvedValue(undefined);
     const response = await GET();
 
@@ -60,8 +66,8 @@ describe('GET /api/account/export', () => {
 
   it('streams the export as a downloadable JSON attachment', async () => {
     const exportData = {
-      profile: PROFILE,
-      bookmarks: [{ postId: POST_ID, createdAt: new Date('2026-01-01') }],
+      profile: MOCK_PROFILE,
+      bookmarks: [{ postId: MOCK_POST_ID, createdAt: new Date('2026-01-01') }],
     };
     exportAccountDataMock.mockResolvedValue(exportData);
     const response = await GET();
@@ -73,12 +79,15 @@ describe('GET /api/account/export', () => {
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(contentType).toBe('application/json');
     expect(contentDisposition).toBe('attachment; filename="account-data.json"');
-    expect(json.profile).toEqual(PROFILE);
-    expect(json.bookmarks[0].postId).toBe(POST_ID);
-    expect(exportAccountDataMock).toHaveBeenCalledWith(MOCK_TENANT_ID, USER_ID);
+    expect(json.profile).toEqual(MOCK_PROFILE);
+    expect(json.bookmarks[0].postId).toBe(MOCK_POST_ID);
+    expect(exportAccountDataMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_USER_ID,
+    );
   });
 
-  it('returns 404 without querying the db when no tenant resolves', async () => {
+  it('responds not found without querying the db when no tenant resolves', async () => {
     resolveTenantIdMock.mockResolvedValue(undefined);
     const response = await GET();
 
@@ -88,7 +97,7 @@ describe('GET /api/account/export', () => {
 
   it('resolves the tenant from the request Host header', async () => {
     exportAccountDataMock.mockResolvedValue({
-      profile: PROFILE,
+      profile: MOCK_PROFILE,
       bookmarks: [],
     });
     await GET();
@@ -96,7 +105,7 @@ describe('GET /api/account/export', () => {
     expect(resolveTenantIdMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
   });
 
-  it('returns 500 when the export query throws', async () => {
+  it('responds with a server error when the export query throws', async () => {
     exportAccountDataMock.mockRejectedValue(MOCK_ERROR);
     const response = await GET();
 

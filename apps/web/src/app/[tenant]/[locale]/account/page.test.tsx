@@ -1,4 +1,6 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
@@ -21,32 +23,28 @@ vi.mock(
   }),
 );
 
-const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
+const setup = customRenderAsync(AccountRoute, { params: mockRouteParams() });
 
-const setup = customRenderAsync(AccountRoute, {
-  params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' as const }),
-});
-
-describe('AccountRoute', () => {
+describe(`<${AccountRoute.name}/>`, () => {
   beforeEach(() => {
-    isReaderAccountEnabledMock.mockReset();
+    vi.mocked(isReaderAccountEnabled).mockReset();
   });
 
-  it('renders AccountPage when the tenant has a reader-account capability enabled', async () => {
-    isReaderAccountEnabledMock.mockResolvedValue(true);
+  it('renders AccountPage when the tenant has reader accounts enabled', async () => {
+    vi.mocked(isReaderAccountEnabled).mockResolvedValue(true);
 
     await setup();
 
-    expect(screen.getByTestId('account-page')).toBeInTheDocument();
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    expect(isReaderAccountEnabledMock).toHaveBeenCalledWith();
+    const accountPage = screen.getByTestId('account-page');
+    expect(accountPage).toBeVisible();
+    expect(notFound).not.toHaveBeenCalled();
   });
 
-  it('answers 404 when the tenant has no reader-account capability enabled', async () => {
-    isReaderAccountEnabledMock.mockResolvedValue(false);
+  it('responds not-found when the tenant has reader accounts disabled', async () => {
+    vi.mocked(isReaderAccountEnabled).mockResolvedValue(false);
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(notFound).toHaveBeenCalledTimes(1);
   });
 });

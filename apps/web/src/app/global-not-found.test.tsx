@@ -1,35 +1,44 @@
-import NotFound, { generateMetadata } from './global-not-found';
+import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { faker } from '@faker-js/faker';
+import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-found-page';
+import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 
-const { standaloneNotFoundPageMock, buildNotFoundMetadataMock } = vi.hoisted(
-  () => ({
-    standaloneNotFoundPageMock: vi.fn(),
-    buildNotFoundMetadataMock: vi.fn(),
-  }),
-);
+import GlobalNotFound, { generateMetadata } from './global-not-found';
+
+faker.seed(6009);
+
+const MOCK_METADATA = { title: faker.lorem.words(3) };
+const MOCK_PAGE = <div data-testid="standalone-not-found" />;
+
+vi.mock('@web/metadata/not-found-metadata/build-not-found-metadata');
 
 vi.mock('@web/components/pages/standalone-not-found-page', () => ({
-  StandaloneNotFoundPage: standaloneNotFoundPageMock,
+  StandaloneNotFoundPage: vi.fn(),
 }));
 
-vi.mock('@web/metadata/not-found-metadata', () => ({
-  buildNotFoundMetadata: buildNotFoundMetadataMock,
-}));
+describe(generateMetadata, () => {
+  it('builds the not-found metadata without a tenant', async () => {
+    vi.mocked(buildNotFoundMetadata).mockResolvedValueOnce(MOCK_METADATA);
 
-describe('GlobalNotFound (unmatched-route 404)', () => {
-  describe('generateMetadata', () => {
-    it('delegates to buildNotFoundMetadata', async () => {
-      const metadata = { title: 'Page not found' };
-      buildNotFoundMetadataMock.mockResolvedValue(metadata);
+    const metadata = await generateMetadata();
 
-      await expect(generateMetadata()).resolves.toBe(metadata);
-    });
+    expect(metadata).toBe(MOCK_METADATA);
+    expect(buildNotFoundMetadata).toHaveBeenCalledWith();
+  });
+});
+
+describe(GlobalNotFound, () => {
+  beforeEach(() => {
+    vi.mocked(StandaloneNotFoundPage).mockResolvedValue(MOCK_PAGE);
   });
 
-  it('renders StandaloneNotFoundPage with no tenant, never reading the request header', async () => {
-    const ui = { type: 'div', props: {} };
-    standaloneNotFoundPageMock.mockResolvedValue(ui);
+  it('renders the standalone page without a tenant in an English document', async () => {
+    const document = await GlobalNotFound();
 
-    expect((await NotFound()).props.children).toBe(ui);
-    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith();
+    const { lang, children } = document.props;
+
+    expect(lang).toBe(LOCALE_BCP47_TAGS.EN);
+    expect(children).toBe(MOCK_PAGE);
+    expect(StandaloneNotFoundPage).toHaveBeenCalledWith();
   });
 });
