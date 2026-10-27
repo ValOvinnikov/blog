@@ -14,13 +14,11 @@ import type { TDb } from '@blog/db/client';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type * as schema from '@blog/db/schema';
 import { siteConfig } from '@blog/db/schema/site-config';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 import { eq, sql } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-const MIGRATION_REPLAY_FAKER_SEED = 6023;
-
-faker.seed(MIGRATION_REPLAY_FAKER_SEED);
+const migrationReplayFaker = createMockFaker(6023);
 
 const migrationsDir = fileURLToPath(
   new URL('../../migrations', import.meta.url),
@@ -112,7 +110,7 @@ export async function insertReplayLegacyTenant(
 ): Promise<{ id: string; primaryDomain: string }> {
   const primaryDomain = `${slug}.example.com`;
   const { rows } = await db.execute<{ id: string }>(
-    sql`insert into "tenants" ("slug", "primary_domain", "sanity_project_id", "sanity_dataset", "locale", "plan", "status") values (${slug}, ${primaryDomain}, ${faker.string.alphanumeric(8)}, ${faker.word.noun()}, ${LOCALE_ISO_CODES.EN}, ${TENANT_PLAN.FREE}, ${TENANT_STATUS.ACTIVE}) returning "id"`,
+    sql`insert into "tenants" ("slug", "primary_domain", "sanity_project_id", "sanity_dataset", "locale", "plan", "status") values (${slug}, ${primaryDomain}, ${migrationReplayFaker.string.alphanumeric(8)}, ${migrationReplayFaker.word.noun()}, ${LOCALE_ISO_CODES.EN}, ${TENANT_PLAN.FREE}, ${TENANT_STATUS.ACTIVE}) returning "id"`,
   );
   const [tenant] = rows;
   if (!tenant) {
@@ -124,7 +122,7 @@ export async function insertReplayLegacyTenant(
 export async function insertReplayUser(
   db: PgliteDatabase<typeof schema>,
 ): Promise<{ id: string }> {
-  const id = faker.string.uuid();
+  const id = migrationReplayFaker.string.uuid();
   await db.execute(sql`insert into "users" ("id") values (${id})`);
   return { id };
 }
@@ -137,9 +135,9 @@ export async function insertReplaySubscriber(
   }: { tenantId: string; unsubscribeToken?: TMaybeNull<string> },
 ): Promise<{ id: string; email: string; confirmationToken: string }> {
   const subscriber = {
-    id: faker.string.uuid(),
-    email: faker.internet.email(),
-    confirmationToken: faker.string.uuid(),
+    id: migrationReplayFaker.string.uuid(),
+    email: migrationReplayFaker.internet.email(),
+    confirmationToken: migrationReplayFaker.string.uuid(),
   };
   const hasUnsubscribeToken = unsubscribeToken !== undefined;
   const unsubscribeColumn = hasUnsubscribeToken
@@ -164,7 +162,7 @@ export async function insertReplayVoiceOverrides(
     insert into "site_config"
       ("tenant_id", "preset", "accent_hue", "heading_font", "body_font", "radius_scale", "density", "voice_overrides")
     values (
-      ${tenant.id}, ${PRESET_ID.EDITORIAL}, ${faker.number.int({ min: 0, max: 360 })}, ${FONT_CHOICE.FRAUNCES}, ${FONT_CHOICE.INTER},
+      ${tenant.id}, ${PRESET_ID.EDITORIAL}, ${migrationReplayFaker.number.int({ min: 0, max: 360 })}, ${FONT_CHOICE.FRAUNCES}, ${FONT_CHOICE.INTER},
       ${RADIUS_SCALE.SM}, ${DENSITY.COMPACT}, ${JSON.stringify(voiceOverrides)}::jsonb
     )
   `);

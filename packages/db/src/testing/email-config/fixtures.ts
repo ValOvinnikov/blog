@@ -1,11 +1,11 @@
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 
-faker.seed(61002);
+const emailConfigFaker = createMockFaker(61002);
 
 export const MOCK_EMAIL_CONFIG = {
-  logoAssetUrl: faker.internet.url(),
-  senderName: faker.company.name(),
-  replyToAddress: faker.internet.email().toLowerCase(),
-  footerPostalAddress: faker.location.streetAddress(),
-  contactRecipient: faker.internet.email().toLowerCase(),
+  logoAssetUrl: emailConfigFaker.internet.url(),
+  senderName: emailConfigFaker.company.name(),
+  replyToAddress: emailConfigFaker.internet.email().toLowerCase(),
+  footerPostalAddress: emailConfigFaker.location.streetAddress(),
+  contactRecipient: emailConfigFaker.internet.email().toLowerCase(),
 };
