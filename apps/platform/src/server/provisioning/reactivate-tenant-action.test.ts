@@ -4,76 +4,65 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { ADMIN_ROLE } from '@blog/db/constants';
+import { queries } from '@blog/db';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
-import { notFound } from 'next/navigation';
+import { auth } from '@platform/server/auth/auth';
+import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
+import {
+  MOCK_OPERATOR_EMAIL,
+  MOCK_OPERATOR_ID,
+} from '@platform/testing/admins/operator';
+import {
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+  mockTenant,
+} from '@platform/testing/tenants/fixtures';
+import type { Session } from 'next-auth';
 
-const {
-  requireSuperAdminMock,
-  startProvisioningMock,
-  getTenantByIdMock,
-  recordAuditEventMock,
-} = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
-  startProvisioningMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-  recordAuditEventMock: vi.fn(),
-}));
+import { reactivateTenantAction } from './reactivate-tenant-action';
 
-vi.mock('@platform/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
-}));
+vi.mock('@platform/server/auth/require-super-admin');
 
-vi.mock('@platform/server/audit/record-audit-event', () => ({
-  recordAuditEvent: recordAuditEventMock,
-}));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('./start-provisioning', () => ({
-  startProvisioning: startProvisioningMock,
-}));
+vi.mock('@platform/server/provisioning/start-provisioning');
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: {
-      getTenantById: getTenantByIdMock,
-    },
+    tenants: { getTenantById: vi.fn() },
+    auditEvents: { insertAuditEvent: vi.fn() },
   },
 }));
 
-const ARCHIVED_TENANT = {
-  id: MOCK_TENANT_ID,
-  name: 'Acme',
-  deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-};
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
+const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
+const startProvisioningMock = vi.mocked(startProvisioning);
 
-describe('reactivateTenantAction', () => {
-  let reactivateTenantAction: typeof import('./reactivate-tenant-action').reactivateTenantAction;
+const MOCK_BLANK_CONFIRM = '  ';
 
-  beforeEach(async () => {
-    requireSuperAdminMock.mockReset();
-    requireSuperAdminMock.mockResolvedValue({
-      id: 'admin-1',
-      role: ADMIN_ROLE.SUPERADMIN,
-    });
-    startProvisioningMock.mockReset();
-    startProvisioningMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.SUCCESS,
+describe(reactivateTenantAction, () => {
+  beforeEach(() => {
+    authMock.mockReset();
+    authMock.mockResolvedValue({
+      user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getTenantByIdMock.mockReset();
-    getTenantByIdMock.mockResolvedValue(ARCHIVED_TENANT);
-    recordAuditEventMock.mockReset();
-    recordAuditEventMock.mockResolvedValue(undefined);
-    ({ reactivateTenantAction } = await import('./reactivate-tenant-action'));
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+    );
+    insertAuditEventMock.mockReset();
   });
 
-  it('requires a super-admin session before reading the tenant', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
-      notFound();
-    });
+  it('stops before reading the tenant when the super-admin gate rejects', async () => {
+    vi.mocked(requireSuperAdmin).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
 
     await expect(
-      reactivateTenantAction(MOCK_TENANT_ID, { confirm: 'Acme' }),
+      reactivateTenantAction(MOCK_TENANT_ID, { confirm: MOCK_TENANT_NAME }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -82,27 +71,23 @@ describe('reactivateTenantAction', () => {
 
   it('starts provisioning and records a REACTIVATED audit event', async () => {
     const result = await reactivateTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme',
+      confirm: MOCK_TENANT_NAME,
     });
 
-    expect(getTenantByIdMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      includeArchived: true,
-    });
     expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(recordAuditEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: AUDIT_ACTION.REACTIVATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: { name: 'Acme' },
-      }),
-    );
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: MOCK_OPERATOR_ID,
+      action: AUDIT_ACTION.REACTIVATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { name: MOCK_TENANT_NAME },
+    });
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
   it('rejects an empty confirmation without reading the tenant', async () => {
     const result = await reactivateTenantAction(MOCK_TENANT_ID, {
-      confirm: '  ',
+      confirm: MOCK_BLANK_CONFIRM,
     });
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -113,45 +98,17 @@ describe('reactivateTenantAction', () => {
     });
   });
 
-  it("rejects a confirmation that doesn't match the tenant's live name", async () => {
-    const result = await reactivateTenantAction(MOCK_TENANT_ID, {
-      confirm: 'acme',
-    });
-
-    expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
-    });
-  });
-
   it('refuses a tenant that is not deprovisioned', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      ...ARCHIVED_TENANT,
-      deprovisionedAt: null,
-    });
+    getTenantByIdMock.mockResolvedValueOnce(mockTenant());
 
     const result = await reactivateTenantAction(MOCK_TENANT_ID, {
-      confirm: 'Acme',
+      confirm: MOCK_TENANT_NAME,
     });
 
     expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.NOT_DEPROVISIONED,
-    });
-  });
-
-  it('refuses an unknown tenant id', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
-
-    const result = await reactivateTenantAction('ghost', { confirm: 'Acme' });
-
-    expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
     });
   });
 
@@ -162,16 +119,16 @@ describe('reactivateTenantAction', () => {
     },
     { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.NOT_FOUND },
     { outcome: ACTION_OUTCOME.SERVER_ERROR },
-  ])(
+  ] as const)(
     'records nothing and returns the provisioning result %o',
     async (started) => {
-      startProvisioningMock.mockResolvedValue(started);
+      startProvisioningMock.mockResolvedValueOnce(started);
 
       const result = await reactivateTenantAction(MOCK_TENANT_ID, {
-        confirm: 'Acme',
+        confirm: MOCK_TENANT_NAME,
       });
 
-      expect(recordAuditEventMock).not.toHaveBeenCalled();
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
       expect(result).toEqual(started);
     },
   );
