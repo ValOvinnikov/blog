@@ -3,6 +3,8 @@ import type { TSettingsFeatures } from '@blog/db/schema/settings-features';
 import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
+faker.seed(61062);
+
 const MOCK_SETTINGS_FEATURES_CREATED_AT = faker.date.past();
 
 export const mockSettingsFeaturesRow = (

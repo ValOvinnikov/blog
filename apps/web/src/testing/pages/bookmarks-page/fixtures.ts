@@ -1,43 +1,46 @@
+import { routes } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import type {
   IBookmarkedPost,
   IBookmarksPageViewProps,
 } from '@web/components/pages/bookmarks-page/bookmarks-page-view';
 
-const makeBookmarkedPost = (
-  overrides: Partial<IBookmarkedPost> = {},
-): IBookmarkedPost => {
+faker.seed(61036);
+
+const MOCK_BOOKMARKS_HEADING = faker.lorem.words(2);
+const MOCK_LIST_HEADING = faker.lorem.words(2);
+const MOCK_EMPTY_MESSAGE = faker.lorem.sentence();
+const MOCK_HINT = faker.lorem.words(2);
+const MOCK_BOOKMARK_REF_DATE = '2026-08-01T00:00:00Z';
+
+const mockBookmarkedPost = (): IBookmarkedPost => {
+  const slug = faker.lorem.slug(3);
+
   return {
-    id: 'post-1',
-    title: 'Static-first rendering, revisited',
-    slug: 'static-first-rendering',
-    href: '/blog/static-first-rendering',
-    filename: 'static-first-rendering.md',
-    formattedDate: 'August 1, 2026',
-    ...overrides,
+    id: faker.string.uuid(),
+    title: faker.lorem.sentence(),
+    slug,
+    href: routes.post(slug),
+    filename: `${slug}.md`,
+    formattedDate: faker.date
+      .past({ refDate: MOCK_BOOKMARK_REF_DATE })
+      .toDateString(),
   };
 };
+
+const MOCK_BOOKMARKED_POSTS = [mockBookmarkedPost(), mockBookmarkedPost()];
 
 export const mockBookmarksPageView = (
   overrides: Partial<IBookmarksPageViewProps> = {},
 ): IBookmarksPageViewProps => {
-  const posts = overrides.posts ?? [
-    makeBookmarkedPost(),
-    makeBookmarkedPost({
-      id: 'post-2',
-      title: 'A tour of the new editor',
-      slug: 'a-tour-of-the-new-editor',
-      href: '/blog/a-tour-of-the-new-editor',
-      filename: 'a-tour-of-the-new-editor.md',
-      formattedDate: 'July 28, 2026',
-    }),
-  ];
+  const posts = overrides.posts ?? MOCK_BOOKMARKED_POSTS;
 
   return {
-    heading: 'My bookmarks',
-    listHeading: 'Saved posts',
+    heading: MOCK_BOOKMARKS_HEADING,
+    listHeading: MOCK_LIST_HEADING,
     posts,
-    emptyMessage: 'No bookmarks yet — save a post to find it here.',
-    hint: posts.length > 0 ? `${posts.length} saved` : undefined,
+    emptyMessage: MOCK_EMPTY_MESSAGE,
+    hint: posts.length > 0 ? MOCK_HINT : undefined,
     ...overrides,
   };
 };

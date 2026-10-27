@@ -1,6 +1,8 @@
 import { routes, type ILink } from '@blog/config';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61057);
+
 const [HOME_LABEL, BLOG_LABEL, ABOUT_LABEL, TOPICS_LABEL] =
   faker.helpers.uniqueArray(faker.lorem.word, 4);
 

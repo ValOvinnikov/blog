@@ -8,6 +8,8 @@ import { faker } from '@faker-js/faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
+faker.seed(61058);
+
 export const mockTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   return {
     id: 'topic-1',

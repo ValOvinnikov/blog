@@ -1,6 +1,9 @@
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { customRender, screen } from '@web/testing/custom-render';
-import { mockNewsletterSectionView } from '@web/testing/pages/account-page/newsletter-section-fixtures';
+import {
+  MOCK_UNSUBSCRIBE_LABEL,
+  mockNewsletterSectionView,
+} from '@web/testing/pages/account-page/newsletter-section-fixtures';
 
 import { NewsletterSectionView } from './newsletter-section-view';
 
@@ -27,7 +30,7 @@ describe(`<${NewsletterSectionView.name}/>`, () => {
       const badge = screen.getByText(MOCK_PROPS.activeBadgeLabel);
       const email = screen.getByText(MOCK_PROPS.email);
       const unsubscribeButton = screen.getByRole('button', {
-        name: 'Unsubscribe',
+        name: MOCK_UNSUBSCRIBE_LABEL,
       });
 
       expect(badge).toBeVisible();

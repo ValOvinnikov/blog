@@ -3,6 +3,8 @@ import type { THeroStatementModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
+faker.seed(61045);
+
 export const MOCK_HERO_STATEMENT_MODULE_ID = faker.string.uuid();
 
 export const MOCK_HERO_STATEMENT_HEADING = faker.company.catchPhrase();

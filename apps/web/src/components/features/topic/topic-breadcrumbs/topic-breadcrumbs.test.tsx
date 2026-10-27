@@ -56,6 +56,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTopicPageMock,
     setup,
     eventFragment: 'topic_breadcrumbs.fetch_failed',
+    logContext: { slug: MOCK_TOPIC_SLUG },
   });
   testBreadcrumbsTrail({
     pageLoaderMock: getTopicPageMock,

@@ -3,6 +3,8 @@ import type { TLogoItem } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
+faker.seed(61048);
+
 export const mockLogoItem = (overrides: Partial<TLogoItem> = {}): TLogoItem => {
   const name = overrides.name ?? 'Acme Corp';
 

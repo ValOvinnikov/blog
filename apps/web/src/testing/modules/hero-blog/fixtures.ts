@@ -2,6 +2,8 @@ import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import type { THeroBlogModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61049);
+
 type THeroBlogDataBase = Omit<
   Extract<THeroBlogModule, { hasPost: true }>,
   'hasPost' | 'heading'

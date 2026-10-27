@@ -1,12 +1,15 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { mockIdentitySectionView } from '@web/testing/pages/account-page/identity-section-fixtures';
+import {
+  MOCK_LAST_METHOD_NOTICE_LABEL,
+  MOCK_LINKED_STATUS_LABEL,
+  MOCK_SAVE_DISPLAY_NAME_LABEL,
+  MOCK_UNLINK_LABEL,
+  mockIdentitySectionView,
+} from '@web/testing/pages/account-page/identity-section-fixtures';
 
 import { IdentitySectionView } from './identity-section-view';
 
 const MOCK_PROPS = mockIdentitySectionView();
-const LINKED_STATUS = 'Linked';
-const LAST_METHOD_NOTICE = "Last remaining method — can't unlink";
-const UNLINK_BUTTON = 'Unlink';
 
 const setup = customRender(IdentitySectionView, MOCK_PROPS);
 
@@ -39,7 +42,7 @@ describe(`<${IdentitySectionView.name}/>`, () => {
   it('shows the linked-status label once per linked row', () => {
     setup();
 
-    const linkedLabels = screen.getAllByText(LINKED_STATUS);
+    const linkedLabels = screen.getAllByText(MOCK_LINKED_STATUS_LABEL);
     const linkedRowCount = MOCK_PROPS.providerRows.filter(
       ({ isLinked }) => isLinked,
     ).length;
@@ -55,7 +58,7 @@ describe(`<${IdentitySectionView.name}/>`, () => {
       })),
     });
 
-    const linkedLabel = screen.queryByText(LINKED_STATUS);
+    const linkedLabel = screen.queryByText(MOCK_LINKED_STATUS_LABEL);
 
     expect(linkedLabel).not.toBeInTheDocument();
   });
@@ -63,7 +66,9 @@ describe(`<${IdentitySectionView.name}/>`, () => {
   it('renders the given control for a row that is not the last method', () => {
     setup();
 
-    const unlinkButton = screen.getByRole('button', { name: UNLINK_BUTTON });
+    const unlinkButton = screen.getByRole('button', {
+      name: MOCK_UNLINK_LABEL,
+    });
 
     expect(unlinkButton).toBeVisible();
   });
@@ -72,21 +77,25 @@ describe(`<${IdentitySectionView.name}/>`, () => {
     setup();
 
     const displayNameLabel = screen.getByText(MOCK_PROPS.displayNameLabel);
-    const saveButton = screen.getByRole('button', { name: 'Save' });
+    const saveButton = screen.getByRole('button', {
+      name: MOCK_SAVE_DISPLAY_NAME_LABEL,
+    });
 
     expect(displayNameLabel).toBeVisible();
     expect(saveButton).toBeVisible();
   });
 
-  it('shows the last-method notice instead of the control for the last method', () => {
+  it('shows the last-method notice and hides the control for the last method', () => {
     setup({
       providerRows: MOCK_PROPS.providerRows.map((row, index) =>
         index === 0 ? { ...row, isLastMethod: true } : row,
       ),
     });
 
-    const lastMethodNotice = screen.getByText(LAST_METHOD_NOTICE);
-    const unlinkButton = screen.queryByRole('button', { name: UNLINK_BUTTON });
+    const lastMethodNotice = screen.getByText(MOCK_LAST_METHOD_NOTICE_LABEL);
+    const unlinkButton = screen.queryByRole('button', {
+      name: MOCK_UNLINK_LABEL,
+    });
 
     expect(lastMethodNotice).toBeVisible();
     expect(unlinkButton).not.toBeInTheDocument();

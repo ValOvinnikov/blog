@@ -5,6 +5,7 @@ import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -42,18 +43,22 @@ export const testNotFoundOnFetchFailure = ({
   pageLoaderMock,
   setup,
   eventFragment,
-}: IWithLoaderMock & { eventFragment?: string }) => {
+  logContext = {},
+}: IWithLoaderMock & {
+  eventFragment?: string;
+  logContext?: Record<string, unknown>;
+}) => {
   it('calls notFound() when the fetch fails', async () => {
-    pageLoaderMock.mockResolvedValue(errorResult(new Error('boom')));
+    pageLoaderMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     if (eventFragment) {
-      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        eventFragment,
-        expect.anything(),
-      );
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(eventFragment, {
+        ...logContext,
+        error: MOCK_ERROR,
+      });
     }
   });
 };

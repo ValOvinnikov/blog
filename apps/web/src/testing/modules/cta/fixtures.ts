@@ -13,6 +13,8 @@ import {
   mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
+faker.seed(61050);
+
 export const MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL =
   'Learn more about our subscription plans';
 

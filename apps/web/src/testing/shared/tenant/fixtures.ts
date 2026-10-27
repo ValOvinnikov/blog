@@ -5,6 +5,8 @@ import type { TTenantSanityContext } from '@blog/service';
 import { faker } from '@faker-js/faker';
 import type { TRequestContext } from '@web/server/request-context/request-context';
 
+faker.seed(61053);
+
 export const MOCK_TENANT_ID = faker.string.uuid();
 
 export const MOCK_OTHER_TENANT_ID = faker.string.uuid();

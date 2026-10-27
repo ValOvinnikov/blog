@@ -48,6 +48,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTagPageMock,
     setup,
     eventFragment: 'tag_breadcrumbs.fetch_failed',
+    logContext: { slug: MOCK_TAG_SLUG },
   });
   testBreadcrumbsTrail({
     pageLoaderMock: getTagPageMock,

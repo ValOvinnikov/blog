@@ -9,7 +9,10 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
-import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
+import {
+  MOCK_POST_DETAIL,
+  MOCK_POST_DETAIL_BODY_TEXT,
+} from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -111,7 +114,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
         level: 1,
         name: MOCK_POST_DETAIL.title,
       });
-      const bodyText = within(main).getByText('Body text.');
+      const bodyText = within(main).getByText(MOCK_POST_DETAIL_BODY_TEXT);
 
       expect(titleHeading).toBeVisible();
       expect(bodyText).toBeVisible();

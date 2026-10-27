@@ -1,6 +1,8 @@
 import type { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61059);
+
 const SUBSCRIBER_ID = faker.string.uuid();
 const SUBSCRIBER_EMAIL = faker.internet.email();
 

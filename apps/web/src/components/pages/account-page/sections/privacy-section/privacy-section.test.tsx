@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes, SITE_MESSAGES } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
@@ -47,10 +47,10 @@ describe(`<${PrivacySection.name}/>`, () => {
 
   it('arms the delete button once the handle is typed', async () => {
     const deleteButton = screen.getByRole('button', {
-      name: MOCK_PROPS.deleteLabel,
+      name: SITE_MESSAGES.accountPage.privacy.deleteButton,
     });
     const handleTextbox = screen.getByRole('textbox', {
-      name: 'Type your handle to confirm deletion',
+      name: SITE_MESSAGES.accountPage.privacy.deleteConfirmAriaLabel,
     });
 
     expect(deleteButton).toBeDisabled();

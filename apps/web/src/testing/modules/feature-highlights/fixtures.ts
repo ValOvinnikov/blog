@@ -3,6 +3,8 @@ import { faker } from '@faker-js/faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
+faker.seed(61047);
+
 export const mockFeatureHighlightItem = (
   overrides: Partial<TFeatureHighlightItem> = {},
 ): TFeatureHighlightItem => ({

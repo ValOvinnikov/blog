@@ -5,6 +5,8 @@ import type { TContactMessageSource } from '@web/server/contact-form/contact-for
 import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
+faker.seed(61061);
+
 export const MOCK_LEAD_SOURCE_PATH = `/${faker.lorem.slug()}`;
 
 export const MOCK_LEAD_SOURCE: TContactMessageSource = {

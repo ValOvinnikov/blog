@@ -1,6 +1,8 @@
 import { NEXT_DYNAMIC_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 
+faker.seed(61054);
+
 const MOCK_ERROR_MESSAGE = faker.lorem.sentence();
 
 export const MOCK_ERROR = new Error(MOCK_ERROR_MESSAGE);
