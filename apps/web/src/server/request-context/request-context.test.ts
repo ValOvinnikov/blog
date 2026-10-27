@@ -1,6 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db';
+import { faker } from '@faker-js/faker';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
+import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import {
   MOCK_TENANT_BASE_URL,
@@ -10,23 +13,29 @@ import {
 } from '@web/testing/shared/tenant/fixtures';
 import { setRequestLocale } from 'next-intl/server';
 
+import {
+  getNotFoundContext,
+  peekVoiceTenant,
+  type TRequestContext,
+} from './request-context';
 import type * as TModule from './request-context';
+
+faker.seed(6010);
 
 const {
   getTenantByIdMock,
   toTenantSanityCredentialsMock,
   selectLiveLocalesMock,
-  isProductionEnvironmentMock,
-  isTenantServableMock,
+  mockEnv,
 } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
   toTenantSanityCredentialsMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
-  isProductionEnvironmentMock: vi.fn(),
-  isTenantServableMock: vi.fn(),
+  mockEnv: {},
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await vi.importActual('@blog/db/constants')),
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,
@@ -36,34 +45,38 @@ vi.mock('@blog/db', () => ({
   },
 }));
 vi.mock('@blog/service', () => ({
-  getPlatformSanityContext: () => PLATFORM_CONTEXT,
+  getPlatformSanityContext: () => MOCK_PLATFORM_CONTEXT,
 }));
-vi.mock('@web/utils/is-production-environment', () => ({
-  isProductionEnvironment: isProductionEnvironmentMock,
-}));
-vi.mock(
-  '@web/server/tenant/resolve-tenant/resolve-tenant',
-  async (importOriginal) => ({
-    ...(await importOriginal()),
-    isTenantServable: isTenantServableMock,
-  }),
-);
+vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
 
+const PRODUCTION_DATASET = 'production';
+const DEVELOPMENT_DATASET = 'development';
+const NOT_FOUND_TENANT_LOAD_FAILED_EVENT =
+  'request_context.not_found_tenant_load_failed';
 const NO_TENANT_ENTERED = 'with no tenant entered';
-const UNSERVED_LOCALE = 'xx';
 
-const PLATFORM_CONTEXT = {
-  projectId: 'platform-project',
-  dataset: 'platform-dataset',
-  token: 'platform-token',
+const MOCK_UNSERVED_LOCALE = faker.string.alpha(8);
+const MOCK_NON_UUID_TENANT = faker.lorem.word();
+const MOCK_DB_ERROR_MESSAGE = faker.lorem.sentence();
+const MOCK_DEPROVISIONED_AT = faker.date.past({ refDate: '2026-01-01' });
+
+const MOCK_PLATFORM_CONTEXT = {
+  projectId: faker.string.alphanumeric(8),
+  dataset: faker.lorem.word(),
+  token: faker.string.alphanumeric(24),
 };
 
-const TENANT_CREDENTIALS = {
-  projectId: 'tenant-project',
-  dataset: 'production',
-  token: 'tenant-token',
+const MOCK_TENANT_CREDENTIALS = {
+  projectId: faker.string.alphanumeric(8),
+  dataset: faker.lorem.word(),
+  token: faker.string.alphanumeric(24),
   defaultLocale: LOCALE_ISO_CODES.EN,
 };
+
+const MOCK_SERVABLE_TENANT = mockTenant({
+  sanityReadTokenEncrypted: faker.string.alphanumeric(32),
+  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+});
 
 const params = (tenant: string, locale: string) =>
   Promise.resolve({ tenant, locale });
@@ -74,22 +87,41 @@ const loadRequestContext = async (): Promise<typeof TModule> => {
   return import('./request-context');
 };
 
-const enterAndRead = async (tenant: string, locale: string) => {
-  const { enterRequestContext, getRequestContext } = await loadRequestContext();
-  await enterRequestContext(params(tenant, locale));
-  return getRequestContext();
+const enterAndRead = async (
+  tenant: string,
+  locale: string,
+): Promise<TRequestContext> => {
+  const requestContext = await loadRequestContext();
+  await requestContext.enterRequestContext(params(tenant, locale));
+  return requestContext.getRequestContext();
+};
+
+const enterWithNotFoundRead = async (tenant: string, locale: string) => {
+  const requestContext = await loadRequestContext();
+  const notFoundContext = requestContext.getNotFoundContext();
+  await requestContext
+    .enterRequestContext(params(tenant, locale))
+    .catch(() => {});
+  return { peekVoiceTenant: requestContext.peekVoiceTenant, notFoundContext };
+};
+
+const enterAndReadNotFound = async (tenant: string, locale: string) => {
+  const { notFoundContext } = await enterWithNotFoundRead(tenant, locale);
+  return notFoundContext;
 };
 
 describe('request-context', () => {
   beforeEach(() => {
-    getTenantByIdMock.mockResolvedValue(mockTenant());
-    toTenantSanityCredentialsMock.mockReturnValue(TENANT_CREDENTIALS);
+    getTenantByIdMock.mockResolvedValue(MOCK_SERVABLE_TENANT);
+    toTenantSanityCredentialsMock.mockReturnValue(MOCK_TENANT_CREDENTIALS);
     selectLiveLocalesMock.mockReturnValue([
       LOCALE_ISO_CODES.EN,
       LOCALE_ISO_CODES.NL,
     ]);
-    isProductionEnvironmentMock.mockReturnValue(true);
-    isTenantServableMock.mockReturnValue(true);
+    setMockEnv({
+      NEXT_PUBLIC_SANITY_DATASET: PRODUCTION_DATASET,
+      NEXT_PUBLIC_SITE_URL: MOCK_TENANT_BASE_URL,
+    });
   });
 
   afterEach(() => {
@@ -98,20 +130,20 @@ describe('request-context', () => {
   });
 
   it("serves the entered tenant's context in the entered locale", async () => {
-    const row = mockTenant();
-    getTenantByIdMock.mockResolvedValue(row);
-
     await expect(
       enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
     ).resolves.toEqual({
       tenantId: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
-      sanityContext: { ...TENANT_CREDENTIALS, locale: LOCALE_ISO_CODES.NL },
+      sanityContext: {
+        ...MOCK_TENANT_CREDENTIALS,
+        locale: LOCALE_ISO_CODES.NL,
+      },
       metadataBase: new URL(`https://${MOCK_TENANT_HOST}`),
       defaultLocale: LOCALE_ISO_CODES.EN,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
-    expect(selectLiveLocalesMock).toHaveBeenCalledWith(row);
+    expect(selectLiveLocalesMock).toHaveBeenCalledWith(MOCK_SERVABLE_TENANT);
   });
 
   it('sets the next-intl request locale', async () => {
@@ -122,7 +154,7 @@ describe('request-context', () => {
     );
   });
 
-  describe('with a freshly loaded module', () => {
+  describe('with a freshly loaded requestContext', () => {
     let enterRequestContext: (typeof TModule)['enterRequestContext'];
     let getRequestContext: (typeof TModule)['getRequestContext'];
 
@@ -141,33 +173,37 @@ describe('request-context', () => {
       });
     });
 
-    it('refuses a second entry with a different tenant', async () => {
-      await enterRequestContext(
+    it.each([
+      [
+        'tenant',
         params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
-      );
+        params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
+      ],
+      [
+        'locale',
+        params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
+        params(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
+      ],
+    ])(
+      'refuses a second entry with a different %s',
+      async (_label, firstEntry, secondEntry) => {
+        await enterRequestContext(firstEntry);
 
-      await expect(
-        enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN)),
-      ).rejects.toThrow(/different route params/);
-    });
+        await expect(enterRequestContext(secondEntry)).rejects.toThrow(
+          /different route params/,
+        );
+      },
+    );
 
-    it('refuses a second entry with a different locale', async () => {
-      await enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN));
-
-      await expect(
-        enterRequestContext(params(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL)),
-      ).rejects.toThrow(/different route params/);
-    });
-
-    it('throws naming enterRequestContext when read before entry', async () => {
+    it('throws naming enterRequestContext when read before entry', () => {
       expect(() => getRequestContext()).toThrow(/enterRequestContext\(\)/);
     });
   });
 
   it('throws a 404 for a locale the site does not serve', async () => {
-    await expect(enterAndRead(MOCK_TENANT_ID, UNSERVED_LOCALE)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(
+      enterAndRead(MOCK_TENANT_ID, MOCK_UNSERVED_LOCALE),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
   });
 
   describe(NO_TENANT_ENTERED, () => {
@@ -177,7 +213,10 @@ describe('request-context', () => {
       ).resolves.toEqual({
         tenantId: undefined,
         locale: LOCALE_ISO_CODES.NL,
-        sanityContext: { ...PLATFORM_CONTEXT, locale: LOCALE_ISO_CODES.NL },
+        sanityContext: {
+          ...MOCK_PLATFORM_CONTEXT,
+          locale: LOCALE_ISO_CODES.NL,
+        },
         metadataBase: new URL(MOCK_TENANT_BASE_URL),
         defaultLocale: undefined,
         liveLocales: undefined,
@@ -186,19 +225,27 @@ describe('request-context', () => {
     });
   });
 
-  describe('with a tenant that has no Sanity credentials', () => {
-    beforeEach(() => {
-      toTenantSanityCredentialsMock.mockReturnValue(undefined);
-    });
+  describe('with a tenant that has no usable Sanity credentials', () => {
+    it.each([
+      [
+        'a row without credentials',
+        () => toTenantSanityCredentialsMock.mockReturnValue(undefined),
+      ],
+      [
+        'no row for the tenant id',
+        () => getTenantByIdMock.mockResolvedValue(undefined),
+      ],
+    ])('throws a 404 in production for %s', async (_label, arrange) => {
+      arrange();
 
-    it('throws a 404 in production', async () => {
       await expect(
         enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
       ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
 
     it('falls back to the platform project outside production', async () => {
-      isProductionEnvironmentMock.mockReturnValue(false);
+      toTenantSanityCredentialsMock.mockReturnValue(undefined);
+      setMockEnv({ NEXT_PUBLIC_SANITY_DATASET: DEVELOPMENT_DATASET });
 
       const { sanityContext } = await enterAndRead(
         MOCK_TENANT_ID,
@@ -206,44 +253,36 @@ describe('request-context', () => {
       );
 
       expect(sanityContext).toEqual({
-        ...PLATFORM_CONTEXT,
+        ...MOCK_PLATFORM_CONTEXT,
         locale: LOCALE_ISO_CODES.EN,
       });
     });
   });
 
-  it('throws a 404 in production when the tenant id matches no row', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
-
-    await expect(
-      enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-  });
-
   it('never queries a tenant id that is not UUID-shaped', async () => {
-    isProductionEnvironmentMock.mockReturnValue(false);
+    setMockEnv({ NEXT_PUBLIC_SANITY_DATASET: DEVELOPMENT_DATASET });
 
-    await enterAndRead('not-a-tenant', LOCALE_ISO_CODES.EN);
+    await enterAndRead(MOCK_NON_UUID_TENANT, LOCALE_ISO_CODES.EN);
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   describe('metadataBase', () => {
-    it('falls back to the site URL for a tenant that is not servable', async () => {
-      isTenantServableMock.mockReturnValue(false);
-
-      const { metadataBase } = await enterAndRead(
-        MOCK_TENANT_ID,
-        LOCALE_ISO_CODES.EN,
-      );
-
-      expect(metadataBase).toEqual(new URL(MOCK_TENANT_BASE_URL));
-    });
-
-    it('falls back to the site URL for a deprovisioned tenant', async () => {
-      getTenantByIdMock.mockResolvedValue(
-        mockTenant({ deprovisionedAt: new Date('2026-01-01') }),
-      );
+    it.each([
+      [
+        'a tenant that is not servable',
+        mockTenant({ sanityReadTokenEncrypted: null }),
+      ],
+      [
+        'a deprovisioned tenant',
+        { ...MOCK_SERVABLE_TENANT, deprovisionedAt: MOCK_DEPROVISIONED_AT },
+      ],
+    ])('falls back to the site URL for %s', async (_label, tenant) => {
+      getTenantByIdMock.mockResolvedValue(tenant);
+      setMockEnv({
+        NEXT_PUBLIC_SANITY_DATASET: PRODUCTION_DATASET,
+        NEXT_PUBLIC_SITE_URL: MOCK_TENANT_BASE_URL,
+      });
 
       const { metadataBase } = await enterAndRead(
         MOCK_TENANT_ID,
@@ -254,15 +293,7 @@ describe('request-context', () => {
     });
   });
 
-  describe('getNotFoundContext', () => {
-    const enterAndReadNotFound = async (tenant: string, locale: string) => {
-      const { enterRequestContext, getNotFoundContext } =
-        await loadRequestContext();
-      const notFoundContext = getNotFoundContext();
-      await enterRequestContext(params(tenant, locale)).catch(() => {});
-      return notFoundContext;
-    };
-
+  describe(getNotFoundContext, () => {
     it('serves the entered language when it is live', async () => {
       await expect(
         enterAndReadNotFound(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
@@ -279,7 +310,7 @@ describe('request-context', () => {
       selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.DE]);
 
       await expect(
-        enterAndReadNotFound(MOCK_TENANT_ID, UNSERVED_LOCALE),
+        enterAndReadNotFound(MOCK_TENANT_ID, MOCK_UNSERVED_LOCALE),
       ).resolves.toEqual({
         tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
@@ -315,7 +346,7 @@ describe('request-context', () => {
     });
 
     it('serves the entered language and logs when the tenants row cannot be read', async () => {
-      const error = new Error('db down');
+      const error = new Error(MOCK_DB_ERROR_MESSAGE);
       getTenantByIdMock.mockRejectedValue(error);
 
       await expect(
@@ -326,86 +357,77 @@ describe('request-context', () => {
       });
       const { logger } = await import('@web/utils/logger/logger');
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'request_context.not_found_tenant_load_failed',
+        NOT_FOUND_TENANT_LOAD_FAILED_EVENT,
         { error },
       );
     });
 
     describe(NO_TENANT_ENTERED, () => {
-      it('serves the entered language', async () => {
+      it.each([
+        [
+          'serves the entered language',
+          LOCALE_ISO_CODES.FR,
+          LOCALE_ISO_CODES.FR,
+        ],
+        [
+          'falls back to English for an invalid language',
+          MOCK_UNSERVED_LOCALE,
+          LOCALE_ISO_CODES.EN,
+        ],
+      ])('%s', async (_label, enteredLocale, servedLocale) => {
         await expect(
-          enterAndReadNotFound(
-            UNRESOLVED_TENANT_PLACEHOLDER,
-            LOCALE_ISO_CODES.FR,
-          ),
-        ).resolves.toEqual({
-          tenantId: undefined,
-          locale: LOCALE_ISO_CODES.FR,
-        });
-      });
-
-      it('falls back to English for an invalid language', async () => {
-        await expect(
-          enterAndReadNotFound(UNRESOLVED_TENANT_PLACEHOLDER, UNSERVED_LOCALE),
-        ).resolves.toEqual({
-          tenantId: undefined,
-          locale: LOCALE_ISO_CODES.EN,
-        });
+          enterAndReadNotFound(UNRESOLVED_TENANT_PLACEHOLDER, enteredLocale),
+        ).resolves.toEqual({ tenantId: undefined, locale: servedLocale });
       });
     });
   });
 
-  describe('peekVoiceTenant', () => {
+  describe(peekVoiceTenant, () => {
     it('resolves no tenant without waiting when no route has entered', async () => {
-      const { peekVoiceTenant } = await loadRequestContext();
+      const requestContext = await loadRequestContext();
 
-      await expect(peekVoiceTenant()).resolves.toBe(undefined);
+      await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
     });
 
     it.each([
       ['its default language', LOCALE_ISO_CODES.EN],
       ['a language other than the default', LOCALE_ISO_CODES.NL],
-    ])('resolves the entered tenant in %s', async (_, locale) => {
-      const { enterRequestContext, peekVoiceTenant } =
-        await loadRequestContext();
-      await enterRequestContext(params(MOCK_TENANT_ID, locale));
+    ])('resolves the entered tenant in %s', async (_label, locale) => {
+      const requestContext = await loadRequestContext();
+      await requestContext.enterRequestContext(params(MOCK_TENANT_ID, locale));
 
-      await expect(peekVoiceTenant()).resolves.toBe(MOCK_TENANT_ID);
+      await expect(requestContext.peekVoiceTenant()).resolves.toBe(
+        MOCK_TENANT_ID,
+      );
     });
 
     it('resolves no tenant when none was entered', async () => {
-      const { enterRequestContext, peekVoiceTenant } =
-        await loadRequestContext();
-      await enterRequestContext(
+      const requestContext = await loadRequestContext();
+      await requestContext.enterRequestContext(
         params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
       );
 
-      await expect(peekVoiceTenant()).resolves.toBe(undefined);
+      await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
     });
 
-    it("resolves the not-found tenant when the layout 404'd on the language", async () => {
-      const { enterRequestContext, getNotFoundContext, peekVoiceTenant } =
-        await loadRequestContext();
-      const notFoundContext = getNotFoundContext();
-      await enterRequestContext(params(MOCK_TENANT_ID, UNSERVED_LOCALE)).catch(
-        () => {},
-      );
-      await notFoundContext;
+    it.each([
+      [
+        'the layout 404d on the language',
+        MOCK_TENANT_CREDENTIALS,
+        MOCK_UNSERVED_LOCALE,
+      ],
+      ['its Sanity credentials 404 the layout', undefined, LOCALE_ISO_CODES.EN],
+    ])(
+      'resolves the not-found tenant when %s',
+      async (_label, credentials, locale) => {
+        toTenantSanityCredentialsMock.mockReturnValue(credentials);
+        const { peekVoiceTenant: peek } = await enterWithNotFoundRead(
+          MOCK_TENANT_ID,
+          locale,
+        );
 
-      await expect(peekVoiceTenant()).resolves.toBe(MOCK_TENANT_ID);
-    });
-
-    it('resolves the not-found tenant when its Sanity credentials 404 the layout', async () => {
-      toTenantSanityCredentialsMock.mockReturnValue(undefined);
-      const { enterRequestContext, getNotFoundContext, peekVoiceTenant } =
-        await loadRequestContext();
-      const notFoundContext = getNotFoundContext();
-      await enterRequestContext(
-        params(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN),
-      ).catch(() => {});
-      await notFoundContext;
-
-      await expect(peekVoiceTenant()).resolves.toBe(MOCK_TENANT_ID);
-    });
+        await expect(peek()).resolves.toBe(MOCK_TENANT_ID);
+      },
+    );
   });
 });

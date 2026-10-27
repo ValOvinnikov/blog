@@ -1,41 +1,44 @@
-/**
- * @vitest-environment jsdom
- */
+import {
+  mockCookieStore,
+  stubCookieStore,
+} from '@web/testing/server/newsletter-cookies/fixtures';
+import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
+
 import {
   clearNewsletterSubscribedCookie,
   markNewsletterSubscribed,
 } from './newsletter-subscribed-cookie';
 
-const { setMock, deleteMock, cookiesMock } = vi.hoisted(() => ({
-  setMock: vi.fn(),
-  deleteMock: vi.fn(),
-  cookiesMock: vi.fn(),
-}));
+vi.mock('next/headers');
 
-vi.mock('next/headers', () => ({ cookies: cookiesMock }));
+const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
+
+let cookieStore: ReturnType<typeof mockCookieStore>;
+
+beforeEach(() => {
+  cookieStore = mockCookieStore();
+  stubCookieStore(cookieStore);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe(markNewsletterSubscribed, () => {
-  beforeEach(() => {
-    setMock.mockReset();
-    cookiesMock.mockReset();
-    cookiesMock.mockResolvedValue({ set: setMock });
-  });
+  it('sets a long-lived, lax, non-httpOnly cookie outside production', async () => {
+    vi.stubEnv('NODE_ENV', 'test');
 
-  afterEach(() => {
-    vi.unstubAllEnvs();
-  });
-
-  it('sets a long-lived, lax, non-httpOnly cookie', async () => {
     await markNewsletterSubscribed();
 
-    expect(setMock).toHaveBeenCalledWith(
-      'newsletter_subscribed',
+    expect(cookieStore.set).toHaveBeenCalledWith(
+      NEWSLETTER_SUBSCRIBED_COOKIE_NAME,
       '1',
-      expect.objectContaining({
-        maxAge: 60 * 60 * 24 * 365,
+      {
+        maxAge: ONE_YEAR_SECONDS,
         sameSite: 'lax',
+        secure: false,
         httpOnly: false,
-      }),
+      },
     );
   });
 
@@ -44,36 +47,25 @@ describe(markNewsletterSubscribed, () => {
 
     await markNewsletterSubscribed();
 
-    expect(setMock).toHaveBeenCalledWith(
-      'newsletter_subscribed',
+    expect(cookieStore.set).toHaveBeenCalledWith(
+      NEWSLETTER_SUBSCRIBED_COOKIE_NAME,
       '1',
-      expect.objectContaining({ secure: true }),
-    );
-  });
-
-  it('does not mark the cookie secure outside production', async () => {
-    vi.stubEnv('NODE_ENV', 'test');
-
-    await markNewsletterSubscribed();
-
-    expect(setMock).toHaveBeenCalledWith(
-      'newsletter_subscribed',
-      '1',
-      expect.objectContaining({ secure: false }),
+      {
+        maxAge: ONE_YEAR_SECONDS,
+        sameSite: 'lax',
+        secure: true,
+        httpOnly: false,
+      },
     );
   });
 });
 
 describe(clearNewsletterSubscribedCookie, () => {
-  beforeEach(() => {
-    deleteMock.mockReset();
-    cookiesMock.mockReset();
-    cookiesMock.mockResolvedValue({ delete: deleteMock });
-  });
-
   it('deletes the newsletter-subscribed cookie', async () => {
     await clearNewsletterSubscribedCookie();
 
-    expect(deleteMock).toHaveBeenCalledWith('newsletter_subscribed');
+    expect(cookieStore.delete).toHaveBeenCalledWith(
+      NEWSLETTER_SUBSCRIBED_COOKIE_NAME,
+    );
   });
 });

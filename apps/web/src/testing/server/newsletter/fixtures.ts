@@ -1,12 +1,9 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates/get-email-template/get-email-template';
-import { LIST_UNSUBSCRIBE_ONE_CLICK, type TSendEmailInput } from '@blog/email';
+import type { TSendEmailInput } from '@blog/email';
 import { faker } from '@faker-js/faker';
-import {
-  MOCK_TENANT_BASE_URL,
-  MOCK_TENANT_ID,
-} from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import type { Mock } from 'vitest';
 
 export const MOCK_CONFIRMATION_TOKEN = faker.string.alphanumeric(16);
@@ -20,13 +17,6 @@ export const MOCK_AUTHORED_SUBJECT = faker.lorem.sentence();
 const MOCK_EMAIL_CONFIG_ID = faker.string.uuid();
 
 const MOCK_EMAIL_CONFIG_CREATED_AT = faker.date.past();
-
-export const MOCK_UNSUBSCRIBE_URL = `${MOCK_TENANT_BASE_URL}/api/newsletter/unsubscribe?token=${MOCK_UNSUBSCRIBE_TOKEN}`;
-
-export const MOCK_UNSUBSCRIBE_HEADERS = {
-  'List-Unsubscribe': `<${MOCK_UNSUBSCRIBE_URL}>`,
-  'List-Unsubscribe-Post': LIST_UNSUBSCRIBE_ONE_CLICK,
-};
 
 export const mockEmailConfig = (
   overrides: Partial<TEmailConfigResult> = {},

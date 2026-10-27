@@ -1,121 +1,102 @@
-import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
-import type { schema } from '@blog/db';
-import type * as emailModule from '@blog/email';
+import { queries } from '@blog/db';
+import { sendEmail } from '@blog/email';
+import type * as TEmail from '@blog/email';
 import { faker } from '@faker-js/faker';
-import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import { MOCK_TENANT_BASE_URL } from '@web/testing/shared/tenant/fixtures';
+import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';
+import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
+import {
+  MOCK_TENANT_BASE_URL,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
+import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
-import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
 import { sendContactNotification } from './contact-notification-send';
 
-const { getContactRecipientMock, getEmailConfigMock, sendEmailMock, envMock } =
-  vi.hoisted(() => ({
-    getContactRecipientMock: vi.fn(),
-    getEmailConfigMock: vi.fn(),
-    sendEmailMock: vi.fn(),
-    envMock: {} as Record<string, string | undefined>,
-  }));
+vi.mock('@web/utils/env/env');
+
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+
+vi.mock(
+  'next/cache',
+  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
+);
 
 vi.mock('@blog/db', () => ({
   queries: {
-    emailConfig: {
-      getContactRecipient: getContactRecipientMock,
-      getEmailConfig: getEmailConfigMock,
-    },
+    emailConfig: { getContactRecipient: vi.fn(), getEmailConfig: vi.fn() },
+    tenants: { getTenantById: vi.fn() },
+    siteConfig: { getSiteConfig: vi.fn() },
   },
 }));
 
 vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof emailModule>()),
-  sendEmail: sendEmailMock,
+  ...(await importOriginal<typeof TEmail>()),
+  sendEmail: vi.fn(),
 }));
 
-vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
-  resolveTenantEmailIdentity: vi.fn(),
-}));
+faker.seed(6010);
 
-vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
-  getTenantBaseUrl: vi.fn(),
-}));
-
-vi.mock('@web/utils/env/env', () => ({ env: envMock }));
-
-const PLATFORM_URL = `https://${faker.internet.domainName()}`;
-const FROM_ADDRESS = `${faker.company.name()} <${faker.internet.email()}>`;
-const RECIPIENT = faker.internet.email();
-
-const lead: schema.TLead = {
-  id: faker.string.uuid(),
-  tenantId: faker.string.uuid(),
-  name: faker.person.fullName(),
-  nameEncrypted: null,
-  email: faker.internet.email(),
-  emailEncrypted: null,
-  emailIndex: null,
-  message: faker.lorem.sentences(2),
-  messageEncrypted: null,
-  sourcePath: `/${faker.lorem.slug()}`,
-  sourceDocumentId: null,
-  sourceLocale: null,
-  readAt: null,
-  createdAt: faker.date.recent(),
-};
+const MOCK_PLATFORM_URL = `https://${faker.internet.domainName()}`;
+const MOCK_FROM_ADDRESS = `${faker.company.name()} <${faker.internet.email()}>`;
+const MOCK_RECIPIENT = faker.internet.email();
+const MOCK_LEAD = mockLeadInput();
 
 describe(sendContactNotification, () => {
   beforeEach(() => {
-    envMock.PLATFORM_APP_URL = PLATFORM_URL;
-    envMock.NEWSLETTER_FROM_ADDRESS = FROM_ADDRESS;
-    vi.mocked(getTenantBaseUrl).mockResolvedValue(MOCK_TENANT_BASE_URL);
-    vi.mocked(resolveTenantEmailIdentity).mockResolvedValue({
-      brandName: faker.company.name(),
-      brand: resolveTenantEmailBrand({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: faker.number.int({ min: 0, max: 359 }),
-      }),
+    Object.assign(env, {
+      PLATFORM_APP_URL: MOCK_PLATFORM_URL,
+      NEWSLETTER_FROM_ADDRESS: MOCK_FROM_ADDRESS,
     });
-    getContactRecipientMock.mockResolvedValue(RECIPIENT);
-    getEmailConfigMock.mockResolvedValue(undefined);
-    sendEmailMock.mockResolvedValue(undefined);
+    vi.mocked(queries.siteConfig.getSiteConfig).mockResolvedValue(undefined);
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(mockTenant());
+    vi.mocked(queries.emailConfig.getContactRecipient).mockResolvedValue(
+      MOCK_RECIPIENT,
+    );
+    vi.mocked(queries.emailConfig.getEmailConfig).mockResolvedValue(undefined);
   });
 
   it('emails the recipient with Reply-To set to the visitor', async () => {
-    await sendContactNotification(lead);
+    await sendContactNotification(MOCK_LEAD);
 
-    const [[{ to, from, replyTo, subject }]] = sendEmailMock.mock.calls as [
-      [{ to: string; from: string; replyTo: string; subject: string }],
-    ];
-    expect(to).toBe(RECIPIENT);
-    expect(from).toBe(FROM_ADDRESS);
-    expect(replyTo).toBe(lead.email);
-    expect(subject).toBe(`New message from ${lead.name}`);
+    const { to, from, replyTo, subject } = firstSentEmail(vi.mocked(sendEmail));
+    expect(to).toBe(MOCK_RECIPIENT);
+    expect(from).toBe(MOCK_FROM_ADDRESS);
+    expect(replyTo).toBe(MOCK_LEAD.email);
+    expect(subject).toContain(MOCK_LEAD.name);
   });
 
   it('links the page the message came from and the leads list', async () => {
-    await sendContactNotification(lead);
+    await sendContactNotification(MOCK_LEAD);
 
-    const [{ html }] = sendEmailMock.mock.calls[0] as [{ html: string }];
-    expect(html).toContain(`href="${MOCK_TENANT_BASE_URL}${lead.sourcePath}"`);
-    expect(html).toContain(`href="${PLATFORM_URL}/dashboard/leads"`);
+    const { html } = firstSentEmail(vi.mocked(sendEmail));
+    expect(html).toContain(
+      `href="${MOCK_TENANT_BASE_URL}${MOCK_LEAD.sourcePath}"`,
+    );
+    expect(html).toContain(`href="${MOCK_PLATFORM_URL}/dashboard/leads"`);
   });
 
   it('sends with an inert leads link and warns when the admin URL is unset', async () => {
-    envMock.PLATFORM_APP_URL = undefined;
+    Object.assign(env, { PLATFORM_APP_URL: undefined });
 
-    await sendContactNotification(lead);
+    await sendContactNotification(MOCK_LEAD);
 
-    const [{ html }] = sendEmailMock.mock.calls[0] as [{ html: string }];
-    expect(sendEmailMock).toHaveBeenCalledOnce();
-    expect(html).not.toContain(PLATFORM_URL);
-    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+    const { html } = firstSentEmail(vi.mocked(sendEmail));
+    expect(sendEmail).toHaveBeenCalledOnce();
+    expect(html).not.toContain(MOCK_PLATFORM_URL);
+    expect(logger.warn).toHaveBeenCalledWith(
       'contact_form.platform_url_missing',
     );
   });
 
   it('throws without sending when the tenant has no recipient', async () => {
-    getContactRecipientMock.mockResolvedValue(undefined);
+    vi.mocked(queries.emailConfig.getContactRecipient).mockResolvedValueOnce(
+      undefined,
+    );
 
-    await expect(sendContactNotification(lead)).rejects.toThrow();
-    expect(sendEmailMock).not.toHaveBeenCalled();
+    await expect(sendContactNotification(MOCK_LEAD)).rejects.toThrow();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 });

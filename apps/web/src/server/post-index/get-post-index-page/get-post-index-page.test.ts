@@ -1,5 +1,8 @@
-import { okResult } from '@blog/utils';
-import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { mockPageLoaderResult } from '@web/testing/server/page-loaders/fixtures';
+import {
+  importWithMemoizingCache,
+  restoreReactCache,
+} from '@web/testing/server/page-loaders/import-with-memoizing-cache';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostIndexPage } from './get-post-index-page';
@@ -13,42 +16,32 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/server/request-context/request-context');
 
 describe(getPostIndexPage, () => {
-  beforeEach(() => {
-    getIndexPageMock.mockReset();
-  });
-
-  it('forwards the resolved tenant context to the blog index service', async () => {
-    getIndexPageMock.mockResolvedValue(okResult());
+  it('loads the blog index for the resolved tenant', async () => {
+    getIndexPageMock.mockResolvedValueOnce(mockPageLoaderResult());
 
     await getPostIndexPage();
 
     expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
   });
 
-  it('returns the raw TResult from getIndexPage unchanged', async () => {
-    const result = okResult({ title: 'Blog' });
-    getIndexPageMock.mockResolvedValue(result);
+  it('returns the service result unchanged', async () => {
+    const result = mockPageLoaderResult();
+    getIndexPageMock.mockResolvedValueOnce(result);
 
     await expect(getPostIndexPage()).resolves.toBe(result);
   });
 
   describe('memoization', () => {
-    afterEach(() => {
-      vi.doUnmock('react');
-      vi.resetModules();
-    });
+    afterEach(restoreReactCache);
 
-    it('dedupes the index-page query across one render pass with the same arguments', async () => {
-      getIndexPageMock.mockResolvedValue(okResult());
+    it('queries once per render pass', async () => {
+      getIndexPageMock.mockResolvedValueOnce(mockPageLoaderResult());
 
-      vi.doMock('react', withMemoizingReactCache);
-      vi.resetModules();
+      const { getPostIndexPage: memoizedGetPostIndexPage } =
+        await importWithMemoizingCache(() => import('./get-post-index-page'));
 
-      const { getPostIndexPage: freshGetPostIndexPage } =
-        await import('./get-post-index-page');
-
-      await freshGetPostIndexPage();
-      await freshGetPostIndexPage();
+      await memoizedGetPostIndexPage();
+      await memoizedGetPostIndexPage();
 
       expect(getIndexPageMock).toHaveBeenCalledTimes(1);
     });

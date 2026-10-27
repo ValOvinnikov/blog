@@ -1,5 +1,6 @@
 import { okResult } from '@blog/utils';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getSiteSettings } from './get-site-settings';
@@ -19,11 +20,10 @@ vi.mock('@web/server/request-context/request-context');
 describe(getSiteSettings, () => {
   beforeEach(() => {
     getSiteSettingsMock.mockReset();
+    getSiteSettingsMock.mockResolvedValue(okResult(MOCK_SITE_SETTINGS));
   });
 
   it('forwards the resolved tenant context to the site settings service', async () => {
-    getSiteSettingsMock.mockResolvedValue(okResult({}));
-
     await getSiteSettings();
 
     expect(getSiteSettingsMock).toHaveBeenCalledWith(
@@ -31,8 +31,8 @@ describe(getSiteSettings, () => {
     );
   });
 
-  it('returns the raw TResult from the service unchanged', async () => {
-    const result = okResult({ brand: { name: 'Blog' } });
+  it('returns the result from the service unchanged', async () => {
+    const result = okResult(MOCK_SITE_SETTINGS);
     getSiteSettingsMock.mockResolvedValue(result);
 
     await expect(getSiteSettings()).resolves.toBe(result);
@@ -45,8 +45,6 @@ describe(getSiteSettings, () => {
     });
 
     it('fetches once however many components read it in one render pass', async () => {
-      getSiteSettingsMock.mockResolvedValue(okResult({}));
-
       vi.doMock('react', withMemoizingReactCache);
       vi.resetModules();
 
