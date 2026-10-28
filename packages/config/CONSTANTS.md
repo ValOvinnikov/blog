@@ -471,6 +471,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FIELD_ERROR**: `INVALID`
 
+### `@web/constants/header-style` — `apps/web/src/constants/header-style.ts`
+
+- **HEADER_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"header_style.site_config_fetch_failed"`
+
 ### `@web/constants/navigation` — `apps/web/src/constants/navigation.ts`
 
 - **NAVIGATION_LOG**: `LAYOUT_FETCH_FAILED`=`"navigation.layout_fetch_failed"`
@@ -496,6 +500,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 
 - **REVALIDATE_LOG**: `SECRET_MISSING`=`"revalidate.secret_missing"`, `TENANT_ID_LOOKUP_FAILED`=`"revalidate.tenant_id_lookup_failed"`, `TENANT_BY_ID_LOOKUP_FAILED`=`"revalidate.tenant_by_id_lookup_failed"`, `TENANT_ARCHIVED`=`"revalidate.tenant_archived"`, `TENANT_SANITY_CREDENTIALS_MISSING`=`"revalidate.tenant_sanity_credentials_missing"`, `TENANT_SANITY_CREDENTIALS_FETCH_THREW`=`"revalidate.tenant_sanity_credentials_fetch_threw"`, `TENANT_ACTIVITY_TOUCH_FAILED`=`"revalidate.tenant_activity_touch_failed"`, `PATH_PURGE_FALLBACK`=`"revalidate.path_purge_fallback"`, `REFERENCING_MODULES_LOOKUP_FAILED`=`"revalidate.referencing_modules_lookup_failed"`, `POST_LOOKUP_FAILED`=`"revalidate.post_lookup_failed"`, `BLOG_PAGINATION_LOOKUP_FAILED`=`"revalidate.blog_pagination_lookup_failed"`, `TAG_PARAMS_LOOKUP_FAILED`=`"revalidate.tag_params_lookup_failed"`, `TAG_PAGINATION_LOOKUP_FAILED`=`"revalidate.tag_pagination_lookup_failed"`, `TOPIC_PARAMS_LOOKUP_FAILED`=`"revalidate.topic_params_lookup_failed"`, `TOPIC_PAGINATION_LOOKUP_FAILED`=`"revalidate.topic_pagination_lookup_failed"`, `BOOKMARK_CLEANUP_FAILED`=`"revalidate.bookmark_cleanup_failed"`
+
+### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
+
+- **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `SITE_SETTINGS_FETCH_FAILED`=`"rss.site_settings_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
 
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 

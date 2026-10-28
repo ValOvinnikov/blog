@@ -7,6 +7,7 @@ import {
   MOCK_ABOUT_LINK,
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
+  MOCK_TOPICS_LINK,
 } from '@web/testing/shared/link/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
@@ -18,14 +19,29 @@ const TOGGLE_NAME = 'Toggle navigation menu';
 const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;
 
 const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_ABOUT_LINK];
+const MOCK_TOPICS_GROUP = {
+  ...MOCK_TOPICS_LINK,
+  subItems: [MOCK_TOPICS_LINK, MOCK_ABOUT_LINK],
+};
 
 const setup = customRender(SiteNavigation, {
   links,
 });
 
 describe(`<${SiteNavigation.name}/>`, () => {
+  const hidePopover = vi.fn();
+
   beforeEach(() => {
     vi.mocked(usePathname).mockReset();
+    Object.defineProperty(HTMLElement.prototype, 'hidePopover', {
+      value: hidePopover,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(HTMLElement.prototype, 'hidePopover');
+    hidePopover.mockReset();
   });
 
   it('marks the Home item active only on the exact root path', () => {
@@ -87,6 +103,37 @@ describe(`<${SiteNavigation.name}/>`, () => {
     const blogLink = screen.getByRole('link', { name: MOCK_BLOG_LINK.label });
 
     expect(blogLink).not.toHaveAttribute(ARIA_CURRENT);
+  });
+
+  it('marks a sub-item active on its own page', () => {
+    vi.mocked(usePathname).mockReturnValue(MOCK_ABOUT_LINK.href);
+    setup({ links: [MOCK_TOPICS_GROUP] });
+
+    const aboutLinks = screen.getAllByRole('link', {
+      name: MOCK_ABOUT_LINK.label,
+      hidden: true,
+    });
+    const topicsLinks = screen.getAllByRole('link', {
+      name: MOCK_TOPICS_LINK.label,
+      hidden: true,
+    });
+
+    for (const aboutLink of aboutLinks) {
+      expect(aboutLink).toHaveAttribute(ARIA_CURRENT, 'page');
+    }
+    for (const topicsLink of topicsLinks) {
+      expect(topicsLink).not.toHaveAttribute(ARIA_CURRENT);
+    }
+  });
+
+  it('closes an open sub-menu when the route changes', () => {
+    const view = setup({ links: [MOCK_TOPICS_GROUP] });
+    hidePopover.mockClear();
+
+    vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
+    view.rerender(<SiteNavigation links={[MOCK_TOPICS_GROUP]} />);
+
+    expect(hidePopover).toHaveBeenCalledOnce();
   });
 
   it('renders the actions slot', () => {

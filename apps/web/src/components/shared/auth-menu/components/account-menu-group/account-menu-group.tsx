@@ -15,36 +15,36 @@ import { accountMenuGroupVariants } from './account-menu-group-variants';
 export type TAccountMenuGroupProps = {
   oauthProviderIds: readonly TOAuthProviderId[];
   panelStyle: TAccountPanelStyle;
+  groupName: string;
 };
 
 export const AccountMenuGroup = ({
   oauthProviderIds,
   panelStyle,
+  groupName,
 }: TAccountMenuGroupProps) => {
   const { status, user, onImageError } = useReaderAccount();
   const t = useTranslations('authMenu');
   const panelId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const { row, glyph, chevron, panel } = accountMenuGroupVariants();
+  const { group, row, glyph, chevron, panel } = accountMenuGroupVariants();
 
   if (status === SESSION_STATUS.LOADING) {
     return null;
   }
 
   return (
-    <>
-      <button
-        type="button"
-        aria-expanded={isExpanded}
-        aria-controls={panelId}
-        onClick={() => setIsExpanded((current) => !current)}
-        className={row()}
-      >
+    <details
+      name={groupName}
+      onToggle={(event) => setIsExpanded(event.currentTarget.open)}
+      className={group()}
+    >
+      <summary className={row()}>
         <Icon name={ICONS.USER} size={SIZE.SM} className={glyph()} />
         {user ? t('accountHeading') : t('signIn')}
         <Icon name={ICONS.CHEVRON_DOWN} size={SIZE.SM} className={chevron()} />
-      </button>
+      </summary>
       {user ? (
         <ReaderAccountPanel
           appearance={panelStyle}
@@ -64,6 +64,6 @@ export const AccountMenuGroup = ({
           className={panel()}
         />
       )}
-    </>
+    </details>
   );
 };

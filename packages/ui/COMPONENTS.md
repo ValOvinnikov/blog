@@ -295,9 +295,15 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel; a link with `subItems` opens them as a sub-menu in the bar and in place in the panel.
-Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · drawerActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
+Top-level `<nav>` landmark; a link with `subItems` opens them as a sub-menu in the bar and in place in the phone menu, where only one `groupName` disclosure is open at a time.
+Props: links: INavItem[] · children?: TCompoundChildren<typeof PrimaryNavigationParts> · groupName?: string · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON
+
+Slots:
+
+- **PrimaryNavigation.Actions** — Controls that stay in the bar at every width, such as the theme toggle or the account button. Props: children?: ReactNode
+- **PrimaryNavigation.PanelActions** — Controls that sit in the bar on wide screens and move into the open phone menu as a row, such as the language and theme controls. Props: children?: ReactNode
+- **PrimaryNavigation.DrawerActions** — Controls that exist only in the open phone menu, below its other rows. Props: children?: ReactNode
 
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 

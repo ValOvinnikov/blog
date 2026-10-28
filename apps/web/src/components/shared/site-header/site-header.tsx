@@ -2,7 +2,7 @@ import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oau
 import { ACCOUNT_PHONE_PLACEMENT } from '@blog/config';
 import { service } from '@blog/service';
 import { Header } from '@blog/ui/components/organisms/header';
-import { AccountMenuGroup, AuthMenu } from '@web/components/shared/auth-menu';
+import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
@@ -13,8 +13,8 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
@@ -25,32 +25,30 @@ export const SiteHeader = async () => {
     await getRequestContext();
   const siteConfigTenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [
-    settingsResult,
     navResult,
     hasReaderAccounts,
     switcherStyle,
     brandLogoUrl,
     accountControl,
+    headerStyle,
   ] = await Promise.all([
-    getSiteSettings(),
     service.global.navigation.v1.getNavigation(sanityContext),
     isReaderAccountEnabled(),
     getLanguageSwitcherStyle(siteConfigTenant),
     getBrandLogoUrl(siteConfigTenant),
     getAccountControl(siteConfigTenant),
+    getHeaderStyle(siteConfigTenant),
   ]);
 
-  if (!settingsResult.ok) {
-    return null;
-  }
   if (!navResult.ok) {
     logger.error(NAVIGATION_LOG.LAYOUT_FETCH_FAILED, {
       error: navResult.error,
     });
   }
 
-  const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
+  const tagline = navResult.ok ? navResult.data.tagline : undefined;
+  const { layout, submenuStyle, barStyle } = headerStyle;
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
   const oauthProviderIds = getEnabledOAuthProviderIds();
@@ -60,12 +58,14 @@ export const SiteHeader = async () => {
 
   return (
     <StickyHeaderFrame>
-      <Header>
+      <Header layout={layout} barStyle={barStyle}>
         <Header.Brand>
-          <BrandLockupLink logoUrl={brandLogoUrl} tagline={brand.tagline} />
+          <BrandLockupLink logoUrl={brandLogoUrl} tagline={tagline} />
         </Header.Brand>
         <SiteNavigation
           links={navItems}
+          layout={layout}
+          submenuStyle={submenuStyle}
           panelActions={
             hasLanguageSwitcher && (
               <>
@@ -79,13 +79,10 @@ export const SiteHeader = async () => {
               </>
             )
           }
-          drawerActions={
-            hasAccountInPhoneMenu && (
-              <AccountMenuGroup
-                oauthProviderIds={oauthProviderIds}
-                panelStyle={accountControl.panelStyle}
-              />
-            )
+          menuAccount={
+            hasAccountInPhoneMenu
+              ? { oauthProviderIds, panelStyle: accountControl.panelStyle }
+              : undefined
           }
           actions={
             <>

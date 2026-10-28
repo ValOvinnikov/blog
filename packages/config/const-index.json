@@ -5560,6 +5560,14 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
+    "header_style.site_config_fetch_failed": [
+      {
+        "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/header-style",
+        "file": "apps/web/src/constants/header-style.ts"
+      }
+    ],
     "navigation.layout_fetch_failed": [
       {
         "ref": "NAVIGATION_LOG.LAYOUT_FETCH_FAILED",
@@ -5822,6 +5830,38 @@
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "rss.posts_fetch_failed": [
+      {
+        "ref": "RSS_LOG.POSTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "rss.site_settings_fetch_failed": [
+      {
+        "ref": "RSS_LOG.SITE_SETTINGS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "rss.index_page_fetch_failed": [
+      {
+        "ref": "RSS_LOG.INDEX_PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "rss.navigation_fetch_failed": [
+      {
+        "ref": "RSS_LOG.NAVIGATION_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
       }
     ],
     "authenticated": [
