@@ -6,7 +6,6 @@
     "look": "Look · Admin",
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
-    "workspacePending": "Workspace not ready · Admin",
     "signInTitle": "Sign in",
     "signInError": "Sign-in problem",
     "addTenant": "Add tenant · Admin",
@@ -26,12 +25,6 @@
     "dataRequestsPage": "Data requests · Admin",
     "signUpTitle": "Create an account",
     "onboarding": "Create your site · Admin"
-  },
-  "workspacePendingPage": {
-    "heading": "Your workspace isn't ready yet",
-    "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening.",
-    "tryAgain": "Try again",
-    "badge": "Setup"
   },
   "signInPage": {
     "heading": "Sign in",

@@ -4,7 +4,6 @@ status: built
 layers: [platform, auth, db, email, config, worker]
 code:
   - apps/platform/src/app/api/auth/**
-  - apps/platform/src/app/*/workspace-pending/**
   - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/app/*/sign-in/**
   - apps/platform/src/app/*/signup/**
@@ -21,7 +20,6 @@ code:
   - apps/platform/src/server/auth/sign-in-with-provider-action*
   - apps/platform/src/utils/safe-callback-path/**
   - apps/platform/src/utils/sign-in-error/**
-  - apps/platform/src/components/features/layout/workspace-pending-view/**
   - apps/platform/src/components/features/layout/sign-out-button/**
   - apps/platform/src/server/auth/auth.ts
   - apps/platform/src/server/auth/require-session-user-id.ts
@@ -72,9 +70,6 @@ Free site.
   styling. A `Verification` error (a magic link already used or expired) says
   so and links to sign-in for a new link; any other error gets a plain message
   and a link back to sign-in.
-- `/workspace-pending`: a session-gated dead end with "Try again" (to
-  `/dashboard`) and "Sign out". Nothing routes to it any more: a user with no
-  membership goes to `/onboarding` instead.
 - `/signup`: a public gate in front of the same providers, not a second
   login. The visitor ticks acceptance of the Terms of Service and the Privacy
   Policy, linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
@@ -270,7 +265,6 @@ Free site.
 - `apps/platform/src/app/[locale]/onboarding/page.tsx`
 - `apps/platform/src/server/onboarding/create-site-action.ts`
 - `apps/platform/src/server/onboarding/check-site-address-action.ts`
-- `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
 - `packages/auth/src/events/record-signup-terms-on-sign-in.ts`
@@ -289,8 +283,7 @@ Free site.
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
   `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
-  `sign-in-view`, `email-sign-in-form`,
-  `workspace-pending-view` and `sign-out-button`.
+  `sign-in-view`, `email-sign-in-form` and `sign-out-button`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.
