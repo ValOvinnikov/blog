@@ -48,6 +48,7 @@ export const OnboardingForm = ({
     panelRef,
     addressCheck,
     siteAddress,
+    previewAddress,
     railSteps,
     changeField,
     changePreset,
@@ -123,6 +124,7 @@ export const OnboardingForm = ({
           <div className={preview()}>
             <OnboardingPreview
               name={values.name}
+              siteAddress={previewAddress}
               locale={values.locale}
               preset={values.preset}
               accentHue={values.accentHue}

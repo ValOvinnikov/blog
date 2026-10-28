@@ -85,6 +85,7 @@
     "presetHint": "Een startstijl voor je site. Je kunt die na het maken verfijnen.",
     "accentLabel": "Accentkleur",
     "previewNamePlaceholder": "Je site",
+    "previewAddressPlaceholder": "je-site",
     "createSite": "Site maken",
     "creating": "Je site wordt gemaakt…",
     "failureTitle": "We konden je site niet maken",
@@ -655,6 +656,14 @@
     "themeToggleDark": "Overschakelen naar donker thema",
     "themeToggleLight": "Overschakelen naar licht thema",
     "menuButton": "Menu"
+  },
+  "frontPageSample": {
+    "heroHeading": "Berichten van de kust",
+    "heroText": "Notities, essays en foto’s.",
+    "heroButton": "Lees het nieuwste",
+    "firstPostTitle": "Een ochtend op de pier",
+    "secondPostTitle": "Laagtij, laat licht",
+    "thirdPostTitle": "De haven in de winter"
   },
   "assetUploadField": {
     "remove": "Verwijderen",

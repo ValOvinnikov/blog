@@ -26,7 +26,12 @@ export const useOnboardingWizard = (
     addressStatus: addressCheck.status,
     flagField,
   });
-  const siteAddress = rootDomain ? `${values.slug}.${rootDomain}` : values.slug;
+  const toAddress = (slug: string) =>
+    rootDomain ? `${slug}.${rootDomain}` : slug;
+  const siteAddress = toAddress(values.slug);
+  const previewAddress = toAddress(
+    values.slug || t('previewAddressPlaceholder'),
+  );
 
   const summaries = {
     [ONBOARDING_STEP.SITE]: t('siteSummary', {
@@ -55,6 +60,7 @@ export const useOnboardingWizard = (
     ...steps,
     addressCheck,
     siteAddress,
+    previewAddress,
     railSteps,
     handleSubmit,
   };
