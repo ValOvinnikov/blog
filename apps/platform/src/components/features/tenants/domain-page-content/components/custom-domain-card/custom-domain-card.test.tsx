@@ -507,7 +507,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       const refusal = await screen.findByText(
         ownDomain.refusal.connectUnavailable,
       );
-      const verifyAgain = screen.getByRole('button', {
+      const verifyAgain = await screen.findByRole('button', {
         name: ownDomain.verify,
       });
 
