@@ -1,4 +1,5 @@
 import { PRESET_REGISTRY, type TPresetId } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -85,4 +86,4 @@ export const countChanges = (a: TLookFormValues, b: TLookFormValues): number =>
 export const listLostStagedFiles = (
   draftValues: TLookFormValues,
 ): TBrandAssetKind[] =>
-  BRAND_ASSET_KINDS.filter((kind) => draftValues[kind].file !== undefined);
+  BRAND_ASSET_KINDS.filter((kind) => !isUndefined(draftValues[kind].file));

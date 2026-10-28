@@ -1,3 +1,4 @@
+import { isUndefined } from '@blog/utils/primitives';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -12,7 +13,7 @@ export const useLookDraftFields = () => {
   const tHue = useTranslations('logoHueField');
   const accountDraftFields = useAccountDraftFields();
   const displayBrandImage = ({ file }: TStagedImage) =>
-    file === undefined ? t('brandImageUnchanged') : t('brandImagePicked');
+    isUndefined(file) ? t('brandImageUnchanged') : t('brandImagePicked');
 
   return [
     {
@@ -31,7 +32,7 @@ export const useLookDraftFields = () => {
       id: 'logoHue',
       label: t('logoHueLabel'),
       display: ({ logoHue }: TLookFormValues) =>
-        logoHue === undefined
+        isUndefined(logoHue)
           ? tHue('followsAccent')
           : tHue('hueValue', { hue: logoHue }),
     },

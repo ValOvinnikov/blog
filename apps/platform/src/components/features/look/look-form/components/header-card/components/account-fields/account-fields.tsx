@@ -6,6 +6,7 @@ import {
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
 } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
@@ -22,21 +23,14 @@ export const AccountFields = () => {
   const panelLock = useLookFieldLock('accountPanelStyle');
   const placementLock = useLookFieldLock('accountPhonePlacement');
 
-  const buttonOptions = Object.values(ACCOUNT_BUTTON_STYLE).map((style) => ({
-    value: style,
-    label: t(`accountButtonStyleOptionLabel.${style}`),
-  }));
-
-  const panelOptions = Object.values(ACCOUNT_PANEL_STYLE).map((style) => ({
-    value: style,
-    label: t(`accountPanelStyleOptionLabel.${style}`),
-  }));
-
-  const placementOptions = Object.values(ACCOUNT_PHONE_PLACEMENT).map(
-    (placement) => ({
-      value: placement,
-      label: t(`accountPhonePlacementOptionLabel.${placement}`),
-    }),
+  const buttonOptions = toOptions(ACCOUNT_BUTTON_STYLE, (style) =>
+    t(`accountButtonStyleOptionLabel.${style}`),
+  );
+  const panelOptions = toOptions(ACCOUNT_PANEL_STYLE, (style) =>
+    t(`accountPanelStyleOptionLabel.${style}`),
+  );
+  const placementOptions = toOptions(ACCOUNT_PHONE_PLACEMENT, (placement) =>
+    t(`accountPhonePlacementOptionLabel.${placement}`),
   );
 
   return (
