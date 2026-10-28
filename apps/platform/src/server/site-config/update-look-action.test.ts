@@ -5,7 +5,10 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   HUE_MAX,
   HUE_MIN,
   isAccentHueAccessible,
@@ -64,6 +67,7 @@ const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
 const UNSUPPORTED_CARD_STYLE = 'SHADOWED';
+const UNSUPPORTED_HEADER_LAYOUT = 'ZIGZAG';
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -76,6 +80,9 @@ const VALID_INPUT: TUpdateLookInput = {
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+  headerLayout: HEADER_LAYOUT.TWO_ROWS,
+  headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
+  headerBarStyle: HEADER_BAR_STYLE.FLOATING,
 };
 
 const onPlan = (plan: TTenantPlan) =>
@@ -158,6 +165,20 @@ describe(updateLookAction, () => {
       ...VALID_INPUT,
       // @ts-expect-error -- an unsupported card style is the invalid input under test
       cardStyle: UNSUPPORTED_CARD_STYLE,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a header layout the site has no arrangement for without writing it', async () => {
+    const result = await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      // @ts-expect-error -- an unsupported header layout is the invalid input under test
+      headerLayout: UNSUPPORTED_HEADER_LAYOUT,
     });
 
     expect(result).toEqual({

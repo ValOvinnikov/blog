@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
     "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening.",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "badge": "Setup"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -124,17 +125,25 @@
     "requestNewLink": "Get a new sign-in link",
     "heading": "We couldn't sign you in",
     "description": "Something went wrong while signing you in. Go back to sign-in and try again.",
-    "backToSignIn": "Back to sign-in"
+    "backToSignIn": "Back to sign-in",
+    "badge": "Sign-in"
   },
   "notFoundPage": {
     "heading": "Page not found",
     "description": "This page doesn't exist, or you don't have access to it.",
-    "backLink": "Back to home"
+    "backLink": "Back to home",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Something went wrong",
     "description": "This page couldn't load. Try again, and if it keeps happening, come back in a few minutes.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "badge": "Error 500",
+    "homeLink": "Back to home"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "Error ID: {errorId}"
   },
   "pageSkeleton": {
     "label": "Loading page…"
@@ -571,6 +580,30 @@
     "typeDescription": "Each font is shown in its own face.",
     "shapeHeading": "Shape",
     "shapeDescription": "Corners, spacing, and how cards and header buttons are framed.",
+    "headerHeading": "Header",
+    "headerDescription": "How the top bar of your site is arranged and how its sub-menus open.",
+    "headerLayoutLabel": "Layout",
+    "headerLayoutDescription": "Where the logo, links and buttons sit on wide screens. Phones always get the bar with a menu button.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Classic",
+      "LINKS_BESIDE_BRAND": "Links beside the brand",
+      "CENTRED_LINKS": "Centred links",
+      "TWO_ROWS": "Two rows",
+      "CENTRED_BRAND": "Centred brand",
+      "MENU_BUTTON": "Menu button"
+    },
+    "headerSubmenuStyleLabel": "Sub-menus",
+    "headerSubmenuStyleDescription": "How a link with sub-items opens on wide screens.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Dropdown",
+      "WIDE_PANEL": "Wide panel"
+    },
+    "headerBarStyleLabel": "Bar",
+    "headerBarStyleDescription": "Whether the bar spans the page or floats above it as a card.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Full width",
+      "FLOATING": "Floating"
+    },
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image"
@@ -599,6 +632,10 @@
     "previewWidthAriaLabel": "Preview width",
     "navPosts": "Posts",
     "navAbout": "About",
+    "navTopics": "Topics",
+    "submenuLead": "All topics",
+    "submenuFirstItem": "Tides",
+    "submenuSecondItem": "Harbours",
     "switcherMenuAriaLabel": "Language: {language}",
     "signIn": "Sign in",
     "themeToggleDark": "Switch to dark theme",

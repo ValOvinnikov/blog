@@ -1,7 +1,10 @@
 import {
   ACTION_OUTCOME,
   CARD_STYLE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
@@ -11,6 +14,11 @@ import {
 import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import {
+  SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
+  SAMPLE_HEADER_TEST_ID,
+} from '@platform/constants/sample-header';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
@@ -140,7 +148,8 @@ const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 const SAVING = 'Saving…';
 const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
-const GROWTH_ONLY_FIELD_COUNT = 8;
+const GROWTH_ONLY_FIELD_COUNT = 11;
+const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
 
 const setup = customRender(LookForm, {
@@ -173,6 +182,9 @@ const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     density: defaults.density,
     cardStyle: defaults.cardStyle,
     headerControlStyle: defaults.headerControlStyle,
+    headerLayout: defaults.headerLayout,
+    headerSubmenuStyle: defaults.headerSubmenuStyle,
+    headerBarStyle: defaults.headerBarStyle,
     languageSwitcherStyle: defaults.languageSwitcherStyle,
     ...overrides,
   };
@@ -201,6 +213,15 @@ const clickSave = async (user: UserEvent) => {
   await user.click(saveChangesButton);
 };
 
+const chooseHeaderLayout = async (user: UserEvent, optionName: string) => {
+  const layoutSelect = screen.getByRole('combobox', {
+    name: HEADER_LAYOUT_LABEL,
+  });
+  await user.click(layoutSelect);
+  const option = await screen.findByRole('option', { name: optionName });
+  await user.click(option);
+};
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -225,7 +246,7 @@ describe(`<${LookForm.name}/>`, () => {
         setup();
       });
 
-      it('groups the settings into six titled cards', () => {
+      it('groups the settings into seven titled cards', () => {
         const cardHeadings = screen.getAllByRole('heading', { level: 2 });
         const cardTitles = cardHeadings.map((heading) => heading.textContent);
 
@@ -234,6 +255,7 @@ describe(`<${LookForm.name}/>`, () => {
           LOOK_FORM.colourHeading,
           LOOK_FORM.typeHeading,
           LOOK_FORM.shapeHeading,
+          LOOK_FORM.headerHeading,
           LOOK_FORM.brandHeading,
           LOOK_FORM.languageSwitcherLabel,
         ]);
@@ -301,6 +323,16 @@ describe(`<${LookForm.name}/>`, () => {
           saved: { headerControlStyle: HEADER_CONTROL_STYLE.SOFT },
         },
         {
+          group: LOOK_FORM.headerSubmenuStyleLabel,
+          option: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
+          saved: { headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL },
+        },
+        {
+          group: LOOK_FORM.headerBarStyleLabel,
+          option: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
+          saved: { headerBarStyle: HEADER_BAR_STYLE.FLOATING },
+        },
+        {
           group: LOOK_FORM.languageSwitcherLabel,
           option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
           saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },
@@ -324,6 +356,45 @@ describe(`<${LookForm.name}/>`, () => {
             savedLookValues(saved),
           );
         });
+      });
+
+      it('saves the chosen header layout', async () => {
+        await chooseHeaderLayout(
+          user,
+          LOOK_FORM.headerLayoutOptionLabel.TWO_ROWS,
+        );
+        await clickSave(user);
+
+        await waitFor(() => {
+          expect(updateLookAction).toHaveBeenCalledWith(
+            MOCK_TENANT_ID,
+            savedLookValues({ headerLayout: HEADER_LAYOUT.TWO_ROWS }),
+          );
+        });
+      });
+
+      it('shows the chosen header layout and bar in the preview', async () => {
+        await chooseHeaderLayout(
+          user,
+          LOOK_FORM.headerLayoutOptionLabel.MENU_BUTTON,
+        );
+        const barGroup = screen.getByRole('group', {
+          name: LOOK_FORM.headerBarStyleLabel,
+        });
+        const floatingButton = within(barGroup).getByRole('button', {
+          name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
+        });
+        await user.click(floatingButton);
+
+        const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
+        expect(sampleHeader).toHaveAttribute(
+          SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
+          HEADER_LAYOUT.MENU_BUTTON,
+        );
+        expect(sampleHeader).toHaveAttribute(
+          SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+          HEADER_BAR_STYLE.FLOATING,
+        );
       });
 
       it('offers Save changes only once the form is dirty', async () => {
@@ -516,6 +587,35 @@ describe(`<${LookForm.name}/>`, () => {
     expect(outlinedButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
+  it('leaves the header layout, sub-menus and bar as they are when a preset is chosen', async () => {
+    setup({
+      initialValues: {
+        ...defaultLookFormValues(),
+        headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
+        headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
+        headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+      },
+    });
+
+    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+    await user.click(editorialRadio);
+
+    const layoutSelect = screen.getByRole('combobox', {
+      name: HEADER_LAYOUT_LABEL,
+    });
+    const wideButton = screen.getByRole('button', {
+      name: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
+    });
+    const floatingButton = screen.getByRole('button', {
+      name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
+    });
+    expect(layoutSelect).toHaveTextContent(
+      LOOK_FORM.headerLayoutOptionLabel.CENTRED_BRAND,
+    );
+    expect(wideButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(floatingButton).toHaveAttribute(ARIA_PRESSED, 'true');
+  });
+
   it('shows a single-language note and no switcher choice with one language', () => {
     setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
@@ -696,6 +796,31 @@ describe(`<${LookForm.name}/>`, () => {
       expect(codesButton).toBeDisabled();
     });
 
+    it('shows the header layout, sub-menus and bar locked at their defaults', () => {
+      const layoutSelect = screen.getByRole('combobox', {
+        name: HEADER_LAYOUT_LABEL,
+      });
+      const barGroup = screen.getByRole('group', {
+        name: LOOK_FORM.headerBarStyleLabel,
+      });
+      const fullWidthButton = within(barGroup).getByRole('button', {
+        name: LOOK_FORM.headerBarStyleOptionLabel.FULL_WIDTH,
+      });
+      const floatingButton = within(barGroup).getByRole('button', {
+        name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
+      });
+
+      expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
+      expect(layoutSelect).toHaveTextContent(
+        LOOK_FORM.headerLayoutOptionLabel.CLASSIC,
+      );
+      expect(layoutSelect).toHaveAccessibleDescription(
+        `${GROWTH_PLAN} ${LOOK_FORM.headerLayoutDescription}`,
+      );
+      expect(fullWidthButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(floatingButton).toBeDisabled();
+    });
+
     it('keeps the preset, accent hue and brand images editable', () => {
       const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
       const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
@@ -753,6 +878,25 @@ describe(`<${LookForm.name}/>`, () => {
         expect(followSwitch).toBeDisabled();
         expect(uploadLogoButton).toBeDisabled();
         expect(uploadFaviconButton).toBeDisabled();
+      });
+
+      it('disables the Header controls', () => {
+        const layoutSelect = screen.getByRole('combobox', {
+          name: HEADER_LAYOUT_LABEL,
+        });
+        const dropdownButton = screen.getByRole('button', {
+          name: LOOK_FORM.headerSubmenuStyleOptionLabel.DROPDOWN,
+        });
+        const floatingButton = screen.getByRole('button', {
+          name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
+        });
+
+        expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
+        expect(layoutSelect).toHaveAccessibleDescription(
+          expect.stringContaining(ARCHIVED_NOTICE_DESCRIPTION),
+        );
+        expect(dropdownButton).toBeDisabled();
+        expect(floatingButton).toBeDisabled();
       });
 
       it('disables the Type and Shape controls', () => {

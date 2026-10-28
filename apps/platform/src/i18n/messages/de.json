@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
     "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt.",
-    "tryAgain": "Erneut versuchen"
+    "tryAgain": "Erneut versuchen",
+    "badge": "Einrichtung"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -124,17 +125,25 @@
     "requestNewLink": "Neuen Anmeldelink anfordern",
     "heading": "Anmeldung fehlgeschlagen",
     "description": "Bei der Anmeldung ist etwas schiefgelaufen. Kehren Sie zur Anmeldung zurück und versuchen Sie es erneut.",
-    "backToSignIn": "Zurück zur Anmeldung"
+    "backToSignIn": "Zurück zur Anmeldung",
+    "badge": "Anmeldung"
   },
   "notFoundPage": {
     "heading": "Seite nicht gefunden",
     "description": "Diese Seite existiert nicht, oder Sie haben keinen Zugriff darauf.",
-    "backLink": "Zur Startseite"
+    "backLink": "Zur Startseite",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Etwas ist schiefgelaufen",
     "description": "Diese Seite konnte nicht geladen werden. Versuchen Sie es erneut, und falls das Problem bleibt, kommen Sie in ein paar Minuten wieder.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "badge": "Fehler 500",
+    "homeLink": "Zur Startseite"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "Fehler-ID: {errorId}"
   },
   "pageSkeleton": {
     "label": "Seite wird geladen…"
@@ -571,6 +580,30 @@
     "typeDescription": "Jede Schrift wird in ihrem eigenen Schnitt gezeigt.",
     "shapeHeading": "Form",
     "shapeDescription": "Ecken, Abstände und wie Karten und Header-Schaltflächen gerahmt sind.",
+    "headerHeading": "Header",
+    "headerDescription": "Wie die obere Leiste Ihrer Website aufgebaut ist und wie sich ihre Untermenüs öffnen.",
+    "headerLayoutLabel": "Layout",
+    "headerLayoutDescription": "Wo Logo, Links und Schaltflächen auf breiten Bildschirmen sitzen. Auf dem Handy gibt es immer die Leiste mit Menü-Schaltfläche.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Klassisch",
+      "LINKS_BESIDE_BRAND": "Links neben der Marke",
+      "CENTRED_LINKS": "Zentrierte Links",
+      "TWO_ROWS": "Zwei Zeilen",
+      "CENTRED_BRAND": "Zentrierte Marke",
+      "MENU_BUTTON": "Menü-Schaltfläche"
+    },
+    "headerSubmenuStyleLabel": "Untermenüs",
+    "headerSubmenuStyleDescription": "Wie sich ein Link mit Unterpunkten auf breiten Bildschirmen öffnet.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Dropdown",
+      "WIDE_PANEL": "Breites Panel"
+    },
+    "headerBarStyleLabel": "Leiste",
+    "headerBarStyleDescription": "Ob die Leiste die ganze Seite überspannt oder als Karte darüber schwebt.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Volle Breite",
+      "FLOATING": "Schwebend"
+    },
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
@@ -599,6 +632,10 @@
     "previewWidthAriaLabel": "Vorschaubreite",
     "navPosts": "Beiträge",
     "navAbout": "Über uns",
+    "navTopics": "Themen",
+    "submenuLead": "Alle Themen",
+    "submenuFirstItem": "Gezeiten",
+    "submenuSecondItem": "Häfen",
     "switcherMenuAriaLabel": "Sprache: {language}",
     "signIn": "Anmelden",
     "themeToggleDark": "Zum dunklen Design wechseln",

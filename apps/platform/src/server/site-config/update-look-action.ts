@@ -7,7 +7,10 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   HUE_MAX,
   HUE_MIN,
   isAccentHueAccessible,
@@ -40,6 +43,9 @@ const updateLookInputSchema = z.object({
   languageSwitcherStyle: z.enum(LANGUAGE_SWITCHER_STYLE),
   cardStyle: z.enum(CARD_STYLE),
   headerControlStyle: z.enum(HEADER_CONTROL_STYLE),
+  headerLayout: z.enum(HEADER_LAYOUT),
+  headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE),
+  headerBarStyle: z.enum(HEADER_BAR_STYLE),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
