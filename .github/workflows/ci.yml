@@ -413,6 +413,7 @@ jobs:
           REQUIRED_ENV_PRESENT_WEB_APP_URL: ${{ vars.WEB_APP_URL != '' }}
           REQUIRED_ENV_PRESENT_VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID != '' }}
           REQUIRED_ENV_PRESENT_VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB != '' }}
+          REQUIRED_ENV_PRESENT_TENANT_ROOT_DOMAIN: ${{ vars.TENANT_ROOT_DOMAIN != '' }}
         run: pnpm check:required-env
 
   migrations:
