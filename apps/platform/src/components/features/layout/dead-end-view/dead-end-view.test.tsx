@@ -20,44 +20,49 @@ const setup = customRender(DeadEndView, {
 });
 
 describe(`<${DeadEndView.name}/>`, () => {
-  it('renders the title as the only page heading with its badge, description and action', () => {
-    setup();
+  describe('without an error id', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    const badge = screen.getByText(MOCK_BADGE_LABEL);
-    const description = screen.getByText(MOCK_DESCRIPTION);
-    const action = screen.getByRole('button', { name: MOCK_ACTION_LABEL });
+    it('renders the title as the only page heading with its badge, description and action', () => {
+      const headings = screen.getAllByRole('heading', { level: 1 });
+      const badge = screen.getByText(MOCK_BADGE_LABEL);
+      const description = screen.getByText(MOCK_DESCRIPTION);
+      const action = screen.getByRole('button', { name: MOCK_ACTION_LABEL });
 
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent(MOCK_TITLE);
-    expect(badge).toBeVisible();
-    expect(description).toBeVisible();
-    expect(action).toBeVisible();
+      expect(headings).toHaveLength(1);
+      expect(headings[0]).toHaveTextContent(MOCK_TITLE);
+      expect(badge).toBeVisible();
+      expect(description).toBeVisible();
+      expect(action).toBeVisible();
+    });
+
+    it('names the product in text inside the main landmark, with no image role', () => {
+      const main = screen.getByRole('main');
+      const wordmark = screen.getByText(messages.deadEndView.brandName);
+      const image = screen.queryByRole('img');
+
+      expect(main).toContainElement(wordmark);
+      expect(image).not.toBeInTheDocument();
+    });
+
+    it('shows no error id line', () => {
+      const errorId = screen.queryByText(MOCK_ERROR_ID, { exact: false });
+
+      expect(errorId).not.toBeInTheDocument();
+    });
   });
 
-  it('names the product in text inside the main landmark', () => {
-    setup();
+  describe('with an error id', () => {
+    beforeEach(() => {
+      setup({ errorId: MOCK_ERROR_ID });
+    });
 
-    const main = screen.getByRole('main');
-    const wordmark = screen.getByText(messages.deadEndView.brandName);
+    it('shows the error id', () => {
+      const errorId = screen.getByText(MOCK_ERROR_ID, { exact: false });
 
-    expect(main).toContainElement(wordmark);
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-  });
-
-  it('shows the error id when one is given', () => {
-    setup({ errorId: MOCK_ERROR_ID });
-
-    const errorId = screen.getByText(MOCK_ERROR_ID, { exact: false });
-
-    expect(errorId).toBeVisible();
-  });
-
-  it('shows no error id line without one', () => {
-    setup();
-
-    const errorId = screen.queryByText(MOCK_ERROR_ID, { exact: false });
-
-    expect(errorId).not.toBeInTheDocument();
+      expect(errorId).toBeVisible();
+    });
   });
 });
