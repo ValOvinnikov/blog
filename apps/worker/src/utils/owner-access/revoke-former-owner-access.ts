@@ -15,6 +15,7 @@ import {
   type TSanityUser,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 
 import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
@@ -24,7 +25,7 @@ function findFormerEmails(
   invites: TSanityInvite[],
   users: TSanityUser[],
   formerOwnerEmail: TMaybeUndefined<string>,
-): Set<string> {
+): string[] {
   const { ownerSanityInviteId, ownerSanityUserId } = target.tenant;
   const candidateEmails = [
     formerOwnerEmail,
@@ -34,18 +35,20 @@ function findFormerEmails(
       users.find(({ sanityUserId }) => sanityUserId === ownerSanityUserId)
         ?.profile.email,
   ];
-  return new Set(
-    candidateEmails.flatMap((email) =>
-      email && !hasOwnerEmail(target, email) ? [normalizeEmail(email)] : [],
+  return [
+    ...new Set(
+      candidateEmails.flatMap((email) =>
+        email && !hasOwnerEmail(target, email) ? [normalizeEmail(email)] : [],
+      ),
     ),
-  );
+  ];
 }
 
 function isFormerEmail(
-  formerEmails: Set<string>,
+  formerEmails: string[],
   email: TMaybeUndefined<string>,
 ): boolean {
-  return !!email && formerEmails.has(normalizeEmail(email));
+  return !!email && formerEmails.includes(normalizeEmail(email));
 }
 
 async function revokeFormerRoles(
@@ -101,7 +104,7 @@ export async function revokeFormerOwnerAccess(
     formerOwnerEmail,
   );
 
-  if (formerEmails.size === 0) {
+  if (!hasArrayGotItems(formerEmails)) {
     const isRecordedUserGone =
       !!ownerSanityUserId &&
       !users.some(({ sanityUserId }) => sanityUserId === ownerSanityUserId);

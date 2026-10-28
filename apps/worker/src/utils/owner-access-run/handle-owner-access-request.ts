@@ -14,7 +14,7 @@ import { z } from 'zod';
 import { wakeOwnerAccess } from './owner-access-run';
 
 const ownerAccessRequestBodySchema = tenantRequestBodySchema.extend({
-  formerOwnerEmail: z.email().optional(),
+  formerOwnerEmail: z.string().trim().pipe(z.email()).optional(),
 });
 
 export async function handleOwnerAccessRequest(

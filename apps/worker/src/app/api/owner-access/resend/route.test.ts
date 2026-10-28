@@ -71,6 +71,18 @@ describe('POST /api/owner-access/resend', () => {
     );
   });
 
+  it('trims the former owner email before the resend', async () => {
+    const response = await POST(
+      resendRequest({ formerOwnerEmail: ` ${MOCK_FORMER_OWNER_EMAIL}\n` }),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
+    expect(resendOwnerInvite).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_FORMER_OWNER_EMAIL,
+    );
+  });
+
   it('answers 400 for a former owner email that is not an address', async () => {
     const response = await POST(
       resendRequest({ formerOwnerEmail: MOCK_NOT_AN_EMAIL }),
