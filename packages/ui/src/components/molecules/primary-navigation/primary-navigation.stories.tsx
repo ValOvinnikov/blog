@@ -10,6 +10,31 @@ const links = [
   { href: '/contact', label: faker.lorem.words(2) },
 ];
 
+const linksWithSubItems = [
+  ...links,
+  {
+    href: '/guides',
+    label: 'Guides',
+    subItems: [
+      { href: '/guides', label: 'Guides' },
+      { href: '/guides/getting-started', label: 'Getting started' },
+      { href: '/guides/deployment', label: 'Deployment' },
+    ],
+  },
+];
+
+const TOGGLE_LABEL = 'Toggle navigation menu';
+const PANEL_ID = 'primary-navigation-panel';
+
+const closedToggle = {
+  isOpen: false,
+  onToggle: () => {},
+  ariaLabel: TOGGLE_LABEL,
+  panelId: PANEL_ID,
+};
+
+const openToggle = { ...closedToggle, isOpen: true };
+
 const meta = {
   title: 'Molecules/PrimaryNavigation',
   component: PrimaryNavigation,
@@ -54,24 +79,14 @@ export const WithExternalLink: TStory = {
 export const MobileClosed: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    mobileToggle: {
-      isOpen: false,
-      onToggle: () => {},
-      ariaLabel: 'Toggle navigation menu',
-      panelId: 'primary-navigation-panel',
-    },
+    mobileToggle: closedToggle,
   },
 };
 
 export const MobileOpen: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    mobileToggle: {
-      isOpen: true,
-      onToggle: () => {},
-      ariaLabel: 'Toggle navigation menu',
-      panelId: 'primary-navigation-panel',
-    },
+    mobileToggle: openToggle,
   },
 };
 
@@ -85,12 +100,7 @@ export const MobileOpenWithPanelActions: TStory = {
         <button type="button">Toggle theme</button>
       </>
     ),
-    mobileToggle: {
-      isOpen: true,
-      onToggle: () => {},
-      ariaLabel: 'Toggle navigation menu',
-      panelId: 'primary-navigation-panel',
-    },
+    mobileToggle: openToggle,
   },
 };
 
@@ -105,12 +115,7 @@ export const MobileOpenWithDrawerActions: TStory = {
       </>
     ),
     drawerActions: <button type="button">Sign in</button>,
-    mobileToggle: {
-      isOpen: true,
-      onToggle: () => {},
-      ariaLabel: 'Toggle navigation menu',
-      panelId: 'primary-navigation-panel',
-    },
+    mobileToggle: openToggle,
   },
 };
 
@@ -123,12 +128,7 @@ export const DesktopWithBothActions: TStory = {
         <button type="button">Toggle theme</button>
       </>
     ),
-    mobileToggle: {
-      isOpen: false,
-      onToggle: () => {},
-      ariaLabel: 'Toggle navigation menu',
-      panelId: 'primary-navigation-panel',
-    },
+    mobileToggle: closedToggle,
   },
 };
 
@@ -141,7 +141,7 @@ const InteractiveMobileDemo = () => {
       mobileToggle={{
         isOpen,
         onToggle: () => setIsOpen((current) => !current),
-        ariaLabel: 'Toggle navigation menu',
+        ariaLabel: TOGGLE_LABEL,
         panelId: 'primary-navigation-interactive-panel',
       }}
     />
@@ -151,4 +151,16 @@ const InteractiveMobileDemo = () => {
 export const MobileInteractive: TStory = {
   globals: { viewport: 'phone' },
   render: () => <InteractiveMobileDemo />,
+};
+
+export const WithSubmenus: TStory = {
+  args: { links: linksWithSubItems },
+};
+
+export const MobileOpenWithSubmenus: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    links: linksWithSubItems,
+    mobileToggle: openToggle,
+  },
 };
