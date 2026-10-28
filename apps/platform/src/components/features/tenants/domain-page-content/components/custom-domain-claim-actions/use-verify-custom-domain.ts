@@ -32,7 +32,7 @@ import {
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 
 type TPolledVerify = TMaybeUndefined<TVerifyCustomDomainResult>;
 
@@ -55,6 +55,14 @@ const connectRejectionOf = (
     ? result.reason
     : undefined;
 
+const isSpuriousAfterSuccess = (
+  result: TVerifyCustomDomainResult,
+  hasSucceeded: boolean,
+) =>
+  hasSucceeded &&
+  isOutcomeRefused(result) &&
+  result.reason === CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM;
+
 export const useVerifyCustomDomain = (tenantId: string) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
   const toast = useToast();
@@ -72,14 +80,42 @@ export const useVerifyCustomDomain = (tenantId: string) => {
   const [manual, setManual] =
     useState<TMaybeNull<TVerifyCustomDomainResult>>(null);
 
+  const announceFailure = useCallback(
+    (result: TVerifyCustomDomainResult) => {
+      if (isOutcomeInvalid(result)) {
+        const reason =
+          result.fieldErrors.domain?.reason ??
+          CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_INVALID;
+        toast.error({
+          message: t(`fieldError.${CUSTOM_DOMAIN_FIELD_ERROR_KEYS[reason]}`),
+        });
+      } else if (isOutcomeRefused(result)) {
+        const message = t(
+          `refusal.${CUSTOM_DOMAIN_REFUSAL_KEYS[result.reason]}`,
+        );
+        if (isStillWaiting(result)) toast.info({ message });
+        else if (!connectRejectionOf(result)) toast.error({ message });
+      } else {
+        toast.error({ message: t('verifyFailed') });
+      }
+    },
+    [t, toast],
+  );
+
+  const settledPoll = useRef<TPolledVerify>(undefined);
+
   useEffect(() => {
     if (isUndefined(polled) || isStillWaiting(polled)) return;
+    if (settledPoll.current === polled) return;
+    settledPoll.current = polled;
     if (isOutcomeSuccess(polled)) {
       hasSucceeded.current = true;
       requestFocus();
+    } else if (!isSpuriousAfterSuccess(polled, hasSucceeded.current)) {
+      announceFailure(polled);
     }
     router.refresh();
-  }, [polled, requestFocus, router]);
+  }, [polled, requestFocus, router, announceFailure]);
 
   const verify = () => {
     startTransition(async () => {
@@ -90,27 +126,10 @@ export const useVerifyCustomDomain = (tenantId: string) => {
         hasSucceeded.current = true;
         requestFocus();
         router.refresh();
-      } else if (isOutcomeInvalid(result)) {
-        const reason =
-          result.fieldErrors.domain?.reason ??
-          CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_INVALID;
-        toast.error({
-          message: t(`fieldError.${CUSTOM_DOMAIN_FIELD_ERROR_KEYS[reason]}`),
-        });
-      } else if (
-        hasSucceeded.current &&
-        isOutcomeRefused(result) &&
-        result.reason === CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM
-      ) {
+      } else if (isSpuriousAfterSuccess(result, hasSucceeded.current)) {
         router.refresh();
-      } else if (isOutcomeRefused(result)) {
-        const message = t(
-          `refusal.${CUSTOM_DOMAIN_REFUSAL_KEYS[result.reason]}`,
-        );
-        if (isStillWaiting(result)) toast.info({ message });
-        else if (!connectRejectionOf(result)) toast.error({ message });
       } else {
-        toast.error({ message: t('verifyFailed') });
+        announceFailure(result);
       }
     });
   };

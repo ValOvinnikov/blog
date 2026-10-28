@@ -1,9 +1,15 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import {
+  CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_REFUSAL,
   CUSTOM_DOMAIN_VERIFY_POLL,
 } from '@platform/constants/custom-domain';
-import { act, renderHookWithIntl } from '@platform/testing/custom-render';
+import messages from '@platform/i18n/messages/en.json';
+import {
+  act,
+  renderHookWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
@@ -27,6 +33,8 @@ vi.mock(
     }),
   }),
 );
+
+const { fieldError, refusal } = messages.tenantDomainPage.ownDomain;
 
 const refused = (reason: string) => ({
   outcome: ACTION_OUTCOME.REFUSED,
@@ -113,5 +121,57 @@ describe(useVerifyCustomDomain, () => {
     expect(verifyCustomDomainActionMock).toHaveBeenCalledTimes(
       CUSTOM_DOMAIN_VERIFY_POLL.maxTicks,
     );
+  });
+
+  it('tells the owner a polled taken domain is in use, then stops', async () => {
+    verifyCustomDomainActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN },
+      },
+    });
+    renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
+
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
+
+    const takenToast = await screen.findByText(fieldError.domainTaken);
+    expect(takenToast).toBeVisible();
+    expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+
+  it('tells the owner a polled plan refusal as a manual verify does', async () => {
+    verifyCustomDomainActionMock.mockResolvedValue(
+      refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN),
+    );
+    const { result } = renderHookWithIntl(() =>
+      useVerifyCustomDomain(MOCK_TENANT_ID),
+    );
+
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
+
+    const polledToast = await screen.findByText(refusal.notOnPlan);
+    expect(polledToast).toBeVisible();
+    expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
+    expect(refresh).toHaveBeenCalledOnce();
+
+    await act(async () => {
+      result.current.verify();
+    });
+    const toasts = await screen.findAllByText(refusal.notOnPlan);
+    expect(toasts).toHaveLength(2);
+  });
+
+  it('shows no toast for a polled connect rejection', async () => {
+    verifyCustomDomainActionMock.mockResolvedValue(
+      refused(CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT),
+    );
+    renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
+
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs);
+
+    const conflictToast = screen.queryByText(refusal.connectConflict);
+    expect(conflictToast).not.toBeInTheDocument();
+    expect(refresh).toHaveBeenCalledOnce();
   });
 });
