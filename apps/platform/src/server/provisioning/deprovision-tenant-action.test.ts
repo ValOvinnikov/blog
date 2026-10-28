@@ -7,9 +7,14 @@ import {
 import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_LOG,
+  TENANT_REFUSAL,
+} from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
@@ -29,6 +34,8 @@ import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workfl
 vi.mock('@platform/server/auth/require-super-admin');
 
 vi.mock('@platform/server/auth/auth');
+
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -51,6 +58,7 @@ const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
 const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
 const dispatchMock = vi.mocked(dispatchDeprovisioningWorkflow);
 const loggerErrorMock = vi.mocked(logger.error);
+const resolveIsPlatformTenantMock = vi.mocked(resolveIsPlatformTenant);
 
 const MOCK_WRONG_NAME = faker.lorem.words(3);
 const MOCK_CONNECTION_ERROR = new Error(faker.lorem.words(2));
@@ -66,6 +74,7 @@ describe(deprovisionTenantAction, () => {
     dispatchMock.mockReset();
     dispatchMock.mockResolvedValue(true);
     insertAuditEventMock.mockReset();
+    resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
   });
 
   it('stops before any tenant work when the super-admin gate rejects', async () => {
@@ -112,6 +121,26 @@ describe(deprovisionTenantAction, () => {
       reason: TENANT_REFUSAL.ALREADY_DEPROVISIONED,
     });
     expect(dispatchMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses the platform tenant without dispatching or auditing, and logs it', async () => {
+    resolveIsPlatformTenantMock.mockResolvedValue(true);
+
+    const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
+      confirm: MOCK_TENANT_NAME,
+      dryRun: false,
+    });
+
+    expect(result).toStrictEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.PLATFORM_TENANT,
+    });
+    expect(dispatchMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      TENANT_LOG.PLATFORM_TENANT_REFUSED,
+      { tenantId: MOCK_TENANT_ID, action: AUDIT_ACTION.DEPROVISION_REQUESTED },
+    );
   });
 
   it('dispatches the deprovisioning workflow when confirm matches the name', async () => {

@@ -13,6 +13,8 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useTranslations } from 'next-intl';
 
+import { useSubmenuPreview } from './use-submenu-preview';
+
 export const HeaderCard = () => {
   const {
     values: { headerLayout, headerSubmenuStyle, headerBarStyle },
@@ -22,6 +24,7 @@ export const HeaderCard = () => {
   const layoutLock = useLookFieldLock('headerLayout');
   const submenuStyleLock = useLookFieldLock('headerSubmenuStyle');
   const barStyleLock = useLookFieldLock('headerBarStyle');
+  const { triggerProps, markChanged } = useSubmenuPreview();
 
   const layoutOptions = Object.values(HEADER_LAYOUT).map((layout) => ({
     value: layout,
@@ -60,20 +63,25 @@ export const HeaderCard = () => {
         />
       </LookField>
 
-      <LookField
-        label={t('headerSubmenuStyleLabel')}
-        hint={t('headerSubmenuStyleDescription')}
-        isGroup={true}
-        lock={submenuStyleLock.lock}
-      >
-        <SegmentedControl<THeaderSubmenuStyle>
-          options={submenuStyleOptions}
-          value={headerSubmenuStyle}
-          onChange={(style) => updateField('headerSubmenuStyle', style)}
-          isDisabled={submenuStyleLock.isDisabled}
-          aria-describedby={submenuStyleLock.describedBy}
-        />
-      </LookField>
+      <div {...triggerProps}>
+        <LookField
+          label={t('headerSubmenuStyleLabel')}
+          hint={t('headerSubmenuStyleDescription')}
+          isGroup={true}
+          lock={submenuStyleLock.lock}
+        >
+          <SegmentedControl<THeaderSubmenuStyle>
+            options={submenuStyleOptions}
+            value={headerSubmenuStyle}
+            onChange={(style) => {
+              updateField('headerSubmenuStyle', style);
+              markChanged();
+            }}
+            isDisabled={submenuStyleLock.isDisabled}
+            aria-describedby={submenuStyleLock.describedBy}
+          />
+        </LookField>
+      </div>
 
       <LookField
         label={t('headerBarStyleLabel')}

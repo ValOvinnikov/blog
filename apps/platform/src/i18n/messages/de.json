@@ -78,7 +78,8 @@
     "siteAddressLabel": "Adresse der Website",
     "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
     "siteAddressChecking": "Adresse wird geprüft…",
-    "siteAddressAvailable": "{address} ist verfügbar.",
+    "siteAddressAvailable": "{address} gehört dir",
+    "siteAddressUnverified": "Wir konnten diese Adresse gerade nicht prüfen. Du kannst fortfahren – wir prüfen sie erneut, wenn du die Website erstellst.",
     "languageLabel": "Sprache",
     "languageHint": "Die Sprache, mit der deine Website startet. Weitere kannst du später hinzufügen.",
     "presetLabel": "Aussehen",
@@ -1166,6 +1167,9 @@
     "title": "Dieser Mandant ist archiviert",
     "description": "Deprovisioniert am {date}. Alles auf diesen Seiten ist schreibgeschützt."
   },
+  "platformTenantNotice": {
+    "title": "Die eigene Website der Plattform"
+  },
   "archivedTenantsToggle": {
     "ariaLabel": "Sichtbarkeit der Mandanten",
     "activeOption": "Aktiv",
@@ -1240,6 +1244,7 @@
     "notDeprovisioned": "Dieser Mandant ist nicht deprovisioniert.",
     "alreadyInProgress": "Die Provisionierung läuft bereits.",
     "notArchived": "Dieser Mandant muss archiviert werden, bevor er gelöscht werden kann.",
+    "platformTenant": "Dies ist die eigene Website der Plattform und kann daher weder gesperrt noch gelöscht werden.",
     "deprovisionFailed": "Die Deprovisionierung konnte nicht gestartet werden — bitte erneut versuchen.",
     "reactivateFailed": "Die Reaktivierung konnte nicht gestartet werden — bitte erneut versuchen.",
     "deleteFailed": "Der Mandant konnte nicht gelöscht werden — bitte erneut versuchen.",

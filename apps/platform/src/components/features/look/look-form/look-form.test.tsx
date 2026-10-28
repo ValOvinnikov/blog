@@ -25,6 +25,8 @@ import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
+  SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
+  SAMPLE_SUBMENU_TEST_ID,
 } from '@platform/constants/sample-header';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import messages from '@platform/i18n/messages/en.json';
@@ -762,6 +764,50 @@ describe(`<${LookForm.name}/>`, () => {
     const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
     expect(alert).toHaveTextContent(LOOK_FORM.alertError);
     expect(saveBar).toContainElement(alert);
+  });
+
+  describe('the preview sub-menu', () => {
+    const submenuGroup = () =>
+      screen.getByRole('group', { name: LOOK_FORM.headerSubmenuStyleLabel });
+    const previewSubmenu = () => screen.queryByTestId(SAMPLE_SUBMENU_TEST_ID);
+
+    beforeEach(() => {
+      setup();
+    });
+
+    it('starts closed', () => {
+      expect(previewSubmenu()).not.toBeInTheDocument();
+    });
+
+    it('opens while the Sub-menus field is hovered', async () => {
+      await user.hover(submenuGroup());
+
+      expect(previewSubmenu()).toHaveAttribute(
+        SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
+        HEADER_SUBMENU_STYLE.DROPDOWN,
+      );
+
+      await user.unhover(submenuGroup());
+
+      expect(previewSubmenu()).not.toBeInTheDocument();
+    });
+
+    it('shows the picked style and stays open while the field keeps focus', async () => {
+      const wideButton = within(submenuGroup()).getByRole('button', {
+        name: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
+      });
+      await user.click(wideButton);
+      await user.unhover(submenuGroup());
+
+      expect(previewSubmenu()).toHaveAttribute(
+        SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
+        HEADER_SUBMENU_STYLE.WIDE_PANEL,
+      );
+
+      await user.click(document.body);
+
+      expect(previewSubmenu()).not.toBeInTheDocument();
+    });
   });
 
   describe('when the accent hue is rejected', () => {

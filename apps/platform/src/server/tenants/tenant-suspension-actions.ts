@@ -4,6 +4,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  isOutcomeSuccess,
   type TAuditAction,
   type TMaybeUndefined,
 } from '@blog/config';
@@ -21,6 +22,7 @@ import {
   type TSavedOwnerEmailBlock,
   undoOwnerEmailBlock,
 } from '@platform/server/tenants/block-tenant-owner-email';
+import { resolveSuspendableTenant } from '@platform/server/tenants/resolve-suspendable-tenant';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -29,6 +31,7 @@ export type TTenantSuspensionResult = TTenantLifecycleResult<
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ARCHIVED
   | typeof TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN
+  | typeof TENANT_REFUSAL.PLATFORM_TENANT
 >;
 
 export type TOwnerEmailBlock = { reason: string };
@@ -54,18 +57,9 @@ const setSuspension = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const tenant = await queries.tenants.getTenantById(tenantId, {
-    includeArchived: true,
-  });
-  if (!tenant) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
-    };
-  }
-  if (tenant.deprovisionedAt || tenant.status === TENANT_STATUS.ARCHIVED) {
-    return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
-  }
+  const resolved = await resolveSuspendableTenant(tenantId, status);
+  if (!isOutcomeSuccess(resolved)) return resolved;
+  const { tenant } = resolved;
 
   let ownerBlock: TMaybeUndefined<TSavedOwnerEmailBlock>;
   let isSuspensionSaved = false;

@@ -12,9 +12,10 @@ import {
 } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { TENANT_LOG, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
@@ -66,6 +67,8 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
@@ -82,6 +85,7 @@ vi.mock('@blog/db', async () => ({
 
 const requireSuperAdminMock = vi.mocked(requireSuperAdmin);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
+const resolveIsPlatformTenantMock = vi.mocked(resolveIsPlatformTenant);
 
 const MOCK_SUPER_ADMIN = mockAdmin({ role: ADMIN_ROLE.SUPERADMIN });
 const OWNER_EMAIL = MOCK_BLOCKED_OWNER_EMAIL;
@@ -110,6 +114,7 @@ describe('tenant suspension actions', () => {
     vi.mocked(logger.error).mockReset();
     recordAuditEventMock.mockReset();
     revalidateSiteConfigMock.mockReset();
+    resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
   });
 
   it('requires a super-admin session before reading the tenant', async () => {
@@ -197,6 +202,42 @@ describe('tenant suspension actions', () => {
       expect(recordAuditEventMock).not.toHaveBeenCalled();
     },
   );
+
+  it('refuses to suspend the platform tenant, blocking nothing, and logs it', async () => {
+    resolveIsPlatformTenantMock.mockResolvedValue(true);
+
+    const result = await suspendTenantAction(ACTIVE_TENANT.id, {
+      reason: MOCK_BLOCK_REASON,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.PLATFORM_TENANT,
+    });
+    expect(saveSignupBlockMock).not.toHaveBeenCalled();
+    expect(setTenantSuspensionMock).not.toHaveBeenCalled();
+    expect(recordAuditEventMock).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      TENANT_LOG.PLATFORM_TENANT_REFUSED,
+      { tenantId: ACTIVE_TENANT.id, action: AUDIT_ACTION.SUSPENSION_APPLIED },
+    );
+  });
+
+  it('still lifts a suspension on the platform tenant', async () => {
+    resolveIsPlatformTenantMock.mockResolvedValue(true);
+    getTenantByIdMock.mockResolvedValue({
+      ...ACTIVE_TENANT,
+      status: TENANT_STATUS.SUSPENDED,
+    });
+
+    const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(setTenantSuspensionMock).toHaveBeenCalledWith(
+      ACTIVE_TENANT.id,
+      TENANT_STATUS.ACTIVE,
+    );
+  });
 
   it('refuses when the tenant is archived before the write lands', async () => {
     setTenantSuspensionMock.mockResolvedValue(

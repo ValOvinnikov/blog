@@ -78,7 +78,8 @@
     "siteAddressLabel": "Adresse du site",
     "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
     "siteAddressChecking": "Vérification de l’adresse…",
-    "siteAddressAvailable": "{address} est disponible.",
+    "siteAddressAvailable": "{address} est à vous",
+    "siteAddressUnverified": "Nous n’avons pas pu vérifier cette adresse pour le moment. Vous pouvez continuer : nous la vérifierons à nouveau lors de la création du site.",
     "languageLabel": "Langue",
     "languageHint": "La langue dans laquelle votre site démarre. Vous pourrez en ajouter d’autres plus tard.",
     "presetLabel": "Apparence",
@@ -1166,6 +1167,9 @@
     "title": "Ce locataire est archivé",
     "description": "Déprovisionné le {date}. Tout le contenu de ces pages est en lecture seule."
   },
+  "platformTenantNotice": {
+    "title": "Le site de la plateforme"
+  },
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilité des locataires",
     "activeOption": "Actifs",
@@ -1240,6 +1244,7 @@
     "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
     "alreadyInProgress": "Le provisionnement est déjà en cours.",
     "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
+    "platformTenant": "Il s'agit du site de la plateforme elle-même : il ne peut être ni suspendu ni supprimé.",
     "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
     "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
     "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer.",

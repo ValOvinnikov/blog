@@ -45,6 +45,7 @@ export const useLookFormState = ({
   const t = useTranslations('lookForm');
   const draftFields = useLookDraftFields();
   const [repickKinds, setRepickKinds] = useState<TBrandAssetKind[]>([]);
+  const [isSubmenuPreviewOpen, setIsSubmenuPreviewOpen] = useState(false);
 
   const {
     values,
@@ -113,6 +114,8 @@ export const useLookFormState = ({
     repickKinds,
     brandAssetFieldIds,
     brandImageError: fieldError,
+    isSubmenuPreviewOpen,
+    setIsSubmenuPreviewOpen,
   });
 
   return { lookForm, isPending, form: { ...form, saveError } };

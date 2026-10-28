@@ -1,11 +1,22 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  isOutcomeSuccess,
+} from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
-import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_LOG,
+  TENANT_REFUSAL,
+} from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
+import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
@@ -24,7 +35,9 @@ export type TDeprovisionTenantInput = z.input<
 >;
 
 export type TDeprovisionTenantResult = TTenantLifecycleResult<
-  typeof TENANT_REFUSAL.NOT_FOUND | typeof TENANT_REFUSAL.ALREADY_DEPROVISIONED
+  | typeof TENANT_REFUSAL.NOT_FOUND
+  | typeof TENANT_REFUSAL.ALREADY_DEPROVISIONED
+  | typeof TENANT_REFUSAL.PLATFORM_TENANT
 >;
 
 /**
@@ -50,10 +63,21 @@ export const deprovisionTenantAction = async (
     precondition: ({ deprovisionedAt }) =>
       deprovisionedAt ? TENANT_REFUSAL.ALREADY_DEPROVISIONED : undefined,
   });
-  if (resolved.outcome !== ACTION_OUTCOME.SUCCESS) {
+  if (!isOutcomeSuccess(resolved)) {
     return resolved;
   }
   const { tenant } = resolved;
+
+  if (await resolveIsPlatformTenant(tenant)) {
+    logger.warn(TENANT_LOG.PLATFORM_TENANT_REFUSED, {
+      tenantId,
+      action: AUDIT_ACTION.DEPROVISION_REQUESTED,
+    });
+    return {
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.PLATFORM_TENANT,
+    };
+  }
 
   const dispatched = await dispatchDeprovisioningWorkflow({
     tenantId,

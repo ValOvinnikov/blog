@@ -5,7 +5,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { Text } from '@platform/components/shared/text';
 import { TextInput } from '@platform/components/shared/text-input';
 import { useTranslations } from 'next-intl';
-import { useId, type ReactNode } from 'react';
+import { useId } from 'react';
 
 import { formSiteAddressInputVariants } from './form-site-address-input-variants';
 
@@ -13,7 +13,7 @@ export type TFormSiteAddressInputProps = {
   label: string;
   hint: string;
   error?: string;
-  footer?: ReactNode;
+  errorId?: string;
   value: string;
   onChange: (value: string) => void;
   rootDomain: TMaybeUndefined<string>;
@@ -23,7 +23,7 @@ export const FormSiteAddressInput = ({
   label,
   hint,
   error,
-  footer,
+  errorId,
   value,
   onChange,
   rootDomain,
@@ -37,8 +37,12 @@ export const FormSiteAddressInput = ({
       label={label}
       hint={hint}
       error={error}
-      footer={footer}
-      control={{ describedBy: rootDomain ? suffixId : undefined }}
+      isInvalid={Boolean(errorId)}
+      control={{
+        describedBy:
+          [rootDomain && suffixId, errorId].filter(Boolean).join(' ') ||
+          undefined,
+      }}
     >
       <div className={row()}>
         <TextInput
