@@ -121,5 +121,48 @@
         "metaDescription": "A second sample case study created with your site. Replace it with your own work, or delete it."
       }
     ]
+  },
+  "personal": {
+    "hero": {
+      "eyebrow": "Hello",
+      "heading": "A little about me and what I do"
+    },
+    "intro": {
+      "body": [
+        "Welcome to my corner of the web. This is where I share who I am, what I work on and what I'm learning along the way.",
+        "Replace this text with a few lines about yourself: your background, what you're good at and what you'd like to do next."
+      ]
+    },
+    "faq": {
+      "heading": "A few questions people ask",
+      "questions": [
+        {
+          "question": "What do you do?",
+          "answer": [
+            "Answer in a sentence or two: your role, your field and the kind of work you enjoy most."
+          ]
+        },
+        {
+          "question": "Are you open to new opportunities?",
+          "answer": [
+            "Say whether you're looking for a job, freelance work or collaborations, and what would interest you."
+          ]
+        },
+        {
+          "question": "Where can I find more of your work?",
+          "answer": [
+            "Point visitors to your writing on this site, and add links to anywhere else you share your work."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Read my writing",
+      "supportingText": "Notes and posts on what I'm working on and learning."
+    },
+    "writing": {
+      "linkLabel": "Writing",
+      "listHeading": "All posts"
+    }
   }
 }

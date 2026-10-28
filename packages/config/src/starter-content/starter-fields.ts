@@ -1,8 +1,4 @@
-import type { ArticleText, Link } from '@blog/config/sanity/generated/types';
-
-import { LINK_TYPE, type TLocaleIsoCode } from '@blog/config/constants';
-
-import type { TStarterDocument } from './starter-document';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 
 export function seo(metaTitle: string, metaDescription: string) {
   return {
@@ -62,41 +58,50 @@ export function moduleHeadingBlock(
   } as const;
 }
 
+function localizedBlocks<
+  TValueType extends
+    | 'internationalizedArrayArticleTextValue'
+    | 'internationalizedArrayListedTextValue',
+>(valueType: TValueType, locale: TLocaleIsoCode, texts: readonly string[]) {
+  return [
+    {
+      _key: locale,
+      _type: valueType,
+      language: locale,
+      value: paragraphs(texts),
+    },
+  ];
+}
+
 export function localizedArticleText(
   locale: TLocaleIsoCode,
   texts: readonly string[],
 ) {
-  return [
-    {
-      _key: locale,
-      _type: 'internationalizedArrayArticleTextValue',
-      language: locale,
-      value: paragraphs(texts),
-    } as const,
-  ];
+  return localizedBlocks(
+    'internationalizedArrayArticleTextValue',
+    locale,
+    texts,
+  );
 }
 
-export function paragraphs(texts: readonly string[]): ArticleText {
+export function localizedListedText(
+  locale: TLocaleIsoCode,
+  texts: readonly string[],
+) {
+  return localizedBlocks(
+    'internationalizedArrayListedTextValue',
+    locale,
+    texts,
+  );
+}
+
+export function paragraphs(texts: readonly string[]) {
   return texts.map((text, index) => ({
-    _type: 'block',
+    _type: 'block' as const,
     _key: `paragraph${index}`,
     markDefs: [],
-    children: [{ _type: 'span', _key: `span${index}`, text, marks: [] }],
+    children: [
+      { _type: 'span' as const, _key: `span${index}`, text, marks: [] },
+    ],
   }));
-}
-
-export function internalLink(
-  id: string,
-  title: string,
-  locale: TLocaleIsoCode,
-  targetId: string,
-): TStarterDocument<Link, 'title' | 'label' | 'linkType'> {
-  return {
-    _id: id,
-    _type: 'link',
-    title,
-    label: localizedString(locale, title),
-    linkType: LINK_TYPE.INTERNAL,
-    internalReference: reference(targetId),
-  };
 }

@@ -1,15 +1,15 @@
-import { faker } from '@faker-js/faker';
 import type { IPrivacySectionProps } from '@web/components/pages/account-page/sections/privacy-section/privacy-section';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61034);
+const mockFaker = createMockFaker(61034);
 
-const MOCK_HANDLE = faker.string.alphanumeric(8);
-const MOCK_PRIVACY_HEADING = faker.lorem.word();
-const MOCK_EXPORT_LABEL = faker.lorem.words(3);
-const MOCK_EXPORT_DESCRIPTION = faker.lorem.sentence();
-const MOCK_EXPORT_BUTTON = faker.lorem.words(2);
-const MOCK_DELETE_LABEL = faker.lorem.words(2);
-const MOCK_DELETE_DESCRIPTION = faker.lorem.sentence();
+const MOCK_HANDLE = mockFaker.string.alphanumeric(8);
+const MOCK_PRIVACY_HEADING = mockFaker.lorem.word();
+const MOCK_EXPORT_LABEL = mockFaker.lorem.words(3);
+const MOCK_EXPORT_DESCRIPTION = mockFaker.lorem.sentence();
+const MOCK_EXPORT_BUTTON = mockFaker.lorem.words(2);
+const MOCK_DELETE_LABEL = mockFaker.lorem.words(2);
+const MOCK_DELETE_DESCRIPTION = mockFaker.lorem.sentence();
 
 export const mockPrivacySection = (
   overrides: Partial<IPrivacySectionProps> = {},

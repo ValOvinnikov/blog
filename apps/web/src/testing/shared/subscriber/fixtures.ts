@@ -1,10 +1,10 @@
 import type { queries } from '@blog/db';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61059);
+const mockFaker = createMockFaker(61059);
 
-const SUBSCRIBER_ID = faker.string.uuid();
-const SUBSCRIBER_EMAIL = faker.internet.email();
+const SUBSCRIBER_ID = mockFaker.string.uuid();
+const SUBSCRIBER_EMAIL = mockFaker.internet.email();
 
 export const mockSubscriber = (
   overrides: Partial<queries.subscribers.TPendingSubscriber> = {},

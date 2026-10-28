@@ -28,6 +28,7 @@ const MOCK_TITLE = faker.lorem.words(2);
 const STARTER_SITE_TYPES = [
   SITE_TYPE.BLOG,
   SITE_TYPE.PORTFOLIO,
+  SITE_TYPE.PERSONAL,
   SITE_TYPE.BLANK,
 ] as const;
 

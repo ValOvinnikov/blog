@@ -4,11 +4,11 @@ import type {
   TTopicDetailPage,
   TTopicWithPostCount,
 } from '@blog/service';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-faker.seed(61058);
+const mockFaker = createMockFaker(61058);
 
 export const mockTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   return {
@@ -35,18 +35,18 @@ export const MOCK_ENGINEERING_TOPIC = mockTopicWithPostCount({
   postCount: 3,
 });
 
-const [SECOND_TOPIC_TITLE, THIRD_TOPIC_TITLE] = faker.helpers.uniqueArray(
-  faker.lorem.word,
+const [SECOND_TOPIC_TITLE, THIRD_TOPIC_TITLE] = mockFaker.helpers.uniqueArray(
+  mockFaker.lorem.word,
   2,
 );
 
-const [SECOND_TOPIC_SLUG, THIRD_TOPIC_SLUG] = faker.helpers.uniqueArray(
-  faker.lorem.slug,
+const [SECOND_TOPIC_SLUG, THIRD_TOPIC_SLUG] = mockFaker.helpers.uniqueArray(
+  mockFaker.lorem.slug,
   2,
 );
 
 export const MOCK_SECOND_TOPIC = mockTopicWithPostCount({
-  id: faker.string.uuid(),
+  id: mockFaker.string.uuid(),
   title: SECOND_TOPIC_TITLE!,
   slug: SECOND_TOPIC_SLUG!,
   description: undefined,
@@ -54,7 +54,7 @@ export const MOCK_SECOND_TOPIC = mockTopicWithPostCount({
 });
 
 export const MOCK_THIRD_TOPIC = mockTopicWithPostCount({
-  id: faker.string.uuid(),
+  id: mockFaker.string.uuid(),
   title: THIRD_TOPIC_TITLE!,
   slug: THIRD_TOPIC_SLUG!,
   description: undefined,

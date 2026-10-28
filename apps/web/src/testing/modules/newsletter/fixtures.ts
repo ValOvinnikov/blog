@@ -1,9 +1,10 @@
 import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-faker.seed(61051);
+const mockFaker = createMockFaker(61051);
 
 export const mockNewsletterModule = (
   overrides: Partial<TNewsletterModule> = {},
@@ -21,4 +22,4 @@ export const mockNewsletterModule = (
   ...overrides,
 });
 
-export const MOCK_NEWSLETTER_MODULE_ID = faker.string.uuid();
+export const MOCK_NEWSLETTER_MODULE_ID = mockFaker.string.uuid();

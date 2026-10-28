@@ -1,11 +1,12 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
 import type { TSettingsFeatures } from '@blog/db/schema/settings-features';
 import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
-faker.seed(61062);
+const mockFaker = createMockFaker(61062);
 
-const MOCK_SETTINGS_FEATURES_CREATED_AT = faker.date.past();
+const MOCK_SETTINGS_FEATURES_CREATED_AT = mockFaker.date.past();
 
 export const mockSettingsFeaturesRow = (
   overrides: Partial<TSettingsFeatures> = {},

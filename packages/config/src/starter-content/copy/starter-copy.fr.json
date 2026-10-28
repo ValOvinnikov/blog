@@ -121,5 +121,48 @@
         "metaDescription": "Une deuxième étude de cas d’exemple créée avec votre site. Remplacez-la par votre travail, ou supprimez-la."
       }
     ]
+  },
+  "personal": {
+    "hero": {
+      "eyebrow": "Bonjour",
+      "heading": "Un peu sur moi et ce que je fais"
+    },
+    "intro": {
+      "body": [
+        "Bienvenue dans mon coin du Web. Je partage ici qui je suis, ce sur quoi je travaille et ce que j'apprends en chemin.",
+        "Remplacez ce texte par quelques lignes sur vous : votre parcours, vos points forts et ce que vous aimeriez faire ensuite."
+      ]
+    },
+    "faq": {
+      "heading": "Quelques questions fréquentes",
+      "questions": [
+        {
+          "question": "Que faites-vous ?",
+          "answer": [
+            "Répondez en une ou deux phrases : votre rôle, votre domaine et le type de travail que vous préférez."
+          ]
+        },
+        {
+          "question": "Êtes-vous ouvert à de nouvelles opportunités ?",
+          "answer": [
+            "Indiquez si vous cherchez un emploi, des missions en freelance ou des collaborations, et ce qui vous intéresserait."
+          ]
+        },
+        {
+          "question": "Où trouver d'autres travaux de votre part ?",
+          "answer": [
+            "Orientez les visiteurs vers vos écrits sur ce site et ajoutez des liens vers les autres endroits où vous partagez votre travail."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Lire mes écrits",
+      "supportingText": "Notes et articles sur ce sur quoi je travaille et ce que j'apprends."
+    },
+    "writing": {
+      "linkLabel": "Écrits",
+      "listHeading": "Tous les articles"
+    }
   }
 }

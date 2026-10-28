@@ -12,7 +12,7 @@ import {
 import { env } from '@worker/utils/env/env';
 import { z } from 'zod';
 
-const tenantRequestBodySchema = z.object({ tenantId: z.uuid() });
+export const tenantRequestBodySchema = z.object({ tenantId: z.uuid() });
 
 export function respond(
   status: THttpStatus,
@@ -32,9 +32,10 @@ function reject(status: THttpStatus, error: TEnqueueError) {
   return errorResult(respondError(status, error));
 }
 
-export async function readSignedTenantRequest(
+export async function readSignedRequest<TBody>(
   request: Request,
-): Promise<TResult<string, Response>> {
+  schema: z.ZodType<TBody>,
+): Promise<TResult<TBody, Response>> {
   const secret = env.WORKER_ENQUEUE_SECRET;
   const rawBody = await request.text();
 
@@ -57,9 +58,16 @@ export async function readSignedTenantRequest(
   } catch {
     return reject(HTTP_STATUS.BAD_REQUEST, ENQUEUE_ERROR.INVALID_BODY);
   }
-  const parsed = tenantRequestBodySchema.safeParse(payload);
+  const parsed = schema.safeParse(payload);
   if (!parsed.success) {
     return reject(HTTP_STATUS.BAD_REQUEST, ENQUEUE_ERROR.INVALID_BODY);
   }
-  return okResult(parsed.data.tenantId);
+  return okResult(parsed.data);
+}
+
+export async function readSignedTenantRequest(
+  request: Request,
+): Promise<TResult<string, Response>> {
+  const signed = await readSignedRequest(request, tenantRequestBodySchema);
+  return signed.ok ? okResult(signed.data.tenantId) : signed;
 }
