@@ -571,6 +571,30 @@
     "typeDescription": "Chaque police s'affiche dans son propre style.",
     "shapeHeading": "Forme",
     "shapeDescription": "Coins, espacement et encadrement des cartes et des boutons d'en-tête.",
+    "headerHeading": "En-tête",
+    "headerDescription": "Comment la barre du haut de votre site est organisée et comment ses sous-menus s’ouvrent.",
+    "headerLayoutLabel": "Disposition",
+    "headerLayoutDescription": "Où se placent le logo, les liens et les boutons sur grand écran. Sur mobile, vous avez toujours la barre avec un bouton de menu.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Classique",
+      "LINKS_BESIDE_BRAND": "Liens à côté de la marque",
+      "CENTRED_LINKS": "Liens centrés",
+      "TWO_ROWS": "Deux lignes",
+      "CENTRED_BRAND": "Marque centrée",
+      "MENU_BUTTON": "Bouton de menu"
+    },
+    "headerSubmenuStyleLabel": "Sous-menus",
+    "headerSubmenuStyleDescription": "Comment un lien avec des sous-éléments s’ouvre sur grand écran.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Menu déroulant",
+      "WIDE_PANEL": "Panneau large"
+    },
+    "headerBarStyleLabel": "Barre",
+    "headerBarStyleDescription": "Si la barre occupe toute la largeur de la page ou flotte au-dessus comme une carte.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Pleine largeur",
+      "FLOATING": "Flottante"
+    },
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
@@ -599,6 +623,10 @@
     "previewWidthAriaLabel": "Largeur de l'aperçu",
     "navPosts": "Articles",
     "navAbout": "À propos",
+    "navTopics": "Sujets",
+    "submenuLead": "Tous les sujets",
+    "submenuFirstItem": "Marées",
+    "submenuSecondItem": "Ports",
     "switcherMenuAriaLabel": "Langue : {language}",
     "signIn": "Se connecter",
     "themeToggleDark": "Passer au thème sombre",

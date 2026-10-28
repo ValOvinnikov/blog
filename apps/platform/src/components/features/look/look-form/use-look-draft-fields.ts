@@ -73,6 +73,24 @@ export const useLookDraftFields = () => {
         t(`headerControlStyleOptionLabel.${headerControlStyle}`),
     },
     {
+      id: 'headerLayout',
+      label: t('headerLayoutLabel'),
+      display: ({ headerLayout }: TLookFormValues) =>
+        t(`headerLayoutOptionLabel.${headerLayout}`),
+    },
+    {
+      id: 'headerSubmenuStyle',
+      label: t('headerSubmenuStyleLabel'),
+      display: ({ headerSubmenuStyle }: TLookFormValues) =>
+        t(`headerSubmenuStyleOptionLabel.${headerSubmenuStyle}`),
+    },
+    {
+      id: 'headerBarStyle',
+      label: t('headerBarStyleLabel'),
+      display: ({ headerBarStyle }: TLookFormValues) =>
+        t(`headerBarStyleOptionLabel.${headerBarStyle}`),
+    },
+    {
       id: 'languageSwitcherStyle',
       label: t('languageSwitcherLabel'),
       display: ({ languageSwitcherStyle }: TLookFormValues) =>

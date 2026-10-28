@@ -65,8 +65,14 @@ const MOCK_SITE_CONFIG: TSiteConfigResult = {
 
 describe(defaultLookFormValues, () => {
   it('follows the Console preset, leaving the logo hue unset', () => {
-    const { themeTokens, cardStyle, headerControlStyle } =
-      PRESET_REGISTRY[PRESET_ID.CONSOLE];
+    const {
+      themeTokens,
+      cardStyle,
+      headerControlStyle,
+      headerLayout,
+      headerSubmenuStyle,
+      headerBarStyle,
+    } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
     const values = defaultLookFormValues();
 
@@ -80,6 +86,9 @@ describe(defaultLookFormValues, () => {
       density: themeTokens.density,
       cardStyle,
       headerControlStyle,
+      headerLayout,
+      headerSubmenuStyle,
+      headerBarStyle,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logo: { url: undefined },
       favicon: { url: undefined },
@@ -102,6 +111,9 @@ describe(toLookFormValues, () => {
       languageSwitcherStyle: MOCK_SITE_CONFIG.languageSwitcherStyle,
       cardStyle: MOCK_SITE_CONFIG.cardStyle,
       headerControlStyle: MOCK_SITE_CONFIG.headerControlStyle,
+      headerLayout: MOCK_SITE_CONFIG.headerLayout,
+      headerSubmenuStyle: MOCK_SITE_CONFIG.headerSubmenuStyle,
+      headerBarStyle: MOCK_SITE_CONFIG.headerBarStyle,
       logo: { url: MOCK_LOGO_URL },
       favicon: { url: MOCK_FAVICON_URL },
     });

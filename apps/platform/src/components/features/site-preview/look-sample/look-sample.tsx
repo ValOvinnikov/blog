@@ -1,9 +1,4 @@
-import {
-  SIZE,
-  type TLanguageSwitcherStyle,
-  type TLocaleIsoCode,
-  type TMaybeUndefined,
-} from '@blog/config';
+import { SIZE, type TLocaleIsoCode, type TMaybeUndefined } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
@@ -11,6 +6,7 @@ import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import { SampleSiteHeader } from '@platform/components/features/site-preview/look-sample/components/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
+import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
 
@@ -21,7 +17,7 @@ export type TLookSampleProps = {
   logoSrc: TMaybeUndefined<string>;
   theme: TSitePreviewTheme;
   liveLocales: readonly TLocaleIsoCode[];
-  languageSwitcherStyle: TLanguageSwitcherStyle;
+  header: TSampleHeaderStyle;
   hasReaderAccounts: boolean;
   isNarrow?: boolean;
 };
@@ -31,7 +27,7 @@ export const LookSample = ({
   logoSrc,
   theme,
   liveLocales,
-  languageSwitcherStyle,
+  header,
   hasReaderAccounts,
   isNarrow = false,
 }: TLookSampleProps) => {
@@ -49,7 +45,7 @@ export const LookSample = ({
         tenantName={tenantName}
         logoSrc={logoSrc}
         liveLocales={liveLocales}
-        languageSwitcherStyle={languageSwitcherStyle}
+        header={header}
         hasReaderAccounts={hasReaderAccounts}
         isNarrow={isNarrow}
         isDark={theme.isDark}

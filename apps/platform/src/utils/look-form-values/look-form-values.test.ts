@@ -1,4 +1,7 @@
 import {
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   HUE_MAX,
   HUE_MIN,
   LANGUAGE_SWITCHER_STYLE,
@@ -50,6 +53,23 @@ describe(applyPresetDefaults, () => {
       density: themeTokens.density,
       cardStyle,
       headerControlStyle,
+    });
+  });
+
+  it('keeps the header layout, sub-menus and bar', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
+      headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
+      headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+    };
+
+    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
+
+    expect(next).toMatchObject({
+      headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
+      headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
+      headerBarStyle: HEADER_BAR_STYLE.FLOATING,
     });
   });
 
