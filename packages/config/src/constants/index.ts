@@ -32,6 +32,7 @@ export * from './layout';
 export * from './link';
 export * from './magic-link-refusal';
 export * from './module';
+export * from './module-pack';
 export * from './next-dynamic-error';
 export * from './next-navigation-error';
 export * from './newsletter-result';

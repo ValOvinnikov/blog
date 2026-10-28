@@ -76,7 +76,12 @@ module types whose capability is off for the tenant carry a warning.
 - A capability that is off does not hide a module type. The type's title gets
   "(off in Features)" in array insert menus, an inserted item carries a
   validation warning, and a document of that type shows a caution banner.
-  Today only `module_newsletter` is mapped to a capability (NEWSLETTER).
+  `module_newsletter` (NEWSLETTER) and `module_contactForm` (CONTACT_FORM)
+  are mapped to a capability.
+- A module type outside the `entitlements` prop's module packs is not hidden
+  either: it reads "(Growth plan)" in the picker, can't be created new, and
+  its documents and page references carry the plan warning instead
+  ([plans-and-entitlements](./plans-and-entitlements.md)).
 - With a single live locale the language filter is hidden and
   single-language inputs apply.
 - Look and Voice do not reach the Studio; its UI is Sanity's own, in English.
@@ -84,8 +89,8 @@ module types whose capability is off for the tenant carry a warning.
 ## Constraints and invariants
 
 - `StudioMount` takes plain props only (`projectId`, `dataset`, `basePath`,
-  `title`, `enabledCapabilities`, `defaultLocale`, `liveLocales`,
-  `loginProvider`) and calls
+  `title`, `enabledCapabilities`, `entitlements`, `defaultLocale`,
+  `liveLocales`, `loginProvider`) and calls
   `buildStudioConfig` itself. It is the only `'use client'` file in
   `@blog/studio`. Nothing exports a built config: calling the builder in a
   Server Component pulls the Sanity SDK into the RSC graph, where `swr`,
@@ -165,7 +170,7 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   Studio page test, `utils/owner-studio-access/owner-studio-access.test.ts`
   and `server/owner-access/request-owner-access.test.ts`.
 - `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
-- Capability warnings: `packages/studio/src/schema-types/inputs/capability-warning-input/*.test.ts`.
+- Capability and plan warnings: `packages/studio/src/schema-types/inputs/requirement-warning-input/*.test.ts`.
 - Login provider: `packages/studio/src/auth/login-provider-auth.test.ts`.
 - No Storybook in either workspace.
 

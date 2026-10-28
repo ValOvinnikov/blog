@@ -8,7 +8,7 @@ import type {
 import type { FC } from 'react';
 import { StudioLayout, StudioProvider } from 'sanity';
 
-import { buildStudioConfig } from './studio-config';
+import { buildStudioConfig, type TStudioEntitlements } from './studio-config';
 
 export type TStudioMountProps = {
   projectId: string;
@@ -16,6 +16,7 @@ export type TStudioMountProps = {
   basePath: string;
   title: string;
   enabledCapabilities?: readonly TCapability[];
+  entitlements?: TStudioEntitlements;
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
   loginProvider?: TSanityLoginProvider;
@@ -39,6 +40,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
   basePath,
   title,
   enabledCapabilities,
+  entitlements,
   defaultLocale,
   liveLocales,
   loginProvider,
@@ -49,6 +51,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
     basePath,
     title,
     enabledCapabilities,
+    entitlements,
     defaultLocale,
     liveLocales,
     loginProvider,

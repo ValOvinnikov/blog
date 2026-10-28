@@ -1,17 +1,17 @@
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import {
+  modulePath,
+  type TModuleReference,
+} from '@blog/studio/schema-types/validation/module-path/module-path';
+import { validateModulesEntitled } from '@blog/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
+import {
   moduleInsertMenuGroups,
   sortModulesByKind,
 } from '@blog/studio/structure/module-kinds/module-kinds';
 import { defineArrayMember, defineField } from 'sanity';
 
-type TModuleReference = { _type?: string; _key?: string };
-
 const ONCE_ERROR = 'Only one module of this type is allowed per page.';
-
-const modulePath = (module: TModuleReference, index: number) =>
-  module._key ? [{ _key: module._key }] : [index];
 
 const DEFAULT_MODULES = [ctaSchema.name, newsletterSchema.name];
 
@@ -43,10 +43,11 @@ export const modulesField = ({
       const uniqueRule = rule
         .unique()
         .error('Each module can only be referenced once per page.');
+      const entitledRule = rule.custom(validateModulesEntitled).warning();
 
-      if (!once) return uniqueRule;
+      if (!once) return [uniqueRule, entitledRule];
 
-      return uniqueRule.custom((modules) => {
+      const onceRule = uniqueRule.custom((modules) => {
         const references = (modules ?? []) as TModuleReference[];
         const counts = new Map<string, number>();
 
@@ -64,6 +65,8 @@ export const modulesField = ({
 
         return violations.length > 0 ? violations : true;
       });
+
+      return [onceRule, entitledRule];
     },
   });
 };
