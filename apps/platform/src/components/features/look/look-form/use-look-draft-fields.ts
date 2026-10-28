@@ -86,6 +86,18 @@ export const useLookDraftFields = () => {
         t(`headerBarStyleOptionLabel.${headerBarStyle}`),
     },
     {
+      id: 'busyButtonStyle',
+      label: t('busyButtonStyleLabel'),
+      display: ({ busyButtonStyle }: TLookFormValues) =>
+        t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
+    },
+    {
+      id: 'spinnerStyle',
+      label: t('spinnerStyleLabel'),
+      display: ({ spinnerStyle }: TLookFormValues) =>
+        t(`spinnerStyleOptionLabel.${spinnerStyle}`),
+    },
+    {
       id: 'languageSwitcherStyle',
       label: t('languageSwitcherLabel'),
       display: ({ languageSwitcherStyle }: TLookFormValues) =>

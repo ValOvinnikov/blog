@@ -7,6 +7,7 @@ import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
+import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
@@ -52,11 +53,11 @@ export const LookPreview = ({
       notes={<p>{t('previewNote')}</p>}
     >
       <LookSample
-        tenantName={tenantName}
-        logoSrc={values.logo.url}
+        brand={{ name: tenantName, logoSrc: values.logo.url }}
         theme={buildSitePreviewTheme(values, isDark)}
         liveLocales={liveLocales}
         header={toSampleHeaderStyle(values)}
+        busy={toSampleBusyStyle(values)}
         hasReaderAccounts={hasReaderAccounts}
         isNarrow={isNarrow}
         isSubmenuOpen={isSubmenuPreviewOpen}

@@ -619,6 +619,24 @@
       "FULL_WIDTH": "Volle Breite",
       "FLOATING": "Schwebend"
     },
+    "buttonsHeading": "Schaltflächen",
+    "buttonsDescription": "Wie Schaltflächen aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
+    "busyButtonStyleLabel": "Bei Beschäftigung",
+    "busyButtonStyleDescription": "Was eine Schaltfläche beim Speichern oder Senden zeigt. Sie behält ihren Platz und bleibt in voller Farbe.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Beschäftigt-Text",
+      "KEPT": "Text bleibt",
+      "EDGE": "Fortschrittskante"
+    },
+    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleDescription": "Der Spinner auf den Schaltflächen und Ladezuständen Ihrer Website.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Dem Preset folgen",
+      "BRAILLE": "Braille",
+      "RING": "Ring",
+      "DOTS": "Punkte",
+      "PULSE": "Puls"
+    },
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
@@ -635,6 +653,8 @@
     "subscribeButton": "Abonnieren",
     "readMoreButton": "Weiterlesen",
     "readTimeChip": "4 Min. Lesezeit",
+    "busyButtonIdle": "Nachricht senden",
+    "busyButtonLabel": "Wird gesendet…",
     "firstCardTitle": "Notizen aus dem Hafen",
     "firstCardExcerpt": "Eine verlinkte Karte, wie Beitragslisten sie darstellen.",
     "secondCardTitle": "Kurs auf die nächste Saison",

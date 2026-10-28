@@ -1,6 +1,7 @@
 import {
   ACTION_OUTCOME,
   CARD_STYLE,
+  BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -10,10 +11,16 @@ import {
   LOCALE_ISO_CODES,
   PRESET_ID,
   PRESET_REGISTRY,
+  SPINNER_STYLE,
 } from '@blog/config';
 import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import {
+  SAMPLE_BUSY_BUTTON_TEST_ID,
+  SAMPLE_BUSY_STYLE_ATTRIBUTE,
+  SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+} from '@platform/constants/sample-busy';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
@@ -150,8 +157,9 @@ const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 const SAVING = 'Saving…';
 const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
-const GROWTH_ONLY_FIELD_COUNT = 11;
+const GROWTH_ONLY_FIELD_COUNT = 13;
 const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
+const SPINNER_LABEL = LOOK_FORM.spinnerStyleLabel;
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
 
 const setup = customRender(LookForm, {
@@ -187,6 +195,8 @@ const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     headerLayout: defaults.headerLayout,
     headerSubmenuStyle: defaults.headerSubmenuStyle,
     headerBarStyle: defaults.headerBarStyle,
+    busyButtonStyle: defaults.busyButtonStyle,
+    spinnerStyle: defaults.spinnerStyle,
     languageSwitcherStyle: defaults.languageSwitcherStyle,
     ...overrides,
   };
@@ -224,6 +234,13 @@ const chooseHeaderLayout = async (user: UserEvent, optionName: string) => {
   await user.click(option);
 };
 
+const chooseSpinner = async (user: UserEvent, optionName: string) => {
+  const spinnerSelect = screen.getByRole('combobox', { name: SPINNER_LABEL });
+  await user.click(spinnerSelect);
+  const option = await screen.findByRole('option', { name: optionName });
+  await user.click(option);
+};
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -248,7 +265,7 @@ describe(`<${LookForm.name}/>`, () => {
         setup();
       });
 
-      it('groups the settings into seven titled cards', () => {
+      it('groups the settings into eight titled cards', () => {
         const cardHeadings = screen.getAllByRole('heading', { level: 2 });
         const cardTitles = cardHeadings.map((heading) => heading.textContent);
 
@@ -258,6 +275,7 @@ describe(`<${LookForm.name}/>`, () => {
           LOOK_FORM.typeHeading,
           LOOK_FORM.shapeHeading,
           LOOK_FORM.headerHeading,
+          LOOK_FORM.buttonsHeading,
           LOOK_FORM.brandHeading,
           LOOK_FORM.languageSwitcherLabel,
         ]);
@@ -335,6 +353,11 @@ describe(`<${LookForm.name}/>`, () => {
           saved: { headerBarStyle: HEADER_BAR_STYLE.FLOATING },
         },
         {
+          group: LOOK_FORM.busyButtonStyleLabel,
+          option: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
+          saved: { busyButtonStyle: BUSY_BUTTON_STYLE.EDGE },
+        },
+        {
           group: LOOK_FORM.languageSwitcherLabel,
           option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
           saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },
@@ -373,6 +396,57 @@ describe(`<${LookForm.name}/>`, () => {
             savedLookValues({ headerLayout: HEADER_LAYOUT.TWO_ROWS }),
           );
         });
+      });
+
+      it('saves the chosen spinner', async () => {
+        await chooseSpinner(user, LOOK_FORM.spinnerStyleOptionLabel.DOTS);
+        await clickSave(user);
+
+        await waitFor(() => {
+          expect(updateLookAction).toHaveBeenCalledWith(
+            MOCK_TENANT_ID,
+            savedLookValues({ spinnerStyle: SPINNER_STYLE.DOTS }),
+          );
+        });
+      });
+
+      it('shows the chosen busy style and spinner on the preview busy button', async () => {
+        const busyGroup = screen.getByRole('group', {
+          name: LOOK_FORM.busyButtonStyleLabel,
+        });
+        const edgeButton = within(busyGroup).getByRole('button', {
+          name: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
+        });
+        await user.click(edgeButton);
+        await chooseSpinner(user, LOOK_FORM.spinnerStyleOptionLabel.PULSE);
+
+        const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
+        expect(sample).toHaveAttribute(
+          SAMPLE_BUSY_STYLE_ATTRIBUTE,
+          BUSY_BUTTON_STYLE.EDGE,
+        );
+        expect(sample).toHaveAttribute(
+          SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+          SPINNER_STYLE.PULSE,
+        );
+      });
+
+      it('follows the preset spinner until one is chosen', async () => {
+        const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
+        expect(sample).toHaveAttribute(
+          SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+          SPINNER_STYLE.BRAILLE,
+        );
+
+        const editorialRadio = screen.getByRole('radio', {
+          name: 'Editorial',
+        });
+        await user.click(editorialRadio);
+
+        expect(sample).toHaveAttribute(
+          SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+          SPINNER_STYLE.RING,
+        );
       });
 
       it('shows the chosen header layout and bar in the preview', async () => {
@@ -616,6 +690,28 @@ describe(`<${LookForm.name}/>`, () => {
     );
     expect(wideButton).toHaveAttribute(ARIA_PRESSED, 'true');
     expect(floatingButton).toHaveAttribute(ARIA_PRESSED, 'true');
+  });
+
+  it('leaves the busy button style and spinner as they are when a preset is chosen', async () => {
+    setup({
+      initialValues: {
+        ...defaultLookFormValues(),
+        busyButtonStyle: BUSY_BUTTON_STYLE.KEPT,
+        spinnerStyle: SPINNER_STYLE.DOTS,
+      },
+    });
+
+    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+    await user.click(editorialRadio);
+
+    const spinnerSelect = screen.getByRole('combobox', { name: SPINNER_LABEL });
+    const keptButton = screen.getByRole('button', {
+      name: LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
+    });
+    expect(spinnerSelect).toHaveTextContent(
+      LOOK_FORM.spinnerStyleOptionLabel.DOTS,
+    );
+    expect(keptButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
   it('shows a single-language note and no switcher choice with one language', () => {
@@ -865,6 +961,28 @@ describe(`<${LookForm.name}/>`, () => {
       );
       expect(fullWidthButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(floatingButton).toBeDisabled();
+    });
+
+    it('shows the busy button style and spinner locked at their defaults', () => {
+      const busyGroup = screen.getByRole('group', {
+        name: LOOK_FORM.busyButtonStyleLabel,
+      });
+      const labelButton = within(busyGroup).getByRole('button', {
+        name: LOOK_FORM.busyButtonStyleOptionLabel.LABEL,
+      });
+      const edgeButton = within(busyGroup).getByRole('button', {
+        name: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
+      });
+      const spinnerSelect = screen.getByRole('combobox', {
+        name: SPINNER_LABEL,
+      });
+
+      expect(labelButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(edgeButton).toBeDisabled();
+      expect(spinnerSelect).toHaveAttribute(DATA_DISABLED);
+      expect(spinnerSelect).toHaveTextContent(
+        LOOK_FORM.spinnerStyleOptionLabel.PRESET,
+      );
     });
 
     it('keeps the preset, accent hue and brand images editable', () => {
