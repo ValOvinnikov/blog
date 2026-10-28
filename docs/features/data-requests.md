@@ -73,8 +73,7 @@ page (#5090). The page serves either answer.
   reads:
   - `subscribers`, `leads` and `membership_invites` rows whose `email_index`
     matches, each with its site's id and name, and with the encrypted email,
-    lead name and message decrypted (falling back to the plain column while a
-    row has no encrypted form);
+    lead name and message decrypted;
   - the tenants holding that address as an unsent Studio re-invite
     (`tenants.unsent_reinvite_former_owner_email_encrypted`, from an
     owner-email change whose re-invite failed — see
@@ -82,8 +81,7 @@ page (#5090). The page serves either answer.
     each stored value is decrypted and compared;
   - `blocked_signup_identities` ADDRESS entries whose `value` is that index;
   - the reader account whose address is exactly the one given
-    (`findUserByEmail`, which keeps a `+tag` and falls back to the plain
-    column for a user with no index): its profile, its linked sign-in methods
+    (`findUserByEmail`, which keeps a `+tag`): its profile, its linked sign-in methods
     (`getLinkedProviders`, no tokens), its bookmarks on every site and its
     count of unexpired sessions;
   - `audit_events` whose `actor_id` is that account, with no email of their
@@ -105,8 +103,8 @@ Nothing is configurable. Both personal-data keys must be set: without
 
 ## Constraints and invariants
 
-- Only rows with an email index are found. The backfill (#5662) gave every
-  existing row one.
+- Every subscriber, lead and invite row has an email index; a user with none
+  is not found.
 - Every lookup, export and erasure is audited as `PERSONAL_DATA_LOOKED_UP`,
   `PERSONAL_DATA_EXPORTED` or `PERSONAL_DATA_ERASED` against target type
   `PERSONAL_DATA`. The `targetId` is the email's index and `details` holds

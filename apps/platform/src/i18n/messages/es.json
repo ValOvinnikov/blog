@@ -1344,6 +1344,25 @@
     "unavailableTitle": "El estado de la versión no está disponible",
     "unavailableDescription": "No se pudo contactar con GitHub, así que no se muestra la última ejecución."
   },
+  "tenantMigrationsCard": {
+    "title": "Migraciones de clientes",
+    "description": "Ejecuta las migraciones de contenido en desarrollo o reintenta un cliente cuya migración en producción falló.",
+    "failed": "La migración falló",
+    "empty": "Ninguna migración de contenido de clientes ha fallado.",
+    "unavailableTitle": "Las migraciones fallidas no están disponibles",
+    "unavailableDescription": "No se pudo leer el registro de clientes, así que no se muestran los clientes cuya migración falló."
+  },
+  "runTenantMigrationsButton": {
+    "developmentLabel": "Ejecutar en desarrollo",
+    "retryLabel": "Reintentar en producción",
+    "retryAriaLabel": "Reintentar {tenant} en producción",
+    "starting": "Iniciando…",
+    "started": "Migraciones de clientes iniciadas.",
+    "tenantRequired": "Las migraciones en producción se ejecutan para un cliente cada vez.",
+    "notFailed": "La última migración de ese cliente no falló, así que no hay nada que reintentar.",
+    "failedTenantsUnavailable": "No se pudo leer el registro de clientes. Vuelve a intentarlo en un momento.",
+    "startFailed": "No se inició nada: no se pudieron lanzar las migraciones de clientes."
+  },
   "releaseRunStatus": {
     "status": {
       "DISPATCHED": "Solicitada",
@@ -1358,7 +1377,7 @@
       "FAILED": "La versión ha fallado y los pasos posteriores al fallo no se ejecutaron."
     },
     "tenantMigrationFailedTitle": "Ha fallado la migración de un cliente",
-    "tenantMigrationFailedDescription": "El despliegue no se ejecutó, así que el sitio en vivo no ha cambiado. Reintenta ese cliente con «Ejecutar migraciones de clientes» en esta página.",
+    "tenantMigrationFailedDescription": "El despliegue no se ejecutó, así que el sitio en vivo no ha cambiado. Reintenta ese cliente en «Migraciones de clientes» en esta página.",
     "viewRun": "Ver la ejecución"
   },
   "startReleaseDialog": {

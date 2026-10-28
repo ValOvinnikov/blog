@@ -2,10 +2,9 @@ import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { tenants } from '@blog/db/schema/tenants';
 import {
-  decryptPersonalValue,
+  decryptOptionalPersonalValue,
   encryptPersonalValue,
 } from '@blog/db/utils/personal-data/personal-data';
-import { isNull } from '@blog/utils/primitives';
 import { eq } from 'drizzle-orm';
 
 export async function setUnsentStudioReinvite(
@@ -29,8 +28,7 @@ export async function getUnsentStudioReinviteEmail(
     .from(tenants)
     .where(eq(tenants.id, tenantId));
 
-  const encrypted = row?.encrypted ?? null;
-  return isNull(encrypted) ? null : decryptPersonalValue(encrypted);
+  return decryptOptionalPersonalValue(row?.encrypted ?? null);
 }
 
 export async function clearUnsentStudioReinvite(

@@ -1344,6 +1344,25 @@
     "unavailableTitle": "Release-Status nicht verfügbar",
     "unavailableDescription": "GitHub war nicht erreichbar, daher wird der letzte Release-Lauf nicht angezeigt."
   },
+  "tenantMigrationsCard": {
+    "title": "Mandanten-Migrationen",
+    "description": "Inhaltsmigrationen auf Development ausführen oder einen Mandanten wiederholen, dessen Produktionsmigration fehlgeschlagen ist.",
+    "failed": "Migration fehlgeschlagen",
+    "empty": "Bei keinem Mandanten ist die Inhaltsmigration fehlgeschlagen.",
+    "unavailableTitle": "Fehlgeschlagene Migrationen sind nicht verfügbar",
+    "unavailableDescription": "Das Mandantenregister konnte nicht gelesen werden, daher werden Mandanten mit fehlgeschlagener Migration nicht angezeigt."
+  },
+  "runTenantMigrationsButton": {
+    "developmentLabel": "Auf Development ausführen",
+    "retryLabel": "In Produktion wiederholen",
+    "retryAriaLabel": "{tenant} in Produktion wiederholen",
+    "starting": "Wird gestartet…",
+    "started": "Mandanten-Migrationen gestartet.",
+    "tenantRequired": "Produktionsmigrationen laufen immer für einen Mandanten.",
+    "notFailed": "Die letzte Migration dieses Mandanten ist nicht fehlgeschlagen, es gibt nichts zu wiederholen.",
+    "failedTenantsUnavailable": "Das Mandantenregister konnte nicht gelesen werden. Versuche es gleich noch einmal.",
+    "startFailed": "Nichts wurde gestartet: Die Mandanten-Migrationen konnten nicht ausgelöst werden."
+  },
   "releaseRunStatus": {
     "status": {
       "DISPATCHED": "Angefordert",
@@ -1358,7 +1377,7 @@
       "FAILED": "Das Release ist fehlgeschlagen, und die Schritte nach dem Fehler sind nicht gelaufen."
     },
     "tenantMigrationFailedTitle": "Eine Mandanten-Migration ist fehlgeschlagen",
-    "tenantMigrationFailedDescription": "Das Deployment ist nicht gelaufen, die Live-Seite ist unverändert. Wiederhole diesen Mandanten mit „Mandanten-Migrationen ausführen“ auf dieser Seite.",
+    "tenantMigrationFailedDescription": "Das Deployment ist nicht gelaufen, die Live-Seite ist unverändert. Wiederhole diesen Mandanten unter „Mandanten-Migrationen“ auf dieser Seite.",
     "viewRun": "Lauf ansehen"
   },
   "startReleaseDialog": {

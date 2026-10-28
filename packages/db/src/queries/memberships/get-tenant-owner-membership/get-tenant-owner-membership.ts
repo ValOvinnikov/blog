@@ -1,13 +1,12 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, PERSONAL_DATA_OWNER } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { users } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import {
-  readPersonalValue,
-  readReportedPersonalValue,
-  reportPlainPersonalRead,
+  decryptOptionalPersonalValue,
+  decryptPersonalValue,
 } from '@blog/db/utils/personal-data/personal-data';
 import { userHasSignedIn } from '@blog/db/utils/user-has-signed-in/user-has-signed-in';
 import { and, eq, isNull } from 'drizzle-orm';
@@ -24,7 +23,6 @@ export async function getTenantOwnerMembership(
 
   const [owner] = await db
     .select({
-      email: users.email,
       emailEncrypted: users.emailEncrypted,
       createdAt: memberships.createdAt,
       hasSignedIn: userHasSignedIn(),
@@ -38,12 +36,8 @@ export async function getTenantOwnerMembership(
       ),
     );
   if (owner) {
-    const { email: plainEmail, emailEncrypted, createdAt, hasSignedIn } = owner;
-    const email = readReportedPersonalValue(
-      PERSONAL_DATA_OWNER.USER,
-      emailEncrypted,
-      plainEmail,
-    );
+    const { emailEncrypted, createdAt, hasSignedIn } = owner;
+    const email = decryptOptionalPersonalValue(emailEncrypted);
     if (email) {
       return hasSignedIn
         ? { email, hasSignedIn, joinedAt: createdAt }
@@ -53,7 +47,6 @@ export async function getTenantOwnerMembership(
 
   const [invite] = await db
     .select({
-      email: membershipInvites.email,
       emailEncrypted: membershipInvites.emailEncrypted,
       createdAt: membershipInvites.createdAt,
     })
@@ -68,10 +61,9 @@ export async function getTenantOwnerMembership(
 
   if (!invite) return undefined;
 
-  const { email, emailEncrypted, createdAt } = invite;
-  reportPlainPersonalRead(PERSONAL_DATA_OWNER.INVITE, emailEncrypted);
+  const { emailEncrypted, createdAt } = invite;
   return {
-    email: readPersonalValue(emailEncrypted, email),
+    email: decryptPersonalValue(emailEncrypted),
     hasSignedIn: false,
     invitedAt: createdAt,
   };

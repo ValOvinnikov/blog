@@ -48,6 +48,17 @@ const groupLink = {
   subItems: [{ href: groupHref, label: groupLabel }, ...subLinks],
 };
 
+const panelActionsSlot = (
+  <PrimaryNavigation.PanelActions key="panel-actions">
+    <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>
+  </PrimaryNavigation.PanelActions>
+);
+const drawerActionsSlot = (
+  <PrimaryNavigation.DrawerActions key="drawer-actions">
+    <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
+  </PrimaryNavigation.DrawerActions>
+);
+
 const setup = customRender(PrimaryNavigation, {
   links,
 });
@@ -92,7 +103,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
   });
 
   it('renders the actions slot', () => {
-    setup({ actions: <button>{MOCK_ACTION_LABEL}</button> });
+    setup({
+      children: (
+        <PrimaryNavigation.Actions>
+          <button>{MOCK_ACTION_LABEL}</button>
+        </PrimaryNavigation.Actions>
+      ),
+    });
 
     const actionButton = screen.getByRole('button', {
       name: MOCK_ACTION_LABEL,
@@ -101,10 +118,8 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     expect(actionButton).toBeVisible();
   });
 
-  it('renders panelActions in the bar when there is no mobile toggle', () => {
-    setup({
-      panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
-    });
+  it('renders the panel actions in the bar when there is no mobile toggle', () => {
+    setup({ children: panelActionsSlot });
 
     const panelActionButton = screen.getByRole('button', {
       name: MOCK_PANEL_ACTION_LABEL,
@@ -113,10 +128,8 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     expect(panelActionButton).toBeVisible();
   });
 
-  it('renders no drawerActions when there is no mobile toggle', () => {
-    setup({
-      drawerActions: <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>,
-    });
+  it('renders no drawer actions when there is no mobile toggle', () => {
+    setup({ children: drawerActionsSlot });
 
     const drawerActionButton = screen.queryByRole('button', {
       name: MOCK_DRAWER_ACTION_LABEL,
@@ -197,11 +210,8 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       }
     });
 
-    it('shows panelActions as a row in the open panel', () => {
-      setup({
-        panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
-        mobileToggle: mobileToggle(true),
-      });
+    it('shows the panel actions as a row in the open panel', () => {
+      setup({ children: panelActionsSlot, mobileToggle: mobileToggle(true) });
 
       const panelActions = screen.getByTestId(PANEL_ACTIONS_TEST_ID);
       const panelActionButton = within(panelActions).getByRole('button', {
@@ -211,23 +221,17 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       expect(panelActionButton).toBeVisible();
     });
 
-    it('leaves panelActions out of the closed panel', () => {
-      setup({
-        panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
-        mobileToggle: mobileToggle(false),
-      });
+    it('leaves the panel actions out of the closed panel', () => {
+      setup({ children: panelActionsSlot, mobileToggle: mobileToggle(false) });
 
       const panelActions = screen.queryByTestId(PANEL_ACTIONS_TEST_ID);
 
       expect(panelActions).not.toBeInTheDocument();
     });
 
-    it('shows drawerActions after the panelActions row in the open panel', () => {
+    it('shows the drawer actions after the panel actions row in the open panel', () => {
       setup({
-        panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
-        drawerActions: (
-          <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
-        ),
+        children: [panelActionsSlot, drawerActionsSlot],
         mobileToggle: mobileToggle(true),
       });
 
@@ -243,13 +247,8 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       );
     });
 
-    it('leaves drawerActions out of the closed panel and the bar', () => {
-      setup({
-        drawerActions: (
-          <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
-        ),
-        mobileToggle: mobileToggle(false),
-      });
+    it('leaves the drawer actions out of the closed panel and the bar', () => {
+      setup({ children: drawerActionsSlot, mobileToggle: mobileToggle(false) });
 
       const drawerActionButton = screen.queryByRole('button', {
         name: MOCK_DRAWER_ACTION_LABEL,

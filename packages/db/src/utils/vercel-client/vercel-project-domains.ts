@@ -23,7 +23,7 @@ export async function deleteVercelProjectDomain(input: {
   domain: string;
 }): Promise<TVercelDeleteResult> {
   const path = withTeamId(
-    `/v9/projects/${input.projectId}/domains/${input.domain}`,
+    `/v9/projects/${input.projectId}/domains/${encodeURIComponent(input.domain)}`,
     input.teamId,
   );
   const response = await fetch(`${VERCEL_API_BASE}${path}`, {
@@ -44,4 +44,16 @@ export async function deleteVercelProjectDomain(input: {
   }
 
   return { alreadyGone: false };
+}
+
+export async function deleteVercelProjectDomains(input: {
+  token: string;
+  teamId: TMaybeUndefined<string>;
+  projectId: string;
+  domains: string[];
+}): Promise<void> {
+  const { domains, ...target } = input;
+  for (const domain of new Set(domains)) {
+    await deleteVercelProjectDomain({ ...target, domain });
+  }
 }

@@ -47,6 +47,10 @@ export const Closed: TStory = {
   args: { isOpen: false },
 };
 
+export const TopLevelHeading: TStory = {
+  args: { headingLevel: 1 },
+};
+
 export const LongContent: TStory = {
   args: {
     children: Array.from({ length: 12 }, () => faker.lorem.paragraph()).map(

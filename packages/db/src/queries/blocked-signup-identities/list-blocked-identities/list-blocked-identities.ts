@@ -1,14 +1,13 @@
 import type { TMaybeNull } from '@blog/config';
 import type { TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { admins } from '@blog/db/schema/admins';
 import { users } from '@blog/db/schema/auth';
 import {
   blockedSignupIdentities,
   type TBlockedSignupIdentity,
 } from '@blog/db/schema/blocked-signup-identities';
-import { readReportedPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { okResult, type TResult } from '@blog/utils';
 import { desc, eq } from 'drizzle-orm';
 
@@ -24,7 +23,6 @@ export async function listBlockedIdentities(): Promise<
   const rows = await db
     .select({
       entry: blockedSignupIdentities,
-      addedByEmail: users.email,
       addedByEmailEncrypted: users.emailEncrypted,
     })
     .from(blockedSignupIdentities)
@@ -36,13 +34,9 @@ export async function listBlockedIdentities(): Promise<
     );
 
   return okResult(
-    rows.map(({ entry, addedByEmail, addedByEmailEncrypted }) => ({
+    rows.map(({ entry, addedByEmailEncrypted }) => ({
       ...entry,
-      addedByEmail: readReportedPersonalValue(
-        PERSONAL_DATA_OWNER.USER,
-        addedByEmailEncrypted,
-        addedByEmail,
-      ),
+      addedByEmail: decryptOptionalPersonalValue(addedByEmailEncrypted),
     })),
   );
 }

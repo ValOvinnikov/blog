@@ -9,7 +9,11 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { EMAIL_ENCRYPTED_COLUMN, EMAIL_INDEX_COLUMN } from './columns';
+import {
+  EMAIL_ENCRYPTED_COLUMN,
+  EMAIL_EXACT_INDEX_COLUMN,
+  EMAIL_INDEX_COLUMN,
+} from './columns';
 import { tenants } from './tenants';
 
 function mintUnusableTokenHash(): string {
@@ -25,9 +29,9 @@ export const subscribers = pgTable(
     tenantId: uuid('tenant_id')
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
-    email: text('email').notNull(),
-    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
-    emailIndex: text(EMAIL_INDEX_COLUMN),
+    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN).notNull(),
+    emailIndex: text(EMAIL_INDEX_COLUMN).notNull(),
+    emailExactIndex: text(EMAIL_EXACT_INDEX_COLUMN),
     status: text('status', {
       enum: Object.values(SUBSCRIBER_STATUS) as [
         TSubscriberStatus,
@@ -54,7 +58,7 @@ export const subscribers = pgTable(
     confirmationSentAt: timestamp('confirmation_sent_at', { mode: 'date' }),
   },
   (subscriber) => [
-    unique().on(subscriber.tenantId, subscriber.email),
+    unique().on(subscriber.tenantId, subscriber.emailExactIndex),
     index('subscribers_tenant_email_index_idx').on(
       subscriber.tenantId,
       subscriber.emailIndex,

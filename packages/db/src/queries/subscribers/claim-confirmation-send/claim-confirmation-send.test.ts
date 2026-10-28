@@ -5,7 +5,6 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
@@ -19,7 +18,6 @@ vi.mock('@blog/db/client');
 const COOLDOWN_MS = 15 * 60_000;
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 beforeEach(() => {
   vi.useFakeTimers({ now: MOCK_CONFIRMATION_NOW, toFake: ['Date'] });

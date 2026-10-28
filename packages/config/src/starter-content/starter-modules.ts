@@ -8,8 +8,6 @@ import type {
 
 import {
   BRAND_VARIANT,
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
   CTA_VARIANT,
   HERO_VARIANT,
   type TLocaleIsoCode,
@@ -22,8 +20,9 @@ import {
   moduleHeadingBlock,
   reference,
 } from './starter-fields';
+import { ctaButton } from './starter-links';
 
-type TModuleInput = {
+export type TModuleInput = {
   id: string;
   title: string;
   locale: TLocaleIsoCode;
@@ -97,15 +96,7 @@ export function buildCalloutCta({
     bandTone: BRAND_VARIANT.PRIMARY,
     variant: CTA_VARIANT.CALLOUT,
     headingBlock: moduleHeadingBlock(locale, heading, supportingText),
-    ctaButtons: [
-      {
-        _key: linkId,
-        _type: 'ctaButton',
-        variant: CTA_ACTION_VARIANT.PRIMARY,
-        appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-        link: reference(linkId),
-      },
-    ],
+    ctaButtons: [ctaButton(linkId)],
   };
 }
 

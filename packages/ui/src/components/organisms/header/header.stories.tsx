@@ -71,15 +71,20 @@ const SiteHeader = ({
         links={navLinks}
         layout={args.layout}
         submenuStyle={submenuStyle}
-        panelActions={<ThemeToggle isDark={false} onToggle={() => {}} />}
-        actions={<button type="button">Sign in</button>}
         mobileToggle={{
           isOpen: isMenuOpen,
           onToggle: () => setIsMenuOpen((current) => !current),
           ariaLabel: 'Toggle navigation menu',
           panelId: 'header-story-menu',
         }}
-      />
+      >
+        <PrimaryNavigation.PanelActions>
+          <ThemeToggle isDark={false} onToggle={() => {}} />
+        </PrimaryNavigation.PanelActions>
+        <PrimaryNavigation.Actions>
+          <button type="button">Sign in</button>
+        </PrimaryNavigation.Actions>
+      </PrimaryNavigation>
     </Header>
   );
 };

@@ -7,12 +7,21 @@ import {
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { type ReactNode, useId } from 'react';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+  type TCompoundComponent,
+} from '@blog/ui/lib/react';
+import { type ElementType, Fragment } from 'react';
 
+import { PrimaryNavigationActions } from './components/actions/primary-navigation-actions';
+import { PrimaryNavigationDrawerActions } from './components/drawer-actions/primary-navigation-drawer-actions';
 import {
   PrimaryNavigationItem,
   type TPrimaryNavigationItemProps,
 } from './components/item/primary-navigation-item';
+import { PrimaryNavigationMobilePanel } from './components/mobile-panel/primary-navigation-mobile-panel';
+import { PrimaryNavigationPanelActions } from './components/panel-actions/primary-navigation-panel-actions';
 import {
   primaryNavigationVariants,
   type TPrimaryNavigationVariants,
@@ -35,12 +44,17 @@ export type TPrimaryNavigationMobileToggleProps = {
   panelId: string;
 };
 
+const PrimaryNavigationParts = {
+  Actions: PrimaryNavigationActions,
+  PanelActions: PrimaryNavigationPanelActions,
+  DrawerActions: PrimaryNavigationDrawerActions,
+} satisfies Record<string, ElementType>;
+
 export type TPrimaryNavigationProps = IWithClassName &
   IWithDataTestId & {
     links: INavItem[];
-    actions?: ReactNode;
-    panelActions?: ReactNode;
-    drawerActions?: ReactNode;
+    children?: TCompoundChildren<typeof PrimaryNavigationParts>;
+    groupName?: string;
     ariaLabel?: string;
     linkAs?: TAnchorElementType;
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
@@ -48,12 +62,11 @@ export type TPrimaryNavigationProps = IWithClassName &
     submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'];
   };
 
-/** Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel; a link with `subItems` opens them as a sub-menu in the bar and in place in the panel. */
-export const PrimaryNavigation = ({
+/** Top-level `<nav>` landmark; a link with `subItems` opens them as a sub-menu in the bar and in place in the phone menu, where only one `groupName` disclosure is open at a time. */
+const PrimaryNavigationRoot = ({
   links,
-  actions,
-  panelActions,
-  drawerActions,
+  children,
+  groupName,
   ariaLabel = 'Primary',
   className,
   dataTestId,
@@ -62,17 +75,16 @@ export const PrimaryNavigation = ({
   layout,
   submenuStyle,
 }: TPrimaryNavigationProps) => {
-  const groupName = useId();
+  const { slots, unmatched } = mapCompoundSlots(
+    children,
+    PrimaryNavigationParts,
+  );
   const {
     root,
     links: linksSlot,
     controls,
     toggle,
-    panel,
-    panelLink,
     barPanelActions,
-    panelActionsRow,
-    drawerActionsRow,
   } = primaryNavigationVariants({
     collapsible: Boolean(mobileToggle),
     layout,
@@ -94,12 +106,12 @@ export const PrimaryNavigation = ({
           />
         ))}
       </div>
-      {(panelActions || actions || mobileToggle) && (
+      {(slots.PanelActions || slots.Actions || mobileToggle) && (
         <div className={controls()}>
-          {panelActions && (
-            <div className={barPanelActions()}>{panelActions}</div>
+          {slots.PanelActions && (
+            <div className={barPanelActions()}>{slots.PanelActions}</div>
           )}
-          {actions}
+          {slots.Actions}
           {mobileToggle && (
             <IconButton
               variant="circle"
@@ -119,38 +131,25 @@ export const PrimaryNavigation = ({
         </div>
       )}
       {mobileToggle && (
-        <div
-          id={mobileToggle.panelId}
-          hidden={!mobileToggle.isOpen}
-          className={panel()}
-          data-testid="primary-navigation-mobile-panel"
-        >
-          {links.map((item) => (
-            <PrimaryNavigationItem
-              key={item.href}
-              item={item}
-              linkAs={linkAs}
-              panel={{ groupName, linkClassName: panelLink() }}
-            />
-          ))}
-          {panelActions && mobileToggle.isOpen && (
-            <div
-              className={panelActionsRow()}
-              data-testid="primary-navigation-panel-actions"
-            >
-              {panelActions}
-            </div>
-          )}
-          {drawerActions && mobileToggle.isOpen && (
-            <div
-              className={drawerActionsRow()}
-              data-testid="primary-navigation-drawer-actions"
-            >
-              {drawerActions}
-            </div>
-          )}
-        </div>
+        <PrimaryNavigationMobilePanel
+          links={links}
+          panelId={mobileToggle.panelId}
+          isOpen={mobileToggle.isOpen}
+          groupName={groupName}
+          layout={layout}
+          linkAs={linkAs}
+          panelActions={slots.PanelActions}
+          drawerActions={slots.DrawerActions}
+        />
       )}
+      {unmatched.map((node, i) => (
+        <Fragment key={i}>{node}</Fragment>
+      ))}
     </nav>
   );
 };
+
+export const PrimaryNavigation: TCompoundComponent<
+  typeof PrimaryNavigationRoot,
+  typeof PrimaryNavigationParts
+> = Object.assign(PrimaryNavigationRoot, PrimaryNavigationParts);

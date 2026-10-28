@@ -35,6 +35,7 @@ export const headerVariants = tv({
       [HEADER_BAR_STYLE.FLOATING]: {
         root: ['px-3 pt-3'],
         inner: [
+          'relative',
           'rounded-card border border-border bg-primary shadow-float',
           HEADER_ANCHOR,
         ],

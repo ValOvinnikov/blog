@@ -1,25 +1,11 @@
-import type {
-  Block_faq,
-  Module_faq,
-} from '@blog/config/sanity/generated/types';
-
-import { BRAND_VARIANT, type TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
-import type {
-  TStarterDocument,
-  TStarterDocumentUnion,
-  TStarterModule,
-} from './starter-document';
+import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import {
-  keyedReference,
-  localizedListedText,
-  localizedString,
-  moduleHeadingBlock,
-  reference,
-} from './starter-fields';
+import { buildFaqModule } from './starter-faq';
+import { keyedReference, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   buildAuthor,
@@ -31,34 +17,6 @@ import {
 
 const ids = STARTER_DOCUMENT_IDS;
 
-function buildFaq(
-  locale: TLocaleIsoCode,
-  { faq }: TStarterCopy['personal'],
-): TStarterDocumentUnion[] {
-  const questions = faq.questions.map(
-    ({ question, answer }, index) =>
-      ({
-        _id: `${ids.PERSONAL_FAQ}Question${index + 1}`,
-        _type: 'block_faq',
-        title: question,
-        question: localizedString(locale, question),
-        answer: localizedListedText(locale, answer),
-      }) satisfies TStarterDocument<Block_faq, 'title' | 'question' | 'answer'>,
-  );
-
-  return [
-    ...questions,
-    {
-      _id: ids.PERSONAL_FAQ,
-      _type: 'module_faq',
-      title: 'Questions',
-      brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: moduleHeadingBlock(locale, faq.heading),
-      questions: questions.map(({ _id }) => keyedReference(_id)),
-    } satisfies TStarterModule<Module_faq>,
-  ];
-}
-
 export function buildPersonalDocuments({
   siteName,
   locale,
@@ -68,8 +26,7 @@ export function buildPersonalDocuments({
   locale: TLocaleIsoCode;
   copy: TStarterCopy;
 }): TStarterDocumentUnion[] {
-  const { personal } = copy;
-  const { hero, intro, cta, writing } = personal;
+  const { hero, intro, faq, cta, writing } = copy.personal;
 
   return [
     ...buildBaseDocuments({
@@ -100,7 +57,12 @@ export function buildPersonalDocuments({
       locale,
       body: intro.body,
     }),
-    ...buildFaq(locale, personal),
+    ...buildFaqModule({
+      id: ids.PERSONAL_FAQ,
+      title: 'Questions',
+      locale,
+      faq,
+    }),
     buildCalloutCta({
       id: ids.PERSONAL_CTA,
       title: 'Read the Writing',

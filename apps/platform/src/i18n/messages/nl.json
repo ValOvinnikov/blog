@@ -1344,6 +1344,25 @@
     "unavailableTitle": "Releasestatus is niet beschikbaar",
     "unavailableDescription": "GitHub was niet bereikbaar, dus de laatste releaserun wordt niet getoond."
   },
+  "tenantMigrationsCard": {
+    "title": "Tenantmigraties",
+    "description": "Voer contentmigraties uit op development, of probeer een tenant opnieuw waarvan de productiemigratie is mislukt.",
+    "failed": "Migratie mislukt",
+    "empty": "Bij geen enkele tenant is de contentmigratie mislukt.",
+    "unavailableTitle": "Mislukte migraties zijn niet beschikbaar",
+    "unavailableDescription": "Het tenantregister kon niet worden gelezen, dus tenants waarvan de migratie is mislukt worden niet getoond."
+  },
+  "runTenantMigrationsButton": {
+    "developmentLabel": "Uitvoeren op development",
+    "retryLabel": "Opnieuw op productie",
+    "retryAriaLabel": "{tenant} opnieuw op productie",
+    "starting": "Bezig met starten…",
+    "started": "Tenantmigraties gestart.",
+    "tenantRequired": "Productiemigraties draaien voor één tenant tegelijk.",
+    "notFailed": "De laatste migratie van die tenant is niet mislukt, dus er is niets om opnieuw te proberen.",
+    "failedTenantsUnavailable": "Het tenantregister kon niet worden gelezen. Probeer het zo opnieuw.",
+    "startFailed": "Er is niets gestart: de tenantmigraties konden niet worden aangevraagd."
+  },
   "releaseRunStatus": {
     "status": {
       "DISPATCHED": "Aangevraagd",
@@ -1358,7 +1377,7 @@
       "FAILED": "De release is mislukt en de stappen na de fout zijn niet uitgevoerd."
     },
     "tenantMigrationFailedTitle": "Een tenantmigratie is mislukt",
-    "tenantMigrationFailedDescription": "De deploy is niet uitgevoerd, dus de live site is ongewijzigd. Probeer die tenant opnieuw met ‘Tenantmigraties uitvoeren’ op deze pagina.",
+    "tenantMigrationFailedDescription": "De deploy is niet uitgevoerd, dus de live site is ongewijzigd. Probeer die tenant opnieuw onder ‘Tenantmigraties’ op deze pagina.",
     "viewRun": "Bekijk de run"
   },
   "startReleaseDialog": {

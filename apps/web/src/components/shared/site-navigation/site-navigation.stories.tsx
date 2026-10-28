@@ -7,12 +7,13 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { AccountMenuGroup, AuthMenu } from '@web/components/shared/auth-menu';
+import { AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import {
+  MOCK_ABOUT_LINK,
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
   MOCK_TOPICS_LINK,
@@ -43,7 +44,9 @@ const clickButton = async (
 const openDrawerAccountRow = async (canvas: TCanvas, row: { name: string }) => {
   await clickButton(canvas, TOGGLE_MENU);
   const drawerActions = await canvas.findByTestId(DRAWER_ACTIONS_TEST_ID);
-  const accountRow = within(drawerActions).getByRole('button', row);
+  const accountRow = within(drawerActions).getByText(row.name, {
+    selector: 'summary',
+  });
   await userEvent.click(accountRow);
 };
 
@@ -114,12 +117,10 @@ const ACCOUNT_IN_MENU = {
 
 const headerControlsWithAccountInMenu = {
   ...headerControls,
-  drawerActions: (
-    <AccountMenuGroup
-      oauthProviderIds={['github']}
-      panelStyle={ACCOUNT_IN_MENU.panelStyle}
-    />
-  ),
+  menuAccount: {
+    oauthProviderIds: ['github'] as const,
+    panelStyle: ACCOUNT_IN_MENU.panelStyle,
+  },
   actions: (
     <AuthMenu oauthProviderIds={['github']} accountControl={ACCOUNT_IN_MENU} />
   ),
@@ -264,5 +265,28 @@ export const MobileSignInInMenu: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await openDrawerAccountRow(canvas, SIGN_IN_BUTTON);
+  },
+};
+
+const linksWithSubItems = [
+  ...links,
+  {
+    ...MOCK_ABOUT_LINK,
+    subItems: [MOCK_ABOUT_LINK, MOCK_BLOG_LINK, MOCK_TOPICS_LINK],
+  },
+];
+
+/** Opening a sub-menu in the phone menu folds the open account row, and the menu stays open. */
+export const MobileSubMenuFoldsAccountRow: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: { ...headerControlsWithAccountInMenu, links: linksWithSubItems },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await openDrawerAccountRow(canvas, SIGN_IN_BUTTON);
+    const subMenuRow = canvas.getByText(MOCK_ABOUT_LINK.label, {
+      selector: 'summary',
+    });
+    await userEvent.click(subMenuRow);
   },
 };

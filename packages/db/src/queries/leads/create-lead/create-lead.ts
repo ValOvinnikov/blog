@@ -1,31 +1,23 @@
 import { getDb } from '@blog/db/client';
-import { leads, type TLead } from '@blog/db/schema/leads';
 import {
-  encryptPersonalValue,
-  emailColumns,
-} from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
+  leadContentColumns,
+  type TLeadContent,
+} from '@blog/db/queries/leads/lead-content';
+import { leads, type TLead } from '@blog/db/schema/leads';
 
-export type TCreateLeadInput = Pick<
-  TLead,
-  'tenantId' | 'name' | 'email' | 'message' | 'sourcePath'
-> &
+export type TCreateLeadInput = Pick<TLead, 'tenantId' | 'sourcePath'> &
+  TLeadContent &
   Partial<Pick<TLead, 'sourceDocumentId' | 'sourceLocale'>>;
 
 export async function createLead(
   input: TCreateLeadInput,
 ): Promise<Pick<TLead, 'id'>> {
   const db = getDb();
-  const { name, email, message } = input;
+  const { name, email, message, ...lead } = input;
 
   const [row] = await db
     .insert(leads)
-    .values({
-      ...input,
-      nameEncrypted: encryptPersonalValue(name),
-      ...emailColumns(email, personalDataIndex),
-      messageEncrypted: encryptPersonalValue(message),
-    })
+    .values({ ...lead, ...leadContentColumns({ name, email, message }) })
     .returning({ id: leads.id });
 
   if (!row) {

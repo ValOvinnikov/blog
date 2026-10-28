@@ -47,16 +47,10 @@ export const saveVoiceOverridesAction = async (
   const { tenant } = await requireTenantMembership(tenantId);
 
   try {
-    const { preset, accentHue, headingFont, bodyFont, radiusScale, density } =
-      await getSiteConfigOrDefaults(tenant.id);
+    const { preset } = await getSiteConfigOrDefaults(tenant.id);
 
     const result = await queries.siteConfig.upsertSiteConfig(tenant.id, {
       preset,
-      accentHue,
-      headingFont,
-      bodyFont,
-      radiusScale,
-      density,
       voiceOverridesByLocale: parsed.data,
     });
 
