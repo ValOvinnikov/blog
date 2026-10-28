@@ -1,2 +1,2 @@
 export { AuthMenu } from './auth-menu';
-export { AccountRow } from './components/account-row/account-row';
+export { AccountMenuGroup } from './components/account-menu-group/account-menu-group';

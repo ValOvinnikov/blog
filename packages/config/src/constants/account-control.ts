@@ -21,3 +21,9 @@ export const ACCOUNT_PHONE_PLACEMENT = {
 } as const;
 
 export type TAccountPhonePlacement = TValueOf<typeof ACCOUNT_PHONE_PLACEMENT>;
+
+export interface IAccountControl {
+  buttonStyle: TAccountButtonStyle;
+  panelStyle: TAccountPanelStyle;
+  phonePlacement: TAccountPhonePlacement;
+}
