@@ -5732,6 +5732,14 @@
         "file": "apps/web/src/constants/bookmark.ts"
       }
     ],
+    "busy_style.site_config_fetch_failed": [
+      {
+        "ref": "BUSY_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/busy-style",
+        "file": "apps/web/src/constants/busy-style.ts"
+      }
+    ],
     "client_log.report_received": [
       {
         "ref": "CLIENT_LOG_LOG.REPORT_RECEIVED",

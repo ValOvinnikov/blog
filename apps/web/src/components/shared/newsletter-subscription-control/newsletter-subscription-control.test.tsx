@@ -3,6 +3,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 import { useRouter } from 'next/navigation';
 
 import { NewsletterSubscriptionControl } from './newsletter-subscription-control';
@@ -91,7 +92,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
         await user.click(button);
 
-        const toast = await screen.findByRole('status');
+        const toast = await findToastStatus();
         expect(toast).toHaveTextContent(successMessage);
         expect(actionMock).toHaveBeenCalledTimes(1);
         await waitFor(() => {
@@ -126,14 +127,14 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
 
         await user.click(button);
 
-        const progressToast = await screen.findByRole('status');
+        const progressToast = await findToastStatus();
         expect(progressToast).toHaveTextContent(loadingMessage);
         expect(button).toHaveAttribute('aria-busy', 'true');
 
         resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 
         await waitFor(() => {
-          expect(button).toHaveAttribute('aria-busy', 'false');
+          expect(button).not.toHaveAttribute('aria-busy');
         });
       });
     },

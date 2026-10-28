@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 import { useRouter } from 'next/navigation';
 
 import { DisplayNameControl } from './display-name-control';
@@ -77,7 +78,7 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     await user.type(nameField, MOCK_NEW_NAME);
     await user.click(saveButton);
 
-    const successToast = await screen.findByRole('status');
+    const successToast = await findToastStatus();
 
     expect(successToast).toHaveTextContent(SAVE_SUCCESS_MESSAGE);
     expect(updateDisplayNameActionMock).toHaveBeenCalledWith(MOCK_NEW_NAME);

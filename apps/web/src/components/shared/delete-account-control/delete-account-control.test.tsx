@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 
 import { DeleteAccountControl } from './delete-account-control';
 
@@ -89,7 +90,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     });
     await armAndClickDelete();
 
-    const successToast = await screen.findByRole('status');
+    const successToast = await findToastStatus();
 
     expect(successToast).toHaveTextContent(SUCCESS_MESSAGE);
     expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: routes.home() });
@@ -112,7 +113,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     resolveDelete({ outcome: ACTION_OUTCOME.SUCCESS });
 
     await waitFor(() => {
-      expect(deleteButton).toHaveAttribute('aria-busy', 'false');
+      expect(deleteButton).not.toHaveAttribute('aria-busy');
     });
   });
 

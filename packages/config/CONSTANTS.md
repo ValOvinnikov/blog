@@ -459,6 +459,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`
 
+### `@web/constants/busy-style` — `apps/web/src/constants/busy-style.ts`
+
+- **BUSY_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"busy_style.site_config_fetch_failed"`
+
 ### `@web/constants/client-log` — `apps/web/src/constants/client-log.ts`
 
 - **CLIENT_LOG_LOG**: `REPORT_RECEIVED`=`"client_log.report_received"`

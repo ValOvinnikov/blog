@@ -5,6 +5,7 @@ import { Alert } from '@blog/ui/components/atoms/alert';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { Textarea } from '@blog/ui/components/atoms/textarea';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { ContactFormField } from '@web/modules/contact-form/components/contact-form-field/contact-form-field';
 import { ContactFormSuccess } from '@web/modules/contact-form/components/contact-form-success/contact-form-success';
 import {
@@ -42,6 +43,7 @@ export const ContactForm = ({
   submitMessage,
 }: TContactFormProps) => {
   const t = useTranslations('contactForm');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const id = useId();
   const {
     formRef,
@@ -133,10 +135,12 @@ export const ContactForm = ({
           <div className={s.actions()}>
             <Button
               type="submit"
-              isDisabled={isSubmitting}
-              aria-busy={isSubmitting}
+              isBusy={isSubmitting}
+              busyLabel={t('submittingLabel')}
+              busyStyle={busyStyle}
+              spinnerVariant={spinnerVariant}
             >
-              {isSubmitting ? t('submittingLabel') : t('submitLabel')}
+              {t('submitLabel')}
             </Button>
             {privacyNote && (
               <div className={s.privacyNote()}>{privacyNote}</div>

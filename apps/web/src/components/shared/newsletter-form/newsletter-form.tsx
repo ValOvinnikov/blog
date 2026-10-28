@@ -13,6 +13,7 @@ import {
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import {
   subscribeToNewsletterAction,
   type TSubscribeResult,
@@ -49,6 +50,7 @@ export const NewsletterForm = ({
   className,
 }: TNewsletterFormProps) => {
   const t = useTranslations('newsletterForm');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [errorMessage, setErrorMessage] =
@@ -94,6 +96,9 @@ export const NewsletterForm = ({
     errorMessageId,
     successMessage: t('successMessage'),
     submitLabel: t('submitLabel'),
+    busyLabel: t('submittingLabel'),
+    busyStyle,
+    spinnerVariant,
     emailAriaLabel: t('emailAriaLabel'),
     placeholder: t('placeholder'),
     align,

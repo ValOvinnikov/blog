@@ -3,6 +3,7 @@
 import { ACTION_OUTCOME, routes } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import { deleteAccountAction } from '@web/server/account/account-actions/account-actions';
 import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
@@ -20,6 +21,7 @@ export const DeleteAccountControl = ({
   handle,
 }: TDeleteAccountControlProps) => {
   const t = useTranslations('accountPage.privacy');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const toast = useToast();
   const [typed, setTyped] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -71,8 +73,11 @@ export const DeleteAccountControl = ({
       />
       <Button
         variant="danger"
-        isDisabled={!isArmed || isPending}
-        aria-busy={isPending}
+        isDisabled={!isArmed}
+        isBusy={isPending}
+        busyLabel={t('deletingLabel')}
+        busyStyle={busyStyle}
+        spinnerVariant={spinnerVariant}
         onClick={handleDelete}
       >
         {t('deleteButton')}

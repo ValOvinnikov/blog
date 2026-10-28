@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 import { useRouter } from 'next/navigation';
 
 import { ProviderLinkControl } from './provider-link-control';
@@ -88,7 +89,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
       resolveSignIn();
 
       await waitFor(() => {
-        expect(linkButton).toHaveAttribute('aria-busy', 'false');
+        expect(linkButton).not.toHaveAttribute('aria-busy');
       });
     });
   });
@@ -106,7 +107,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
 
       await user.click(unlinkButton);
 
-      const successToast = await screen.findByRole('status');
+      const successToast = await findToastStatus();
 
       expect(successToast).toHaveTextContent(UNLINK_SUCCESS_MESSAGE);
       expect(unlinkProviderActionMock).toHaveBeenCalledWith(PROVIDER);
