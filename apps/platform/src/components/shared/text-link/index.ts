@@ -1,1 +1,1 @@
-export { AuthCrossLink } from './auth-cross-link';
+export { TextLink } from './text-link';

@@ -1,11 +1,11 @@
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
-import { AuthCrossLink } from '@platform/components/features/sign-in/auth-cross-link';
 import { SignInOptions } from '@platform/components/features/sign-in/sign-in-options';
 import { Alert } from '@platform/components/shared/alert';
 import { Heading } from '@platform/components/shared/heading';
 import { Text } from '@platform/components/shared/text';
+import { TextLink } from '@platform/components/shared/text-link';
 import { SIGN_IN_ERROR, type TSignInError } from '@platform/constants/sign-in';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
@@ -46,9 +46,7 @@ export const SignInView = ({
         <Text variant="hint" className={footer()}>
           {t.rich('signUpPrompt', {
             link: (chunks) => (
-              <AuthCrossLink href={adminRoutes.signUp()}>
-                {chunks}
-              </AuthCrossLink>
+              <TextLink href={adminRoutes.signUp()}>{chunks}</TextLink>
             ),
           })}
         </Text>

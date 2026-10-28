@@ -1,15 +1,15 @@
 import { Link } from '@platform/i18n/navigation';
 import type { ReactNode } from 'react';
 
-import { authCrossLinkVariants } from './auth-cross-link-variants';
+import { textLinkVariants } from './text-link-variants';
 
-export type TAuthCrossLinkProps = {
+export type TTextLinkProps = {
   href: string;
   children: ReactNode;
 };
 
-export const AuthCrossLink = ({ href, children }: TAuthCrossLinkProps) => (
-  <Link href={href} className={authCrossLinkVariants()}>
+export const TextLink = ({ href, children }: TTextLinkProps) => (
+  <Link href={href} className={textLinkVariants()}>
     {children}
   </Link>
 );
