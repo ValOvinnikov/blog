@@ -86,6 +86,7 @@
     "presetHint": "Un style de départ pour votre site. Vous pourrez l’ajuster après sa création.",
     "accentLabel": "Couleur d’accent",
     "previewNamePlaceholder": "Votre site",
+    "previewAddressPlaceholder": "votre-site",
     "createSite": "Créer le site",
     "creating": "Création de votre site…",
     "failureTitle": "Nous n’avons pas pu créer votre site",
@@ -656,6 +657,14 @@
     "themeToggleDark": "Passer au thème sombre",
     "themeToggleLight": "Passer au thème clair",
     "menuButton": "Menu"
+  },
+  "frontPageSample": {
+    "heroHeading": "Chroniques de la côte",
+    "heroText": "Notes, essais et photographies.",
+    "heroButton": "Lire les derniers articles",
+    "firstPostTitle": "Un matin sur la jetée",
+    "secondPostTitle": "Marée basse, lumière du soir",
+    "thirdPostTitle": "Le port en hiver"
   },
   "assetUploadField": {
     "remove": "Supprimer",

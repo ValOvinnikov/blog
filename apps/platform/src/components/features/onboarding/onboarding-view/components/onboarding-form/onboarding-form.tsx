@@ -48,9 +48,9 @@ export const OnboardingForm = ({
     isLastStep,
     isContinueDisabled,
     panelRef,
-    addressStatus,
-    addressError,
+    addressVerdict,
     siteAddress,
+    previewAddress,
     railSteps,
     changeField,
     changePreset,
@@ -95,7 +95,7 @@ export const OnboardingForm = ({
                   <AddressStepFields
                     values={values}
                     rootDomain={rootDomain}
-                    isAddressInvalid={Boolean(addressError)}
+                    isAddressInvalid={Boolean(addressVerdict.error)}
                     onFieldChange={changeField}
                   />
                 )}
@@ -132,17 +132,14 @@ export const OnboardingForm = ({
               onContinue={goNext}
             >
               {step === ONBOARDING_STEP.ADDRESS && (
-                <AddressVerdict
-                  siteAddress={siteAddress}
-                  status={addressStatus}
-                  error={addressError}
-                />
+                <AddressVerdict verdict={addressVerdict} />
               )}
             </OnboardingActions>
           </div>
           <div className={preview()}>
             <OnboardingPreview
               name={values.name}
+              siteAddress={previewAddress}
               locale={values.locale}
               preset={values.preset}
               accentHue={values.accentHue}

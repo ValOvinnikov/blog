@@ -6,6 +6,7 @@ import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
 
+import type { TAddressVerdict } from './components/address-verdict';
 import type { TOnboardingRailStep } from './components/onboarding-rail';
 import { useOnboardingForm } from './use-onboarding-form';
 import { ONBOARDING_STEPS, useOnboardingSteps } from './use-onboarding-steps';
@@ -26,8 +27,17 @@ export const useOnboardingWizard = (
     addressStatus: addressCheck.status,
     flagField,
   });
-  const siteAddress = rootDomain ? `${values.slug}.${rootDomain}` : values.slug;
-  const addressError = fieldErrors.slug?.reason ?? addressCheck.error;
+  const toAddress = (slug: string) =>
+    rootDomain ? `${slug}.${rootDomain}` : slug;
+  const siteAddress = toAddress(values.slug);
+  const previewAddress = toAddress(
+    values.slug || t('previewAddressPlaceholder'),
+  );
+  const addressVerdict: TAddressVerdict = {
+    siteAddress,
+    status: addressCheck.status,
+    error: fieldErrors.slug?.reason ?? addressCheck.error,
+  };
 
   const summaries = {
     [ONBOARDING_STEP.SITE]: t('siteSummary', {
@@ -54,9 +64,9 @@ export const useOnboardingWizard = (
   return {
     ...form,
     ...steps,
-    addressStatus: addressCheck.status,
-    addressError,
+    addressVerdict,
     siteAddress,
+    previewAddress,
     railSteps,
     handleSubmit,
   };

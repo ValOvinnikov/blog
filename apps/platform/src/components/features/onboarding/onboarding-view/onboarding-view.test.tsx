@@ -46,6 +46,8 @@ const MOCK_ADDRESS_CHECKING = 'Checking the address…';
 const MOCK_ADDRESS_TAKEN = 'This address is taken. Choose another.';
 const MOCK_ADDRESS_UNVERIFIED =
   'We couldn’t check this address right now. You can continue — we’ll check it again when you create the site.';
+const MOCK_PLACEHOLDER_ADDRESS = `your-site.${MOCK_TENANT_ROOT_DOMAIN}`;
+const MOCK_LIVE_PREVIEW = { name: 'Live preview' };
 
 const MOCK_CREATE_SITE_INPUT = {
   siteType: SITE_TYPE.BLOG,
@@ -178,6 +180,24 @@ describe(`<${OnboardingView.name}/>`, () => {
 
     expect(available).toBeVisible();
     expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_SLUG);
+  });
+
+  it('shows a placeholder address in the preview before one is typed', async () => {
+    await completeSiteStep();
+
+    const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+
+    expect(preview).toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
+  });
+
+  it('shows the typed address in the preview', async () => {
+    await completeSiteStep();
+    await typeAddress();
+
+    const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+
+    expect(preview).toHaveTextContent(MOCK_SITE_ADDRESS);
+    expect(preview).not.toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
   });
 
   it('keeps a taken address from continuing', async () => {

@@ -4,7 +4,8 @@ import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Panel } from '@blog/ui/components/molecules/panel';
-import { SampleSiteHeader } from '@platform/components/features/site-preview/look-sample/components/sample-site-header';
+import { SampleChip } from '@platform/components/features/site-preview/sample-chip';
+import { SampleSiteHeader } from '@platform/components/features/site-preview/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -33,7 +34,7 @@ export const LookSample = ({
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, actionsRow, chip, cards, outlinedCard } = lookSampleVariants();
+  const { root, actionsRow, cards, outlinedCard } = lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -42,13 +43,13 @@ export const LookSample = ({
       testId="look-sample-tokens"
     >
       <SampleSiteHeader
-        tenantName={tenantName}
-        logoSrc={logoSrc}
+        brand={{ name: tenantName, logoSrc }}
         liveLocales={liveLocales}
         header={header}
         hasReaderAccounts={hasReaderAccounts}
         isNarrow={isNarrow}
         isDark={theme.isDark}
+        isSubmenuOpen={true}
       />
       <Heading level={3} visual="preview">
         {t('sampleHeading')}
@@ -61,7 +62,7 @@ export const LookSample = ({
         <Button type="button" variant="ghost" size={SIZE.SM}>
           {t('readMoreButton')}
         </Button>
-        <span className={chip()}>{t('readTimeChip')}</span>
+        <SampleChip>{t('readTimeChip')}</SampleChip>
       </div>
       <div className={cards()}>
         <MediaCard isInteractive={true} excerpt={t('firstCardExcerpt')}>

@@ -96,7 +96,13 @@ Free site.
   site" and the step list, where each done step shows its choice ("Blog ·
   Field Notes", the site address, the preset); the current step's fields sit
   in the middle with Back / Continue, and the live site preview stays on the
-  right on every step. Below `lg` the rail is a top band reading "Step N of 4
+  right on every step. The preview is framed as the new site in a browser: an
+  address bar shows `<slug>.<TENANT_ROOT_DOMAIN>` as it is typed
+  (`your-site.<TENANT_ROOT_DOMAIN>` before then), and below it a sample front
+  page (`FrontPageSample` in `site-preview/`) renders in the chosen preset,
+  accent and light/dark mode: the header with the typed site name and its
+  Topics sub-menu closed, a hero ("Dispatches from the coast") and three
+  posts. Below `lg` the rail is a top band reading "Step N of 4
   · <step>", and fields, Back / Continue and the preview stack in that order.
   The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
@@ -276,6 +282,7 @@ Free site.
   `accept-signup-terms-action.test.ts`, `legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
+  `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
   `sign-in-view`, `email-sign-in-form`,
   `workspace-pending-view` and `sign-out-button`.

@@ -5,8 +5,8 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
-import { SampleHeaderControls } from '@platform/components/features/site-preview/look-sample/components/sample-site-header/components/sample-header-controls/sample-header-controls';
-import { SampleHeaderLinks } from '@platform/components/features/site-preview/look-sample/components/sample-site-header/components/sample-header-links/sample-header-links';
+import { SampleHeaderControls } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/sample-header-controls';
+import { SampleHeaderLinks } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-links/sample-header-links';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
@@ -16,24 +16,29 @@ import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sam
 
 import { sampleSiteHeaderVariants } from './sample-site-header-variants';
 
-export type TSampleSiteHeaderProps = {
-  tenantName: string;
+type TSampleBrand = {
+  name: string;
   logoSrc: TMaybeUndefined<string>;
+};
+
+export type TSampleSiteHeaderProps = {
+  brand: TSampleBrand;
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
   hasReaderAccounts: boolean;
   isNarrow: boolean;
   isDark: boolean;
+  isSubmenuOpen: boolean;
 };
 
 export const SampleSiteHeader = ({
-  tenantName,
-  logoSrc,
+  brand: { name, logoSrc },
   liveLocales,
   header,
   hasReaderAccounts,
   isNarrow,
   isDark,
+  isSubmenuOpen,
 }: TSampleSiteHeaderProps) => {
   const { layout, submenuStyle, barStyle, languageSwitcherStyle } = header;
   const { root, inner, group, links, controls, brand, brandName } =
@@ -56,13 +61,14 @@ export const SampleSiteHeader = ({
     >
       <div className={inner()}>
         <div className={brand()}>
-          <BrandMark size={SIZE.SM} title={tenantName} src={logoSrc} />
-          <span className={brandName()}>{tenantName}</span>
+          <BrandMark size={SIZE.SM} title={name} src={logoSrc} />
+          <span className={brandName()}>{name}</span>
         </div>
         <div className={group()}>
           {hasLinks && (
             <SampleHeaderLinks
               submenuStyle={submenuStyle}
+              isSubmenuOpen={isSubmenuOpen}
               className={links()}
             />
           )}

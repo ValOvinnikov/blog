@@ -86,6 +86,7 @@
     "presetHint": "Ein Ausgangsstil für deine Website. Du kannst ihn nach dem Erstellen anpassen.",
     "accentLabel": "Akzentfarbe",
     "previewNamePlaceholder": "Deine Website",
+    "previewAddressPlaceholder": "deine-website",
     "createSite": "Website erstellen",
     "creating": "Deine Website wird erstellt…",
     "failureTitle": "Wir konnten deine Website nicht erstellen",
@@ -656,6 +657,14 @@
     "themeToggleDark": "Zum dunklen Design wechseln",
     "themeToggleLight": "Zum hellen Design wechseln",
     "menuButton": "Menü"
+  },
+  "frontPageSample": {
+    "heroHeading": "Berichte von der Küste",
+    "heroText": "Notizen, Essays und Fotografien.",
+    "heroButton": "Das Neueste lesen",
+    "firstPostTitle": "Ein Morgen auf dem Pier",
+    "secondPostTitle": "Ebbe, spätes Licht",
+    "thirdPostTitle": "Der Hafen im Winter"
   },
   "assetUploadField": {
     "remove": "Entfernen",

@@ -19,16 +19,18 @@ const VERDICT_ICON = {
   [SITE_ADDRESS_STATUS.UNVERIFIED]: ICONS.WARNING,
 } as const;
 
-export type TAddressVerdictProps = {
+export type TAddressVerdict = {
   siteAddress: string;
   status: TSiteAddressStatus;
   error: TMaybeUndefined<TCreateSiteFieldError>;
 };
 
+export type TAddressVerdictProps = {
+  verdict: TAddressVerdict;
+};
+
 export const AddressVerdict = ({
-  siteAddress,
-  status,
-  error,
+  verdict: { siteAddress, status, error },
 }: TAddressVerdictProps) => {
   const t = useTranslations('onboardingForm');
   const toErrorText = useFieldErrorText();

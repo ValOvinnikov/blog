@@ -1,1 +1,1 @@
-export { AddressVerdict } from './address-verdict';
+export { AddressVerdict, type TAddressVerdict } from './address-verdict';
