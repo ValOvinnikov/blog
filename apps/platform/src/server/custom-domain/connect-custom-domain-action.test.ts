@@ -76,8 +76,8 @@ const asMember = (overrides: Partial<TTenant> = {}) =>
 describe(connectCustomDomainAction, () => {
   beforeEach(() => {
     envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
-    delete envMock.WEB_APP_URL;
-    delete envMock.PLATFORM_APP_BASE_URL;
+    envMock.WEB_APP_URL = `https://${MOCK_WEB_HOST}`;
+    envMock.PLATFORM_APP_BASE_URL = `https://${MOCK_PLATFORM_HOST}`;
     vi.mocked(tenantDomains.isDomainHeldByAnyTenant)
       .mockReset()
       .mockResolvedValue(false);
@@ -169,8 +169,6 @@ describe(connectCustomDomainAction, () => {
     ['the platform app host', MOCK_PLATFORM_HOST],
   ])('reports %s as a platform address', async (_name, domain) => {
     asMember();
-    envMock.WEB_APP_URL = `https://${MOCK_WEB_HOST}`;
-    envMock.PLATFORM_APP_BASE_URL = `https://${MOCK_PLATFORM_HOST}`;
 
     const result = await connectCustomDomainAction(MOCK_TENANT_ID, { domain });
 
@@ -196,6 +194,30 @@ describe(connectCustomDomainAction, () => {
     );
     expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ['WEB_APP_URL', ['WEB_APP_URL']],
+    ['PLATFORM_APP_BASE_URL', ['PLATFORM_APP_BASE_URL']],
+  ] as const)(
+    'fails closed with a logged server error when %s is unset',
+    async (name, missing) => {
+      asMember();
+      delete envMock[name];
+
+      const result = await connectCustomDomainAction(
+        MOCK_TENANT_ID,
+        MOCK_INPUT,
+      );
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(logger.error).toHaveBeenCalledWith(
+        CUSTOM_DOMAIN_LOG.APP_URL_MISSING,
+        { tenantId: MOCK_TENANT_ID, missing },
+      );
+      expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+      expect(enqueueWorkerRequest).not.toHaveBeenCalled();
+    },
+  );
 
   it('refuses a tenant whose main address is already a custom domain', async () => {
     asMember({ primaryDomain: MOCK_OTHER_CUSTOM_DOMAIN });

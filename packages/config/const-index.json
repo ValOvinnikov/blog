@@ -3936,6 +3936,14 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
+    "custom_domain.app_url_missing": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.APP_URL_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "custom_domain.disconnect_audit_failed": [
       {
         "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED",

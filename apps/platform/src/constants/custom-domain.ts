@@ -33,6 +33,7 @@ export const CUSTOM_DOMAIN_LOG = {
   CONNECT_FAILED: 'custom_domain.connect_failed',
   CONNECT_ROLLBACK_FAILED: 'custom_domain.connect_rollback_failed',
   ROOT_DOMAIN_MISSING: 'custom_domain.root_domain_missing',
+  APP_URL_MISSING: 'custom_domain.app_url_missing',
   DISCONNECT_AUDIT_FAILED: 'custom_domain.disconnect_audit_failed',
   DISCONNECT_REJECTED_RESTORING: 'custom_domain.disconnect_rejected_restoring',
   DISCONNECT_RESTORE_FAILED: 'custom_domain.disconnect_restore_failed',

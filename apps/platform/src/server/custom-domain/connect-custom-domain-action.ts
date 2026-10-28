@@ -73,12 +73,18 @@ export const connectCustomDomainAction = async (
     logger.error(CUSTOM_DOMAIN_LOG.ROOT_DOMAIN_MISSING, { tenantId: id });
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
-  if (
-    isReservedDomain(domain, rootDomain, [
-      env.WEB_APP_URL,
-      env.PLATFORM_APP_BASE_URL,
-    ])
-  ) {
+  const { WEB_APP_URL: webAppUrl, PLATFORM_APP_BASE_URL: platformAppUrl } = env;
+  if (!webAppUrl || !platformAppUrl) {
+    logger.error(CUSTOM_DOMAIN_LOG.APP_URL_MISSING, {
+      tenantId: id,
+      missing: [
+        ...(webAppUrl ? [] : ['WEB_APP_URL']),
+        ...(platformAppUrl ? [] : ['PLATFORM_APP_BASE_URL']),
+      ],
+    });
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  }
+  if (isReservedDomain(domain, rootDomain, [webAppUrl, platformAppUrl])) {
     return fieldError(CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_PLATFORM_ADDRESS);
   }
 

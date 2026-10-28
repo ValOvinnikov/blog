@@ -8,7 +8,7 @@ import { isReservedDomain } from './is-reserved-domain';
 
 const WEB_APP_URL = 'https://web.example.net';
 const PLATFORM_APP_BASE_URL = 'https://admin.example.net';
-const APP_URLS = [WEB_APP_URL, PLATFORM_APP_BASE_URL, undefined];
+const APP_URLS = [WEB_APP_URL, PLATFORM_APP_BASE_URL];
 
 describe(isReservedDomain, () => {
   it.each([
