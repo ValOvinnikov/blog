@@ -188,7 +188,8 @@
     "roleChip": "{role} · {scope}"
   },
   "account": {
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "signedInAs": "Sesión iniciada como {email}"
   },
   "roleLabel": {
     "SUPERADMIN": "Superadministrador",

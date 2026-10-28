@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
 import { BrandMark } from '@platform/components/shared/brand-mark';
 import type { TOnboardingStep } from '@platform/constants/onboarding';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
@@ -16,6 +17,7 @@ export type TOnboardingRailStep = {
 export type TOnboardingRailProps = {
   steps: TOnboardingRailStep[];
   currentIndex: number;
+  accountEmail: TMaybeUndefined<string>;
 };
 
 const toIndicatorState = (index: number, currentIndex: number) => {
@@ -27,11 +29,21 @@ const toIndicatorState = (index: number, currentIndex: number) => {
 export const OnboardingRail = ({
   steps,
   currentIndex,
+  accountEmail,
 }: TOnboardingRailProps) => {
   const t = useTranslations('onboardingPage');
   const tForm = useTranslations('onboardingForm');
-  const { root, brand, brandName, intro, title, description, progress, list } =
-    onboardingRailVariants();
+  const {
+    root,
+    brand,
+    brandName,
+    intro,
+    title,
+    description,
+    progress,
+    list,
+    account,
+  } = onboardingRailVariants();
   const currentStep = steps[currentIndex];
 
   return (
@@ -64,6 +76,11 @@ export const OnboardingRail = ({
           />
         ))}
       </ol>
+      {accountEmail && (
+        <div className={account()}>
+          <SignedInAccount email={accountEmail} />
+        </div>
+      )}
     </header>
   );
 };

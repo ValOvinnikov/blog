@@ -13,5 +13,6 @@ export const onboardingRailVariants = tv({
     description: ['text-admin-13 text-admin-side-text'],
     progress: ['text-admin-13 font-semibold lg:hidden'],
     list: ['mt-8 hidden flex-col gap-1 lg:flex'],
+    account: ['lg:mt-auto lg:pt-8'],
   },
 });

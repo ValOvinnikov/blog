@@ -23,6 +23,8 @@ code:
   - apps/platform/src/utils/sign-in-error/**
   - apps/platform/src/components/features/layout/workspace-pending-view/**
   - apps/platform/src/components/features/layout/sign-out-button/**
+  - apps/platform/src/components/features/layout/signed-in-account/**
+  - apps/platform/src/server/auth/get-session-email*
   - apps/platform/src/server/auth/auth.ts
   - apps/platform/src/server/auth/require-session-user-id.ts
   - apps/platform/src/server/auth/resolve-home-href*
@@ -73,7 +75,7 @@ Free site.
   so and links to sign-in for a new link; any other error gets a plain message
   and a link back to sign-in.
 - `/workspace-pending`: a session-gated dead end with "Try again" (to
-  `/dashboard`) and "Sign out". Nothing routes to it any more: a user with no
+  `/dashboard`) and the signed-in account line. Nothing routes to it any more: a user with no
   membership goes to `/onboarding` instead.
 - `/signup`: a public gate in front of the same providers, not a second
   login. The visitor ticks acceptance of the Terms of Service and the Privacy
@@ -88,6 +90,12 @@ Free site.
 - Sign-out (account menu, or the button on pre-shell pages) runs
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
+- Every signed-in pre-shell page shows a `SignedInAccount` line — "Signed in
+  as <email>" and Sign out, the email read by `getSessionEmail`: the
+  onboarding rail (below the step list on wide screens), `/workspace-pending`,
+  the dashboard tenant picker, and the not-found page when a session exists.
+  `/sign-in`, `/signup` and `/sign-in-error` never show it, and neither does
+  the client-side error page, which has no session to read.
 
 - `/onboarding`: a four-step setup wizard for a signed-in user with no
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
@@ -285,7 +293,8 @@ Free site.
   `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
   `sign-in-view`, `email-sign-in-form`,
-  `workspace-pending-view` and `sign-out-button`.
+  `workspace-pending-view`, `sign-out-button`, `signed-in-account` and
+  `dead-end-view`, plus `get-session-email.test.ts`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.

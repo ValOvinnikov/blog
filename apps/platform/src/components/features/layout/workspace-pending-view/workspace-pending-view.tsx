@@ -1,10 +1,15 @@
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
-import { SignOutButton } from '@platform/components/features/layout/sign-out-button';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
-export const WorkspacePendingView = () => {
+export type TWorkspacePendingViewProps = {
+  accountEmail?: string;
+};
+
+export const WorkspacePendingView = ({
+  accountEmail,
+}: TWorkspacePendingViewProps) => {
   const t = useTranslations('workspacePendingPage');
 
   return (
@@ -13,13 +18,11 @@ export const WorkspacePendingView = () => {
       title={t('heading')}
       description={t('description')}
       action={
-        <>
-          <LinkButton href={adminRoutes.dashboard()} variant="primary">
-            {t('tryAgain')}
-          </LinkButton>
-          <SignOutButton />
-        </>
+        <LinkButton href={adminRoutes.dashboard()} variant="primary">
+          {t('tryAgain')}
+        </LinkButton>
       }
+      accountEmail={accountEmail}
     />
   );
 };

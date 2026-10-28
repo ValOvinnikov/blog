@@ -1,12 +1,14 @@
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
 import { LinkButton } from '@platform/components/shared/link-button';
+import { getSessionEmail } from '@platform/server/auth/get-session-email';
 import { resolveHomeHref } from '@platform/server/auth/resolve-home-href';
 import { getTranslations } from 'next-intl/server';
 
 export default async function NotFound() {
-  const [t, homeHref] = await Promise.all([
+  const [t, homeHref, accountEmail] = await Promise.all([
     getTranslations('notFoundPage'),
     resolveHomeHref(),
+    getSessionEmail(),
   ]);
 
   return (
@@ -19,6 +21,7 @@ export default async function NotFound() {
           {t('backLink')}
         </LinkButton>
       }
+      accountEmail={accountEmail}
     />
   );
 }

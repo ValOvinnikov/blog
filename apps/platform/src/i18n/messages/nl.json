@@ -188,7 +188,8 @@
     "roleChip": "{role} · {scope}"
   },
   "account": {
-    "signOut": "Uitloggen"
+    "signOut": "Uitloggen",
+    "signedInAs": "Ingelogd als {email}"
   },
   "roleLabel": {
     "SUPERADMIN": "Superbeheerder",
