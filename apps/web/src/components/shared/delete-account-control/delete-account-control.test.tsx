@@ -1,7 +1,7 @@
 import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 
@@ -112,8 +112,9 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
 
     resolveDelete({ outcome: ACTION_OUTCOME.SUCCESS });
 
-    await findToastStatus();
-    expect(deleteButton).not.toHaveAttribute('aria-busy');
+    await waitFor(() => {
+      expect(deleteButton).not.toHaveAttribute('aria-busy');
+    });
   });
 
   it.each([
