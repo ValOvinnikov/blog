@@ -45,7 +45,7 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
 - **Owner tree.** `/dashboard/*` resolves the tenant from the session's own memberships:
   - with one membership, it uses that tenant;
   - with several, it reads the `admin-active-tenant` cookie, and without the cookie it redirects to `/dashboard/select-tenant`;
-  - with none, it redirects to `/workspace-pending`.
+  - with none, it redirects to `/onboarding`.
     This tree hides the Platform nav, so an owner never sees that the platform has other tenants.
 - **Tenant switching.** `GET /api/dashboard/select-tenant?tenantId=` sets the active-tenant cookie (httpOnly, 30 days) after checking access, and 404s otherwise. The tenant switcher in the shell only appears for users with more than one tenant.
 - **Signup blocklist.** `/blocked-signups` in the `(operator)` group lists every blocked identity: its kind, the domain or the first characters of an address hash, the reason, who added it and when. A SUPERADMIN can add a domain there and remove any entry. The Suspend dialog on a tenant can also block that tenant's owner email, with a reason. The nav entry shows for SUPERADMINs only, and owners never see the list.
