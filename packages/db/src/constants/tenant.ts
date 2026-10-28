@@ -6,7 +6,7 @@ import {
 } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 
-import { LOOK_FIELDS, type TLookField } from './look';
+import { LOOK_FIELD, LOOK_FIELDS, type TLookField } from './look';
 
 export const TENANT_STATUS = {
   ACTIVE: 'ACTIVE',
@@ -64,7 +64,12 @@ export type TPlanEntitlements = {
 
 export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.FREE]: {
-    lookFields: ['preset', 'accentHue', 'logoAssetUrl', 'faviconAssetUrl'],
+    lookFields: [
+      LOOK_FIELD.PRESET,
+      LOOK_FIELD.ACCENT_HUE,
+      LOOK_FIELD.LOGO_ASSET_URL,
+      LOOK_FIELD.FAVICON_ASSET_URL,
+    ],
     modulePacks: [MODULE_PACK.CORE],
   },
   [TENANT_PLAN.GROWTH]: {

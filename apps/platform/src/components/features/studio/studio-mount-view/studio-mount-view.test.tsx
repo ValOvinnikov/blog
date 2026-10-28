@@ -1,10 +1,9 @@
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
-  MODULE_PACK,
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { PLAN_ENTITLEMENTS, TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
@@ -156,22 +155,15 @@ describe(`<${StudioMountView.name}/>`, () => {
     });
   });
 
-  it.each([
-    {
-      plan: TENANT_PLAN.FREE,
-      modulePacks: MOCK_FREE_STUDIO_ENTITLEMENTS.modulePacks,
-    },
-    {
-      plan: TENANT_PLAN.GROWTH,
-      modulePacks: [MODULE_PACK.CORE, MODULE_PACK.GROWTH],
-    },
-  ])(
-    "passes the $plan plan's module packs to Studio",
-    async ({ plan, modulePacks }) => {
+  it.each(Object.values(TENANT_PLAN))(
+    "passes the %s plan's module packs to Studio",
+    async (plan) => {
       await setup({ tenant: mockProvisionedTenant({ plan }) });
 
       expect(studioMountMock).toHaveBeenCalledWith(
-        expect.objectContaining({ entitlements: { modulePacks } }),
+        expect.objectContaining({
+          entitlements: { modulePacks: PLAN_ENTITLEMENTS[plan].modulePacks },
+        }),
       );
     },
   );
