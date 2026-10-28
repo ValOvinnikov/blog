@@ -9,7 +9,6 @@ import {
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
@@ -19,7 +18,6 @@ import { createLead } from './create-lead';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 faker.seed(6024);
 
@@ -54,10 +52,10 @@ describe(createLead, () => {
     const created = await createLead({ tenantId, ...MOCK_LEAD });
 
     const row = await readOnlyLead();
-    const { id, name, email, message, sourcePath, readAt } = row;
+    const { id, sourcePath, readAt } = row;
     expect(created).toEqual({ id });
-    expect({ name, email, message, sourcePath, readAt }).toEqual({
-      ...MOCK_LEAD,
+    expect({ sourcePath, readAt }).toEqual({
+      sourcePath: MOCK_LEAD.sourcePath,
       readAt: null,
     });
     expect(row.tenantId).toBe(tenantId);

@@ -1,3 +1,4 @@
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
@@ -8,7 +9,6 @@ import {
   mockMembership,
   MOCK_USER_ID,
 } from '@blog/db/testing/memberships/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -19,7 +19,6 @@ vi.mock('@blog/db/client');
 faker.seed(6022);
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.memberships);
@@ -35,7 +34,10 @@ describe(getTenantOwnerEmail, () => {
   });
 
   it('returns the OWNER membership user email for the tenant', async () => {
-    await insertTestUser(db(), { id: MOCK_USER_ID, email: MOCK_OWNER_EMAIL });
+    await insertTestUser(db(), {
+      id: MOCK_USER_ID,
+      ...userPersonalColumns({ email: MOCK_OWNER_EMAIL }),
+    });
     await mockMembership(db(), { userId: MOCK_USER_ID, tenantId });
 
     const result = await getTenantOwnerEmail(tenantId);

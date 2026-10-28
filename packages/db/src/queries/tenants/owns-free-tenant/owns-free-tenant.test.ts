@@ -5,13 +5,13 @@ import {
   TENANT_STATUS,
   type TMembershipRole,
 } from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
 import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import {
   mockAccountEmailIndex,
   testPersonalEmailIndex,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
@@ -27,7 +27,6 @@ import { ownsFreeTenant } from './owns-free-tenant';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 const OWNS_ONE = okResult(true);
 const OWNS_NONE = okResult(false);
@@ -159,8 +158,7 @@ describe(ownsFreeTenant, () => {
       .insert(schema.membershipInvites)
       .values({
         tenantId: tenant.id,
-        email: MOCK_SELF_SERVE_OWNER_EMAIL,
-        emailIndex: testPersonalEmailIndex(MOCK_SELF_SERVE_OWNER_EMAIL),
+        ...inviteEmailColumns(MOCK_SELF_SERVE_OWNER_EMAIL),
         role: MEMBERSHIP_ROLE.OWNER,
       });
 

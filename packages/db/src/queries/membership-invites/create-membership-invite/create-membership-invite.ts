@@ -12,7 +12,7 @@ export type TCreateMembershipInviteResult =
   | { outcome: 'already-pending'; invite: TMembershipInvite }
   | { outcome: 'already-consumed'; invite: TMembershipInvite };
 
-// Idempotent on the (tenantId, email) pair (the table's unique constraint)
+// Idempotent on the (tenantId, exact address) pair (the table's unique constraint)
 // rather than throwing on a re-invite — the provisioning wizard's owner
 // step can be re-run against the same email if the first invite email was
 // lost. An existing row's `role` is not updated by a duplicate call;
@@ -25,7 +25,7 @@ export async function createMembershipInvite(
 ): Promise<TCreateMembershipInviteResult> {
   const db = getDb();
   const emailColumns = inviteEmailColumns(email);
-  const { email: normalizedEmail } = emailColumns;
+  const { emailExactIndex } = emailColumns;
 
   const [inserted] = await db
     .insert(membershipInvites)
@@ -43,13 +43,13 @@ export async function createMembershipInvite(
     .where(
       and(
         eq(membershipInvites.tenantId, tenantId),
-        eq(membershipInvites.email, normalizedEmail),
+        eq(membershipInvites.emailExactIndex, emailExactIndex),
       ),
     );
 
   if (!existing) {
     throw new Error(
-      `createMembershipInvite: expected an existing row for tenant "${tenantId}" / email "${normalizedEmail}" after a no-op insert.`,
+      `createMembershipInvite: expected an existing row for tenant "${tenantId}" after a no-op insert.`,
     );
   }
 

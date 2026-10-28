@@ -19,10 +19,7 @@ import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data';
 import * as schema from '@blog/db/schema';
 import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestUser } from '@blog/db/testing/fixtures';
-import {
-  testPersonalEmailIndex,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
+import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { unwrapOk } from '@blog/db/testing/tenants/fixtures';
 import {
@@ -82,7 +79,6 @@ vi.mock(INSERT_AUDIT_EVENT_MODULE, () => ({
 faker.seed(6020);
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
 const MOCK_AUDIT_FAILURE = faker.lorem.sentence();

@@ -35,7 +35,6 @@
  */
 import { pathToFileURL } from 'node:url';
 
-import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
@@ -54,10 +53,9 @@ import {
   getTenantIdBySanityProjectId,
   setTenantSanityToken,
 } from '@blog/db/queries/tenants';
-import { users } from '@blog/db/schema/auth';
+import { findUserByEmail } from '@blog/db/queries/users';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
-import { eq } from 'drizzle-orm';
 
 type TParsedArgs = {
   name: string;
@@ -201,7 +199,6 @@ export async function resolveOrCreateTenant(
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const db = getDb();
 
   const tenant = await resolveOrCreateTenant(args);
 
@@ -220,10 +217,7 @@ async function main(): Promise<void> {
     console.warn(`Domain "${domain}" -> tenant "${tenant.name}".`);
   }
 
-  const [owner] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, args.ownerEmail));
+  const owner = await findUserByEmail(args.ownerEmail);
   if (!owner) {
     throw new Error(
       `seed-tenant: no "users" row for "${args.ownerEmail}" — have them sign in to the site once first, then re-run this script.`,

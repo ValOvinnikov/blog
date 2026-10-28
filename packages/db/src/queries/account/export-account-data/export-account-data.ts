@@ -1,12 +1,8 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { users } from '@blog/db/schema/auth';
 import { bookmarks } from '@blog/db/schema/bookmarks';
-import {
-  readOptionalPersonalValue,
-  reportPlainPersonalRead,
-} from '@blog/db/utils/personal-data/personal-data';
+import { decryptOptionalPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { and, desc, eq } from 'drizzle-orm';
 
 export type TAccountProfileExport = {
@@ -27,11 +23,8 @@ export type TAccountDataExport = {
   bookmarks: TAccountBookmarkExport[];
 };
 
-function readOptional(
-  encrypted: TMaybeNull<string>,
-  plain: TMaybeNull<string>,
-): TMaybeUndefined<string> {
-  return readOptionalPersonalValue(encrypted, plain) ?? undefined;
+function readOptional(encrypted: TMaybeNull<string>): TMaybeUndefined<string> {
+  return decryptOptionalPersonalValue(encrypted) ?? undefined;
 }
 
 // TODO: fold in comments and ratings once each lands (#1040, #1041).
@@ -45,9 +38,7 @@ export async function exportAccountData(
   const [user] = await db
     .select({
       id: users.id,
-      name: users.name,
       nameEncrypted: users.nameEncrypted,
-      email: users.email,
       emailEncrypted: users.emailEncrypted,
       emailVerified: users.emailVerified,
       image: users.image,
@@ -57,16 +48,7 @@ export async function exportAccountData(
 
   if (!user) return undefined;
 
-  const {
-    id,
-    name,
-    nameEncrypted,
-    email,
-    emailEncrypted,
-    emailVerified,
-    image,
-  } = user;
-  reportPlainPersonalRead(PERSONAL_DATA_OWNER.USER, emailEncrypted);
+  const { id, nameEncrypted, emailEncrypted, emailVerified, image } = user;
 
   const userBookmarks = await db
     .select({ postId: bookmarks.postId, createdAt: bookmarks.createdAt })
@@ -77,8 +59,8 @@ export async function exportAccountData(
   return {
     profile: {
       id,
-      name: readOptional(nameEncrypted, name),
-      email: readOptional(emailEncrypted, email),
+      name: readOptional(nameEncrypted),
+      email: readOptional(emailEncrypted),
       emailVerified: emailVerified ?? undefined,
       image: image ?? undefined,
     },

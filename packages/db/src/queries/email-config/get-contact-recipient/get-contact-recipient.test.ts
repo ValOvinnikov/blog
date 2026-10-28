@@ -3,7 +3,7 @@ import * as schema from '@blog/db/schema';
 import { MOCK_EMAIL_CONFIG } from '@blog/db/testing/email-config/fixtures';
 import {
   insertTestTenant,
-  insertTestUser,
+  insertTestReader,
   MOCK_OWNER_EMAIL,
 } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -26,9 +26,7 @@ describe(getContactRecipient, () => {
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
-    const { id: ownerId } = await insertTestUser(db(), {
-      email: MOCK_OWNER_EMAIL,
-    });
+    const { id: ownerId } = await insertTestReader(db(), MOCK_OWNER_EMAIL);
     await db().insert(schema.memberships).values({
       userId: ownerId,
       tenantId,
