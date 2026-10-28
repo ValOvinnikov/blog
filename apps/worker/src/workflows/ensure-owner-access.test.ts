@@ -15,6 +15,7 @@ import { createHook, type Hook, sleep } from 'workflow';
 import { ensureOwnerAccess } from './ensure-owner-access';
 
 const { PENDING_ACCEPTANCE, ELEVATED, STALLED } = ELEVATE_TENANT_OWNER_OUTCOME;
+const MOCK_FAILING_SINCE = Date.parse('2026-10-28T21:44:00.000Z');
 
 vi.mock('@worker/units/check-owner-access');
 vi.mock('workflow');
@@ -39,7 +40,10 @@ function fakeHook(options: { conflict?: boolean; wakes?: number } = {}) {
 
 function checksReturn(...outcomes: TElevateTenantOwnerOutcome[]) {
   outcomes.forEach((outcome) =>
-    vi.mocked(checkOwnerAccess).mockResolvedValueOnce(outcome),
+    vi.mocked(checkOwnerAccess).mockResolvedValueOnce({
+      outcome,
+      failingSince: null,
+    }),
   );
 }
 
@@ -82,6 +86,22 @@ describe(ensureOwnerAccess, () => {
     expect(intervals[OWNER_ACCESS_FAST_POLL_TICKS]).toBe(
       OWNER_ACCESS_SLOW_POLL_INTERVAL,
     );
+  });
+
+  it('carries the failure streak from one check to the next', async () => {
+    vi.mocked(checkOwnerAccess)
+      .mockResolvedValueOnce({
+        outcome: PENDING_ACCEPTANCE,
+        failingSince: MOCK_FAILING_SINCE,
+      })
+      .mockResolvedValueOnce({ outcome: ELEVATED, failingSince: null });
+
+    await ensureOwnerAccess(MOCK_TENANT_ID);
+
+    expect(vi.mocked(checkOwnerAccess).mock.calls).toEqual([
+      [MOCK_TENANT_ID, null],
+      [MOCK_TENANT_ID, MOCK_FAILING_SINCE],
+    ]);
   });
 
   it('releases the hook when it finishes', async () => {

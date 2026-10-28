@@ -42,9 +42,6 @@ supplies authentication only — it has no opinion on either.
     Look/Voice/Features/Domain settings), genuinely scoped per-tenant:
     resolved from the signed-in user's own `memberships` rows and the
     active-tenant cookie rather than from a URL segment.
-  - `workspace-pending/` — session-gated page for a signed-in user with no
-    `admins` row and no `memberships` rows: a workspace still provisioning,
-    or one whose provisioning failed.
 - `src/app/api/` — Route Handlers: the Auth.js catch-all and the dashboard
   tenant-select endpoint.
 - `src/components/` — one folder per component (component file,

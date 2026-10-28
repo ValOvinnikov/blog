@@ -4,7 +4,6 @@ status: built
 layers: [platform, auth, db, email, config, worker]
 code:
   - apps/platform/src/app/api/auth/**
-  - apps/platform/src/app/*/workspace-pending/**
   - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/app/*/sign-in/**
   - apps/platform/src/app/*/signup/**
@@ -21,7 +20,6 @@ code:
   - apps/platform/src/server/auth/sign-in-with-provider-action*
   - apps/platform/src/utils/safe-callback-path/**
   - apps/platform/src/utils/sign-in-error/**
-  - apps/platform/src/components/features/layout/workspace-pending-view/**
   - apps/platform/src/components/features/layout/sign-out-button/**
   - apps/platform/src/server/auth/auth.ts
   - apps/platform/src/server/auth/require-session-user-id.ts
@@ -75,9 +73,6 @@ Free site.
   styling. A `Verification` error (a magic link already used or expired) says
   so and links to sign-in for a new link; any other error gets a plain message
   and a link back to sign-in.
-- `/workspace-pending`: a session-gated dead end with "Try again" (to
-  `/dashboard`) and "Sign out". Nothing routes to it any more: a user with no
-  membership goes to `/onboarding` instead.
 - `/signup`: the same card, titled "Create an account", with the same
   provider buttons and email field (`SignInOptions` with `isSignUp`), then the
   note "By continuing, you agree to the Terms of Service and the Privacy
@@ -121,7 +116,12 @@ Free site.
      phone), never under the input, which only turns red on an error:
      checking, "<address> is yours", the taken / reserved / invalid error, or
      an amber "couldn't check" note.
-  3. **Look** — the preset and accent colour.
+  3. **Look** — the preset and accent colour. Each site type starts on its
+     own preset and that preset's accent (`STARTER_PRESET_BY_SITE_TYPE`:
+     Editorial for Blog, Portfolio and Personal / résumé; Console for Docs and
+     Blank), and changing the site type moves the preview with it until the
+     owner picks a preset or moves the accent here; from then on their choice
+     stays whatever the site type.
   4. **Review** — every choice with an Edit button back to its step, and the
      terms acceptance again (a magic link opened in another browser carries
      no `/signup` cookie).
@@ -209,6 +209,10 @@ Free site.
 
 ## Constraints and invariants
 
+- The admin panel is not indexed: `[locale]/layout.tsx` sets
+  `robots: { index: false, follow: false }`, so every page under it, public or
+  session-gated, serves `noindex, nofollow`. There is no `robots.txt`, because
+  a crawler must fetch a page to read its noindex.
 - `@blog/auth`'s `findMagicLinkSendRefusal` refuses a magic-link send to
   an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
@@ -271,7 +275,6 @@ Free site.
 - `apps/platform/src/app/[locale]/onboarding/page.tsx`
 - `apps/platform/src/server/onboarding/create-site-action.ts`
 - `apps/platform/src/server/onboarding/check-site-address-action.ts`
-- `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
 - `packages/auth/src/events/record-signup-terms-on-sign-in.ts`
@@ -290,8 +293,8 @@ Free site.
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
   `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
-  `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `dead-end-view`,
-  `workspace-pending-view` and `sign-out-button`.
+  `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `dead-end-view`
+  and `sign-out-button`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.

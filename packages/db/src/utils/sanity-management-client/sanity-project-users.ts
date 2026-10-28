@@ -10,6 +10,7 @@ export type TSanityUser = {
     resourceType: string;
     resourceId: string;
     roleNames: string[];
+    resourceUserId?: TMaybeNull<string>;
   }>;
 };
 

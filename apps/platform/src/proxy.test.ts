@@ -29,7 +29,6 @@ describe('proxy matcher', () => {
     adminRoutes.home(),
     adminRoutes.tenants(),
     adminRoutes.look(MOCK_TENANT_ID),
-    adminRoutes.workspacePending(),
     adminRoutes.dashboard(),
     adminRoutes.dashboardLook(),
     adminRoutes.dashboardSelectTenant(),

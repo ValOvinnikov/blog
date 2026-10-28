@@ -5,7 +5,10 @@ import type { TOnboardingFieldErrors } from '@platform/components/features/onboa
 import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { OptionSelect } from '@platform/components/shared/option-select';
-import { SELF_SERVE_SITE_TYPES } from '@platform/constants/onboarding';
+import {
+  SELF_SERVE_SITE_TYPES,
+  type TSelfServeSiteType,
+} from '@platform/constants/onboarding';
 import type { TCreateSiteInput } from '@platform/server/onboarding/create-site-input';
 import { useTranslations } from 'next-intl';
 
@@ -13,12 +16,14 @@ export type TSiteDetailsFieldsProps = {
   values: TCreateSiteInput;
   fieldErrors: TOnboardingFieldErrors;
   onFieldChange: (patch: Partial<TCreateSiteInput>) => void;
+  onSiteTypeChange: (siteType: TSelfServeSiteType) => void;
 };
 
 export const SiteDetailsFields = ({
   values,
   fieldErrors,
   onFieldChange,
+  onSiteTypeChange,
 }: TSiteDetailsFieldsProps) => {
   const t = useTranslations('onboardingForm');
   const errorText = useFieldErrorText();
@@ -33,7 +38,7 @@ export const SiteDetailsFields = ({
             label: t(`siteTypes.${siteType}`),
           }))}
           value={values.siteType}
-          onChange={(siteType) => onFieldChange({ siteType })}
+          onChange={onSiteTypeChange}
         />
       </FormField>
       <FormTextInput

@@ -1170,6 +1170,14 @@
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
+    "OWNER_ACCESS_CHECK_FAILED": [
+      {
+        "ref": "FINDING_KIND.OWNER_ACCESS_CHECK_FAILED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
     "CRITICAL": [
       {
         "ref": "FINDING_SEVERITY.CRITICAL",
@@ -2797,6 +2805,22 @@
     "viewer": [
       {
         "ref": "SANITY_PROJECT_ROLE.VIEWER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "project": [
+      {
+        "ref": "SANITY_RESOURCE_TYPE.PROJECT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
+    "organization": [
+      {
+        "ref": "SANITY_RESOURCE_TYPE.ORGANIZATION",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/sanity-project.ts"
@@ -6386,6 +6410,38 @@
         "scope": "app:worker",
         "from": "@worker/constants/inactivity-sweep",
         "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "owner_access.check_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.CHECK_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.activity_touch_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.ACTIVITY_TOUCH_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.finding_open_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.FINDING_OPEN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.finding_resolve_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.FINDING_RESOLVE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
       }
     ],
     "PENDING_SUBSCRIBERS": [

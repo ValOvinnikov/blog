@@ -103,6 +103,11 @@ platform-wide Findings page. Tenant owners see neither.
   - Findings: only `validate-tenant-documents` writes, as
     `DOCUMENT_VALIDATION` / `SCHEMA_VALIDATION_ERROR` (CRITICAL if any
     document has an error, else WARNING), and resolves it on a clean run.
+  - The owner-access checks in the worker write one `TENANT_PROVISIONING` /
+    `OWNER_ACCESS_CHECK_FAILED` WARNING per tenant once the checks have
+    failed for 30 minutes in a row, with the error and the time the failures
+    began as `details`, and resolve it when the owner is granted access
+    ([Tenant provisioning](tenant-provisioning.md)).
     The other declared sources and kinds have no writer yet.
   - The release actions (`RELEASE_STARTED`, `RELEASE_OVERRIDE`,
     `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`) and the `RELEASE`
