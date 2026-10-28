@@ -467,6 +467,39 @@
       "PENDING": "En attente du DNS",
       "VERIFIED": "Vérifié",
       "ERROR": "Vérification impossible"
+    },
+    "ownDomain": {
+      "title": "Utiliser mon propre domaine",
+      "supportingText": "Publiez votre site à une adresse qui vous appartient. Votre adresse actuelle continue de fonctionner.",
+      "upgradePrompt": "Utiliser votre propre domaine est inclus dans l’offre Growth.",
+      "ownerOnly": "Seul le propriétaire du site peut connecter un domaine.",
+      "archivedState": "Ce site est archivé, son domaine ne peut pas être modifié.",
+      "domainLabel": "Domaine",
+      "domainHint": "Un domaine complet qui vous appartient, comme blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Connecter le domaine",
+      "connecting": "Connexion…",
+      "remove": "Retirer",
+      "removeTitle": "Retirer ce domaine ?",
+      "removeDescription": "{domain} ne servira plus votre site. Votre adresse actuelle continue de fonctionner.",
+      "removeConfirm": "Retirer le domaine",
+      "removing": "Suppression…",
+      "connectFailed": "Impossible de connecter le domaine. Réessayez.",
+      "removeFailed": "Impossible de retirer le domaine. Réessayez.",
+      "invalidInput": "Saisissez un domaine complet, comme blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Saisissez un domaine complet, comme blog.example.com.",
+        "domainPlatformAddress": "Cette adresse appartient à la plateforme. Saisissez un domaine qui vous appartient.",
+        "domainTaken": "Ce domaine est déjà utilisé."
+      },
+      "refusal": {
+        "notFound": "Ce site est introuvable.",
+        "archived": "Ce site est archivé, son domaine ne peut pas être modifié.",
+        "notOnPlan": "Utiliser votre propre domaine est inclus dans l’offre Growth.",
+        "notProvisioned": "Ce site n’est pas encore configuré. Réessayez une fois la configuration terminée.",
+        "alreadyConnected": "Ce site a déjà son propre domaine.",
+        "notCustomDomain": "Ce domaine ne peut pas être retiré."
+      }
     }
   },
   "presetPicker": {

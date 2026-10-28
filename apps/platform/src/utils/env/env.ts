@@ -5,6 +5,7 @@ import {
   PERSONAL_DATA_KEY_FORMAT,
   PERSONAL_DATA_KEYRING_FORMAT,
 } from '@blog/utils/encryption';
+import { MIGRATION_ENVIRONMENT } from '@platform/constants/release';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
@@ -18,6 +19,8 @@ export const env = createEnv({
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
     // @env-required: development, production
     WEB_APP_URL: z.string().url().optional(),
+    // @env-optional
+    PLATFORM_APP_BASE_URL: z.string().url().optional(),
     // Must be byte-identical to `apps/web`'s `SITE_CONFIG_REVALIDATE_SECRET`.
     // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
@@ -31,9 +34,7 @@ export const env = createEnv({
       .optional(),
     // Set by hand per Vercel project: `VERCEL_ENV` cannot tell a dev deployment from production.
     // @env-optional
-    TENANT_PROVISIONING_DATASET: z
-      .enum(['development', 'production'])
-      .optional(),
+    TENANT_PROVISIONING_DATASET: z.enum(MIGRATION_ENVIRONMENT).optional(),
     // @env-optional
     WORKER_ENQUEUE_URL: z.string().url().optional(),
     // Must be byte-identical to `apps/worker`'s own `WORKER_ENQUEUE_SECRET`.
@@ -92,6 +93,7 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     WEB_APP_URL: process.env.WEB_APP_URL,
+    PLATFORM_APP_BASE_URL: process.env.PLATFORM_APP_BASE_URL,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     TENANT_PROVISIONING_GITHUB_TOKEN:
       process.env.TENANT_PROVISIONING_GITHUB_TOKEN,

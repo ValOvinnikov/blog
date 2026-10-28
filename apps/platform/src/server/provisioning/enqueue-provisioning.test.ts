@@ -5,12 +5,19 @@ import {
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
 import { faker } from '@faker-js/faker';
+import { CUSTOM_DOMAIN_PATH } from '@platform/constants/custom-domain';
 import { WORKER_LOG } from '@platform/constants/worker';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_CUSTOM_DOMAIN,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
-import { enqueueProvisioning } from './enqueue-provisioning';
+import {
+  enqueueProvisioning,
+  enqueueWorkerRequest,
+} from './enqueue-provisioning';
 
 vi.mock('@platform/utils/env/env');
 
@@ -88,6 +95,30 @@ describe(enqueueProvisioning, () => {
         timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
         signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
         path: PROVISION_PATH,
+        rawBody: init.body as string,
+      }),
+    ).toBe(true);
+  });
+
+  it('includes the domain in the signed body when one is given', async () => {
+    await enqueueWorkerRequest(CUSTOM_DOMAIN_PATH.CONNECT, {
+      tenantId: MOCK_TENANT_ID,
+      domain: MOCK_CUSTOM_DOMAIN,
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
+    const headers = init.headers as Record<string, string>;
+
+    expect(JSON.parse(init.body as string)).toEqual({
+      tenantId: MOCK_TENANT_ID,
+      domain: MOCK_CUSTOM_DOMAIN,
+    });
+    expect(
+      isValidEnqueueSignature({
+        secret: MOCK_SECRET,
+        timestamp: headers[ENQUEUE_TIMESTAMP_HEADER] ?? null,
+        signature: headers[ENQUEUE_SIGNATURE_HEADER] ?? null,
+        path: CUSTOM_DOMAIN_PATH.CONNECT,
         rawBody: init.body as string,
       }),
     ).toBe(true);

@@ -17,6 +17,9 @@ const isFinalDomainVerificationStatus = (status: TDomainVerificationStatus) =>
 export const useDomainStatusPoll = (
   tenantId: string,
   initialStatus: TDomainVerificationStatus,
+  fetchStatus: (
+    tenantId: string,
+  ) => Promise<TDomainVerificationStatus> = getDomainVerificationStatusAction,
 ): TDomainVerificationStatus => {
   const [renderedInitialStatus, setRenderedInitialStatus] =
     useState(initialStatus);
@@ -47,7 +50,7 @@ export const useDomainStatusPoll = (
         clearInterval(intervalId);
       }
 
-      getDomainVerificationStatusAction(tenantId)
+      fetchStatus(tenantId)
         .then((result) => {
           if (!cancelled) {
             setStatus(result);
@@ -60,7 +63,7 @@ export const useDomainStatusPoll = (
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenantId, isFinal]);
+  }, [tenantId, isFinal, fetchStatus]);
 
   return status;
 };

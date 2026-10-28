@@ -61,6 +61,25 @@ describe(useDomainStatusPoll, () => {
     expect(result.current).toBe(DOMAIN_VERIFICATION_STATUS.ERROR);
   });
 
+  it('polls through the fetcher it is given', async () => {
+    const fetchStatus = vi
+      .fn()
+      .mockResolvedValue(DOMAIN_VERIFICATION_STATUS.VERIFIED);
+    const { result } = renderHook(() =>
+      useDomainStatusPoll(
+        MOCK_TENANT_ID,
+        DOMAIN_VERIFICATION_STATUS.PENDING,
+        fetchStatus,
+      ),
+    );
+
+    await advance(DOMAIN_POLL_INTERVAL_MS);
+
+    expect(fetchStatus).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(getDomainVerificationStatusActionMock).not.toHaveBeenCalled();
+    expect(result.current).toBe(DOMAIN_VERIFICATION_STATUS.VERIFIED);
+  });
+
   it.each([
     DOMAIN_VERIFICATION_STATUS.VERIFIED,
     DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
