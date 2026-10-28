@@ -22,6 +22,11 @@ import {
   MOCK_TOPICS_LINK,
   MOCK_TOPICS_WITH_SUB_ITEMS,
 } from '@web/testing/shared/link/fixtures';
+import {
+  ACCOUNT_TRIGGER_TEST_ID,
+  DRAWER_ACTIONS_TEST_ID,
+  MOBILE_PANEL_TEST_ID,
+} from '@web/testing/shared/site-navigation/constants';
 import type { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { userEvent, within } from 'storybook/test';
@@ -33,9 +38,6 @@ const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_TOPICS_LINK];
 const TOGGLE_MENU = { name: /Toggle navigation menu/ };
 const ACCOUNT_BUTTON = { name: 'Account' };
 const SIGN_IN_BUTTON = { name: 'Sign in' };
-const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
-const ACCOUNT_TRIGGER_TEST_ID = 'account-menu-trigger';
-const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
 
 type TCanvas = ReturnType<typeof within>;
 

@@ -14,6 +14,12 @@ import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtur
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_TOPICS_WITH_SUB_ITEMS } from '@web/testing/shared/link/fixtures';
+import {
+  ACCOUNT_GROUP_TEST_ID,
+  ACCOUNT_TRIGGER_TEST_ID,
+  DRAWER_ACTIONS_TEST_ID,
+  MOBILE_PANEL_TEST_ID,
+} from '@web/testing/shared/site-navigation/constants';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -85,10 +91,6 @@ const setup = customRenderAsync(SiteHeader, {});
 
 const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const LANGUAGE_ENGLISH = 'Language: English';
-const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
-const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
-const ACCOUNT_GROUP_TEST_ID = 'account-menu-group';
-const ACCOUNT_TRIGGER_TEST_ID = 'account-menu-trigger';
 const SIGN_IN = 'Sign in';
 const ACCOUNT = 'Account';
 const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
