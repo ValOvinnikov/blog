@@ -194,7 +194,9 @@ data takes an explicit `tenantId`, and there is no row-level security and no
 tenant-bound accessor.
 
 Provisioning runs in `apps/worker`. It calls Sanity's Management API over
-`fetch` (through `@blog/db`'s `src/utils/sanity-management-client/`) and
+`fetch` (through `@blog/db`'s `src/utils/sanity-management-client/`, and
+Vercel's domains API through `src/utils/vercel-client/`, shared with the
+deprovisioning CLI) and
 seeds through `@sanity/client`, to create a new tenant's
 Sanity project/dataset/CORS entry, invite the tenant owner (resolved from
 their OWNER `memberships` row, falling back to a pending OWNER
