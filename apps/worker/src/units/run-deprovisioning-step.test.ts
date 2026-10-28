@@ -11,6 +11,7 @@ import {
 } from '@blog/db/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
 import { purgeTenantReaderData } from '@blog/db/queries/reader-data';
+import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
 import {
   archiveTenant,
   clearTenantProvisioningArtifacts,
@@ -27,7 +28,7 @@ import {
   SANITY_WRITE_TOKEN_LABEL,
 } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
-import { deleteVercelProjectDomain } from '@blog/db/utils/vercel-client/vercel-project-domains';
+import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
 import { errorResult, okResult } from '@blog/utils/result';
 import { faker } from '@faker-js/faker';
 import {
@@ -59,6 +60,10 @@ const MOCK_READ_ROBOT_ID = faker.string.uuid();
 const MOCK_WRITE_ROBOT_ID = faker.string.uuid();
 const MOCK_OTHER_ROBOT_ID = faker.string.uuid();
 const MOCK_OTHER_ROBOT_LABEL = faker.lorem.word();
+const MOCK_TENANT_HOSTS = [
+  MOCK_PROVISIONED_TENANT.primaryDomain,
+  faker.internet.domainName(),
+];
 const MOCK_READER_DATA_COUNTS = {
   subscribers: 3,
   bookmarks: 5,
@@ -73,6 +78,7 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-robot-tokens');
 vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
 vi.mock('@blog/db/utils/vercel-client/vercel-project-domains');
 vi.mock('@blog/db/queries/tenants');
+vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
 vi.mock(
   '@worker/utils/deprovision-env/deprovision-env',
   () => import('@worker/testing/deprovision-env/fake-deprovision-env'),
@@ -101,19 +107,20 @@ describe(runDeprovisioningStep, () => {
     );
     vi.mocked(listSanityRobotTokens).mockResolvedValue([]);
     vi.mocked(purgeTenantReaderData).mockResolvedValue(MOCK_READER_DATA_COUNTS);
+    vi.mocked(listTenantHosts).mockResolvedValue(MOCK_TENANT_HOSTS);
   });
 
-  it("removes the tenant's domain from the web project and reports the step done", async () => {
+  it('removes every tenant host from the web project and reports the step done', async () => {
     await expect(run(DEPROVISIONING_STEP.REMOVE_DOMAIN)).resolves.toEqual({
       ok: true,
       data: undefined,
     });
 
-    expect(deleteVercelProjectDomain).toHaveBeenCalledWith({
+    expect(deleteVercelProjectDomains).toHaveBeenCalledWith({
       token: MOCK_DEPROVISION_ENV.vercelToken,
       teamId: MOCK_DEPROVISION_ENV.vercelTeamId,
       projectId: MOCK_DEPROVISION_ENV.vercelWebProjectId,
-      domain: MOCK_PROVISIONED_TENANT.primaryDomain,
+      domains: MOCK_TENANT_HOSTS,
     });
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
