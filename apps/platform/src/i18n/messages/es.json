@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
     "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó.",
-    "tryAgain": "Volver a intentarlo"
+    "tryAgain": "Volver a intentarlo",
+    "badge": "Configuración"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -124,17 +125,25 @@
     "requestNewLink": "Obtener un nuevo enlace de inicio de sesión",
     "heading": "No hemos podido iniciar tu sesión",
     "description": "Algo ha fallado al iniciar sesión. Vuelve al inicio de sesión e inténtalo de nuevo.",
-    "backToSignIn": "Volver al inicio de sesión"
+    "backToSignIn": "Volver al inicio de sesión",
+    "badge": "Inicio de sesión"
   },
   "notFoundPage": {
     "heading": "Página no encontrada",
     "description": "Esta página no existe o no tienes acceso a ella.",
-    "backLink": "Volver al inicio"
+    "backLink": "Volver al inicio",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Algo salió mal",
     "description": "No se pudo cargar esta página. Inténtalo de nuevo y, si sigue ocurriendo, vuelve en unos minutos.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "badge": "Error 500",
+    "homeLink": "Volver al inicio"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "ID del error: {errorId}"
   },
   "pageSkeleton": {
     "label": "Cargando la página…"

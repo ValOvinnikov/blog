@@ -20,10 +20,12 @@ export default async function SignInErrorPage({ searchParams }: TProps) {
     searchParams,
     getTranslations('signInErrorPage'),
   ]);
+  const badge = { label: t('badge'), tone: 'brand' } as const;
 
   if (error === SPENT_LINK_ERROR) {
     return (
       <DeadEndView
+        badge={badge}
         title={t('linkSpentHeading')}
         description={t('linkSpentDescription')}
         action={
@@ -37,6 +39,7 @@ export default async function SignInErrorPage({ searchParams }: TProps) {
 
   return (
     <DeadEndView
+      badge={badge}
       title={t('heading')}
       description={t('description')}
       action={
