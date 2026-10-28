@@ -150,21 +150,24 @@ A domain is a module, a feature, a page, or a layout or app route.
 
 ## Styling files
 
-- Every component with a `tv()` of its own keeps it in a sibling
-  `<component>-variants.ts`, in every React workspace, one consumer or many
-  (class strings inline in JSX stay banned). A component that applies no
-  classes of its own has none. `packages/ui` depends on it besides:
-  `scripts/gen-ui-index.mjs` reads that file to build `COMPONENTS.md`.
-- Derive its `T{X}Variants` (`VariantProps<typeof xVariants>`) beside the
-  `tv()`; export it once another file imports it — knip fails an unused
-  export.
-- A diff that touches a component whose `tv()` still sits inline in its
-  `.tsx` moves it into the sibling `-variants.ts` in that change. Never as a
-  sweep.
-- A recipe in `packages/ui/src/lib/styling/` exists only once a second
-  component imports it. Every importer counts: a compound-slot sibling, a
-  consumer in another workspace, an import through the `@blog/ui/lib/styling`
-  barrel. The change that adds the second consumer extracts it there.
+- A component's `tv()` is a module-scope const in its own `.tsx` (class
+  strings inline in JSX stay banned). Derive its `T{X}Variants`
+  (`VariantProps<typeof xVariants>`) beside the `tv()`, wherever that lives;
+  export it once another file imports it — knip fails an unused export.
+- A separate `<name>-variants.ts`, or a recipe in
+  `packages/ui/src/lib/styling/`, exists only once a second component imports
+  it. Every importer counts: a compound-slot sibling, a consumer in another
+  workspace (`apps/web` importing `text-link-variants` by path), an import
+  through the `@blog/ui/lib/styling` barrel.
+- The change that adds the second consumer extracts the `tv()` into that file.
+- A diff that touches a component whose variants file has one consumer folds
+  the `tv()` back into the `.tsx` in that change. Never as a sweep.
+- **`packages/ui` exception:** every component there with a `tv()` of its
+  own, a new one included, keeps it in a sibling `<component>-variants.ts`,
+  because `scripts/gen-ui-index.mjs` reads that file to build
+  `COMPONENTS.md`; a component that applies no classes of its own has none.
+  The exception ends when the generator reads an inline `tv()`. A
+  `lib/styling/` recipe follows the rule above.
 
 ## Size and splitting
 

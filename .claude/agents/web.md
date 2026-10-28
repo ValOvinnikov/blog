@@ -166,9 +166,11 @@ if (!result.ok) {
         testimonial-carousel.test.tsx
   ```
 
-  Each component's `tv()` sits beside it in a `<name>-variants.ts`
-  (`testimonial-card-variants.ts`; `react-component-practices` → "Styling
-  files"). The `*-module.tsx` / `*-module-view.tsx` pair stays at the top.
+  On disk it also holds `testimonial-module-view-variants.ts` and
+  `testimonial-card-variants.ts`, each with one consumer; the diff that
+  touches either folds it into its `.tsx` (`react-component-practices` →
+  "Styling files"). The `*-module.tsx` / `*-module-view.tsx` pair stays at
+  the top.
 
 - **Modules** live in `src/modules/<name>/` — the web side of the CMS
   `module_*` documents, each a `<name>-module.tsx` (fetches) and

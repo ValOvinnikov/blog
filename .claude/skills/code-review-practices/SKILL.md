@@ -201,8 +201,8 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   (`apps/web/index.css`, `apps/platform/index.css`).
 - No class strings inline in JSX in any React workspace — classes go through a
   module-scope `tv()`; no standalone `clsx` or `tailwind-merge`. Exception:
-  `next/font` variable class names in `layout.tsx`. The `tv()` lives in the
-  component's sibling `*-variants.ts` →
+  `next/font` variable class names in `layout.tsx`. Where the `tv()` lives,
+  and when a `*-variants.ts` is folded in or extracted →
   `react-component-practices` § Styling files.
 - Every `slots` value in a `tv()` is an array of strings, even a single class.
 - Mobile-first, `md:`/`lg:` as the layout tiers, no custom `--breakpoint-*`
