@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
@@ -17,6 +16,7 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@worker/testing/tenant/fixtures';
+import { getDisconnectRefusal } from '@worker/utils/disconnect-guard/disconnect-guard';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { logger } from '@worker/utils/logger/logger';
 import { disconnectCustomDomain } from '@worker/workflows/disconnect-custom-domain';
@@ -30,7 +30,7 @@ vi.mock('@worker/utils/env/env');
 vi.mock('@worker/workflows/disconnect-custom-domain');
 vi.mock('workflow/api');
 vi.mock('@blog/db/queries/tenants');
-vi.mock('@blog/db/queries/tenant-domains/get-tenant-by-domain');
+vi.mock('@worker/utils/disconnect-guard/disconnect-guard');
 
 function disconnectRequest(
   body: Record<string, TMaybeUndefined<string>> = {
@@ -48,7 +48,7 @@ describe('POST /api/custom-domain/disconnect', () => {
   beforeEach(() => {
     mockEnv.WORKER_ENQUEUE_SECRET = MOCK_ENQUEUE_SECRET;
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
-    vi.mocked(getTenantByDomain).mockResolvedValue(undefined);
+    vi.mocked(getDisconnectRefusal).mockResolvedValue(null);
     vi.mocked(start).mockResolvedValue({ runId: MOCK_RUN_ID } as never);
   });
 
@@ -104,14 +104,29 @@ describe('POST /api/custom-domain/disconnect', () => {
     expect(start).not.toHaveBeenCalled();
   });
 
-  it('answers a conflict while any tenant still routes the domain', async () => {
-    vi.mocked(getTenantByDomain).mockResolvedValue(mockTenant());
+  it.each([ENQUEUE_ERROR.DOMAIN_STILL_ASSIGNED, ENQUEUE_ERROR.DOMAIN_RESERVED])(
+    'answers a conflict carrying the %s refusal',
+    async (refusal) => {
+      vi.mocked(getDisconnectRefusal).mockResolvedValue(refusal);
+
+      const response = await POST(disconnectRequest());
+
+      expect(response.status).toBe(HTTP_STATUS.CONFLICT);
+      await expect(response.json()).resolves.toEqual({ error: refusal });
+      expect(start).not.toHaveBeenCalled();
+    },
+  );
+
+  it('answers a server error when the guard cannot be evaluated', async () => {
+    vi.mocked(getDisconnectRefusal).mockRejectedValue(
+      new Error(MOCK_QUEUE_DOWN),
+    );
 
     const response = await POST(disconnectRequest());
 
-    expect(response.status).toBe(HTTP_STATUS.CONFLICT);
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     await expect(response.json()).resolves.toEqual({
-      error: ENQUEUE_ERROR.DOMAIN_STILL_ASSIGNED,
+      error: ENQUEUE_ERROR.SERVER_ERROR,
     });
     expect(start).not.toHaveBeenCalled();
   });

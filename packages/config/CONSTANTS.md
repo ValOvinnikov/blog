@@ -509,7 +509,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
 
-- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`, `DOMAIN_NOT_ASSIGNED`, `DOMAIN_STILL_ASSIGNED`
+- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`, `DOMAIN_NOT_ASSIGNED`, `DOMAIN_STILL_ASSIGNED`, `DOMAIN_RESERVED`
 
 ### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
 

@@ -5912,6 +5912,14 @@
         "file": "apps/worker/src/constants/enqueue-error.ts"
       }
     ],
+    "DOMAIN_RESERVED": [
+      {
+        "ref": "ENQUEUE_ERROR.DOMAIN_RESERVED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
     "inactivity_sweep.not_configured": [
       {
         "ref": "INACTIVITY_SWEEP_LOG.NOT_CONFIGURED",

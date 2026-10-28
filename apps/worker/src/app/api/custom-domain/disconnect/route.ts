@@ -1,10 +1,10 @@
 import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { customDomainRequestBodySchema } from '@worker/utils/custom-domain-request/custom-domain-request';
+import { getDisconnectRefusal } from '@worker/utils/disconnect-guard/disconnect-guard';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
@@ -26,12 +26,8 @@ export async function POST(request: Request): Promise<Response> {
     if (!(await getTenantById(tenantId, { includeArchived: true }))) {
       return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
     }
-    if (await getTenantByDomain(domain)) {
-      return respondError(
-        HTTP_STATUS.CONFLICT,
-        ENQUEUE_ERROR.DOMAIN_STILL_ASSIGNED,
-      );
-    }
+    const refusal = await getDisconnectRefusal(domain);
+    if (refusal) return respondError(HTTP_STATUS.CONFLICT, refusal);
 
     const run = await start(disconnectCustomDomain, [tenantId, domain]);
     return respond(HTTP_STATUS.ACCEPTED, { runId: run.runId });

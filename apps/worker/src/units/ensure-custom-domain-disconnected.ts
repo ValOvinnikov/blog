@@ -1,8 +1,8 @@
-import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
 import { sanitizeLogMessage } from '@blog/insight';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
+import { getDisconnectRefusal } from '@worker/utils/disconnect-guard/disconnect-guard';
 import { logger } from '@worker/utils/logger/logger';
 import { getVercelEnv } from '@worker/utils/vercel-env/vercel-env';
 import { FatalError } from 'workflow';
@@ -16,8 +16,11 @@ export async function ensureCustomDomainDisconnected(
   'use step';
 
   try {
-    if (await getTenantByDomain(domain)) {
-      throw new FatalError(`Domain "${domain}" is still assigned to a tenant.`);
+    const refusal = await getDisconnectRefusal(domain);
+    if (refusal) {
+      throw new FatalError(
+        `Domain "${domain}" cannot be disconnected: ${refusal}.`,
+      );
     }
     const { vercelToken, vercelTeamId, vercelWebProjectId } = getVercelEnv();
     await deleteVercelProjectDomains({
