@@ -161,7 +161,7 @@ describe(verifyCustomDomainAction, () => {
     });
   });
 
-  it('reports a domain another site verified first as taken, without contacting the worker', async () => {
+  it('reports a domain verified first by another site as taken', async () => {
     asOwner();
     vi.mocked(customDomainClaims.promoteCustomDomainClaim).mockResolvedValue(
       errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN),

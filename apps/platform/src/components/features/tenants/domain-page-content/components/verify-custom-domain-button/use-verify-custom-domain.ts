@@ -28,7 +28,7 @@ import {
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useTransition } from 'react';
+import { useEffect, useRef, useTransition } from 'react';
 
 type TPolledVerify = TMaybeUndefined<TVerifyCustomDomainResult>;
 
@@ -56,11 +56,15 @@ export const useVerifyCustomDomain = (tenantId: string) => {
     VERIFY_POLL_OPTIONS,
   );
 
+  const hasSucceeded = useRef(false);
+
   useEffect(() => {
-    if (polled && isOutcomeSuccess(polled)) {
+    if (isUndefined(polled) || isStillWaiting(polled)) return;
+    if (isOutcomeSuccess(polled)) {
+      hasSucceeded.current = true;
       requestFocus();
-      router.refresh();
     }
+    router.refresh();
   }, [polled, requestFocus, router]);
 
   const verify = () => {
@@ -68,6 +72,7 @@ export const useVerifyCustomDomain = (tenantId: string) => {
       const result = await verifyCustomDomainAction(tenantId);
 
       if (isOutcomeSuccess(result)) {
+        hasSucceeded.current = true;
         requestFocus();
         router.refresh();
       } else if (isOutcomeInvalid(result)) {
@@ -77,6 +82,12 @@ export const useVerifyCustomDomain = (tenantId: string) => {
         toast.error({
           message: t(`fieldError.${CUSTOM_DOMAIN_FIELD_ERROR_KEYS[reason]}`),
         });
+      } else if (
+        hasSucceeded.current &&
+        isOutcomeRefused(result) &&
+        result.reason === CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM
+      ) {
+        router.refresh();
       } else if (isOutcomeRefused(result)) {
         const message = t(
           `refusal.${CUSTOM_DOMAIN_REFUSAL_KEYS[result.reason]}`,
