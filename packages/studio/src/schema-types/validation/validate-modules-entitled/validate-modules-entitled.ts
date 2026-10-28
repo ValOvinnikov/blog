@@ -7,6 +7,7 @@ import {
   modulePath,
   type TModuleReference,
 } from '@blog/studio/schema-types/validation/module-path/module-path';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 
 export const validateModulesEntitled = (modules: unknown) => {
   const entitledModulePacks = getEntitledModulePacks();
@@ -26,5 +27,5 @@ export const validateModulesEntitled = (modules: unknown) => {
     },
   );
 
-  return warnings.length > 0 ? warnings : true;
+  return hasArrayGotItems(warnings) ? warnings : true;
 };

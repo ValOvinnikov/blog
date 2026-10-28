@@ -10,6 +10,7 @@ import {
   moduleInsertMenuGroups,
   sortModulesByKind,
 } from '@blog/studio/structure/module-kinds/module-kinds';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { defineArrayMember, defineField } from 'sanity';
 
 const ONCE_ERROR = 'Only one module of this type is allowed per page.';
@@ -69,7 +70,7 @@ export const modulesField = ({
             : [],
         );
 
-        return violations.length > 0 ? violations : true;
+        return hasArrayGotItems(violations) ? violations : true;
       });
 
       return [onceRule, entitledRule];
