@@ -92,7 +92,8 @@ Free site.
   `/`.
 - Every signed-in pre-shell page shows a `SignedInAccount` line — "Signed in
   as <email>" and Sign out, the email read by `getSessionEmail`: the
-  onboarding rail (below the step list on wide screens), `/workspace-pending`,
+  onboarding rail (below the step list on wide screens; on phones a compact
+  Sign out beside the brand, without the email), `/workspace-pending`,
   the dashboard tenant picker, and the not-found page when a session exists.
   `/sign-in`, `/signup` and `/sign-in-error` never show it, and neither does
   the client-side error page, which has no session to read.

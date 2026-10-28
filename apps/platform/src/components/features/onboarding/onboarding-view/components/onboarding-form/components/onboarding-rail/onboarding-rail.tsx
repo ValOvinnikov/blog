@@ -78,7 +78,7 @@ export const OnboardingRail = ({
       </ol>
       {accountEmail && (
         <div className={account()}>
-          <SignedInAccount email={accountEmail} />
+          <SignedInAccount email={accountEmail} surface="rail" />
         </div>
       )}
     </header>
