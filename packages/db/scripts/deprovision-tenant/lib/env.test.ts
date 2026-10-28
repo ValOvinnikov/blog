@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config/types';
 import { MOCK_DEPROVISION_ENV } from '@blog/db/testing/deprovision-tenant/fixtures';
 import { faker } from '@faker-js/faker';
 
@@ -14,6 +15,7 @@ const REQUIRED_ENV_VARS = {
   SANITY_MANAGEMENT_TOKEN: MOCK_ENV.sanityManagementToken,
   VERCEL_TOKEN: MOCK_ENV.vercelToken,
   VERCEL_PROJECT_ID_WEB: MOCK_ENV.vercelWebProjectId,
+  TENANT_ROOT_DOMAIN: MOCK_ENV.tenantRootDomain,
 };
 
 const OPTIONAL_ENV_VARS = {
@@ -26,7 +28,7 @@ const OPTIONAL_ENV_VARS = {
   SITE_CONFIG_REVALIDATE_SECRET: MOCK_ENV.siteConfigRevalidateSecret,
 };
 
-function stubEnvVars(vars: Record<string, string | undefined>) {
+function stubEnvVars(vars: Record<string, TMaybeUndefined<string>>) {
   for (const [name, value] of Object.entries(vars)) {
     vi.stubEnv(name, value);
   }

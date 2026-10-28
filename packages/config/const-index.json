@@ -6252,6 +6252,14 @@
         "file": "apps/worker/src/constants/inactivity-sweep.ts"
       }
     ],
+    "inactivity_sweep.platform_tenant_skipped": [
+      {
+        "ref": "INACTIVITY_SWEEP_LOG.PLATFORM_TENANT_SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/inactivity-sweep",
+        "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
     "inactivity_sweep.alert_no_recipients": [
       {
         "ref": "INACTIVITY_SWEEP_LOG.ALERT_NO_RECIPIENTS",

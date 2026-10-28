@@ -1,3 +1,4 @@
+import { DOMAIN_PATTERN } from '@blog/config/constants';
 import {
   isPersonalDataKey,
   isPersonalDataKeyring,
@@ -31,6 +32,13 @@ export const env = createEnv({
     // Must be byte-identical to `apps/web`'s own `SITE_CONFIG_REVALIDATE_SECRET`.
     // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
+    // @env-required: development, production
+    TENANT_ROOT_DOMAIN: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(DOMAIN_PATTERN)
+      .optional(),
     // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
     // @env-optional
@@ -69,6 +77,7 @@ export const env = createEnv({
     WEB_APP_URL: process.env.WEB_APP_URL,
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
+    TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
