@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
+  type ACTION_OUTCOME,
   isOutcomeRefused,
   isOutcomeSuccess,
   isOutcomeUnavailable,
