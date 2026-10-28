@@ -145,6 +145,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **MAGIC_LINK_REFUSAL**: `BLOCKED`, `NETWORK_LIMIT`, `ADDRESS_LIMIT`, `CHECK_FAILED`
 - **MAGIC_LINK_SIGN_IN_CODE**: `SEND_LIMITED`
 
+### `@blog/config/constants` — `packages/config/src/constants/module-pack.ts`
+
+- **MODULE_PACK**: `CORE`, `GROWTH`
+
 ### `@blog/config/constants` — `packages/config/src/constants/module.ts`
 
 - **HERO_FIELD_MODE**: `CUSTOM`, `NONE`, `POST_TOPIC`, `POST_TITLE`, `POST_EXCERPT`, `POST_IMAGE`

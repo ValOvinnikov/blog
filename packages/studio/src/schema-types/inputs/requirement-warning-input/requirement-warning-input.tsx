@@ -1,22 +1,22 @@
-import type { TCapability } from '@blog/config/constants';
 import {
-  getCapabilityOffMessage,
-  getMissingCapability,
-} from '@blog/studio/schema-types/inputs/capability-warning-input/get-missing-capability';
-import { markCapabilityOffTypes } from '@blog/studio/schema-types/inputs/capability-warning-input/mark-capability-off-types';
+  getMissingRequirement,
+  getRequirementOffMessage,
+  type TEntitlementState,
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
 import { Card, Stack, Text } from '@sanity/ui';
 import { useMemo } from 'react';
 import { type InputProps, isArraySchemaType } from 'sanity';
 
-export const createCapabilityWarningInput = (
-  enabledCapabilities: readonly TCapability[],
+export const createRequirementWarningInput = (
+  entitlements: TEntitlementState,
 ) => {
-  return function CapabilityWarningInput(props: InputProps) {
+  return function RequirementWarningInput(props: InputProps) {
     const { schemaType } = props;
     const markedArrayType = useMemo(() => {
       const of =
         isArraySchemaType(schemaType) &&
-        markCapabilityOffTypes(schemaType.of, enabledCapabilities);
+        markRequirementOffTypes(schemaType.of, entitlements);
 
       return of ? Object.create(schemaType, { of: { value: of } }) : null;
     }, [schemaType]);
@@ -27,7 +27,7 @@ export const createCapabilityWarningInput = (
 
     const missing =
       props.path.length === 0
-        ? getMissingCapability(schemaType.name, enabledCapabilities)
+        ? getMissingRequirement(schemaType.name, entitlements)
         : null;
 
     if (!missing) {
@@ -37,7 +37,7 @@ export const createCapabilityWarningInput = (
     return (
       <Stack gap={4}>
         <Card tone="caution" padding={3} radius={2} border={true}>
-          <Text size={1}>{getCapabilityOffMessage(missing)}</Text>
+          <Text size={1}>{getRequirementOffMessage(missing)}</Text>
         </Card>
         {props.renderDefault(props)}
       </Stack>
