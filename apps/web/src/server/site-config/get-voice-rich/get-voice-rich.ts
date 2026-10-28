@@ -1,5 +1,5 @@
 import type { TVoicePortableText } from '@blog/config';
-import { VOICE_RICH_FETCH_FAILED_EVENT } from '@web/constants/site-config';
+import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -20,7 +20,10 @@ export const getVoiceRich = async (
   const result = await getSiteConfig(tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER);
 
   if (!result.ok) {
-    logger.error(VOICE_RICH_FETCH_FAILED_EVENT, { id, error: result.error });
+    logger.error(SITE_CONFIG_LOG.VOICE_RICH_FETCH_FAILED, {
+      id,
+      error: result.error,
+    });
     return resolveVoiceRichFields({}, baseMessages)[id];
   }
 

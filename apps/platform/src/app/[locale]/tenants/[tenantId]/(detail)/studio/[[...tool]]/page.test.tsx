@@ -7,7 +7,10 @@ import {
   MOCK_OTHER_TENANT_NAME,
   MOCK_SANITY_PROJECT_ID,
 } from '@platform/testing/tenants/fixtures';
-import { mockStudioReadyTenant } from '@platform/testing/tenants/studio-ready-tenant';
+import {
+  MOCK_FREE_STUDIO_ENTITLEMENTS,
+  mockStudioReadyTenant,
+} from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import TenantStudioPage from './page';
@@ -81,6 +84,7 @@ describe(`<${TenantStudioPage.name}/>`, () => {
       basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
       title: MOCK_OTHER_TENANT_NAME,
       enabledCapabilities: [],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: tenant.locale,
       liveLocales: [],
       loginProvider: undefined,

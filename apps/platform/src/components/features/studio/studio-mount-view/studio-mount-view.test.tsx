@@ -3,6 +3,7 @@ import {
   LOCALE_ISO_CODES,
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
+import { PLAN_ENTITLEMENTS, TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
@@ -12,6 +13,7 @@ import {
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { MOCK_FREE_STUDIO_ENTITLEMENTS } from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { StudioMountView } from './studio-mount-view';
@@ -129,6 +131,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       basePath,
       title: MOCK_OTHER_TENANT_NAME,
       enabledCapabilities: [],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: tenant.locale,
       liveLocales: [LOCALE_ISO_CODES.EN],
     });
@@ -146,10 +149,24 @@ describe(`<${StudioMountView.name}/>`, () => {
       basePath: adminRoutes.dashboardStudio(),
       title: MOCK_TENANT.name,
       enabledCapabilities: [CAPABILITY.COMMENTS],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: MOCK_TENANT.locale,
       liveLocales: [LOCALE_ISO_CODES.EN],
     });
   });
+
+  it.each(Object.values(TENANT_PLAN))(
+    "passes the %s plan's module packs to Studio",
+    async (plan) => {
+      await setup({ tenant: mockProvisionedTenant({ plan }) });
+
+      expect(studioMountMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          entitlements: { modulePacks: PLAN_ENTITLEMENTS[plan].modulePacks },
+        }),
+      );
+    },
+  );
 
   it("passes the tenant's default and live languages to Studio", async () => {
     const tenant = mockProvisionedTenant({ locale: LOCALE_ISO_CODES.NL });
@@ -165,6 +182,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       basePath: adminRoutes.dashboardStudio(),
       title: tenant.name,
       enabledCapabilities: [],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: LOCALE_ISO_CODES.NL,
       liveLocales,
     });
@@ -179,6 +197,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       basePath: adminRoutes.dashboardStudio(),
       title: MOCK_TENANT.name,
       enabledCapabilities: [],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: MOCK_TENANT.locale,
       liveLocales: [LOCALE_ISO_CODES.EN],
       loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
