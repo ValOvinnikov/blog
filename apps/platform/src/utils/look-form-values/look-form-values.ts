@@ -26,6 +26,9 @@ export const applyPresetDefaults = (
     density: tokens.density,
     cardStyle,
     headerControlStyle,
+    headerLayout: current.headerLayout,
+    headerSubmenuStyle: current.headerSubmenuStyle,
+    headerBarStyle: current.headerBarStyle,
     languageSwitcherStyle: current.languageSwitcherStyle,
     logo: current.logo,
     favicon: current.favicon,
@@ -37,6 +40,7 @@ export const CARD_FIELDS = {
   colour: ['accentHue', 'logoHue'],
   type: ['headingFont', 'bodyFont'],
   shape: ['radiusScale', 'density', 'cardStyle', 'headerControlStyle'],
+  header: ['headerLayout', 'headerSubmenuStyle', 'headerBarStyle'],
   brand: ['logo', 'favicon'],
   languageSwitcher: ['languageSwitcherStyle'],
 } as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;

@@ -5,7 +5,10 @@ import {
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type THeaderBarStyle,
   type THeaderControlStyle,
+  type THeaderLayout,
+  type THeaderSubmenuStyle,
   type TLanguageSwitcherStyle,
   type TMaybeUndefined,
   type TPresetId,
@@ -24,6 +27,9 @@ export type TLookFormValues = {
   density: TDensity;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  headerLayout: THeaderLayout;
+  headerSubmenuStyle: THeaderSubmenuStyle;
+  headerBarStyle: THeaderBarStyle;
   languageSwitcherStyle: TLanguageSwitcherStyle;
   logo: TStagedImage;
   favicon: TStagedImage;
@@ -40,6 +46,9 @@ export const defaultLookFormValues = (): TLookFormValues => {
     themeTokens: consoleTokens,
     cardStyle,
     headerControlStyle,
+    headerLayout,
+    headerSubmenuStyle,
+    headerBarStyle,
   } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
   return {
@@ -52,6 +61,9 @@ export const defaultLookFormValues = (): TLookFormValues => {
     density: consoleTokens.density,
     cardStyle,
     headerControlStyle,
+    headerLayout,
+    headerSubmenuStyle,
+    headerBarStyle,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     logo: { url: undefined },
     favicon: { url: undefined },
@@ -71,6 +83,9 @@ export const toLookFormValues = (
     density: siteConfig.density,
     cardStyle: siteConfig.cardStyle,
     headerControlStyle: siteConfig.headerControlStyle,
+    headerLayout: siteConfig.headerLayout,
+    headerSubmenuStyle: siteConfig.headerSubmenuStyle,
+    headerBarStyle: siteConfig.headerBarStyle,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
     logo: { url: siteConfig.logoAssetUrl },
     favicon: { url: siteConfig.faviconAssetUrl },

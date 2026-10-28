@@ -538,6 +538,30 @@
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
     "shapeHeading": "Forma",
     "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas y los botones de la cabecera.",
+    "headerHeading": "Cabecera",
+    "headerDescription": "Cómo se organiza la barra superior de su sitio y cómo se abren sus submenús.",
+    "headerLayoutLabel": "Diseño",
+    "headerLayoutDescription": "Dónde van el logotipo, los enlaces y los botones en pantallas anchas. En el móvil siempre hay una barra con botón de menú.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Clásico",
+      "LINKS_BESIDE_BRAND": "Enlaces junto a la marca",
+      "CENTRED_LINKS": "Enlaces centrados",
+      "TWO_ROWS": "Dos filas",
+      "CENTRED_BRAND": "Marca centrada",
+      "MENU_BUTTON": "Botón de menú"
+    },
+    "headerSubmenuStyleLabel": "Submenús",
+    "headerSubmenuStyleDescription": "Cómo se abre un enlace con subelementos en pantallas anchas.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Desplegable",
+      "WIDE_PANEL": "Panel ancho"
+    },
+    "headerBarStyleLabel": "Barra",
+    "headerBarStyleDescription": "Si la barra ocupa todo el ancho de la página o flota sobre ella como una tarjeta.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Ancho completo",
+      "FLOATING": "Flotante"
+    },
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
@@ -566,6 +590,10 @@
     "previewWidthAriaLabel": "Ancho de la vista previa",
     "navPosts": "Entradas",
     "navAbout": "Acerca de",
+    "navTopics": "Temas",
+    "submenuLead": "Todos los temas",
+    "submenuFirstItem": "Mareas",
+    "submenuSecondItem": "Puertos",
     "switcherMenuAriaLabel": "Idioma: {language}",
     "signIn": "Iniciar sesión",
     "themeToggleDark": "Cambiar al tema oscuro",

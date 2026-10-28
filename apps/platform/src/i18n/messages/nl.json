@@ -538,6 +538,30 @@
     "typeDescription": "Elk lettertype wordt in zijn eigen stijl getoond.",
     "shapeHeading": "Vorm",
     "shapeDescription": "Hoeken, ruimte en hoe kaarten en headerknoppen zijn omlijst.",
+    "headerHeading": "Koptekst",
+    "headerDescription": "Hoe de bovenbalk van uw site is ingedeeld en hoe de submenu’s openen.",
+    "headerLayoutLabel": "Indeling",
+    "headerLayoutDescription": "Waar logo, links en knoppen op brede schermen staan. Op telefoons krijgt u altijd de balk met een menuknop.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Klassiek",
+      "LINKS_BESIDE_BRAND": "Links naast het merk",
+      "CENTRED_LINKS": "Gecentreerde links",
+      "TWO_ROWS": "Twee rijen",
+      "CENTRED_BRAND": "Gecentreerd merk",
+      "MENU_BUTTON": "Menuknop"
+    },
+    "headerSubmenuStyleLabel": "Submenu’s",
+    "headerSubmenuStyleDescription": "Hoe een link met subitems opent op brede schermen.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Dropdown",
+      "WIDE_PANEL": "Breed paneel"
+    },
+    "headerBarStyleLabel": "Balk",
+    "headerBarStyleDescription": "Of de balk de hele pagina beslaat of als kaart erboven zweeft.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Volledige breedte",
+      "FLOATING": "Zwevend"
+    },
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
@@ -566,6 +590,10 @@
     "previewWidthAriaLabel": "Breedte voorbeeld",
     "navPosts": "Berichten",
     "navAbout": "Over",
+    "navTopics": "Onderwerpen",
+    "submenuLead": "Alle onderwerpen",
+    "submenuFirstItem": "Getijden",
+    "submenuSecondItem": "Havens",
     "switcherMenuAriaLabel": "Taal: {language}",
     "signIn": "Inloggen",
     "themeToggleDark": "Overschakelen naar donker thema",

@@ -98,6 +98,9 @@ export const useLookSave = ({
         density: vals.density,
         cardStyle: vals.cardStyle,
         headerControlStyle: vals.headerControlStyle,
+        headerLayout: vals.headerLayout,
+        headerSubmenuStyle: vals.headerSubmenuStyle,
+        headerBarStyle: vals.headerBarStyle,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
       return finish(outcome);

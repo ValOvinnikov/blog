@@ -7,6 +7,7 @@ import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
+import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
@@ -55,7 +56,7 @@ export const LookPreview = ({
         logoSrc={values.logo.url}
         theme={buildSitePreviewTheme(values, isDark)}
         liveLocales={liveLocales}
-        languageSwitcherStyle={values.languageSwitcherStyle}
+        header={toSampleHeaderStyle(values)}
         hasReaderAccounts={hasReaderAccounts}
         isNarrow={isNarrow}
       />

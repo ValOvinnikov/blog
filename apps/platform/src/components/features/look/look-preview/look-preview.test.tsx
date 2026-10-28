@@ -1,6 +1,7 @@
 import {
   CARD_STYLE,
   DENSITY,
+  HEADER_LAYOUT,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
@@ -108,6 +109,20 @@ describe(`<${LookPreview.name}/>`, () => {
 
     const mobileButton = screen.getByRole('button', { name: MOBILE });
     await user.click(mobileButton);
+
+    const menuButton = screen.getByRole('button', {
+      name: messages.lookPreview.menuButton,
+    });
+    const postsLink = screen.queryByRole('link', {
+      name: messages.lookPreview.navPosts,
+    });
+
+    expect(menuButton).toBeVisible();
+    expect(postsLink).not.toBeInTheDocument();
+  });
+
+  it('swaps the desktop page links for a menu button with the menu button layout', () => {
+    renderPreview({ headerLayout: HEADER_LAYOUT.MENU_BUTTON });
 
     const menuButton = screen.getByRole('button', {
       name: messages.lookPreview.menuButton,

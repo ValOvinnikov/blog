@@ -6,6 +6,7 @@ import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { applyPresetDefaults } from '@platform/utils/look-form-values/look-form-values';
+import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
@@ -39,7 +40,7 @@ export const OnboardingPreview = ({
         logoSrc={undefined}
         theme={buildSitePreviewTheme({ ...look, accentHue }, isDark)}
         liveLocales={[locale]}
-        languageSwitcherStyle={look.languageSwitcherStyle}
+        header={toSampleHeaderStyle(look)}
         hasReaderAccounts={false}
       />
     </PreviewFrame>
