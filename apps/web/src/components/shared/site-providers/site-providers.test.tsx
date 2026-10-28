@@ -26,6 +26,8 @@ vi.mock(
   () => ({ isCapabilityEnabled: vi.fn() }),
 );
 
+vi.mock('@web/server/site-config/get-busy-style/get-busy-style');
+
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));

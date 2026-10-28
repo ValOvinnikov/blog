@@ -7,7 +7,6 @@ import {
   customRender,
   renderElement,
   screen,
-  waitFor,
 } from '@web/testing/custom-render';
 
 import { NewsletterForm } from './newsletter-form';
@@ -35,6 +34,7 @@ const MOCK_SECOND_TRUST_CUE = faker.lorem.words(3);
 
 const EMAIL_FIELD_NAME = 'Email address';
 const SUBSCRIBE_BUTTON_NAME = 'Subscribe';
+const SUBSCRIBING_BUTTON_NAME = 'Subscribing…';
 const DESCRIBED_BY_ATTRIBUTE = 'aria-describedby';
 const SUCCESS_MESSAGE = 'Almost there — check your inbox to confirm.';
 const INVALID_EMAIL_MESSAGE = 'Enter a valid email address.';
@@ -82,7 +82,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
       expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
     });
 
-    it('marks the button busy while the server action is in flight', async () => {
+    it('reads Subscribing… on a busy button while the server action is in flight', async () => {
       let resolveAction!: (result: TSubscribeResult) => void;
       subscribeToNewsletterActionMock.mockImplementationOnce(
         () =>
@@ -92,12 +92,11 @@ describe(`<${NewsletterForm.name}/>`, () => {
       );
       await typeAndSubmit(user, MOCK_EMAIL);
 
-      const button = screen.getByRole('button', {
-        name: SUBSCRIBE_BUTTON_NAME,
+      const button = await screen.findByRole('button', {
+        name: SUBSCRIBING_BUTTON_NAME,
       });
-      await waitFor(() => {
-        expect(button).toHaveAttribute('aria-busy', 'true');
-      });
+
+      expect(button).toHaveAttribute('aria-busy', 'true');
 
       resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 

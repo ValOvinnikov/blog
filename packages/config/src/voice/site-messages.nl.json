@@ -162,6 +162,7 @@
   },
   "newsletterForm": {
     "submitLabel": "Abonneren",
+    "submittingLabel": "Aanmelden…",
     "emailAriaLabel": "E-mailadres",
     "placeholder": "naam@voorbeeld.nl",
     "successMessage": "Bijna klaar — controleer uw inbox om te bevestigen.",

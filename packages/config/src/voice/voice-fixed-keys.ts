@@ -95,6 +95,7 @@ export const VOICE_FIXED_KEYS = [
   'rss.fallbackDescription',
 
   'newsletterForm.submitLabel',
+  'newsletterForm.submittingLabel',
   'newsletterForm.emailAriaLabel',
   'newsletterForm.placeholder',
   'newsletterForm.successMessage',

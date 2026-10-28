@@ -162,6 +162,7 @@
   },
   "newsletterForm": {
     "submitLabel": "Suscribirse",
+    "submittingLabel": "Suscribiendo…",
     "emailAriaLabel": "Correo electrónico",
     "placeholder": "nombre@ejemplo.com",
     "successMessage": "Ya casi está — revise su bandeja de entrada para confirmar.",

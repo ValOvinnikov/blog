@@ -162,6 +162,7 @@
   },
   "newsletterForm": {
     "submitLabel": "Abonnieren",
+    "submittingLabel": "Wird abonniert …",
     "emailAriaLabel": "E-Mail-Adresse",
     "placeholder": "name@beispiel.de",
     "successMessage": "Fast geschafft — prüfen Sie Ihr Postfach, um zu bestätigen.",

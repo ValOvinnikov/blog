@@ -162,6 +162,7 @@
   },
   "newsletterForm": {
     "submitLabel": "Subscribe",
+    "submittingLabel": "Subscribing…",
     "emailAriaLabel": "Email address",
     "placeholder": "you@example.com",
     "successMessage": "Almost there — check your inbox to confirm.",

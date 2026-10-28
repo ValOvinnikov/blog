@@ -89,7 +89,7 @@ describe(`<${ContactForm.name}/>`, () => {
     });
 
     it('announces the success message through a status region', async () => {
-      const status = screen.getByRole('status');
+      const [status] = screen.getAllByRole('status');
 
       await fillAndSendContactForm(user, MOCK_CONTACT_MESSAGE);
 

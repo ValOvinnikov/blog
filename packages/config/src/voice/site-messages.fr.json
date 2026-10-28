@@ -162,6 +162,7 @@
   },
   "newsletterForm": {
     "submitLabel": "S'abonner",
+    "submittingLabel": "Inscription…",
     "emailAriaLabel": "Adresse e-mail",
     "placeholder": "vous@exemple.fr",
     "successMessage": "C'est presque fini — consultez votre boîte de réception pour confirmer.",
