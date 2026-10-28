@@ -1,3 +1,4 @@
+import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { screen } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import type { Mock } from 'vitest';
@@ -158,7 +159,7 @@ export const testWarnsForUnknownModule = ({
     expect(unknownModuleText).not.toBeInTheDocument();
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
     expect(loggerWarnMock).toHaveBeenCalledWith(
-      'module_renderer.unknown_module_type',
+      MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE,
       { moduleType: unknownModule.type },
     );
   });

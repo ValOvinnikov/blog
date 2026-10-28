@@ -1,14 +1,24 @@
 import { faker } from '@faker-js/faker';
+import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
+import { isModuleEntitled } from '@web/server/settings-features/is-module-entitled/is-module-entitled';
 import {
-  customRender,
   customRenderAsync,
+  customRenderServerAsync,
   screen,
 } from '@web/testing/custom-render';
 import { logger } from '@web/utils/logger/logger';
 
-import { renderHeroModule, renderModules } from './module-renderer';
+import {
+  type IRenderModulesProps,
+  renderHeroModule,
+  renderModules,
+} from './module-renderer';
 
 faker.seed(6011);
+
+vi.mock('@web/server/settings-features/is-module-entitled/is-module-entitled');
+
+const isModuleEntitledMock = vi.mocked(isModuleEntitled);
 
 const { STUB_TEST_ID, STUB_PAGE_TEST_ID, StubModule, StubHeroModule } =
   vi.hoisted(() => {
@@ -39,6 +49,7 @@ const { STUB_TEST_ID, STUB_PAGE_TEST_ID, StubModule, StubHeroModule } =
 const moduleMap = {
   module_cta: StubModule,
   module_postList: StubModule,
+  module_stats: StubModule,
 };
 
 const heroMap = {
@@ -47,14 +58,28 @@ const heroMap = {
 
 const MOCK_CTA_ID = faker.string.uuid();
 const MOCK_POST_LIST_ID = faker.string.uuid();
+const MOCK_STATS_ID = faker.string.uuid();
 const MOCK_HERO_ID = faker.string.uuid();
 const MOCK_PAGE = faker.number.int({ min: 2, max: 9 });
 const MOCK_UNKNOWN_MODULE_TYPE = 'module_unknown';
 const MOCK_UNKNOWN_HERO_TYPE = 'module_heroUnknown';
 
-const setupModules = customRender(renderModules, {
-  modules: [{ type: 'module_cta', id: MOCK_CTA_ID }],
-  map: moduleMap,
+const setupModules = customRenderServerAsync(
+  async (props: IRenderModulesProps) => renderModules(props),
+  {
+    modules: [{ type: 'module_cta', id: MOCK_CTA_ID }],
+    map: moduleMap,
+  },
+);
+
+const entitleOnly =
+  (...entitledTypes: string[]) =>
+  async (moduleType: string) =>
+    entitledTypes.includes(moduleType);
+
+beforeEach(() => {
+  isModuleEntitledMock.mockReset();
+  isModuleEntitledMock.mockResolvedValue(true);
 });
 
 const setupHero = customRenderAsync(renderHeroModule, {
@@ -63,24 +88,24 @@ const setupHero = customRenderAsync(renderHeroModule, {
 });
 
 describe(renderModules, () => {
-  it('renders the mapped component for a known module type with its id', () => {
-    setupModules();
+  it('renders the mapped component for a known module type with its id', async () => {
+    await setupModules();
 
     const stub = screen.getByTestId(STUB_TEST_ID);
 
     expect(stub).toHaveTextContent(MOCK_CTA_ID);
   });
 
-  it('forwards the caller-provided context to the module component', () => {
-    setupModules({ context: { page: MOCK_PAGE } });
+  it('forwards the caller-provided context to the module component', async () => {
+    await setupModules({ context: { page: MOCK_PAGE } });
 
     const page = screen.getByTestId(STUB_PAGE_TEST_ID);
 
     expect(page).toHaveTextContent(String(MOCK_PAGE));
   });
 
-  it('renders nothing for an unknown module type and warns once', () => {
-    const { container } = setupModules({
+  it('renders nothing for an unknown module type and warns once', async () => {
+    const { container } = await setupModules({
       modules: [
         { type: MOCK_UNKNOWN_MODULE_TYPE as never, id: faker.string.uuid() },
       ],
@@ -89,15 +114,34 @@ describe(renderModules, () => {
     expect(container).toBeEmptyDOMElement();
     expect(vi.mocked(logger.warn)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      'module_renderer.unknown_module_type',
+      MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE,
       { moduleType: MOCK_UNKNOWN_MODULE_TYPE },
     );
   });
 
-  it('renders every module in the given order', () => {
-    setupModules({
+  it('renders every module in the given order', async () => {
+    await setupModules({
       modules: [
         { type: 'module_cta', id: MOCK_CTA_ID },
+        { type: 'module_postList', id: MOCK_POST_LIST_ID },
+      ],
+    });
+
+    const stubs = screen.getAllByTestId(STUB_TEST_ID);
+    const renderedIds = stubs.map((stub) => stub.textContent);
+
+    expect(renderedIds).toEqual([MOCK_CTA_ID, MOCK_POST_LIST_ID]);
+  });
+
+  it('skips a module the tenant is not entitled to and renders the rest in order', async () => {
+    isModuleEntitledMock.mockImplementation(
+      entitleOnly('module_cta', 'module_postList'),
+    );
+
+    await setupModules({
+      modules: [
+        { type: 'module_cta', id: MOCK_CTA_ID },
+        { type: 'module_stats', id: MOCK_STATS_ID },
         { type: 'module_postList', id: MOCK_POST_LIST_ID },
       ],
     });
@@ -126,8 +170,16 @@ describe(renderHeroModule, () => {
     expect(container).toBeEmptyDOMElement();
     expect(vi.mocked(logger.warn)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      'hero_slot.unknown_hero_type',
+      MODULE_RENDERER_LOG.UNKNOWN_HERO_TYPE,
       { heroType: MOCK_UNKNOWN_HERO_TYPE },
     );
+  });
+
+  it('renders nothing for a hero the tenant is not entitled to', async () => {
+    isModuleEntitledMock.mockResolvedValue(false);
+
+    const { container } = await setupHero();
+
+    expect(container).toBeEmptyDOMElement();
   });
 });
