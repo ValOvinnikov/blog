@@ -44,6 +44,8 @@ const renderPreview = (values: Partial<TLookFormValues> = {}) => {
     brandImageError: undefined,
     changePreset: vi.fn(),
     resetToPreset: vi.fn(),
+    isSubmenuPreviewOpen: false,
+    setIsSubmenuPreviewOpen: vi.fn(),
   };
 
   return renderWithIntl(
