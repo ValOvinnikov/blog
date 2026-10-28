@@ -244,7 +244,7 @@
   },
   "tenantsView": {
     "title": "Locataires",
-    "description": "Tous les sites de la plateforme, lus depuis la table <code>tenants</code> réelle.",
+    "description": "Tous les sites de la plateforme, avec leur formule et leur statut.",
     "addTenant": "Ajouter un locataire"
   },
   "emailAlertsBanner": {
