@@ -7,8 +7,9 @@ import { ReaderAccountPanel } from '@web/components/shared/auth-menu/components/
 import { ReaderSignInPanel } from '@web/components/shared/auth-menu/components/reader-sign-in-panel/reader-sign-in-panel';
 import { useReaderAccount } from '@web/components/shared/auth-menu/hooks/use-reader-account';
 import { SESSION_STATUS } from '@web/constants/session';
+import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
 import { useTranslations } from 'next-intl';
-import { useId, useRef, useState } from 'react';
+import { useId, useRef } from 'react';
 
 import { accountMenuGroupVariants } from './account-menu-group-variants';
 
@@ -27,7 +28,9 @@ export const AccountMenuGroup = ({
   const t = useTranslations('authMenu');
   const panelId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useOverlayOpenState({
+    overlayId: panelId,
+  });
   const { group, row, glyph, chevron, panel } = accountMenuGroupVariants();
 
   if (status === SESSION_STATUS.LOADING) {
@@ -37,6 +40,7 @@ export const AccountMenuGroup = ({
   return (
     <details
       name={groupName}
+      open={isExpanded}
       onToggle={(event) => setIsExpanded(event.currentTarget.open)}
       className={group()}
     >

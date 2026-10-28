@@ -11,11 +11,13 @@ import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   KEY_ARROW_DOWN,
   KEY_ARROW_UP,
   KEY_END,
+  KEY_ESCAPE,
 } from '@web/testing/shared/keyboard/constants';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import {
@@ -100,6 +102,7 @@ const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
+const PANEL_ACTIONS_TEST_ID = 'primary-navigation-panel-actions';
 const SIGN_IN = 'Sign in';
 const ACCOUNT = 'Account';
 const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
@@ -216,7 +219,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     it('puts the language pill and theme toggle in the phone menu', async () => {
       await openPhoneMenu();
 
-      const panelRow = screen.getByTestId('primary-navigation-panel-actions');
+      const panelRow = screen.getByTestId(PANEL_ACTIONS_TEST_ID);
       const englishButton = within(panelRow).getByRole('button', {
         name: LANGUAGE_ENGLISH,
       });
@@ -259,6 +262,18 @@ describe(`<${SiteHeader.name}/>`, () => {
       await setup();
     });
 
+    it('closes the phone menu when the phone circle opens its panel', async () => {
+      await openPhoneMenu();
+      const [, phoneCircle] = getBarSignInButtons();
+      await user.click(phoneCircle!);
+
+      const toggleButton = screen.getByRole('button', {
+        name: TOGGLE_NAVIGATION_MENU,
+      });
+
+      expect(toggleButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
     it('adds a circle beside the wide pill', () => {
       const signInButtons = getBarSignInButtons();
 
@@ -276,7 +291,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     it('returns focus to the phone circle when Escape closes its panel', async () => {
       const [, phoneCircle] = getBarSignInButtons();
       await user.click(phoneCircle!);
-      await user.keyboard('{Escape}');
+      await user.keyboard(KEY_ESCAPE);
 
       const signInDialog = screen.queryByRole('dialog', { name: SIGN_IN });
 
@@ -393,6 +408,89 @@ describe(`<${SiteHeader.name}/>`, () => {
       await user.click(accountRow);
 
       expect(githubButton).not.toBeVisible();
+    });
+  });
+
+  describe('with the language switcher and the account in the phone menu', () => {
+    const getPanelLanguageButton = () => {
+      const panelRow = screen.getByTestId(PANEL_ACTIONS_TEST_ID);
+      return within(panelRow).getByRole('button', { name: LANGUAGE_ENGLISH });
+    };
+
+    const openAccountRow = async () => {
+      const accountRow = getDrawerAccountRow(SIGN_IN);
+      await user.click(accountRow);
+      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
+      return within(drawerActions).findByRole('button', {
+        name: CONTINUE_WITH_GITHUB,
+      });
+    };
+
+    beforeEach(async () => {
+      stubHidePopover();
+      getRequestContextMock.mockResolvedValueOnce({
+        ...MOCK_REQUEST_CONTEXT,
+        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+      });
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [], showLanguageSwitcher: true }),
+      );
+      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+      await setup();
+      await openPhoneMenu();
+    });
+
+    afterEach(() => {
+      unstubHidePopover();
+    });
+
+    it('keeps the phone menu open when the language menu opens inside it', async () => {
+      const languageButton = getPanelLanguageButton();
+      await user.click(languageButton);
+
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      const languageMenu = within(mobilePanel).getByRole('menu', {
+        name: LANGUAGE_NAV_NAME,
+      });
+
+      expect(mobilePanel).toBeVisible();
+      expect(languageMenu).toBeVisible();
+    });
+
+    it('folds the open account row when the language menu opens', async () => {
+      const githubButton = await openAccountRow();
+
+      const languageButton = getPanelLanguageButton();
+      await user.click(languageButton);
+
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
+      expect(githubButton).not.toBeVisible();
+      expect(mobilePanel).toBeVisible();
+    });
+
+    it('closes the open language menu when the account row opens', async () => {
+      const languageButton = getPanelLanguageButton();
+      await user.click(languageButton);
+
+      const githubButton = await openAccountRow();
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
+      expect(languageButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(githubButton).toBeVisible();
+      expect(mobilePanel).toBeVisible();
+    });
+
+    it('closes only the language menu on Escape inside the phone menu', async () => {
+      const languageButton = getPanelLanguageButton();
+      await user.click(languageButton);
+
+      await user.keyboard(KEY_ESCAPE);
+
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
+      expect(languageButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(mobilePanel).toBeVisible();
     });
   });
 
