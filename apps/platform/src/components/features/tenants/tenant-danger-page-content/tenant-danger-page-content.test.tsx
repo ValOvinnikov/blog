@@ -10,6 +10,7 @@ import {
   MOCK_RUN_PLUS_1_MIN_AT,
   MOCK_RUN_STARTED_AT,
   MOCK_TENANT_ID,
+  PLATFORM_TENANT_NOTICE_TEXT,
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
 
@@ -91,6 +92,16 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     expect(trigger).not.toHaveAttribute(ARIA_DISABLED);
     expect(removeDomainStep).not.toBeInTheDocument();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
+  });
+
+  it('offers no Deprovision on the platform tenant, and says why', () => {
+    setup({ isPlatformTenant: true });
+
+    const trigger = screen.queryByRole('button', { name: 'Deprovision' });
+    const notice = screen.getByText(PLATFORM_TENANT_NOTICE_TEXT);
+
+    expect(trigger).not.toBeInTheDocument();
+    expect(notice).toBeVisible();
   });
 
   it('shows the starting state while a requested run has not begun', async () => {

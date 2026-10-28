@@ -1132,6 +1132,10 @@
     "title": "This tenant is archived",
     "description": "Deprovisioned {date}. Everything on these pages is read-only."
   },
+  "platformTenantNotice": {
+    "title": "The platform's own site",
+    "description": "This is the platform's own site, so it can't be suspended or deleted."
+  },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",
     "activeOption": "Active",
@@ -1206,6 +1210,7 @@
     "notDeprovisioned": "This tenant is not deprovisioned.",
     "alreadyInProgress": "Provisioning is already running.",
     "notArchived": "This tenant must be archived before it can be deleted.",
+    "platformTenant": "This is the platform's own site, so it can't be suspended or deleted.",
     "deprovisionFailed": "Couldn't start deprovisioning — try again.",
     "reactivateFailed": "Couldn't start reactivation — try again.",
     "deleteFailed": "Couldn't delete the tenant — try again.",

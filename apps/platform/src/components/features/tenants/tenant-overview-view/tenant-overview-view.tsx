@@ -6,12 +6,14 @@ import { DomainCardSkeleton } from '@platform/components/features/tenants/domain
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
+import { PlatformTenantNotice } from '@platform/components/features/tenants/platform-tenant-notice';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { Suspense } from 'react';
@@ -29,18 +31,26 @@ export const TenantOverviewView = async ({
   const { id, primaryDomain, status, deprovisionedAt } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [admin, owner, auditEvents, findings] = await Promise.all([
-    requireAdmin(),
-    queries.memberships.getTenantOwnerMembership(id),
-    queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
-      limit: 5,
-    }),
-    queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
-  ]);
+  const [admin, owner, auditEvents, findings, isPlatformTenant] =
+    await Promise.all([
+      requireAdmin(),
+      queries.memberships.getTenantOwnerMembership(id),
+      queries.auditEvents.listAuditEventsForTarget(
+        AUDIT_TARGET_TYPE.TENANT,
+        id,
+        {
+          limit: 5,
+        },
+      ),
+      queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+      resolveIsPlatformTenant(tenant),
+    ]);
   const canChangeSuspension =
     isSuperAdmin(admin) &&
     !deprovisionedAt &&
     status !== TENANT_STATUS.ARCHIVED;
+  const isSuspensionControlShown =
+    !isPlatformTenant || status === TENANT_STATUS.SUSPENDED;
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
 
   return (
@@ -61,9 +71,12 @@ export const TenantOverviewView = async ({
             />
           </Suspense>
           <OwnerCard owner={owner} />
-          {canChangeSuspension && (
-            <TenantSuspensionControl tenant={clientTenant} />
-          )}
+          {canChangeSuspension &&
+            (isSuspensionControlShown ? (
+              <TenantSuspensionControl tenant={clientTenant} />
+            ) : (
+              <PlatformTenantNotice />
+            ))}
         </div>
         <div className={cardsColumn()}>
           <ContentWorkspaceCard tenant={clientTenant} />

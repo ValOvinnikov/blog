@@ -1132,6 +1132,10 @@
     "title": "Este cliente está archivado",
     "description": "Desaprovisionado el {date}. Todo lo que aparece en estas páginas es de solo lectura."
   },
+  "platformTenantNotice": {
+    "title": "El sitio propio de la plataforma",
+    "description": "Este es el sitio propio de la plataforma, así que no se puede suspender ni eliminar."
+  },
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilidad de clientes",
     "activeOption": "Activos",
@@ -1206,6 +1210,7 @@
     "notDeprovisioned": "Este cliente no está desaprovisionado.",
     "alreadyInProgress": "El aprovisionamiento ya está en curso.",
     "notArchived": "Este cliente debe archivarse antes de poder eliminarlo.",
+    "platformTenant": "Este es el sitio propio de la plataforma, así que no se puede suspender ni eliminar.",
     "deprovisionFailed": "No se pudo iniciar el desaprovisionamiento. Vuelva a intentarlo.",
     "reactivateFailed": "No se pudo iniciar la reactivación. Vuelva a intentarlo.",
     "deleteFailed": "No se pudo eliminar el cliente. Vuelva a intentarlo.",

@@ -1132,6 +1132,10 @@
     "title": "Ce locataire est archivé",
     "description": "Déprovisionné le {date}. Tout le contenu de ces pages est en lecture seule."
   },
+  "platformTenantNotice": {
+    "title": "Le site de la plateforme",
+    "description": "Il s'agit du site de la plateforme elle-même : il ne peut être ni suspendu ni supprimé."
+  },
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilité des locataires",
     "activeOption": "Actifs",
@@ -1206,6 +1210,7 @@
     "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
     "alreadyInProgress": "Le provisionnement est déjà en cours.",
     "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
+    "platformTenant": "Il s'agit du site de la plateforme elle-même : il ne peut être ni suspendu ni supprimé.",
     "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
     "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
     "deleteFailed": "Impossible de supprimer le locataire — veuillez réessayer.",

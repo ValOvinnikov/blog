@@ -36,6 +36,8 @@ vi.mock('@platform/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
 
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
+
 vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
   suspendTenantAction: vi.fn(),
   liftTenantSuspensionAction: vi.fn(),

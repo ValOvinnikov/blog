@@ -5356,6 +5356,14 @@
         "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
+    "PLATFORM_TENANT": [
+      {
+        "ref": "TENANT_REFUSAL.PLATFORM_TENANT",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "LOCALE_IS_ADDITIONAL": [
       {
         "ref": "TENANT_REFUSAL.LOCALE_IS_ADDITIONAL",
@@ -5479,6 +5487,14 @@
     "tenants.owner_invite_email_failed": [
       {
         "ref": "TENANT_LOG.OWNER_INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.platform_tenant_refused": [
+      {
+        "ref": "TENANT_LOG.PLATFORM_TENANT_REFUSED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
