@@ -44,9 +44,7 @@ vi.mock('@platform/server/audit/record-audit-event');
 
 vi.mock('./lookup-txt-records');
 
-vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
-  enqueueWorkerRequest: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/enqueue-provisioning');
 
 vi.mock('@blog/db', async () => {
   const { mockCustomDomainDb } =
@@ -56,15 +54,22 @@ vi.mock('@blog/db', async () => {
 
 const { customDomainClaims, tenantDomains } = queries;
 
-const asOwner = (overrides: Partial<TTenant> = {}) =>
+const MOCK_GROWTH_OWNER = { plan: TENANT_PLAN.GROWTH };
+
+const verify = () => verifyCustomDomainAction(MOCK_TENANT_ID);
+
+const asTenant = (overrides: Partial<TTenant>) =>
   vi
     .mocked(requireTenantMembership)
     .mockResolvedValueOnce(
-      mockOwnerContext({ plan: TENANT_PLAN.GROWTH, ...overrides }),
+      mockOwnerContext({ ...MOCK_GROWTH_OWNER, ...overrides }),
     );
 
 describe(verifyCustomDomainAction, () => {
   beforeEach(() => {
+    vi.mocked(requireTenantMembership)
+      .mockReset()
+      .mockResolvedValue(mockOwnerContext(MOCK_GROWTH_OWNER));
     vi.mocked(customDomainClaims.getCustomDomainClaim)
       .mockReset()
       .mockResolvedValue(mockCustomDomainClaim());
@@ -90,7 +95,7 @@ describe(verifyCustomDomainAction, () => {
       notFound();
     });
 
-    await expect(verifyCustomDomainAction(MOCK_TENANT_ID)).rejects.toThrow(
+    await expect(verify()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
     expect(lookupTxtRecords).not.toHaveBeenCalled();
@@ -102,19 +107,18 @@ describe(verifyCustomDomainAction, () => {
       membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
     });
 
-    await expect(verifyCustomDomainAction(MOCK_TENANT_ID)).rejects.toThrow(
+    await expect(verify()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
     expect(customDomainClaims.promoteCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it('refuses when the site has no claim', async () => {
-    asOwner();
     vi.mocked(customDomainClaims.getCustomDomainClaim).mockResolvedValue(
       undefined,
     );
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -124,10 +128,9 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('reports the record as not found yet without logging or promoting', async () => {
-    asOwner();
     vi.mocked(lookupTxtRecords).mockResolvedValue(['someone-else']);
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -142,9 +145,7 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('promotes the claim, asks the worker to connect it and audits it on a match', async () => {
-    asOwner();
-
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(customDomainClaims.promoteCustomDomainClaim).toHaveBeenCalledWith(
@@ -165,12 +166,11 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('reports a domain verified first by another site as taken', async () => {
-    asOwner();
     vi.mocked(customDomainClaims.promoteCustomDomainClaim).mockResolvedValue(
       errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN),
     );
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -183,12 +183,11 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('refuses when the claim was removed before it could be promoted', async () => {
-    asOwner();
     vi.mocked(customDomainClaims.promoteCustomDomainClaim).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -198,11 +197,10 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('logs and reports a server error when the lookup fails', async () => {
-    asOwner();
     const failure = new Error('timed out');
     vi.mocked(lookupTxtRecords).mockRejectedValue(failure);
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
@@ -231,10 +229,9 @@ describe(verifyCustomDomainAction, () => {
   ])(
     'removes the promoted domain, restores the claim with its token and refuses on %s from the worker',
     async (_name, status, reason) => {
-      asOwner();
       vi.mocked(enqueueWorkerRequest).mockResolvedValue(status);
 
-      const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+      const result = await verify();
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.REFUSED, reason });
       expect(tenantDomains.removeTenantDomain).toHaveBeenCalledWith(
@@ -251,13 +248,12 @@ describe(verifyCustomDomainAction, () => {
   );
 
   it('logs and reports a server error when the claim cannot be restored', async () => {
-    asOwner();
     vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
     vi.mocked(customDomainClaims.restoreCustomDomainClaim).mockResolvedValue(
       errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS),
     );
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
@@ -268,11 +264,10 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('reports a server error without restoring when the domain could not be removed', async () => {
-    asOwner();
     vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
     vi.mocked(tenantDomains.removeTenantDomain).mockResolvedValue(false);
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(customDomainClaims.restoreCustomDomainClaim).not.toHaveBeenCalled();
@@ -283,9 +278,9 @@ describe(verifyCustomDomainAction, () => {
     ['an archived site', { deprovisionedAt: new Date() }],
     ['a Free site', { plan: TENANT_PLAN.FREE }],
   ])('refuses %s without looking anything up', async (_name, overrides) => {
-    asOwner(overrides);
+    asTenant(overrides);
 
-    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+    const result = await verify();
 
     expect(result.outcome).toBe(ACTION_OUTCOME.REFUSED);
     expect(lookupTxtRecords).not.toHaveBeenCalled();

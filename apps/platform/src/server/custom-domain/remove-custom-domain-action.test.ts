@@ -40,9 +40,7 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/audit/record-audit-event');
 
-vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
-  enqueueWorkerRequest: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/enqueue-provisioning');
 
 vi.mock('@platform/utils/env/env');
 
