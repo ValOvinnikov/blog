@@ -4,7 +4,7 @@ import type { TLocaleIsoCode } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
 import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
 import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
-import { HeaderCard } from '@platform/components/features/look/look-form/components/header-card/header-card';
+import { HeaderCard } from '@platform/components/features/look/look-form/components/header-card';
 import { LanguageSwitcherCard } from '@platform/components/features/look/look-form/components/language-switcher-card';
 import { PresetCard } from '@platform/components/features/look/look-form/components/preset-card';
 import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';

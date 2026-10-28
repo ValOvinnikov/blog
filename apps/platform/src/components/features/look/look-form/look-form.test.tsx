@@ -14,6 +14,11 @@ import {
 import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import {
+  SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
+  SAMPLE_HEADER_TEST_ID,
+} from '@platform/constants/sample-header';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
@@ -145,7 +150,6 @@ const SAVING = 'Saving…';
 const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
 const GROWTH_ONLY_FIELD_COUNT = 11;
 const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
-const SAMPLE_HEADER_TEST_ID = 'sample-site-header';
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
 
 const setup = customRender(LookForm, {
@@ -383,11 +387,11 @@ describe(`<${LookForm.name}/>`, () => {
 
         const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
         expect(sampleHeader).toHaveAttribute(
-          'data-header-layout',
+          SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
           HEADER_LAYOUT.MENU_BUTTON,
         );
         expect(sampleHeader).toHaveAttribute(
-          'data-header-bar-style',
+          SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
           HEADER_BAR_STYLE.FLOATING,
         );
       });
@@ -810,7 +814,7 @@ describe(`<${LookForm.name}/>`, () => {
         LOOK_FORM.headerLayoutOptionLabel.CLASSIC,
       );
       expect(layoutSelect).toHaveAccessibleDescription(
-        `${LOOK_FORM.headerLayoutDescription} ${GROWTH_PLAN}`,
+        `${GROWTH_PLAN} ${LOOK_FORM.headerLayoutDescription}`,
       );
       expect(fullWidthButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(floatingButton).toBeDisabled();
@@ -887,6 +891,9 @@ describe(`<${LookForm.name}/>`, () => {
         });
 
         expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
+        expect(layoutSelect).toHaveAccessibleDescription(
+          expect.stringContaining(ARCHIVED_NOTICE_DESCRIPTION),
+        );
         expect(dropdownButton).toBeDisabled();
         expect(floatingButton).toBeDisabled();
       });

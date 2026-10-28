@@ -8,6 +8,11 @@ import {
 import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
 import { SampleHeaderControls } from '@platform/components/features/site-preview/look-sample/components/sample-site-header/components/sample-header-controls/sample-header-controls';
 import { SampleHeaderLinks } from '@platform/components/features/site-preview/look-sample/components/sample-site-header/components/sample-header-links/sample-header-links';
+import {
+  SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
+  SAMPLE_HEADER_TEST_ID,
+} from '@platform/constants/sample-header';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -106,9 +111,11 @@ export const SampleSiteHeader = ({
   return (
     <header
       className={root()}
-      data-testid="sample-site-header"
-      data-header-layout={layout}
-      data-header-bar-style={barStyle}
+      data-testid={SAMPLE_HEADER_TEST_ID}
+      {...{
+        [SAMPLE_HEADER_LAYOUT_ATTRIBUTE]: layout,
+        [SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE]: barStyle,
+      }}
     >
       <div className={inner()}>
         <div className={brand()}>

@@ -1,4 +1,8 @@
 import { HEADER_SUBMENU_STYLE, type THeaderSubmenuStyle } from '@blog/config';
+import {
+  SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
+  SAMPLE_SUBMENU_TEST_ID,
+} from '@platform/constants/sample-header';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
@@ -39,8 +43,8 @@ export const SampleHeaderSubmenu = ({
   return (
     <div
       className={panel()}
-      data-testid="sample-header-submenu"
-      data-submenu-style={submenuStyle}
+      data-testid={SAMPLE_SUBMENU_TEST_ID}
+      {...{ [SAMPLE_SUBMENU_STYLE_ATTRIBUTE]: submenuStyle }}
     >
       <span className={lead()}>{t('submenuLead')}</span>
       <span className={item()}>{t('submenuFirstItem')}</span>

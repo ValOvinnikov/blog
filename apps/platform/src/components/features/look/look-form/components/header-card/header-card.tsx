@@ -56,6 +56,7 @@ export const HeaderCard = () => {
           value={headerLayout}
           onChange={(layout) => updateField('headerLayout', layout)}
           isDisabled={layoutLock.isDisabled}
+          aria-describedby={layoutLock.describedBy}
         />
       </LookField>
 

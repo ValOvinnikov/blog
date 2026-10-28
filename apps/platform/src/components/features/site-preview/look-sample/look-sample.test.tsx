@@ -6,6 +6,13 @@ import {
   LOCALE_ISO_CODES,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
+  SAMPLE_HEADER_TEST_ID,
+  SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
+  SAMPLE_SUBMENU_TEST_ID,
+} from '@platform/constants/sample-header';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
@@ -30,8 +37,6 @@ const MOCK_DARK_ACCENT = 'oklch(0.7 0.16 28)';
 const MOCK_LOGO_URL = faker.image.url();
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
-const SAMPLE_HEADER_TEST_ID = 'sample-site-header';
-const SUBMENU_TEST_ID = 'sample-header-submenu';
 const TOPICS = 'Topics';
 const ALL_TOPICS = 'All topics';
 
@@ -284,7 +289,7 @@ describe(`<${LookSample.name}/>`, () => {
         const postsLink = screen.getByRole('link', { name: POSTS });
         const menuButton = screen.queryByRole('button', { name: MENU });
 
-        expect(header).toHaveAttribute('data-header-layout', layout);
+        expect(header).toHaveAttribute(SAMPLE_HEADER_LAYOUT_ATTRIBUTE, layout);
         expect(postsLink).toBeVisible();
         expect(menuButton).not.toBeInTheDocument();
       },
@@ -309,7 +314,7 @@ describe(`<${LookSample.name}/>`, () => {
 
         const menuButton = screen.getByRole('button', { name: MENU });
         const postsLink = screen.queryByRole('link', { name: POSTS });
-        const submenu = screen.queryByTestId(SUBMENU_TEST_ID);
+        const submenu = screen.queryByTestId(SAMPLE_SUBMENU_TEST_ID);
 
         expect(menuButton).toBeVisible();
         expect(postsLink).not.toBeInTheDocument();
@@ -322,8 +327,10 @@ describe(`<${LookSample.name}/>`, () => {
       (barStyle) => {
         setup({ header: { ...MOCK_HEADER, barStyle } });
 
-        expect(screen.getByTestId(SAMPLE_HEADER_TEST_ID)).toHaveAttribute(
-          'data-header-bar-style',
+        const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
+
+        expect(header).toHaveAttribute(
+          SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
           barStyle,
         );
       },
@@ -334,10 +341,14 @@ describe(`<${LookSample.name}/>`, () => {
       (submenuStyle) => {
         setup({ header: { ...MOCK_HEADER, submenuStyle } });
 
-        const submenu = screen.getByTestId(SUBMENU_TEST_ID);
+        const submenu = screen.getByTestId(SAMPLE_SUBMENU_TEST_ID);
+        const topicsTrigger = screen.getByText(TOPICS);
 
-        expect(screen.getByText(TOPICS)).toBeVisible();
-        expect(submenu).toHaveAttribute('data-submenu-style', submenuStyle);
+        expect(topicsTrigger).toBeVisible();
+        expect(submenu).toHaveAttribute(
+          SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
+          submenuStyle,
+        );
         expect(submenu).toHaveTextContent(ALL_TOPICS);
       },
     );
