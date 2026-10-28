@@ -1164,9 +1164,11 @@ commit or redeploy a prior Vercel build.
 
 Migration `0065_drop_plain_personal_data` drops the plain `subscribers`,
 `membership_invites` and `leads` email, name and message columns and makes
-their encrypted and index forms NOT NULL. There is no backfill step: a row
-with no encrypted form fails the migration. If it does on dev, reset the dev
-database and re-apply instead of backfilling. `users.email` and `users.name`
+their encrypted and index forms NOT NULL, and makes `users_email_index_idx`
+unique. There is no backfill step: a row with no encrypted form, or two users
+sharing an email index (such as leftover `+tag` accounts), fails the
+migration. If it does on dev, reset the dev database and re-apply instead of
+backfilling. `users.email` and `users.name`
 stay, always null, and the migration does not blank existing values; the
 reset clears them. Both apps then need `PERSONAL_DATA_ENCRYPTION_KEY` and
 `PERSONAL_DATA_INDEX_KEY`: every personal-data write and read throws without

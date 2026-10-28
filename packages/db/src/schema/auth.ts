@@ -15,7 +15,7 @@ export const users = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    // Always null: kept only because the Drizzle adapter's users table type requires them.
+    // Kept null by @blog/auth's withEncryptedUsers.
     name: text('name'),
     email: text('email').unique(),
     nameEncrypted: text('nameEncrypted'),

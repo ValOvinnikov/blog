@@ -25,8 +25,8 @@ vi.mock('@blog/db/client');
 
 faker.seed(5666);
 
-const PLAIN_PERSONAL_COLUMNS = {
-  users: ['email', 'name'],
+const PLAIN_USER_COLUMNS = ['email', 'name'];
+const DROPPED_PLAIN_COLUMNS = {
   subscribers: ['email'],
   membership_invites: ['email'],
   leads: ['name', 'email', 'message'],
@@ -34,20 +34,25 @@ const PLAIN_PERSONAL_COLUMNS = {
 
 const db = useQueryTestDb();
 
-async function countPlainValues(): Promise<Record<string, number>> {
+async function existingColumns(
+  table: string,
+  columns: string[],
+): Promise<string[]> {
+  const { rows } = await db().execute<{ column_name: string }>(
+    sql`select column_name from information_schema.columns where table_name = ${table} and column_name in ${columns}`,
+  );
+  return rows.map(({ column_name: column }) => column);
+}
+
+async function countPlainUserValues(): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
-  for (const [table, columns] of Object.entries(PLAIN_PERSONAL_COLUMNS)) {
-    const { rows } = await db().execute<{ column_name: string }>(
-      sql`select column_name from information_schema.columns where table_name = ${table} and column_name in ${columns}`,
+  for (const column of PLAIN_USER_COLUMNS) {
+    const {
+      rows: [row],
+    } = await db().execute<{ count: number }>(
+      sql`select count(${sql.identifier(column)})::int as count from ${schema.users}`,
     );
-    for (const { column_name: column } of rows) {
-      const {
-        rows: [row],
-      } = await db().execute<{ count: number }>(
-        sql`select count(${sql.identifier(column)})::int as count from ${sql.identifier(table)}`,
-      );
-      counts[`${table}.${column}`] = row?.count ?? 0;
-    }
+    counts[column] = row?.count ?? 0;
   }
   return counts;
 }
@@ -61,7 +66,14 @@ afterEach(async () => {
 });
 
 describe('plain personal data', () => {
-  it('is never written by a write path that takes an email, name or message', async () => {
+  it.each(Object.entries(DROPPED_PLAIN_COLUMNS))(
+    'has no readable column on %s',
+    async (table, columns) => {
+      await expect(existingColumns(table, columns)).resolves.toEqual([]);
+    },
+  );
+
+  it('is never written to a user by a write path that takes an email or name', async () => {
     const { id: tenantId } = await insertTestTenant(db());
     const { id: userId } = await insertTestReader(db(), MOCK_USER_EMAIL);
     const { invite } = await createMembershipInvite(
@@ -86,8 +98,8 @@ describe('plain personal data', () => {
       grant: { inviteId: invite.id },
     });
 
-    const counts = await countPlainValues();
+    const counts = await countPlainUserValues();
 
-    expect(Object.entries(counts).filter(([, count]) => count > 0)).toEqual([]);
+    expect(counts).toEqual({ email: 0, name: 0 });
   });
 });
