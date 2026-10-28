@@ -7,6 +7,8 @@ code:
   - packages/config/src/constants/card-style.ts
   - packages/db/src/schema/site-config.ts
   - packages/db/src/queries/site-config/**
+  - packages/db/src/constants/look.ts
+  - packages/db/src/utils/effective-look/**
   - apps/platform/src/app/*/dashboard/*/look/**
   - apps/platform/src/app/*/tenants/*/*/look/**
   - apps/platform/src/components/features/look/**
@@ -43,7 +45,7 @@ The Look page is where a tenant owner styles their public site without touching 
 
 ## Surfaces and routes
 
-- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Brand and Language switcher cards. Not plan-gated.
+- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Brand and Language switcher cards. On `FREE` every field but the preset, accent hue, logo and favicon is locked (see Configuration).
 - **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style. The header brand shows the Look logo and `app/icon.tsx` serves the Look favicon.
 - **Email** — `resolveTenantEmailBrand` turns the preset, accent hue and logo hue into hex colours for the magic-link, newsletter and test emails.
 - No Studio surface: the theme is not Sanity content.
@@ -59,12 +61,13 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Configuration
 
 - Any tenant member, and any operator (as a virtual owner), can save. An archived tenant's form is read-only.
+- **Plan** — `PLAN_ENTITLEMENTS[plan].lookFields` lists the fields a plan may set. On `FREE` that is the preset, accent hue, logo and favicon; the fonts, radius, density, card style, header buttons style, logo hue and language-switcher style show disabled with the Features page's "Growth plan" badge, at the preset's value, in the form and the preview. The form opens on `toEffectiveLook` of the stored row, and a restored draft goes through it too. `updateLookAction` writes only the fields the plan includes, so the stored Growth choices stay and come back on an upgrade. The account, busy-button, spinner and header-layout columns are Growth-only too; they have no Look control yet. Until the public site reads `toEffectiveLook`, a `FREE` site still renders the stored values.
 - Picking a preset re-seeds the accent hue, fonts, radius, density, card style and header buttons style from `PRESET_REGISTRY` and clears the logo hue. The language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
 - The five fonts are allowed in either role; each has a heading and a body loader in `apps/web`.
 - The language-switcher control appears only when the tenant has more than one live language.
 - Unsaved edits persist as a draft in `localStorage`, keyed by tenant and page under `platform.settings-draft.v1`. Staged image files cannot survive a reload, so a restored draft asks for them again. A draft missing a field the form now has is dropped, not offered.
 - The preview's sample header is signed out and at rest. At desktop width it shows the nav links, the language switcher in the tenant's style, the 36px theme circle and, when the site has a reader account (`READER_ACCOUNT_CAPABILITIES`, after plan clamping), the Sign in pill. At Mobile width it shows the brand, the person circle (reader accounts only) and the menu circle. Every control is drawn from `@blog/ui`'s `HEADER_CONTROL` recipe, so the header buttons style restyles them all at once.
-- Reach: every page of the tenant's site, its emails, and the platform's own Voice specimens (through `theme-preview-tokens`). Plans do not gate any Look field.
+- Reach: every page of the tenant's site, its emails, and the platform's own Voice specimens (through `theme-preview-tokens`). Plans gate the Look fields above.
 
 ## Constraints and invariants
 
@@ -82,7 +85,8 @@ The Look page is where a tenant owner styles their public site without touching 
 - Images upload before the Look save. Each successful upload or clear revalidates the site itself, so an image already stored still reaches the public site when a later step of the save fails; a failed one does not revalidate.
 - A failed image upload or clear stops the save: its message shows under that picker, which is marked invalid and takes focus, and the save bar reads "Not saved" with a link to it. Any other save failure is announced beside Save.
 - The public site's header logo is `logo_asset_url` and its favicon is `favicon_asset_url`, each falling back to the platform's default three-layer mark when unset. The Studio's Site Settings brand logo is not a source for either. A logo that fails to load in the browser, or a favicon the icon route cannot fetch within 5s, also falls back to the default mark, so a broken upload never breaks the page. The public site's CSP allows `https://*.blob.vercel-storage.com` in `img-src` so the uploaded logo loads; the favicon is served from the site's own origin. Both follow a save on the next render after `site-config:<id>` expires, subject to browser favicon caching.
-- Every save writes an audit event (`SETTINGS_UPDATED` on `SITE_CONFIG`).
+- Every save writes an audit event (`SETTINGS_UPDATED` on `SITE_CONFIG`) whose details are the fields it wrote.
+- `upsertSiteConfig` requires only the preset; any Look column a save omits is left as stored, or takes the preset's value on a new row.
 
 ## Dependencies
 

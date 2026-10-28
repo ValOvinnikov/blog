@@ -1,6 +1,7 @@
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
@@ -19,6 +20,7 @@ export const ColourCard = () => {
   } = useLookForm();
   const t = useTranslations('lookForm');
   const tHue = useTranslations('logoHueField');
+  const logoHueLock = useLookFieldLock('logoHue');
   const { hueField, swatch, hueValue } = colourCardVariants();
 
   const accentHueLabel = t('accentHueLabel');
@@ -62,13 +64,14 @@ export const ColourCard = () => {
         hint={t('logoHueDescription')}
         isOptional={true}
         isGroup={true}
+        lock={logoHueLock.lock}
       >
         <LogoHueField
           accentHue={accentHue}
           logoHue={logoHue}
           onChange={(hue) => updateField('logoHue', hue)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
+          isDisabled={logoHueLock.isDisabled}
+          aria-describedby={logoHueLock.describedBy}
         />
       </LookField>
     </LookCard>

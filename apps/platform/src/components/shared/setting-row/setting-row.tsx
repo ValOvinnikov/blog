@@ -1,4 +1,5 @@
 import { Field } from '@base-ui/react/field';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import type { ReactNode } from 'react';
 
@@ -26,7 +27,6 @@ export const SettingRow = ({
     content,
     label: labelSlot,
     description: descriptionSlot,
-    reason,
     control,
   } = settingRowVariants();
 
@@ -45,10 +45,7 @@ export const SettingRow = ({
           </Field.Description>
         )}
         {isLocked && lockedReason && (
-          <Field.Description className={reason()}>
-            <span aria-hidden="true">🔒</span>
-            <span>{lockedReason}</span>
-          </Field.Description>
+          <LockedReason>{lockedReason}</LockedReason>
         )}
       </div>
       <div className={control()}>{children}</div>

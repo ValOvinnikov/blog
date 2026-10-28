@@ -3,6 +3,7 @@ export * from './audit-event';
 export * from './blocked-signup-identity';
 export * from './email-template-defaults';
 export * from './lead';
+export * from './look';
 export * from './membership';
 export * from './personal-data';
 export * from './retention';

@@ -17,6 +17,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { pickEntitledLook } from '@blog/db/utils/effective-look/effective-look';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -57,16 +58,18 @@ export const updateLookAction = async (
   }
 
   const { tenant } = await requireTenantMembership(tenantId);
+  const { preset, ...rest } = parsed.data;
+  const look = { preset, ...pickEntitledLook(rest, tenant.plan) };
 
   try {
-    await queries.siteConfig.upsertSiteConfig(tenant.id, parsed.data);
+    await queries.siteConfig.upsertSiteConfig(tenant.id, look);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: SITE_CONFIG_LOG.LOOK_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
-      details: parsed.data,
+      details: look,
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {

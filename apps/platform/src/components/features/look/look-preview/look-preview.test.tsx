@@ -34,6 +34,7 @@ const renderPreview = (values: Partial<TLookFormValues> = {}) => {
       ...values,
     },
     updateField: vi.fn(),
+    isLocked: () => false,
     hasCardChanges: () => false,
     isDivergedFromPreset: false,
     isAccentHueRejected: false,

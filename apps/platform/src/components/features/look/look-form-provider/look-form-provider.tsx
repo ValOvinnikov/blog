@@ -1,6 +1,7 @@
 'use client';
 
 import type { TMaybeUndefined, TPresetId } from '@blog/config';
+import type { TLookField } from '@blog/db/constants';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type {
   TLookFormFieldSetter,
@@ -13,6 +14,7 @@ export type TLookFormContext = {
   tenantName: string;
   values: TLookFormValues;
   updateField: TLookFormFieldSetter;
+  isLocked: (field: TLookField) => boolean;
   hasCardChanges: (card: TLookCardKey) => boolean;
   isDivergedFromPreset: boolean;
   isAccentHueRejected: boolean;
