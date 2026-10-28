@@ -1,4 +1,5 @@
 import { TOAST_TYPE } from '@blog/config';
+import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -17,6 +18,10 @@ const meta = {
     phase: {
       control: 'select',
       options: objectKeys(toastVariants.variants.phase),
+    },
+    spinnerVariant: {
+      control: 'select',
+      options: objectKeys(spinnerVariants.variants.variant),
     },
   },
   args: {
@@ -72,6 +77,17 @@ export const Loading: TStory = {
     time: undefined,
     durationMs: undefined,
   },
+};
+
+export const LoadingInEverySpinnerStyle: TStory = {
+  args: Loading.args,
+  render: (args) => (
+    <div className="flex w-80 flex-col gap-4">
+      {objectKeys(spinnerVariants.variants.variant).map((spinnerVariant) => (
+        <Toast key={spinnerVariant} {...args} spinnerVariant={spinnerVariant} />
+      ))}
+    </div>
+  ),
 };
 
 export const WithAction: TStory = {

@@ -7,6 +7,7 @@ import {
 import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { Toast } from '@blog/ui/components/molecules/toast';
+import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn } from 'storybook/test';
@@ -53,6 +54,8 @@ const meta = {
   ],
   argTypes: {
     pendingProviderId: { control: 'select', options: ['github', 'google'] },
+    busyStyle: { control: 'select', options: BUSY_STYLES },
+    spinnerVariant: { control: 'select', options: SPINNER_VARIANTS },
   },
   args: {
     panel: { id: PANEL_ID, isOpen: true },
@@ -117,6 +120,59 @@ export const Sending: TStory = {
       status: FORM_STATUS.SUBMITTING,
     },
   },
+};
+
+export const SendingInEveryBusyStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-wrap items-start gap-4">
+      {BUSY_STYLES.map((busyStyle) => (
+        <SignInPanel
+          key={busyStyle}
+          {...args}
+          busyStyle={busyStyle}
+          emailForm={{
+            ...args.emailForm,
+            value: READER_EMAIL,
+            status: FORM_STATUS.SUBMITTING,
+          }}
+        />
+      ))}
+    </div>
+  ),
+};
+
+export const SendingInEverySpinnerStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-wrap items-start gap-4">
+      {SPINNER_VARIANTS.map((spinnerVariant) => (
+        <SignInPanel
+          key={spinnerVariant}
+          {...args}
+          spinnerVariant={spinnerVariant}
+          emailForm={{
+            ...args.emailForm,
+            value: READER_EMAIL,
+            status: FORM_STATUS.SUBMITTING,
+          }}
+        />
+      ))}
+    </div>
+  ),
+};
+
+export const ProviderPressedInEverySpinnerStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-wrap items-start gap-4">
+      {SPINNER_VARIANTS.map((spinnerVariant) => (
+        <SignInPanel
+          key={spinnerVariant}
+          {...args}
+          pendingProviderId="github"
+          spinnerVariant={spinnerVariant}
+        />
+      ))}
+    </div>
+  ),
 };
 
 export const Sent: TStory = {

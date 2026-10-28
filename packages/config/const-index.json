@@ -1748,12 +1748,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
-      },
-      {
-        "ref": "PERSONAL_DATA_OWNER.USER",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
       }
     ],
     "USERS": [
@@ -2424,14 +2418,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "personal_data.plain_fallback": [
-      {
-        "ref": "PERSONAL_DATA_LOG.PLAIN_FALLBACK",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/personal-data.ts"
       }
     ],
     "bodyImage": [
@@ -3184,72 +3170,6 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
-    "LEAD": [
-      {
-        "ref": "PERSONAL_DATA_OWNER.LEAD",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      },
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "SUBSCRIBER": [
-      {
-        "ref": "PERSONAL_DATA_OWNER.SUBSCRIBER",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      },
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "INVITE": [
-      {
-        "ref": "PERSONAL_DATA_OWNER.INVITE",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      },
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "NOT_BACKFILLED": [
-      {
-        "ref": "PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      }
-    ],
-    "ENCRYPTION_KEY_UNSET": [
-      {
-        "ref": "PERSONAL_DATA_FALLBACK_REASON.ENCRYPTION_KEY_UNSET",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      }
-    ],
-    "INDEX_KEY_UNSET": [
-      {
-        "ref": "PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      }
-    ],
     "ACTIVE": [
       {
         "ref": "SUBSCRIBER_STATUS.ACTIVE",
@@ -3906,6 +3826,30 @@
         "scope": "app:platform",
         "from": "@platform/constants/create-site-gate",
         "file": "apps/platform/src/constants/create-site-gate.ts"
+      }
+    ],
+    "SUBSCRIBER": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "LEAD": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "INVITE": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
     "SIGNUP_BLOCK": [
@@ -5552,6 +5496,14 @@
         "file": "apps/platform/src/constants/worker.ts"
       }
     ],
+    "account_control.site_config_fetch_failed": [
+      {
+        "ref": "ACCOUNT_CONTROL_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account-control",
+        "file": "apps/web/src/constants/account-control.ts"
+      }
+    ],
     "bookmark_button.status_fetch_failed": [
       {
         "ref": "BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED",
@@ -5614,6 +5566,14 @@
         "scope": "app:web",
         "from": "@web/constants/contact-form",
         "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "navigation.layout_fetch_failed": [
+      {
+        "ref": "NAVIGATION_LOG.LAYOUT_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/navigation",
+        "file": "apps/web/src/constants/navigation.ts"
       }
     ],
     "ALREADY_SUBSCRIBED": [
@@ -5904,6 +5864,38 @@
         "file": "apps/web/src/constants/tenant-write.ts"
       }
     ],
+    "custom_domain.connect_start_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_start_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
     "UNAUTHORIZED": [
       {
         "ref": "ENQUEUE_ERROR.UNAUTHORIZED",
@@ -5923,6 +5915,30 @@
     "NOT_PROVISIONED": [
       {
         "ref": "ENQUEUE_ERROR.NOT_PROVISIONED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "DOMAIN_NOT_ASSIGNED": [
+      {
+        "ref": "ENQUEUE_ERROR.DOMAIN_NOT_ASSIGNED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "DOMAIN_STILL_ASSIGNED": [
+      {
+        "ref": "ENQUEUE_ERROR.DOMAIN_STILL_ASSIGNED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "DOMAIN_RESERVED": [
+      {
+        "ref": "ENQUEUE_ERROR.DOMAIN_RESERVED",
         "scope": "app:worker",
         "from": "@worker/constants/enqueue-error",
         "file": "apps/worker/src/constants/enqueue-error.ts"

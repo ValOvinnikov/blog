@@ -41,7 +41,7 @@ export async function ensureInfrastructure(
     },
     {
       step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-      run: () => mapTenantDomain(tenant, env),
+      run: () => mapTenantDomain(tenant.primaryDomain, env),
     },
   ];
 

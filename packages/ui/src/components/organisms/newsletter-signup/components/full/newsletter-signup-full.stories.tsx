@@ -3,6 +3,7 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
+import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -48,6 +49,7 @@ const meta = {
     headingId: 'newsletter-signup-full-heading',
     supportingText: faker.lorem.sentences(2),
     submitLabel: faker.lorem.word(),
+    busyLabel: faker.lorem.words(2),
     emailAriaLabel: faker.lorem.words(2),
     placeholder: faker.internet.email(),
     successMessage: faker.lorem.sentence(),
@@ -61,6 +63,38 @@ export const Default: TStory = {};
 
 export const Submitting: TStory = {
   args: { status: FORM_STATUS.SUBMITTING, email: faker.internet.email() },
+};
+
+export const SubmittingInEveryBusyStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      {BUSY_STYLES.map((busyStyle) => (
+        <NewsletterSignup.Full
+          key={busyStyle}
+          {...args}
+          email={faker.internet.email()}
+          status={FORM_STATUS.SUBMITTING}
+          busyStyle={busyStyle}
+        />
+      ))}
+    </div>
+  ),
+};
+
+export const SubmittingInEverySpinnerStyle: TStory = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      {SPINNER_VARIANTS.map((spinnerVariant) => (
+        <NewsletterSignup.Full
+          key={spinnerVariant}
+          {...args}
+          email={faker.internet.email()}
+          status={FORM_STATUS.SUBMITTING}
+          spinnerVariant={spinnerVariant}
+        />
+      ))}
+    </div>
+  ),
 };
 
 export const Success: TStory = {

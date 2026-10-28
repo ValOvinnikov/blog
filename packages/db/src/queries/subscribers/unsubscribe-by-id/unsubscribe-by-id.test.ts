@@ -6,7 +6,6 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { readSubscriberIds } from '@blog/db/testing/subscribers/fixtures';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -21,7 +20,6 @@ faker.seed(1);
 const MOCK_UNKNOWN_SUBSCRIBER_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);

@@ -5,12 +5,5 @@ export const signInPanelEmailFormVariants = tv({
     root: ['flex flex-col gap-2'],
     label: ['font-mono text-meta font-medium text-text'],
     submit: ['w-full'],
-    submitLabels: ['inline-grid'],
-    submitLabel: [
-      'col-start-1 row-start-1',
-      'inline-flex items-center justify-center gap-2',
-    ],
-    spareLabel: ['invisible col-start-1 row-start-1'],
-    spinner: ['text-current'],
   },
 });

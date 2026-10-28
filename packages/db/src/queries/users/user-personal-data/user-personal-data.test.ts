@@ -1,23 +1,14 @@
 import type { TMaybeNull } from '@blog/config/types';
-import {
-  PERSONAL_DATA_FALLBACK_REASON,
-  PERSONAL_DATA_OWNER,
-} from '@blog/db/constants';
 import { MOCK_USER_EMAIL, MOCK_USER_NAME } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-  usePersonalDataFallbackListener,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 
 import {
   readUserPersonalData,
   userPersonalColumns,
 } from './user-personal-data';
-
-usePersonalDataKeys();
-const fallbackListener = usePersonalDataFallbackListener();
 
 describe(userPersonalColumns, () => {
   it('encrypts and indexes the email and encrypts the name', () => {
@@ -72,41 +63,7 @@ describe(readUserPersonalData, () => {
     expect(result).toEqual({ email: MOCK_USER_EMAIL, name: null });
   });
 
-  it('reads a user not yet backfilled from the plain columns and reports it', () => {
-    const result = readUserPersonalData({
-      email: MOCK_USER_EMAIL,
-      name: MOCK_USER_NAME,
-      emailEncrypted: null,
-      nameEncrypted: null,
-    });
-
-    expect(result).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
-    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
-      owner: PERSONAL_DATA_OWNER.USER,
-      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
-    });
-  });
-
-  it('reads the plain columns when the encryption key is unset', () => {
-    vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', undefined);
-
-    const result = readUserPersonalData({
-      email: MOCK_USER_EMAIL,
-      name: MOCK_USER_NAME,
-      emailEncrypted,
-      nameEncrypted,
-    });
-
-    expect(result).toEqual({ email: MOCK_USER_EMAIL, name: MOCK_USER_NAME });
-  });
-
-  it('reports nothing for a backfilled user', () => {
-    readUserPersonalData({ emailEncrypted, nameEncrypted });
-
-    expect(fallbackListener).not.toHaveBeenCalled();
-  });
-
-  it('refuses a user with no email in either form', () => {
+  it('refuses a user with no email', () => {
     expect(() =>
       readUserPersonalData({ emailEncrypted: null, nameEncrypted: null }),
     ).toThrow();

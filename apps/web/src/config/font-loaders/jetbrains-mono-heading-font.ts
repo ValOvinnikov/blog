@@ -4,7 +4,7 @@ export const jetbrainsMonoHeading = localFont({
   src: [
     {
       path: './fonts/jetbrains-mono.woff2',
-      weight: '400 500',
+      weight: '400 800',
       style: 'normal',
     },
   ],

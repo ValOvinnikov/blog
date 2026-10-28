@@ -1160,31 +1160,19 @@ launch. Pre-1.0 (`0.y.z`): bump MINOR freely for notable changes, PATCH for
 fixes. Only tag commits already green on `main`. Rollback = re-tag an earlier
 commit or redeploy a prior Vercel build.
 
-### The personal-data backfill — between two releases
+### The plain personal-data columns are gone
 
-The readers fall back to the plain columns for any row the backfill has not
-reached yet, and for every row while a personal-data key is unset, so a release
-that ships them before `db:backfill-personal-data` has run locks no one out.
-Each fallback logs `personal_data.plain_fallback` (warn, with the owner and
-reason, never the address), so leftover rows stay visible in the log stream.
-The workflow cannot run the backfill for you: `migrate-db` is followed straight
-by the app deploys. Ship the first production release that contains the readers
-in two tags anyway, so the readers meet a filled table and the fallback lines
-stay at zero:
-
-1. **Tag the expand.** Tag a green `main` commit that contains the encrypted
-   columns (migration `0055_add_personal_data_encrypted_columns`, PR #5703)
-   and the backfill CLI (PR #5736), but not the readers (PR #5766). The apps
-   keep reading the plain columns and start writing both forms.
-2. **Back up, then backfill production.** With the owner's go-ahead, follow
-   `packages/db/scripts/backfill-personal-data/README.md` against the
-   production database, using the exact `PERSONAL_DATA_ENCRYPTION_KEY` and
-   `PERSONAL_DATA_INDEX_KEY` values `web-prod` and `platform-prod` hold. A
-   different key fills the columns with values nothing can read. Run it from
-   a checkout of `main`, dry run first. The run must end with
-   `0 row(s) still missing` for every table.
-3. **Tag the readers.** Tag the commit with PR #5766 (or later), then sign in
-   on both production sites ("Post-deploy verification").
+Migration `0065_drop_plain_personal_data` drops the plain `subscribers`,
+`membership_invites` and `leads` email, name and message columns and makes
+their encrypted and index forms NOT NULL, and makes `users_email_index_idx`
+unique. There is no backfill step: a row with no encrypted form, or two users
+sharing an email index (such as leftover `+tag` accounts), fails the
+migration. If it does on dev, reset the dev database and re-apply instead of
+backfilling. `users.email` and `users.name`
+stay, always null, and the migration does not blank existing values; the
+reset clears them. Both apps then need `PERSONAL_DATA_ENCRYPTION_KEY` and
+`PERSONAL_DATA_INDEX_KEY`: every personal-data write and read throws without
+them.
 
 ---
 

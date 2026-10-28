@@ -8,9 +8,8 @@ import { getDb } from '@blog/db/client';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { findSubscriberByExactEmail } from '@blog/db/queries/subscribers/user-subscriber';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
+import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
-import { personalDataIndex } from '@blog/utils/encryption';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 
 export type TPendingSubscriber = {
@@ -61,11 +60,7 @@ export async function createPendingSubscriber(
 
   const [inserted] = await getDb()
     .insert(subscribers)
-    .values({
-      tenantId,
-      email: normalizedEmail,
-      ...emailColumns(normalizedEmail, personalDataIndex),
-    })
+    .values({ tenantId, ...uniqueEmailColumns(normalizedEmail) })
     .onConflictDoNothing()
     .returning({ id: subscribers.id });
 

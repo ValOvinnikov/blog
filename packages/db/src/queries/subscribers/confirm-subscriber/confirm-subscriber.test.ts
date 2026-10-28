@@ -6,7 +6,6 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
@@ -26,7 +25,6 @@ const MOCK_UNKNOWN_TOKEN = faker.string.uuid();
 const ONE_HOUR_MS = 60 * 60_000;
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 beforeEach(() => {
   vi.useFakeTimers({ now: MOCK_CONFIRMATION_NOW, toFake: ['Date'] });

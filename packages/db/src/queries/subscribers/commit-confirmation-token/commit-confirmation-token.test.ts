@@ -4,7 +4,6 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_CONFIRMATION_NOW,
@@ -22,7 +21,6 @@ faker.seed(5801);
 const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);

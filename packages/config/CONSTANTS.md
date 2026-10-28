@@ -168,10 +168,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`
 
-### `@blog/config/constants` — `packages/config/src/constants/personal-data.ts`
-
-- **PERSONAL_DATA_LOG**: `PLAIN_FALLBACK`=`"personal_data.plain_fallback"`
-
 ### `@blog/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
 - **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`
@@ -253,11 +249,6 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
-
-### `@blog/db/constants` — `packages/db/src/constants/personal-data.ts`
-
-- **PERSONAL_DATA_OWNER**: `USER`, `LEAD`, `SUBSCRIBER`, `INVITE`
-- **PERSONAL_DATA_FALLBACK_REASON**: `NOT_BACKFILLED`, `ENCRYPTION_KEY_UNSET`, `INDEX_KEY_UNSET`
 
 ### `@blog/db/constants` — `packages/db/src/constants/subscriber.ts`
 
@@ -448,6 +439,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:web
 
+### `@web/constants/account-control` — `apps/web/src/constants/account-control.ts`
+
+- **ACCOUNT_CONTROL_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"account_control.site_config_fetch_failed"`
+
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
 - **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`
@@ -467,6 +462,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`
+
+### `@web/constants/navigation` — `apps/web/src/constants/navigation.ts`
+
+- **NAVIGATION_LOG**: `LAYOUT_FETCH_FAILED`=`"navigation.layout_fetch_failed"`
 
 ### `@web/constants/newsletter` — `apps/web/src/constants/newsletter.ts`
 
@@ -504,9 +503,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:worker
 
+### `@worker/constants/custom-domain` — `apps/worker/src/constants/custom-domain.ts`
+
+- **CUSTOM_DOMAIN_LOG**: `CONNECT_START_FAILED`=`"custom_domain.connect_start_failed"`, `DISCONNECT_START_FAILED`=`"custom_domain.disconnect_start_failed"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
 
-- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`
+- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`, `DOMAIN_NOT_ASSIGNED`, `DOMAIN_STILL_ASSIGNED`, `DOMAIN_RESERVED`
 
 ### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
 

@@ -1,13 +1,17 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   type TMaybeNull,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { AccountRow, AuthMenu } from '@web/components/shared/auth-menu';
+import { AccountMenuGroup, AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
+import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import {
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
@@ -20,6 +24,28 @@ import { userEvent, within } from 'storybook/test';
 import { SiteNavigation } from './site-navigation';
 
 const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_TOPICS_LINK];
+
+const TOGGLE_MENU = { name: /Toggle navigation menu/ };
+const ACCOUNT_BUTTON = { name: 'Account' };
+const SIGN_IN_BUTTON = { name: 'Sign in' };
+const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
+
+type TCanvas = ReturnType<typeof within>;
+
+const clickButton = async (
+  canvas: TCanvas,
+  button: { name: string | RegExp },
+) => {
+  const target = await canvas.findByRole('button', button);
+  await userEvent.click(target);
+};
+
+const openDrawerAccountRow = async (canvas: TCanvas, row: { name: string }) => {
+  await clickButton(canvas, TOGGLE_MENU);
+  const drawerActions = await canvas.findByTestId(DRAWER_ACTIONS_TEST_ID);
+  const accountRow = within(drawerActions).getByRole('button', row);
+  await userEvent.click(accountRow);
+};
 
 const meta = {
   title: 'Components/SiteNavigation',
@@ -54,9 +80,7 @@ export const MobileOpen: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
-    );
+    await clickButton(canvas, TOGGLE_MENU);
   },
 };
 
@@ -74,8 +98,31 @@ const headerControls = {
       <ThemeToggleButton />
     </>
   ),
-  drawerActions: <AccountRow />,
-  actions: <AuthMenu oauthProviderIds={['github']} />,
+  actions: (
+    <AuthMenu
+      oauthProviderIds={['github']}
+      accountControl={MOCK_ACCOUNT_CONTROL}
+    />
+  ),
+};
+
+const ACCOUNT_IN_MENU = {
+  ...MOCK_ACCOUNT_CONTROL,
+  panelStyle: ACCOUNT_PANEL_STYLE.HUB,
+  phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+};
+
+const headerControlsWithAccountInMenu = {
+  ...headerControls,
+  drawerActions: (
+    <AccountMenuGroup
+      oauthProviderIds={['github']}
+      panelStyle={ACCOUNT_IN_MENU.panelStyle}
+    />
+  ),
+  actions: (
+    <AuthMenu oauthProviderIds={['github']} accountControl={ACCOUNT_IN_MENU} />
+  ),
 };
 
 const SESSION_EXPIRES = '2099-01-01';
@@ -130,9 +177,7 @@ export const AccountMenuLongEmail: TStory = {
   args: headerControls,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      await canvas.findByRole('button', { name: 'Account menu' }),
-    );
+    await clickButton(canvas, ACCOUNT_BUTTON);
   },
 };
 
@@ -142,12 +187,8 @@ export const MobilePanelLanguageMenuOpen: TStory = {
   args: headerControls,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
-    );
-    await userEvent.click(
-      await canvas.findByRole('button', { name: 'Language: Nederlands' }),
-    );
+    await clickButton(canvas, TOGGLE_MENU);
+    await clickButton(canvas, { name: 'Language: Nederlands' });
   },
 };
 
@@ -170,9 +211,7 @@ export const MobilePanelCompactCodes: TStory = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
-    );
+    await clickButton(canvas, TOGGLE_MENU);
   },
 };
 
@@ -182,14 +221,48 @@ export const MobileSignInSheetOpen: TStory = {
   args: headerControls,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
-    );
-    const drawerActions = await canvas.findByTestId(
-      'primary-navigation-drawer-actions',
-    );
-    await userEvent.click(
-      within(drawerActions).getByRole('button', { name: 'Sign in' }),
-    );
+    await clickButton(canvas, SIGN_IN_BUTTON);
+  },
+};
+
+export const HubPanelFromCircle: TStory = {
+  globals: { viewport: 'desktop' },
+  decorators: withSignedInSession,
+  args: {
+    ...headerControls,
+    actions: (
+      <AuthMenu
+        oauthProviderIds={['github']}
+        accountControl={{
+          ...MOCK_ACCOUNT_CONTROL,
+          buttonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+          panelStyle: ACCOUNT_PANEL_STYLE.HUB,
+        }}
+      />
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await clickButton(canvas, ACCOUNT_BUTTON);
+  },
+};
+
+export const MobileAccountInMenu: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedInSession,
+  args: headerControlsWithAccountInMenu,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await openDrawerAccountRow(canvas, ACCOUNT_BUTTON);
+  },
+};
+
+export const MobileSignInInMenu: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: headerControlsWithAccountInMenu,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await openDrawerAccountRow(canvas, SIGN_IN_BUTTON);
   },
 };

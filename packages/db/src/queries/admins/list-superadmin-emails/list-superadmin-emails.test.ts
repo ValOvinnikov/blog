@@ -1,17 +1,7 @@
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  PERSONAL_DATA_FALLBACK_REASON,
-  PERSONAL_DATA_OWNER,
-  type TAdminRole,
-} from '@blog/db/constants';
+import { ADMIN_ROLE, GRANTED_VIA, type TAdminRole } from '@blog/db/constants';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
-import {
-  usePersonalDataFallbackListener,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -27,8 +17,6 @@ const MOCK_ADMIN_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_MODERATOR_EMAIL = faker.internet.email().toLowerCase();
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
-const fallbackListener = usePersonalDataFallbackListener();
 
 async function insertAdmin(
   user: Partial<typeof schema.users.$inferInsert>,
@@ -57,29 +45,15 @@ describe(listSuperadminEmails, () => {
     expect(emails.sort()).toEqual(
       [MOCK_SUPER_ONE_EMAIL, MOCK_SUPER_TWO_EMAIL].sort(),
     );
-    expect(fallbackListener).not.toHaveBeenCalled();
   });
 
-  it('lists a SUPERADMIN not yet backfilled by plain email, and reports it', async () => {
-    await insertAdmin({ email: MOCK_SUPER_ONE_EMAIL });
-
-    const emails = await listSuperadminEmails();
-
-    expect(emails).toEqual([MOCK_SUPER_ONE_EMAIL]);
-    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
-      owner: PERSONAL_DATA_OWNER.USER,
-      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
-    });
-  });
-
-  it('drops a SUPERADMIN with no address and reports nothing', async () => {
+  it('drops a SUPERADMIN with no address', async () => {
     await insertAdmin({});
     await insertAdmin(userPersonalColumns({ email: MOCK_SUPER_ONE_EMAIL }));
 
     const emails = await listSuperadminEmails();
 
     expect(emails).toEqual([MOCK_SUPER_ONE_EMAIL]);
-    expect(fallbackListener).not.toHaveBeenCalled();
   });
 
   it('excludes ADMIN and MODERATOR admins', async () => {

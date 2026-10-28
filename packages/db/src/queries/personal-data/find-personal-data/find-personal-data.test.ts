@@ -16,10 +16,7 @@ import {
   MOCK_INVITE_EMAIL,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import {
-  testPersonalEmailIndex,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
+import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
 import {
   deleteTestPersonalDataRows,
   getTestReaderId,
@@ -31,14 +28,12 @@ import {
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { eq } from 'drizzle-orm';
 
 import { findPersonalData } from './find-personal-data';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 faker.seed(6022);
 
@@ -202,20 +197,6 @@ describe(findPersonalData, () => {
         { tenantName, postId: MOCK_BOOKMARKED_POST_ID },
       ]);
     });
-  });
-
-  it('finds the reader account of an address with no email index', async () => {
-    await db()
-      .update(schema.users)
-      .set({ emailIndex: null })
-      .where(eq(schema.users.email, MOCK_SUBSCRIBER_EMAIL));
-
-    const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.data.readerAccount?.email).toBe(MOCK_SUBSCRIBER_EMAIL);
-    expect(result.data.auditEvents).toHaveLength(1);
   });
 
   it('finds no audit events for a +tag variant of the account address', async () => {
