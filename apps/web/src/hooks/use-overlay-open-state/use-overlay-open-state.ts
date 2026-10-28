@@ -1,30 +1,53 @@
 'use client';
 
-import { useHeaderOverlay } from '@web/context/header-overlay-provider';
+import {
+  useHeaderOverlay,
+  useHeaderOverlayParentId,
+} from '@web/context/header-overlay-provider';
 import { useCallback, useState } from 'react';
 
+export type TOverlayOpenStateOptions = {
+  overlayId?: string;
+  takesKeys?: boolean;
+};
+
 /** Open state that lives in the header's shared overlay when `overlayId` is given inside a `HeaderOverlayProvider`, and locally otherwise. */
-export const useOverlayOpenState = (overlayId?: string) => {
+export const useOverlayOpenState = ({
+  overlayId,
+  takesKeys = false,
+}: TOverlayOpenStateOptions = {}) => {
   const overlay = useHeaderOverlay();
+  const parentId = useHeaderOverlayParentId();
   const [localOpen, setLocalOpen] = useState(false);
-  const setActiveId = overlay?.setActiveId;
-  const isShared = Boolean(setActiveId && overlayId);
-  const open = isShared ? overlay?.activeId === overlayId : localOpen;
+  const openOverlay = overlay?.openOverlay;
+  const closeOverlay = overlay?.closeOverlay;
+  const openOverlays = overlay?.openOverlays ?? [];
+  const isShared = Boolean(overlay && overlayId);
+  const ownIndex = openOverlays.findIndex(({ id }) => id === overlayId);
+  const open = isShared ? ownIndex !== -1 : localOpen;
+  const frontOverlay = openOverlays.at(-1);
+  const hasChildTakingKeys =
+    open &&
+    isShared &&
+    frontOverlay?.id !== overlayId &&
+    Boolean(frontOverlay?.takesKeys);
 
   const setOpen = useCallback(
     (next: boolean) => {
-      if (!setActiveId || !overlayId) {
+      if (!openOverlay || !closeOverlay || !overlayId) {
         setLocalOpen(next);
         return;
       }
 
-      setActiveId((activeId) => {
-        if (next) return overlayId;
-        return activeId === overlayId ? null : activeId;
-      });
+      if (next) {
+        openOverlay({ id: overlayId, takesKeys }, parentId);
+        return;
+      }
+
+      closeOverlay(overlayId);
     },
-    [setActiveId, overlayId],
+    [openOverlay, closeOverlay, overlayId, takesKeys, parentId],
   );
 
-  return [open, setOpen] as const;
+  return [open, setOpen, hasChildTakingKeys] as const;
 };
