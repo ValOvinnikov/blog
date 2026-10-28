@@ -43,6 +43,10 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
+vi.mock(
+  '@web/components/shared/newsletter-subscribed-gate/hooks/use-is-reader-subscribed',
+);
+
 faker.seed(6011);
 
 const MOCK_FIRST_CUE = faker.lorem.words(2);

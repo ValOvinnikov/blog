@@ -2,6 +2,7 @@ import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
+import { SessionProvider } from 'next-auth/react';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -10,6 +11,13 @@ const meta = {
   component: NewsletterModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
+  decorators: [
+    (Story) => (
+      <SessionProvider session={null}>
+        <Story />
+      </SessionProvider>
+    ),
+  ],
   argTypes: {
     brandVariant: {
       control: 'select',
