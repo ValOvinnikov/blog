@@ -21,6 +21,7 @@ import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity
 import { OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 
+import { findProjectAclEntry } from './find-project-acl-entry';
 import type { TOwnerAccessTarget } from './owner-access-target';
 
 function toLoginProvider(
@@ -55,9 +56,7 @@ export async function grantOwnerAdministrator(
   const token = env.sanityManagementToken;
 
   const acl = await listSanityProjectAcl({ token, projectId });
-  const entry = acl.find(
-    ({ projectUserId }) => projectUserId === owner.profile.id,
-  );
+  const entry = findProjectAclEntry(acl, owner, projectId);
   if (!entry) {
     throw new Error(
       `Tenant "${tenant.id}"'s owner is a project member with no ACL entry yet.`,

@@ -1,5 +1,6 @@
 import {
   HTTP_METHOD,
+  SANITY_RESOURCE_TYPE,
   type TMaybeUndefined,
   type TSanityRobotRole,
 } from '@blog/config';
@@ -25,7 +26,7 @@ export async function createSanityRobotToken(input: {
       label: input.label,
       memberships: [
         {
-          resourceType: 'project',
+          resourceType: SANITY_RESOURCE_TYPE.PROJECT,
           resourceId: input.projectId,
           roleNames: [input.role],
         },

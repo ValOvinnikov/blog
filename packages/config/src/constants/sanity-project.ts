@@ -48,6 +48,10 @@ export const SANITY_PROJECT_ROLE = {
 
 export type TSanityProjectRole = TValueOf<typeof SANITY_PROJECT_ROLE>;
 
+export const SANITY_RESOURCE_TYPE = {
+  PROJECT: 'project',
+} as const;
+
 export const SANITY_LOGIN_PROVIDER = {
   GOOGLE: 'GOOGLE',
   GITHUB: 'GITHUB',

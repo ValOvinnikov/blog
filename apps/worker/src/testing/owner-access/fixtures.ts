@@ -1,3 +1,7 @@
+import {
+  SANITY_PROJECT_ROLE,
+  SANITY_RESOURCE_TYPE,
+} from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import type { TSanityInvite } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
@@ -15,6 +19,7 @@ export const MOCK_INVITE_SENT_AT = '2026-10-20T09:00:00.000Z';
 export const MOCK_SANITY_INVITE_ID = 'invite-1';
 export const MOCK_OWNER_PROJECT_USER_ID = 'p-owner';
 export const MOCK_SANITY_USER_ID = `g${mockFaker.string.alphanumeric(10)}`;
+const MOCK_OWNER_PROFILE_ID = `p${mockFaker.string.alphanumeric(10)}`;
 
 export function mockSanityOwner(
   overrides: Partial<TSanityUser['profile']> = {},
@@ -27,6 +32,23 @@ export function mockSanityOwner(
       provider: 'google',
       ...overrides,
     },
+  };
+}
+
+export function mockSanityOwnerWithProjectMembership(
+  profile: Partial<TSanityUser['profile']> = { id: MOCK_OWNER_PROFILE_ID },
+  resourceUserId = MOCK_OWNER_PROJECT_USER_ID,
+): TSanityUser {
+  return {
+    ...mockSanityOwner(profile),
+    memberships: [
+      {
+        resourceType: SANITY_RESOURCE_TYPE.PROJECT,
+        resourceId: MOCK_SANITY_PROJECT_ID,
+        roleNames: [SANITY_PROJECT_ROLE.VIEWER],
+        resourceUserId,
+      },
+    ],
   };
 }
 

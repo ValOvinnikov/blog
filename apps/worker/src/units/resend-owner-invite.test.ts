@@ -23,6 +23,7 @@ import {
   MOCK_SANITY_USER_ID,
   mockPendingInvite,
   mockSanityOwner,
+  mockSanityOwnerWithProjectMembership,
 } from '@worker/testing/owner-access/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
@@ -44,6 +45,7 @@ const MOCK_FORMER_OWNER_EMAIL = faker.internet.email();
 const MOCK_FORMER_INVITE_ID = faker.string.uuid();
 const MOCK_FORMER_SANITY_USER_ID = `g${faker.string.alphanumeric(10)}`;
 const MOCK_FORMER_PROJECT_USER_ID = `p${faker.string.alphanumeric(10)}`;
+const MOCK_FORMER_PROFILE_ID = `p${faker.string.alphanumeric(10)}`;
 
 function mockFormerOwner(): TSanityUser {
   return {
@@ -268,6 +270,24 @@ describe(resendOwnerInvite, () => {
     });
 
     it('removes the role of a never-recorded old owner who accepted the invite', async () => {
+      await resendOwnerInvite(MOCK_TENANT_ID, MOCK_FORMER_OWNER_EMAIL);
+
+      expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        projectUserId: MOCK_FORMER_PROJECT_USER_ID,
+        roleName: SANITY_PROJECT_ROLE.VIEWER,
+      });
+    });
+
+    it('removes the role an old owner holds under their project membership id', async () => {
+      vi.mocked(listSanityProjectUsers).mockResolvedValue([
+        mockSanityOwnerWithProjectMembership(
+          { id: MOCK_FORMER_PROFILE_ID, email: MOCK_FORMER_OWNER_EMAIL },
+          MOCK_FORMER_PROJECT_USER_ID,
+        ),
+      ]);
+
       await resendOwnerInvite(MOCK_TENANT_ID, MOCK_FORMER_OWNER_EMAIL);
 
       expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({

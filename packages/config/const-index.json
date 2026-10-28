@@ -2802,6 +2802,14 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
+    "project": [
+      {
+        "ref": "SANITY_RESOURCE_TYPE.PROJECT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
     "SANITY": [
       {
         "ref": "SANITY_LOGIN_PROVIDER.SANITY",
