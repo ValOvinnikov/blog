@@ -2025,9 +2025,15 @@ indexed by `accountEmailIndex`, the same HMAC over `normalizeEmail` (`+tag`
 kept), because `name+tag@domain` may be a different mailbox and must never
 sign in as `name@domain`. Both keys are backed up outside the database:
 losing the encryption key loses the data.
-Until the plain columns are dropped, every read falls back to them for a row
-with no encrypted or index form, or while a key is unset (§17 says how it is
-logged), so an unbackfilled row or a missing key never locks a user out.
+No table stores a readable email address, name or lead message: the encrypted
+and index forms are the only copy, so every write and read of them throws
+while a key is unset. `users.email` and `users.name` stay as columns only
+because the Auth.js Drizzle adapter's table type requires them; `@blog/auth`
+strips both before every adapter write, so they are always null. A table that
+must stay unique per exact address (`subscribers`, `membership_invites`) also
+stores `email_exact_index`, the `accountEmailIndex` of the address, and is
+unique on it per tenant, so `name+tag@domain` and `name@domain` stay separate
+rows.
 
 **Rate limits are shared across instances.** `apps/web` keeps every rate
 limiter's counts in Upstash Redis (`KV_REST_API_URL`/`KV_REST_API_TOKEN`), so a
@@ -2682,13 +2688,6 @@ stdout — stdout is the transport, so there is no logging framework.
 `service`, `db`, and `auth` **never log**. They return the failure to the
 caller, and the app layer logs it once, with request context. A failure logged
 in two layers is one failure that looks like two.
-
-The one signal `db` raises with no caller to return it to is a personal-data
-read that fell back to a plain column (a row not yet backfilled, or a
-personal-data key unset). It calls the listeners registered with
-`onPersonalDataFallback` with the owner and reason, never the value; each app
-registers one in its `instrumentation.ts`, which logs
-`personal_data.plain_fallback` at `warn`. It goes when the plain columns do.
 
 Event names are static, lowercase and dot-namespaced (`tenants.create_failed`),
 and each logging domain declares its names once, in a `<DOMAIN>_LOG` const

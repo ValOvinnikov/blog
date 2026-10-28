@@ -10,7 +10,6 @@ import { insertTestUser, MOCK_OWNER_EMAIL } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
@@ -37,7 +36,6 @@ vi.mock('@blog/db/client');
 faker.seed(6020);
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 const MOCK_SECOND_OWNER_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_OWNER_USER_ID = faker.string.uuid();
@@ -222,10 +220,8 @@ describe(createTenantDraft, () => {
       .select()
       .from(schema.memberships)
       .where(eq(schema.memberships.tenantId, tenantId));
-    const { email, emailIndex, role, consumedAt, emailEncrypted } =
-      inviteRow ?? {};
-    expect({ email, emailIndex, role, consumedAt }).toEqual({
-      email: MOCK_OWNER_EMAIL,
+    const { emailIndex, role, consumedAt, emailEncrypted } = inviteRow ?? {};
+    expect({ emailIndex, role, consumedAt }).toEqual({
       emailIndex: testPersonalEmailIndex(MOCK_OWNER_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
       consumedAt: null,
@@ -264,7 +260,12 @@ describe(createTenantDraft, () => {
     const secondInviteRows = await db()
       .select()
       .from(schema.membershipInvites)
-      .where(eq(schema.membershipInvites.email, MOCK_SECOND_OWNER_EMAIL));
+      .where(
+        eq(
+          schema.membershipInvites.emailIndex,
+          testPersonalEmailIndex(MOCK_SECOND_OWNER_EMAIL),
+        ),
+      );
     expect(tenantRows).toEqual([firstTenant]);
     expect(secondInviteRows).toEqual([]);
   });

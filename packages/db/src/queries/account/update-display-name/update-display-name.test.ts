@@ -1,9 +1,7 @@
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import { insertTestUser } from '@blog/db/testing/fixtures';
-import {
-  decryptTestPersonalValue,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
+import { decryptTestPersonalValue } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -20,7 +18,6 @@ const MOCK_OTHER_USER_NAME = faker.person.fullName();
 const MOCK_UNKNOWN_USER_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.users);
@@ -28,7 +25,10 @@ afterEach(async () => {
 
 describe(updateDisplayName, () => {
   it('persists the new name', async () => {
-    const user = await insertTestUser(db(), { name: MOCK_OLD_NAME });
+    const user = await insertTestUser(
+      db(),
+      userPersonalColumns({ name: MOCK_OLD_NAME }),
+    );
 
     await updateDisplayName(user.id, MOCK_NEW_NAME);
 
@@ -36,17 +36,20 @@ describe(updateDisplayName, () => {
       .select()
       .from(schema.users)
       .where(eq(schema.users.id, user.id));
-    expect(updated?.name).toBe(MOCK_NEW_NAME);
     expect(decryptTestPersonalValue(updated?.nameEncrypted ?? null)).toBe(
       MOCK_NEW_NAME,
     );
   });
 
   it("does not change another user's name", async () => {
-    const user = await insertTestUser(db(), { name: MOCK_OLD_NAME });
-    const otherUser = await insertTestUser(db(), {
-      name: MOCK_OTHER_USER_NAME,
-    });
+    const user = await insertTestUser(
+      db(),
+      userPersonalColumns({ name: MOCK_OLD_NAME }),
+    );
+    const otherUser = await insertTestUser(
+      db(),
+      userPersonalColumns({ name: MOCK_OTHER_USER_NAME }),
+    );
 
     await updateDisplayName(user.id, MOCK_NEW_NAME);
 
@@ -54,7 +57,9 @@ describe(updateDisplayName, () => {
       .select()
       .from(schema.users)
       .where(eq(schema.users.id, otherUser.id));
-    expect(untouched?.name).toBe(MOCK_OTHER_USER_NAME);
+    expect(decryptTestPersonalValue(untouched?.nameEncrypted ?? null)).toBe(
+      MOCK_OTHER_USER_NAME,
+    );
   });
 
   it('is a no-op for an unrecognized userId', async () => {

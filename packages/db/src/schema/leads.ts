@@ -15,13 +15,10 @@ export const leads = pgTable(
     tenantId: uuid('tenant_id')
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
-    name: text('name').notNull(),
-    nameEncrypted: text('name_encrypted'),
-    email: text('email').notNull(),
-    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
-    emailIndex: text(EMAIL_INDEX_COLUMN),
-    message: text('message').notNull(),
-    messageEncrypted: text('message_encrypted'),
+    nameEncrypted: text('name_encrypted').notNull(),
+    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN).notNull(),
+    emailIndex: text(EMAIL_INDEX_COLUMN).notNull(),
+    messageEncrypted: text('message_encrypted').notNull(),
     sourcePath: text('source_path').notNull(),
     sourceDocumentId: text('source_document_id'),
     sourceLocale: text('source_locale'),

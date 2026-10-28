@@ -3,10 +3,6 @@ import {
   AUDIT_TARGET_TYPE,
   WORKER_AUDIT_ACTOR_ID,
 } from '@blog/config/constants';
-import {
-  PERSONAL_DATA_FALLBACK_REASON,
-  PERSONAL_DATA_OWNER,
-} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import {
@@ -14,10 +10,6 @@ import {
   insertTestAuditEvent,
   insertTestUser,
 } from '@blog/db/testing/fixtures';
-import {
-  usePersonalDataFallbackListener,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
@@ -32,8 +24,6 @@ faker.seed(602104);
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
-const fallbackListener = usePersonalDataFallbackListener();
 
 const MOCK_TARGET_ID = faker.string.uuid();
 const MOCK_FIRST_DAY = new Date(2026, 0, 1);
@@ -159,7 +149,6 @@ describe(listAuditEventsForTarget, () => {
 
   it("returns the actor's account email, read from the encrypted column", async () => {
     const { id } = await insertTestUser(db(), {
-      email: faker.internet.email(),
       emailEncrypted: encryptPersonalValue(MOCK_OPERATOR_EMAIL),
     });
     await insertEvent({ actorId: id });
@@ -169,33 +158,16 @@ describe(listAuditEventsForTarget, () => {
     expect(event?.actorAccountEmail).toBe(MOCK_OPERATOR_EMAIL);
   });
 
-  it('reads an account not yet backfilled from its plain email, and reports it', async () => {
-    const { id } = await insertTestUser(db(), { email: MOCK_OPERATOR_EMAIL });
-    await insertEvent({ actorId: id });
-
-    const [event] = await listTargetEvents();
-
-    expect(event?.actorAccountEmail).toBe(MOCK_OPERATOR_EMAIL);
-    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
-      owner: PERSONAL_DATA_OWNER.USER,
-      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
-    });
-  });
-
   it.each([
     ['a deleted account', faker.string.uuid()],
     ['a system actor', WORKER_AUDIT_ACTOR_ID],
-  ])(
-    'returns a null account email, and reports nothing, for %s',
-    async (_, actorId) => {
-      await insertEvent({ actorId });
+  ])('returns a null account email for %s', async (_, actorId) => {
+    await insertEvent({ actorId });
 
-      const [event] = await listTargetEvents();
+    const [event] = await listTargetEvents();
 
-      expect(event?.actorAccountEmail).toBeNull();
-      expect(fallbackListener).not.toHaveBeenCalled();
-    },
-  );
+    expect(event?.actorAccountEmail).toBeNull();
+  });
 
   it('returns an empty array when no events exist for the target', async () => {
     const result = await listTargetEvents();
