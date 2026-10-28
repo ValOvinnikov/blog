@@ -5,6 +5,7 @@ import {
   PERSONAL_DATA_KEY_FORMAT,
   PERSONAL_DATA_KEYRING_FORMAT,
 } from '@blog/utils/encryption';
+import { MIGRATION_ENVIRONMENT } from '@platform/constants/release';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
@@ -33,9 +34,7 @@ export const env = createEnv({
       .optional(),
     // Set by hand per Vercel project: `VERCEL_ENV` cannot tell a dev deployment from production.
     // @env-optional
-    TENANT_PROVISIONING_DATASET: z
-      .enum(['development', 'production'])
-      .optional(),
+    TENANT_PROVISIONING_DATASET: z.enum(MIGRATION_ENVIRONMENT).optional(),
     // @env-optional
     WORKER_ENQUEUE_URL: z.string().url().optional(),
     // Must be byte-identical to `apps/worker`'s own `WORKER_ENQUEUE_SECRET`.
