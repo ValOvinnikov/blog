@@ -8,12 +8,12 @@ code:
   - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/app/*/sign-in/**
   - apps/platform/src/app/*/signup/**
-  - apps/platform/src/components/features/sign-up/**
+  - apps/platform/src/components/features/layout/centered-card-frame/**
   - apps/platform/src/app/*/onboarding/**
   - apps/platform/src/components/features/onboarding/**
   - apps/platform/src/server/onboarding/**
   - apps/platform/src/constants/onboarding.ts
-  - apps/platform/src/server/auth/accept-signup-terms-action*
+  - apps/platform/src/server/auth/set-signup-terms-cookie*
   - apps/platform/src/utils/legal-page-urls/**
   - apps/platform/src/instrumentation-client.ts
   - apps/platform/src/components/features/sign-in/**
@@ -41,15 +41,18 @@ epics: [4840, 4960, 4979, 4982, 4958, 4949, 5649]
 
 How a person gets into `apps/platform` and, once signed in, into a workspace.
 Every platform user, operator, owner or invited editor, signs in on one
-branded `/sign-in` page, and a prospect passes a `/signup` gate first. A
+branded `/sign-in` page, and a prospect signs up on `/signup`, which offers
+the same sign-in methods and records the terms they agree to. A
 signed-in user with no workspace lands on `/onboarding`, which creates their
 Free site.
 
 ## Surfaces and routes
 
-- `/sign-in` is Auth.js's `pages.signIn`, public and in the panel's own
-  pre-shell styling: a button per configured OAuth provider, then an email
-  field that sends a magic link and says to check your inbox on the same page,
+- `/sign-in` is Auth.js's `pages.signIn`, public, in the same frame as the
+  dead-end pages (`CenteredCardFrame`: the Valstack mark and wordmark centred
+  above a white card). Inside the card: the title and description, any
+  sign-in error, a button per configured OAuth provider, an "or" divider and
+  an email field that sends a magic link and says to check your inbox on the same page,
   or, when the send limit refused it, that too many links were requested and
   to try again in an hour.
   `adminRoutes.signIn(callbackUrl)` builds it, always with an explicit
@@ -75,16 +78,19 @@ Free site.
 - `/workspace-pending`: a session-gated dead end with "Try again" (to
   `/dashboard`) and "Sign out". Nothing routes to it any more: a user with no
   membership goes to `/onboarding` instead.
-- `/signup`: a public gate in front of the same providers, not a second
-  login. The visitor ticks acceptance of the Terms of Service and the Privacy
-  Policy, linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
+- `/signup`: the same card, titled "Create an account", with the same
+  provider buttons and email field (`SignInOptions` with `isSignUp`), then the
+  note "By continuing, you agree to the Terms of Service and the Privacy
+  Policy", linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
   (`routes.terms()` and `routes.privacy()` in `@blog/config`; the marketing
-  site serves them), or named as plain text without a root domain. Continue
-  runs `acceptSignupTermsAction`: Vercel BotID at its free Basic level, then the
-  `SIGNUP_TERMS_COOKIE_NAME` cookie set to `TERMS_VERSION` for two days, then
-  `/sign-in` with a `callbackUrl` of `/`. A bot, or a failed check, gets a
-  neutral "try again later" and no cookie; a failed check is logged. A
-  signed-in visitor is sent to `/`. `/sign-in` links to it ("New here?").
+  site serves them), or named as plain text without a root domain. No
+  checkbox and no separate step: choosing a provider or sending a link runs
+  `setSignupTermsCookie` first, which checks Vercel BotID at its free Basic
+  level and sets the `SIGNUP_TERMS_COOKIE_NAME` cookie to `TERMS_VERSION` for
+  two days. A bot, or a failed check, gets no cookie and still signs in; a
+  failed check is logged. A sign-up always lands on `/`. A signed-in visitor
+  is sent to `/`. Under the card, `/signup` links to `/sign-in` ("Already have
+  an account?") and `/sign-in` links to `/signup` ("New here?").
 - Sign-out (account menu, or the button on pre-shell pages) runs
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
@@ -178,8 +184,8 @@ Free site.
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
   cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
   users are never stamped, and a recorded acceptance is never overwritten.
-  `/signup` sets that cookie; Create site records the acceptance it asks for
-  again.
+  Signing up from `/signup` sets that cookie; Create site records the
+  acceptance it asks for again.
 
 ## Configuration
 
@@ -261,7 +267,7 @@ Free site.
 - `apps/platform/src/server/auth/resolve-home-href.ts`
 - `apps/platform/src/app/[locale]/sign-in/page.tsx`
 - `apps/platform/src/app/[locale]/signup/page.tsx`
-- `apps/platform/src/server/auth/accept-signup-terms-action.ts`
+- `apps/platform/src/server/auth/set-signup-terms-cookie.ts`
 - `apps/platform/src/app/[locale]/onboarding/page.tsx`
 - `apps/platform/src/server/onboarding/create-site-action.ts`
 - `apps/platform/src/server/onboarding/check-site-address-action.ts`
@@ -279,12 +285,12 @@ Free site.
   `sign-out-action.test.ts`, `send-sign-in-link-action.test.ts`,
   `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
   `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
-  `accept-signup-terms-action.test.ts`, `legal-page-urls.test.ts`,
+  `set-signup-terms-cookie.test.ts`, `legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
   `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
-  `sign-in-view`, `email-sign-in-form`,
+  `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `dead-end-view`,
   `workspace-pending-view` and `sign-out-button`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.

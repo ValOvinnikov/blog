@@ -27,11 +27,13 @@ const providerSignInButtonVariants = tv({
 export type TProviderSignInButtonProps = {
   providerId: TOAuthProviderId;
   callbackPath: string;
+  isSignUp: boolean;
 };
 
 export const ProviderSignInButton = ({
   providerId,
   callbackPath,
+  isSignUp,
 }: TProviderSignInButtonProps) => {
   const t = useTranslations('providerSignInButton');
   const [isPending, startTransition] = useTransition();
@@ -39,7 +41,7 @@ export const ProviderSignInButton = ({
 
   const handleClick = () => {
     startTransition(() =>
-      signInWithProviderAction({ providerId, callbackPath }),
+      signInWithProviderAction({ providerId, callbackPath, isSignUp }),
     );
   };
 

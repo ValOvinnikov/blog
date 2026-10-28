@@ -1,7 +1,6 @@
 'use client';
 
 import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { TermsAcceptanceCheckbox } from '@platform/components/features/sign-up/terms-acceptance-checkbox';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
@@ -15,6 +14,7 @@ import { buildAccentPreviewTokens } from '@platform/utils/theme-preview-tokens/t
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { TermsAcceptanceCheckbox } from './components/terms-acceptance-checkbox/terms-acceptance-checkbox';
 import { reviewStepVariants } from './review-step-variants';
 
 type TReviewRow = {

@@ -36,7 +36,6 @@
   "signInPage": {
     "heading": "Inloggen",
     "description": "Gebruik het account waarmee je je hebt aangemeld of bent uitgenodigd.",
-    "brandMarkLabel": "Valstack",
     "accountNotLinkedTitle": "Dit e-mailadres logt al op een andere manier in",
     "accountNotLinkedDescription": "Je e-mailadres wordt al gebruikt met een andere inlogmethode. Log in zoals je de vorige keer deed.",
     "signInFailedTitle": "We konden je niet inloggen",
@@ -45,14 +44,11 @@
   },
   "signUpPage": {
     "heading": "Account aanmaken",
-    "description": "Accepteer de voorwaarden en kies daarna hoe je wilt inloggen.",
-    "brandMarkLabel": "Valstack"
+    "agreement": "Door verder te gaan, ga je akkoord met de <terms>Servicevoorwaarden</terms> en het <privacy>Privacybeleid</privacy>.",
+    "signInPrompt": "Heb je al een account? <link>Inloggen</link>"
   },
-  "signUpForm": {
-    "continue": "Doorgaan",
-    "continuing": "Controleren…",
-    "refusedTitle": "We konden je aanmelding niet voortzetten",
-    "refusedDescription": "Probeer het later opnieuw."
+  "signInOptions": {
+    "or": "of"
   },
   "termsAcceptance": {
     "acceptTerms": "Ik ga akkoord met de <terms>Servicevoorwaarden</terms> en het <privacy>Privacybeleid</privacy>.",
@@ -157,8 +153,10 @@
     "badge": "Fout 500",
     "homeLink": "Terug naar start"
   },
+  "centeredCardFrame": {
+    "brandName": "Valstack"
+  },
   "deadEndView": {
-    "brandName": "Valstack",
     "errorId": "Fout-ID: {errorId}"
   },
   "pageSkeleton": {

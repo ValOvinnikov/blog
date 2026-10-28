@@ -1,17 +1,15 @@
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
-import { PreShellFrame } from '@platform/components/features/layout/pre-shell-frame';
+import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
+import { AuthCrossLink } from '@platform/components/features/sign-in/auth-cross-link';
+import { SignInOptions } from '@platform/components/features/sign-in/sign-in-options';
 import { Alert } from '@platform/components/shared/alert';
-import { BrandMark } from '@platform/components/shared/brand-mark';
-import { PageHeader } from '@platform/components/shared/page-header';
+import { Heading } from '@platform/components/shared/heading';
 import { Text } from '@platform/components/shared/text';
 import { SIGN_IN_ERROR, type TSignInError } from '@platform/constants/sign-in';
-import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
-import { EmailSignInForm } from './components/email-sign-in-form';
-import { ProviderSignInButton } from './components/provider-sign-in-button';
 import { signInViewVariants } from './sign-in-view-variants';
 
 const SIGN_IN_ERROR_KEYS = {
@@ -40,19 +38,29 @@ export const SignInView = ({
   error,
 }: TSignInViewProps) => {
   const t = useTranslations('signInPage');
-  const { content, providers, signUpLink } = signInViewVariants();
+  const { content, copy, footer } = signInViewVariants();
 
   return (
-    <PreShellFrame
-      header={
-        <PageHeader
-          title={t('heading')}
-          description={t('description')}
-          actions={<BrandMark title={t('brandMarkLabel')} />}
-        />
+    <CenteredCardFrame
+      footer={
+        <Text variant="hint" className={footer()}>
+          {t.rich('signUpPrompt', {
+            link: (chunks) => (
+              <AuthCrossLink href={adminRoutes.signUp()}>
+                {chunks}
+              </AuthCrossLink>
+            ),
+          })}
+        </Text>
       }
     >
       <div className={content()}>
+        <div className={copy()}>
+          <Heading level={1} size="pageTitle">
+            {t('heading')}
+          </Heading>
+          <Text variant="supporting">{t('description')}</Text>
+        </div>
         {error && (
           <Alert
             type={ALERT_TYPE.ERROR}
@@ -60,28 +68,12 @@ export const SignInView = ({
             description={t(SIGN_IN_ERROR_KEYS[error].description)}
           />
         )}
-        {providerIds.length > 0 && (
-          <div className={providers()}>
-            {providerIds.map((providerId) => (
-              <ProviderSignInButton
-                key={providerId}
-                providerId={providerId}
-                callbackPath={callbackPath}
-              />
-            ))}
-          </div>
-        )}
-        <EmailSignInForm callbackPath={callbackPath} />
-        <Text variant="hint">
-          {t.rich('signUpPrompt', {
-            link: (chunks) => (
-              <Link href={adminRoutes.signUp()} className={signUpLink()}>
-                {chunks}
-              </Link>
-            ),
-          })}
-        </Text>
+        <SignInOptions
+          providerIds={providerIds}
+          callbackPath={callbackPath}
+          isSignUp={false}
+        />
       </div>
-    </PreShellFrame>
+    </CenteredCardFrame>
   );
 };

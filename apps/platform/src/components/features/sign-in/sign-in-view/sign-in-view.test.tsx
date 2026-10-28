@@ -87,6 +87,7 @@ describe(`<${SignInView.name}/>`, () => {
     expect(signInWithProviderAction).toHaveBeenCalledWith({
       providerId: GOOGLE_PROVIDER_ID,
       callbackPath: adminRoutes.dashboard(),
+      isSignUp: false,
     });
   });
 

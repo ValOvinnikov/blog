@@ -44,7 +44,7 @@ describe(`<${DeadEndView.name}/>`, () => {
 
     it('names the product in text, with the mark hidden', () => {
       const main = screen.getByRole('main');
-      const wordmark = screen.getByText(messages.deadEndView.brandName);
+      const wordmark = screen.getByText(messages.centeredCardFrame.brandName);
       const image = screen.queryByRole('img');
 
       expect(main).toContainElement(wordmark);

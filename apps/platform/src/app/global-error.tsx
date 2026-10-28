@@ -30,7 +30,7 @@ export default function GlobalError({ retry }: TProps) {
         <NextIntlClientProvider
           locale={LOCALE_ISO_CODES.EN}
           messages={{
-            deadEndView: { brandName: globalErrorCopy.brandName },
+            centeredCardFrame: { brandName: globalErrorCopy.brandName },
           }}
         >
           <DeadEndView

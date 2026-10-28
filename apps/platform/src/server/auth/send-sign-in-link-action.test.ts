@@ -4,6 +4,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { SIGN_IN_LOG } from '@platform/constants/sign-in';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
+import { setSignupTermsCookie } from '@platform/server/auth/set-signup-terms-cookie';
 import {
   MOCK_OFF_ORIGIN_PATH,
   MOCK_SIGN_IN_EMAIL,
@@ -17,6 +18,10 @@ import { sendSignInLinkAction } from './send-sign-in-link-action';
 vi.hoisted(() => vi.stubEnv('SKIP_ENV_VALIDATION', 'true'));
 
 vi.mock('@platform/server/auth/auth');
+
+vi.mock('@platform/server/auth/set-signup-terms-cookie', () => ({
+  setSignupTermsCookie: vi.fn(),
+}));
 
 const MOCK_SIGN_IN_INPUT = {
   email: MOCK_SIGN_IN_EMAIL,
@@ -40,6 +45,17 @@ describe(sendSignInLinkAction, () => {
       redirectTo: adminRoutes.dashboardLeads(),
       redirect: false,
     });
+    expect(setSignupTermsCookie).not.toHaveBeenCalled();
+  });
+
+  it('marks a sign-up as agreeing to the terms before sending the link', async () => {
+    await sendSignInLinkAction({ ...MOCK_SIGN_IN_INPUT, isSignUp: true });
+
+    const [cookieCallOrder] =
+      vi.mocked(setSignupTermsCookie).mock.invocationCallOrder;
+    const [signInCallOrder] = vi.mocked(signIn).mock.invocationCallOrder;
+
+    expect(cookieCallOrder).toBeLessThan(signInCallOrder ?? 0);
   });
 
   it('returns a link that would leave this origin to home instead', async () => {
@@ -66,6 +82,7 @@ describe(sendSignInLinkAction, () => {
       fieldErrors: { email: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
     });
     expect(signIn).not.toHaveBeenCalled();
+    expect(setSignupTermsCookie).not.toHaveBeenCalled();
   });
 
   it('logs and reports a send that fails', async () => {

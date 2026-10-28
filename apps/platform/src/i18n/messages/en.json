@@ -36,7 +36,6 @@
   "signInPage": {
     "heading": "Sign in",
     "description": "Use the account you signed up or were invited with.",
-    "brandMarkLabel": "Valstack",
     "accountNotLinkedTitle": "This email already signs in another way",
     "accountNotLinkedDescription": "Your email address is already used with a different sign-in method. Sign in the way you did before.",
     "signInFailedTitle": "We couldn't sign you in",
@@ -45,14 +44,11 @@
   },
   "signUpPage": {
     "heading": "Create an account",
-    "description": "Accept the terms, then choose how you want to sign in.",
-    "brandMarkLabel": "Valstack"
+    "agreement": "By continuing, you agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
+    "signInPrompt": "Already have an account? <link>Sign in</link>"
   },
-  "signUpForm": {
-    "continue": "Continue",
-    "continuing": "Checking…",
-    "refusedTitle": "We couldn't continue your sign-up",
-    "refusedDescription": "Try again later."
+  "signInOptions": {
+    "or": "or"
   },
   "termsAcceptance": {
     "acceptTerms": "I agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
@@ -157,8 +153,10 @@
     "badge": "Error 500",
     "homeLink": "Back to home"
   },
+  "centeredCardFrame": {
+    "brandName": "Valstack"
+  },
   "deadEndView": {
-    "brandName": "Valstack",
     "errorId": "Error ID: {errorId}"
   },
   "pageSkeleton": {

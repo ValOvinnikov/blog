@@ -36,9 +36,13 @@ const emailSignInFormVariants = tv({
 
 export type TEmailSignInFormProps = {
   callbackPath: string;
+  isSignUp: boolean;
 };
 
-export const EmailSignInForm = ({ callbackPath }: TEmailSignInFormProps) => {
+export const EmailSignInForm = ({
+  callbackPath,
+  isSignUp,
+}: TEmailSignInFormProps) => {
   const t = useTranslations('emailSignInForm');
   const {
     email,
@@ -48,7 +52,7 @@ export const EmailSignInForm = ({ callbackPath }: TEmailSignInFormProps) => {
     sendRefusal,
     isPending,
     submit,
-  } = useEmailSignIn(callbackPath);
+  } = useEmailSignIn({ callbackPath, isSignUp });
   const fieldErrorText = useTenantFieldErrorText();
   const { root, submit: submitSlot } = emailSignInFormVariants();
 

@@ -13,10 +13,12 @@ import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-call
 import { z } from 'zod';
 
 import { signIn } from './auth';
+import { setSignupTermsCookie } from './set-signup-terms-cookie';
 
 const sendSignInLinkInputSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   callbackPath: z.string(),
+  isSignUp: z.boolean().optional(),
 });
 
 export type TSendSignInLinkInput = z.input<typeof sendSignInLinkInputSchema>;
@@ -46,7 +48,9 @@ export const sendSignInLinkAction = async (
     };
   }
 
-  const { email, callbackPath } = parsed.data;
+  const { email, callbackPath, isSignUp } = parsed.data;
+  if (isSignUp) await setSignupTermsCookie();
+
   try {
     await signIn(MAGIC_LINK_PROVIDER_ID, {
       email,
