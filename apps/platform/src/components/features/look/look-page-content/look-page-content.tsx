@@ -1,6 +1,7 @@
 import { READER_ACCOUNT_CAPABILITIES } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { LookForm } from '@platform/components/features/look/look-form';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
@@ -20,7 +21,11 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
     <LookForm
       tenantId={tenant.id}
       tenantName={tenant.name}
-      initialValues={lookFormValuesOrDefaults(siteConfig)}
+      initialValues={toEffectiveLook(
+        lookFormValuesOrDefaults(siteConfig),
+        tenant.plan,
+      )}
+      plan={tenant.plan}
       liveLocales={liveLocales}
       hasReaderAccounts={READER_ACCOUNT_CAPABILITIES.some((capability) =>
         enabledCapabilities.includes(capability),

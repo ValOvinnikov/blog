@@ -10,10 +10,6 @@ export const settingRowVariants = tv({
     content: ['min-w-0 flex-1'],
     label: ['block text-admin-13 font-semibold text-admin-text'],
     description: ['mt-0.5 block'],
-    reason: [
-      'mt-[5px] flex items-start gap-[5px]',
-      'text-admin-12 leading-[1.45] text-admin-muted',
-    ],
     control: ['flex shrink-0 items-center gap-2'],
   },
 });

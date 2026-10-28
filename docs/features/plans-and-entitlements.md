@@ -4,6 +4,8 @@ status: partial
 layers: [config, db, studio, web, platform]
 code:
   - packages/db/src/constants/tenant.ts
+  - packages/db/src/constants/look.ts
+  - packages/db/src/utils/effective-look/**
   - packages/config/src/constants/capability.ts
   - packages/db/src/schema/settings-features.ts
   - packages/db/src/queries/settings-features/**
@@ -37,6 +39,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `tenants.plan` — required, the `tenant_plan` pgEnum built from `TENANT_PLAN`.
 - `PLAN_REGISTRY` (`@blog/db/constants`) — `FREE`: `RATINGS`, `CONSENT_BANNER`. `GROWTH`: all seven `CAPABILITY` keys (`COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`).
 - `PLAN_LOCALE_LIMIT` — languages per plan including the default: `FREE` 1, `GROWTH` 3.
+- `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` the preset, accent hue, logo and favicon; `GROWTH` every Look column. The epic's later entitlements join this record as fields of their own.
 - `settings_features` — one row per tenant (unique `tenant_id`, cascade delete), seven `NOT NULL` boolean toggles. Provisioning writes no row; an absent row resolves to the tenant's current preset's `featureDefaults` (both presets: comments, ratings, bookmarks and contact form on; newsletter, analytics and consent banner off).
 - No price exists anywhere in the code.
 - **Caching (web)** — `getTenantPlan` and `getEffectiveSettingsFeatures` are `unstable_cache` per tenant, tagged `tenant-plan:<id>` and `settings-features:<id>`, with `TENANT_CONFIG_REVALIDATE_SECONDS` (3600) as the fallback. `POST /api/revalidate-site-config` expires both tags with `site-config:<id>` and purges the whole layout. The platform and Studio read `tenants.plan` uncached on every request.
@@ -47,18 +50,21 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Owner or operator** saves Features through `updateFeaturesAction`, behind `requireTenantMembership` (any member; an operator gets a virtual owner membership).
 - **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` on `FREE`.
 - **Plan page access** (`planPageAccess`) — Languages when `PLAN_LOCALE_LIMIT` > 1; Email when the plan holds bookmarks, comments or newsletter; Subscribers with newsletter; Comments with comments; Team on any plan but `FREE`. The owner's sidebar omits the rest and their pages 404; the operator's `/tenants/{id}` view shows every entry and page whatever the plan.
-- **Not plan-gated** — Look, Voice, Domain, Studio, the Features page itself, modules and page types, team seats, AI takeaways.
+- **Look** — fields outside `lookFields` show locked on the Look page with the "Growth plan" badge, at the preset's value (see [look](./look.md)).
+- **Not plan-gated** — Voice, Domain, Studio, the Features page itself, modules and page types, team seats, AI takeaways.
 
 ## Constraints and invariants
 
 - Most restrictive wins: `isCapabilityEnabled` is `PLAN_REGISTRY[plan].includes(capability) && toggle`. Every failure path returns `false`. A fetch error also logs (`settings_features.plan_fetch_failed` or `effective_fetch_failed`); a missing tenant or plan does not. A render site omits the capability silently, never with a placeholder.
 - The server re-checks entitlement: `updateFeaturesAction` rejects the whole save, logging `settings_features.plan_entitlement_rejected`, when any toggle that is not coming soon is on outside the plan. A disabled switch is never the gate.
 - A downgrade deletes nothing. Toggles are clamped on read: on the site, in Studio (`getEnabledCapabilities`) and in the Features page's initial values. Saving that page never writes an out-of-plan toggle: `updateFeaturesAction` keeps its stored value, so an upgrade brings back what was on. Switching one on is still refused.
+- Look: `toEffectiveLook` (`@blog/db/utils/effective-look/effective-look`, client-safe) gives each field outside the plan its preset's value; `updateLookAction` writes only the fields the plan includes (`pickEntitledLook`), so a downgrade keeps the stored choices and an upgrade shows them again.
 - Languages: the live set is the default plus the first `limit − 1` stored additional languages. `setTenantAdditionalLocales` refuses to add a locale past the limit (`DB_LOCALE_LIMIT_EXCEEDED`) but lets a downgraded tenant keep or reorder its stored ones.
 - A reader account exists only while bookmarks, comments or newsletter is enabled, so a `FREE` site has none.
 - Saving a tenant's details (plan, default language, domain) or its additional languages calls the revalidation route, so the site serves the change on its next load. A failed call is logged and does not fail the save; the site then catches up within 3600s.
 - `PLAN_REGISTRY` lives in `@blog/db` because it keys off `TENANT_PLAN`, which `db` owns and `config` cannot import.
-- `TENANT_PLAN` backs a pgEnum: reordering it reorders the enum, and a new plan needs a migration plus entries in both `Record<TTenantPlan, …>` maps.
+- `TENANT_PLAN` backs a pgEnum: reordering it reorders the enum, and a new plan needs a migration plus entries in every `Record<TTenantPlan, …>` map.
+- A new Growth-only Look column joins `LOOK_FIELDS` and the effective-Look fallback in the change that adds it.
 - A new capability means a `CAPABILITY` key, every `Record<TCapability, …>` map, a `settings_features` column with its migration, a `CAPABILITY_TOGGLES` row and the mapping in `to-effective-settings-features`.
 
 ## Dependencies
@@ -69,7 +75,8 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 ## Entry points
 
-- `packages/db/src/constants/tenant.ts` — `TENANT_PLAN`, `PLAN_REGISTRY`, `PLAN_LOCALE_LIMIT`
+- `packages/db/src/constants/tenant.ts` — `TENANT_PLAN`, `PLAN_REGISTRY`, `PLAN_LOCALE_LIMIT`, `PLAN_ENTITLEMENTS`
+- `packages/db/src/utils/effective-look/effective-look.ts` — `toEffectiveLook`, `pickEntitledLook`, `isLookFieldEntitled`
 - `apps/web/src/server/settings-features/is-capability-enabled/is-capability-enabled.ts`
 - `apps/web/src/server/settings-features/is-reader-account-enabled/is-reader-account-enabled.ts`
 - `apps/web/src/utils/to-effective-settings-features/to-effective-settings-features.ts`

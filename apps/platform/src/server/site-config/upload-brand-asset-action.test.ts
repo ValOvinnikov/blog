@@ -184,7 +184,7 @@ describe(uploadBrandAssetAction, () => {
     );
   });
 
-  it('saves the theme fields plus the new logo URL', async () => {
+  it('saves the preset and the new logo URL', async () => {
     await uploadBrandAssetAction(
       MOCK_TENANT_ID,
       brandAssetKindSchema.enum.logo,
@@ -192,7 +192,7 @@ describe(uploadBrandAssetAction, () => {
     );
 
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      ...MOCK_THEME_FIELDS,
+      preset: MOCK_THEME_FIELDS.preset,
       logoAssetUrl: MOCK_UPLOADED_URL,
     });
   });

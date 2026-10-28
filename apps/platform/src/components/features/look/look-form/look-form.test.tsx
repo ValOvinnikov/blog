@@ -9,6 +9,7 @@ import {
   PRESET_REGISTRY,
 } from '@blog/config';
 import type * as BlogConfig from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import messages from '@platform/i18n/messages/en.json';
@@ -126,6 +127,8 @@ const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
 const HEAVY_FORM_TIMEOUT_MS = 15_000;
 const ARROW_RIGHT_KEY = '{ArrowRight}';
 const ARIA_SELECTED = 'aria-selected';
+const ARIA_PRESSED = 'aria-pressed';
+const DATA_DISABLED = 'data-disabled';
 const ARIA_DISABLED = 'aria-disabled';
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
@@ -136,12 +139,15 @@ const EXTRA_LARGE = LOOK_FORM.radiusScaleOptionLabel.XL;
 const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 const SAVING = 'Saving…';
+const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
+const GROWTH_ONLY_FIELD_COUNT = 8;
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
 
 const setup = customRender(LookForm, {
   tenantId: MOCK_TENANT_ID,
   tenantName: MOCK_TENANT_NAME,
   initialValues: defaultLookFormValues(),
+  plan: TENANT_PLAN.GROWTH,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
 });
@@ -507,10 +513,10 @@ describe(`<${LookForm.name}/>`, () => {
     const outlinedButton = within(headerButtons).getByRole('button', {
       name: LOOK_FORM.headerControlStyleOptionLabel.OUTLINED,
     });
-    expect(outlinedButton).toHaveAttribute('aria-pressed', 'true');
+    expect(outlinedButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
-  it('shows a note instead of the language switcher choice with one language', () => {
+  it('shows a single-language note and no switcher choice with one language', () => {
     setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
     const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
@@ -662,6 +668,59 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
+  describe('on Free', () => {
+    beforeEach(() => {
+      setup({ plan: TENANT_PLAN.FREE });
+    });
+
+    it('locks every Growth-only field with the Growth plan badge', () => {
+      const locks = screen.getAllByText(GROWTH_PLAN);
+      const headingFont = screen.getByRole('combobox', {
+        name: LOOK_FORM.headingFontLabel,
+      });
+      const extraLargeButton = screen.getByRole('button', {
+        name: EXTRA_LARGE,
+      });
+      const followSwitch = screen.getByRole('switch', {
+        name: FOLLOW_ACCENT_HUE,
+      });
+      const codesButton = screen.getByRole('button', {
+        name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
+      });
+
+      expect(locks).toHaveLength(GROWTH_ONLY_FIELD_COUNT);
+      expect(headingFont).toHaveAttribute(DATA_DISABLED);
+      expect(headingFont).toHaveAccessibleDescription(GROWTH_PLAN);
+      expect(extraLargeButton).toBeDisabled();
+      expect(followSwitch).toBeDisabled();
+      expect(codesButton).toBeDisabled();
+    });
+
+    it('keeps the preset, accent hue and brand images editable', () => {
+      const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
+      const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+      const uploadLogoButton = screen.getByRole('button', {
+        name: UPLOAD_LOGO,
+      });
+
+      expect(editorialPreset).not.toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(hueSlider).toBeEnabled();
+      expect(uploadLogoButton).toBeEnabled();
+    });
+
+    it("previews a new preset's own fonts and corners", async () => {
+      const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+      await user.click(editorialRadio);
+
+      const smallButton = screen.getByRole('button', {
+        name: LOOK_FORM.radiusScaleOptionLabel.SM,
+      });
+      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(sampleTokens).toHaveStyle({ '--radius-md': '3px' });
+    });
+  });
+
   describe('archived tenant', () => {
     describe('with only the archive date', () => {
       beforeEach(() => {
@@ -720,7 +779,7 @@ describe(`<${LookForm.name}/>`, () => {
           name: LOOK_FORM.headerControlStyleOptionLabel.SOFT,
         });
 
-        expect(headingFont).toHaveAttribute('data-disabled');
+        expect(headingFont).toHaveAttribute(DATA_DISABLED);
         expect(bodyFont).toHaveAccessibleDescription(
           ARCHIVED_NOTICE_DESCRIPTION,
         );

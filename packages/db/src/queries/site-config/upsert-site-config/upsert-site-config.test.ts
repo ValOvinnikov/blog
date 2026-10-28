@@ -10,6 +10,8 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
+  DENSITY,
+  FONT_CHOICE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -18,6 +20,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   PRESET_ID,
+  RADIUS_SCALE,
   SPINNER_STYLE,
 } from '@blog/config/constants';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
@@ -82,6 +85,7 @@ function voiceFieldMax(id: string): number {
 const NOT_FOUND_HEADING_MAX = voiceFieldMax(NOT_FOUND_HEADING_ID);
 const SUPPORTING_TEXT_MAX = voiceFieldMax(SUPPORTING_TEXT_ID);
 const CHANGED_ACCENT_HUE = MOCK_ACCENT_HUE - 1;
+const EDITORIAL_ACCENT_HUE = 28;
 const MOCK_LOGO_HUE = MOCK_ACCENT_HUE - 2;
 const MOCK_UNKNOWN_VALUE = faker.lorem.word();
 const MOCK_HEADING = faker.lorem.words(3);
@@ -362,6 +366,36 @@ describe(upsertSiteConfig, () => {
         expect(result[field]).toBe(value);
       },
     );
+
+    it('gives a new config saved with only a preset its preset values', async () => {
+      const result = expectOk(
+        await upsertSiteConfig(tenantId, { preset: PRESET_ID.EDITORIAL }),
+      );
+
+      expect(result).toMatchObject({
+        accentHue: EDITORIAL_ACCENT_HUE,
+        headingFont: FONT_CHOICE.FRAUNCES,
+        bodyFont: FONT_CHOICE.INTER,
+        radiusScale: RADIUS_SCALE.SM,
+        density: DENSITY.COMPACT,
+      });
+    });
+
+    it('keeps the stored hue, fonts, corners and density when a save omits them', async () => {
+      await save();
+
+      const result = expectOk(
+        await upsertSiteConfig(tenantId, { preset: PRESET_ID.EDITORIAL }),
+      );
+
+      expect(result).toMatchObject({
+        accentHue: MOCK_ACCENT_HUE,
+        headingFont: FONT_CHOICE.SPACE_GROTESK,
+        bodyFont: FONT_CHOICE.NEWSREADER,
+        radiusScale: RADIUS_SCALE.MD,
+        density: DENSITY.DEFAULT,
+      });
+    });
 
     it('keeps the card style across a preset change when a save omits it', async () => {
       await save();
