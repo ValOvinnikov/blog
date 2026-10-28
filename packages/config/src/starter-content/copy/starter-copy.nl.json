@@ -121,5 +121,48 @@
         "metaDescription": "Een tweede voorbeeldcase, aangemaakt met je site. Vervang hem door je eigen werk, of verwijder hem."
       }
     ]
+  },
+  "personal": {
+    "hero": {
+      "eyebrow": "Hallo",
+      "heading": "Iets over mij en wat ik doe"
+    },
+    "intro": {
+      "body": [
+        "Welkom op mijn plekje op het web. Hier vertel ik wie ik ben, waar ik aan werk en wat ik onderweg leer.",
+        "Vervang deze tekst door een paar regels over jezelf: je achtergrond, waar je goed in bent en wat je hierna wilt doen."
+      ]
+    },
+    "faq": {
+      "heading": "Een paar vragen die mensen stellen",
+      "questions": [
+        {
+          "question": "Wat doe je?",
+          "answer": [
+            "Antwoord in een zin of twee: je rol, je vakgebied en het soort werk dat je het leukst vindt."
+          ]
+        },
+        {
+          "question": "Sta je open voor nieuwe kansen?",
+          "answer": [
+            "Vertel of je een baan, freelancewerk of samenwerkingen zoekt, en wat je zou interesseren."
+          ]
+        },
+        {
+          "question": "Waar vind ik meer van je werk?",
+          "answer": [
+            "Verwijs bezoekers naar je teksten op deze site en voeg links toe naar andere plekken waar je je werk deelt."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Lees wat ik schrijf",
+      "supportingText": "Notities en berichten over waar ik aan werk en wat ik leer."
+    },
+    "writing": {
+      "linkLabel": "Teksten",
+      "listHeading": "Alle berichten"
+    }
   }
 }

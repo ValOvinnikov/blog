@@ -1,9 +1,10 @@
 import { BRAND_VARIANT } from '@blog/config';
 import type { TContactFormModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-faker.seed(61042);
+const mockFaker = createMockFaker(61042);
 
 export const mockContactFormModule = (
   overrides: Partial<TContactFormModule> = {},
@@ -21,7 +22,7 @@ export const mockContactFormModule = (
 });
 
 export const MOCK_CONTACT_MESSAGE = {
-  name: faker.person.fullName(),
-  email: faker.internet.email(),
-  message: faker.lorem.sentences(2),
+  name: mockFaker.person.fullName(),
+  email: mockFaker.internet.email(),
+  message: mockFaker.lorem.sentences(2),
 };
