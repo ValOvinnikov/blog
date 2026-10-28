@@ -14,6 +14,7 @@ import { logger } from '@web/utils/logger/logger';
 import { getHeaderStyle } from './get-header-style';
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
+vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
 
 vi.mock(
   '@blog/db',

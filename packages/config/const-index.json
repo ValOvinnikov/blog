@@ -6132,6 +6132,30 @@
         "file": "apps/web/src/constants/session.ts"
       }
     ],
+    "site_config.fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.plan_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "voice_rich.fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.VOICE_RICH_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
     "tenant_write.unresolved": [
       {
         "ref": "TENANT_WRITE_LOG.UNRESOLVED",

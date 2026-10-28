@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
-import { VOICE_RICH_FETCH_FAILED_EVENT } from '@web/constants/site-config';
+import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
@@ -106,10 +106,13 @@ describe(getVoiceRich, () => {
     const result = await getVoiceRich(FIELD_ID);
 
     expect(result[0]?.children[0]?.text).toBe(MOCK_CATALOG_EMPTY);
-    expect(logger.error).toHaveBeenCalledWith(VOICE_RICH_FETCH_FAILED_EVENT, {
-      id: FIELD_ID,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.VOICE_RICH_FETCH_FAILED,
+      {
+        id: FIELD_ID,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it("reads the site config of the request context's tenant", async () => {

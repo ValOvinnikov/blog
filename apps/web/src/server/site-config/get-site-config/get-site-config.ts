@@ -1,15 +1,16 @@
 import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
 import { queries } from '@blog/db';
-import { safeAsync } from '@blog/utils';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
+import { safeAsync, type TResult } from '@blog/utils';
+import { SITE_CONFIG_LOG } from '@web/constants/site-config';
+import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { logger } from '@web/utils/logger/logger';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
 
-// `apps/platform`'s Look/Voice saves write `site_config` directly via
-// `@blog/db`, then call `/api/revalidate-site-config` (a separate Vercel
-// deployment, so this is a cross-app HTTP call rather than a shared cache
-// reference) to expire this tenant's tag immediately. Absent that call, a
-// save still appears live within `TENANT_CONFIG_REVALIDATE_SECONDS`.
+// The platform's Look/Voice saves expire this tag over HTTP (`/api/revalidate-site-config`), since the apps share no cache.
 const getCachedSiteConfigForTenant = (tenantId: string) =>
   unstable_cache(
     (id: string) => queries.siteConfig.getSiteConfig(id),
@@ -20,16 +21,29 @@ const getCachedSiteConfigForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
+const toLookPlan = (
+  planResult: TResult<TTenantPlan | undefined>,
+): TTenantPlan => {
+  if (!planResult.ok) {
+    logger.error(SITE_CONFIG_LOG.PLAN_FETCH_FAILED, {
+      error: planResult.error,
+    });
+    return TENANT_PLAN.FREE;
+  }
+  return planResult.data ?? TENANT_PLAN.FREE;
+};
+
 const getSiteConfigForTenantId = safeAsync(async (tenantId?: string) => {
   if (!tenantId) return undefined;
-  return getCachedSiteConfigForTenant(tenantId);
+
+  const [siteConfig, planResult] = await Promise.all([
+    getCachedSiteConfigForTenant(tenantId),
+    getTenantPlan(tenantId),
+  ]);
+  if (!siteConfig) return undefined;
+
+  return toEffectiveLook(siteConfig, toLookPlan(planResult));
 });
 
-/**
- * The single `@blog/db` read shared by `getThemeTokens` (the theme
- * `<style>`/font-variable injector) and `resolveTenantMessages` (the
- * next-intl voice ladder) — one cached row backs both, cached per tenant so
- * no tenant is ever served another's config.
- */
 export const getSiteConfig = async (tenant?: string) =>
   getSiteConfigForTenantId(await getRequestTenantId(tenant));
