@@ -56,6 +56,11 @@ const setup = customRender(LookSample, {
   hasReaderAccounts: true,
 });
 
+const setupWithHeader = (
+  header: Partial<TSampleHeaderStyle>,
+  props: NonNullable<Parameters<typeof setup>[0]> = {},
+) => setup({ ...props, header: { ...MOCK_HEADER, ...header } });
+
 describe(`<${LookSample.name}/>`, () => {
   let staticDarkRamp: HTMLStyleElement;
 
@@ -217,11 +222,8 @@ describe(`<${LookSample.name}/>`, () => {
   });
 
   it('shows a menu pill with the current code for menu with code', () => {
-    setup({
-      header: {
-        ...MOCK_HEADER,
-        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-      },
+    setupWithHeader({
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     });
 
     const languageMenu = screen.getByRole('button', { name: LANGUAGE_ENGLISH });
@@ -232,11 +234,8 @@ describe(`<${LookSample.name}/>`, () => {
   });
 
   it('shows a globe menu without a code for menu with globe', () => {
-    setup({
-      header: {
-        ...MOCK_HEADER,
-        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
-      },
+    setupWithHeader({
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
     });
 
     const languageMenu = screen.getByRole('button', { name: LANGUAGE_ENGLISH });
@@ -261,13 +260,10 @@ describe(`<${LookSample.name}/>`, () => {
   });
 
   it('shows no switcher with one live language', () => {
-    setup({
-      liveLocales: [LOCALE_ISO_CODES.EN],
-      header: {
-        ...MOCK_HEADER,
-        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
-      },
-    });
+    setupWithHeader(
+      { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE },
+      { liveLocales: [LOCALE_ISO_CODES.EN] },
+    );
 
     const languageMenu = screen.queryByRole('button', { name: /^Language/ });
     const englishLink = screen.queryByRole('link', { name: ENGLISH });
@@ -283,7 +279,7 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(WIDE_LAYOUTS)(
       'keeps the page links and no menu button at wide width with the %s layout',
       (layout) => {
-        setup({ header: { ...MOCK_HEADER, layout } });
+        setupWithHeader({ layout });
 
         const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
         const postsLink = screen.getByRole('link', { name: POSTS });
@@ -296,9 +292,7 @@ describe(`<${LookSample.name}/>`, () => {
     );
 
     it('swaps the page links for a menu button with the menu button layout', () => {
-      setup({
-        header: { ...MOCK_HEADER, layout: HEADER_LAYOUT.MENU_BUTTON },
-      });
+      setupWithHeader({ layout: HEADER_LAYOUT.MENU_BUTTON });
 
       const menuButton = screen.getByRole('button', { name: MENU });
       const postsLink = screen.queryByRole('link', { name: POSTS });
@@ -310,7 +304,7 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_LAYOUT))(
       'shows the same narrow bar with the %s layout',
       (layout) => {
-        setup({ isNarrow: true, header: { ...MOCK_HEADER, layout } });
+        setupWithHeader({ layout }, { isNarrow: true });
 
         const menuButton = screen.getByRole('button', { name: MENU });
         const postsLink = screen.queryByRole('link', { name: POSTS });
@@ -325,7 +319,7 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_BAR_STYLE))(
       'follows the %s bar',
       (barStyle) => {
-        setup({ header: { ...MOCK_HEADER, barStyle } });
+        setupWithHeader({ barStyle });
 
         const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
 
@@ -339,7 +333,7 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_SUBMENU_STYLE))(
       'draws the %s sub-menu open under the Topics link',
       (submenuStyle) => {
-        setup({ header: { ...MOCK_HEADER, submenuStyle } });
+        setupWithHeader({ submenuStyle });
 
         const submenu = screen.getByTestId(SAMPLE_SUBMENU_TEST_ID);
         const topicsTrigger = screen.getByText(TOPICS);

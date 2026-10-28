@@ -1,29 +1,11 @@
-import {
-  HEADER_SUBMENU_STYLE,
-  ICONS,
-  SIZE,
-  type THeaderSubmenuStyle,
-} from '@blog/config';
+import { ICONS, SIZE, type THeaderSubmenuStyle } from '@blog/config';
 import type { IWithClassName } from '@blog/config/types';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { SampleHeaderSubmenu } from '@platform/components/features/site-preview/look-sample/components/sample-site-header/components/sample-header-links/components/sample-header-submenu/sample-header-submenu';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-const sampleHeaderLinksVariants = tv({
-  slots: {
-    root: ['flex items-center gap-4'],
-    submenu: ['inline-flex items-center'],
-    trigger: ['inline-flex items-center gap-1 font-mono text-meta text-muted'],
-  },
-  variants: {
-    submenuStyle: {
-      [HEADER_SUBMENU_STYLE.DROPDOWN]: { submenu: ['relative'] },
-      [HEADER_SUBMENU_STYLE.WIDE_PANEL]: { submenu: [] },
-    },
-  },
-});
+import { sampleHeaderLinksVariants } from './sample-header-links-variants';
 
 export type TSampleHeaderLinksProps = IWithClassName & {
   submenuStyle: THeaderSubmenuStyle;

@@ -213,6 +213,15 @@ const clickSave = async (user: UserEvent) => {
   await user.click(saveChangesButton);
 };
 
+const chooseHeaderLayout = async (user: UserEvent, optionName: string) => {
+  const layoutSelect = screen.getByRole('combobox', {
+    name: HEADER_LAYOUT_LABEL,
+  });
+  await user.click(layoutSelect);
+  const option = await screen.findByRole('option', { name: optionName });
+  await user.click(option);
+};
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -350,14 +359,10 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('saves the chosen header layout', async () => {
-        const layoutSelect = screen.getByRole('combobox', {
-          name: HEADER_LAYOUT_LABEL,
-        });
-        await user.click(layoutSelect);
-        const twoRows = await screen.findByRole('option', {
-          name: LOOK_FORM.headerLayoutOptionLabel.TWO_ROWS,
-        });
-        await user.click(twoRows);
+        await chooseHeaderLayout(
+          user,
+          LOOK_FORM.headerLayoutOptionLabel.TWO_ROWS,
+        );
         await clickSave(user);
 
         await waitFor(() => {
@@ -369,14 +374,10 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('shows the chosen header layout and bar in the preview', async () => {
-        const layoutSelect = screen.getByRole('combobox', {
-          name: HEADER_LAYOUT_LABEL,
-        });
-        await user.click(layoutSelect);
-        const menuButtonLayout = await screen.findByRole('option', {
-          name: LOOK_FORM.headerLayoutOptionLabel.MENU_BUTTON,
-        });
-        await user.click(menuButtonLayout);
+        await chooseHeaderLayout(
+          user,
+          LOOK_FORM.headerLayoutOptionLabel.MENU_BUTTON,
+        );
         const barGroup = screen.getByRole('group', {
           name: LOOK_FORM.headerBarStyleLabel,
         });

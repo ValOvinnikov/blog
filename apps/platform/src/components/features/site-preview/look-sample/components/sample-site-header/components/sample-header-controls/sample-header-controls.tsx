@@ -8,23 +8,10 @@ import type { IWithClassName } from '@blog/config/types';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
-import { HEADER_CONTROL } from '@blog/ui/lib/styling';
 import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/look-sample/components/sample-language-switcher';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-const sampleHeaderControlsVariants = tv({
-  slots: {
-    root: ['flex items-center gap-2'],
-    themeToggle: [HEADER_CONTROL, 'size-9 px-0'],
-    signIn: [
-      HEADER_CONTROL,
-      'inline-flex shrink-0 items-center justify-center gap-1.5',
-      'min-h-9 pl-3 pr-4 py-0',
-    ],
-    signInGlyph: ['text-muted'],
-  },
-});
+import { sampleHeaderControlsVariants } from './sample-header-controls-variants';
 
 export type TSampleHeaderControlsProps = IWithClassName & {
   liveLocales: readonly TLocaleIsoCode[];
