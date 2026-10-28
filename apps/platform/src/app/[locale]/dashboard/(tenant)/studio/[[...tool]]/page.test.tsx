@@ -16,7 +16,10 @@ import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
-import { mockStudioReadyTenant } from '@platform/testing/tenants/studio-ready-tenant';
+import {
+  MOCK_FREE_STUDIO_ENTITLEMENTS,
+  mockStudioReadyTenant,
+} from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -105,13 +108,14 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
       basePath: adminRoutes.dashboardStudio(),
       title: MOCK_TENANT_NAME,
       enabledCapabilities: [],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: tenant.locale,
       liveLocales: [],
       loginProvider: undefined,
     });
   });
 
-  it("explains the owner's pending Studio access instead of mounting Studio", async () => {
+  it("explains the owner's pending Studio access and leaves Studio unmounted", async () => {
     await renderForTenant({ ownerInviteSentAt: MOCK_OWNER_INVITED_AT });
 
     const explainerTitle = screen.getByText(
@@ -140,6 +144,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
       basePath: adminRoutes.dashboardStudio(),
       title: MOCK_TENANT_NAME,
       enabledCapabilities: [],
+      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
       defaultLocale: tenant.locale,
       liveLocales: [],
       loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,

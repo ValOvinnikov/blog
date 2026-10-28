@@ -1,4 +1,9 @@
-import { CAPABILITY, type TCapability } from '@blog/config/constants';
+import {
+  CAPABILITY,
+  MODULE_PACK,
+  type TCapability,
+  type TModulePack,
+} from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 
 import { LOOK_FIELDS, type TLookField } from './look';
@@ -54,11 +59,16 @@ export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
 
 export type TPlanEntitlements = {
   lookFields: readonly TLookField[];
+  modulePacks: readonly TModulePack[];
 };
 
 export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.FREE]: {
     lookFields: ['preset', 'accentHue', 'logoAssetUrl', 'faviconAssetUrl'],
+    modulePacks: [MODULE_PACK.CORE],
   },
-  [TENANT_PLAN.GROWTH]: { lookFields: LOOK_FIELDS },
+  [TENANT_PLAN.GROWTH]: {
+    lookFields: LOOK_FIELDS,
+    modulePacks: [MODULE_PACK.CORE, MODULE_PACK.GROWTH],
+  },
 };
