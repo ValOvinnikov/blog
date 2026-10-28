@@ -44,7 +44,7 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Surfaces and routes
 
 - **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Brand and Language switcher cards. Not plan-gated.
-- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style. The header brand shows the Look logo and `app/icon.tsx` serves the Look favicon.
+- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style, and the header also follows the stored header layout, sub-menu style and bar style. The header brand shows the Look logo and `app/icon.tsx` serves the Look favicon.
 - **Email** — `resolveTenantEmailBrand` turns the preset, accent hue and logo hue into hex colours for the magic-link, newsletter and test emails.
 - No Studio surface: the theme is not Sanity content.
 

@@ -24,3 +24,13 @@ export const MOCK_ABOUT_LINK = mockNavLink(
 );
 
 export const MOCK_TOPICS_LINK = mockNavLink(TOPICS_LABEL!, routes.topics());
+
+export const MOCK_TOPIC_CHILD_LINK = mockNavLink(
+  `${mockFaker.lorem.word()}-child`,
+  `${routes.topics()}/${mockFaker.lorem.slug()}`,
+);
+
+export const MOCK_TOPICS_WITH_SUB_ITEMS = {
+  ...MOCK_TOPICS_LINK,
+  subItems: [MOCK_TOPICS_LINK, MOCK_TOPIC_CHILD_LINK],
+};

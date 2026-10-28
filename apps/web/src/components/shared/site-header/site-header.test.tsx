@@ -8,14 +8,12 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { getHeaderSettings } from '@web/server/site-config/get-header-settings/get-header-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
-import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { MOCK_TOPICS_WITH_SUB_ITEMS } from '@web/testing/shared/link/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -36,14 +34,14 @@ vi.mock(
 
 vi.mock('@web/server/site-config/get-account-control/get-account-control');
 
+vi.mock('@web/server/site-config/get-header-settings/get-header-settings');
+
 vi.mock(
   '@web/server/site-config/get-brand-logo-url/get-brand-logo-url',
   () => ({
     getBrandLogoUrl: vi.fn(),
   }),
 );
-
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
@@ -69,15 +67,15 @@ vi.mock('next-auth/react', () => ({
 }));
 
 const getRequestContextMock = vi.mocked(getRequestContext);
-const getSiteSettingsMock = vi.mocked(getSiteSettings);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
 const getAccountControlMock = vi.mocked(getAccountControl);
+const getHeaderSettingsMock = vi.mocked(getHeaderSettings);
 
 faker.seed(5);
 
 const MOCK_LOOK_LOGO_URL = faker.internet.url();
-const MOCK_STUDIO_LOGO = mockSanityImage({ alt: faker.lorem.word() });
+const MOCK_TAGLINE = faker.lorem.words(4);
 const MOCK_READER = {
   name: faker.person.fullName(),
   email: faker.internet.email(),
@@ -88,6 +86,9 @@ const setup = customRenderAsync(SiteHeader, {});
 const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
+const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
+const ACCOUNT_GROUP_TEST_ID = 'account-menu-group';
+const ACCOUNT_TRIGGER_TEST_ID = 'account-menu-trigger';
 const SIGN_IN = 'Sign in';
 const ACCOUNT = 'Account';
 const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
@@ -107,9 +108,10 @@ describe(`<${SiteHeader.name}/>`, () => {
     await user.click(toggleButton);
   };
 
-  const getDrawerAccountButton = (name: string) => {
+  const getDrawerAccountRow = () => {
     const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-    return within(drawerActions).getByRole('button', { name });
+
+    return within(drawerActions).getByTestId(ACCOUNT_TRIGGER_TEST_ID);
   };
 
   const getBarSignInButtons = () => {
@@ -130,14 +132,8 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   describe('the brand logo', () => {
-    it("shows the tenant's Look logo, not the Studio brand logo", async () => {
+    it("shows the tenant's Look logo", async () => {
       getBrandLogoUrlMock.mockResolvedValue(MOCK_LOOK_LOGO_URL);
-      getSiteSettingsMock.mockResolvedValueOnce(
-        okResult({
-          ...MOCK_SITE_SETTINGS,
-          brand: { ...MOCK_SITE_SETTINGS.brand, logo: MOCK_STUDIO_LOGO },
-        }),
-      );
 
       await setup();
 
@@ -151,13 +147,6 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('shows the default mark without a Look logo', async () => {
-      getSiteSettingsMock.mockResolvedValueOnce(
-        okResult({
-          ...MOCK_SITE_SETTINGS,
-          brand: { ...MOCK_SITE_SETTINGS.brand, logo: MOCK_STUDIO_LOGO },
-        }),
-      );
-
       await setup();
 
       const homeLink = screen.getByRole('link', { name: HOME_LINK_NAME });
@@ -166,6 +155,36 @@ describe(`<${SiteHeader.name}/>`, () => {
       expect(presentation).not.toBeInTheDocument();
       expect(homeLink).not.toBeEmptyDOMElement();
     });
+  });
+
+  describe('the tagline', () => {
+    it('shows the header tagline under the logo', async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [], tagline: MOCK_TAGLINE }),
+      );
+
+      await setup();
+
+      const tagline = screen.getByText(MOCK_TAGLINE);
+
+      expect(tagline).toBeVisible();
+    });
+
+    it('shows no tagline when the header has none', async () => {
+      await setup();
+
+      const tagline = screen.queryByText(MOCK_TAGLINE);
+
+      expect(tagline).not.toBeInTheDocument();
+    });
+  });
+
+  it("reads the header layout from the tenant's site config", async () => {
+    await setup();
+
+    expect(getHeaderSettingsMock).toHaveBeenCalledWith(
+      MOCK_REQUEST_CONTEXT.tenantId,
+    );
   });
 
   describe('with several live languages and the switcher on', () => {
@@ -264,44 +283,58 @@ describe(`<${SiteHeader.name}/>`, () => {
   describe('with the account in the phone menu', () => {
     beforeEach(async () => {
       getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [MOCK_TOPICS_WITH_SUB_ITEMS] }),
+      );
       await setup();
       await openPhoneMenu();
     });
 
     it('puts only the wide button in the bar, with no phone circle', () => {
-      const accountRow = getDrawerAccountButton(SIGN_IN);
-      const barTriggers = getBarSignInButtons().filter(
-        (button) => button !== accountRow,
-      );
+      const barTriggers = getBarSignInButtons();
 
       expect(barTriggers).toHaveLength(1);
     });
 
     it('opens the sign-in panel in place and keeps the menu open', async () => {
-      const accountRow = getDrawerAccountButton(SIGN_IN);
+      const accountRow = getDrawerAccountRow();
       await user.click(accountRow);
 
-      const mobilePanel = screen.getByTestId('primary-navigation-mobile-panel');
-      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-      const githubButton = within(drawerActions).getByRole('button', {
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      const accountGroup = screen.getByTestId(ACCOUNT_GROUP_TEST_ID);
+      const githubButton = within(accountGroup).getByRole('button', {
         name: CONTINUE_WITH_GITHUB,
       });
 
       expect(mobilePanel).toBeVisible();
-      expect(accountRow).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(accountGroup).toHaveAttribute('open');
       expect(githubButton).toBeVisible();
     });
 
     it('folds the account group when its row is pressed again', async () => {
-      const accountRow = getDrawerAccountButton(SIGN_IN);
+      const accountRow = getDrawerAccountRow();
       await user.click(accountRow);
       await user.click(accountRow);
 
-      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-      const signInDialog = within(drawerActions).queryByRole('dialog');
+      const accountGroup = screen.getByTestId(ACCOUNT_GROUP_TEST_ID);
+      const githubButton = within(accountGroup).getByRole('button', {
+        name: CONTINUE_WITH_GITHUB,
+        hidden: true,
+      });
 
-      expect(accountRow).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(signInDialog).not.toBeInTheDocument();
+      expect(accountGroup).not.toHaveAttribute('open');
+      expect(githubButton).not.toBeVisible();
+    });
+
+    it('joins the sub-menus in one open-at-a-time group', () => {
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      const [subMenuGroup] = within(mobilePanel).getAllByRole('group');
+      const accountGroup = screen.getByTestId(ACCOUNT_GROUP_TEST_ID);
+
+      expect(accountGroup).toHaveAttribute(
+        'name',
+        subMenuGroup!.getAttribute('name'),
+      );
     });
   });
 
@@ -314,9 +347,9 @@ describe(`<${SiteHeader.name}/>`, () => {
     await setup();
     await openPhoneMenu();
 
-    const accountButton = getDrawerAccountButton(ACCOUNT);
+    const accountRow = getDrawerAccountRow();
 
-    expect(accountButton).toBeVisible();
+    expect(accountRow).toHaveTextContent(ACCOUNT);
   });
 
   it('hides the language switcher when its toggle is off', async () => {

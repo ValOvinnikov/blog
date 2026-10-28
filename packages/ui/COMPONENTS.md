@@ -295,9 +295,15 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel; a link with `subItems` opens them as a sub-menu in the bar and in place in the panel.
-Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · drawerActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
-Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON
+Top-level `<nav>` landmark whose `Actions` slot stays in the bar, whose `PanelActions` slot moves into the mobile panel below `lg`, and whose `DrawerActions` slot exists only in the open mobile panel; a link with `subItems` opens them as a sub-menu in the bar and in place in the panel.
+Props: links: INavItem[] · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] · barStyle?: TPrimaryNavigationVariants['barStyle'] · panelGroupName?: string · children?: TCompoundChildren<typeof PrimaryNavigationParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON · barStyle: HEADER_BAR_STYLE.FULL_WIDTH|HEADER_BAR_STYLE.FLOATING
+
+Slots:
+
+- **PrimaryNavigation.Actions** — The trailing controls that stay in the navigation bar at every width. Props: children?: ReactNode
+- **PrimaryNavigation.PanelActions** — Controls shown in the bar from `lg` up and as a row in the open phone panel below it. Props: children?: ReactNode
+- **PrimaryNavigation.DrawerActions** — Controls that exist only in the open phone panel, after the panel actions row. Props: children?: ReactNode
 
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 

@@ -8,7 +8,7 @@ export const sidebarNavVariants = tv({
       'sticky top-[var(--site-header-height,5rem)] z-10',
       'lg:static lg:top-auto lg:z-auto',
     ],
-    desktop: ['hidden lg:block', 'lg:sticky lg:top-24', 'lg:pr-6'],
+    desktop: ['hidden lg:block', 'lg:sticky lg:top-[calc(var(--site-header-height,5rem)+--spacing(6))]', 'lg:pr-6'],
     // `shadow-md`: this bar shares `Header`'s background and border, so the hairline alone doesn't read as a seam once it sticks beneath it.
     mobile: [
       'relative',

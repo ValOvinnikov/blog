@@ -7,6 +7,7 @@ import { ReaderAccountPanel } from '@web/components/shared/auth-menu/components/
 import { ReaderSignInPanel } from '@web/components/shared/auth-menu/components/reader-sign-in-panel/reader-sign-in-panel';
 import { useReaderAccount } from '@web/components/shared/auth-menu/hooks/use-reader-account';
 import { SESSION_STATUS } from '@web/constants/session';
+import { useNavPanelGroupName } from '@web/context/nav-panel-group-provider';
 import { useTranslations } from 'next-intl';
 import { useId, useRef, useState } from 'react';
 
@@ -25,26 +26,26 @@ export const AccountMenuGroup = ({
   const t = useTranslations('authMenu');
   const panelId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const groupName = useNavPanelGroupName();
   const [isExpanded, setIsExpanded] = useState(false);
-  const { row, glyph, chevron, panel } = accountMenuGroupVariants();
+  const { root, row, glyph, chevron, panel } = accountMenuGroupVariants();
 
   if (status === SESSION_STATUS.LOADING) {
     return null;
   }
 
   return (
-    <>
-      <button
-        type="button"
-        aria-expanded={isExpanded}
-        aria-controls={panelId}
-        onClick={() => setIsExpanded((current) => !current)}
-        className={row()}
-      >
+    <details
+      name={groupName}
+      className={root()}
+      onToggle={(event) => setIsExpanded(event.currentTarget.open)}
+      data-testid="account-menu-group"
+    >
+      <summary className={row()} data-testid="account-menu-trigger">
         <Icon name={ICONS.USER} size={SIZE.SM} className={glyph()} />
         {user ? t('accountHeading') : t('signIn')}
         <Icon name={ICONS.CHEVRON_DOWN} size={SIZE.SM} className={chevron()} />
-      </button>
+      </summary>
       {user ? (
         <ReaderAccountPanel
           appearance={panelStyle}
@@ -64,6 +65,6 @@ export const AccountMenuGroup = ({
           className={panel()}
         />
       )}
-    </>
+    </details>
   );
 };

@@ -85,6 +85,8 @@ if (typeof HTMLImageElement !== 'undefined') {
 }
 
 if (typeof HTMLElement !== 'undefined') {
+  HTMLElement.prototype.hidePopover = () => {};
+
   Object.defineProperties(HTMLElement.prototype, {
     offsetWidth: {
       configurable: true,

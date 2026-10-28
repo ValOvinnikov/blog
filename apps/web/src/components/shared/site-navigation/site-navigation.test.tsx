@@ -7,6 +7,8 @@ import {
   MOCK_ABOUT_LINK,
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
+  MOCK_TOPIC_CHILD_LINK,
+  MOCK_TOPICS_WITH_SUB_ITEMS,
 } from '@web/testing/shared/link/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
@@ -15,6 +17,7 @@ import { SiteNavigation } from './site-navigation';
 vi.mock('@web/i18n/navigation');
 
 const TOGGLE_NAME = 'Toggle navigation menu';
+const DRAWER_ROW = 'Account row';
 const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;
 
 const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_ABOUT_LINK];
@@ -95,6 +98,43 @@ describe(`<${SiteNavigation.name}/>`, () => {
     const actionButton = screen.getByRole('button', { name: 'Toggle' });
 
     expect(actionButton).toBeVisible();
+  });
+
+  it('marks the sub-item of the current page as the current page', () => {
+    vi.mocked(usePathname).mockReturnValue(MOCK_TOPIC_CHILD_LINK.href);
+    setup({ links: [MOCK_HOME_LINK, MOCK_TOPICS_WITH_SUB_ITEMS] });
+
+    const [childLink] = screen.getAllByRole('link', {
+      name: MOCK_TOPIC_CHILD_LINK.label,
+      hidden: true,
+    });
+
+    expect(childLink).toHaveAttribute(ARIA_CURRENT, 'page');
+  });
+
+  it('hides the open sub-menus when the route changes', () => {
+    const hidePopover = vi.spyOn(HTMLElement.prototype, 'hidePopover');
+    const view = setup({ links: [MOCK_TOPICS_WITH_SUB_ITEMS] });
+    hidePopover.mockClear();
+
+    vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
+    view.rerender(<SiteNavigation links={[MOCK_TOPICS_WITH_SUB_ITEMS]} />);
+
+    expect(hidePopover).toHaveBeenCalled();
+  });
+
+  describe('with drawer actions', () => {
+    it('shows them only in the open phone menu', async () => {
+      const user = userEvent.setup();
+      setup({ drawerActions: <button>{DRAWER_ROW}</button> });
+
+      const closedRow = screen.queryByRole('button', { name: DRAWER_ROW });
+      await user.click(screen.getByRole('button', { name: TOGGLE_NAME }));
+      const openRow = screen.getByRole('button', { name: DRAWER_ROW });
+
+      expect(closedRow).not.toBeInTheDocument();
+      expect(openRow).toBeVisible();
+    });
   });
 
   describe('mobile toggle', () => {

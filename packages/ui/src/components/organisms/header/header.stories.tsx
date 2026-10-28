@@ -71,15 +71,21 @@ const SiteHeader = ({
         links={navLinks}
         layout={args.layout}
         submenuStyle={submenuStyle}
-        panelActions={<ThemeToggle isDark={false} onToggle={() => {}} />}
-        actions={<button type="button">Sign in</button>}
+        barStyle={args.barStyle}
         mobileToggle={{
           isOpen: isMenuOpen,
           onToggle: () => setIsMenuOpen((current) => !current),
           ariaLabel: 'Toggle navigation menu',
           panelId: 'header-story-menu',
         }}
-      />
+      >
+        <PrimaryNavigation.PanelActions>
+          <ThemeToggle isDark={false} onToggle={() => {}} />
+        </PrimaryNavigation.PanelActions>
+        <PrimaryNavigation.Actions>
+          <button type="button">Sign in</button>
+        </PrimaryNavigation.Actions>
+      </PrimaryNavigation>
     </Header>
   );
 };
@@ -195,6 +201,16 @@ export const Phone: TStory = {
 export const PhoneMenuOpen: TStory = {
   globals: { viewport: 'phone' },
   args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => <SiteHeader {...args} isMenuOpen={true} />,
+};
+
+export const PhoneFloatingMenuOpen: TStory = {
+  decorators: [withPageContent],
+  globals: { viewport: 'phone' },
+  args: {
+    layout: HEADER_LAYOUT.CLASSIC,
+    barStyle: HEADER_BAR_STYLE.FLOATING,
+  },
   render: (args) => <SiteHeader {...args} isMenuOpen={true} />,
 };
 

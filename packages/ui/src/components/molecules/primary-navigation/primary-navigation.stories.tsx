@@ -1,8 +1,10 @@
+import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { PrimaryNavigation } from './primary-navigation';
+import { primaryNavigationVariants } from './primary-navigation-variants';
 
 const links = [
   { href: '/blog', label: 'Blog', isActive: true },
@@ -40,6 +42,12 @@ const meta = {
   component: PrimaryNavigation,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    barStyle: {
+      control: 'select',
+      options: objectKeys(primaryNavigationVariants.variants.barStyle),
+    },
+  },
   args: { links },
 } satisfies Meta<typeof PrimaryNavigation>;
 
@@ -50,7 +58,11 @@ export const Default: TStory = {};
 
 export const WithActions: TStory = {
   args: {
-    actions: <button type="button">Toggle theme</button>,
+    children: (
+      <PrimaryNavigation.Actions>
+        <button type="button">Toggle theme</button>
+      </PrimaryNavigation.Actions>
+    ),
   },
 };
 
@@ -93,11 +105,15 @@ export const MobileOpen: TStory = {
 export const MobileOpenWithPanelActions: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    actions: <button type="button">Account</button>,
-    panelActions: (
+    children: (
       <>
-        <button type="button">EN</button>
-        <button type="button">Toggle theme</button>
+        <PrimaryNavigation.Actions>
+          <button type="button">Account</button>
+        </PrimaryNavigation.Actions>
+        <PrimaryNavigation.PanelActions>
+          <button type="button">EN</button>
+          <button type="button">Toggle theme</button>
+        </PrimaryNavigation.PanelActions>
       </>
     ),
     mobileToggle: openToggle,
@@ -107,25 +123,35 @@ export const MobileOpenWithPanelActions: TStory = {
 export const MobileOpenWithDrawerActions: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    actions: <button type="button">Account</button>,
-    panelActions: (
+    children: (
       <>
-        <button type="button">EN</button>
-        <button type="button">Toggle theme</button>
+        <PrimaryNavigation.Actions>
+          <button type="button">Account</button>
+        </PrimaryNavigation.Actions>
+        <PrimaryNavigation.PanelActions>
+          <button type="button">EN</button>
+          <button type="button">Toggle theme</button>
+        </PrimaryNavigation.PanelActions>
+        <PrimaryNavigation.DrawerActions>
+          <button type="button">Sign in</button>
+        </PrimaryNavigation.DrawerActions>
       </>
     ),
-    drawerActions: <button type="button">Sign in</button>,
     mobileToggle: openToggle,
   },
 };
 
 export const DesktopWithBothActions: TStory = {
   args: {
-    actions: <button type="button">Account</button>,
-    panelActions: (
+    children: (
       <>
-        <button type="button">EN</button>
-        <button type="button">Toggle theme</button>
+        <PrimaryNavigation.Actions>
+          <button type="button">Account</button>
+        </PrimaryNavigation.Actions>
+        <PrimaryNavigation.PanelActions>
+          <button type="button">EN</button>
+          <button type="button">Toggle theme</button>
+        </PrimaryNavigation.PanelActions>
       </>
     ),
     mobileToggle: closedToggle,

@@ -2,10 +2,14 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  HEADER_BAR_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
   type TMaybeNull,
 } from '@blog/config';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { AccountMenuGroup, AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
@@ -16,6 +20,7 @@ import {
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
   MOCK_TOPICS_LINK,
+  MOCK_TOPICS_WITH_SUB_ITEMS,
 } from '@web/testing/shared/link/fixtures';
 import type { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
@@ -29,6 +34,8 @@ const TOGGLE_MENU = { name: /Toggle navigation menu/ };
 const ACCOUNT_BUTTON = { name: 'Account' };
 const SIGN_IN_BUTTON = { name: 'Sign in' };
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
+const ACCOUNT_TRIGGER_TEST_ID = 'account-menu-trigger';
+const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
 
 type TCanvas = ReturnType<typeof within>;
 
@@ -40,11 +47,15 @@ const clickButton = async (
   await userEvent.click(target);
 };
 
-const openDrawerAccountRow = async (canvas: TCanvas, row: { name: string }) => {
-  await clickButton(canvas, TOGGLE_MENU);
+const clickDrawerAccountRow = async (canvas: TCanvas) => {
   const drawerActions = await canvas.findByTestId(DRAWER_ACTIONS_TEST_ID);
-  const accountRow = within(drawerActions).getByRole('button', row);
+  const accountRow = within(drawerActions).getByTestId(ACCOUNT_TRIGGER_TEST_ID);
   await userEvent.click(accountRow);
+};
+
+const openDrawerAccountRow = async (canvas: TCanvas) => {
+  await clickButton(canvas, TOGGLE_MENU);
+  await clickDrawerAccountRow(canvas);
 };
 
 const meta = {
@@ -52,6 +63,14 @@ const meta = {
   component: SiteNavigation,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    layout: { control: 'select', options: objectKeys(HEADER_LAYOUT) },
+    submenuStyle: {
+      control: 'select',
+      options: objectKeys(HEADER_SUBMENU_STYLE),
+    },
+    barStyle: { control: 'select', options: objectKeys(HEADER_BAR_STYLE) },
+  },
   args: { links, actions: <ThemeToggleButton /> },
 } satisfies Meta<typeof SiteNavigation>;
 
@@ -69,6 +88,19 @@ export const ActiveBlogRoute: TStory = {
     nextjs: {
       navigation: { pathname: '/blog' },
     },
+  },
+};
+
+export const WithSubMenus: TStory = {
+  globals: { viewport: 'desktop' },
+  args: { links: [MOCK_HOME_LINK, MOCK_TOPICS_WITH_SUB_ITEMS] },
+};
+
+export const WithWidePanelSubMenus: TStory = {
+  globals: { viewport: 'desktop' },
+  args: {
+    links: [MOCK_HOME_LINK, MOCK_TOPICS_WITH_SUB_ITEMS],
+    submenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
   },
 };
 
@@ -253,7 +285,7 @@ export const MobileAccountInMenu: TStory = {
   args: headerControlsWithAccountInMenu,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await openDrawerAccountRow(canvas, ACCOUNT_BUTTON);
+    await openDrawerAccountRow(canvas);
   },
 };
 
@@ -263,6 +295,25 @@ export const MobileSignInInMenu: TStory = {
   args: headerControlsWithAccountInMenu,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await openDrawerAccountRow(canvas, SIGN_IN_BUTTON);
+    await openDrawerAccountRow(canvas);
+  },
+};
+
+export const MobileAccountFoldsSubMenu: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: {
+    ...headerControlsWithAccountInMenu,
+    links: [MOCK_HOME_LINK, MOCK_TOPICS_WITH_SUB_ITEMS],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await clickButton(canvas, TOGGLE_MENU);
+    const mobilePanel = await canvas.findByTestId(MOBILE_PANEL_TEST_ID);
+    const subMenuRow = within(mobilePanel).getByText(
+      MOCK_TOPICS_WITH_SUB_ITEMS.label,
+    );
+    await userEvent.click(subMenuRow);
+    await clickDrawerAccountRow(canvas);
   },
 };

@@ -31,11 +31,13 @@ faker.seed(6009);
 const {
   getAllPublishedPostsMock,
   getSiteSettingsMock,
+  getNavigationMock,
   getIndexPageMock,
   getHostTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getAllPublishedPostsMock: vi.fn(),
   getSiteSettingsMock: vi.fn(),
+  getNavigationMock: vi.fn(),
   getIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
 }));
@@ -45,7 +47,10 @@ vi.mock('@blog/service', () => ({
     entities: {
       posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },
     },
-    global: { siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } } },
+    global: {
+      siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
+      navigation: { v1: { getNavigation: getNavigationMock } },
+    },
     pages: { blog: { v1: { getIndexPage: getIndexPageMock } } },
   },
 }));
@@ -84,9 +89,9 @@ const getParsedFeed = async (locale: string = EN) => {
   return parseRssFeed(await response.text());
 };
 
-const siteSettingsWithTagline = okResult({
-  ...MOCK_SITE_SETTINGS,
-  brand: { ...MOCK_SITE_SETTINGS.brand, tagline: MOCK_SITE_TAGLINE },
+const navigationWithTagline = okResult({
+  items: [],
+  tagline: MOCK_SITE_TAGLINE,
 });
 
 describe(GET, () => {
@@ -98,11 +103,13 @@ describe(GET, () => {
     getIndexPageMock.mockResolvedValue(okResult());
     getAllPublishedPostsMock.mockResolvedValue(okResult([]));
     getSiteSettingsMock.mockResolvedValue(okResult(MOCK_SITE_SETTINGS));
+    getNavigationMock.mockResolvedValue(okResult({ items: [] }));
   });
 
   afterEach(() => {
     getAllPublishedPostsMock.mockReset();
     getSiteSettingsMock.mockReset();
+    getNavigationMock.mockReset();
     getIndexPageMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
   });
@@ -156,24 +163,33 @@ describe(GET, () => {
     expect(channel.description).toBe(SITE_MESSAGES.rss.fallbackDescription);
   });
 
-  it('uses the brand tagline when the index page has no description', async () => {
+  it('uses the header tagline when the index page has no description', async () => {
     getIndexPageMock.mockResolvedValue(
       okResult({ seo: mockSeo({ description: undefined }) }),
     );
-    getSiteSettingsMock.mockResolvedValue(siteSettingsWithTagline);
+    getNavigationMock.mockResolvedValue(navigationWithTagline);
 
     const { channel } = await getParsedFeed();
 
     expect(channel.description).toBe(MOCK_SITE_TAGLINE);
   });
 
-  it('uses the brand tagline when the index page fails to load', async () => {
+  it('uses the header tagline when the index page fails to load', async () => {
     getIndexPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
-    getSiteSettingsMock.mockResolvedValue(siteSettingsWithTagline);
+    getNavigationMock.mockResolvedValue(navigationWithTagline);
 
     const { channel } = await getParsedFeed();
 
     expect(channel.description).toBe(MOCK_SITE_TAGLINE);
+  });
+
+  it('falls back to generic channel copy when the header tagline fails to load', async () => {
+    getNavigationMock.mockResolvedValue(errorResult(MOCK_ERROR));
+
+    const { channel } = await getParsedFeed();
+
+    expect(channel.title).toBe(MOCK_SITE_SETTINGS.brand.name);
+    expect(channel.description).toBe(SITE_MESSAGES.rss.fallbackDescription);
   });
 
   it('carries the language and links of a default-language feed', async () => {
@@ -207,6 +223,7 @@ describe(GET, () => {
 
     expect(getAllPublishedPostsMock).toHaveBeenCalledWith(localizedTenant);
     expect(getSiteSettingsMock).toHaveBeenCalledWith(localizedTenant);
+    expect(getNavigationMock).toHaveBeenCalledWith(localizedTenant);
     expect(getIndexPageMock).toHaveBeenCalledWith(localizedTenant);
   });
 

@@ -1,4 +1,4 @@
-import { HEADER_LAYOUT } from '@blog/config';
+import { HEADER_BAR_STYLE, HEADER_LAYOUT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -63,6 +63,15 @@ export const primaryNavigationVariants = tv({
       },
       [HEADER_LAYOUT.MENU_BUTTON]: { root: ['justify-end'] },
     },
+    barStyle: {
+      [HEADER_BAR_STYLE.FULL_WIDTH]: {},
+      [HEADER_BAR_STYLE.FLOATING]: {
+        panel: [
+          'inset-x-3 mt-2',
+          'rounded-card border border-border shadow-float',
+        ],
+      },
+    },
   },
   compoundVariants: [
     {
@@ -79,6 +88,7 @@ export const primaryNavigationVariants = tv({
   ],
   defaultVariants: {
     layout: HEADER_LAYOUT.CLASSIC,
+    barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
   },
 });
 

@@ -13,8 +13,8 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getHeaderSettings } from '@web/server/site-config/get-header-settings/get-header-settings';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
@@ -25,31 +25,29 @@ export const SiteHeader = async () => {
     await getRequestContext();
   const siteConfigTenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [
-    settingsResult,
     navResult,
     hasReaderAccounts,
     switcherStyle,
     brandLogoUrl,
     accountControl,
+    headerSettings,
   ] = await Promise.all([
-    getSiteSettings(),
     service.global.navigation.v1.getNavigation(sanityContext),
     isReaderAccountEnabled(),
     getLanguageSwitcherStyle(siteConfigTenant),
     getBrandLogoUrl(siteConfigTenant),
     getAccountControl(siteConfigTenant),
+    getHeaderSettings(siteConfigTenant),
   ]);
 
-  if (!settingsResult.ok) {
-    return null;
-  }
   if (!navResult.ok) {
     logger.error(NAVIGATION_LOG.LAYOUT_FETCH_FAILED, {
       error: navResult.error,
     });
   }
 
-  const { brand } = settingsResult.data;
+  const { layout, submenuStyle, barStyle } = headerSettings;
+  const tagline = navResult.ok ? navResult.data.tagline : undefined;
   const navItems = navResult.ok ? navResult.data.items : [];
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
@@ -60,12 +58,15 @@ export const SiteHeader = async () => {
 
   return (
     <StickyHeaderFrame>
-      <Header>
+      <Header layout={layout} barStyle={barStyle}>
         <Header.Brand>
-          <BrandLockupLink logoUrl={brandLogoUrl} tagline={brand.tagline} />
+          <BrandLockupLink logoUrl={brandLogoUrl} tagline={tagline} />
         </Header.Brand>
         <SiteNavigation
           links={navItems}
+          layout={layout}
+          submenuStyle={submenuStyle}
+          barStyle={barStyle}
           panelActions={
             hasLanguageSwitcher && (
               <>

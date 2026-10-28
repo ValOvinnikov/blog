@@ -5,6 +5,8 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PrimaryNavigation } from './primary-navigation';
 
+const { Actions, PanelActions, DrawerActions } = PrimaryNavigation;
+
 const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
 const LINKS_TEST_ID = 'primary-navigation-links';
 const PANEL_ACTIONS_TEST_ID = 'primary-navigation-panel-actions';
@@ -92,7 +94,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
   });
 
   it('renders the actions slot', () => {
-    setup({ actions: <button>{MOCK_ACTION_LABEL}</button> });
+    setup({
+      children: (
+        <Actions>
+          <button>{MOCK_ACTION_LABEL}</button>
+        </Actions>
+      ),
+    });
 
     const actionButton = screen.getByRole('button', {
       name: MOCK_ACTION_LABEL,
@@ -101,9 +109,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     expect(actionButton).toBeVisible();
   });
 
-  it('renders panelActions in the bar when there is no mobile toggle', () => {
+  it('renders the panel actions in the bar when there is no mobile toggle', () => {
     setup({
-      panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
+      children: (
+        <PanelActions>
+          <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>
+        </PanelActions>
+      ),
     });
 
     const panelActionButton = screen.getByRole('button', {
@@ -113,9 +125,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     expect(panelActionButton).toBeVisible();
   });
 
-  it('renders no drawerActions when there is no mobile toggle', () => {
+  it('renders no drawer actions when there is no mobile toggle', () => {
     setup({
-      drawerActions: <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>,
+      children: (
+        <DrawerActions>
+          <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
+        </DrawerActions>
+      ),
     });
 
     const drawerActionButton = screen.queryByRole('button', {
@@ -197,9 +213,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       }
     });
 
-    it('shows panelActions as a row in the open panel', () => {
+    it('shows the panel actions as a row in the open panel', () => {
       setup({
-        panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
+        children: (
+          <PanelActions>
+            <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>
+          </PanelActions>
+        ),
         mobileToggle: mobileToggle(true),
       });
 
@@ -211,9 +231,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       expect(panelActionButton).toBeVisible();
     });
 
-    it('leaves panelActions out of the closed panel', () => {
+    it('leaves the panel actions out of the closed panel', () => {
       setup({
-        panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
+        children: (
+          <PanelActions>
+            <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>
+          </PanelActions>
+        ),
         mobileToggle: mobileToggle(false),
       });
 
@@ -222,11 +246,17 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       expect(panelActions).not.toBeInTheDocument();
     });
 
-    it('shows drawerActions after the panelActions row in the open panel', () => {
+    it('shows the drawer actions after the panel actions row in the open panel', () => {
       setup({
-        panelActions: <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>,
-        drawerActions: (
-          <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
+        children: (
+          <>
+            <PanelActions>
+              <button type="button">{MOCK_PANEL_ACTION_LABEL}</button>
+            </PanelActions>
+            <DrawerActions>
+              <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
+            </DrawerActions>
+          </>
         ),
         mobileToggle: mobileToggle(true),
       });
@@ -243,10 +273,12 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       );
     });
 
-    it('leaves drawerActions out of the closed panel and the bar', () => {
+    it('leaves the drawer actions out of the closed panel and the bar', () => {
       setup({
-        drawerActions: (
-          <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
+        children: (
+          <DrawerActions>
+            <button type="button">{MOCK_DRAWER_ACTION_LABEL}</button>
+          </DrawerActions>
         ),
         mobileToggle: mobileToggle(false),
       });
@@ -303,6 +335,31 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       await user.click(groupToggle);
 
       expect(subLink).toBeVisible();
+    });
+
+    it('names every phone panel group with the supplied group name', () => {
+      const groupName = faker.lorem.slug();
+      const accountLabel = faker.lorem.words(2);
+      setup({
+        links: [groupLink],
+        panelGroupName: groupName,
+        mobileToggle: mobileToggle(true),
+        children: (
+          <DrawerActions>
+            <details name={groupName}>
+              <summary>{accountLabel}</summary>
+            </details>
+          </DrawerActions>
+        ),
+      });
+
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      const groups = within(mobilePanel).getAllByRole('group');
+
+      expect(groups).toHaveLength(2);
+      for (const group of groups) {
+        expect(group).toHaveAttribute('name', groupName);
+      }
     });
   });
 });
