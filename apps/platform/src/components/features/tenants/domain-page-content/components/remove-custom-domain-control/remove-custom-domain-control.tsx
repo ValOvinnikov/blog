@@ -2,9 +2,9 @@
 
 import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
-import { requestCustomDomainCardFocus } from '@platform/utils/custom-domain-focus/custom-domain-focus';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -20,6 +20,7 @@ export const RemoveCustomDomainControl = ({
 }: TRemoveCustomDomainControlProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
   const router = useRouter();
+  const { requestFocus } = useCustomDomainFocus();
 
   const confirm = async () => {
     const result = await removeCustomDomainAction(tenantId, { domain });
@@ -39,7 +40,7 @@ export const RemoveCustomDomainControl = ({
   };
 
   const handleConfirmed = () => {
-    requestCustomDomainCardFocus();
+    requestFocus();
     router.refresh();
   };
 

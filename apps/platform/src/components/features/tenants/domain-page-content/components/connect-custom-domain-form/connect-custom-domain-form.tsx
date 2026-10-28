@@ -1,6 +1,7 @@
 'use client';
 
 import { Form } from '@base-ui/react/form';
+import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
@@ -29,6 +30,7 @@ export const ConnectCustomDomainForm = ({
   const { domain, changeDomain, error, isPending, submit } =
     useConnectCustomDomain(tenantId);
   const { fields, footerActions } = connectCustomDomainFormVariants();
+  const { registerHeading } = useCustomDomainFocus();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,7 +40,12 @@ export const ConnectCustomDomainForm = ({
   return (
     <Form onSubmit={handleSubmit}>
       <Card>
-        <Card.Header title={t('title')} supportingText={t('supportingText')} />
+        <Card.Header
+          title={t('title')}
+          supportingText={t('supportingText')}
+          titleRef={registerHeading}
+          titleTabIndex={-1}
+        />
         <Card.Body>
           <div className={fields()}>
             <FormField

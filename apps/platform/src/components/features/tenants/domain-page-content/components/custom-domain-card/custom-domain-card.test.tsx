@@ -1,9 +1,18 @@
+import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
+import { connectCustomDomainAction } from '@platform/server/custom-domain/connect-custom-domain-action';
 import { getCustomDomainStatusAction } from '@platform/server/custom-domain/get-custom-domain-status-action';
+import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
-import { act, customRender, screen } from '@platform/testing/custom-render';
+import {
+  act,
+  customRender,
+  screen,
+  waitFor,
+} from '@platform/testing/custom-render';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
@@ -11,7 +20,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
-import { requestCustomDomainCardFocus } from '@platform/utils/custom-domain-focus/custom-domain-focus';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {
   CustomDomainCard,
@@ -49,7 +58,10 @@ const BASE_PROPS: TCustomDomainCardProps = {
 const setup = customRender(CustomDomainCard, BASE_PROPS);
 
 describe(`<${CustomDomainCard.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     vi.mocked(getCustomDomainStatusAction).mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.PENDING,
     );
@@ -64,9 +76,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
   });
 
   const renderCard = (props: Partial<TCustomDomainCardProps>) =>
-    act(async () => {
-      setup(props);
-    });
+    act(async () => setup(props));
 
   const pollOnce = async () => {
     await act(async () => {
@@ -127,10 +137,55 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     expect(input).not.toBeInTheDocument();
   });
 
-  it('moves focus to the card heading after an action asked for it', async () => {
-    requestCustomDomainCardFocus();
+  it('moves focus to the new card heading after a successful connect', async () => {
+    vi.mocked(connectCustomDomainAction).mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
+    const refresh = mockRouterRefresh();
+    const { rerender } = await renderCard({});
+    const domainField = screen.getByRole('textbox', {
+      name: ownDomain.domainLabel,
+    });
+    const connectButton = screen.getByRole('button', {
+      name: ownDomain.connect,
+    });
 
-    await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
+    await user.type(domainField, MOCK_CUSTOM_DOMAIN);
+    await user.click(connectButton);
+    await waitFor(() => {
+      expect(refresh).toHaveBeenCalledTimes(1);
+    });
+    await act(async () => {
+      rerender(
+        <CustomDomainCard {...BASE_PROPS} customDomain={MOCK_CUSTOM_DOMAIN} />,
+      );
+    });
+
+    const heading = await screen.findByRole('heading', TITLE);
+    expect(heading).toHaveFocus();
+  });
+
+  it('moves focus to the new card heading after a successful remove', async () => {
+    vi.mocked(removeCustomDomainAction).mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
+    const refresh = mockRouterRefresh();
+    const { rerender } = await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
+    const removeButton = await screen.findByRole('button', {
+      name: ownDomain.remove,
+    });
+    await user.click(removeButton);
+    const confirmButton = await screen.findByRole('button', {
+      name: ownDomain.removeConfirm,
+    });
+
+    await user.click(confirmButton);
+    await waitFor(() => {
+      expect(refresh).toHaveBeenCalledTimes(1);
+    });
+    await act(async () => {
+      rerender(<CustomDomainCard {...BASE_PROPS} />);
+    });
 
     const heading = await screen.findByRole('heading', TITLE);
     expect(heading).toHaveFocus();

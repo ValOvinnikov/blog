@@ -2,14 +2,12 @@ import type { TMaybeUndefined } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
-import { CustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus/custom-domain-focus';
+import { CustomDomainFocusProvider } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/custom-domain-focus-provider';
+import { CustomDomainNoticeCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-notice-card/custom-domain-notice-card';
 import { CustomDomainStatusRefresher } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-status-refresher/custom-domain-status-refresher';
 import { DomainVerificationCard } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card/domain-verification-card';
 import { DomainVerificationCardSkeleton } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card-skeleton/domain-verification-card-skeleton';
 import { RemoveCustomDomainControl } from '@platform/components/features/tenants/domain-page-content/components/remove-custom-domain-control/remove-custom-domain-control';
-import { Card } from '@platform/components/shared/card';
-import { Text } from '@platform/components/shared/text';
-import { CUSTOM_DOMAIN_CARD } from '@platform/constants/custom-domain';
 import {
   getProjectDomain,
   type TProjectDomain,
@@ -51,7 +49,7 @@ export const CustomDomainCard = ({
   if (isArchived) noticeKey = 'archivedState';
 
   return (
-    <div id={CUSTOM_DOMAIN_CARD.ID}>
+    <CustomDomainFocusProvider>
       {shown && (
         <Suspense fallback={<DomainVerificationCardSkeleton />}>
           <DomainVerificationCard
@@ -74,22 +72,12 @@ export const CustomDomainCard = ({
               initialStatus={shown.projectDomain.then(({ status }) => status)}
             />
           )}
-          <CustomDomainFocus />
         </Suspense>
       )}
       {canConnect && <ConnectCustomDomainForm tenantId={id} />}
       {!shown && !canConnect && (
-        <Card>
-          <Card.Header
-            title={t('title')}
-            supportingText={t('supportingText')}
-          />
-          <Card.Body>
-            <Text>{t(noticeKey)}</Text>
-          </Card.Body>
-        </Card>
+        <CustomDomainNoticeCard noticeKey={noticeKey} />
       )}
-      {!shown && <CustomDomainFocus />}
-    </div>
+    </CustomDomainFocusProvider>
   );
 };

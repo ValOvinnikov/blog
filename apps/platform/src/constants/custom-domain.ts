@@ -39,5 +39,3 @@ export const CUSTOM_DOMAIN_LOG = {
   DISCONNECT_RESTORE_FAILED: 'custom_domain.disconnect_restore_failed',
   DISCONNECT_FAILED: 'custom_domain.disconnect_failed',
 } as const;
-
-export const CUSTOM_DOMAIN_CARD = { ID: 'custom-domain-card' } as const;

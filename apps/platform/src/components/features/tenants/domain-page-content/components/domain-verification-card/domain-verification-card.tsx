@@ -1,4 +1,7 @@
+'use client';
+
 import { ConnectedDomainDetails } from '@platform/components/features/tenants/domain-page-content/components/connected-domain-details/connected-domain-details';
+import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
@@ -40,11 +43,14 @@ export const DomainVerificationCard = ({
   const isVerified = status === DOMAIN_VERIFICATION_STATUS.VERIFIED;
   const wasChecked = !UNCHECKED_STATUSES.has(status);
   const { pendingAddress } = domainVerificationCardVariants();
+  const { registerHeading } = useCustomDomainFocus();
 
   return (
     <Card>
       <Card.Header
         title={title ?? t('cardTitle')}
+        titleRef={registerHeading}
+        titleTabIndex={-1}
         actions={
           (!isVerified || actions) && (
             <>

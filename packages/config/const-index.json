@@ -3982,14 +3982,6 @@
         "file": "apps/worker/src/constants/custom-domain.ts"
       }
     ],
-    "custom-domain-card": [
-      {
-        "ref": "CUSTOM_DOMAIN_CARD.ID",
-        "scope": "app:platform",
-        "from": "@platform/constants/custom-domain",
-        "file": "apps/platform/src/constants/custom-domain.ts"
-      }
-    ],
     "SUBSCRIBER": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
