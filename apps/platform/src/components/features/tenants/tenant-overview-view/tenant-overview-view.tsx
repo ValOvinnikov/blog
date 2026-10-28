@@ -6,12 +6,14 @@ import { DomainCardSkeleton } from '@platform/components/features/tenants/domain
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
+import { PlatformTenantNotice } from '@platform/components/features/tenants/platform-tenant-notice';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { Suspense } from 'react';
@@ -41,6 +43,10 @@ export const TenantOverviewView = async ({
     isSuperAdmin(admin) &&
     !deprovisionedAt &&
     status !== TENANT_STATUS.ARCHIVED;
+  const isSuspensionControlShown =
+    canChangeSuspension &&
+    (status === TENANT_STATUS.SUSPENDED ||
+      !(await resolveIsPlatformTenant(tenant)));
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
 
   return (
@@ -61,9 +67,12 @@ export const TenantOverviewView = async ({
             />
           </Suspense>
           <OwnerCard owner={owner} />
-          {canChangeSuspension && (
-            <TenantSuspensionControl tenant={clientTenant} />
-          )}
+          {canChangeSuspension &&
+            (isSuspensionControlShown ? (
+              <TenantSuspensionControl tenant={clientTenant} />
+            ) : (
+              <PlatformTenantNotice />
+            ))}
         </div>
         <div className={cardsColumn()}>
           <ContentWorkspaceCard tenant={clientTenant} />
