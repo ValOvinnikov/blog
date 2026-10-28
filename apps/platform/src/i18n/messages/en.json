@@ -85,6 +85,7 @@
     "presetHint": "A starting style for your site. You can fine-tune it after it’s created.",
     "accentLabel": "Accent colour",
     "previewNamePlaceholder": "Your site",
+    "previewAddressPlaceholder": "your-site",
     "createSite": "Create site",
     "creating": "Creating your site…",
     "failureTitle": "We couldn’t create your site",
@@ -669,6 +670,14 @@
     "themeToggleDark": "Switch to dark theme",
     "themeToggleLight": "Switch to light theme",
     "menuButton": "Menu"
+  },
+  "frontPageSample": {
+    "heroHeading": "Dispatches from the coast",
+    "heroText": "Notes, essays and photographs.",
+    "heroButton": "Read the latest",
+    "firstPostTitle": "A morning on the pier",
+    "secondPostTitle": "Low tide, late light",
+    "thirdPostTitle": "The harbour in winter"
   },
   "assetUploadField": {
     "remove": "Remove",

@@ -342,8 +342,8 @@ describe('the real repo files', () => {
   it('classifies the expected number of vars each way', () => {
     const { required, optional } = collectClassification(ENV_FILES);
 
-    assert.equal(required.size, 9);
-    assert.equal(optional.length, 60);
+    assert.equal(required.size, 10);
+    assert.equal(optional.length, 61);
     for (const [, entry] of required)
       for (const environment of entry.environments)
         assert.ok(KNOWN_ENVIRONMENTS.includes(environment));

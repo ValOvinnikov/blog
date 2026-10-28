@@ -85,6 +85,7 @@
     "presetHint": "Un estilo de partida para tu sitio. Podrás ajustarlo después de crearlo.",
     "accentLabel": "Color de acento",
     "previewNamePlaceholder": "Tu sitio",
+    "previewAddressPlaceholder": "tu-sitio",
     "createSite": "Crear sitio",
     "creating": "Creando tu sitio…",
     "failureTitle": "No hemos podido crear tu sitio",
@@ -669,6 +670,14 @@
     "themeToggleDark": "Cambiar al tema oscuro",
     "themeToggleLight": "Cambiar al tema claro",
     "menuButton": "Menú"
+  },
+  "frontPageSample": {
+    "heroHeading": "Crónicas desde la costa",
+    "heroText": "Notas, ensayos y fotografías.",
+    "heroButton": "Leer lo último",
+    "firstPostTitle": "Una mañana en el muelle",
+    "secondPostTitle": "Marea baja, luz tardía",
+    "thirdPostTitle": "El puerto en invierno"
   },
   "assetUploadField": {
     "remove": "Quitar",
