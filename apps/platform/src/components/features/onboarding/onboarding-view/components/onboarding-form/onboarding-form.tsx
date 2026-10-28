@@ -49,6 +49,7 @@ export const OnboardingForm = ({
     isContinueDisabled,
     panelRef,
     addressVerdict,
+    addressErrorId,
     siteAddress,
     previewAddress,
     railSteps,
@@ -95,7 +96,7 @@ export const OnboardingForm = ({
                   <AddressStepFields
                     values={values}
                     rootDomain={rootDomain}
-                    isAddressInvalid={Boolean(addressVerdict.error)}
+                    addressErrorId={addressErrorId}
                     onFieldChange={changeField}
                   />
                 )}

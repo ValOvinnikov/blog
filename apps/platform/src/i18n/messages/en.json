@@ -509,8 +509,22 @@
         "notOnPlan": "Using your own domain comes with the Growth plan.",
         "notProvisioned": "This site isn't set up yet. Try again once setup finishes.",
         "alreadyConnected": "This site already has its own domain.",
-        "notCustomDomain": "This domain can't be removed."
-      }
+        "notCustomDomain": "This domain can't be removed.",
+        "claimPending": "This site already has a domain waiting for verification.",
+        "noPendingClaim": "There's no domain waiting for verification.",
+        "recordNotFound": "We can't see the TXT record yet. DNS changes can take a few minutes.",
+        "connectUnavailable": "We verified your domain, but couldn't connect it because our setup service is unavailable. Press Verify to try again; your DNS record is still in place.",
+        "connectConflict": "We verified your domain, but couldn't connect it because the site or domain isn't ready yet. Press Verify to try again; your DNS record is still in place."
+      },
+      "awaitingProof": "Awaiting proof",
+      "proofInstructions": "Add this TXT record at your DNS provider to prove the domain is yours. We check it automatically, or press Verify.",
+      "recordTypeLabel": "Type",
+      "recordNameLabel": "Name",
+      "recordValueLabel": "Value",
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "verifyFailed": "Couldn't check the record. Try again.",
+      "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working."
     }
   },
   "presetPicker": {
@@ -620,6 +634,24 @@
       "FULL_WIDTH": "Full width",
       "FLOATING": "Floating"
     },
+    "buttonsHeading": "Buttons",
+    "buttonsDescription": "How buttons look while they work, and the spinner they show.",
+    "busyButtonStyleLabel": "While busy",
+    "busyButtonStyleDescription": "What a button shows while it saves or sends. It keeps its place and stays full colour.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Busy label",
+      "KEPT": "Label kept",
+      "EDGE": "Progress edge"
+    },
+    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleDescription": "The spinner on your site's buttons and loading states.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Follow the preset",
+      "BRAILLE": "Braille",
+      "RING": "Ring",
+      "DOTS": "Dots",
+      "PULSE": "Pulse"
+    },
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image"
@@ -636,6 +668,8 @@
     "subscribeButton": "Subscribe",
     "readMoreButton": "Read more",
     "readTimeChip": "4 min read",
+    "busyButtonIdle": "Send message",
+    "busyButtonLabel": "Sending…",
     "firstCardTitle": "Notes from the harbour",
     "firstCardExcerpt": "A linked card, the way post lists render it.",
     "secondCardTitle": "Charting the next season",

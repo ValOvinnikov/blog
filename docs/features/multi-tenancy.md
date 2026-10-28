@@ -44,6 +44,7 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 - **Sanity:** one project and one dataset per tenant, all on the shared `@blog/studio` schema. The platform keeps its own "console" project, which is used only as the non-production fallback.
 - **`tenants`:** `name`, `primaryDomain`, `locale` and `additionalLocales`, `plan` and `status` (ACTIVE / SUSPENDED / ARCHIVED). It also holds `sanityProjectId` (unique), `sanityDataset`, the encrypted `sanityReadTokenEncrypted` and `sanityWriteTokenEncrypted`, `provisioningStatus` and `deprovisionedAt`.
 - **`tenant_domains`:** a unique `domain` with a `tenantId` foreign key that cascades on delete. This table decides routing. `primaryDomain` only says which domain is canonical; it is the base URL (`https://<primaryDomain>`), with `NEXT_PUBLIC_SITE_URL` as the fallback.
+- **`custom_domain_claims`:** a tenant's pending custom domain (one per tenant, `tenantId` unique and cascading on delete) with the random token its `_blog-verify` TXT record must carry. The domain is not unique across tenants and never routes; verifying it moves it into `tenant_domains`.
 - **Tenant-scoped tables:** these carry `tenantId` and cascade when the tenant is hard-deleted: `bookmarks`, `subscribers`, `site_config`, `settings_features`, `email_config`, `email_templates`, `findings`, `memberships` and `membership_invites`. The Auth.js tables stay global.
 - **Caching:**
   - Sanity fetches are tagged `t:<projectId>:<tag>` (`isr()` in `@blog/service`).
@@ -56,7 +57,7 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 ## Configuration
 
 - **Operators:** they control which domains route to a tenant and whether it is servable, through [tenant provisioning](./tenant-provisioning.md): the add-tenant wizard, details edits that repoint the primary `tenant_domains` row, deprovisioning, and reactivation.
-- **Extra domains:** a Growth tenant's owner or an operator can connect one custom domain from the Domain page, and remove it while it is not `primaryDomain` ([public front door](./public-front-door.md)); it lives as a `tenant_domains` row beside the subdomain. Any other extra domain comes only from `seed-tenant --domain`.
+- **Extra domains:** a Growth tenant's owner or an operator can claim one custom domain from the Domain page, prove ownership with a TXT record, and so connect it, and remove it while it is not `primaryDomain` ([public front door](./public-front-door.md)); until proven it lives only in `custom_domain_claims` and does not route; once proven it is a `tenant_domains` row beside the subdomain. Any other extra domain comes only from `seed-tenant --domain`.
 - **Plans:** the plan caps the tenant's live languages through `PLAN_LOCALE_LIMIT` ([languages](./languages.md), [plans and entitlements](./plans-and-entitlements.md)).
 - **Editors:** they never see tenancy. Their Studio is already scoped to one project.
 

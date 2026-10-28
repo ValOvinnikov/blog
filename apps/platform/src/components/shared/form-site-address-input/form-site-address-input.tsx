@@ -13,7 +13,7 @@ export type TFormSiteAddressInputProps = {
   label: string;
   hint: string;
   error?: string;
-  isInvalid?: boolean;
+  errorId?: string;
   value: string;
   onChange: (value: string) => void;
   rootDomain: TMaybeUndefined<string>;
@@ -23,7 +23,7 @@ export const FormSiteAddressInput = ({
   label,
   hint,
   error,
-  isInvalid,
+  errorId,
   value,
   onChange,
   rootDomain,
@@ -37,8 +37,12 @@ export const FormSiteAddressInput = ({
       label={label}
       hint={hint}
       error={error}
-      isInvalid={isInvalid}
-      control={{ describedBy: rootDomain ? suffixId : undefined }}
+      isInvalid={Boolean(errorId)}
+      control={{
+        describedBy:
+          [rootDomain && suffixId, errorId].filter(Boolean).join(' ') ||
+          undefined,
+      }}
     >
       <div className={row()}>
         <TextInput

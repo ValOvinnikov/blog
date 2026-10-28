@@ -10,14 +10,14 @@ import { useTranslations } from 'next-intl';
 export type TAddressStepFieldsProps = {
   values: TCreateSiteInput;
   rootDomain: TMaybeUndefined<string>;
-  isAddressInvalid: boolean;
+  addressErrorId: TMaybeUndefined<string>;
   onFieldChange: (patch: Partial<TCreateSiteInput>) => void;
 };
 
 export const AddressStepFields = ({
   values,
   rootDomain,
-  isAddressInvalid,
+  addressErrorId,
   onFieldChange,
 }: TAddressStepFieldsProps) => {
   const t = useTranslations('onboardingForm');
@@ -29,7 +29,7 @@ export const AddressStepFields = ({
         value={values.slug}
         onChange={(slug) => onFieldChange({ slug })}
         rootDomain={rootDomain}
-        isInvalid={isAddressInvalid}
+        errorId={addressErrorId}
       />
       <FormField label={t('languageLabel')} hint={t('languageHint')}>
         <OptionSelect

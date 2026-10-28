@@ -29,7 +29,7 @@ export const FormField = ({
   label,
   hint,
   error,
-  isInvalid = Boolean(error),
+  isInvalid = false,
   children,
   footer,
   actions,
@@ -44,7 +44,11 @@ export const FormField = ({
   } = formFieldVariants();
 
   return (
-    <Field.Root className={root()} invalid={isInvalid} disabled={isDisabled}>
+    <Field.Root
+      className={root()}
+      invalid={isInvalid || Boolean(error)}
+      disabled={isDisabled}
+    >
       <div className={header()}>
         {hasOwnAccessibleName ? (
           <span className={labelSlot()}>{label}</span>

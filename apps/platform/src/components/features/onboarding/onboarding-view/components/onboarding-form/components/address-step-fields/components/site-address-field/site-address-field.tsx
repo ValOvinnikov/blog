@@ -8,14 +8,14 @@ export type TSiteAddressFieldProps = {
   value: string;
   onChange: (value: string) => void;
   rootDomain: TMaybeUndefined<string>;
-  isInvalid: boolean;
+  errorId: TMaybeUndefined<string>;
 };
 
 export const SiteAddressField = ({
   value,
   onChange,
   rootDomain,
-  isInvalid,
+  errorId,
 }: TSiteAddressFieldProps) => {
   const t = useTranslations('onboardingForm');
 
@@ -23,7 +23,7 @@ export const SiteAddressField = ({
     <FormSiteAddressInput
       label={t('siteAddressLabel')}
       hint={t('siteAddressHint')}
-      isInvalid={isInvalid}
+      errorId={errorId}
       value={value}
       onChange={onChange}
       rootDomain={rootDomain}

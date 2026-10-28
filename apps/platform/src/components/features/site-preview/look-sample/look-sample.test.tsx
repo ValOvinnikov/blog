@@ -1,11 +1,19 @@
 import {
+  BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
+  SPINNER_STYLE,
+  type IBusyStyle,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  SAMPLE_BUSY_BUTTON_TEST_ID,
+  SAMPLE_BUSY_STYLE_ATTRIBUTE,
+  SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+} from '@platform/constants/sample-busy';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
@@ -47,12 +55,17 @@ const MOCK_HEADER: TSampleHeaderStyle = {
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
 };
 
+const MOCK_BUSY: IBusyStyle = {
+  busyStyle: BUSY_BUTTON_STYLE.LABEL,
+  spinnerVariant: SPINNER_STYLE.BRAILLE,
+};
+
 const setup = customRender(LookSample, {
-  tenantName: MOCK_TENANT_NAME,
-  logoSrc: undefined,
+  brand: { name: MOCK_TENANT_NAME, logoSrc: undefined },
   theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   header: MOCK_HEADER,
+  busy: MOCK_BUSY,
   hasReaderAccounts: true,
 });
 
@@ -170,7 +183,7 @@ describe(`<${LookSample.name}/>`, () => {
   });
 
   it('renders the uploaded logo in place of the generated mark', () => {
-    setup({ logoSrc: MOCK_LOGO_URL });
+    setup({ brand: { name: MOCK_TENANT_NAME, logoSrc: MOCK_LOGO_URL } });
 
     const logo = screen.getByRole('img', { name: MOCK_TENANT_NAME });
 
@@ -271,6 +284,40 @@ describe(`<${LookSample.name}/>`, () => {
     expect(languageMenu).not.toBeInTheDocument();
     expect(englishLink).not.toBeInTheDocument();
   });
+  describe('busy button', () => {
+    it('shows a busy button', () => {
+      setup();
+
+      const busyButton = screen.getByRole('button', { busy: true });
+
+      expect(busyButton).toBeVisible();
+    });
+
+    it.each(Object.values(BUSY_BUTTON_STYLE))(
+      'follows the %s busy style',
+      (busyStyle) => {
+        setup({ busy: { ...MOCK_BUSY, busyStyle } });
+
+        const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
+
+        expect(sample).toHaveAttribute(SAMPLE_BUSY_STYLE_ATTRIBUTE, busyStyle);
+      },
+    );
+
+    it.each(
+      Object.values(SPINNER_STYLE).filter((s) => s !== SPINNER_STYLE.PRESET),
+    )('follows the %s spinner', (spinnerVariant) => {
+      setup({ busy: { ...MOCK_BUSY, spinnerVariant } });
+
+      const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
+
+      expect(sample).toHaveAttribute(
+        SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+        spinnerVariant,
+      );
+    });
+  });
+
   describe('header arrangement', () => {
     const WIDE_LAYOUTS = Object.values(HEADER_LAYOUT).filter(
       (layout) => layout !== HEADER_LAYOUT.MENU_BUTTON,

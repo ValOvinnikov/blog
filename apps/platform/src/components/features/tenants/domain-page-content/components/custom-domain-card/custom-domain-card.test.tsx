@@ -1,11 +1,20 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import {
+  CUSTOM_DOMAIN_REFUSAL,
+  CUSTOM_DOMAIN_VERIFY_POLL,
+} from '@platform/constants/custom-domain';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { connectCustomDomainAction } from '@platform/server/custom-domain/connect-custom-domain-action';
 import { getCustomDomainStatusAction } from '@platform/server/custom-domain/get-custom-domain-status-action';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
+import { verifyCustomDomainAction } from '@platform/server/custom-domain/verify-custom-domain-action';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import {
+  MOCK_CLAIM_TOKEN,
+  mockCustomDomainClaim,
+} from '@platform/testing/custom-domain/fixtures';
 import {
   act,
   customRender,
@@ -20,6 +29,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
+import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import {
@@ -34,9 +44,11 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 vi.mock('@platform/server/custom-domain/get-custom-domain-status-action');
 vi.mock('@platform/server/custom-domain/connect-custom-domain-action');
 vi.mock('@platform/server/custom-domain/remove-custom-domain-action');
+vi.mock('@platform/server/custom-domain/verify-custom-domain-action');
 
 const { ownDomain } = en.tenantDomainPage;
 const POLL_INTERVAL_MS = 10_000;
+const CLAIM = mockCustomDomainClaim();
 const TITLE = { level: 2, name: ownDomain.title };
 
 const BASE_PROPS: TCustomDomainCardProps = {
@@ -47,6 +59,7 @@ const BASE_PROPS: TCustomDomainCardProps = {
     primaryDomain: MOCK_TENANT_DOMAIN,
   },
   customDomain: undefined,
+  claim: undefined,
   isPrimaryCustom: false,
   primaryProjectDomain: Promise.resolve({
     status: DOMAIN_VERIFICATION_STATUS.PENDING,
@@ -189,5 +202,128 @@ describe(`<${CustomDomainCard.name}/>`, () => {
 
     const heading = await screen.findByRole('heading', TITLE);
     expect(heading).toHaveFocus();
+  });
+
+  describe('awaiting proof', () => {
+    beforeEach(() => {
+      vi.mocked(verifyCustomDomainAction).mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: CUSTOM_DOMAIN_REFUSAL.RECORD_NOT_FOUND,
+      });
+    });
+
+    it('shows the domain and the TXT record to add', async () => {
+      await renderCard({ claim: CLAIM });
+      await screen.findByRole('heading', TITLE);
+
+      const domain = screen.getByText(MOCK_CUSTOM_DOMAIN);
+      const txtName = screen.getByText(customDomainTxtName(MOCK_CUSTOM_DOMAIN));
+      const token = screen.getByText(MOCK_CLAIM_TOKEN);
+
+      expect(domain).toBeVisible();
+      expect(txtName).toBeVisible();
+      expect(token).toBeVisible();
+    });
+
+    it('offers Verify and Remove to the owner, and no connect form', async () => {
+      await renderCard({ claim: CLAIM });
+      await screen.findByRole('heading', TITLE);
+
+      const verify = screen.getByRole('button', { name: ownDomain.verify });
+      const remove = screen.getByRole('button', { name: ownDomain.remove });
+      const textbox = screen.queryByRole('textbox');
+
+      expect(verify).toBeVisible();
+      expect(remove).toBeVisible();
+      expect(textbox).not.toBeInTheDocument();
+    });
+
+    it('shows the claim read-only to someone who cannot manage the site', async () => {
+      await renderCard({ claim: CLAIM, canManage: false });
+      await screen.findByRole('heading', TITLE);
+
+      const token = screen.getByText(MOCK_CLAIM_TOKEN);
+      const verify = screen.queryByRole('button', { name: ownDomain.verify });
+      const remove = screen.queryByRole('button', { name: ownDomain.remove });
+
+      expect(token).toBeVisible();
+      expect(verify).not.toBeInTheDocument();
+      expect(remove).not.toBeInTheDocument();
+    });
+
+    it('verifies the site when the owner presses Verify', async () => {
+      await renderCard({ claim: CLAIM });
+      const verify = await screen.findByRole('button', {
+        name: ownDomain.verify,
+      });
+
+      await user.click(verify);
+
+      expect(verifyCustomDomainAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('moves focus to the new card heading after a successful verify', async () => {
+      vi.mocked(verifyCustomDomainAction).mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      const refresh = mockRouterRefresh();
+      const { rerender } = await renderCard({ claim: CLAIM });
+      const verify = await screen.findByRole('button', {
+        name: ownDomain.verify,
+      });
+
+      await user.click(verify);
+      await waitFor(() => {
+        expect(refresh).toHaveBeenCalledTimes(1);
+      });
+      await act(async () => {
+        rerender(
+          <CustomDomainCard
+            {...BASE_PROPS}
+            customDomain={MOCK_CUSTOM_DOMAIN}
+          />,
+        );
+      });
+
+      const heading = await screen.findByRole('heading', TITLE);
+      expect(heading).toHaveFocus();
+    });
+
+    it("shows the worker's reason and keeps Verify after a rejected connect", async () => {
+      vi.mocked(verifyCustomDomainAction).mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
+      });
+      await renderCard({ claim: CLAIM });
+      const verify = await screen.findByRole('button', {
+        name: ownDomain.verify,
+      });
+
+      await user.click(verify);
+
+      const refusal = await screen.findByText(
+        ownDomain.refusal.connectUnavailable,
+      );
+      const verifyAgain = screen.getByRole('button', {
+        name: ownDomain.verify,
+      });
+
+      expect(refusal).toBeInTheDocument();
+      expect(verifyAgain).toBeInTheDocument();
+    });
+
+    it('does not poll for someone who cannot manage the site', async () => {
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+      await renderCard({ claim: CLAIM, canManage: false });
+      await screen.findByRole('heading', TITLE);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(
+          CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3,
+        );
+      });
+
+      expect(verifyCustomDomainAction).not.toHaveBeenCalled();
+    });
   });
 });

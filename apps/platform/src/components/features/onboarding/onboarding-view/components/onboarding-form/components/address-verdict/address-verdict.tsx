@@ -20,6 +20,7 @@ const VERDICT_ICON = {
 } as const;
 
 export type TAddressVerdict = {
+  messageId: string;
   siteAddress: string;
   status: TSiteAddressStatus;
   error: TMaybeUndefined<TCreateSiteFieldError>;
@@ -30,7 +31,7 @@ export type TAddressVerdictProps = {
 };
 
 export const AddressVerdict = ({
-  verdict: { siteAddress, status, error },
+  verdict: { messageId, siteAddress, status, error },
 }: TAddressVerdictProps) => {
   const t = useTranslations('onboardingForm');
   const toErrorText = useFieldErrorText();
@@ -62,7 +63,9 @@ export const AddressVerdict = ({
             <Icon name={VERDICT_ICON[verdictStatus]} size={SIZE.SM} />
           )}
         </span>
-        <span className={message()}>{messages[verdictStatus]}</span>
+        <span id={messageId} className={message()}>
+          {messages[verdictStatus]}
+        </span>
       </span>
     </div>
   );

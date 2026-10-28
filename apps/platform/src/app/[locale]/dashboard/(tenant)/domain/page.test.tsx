@@ -33,6 +33,7 @@ vi.mock('@blog/db', async () => ({
     },
     admins: { getAdminByUserId: vi.fn() },
     tenantDomains: { listTenantDomains: vi.fn(async () => []) },
+    customDomainClaims: { getCustomDomainClaim: vi.fn(async () => undefined) },
   },
 }));
 

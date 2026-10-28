@@ -4,6 +4,10 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import {
+  MOCK_CLAIM_TOKEN,
+  mockCustomDomainClaim,
+} from '@platform/testing/custom-domain/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
@@ -26,7 +30,10 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 vi.mock('@platform/utils/env/env');
 
 vi.mock('@blog/db', () => ({
-  queries: { tenantDomains: { listTenantDomains: vi.fn() } },
+  queries: {
+    tenantDomains: { listTenantDomains: vi.fn() },
+    customDomainClaims: { getCustomDomainClaim: vi.fn() },
+  },
 }));
 
 const { tenantDomainPage } = en;
@@ -34,6 +41,9 @@ const { ownDomain } = tenantDomainPage;
 const getProjectDomainMock = vi.mocked(getProjectDomain);
 const listTenantDomainsMock = vi.mocked(
   queries.tenantDomains.listTenantDomains,
+);
+const getCustomDomainClaimMock = vi.mocked(
+  queries.customDomainClaims.getCustomDomainClaim,
 );
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 
@@ -45,6 +55,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
   beforeEach(() => {
     getProjectDomainMock.mockReset();
     listTenantDomainsMock.mockReset().mockResolvedValue([]);
+    getCustomDomainClaimMock.mockReset().mockResolvedValue(undefined);
     delete envMock.TENANT_ROOT_DOMAIN;
     getProjectDomainMock.mockResolvedValue({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
@@ -267,6 +278,18 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
       expect(message).toBeVisible();
       expect(input).not.toBeInTheDocument();
+    });
+
+    it("shows the site's pending claim in place of the connect form", async () => {
+      getCustomDomainClaimMock.mockResolvedValue(mockCustomDomainClaim());
+
+      await setup({ tenant: growthTenant(), membership: mockMembership() });
+
+      const token = await screen.findByText(MOCK_CLAIM_TOKEN);
+      const connect = screen.queryByRole('button', { name: ownDomain.connect });
+
+      expect(token).toBeVisible();
+      expect(connect).not.toBeInTheDocument();
     });
   });
 });
