@@ -1,6 +1,7 @@
 import {
   BRAND_TAGLINE_SEPARATORS,
   type TBrandTaglineSeparator,
+  type TMaybeNull,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 
@@ -12,7 +13,7 @@ const MOCK_FIRST_ITEM = faker.string.alpha(8);
 const MOCK_SECOND_ITEM = faker.string.alpha(8);
 
 function mockTagline(
-  texts: (string | null)[],
+  texts: TMaybeNull<string>[],
   separator: TBrandTaglineSeparator = BRAND_TAGLINE_SEPARATORS.DOT,
 ) {
   return {
