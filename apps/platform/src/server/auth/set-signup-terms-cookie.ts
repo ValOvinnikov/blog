@@ -29,7 +29,6 @@ export const setSignupTermsCookie = async (): Promise<void> => {
     maxAge: SIGNUP_TERMS_COOKIE_MAX_AGE_SECONDS,
     httpOnly: true,
     sameSite: 'lax',
-    // eslint-disable-next-line blog-touched/prefer-shared-constant -- CLAUDE.md exempts an env comparison; the rule does not yet
     secure: process.env.NODE_ENV === 'production',
     path: '/',
   });

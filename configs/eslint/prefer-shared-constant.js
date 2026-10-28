@@ -1,6 +1,11 @@
 import { readFileSync } from 'node:fs';
 
-import { ATTRIBUTE_NAME_CALLEES } from './literal-vocabulary.js';
+import {
+  ATTRIBUTE_NAME_CALLEES,
+  ENV_OBJECT_NAME,
+  EQUALITY_OPERATORS,
+  PROCESS_NAME,
+} from './literal-vocabulary.js';
 
 const INDEX_URL = new URL(
   '../../packages/config/const-index.json',
@@ -144,7 +149,24 @@ const isAttributeName = (node) => {
   );
 };
 
+const isEnvObject = (expression) =>
+  (expression.type === 'Identifier' && expression.name === ENV_OBJECT_NAME) ||
+  (expression.type === 'MemberExpression' &&
+    !expression.computed &&
+    expression.property.name === ENV_OBJECT_NAME &&
+    expression.object.type === 'Identifier' &&
+    expression.object.name === PROCESS_NAME);
+
+const isEnvRead = (expression) =>
+  expression.type === 'MemberExpression' && isEnvObject(expression.object);
+
+export const isEnvComparisonOperand = ({ parent }) =>
+  parent.type === 'BinaryExpression' &&
+  EQUALITY_OPERATORS.has(parent.operator) &&
+  (isEnvRead(parent.left) || isEnvRead(parent.right));
+
 const isExemptString = (node) =>
+  isEnvComparisonOperand(node) ||
   node.parent.type === 'ExpressionStatement' ||
   isModulePath(node) ||
   isAttributeName(node) ||
