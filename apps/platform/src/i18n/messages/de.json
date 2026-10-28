@@ -634,6 +634,25 @@
       "FULL_WIDTH": "Volle Breite",
       "FLOATING": "Schwebend"
     },
+    "accountButtonStyleLabel": "Konto-Schaltfläche",
+    "accountButtonStyleDescription": "Die Schaltfläche, mit der sich Leser anmelden und ihr Konto öffnen, auf breiten Bildschirmen. Telefone zeigen einen Kreis.",
+    "accountButtonStyleOptionLabel": {
+      "PILL": "Pille mit Beschriftung",
+      "CIRCLE": "Kreis"
+    },
+    "accountPanelStyleLabel": "Konto-Bereich",
+    "accountPanelStyleDescription": "Was die Konto-Schaltfläche öffnet, sobald ein Leser angemeldet ist.",
+    "accountPanelStyleOptionLabel": {
+      "CARD": "Karte",
+      "PROFILE": "Profil",
+      "HUB": "Hub"
+    },
+    "accountPhonePlacementLabel": "Auf Telefonen sitzt das Konto",
+    "accountPhonePlacementDescription": "In der Leiste als Kreis oder als letzte Zeile des Menüs.",
+    "accountPhonePlacementOptionLabel": {
+      "BAR": "In der Leiste",
+      "MENU": "Im Menü"
+    },
     "buttonsHeading": "Schaltflächen",
     "buttonsDescription": "Wie Schaltflächen aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
     "busyButtonStyleLabel": "Bei Beschäftigung",
@@ -690,7 +709,18 @@
     "signIn": "Anmelden",
     "themeToggleDark": "Zum dunklen Design wechseln",
     "themeToggleLight": "Zum hellen Design wechseln",
-    "menuButton": "Menü"
+    "menuButton": "Menü",
+    "readerStateAriaLabel": "Leser",
+    "readerSignedOut": "Abgemeldet",
+    "readerSignedIn": "Angemeldet",
+    "sampleReaderName": "Robin Hale",
+    "accountHeading": "Konto",
+    "accountMenuAriaLabel": "Kontomenü",
+    "myBookmarks": "Meine Lesezeichen",
+    "myBookmarksDescription": "Beiträge, die Sie für später gespeichert haben",
+    "accountSettings": "Kontoeinstellungen",
+    "accountSettingsDescription": "Name, Anmeldemethoden, Ihre Daten",
+    "signOut": "Abmelden"
   },
   "frontPageSample": {
     "heroHeading": "Berichte von der Küste",

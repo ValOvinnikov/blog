@@ -13,6 +13,7 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useTranslations } from 'next-intl';
 
+import { AccountFields } from './components/account-fields/account-fields';
 import { useSubmenuPreview } from './use-submenu-preview';
 
 export const HeaderCard = () => {
@@ -97,6 +98,8 @@ export const HeaderCard = () => {
           aria-describedby={barStyleLock.describedBy}
         />
       </LookField>
+
+      <AccountFields />
     </LookCard>
   );
 };

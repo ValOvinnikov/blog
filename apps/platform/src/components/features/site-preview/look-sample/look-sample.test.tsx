@@ -1,4 +1,6 @@
 import {
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
@@ -21,7 +23,9 @@ import {
   SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
   SAMPLE_SUBMENU_TEST_ID,
 } from '@platform/constants/sample-header';
+import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
@@ -48,12 +52,12 @@ const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const TOPICS = 'Topics';
 const ALL_TOPICS = 'All topics';
 
-const MOCK_HEADER: TSampleHeaderStyle = {
-  layout: HEADER_LAYOUT.CLASSIC,
-  submenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
-  barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
-  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-};
+const {
+  accountHeading: ACCOUNT,
+  accountMenuAriaLabel: ACCOUNT_MENU,
+  myBookmarksDescription: BOOKMARKS_DESCRIPTION,
+  signOut: SIGN_OUT,
+} = messages.lookPreview;
 
 const MOCK_BUSY: IBusyStyle = {
   busyStyle: BUSY_BUTTON_STYLE.LABEL,
@@ -64,7 +68,7 @@ const setup = customRender(LookSample, {
   brand: { name: MOCK_TENANT_NAME, logoSrc: undefined },
   theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
-  header: MOCK_HEADER,
+  header: MOCK_SAMPLE_HEADER_STYLE,
   busy: MOCK_BUSY,
   hasReaderAccounts: true,
 });
@@ -72,7 +76,7 @@ const setup = customRender(LookSample, {
 const setupWithHeader = (
   header: Partial<TSampleHeaderStyle>,
   props: NonNullable<Parameters<typeof setup>[0]> = {},
-) => setup({ ...props, header: { ...MOCK_HEADER, ...header } });
+) => setup({ ...props, header: { ...MOCK_SAMPLE_HEADER_STYLE, ...header } });
 
 describe(`<${LookSample.name}/>`, () => {
   let staticDarkRamp: HTMLStyleElement;
@@ -222,6 +226,63 @@ describe(`<${LookSample.name}/>`, () => {
     expect(menuButton).toBeVisible();
     expect(postsLink).not.toBeInTheDocument();
     expect(currentLanguage).not.toBeInTheDocument();
+  });
+
+  describe('account', () => {
+    const setupWithAccount = (
+      account: Partial<TSampleHeaderStyle['account']>,
+      props: NonNullable<Parameters<typeof setup>[0]> = {},
+    ) =>
+      setupWithHeader(
+        { account: { ...MOCK_SAMPLE_HEADER_STYLE.account, ...account } },
+        props,
+      );
+
+    it('shows no account menu while signed out', () => {
+      setup();
+
+      const accountMenu = screen.queryByRole('menu', { name: ACCOUNT_MENU });
+
+      expect(accountMenu).not.toBeInTheDocument();
+    });
+
+    it('opens the account menu from the Account button while signed in', () => {
+      setup({ isSignedIn: true });
+
+      const accountButton = screen.getByRole('button', { name: ACCOUNT });
+      const accountMenu = screen.getByRole('menu', { name: ACCOUNT_MENU });
+
+      expect(accountButton).toHaveAttribute('aria-expanded', 'true');
+      expect(accountMenu).toBeVisible();
+      expect(accountMenu).toHaveTextContent(SIGN_OUT);
+    });
+
+    it.each([
+      { panelStyle: ACCOUNT_PANEL_STYLE.HUB, hasDescriptions: true },
+      { panelStyle: ACCOUNT_PANEL_STYLE.CARD, hasDescriptions: false },
+    ])(
+      'describes the account links only in the hub panel ($panelStyle)',
+      ({ panelStyle, hasDescriptions }) => {
+        setupWithAccount({ panelStyle }, { isSignedIn: true });
+
+        const description = screen.queryByText(BOOKMARKS_DESCRIPTION);
+
+        expect(Boolean(description)).toBe(hasDescriptions);
+      },
+    );
+
+    it('moves the account out of the narrow bar when it sits in the menu', () => {
+      setupWithAccount(
+        { phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU },
+        { isNarrow: true },
+      );
+
+      const signInButton = screen.queryByRole('button', { name: SIGN_IN });
+      const menuButton = screen.getByRole('button', { name: MENU });
+
+      expect(signInButton).not.toBeInTheDocument();
+      expect(menuButton).toBeVisible();
+    });
   });
 
   it('keeps the narrow bar to the brand and the menu button without reader accounts', () => {

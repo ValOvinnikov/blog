@@ -4,10 +4,13 @@ import type { TLookFormValues } from '@platform/utils/default-look-values/defaul
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 
+import { useAccountDraftFields } from './use-account-draft-fields';
+
 export const useLookDraftFields = () => {
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
+  const accountDraftFields = useAccountDraftFields();
   const displayBrandImage = ({ file }: TStagedImage) =>
     file === undefined ? t('brandImageUnchanged') : t('brandImagePicked');
 
@@ -85,6 +88,7 @@ export const useLookDraftFields = () => {
       display: ({ headerBarStyle }: TLookFormValues) =>
         t(`headerBarStyleOptionLabel.${headerBarStyle}`),
     },
+    ...accountDraftFields,
     {
       id: 'busyButtonStyle',
       label: t('busyButtonStyleLabel'),

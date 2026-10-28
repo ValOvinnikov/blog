@@ -634,6 +634,25 @@
       "FULL_WIDTH": "Ancho completo",
       "FLOATING": "Flotante"
     },
+    "accountButtonStyleLabel": "Botón de la cuenta",
+    "accountButtonStyleDescription": "El botón con el que los lectores inician sesión y abren su cuenta, en pantallas anchas. Los teléfonos muestran un círculo.",
+    "accountButtonStyleOptionLabel": {
+      "PILL": "Píldora con etiqueta",
+      "CIRCLE": "Círculo"
+    },
+    "accountPanelStyleLabel": "Panel de la cuenta",
+    "accountPanelStyleDescription": "Lo que abre el botón de la cuenta cuando el lector ha iniciado sesión.",
+    "accountPanelStyleOptionLabel": {
+      "CARD": "Tarjeta",
+      "PROFILE": "Perfil",
+      "HUB": "Centro"
+    },
+    "accountPhonePlacementLabel": "En teléfonos, la cuenta va",
+    "accountPhonePlacementDescription": "En la barra como un círculo, o como la última fila del menú.",
+    "accountPhonePlacementOptionLabel": {
+      "BAR": "En la barra",
+      "MENU": "En el menú"
+    },
     "buttonsHeading": "Botones",
     "buttonsDescription": "Cómo se ven los botones mientras trabajan y el indicador de carga que muestran.",
     "busyButtonStyleLabel": "Mientras trabaja",
@@ -690,7 +709,18 @@
     "signIn": "Iniciar sesión",
     "themeToggleDark": "Cambiar al tema oscuro",
     "themeToggleLight": "Cambiar al tema claro",
-    "menuButton": "Menú"
+    "menuButton": "Menú",
+    "readerStateAriaLabel": "Lector",
+    "readerSignedOut": "Sin sesión",
+    "readerSignedIn": "Con sesión",
+    "sampleReaderName": "Robin Hale",
+    "accountHeading": "Cuenta",
+    "accountMenuAriaLabel": "Menú de la cuenta",
+    "myBookmarks": "Mis guardados",
+    "myBookmarksDescription": "Publicaciones guardadas para leer más tarde",
+    "accountSettings": "Configuración de la cuenta",
+    "accountSettingsDescription": "Nombre, métodos de acceso, tus datos",
+    "signOut": "Cerrar sesión"
   },
   "frontPageSample": {
     "heroHeading": "Crónicas desde la costa",

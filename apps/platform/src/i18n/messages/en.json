@@ -634,6 +634,25 @@
       "FULL_WIDTH": "Full width",
       "FLOATING": "Floating"
     },
+    "accountButtonStyleLabel": "Account button",
+    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones show a circle.",
+    "accountButtonStyleOptionLabel": {
+      "PILL": "Pill with label",
+      "CIRCLE": "Circle"
+    },
+    "accountPanelStyleLabel": "Account panel",
+    "accountPanelStyleDescription": "What the account button opens once a reader is signed in.",
+    "accountPanelStyleOptionLabel": {
+      "CARD": "Card",
+      "PROFILE": "Profile",
+      "HUB": "Hub"
+    },
+    "accountPhonePlacementLabel": "On phones, the account sits",
+    "accountPhonePlacementDescription": "In the bar as a circle, or as the menu's last row.",
+    "accountPhonePlacementOptionLabel": {
+      "BAR": "In the bar",
+      "MENU": "In the menu"
+    },
     "buttonsHeading": "Buttons",
     "buttonsDescription": "How buttons look while they work, and the spinner they show.",
     "busyButtonStyleLabel": "While busy",
@@ -690,7 +709,18 @@
     "signIn": "Sign in",
     "themeToggleDark": "Switch to dark theme",
     "themeToggleLight": "Switch to light theme",
-    "menuButton": "Menu"
+    "menuButton": "Menu",
+    "readerStateAriaLabel": "Reader",
+    "readerSignedOut": "Signed out",
+    "readerSignedIn": "Signed in",
+    "sampleReaderName": "Robin Hale",
+    "accountHeading": "Account",
+    "accountMenuAriaLabel": "Account menu",
+    "myBookmarks": "My bookmarks",
+    "myBookmarksDescription": "Posts you saved to read later",
+    "accountSettings": "Account settings",
+    "accountSettingsDescription": "Name, sign-in methods, your data",
+    "signOut": "Sign out"
   },
   "frontPageSample": {
     "heroHeading": "Dispatches from the coast",

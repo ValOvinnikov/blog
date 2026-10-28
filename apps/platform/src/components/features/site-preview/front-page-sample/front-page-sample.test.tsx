@@ -1,13 +1,8 @@
-import {
-  HEADER_BAR_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  LANGUAGE_SWITCHER_STYLE,
-  LOCALE_ISO_CODES,
-} from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { SAMPLE_SUBMENU_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 
@@ -29,12 +24,7 @@ const setup = customRender(FrontPageSample, {
   tenantName: MOCK_TENANT_NAME,
   theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN],
-  header: {
-    layout: HEADER_LAYOUT.CLASSIC,
-    submenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
-    barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
-    languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-  },
+  header: MOCK_SAMPLE_HEADER_STYLE,
 });
 
 describe(`<${FrontPageSample.name}/>`, () => {
