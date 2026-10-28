@@ -122,7 +122,7 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
 
   const handleToggle = () => {
     if (status === SESSION_STATUS.UNAUTHENTICATED) {
-      overlay?.setActiveId(ACCOUNT_OVERLAY_ID);
+      overlay?.openOverlay({ id: ACCOUNT_OVERLAY_ID, takesKeys: true });
       return;
     }
     if (!isResolved) return;

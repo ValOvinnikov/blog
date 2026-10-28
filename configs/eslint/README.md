@@ -92,6 +92,16 @@
   (the same `BLOG_LINT_TOUCHED=1` gate), with `mustNotMatch` failing an
   `it`/`test` title that says "instead of" or "rather than" in any case.
 
+- `no-nested-query.js` — bans a Testing Library query (`screen.*By*`,
+  `within(…).*By*`, an awaited `findBy*` included) passed directly to
+  `expect(…)`, `user.<method>(…)`, `userEvent.<method>(…)`, `fireEvent(…)` or
+  `fireEvent.<method>(…)`; a query bound to a const first passes. Registered
+  in the `blog-test` plugin in `base.js` but enabled only in the
+  `BLOG_LINT_TOUCHED=1` test-file block, so untouched files keep their
+  backlog. Co-located `no-nested-query.test.js`. Per `testing-practices` →
+  "Name the element, then use the name". Known gap: a query nested deeper
+  than a direct argument (inside an object literal) is not reported.
+
 - `eslint-plugin-testing-library` — registered in `base.js`'s
   `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,
   with exactly three rules as `error` (no `recommended` preset):

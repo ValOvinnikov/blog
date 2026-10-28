@@ -9,6 +9,7 @@ import tseslint from 'typescript-eslint';
 
 import { noClassAssertionsRule } from './no-class-assertions.js';
 import { noDuplicateStringRule } from './no-duplicate-string.js';
+import { noNestedQueryRule } from './no-nested-query.js';
 import { noNodeAccessRule } from './no-node-access.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import { preferSharedConstantRule } from './prefer-shared-constant.js';
@@ -43,6 +44,7 @@ const touchedTestFileRules = {
   files: ['**/*.test.{ts,tsx}'],
   plugins: { vitest },
   rules: {
+    'blog-test/no-nested-query': 'error',
     'vitest/valid-title': [
       'error',
       {
@@ -133,7 +135,12 @@ export default [
     // "Cannot redefine plugin".
     files: ['**/*.test.{ts,tsx}', 'src/testing/**/*.{ts,tsx}'],
     plugins: {
-      'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },
+      'blog-test': {
+        rules: {
+          'no-class-assertions': noClassAssertionsRule,
+          'no-nested-query': noNestedQueryRule,
+        },
+      },
       'testing-library': {
         ...testingLibrary,
         rules: { ...testingLibrary.rules, 'no-node-access': noNodeAccessRule },

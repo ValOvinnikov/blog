@@ -123,10 +123,11 @@ contracts:
     `.claude/skills/testing-practices/SKILL.md`. Subagents have no Skill tool,
     so a guide that only names the skill leaves reading it optional: a
     `platform-app` run that skipped it copied its neighbours' inline
-    `expect(screen.…)` queries, which the skill bans and no lint rule catches.
-    The ban covers interactions too (`user.click(screen.getByRole(…))`), and
-    `code-review-practices`' mechanical scan and blocking finding name both,
-    since the interaction half was the one shipping unflagged.
+    `expect(screen.…)` queries, which the skill bans. The ban covers
+    interactions too (`user.click(screen.getByRole(…))`), and solo sessions
+    kept shipping that half after the prose named it, so the touched-file
+    rule `blog-test/no-nested-query` now fails both (#6202);
+    `code-review-practices`' scan stays as a check for suppressions.
   - The same eleven, and `test-writer`, list a required **Reuse** item right
     after it: for each const, literal value, fixture, builder, fake or helper
     the diff adds, where they searched (`const-index.json`, the workspace's
@@ -379,7 +380,8 @@ file` are all denied alike) — an earlier version only handled the
     `pnpm lint` does, which keeps `@next/eslint-plugin-next`'s "Pages
     directory cannot be found" line out of the feedback. It sets
     `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
-    (`prefer-shared-constant`, `no-duplicate-string`) that repo-wide
+    (`prefer-shared-constant`, `no-duplicate-string`,
+    `blog-test/no-nested-query`) that repo-wide
     `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
     same way. When ESLint exits fatally in a directory that has an
     `eslint.config.*` (the workspace's, or the root one the walk falls back
@@ -587,8 +589,8 @@ file` are all denied alike) — an earlier version only handled the
     left by an earlier dispatch, removing an issue dependency.
     `board-keeper-graphql-guard.test.sh` pins the deny/allow matrix.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
-  `boolean-prop-prefix.js`, `no-class-assertions.js` and
-  `text-input-textarea-accessible-name.js` are the repo's hand-written rules
+  `boolean-prop-prefix.js`, `no-class-assertions.js`, `no-nested-query.js`
+  and `text-input-textarea-accessible-name.js` are the repo's hand-written rules
   (each with a `create()` visitor). They sit alongside two `no-restricted-imports` helpers
   that are configuration rather than rules: `no-upstream-imports.js`, a
   flat-config preset blocking a base-of-the-graph package from importing

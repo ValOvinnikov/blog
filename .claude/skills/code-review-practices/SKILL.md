@@ -72,7 +72,9 @@ D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAl
 
 # A query nested in expect or an interaction (testing-practices "Writing a
 # component test" → "Name the element"). Run over every test file the diff
-# touches, not only the added lines: a touched file is converted whole.
+# touches, not only the added lines: a touched file is converted whole. The
+# touched-file rule blog-test/no-nested-query fails these, so a hit means a
+# suppression was added.
 D | awk '/^\+\+\+ b\//{f=substr($0,7)} f ~ /\.test\.tsx?$/{print f}' | sort -u | xargs -r grep -nE '(expect|user\.[a-zA-Z]+|fireEvent\.[a-zA-Z]+)\((await )?(screen|within\()|(expect|user\.[a-zA-Z]+|fireEvent\.[a-zA-Z]+)\($' 2>/dev/null
 
 # Faking our own components, or reading a fake's arguments (testing-practices
@@ -263,8 +265,9 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   `fireEvent.*(…)` in any test file the diff creates or touches is
   **blocking** — the element is a named `const` first, and a touched file is
   converted whole (→ `testing-practices` "Name the element, then use the
-  name"). Hits ending in `($` need a look: a multi-line call wrapping a
-  query is the same finding, one wrapping a mock or a const is not.
+  name"; `blog-test/no-nested-query` fails it on touched files). Hits
+  ending in `($` need a look: a multi-line call wrapping a query is the same
+  finding, one wrapping a mock or a const is not.
 - A bug fix has a regression test that failed before the fix.
 - Suite labels: a component takes ``describe(`<${Component.name}/>`, …)``,
   anything else the bare symbol. The common miss is a bare symbol on a
