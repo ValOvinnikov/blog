@@ -373,11 +373,12 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/release` — `apps/platform/src/constants/release.ts`
 
 - **CONTRAST_STATUS**: `GREEN`, `FAILED`, `RUNNING`, `NONE`, `DUE`
-- **RELEASE_REFUSAL**: `CONTRAST_CHECK_RUNNING`, `RELEASE_RUNNING`, `RELEASES_PAUSED`
+- **MIGRATION_ENVIRONMENT**: `DEVELOPMENT`=`"development"`, `PRODUCTION`=`"production"`
+- **RELEASE_REFUSAL**: `CONTRAST_CHECK_RUNNING`, `RELEASE_RUNNING`, `RELEASES_PAUSED`, `TENANT_REQUIRED`, `TENANT_MIGRATION_NOT_FAILED`
 - **RELEASE_FIELD_ERROR**: `VERSION_MALFORMED`, `VERSION_NOT_GREATER`, `REASON_REQUIRED`
 - **RELEASE_FAILURE**: `NO_RELEASE_TAG`, `TAG_LIST_INCOMPLETE`, `DB_ERROR`
 - **RELEASE_RUN_STATUS**: `DISPATCHED`, `RUNNING`, `SUCCEEDED`, `FAILED`
-- **RELEASE_LOG**: `CONTRAST_CHECK_AUDIT_FAILED`=`"releases.contrast_check_audit_failed"`, `CONTRAST_DISPATCH_ERROR`=`"releases.contrast_dispatch_error"`, `CONTRAST_DISPATCH_FAILED`=`"releases.contrast_dispatch_failed"`, `CONTRAST_DISPATCH_SKIPPED`=`"releases.contrast_dispatch_skipped"`, `DB_READ_FAILED`=`"releases.db_read_failed"`, `RELEASE_AUDIT_FAILED`=`"releases.release_audit_failed"`, `RELEASE_DISPATCH_ERROR`=`"releases.release_dispatch_error"`, `RELEASE_DISPATCH_FAILED`=`"releases.release_dispatch_failed"`, `RELEASE_DISPATCH_SKIPPED`=`"releases.release_dispatch_skipped"`, `RELEASE_OVERRIDE_AUDIT_FAILED`=`"releases.release_override_audit_failed"`
+- **RELEASE_LOG**: `CONTRAST_CHECK_AUDIT_FAILED`=`"releases.contrast_check_audit_failed"`, `CONTRAST_DISPATCH_ERROR`=`"releases.contrast_dispatch_error"`, `CONTRAST_DISPATCH_FAILED`=`"releases.contrast_dispatch_failed"`, `CONTRAST_DISPATCH_SKIPPED`=`"releases.contrast_dispatch_skipped"`, `DB_READ_FAILED`=`"releases.db_read_failed"`, `RELEASE_AUDIT_FAILED`=`"releases.release_audit_failed"`, `RELEASE_DISPATCH_ERROR`=`"releases.release_dispatch_error"`, `RELEASE_DISPATCH_FAILED`=`"releases.release_dispatch_failed"`, `RELEASE_DISPATCH_SKIPPED`=`"releases.release_dispatch_skipped"`, `RELEASE_OVERRIDE_AUDIT_FAILED`=`"releases.release_override_audit_failed"`, `TENANT_MIGRATIONS_AUDIT_FAILED`=`"releases.tenant_migrations_audit_failed"`, `TENANT_MIGRATIONS_DISPATCH_ERROR`=`"releases.tenant_migrations_dispatch_error"`, `TENANT_MIGRATIONS_DISPATCH_FAILED`=`"releases.tenant_migrations_dispatch_failed"`, `TENANT_MIGRATIONS_DISPATCH_SKIPPED`=`"releases.tenant_migrations_dispatch_skipped"`
 
 ### `@platform/constants/request` — `apps/platform/src/constants/request.ts`
 

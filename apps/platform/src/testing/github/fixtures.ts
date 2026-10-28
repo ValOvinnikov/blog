@@ -1,7 +1,10 @@
 import type { TValueOf } from '@blog/config/utils';
 import { faker } from '@faker-js/faker';
 import { GITHUB_FILE_STATUS } from '@platform/constants/github';
-import { CONTRAST_WORKFLOW_FILE } from '@platform/constants/release';
+import {
+  CONTRAST_WORKFLOW_FILE,
+  TENANT_MIGRATION_WORKFLOW_FILE,
+} from '@platform/constants/release';
 import type { TChangedFile } from '@platform/server/github/compare-commits';
 
 export const MOCK_GITHUB_RELEASE_TAGS_PATH = '/git/matching-refs/tags/v';
@@ -10,6 +13,7 @@ export const MOCK_GITHUB_DB_JOURNAL_PATH =
   '/contents/packages/db/migrations/meta/_journal.json';
 export const MOCK_GITHUB_CONTRAST_RUNS_PATH = `/actions/workflows/${CONTRAST_WORKFLOW_FILE}/runs`;
 export const MOCK_GITHUB_CONTRAST_DISPATCH_PATH = `/actions/workflows/${CONTRAST_WORKFLOW_FILE}/dispatches`;
+export const MOCK_GITHUB_TENANT_MIGRATION_DISPATCH_PATH = `/actions/workflows/${TENANT_MIGRATION_WORKFLOW_FILE}/dispatches`;
 
 export const mockGitHubCommit = () => ({
   sha: faker.git.commitSha(),

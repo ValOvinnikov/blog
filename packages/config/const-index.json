@@ -4488,6 +4488,22 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "development": [
+      {
+        "ref": "MIGRATION_ENVIRONMENT.DEVELOPMENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "production": [
+      {
+        "ref": "MIGRATION_ENVIRONMENT.PRODUCTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
     "CONTRAST_CHECK_RUNNING": [
       {
         "ref": "RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING",
@@ -4507,6 +4523,22 @@
     "RELEASES_PAUSED": [
       {
         "ref": "RELEASE_REFUSAL.RELEASES_PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "TENANT_REQUIRED": [
+      {
+        "ref": "RELEASE_REFUSAL.TENANT_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "TENANT_MIGRATION_NOT_FAILED": [
+      {
+        "ref": "RELEASE_REFUSAL.TENANT_MIGRATION_NOT_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
@@ -4643,6 +4675,38 @@
     "releases.release_override_audit_failed": [
       {
         "ref": "RELEASE_LOG.RELEASE_OVERRIDE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_audit_failed": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_dispatch_error": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_dispatch_failed": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_dispatch_skipped": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_DISPATCH_SKIPPED",
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"

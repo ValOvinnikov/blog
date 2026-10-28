@@ -14,6 +14,15 @@ export const CONTRAST_WORKFLOW_FILE = 'contrast.yml';
 
 export const RELEASE_WORKFLOW_FILE = 'release.yml';
 
+export const TENANT_MIGRATION_WORKFLOW_FILE = 'migrate-tenant-content.yml';
+
+export const MIGRATION_ENVIRONMENT = {
+  DEVELOPMENT: 'development',
+  PRODUCTION: 'production',
+} as const;
+
+export type TMigrationEnvironment = TValueOf<typeof MIGRATION_ENVIRONMENT>;
+
 export const IS_PRODUCTION_RELEASE_ENABLED = false;
 
 // The job name inside migrate-tenant-content.yml, which release.yml calls.
@@ -27,6 +36,8 @@ export const RELEASE_REFUSAL = {
   CONTRAST_CHECK_RUNNING: 'CONTRAST_CHECK_RUNNING',
   RELEASE_RUNNING: 'RELEASE_RUNNING',
   RELEASES_PAUSED: 'RELEASES_PAUSED',
+  TENANT_REQUIRED: 'TENANT_REQUIRED',
+  TENANT_MIGRATION_NOT_FAILED: 'TENANT_MIGRATION_NOT_FAILED',
 } as const;
 
 export const RELEASE_FIELD_ERROR = {
@@ -63,4 +74,10 @@ export const RELEASE_LOG = {
   RELEASE_DISPATCH_FAILED: 'releases.release_dispatch_failed',
   RELEASE_DISPATCH_SKIPPED: 'releases.release_dispatch_skipped',
   RELEASE_OVERRIDE_AUDIT_FAILED: 'releases.release_override_audit_failed',
+  TENANT_MIGRATIONS_AUDIT_FAILED: 'releases.tenant_migrations_audit_failed',
+  TENANT_MIGRATIONS_DISPATCH_ERROR: 'releases.tenant_migrations_dispatch_error',
+  TENANT_MIGRATIONS_DISPATCH_FAILED:
+    'releases.tenant_migrations_dispatch_failed',
+  TENANT_MIGRATIONS_DISPATCH_SKIPPED:
+    'releases.tenant_migrations_dispatch_skipped',
 } as const;

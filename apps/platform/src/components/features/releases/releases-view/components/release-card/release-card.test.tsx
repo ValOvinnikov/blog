@@ -110,7 +110,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     const status = screen.getByText('Failed');
     const failureTitle = screen.getByText('A tenant migration failed');
     const failureHint = screen.getByText(
-      'The deploy did not run, so the live site is unchanged. Retry that tenant with Run tenant migrations on this page.',
+      'The deploy did not run, so the live site is unchanged. Retry that tenant under Tenant migrations on this page.',
     );
 
     expect(status).toBeVisible();

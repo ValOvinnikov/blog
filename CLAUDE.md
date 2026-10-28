@@ -617,8 +617,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   touched, the same steady-state rule as comments. Where helpers and shared
   constants live: `.claude/agents/config.md`.
 - **Read an action result through its outcome guards.** `@blog/config`'s
-  `isOutcomeSuccess(result)`, `isOutcomeInvalid(result)` and
-  `isOutcomeServerError(result)` take the whole result and narrow it — never
+  `isOutcomeSuccess(result)`, `isOutcomeInvalid(result)`,
+  `isOutcomeServerError(result)`, `isOutcomeRefused(result)` and
+  `isOutcomeUnavailable(result)` take the whole result and narrow it — never
   `result.outcome === ACTION_OUTCOME.<X>`. A guard for another outcome is
   added by the change that gives that check its second use, never ahead of
   it. Files still comparing raw outcomes, and what is left to add:
