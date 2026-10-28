@@ -1046,6 +1046,14 @@
         "file": "packages/config/src/constants/error.ts"
       }
     ],
+    "DB_DOMAIN_CLAIM_EXISTS": [
+      {
+        "ref": "ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
     "DOCUMENT_VALIDATION": [
       {
         "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
