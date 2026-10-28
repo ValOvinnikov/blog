@@ -1,4 +1,7 @@
+'use client';
+
 import { ConnectedDomainDetails } from '@platform/components/features/tenants/domain-page-content/components/connected-domain-details/connected-domain-details';
+import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
@@ -11,7 +14,7 @@ import {
 import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
-import { use } from 'react';
+import { use, type ReactNode } from 'react';
 
 import { domainVerificationCardVariants } from './domain-verification-card-variants';
 
@@ -24,34 +27,46 @@ export type TDomainVerificationCardProps = {
   domain: string;
   isPlatformAddress: boolean;
   projectDomain: Promise<TProjectDomain>;
+  title?: string;
+  actions?: ReactNode;
 };
 
 export const DomainVerificationCard = ({
   domain,
   isPlatformAddress,
   projectDomain,
+  title,
+  actions,
 }: TDomainVerificationCardProps) => {
   const t = useTranslations('tenantDomainPage');
   const { status, dnsRecords } = use(projectDomain);
   const isVerified = status === DOMAIN_VERIFICATION_STATUS.VERIFIED;
   const wasChecked = !UNCHECKED_STATUSES.has(status);
   const { pendingAddress } = domainVerificationCardVariants();
+  const { registerHeading } = useCustomDomainFocus();
 
   return (
     <Card>
       <Card.Header
-        title={t('cardTitle')}
+        title={title ?? t('cardTitle')}
+        titleRef={registerHeading}
+        titleTabIndex={-1}
         actions={
-          !isVerified && (
+          (!isVerified || actions) && (
             <>
-              <StatusBadge tone={domainVerificationTone(status)}>
-                {t(`dnsStatus.${status}`)}
-              </StatusBadge>
-              {wasChecked && (
-                <Text variant="meta" as="span">
-                  {t('checkedHint')}
-                </Text>
+              {!isVerified && (
+                <>
+                  <StatusBadge tone={domainVerificationTone(status)}>
+                    {t(`dnsStatus.${status}`)}
+                  </StatusBadge>
+                  {wasChecked && (
+                    <Text variant="meta" as="span">
+                      {t('checkedHint')}
+                    </Text>
+                  )}
+                </>
               )}
+              {actions}
             </>
           )
         }

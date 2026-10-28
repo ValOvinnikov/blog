@@ -14,6 +14,7 @@ describe(toDataRequestMatches, () => {
       DATA_REQUEST_MATCH_KIND.SUBSCRIBER,
       DATA_REQUEST_MATCH_KIND.LEAD,
       DATA_REQUEST_MATCH_KIND.INVITE,
+      DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE,
       DATA_REQUEST_MATCH_KIND.READER_ACCOUNT,
       DATA_REQUEST_MATCH_KIND.BOOKMARK,
       DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
@@ -28,6 +29,7 @@ describe(toDataRequestMatches, () => {
       MOCK_DATA_REQUEST_SITE_NAME,
       MOCK_DATA_REQUEST_SITE_NAME,
       MOCK_DATA_REQUEST_SITE_NAME,
+      MOCK_DATA_REQUEST_SITE_NAME,
       undefined,
       MOCK_DATA_REQUEST_SITE_NAME,
       undefined,
@@ -36,7 +38,7 @@ describe(toDataRequestMatches, () => {
   });
 
   it('shows no email for a bookmark, a sign-up block or an audit event, which hold none', () => {
-    const [, , , , bookmark, block, auditEvent] = toDataRequestMatches(
+    const [, , , , , bookmark, block, auditEvent] = toDataRequestMatches(
       mockPersonalDataMatches(),
     );
 

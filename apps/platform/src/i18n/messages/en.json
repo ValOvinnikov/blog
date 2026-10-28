@@ -453,6 +453,39 @@
       "PENDING": "Awaiting DNS",
       "VERIFIED": "Verified",
       "ERROR": "Couldn't check"
+    },
+    "ownDomain": {
+      "title": "Use my own domain",
+      "supportingText": "Serve your site from an address you own. Your current address keeps working.",
+      "upgradePrompt": "Using your own domain comes with the Growth plan.",
+      "ownerOnly": "Only the site owner can connect a domain.",
+      "archivedState": "This site is archived, so its domain can't be changed.",
+      "domainLabel": "Domain",
+      "domainHint": "A full domain you own, like blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Connect domain",
+      "connecting": "Connecting…",
+      "remove": "Remove",
+      "removeTitle": "Remove this domain?",
+      "removeDescription": "{domain} will stop serving your site. Your current address keeps working.",
+      "removeConfirm": "Remove domain",
+      "removing": "Removing…",
+      "connectFailed": "Couldn't connect the domain. Try again.",
+      "removeFailed": "Couldn't remove the domain. Try again.",
+      "invalidInput": "Enter a full domain, like blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Enter a full domain, like blog.example.com.",
+        "domainPlatformAddress": "This address belongs to the platform. Enter a domain you own.",
+        "domainTaken": "This domain is already in use."
+      },
+      "refusal": {
+        "notFound": "This site couldn't be found.",
+        "archived": "This site is archived, so its domain can't be changed.",
+        "notOnPlan": "Using your own domain comes with the Growth plan.",
+        "notProvisioned": "This site isn't set up yet. Try again once setup finishes.",
+        "alreadyConnected": "This site already has its own domain.",
+        "notCustomDomain": "This domain can't be removed."
+      }
     }
   },
   "presetPicker": {
@@ -1002,6 +1035,10 @@
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Tenant details saved.",
+    "alertSavedStudioInviteUnsent": "Tenant details saved, but the Studio invite to the new owner wasn't sent.",
+    "resendStudioInvite": "Resend invite",
+    "studioInviteResent": "A new Studio invite is on its way to the owner.",
+    "studioInviteResendFailed": "Couldn't reach the setup service — try again.",
     "lockedAnnouncement": "Some tenant detail fields are now locked.",
     "unlockedAnnouncement": "More tenant detail fields are now editable.",
     "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",
@@ -1531,6 +1568,7 @@
     "SUBSCRIBER": "Subscriber",
     "LEAD": "Contact message",
     "INVITE": "Invite",
+    "STUDIO_REINVITE": "Unsent Studio invite",
     "SIGNUP_BLOCK": "Sign-up block",
     "AUDIT_EVENT": "Audit event",
     "READER_ACCOUNT": "Reader account",

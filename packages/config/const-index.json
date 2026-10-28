@@ -2248,6 +2248,28 @@
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
+    "CORE": [
+      {
+        "ref": "MODULE_PACK.CORE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module-pack.ts"
+      }
+    ],
+    "GROWTH": [
+      {
+        "ref": "MODULE_PACK.GROWTH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module-pack.ts"
+      },
+      {
+        "ref": "TENANT_PLAN.GROWTH",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
     "CUSTOM": [
       {
         "ref": "HERO_FIELD_MODE.CUSTOM",
@@ -3624,14 +3646,6 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
-    "GROWTH": [
-      {
-        "ref": "TENANT_PLAN.GROWTH",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/tenant.ts"
-      }
-    ],
     "UPDATED": [
       {
         "ref": "TENANT_DETAILS_UPDATE_OUTCOME.UPDATED",
@@ -3828,6 +3842,160 @@
         "file": "apps/platform/src/constants/create-site-gate.ts"
       }
     ],
+    "DOMAIN_PLATFORM_ADDRESS": [
+      {
+        "ref": "CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_PLATFORM_ADDRESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NOT_ON_PLAN": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NOT_PROVISIONED": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.NOT_PROVISIONED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "ALREADY_CONNECTED": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NOT_CUSTOM_DOMAIN": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NOT_CUSTOM_DOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "/api/custom-domain/connect": [
+      {
+        "ref": "CUSTOM_DOMAIN_PATH.CONNECT",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "/api/custom-domain/disconnect": [
+      {
+        "ref": "CUSTOM_DOMAIN_PATH.DISCONNECT",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_audit_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_enqueue_rejected": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_rollback_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ROLLBACK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.root_domain_missing": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.ROOT_DOMAIN_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.app_url_missing": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.APP_URL_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_audit_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_rejected_restoring": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_restore_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_RESTORE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
     "SUBSCRIBER": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
@@ -3847,6 +4015,14 @@
     "INVITE": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "STUDIO_REINVITE": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE",
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"
@@ -5176,6 +5352,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "STUDIO_NOT_PROVISIONED": [
+      {
+        "ref": "TENANT_REFUSAL.STUDIO_NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "STEP": [
       {
         "ref": "TENANT_FIELD_LOCK_KIND.STEP",
@@ -5928,22 +6112,6 @@
         "file": "apps/worker/src/constants/custom-domain.ts"
       }
     ],
-    "custom_domain.connect_failed": [
-      {
-        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/custom-domain",
-        "file": "apps/worker/src/constants/custom-domain.ts"
-      }
-    ],
-    "custom_domain.disconnect_failed": [
-      {
-        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/custom-domain",
-        "file": "apps/worker/src/constants/custom-domain.ts"
-      }
-    ],
     "UNAUTHORIZED": [
       {
         "ref": "ENQUEUE_ERROR.UNAUTHORIZED",
@@ -5955,14 +6123,6 @@
     "INVALID_BODY": [
       {
         "ref": "ENQUEUE_ERROR.INVALID_BODY",
-        "scope": "app:worker",
-        "from": "@worker/constants/enqueue-error",
-        "file": "apps/worker/src/constants/enqueue-error.ts"
-      }
-    ],
-    "NOT_PROVISIONED": [
-      {
-        "ref": "ENQUEUE_ERROR.NOT_PROVISIONED",
         "scope": "app:worker",
         "from": "@worker/constants/enqueue-error",
         "file": "apps/worker/src/constants/enqueue-error.ts"

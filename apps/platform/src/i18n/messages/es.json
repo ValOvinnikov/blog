@@ -453,6 +453,39 @@
       "PENDING": "A la espera del DNS",
       "VERIFIED": "Verificado",
       "ERROR": "No se pudo comprobar"
+    },
+    "ownDomain": {
+      "title": "Usar mi propio dominio",
+      "supportingText": "Publica tu sitio en una dirección que te pertenece. Tu dirección actual sigue funcionando.",
+      "upgradePrompt": "Usar tu propio dominio viene con el plan Growth.",
+      "ownerOnly": "Solo el propietario del sitio puede conectar un dominio.",
+      "archivedState": "Este sitio está archivado, así que no se puede cambiar su dominio.",
+      "domainLabel": "Dominio",
+      "domainHint": "Un dominio completo que te pertenece, como blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Conectar dominio",
+      "connecting": "Conectando…",
+      "remove": "Quitar",
+      "removeTitle": "¿Quitar este dominio?",
+      "removeDescription": "{domain} dejará de mostrar tu sitio. Tu dirección actual sigue funcionando.",
+      "removeConfirm": "Quitar dominio",
+      "removing": "Quitando…",
+      "connectFailed": "No se pudo conectar el dominio. Inténtalo de nuevo.",
+      "removeFailed": "No se pudo quitar el dominio. Inténtalo de nuevo.",
+      "invalidInput": "Introduce un dominio completo, como blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Introduce un dominio completo, como blog.example.com.",
+        "domainPlatformAddress": "Esta dirección pertenece a la plataforma. Introduce un dominio que te pertenezca.",
+        "domainTaken": "Este dominio ya está en uso."
+      },
+      "refusal": {
+        "notFound": "No se encontró este sitio.",
+        "archived": "Este sitio está archivado, así que no se puede cambiar su dominio.",
+        "notOnPlan": "Usar tu propio dominio viene con el plan Growth.",
+        "notProvisioned": "Este sitio aún no está configurado. Inténtalo de nuevo cuando termine la configuración.",
+        "alreadyConnected": "Este sitio ya tiene su propio dominio.",
+        "notCustomDomain": "Este dominio no se puede quitar."
+      }
     }
   },
   "presetPicker": {
@@ -1002,6 +1035,10 @@
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
     "alertSuccess": "Detalles del cliente guardados.",
+    "alertSavedStudioInviteUnsent": "Detalles del cliente guardados, pero la invitación a Studio no se ha enviado al nuevo propietario.",
+    "resendStudioInvite": "Reenviar invitación",
+    "studioInviteResent": "Una nueva invitación a Studio va de camino al propietario.",
+    "studioInviteResendFailed": "No se pudo contactar con el servicio de configuración. Inténtalo de nuevo.",
     "lockedAnnouncement": "Algunos campos de detalles del cliente están ahora bloqueados.",
     "unlockedAnnouncement": "Ahora se pueden editar más campos de detalles del cliente.",
     "fieldLockedReasonStep": "Bloqueado: el paso «{step}» ya se ha completado y ha usado este valor.",
@@ -1531,6 +1568,7 @@
     "SUBSCRIBER": "Suscriptor",
     "LEAD": "Mensaje de contacto",
     "INVITE": "Invitación",
+    "STUDIO_REINVITE": "Invitación a Studio no enviada",
     "SIGNUP_BLOCK": "Bloqueo de registro",
     "AUDIT_EVENT": "Evento de auditoría",
     "READER_ACCOUNT": "Cuenta de lector",

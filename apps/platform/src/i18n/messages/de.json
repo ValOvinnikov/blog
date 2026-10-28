@@ -453,6 +453,39 @@
       "PENDING": "Wartet auf DNS",
       "VERIFIED": "Verifiziert",
       "ERROR": "Prüfung fehlgeschlagen"
+    },
+    "ownDomain": {
+      "title": "Eigene Domain verwenden",
+      "supportingText": "Veröffentliche deine Website unter einer Adresse, die dir gehört. Deine aktuelle Adresse funktioniert weiter.",
+      "upgradePrompt": "Eine eigene Domain gehört zum Growth-Tarif.",
+      "ownerOnly": "Nur die Inhaberin oder der Inhaber der Website kann eine Domain verbinden.",
+      "archivedState": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
+      "domainLabel": "Domain",
+      "domainHint": "Eine vollständige Domain, die dir gehört, z. B. blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Domain verbinden",
+      "connecting": "Verbinden …",
+      "remove": "Entfernen",
+      "removeTitle": "Diese Domain entfernen?",
+      "removeDescription": "Unter {domain} wird deine Website nicht mehr ausgeliefert. Deine aktuelle Adresse funktioniert weiter.",
+      "removeConfirm": "Domain entfernen",
+      "removing": "Entfernen …",
+      "connectFailed": "Die Domain konnte nicht verbunden werden. Versuche es erneut.",
+      "removeFailed": "Die Domain konnte nicht entfernt werden. Versuche es erneut.",
+      "invalidInput": "Gib eine vollständige Domain ein, z. B. blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Gib eine vollständige Domain ein, z. B. blog.example.com.",
+        "domainPlatformAddress": "Diese Adresse gehört zur Plattform. Gib eine Domain ein, die dir gehört.",
+        "domainTaken": "Diese Domain wird bereits verwendet."
+      },
+      "refusal": {
+        "notFound": "Diese Website wurde nicht gefunden.",
+        "archived": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
+        "notOnPlan": "Eine eigene Domain gehört zum Growth-Tarif.",
+        "notProvisioned": "Diese Website ist noch nicht eingerichtet. Versuche es nach der Einrichtung erneut.",
+        "alreadyConnected": "Diese Website hat bereits eine eigene Domain.",
+        "notCustomDomain": "Diese Domain kann nicht entfernt werden."
+      }
     }
   },
   "presetPicker": {
@@ -1002,6 +1035,10 @@
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Mandantendetails gespeichert.",
+    "alertSavedStudioInviteUnsent": "Mandantendetails gespeichert, aber die Studio-Einladung an den neuen Inhaber wurde nicht gesendet.",
+    "resendStudioInvite": "Einladung erneut senden",
+    "studioInviteResent": "Eine neue Studio-Einladung ist an den Inhaber unterwegs.",
+    "studioInviteResendFailed": "Der Einrichtungsdienst war nicht erreichbar – versuchen Sie es erneut.",
     "lockedAnnouncement": "Einige Felder der Mandantendetails sind jetzt gesperrt.",
     "unlockedAnnouncement": "Weitere Felder der Mandantendetails sind jetzt bearbeitbar.",
     "fieldLockedReasonStep": "Gesperrt — der Schritt „{step}“ ist bereits abgeschlossen und hat diesen Wert verwendet.",
@@ -1531,6 +1568,7 @@
     "SUBSCRIBER": "Abonnent",
     "LEAD": "Kontaktnachricht",
     "INVITE": "Einladung",
+    "STUDIO_REINVITE": "Nicht gesendete Studio-Einladung",
     "SIGNUP_BLOCK": "Registrierungssperre",
     "AUDIT_EVENT": "Audit-Ereignis",
     "READER_ACCOUNT": "Leserkonto",

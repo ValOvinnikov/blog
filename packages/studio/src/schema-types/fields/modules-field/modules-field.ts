@@ -1,17 +1,19 @@
+import { entitledModuleFilter } from '@blog/studio/schema-types/filters/entitled-module';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import {
+  modulePath,
+  type TModuleReference,
+} from '@blog/studio/schema-types/validation/module-path/module-path';
+import { validateModulesEntitled } from '@blog/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
 import {
   moduleInsertMenuGroups,
   sortModulesByKind,
 } from '@blog/studio/structure/module-kinds/module-kinds';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { defineArrayMember, defineField } from 'sanity';
 
-type TModuleReference = { _type?: string; _key?: string };
-
 const ONCE_ERROR = 'Only one module of this type is allowed per page.';
-
-const modulePath = (module: TModuleReference, index: number) =>
-  module._key ? [{ _key: module._key }] : [index];
 
 const DEFAULT_MODULES = [ctaSchema.name, newsletterSchema.name];
 
@@ -32,7 +34,12 @@ export const modulesField = ({
     type: 'array',
     description: description ?? 'Ordered content modules that build this page.',
     of: allow.map((type) =>
-      defineArrayMember({ name: type, type: 'reference', to: [{ type }] }),
+      defineArrayMember({
+        name: type,
+        type: 'reference',
+        to: [{ type }],
+        options: { filter: entitledModuleFilter },
+      }),
     ),
     options: { insertMenu: { groups: moduleInsertMenuGroups(allow) } },
     validation: (rule) => {
@@ -43,10 +50,11 @@ export const modulesField = ({
       const uniqueRule = rule
         .unique()
         .error('Each module can only be referenced once per page.');
+      const entitledRule = rule.custom(validateModulesEntitled).warning();
 
-      if (!once) return uniqueRule;
+      if (!once) return [uniqueRule, entitledRule];
 
-      return uniqueRule.custom((modules) => {
+      const onceRule = uniqueRule.custom((modules) => {
         const references = (modules ?? []) as TModuleReference[];
         const counts = new Map<string, number>();
 
@@ -62,8 +70,10 @@ export const modulesField = ({
             : [],
         );
 
-        return violations.length > 0 ? violations : true;
+        return hasArrayGotItems(violations) ? violations : true;
       });
+
+      return [onceRule, entitledRule];
     },
   });
 };

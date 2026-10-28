@@ -4,6 +4,7 @@ import {
   ERROR_CODE,
 } from '@blog/config/constants';
 import { DAY_MS, MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { setUnsentStudioReinvite } from '@blog/db/queries/tenants/unsent-studio-reinvite';
 import * as schema from '@blog/db/schema';
 import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
 import {
@@ -210,6 +211,20 @@ describe(findPersonalData, () => {
     expect(result.data.readerAccount).toBeUndefined();
   });
 
+  it('finds an unsent Studio re-invite held for a +tag variant of the mailbox', async () => {
+    await setUnsentStudioReinvite(tenantId, MOCK_SUBSCRIBER_EMAIL);
+
+    const result = await findPersonalData(
+      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.unsentStudioReinvites).toEqual([
+      { tenantId, tenantName, email: MOCK_SUBSCRIBER_EMAIL },
+    ]);
+  });
+
   it('finds nothing for a mailbox with no rows', async () => {
     const result = await findPersonalData(MOCK_NOBODY_EMAIL);
 
@@ -219,6 +234,7 @@ describe(findPersonalData, () => {
         subscribers: [],
         leads: [],
         membershipInvites: [],
+        unsentStudioReinvites: [],
         readerAccount: undefined,
         blockedSignupIdentities: [],
         auditEvents: [],

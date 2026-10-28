@@ -4671,14 +4671,6 @@
             "name": "imageWithAlt"
           },
           "optional": true
-        },
-        "tagline": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "inline",
-            "name": "brandTagline"
-          },
-          "optional": true
         }
       }
     }
