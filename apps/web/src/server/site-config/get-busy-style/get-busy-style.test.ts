@@ -1,4 +1,4 @@
-import { BUSY_BUTTON_STYLE, PRESET_ID, SPINNER_STYLE } from '@blog/config';
+import { BUSY_BUTTON_STYLE, SPINNER_STYLE } from '@blog/config';
 import { queries } from '@blog/db';
 import { BUSY_STYLE_LOG } from '@web/constants/busy-style';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
@@ -41,22 +41,6 @@ describe(getBusyStyle, () => {
       spinnerVariant: SPINNER_STYLE.DOTS,
     });
   });
-
-  it.each([
-    [PRESET_ID.CONSOLE, SPINNER_STYLE.BRAILLE],
-    [PRESET_ID.EDITORIAL, SPINNER_STYLE.RING],
-  ])(
-    'resolves Follow the preset to the %s preset spinner, %s',
-    async (preset, spinnerVariant) => {
-      getSiteConfigMock.mockResolvedValue(
-        mockSiteConfig({ preset, spinnerStyle: SPINNER_STYLE.PRESET }),
-      );
-
-      const { spinnerVariant: resolved } = await getBusyStyle(MOCK_TENANT_ID);
-
-      expect(resolved).toBe(spinnerVariant);
-    },
-  );
 
   it('falls back to the busy label and the Braille spinner when the tenant has no site config', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);

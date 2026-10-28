@@ -19,7 +19,6 @@ export const BusyStyleProvider = ({
   </BusyStyleContext.Provider>
 );
 
-/** Reads the site's busy-button style and spinner style — throws outside a `BusyStyleProvider`. */
 export const useBusyStyle = (): IBusyStyle => {
   const context = useContext(BusyStyleContext);
   if (!context) {
