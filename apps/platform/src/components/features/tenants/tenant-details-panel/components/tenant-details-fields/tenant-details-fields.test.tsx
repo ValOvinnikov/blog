@@ -64,6 +64,13 @@ const FIELD_ERROR_CASES = [
     text: MOCK_DOMAIN_LOCKED_HINT,
   },
   {
+    label: PRIMARY_DOMAIN_LABEL,
+    fieldErrors: {
+      primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_CUSTOM_MAIN },
+    },
+    text: tenantFieldErrors.domainCustomMain,
+  },
+  {
     label: OWNER_EMAIL_LABEL,
     fieldErrors: {
       ownerEmail: { reason: TENANT_FIELD_ERROR.OWNER_EMAIL_TAKEN },
@@ -145,6 +152,21 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     expect(domainInput).toBeDisabled();
     expect(domainInput).toHaveAccessibleDescription(MOCK_DOMAIN_LOCKED_HINT);
     expect(nameInput).toBeEnabled();
+  });
+
+  it('disables the domain of a custom main address and points to the Domain page', () => {
+    setup({
+      fieldLocks: {
+        primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN },
+      },
+    });
+
+    const domainInput = getTextbox(PRIMARY_DOMAIN_LABEL);
+
+    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAccessibleDescription(
+      tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
+    );
   });
 
   it('disables a locked choice and states why, keeping its value shown', () => {

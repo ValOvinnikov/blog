@@ -23,6 +23,9 @@ export const CUSTOM_DOMAIN_REFUSAL = {
   RECORD_NOT_FOUND: 'RECORD_NOT_FOUND',
   CONNECT_UNAVAILABLE: 'CONNECT_UNAVAILABLE',
   CONNECT_CONFLICT: 'CONNECT_CONFLICT',
+  NOT_VERIFIED: 'NOT_VERIFIED',
+  ADDRESS_NOT_FOUND: 'ADDRESS_NOT_FOUND',
+  ALREADY_MAIN_ADDRESS: 'ALREADY_MAIN_ADDRESS',
 } as const;
 
 export type TCustomDomainRefusal = TValueOf<typeof CUSTOM_DOMAIN_REFUSAL>;
@@ -32,6 +35,13 @@ export const CUSTOM_DOMAIN_CONNECT_REJECTIONS: readonly TCustomDomainRefusal[] =
     CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
     CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT,
   ];
+
+export const MAIN_ADDRESS_TARGET = {
+  CUSTOM_DOMAIN: 'CUSTOM_DOMAIN',
+  SUBDOMAIN: 'SUBDOMAIN',
+} as const;
+
+export type TMainAddressTarget = TValueOf<typeof MAIN_ADDRESS_TARGET>;
 
 export const CUSTOM_DOMAIN_VERIFY_POLL = {
   intervalMs: 15000,
@@ -61,4 +71,6 @@ export const CUSTOM_DOMAIN_LOG = {
   DISCONNECT_REJECTED_RESTORING: 'custom_domain.disconnect_rejected_restoring',
   DISCONNECT_RESTORE_FAILED: 'custom_domain.disconnect_restore_failed',
   DISCONNECT_FAILED: 'custom_domain.disconnect_failed',
+  MAIN_ADDRESS_FAILED: 'custom_domain.main_address_failed',
+  MAIN_ADDRESS_AUDIT_FAILED: 'custom_domain.main_address_audit_failed',
 } as const;

@@ -8,6 +8,8 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { connectCustomDomainAction } from '@platform/server/custom-domain/connect-custom-domain-action';
 import { getCustomDomainStatusAction } from '@platform/server/custom-domain/get-custom-domain-status-action';
+import { makeCustomDomainMainAddressAction } from '@platform/server/custom-domain/make-custom-domain-main-address-action';
+import { makeSubdomainMainAddressAction } from '@platform/server/custom-domain/make-subdomain-main-address-action';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
 import { verifyCustomDomainAction } from '@platform/server/custom-domain/verify-custom-domain-action';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
@@ -44,12 +46,18 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 vi.mock('@platform/server/custom-domain/get-custom-domain-status-action');
 vi.mock('@platform/server/custom-domain/connect-custom-domain-action');
 vi.mock('@platform/server/custom-domain/remove-custom-domain-action');
+vi.mock(
+  '@platform/server/custom-domain/make-custom-domain-main-address-action',
+);
+vi.mock('@platform/server/custom-domain/make-subdomain-main-address-action');
 vi.mock('@platform/server/custom-domain/verify-custom-domain-action');
 
 const { ownDomain } = en.tenantDomainPage;
 const POLL_INTERVAL_MS = 10_000;
 const CLAIM = mockCustomDomainClaim();
 const TITLE = { level: 2, name: ownDomain.title };
+const MAIN_TITLE = { level: 2, name: ownDomain.mainTitle };
+const { makeMain, useSubdomain } = ownDomain.mainAddress;
 
 const BASE_PROPS: TCustomDomainCardProps = {
   tenant: {
@@ -129,15 +137,210 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     expect(remove).not.toBeInTheDocument();
   });
 
-  it('shows a custom main address read-only, with no form and no Remove', async () => {
-    await renderCard({ isPrimaryCustom: true });
+  describe('a custom main address', () => {
+    it('is shown as the main address with no form and no Remove', async () => {
+      await renderCard({ isPrimaryCustom: true });
+      await screen.findByRole('heading', MAIN_TITLE);
+
+      const remove = screen.queryByRole('button', { name: ownDomain.remove });
+      const input = screen.queryByRole('textbox');
+
+      expect(remove).not.toBeInTheDocument();
+      expect(input).not.toBeInTheDocument();
+    });
+
+    it('offers the way back to the subdomain to an owner', async () => {
+      await renderCard({ isPrimaryCustom: true });
+
+      const switchBack = await screen.findByRole('button', {
+        name: useSubdomain.trigger,
+      });
+
+      expect(switchBack).toBeVisible();
+    });
+
+    it('offers the way back to the subdomain on a Free site', async () => {
+      await renderCard({
+        isPrimaryCustom: true,
+        tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.FREE },
+      });
+
+      const switchBack = await screen.findByRole('button', {
+        name: useSubdomain.trigger,
+      });
+
+      expect(switchBack).toBeVisible();
+    });
+
+    it('offers no switch to someone who cannot manage the site', async () => {
+      await renderCard({ isPrimaryCustom: true, canManage: false });
+      await screen.findByRole('heading', MAIN_TITLE);
+
+      const switchBack = screen.queryByRole('button', {
+        name: useSubdomain.trigger,
+      });
+
+      expect(switchBack).not.toBeInTheDocument();
+    });
+
+    it('offers no switch on an archived site', async () => {
+      await renderCard({
+        isPrimaryCustom: true,
+        tenant: { ...BASE_PROPS.tenant, deprovisionedAt: MOCK_ARCHIVED_AT },
+      });
+      await screen.findByRole('heading', MAIN_TITLE);
+
+      const switchBack = screen.queryByRole('button', {
+        name: useSubdomain.trigger,
+      });
+
+      expect(switchBack).not.toBeInTheDocument();
+    });
+
+    it('switches back after confirmation and moves focus to the new heading', async () => {
+      vi.mocked(makeSubdomainMainAddressAction).mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      const refresh = mockRouterRefresh();
+      const { rerender } = await renderCard({ isPrimaryCustom: true });
+      const trigger = await screen.findByRole('button', {
+        name: useSubdomain.trigger,
+      });
+      await user.click(trigger);
+      const confirm = await screen.findByRole('button', {
+        name: useSubdomain.confirm,
+      });
+      expect(makeSubdomainMainAddressAction).not.toHaveBeenCalled();
+
+      await user.click(confirm);
+      await waitFor(() => {
+        expect(refresh).toHaveBeenCalledTimes(1);
+      });
+      await act(async () => {
+        rerender(
+          <CustomDomainCard
+            {...BASE_PROPS}
+            customDomain={MOCK_CUSTOM_DOMAIN}
+          />,
+        );
+      });
+
+      const heading = await screen.findByRole('heading', TITLE);
+      expect(makeSubdomainMainAddressAction).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      expect(heading).toHaveFocus();
+    });
+  });
+
+  describe('a verified custom domain that is not the main address', () => {
+    beforeEach(() => {
+      vi.mocked(getProjectDomain).mockResolvedValue({
+        status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+        dnsRecords: [],
+      });
+    });
+
+    it('offers Make this the main address to an owner', async () => {
+      await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
+
+      const makeMainButton = await screen.findByRole('button', {
+        name: makeMain.trigger,
+      });
+
+      expect(makeMainButton).toBeVisible();
+    });
+
+    it('offers it to nobody who cannot manage the site', async () => {
+      await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN, canManage: false });
+      await screen.findByRole('heading', TITLE);
+
+      const makeMainButton = screen.queryByRole('button', {
+        name: makeMain.trigger,
+      });
+
+      expect(makeMainButton).not.toBeInTheDocument();
+    });
+
+    it('offers it on no Free site', async () => {
+      await renderCard({
+        customDomain: MOCK_CUSTOM_DOMAIN,
+        tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.FREE },
+      });
+      await screen.findByRole('heading', TITLE);
+
+      const makeMainButton = screen.queryByRole('button', {
+        name: makeMain.trigger,
+      });
+
+      expect(makeMainButton).not.toBeInTheDocument();
+    });
+
+    it('makes it the main address after confirmation and moves focus to the new heading', async () => {
+      vi.mocked(makeCustomDomainMainAddressAction).mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      const refresh = mockRouterRefresh();
+      const { rerender } = await renderCard({
+        customDomain: MOCK_CUSTOM_DOMAIN,
+      });
+      const trigger = await screen.findByRole('button', {
+        name: makeMain.trigger,
+      });
+      await user.click(trigger);
+      const confirm = await screen.findByRole('button', {
+        name: makeMain.confirm,
+      });
+      expect(makeCustomDomainMainAddressAction).not.toHaveBeenCalled();
+
+      await user.click(confirm);
+      await waitFor(() => {
+        expect(refresh).toHaveBeenCalledTimes(1);
+      });
+      await act(async () => {
+        rerender(<CustomDomainCard {...BASE_PROPS} isPrimaryCustom={true} />);
+      });
+
+      const heading = await screen.findByRole('heading', MAIN_TITLE);
+      expect(makeCustomDomainMainAddressAction).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        { domain: MOCK_CUSTOM_DOMAIN },
+      );
+      expect(heading).toHaveFocus();
+    });
+
+    it('shows the refusal in the dialog and does not refresh', async () => {
+      vi.mocked(makeCustomDomainMainAddressAction).mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: CUSTOM_DOMAIN_REFUSAL.NOT_VERIFIED,
+      });
+      const refresh = mockRouterRefresh();
+      await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
+      const trigger = await screen.findByRole('button', {
+        name: makeMain.trigger,
+      });
+      await user.click(trigger);
+      const confirm = await screen.findByRole('button', {
+        name: makeMain.confirm,
+      });
+
+      await user.click(confirm);
+
+      const message = await screen.findByText(ownDomain.refusal.notVerified);
+      expect(message).toBeVisible();
+      expect(refresh).not.toHaveBeenCalled();
+    });
+  });
+
+  it('offers no way to make a pending custom domain the main address', async () => {
+    await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
     await screen.findByRole('heading', TITLE);
 
-    const remove = screen.queryByRole('button', { name: ownDomain.remove });
-    const input = screen.queryByRole('textbox');
+    const makeMainButton = screen.queryByRole('button', {
+      name: makeMain.trigger,
+    });
 
-    expect(remove).not.toBeInTheDocument();
-    expect(input).not.toBeInTheDocument();
+    expect(makeMainButton).not.toBeInTheDocument();
   });
 
   it('tells a member who cannot manage the site that only the owner can connect', () => {
@@ -304,7 +507,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       const refusal = await screen.findByText(
         ownDomain.refusal.connectUnavailable,
       );
-      const verifyAgain = screen.getByRole('button', {
+      const verifyAgain = await screen.findByRole('button', {
         name: ownDomain.verify,
       });
 

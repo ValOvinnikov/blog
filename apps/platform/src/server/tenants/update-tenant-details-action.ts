@@ -23,6 +23,8 @@ import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
+import { env } from '@platform/utils/env/env';
+import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -94,6 +96,17 @@ export const updateTenantDetailsAction = async (
   }
   if (tenant.deprovisionedAt) {
     return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
+  }
+  if (
+    parsed.data.primaryDomain !== tenant.primaryDomain &&
+    isCustomDomain(tenant.primaryDomain, env.TENANT_ROOT_DOMAIN)
+  ) {
+    return {
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_CUSTOM_MAIN },
+      },
+    };
   }
   if (
     parsed.data.locale !== tenant.locale &&

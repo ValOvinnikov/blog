@@ -33,6 +33,7 @@ export * from './set-tenant-additional-locales';
 export * from './set-tenant-owner-access';
 export * from './set-tenant-provisioning-status';
 export * from './set-tenant-revalidate-webhook-secret';
+export * from './set-tenant-primary-domain';
 export * from './set-tenant-sanity-project';
 export * from './set-tenant-sanity-token';
 export * from './set-tenant-sanity-write-token';

@@ -50,6 +50,7 @@ describe(computeTenantFieldLocks, () => {
       hasSteps ? mockIdleProvisioningSteps() : null,
       hasSteps ? TENANT_PROVISIONING_STATUS.PENDING : null,
       undefined,
+      false,
     );
 
     expect(locks).toEqual({});
@@ -60,6 +61,7 @@ describe(computeTenantFieldLocks, () => {
       mockMapDomainFailedProvisioningSteps(MOCK_ERROR),
       TENANT_PROVISIONING_STATUS.FAILED,
       undefined,
+      false,
     );
 
     expect(locks).toEqual({});
@@ -78,6 +80,7 @@ describe(computeTenantFieldLocks, () => {
       steps,
       TENANT_PROVISIONING_STATUS.FAILED,
       undefined,
+      false,
     );
 
     expect(locks).toEqual({
@@ -100,7 +103,12 @@ describe(computeTenantFieldLocks, () => {
       TENANT_PROVISIONING_STATUS.PROVISIONING,
     ],
   ])('locks every field as running when %s', (_, steps, status) => {
-    const locks = computeTenantFieldLocks(steps, status, mockInvitedOwner());
+    const locks = computeTenantFieldLocks(
+      steps,
+      status,
+      mockInvitedOwner(),
+      false,
+    );
 
     expect(locks).toEqual(everyFieldLockedBy(RUNNING));
   });
@@ -110,6 +118,7 @@ describe(computeTenantFieldLocks, () => {
       mockDoneProvisioningSteps(),
       TENANT_PROVISIONING_STATUS.READY,
       mockJoinedOwner(),
+      false,
     );
 
     expect(locks).toEqual(everyFieldLockedBy(SUCCEEDED));
@@ -120,6 +129,7 @@ describe(computeTenantFieldLocks, () => {
       mockDoneProvisioningSteps(),
       TENANT_PROVISIONING_STATUS.READY,
       mockInvitedOwner(),
+      false,
     );
 
     expect(locks).toEqual({
@@ -129,6 +139,29 @@ describe(computeTenantFieldLocks, () => {
       locale: SUCCEEDED,
     });
   });
+
+  it.each([
+    ['provisioning has not started', null, null],
+    [
+      'provisioning has finished',
+      mockDoneProvisioningSteps(),
+      TENANT_PROVISIONING_STATUS.READY,
+    ],
+  ])(
+    'locks primaryDomain for a custom main address when %s',
+    (_, steps, status) => {
+      const locks = computeTenantFieldLocks(
+        steps,
+        status,
+        mockInvitedOwner(),
+        true,
+      );
+
+      expect(locks.primaryDomain).toEqual({
+        kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN,
+      });
+    },
+  );
 
   it('ignores a failed OWNER_ELEVATION step', () => {
     const locks = computeTenantFieldLocks(
@@ -141,6 +174,7 @@ describe(computeTenantFieldLocks, () => {
       },
       TENANT_PROVISIONING_STATUS.READY,
       undefined,
+      false,
     );
 
     expect(locks).toEqual(everyFieldLockedBy(SUCCEEDED));

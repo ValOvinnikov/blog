@@ -9,6 +9,7 @@ import {
 } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import en from '@platform/i18n/messages/en.json';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
@@ -22,6 +23,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
@@ -36,8 +38,10 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_INVITED_OWNER_EMAIL,
   MOCK_SANITY_PROJECT_ID,
+  MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
+  MOCK_TENANT_ROOT_DOMAIN,
   MOCK_TENANT_URL,
   mockFirstStepRunningProvisioningSteps,
   PLATFORM_TENANT_NOTICE_TEXT,
@@ -78,6 +82,8 @@ vi.mock('@blog/db', async () => ({
     findings: { listFindingsForTenant: listFindingsForTenantMock },
   },
 }));
+
+vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
@@ -137,6 +143,7 @@ const SUSPEND_TENANT = 'Suspend tenant';
 
 describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
+    mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     retryProvisioningStepActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockReset();
@@ -231,6 +238,21 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(domainInput).toBeDisabled();
     expect(domainInput).toHaveAccessibleDescription(
       'Locked — the "Connect domain" step has already completed and used this value.',
+    );
+    expect(nameInput).not.toBeDisabled();
+  });
+
+  it('locks the domain field while the main address is the custom domain', async () => {
+    await setup({ tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }) });
+
+    const domainInput = screen.getByRole('textbox', {
+      name: PRIMARY_DOMAIN_LABEL,
+    });
+    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+
+    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAccessibleDescription(
+      en.tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
     );
     expect(nameInput).not.toBeDisabled();
   });
