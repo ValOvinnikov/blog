@@ -42,7 +42,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `tenants.plan` — required, the `tenant_plan` pgEnum built from `TENANT_PLAN`.
 - `PLAN_REGISTRY` (`@blog/db/constants`) — `FREE`: `RATINGS`, `CONSENT_BANNER`. `GROWTH`: all seven `CAPABILITY` keys (`COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`).
 - `PLAN_LOCALE_LIMIT` — languages per plan including the default: `FREE` 1, `GROWTH` 3.
-- `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` the preset, accent hue, logo and favicon; `GROWTH` every Look column. The epic's later entitlements join this record as fields of their own.
+- `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` the preset, accent hue, logo and favicon; `GROWTH` every Look column. `modulePacks` lists the module packs the plan entitles: `FREE` `CORE`; `GROWTH` `CORE` and `GROWTH`. The epic's later entitlements join this record as fields of their own.
 - `settings_features` — one row per tenant (unique `tenant_id`, cascade delete), seven `NOT NULL` boolean toggles. Provisioning writes no row; an absent row resolves to the tenant's current preset's `featureDefaults` (both presets: comments, ratings, bookmarks and contact form on; newsletter, analytics and consent banner off).
 - `MODULE_PACK` (`CORE`, `GROWTH`) and `MODULE_PACK_BY_TYPE` (`@blog/config/constants`) give every module `_type` exactly one pack; the map `satisfies Record<TModuleType, TModulePack>`, so a new module type fails type-check until it has one. Core: the four heroes (the deprecated `module_hero` included), the five Posts modules, content, FAQ, section pages, CTA and newsletter. Growth: testimonial, team, logo wall, stats, pricing, feature list, feature highlights, timeline and contact form. `isModuleTypeEntitled(type, packs)` is the one check; an unknown type is never entitled.
 - No price exists anywhere in the code.
@@ -55,7 +55,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` on `FREE`.
 - **Plan page access** (`planPageAccess`) — Languages when `PLAN_LOCALE_LIMIT` > 1; Email when the plan holds bookmarks, comments or newsletter; Subscribers with newsletter; Comments with comments; Team on any plan but `FREE`. The owner's sidebar omits the rest and their pages 404; the operator's `/tenants/{id}` view shows every entry and page whatever the plan.
 - **Look** — fields outside `lookFields` show locked on the Look page with the "Growth plan" badge, at the preset's value (see [look](./look.md)).
-- **Module packs in Studio** — `StudioMount` takes an optional plain-data `entitlements` object whose `modulePacks` lists the entitled packs. Omitted, every pack is entitled and the Studio behaves as before: the site is the enforcement point, and the Sanity CLI Studio has no tenant. The platform does not pass it yet, and the site does not gate modules yet.
+- **Module packs in Studio** — `StudioMount` takes an optional plain-data `entitlements` object whose `modulePacks` lists the entitled packs. Omitted, every pack is entitled: the site is the enforcement point, and the Sanity CLI Studio has no tenant. The platform's `StudioMountView` passes the tenant plan's `PLAN_ENTITLEMENTS` `modulePacks`, read on every load, so the owner's `/dashboard` Studio and the operator's `/tenants/{id}` Studio both follow the current plan. The site does not gate modules yet.
 - **Not plan-gated** — Voice, Domain, Studio, the Features page itself, page types, team seats, AI takeaways; on the site, modules.
 
 ## Constraints and invariants
@@ -90,6 +90,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `apps/platform/src/utils/settings-features-fields/settings-features-fields.ts`
 - `apps/platform/src/server/settings-features/update-features-action.ts`
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
+- `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx` — passes the plan's `modulePacks` to `StudioMount`
 - `apps/platform/src/utils/nav-sections/nav-sections.ts`
 - `packages/db/src/queries/tenants/get-tenant-live-locales/get-tenant-live-locales.ts`
 - `packages/config/src/constants/module-pack.ts` — `MODULE_PACK`, `MODULE_PACK_BY_TYPE`, `isModuleTypeEntitled`
@@ -100,7 +101,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 ## Tests and stories
 
-- Platform: `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`.
+- Platform: `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`, and `studio-mount-view.test.tsx`.
 - Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`.
 - db: `packages/db/src/queries/settings-features/**/*.test.ts`, `get-tenant-live-locales.test.ts`, `set-tenant-additional-locales.test.ts`.
 - Config: `module-pack.test.ts`.
