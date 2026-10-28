@@ -1,5 +1,6 @@
 import { HTTP_METHOD, type TMaybeNull } from '@blog/config';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
+import { isUndefined } from '@blog/utils/primitives';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -30,7 +31,7 @@ export const enqueueWorkerRequest = async (
 
   const url = new URL(path, workerUrl);
   const rawBody = JSON.stringify(
-    domain === undefined ? { tenantId } : { tenantId, domain },
+    isUndefined(domain) ? { tenantId } : { tenantId, domain },
   );
 
   try {
