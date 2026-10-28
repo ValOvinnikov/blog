@@ -203,6 +203,10 @@ Free site.
 
 ## Constraints and invariants
 
+- The admin panel is not indexed: `[locale]/layout.tsx` sets
+  `robots: { index: false, follow: false }`, so every page under it, public or
+  session-gated, serves `noindex, nofollow`. There is no `robots.txt`, because
+  a crawler must fetch a page to read its noindex.
 - `@blog/auth`'s `findMagicLinkSendRefusal` refuses a magic-link send to
   an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
