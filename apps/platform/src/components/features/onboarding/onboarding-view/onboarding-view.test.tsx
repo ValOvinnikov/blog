@@ -8,6 +8,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import messages from '@platform/i18n/messages/en.json';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
 import {
@@ -16,6 +17,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -40,17 +42,39 @@ faker.seed(5994);
 
 const MOCK_SLUG = faker.helpers.slugify(faker.lorem.words(2));
 const MOCK_SITE_ADDRESS = `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
-const MOCK_NAME_FIELD = { name: 'Site name' };
-const MOCK_ADDRESS_FIELD = { name: 'Site address' };
-const MOCK_ACCEPTANCE = { name: /I agree to the Terms of Service/ };
-const MOCK_CREATE = { name: 'Create site' };
-const MOCK_CONTINUE = { name: 'Continue' };
-const MOCK_BACK = { name: 'Back' };
-const MOCK_ADDRESS_AVAILABLE = `${MOCK_SITE_ADDRESS} is available.`;
-const MOCK_ADDRESS_CHECKING = 'Checking the address…';
-const MOCK_ADDRESS_TAKEN = 'This address is taken. Choose another.';
-const MOCK_PLACEHOLDER_ADDRESS = `your-site.${MOCK_TENANT_ROOT_DOMAIN}`;
-const MOCK_LIVE_PREVIEW = { name: 'Live preview' };
+const {
+  nameLabel: NAME_LABEL,
+  siteAddressLabel: SITE_ADDRESS_LABEL,
+  siteAddressChecking: ADDRESS_CHECKING,
+  previewAddressPlaceholder: PLACEHOLDER_SLUG,
+  createSite: CREATE_SITE,
+  continue: CONTINUE,
+  back: BACK,
+  siteTypeLabel: SITE_TYPE_LABEL,
+  siteTypes: SITE_TYPES,
+  steps: STEPS,
+  stepsAriaLabel: STEPS_ARIA_LABEL,
+  fieldErrors: { nameRequired: NAME_REQUIRED, siteAddressTaken: ADDRESS_TAKEN },
+  failures: { tryAgainLater: TRY_AGAIN_LATER },
+} = messages.onboardingForm;
+const { console: CONSOLE_PRESET, editorial: EDITORIAL_PRESET } =
+  messages.presetPicker;
+const [ACCEPT_TERMS_LEAD] = messages.termsAcceptance.acceptTerms.split('<');
+const t = makeEnTranslator('onboardingForm');
+
+const MOCK_NAME_FIELD = { name: NAME_LABEL };
+const MOCK_ADDRESS_FIELD = { name: SITE_ADDRESS_LABEL };
+const MOCK_ACCEPTANCE = { name: new RegExp(`^${ACCEPT_TERMS_LEAD}`) };
+const MOCK_CREATE = { name: CREATE_SITE };
+const MOCK_CONTINUE = { name: CONTINUE };
+const MOCK_BACK = { name: BACK };
+const MOCK_ADDRESS_AVAILABLE = t('siteAddressAvailable', {
+  address: MOCK_SITE_ADDRESS,
+});
+const MOCK_PLACEHOLDER_ADDRESS = `${PLACEHOLDER_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
+const MOCK_LIVE_PREVIEW = {
+  name: messages.previewModeControl.livePreviewHeading,
+};
 
 const MOCK_CREATE_SITE_INPUT = {
   siteType: SITE_TYPE.BLOG,
@@ -127,7 +151,9 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('starts from the accent of the preset the user picks', async () => {
     await completeSiteStep();
     await completeAddressStep();
-    const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
+    const editorialPreset = screen.getByRole('radio', {
+      name: EDITORIAL_PRESET,
+    });
     await user.click(editorialPreset);
     await clickContinue();
     await acceptAndCreate();
@@ -140,10 +166,12 @@ describe(`<${OnboardingView.name}/>`, () => {
   });
 
   it('creates the site type the user picks', async () => {
-    const siteTypeSelect = screen.getByRole('combobox', { name: 'Site type' });
+    const siteTypeSelect = screen.getByRole('combobox', {
+      name: SITE_TYPE_LABEL,
+    });
     await user.click(siteTypeSelect);
     const portfolioOption = await screen.findByRole('option', {
-      name: 'Portfolio',
+      name: SITE_TYPES.PORTFOLIO,
     });
     await user.click(portfolioOption);
     await reachReview();
@@ -158,8 +186,8 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('asks for a name before leaving the first step', async () => {
     await clickContinue();
 
-    const message = screen.getByText('Enter a name for your site.');
-    const heading = stepHeading('Site');
+    const message = screen.getByText(NAME_REQUIRED);
+    const heading = stepHeading(STEPS.SITE);
 
     expect(message).toBeVisible();
     expect(heading).toBeVisible();
@@ -207,10 +235,10 @@ describe(`<${OnboardingView.name}/>`, () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
     await completeSiteStep();
     const addressField = await typeAddress();
-    await screen.findByText(MOCK_ADDRESS_TAKEN);
+    await screen.findByText(ADDRESS_TAKEN);
     await clickContinue();
 
-    const heading = stepHeading('Address');
+    const heading = stepHeading(STEPS.ADDRESS);
 
     expect(addressField).toBeInvalid();
     expect(heading).toBeVisible();
@@ -220,12 +248,10 @@ describe(`<${OnboardingView.name}/>`, () => {
     checkSiteAddressMock.mockRejectedValue(new Error());
     await completeSiteStep();
     await typeAddress();
-    await waitForElementToBeRemoved(() =>
-      screen.queryByText(MOCK_ADDRESS_CHECKING),
-    );
+    await waitForElementToBeRemoved(() => screen.queryByText(ADDRESS_CHECKING));
     await clickContinue();
 
-    const heading = stepHeading('Look');
+    const heading = stepHeading(STEPS.LOOK);
 
     expect(heading).toBeVisible();
   });
@@ -235,19 +261,22 @@ describe(`<${OnboardingView.name}/>`, () => {
     await typeAddress();
     await clickContinue();
 
-    const heading = stepHeading('Look');
+    const heading = stepHeading(STEPS.LOOK);
 
     expect(heading).toBeVisible();
   });
 
   it.each([
-    ['Site', `Blog · ${MOCK_TENANT_NAME}`],
-    ['Address', MOCK_SITE_ADDRESS],
-    ['Look', 'Console'],
+    [
+      STEPS.SITE,
+      t('siteSummary', { siteType: SITE_TYPES.BLOG, name: MOCK_TENANT_NAME }),
+    ],
+    [STEPS.ADDRESS, MOCK_SITE_ADDRESS],
+    [STEPS.LOOK, CONSOLE_PRESET],
   ])('shows the %s step’s choice once it is done', async (_, summary) => {
     await reachReview();
 
-    const steps = screen.getByRole('list', { name: 'Setup steps' });
+    const steps = screen.getByRole('list', { name: STEPS_ARIA_LABEL });
 
     const stepSummary = within(steps).getByText(summary);
 
@@ -257,22 +286,24 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('opens a step from its Edit link on review', async () => {
     await reachReview();
     const editAddress = screen.getByRole('button', {
-      name: 'Edit Site address',
+      name: t('editField', { field: SITE_ADDRESS_LABEL }),
     });
     await user.click(editAddress);
 
-    const heading = stepHeading('Address');
+    const heading = stepHeading(STEPS.ADDRESS);
 
     expect(heading).toBeVisible();
   });
 
   it('returns to review after editing a step from it', async () => {
     await reachReview();
-    const editName = screen.getByRole('button', { name: 'Edit Site name' });
+    const editName = screen.getByRole('button', {
+      name: t('editField', { field: NAME_LABEL }),
+    });
     await user.click(editName);
     await clickContinue();
 
-    const heading = stepHeading('Review');
+    const heading = stepHeading(STEPS.REVIEW);
 
     expect(heading).toBeVisible();
   });
@@ -285,8 +316,8 @@ describe(`<${OnboardingView.name}/>`, () => {
     await reachReview();
     await acceptAndCreate();
 
-    const message = await screen.findByText(MOCK_ADDRESS_TAKEN);
-    const heading = stepHeading('Address');
+    const message = await screen.findByText(ADDRESS_TAKEN);
+    const heading = stepHeading(STEPS.ADDRESS);
 
     expect(message).toBeVisible();
     expect(heading).toBeVisible();
@@ -300,7 +331,7 @@ describe(`<${OnboardingView.name}/>`, () => {
     await reachReview();
     await acceptAndCreate();
 
-    const refusal = await screen.findByText('Try again later.');
+    const refusal = await screen.findByText(TRY_AGAIN_LATER);
 
     expect(refusal).toBeVisible();
   });

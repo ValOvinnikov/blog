@@ -2,10 +2,21 @@ import { previewAddressBarVariants } from './preview-address-bar-variants';
 
 export type TPreviewAddressBarProps = {
   address: string;
+  isDark: boolean;
 };
 
-export const PreviewAddressBar = ({ address }: TPreviewAddressBarProps) => {
-  const { root, dots, dot, address: addressSlot } = previewAddressBarVariants();
+export const PreviewAddressBar = ({
+  address,
+  isDark,
+}: TPreviewAddressBarProps) => {
+  const {
+    root,
+    dots,
+    dot,
+    address: addressSlot,
+  } = previewAddressBarVariants({
+    isDark,
+  });
 
   return (
     <div className={root()}>

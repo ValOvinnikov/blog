@@ -33,7 +33,7 @@ export const OnboardingPreview = ({
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
   const look = applyPresetDefaults(preset, defaultLookFormValues());
-  const { browser, site } = onboardingPreviewVariants();
+  const { browser, site } = onboardingPreviewVariants({ isDark });
 
   return (
     <PreviewFrame
@@ -42,7 +42,7 @@ export const OnboardingPreview = ({
       controls={<PreviewModeControl value={mode} onChange={setMode} />}
     >
       <div className={browser()}>
-        <PreviewAddressBar address={siteAddress} />
+        <PreviewAddressBar address={siteAddress} isDark={isDark} />
         <div className={site()}>
           <FrontPageSample
             tenantName={name || t('previewNamePlaceholder')}
