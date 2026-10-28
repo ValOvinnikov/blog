@@ -38,7 +38,7 @@ export const useDismissibleMenu = ({
   closeOnFocusOut = false,
   overlayId,
 }: TDismissibleMenuAccessors) => {
-  const [open, setOpenState, hasKeyChild] = useOverlayOpenState({
+  const [open, setOpenState, hasChildTakingKeys] = useOverlayOpenState({
     overlayId,
     takesKeys: true,
   });
@@ -82,7 +82,7 @@ export const useDismissibleMenu = ({
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (hasKeyChild) return;
+      if (hasChildTakingKeys) return;
 
       if (event.key === 'Escape') {
         close();
@@ -145,7 +145,15 @@ export const useDismissibleMenu = ({
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [open, hasKeyChild, getPanel, getTrigger, getContainer, close, trapFocus]);
+  }, [
+    open,
+    hasChildTakingKeys,
+    getPanel,
+    getTrigger,
+    getContainer,
+    close,
+    trapFocus,
+  ]);
 
   useEffect(() => {
     if (!open || !closeOnFocusOut) return;

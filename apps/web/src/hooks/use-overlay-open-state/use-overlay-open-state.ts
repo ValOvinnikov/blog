@@ -11,7 +11,7 @@ export type TOverlayOpenStateOptions = {
   takesKeys?: boolean;
 };
 
-/** Open state that lives in the header's shared overlay when `overlayId` is given inside a `HeaderOverlayProvider`, and locally otherwise; `hasKeyChild` is true while an overlay opened inside this one takes the keyboard. */
+/** Open state that lives in the header's shared overlay when `overlayId` is given inside a `HeaderOverlayProvider`, and locally otherwise. */
 export const useOverlayOpenState = ({
   overlayId,
   takesKeys = false,
@@ -26,7 +26,7 @@ export const useOverlayOpenState = ({
   const ownIndex = openOverlays.findIndex(({ id }) => id === overlayId);
   const open = isShared ? ownIndex !== -1 : localOpen;
   const frontOverlay = openOverlays.at(-1);
-  const hasKeyChild =
+  const hasChildTakingKeys =
     open &&
     isShared &&
     frontOverlay?.id !== overlayId &&
@@ -49,5 +49,5 @@ export const useOverlayOpenState = ({
     [openOverlay, closeOverlay, overlayId, takesKeys, parentId],
   );
 
-  return [open, setOpen, hasKeyChild] as const;
+  return [open, setOpen, hasChildTakingKeys] as const;
 };
