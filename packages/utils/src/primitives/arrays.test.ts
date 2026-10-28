@@ -8,4 +8,8 @@ describe(hasArrayGotItems, () => {
   it('rejects an empty array', () => {
     expect(hasArrayGotItems([])).toBe(false);
   });
+
+  it('rejects a missing array', () => {
+    expect(hasArrayGotItems(undefined)).toBe(false);
+  });
 });

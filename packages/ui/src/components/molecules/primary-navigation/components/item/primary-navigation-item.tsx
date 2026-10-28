@@ -23,7 +23,7 @@ export const PrimaryNavigationItem = ({
 }: TPrimaryNavigationItemProps) => {
   const { href, label, isActive, target, subItems } = item;
 
-  if (subItems && hasArrayGotItems(subItems)) {
+  if (hasArrayGotItems(subItems)) {
     return panel ? (
       <PrimaryNavigationPanelGroup
         item={item}
