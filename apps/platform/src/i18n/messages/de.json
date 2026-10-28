@@ -25,7 +25,9 @@
     "blockedSignupsPage": "Gesperrte Registrierungen · Admin",
     "dataRequestsPage": "Datenanfragen · Admin",
     "signUpTitle": "Konto erstellen",
-    "onboarding": "Website erstellen · Admin"
+    "onboarding": "Website erstellen · Admin",
+    "termsTitle": "Nutzungsbedingungen",
+    "privacyTitle": "Datenschutzerklärung"
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
@@ -142,6 +144,13 @@
     "description": "Bei der Anmeldung ist etwas schiefgelaufen. Kehren Sie zur Anmeldung zurück und versuchen Sie es erneut.",
     "backToSignIn": "Zurück zur Anmeldung",
     "badge": "Anmeldung"
+  },
+  "legalPlaceholderPage": {
+    "termsHeading": "Nutzungsbedingungen",
+    "termsDescription": "Dies ist ein Platzhalter. Unsere vollständigen Nutzungsbedingungen werden gerade fertiggestellt und erscheinen bald hier.",
+    "privacyHeading": "Datenschutzerklärung",
+    "privacyDescription": "Dies ist ein Platzhalter. Unsere vollständige Datenschutzerklärung wird gerade fertiggestellt und erscheint bald hier.",
+    "backToSignUp": "Zurück zur Registrierung"
   },
   "notFoundPage": {
     "heading": "Seite nicht gefunden",

@@ -25,7 +25,9 @@
     "blockedSignupsPage": "Inscriptions bloquées · Admin",
     "dataRequestsPage": "Demandes de données · Admin",
     "signUpTitle": "Créer un compte",
-    "onboarding": "Créer votre site · Administration"
+    "onboarding": "Créer votre site · Administration",
+    "termsTitle": "Conditions d'utilisation",
+    "privacyTitle": "Politique de confidentialité"
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
@@ -142,6 +144,13 @@
     "description": "Un problème est survenu lors de la connexion. Revenez à la page de connexion et réessayez.",
     "backToSignIn": "Retour à la connexion",
     "badge": "Connexion"
+  },
+  "legalPlaceholderPage": {
+    "termsHeading": "Conditions d'utilisation",
+    "termsDescription": "Ceci est une page provisoire. Nos Conditions d'utilisation complètes sont en cours de finalisation et seront bientôt publiées ici.",
+    "privacyHeading": "Politique de confidentialité",
+    "privacyDescription": "Ceci est une page provisoire. Notre Politique de confidentialité complète est en cours de finalisation et sera bientôt publiée ici.",
+    "backToSignUp": "Retour à l'inscription"
   },
   "notFoundPage": {
     "heading": "Page introuvable",

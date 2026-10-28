@@ -25,7 +25,9 @@
     "blockedSignupsPage": "Blocked sign-ups · Admin",
     "dataRequestsPage": "Data requests · Admin",
     "signUpTitle": "Create an account",
-    "onboarding": "Create your site · Admin"
+    "onboarding": "Create your site · Admin",
+    "termsTitle": "Terms of Service",
+    "privacyTitle": "Privacy Policy"
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
@@ -142,6 +144,13 @@
     "description": "Something went wrong while signing you in. Go back to sign-in and try again.",
     "backToSignIn": "Back to sign-in",
     "badge": "Sign-in"
+  },
+  "legalPlaceholderPage": {
+    "termsHeading": "Terms of Service",
+    "termsDescription": "This is a placeholder. Our full Terms of Service are being finalised and will be published here soon.",
+    "privacyHeading": "Privacy Policy",
+    "privacyDescription": "This is a placeholder. Our full Privacy Policy is being finalised and will be published here soon.",
+    "backToSignUp": "Back to sign-up"
   },
   "notFoundPage": {
     "heading": "Page not found",

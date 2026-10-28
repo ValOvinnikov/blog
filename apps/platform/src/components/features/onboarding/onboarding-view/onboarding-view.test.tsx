@@ -64,7 +64,7 @@ const MOCK_CREATE_SITE_INPUT = {
 
 const setup = customRender(OnboardingView, {
   rootDomain: MOCK_TENANT_ROOT_DOMAIN,
-  legalPageUrls: toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN),
+  legalPageUrls: toLegalPageUrls(),
   initialLocale: LOCALE_ISO_CODES.EN,
 });
 

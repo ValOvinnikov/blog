@@ -58,6 +58,18 @@ describe(`<${DeadEndView.name}/>`, () => {
     });
   });
 
+  describe('without a badge', () => {
+    beforeEach(() => {
+      setup({ badge: undefined });
+    });
+
+    it('shows no status badge', () => {
+      const badge = screen.queryByText(MOCK_BADGE_LABEL);
+
+      expect(badge).not.toBeInTheDocument();
+    });
+  });
+
   describe('with an error id', () => {
     beforeEach(() => {
       setup({ errorId: MOCK_ERROR_ID });

@@ -25,7 +25,9 @@
     "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
     "dataRequestsPage": "Gegevensverzoeken · Admin",
     "signUpTitle": "Account aanmaken",
-    "onboarding": "Je site maken · Admin"
+    "onboarding": "Je site maken · Admin",
+    "termsTitle": "Servicevoorwaarden",
+    "privacyTitle": "Privacybeleid"
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
@@ -142,6 +144,13 @@
     "description": "Er ging iets mis bij het inloggen. Ga terug naar inloggen en probeer het opnieuw.",
     "backToSignIn": "Terug naar inloggen",
     "badge": "Inloggen"
+  },
+  "legalPlaceholderPage": {
+    "termsHeading": "Servicevoorwaarden",
+    "termsDescription": "Dit is een tijdelijke pagina. Onze volledige Servicevoorwaarden worden afgerond en verschijnen hier binnenkort.",
+    "privacyHeading": "Privacybeleid",
+    "privacyDescription": "Dit is een tijdelijke pagina. Ons volledige Privacybeleid wordt afgerond en verschijnt hier binnenkort.",
+    "backToSignUp": "Terug naar registreren"
   },
   "notFoundPage": {
     "heading": "Pagina niet gevonden",

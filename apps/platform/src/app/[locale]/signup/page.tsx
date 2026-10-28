@@ -1,7 +1,6 @@
 import { SignUpView } from '@platform/components/features/sign-up/sign-up-view';
 import { getSession } from '@platform/server/auth/auth';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
-import { env } from '@platform/utils/env/env';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
@@ -18,5 +17,5 @@ export default async function SignUpPage() {
     redirect(adminRoutes.home());
   }
 
-  return <SignUpView legalPageUrls={toLegalPageUrls(env.TENANT_ROOT_DOMAIN)} />;
+  return <SignUpView legalPageUrls={toLegalPageUrls()} />;
 }

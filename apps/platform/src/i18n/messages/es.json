@@ -25,7 +25,9 @@
     "blockedSignupsPage": "Registros bloqueados · Admin",
     "dataRequestsPage": "Solicitudes de datos · Admin",
     "signUpTitle": "Crear una cuenta",
-    "onboarding": "Crear tu sitio · Administración"
+    "onboarding": "Crear tu sitio · Administración",
+    "termsTitle": "Términos del servicio",
+    "privacyTitle": "Política de privacidad"
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
@@ -142,6 +144,13 @@
     "description": "Algo ha fallado al iniciar sesión. Vuelve al inicio de sesión e inténtalo de nuevo.",
     "backToSignIn": "Volver al inicio de sesión",
     "badge": "Inicio de sesión"
+  },
+  "legalPlaceholderPage": {
+    "termsHeading": "Términos del servicio",
+    "termsDescription": "Esta es una página provisional. Estamos terminando nuestros Términos del servicio completos y los publicaremos aquí pronto.",
+    "privacyHeading": "Política de privacidad",
+    "privacyDescription": "Esta es una página provisional. Estamos terminando nuestra Política de privacidad completa y la publicaremos aquí pronto.",
+    "backToSignUp": "Volver al registro"
   },
   "notFoundPage": {
     "heading": "Página no encontrada",

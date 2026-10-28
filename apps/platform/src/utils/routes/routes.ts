@@ -17,6 +17,8 @@ export const adminRoutes = {
     `${SIGN_IN_PATH}?${new URLSearchParams({ callbackUrl })}`,
   signInError: () => '/sign-in-error',
   signUp: () => '/signup',
+  terms: () => '/terms',
+  privacy: () => '/privacy',
   workspacePending: () => '/workspace-pending',
   onboarding: () => '/onboarding',
   tenants: (options?: { archived?: boolean }) =>

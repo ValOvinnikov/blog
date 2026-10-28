@@ -12,7 +12,7 @@ import type { ReactNode } from 'react';
 import { deadEndViewVariants } from './dead-end-view-variants';
 
 export type TDeadEndViewProps = {
-  badge: { label: string; tone: TStatusBadgeProps['tone'] };
+  badge?: { label: string; tone: TStatusBadgeProps['tone'] };
   title: string;
   description: string;
   action: ReactNode;
@@ -49,7 +49,9 @@ export const DeadEndView = ({
         <Card className={card()}>
           <Card.Body>
             <div className={content()}>
-              <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+              {badge && (
+                <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+              )}
               <div className={copy()}>
                 <Heading level={1} size="pageTitle">
                   {title}

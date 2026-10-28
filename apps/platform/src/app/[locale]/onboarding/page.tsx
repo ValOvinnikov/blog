@@ -17,7 +17,7 @@ export default async function OnboardingPage() {
   return (
     <OnboardingView
       rootDomain={env.TENANT_ROOT_DOMAIN}
-      legalPageUrls={toLegalPageUrls(env.TENANT_ROOT_DOMAIN)}
+      legalPageUrls={toLegalPageUrls()}
       initialLocale={isLocaleIsoCode(locale) ? locale : LOCALE_ISO_CODES.EN}
     />
   );

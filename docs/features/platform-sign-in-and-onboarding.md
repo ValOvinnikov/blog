@@ -8,6 +8,8 @@ code:
   - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/app/*/sign-in/**
   - apps/platform/src/app/*/signup/**
+  - apps/platform/src/app/*/terms/**
+  - apps/platform/src/app/*/privacy/**
   - apps/platform/src/components/features/sign-up/**
   - apps/platform/src/app/*/onboarding/**
   - apps/platform/src/components/features/onboarding/**
@@ -77,14 +79,17 @@ Free site.
   membership goes to `/onboarding` instead.
 - `/signup`: a public gate in front of the same providers, not a second
   login. The visitor ticks acceptance of the Terms of Service and the Privacy
-  Policy, linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
-  (`routes.terms()` and `routes.privacy()` in `@blog/config`; the marketing
-  site serves them), or named as plain text without a root domain. Continue
+  Policy, linked at the panel's own `/terms` and `/privacy` (opening in a new
+  tab) until the marketing site publishes the real pages. Continue
   runs `acceptSignupTermsAction`: Vercel BotID at its free Basic level, then the
   `SIGNUP_TERMS_COOKIE_NAME` cookie set to `TERMS_VERSION` for two days, then
   `/sign-in` with a `callbackUrl` of `/`. A bot, or a failed check, gets a
   neutral "try again later" and no cookie; a failed check is logged. A
   signed-in visitor is sent to `/`. `/sign-in` links to it ("New here?").
+- `/terms` and `/privacy`: public interim pages in the dead-end frame (mark
+  above the card), each saying the final text is being written, with a "Back
+  to sign-up" link. The onboarding review step links to them too. When the
+  marketing site serves the real pages, these routes redirect there.
 - Sign-out (account menu, or the button on pre-shell pages) runs
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
@@ -254,6 +259,7 @@ Free site.
 - `apps/platform/src/server/auth/resolve-home-href.ts`
 - `apps/platform/src/app/[locale]/sign-in/page.tsx`
 - `apps/platform/src/app/[locale]/signup/page.tsx`
+- `apps/platform/src/app/[locale]/terms/page.tsx` and `privacy/page.tsx`
 - `apps/platform/src/server/auth/accept-signup-terms-action.ts`
 - `apps/platform/src/app/[locale]/onboarding/page.tsx`
 - `apps/platform/src/server/onboarding/create-site-action.ts`
@@ -272,6 +278,7 @@ Free site.
   `sign-out-action.test.ts`, `send-sign-in-link-action.test.ts`,
   `sign-in-with-provider-action.test.ts`, `sign-in/page.test.tsx`,
   `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
+  `terms/page.test.tsx`, `privacy/page.test.tsx`,
   `accept-signup-terms-action.test.ts`, `legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
