@@ -5,6 +5,7 @@ import {
   isOutcomeRefused,
   isOutcomeServerError,
   isOutcomeSuccess,
+  type TMaybeNull,
   type TMaybeUndefined,
 } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
@@ -14,8 +15,11 @@ import {
   type TPolledValueOptions,
 } from '@platform/components/features/tenants/live-domain-card';
 import {
+  CUSTOM_DOMAIN_CONNECT_REJECTIONS,
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_REFUSAL,
+  CUSTOM_DOMAIN_VERIFY_POLL,
+  type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { useToast } from '@platform/context/toast-provider';
 import {
@@ -28,7 +32,7 @@ import {
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
 type TPolledVerify = TMaybeUndefined<TVerifyCustomDomainResult>;
 
@@ -38,10 +42,18 @@ const isStillWaiting = (result: TVerifyCustomDomainResult) =>
     result.reason === CUSTOM_DOMAIN_REFUSAL.RECORD_NOT_FOUND);
 
 const VERIFY_POLL_OPTIONS: TPolledValueOptions<TPolledVerify> = {
-  intervalMs: 15000,
-  maxTicks: 40,
+  ...CUSTOM_DOMAIN_VERIFY_POLL,
   isFinal: (result) => !isUndefined(result) && !isStillWaiting(result),
 };
+
+const connectRejectionOf = (
+  result: TPolledVerify | TMaybeNull<TVerifyCustomDomainResult>,
+): TMaybeUndefined<TCustomDomainRefusal> =>
+  result &&
+  isOutcomeRefused(result) &&
+  CUSTOM_DOMAIN_CONNECT_REJECTIONS.includes(result.reason)
+    ? result.reason
+    : undefined;
 
 export const useVerifyCustomDomain = (tenantId: string) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
@@ -57,6 +69,8 @@ export const useVerifyCustomDomain = (tenantId: string) => {
   );
 
   const hasSucceeded = useRef(false);
+  const [manual, setManual] =
+    useState<TMaybeNull<TVerifyCustomDomainResult>>(null);
 
   useEffect(() => {
     if (isUndefined(polled) || isStillWaiting(polled)) return;
@@ -70,6 +84,7 @@ export const useVerifyCustomDomain = (tenantId: string) => {
   const verify = () => {
     startTransition(async () => {
       const result = await verifyCustomDomainAction(tenantId);
+      setManual(result);
 
       if (isOutcomeSuccess(result)) {
         hasSucceeded.current = true;
@@ -93,12 +108,16 @@ export const useVerifyCustomDomain = (tenantId: string) => {
           `refusal.${CUSTOM_DOMAIN_REFUSAL_KEYS[result.reason]}`,
         );
         if (isStillWaiting(result)) toast.info({ message });
-        else toast.error({ message });
+        else if (!connectRejectionOf(result)) toast.error({ message });
       } else {
         toast.error({ message: t('verifyFailed') });
       }
     });
   };
 
-  return { isPending, verify };
+  return {
+    isPending,
+    verify,
+    rejection: connectRejectionOf(manual ?? polled),
+  };
 };

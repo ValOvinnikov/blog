@@ -21,4 +21,6 @@ export const CUSTOM_DOMAIN_REFUSAL_KEYS = {
   [CUSTOM_DOMAIN_REFUSAL.CLAIM_PENDING]: 'claimPending',
   [CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM]: 'noPendingClaim',
   [CUSTOM_DOMAIN_REFUSAL.RECORD_NOT_FOUND]: 'recordNotFound',
+  [CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE]: 'connectUnavailable',
+  [CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT]: 'connectConflict',
 } satisfies Record<TCustomDomainRefusal, string>;

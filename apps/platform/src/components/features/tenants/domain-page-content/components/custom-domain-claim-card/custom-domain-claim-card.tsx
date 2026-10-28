@@ -1,8 +1,7 @@
 'use client';
 
+import { CustomDomainClaimActions } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-actions/custom-domain-claim-actions';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
-import { RemoveCustomDomainControl } from '@platform/components/features/tenants/domain-page-content/components/remove-custom-domain-control/remove-custom-domain-control';
-import { VerifyCustomDomainButton } from '@platform/components/features/tenants/domain-page-content/components/verify-custom-domain-button/verify-custom-domain-button';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -28,8 +27,7 @@ export const CustomDomainClaimCard = ({
 }: TCustomDomainClaimCardProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
   const { registerHeading } = useCustomDomainFocus();
-  const { records, selectable, footerActions } =
-    customDomainClaimCardVariants();
+  const { records, selectable } = customDomainClaimCardVariants();
 
   return (
     <Card>
@@ -61,14 +59,7 @@ export const CustomDomainClaimCard = ({
       </Card.Body>
       {canManage && (
         <Card.Footer>
-          <div className={footerActions()}>
-            <RemoveCustomDomainControl
-              tenantId={tenantId}
-              domain={domain}
-              isClaim={true}
-            />
-            <VerifyCustomDomainButton tenantId={tenantId} />
-          </div>
+          <CustomDomainClaimActions tenantId={tenantId} domain={domain} />
         </Card.Footer>
       )}
     </Card>

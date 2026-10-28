@@ -3,24 +3,23 @@
 import { Button } from '@platform/components/shared/button';
 import { useTranslations } from 'next-intl';
 
-import { useVerifyCustomDomain } from './use-verify-custom-domain';
-
 export type TVerifyCustomDomainButtonProps = {
-  tenantId: string;
+  isPending: boolean;
+  onVerify: () => void;
 };
 
 export const VerifyCustomDomainButton = ({
-  tenantId,
+  isPending,
+  onVerify,
 }: TVerifyCustomDomainButtonProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
-  const { isPending, verify } = useVerifyCustomDomain(tenantId);
 
   return (
     <Button
       variant="primary"
       isPending={isPending}
       pendingLabel={t('verifying')}
-      onClick={verify}
+      onClick={onVerify}
     >
       {t('verify')}
     </Button>

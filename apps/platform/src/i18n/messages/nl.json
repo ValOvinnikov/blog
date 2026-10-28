@@ -510,7 +510,9 @@
         "notCustomDomain": "Dit domein kan niet worden verwijderd.",
         "claimPending": "Deze site heeft al een domein dat op verificatie wacht.",
         "noPendingClaim": "Er wacht geen domein op verificatie.",
-        "recordNotFound": "We zien het TXT-record nog niet. DNS-wijzigingen kunnen enkele minuten duren."
+        "recordNotFound": "We zien het TXT-record nog niet. DNS-wijzigingen kunnen enkele minuten duren.",
+        "connectUnavailable": "We hebben je domein geverifieerd, maar konden het niet koppelen omdat onze installatiedienst niet beschikbaar is. Klik opnieuw op Controleren; je DNS-record staat er nog.",
+        "connectConflict": "We hebben je domein geverifieerd, maar konden het niet koppelen omdat de site of het domein nog niet klaar is. Klik opnieuw op Controleren; je DNS-record staat er nog."
       },
       "awaitingProof": "Bewijs vereist",
       "proofInstructions": "Voeg dit TXT-record toe bij je DNS-provider om te bewijzen dat het domein van jou is. We controleren het automatisch, of klik op Controleren.",

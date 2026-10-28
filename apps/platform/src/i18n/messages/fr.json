@@ -510,7 +510,9 @@
         "notCustomDomain": "Ce domaine ne peut pas être retiré.",
         "claimPending": "Ce site a déjà un domaine en attente de vérification.",
         "noPendingClaim": "Aucun domaine n'est en attente de vérification.",
-        "recordNotFound": "Nous ne voyons pas encore l'enregistrement TXT. Les modifications DNS peuvent prendre quelques minutes."
+        "recordNotFound": "Nous ne voyons pas encore l'enregistrement TXT. Les modifications DNS peuvent prendre quelques minutes.",
+        "connectUnavailable": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car notre service de configuration est indisponible. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place.",
+        "connectConflict": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car le site ou le domaine n'est pas encore prêt. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place."
       },
       "awaitingProof": "Preuve en attente",
       "proofInstructions": "Ajoutez cet enregistrement TXT chez votre fournisseur DNS pour prouver que le domaine vous appartient. Nous le vérifions automatiquement, ou cliquez sur Vérifier.",

@@ -22,6 +22,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { enqueueCustomDomainConnectOrUndo } from '@platform/server/custom-domain/enqueue-custom-domain-connect-or-undo';
 import { lookupTxtRecords } from '@platform/server/custom-domain/lookup-txt-records';
+import { restoreClaimAfterRejection } from '@platform/server/custom-domain/restore-claim-after-rejection';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -95,8 +96,14 @@ export const verifyCustomDomainAction = async (
       return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
-    if (!(await enqueueCustomDomainConnectOrUndo(id, domain))) {
-      return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+    const attempt = await enqueueCustomDomainConnectOrUndo(id, domain);
+    if (!attempt.isAccepted) {
+      const isRestored =
+        attempt.isUndone &&
+        (await restoreClaimAfterRejection(id, domain, token));
+      return isRestored
+        ? refused(attempt.reason)
+        : toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
     await recordAuditEvent({

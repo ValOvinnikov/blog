@@ -1,6 +1,9 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { CUSTOM_DOMAIN_REFUSAL } from '@platform/constants/custom-domain';
+import {
+  CUSTOM_DOMAIN_REFUSAL,
+  CUSTOM_DOMAIN_VERIFY_POLL,
+} from '@platform/constants/custom-domain';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { connectCustomDomainAction } from '@platform/server/custom-domain/connect-custom-domain-action';
@@ -45,8 +48,6 @@ vi.mock('@platform/server/custom-domain/verify-custom-domain-action');
 
 const { ownDomain } = en.tenantDomainPage;
 const POLL_INTERVAL_MS = 10_000;
-const VERIFY_POLL_INTERVAL_MS = 15_000;
-const VERIFY_POLL_MAX_TICKS = 40;
 const CLAIM = mockCustomDomainClaim();
 const TITLE = { level: 2, name: ownDomain.title };
 
@@ -286,36 +287,24 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       expect(heading).toHaveFocus();
     });
 
-    it('refreshes the page when a poll finds the record', async () => {
-      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    it("shows the worker's reason and keeps Verify after a rejected connect", async () => {
       vi.mocked(verifyCustomDomainAction).mockResolvedValue({
-        outcome: ACTION_OUTCOME.SUCCESS,
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
       });
-      const refresh = mockRouterRefresh();
       await renderCard({ claim: CLAIM });
-      await screen.findByRole('heading', TITLE);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(VERIFY_POLL_INTERVAL_MS);
+      const verify = await screen.findByRole('button', {
+        name: ownDomain.verify,
       });
 
-      expect(refresh).toHaveBeenCalledTimes(1);
-    });
+      await user.click(verify);
 
-    it('stops polling after its limit', async () => {
-      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
-      await renderCard({ claim: CLAIM });
-      await screen.findByRole('heading', TITLE);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(
-          VERIFY_POLL_INTERVAL_MS * (VERIFY_POLL_MAX_TICKS + 5),
-        );
-      });
-
-      expect(verifyCustomDomainAction).toHaveBeenCalledTimes(
-        VERIFY_POLL_MAX_TICKS,
-      );
+      expect(
+        await screen.findByText(ownDomain.refusal.connectUnavailable),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: ownDomain.verify }),
+      ).toBeInTheDocument();
     });
 
     it('does not poll for someone who cannot manage the site', async () => {
@@ -324,7 +313,9 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       await screen.findByRole('heading', TITLE);
 
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(VERIFY_POLL_INTERVAL_MS * 3);
+        await vi.advanceTimersByTimeAsync(
+          CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3,
+        );
       });
 
       expect(verifyCustomDomainAction).not.toHaveBeenCalled();

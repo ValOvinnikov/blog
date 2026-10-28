@@ -1,13 +1,13 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import { CUSTOM_DOMAIN_REFUSAL } from '@platform/constants/custom-domain';
+import {
+  CUSTOM_DOMAIN_REFUSAL,
+  CUSTOM_DOMAIN_VERIFY_POLL,
+} from '@platform/constants/custom-domain';
 import { act, renderHookWithIntl } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { useVerifyCustomDomain } from './use-verify-custom-domain';
-
-const VERIFY_POLL_INTERVAL_MS = 15000;
-const VERIFY_POLL_MAX_TICKS = 40;
 
 const { verifyCustomDomainActionMock, requestFocusMock } = vi.hoisted(() => ({
   verifyCustomDomainActionMock: vi.fn(),
@@ -59,13 +59,13 @@ describe(useVerifyCustomDomain, () => {
     });
     renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
 
-    await advance(VERIFY_POLL_INTERVAL_MS);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs);
 
     expect(verifyCustomDomainActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(requestFocusMock).toHaveBeenCalledOnce();
     expect(refresh).toHaveBeenCalledOnce();
 
-    await advance(VERIFY_POLL_INTERVAL_MS * 3);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
     expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
   });
 
@@ -76,7 +76,7 @@ describe(useVerifyCustomDomain, () => {
     verifyCustomDomainActionMock.mockResolvedValue(result);
     renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
 
-    await advance(VERIFY_POLL_INTERVAL_MS * 3);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
 
     expect(verifyCustomDomainActionMock).toHaveBeenCalledTimes(3);
     expect(refresh).not.toHaveBeenCalled();
@@ -91,8 +91,8 @@ describe(useVerifyCustomDomain, () => {
     verifyCustomDomainActionMock.mockResolvedValue(refused(reason));
     renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
 
-    await advance(VERIFY_POLL_INTERVAL_MS);
-    await advance(VERIFY_POLL_INTERVAL_MS * 3);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
 
     expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
     expect(refresh).toHaveBeenCalledOnce();
@@ -105,10 +105,13 @@ describe(useVerifyCustomDomain, () => {
     );
     renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
 
-    await advance(VERIFY_POLL_INTERVAL_MS * (VERIFY_POLL_MAX_TICKS + 5));
+    await advance(
+      CUSTOM_DOMAIN_VERIFY_POLL.intervalMs *
+        (CUSTOM_DOMAIN_VERIFY_POLL.maxTicks + 5),
+    );
 
     expect(verifyCustomDomainActionMock).toHaveBeenCalledTimes(
-      VERIFY_POLL_MAX_TICKS,
+      CUSTOM_DOMAIN_VERIFY_POLL.maxTicks,
     );
   });
 });

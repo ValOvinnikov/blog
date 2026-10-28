@@ -23,6 +23,7 @@ export const mockCustomDomainDb = () => ({
       getCustomDomainClaim: vi.fn(),
       deleteCustomDomainClaim: vi.fn(),
       promoteCustomDomainClaim: vi.fn(),
+      restoreCustomDomainClaim: vi.fn(),
     },
   },
 });

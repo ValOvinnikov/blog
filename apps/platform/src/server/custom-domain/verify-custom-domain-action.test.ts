@@ -71,6 +71,9 @@ describe(verifyCustomDomainAction, () => {
     vi.mocked(customDomainClaims.promoteCustomDomainClaim)
       .mockReset()
       .mockResolvedValue(okResult({} as never));
+    vi.mocked(customDomainClaims.restoreCustomDomainClaim)
+      .mockReset()
+      .mockResolvedValue(okResult({} as never));
     vi.mocked(tenantDomains.removeTenantDomain)
       .mockReset()
       .mockResolvedValue(true);
@@ -214,24 +217,67 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it.each([
-    ['a rejected response', HTTP_STATUS.INTERNAL_SERVER_ERROR],
-    ['no response', null],
+    ['no response', null, CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE],
+    [
+      'a server error',
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
+    ],
+    [
+      'a conflict',
+      HTTP_STATUS.CONFLICT,
+      CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT,
+    ],
   ])(
-    'removes the promoted domain, reports a server error and records nothing on %s from the worker',
-    async (_name, status) => {
+    'removes the promoted domain, restores the claim with its token and refuses on %s from the worker',
+    async (_name, status, reason) => {
       asOwner();
       vi.mocked(enqueueWorkerRequest).mockResolvedValue(status);
 
       const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
 
-      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.REFUSED, reason });
       expect(tenantDomains.removeTenantDomain).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         MOCK_CUSTOM_DOMAIN,
       );
+      expect(customDomainClaims.restoreCustomDomainClaim).toHaveBeenCalledWith({
+        tenantId: MOCK_TENANT_ID,
+        domain: MOCK_CUSTOM_DOMAIN,
+        token: MOCK_CLAIM_TOKEN,
+      });
       expect(recordAuditEvent).not.toHaveBeenCalled();
     },
   );
+
+  it('logs and reports a server error when the claim cannot be restored', async () => {
+    asOwner();
+    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
+    vi.mocked(customDomainClaims.restoreCustomDomainClaim).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS),
+    );
+
+    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(
+      CUSTOM_DOMAIN_LOG.CLAIM_RESTORE_FAILED,
+      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
+    );
+    expect(recordAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it('reports a server error without restoring when the domain could not be removed', async () => {
+    asOwner();
+    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
+    vi.mocked(tenantDomains.removeTenantDomain).mockResolvedValue(false);
+
+    const result = await verifyCustomDomainAction(MOCK_TENANT_ID);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(customDomainClaims.restoreCustomDomainClaim).not.toHaveBeenCalled();
+    expect(recordAuditEvent).not.toHaveBeenCalled();
+  });
 
   it.each([
     ['an archived site', { deprovisionedAt: new Date() }],

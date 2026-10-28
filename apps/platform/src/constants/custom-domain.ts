@@ -21,9 +21,22 @@ export const CUSTOM_DOMAIN_REFUSAL = {
   CLAIM_PENDING: 'CLAIM_PENDING',
   NO_PENDING_CLAIM: 'NO_PENDING_CLAIM',
   RECORD_NOT_FOUND: 'RECORD_NOT_FOUND',
+  CONNECT_UNAVAILABLE: 'CONNECT_UNAVAILABLE',
+  CONNECT_CONFLICT: 'CONNECT_CONFLICT',
 } as const;
 
 export type TCustomDomainRefusal = TValueOf<typeof CUSTOM_DOMAIN_REFUSAL>;
+
+export const CUSTOM_DOMAIN_CONNECT_REJECTIONS: readonly TCustomDomainRefusal[] =
+  [
+    CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
+    CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT,
+  ];
+
+export const CUSTOM_DOMAIN_VERIFY_POLL = {
+  intervalMs: 15000,
+  maxTicks: 40,
+} as const;
 
 export const CUSTOM_DOMAIN_TXT_LABEL = '_blog-verify';
 
@@ -36,6 +49,7 @@ export const CUSTOM_DOMAIN_PATH = {
 
 export const CUSTOM_DOMAIN_LOG = {
   CONNECT_ENQUEUE_REJECTED: 'custom_domain.connect_enqueue_rejected',
+  CLAIM_RESTORE_FAILED: 'custom_domain.claim_restore_failed',
   CONNECT_FAILED: 'custom_domain.connect_failed',
   CONNECT_ROLLBACK_FAILED: 'custom_domain.connect_rollback_failed',
   VERIFY_AUDIT_FAILED: 'custom_domain.verify_audit_failed',

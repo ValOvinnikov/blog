@@ -3932,6 +3932,22 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
+    "CONNECT_UNAVAILABLE": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "CONNECT_CONFLICT": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "/api/custom-domain/connect": [
       {
         "ref": "CUSTOM_DOMAIN_PATH.CONNECT",
@@ -3951,6 +3967,14 @@
     "custom_domain.connect_enqueue_rejected": [
       {
         "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.claim_restore_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CLAIM_RESTORE_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
@@ -6406,6 +6430,14 @@
         "file": "apps/platform/src/constants/dns.ts"
       }
     ],
+    "40": [
+      {
+        "ref": "CUSTOM_DOMAIN_VERIFY_POLL.maxTicks",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "200": [
       {
         "ref": "HTTP_STATUS.OK",
@@ -6532,6 +6564,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "15000": [
+      {
+        "ref": "CUSTOM_DOMAIN_VERIFY_POLL.intervalMs",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ]
   }
