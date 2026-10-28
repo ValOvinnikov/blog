@@ -1,6 +1,6 @@
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
+import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import GlobalError from './global-error';
@@ -11,15 +11,19 @@ const MOCK_ERROR = Object.assign(new Error(faker.lorem.sentence()), {
   digest: faker.string.alphanumeric(10),
 });
 
+const MOCK_RETRY = vi.fn();
+
+const setup = customRender(GlobalError, {
+  error: MOCK_ERROR,
+  retry: MOCK_RETRY,
+});
+
 describe(`<${GlobalError.name}/>`, () => {
   let user: UserEvent;
-  const retry = vi.fn();
 
   beforeEach(() => {
     user = userEvent.setup();
-    render(<GlobalError error={MOCK_ERROR} retry={retry} />, {
-      container: document,
-    });
+    setup();
   });
 
   it('owns an English document', () => {
@@ -36,10 +40,10 @@ describe(`<${GlobalError.name}/>`, () => {
   });
 
   it('retries the render from its one action', async () => {
-    const reloadButton = screen.getByRole('button');
+    const reloadButton = screen.getByRole('button', { name: 'Reload' });
 
     await user.click(reloadButton);
 
-    expect(retry).toHaveBeenCalledOnce();
+    expect(MOCK_RETRY).toHaveBeenCalledOnce();
   });
 });

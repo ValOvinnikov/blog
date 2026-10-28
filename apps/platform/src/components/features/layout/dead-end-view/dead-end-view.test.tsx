@@ -25,20 +25,24 @@ describe(`<${DeadEndView.name}/>`, () => {
       setup();
     });
 
-    it('renders the title as the only page heading with its badge, description and action', () => {
+    it('renders the title as the only page heading', () => {
       const headings = screen.getAllByRole('heading', { level: 1 });
+
+      expect(headings).toHaveLength(1);
+      expect(headings[0]).toHaveTextContent(MOCK_TITLE);
+    });
+
+    it('shows the status badge, description and action', () => {
       const badge = screen.getByText(MOCK_BADGE_LABEL);
       const description = screen.getByText(MOCK_DESCRIPTION);
       const action = screen.getByRole('button', { name: MOCK_ACTION_LABEL });
 
-      expect(headings).toHaveLength(1);
-      expect(headings[0]).toHaveTextContent(MOCK_TITLE);
       expect(badge).toBeVisible();
       expect(description).toBeVisible();
       expect(action).toBeVisible();
     });
 
-    it('names the product in text inside the main landmark, with no image role', () => {
+    it('names the product in text, with the mark hidden', () => {
       const main = screen.getByRole('main');
       const wordmark = screen.getByText(messages.deadEndView.brandName);
       const image = screen.queryByRole('img');
