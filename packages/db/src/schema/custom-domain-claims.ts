@@ -3,7 +3,7 @@ import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
-export const CUSTOM_DOMAIN_CLAIMS_TENANT_UNIQUE_NAME =
+const CUSTOM_DOMAIN_CLAIMS_TENANT_UNIQUE_NAME =
   'custom_domain_claims_tenant_id_unique';
 
 export const customDomainClaims = pgTable('custom_domain_claims', {

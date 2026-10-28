@@ -61,7 +61,7 @@ describe(promoteCustomDomainClaim, () => {
     expect(claims).toEqual([]);
   });
 
-  it('returns DB_DUPLICATE_DOMAIN and keeps the claim when another site holds the domain', async () => {
+  it('keeps the claim and reports a duplicate when another site holds the domain', async () => {
     const claim = await insertClaim(tenantId);
     await db()
       .insert(schema.tenantDomains)
