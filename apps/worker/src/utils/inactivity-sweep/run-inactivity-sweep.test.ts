@@ -8,6 +8,7 @@ import {
 } from '@blog/db/constants';
 import { listSuperadminEmails } from '@blog/db/queries/admins';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
+import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
 import {
   listTenantsDueForInactivityStage,
   stampTenantInactivityStage,
@@ -31,6 +32,7 @@ import {
   mockTenant,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  MOCK_TENANT_ROOT_DOMAIN,
 } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { OWNER_INACTIVITY_EMAIL_COPY } from '@worker/utils/owner-email/owner-inactivity-email-copy';
@@ -53,6 +55,7 @@ const MOCK_NO_STAGE_ADVANCED = {
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/queries/admins');
 vi.mock('@blog/db/queries/memberships');
+vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
 vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
 vi.mock('@blog/email/transport/send-email');
 vi.mock('@worker/workflows/deprovision-tenant');
@@ -84,6 +87,7 @@ function sentTo(): string[] {
 }
 
 beforeEach(() => {
+  vi.mocked(listTenantHosts).mockResolvedValue([MOCK_TENANT_DOMAIN]);
   vi.mocked(listTenantsDueForInactivityStage).mockResolvedValue([]);
   vi.mocked(stampTenantInactivityStage).mockImplementation(async (id) =>
     mockTenant({ id }),
@@ -292,5 +296,58 @@ describe(runInactivitySweep, () => {
     const [lastInvalidation] =
       vi.mocked(requestTenantCacheInvalidation).mock.lastCall ?? [];
     expect(lastInvalidation?.tenantId).toBe(secondTenantId);
+  });
+
+  describe('the platform tenant', () => {
+    const platformTenantId = faker.string.uuid();
+
+    beforeEach(() => {
+      vi.mocked(listTenantHosts).mockImplementation(async ({ id }) =>
+        id === platformTenantId
+          ? [MOCK_TENANT_ROOT_DOMAIN, `www.${MOCK_TENANT_ROOT_DOMAIN}`]
+          : [MOCK_TENANT_DOMAIN],
+      );
+    });
+
+    it.each([
+      [INACTIVITY_STAGE.SUSPENSION_WARNING, 23],
+      [INACTIVITY_STAGE.SUSPENSION, 30],
+      [INACTIVITY_STAGE.DELETION_NOTICE, 50],
+      [INACTIVITY_STAGE.DEPROVISIONING, 60],
+    ])('is never advanced at %s', async (stage, days) => {
+      dueAt(stage, [inactiveFor(days, { id: platformTenantId })]);
+
+      await expect(sweep()).resolves.toEqual(MOCK_NO_STAGE_ADVANCED);
+      expect(stampTenantInactivityStage).not.toHaveBeenCalled();
+      expect(requestTenantCacheInvalidation).not.toHaveBeenCalled();
+      expect(sendEmail).not.toHaveBeenCalled();
+      expect(start).not.toHaveBeenCalled();
+    });
+
+    it('logs the skip once per sweep, however many stages list it', async () => {
+      vi.mocked(listTenantsDueForInactivityStage).mockResolvedValue([
+        inactiveFor(60, { id: platformTenantId }),
+      ]);
+
+      await sweep();
+
+      expect(logger.info).toHaveBeenCalledExactlyOnceWith(
+        INACTIVITY_SWEEP_LOG.PLATFORM_TENANT_SKIPPED,
+        { tenantId: platformTenantId },
+      );
+    });
+
+    it('still sweeps every other tenant due beside it', async () => {
+      dueAt(INACTIVITY_STAGE.DEPROVISIONING, [
+        inactiveFor(60, { id: platformTenantId }),
+        inactiveFor(60),
+      ]);
+
+      await sweep();
+
+      expect(start).toHaveBeenCalledExactlyOnceWith(deprovisionTenant, [
+        MOCK_TENANT_ID,
+      ]);
+    });
   });
 });

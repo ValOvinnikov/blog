@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TDeprovisioningStep,
 } from '@blog/db/constants';
+import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
@@ -38,6 +39,7 @@ vi.mock('./steps/purge-reader-data');
 vi.mock('./steps/invalidate-tenant-cache');
 vi.mock('./lib/report-deprovisioning-step-status');
 vi.mock('./lib/report-deprovisioning-run');
+vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
 
 faker.seed(5765);
 
@@ -240,6 +242,36 @@ describe(runSteps, () => {
 });
 
 describe(runDeprovisioning, () => {
+  const { tenantRootDomain } = MOCK_DEPROVISION_ENV;
+
+  beforeEach(() => {
+    vi.mocked(listTenantHosts).mockResolvedValue([MOCK_TENANT.primaryDomain]);
+  });
+
+  it.each([
+    ['the root domain', tenantRootDomain],
+    ['the www host of the root domain', `www.${tenantRootDomain}`],
+  ])(
+    'refuses the platform tenant holding %s before any step runs',
+    async (_, host) => {
+      vi.mocked(listTenantHosts).mockResolvedValue([
+        MOCK_TENANT.primaryDomain,
+        host,
+      ]);
+
+      await expect(
+        runDeprovisioning(MOCK_TENANT, MOCK_TENANT.name, MOCK_DEPROVISION_ENV),
+      ).rejects.toThrow(
+        `deprovision-tenant: tenant "${MOCK_TENANT.id}" ("${MOCK_TENANT.name}") holds the platform root domain "${tenantRootDomain}" — the platform tenant is never deprovisioned, aborting before any destructive action.`,
+      );
+
+      for (const [, mock] of STEP_MOCKS) {
+        expect(mock).not.toHaveBeenCalled();
+      }
+      expect(reportDeprovisioningRunStart).not.toHaveBeenCalled();
+    },
+  );
+
   it('throws before any step runs when confirm does not match the name', async () => {
     await expect(
       runDeprovisioning(MOCK_TENANT, MOCK_WRONG_CONFIRM, MOCK_DEPROVISION_ENV),
