@@ -1948,7 +1948,8 @@ than showing a false warning. Because it is read on each Studio load,
 turning a feature on clears the warning on the next load. The same warning
 covers module packs: given an optional `entitlements.modulePacks`, a module
 type outside them (`MODULE_PACK_BY_TYPE` in `@blog/config`) reads
-"(Growth plan)" in pickers, can't be created new, and warns on its documents
+"(Growth plan)" in pickers, offers no document to pick, can't be created new,
+and warns on its documents
 and on page references; the plan message wins over the capability one.
 Omitted, every pack is entitled.
 

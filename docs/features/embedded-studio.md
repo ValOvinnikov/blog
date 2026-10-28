@@ -79,7 +79,8 @@ module types whose capability is off for the tenant carry a warning.
   `module_newsletter` (NEWSLETTER) and `module_contactForm` (CONTACT_FORM)
   are mapped to a capability.
 - A module type outside the `entitlements` prop's module packs is not hidden
-  either: it reads "(Growth plan)" in the picker, can't be created new, and
+  either: it reads "(Growth plan)" in the picker, offers no document to pick, can't
+  be created new, and
   its documents and page references carry the plan warning instead
   ([plans-and-entitlements](./plans-and-entitlements.md)).
 - With a single live locale the language filter is hidden and

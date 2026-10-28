@@ -17,6 +17,7 @@ code:
   - packages/config/src/constants/module-pack.ts
   - packages/studio/src/schema-types/inputs/requirement-warning-input/**
   - packages/studio/src/schema-types/validation/validate-modules-entitled/**
+  - packages/studio/src/schema-types/filters/entitled-module.ts
 epics: [4840, 2798, 4083, 3667]
 ---
 
@@ -32,7 +33,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Platform, Features page** — `/dashboard/features` (owner) and `/tenants/{id}/features` (operator). Seven capability rows: a "Coming soon" row has no switch, and a row outside the plan is locked with a "Growth plan" badge.
 - **Platform, plan-gated pages** — `/dashboard/languages` and `/dashboard/email` answer 404 when the plan does not open them. Subscribers, Comments and Team are sidebar entries with a "Coming soon" badge and no page.
 - **Public site** — no route of its own. It gates `/account` and `/bookmarks` (404 with no reader-account capability), the header account menu, the bookmark button, the newsletter module and its server action, Vercel Analytics and Speed Insights, and the consent banner.
-- **Studio** — a module type whose capability is off is relabelled "(off in Features)" in pickers, and its documents carry a warning; `module_newsletter` and `module_contactForm` map to a capability. Given module-pack entitlements, a module type outside them is relabelled "(Growth plan)" in a page's module picker and can't be created new from the desk, the global Create menu or a reference's "Create new"; its existing documents stay listed and editable, with a banner, and a page referencing one shows a warning on that item that never blocks publishing. When a type is both off-plan and off in Features, the plan message shows.
+- **Studio** — a module type whose capability is off is relabelled "(off in Features)" in pickers, and its documents carry a warning; `module_newsletter` and `module_contactForm` map to a capability. Given module-pack entitlements, a module type outside them is relabelled "(Growth plan)" in a page's module picker, offers no existing document to pick there, and can't be created new from the desk, the global Create menu or a reference's "Create new"; its existing documents stay listed and editable, with a banner, and a page referencing one shows a warning on that item that never blocks publishing. When a type is both off-plan and off in Features, the plan message shows.
 
 ## Data
 
@@ -88,6 +89,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `packages/studio/src/schema-types/inputs/requirement-warning-input/get-missing-requirement.ts`
 - `packages/studio/src/schema-types/inputs/requirement-warning-input/entitlement-gates.ts`
 - `packages/studio/src/schema-types/validation/validate-modules-entitled/validate-modules-entitled.ts`
+- `packages/studio/src/schema-types/filters/entitled-module.ts`
 
 ## Tests and stories
 
@@ -95,7 +97,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`.
 - db: `packages/db/src/queries/settings-features/**/*.test.ts`, `get-tenant-live-locales.test.ts`, `set-tenant-additional-locales.test.ts`.
 - Config: `module-pack.test.ts`.
-- Studio: `get-missing-requirement.test.ts`, `mark-requirement-off-types.test.ts`, `entitlement-gates.test.ts`, `validate-modules-entitled.test.ts`.
+- Studio: `get-missing-requirement.test.ts`, `mark-requirement-off-types.test.ts`, `entitlement-gates.test.ts`, `validate-modules-entitled.test.ts`, `entitled-module.test.ts`.
 - No Storybook stories; the platform has none.
 
 ## Related

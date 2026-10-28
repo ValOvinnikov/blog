@@ -1,3 +1,4 @@
+import { entitledModuleFilter } from '@blog/studio/schema-types/filters/entitled-module';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import {
@@ -32,7 +33,12 @@ export const modulesField = ({
     type: 'array',
     description: description ?? 'Ordered content modules that build this page.',
     of: allow.map((type) =>
-      defineArrayMember({ name: type, type: 'reference', to: [{ type }] }),
+      defineArrayMember({
+        name: type,
+        type: 'reference',
+        to: [{ type }],
+        options: { filter: entitledModuleFilter },
+      }),
     ),
     options: { insertMenu: { groups: moduleInsertMenuGroups(allow) } },
     validation: (rule) => {
