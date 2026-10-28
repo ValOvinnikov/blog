@@ -51,7 +51,9 @@ export const OnboardingForm = ({
     previewAddress,
     railSteps,
     changeField,
+    changeSiteType,
     changePreset,
+    changeAccentHue,
     editStep,
     goNext,
     goBack,
@@ -87,6 +89,7 @@ export const OnboardingForm = ({
                     values={values}
                     fieldErrors={fieldErrors}
                     onFieldChange={changeField}
+                    onSiteTypeChange={changeSiteType}
                   />
                 )}
                 {step === ONBOARDING_STEP.ADDRESS && (
@@ -103,9 +106,7 @@ export const OnboardingForm = ({
                     preset={values.preset}
                     accentHue={values.accentHue}
                     onPresetChange={changePreset}
-                    onAccentHueChange={(accentHue) =>
-                      changeField({ accentHue })
-                    }
+                    onAccentHueChange={changeAccentHue}
                   />
                 )}
                 {step === ONBOARDING_STEP.REVIEW && (

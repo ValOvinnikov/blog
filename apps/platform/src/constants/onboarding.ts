@@ -9,6 +9,8 @@ export const SELF_SERVE_SITE_TYPES = [
   SITE_TYPE.BLANK,
 ] as const;
 
+export type TSelfServeSiteType = (typeof SELF_SERVE_SITE_TYPES)[number];
+
 export const SITE_ADDRESS_STATUS = {
   IDLE: 'IDLE',
   CHECKING: 'CHECKING',
