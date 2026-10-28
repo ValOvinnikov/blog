@@ -80,7 +80,7 @@ describe(saveVoiceOverridesAction, () => {
     expect(getSiteConfigOrDefaults).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it('round-trips the saved theme and never writes the logo or favicon columns', async () => {
+  it('keeps the saved preset and writes no other Look column', async () => {
     vi.mocked(getSiteConfigOrDefaults).mockResolvedValue(
       mockSiteConfigThemeAndAssets({
         logoAssetUrl: faker.internet.url(),
@@ -91,7 +91,7 @@ describe(saveVoiceOverridesAction, () => {
     await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
 
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-      ...MOCK_THEME_FIELDS,
+      preset: MOCK_THEME_FIELDS.preset,
       voiceOverridesByLocale: overridesByLocale,
     });
   });

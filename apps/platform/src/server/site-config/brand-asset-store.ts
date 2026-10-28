@@ -16,22 +16,15 @@ export const getBrandAssetUrl = async (
   return current[assetColumn(kind)];
 };
 
-// upsertSiteConfig requires every theme column, so the current ones are re-supplied unchanged.
 export const setBrandAssetUrl = async (
   tenantId: string,
   kind: TBrandAssetKind,
   url: string | null,
 ): Promise<void> => {
-  const { preset, accentHue, headingFont, bodyFont, radiusScale, density } =
-    await getSiteConfigOrDefaults(tenantId);
+  const { preset } = await getSiteConfigOrDefaults(tenantId);
 
   await queries.siteConfig.upsertSiteConfig(tenantId, {
     preset,
-    accentHue,
-    headingFont,
-    bodyFont,
-    radiusScale,
-    density,
     [assetColumn(kind)]: url,
   });
 };
