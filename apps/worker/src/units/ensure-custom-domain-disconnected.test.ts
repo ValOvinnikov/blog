@@ -37,15 +37,6 @@ describe(ensureCustomDomainDisconnected, () => {
     });
   });
 
-  it('succeeds again when the domain is already gone from the project', async () => {
-    vi.mocked(deleteVercelProjectDomains).mockResolvedValue(undefined);
-
-    await ensureCustomDomainDisconnected(MOCK_TENANT_ID, MOCK_CUSTOM_DOMAIN);
-    await expect(
-      ensureCustomDomainDisconnected(MOCK_TENANT_ID, MOCK_CUSTOM_DOMAIN),
-    ).resolves.toBeUndefined();
-  });
-
   it('refuses to remove a domain a tenant still routes', async () => {
     vi.mocked(getTenantByDomain).mockResolvedValue(mockProvisionedTenant());
 

@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { env } from '@worker/utils/env/env';
-import { requireValues } from '@worker/utils/provision-env/provision-env';
+import { requireValues } from '@worker/utils/require-values/require-values';
 
 export type TVercelEnv = {
   vercelToken: string;

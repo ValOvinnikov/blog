@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { getTenantById } from '@blog/db/queries/tenants';
@@ -34,7 +35,7 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/queries/tenant-domains/get-tenant-by-domain');
 
 function connectRequest(
-  body: Record<string, string> = {
+  body: Record<string, TMaybeUndefined<string>> = {
     tenantId: MOCK_TENANT_ID,
     domain: MOCK_CUSTOM_DOMAIN,
   },

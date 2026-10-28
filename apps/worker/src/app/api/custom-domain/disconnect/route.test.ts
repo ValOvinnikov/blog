@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { getTenantById } from '@blog/db/queries/tenants';
@@ -32,7 +33,7 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/queries/tenant-domains/get-tenant-by-domain');
 
 function disconnectRequest(
-  body: Record<string, string> = {
+  body: Record<string, TMaybeUndefined<string>> = {
     tenantId: MOCK_TENANT_ID,
     domain: MOCK_CUSTOM_DOMAIN,
   },
@@ -60,6 +61,18 @@ describe('POST /api/custom-domain/disconnect', () => {
       MOCK_TENANT_ID,
       MOCK_CUSTOM_DOMAIN,
     ]);
+  });
+
+  it('starts the run for an archived tenant, whose hosts may still be on the project', async () => {
+    vi.mocked(getTenantById).mockImplementation(async (_id, options) =>
+      options?.includeArchived
+        ? mockTenant({ deprovisionedAt: new Date(0) })
+        : undefined,
+    );
+
+    const response = await POST(disconnectRequest());
+
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
   });
 
   it('refuses a request signed with the wrong secret', async () => {
