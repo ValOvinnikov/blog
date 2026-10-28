@@ -334,9 +334,9 @@ this rule across.
   `rounded-admin`). `index.css` also imports `@blog/tailwind-config/theme.css`,
   but only for `site-preview/`; a site token, a hex or a raw palette colour
   anywhere else is wrong (`platform-ui-practices` → "Colour and contrast").
-- **No class strings inline in JSX** — classes live in a module-scope `tv()`.
-  Whether it sits in the `.tsx` or a `*-variants.ts` is
-  `react-component-practices` → "Styling files". Import `tv` from
+- **No class strings inline in JSX** — classes live in a `tv()` in the
+  component's sibling `*-variants.ts` (`react-component-practices` → "Styling
+  files"). Import `tv` from
   `@platform/utils/tv/tv`: its tailwind-merge config registers the admin text
   sizes, which plain `tailwind-variants` misreads as colours and drops. Pass
   `class: className` into the call; never `cn()`. Group classes by concern in
