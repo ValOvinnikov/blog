@@ -2,7 +2,10 @@ import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PROVISIONING_STEP } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
-import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_FIELD_LOCK_KIND,
+} from '@platform/constants/tenant';
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import messages from '@platform/i18n/messages/en.json';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
@@ -76,7 +79,10 @@ const MOCK_UNSAVED_NAME = faker.company.name();
 const MOCK_EDITED_NAME = faker.company.name();
 
 const DOMAIN_LOCKED: TTenantFieldLocks = {
-  primaryDomain: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
+  primaryDomain: {
+    kind: TENANT_FIELD_LOCK_KIND.STEP,
+    step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+  },
 };
 
 const DEFAULT_TENANT = mockClientTenant();
@@ -143,8 +149,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     setup();
 
     const nameInput = getNameInput();
+    const saveButton = getSaveButton();
     await replaceValue(nameInput, MOCK_RENAMED_TENANT_NAME);
-    await user.click(getSaveButton());
+    await user.click(saveButton);
     await screen.findByText(tenantDetailsPanel.alertSuccess);
     await user.type(nameInput, MOCK_EDITED_NAME);
 
@@ -169,11 +176,13 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
     setup();
 
-    await replaceValue(getDomainInput(), MOCK_OTHER_TENANT_DOMAIN);
-    await user.click(getSaveButton());
+    const domainInput = getDomainInput();
+    const saveButton = getSaveButton();
+    await replaceValue(domainInput, MOCK_OTHER_TENANT_DOMAIN);
+    await user.click(saveButton);
     await screen.findByText(tenantFieldErrors.domainTaken);
 
-    expect(getDomainInput()).toHaveAccessibleDescription(
+    expect(domainInput).toHaveAccessibleDescription(
       tenantFieldErrors.domainTaken,
     );
   });
@@ -191,8 +200,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     );
     setup();
 
-    await replaceValue(getNameInput(), MOCK_RENAMED_TENANT_NAME);
-    await user.click(getSaveButton());
+    const nameInput = getNameInput();
+    const saveButton = getSaveButton();
+    await replaceValue(nameInput, MOCK_RENAMED_TENANT_NAME);
+    await user.click(saveButton);
 
     const savingButton = await screen.findByRole('button', {
       name: SAVING_LABEL,
@@ -262,7 +273,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('leaves Save undescribed without an archived notice', () => {
       setup({ tenant: ARCHIVED_TENANT });
 
-      expect(getSaveButton()).not.toHaveAttribute('aria-describedby');
+      const saveButton = getSaveButton();
+
+      expect(saveButton).not.toHaveAttribute('aria-describedby');
     });
 
     it('describes the disabled Save with the page-level archived notice', () => {
@@ -276,7 +289,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         </>,
       );
 
-      expect(getSaveButton()).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
+      const saveButton = getSaveButton();
+
+      expect(saveButton).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
     });
   });
 
@@ -296,7 +311,8 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       );
       nameInput = getNameInput();
       await replaceValue(nameInput, MOCK_UNSAVED_NAME);
-      await user.click(screen.getByRole('link', { name: TENANTS_LABEL }));
+      const tenantsLink = screen.getByRole('link', { name: TENANTS_LABEL });
+      await user.click(tenantsLink);
     });
 
     it('asks first, then restores the saved values on Discard and leave', async () => {
@@ -310,9 +326,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         }),
       );
 
-      await user.click(
-        screen.getByRole('button', { name: leavePageDialog.discardAndLeave }),
-      );
+      const discardButton = screen.getByRole('button', {
+        name: leavePageDialog.discardAndLeave,
+      });
+      await user.click(discardButton);
 
       expect(push).toHaveBeenCalledWith(adminRoutes.tenants());
       expect(nameInput).toHaveValue(MOCK_TENANT_NAME);
@@ -323,9 +340,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
 
-      await user.click(
-        screen.getByRole('button', { name: leavePageDialog.saveAndLeave }),
-      );
+      const saveAndLeaveButton = screen.getByRole('button', {
+        name: leavePageDialog.saveAndLeave,
+      });
+      await user.click(saveAndLeaveButton);
 
       const saveFailedAlert = await screen.findByText(
         tenantDetailsPanel.errors.saveFailed,

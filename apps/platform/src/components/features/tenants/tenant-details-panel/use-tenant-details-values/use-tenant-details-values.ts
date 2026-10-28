@@ -1,17 +1,16 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import {
+  tenantDetailsValuesOf,
+  type TTenantDetailsValues,
+} from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   ALL_FIELD_KEYS,
   type TTenantFieldKey,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useState } from 'react';
-
-import {
-  tenantDetailsValuesOf,
-  type TTenantDetailsValues,
-} from './tenant-details-values';
 
 export const useTenantDetailsValues = (
   tenant: TClientTenant,
@@ -46,9 +45,9 @@ export const useTenantDetailsValues = (
     setValues(baselineValues);
   };
 
-  const changeCount = ALL_FIELD_KEYS.filter(
+  const changedFieldKeys = ALL_FIELD_KEYS.filter(
     (key) => values[key] !== baselineValues[key],
-  ).length;
+  );
 
-  return { values, updateField, revertFields, resetValues, changeCount };
+  return { values, updateField, revertFields, resetValues, changedFieldKeys };
 };

@@ -1,7 +1,10 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { tenantDetailsValuesOf } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
-import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import {
+  TENANT_FIELD_ERROR,
+  TENANT_FIELD_LOCK_KIND,
+} from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -111,9 +114,12 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     const onChange = vi.fn();
     setup({ onChange });
 
-    await user.type(getTextbox(OWNER_EMAIL_LABEL), MOCK_TYPED_CHARACTER);
-    await user.click(screen.getByRole('button', { name: DUTCH_LABEL }));
-    await user.click(screen.getByRole('button', { name: GROWTH_LABEL }));
+    const ownerEmailInput = getTextbox(OWNER_EMAIL_LABEL);
+    const dutchButton = screen.getByRole('button', { name: DUTCH_LABEL });
+    const growthButton = screen.getByRole('button', { name: GROWTH_LABEL });
+    await user.type(ownerEmailInput, MOCK_TYPED_CHARACTER);
+    await user.click(dutchButton);
+    await user.click(growthButton);
 
     expect(onChange).toHaveBeenCalledWith(
       'ownerEmail',
@@ -127,7 +133,7 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     setup({
       fieldLocks: {
         primaryDomain: {
-          kind: 'step',
+          kind: TENANT_FIELD_LOCK_KIND.STEP,
           step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
         },
       },
@@ -147,7 +153,7 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
         mockClientTenant({ plan: TENANT_PLAN.GROWTH }),
         MOCK_OWNER_EMAIL,
       ),
-      fieldLocks: { plan: { kind: 'succeeded' } },
+      fieldLocks: { plan: { kind: TENANT_FIELD_LOCK_KIND.SUCCEEDED } },
     });
 
     const planGroup = screen.getByRole('group', { name: PLAN_LABEL });

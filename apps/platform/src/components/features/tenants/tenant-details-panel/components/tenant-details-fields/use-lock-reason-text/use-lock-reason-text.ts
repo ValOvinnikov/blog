@@ -1,6 +1,7 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import type { TTenantFieldLockReason } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useTranslations } from 'next-intl';
 
@@ -15,15 +16,15 @@ export const useLockReasonText = () => {
       return undefined;
     }
     switch (reason.kind) {
-      case 'step':
+      case TENANT_FIELD_LOCK_KIND.STEP:
         return t('fieldLockedReasonStep', {
           step: tSteps(`stepLabel.${reason.step}`),
         });
-      case 'succeeded':
+      case TENANT_FIELD_LOCK_KIND.SUCCEEDED:
         return t('fieldLockedReasonSucceeded');
-      case 'archived':
+      case TENANT_FIELD_LOCK_KIND.ARCHIVED:
         return t('fieldLockedReasonArchived');
-      case 'running':
+      case TENANT_FIELD_LOCK_KIND.RUNNING:
         return t('fieldLockedReasonRunning');
       default: {
         const unhandledReason: never = reason;

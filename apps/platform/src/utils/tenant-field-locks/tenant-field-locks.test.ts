@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import {
   mockDoneProvisioningSteps,
   mockFirstStepRunningProvisioningSteps,
@@ -22,9 +23,15 @@ import {
 faker.seed(6006);
 
 const MOCK_ERROR = faker.lorem.sentence();
-const RUNNING: TTenantFieldLockReason = { kind: 'running' };
-const SUCCEEDED: TTenantFieldLockReason = { kind: 'succeeded' };
-const ARCHIVED: TTenantFieldLockReason = { kind: 'archived' };
+const RUNNING: TTenantFieldLockReason = {
+  kind: TENANT_FIELD_LOCK_KIND.RUNNING,
+};
+const SUCCEEDED: TTenantFieldLockReason = {
+  kind: TENANT_FIELD_LOCK_KIND.SUCCEEDED,
+};
+const ARCHIVED: TTenantFieldLockReason = {
+  kind: TENANT_FIELD_LOCK_KIND.ARCHIVED,
+};
 
 const everyFieldLockedBy = (reason: TTenantFieldLockReason) => ({
   name: reason,
@@ -75,7 +82,7 @@ describe(computeTenantFieldLocks, () => {
 
     expect(locks).toEqual({
       primaryDomain: {
-        kind: 'step',
+        kind: TENANT_FIELD_LOCK_KIND.STEP,
         step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
       },
     });

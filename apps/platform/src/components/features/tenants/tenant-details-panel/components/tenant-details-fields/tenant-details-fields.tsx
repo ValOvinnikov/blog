@@ -2,7 +2,7 @@
 
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { LockableSegmentedField } from '@platform/components/features/tenants/tenant-details-panel/components/lockable-segmented-field/lockable-segmented-field';
+import { LockableSegmentedField } from '@platform/components/features/tenants/tenant-details-panel/components/lockable-segmented-field';
 import type {
   TTenantDetailsFieldErrors,
   TTenantDetailsValues,

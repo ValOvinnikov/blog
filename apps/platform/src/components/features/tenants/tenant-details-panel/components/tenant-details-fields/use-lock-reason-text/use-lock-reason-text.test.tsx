@@ -1,4 +1,5 @@
 import { TENANT_PROVISIONING_STEP } from '@blog/db';
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { renderHookWithIntl } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -14,7 +15,10 @@ const LOCK_REASON_CASES: {
   text: string;
 }[] = [
   {
-    reason: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
+    reason: {
+      kind: TENANT_FIELD_LOCK_KIND.STEP,
+      step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+    },
     text: t('tenantDetailsPanel.fieldLockedReasonStep', {
       step: provisioningStatusView.stepLabel[
         TENANT_PROVISIONING_STEP.MAP_DOMAIN
@@ -22,15 +26,15 @@ const LOCK_REASON_CASES: {
     }),
   },
   {
-    reason: { kind: 'running' },
+    reason: { kind: TENANT_FIELD_LOCK_KIND.RUNNING },
     text: tenantDetailsPanel.fieldLockedReasonRunning,
   },
   {
-    reason: { kind: 'succeeded' },
+    reason: { kind: TENANT_FIELD_LOCK_KIND.SUCCEEDED },
     text: tenantDetailsPanel.fieldLockedReasonSucceeded,
   },
   {
-    reason: { kind: 'archived' },
+    reason: { kind: TENANT_FIELD_LOCK_KIND.ARCHIVED },
     text: tenantDetailsPanel.fieldLockedReasonArchived,
   },
 ];

@@ -36,7 +36,7 @@ describe(useTenantDetailsValues, () => {
       locale: DEFAULT_TENANT.locale,
       ownerEmail: MOCK_OWNER_EMAIL,
     });
-    expect(result.current.changeCount).toBe(0);
+    expect(result.current.changedFieldKeys).toEqual([]);
   });
 
   it('starts with an empty owner email when the tenant has no owner', () => {
@@ -47,17 +47,17 @@ describe(useTenantDetailsValues, () => {
     expect(result.current.values.ownerEmail).toBe('');
   });
 
-  it('counts each field that differs from the saved values', () => {
+  it('lists each field that differs from the saved values', () => {
     const { result } = renderValues();
 
     act(() => result.current.updateField('name', MOCK_RENAMED_TENANT_NAME));
     act(() => result.current.updateField('locale', LOCALE_ISO_CODES.NL));
 
-    expect(result.current.changeCount).toBe(2);
+    expect(result.current.changedFieldKeys).toEqual(['name', 'locale']);
 
     act(() => result.current.updateField('name', MOCK_TENANT_NAME));
 
-    expect(result.current.changeCount).toBe(1);
+    expect(result.current.changedFieldKeys).toEqual(['locale']);
   });
 
   it('reverts only the given fields to their saved values', () => {
@@ -78,7 +78,7 @@ describe(useTenantDetailsValues, () => {
 
     act(() => result.current.resetValues());
 
-    expect(result.current.changeCount).toBe(0);
+    expect(result.current.changedFieldKeys).toEqual([]);
   });
 
   it('takes the refreshed tenant as the new saved values', () => {
@@ -91,6 +91,6 @@ describe(useTenantDetailsValues, () => {
     });
 
     expect(result.current.values.name).toBe(MOCK_RENAMED_TENANT_NAME);
-    expect(result.current.changeCount).toBe(0);
+    expect(result.current.changedFieldKeys).toEqual([]);
   });
 });

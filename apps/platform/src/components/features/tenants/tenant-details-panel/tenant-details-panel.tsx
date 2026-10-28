@@ -2,9 +2,11 @@
 
 import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
@@ -14,7 +16,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useId, useTransition } from 'react';
 
-import { TenantDetailsFields } from './components/tenant-details-fields/tenant-details-fields';
+import { TenantDetailsFields } from './components/tenant-details-fields';
 import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 import { useLockStateChange } from './use-lock-state-change';
 import { useTenantDetailsSave } from './use-tenant-details-save';
@@ -35,7 +37,7 @@ export const TenantDetailsPanel = ({
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
   const panelId = useId();
-  const { values, updateField, revertFields, resetValues, changeCount } =
+  const { values, updateField, revertFields, resetValues, changedFieldKeys } =
     useTenantDetailsValues(tenant, owner?.email);
   const { fieldErrors, formError, save, clearErrors } = useTenantDetailsSave(
     tenant.id,
@@ -43,10 +45,10 @@ export const TenantDetailsPanel = ({
   );
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
-  const isDirty = changeCount > 0;
+  const isDirty = hasArrayGotItems(changedFieldKeys);
 
   const effectiveFieldLocks = isArchived
-    ? lockAllFields({ kind: 'archived' })
+    ? lockAllFields({ kind: TENANT_FIELD_LOCK_KIND.ARCHIVED })
     : fieldLocks;
 
   const { lockAnnouncement, fieldsContainerRef } = useLockStateChange({
@@ -72,7 +74,14 @@ export const TenantDetailsPanel = ({
   };
 
   useUnsavedChangesGuard(
-    isDirty ? { pageTitle: t('heading'), changeCount, save, discard } : null,
+    isDirty
+      ? {
+          pageTitle: t('heading'),
+          changeCount: changedFieldKeys.length,
+          save,
+          discard,
+        }
+      : null,
   );
 
   return (

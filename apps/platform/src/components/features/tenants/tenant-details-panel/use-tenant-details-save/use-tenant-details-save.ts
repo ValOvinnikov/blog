@@ -2,6 +2,10 @@
 
 import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
+import type {
+  TTenantDetailsFieldErrors,
+  TTenantDetailsValues,
+} from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
 import {
@@ -11,11 +15,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
-import type {
-  TTenantDetailsFieldErrors,
-  TTenantDetailsValues,
-} from './tenant-details-values';
 
 const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_FOUND]: 'notFound',

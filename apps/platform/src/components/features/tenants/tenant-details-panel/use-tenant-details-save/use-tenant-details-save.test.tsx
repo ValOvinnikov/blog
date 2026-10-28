@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { tenantDetailsValuesOf } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import {
@@ -13,7 +14,6 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 
-import { tenantDetailsValuesOf } from './tenant-details-values';
 import { useTenantDetailsSave } from './use-tenant-details-save';
 
 const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
@@ -107,13 +107,14 @@ describe(useTenantDetailsSave, () => {
     const { result } = renderSave();
 
     const isSaved = await saveWith(result);
+    const savedToast = await screen.findByText(alertSuccess);
 
     expect(isSaved).toBe(true);
     expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_VALUES,
     );
-    expect(await screen.findByText(alertSuccess)).toBeVisible();
+    expect(savedToast).toBeVisible();
     expect(refreshMock).toHaveBeenCalled();
   });
 
@@ -125,11 +126,12 @@ describe(useTenantDetailsSave, () => {
     const { result } = renderSave();
 
     const isSaved = await saveWith(result);
+    const savedToast = screen.queryByText(alertSuccess);
 
     expect(isSaved).toBe(false);
     expect(result.current.fieldErrors).toEqual(DOMAIN_TAKEN_ERRORS);
     expect(result.current.formError).toBeUndefined();
-    expect(screen.queryByText(alertSuccess)).not.toBeInTheDocument();
+    expect(savedToast).not.toBeInTheDocument();
     expect(refreshMock).not.toHaveBeenCalled();
   });
 

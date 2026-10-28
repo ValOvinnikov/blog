@@ -1,3 +1,4 @@
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import { customRender, screen } from '@platform/testing/custom-render';
 import type {
   TTenantFieldKey,
@@ -15,11 +16,15 @@ const MOCK_INSIDE_INPUT_LABEL = 'inside';
 const MOCK_OUTSIDE_BUTTON_LABEL = 'outside';
 
 const NO_LOCKS: TTenantFieldLocks = {};
-const NAME_LOCKED: TTenantFieldLocks = { name: { kind: 'running' } };
-const DOMAIN_LOCKED: TTenantFieldLocks = { primaryDomain: { kind: 'running' } };
+const NAME_LOCKED: TTenantFieldLocks = {
+  name: { kind: TENANT_FIELD_LOCK_KIND.RUNNING },
+};
+const DOMAIN_LOCKED: TTenantFieldLocks = {
+  primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.RUNNING },
+};
 const BOTH_LOCKED: TTenantFieldLocks = {
-  name: { kind: 'running' },
-  primaryDomain: { kind: 'running' },
+  name: { kind: TENANT_FIELD_LOCK_KIND.RUNNING },
+  primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.RUNNING },
 };
 
 type THarnessProps = {

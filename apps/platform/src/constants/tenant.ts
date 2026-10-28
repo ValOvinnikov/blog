@@ -36,6 +36,13 @@ export const TENANT_REFUSAL = {
 
 export type TTenantRefusal = TValueOf<typeof TENANT_REFUSAL>;
 
+export const TENANT_FIELD_LOCK_KIND = {
+  STEP: 'STEP',
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
 export const TENANT_LOG = {
   CREATE_AUDIT_FAILED: 'tenants.create_audit_failed',
   CREATE_DRAFT_FAILED: 'tenants.create_draft_failed',
