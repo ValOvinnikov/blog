@@ -1,11 +1,15 @@
-import { SIZE, type TLocaleIsoCode, type TMaybeUndefined } from '@blog/config';
+import { type IBusyStyle, SIZE, type TLocaleIsoCode } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Panel } from '@blog/ui/components/molecules/panel';
+import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
 import { SampleChip } from '@platform/components/features/site-preview/sample-chip';
-import { SampleSiteHeader } from '@platform/components/features/site-preview/sample-site-header';
+import {
+  SampleSiteHeader,
+  type TSampleSiteHeaderProps,
+} from '@platform/components/features/site-preview/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -14,21 +18,21 @@ import { useTranslations } from 'next-intl';
 import { lookSampleVariants } from './look-sample-variants';
 
 export type TLookSampleProps = {
-  tenantName: string;
-  logoSrc: TMaybeUndefined<string>;
+  brand: TSampleSiteHeaderProps['brand'];
   theme: TSitePreviewTheme;
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
+  busy: IBusyStyle;
   hasReaderAccounts: boolean;
   isNarrow?: boolean;
 };
 
 export const LookSample = ({
-  tenantName,
-  logoSrc,
+  brand,
   theme,
   liveLocales,
   header,
+  busy,
   hasReaderAccounts,
   isNarrow = false,
 }: TLookSampleProps) => {
@@ -43,7 +47,7 @@ export const LookSample = ({
       testId="look-sample-tokens"
     >
       <SampleSiteHeader
-        brand={{ name: tenantName, logoSrc }}
+        brand={brand}
         liveLocales={liveLocales}
         header={header}
         hasReaderAccounts={hasReaderAccounts}
@@ -62,6 +66,7 @@ export const LookSample = ({
         <Button type="button" variant="ghost" size={SIZE.SM}>
           {t('readMoreButton')}
         </Button>
+        <SampleBusyButton busy={busy} />
         <SampleChip>{t('readTimeChip')}</SampleChip>
       </div>
       <div className={cards()}>
