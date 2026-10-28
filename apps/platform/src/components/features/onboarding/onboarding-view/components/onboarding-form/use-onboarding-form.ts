@@ -5,14 +5,15 @@ import {
   isOutcomeInvalid,
   isOutcomeRefused,
   isOutcomeServerError,
-  PRESET_ID,
   PRESET_REGISTRY,
   SITE_TYPE,
+  STARTER_PRESET_BY_SITE_TYPE,
   type TFieldErrors,
   type TLocaleIsoCode,
   type TMaybeUndefined,
   type TPresetId,
 } from '@blog/config';
+import type { TSelfServeSiteType } from '@platform/constants/onboarding';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
 import type {
   TCreateSiteFieldError,
@@ -38,16 +39,31 @@ const toFailure = (
   return undefined;
 };
 
+const toLook = (preset: TPresetId) => ({
+  preset,
+  accentHue: PRESET_REGISTRY[preset].themeTokens.accentHue,
+});
+
+const toStarterLook = (siteType: TSelfServeSiteType) =>
+  toLook(STARTER_PRESET_BY_SITE_TYPE[siteType]);
+
+const toInitialValues = (
+  siteType: TSelfServeSiteType,
+  locale: TLocaleIsoCode,
+): TCreateSiteInput => ({
+  siteType,
+  name: '',
+  slug: '',
+  locale,
+  ...toStarterLook(siteType),
+  hasAcceptedTerms: false,
+});
+
 export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
-  const [values, setValues] = useState<TCreateSiteInput>({
-    siteType: SITE_TYPE.BLOG,
-    name: '',
-    slug: '',
-    locale: initialLocale,
-    preset: PRESET_ID.CONSOLE,
-    accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
-    hasAcceptedTerms: false,
-  });
+  const [values, setValues] = useState<TCreateSiteInput>(() =>
+    toInitialValues(SITE_TYPE.BLOG, initialLocale),
+  );
+  const [hasChosenLook, setHasChosenLook] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<TOnboardingFieldErrors>({});
   const [failure, setFailure] =
     useState<TMaybeUndefined<TOnboardingFormFailure>>(undefined);
@@ -64,11 +80,20 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
     });
   };
 
-  const changePreset = (preset: TPresetId) =>
-    changeField({
-      preset,
-      accentHue: PRESET_REGISTRY[preset].themeTokens.accentHue,
-    });
+  const changeSiteType = (siteType: TSelfServeSiteType) =>
+    changeField(
+      hasChosenLook ? { siteType } : { siteType, ...toStarterLook(siteType) },
+    );
+
+  const changePreset = (preset: TPresetId) => {
+    setHasChosenLook(true);
+    changeField(toLook(preset));
+  };
+
+  const changeAccentHue = (accentHue: number) => {
+    setHasChosenLook(true);
+    changeField({ accentHue });
+  };
 
   const flagField = (
     field: keyof TCreateSiteInput,
@@ -94,7 +119,9 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
     failure,
     isPending,
     changeField,
+    changeSiteType,
     changePreset,
+    changeAccentHue,
     flagField,
     submit,
   };

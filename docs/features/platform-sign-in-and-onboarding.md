@@ -115,7 +115,12 @@ Free site.
      phone), never under the input, which only turns red on an error:
      checking, "<address> is yours", the taken / reserved / invalid error, or
      an amber "couldn't check" note.
-  3. **Look** — the preset and accent colour.
+  3. **Look** — the preset and accent colour. Each site type starts on its
+     own preset and that preset's accent (`STARTER_PRESET_BY_SITE_TYPE`:
+     Editorial for Blog, Portfolio and Personal / résumé; Console for Docs and
+     Blank), and changing the site type moves the preview with it until the
+     owner picks a preset or moves the accent here; from then on their choice
+     stays whatever the site type.
   4. **Review** — every choice with an Edit button back to its step, and the
      terms acceptance again (a magic link opened in another browser carries
      no `/signup` cookie).
