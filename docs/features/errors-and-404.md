@@ -19,8 +19,10 @@ code:
   - apps/web/src/metadata/not-found-metadata/**
   - apps/web/src/utils/resolve-not-found-messages/**
   - apps/web/src/utils/guard-page-loader-result/**
+  - apps/platform/src/app/global-error.tsx
   - apps/platform/src/app/[locale]/error.tsx
   - apps/platform/src/app/[locale]/not-found.tsx
+  - apps/platform/src/components/features/layout/dead-end-view/**
 epics: []
 ---
 
@@ -28,7 +30,7 @@ epics: []
 
 ## What it does
 
-A reader who hits a missing page sees the tenant's own 404 in its theme and language, with copy the owner can rewrite in Voice and a link home. A render failure inside a page shows a translated error panel with **Try again** and **Go home**; a failure in the site's root layout falls back to a fixed English page that owns the whole document. Every public-site error boundary reports the failure to the server log (see [client-error-capture](./client-error-capture.md)). The platform has its own plain dead-end pages, and its error page reports nothing.
+A reader who hits a missing page sees the tenant's own 404 in its theme and language, with copy the owner can rewrite in Voice and a link home. A render failure inside a page shows a translated error panel with **Try again** and **Go home**; a failure in the site's root layout falls back to a fixed English page that owns the whole document. Every public-site error boundary reports the failure to the server log (see [client-error-capture](./client-error-capture.md)). The platform has its own branded dead-end pages — the Valstack mark and wordmark above a card with a status badge — and its error page reports nothing.
 
 ## Surfaces and routes
 
@@ -38,13 +40,15 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 - `[tenant]/[locale]/error.tsx` — `LocaleErrorPage`, below `NextIntlClientProvider`.
 - `global-error.tsx` — `GlobalErrorPage`, replaces the document when the locale layout (the root layout) throws; re-imports the global stylesheet.
 - The proxy answers some requests with a bare status and no page: 404 for a tenant-shaped or undecodable first path segment, 404 for an unknown host in production, 503 when the tenant lookup fails.
-- Platform: `apps/platform/src/app/[locale]/not-found.tsx` and `error.tsx`, both `DeadEndView`.
+- Platform: `apps/platform/src/app/[locale]/not-found.tsx`, `error.tsx`, `sign-in-error/page.tsx` and `workspace-pending/page.tsx` (through `WorkspacePendingView`), all `DeadEndView`. `error.tsx` offers **Try again** and **Back to home** (`/`, which redirects to the viewer's home) and shows `Error ID: <digest>` when Next provides one.
+- Platform: `apps/platform/src/app/global-error.tsx` replaces the document when `[locale]/layout.tsx` throws; it renders the same `DeadEndView` in fixed English under its own minimal `NextIntlClientProvider`, with **Reload** calling Next's `retry`.
 
 ## Data
 
 - Voice fields (catalogue paths): `notFound.eyebrow`, `notFound.heading`, `notFound.supportingText` (rich), `localeErrorPage.title`, `localeErrorPage.description` (rich). Other strings (`returnHome`, `retry`, `goHome`, `announcement`) are fixed catalogue keys.
 - `resolveNotFoundMessages` resolves the catalogue plus the tenant's Voice overrides for boundaries that render outside the locale layout; `getNotFoundContext` supplies the tenant and the served language.
 - `GlobalErrorPage` copy is the fixed English `errorBoundaryCopy`.
+- Platform copy lives in `apps/platform/src/i18n/messages/*.json` (`deadEndView`, each page's `badge`); the platform `global-error.tsx` copy is fixed English in that file.
 - 404 metadata: title = the 404 heading, description = its supporting text, both Voice-resolved.
 
 ## Configuration
@@ -77,12 +81,13 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 - `apps/web/src/utils/guard-page-loader-result/guard-page-loader-result.ts`
 - `apps/web/src/server/request-context/request-context.ts` (`getNotFoundContext`)
 - `apps/web/src/proxy.ts`
+- `apps/platform/src/app/global-error.tsx`, `apps/platform/src/components/features/layout/dead-end-view/dead-end-view.tsx`
 
 ## Tests and stories
 
 - Web tests: `global-error.test.tsx`, `global-not-found.test.tsx`, both `not-found.test.tsx`, `error.test.tsx`, a `*.test.tsx` beside each page component above, `document-shell.test.tsx`, `build-not-found-metadata.test.ts`, `guard-page-loader-result.test.ts`, `proxy.test.ts`.
 - Stories: `not-found-page.stories.tsx`, `locale-error-page.stories.tsx`, `global-error-page.stories.tsx`.
-- Platform: no tests for its `error.tsx` or `not-found.tsx`.
+- Platform tests: `dead-end-view.test.tsx`, `workspace-pending-view.test.tsx`, `global-error.test.tsx`; none for `error.tsx` or `not-found.tsx`.
 
 ## Related
 

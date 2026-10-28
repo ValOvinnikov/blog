@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
     "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste.",
-    "tryAgain": "Réessayer"
+    "tryAgain": "Réessayer",
+    "badge": "Configuration"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -124,17 +125,25 @@
     "requestNewLink": "Obtenir un nouveau lien de connexion",
     "heading": "Nous n'avons pas pu vous connecter",
     "description": "Un problème est survenu lors de la connexion. Revenez à la page de connexion et réessayez.",
-    "backToSignIn": "Retour à la connexion"
+    "backToSignIn": "Retour à la connexion",
+    "badge": "Connexion"
   },
   "notFoundPage": {
     "heading": "Page introuvable",
     "description": "Cette page n'existe pas, ou vous n'y avez pas accès.",
-    "backLink": "Retour à l'accueil"
+    "backLink": "Retour à l'accueil",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Une erreur s'est produite",
     "description": "Cette page n'a pas pu se charger. Réessayez, et si le problème persiste, revenez dans quelques minutes.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "badge": "Erreur 500",
+    "homeLink": "Retour à l'accueil"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "ID de l’erreur : {errorId}"
   },
   "pageSkeleton": {
     "label": "Chargement de la page…"

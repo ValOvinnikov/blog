@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
     "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt.",
-    "tryAgain": "Opnieuw proberen"
+    "tryAgain": "Opnieuw proberen",
+    "badge": "Instellen"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -124,17 +125,25 @@
     "requestNewLink": "Nieuwe inloglink aanvragen",
     "heading": "We konden je niet inloggen",
     "description": "Er ging iets mis bij het inloggen. Ga terug naar inloggen en probeer het opnieuw.",
-    "backToSignIn": "Terug naar inloggen"
+    "backToSignIn": "Terug naar inloggen",
+    "badge": "Inloggen"
   },
   "notFoundPage": {
     "heading": "Pagina niet gevonden",
     "description": "Deze pagina bestaat niet, of je hebt er geen toegang toe.",
-    "backLink": "Terug naar start"
+    "backLink": "Terug naar start",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Er ging iets mis",
     "description": "Deze pagina kon niet worden geladen. Probeer het opnieuw, en kom over een paar minuten terug als het blijft gebeuren.",
-    "retry": "Opnieuw proberen"
+    "retry": "Opnieuw proberen",
+    "badge": "Fout 500",
+    "homeLink": "Terug naar start"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "Fout-ID: {errorId}"
   },
   "pageSkeleton": {
     "label": "Pagina wordt geladen…"
