@@ -18,6 +18,7 @@ export type TFormFieldProps = {
   label: string;
   hint?: ReactNode;
   error?: string;
+  isInvalid?: boolean;
   children: ReactNode;
   footer?: ReactNode;
   actions?: ReactNode;
@@ -28,6 +29,7 @@ export const FormField = ({
   label,
   hint,
   error,
+  isInvalid = false,
   children,
   footer,
   actions,
@@ -44,7 +46,7 @@ export const FormField = ({
   return (
     <Field.Root
       className={root()}
-      invalid={Boolean(error)}
+      invalid={isInvalid || Boolean(error)}
       disabled={isDisabled}
     >
       <div className={header()}>

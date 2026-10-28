@@ -7,6 +7,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { AddressStepFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields';
+import { AddressVerdict } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-verdict';
 import { OnboardingActions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-actions';
 import { OnboardingPreview } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-preview';
 import { OnboardingRail } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-rail';
@@ -45,8 +46,10 @@ export const OnboardingForm = ({
     stepIndex,
     isFirstStep,
     isLastStep,
+    isContinueDisabled,
     panelRef,
-    addressCheck,
+    addressVerdict,
+    addressErrorId,
     siteAddress,
     previewAddress,
     railSteps,
@@ -92,9 +95,8 @@ export const OnboardingForm = ({
                 {step === ONBOARDING_STEP.ADDRESS && (
                   <AddressStepFields
                     values={values}
-                    fieldErrors={fieldErrors}
                     rootDomain={rootDomain}
-                    addressCheck={addressCheck}
+                    addressErrorId={addressErrorId}
                     onFieldChange={changeField}
                   />
                 )}
@@ -121,6 +123,20 @@ export const OnboardingForm = ({
               </div>
             </Card.Body>
           </Card>
+          <div className={actions()}>
+            <OnboardingActions
+              isFirstStep={isFirstStep}
+              isLastStep={isLastStep}
+              isPending={isPending}
+              isContinueDisabled={isContinueDisabled}
+              onBack={goBack}
+              onContinue={goNext}
+            >
+              {step === ONBOARDING_STEP.ADDRESS && (
+                <AddressVerdict verdict={addressVerdict} />
+              )}
+            </OnboardingActions>
+          </div>
           <div className={preview()}>
             <OnboardingPreview
               name={values.name}
@@ -130,14 +146,6 @@ export const OnboardingForm = ({
               accentHue={values.accentHue}
             />
           </div>
-          <OnboardingActions
-            isFirstStep={isFirstStep}
-            isLastStep={isLastStep}
-            isPending={isPending}
-            onBack={goBack}
-            onContinue={goNext}
-            className={actions()}
-          />
         </Form>
       </main>
     </div>

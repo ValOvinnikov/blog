@@ -63,6 +63,11 @@ export const useOnboardingSteps = ({
   const panelRef = useRef<HTMLDivElement>(null);
   const hasNavigatedRef = useRef(false);
   const stepIndex = ONBOARDING_STEPS.indexOf(step);
+  const isAddressBlocked =
+    step === ONBOARDING_STEP.ADDRESS &&
+    (Boolean(fieldErrors.slug) ||
+      addressStatus === SITE_ADDRESS_STATUS.CHECKING ||
+      addressStatus === SITE_ADDRESS_STATUS.UNAVAILABLE);
 
   useEffect(() => {
     if (hasNavigatedRef.current) panelRef.current?.focus();
@@ -87,10 +92,7 @@ export const useOnboardingSteps = ({
     }
 
     const hasFieldError = STEP_FIELDS[step].some((field) => fieldErrors[field]);
-    const isAddressUnavailable =
-      step === ONBOARDING_STEP.ADDRESS &&
-      addressStatus === SITE_ADDRESS_STATUS.UNAVAILABLE;
-    if (hasFieldError || isAddressUnavailable) return;
+    if (hasFieldError || isAddressBlocked) return;
 
     const next = isEditingFromReview
       ? ONBOARDING_STEP.REVIEW
@@ -115,6 +117,7 @@ export const useOnboardingSteps = ({
     stepIndex,
     isFirstStep: stepIndex === 0,
     isLastStep: stepIndex === ONBOARDING_STEPS.length - 1,
+    isContinueDisabled: isAddressBlocked,
     panelRef,
     editStep,
     goNext,

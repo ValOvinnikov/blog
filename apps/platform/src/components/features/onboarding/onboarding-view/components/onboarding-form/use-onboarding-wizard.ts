@@ -4,8 +4,9 @@ import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import { useTranslations } from 'next-intl';
-import type { FormEvent } from 'react';
+import { useId, type FormEvent } from 'react';
 
+import type { TAddressVerdict } from './components/address-verdict';
 import type { TOnboardingRailStep } from './components/onboarding-rail';
 import { useOnboardingForm } from './use-onboarding-form';
 import { ONBOARDING_STEPS, useOnboardingSteps } from './use-onboarding-steps';
@@ -32,6 +33,13 @@ export const useOnboardingWizard = (
   const previewAddress = toAddress(
     values.slug || t('previewAddressPlaceholder'),
   );
+  const addressMessageId = useId();
+  const addressVerdict: TAddressVerdict = {
+    messageId: addressMessageId,
+    siteAddress,
+    status: addressCheck.status,
+    error: fieldErrors.slug?.reason ?? addressCheck.error,
+  };
 
   const summaries = {
     [ONBOARDING_STEP.SITE]: t('siteSummary', {
@@ -58,7 +66,8 @@ export const useOnboardingWizard = (
   return {
     ...form,
     ...steps,
-    addressCheck,
+    addressVerdict,
+    addressErrorId: addressVerdict.error ? addressMessageId : undefined,
     siteAddress,
     previewAddress,
     railSteps,
