@@ -18,6 +18,7 @@ import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 
+import { findProjectAclEntry } from './find-project-acl-entry';
 import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
 
 function findFormerEmails(
@@ -59,13 +60,14 @@ async function revokeFormerRoles(
   const token = env.sanityManagementToken;
   const acl = await listSanityProjectAcl({ token, projectId });
 
-  for (const { profile } of formerUsers) {
-    const entry = acl.find(({ projectUserId }) => projectUserId === profile.id);
-    for (const { name } of entry?.roles ?? []) {
+  for (const user of formerUsers) {
+    const entry = findProjectAclEntry(acl, user, projectId);
+    if (!entry) continue;
+    for (const { name } of entry.roles) {
       await revokeSanityProjectRole({
         token,
         projectId,
-        projectUserId: profile.id,
+        projectUserId: entry.projectUserId,
         roleName: name,
       });
     }
