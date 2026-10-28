@@ -1,9 +1,9 @@
 import { ICONS } from '@blog/config';
 import type { TFeatureListItem } from '@blog/service';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
-faker.seed(61044);
+const mockFaker = createMockFaker(61044);
 
 export const mockFeatureListItem = (
   overrides: Partial<TFeatureListItem> = {},
@@ -24,7 +24,7 @@ export const MOCK_FEATURE_LIST_HEADING = 'Why choose us';
 export const MOCK_FEATURE_LIST_ITEMS: TFeatureListItem[] = [
   mockFeatureListItem(),
   mockFeatureListItem({
-    id: faker.string.uuid(),
+    id: mockFaker.string.uuid(),
     headingBlock: mockHeadingBlock({ heading: 'Built for scale' }),
   }),
 ];

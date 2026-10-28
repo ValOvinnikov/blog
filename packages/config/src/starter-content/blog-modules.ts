@@ -1,16 +1,12 @@
 import type {
-  Module_cta,
   Module_heroBlog,
   Module_postLatest,
-  Module_postList,
   Module_taxonomyList,
 } from '@blog/config/sanity/generated/types';
 
 import {
   BRAND_VARIANT,
   CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
-  CTA_VARIANT,
   HERO_VARIANT,
   POST_SOURCE,
   TAXONOMY_KIND,
@@ -26,9 +22,9 @@ import {
   moduleHeadingBlock,
   reference,
 } from './starter-fields';
+import { buildCalloutCta, buildPostListModule } from './starter-modules';
 
 const LATEST_POSTS_LIMIT = 6;
-const POST_LIST_PAGE_SIZE = 12;
 
 export function buildBlogModules(
   locale: TLocaleIsoCode,
@@ -64,35 +60,19 @@ export function buildBlogModules(
       taxonomy: TAXONOMY_KIND.TOPICS,
       sortOrder: TAXONOMY_SORT.MOST_POSTS,
     } satisfies TStarterModule<Module_taxonomyList>,
-    {
-      _id: STARTER_DOCUMENT_IDS.BLOG_CTA,
-      _type: 'module_cta',
+    buildCalloutCta({
+      id: STARTER_DOCUMENT_IDS.BLOG_CTA,
       title: 'About the Author',
-      brandVariant: BRAND_VARIANT.SECONDARY,
-      bandTone: BRAND_VARIANT.PRIMARY,
-      variant: CTA_VARIANT.CALLOUT,
-      headingBlock: moduleHeadingBlock(
-        locale,
-        blog.cta.heading,
-        blog.cta.supportingText,
-      ),
-      ctaButtons: [
-        {
-          _key: STARTER_DOCUMENT_IDS.BLOG_ABOUT_LINK,
-          _type: 'ctaButton',
-          variant: CTA_ACTION_VARIANT.PRIMARY,
-          appearance: CTA_ACTION_APPEARANCE.CONTAINED,
-          link: reference(STARTER_DOCUMENT_IDS.BLOG_ABOUT_LINK),
-        },
-      ],
-    } satisfies TStarterModule<Module_cta>,
-    {
-      _id: STARTER_DOCUMENT_IDS.BLOG_POST_LIST,
-      _type: 'module_postList',
+      locale,
+      heading: blog.cta.heading,
+      supportingText: blog.cta.supportingText,
+      linkId: STARTER_DOCUMENT_IDS.BLOG_ABOUT_LINK,
+    }),
+    buildPostListModule({
+      id: STARTER_DOCUMENT_IDS.BLOG_POST_LIST,
       title: 'Blog Post List',
-      brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: moduleHeadingBlock(locale, blog.postList.heading),
-      pageSize: POST_LIST_PAGE_SIZE,
-    } satisfies TStarterModule<Module_postList>,
+      locale,
+      heading: blog.postList.heading,
+    }),
   ];
 }

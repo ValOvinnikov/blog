@@ -11,6 +11,7 @@ import {
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogDocuments } from './blog-documents';
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
+import { buildPersonalDocuments } from './personal-documents';
 import { buildPortfolioDocuments } from './portfolio-documents';
 import type { TStarterDocumentUnion } from './starter-document';
 
@@ -28,6 +29,12 @@ const BUILD_BY_SITE_TYPE = {
     }),
   [SITE_TYPE.PORTFOLIO]: ({ siteName, locale }: TStarterInput) =>
     buildPortfolioDocuments({
+      siteName,
+      locale,
+      copy: STARTER_COPY_BY_LOCALE[locale],
+    }),
+  [SITE_TYPE.PERSONAL]: ({ siteName, locale }: TStarterInput) =>
+    buildPersonalDocuments({
       siteName,
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
@@ -50,6 +57,7 @@ export const STARTER_PRESET_BY_SITE_TYPE: Record<TStarterSiteType, TPresetId> =
   {
     [SITE_TYPE.BLOG]: PRESET_ID.EDITORIAL,
     [SITE_TYPE.PORTFOLIO]: PRESET_ID.EDITORIAL,
+    [SITE_TYPE.PERSONAL]: PRESET_ID.EDITORIAL,
     [SITE_TYPE.BLANK]: PRESET_ID.CONSOLE,
   };
 

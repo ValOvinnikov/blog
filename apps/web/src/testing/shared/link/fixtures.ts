@@ -1,10 +1,10 @@
 import { routes, type ILink } from '@blog/config';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61057);
+const mockFaker = createMockFaker(61057);
 
 const [HOME_LABEL, BLOG_LABEL, ABOUT_LABEL, TOPICS_LABEL] =
-  faker.helpers.uniqueArray(faker.lorem.word, 4);
+  mockFaker.helpers.uniqueArray(mockFaker.lorem.word, 4);
 
 const mockNavLink = (label: string, href: string): ILink => ({
   label,
@@ -20,7 +20,7 @@ export const MOCK_BLOG_LINK = mockNavLink(BLOG_LABEL!, routes.blogIndex());
 
 export const MOCK_ABOUT_LINK = mockNavLink(
   ABOUT_LABEL!,
-  routes.landingPage(faker.lorem.slug()),
+  routes.landingPage(mockFaker.lorem.slug()),
 );
 
 export const MOCK_TOPICS_LINK = mockNavLink(TOPICS_LABEL!, routes.topics());

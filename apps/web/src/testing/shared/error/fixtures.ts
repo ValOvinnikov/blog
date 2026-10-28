@@ -1,9 +1,9 @@
 import { NEXT_DYNAMIC_ERROR } from '@blog/config';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61054);
+const mockFaker = createMockFaker(61054);
 
-const MOCK_ERROR_MESSAGE = faker.lorem.sentence();
+const MOCK_ERROR_MESSAGE = mockFaker.lorem.sentence();
 
 export const MOCK_ERROR = new Error(MOCK_ERROR_MESSAGE);
 
@@ -14,9 +14,9 @@ export const MOCK_DYNAMIC_SERVER_USAGE_ERROR = Object.assign(
   { digest: NEXT_DYNAMIC_ERROR.DYNAMIC_SERVER_USAGE },
 );
 
-export const MOCK_ERROR_DIGEST = faker.string.uuid();
+export const MOCK_ERROR_DIGEST = mockFaker.string.uuid();
 
 export const MOCK_ERROR_WITH_DIGEST = Object.assign(
-  new Error(faker.lorem.sentence()),
+  new Error(mockFaker.lorem.sentence()),
   { digest: MOCK_ERROR_DIGEST },
 );

@@ -33,4 +33,11 @@ export const STARTER_DOCUMENT_IDS = {
   PORTFOLIO_WORK_LIST: 'starter.portfolio.workList',
   PORTFOLIO_WORK: 'starter.portfolio.work',
   PORTFOLIO_WORK_LINK: 'starter.portfolio.workLink',
+  PERSONAL_HERO: 'starter.personal.hero',
+  PERSONAL_INTRO: 'starter.personal.intro',
+  PERSONAL_FAQ: 'starter.personal.faq',
+  PERSONAL_CTA: 'starter.personal.cta',
+  PERSONAL_AUTHOR: 'starter.personal.author',
+  PERSONAL_POST_LIST: 'starter.personal.postList',
+  PERSONAL_WRITING_LINK: 'starter.personal.writingLink',
 } as const;

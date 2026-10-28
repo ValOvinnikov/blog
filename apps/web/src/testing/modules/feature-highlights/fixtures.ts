@@ -1,9 +1,9 @@
 import type { TFeatureHighlightItem } from '@blog/service';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
-faker.seed(61047);
+const mockFaker = createMockFaker(61047);
 
 export const mockFeatureHighlightItem = (
   overrides: Partial<TFeatureHighlightItem> = {},
@@ -21,7 +21,7 @@ export const MOCK_FEATURE_HIGHLIGHTS_HEADING = 'What sets us apart';
 export const MOCK_FEATURE_HIGHLIGHT_ITEMS: TFeatureHighlightItem[] = [
   mockFeatureHighlightItem(),
   mockFeatureHighlightItem({
-    id: faker.string.uuid(),
+    id: mockFaker.string.uuid(),
     heading: 'Built to last',
   }),
 ];

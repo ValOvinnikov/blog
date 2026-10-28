@@ -2,13 +2,13 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import type { queries } from '@blog/db';
 import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import {
   MOCK_TENANT_SANITY_CONTEXT,
   mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
 
-faker.seed(61060);
+const mockFaker = createMockFaker(61060);
 
 type TTenantSanityCredentials = NonNullable<
   ReturnType<typeof queries.tenants.toTenantSanityCredentials>
@@ -18,7 +18,7 @@ type TTenantSanityWriteCredentials = NonNullable<
   ReturnType<typeof queries.tenants.toTenantSanityWriteCredentials>
 >;
 
-const MOCK_ENCRYPTED_READ_TOKEN = faker.string.alphanumeric(32);
+const MOCK_ENCRYPTED_READ_TOKEN = mockFaker.string.alphanumeric(32);
 
 export const mockServableTenant = (overrides: Partial<TTenant> = {}): TTenant =>
   mockTenant({

@@ -1,16 +1,16 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import type { queries } from '@blog/db';
-import { faker } from '@faker-js/faker';
 import type { TContactMessageSource } from '@web/server/contact-form/contact-form-actions/contact-form-actions';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_CONTACT_MESSAGE } from '@web/testing/modules/contact-form/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
-faker.seed(61061);
+const mockFaker = createMockFaker(61061);
 
-export const MOCK_LEAD_SOURCE_PATH = `/${faker.lorem.slug()}`;
+export const MOCK_LEAD_SOURCE_PATH = `/${mockFaker.lorem.slug()}`;
 
 export const MOCK_LEAD_SOURCE: TContactMessageSource = {
-  sourceDocumentId: faker.string.uuid(),
+  sourceDocumentId: mockFaker.string.uuid(),
   sourceLocale: LOCALE_ISO_CODES.NL,
 };
 
