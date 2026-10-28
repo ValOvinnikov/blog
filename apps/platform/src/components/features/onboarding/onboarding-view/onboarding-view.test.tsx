@@ -72,8 +72,10 @@ describe(`<${OnboardingView.name}/>`, () => {
   const stepHeading = (name: string) =>
     screen.getByRole('heading', { level: 1, name });
 
-  const clickContinue = () =>
-    user.click(screen.getByRole('button', MOCK_CONTINUE));
+  const clickContinue = async () => {
+    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+    await user.click(continueButton);
+  };
 
   const completeSiteStep = async () => {
     const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
@@ -100,8 +102,10 @@ describe(`<${OnboardingView.name}/>`, () => {
   };
 
   const acceptAndCreate = async () => {
-    await user.click(screen.getByRole('checkbox', MOCK_ACCEPTANCE));
-    await user.click(screen.getByRole('button', MOCK_CREATE));
+    const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+    await user.click(acceptance);
+    const createButton = screen.getByRole('button', MOCK_CREATE);
+    await user.click(createButton);
   };
 
   beforeEach(() => {
@@ -121,7 +125,8 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('starts from the accent of the preset the user picks', async () => {
     await completeSiteStep();
     await completeAddressStep();
-    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+    const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
+    await user.click(editorialPreset);
     await clickContinue();
     await acceptAndCreate();
 
@@ -133,8 +138,12 @@ describe(`<${OnboardingView.name}/>`, () => {
   });
 
   it('creates the site type the user picks', async () => {
-    await user.click(screen.getByRole('combobox', { name: 'Site type' }));
-    await user.click(await screen.findByRole('option', { name: 'Portfolio' }));
+    const siteTypeSelect = screen.getByRole('combobox', { name: 'Site type' });
+    await user.click(siteTypeSelect);
+    const portfolioOption = await screen.findByRole('option', {
+      name: 'Portfolio',
+    });
+    await user.click(portfolioOption);
     await reachReview();
     await acceptAndCreate();
 
@@ -148,14 +157,16 @@ describe(`<${OnboardingView.name}/>`, () => {
     await clickContinue();
 
     const message = screen.getByText('Enter a name for your site.');
+    const heading = stepHeading('Site');
 
     expect(message).toBeVisible();
-    expect(stepHeading('Site')).toBeVisible();
+    expect(heading).toBeVisible();
   });
 
   it('keeps the values entered when going back a step', async () => {
     await completeSiteStep();
-    await user.click(screen.getByRole('button', MOCK_BACK));
+    const backButton = screen.getByRole('button', MOCK_BACK);
+    await user.click(backButton);
 
     const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
 
@@ -179,8 +190,10 @@ describe(`<${OnboardingView.name}/>`, () => {
     await screen.findByText(MOCK_ADDRESS_TAKEN);
     await clickContinue();
 
+    const heading = stepHeading('Address');
+
     expect(addressField).toBeInvalid();
-    expect(stepHeading('Address')).toBeVisible();
+    expect(heading).toBeVisible();
   });
 
   it('lets the user continue when the address check fails', async () => {
@@ -192,7 +205,9 @@ describe(`<${OnboardingView.name}/>`, () => {
     );
     await clickContinue();
 
-    expect(stepHeading('Look')).toBeVisible();
+    const heading = stepHeading('Look');
+
+    expect(heading).toBeVisible();
   });
 
   it('lets the user continue before the address check answers', async () => {
@@ -200,7 +215,9 @@ describe(`<${OnboardingView.name}/>`, () => {
     await typeAddress();
     await clickContinue();
 
-    expect(stepHeading('Look')).toBeVisible();
+    const heading = stepHeading('Look');
+
+    expect(heading).toBeVisible();
   });
 
   it.each([
@@ -212,22 +229,32 @@ describe(`<${OnboardingView.name}/>`, () => {
 
     const steps = screen.getByRole('list', { name: 'Setup steps' });
 
-    expect(within(steps).getByText(summary)).toBeVisible();
+    const stepSummary = within(steps).getByText(summary);
+
+    expect(stepSummary).toBeVisible();
   });
 
   it('opens a step from its Edit link on review', async () => {
     await reachReview();
-    await user.click(screen.getByRole('button', { name: 'Edit Site address' }));
+    const editAddress = screen.getByRole('button', {
+      name: 'Edit Site address',
+    });
+    await user.click(editAddress);
 
-    expect(stepHeading('Address')).toBeVisible();
+    const heading = stepHeading('Address');
+
+    expect(heading).toBeVisible();
   });
 
   it('returns to review after editing a step from it', async () => {
     await reachReview();
-    await user.click(screen.getByRole('button', { name: 'Edit Site name' }));
+    const editName = screen.getByRole('button', { name: 'Edit Site name' });
+    await user.click(editName);
     await clickContinue();
 
-    expect(stepHeading('Review')).toBeVisible();
+    const heading = stepHeading('Review');
+
+    expect(heading).toBeVisible();
   });
 
   it('returns to the address step when the address was taken meanwhile', async () => {
@@ -239,9 +266,10 @@ describe(`<${OnboardingView.name}/>`, () => {
     await acceptAndCreate();
 
     const message = await screen.findByText(MOCK_ADDRESS_TAKEN);
+    const heading = stepHeading('Address');
 
     expect(message).toBeVisible();
-    expect(stepHeading('Address')).toBeVisible();
+    expect(heading).toBeVisible();
   });
 
   it('shows the neutral refusal when creation is refused', async () => {
