@@ -135,7 +135,7 @@ describe(removeCustomDomainAction, () => {
     );
   });
 
-  it('puts the domain back, records nothing and reports a server error when the worker does not accept the disconnect', async () => {
+  it('restores the domain and reports a server error when the disconnect is rejected', async () => {
     asMember();
     vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
 
