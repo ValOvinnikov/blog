@@ -8,7 +8,6 @@ export interface IAccountPlaceholderProps {
   accountControl: IAccountControl;
 }
 
-/** Holds the header's account slot at the chosen button's footprint until the session resolves. */
 export const AccountPlaceholder = ({
   accountControl,
 }: IAccountPlaceholderProps) => {

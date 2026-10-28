@@ -5,6 +5,7 @@ import {
   FORM_STATUS,
   ICONS,
   type IWithClassName,
+  type TIconName,
   type TMaybeNull,
 } from '@blog/config';
 import { SignInPanel } from '@blog/ui/components/molecules/sign-in-panel';
@@ -49,26 +50,26 @@ export const ReaderSignInPanel = ({
     panelRef.current?.querySelector<HTMLElement>(target)?.focus();
   }, [isSent, isOpen, panelRef]);
 
-  const allProviders = [
-    {
-      id: 'github',
+  const providerCopy: Record<
+    TOAuthProviderId,
+    { icon: TIconName; label: string; pendingLabel: string }
+  > = {
+    github: {
       icon: ICONS.GITHUB,
       label: t('continueWithGithub'),
       pendingLabel: t('continuingWithGithub'),
     },
-    {
-      id: 'google',
+    google: {
       icon: ICONS.GOOGLE,
       label: t('continueWithGoogle'),
       pendingLabel: t('continuingWithGoogle'),
     },
-  ] as const;
-  const providers = allProviders
-    .filter(({ id }) => oauthProviderIds.includes(id))
-    .map((provider) => ({
-      ...provider,
-      onSelect: () => selectProvider(provider.id),
-    }));
+  };
+  const providers = oauthProviderIds.map((id) => ({
+    id,
+    ...providerCopy[id],
+    onSelect: () => void selectProvider(id),
+  }));
 
   return (
     <SignInPanel

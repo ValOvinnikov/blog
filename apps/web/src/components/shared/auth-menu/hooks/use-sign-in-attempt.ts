@@ -8,7 +8,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useSignInAttempt = (isOpen: boolean) => {
   const [wasOpen, setWasOpen] = useState(isOpen);
@@ -32,9 +32,22 @@ export const useSignInAttempt = (isOpen: boolean) => {
     }
   }
 
-  const selectProvider = (providerId: TOAuthProviderId) => {
+  useEffect(() => {
+    const clearPendingOnReturn = (event: PageTransitionEvent) => {
+      if (event.persisted) setPendingProviderId(undefined);
+    };
+
+    window.addEventListener('pageshow', clearPendingOnReturn);
+    return () => window.removeEventListener('pageshow', clearPendingOnReturn);
+  }, []);
+
+  const selectProvider = async (providerId: TOAuthProviderId) => {
     setPendingProviderId(providerId);
-    void signIn(providerId);
+    try {
+      await signIn(providerId);
+    } catch {
+      setPendingProviderId(undefined);
+    }
   };
 
   const submitEmail = async () => {

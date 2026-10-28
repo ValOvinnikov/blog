@@ -25,7 +25,6 @@ export type TAccountTriggersProps = IWithClassName & {
   onToggle?: () => void;
 };
 
-/** The bar's account button: the site's chosen button from `lg`, and below it a circle, or nothing when the account sits in the phone menu. */
 export const AccountTriggers = ({
   accountControl,
   user,

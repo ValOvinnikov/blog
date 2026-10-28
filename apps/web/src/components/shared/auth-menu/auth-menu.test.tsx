@@ -9,7 +9,7 @@ import {
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
-import { customRender, screen, within } from '@web/testing/custom-render';
+import { act, customRender, screen, within } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
@@ -293,6 +293,41 @@ describe(`<${AuthMenu.name}/>`, () => {
 
       expect(signInMock).toHaveBeenCalledWith(PROVIDER.GITHUB);
       expect(pendingRow).toBeVisible();
+    });
+
+    it('lets the reader pick a provider again when its redirect fails', async () => {
+      signInMock.mockRejectedValue(new Error(OAUTH_ERROR));
+      setup();
+      const panel = await openSignInPanel();
+      const githubButton = within(panel).getByRole('button', {
+        name: GITHUB_BUTTON,
+      });
+      await user.click(githubButton);
+
+      const restoredButton = await within(panel).findByRole('button', {
+        name: GITHUB_BUTTON,
+      });
+
+      expect(restoredButton).not.toHaveAttribute('aria-busy');
+    });
+
+    it('lets the reader pick a provider again after coming back with Back', async () => {
+      signInMock.mockReturnValue(new Promise(() => {}));
+      setup();
+      const panel = await openSignInPanel();
+      const githubButton = within(panel).getByRole('button', {
+        name: GITHUB_BUTTON,
+      });
+      await user.click(githubButton);
+      act(() => {
+        window.dispatchEvent(
+          new PageTransitionEvent('pageshow', { persisted: true }),
+        );
+      });
+
+      const pendingRow = within(panel).queryByText(GITHUB_PENDING);
+
+      expect(pendingRow).not.toBeInTheDocument();
     });
 
     it('shows Sending on the button while the link is on its way', async () => {

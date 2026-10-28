@@ -17,7 +17,6 @@ export type TAccountMenuGroupProps = {
   panelStyle: TAccountPanelStyle;
 };
 
-/** The phone menu's last row when the account sits in the menu: it opens the account or sign-in panel in place, like a sub-menu. */
 export const AccountMenuGroup = ({
   oauthProviderIds,
   panelStyle,

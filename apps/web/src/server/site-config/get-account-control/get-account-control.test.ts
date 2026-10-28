@@ -7,6 +7,7 @@ import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { ACCOUNT_CONTROL_LOG } from '@web/constants/account-control';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
+import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -28,12 +29,6 @@ vi.mock(
 );
 
 const getSiteConfigMock = vi.mocked(queries.siteConfig.getSiteConfig);
-
-const DEFAULT_ACCOUNT_CONTROL = {
-  buttonStyle: ACCOUNT_BUTTON_STYLE.PILL,
-  panelStyle: ACCOUNT_PANEL_STYLE.CARD,
-  phonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
-};
 
 describe(getAccountControl, () => {
   beforeEach(() => {
@@ -60,7 +55,7 @@ describe(getAccountControl, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await expect(getAccountControl(MOCK_TENANT_ID)).resolves.toEqual(
-      DEFAULT_ACCOUNT_CONTROL,
+      MOCK_ACCOUNT_CONTROL,
     );
   });
 
@@ -71,7 +66,7 @@ describe(getAccountControl, () => {
 
     it('falls back to the pill, card and bar', async () => {
       await expect(getAccountControl(MOCK_TENANT_ID)).resolves.toEqual(
-        DEFAULT_ACCOUNT_CONTROL,
+        MOCK_ACCOUNT_CONTROL,
       );
     });
 
