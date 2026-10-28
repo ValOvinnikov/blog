@@ -1,6 +1,7 @@
 import { FORM_STATUS } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import {
+  MOCK_NEWSLETTER_BUSY_LABEL,
   MOCK_NEWSLETTER_EMAIL_LABEL,
   MOCK_NEWSLETTER_SUBMIT_LABEL,
   mockNewsletterSignupArgs,
@@ -115,7 +116,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
         name: MOCK_NEWSLETTER_EMAIL_LABEL,
       });
       const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+        name: MOCK_NEWSLETTER_BUSY_LABEL,
       });
 
       expect(emailField).toBeDisabled();
@@ -124,7 +125,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
 
     it('keeps the button focusable', async () => {
       const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+        name: MOCK_NEWSLETTER_BUSY_LABEL,
       });
 
       await user.tab();
@@ -135,13 +136,15 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     it('announces that it is subscribing', () => {
       const status = screen.getByRole('status');
 
-      expect(status).toHaveTextContent(MOCK_NEWSLETTER_SUBMIT_LABEL);
+      expect(status).toHaveTextContent(MOCK_NEWSLETTER_BUSY_LABEL);
     });
 
     it('does not subscribe a second time', async () => {
-      await user.click(
-        screen.getByRole('button', { name: MOCK_NEWSLETTER_SUBMIT_LABEL }),
-      );
+      const button = screen.getByRole('button', {
+        name: MOCK_NEWSLETTER_BUSY_LABEL,
+      });
+
+      await user.click(button);
 
       expect(onSubmit).not.toHaveBeenCalled();
     });

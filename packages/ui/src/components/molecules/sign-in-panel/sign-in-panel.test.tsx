@@ -83,26 +83,25 @@ describe(`<${SignInPanel.name}/>`, () => {
   });
 
   it('continues with the provider the reader picks', async () => {
-    await userEvent.click(
-      screen.getByRole('button', { name: MOCK_GOOGLE.label }),
-    );
+    const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
+
+    await userEvent.click(google);
 
     expect(providers[1]?.onSelect).toHaveBeenCalledOnce();
   });
 
   it('sends the link when the form is submitted', async () => {
-    await userEvent.click(
-      screen.getByRole('button', { name: MOCK_LABELS.submit }),
-    );
+    const submit = screen.getByRole('button', { name: MOCK_LABELS.submit });
+
+    await userEvent.click(submit);
 
     expect(emailForm.onSubmit).toHaveBeenCalledOnce();
   });
 
   it('passes each keystroke in the email field to onChange', async () => {
-    await userEvent.type(
-      screen.getByRole('textbox', { name: MOCK_LABELS.email }),
-      'a',
-    );
+    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+
+    await userEvent.type(email, 'a');
 
     expect(emailForm.onChange).toHaveBeenCalledWith(`${MOCK_EMAIL}a`);
   });
@@ -173,9 +172,9 @@ describe(`<${SignInPanel.name}/> while the link is sending`, () => {
   });
 
   it('does not send a second time', async () => {
-    await userEvent.click(
-      screen.getByRole('button', { name: MOCK_LABELS.sending }),
-    );
+    const submit = screen.getByRole('button', { name: MOCK_LABELS.sending });
+
+    await userEvent.click(submit);
 
     expect(emailForm.onSubmit).not.toHaveBeenCalled();
   });
@@ -208,9 +207,11 @@ describe(`<${SignInPanel.name}/> once the link is sent`, () => {
   });
 
   it('starts over with a different email', async () => {
-    await userEvent.click(
-      screen.getByRole('button', { name: MOCK_LABELS.useDifferentEmail }),
-    );
+    const reset = screen.getByRole('button', {
+      name: MOCK_LABELS.useDifferentEmail,
+    });
+
+    await userEvent.click(reset);
 
     expect(emailForm.onReset).toHaveBeenCalledOnce();
   });

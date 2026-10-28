@@ -1,18 +1,14 @@
 import { FORM_STATUS, CONTENT_ALIGNMENT, ICONS, SIZE } from '@blog/config';
-import { buttonBusyVariants } from '@blog/ui/components/atoms/button/button-variants';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { HEADING_LEVELS } from '@blog/ui/lib/react';
+import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 faker.seed(123);
-
-const BUSY_STYLES = objectKeys(buttonBusyVariants.variants.busyStyle);
-const SPINNER_VARIANTS = objectKeys(spinnerVariants.variants.variant);
 
 const trustCues = [
   {
@@ -53,6 +49,7 @@ const meta = {
     headingId: 'newsletter-signup-full-heading',
     supportingText: faker.lorem.sentences(2),
     submitLabel: faker.lorem.word(),
+    busyLabel: faker.lorem.words(2),
     emailAriaLabel: faker.lorem.words(2),
     placeholder: faker.internet.email(),
     successMessage: faker.lorem.sentence(),

@@ -1,6 +1,7 @@
 import { ALERT_TYPE, type TFormStatus, FORM_STATUS } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Button, type TButtonProps } from '@blog/ui/components/atoms/button';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import {
   newsletterSignupVariants,
@@ -16,12 +17,13 @@ type TNewsletterSignupContentProps = {
   errorMessage?: string;
   errorMessageId?: string;
   submitLabel: string;
+  busyLabel?: string;
   emailAriaLabel: string;
   placeholder?: string;
   inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
   busyStyle?: TButtonProps['busyStyle'];
-  spinnerVariant?: TButtonProps['spinnerVariant'];
+  spinnerVariant?: TSpinnerProps['variant'];
 };
 
 /** The email input, submit button, and inline error feedback shared by every density of the signup form. */
@@ -33,6 +35,7 @@ export const NewsletterSignupContent = ({
   errorMessage,
   errorMessageId,
   submitLabel,
+  busyLabel,
   emailAriaLabel,
   placeholder,
   inputPrompt,
@@ -67,7 +70,7 @@ export const NewsletterSignupContent = ({
         variant="primary"
         type="submit"
         isBusy={isSubmitting}
-        busyLabel={submitLabel}
+        busyLabel={busyLabel ?? submitLabel}
         busyStyle={busyStyle}
         spinnerVariant={spinnerVariant}
         className={s.submit()}

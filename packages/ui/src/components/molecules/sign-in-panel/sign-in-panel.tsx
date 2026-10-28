@@ -4,6 +4,7 @@ import {
   type IWithDataTestId,
 } from '@blog/config';
 import type { TButtonProps } from '@blog/ui/components/atoms/button';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { useId, type ReactNode, type Ref } from 'react';
 
 import {
@@ -40,7 +41,7 @@ export type TSignInPanelProps = IWithClassName &
     pendingProviderId?: string;
     emailForm: ISignInPanelEmailForm;
     busyStyle?: TButtonProps['busyStyle'];
-    spinnerVariant?: TButtonProps['spinnerVariant'];
+    spinnerVariant?: TSpinnerProps['variant'];
     ref?: Ref<HTMLDivElement>;
   };
 

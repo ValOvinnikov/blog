@@ -4,12 +4,10 @@ import {
   ICONS,
   TOAST_TYPE,
 } from '@blog/config';
-import { buttonBusyVariants } from '@blog/ui/components/atoms/button/button-variants';
-import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
 import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { Toast } from '@blog/ui/components/molecules/toast';
-import { objectKeys } from '@blog/utils/primitives';
+import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn } from 'storybook/test';
@@ -19,8 +17,6 @@ import { SignInPanel, type TSignInPanelProps } from './sign-in-panel';
 const PANEL_ID = 'sign-in-panel';
 const TRIGGER_LABELS = { signIn: 'Sign in', account: 'Account' };
 const READER_EMAIL = 'sam@example.com';
-const BUSY_STYLES = objectKeys(buttonBusyVariants.variants.busyStyle);
-const SPINNER_VARIANTS = objectKeys(spinnerVariants.variants.variant);
 
 const InteractiveSignInPanel = (args: TSignInPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);

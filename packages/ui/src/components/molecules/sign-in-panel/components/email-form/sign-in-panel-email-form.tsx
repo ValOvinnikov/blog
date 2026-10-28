@@ -1,6 +1,7 @@
 import { ALERT_TYPE, FORM_STATUS, SIZE, type TFormStatus } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Button, type TButtonProps } from '@blog/ui/components/atoms/button';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useId, type SubmitEvent } from 'react';
 
@@ -26,7 +27,7 @@ type TSignInPanelEmailFormProps = {
   emailForm: ISignInPanelEmailForm;
   labels: ISignInPanelEmailFormLabels;
   busyStyle?: TButtonProps['busyStyle'];
-  spinnerVariant?: TButtonProps['spinnerVariant'];
+  spinnerVariant?: TSpinnerProps['variant'];
 };
 
 /** The always-visible email field and send button of the sign-in panel, with its sending and couldn't-send feedback. */

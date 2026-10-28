@@ -1,16 +1,12 @@
 import { CONTENT_ALIGNMENT, FORM_STATUS } from '@blog/config';
-import { buttonBusyVariants } from '@blog/ui/components/atoms/button/button-variants';
-import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 faker.seed(123);
-
-const BUSY_STYLES = objectKeys(buttonBusyVariants.variants.busyStyle);
-const SPINNER_VARIANTS = objectKeys(spinnerVariants.variants.variant);
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',
@@ -38,6 +34,7 @@ const meta = {
     headingId: 'newsletter-signup-compact-heading',
     prefix: <span aria-hidden="true">$</span>,
     submitLabel: faker.lorem.word(),
+    busyLabel: faker.lorem.words(2),
     emailAriaLabel: faker.lorem.words(2),
     placeholder: faker.internet.email(),
     successMessage: faker.lorem.sentence(),

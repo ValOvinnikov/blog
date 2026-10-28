@@ -11,6 +11,7 @@ import { Alert } from '@blog/ui/components/atoms/alert';
 import type { TButtonProps } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import {
@@ -39,12 +40,13 @@ export type TNewsletterSignupFullProps = IWithClassName &
     errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
+    busyLabel?: string;
     emailAriaLabel: string;
     placeholder?: string;
     trustCues?: INewsletterSignupTrustCue[];
     align?: TNewsletterSignupVariants['align'];
     busyStyle?: TButtonProps['busyStyle'];
-    spinnerVariant?: TButtonProps['spinnerVariant'];
+    spinnerVariant?: TSpinnerProps['variant'];
   };
 
 /** A panel that sets a heading, pitch and trust cues beside the subscribe form. */
@@ -61,6 +63,7 @@ export const NewsletterSignupFull = ({
   errorMessageId,
   successMessage,
   submitLabel,
+  busyLabel,
   emailAriaLabel,
   placeholder,
   trustCues,
@@ -114,6 +117,7 @@ export const NewsletterSignupFull = ({
               errorMessage={errorMessage}
               errorMessageId={errorMessageId}
               submitLabel={submitLabel}
+              busyLabel={busyLabel}
               emailAriaLabel={emailAriaLabel}
               placeholder={placeholder}
               inputPrompt={
