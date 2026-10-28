@@ -453,6 +453,38 @@
       "PENDING": "Wartet auf DNS",
       "VERIFIED": "Verifiziert",
       "ERROR": "Prüfung fehlgeschlagen"
+    },
+    "ownDomain": {
+      "title": "Eigene Domain verwenden",
+      "supportingText": "Veröffentliche deine Website unter einer Adresse, die dir gehört. Deine aktuelle Adresse funktioniert weiter.",
+      "upgradePrompt": "Eine eigene Domain gehört zum Growth-Tarif.",
+      "archivedState": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
+      "domainLabel": "Domain",
+      "domainHint": "Eine vollständige Domain, die dir gehört, z. B. blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Domain verbinden",
+      "connecting": "Verbinden …",
+      "remove": "Entfernen",
+      "removeTitle": "Diese Domain entfernen?",
+      "removeDescription": "Unter {domain} wird deine Website nicht mehr ausgeliefert. Deine aktuelle Adresse funktioniert weiter.",
+      "removeConfirm": "Domain entfernen",
+      "removing": "Entfernen …",
+      "connectFailed": "Die Domain konnte nicht verbunden werden. Versuche es erneut.",
+      "removeFailed": "Die Domain konnte nicht entfernt werden. Versuche es erneut.",
+      "invalidInput": "Gib eine vollständige Domain ein, z. B. blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Gib eine vollständige Domain ein, z. B. blog.example.com.",
+        "domainPlatformAddress": "Diese Adresse gehört zur Plattform. Gib eine Domain ein, die dir gehört.",
+        "domainTaken": "Diese Domain wird bereits verwendet."
+      },
+      "refusal": {
+        "notFound": "Diese Website wurde nicht gefunden.",
+        "archived": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
+        "notOnPlan": "Eine eigene Domain gehört zum Growth-Tarif.",
+        "notProvisioned": "Diese Website ist noch nicht eingerichtet. Versuche es nach der Einrichtung erneut.",
+        "alreadyConnected": "Diese Website hat bereits eine eigene Domain.",
+        "notCustomDomain": "Diese Domain kann nicht entfernt werden."
+      }
     }
   },
   "presetPicker": {

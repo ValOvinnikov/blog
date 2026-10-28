@@ -13,6 +13,7 @@ const ENQUEUE_TIMEOUT_MS = 10_000;
 export const enqueueWorkerRequest = async (
   path: string,
   tenantId: string,
+  domain?: string,
 ): Promise<TMaybeNull<number>> => {
   const workerUrl = env.WORKER_ENQUEUE_URL;
   const secret = env.WORKER_ENQUEUE_SECRET;
@@ -28,7 +29,9 @@ export const enqueueWorkerRequest = async (
   }
 
   const url = new URL(path, workerUrl);
-  const rawBody = JSON.stringify({ tenantId });
+  const rawBody = JSON.stringify(
+    domain === undefined ? { tenantId } : { tenantId, domain },
+  );
 
   try {
     const response = await fetch(url, {

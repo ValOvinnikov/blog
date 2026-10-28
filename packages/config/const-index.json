@@ -3908,6 +3908,136 @@
         "file": "apps/platform/src/constants/create-site-gate.ts"
       }
     ],
+    "DOMAIN_PLATFORM_ADDRESS": [
+      {
+        "ref": "CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_PLATFORM_ADDRESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NOT_ON_PLAN": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NOT_PROVISIONED": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "ENQUEUE_ERROR.NOT_PROVISIONED",
+        "scope": "app:worker",
+        "from": "@worker/constants/enqueue-error",
+        "file": "apps/worker/src/constants/enqueue-error.ts"
+      }
+    ],
+    "ALREADY_CONNECTED": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NOT_CUSTOM_DOMAIN": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NOT_CUSTOM_DOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "/api/custom-domain/connect": [
+      {
+        "ref": "CUSTOM_DOMAIN_PATH.CONNECT",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "/api/custom-domain/disconnect": [
+      {
+        "ref": "CUSTOM_DOMAIN_PATH.DISCONNECT",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_audit_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_enqueue_rejected": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.connect_rollback_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ROLLBACK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_audit_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_enqueue_rejected": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_ENQUEUE_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/custom-domain",
+        "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
     "SIGNUP_BLOCK": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK",
@@ -5872,22 +6002,6 @@
         "file": "apps/worker/src/constants/custom-domain.ts"
       }
     ],
-    "custom_domain.connect_failed": [
-      {
-        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/custom-domain",
-        "file": "apps/worker/src/constants/custom-domain.ts"
-      }
-    ],
-    "custom_domain.disconnect_failed": [
-      {
-        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/custom-domain",
-        "file": "apps/worker/src/constants/custom-domain.ts"
-      }
-    ],
     "UNAUTHORIZED": [
       {
         "ref": "ENQUEUE_ERROR.UNAUTHORIZED",
@@ -5899,14 +6013,6 @@
     "INVALID_BODY": [
       {
         "ref": "ENQUEUE_ERROR.INVALID_BODY",
-        "scope": "app:worker",
-        "from": "@worker/constants/enqueue-error",
-        "file": "apps/worker/src/constants/enqueue-error.ts"
-      }
-    ],
-    "NOT_PROVISIONED": [
-      {
-        "ref": "ENQUEUE_ERROR.NOT_PROVISIONED",
         "scope": "app:worker",
         "from": "@worker/constants/enqueue-error",
         "file": "apps/worker/src/constants/enqueue-error.ts"

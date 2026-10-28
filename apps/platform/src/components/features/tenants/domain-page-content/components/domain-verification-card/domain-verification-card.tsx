@@ -11,7 +11,7 @@ import {
 import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
-import { use } from 'react';
+import { use, type ReactNode } from 'react';
 
 import { domainVerificationCardVariants } from './domain-verification-card-variants';
 
@@ -24,12 +24,16 @@ export type TDomainVerificationCardProps = {
   domain: string;
   isPlatformAddress: boolean;
   projectDomain: Promise<TProjectDomain>;
+  title?: string;
+  actions?: ReactNode;
 };
 
 export const DomainVerificationCard = ({
   domain,
   isPlatformAddress,
   projectDomain,
+  title,
+  actions,
 }: TDomainVerificationCardProps) => {
   const t = useTranslations('tenantDomainPage');
   const { status, dnsRecords } = use(projectDomain);
@@ -40,18 +44,23 @@ export const DomainVerificationCard = ({
   return (
     <Card>
       <Card.Header
-        title={t('cardTitle')}
+        title={title ?? t('cardTitle')}
         actions={
-          !isVerified && (
+          (!isVerified || actions) && (
             <>
-              <StatusBadge tone={domainVerificationTone(status)}>
-                {t(`dnsStatus.${status}`)}
-              </StatusBadge>
-              {wasChecked && (
-                <Text variant="meta" as="span">
-                  {t('checkedHint')}
-                </Text>
+              {!isVerified && (
+                <>
+                  <StatusBadge tone={domainVerificationTone(status)}>
+                    {t(`dnsStatus.${status}`)}
+                  </StatusBadge>
+                  {wasChecked && (
+                    <Text variant="meta" as="span">
+                      {t('checkedHint')}
+                    </Text>
+                  )}
+                </>
               )}
+              {actions}
             </>
           )
         }

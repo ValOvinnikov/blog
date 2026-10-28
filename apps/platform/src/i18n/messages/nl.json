@@ -453,6 +453,38 @@
       "PENDING": "Wacht op DNS",
       "VERIFIED": "Geverifieerd",
       "ERROR": "Controle mislukt"
+    },
+    "ownDomain": {
+      "title": "Mijn eigen domein gebruiken",
+      "supportingText": "Toon je site op een adres dat van jou is. Je huidige adres blijft werken.",
+      "upgradePrompt": "Een eigen domein hoort bij het Growth-abonnement.",
+      "archivedState": "Deze site is gearchiveerd, dus het domein kan niet worden gewijzigd.",
+      "domainLabel": "Domein",
+      "domainHint": "Een volledig domein dat van jou is, zoals blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Domein koppelen",
+      "connecting": "Koppelen…",
+      "remove": "Verwijderen",
+      "removeTitle": "Dit domein verwijderen?",
+      "removeDescription": "{domain} toont je site niet meer. Je huidige adres blijft werken.",
+      "removeConfirm": "Domein verwijderen",
+      "removing": "Verwijderen…",
+      "connectFailed": "Het domein kon niet worden gekoppeld. Probeer het opnieuw.",
+      "removeFailed": "Het domein kon niet worden verwijderd. Probeer het opnieuw.",
+      "invalidInput": "Voer een volledig domein in, zoals blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Voer een volledig domein in, zoals blog.example.com.",
+        "domainPlatformAddress": "Dit adres hoort bij het platform. Voer een domein in dat van jou is.",
+        "domainTaken": "Dit domein is al in gebruik."
+      },
+      "refusal": {
+        "notFound": "Deze site is niet gevonden.",
+        "archived": "Deze site is gearchiveerd, dus het domein kan niet worden gewijzigd.",
+        "notOnPlan": "Een eigen domein hoort bij het Growth-abonnement.",
+        "notProvisioned": "Deze site is nog niet ingericht. Probeer het opnieuw zodra de inrichting klaar is.",
+        "alreadyConnected": "Deze site heeft al een eigen domein.",
+        "notCustomDomain": "Dit domein kan niet worden verwijderd."
+      }
     }
   },
   "presetPicker": {
