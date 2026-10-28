@@ -124,6 +124,9 @@ contracts:
     so a guide that only names the skill leaves reading it optional: a
     `platform-app` run that skipped it copied its neighbours' inline
     `expect(screen.…)` queries, which the skill bans and no lint rule catches.
+    The ban covers interactions too (`user.click(screen.getByRole(…))`), and
+    `code-review-practices`' mechanical scan and blocking finding name both,
+    since the interaction half was the one shipping unflagged.
   - The same eleven, and `test-writer`, list a required **Reuse** item right
     after it: for each const, literal value, fixture, builder, fake or helper
     the diff adds, where they searched (`const-index.json`, the workspace's
