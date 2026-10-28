@@ -8,7 +8,9 @@ import {
   FORM_STATUS,
 } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
+import type { TButtonProps } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import {
   newsletterSignupVariants,
@@ -29,9 +31,12 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
+    busyLabel?: string;
     emailAriaLabel: string;
     placeholder?: string;
     align?: TNewsletterSignupVariants['align'];
+    busyStyle?: TButtonProps['busyStyle'];
+    spinnerVariant?: TSpinnerProps['variant'];
   };
 
 /** A single-row subscribe strip with an inline label in place of a heading. */
@@ -47,9 +52,12 @@ export const NewsletterSignupCompact = ({
   errorMessageId,
   successMessage,
   submitLabel,
+  busyLabel,
   emailAriaLabel,
   placeholder,
   align,
+  busyStyle,
+  spinnerVariant,
   className,
   dataTestId,
 }: TNewsletterSignupCompactProps) => {
@@ -83,6 +91,7 @@ export const NewsletterSignupCompact = ({
           errorMessage={errorMessage}
           errorMessageId={errorMessageId}
           submitLabel={submitLabel}
+          busyLabel={busyLabel}
           emailAriaLabel={emailAriaLabel}
           placeholder={placeholder}
           inputPrompt={
@@ -93,6 +102,8 @@ export const NewsletterSignupCompact = ({
             />
           }
           variant="compact"
+          busyStyle={busyStyle}
+          spinnerVariant={spinnerVariant}
         />
       )}
     </div>

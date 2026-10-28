@@ -1,7 +1,7 @@
 import { ALERT_TYPE, type TFormStatus, FORM_STATUS } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Spinner } from '@blog/ui/components/atoms/spinner';
+import { Button, type TButtonProps } from '@blog/ui/components/atoms/button';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import {
   newsletterSignupVariants,
@@ -17,10 +17,13 @@ type TNewsletterSignupContentProps = {
   errorMessage?: string;
   errorMessageId?: string;
   submitLabel: string;
+  busyLabel?: string;
   emailAriaLabel: string;
   placeholder?: string;
   inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
+  busyStyle?: TButtonProps['busyStyle'];
+  spinnerVariant?: TSpinnerProps['variant'];
 };
 
 /** The email input, submit button, and inline error feedback shared by every density of the signup form. */
@@ -32,10 +35,13 @@ export const NewsletterSignupContent = ({
   errorMessage,
   errorMessageId,
   submitLabel,
+  busyLabel,
   emailAriaLabel,
   placeholder,
   inputPrompt,
   variant,
+  busyStyle,
+  spinnerVariant,
 }: TNewsletterSignupContentProps) => {
   const isSubmitting = status === FORM_STATUS.SUBMITTING;
   const isError = status === FORM_STATUS.ERROR;
@@ -63,20 +69,13 @@ export const NewsletterSignupContent = ({
       <Button
         variant="primary"
         type="submit"
-        isDisabled={isSubmitting}
-        aria-busy={isSubmitting}
-        title={isSubmitting ? submitLabel : undefined}
+        isBusy={isSubmitting}
+        busyLabel={busyLabel ?? submitLabel}
+        busyStyle={busyStyle}
+        spinnerVariant={spinnerVariant}
         className={s.submit()}
       >
-        {isSubmitting ? (
-          <Spinner
-            label={submitLabel}
-            className={s.spinner()}
-            dataTestId="newsletter-signup-spinner"
-          />
-        ) : (
-          submitLabel
-        )}
+        {submitLabel}
       </Button>
       {isError && errorMessage && (
         <Alert

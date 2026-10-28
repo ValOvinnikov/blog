@@ -1,7 +1,7 @@
 import { ALERT_TYPE, FORM_STATUS, SIZE, type TFormStatus } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
-import { Button } from '@blog/ui/components/atoms/button';
-import { Spinner } from '@blog/ui/components/atoms/spinner';
+import { Button, type TButtonProps } from '@blog/ui/components/atoms/button';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useId, type SubmitEvent } from 'react';
 
@@ -26,12 +26,16 @@ export interface ISignInPanelEmailFormLabels {
 type TSignInPanelEmailFormProps = {
   emailForm: ISignInPanelEmailForm;
   labels: ISignInPanelEmailFormLabels;
+  busyStyle?: TButtonProps['busyStyle'];
+  spinnerVariant?: TSpinnerProps['variant'];
 };
 
 /** The always-visible email field and send button of the sign-in panel, with its sending and couldn't-send feedback. */
 export const SignInPanelEmailForm = ({
   emailForm,
   labels,
+  busyStyle,
+  spinnerVariant,
 }: TSignInPanelEmailFormProps) => {
   const { value, onChange, onSubmit, status, errorMessage } = emailForm;
   const inputId = useId();
@@ -70,25 +74,13 @@ export const SignInPanelEmailForm = ({
       <Button
         type="submit"
         size={SIZE.SM}
-        aria-busy={isSending || undefined}
+        isBusy={isSending}
+        busyLabel={labels.sending}
+        busyStyle={busyStyle}
+        spinnerVariant={spinnerVariant}
         className={s.submit()}
       >
-        <span className={s.submitLabels()}>
-          <span className={s.submitLabel()}>
-            {isSending && (
-              <Spinner
-                label={labels.sending}
-                size={SIZE.SM}
-                aria-hidden="true"
-                className={s.spinner()}
-              />
-            )}
-            {isSending ? labels.sending : labels.submit}
-          </span>
-          <span aria-hidden="true" className={s.spareLabel()}>
-            {isSending ? labels.submit : labels.sending}
-          </span>
-        </span>
+        {labels.submit}
       </Button>
     </form>
   );
