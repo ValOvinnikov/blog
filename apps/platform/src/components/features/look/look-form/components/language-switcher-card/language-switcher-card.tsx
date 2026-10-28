@@ -3,6 +3,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   type TLanguageSwitcherStyle,
 } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
@@ -31,11 +32,8 @@ export const LanguageSwitcherCard = ({
 
   const languageSwitcherLabel = t('languageSwitcherLabel');
 
-  const languageSwitcherOptions = Object.values(LANGUAGE_SWITCHER_STYLE).map(
-    (style) => ({
-      value: style,
-      label: t(`languageSwitcherOptionLabel.${style}`),
-    }),
+  const languageSwitcherOptions = toOptions(LANGUAGE_SWITCHER_STYLE, (style) =>
+    t(`languageSwitcherOptionLabel.${style}`),
   );
 
   return (
