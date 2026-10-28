@@ -6,7 +6,6 @@ import type {
 
 export type TBrand = {
   name: string;
-  tagline: TMaybeUndefined<string>;
   logo: TMaybeUndefined<ISanityImage>;
 };
 

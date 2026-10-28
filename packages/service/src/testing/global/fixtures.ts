@@ -32,7 +32,6 @@ export function mockRawSiteSettings(
   return {
     brand: {
       name: 'My Blog',
-      tagline: null,
       logo: mockRawSanityImage('Logo'),
     },
     currency: 'USD',

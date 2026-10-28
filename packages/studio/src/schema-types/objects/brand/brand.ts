@@ -1,4 +1,3 @@
-import { brandTaglineSchema } from '@blog/studio/schema-types/objects/brand-tagline/brand-tagline';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { defineField, defineType } from 'sanity';
 
@@ -6,8 +5,7 @@ export const brandSchema = defineType({
   name: 'brand',
   title: 'Brand',
   type: 'object',
-  description:
-    'The site name, logo, and optional status line shown in the header and footer.',
+  description: 'The site name and logo shown in the header and footer.',
   options: { collapsible: true, collapsed: false },
   fields: [
     defineField({
@@ -24,13 +22,6 @@ export const brandSchema = defineType({
       type: imageWithAltSchema.name,
       description:
         'Site logo. SVG or high-res PNG recommended. Falls back to the default mark when unset.',
-    }),
-    defineField({
-      name: 'tagline',
-      title: 'Tagline',
-      type: brandTaglineSchema.name,
-      description:
-        'Optional monospace line shown below the logo — system-status/build-tag style text, e.g. "build 2026.07 · online".',
     }),
   ],
 });
