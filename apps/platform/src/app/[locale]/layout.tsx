@@ -21,7 +21,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMetadata('root');
+  return {
+    ...(await pageMetadata('root')),
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function LocaleLayout({ children, params }: TProps) {

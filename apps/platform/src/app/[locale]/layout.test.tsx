@@ -9,7 +9,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
-import LocaleLayout, { generateStaticParams } from './layout';
+import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
 faker.seed(5996);
 
@@ -36,6 +36,14 @@ describe(generateStaticParams, () => {
     expect(generateStaticParams()).toEqual(
       Object.values(LOCALE_ISO_CODES).map((locale) => ({ locale })),
     );
+  });
+});
+
+describe(generateMetadata, () => {
+  it('keeps every admin-panel page out of search results', async () => {
+    const { robots } = await generateMetadata();
+
+    expect(robots).toEqual({ index: false, follow: false });
   });
 });
 
