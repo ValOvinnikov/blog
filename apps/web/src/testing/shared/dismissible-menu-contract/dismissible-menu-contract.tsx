@@ -5,6 +5,7 @@ import {
   KEY_ARROW_DOWN,
   KEY_ARROW_UP,
   KEY_END,
+  KEY_HOME,
 } from '@web/testing/shared/keyboard/constants';
 
 export const MENU_TRIGGER_NAME = 'trigger';
@@ -156,7 +157,7 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
     });
     await getUser().keyboard(KEY_END);
 
-    await getUser().keyboard('{Home}');
+    await getUser().keyboard(KEY_HOME);
 
     expect(firstItem).toHaveFocus();
   });
