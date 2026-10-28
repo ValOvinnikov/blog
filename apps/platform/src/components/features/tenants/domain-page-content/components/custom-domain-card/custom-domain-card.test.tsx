@@ -216,37 +216,39 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       await renderCard({ claim: CLAIM });
       await screen.findByRole('heading', TITLE);
 
-      expect(screen.getByText(MOCK_CUSTOM_DOMAIN)).toBeVisible();
-      expect(
-        screen.getByText(customDomainTxtName(MOCK_CUSTOM_DOMAIN)),
-      ).toBeVisible();
-      expect(screen.getByText(MOCK_CLAIM_TOKEN)).toBeVisible();
+      const domain = screen.getByText(MOCK_CUSTOM_DOMAIN);
+      const txtName = screen.getByText(customDomainTxtName(MOCK_CUSTOM_DOMAIN));
+      const token = screen.getByText(MOCK_CLAIM_TOKEN);
+
+      expect(domain).toBeVisible();
+      expect(txtName).toBeVisible();
+      expect(token).toBeVisible();
     });
 
     it('offers Verify and Remove to the owner, and no connect form', async () => {
       await renderCard({ claim: CLAIM });
       await screen.findByRole('heading', TITLE);
 
-      expect(
-        screen.getByRole('button', { name: ownDomain.verify }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('button', { name: ownDomain.remove }),
-      ).toBeVisible();
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+      const verify = screen.getByRole('button', { name: ownDomain.verify });
+      const remove = screen.getByRole('button', { name: ownDomain.remove });
+      const textbox = screen.queryByRole('textbox');
+
+      expect(verify).toBeVisible();
+      expect(remove).toBeVisible();
+      expect(textbox).not.toBeInTheDocument();
     });
 
     it('shows the claim read-only to someone who cannot manage the site', async () => {
       await renderCard({ claim: CLAIM, canManage: false });
       await screen.findByRole('heading', TITLE);
 
-      expect(screen.getByText(MOCK_CLAIM_TOKEN)).toBeVisible();
-      expect(
-        screen.queryByRole('button', { name: ownDomain.verify }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', { name: ownDomain.remove }),
-      ).not.toBeInTheDocument();
+      const token = screen.getByText(MOCK_CLAIM_TOKEN);
+      const verify = screen.queryByRole('button', { name: ownDomain.verify });
+      const remove = screen.queryByRole('button', { name: ownDomain.remove });
+
+      expect(token).toBeVisible();
+      expect(verify).not.toBeInTheDocument();
+      expect(remove).not.toBeInTheDocument();
     });
 
     it('verifies the site when the owner presses Verify', async () => {
@@ -299,12 +301,15 @@ describe(`<${CustomDomainCard.name}/>`, () => {
 
       await user.click(verify);
 
-      expect(
-        await screen.findByText(ownDomain.refusal.connectUnavailable),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: ownDomain.verify }),
-      ).toBeInTheDocument();
+      const refusal = await screen.findByText(
+        ownDomain.refusal.connectUnavailable,
+      );
+      const verifyAgain = screen.getByRole('button', {
+        name: ownDomain.verify,
+      });
+
+      expect(refusal).toBeInTheDocument();
+      expect(verifyAgain).toBeInTheDocument();
     });
 
     it('does not poll for someone who cannot manage the site', async () => {
