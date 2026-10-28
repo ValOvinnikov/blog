@@ -7,7 +7,6 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { faker } from '@faker-js/faker';
@@ -19,7 +18,6 @@ vi.mock('@blog/db/client');
 faker.seed(1);
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 const NOT_PENDING = toOutcome(SUBSCRIBER_OUTCOME.NOT_PENDING);
 const MOCK_CONFIRMATION_TOKEN = faker.string.uuid() as ReturnType<

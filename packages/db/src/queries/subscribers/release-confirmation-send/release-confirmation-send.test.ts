@@ -4,7 +4,6 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { readTestSubscriber } from '@blog/db/testing/subscribers/fixtures';
 
@@ -16,7 +15,6 @@ const MOCK_CLAIMED_AT = new Date('2026-10-15T10:00:00.000Z');
 const MOCK_NEWER_CLAIMED_AT = new Date('2026-10-15T10:20:00.000Z');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);

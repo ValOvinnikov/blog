@@ -1,4 +1,3 @@
-import { onPersonalDataFallback } from '@blog/db';
 import { registerLogSink } from '@blog/insight';
 import { REQUEST_LOG } from '@platform/constants/request';
 import { MOCK_LOKI_ENV } from '@platform/testing/env/fixtures';
@@ -19,7 +18,6 @@ vi.mock('@blog/insight', () => ({
   createLokiSink: vi.fn(() => vi.fn()),
   registerLogSink: vi.fn(),
 }));
-vi.mock('@blog/db', () => ({ onPersonalDataFallback: vi.fn() }));
 vi.mock('@platform/utils/env/env');
 
 describe(register, () => {
@@ -31,13 +29,12 @@ describe(register, () => {
     vi.unstubAllEnvs();
   });
 
-  it('ships logs and watches personal-data fallbacks in the Node.js runtime', async () => {
+  it('ships logs in the Node.js runtime', async () => {
     vi.stubEnv('NEXT_RUNTIME', 'nodejs');
 
     await register();
 
     expect(registerLogSink).toHaveBeenCalledOnce();
-    expect(onPersonalDataFallback).toHaveBeenCalledOnce();
   });
 
   it('registers nothing in the edge runtime', async () => {
@@ -46,7 +43,6 @@ describe(register, () => {
     await register();
 
     expect(registerLogSink).not.toHaveBeenCalled();
-    expect(onPersonalDataFallback).not.toHaveBeenCalled();
   });
 });
 

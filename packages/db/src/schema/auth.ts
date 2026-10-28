@@ -1,11 +1,11 @@
 import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
 import {
-  index,
   integer,
   pgTable,
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // Column names are load-bearing: `@auth/drizzle-adapter` reads them by these exact keys.
@@ -15,9 +15,10 @@ export const users = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
+    // Always null: kept only because the Drizzle adapter's users table type requires them.
     name: text('name'),
-    nameEncrypted: text('nameEncrypted'),
     email: text('email').unique(),
+    nameEncrypted: text('nameEncrypted'),
     emailEncrypted: text('emailEncrypted'),
     emailIndex: text('emailIndex'),
     emailVerified: timestamp('emailVerified', { mode: 'date' }),
@@ -25,7 +26,7 @@ export const users = pgTable(
     termsAcceptedAt: timestamp('termsAcceptedAt'),
     termsVersion: text('termsVersion'),
   },
-  (user) => [index('users_email_index_idx').on(user.emailIndex)],
+  (user) => [uniqueIndex('users_email_index_idx').on(user.emailIndex)],
 );
 
 export const accounts = pgTable(

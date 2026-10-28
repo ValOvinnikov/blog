@@ -1,6 +1,5 @@
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import type * as schema from '@blog/db/schema';
-import { subscribers } from '@blog/db/schema/subscribers';
 import { createEmptyTestDb } from '@blog/db/testing/create-test-db';
 import {
   applyMigrationFile,
@@ -16,8 +15,21 @@ faker.seed(6023);
 
 const UPPERCASE_MIGRATION = '0059_uppercase_subscriber_status.sql';
 
-function byEmail(a: { email: string }, b: { email: string }): number {
+type TReplaySubscriber = { email: string; status: string };
+
+function byEmail(a: TReplaySubscriber, b: TReplaySubscriber): number {
   return a.email < b.email ? -1 : 1;
+}
+
+async function insertSubscriber(
+  db: PgliteDatabase<typeof schema>,
+  tenantId: string,
+  email: string,
+  status = sql`default`,
+): Promise<void> {
+  await db.execute(
+    sql`insert into "subscribers" ("id", "tenant_id", "email", "status", "confirmation_token_hash", "unsubscribe_token_hash") values (${faker.string.uuid()}, ${tenantId}, ${email}, ${status}, ${faker.string.uuid()}, ${faker.string.uuid()})`,
+  );
 }
 
 describe(`${UPPERCASE_MIGRATION} (subscriber statuses stored uppercase)`, () => {
@@ -36,18 +48,15 @@ describe(`${UPPERCASE_MIGRATION} (subscriber statuses stored uppercase)`, () => 
         email: faker.internet.email(),
         status,
       }));
-      await db
-        .insert(subscribers)
-        .values(seeds.map((seed) => ({ ...seed, tenantId: tenant.id })));
-      await db.execute(
-        sql`update "subscribers" set "status" = lower("status")`,
-      );
+      for (const { email, status } of seeds) {
+        await insertSubscriber(db, tenant.id, email, sql`lower(${status})`);
+      }
 
       await applyMigrationFile(db, UPPERCASE_MIGRATION);
 
-      const rows = await db
-        .select({ email: subscribers.email, status: subscribers.status })
-        .from(subscribers);
+      const { rows } = await db.execute<TReplaySubscriber>(
+        sql`select "email", "status" from "subscribers"`,
+      );
       expect(rows.sort(byEmail)).toEqual([...seeds].sort(byEmail));
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
@@ -59,14 +68,12 @@ describe(`${UPPERCASE_MIGRATION} (subscriber statuses stored uppercase)`, () => 
       await applyMigrationFile(db, UPPERCASE_MIGRATION);
       const tenant = await insertReplayTenant(db);
 
-      await db
-        .insert(subscribers)
-        .values({ tenantId: tenant.id, email: faker.internet.email() });
+      await insertSubscriber(db, tenant.id, faker.internet.email());
 
-      const [row] = await db
-        .select({ status: subscribers.status })
-        .from(subscribers);
-      expect(row?.status).toBe(SUBSCRIBER_STATUS.PENDING);
+      const { rows } = await db.execute<Pick<TReplaySubscriber, 'status'>>(
+        sql`select "status" from "subscribers"`,
+      );
+      expect(rows).toEqual([{ status: SUBSCRIBER_STATUS.PENDING }]);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );

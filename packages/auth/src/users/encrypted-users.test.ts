@@ -41,13 +41,7 @@ usePersonalDataKeys();
 
 const MOCK_NAME = faker.person.fullName();
 const MOCK_CHANGED_EMAIL = faker.internet.exampleEmail();
-const MOCK_PLAIN_EMAIL = faker.internet.exampleEmail();
-const MOCK_PLAIN_NAME = faker.person.fullName();
 const MOCK_PERSONAL_DATA = { email: MOCK_EMAIL, name: MOCK_NAME };
-const MOCK_PLAIN_PERSONAL_DATA = {
-  email: MOCK_PLAIN_EMAIL,
-  name: MOCK_PLAIN_NAME,
-};
 const PERSONAL_COLUMNS = ['emailEncrypted', 'emailIndex', 'nameEncrypted'];
 
 const mockSignedUpUser = (): AdapterUser => ({
@@ -56,9 +50,10 @@ const mockSignedUpUser = (): AdapterUser => ({
   emailVerified: null,
 });
 
-const mockUnbackfilledUser = (): TUser & AdapterUser => ({
+const mockStoredUser = (): TUser & AdapterUser => ({
   id: MOCK_USER_ID,
-  ...MOCK_PLAIN_PERSONAL_DATA,
+  email: null as unknown as string,
+  name: null,
   emailVerified: null,
   image: null,
   termsAcceptedAt: null,
@@ -66,10 +61,6 @@ const mockUnbackfilledUser = (): TUser & AdapterUser => ({
   emailEncrypted: null,
   nameEncrypted: null,
   emailIndex: null,
-});
-
-const mockStoredUser = (): TUser & AdapterUser => ({
-  ...mockUnbackfilledUser(),
   ...queries.users.userPersonalColumns(MOCK_PERSONAL_DATA),
 });
 
@@ -109,13 +100,13 @@ describe(withEncryptedUsers, () => {
     encryptedAdapter = withEncryptedUsers(adapter);
   });
 
-  it('writes a new user with the encrypted email, its index and the encrypted name', async () => {
+  it('writes a new user with only the encrypted email, its index and the encrypted name', async () => {
     await encryptedAdapter.createUser?.(mockSignedUpUser());
 
     const [created] = adapter.createUser.mock.calls[0] ?? [];
     const { email, name, emailIndex, emailEncrypted, nameEncrypted } =
-      created as TUser;
-    expect({ email, name }).toEqual(MOCK_PERSONAL_DATA);
+      created as Partial<TUser>;
+    expect({ email, name }).toEqual({ email: undefined, name: undefined });
     expect(emailIndex).toBe(mockAccountEmailIndex(MOCK_EMAIL));
     expect(emailEncrypted).not.toContain(MOCK_EMAIL);
     expect(nameEncrypted).not.toContain(MOCK_NAME);
@@ -135,7 +126,9 @@ describe(withEncryptedUsers, () => {
     });
 
     const [changes] = adapter.updateUser.mock.calls[0] ?? [];
-    const { emailIndex, nameEncrypted } = changes as TUser;
+    const { email, name, emailIndex, nameEncrypted } =
+      changes as Partial<TUser>;
+    expect({ email, name }).toEqual({ email: undefined, name: undefined });
     expect(emailIndex).toBe(mockAccountEmailIndex(MOCK_CHANGED_EMAIL));
     expect(nameEncrypted).toBeNull();
     expect(personalDataOf(updated)).toEqual({
@@ -191,26 +184,6 @@ describe(withEncryptedUsers, () => {
     ).resolves.toBeNull();
   });
 
-  it('signs in a user not yet backfilled, read from the plain columns', async () => {
-    findUserByEmailMock.mockResolvedValue(mockUnbackfilledUser());
-
-    const user = await encryptedAdapter.getUserByEmail?.(MOCK_PLAIN_EMAIL);
-
-    expect(personalDataOf(user)).toEqual(MOCK_PLAIN_PERSONAL_DATA);
-  });
-
-  it('keeps the session of a user not yet backfilled', async () => {
-    adapter.getSessionAndUser.mockResolvedValue({
-      session: mockSession(),
-      user: mockUnbackfilledUser(),
-    });
-
-    const found =
-      await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
-
-    expect(personalDataOf(found?.user)).toEqual(MOCK_PLAIN_PERSONAL_DATA);
-  });
-
   it.each(PERSONAL_COLUMNS)(
     'returns the user to Auth.js without %s',
     async (column) => {
@@ -223,30 +196,13 @@ describe(withEncryptedUsers, () => {
     },
   );
 
-  describe('with no personal data keys configured', () => {
-    beforeEach(() => {
-      vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', undefined);
-      vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
-    });
+  it('refuses to create a user while the personal data keys are unset', async () => {
+    vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', undefined);
+    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', undefined);
 
-    it('creates a user with only the plain email and name', async () => {
-      const created = await encryptedAdapter.createUser?.(mockSignedUpUser());
-
-      const [written] = adapter.createUser.mock.calls[0] ?? [];
-      const { emailEncrypted, emailIndex, nameEncrypted } = written as TUser;
-      expect([emailEncrypted, emailIndex, nameEncrypted]).toEqual([
-        null,
-        null,
-        null,
-      ]);
-      expect(personalDataOf(created)).toEqual(MOCK_PERSONAL_DATA);
-    });
-
-    it("reads a backfilled user's session from the plain columns", async () => {
-      const found =
-        await encryptedAdapter.getSessionAndUser?.(MOCK_SESSION_TOKEN);
-
-      expect(personalDataOf(found?.user)).toEqual(MOCK_PLAIN_PERSONAL_DATA);
-    });
+    await expect(
+      encryptedAdapter.createUser?.(mockSignedUpUser()),
+    ).rejects.toThrow();
+    expect(adapter.createUser).not.toHaveBeenCalled();
   });
 });

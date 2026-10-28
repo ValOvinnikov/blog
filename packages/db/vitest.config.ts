@@ -18,6 +18,7 @@ export default mergeConfig(
       unstubEnvs: true,
       include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
       globalSetup: ['./src/testing/global-setup.ts'],
+      setupFiles: ['./src/testing/personal-data-keys-setup.ts'],
       env: {
         // `env.ts` validates at import time; SKIP_ENV_VALIDATION lets tests
         // import client/env modules without a real Neon connection string.

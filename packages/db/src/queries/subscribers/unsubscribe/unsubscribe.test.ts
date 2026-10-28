@@ -6,7 +6,6 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { unsubscribe } from './unsubscribe';
@@ -14,7 +13,6 @@ import { unsubscribe } from './unsubscribe';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);

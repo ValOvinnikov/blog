@@ -1,10 +1,11 @@
 import { getDb } from '@blog/db/client';
+import { readLeadContent } from '@blog/db/queries/leads/lead-content';
 import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { tenants } from '@blog/db/schema/tenants';
-import { readPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { asc, eq } from 'drizzle-orm';
 
 const siteColumns = { tenantId: tenants.id, tenantName: tenants.name };
@@ -19,7 +20,6 @@ export async function findSitePersonalData(
       .select({
         ...siteColumns,
         id: subscribers.id,
-        email: subscribers.email,
         emailEncrypted: subscribers.emailEncrypted,
         status: subscribers.status,
         subscribedAt: subscribers.subscribedAt,
@@ -33,11 +33,8 @@ export async function findSitePersonalData(
       .select({
         ...siteColumns,
         id: leads.id,
-        name: leads.name,
         nameEncrypted: leads.nameEncrypted,
-        email: leads.email,
         emailEncrypted: leads.emailEncrypted,
-        message: leads.message,
         messageEncrypted: leads.messageEncrypted,
         sourcePath: leads.sourcePath,
         createdAt: leads.createdAt,
@@ -50,7 +47,6 @@ export async function findSitePersonalData(
       .select({
         ...siteColumns,
         id: membershipInvites.id,
-        email: membershipInvites.email,
         emailEncrypted: membershipInvites.emailEncrypted,
         role: membershipInvites.role,
         createdAt: membershipInvites.createdAt,
@@ -64,32 +60,22 @@ export async function findSitePersonalData(
 
   return {
     subscribers: subscriberRows.map(
-      ({ email, emailEncrypted, confirmedAt, ...subscriber }) => ({
+      ({ emailEncrypted, confirmedAt, ...subscriber }) => ({
         ...subscriber,
-        email: readPersonalValue(emailEncrypted, email),
+        email: decryptPersonalValue(emailEncrypted),
         confirmedAt: confirmedAt ?? undefined,
       }),
     ),
     leads: leadRows.map(
-      ({
-        name,
-        nameEncrypted,
-        email,
-        emailEncrypted,
-        message,
-        messageEncrypted,
-        ...lead
-      }) => ({
+      ({ nameEncrypted, emailEncrypted, messageEncrypted, ...lead }) => ({
         ...lead,
-        name: readPersonalValue(nameEncrypted, name),
-        email: readPersonalValue(emailEncrypted, email),
-        message: readPersonalValue(messageEncrypted, message),
+        ...readLeadContent({ nameEncrypted, emailEncrypted, messageEncrypted }),
       }),
     ),
     membershipInvites: inviteRows.map(
-      ({ email, emailEncrypted, consumedAt, ...invite }) => ({
+      ({ emailEncrypted, consumedAt, ...invite }) => ({
         ...invite,
-        email: readPersonalValue(emailEncrypted, email),
+        email: decryptPersonalValue(emailEncrypted),
         consumedAt: consumedAt ?? undefined,
       }),
     ),

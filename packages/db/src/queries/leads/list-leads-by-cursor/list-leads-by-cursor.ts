@@ -1,12 +1,11 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { getDb } from '@blog/db/client';
-import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
-import { leads, type TLead } from '@blog/db/schema/leads';
 import {
-  readPersonalValue,
-  reportPlainPersonalRead,
-} from '@blog/db/utils/personal-data/personal-data';
+  readLeadContent,
+  type TLeadContent,
+} from '@blog/db/queries/leads/lead-content';
+import { leads, type TLead } from '@blog/db/schema/leads';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
 export type TLeadsCursor = {
@@ -22,15 +21,13 @@ export type TListLeadsByCursorInput = {
 export type TListedLead = Pick<
   TLead,
   | 'id'
-  | 'name'
-  | 'email'
-  | 'message'
   | 'sourcePath'
   | 'sourceDocumentId'
   | 'sourceLocale'
   | 'readAt'
   | 'createdAt'
->;
+> &
+  TLeadContent;
 
 export type TListLeadsByCursorResult = {
   leads: TListedLead[];
@@ -47,11 +44,8 @@ export async function listLeadsByCursor({
     .select({
       lead: {
         id: leads.id,
-        name: leads.name,
         nameEncrypted: leads.nameEncrypted,
-        email: leads.email,
         emailEncrypted: leads.emailEncrypted,
-        message: leads.message,
         messageEncrypted: leads.messageEncrypted,
         sourcePath: leads.sourcePath,
         sourceDocumentId: leads.sourceDocumentId,
@@ -79,24 +73,11 @@ export async function listLeadsByCursor({
   return {
     leads: page.map(
       ({
-        lead: {
-          name,
-          nameEncrypted,
-          email,
-          emailEncrypted,
-          message,
-          messageEncrypted,
-          ...lead
-        },
-      }) => {
-        reportPlainPersonalRead(PERSONAL_DATA_OWNER.LEAD, emailEncrypted);
-        return {
-          ...lead,
-          name: readPersonalValue(nameEncrypted, name),
-          email: readPersonalValue(emailEncrypted, email),
-          message: readPersonalValue(messageEncrypted, message),
-        };
-      },
+        lead: { nameEncrypted, emailEncrypted, messageEncrypted, ...lead },
+      }) => ({
+        ...lead,
+        ...readLeadContent({ nameEncrypted, emailEncrypted, messageEncrypted }),
+      }),
     ),
     nextCursor:
       rows.length > LEADS_PAGE_SIZE && last

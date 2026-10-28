@@ -4,7 +4,6 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 
 import { getSubscriberByEmailIndex } from './get-subscriber-by-email-index';
@@ -12,7 +11,6 @@ import { getSubscriberByEmailIndex } from './get-subscriber-by-email-index';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.subscribers);
