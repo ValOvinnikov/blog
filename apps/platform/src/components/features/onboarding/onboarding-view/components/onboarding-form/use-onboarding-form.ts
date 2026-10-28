@@ -1,7 +1,10 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
+  type ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeRefused,
+  isOutcomeServerError,
   PRESET_ID,
   PRESET_REGISTRY,
   SITE_TYPE,
@@ -19,14 +22,19 @@ import type {
 } from '@platform/server/onboarding/create-site-input';
 import { useState, useTransition } from 'react';
 
+export type TOnboardingFieldErrors = TFieldErrors<
+  keyof TCreateSiteInput,
+  TCreateSiteFieldError
+>;
+
 export type TOnboardingFormFailure =
   TCreateSiteRefusal | typeof ACTION_OUTCOME.SERVER_ERROR;
 
 const toFailure = (
   result: TCreateSiteResult,
 ): TMaybeUndefined<TOnboardingFormFailure> => {
-  if (result.outcome === ACTION_OUTCOME.REFUSED) return result.reason;
-  if (result.outcome === ACTION_OUTCOME.SERVER_ERROR) return result.outcome;
+  if (isOutcomeRefused(result)) return result.reason;
+  if (isOutcomeServerError(result)) return result.outcome;
   return undefined;
 };
 
@@ -40,9 +48,7 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
     accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
     hasAcceptedTerms: false,
   });
-  const [fieldErrors, setFieldErrors] = useState<
-    TFieldErrors<keyof TCreateSiteInput, TCreateSiteFieldError>
-  >({});
+  const [fieldErrors, setFieldErrors] = useState<TOnboardingFieldErrors>({});
   const [failure, setFailure] =
     useState<TMaybeUndefined<TOnboardingFormFailure>>(undefined);
   const [isPending, startTransition] = useTransition();
@@ -64,14 +70,21 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
       accentHue: PRESET_REGISTRY[preset].themeTokens.accentHue,
     });
 
-  const submit = () => {
+  const flagField = (
+    field: keyof TCreateSiteInput,
+    reason: TCreateSiteFieldError,
+  ) => setFieldErrors((current) => ({ ...current, [field]: { reason } }));
+
+  const submit = (onFieldErrors: (errors: TOnboardingFieldErrors) => void) => {
     startTransition(async () => {
       const result = await createSiteAction(values);
+      const nextFieldErrors = isOutcomeInvalid(result)
+        ? result.fieldErrors
+        : {};
 
-      setFieldErrors(
-        result.outcome === ACTION_OUTCOME.INVALID ? result.fieldErrors : {},
-      );
+      setFieldErrors(nextFieldErrors);
       setFailure(toFailure(result));
+      onFieldErrors(nextFieldErrors);
     });
   };
 
@@ -82,6 +95,7 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
     isPending,
     changeField,
     changePreset,
+    flagField,
     submit,
   };
 };

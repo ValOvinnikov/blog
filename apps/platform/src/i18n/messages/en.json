@@ -61,7 +61,7 @@
   "onboardingPage": {
     "heading": "Create your site",
     "description": "Choose what kind of site you want, its address and its look. You can change everything except the address later.",
-    "brandMarkLabel": "Valstack"
+    "brandName": "Valstack"
   },
   "onboardingForm": {
     "siteTypeLabel": "Site type",
@@ -99,7 +99,21 @@
       "siteAddressReserved": "This address is reserved. Choose another.",
       "siteAddressTaken": "This address is taken. Choose another.",
       "termsNotAccepted": "Accept the Terms of Service and the Privacy Policy to continue."
-    }
+    },
+    "steps": {
+      "SITE": "Site",
+      "ADDRESS": "Address",
+      "LOOK": "Look",
+      "REVIEW": "Review"
+    },
+    "stepsAriaLabel": "Setup steps",
+    "stepProgress": "Step {n} of {total}",
+    "stepProgressNamed": "Step {n} of {total} · {step}",
+    "siteSummary": "{siteType} · {name}",
+    "back": "Back",
+    "continue": "Continue",
+    "edit": "Edit",
+    "editField": "Edit {field}"
   },
   "providerSignInButton": {
     "continueWithGithub": "Continue with GitHub",

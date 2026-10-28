@@ -26,7 +26,6 @@ itself stays.
 - `apps/platform/src/components/features/email/email-settings/use-email-draft.ts` — INVALID, SUCCESS
 - `apps/platform/src/components/features/leads/leads-inbox/components/lead-reading-pane/components/delete-lead-control/delete-lead-control.tsx` — REFUSED, SUCCESS
 - `apps/platform/src/components/features/look/look-form/use-look-save.ts` — SUCCESS
-- `apps/platform/src/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-form.ts` — INVALID, REFUSED, SERVER_ERROR
 - `apps/platform/src/components/features/releases/releases-view/components/release-card/components/start-release-dialog/start-release-dialog.tsx` — INVALID, SUCCESS
 - `apps/platform/src/components/features/releases/releases-view/components/run-contrast-check-button/run-contrast-check-button.tsx` — REFUSED, SUCCESS, UNAVAILABLE
 - `apps/platform/src/components/features/sign-up/sign-up-view/components/sign-up-form/use-sign-up.ts` — INVALID, REFUSED

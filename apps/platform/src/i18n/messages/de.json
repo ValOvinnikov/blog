@@ -61,7 +61,7 @@
   "onboardingPage": {
     "heading": "Erstelle deine Website",
     "description": "Wähle, welche Art von Website du möchtest, ihre Adresse und ihr Aussehen. Bis auf die Adresse kannst du später alles ändern.",
-    "brandMarkLabel": "Valstack"
+    "brandName": "Valstack"
   },
   "onboardingForm": {
     "siteTypeLabel": "Art der Website",
@@ -99,7 +99,21 @@
       "siteAddressReserved": "Diese Adresse ist reserviert. Wähle eine andere.",
       "siteAddressTaken": "Diese Adresse ist vergeben. Wähle eine andere.",
       "termsNotAccepted": "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
-    }
+    },
+    "steps": {
+      "SITE": "Website",
+      "ADDRESS": "Adresse",
+      "LOOK": "Aussehen",
+      "REVIEW": "Überprüfen"
+    },
+    "stepsAriaLabel": "Einrichtungsschritte",
+    "stepProgress": "Schritt {n} von {total}",
+    "stepProgressNamed": "Schritt {n} von {total} · {step}",
+    "siteSummary": "{siteType} · {name}",
+    "back": "Zurück",
+    "continue": "Weiter",
+    "edit": "Bearbeiten",
+    "editField": "{field} bearbeiten"
   },
   "providerSignInButton": {
     "continueWithGithub": "Weiter mit GitHub",

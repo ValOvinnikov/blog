@@ -61,7 +61,7 @@
   "onboardingPage": {
     "heading": "Maak je site",
     "description": "Kies wat voor site je wilt, het adres en het uiterlijk. Alles behalve het adres kun je later nog wijzigen.",
-    "brandMarkLabel": "Valstack"
+    "brandName": "Valstack"
   },
   "onboardingForm": {
     "siteTypeLabel": "Type site",
@@ -99,7 +99,21 @@
       "siteAddressReserved": "Dit adres is gereserveerd. Kies een ander.",
       "siteAddressTaken": "Dit adres is al in gebruik. Kies een ander.",
       "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan."
-    }
+    },
+    "steps": {
+      "SITE": "Site",
+      "ADDRESS": "Adres",
+      "LOOK": "Uiterlijk",
+      "REVIEW": "Controleren"
+    },
+    "stepsAriaLabel": "Configuratiestappen",
+    "stepProgress": "Stap {n} van {total}",
+    "stepProgressNamed": "Stap {n} van {total} · {step}",
+    "siteSummary": "{siteType} · {name}",
+    "back": "Terug",
+    "continue": "Doorgaan",
+    "edit": "Bewerken",
+    "editField": "{field} bewerken"
   },
   "providerSignInButton": {
     "continueWithGithub": "Doorgaan met GitHub",
