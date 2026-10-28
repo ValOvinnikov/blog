@@ -1,4 +1,7 @@
-import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  TENANT_CONFIG_REVALIDATE_SECONDS,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
@@ -22,7 +25,7 @@ const getCachedSiteConfigForTenant = (tenantId: string) =>
   )(tenantId);
 
 const toLookPlan = (
-  planResult: TResult<TTenantPlan | undefined>,
+  planResult: TResult<TMaybeUndefined<TTenantPlan>>,
 ): TTenantPlan => {
   if (!planResult.ok) {
     logger.error(SITE_CONFIG_LOG.PLAN_FETCH_FAILED, {
