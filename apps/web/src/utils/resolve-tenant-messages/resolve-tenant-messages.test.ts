@@ -11,7 +11,7 @@ import {
   VOICE_FIELD_KIND,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { SITE_CONFIG_FETCH_FAILED_EVENT } from '@web/constants/site-config';
+import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_OTHER_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
@@ -207,7 +207,7 @@ describe(resolveTenantMessages, () => {
 
     expect(messages).toEqual(SITE_MESSAGES);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      SITE_CONFIG_FETCH_FAILED_EVENT,
+      SITE_CONFIG_LOG.FETCH_FAILED,
       { error: MOCK_ERROR },
     );
   });

@@ -11,6 +11,7 @@ import {
   type TAccountMenuGroupProps,
 } from '@web/components/shared/auth-menu';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { HeaderOverlayParent } from '@web/context/header-overlay-provider';
 import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import { useTranslations } from 'next-intl';
@@ -97,7 +98,9 @@ export const SiteNavigation = ({
       >
         {panelActions ? (
           <PrimaryNavigation.PanelActions>
-            {panelActions}
+            <HeaderOverlayParent id={panelId}>
+              {panelActions}
+            </HeaderOverlayParent>
           </PrimaryNavigation.PanelActions>
         ) : null}
         {actions ? (
@@ -105,7 +108,9 @@ export const SiteNavigation = ({
         ) : null}
         {menuAccount && (
           <PrimaryNavigation.DrawerActions>
-            <AccountMenuGroup {...menuAccount} groupName={groupName} />
+            <HeaderOverlayParent id={panelId}>
+              <AccountMenuGroup {...menuAccount} groupName={groupName} />
+            </HeaderOverlayParent>
           </PrimaryNavigation.DrawerActions>
         )}
       </PrimaryNavigation>

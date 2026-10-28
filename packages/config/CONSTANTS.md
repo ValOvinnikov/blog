@@ -527,6 +527,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SIGN_IN_LOG**: `LINK_REFUSED`=`"auth.sign_in_link_refused"`
 
+### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
+
+- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
+
 ### `@web/constants/tenant-write` — `apps/web/src/constants/tenant-write.ts`
 
 - **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`

@@ -1,5 +1,6 @@
 import { ALERT_TYPE, type TSanityLoginProvider } from '@blog/config';
 import { queries } from '@blog/db';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { StudioMount } from '@blog/studio';
 import { Alert } from '@platform/components/shared/alert';
@@ -50,6 +51,7 @@ export const StudioMountView = async ({
 
   const enabledCapabilities = await getEnabledCapabilities(tenant);
   const liveLocales = queries.tenants.selectLiveLocales(tenant);
+  const { modulePacks } = PLAN_ENTITLEMENTS[tenant.plan];
 
   return (
     <StudioMount
@@ -58,6 +60,7 @@ export const StudioMountView = async ({
       basePath={basePath}
       title={tenant.name}
       enabledCapabilities={enabledCapabilities}
+      entitlements={{ modulePacks }}
       defaultLocale={tenant.locale}
       liveLocales={liveLocales}
       loginProvider={loginProvider}
