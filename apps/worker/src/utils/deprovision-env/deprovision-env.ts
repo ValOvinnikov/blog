@@ -1,38 +1,26 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { env } from '@worker/utils/env/env';
-import { requireValues } from '@worker/utils/provision-env/provision-env';
+import { requireValues } from '@worker/utils/require-values/require-values';
+import {
+  getVercelEnv,
+  type TVercelEnv,
+} from '@worker/utils/vercel-env/vercel-env';
 
-export type TDeprovisionEnv = {
+export type TDeprovisionEnv = TVercelEnv & {
   sanityManagementToken: string;
-  vercelToken: string;
-  vercelTeamId: TMaybeUndefined<string>;
-  vercelWebProjectId: string;
   webAppBaseUrl: string;
   siteConfigRevalidateSecret: string;
 };
 
 export function getDeprovisionEnv(): TDeprovisionEnv {
-  const {
-    SANITY_MANAGEMENT_TOKEN,
-    VERCEL_TOKEN,
-    VERCEL_TEAM_ID,
-    VERCEL_PROJECT_ID_WEB,
-    WEB_APP_URL,
-    SITE_CONFIG_REVALIDATE_SECRET,
-  } = env;
   const required = requireValues({
-    SANITY_MANAGEMENT_TOKEN,
-    VERCEL_TOKEN,
-    VERCEL_PROJECT_ID_WEB,
-    WEB_APP_URL,
-    SITE_CONFIG_REVALIDATE_SECRET,
+    SANITY_MANAGEMENT_TOKEN: env.SANITY_MANAGEMENT_TOKEN,
+    WEB_APP_URL: env.WEB_APP_URL,
+    SITE_CONFIG_REVALIDATE_SECRET: env.SITE_CONFIG_REVALIDATE_SECRET,
   });
 
   return {
+    ...getVercelEnv(),
     sanityManagementToken: required.SANITY_MANAGEMENT_TOKEN,
-    vercelToken: required.VERCEL_TOKEN,
-    vercelTeamId: VERCEL_TEAM_ID,
-    vercelWebProjectId: required.VERCEL_PROJECT_ID_WEB,
     webAppBaseUrl: required.WEB_APP_URL,
     siteConfigRevalidateSecret: required.SITE_CONFIG_REVALIDATE_SECRET,
   };

@@ -2,6 +2,7 @@ import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
 import {
   emptyResponse,
   firstFetchCall,
+  nthFetchCall,
   textResponse,
   useFetchFake,
 } from '@blog/db/testing/sanity-management-client/fetch-fake';
@@ -9,6 +10,7 @@ import { faker } from '@faker-js/faker';
 
 import {
   deleteVercelProjectDomain,
+  deleteVercelProjectDomains,
   VERCEL_API_BASE,
 } from './vercel-project-domains';
 
@@ -71,5 +73,34 @@ describe(deleteVercelProjectDomain, () => {
     await expect(deleteVercelProjectDomain(MOCK_DOMAIN_INPUT)).rejects.toThrow(
       `Vercel API DELETE ${DOMAIN_PATH} failed: ${HTTP_STATUS.BAD_REQUEST} ${MOCK_FAILURE_BODY}`,
     );
+  });
+});
+
+describe(deleteVercelProjectDomains, () => {
+  it('deletes each distinct domain from the project', async () => {
+    const other = faker.internet.domainName();
+    const { domain, ...target } = MOCK_DOMAIN_INPUT;
+
+    await deleteVercelProjectDomains({
+      ...target,
+      domains: [domain, other, domain],
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(nthFetchCall(fetchMock, 1).url).toBe(
+      `${VERCEL_API_BASE}/v9/projects/${target.projectId}/domains/${other}`,
+    );
+  });
+
+  it('keeps going when a domain is already gone', async () => {
+    fetchMock.mockResolvedValueOnce(emptyResponse(HTTP_STATUS.NOT_FOUND));
+    const { domain, ...target } = MOCK_DOMAIN_INPUT;
+
+    await deleteVercelProjectDomains({
+      ...target,
+      domains: [domain, faker.internet.domainName()],
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

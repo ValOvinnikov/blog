@@ -1,14 +1,13 @@
-import type { TTenant } from '@blog/db/schema/tenants';
-import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import {
   addVercelProjectDomain,
   listVercelProjectDomains,
 } from '@worker/utils/vercel-client/vercel-client';
+import type { TVercelEnv } from '@worker/utils/vercel-env/vercel-env';
 
 // Never waits on DNS verification: the admin tenant page checks it live.
 export async function mapTenantDomain(
-  tenant: TTenant,
-  env: TProvisionEnv,
+  domain: string,
+  env: TVercelEnv,
 ): Promise<void> {
   const existingDomains = await listVercelProjectDomains({
     token: env.vercelToken,
@@ -16,7 +15,7 @@ export async function mapTenantDomain(
     projectId: env.vercelWebProjectId,
   });
 
-  if (existingDomains.some((d) => d.name === tenant.primaryDomain)) {
+  if (existingDomains.some((d) => d.name === domain)) {
     return;
   }
 
@@ -24,6 +23,6 @@ export async function mapTenantDomain(
     token: env.vercelToken,
     teamId: env.vercelTeamId,
     projectId: env.vercelWebProjectId,
-    domain: tenant.primaryDomain,
+    domain,
   });
 }

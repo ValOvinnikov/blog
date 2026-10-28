@@ -8,6 +8,7 @@ const mockFaker = createMockFaker(6025);
 
 export const MOCK_TENANT_ID = mockFaker.string.uuid();
 export const MOCK_TENANT_DOMAIN = 'acme.example.com';
+export const MOCK_CUSTOM_DOMAIN = 'blog.customer.example';
 export const MOCK_SANITY_PROJECT_ID = 'sanity-project-1';
 export const MOCK_SANITY_DATASET = MOCK_PROVISION_ENV.tenantSanityDataset;
 export const MOCK_SANITY_READ_TOKEN = 'sk-read';

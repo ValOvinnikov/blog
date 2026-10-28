@@ -515,9 +515,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:worker
 
+### `@worker/constants/custom-domain` — `apps/worker/src/constants/custom-domain.ts`
+
+- **CUSTOM_DOMAIN_LOG**: `CONNECT_START_FAILED`=`"custom_domain.connect_start_failed"`, `DISCONNECT_START_FAILED`=`"custom_domain.disconnect_start_failed"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
 
-- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`
+- **ENQUEUE_ERROR**: `UNAUTHORIZED`, `INVALID_BODY`, `SERVER_ERROR`, `ALREADY_IN_PROGRESS`, `NOT_FOUND`, `NOT_PROVISIONED`, `DOMAIN_NOT_ASSIGNED`, `DOMAIN_STILL_ASSIGNED`, `DOMAIN_RESERVED`
 
 ### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
 
