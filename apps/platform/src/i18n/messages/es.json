@@ -244,7 +244,7 @@
   },
   "tenantsView": {
     "title": "Clientes",
-    "description": "Todos los sitios de la plataforma, leídos de la tabla real <code>tenants</code>.",
+    "description": "Todos los sitios de la plataforma, con su plan y estado.",
     "addTenant": "Añadir cliente"
   },
   "emailAlertsBanner": {

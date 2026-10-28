@@ -244,7 +244,7 @@
   },
   "tenantsView": {
     "title": "Tenants",
-    "description": "Elke site op het platform, gelezen uit de echte <code>tenants</code>-tabel.",
+    "description": "Elke site op het platform, met abonnement en status.",
     "addTenant": "Tenant toevoegen"
   },
   "emailAlertsBanner": {

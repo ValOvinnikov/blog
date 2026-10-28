@@ -244,7 +244,7 @@
   },
   "tenantsView": {
     "title": "Tenants",
-    "description": "Every site on the platform, read from the real <code>tenants</code> table.",
+    "description": "Every site on the platform, with its plan and status.",
     "addTenant": "Add tenant"
   },
   "emailAlertsBanner": {

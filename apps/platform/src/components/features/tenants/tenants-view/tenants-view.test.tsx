@@ -15,7 +15,6 @@ const setup = customRender(TenantsView, {
 
 const ARIA_PRESSED = 'aria-pressed';
 const PRESSED = 'true';
-const CODE_TAG = 'code';
 const EMAIL_ALERTS_NOT_CONFIGURED = 'Email alerts not configured';
 
 describe(`<${TenantsView.name}/>`, () => {
@@ -30,12 +29,6 @@ describe(`<${TenantsView.name}/>`, () => {
 
       expect(heading).toBeVisible();
       expect(tenantName).toBeVisible();
-    });
-
-    it("marks the description's tenants term as code", () => {
-      const code = screen.getByText('tenants', { selector: CODE_TAG });
-
-      expect(code.localName).toBe(CODE_TAG);
     });
 
     it('links add-tenant to the wizard', () => {

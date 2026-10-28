@@ -23,15 +23,13 @@ export const TenantsView = ({
   isEmailAlertingConfigured,
 }: TTenantsViewProps) => {
   const t = useTranslations('tenantsView');
-  const { root, toolbar, codeChunk } = tenantsViewVariants();
+  const { root, toolbar } = tenantsViewVariants();
 
   return (
     <div className={root()}>
       <PageHeader
         title={t('title')}
-        description={t.rich('description', {
-          code: (chunks) => <code className={codeChunk()}>{chunks}</code>,
-        })}
+        description={t('description')}
         actions={
           <LinkButton href={adminRoutes.newTenant()} variant="primary">
             <Icon name={ICONS.PLUS} />
