@@ -438,6 +438,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:web
 
+### `@web/constants/account-control` — `apps/web/src/constants/account-control.ts`
+
+- **ACCOUNT_CONTROL_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"account_control.site_config_fetch_failed"`
+
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
 - **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`
@@ -457,6 +461,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`
+
+### `@web/constants/navigation` — `apps/web/src/constants/navigation.ts`
+
+- **NAVIGATION_LOG**: `LAYOUT_FETCH_FAILED`=`"navigation.layout_fetch_failed"`
 
 ### `@web/constants/newsletter` — `apps/web/src/constants/newsletter.ts`
 

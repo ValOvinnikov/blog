@@ -1,12 +1,12 @@
 import { SIZE } from '@blog/config';
-import { spinnerVariants } from '@blog/ui/components/atoms/spinner/spinner-variants';
+import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
 import { ReducedMotion } from '@blog/ui/testing/reduced-motion';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within } from 'storybook/test';
 
 import { Button } from './button';
-import { buttonBusyVariants, buttonVariants } from './button-variants';
+import { buttonVariants } from './button-variants';
 
 const meta: Meta<typeof Button> = {
   title: 'Atoms/Button',
@@ -23,11 +23,11 @@ const meta: Meta<typeof Button> = {
     },
     busyStyle: {
       control: 'select',
-      options: objectKeys(buttonBusyVariants.variants.busyStyle),
+      options: BUSY_STYLES,
     },
     spinnerVariant: {
       control: 'select',
-      options: objectKeys(spinnerVariants.variants.variant),
+      options: SPINNER_VARIANTS,
     },
   },
 };
@@ -126,9 +126,7 @@ export const Busy: TStory = {
   },
 };
 
-const BUSY_STYLES = objectKeys(buttonBusyVariants.variants.busyStyle);
 const BUTTON_VARIANTS = objectKeys(buttonVariants.variants.variant);
-const SPINNER_VARIANTS = objectKeys(spinnerVariants.variants.variant);
 
 const BusyStyles = () => (
   <div className="flex flex-col gap-4">

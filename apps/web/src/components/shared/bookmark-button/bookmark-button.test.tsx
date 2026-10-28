@@ -12,6 +12,7 @@ import {
   type TSetBookmarkResult,
 } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
+import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_PRESSED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -36,7 +37,7 @@ const MOCK_SESSION = { user: { id: faker.string.uuid() }, expires: '' };
 
 const SAVE_POST = 'Save post';
 const REMOVE_BOOKMARK = 'Remove bookmark';
-const SIGN_IN_PANEL = 'Sign in options';
+const SIGN_IN_PANEL = 'Sign in';
 const UNDO = 'Undo';
 const RETRY = /^Retry/;
 const SAVED_MESSAGE = 'Saved to bookmarks';
@@ -57,7 +58,10 @@ const mockSessionStatus = (status: TValueOf<typeof SESSION_STATUS>) => {
 const setup = () =>
   renderElement(
     <ToastProvider>
-      <AuthMenu oauthProviderIds={['github']} />
+      <AuthMenu
+        oauthProviderIds={['github']}
+        accountControl={MOCK_ACCOUNT_CONTROL}
+      />
       <BookmarkButton postId={MOCK_POST_ID} />
     </ToastProvider>,
   );
@@ -96,7 +100,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     it('opens the sign-in panel and saves nothing when pressed', async () => {
       await user.click(saveButton);
 
-      const signInPanel = screen.getByRole('menu', { name: SIGN_IN_PANEL });
+      const signInPanel = screen.getByRole('dialog', { name: SIGN_IN_PANEL });
       expect(signInPanel).toBeVisible();
       expect(setBookmarkStatus).not.toHaveBeenCalled();
     });
@@ -113,7 +117,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
       await user.click(saveButton);
 
-      const signInPanel = screen.queryByRole('menu', { name: SIGN_IN_PANEL });
+      const signInPanel = screen.queryByRole('dialog', { name: SIGN_IN_PANEL });
       expect(signInPanel).not.toBeInTheDocument();
       expect(setBookmarkStatus).not.toHaveBeenCalled();
     });

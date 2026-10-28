@@ -5432,6 +5432,14 @@
         "file": "apps/platform/src/constants/worker.ts"
       }
     ],
+    "account_control.site_config_fetch_failed": [
+      {
+        "ref": "ACCOUNT_CONTROL_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account-control",
+        "file": "apps/web/src/constants/account-control.ts"
+      }
+    ],
     "bookmark_button.status_fetch_failed": [
       {
         "ref": "BOOKMARK_LOG.BUTTON_STATUS_FETCH_FAILED",
@@ -5494,6 +5502,14 @@
         "scope": "app:web",
         "from": "@web/constants/contact-form",
         "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "navigation.layout_fetch_failed": [
+      {
+        "ref": "NAVIGATION_LOG.LAYOUT_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/navigation",
+        "file": "apps/web/src/constants/navigation.ts"
       }
     ],
     "ALREADY_SUBSCRIBED": [

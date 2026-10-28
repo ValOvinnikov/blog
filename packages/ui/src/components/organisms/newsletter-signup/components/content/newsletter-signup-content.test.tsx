@@ -1,12 +1,14 @@
 import { FORM_STATUS } from '@blog/config';
-import { customRender, screen, within } from '@blog/ui/testing/custom-render';
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 import {
+  MOCK_NEWSLETTER_BUSY_LABEL,
   MOCK_NEWSLETTER_EMAIL_LABEL,
   MOCK_NEWSLETTER_SUBMIT_LABEL,
   mockNewsletterSignupArgs,
 } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { NewsletterSignupContent } from './newsletter-signup-content';
 
@@ -102,32 +104,49 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
   });
 
   describe('while submitting', () => {
+    let onSubmit: Mock<() => void>;
+
     beforeEach(() => {
-      setup({ status: FORM_STATUS.SUBMITTING });
+      onSubmit = vi.fn();
+      setup({ status: FORM_STATUS.SUBMITTING, onSubmit });
     });
 
-    it('disables the field and button and marks the button busy', () => {
+    it('locks the field and marks the button busy', () => {
       const emailField = screen.getByRole('textbox', {
         name: MOCK_NEWSLETTER_EMAIL_LABEL,
       });
       const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+        name: MOCK_NEWSLETTER_BUSY_LABEL,
       });
 
       expect(emailField).toBeDisabled();
-      expect(button).toBeDisabled();
       expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
-    it('shows a spinner inside the button', () => {
+    it('keeps the button focusable', async () => {
       const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
-      });
-      const spinner = within(button).getByRole('status', {
-        name: MOCK_NEWSLETTER_SUBMIT_LABEL,
+        name: MOCK_NEWSLETTER_BUSY_LABEL,
       });
 
-      expect(spinner).toBeVisible();
+      await user.tab();
+
+      expect(button).toHaveFocus();
+    });
+
+    it('announces that it is subscribing', () => {
+      const status = screen.getByRole('status');
+
+      expect(status).toHaveTextContent(MOCK_NEWSLETTER_BUSY_LABEL);
+    });
+
+    it('does not subscribe a second time', async () => {
+      const button = screen.getByRole('button', {
+        name: MOCK_NEWSLETTER_BUSY_LABEL,
+      });
+
+      await user.click(button);
+
+      expect(onSubmit).not.toHaveBeenCalled();
     });
   });
 

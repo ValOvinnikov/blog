@@ -3,6 +3,8 @@ import {
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
+import type { TButtonProps } from '@blog/ui/components/atoms/button';
+import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { useId, type ReactNode, type Ref } from 'react';
 
 import {
@@ -38,6 +40,8 @@ export type TSignInPanelProps = IWithClassName &
     providers: ISignInPanelProvider[];
     pendingProviderId?: string;
     emailForm: ISignInPanelEmailForm;
+    busyStyle?: TButtonProps['busyStyle'];
+    spinnerVariant?: TSpinnerProps['variant'];
     ref?: Ref<HTMLDivElement>;
   };
 
@@ -48,6 +52,8 @@ export const SignInPanel = ({
   providers,
   pendingProviderId,
   emailForm,
+  busyStyle,
+  spinnerVariant,
   ref,
   className,
   dataTestId,
@@ -92,6 +98,7 @@ export const SignInPanel = ({
                     key={provider.id}
                     provider={provider}
                     isPending={provider.id === pendingProviderId}
+                    spinnerVariant={spinnerVariant}
                     isWaiting={
                       isSending ||
                       (Boolean(pendingProviderId) &&
@@ -103,7 +110,12 @@ export const SignInPanel = ({
               <p className={s.or()}>{labels.or}</p>
             </>
           )}
-          <SignInPanelEmailForm emailForm={emailForm} labels={labels} />
+          <SignInPanelEmailForm
+            emailForm={emailForm}
+            labels={labels}
+            busyStyle={busyStyle}
+            spinnerVariant={spinnerVariant}
+          />
           <p className={s.hint()}>{labels.hint}</p>
         </>
       )}

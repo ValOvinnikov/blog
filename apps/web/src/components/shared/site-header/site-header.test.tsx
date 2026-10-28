@@ -1,14 +1,18 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { ACCOUNT_PHONE_PLACEMENT, LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { SESSION_STATUS } from '@web/constants/session';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
@@ -29,6 +33,8 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
 );
+
+vi.mock('@web/server/site-config/get-account-control/get-account-control');
 
 vi.mock(
   '@web/server/site-config/get-brand-logo-url/get-brand-logo-url',
@@ -66,6 +72,7 @@ const getRequestContextMock = vi.mocked(getRequestContext);
 const getSiteSettingsMock = vi.mocked(getSiteSettings);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
+const getAccountControlMock = vi.mocked(getAccountControl);
 
 faker.seed(5);
 
@@ -82,8 +89,12 @@ const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 const SIGN_IN = 'Sign in';
-const SIGN_IN_OPTIONS = 'Sign in options';
+const ACCOUNT = 'Account';
 const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
+const ACCOUNT_IN_PHONE_MENU = {
+  ...MOCK_ACCOUNT_CONTROL,
+  phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+};
 const HOME_LINK_NAME = 'Home';
 
 describe(`<${SiteHeader.name}/>`, () => {
@@ -96,9 +107,14 @@ describe(`<${SiteHeader.name}/>`, () => {
     await user.click(toggleButton);
   };
 
-  const getDrawerSignInButton = () => {
+  const getDrawerAccountButton = (name: string) => {
     const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-    return within(drawerActions).getByRole('button', { name: SIGN_IN });
+    return within(drawerActions).getByRole('button', { name });
+  };
+
+  const getBarSignInButtons = () => {
+    const banner = screen.getByRole('banner');
+    return within(banner).getAllByRole('button', { name: SIGN_IN });
   };
 
   beforeEach(() => {
@@ -173,7 +189,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       expect(languageNav).toBeVisible();
     });
 
-    it('puts the language pill and theme toggle before the account row', async () => {
+    it('puts the language pill and theme toggle in the phone menu', async () => {
       await openPhoneMenu();
 
       const panelRow = screen.getByTestId('primary-navigation-panel-actions');
@@ -186,12 +202,10 @@ describe(`<${SiteHeader.name}/>`, () => {
       const panelSignInButton = within(panelRow).queryByRole('button', {
         name: SIGN_IN,
       });
-      const drawerSignInButton = getDrawerSignInButton();
 
       expect(englishButton).toBeVisible();
       expect(switchToButton).toBeVisible();
       expect(panelSignInButton).not.toBeInTheDocument();
-      expect(drawerSignInButton).toBeVisible();
     });
 
     it('closes the open language menu when the sign-in panel opens', async () => {
@@ -205,54 +219,94 @@ describe(`<${SiteHeader.name}/>`, () => {
 
       expect(languageMenu).toBeVisible();
 
-      const signInButton = screen.getByRole('button', { name: SIGN_IN });
-      await user.click(signInButton);
+      const [signInButton] = getBarSignInButtons();
+      await user.click(signInButton!);
 
-      const menus = screen.getAllByRole('menu');
-      const signInOptionsMenu = screen.getByRole('menu', {
-        name: SIGN_IN_OPTIONS,
-      });
+      const menus = screen.queryAllByRole('menu');
+      const signInDialog = screen.getByRole('dialog', { name: SIGN_IN });
 
-      expect(menus).toHaveLength(1);
-      expect(signInOptionsMenu).toBeVisible();
+      expect(menus).toHaveLength(0);
+      expect(signInDialog).toBeVisible();
     });
   });
 
-  describe('the phone menu account row', () => {
+  describe('with the account in the bar on phones', () => {
     beforeEach(async () => {
+      await setup();
+    });
+
+    it('adds a circle beside the wide pill', () => {
+      const signInButtons = getBarSignInButtons();
+
+      expect(signInButtons).toHaveLength(2);
+    });
+
+    it('adds no account row to the phone menu', async () => {
+      await openPhoneMenu();
+
+      const drawerActions = screen.queryByTestId(DRAWER_ACTIONS_TEST_ID);
+
+      expect(drawerActions).not.toBeInTheDocument();
+    });
+
+    it('returns focus to the phone circle when Escape closes its panel', async () => {
+      const [, phoneCircle] = getBarSignInButtons();
+      await user.click(phoneCircle!);
+      await user.keyboard('{Escape}');
+
+      const signInDialog = screen.queryByRole('dialog', { name: SIGN_IN });
+
+      expect(signInDialog).not.toBeInTheDocument();
+      expect(phoneCircle).toHaveFocus();
+    });
+  });
+
+  describe('with the account in the phone menu', () => {
+    beforeEach(async () => {
+      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
       await setup();
       await openPhoneMenu();
     });
 
-    it('closes the menu and opens the sign-in panel with focus on its first item', async () => {
-      const drawerSignInButton = getDrawerSignInButton();
-      await user.click(drawerSignInButton);
+    it('puts only the wide button in the bar, with no phone circle', () => {
+      const accountRow = getDrawerAccountButton(SIGN_IN);
+      const barTriggers = getBarSignInButtons().filter(
+        (button) => button !== accountRow,
+      );
+
+      expect(barTriggers).toHaveLength(1);
+    });
+
+    it('opens the sign-in panel in place and keeps the menu open', async () => {
+      const accountRow = getDrawerAccountButton(SIGN_IN);
+      await user.click(accountRow);
 
       const mobilePanel = screen.getByTestId('primary-navigation-mobile-panel');
-      const githubMenuItem = screen.getByRole('menuitem', {
+      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
+      const githubButton = within(drawerActions).getByRole('button', {
         name: CONTINUE_WITH_GITHUB,
       });
 
-      expect(mobilePanel).not.toBeVisible();
-      expect(githubMenuItem).toHaveFocus();
+      expect(mobilePanel).toBeVisible();
+      expect(accountRow).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(githubButton).toBeVisible();
     });
 
-    it('returns focus to the bar control when Escape closes the panel', async () => {
-      const drawerSignInButton = getDrawerSignInButton();
-      await user.click(drawerSignInButton);
-      await user.keyboard('{Escape}');
+    it('folds the account group when its row is pressed again', async () => {
+      const accountRow = getDrawerAccountButton(SIGN_IN);
+      await user.click(accountRow);
+      await user.click(accountRow);
 
-      const signInOptionsMenu = screen.queryByRole('menu', {
-        name: SIGN_IN_OPTIONS,
-      });
-      const signInButton = screen.getByRole('button', { name: SIGN_IN });
+      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
+      const signInDialog = within(drawerActions).queryByRole('dialog');
 
-      expect(signInOptionsMenu).not.toBeInTheDocument();
-      expect(signInButton).toHaveFocus();
+      expect(accountRow).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(signInDialog).not.toBeInTheDocument();
     });
   });
 
   it('labels the phone menu account row "Account" for a signed-in reader', async () => {
+    getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
     useSessionMock.mockReturnValue({
       data: { user: MOCK_READER },
       status: SESSION_STATUS.AUTHENTICATED,
@@ -260,10 +314,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     await setup();
     await openPhoneMenu();
 
-    const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-    const accountButton = within(drawerActions).getByRole('button', {
-      name: 'Account',
-    });
+    const accountButton = getDrawerAccountButton(ACCOUNT);
 
     expect(accountButton).toBeVisible();
   });
@@ -301,19 +352,19 @@ describe(`<${SiteHeader.name}/>`, () => {
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github']);
     await setup();
 
-    const signInButton = screen.getByRole('button', { name: SIGN_IN });
-    await user.click(signInButton);
+    const [signInButton] = getBarSignInButtons();
+    await user.click(signInButton!);
 
-    const panel = screen.getByRole('menu');
-    const githubMenuItem = within(panel).getByRole('menuitem', {
+    const panel = screen.getByRole('dialog', { name: SIGN_IN });
+    const githubButton = within(panel).getByRole('button', {
       name: CONTINUE_WITH_GITHUB,
     });
-    const googleMenuItem = within(panel).queryByRole('menuitem', {
+    const googleButton = within(panel).queryByRole('button', {
       name: 'Continue with Google',
     });
 
-    expect(githubMenuItem).toBeVisible();
-    expect(googleMenuItem).not.toBeInTheDocument();
+    expect(githubButton).toBeVisible();
+    expect(googleButton).not.toBeInTheDocument();
   });
 
   it('hides the sign-in menu without a reader-account capability', async () => {
@@ -338,7 +389,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('shows the sign-in menu with a reader-account capability enabled', () => {
-      const signInButton = screen.getByRole('button', { name: SIGN_IN });
+      const [signInButton] = getBarSignInButtons();
 
       expect(signInButton).toBeVisible();
     });
@@ -354,7 +405,7 @@ describe(`<${SiteHeader.name}/>`, () => {
 
       expect(banner).toBeVisible();
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'navigation.layout_fetch_failed',
+        NAVIGATION_LOG.LAYOUT_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });

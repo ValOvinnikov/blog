@@ -9,7 +9,7 @@ import {
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { Spinner } from '@blog/ui/components/atoms/spinner';
+import { Spinner, type TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { toastVariants, type TToastVariants } from './toast-variants';
@@ -24,6 +24,7 @@ export type TToastProps = IWithClassName &
   IWithDataTestId & {
     type: TToastType;
     isLoading?: boolean;
+    spinnerVariant?: TSpinnerProps['variant'];
     title?: ReactNode;
     message: ReactNode;
     time?: string;
@@ -56,6 +57,7 @@ const TOAST_ANNOUNCEMENT: Record<
 export const Toast = ({
   type,
   isLoading = false,
+  spinnerVariant,
   title,
   message,
   time,
@@ -79,6 +81,7 @@ export const Toast = ({
   const typeIcon = isLoading ? (
     <Spinner
       label={type}
+      variant={spinnerVariant}
       size={SIZE.SM}
       className={s.spinner()}
       aria-hidden="true"
