@@ -1,3 +1,4 @@
+import { isUndefined } from '@blog/utils/primitives';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { useRef, type FocusEvent } from 'react';
 
@@ -19,7 +20,7 @@ export const useSubmenuPreview = () => {
     const next = { ...state.current, ...patch };
     const hasLeft = !next.isHovered && !next.isFocused;
     // A touch tap fires pointerleave before the change, so only a leave clears a change.
-    if (hasLeft && patch.hasChanged === undefined) {
+    if (hasLeft && isUndefined(patch.hasChanged)) {
       next.hasChanged = false;
     }
     state.current = next;
