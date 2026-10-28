@@ -109,8 +109,10 @@ Free site.
      no `/signup` cookie).
 
   Continue checks only the current step: the name must not be blank, and the
-  address must be filled in and have passed the availability check. Back keeps
-  every value. Nothing is saved until **Create site** on Review runs
+  address must be filled in and not known to be taken, reserved or invalid. An
+  address whose live check is still running or failed is let through, since
+  Create site checks it again. Back keeps every value, and Continue after an
+  Edit from Review returns straight to Review. Nothing is saved until **Create site** on Review runs
   `createSiteAction` once with every value; a field error it returns (an
   address taken meanwhile) opens that field's step. Success redirects to
   `/dashboard`, whose site setup card follows provisioning.

@@ -10,7 +10,12 @@ import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitForElementToBeRemoved,
+  within,
+} from '@platform/testing/custom-render';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -42,6 +47,7 @@ const MOCK_CREATE = { name: 'Create site' };
 const MOCK_CONTINUE = { name: 'Continue' };
 const MOCK_BACK = { name: 'Back' };
 const MOCK_ADDRESS_AVAILABLE = `${MOCK_SITE_ADDRESS} is available.`;
+const MOCK_ADDRESS_CHECKING = 'Checking the address…';
 const MOCK_ADDRESS_TAKEN = 'This address is taken. Choose another.';
 
 const MOCK_CREATE_SITE_INPUT = {
@@ -177,6 +183,26 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(stepHeading('Address')).toBeVisible();
   });
 
+  it('lets the user continue when the address check fails', async () => {
+    checkSiteAddressMock.mockRejectedValue(new Error());
+    await completeSiteStep();
+    await typeAddress();
+    await waitForElementToBeRemoved(() =>
+      screen.queryByText(MOCK_ADDRESS_CHECKING),
+    );
+    await clickContinue();
+
+    expect(stepHeading('Look')).toBeVisible();
+  });
+
+  it('lets the user continue before the address check answers', async () => {
+    await completeSiteStep();
+    await typeAddress();
+    await clickContinue();
+
+    expect(stepHeading('Look')).toBeVisible();
+  });
+
   it.each([
     ['Site', `Blog · ${MOCK_TENANT_NAME}`],
     ['Address', MOCK_SITE_ADDRESS],
@@ -194,6 +220,14 @@ describe(`<${OnboardingView.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Edit Site address' }));
 
     expect(stepHeading('Address')).toBeVisible();
+  });
+
+  it('returns to review after editing a step from it', async () => {
+    await reachReview();
+    await user.click(screen.getByRole('button', { name: 'Edit Site name' }));
+    await clickContinue();
+
+    expect(stepHeading('Review')).toBeVisible();
   });
 
   it('returns to the address step when the address was taken meanwhile', async () => {

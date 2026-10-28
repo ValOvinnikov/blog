@@ -59,6 +59,7 @@ export const useOnboardingSteps = ({
   flagField,
 }: TUseOnboardingStepsOptions) => {
   const [step, setStep] = useState<TOnboardingStep>(ONBOARDING_STEP.SITE);
+  const [isEditingFromReview, setIsEditingFromReview] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const hasNavigatedRef = useRef(false);
   const stepIndex = ONBOARDING_STEPS.indexOf(step);
@@ -70,6 +71,12 @@ export const useOnboardingSteps = ({
   const goTo = (next: TOnboardingStep) => {
     hasNavigatedRef.current = true;
     setStep(next);
+    if (next === ONBOARDING_STEP.REVIEW) setIsEditingFromReview(false);
+  };
+
+  const editStep = (next: TOnboardingStep) => {
+    setIsEditingFromReview(true);
+    goTo(next);
   };
 
   const goNext = () => {
@@ -80,12 +87,14 @@ export const useOnboardingSteps = ({
     }
 
     const hasFieldError = STEP_FIELDS[step].some((field) => fieldErrors[field]);
-    const isAddressPending =
+    const isAddressUnavailable =
       step === ONBOARDING_STEP.ADDRESS &&
-      addressStatus !== SITE_ADDRESS_STATUS.AVAILABLE;
-    if (hasFieldError || isAddressPending) return;
+      addressStatus === SITE_ADDRESS_STATUS.UNAVAILABLE;
+    if (hasFieldError || isAddressUnavailable) return;
 
-    const next = ONBOARDING_STEPS[stepIndex + 1];
+    const next = isEditingFromReview
+      ? ONBOARDING_STEP.REVIEW
+      : ONBOARDING_STEPS[stepIndex + 1];
     if (next) goTo(next);
   };
 
@@ -98,7 +107,7 @@ export const useOnboardingSteps = ({
     const erroredStep = ONBOARDING_STEPS.find((candidate) =>
       STEP_FIELDS[candidate].some((field) => errors[field]),
     );
-    if (erroredStep && erroredStep !== step) goTo(erroredStep);
+    if (erroredStep && erroredStep !== step) editStep(erroredStep);
   };
 
   return {
@@ -107,7 +116,7 @@ export const useOnboardingSteps = ({
     isFirstStep: stepIndex === 0,
     isLastStep: stepIndex === ONBOARDING_STEPS.length - 1,
     panelRef,
-    goTo,
+    editStep,
     goNext,
     goBack,
     showFirstFieldError,

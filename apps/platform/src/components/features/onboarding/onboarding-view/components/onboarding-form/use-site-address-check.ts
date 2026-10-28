@@ -15,6 +15,7 @@ const SITE_ADDRESS_CHECK_DELAY_MS = 400;
 type TCheckedSlug = {
   slug: string;
   error: TMaybeUndefined<TTenantSlugError>;
+  hasFailed: boolean;
 };
 
 export type TSiteAddressCheck = {
@@ -28,6 +29,7 @@ const toSiteAddressStatus = (
 ): TSiteAddressStatus => {
   if (!slug) return SITE_ADDRESS_STATUS.IDLE;
   if (check?.slug !== slug) return SITE_ADDRESS_STATUS.CHECKING;
+  if (check.hasFailed) return SITE_ADDRESS_STATUS.UNVERIFIED;
   if (check.error) return SITE_ADDRESS_STATUS.UNAVAILABLE;
   return SITE_ADDRESS_STATUS.AVAILABLE;
 };
@@ -42,9 +44,11 @@ export const useSiteAddressCheck = (slug: string): TSiteAddressCheck => {
     const timer = setTimeout(() => {
       checkSiteAddressAction(slug).then(
         (error) => {
-          if (isCurrent) setCheck({ slug, error });
+          if (isCurrent) setCheck({ slug, error, hasFailed: false });
         },
-        () => undefined,
+        () => {
+          if (isCurrent) setCheck({ slug, error: undefined, hasFailed: true });
+        },
       );
     }, SITE_ADDRESS_CHECK_DELAY_MS);
 

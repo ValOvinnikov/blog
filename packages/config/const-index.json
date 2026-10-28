@@ -4468,6 +4468,14 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
+    "UNVERIFIED": [
+      {
+        "ref": "SITE_ADDRESS_STATUS.UNVERIFIED",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
     "LOOK": [
       {
         "ref": "ONBOARDING_STEP.LOOK",

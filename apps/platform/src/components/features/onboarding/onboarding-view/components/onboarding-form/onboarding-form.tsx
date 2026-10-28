@@ -51,7 +51,7 @@ export const OnboardingForm = ({
     railSteps,
     changeField,
     changePreset,
-    goTo,
+    editStep,
     goNext,
     goBack,
     handleSubmit,
@@ -114,7 +114,7 @@ export const OnboardingForm = ({
                     legalPageUrls={legalPageUrls}
                     hasTermsError={Boolean(fieldErrors.hasAcceptedTerms)}
                     onFieldChange={changeField}
-                    onEdit={goTo}
+                    onEdit={editStep}
                   />
                 )}
               </div>

@@ -357,7 +357,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 
-- **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`
+- **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`, `UNVERIFIED`
 - **ONBOARDING_STEP**: `SITE`, `ADDRESS`, `LOOK`, `REVIEW`
 - **ONBOARDING_LOG**: `ROOT_DOMAIN_MISSING`=`"onboarding.root_domain_missing"`, `SESSION_EMAIL_MISSING`=`"onboarding.session_email_missing"`, `OWNS_FREE_TENANT_CHECK_FAILED`=`"onboarding.owns_free_tenant_check_failed"`, `TERMS_RECORD_FAILED`=`"onboarding.terms_record_failed"`, `CREATE_FAILED`=`"onboarding.create_failed"`
 

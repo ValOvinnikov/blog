@@ -14,6 +14,7 @@ export const SITE_ADDRESS_STATUS = {
   CHECKING: 'CHECKING',
   AVAILABLE: 'AVAILABLE',
   UNAVAILABLE: 'UNAVAILABLE',
+  UNVERIFIED: 'UNVERIFIED',
 } as const;
 
 export type TSiteAddressStatus = TValueOf<typeof SITE_ADDRESS_STATUS>;
