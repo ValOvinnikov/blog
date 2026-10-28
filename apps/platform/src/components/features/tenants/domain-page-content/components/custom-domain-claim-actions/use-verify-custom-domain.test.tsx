@@ -132,12 +132,14 @@ describe(useVerifyCustomDomain, () => {
     });
     renderHookWithIntl(() => useVerifyCustomDomain(MOCK_TENANT_ID));
 
-    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs);
 
-    const takenToast = await screen.findByText(fieldError.domainTaken);
+    const takenToast = screen.getByText(fieldError.domainTaken);
     expect(takenToast).toBeVisible();
-    expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
     expect(refresh).toHaveBeenCalledOnce();
+
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
+    expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
   });
 
   it('tells the owner a polled plan refusal as a manual verify does', async () => {
@@ -148,9 +150,9 @@ describe(useVerifyCustomDomain, () => {
       useVerifyCustomDomain(MOCK_TENANT_ID),
     );
 
-    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs * 3);
+    await advance(CUSTOM_DOMAIN_VERIFY_POLL.intervalMs);
 
-    const polledToast = await screen.findByText(refusal.notOnPlan);
+    const polledToast = screen.getByText(refusal.notOnPlan);
     expect(polledToast).toBeVisible();
     expect(verifyCustomDomainActionMock).toHaveBeenCalledOnce();
     expect(refresh).toHaveBeenCalledOnce();
@@ -158,7 +160,7 @@ describe(useVerifyCustomDomain, () => {
     await act(async () => {
       result.current.verify();
     });
-    const toasts = await screen.findAllByText(refusal.notOnPlan);
+    const toasts = screen.getAllByText(refusal.notOnPlan);
     expect(toasts).toHaveLength(2);
   });
 
