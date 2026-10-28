@@ -310,8 +310,8 @@ describe(updateTenantDetails, () => {
           ownerEmail: MOCK_UNNORMALIZED_NEW_OWNER_EMAIL,
         });
 
-        const { ownerEmailChanged } = unwrapUpdatedResult(result);
-        expect(ownerEmailChanged).toBe(true);
+        const { previousOwnerEmail } = unwrapUpdatedResult(result);
+        expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
 
         const invite = await readOwnerInvite(tenantId);
         expect(invite?.email).toBe(MOCK_NEW_OWNER_EMAIL);
@@ -364,8 +364,8 @@ describe(updateTenantDetails, () => {
           ownerEmail: MOCK_OWNER_EMAIL,
         });
 
-        const { ownerEmailChanged } = unwrapUpdatedResult(result);
-        expect(ownerEmailChanged).toBe(false);
+        const { previousOwnerEmail } = unwrapUpdatedResult(result);
+        expect(previousOwnerEmail).toBeUndefined();
         const identifiers = await readVerificationIdentifiers();
         expect(identifiers).toEqual([MOCK_OWNER_EMAIL]);
       });
@@ -436,8 +436,8 @@ describe(updateTenantDetails, () => {
           ownerEmail: MOCK_NEW_OWNER_EMAIL,
         });
 
-        const { ownerEmailChanged } = unwrapUpdatedResult(result);
-        expect(ownerEmailChanged).toBe(true);
+        const { previousOwnerEmail } = unwrapUpdatedResult(result);
+        expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
         const ownerMembership = await readOwnerMembership(tenantId);
         expect(ownerMembership).toBeUndefined();
         const ownerInvite = await readOwnerInvite(tenantId);
@@ -567,8 +567,8 @@ describe(updateTenantDetails, () => {
         ownerEmail: MOCK_NEW_OWNER_EMAIL,
       });
 
-      const { ownerEmailChanged } = unwrapUpdatedResult(result);
-      expect(ownerEmailChanged).toBe(true);
+      const { previousOwnerEmail } = unwrapUpdatedResult(result);
+      expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
       const ownerInvite = await readOwnerInvite(tenantId);
       expect(ownerInvite?.email).toBe(MOCK_NEW_OWNER_EMAIL);
     });

@@ -123,13 +123,16 @@ describe(updateTenantDetailsAction, () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: MOCK_UPDATED_TENANT,
-      ownerEmailChanged: false,
+      previousOwnerEmail: undefined,
     });
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: MOCK_AUDIT_EVENT_ID });
     loggerErrorMock.mockReset();
     sendOwnerInviteEmailMock.mockReset();
     enqueueOwnerAccessRequestMock.mockReset();
+    enqueueOwnerAccessRequestMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
   });
 
   it('requires an admin session before validating or saving', async () => {
@@ -308,7 +311,7 @@ describe(updateTenantDetailsAction, () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant,
-      ownerEmailChanged: false,
+      previousOwnerEmail: undefined,
     });
 
     const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
@@ -339,7 +342,11 @@ describe(updateTenantDetailsAction, () => {
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
-      details: { ...validInput, ownerEmailUpdated: false },
+      details: {
+        ...validInput,
+        ownerEmailUpdated: false,
+        studioReinviteRequested: false,
+      },
     });
   });
 
@@ -347,7 +354,7 @@ describe(updateTenantDetailsAction, () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: MOCK_UPDATED_TENANT,
-      ownerEmailChanged: true,
+      previousOwnerEmail: MOCK_OWNER_EMAIL,
     });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {
@@ -360,6 +367,7 @@ describe(updateTenantDetailsAction, () => {
     expect(event.details).toStrictEqual({
       ...validInput,
       ownerEmailUpdated: true,
+      studioReinviteRequested: false,
     });
   });
 
@@ -367,7 +375,7 @@ describe(updateTenantDetailsAction, () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: MOCK_UPDATED_TENANT,
-      ownerEmailChanged: true,
+      previousOwnerEmail: MOCK_OWNER_EMAIL,
     });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {
@@ -385,7 +393,7 @@ describe(updateTenantDetailsAction, () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: mockReadyTenant(),
-      ownerEmailChanged: true,
+      previousOwnerEmail: MOCK_OWNER_EMAIL,
     });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {
@@ -396,17 +404,81 @@ describe(updateTenantDetailsAction, () => {
     expect(enqueueOwnerAccessRequestMock).toHaveBeenCalledExactlyOnceWith(
       OWNER_INVITE_RESEND_PATH,
       MOCK_TENANT_ID,
+      MOCK_OWNER_EMAIL,
     );
     expect(sendOwnerInviteEmailMock.mock.invocationCallOrder[0]).toBeLessThan(
       enqueueOwnerAccessRequestMock.mock.invocationCallOrder[0] ?? 0,
     );
   });
 
+  describe('once a provisioned owner email changed', () => {
+    const readyTenant = mockReadyTenant();
+
+    beforeEach(() => {
+      updateTenantDetailsMock.mockResolvedValue({
+        outcome: UPDATED,
+        tenant: readyTenant,
+        previousOwnerEmail: MOCK_OWNER_EMAIL,
+      });
+    });
+
+    it('records that the Studio re-invite was requested', async () => {
+      const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+        ...validInput,
+        ownerEmail: MOCK_NEW_OWNER_EMAIL,
+      });
+
+      const [event] = insertAuditEventMock.mock.lastCall ?? [];
+      expect(event.details.studioReinviteRequested).toBe(true);
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        tenant: readyTenant,
+      });
+    });
+
+    it('still saves, and hands back the former email to resend with, when the re-invite request fails', async () => {
+      enqueueOwnerAccessRequestMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+
+      const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+        ...validInput,
+        ownerEmail: MOCK_NEW_OWNER_EMAIL,
+      });
+
+      const [event] = insertAuditEventMock.mock.lastCall ?? [];
+      expect(event.details.studioReinviteRequested).toBe(false);
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        tenant: readyTenant,
+        unsentStudioReinvite: { formerOwnerEmail: MOCK_OWNER_EMAIL },
+      });
+    });
+  });
+
+  it('hands back no unsent Studio invite while the tenant has no Sanity project', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: UPDATED,
+      tenant: MOCK_UPDATED_TENANT,
+      previousOwnerEmail: MOCK_OWNER_EMAIL,
+    });
+
+    const result = await updateTenantDetailsAction(MOCK_TENANT_ID, {
+      ...validInput,
+      ownerEmail: MOCK_NEW_OWNER_EMAIL,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      tenant: MOCK_UPDATED_TENANT,
+    });
+  });
+
   it('re-sends no Sanity invite while the tenant has no Sanity project', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: MOCK_UPDATED_TENANT,
-      ownerEmailChanged: true,
+      previousOwnerEmail: MOCK_OWNER_EMAIL,
     });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {
@@ -421,7 +493,7 @@ describe(updateTenantDetailsAction, () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: UPDATED,
       tenant: mockReadyTenant(),
-      ownerEmailChanged: false,
+      previousOwnerEmail: undefined,
     });
 
     await updateTenantDetailsAction(MOCK_TENANT_ID, {

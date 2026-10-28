@@ -12,7 +12,10 @@ import { WORKER_LOG } from '@platform/constants/worker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_OWNER_EMAIL,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
@@ -53,7 +56,7 @@ const envMock: Partial<Record<keyof typeof env, string>> = env;
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const getMembership = vi.mocked(queries.memberships.getMembership);
 const getAdminByUserId = vi.mocked(queries.admins.getAdminByUserId);
-const fetchMock = vi.fn<(url: URL) => Promise<Response>>();
+const fetchMock = vi.fn<(url: URL, init?: RequestInit) => Promise<Response>>();
 
 const requestedUrls = (): string[] =>
   fetchMock.mock.calls.map(([url]) => url.href);
@@ -160,6 +163,20 @@ describe(enqueueOwnerAccessRequest, () => {
       new URL(MOCK_WORKER_PATH, MOCK_WORKER_URL).href,
     ]);
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+  });
+
+  it('carries the former owner email to the worker when given one', async () => {
+    await enqueueOwnerAccessRequest(
+      MOCK_WORKER_PATH,
+      MOCK_TENANT_ID,
+      MOCK_OWNER_EMAIL,
+    );
+
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    expect(JSON.parse(String(init?.body))).toEqual({
+      tenantId: MOCK_TENANT_ID,
+      formerOwnerEmail: MOCK_OWNER_EMAIL,
+    });
   });
 });
 

@@ -5168,6 +5168,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "STUDIO_NOT_PROVISIONED": [
+      {
+        "ref": "TENANT_REFUSAL.STUDIO_NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "STEP": [
       {
         "ref": "TENANT_FIELD_LOCK_KIND.STEP",

@@ -68,7 +68,7 @@ export type TUpdateTenantDetailsResult =
   | {
       outcome: typeof OUTCOME.UPDATED;
       tenant: TTenant;
-      ownerEmailChanged: boolean;
+      previousOwnerEmail: TMaybeUndefined<string>;
     }
   | TOutcome<typeof OUTCOME.DOMAIN_TAKEN>
   | {
@@ -246,6 +246,6 @@ export async function updateTenantDetails(
   return {
     outcome: OUTCOME.UPDATED,
     tenant,
-    ownerEmailChanged: Boolean(ownerEmailChange),
+    previousOwnerEmail: ownerEmailChange?.previousEmail,
   };
 }

@@ -16,8 +16,12 @@ export type TOwnerAccessRequestResult = TActionResult<
 export const enqueueOwnerAccessRequest = async (
   path: string,
   tenantId: string,
+  formerOwnerEmail?: string,
 ): Promise<TOwnerAccessRequestResult> => {
-  const status = await enqueueWorkerRequest(path, tenantId);
+  const status = await enqueueWorkerRequest(path, {
+    tenantId,
+    formerOwnerEmail,
+  });
 
   if (status === HTTP_STATUS.ACCEPTED) {
     return toOutcome(ACTION_OUTCOME.SUCCESS);
