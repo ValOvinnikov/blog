@@ -164,5 +164,85 @@
       "linkLabel": "Escritos",
       "listHeading": "Todos los artículos"
     }
+  },
+  "docs": {
+    "hero": {
+      "eyebrow": "Documentación",
+      "heading": "Todo lo que necesitas para empezar",
+      "supportingText": "Guías y respuestas, organizadas para que cada lector encuentre lo que busca."
+    },
+    "intro": {
+      "body": [
+        "Te damos la bienvenida a la documentación. Empieza por las guías o consulta las preguntas de abajo para obtener respuestas rápidas.",
+        "Sustituye este texto por un breve resumen de lo que hace tu producto o proyecto y de a quién va dirigida esta documentación."
+      ]
+    },
+    "faq": {
+      "heading": "Preguntas frecuentes",
+      "questions": [
+        {
+          "question": "¿Por dónde empiezo?",
+          "answer": [
+            "Dirige a los nuevos lectores a la primera guía y explica qué necesitan antes de empezar."
+          ]
+        },
+        {
+          "question": "¿Cómo consigo ayuda?",
+          "answer": [
+            "Explica dónde pueden hacer una pregunta o informar de un problema, y en cuánto tiempo pueden esperar respuesta."
+          ]
+        },
+        {
+          "question": "¿Está actualizada esta documentación?",
+          "answer": [
+            "Indica cada cuánto se revisan estas páginas y dónde se puede ver qué ha cambiado."
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "title": "Guías",
+      "slug": "guias",
+      "heading": "Guías",
+      "supportingText": "Ayuda paso a paso, desde los primeros pasos hasta el uso diario.",
+      "listHeading": "Todas las guías",
+      "metaTitle": "Guías — ayuda paso a paso desde el primer día",
+      "metaDescription": "Guías paso a paso sobre la instalación, los conceptos clave y cómo resolver los problemas más habituales."
+    },
+    "pages": [
+      {
+        "title": "Primeros pasos",
+        "slug": "primeros-pasos",
+        "summary": "Una guía de ejemplo. Sustitúyela por tus propios primeros pasos.",
+        "body": [
+          "Describe lo que necesitan los lectores antes de empezar y guíalos después paso a paso.",
+          "Termina con lo que deberían ver cuando todo funciona y enlaza a la siguiente guía."
+        ],
+        "metaTitle": "Primeros pasos — una primera guía de ejemplo",
+        "metaDescription": "Una guía de ejemplo creada con tu sitio. Sustitúyela por los primeros pasos para tus propios lectores."
+      },
+      {
+        "title": "Conceptos clave",
+        "slug": "conceptos-clave",
+        "summary": "Una guía de ejemplo sobre lo que los lectores deben saber.",
+        "body": [
+          "Explica las pocas ideas en las que se basa todo lo demás, cada una con un ejemplo breve.",
+          "Mantén cada sección corta y enlaza a las guías que ponen esas ideas en práctica."
+        ],
+        "metaTitle": "Conceptos clave — una guía de ejemplo de lo esencial",
+        "metaDescription": "Una guía de ejemplo creada con tu sitio. Úsala para explicar las ideas que tus lectores necesitan conocer."
+      },
+      {
+        "title": "Solución de problemas",
+        "slug": "solucion-de-problemas",
+        "summary": "Una guía de ejemplo para resolver problemas habituales.",
+        "body": [
+          "Enumera los problemas más frecuentes, cada uno con su causa y su solución.",
+          "Indica dónde pedir ayuda si la respuesta no está aquí. Borra esta página si aún no la necesitas."
+        ],
+        "metaTitle": "Solución de problemas — una guía de ejemplo",
+        "metaDescription": "Una guía de ejemplo creada con tu sitio. Úsala para los problemas habituales, sus causas y sus soluciones."
+      }
+    ]
   }
 }
