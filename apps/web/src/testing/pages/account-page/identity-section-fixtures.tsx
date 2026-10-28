@@ -1,26 +1,26 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { faker } from '@faker-js/faker';
 import { identitySectionVariants } from '@web/components/pages/account-page/sections/identity-section/identity-section-variants';
 import type {
   IIdentityProviderRow,
   IIdentitySectionViewProps,
 } from '@web/components/pages/account-page/sections/identity-section/identity-section-view';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61032);
+const mockFaker = createMockFaker(61032);
 
-export const MOCK_LINKED_STATUS_LABEL = faker.lorem.word();
-export const MOCK_LAST_METHOD_NOTICE_LABEL = faker.lorem.sentence();
-export const MOCK_UNLINK_LABEL = faker.lorem.word();
-export const MOCK_SAVE_DISPLAY_NAME_LABEL = faker.lorem.word();
-const MOCK_LINK_LABEL = faker.lorem.word();
-const MOCK_GITHUB_LABEL = faker.company.name();
-const MOCK_GOOGLE_LABEL = faker.company.name();
-const MOCK_EMAIL_LINK_LABEL = faker.company.name();
-const MOCK_IDENTITY_HEADING = faker.lorem.words(2);
-const MOCK_DISPLAY_NAME_LABEL = faker.lorem.words(2);
-const MOCK_DISPLAY_NAME_DESCRIPTION = faker.lorem.sentence();
+export const MOCK_LINKED_STATUS_LABEL = mockFaker.lorem.word();
+export const MOCK_LAST_METHOD_NOTICE_LABEL = mockFaker.lorem.sentence();
+export const MOCK_UNLINK_LABEL = mockFaker.lorem.word();
+export const MOCK_SAVE_DISPLAY_NAME_LABEL = mockFaker.lorem.word();
+const MOCK_LINK_LABEL = mockFaker.lorem.word();
+const MOCK_GITHUB_LABEL = mockFaker.company.name();
+const MOCK_GOOGLE_LABEL = mockFaker.company.name();
+const MOCK_EMAIL_LINK_LABEL = mockFaker.company.name();
+const MOCK_IDENTITY_HEADING = mockFaker.lorem.words(2);
+const MOCK_DISPLAY_NAME_LABEL = mockFaker.lorem.words(2);
+const MOCK_DISPLAY_NAME_DESCRIPTION = mockFaker.lorem.sentence();
 
 const s = identitySectionVariants();
 

@@ -1,8 +1,8 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import type { THeroBlogModule } from '@blog/service';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61049);
+const mockFaker = createMockFaker(61049);
 
 type THeroBlogDataBase = Omit<
   Extract<THeroBlogModule, { hasPost: true }>,
@@ -59,4 +59,4 @@ export const mockStaleUnresolvedHeroBlogData = (
     heading,
   }) as THeroBlogModule;
 
-export const MOCK_HERO_BLOG_MODULE_ID = faker.string.uuid();
+export const MOCK_HERO_BLOG_MODULE_ID = mockFaker.string.uuid();

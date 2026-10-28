@@ -17,11 +17,12 @@ import {
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config/get-site-config';
 import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
-faker.seed(61063);
+const mockFaker = createMockFaker(61063);
 
-const MOCK_SITE_CONFIG_CREATED_AT = faker.date.past();
+const MOCK_SITE_CONFIG_CREATED_AT = mockFaker.date.past();
 
 export const mockSiteConfig = (
   overrides: Partial<TSiteConfigResult> = {},

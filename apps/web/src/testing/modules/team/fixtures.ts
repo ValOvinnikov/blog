@@ -1,7 +1,7 @@
 import type { TTeamMember } from '@blog/service';
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61043);
+const mockFaker = createMockFaker(61043);
 
 export const MOCK_TEAM_MEMBER_NAME = 'Jordan Reyes';
 
@@ -24,7 +24,7 @@ export const MOCK_TEAM_HEADING = 'Meet the team';
 
 export const MOCK_TEAM_MEMBERS: TTeamMember[] = [
   mockTeamMember(),
-  mockTeamMember({ id: faker.string.uuid(), name: 'Casey Morgan' }),
+  mockTeamMember({ id: mockFaker.string.uuid(), name: 'Casey Morgan' }),
 ];
 
 export const MOCK_TEAM_MEMBER_PROFILE_URL = '/team/jordan-reyes';
