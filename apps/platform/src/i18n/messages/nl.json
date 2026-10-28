@@ -628,6 +628,25 @@
       "FULL_WIDTH": "Volledige breedte",
       "FLOATING": "Zwevend"
     },
+    "accountButtonStyleLabel": "Accountknop",
+    "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons tonen een cirkel.",
+    "accountButtonStyleOptionLabel": {
+      "PILL": "Pil met label",
+      "CIRCLE": "Cirkel"
+    },
+    "accountPanelStyleLabel": "Accountpaneel",
+    "accountPanelStyleDescription": "Wat de accountknop opent zodra een lezer is ingelogd.",
+    "accountPanelStyleOptionLabel": {
+      "CARD": "Kaart",
+      "PROFILE": "Profiel",
+      "HUB": "Hub"
+    },
+    "accountPhonePlacementLabel": "Op telefoons staat het account",
+    "accountPhonePlacementDescription": "In de balk als cirkel, of als laatste rij van het menu.",
+    "accountPhonePlacementOptionLabel": {
+      "BAR": "In de balk",
+      "MENU": "In het menu"
+    },
     "buttonsHeading": "Knoppen",
     "buttonsDescription": "Hoe knoppen eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
     "busyButtonStyleLabel": "Tijdens het werken",
@@ -684,7 +703,18 @@
     "signIn": "Inloggen",
     "themeToggleDark": "Overschakelen naar donker thema",
     "themeToggleLight": "Overschakelen naar licht thema",
-    "menuButton": "Menu"
+    "menuButton": "Menu",
+    "readerStateAriaLabel": "Lezer",
+    "readerSignedOut": "Uitgelogd",
+    "readerSignedIn": "Ingelogd",
+    "sampleReaderName": "Robin Hale",
+    "accountHeading": "Account",
+    "accountMenuAriaLabel": "Accountmenu",
+    "myBookmarks": "Mijn bladwijzers",
+    "myBookmarksDescription": "Berichten die je hebt bewaard om later te lezen",
+    "accountSettings": "Accountinstellingen",
+    "accountSettingsDescription": "Naam, inlogmethoden, je gegevens",
+    "signOut": "Uitloggen"
   },
   "frontPageSample": {
     "heroHeading": "Berichten van de kust",

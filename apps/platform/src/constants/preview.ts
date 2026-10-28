@@ -13,3 +13,10 @@ export const PREVIEW_WIDTH = {
 } as const;
 
 export type TPreviewWidth = TValueOf<typeof PREVIEW_WIDTH>;
+
+export const PREVIEW_READER_STATE = {
+  SIGNED_OUT: 'SIGNED_OUT',
+  SIGNED_IN: 'SIGNED_IN',
+} as const;
+
+export type TPreviewReaderState = TValueOf<typeof PREVIEW_READER_STATE>;

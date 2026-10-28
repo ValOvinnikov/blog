@@ -384,6 +384,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **PREVIEW_MODE**: `LIGHT`, `DARK`
 - **PREVIEW_WIDTH**: `DESKTOP`, `MOBILE`
+- **PREVIEW_READER_STATE**: `SIGNED_OUT`, `SIGNED_IN`
 
 ### `@platform/constants/provisioning` — `apps/platform/src/constants/provisioning.ts`
 

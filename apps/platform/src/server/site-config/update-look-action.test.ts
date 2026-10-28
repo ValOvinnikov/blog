@@ -1,4 +1,7 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
@@ -71,6 +74,7 @@ const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
 const UNSUPPORTED_CARD_STYLE = 'SHADOWED';
 const UNSUPPORTED_HEADER_LAYOUT = 'ZIGZAG';
 const UNSUPPORTED_BUSY_BUTTON_STYLE = 'SHAKE';
+const UNSUPPORTED_ACCOUNT_PANEL_STYLE = 'DRAWER';
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -86,6 +90,9 @@ const VALID_INPUT: TUpdateLookInput = {
   headerLayout: HEADER_LAYOUT.TWO_ROWS,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
   headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+  accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+  accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
+  accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
   busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
   spinnerStyle: SPINNER_STYLE.DOTS,
 };
@@ -198,6 +205,20 @@ describe(updateLookAction, () => {
       ...VALID_INPUT,
       // @ts-expect-error -- an unsupported busy button style is the invalid input under test
       busyButtonStyle: UNSUPPORTED_BUSY_BUTTON_STYLE,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an account panel the site has no layout for without writing it', async () => {
+    const result = await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      // @ts-expect-error -- an unsupported account panel style is the invalid input under test
+      accountPanelStyle: UNSUPPORTED_ACCOUNT_PANEL_STYLE,
     });
 
     expect(result).toEqual({

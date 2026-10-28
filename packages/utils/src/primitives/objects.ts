@@ -1,8 +1,3 @@
-/**
- * Typed `Object.keys`: preserves `keyof T` instead of widening to `string[]`.
- * Handy for deriving option lists from an object (e.g. Storybook arg dropdowns
- * from a `tailwind-variants` config).
- */
 export const objectKeys = <T extends object>(obj: T): Array<keyof T> =>
   Object.keys(obj) as Array<keyof T>;
 
@@ -12,3 +7,9 @@ export const toTitleCase = (value: string): string =>
     .split('_')
     .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
     .join(' ');
+
+export const toOptions = <TValue extends string>(
+  vocabulary: Record<string, TValue>,
+  toLabel: (value: TValue) => string,
+): { value: TValue; label: string }[] =>
+  Object.values(vocabulary).map((value) => ({ value, label: toLabel(value) }));

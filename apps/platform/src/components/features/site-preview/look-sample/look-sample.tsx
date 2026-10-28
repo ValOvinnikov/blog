@@ -24,6 +24,7 @@ export type TLookSampleProps = {
   header: TSampleHeaderStyle;
   busy: IBusyStyle;
   hasReaderAccounts: boolean;
+  isSignedIn?: boolean;
   isNarrow?: boolean;
   isSubmenuOpen?: boolean;
 };
@@ -35,6 +36,7 @@ export const LookSample = ({
   header,
   busy,
   hasReaderAccounts,
+  isSignedIn = false,
   isNarrow = false,
   isSubmenuOpen = false,
 }: TLookSampleProps) => {
@@ -53,6 +55,7 @@ export const LookSample = ({
         liveLocales={liveLocales}
         header={header}
         hasReaderAccounts={hasReaderAccounts}
+        isSignedIn={isSignedIn}
         isNarrow={isNarrow}
         isDark={theme.isDark}
         isSubmenuOpen={isSubmenuOpen}

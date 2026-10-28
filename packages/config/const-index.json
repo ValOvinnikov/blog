@@ -4700,6 +4700,22 @@
         "file": "apps/platform/src/constants/preview.ts"
       }
     ],
+    "SIGNED_OUT": [
+      {
+        "ref": "PREVIEW_READER_STATE.SIGNED_OUT",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "SIGNED_IN": [
+      {
+        "ref": "PREVIEW_READER_STATE.SIGNED_IN",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
     "provisioning.deprovision_audit_failed": [
       {
         "ref": "PROVISIONING_LOG.DEPROVISION_AUDIT_FAILED",

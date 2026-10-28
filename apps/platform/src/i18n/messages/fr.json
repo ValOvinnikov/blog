@@ -628,6 +628,25 @@
       "FULL_WIDTH": "Pleine largeur",
       "FLOATING": "Flottante"
     },
+    "accountButtonStyleLabel": "Bouton du compte",
+    "accountButtonStyleDescription": "Le bouton avec lequel les lecteurs se connectent et ouvrent leur compte, sur grand écran. Les téléphones affichent un cercle.",
+    "accountButtonStyleOptionLabel": {
+      "PILL": "Pastille avec libellé",
+      "CIRCLE": "Cercle"
+    },
+    "accountPanelStyleLabel": "Panneau du compte",
+    "accountPanelStyleDescription": "Ce que le bouton du compte ouvre une fois le lecteur connecté.",
+    "accountPanelStyleOptionLabel": {
+      "CARD": "Carte",
+      "PROFILE": "Profil",
+      "HUB": "Hub"
+    },
+    "accountPhonePlacementLabel": "Sur téléphone, le compte se trouve",
+    "accountPhonePlacementDescription": "Dans la barre sous forme de cercle, ou en dernière ligne du menu.",
+    "accountPhonePlacementOptionLabel": {
+      "BAR": "Dans la barre",
+      "MENU": "Dans le menu"
+    },
     "buttonsHeading": "Boutons",
     "buttonsDescription": "L'aspect des boutons pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
     "busyButtonStyleLabel": "Pendant le traitement",
@@ -684,7 +703,18 @@
     "signIn": "Se connecter",
     "themeToggleDark": "Passer au thème sombre",
     "themeToggleLight": "Passer au thème clair",
-    "menuButton": "Menu"
+    "menuButton": "Menu",
+    "readerStateAriaLabel": "Lecteur",
+    "readerSignedOut": "Déconnecté",
+    "readerSignedIn": "Connecté",
+    "sampleReaderName": "Robin Hale",
+    "accountHeading": "Compte",
+    "accountMenuAriaLabel": "Menu du compte",
+    "myBookmarks": "Mes favoris",
+    "myBookmarksDescription": "Les articles enregistrés pour plus tard",
+    "accountSettings": "Paramètres du compte",
+    "accountSettingsDescription": "Nom, méthodes de connexion, vos données",
+    "signOut": "Se déconnecter"
   },
   "frontPageSample": {
     "heroHeading": "Chroniques de la côte",

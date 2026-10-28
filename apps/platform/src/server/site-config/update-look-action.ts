@@ -1,6 +1,9 @@
 'use server';
 
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
@@ -48,6 +51,9 @@ const updateLookInputSchema = z.object({
   headerLayout: z.enum(HEADER_LAYOUT),
   headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE),
   headerBarStyle: z.enum(HEADER_BAR_STYLE),
+  accountButtonStyle: z.enum(ACCOUNT_BUTTON_STYLE),
+  accountPanelStyle: z.enum(ACCOUNT_PANEL_STYLE),
+  accountPhonePlacement: z.enum(ACCOUNT_PHONE_PLACEMENT),
   busyButtonStyle: z.enum(BUSY_BUTTON_STYLE),
   spinnerStyle: z.enum(SPINNER_STYLE),
 });
