@@ -23,11 +23,9 @@
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
-import { getDb } from '@blog/db/client';
 import { ADMIN_ROLE, GRANTED_VIA, type TAdminRole } from '@blog/db/constants';
 import { createAdmin, getAdminByUserId } from '@blog/db/queries/admins';
-import { users } from '@blog/db/schema/auth';
-import { eq } from 'drizzle-orm';
+import { findUserByEmail } from '@blog/db/queries/users';
 
 type TParsedArgs = {
   email: string;
@@ -68,12 +66,8 @@ function parseArgs(argv: string[]): TParsedArgs {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const db = getDb();
 
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, args.email));
+  const user = await findUserByEmail(args.email);
   if (!user) {
     throw new Error(
       `seed-admin: no "users" row for "${args.email}" — have them sign in to the site once first, then re-run this script.`,

@@ -8,10 +8,7 @@ import {
   MOCK_INVITE_EMAIL,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
-import {
-  testPersonalEmailIndex,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
+import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
 import {
   deleteTestPersonalDataRows,
   findTestReaderId,
@@ -30,7 +27,6 @@ import {
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 faker.seed(6022);
 

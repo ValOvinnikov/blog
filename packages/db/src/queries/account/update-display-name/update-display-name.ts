@@ -12,6 +12,6 @@ export async function updateDisplayName(
 
   await db
     .update(users)
-    .set({ name, nameEncrypted: encryptPersonalValue(name) })
+    .set({ nameEncrypted: encryptPersonalValue(name) })
     .where(eq(users.id, userId));
 }

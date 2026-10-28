@@ -10,6 +10,7 @@ import {
   insertReplayTenant,
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
+import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { sha256Hex } from '@blog/utils/hash';
 import { faker } from '@faker-js/faker';
 
@@ -66,14 +67,17 @@ describe(`${HASH_MIGRATION} (subscriber tokens hashed in place)`, () => {
     const tenant = await insertReplayTenant(db);
     const [first] = await db
       .insert(subscribers)
-      .values({ tenantId: tenant.id, email: faker.internet.email() })
+      .values({
+        tenantId: tenant.id,
+        ...uniqueEmailColumns(faker.internet.email()),
+      })
       .returning();
     if (!first) throw new Error('failed to seed a subscriber row');
 
     await expect(
       db.insert(subscribers).values({
         tenantId: tenant.id,
-        email: faker.internet.email(),
+        ...uniqueEmailColumns(faker.internet.email()),
         unsubscribeTokenHash: first.unsubscribeTokenHash,
       }),
     ).rejects.toThrow();

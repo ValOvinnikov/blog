@@ -62,8 +62,8 @@ default to zero".
 - **Never import** React, `@blog/ui`, `@blog/service`, `@blog/auth` or
   `@blog/studio`. Needing one is a signal to stop and report.
 - **Nothing imports `apps/worker`.** The admin panel reaches it only through
-  its signed endpoints — `POST /api/provision`, `POST /api/deprovision` and
-  `POST /api/owner-access/*`
+  its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
+  `POST /api/owner-access/*` and `POST /api/custom-domain/*`
   — every one authenticated by the shared enqueue secret. The one other route
   is Vercel Cron's `GET /api/inactivity-sweep`, authenticated by
   `CRON_SECRET`.

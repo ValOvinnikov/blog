@@ -1,5 +1,4 @@
 import { getDb } from '@blog/db/client';
-import { PERSONAL_DATA_OWNER } from '@blog/db/constants';
 import {
   membershipInvites,
   type TMembershipInvite,
@@ -20,18 +19,10 @@ export async function findPendingInviteByEmail(
     .from(membershipInvites)
     .where(
       and(
-        byEmailAddress(address, {
-          index: membershipInvites.emailIndex,
-          plain: membershipInvites.email,
-          owner: PERSONAL_DATA_OWNER.INVITE,
-        }),
+        byEmailAddress(address, membershipInvites.emailIndex),
         isNull(membershipInvites.consumedAt),
       ),
     );
 
-  return withExactEmailAddress(
-    candidates,
-    address,
-    PERSONAL_DATA_OWNER.INVITE,
-  ).map(({ row }) => row);
+  return withExactEmailAddress(candidates, address).map(({ row }) => row);
 }

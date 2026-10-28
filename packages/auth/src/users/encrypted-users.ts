@@ -4,19 +4,28 @@ import type { Adapter, AdapterUser } from 'next-auth/adapters';
 
 type TStoredUser = Omit<AdapterUser, 'email'> & {
   email?: TUser['email'];
-} & Partial<Pick<TUser, 'emailEncrypted' | 'emailIndex' | 'nameEncrypted'>>;
+} & Partial<Pick<TUser, 'emailEncrypted' | 'nameEncrypted'>>;
+
+function toStoredColumns<TWrite extends Partial<AdapterUser>>({
+  email,
+  name,
+  ...user
+}: TWrite) {
+  return { ...user, ...queries.users.userPersonalColumns({ email, name }) };
+}
 
 function decryptUser({
   id,
   emailVerified,
   image,
-  ...personal
+  emailEncrypted,
+  nameEncrypted,
 }: TStoredUser): AdapterUser {
   return {
     id,
     emailVerified,
     image,
-    ...queries.users.readUserPersonalData(personal),
+    ...queries.users.readUserPersonalData({ emailEncrypted, nameEncrypted }),
   };
 }
 
@@ -33,13 +42,11 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
     ...adapter,
     createUser:
       createUser &&
-      (async (user) => {
-        const withEncrypted = {
-          ...user,
-          ...queries.users.userPersonalColumns(user),
-        };
-        return decryptUser(await createUser(withEncrypted));
-      }),
+      (async (user) =>
+        decryptUser(
+          // Auth.js types the write as a full user, but the plain email and name are never stored.
+          await createUser(toStoredColumns(user) as AdapterUser),
+        )),
     getUser:
       getUser &&
       (async (id) => {
@@ -58,13 +65,7 @@ export function withEncryptedUsers(adapter: Adapter): Adapter {
       }),
     updateUser:
       updateUser &&
-      (async (user) => {
-        const withEncrypted = {
-          ...user,
-          ...queries.users.userPersonalColumns(user),
-        };
-        return decryptUser(await updateUser(withEncrypted));
-      }),
+      (async (user) => decryptUser(await updateUser(toStoredColumns(user)))),
     getSessionAndUser:
       getSessionAndUser &&
       (async (sessionToken) => {

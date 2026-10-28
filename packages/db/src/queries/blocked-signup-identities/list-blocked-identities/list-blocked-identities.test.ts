@@ -2,8 +2,6 @@ import {
   ADMIN_ROLE,
   BLOCKED_IDENTITY_KIND,
   GRANTED_VIA,
-  PERSONAL_DATA_FALLBACK_REASON,
-  PERSONAL_DATA_OWNER,
 } from '@blog/db/constants';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
@@ -17,10 +15,6 @@ import {
   insertTestAdmin,
   insertTestUser,
 } from '@blog/db/testing/fixtures';
-import {
-  usePersonalDataFallbackListener,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -40,8 +34,6 @@ const MOCK_NEWER_AT = new Date(MOCK_OLDER_AT.getTime() + 1);
 const MOCK_ADMIN_NAME = faker.person.fullName();
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
-const fallbackListener = usePersonalDataFallbackListener();
 
 afterEach(async () => {
   await db().delete(schema.blockedSignupIdentities);
@@ -123,25 +115,9 @@ describe(listBlockedIdentities, () => {
 
       expect(entry?.addedByEmail).toBe(MOCK_OPERATOR_EMAIL);
       expect(JSON.stringify(entry)).not.toContain(MOCK_ADMIN_NAME);
-      expect(fallbackListener).not.toHaveBeenCalled();
     });
 
-    it('lists the plain email of an admin not yet backfilled, and reports it', async () => {
-      const createdByAdminId = await insertAdmin({
-        email: MOCK_OPERATOR_EMAIL,
-      });
-      await insertBlockedDomain({ createdByAdminId });
-
-      const [entry] = await listEntries();
-
-      expect(entry?.addedByEmail).toBe(MOCK_OPERATOR_EMAIL);
-      expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
-        owner: PERSONAL_DATA_OWNER.USER,
-        reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
-      });
-    });
-
-    it('is null and reports nothing once the admin is gone', async () => {
+    it('is null once the admin is gone', async () => {
       const createdByAdminId = await insertAdmin(
         userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
       );
@@ -151,7 +127,6 @@ describe(listBlockedIdentities, () => {
       const entries = await listEntries();
 
       expect(entries.map(({ addedByEmail }) => addedByEmail)).toEqual([null]);
-      expect(fallbackListener).not.toHaveBeenCalled();
     });
   });
 });

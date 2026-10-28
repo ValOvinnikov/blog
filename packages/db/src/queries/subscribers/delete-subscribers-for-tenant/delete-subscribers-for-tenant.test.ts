@@ -1,5 +1,8 @@
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestSubscriber,
+  insertTestTenant,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -37,12 +40,8 @@ describe(deleteSubscribersForTenant, () => {
   });
 
   it('deletes every subscriber row for the tenant and returns the count', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values([
-        { tenantId, email: MOCK_FIRST_EMAIL },
-        { tenantId, email: MOCK_SECOND_EMAIL },
-      ]);
+    await insertTestSubscriber(db(), tenantId, MOCK_FIRST_EMAIL);
+    await insertTestSubscriber(db(), tenantId, MOCK_SECOND_EMAIL);
 
     const deleted = await deleteSubscribersForTenant(tenantId);
 
@@ -53,9 +52,7 @@ describe(deleteSubscribersForTenant, () => {
 
   it("leaves another tenant's subscribers untouched", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId: otherTenantId, email: MOCK_FIRST_EMAIL });
+    await insertTestSubscriber(db(), otherTenantId, MOCK_FIRST_EMAIL);
 
     await deleteSubscribersForTenant(tenantId);
 
