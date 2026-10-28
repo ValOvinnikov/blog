@@ -21,6 +21,7 @@ import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import {
   MOCK_SANITY_DATASET,
   MOCK_SANITY_PROJECT_ID,
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
   mockTenant,
@@ -86,11 +87,11 @@ describe(ensureInfrastructure, () => {
 
     const [persistedTenant, persistEnv] =
       vi.mocked(persistTenantSanityToken).mock.lastCall ?? [];
-    const [mappedTenant, mapEnv] =
+    const [mappedDomain, mapEnv] =
       vi.mocked(mapTenantDomain).mock.lastCall ?? [];
     expect(persistedTenant?.sanityProjectId).toBe(MOCK_SANITY_PROJECT_ID);
     expect(persistedTenant?.sanityDataset).toBe(MOCK_SANITY_DATASET);
-    expect(mappedTenant?.sanityProjectId).toBe(MOCK_SANITY_PROJECT_ID);
+    expect(mappedDomain).toBe(MOCK_TENANT_DOMAIN);
     expect(persistEnv).toBe(MOCK_PROVISION_ENV);
     expect(mapEnv).toBe(MOCK_PROVISION_ENV);
   });

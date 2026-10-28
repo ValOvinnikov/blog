@@ -5,7 +5,6 @@ export * from './email-template-defaults';
 export * from './lead';
 export * from './look';
 export * from './membership';
-export * from './personal-data';
 export * from './retention';
 export * from './subscriber';
 export * from './tenant';

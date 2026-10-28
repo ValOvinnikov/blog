@@ -1,5 +1,8 @@
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
+import {
+  insertTestSubscriber,
+  insertTestTenant,
+} from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -27,12 +30,8 @@ describe(countSubscribersForTenant, () => {
   });
 
   it('counts every subscriber row for the tenant', async () => {
-    await db()
-      .insert(schema.subscribers)
-      .values([
-        { tenantId, email: MOCK_FIRST_EMAIL },
-        { tenantId, email: MOCK_SECOND_EMAIL },
-      ]);
+    await insertTestSubscriber(db(), tenantId, MOCK_FIRST_EMAIL);
+    await insertTestSubscriber(db(), tenantId, MOCK_SECOND_EMAIL);
 
     const count = await countSubscribersForTenant(tenantId);
 
@@ -41,9 +40,7 @@ describe(countSubscribersForTenant, () => {
 
   it("does not count another tenant's subscribers", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    await db()
-      .insert(schema.subscribers)
-      .values({ tenantId: otherTenantId, email: MOCK_FIRST_EMAIL });
+    await insertTestSubscriber(db(), otherTenantId, MOCK_FIRST_EMAIL);
 
     const count = await countSubscribersForTenant(tenantId);
 

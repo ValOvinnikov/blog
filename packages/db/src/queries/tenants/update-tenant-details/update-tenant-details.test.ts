@@ -9,6 +9,8 @@ import {
   TENANT_STATUS,
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
+import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
+import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import { type users, verificationTokens } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
@@ -30,7 +32,6 @@ import {
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
@@ -45,7 +46,6 @@ import {
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
-import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
 import { and, eq } from 'drizzle-orm';
 
@@ -60,7 +60,6 @@ vi.mock('@blog/db/client');
 faker.seed(6020);
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 const MOCK_TENANT_NAME = faker.company.name();
 const MOCK_NEW_NAME = faker.company.name();
@@ -150,8 +149,7 @@ async function insertOwnerInvite(tenantId: string, email: string) {
     .insert(membershipInvites)
     .values({
       tenantId,
-      email,
-      emailEncrypted: encryptPersonalValue(email),
+      ...inviteEmailColumns(email),
       role: MEMBERSHIP_ROLE.OWNER,
     });
 }
@@ -174,7 +172,7 @@ async function insertJoinedOwner(
   email?: string,
 ): Promise<void> {
   await insertOwnerMember(tenantId, {
-    email,
+    ...(email && userPersonalColumns({ email })),
     emailVerified: MOCK_EMAIL_VERIFIED_AT,
   });
 }
@@ -314,7 +312,9 @@ describe(updateTenantDetails, () => {
         expect(ownerEmailChanged).toBe(true);
 
         const invite = await readOwnerInvite(tenantId);
-        expect(invite?.email).toBe(MOCK_NEW_OWNER_EMAIL);
+        expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
+          MOCK_NEW_OWNER_EMAIL,
+        );
         expect(invite?.emailIndex).toBe(
           testPersonalEmailIndex(MOCK_NEW_OWNER_EMAIL),
         );
@@ -339,7 +339,9 @@ describe(updateTenantDetails, () => {
 
           expect(name).toBe(MOCK_NEW_NAME);
           const ownerInvite = await readOwnerInvite(tenantId);
-          expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
+          expect(
+            decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
+          ).toBe(MOCK_OWNER_EMAIL);
         },
       );
 
@@ -371,11 +373,13 @@ describe(updateTenantDetails, () => {
       });
 
       it('returns owner-email-taken when the new email matches another invite', async () => {
-        await db().insert(membershipInvites).values({
-          tenantId,
-          email: MOCK_MEMBER_EMAIL,
-          role: MEMBERSHIP_ROLE.EDITOR,
-        });
+        await db()
+          .insert(membershipInvites)
+          .values({
+            tenantId,
+            ...inviteEmailColumns(MOCK_MEMBER_EMAIL),
+            role: MEMBERSHIP_ROLE.EDITOR,
+          });
 
         const result = await updateTenantDetails(tenantId, {
           ...MOCK_VALID_INPUT,
@@ -384,7 +388,9 @@ describe(updateTenantDetails, () => {
 
         expect(result).toEqual({ outcome: OWNER_EMAIL_TAKEN });
         const ownerInvite = await readOwnerInvite(tenantId);
-        expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
+        expect(
+          decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
+        ).toBe(MOCK_OWNER_EMAIL);
       });
     });
 
@@ -425,9 +431,10 @@ describe(updateTenantDetails, () => {
       let ownerUserId: string;
 
       beforeEach(async () => {
-        ownerUserId = await insertOwnerMember(tenantId, {
-          email: MOCK_OWNER_EMAIL,
-        });
+        ownerUserId = await insertOwnerMember(
+          tenantId,
+          userPersonalColumns({ email: MOCK_OWNER_EMAIL }),
+        );
       });
 
       it('swaps the owner membership for a pending invite to the new address', async () => {
@@ -441,7 +448,9 @@ describe(updateTenantDetails, () => {
         const ownerMembership = await readOwnerMembership(tenantId);
         expect(ownerMembership).toBeUndefined();
         const ownerInvite = await readOwnerInvite(tenantId);
-        expect(ownerInvite?.email).toBe(MOCK_NEW_OWNER_EMAIL);
+        expect(
+          decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
+        ).toBe(MOCK_NEW_OWNER_EMAIL);
       });
 
       it('returns owner-already-joined once the owner has linked an OAuth account', async () => {
@@ -547,7 +556,9 @@ describe(updateTenantDetails, () => {
 
       expect(result).toEqual({ outcome: PROVISIONING_STARTED });
       const ownerInvite = await readOwnerInvite(tenantId);
-      expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
+      expect(
+        decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
+      ).toBe(MOCK_OWNER_EMAIL);
     });
   });
 
@@ -570,7 +581,9 @@ describe(updateTenantDetails, () => {
       const { ownerEmailChanged } = unwrapUpdatedResult(result);
       expect(ownerEmailChanged).toBe(true);
       const ownerInvite = await readOwnerInvite(tenantId);
-      expect(ownerInvite?.email).toBe(MOCK_NEW_OWNER_EMAIL);
+      expect(
+        decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
+      ).toBe(MOCK_NEW_OWNER_EMAIL);
     });
 
     it('refuses an owner-email change bundled with another field, leaving the invite', async () => {
@@ -582,7 +595,9 @@ describe(updateTenantDetails, () => {
 
       expect(result).toEqual({ outcome: PROVISIONING_STARTED });
       const ownerInvite = await readOwnerInvite(tenantId);
-      expect(ownerInvite?.email).toBe(MOCK_OWNER_EMAIL);
+      expect(
+        decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
+      ).toBe(MOCK_OWNER_EMAIL);
     });
   });
 

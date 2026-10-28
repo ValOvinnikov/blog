@@ -1,7 +1,3 @@
-import {
-  PERSONAL_DATA_FALLBACK_REASON,
-  PERSONAL_DATA_OWNER,
-} from '@blog/db/constants';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import {
@@ -10,10 +6,6 @@ import {
   MOCK_USER_EMAIL,
   MOCK_USER_NAME,
 } from '@blog/db/testing/fixtures';
-import {
-  usePersonalDataFallbackListener,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 
@@ -34,8 +26,6 @@ const MOCK_OLDER_BOOKMARKED_AT = faker.date.past({ refDate: MOCK_REF_DATE });
 const MOCK_NEWER_BOOKMARKED_AT = faker.date.future({ refDate: MOCK_REF_DATE });
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
-const fallbackListener = usePersonalDataFallbackListener();
 let tenantId: string;
 
 beforeEach(async () => {
@@ -58,8 +48,6 @@ describe(exportAccountData, () => {
   it("exports the decrypted profile and this tenant's bookmarks, newest first", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     const { id: userId } = await insertTestUser(db(), {
-      name: MOCK_USER_NAME,
-      email: MOCK_USER_EMAIL,
       ...userPersonalColumns({ name: MOCK_USER_NAME, email: MOCK_USER_EMAIL }),
       image: MOCK_AVATAR_URL,
     });
@@ -114,30 +102,6 @@ describe(exportAccountData, () => {
         image: undefined,
       },
       bookmarks: [],
-    });
-  });
-
-  it('exports the plain name and email of a user not yet backfilled, and reports it', async () => {
-    const { id: userId } = await insertTestUser(db(), {
-      name: MOCK_USER_NAME,
-      email: MOCK_USER_EMAIL,
-    });
-
-    const result = await exportAccountData(tenantId, userId);
-
-    expect(result).toEqual({
-      profile: {
-        id: userId,
-        name: MOCK_USER_NAME,
-        email: MOCK_USER_EMAIL,
-        emailVerified: undefined,
-        image: undefined,
-      },
-      bookmarks: [],
-    });
-    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
-      owner: PERSONAL_DATA_OWNER.USER,
-      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
     });
   });
 });

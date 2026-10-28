@@ -64,7 +64,12 @@ export const Dialog = ({
           <div className={s.header()}>
             <BaseDialog.Title
               render={({ id }) => (
-                <Heading level={headingLevel} id={id} className={s.heading()}>
+                <Heading
+                  level={headingLevel}
+                  size={SIZE.SM}
+                  id={id}
+                  className={s.heading()}
+                >
                   {heading}
                 </Heading>
               )}

@@ -9,6 +9,10 @@ import {
   TENANT_PLAN,
   TENANT_STATUS,
 } from '@blog/db/constants';
+import {
+  leadContentColumns,
+  type TLeadContent,
+} from '@blog/db/queries/leads/lead-content';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import type { TAdmin } from '@blog/db/schema/admins';
@@ -19,8 +23,7 @@ import type { TSubscriber } from '@blog/db/schema/subscribers';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
-import { emailColumns } from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
+import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import type { PGlite } from '@electric-sql/pglite';
 import { faker } from '@faker-js/faker';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -90,7 +93,7 @@ export async function insertTestReader(
   db: TTestDb,
   email: string,
 ): Promise<TUser> {
-  return insertTestUser(db, { email, ...userPersonalColumns({ email }) });
+  return insertTestUser(db, userPersonalColumns({ email }));
 }
 
 export async function insertTestSubscriber(
@@ -103,8 +106,7 @@ export async function insertTestSubscriber(
     .insert(schema.subscribers)
     .values({
       tenantId,
-      email,
-      ...emailColumns(email, personalDataIndex),
+      ...uniqueEmailColumns(email),
       ...overrides,
     })
     .returning();
@@ -149,15 +151,18 @@ export async function insertTestAccount(
 export async function insertTestLead(
   db: TTestDb,
   tenantId: string,
-  overrides: Partial<typeof schema.leads.$inferInsert> = {},
+  {
+    name = MOCK_LEAD_NAME,
+    email = MOCK_LEAD_EMAIL,
+    message = MOCK_LEAD_MESSAGE,
+    ...overrides
+  }: Partial<typeof schema.leads.$inferInsert & TLeadContent> = {},
 ): Promise<TLead> {
   const [lead] = await db
     .insert(schema.leads)
     .values({
       tenantId,
-      name: MOCK_LEAD_NAME,
-      email: MOCK_LEAD_EMAIL,
-      message: MOCK_LEAD_MESSAGE,
+      ...leadContentColumns({ name, email, message }),
       sourcePath: MOCK_LEAD_SOURCE_PATH,
       ...overrides,
     })

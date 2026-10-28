@@ -1,15 +1,16 @@
+import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { deleteVercelProjectDomain } from '@blog/db/utils/vercel-client/vercel-project-domains';
+import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
 import type { TDeprovisionEnv } from '@worker/utils/deprovision-env/deprovision-env';
 
 export async function removeTenantDomain(
   tenant: TTenant,
   env: TDeprovisionEnv,
 ): Promise<void> {
-  await deleteVercelProjectDomain({
+  await deleteVercelProjectDomains({
     token: env.vercelToken,
     teamId: env.vercelTeamId,
     projectId: env.vercelWebProjectId,
-    domain: tenant.primaryDomain,
+    domains: await listTenantHosts(tenant),
   });
 }

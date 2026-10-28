@@ -1,7 +1,3 @@
-import {
-  PERSONAL_DATA_FALLBACK_REASON,
-  PERSONAL_DATA_OWNER,
-} from '@blog/db/constants';
 import { LEADS_PAGE_SIZE } from '@blog/db/constants/lead';
 import * as schema from '@blog/db/schema';
 import {
@@ -11,12 +7,7 @@ import {
   MOCK_LEAD_MESSAGE,
   MOCK_LEAD_NAME,
 } from '@blog/db/testing/fixtures';
-import {
-  usePersonalDataFallbackListener,
-  usePersonalDataKeys,
-} from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
 import { eq, sql } from 'drizzle-orm';
 
@@ -25,8 +16,6 @@ import { listLeadsByCursor } from './list-leads-by-cursor';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
-const fallbackListener = usePersonalDataFallbackListener();
 
 const MOCK_LEAD_COUNT = LEADS_PAGE_SIZE + 5;
 const MINUTE_MS = 60_000;
@@ -44,23 +33,9 @@ const MOCK_LEAD_NAMES = faker.helpers.uniqueArray(
   MOCK_LEAD_COUNT,
 );
 
-function insertEncryptedLead(
-  tenantId: string,
-  overrides: Partial<typeof schema.leads.$inferInsert> = {},
-) {
-  const name = overrides.name ?? MOCK_LEAD_NAME;
-  return insertTestLead(db(), tenantId, {
-    ...overrides,
-    name,
-    nameEncrypted: encryptPersonalValue(name),
-    emailEncrypted: encryptPersonalValue(MOCK_LEAD_EMAIL),
-    messageEncrypted: encryptPersonalValue(MOCK_LEAD_MESSAGE),
-  });
-}
-
 async function insertLeadsOneMinuteApart(tenantId: string, count: number) {
   for (let index = 0; index < count; index += 1) {
-    await insertEncryptedLead(tenantId, {
+    await insertTestLead(db(), tenantId, {
       name: MOCK_LEAD_NAMES[index],
       createdAt: new Date(MOCK_START + index * MINUTE_MS),
     });
@@ -72,7 +47,7 @@ async function insertLeadAtExactTime(
   name: string,
   createdAt: string,
 ) {
-  const { id } = await insertEncryptedLead(tenantId, { name });
+  const { id } = await insertTestLead(db(), tenantId, { name });
   await db()
     .update(schema.leads)
     .set({ createdAt: sql`${createdAt}::timestamptz` })
@@ -102,33 +77,6 @@ describe(listLeadsByCursor, () => {
   });
 
   it('returns the name, email and message from their encrypted form', async () => {
-    const { id, sourcePath, createdAt } = await insertTestLead(db(), tenantId, {
-      name: '',
-      email: '',
-      message: '',
-      nameEncrypted: encryptPersonalValue(MOCK_LEAD_NAME),
-      emailEncrypted: encryptPersonalValue(MOCK_LEAD_EMAIL),
-      messageEncrypted: encryptPersonalValue(MOCK_LEAD_MESSAGE),
-    });
-
-    const { leads } = await listLeadsByCursor({ tenantId });
-
-    expect(leads).toEqual([
-      {
-        id,
-        name: MOCK_LEAD_NAME,
-        email: MOCK_LEAD_EMAIL,
-        message: MOCK_LEAD_MESSAGE,
-        sourcePath,
-        sourceDocumentId: null,
-        sourceLocale: null,
-        readAt: null,
-        createdAt,
-      },
-    ]);
-  });
-
-  it('reads a lead not yet backfilled from its plain columns and reports it', async () => {
     const { id, sourcePath, createdAt } = await insertTestLead(db(), tenantId);
 
     const { leads } = await listLeadsByCursor({ tenantId });
@@ -146,18 +94,6 @@ describe(listLeadsByCursor, () => {
         createdAt,
       },
     ]);
-    expect(fallbackListener).toHaveBeenCalledExactlyOnceWith({
-      owner: PERSONAL_DATA_OWNER.LEAD,
-      reason: PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED,
-    });
-  });
-
-  it('reports nothing for a backfilled lead', async () => {
-    await insertEncryptedLead(tenantId);
-
-    await listLeadsByCursor({ tenantId });
-
-    expect(fallbackListener).not.toHaveBeenCalled();
   });
 
   it('pages through every lead once, newest first', async () => {
@@ -180,7 +116,7 @@ describe(listLeadsByCursor, () => {
     await insertLeadsOneMinuteApart(tenantId, MOCK_LEAD_COUNT);
     const first = await listLeadsByCursor({ tenantId });
 
-    await insertEncryptedLead(tenantId, {
+    await insertTestLead(db(), tenantId, {
       name: MOCK_LATE_LEAD_NAME,
       createdAt: new Date(MOCK_START + MOCK_LEAD_COUNT * MINUTE_MS),
     });
@@ -223,7 +159,7 @@ describe(listLeadsByCursor, () => {
     const createdAt = new Date(MOCK_START);
     const insertedIds: string[] = [];
     for (let index = 0; index < MOCK_LEAD_COUNT; index += 1) {
-      const { id } = await insertEncryptedLead(tenantId, { createdAt });
+      const { id } = await insertTestLead(db(), tenantId, { createdAt });
       insertedIds.push(id);
     }
 
@@ -239,8 +175,8 @@ describe(listLeadsByCursor, () => {
 
   it("never returns another tenant's leads", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
-    const mine = await insertEncryptedLead(tenantId);
-    await insertEncryptedLead(otherTenantId);
+    const mine = await insertTestLead(db(), tenantId);
+    await insertTestLead(db(), otherTenantId);
 
     const { leads } = await listLeadsByCursor({ tenantId });
 
