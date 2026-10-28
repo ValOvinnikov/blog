@@ -1,27 +1,21 @@
 'use client';
 
 import { Form } from '@base-ui/react/form';
-import {
-  ALERT_TYPE,
-  type TLocaleIsoCode,
-  type TMaybeUndefined,
-} from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { AddressStepFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields';
 import { AddressVerdict } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-verdict';
 import { OnboardingActions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-actions';
+import { OnboardingFailureAlert } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-failure-alert';
 import { OnboardingPreview } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-preview';
 import { OnboardingRail } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-rail';
 import { OnboardingStepHeader } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-step-header';
 import { ReviewStep } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/review-step';
 import { SiteDetailsFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-details-fields';
 import { SiteLookFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-look-fields';
-import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
-import { useTranslations } from 'next-intl';
 
-import { ONBOARDING_FAILURE_KEYS } from './onboarding-error-keys';
 import { onboardingFormVariants } from './onboarding-form-variants';
 import { useOnboardingWizard } from './use-onboarding-wizard';
 
@@ -29,14 +23,15 @@ export type TOnboardingFormProps = {
   rootDomain: TMaybeUndefined<string>;
   legalPageUrls: TMaybeUndefined<TLegalPageUrls>;
   initialLocale: TLocaleIsoCode;
+  accountEmail: TMaybeUndefined<string>;
 };
 
 export const OnboardingForm = ({
   rootDomain,
   legalPageUrls,
   initialLocale,
+  accountEmail,
 }: TOnboardingFormProps) => {
-  const t = useTranslations('onboardingForm');
   const {
     values,
     fieldErrors,
@@ -67,7 +62,11 @@ export const OnboardingForm = ({
 
   return (
     <div className={root()}>
-      <OnboardingRail steps={railSteps} currentIndex={stepIndex} />
+      <OnboardingRail
+        steps={railSteps}
+        currentIndex={stepIndex}
+        accountEmail={accountEmail}
+      />
       <main className={main()}>
         <Form className={form()} onSubmit={handleSubmit}>
           <Card className={panel()}>
@@ -78,15 +77,7 @@ export const OnboardingForm = ({
                   stepNumber={stepIndex + 1}
                   stepTotal={railSteps.length}
                 />
-                {failure && (
-                  <Alert
-                    type={ALERT_TYPE.ERROR}
-                    title={t('failureTitle')}
-                    description={t(
-                      `failures.${ONBOARDING_FAILURE_KEYS[failure]}`,
-                    )}
-                  />
-                )}
+                {failure && <OnboardingFailureAlert failure={failure} />}
                 {step === ONBOARDING_STEP.SITE && (
                   <SiteDetailsFields
                     values={values}

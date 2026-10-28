@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import type { TTenantDomain } from '@blog/db/schema/tenant-domains';
-import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
+import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 
 export const findCustomDomain = (
   tenantDomains: Pick<TTenantDomain, 'domain'>[],
@@ -11,5 +11,5 @@ export const findCustomDomain = (
     .map(({ domain }) => domain)
     .find(
       (domain) =>
-        domain !== primaryDomain && !isPlatformAddress(domain, rootDomain),
+        domain !== primaryDomain && isCustomDomain(domain, rootDomain),
     );

@@ -1,6 +1,6 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 import { PreShellFrame } from '@platform/components/features/layout/pre-shell-frame';
-import { SignOutButton } from '@platform/components/features/layout/sign-out-button';
+import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Link } from '@platform/i18n/navigation';
@@ -12,10 +12,12 @@ import { dashboardTenantPickerVariants } from './dashboard-tenant-picker-variant
 
 export type TDashboardTenantPickerProps = {
   tenants: TTenant[];
+  accountEmail?: string;
 };
 
 export const DashboardTenantPicker = ({
   tenants,
+  accountEmail,
 }: TDashboardTenantPickerProps) => {
   const t = useTranslations('dashboardTenantPicker');
   const tSwitcher = useTranslations('tenantSwitcher');
@@ -29,12 +31,9 @@ export const DashboardTenantPicker = ({
   return (
     <PreShellFrame
       header={
-        <PageHeader
-          title={t('heading')}
-          description={t('description')}
-          actions={<SignOutButton />}
-        />
+        <PageHeader title={t('heading')} description={t('description')} />
       }
+      footer={accountEmail && <SignedInAccount email={accountEmail} />}
     >
       <ul className={list()}>
         {toTenantSwitcherItems(tenants).map((tenant) => (

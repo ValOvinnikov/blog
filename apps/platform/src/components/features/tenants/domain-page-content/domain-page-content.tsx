@@ -9,6 +9,7 @@ import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
+import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
@@ -64,9 +65,7 @@ export const DomainPageContent = async ({
         customDomain={customDomain}
         claim={claim}
         primaryProjectDomain={projectDomain}
-        isPrimaryCustom={
-          !isPlatformAddress(primaryDomain, env.TENANT_ROOT_DOMAIN)
-        }
+        isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}
         canManage={
           Boolean(admin) || (membership ? isTenantOwner(membership) : false)
         }

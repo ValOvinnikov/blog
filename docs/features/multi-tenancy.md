@@ -57,7 +57,7 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 ## Configuration
 
 - **Operators:** they control which domains route to a tenant and whether it is servable, through [tenant provisioning](./tenant-provisioning.md): the add-tenant wizard, details edits that repoint the primary `tenant_domains` row, deprovisioning, and reactivation.
-- **Extra domains:** a Growth tenant's owner or an operator can claim one custom domain from the Domain page, prove ownership with a TXT record, and so connect it, and remove it while it is not `primaryDomain` ([public front door](./public-front-door.md)); until proven it lives only in `custom_domain_claims` and does not route; once proven it is a `tenant_domains` row beside the subdomain. Any other extra domain comes only from `seed-tenant --domain`.
+- **Extra domains:** a Growth tenant's owner or an operator can claim one custom domain from the Domain page, prove ownership with a TXT record, and so connect it, and remove it while it is not `primaryDomain` ([public front door](./public-front-door.md)); until proven it lives only in `custom_domain_claims` and does not route; once proven it is a `tenant_domains` row beside the subdomain, and either row can be the main address (`primaryDomain`), switched from the Domain page without renaming either row. Any other extra domain comes only from `seed-tenant --domain`.
 - **Plans:** the plan caps the tenant's live languages through `PLAN_LOCALE_LIMIT` ([languages](./languages.md), [plans and entitlements](./plans-and-entitlements.md)).
 - **Editors:** they never see tenancy. Their Studio is already scoped to one project.
 

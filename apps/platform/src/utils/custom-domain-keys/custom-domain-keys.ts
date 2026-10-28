@@ -23,4 +23,7 @@ export const CUSTOM_DOMAIN_REFUSAL_KEYS = {
   [CUSTOM_DOMAIN_REFUSAL.RECORD_NOT_FOUND]: 'recordNotFound',
   [CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE]: 'connectUnavailable',
   [CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT]: 'connectConflict',
+  [CUSTOM_DOMAIN_REFUSAL.NOT_VERIFIED]: 'notVerified',
+  [CUSTOM_DOMAIN_REFUSAL.ADDRESS_NOT_FOUND]: 'addressNotFound',
+  [CUSTOM_DOMAIN_REFUSAL.ALREADY_MAIN_ADDRESS]: 'alreadyMainAddress',
 } satisfies Record<TCustomDomainRefusal, string>;

@@ -26,6 +26,7 @@ export type TSampleSiteHeaderProps = {
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
   hasReaderAccounts: boolean;
+  isSignedIn: boolean;
   isNarrow: boolean;
   isDark: boolean;
   isSubmenuOpen: boolean;
@@ -36,11 +37,13 @@ export const SampleSiteHeader = ({
   liveLocales,
   header,
   hasReaderAccounts,
+  isSignedIn,
   isNarrow,
   isDark,
   isSubmenuOpen,
 }: TSampleSiteHeaderProps) => {
-  const { layout, submenuStyle, barStyle, languageSwitcherStyle } = header;
+  const { layout, submenuStyle, barStyle, languageSwitcherStyle, account } =
+    header;
   const { root, inner, group, links, controls, brand, brandName } =
     sampleSiteHeaderVariants({
       isNarrow,
@@ -75,7 +78,9 @@ export const SampleSiteHeader = ({
           <SampleHeaderControls
             liveLocales={liveLocales}
             languageSwitcherStyle={languageSwitcherStyle}
+            account={account}
             hasReaderAccounts={hasReaderAccounts}
+            isSignedIn={isSignedIn}
             isDark={isDark}
             isNarrow={isNarrow}
             hasMenuButton={hasMenuButton}

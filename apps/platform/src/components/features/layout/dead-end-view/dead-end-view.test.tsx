@@ -1,8 +1,11 @@
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
+import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { DeadEndView } from './dead-end-view';
+
+vi.mock('@platform/server/auth/sign-out-action');
 
 faker.seed(2404);
 
@@ -55,6 +58,30 @@ describe(`<${DeadEndView.name}/>`, () => {
       const errorId = screen.queryByText(MOCK_ERROR_ID, { exact: false });
 
       expect(errorId).not.toBeInTheDocument();
+    });
+
+    it('offers no sign out', () => {
+      const signOutButton = screen.queryByRole('button', {
+        name: messages.account.signOut,
+      });
+
+      expect(signOutButton).not.toBeInTheDocument();
+    });
+  });
+
+  describe('with a signed-in account', () => {
+    beforeEach(() => {
+      setup({ accountEmail: MOCK_SIGN_IN_EMAIL });
+    });
+
+    it('names the signed-in email and offers a sign out', () => {
+      const email = screen.getByText(MOCK_SIGN_IN_EMAIL, { exact: false });
+      const signOutButton = screen.getByRole('button', {
+        name: messages.account.signOut,
+      });
+
+      expect(email).toBeVisible();
+      expect(signOutButton).toBeVisible();
     });
   });
 

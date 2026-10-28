@@ -21,6 +21,8 @@ code:
   - apps/platform/src/utils/safe-callback-path/**
   - apps/platform/src/utils/sign-in-error/**
   - apps/platform/src/components/features/layout/sign-out-button/**
+  - apps/platform/src/components/features/layout/signed-in-account/**
+  - apps/platform/src/server/auth/get-session-email*
   - apps/platform/src/server/auth/auth.ts
   - apps/platform/src/server/auth/require-session-user-id.ts
   - apps/platform/src/server/auth/resolve-home-href*
@@ -89,6 +91,13 @@ Free site.
 - Sign-out (account menu, or the button on pre-shell pages) runs
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
+- Every signed-in pre-shell page shows a `SignedInAccount` line — "Signed in
+  as <email>" and Sign out, the email read by `getSessionEmail`: the
+  onboarding rail (below the step list on wide screens; on phones a compact
+  Sign out beside the brand, without the email), the dashboard tenant
+  picker, and the not-found page when a session exists.
+  `/sign-in`, `/signup` and `/sign-in-error` never show it, and neither does
+  the client-side error page, which has no session to read.
 
 - `/onboarding`: a four-step setup wizard for a signed-in user with no
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
@@ -293,8 +302,8 @@ Free site.
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
   `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
-  `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `dead-end-view`
-  and `sign-out-button`.
+  `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `sign-out-button`,
+  `signed-in-account` and `dead-end-view`, plus `get-session-email.test.ts`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.

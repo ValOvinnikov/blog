@@ -18,6 +18,9 @@ export const mockCustomDomainDb = () => ({
       addTenantDomain: vi.fn(),
       removeTenantDomain: vi.fn(),
     },
+    tenants: {
+      setTenantPrimaryDomain: vi.fn(),
+    },
     customDomainClaims: {
       createCustomDomainClaim: vi.fn(),
       getCustomDomainClaim: vi.fn(),

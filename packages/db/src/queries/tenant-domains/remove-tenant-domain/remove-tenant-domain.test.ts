@@ -7,6 +7,7 @@ import {
   MOCK_WWW_TENANT_DOMAIN,
 } from '@blog/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
+import { eq } from 'drizzle-orm';
 
 import { removeTenantDomain } from './remove-tenant-domain';
 
@@ -61,6 +62,21 @@ describe(removeTenantDomain, () => {
     );
 
     const rows = await db().select().from(schema.tenantDomains);
+    expect(removed).toBe(false);
+    expect(rows).toHaveLength(1);
+  });
+
+  it('keeps the row and returns false when it is the main address', async () => {
+    await db()
+      .insert(schema.tenantDomains)
+      .values({ tenantId, domain: MOCK_TENANT_DOMAIN });
+
+    const removed = await removeTenantDomain(tenantId, MOCK_TENANT_DOMAIN);
+
+    const rows = await db()
+      .select()
+      .from(schema.tenantDomains)
+      .where(eq(schema.tenantDomains.domain, MOCK_TENANT_DOMAIN));
     expect(removed).toBe(false);
     expect(rows).toHaveLength(1);
   });

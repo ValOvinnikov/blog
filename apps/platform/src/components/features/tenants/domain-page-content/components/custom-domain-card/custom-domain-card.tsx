@@ -3,13 +3,13 @@ import { TENANT_PLAN } from '@blog/db/constants';
 import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
+import { CustomDomainActions } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-actions/custom-domain-actions';
 import { CustomDomainClaimCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-card/custom-domain-claim-card';
 import { CustomDomainFocusProvider } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/custom-domain-focus-provider';
 import { CustomDomainNoticeCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-notice-card/custom-domain-notice-card';
 import { CustomDomainStatusRefresher } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-status-refresher/custom-domain-status-refresher';
 import { DomainVerificationCard } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card/domain-verification-card';
 import { DomainVerificationCardSkeleton } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card-skeleton/domain-verification-card-skeleton';
-import { RemoveCustomDomainControl } from '@platform/components/features/tenants/domain-page-content/components/remove-custom-domain-control/remove-custom-domain-control';
 import {
   getProjectDomain,
   type TProjectDomain,
@@ -45,7 +45,7 @@ export const CustomDomainCard = ({
       ? getProjectDomain(customDomain)
       : primaryProjectDomain,
   };
-  const canRemove = canManage && !isArchived && Boolean(customDomain);
+  const canAct = canManage && !isArchived;
   const canConnect = !shown && !claim && canManage && !isArchived && isGrowth;
   let noticeKey: 'archivedState' | 'ownerOnly' | 'upgradePrompt' =
     'upgradePrompt';
@@ -57,15 +57,19 @@ export const CustomDomainCard = ({
       {shown && (
         <Suspense fallback={<DomainVerificationCardSkeleton />}>
           <DomainVerificationCard
+            key={isPrimaryCustom ? 'main' : 'secondary'}
             domain={shown.domain}
             isPlatformAddress={false}
             projectDomain={shown.projectDomain}
-            title={t('title')}
+            title={isPrimaryCustom ? t('mainTitle') : t('title')}
             actions={
-              canRemove && (
-                <RemoveCustomDomainControl
+              canAct && (
+                <CustomDomainActions
                   tenantId={id}
                   domain={shown.domain}
+                  projectDomain={shown.projectDomain}
+                  isMainAddress={isPrimaryCustom}
+                  canMakeMain={isGrowth}
                 />
               )
             }
@@ -83,7 +87,7 @@ export const CustomDomainCard = ({
           tenantId={id}
           domain={claim.domain}
           token={claim.token}
-          canManage={canManage && !isArchived}
+          canManage={canAct}
         />
       )}
       {canConnect && <ConnectCustomDomainForm tenantId={id} />}

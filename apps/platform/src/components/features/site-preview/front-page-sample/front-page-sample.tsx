@@ -46,6 +46,7 @@ export const FrontPageSample = ({
         liveLocales={liveLocales}
         header={header}
         hasReaderAccounts={false}
+        isSignedIn={false}
         isNarrow={false}
         isDark={theme.isDark}
         isSubmenuOpen={false}

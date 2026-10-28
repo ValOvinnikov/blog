@@ -1,4 +1,7 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
@@ -72,6 +75,23 @@ describe(applyPresetDefaults, () => {
       headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
       headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
       headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+    });
+  });
+
+  it('keeps the account button, panel and phone placement', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+      accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
+      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+    };
+
+    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
+
+    expect(next).toMatchObject({
+      accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+      accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
+      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
     });
   });
 

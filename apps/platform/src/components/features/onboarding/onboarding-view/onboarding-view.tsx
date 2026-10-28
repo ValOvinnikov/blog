@@ -7,16 +7,19 @@ export type TOnboardingViewProps = {
   rootDomain: TMaybeUndefined<string>;
   legalPageUrls: TMaybeUndefined<TLegalPageUrls>;
   initialLocale: TLocaleIsoCode;
+  accountEmail: TMaybeUndefined<string>;
 };
 
 export const OnboardingView = ({
   rootDomain,
   legalPageUrls,
   initialLocale,
+  accountEmail,
 }: TOnboardingViewProps) => (
   <OnboardingForm
     rootDomain={rootDomain}
     legalPageUrls={legalPageUrls}
     initialLocale={initialLocale}
+    accountEmail={accountEmail}
   />
 );

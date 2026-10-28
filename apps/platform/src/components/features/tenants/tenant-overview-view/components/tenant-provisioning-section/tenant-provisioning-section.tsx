@@ -13,11 +13,13 @@ import { useId } from 'react';
 export type TTenantProvisioningSectionProps = {
   tenant: TClientTenant;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
+  isPrimaryCustom: boolean;
 };
 
 export const TenantProvisioningSection = ({
   tenant,
   owner,
+  isPrimaryCustom,
 }: TTenantProvisioningSectionProps) => {
   const { id, deprovisionedAt } = tenant;
   const archivedNoticeId = useId();
@@ -41,6 +43,7 @@ export const TenantProvisioningSection = ({
           provisioningSteps,
           provisioningStatus,
           owner,
+          isPrimaryCustom,
         )}
         owner={owner}
         archivedNoticeId={archivedNoticeId}

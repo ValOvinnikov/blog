@@ -5,6 +5,7 @@ import {
   type THeaderBarStyle,
   type THeaderSubmenuStyle,
 } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -13,6 +14,7 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useTranslations } from 'next-intl';
 
+import { AccountFields } from './components/account-fields/account-fields';
 import { useSubmenuPreview } from './use-submenu-preview';
 
 export const HeaderCard = () => {
@@ -26,22 +28,15 @@ export const HeaderCard = () => {
   const barStyleLock = useLookFieldLock('headerBarStyle');
   const { triggerProps, markChanged } = useSubmenuPreview();
 
-  const layoutOptions = Object.values(HEADER_LAYOUT).map((layout) => ({
-    value: layout,
-    label: t(`headerLayoutOptionLabel.${layout}`),
-  }));
-
-  const submenuStyleOptions = Object.values(HEADER_SUBMENU_STYLE).map(
-    (style) => ({
-      value: style,
-      label: t(`headerSubmenuStyleOptionLabel.${style}`),
-    }),
+  const layoutOptions = toOptions(HEADER_LAYOUT, (layout) =>
+    t(`headerLayoutOptionLabel.${layout}`),
   );
-
-  const barStyleOptions = Object.values(HEADER_BAR_STYLE).map((style) => ({
-    value: style,
-    label: t(`headerBarStyleOptionLabel.${style}`),
-  }));
+  const submenuStyleOptions = toOptions(HEADER_SUBMENU_STYLE, (style) =>
+    t(`headerSubmenuStyleOptionLabel.${style}`),
+  );
+  const barStyleOptions = toOptions(HEADER_BAR_STYLE, (style) =>
+    t(`headerBarStyleOptionLabel.${style}`),
+  );
 
   return (
     <LookCard
@@ -97,6 +92,8 @@ export const HeaderCard = () => {
           aria-describedby={barStyleLock.describedBy}
         />
       </LookField>
+
+      <AccountFields />
     </LookCard>
   );
 };

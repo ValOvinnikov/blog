@@ -179,7 +179,8 @@
     "roleChip": "{role} · {scope}"
   },
   "account": {
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as {email}"
   },
   "roleLabel": {
     "SUPERADMIN": "Super admin",
@@ -506,7 +507,10 @@
         "noPendingClaim": "There's no domain waiting for verification.",
         "recordNotFound": "We can't see the TXT record yet. DNS changes can take a few minutes.",
         "connectUnavailable": "We verified your domain, but couldn't connect it because our setup service is unavailable. Press Verify to try again; your DNS record is still in place.",
-        "connectConflict": "We verified your domain, but couldn't connect it because the site or domain isn't ready yet. Press Verify to try again; your DNS record is still in place."
+        "connectConflict": "We verified your domain, but couldn't connect it because the site or domain isn't ready yet. Press Verify to try again; your DNS record is still in place.",
+        "notVerified": "This domain isn't verified yet. Try again once it is.",
+        "addressNotFound": "That address isn't one of this site's addresses.",
+        "alreadyMainAddress": "This address is already the main address."
       },
       "awaitingProof": "Awaiting proof",
       "proofInstructions": "Add this TXT record at your DNS provider to prove the domain is yours. We check it automatically, or press Verify.",
@@ -516,7 +520,25 @@
       "verify": "Verify",
       "verifying": "Verifying…",
       "verifyFailed": "Couldn't check the record. Try again.",
-      "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working."
+      "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working.",
+      "mainTitle": "Your own domain (main address)",
+      "mainAddress": {
+        "failed": "Couldn't switch the main address. Try again.",
+        "makeMain": {
+          "trigger": "Make this the main address",
+          "title": "Make this the main address?",
+          "description": "Your site will be known by {domain}. You can switch back to your subdomain at any time.",
+          "confirm": "Make main address",
+          "confirming": "Switching…"
+        },
+        "useSubdomain": {
+          "trigger": "Use my subdomain as the main address",
+          "title": "Use your subdomain as the main address?",
+          "description": "Your site will go back to being known by your subdomain. {domain} stays connected.",
+          "confirm": "Use subdomain",
+          "confirming": "Switching…"
+        }
+      }
     }
   },
   "presetPicker": {
@@ -626,6 +648,25 @@
       "FULL_WIDTH": "Full width",
       "FLOATING": "Floating"
     },
+    "accountButtonStyleLabel": "Account button",
+    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones show a circle.",
+    "accountButtonStyleOptionLabel": {
+      "PILL": "Pill with label",
+      "CIRCLE": "Circle"
+    },
+    "accountPanelStyleLabel": "Account panel",
+    "accountPanelStyleDescription": "What the account button opens once a reader is signed in.",
+    "accountPanelStyleOptionLabel": {
+      "CARD": "Card",
+      "PROFILE": "Profile",
+      "HUB": "Hub"
+    },
+    "accountPhonePlacementLabel": "On phones, the account sits",
+    "accountPhonePlacementDescription": "In the bar as a circle, or as the menu's last row.",
+    "accountPhonePlacementOptionLabel": {
+      "BAR": "In the bar",
+      "MENU": "In the menu"
+    },
     "buttonsHeading": "Buttons",
     "buttonsDescription": "How buttons look while they work, and the spinner they show.",
     "busyButtonStyleLabel": "While busy",
@@ -682,7 +723,18 @@
     "signIn": "Sign in",
     "themeToggleDark": "Switch to dark theme",
     "themeToggleLight": "Switch to light theme",
-    "menuButton": "Menu"
+    "menuButton": "Menu",
+    "readerStateAriaLabel": "Reader",
+    "readerSignedOut": "Signed out",
+    "readerSignedIn": "Signed in",
+    "sampleReaderName": "Robin Hale",
+    "accountHeading": "Account",
+    "accountMenuAriaLabel": "Account menu",
+    "myBookmarks": "My bookmarks",
+    "myBookmarksDescription": "Posts you saved to read later",
+    "accountSettings": "Account settings",
+    "accountSettingsDescription": "Name, sign-in methods, your data",
+    "signOut": "Sign out"
   },
   "frontPageSample": {
     "heroHeading": "Dispatches from the coast",
@@ -1140,7 +1192,8 @@
       "ownerAlreadyJoined": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       "ownerHasFreeTenant": "This owner already has a Free site. Archive it or keep this site on its current plan.",
       "saveFailed": "Couldn't save tenant details — try again."
-    }
+    },
+    "fieldLockedReasonCustomMainDomain": "Locked — the main address is your own domain. Switch back to the subdomain on the Domain page to edit."
   },
   "tenantFieldErrors": {
     "nameRequired": "Enter a tenant name.",
@@ -1153,7 +1206,8 @@
     "emailInvalid": "Enter a valid email.",
     "planUnsupported": "Choose a supported plan.",
     "localeUnsupported": "Choose a supported language.",
-    "ownerEmailTaken": "This email already has a pending invite on this tenant."
+    "ownerEmailTaken": "This email already has a pending invite on this tenant.",
+    "domainCustomMain": "This site's main address is its own domain. Switch back to the subdomain on its Domain page first."
   },
   "archivedTenantNotice": {
     "title": "This tenant is archived",

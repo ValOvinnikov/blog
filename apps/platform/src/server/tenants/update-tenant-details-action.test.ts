@@ -26,13 +26,16 @@ import {
   MOCK_OPERATOR_ID,
   MOCK_OPERATOR_EMAIL,
 } from '@platform/testing/admins/operator';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockReadyTenant,
   mockTenant,
   MOCK_ARCHIVED_AT,
+  MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  MOCK_TENANT_ROOT_DOMAIN,
   MOCK_NEW_OWNER_EMAIL,
   MOCK_OWNER_EMAIL,
   MOCK_RENAMED_TENANT_NAME,
@@ -68,6 +71,8 @@ const {
 vi.mock('@platform/server/auth/require-admin');
 
 vi.mock('@platform/server/auth/auth');
+
+vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
@@ -118,6 +123,7 @@ const validInput = {
 
 describe(updateTenantDetailsAction, () => {
   beforeEach(() => {
+    mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
     requireAdminMock.mockReset();
     authMock.mockReset();
     authMock.mockResolvedValue({
@@ -178,6 +184,46 @@ describe(updateTenantDetailsAction, () => {
     });
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  describe('while the main address is the custom domain', () => {
+    beforeEach(() => {
+      getTenantByIdMock.mockResolvedValue(
+        mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+      );
+    });
+
+    it('refuses a primary domain change without saving anything', async () => {
+      const result = await updateTenantDetailsAction(
+        MOCK_TENANT_ID,
+        validInput,
+      );
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          primaryDomain: { reason: TENANT_FIELD_ERROR.DOMAIN_CUSTOM_MAIN },
+        },
+      });
+      expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
+    });
+
+    it('still saves other fields while the primary domain is unchanged', async () => {
+      const input = {
+        ...validInput,
+        name: MOCK_RENAMED_TENANT_NAME,
+        primaryDomain: MOCK_CUSTOM_DOMAIN,
+      };
+
+      const result = await updateTenantDetailsAction(MOCK_TENANT_ID, input);
+
+      expect(result).toMatchObject({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(updateTenantDetailsMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        input,
+      );
+    });
   });
 
   it('returns field errors for an invalid domain', async () => {

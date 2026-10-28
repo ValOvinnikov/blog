@@ -1,4 +1,5 @@
 import { DashboardTenantPicker } from '@platform/components/features/layout/dashboard-tenant-picker';
+import { getSessionEmail } from '@platform/server/auth/get-session-email';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -10,11 +11,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SelectTenantPage() {
-  const { memberships, tenants } = await listSessionTenants();
+  const [{ memberships, tenants }, accountEmail] = await Promise.all([
+    listSessionTenants(),
+    getSessionEmail(),
+  ]);
 
   if (memberships.length === 1) {
     redirect(adminRoutes.dashboard());
   }
 
-  return <DashboardTenantPicker tenants={tenants} />;
+  return (
+    <DashboardTenantPicker tenants={tenants} accountEmail={accountEmail} />
+  );
 }

@@ -2,6 +2,9 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
+  type TAccountButtonStyle,
+  type TAccountPanelStyle,
+  type TAccountPhonePlacement,
   type TBusyButtonStyle,
   type TCardStyle,
   type TDensity,
@@ -32,6 +35,9 @@ export type TLookFormValues = {
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
+  accountButtonStyle: TAccountButtonStyle;
+  accountPanelStyle: TAccountPanelStyle;
+  accountPhonePlacement: TAccountPhonePlacement;
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
   languageSwitcherStyle: TLanguageSwitcherStyle;
@@ -53,6 +59,9 @@ export const defaultLookFormValues = (): TLookFormValues => {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    accountButtonStyle,
+    accountPanelStyle,
+    accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
   } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
@@ -70,6 +79,9 @@ export const defaultLookFormValues = (): TLookFormValues => {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    accountButtonStyle,
+    accountPanelStyle,
+    accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
@@ -94,6 +106,9 @@ export const toLookFormValues = (
     headerLayout: siteConfig.headerLayout,
     headerSubmenuStyle: siteConfig.headerSubmenuStyle,
     headerBarStyle: siteConfig.headerBarStyle,
+    accountButtonStyle: siteConfig.accountButtonStyle,
+    accountPanelStyle: siteConfig.accountPanelStyle,
+    accountPhonePlacement: siteConfig.accountPhonePlacement,
     busyButtonStyle: siteConfig.busyButtonStyle,
     spinnerStyle: siteConfig.spinnerStyle,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,

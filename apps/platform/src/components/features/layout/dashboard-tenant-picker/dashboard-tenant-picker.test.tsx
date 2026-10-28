@@ -1,4 +1,5 @@
 import messages from '@platform/i18n/messages/en.json';
+import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   MOCK_ARCHIVED_AT,
@@ -20,6 +21,7 @@ const MOCK_TENANT_NAME_PATTERN = new RegExp(MOCK_TENANT_NAME);
 const MOCK_OTHER_TENANT_NAME_PATTERN = new RegExp(MOCK_OTHER_TENANT_NAME);
 
 const setup = customRender(DashboardTenantPicker, {
+  accountEmail: MOCK_SIGN_IN_EMAIL,
   tenants: [
     mockTenant(),
     mockTenant({
@@ -85,11 +87,13 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       expect(activeBadge).not.toBeInTheDocument();
     });
 
-    it('offers a sign out', () => {
+    it('names the signed-in email and offers a sign out', () => {
+      const email = screen.getByText(MOCK_SIGN_IN_EMAIL, { exact: false });
       const signOutButton = screen.getByRole('button', {
         name: messages.account.signOut,
       });
 
+      expect(email).toBeVisible();
       expect(signOutButton).toBeVisible();
     });
   });

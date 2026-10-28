@@ -1,4 +1,7 @@
 import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  ACCOUNT_PHONE_PLACEMENT,
   ACTION_OUTCOME,
   CARD_STYLE,
   BUSY_BUTTON_STYLE,
@@ -116,7 +119,7 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action', () => ({
 
 faker.seed(5993);
 
-const { lookForm: LOOK_FORM } = messages;
+const { lookForm: LOOK_FORM, lookPreview: LOOK_PREVIEW } = messages;
 const tLogoHue = makeEnTranslator('logoHueField');
 const tUploadErrors = makeEnTranslator('uploadErrors');
 const tSaveBar = makeEnTranslator('saveBar');
@@ -157,7 +160,7 @@ const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 const SAVING = 'Saving…';
 const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
-const GROWTH_ONLY_FIELD_COUNT = 13;
+const GROWTH_ONLY_FIELD_COUNT = 16;
 const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
 const SPINNER_LABEL = LOOK_FORM.spinnerStyleLabel;
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
@@ -195,6 +198,9 @@ const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     headerLayout: defaults.headerLayout,
     headerSubmenuStyle: defaults.headerSubmenuStyle,
     headerBarStyle: defaults.headerBarStyle,
+    accountButtonStyle: defaults.accountButtonStyle,
+    accountPanelStyle: defaults.accountPanelStyle,
+    accountPhonePlacement: defaults.accountPhonePlacement,
     busyButtonStyle: defaults.busyButtonStyle,
     spinnerStyle: defaults.spinnerStyle,
     languageSwitcherStyle: defaults.languageSwitcherStyle,
@@ -353,6 +359,21 @@ describe(`<${LookForm.name}/>`, () => {
           saved: { headerBarStyle: HEADER_BAR_STYLE.FLOATING },
         },
         {
+          group: LOOK_FORM.accountButtonStyleLabel,
+          option: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
+          saved: { accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE },
+        },
+        {
+          group: LOOK_FORM.accountPanelStyleLabel,
+          option: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
+          saved: { accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB },
+        },
+        {
+          group: LOOK_FORM.accountPhonePlacementLabel,
+          option: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
+          saved: { accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU },
+        },
+        {
           group: LOOK_FORM.busyButtonStyleLabel,
           option: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
           saved: { busyButtonStyle: BUSY_BUTTON_STYLE.EDGE },
@@ -408,6 +429,25 @@ describe(`<${LookForm.name}/>`, () => {
             savedLookValues({ spinnerStyle: SPINNER_STYLE.DOTS }),
           );
         });
+      });
+
+      it('previews the chosen account panel open while signed in', async () => {
+        const hubButton = screen.getByRole('button', {
+          name: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
+        });
+        await user.click(hubButton);
+        const signedInButton = screen.getByRole('button', {
+          name: LOOK_PREVIEW.readerSignedIn,
+        });
+        await user.click(signedInButton);
+
+        const accountMenu = screen.getByRole('menu', {
+          name: LOOK_PREVIEW.accountMenuAriaLabel,
+        });
+        expect(accountMenu).toBeVisible();
+        expect(accountMenu).toHaveTextContent(
+          LOOK_PREVIEW.myBookmarksDescription,
+        );
       });
 
       it('shows the chosen busy style and spinner on the preview busy button', async () => {
@@ -714,6 +754,33 @@ describe(`<${LookForm.name}/>`, () => {
     expect(keptButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
+  it('leaves the account button, panel and phone placement as they are when a preset is chosen', async () => {
+    setup({
+      initialValues: {
+        ...defaultLookFormValues(),
+        accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
+        accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
+        accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
+      },
+    });
+
+    const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
+    await user.click(editorialRadio);
+
+    const circleButton = screen.getByRole('button', {
+      name: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
+    });
+    const hubButton = screen.getByRole('button', {
+      name: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
+    });
+    const inMenuButton = screen.getByRole('button', {
+      name: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
+    });
+    expect(circleButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(hubButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(inMenuButton).toHaveAttribute(ARIA_PRESSED, 'true');
+  });
+
   it('shows a single-language note and no switcher choice with one language', () => {
     setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
@@ -961,6 +1028,35 @@ describe(`<${LookForm.name}/>`, () => {
       );
       expect(fullWidthButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(floatingButton).toBeDisabled();
+    });
+
+    it.each([
+      {
+        group: LOOK_FORM.accountButtonStyleLabel,
+        current: LOOK_FORM.accountButtonStyleOptionLabel.PILL,
+        other: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
+      },
+      {
+        group: LOOK_FORM.accountPanelStyleLabel,
+        current: LOOK_FORM.accountPanelStyleOptionLabel.CARD,
+        other: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
+      },
+      {
+        group: LOOK_FORM.accountPhonePlacementLabel,
+        current: LOOK_FORM.accountPhonePlacementOptionLabel.BAR,
+        other: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
+      },
+    ])('shows $group locked at its default', ({ group, current, other }) => {
+      const accountGroup = screen.getByRole('group', { name: group });
+      const currentButton = within(accountGroup).getByRole('button', {
+        name: current,
+      });
+      const otherButton = within(accountGroup).getByRole('button', {
+        name: other,
+      });
+
+      expect(currentButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(otherButton).toBeDisabled();
     });
 
     it('shows the busy button style and spinner locked at their defaults', () => {

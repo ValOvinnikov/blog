@@ -1,4 +1,5 @@
 import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
+import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
 import { Heading } from '@platform/components/shared/heading';
 import {
   StatusBadge,
@@ -16,6 +17,7 @@ export type TDeadEndViewProps = {
   description: string;
   action: ReactNode;
   errorId?: string;
+  accountEmail?: string;
 };
 
 export const DeadEndView = ({
@@ -24,6 +26,7 @@ export const DeadEndView = ({
   description,
   action,
   errorId,
+  accountEmail,
 }: TDeadEndViewProps) => {
   const t = useTranslations('deadEndView');
   const {
@@ -31,6 +34,7 @@ export const DeadEndView = ({
     copy,
     actions,
     errorId: errorIdSlot,
+    account,
   } = deadEndViewVariants();
 
   return (
@@ -48,6 +52,11 @@ export const DeadEndView = ({
           <Text variant="meta" className={errorIdSlot()}>
             {t('errorId', { errorId })}
           </Text>
+        )}
+        {accountEmail && (
+          <div className={account()}>
+            <SignedInAccount email={accountEmail} />
+          </div>
         )}
       </div>
     </CenteredCardFrame>

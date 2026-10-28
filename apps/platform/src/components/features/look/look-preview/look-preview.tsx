@@ -6,7 +6,12 @@ import { LookSample } from '@platform/components/features/site-preview/look-samp
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
+import {
+  PREVIEW_READER_STATE,
+  PREVIEW_WIDTH,
+  type TPreviewReaderState,
+  type TPreviewWidth,
+} from '@platform/constants/preview';
 import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -28,11 +33,19 @@ export const LookPreview = ({
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
   const [width, setWidth] = useState<TPreviewWidth>(PREVIEW_WIDTH.DESKTOP);
+  const [readerState, setReaderState] = useState<TPreviewReaderState>(
+    PREVIEW_READER_STATE.SIGNED_OUT,
+  );
   const isNarrow = width === PREVIEW_WIDTH.MOBILE;
 
   const widthOptions: { value: TPreviewWidth; label: string }[] = [
     { value: PREVIEW_WIDTH.DESKTOP, label: t('widthDesktop') },
     { value: PREVIEW_WIDTH.MOBILE, label: t('widthMobile') },
+  ];
+
+  const readerStateOptions: { value: TPreviewReaderState; label: string }[] = [
+    { value: PREVIEW_READER_STATE.SIGNED_OUT, label: t('readerSignedOut') },
+    { value: PREVIEW_READER_STATE.SIGNED_IN, label: t('readerSignedIn') },
   ];
 
   return (
@@ -49,7 +62,19 @@ export const LookPreview = ({
           onChange={setWidth}
         />
       }
-      controls={<PreviewModeControl value={mode} onChange={setMode} />}
+      controls={
+        <>
+          <PreviewModeControl value={mode} onChange={setMode} />
+          {hasReaderAccounts && (
+            <SegmentedControl
+              ariaLabel={t('readerStateAriaLabel')}
+              options={readerStateOptions}
+              value={readerState}
+              onChange={setReaderState}
+            />
+          )}
+        </>
+      }
       notes={<p>{t('previewNote')}</p>}
     >
       <LookSample
@@ -59,6 +84,7 @@ export const LookPreview = ({
         header={toSampleHeaderStyle(values)}
         busy={toSampleBusyStyle(values)}
         hasReaderAccounts={hasReaderAccounts}
+        isSignedIn={readerState === PREVIEW_READER_STATE.SIGNED_IN}
         isNarrow={isNarrow}
         isSubmenuOpen={isSubmenuPreviewOpen}
       />
