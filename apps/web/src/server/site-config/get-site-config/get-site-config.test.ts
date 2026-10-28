@@ -1,7 +1,11 @@
 import { PRESET_ID } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { TENANT_PLAN } from '@blog/db/constants';
+import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { SITE_CONFIG_LOG } from '@web/constants/site-config';
+import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import {
@@ -12,12 +16,18 @@ import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { getSiteConfig } from './get-site-config';
 
 faker.seed(6010);
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
+vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan');
+
+vi.mock('@blog/db/utils/effective-look/effective-look', () => ({
+  toEffectiveLook: vi.fn((look: unknown) => look),
+}));
 
 vi.mock(
   '@blog/db',
@@ -94,5 +104,59 @@ describe(getSiteConfig, () => {
 
     await expect(getSiteConfig()).rejects.toBe(MOCK_DYNAMIC_SERVER_USAGE_ERROR);
     expect(getSiteConfigMock).not.toHaveBeenCalled();
+  });
+
+  it("applies the tenant's plan to the row's Look", async () => {
+    const effectiveRow = mockSiteConfig({ tenantId: MOCK_TENANT_ID });
+    getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG_ROW_A);
+    vi.mocked(getTenantPlan).mockResolvedValue(okResult(TENANT_PLAN.FREE));
+    vi.mocked(toEffectiveLook).mockReturnValueOnce(effectiveRow);
+
+    const result = await getSiteConfig(MOCK_TENANT_ID);
+
+    expect(result).toEqual(okResult(effectiveRow));
+    expect(getTenantPlan).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(toEffectiveLook).toHaveBeenCalledWith(
+      MOCK_SITE_CONFIG_ROW_A,
+      TENANT_PLAN.FREE,
+    );
+  });
+
+  it('applies the Free Look and logs when the plan cannot be read', async () => {
+    getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG_ROW_A);
+    vi.mocked(getTenantPlan).mockResolvedValue(errorResult(MOCK_ERROR));
+
+    await getSiteConfig(MOCK_TENANT_ID);
+
+    expect(toEffectiveLook).toHaveBeenCalledWith(
+      MOCK_SITE_CONFIG_ROW_A,
+      TENANT_PLAN.FREE,
+    );
+    expect(logger.error).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.PLAN_FETCH_FAILED,
+      { error: MOCK_ERROR },
+    );
+  });
+
+  it('applies the Free Look when the tenant has no plan', async () => {
+    getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG_ROW_A);
+    vi.mocked(getTenantPlan).mockResolvedValue(okResult());
+
+    await getSiteConfig(MOCK_TENANT_ID);
+
+    expect(toEffectiveLook).toHaveBeenCalledWith(
+      MOCK_SITE_CONFIG_ROW_A,
+      TENANT_PLAN.FREE,
+    );
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('resolves no row when the tenant has no site_config row', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+
+    const result = await getSiteConfig(MOCK_TENANT_ID);
+
+    expect(result).toEqual(okResult());
+    expect(toEffectiveLook).not.toHaveBeenCalled();
   });
 });
