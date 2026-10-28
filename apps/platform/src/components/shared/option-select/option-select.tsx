@@ -1,6 +1,7 @@
 'use client';
 
 import { Select } from '@platform/components/shared/select';
+import type { AriaAttributes } from 'react';
 
 type TOptionSelectOption<TValue extends string> = {
   value: TValue;
@@ -12,6 +13,7 @@ export type TOptionSelectProps<TValue extends string> = {
   value: TValue;
   onChange: (value: TValue) => void;
   isDisabled?: boolean;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 export const OptionSelect = <TValue extends string>({
@@ -19,12 +21,15 @@ export const OptionSelect = <TValue extends string>({
   value,
   onChange,
   isDisabled,
+  'aria-describedby': ariaDescribedBy,
 }: TOptionSelectProps<TValue>) => {
   const selected = options.find((option) => option.value === value);
 
   return (
     <Select value={value} onChange={onChange} isDisabled={isDisabled}>
-      <Select.Trigger>{selected?.label}</Select.Trigger>
+      <Select.Trigger aria-describedby={ariaDescribedBy}>
+        {selected?.label}
+      </Select.Trigger>
       <Select.Popup>
         {options.map((option) => (
           <Select.Item key={option.value} value={option.value}>

@@ -512,6 +512,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"
+      },
+      {
+        "ref": "ONBOARDING_STEP.SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "PLATFORM": [
@@ -3160,6 +3166,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
+      },
+      {
+        "ref": "ONBOARDING_STEP.ADDRESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "DOMAIN": [
@@ -4504,6 +4516,30 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
+    "UNVERIFIED": [
+      {
+        "ref": "SITE_ADDRESS_STATUS.UNVERIFIED",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "LOOK": [
+      {
+        "ref": "ONBOARDING_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "REVIEW": [
+      {
+        "ref": "ONBOARDING_STEP.REVIEW",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
     "onboarding.root_domain_missing": [
       {
         "ref": "ONBOARDING_LOG.ROOT_DOMAIN_MISSING",
@@ -5742,6 +5778,14 @@
         "scope": "app:web",
         "from": "@web/constants/bookmark",
         "file": "apps/web/src/constants/bookmark.ts"
+      }
+    ],
+    "busy_style.site_config_fetch_failed": [
+      {
+        "ref": "BUSY_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/busy-style",
+        "file": "apps/web/src/constants/busy-style.ts"
       }
     ],
     "client_log.report_received": [

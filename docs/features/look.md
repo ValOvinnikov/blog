@@ -5,6 +5,7 @@ layers: [config, db, web, platform]
 code:
   - packages/config/src/constants/preset.ts
   - packages/config/src/constants/card-style.ts
+  - packages/config/src/theme/spinner-variant.ts
   - packages/db/src/schema/site-config.ts
   - packages/db/src/queries/site-config/**
   - packages/db/src/constants/look.ts
@@ -28,6 +29,8 @@ code:
   - apps/platform/src/utils/brand-asset-limits/**
   - apps/web/src/server/site-config/get-site-config/**
   - apps/web/src/server/site-config/get-language-switcher-style/**
+  - apps/web/src/server/site-config/get-busy-style/**
+  - apps/web/src/context/busy-style-provider/**
   - apps/web/src/utils/to-theme-tokens/**
   - apps/web/src/utils/get-theme-tokens/**
   - apps/web/src/utils/build-theme-style-block/**
@@ -41,12 +44,12 @@ epics: [4987, 4991, 4992, 4993, 4999, 4960]
 
 ## What it does
 
-The Look page is where a tenant owner styles their public site without touching code. They pick a preset (Console or Editorial), then adjust the accent hue, the logo-mark hue, the heading and body fonts, corner radius, density, card style, the header buttons style and the language-switcher style, and upload a logo and favicon. A live preview shows the result in light or dark and at desktop or phone width before saving. One save restyles every page of the site, and the accent and logo hues also colour the tenant's emails.
+The Look page is where a tenant owner styles their public site without touching code. They pick a preset (Console or Editorial), then adjust the accent hue, the logo-mark hue, the heading and body fonts, corner radius, density, card style, the header buttons style, the header's wide-screen layout, sub-menu style and bar, and the language-switcher style, and upload a logo and favicon. A live preview shows the result in light or dark and at desktop or phone width before saving. One save restyles every page of the site, and the accent and logo hues also colour the tenant's emails.
 
 ## Surfaces and routes
 
-- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Brand and Language switcher cards. On `FREE` every field but the preset, accent hue, logo and favicon is locked (see Configuration).
-- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style. The header brand shows the Look logo and `app/icon.tsx` serves the Look favicon.
+- **Platform** — `/dashboard/look` (owner) and `/tenants/{id}/look` (operator). An Edit/Preview tab pair; the edit panel holds the Preset, Colour, Type, Shape (radius, density, card style, header buttons), Header (layout, sub-menus, bar), Brand and Language switcher cards. On `FREE` every field but the preset, accent hue, logo and favicon is locked (see Configuration).
+- **Public site** — no route of its own. `[tenant]/[locale]/layout.tsx` and the standalone not-found page wrap the page in `ThemeScope`, which hoists one `<style>` into `<head>` and sets the font variable classes. The header and footer read the language-switcher style. Every busy button and spinner on the site reads the busy-button style and spinner style. The header brand shows the Look logo and `app/icon.tsx` serves the Look favicon.
 - **Email** — `resolveTenantEmailBrand` turns the preset, accent hue and logo hue into hex colours for the magic-link, newsletter and test emails.
 - No Studio surface: the theme is not Sanity content.
 
@@ -61,18 +64,19 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Configuration
 
 - Any tenant member, and any operator (as a virtual owner), can save. An archived tenant's form is read-only.
-- **Plan** — `PLAN_ENTITLEMENTS[plan].lookFields` lists the fields a plan may set. On `FREE` that is the preset, accent hue, logo and favicon; the fonts, radius, density, card style, header buttons style, logo hue and language-switcher style show disabled with the Features page's "Growth plan" badge, at the preset's value, in the form and the preview. The form opens on `toEffectiveLook` of the stored row, and a restored draft goes through it too. `updateLookAction` writes only the fields the plan includes, so the stored Growth choices stay and come back on an upgrade. The account, busy-button, spinner and header-layout columns are Growth-only too; they have no Look control yet. Until the public site reads `toEffectiveLook`, a `FREE` site still renders the stored values.
-- Picking a preset re-seeds the accent hue, fonts, radius, density, card style and header buttons style from `PRESET_REGISTRY` and clears the logo hue. The language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
+- **Plan** — `PLAN_ENTITLEMENTS[plan].lookFields` lists the fields a plan may set. On `FREE` that is the preset, accent hue, logo and favicon; the fonts, radius, density, card style, header buttons style, header layout, sub-menu style, bar, logo hue and language-switcher style show disabled with the Features page's "Growth plan" badge, at the preset's value, in the form and the preview. The form opens on `toEffectiveLook` of the stored row, and a restored draft goes through it too. `updateLookAction` writes only the fields the plan includes, so the stored Growth choices stay and come back on an upgrade. The account, busy-button and spinner columns are Growth-only too; they have no Look control yet. Until the public site reads `toEffectiveLook`, a `FREE` site still renders the stored values.
+- Picking a preset re-seeds the accent hue, fonts, radius, density, card style and header buttons style from `PRESET_REGISTRY` and clears the logo hue. The header layout, sub-menu style and bar, the language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
 - The five fonts are allowed in either role; each has a heading and a body loader in `apps/web`.
 - The language-switcher control appears only when the tenant has more than one live language.
 - Unsaved edits persist as a draft in `localStorage`, keyed by tenant and page under `platform.settings-draft.v1`. Staged image files cannot survive a reload, so a restored draft asks for them again. A draft missing a field the form now has is dropped, not offered.
-- The preview's sample header is signed out and at rest. At desktop width it shows the nav links, the language switcher in the tenant's style, the 36px theme circle and, when the site has a reader account (`READER_ACCOUNT_CAPABILITIES`, after plan clamping), the Sign in pill. At Mobile width it shows the brand, the person circle (reader accounts only) and the menu circle. Every control is drawn from `@blog/ui`'s `HEADER_CONTROL` recipe, so the header buttons style restyles them all at once.
+- The preview's sample header is signed out and at rest. At desktop width it shows the nav links, the language switcher in the tenant's style, the 36px theme circle and, when the site has a reader account (`READER_ACCOUNT_CAPABILITIES`, after plan clamping), the Sign in pill. At Mobile width it shows the brand, the person circle (reader accounts only) and the menu circle. The sample follows the header settings: at desktop width it arranges the brand, links and controls by the chosen layout (Menu button shows the menu circle instead of links) and draws one link's sub-menu open as a dropdown or a wide panel; at both widths Floating insets the bar as a card. Mobile width shows every layout as the bar with the menu button. Every control is drawn from `@blog/ui`'s `HEADER_CONTROL` recipe, so the header buttons style restyles them all at once.
 - Reach: every page of the tenant's site, its emails, and the platform's own Voice specimens (through `theme-preview-tokens`). Plans gate the Look fields above.
 
 ## Constraints and invariants
 
 - The resolved theme is never partial. `toThemeTokens` fills every gap from the row's preset, and a missing row or failed fetch falls back to `CONSOLE`.
 - Accent and logo ramps are declared in both `:root` and `.dark`. Radius, density, card style, header control style and the image-scrim ramp go in `:root` only (see [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)).
+- The public site reads the busy-button style and spinner style through `getBusyStyle` (`getSiteConfig`, falling back to the preset's, and to Console with no row). Follow the preset resolves to Braille for Console and Ring for Editorial through `toSpinnerVariant` (`@blog/config`), so the platform can resolve it the same way. `SiteProviders` hands the pair to `BusyStyleProvider`, and every busy `Button` and every `Spinner` on the site reads it through `useBusyStyle`: the sign-in panel, the newsletter signup ("Subscribing…"), the contact form, the account page's Save, Unlink, Unsubscribe, Resend and Delete buttons, and the toast's loading spinner. A busy button only draws the style when it has a busy label, so each of these has a short fixed one. Linking a provider and the public unsubscribe page's plain form post have none and stay unstyled.
 - A header buttons style changes only the resting border and fill. Outlined frames each control with `--border-strong` on `--surface`; Soft fills it with `--border` and no outline; Plain shows neither until hovered, so a Plain codes pill is carried by its brand-filled current chip. Geometry, hover, open, focus and forced colours are the same in every style, and every style combines with every language-switcher style. No style's resting cue reaches 3:1; each control is identified by its glyph or label, which WCAG 1.4.11 accepts.
 - The public site resolves the stored header control style through `toThemeTokens` (falling back to the preset's) and `buildThemeStyleBlock` spreads `HEADER_CONTROL_STYLE_DECLARATIONS` into `:root`, so every header control follows it on the next render after a save (the existing `site-config:<id>` tag). Hover and open draw a brand outline in every style.
 - `theme.css`'s static values equal what `buildThemeStyleBlock` emits for the Console preset; `build-theme-style-block.test.ts` reads `theme.css` for the radius, spacing, item-card, header-control and scrim tokens, and checks the brand and logo ramps against fixed literals.
@@ -113,7 +117,7 @@ The Look page is where a tenant owner styles their public site without touching 
 ## Tests and stories
 
 - Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
-- Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `get-brand-logo-url.test.ts`, `icon.test.tsx`, `brand-lockup-link.test.tsx`, `site-header.test.tsx`, `apps/web/src/config/fonts.test.ts`.
+- Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `get-busy-style.test.ts`, `get-brand-logo-url.test.ts`, `icon.test.tsx`, `brand-lockup-link.test.tsx`, `site-header.test.tsx`, `apps/web/src/config/fonts.test.ts`.
 - db: `packages/db/src/queries/site-config/**/*.test.ts`.
 - Stories: `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`. The platform has no stories.
 

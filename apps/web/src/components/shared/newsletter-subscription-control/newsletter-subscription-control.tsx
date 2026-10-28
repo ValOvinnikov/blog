@@ -4,6 +4,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
 import { Button } from '@blog/ui/components/atoms/button';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import {
   resendConfirmationAction,
@@ -21,6 +22,7 @@ export const NewsletterSubscriptionControl = ({
   action,
 }: TNewsletterSubscriptionControlProps) => {
   const t = useTranslations('accountPage.newsletter');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const toast = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -68,8 +70,10 @@ export const NewsletterSubscriptionControl = ({
   return (
     <Button
       variant="ghost"
-      isDisabled={isPending}
-      aria-busy={isPending}
+      isBusy={isPending}
+      busyLabel={isUnsubscribe ? t('unsubscribingLabel') : t('resendingLabel')}
+      busyStyle={busyStyle}
+      spinnerVariant={spinnerVariant}
       onClick={handleClick}
     >
       {isUnsubscribe ? t('unsubscribeButton') : t('resendButton')}

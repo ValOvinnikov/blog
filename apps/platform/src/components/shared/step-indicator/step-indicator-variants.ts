@@ -24,8 +24,38 @@ export const stepIndicatorVariants = tv({
       true: { connector: ['bg-admin-ok'] },
       false: {},
     },
+    isOnDark: {
+      true: {},
+      false: {},
+    },
   },
+  compoundVariants: [
+    {
+      isOnDark: true,
+      state: STEP_INDICATOR_STATE.DONE,
+      class: { circle: ['bg-admin-side-accent text-admin-side'] },
+    },
+    {
+      isOnDark: true,
+      state: STEP_INDICATOR_STATE.ACTIVE,
+      class: {
+        circle: [
+          'border-2 border-admin-side-accent bg-transparent text-admin-side-accent',
+        ],
+      },
+    },
+    {
+      isOnDark: true,
+      state: STEP_INDICATOR_STATE.UPCOMING,
+      class: {
+        circle: [
+          'border border-admin-side-muted bg-transparent text-admin-side-muted',
+        ],
+      },
+    },
+  ],
   defaultVariants: {
     isConnectorDone: false,
+    isOnDark: false,
   },
 });

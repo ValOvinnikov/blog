@@ -17,3 +17,13 @@ export const SPINNER_STYLE = {
 } as const;
 
 export type TSpinnerStyle = TValueOf<typeof SPINNER_STYLE>;
+
+export type TSpinnerVariant = Exclude<
+  TSpinnerStyle,
+  typeof SPINNER_STYLE.PRESET
+>;
+
+export interface IBusyStyle {
+  busyStyle: TBusyButtonStyle;
+  spinnerVariant: TSpinnerVariant;
+}

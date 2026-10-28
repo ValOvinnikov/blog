@@ -2,6 +2,7 @@
 
 import { ACTION_OUTCOME, routes } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import {
   unlinkProviderAction,
@@ -23,6 +24,7 @@ export const ProviderLinkControl = ({
   action,
 }: TProviderLinkControlProps) => {
   const t = useTranslations('accountPage.identity');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const toast = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -69,8 +71,10 @@ export const ProviderLinkControl = ({
   return (
     <Button
       variant="ghost"
-      isDisabled={isPending}
-      aria-busy={isPending}
+      isBusy={isPending}
+      busyLabel={isLink ? undefined : t('unlinkingLabel')}
+      busyStyle={busyStyle}
+      spinnerVariant={spinnerVariant}
       onClick={isLink ? handleLink : handleUnlink}
     >
       {isLink ? t('linkButton') : t('unlinkButton')}

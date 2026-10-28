@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
     "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó.",
-    "tryAgain": "Volver a intentarlo"
+    "tryAgain": "Volver a intentarlo",
+    "badge": "Configuración"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -60,7 +61,7 @@
   "onboardingPage": {
     "heading": "Crea tu sitio",
     "description": "Elige qué tipo de sitio quieres, su dirección y su aspecto. Podrás cambiarlo todo más adelante, salvo la dirección.",
-    "brandMarkLabel": "Valstack"
+    "brandName": "Valstack"
   },
   "onboardingForm": {
     "siteTypeLabel": "Tipo de sitio",
@@ -98,7 +99,21 @@
       "siteAddressReserved": "Esta dirección está reservada. Elige otra.",
       "siteAddressTaken": "Esta dirección ya está en uso. Elige otra.",
       "termsNotAccepted": "Acepta los Términos del servicio y la Política de privacidad para continuar."
-    }
+    },
+    "steps": {
+      "SITE": "Sitio",
+      "ADDRESS": "Dirección",
+      "LOOK": "Aspecto",
+      "REVIEW": "Revisión"
+    },
+    "stepsAriaLabel": "Pasos de configuración",
+    "stepProgress": "Paso {n} de {total}",
+    "stepProgressNamed": "Paso {n} de {total} · {step}",
+    "siteSummary": "{siteType} · {name}",
+    "back": "Atrás",
+    "continue": "Continuar",
+    "edit": "Editar",
+    "editField": "Editar {field}"
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuar con GitHub",
@@ -124,17 +139,25 @@
     "requestNewLink": "Obtener un nuevo enlace de inicio de sesión",
     "heading": "No hemos podido iniciar tu sesión",
     "description": "Algo ha fallado al iniciar sesión. Vuelve al inicio de sesión e inténtalo de nuevo.",
-    "backToSignIn": "Volver al inicio de sesión"
+    "backToSignIn": "Volver al inicio de sesión",
+    "badge": "Inicio de sesión"
   },
   "notFoundPage": {
     "heading": "Página no encontrada",
     "description": "Esta página no existe o no tienes acceso a ella.",
-    "backLink": "Volver al inicio"
+    "backLink": "Volver al inicio",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Algo salió mal",
     "description": "No se pudo cargar esta página. Inténtalo de nuevo y, si sigue ocurriendo, vuelve en unos minutos.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "badge": "Error 500",
+    "homeLink": "Volver al inicio"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "ID del error: {errorId}"
   },
   "pageSkeleton": {
     "label": "Cargando la página…"
@@ -583,6 +606,30 @@
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
     "shapeHeading": "Forma",
     "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas y los botones de la cabecera.",
+    "headerHeading": "Cabecera",
+    "headerDescription": "Cómo se organiza la barra superior de su sitio y cómo se abren sus submenús.",
+    "headerLayoutLabel": "Diseño",
+    "headerLayoutDescription": "Dónde van el logotipo, los enlaces y los botones en pantallas anchas. En el móvil siempre hay una barra con botón de menú.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Clásico",
+      "LINKS_BESIDE_BRAND": "Enlaces junto a la marca",
+      "CENTRED_LINKS": "Enlaces centrados",
+      "TWO_ROWS": "Dos filas",
+      "CENTRED_BRAND": "Marca centrada",
+      "MENU_BUTTON": "Botón de menú"
+    },
+    "headerSubmenuStyleLabel": "Submenús",
+    "headerSubmenuStyleDescription": "Cómo se abre un enlace con subelementos en pantallas anchas.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Desplegable",
+      "WIDE_PANEL": "Panel ancho"
+    },
+    "headerBarStyleLabel": "Barra",
+    "headerBarStyleDescription": "Si la barra ocupa todo el ancho de la página o flota sobre ella como una tarjeta.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Ancho completo",
+      "FLOATING": "Flotante"
+    },
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
@@ -611,6 +658,10 @@
     "previewWidthAriaLabel": "Ancho de la vista previa",
     "navPosts": "Entradas",
     "navAbout": "Acerca de",
+    "navTopics": "Temas",
+    "submenuLead": "Todos los temas",
+    "submenuFirstItem": "Mareas",
+    "submenuSecondItem": "Puertos",
     "switcherMenuAriaLabel": "Idioma: {language}",
     "signIn": "Iniciar sesión",
     "themeToggleDark": "Cambiar al tema oscuro",

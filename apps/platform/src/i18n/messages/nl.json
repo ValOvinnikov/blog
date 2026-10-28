@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
     "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt.",
-    "tryAgain": "Opnieuw proberen"
+    "tryAgain": "Opnieuw proberen",
+    "badge": "Instellen"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -60,7 +61,7 @@
   "onboardingPage": {
     "heading": "Maak je site",
     "description": "Kies wat voor site je wilt, het adres en het uiterlijk. Alles behalve het adres kun je later nog wijzigen.",
-    "brandMarkLabel": "Valstack"
+    "brandName": "Valstack"
   },
   "onboardingForm": {
     "siteTypeLabel": "Type site",
@@ -98,7 +99,21 @@
       "siteAddressReserved": "Dit adres is gereserveerd. Kies een ander.",
       "siteAddressTaken": "Dit adres is al in gebruik. Kies een ander.",
       "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan."
-    }
+    },
+    "steps": {
+      "SITE": "Site",
+      "ADDRESS": "Adres",
+      "LOOK": "Uiterlijk",
+      "REVIEW": "Controleren"
+    },
+    "stepsAriaLabel": "Configuratiestappen",
+    "stepProgress": "Stap {n} van {total}",
+    "stepProgressNamed": "Stap {n} van {total} · {step}",
+    "siteSummary": "{siteType} · {name}",
+    "back": "Terug",
+    "continue": "Doorgaan",
+    "edit": "Bewerken",
+    "editField": "{field} bewerken"
   },
   "providerSignInButton": {
     "continueWithGithub": "Doorgaan met GitHub",
@@ -124,17 +139,25 @@
     "requestNewLink": "Nieuwe inloglink aanvragen",
     "heading": "We konden je niet inloggen",
     "description": "Er ging iets mis bij het inloggen. Ga terug naar inloggen en probeer het opnieuw.",
-    "backToSignIn": "Terug naar inloggen"
+    "backToSignIn": "Terug naar inloggen",
+    "badge": "Inloggen"
   },
   "notFoundPage": {
     "heading": "Pagina niet gevonden",
     "description": "Deze pagina bestaat niet, of je hebt er geen toegang toe.",
-    "backLink": "Terug naar start"
+    "backLink": "Terug naar start",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Er ging iets mis",
     "description": "Deze pagina kon niet worden geladen. Probeer het opnieuw, en kom over een paar minuten terug als het blijft gebeuren.",
-    "retry": "Opnieuw proberen"
+    "retry": "Opnieuw proberen",
+    "badge": "Fout 500",
+    "homeLink": "Terug naar start"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "Fout-ID: {errorId}"
   },
   "pageSkeleton": {
     "label": "Pagina wordt geladen…"
@@ -583,6 +606,30 @@
     "typeDescription": "Elk lettertype wordt in zijn eigen stijl getoond.",
     "shapeHeading": "Vorm",
     "shapeDescription": "Hoeken, ruimte en hoe kaarten en headerknoppen zijn omlijst.",
+    "headerHeading": "Koptekst",
+    "headerDescription": "Hoe de bovenbalk van uw site is ingedeeld en hoe de submenu’s openen.",
+    "headerLayoutLabel": "Indeling",
+    "headerLayoutDescription": "Waar logo, links en knoppen op brede schermen staan. Op telefoons krijgt u altijd de balk met een menuknop.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Klassiek",
+      "LINKS_BESIDE_BRAND": "Links naast het merk",
+      "CENTRED_LINKS": "Gecentreerde links",
+      "TWO_ROWS": "Twee rijen",
+      "CENTRED_BRAND": "Gecentreerd merk",
+      "MENU_BUTTON": "Menuknop"
+    },
+    "headerSubmenuStyleLabel": "Submenu’s",
+    "headerSubmenuStyleDescription": "Hoe een link met subitems opent op brede schermen.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Dropdown",
+      "WIDE_PANEL": "Breed paneel"
+    },
+    "headerBarStyleLabel": "Balk",
+    "headerBarStyleDescription": "Of de balk de hele pagina beslaat of als kaart erboven zweeft.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Volledige breedte",
+      "FLOATING": "Zwevend"
+    },
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
@@ -611,6 +658,10 @@
     "previewWidthAriaLabel": "Breedte voorbeeld",
     "navPosts": "Berichten",
     "navAbout": "Over",
+    "navTopics": "Onderwerpen",
+    "submenuLead": "Alle onderwerpen",
+    "submenuFirstItem": "Getijden",
+    "submenuSecondItem": "Havens",
     "switcherMenuAriaLabel": "Taal: {language}",
     "signIn": "Inloggen",
     "themeToggleDark": "Overschakelen naar donker thema",

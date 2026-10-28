@@ -12,24 +12,30 @@ import { useEffect, useState } from 'react';
 // Long enough that typing an address runs one check, not one per keystroke.
 const SITE_ADDRESS_CHECK_DELAY_MS = 400;
 
-type TSiteAddressCheck = {
+type TCheckedSlug = {
   slug: string;
+  error: TMaybeUndefined<TTenantSlugError>;
+  hasFailed: boolean;
+};
+
+export type TSiteAddressCheck = {
+  status: TSiteAddressStatus;
   error: TMaybeUndefined<TTenantSlugError>;
 };
 
 const toSiteAddressStatus = (
   slug: string,
-  check: TMaybeUndefined<TSiteAddressCheck>,
+  check: TMaybeUndefined<TCheckedSlug>,
 ): TSiteAddressStatus => {
   if (!slug) return SITE_ADDRESS_STATUS.IDLE;
   if (check?.slug !== slug) return SITE_ADDRESS_STATUS.CHECKING;
+  if (check.hasFailed) return SITE_ADDRESS_STATUS.UNVERIFIED;
   if (check.error) return SITE_ADDRESS_STATUS.UNAVAILABLE;
   return SITE_ADDRESS_STATUS.AVAILABLE;
 };
 
-export const useSiteAddressCheck = (slug: string) => {
-  const [check, setCheck] =
-    useState<TMaybeUndefined<TSiteAddressCheck>>(undefined);
+export const useSiteAddressCheck = (slug: string): TSiteAddressCheck => {
+  const [check, setCheck] = useState<TMaybeUndefined<TCheckedSlug>>(undefined);
 
   useEffect(() => {
     if (!slug) return;
@@ -38,9 +44,11 @@ export const useSiteAddressCheck = (slug: string) => {
     const timer = setTimeout(() => {
       checkSiteAddressAction(slug).then(
         (error) => {
-          if (isCurrent) setCheck({ slug, error });
+          if (isCurrent) setCheck({ slug, error, hasFailed: false });
         },
-        () => undefined,
+        () => {
+          if (isCurrent) setCheck({ slug, error: undefined, hasFailed: true });
+        },
       );
     }, SITE_ADDRESS_CHECK_DELAY_MS);
 

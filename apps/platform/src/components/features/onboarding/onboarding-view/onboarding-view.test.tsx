@@ -10,7 +10,12 @@ import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
-import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitForElementToBeRemoved,
+  within,
+} from '@platform/testing/custom-render';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -34,10 +39,16 @@ const checkSiteAddressMock = vi.mocked(checkSiteAddressAction);
 faker.seed(5994);
 
 const MOCK_SLUG = faker.helpers.slugify(faker.lorem.words(2));
+const MOCK_SITE_ADDRESS = `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
 const MOCK_NAME_FIELD = { name: 'Site name' };
 const MOCK_ADDRESS_FIELD = { name: 'Site address' };
 const MOCK_ACCEPTANCE = { name: /I agree to the Terms of Service/ };
 const MOCK_CREATE = { name: 'Create site' };
+const MOCK_CONTINUE = { name: 'Continue' };
+const MOCK_BACK = { name: 'Back' };
+const MOCK_ADDRESS_AVAILABLE = `${MOCK_SITE_ADDRESS} is available.`;
+const MOCK_ADDRESS_CHECKING = 'Checking the address…';
+const MOCK_ADDRESS_TAKEN = 'This address is taken. Choose another.';
 
 const MOCK_CREATE_SITE_INPUT = {
   siteType: SITE_TYPE.BLOG,
@@ -58,16 +69,39 @@ const setup = customRender(OnboardingView, {
 describe(`<${OnboardingView.name}/>`, () => {
   let user: UserEvent;
 
+  const stepHeading = (name: string) =>
+    screen.getByRole('heading', { level: 1, name });
+
+  const clickContinue = async () => {
+    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+    await user.click(continueButton);
+  };
+
+  const completeSiteStep = async () => {
+    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+    await user.type(nameField, MOCK_TENANT_NAME);
+    await clickContinue();
+  };
+
   const typeAddress = async () => {
     const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
     await user.type(addressField, MOCK_SLUG);
     return addressField;
   };
 
-  const fillAndCreate = async () => {
-    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
-    await user.type(nameField, MOCK_TENANT_NAME);
+  const completeAddressStep = async () => {
     await typeAddress();
+    await screen.findByText(MOCK_ADDRESS_AVAILABLE);
+    await clickContinue();
+  };
+
+  const reachReview = async () => {
+    await completeSiteStep();
+    await completeAddressStep();
+    await clickContinue();
+  };
+
+  const acceptAndCreate = async () => {
     const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
     await user.click(acceptance);
     const createButton = screen.getByRole('button', MOCK_CREATE);
@@ -82,15 +116,19 @@ describe(`<${OnboardingView.name}/>`, () => {
   });
 
   it('creates the site from the values the user entered', async () => {
-    await fillAndCreate();
+    await reachReview();
+    await acceptAndCreate();
 
     expect(createSiteMock).toHaveBeenCalledWith(MOCK_CREATE_SITE_INPUT);
   });
 
   it('starts from the accent of the preset the user picks', async () => {
+    await completeSiteStep();
+    await completeAddressStep();
     const editorialPreset = screen.getByRole('radio', { name: 'Editorial' });
     await user.click(editorialPreset);
-    await fillAndCreate();
+    await clickContinue();
+    await acceptAndCreate();
 
     expect(createSiteMock).toHaveBeenCalledWith({
       ...MOCK_CREATE_SITE_INPUT,
@@ -106,7 +144,8 @@ describe(`<${OnboardingView.name}/>`, () => {
       name: 'Portfolio',
     });
     await user.click(portfolioOption);
-    await fillAndCreate();
+    await reachReview();
+    await acceptAndCreate();
 
     expect(createSiteMock).toHaveBeenCalledWith({
       ...MOCK_CREATE_SITE_INPUT,
@@ -114,28 +153,123 @@ describe(`<${OnboardingView.name}/>`, () => {
     });
   });
 
+  it('asks for a name before leaving the first step', async () => {
+    await clickContinue();
+
+    const message = screen.getByText('Enter a name for your site.');
+    const heading = stepHeading('Site');
+
+    expect(message).toBeVisible();
+    expect(heading).toBeVisible();
+  });
+
+  it('keeps the values entered when going back a step', async () => {
+    await completeSiteStep();
+    const backButton = screen.getByRole('button', MOCK_BACK);
+    await user.click(backButton);
+
+    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+
+    expect(nameField).toHaveValue(MOCK_TENANT_NAME);
+  });
+
   it('says the address is free once it has been checked', async () => {
+    await completeSiteStep();
     await typeAddress();
 
-    const available = await screen.findByText(
-      `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN} is available.`,
-    );
+    const available = await screen.findByText(MOCK_ADDRESS_AVAILABLE);
 
     expect(available).toBeVisible();
     expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_SLUG);
   });
 
-  it('marks a taken address invalid', async () => {
+  it('keeps a taken address from continuing', async () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
-
+    await completeSiteStep();
     const addressField = await typeAddress();
+    await screen.findByText(MOCK_ADDRESS_TAKEN);
+    await clickContinue();
 
-    const message = await screen.findByText(
-      'This address is taken. Choose another.',
+    const heading = stepHeading('Address');
+
+    expect(addressField).toBeInvalid();
+    expect(heading).toBeVisible();
+  });
+
+  it('lets the user continue when the address check fails', async () => {
+    checkSiteAddressMock.mockRejectedValue(new Error());
+    await completeSiteStep();
+    await typeAddress();
+    await waitForElementToBeRemoved(() =>
+      screen.queryByText(MOCK_ADDRESS_CHECKING),
     );
+    await clickContinue();
+
+    const heading = stepHeading('Look');
+
+    expect(heading).toBeVisible();
+  });
+
+  it('lets the user continue before the address check answers', async () => {
+    await completeSiteStep();
+    await typeAddress();
+    await clickContinue();
+
+    const heading = stepHeading('Look');
+
+    expect(heading).toBeVisible();
+  });
+
+  it.each([
+    ['Site', `Blog · ${MOCK_TENANT_NAME}`],
+    ['Address', MOCK_SITE_ADDRESS],
+    ['Look', 'Console'],
+  ])('shows the %s step’s choice once it is done', async (_, summary) => {
+    await reachReview();
+
+    const steps = screen.getByRole('list', { name: 'Setup steps' });
+
+    const stepSummary = within(steps).getByText(summary);
+
+    expect(stepSummary).toBeVisible();
+  });
+
+  it('opens a step from its Edit link on review', async () => {
+    await reachReview();
+    const editAddress = screen.getByRole('button', {
+      name: 'Edit Site address',
+    });
+    await user.click(editAddress);
+
+    const heading = stepHeading('Address');
+
+    expect(heading).toBeVisible();
+  });
+
+  it('returns to review after editing a step from it', async () => {
+    await reachReview();
+    const editName = screen.getByRole('button', { name: 'Edit Site name' });
+    await user.click(editName);
+    await clickContinue();
+
+    const heading = stepHeading('Review');
+
+    expect(heading).toBeVisible();
+  });
+
+  it('returns to the address step when the address was taken meanwhile', async () => {
+    createSiteMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
+    });
+    await reachReview();
+    await acceptAndCreate();
+
+    const message = await screen.findByText(MOCK_ADDRESS_TAKEN);
+    const heading = stepHeading('Address');
 
     expect(message).toBeVisible();
-    expect(addressField).toBeInvalid();
+    expect(heading).toBeVisible();
   });
 
   it('shows the neutral refusal when creation is refused', async () => {
@@ -143,8 +277,8 @@ describe(`<${OnboardingView.name}/>`, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,
     });
-
-    await fillAndCreate();
+    await reachReview();
+    await acceptAndCreate();
 
     const refusal = await screen.findByText('Try again later.');
 

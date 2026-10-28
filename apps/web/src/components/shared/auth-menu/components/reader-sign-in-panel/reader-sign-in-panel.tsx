@@ -10,6 +10,7 @@ import {
 } from '@blog/config';
 import { SignInPanel } from '@blog/ui/components/molecules/sign-in-panel';
 import { useSignInAttempt } from '@web/components/shared/auth-menu/hooks/use-sign-in-attempt';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, type RefObject } from 'react';
 
@@ -28,6 +29,7 @@ export const ReaderSignInPanel = ({
   className,
 }: TReaderSignInPanelProps) => {
   const t = useTranslations('authMenu');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const {
     status,
     email,
@@ -78,6 +80,8 @@ export const ReaderSignInPanel = ({
       className={className}
       providers={providers}
       pendingProviderId={pendingProviderId}
+      busyStyle={busyStyle}
+      spinnerVariant={spinnerVariant}
       labels={{
         title: t('signInHeading'),
         or: t('or'),

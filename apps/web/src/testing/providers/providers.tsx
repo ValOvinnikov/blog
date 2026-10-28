@@ -1,8 +1,10 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
+import { BusyStyleProvider } from '@web/context/busy-style-provider';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
+import { MOCK_BUSY_STYLE } from '@web/testing/shared/busy-style/fixtures';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -30,9 +32,11 @@ export const AppProviders = ({ children }: IAppProvidersProps) => (
   <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={SITE_MESSAGES}>
     <SanityImageBaseUrlProvider baseUrl={STATIC_SANITY_IMAGE_BASE_URL}>
       <VoiceRichProvider values={CATALOG_VOICE_RICH}>
-        <ConsentPreferencesProvider>
-          <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
-        </ConsentPreferencesProvider>
+        <BusyStyleProvider value={MOCK_BUSY_STYLE}>
+          <ConsentPreferencesProvider>
+            <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
+          </ConsentPreferencesProvider>
+        </BusyStyleProvider>
       </VoiceRichProvider>
     </SanityImageBaseUrlProvider>
   </NextIntlClientProvider>

@@ -14,7 +14,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import { useTranslations } from 'next-intl';
-import { useEffect, useId, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useId, type ReactNode } from 'react';
 
 import { siteNavigationVariants } from './site-navigation-variants';
 
@@ -67,13 +67,15 @@ export const SiteNavigation = ({
   const groupName = useId();
   const { open, toggle, close, containerRef } = useMobileNavToggle(panelId);
 
-  useEffect(() => {
-    // Sub-menus are native popovers, which stay open across client-side navigation.
+  const closeMenusLeftOpenByNavigation = useEffectEvent(() => {
     containerRef.current
       ?.querySelectorAll<HTMLElement>('[popover]')
       .forEach((popover) => popover.hidePopover());
     if (open) close();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- close only when the route actually changes, not whenever `open`/`close` are redefined
+  });
+
+  useEffect(() => {
+    closeMenusLeftOpenByNavigation();
   }, [pathname]);
 
   const items = links.map((link) => toNavItem(pathname, link));

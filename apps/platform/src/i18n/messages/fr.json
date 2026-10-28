@@ -30,7 +30,8 @@
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
     "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste.",
-    "tryAgain": "Réessayer"
+    "tryAgain": "Réessayer",
+    "badge": "Configuration"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -60,7 +61,7 @@
   "onboardingPage": {
     "heading": "Créez votre site",
     "description": "Choisissez le type de site, son adresse et son apparence. Vous pourrez tout modifier plus tard, sauf l’adresse.",
-    "brandMarkLabel": "Valstack"
+    "brandName": "Valstack"
   },
   "onboardingForm": {
     "siteTypeLabel": "Type de site",
@@ -98,7 +99,21 @@
       "siteAddressReserved": "Cette adresse est réservée. Choisissez-en une autre.",
       "siteAddressTaken": "Cette adresse est déjà prise. Choisissez-en une autre.",
       "termsNotAccepted": "Acceptez les Conditions d’utilisation et la Politique de confidentialité pour continuer."
-    }
+    },
+    "steps": {
+      "SITE": "Site",
+      "ADDRESS": "Adresse",
+      "LOOK": "Apparence",
+      "REVIEW": "Récapitulatif"
+    },
+    "stepsAriaLabel": "Étapes de configuration",
+    "stepProgress": "Étape {n} sur {total}",
+    "stepProgressNamed": "Étape {n} sur {total} · {step}",
+    "siteSummary": "{siteType} · {name}",
+    "back": "Retour",
+    "continue": "Continuer",
+    "edit": "Modifier",
+    "editField": "Modifier {field}"
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuer avec GitHub",
@@ -124,17 +139,25 @@
     "requestNewLink": "Obtenir un nouveau lien de connexion",
     "heading": "Nous n'avons pas pu vous connecter",
     "description": "Un problème est survenu lors de la connexion. Revenez à la page de connexion et réessayez.",
-    "backToSignIn": "Retour à la connexion"
+    "backToSignIn": "Retour à la connexion",
+    "badge": "Connexion"
   },
   "notFoundPage": {
     "heading": "Page introuvable",
     "description": "Cette page n'existe pas, ou vous n'y avez pas accès.",
-    "backLink": "Retour à l'accueil"
+    "backLink": "Retour à l'accueil",
+    "badge": "404"
   },
   "errorPage": {
     "heading": "Une erreur s'est produite",
     "description": "Cette page n'a pas pu se charger. Réessayez, et si le problème persiste, revenez dans quelques minutes.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "badge": "Erreur 500",
+    "homeLink": "Retour à l'accueil"
+  },
+  "deadEndView": {
+    "brandName": "Valstack",
+    "errorId": "ID de l’erreur : {errorId}"
   },
   "pageSkeleton": {
     "label": "Chargement de la page…"
@@ -583,6 +606,30 @@
     "typeDescription": "Chaque police s'affiche dans son propre style.",
     "shapeHeading": "Forme",
     "shapeDescription": "Coins, espacement et encadrement des cartes et des boutons d'en-tête.",
+    "headerHeading": "En-tête",
+    "headerDescription": "Comment la barre du haut de votre site est organisée et comment ses sous-menus s’ouvrent.",
+    "headerLayoutLabel": "Disposition",
+    "headerLayoutDescription": "Où se placent le logo, les liens et les boutons sur grand écran. Sur mobile, vous avez toujours la barre avec un bouton de menu.",
+    "headerLayoutOptionLabel": {
+      "CLASSIC": "Classique",
+      "LINKS_BESIDE_BRAND": "Liens à côté de la marque",
+      "CENTRED_LINKS": "Liens centrés",
+      "TWO_ROWS": "Deux lignes",
+      "CENTRED_BRAND": "Marque centrée",
+      "MENU_BUTTON": "Bouton de menu"
+    },
+    "headerSubmenuStyleLabel": "Sous-menus",
+    "headerSubmenuStyleDescription": "Comment un lien avec des sous-éléments s’ouvre sur grand écran.",
+    "headerSubmenuStyleOptionLabel": {
+      "DROPDOWN": "Menu déroulant",
+      "WIDE_PANEL": "Panneau large"
+    },
+    "headerBarStyleLabel": "Barre",
+    "headerBarStyleDescription": "Si la barre occupe toute la largeur de la page ou flotte au-dessus comme une carte.",
+    "headerBarStyleOptionLabel": {
+      "FULL_WIDTH": "Pleine largeur",
+      "FLOATING": "Flottante"
+    },
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
@@ -611,6 +658,10 @@
     "previewWidthAriaLabel": "Largeur de l'aperçu",
     "navPosts": "Articles",
     "navAbout": "À propos",
+    "navTopics": "Sujets",
+    "submenuLead": "Tous les sujets",
+    "submenuFirstItem": "Marées",
+    "submenuSecondItem": "Ports",
     "switcherMenuAriaLabel": "Langue : {language}",
     "signIn": "Se connecter",
     "themeToggleDark": "Passer au thème sombre",

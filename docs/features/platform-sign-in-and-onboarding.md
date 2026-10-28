@@ -89,17 +89,33 @@ Free site.
   `signOutAction` and returns to the sign-in page, whose next sign-in lands on
   `/`.
 
-- `/onboarding`: one pre-shell form beside a live site preview, for a
-  signed-in user with no membership and no `admins` row
-  (`requireOnboardingUser`; anyone else is sent to their own home, so an
-  invited member never sees it). It asks for the site type (Blog, Portfolio,
-  Personal / résumé, Docs or Blank), the site name, the Site address (only
-  the subdomain, with `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live
-  by `checkSiteAddressAction` as the user types), the starting language, the
-  preset and accent colour, and the terms acceptance again (a magic link
-  opened in another browser carries no `/signup` cookie). **Create site**
-  runs `createSiteAction`, then redirects to `/dashboard`, whose site setup
-  card follows provisioning.
+- `/onboarding`: a four-step setup wizard for a signed-in user with no
+  membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
+  to their own home, so an invited member never sees it). A dark left rail
+  (the sidebar's `admin-side*` tokens) carries the Valstack mark, "Create your
+  site" and the step list, where each done step shows its choice ("Blog ·
+  Field Notes", the site address, the preset); the current step's fields sit
+  in the middle with Back / Continue, and the live site preview stays on the
+  right on every step. Below `lg` the rail is a top band reading "Step N of 4
+  · <step>", and fields, preview and Back / Continue stack. The steps:
+  1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
+     Blank) and the site name.
+  2. **Address** — the Site address (only the subdomain, with
+     `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live by
+     `checkSiteAddressAction` as the user types) and the starting language.
+  3. **Look** — the preset and accent colour.
+  4. **Review** — every choice with an Edit button back to its step, and the
+     terms acceptance again (a magic link opened in another browser carries
+     no `/signup` cookie).
+
+  Continue checks only the current step: the name must not be blank, and the
+  address must be filled in and not known to be taken, reserved or invalid. An
+  address whose live check is still running or failed is let through, since
+  Create site checks it again. Back keeps every value, and Continue after an
+  Edit from Review returns straight to Review. Nothing is saved until **Create site** on Review runs
+  `createSiteAction` once with every value; a field error it returns (an
+  address taken meanwhile) opens that field's step. Success redirects to
+  `/dashboard`, whose site setup card follows provisioning.
 
 ## Data
 

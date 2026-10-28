@@ -3,6 +3,7 @@
 import { TOAST_TYPE } from '@blog/config';
 import { Toast } from '@blog/ui/components/molecules/toast';
 import { ToastViewport } from '@blog/ui/components/organisms/toast-viewport';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useTranslations } from 'next-intl';
 import {
   createContext,
@@ -57,6 +58,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
   // store instance that's safe to read during render, unlike a ref.
   const [store] = useState(() => createToastStore());
   const t = useTranslations('toastProvider');
+  const { spinnerVariant } = useBusyStyle();
 
   const state = useSyncExternalStore(
     store.subscribe,
@@ -149,6 +151,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
             <Toast
               type={record.type}
               isLoading={record.isLoading}
+              spinnerVariant={spinnerVariant}
               title={record.title}
               message={
                 record.count && record.count > 1

@@ -1,13 +1,8 @@
-import { PRESET_ID, type TPresetId } from '@blog/config';
+import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
-
-const PRESET_LABEL_KEY = {
-  [PRESET_ID.CONSOLE]: 'console',
-  [PRESET_ID.EDITORIAL]: 'editorial',
-} as const satisfies Record<TPresetId, string>;
 
 export const useLookDraftFields = () => {
   const t = useTranslations('lookForm');
@@ -71,6 +66,24 @@ export const useLookDraftFields = () => {
       label: t('headerControlStyleLabel'),
       display: ({ headerControlStyle }: TLookFormValues) =>
         t(`headerControlStyleOptionLabel.${headerControlStyle}`),
+    },
+    {
+      id: 'headerLayout',
+      label: t('headerLayoutLabel'),
+      display: ({ headerLayout }: TLookFormValues) =>
+        t(`headerLayoutOptionLabel.${headerLayout}`),
+    },
+    {
+      id: 'headerSubmenuStyle',
+      label: t('headerSubmenuStyleLabel'),
+      display: ({ headerSubmenuStyle }: TLookFormValues) =>
+        t(`headerSubmenuStyleOptionLabel.${headerSubmenuStyle}`),
+    },
+    {
+      id: 'headerBarStyle',
+      label: t('headerBarStyleLabel'),
+      display: ({ headerBarStyle }: TLookFormValues) =>
+        t(`headerBarStyleOptionLabel.${headerBarStyle}`),
     },
     {
       id: 'languageSwitcherStyle',

@@ -362,7 +362,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 
-- **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`
+- **SITE_ADDRESS_STATUS**: `IDLE`, `CHECKING`, `AVAILABLE`, `UNAVAILABLE`, `UNVERIFIED`
+- **ONBOARDING_STEP**: `SITE`, `ADDRESS`, `LOOK`, `REVIEW`
 - **ONBOARDING_LOG**: `ROOT_DOMAIN_MISSING`=`"onboarding.root_domain_missing"`, `SESSION_EMAIL_MISSING`=`"onboarding.session_email_missing"`, `OWNS_FREE_TENANT_CHECK_FAILED`=`"onboarding.owns_free_tenant_check_failed"`, `TERMS_RECORD_FAILED`=`"onboarding.terms_record_failed"`, `CREATE_FAILED`=`"onboarding.create_failed"`
 
 ### `@platform/constants/operator-alert` — `apps/platform/src/constants/operator-alert.ts`
@@ -462,6 +463,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
 - **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`
+
+### `@web/constants/busy-style` — `apps/web/src/constants/busy-style.ts`
+
+- **BUSY_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"busy_style.site_config_fetch_failed"`
 
 ### `@web/constants/client-log` — `apps/web/src/constants/client-log.ts`
 

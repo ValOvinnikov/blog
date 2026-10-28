@@ -11,6 +11,7 @@ export default async function NotFound() {
 
   return (
     <DeadEndView
+      badge={{ label: t('badge'), tone: 'brand' }}
       title={t('heading')}
       description={t('description')}
       action={
