@@ -8,7 +8,7 @@ import type { IWithClassName } from '@blog/config/types';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
-import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/look-sample/components/sample-language-switcher';
+import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-language-switcher/sample-language-switcher';
 import { useTranslations } from 'next-intl';
 
 import { sampleHeaderControlsVariants } from './sample-header-controls-variants';

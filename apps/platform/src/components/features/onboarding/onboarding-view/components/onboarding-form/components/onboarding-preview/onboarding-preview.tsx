@@ -1,7 +1,7 @@
 'use client';
 
 import type { TLocaleIsoCode, TPresetId } from '@blog/config';
-import { LookSample } from '@platform/components/features/site-preview/look-sample';
+import { FrontPageSample } from '@platform/components/features/site-preview/front-page-sample';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -11,8 +11,12 @@ import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/them
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
 
+import { PreviewAddressBar } from './components/preview-address-bar/preview-address-bar';
+import { onboardingPreviewVariants } from './onboarding-preview-variants';
+
 export type TOnboardingPreviewProps = {
   name: string;
+  siteAddress: string;
   locale: TLocaleIsoCode;
   preset: TPresetId;
   accentHue: number;
@@ -20,6 +24,7 @@ export type TOnboardingPreviewProps = {
 
 export const OnboardingPreview = ({
   name,
+  siteAddress,
   locale,
   preset,
   accentHue,
@@ -28,6 +33,7 @@ export const OnboardingPreview = ({
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
   const look = applyPresetDefaults(preset, defaultLookFormValues());
+  const { browser, site } = onboardingPreviewVariants();
 
   return (
     <PreviewFrame
@@ -35,14 +41,17 @@ export const OnboardingPreview = ({
       widthControl={null}
       controls={<PreviewModeControl value={mode} onChange={setMode} />}
     >
-      <LookSample
-        tenantName={name || t('previewNamePlaceholder')}
-        logoSrc={undefined}
-        theme={buildSitePreviewTheme({ ...look, accentHue }, isDark)}
-        liveLocales={[locale]}
-        header={toSampleHeaderStyle(look)}
-        hasReaderAccounts={false}
-      />
+      <div className={browser()}>
+        <PreviewAddressBar address={siteAddress} />
+        <div className={site()}>
+          <FrontPageSample
+            tenantName={name || t('previewNamePlaceholder')}
+            theme={buildSitePreviewTheme({ ...look, accentHue }, isDark)}
+            liveLocales={[locale]}
+            header={toSampleHeaderStyle(look)}
+          />
+        </div>
+      </div>
     </PreviewFrame>
   );
 };
