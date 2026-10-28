@@ -3,15 +3,17 @@ import { queries } from '@blog/db';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockOwnerContext,
+  mockTenantDomainRows,
+} from '@platform/testing/custom-domain/fixtures';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_TENANT_ROOT_DOMAIN,
-  mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
 import { notFound } from 'next/navigation';
 
 import { getCustomDomainStatusAction } from './get-custom-domain-status-action';
@@ -24,31 +26,23 @@ vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
   getDomainVerificationStatus: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
-  queries: { tenantDomains: { listTenantDomains: vi.fn() } },
-}));
+vi.mock('@blog/db', async () => {
+  const { mockCustomDomainDb } =
+    await import('@platform/testing/custom-domain/fixtures');
+  return mockCustomDomainDb();
+});
 
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 const listTenantDomainsMock = vi.mocked(
   queries.tenantDomains.listTenantDomains,
 );
 
 describe(getCustomDomainStatusAction, () => {
   beforeEach(() => {
-    envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
-    listTenantDomainsMock
-      .mockReset()
-      .mockResolvedValue([
-        { domain: MOCK_TENANT_DOMAIN },
-        { domain: MOCK_CUSTOM_DOMAIN },
-      ] as never);
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({
-        id: MOCK_TENANT_ID,
-        primaryDomain: MOCK_TENANT_DOMAIN,
-      }),
-      membership: mockMembership(),
-    });
+    mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+    listTenantDomainsMock.mockReset().mockResolvedValue(mockTenantDomainRows());
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockOwnerContext(),
+    );
   });
 
   it('rejects a caller without access to the tenant', async () => {

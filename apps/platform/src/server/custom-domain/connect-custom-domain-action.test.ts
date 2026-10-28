@@ -19,15 +19,15 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
+import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
-  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_TENANT_ROOT_DOMAIN,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -43,19 +43,13 @@ vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', () => ({
-  queries: {
-    tenantDomains: {
-      isDomainHeldByAnyTenant: vi.fn(),
-      listTenantDomains: vi.fn(),
-      addTenantDomain: vi.fn(),
-      removeTenantDomain: vi.fn(),
-    },
-  },
-}));
+vi.mock('@blog/db', async () => {
+  const { mockCustomDomainDb } =
+    await import('@platform/testing/custom-domain/fixtures');
+  return mockCustomDomainDb();
+});
 
 const { tenantDomains } = queries;
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 const MOCK_WEB_HOST = 'web.example.net';
 const MOCK_PLATFORM_HOST = 'admin.example.net';
@@ -63,21 +57,17 @@ const MOCK_OTHER_CUSTOM_DOMAIN = 'legacy.example.dev';
 const MOCK_INPUT = { domain: ` ${MOCK_CUSTOM_DOMAIN.toUpperCase()} ` };
 
 const asMember = (overrides: Partial<TTenant> = {}) =>
-  vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-    tenant: mockReadyTenant({
-      id: MOCK_TENANT_ID,
-      plan: TENANT_PLAN.GROWTH,
-      primaryDomain: MOCK_TENANT_DOMAIN,
-      ...overrides,
-    }),
-    membership: mockMembership(),
-  });
+  vi
+    .mocked(requireTenantMembership)
+    .mockResolvedValueOnce(
+      mockOwnerContext({ plan: TENANT_PLAN.GROWTH, ...overrides }),
+    );
 
 describe(connectCustomDomainAction, () => {
   beforeEach(() => {
-    envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
-    envMock.WEB_APP_URL = `https://${MOCK_WEB_HOST}`;
-    envMock.PLATFORM_APP_BASE_URL = `https://${MOCK_PLATFORM_HOST}`;
+    mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+    mockedEnv.WEB_APP_URL = `https://${MOCK_WEB_HOST}`;
+    mockedEnv.PLATFORM_APP_BASE_URL = `https://${MOCK_PLATFORM_HOST}`;
     vi.mocked(tenantDomains.isDomainHeldByAnyTenant)
       .mockReset()
       .mockResolvedValue(false);
@@ -121,14 +111,13 @@ describe(connectCustomDomainAction, () => {
       MOCK_TENANT_ID,
       MOCK_CUSTOM_DOMAIN,
     );
-    expect(recordAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: AUDIT_ACTION.SETTINGS_UPDATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: { customDomainConnectRequested: MOCK_CUSTOM_DOMAIN },
-      }),
-    );
+    expect(recordAuditEvent).toHaveBeenCalledWith({
+      logEvent: CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { customDomainConnectRequested: MOCK_CUSTOM_DOMAIN },
+    });
   });
 
   it('reports input that is not a full domain without saving it', async () => {
@@ -183,7 +172,7 @@ describe(connectCustomDomainAction, () => {
 
   it('fails closed with a logged server error when the root domain is unset', async () => {
     asMember();
-    delete envMock.TENANT_ROOT_DOMAIN;
+    delete mockedEnv.TENANT_ROOT_DOMAIN;
 
     const result = await connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
 
@@ -202,7 +191,7 @@ describe(connectCustomDomainAction, () => {
     'fails closed with a logged server error when %s is unset',
     async (name, missing) => {
       asMember();
-      delete envMock[name];
+      delete mockedEnv[name];
 
       const result = await connectCustomDomainAction(
         MOCK_TENANT_ID,
@@ -338,7 +327,11 @@ describe(connectCustomDomainAction, () => {
       );
       expect(logger.error).toHaveBeenCalledWith(
         CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED,
-        expect.objectContaining({ responseStatus: status }),
+        {
+          tenantId: MOCK_TENANT_ID,
+          domain: MOCK_CUSTOM_DOMAIN,
+          responseStatus: status,
+        },
       );
       expect(recordAuditEvent).not.toHaveBeenCalled();
     },

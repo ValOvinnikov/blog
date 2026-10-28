@@ -17,6 +17,11 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
+import {
+  mockOwnerContext,
+  mockTenantDomainRows,
+} from '@platform/testing/custom-domain/fixtures';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
@@ -25,7 +30,6 @@ import {
   MOCK_TENANT_ROOT_DOMAIN,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -41,40 +45,33 @@ vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', () => ({
-  queries: {
-    tenantDomains: {
-      listTenantDomains: vi.fn(),
-      removeTenantDomain: vi.fn(),
-      addTenantDomain: vi.fn(),
-    },
-  },
-}));
+vi.mock('@blog/db', async () => {
+  const { mockCustomDomainDb } =
+    await import('@platform/testing/custom-domain/fixtures');
+  return mockCustomDomainDb();
+});
 
 const { tenantDomains } = queries;
-const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 const MOCK_INPUT = { domain: MOCK_CUSTOM_DOMAIN };
 
-const asMember = (overrides: Partial<TTenant> = {}) =>
-  vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-    tenant: mockReadyTenant({
-      id: MOCK_TENANT_ID,
-      primaryDomain: MOCK_TENANT_DOMAIN,
-      ...overrides,
-    }),
-    membership: mockMembership(),
-  });
+const remove = (input = MOCK_INPUT) =>
+  removeCustomDomainAction(MOCK_TENANT_ID, input);
+
+const asTenant = (overrides: Partial<TTenant>) =>
+  vi
+    .mocked(requireTenantMembership)
+    .mockResolvedValueOnce(mockOwnerContext(overrides));
 
 describe(removeCustomDomainAction, () => {
   beforeEach(() => {
-    envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+    mockedEnv.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+    vi.mocked(requireTenantMembership)
+      .mockReset()
+      .mockResolvedValue(mockOwnerContext());
     vi.mocked(tenantDomains.listTenantDomains)
       .mockReset()
-      .mockResolvedValue([
-        { domain: MOCK_TENANT_DOMAIN },
-        { domain: MOCK_CUSTOM_DOMAIN },
-      ] as never);
+      .mockResolvedValue(mockTenantDomainRows());
     vi.mocked(tenantDomains.removeTenantDomain)
       .mockReset()
       .mockResolvedValue(true);
@@ -86,34 +83,34 @@ describe(removeCustomDomainAction, () => {
       .mockResolvedValue(HTTP_STATUS.ACCEPTED);
   });
 
-  it('rejects a caller without access to the tenant', async () => {
-    vi.mocked(requireTenantMembership).mockImplementationOnce(() => {
-      notFound();
-    });
+  it.each([
+    [
+      'a caller without access to the tenant',
+      () =>
+        vi.mocked(requireTenantMembership).mockImplementationOnce(() => {
+          notFound();
+        }),
+    ],
+    [
+      'a member who is not the owner',
+      () =>
+        vi.mocked(requireTenantMembership).mockResolvedValueOnce({
+          tenant: mockReadyTenant({ id: MOCK_TENANT_ID }),
+          membership: mockMembership({ role: MEMBERSHIP_ROLE.READER }),
+        }),
+    ],
+  ])('rejects %s', async (_name, arrange) => {
+    arrange();
 
-    await expect(
-      removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
-  });
-
-  it('refuses a member who is not the owner', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID }),
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.READER }),
-    });
-
-    await expect(
-      removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(remove()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
     expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
     expect(enqueueWorkerRequest).not.toHaveBeenCalled();
   });
 
-  it('deletes the domain, asks the worker to disconnect it, and audits the removal', async () => {
-    asMember();
-
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+  it('deletes the domain, asks the worker to disconnect it, and audits it', async () => {
+    const result = await remove();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(tenantDomains.removeTenantDomain).toHaveBeenCalledWith(
@@ -125,21 +122,19 @@ describe(removeCustomDomainAction, () => {
       MOCK_TENANT_ID,
       MOCK_CUSTOM_DOMAIN,
     );
-    expect(recordAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: AUDIT_ACTION.SETTINGS_UPDATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: { customDomainRemoved: MOCK_CUSTOM_DOMAIN },
-      }),
-    );
+    expect(recordAuditEvent).toHaveBeenCalledWith({
+      logEvent: CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { customDomainRemoved: MOCK_CUSTOM_DOMAIN },
+    });
   });
 
-  it('restores the domain and reports a server error when the disconnect is rejected', async () => {
-    asMember();
+  it('restores the domain and reports a server error on a rejected disconnect', async () => {
     vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
 
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+    const result = await remove();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(tenantDomains.addTenantDomain).toHaveBeenCalledWith(
@@ -148,35 +143,38 @@ describe(removeCustomDomainAction, () => {
     );
     expect(logger.error).toHaveBeenCalledWith(
       CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING,
-      expect.objectContaining({ responseStatus: null }),
+      {
+        tenantId: MOCK_TENANT_ID,
+        domain: MOCK_CUSTOM_DOMAIN,
+        responseStatus: null,
+      },
     );
     expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('logs and reports a server error when putting the domain back fails', async () => {
-    asMember();
     vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
     vi.mocked(tenantDomains.addTenantDomain).mockResolvedValue({
       ok: false,
       error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
     } as never);
 
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+    const result = await remove();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(logger.error).toHaveBeenCalledWith(
       CUSTOM_DOMAIN_LOG.DISCONNECT_RESTORE_FAILED,
-      expect.objectContaining({ error: ERROR_CODE.DB_DUPLICATE_DOMAIN }),
+      {
+        tenantId: MOCK_TENANT_ID,
+        domain: MOCK_CUSTOM_DOMAIN,
+        error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
+      },
     );
     expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('reports input that is not a domain without removing anything', async () => {
-    asMember();
-
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, {
-      domain: 'not a domain',
-    });
+    const result = await remove({ domain: 'not a domain' });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
@@ -185,36 +183,34 @@ describe(removeCustomDomainAction, () => {
     expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
   });
 
-  it('refuses to remove the main address', async () => {
-    asMember({ primaryDomain: MOCK_CUSTOM_DOMAIN });
+  it.each([
+    [
+      'the main address',
+      { primaryDomain: MOCK_CUSTOM_DOMAIN },
+      { domain: MOCK_CUSTOM_DOMAIN },
+    ],
+    [
+      'a domain that is not the tenant custom domain',
+      {},
+      { domain: MOCK_TENANT_DOMAIN },
+    ],
+  ])('refuses to remove %s', async (_name, overrides, input) => {
+    asTenant(overrides);
 
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+    const result = await remove(input);
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: CUSTOM_DOMAIN_REFUSAL.NOT_CUSTOM_DOMAIN,
     });
     expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
-  });
-
-  it('refuses a domain that is not the tenant custom domain', async () => {
-    asMember();
-
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, {
-      domain: MOCK_TENANT_DOMAIN,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: CUSTOM_DOMAIN_REFUSAL.NOT_CUSTOM_DOMAIN,
-    });
     expect(enqueueWorkerRequest).not.toHaveBeenCalled();
   });
 
   it('refuses an archived tenant', async () => {
-    asMember({ deprovisionedAt: new Date() });
+    asTenant({ deprovisionedAt: new Date() });
 
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+    const result = await remove();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -224,12 +220,11 @@ describe(removeCustomDomainAction, () => {
   });
 
   it('reports a server error and records nothing when the delete throws', async () => {
-    asMember();
     vi.mocked(tenantDomains.removeTenantDomain).mockRejectedValue(
       new Error('db down'),
     );
 
-    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+    const result = await remove();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(enqueueWorkerRequest).not.toHaveBeenCalled();
