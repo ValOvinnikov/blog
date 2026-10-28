@@ -6,7 +6,6 @@
     "look": "Uiterlijk · Admin",
     "voice": "Toon · Admin",
     "selectTenant": "Kies een werkruimte · Admin",
-    "workspacePending": "Werkruimte niet klaar · Admin",
     "signInTitle": "Inloggen",
     "signInError": "Probleem bij inloggen",
     "addTenant": "Tenant toevoegen · Admin",
@@ -26,12 +25,6 @@
     "dataRequestsPage": "Gegevensverzoeken · Admin",
     "signUpTitle": "Account aanmaken",
     "onboarding": "Je site maken · Admin"
-  },
-  "workspacePendingPage": {
-    "heading": "Uw werkruimte is nog niet klaar",
-    "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt.",
-    "tryAgain": "Opnieuw proberen",
-    "badge": "Instellen"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -245,7 +238,7 @@
   },
   "tenantsView": {
     "title": "Tenants",
-    "description": "Elke site op het platform, gelezen uit de echte <code>tenants</code>-tabel.",
+    "description": "Elke site op het platform, met abonnement en status.",
     "addTenant": "Tenant toevoegen"
   },
   "emailAlertsBanner": {
@@ -332,7 +325,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Eigenaarscontrole onduidelijk",
     "DOMAIN_NOT_ADDED": "Domein niet toegevoegd",
     "REVALIDATION_FAILED": "Hervalidatie mislukt",
-    "CONTRAST_REGRESSION": "Contrastregressie"
+    "CONTRAST_REGRESSION": "Contrastregressie",
+    "OWNER_ACCESS_CHECK_FAILED": "Controle van eigenaarstoegang mislukt"
   },
   "ownerHomePage": {
     "description": "Uw site in één oogopslag. Alles hier is live.",

@@ -1,4 +1,9 @@
-import { HTTP_METHOD, HTTP_STATUS, SANITY_ROBOT_ROLE } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  SANITY_RESOURCE_TYPE,
+  SANITY_ROBOT_ROLE,
+} from '@blog/config';
 import {
   emptyResponse,
   firstFetchCall,
@@ -57,7 +62,7 @@ describe(createSanityRobotToken, () => {
       label: MOCK_CREATE_INPUT.label,
       memberships: [
         {
-          resourceType: 'project',
+          resourceType: SANITY_RESOURCE_TYPE.PROJECT,
           resourceId: MOCK_SANITY_PROJECT_ID,
           roleNames: [MOCK_CREATE_INPUT.role],
         },

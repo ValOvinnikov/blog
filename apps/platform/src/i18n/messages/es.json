@@ -6,7 +6,6 @@
     "look": "Aspecto · Administración",
     "voice": "Voz · Administración",
     "selectTenant": "Elija un espacio de trabajo · Administración",
-    "workspacePending": "Espacio de trabajo no listo · Administración",
     "signInTitle": "Iniciar sesión",
     "signInError": "Problema al iniciar sesión",
     "addTenant": "Añadir cliente · Administración",
@@ -26,12 +25,6 @@
     "dataRequestsPage": "Solicitudes de datos · Admin",
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio · Administración"
-  },
-  "workspacePendingPage": {
-    "heading": "Su espacio de trabajo aún no está listo",
-    "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó.",
-    "tryAgain": "Volver a intentarlo",
-    "badge": "Configuración"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -245,7 +238,7 @@
   },
   "tenantsView": {
     "title": "Clientes",
-    "description": "Todos los sitios de la plataforma, leídos de la tabla real <code>tenants</code>.",
+    "description": "Todos los sitios de la plataforma, con su plan y estado.",
     "addTenant": "Añadir cliente"
   },
   "emailAlertsBanner": {
@@ -332,7 +325,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Comprobación del propietario ambigua",
     "DOMAIN_NOT_ADDED": "Dominio no añadido",
     "REVALIDATION_FAILED": "Revalidación fallida",
-    "CONTRAST_REGRESSION": "Regresión de contraste"
+    "CONTRAST_REGRESSION": "Regresión de contraste",
+    "OWNER_ACCESS_CHECK_FAILED": "La comprobación del acceso del propietario falla"
   },
   "ownerHomePage": {
     "description": "Su sitio de un vistazo. Todo lo que aparece aquí está en vivo.",

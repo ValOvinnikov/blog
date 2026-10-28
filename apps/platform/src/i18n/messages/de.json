@@ -6,7 +6,6 @@
     "look": "Erscheinungsbild · Admin",
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
-    "workspacePending": "Arbeitsbereich nicht bereit · Admin",
     "signInTitle": "Anmelden",
     "signInError": "Problem bei der Anmeldung",
     "addTenant": "Mandant hinzufügen · Admin",
@@ -26,12 +25,6 @@
     "dataRequestsPage": "Datenanfragen · Admin",
     "signUpTitle": "Konto erstellen",
     "onboarding": "Website erstellen · Admin"
-  },
-  "workspacePendingPage": {
-    "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
-    "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt.",
-    "tryAgain": "Erneut versuchen",
-    "badge": "Einrichtung"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -245,7 +238,7 @@
   },
   "tenantsView": {
     "title": "Mandanten",
-    "description": "Jede Website der Plattform, gelesen aus der echten Tabelle <code>tenants</code>.",
+    "description": "Jede Website der Plattform, mit Tarif und Status.",
     "addTenant": "Mandant hinzufügen"
   },
   "emailAlertsBanner": {
@@ -332,7 +325,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Inhaberprüfung nicht eindeutig",
     "DOMAIN_NOT_ADDED": "Domain nicht hinzugefügt",
     "REVALIDATION_FAILED": "Revalidierung fehlgeschlagen",
-    "CONTRAST_REGRESSION": "Kontrastregression"
+    "CONTRAST_REGRESSION": "Kontrastregression",
+    "OWNER_ACCESS_CHECK_FAILED": "Prüfung des Inhaberzugriffs schlägt fehl"
   },
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",

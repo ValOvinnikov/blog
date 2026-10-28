@@ -6,7 +6,6 @@
     "look": "Apparence · Administration",
     "voice": "Voix · Administration",
     "selectTenant": "Choisir un espace de travail · Administration",
-    "workspacePending": "Espace de travail pas encore prêt · Administration",
     "signInTitle": "Connexion",
     "signInError": "Problème de connexion",
     "addTenant": "Ajouter un locataire · Administration",
@@ -26,12 +25,6 @@
     "dataRequestsPage": "Demandes de données · Admin",
     "signUpTitle": "Créer un compte",
     "onboarding": "Créer votre site · Administration"
-  },
-  "workspacePendingPage": {
-    "heading": "Votre espace de travail n'est pas encore prêt",
-    "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste.",
-    "tryAgain": "Réessayer",
-    "badge": "Configuration"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -245,7 +238,7 @@
   },
   "tenantsView": {
     "title": "Locataires",
-    "description": "Tous les sites de la plateforme, lus depuis la table <code>tenants</code> réelle.",
+    "description": "Tous les sites de la plateforme, avec leur formule et leur statut.",
     "addTenant": "Ajouter un locataire"
   },
   "emailAlertsBanner": {
@@ -332,7 +325,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Vérification du propriétaire ambiguë",
     "DOMAIN_NOT_ADDED": "Domaine non ajouté",
     "REVALIDATION_FAILED": "Échec de la revalidation",
-    "CONTRAST_REGRESSION": "Régression du contraste"
+    "CONTRAST_REGRESSION": "Régression du contraste",
+    "OWNER_ACCESS_CHECK_FAILED": "Échec de la vérification de l'accès du propriétaire"
   },
   "ownerHomePage": {
     "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",

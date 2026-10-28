@@ -50,6 +50,7 @@ const {
   continue: CONTINUE,
   back: BACK,
   siteTypeLabel: SITE_TYPE_LABEL,
+  accentLabel: ACCENT_LABEL,
   siteTypes: SITE_TYPES,
   steps: STEPS,
   stepsAriaLabel: STEPS_ARIA_LABEL,
@@ -74,14 +75,26 @@ const MOCK_PLACEHOLDER_ADDRESS = `${PLACEHOLDER_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}
 const MOCK_LIVE_PREVIEW = {
   name: messages.previewModeControl.livePreviewHeading,
 };
+const MOCK_SITE_TYPE_SELECT = { name: SITE_TYPE_LABEL };
+const MOCK_EDIT_SITE_TYPE = {
+  name: t('editField', { field: SITE_TYPE_LABEL }),
+};
+const MOCK_ACCENT_SLIDER = { name: ACCENT_LABEL };
+const MOCK_EDITORIAL_LOOK = {
+  preset: PRESET_ID.EDITORIAL,
+  accentHue: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
+};
+const MOCK_CONSOLE_LOOK = {
+  preset: PRESET_ID.CONSOLE,
+  accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
+};
 
 const MOCK_CREATE_SITE_INPUT = {
   siteType: SITE_TYPE.BLOG,
   name: MOCK_TENANT_NAME,
   slug: MOCK_SLUG,
   locale: LOCALE_ISO_CODES.EN,
-  preset: PRESET_ID.CONSOLE,
-  accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
+  ...MOCK_EDITORIAL_LOOK,
   hasAcceptedTerms: true,
 };
 
@@ -101,6 +114,20 @@ describe(`<${OnboardingView.name}/>`, () => {
   const clickContinue = async () => {
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
     await user.click(continueButton);
+  };
+
+  const pickSiteType = async (name: string) => {
+    const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
+    await user.click(siteTypeSelect);
+    const option = await screen.findByRole('option', { name });
+    await user.click(option);
+  };
+
+  const changeSiteTypeFromReview = async (name: string) => {
+    const editSiteType = screen.getByRole('button', MOCK_EDIT_SITE_TYPE);
+    await user.click(editSiteType);
+    await pickSiteType(name);
+    await clickContinue();
   };
 
   const completeSiteStep = async () => {
@@ -161,29 +188,19 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('starts from the accent of the preset the user picks', async () => {
     await completeSiteStep();
     await completeAddressStep();
-    const editorialPreset = screen.getByRole('radio', {
-      name: EDITORIAL_PRESET,
-    });
-    await user.click(editorialPreset);
+    const consolePreset = screen.getByRole('radio', { name: CONSOLE_PRESET });
+    await user.click(consolePreset);
     await clickContinue();
     await acceptAndCreate();
 
     expect(createSiteMock).toHaveBeenCalledWith({
       ...MOCK_CREATE_SITE_INPUT,
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.accentHue,
+      ...MOCK_CONSOLE_LOOK,
     });
   });
 
   it('creates the site type the user picks', async () => {
-    const siteTypeSelect = screen.getByRole('combobox', {
-      name: SITE_TYPE_LABEL,
-    });
-    await user.click(siteTypeSelect);
-    const portfolioOption = await screen.findByRole('option', {
-      name: SITE_TYPES.PORTFOLIO,
-    });
-    await user.click(portfolioOption);
+    await pickSiteType(SITE_TYPES.PORTFOLIO);
     await reachReview();
     await acceptAndCreate();
 
@@ -191,6 +208,64 @@ describe(`<${OnboardingView.name}/>`, () => {
       ...MOCK_CREATE_SITE_INPUT,
       siteType: SITE_TYPE.PORTFOLIO,
     });
+  });
+
+  it.each([SITE_TYPES.DOCS, SITE_TYPES.BLANK])(
+    'starts a %s site on the Console preset',
+    async (siteType) => {
+      await reachReview();
+      await changeSiteTypeFromReview(siteType);
+      await acceptAndCreate();
+
+      expect(createSiteMock).toHaveBeenCalledWith(
+        expect.objectContaining(MOCK_CONSOLE_LOOK),
+      );
+    },
+  );
+
+  it('returns to the Editorial preset when switching back from Docs', async () => {
+    await reachReview();
+    await changeSiteTypeFromReview(SITE_TYPES.DOCS);
+    await changeSiteTypeFromReview(SITE_TYPES.PERSONAL);
+    await acceptAndCreate();
+
+    expect(createSiteMock).toHaveBeenCalledWith(
+      expect.objectContaining(MOCK_EDITORIAL_LOOK),
+    );
+  });
+
+  it('keeps the preset the user picked when the site type changes', async () => {
+    await completeSiteStep();
+    await completeAddressStep();
+    const consolePreset = screen.getByRole('radio', { name: CONSOLE_PRESET });
+    await user.click(consolePreset);
+    await clickContinue();
+    await changeSiteTypeFromReview(SITE_TYPES.PORTFOLIO);
+    await acceptAndCreate();
+
+    expect(createSiteMock).toHaveBeenCalledWith(
+      expect.objectContaining(MOCK_CONSOLE_LOOK),
+    );
+  });
+
+  it('keeps the accent the user moved when the site type changes', async () => {
+    await completeSiteStep();
+    await completeAddressStep();
+    const accentSlider = screen.getByRole('slider', MOCK_ACCENT_SLIDER);
+    await user.click(accentSlider);
+    await user.keyboard('{ArrowRight}');
+    const movedHue = Number(accentSlider.getAttribute('aria-valuenow'));
+    await clickContinue();
+    await changeSiteTypeFromReview(SITE_TYPES.DOCS);
+    await acceptAndCreate();
+
+    expect(movedHue).not.toBe(MOCK_EDITORIAL_LOOK.accentHue);
+    expect(createSiteMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        preset: PRESET_ID.EDITORIAL,
+        accentHue: movedHue,
+      }),
+    );
   });
 
   it('asks for a name before leaving the first step', async () => {
@@ -313,7 +388,7 @@ describe(`<${OnboardingView.name}/>`, () => {
       t('siteSummary', { siteType: SITE_TYPES.BLOG, name: MOCK_TENANT_NAME }),
     ],
     [STEPS.ADDRESS, MOCK_SITE_ADDRESS],
-    [STEPS.LOOK, CONSOLE_PRESET],
+    [STEPS.LOOK, EDITORIAL_PRESET],
   ])('shows the %s step’s choice once it is done', async (_, summary) => {
     await reachReview();
 

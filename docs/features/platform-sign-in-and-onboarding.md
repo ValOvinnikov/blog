@@ -4,7 +4,6 @@ status: built
 layers: [platform, auth, db, email, config, worker]
 code:
   - apps/platform/src/app/api/auth/**
-  - apps/platform/src/app/*/workspace-pending/**
   - apps/platform/src/app/*/sign-in-error/**
   - apps/platform/src/app/*/sign-in/**
   - apps/platform/src/app/*/signup/**
@@ -21,7 +20,6 @@ code:
   - apps/platform/src/server/auth/sign-in-with-provider-action*
   - apps/platform/src/utils/safe-callback-path/**
   - apps/platform/src/utils/sign-in-error/**
-  - apps/platform/src/components/features/layout/workspace-pending-view/**
   - apps/platform/src/components/features/layout/sign-out-button/**
   - apps/platform/src/components/features/layout/signed-in-account/**
   - apps/platform/src/server/auth/get-session-email*
@@ -74,9 +72,6 @@ Free site.
   styling. A `Verification` error (a magic link already used or expired) says
   so and links to sign-in for a new link; any other error gets a plain message
   and a link back to sign-in.
-- `/workspace-pending`: a session-gated dead end with "Try again" (to
-  `/dashboard`) and the signed-in account line. Nothing routes to it any more: a user with no
-  membership goes to `/onboarding` instead.
 - `/signup`: a public gate in front of the same providers, not a second
   login. The visitor ticks acceptance of the Terms of Service and the Privacy
   Policy, linked at `https://<TENANT_ROOT_DOMAIN>/terms` and `/privacy`
@@ -93,8 +88,8 @@ Free site.
 - Every signed-in pre-shell page shows a `SignedInAccount` line — "Signed in
   as <email>" and Sign out, the email read by `getSessionEmail`: the
   onboarding rail (below the step list on wide screens; on phones a compact
-  Sign out beside the brand, without the email), `/workspace-pending`,
-  the dashboard tenant picker, and the not-found page when a session exists.
+  Sign out beside the brand, without the email), the dashboard tenant
+  picker, and the not-found page when a session exists.
   `/sign-in`, `/signup` and `/sign-in-error` never show it, and neither does
   the client-side error page, which has no session to read.
 
@@ -124,7 +119,12 @@ Free site.
      phone), never under the input, which only turns red on an error:
      checking, "<address> is yours", the taken / reserved / invalid error, or
      an amber "couldn't check" note.
-  3. **Look** — the preset and accent colour.
+  3. **Look** — the preset and accent colour. Each site type starts on its
+     own preset and that preset's accent (`STARTER_PRESET_BY_SITE_TYPE`:
+     Editorial for Blog, Portfolio and Personal / résumé; Console for Docs and
+     Blank), and changing the site type moves the preview with it until the
+     owner picks a preset or moves the accent here; from then on their choice
+     stays whatever the site type.
   4. **Review** — every choice with an Edit button back to its step, and the
      terms acceptance again (a magic link opened in another browser carries
      no `/signup` cookie).
@@ -212,6 +212,10 @@ Free site.
 
 ## Constraints and invariants
 
+- The admin panel is not indexed: `[locale]/layout.tsx` sets
+  `robots: { index: false, follow: false }`, so every page under it, public or
+  session-gated, serves `noindex, nofollow`. There is no `robots.txt`, because
+  a crawler must fetch a page to read its noindex.
 - `@blog/auth`'s `findMagicLinkSendRefusal` refuses a magic-link send to
   an address or domain on `@blog/db`'s signup blocklist (`isSignupBlocked`),
   then past the per-IP and per-address hourly limits. The per-address count
@@ -274,7 +278,6 @@ Free site.
 - `apps/platform/src/app/[locale]/onboarding/page.tsx`
 - `apps/platform/src/server/onboarding/create-site-action.ts`
 - `apps/platform/src/server/onboarding/check-site-address-action.ts`
-- `apps/platform/src/app/[locale]/workspace-pending/page.tsx`
 - `apps/platform/src/app/[locale]/sign-in-error/page.tsx`
 - `packages/auth/src/config.ts`
 - `packages/auth/src/events/record-signup-terms-on-sign-in.ts`
@@ -293,9 +296,8 @@ Free site.
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
   `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
-  `sign-in-view`, `email-sign-in-form`,
-  `workspace-pending-view`, `sign-out-button`, `signed-in-account` and
-  `dead-end-view`, plus `get-session-email.test.ts`.
+  `sign-in-view`, `email-sign-in-form`, `sign-out-button`, `signed-in-account`
+  and `dead-end-view`, plus `get-session-email.test.ts`.
 - `create-site-gate.test.ts`, `alert-self-serve-limit.test.ts` and the
   `server/rate-limit/` store tests.
 - No Storybook in `apps/platform`.

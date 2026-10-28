@@ -40,7 +40,7 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 - `[tenant]/[locale]/error.tsx` — `LocaleErrorPage`, below `NextIntlClientProvider`.
 - `global-error.tsx` — `GlobalErrorPage`, replaces the document when the locale layout (the root layout) throws; re-imports the global stylesheet.
 - The proxy answers some requests with a bare status and no page: 404 for a tenant-shaped or undecodable first path segment, 404 for an unknown host in production, 503 when the tenant lookup fails.
-- Platform: `apps/platform/src/app/[locale]/not-found.tsx`, `error.tsx`, `sign-in-error/page.tsx` and `workspace-pending/page.tsx` (through `WorkspacePendingView`), all `DeadEndView`. `error.tsx` offers **Try again** and **Back to home** (`/`, which redirects to the viewer's home) and shows `Error ID: <digest>` when Next provides one.
+- Platform: `apps/platform/src/app/[locale]/not-found.tsx`, `error.tsx`, and `sign-in-error/page.tsx`, all `DeadEndView`. `error.tsx` offers **Try again** and **Back to home** (`/`, which redirects to the viewer's home) and shows `Error ID: <digest>` when Next provides one.
 - Platform: `apps/platform/src/app/global-error.tsx` replaces the document when `[locale]/layout.tsx` throws; it renders the same `DeadEndView` in fixed English under its own minimal `NextIntlClientProvider`, with **Reload** calling Next's `retry`.
 
 ## Data
@@ -87,7 +87,7 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 
 - Web tests: `global-error.test.tsx`, `global-not-found.test.tsx`, both `not-found.test.tsx`, `error.test.tsx`, a `*.test.tsx` beside each page component above, `document-shell.test.tsx`, `build-not-found-metadata.test.ts`, `guard-page-loader-result.test.ts`, `proxy.test.ts`.
 - Stories: `not-found-page.stories.tsx`, `locale-error-page.stories.tsx`, `global-error-page.stories.tsx`.
-- Platform tests: `dead-end-view.test.tsx`, `workspace-pending-view.test.tsx`, `global-error.test.tsx`; none for `error.tsx` or `not-found.tsx`.
+- Platform tests: `dead-end-view.test.tsx`, `global-error.test.tsx`; none for `error.tsx` or `not-found.tsx`.
 
 ## Related
 

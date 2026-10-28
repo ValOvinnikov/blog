@@ -34,8 +34,8 @@ The chrome every signed-in page of `apps/platform` renders inside: a sidebar of
 nav sections, a topbar with a breadcrumb and an account menu, and a content
 column. It comes in three gated trees: the operator's Platform section, the
 operator's view of one tenant, and the owner's `/dashboard`, which never shows
-that the platform hosts more than one tenant. The 404, error, workspace-pending
-and `/dashboard/select-tenant` pages use a smaller pre-shell frame.
+that the platform hosts more than one tenant. The 404, error and
+`/dashboard/select-tenant` pages use a smaller pre-shell frame.
 
 ## Surfaces and routes
 
@@ -93,9 +93,9 @@ The Studio segment switches the content column to full-bleed (see
   those calls its own gate (see [tenant-access](./tenant-access.md)).
 - A denied entitlement 404s, indistinguishable from a missing route. No
   session redirects to sign-in.
-- `/dashboard` with zero memberships redirects to `/workspace-pending`. Only a
+- `/dashboard` with zero memberships redirects to `/onboarding`. Only a
   SUPERADMIN gets every tenant, as virtual OWNER memberships; an ADMIN or
-  MODERATOR with no membership is sent to `/workspace-pending` too.
+  MODERATOR with no membership is sent to `/onboarding` too.
 - With one membership the tenant is implicit. With several, a valid
   `admin-active-tenant` cookie picks it, otherwise the picker opens. The
   select-tenant route re-checks membership (or SUPERADMIN) before setting the
