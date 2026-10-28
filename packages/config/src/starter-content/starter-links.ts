@@ -1,6 +1,8 @@
 import type { Link } from '@blog/config/sanity/generated/types';
 
 import {
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
   LINK_TYPE,
   PORTABLE_TEXT_BLOCK_TYPE,
   type TLocaleIsoCode,
@@ -15,6 +17,16 @@ export function navigationLink(linkId: string) {
     _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
     link: reference(linkId),
   };
+}
+
+export function ctaButton(linkId: string) {
+  return {
+    _key: linkId,
+    _type: 'ctaButton',
+    variant: CTA_ACTION_VARIANT.PRIMARY,
+    appearance: CTA_ACTION_APPEARANCE.CONTAINED,
+    link: reference(linkId),
+  } as const;
 }
 
 export function internalLink(

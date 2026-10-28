@@ -2,7 +2,6 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
-import { buildPortfolioPages } from './portfolio-pages';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { keyedReference, reference } from './starter-fields';
@@ -13,6 +12,7 @@ import {
   buildContentModule,
   buildProfileHero,
 } from './starter-modules';
+import { buildSectionPages } from './starter-section-pages';
 
 const ids = STARTER_DOCUMENT_IDS;
 
@@ -25,7 +25,7 @@ export function buildPortfolioDocuments({
   locale: TLocaleIsoCode;
   copy: TStarterCopy;
 }): TStarterDocumentUnion[] {
-  const { hero, intro, cta, work } = copy.portfolio;
+  const { hero, intro, cta, work, projects } = copy.portfolio;
 
   return [
     ...buildBaseDocuments({
@@ -67,6 +67,17 @@ export function buildPortfolioDocuments({
       locale,
       ids.PORTFOLIO_WORK,
     ),
-    ...buildPortfolioPages(locale, copy),
+    ...buildSectionPages({
+      locale,
+      name: 'Work',
+      ids: {
+        page: ids.PORTFOLIO_WORK,
+        template: ids.PORTFOLIO_WORK_TEMPLATE,
+        list: ids.PORTFOLIO_WORK_LIST,
+        childPrefix: ids.PORTFOLIO_PROJECT_PREFIX,
+      },
+      section: work,
+      pages: projects,
+    }),
   ];
 }
