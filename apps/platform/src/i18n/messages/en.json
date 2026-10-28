@@ -508,8 +508,22 @@
         "notOnPlan": "Using your own domain comes with the Growth plan.",
         "notProvisioned": "This site isn't set up yet. Try again once setup finishes.",
         "alreadyConnected": "This site already has its own domain.",
-        "notCustomDomain": "This domain can't be removed."
-      }
+        "notCustomDomain": "This domain can't be removed.",
+        "claimPending": "This site already has a domain waiting for verification.",
+        "noPendingClaim": "There's no domain waiting for verification.",
+        "recordNotFound": "We can't see the TXT record yet. DNS changes can take a few minutes.",
+        "connectUnavailable": "We verified your domain, but couldn't connect it because our setup service is unavailable. Press Verify to try again; your DNS record is still in place.",
+        "connectConflict": "We verified your domain, but couldn't connect it because the site or domain isn't ready yet. Press Verify to try again; your DNS record is still in place."
+      },
+      "awaitingProof": "Awaiting proof",
+      "proofInstructions": "Add this TXT record at your DNS provider to prove the domain is yours. We check it automatically, or press Verify.",
+      "recordTypeLabel": "Type",
+      "recordNameLabel": "Name",
+      "recordValueLabel": "Value",
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "verifyFailed": "Couldn't check the record. Try again.",
+      "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working."
     }
   },
   "presetPicker": {

@@ -3,6 +3,7 @@ export * as admins from './admins';
 export * as auditEvents from './audit-events';
 export * as blockedSignupIdentities from './blocked-signup-identities';
 export * as bookmarks from './bookmarks';
+export * as customDomainClaims from './custom-domain-claims';
 export * as emailConfig from './email-config';
 export * as emailTemplates from './email-templates';
 export * as findings from './findings';

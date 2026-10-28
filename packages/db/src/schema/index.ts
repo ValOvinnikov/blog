@@ -3,6 +3,7 @@ export * from './audit-events';
 export * from './auth';
 export * from './blocked-signup-identities';
 export * from './bookmarks';
+export * from './custom-domain-claims';
 export * from './email-config';
 export * from './email-templates';
 export * from './findings';
