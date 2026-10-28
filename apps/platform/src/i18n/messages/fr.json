@@ -181,7 +181,8 @@
     "roleChip": "{role} · {scope}"
   },
   "account": {
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "signedInAs": "Connecté en tant que {email}"
   },
   "roleLabel": {
     "SUPERADMIN": "Super-administrateur",

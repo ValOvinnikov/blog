@@ -11,6 +11,7 @@ import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
+import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -25,6 +26,8 @@ import { OnboardingView } from './onboarding-view';
 vi.mock('@platform/server/onboarding/create-site-action', () => ({
   createSiteAction: vi.fn(),
 }));
+
+vi.mock('@platform/server/auth/sign-out-action');
 
 vi.mock('@platform/server/onboarding/check-site-address-action', () => ({
   checkSiteAddressAction: vi.fn(),
@@ -99,6 +102,7 @@ const setup = customRender(OnboardingView, {
   rootDomain: MOCK_TENANT_ROOT_DOMAIN,
   legalPageUrls: toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN),
   initialLocale: LOCALE_ISO_CODES.EN,
+  accountEmail: MOCK_SIGN_IN_EMAIL,
 });
 
 describe(`<${OnboardingView.name}/>`, () => {
@@ -162,6 +166,16 @@ describe(`<${OnboardingView.name}/>`, () => {
     checkSiteAddressMock.mockResolvedValue(undefined);
     createSiteMock.mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
     setup();
+  });
+
+  it('names the signed-in email and offers a sign out', () => {
+    const email = screen.getByText(MOCK_SIGN_IN_EMAIL, { exact: false });
+    const signOutButton = screen.getByRole('button', {
+      name: messages.account.signOut,
+    });
+
+    expect(email).toBeVisible();
+    expect(signOutButton).toBeVisible();
   });
 
   it('creates the site from the values the user entered', async () => {

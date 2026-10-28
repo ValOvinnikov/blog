@@ -181,7 +181,8 @@
     "roleChip": "{role} · {scope}"
   },
   "account": {
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as {email}"
   },
   "roleLabel": {
     "SUPERADMIN": "Super admin",

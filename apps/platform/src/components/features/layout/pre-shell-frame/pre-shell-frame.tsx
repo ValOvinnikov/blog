@@ -6,6 +6,7 @@ import { preShellFrameVariants } from './pre-shell-frame-variants';
 export type TPreShellFrameProps = {
   header: ReactNode;
   isWide?: boolean;
+  footer?: ReactNode;
   children: ReactNode;
 };
 
@@ -13,6 +14,7 @@ export type TPreShellFrameProps = {
 export const PreShellFrame = ({
   header,
   isWide = false,
+  footer,
   children,
 }: TPreShellFrameProps) => {
   const { root, main, card, headerGutter } = preShellFrameVariants({ isWide });
@@ -23,6 +25,7 @@ export const PreShellFrame = ({
         <Card className={card()}>
           <div className={headerGutter()}>{header}</div>
           <Card.Body>{children}</Card.Body>
+          {footer ? <Card.Footer>{footer}</Card.Footer> : undefined}
         </Card>
       </main>
     </div>
