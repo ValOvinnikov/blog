@@ -18,6 +18,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import {
+  mockCustomDomainClaim,
   mockOwnerContext,
   mockTenantDomainRows,
 } from '@platform/testing/custom-domain/fixtures';
@@ -51,7 +52,7 @@ vi.mock('@blog/db', async () => {
   return mockCustomDomainDb();
 });
 
-const { tenantDomains } = queries;
+const { tenantDomains, customDomainClaims } = queries;
 
 const MOCK_INPUT = { domain: MOCK_CUSTOM_DOMAIN };
 
@@ -81,6 +82,12 @@ describe(removeCustomDomainAction, () => {
     vi.mocked(enqueueWorkerRequest)
       .mockReset()
       .mockResolvedValue(HTTP_STATUS.ACCEPTED);
+    vi.mocked(customDomainClaims.getCustomDomainClaim)
+      .mockReset()
+      .mockResolvedValue(undefined);
+    vi.mocked(customDomainClaims.deleteCustomDomainClaim)
+      .mockReset()
+      .mockResolvedValue(true);
   });
 
   it.each([
@@ -231,5 +238,43 @@ describe(removeCustomDomainAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(enqueueWorkerRequest).not.toHaveBeenCalled();
     expect(recordAuditEvent).not.toHaveBeenCalled();
+  });
+
+  describe('a pending claim', () => {
+    beforeEach(() => {
+      vi.mocked(customDomainClaims.getCustomDomainClaim).mockResolvedValue(
+        mockCustomDomainClaim(),
+      );
+    });
+
+    it('deletes the claim without contacting the worker', async () => {
+      const result = await remove();
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(customDomainClaims.deleteCustomDomainClaim).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
+      expect(enqueueWorkerRequest).not.toHaveBeenCalled();
+    });
+
+    it('refuses when the claim is already gone', async () => {
+      vi.mocked(customDomainClaims.deleteCustomDomainClaim).mockResolvedValue(
+        false,
+      );
+
+      const result = await remove();
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM,
+      });
+    });
+
+    it('leaves the claim alone for a different domain', async () => {
+      await remove({ domain: MOCK_TENANT_DOMAIN });
+
+      expect(customDomainClaims.deleteCustomDomainClaim).not.toHaveBeenCalled();
+    });
   });
 });

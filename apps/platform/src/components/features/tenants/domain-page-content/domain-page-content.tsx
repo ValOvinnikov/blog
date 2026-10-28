@@ -30,9 +30,10 @@ export const DomainPageContent = async ({
 }: TDomainPageContentProps) => {
   const { id, primaryDomain, deprovisionedAt } = tenant;
   const projectDomain = getProjectDomain(primaryDomain);
-  const [t, tenantDomains] = await Promise.all([
+  const [t, tenantDomains, claim] = await Promise.all([
     getTranslations('tenantDomainPage'),
     queries.tenantDomains.listTenantDomains(id),
+    queries.customDomainClaims.getCustomDomainClaim(id),
   ]);
   const customDomain = findCustomDomain(
     tenantDomains,
@@ -61,6 +62,7 @@ export const DomainPageContent = async ({
       <CustomDomainCard
         tenant={tenant}
         customDomain={customDomain}
+        claim={claim}
         primaryProjectDomain={projectDomain}
         isPrimaryCustom={
           !isPlatformAddress(primaryDomain, env.TENANT_ROOT_DOMAIN)

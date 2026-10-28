@@ -12,11 +12,13 @@ import { useTranslations } from 'next-intl';
 export type TRemoveCustomDomainControlProps = {
   tenantId: string;
   domain: string;
+  isClaim?: boolean;
 };
 
 export const RemoveCustomDomainControl = ({
   tenantId,
   domain,
+  isClaim = false,
 }: TRemoveCustomDomainControlProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
   const router = useRouter();
@@ -51,7 +53,12 @@ export const RemoveCustomDomainControl = ({
       </ConfirmDialog.Trigger>
       <ConfirmDialog.Content
         title={t('removeTitle')}
-        description={t('removeDescription', { domain })}
+        description={t(
+          isClaim ? 'removeClaimDescription' : 'removeDescription',
+          {
+            domain,
+          },
+        )}
         confirmButtonLabel={t('removeConfirm')}
         confirmingButtonLabel={t('removing')}
       />

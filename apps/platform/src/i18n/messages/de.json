@@ -484,8 +484,20 @@
         "notOnPlan": "Eine eigene Domain gehört zum Growth-Tarif.",
         "notProvisioned": "Diese Website ist noch nicht eingerichtet. Versuche es nach der Einrichtung erneut.",
         "alreadyConnected": "Diese Website hat bereits eine eigene Domain.",
-        "notCustomDomain": "Diese Domain kann nicht entfernt werden."
-      }
+        "notCustomDomain": "Diese Domain kann nicht entfernt werden.",
+        "claimPending": "Diese Website hat bereits eine Domain, die auf die Bestätigung wartet.",
+        "noPendingClaim": "Es wartet keine Domain auf die Bestätigung.",
+        "recordNotFound": "Der TXT-Eintrag ist noch nicht sichtbar. DNS-Änderungen können einige Minuten dauern."
+      },
+      "awaitingProof": "Nachweis ausstehend",
+      "proofInstructions": "Lege diesen TXT-Eintrag bei deinem DNS-Anbieter an, um zu belegen, dass dir die Domain gehört. Wir prüfen ihn automatisch, oder du klickst auf Prüfen.",
+      "recordTypeLabel": "Typ",
+      "recordNameLabel": "Name",
+      "recordValueLabel": "Wert",
+      "verify": "Prüfen",
+      "verifying": "Wird geprüft…",
+      "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
+      "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter."
     }
   },
   "presetPicker": {

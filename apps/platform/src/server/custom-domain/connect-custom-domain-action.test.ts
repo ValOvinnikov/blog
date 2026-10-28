@@ -1,9 +1,6 @@
 import {
   ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
   ERROR_CODE,
-  HTTP_STATUS,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { queries } from '@blog/db';
@@ -13,10 +10,8 @@ import { errorResult, okResult } from '@blog/utils';
 import {
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_LOG,
-  CUSTOM_DOMAIN_PATH,
   CUSTOM_DOMAIN_REFUSAL,
 } from '@platform/constants/custom-domain';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
@@ -35,8 +30,6 @@ import { connectCustomDomainAction } from './connect-custom-domain-action';
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/audit/record-audit-event');
-
 vi.mock('@platform/server/provisioning/enqueue-provisioning', () => ({
   enqueueWorkerRequest: vi.fn(),
 }));
@@ -49,7 +42,7 @@ vi.mock('@blog/db', async () => {
   return mockCustomDomainDb();
 });
 
-const { tenantDomains } = queries;
+const { tenantDomains, customDomainClaims } = queries;
 
 const MOCK_WEB_HOST = 'web.example.net';
 const MOCK_PLATFORM_HOST = 'admin.example.net';
@@ -74,15 +67,10 @@ describe(connectCustomDomainAction, () => {
     vi.mocked(tenantDomains.listTenantDomains)
       .mockReset()
       .mockResolvedValue([]);
-    vi.mocked(tenantDomains.addTenantDomain)
+    vi.mocked(customDomainClaims.createCustomDomainClaim)
       .mockReset()
       .mockResolvedValue(okResult({} as never));
-    vi.mocked(tenantDomains.removeTenantDomain)
-      .mockReset()
-      .mockResolvedValue(true);
-    vi.mocked(enqueueWorkerRequest)
-      .mockReset()
-      .mockResolvedValue(HTTP_STATUS.ACCEPTED);
+    vi.mocked(enqueueWorkerRequest).mockReset();
   });
 
   it('rejects a caller without access to the tenant', async () => {
@@ -93,33 +81,21 @@ describe(connectCustomDomainAction, () => {
     await expect(
       connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
-  it('connects the normalised domain and audits the request', async () => {
+  it('records a claim for the normalised domain without contacting the worker', async () => {
     asMember();
 
     const result = await connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(tenantDomains.addTenantDomain).toHaveBeenCalledWith(
+    expect(customDomainClaims.createCustomDomainClaim).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_CUSTOM_DOMAIN,
     );
-    expect(enqueueWorkerRequest).toHaveBeenCalledWith(
-      CUSTOM_DOMAIN_PATH.CONNECT,
-      {
-        tenantId: MOCK_TENANT_ID,
-        domain: MOCK_CUSTOM_DOMAIN,
-      },
-    );
-    expect(recordAuditEvent).toHaveBeenCalledWith({
-      logEvent: CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: MOCK_TENANT_ID,
-      details: { customDomainConnectRequested: MOCK_CUSTOM_DOMAIN },
-    });
+    expect(enqueueWorkerRequest).not.toHaveBeenCalled();
+    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
   });
 
   it('reports input that is not a full domain without saving it', async () => {
@@ -135,7 +111,7 @@ describe(connectCustomDomainAction, () => {
         domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_INVALID },
       },
     });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it('reports a host under the platform root domain', async () => {
@@ -151,7 +127,7 @@ describe(connectCustomDomainAction, () => {
         domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_PLATFORM_ADDRESS },
       },
     });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -169,7 +145,7 @@ describe(connectCustomDomainAction, () => {
         domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_PLATFORM_ADDRESS },
       },
     });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it('fails closed with a logged server error when the root domain is unset', async () => {
@@ -183,7 +159,7 @@ describe(connectCustomDomainAction, () => {
       CUSTOM_DOMAIN_LOG.ROOT_DOMAIN_MISSING,
       { tenantId: MOCK_TENANT_ID },
     );
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -205,7 +181,7 @@ describe(connectCustomDomainAction, () => {
         CUSTOM_DOMAIN_LOG.APP_URL_MISSING,
         { tenantId: MOCK_TENANT_ID, missing },
       );
-      expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+      expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
       expect(enqueueWorkerRequest).not.toHaveBeenCalled();
     },
   );
@@ -219,7 +195,7 @@ describe(connectCustomDomainAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED,
     });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it('refuses a member who is not the owner', async () => {
@@ -231,7 +207,7 @@ describe(connectCustomDomainAction, () => {
     await expect(
       connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
     expect(enqueueWorkerRequest).not.toHaveBeenCalled();
   });
 
@@ -247,24 +223,21 @@ describe(connectCustomDomainAction, () => {
         domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN },
       },
     });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
-  it('reports a domain claimed between the check and the write as taken', async () => {
+  it('refuses a site that already has a claim waiting', async () => {
     asMember();
-    vi.mocked(tenantDomains.addTenantDomain).mockResolvedValue(
-      errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN),
+    vi.mocked(customDomainClaims.createCustomDomainClaim).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS),
     );
 
     const result = await connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
 
     expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {
-        domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN },
-      },
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: CUSTOM_DOMAIN_REFUSAL.CLAIM_PENDING,
     });
-    expect(enqueueWorkerRequest).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -289,8 +262,7 @@ describe(connectCustomDomainAction, () => {
     const result = await connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.REFUSED, reason });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
-    expect(recordAuditEvent).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
   it('refuses a tenant that already has a custom domain', async () => {
@@ -305,50 +277,25 @@ describe(connectCustomDomainAction, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED,
     });
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ['a rejected response', HTTP_STATUS.INTERNAL_SERVER_ERROR],
-    ['no response', null],
-  ])(
-    'removes the saved domain and reports a server error on %s from the worker',
-    async (_name, status) => {
-      asMember();
-      vi.mocked(enqueueWorkerRequest).mockResolvedValue(status);
-
-      const result = await connectCustomDomainAction(
-        MOCK_TENANT_ID,
-        MOCK_INPUT,
-      );
-
-      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-      expect(tenantDomains.removeTenantDomain).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        MOCK_CUSTOM_DOMAIN,
-      );
-      expect(logger.error).toHaveBeenCalledWith(
-        CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED,
-        {
-          tenantId: MOCK_TENANT_ID,
-          domain: MOCK_CUSTOM_DOMAIN,
-          responseStatus: status,
-        },
-      );
-      expect(recordAuditEvent).not.toHaveBeenCalled();
-    },
-  );
-
-  it('reports a server error without contacting the worker when the write fails', async () => {
+  it('logs and reports a server error when the claim cannot be written', async () => {
     asMember();
-    vi.mocked(tenantDomains.addTenantDomain).mockResolvedValue(
+    vi.mocked(customDomainClaims.createCustomDomainClaim).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
     const result = await connectCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(enqueueWorkerRequest).not.toHaveBeenCalled();
-    expect(recordAuditEvent).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      CUSTOM_DOMAIN_LOG.CONNECT_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        domain: MOCK_CUSTOM_DOMAIN,
+        error: ERROR_CODE.DB_NOT_FOUND,
+      },
+    );
   });
 });

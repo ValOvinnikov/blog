@@ -3896,6 +3896,30 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
+    "CLAIM_PENDING": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.CLAIM_PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NO_PENDING_CLAIM": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "RECORD_NOT_FOUND": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.RECORD_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "/api/custom-domain/connect": [
       {
         "ref": "CUSTOM_DOMAIN_PATH.CONNECT",
@@ -3907,14 +3931,6 @@
     "/api/custom-domain/disconnect": [
       {
         "ref": "CUSTOM_DOMAIN_PATH.DISCONNECT",
-        "scope": "app:platform",
-        "from": "@platform/constants/custom-domain",
-        "file": "apps/platform/src/constants/custom-domain.ts"
-      }
-    ],
-    "custom_domain.connect_audit_failed": [
-      {
-        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
@@ -3945,6 +3961,30 @@
     "custom_domain.connect_rollback_failed": [
       {
         "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ROLLBACK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.verify_audit_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.VERIFY_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.verify_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.VERIFY_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.verify_lookup_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.VERIFY_LOOKUP_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
@@ -6282,6 +6322,46 @@
     ]
   },
   "numbers": {
+    "0": [
+      {
+        "ref": "DNS_RCODE.NO_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "2": [
+      {
+        "ref": "DNS_RCODE.SERVFAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "3": [
+      {
+        "ref": "DNS_RCODE.NXDOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "5": [
+      {
+        "ref": "DNS_TYPE.CNAME",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "16": [
+      {
+        "ref": "DNS_TYPE.TXT",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
     "200": [
       {
         "ref": "HTTP_STATUS.OK",

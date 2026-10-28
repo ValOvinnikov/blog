@@ -304,9 +304,9 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/custom-domain` — `apps/platform/src/constants/custom-domain.ts`
 
 - **CUSTOM_DOMAIN_FIELD_ERROR**: `DOMAIN_PLATFORM_ADDRESS`
-- **CUSTOM_DOMAIN_REFUSAL**: `NOT_ON_PLAN`, `NOT_PROVISIONED`, `ALREADY_CONNECTED`, `NOT_CUSTOM_DOMAIN`
+- **CUSTOM_DOMAIN_REFUSAL**: `NOT_ON_PLAN`, `NOT_PROVISIONED`, `ALREADY_CONNECTED`, `NOT_CUSTOM_DOMAIN`, `CLAIM_PENDING`, `NO_PENDING_CLAIM`, `RECORD_NOT_FOUND`
 - **CUSTOM_DOMAIN_PATH**: `CONNECT`=`"/api/custom-domain/connect"`, `DISCONNECT`=`"/api/custom-domain/disconnect"`
-- **CUSTOM_DOMAIN_LOG**: `CONNECT_AUDIT_FAILED`=`"custom_domain.connect_audit_failed"`, `CONNECT_ENQUEUE_REJECTED`=`"custom_domain.connect_enqueue_rejected"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `CONNECT_ROLLBACK_FAILED`=`"custom_domain.connect_rollback_failed"`, `ROOT_DOMAIN_MISSING`=`"custom_domain.root_domain_missing"`, `APP_URL_MISSING`=`"custom_domain.app_url_missing"`, `DISCONNECT_AUDIT_FAILED`=`"custom_domain.disconnect_audit_failed"`, `DISCONNECT_REJECTED_RESTORING`=`"custom_domain.disconnect_rejected_restoring"`, `DISCONNECT_RESTORE_FAILED`=`"custom_domain.disconnect_restore_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+- **CUSTOM_DOMAIN_LOG**: `CONNECT_ENQUEUE_REJECTED`=`"custom_domain.connect_enqueue_rejected"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `CONNECT_ROLLBACK_FAILED`=`"custom_domain.connect_rollback_failed"`, `VERIFY_AUDIT_FAILED`=`"custom_domain.verify_audit_failed"`, `VERIFY_FAILED`=`"custom_domain.verify_failed"`, `VERIFY_LOOKUP_FAILED`=`"custom_domain.verify_lookup_failed"`, `ROOT_DOMAIN_MISSING`=`"custom_domain.root_domain_missing"`, `APP_URL_MISSING`=`"custom_domain.app_url_missing"`, `DISCONNECT_AUDIT_FAILED`=`"custom_domain.disconnect_audit_failed"`, `DISCONNECT_REJECTED_RESTORING`=`"custom_domain.disconnect_rejected_restoring"`, `DISCONNECT_RESTORE_FAILED`=`"custom_domain.disconnect_restore_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
 
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
@@ -315,6 +315,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **DATA_REQUEST_MATCH_COLUMN**: `KIND`, `SITE`, `EMAIL`, `RECORDED`
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
 - **DATA_REQUEST_LOG**: `AUDIT_FAILED`=`"data_request.audit_failed"`, `FAILED`=`"data_request.failed"`
+
+### `@platform/constants/dns` — `apps/platform/src/constants/dns.ts`
+
+- **DNS_TYPE**: `CNAME`=`5`, `TXT`=`16`
+- **DNS_RCODE**: `NO_ERROR`=`0`, `SERVFAIL`=`2`, `NXDOMAIN`=`3`
 
 ### `@platform/constants/domain` — `apps/platform/src/constants/domain.ts`
 
