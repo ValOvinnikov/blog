@@ -24,7 +24,7 @@ export default async function TenantDangerPage({ params }: TProps) {
   // Queried unconditionally: a request newer than any existing run, even a FAILED one, is how a retry restarts.
   const [deprovisionRequestedAt, isPlatformTenant] = await Promise.all([
     queries.auditEvents.getLatestDeprovisionRequestedAt(tenantId),
-    resolveIsPlatformTenant(tenant),
+    !tenant.deprovisionedAt && resolveIsPlatformTenant(tenant),
   ]);
 
   return (

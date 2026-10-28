@@ -17,13 +17,13 @@ import { tenantDangerPageContentVariants } from './tenant-danger-page-content-va
 export type TTenantDangerPageContentProps = {
   tenant: TClientTenant;
   deprovisionRequestedAt?: string;
-  isPlatformTenant?: boolean;
+  isPlatformTenant: boolean;
 };
 
 export const TenantDangerPageContent = ({
   tenant,
   deprovisionRequestedAt,
-  isPlatformTenant = false,
+  isPlatformTenant,
 }: TTenantDangerPageContentProps) => {
   const t = useTranslations('tenantDangerPage');
   const showDeprovisioningStatus =

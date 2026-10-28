@@ -1133,8 +1133,7 @@
     "description": "Deprovisioned {date}. Everything on these pages is read-only."
   },
   "platformTenantNotice": {
-    "title": "The platform's own site",
-    "description": "This is the platform's own site, so it can't be suspended or deleted."
+    "title": "The platform's own site"
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",

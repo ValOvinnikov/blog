@@ -1133,8 +1133,7 @@
     "description": "Déprovisionné le {date}. Tout le contenu de ces pages est en lecture seule."
   },
   "platformTenantNotice": {
-    "title": "Le site de la plateforme",
-    "description": "Il s'agit du site de la plateforme elle-même : il ne peut être ni suspendu ni supprimé."
+    "title": "Le site de la plateforme"
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilité des locataires",

@@ -1133,8 +1133,7 @@
     "description": "Deprovisioniert am {date}. Alles auf diesen Seiten ist schreibgeschützt."
   },
   "platformTenantNotice": {
-    "title": "Die eigene Website der Plattform",
-    "description": "Dies ist die eigene Website der Plattform und kann daher weder gesperrt noch gelöscht werden."
+    "title": "Die eigene Website der Plattform"
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Sichtbarkeit der Mandanten",

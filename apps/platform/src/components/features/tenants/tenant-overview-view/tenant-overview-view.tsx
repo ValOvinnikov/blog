@@ -31,26 +31,22 @@ export const TenantOverviewView = async ({
   const { id, primaryDomain, status, deprovisionedAt } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [admin, owner, auditEvents, findings, isPlatformTenant] =
-    await Promise.all([
-      requireAdmin(),
-      queries.memberships.getTenantOwnerMembership(id),
-      queries.auditEvents.listAuditEventsForTarget(
-        AUDIT_TARGET_TYPE.TENANT,
-        id,
-        {
-          limit: 5,
-        },
-      ),
-      queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
-      resolveIsPlatformTenant(tenant),
-    ]);
+  const [admin, owner, auditEvents, findings] = await Promise.all([
+    requireAdmin(),
+    queries.memberships.getTenantOwnerMembership(id),
+    queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
+      limit: 5,
+    }),
+    queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+  ]);
   const canChangeSuspension =
     isSuperAdmin(admin) &&
     !deprovisionedAt &&
     status !== TENANT_STATUS.ARCHIVED;
   const isSuspensionControlShown =
-    !isPlatformTenant || status === TENANT_STATUS.SUSPENDED;
+    canChangeSuspension &&
+    (status === TENANT_STATUS.SUSPENDED ||
+      !(await resolveIsPlatformTenant(tenant)));
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
 
   return (

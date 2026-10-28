@@ -458,6 +458,17 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       expect(notice).toBeVisible();
     });
 
+    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+      'never reads the tenant hosts for a %s',
+      async (role) => {
+        requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
+
+        await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
+
+        expect(resolveIsPlatformTenantMock).not.toHaveBeenCalled();
+      },
+    );
+
     it('still offers Reactivate on a suspended platform tenant', async () => {
       resolveIsPlatformTenantMock.mockResolvedValue(true);
 

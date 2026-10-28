@@ -57,6 +57,7 @@ const failedSteps = {
 
 const setup = customRender(TenantDangerPageContent, {
   tenant: mockClientTenant({ deprovisionedAt: null }),
+  isPlatformTenant: false,
 });
 
 const getTrigger = () => screen.getByRole('button', { name: 'Deprovision' });

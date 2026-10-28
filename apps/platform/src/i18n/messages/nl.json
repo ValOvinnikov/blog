@@ -1133,8 +1133,7 @@
     "description": "Ontmanteld op {date}. Alles op deze pagina's is alleen-lezen."
   },
   "platformTenantNotice": {
-    "title": "De eigen site van het platform",
-    "description": "Dit is de eigen site van het platform, dus deze kan niet worden opgeschort of verwijderd."
+    "title": "De eigen site van het platform"
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Zichtbaarheid tenants",

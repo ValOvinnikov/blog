@@ -70,7 +70,7 @@ const {
   deprovisionTenantControl,
   reactivateTenantControl,
   deprovisioningStatusView,
-  platformTenantNotice,
+  tenantLifecycleErrors,
   runStatus,
 } = messages;
 
@@ -145,7 +145,7 @@ describe(`<${TenantDangerPage.name}/>`, () => {
     const deprovisionButton = screen.queryByRole('button', {
       name: deprovisionTenantControl.triggerButton,
     });
-    const notice = screen.getByText(platformTenantNotice.description);
+    const notice = screen.getByText(tenantLifecycleErrors.platformTenant);
 
     expect(deprovisionButton).not.toBeInTheDocument();
     expect(notice).toBeVisible();
