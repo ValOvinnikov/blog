@@ -16,6 +16,7 @@ const MOCK_PUBLISHED_AT = '2026-10-21T09:00:00.000Z';
 const STARTER_SITE_TYPES = [
   SITE_TYPE.BLOG,
   SITE_TYPE.PORTFOLIO,
+  SITE_TYPE.PERSONAL,
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
@@ -170,6 +171,32 @@ describe(buildStarterDocuments, () => {
     expect(parents).toEqual([parents[0], parents[0]]);
   });
 
+  it('opens the Personal home with a profile hero, then an introduction, questions and a CTA to the post index', () => {
+    const documents = build(SITE_TYPE.PERSONAL);
+    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
+    const { hero, modules = [] } = findByType(documents, 'template_home');
+    const cta = findByType(documents, 'module_cta');
+    const ctaLink = byId(cta.ctaButtons?.[0]?.link?._ref);
+    const ctaTarget =
+      ctaLink && 'internalReference' in ctaLink
+        ? byId(ctaLink.internalReference?._ref)
+        : undefined;
+
+    const sequence = [
+      byId(hero?._ref),
+      ...modules.map(({ _ref }) => byId(_ref)),
+      ctaTarget,
+    ].map((document) => ({ _type: document?._type }));
+
+    expect(sequence).toEqual([
+      { _type: 'module_heroProfile' },
+      { _type: 'module_content' },
+      { _type: 'module_faq' },
+      { _type: 'module_cta' },
+      { _type: 'page_postIndex' },
+    ]);
+  });
+
   it('the site settings brand carries the site name', () => {
     const { brand } = findByType(build(), 'settings_site');
 
@@ -219,7 +246,7 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.PERSONAL])(
+  it.each([null, SITE_TYPE.DOCS])(
     'starts %s from the Blank site',
     (siteType) => {
       expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);

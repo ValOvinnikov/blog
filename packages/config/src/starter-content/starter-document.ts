@@ -1,8 +1,10 @@
 import type {
+  Block_faq,
   Blog_topic,
   Link,
   Module_cta,
   Module_content,
+  Module_faq,
   Module_heroBlog,
   Module_heroProfile,
   Module_postLatest,
@@ -55,6 +57,7 @@ export type TStarterModule<
     | Module_postLatest
     | Module_postList
     | Module_taxonomyList
+    | Module_faq
     | Module_cta,
 > = TStarterDocument<TModule, 'title' | 'brandVariant'>;
 
@@ -90,4 +93,6 @@ export type TStarterDocumentUnion =
   | TStarterModule<Module_cta>
   | TStarterModule<Module_heroProfile>
   | TStarterModule<Module_content>
-  | TStarterModule<Module_sectionPages>;
+  | TStarterModule<Module_sectionPages>
+  | TStarterModule<Module_faq>
+  | TStarterDocument<Block_faq, 'title' | 'question' | 'answer'>;

@@ -1,9 +1,6 @@
-import type { Blog_topic, Person } from '@blog/config/sanity/generated/types';
+import type { Blog_topic } from '@blog/config/sanity/generated/types';
 
-import {
-  PORTABLE_TEXT_BLOCK_TYPE,
-  type TLocaleIsoCode,
-} from '@blog/config/constants';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogIndexPages } from './blog-index-pages';
@@ -17,7 +14,6 @@ import type {
 } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import {
-  internalLink,
   keyedReference,
   localizedString,
   localizedText,
@@ -27,6 +23,8 @@ import {
   seo,
   slug,
 } from './starter-fields';
+import { internalLink, navigationLink } from './starter-links';
+import { buildAuthor } from './starter-modules';
 
 const ids = STARTER_DOCUMENT_IDS;
 
@@ -49,11 +47,7 @@ export function buildBlogDocuments({
       locale,
       copy,
       navigationItems: [ids.BLOG_POST_INDEX_LINK, ids.BLOG_ABOUT_LINK].map(
-        (linkId) => ({
-          _key: linkId,
-          _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-          link: reference(linkId),
-        }),
+        navigationLink,
       ),
       homeLayout: {
         hero: reference(ids.BLOG_HERO),
@@ -72,11 +66,7 @@ export function buildBlogDocuments({
       title: localizedString(locale, topic.title),
       description: localizedText(locale, topic.description),
     } satisfies TStarterDocument<Blog_topic, 'title'>,
-    {
-      _id: ids.BLOG_AUTHOR,
-      _type: 'person',
-      name: siteName,
-    } satisfies TStarterDocument<Person, 'name'>,
+    buildAuthor(ids.BLOG_AUTHOR, siteName),
     {
       _id: ids.BLOG_WELCOME_POST,
       _type: 'page_post',

@@ -121,5 +121,48 @@
         "metaDescription": "Un segundo caso de ejemplo creado con tu sitio. Sustitúyelo por tu propio trabajo, o bórralo."
       }
     ]
+  },
+  "personal": {
+    "hero": {
+      "eyebrow": "Hola",
+      "heading": "Un poco sobre mí y lo que hago"
+    },
+    "intro": {
+      "body": [
+        "Bienvenido a mi rincón de la web. Aquí cuento quién soy, en qué trabajo y lo que aprendo por el camino.",
+        "Sustituye este texto por unas líneas sobre ti: tu trayectoria, en qué destacas y qué te gustaría hacer a continuación."
+      ]
+    },
+    "faq": {
+      "heading": "Algunas preguntas frecuentes",
+      "questions": [
+        {
+          "question": "¿A qué te dedicas?",
+          "answer": [
+            "Responde en una o dos frases: tu función, tu campo y el tipo de trabajo que más disfrutas."
+          ]
+        },
+        {
+          "question": "¿Estás abierto a nuevas oportunidades?",
+          "answer": [
+            "Cuenta si buscas empleo, trabajo freelance o colaboraciones, y qué te interesaría."
+          ]
+        },
+        {
+          "question": "¿Dónde puedo ver más de tu trabajo?",
+          "answer": [
+            "Dirige a los visitantes a tus textos en este sitio y añade enlaces a otros lugares donde compartes tu trabajo."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Lee lo que escribo",
+      "supportingText": "Notas y artículos sobre aquello en lo que trabajo y lo que aprendo."
+    },
+    "writing": {
+      "linkLabel": "Escritos",
+      "listHeading": "Todos los artículos"
+    }
   }
 }
