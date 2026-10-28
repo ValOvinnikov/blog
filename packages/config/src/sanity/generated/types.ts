@@ -711,7 +711,6 @@ export type Brand = {
   _type: 'brand';
   name?: string;
   logo?: ImageWithAlt;
-  tagline?: BrandTagline;
 };
 
 export type BrandTagline = {
