@@ -25,6 +25,7 @@ export type TLookSampleProps = {
   busy: IBusyStyle;
   hasReaderAccounts: boolean;
   isNarrow?: boolean;
+  isSubmenuOpen?: boolean;
 };
 
 export const LookSample = ({
@@ -35,6 +36,7 @@ export const LookSample = ({
   busy,
   hasReaderAccounts,
   isNarrow = false,
+  isSubmenuOpen = false,
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
@@ -53,7 +55,7 @@ export const LookSample = ({
         hasReaderAccounts={hasReaderAccounts}
         isNarrow={isNarrow}
         isDark={theme.isDark}
-        isSubmenuOpen={true}
+        isSubmenuOpen={isSubmenuOpen}
       />
       <Heading level={3} visual="preview">
         {t('sampleHeading')}

@@ -3,6 +3,7 @@
 import { DeleteTenantControl } from '@platform/components/features/tenants/delete-tenant-control';
 import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
 import { DeprovisioningStatusView } from '@platform/components/features/tenants/deprovisioning-status-view';
+import { PlatformTenantNotice } from '@platform/components/features/tenants/platform-tenant-notice';
 import { ReactivateTenantControl } from '@platform/components/features/tenants/reactivate-tenant-control';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Heading } from '@platform/components/shared/heading';
@@ -16,11 +17,13 @@ import { tenantDangerPageContentVariants } from './tenant-danger-page-content-va
 export type TTenantDangerPageContentProps = {
   tenant: TClientTenant;
   deprovisionRequestedAt?: string;
+  isPlatformTenant: boolean;
 };
 
 export const TenantDangerPageContent = ({
   tenant,
   deprovisionRequestedAt,
+  isPlatformTenant,
 }: TTenantDangerPageContentProps) => {
   const t = useTranslations('tenantDangerPage');
   const showDeprovisioningStatus =
@@ -53,6 +56,8 @@ export const TenantDangerPageContent = ({
             </div>
           )}
         </>
+      ) : isPlatformTenant ? (
+        <PlatformTenantNotice />
       ) : (
         <>
           <DeprovisionTenantControl

@@ -78,7 +78,8 @@
     "siteAddressLabel": "Adres van de site",
     "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
     "siteAddressChecking": "Adres controleren…",
-    "siteAddressAvailable": "{address} is beschikbaar.",
+    "siteAddressAvailable": "{address} is van jou",
+    "siteAddressUnverified": "We konden dit adres nu niet controleren. Je kunt doorgaan – we controleren het opnieuw wanneer je de site aanmaakt.",
     "languageLabel": "Taal",
     "languageHint": "De taal waarmee je site begint. Je kunt later meer talen toevoegen.",
     "presetLabel": "Uiterlijk",
@@ -1189,6 +1190,9 @@
     "title": "Deze tenant is gearchiveerd",
     "description": "Ontmanteld op {date}. Alles op deze pagina's is alleen-lezen."
   },
+  "platformTenantNotice": {
+    "title": "De eigen site van het platform"
+  },
   "archivedTenantsToggle": {
     "ariaLabel": "Zichtbaarheid tenants",
     "activeOption": "Actief",
@@ -1263,6 +1267,7 @@
     "notDeprovisioned": "Deze tenant is niet ontmanteld.",
     "alreadyInProgress": "De inrichting loopt al.",
     "notArchived": "Deze tenant moet worden gearchiveerd voordat hij kan worden verwijderd.",
+    "platformTenant": "Dit is de eigen site van het platform, dus deze kan niet worden opgeschort of verwijderd.",
     "deprovisionFailed": "De ontmanteling kon niet worden gestart — probeer het opnieuw.",
     "reactivateFailed": "Het opnieuw activeren kon niet worden gestart — probeer het opnieuw.",
     "deleteFailed": "De tenant kon niet worden verwijderd — probeer het opnieuw.",

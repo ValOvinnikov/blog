@@ -27,6 +27,7 @@ export const TENANT_REFUSAL = {
   NOT_DEPROVISIONED: 'NOT_DEPROVISIONED',
   ALREADY_IN_PROGRESS: 'ALREADY_IN_PROGRESS',
   NOT_ARCHIVED: 'NOT_ARCHIVED',
+  PLATFORM_TENANT: 'PLATFORM_TENANT',
   LOCALE_IS_ADDITIONAL: 'LOCALE_IS_ADDITIONAL',
   PROVISIONING_STARTED: 'PROVISIONING_STARTED',
   OWNER_ALREADY_JOINED: 'OWNER_ALREADY_JOINED',
@@ -60,6 +61,7 @@ export const TENANT_LOG = {
   DOMAIN_AVAILABILITY_INVALID_DOMAIN:
     'tenants.domain_availability_invalid_domain',
   OWNER_INVITE_EMAIL_FAILED: 'tenants.owner_invite_email_failed',
+  PLATFORM_TENANT_REFUSED: 'tenants.platform_tenant_refused',
   ROOT_DOMAIN_MISSING: 'tenants.root_domain_missing',
   SIGN_IN_ACTIVITY_FAILED: 'tenant.sign_in_activity_failed',
   SIGN_IN_OWNER_LOOKUP_FAILED: 'tenant.sign_in_owner_lookup_failed',

@@ -226,4 +226,6 @@ export const mockClientTenant = (
 export const OWNER_EMAIL_LABEL = 'Owner email';
 export const PRIMARY_DOMAIN_LABEL = 'Primary domain';
 export const REACTIVATE_TENANT_LABEL = 'Reactivate tenant';
+export const PLATFORM_TENANT_NOTICE_TEXT =
+  "This is the platform's own site, so it can't be suspended or deleted.";
 export const CONFIRM_TENANT_NAME_LABEL = `Type "${MOCK_TENANT_NAME}" to confirm`;

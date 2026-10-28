@@ -5492,6 +5492,14 @@
         "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
+    "PLATFORM_TENANT": [
+      {
+        "ref": "TENANT_REFUSAL.PLATFORM_TENANT",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "LOCALE_IS_ADDITIONAL": [
       {
         "ref": "TENANT_REFUSAL.LOCALE_IS_ADDITIONAL",
@@ -5623,6 +5631,14 @@
     "tenants.owner_invite_email_failed": [
       {
         "ref": "TENANT_LOG.OWNER_INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.platform_tenant_refused": [
+      {
+        "ref": "TENANT_LOG.PLATFORM_TENANT_REFUSED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -5946,6 +5962,30 @@
         "scope": "app:web",
         "from": "@web/constants/header-style",
         "file": "apps/web/src/constants/header-style.ts"
+      }
+    ],
+    "module_renderer.unknown_module_type": [
+      {
+        "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",
+        "scope": "app:web",
+        "from": "@web/constants/module-renderer",
+        "file": "apps/web/src/constants/module-renderer.ts"
+      }
+    ],
+    "hero_slot.unknown_hero_type": [
+      {
+        "ref": "MODULE_RENDERER_LOG.UNKNOWN_HERO_TYPE",
+        "scope": "app:web",
+        "from": "@web/constants/module-renderer",
+        "file": "apps/web/src/constants/module-renderer.ts"
+      }
+    ],
+    "module_renderer.plan_fetch_failed": [
+      {
+        "ref": "MODULE_RENDERER_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/module-renderer",
+        "file": "apps/web/src/constants/module-renderer.ts"
       }
     ],
     "navigation.layout_fetch_failed": [

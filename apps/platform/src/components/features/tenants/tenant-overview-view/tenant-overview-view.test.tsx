@@ -12,6 +12,7 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import {
   mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
@@ -43,6 +44,7 @@ import {
   MOCK_TENANT_ROOT_DOMAIN,
   MOCK_TENANT_URL,
   mockFirstStepRunningProvisioningSteps,
+  PLATFORM_TENANT_NOTICE_TEXT,
   PRIMARY_DOMAIN_LABEL,
   REACTIVATE_TENANT_LABEL,
   MOCK_TENANT_ID,
@@ -86,6 +88,10 @@ vi.mock('@platform/utils/env/env');
 vi.mock('@platform/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
+
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
+
+const resolveIsPlatformTenantMock = vi.mocked(resolveIsPlatformTenant);
 
 vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
   suspendTenantAction: vi.fn(),
@@ -156,6 +162,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
     );
+    resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
   });
 
   afterEach(() => {
@@ -457,6 +464,42 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
       expect(reactivateButton).toBeVisible();
       expect(suspendButton).not.toBeInTheDocument();
+    });
+
+    it('offers no Suspend on the platform tenant, and says why', async () => {
+      resolveIsPlatformTenantMock.mockResolvedValue(true);
+
+      await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
+
+      const suspendButton = screen.queryByRole('button', {
+        name: SUSPEND_TENANT,
+      });
+      const notice = screen.getByText(PLATFORM_TENANT_NOTICE_TEXT);
+
+      expect(suspendButton).not.toBeInTheDocument();
+      expect(notice).toBeVisible();
+    });
+
+    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+      'never reads the tenant hosts for a %s',
+      async (role) => {
+        requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
+
+        await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
+
+        expect(resolveIsPlatformTenantMock).not.toHaveBeenCalled();
+      },
+    );
+
+    it('still offers Reactivate on a suspended platform tenant', async () => {
+      resolveIsPlatformTenantMock.mockResolvedValue(true);
+
+      await setup({ tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }) });
+
+      const reactivateButton = screen.getByRole('button', {
+        name: REACTIVATE_TENANT_LABEL,
+      });
+      expect(reactivateButton).toBeVisible();
     });
 
     it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(

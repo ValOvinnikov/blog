@@ -1,6 +1,7 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -43,6 +44,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
+
 vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: vi.fn(),
 }));
@@ -67,6 +70,7 @@ const {
   deprovisionTenantControl,
   reactivateTenantControl,
   deprovisioningStatusView,
+  tenantLifecycleErrors,
   runStatus,
 } = messages;
 
@@ -91,6 +95,7 @@ describe(`<${TenantDangerPage.name}/>`, () => {
     );
     requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
+    vi.mocked(resolveIsPlatformTenant).mockResolvedValue(false);
   });
 
   afterEach(() => {
@@ -130,6 +135,20 @@ describe(`<${TenantDangerPage.name}/>`, () => {
       MOCK_TENANT_ID,
     );
     expect(startingBadge).toBeVisible();
+  });
+
+  it('offers no Deprovision control for the platform tenant, and says why', async () => {
+    vi.mocked(resolveIsPlatformTenant).mockResolvedValue(true);
+
+    await setup();
+
+    const deprovisionButton = screen.queryByRole('button', {
+      name: deprovisionTenantControl.triggerButton,
+    });
+    const notice = screen.getByText(tenantLifecycleErrors.platformTenant);
+
+    expect(deprovisionButton).not.toBeInTheDocument();
+    expect(notice).toBeVisible();
   });
 
   describe('for a live tenant', () => {

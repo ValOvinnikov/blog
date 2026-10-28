@@ -1,6 +1,6 @@
 'use client';
 
-import { ACTION_OUTCOME, type TOutcome } from '@blog/config';
+import { ACTION_OUTCOME, isOutcomeSuccess, type TOutcome } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TConfirmTenantFieldError } from '@platform/server/provisioning/resolve-confirmed-tenant';
@@ -22,6 +22,7 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_DEPROVISIONED]: 'notDeprovisioned',
   [TENANT_REFUSAL.ALREADY_IN_PROGRESS]: 'alreadyInProgress',
   [TENANT_REFUSAL.NOT_ARCHIVED]: 'notArchived',
+  [TENANT_REFUSAL.PLATFORM_TENANT]: 'platformTenant',
   [TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN]: 'ownerEmailUnknown',
 } satisfies Record<TTenantLifecycleRefusal, string>;
 
@@ -61,7 +62,7 @@ export const useTenantLifecycleAction = <
 
   return async (...args: TArgs) => {
     const result = await action(...args);
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) return okResult();
+    if (isOutcomeSuccess(result)) return okResult();
     return errorResult(t(errorKey(result)));
   };
 };

@@ -11,12 +11,7 @@ import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
-import {
-  customRender,
-  screen,
-  waitForElementToBeRemoved,
-  within,
-} from '@platform/testing/custom-render';
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_TENANT_NAME,
@@ -46,6 +41,7 @@ const {
   nameLabel: NAME_LABEL,
   siteAddressLabel: SITE_ADDRESS_LABEL,
   siteAddressChecking: ADDRESS_CHECKING,
+  siteAddressUnverified: ADDRESS_UNVERIFIED,
   previewAddressPlaceholder: PLACEHOLDER_SLUG,
   createSite: CREATE_SITE,
   continue: CONTINUE,
@@ -236,19 +232,39 @@ describe(`<${OnboardingView.name}/>`, () => {
     await completeSiteStep();
     const addressField = await typeAddress();
     await screen.findByText(ADDRESS_TAKEN);
-    await clickContinue();
 
-    const heading = stepHeading(STEPS.ADDRESS);
+    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
     expect(addressField).toBeInvalid();
-    expect(heading).toBeVisible();
+    expect(continueButton).toBeDisabled();
+  });
+
+  it('describes a taken address field by why it is taken', async () => {
+    checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
+    await completeSiteStep();
+    const addressField = await typeAddress();
+    await screen.findByText(ADDRESS_TAKEN);
+
+    expect(addressField).toHaveAccessibleDescription(
+      expect.stringContaining(ADDRESS_TAKEN),
+    );
+  });
+
+  it('says when the address could not be checked', async () => {
+    checkSiteAddressMock.mockRejectedValue(new Error());
+    await completeSiteStep();
+    await typeAddress();
+
+    const unverified = await screen.findByText(ADDRESS_UNVERIFIED);
+
+    expect(unverified).toBeVisible();
   });
 
   it('lets the user continue when the address check fails', async () => {
     checkSiteAddressMock.mockRejectedValue(new Error());
     await completeSiteStep();
     await typeAddress();
-    await waitForElementToBeRemoved(() => screen.queryByText(ADDRESS_CHECKING));
+    await screen.findByText(ADDRESS_UNVERIFIED);
     await clickContinue();
 
     const heading = stepHeading(STEPS.LOOK);
@@ -256,12 +272,23 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(heading).toBeVisible();
   });
 
-  it('lets the user continue before the address check answers', async () => {
+  it('keeps Continue disabled while the address is checked', async () => {
     await completeSiteStep();
     await typeAddress();
-    await clickContinue();
 
-    const heading = stepHeading(STEPS.LOOK);
+    const checking = screen.getByText(ADDRESS_CHECKING);
+    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+    expect(checking).toBeVisible();
+    expect(continueButton).toBeDisabled();
+  });
+
+  it('stays on the address step when Enter is pressed during the check', async () => {
+    await completeSiteStep();
+    const addressField = await typeAddress();
+    await user.type(addressField, '{Enter}');
+
+    const heading = stepHeading(STEPS.ADDRESS);
 
     expect(heading).toBeVisible();
   });

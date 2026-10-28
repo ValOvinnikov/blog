@@ -21,6 +21,8 @@ type TBuildLookFormContextArgs = Pick<
   | 'repickKinds'
   | 'brandAssetFieldIds'
   | 'brandImageError'
+  | 'isSubmenuPreviewOpen'
+  | 'setIsSubmenuPreviewOpen'
 > & {
   savedValues: TLookFormValues;
   setValues: Dispatch<SetStateAction<TLookFormValues>>;
