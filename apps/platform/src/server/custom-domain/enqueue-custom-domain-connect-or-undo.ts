@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { HTTP_STATUS } from '@blog/config';
+import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
 import { queries } from '@blog/db';
 import {
   CUSTOM_DOMAIN_LOG,
@@ -15,7 +15,7 @@ export type TConnectAttempt =
   | { isAccepted: true }
   | { isAccepted: false; isUndone: boolean; reason: TCustomDomainRefusal };
 
-const rejectionReason = (status: number | null): TCustomDomainRefusal =>
+const rejectionReason = (status: TMaybeNull<number>): TCustomDomainRefusal =>
   status === HTTP_STATUS.CONFLICT
     ? CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT
     : CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE;
