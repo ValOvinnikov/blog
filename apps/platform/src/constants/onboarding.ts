@@ -18,6 +18,15 @@ export const SITE_ADDRESS_STATUS = {
 
 export type TSiteAddressStatus = TValueOf<typeof SITE_ADDRESS_STATUS>;
 
+export const ONBOARDING_STEP = {
+  SITE: 'SITE',
+  ADDRESS: 'ADDRESS',
+  LOOK: 'LOOK',
+  REVIEW: 'REVIEW',
+} as const;
+
+export type TOnboardingStep = TValueOf<typeof ONBOARDING_STEP>;
+
 export const ONBOARDING_LOG = {
   ROOT_DOMAIN_MISSING: 'onboarding.root_domain_missing',
   SESSION_EMAIL_MISSING: 'onboarding.session_email_missing',

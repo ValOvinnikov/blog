@@ -1,0 +1,26 @@
+import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
+import { tv } from '@platform/utils/tv/tv';
+import type { VariantProps } from 'tailwind-variants';
+
+export const onboardingRailStepVariants = tv({
+  slots: {
+    item: ['flex items-start gap-3 rounded-admin-control px-3 py-2.5'],
+    body: ['flex min-w-0 flex-col gap-0.5'],
+    label: ['text-admin-14 leading-6 font-medium'],
+    summary: ['truncate text-admin-12 text-admin-side-muted'],
+  },
+  variants: {
+    state: {
+      [STEP_INDICATOR_STATE.DONE]: { label: ['text-admin-side-text'] },
+      [STEP_INDICATOR_STATE.ACTIVE]: {
+        item: ['bg-admin-side-raised'],
+        label: ['font-semibold text-white'],
+      },
+      [STEP_INDICATOR_STATE.UPCOMING]: { label: ['text-admin-side-muted'] },
+    },
+  },
+});
+
+export type TOnboardingRailStepVariants = VariantProps<
+  typeof onboardingRailStepVariants
+>;

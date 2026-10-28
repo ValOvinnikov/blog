@@ -1,6 +1,8 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import { useFieldErrorText } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-field-error-text';
+import type { TSiteAddressCheck } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-site-address-check';
 import { FormSiteAddressInput } from '@platform/components/shared/form-site-address-input';
 import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
@@ -8,25 +10,23 @@ import { SITE_ADDRESS_STATUS } from '@platform/constants/onboarding';
 import type { TCreateSiteFieldError } from '@platform/server/onboarding/create-site-input';
 import { useTranslations } from 'next-intl';
 
-import { useSiteAddressCheck } from './use-site-address-check';
-
 export type TSiteAddressFieldProps = {
   value: string;
   onChange: (value: string) => void;
   rootDomain: TMaybeUndefined<string>;
+  check: TSiteAddressCheck;
   submittedError: TMaybeUndefined<TCreateSiteFieldError>;
-  toErrorText: (error: TCreateSiteFieldError) => string;
 };
 
 export const SiteAddressField = ({
   value,
   onChange,
   rootDomain,
+  check: { status, error: checkError },
   submittedError,
-  toErrorText,
 }: TSiteAddressFieldProps) => {
   const t = useTranslations('onboardingForm');
-  const { status, error: checkError } = useSiteAddressCheck(value);
+  const toErrorText = useFieldErrorText();
   const error = submittedError ?? checkError;
 
   const isAvailable =

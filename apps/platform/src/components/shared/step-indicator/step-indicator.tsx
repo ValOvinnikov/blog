@@ -10,6 +10,7 @@ type TStepIndicatorProps = {
   stepNumber: number;
   hasConnector: boolean;
   isConnectorDone?: boolean;
+  isOnDark?: boolean;
 };
 
 const GLYPH_BY_STATE: Partial<Record<TStepIndicatorState, string>> = {
@@ -22,10 +23,12 @@ export const StepIndicator = ({
   stepNumber,
   hasConnector,
   isConnectorDone,
+  isOnDark,
 }: TStepIndicatorProps) => {
   const { root, circle, connector } = stepIndicatorVariants({
     state,
     isConnectorDone,
+    isOnDark,
   });
 
   return (
