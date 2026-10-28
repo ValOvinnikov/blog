@@ -10,18 +10,21 @@ import {
 } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
 export const ShapeCard = () => {
-  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const {
     values: { radiusScale, density, cardStyle, headerControlStyle },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
+  const radiusScaleLock = useLookFieldLock('radiusScale');
+  const densityLock = useLookFieldLock('density');
+  const cardStyleLock = useLookFieldLock('cardStyle');
+  const headerControlStyleLock = useLookFieldLock('headerControlStyle');
 
   const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
     value: scale,
@@ -61,13 +64,14 @@ export const ShapeCard = () => {
         label={radiusScaleLabel}
         hint={t('radiusScaleDescription')}
         isGroup={true}
+        lock={radiusScaleLock.lock}
       >
         <SegmentedControl<TRadiusScale>
           options={radiusOptions}
           value={radiusScale}
           onChange={(scale) => updateField('radiusScale', scale)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
+          isDisabled={radiusScaleLock.isDisabled}
+          aria-describedby={radiusScaleLock.describedBy}
         />
       </LookField>
 
@@ -75,13 +79,14 @@ export const ShapeCard = () => {
         label={densityLabel}
         hint={t('densityDescription')}
         isGroup={true}
+        lock={densityLock.lock}
       >
         <SegmentedControl<TDensity>
           options={densityOptions}
           value={density}
           onChange={(option) => updateField('density', option)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
+          isDisabled={densityLock.isDisabled}
+          aria-describedby={densityLock.describedBy}
         />
       </LookField>
 
@@ -89,13 +94,14 @@ export const ShapeCard = () => {
         label={cardStyleLabel}
         hint={t('cardStyleDescription')}
         isGroup={true}
+        lock={cardStyleLock.lock}
       >
         <SegmentedControl<TCardStyle>
           options={cardStyleOptions}
           value={cardStyle}
           onChange={(style) => updateField('cardStyle', style)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
+          isDisabled={cardStyleLock.isDisabled}
+          aria-describedby={cardStyleLock.describedBy}
         />
       </LookField>
 
@@ -103,13 +109,14 @@ export const ShapeCard = () => {
         label={headerControlStyleLabel}
         hint={t('headerControlStyleDescription')}
         isGroup={true}
+        lock={headerControlStyleLock.lock}
       >
         <SegmentedControl<THeaderControlStyle>
           options={headerControlStyleOptions}
           value={headerControlStyle}
           onChange={(style) => updateField('headerControlStyle', style)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
+          isDisabled={headerControlStyleLock.isDisabled}
+          aria-describedby={headerControlStyleLock.describedBy}
         />
       </LookField>
     </LookCard>

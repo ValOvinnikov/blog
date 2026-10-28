@@ -1,5 +1,6 @@
-import { isAccentHueAccessible, type TPresetId } from '@blog/config';
-import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
+import { isAccentHueAccessible } from '@blog/config';
+import type { TTenantPlan } from '@blog/db/constants';
+import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { useToast } from '@platform/context/toast-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type {
@@ -7,17 +8,14 @@ import type {
   TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
 import {
-  applyPresetDefaults,
-  CARD_FIELDS,
   countChanges,
   isBrandAssetKind,
-  isFieldChanged,
   listLostStagedFiles,
-  type TLookCardKey,
 } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
+import { buildLookFormContext } from './build-look-form-context';
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
 import { useLookSaveErrors } from './use-look-save-errors';
@@ -26,6 +24,7 @@ type TUseLookFormStateArgs = {
   tenantId: string;
   tenantName: string;
   initialValues: TLookFormValues;
+  plan: TTenantPlan;
   savedAt?: Date;
   archivedAt?: Date;
   revealInvalidField: () => void;
@@ -35,6 +34,7 @@ export const useLookFormState = ({
   tenantId,
   tenantName,
   initialValues,
+  plan,
   savedAt,
   archivedAt,
   revealInvalidField,
@@ -81,7 +81,7 @@ export const useLookFormState = ({
       onRestore: (draftValues) => {
         setRepickKinds(listLostStagedFiles(draftValues));
         setValues((prev) => ({
-          ...draftValues,
+          ...toEffectiveLook(draftValues, plan),
           logo: prev.logo,
           favicon: prev.favicon,
         }));
@@ -102,24 +102,18 @@ export const useLookFormState = ({
     }
   };
 
-  const lookForm: TLookFormContext = {
+  const lookForm = buildLookFormContext({
     tenantName,
     values,
+    savedValues,
+    setValues,
     updateField,
-    hasCardChanges: (card: TLookCardKey) =>
-      CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues)),
-    isDivergedFromPreset:
-      countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
-    isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
+    plan,
     accentHueFieldId,
     repickKinds,
     brandAssetFieldIds,
     brandImageError: fieldError,
-    changePreset: (preset: TPresetId) =>
-      setValues((prev) => applyPresetDefaults(preset, prev)),
-    resetToPreset: () =>
-      setValues((prev) => applyPresetDefaults(prev.preset, prev)),
-  };
+  });
 
   return { lookForm, isPending, form: { ...form, saveError } };
 };

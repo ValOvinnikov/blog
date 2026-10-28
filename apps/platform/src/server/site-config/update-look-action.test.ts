@@ -15,6 +15,7 @@ import {
   RADIUS_SCALE,
   type TMaybeNull,
 } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { auth } from '@platform/server/auth/auth';
@@ -24,7 +25,11 @@ import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockReadyTenant,
+} from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -73,8 +78,15 @@ const VALID_INPUT: TUpdateLookInput = {
   headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
 };
 
+const onPlan = (plan: TTenantPlan) =>
+  vi.mocked(requireTenantMembership).mockImplementation(async (tenantId) => ({
+    tenant: mockReadyTenant({ id: tenantId, plan }),
+    membership: mockMembership({ tenantId }),
+  }));
+
 describe(updateLookAction, () => {
   beforeEach(() => {
+    onPlan(TENANT_PLAN.GROWTH);
     authMock.mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
@@ -93,6 +105,33 @@ describe(updateLookAction, () => {
       VALID_INPUT,
     );
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+  });
+
+  describe('on Free', () => {
+    beforeEach(() => {
+      onPlan(TENANT_PLAN.FREE);
+    });
+
+    it('writes only the preset and accent hue, leaving every Growth-only field stored as it is', async () => {
+      const { preset, accentHue } = VALID_INPUT;
+
+      await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+
+      expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+        preset,
+        accentHue,
+      });
+    });
+
+    it('audits only what it wrote', async () => {
+      const { preset, accentHue } = VALID_INPUT;
+
+      await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+
+      expect(insertAuditEventMock).toHaveBeenCalledWith(
+        expect.objectContaining({ details: { preset, accentHue } }),
+      );
+    });
   });
 
   it('revalidates the site config after a successful save', async () => {

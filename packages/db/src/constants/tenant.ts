@@ -1,6 +1,8 @@
 import { CAPABILITY, type TCapability } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 
+import { LOOK_FIELDS, type TLookField } from './look';
+
 export const TENANT_STATUS = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
@@ -48,4 +50,15 @@ export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
 export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
   [TENANT_PLAN.FREE]: 1,
   [TENANT_PLAN.GROWTH]: 3,
+};
+
+export type TPlanEntitlements = {
+  lookFields: readonly TLookField[];
+};
+
+export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
+  [TENANT_PLAN.FREE]: {
+    lookFields: ['preset', 'accentHue', 'logoAssetUrl', 'faviconAssetUrl'],
+  },
+  [TENANT_PLAN.GROWTH]: { lookFields: LOOK_FIELDS },
 };
