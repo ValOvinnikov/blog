@@ -331,7 +331,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Comprobación del propietario ambigua",
     "DOMAIN_NOT_ADDED": "Dominio no añadido",
     "REVALIDATION_FAILED": "Revalidación fallida",
-    "CONTRAST_REGRESSION": "Regresión de contraste"
+    "CONTRAST_REGRESSION": "Regresión de contraste",
+    "OWNER_ACCESS_CHECK_FAILED": "La comprobación del acceso del propietario falla"
   },
   "ownerHomePage": {
     "description": "Su sitio de un vistazo. Todo lo que aparece aquí está en vivo.",

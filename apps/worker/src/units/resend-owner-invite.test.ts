@@ -23,7 +23,7 @@ import {
   MOCK_SANITY_USER_ID,
   mockPendingInvite,
   mockSanityOwner,
-  mockSanityOwnerWithProjectMembership,
+  mockSanityOwnerWithMembership,
 } from '@worker/testing/owner-access/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
@@ -282,7 +282,7 @@ describe(resendOwnerInvite, () => {
 
     it('removes the role an old owner holds under their project membership id', async () => {
       vi.mocked(listSanityProjectUsers).mockResolvedValue([
-        mockSanityOwnerWithProjectMembership(
+        mockSanityOwnerWithMembership(
           { id: MOCK_FORMER_PROFILE_ID, email: MOCK_FORMER_OWNER_EMAIL },
           MOCK_FORMER_PROJECT_USER_ID,
         ),

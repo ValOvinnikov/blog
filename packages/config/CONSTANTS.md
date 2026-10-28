@@ -89,7 +89,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/finding.ts`
 
 - **FINDING_SOURCE**: `DOCUMENT_VALIDATION`, `TENANT_PROVISIONING`, `RECHECK_TENANT_OWNERS`, `DOMAIN_VERIFICATION`, `SITE_CONFIG_REVALIDATION`, `CONTRAST_CHECK`
-- **FINDING_KIND**: `SCHEMA_VALIDATION_ERROR`, `PROVISIONING_STEP_FAILED`, `OWNER_CHECK_STALLED`, `OWNER_CHECK_AMBIGUOUS`, `DOMAIN_NOT_ADDED`, `REVALIDATION_FAILED`, `CONTRAST_REGRESSION`
+- **FINDING_KIND**: `SCHEMA_VALIDATION_ERROR`, `PROVISIONING_STEP_FAILED`, `OWNER_CHECK_STALLED`, `OWNER_CHECK_AMBIGUOUS`, `DOMAIN_NOT_ADDED`, `REVALIDATION_FAILED`, `CONTRAST_REGRESSION`, `OWNER_ACCESS_CHECK_FAILED`
 - **FINDING_SEVERITY**: `INFO`, `WARNING`, `CRITICAL`
 - **FINDING_STATUS**: `OPEN`, `RESOLVED`
 
@@ -204,7 +204,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SANITY_PROJECT_UNARCHIVE_OUTCOME**: `UNARCHIVED`, `ALREADY_ACTIVE`, `ALREADY_GONE`
 - **SANITY_PROJECT_TOGGLE_RESULT**: `CHANGED`, `ALREADY_IN_STATE`, `ALREADY_GONE`
 - **SANITY_PROJECT_ROLE**: `ADMINISTRATOR`=`"administrator"`, `EDITOR`=`"editor"`, `VIEWER`=`"viewer"`
-- **SANITY_RESOURCE_TYPE**: `PROJECT`=`"project"`
+- **SANITY_RESOURCE_TYPE**: `PROJECT`=`"project"`, `ORGANIZATION`=`"organization"`
 - **SANITY_LOGIN_PROVIDER**: `GOOGLE`, `GITHUB`, `SANITY`
 - **SANITY_API_SURFACE**: `MANAGEMENT`, `ACCESS`, `WEBHOOKS`
 - **TENANT_DELETE_SANITY_PROJECT_OUTCOME**: `DELETED`, `ALREADY_GONE`, `LEFT_ARCHIVED`, `NO_PROJECT`, `SKIPPED_NO_TOKEN`
@@ -553,6 +553,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@worker/constants/inactivity-sweep` — `apps/worker/src/constants/inactivity-sweep.ts`
 
 - **INACTIVITY_SWEEP_LOG**: `NOT_CONFIGURED`=`"inactivity_sweep.not_configured"`, `FAILED`=`"inactivity_sweep.failed"`, `STAGE_FAILED`=`"inactivity_sweep.stage_failed"`, `OWNER_MISSING`=`"inactivity_sweep.owner_missing"`, `PLATFORM_TENANT_SKIPPED`=`"inactivity_sweep.platform_tenant_skipped"`, `ALERT_NO_RECIPIENTS`=`"inactivity_sweep.alert_no_recipients"`, `EMAIL_SEND_FAILED`=`"inactivity_sweep.email_send_failed"`
+
+### `@worker/constants/owner-access` — `apps/worker/src/constants/owner-access.ts`
+
+- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `FINDING_RESOLVE_FAILED`=`"owner_access.finding_resolve_failed"`
 
 ### `@worker/constants/provisioning` — `apps/worker/src/constants/provisioning.ts`
 

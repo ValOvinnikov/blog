@@ -331,7 +331,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Inhaberprüfung nicht eindeutig",
     "DOMAIN_NOT_ADDED": "Domain nicht hinzugefügt",
     "REVALIDATION_FAILED": "Revalidierung fehlgeschlagen",
-    "CONTRAST_REGRESSION": "Kontrastregression"
+    "CONTRAST_REGRESSION": "Kontrastregression",
+    "OWNER_ACCESS_CHECK_FAILED": "Prüfung des Inhaberzugriffs schlägt fehl"
   },
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",

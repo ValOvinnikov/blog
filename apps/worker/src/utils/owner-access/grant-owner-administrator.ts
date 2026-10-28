@@ -18,7 +18,7 @@ import {
   listSanityProjectAcl,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
-import { OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT } from '@worker/constants/owner-access';
+import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
@@ -41,7 +41,7 @@ async function touchActivityOnInviteAcceptance(
 ): Promise<void> {
   const touched = await touchTenantActivity(tenantId, acceptedAt);
   if (!touched.ok) {
-    logger.error(OWNER_ACCESS_ACTIVITY_TOUCH_FAILED_EVENT, {
+    logger.error(OWNER_ACCESS_LOG.ACTIVITY_TOUCH_FAILED, {
       tenantId,
       error: touched.error,
     });

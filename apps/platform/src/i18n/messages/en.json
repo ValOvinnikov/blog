@@ -331,7 +331,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Owner check ambiguous",
     "DOMAIN_NOT_ADDED": "Domain not added",
     "REVALIDATION_FAILED": "Revalidation failed",
-    "CONTRAST_REGRESSION": "Contrast regression"
+    "CONTRAST_REGRESSION": "Contrast regression",
+    "OWNER_ACCESS_CHECK_FAILED": "Owner access check failing"
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",

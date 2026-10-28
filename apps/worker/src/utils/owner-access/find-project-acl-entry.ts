@@ -1,3 +1,4 @@
+import { SANITY_RESOURCE_TYPE } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import type { TSanityAclEntry } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
@@ -9,8 +10,13 @@ export function findProjectAclEntry(
   projectId: string,
 ): TMaybeUndefined<TSanityAclEntry> {
   const projectUserIds = [
-    ...(user.memberships ?? []).flatMap(({ resourceId, resourceUserId }) =>
-      resourceId === projectId && resourceUserId ? [resourceUserId] : [],
+    ...(user.memberships ?? []).flatMap(
+      ({ resourceType, resourceId, resourceUserId }) =>
+        resourceType === SANITY_RESOURCE_TYPE.PROJECT &&
+        resourceId === projectId &&
+        resourceUserId
+          ? [resourceUserId]
+          : [],
     ),
     user.profile.id,
   ];

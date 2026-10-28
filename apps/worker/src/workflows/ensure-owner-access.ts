@@ -8,7 +8,10 @@ import {
   OWNER_ACCESS_FAST_POLL_TICKS,
   OWNER_ACCESS_SLOW_POLL_INTERVAL,
 } from '@worker/constants/owner-access';
-import { checkOwnerAccess } from '@worker/units/check-owner-access';
+import {
+  checkOwnerAccess,
+  type TOwnerAccessCheck,
+} from '@worker/units/check-owner-access';
 import { ownerAccessHookToken } from '@worker/utils/owner-access-hook/owner-access-hook';
 import { createHook, sleep } from 'workflow';
 
@@ -30,8 +33,14 @@ export async function ensureOwnerAccess(
     const wakes = wake[Symbol.asyncIterator]();
     let nextWake = wakes.next();
     let tick = 0;
+    let failingSince: TMaybeNull<number> = null;
     for (;;) {
-      const outcome = await checkOwnerAccess(tenantId);
+      const check: TOwnerAccessCheck = await checkOwnerAccess(
+        tenantId,
+        failingSince,
+      );
+      const { outcome } = check;
+      failingSince = check.failingSince;
       if (outcome !== ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE) {
         return outcome;
       }

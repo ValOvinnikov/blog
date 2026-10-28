@@ -331,7 +331,8 @@
     "OWNER_CHECK_AMBIGUOUS": "Vérification du propriétaire ambiguë",
     "DOMAIN_NOT_ADDED": "Domaine non ajouté",
     "REVALIDATION_FAILED": "Échec de la revalidation",
-    "CONTRAST_REGRESSION": "Régression du contraste"
+    "CONTRAST_REGRESSION": "Régression du contraste",
+    "OWNER_ACCESS_CHECK_FAILED": "Échec de la vérification de l'accès du propriétaire"
   },
   "ownerHomePage": {
     "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",
