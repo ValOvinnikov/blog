@@ -124,6 +124,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     ownerInviteHeadsUpSentAt: null,
     ownerInviteNudgeSentAt: null,
     ownerSiteReadySentAt: null,
+    unsentReinviteFormerOwnerEmailEncrypted: null,
     lastActivityAt: createdAt,
     inactivityWarnedAt: null,
     suspendedAt: null,

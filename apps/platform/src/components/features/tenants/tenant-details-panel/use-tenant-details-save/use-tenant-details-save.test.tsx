@@ -13,18 +13,35 @@ import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import userEvent from '@testing-library/user-event';
 
 import { useTenantDetailsSave } from './use-tenant-details-save';
 
-const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
-  updateTenantDetailsActionMock: vi.fn(),
-}));
+const { updateTenantDetailsActionMock, resendStudioInviteActionMock } =
+  vi.hoisted(() => ({
+    updateTenantDetailsActionMock: vi.fn(),
+    resendStudioInviteActionMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
-const { errors, alertSuccess } = messages.tenantDetailsPanel;
+vi.mock(
+  '@platform/server/tenants/resend-changed-owner-studio-invite-action',
+  () => ({
+    resendChangedOwnerStudioInviteAction: resendStudioInviteActionMock,
+  }),
+);
+
+const {
+  errors,
+  alertSuccess,
+  alertSavedStudioInviteUnsent,
+  resendStudioInvite,
+  studioInviteResent,
+  studioInviteResendFailed,
+} = messages.tenantDetailsPanel;
 
 const MOCK_VALUES = tenantDetailsValuesOf(mockClientTenant(), MOCK_OWNER_EMAIL);
 const DOMAIN_TAKEN_ERRORS = {
@@ -96,6 +113,7 @@ describe(useTenantDetailsSave, () => {
 
   beforeEach(() => {
     updateTenantDetailsActionMock.mockReset();
+    resendStudioInviteActionMock.mockReset();
     refreshMock = mockRouterRefresh();
   });
 
@@ -103,6 +121,7 @@ describe(useTenantDetailsSave, () => {
     updateTenantDetailsActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
       tenant: mockClientTenant(),
+      isStudioReinviteUnsent: false,
     });
     const { result } = renderSave();
 
@@ -116,6 +135,47 @@ describe(useTenantDetailsSave, () => {
     );
     expect(savedToast).toBeVisible();
     expect(refreshMock).toHaveBeenCalled();
+  });
+
+  describe('when the Studio re-invite to a changed owner was not sent', () => {
+    beforeEach(() => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        tenant: mockClientTenant(),
+        isStudioReinviteUnsent: true,
+      });
+    });
+
+    it('still reports the save, saying the Studio invite was not sent', async () => {
+      const { result } = renderSave();
+
+      const isSaved = await saveWith(result);
+      const unsentToast = await screen.findByText(alertSavedStudioInviteUnsent);
+
+      expect(isSaved).toBe(true);
+      expect(unsentToast).toBeVisible();
+      expect(screen.queryByText(alertSuccess)).not.toBeInTheDocument();
+      expect(refreshMock).toHaveBeenCalled();
+    });
+
+    it.each([
+      [ACTION_OUTCOME.SUCCESS, studioInviteResent],
+      [ACTION_OUTCOME.SERVER_ERROR, studioInviteResendFailed],
+    ])('resends it from the toast (%s)', async (outcome, message) => {
+      resendStudioInviteActionMock.mockResolvedValue({ outcome });
+      const user = userEvent.setup();
+      const { result } = renderSave();
+      await saveWith(result);
+
+      await user.click(
+        await screen.findByRole('button', { name: resendStudioInvite }),
+      );
+
+      expect(resendStudioInviteActionMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+      );
+      expect(await screen.findByText(message)).toBeVisible();
+    });
   });
 
   it('returns the field errors of an invalid save, without a toast or refresh', async () => {

@@ -2,26 +2,23 @@
 
 import {
   ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
   DOMAIN_PATTERN,
   isLocaleIsoCode,
   type TActionResult,
   type TOutcome,
 } from '@blog/config';
 import { queries, TENANT_DETAILS_UPDATE_OUTCOME, TENANT_PLAN } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
   TENANT_LOG,
 } from '@platform/constants/tenant';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
-import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
-import { reinviteChangedOwner } from '@platform/server/tenants/reinvite-changed-owner';
+import {
+  completeTenantDetailsUpdate,
+  type TTenantDetailsSaved,
+} from '@platform/server/tenants/complete-tenant-details-update';
 import {
   toTenantFieldErrors,
   type TTenantDetailsFieldError,
@@ -61,8 +58,7 @@ type TUpdateTenantDetailsFailure = Exclude<
 >;
 
 export type TUpdateTenantDetailsActionResult =
-  | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TTenant }
-  | TUpdateTenantDetailsFailure;
+  TTenantDetailsSaved | TUpdateTenantDetailsFailure;
 
 export const updateTenantDetailsAction = async (
   tenantId: string,
@@ -116,22 +112,8 @@ export const updateTenantDetailsAction = async (
     );
 
     switch (result.outcome) {
-      case TENANT_DETAILS_UPDATE_OUTCOME.UPDATED: {
-        const { ownerEmail, ...auditedDetails } = parsed.data;
-        const { tenant: updatedTenant, ownerEmailChanged } = result;
-        await revalidateSiteConfig(tenantId);
-        if (ownerEmailChanged && !isUndefined(ownerEmail)) {
-          await reinviteChangedOwner(updatedTenant, ownerEmail);
-        }
-        await recordAuditEvent({
-          logEvent: TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED,
-          action: AUDIT_ACTION.SETTINGS_UPDATED,
-          targetType: AUDIT_TARGET_TYPE.TENANT,
-          targetId: tenantId,
-          details: { ...auditedDetails, ownerEmailUpdated: ownerEmailChanged },
-        });
-        return { outcome: ACTION_OUTCOME.SUCCESS, tenant: updatedTenant };
-      }
+      case TENANT_DETAILS_UPDATE_OUTCOME.UPDATED:
+        return completeTenantDetailsUpdate(tenantId, parsed.data, result);
       case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN:
         return {
           outcome: ACTION_OUTCOME.INVALID,

@@ -147,6 +147,9 @@ export const tenants = pgTable(
     ownerInviteHeadsUpSentAt: timestamp('owner_invite_heads_up_sent_at'),
     ownerInviteNudgeSentAt: timestamp('owner_invite_nudge_sent_at'),
     ownerSiteReadySentAt: timestamp('owner_site_ready_sent_at'),
+    unsentReinviteFormerOwnerEmailEncrypted: text(
+      'unsent_reinvite_former_owner_email_encrypted',
+    ),
     lastActivityAt: timestamp('last_activity_at').notNull().defaultNow(),
     inactivityWarnedAt: timestamp('inactivity_warned_at'),
     suspendedAt: timestamp('suspended_at'),

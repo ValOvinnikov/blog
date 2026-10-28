@@ -1,6 +1,10 @@
 'use client';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+} from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
 import type {
   TTenantDetailsFieldErrors,
@@ -8,6 +12,7 @@ import type {
 } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
+import { resendChangedOwnerStudioInviteAction } from '@platform/server/tenants/resend-changed-owner-studio-invite-action';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsRefusal,
@@ -27,6 +32,9 @@ const REFUSAL_KEYS = {
 
 type TFormErrorKey = TValueOf<typeof REFUSAL_KEYS> | 'saveFailed';
 
+// A warning otherwise leaves after 5s, before an operator can reach its Resend action.
+const STUDIO_REINVITE_WARNING_MS = 20_000;
+
 export const useTenantDetailsSave = (
   tenantId: string,
   values: TTenantDetailsValues,
@@ -43,15 +51,38 @@ export const useTenantDetailsSave = (
     setFormErrorKey(undefined);
   };
 
+  const resendStudioInvite = async () => {
+    const result = await resendChangedOwnerStudioInviteAction(tenantId);
+    if (isOutcomeSuccess(result)) {
+      toast.success({ message: t('studioInviteResent') });
+    } else {
+      toast.error({ message: t('studioInviteResendFailed') });
+    }
+  };
+
   const save = async (): Promise<boolean> => {
     clearErrors();
 
     const result = await updateTenantDetailsAction(tenantId, values);
     switch (result.outcome) {
-      case ACTION_OUTCOME.SUCCESS:
-        toast.success({ message: t('alertSuccess') });
+      case ACTION_OUTCOME.SUCCESS: {
+        if (result.isStudioReinviteUnsent) {
+          toast.warning({
+            message: t('alertSavedStudioInviteUnsent'),
+            durationMs: STUDIO_REINVITE_WARNING_MS,
+            action: {
+              label: t('resendStudioInvite'),
+              onAct: () => {
+                void resendStudioInvite();
+              },
+            },
+          });
+        } else {
+          toast.success({ message: t('alertSuccess') });
+        }
         router.refresh();
         return true;
+      }
       case ACTION_OUTCOME.INVALID:
         setFieldErrors(result.fieldErrors);
         return false;

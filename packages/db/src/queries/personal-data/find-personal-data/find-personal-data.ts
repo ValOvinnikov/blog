@@ -16,6 +16,10 @@ import {
 } from '@blog/db/queries/personal-data/reader-account-personal-data';
 import { findSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data';
 import type { TSitePersonalData } from '@blog/db/queries/personal-data/site-personal-data-types';
+import {
+  findUnsentStudioReinvites,
+  type TPersonalDataUnsentStudioReinvite,
+} from '@blog/db/queries/personal-data/unsent-studio-reinvite-personal-data';
 import { findUserByEmail } from '@blog/db/queries/users/find-user-by-email';
 import { auditEvents } from '@blog/db/schema/audit-events';
 import { blockedSignupIdentities } from '@blog/db/schema/blocked-signup-identities';
@@ -38,6 +42,7 @@ export type TPersonalDataAuditEvent = {
 
 export type TPersonalDataMatches = TSitePersonalData & {
   emailIndex: string;
+  unsentStudioReinvites: TPersonalDataUnsentStudioReinvite[];
   readerAccount: TMaybeUndefined<TPersonalDataReaderAccount>;
   blockedSignupIdentities: TPersonalDataBlock[];
   auditEvents: TPersonalDataAuditEvent[];
@@ -68,23 +73,26 @@ export async function findPersonalData(
 
   const user = await findUserByEmail(email.trim());
 
-  const [siteData, blockRows, readerAccount, auditRows] = await Promise.all([
-    findSitePersonalData(emailIndex),
-    getDb()
-      .select({
-        id: blockedSignupIdentities.id,
-        reason: blockedSignupIdentities.reason,
-        createdAt: blockedSignupIdentities.createdAt,
-      })
-      .from(blockedSignupIdentities)
-      .where(isBlockedAddress(emailIndex)),
-    user && findReaderAccountPersonalData(user),
-    user ? findAuditEventsBy(user.id) : [],
-  ]);
+  const [siteData, reinviteRows, blockRows, readerAccount, auditRows] =
+    await Promise.all([
+      findSitePersonalData(emailIndex),
+      findUnsentStudioReinvites(email),
+      getDb()
+        .select({
+          id: blockedSignupIdentities.id,
+          reason: blockedSignupIdentities.reason,
+          createdAt: blockedSignupIdentities.createdAt,
+        })
+        .from(blockedSignupIdentities)
+        .where(isBlockedAddress(emailIndex)),
+      user && findReaderAccountPersonalData(user),
+      user ? findAuditEventsBy(user.id) : [],
+    ]);
 
   return okResult({
     emailIndex,
     ...siteData,
+    unsentStudioReinvites: reinviteRows,
     readerAccount,
     blockedSignupIdentities: blockRows,
     auditEvents: auditRows,
