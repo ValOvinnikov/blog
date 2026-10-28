@@ -619,6 +619,24 @@
       "FULL_WIDTH": "Volledige breedte",
       "FLOATING": "Zwevend"
     },
+    "buttonsHeading": "Knoppen",
+    "buttonsDescription": "Hoe knoppen eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
+    "busyButtonStyleLabel": "Tijdens het werken",
+    "busyButtonStyleDescription": "Wat een knop toont tijdens opslaan of verzenden. Hij behoudt zijn plek en blijft in volle kleur.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Bezig-tekst",
+      "KEPT": "Tekst behouden",
+      "EDGE": "Voortgangsrand"
+    },
+    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleDescription": "De spinner op de knoppen en laadstatussen van uw site.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "De preset volgen",
+      "BRAILLE": "Braille",
+      "RING": "Ring",
+      "DOTS": "Stippen",
+      "PULSE": "Puls"
+    },
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
@@ -635,6 +653,8 @@
     "subscribeButton": "Abonneren",
     "readMoreButton": "Lees meer",
     "readTimeChip": "4 min lezen",
+    "busyButtonIdle": "Bericht versturen",
+    "busyButtonLabel": "Verzenden…",
     "firstCardTitle": "Notities uit de haven",
     "firstCardExcerpt": "Een gelinkte kaart, zoals berichtenlijsten hem tonen.",
     "secondCardTitle": "Koers naar het volgende seizoen",

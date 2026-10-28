@@ -101,6 +101,8 @@ export const useLookSave = ({
         headerLayout: vals.headerLayout,
         headerSubmenuStyle: vals.headerSubmenuStyle,
         headerBarStyle: vals.headerBarStyle,
+        busyButtonStyle: vals.busyButtonStyle,
+        spinnerStyle: vals.spinnerStyle,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
       return finish(outcome);

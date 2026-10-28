@@ -2,6 +2,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
+  type TBusyButtonStyle,
   type TCardStyle,
   type TDensity,
   type TFontChoice,
@@ -12,6 +13,7 @@ import {
   type TLanguageSwitcherStyle,
   type TMaybeUndefined,
   type TPresetId,
+  type TSpinnerStyle,
   type TRadiusScale,
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
@@ -30,6 +32,8 @@ export type TLookFormValues = {
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
+  busyButtonStyle: TBusyButtonStyle;
+  spinnerStyle: TSpinnerStyle;
   languageSwitcherStyle: TLanguageSwitcherStyle;
   logo: TStagedImage;
   favicon: TStagedImage;
@@ -49,6 +53,8 @@ export const defaultLookFormValues = (): TLookFormValues => {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    busyButtonStyle,
+    spinnerStyle,
   } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
   return {
@@ -64,6 +70,8 @@ export const defaultLookFormValues = (): TLookFormValues => {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    busyButtonStyle,
+    spinnerStyle,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     logo: { url: undefined },
     favicon: { url: undefined },
@@ -86,6 +94,8 @@ export const toLookFormValues = (
     headerLayout: siteConfig.headerLayout,
     headerSubmenuStyle: siteConfig.headerSubmenuStyle,
     headerBarStyle: siteConfig.headerBarStyle,
+    busyButtonStyle: siteConfig.busyButtonStyle,
+    spinnerStyle: siteConfig.spinnerStyle,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
     logo: { url: siteConfig.logoAssetUrl },
     favicon: { url: siteConfig.faviconAssetUrl },

@@ -5,6 +5,7 @@ import {
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
+  BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -16,6 +17,7 @@ import {
   NEXT_NAVIGATION_ERROR,
   PRESET_ID,
   RADIUS_SCALE,
+  SPINNER_STYLE,
   type TMaybeNull,
 } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
@@ -68,6 +70,7 @@ const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
 const UNSUPPORTED_CARD_STYLE = 'SHADOWED';
 const UNSUPPORTED_HEADER_LAYOUT = 'ZIGZAG';
+const UNSUPPORTED_BUSY_BUTTON_STYLE = 'SHAKE';
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -83,6 +86,8 @@ const VALID_INPUT: TUpdateLookInput = {
   headerLayout: HEADER_LAYOUT.TWO_ROWS,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
   headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+  busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
+  spinnerStyle: SPINNER_STYLE.DOTS,
 };
 
 const onPlan = (plan: TTenantPlan) =>
@@ -179,6 +184,20 @@ describe(updateLookAction, () => {
       ...VALID_INPUT,
       // @ts-expect-error -- an unsupported header layout is the invalid input under test
       headerLayout: UNSUPPORTED_HEADER_LAYOUT,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a busy button style the site has no treatment for without writing it', async () => {
+    const result = await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      // @ts-expect-error -- an unsupported busy button style is the invalid input under test
+      busyButtonStyle: UNSUPPORTED_BUSY_BUTTON_STYLE,
     });
 
     expect(result).toEqual({

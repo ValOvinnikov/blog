@@ -619,6 +619,24 @@
       "FULL_WIDTH": "Ancho completo",
       "FLOATING": "Flotante"
     },
+    "buttonsHeading": "Botones",
+    "buttonsDescription": "Cómo se ven los botones mientras trabajan y el indicador de carga que muestran.",
+    "busyButtonStyleLabel": "Mientras trabaja",
+    "busyButtonStyleDescription": "Qué muestra un botón mientras guarda o envía. Conserva su sitio y su color completo.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Texto de espera",
+      "KEPT": "Texto conservado",
+      "EDGE": "Borde de progreso"
+    },
+    "spinnerStyleLabel": "Indicador de carga",
+    "spinnerStyleDescription": "El indicador de los botones y de los estados de carga de su sitio.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Seguir el preset",
+      "BRAILLE": "Braille",
+      "RING": "Anillo",
+      "DOTS": "Puntos",
+      "PULSE": "Pulso"
+    },
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
@@ -635,6 +653,8 @@
     "subscribeButton": "Suscribirse",
     "readMoreButton": "Leer más",
     "readTimeChip": "4 min de lectura",
+    "busyButtonIdle": "Enviar mensaje",
+    "busyButtonLabel": "Enviando…",
     "firstCardTitle": "Notas desde el puerto",
     "firstCardExcerpt": "Una tarjeta enlazada, tal como la muestran las listas de entradas.",
     "secondCardTitle": "Rumbo a la próxima temporada",

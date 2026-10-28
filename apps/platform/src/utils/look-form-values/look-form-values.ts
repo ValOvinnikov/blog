@@ -29,6 +29,8 @@ export const applyPresetDefaults = (
     headerLayout: current.headerLayout,
     headerSubmenuStyle: current.headerSubmenuStyle,
     headerBarStyle: current.headerBarStyle,
+    busyButtonStyle: current.busyButtonStyle,
+    spinnerStyle: current.spinnerStyle,
     languageSwitcherStyle: current.languageSwitcherStyle,
     logo: current.logo,
     favicon: current.favicon,
@@ -41,6 +43,7 @@ export const CARD_FIELDS = {
   type: ['headingFont', 'bodyFont'],
   shape: ['radiusScale', 'density', 'cardStyle', 'headerControlStyle'],
   header: ['headerLayout', 'headerSubmenuStyle', 'headerBarStyle'],
+  buttons: ['busyButtonStyle', 'spinnerStyle'],
   brand: ['logo', 'favicon'],
   languageSwitcher: ['languageSwitcherStyle'],
 } as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;

@@ -619,6 +619,24 @@
       "FULL_WIDTH": "Full width",
       "FLOATING": "Floating"
     },
+    "buttonsHeading": "Buttons",
+    "buttonsDescription": "How buttons look while they work, and the spinner they show.",
+    "busyButtonStyleLabel": "While busy",
+    "busyButtonStyleDescription": "What a button shows while it saves or sends. It keeps its place and stays full colour.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Busy label",
+      "KEPT": "Label kept",
+      "EDGE": "Progress edge"
+    },
+    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleDescription": "The spinner on your site's buttons and loading states.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Follow the preset",
+      "BRAILLE": "Braille",
+      "RING": "Ring",
+      "DOTS": "Dots",
+      "PULSE": "Pulse"
+    },
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image"
@@ -635,6 +653,8 @@
     "subscribeButton": "Subscribe",
     "readMoreButton": "Read more",
     "readTimeChip": "4 min read",
+    "busyButtonIdle": "Send message",
+    "busyButtonLabel": "Sending…",
     "firstCardTitle": "Notes from the harbour",
     "firstCardExcerpt": "A linked card, the way post lists render it.",
     "secondCardTitle": "Charting the next season",

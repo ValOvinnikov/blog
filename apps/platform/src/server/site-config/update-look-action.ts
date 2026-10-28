@@ -4,6 +4,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  BUSY_BUTTON_STYLE,
   CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
@@ -17,6 +18,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  SPINNER_STYLE,
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
@@ -46,6 +48,8 @@ const updateLookInputSchema = z.object({
   headerLayout: z.enum(HEADER_LAYOUT),
   headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE),
   headerBarStyle: z.enum(HEADER_BAR_STYLE),
+  busyButtonStyle: z.enum(BUSY_BUTTON_STYLE),
+  spinnerStyle: z.enum(SPINNER_STYLE),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
