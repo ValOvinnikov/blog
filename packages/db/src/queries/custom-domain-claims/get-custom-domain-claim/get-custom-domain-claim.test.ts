@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
+import { insertTestCustomDomainClaim } from '@blog/db/testing/custom-domain-claims/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_SHARED_TENANT_DOMAIN } from '@blog/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
 
 import { getCustomDomainClaim } from './get-custom-domain-claim';
@@ -16,14 +16,16 @@ afterEach(async () => {
 });
 
 describe(getCustomDomainClaim, () => {
-  it("returns the site's claim", async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: MOCK_TENANT_DOMAIN,
-    });
-    const [claim] = await db()
-      .insert(schema.customDomainClaims)
-      .values({ tenantId, domain: MOCK_SHARED_TENANT_DOMAIN, token: 'token' })
-      .returning();
+    }));
+  });
+
+  it("returns the site's claim", async () => {
+    const claim = await insertTestCustomDomainClaim(db(), { tenantId });
 
     const result = await getCustomDomainClaim(tenantId);
 
@@ -31,10 +33,6 @@ describe(getCustomDomainClaim, () => {
   });
 
   it('returns undefined when the site has no claim', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: MOCK_TENANT_DOMAIN,
-    });
-
     const result = await getCustomDomainClaim(tenantId);
 
     expect(result).toBeUndefined();

@@ -47,20 +47,6 @@ describe(createCustomDomainClaim, () => {
     expect(row?.token).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  it('refuses a second claim for the same site and keeps the first', async () => {
-    await createCustomDomainClaim(tenantId, MOCK_SHARED_TENANT_DOMAIN);
-
-    const result = await createCustomDomainClaim(
-      tenantId,
-      MOCK_OTHER_TENANT_DOMAIN,
-    );
-
-    const rows = await db().select().from(schema.customDomainClaims);
-    expect(result).toEqual(errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS));
-    expect(rows).toHaveLength(1);
-    expect(rows[0]?.domain).toBe(MOCK_SHARED_TENANT_DOMAIN);
-  });
-
   it('lets two sites claim the same domain with different tokens', async () => {
     const first = await createCustomDomainClaim(
       tenantId,
@@ -88,12 +74,28 @@ describe(createCustomDomainClaim, () => {
     expect(rows).toEqual([]);
   });
 
-  it('removes its claim when the owning tenant is deleted', async () => {
-    await createCustomDomainClaim(tenantId, MOCK_SHARED_TENANT_DOMAIN);
+  describe('when the site already has a claim', () => {
+    beforeEach(async () => {
+      await createCustomDomainClaim(tenantId, MOCK_SHARED_TENANT_DOMAIN);
+    });
 
-    await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
+    it('refuses a second claim for the same site and keeps the first', async () => {
+      const result = await createCustomDomainClaim(
+        tenantId,
+        MOCK_OTHER_TENANT_DOMAIN,
+      );
 
-    const rows = await db().select().from(schema.customDomainClaims);
-    expect(rows).toEqual([]);
+      const rows = await db().select().from(schema.customDomainClaims);
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS));
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.domain).toBe(MOCK_SHARED_TENANT_DOMAIN);
+    });
+
+    it('removes its claim when the owning tenant is deleted', async () => {
+      await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
+
+      const rows = await db().select().from(schema.customDomainClaims);
+      expect(rows).toEqual([]);
+    });
   });
 });

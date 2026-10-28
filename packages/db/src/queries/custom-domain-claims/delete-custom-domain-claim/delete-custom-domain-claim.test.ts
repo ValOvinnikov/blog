@@ -1,7 +1,7 @@
 import * as schema from '@blog/db/schema';
+import { insertTestCustomDomainClaim } from '@blog/db/testing/custom-domain-claims/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_SHARED_TENANT_DOMAIN } from '@blog/db/testing/tenant-domains/fixtures';
 import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
 
 import { deleteCustomDomainClaim } from './delete-custom-domain-claim';
@@ -25,11 +25,7 @@ describe(deleteCustomDomainClaim, () => {
   });
 
   it('deletes the claim and returns true', async () => {
-    await db().insert(schema.customDomainClaims).values({
-      tenantId,
-      domain: MOCK_SHARED_TENANT_DOMAIN,
-      token: 'token',
-    });
+    await insertTestCustomDomainClaim(db(), { tenantId });
 
     const result = await deleteCustomDomainClaim(tenantId);
 

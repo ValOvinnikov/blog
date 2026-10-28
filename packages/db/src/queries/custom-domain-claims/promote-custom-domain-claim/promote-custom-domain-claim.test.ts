@@ -1,5 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
+import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
+import { insertTestCustomDomainClaim } from '@blog/db/testing/custom-domain-claims/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
@@ -25,19 +27,6 @@ describe(promoteCustomDomainClaim, () => {
   let tenantId: string;
   let otherTenantId: string;
 
-  async function insertClaim(forTenantId: string) {
-    const [claim] = await db()
-      .insert(schema.customDomainClaims)
-      .values({
-        tenantId: forTenantId,
-        domain: MOCK_SHARED_TENANT_DOMAIN,
-        token: `token-${forTenantId}`,
-      })
-      .returning();
-    if (!claim) throw new Error('claim not inserted');
-    return claim;
-  }
-
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: MOCK_TENANT_DOMAIN,
@@ -47,37 +36,52 @@ describe(promoteCustomDomainClaim, () => {
     }));
   });
 
-  it('writes the tenant domain and removes the claim', async () => {
-    const claim = await insertClaim(tenantId);
+  describe('with a claim held by the site', () => {
+    let claim: TCustomDomainClaim;
 
-    const result = await promoteCustomDomainClaim(tenantId, claim.id);
+    beforeEach(async () => {
+      claim = await insertTestCustomDomainClaim(db(), { tenantId });
+    });
 
-    const domains = await db().select().from(schema.tenantDomains);
-    const claims = await db().select().from(schema.customDomainClaims);
-    expect(domains).toHaveLength(1);
-    expect(domains[0]?.tenantId).toBe(tenantId);
-    expect(domains[0]?.domain).toBe(MOCK_SHARED_TENANT_DOMAIN);
-    expect(result).toEqual({ ok: true, data: domains[0] });
-    expect(claims).toEqual([]);
-  });
+    it('writes the tenant domain and removes the claim', async () => {
+      const result = await promoteCustomDomainClaim(tenantId, claim.id);
 
-  it('keeps the claim and reports a duplicate when another site holds the domain', async () => {
-    const claim = await insertClaim(tenantId);
-    await db()
-      .insert(schema.tenantDomains)
-      .values({ tenantId: otherTenantId, domain: MOCK_SHARED_TENANT_DOMAIN });
+      const domains = await db().select().from(schema.tenantDomains);
+      const claims = await db().select().from(schema.customDomainClaims);
+      expect(domains).toHaveLength(1);
+      expect(domains[0]?.tenantId).toBe(tenantId);
+      expect(domains[0]?.domain).toBe(MOCK_SHARED_TENANT_DOMAIN);
+      expect(result).toEqual({ ok: true, data: domains[0] });
+      expect(claims).toEqual([]);
+    });
 
-    const result = await promoteCustomDomainClaim(tenantId, claim.id);
+    it('keeps the claim and reports a duplicate when the domain is held', async () => {
+      await db()
+        .insert(schema.tenantDomains)
+        .values({ tenantId: otherTenantId, domain: MOCK_SHARED_TENANT_DOMAIN });
 
-    const claims = await db().select().from(schema.customDomainClaims);
-    const domains = await db().select().from(schema.tenantDomains);
-    expect(result).toEqual(errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN));
-    expect(claims).toEqual([claim]);
-    expect(domains).toHaveLength(1);
+      const result = await promoteCustomDomainClaim(tenantId, claim.id);
+
+      const claims = await db().select().from(schema.customDomainClaims);
+      const domains = await db().select().from(schema.tenantDomains);
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_DUPLICATE_DOMAIN));
+      expect(claims).toEqual([claim]);
+      expect(domains).toHaveLength(1);
+    });
+
+    it('returns DB_NOT_FOUND when the claim is gone', async () => {
+      await db().delete(schema.customDomainClaims);
+
+      const result = await promoteCustomDomainClaim(tenantId, claim.id);
+
+      expect(result).toEqual(errorResult(ERROR_CODE.DB_NOT_FOUND));
+    });
   });
 
   it("returns DB_NOT_FOUND for another site's claim and leaves it", async () => {
-    const claim = await insertClaim(otherTenantId);
+    const claim = await insertTestCustomDomainClaim(db(), {
+      tenantId: otherTenantId,
+    });
 
     const result = await promoteCustomDomainClaim(tenantId, claim.id);
 
@@ -86,14 +90,5 @@ describe(promoteCustomDomainClaim, () => {
     expect(result).toEqual(errorResult(ERROR_CODE.DB_NOT_FOUND));
     expect(claims).toEqual([claim]);
     expect(domains).toEqual([]);
-  });
-
-  it('returns DB_NOT_FOUND when the claim is gone', async () => {
-    const claim = await insertClaim(tenantId);
-    await db().delete(schema.customDomainClaims);
-
-    const result = await promoteCustomDomainClaim(tenantId, claim.id);
-
-    expect(result).toEqual(errorResult(ERROR_CODE.DB_NOT_FOUND));
   });
 });
