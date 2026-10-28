@@ -1,5 +1,6 @@
 import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
+import { faker } from '@faker-js/faker';
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_WORKER_ORIGIN,
@@ -16,6 +17,11 @@ import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run
 
 import { POST } from './route';
 
+faker.seed(6143);
+
+const MOCK_FORMER_OWNER_EMAIL = faker.internet.email();
+const MOCK_NOT_AN_EMAIL = faker.lorem.slug();
+
 const MOCK_RESEND_URL = `${MOCK_WORKER_ORIGIN}/api/owner-access/resend`;
 
 vi.mock('@worker/utils/env/env');
@@ -23,10 +29,10 @@ vi.mock('@worker/units/resend-owner-invite');
 vi.mock('@worker/utils/owner-access-run/owner-access-run');
 vi.mock('@blog/db/queries/tenants');
 
-function resendRequest(): Request {
+function resendRequest(body: Record<string, string> = {}): Request {
   return mockSignedRequest(
     MOCK_RESEND_URL,
-    JSON.stringify({ tenantId: MOCK_TENANT_ID }),
+    JSON.stringify({ tenantId: MOCK_TENANT_ID, ...body }),
     { secret: MOCK_ENQUEUE_SECRET },
   );
 }
@@ -49,8 +55,41 @@ describe('POST /api/owner-access/resend', () => {
     const response = await POST(resendRequest());
 
     expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
-    expect(resendOwnerInvite).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(resendOwnerInvite).toHaveBeenCalledWith(MOCK_TENANT_ID, undefined);
     expect(order).toEqual(['resend', 'wake']);
+  });
+
+  it('passes a former owner email on to the resend', async () => {
+    const response = await POST(
+      resendRequest({ formerOwnerEmail: MOCK_FORMER_OWNER_EMAIL }),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
+    expect(resendOwnerInvite).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_FORMER_OWNER_EMAIL,
+    );
+  });
+
+  it('trims the former owner email before the resend', async () => {
+    const response = await POST(
+      resendRequest({ formerOwnerEmail: ` ${MOCK_FORMER_OWNER_EMAIL}\n` }),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
+    expect(resendOwnerInvite).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_FORMER_OWNER_EMAIL,
+    );
+  });
+
+  it('answers 400 for a former owner email that is not an address', async () => {
+    const response = await POST(
+      resendRequest({ formerOwnerEmail: MOCK_NOT_AN_EMAIL }),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(resendOwnerInvite).not.toHaveBeenCalled();
   });
 
   it('answers 500 and restarts nothing when the resend fails', async () => {

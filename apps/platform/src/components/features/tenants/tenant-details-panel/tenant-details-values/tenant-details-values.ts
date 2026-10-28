@@ -1,5 +1,6 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TFieldErrors, TMaybeUndefined } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 
 export type TTenantDetailsValues = {
@@ -9,6 +10,11 @@ export type TTenantDetailsValues = {
   locale: string;
   ownerEmail: string;
 };
+
+export type TTenantDetailsFieldErrors = TFieldErrors<
+  keyof TTenantDetailsValues,
+  TTenantDetailsFieldError
+>;
 
 export const tenantDetailsValuesOf = (
   tenant: TClientTenant,

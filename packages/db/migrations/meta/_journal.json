@@ -449,6 +449,13 @@
       "when": 1793128049014,
       "tag": "0063_add_site_config_header_layout",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1793139793843,
+      "tag": "0064_add_tenants_content_migration_failed_at",
+      "breakpoints": true
     }
   ]
 }

@@ -1,37 +1,26 @@
 'use client';
 
-import {
-  ALERT_TYPE,
-  LOCALE_ISO_CODES,
-  type TMaybeUndefined,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import { FormField } from '@platform/components/shared/form-field';
-import { TextInput } from '@platform/components/shared/text-input';
+import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
-  ALL_FIELD_KEYS,
   lockAllFields,
-  type TTenantFieldLockReason,
   type TTenantFieldLocks,
 } from '@platform/utils/tenant-field-locks/tenant-field-locks';
-import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
-import { useId, useState, useTransition } from 'react';
+import { useId, useTransition } from 'react';
 
-import { LockableSegmentedField } from './components/lockable-segmented-field/lockable-segmented-field';
+import { TenantDetailsFields } from './components/tenant-details-fields';
 import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
-import {
-  tenantDetailsValuesOf,
-  type TTenantDetailsValues,
-} from './tenant-details-values';
 import { useLockStateChange } from './use-lock-state-change';
 import { useTenantDetailsSave } from './use-tenant-details-save';
+import { useTenantDetailsValues } from './use-tenant-details-values';
 
 export type TTenantDetailsPanelProps = {
   tenant: TClientTenant;
@@ -40,43 +29,26 @@ export type TTenantDetailsPanelProps = {
   archivedNoticeId?: string;
 };
 
-const TEXT_FIELDS = [
-  { key: 'name', labelKey: 'nameLabel' },
-  { key: 'primaryDomain', labelKey: 'domainLabel' },
-  { key: 'ownerEmail', labelKey: 'ownerEmailLabel', type: 'email' },
-] as const;
-
 export const TenantDetailsPanel = ({
   tenant,
   fieldLocks,
   owner,
   archivedNoticeId,
 }: TTenantDetailsPanelProps) => {
-  const ownerEmail = owner?.email;
   const t = useTranslations('tenantDetailsPanel');
-  const tSteps = useTranslations('provisioningStatusView');
-  const tLanguage = useTranslations('languageNames');
-  const fieldErrorText = useTenantFieldErrorText();
   const panelId = useId();
-  const baselineValues = tenantDetailsValuesOf(tenant, ownerEmail);
-  const [renderedTenant, setRenderedTenant] = useState(tenant);
-  const [renderedOwnerEmail, setRenderedOwnerEmail] = useState(ownerEmail);
-  const [values, setValues] = useState<TTenantDetailsValues>(baselineValues);
+  const { values, updateField, revertFields, resetValues, changedFieldKeys } =
+    useTenantDetailsValues(tenant, owner?.email);
   const { fieldErrors, formError, save, clearErrors } = useTenantDetailsSave(
     tenant.id,
     values,
   );
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
-
-  if (tenant !== renderedTenant || ownerEmail !== renderedOwnerEmail) {
-    setRenderedTenant(tenant);
-    setRenderedOwnerEmail(ownerEmail);
-    setValues(baselineValues);
-  }
+  const isDirty = hasArrayGotItems(changedFieldKeys);
 
   const effectiveFieldLocks = isArchived
-    ? lockAllFields({ kind: 'archived' })
+    ? lockAllFields({ kind: TENANT_FIELD_LOCK_KIND.ARCHIVED })
     : fieldLocks;
 
   const { lockAnnouncement, fieldsContainerRef } = useLockStateChange({
@@ -84,36 +56,11 @@ export const TenantDetailsPanel = ({
     fieldLocks: effectiveFieldLocks,
     lockedAnnouncement: t('lockedAnnouncement'),
     unlockedAnnouncement: t('unlockedAnnouncement'),
-    onFieldsLocked: (newlyLockedKeys) => {
-      setValues((prev) => ({
-        ...prev,
-        ...Object.fromEntries(
-          newlyLockedKeys.map((key) => [key, baselineValues[key]]),
-        ),
-      }));
-    },
+    onFieldsLocked: revertFields,
   });
 
-  const {
-    root,
-    bodyStack,
-    fields,
-    lockAnnouncementLive,
-    wideField,
-    footerActions,
-  } = tenantDetailsPanelVariants();
-
-  const changeCount = ALL_FIELD_KEYS.filter(
-    (key) => values[key] !== baselineValues[key],
-  ).length;
-  const isDirty = changeCount > 0;
-
-  const updateField = <K extends keyof TTenantDetailsValues>(
-    key: K,
-    nextValue: TTenantDetailsValues[K],
-  ) => {
-    setValues((prev) => ({ ...prev, [key]: nextValue }));
-  };
+  const { root, bodyStack, fields, lockAnnouncementLive, footerActions } =
+    tenantDetailsPanelVariants();
 
   const handleSave = () => {
     startTransition(async () => {
@@ -122,55 +69,24 @@ export const TenantDetailsPanel = ({
   };
 
   const discard = () => {
-    setValues(baselineValues);
+    resetValues();
     clearErrors();
   };
 
   useUnsavedChangesGuard(
-    isDirty ? { pageTitle: t('heading'), changeCount, save, discard } : null,
+    isDirty
+      ? {
+          pageTitle: t('heading'),
+          changeCount: changedFieldKeys.length,
+          save,
+          discard,
+        }
+      : null,
   );
-
-  const lockReasonText = (
-    reason: TMaybeUndefined<TTenantFieldLockReason>,
-  ): TMaybeUndefined<string> => {
-    if (!reason) {
-      return undefined;
-    }
-    switch (reason.kind) {
-      case 'step':
-        return t('fieldLockedReasonStep', {
-          step: tSteps(`stepLabel.${reason.step}`),
-        });
-      case 'succeeded':
-        return t('fieldLockedReasonSucceeded');
-      case 'archived':
-        return t('fieldLockedReasonArchived');
-      case 'running':
-        return t('fieldLockedReasonRunning');
-      default: {
-        const unhandledReason: never = reason;
-        throw new Error(
-          `lockReasonText: unhandled reason ${JSON.stringify(unhandledReason)}`,
-        );
-      }
-    }
-  };
-
-  const planOptions = [
-    { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
-    { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
-  ];
-
-  const localeOptions = Object.values(LOCALE_ISO_CODES).map((locale) => ({
-    value: locale,
-    label: tLanguage(locale),
-  }));
 
   return (
     <div className={root()} data-tenant-details-panel={panelId}>
-      {formError && (
-        <Alert type={ALERT_TYPE.ERROR} title={t(`errors.${formError}`)} />
-      )}
+      {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
       <Card>
         <Card.Header title={t('heading')} />
@@ -191,43 +107,11 @@ export const TenantDetailsPanel = ({
               role="group"
               aria-label={t('fieldsGroupLabel')}
             >
-              {TEXT_FIELDS.map((field) => {
-                const { key, labelKey } = field;
-                const lockReason = lockReasonText(effectiveFieldLocks[key]);
-
-                return (
-                  <FormField
-                    key={key}
-                    label={t(labelKey)}
-                    hint={lockReason}
-                    error={fieldErrorText(fieldErrors[key])}
-                    control={{ isDisabled: Boolean(lockReason) }}
-                  >
-                    <TextInput
-                      type={'type' in field ? field.type : undefined}
-                      value={values[key]}
-                      onChange={(nextValue) => updateField(key, nextValue)}
-                    />
-                  </FormField>
-                );
-              })}
-
-              <div className={wideField()}>
-                <LockableSegmentedField
-                  label={t('localeLabel')}
-                  options={localeOptions}
-                  value={values.locale}
-                  onChange={(locale) => updateField('locale', locale)}
-                  lockReason={lockReasonText(effectiveFieldLocks.locale)}
-                />
-              </div>
-
-              <LockableSegmentedField
-                label={t('planLabel')}
-                options={planOptions}
-                value={values.plan}
-                onChange={(plan) => updateField('plan', plan)}
-                lockReason={lockReasonText(effectiveFieldLocks.plan)}
+              <TenantDetailsFields
+                values={values}
+                fieldLocks={effectiveFieldLocks}
+                fieldErrors={fieldErrors}
+                onChange={updateField}
               />
             </div>
           </div>

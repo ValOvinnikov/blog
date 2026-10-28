@@ -2082,6 +2082,13 @@ nothing; neither is a `TActionResult`.
 
 ## 8. Migrations & live data (core contract)
 
+**Paused until launch (decided 2026-10-27).** Production is replaced at launch
+rather than upgraded, so no content migration, data backfill or expand/contract
+pair is written until the first real tenant; a changed content shape updates
+the starter content instead. Drizzle schema migrations are still generated. The
+contract below returns at launch in its "deploy first, then migrate" form —
+epic #6152, `docs/superpowers/specs/2026-10-27-deploy-first-migrations-design.md`.
+
 Content is live in the `production` dataset. Schema and content are decoupled:
 changing a schema does **not** change existing documents. Any change altering
 an _existing_ shape (rename/remove/move a field, rename a `_type`, restructure

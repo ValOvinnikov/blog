@@ -4,20 +4,29 @@ import { sanitizeLogMessage } from '@blog/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { logger } from '@worker/utils/logger/logger';
 import {
-  readSignedTenantRequest,
+  readSignedRequest,
   respond,
   respondError,
+  tenantRequestBodySchema,
 } from '@worker/utils/signed-tenant-request/signed-tenant-request';
+import { z } from 'zod';
 
 import { wakeOwnerAccess } from './owner-access-run';
 
+const ownerAccessRequestBodySchema = tenantRequestBodySchema.extend({
+  formerOwnerEmail: z.string().trim().pipe(z.email()).optional(),
+});
+
 export async function handleOwnerAccessRequest(
   request: Request,
-  input: { failureEvent: string; before?: (tenantId: string) => Promise<void> },
+  input: {
+    failureEvent: string;
+    before?: (tenantId: string, formerOwnerEmail?: string) => Promise<void>;
+  },
 ): Promise<Response> {
-  const signed = await readSignedTenantRequest(request);
+  const signed = await readSignedRequest(request, ownerAccessRequestBodySchema);
   if (!signed.ok) return signed.error;
-  const { data: tenantId } = signed;
+  const { tenantId, formerOwnerEmail } = signed.data;
 
   try {
     const tenant = await getTenantById(tenantId);
@@ -28,7 +37,7 @@ export async function handleOwnerAccessRequest(
       return respondError(HTTP_STATUS.CONFLICT, ENQUEUE_ERROR.NOT_PROVISIONED);
     }
 
-    await input.before?.(tenantId);
+    await input.before?.(tenantId, formerOwnerEmail);
     await wakeOwnerAccess(tenantId);
     return respond(HTTP_STATUS.ACCEPTED, {});
   } catch (error) {

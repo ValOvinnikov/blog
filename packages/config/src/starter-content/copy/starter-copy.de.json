@@ -121,5 +121,48 @@
         "metaDescription": "Eine zweite Beispiel-Fallstudie, die mit deiner Website erstellt wurde. Ersetze oder lösche sie."
       }
     ]
+  },
+  "personal": {
+    "hero": {
+      "eyebrow": "Hallo",
+      "heading": "Ein wenig über mich und meine Arbeit"
+    },
+    "intro": {
+      "body": [
+        "Willkommen in meiner Ecke des Webs. Hier erzähle ich, wer ich bin, woran ich arbeite und was ich dabei lerne.",
+        "Ersetzen Sie diesen Text durch ein paar Zeilen über sich: Ihren Werdegang, Ihre Stärken und was Sie als Nächstes vorhaben."
+      ]
+    },
+    "faq": {
+      "heading": "Ein paar häufige Fragen",
+      "questions": [
+        {
+          "question": "Was machen Sie?",
+          "answer": [
+            "Antworten Sie in ein, zwei Sätzen: Ihre Rolle, Ihr Fachgebiet und die Arbeit, die Ihnen am meisten Freude macht."
+          ]
+        },
+        {
+          "question": "Sind Sie offen für neue Möglichkeiten?",
+          "answer": [
+            "Schreiben Sie, ob Sie eine Stelle, freie Aufträge oder Kooperationen suchen und was Sie interessieren würde."
+          ]
+        },
+        {
+          "question": "Wo finde ich mehr von Ihrer Arbeit?",
+          "answer": [
+            "Verweisen Sie Besucher auf Ihre Texte auf dieser Website und ergänzen Sie Links zu anderen Orten, an denen Sie Ihre Arbeit zeigen."
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Meine Texte lesen",
+      "supportingText": "Notizen und Beiträge zu dem, woran ich arbeite und was ich lerne."
+    },
+    "writing": {
+      "linkLabel": "Texte",
+      "listHeading": "Alle Beiträge"
+    }
   }
 }

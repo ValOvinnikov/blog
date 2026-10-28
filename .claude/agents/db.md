@@ -124,6 +124,11 @@ schema diff — a different mechanism from the Sanity content migrations in
 touching shared data, back up before anything irreversible, production behind
 a human gate.
 
+Until launch, schema migrations are still generated, but no hand-written data
+fix is: both databases are recreated from one baseline at launch (CLAUDE.md →
+"Until launch, no content migrations"). A generated migration must still apply
+to dev's existing rows, so a new `NOT NULL` column needs a default.
+
 1. **Edit** `src/schema/<domain>.ts`.
 2. **Generate — last, not while iterating.**
    `pnpm --filter @blog/db db:generate` writes the next-index SQL file under

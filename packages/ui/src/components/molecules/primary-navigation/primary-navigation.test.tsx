@@ -6,6 +6,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { PrimaryNavigation } from './primary-navigation';
 
 const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
+const LINKS_TEST_ID = 'primary-navigation-links';
 const PANEL_ACTIONS_TEST_ID = 'primary-navigation-panel-actions';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 
@@ -31,6 +32,21 @@ const mobileToggle = (isOpen: boolean, onToggle: () => void = () => {}) => ({
   ariaLabel: MOCK_TOGGLE_LABEL,
   panelId: MOCK_PANEL_ID,
 });
+
+const groupHref = `/${faker.lorem.slug()}`;
+const groupLabel = faker.lorem.words(2);
+const subLinks = faker.helpers.multiple(
+  () => ({
+    href: `${groupHref}/${faker.lorem.slug()}`,
+    label: faker.lorem.words(2),
+  }),
+  { count: 2 },
+);
+const groupLink = {
+  href: groupHref,
+  label: groupLabel,
+  subItems: [{ href: groupHref, label: groupLabel }, ...subLinks],
+};
 
 const setup = customRender(PrimaryNavigation, {
   links,
@@ -250,6 +266,43 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       await user.click(toggle);
 
       expect(onToggle).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('a link with sub-items', () => {
+    it('sits behind a button named by the link, listing its own page first', () => {
+      setup({ links: [groupLink] });
+
+      const trigger = screen.getByRole('button', { name: groupLabel });
+      const barLinksRegion = screen.getByTestId(LINKS_TEST_ID);
+      const barLinks = within(barLinksRegion).getAllByRole('link', {
+        hidden: true,
+      });
+
+      expect(trigger).toBeVisible();
+      expect(barLinks.map((link) => link.getAttribute('href'))).toEqual([
+        groupHref,
+        ...subLinks.map((link) => link.href),
+      ]);
+    });
+
+    it('keeps its sub-items folded in the open panel until opened', async () => {
+      setup({ links: [groupLink], mobileToggle: mobileToggle(true) });
+
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      const [firstSubLink] = subLinks;
+      const subLink = within(mobilePanel).getByRole('link', {
+        name: firstSubLink?.label,
+      });
+      const groupToggle = within(mobilePanel).getByText(groupLabel, {
+        selector: 'summary',
+      });
+
+      expect(subLink).not.toBeVisible();
+
+      await user.click(groupToggle);
+
+      expect(subLink).toBeVisible();
     });
   });
 });

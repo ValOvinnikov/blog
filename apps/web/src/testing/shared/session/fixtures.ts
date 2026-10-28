@@ -1,11 +1,11 @@
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 import type { Session } from 'next-auth';
 
-faker.seed(61056);
+const mockFaker = createMockFaker(61056);
 
-export const MOCK_USER_ID = faker.string.uuid();
+export const MOCK_USER_ID = mockFaker.string.uuid();
 
-const MOCK_SESSION_EXPIRES = faker.date.future().toISOString();
+const MOCK_SESSION_EXPIRES = mockFaker.date.future().toISOString();
 
 export const mockSession = (overrides: Partial<Session> = {}): Session => ({
   user: { id: MOCK_USER_ID },

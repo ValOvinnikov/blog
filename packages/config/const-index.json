@@ -2708,6 +2708,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.ARCHIVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "ALREADY_ARCHIVED": [
@@ -3588,6 +3594,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/step-indicator",
         "file": "apps/platform/src/constants/step-indicator.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.RUNNING",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "DONE": [
@@ -3616,6 +3628,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.SUCCEEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       },
       {
         "ref": "PROVISION_CLI_RESULT.SUCCEEDED",
@@ -5145,6 +5163,14 @@
     "OWNER_EMAIL_UNKNOWN": [
       {
         "ref": "TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "STEP": [
+      {
+        "ref": "TENANT_FIELD_LOCK_KIND.STEP",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

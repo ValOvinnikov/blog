@@ -152,6 +152,9 @@ export const tenants = pgTable(
     suspendedAt: timestamp('suspended_at'),
     deletionNotifiedAt: timestamp('deletion_notified_at'),
     suspensionReason: text('suspension_reason').$type<TSuspensionReason>(),
+    contentMigrationFailedAt: timestamp('content_migration_failed_at', {
+      mode: 'date',
+    }),
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()
       .defaultNow(),

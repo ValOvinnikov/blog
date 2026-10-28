@@ -2,18 +2,18 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import type { TTenantSanityContext } from '@blog/service';
-import { faker } from '@faker-js/faker';
 import type { TRequestContext } from '@web/server/request-context/request-context';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61053);
+const mockFaker = createMockFaker(61053);
 
-export const MOCK_TENANT_ID = faker.string.uuid();
+export const MOCK_TENANT_ID = mockFaker.string.uuid();
 
-export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
+export const MOCK_OTHER_TENANT_ID = mockFaker.string.uuid();
 
-const MOCK_TENANT_NAME = faker.company.name();
+const MOCK_TENANT_NAME = mockFaker.company.name();
 
-const MOCK_TENANT_CREATED_AT = faker.date.past();
+const MOCK_TENANT_CREATED_AT = mockFaker.date.past();
 
 export const MOCK_TENANT_HOST = 'tenant.example.com';
 
@@ -71,6 +71,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   suspendedAt: null,
   deletionNotifiedAt: null,
   suspensionReason: null,
+  contentMigrationFailedAt: null,
   createdAt: MOCK_TENANT_CREATED_AT,
   updatedAt: MOCK_TENANT_CREATED_AT,
   ...overrides,

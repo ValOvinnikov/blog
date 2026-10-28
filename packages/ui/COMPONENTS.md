@@ -295,9 +295,9 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel.
-Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · drawerActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
-Variants: collapsible: (boolean)
+Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel; a link with `subItems` opens them as a sub-menu in the bar and in place in the panel.
+Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · drawerActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
+Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON
 
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 
@@ -418,8 +418,9 @@ Slots:
 
 ### Header — `components/organisms/header/header.tsx`
 
-The site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`.
-Props: children?: TCompoundChildren<typeof HeaderParts> _(extends IWithClassName, IWithDataTestId)_
+The site header shell; arranges a `Header.Brand` slot and the navigation for wide screens by `layout`, and sits full width or floating by `barStyle`.
+Props: layout?: THeaderVariants['layout'] · barStyle?: THeaderVariants['barStyle'] · children?: TCompoundChildren<typeof HeaderParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON · barStyle: HEADER_BAR_STYLE.FULL_WIDTH|HEADER_BAR_STYLE.FLOATING
 
 Slots:
 

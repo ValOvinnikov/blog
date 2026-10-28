@@ -7,10 +7,16 @@ import {
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
-import { Fragment, type ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 
-import { primaryNavigationVariants } from './primary-navigation-variants';
+import {
+  PrimaryNavigationItem,
+  type TPrimaryNavigationItemProps,
+} from './components/item/primary-navigation-item';
+import {
+  primaryNavigationVariants,
+  type TPrimaryNavigationVariants,
+} from './primary-navigation-variants';
 
 export type { TAnchorElementType };
 
@@ -19,6 +25,7 @@ export interface INavItem {
   label: string;
   isActive?: boolean;
   target?: '_blank';
+  subItems?: INavItem[];
 }
 
 export type TPrimaryNavigationMobileToggleProps = {
@@ -37,9 +44,11 @@ export type TPrimaryNavigationProps = IWithClassName &
     ariaLabel?: string;
     linkAs?: TAnchorElementType;
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
+    layout?: TPrimaryNavigationVariants['layout'];
+    submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'];
   };
 
-/** Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel. */
+/** Top-level `<nav>` landmark whose trailing `actions` stay in the bar, whose `panelActions` move into the mobile panel below `lg`, and whose `drawerActions` exist only in the open mobile panel; a link with `subItems` opens them as a sub-menu in the bar and in place in the panel. */
 export const PrimaryNavigation = ({
   links,
   actions,
@@ -50,33 +59,24 @@ export const PrimaryNavigation = ({
   dataTestId,
   linkAs,
   mobileToggle,
+  layout,
+  submenuStyle,
 }: TPrimaryNavigationProps) => {
+  const groupName = useId();
   const {
     root,
     links: linksSlot,
+    controls,
     toggle,
     panel,
     panelLink,
     barPanelActions,
     panelActionsRow,
     drawerActionsRow,
-  } = primaryNavigationVariants({ collapsible: Boolean(mobileToggle) });
-
-  const renderLinks = (itemClassName?: string) =>
-    links.map(({ href, label, isActive, target }) => (
-      <TextLink
-        key={href}
-        appearance="nav"
-        as={linkAs}
-        href={href}
-        isCurrent={isActive}
-        currentStyle="weight"
-        target={target}
-        className={itemClassName}
-      >
-        {label}
-      </TextLink>
-    ));
+  } = primaryNavigationVariants({
+    collapsible: Boolean(mobileToggle),
+    layout,
+  });
 
   return (
     <nav
@@ -85,51 +85,71 @@ export const PrimaryNavigation = ({
       data-testid={dataTestId}
     >
       <div className={linksSlot()} data-testid="primary-navigation-links">
-        {renderLinks()}
+        {links.map((item) => (
+          <PrimaryNavigationItem
+            key={item.href}
+            item={item}
+            linkAs={linkAs}
+            submenuStyle={submenuStyle}
+          />
+        ))}
       </div>
-      {panelActions && <div className={barPanelActions()}>{panelActions}</div>}
-      {actions}
+      {(panelActions || actions || mobileToggle) && (
+        <div className={controls()}>
+          {panelActions && (
+            <div className={barPanelActions()}>{panelActions}</div>
+          )}
+          {actions}
+          {mobileToggle && (
+            <IconButton
+              variant="circle"
+              ariaLabel={mobileToggle.ariaLabel}
+              title={mobileToggle.ariaLabel}
+              aria-expanded={mobileToggle.isOpen}
+              aria-controls={mobileToggle.panelId}
+              onClick={mobileToggle.onToggle}
+              className={toggle()}
+            >
+              <Icon
+                name={mobileToggle.isOpen ? ICONS.CLOSE : ICONS.MENU}
+                size={SIZE.MD}
+              />
+            </IconButton>
+          )}
+        </div>
+      )}
       {mobileToggle && (
-        <Fragment>
-          <IconButton
-            variant="circle"
-            ariaLabel={mobileToggle.ariaLabel}
-            title={mobileToggle.ariaLabel}
-            aria-expanded={mobileToggle.isOpen}
-            aria-controls={mobileToggle.panelId}
-            onClick={mobileToggle.onToggle}
-            className={toggle()}
-          >
-            <Icon
-              name={mobileToggle.isOpen ? ICONS.CLOSE : ICONS.MENU}
-              size={SIZE.MD}
+        <div
+          id={mobileToggle.panelId}
+          hidden={!mobileToggle.isOpen}
+          className={panel()}
+          data-testid="primary-navigation-mobile-panel"
+        >
+          {links.map((item) => (
+            <PrimaryNavigationItem
+              key={item.href}
+              item={item}
+              linkAs={linkAs}
+              panel={{ groupName, linkClassName: panelLink() }}
             />
-          </IconButton>
-          <div
-            id={mobileToggle.panelId}
-            hidden={!mobileToggle.isOpen}
-            className={panel()}
-            data-testid="primary-navigation-mobile-panel"
-          >
-            {renderLinks(panelLink())}
-            {panelActions && mobileToggle.isOpen && (
-              <div
-                className={panelActionsRow()}
-                data-testid="primary-navigation-panel-actions"
-              >
-                {panelActions}
-              </div>
-            )}
-            {drawerActions && mobileToggle.isOpen && (
-              <div
-                className={drawerActionsRow()}
-                data-testid="primary-navigation-drawer-actions"
-              >
-                {drawerActions}
-              </div>
-            )}
-          </div>
-        </Fragment>
+          ))}
+          {panelActions && mobileToggle.isOpen && (
+            <div
+              className={panelActionsRow()}
+              data-testid="primary-navigation-panel-actions"
+            >
+              {panelActions}
+            </div>
+          )}
+          {drawerActions && mobileToggle.isOpen && (
+            <div
+              className={drawerActionsRow()}
+              data-testid="primary-navigation-drawer-actions"
+            >
+              {drawerActions}
+            </div>
+          )}
+        </div>
       )}
     </nav>
   );

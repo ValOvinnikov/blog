@@ -1,20 +1,20 @@
 import { SIZE } from '@blog/config';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { Button } from '@blog/ui/components/atoms/button';
-import { faker } from '@faker-js/faker';
 import type { INewsletterSectionViewProps } from '@web/components/pages/account-page/sections/newsletter-section/newsletter-section-view';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61033);
+const mockFaker = createMockFaker(61033);
 
-export const MOCK_UNSUBSCRIBE_LABEL = faker.lorem.word();
-const MOCK_NEWSLETTER_HEADING = faker.lorem.word();
-const MOCK_NEWSLETTER_LABEL = faker.lorem.word();
-const MOCK_SUBSCRIBER_EMAIL = faker.internet.email();
-const MOCK_ACTIVE_BADGE_LABEL = faker.lorem.word();
-const MOCK_ACTIVE_DESCRIPTION_PREFIX = faker.lorem.words(3);
-const MOCK_ACTIVE_DESCRIPTION_SUFFIX = faker.lorem.sentence();
-const MOCK_PENDING_BADGE_LABEL = faker.lorem.words(2);
-const MOCK_PENDING_DESCRIPTION = faker.lorem.sentence();
+export const MOCK_UNSUBSCRIBE_LABEL = mockFaker.lorem.word();
+const MOCK_NEWSLETTER_HEADING = mockFaker.lorem.word();
+const MOCK_NEWSLETTER_LABEL = mockFaker.lorem.word();
+const MOCK_SUBSCRIBER_EMAIL = mockFaker.internet.email();
+const MOCK_ACTIVE_BADGE_LABEL = mockFaker.lorem.word();
+const MOCK_ACTIVE_DESCRIPTION_PREFIX = mockFaker.lorem.words(3);
+const MOCK_ACTIVE_DESCRIPTION_SUFFIX = mockFaker.lorem.sentence();
+const MOCK_PENDING_BADGE_LABEL = mockFaker.lorem.words(2);
+const MOCK_PENDING_DESCRIPTION = mockFaker.lorem.sentence();
 
 export const mockNewsletterSectionView = (
   overrides: Partial<INewsletterSectionViewProps> = {},

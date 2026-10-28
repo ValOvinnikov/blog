@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@web/testing/mock-faker';
 
-faker.seed(61046);
+const mockFaker = createMockFaker(61046);
 
-export const MOCK_CONTENT_MODULE_ID = faker.string.uuid();
+export const MOCK_CONTENT_MODULE_ID = mockFaker.string.uuid();

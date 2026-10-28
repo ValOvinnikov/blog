@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 
 import { TENANT_STATUS } from '@blog/db/constants';
+import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { mockTenantSanityCredentials } from '@blog/db/testing/tenant-sanity-credentials/fixtures';
 import {
   MOCK_MISSING_TENANT_ID,
@@ -8,17 +9,19 @@ import {
 } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
 
+import type { TMigrateSummary } from './lib/migrate-tenant';
 import {
   hasSystemicFailures,
   runMigration,
   runMigrationForTenant,
-  type TMigrateSummary,
 } from './run';
 
 const {
   listActiveTenantsMock,
   getTenantByIdMock,
   getTenantSanityWriteCredentialsMock,
+  recordTenantContentMigrationFailureMock,
+  clearTenantContentMigrationFailureMock,
   isTenantMigrationLedgerEmptyMock,
   runTenantMigrationDeployMock,
   exportTenantDatasetMock,
@@ -26,6 +29,8 @@ const {
   listActiveTenantsMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   getTenantSanityWriteCredentialsMock: vi.fn(),
+  recordTenantContentMigrationFailureMock: vi.fn(),
+  clearTenantContentMigrationFailureMock: vi.fn(),
   isTenantMigrationLedgerEmptyMock: vi.fn(),
   runTenantMigrationDeployMock: vi.fn(),
   exportTenantDatasetMock: vi.fn(),
@@ -35,6 +40,8 @@ vi.mock('@blog/db/queries/tenants', () => ({
   listActiveTenants: listActiveTenantsMock,
   getTenantById: getTenantByIdMock,
   getTenantSanityWriteCredentials: getTenantSanityWriteCredentialsMock,
+  recordTenantContentMigrationFailure: recordTenantContentMigrationFailureMock,
+  clearTenantContentMigrationFailure: clearTenantContentMigrationFailureMock,
 }));
 vi.mock('./lib/read-tenant-migration-ledger', () => ({
   isTenantMigrationLedgerEmpty: isTenantMigrationLedgerEmptyMock,
@@ -57,6 +64,10 @@ const MOCK_DEPROVISIONED_AT = faker.date.past();
 const MOCK_MIGRATION_ERROR = faker.lorem.sentence();
 const MOCK_LEDGER_ERROR = faker.lorem.sentence();
 const MOCK_EXPORT_ERROR = faker.lorem.sentence();
+const MOCK_RECORD_ERROR = faker.lorem.sentence();
+const MOCK_FAILED_TENANT = mockTenant({
+  contentMigrationFailedAt: faker.date.past({ refDate: MOCK_NOW }),
+});
 const MOCK_EMPTY_SUMMARY: TMigrateSummary = {
   checked: 0,
   migrated: 0,
@@ -64,6 +75,8 @@ const MOCK_EMPTY_SUMMARY: TMigrateSummary = {
   skipped: 0,
   errors: 0,
 };
+
+useFrozenClock();
 
 beforeEach(() => {
   listActiveTenantsMock.mockResolvedValue([]);
@@ -218,6 +231,102 @@ describe(runMigration, () => {
       expect(isTenantMigrationLedgerEmptyMock).not.toHaveBeenCalled();
       expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('the content migration failure record', () => {
+  it('records the failure time on the failed tenant only', async () => {
+    listActiveTenantsMock.mockResolvedValue(MOCK_TENANTS);
+    runTenantMigrationDeployMock
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => {
+        throw new Error(MOCK_MIGRATION_ERROR);
+      })
+      .mockImplementationOnce(() => undefined);
+
+    await runMigration();
+
+    expect(recordTenantContentMigrationFailureMock).toHaveBeenCalledTimes(1);
+    expect(recordTenantContentMigrationFailureMock).toHaveBeenCalledWith(
+      MOCK_TENANTS[1]?.id,
+      MOCK_NOW,
+    );
+  });
+
+  it.each([
+    ['migrates', false],
+    ['backfills', true],
+  ])(
+    'clears the record when a previously failed tenant %s',
+    async (_case, ledgerEmpty) => {
+      listActiveTenantsMock.mockResolvedValue([MOCK_FAILED_TENANT]);
+      isTenantMigrationLedgerEmptyMock.mockReturnValue(ledgerEmpty);
+
+      await runMigration();
+
+      expect(clearTenantContentMigrationFailureMock).toHaveBeenCalledWith(
+        MOCK_FAILED_TENANT.id,
+      );
+      expect(recordTenantContentMigrationFailureMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it('clears the record when a single-tenant run succeeds', async () => {
+    getTenantByIdMock.mockResolvedValue(MOCK_FAILED_TENANT);
+
+    await runMigrationForTenant(MOCK_FAILED_TENANT.id);
+
+    expect(clearTenantContentMigrationFailureMock).toHaveBeenCalledWith(
+      MOCK_FAILED_TENANT.id,
+    );
+  });
+
+  it('leaves the record alone for a tenant that never failed', async () => {
+    listActiveTenantsMock.mockResolvedValue([MOCK_TENANT]);
+
+    await runMigration();
+
+    expect(clearTenantContentMigrationFailureMock).not.toHaveBeenCalled();
+    expect(recordTenantContentMigrationFailureMock).not.toHaveBeenCalled();
+  });
+
+  it('leaves the record alone for a skipped tenant', async () => {
+    listActiveTenantsMock.mockResolvedValue([MOCK_FAILED_TENANT]);
+    getTenantSanityWriteCredentialsMock.mockResolvedValue({
+      ...MOCK_CREDENTIALS,
+      status: TENANT_STATUS.SUSPENDED,
+    });
+
+    await runMigration();
+
+    expect(clearTenantContentMigrationFailureMock).not.toHaveBeenCalled();
+    expect(recordTenantContentMigrationFailureMock).not.toHaveBeenCalled();
+  });
+
+  it('still reports the original failure when recording it fails', async () => {
+    listActiveTenantsMock.mockResolvedValue([MOCK_TENANT]);
+    runTenantMigrationDeployMock.mockImplementation(() => {
+      throw new Error(MOCK_MIGRATION_ERROR);
+    });
+    recordTenantContentMigrationFailureMock.mockRejectedValue(
+      new Error(MOCK_RECORD_ERROR),
+    );
+
+    const summary = await runMigration();
+
+    expect(summary).toEqual({ ...MOCK_EMPTY_SUMMARY, checked: 1, errors: 1 });
+    expect(hasSystemicFailures(summary)).toBe(true);
+  });
+
+  it('counts a successful tenant as migrated when clearing its record fails', async () => {
+    listActiveTenantsMock.mockResolvedValue([MOCK_FAILED_TENANT]);
+    clearTenantContentMigrationFailureMock.mockRejectedValue(
+      new Error(MOCK_RECORD_ERROR),
+    );
+
+    const summary = await runMigration();
+
+    expect(summary).toEqual({ ...MOCK_EMPTY_SUMMARY, checked: 1, migrated: 1 });
   });
 });
 
