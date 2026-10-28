@@ -2,6 +2,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  ERROR_CODE,
   HTTP_STATUS,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
@@ -45,6 +46,7 @@ vi.mock('@blog/db', () => ({
     tenantDomains: {
       listTenantDomains: vi.fn(),
       removeTenantDomain: vi.fn(),
+      addTenantDomain: vi.fn(),
     },
   },
 }));
@@ -76,6 +78,9 @@ describe(removeCustomDomainAction, () => {
     vi.mocked(tenantDomains.removeTenantDomain)
       .mockReset()
       .mockResolvedValue(true);
+    vi.mocked(tenantDomains.addTenantDomain)
+      .mockReset()
+      .mockResolvedValue({ ok: true, data: {} } as never);
     vi.mocked(enqueueWorkerRequest)
       .mockReset()
       .mockResolvedValue(HTTP_STATUS.ACCEPTED);
@@ -125,33 +130,45 @@ describe(removeCustomDomainAction, () => {
         action: AUDIT_ACTION.SETTINGS_UPDATED,
         targetType: AUDIT_TARGET_TYPE.TENANT,
         targetId: MOCK_TENANT_ID,
-        details: {
-          customDomainRemoved: MOCK_CUSTOM_DOMAIN,
-          isDisconnectAccepted: true,
-        },
+        details: { customDomainRemoved: MOCK_CUSTOM_DOMAIN },
       }),
     );
   });
 
-  it('keeps the removal and logs when the worker does not accept the disconnect', async () => {
+  it('puts the domain back, records nothing and reports a server error when the worker does not accept the disconnect', async () => {
     asMember();
     vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
 
     const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(tenantDomains.addTenantDomain).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_CUSTOM_DOMAIN,
+    );
     expect(logger.error).toHaveBeenCalledWith(
-      CUSTOM_DOMAIN_LOG.DISCONNECT_ENQUEUE_REJECTED,
+      CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING,
       expect.objectContaining({ responseStatus: null }),
     );
-    expect(recordAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        details: {
-          customDomainRemoved: MOCK_CUSTOM_DOMAIN,
-          isDisconnectAccepted: false,
-        },
-      }),
+    expect(recordAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it('logs and reports a server error when putting the domain back fails', async () => {
+    asMember();
+    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
+    vi.mocked(tenantDomains.addTenantDomain).mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
+    } as never);
+
+    const result = await removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(logger.error).toHaveBeenCalledWith(
+      CUSTOM_DOMAIN_LOG.DISCONNECT_RESTORE_FAILED,
+      expect.objectContaining({ error: ERROR_CODE.DB_DUPLICATE_DOMAIN }),
     );
+    expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('reports input that is not a domain without removing anything', async () => {

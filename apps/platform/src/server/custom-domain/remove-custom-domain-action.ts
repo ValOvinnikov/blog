@@ -4,20 +4,17 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  HTTP_STATUS,
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CUSTOM_DOMAIN_LOG,
-  CUSTOM_DOMAIN_PATH,
   CUSTOM_DOMAIN_REFUSAL,
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
-import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -27,6 +24,7 @@ import {
   customDomainInputSchema,
   type TCustomDomainInput,
 } from './custom-domain-input';
+import { enqueueCustomDomainDisconnectOrRestore } from './enqueue-custom-domain-disconnect-or-restore';
 
 export type TRemoveCustomDomainResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
@@ -69,18 +67,8 @@ export const removeCustomDomainAction = async (
       return refused(CUSTOM_DOMAIN_REFUSAL.NOT_CUSTOM_DOMAIN);
     }
 
-    const status = await enqueueWorkerRequest(
-      CUSTOM_DOMAIN_PATH.DISCONNECT,
-      id,
-      domain,
-    );
-    const isDisconnectAccepted = status === HTTP_STATUS.ACCEPTED;
-    if (!isDisconnectAccepted) {
-      logger.error(CUSTOM_DOMAIN_LOG.DISCONNECT_ENQUEUE_REJECTED, {
-        tenantId: id,
-        domain,
-        responseStatus: status,
-      });
+    if (!(await enqueueCustomDomainDisconnectOrRestore(id, domain))) {
+      return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
     await recordAuditEvent({
@@ -88,7 +76,7 @@ export const removeCustomDomainAction = async (
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: id,
-      details: { customDomainRemoved: domain, isDisconnectAccepted },
+      details: { customDomainRemoved: domain },
     });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {

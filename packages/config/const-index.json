@@ -3944,9 +3944,17 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
-    "custom_domain.disconnect_enqueue_rejected": [
+    "custom_domain.disconnect_rejected_restoring": [
       {
-        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_ENQUEUE_REJECTED",
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.disconnect_restore_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_RESTORE_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
