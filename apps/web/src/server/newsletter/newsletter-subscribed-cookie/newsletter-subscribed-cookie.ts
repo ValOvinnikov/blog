@@ -1,4 +1,6 @@
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { ONE_YEAR_IN_SECONDS } from '@web/constants/time';
+import { logger } from '@web/utils/logger/logger';
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
 import { cookies } from 'next/headers';
 
@@ -19,3 +21,12 @@ export const clearNewsletterSubscribedCookie = async (): Promise<void> => {
 
   cookieStore.delete(NEWSLETTER_SUBSCRIBED_COOKIE_NAME);
 };
+
+export const clearNewsletterSubscribedCookieSafely =
+  async (): Promise<void> => {
+    try {
+      await clearNewsletterSubscribedCookie();
+    } catch (error) {
+      logger.error(NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED, { error });
+    }
+  };

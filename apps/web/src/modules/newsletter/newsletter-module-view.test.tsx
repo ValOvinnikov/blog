@@ -16,6 +16,10 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
+vi.mock(
+  '@web/components/shared/newsletter-subscribed-gate/hooks/use-is-reader-subscribed',
+);
+
 const { emailAriaLabel } = SITE_MESSAGES.newsletterForm;
 
 const BAND_TEST_ID = `newsletter-module-${MOCK_NEWSLETTER_MODULE_ID}`;
