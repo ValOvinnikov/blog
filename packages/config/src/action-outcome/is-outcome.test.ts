@@ -2,8 +2,10 @@ import { ACTION_OUTCOME, type TActionOutcome } from '@blog/config/constants';
 
 import {
   isOutcomeInvalid,
+  isOutcomeRefused,
   isOutcomeServerError,
   isOutcomeSuccess,
+  isOutcomeUnavailable,
 } from './is-outcome';
 
 const MOCK_FIELD_ERRORS = { email: { reason: 'EMAIL_INVALID' } };
@@ -22,6 +24,8 @@ describe.each([
   [isOutcomeSuccess, ACTION_OUTCOME.SUCCESS],
   [isOutcomeInvalid, ACTION_OUTCOME.INVALID],
   [isOutcomeServerError, ACTION_OUTCOME.SERVER_ERROR],
+  [isOutcomeRefused, ACTION_OUTCOME.REFUSED],
+  [isOutcomeUnavailable, ACTION_OUTCOME.UNAVAILABLE],
 ])('%o', (isGivenOutcome, outcome) => {
   it(`accepts a ${outcome} result`, () => {
     expect(isGivenOutcome(resultOf(outcome))).toBe(true);

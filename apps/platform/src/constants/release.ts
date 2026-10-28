@@ -16,7 +16,6 @@ export const RELEASE_WORKFLOW_FILE = 'release.yml';
 
 export const TENANT_MIGRATION_WORKFLOW_FILE = 'migrate-tenant-content.yml';
 
-// The GitHub Environment names migrate-tenant-content.yml takes as its `environment` input.
 export const MIGRATION_ENVIRONMENT = {
   DEVELOPMENT: 'development',
   PRODUCTION: 'production',

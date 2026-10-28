@@ -64,7 +64,7 @@ const productionRefusal = async (
   return undefined;
 };
 
-/** Production only retries a tenant whose last migration failed; the audit event attests the dispatch request, not the workflow's outcome. */
+/** The audit event attests the dispatch request, not the workflow's outcome. */
 export const startTenantMigrationsAction = async (
   input: TStartTenantMigrationsInput,
 ): Promise<TStartTenantMigrationsResult> => {

@@ -1,6 +1,13 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE, type TOutcome } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  isOutcomeUnavailable,
+  SIZE,
+  type TOutcome,
+} from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import {
   MIGRATION_ENVIRONMENT,
@@ -31,10 +38,10 @@ const failureKey = (
     TOutcome<typeof ACTION_OUTCOME.SUCCESS>
   >,
 ) => {
-  if (result.outcome === ACTION_OUTCOME.REFUSED) {
+  if (isOutcomeRefused(result)) {
     return REFUSAL_KEYS[result.reason];
   }
-  return result.outcome === ACTION_OUTCOME.UNAVAILABLE
+  return isOutcomeUnavailable(result)
     ? 'failedTenantsUnavailable'
     : 'startFailed';
 };
@@ -62,7 +69,7 @@ export const RunTenantMigrationsButton = ({
           : { environment: MIGRATION_ENVIRONMENT.DEVELOPMENT },
       );
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
         toast.success({ message: t('started') });
         router.refresh();
         return;
