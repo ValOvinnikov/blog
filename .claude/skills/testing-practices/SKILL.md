@@ -375,9 +375,11 @@ testing-library/no-node-access` that gives this reason.
 - **Presence is `.toBeVisible()`; absence is `screen.queryBy*` +
   `.not.toBeInTheDocument()`.** Never `.toBeInTheDocument()` for presence
   (hidden still passes), never `getBy*` for absence (it throws first).
-- **Name the element, then assert on the name.** Every queried element an
-  `expect` checks is first bound to a `const` named for what it is, and
-  `expect` takes that const — never a `screen` query inline. Absence and
+- **Name the element, then use the name.** Every queried element an
+  `expect` checks or an interaction acts on (`user.click`, `user.type`,
+  `user.selectOptions`, `fireEvent.*`, any call taking an element) is first
+  bound to a `const` named for what it is, and the call takes that const —
+  never a `screen` or `within` query nested in its arguments. Absence and
   async read the same way:
 
   ```tsx
@@ -396,16 +398,24 @@ testing-library/no-node-access` that gives this reason.
   expect(screen.getByRole('heading', { level: 1 })).toBeVisible(); // ❌
   ```
 
-  The same holds for a query an interaction acts on: bind it, then pass the
-  const. A query is never nested inside another call:
+  An interaction is held to the same rule as `expect`: bind the element,
+  then pass the const. A query is never nested inside another call:
 
   ```tsx
   const blockSwitch = await screen.findByRole('switch', { name: 'Block' });
   await user.click(blockSwitch); // ✅
 
+  const backButton = screen.getByRole('button', MOCK_BACK);
+  await user.click(backButton); // ✅
+
   await user.click(await screen.findByRole('switch', { name: 'Block' })); // ❌
-  await user.click(screen.getByRole('button', { name: 'Save' })); // ❌
+  await user.click(screen.getByRole('button', MOCK_BACK)); // ❌
+  await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ada'); // ❌
   ```
+
+  No exceptions: not for a click used once, not for a step in the middle
+  of a multi-step flow, not for a query whose name is already a `MOCK_*`
+  const, and not because the neighbouring tests nest theirs.
 
   `within` is a query like any other: it scopes freely, but its result is
   bound to a `const` too, never written inside `expect` or an interaction:
@@ -420,8 +430,9 @@ testing-library/no-node-access` that gives this reason.
   ).toBeVisible(); // ❌
   ```
 
-  **A test file you create or touch is converted whole** — every inline
-  query assertion in it, not only the lines your change edits. Files the
+  **A test file you create or touch is converted whole** — every nested
+  query in it, in an `expect` or an interaction, not only the lines your
+  change edits. Files the
   change does not touch stay as they are.
 
 - **Interaction is `userEvent`, set up in `beforeEach`** (`user =
@@ -676,8 +687,10 @@ have a test? Report gaps rather than leaving them silent.
 - [ ] Queried by role, then text; asserts behaviour, not implementation.
 - [ ] No asymmetric matcher (`expect.objectContaining`, `expect.any`, …) inside
       an assertion; every expected value is exact.
-- [ ] Every asserted element is a named `const`; no `screen` query inside
-      `expect(…)` anywhere in a file the change creates or touches.
+- [ ] Every element an `expect` checks or an interaction acts on is a named
+      `const`; no `screen` or `within` query nested inside `expect(…)`,
+      `user.*(…)` or `fireEvent.*(…)` anywhere in a file the change creates
+      or touches.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
 - [ ] No arrangement repeated across `it`s; no prop bag rendered 3+ times.
 - [ ] Every touched test file pruned: no duplicate, no case another unit
