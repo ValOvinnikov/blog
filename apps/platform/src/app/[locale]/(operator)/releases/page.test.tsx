@@ -36,6 +36,9 @@ vi.mock('@blog/db', async () => ({
       getContrastFinding: vi.fn(),
       getLatestPassingContrastSha: vi.fn(),
     },
+    tenants: {
+      listActiveTenants: vi.fn().mockResolvedValue([]),
+    },
   },
 }));
 
@@ -49,6 +52,10 @@ vi.mock('@platform/server/releases/start-release-action', () => ({
 
 vi.mock('@platform/server/releases/get-release-run-action', () => ({
   getReleaseRunAction: vi.fn(),
+}));
+
+vi.mock('@platform/server/releases/start-tenant-migrations-action', () => ({
+  startTenantMigrationsAction: vi.fn(),
 }));
 
 const MOCK_HEAD_SHA = faker.git.commitSha();

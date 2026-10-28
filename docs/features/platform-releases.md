@@ -25,8 +25,10 @@ epics: [5271]
 ## What it does
 
 A SUPERADMIN sees the release candidate on the platform Releases page, runs
-the contrast check from it and cuts a production release by dispatching
-`release.yml`; a contrast-due banner on the operator pages links there. What
+the contrast check from it, cuts a production release by dispatching
+`release.yml`, and runs tenant content migrations on development or retries a
+tenant whose production migration failed; a contrast-due banner on the
+operator pages links there. What
 exists is the shared vocabulary, the server-side reader that works out the
 release candidate from GitHub and the database, the signed route the contrast
 workflow posts its result to, the page, the contrast and release Server
@@ -135,11 +137,35 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   Succeeded, and any other conclusion Failed; each links to the run and shows
   its title. A failed run whose failed jobs include `Migrate tenant content`
   (`TENANT_MIGRATION_JOB_NAME`, the job `release.yml` calls) also says the
-  deploy did not run and points to Run tenant migrations for retrying that
-  tenant. Straight after a successful start the card shows Dispatched before
+  deploy did not run and points to the Tenant migrations card for retrying
+  that tenant. Straight after a successful start the card shows Dispatched before
   GitHub lists the run, and treats an older run as not yet its own. When a
   polled run finishes the page refreshes. A failed read shows "Release status
   is unavailable" in the card, never earlier data.
+- The Tenant migrations card. Run on development migrates every in-scope
+  development tenant. Below it, every active, non-deprovisioned tenant whose
+  `contentMigrationFailedAt` is set (`listFailedMigrationTenants`, newest
+  failure first) is listed with its failure date and a Retry on production
+  button; with none, the card says no migration has failed and offers no
+  production control. A failed registry read shows "Failed migrations are
+  unavailable" and no retry. The record is written and cleared by the
+  migration run itself (`docs/features/cross-tenant-migrations.md`), so a
+  retried tenant leaves the list once its run succeeds and the page reloads.
+- Server Action `startTenantMigrationsAction`
+  (`server/releases/start-tenant-migrations-action.ts`): `requireSuperAdmin`,
+  validates `{ environment, tenantId? }` with Zod (`MIGRATION_ENVIRONMENT`, a
+  uuid tenant id; `INVALID` otherwise). On production it answers `REFUSED`
+  with `TENANT_REQUIRED` without a tenant, `UNAVAILABLE` when the failed
+  tenants cannot be read, and `REFUSED` with `TENANT_MIGRATION_NOT_FAILED`
+  for a tenant whose last migration did not fail, so it is never a way to
+  migrate production ahead of a release. It then dispatches
+  `migrate-tenant-content.yml` on `main` with inputs `environment` and
+  `tenantId` (`SERVER_ERROR` when that fails, which the button reports as
+  nothing started) and records `TENANT_MIGRATIONS_STARTED` with details
+  `{ environment }`: on the `TENANT` target with the tenant id, or on the
+  `RELEASE` target with the environment as `targetId` for a run across every
+  tenant. The event attests the dispatch request, not the workflow's outcome,
+  and is written only after a successful dispatch.
 - `POST /api/internal/contrast-result` — machine-only, Bearer
   `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
@@ -154,12 +180,16 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 
 ## Data
 
-No table of its own. Releases reuse two existing records, both storing these
-values as plain `text`, so none of them needs a db migration:
+No table of its own. Releases reuse existing records; the audit and finding
+values are stored as plain `text`, so none of them needs a db migration:
 
 - `audit_events`: `RELEASE_STARTED`, `RELEASE_OVERRIDE` and
   `CONTRAST_CHECK_STARTED` on the `RELEASE` target type, whose `targetId` is
-  the version or commit SHA. `TENANT_MIGRATIONS_STARTED` targets the tenant.
+  the version or commit SHA. `TENANT_MIGRATIONS_STARTED` targets the tenant
+  it retried, or `RELEASE` with the environment for a run across every
+  tenant.
+- `tenants.content_migration_failed_at`, read to list the tenants a
+  production retry is offered for.
 - `findings`: source `CONTRAST_CHECK`, kind `CONTRAST_REGRESSION`.
 
 ## Configuration
@@ -219,8 +249,9 @@ values as plain `text`, so none of them needs a db migration:
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@blog/utils/version`).
 - `getReleaseCandidate` and `isContrastDue`, both built on
   `getCandidateComparison` (`apps/platform/src/server/releases/`).
-- `startContrastCheckAction`, `startReleaseAction`, `getReleaseRun` and
-  `getReleaseRunAction` (`apps/platform/src/server/releases/`).
+- `startContrastCheckAction`, `startReleaseAction`, `getReleaseRun`,
+  `getReleaseRunAction`, `startTenantMigrationsAction` and
+  `listFailedMigrationTenants` (`apps/platform/src/server/releases/`).
 - `isReleaseOverrideRequired` and `isReleaseRunActive`
   (`apps/platform/src/utils/release-state/`).
 - `ReleasesView` (`apps/platform/src/components/features/releases/`).

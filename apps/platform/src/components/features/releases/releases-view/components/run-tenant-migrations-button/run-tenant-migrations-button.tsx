@@ -1,0 +1,91 @@
+'use client';
+
+import { ACTION_OUTCOME, SIZE, type TOutcome } from '@blog/config';
+import { Button } from '@platform/components/shared/button';
+import {
+  MIGRATION_ENVIRONMENT,
+  RELEASE_REFUSAL,
+} from '@platform/constants/release';
+import { useToast } from '@platform/context/toast-provider';
+import type { TFailedMigrationTenant } from '@platform/server/releases/list-failed-migration-tenants';
+import {
+  startTenantMigrationsAction,
+  type TStartTenantMigrationsResult,
+} from '@platform/server/releases/start-tenant-migrations-action';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useTransition } from 'react';
+
+const REFUSAL_KEYS = {
+  [RELEASE_REFUSAL.TENANT_REQUIRED]: 'tenantRequired',
+  [RELEASE_REFUSAL.TENANT_MIGRATION_NOT_FAILED]: 'notFailed',
+} satisfies Record<
+  | typeof RELEASE_REFUSAL.TENANT_REQUIRED
+  | typeof RELEASE_REFUSAL.TENANT_MIGRATION_NOT_FAILED,
+  string
+>;
+
+const failureKey = (
+  result: Exclude<
+    TStartTenantMigrationsResult,
+    TOutcome<typeof ACTION_OUTCOME.SUCCESS>
+  >,
+) => {
+  if (result.outcome === ACTION_OUTCOME.REFUSED) {
+    return REFUSAL_KEYS[result.reason];
+  }
+  return result.outcome === ACTION_OUTCOME.UNAVAILABLE
+    ? 'failedTenantsUnavailable'
+    : 'startFailed';
+};
+
+export type TRunTenantMigrationsButtonProps = {
+  retryTenant?: Pick<TFailedMigrationTenant, 'id' | 'name'>;
+};
+
+export const RunTenantMigrationsButton = ({
+  retryTenant,
+}: TRunTenantMigrationsButtonProps) => {
+  const t = useTranslations('runTenantMigrationsButton');
+  const toast = useToast();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleClick = () => {
+    startTransition(async () => {
+      const result = await startTenantMigrationsAction(
+        retryTenant
+          ? {
+              environment: MIGRATION_ENVIRONMENT.PRODUCTION,
+              tenantId: retryTenant.id,
+            }
+          : { environment: MIGRATION_ENVIRONMENT.DEVELOPMENT },
+      );
+
+      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+        toast.success({ message: t('started') });
+        router.refresh();
+        return;
+      }
+
+      toast.error({ message: t(failureKey(result)) });
+    });
+  };
+
+  return (
+    <Button
+      variant={retryTenant ? 'secondary' : 'primary'}
+      size={SIZE.SM}
+      isPending={isPending}
+      pendingLabel={t('starting')}
+      aria-label={
+        retryTenant
+          ? t('retryAriaLabel', { tenant: retryTenant.name })
+          : undefined
+      }
+      onClick={handleClick}
+    >
+      {retryTenant ? t('retryLabel') : t('developmentLabel')}
+    </Button>
+  );
+};

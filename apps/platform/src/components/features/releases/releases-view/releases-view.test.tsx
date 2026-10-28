@@ -25,6 +25,9 @@ vi.mock('@platform/server/releases/start-release-action', () => ({
 vi.mock('@platform/server/releases/get-release-run-action', () => ({
   getReleaseRunAction: vi.fn(),
 }));
+vi.mock('@platform/server/releases/start-tenant-migrations-action', () => ({
+  startTenantMigrationsAction: vi.fn(),
+}));
 
 const MOCK_COMMIT_SUBJECT = mockComparedCommit().message.split('\n')[0] ?? '';
 const NO_CHANGES = mockReleaseCandidate().changes;
@@ -39,6 +42,7 @@ const ALL_CHANGED = {
 const setup = customRender(ReleasesView, {
   result: okResult(mockReleaseCandidate()),
   releaseRun: okResult(),
+  failedMigrationTenants: okResult([]),
 });
 
 describe(`<${ReleasesView.name}/>`, () => {
