@@ -91,6 +91,13 @@ export const mockPersonalDataMatches = (
       consumedAt: undefined,
     },
   ],
+  unsentStudioReinvites: [
+    {
+      tenantId: TENANT_ID,
+      tenantName: MOCK_DATA_REQUEST_SITE_NAME,
+      email: MOCK_DATA_REQUEST_EMAIL,
+    },
+  ],
   readerAccount: mockPersonalDataReaderAccount(),
   blockedSignupIdentities: [
     {
@@ -116,6 +123,7 @@ export const mockPersonalDataExport = (): TPersonalDataExport => {
     subscribers,
     leads,
     membershipInvites,
+    unsentStudioReinvites,
     readerAccount,
     blockedSignupIdentities,
     auditEvents,
@@ -128,6 +136,7 @@ export const mockPersonalDataExport = (): TPersonalDataExport => {
     subscribers,
     leads,
     membershipInvites,
+    unsentStudioReinvites,
     readerAccount,
     blockedSignupIdentities,
     auditEvents,
@@ -138,6 +147,7 @@ export const MOCK_ONE_OF_EACH_COUNT = {
   subscribers: 1,
   leads: 1,
   membershipInvites: 1,
+  unsentStudioReinvites: 1,
   readerAccounts: 1,
 };
 
@@ -145,6 +155,7 @@ export const MOCK_ONE_OF_EACH_MATCH_COUNT = {
   subscribers: 1,
   leads: 1,
   membershipInvites: 1,
+  unsentStudioReinvites: 1,
   readerAccount: 1,
   bookmarks: 1,
   blockedSignupIdentities: 1,

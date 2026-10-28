@@ -1516,6 +1516,7 @@
     "SUBSCRIBER": "Abonnee",
     "LEAD": "Contactbericht",
     "INVITE": "Uitnodiging",
+    "STUDIO_REINVITE": "Niet-verstuurde Studio-uitnodiging",
     "SIGNUP_BLOCK": "Aanmeldblokkade",
     "AUDIT_EVENT": "Auditgebeurtenis",
     "READER_ACCOUNT": "Lezersaccount",

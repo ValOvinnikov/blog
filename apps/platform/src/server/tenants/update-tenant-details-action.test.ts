@@ -53,12 +53,17 @@ const MOCK_AUDIT_WRITE_ERROR = new Error(faker.lorem.sentence());
 const MOCK_UPDATE_ERROR = new Error(faker.lorem.sentence());
 const MOCK_UPDATED_TENANT = mockTenant({ name: MOCK_TENANT_NAME });
 
-const { getTenantByIdMock, updateTenantDetailsMock, insertAuditEventMock } =
-  vi.hoisted(() => ({
-    getTenantByIdMock: vi.fn(),
-    updateTenantDetailsMock: vi.fn(),
-    insertAuditEventMock: vi.fn(),
-  }));
+const {
+  getTenantByIdMock,
+  updateTenantDetailsMock,
+  setUnsentStudioReinviteMock,
+  insertAuditEventMock,
+} = vi.hoisted(() => ({
+  getTenantByIdMock: vi.fn(),
+  updateTenantDetailsMock: vi.fn(),
+  setUnsentStudioReinviteMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
+}));
 
 vi.mock('@platform/server/auth/require-admin');
 
@@ -80,6 +85,7 @@ vi.mock('@blog/db', async () => ({
     tenants: {
       getTenantById: getTenantByIdMock,
       updateTenantDetails: updateTenantDetailsMock,
+      setUnsentStudioReinvite: setUnsentStudioReinviteMock,
     },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
@@ -126,6 +132,7 @@ describe(updateTenantDetailsAction, () => {
       previousOwnerEmail: undefined,
     });
     insertAuditEventMock.mockReset();
+    setUnsentStudioReinviteMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: MOCK_AUDIT_EVENT_ID });
     loggerErrorMock.mockReset();
     sendOwnerInviteEmailMock.mockReset();
@@ -210,6 +217,7 @@ describe(updateTenantDetailsAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       tenant: MOCK_UPDATED_TENANT,
+      isStudioReinviteUnsent: false,
     });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...validInput,
@@ -320,7 +328,11 @@ describe(updateTenantDetailsAction, () => {
       ownerEmail: MOCK_OWNER_EMAIL,
     });
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS, tenant });
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      tenant,
+      isStudioReinviteUnsent: false,
+    });
     expect(updateTenantDetailsMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       ...validInput,
       name: MOCK_RENAMED_TENANT_NAME,
@@ -430,13 +442,15 @@ describe(updateTenantDetailsAction, () => {
 
       const [event] = insertAuditEventMock.mock.lastCall ?? [];
       expect(event.details.studioReinviteRequested).toBe(true);
+      expect(setUnsentStudioReinviteMock).not.toHaveBeenCalled();
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: readyTenant,
+        isStudioReinviteUnsent: false,
       });
     });
 
-    it('still saves, and hands back the former email to resend with, when the re-invite request fails', async () => {
+    it('still saves, flags the unsent invite and stores the former email server-side when the re-invite request fails', async () => {
       enqueueOwnerAccessRequestMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
@@ -451,8 +465,12 @@ describe(updateTenantDetailsAction, () => {
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: readyTenant,
-        unsentStudioReinvite: { formerOwnerEmail: MOCK_OWNER_EMAIL },
+        isStudioReinviteUnsent: true,
       });
+      expect(setUnsentStudioReinviteMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        MOCK_OWNER_EMAIL,
+      );
     });
   });
 
@@ -471,6 +489,7 @@ describe(updateTenantDetailsAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       tenant: MOCK_UPDATED_TENANT,
+      isStudioReinviteUnsent: false,
     });
   });
 
@@ -534,6 +553,7 @@ describe(updateTenantDetailsAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       tenant: MOCK_UPDATED_TENANT,
+      isStudioReinviteUnsent: false,
     });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED,

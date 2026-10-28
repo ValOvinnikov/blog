@@ -32,6 +32,9 @@ const REFUSAL_KEYS = {
 
 type TFormErrorKey = TValueOf<typeof REFUSAL_KEYS> | 'saveFailed';
 
+// A warning otherwise leaves after 5s, before an operator can reach its Resend action.
+const STUDIO_REINVITE_WARNING_MS = 20_000;
+
 export const useTenantDetailsSave = (
   tenantId: string,
   values: TTenantDetailsValues,
@@ -48,11 +51,8 @@ export const useTenantDetailsSave = (
     setFormErrorKey(undefined);
   };
 
-  const resendStudioInvite = async (formerOwnerEmail: string) => {
-    const result = await resendChangedOwnerStudioInviteAction(
-      tenantId,
-      formerOwnerEmail,
-    );
+  const resendStudioInvite = async () => {
+    const result = await resendChangedOwnerStudioInviteAction(tenantId);
     if (isOutcomeSuccess(result)) {
       toast.success({ message: t('studioInviteResent') });
     } else {
@@ -66,14 +66,14 @@ export const useTenantDetailsSave = (
     const result = await updateTenantDetailsAction(tenantId, values);
     switch (result.outcome) {
       case ACTION_OUTCOME.SUCCESS: {
-        const { unsentStudioReinvite } = result;
-        if (unsentStudioReinvite) {
-          toast.error({
+        if (result.isStudioReinviteUnsent) {
+          toast.warning({
             message: t('alertSavedStudioInviteUnsent'),
+            durationMs: STUDIO_REINVITE_WARNING_MS,
             action: {
               label: t('resendStudioInvite'),
               onAct: () => {
-                void resendStudioInvite(unsentStudioReinvite.formerOwnerEmail);
+                void resendStudioInvite();
               },
             },
           });

@@ -1516,6 +1516,7 @@
     "SUBSCRIBER": "Suscriptor",
     "LEAD": "Mensaje de contacto",
     "INVITE": "Invitación",
+    "STUDIO_REINVITE": "Invitación a Studio no enviada",
     "SIGNUP_BLOCK": "Bloqueo de registro",
     "AUDIT_EVENT": "Evento de auditoría",
     "READER_ACCOUNT": "Cuenta de lector",

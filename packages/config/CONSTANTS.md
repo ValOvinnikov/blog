@@ -308,7 +308,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
-- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
+- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
 - **DATA_REQUEST_KIND_FILTER**: `ALL`
 - **DATA_REQUEST_MATCH_COLUMN**: `KIND`, `SITE`, `EMAIL`, `RECORDED`
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`

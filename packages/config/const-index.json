@@ -3908,6 +3908,14 @@
         "file": "apps/platform/src/constants/create-site-gate.ts"
       }
     ],
+    "STUDIO_REINVITE": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "SIGNUP_BLOCK": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK",

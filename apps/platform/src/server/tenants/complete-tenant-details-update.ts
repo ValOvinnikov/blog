@@ -7,6 +7,7 @@ import {
   isOutcomeSuccess,
   type TMaybeUndefined,
 } from '@blog/config';
+import { queries } from '@blog/db';
 import type { TENANT_DETAILS_UPDATE_OUTCOME } from '@blog/db/constants';
 import type {
   TUpdateTenantDetailsInput,
@@ -28,7 +29,7 @@ type TTenantDetailsUpdate = Extract<
 export type TTenantDetailsSaved = {
   outcome: typeof ACTION_OUTCOME.SUCCESS;
   tenant: TTenant;
-  unsentStudioReinvite?: { formerOwnerEmail: string };
+  isStudioReinviteUnsent: boolean;
 };
 
 const reinviteIfOwnerChanged = async (
@@ -39,7 +40,18 @@ const reinviteIfOwnerChanged = async (
   if (isUndefined(ownerEmail) || isUndefined(previousOwnerEmail)) {
     return undefined;
   }
-  return reinviteChangedOwner(tenant, ownerEmail, previousOwnerEmail);
+  const result = await reinviteChangedOwner(
+    tenant,
+    ownerEmail,
+    previousOwnerEmail,
+  );
+  if (!isUndefined(result) && !isOutcomeSuccess(result)) {
+    await queries.tenants.setUnsentStudioReinvite(
+      tenant.id,
+      previousOwnerEmail,
+    );
+  }
+  return result;
 };
 
 export const completeTenantDetailsUpdate = async (
@@ -67,13 +79,10 @@ export const completeTenantDetailsUpdate = async (
     },
   });
 
-  const isStudioReinviteUnsent =
-    !isUndefined(studioReinvite) && !studioReinviteRequested;
-  return isStudioReinviteUnsent && previousOwnerEmail
-    ? {
-        outcome: ACTION_OUTCOME.SUCCESS,
-        tenant,
-        unsentStudioReinvite: { formerOwnerEmail: previousOwnerEmail },
-      }
-    : { outcome: ACTION_OUTCOME.SUCCESS, tenant };
+  return {
+    outcome: ACTION_OUTCOME.SUCCESS,
+    tenant,
+    isStudioReinviteUnsent:
+      !isUndefined(studioReinvite) && !studioReinviteRequested,
+  };
 };

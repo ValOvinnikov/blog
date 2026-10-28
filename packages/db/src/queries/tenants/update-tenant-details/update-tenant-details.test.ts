@@ -9,6 +9,10 @@ import {
   TENANT_STATUS,
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
+import {
+  getUnsentStudioReinviteEmail,
+  setUnsentStudioReinvite,
+} from '@blog/db/queries/tenants/unsent-studio-reinvite';
 import * as schema from '@blog/db/schema';
 import { type users, verificationTokens } from '@blog/db/schema/auth';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
@@ -70,6 +74,7 @@ const MOCK_ALT_DOMAIN = faker.internet.domainName();
 const MOCK_FIXED_DOMAIN = faker.internet.domainName();
 const MOCK_OTHER_TENANT_DOMAIN = faker.internet.domainName();
 const MOCK_NEW_OWNER_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_PREVIOUS_FORMER_OWNER_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_UNNORMALIZED_NEW_OWNER_EMAIL = `  ${MOCK_NEW_OWNER_EMAIL.toUpperCase()}  `;
 const MOCK_MEMBER_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_OTHER_EMAIL = faker.internet.email().toLowerCase();
@@ -322,6 +327,26 @@ describe(updateTenantDetails, () => {
           MOCK_NEW_OWNER_EMAIL,
         );
       });
+
+      it.each([
+        ['clears', MOCK_NEW_OWNER_EMAIL, null],
+        ['keeps', MOCK_OWNER_EMAIL, MOCK_PREVIOUS_FORMER_OWNER_EMAIL],
+      ])(
+        '%s an earlier unsent Studio re-invite when the owner email is %s',
+        async (_verb, ownerEmail, expected) => {
+          await setUnsentStudioReinvite(
+            tenantId,
+            MOCK_PREVIOUS_FORMER_OWNER_EMAIL,
+          );
+
+          await updateTenantDetails(tenantId, {
+            ...MOCK_VALID_INPUT,
+            ownerEmail,
+          });
+
+          expect(await getUnsentStudioReinviteEmail(tenantId)).toBe(expected);
+        },
+      );
 
       it.each([
         ['omitted', undefined],

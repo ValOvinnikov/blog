@@ -38,6 +38,7 @@ export const toDataRequestMatches = ({
   subscribers,
   leads,
   membershipInvites,
+  unsentStudioReinvites,
   readerAccount,
   blockedSignupIdentities,
   auditEvents,
@@ -56,6 +57,15 @@ export const toDataRequestMatches = ({
   ),
   ...membershipInvites.map(({ id, tenantName, email, createdAt }) =>
     toMatch(DATA_REQUEST_MATCH_KIND.INVITE, id, tenantName, email, createdAt),
+  ),
+  ...unsentStudioReinvites.map(({ tenantId, tenantName, email }) =>
+    toMatch(
+      DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE,
+      tenantId,
+      tenantName,
+      email,
+      undefined,
+    ),
   ),
   ...(readerAccount
     ? [
@@ -102,6 +112,7 @@ export const countPersonalDataMatches = ({
   subscribers,
   leads,
   membershipInvites,
+  unsentStudioReinvites,
   readerAccount,
   blockedSignupIdentities,
   auditEvents,
@@ -109,6 +120,7 @@ export const countPersonalDataMatches = ({
   subscribers: subscribers.length,
   leads: leads.length,
   membershipInvites: membershipInvites.length,
+  unsentStudioReinvites: unsentStudioReinvites.length,
   readerAccount: readerAccount ? 1 : 0,
   bookmarks: readerAccount?.bookmarks.length ?? 0,
   blockedSignupIdentities: blockedSignupIdentities.length,

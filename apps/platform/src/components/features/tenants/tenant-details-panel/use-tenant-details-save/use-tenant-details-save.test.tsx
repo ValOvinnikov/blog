@@ -121,6 +121,7 @@ describe(useTenantDetailsSave, () => {
     updateTenantDetailsActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
       tenant: mockClientTenant(),
+      isStudioReinviteUnsent: false,
     });
     const { result } = renderSave();
 
@@ -141,7 +142,7 @@ describe(useTenantDetailsSave, () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: mockClientTenant(),
-        unsentStudioReinvite: { formerOwnerEmail: MOCK_OWNER_EMAIL },
+        isStudioReinviteUnsent: true,
       });
     });
 
@@ -160,25 +161,21 @@ describe(useTenantDetailsSave, () => {
     it.each([
       [ACTION_OUTCOME.SUCCESS, studioInviteResent],
       [ACTION_OUTCOME.SERVER_ERROR, studioInviteResendFailed],
-    ])(
-      'resends it with the former owner email from the toast (%s)',
-      async (outcome, message) => {
-        resendStudioInviteActionMock.mockResolvedValue({ outcome });
-        const user = userEvent.setup();
-        const { result } = renderSave();
-        await saveWith(result);
+    ])('resends it from the toast (%s)', async (outcome, message) => {
+      resendStudioInviteActionMock.mockResolvedValue({ outcome });
+      const user = userEvent.setup();
+      const { result } = renderSave();
+      await saveWith(result);
 
-        await user.click(
-          await screen.findByRole('button', { name: resendStudioInvite }),
-        );
+      await user.click(
+        await screen.findByRole('button', { name: resendStudioInvite }),
+      );
 
-        expect(resendStudioInviteActionMock).toHaveBeenCalledExactlyOnceWith(
-          MOCK_TENANT_ID,
-          MOCK_OWNER_EMAIL,
-        );
-        expect(await screen.findByText(message)).toBeVisible();
-      },
-    );
+      expect(resendStudioInviteActionMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+      );
+      expect(await screen.findByText(message)).toBeVisible();
+    });
   });
 
   it('returns the field errors of an invalid save, without a toast or refresh', async () => {

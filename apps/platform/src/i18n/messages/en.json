@@ -1516,6 +1516,7 @@
     "SUBSCRIBER": "Subscriber",
     "LEAD": "Contact message",
     "INVITE": "Invite",
+    "STUDIO_REINVITE": "Unsent Studio invite",
     "SIGNUP_BLOCK": "Sign-up block",
     "AUDIT_EVENT": "Audit event",
     "READER_ACCOUNT": "Reader account",

@@ -1,5 +1,4 @@
 import type { TMaybeUndefined, TOutcome } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   PROVISIONING_STATE,
@@ -25,6 +24,11 @@ import {
   type TOwnerEmailChange,
   type TOwnerEmailRefusal,
 } from './owner-email-change';
+import {
+  changesTenantDetails,
+  restorableTenantFields,
+  tenantDetailsFields,
+} from './tenant-details-fields';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -33,34 +37,6 @@ export type TUpdateTenantDetailsInput = {
   locale: string;
   ownerEmail?: string;
 };
-
-type TTenantDetailsFields = {
-  name: string;
-  primaryDomain: string;
-  plan: TTenantPlan;
-  locale: TLocaleIsoCode;
-};
-
-function tenantDetailsFields(
-  source: TTenantDetailsFields,
-): TTenantDetailsFields {
-  return {
-    name: source.name,
-    primaryDomain: source.primaryDomain,
-    plan: source.plan,
-    locale: source.locale,
-  };
-}
-
-function changesTenantDetails(
-  next: TTenantDetailsFields,
-  existing: TTenant,
-): boolean {
-  const current = tenantDetailsFields(existing);
-  return (Object.keys(next) as (keyof TTenantDetailsFields)[]).some(
-    (key) => next[key] !== current[key],
-  );
-}
 
 const OUTCOME = TENANT_DETAILS_UPDATE_OUTCOME;
 
@@ -176,7 +152,11 @@ export async function updateTenantDetails(
   try {
     [tenant] = await db
       .update(tenants)
-      .set(details)
+      .set(
+        ownerEmailChange
+          ? { ...details, unsentReinviteFormerOwnerEmailEncrypted: null }
+          : details,
+      )
       .where(eq(tenants.id, tenantId))
       .returning();
   } catch (error) {
@@ -193,7 +173,7 @@ export async function updateTenantDetails(
   async function restoreTenantRow(original: TTenant): Promise<void> {
     await db
       .update(tenants)
-      .set(tenantDetailsFields(original))
+      .set(restorableTenantFields(original))
       .where(eq(tenants.id, tenantId));
   }
 

@@ -75,6 +75,11 @@ page (#5090). The page serves either answer.
     matches, each with its site's id and name, and with the encrypted email,
     lead name and message decrypted (falling back to the plain column while a
     row has no encrypted form);
+  - the tenants holding that address as an unsent Studio re-invite
+    (`tenants.unsent_reinvite_former_owner_email_encrypted`, from an
+    owner-email change whose re-invite failed — see
+    [tenant access](./tenant-access.md)). The column has no lookup index, so
+    each stored value is decrypted and compared;
   - `blocked_signup_identities` ADDRESS entries whose `value` is that index;
   - the reader account whose address is exactly the one given
     (`findUserByEmail`, which keeps a `+tag` and falls back to the plain
@@ -84,7 +89,8 @@ page (#5090). The page serves either answer.
   - `audit_events` whose `actor_id` is that account, with no email of their
     own.
 - `queries.personalData.erasePersonalData(email, { includesReaderAccount })`
-  deletes the matched subscribers, leads and invites and, when asked, the
+  deletes the matched subscribers, leads and invites, clears the matched
+  unsent Studio re-invites and, when asked, the
   reader account through `deleteAccount`: its sessions (so it is signed out
   everywhere), linked sign-ins and bookmarks cascade. It returns how many of
   each it deleted and whether the account was refused. Audit events hold no

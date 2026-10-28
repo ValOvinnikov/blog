@@ -1,6 +1,10 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { isSignupBlocked } from '@blog/db/queries/blocked-signup-identities/is-signup-blocked';
+import {
+  getUnsentStudioReinviteEmail,
+  setUnsentStudioReinvite,
+} from '@blog/db/queries/tenants/unsent-studio-reinvite';
 import * as schema from '@blog/db/schema';
 import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import {
@@ -41,12 +45,18 @@ const MOCK_SESSION_EXPIRES = faker.date.future({
 
 const WITH_READER_ACCOUNT = { includesReaderAccount: true };
 const WITHOUT_READER_ACCOUNT = { includesReaderAccount: false };
-const SITE_RECORDS = { subscribers: 1, leads: 1, membershipInvites: 1 };
+const SITE_RECORDS = {
+  subscribers: 1,
+  leads: 1,
+  membershipInvites: 1,
+  unsentStudioReinvites: 0,
+};
 const ONE_OF_EACH = { ...SITE_RECORDS, readerAccounts: 1 };
 const NONE = {
   subscribers: 0,
   leads: 0,
   membershipInvites: 0,
+  unsentStudioReinvites: 0,
   readerAccounts: 0,
 };
 
@@ -85,6 +95,28 @@ describe(erasePersonalData, () => {
 
     expect(result).toEqual(erasure(MOCK_SUBSCRIBER_EMAIL, ONE_OF_EACH));
     expect(readerId).toBeUndefined();
+  });
+
+  it("clears an unsent Studio re-invite held for the mailbox, keeping another address's", async () => {
+    const { id: otherTenantId } = await insertTestTenant(db());
+    await setUnsentStudioReinvite(tenantId, MOCK_SUBSCRIBER_EMAIL);
+    await setUnsentStudioReinvite(otherTenantId, MOCK_INVITE_EMAIL);
+
+    const result = await erasePersonalData(
+      MOCK_SUBSCRIBER_EMAIL,
+      WITH_READER_ACCOUNT,
+    );
+
+    expect(result).toEqual(
+      erasure(MOCK_SUBSCRIBER_EMAIL, {
+        ...ONE_OF_EACH,
+        unsentStudioReinvites: 1,
+      }),
+    );
+    expect(await getUnsentStudioReinviteEmail(tenantId)).toBeNull();
+    expect(await getUnsentStudioReinviteEmail(otherTenantId)).toBe(
+      MOCK_INVITE_EMAIL,
+    );
   });
 
   it('revokes every session of the erased reader account', async () => {
