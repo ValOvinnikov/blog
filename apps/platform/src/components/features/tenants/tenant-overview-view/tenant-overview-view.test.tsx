@@ -242,7 +242,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(nameInput).not.toBeDisabled();
   });
 
-  it('locks the domain and points to the Domain page while the main address is the custom domain', async () => {
+  it('locks the domain field while the main address is the custom domain', async () => {
     await setup({ tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }) });
 
     const domainInput = screen.getByRole('textbox', {

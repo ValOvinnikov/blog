@@ -13,7 +13,7 @@ import {
 } from '@platform/constants/custom-domain';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { env } from '@platform/utils/env/env';
-import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
+import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { isReservedDomain } from '@platform/utils/is-reserved-domain/is-reserved-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -91,7 +91,7 @@ export const connectCustomDomainAction = async (
         (row) => row.domain,
       ),
     ];
-    if (hosts.some((host) => !isPlatformAddress(host, rootDomain))) {
+    if (hosts.some((host) => isCustomDomain(host, rootDomain))) {
       return refused(CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED);
     }
 

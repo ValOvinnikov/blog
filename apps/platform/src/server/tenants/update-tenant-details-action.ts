@@ -24,7 +24,7 @@ import {
   type TTenantDetailsFieldError,
 } from '@platform/server/tenants/tenant-field-error';
 import { env } from '@platform/utils/env/env';
-import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
+import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -99,7 +99,7 @@ export const updateTenantDetailsAction = async (
   }
   if (
     parsed.data.primaryDomain !== tenant.primaryDomain &&
-    !isPlatformAddress(tenant.primaryDomain, env.TENANT_ROOT_DOMAIN)
+    isCustomDomain(tenant.primaryDomain, env.TENANT_ROOT_DOMAIN)
   ) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
