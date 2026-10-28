@@ -4,6 +4,7 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { PrimaryNavigationSubLink } from '@blog/ui/components/molecules/primary-navigation/components/sub-link/primary-navigation-sub-link';
 import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
 import { splitSubItems } from '@blog/ui/components/molecules/primary-navigation/split-sub-items';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { useId } from 'react';
 
 import {
@@ -60,7 +61,7 @@ export const PrimaryNavigationSubmenu = ({
               linkAs={linkAs}
             />
           )}
-          {lead && rest.length > 0 && <hr className={separator()} />}
+          {lead && hasArrayGotItems(rest) && <hr className={separator()} />}
           <div className={slots.rest()}>
             {rest.map((subItem) => (
               <PrimaryNavigationSubLink

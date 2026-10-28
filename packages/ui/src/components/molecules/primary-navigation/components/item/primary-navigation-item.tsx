@@ -6,6 +6,7 @@ import {
   type TPrimaryNavigationSubmenuProps,
 } from '@blog/ui/components/molecules/primary-navigation/components/submenu/primary-navigation-submenu';
 import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 
 export type TPrimaryNavigationItemProps = {
   item: INavItem;
@@ -22,17 +23,14 @@ export const PrimaryNavigationItem = ({
 }: TPrimaryNavigationItemProps) => {
   const { href, label, isActive, target, subItems } = item;
 
-  if (subItems?.length && panel) {
-    return (
+  if (subItems && hasArrayGotItems(subItems)) {
+    return panel ? (
       <PrimaryNavigationPanelGroup
         item={item}
         groupName={panel.groupName}
         linkAs={linkAs}
       />
-    );
-  }
-  if (subItems?.length) {
-    return (
+    ) : (
       <PrimaryNavigationSubmenu
         item={item}
         submenuStyle={submenuStyle}
