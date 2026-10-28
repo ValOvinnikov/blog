@@ -28,6 +28,8 @@ const {
   getDomainVerificationStatusMock: vi.fn(),
 }));
 
+vi.mock('@platform/utils/env/env');
+
 vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
   requireTenantById: requireTenantByIdMock,
 }));

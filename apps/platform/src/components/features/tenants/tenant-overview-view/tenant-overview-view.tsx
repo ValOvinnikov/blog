@@ -13,6 +13,8 @@ import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { env } from '@platform/utils/env/env';
+import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { Suspense } from 'react';
 
@@ -47,7 +49,13 @@ export const TenantOverviewView = async ({
     <div className={root()}>
       <TenantPageHeader tenant={tenant} />
 
-      <TenantProvisioningSection tenant={clientTenant} owner={owner} />
+      <TenantProvisioningSection
+        tenant={clientTenant}
+        owner={owner}
+        isPrimaryCustom={
+          !isPlatformAddress(primaryDomain, env.TENANT_ROOT_DOMAIN)
+        }
+      />
 
       <FindingsCard tenantId={id} findings={findings} />
 

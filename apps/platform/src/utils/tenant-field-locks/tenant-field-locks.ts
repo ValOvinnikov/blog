@@ -25,6 +25,7 @@ export type TTenantFieldLockReason =
   | { kind: typeof TENANT_FIELD_LOCK_KIND.STEP; step: TTenantProvisioningStep }
   | { kind: typeof TENANT_FIELD_LOCK_KIND.RUNNING }
   | { kind: typeof TENANT_FIELD_LOCK_KIND.SUCCEEDED }
+  | { kind: typeof TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN }
   // Never returned by computeTenantFieldLocks; TenantDetailsPanel overlays it.
   | { kind: typeof TENANT_FIELD_LOCK_KIND.ARCHIVED };
 
@@ -40,7 +41,7 @@ export const lockAllFields = (
   ) as TTenantFieldLocks;
 };
 
-export const computeTenantFieldLocks = (
+const computeProvisioningFieldLocks = (
   steps: TMaybeNull<TTenantProvisioningState>,
   provisioningStatus: TMaybeNull<TTenantProvisioningStatus>,
   owner: TMaybeUndefined<TTenantOwnerMembership>,
@@ -75,4 +76,20 @@ export const computeTenantFieldLocks = (
   }
 
   return lockAllFields({ kind: TENANT_FIELD_LOCK_KIND.RUNNING });
+};
+
+export const computeTenantFieldLocks = (
+  steps: TMaybeNull<TTenantProvisioningState>,
+  provisioningStatus: TMaybeNull<TTenantProvisioningStatus>,
+  owner: TMaybeUndefined<TTenantOwnerMembership>,
+  isPrimaryCustom: boolean,
+): TTenantFieldLocks => {
+  const locks = computeProvisioningFieldLocks(steps, provisioningStatus, owner);
+
+  return isPrimaryCustom
+    ? {
+        ...locks,
+        primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN },
+      }
+    : locks;
 };

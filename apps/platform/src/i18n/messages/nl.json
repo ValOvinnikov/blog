@@ -513,7 +513,10 @@
         "noPendingClaim": "Er wacht geen domein op verificatie.",
         "recordNotFound": "We zien het TXT-record nog niet. DNS-wijzigingen kunnen enkele minuten duren.",
         "connectUnavailable": "We hebben je domein geverifieerd, maar konden het niet koppelen omdat onze installatiedienst niet beschikbaar is. Klik opnieuw op Controleren; je DNS-record staat er nog.",
-        "connectConflict": "We hebben je domein geverifieerd, maar konden het niet koppelen omdat de site of het domein nog niet klaar is. Klik opnieuw op Controleren; je DNS-record staat er nog."
+        "connectConflict": "We hebben je domein geverifieerd, maar konden het niet koppelen omdat de site of het domein nog niet klaar is. Klik opnieuw op Controleren; je DNS-record staat er nog.",
+        "notVerified": "Dit domein is nog niet geverifieerd. Probeer het opnieuw zodra het dat is.",
+        "addressNotFound": "Dit adres hoort niet bij deze site.",
+        "alreadyMainAddress": "Dit adres is al het hoofdadres."
       },
       "awaitingProof": "Bewijs vereist",
       "proofInstructions": "Voeg dit TXT-record toe bij je DNS-provider om te bewijzen dat het domein van jou is. We controleren het automatisch, of klik op Controleren.",
@@ -523,7 +526,25 @@
       "verify": "Controleren",
       "verifying": "Controleren…",
       "verifyFailed": "Het record kon niet worden gecontroleerd. Probeer het opnieuw.",
-      "removeClaimDescription": "{domain} wacht niet meer op verificatie. Je huidige adres blijft werken."
+      "removeClaimDescription": "{domain} wacht niet meer op verificatie. Je huidige adres blijft werken.",
+      "mainTitle": "Je eigen domein (hoofdadres)",
+      "mainAddress": {
+        "failed": "Het hoofdadres kon niet worden gewijzigd. Probeer het opnieuw.",
+        "makeMain": {
+          "trigger": "Gebruik als hoofdadres",
+          "title": "Dit domein als hoofdadres gebruiken?",
+          "description": "Je site is dan bekend onder {domain}. Je kunt op elk moment terug naar je subdomein.",
+          "confirm": "Gebruik als hoofdadres",
+          "confirming": "Wijzigen…"
+        },
+        "useSubdomain": {
+          "trigger": "Gebruik mijn subdomein als hoofdadres",
+          "title": "Je subdomein als hoofdadres gebruiken?",
+          "description": "Je site is dan weer bekend onder je subdomein. {domain} blijft gekoppeld.",
+          "confirm": "Gebruik subdomein",
+          "confirming": "Wijzigen…"
+        }
+      }
     }
   },
   "presetPicker": {
@@ -1147,7 +1168,8 @@
       "ownerAlreadyJoined": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
       "ownerHasFreeTenant": "Deze eigenaar heeft al een gratis site. Archiveer die of laat deze site op het huidige abonnement.",
       "saveFailed": "De tenantgegevens konden niet worden opgeslagen — probeer het opnieuw."
-    }
+    },
+    "fieldLockedReasonCustomMainDomain": "Vergrendeld — het hoofdadres is het eigen domein. Ga op de Domein-pagina terug naar het subdomein om te bewerken."
   },
   "tenantFieldErrors": {
     "nameRequired": "Vul een tenantnaam in.",
@@ -1160,7 +1182,8 @@
     "emailInvalid": "Vul een geldig e-mailadres in.",
     "planUnsupported": "Kies een ondersteund abonnement.",
     "localeUnsupported": "Kies een ondersteunde taal.",
-    "ownerEmailTaken": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant."
+    "ownerEmailTaken": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant.",
+    "domainCustomMain": "Het hoofdadres van deze site is het eigen domein. Ga eerst op de Domein-pagina terug naar het subdomein."
   },
   "archivedTenantNotice": {
     "title": "Deze tenant is gearchiveerd",

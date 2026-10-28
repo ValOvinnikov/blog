@@ -211,18 +211,25 @@ describe(`<${DomainPageContent.name}/>`, () => {
       expect(input).toBeVisible();
     });
 
-    it('shows a custom main address once, read-only, without a form', async () => {
+    it('shows a custom main address once, with the way back and without a form', async () => {
       await setup({
         tenant: growthTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
         membership: mockMembership(),
       });
 
-      await screen.findByRole('heading', OWN_DOMAIN_TITLE);
+      await screen.findByRole('heading', {
+        level: 2,
+        name: ownDomain.mainTitle,
+      });
       const remove = screen.queryByRole('button', { name: ownDomain.remove });
       const input = screen.queryByRole('textbox');
+      const switchBack = screen.getByRole('button', {
+        name: ownDomain.mainAddress.useSubdomain.trigger,
+      });
 
       expect(remove).not.toBeInTheDocument();
       expect(input).not.toBeInTheDocument();
+      expect(switchBack).toBeVisible();
       expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
         MOCK_CUSTOM_DOMAIN,
       );

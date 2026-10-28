@@ -513,7 +513,10 @@
         "noPendingClaim": "Aucun domaine n'est en attente de vérification.",
         "recordNotFound": "Nous ne voyons pas encore l'enregistrement TXT. Les modifications DNS peuvent prendre quelques minutes.",
         "connectUnavailable": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car notre service de configuration est indisponible. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place.",
-        "connectConflict": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car le site ou le domaine n'est pas encore prêt. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place."
+        "connectConflict": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car le site ou le domaine n'est pas encore prêt. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place.",
+        "notVerified": "Ce domaine n'est pas encore vérifié. Réessayez une fois qu'il l'est.",
+        "addressNotFound": "Cette adresse ne fait pas partie des adresses de ce site.",
+        "alreadyMainAddress": "Cette adresse est déjà l'adresse principale."
       },
       "awaitingProof": "Preuve en attente",
       "proofInstructions": "Ajoutez cet enregistrement TXT chez votre fournisseur DNS pour prouver que le domaine vous appartient. Nous le vérifions automatiquement, ou cliquez sur Vérifier.",
@@ -523,7 +526,25 @@
       "verify": "Vérifier",
       "verifying": "Vérification…",
       "verifyFailed": "Impossible de vérifier l'enregistrement. Réessayez.",
-      "removeClaimDescription": "{domain} n'attendra plus de vérification. Votre adresse actuelle continue de fonctionner."
+      "removeClaimDescription": "{domain} n'attendra plus de vérification. Votre adresse actuelle continue de fonctionner.",
+      "mainTitle": "Votre propre domaine (adresse principale)",
+      "mainAddress": {
+        "failed": "Impossible de changer l'adresse principale. Réessayez.",
+        "makeMain": {
+          "trigger": "Utiliser comme adresse principale",
+          "title": "Utiliser ce domaine comme adresse principale ?",
+          "description": "Votre site sera connu sous {domain}. Vous pouvez revenir à votre sous-domaine à tout moment.",
+          "confirm": "Utiliser comme adresse principale",
+          "confirming": "Changement…"
+        },
+        "useSubdomain": {
+          "trigger": "Utiliser mon sous-domaine comme adresse principale",
+          "title": "Utiliser votre sous-domaine comme adresse principale ?",
+          "description": "Votre site sera de nouveau connu sous votre sous-domaine. {domain} reste connecté.",
+          "confirm": "Utiliser le sous-domaine",
+          "confirming": "Changement…"
+        }
+      }
     }
   },
   "presetPicker": {
@@ -1147,7 +1168,8 @@
       "ownerAlreadyJoined": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
       "ownerHasFreeTenant": "Ce propriétaire a déjà un site gratuit. Archivez-le ou laissez ce site sur son offre actuelle.",
       "saveFailed": "Impossible d'enregistrer les informations du locataire — veuillez réessayer."
-    }
+    },
+    "fieldLockedReasonCustomMainDomain": "Verrouillé — l'adresse principale est le domaine propre du site. Pour la modifier, revenez au sous-domaine depuis la page Domaine."
   },
   "tenantFieldErrors": {
     "nameRequired": "Saisissez un nom de locataire.",
@@ -1160,7 +1182,8 @@
     "emailInvalid": "Saisissez une adresse e-mail valide.",
     "planUnsupported": "Choisissez une formule prise en charge.",
     "localeUnsupported": "Choisissez une langue prise en charge.",
-    "ownerEmailTaken": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire."
+    "ownerEmailTaken": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire.",
+    "domainCustomMain": "L'adresse principale de ce site est son propre domaine. Revenez d'abord au sous-domaine depuis sa page Domaine."
   },
   "archivedTenantNotice": {
     "title": "Ce locataire est archivé",

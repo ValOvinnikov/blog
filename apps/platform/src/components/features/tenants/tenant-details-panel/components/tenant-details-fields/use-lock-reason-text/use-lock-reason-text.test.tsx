@@ -34,6 +34,10 @@ const LOCK_REASON_CASES: {
     text: tenantDetailsPanel.fieldLockedReasonSucceeded,
   },
   {
+    reason: { kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN },
+    text: tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
+  },
+  {
     reason: { kind: TENANT_FIELD_LOCK_KIND.ARCHIVED },
     text: tenantDetailsPanel.fieldLockedReasonArchived,
   },

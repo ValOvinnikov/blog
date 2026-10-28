@@ -513,7 +513,10 @@
         "noPendingClaim": "No hay ningún dominio pendiente de verificación.",
         "recordNotFound": "Todavía no vemos el registro TXT. Los cambios de DNS pueden tardar unos minutos.",
         "connectUnavailable": "Verificamos tu dominio, pero no pudimos conectarlo porque nuestro servicio de configuración no está disponible. Pulsa Verificar para reintentarlo; tu registro DNS sigue en su sitio.",
-        "connectConflict": "Verificamos tu dominio, pero no pudimos conectarlo porque el sitio o el dominio aún no está listo. Pulsa Verificar para reintentarlo; tu registro DNS sigue en su sitio."
+        "connectConflict": "Verificamos tu dominio, pero no pudimos conectarlo porque el sitio o el dominio aún no está listo. Pulsa Verificar para reintentarlo; tu registro DNS sigue en su sitio.",
+        "notVerified": "Este dominio aún no está verificado. Inténtalo de nuevo cuando lo esté.",
+        "addressNotFound": "Esa dirección no es una de las direcciones de este sitio.",
+        "alreadyMainAddress": "Esta dirección ya es la dirección principal."
       },
       "awaitingProof": "Pendiente de prueba",
       "proofInstructions": "Añade este registro TXT en tu proveedor de DNS para demostrar que el dominio es tuyo. Lo comprobamos automáticamente, o pulsa Verificar.",
@@ -523,7 +526,25 @@
       "verify": "Verificar",
       "verifying": "Verificando…",
       "verifyFailed": "No se pudo comprobar el registro. Inténtalo de nuevo.",
-      "removeClaimDescription": "{domain} dejará de esperar la verificación. Tu dirección actual sigue funcionando."
+      "removeClaimDescription": "{domain} dejará de esperar la verificación. Tu dirección actual sigue funcionando.",
+      "mainTitle": "Tu propio dominio (dirección principal)",
+      "mainAddress": {
+        "failed": "No se pudo cambiar la dirección principal. Inténtalo de nuevo.",
+        "makeMain": {
+          "trigger": "Usar como dirección principal",
+          "title": "¿Usar este dominio como dirección principal?",
+          "description": "Tu sitio se conocerá como {domain}. Puedes volver a tu subdominio cuando quieras.",
+          "confirm": "Usar como dirección principal",
+          "confirming": "Cambiando…"
+        },
+        "useSubdomain": {
+          "trigger": "Usar mi subdominio como dirección principal",
+          "title": "¿Usar tu subdominio como dirección principal?",
+          "description": "Tu sitio volverá a conocerse por tu subdominio. {domain} sigue conectado.",
+          "confirm": "Usar subdominio",
+          "confirming": "Cambiando…"
+        }
+      }
     }
   },
   "presetPicker": {
@@ -1147,7 +1168,8 @@
       "ownerAlreadyJoined": "El propietario de este cliente ya ha iniciado sesión, por lo que su correo ya no se puede corregir aquí: eso transferiría la propiedad.",
       "ownerHasFreeTenant": "Este propietario ya tiene un sitio gratuito. Archívelo o mantenga este sitio en su plan actual.",
       "saveFailed": "No se pudieron guardar los datos del cliente. Vuelva a intentarlo."
-    }
+    },
+    "fieldLockedReasonCustomMainDomain": "Bloqueado — la dirección principal es su propio dominio. Para editarla, vuelve al subdominio en la página Dominio."
   },
   "tenantFieldErrors": {
     "nameRequired": "Introduzca un nombre de cliente.",
@@ -1160,7 +1182,8 @@
     "emailInvalid": "Introduzca un correo electrónico válido.",
     "planUnsupported": "Elija un plan compatible.",
     "localeUnsupported": "Elija un idioma compatible.",
-    "ownerEmailTaken": "Este correo electrónico ya tiene una invitación pendiente en este cliente."
+    "ownerEmailTaken": "Este correo electrónico ya tiene una invitación pendiente en este cliente.",
+    "domainCustomMain": "La dirección principal de este sitio es su propio dominio. Vuelve primero al subdominio en su página Dominio."
   },
   "archivedTenantNotice": {
     "title": "Este cliente está archivado",

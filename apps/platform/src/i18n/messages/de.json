@@ -513,7 +513,10 @@
         "noPendingClaim": "Es wartet keine Domain auf die Bestätigung.",
         "recordNotFound": "Der TXT-Eintrag ist noch nicht sichtbar. DNS-Änderungen können einige Minuten dauern.",
         "connectUnavailable": "Wir haben Ihre Domain verifiziert, konnten sie aber nicht verbinden, weil unser Einrichtungsdienst nicht erreichbar ist. Klicken Sie erneut auf Prüfen; Ihr DNS-Eintrag bleibt bestehen.",
-        "connectConflict": "Wir haben Ihre Domain verifiziert, konnten sie aber nicht verbinden, weil die Website oder Domain noch nicht bereit ist. Klicken Sie erneut auf Prüfen; Ihr DNS-Eintrag bleibt bestehen."
+        "connectConflict": "Wir haben Ihre Domain verifiziert, konnten sie aber nicht verbinden, weil die Website oder Domain noch nicht bereit ist. Klicken Sie erneut auf Prüfen; Ihr DNS-Eintrag bleibt bestehen.",
+        "notVerified": "Diese Domain ist noch nicht verifiziert. Versuche es erneut, sobald sie es ist.",
+        "addressNotFound": "Diese Adresse gehört nicht zu dieser Website.",
+        "alreadyMainAddress": "Diese Adresse ist bereits die Hauptadresse."
       },
       "awaitingProof": "Nachweis ausstehend",
       "proofInstructions": "Lege diesen TXT-Eintrag bei deinem DNS-Anbieter an, um zu belegen, dass dir die Domain gehört. Wir prüfen ihn automatisch, oder du klickst auf Prüfen.",
@@ -523,7 +526,25 @@
       "verify": "Prüfen",
       "verifying": "Wird geprüft…",
       "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
-      "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter."
+      "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter.",
+      "mainTitle": "Eigene Domain (Hauptadresse)",
+      "mainAddress": {
+        "failed": "Die Hauptadresse konnte nicht gewechselt werden. Versuche es erneut.",
+        "makeMain": {
+          "trigger": "Als Hauptadresse verwenden",
+          "title": "Diese Domain als Hauptadresse verwenden?",
+          "description": "Deine Website ist dann unter {domain} erreichbar. Du kannst jederzeit zur Subdomain zurückwechseln.",
+          "confirm": "Als Hauptadresse verwenden",
+          "confirming": "Wechseln …"
+        },
+        "useSubdomain": {
+          "trigger": "Meine Subdomain als Hauptadresse verwenden",
+          "title": "Deine Subdomain als Hauptadresse verwenden?",
+          "description": "Deine Website ist dann wieder unter deiner Subdomain erreichbar. {domain} bleibt verbunden.",
+          "confirm": "Subdomain verwenden",
+          "confirming": "Wechseln …"
+        }
+      }
     }
   },
   "presetPicker": {
@@ -1147,7 +1168,8 @@
       "ownerAlreadyJoined": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
       "ownerHasFreeTenant": "Dieser Inhaber hat bereits eine kostenlose Website. Archivieren Sie sie oder belassen Sie diese Website in ihrem aktuellen Tarif.",
       "saveFailed": "Die Mandantendaten konnten nicht gespeichert werden — bitte erneut versuchen."
-    }
+    },
+    "fieldLockedReasonCustomMainDomain": "Gesperrt — die Hauptadresse ist die eigene Domain. Wechsle zum Bearbeiten auf der Domain-Seite zurück zur Subdomain."
   },
   "tenantFieldErrors": {
     "nameRequired": "Geben Sie einen Mandantennamen ein.",
@@ -1160,7 +1182,8 @@
     "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
     "planUnsupported": "Wählen Sie einen unterstützten Tarif.",
     "localeUnsupported": "Wählen Sie eine unterstützte Sprache.",
-    "ownerEmailTaken": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung."
+    "ownerEmailTaken": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung.",
+    "domainCustomMain": "Die Hauptadresse dieser Website ist ihre eigene Domain. Wechsle zuerst auf ihrer Domain-Seite zurück zur Subdomain."
   },
   "archivedTenantNotice": {
     "title": "Dieser Mandant ist archiviert",
