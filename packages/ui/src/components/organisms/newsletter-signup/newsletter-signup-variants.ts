@@ -19,7 +19,6 @@ export const newsletterSignupVariants = tv({
     form: ['flex flex-col gap-3'],
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
-    spinner: ['text-brand-primary-contrast'],
     label: ['font-mono text-copy text-text'],
     alert: [],
     errorAlert: [],

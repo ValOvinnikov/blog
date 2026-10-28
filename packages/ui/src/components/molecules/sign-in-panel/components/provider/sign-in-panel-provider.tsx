@@ -1,6 +1,6 @@
 import { SIZE, type TIconName } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { Spinner } from '@blog/ui/components/atoms/spinner';
+import { Spinner, type TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 
 import { signInPanelProviderVariants } from './sign-in-panel-provider-variants';
 
@@ -16,6 +16,7 @@ type TSignInPanelProviderProps = {
   provider: ISignInPanelProvider;
   isPending: boolean;
   isWaiting: boolean;
+  spinnerVariant?: TSpinnerProps['variant'];
 };
 
 /** One "continue with" row of the sign-in panel, which names where it is taking the reader once pressed. */
@@ -23,6 +24,7 @@ export const SignInPanelProvider = ({
   provider,
   isPending,
   isWaiting,
+  spinnerVariant,
 }: TSignInPanelProviderProps) => {
   const { icon, label, pendingLabel, onSelect } = provider;
   const s = signInPanelProviderVariants({ isPending, isWaiting });
@@ -39,6 +41,7 @@ export const SignInPanelProvider = ({
       {isPending ? (
         <Spinner
           label={pendingLabel}
+          variant={spinnerVariant}
           size={SIZE.SM}
           aria-hidden="true"
           className={s.spinner()}
