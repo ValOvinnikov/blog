@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { headingVariants, type THeadingVariants } from './heading-variants';
 
@@ -16,6 +16,8 @@ export type THeadingProps = {
   size: NonNullable<THeadingVariants['size']>;
   children: ReactNode;
   className?: string;
+  ref?: Ref<HTMLHeadingElement>;
+  tabIndex?: number;
 };
 
 export const Heading = ({
@@ -23,11 +25,17 @@ export const Heading = ({
   size,
   children,
   className,
+  ref,
+  tabIndex,
 }: THeadingProps) => {
   const Tag = HEADING_TAGS[level];
 
   return (
-    <Tag className={headingVariants({ size, class: className })}>
+    <Tag
+      ref={ref}
+      tabIndex={tabIndex}
+      className={headingVariants({ size, class: className })}
+    >
       {children}
     </Tag>
   );

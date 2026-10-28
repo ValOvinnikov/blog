@@ -12,6 +12,7 @@ const ENQUEUE_TIMEOUT_MS = 10_000;
 type TWorkerRequestBody = {
   tenantId: string;
   formerOwnerEmail?: string;
+  domain?: string;
 };
 
 /** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */

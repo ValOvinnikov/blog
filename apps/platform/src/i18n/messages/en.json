@@ -453,6 +453,39 @@
       "PENDING": "Awaiting DNS",
       "VERIFIED": "Verified",
       "ERROR": "Couldn't check"
+    },
+    "ownDomain": {
+      "title": "Use my own domain",
+      "supportingText": "Serve your site from an address you own. Your current address keeps working.",
+      "upgradePrompt": "Using your own domain comes with the Growth plan.",
+      "ownerOnly": "Only the site owner can connect a domain.",
+      "archivedState": "This site is archived, so its domain can't be changed.",
+      "domainLabel": "Domain",
+      "domainHint": "A full domain you own, like blog.example.com.",
+      "domainPlaceholder": "blog.example.com",
+      "connect": "Connect domain",
+      "connecting": "Connecting…",
+      "remove": "Remove",
+      "removeTitle": "Remove this domain?",
+      "removeDescription": "{domain} will stop serving your site. Your current address keeps working.",
+      "removeConfirm": "Remove domain",
+      "removing": "Removing…",
+      "connectFailed": "Couldn't connect the domain. Try again.",
+      "removeFailed": "Couldn't remove the domain. Try again.",
+      "invalidInput": "Enter a full domain, like blog.example.com.",
+      "fieldError": {
+        "domainInvalid": "Enter a full domain, like blog.example.com.",
+        "domainPlatformAddress": "This address belongs to the platform. Enter a domain you own.",
+        "domainTaken": "This domain is already in use."
+      },
+      "refusal": {
+        "notFound": "This site couldn't be found.",
+        "archived": "This site is archived, so its domain can't be changed.",
+        "notOnPlan": "Using your own domain comes with the Growth plan.",
+        "notProvisioned": "This site isn't set up yet. Try again once setup finishes.",
+        "alreadyConnected": "This site already has its own domain.",
+        "notCustomDomain": "This domain can't be removed."
+      }
     }
   },
   "presetPicker": {

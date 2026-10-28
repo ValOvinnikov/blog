@@ -301,6 +301,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CREATE_SITE_GATE_LOG**: `ALERT_FAILED`=`"create_site_gate.alert_failed"`, `ALERT_NO_RECIPIENTS`=`"create_site_gate.alert_no_recipients"`, `ALERT_SEND_FAILED`=`"create_site_gate.alert_send_failed"`, `BLOCKED`=`"create_site_gate.blocked"`, `BLOCK_CHECK_FAILED`=`"create_site_gate.block_check_failed"`, `GLOBAL_LIMITED`=`"create_site_gate.global_limited"`, `IP_LIMITED`=`"create_site_gate.ip_limited"`
 
+### `@platform/constants/custom-domain` — `apps/platform/src/constants/custom-domain.ts`
+
+- **CUSTOM_DOMAIN_FIELD_ERROR**: `DOMAIN_PLATFORM_ADDRESS`
+- **CUSTOM_DOMAIN_REFUSAL**: `NOT_ON_PLAN`, `NOT_PROVISIONED`, `ALREADY_CONNECTED`, `NOT_CUSTOM_DOMAIN`
+- **CUSTOM_DOMAIN_PATH**: `CONNECT`=`"/api/custom-domain/connect"`, `DISCONNECT`=`"/api/custom-domain/disconnect"`
+- **CUSTOM_DOMAIN_LOG**: `CONNECT_AUDIT_FAILED`=`"custom_domain.connect_audit_failed"`, `CONNECT_ENQUEUE_REJECTED`=`"custom_domain.connect_enqueue_rejected"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `CONNECT_ROLLBACK_FAILED`=`"custom_domain.connect_rollback_failed"`, `ROOT_DOMAIN_MISSING`=`"custom_domain.root_domain_missing"`, `APP_URL_MISSING`=`"custom_domain.app_url_missing"`, `DISCONNECT_AUDIT_FAILED`=`"custom_domain.disconnect_audit_failed"`, `DISCONNECT_REJECTED_RESTORING`=`"custom_domain.disconnect_rejected_restoring"`, `DISCONNECT_RESTORE_FAILED`=`"custom_domain.disconnect_restore_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
 - **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
