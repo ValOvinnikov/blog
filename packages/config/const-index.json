@@ -1052,6 +1052,14 @@
         "file": "packages/config/src/constants/error.ts"
       }
     ],
+    "DB_DOMAIN_CLAIM_EXISTS": [
+      {
+        "ref": "ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/error.ts"
+      }
+    ],
     "DOCUMENT_VALIDATION": [
       {
         "ref": "FINDING_SOURCE.DOCUMENT_VALIDATION",
@@ -3900,6 +3908,46 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
+    "CLAIM_PENDING": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.CLAIM_PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "NO_PENDING_CLAIM": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "RECORD_NOT_FOUND": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.RECORD_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "CONNECT_UNAVAILABLE": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "CONNECT_CONFLICT": [
+      {
+        "ref": "CUSTOM_DOMAIN_REFUSAL.CONNECT_CONFLICT",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "/api/custom-domain/connect": [
       {
         "ref": "CUSTOM_DOMAIN_PATH.CONNECT",
@@ -3916,17 +3964,17 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
-    "custom_domain.connect_audit_failed": [
+    "custom_domain.connect_enqueue_rejected": [
       {
-        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED",
+        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
-    "custom_domain.connect_enqueue_rejected": [
+    "custom_domain.claim_restore_failed": [
       {
-        "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED",
+        "ref": "CUSTOM_DOMAIN_LOG.CLAIM_RESTORE_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
@@ -3949,6 +3997,30 @@
     "custom_domain.connect_rollback_failed": [
       {
         "ref": "CUSTOM_DOMAIN_LOG.CONNECT_ROLLBACK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.verify_audit_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.VERIFY_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.verify_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.VERIFY_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom_domain.verify_lookup_failed": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.VERIFY_LOOKUP_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
@@ -5804,6 +5876,30 @@
         "file": "apps/web/src/constants/header-style.ts"
       }
     ],
+    "module_renderer.unknown_module_type": [
+      {
+        "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",
+        "scope": "app:web",
+        "from": "@web/constants/module-renderer",
+        "file": "apps/web/src/constants/module-renderer.ts"
+      }
+    ],
+    "hero_slot.unknown_hero_type": [
+      {
+        "ref": "MODULE_RENDERER_LOG.UNKNOWN_HERO_TYPE",
+        "scope": "app:web",
+        "from": "@web/constants/module-renderer",
+        "file": "apps/web/src/constants/module-renderer.ts"
+      }
+    ],
+    "module_renderer.plan_fetch_failed": [
+      {
+        "ref": "MODULE_RENDERER_LOG.PLAN_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/module-renderer",
+        "file": "apps/web/src/constants/module-renderer.ts"
+      }
+    ],
     "navigation.layout_fetch_failed": [
       {
         "ref": "NAVIGATION_LOG.LAYOUT_FETCH_FAILED",
@@ -6350,6 +6446,54 @@
     ]
   },
   "numbers": {
+    "0": [
+      {
+        "ref": "DNS_RCODE.NO_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "2": [
+      {
+        "ref": "DNS_RCODE.SERVFAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "3": [
+      {
+        "ref": "DNS_RCODE.NXDOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "5": [
+      {
+        "ref": "DNS_TYPE.CNAME",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "16": [
+      {
+        "ref": "DNS_TYPE.TXT",
+        "scope": "app:platform",
+        "from": "@platform/constants/dns",
+        "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "40": [
+      {
+        "ref": "CUSTOM_DOMAIN_VERIFY_POLL.maxTicks",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "200": [
       {
         "ref": "HTTP_STATUS.OK",
@@ -6476,6 +6620,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "15000": [
+      {
+        "ref": "CUSTOM_DOMAIN_VERIFY_POLL.intervalMs",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ]
   }

@@ -1,4 +1,5 @@
 import {
+  BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -8,6 +9,7 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
+  SPINNER_STYLE,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
@@ -70,6 +72,21 @@ describe(applyPresetDefaults, () => {
       headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
       headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
       headerBarStyle: HEADER_BAR_STYLE.FLOATING,
+    });
+  });
+
+  it('keeps the busy button style and spinner', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
+      spinnerStyle: SPINNER_STYLE.PULSE,
+    };
+
+    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
+
+    expect(next).toMatchObject({
+      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
+      spinnerStyle: SPINNER_STYLE.PULSE,
     });
   });
 

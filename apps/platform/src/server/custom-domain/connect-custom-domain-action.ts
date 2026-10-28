@@ -1,12 +1,6 @@
 'use server';
 
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  type TActionResult,
-} from '@blog/config';
+import { ACTION_OUTCOME, ERROR_CODE, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -17,9 +11,7 @@ import {
   type TCustomDomainFieldError,
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
-import { enqueueCustomDomainConnectOrUndo } from '@platform/server/custom-domain/enqueue-custom-domain-connect-or-undo';
 import { env } from '@platform/utils/env/env';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import { isReservedDomain } from '@platform/utils/is-reserved-domain/is-reserved-domain';
@@ -103,30 +95,25 @@ export const connectCustomDomainAction = async (
       return refused(CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED);
     }
 
-    const added = await queries.tenantDomains.addTenantDomain(id, domain);
-    if (!added.ok) {
-      if (added.error === ERROR_CODE.DB_DUPLICATE_DOMAIN) {
-        return fieldError(CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN);
+    const claimed = await queries.customDomainClaims.createCustomDomainClaim(
+      id,
+      domain,
+    );
+    if (!claimed.ok) {
+      if (claimed.error === ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS) {
+        return refused(CUSTOM_DOMAIN_REFUSAL.CLAIM_PENDING);
+      }
+      if (claimed.error === ERROR_CODE.DB_INVALID_DOMAIN) {
+        return fieldError(CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_INVALID);
       }
       logger.error(CUSTOM_DOMAIN_LOG.CONNECT_FAILED, {
         tenantId: id,
         domain,
-        error: added.error,
+        error: claimed.error,
       });
       return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
-    if (!(await enqueueCustomDomainConnectOrUndo(id, domain))) {
-      return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-    }
-
-    await recordAuditEvent({
-      logEvent: CUSTOM_DOMAIN_LOG.CONNECT_AUDIT_FAILED,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: id,
-      details: { customDomainConnectRequested: domain },
-    });
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error(CUSTOM_DOMAIN_LOG.CONNECT_FAILED, {

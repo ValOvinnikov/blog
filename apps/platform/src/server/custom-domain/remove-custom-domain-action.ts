@@ -54,6 +54,14 @@ export const removeCustomDomainAction = async (
   if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
 
   try {
+    const claim = await queries.customDomainClaims.getCustomDomainClaim(id);
+    if (claim?.domain === domain) {
+      if (!(await queries.customDomainClaims.deleteCustomDomainClaim(id))) {
+        return refused(CUSTOM_DOMAIN_REFUSAL.NO_PENDING_CLAIM);
+      }
+      return toOutcome(ACTION_OUTCOME.SUCCESS);
+    }
+
     const customDomain = findCustomDomain(
       await queries.tenantDomains.listTenantDomains(id),
       primaryDomain,

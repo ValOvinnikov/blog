@@ -1,7 +1,9 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
+import { CustomDomainClaimCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-card/custom-domain-claim-card';
 import { CustomDomainFocusProvider } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/custom-domain-focus-provider';
 import { CustomDomainNoticeCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-notice-card/custom-domain-notice-card';
 import { CustomDomainStatusRefresher } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-status-refresher/custom-domain-status-refresher';
@@ -18,6 +20,7 @@ import { Suspense } from 'react';
 export type TCustomDomainCardProps = {
   tenant: Pick<TTenant, 'id' | 'plan' | 'deprovisionedAt' | 'primaryDomain'>;
   customDomain: TMaybeUndefined<string>;
+  claim: TMaybeUndefined<Pick<TCustomDomainClaim, 'domain' | 'token'>>;
   isPrimaryCustom: boolean;
   primaryProjectDomain: Promise<TProjectDomain>;
   canManage: boolean;
@@ -26,6 +29,7 @@ export type TCustomDomainCardProps = {
 export const CustomDomainCard = ({
   tenant,
   customDomain,
+  claim,
   isPrimaryCustom,
   primaryProjectDomain,
   canManage,
@@ -42,7 +46,7 @@ export const CustomDomainCard = ({
       : primaryProjectDomain,
   };
   const canRemove = canManage && !isArchived && Boolean(customDomain);
-  const canConnect = !shown && canManage && !isArchived && isGrowth;
+  const canConnect = !shown && !claim && canManage && !isArchived && isGrowth;
   let noticeKey: 'archivedState' | 'ownerOnly' | 'upgradePrompt' =
     'upgradePrompt';
   if (isGrowth) noticeKey = 'ownerOnly';
@@ -74,8 +78,16 @@ export const CustomDomainCard = ({
           )}
         </Suspense>
       )}
+      {!shown && claim && (
+        <CustomDomainClaimCard
+          tenantId={id}
+          domain={claim.domain}
+          token={claim.token}
+          canManage={canManage && !isArchived}
+        />
+      )}
       {canConnect && <ConnectCustomDomainForm tenantId={id} />}
-      {!shown && !canConnect && (
+      {!shown && !claim && !canConnect && (
         <CustomDomainNoticeCard noticeKey={noticeKey} />
       )}
     </CustomDomainFocusProvider>

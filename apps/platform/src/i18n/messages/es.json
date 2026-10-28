@@ -508,8 +508,22 @@
         "notOnPlan": "Usar tu propio dominio viene con el plan Growth.",
         "notProvisioned": "Este sitio aún no está configurado. Inténtalo de nuevo cuando termine la configuración.",
         "alreadyConnected": "Este sitio ya tiene su propio dominio.",
-        "notCustomDomain": "Este dominio no se puede quitar."
-      }
+        "notCustomDomain": "Este dominio no se puede quitar.",
+        "claimPending": "Este sitio ya tiene un dominio pendiente de verificación.",
+        "noPendingClaim": "No hay ningún dominio pendiente de verificación.",
+        "recordNotFound": "Todavía no vemos el registro TXT. Los cambios de DNS pueden tardar unos minutos.",
+        "connectUnavailable": "Verificamos tu dominio, pero no pudimos conectarlo porque nuestro servicio de configuración no está disponible. Pulsa Verificar para reintentarlo; tu registro DNS sigue en su sitio.",
+        "connectConflict": "Verificamos tu dominio, pero no pudimos conectarlo porque el sitio o el dominio aún no está listo. Pulsa Verificar para reintentarlo; tu registro DNS sigue en su sitio."
+      },
+      "awaitingProof": "Pendiente de prueba",
+      "proofInstructions": "Añade este registro TXT en tu proveedor de DNS para demostrar que el dominio es tuyo. Lo comprobamos automáticamente, o pulsa Verificar.",
+      "recordTypeLabel": "Tipo",
+      "recordNameLabel": "Nombre",
+      "recordValueLabel": "Valor",
+      "verify": "Verificar",
+      "verifying": "Verificando…",
+      "verifyFailed": "No se pudo comprobar el registro. Inténtalo de nuevo.",
+      "removeClaimDescription": "{domain} dejará de esperar la verificación. Tu dirección actual sigue funcionando."
     }
   },
   "presetPicker": {
@@ -619,6 +633,24 @@
       "FULL_WIDTH": "Ancho completo",
       "FLOATING": "Flotante"
     },
+    "buttonsHeading": "Botones",
+    "buttonsDescription": "Cómo se ven los botones mientras trabajan y el indicador de carga que muestran.",
+    "busyButtonStyleLabel": "Mientras trabaja",
+    "busyButtonStyleDescription": "Qué muestra un botón mientras guarda o envía. Conserva su sitio y su color completo.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Texto de espera",
+      "KEPT": "Texto conservado",
+      "EDGE": "Borde de progreso"
+    },
+    "spinnerStyleLabel": "Indicador de carga",
+    "spinnerStyleDescription": "El indicador de los botones y de los estados de carga de su sitio.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Seguir el preset",
+      "BRAILLE": "Braille",
+      "RING": "Anillo",
+      "DOTS": "Puntos",
+      "PULSE": "Pulso"
+    },
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
@@ -635,6 +667,8 @@
     "subscribeButton": "Suscribirse",
     "readMoreButton": "Leer más",
     "readTimeChip": "4 min de lectura",
+    "busyButtonIdle": "Enviar mensaje",
+    "busyButtonLabel": "Enviando…",
     "firstCardTitle": "Notas desde el puerto",
     "firstCardExcerpt": "Una tarjeta enlazada, tal como la muestran las listas de entradas.",
     "secondCardTitle": "Rumbo a la próxima temporada",

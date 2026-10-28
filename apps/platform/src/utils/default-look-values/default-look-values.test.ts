@@ -72,6 +72,8 @@ describe(defaultLookFormValues, () => {
       headerLayout,
       headerSubmenuStyle,
       headerBarStyle,
+      busyButtonStyle,
+      spinnerStyle,
     } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
     const values = defaultLookFormValues();
@@ -89,6 +91,8 @@ describe(defaultLookFormValues, () => {
       headerLayout,
       headerSubmenuStyle,
       headerBarStyle,
+      busyButtonStyle,
+      spinnerStyle,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logo: { url: undefined },
       favicon: { url: undefined },
@@ -114,6 +118,8 @@ describe(toLookFormValues, () => {
       headerLayout: MOCK_SITE_CONFIG.headerLayout,
       headerSubmenuStyle: MOCK_SITE_CONFIG.headerSubmenuStyle,
       headerBarStyle: MOCK_SITE_CONFIG.headerBarStyle,
+      busyButtonStyle: MOCK_SITE_CONFIG.busyButtonStyle,
+      spinnerStyle: MOCK_SITE_CONFIG.spinnerStyle,
       logo: { url: MOCK_LOGO_URL },
       favicon: { url: MOCK_FAVICON_URL },
     });

@@ -470,6 +470,13 @@
       "when": 1793197733886,
       "tag": "0066_needy_the_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1793206792873,
+      "tag": "0067_windy_red_hulk",
+      "breakpoints": true
     }
   ]
 }

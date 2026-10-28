@@ -508,8 +508,22 @@
         "notOnPlan": "Utiliser votre propre domaine est inclus dans l’offre Growth.",
         "notProvisioned": "Ce site n’est pas encore configuré. Réessayez une fois la configuration terminée.",
         "alreadyConnected": "Ce site a déjà son propre domaine.",
-        "notCustomDomain": "Ce domaine ne peut pas être retiré."
-      }
+        "notCustomDomain": "Ce domaine ne peut pas être retiré.",
+        "claimPending": "Ce site a déjà un domaine en attente de vérification.",
+        "noPendingClaim": "Aucun domaine n'est en attente de vérification.",
+        "recordNotFound": "Nous ne voyons pas encore l'enregistrement TXT. Les modifications DNS peuvent prendre quelques minutes.",
+        "connectUnavailable": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car notre service de configuration est indisponible. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place.",
+        "connectConflict": "Nous avons vérifié votre domaine, mais nous n'avons pas pu le connecter, car le site ou le domaine n'est pas encore prêt. Cliquez à nouveau sur Vérifier ; votre enregistrement DNS est toujours en place."
+      },
+      "awaitingProof": "Preuve en attente",
+      "proofInstructions": "Ajoutez cet enregistrement TXT chez votre fournisseur DNS pour prouver que le domaine vous appartient. Nous le vérifions automatiquement, ou cliquez sur Vérifier.",
+      "recordTypeLabel": "Type",
+      "recordNameLabel": "Nom",
+      "recordValueLabel": "Valeur",
+      "verify": "Vérifier",
+      "verifying": "Vérification…",
+      "verifyFailed": "Impossible de vérifier l'enregistrement. Réessayez.",
+      "removeClaimDescription": "{domain} n'attendra plus de vérification. Votre adresse actuelle continue de fonctionner."
     }
   },
   "presetPicker": {
@@ -619,6 +633,24 @@
       "FULL_WIDTH": "Pleine largeur",
       "FLOATING": "Flottante"
     },
+    "buttonsHeading": "Boutons",
+    "buttonsDescription": "L'aspect des boutons pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
+    "busyButtonStyleLabel": "Pendant le traitement",
+    "busyButtonStyleDescription": "Ce qu'un bouton affiche pendant un enregistrement ou un envoi. Il garde sa place et ses couleurs pleines.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Libellé d'attente",
+      "KEPT": "Libellé conservé",
+      "EDGE": "Barre de progression"
+    },
+    "spinnerStyleLabel": "Indicateur de chargement",
+    "spinnerStyleDescription": "L'indicateur sur les boutons et les états de chargement de votre site.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Suivre le preset",
+      "BRAILLE": "Braille",
+      "RING": "Anneau",
+      "DOTS": "Points",
+      "PULSE": "Pulsation"
+    },
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
@@ -635,6 +667,8 @@
     "subscribeButton": "S'abonner",
     "readMoreButton": "Lire la suite",
     "readTimeChip": "4 min de lecture",
+    "busyButtonIdle": "Envoyer le message",
+    "busyButtonLabel": "Envoi…",
     "firstCardTitle": "Notes du port",
     "firstCardExcerpt": "Une carte avec lien, telle que les listes d'articles l'affichent.",
     "secondCardTitle": "Cap sur la prochaine saison",

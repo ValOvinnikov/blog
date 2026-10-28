@@ -508,8 +508,22 @@
         "notOnPlan": "Eine eigene Domain gehört zum Growth-Tarif.",
         "notProvisioned": "Diese Website ist noch nicht eingerichtet. Versuche es nach der Einrichtung erneut.",
         "alreadyConnected": "Diese Website hat bereits eine eigene Domain.",
-        "notCustomDomain": "Diese Domain kann nicht entfernt werden."
-      }
+        "notCustomDomain": "Diese Domain kann nicht entfernt werden.",
+        "claimPending": "Diese Website hat bereits eine Domain, die auf die Bestätigung wartet.",
+        "noPendingClaim": "Es wartet keine Domain auf die Bestätigung.",
+        "recordNotFound": "Der TXT-Eintrag ist noch nicht sichtbar. DNS-Änderungen können einige Minuten dauern.",
+        "connectUnavailable": "Wir haben Ihre Domain verifiziert, konnten sie aber nicht verbinden, weil unser Einrichtungsdienst nicht erreichbar ist. Klicken Sie erneut auf Prüfen; Ihr DNS-Eintrag bleibt bestehen.",
+        "connectConflict": "Wir haben Ihre Domain verifiziert, konnten sie aber nicht verbinden, weil die Website oder Domain noch nicht bereit ist. Klicken Sie erneut auf Prüfen; Ihr DNS-Eintrag bleibt bestehen."
+      },
+      "awaitingProof": "Nachweis ausstehend",
+      "proofInstructions": "Lege diesen TXT-Eintrag bei deinem DNS-Anbieter an, um zu belegen, dass dir die Domain gehört. Wir prüfen ihn automatisch, oder du klickst auf Prüfen.",
+      "recordTypeLabel": "Typ",
+      "recordNameLabel": "Name",
+      "recordValueLabel": "Wert",
+      "verify": "Prüfen",
+      "verifying": "Wird geprüft…",
+      "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
+      "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter."
     }
   },
   "presetPicker": {
@@ -619,6 +633,24 @@
       "FULL_WIDTH": "Volle Breite",
       "FLOATING": "Schwebend"
     },
+    "buttonsHeading": "Schaltflächen",
+    "buttonsDescription": "Wie Schaltflächen aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
+    "busyButtonStyleLabel": "Bei Beschäftigung",
+    "busyButtonStyleDescription": "Was eine Schaltfläche beim Speichern oder Senden zeigt. Sie behält ihren Platz und bleibt in voller Farbe.",
+    "busyButtonStyleOptionLabel": {
+      "LABEL": "Beschäftigt-Text",
+      "KEPT": "Text bleibt",
+      "EDGE": "Fortschrittskante"
+    },
+    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleDescription": "Der Spinner auf den Schaltflächen und Ladezuständen Ihrer Website.",
+    "spinnerStyleOptionLabel": {
+      "PRESET": "Dem Preset folgen",
+      "BRAILLE": "Braille",
+      "RING": "Ring",
+      "DOTS": "Punkte",
+      "PULSE": "Puls"
+    },
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
@@ -635,6 +667,8 @@
     "subscribeButton": "Abonnieren",
     "readMoreButton": "Weiterlesen",
     "readTimeChip": "4 Min. Lesezeit",
+    "busyButtonIdle": "Nachricht senden",
+    "busyButtonLabel": "Wird gesendet…",
     "firstCardTitle": "Notizen aus dem Hafen",
     "firstCardExcerpt": "Eine verlinkte Karte, wie Beitragslisten sie darstellen.",
     "secondCardTitle": "Kurs auf die nächste Saison",
