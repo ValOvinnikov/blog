@@ -12,6 +12,7 @@ import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-te
 import { logger } from '@web/utils/logger/logger';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 
 // The platform's Look/Voice saves expire this tag over HTTP (`/api/revalidate-site-config`), since the apps share no cache.
 const getCachedSiteConfigForTenant = (tenantId: string) =>
@@ -36,17 +37,19 @@ const toLookPlan = (
   return planResult.data ?? TENANT_PLAN.FREE;
 };
 
-const getSiteConfigForTenantId = safeAsync(async (tenantId?: string) => {
-  if (!tenantId) return undefined;
+const getSiteConfigForTenantId = cache(
+  safeAsync(async (tenantId?: string) => {
+    if (!tenantId) return undefined;
 
-  const [siteConfig, planResult] = await Promise.all([
-    getCachedSiteConfigForTenant(tenantId),
-    getTenantPlan(tenantId),
-  ]);
-  if (!siteConfig) return undefined;
+    const [siteConfig, planResult] = await Promise.all([
+      getCachedSiteConfigForTenant(tenantId),
+      getTenantPlan(tenantId),
+    ]);
+    if (!siteConfig) return undefined;
 
-  return toEffectiveLook(siteConfig, toLookPlan(planResult));
-});
+    return toEffectiveLook(siteConfig, toLookPlan(planResult));
+  }),
+);
 
 export const getSiteConfig = async (tenant?: string) =>
   getSiteConfigForTenantId(await getRequestTenantId(tenant));
