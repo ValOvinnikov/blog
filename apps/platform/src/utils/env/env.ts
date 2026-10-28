@@ -18,6 +18,8 @@ export const env = createEnv({
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
     // @env-required: development, production
     WEB_APP_URL: z.string().url().optional(),
+    // @env-optional
+    PLATFORM_APP_BASE_URL: z.string().url().optional(),
     // Must be byte-identical to `apps/web`'s `SITE_CONFIG_REVALIDATE_SECRET`.
     // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
@@ -92,6 +94,7 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     WEB_APP_URL: process.env.WEB_APP_URL,
+    PLATFORM_APP_BASE_URL: process.env.PLATFORM_APP_BASE_URL,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     TENANT_PROVISIONING_GITHUB_TOKEN:
       process.env.TENANT_PROVISIONING_GITHUB_TOKEN,

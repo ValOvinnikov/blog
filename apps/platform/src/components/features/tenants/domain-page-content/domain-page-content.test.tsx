@@ -1,9 +1,11 @@
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   mockTenant,
@@ -76,7 +78,10 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
   describe('for a live tenant', () => {
     beforeEach(async () => {
-      await setup();
+      envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+      await setup({
+        tenant: mockTenant({ primaryDomain: MOCK_TENANT_DOMAIN }),
+      });
     });
 
     it('replaces the skeleton with the domain card once Vercel answers', async () => {
@@ -96,7 +101,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
       await screen.findByRole('table');
 
       expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
-        MOCK_CUSTOM_DOMAIN,
+        MOCK_TENANT_DOMAIN,
       );
     });
 
@@ -161,7 +166,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     });
 
     it('offers a Growth tenant without a custom domain an input and a connect button', async () => {
-      await setup({ tenant: growthTenant() });
+      await setup({ tenant: growthTenant(), membership: mockMembership() });
 
       const input = screen.getByRole('textbox', {
         name: ownDomain.domainLabel,
@@ -172,13 +177,53 @@ describe(`<${DomainPageContent.name}/>`, () => {
       expect(connect).toBeVisible();
     });
 
+    it('hides the input from a member who is not the owner', async () => {
+      await setup({
+        tenant: growthTenant(),
+        membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      });
+
+      const message = screen.getByText(ownDomain.ownerOnly);
+      const input = screen.queryByRole('textbox');
+
+      expect(message).toBeVisible();
+      expect(input).not.toBeInTheDocument();
+    });
+
+    it('offers an operator the input without a membership', async () => {
+      await setup({ tenant: growthTenant(), admin: mockAdmin() });
+
+      const input = screen.getByRole('textbox', {
+        name: ownDomain.domainLabel,
+      });
+
+      expect(input).toBeVisible();
+    });
+
+    it('shows a custom main address once, read-only, without a form', async () => {
+      await setup({
+        tenant: growthTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+        membership: mockMembership(),
+      });
+
+      await screen.findByRole('heading', OWN_DOMAIN_TITLE);
+      const remove = screen.queryByRole('button', { name: ownDomain.remove });
+      const input = screen.queryByRole('textbox');
+
+      expect(remove).not.toBeInTheDocument();
+      expect(input).not.toBeInTheDocument();
+      expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_CUSTOM_DOMAIN,
+      );
+    });
+
     it('shows the custom domain with its status and a remove button', async () => {
       listTenantDomainsMock.mockResolvedValue([
         { domain: MOCK_TENANT_DOMAIN },
         { domain: MOCK_CUSTOM_DOMAIN },
       ] as never);
 
-      await setup({ tenant: growthTenant() });
+      await setup({ tenant: growthTenant(), membership: mockMembership() });
 
       const heading = await screen.findByRole('heading', OWN_DOMAIN_TITLE);
       const remove = await screen.findByRole('button', {
@@ -200,6 +245,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
 
       await setup({
         tenant: growthTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+        membership: mockMembership(),
       });
 
       await screen.findByRole('heading', OWN_DOMAIN_TITLE);
@@ -213,6 +259,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     it('tells an archived tenant without a custom domain it cannot be changed', async () => {
       await setup({
         tenant: growthTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+        membership: mockMembership(),
       });
 
       const message = screen.getByText(ownDomain.archivedState);

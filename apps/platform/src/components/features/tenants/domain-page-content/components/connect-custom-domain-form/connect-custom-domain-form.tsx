@@ -26,7 +26,7 @@ export const ConnectCustomDomainForm = ({
   tenantId,
 }: TConnectCustomDomainFormProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
-  const { domain, setDomain, error, isPending, submit } =
+  const { domain, changeDomain, error, isPending, submit } =
     useConnectCustomDomain(tenantId);
   const { fields, footerActions } = connectCustomDomainFormVariants();
 
@@ -48,7 +48,7 @@ export const ConnectCustomDomainForm = ({
             >
               <TextInput
                 value={domain}
-                onChange={setDomain}
+                onChange={changeDomain}
                 placeholder={t('domainPlaceholder')}
               />
             </FormField>

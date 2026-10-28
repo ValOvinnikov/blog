@@ -458,6 +458,7 @@
       "title": "Mijn eigen domein gebruiken",
       "supportingText": "Toon je site op een adres dat van jou is. Je huidige adres blijft werken.",
       "upgradePrompt": "Een eigen domein hoort bij het Growth-abonnement.",
+      "ownerOnly": "Alleen de eigenaar van de site kan een domein koppelen.",
       "archivedState": "Deze site is gearchiveerd, dus het domein kan niet worden gewijzigd.",
       "domainLabel": "Domein",
       "domainHint": "Een volledig domein dat van jou is, zoals blog.example.com.",

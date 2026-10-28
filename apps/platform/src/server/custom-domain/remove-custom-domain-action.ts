@@ -16,7 +16,7 @@ import {
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
@@ -44,7 +44,7 @@ export const removeCustomDomainAction = async (
   tenantId: string,
   input: TCustomDomainInput,
 ): Promise<TRemoveCustomDomainResult> => {
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantOwner(tenantId);
 
   const parsed = customDomainInputSchema.safeParse(input);
   if (!parsed.success) {

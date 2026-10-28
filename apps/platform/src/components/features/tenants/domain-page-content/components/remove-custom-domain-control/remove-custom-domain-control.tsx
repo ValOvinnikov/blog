@@ -4,6 +4,7 @@ import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
+import { requestCustomDomainCardFocus } from '@platform/utils/custom-domain-focus/custom-domain-focus';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -37,8 +38,13 @@ export const RemoveCustomDomainControl = ({
     }
   };
 
+  const handleConfirmed = () => {
+    requestCustomDomainCardFocus();
+    router.refresh();
+  };
+
   return (
-    <ConfirmDialog onConfirm={confirm} onConfirmed={() => router.refresh()}>
+    <ConfirmDialog onConfirm={confirm} onConfirmed={handleConfirmed}>
       <ConfirmDialog.Trigger size={SIZE.SM}>
         {t('remove')}
       </ConfirmDialog.Trigger>

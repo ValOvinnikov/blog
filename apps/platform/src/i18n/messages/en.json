@@ -458,6 +458,7 @@
       "title": "Use my own domain",
       "supportingText": "Serve your site from an address you own. Your current address keeps working.",
       "upgradePrompt": "Using your own domain comes with the Growth plan.",
+      "ownerOnly": "Only the site owner can connect a domain.",
       "archivedState": "This site is archived, so its domain can't be changed.",
       "domainLabel": "Domain",
       "domainHint": "A full domain you own, like blog.example.com.",

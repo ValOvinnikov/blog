@@ -32,18 +32,24 @@ describe(`<${RemoveCustomDomainControl.name}/>`, () => {
       outcome: ACTION_OUTCOME.SUCCESS,
     });
     setup();
+    const trigger = screen.getByRole('button', { name: ownDomain.remove });
 
-    await user.click(screen.getByRole('button', { name: ownDomain.remove }));
+    await user.click(trigger);
   });
+
+  const confirmRemoval = async () => {
+    const confirm = await screen.findByRole('button', {
+      name: ownDomain.removeConfirm,
+    });
+    await user.click(confirm);
+  };
 
   it('removes nothing until the dialog is confirmed', () => {
     expect(removeCustomDomainAction).not.toHaveBeenCalled();
   });
 
   it('removes the domain on confirm and refreshes the page', async () => {
-    await user.click(
-      await screen.findByRole('button', { name: ownDomain.removeConfirm }),
-    );
+    await confirmRemoval();
 
     expect(removeCustomDomainAction).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       domain: MOCK_CUSTOM_DOMAIN,
@@ -57,13 +63,10 @@ describe(`<${RemoveCustomDomainControl.name}/>`, () => {
       reason: CUSTOM_DOMAIN_REFUSAL.NOT_CUSTOM_DOMAIN,
     });
 
-    await user.click(
-      await screen.findByRole('button', { name: ownDomain.removeConfirm }),
-    );
+    await confirmRemoval();
 
-    expect(
-      await screen.findByText(ownDomain.refusal.notCustomDomain),
-    ).toBeVisible();
+    const message = await screen.findByText(ownDomain.refusal.notCustomDomain);
+    expect(message).toBeVisible();
     expect(refresh).not.toHaveBeenCalled();
   });
 
@@ -72,10 +75,9 @@ describe(`<${RemoveCustomDomainControl.name}/>`, () => {
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
 
-    await user.click(
-      await screen.findByRole('button', { name: ownDomain.removeConfirm }),
-    );
+    await confirmRemoval();
 
-    expect(await screen.findByText(ownDomain.removeFailed)).toBeVisible();
+    const message = await screen.findByText(ownDomain.removeFailed);
+    expect(message).toBeVisible();
   });
 });

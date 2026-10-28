@@ -2,65 +2,94 @@ import type { TMaybeUndefined } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
+import { CustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus/custom-domain-focus';
 import { CustomDomainStatusRefresher } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-status-refresher/custom-domain-status-refresher';
 import { DomainVerificationCard } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card/domain-verification-card';
 import { DomainVerificationCardSkeleton } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card-skeleton/domain-verification-card-skeleton';
 import { RemoveCustomDomainControl } from '@platform/components/features/tenants/domain-page-content/components/remove-custom-domain-control/remove-custom-domain-control';
 import { Card } from '@platform/components/shared/card';
 import { Text } from '@platform/components/shared/text';
-import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { CUSTOM_DOMAIN_CARD } from '@platform/constants/custom-domain';
+import {
+  getProjectDomain,
+  type TProjectDomain,
+} from '@platform/server/provisioning/vercel-domains-api';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
 export type TCustomDomainCardProps = {
-  tenant: Pick<TTenant, 'id' | 'plan' | 'deprovisionedAt'>;
+  tenant: Pick<TTenant, 'id' | 'plan' | 'deprovisionedAt' | 'primaryDomain'>;
   customDomain: TMaybeUndefined<string>;
+  isPrimaryCustom: boolean;
+  primaryProjectDomain: Promise<TProjectDomain>;
+  canManage: boolean;
 };
 
 export const CustomDomainCard = ({
   tenant,
   customDomain,
+  isPrimaryCustom,
+  primaryProjectDomain,
+  canManage,
 }: TCustomDomainCardProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
-  const { id, plan, deprovisionedAt } = tenant;
+  const { id, plan, deprovisionedAt, primaryDomain } = tenant;
   const isArchived = Boolean(deprovisionedAt);
-
-  if (customDomain) {
-    const projectDomain = getProjectDomain(customDomain);
-
-    return (
-      <Suspense fallback={<DomainVerificationCardSkeleton />}>
-        <DomainVerificationCard
-          domain={customDomain}
-          isPlatformAddress={false}
-          projectDomain={projectDomain}
-          title={t('title')}
-          actions={
-            !isArchived && (
-              <RemoveCustomDomainControl tenantId={id} domain={customDomain} />
-            )
-          }
-        />
-        {!isArchived && (
-          <CustomDomainStatusRefresher
-            tenantId={id}
-            initialStatus={projectDomain.then(({ status }) => status)}
-          />
-        )}
-      </Suspense>
-    );
-  }
-
-  if (!isArchived && plan === TENANT_PLAN.GROWTH) {
-    return <ConnectCustomDomainForm tenantId={id} />;
-  }
+  const isGrowth = plan === TENANT_PLAN.GROWTH;
+  const domain = customDomain ?? (isPrimaryCustom ? primaryDomain : null);
+  const shown = domain && {
+    domain,
+    projectDomain: customDomain
+      ? getProjectDomain(customDomain)
+      : primaryProjectDomain,
+  };
+  const canRemove = canManage && !isArchived && Boolean(customDomain);
+  const canConnect = !shown && canManage && !isArchived && isGrowth;
+  let noticeKey: 'archivedState' | 'ownerOnly' | 'upgradePrompt' =
+    'upgradePrompt';
+  if (isGrowth) noticeKey = 'ownerOnly';
+  if (isArchived) noticeKey = 'archivedState';
 
   return (
-    <Card>
-      <Card.Header title={t('title')} supportingText={t('supportingText')} />
-      <Card.Body>
-        <Text>{isArchived ? t('archivedState') : t('upgradePrompt')}</Text>
-      </Card.Body>
-    </Card>
+    <div id={CUSTOM_DOMAIN_CARD.ID}>
+      {shown && (
+        <Suspense fallback={<DomainVerificationCardSkeleton />}>
+          <DomainVerificationCard
+            domain={shown.domain}
+            isPlatformAddress={false}
+            projectDomain={shown.projectDomain}
+            title={t('title')}
+            actions={
+              canRemove && (
+                <RemoveCustomDomainControl
+                  tenantId={id}
+                  domain={shown.domain}
+                />
+              )
+            }
+          />
+          {customDomain && !isArchived && (
+            <CustomDomainStatusRefresher
+              tenantId={id}
+              initialStatus={shown.projectDomain.then(({ status }) => status)}
+            />
+          )}
+          <CustomDomainFocus />
+        </Suspense>
+      )}
+      {canConnect && <ConnectCustomDomainForm tenantId={id} />}
+      {!shown && !canConnect && (
+        <Card>
+          <Card.Header
+            title={t('title')}
+            supportingText={t('supportingText')}
+          />
+          <Card.Body>
+            <Text>{t(noticeKey)}</Text>
+          </Card.Body>
+        </Card>
+      )}
+      {!shown && <CustomDomainFocus />}
+    </div>
   );
 };

@@ -5,6 +5,7 @@ import type { TValueOf } from '@blog/config/utils';
 import { CUSTOM_DOMAIN_FIELD_ERROR } from '@platform/constants/custom-domain';
 import { useToast } from '@platform/context/toast-provider';
 import { connectCustomDomainAction } from '@platform/server/custom-domain/connect-custom-domain-action';
+import { requestCustomDomainCardFocus } from '@platform/utils/custom-domain-focus/custom-domain-focus';
 import {
   CUSTOM_DOMAIN_FIELD_ERROR_KEYS,
   CUSTOM_DOMAIN_REFUSAL_KEYS,
@@ -23,6 +24,11 @@ export const useConnectCustomDomain = (tenantId: string) => {
   const [errorKey, setErrorKey] = useState<TMaybeUndefined<TFieldErrorKey>>();
   const [isPending, startTransition] = useTransition();
 
+  const changeDomain = (nextDomain: string) => {
+    setDomain(nextDomain);
+    setErrorKey(undefined);
+  };
+
   const submit = () => {
     startTransition(async () => {
       const result = await connectCustomDomainAction(tenantId, { domain });
@@ -31,6 +37,7 @@ export const useConnectCustomDomain = (tenantId: string) => {
       switch (result.outcome) {
         case ACTION_OUTCOME.SUCCESS:
           setDomain('');
+          requestCustomDomainCardFocus();
           router.refresh();
           return;
         case ACTION_OUTCOME.INVALID: {
@@ -54,7 +61,7 @@ export const useConnectCustomDomain = (tenantId: string) => {
 
   return {
     domain,
-    setDomain,
+    changeDomain,
     error: errorKey && t(`fieldError.${errorKey}`),
     isPending,
     submit,

@@ -4008,6 +4008,14 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
+    "custom_domain.root_domain_missing": [
+      {
+        "ref": "CUSTOM_DOMAIN_LOG.ROOT_DOMAIN_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
     "custom_domain.disconnect_audit_failed": [
       {
         "ref": "CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED",
@@ -4036,6 +4044,14 @@
         "scope": "app:worker",
         "from": "@worker/constants/custom-domain",
         "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "custom-domain-card": [
+      {
+        "ref": "CUSTOM_DOMAIN_CARD.ID",
+        "scope": "app:platform",
+        "from": "@platform/constants/custom-domain",
+        "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
     "SIGNUP_BLOCK": [

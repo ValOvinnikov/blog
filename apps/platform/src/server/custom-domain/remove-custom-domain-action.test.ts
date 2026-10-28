@@ -6,6 +6,7 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   CUSTOM_DOMAIN_LOG,
@@ -89,6 +90,19 @@ describe(removeCustomDomainAction, () => {
       removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
+  });
+
+  it('refuses a member who is not the owner', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
+      tenant: mockReadyTenant({ id: MOCK_TENANT_ID }),
+      membership: mockMembership({ role: MEMBERSHIP_ROLE.READER }),
+    });
+
+    await expect(
+      removeCustomDomainAction(MOCK_TENANT_ID, MOCK_INPUT),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
+    expect(enqueueWorkerRequest).not.toHaveBeenCalled();
   });
 
   it('deletes the domain, asks the worker to disconnect it, and audits the removal', async () => {

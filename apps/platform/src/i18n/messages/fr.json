@@ -458,6 +458,7 @@
       "title": "Utiliser mon propre domaine",
       "supportingText": "Publiez votre site à une adresse qui vous appartient. Votre adresse actuelle continue de fonctionner.",
       "upgradePrompt": "Utiliser votre propre domaine est inclus dans l’offre Growth.",
+      "ownerOnly": "Seul le propriétaire du site peut connecter un domaine.",
       "archivedState": "Ce site est archivé, son domaine ne peut pas être modifié.",
       "domainLabel": "Domaine",
       "domainHint": "Un domaine complet qui vous appartient, comme blog.example.com.",

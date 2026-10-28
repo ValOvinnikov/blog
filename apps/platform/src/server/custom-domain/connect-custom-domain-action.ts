@@ -18,11 +18,11 @@ import {
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { enqueueCustomDomainConnectOrUndo } from '@platform/server/custom-domain/enqueue-custom-domain-connect-or-undo';
 import { env } from '@platform/utils/env/env';
-import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
+import { isReservedDomain } from '@platform/utils/is-reserved-domain/is-reserved-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -54,7 +54,7 @@ export const connectCustomDomainAction = async (
   tenantId: string,
   input: TCustomDomainInput,
 ): Promise<TConnectCustomDomainResult> => {
-  const { tenant } = await requireTenantMembership(tenantId);
+  const { tenant } = await requireTenantOwner(tenantId);
 
   const parsed = customDomainInputSchema.safeParse(input);
   if (!parsed.success) {
@@ -68,7 +68,17 @@ export const connectCustomDomainAction = async (
     return refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN);
   }
   if (!sanityProjectId) return refused(CUSTOM_DOMAIN_REFUSAL.NOT_PROVISIONED);
-  if (isPlatformAddress(domain, env.TENANT_ROOT_DOMAIN)) {
+  const rootDomain = env.TENANT_ROOT_DOMAIN;
+  if (!rootDomain) {
+    logger.error(CUSTOM_DOMAIN_LOG.ROOT_DOMAIN_MISSING, { tenantId: id });
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  }
+  if (
+    isReservedDomain(domain, rootDomain, [
+      env.WEB_APP_URL,
+      env.PLATFORM_APP_BASE_URL,
+    ])
+  ) {
     return fieldError(CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_PLATFORM_ADDRESS);
   }
 
@@ -77,12 +87,15 @@ export const connectCustomDomainAction = async (
       return fieldError(CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN);
     }
 
-    const existing = findCustomDomain(
-      await queries.tenantDomains.listTenantDomains(id),
+    const hosts = [
       primaryDomain,
-      env.TENANT_ROOT_DOMAIN,
-    );
-    if (existing) return refused(CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED);
+      ...(await queries.tenantDomains.listTenantDomains(id)).map(
+        (row) => row.domain,
+      ),
+    ];
+    if (hosts.some((host) => !isPlatformAddress(host, rootDomain))) {
+      return refused(CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED);
+    }
 
     const added = await queries.tenantDomains.addTenantDomain(id, domain);
     if (!added.ok) {

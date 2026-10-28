@@ -44,12 +44,15 @@ describe(`<${ConnectCustomDomainForm.name}/>`, () => {
   });
 
   it('submits the entered domain, clears the input and refreshes the page', async () => {
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
 
+    await user.click(submit);
+
+    const domainField = await screen.findByRole('textbox', DOMAIN_FIELD);
     expect(connectCustomDomainAction).toHaveBeenCalledWith(MOCK_TENANT_ID, {
       domain: MOCK_CUSTOM_DOMAIN,
     });
-    expect(await screen.findByRole('textbox', DOMAIN_FIELD)).toHaveValue('');
+    expect(domainField).toHaveValue('');
     expect(refresh).toHaveBeenCalledTimes(1);
   });
 
@@ -60,15 +63,33 @@ describe(`<${ConnectCustomDomainForm.name}/>`, () => {
         domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN },
       },
     });
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
 
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    await user.click(submit);
 
     const error = await screen.findByText(ownDomain.fieldError.domainTaken);
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
     expect(error).toBeVisible();
-    expect(screen.getByRole('textbox', DOMAIN_FIELD)).toHaveValue(
-      MOCK_CUSTOM_DOMAIN,
-    );
+    expect(domainField).toHaveValue(MOCK_CUSTOM_DOMAIN);
     expect(refresh).not.toHaveBeenCalled();
+  });
+
+  it('clears the field error once the input changes', async () => {
+    vi.mocked(connectCustomDomainAction).mockResolvedValue({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: { reason: CUSTOM_DOMAIN_FIELD_ERROR.DOMAIN_TAKEN },
+      },
+    });
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
+    await screen.findByText(ownDomain.fieldError.domainTaken);
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+
+    await user.type(domainField, 'x');
+
+    const error = screen.queryByText(ownDomain.fieldError.domainTaken);
+    expect(error).not.toBeInTheDocument();
   });
 
   it('reports a refusal without touching the input', async () => {
@@ -76,27 +97,27 @@ describe(`<${ConnectCustomDomainForm.name}/>`, () => {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: CUSTOM_DOMAIN_REFUSAL.ALREADY_CONNECTED,
     });
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
 
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    await user.click(submit);
 
-    expect(
-      await screen.findByText(ownDomain.refusal.alreadyConnected),
-    ).toBeVisible();
-    expect(screen.getByRole('textbox', DOMAIN_FIELD)).toHaveValue(
-      MOCK_CUSTOM_DOMAIN,
-    );
+    const message = await screen.findByText(ownDomain.refusal.alreadyConnected);
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+    expect(message).toBeVisible();
+    expect(domainField).toHaveValue(MOCK_CUSTOM_DOMAIN);
   });
 
   it('reports a server error and keeps the input so it can be retried', async () => {
     vi.mocked(connectCustomDomainAction).mockResolvedValue({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
 
-    await user.click(screen.getByRole('button', SUBMIT_BUTTON));
+    await user.click(submit);
 
-    expect(await screen.findByText(ownDomain.connectFailed)).toBeVisible();
-    expect(screen.getByRole('textbox', DOMAIN_FIELD)).toHaveValue(
-      MOCK_CUSTOM_DOMAIN,
-    );
+    const message = await screen.findByText(ownDomain.connectFailed);
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+    expect(message).toBeVisible();
+    expect(domainField).toHaveValue(MOCK_CUSTOM_DOMAIN);
   });
 });

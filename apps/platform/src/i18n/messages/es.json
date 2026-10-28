@@ -458,6 +458,7 @@
       "title": "Usar mi propio dominio",
       "supportingText": "Publica tu sitio en una dirección que te pertenece. Tu dirección actual sigue funcionando.",
       "upgradePrompt": "Usar tu propio dominio viene con el plan Growth.",
+      "ownerOnly": "Solo el propietario del sitio puede conectar un dominio.",
       "archivedState": "Este sitio está archivado, así que no se puede cambiar su dominio.",
       "domainLabel": "Dominio",
       "domainHint": "Un dominio completo que te pertenece, como blog.example.com.",

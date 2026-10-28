@@ -9,7 +9,6 @@ import {
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { logger } from '@platform/utils/logger/logger';
 
-/** Deletes the just-added `tenant_domains` row when the worker does not accept the connect, and reports whether it did. */
 export const enqueueCustomDomainConnectOrUndo = async (
   tenantId: string,
   domain: string,

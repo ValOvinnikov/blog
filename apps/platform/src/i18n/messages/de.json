@@ -458,6 +458,7 @@
       "title": "Eigene Domain verwenden",
       "supportingText": "Veröffentliche deine Website unter einer Adresse, die dir gehört. Deine aktuelle Adresse funktioniert weiter.",
       "upgradePrompt": "Eine eigene Domain gehört zum Growth-Tarif.",
+      "ownerOnly": "Nur die Inhaberin oder der Inhaber der Website kann eine Domain verbinden.",
       "archivedState": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
       "domainLabel": "Domain",
       "domainHint": "Eine vollständige Domain, die dir gehört, z. B. blog.example.com.",

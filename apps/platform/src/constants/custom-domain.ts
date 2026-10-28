@@ -32,7 +32,10 @@ export const CUSTOM_DOMAIN_LOG = {
   CONNECT_ENQUEUE_REJECTED: 'custom_domain.connect_enqueue_rejected',
   CONNECT_FAILED: 'custom_domain.connect_failed',
   CONNECT_ROLLBACK_FAILED: 'custom_domain.connect_rollback_failed',
+  ROOT_DOMAIN_MISSING: 'custom_domain.root_domain_missing',
   DISCONNECT_AUDIT_FAILED: 'custom_domain.disconnect_audit_failed',
   DISCONNECT_ENQUEUE_REJECTED: 'custom_domain.disconnect_enqueue_rejected',
   DISCONNECT_FAILED: 'custom_domain.disconnect_failed',
 } as const;
+
+export const CUSTOM_DOMAIN_CARD = { ID: 'custom-domain-card' } as const;

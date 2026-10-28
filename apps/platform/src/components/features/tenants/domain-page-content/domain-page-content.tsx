@@ -1,8 +1,11 @@
 import { queries } from '@blog/db';
+import type { TAdmin } from '@blog/db/schema/admins';
+import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { CustomDomainCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-card/custom-domain-card';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
+import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
@@ -16,10 +19,14 @@ import { domainPageContentVariants } from './domain-page-content-variants';
 
 export type TDomainPageContentProps = {
   tenant: TTenant;
+  membership?: TMembership;
+  admin?: TAdmin;
 };
 
 export const DomainPageContent = async ({
   tenant,
+  membership,
+  admin,
 }: TDomainPageContentProps) => {
   const { id, primaryDomain, deprovisionedAt } = tenant;
   const projectDomain = getProjectDomain(primaryDomain);
@@ -51,7 +58,17 @@ export const DomainPageContent = async ({
         />
       </Suspense>
 
-      <CustomDomainCard tenant={tenant} customDomain={customDomain} />
+      <CustomDomainCard
+        tenant={tenant}
+        customDomain={customDomain}
+        primaryProjectDomain={projectDomain}
+        isPrimaryCustom={
+          !isPlatformAddress(primaryDomain, env.TENANT_ROOT_DOMAIN)
+        }
+        canManage={
+          Boolean(admin) || (membership ? isTenantOwner(membership) : false)
+        }
+      />
     </div>
   );
 };
