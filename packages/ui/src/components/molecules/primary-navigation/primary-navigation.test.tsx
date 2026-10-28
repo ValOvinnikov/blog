@@ -274,10 +274,10 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       setup({ links: [groupLink] });
 
       const trigger = screen.getByRole('button', { name: groupLabel });
-      const barLinks = within(screen.getByTestId(LINKS_TEST_ID)).getAllByRole(
-        'link',
-        { hidden: true },
-      );
+      const barLinksRegion = screen.getByTestId(LINKS_TEST_ID);
+      const barLinks = within(barLinksRegion).getAllByRole('link', {
+        hidden: true,
+      });
 
       expect(trigger).toBeVisible();
       expect(barLinks.map((link) => link.getAttribute('href'))).toEqual([
@@ -294,12 +294,13 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       const subLink = within(mobilePanel).getByRole('link', {
         name: firstSubLink?.label,
       });
+      const groupToggle = within(mobilePanel).getByText(groupLabel, {
+        selector: 'summary',
+      });
 
       expect(subLink).not.toBeVisible();
 
-      await user.click(
-        within(mobilePanel).getByText(groupLabel, { selector: 'summary' }),
-      );
+      await user.click(groupToggle);
 
       expect(subLink).toBeVisible();
     });
