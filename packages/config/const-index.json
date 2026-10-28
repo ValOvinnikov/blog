@@ -512,6 +512,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"
+      },
+      {
+        "ref": "ONBOARDING_STEP.SITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "PLATFORM": [
@@ -3152,6 +3158,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
+      },
+      {
+        "ref": "ONBOARDING_STEP.ADDRESS",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "DOMAIN": [
@@ -4451,6 +4463,22 @@
     "CHECKING": [
       {
         "ref": "SITE_ADDRESS_STATUS.CHECKING",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "LOOK": [
+      {
+        "ref": "ONBOARDING_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "REVIEW": [
+      {
+        "ref": "ONBOARDING_STEP.REVIEW",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
         "file": "apps/platform/src/constants/onboarding.ts"
