@@ -205,10 +205,12 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   };
 };
 
+const MOCK_READY_TENANT_DATASET = faker.word.noun();
+
 export const mockReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return mockTenant({
     sanityProjectId: MOCK_SANITY_PROJECT_ID,
-    sanityDataset: 'production',
+    sanityDataset: MOCK_READY_TENANT_DATASET,
     locale: LOCALE_ISO_CODES.EN,
     provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
     provisioningSteps: mockDoneProvisioningSteps(),
