@@ -7,9 +7,15 @@ import {
   MOCK_ABOUT_LINK,
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
+  MOCK_TOPICS_GROUP,
   MOCK_TOPICS_LINK,
 } from '@web/testing/shared/link/fixtures';
+import {
+  stubHidePopover,
+  unstubHidePopover,
+} from '@web/testing/shared/popover/stub-hide-popover';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import type { Mock } from 'vitest';
 
 import { SiteNavigation } from './site-navigation';
 
@@ -19,29 +25,21 @@ const TOGGLE_NAME = 'Toggle navigation menu';
 const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;
 
 const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_ABOUT_LINK];
-const MOCK_TOPICS_GROUP = {
-  ...MOCK_TOPICS_LINK,
-  subItems: [MOCK_TOPICS_LINK, MOCK_ABOUT_LINK],
-};
 
 const setup = customRender(SiteNavigation, {
   links,
 });
 
 describe(`<${SiteNavigation.name}/>`, () => {
-  const hidePopover = vi.fn();
+  let hidePopover: Mock;
 
   beforeEach(() => {
     vi.mocked(usePathname).mockReset();
-    Object.defineProperty(HTMLElement.prototype, 'hidePopover', {
-      value: hidePopover,
-      configurable: true,
-    });
+    hidePopover = stubHidePopover();
   });
 
   afterEach(() => {
-    Reflect.deleteProperty(HTMLElement.prototype, 'hidePopover');
-    hidePopover.mockReset();
+    unstubHidePopover();
   });
 
   it('marks the Home item active only on the exact root path', () => {

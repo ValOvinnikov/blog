@@ -1,7 +1,7 @@
 import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
 
 import { DeleteAccountControl } from './delete-account-control';
@@ -111,8 +111,9 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
 
     resolveDelete({ outcome: ACTION_OUTCOME.SUCCESS });
 
-    await screen.findByRole('status');
-    expect(deleteButton).toHaveAttribute('aria-busy', 'false');
+    await waitFor(() => {
+      expect(deleteButton).toHaveAttribute('aria-busy', 'false');
+    });
   });
 
   it.each([

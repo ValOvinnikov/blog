@@ -24,3 +24,8 @@ export const MOCK_ABOUT_LINK = mockNavLink(
 );
 
 export const MOCK_TOPICS_LINK = mockNavLink(TOPICS_LABEL!, routes.topics());
+
+export const MOCK_TOPICS_GROUP = {
+  ...MOCK_TOPICS_LINK,
+  subItems: [MOCK_TOPICS_LINK, MOCK_ABOUT_LINK],
+};
