@@ -1748,12 +1748,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
-      },
-      {
-        "ref": "PERSONAL_DATA_OWNER.USER",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
       }
     ],
     "USERS": [
@@ -2446,14 +2440,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "personal_data.plain_fallback": [
-      {
-        "ref": "PERSONAL_DATA_LOG.PLAIN_FALLBACK",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/personal-data.ts"
       }
     ],
     "bodyImage": [
@@ -3206,72 +3192,6 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
-    "LEAD": [
-      {
-        "ref": "PERSONAL_DATA_OWNER.LEAD",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      },
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "SUBSCRIBER": [
-      {
-        "ref": "PERSONAL_DATA_OWNER.SUBSCRIBER",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      },
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "INVITE": [
-      {
-        "ref": "PERSONAL_DATA_OWNER.INVITE",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      },
-      {
-        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
-    "NOT_BACKFILLED": [
-      {
-        "ref": "PERSONAL_DATA_FALLBACK_REASON.NOT_BACKFILLED",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      }
-    ],
-    "ENCRYPTION_KEY_UNSET": [
-      {
-        "ref": "PERSONAL_DATA_FALLBACK_REASON.ENCRYPTION_KEY_UNSET",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      }
-    ],
-    "INDEX_KEY_UNSET": [
-      {
-        "ref": "PERSONAL_DATA_FALLBACK_REASON.INDEX_KEY_UNSET",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/personal-data.ts"
-      }
-    ],
     "ACTIVE": [
       {
         "ref": "SUBSCRIBER_STATUS.ACTIVE",
@@ -3922,6 +3842,30 @@
         "file": "apps/platform/src/constants/create-site-gate.ts"
       }
     ],
+    "SUBSCRIBER": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.SUBSCRIBER",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "LEAD": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.LEAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "INVITE": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "SIGNUP_BLOCK": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK",
@@ -4558,6 +4502,22 @@
         "file": "apps/platform/src/constants/release.ts"
       }
     ],
+    "development": [
+      {
+        "ref": "MIGRATION_ENVIRONMENT.DEVELOPMENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "production": [
+      {
+        "ref": "MIGRATION_ENVIRONMENT.PRODUCTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
     "CONTRAST_CHECK_RUNNING": [
       {
         "ref": "RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING",
@@ -4577,6 +4537,22 @@
     "RELEASES_PAUSED": [
       {
         "ref": "RELEASE_REFUSAL.RELEASES_PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "TENANT_REQUIRED": [
+      {
+        "ref": "RELEASE_REFUSAL.TENANT_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "TENANT_MIGRATION_NOT_FAILED": [
+      {
+        "ref": "RELEASE_REFUSAL.TENANT_MIGRATION_NOT_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
@@ -4713,6 +4689,38 @@
     "releases.release_override_audit_failed": [
       {
         "ref": "RELEASE_LOG.RELEASE_OVERRIDE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_audit_failed": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_dispatch_error": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_DISPATCH_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_dispatch_failed": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_DISPATCH_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      }
+    ],
+    "releases.tenant_migrations_dispatch_skipped": [
+      {
+        "ref": "RELEASE_LOG.TENANT_MIGRATIONS_DISPATCH_SKIPPED",
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
@@ -5574,6 +5582,14 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
+    "header_style.site_config_fetch_failed": [
+      {
+        "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/header-style",
+        "file": "apps/web/src/constants/header-style.ts"
+      }
+    ],
     "navigation.layout_fetch_failed": [
       {
         "ref": "NAVIGATION_LOG.LAYOUT_FETCH_FAILED",
@@ -5649,6 +5665,14 @@
     "newsletter.subscribed_cookie_clear_failed": [
       {
         "ref": "NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.gate_status_fetch_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.GATE_STATUS_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/newsletter",
         "file": "apps/web/src/constants/newsletter.ts"
@@ -5836,6 +5860,38 @@
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "rss.posts_fetch_failed": [
+      {
+        "ref": "RSS_LOG.POSTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "rss.site_settings_fetch_failed": [
+      {
+        "ref": "RSS_LOG.SITE_SETTINGS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "rss.index_page_fetch_failed": [
+      {
+        "ref": "RSS_LOG.INDEX_PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "rss.navigation_fetch_failed": [
+      {
+        "ref": "RSS_LOG.NAVIGATION_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
       }
     ],
     "authenticated": [

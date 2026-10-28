@@ -36,6 +36,10 @@ const config: StorybookConfig = {
         fileURLToPath(
           new URL('./mocks/newsletter-actions.ts', import.meta.url),
         ),
+      '@web/server/newsletter/reader-subscription-status/reader-subscription-status':
+        fileURLToPath(
+          new URL('./mocks/reader-subscription-status.ts', import.meta.url),
+        ),
       // The account-page sections' barrel drags this in alongside their pure views.
       '@web/server/auth/auth': fileURLToPath(
         new URL('./mocks/auth.ts', import.meta.url),

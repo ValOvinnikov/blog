@@ -9,8 +9,8 @@ import {
 } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
+  mockAccountEmailIndex,
   testPersonalEmailIndex,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { errorResult, okResult } from '@blog/utils';
@@ -20,7 +20,6 @@ import { createPendingSubscriber } from './create-pending-subscriber';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 async function readSubscribers(): Promise<schema.TSubscriber[]> {
   return db().select().from(schema.subscribers);
@@ -39,7 +38,7 @@ describe(createPendingSubscriber, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('stores a fresh email as a pending row with its encrypted and index forms', async () => {
+  it('stores a fresh email as a pending row with its encrypted form and both indexes', async () => {
     const result = await createPendingSubscriber(
       tenantId,
       MOCK_SUBSCRIBER_EMAIL,
@@ -55,6 +54,9 @@ describe(createPendingSubscriber, () => {
     );
     expect(row?.status).toBe(SUBSCRIBER_STATUS.PENDING);
     expect(row?.emailIndex).toBe(testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL));
+    expect(row?.emailExactIndex).toBe(
+      mockAccountEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+    );
     expect(decryptTestPersonalValue(row?.emailEncrypted ?? null)).toBe(
       MOCK_SUBSCRIBER_EMAIL,
     );
@@ -92,7 +94,9 @@ describe(createPendingSubscriber, () => {
 
     const rows = await readSubscribers();
     const tagged = rows.find(
-      ({ email }) => email === MOCK_SUBSCRIBER_TAGGED_EMAIL,
+      ({ emailEncrypted }) =>
+        decryptTestPersonalValue(emailEncrypted) ===
+        MOCK_SUBSCRIBER_TAGGED_EMAIL,
     );
     expect(rows).toHaveLength(2);
     expect(result).toEqual(

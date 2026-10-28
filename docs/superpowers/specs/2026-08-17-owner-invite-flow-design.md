@@ -29,7 +29,7 @@ adds the not-found path as a genuine addition, not a rewrite.
 ## Architecture
 
 **Provisioning flow (`apps/platform/src/server/tenants/create-tenant-action.ts`).**
-The owner-email lookup (`queries.users.getUserByEmail`) stays first and
+The owner-email lookup (`queries.users.findUserByEmail`) stays first and
 unchanged for the found case — real user, immediate `memberships` row with
 `role: OWNER`, exactly as today. Only the not-found branch changes:
 
@@ -129,7 +129,7 @@ email)` constraint — the action treats that as idempotent ("invite already
   GitHub whose account email matches) still consumes correctly — consumption
   keys on verified email, not provider.
 - A user with an existing platform account is invited to a _new_ tenant:
-  `getUserByEmail` finds them, so this stays on the existing immediate-
+  `findUserByEmail` finds them, so this stays on the existing immediate-
   membership path (found branch), not the invite path — the invite path only
   fires for genuinely unregistered emails. Routing an _existing_ user through
   `membershipInvites` instead (the Team-tab reuse case) is that feature's own

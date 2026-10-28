@@ -4,8 +4,8 @@ import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
 import { MOCK_INVITE_CONSUMED_AT } from '@blog/db/testing/membership-invites/fixtures';
 import {
   decryptTestPersonalValue,
+  mockAccountEmailIndex,
   testPersonalEmailIndex,
-  usePersonalDataKeys,
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
@@ -23,7 +23,6 @@ const OUTCOME_ALREADY_PENDING = 'already-pending';
 const OUTCOME_ALREADY_CONSUMED = 'already-consumed';
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 afterEach(async () => {
   await db().delete(schema.membershipInvites);
@@ -51,9 +50,9 @@ describe(createMembershipInvite, () => {
       id: invite.id,
       createdAt: invite.createdAt,
       tenantId,
-      email: MOCK_INVITE_EMAIL,
       emailEncrypted: invite.emailEncrypted,
       emailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
+      emailExactIndex: mockAccountEmailIndex(MOCK_INVITE_EMAIL),
       role: MEMBERSHIP_ROLE.OWNER,
       consumedAt: null,
     });

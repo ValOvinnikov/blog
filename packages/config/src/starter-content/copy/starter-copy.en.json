@@ -164,5 +164,85 @@
       "linkLabel": "Writing",
       "listHeading": "All posts"
     }
+  },
+  "docs": {
+    "hero": {
+      "eyebrow": "Documentation",
+      "heading": "Everything you need to get started",
+      "supportingText": "Guides and answers, organised so readers find what they need."
+    },
+    "intro": {
+      "body": [
+        "Welcome to the documentation. Start with the guides, or look through the questions below for quick answers.",
+        "Replace this text with a short overview of what your product or project does and who these docs are for."
+      ]
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "questions": [
+        {
+          "question": "Where should I start?",
+          "answer": [
+            "Point new readers to the first guide, and say what they need before they begin."
+          ]
+        },
+        {
+          "question": "How do I get help?",
+          "answer": [
+            "Explain where readers can ask a question or report a problem, and how quickly they can expect an answer."
+          ]
+        },
+        {
+          "question": "Is this documentation up to date?",
+          "answer": [
+            "Say how often these pages are reviewed, and where readers can see what has changed."
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "title": "Guides",
+      "slug": "guides",
+      "heading": "Guides",
+      "supportingText": "Step-by-step help, from the first steps to everyday use.",
+      "listHeading": "All guides",
+      "metaTitle": "Guides — step-by-step help from the first steps on",
+      "metaDescription": "Step-by-step guides covering setup, the core ideas and how to solve common problems."
+    },
+    "pages": [
+      {
+        "title": "Getting started",
+        "slug": "getting-started",
+        "summary": "A sample guide. Replace it with your own first steps.",
+        "body": [
+          "Describe what readers need before they begin, then walk them through the first steps one at a time.",
+          "End with what they should see once everything works, and link to the next guide."
+        ],
+        "metaTitle": "Getting started — a sample first guide to replace",
+        "metaDescription": "A sample guide created with your site. Replace it with the first steps for your own readers."
+      },
+      {
+        "title": "Core concepts",
+        "slug": "core-concepts",
+        "summary": "A sample guide for the ideas readers need to know.",
+        "body": [
+          "Explain the few ideas everything else builds on, with a short example for each.",
+          "Keep each section brief, and link to the guides that put the ideas into practice."
+        ],
+        "metaTitle": "Core concepts — a sample guide to the key ideas",
+        "metaDescription": "A sample guide created with your site. Use it to explain the ideas your readers need to know."
+      },
+      {
+        "title": "Troubleshooting",
+        "slug": "troubleshooting",
+        "summary": "A sample guide for solving common problems.",
+        "body": [
+          "List the problems readers run into most often, each with its cause and how to fix it.",
+          "Say where to get help when the answer isn't here. Delete this page if you don't need it yet."
+        ],
+        "metaTitle": "Troubleshooting — a sample guide to common problems",
+        "metaDescription": "A sample guide created with your site. Use it for common problems, their causes and their fixes."
+      }
+    ]
   }
 }

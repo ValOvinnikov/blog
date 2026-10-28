@@ -8,14 +8,11 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
-import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -43,7 +40,7 @@ vi.mock(
   }),
 );
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-header-style/get-header-style');
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
@@ -69,7 +66,7 @@ vi.mock('next-auth/react', () => ({
 }));
 
 const getRequestContextMock = vi.mocked(getRequestContext);
-const getSiteSettingsMock = vi.mocked(getSiteSettings);
+const getHeaderStyleMock = vi.mocked(getHeaderStyle);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
 const getAccountControlMock = vi.mocked(getAccountControl);
@@ -77,7 +74,7 @@ const getAccountControlMock = vi.mocked(getAccountControl);
 faker.seed(5);
 
 const MOCK_LOOK_LOGO_URL = faker.internet.url();
-const MOCK_STUDIO_LOGO = mockSanityImage({ alt: faker.lorem.word() });
+const MOCK_HEADER_TAGLINE = faker.lorem.words(3);
 const MOCK_READER = {
   name: faker.person.fullName(),
   email: faker.internet.email(),
@@ -107,9 +104,9 @@ describe(`<${SiteHeader.name}/>`, () => {
     await user.click(toggleButton);
   };
 
-  const getDrawerAccountButton = (name: string) => {
+  const getDrawerAccountRow = (name: string) => {
     const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-    return within(drawerActions).getByRole('button', { name });
+    return within(drawerActions).getByText(name, { selector: 'summary' });
   };
 
   const getBarSignInButtons = () => {
@@ -130,14 +127,8 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   describe('the brand logo', () => {
-    it("shows the tenant's Look logo, not the Studio brand logo", async () => {
+    it("shows the tenant's Look logo", async () => {
       getBrandLogoUrlMock.mockResolvedValue(MOCK_LOOK_LOGO_URL);
-      getSiteSettingsMock.mockResolvedValueOnce(
-        okResult({
-          ...MOCK_SITE_SETTINGS,
-          brand: { ...MOCK_SITE_SETTINGS.brand, logo: MOCK_STUDIO_LOGO },
-        }),
-      );
 
       await setup();
 
@@ -151,13 +142,6 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('shows the default mark without a Look logo', async () => {
-      getSiteSettingsMock.mockResolvedValueOnce(
-        okResult({
-          ...MOCK_SITE_SETTINGS,
-          brand: { ...MOCK_SITE_SETTINGS.brand, logo: MOCK_STUDIO_LOGO },
-        }),
-      );
-
       await setup();
 
       const homeLink = screen.getByRole('link', { name: HOME_LINK_NAME });
@@ -165,6 +149,31 @@ describe(`<${SiteHeader.name}/>`, () => {
 
       expect(presentation).not.toBeInTheDocument();
       expect(homeLink).not.toBeEmptyDOMElement();
+    });
+  });
+
+  describe('the header tagline', () => {
+    it('shows the tagline from the header settings under the logo', async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [], tagline: MOCK_HEADER_TAGLINE }),
+      );
+
+      await setup();
+
+      const homeLink = screen.getByRole('link', { name: HOME_LINK_NAME });
+      const tagline = within(homeLink).getByText(MOCK_HEADER_TAGLINE);
+
+      expect(tagline).toBeVisible();
+    });
+
+    it('shows no tagline when the navigation fails to load', async () => {
+      getNavigationMock.mockResolvedValue(errorResult(MOCK_ERROR));
+
+      await setup();
+
+      const tagline = screen.queryByText(MOCK_HEADER_TAGLINE);
+
+      expect(tagline).not.toBeInTheDocument();
     });
   });
 
@@ -269,39 +278,35 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('puts only the wide button in the bar, with no phone circle', () => {
-      const accountRow = getDrawerAccountButton(SIGN_IN);
-      const barTriggers = getBarSignInButtons().filter(
-        (button) => button !== accountRow,
-      );
+      const barTriggers = getBarSignInButtons();
 
       expect(barTriggers).toHaveLength(1);
     });
 
     it('opens the sign-in panel in place and keeps the menu open', async () => {
-      const accountRow = getDrawerAccountButton(SIGN_IN);
+      const accountRow = getDrawerAccountRow(SIGN_IN);
       await user.click(accountRow);
 
       const mobilePanel = screen.getByTestId('primary-navigation-mobile-panel');
       const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-      const githubButton = within(drawerActions).getByRole('button', {
+      const githubButton = await within(drawerActions).findByRole('button', {
         name: CONTINUE_WITH_GITHUB,
       });
 
       expect(mobilePanel).toBeVisible();
-      expect(accountRow).toHaveAttribute(ARIA_EXPANDED, 'true');
       expect(githubButton).toBeVisible();
     });
 
     it('folds the account group when its row is pressed again', async () => {
-      const accountRow = getDrawerAccountButton(SIGN_IN);
+      const accountRow = getDrawerAccountRow(SIGN_IN);
       await user.click(accountRow);
-      await user.click(accountRow);
-
       const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-      const signInDialog = within(drawerActions).queryByRole('dialog');
+      const githubButton = await within(drawerActions).findByRole('button', {
+        name: CONTINUE_WITH_GITHUB,
+      });
+      await user.click(accountRow);
 
-      expect(accountRow).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(signInDialog).not.toBeInTheDocument();
+      expect(githubButton).not.toBeVisible();
     });
   });
 
@@ -314,9 +319,9 @@ describe(`<${SiteHeader.name}/>`, () => {
     await setup();
     await openPhoneMenu();
 
-    const accountButton = getDrawerAccountButton(ACCOUNT);
+    const accountRow = getDrawerAccountRow(ACCOUNT);
 
-    expect(accountButton).toBeVisible();
+    expect(accountRow).toBeVisible();
   });
 
   it('hides the language switcher when its toggle is off', async () => {
@@ -385,6 +390,12 @@ describe(`<${SiteHeader.name}/>`, () => {
     it('forwards the tenant Sanity context to the navigation loader', () => {
       expect(getNavigationMock).toHaveBeenCalledWith(
         MOCK_REQUEST_CONTEXT.sanityContext,
+      );
+    });
+
+    it("reads the tenant's header layout, sub-menu style and bar", () => {
+      expect(getHeaderStyleMock).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
       );
     });
 

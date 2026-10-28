@@ -6,6 +6,11 @@ import {
 import type { TComparedCommit } from '@platform/server/github/compare-commits';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
+import type { TFailedMigrationTenant } from '@platform/server/releases/list-failed-migration-tenants';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 
 const RELEASE_AT = '2026-04-02T10:00:00.000Z';
 
@@ -60,3 +65,14 @@ export const mockReleaseRun = (
 });
 
 export const MOCK_LAST_TAG = mockReleaseCandidate().lastTag;
+
+export const MOCK_MIGRATION_FAILED_AT = new Date(RELEASE_AT);
+
+export const mockFailedMigrationTenant = (
+  overrides: Partial<TFailedMigrationTenant> = {},
+): TFailedMigrationTenant => ({
+  id: MOCK_TENANT_ID,
+  name: MOCK_TENANT_NAME,
+  failedAt: MOCK_MIGRATION_FAILED_AT,
+  ...overrides,
+});

@@ -164,5 +164,85 @@
       "linkLabel": "Écrits",
       "listHeading": "Tous les articles"
     }
+  },
+  "docs": {
+    "hero": {
+      "eyebrow": "Documentation",
+      "heading": "Tout ce qu'il faut pour bien démarrer",
+      "supportingText": "Des guides et des réponses, organisés pour que chacun trouve ce qu'il cherche."
+    },
+    "intro": {
+      "body": [
+        "Bienvenue dans la documentation. Commencez par les guides, ou parcourez les questions ci-dessous pour une réponse rapide.",
+        "Remplacez ce texte par un bref aperçu de ce que fait votre produit ou projet et des personnes à qui s'adresse cette documentation."
+      ]
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "questions": [
+        {
+          "question": "Par où commencer ?",
+          "answer": [
+            "Orientez les nouveaux lecteurs vers le premier guide et indiquez ce dont ils ont besoin avant de commencer."
+          ]
+        },
+        {
+          "question": "Comment obtenir de l'aide ?",
+          "answer": [
+            "Expliquez où poser une question ou signaler un problème, et dans quel délai attendre une réponse."
+          ]
+        },
+        {
+          "question": "Cette documentation est-elle à jour ?",
+          "answer": [
+            "Indiquez à quelle fréquence ces pages sont relues et où voir ce qui a changé."
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "title": "Guides",
+      "slug": "guides",
+      "heading": "Guides",
+      "supportingText": "Une aide pas à pas, des premiers pas à l'usage quotidien.",
+      "listHeading": "Tous les guides",
+      "metaTitle": "Guides — une aide pas à pas dès les premiers pas",
+      "metaDescription": "Des guides pas à pas sur l'installation, les notions clés et la résolution des problèmes courants."
+    },
+    "pages": [
+      {
+        "title": "Premiers pas",
+        "slug": "premiers-pas",
+        "summary": "Un guide d'exemple. Remplacez-le par vos propres premiers pas.",
+        "body": [
+          "Décrivez ce dont les lecteurs ont besoin avant de commencer, puis guidez-les étape par étape.",
+          "Terminez par ce qu'ils doivent voir quand tout fonctionne, avec un lien vers le guide suivant."
+        ],
+        "metaTitle": "Premiers pas — un premier guide d'exemple à remplacer",
+        "metaDescription": "Un guide d'exemple créé avec votre site. Remplacez-le par les premiers pas pour vos propres lecteurs."
+      },
+      {
+        "title": "Notions clés",
+        "slug": "notions-cles",
+        "summary": "Un guide d'exemple sur les notions à connaître.",
+        "body": [
+          "Expliquez les quelques notions sur lesquelles tout le reste repose, chacune avec un court exemple.",
+          "Gardez chaque partie brève et renvoyez aux guides qui les mettent en pratique."
+        ],
+        "metaTitle": "Notions clés — un guide d'exemple sur l'essentiel",
+        "metaDescription": "Un guide d'exemple créé avec votre site. Utilisez-le pour expliquer les notions que vos lecteurs doivent connaître."
+      },
+      {
+        "title": "Dépannage",
+        "slug": "depannage",
+        "summary": "Un guide d'exemple pour résoudre les problèmes courants.",
+        "body": [
+          "Listez les problèmes les plus fréquents, chacun avec sa cause et sa solution.",
+          "Indiquez où trouver de l'aide si la réponse n'est pas ici. Supprimez cette page si vous n'en avez pas encore besoin."
+        ],
+        "metaTitle": "Dépannage — un guide d'exemple des problèmes courants",
+        "metaDescription": "Un guide d'exemple créé avec votre site. Utilisez-le pour les problèmes courants, leurs causes et leurs solutions."
+      }
+    ]
   }
 }

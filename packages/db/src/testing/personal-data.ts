@@ -1,8 +1,4 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import {
-  onPersonalDataFallback,
-  type TPersonalDataFallbackListener,
-} from '@blog/db/utils/personal-data/personal-data-fallback';
+import type { TMaybeNull } from '@blog/config/types';
 import {
   accountEmailIndex,
   decryptPersonalData,
@@ -14,35 +10,24 @@ import {
   MOCK_ENCRYPTION_KEY,
 } from '@blog/utils/encryption/encryption-fixtures';
 import { isNull } from '@blog/utils/primitives';
-import type { Mock } from 'vitest';
 
 const TEST_KEYRING = `v1:${MOCK_ENCRYPTION_KEY}`;
 
+export const TEST_PERSONAL_DATA_ENV = {
+  PERSONAL_DATA_ENCRYPTION_KEY: TEST_KEYRING,
+  PERSONAL_DATA_INDEX_KEY: MOCK_OTHER_ENCRYPTION_KEY,
+};
+
 export function usePersonalDataKeys(): void {
   beforeEach(() => {
-    vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', TEST_KEYRING);
-    vi.stubEnv('PERSONAL_DATA_INDEX_KEY', MOCK_OTHER_ENCRYPTION_KEY);
+    Object.entries(TEST_PERSONAL_DATA_ENV).forEach(([name, value]) =>
+      vi.stubEnv(name, value),
+    );
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
   });
-}
-
-export function usePersonalDataFallbackListener(): Mock<TPersonalDataFallbackListener> {
-  const listener = vi.fn<TPersonalDataFallbackListener>();
-  let stopListening: TMaybeUndefined<() => void>;
-
-  beforeEach(() => {
-    listener.mockClear();
-    stopListening = onPersonalDataFallback(listener);
-  });
-
-  afterEach(() => {
-    stopListening?.();
-  });
-
-  return listener;
 }
 
 export function decryptTestPersonalValue(

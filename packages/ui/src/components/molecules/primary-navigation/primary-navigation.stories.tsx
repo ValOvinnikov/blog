@@ -50,7 +50,11 @@ export const Default: TStory = {};
 
 export const WithActions: TStory = {
   args: {
-    actions: <button type="button">Toggle theme</button>,
+    children: (
+      <PrimaryNavigation.Actions>
+        <button type="button">Toggle theme</button>
+      </PrimaryNavigation.Actions>
+    ),
   },
 };
 
@@ -93,13 +97,15 @@ export const MobileOpen: TStory = {
 export const MobileOpenWithPanelActions: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    actions: <button type="button">Account</button>,
-    panelActions: (
-      <>
+    children: [
+      <PrimaryNavigation.Actions key="actions">
+        <button type="button">Account</button>
+      </PrimaryNavigation.Actions>,
+      <PrimaryNavigation.PanelActions key="panel-actions">
         <button type="button">EN</button>
         <button type="button">Toggle theme</button>
-      </>
-    ),
+      </PrimaryNavigation.PanelActions>,
+    ],
     mobileToggle: openToggle,
   },
 };
@@ -107,27 +113,33 @@ export const MobileOpenWithPanelActions: TStory = {
 export const MobileOpenWithDrawerActions: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    actions: <button type="button">Account</button>,
-    panelActions: (
-      <>
+    children: [
+      <PrimaryNavigation.Actions key="actions">
+        <button type="button">Account</button>
+      </PrimaryNavigation.Actions>,
+      <PrimaryNavigation.PanelActions key="panel-actions">
         <button type="button">EN</button>
         <button type="button">Toggle theme</button>
-      </>
-    ),
-    drawerActions: <button type="button">Sign in</button>,
+      </PrimaryNavigation.PanelActions>,
+      <PrimaryNavigation.DrawerActions key="drawer-actions">
+        <button type="button">Sign in</button>
+      </PrimaryNavigation.DrawerActions>,
+    ],
     mobileToggle: openToggle,
   },
 };
 
 export const DesktopWithBothActions: TStory = {
   args: {
-    actions: <button type="button">Account</button>,
-    panelActions: (
-      <>
+    children: [
+      <PrimaryNavigation.Actions key="actions">
+        <button type="button">Account</button>
+      </PrimaryNavigation.Actions>,
+      <PrimaryNavigation.PanelActions key="panel-actions">
         <button type="button">EN</button>
         <button type="button">Toggle theme</button>
-      </>
-    ),
+      </PrimaryNavigation.PanelActions>,
+    ],
     mobileToggle: closedToggle,
   },
 };
@@ -162,5 +174,25 @@ export const MobileOpenWithSubmenus: TStory = {
   args: {
     links: linksWithSubItems,
     mobileToggle: openToggle,
+  },
+};
+
+const SHARED_GROUP_NAME = 'primary-navigation-shared-group';
+
+/** A disclosure in the drawer slot that takes `groupName` folds an open sub-menu when it opens, and the reverse. */
+export const MobileOpenWithGroupedDrawerActions: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    links: linksWithSubItems,
+    groupName: SHARED_GROUP_NAME,
+    mobileToggle: openToggle,
+    children: (
+      <PrimaryNavigation.DrawerActions>
+        <details name={SHARED_GROUP_NAME}>
+          <summary>Account</summary>
+          <button type="button">Sign out</button>
+        </details>
+      </PrimaryNavigation.DrawerActions>
+    ),
   },
 };

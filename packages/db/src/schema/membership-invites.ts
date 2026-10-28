@@ -10,6 +10,7 @@ import {
 import {
   CREATED_AT_COLUMN,
   EMAIL_ENCRYPTED_COLUMN,
+  EMAIL_EXACT_INDEX_COLUMN,
   EMAIL_INDEX_COLUMN,
 } from './columns';
 import { membershipRoleEnum } from './memberships';
@@ -22,9 +23,9 @@ export const membershipInvites = pgTable(
     tenantId: uuid('tenant_id')
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
-    email: text('email').notNull(),
-    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN),
-    emailIndex: text(EMAIL_INDEX_COLUMN),
+    emailEncrypted: text(EMAIL_ENCRYPTED_COLUMN).notNull(),
+    emailIndex: text(EMAIL_INDEX_COLUMN).notNull(),
+    emailExactIndex: text(EMAIL_EXACT_INDEX_COLUMN),
     role: membershipRoleEnum('role').notNull(),
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()
@@ -32,7 +33,7 @@ export const membershipInvites = pgTable(
     consumedAt: timestamp('consumed_at', { mode: 'date' }),
   },
   (invite) => [
-    unique().on(invite.tenantId, invite.email),
+    unique().on(invite.tenantId, invite.emailExactIndex),
     index('membership_invites_email_index_idx').on(invite.emailIndex),
   ],
 );

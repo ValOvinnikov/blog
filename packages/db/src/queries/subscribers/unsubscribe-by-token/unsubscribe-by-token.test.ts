@@ -6,7 +6,6 @@ import {
   MOCK_SUBSCRIBER_EMAIL,
   MOCK_SUBSCRIBER_TAGGED_EMAIL,
 } from '@blog/db/testing/fixtures';
-import { usePersonalDataKeys } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { readSubscriberIds } from '@blog/db/testing/subscribers/fixtures';
 import { sha256Hex } from '@blog/utils/hash';
@@ -20,7 +19,6 @@ vi.mock('@blog/db/client');
 faker.seed(1);
 
 const db = useQueryTestDb();
-usePersonalDataKeys();
 
 const MOCK_UNSUBSCRIBE_TOKEN = faker.string.uuid();
 const MOCK_UNKNOWN_TOKEN = faker.string.uuid();

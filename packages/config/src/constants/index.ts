@@ -38,7 +38,6 @@ export * from './next-navigation-error';
 export * from './newsletter-result';
 export * from './operator-alert';
 export * from './path';
-export * from './personal-data';
 export * from './portable-text-block-type';
 export * from './preset';
 export * from './price-period';

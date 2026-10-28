@@ -8,11 +8,8 @@ import {
   insertTestReader,
   type TTestDb,
 } from '@blog/db/testing/fixtures';
-import {
-  encryptPersonalValue,
-  emailColumns,
-} from '@blog/db/utils/personal-data/personal-data';
-import { personalDataIndex } from '@blog/utils/encryption';
+import { mockAccountEmailIndex } from '@blog/db/testing/personal-data';
+import { uniqueEmailColumns } from '@blog/db/utils/personal-data/personal-data';
 import { eq } from 'drizzle-orm';
 
 export const MOCK_PERSONAL_DATA_LEAD_NAME = 'Grace Hopper';
@@ -31,22 +28,17 @@ export async function insertTestPersonalDataRows(
   tenantId: string,
   email: string,
 ): Promise<void> {
-  const columns = emailColumns(email, personalDataIndex);
+  const columns = uniqueEmailColumns(email);
   const { emailIndex } = columns;
-  if (!emailIndex) throw new Error('Stub the personal data keys first.');
 
-  await db.insert(schema.subscribers).values({ tenantId, email, ...columns });
+  await db.insert(schema.subscribers).values({ tenantId, ...columns });
   await insertTestLead(db, tenantId, {
     email,
-    ...columns,
     name: MOCK_PERSONAL_DATA_LEAD_NAME,
-    nameEncrypted: encryptPersonalValue(MOCK_PERSONAL_DATA_LEAD_NAME),
     message: MOCK_PERSONAL_DATA_LEAD_MESSAGE,
-    messageEncrypted: encryptPersonalValue(MOCK_PERSONAL_DATA_LEAD_MESSAGE),
   });
   await db.insert(schema.membershipInvites).values({
     tenantId,
-    email,
     ...columns,
     role: MEMBERSHIP_ROLE.EDITOR,
   });
@@ -71,7 +63,7 @@ export async function findTestReaderId(
   const [reader] = await db
     .select({ id: schema.users.id })
     .from(schema.users)
-    .where(eq(schema.users.email, email));
+    .where(eq(schema.users.emailIndex, mockAccountEmailIndex(email)));
   return reader?.id;
 }
 

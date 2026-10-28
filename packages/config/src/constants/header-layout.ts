@@ -24,3 +24,9 @@ export const HEADER_BAR_STYLE = {
 } as const;
 
 export type THeaderBarStyle = TValueOf<typeof HEADER_BAR_STYLE>;
+
+export interface IHeaderStyle {
+  layout: THeaderLayout;
+  submenuStyle: THeaderSubmenuStyle;
+  barStyle: THeaderBarStyle;
+}

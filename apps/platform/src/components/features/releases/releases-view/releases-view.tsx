@@ -4,6 +4,7 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
 import type { TReleaseCandidate } from '@platform/server/releases/get-release-candidate';
 import type { TReleaseRun } from '@platform/server/releases/get-release-run';
+import type { TFailedMigrationTenant } from '@platform/server/releases/list-failed-migration-tenants';
 import type { TReleaseResult } from '@platform/server/releases/release-result';
 import { isReleaseOverrideRequired } from '@platform/utils/release-state/release-state';
 import { tv } from '@platform/utils/tv/tv';
@@ -15,6 +16,7 @@ import { ReleaseCommits } from './components/release-commits/release-commits';
 import { ReleaseContrastCard } from './components/release-contrast-card/release-contrast-card';
 import { ReleaseSummaryCard } from './components/release-summary-card/release-summary-card';
 import { ReleaseUnavailable } from './components/release-unavailable/release-unavailable';
+import { TenantMigrationsCard } from './components/tenant-migrations-card/tenant-migrations-card';
 
 const releasesViewVariants = tv({
   slots: {
@@ -25,9 +27,14 @@ const releasesViewVariants = tv({
 export type TReleasesViewProps = {
   result: TReleaseResult<TReleaseCandidate>;
   releaseRun: TReleaseResult<TMaybeUndefined<TReleaseRun>>;
+  failedMigrationTenants: TReleaseResult<TFailedMigrationTenant[]>;
 };
 
-export const ReleasesView = ({ result, releaseRun }: TReleasesViewProps) => {
+export const ReleasesView = ({
+  result,
+  releaseRun,
+  failedMigrationTenants,
+}: TReleasesViewProps) => {
   const t = useTranslations('releasesView');
   const { root } = releasesViewVariants();
 
@@ -89,6 +96,7 @@ export const ReleasesView = ({ result, releaseRun }: TReleasesViewProps) => {
         })}
         releaseRun={releaseRun}
       />
+      <TenantMigrationsCard failedTenants={failedMigrationTenants} />
     </div>
   );
 };

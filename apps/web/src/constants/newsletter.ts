@@ -14,6 +14,7 @@ export const NEWSLETTER_LOG = {
   SUBSCRIBE_CAPABILITY_DISABLED: 'newsletter.subscribe_capability_disabled',
   SUBSCRIBED_COOKIE_SET_FAILED: 'newsletter.subscribed_cookie_set_failed',
   SUBSCRIBED_COOKIE_CLEAR_FAILED: 'newsletter.subscribed_cookie_clear_failed',
+  GATE_STATUS_FETCH_FAILED: 'newsletter.gate_status_fetch_failed',
   UNSUBSCRIBE_FAILED: 'newsletter.unsubscribe_failed',
   UNSUBSCRIBE_TENANT_UNRESOLVED: 'newsletter.unsubscribe_tenant_unresolved',
   CONFIRMATION_RESEND_FAILED: 'newsletter.confirmation_resend_failed',

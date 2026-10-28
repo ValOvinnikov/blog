@@ -4,6 +4,7 @@ import { createMembershipInvite } from '@blog/db/queries/membership-invites';
 import * as schema from '@blog/db/schema';
 import {
   insertTestLead,
+  insertTestSubscriber,
   insertTestTenant,
   insertTestUser,
   MOCK_SUBSCRIBER_EMAIL,
@@ -34,9 +35,7 @@ const NONE = { subscribers: 0, bookmarks: 0, membershipInvites: 0, leads: 0 };
 
 async function seedReaderData(tenantId: string): Promise<void> {
   const user = await insertTestUser(db());
-  await db()
-    .insert(schema.subscribers)
-    .values({ tenantId, email: MOCK_SUBSCRIBER_EMAIL });
+  await insertTestSubscriber(db(), tenantId, MOCK_SUBSCRIBER_EMAIL);
   await addBookmark(tenantId, user.id, MOCK_POST_ID);
   await createMembershipInvite(
     tenantId,
