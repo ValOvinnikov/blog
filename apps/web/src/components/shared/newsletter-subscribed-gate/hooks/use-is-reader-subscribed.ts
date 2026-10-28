@@ -4,7 +4,6 @@ import type { TMaybeUndefined } from '@blog/config';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { SESSION_STATUS } from '@web/constants/session';
 import { isReaderSubscribedToNewsletter } from '@web/server/newsletter/reader-subscription-status/reader-subscription-status';
-import { logger } from '@web/utils/logger/logger';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -25,7 +24,6 @@ export const useIsReaderSubscribed = (): TMaybeUndefined<boolean> => {
         if (!cancelled) setIsSubscribed(subscribed);
       })
       .catch((error: unknown) => {
-        logger.error(NEWSLETTER_LOG.GATE_STATUS_FETCH_FAILED, { error });
         reportClientError(NEWSLETTER_LOG.GATE_STATUS_FETCH_FAILED, error);
       });
 

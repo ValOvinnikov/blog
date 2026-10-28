@@ -8,7 +8,6 @@ import { isReaderSubscribedToNewsletter } from '@web/server/newsletter/reader-su
 import { renderHook, waitFor } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockSession } from '@web/testing/shared/session/fixtures';
-import { logger } from '@web/utils/logger/logger';
 import { reportClientError } from '@web/utils/report-client-error';
 import { type SessionContextValue, useSession } from 'next-auth/react';
 
@@ -58,7 +57,7 @@ describe(useIsReaderSubscribed, () => {
     },
   );
 
-  it('logs and leaves the decision to the cookie when the status read fails', async () => {
+  it('reports and leaves the decision to the cookie when the status read fails', async () => {
     mockSessionStatus(SESSION_STATUS.AUTHENTICATED);
     vi.mocked(isReaderSubscribedToNewsletter).mockRejectedValue(MOCK_ERROR);
 
@@ -70,10 +69,6 @@ describe(useIsReaderSubscribed, () => {
         MOCK_ERROR,
       );
     });
-    expect(logger.error).toHaveBeenCalledWith(
-      NEWSLETTER_LOG.GATE_STATUS_FETCH_FAILED,
-      { error: MOCK_ERROR },
-    );
     expect(result.current).toBeUndefined();
   });
 });
