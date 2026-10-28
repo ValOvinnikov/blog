@@ -25,20 +25,20 @@ import type { TVoiceOverridesByLocaleInput } from './parse-voice-overrides';
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
-// A field absent from the input is left untouched on `UPDATE` — Look and
-// Voice are saved from separate admin-panel tabs, so a Look save must never
-// wipe Voice data (or vice versa). `logoHue`/`logoAssetUrl`/`faviconAssetUrl`
-// additionally accept an explicit `null` to clear them, since `undefined`
-// alone can't express "unset this". A Voice save replaces the map of each
-// locale it carries (even with `{}`) and leaves every other locale's map untouched.
+// A field absent from the input is left untouched on `UPDATE` and takes the
+// preset's value on `INSERT`: Look and Voice save separately, and a plan may
+// keep a Look field from being written. `logoHue`/`logoAssetUrl`/`faviconAssetUrl`
+// accept an explicit `null` to clear them, since `undefined` alone can't
+// express "unset this". A Voice save replaces the map of each locale it
+// carries (even with `{}`) and leaves every other locale's map untouched.
 export const updateSiteConfigInputSchema = z.object({
   preset: z.enum(PRESET_ID),
-  accentHue: hueSchema,
+  accentHue: hueSchema.optional(),
   logoHue: hueSchema.nullable().optional(),
-  headingFont: z.enum(FONT_CHOICE),
-  bodyFont: z.enum(FONT_CHOICE),
-  radiusScale: z.enum(RADIUS_SCALE),
-  density: z.enum(DENSITY),
+  headingFont: z.enum(FONT_CHOICE).optional(),
+  bodyFont: z.enum(FONT_CHOICE).optional(),
+  radiusScale: z.enum(RADIUS_SCALE).optional(),
+  density: z.enum(DENSITY).optional(),
   languageSwitcherStyle: z.enum(LANGUAGE_SWITCHER_STYLE).optional(),
   cardStyle: z.enum(CARD_STYLE).optional(),
   headerControlStyle: z.enum(HEADER_CONTROL_STYLE).optional(),
@@ -68,7 +68,12 @@ export function presentOptionalFields(
 ): TSiteConfigWritable {
   const fields: TSiteConfigWritable = {};
 
+  if (!isUndefined(parsed.accentHue)) fields.accentHue = parsed.accentHue;
   if (!isUndefined(parsed.logoHue)) fields.logoHue = parsed.logoHue;
+  if (!isUndefined(parsed.headingFont)) fields.headingFont = parsed.headingFont;
+  if (!isUndefined(parsed.bodyFont)) fields.bodyFont = parsed.bodyFont;
+  if (!isUndefined(parsed.radiusScale)) fields.radiusScale = parsed.radiusScale;
+  if (!isUndefined(parsed.density)) fields.density = parsed.density;
   if (!isUndefined(parsed.languageSwitcherStyle)) {
     fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
   }

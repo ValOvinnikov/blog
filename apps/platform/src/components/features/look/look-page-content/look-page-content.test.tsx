@@ -1,4 +1,11 @@
-import { CAPABILITY, LOCALE_ISO_CODES, PRESET_ID } from '@blog/config';
+import {
+  CAPABILITY,
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
+import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -30,6 +37,9 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
 const MOCK_ACCENT_HUE = 28;
 const SIGN_IN = 'Sign in';
+const ARIA_PRESSED = 'aria-pressed';
+const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
+const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
 
 const tLogoHue = makeEnTranslator('logoHueField');
 
@@ -71,6 +81,38 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     expect(editorialRadio).toBeChecked();
     expect(hueValue).toBeVisible();
+  });
+
+  describe('with a stored Growth-only corner radius', () => {
+    beforeEach(() => {
+      getSiteConfigMock.mockResolvedValue(
+        mockSiteConfig({ radiusScale: RADIUS_SCALE.XL }),
+      );
+    });
+
+    it("shows and previews the preset's radius on Free", async () => {
+      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
+
+      const presetRadius = screen.getByRole('button', {
+        name: RADIUS_LABEL.MD,
+      });
+      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(presetRadius).toBeDisabled();
+      expect(sampleTokens).not.toHaveStyle({ '--radius-md': '12px' });
+    });
+
+    it('shows and previews the stored radius on Growth', async () => {
+      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
+
+      const storedRadius = screen.getByRole('button', {
+        name: RADIUS_LABEL.XL,
+      });
+      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(storedRadius).toBeEnabled();
+      expect(sampleTokens).toHaveStyle({ '--radius-md': '12px' });
+    });
   });
 
   it('previews Sign in when a reader feature is on', async () => {

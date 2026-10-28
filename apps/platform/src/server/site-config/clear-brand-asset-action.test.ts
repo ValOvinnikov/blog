@@ -109,7 +109,7 @@ describe(clearBrandAssetAction, () => {
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
       expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        ...MOCK_THEME_FIELDS,
+        preset: MOCK_THEME_FIELDS.preset,
         ...cleared,
       });
       expect(delMock).toHaveBeenCalledWith(blobUrl, {

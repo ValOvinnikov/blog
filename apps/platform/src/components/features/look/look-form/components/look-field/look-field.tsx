@@ -1,5 +1,7 @@
 import { Field } from '@base-ui/react/field';
 import { Fieldset } from '@base-ui/react/fieldset';
+import type { TLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import { useTranslations } from 'next-intl';
@@ -13,6 +15,7 @@ export type TLookFieldProps = {
   error?: string;
   isOptional?: boolean;
   isGroup?: boolean;
+  lock?: TLookFieldLock;
   children: ReactNode;
 };
 
@@ -22,6 +25,7 @@ export const LookField = ({
   error,
   isOptional = false,
   isGroup = false,
+  lock,
   children,
 }: TLookFieldProps) => {
   const t = useTranslations('lookForm');
@@ -31,6 +35,7 @@ export const LookField = ({
     label: labelSlot,
     hint: hintSlot,
     error: errorSlot,
+    lock: lockSlot,
   } = lookFieldVariants();
 
   const labelContent = (
@@ -44,13 +49,22 @@ export const LookField = ({
       )}
     </>
   );
-  const description = hint && (
-    <Field.Description
-      id={hintId}
-      className={textVariants({ variant: 'hint', class: hintSlot() })}
-    >
-      {hint}
-    </Field.Description>
+  const description = (
+    <>
+      {hint && (
+        <Field.Description
+          id={hintId}
+          className={textVariants({ variant: 'hint', class: hintSlot() })}
+        >
+          {hint}
+        </Field.Description>
+      )}
+      {lock && (
+        <LockedReason id={lock.id} className={lockSlot()}>
+          {lock.reason}
+        </LockedReason>
+      )}
+    </>
   );
 
   return (

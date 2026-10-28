@@ -119,8 +119,10 @@ describe(removeCustomDomainAction, () => {
     );
     expect(enqueueWorkerRequest).toHaveBeenCalledWith(
       CUSTOM_DOMAIN_PATH.DISCONNECT,
-      MOCK_TENANT_ID,
-      MOCK_CUSTOM_DOMAIN,
+      {
+        tenantId: MOCK_TENANT_ID,
+        domain: MOCK_CUSTOM_DOMAIN,
+      },
     );
     expect(recordAuditEvent).toHaveBeenCalledWith({
       logEvent: CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED,

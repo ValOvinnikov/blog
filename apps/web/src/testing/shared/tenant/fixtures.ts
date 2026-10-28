@@ -66,6 +66,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   ownerInviteHeadsUpSentAt: null,
   ownerInviteNudgeSentAt: null,
   ownerSiteReadySentAt: null,
+  unsentReinviteFormerOwnerEmailEncrypted: null,
   lastActivityAt: MOCK_TENANT_CREATED_AT,
   inactivityWarnedAt: null,
   suspendedAt: null,

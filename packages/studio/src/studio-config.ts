@@ -2,6 +2,7 @@ import {
   LOCALE_ISO_CODES,
   type TCapability,
   type TLocaleIsoCode,
+  type TModulePack,
   type TSanityLoginProvider,
 } from '@blog/config/constants';
 import { buildLoginProviderAuth } from '@blog/studio/auth/login-provider-auth';
@@ -17,14 +18,13 @@ import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
-import { createCapabilityWarningItem } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-item';
 import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import {
   createLocalizationNoticeInput,
   type TLocalizationNoticeOptions,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
 import { createSingleLanguageInput } from '@blog/studio/schema-types/inputs/single-language-input/single-language-input';
 import {
   createTranslationLinkInput,
@@ -34,6 +34,10 @@ import { articleTextSchema } from '@blog/studio/schema-types/portable-text/artic
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import {
+  EVERY_MODULE_PACK,
+  setEntitledModulePacks,
+} from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { setLiveLanguages } from '@blog/studio/schema-types/validation/live-languages/live-languages';
 import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
@@ -47,12 +51,17 @@ import { media, mediaAssetSource } from 'sanity-plugin-media';
 
 import { createStudioStructure } from './studio-structure';
 
+export type TStudioEntitlements = {
+  modulePacks?: readonly TModulePack[];
+};
+
 export type TBuildStudioConfigParams = {
   projectId: string;
   dataset: string;
   basePath?: string;
   title: string;
   enabledCapabilities?: readonly TCapability[];
+  entitlements?: TStudioEntitlements;
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
   loginProvider?: TSanityLoginProvider;
@@ -117,12 +126,15 @@ export const buildStudioConfig = ({
   basePath,
   title,
   enabledCapabilities,
+  entitlements,
   defaultLocale = LOCALE_ISO_CODES.EN,
   liveLocales,
   loginProvider,
 }: TBuildStudioConfigParams) => {
+  const entitledModulePacks = entitlements?.modulePacks ?? EVERY_MODULE_PACK;
   setDefaultLanguage(defaultLocale);
   setLiveLanguages(liveLocales ?? []);
+  setEntitledModulePacks(entitledModulePacks);
 
   const offeredLocales = orderLocales(defaultLocale, liveLocales);
   const languages = offeredLocales.map((locale) => ({
@@ -171,6 +183,9 @@ export const buildStudioConfig = ({
             singleLanguageFields({ liveLocales, defaultLocale }),
           ]
         : []),
+      ...(enabledCapabilities || entitlements?.modulePacks
+        ? [entitlementGates({ enabledCapabilities, entitledModulePacks })]
+        : []),
     ],
 
     schema: {
@@ -185,12 +200,6 @@ export const buildStudioConfig = ({
     form: {
       image: { assetSources: [mediaAssetSource] },
       file: { assetSources: [mediaAssetSource] },
-      ...(enabledCapabilities && {
-        components: {
-          input: createCapabilityWarningInput(enabledCapabilities),
-          item: createCapabilityWarningItem(enabledCapabilities),
-        },
-      }),
     },
 
     document: {

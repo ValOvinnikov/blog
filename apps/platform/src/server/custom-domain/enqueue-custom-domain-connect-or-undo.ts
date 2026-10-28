@@ -13,11 +13,10 @@ export const enqueueCustomDomainConnectOrUndo = async (
   tenantId: string,
   domain: string,
 ): Promise<boolean> => {
-  const status = await enqueueWorkerRequest(
-    CUSTOM_DOMAIN_PATH.CONNECT,
+  const status = await enqueueWorkerRequest(CUSTOM_DOMAIN_PATH.CONNECT, {
     tenantId,
     domain,
-  );
+  });
   if (status === HTTP_STATUS.ACCEPTED) return true;
 
   logger.error(CUSTOM_DOMAIN_LOG.CONNECT_ENQUEUE_REJECTED, {

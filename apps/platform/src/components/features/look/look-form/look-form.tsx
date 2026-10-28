@@ -1,6 +1,7 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config';
+import type { TTenantPlan } from '@blog/db/constants';
 import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
 import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
 import { LanguageSwitcherCard } from '@platform/components/features/look/look-form/components/language-switcher-card';
@@ -21,6 +22,7 @@ export type TLookFormProps = {
   tenantId: string;
   tenantName: string;
   initialValues: TLookFormValues;
+  plan: TTenantPlan;
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
   savedAt?: Date;
@@ -31,6 +33,7 @@ export const LookForm = ({
   tenantId,
   tenantName,
   initialValues,
+  plan,
   liveLocales,
   hasReaderAccounts,
   savedAt,
@@ -42,6 +45,7 @@ export const LookForm = ({
     tenantId,
     tenantName,
     initialValues,
+    plan,
     savedAt,
     archivedAt,
     revealInvalidField: () => tabsProps.onChange('edit'),

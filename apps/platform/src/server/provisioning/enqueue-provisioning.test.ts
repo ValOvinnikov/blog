@@ -101,11 +101,10 @@ describe(enqueueProvisioning, () => {
   });
 
   it('includes the domain in the signed body when one is given', async () => {
-    await enqueueWorkerRequest(
-      CUSTOM_DOMAIN_PATH.CONNECT,
-      MOCK_TENANT_ID,
-      MOCK_CUSTOM_DOMAIN,
-    );
+    await enqueueWorkerRequest(CUSTOM_DOMAIN_PATH.CONNECT, {
+      tenantId: MOCK_TENANT_ID,
+      domain: MOCK_CUSTOM_DOMAIN,
+    });
 
     const [, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
     const headers = init.headers as Record<string, string>;

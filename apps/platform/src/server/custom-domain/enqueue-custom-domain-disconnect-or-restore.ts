@@ -13,11 +13,10 @@ export const enqueueCustomDomainDisconnectOrRestore = async (
   tenantId: string,
   domain: string,
 ): Promise<boolean> => {
-  const status = await enqueueWorkerRequest(
-    CUSTOM_DOMAIN_PATH.DISCONNECT,
+  const status = await enqueueWorkerRequest(CUSTOM_DOMAIN_PATH.DISCONNECT, {
     tenantId,
     domain,
-  );
+  });
   if (status === HTTP_STATUS.ACCEPTED) return true;
 
   logger.error(CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING, {

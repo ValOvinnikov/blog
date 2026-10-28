@@ -1,6 +1,5 @@
 import { HTTP_METHOD, type TMaybeNull } from '@blog/config';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
-import { isUndefined } from '@blog/utils/primitives';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -10,12 +9,18 @@ const PROVISION_PATH = '/api/provision';
 // Twice the platform's other outbound calls: the worker admits the row and starts the run before it answers.
 const ENQUEUE_TIMEOUT_MS = 10_000;
 
+type TWorkerRequestBody = {
+  tenantId: string;
+  formerOwnerEmail?: string;
+  domain?: string;
+};
+
 /** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */
 export const enqueueWorkerRequest = async (
   path: string,
-  tenantId: string,
-  domain?: string,
+  body: TWorkerRequestBody,
 ): Promise<TMaybeNull<number>> => {
+  const { tenantId } = body;
   const workerUrl = env.WORKER_ENQUEUE_URL;
   const secret = env.WORKER_ENQUEUE_SECRET;
 
@@ -30,9 +35,7 @@ export const enqueueWorkerRequest = async (
   }
 
   const url = new URL(path, workerUrl);
-  const rawBody = JSON.stringify(
-    isUndefined(domain) ? { tenantId } : { tenantId, domain },
-  );
+  const rawBody = JSON.stringify(body);
 
   try {
     const response = await fetch(url, {
@@ -58,4 +61,4 @@ export const enqueueWorkerRequest = async (
 export const enqueueProvisioning = (
   tenantId: string,
 ): Promise<TMaybeNull<number>> =>
-  enqueueWorkerRequest(PROVISION_PATH, tenantId);
+  enqueueWorkerRequest(PROVISION_PATH, { tenantId });

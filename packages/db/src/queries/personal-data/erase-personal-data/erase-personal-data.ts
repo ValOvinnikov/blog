@@ -2,6 +2,7 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { deleteAccount } from '@blog/db/queries/account/delete-account';
 import { toPersonalEmailIndex } from '@blog/db/queries/personal-data/personal-data-match';
+import { eraseUnsentStudioReinvites } from '@blog/db/queries/personal-data/unsent-studio-reinvite-personal-data';
 import { findUserByEmail } from '@blog/db/queries/users/find-user-by-email';
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
@@ -13,6 +14,7 @@ export type TPersonalDataCounts = {
   subscribers: number;
   leads: number;
   membershipInvites: number;
+  unsentStudioReinvites: number;
   readerAccounts: number;
 };
 
@@ -47,22 +49,28 @@ export async function erasePersonalData(
 
   const db = getDb();
 
-  const [erasedSubscribers, erasedLeads, erasedInvites, erasedAccounts] =
-    await Promise.all([
-      db
-        .delete(subscribers)
-        .where(eq(subscribers.emailIndex, emailIndex))
-        .returning({ id: subscribers.id }),
-      db
-        .delete(leads)
-        .where(eq(leads.emailIndex, emailIndex))
-        .returning({ id: leads.id }),
-      db
-        .delete(membershipInvites)
-        .where(eq(membershipInvites.emailIndex, emailIndex))
-        .returning({ id: membershipInvites.id }),
-      includesReaderAccount ? eraseReaderAccount(email.trim()) : okResult(0),
-    ]);
+  const [
+    erasedSubscribers,
+    erasedLeads,
+    erasedInvites,
+    erasedReinvites,
+    erasedAccounts,
+  ] = await Promise.all([
+    db
+      .delete(subscribers)
+      .where(eq(subscribers.emailIndex, emailIndex))
+      .returning({ id: subscribers.id }),
+    db
+      .delete(leads)
+      .where(eq(leads.emailIndex, emailIndex))
+      .returning({ id: leads.id }),
+    db
+      .delete(membershipInvites)
+      .where(eq(membershipInvites.emailIndex, emailIndex))
+      .returning({ id: membershipInvites.id }),
+    eraseUnsentStudioReinvites(email),
+    includesReaderAccount ? eraseReaderAccount(email.trim()) : okResult(0),
+  ]);
 
   const isReaderAccountRefused =
     !erasedAccounts.ok &&
@@ -75,6 +83,7 @@ export async function erasePersonalData(
       subscribers: erasedSubscribers.length,
       leads: erasedLeads.length,
       membershipInvites: erasedInvites.length,
+      unsentStudioReinvites: erasedReinvites,
       readerAccounts: erasedAccounts.ok ? erasedAccounts.data : 0,
     },
     isReaderAccountRefused,

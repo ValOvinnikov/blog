@@ -1,13 +1,15 @@
-import { CAPABILITY } from '@blog/config/constants';
+import { CAPABILITY, MODULE_PACK } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 import type { ComponentProps } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { StudioMount } from './studio-mount';
 
-const { STUDIO_LAYOUT_TEST_ID, INPUT_OVERRIDE_MARKER } = vi.hoisted(() => ({
+const { STUDIO_LAYOUT_TEST_ID } = vi.hoisted(() => ({
   STUDIO_LAYOUT_TEST_ID: 'studio-layout-mock',
-  INPUT_OVERRIDE_MARKER: 'has-input-override',
 }));
 
 vi.mock('sanity/structure');
@@ -30,13 +32,13 @@ vi.mock('sanity', async () => {
         dataset: string;
         basePath?: string;
         title: string;
-        form?: { components?: { input?: unknown } };
+        plugins?: TMaybeUndefined<{ name: string }>[];
       };
       children: React.ReactNode;
     }) => (
       <div data-testid="studio-provider-mock">
         {config.projectId}:{config.dataset}:{config.basePath}:{config.title}
-        {config.form?.components?.input ? INPUT_OVERRIDE_MARKER : null}
+        {config.plugins?.map((plugin) => plugin?.name).join(' ')}
         {children}
       </div>
     ),
@@ -50,6 +52,10 @@ const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_DATASET = faker.lorem.word();
 const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
 const MOCK_TITLE = faker.lorem.words(2);
+
+const ENTITLEMENT_GATES_NAME = entitlementGates({
+  entitledModulePacks: EVERY_MODULE_PACK,
+}).name;
 
 const renderMount = (
   overrides: Partial<ComponentProps<typeof StudioMount>> = {},
@@ -74,9 +80,20 @@ describe(`<${StudioMount.name}/>`, () => {
     expect(html).toContain(STUDIO_LAYOUT_TEST_ID);
   });
 
-  it('applies the enabled capabilities to the Studio forms', () => {
-    const html = renderMount({ enabledCapabilities: [CAPABILITY.NEWSLETTER] });
+  it.each([
+    {
+      given: 'enabled capabilities',
+      overrides: { enabledCapabilities: [CAPABILITY.NEWSLETTER] },
+    },
+    {
+      given: 'entitlements',
+      overrides: { entitlements: { modulePacks: [MODULE_PACK.CORE] } },
+    },
+  ])('gates the Studio by the $given', ({ overrides }) => {
+    expect(renderMount(overrides)).toContain(ENTITLEMENT_GATES_NAME);
+  });
 
-    expect(html).toContain(INPUT_OVERRIDE_MARKER);
+  it('leaves the Studio ungated without capabilities or entitlements', () => {
+    expect(renderMount()).not.toContain(ENTITLEMENT_GATES_NAME);
   });
 });

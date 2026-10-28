@@ -69,21 +69,21 @@ export async function upsertSiteConfig(
     voicePatch = result.data;
   }
 
-  const required = {
-    preset: parsed.preset,
-    accentHue: parsed.accentHue,
-    headingFont: parsed.headingFont,
-    bodyFont: parsed.bodyFont,
-    radiusScale: parsed.radiusScale,
-    density: parsed.density,
-  };
+  const { preset } = parsed;
   const optional = presentOptionalFields(parsed);
-  const presetBundle = PRESET_REGISTRY[parsed.preset];
+  const presetBundle = PRESET_REGISTRY[preset];
+  const { accentHue, headingFont, bodyFont, radiusScale, density } =
+    presetBundle.themeTokens;
 
   const [row] = await db
     .insert(siteConfig)
     .values({
       tenantId,
+      accentHue,
+      headingFont,
+      bodyFont,
+      radiusScale,
+      density,
       cardStyle: presetBundle.cardStyle,
       headerControlStyle: presetBundle.headerControlStyle,
       accountButtonStyle: presetBundle.accountButtonStyle,
@@ -94,14 +94,14 @@ export async function upsertSiteConfig(
       headerLayout: presetBundle.headerLayout,
       headerSubmenuStyle: presetBundle.headerSubmenuStyle,
       headerBarStyle: presetBundle.headerBarStyle,
-      ...required,
+      preset,
       ...optional,
       ...(voicePatch && { voiceOverridesByLocale: voicePatch }),
     })
     .onConflictDoUpdate({
       target: siteConfig.tenantId,
       set: {
-        ...required,
+        preset,
         ...optional,
         ...(voicePatch && {
           voiceOverridesByLocale: sql`${siteConfig.voiceOverridesByLocale} || ${JSON.stringify(voicePatch)}::jsonb`,
