@@ -24,6 +24,8 @@ export type TLookFormContext = {
   brandImageError: TMaybeUndefined<{ kind: TBrandAssetKind; message: string }>;
   changePreset: (preset: TPresetId) => void;
   resetToPreset: () => void;
+  isSubmenuPreviewOpen: boolean;
+  setIsSubmenuPreviewOpen: (isOpen: boolean) => void;
 };
 
 const LookFormContext =

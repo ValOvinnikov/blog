@@ -22,7 +22,7 @@ export const LookPreview = ({
   liveLocales,
   hasReaderAccounts,
 }: TLookPreviewProps) => {
-  const { tenantName, values } = useLookForm();
+  const { tenantName, values, isSubmenuPreviewOpen } = useLookForm();
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
@@ -59,6 +59,7 @@ export const LookPreview = ({
         header={toSampleHeaderStyle(values)}
         hasReaderAccounts={hasReaderAccounts}
         isNarrow={isNarrow}
+        isSubmenuOpen={isSubmenuPreviewOpen}
       />
     </PreviewFrame>
   );

@@ -330,10 +330,20 @@ describe(`<${LookSample.name}/>`, () => {
       },
     );
 
+    it('keeps the Topics sub-menu closed by default', () => {
+      setup();
+
+      const topicsTrigger = screen.getByText(TOPICS);
+      const submenu = screen.queryByTestId(SAMPLE_SUBMENU_TEST_ID);
+
+      expect(topicsTrigger).toBeVisible();
+      expect(submenu).not.toBeInTheDocument();
+    });
+
     it.each(Object.values(HEADER_SUBMENU_STYLE))(
-      'draws the %s sub-menu open under the Topics link',
+      'draws the %s sub-menu open under the Topics link when asked',
       (submenuStyle) => {
-        setupWithHeader({ submenuStyle });
+        setupWithHeader({ submenuStyle }, { isSubmenuOpen: true });
 
         const submenu = screen.getByTestId(SAMPLE_SUBMENU_TEST_ID);
         const topicsTrigger = screen.getByText(TOPICS);
