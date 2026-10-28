@@ -129,6 +129,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     suspendedAt: null,
     deletionNotifiedAt: null,
     suspensionReason: null,
+    contentMigrationFailedAt: null,
     createdAt,
     updatedAt: createdAt,
     ...overrides,
