@@ -3,13 +3,15 @@ import {
   Heading,
   type THeadingLevel,
 } from '@platform/components/shared/heading';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 export type TCardHeaderProps = {
   title: ReactNode;
   supportingText?: ReactNode;
   actions?: ReactNode;
   headingLevel?: THeadingLevel;
+  titleRef?: Ref<HTMLHeadingElement>;
+  titleTabIndex?: number;
   className?: string;
 };
 
@@ -18,6 +20,8 @@ export const CardHeader = ({
   supportingText,
   actions,
   headingLevel = 2,
+  titleRef,
+  titleTabIndex,
   className,
 }: TCardHeaderProps) => {
   const { header, headerTitleGroup, headerDescription, headerActions } =
@@ -26,7 +30,12 @@ export const CardHeader = ({
   return (
     <div className={header({ class: className })}>
       <div className={headerTitleGroup()}>
-        <Heading level={headingLevel} size="cardTitle">
+        <Heading
+          level={headingLevel}
+          size="cardTitle"
+          ref={titleRef}
+          tabIndex={titleTabIndex}
+        >
           {title}
         </Heading>
         {supportingText && (

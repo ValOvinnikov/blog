@@ -12,7 +12,21 @@ import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-hea
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  KEY_ARROW_DOWN,
+  KEY_ARROW_UP,
+  KEY_END,
+} from '@web/testing/shared/keyboard/constants';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
+import {
+  MOCK_BLOG_LINK,
+  MOCK_TOPICS_GROUP,
+  MOCK_TOPICS_LINK,
+} from '@web/testing/shared/link/fixtures';
+import {
+  stubHidePopover,
+  unstubHidePopover,
+} from '@web/testing/shared/popover/stub-hide-popover';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
@@ -85,6 +99,7 @@ const setup = customRenderAsync(SiteHeader, {});
 const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
+const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
 const SIGN_IN = 'Sign in';
 const ACCOUNT = 'Account';
 const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
@@ -271,10 +286,81 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   describe('with the account in the phone menu', () => {
+    const getPanelRows = () => {
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      return {
+        subMenuRow: within(mobilePanel).getByText(MOCK_TOPICS_GROUP.label, {
+          selector: 'summary',
+        }),
+        blogLink: within(mobilePanel).getByRole('link', {
+          name: MOCK_BLOG_LINK.label,
+        }),
+        accountRow: getDrawerAccountRow(SIGN_IN),
+      };
+    };
+
     beforeEach(async () => {
+      stubHidePopover();
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [MOCK_TOPICS_GROUP, MOCK_BLOG_LINK] }),
+      );
       getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
       await setup();
       await openPhoneMenu();
+    });
+
+    afterEach(() => {
+      unstubHidePopover();
+    });
+
+    it('focuses the leading sub-menu row when the menu opens', () => {
+      const { subMenuRow } = getPanelRows();
+
+      expect(subMenuRow).toHaveFocus();
+    });
+
+    it('reaches the account row with ArrowDown, past the closed sub-menu', async () => {
+      const { blogLink, accountRow } = getPanelRows();
+
+      await user.keyboard(KEY_ARROW_DOWN);
+      expect(blogLink).toHaveFocus();
+
+      await user.keyboard(KEY_ARROW_DOWN);
+      expect(accountRow).toHaveFocus();
+    });
+
+    it('reaches the sub-menu row with ArrowUp from the account row', async () => {
+      const { subMenuRow } = getPanelRows();
+      await user.keyboard(KEY_END);
+
+      await user.keyboard(`${KEY_ARROW_UP}${KEY_ARROW_UP}`);
+
+      expect(subMenuRow).toHaveFocus();
+    });
+
+    it('wraps Tab from the account row to the first row, and Shift+Tab back', async () => {
+      const { subMenuRow, accountRow } = getPanelRows();
+      await user.keyboard(KEY_END);
+      expect(accountRow).toHaveFocus();
+
+      await user.tab();
+      expect(subMenuRow).toHaveFocus();
+
+      await user.tab({ shift: true });
+      expect(accountRow).toHaveFocus();
+    });
+
+    it('puts the rows of an opened sub-menu into the arrow-key order', async () => {
+      const { subMenuRow } = getPanelRows();
+      await user.click(subMenuRow);
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      const [leadSubLink] = within(mobilePanel).getAllByRole('link', {
+        name: MOCK_TOPICS_LINK.label,
+      });
+
+      await user.keyboard(KEY_ARROW_DOWN);
+
+      expect(leadSubLink).toHaveFocus();
     });
 
     it('puts only the wide button in the bar, with no phone circle', () => {
@@ -287,7 +373,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       const accountRow = getDrawerAccountRow(SIGN_IN);
       await user.click(accountRow);
 
-      const mobilePanel = screen.getByTestId('primary-navigation-mobile-panel');
+      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
       const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
       const githubButton = await within(drawerActions).findByRole('button', {
         name: CONTINUE_WITH_GITHUB,

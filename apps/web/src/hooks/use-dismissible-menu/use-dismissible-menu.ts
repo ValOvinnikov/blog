@@ -5,10 +5,21 @@ import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
 import { useCallback, useEffect } from 'react';
 
 const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
+
+const isInsideClosedDetails = (element: Element): boolean => {
+  const closedDetails = element.parentElement?.closest('details:not([open])');
+  if (!closedDetails) return false;
+
+  const isOwnSummary =
+    element.matches('summary') && element.parentElement === closedDetails;
+  return isOwnSummary ? isInsideClosedDetails(closedDetails) : true;
+};
 
 const getFocusables = (panel: TMaybeNull<HTMLElement>) =>
-  Array.from(panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
+  Array.from(
+    panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? [],
+  ).filter((element) => !isInsideClosedDetails(element));
 
 export type TDismissibleMenuAccessors = {
   getTrigger: () => TMaybeNull<HTMLElement>;

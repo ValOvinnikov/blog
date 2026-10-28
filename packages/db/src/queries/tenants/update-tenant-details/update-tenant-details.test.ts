@@ -10,6 +10,10 @@ import {
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
+import {
+  getUnsentStudioReinviteEmail,
+  setUnsentStudioReinvite,
+} from '@blog/db/queries/tenants/unsent-studio-reinvite';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@blog/db/schema';
 import { type users, verificationTokens } from '@blog/db/schema/auth';
@@ -69,6 +73,7 @@ const MOCK_ALT_DOMAIN = faker.internet.domainName();
 const MOCK_FIXED_DOMAIN = faker.internet.domainName();
 const MOCK_OTHER_TENANT_DOMAIN = faker.internet.domainName();
 const MOCK_NEW_OWNER_EMAIL = faker.internet.email().toLowerCase();
+const MOCK_PREVIOUS_FORMER_OWNER_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_UNNORMALIZED_NEW_OWNER_EMAIL = `  ${MOCK_NEW_OWNER_EMAIL.toUpperCase()}  `;
 const MOCK_MEMBER_EMAIL = faker.internet.email().toLowerCase();
 const MOCK_OTHER_EMAIL = faker.internet.email().toLowerCase();
@@ -308,8 +313,8 @@ describe(updateTenantDetails, () => {
           ownerEmail: MOCK_UNNORMALIZED_NEW_OWNER_EMAIL,
         });
 
-        const { ownerEmailChanged } = unwrapUpdatedResult(result);
-        expect(ownerEmailChanged).toBe(true);
+        const { previousOwnerEmail } = unwrapUpdatedResult(result);
+        expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
 
         const invite = await readOwnerInvite(tenantId);
         expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
@@ -322,6 +327,26 @@ describe(updateTenantDetails, () => {
           MOCK_NEW_OWNER_EMAIL,
         );
       });
+
+      it.each([
+        ['clears', MOCK_NEW_OWNER_EMAIL, null],
+        ['keeps', MOCK_OWNER_EMAIL, MOCK_PREVIOUS_FORMER_OWNER_EMAIL],
+      ])(
+        '%s an earlier unsent Studio re-invite when the owner email is %s',
+        async (_verb, ownerEmail, expected) => {
+          await setUnsentStudioReinvite(
+            tenantId,
+            MOCK_PREVIOUS_FORMER_OWNER_EMAIL,
+          );
+
+          await updateTenantDetails(tenantId, {
+            ...MOCK_VALID_INPUT,
+            ownerEmail,
+          });
+
+          expect(await getUnsentStudioReinviteEmail(tenantId)).toBe(expected);
+        },
+      );
 
       it.each([
         ['omitted', undefined],
@@ -366,8 +391,8 @@ describe(updateTenantDetails, () => {
           ownerEmail: MOCK_OWNER_EMAIL,
         });
 
-        const { ownerEmailChanged } = unwrapUpdatedResult(result);
-        expect(ownerEmailChanged).toBe(false);
+        const { previousOwnerEmail } = unwrapUpdatedResult(result);
+        expect(previousOwnerEmail).toBeUndefined();
         const identifiers = await readVerificationIdentifiers();
         expect(identifiers).toEqual([MOCK_OWNER_EMAIL]);
       });
@@ -443,8 +468,8 @@ describe(updateTenantDetails, () => {
           ownerEmail: MOCK_NEW_OWNER_EMAIL,
         });
 
-        const { ownerEmailChanged } = unwrapUpdatedResult(result);
-        expect(ownerEmailChanged).toBe(true);
+        const { previousOwnerEmail } = unwrapUpdatedResult(result);
+        expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
         const ownerMembership = await readOwnerMembership(tenantId);
         expect(ownerMembership).toBeUndefined();
         const ownerInvite = await readOwnerInvite(tenantId);
@@ -578,8 +603,8 @@ describe(updateTenantDetails, () => {
         ownerEmail: MOCK_NEW_OWNER_EMAIL,
       });
 
-      const { ownerEmailChanged } = unwrapUpdatedResult(result);
-      expect(ownerEmailChanged).toBe(true);
+      const { previousOwnerEmail } = unwrapUpdatedResult(result);
+      expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
       const ownerInvite = await readOwnerInvite(tenantId);
       expect(
         decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),

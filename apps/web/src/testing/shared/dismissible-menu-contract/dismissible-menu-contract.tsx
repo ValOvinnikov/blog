@@ -1,7 +1,13 @@
 import type { UserEvent } from '@testing-library/user-event';
 import { fireEvent, screen } from '@web/testing/custom-render';
+import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
+import {
+  KEY_ARROW_DOWN,
+  KEY_ARROW_UP,
+  KEY_END,
+  KEY_HOME,
+} from '@web/testing/shared/keyboard/constants';
 
-const ARIA_EXPANDED = 'aria-expanded';
 export const MENU_TRIGGER_NAME = 'trigger';
 export const MENU_FIRST_ITEM_NAME = 'first';
 export const MENU_LAST_ITEM_NAME = 'second';
@@ -14,8 +20,6 @@ export const expectMenuClosed = (trigger: HTMLElement) => {
 export const expectMenuOpen = (trigger: HTMLElement) => {
   expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
 };
-
-const KEY_ARROW_DOWN = '{ArrowDown}';
 
 type TGetUser = () => UserEvent;
 
@@ -88,7 +92,7 @@ export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
     const firstItem = screen.getByRole('button', {
       name: MENU_FIRST_ITEM_NAME,
     });
-    await getUser().keyboard('{End}');
+    await getUser().keyboard(KEY_END);
 
     await getUser().tab();
 
@@ -115,7 +119,7 @@ export const testCoreDismissibleMenuBehavior = (getUser: TGetUser) => {
     await getUser().click(trigger);
     const lastItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
 
-    await getUser().keyboard('{End}');
+    await getUser().keyboard(KEY_END);
 
     expect(lastItem).toHaveFocus();
   });
@@ -127,7 +131,7 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
     await getUser().click(trigger);
     const lastItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
 
-    await getUser().keyboard('{ArrowUp}');
+    await getUser().keyboard(KEY_ARROW_UP);
 
     expect(lastItem).toHaveFocus();
   });
@@ -138,9 +142,9 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
     const firstItem = screen.getByRole('button', {
       name: MENU_FIRST_ITEM_NAME,
     });
-    await getUser().keyboard('{End}');
+    await getUser().keyboard(KEY_END);
 
-    await getUser().keyboard('{ArrowUp}');
+    await getUser().keyboard(KEY_ARROW_UP);
 
     expect(firstItem).toHaveFocus();
   });
@@ -151,9 +155,9 @@ export const testArrowUpAndHomeBehavior = (getUser: TGetUser) => {
     const firstItem = screen.getByRole('button', {
       name: MENU_FIRST_ITEM_NAME,
     });
-    await getUser().keyboard('{End}');
+    await getUser().keyboard(KEY_END);
 
-    await getUser().keyboard('{Home}');
+    await getUser().keyboard(KEY_HOME);
 
     expect(firstItem).toHaveFocus();
   });

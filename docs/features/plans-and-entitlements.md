@@ -16,7 +16,10 @@ code:
   - apps/platform/src/components/features/capabilities/**
   - apps/web/src/server/settings-features/**
   - apps/web/src/utils/to-effective-settings-features/**
-  - packages/studio/src/schema-types/inputs/capability-warning-input/**
+  - packages/config/src/constants/module-pack.ts
+  - packages/studio/src/schema-types/inputs/requirement-warning-input/**
+  - packages/studio/src/schema-types/validation/validate-modules-entitled/**
+  - packages/studio/src/schema-types/filters/entitled-module.ts
 epics: [4840, 2798, 4083, 3667]
 ---
 
@@ -32,7 +35,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Platform, Features page** — `/dashboard/features` (owner) and `/tenants/{id}/features` (operator). Seven capability rows: a "Coming soon" row has no switch, and a row outside the plan is locked with a "Growth plan" badge.
 - **Platform, plan-gated pages** — `/dashboard/languages` and `/dashboard/email` answer 404 when the plan does not open them. Subscribers, Comments and Team are sidebar entries with a "Coming soon" badge and no page.
 - **Public site** — no route of its own. It gates `/account` and `/bookmarks` (404 with no reader-account capability), the header account menu, the bookmark button, the newsletter module and its server action, Vercel Analytics and Speed Insights, and the consent banner.
-- **Studio** — a module type whose capability is off is relabelled "(off in Features)" in pickers, and its documents carry a warning; today only `module_newsletter` maps to a capability.
+- **Studio** — a module type whose capability is off is relabelled "(off in Features)" in pickers, and its documents carry a warning; `module_newsletter` and `module_contactForm` map to a capability. Given module-pack entitlements, a module type outside them is relabelled "(Growth plan)" in a page's module picker, offers no existing document to pick there, and can't be created new from the desk, the global Create menu or a reference's "Create new"; its existing documents stay listed and editable, with a banner, and a page referencing one shows a warning on that item that never blocks publishing. When a type is both off-plan and off in Features, the plan message shows.
 
 ## Data
 
@@ -41,6 +44,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `PLAN_LOCALE_LIMIT` — languages per plan including the default: `FREE` 1, `GROWTH` 3.
 - `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` the preset, accent hue, logo and favicon; `GROWTH` every Look column. The epic's later entitlements join this record as fields of their own.
 - `settings_features` — one row per tenant (unique `tenant_id`, cascade delete), seven `NOT NULL` boolean toggles. Provisioning writes no row; an absent row resolves to the tenant's current preset's `featureDefaults` (both presets: comments, ratings, bookmarks and contact form on; newsletter, analytics and consent banner off).
+- `MODULE_PACK` (`CORE`, `GROWTH`) and `MODULE_PACK_BY_TYPE` (`@blog/config/constants`) give every module `_type` exactly one pack; the map `satisfies Record<TModuleType, TModulePack>`, so a new module type fails type-check until it has one. Core: the four heroes (the deprecated `module_hero` included), the five Posts modules, content, FAQ, section pages, CTA and newsletter. Growth: testimonial, team, logo wall, stats, pricing, feature list, feature highlights, timeline and contact form. `isModuleTypeEntitled(type, packs)` is the one check; an unknown type is never entitled.
 - No price exists anywhere in the code.
 - **Caching (web)** — `getTenantPlan` and `getEffectiveSettingsFeatures` are `unstable_cache` per tenant, tagged `tenant-plan:<id>` and `settings-features:<id>`, with `TENANT_CONFIG_REVALIDATE_SECONDS` (3600) as the fallback. `POST /api/revalidate-site-config` expires both tags with `site-config:<id>` and purges the whole layout. The platform and Studio read `tenants.plan` uncached on every request.
 
@@ -51,7 +55,8 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` on `FREE`.
 - **Plan page access** (`planPageAccess`) — Languages when `PLAN_LOCALE_LIMIT` > 1; Email when the plan holds bookmarks, comments or newsletter; Subscribers with newsletter; Comments with comments; Team on any plan but `FREE`. The owner's sidebar omits the rest and their pages 404; the operator's `/tenants/{id}` view shows every entry and page whatever the plan.
 - **Look** — fields outside `lookFields` show locked on the Look page with the "Growth plan" badge, at the preset's value (see [look](./look.md)).
-- **Not plan-gated** — Voice, Domain, Studio, the Features page itself, modules and page types, team seats, AI takeaways.
+- **Module packs in Studio** — `StudioMount` takes an optional plain-data `entitlements` object whose `modulePacks` lists the entitled packs. Omitted, every pack is entitled and the Studio behaves as before: the site is the enforcement point, and the Sanity CLI Studio has no tenant. The platform does not pass it yet, and the site does not gate modules yet.
+- **Not plan-gated** — Voice, Domain, Studio, the Features page itself, page types, team seats, AI takeaways; on the site, modules.
 
 ## Constraints and invariants
 
@@ -87,14 +92,19 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
 - `apps/platform/src/utils/nav-sections/nav-sections.ts`
 - `packages/db/src/queries/tenants/get-tenant-live-locales/get-tenant-live-locales.ts`
-- `packages/studio/src/schema-types/inputs/capability-warning-input/get-missing-capability.ts`
+- `packages/config/src/constants/module-pack.ts` — `MODULE_PACK`, `MODULE_PACK_BY_TYPE`, `isModuleTypeEntitled`
+- `packages/studio/src/schema-types/inputs/requirement-warning-input/get-missing-requirement.ts`
+- `packages/studio/src/schema-types/inputs/requirement-warning-input/entitlement-gates.ts`
+- `packages/studio/src/schema-types/validation/validate-modules-entitled/validate-modules-entitled.ts`
+- `packages/studio/src/schema-types/filters/entitled-module.ts`
 
 ## Tests and stories
 
 - Platform: `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`.
 - Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`.
 - db: `packages/db/src/queries/settings-features/**/*.test.ts`, `get-tenant-live-locales.test.ts`, `set-tenant-additional-locales.test.ts`.
-- Studio: `get-missing-capability.test.ts`, `mark-capability-off-types.test.ts`.
+- Config: `module-pack.test.ts`.
+- Studio: `get-missing-requirement.test.ts`, `mark-requirement-off-types.test.ts`, `entitlement-gates.test.ts`, `validate-modules-entitled.test.ts`, `entitled-module.test.ts`.
 - No Storybook stories; the platform has none.
 
 ## Related

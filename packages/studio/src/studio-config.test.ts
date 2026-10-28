@@ -1,8 +1,8 @@
 import {
   CAPABILITY,
   LOCALE_ISO_CODES,
+  MODULE_PACK,
   SANITY_LOGIN_PROVIDER,
-  type TCapability,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
@@ -14,19 +14,15 @@ import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/t
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { getCapabilityOffMessage } from '@blog/studio/schema-types/inputs/capability-warning-input/get-missing-capability';
-import { markCapabilityOffTypes } from '@blog/studio/schema-types/inputs/capability-warning-input/mark-capability-off-types';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import {
+  EVERY_MODULE_PACK,
+  getEntitledModulePacks,
+} from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
-import { ThemeProvider } from '@sanity/ui';
-import { buildTheme } from '@sanity/ui/theme';
-import { createElement, type ReactElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import {
   type DocumentActionComponent,
   type DocumentActionsContext,
-  type InputProps,
-  type ItemProps,
   type TemplateItem,
 } from 'sanity';
 
@@ -50,15 +46,12 @@ const MOCK_TITLE = faker.company.name();
 const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
 const MOCK_DOCUMENT_ID = faker.string.uuid();
 const MOCK_UNTRANSLATED_TYPE = faker.lorem.word();
-const MOCK_DEFAULT_INPUT = faker.lorem.words(3);
-const MOCK_MODULE_KEY = faker.string.alphanumeric(12);
 
 const PUBLISH_ACTION = 'publish';
 const TRANSLATIONS_PLUGIN_NAME = '@sanity/document-internationalization';
-const NEWSLETTER_TYPE = newsletterSchema.name;
-const NEWSLETTER_OFF_MARKUP = renderToStaticMarkup(
-  getCapabilityOffMessage(CAPABILITY.NEWSLETTER),
-);
+const ENTITLEMENT_GATES_NAME = entitlementGates({
+  entitledModulePacks: EVERY_MODULE_PACK,
+}).name;
 
 const buildConfig = (overrides: Partial<TBuildStudioConfigParams> = {}) =>
   buildStudioConfig({
@@ -68,14 +61,11 @@ const buildConfig = (overrides: Partial<TBuildStudioConfigParams> = {}) =>
     ...overrides,
   });
 
-const getFormComponents = (enabledCapabilities: TCapability[]) => {
-  const components = buildConfig({ enabledCapabilities }).form?.components;
-  if (!components?.input || !components.item) {
-    throw new Error('capability components not registered');
-  }
-
-  return { input: components.input, item: components.item };
-};
+const hasEntitlementGates = (overrides: Partial<TBuildStudioConfigParams>) =>
+  buildConfig(overrides).plugins?.some(
+    (plugin) =>
+      typeof plugin === 'object' && plugin.name === ENTITLEMENT_GATES_NAME,
+  );
 
 describe(buildStudioConfig, () => {
   let config: ReturnType<typeof buildStudioConfig>;
@@ -232,116 +222,36 @@ describe(buildStudioConfig, () => {
     );
   });
 
-  describe('capability warning', () => {
-    const renderRootInput = (
-      enabledCapabilities: TCapability[],
-      path: InputProps['path'] = [],
-    ) => {
-      const { input } = getFormComponents(enabledCapabilities);
-      const props = {
-        path,
-        schemaType: { name: NEWSLETTER_TYPE },
-        renderDefault: () => createElement('div', null, MOCK_DEFAULT_INPUT),
-      } as unknown as InputProps;
-
-      return renderToStaticMarkup(
-        createElement(
-          ThemeProvider,
-          { theme: buildTheme() },
-          createElement(input, props),
-        ),
-      );
-    };
-
-    it('shows the banner above the form when Newsletter is absent', () => {
-      const html = renderRootInput([CAPABILITY.COMMENTS]);
-
-      expect(html).toContain(NEWSLETTER_OFF_MARKUP);
-      expect(html.indexOf(NEWSLETTER_OFF_MARKUP)).toBeLessThan(
-        html.indexOf(MOCK_DEFAULT_INPUT),
-      );
-    });
-
-    it('shows no banner when Newsletter is present', () => {
-      const html = renderRootInput([CAPABILITY.NEWSLETTER]);
-
-      expect(html).not.toContain(NEWSLETTER_OFF_MARKUP);
-      expect(html).toContain(MOCK_DEFAULT_INPUT);
-    });
-
-    it('registers no capability warnings when no capabilities are given', () => {
-      expect(config.form?.components).toBeUndefined();
-    });
-
-    it('shows no banner on nested inputs', () => {
-      const html = renderRootInput([], ['title']);
-
-      expect(html).not.toContain(NEWSLETTER_OFF_MARKUP);
-    });
-
-    it('marks a gated module in the picker when its capability is off', () => {
-      const enabledCapabilities = [CAPABILITY.COMMENTS];
-      const { input } = getFormComponents(enabledCapabilities);
-      const of = [{ name: NEWSLETTER_TYPE, title: newsletterSchema.title }];
-      const renderDefault = vi.fn<(props: InputProps) => ReactElement>(() =>
-        createElement('div'),
-      );
-      const props = {
-        path: ['modules'],
-        schemaType: { name: 'array', jsonType: 'array', of },
-        renderDefault,
-      } as unknown as InputProps;
-
-      renderToStaticMarkup(createElement(input, props));
-
-      const [renderedProps] = renderDefault.mock.calls.map(([props]) => props);
-      const [markedType] = (renderedProps?.schemaType as { of: typeof of }).of;
-      const [expectedType] = markCapabilityOffTypes(of, enabledCapabilities)!;
-
-      expect(markedType?.title).toBe(expectedType?.title);
-    });
-
+  describe('entitlement gates', () => {
     it.each([
+      { given: 'nothing', overrides: {}, registered: false },
       {
-        state: 'off',
-        enabledCapabilities: [CAPABILITY.COMMENTS],
-        warned: true,
+        given: 'enabled capabilities',
+        overrides: { enabledCapabilities: [CAPABILITY.NEWSLETTER] },
+        registered: true,
       },
       {
-        state: 'on',
-        enabledCapabilities: [CAPABILITY.NEWSLETTER],
-        warned: false,
+        given: 'module packs',
+        overrides: { entitlements: { modulePacks: [MODULE_PACK.CORE] } },
+        registered: true,
       },
     ])(
-      'warns on a page item only when its capability is $state',
-      ({ enabledCapabilities, warned }) => {
-        const { item } = getFormComponents(enabledCapabilities);
-        const path = ['modules', { _key: MOCK_MODULE_KEY }];
-        const renderDefault = vi.fn<(props: ItemProps) => ReactElement>(() =>
-          createElement('div'),
-        );
-        const props = {
-          path,
-          schemaType: { name: NEWSLETTER_TYPE },
-          validation: [],
-          renderDefault,
-        } as unknown as ItemProps;
-
-        renderToStaticMarkup(createElement(item, props));
-
-        const [renderedProps] = renderDefault.mock.calls.map(
-          ([props]) => props,
-        );
-        const expectedWarning = {
-          level: 'warning',
-          message: getCapabilityOffMessage(CAPABILITY.NEWSLETTER),
-          path,
-        };
-
-        expect(renderedProps?.validation).toEqual(
-          warned ? [expectedWarning] : [],
-        );
+      'registers the gates when given $given: $registered',
+      ({ overrides, registered }) => {
+        expect(hasEntitlementGates(overrides)).toBe(registered);
       },
     );
+
+    it('hands the entitled module packs to validation', () => {
+      buildConfig({ entitlements: { modulePacks: [MODULE_PACK.CORE] } });
+
+      expect(getEntitledModulePacks()).toEqual([MODULE_PACK.CORE]);
+    });
+
+    it('entitles every module pack when none are given', () => {
+      buildConfig({ entitlements: {} });
+
+      expect(getEntitledModulePacks()).toEqual(EVERY_MODULE_PACK);
+    });
   });
 });

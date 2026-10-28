@@ -32,6 +32,7 @@ vi.mock('@blog/db', async () => ({
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
     admins: { getAdminByUserId: vi.fn() },
+    tenantDomains: { listTenantDomains: vi.fn(async () => []) },
   },
 }));
 

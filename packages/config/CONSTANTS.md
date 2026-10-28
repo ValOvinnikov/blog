@@ -145,6 +145,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **MAGIC_LINK_REFUSAL**: `BLOCKED`, `NETWORK_LIMIT`, `ADDRESS_LIMIT`, `CHECK_FAILED`
 - **MAGIC_LINK_SIGN_IN_CODE**: `SEND_LIMITED`
 
+### `@blog/config/constants` — `packages/config/src/constants/module-pack.ts`
+
+- **MODULE_PACK**: `CORE`, `GROWTH`
+
 ### `@blog/config/constants` — `packages/config/src/constants/module.ts`
 
 - **HERO_FIELD_MODE**: `CUSTOM`, `NONE`, `POST_TOPIC`, `POST_TITLE`, `POST_EXCERPT`, `POST_IMAGE`
@@ -297,9 +301,16 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CREATE_SITE_GATE_LOG**: `ALERT_FAILED`=`"create_site_gate.alert_failed"`, `ALERT_NO_RECIPIENTS`=`"create_site_gate.alert_no_recipients"`, `ALERT_SEND_FAILED`=`"create_site_gate.alert_send_failed"`, `BLOCKED`=`"create_site_gate.blocked"`, `BLOCK_CHECK_FAILED`=`"create_site_gate.block_check_failed"`, `GLOBAL_LIMITED`=`"create_site_gate.global_limited"`, `IP_LIMITED`=`"create_site_gate.ip_limited"`
 
+### `@platform/constants/custom-domain` — `apps/platform/src/constants/custom-domain.ts`
+
+- **CUSTOM_DOMAIN_FIELD_ERROR**: `DOMAIN_PLATFORM_ADDRESS`
+- **CUSTOM_DOMAIN_REFUSAL**: `NOT_ON_PLAN`, `NOT_PROVISIONED`, `ALREADY_CONNECTED`, `NOT_CUSTOM_DOMAIN`
+- **CUSTOM_DOMAIN_PATH**: `CONNECT`=`"/api/custom-domain/connect"`, `DISCONNECT`=`"/api/custom-domain/disconnect"`
+- **CUSTOM_DOMAIN_LOG**: `CONNECT_AUDIT_FAILED`=`"custom_domain.connect_audit_failed"`, `CONNECT_ENQUEUE_REJECTED`=`"custom_domain.connect_enqueue_rejected"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `CONNECT_ROLLBACK_FAILED`=`"custom_domain.connect_rollback_failed"`, `ROOT_DOMAIN_MISSING`=`"custom_domain.root_domain_missing"`, `APP_URL_MISSING`=`"custom_domain.app_url_missing"`, `DISCONNECT_AUDIT_FAILED`=`"custom_domain.disconnect_audit_failed"`, `DISCONNECT_REJECTED_RESTORING`=`"custom_domain.disconnect_rejected_restoring"`, `DISCONNECT_RESTORE_FAILED`=`"custom_domain.disconnect_restore_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
-- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
+- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
 - **DATA_REQUEST_KIND_FILTER**: `ALL`
 - **DATA_REQUEST_MATCH_COLUMN**: `KIND`, `SITE`, `EMAIL`, `RECORDED`
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
@@ -424,7 +435,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
-- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`
+- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`
 - **TENANT_FIELD_LOCK_KIND**: `STEP`, `RUNNING`, `SUCCEEDED`, `ARCHIVED`
 - **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `ROOT_DOMAIN_MISSING`=`"tenants.root_domain_missing"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
 
