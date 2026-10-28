@@ -5,6 +5,7 @@ import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
+import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useToast } from '@web/context/toast-provider';
 import { updateDisplayNameAction } from '@web/server/account/identity-actions/identity-actions';
 import { useRouter } from 'next/navigation';
@@ -25,6 +26,7 @@ export const DisplayNameControl = ({
   image,
 }: TDisplayNameControlProps) => {
   const t = useTranslations('accountPage.identity');
+  const { busyStyle, spinnerVariant } = useBusyStyle();
   const toast = useToast();
   const router = useRouter();
   const [name, setName] = useState(initialName);
@@ -34,7 +36,7 @@ export const DisplayNameControl = ({
 
   const avatarName = name.trim() || email || '';
   const avatarSrc = imageFailed ? undefined : (image ?? undefined);
-  const isSaveDisabled = isPending || name.trim().length === 0;
+  const isNameEmpty = name.trim().length === 0;
 
   const handleSave = () => {
     startTransition(async () => {
@@ -88,8 +90,11 @@ export const DisplayNameControl = ({
       </div>
       <Button
         variant="primary"
-        isDisabled={isSaveDisabled}
-        aria-busy={isPending}
+        isDisabled={isNameEmpty}
+        isBusy={isPending}
+        busyLabel={t('savingLabel')}
+        busyStyle={busyStyle}
+        spinnerVariant={spinnerVariant}
         onClick={handleSave}
         className={button()}
       >
