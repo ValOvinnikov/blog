@@ -8,6 +8,7 @@ import {
   listSanityProjectUsers,
   type TSanityUser,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { loadTenant } from '@worker/units/run-reported-step';
 import {
   getProvisionEnv,
@@ -42,7 +43,7 @@ export function hasOwnerEmail(
   target: TOwnerAccessTarget,
   email: TMaybeUndefined<string>,
 ): boolean {
-  return email?.toLowerCase() === target.ownerEmail.toLowerCase();
+  return !!email && normalizeEmail(email) === normalizeEmail(target.ownerEmail);
 }
 
 export async function findOwner(
