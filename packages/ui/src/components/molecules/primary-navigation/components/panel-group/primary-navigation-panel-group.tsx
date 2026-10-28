@@ -1,7 +1,7 @@
 import { ICONS, SIZE } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
+import { PrimaryNavigationSubLink } from '@blog/ui/components/molecules/primary-navigation/components/sub-link/primary-navigation-sub-link';
 import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
 import { splitSubItems } from '@blog/ui/components/molecules/primary-navigation/split-sub-items';
 
@@ -22,25 +22,6 @@ export const PrimaryNavigationPanelGroup = ({
   const { root, summary, chevron, items, link } =
     primaryNavigationPanelGroupVariants({ isActive: item.isActive });
 
-  const renderLink = (
-    { href, label, isActive, target }: INavItem,
-    isLead: boolean,
-  ) => (
-    <TextLink
-      key={href}
-      appearance="nav"
-      as={linkAs}
-      href={href}
-      isCurrent={isActive}
-      currentStyle="weight"
-      target={target}
-      className={link({ isLead })}
-    >
-      {label}
-      {isLead && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
-    </TextLink>
-  );
-
   return (
     <details name={groupName} className={root()}>
       <summary className={summary()}>
@@ -48,8 +29,25 @@ export const PrimaryNavigationPanelGroup = ({
         <Icon name={ICONS.CHEVRON_DOWN} size={SIZE.SM} className={chevron()} />
       </summary>
       <div className={items()}>
-        {lead && renderLink(lead, true)}
-        {rest.map((subItem) => renderLink(subItem, false))}
+        {lead && (
+          <PrimaryNavigationSubLink
+            item={lead}
+            isLead={true}
+            appearance="nav"
+            className={link({ isLead: true })}
+            linkAs={linkAs}
+          />
+        )}
+        {rest.map((subItem) => (
+          <PrimaryNavigationSubLink
+            key={subItem.href}
+            item={subItem}
+            isLead={false}
+            appearance="nav"
+            className={link()}
+            linkAs={linkAs}
+          />
+        ))}
       </div>
     </details>
   );
