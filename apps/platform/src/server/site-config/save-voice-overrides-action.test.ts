@@ -2,6 +2,7 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  type TMaybeNull,
   VOICE_FIELD_ERROR,
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
@@ -48,7 +49,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_DE_HEADING = faker.lorem.words(2);
