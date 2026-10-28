@@ -18,6 +18,7 @@ export type TFormFieldProps = {
   label: string;
   hint?: ReactNode;
   error?: string;
+  isInvalid?: boolean;
   children: ReactNode;
   footer?: ReactNode;
   actions?: ReactNode;
@@ -28,6 +29,7 @@ export const FormField = ({
   label,
   hint,
   error,
+  isInvalid = Boolean(error),
   children,
   footer,
   actions,
@@ -42,11 +44,7 @@ export const FormField = ({
   } = formFieldVariants();
 
   return (
-    <Field.Root
-      className={root()}
-      invalid={Boolean(error)}
-      disabled={isDisabled}
-    >
+    <Field.Root className={root()} invalid={isInvalid} disabled={isDisabled}>
       <div className={header()}>
         {hasOwnAccessibleName ? (
           <span className={labelSlot()}>{label}</span>

@@ -27,6 +27,7 @@ export const useOnboardingWizard = (
     flagField,
   });
   const siteAddress = rootDomain ? `${values.slug}.${rootDomain}` : values.slug;
+  const addressError = fieldErrors.slug?.reason ?? addressCheck.error;
 
   const summaries = {
     [ONBOARDING_STEP.SITE]: t('siteSummary', {
@@ -53,7 +54,8 @@ export const useOnboardingWizard = (
   return {
     ...form,
     ...steps,
-    addressCheck,
+    addressStatus: addressCheck.status,
+    addressError,
     siteAddress,
     railSteps,
     handleSubmit,

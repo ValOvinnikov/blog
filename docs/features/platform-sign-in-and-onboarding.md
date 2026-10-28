@@ -97,21 +97,28 @@ Free site.
   Field Notes", the site address, the preset); the current step's fields sit
   in the middle with Back / Continue, and the live site preview stays on the
   right on every step. Below `lg` the rail is a top band reading "Step N of 4
-  · <step>", and fields, preview and Back / Continue stack. The steps:
+  · <step>", and fields, Back / Continue and the preview stack in that order.
+  The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
      Blank) and the site name.
   2. **Address** — the Site address (only the subdomain, with
      `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live by
      `checkSiteAddressAction` as the user types) and the starting language.
+     The check's verdict is a tinted chip in a `role="status"` region in the
+     actions row, between Back and Continue (on its own line above them on a
+     phone), never under the input, which only turns red on an error:
+     checking, "<address> is yours", the taken / reserved / invalid error, or
+     an amber "couldn't check" note.
   3. **Look** — the preset and accent colour.
   4. **Review** — every choice with an Edit button back to its step, and the
      terms acceptance again (a magic link opened in another browser carries
      no `/signup` cookie).
 
   Continue checks only the current step: the name must not be blank, and the
-  address must be filled in and not known to be taken, reserved or invalid. An
-  address whose live check is still running or failed is let through, since
-  Create site checks it again. Back keeps every value, and Continue after an
+  address must be filled in and not known to be taken, reserved or invalid.
+  On the Address step Continue is disabled while the check runs and on an
+  error; an address whose check failed is let through, since Create site
+  checks it again. Back keeps every value, and Continue after an
   Edit from Review returns straight to Review. Nothing is saved until **Create site** on Review runs
   `createSiteAction` once with every value; a field error it returns (an
   address taken meanwhile) opens that field's step. Success redirects to
