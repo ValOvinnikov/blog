@@ -1,31 +1,15 @@
-/**
- * Deprovisioning workflow entrypoint — reverses provisioning for one tenant: removes its domain from the shared web project, archives
- * (never deletes) its Sanity project, revokes the provisioned Sanity robot
- * tokens still live in that project, clears the provisioning-artifact
- * columns, archives (never hard-deletes) the `tenants` row, purges its
- * readers' personal data (`subscribers`, `bookmarks`, `membership_invites`),
- * then invalidates its cached pages so the archived site stops serving.
- *
- * Invoked only by `.github/workflows/deprovision-tenant.yml` via
- * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
- * --confirm=<name>` — never run by hand against a shared/production tenant
- * outside that workflow. Defaults to a dry run (`--dry-run` unset or
- * anything other than `"false"`); an operator must pass `--dry-run=false`
- * to actually delete anything, on top of `--confirm` matching the tenant's
- * name.
- *
- * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build.
- */
 import { pathToFileURL } from 'node:url';
 
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TDeprovisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
+import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hosts';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isPlatformTenant } from '@blog/db/utils/is-platform-tenant/is-platform-tenant';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
@@ -49,7 +33,7 @@ const TENANT_ID_FLAG = '--tenant-id=';
 const CONFIRM_FLAG = '--confirm=';
 const DRY_RUN_FLAG = '--dry-run=';
 
-function parseFlagValue(argv: string[], flag: string): string | undefined {
+function parseFlagValue(argv: string[], flag: string): TMaybeUndefined<string> {
   return argv.find((arg) => arg.startsWith(flag))?.slice(flag.length);
 }
 
@@ -74,8 +58,6 @@ function parseConfirm(argv: string[]): string {
   return value;
 }
 
-// Defaults to a dry run — an operator must explicitly pass `--dry-run=false`
-// (or `DRY_RUN=false`) to perform real deletions.
 function parseDryRun(argv: string[]): boolean {
   const value = parseFlagValue(argv, DRY_RUN_FLAG) ?? process.env['DRY_RUN'];
   return value !== 'false';
@@ -125,9 +107,6 @@ const STEPS: TStep[] = [
   },
 ];
 
-// recordStepStatus, recordRunStart and recordRunFinish each swallow their
-// own error: a failure recording step/run state must never abort the
-// teardown it is only trying to describe.
 async function recordStepStatus(
   tenantId: string,
   step: TDeprovisioningStep,
@@ -180,9 +159,6 @@ async function recordRunFinish(tenantId: string): Promise<void> {
   }
 }
 
-// Exported for direct testing of the step sequencing without also exercising
-// the confirmation guard, argv parsing, env loading, or the tenant-row fetch
-// `main()` wraps it in.
 export async function runSteps(
   tenant: TTenant,
   env: TDeprovisionEnv,
@@ -242,15 +218,18 @@ export async function runSteps(
 
 export type TRunDeprovisioningResult = { ok: boolean; skipped?: true };
 
-// Exported for direct testing of the confirmation/idempotency guard —
-// the settled safety requirement this workflow exists to enforce — without
-// exercising argv parsing, env loading, or the tenant-row fetch `main()`
-// wraps it in.
 export async function runDeprovisioning(
   tenant: TTenant,
   confirm: string,
   env: TDeprovisionEnv,
 ): Promise<TRunDeprovisioningResult> {
+  const hosts = await listTenantHosts(tenant);
+  if (isPlatformTenant(hosts, env.tenantRootDomain)) {
+    throw new Error(
+      `deprovision-tenant: tenant "${tenant.id}" ("${tenant.name}") holds the platform root domain "${env.tenantRootDomain}" — the platform tenant is never deprovisioned, aborting before any destructive action.`,
+    );
+  }
+
   if (tenant.deprovisionedAt) {
     console.warn(
       `deprovision-tenant: tenant "${tenant.id}" is already deprovisioned (at ${tenant.deprovisionedAt.toISOString()}) — nothing to do.`,
@@ -288,9 +267,7 @@ async function main(): Promise<void> {
   }
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
-// against `main()` firing as an import side effect when a test imports
-// `runSteps` from this same module.
+// Without this guard, importing `runSteps` in a test would also run `main()`.
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href

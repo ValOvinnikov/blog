@@ -77,6 +77,9 @@ jobs:
       # The *shared* apps/web Vercel project — step 1 removes the tenant's
       # domain from this one project, never a per-tenant project.
       VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB }}
+      # The CLI refuses the tenant holding this apex (or its www host), and
+      # refuses every tenant when it is unset.
+      TENANT_ROOT_DOMAIN: ${{ vars.TENANT_ROOT_DOMAIN }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
       # specifically — deliberately its own secret, distinct from
       # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
