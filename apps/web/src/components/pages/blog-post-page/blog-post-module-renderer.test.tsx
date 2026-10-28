@@ -1,6 +1,7 @@
 import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
@@ -16,6 +17,9 @@ import { logger } from '@web/utils/logger/logger';
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
 
 faker.seed(8143);
+
+vi.mock('@web/modules/module-gate/module-gate');
+vi.mock('@web/server/settings-features/is-module-entitled/is-module-entitled');
 
 vi.mock('@web/modules/cta/cta-module');
 vi.mock('@web/modules/newsletter/newsletter-module');
@@ -71,7 +75,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
     expect(unknownModuleText).not.toBeInTheDocument();
     expect(logger.warn).toHaveBeenCalledTimes(1);
     expect(logger.warn).toHaveBeenCalledWith(
-      'module_renderer.unknown_module_type',
+      MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE,
       { moduleType: MOCK_UNKNOWN_MODULE_TYPE },
     );
   });

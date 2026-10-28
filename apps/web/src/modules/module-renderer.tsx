@@ -1,5 +1,8 @@
 import type { TTaxonomyKind } from '@blog/config';
 import type { TModule } from '@blog/service';
+import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
+import { ModuleGate } from '@web/modules/module-gate/module-gate';
+import { isModuleEntitled } from '@web/server/settings-features/is-module-entitled/is-module-entitled';
 import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
@@ -45,13 +48,17 @@ export const renderModules = ({
     const Component = map[module.type];
 
     if (!Component) {
-      logger.warn('module_renderer.unknown_module_type', {
+      logger.warn(MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE, {
         moduleType: module.type,
       });
       return null;
     }
 
-    return <Component key={module.id} id={module.id} context={context} />;
+    return (
+      <ModuleGate key={module.id} moduleType={module.type}>
+        <Component id={module.id} context={context} />
+      </ModuleGate>
+    );
   });
 
 export interface IRenderHeroModuleProps {
@@ -66,9 +73,11 @@ export const renderHeroModule = async ({
   const Component = map[hero.type];
 
   if (!Component) {
-    logger.warn('hero_slot.unknown_hero_type', { heroType: hero.type });
+    logger.warn(MODULE_RENDERER_LOG.UNKNOWN_HERO_TYPE, { heroType: hero.type });
     return null;
   }
+
+  if (!(await isModuleEntitled(hero.type))) return null;
 
   return Component({ id: hero.id });
 };

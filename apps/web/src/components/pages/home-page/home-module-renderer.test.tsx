@@ -32,6 +32,9 @@ import { HomeModuleRenderer } from './home-module-renderer';
 
 faker.seed(3917);
 
+vi.mock('@web/modules/module-gate/module-gate');
+vi.mock('@web/server/settings-features/is-module-entitled/is-module-entitled');
+
 vi.mock('@web/modules/content/content-module');
 vi.mock('@web/modules/cta/cta-module');
 vi.mock('@web/modules/newsletter/newsletter-module');

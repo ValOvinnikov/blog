@@ -25,6 +25,9 @@ import { TagModuleRenderer } from './tag-module-renderer';
 
 faker.seed(7731);
 
+vi.mock('@web/modules/module-gate/module-gate');
+vi.mock('@web/server/settings-features/is-module-entitled/is-module-entitled');
+
 vi.mock('@web/modules/cta/cta-module');
 vi.mock('@web/modules/newsletter/newsletter-module');
 vi.mock('@web/modules/post-latest/post-latest-module');

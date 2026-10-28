@@ -483,6 +483,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **HEADER_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"header_style.site_config_fetch_failed"`
 
+### `@web/constants/module-renderer` — `apps/web/src/constants/module-renderer.ts`
+
+- **MODULE_RENDERER_LOG**: `UNKNOWN_MODULE_TYPE`=`"module_renderer.unknown_module_type"`, `UNKNOWN_HERO_TYPE`=`"hero_slot.unknown_hero_type"`, `PLAN_FETCH_FAILED`=`"module_renderer.plan_fetch_failed"`
+
 ### `@web/constants/navigation` — `apps/web/src/constants/navigation.ts`
 
 - **NAVIGATION_LOG**: `LAYOUT_FETCH_FAILED`=`"navigation.layout_fetch_failed"`
