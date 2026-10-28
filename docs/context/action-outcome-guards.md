@@ -5,12 +5,12 @@ Read an action result through `@blog/config`'s outcome guards, never a raw
 result and narrows it, so `isOutcomeInvalid(result) && result.fieldErrors`
 type-checks:
 
-- `isOutcomeSuccess`, `isOutcomeInvalid`, `isOutcomeServerError` exist today
+- `isOutcomeSuccess`, `isOutcomeInvalid`, `isOutcomeServerError`,
+  `isOutcomeRefused` and `isOutcomeUnavailable` exist today
   (`packages/config/src/action-outcome/is-outcome.ts`).
 - A guard for another outcome is added only by the change that gives that
-  check its second use. `REFUSED` and `UNAVAILABLE` already repeat below, so
-  the first file converted that compares one adds its guard. `RATE_LIMITED`
-  (one use) and `BLOCKED` (none) stay raw comparisons until then.
+  check its second use. `RATE_LIMITED` (one use) and `BLOCKED` (none) stay raw
+  comparisons until then.
 
 ## Files still comparing raw outcomes
 

@@ -164,5 +164,85 @@
       "linkLabel": "Texte",
       "listHeading": "Alle Beiträge"
     }
+  },
+  "docs": {
+    "hero": {
+      "eyebrow": "Dokumentation",
+      "heading": "Alles, was du für den Einstieg brauchst",
+      "supportingText": "Anleitungen und Antworten, so geordnet, dass Leser schnell finden, was sie suchen."
+    },
+    "intro": {
+      "body": [
+        "Willkommen in der Dokumentation. Beginne mit den Anleitungen oder sieh dir unten die Fragen für schnelle Antworten an.",
+        "Ersetze diesen Text durch einen kurzen Überblick darüber, was dein Produkt oder Projekt macht und für wen diese Dokumentation gedacht ist."
+      ]
+    },
+    "faq": {
+      "heading": "Häufig gestellte Fragen",
+      "questions": [
+        {
+          "question": "Wo fange ich an?",
+          "answer": [
+            "Verweise neue Leser auf die erste Anleitung und sag ihnen, was sie vor dem Start brauchen."
+          ]
+        },
+        {
+          "question": "Wie bekomme ich Hilfe?",
+          "answer": [
+            "Erkläre, wo Leser eine Frage stellen oder ein Problem melden können und wie schnell sie mit einer Antwort rechnen können."
+          ]
+        },
+        {
+          "question": "Ist diese Dokumentation aktuell?",
+          "answer": [
+            "Sag, wie oft diese Seiten geprüft werden und wo Leser sehen, was sich geändert hat."
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "title": "Anleitungen",
+      "slug": "anleitungen",
+      "heading": "Anleitungen",
+      "supportingText": "Hilfe Schritt für Schritt, von den ersten Schritten bis zum Alltag.",
+      "listHeading": "Alle Anleitungen",
+      "metaTitle": "Anleitungen — Schritt für Schritt zum Ziel",
+      "metaDescription": "Anleitungen Schritt für Schritt: die Einrichtung, die wichtigsten Begriffe und die Lösung häufiger Probleme."
+    },
+    "pages": [
+      {
+        "title": "Erste Schritte",
+        "slug": "erste-schritte",
+        "summary": "Eine Beispielanleitung. Ersetze sie durch deine eigenen ersten Schritte.",
+        "body": [
+          "Beschreibe, was Leser vor dem Start brauchen, und führe sie dann Schritt für Schritt durch den Anfang.",
+          "Schließe damit, was sie sehen, wenn alles funktioniert, und verlinke die nächste Anleitung."
+        ],
+        "metaTitle": "Erste Schritte — eine erste Anleitung zum Ersetzen",
+        "metaDescription": "Eine Beispielanleitung, erstellt mit deiner Website. Ersetze sie durch die ersten Schritte für deine Leser."
+      },
+      {
+        "title": "Grundbegriffe",
+        "slug": "grundbegriffe",
+        "summary": "Eine Beispielanleitung zu dem, was Leser wissen müssen.",
+        "body": [
+          "Erkläre die wenigen Begriffe, auf denen alles andere aufbaut, jeweils mit einem kurzen Beispiel.",
+          "Halte jeden Abschnitt kurz und verlinke die Anleitungen, die die Begriffe in die Praxis umsetzen."
+        ],
+        "metaTitle": "Grundbegriffe — eine Beispielanleitung zum Wesentlichen",
+        "metaDescription": "Eine Beispielanleitung, erstellt mit deiner Website. Erkläre damit die Begriffe, die deine Leser kennen müssen."
+      },
+      {
+        "title": "Fehlerbehebung",
+        "slug": "fehlerbehebung",
+        "summary": "Eine Beispielanleitung zur Lösung häufiger Probleme.",
+        "body": [
+          "Liste die Probleme auf, auf die Leser am häufigsten stoßen, jeweils mit Ursache und Lösung.",
+          "Sag, wo es Hilfe gibt, wenn die Antwort hier fehlt. Lösche diese Seite, wenn du sie noch nicht brauchst."
+        ],
+        "metaTitle": "Fehlerbehebung — eine Beispielanleitung zu Problemen",
+        "metaDescription": "Eine Beispielanleitung, erstellt mit deiner Website. Nutze sie für häufige Probleme, ihre Ursachen und Lösungen."
+      }
+    ]
   }
 }

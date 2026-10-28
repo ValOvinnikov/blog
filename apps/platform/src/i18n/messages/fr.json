@@ -1373,6 +1373,25 @@
     "unavailableTitle": "L’état de la version est indisponible",
     "unavailableDescription": "GitHub est injoignable, la dernière exécution n’est donc pas affichée."
   },
+  "tenantMigrationsCard": {
+    "title": "Migrations des clients",
+    "description": "Lancez les migrations de contenu en développement, ou relancez un client dont la migration en production a échoué.",
+    "failed": "Migration échouée",
+    "empty": "Aucune migration de contenu client n’a échoué.",
+    "unavailableTitle": "Migrations échouées indisponibles",
+    "unavailableDescription": "Le registre des clients n’a pas pu être lu, les clients dont la migration a échoué ne sont donc pas affichés."
+  },
+  "runTenantMigrationsButton": {
+    "developmentLabel": "Lancer en développement",
+    "retryLabel": "Relancer en production",
+    "retryAriaLabel": "Relancer {tenant} en production",
+    "starting": "Démarrage…",
+    "started": "Migrations des clients lancées.",
+    "tenantRequired": "Les migrations en production se lancent pour un client à la fois.",
+    "notFailed": "La dernière migration de ce client n’a pas échoué, il n’y a donc rien à relancer.",
+    "failedTenantsUnavailable": "Le registre des clients n’a pas pu être lu. Réessayez dans un instant.",
+    "startFailed": "Rien n’a été lancé : les migrations des clients n’ont pas pu être déclenchées."
+  },
   "releaseRunStatus": {
     "status": {
       "DISPATCHED": "Demandée",
@@ -1387,7 +1406,7 @@
       "FAILED": "La version a échoué, et les étapes suivant l’échec n’ont pas été exécutées."
     },
     "tenantMigrationFailedTitle": "La migration d’un client a échoué",
-    "tenantMigrationFailedDescription": "Le déploiement n’a pas eu lieu, le site en ligne est donc inchangé. Relancez ce client avec « Lancer les migrations des clients » sur cette page.",
+    "tenantMigrationFailedDescription": "Le déploiement n’a pas eu lieu, le site en ligne est donc inchangé. Relancez ce client dans « Migrations des clients » sur cette page.",
     "viewRun": "Voir l’exécution"
   },
   "startReleaseDialog": {

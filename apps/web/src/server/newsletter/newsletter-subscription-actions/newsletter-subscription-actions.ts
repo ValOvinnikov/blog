@@ -11,7 +11,7 @@ import { toOutcome } from '@blog/utils/to-outcome';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { auth } from '@web/server/auth/auth';
 import { deliverNewsletterConfirmation } from '@web/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send';
-import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
+import { clearNewsletterSubscribedCookieSafely } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
@@ -45,14 +45,6 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
   } catch (error) {
     logger.error(NEWSLETTER_LOG.UNSUBSCRIBE_FAILED, { error });
     return SERVER_ERROR;
-  }
-};
-
-const clearNewsletterSubscribedCookieSafely = async (): Promise<void> => {
-  try {
-    await clearNewsletterSubscribedCookie();
-  } catch (error) {
-    logger.error(NEWSLETTER_LOG.SUBSCRIBED_COOKIE_CLEAR_FAILED, { error });
   }
 };
 

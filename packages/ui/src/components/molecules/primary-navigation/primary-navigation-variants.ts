@@ -10,30 +10,18 @@ export const PANEL_LINK = [
 
 export const primaryNavigationVariants = tv({
   slots: {
-    // No `relative` here on purpose: `panel`'s `absolute inset-x-0` deliberately relies on `Header`'s own `sticky` element as its containing block.
+    // No `relative` here on purpose: the phone menu's `absolute inset-x-0` takes `Header`'s bar as its containing block, so it spans the bar's width.
     root: ['flex min-w-0 flex-wrap items-center gap-x-2 gap-y-2 lg:gap-x-6'],
     links: ['flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2'],
     controls: ['flex shrink-0 items-center gap-x-2 lg:gap-x-6'],
     toggle: ['shrink-0'],
-    panel: [
-      'absolute inset-x-0 top-full z-20',
-      'flex flex-col items-start gap-1 p-4',
-      'bg-primary border-b border-border shadow-lg',
-    ],
-    panelLink: PANEL_LINK,
     barPanelActions: ['flex shrink-0 items-center gap-x-2'],
-    panelActionsRow: [
-      'flex w-full items-center gap-3',
-      'mt-2 border-t border-border px-3 pt-3',
-    ],
-    drawerActionsRow: ['w-full', 'mt-2 border-t border-border pt-3'],
   },
   variants: {
     collapsible: {
       true: {
         links: ['hidden lg:flex'],
         toggle: ['lg:hidden'],
-        panel: ['lg:hidden'],
         barPanelActions: ['hidden lg:flex'],
       },
     },
@@ -71,9 +59,6 @@ export const primaryNavigationVariants = tv({
       class: {
         links: ['lg:hidden'],
         toggle: ['lg:inline-grid'],
-        panel: ['lg:flex'],
-        panelActionsRow: ['lg:hidden'],
-        drawerActionsRow: ['lg:hidden'],
       },
     },
   ],

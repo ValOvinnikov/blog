@@ -64,7 +64,7 @@ Every public page emits the title, description, canonical, Open Graph and Twitte
 - `account` and `bookmarks` metadata is always `noindex`.
 - JSON-LD is serialised through `JsonLd`, which escapes `&`, `<` and `>` so string content cannot close the script element.
 - Feeds list only published posts in the requested language, and the sitemap lists published posts in every live language; a scheduled post is absent from both.
-- The site feed tolerates a failed site-settings or index-page fetch (generic catalogue title and description); its channel description is the blog index's `metaDescription`, then the brand tagline, then the catalogue fallback. The tag feed 404s on any failed tag or post fetch.
+- The site feed tolerates a failed site-settings or index-page fetch (generic catalogue title and description); its channel description is the blog index's `metaDescription`, then the header tagline (`settings_navigation`, read through `getNavigation`; a failed read is logged and skipped), then the catalogue fallback. The tag feed 404s on any failed tag or post fetch.
 - The sitemap returns empty when the tenant has no base URL or no resolvable Sanity context, and drops any section whose fetch failed (each logged).
 
 ## Dependencies

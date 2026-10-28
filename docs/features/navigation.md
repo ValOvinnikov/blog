@@ -11,6 +11,7 @@ code:
   - apps/web/src/components/shared/site-header/**
   - apps/web/src/components/shared/site-navigation/**
   - apps/web/src/hooks/use-mobile-nav-toggle/**
+  - apps/web/src/server/site-config/get-header-style/**
 epics: [4987, 4995, 4998, 5459]
 ---
 
@@ -18,7 +19,7 @@ epics: [4987, 4995, 4998, 5459]
 
 ## What it does
 
-The site header: the brand lockup, a single row of top-level links an editor curates, and trailing controls — the theme toggle, the reader account menu when reader accounts are on, and an optional language switcher. Below the `lg` breakpoint the links collapse into a toggled panel. The link for the page being read is marked current.
+The site header: the brand lockup with the header tagline, top-level links an editor curates (each optionally opening its own sub-items), and trailing controls — the theme toggle, the reader account menu when reader accounts are on, and an optional language switcher. The site owner picks the wide-screen layout, how sub-menus open and whether the bar spans the page or floats. Below the `lg` breakpoint every layout is the bar with a menu button, and the links collapse into a toggled panel. The link for the page being read is marked current.
 
 ## Surfaces and routes
 
@@ -31,7 +32,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 - **`settings_navigation`:** `title`, `items[]` (each a `linkRef` — a bare reference to a `link` document — or a `linkRefWithSubItems`: a `link` reference plus an ordered `subItems[]` of at least one `linkRef`), `tagline` (a `brandTagline`, copied from `settings_site` › `brand.tagline` by the `copy-brand-tagline-into-navigation` migration; Site Settings keeps its own tagline until the contract step), `showLanguageSwitcher` (boolean, initial `false`). Provisioning seeds it with no items, and seed verification requires the singleton and that every item resolves to a `link` document.
 - **Service:** `service.global.navigation.v1.getNavigation(sanityContext)` returns `{ items: TNavigationItem[], tagline, showLanguageSwitcher? }`. Items resolve through `linkDocumentFragment` and `toLinkDocument` (./links.md) in the request language; an item whose link has no label or no resolvable href is dropped. A `TNavigationItem` is an `ILink`, plus `subItems` for a link with sub-items: its own link first, then the sub-items in the editor's order. A sub-item that does not resolve drops only itself; a link none of whose sub-items resolve comes back as a plain link. `tagline` is the header tagline's items joined with their separator character (`toBrandTagline`, shared with `getSiteSettings`), or `undefined` when it has no items.
 - **Cache:** the query is tagged `navigation`, `link` and every page type (`page_post`, `page_landing`, `page_postIndex`, `homePage`, `page_topic`, `page_topicIndex`, `page_tag`, `page_tagIndex`), tenant-scoped, so a target page's slug change refreshes the header. The publish webhook maps `settings_navigation` → `navigation` and `link` → `link`.
-- **Alongside:** the brand comes from `settings_site` through `getSiteSettings`; the switcher style from `site_config.language_switcher_style`.
+- **Alongside:** the logo comes from Look (`getBrandLogoUrl`); the switcher style from `site_config.language_switcher_style`; the layout, sub-menu style and bar from `site_config.header_layout`, `header_submenu_style` and `header_bar_style` through `getHeaderStyle`, which reads `getSiteConfig` and falls back to the preset's values (Classic, Dropdown, Full width) when a column is unset or the read fails.
 
 ## Configuration
 
@@ -42,17 +43,20 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 
 ## Constraints and invariants
 
-- A navigation item holds no label or destination of its own — always a `link` document reference. Studio allows one level of sub-items under a header link; the service returns sub-items and the navigation tagline, but the site does not read them yet, so the header renders a flat list in the editor's order.
+- A navigation item holds no label or destination of its own — always a `link` document reference. Studio allows one level of sub-items under a header link. In the bar such a link is a button that opens its sub-items as a dropdown or a wide panel (the site's sub-menu style), listing its own page first; in the phone menu it is a disclosure that opens them in place. A link is current when its own page or one of its sub-items is.
+- The tagline shows under the logo whenever the header settings fill it in, in every layout; a failed navigation read shows none.
+- One stored layout feeds both `Header` and `PrimaryNavigation`, so the two never disagree. `SiteNavigation`'s wrapper is `lg:contents` and sits directly in `Header`, never inside `Header.Nav` or `Header.Actions`, so the grid layouts (Links beside the brand, Centred links, Two rows, Centred brand) place the links and controls in `Header`'s own grid. Layouts change wide screens only.
 - An item is current when its href equals the public pathname — no tenant segment and no locale prefix, in prerendered HTML as on the client — or the pathname is under it (`/blog` matches `/blog/post`); `/` matches only itself. The current link carries `aria-current="page"` and the active colour of `TextLink`'s `nav` appearance, plus a cue that reads without the hue (WCAG 1.4.1): in the header and the mobile menu it is bold (`currentStyle="weight"`), while the footer navigation and footer language codes keep a 2px underline in that colour (the default). The `nav` appearance is monospaced, so the bold label keeps its width and switching pages never moves a header link. Hover changes only the colour: another link turns from muted to the text colour, so it never looks current, while the current link deepens to the brand hover shade and stays bold or underlined.
-- The mobile panel closes on every route change; `useMobileNavToggle` handles focus, Escape and outside-click dismissal, scoped to the navigation's own container.
-- `actions` stay in the bar at every width; `panelActions` move into the mobile panel below `lg`. With the switcher on, the switcher and the theme toggle are `panelActions`; with it off, the theme toggle is an `action`. The account menu is always an `action`.
-- `drawerActions` render only inside the open mobile panel, after the `panelActions` row behind their own divider, and never in the bar. Each drawer link row is at least 44px tall.
+- The mobile panel and any open sub-menu close on every route change (sub-menus are native popovers, which otherwise survive client-side navigation); `useMobileNavToggle` handles focus, Escape and outside-click dismissal, scoped to the navigation's own container.
+- `PrimaryNavigation`'s controls are compound slots. `PrimaryNavigation.Actions` stay in the bar at every width; `PrimaryNavigation.PanelActions` move into the mobile panel below `lg`. With the switcher on, the switcher and the theme toggle are panel actions; with it off, the theme toggle is an action. The account menu is always an action. `apps/web` builds the slots inside the client `SiteNavigation`, since a slot element created in a Server Component would not match its part on the client.
+- `PrimaryNavigation.DrawerActions` render only inside the open mobile panel, after the panel actions row behind their own divider, and never in the bar. Each drawer link row is at least 44px tall.
 - Every header control is round and one height: 36px from `lg`, 44px below it and on any touch screen (`pointer-coarse`). They share `@blog/ui`'s `HEADER_CONTROL` recipe; the radius scale never reaches the bar.
-- On phones the bar holds the brand, the account control the site chose and the menu button. With the account in the bar it is a 44px circle ("Sign in", or the avatar signed in) whose panel opens as a sheet under the bar, and the menu has no account row. With the account in the menu the bar has no account control; the menu ends with an account row — "Sign in" signed out, "Account" signed in — that opens the account or sign-in panel in place, and the menu stays open (./reader-auth.md).
+- On phones the bar holds the brand, the account control the site chose and the menu button. With the account in the bar it is a 44px circle ("Sign in", or the avatar signed in) whose panel opens as a sheet under the bar, and the menu has no account row. With the account in the menu the bar has no account control; the menu ends with an account row — "Sign in" signed out, "Account" signed in — that opens the account or sign-in panel in place, and the menu stays open (./reader-auth.md). The account row and the sub-menu disclosures are one native `<details name>` group, so opening one folds the other; `SiteNavigation` owns the group name and passes it to `PrimaryNavigation` (`groupName`) and the account row.
 - One overlay at a time: the drawer, the account panel and the header language menu share one open state (`HeaderOverlayProvider`, mounted site-wide in `SiteProviders` and read by `useDismissibleMenu` through an `overlayId`), so opening one closes the others without moving focus from the one opening. The footer language menu passes no `overlayId` and keeps its own state. Outside the header, the post's bookmark button opens the account panel for a signed-out reader.
 - Controls are grouped by gap, never by divider: from `lg` the links sit 16px apart, then 24px to the `panelActions` group (8px apart inside it), then 24px to the `actions`; below `lg` every control in the bar sits 8px apart.
 - The `<nav>` landmark is named by `PrimaryNavigation`'s default `ariaLabel`, `Primary`, in every language; the menu toggle's name is the catalog's `siteNavigation.toggleMenu`.
-- A failed site-settings read renders no header; a failed navigation read is logged (`NAVIGATION_LOG.LAYOUT_FETCH_FAILED`) and the header renders with no links and no switcher.
+- The header reads no site settings. A failed navigation read is logged (`NAVIGATION_LOG.LAYOUT_FETCH_FAILED`) and the header renders with no links, no switcher and no tagline.
+- Under the floating bar the open phone menu spans the bar's width, not the page's. The sticky offsets below the header (the docs rail and in-page heading anchors from `lg`) follow the header's measured height (`--site-header-height`), so the floating bar never hides an anchored heading.
 - `@blog/ui`'s `Header`, `PrimaryNavigation` and `TextLink` stay prop-driven: `apps/web` passes resolved links, `linkAs={SmartLink}` and the mobile toggle state.
 
 ## Dependencies
@@ -73,7 +77,7 @@ The site header: the brand lockup, a single row of top-level links an editor cur
 ## Tests and stories
 
 - `packages/service/src/features/global/navigation/adaptor/loader.test.ts`, `query.test.ts`
-- `apps/web/src/components/shared/site-header/site-header.test.tsx`, `site-navigation/site-navigation.test.tsx`, `apps/web/src/hooks/use-mobile-nav-toggle/use-mobile-nav-toggle.test.tsx`
+- `apps/web/src/components/shared/site-header/site-header.test.tsx`, `site-navigation/site-navigation.test.tsx`, `apps/web/src/server/site-config/get-header-style/get-header-style.test.ts`, `apps/web/src/hooks/use-mobile-nav-toggle/use-mobile-nav-toggle.test.tsx`
 - `packages/ui`: `header.test.tsx`, `primary-navigation.test.tsx`, `text-link.test.tsx`
 - Stories: `packages/ui/src/components/organisms/header/header.stories.tsx`, `molecules/primary-navigation/primary-navigation.stories.tsx`, `atoms/text-link/text-link.stories.tsx`; `apps/web/src/components/shared/site-navigation/site-navigation.stories.tsx`, `brand-lockup-link/brand-lockup-link.stories.tsx`.
 

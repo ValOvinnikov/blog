@@ -381,11 +381,12 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/release` — `apps/platform/src/constants/release.ts`
 
 - **CONTRAST_STATUS**: `GREEN`, `FAILED`, `RUNNING`, `NONE`, `DUE`
-- **RELEASE_REFUSAL**: `CONTRAST_CHECK_RUNNING`, `RELEASE_RUNNING`, `RELEASES_PAUSED`
+- **MIGRATION_ENVIRONMENT**: `DEVELOPMENT`=`"development"`, `PRODUCTION`=`"production"`
+- **RELEASE_REFUSAL**: `CONTRAST_CHECK_RUNNING`, `RELEASE_RUNNING`, `RELEASES_PAUSED`, `TENANT_REQUIRED`, `TENANT_MIGRATION_NOT_FAILED`
 - **RELEASE_FIELD_ERROR**: `VERSION_MALFORMED`, `VERSION_NOT_GREATER`, `REASON_REQUIRED`
 - **RELEASE_FAILURE**: `NO_RELEASE_TAG`, `TAG_LIST_INCOMPLETE`, `DB_ERROR`
 - **RELEASE_RUN_STATUS**: `DISPATCHED`, `RUNNING`, `SUCCEEDED`, `FAILED`
-- **RELEASE_LOG**: `CONTRAST_CHECK_AUDIT_FAILED`=`"releases.contrast_check_audit_failed"`, `CONTRAST_DISPATCH_ERROR`=`"releases.contrast_dispatch_error"`, `CONTRAST_DISPATCH_FAILED`=`"releases.contrast_dispatch_failed"`, `CONTRAST_DISPATCH_SKIPPED`=`"releases.contrast_dispatch_skipped"`, `DB_READ_FAILED`=`"releases.db_read_failed"`, `RELEASE_AUDIT_FAILED`=`"releases.release_audit_failed"`, `RELEASE_DISPATCH_ERROR`=`"releases.release_dispatch_error"`, `RELEASE_DISPATCH_FAILED`=`"releases.release_dispatch_failed"`, `RELEASE_DISPATCH_SKIPPED`=`"releases.release_dispatch_skipped"`, `RELEASE_OVERRIDE_AUDIT_FAILED`=`"releases.release_override_audit_failed"`
+- **RELEASE_LOG**: `CONTRAST_CHECK_AUDIT_FAILED`=`"releases.contrast_check_audit_failed"`, `CONTRAST_DISPATCH_ERROR`=`"releases.contrast_dispatch_error"`, `CONTRAST_DISPATCH_FAILED`=`"releases.contrast_dispatch_failed"`, `CONTRAST_DISPATCH_SKIPPED`=`"releases.contrast_dispatch_skipped"`, `DB_READ_FAILED`=`"releases.db_read_failed"`, `RELEASE_AUDIT_FAILED`=`"releases.release_audit_failed"`, `RELEASE_DISPATCH_ERROR`=`"releases.release_dispatch_error"`, `RELEASE_DISPATCH_FAILED`=`"releases.release_dispatch_failed"`, `RELEASE_DISPATCH_SKIPPED`=`"releases.release_dispatch_skipped"`, `RELEASE_OVERRIDE_AUDIT_FAILED`=`"releases.release_override_audit_failed"`, `TENANT_MIGRATIONS_AUDIT_FAILED`=`"releases.tenant_migrations_audit_failed"`, `TENANT_MIGRATIONS_DISPATCH_ERROR`=`"releases.tenant_migrations_dispatch_error"`, `TENANT_MIGRATIONS_DISPATCH_FAILED`=`"releases.tenant_migrations_dispatch_failed"`, `TENANT_MIGRATIONS_DISPATCH_SKIPPED`=`"releases.tenant_migrations_dispatch_skipped"`
 
 ### `@platform/constants/request` — `apps/platform/src/constants/request.ts`
 
@@ -470,6 +471,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FIELD_ERROR**: `INVALID`
 
+### `@web/constants/header-style` — `apps/web/src/constants/header-style.ts`
+
+- **HEADER_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"header_style.site_config_fetch_failed"`
+
 ### `@web/constants/navigation` — `apps/web/src/constants/navigation.ts`
 
 - **NAVIGATION_LOG**: `LAYOUT_FETCH_FAILED`=`"navigation.layout_fetch_failed"`
@@ -478,7 +483,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
 - **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
-- **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
+- **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `GATE_STATUS_FETCH_FAILED`=`"newsletter.gate_status_fetch_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
 
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 
@@ -495,6 +500,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 
 - **REVALIDATE_LOG**: `SECRET_MISSING`=`"revalidate.secret_missing"`, `TENANT_ID_LOOKUP_FAILED`=`"revalidate.tenant_id_lookup_failed"`, `TENANT_BY_ID_LOOKUP_FAILED`=`"revalidate.tenant_by_id_lookup_failed"`, `TENANT_ARCHIVED`=`"revalidate.tenant_archived"`, `TENANT_SANITY_CREDENTIALS_MISSING`=`"revalidate.tenant_sanity_credentials_missing"`, `TENANT_SANITY_CREDENTIALS_FETCH_THREW`=`"revalidate.tenant_sanity_credentials_fetch_threw"`, `TENANT_ACTIVITY_TOUCH_FAILED`=`"revalidate.tenant_activity_touch_failed"`, `PATH_PURGE_FALLBACK`=`"revalidate.path_purge_fallback"`, `REFERENCING_MODULES_LOOKUP_FAILED`=`"revalidate.referencing_modules_lookup_failed"`, `POST_LOOKUP_FAILED`=`"revalidate.post_lookup_failed"`, `BLOG_PAGINATION_LOOKUP_FAILED`=`"revalidate.blog_pagination_lookup_failed"`, `TAG_PARAMS_LOOKUP_FAILED`=`"revalidate.tag_params_lookup_failed"`, `TAG_PAGINATION_LOOKUP_FAILED`=`"revalidate.tag_pagination_lookup_failed"`, `TOPIC_PARAMS_LOOKUP_FAILED`=`"revalidate.topic_params_lookup_failed"`, `TOPIC_PAGINATION_LOOKUP_FAILED`=`"revalidate.topic_pagination_lookup_failed"`, `BOOKMARK_CLEANUP_FAILED`=`"revalidate.bookmark_cleanup_failed"`
+
+### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
+
+- **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `SITE_SETTINGS_FETCH_FAILED`=`"rss.site_settings_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
 
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 

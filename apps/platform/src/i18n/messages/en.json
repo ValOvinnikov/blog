@@ -1373,6 +1373,25 @@
     "unavailableTitle": "Release status is unavailable",
     "unavailableDescription": "GitHub could not be reached, so the latest release run is not shown."
   },
+  "tenantMigrationsCard": {
+    "title": "Tenant migrations",
+    "description": "Run content migrations on development, or retry a tenant whose production migration failed.",
+    "failed": "Migration failed",
+    "empty": "No tenant's content migration has failed.",
+    "unavailableTitle": "Failed migrations are unavailable",
+    "unavailableDescription": "The tenant registry could not be read, so tenants whose migration failed are not shown."
+  },
+  "runTenantMigrationsButton": {
+    "developmentLabel": "Run on development",
+    "retryLabel": "Retry on production",
+    "retryAriaLabel": "Retry {tenant} on production",
+    "starting": "Starting…",
+    "started": "Tenant migrations started.",
+    "tenantRequired": "Production migrations run for one tenant at a time.",
+    "notFailed": "That tenant's last migration did not fail, so there is nothing to retry.",
+    "failedTenantsUnavailable": "The tenant registry could not be read. Try again in a moment.",
+    "startFailed": "Nothing was started: the tenant migrations could not be dispatched."
+  },
   "releaseRunStatus": {
     "status": {
       "DISPATCHED": "Dispatched",
@@ -1387,7 +1406,7 @@
       "FAILED": "The release failed, and the steps after the failure did not run."
     },
     "tenantMigrationFailedTitle": "A tenant migration failed",
-    "tenantMigrationFailedDescription": "The deploy did not run, so the live site is unchanged. Retry that tenant with Run tenant migrations on this page.",
+    "tenantMigrationFailedDescription": "The deploy did not run, so the live site is unchanged. Retry that tenant under Tenant migrations on this page.",
     "viewRun": "View the run"
   },
   "startReleaseDialog": {

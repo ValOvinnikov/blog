@@ -17,6 +17,7 @@ const STARTER_SITE_TYPES = [
   SITE_TYPE.BLOG,
   SITE_TYPE.PORTFOLIO,
   SITE_TYPE.PERSONAL,
+  SITE_TYPE.DOCS,
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
@@ -197,6 +198,50 @@ describe(buildStarterDocuments, () => {
     ]);
   });
 
+  it('opens the Docs home with a statement hero linking to the guides, then an introduction and questions', () => {
+    const documents = build(SITE_TYPE.DOCS);
+    const byId = (id?: string) => documents.find(({ _id }) => _id === id);
+    const { hero, modules = [] } = findByType(documents, 'template_home');
+    const heroDocument = byId(hero?._ref);
+    const heroLink =
+      heroDocument && 'ctaButtons' in heroDocument
+        ? byId(heroDocument.ctaButtons?.[0]?.link?._ref)
+        : undefined;
+    const heroTarget =
+      heroLink && 'internalReference' in heroLink
+        ? byId(heroLink.internalReference?._ref)
+        : undefined;
+
+    const sequence = [
+      heroDocument,
+      ...modules.map(({ _ref }) => byId(_ref)),
+      heroTarget,
+    ].map((document) => ({ _type: document?._type }));
+
+    expect(sequence).toEqual([
+      { _type: 'module_heroStatement' },
+      { _type: 'module_content' },
+      { _type: 'module_faq' },
+      { _type: 'page_landing' },
+    ]);
+  });
+
+  it('the Docs guides are three pages under the page that turns on section navigation', () => {
+    const landings = build(SITE_TYPE.DOCS).filter(
+      (document) => document._type === 'page_landing',
+    );
+    const section = landings.find(
+      (document) =>
+        'sectionNavigation' in document && document.sectionNavigation,
+    );
+
+    const parents = landings.flatMap((document) =>
+      'parent' in document && document.parent ? [document.parent._ref] : [],
+    );
+
+    expect(parents).toEqual([section?._id, section?._id, section?._id]);
+  });
+
   it('the site settings brand carries the site name', () => {
     const { brand } = findByType(build(), 'settings_site');
 
@@ -246,7 +291,7 @@ describe(toStarterSiteType, () => {
     expect(toStarterSiteType(SITE_TYPE.BLOG)).toBe(SITE_TYPE.BLOG);
   });
 
-  it.each([null, SITE_TYPE.DOCS])(
+  it.each([null, SITE_TYPE.BUSINESS])(
     'starts %s from the Blank site',
     (siteType) => {
       expect(toStarterSiteType(siteType)).toBe(SITE_TYPE.BLANK);

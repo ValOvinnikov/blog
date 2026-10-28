@@ -164,5 +164,85 @@
       "linkLabel": "Teksten",
       "listHeading": "Alle berichten"
     }
+  },
+  "docs": {
+    "hero": {
+      "eyebrow": "Documentatie",
+      "heading": "Alles wat je nodig hebt om te beginnen",
+      "supportingText": "Handleidingen en antwoorden, zo geordend dat lezers vinden wat ze zoeken."
+    },
+    "intro": {
+      "body": [
+        "Welkom bij de documentatie. Begin met de handleidingen, of bekijk de vragen hieronder voor snelle antwoorden.",
+        "Vervang deze tekst door een kort overzicht van wat je product of project doet en voor wie deze documentatie is."
+      ]
+    },
+    "faq": {
+      "heading": "Veelgestelde vragen",
+      "questions": [
+        {
+          "question": "Waar begin ik?",
+          "answer": [
+            "Verwijs nieuwe lezers naar de eerste handleiding en vertel wat ze nodig hebben voordat ze beginnen."
+          ]
+        },
+        {
+          "question": "Hoe krijg ik hulp?",
+          "answer": [
+            "Leg uit waar lezers een vraag kunnen stellen of een probleem kunnen melden, en hoe snel ze een antwoord kunnen verwachten."
+          ]
+        },
+        {
+          "question": "Is deze documentatie actueel?",
+          "answer": [
+            "Vertel hoe vaak deze pagina's worden nagekeken en waar lezers kunnen zien wat er is veranderd."
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "title": "Handleidingen",
+      "slug": "handleidingen",
+      "heading": "Handleidingen",
+      "supportingText": "Hulp stap voor stap, van de eerste stappen tot dagelijks gebruik.",
+      "listHeading": "Alle handleidingen",
+      "metaTitle": "Handleidingen — stap voor stap op weg",
+      "metaDescription": "Handleidingen stap voor stap: de installatie, de belangrijkste begrippen en het oplossen van veelvoorkomende problemen."
+    },
+    "pages": [
+      {
+        "title": "Aan de slag",
+        "slug": "aan-de-slag",
+        "summary": "Een voorbeeldhandleiding. Vervang haar door je eigen eerste stappen.",
+        "body": [
+          "Beschrijf wat lezers nodig hebben voordat ze beginnen, en neem ze daarna stap voor stap mee.",
+          "Sluit af met wat ze zien als alles werkt, en verwijs naar de volgende handleiding."
+        ],
+        "metaTitle": "Aan de slag — een eerste handleiding om te vervangen",
+        "metaDescription": "Een voorbeeldhandleiding gemaakt met je site. Vervang haar door de eerste stappen voor je eigen lezers."
+      },
+      {
+        "title": "Belangrijkste begrippen",
+        "slug": "belangrijkste-begrippen",
+        "summary": "Een voorbeeldhandleiding over wat lezers moeten weten.",
+        "body": [
+          "Leg de paar begrippen uit waarop al het andere voortbouwt, elk met een kort voorbeeld.",
+          "Houd elk deel kort en verwijs naar de handleidingen die de begrippen in de praktijk brengen."
+        ],
+        "metaTitle": "Belangrijkste begrippen — een voorbeeldhandleiding",
+        "metaDescription": "Een voorbeeldhandleiding gemaakt met je site. Gebruik haar om de begrippen uit te leggen die je lezers moeten kennen."
+      },
+      {
+        "title": "Problemen oplossen",
+        "slug": "problemen-oplossen",
+        "summary": "Een voorbeeldhandleiding voor veelvoorkomende problemen.",
+        "body": [
+          "Noem de problemen waar lezers het vaakst tegenaan lopen, elk met de oorzaak en de oplossing.",
+          "Vertel waar ze hulp krijgen als het antwoord hier niet staat. Verwijder deze pagina als je haar nog niet nodig hebt."
+        ],
+        "metaTitle": "Problemen oplossen — een voorbeeldhandleiding",
+        "metaDescription": "Een voorbeeldhandleiding gemaakt met je site. Gebruik haar voor veelvoorkomende problemen, hun oorzaak en de oplossing."
+      }
+    ]
   }
 }

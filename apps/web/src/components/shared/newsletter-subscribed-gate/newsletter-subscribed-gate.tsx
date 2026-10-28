@@ -4,6 +4,8 @@ import { hasNewsletterSubscribedCookie } from '@web/utils/has-newsletter-subscri
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
 import { type ReactNode, useRef, useSyncExternalStore } from 'react';
 
+import { useIsReaderSubscribed } from './hooks/use-is-reader-subscribed';
+
 type TNewsletterSubscribedGateProps = {
   children: ReactNode;
 };
@@ -31,7 +33,9 @@ export const NewsletterSubscribedGate = ({
     getServerPhase,
   );
 
-  if (phase === 'subscribed') return null;
+  const isReaderSubscribed = useIsReaderSubscribed();
+
+  if (isReaderSubscribed ?? phase === 'subscribed') return null;
 
   return (
     <>
