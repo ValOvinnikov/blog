@@ -38,6 +38,7 @@ export const OnboardingActions = ({
       {children && <div className={status()}>{children}</div>}
       {isLastStep ? (
         <Button
+          key="create-site"
           type="submit"
           variant="primary"
           isPending={isPending}
@@ -47,6 +48,7 @@ export const OnboardingActions = ({
         </Button>
       ) : (
         <Button
+          key="continue"
           variant="primary"
           isAriaDisabled={isContinueDisabled}
           onClick={onContinue}
