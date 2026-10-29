@@ -18,9 +18,10 @@ import { preferSharedConstantRule } from './prefer-shared-constant.js';
 // check:touched-lint`), so files nobody edits keep their existing violations.
 const lintsTouchedFiles = process.env.BLOG_LINT_TOUCHED === '1';
 
-const touchedFileRules = {
+// Registered on every run so a preset can switch one of these rules off for a
+// file without the full lint failing on an unknown plugin.
+const touchedFilePlugins = {
   files: ['**/*.{ts,tsx}'],
-  ignores: ['migrations/**'],
   plugins: {
     'blog-touched': {
       rules: {
@@ -29,6 +30,11 @@ const touchedFileRules = {
       },
     },
   },
+};
+
+const touchedFileRules = {
+  files: ['**/*.{ts,tsx}'],
+  ignores: ['migrations/**'],
   rules: {
     'blog-touched/prefer-shared-constant': 'error',
     'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
@@ -179,6 +185,7 @@ export default [
       ],
     },
   },
+  touchedFilePlugins,
   ...(lintsTouchedFiles ? [touchedFileRules, touchedTestFileRules] : []),
   prettier,
 ];

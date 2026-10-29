@@ -302,6 +302,87 @@
     }
   },
   {
+    "name": "module_cookieSettings",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "module_cookieSettings"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "moduleHeadingBlock"
+        },
+        "optional": true
+      },
+      "layout": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "layout"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
     "name": "module_contactForm",
     "type": "document",
     "attributes": {
@@ -8185,6 +8266,36 @@
   },
   {
     "type": "type",
+    "name": "module_cookieSettings.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_cookieSettings"
+    }
+  },
+  {
+    "type": "type",
     "name": "module_newsletter.reference",
     "value": {
       "type": "object",
@@ -8566,6 +8677,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "module_contactForm.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_cookieSettings.reference"
                 }
               },
               {
@@ -11802,6 +11928,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "module_contactForm.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_cookieSettings.reference"
                 }
               },
               {

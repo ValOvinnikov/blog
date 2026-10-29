@@ -26,6 +26,7 @@ export const MODULE_PACK_BY_TYPE = {
   module_sectionPages: MODULE_PACK.CORE,
   module_cta: MODULE_PACK.CORE,
   module_newsletter: MODULE_PACK.CORE,
+  module_cookieSettings: MODULE_PACK.CORE,
   module_testimonial: MODULE_PACK.GROWTH,
   module_team: MODULE_PACK.GROWTH,
   module_logoWall: MODULE_PACK.GROWTH,

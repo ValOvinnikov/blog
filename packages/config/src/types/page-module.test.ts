@@ -31,6 +31,7 @@ describe('page module type unions', () => {
       | 'module_team'
       | 'module_pricing'
       | 'module_contactForm'
+      | 'module_cookieSettings'
     >();
   });
 
@@ -66,6 +67,7 @@ describe('page module type unions', () => {
       | 'module_team'
       | 'module_pricing'
       | 'module_contactForm'
+      | 'module_cookieSettings'
     >();
   });
 

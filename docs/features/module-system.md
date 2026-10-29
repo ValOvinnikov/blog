@@ -47,7 +47,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 
 ## Data
 
-- **Module documents** — 22 registered `module_*` types (`packages/studio/src/schema-types/modules/index.ts`), one document per placed instance. Modules and templates are not translated documents: copy fields hold per-language values inside the one document, and each language's page references a template (Studio warns when it differs from the default-language page's).
+- **Module documents** — 24 registered `module_*` types (`packages/studio/src/schema-types/modules/index.ts`), one document per placed instance. Modules and templates are not translated documents: copy fields hold per-language values inside the one document, and each language's page references a template (Studio warns when it differs from the default-language page's).
 - **Shared fields** most modules carry: `title` (Studio-only label), `brandVariant` (Background: Plain `PRIMARY`, Shaded `SECONDARY`, Brand tint `BRAND_PRIMARY`; required), `headingBlock` (`moduleHeadingBlock`: per-language `heading` + `supportingText`), `contentAlignment` (Left/Center by default; a module may allow Right), and a layout object. Optional per kind: `displayMode` (`GRID` or `CAROUSEL`, read as Grid when unset) and `showImages` (read as on when unset).
 - **Layout objects** — `layout` (spacing top/bottom, container width Narrow/Wide/Full, dividers), `wideLayout` (width limited to Wide/Full), `heroLayout` (no width; see [heroes](./heroes.md)) and `ctaLayout` (see [cta-module](./cta-module.md)). Spacing is `SPACING_SCALE` `NONE`…`XL`; unset means Medium. Width unset means Wide.
 - **Page → modules** — page queries deref `template.hero` and `template.modules[]` to `{ _id, _type }` only (`moduleFragment`); `toModule` / `toHeroSlot` turn them into `TModule { id, type }`. The module's own content is fetched later by its component.
@@ -56,6 +56,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 ## Configuration
 
 - Editors (Studio) create module documents, set their fields, and order them in a template's Modules field. Every page accepts `module_cta` and `module_newsletter`; each template adds its own list in `modulesField({ extend })`. See [page-types](./page-types.md) for each template's list.
+- `module_cookieSettings` (Cookie Settings, Conversion group) is accepted by `template_home` and `template_landing` and carries only the shared fields, its heading optional. It exists in Studio only so far: the web has no renderer for it, so a placed one renders nothing.
 - `module_newsletter` is the only capability-gated module: Studio flags it when the Newsletter capability is off, and the web module renders nothing ([newsletter](./newsletter.md), [plans-and-entitlements](./plans-and-entitlements.md)). No module is plan-gated.
 - Look reach: accent hue (the Brand tint band and every accent colour), card style, radius, fonts and density restyle every module through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Voice reaches only the empty states of the post list and taxonomy list ([voice](./voice.md)).
 

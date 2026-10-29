@@ -64,6 +64,18 @@ export type InternationalizedArrayString = Array<
   } & InternationalizedArrayStringValue
 >;
 
+export type Module_cookieSettings = {
+  _id: string;
+  _type: 'module_cookieSettings';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  headingBlock?: ModuleHeadingBlock;
+  layout?: Layout;
+};
+
 export type Module_contactForm = {
   _id: string;
   _type: 'module_contactForm';
@@ -1398,6 +1410,13 @@ export type Module_contactFormReference = {
   [internalGroqTypeReferenceTo]?: 'module_contactForm';
 };
 
+export type Module_cookieSettingsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_cookieSettings';
+};
+
 export type Module_newsletterReference = {
   _ref: string;
   _type: 'reference';
@@ -1478,6 +1497,9 @@ export type Template_home = {
     | ({
         _key: string;
       } & Module_contactFormReference)
+    | ({
+        _key: string;
+      } & Module_cookieSettingsReference)
     | ({
         _key: string;
       } & Module_newsletterReference)
@@ -2015,6 +2037,9 @@ export type Template_landing = {
       } & Module_contactFormReference)
     | ({
         _key: string;
+      } & Module_cookieSettingsReference)
+    | ({
+        _key: string;
       } & Module_newsletterReference)
     | ({
         _key: string;
@@ -2220,6 +2245,7 @@ export type AllSanitySchemaTypes =
   | ModuleHeadingBlock
   | Module_pricing
   | InternationalizedArrayString
+  | Module_cookieSettings
   | Module_contactForm
   | InternationalizedArrayParagraphText
   | Module_newsletter
@@ -2322,6 +2348,7 @@ export type AllSanitySchemaTypes =
   | Module_testimonialReference
   | Module_ctaReference
   | Module_contactFormReference
+  | Module_cookieSettingsReference
   | Module_newsletterReference
   | Module_pricingReference
   | Module_postFeaturedReference

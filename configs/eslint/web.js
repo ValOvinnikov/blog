@@ -95,6 +95,13 @@ export default [
     },
   },
   {
+    // check:revalidate-tags-sync reads REVALIDATE_TAGS' tags as literals, so a shared const would hide them from it.
+    files: ['src/utils/revalidate-tags/revalidate-tags.ts'],
+    rules: {
+      'blog-touched/no-duplicate-string': 'off',
+    },
+  },
+  {
     // Next.js reserved exports (generateMetadata, route verbs, ...) stay as
     // function declarations — framework API surface, not app code.
     files: [

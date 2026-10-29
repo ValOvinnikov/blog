@@ -106,6 +106,7 @@ const REVALIDATE_TAGS = {
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
   module_contactForm: ['modules:contactForm'],
+  module_cookieSettings: ['modules:cookieSettings'],
   module_team: ['modules:team'],
   module_timeline: ['modules:timeline'],
   module_pricing: ['modules:pricing'],
