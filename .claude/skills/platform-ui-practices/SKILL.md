@@ -265,7 +265,7 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 - Sizes are the `--text-admin-*` tokens in `styles/admin-theme.css`, one per
   pixel value: `text-admin-11`, `text-admin-11-5`, `text-admin-12`,
   `text-admin-12-5`, `text-admin-13`, `text-admin-13-5`, `text-admin-14`,
-  `text-admin-15`, `text-admin-16`, `text-admin-24`. A new one is registered in
+  `text-admin-15`, `text-admin-16`, `text-admin-20`, `text-admin-24`. A new one is registered in
   `FONT_SIZE_TOKENS` in `utils/tv/tv.ts`, or tailwind-merge drops it as a
   colour. No arbitrary `text-[Npx]` and no size off the scale; the site's named
   sizes (`text-xs`, `text-sm`, `text-base`, `text-label`, `text-meta`, …)

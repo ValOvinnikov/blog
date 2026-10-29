@@ -1,16 +1,21 @@
-import { brandMarkVariants } from './brand-mark-variants';
+import type { IWithClassName } from '@blog/config/types';
 
-export type TBrandMarkProps = {
+import {
+  brandMarkVariants,
+  type TBrandMarkVariants,
+} from './brand-mark-variants';
+
+export type TBrandMarkProps = IWithClassName & {
   title?: string;
-  className?: string;
+  size?: TBrandMarkVariants['size'];
 };
 
-export const BrandMark = ({ title, className }: TBrandMarkProps) => (
+export const BrandMark = ({ title, size, className }: TBrandMarkProps) => (
   <div
     role={title ? 'img' : undefined}
     aria-label={title}
     aria-hidden={title ? undefined : true}
-    className={brandMarkVariants({ class: className })}
+    className={brandMarkVariants({ size, class: className })}
   >
     V
   </div>

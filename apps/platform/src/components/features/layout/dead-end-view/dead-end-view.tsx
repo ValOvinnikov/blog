@@ -32,6 +32,7 @@ export const DeadEndView = ({
   const {
     content,
     copy,
+    description: descriptionSlot,
     actions,
     errorId: errorIdSlot,
     account,
@@ -45,7 +46,9 @@ export const DeadEndView = ({
           <Heading level={1} size="pageTitle">
             {title}
           </Heading>
-          <Text variant="supporting">{description}</Text>
+          <Text variant="supporting" className={descriptionSlot()}>
+            {description}
+          </Text>
         </div>
         <div className={actions()}>{action}</div>
         {errorId && (
