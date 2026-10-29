@@ -2,6 +2,7 @@ import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/t
 
 import { contactFormSchema } from './contact-form/contact-form';
 import { contentSchema } from './content/content';
+import { cookieSettingsSchema } from './cookie-settings/cookie-settings';
 import { ctaSchema } from './cta/cta';
 import { faqSchema } from './faq/faq';
 import { featureHighlightsSchema } from './feature-highlights/feature-highlights';
@@ -46,6 +47,7 @@ export const modules = [
   ctaSchema,
   newsletterSchema,
   contactFormSchema,
+  cookieSettingsSchema,
   pricingSchema,
   sectionPagesSchema,
 ].map((schema) => ({ ...schema, icon: textSizedIcon(schema.icon) }));

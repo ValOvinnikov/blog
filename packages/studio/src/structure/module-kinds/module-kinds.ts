@@ -1,6 +1,7 @@
 import { modules } from '@blog/studio/schema-types/modules';
 import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
+import { cookieSettingsSchema } from '@blog/studio/schema-types/modules/cookie-settings/cookie-settings';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
@@ -40,7 +41,13 @@ export const moduleKinds = [
   {
     name: 'conversion',
     title: 'Conversion',
-    modules: [ctaSchema, newsletterSchema, contactFormSchema, pricingSchema],
+    modules: [
+      ctaSchema,
+      newsletterSchema,
+      contactFormSchema,
+      cookieSettingsSchema,
+      pricingSchema,
+    ],
   },
   {
     name: 'posts',

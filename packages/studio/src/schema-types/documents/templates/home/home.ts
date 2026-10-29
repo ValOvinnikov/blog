@@ -3,6 +3,7 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
+import { cookieSettingsSchema } from '@blog/studio/schema-types/modules/cookie-settings/cookie-settings';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
 import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
@@ -55,6 +56,7 @@ export const homeTemplateSchema = defineType({
         faqSchema.name,
         pricingSchema.name,
         contactFormSchema.name,
+        cookieSettingsSchema.name,
       ],
     }),
   ],
