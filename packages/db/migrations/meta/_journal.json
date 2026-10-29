@@ -477,6 +477,13 @@
       "when": 1793206792873,
       "tag": "0067_windy_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1793262467378,
+      "tag": "0068_add_site_config_footer",
+      "breakpoints": true
     }
   ]
 }

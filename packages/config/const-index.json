@@ -28,6 +28,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "FOOTER_SURFACE.CARD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
     "PROFILE": [
@@ -1202,6 +1208,80 @@
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
+    "COLUMNS": [
+      {
+        "ref": "FOOTER_LAYOUT.COLUMNS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      }
+    ],
+    "CENTRED": [
+      {
+        "ref": "FOOTER_LAYOUT.CENTRED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      }
+    ],
+    "COMPACT": [
+      {
+        "ref": "FOOTER_LAYOUT.COMPACT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      },
+      {
+        "ref": "NEWSLETTER_VARIANT.COMPACT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module.ts"
+      },
+      {
+        "ref": "DENSITY.COMPACT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      }
+    ],
+    "BIG_WORDMARK": [
+      {
+        "ref": "FOOTER_LAYOUT.BIG_WORDMARK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      }
+    ],
+    "FULL_WIDTH": [
+      {
+        "ref": "FOOTER_SURFACE.FULL_WIDTH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      },
+      {
+        "ref": "HEADER_BAR_STYLE.FULL_WIDTH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-layout.ts"
+      }
+    ],
+    "HIDDEN": [
+      {
+        "ref": "COOKIE_SETTINGS_BUTTON.HIDDEN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      }
+    ],
+    "SHOWN": [
+      {
+        "ref": "COOKIE_SETTINGS_BUTTON.SHOWN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      }
+    ],
     "IDLE": [
       {
         "ref": "FORM_STATUS.IDLE",
@@ -1305,14 +1385,6 @@
     "WIDE_PANEL": [
       {
         "ref": "HEADER_SUBMENU_STYLE.WIDE_PANEL",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/header-layout.ts"
-      }
-    ],
-    "FULL_WIDTH": [
-      {
-        "ref": "HEADER_BAR_STYLE.FULL_WIDTH",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/header-layout.ts"
@@ -2338,20 +2410,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "COMPACT": [
-      {
-        "ref": "NEWSLETTER_VARIANT.COMPACT",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      },
-      {
-        "ref": "DENSITY.COMPACT",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/preset.ts"
       }
     ],
     "PINNED": [

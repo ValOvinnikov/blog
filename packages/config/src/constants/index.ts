@@ -18,6 +18,7 @@ export * from './display-mode';
 export * from './email-template';
 export * from './error';
 export * from './finding';
+export * from './footer-layout';
 export * from './form-status';
 export * from './header-control-style';
 export * from './header-layout';

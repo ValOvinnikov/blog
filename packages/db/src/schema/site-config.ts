@@ -3,10 +3,14 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
+  COOKIE_SETTINGS_BUTTON,
   DENSITY,
   FONT_CHOICE,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -18,10 +22,14 @@ import {
   type TAccountButtonStyle,
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
+  type TBrandVariant,
   type TBusyButtonStyle,
   type TCardStyle,
+  type TCookieSettingsButton,
   type TDensity,
   type TFontChoice,
+  type TFooterLayout,
+  type TFooterSurface,
   type THeaderBarStyle,
   type THeaderControlStyle,
   type THeaderLayout,
@@ -138,6 +146,29 @@ export const headerBarStyleEnum = pgEnum(
   Object.values(HEADER_BAR_STYLE) as [THeaderBarStyle, ...THeaderBarStyle[]],
 );
 
+export const footerLayoutEnum = pgEnum(
+  'footer_layout',
+  Object.values(FOOTER_LAYOUT) as [TFooterLayout, ...TFooterLayout[]],
+);
+
+export const footerBackgroundEnum = pgEnum(
+  'footer_background',
+  Object.values(BRAND_VARIANT) as [TBrandVariant, ...TBrandVariant[]],
+);
+
+export const footerSurfaceEnum = pgEnum(
+  'footer_surface',
+  Object.values(FOOTER_SURFACE) as [TFooterSurface, ...TFooterSurface[]],
+);
+
+export const cookieSettingsButtonEnum = pgEnum(
+  'cookie_settings_button',
+  Object.values(COOKIE_SETTINGS_BUTTON) as [
+    TCookieSettingsButton,
+    ...TCookieSettingsButton[],
+  ],
+);
+
 export type TVoiceOverrideValue = string | TVoicePortableText;
 
 export type TVoiceOverrides = Record<string, TVoiceOverrideValue>;
@@ -193,6 +224,18 @@ export const siteConfig = pgTable('site_config', {
   headerBarStyle: headerBarStyleEnum('header_bar_style')
     .notNull()
     .default(HEADER_BAR_STYLE.FULL_WIDTH),
+  footerLayout: footerLayoutEnum('footer_layout')
+    .notNull()
+    .default(FOOTER_LAYOUT.COLUMNS),
+  footerBackground: footerBackgroundEnum('footer_background')
+    .notNull()
+    .default(BRAND_VARIANT.BRAND_PRIMARY),
+  footerSurface: footerSurfaceEnum('footer_surface')
+    .notNull()
+    .default(FOOTER_SURFACE.FULL_WIDTH),
+  cookieSettingsButton: cookieSettingsButtonEnum('cookie_settings_button')
+    .notNull()
+    .default(COOKIE_SETTINGS_BUTTON.HIDDEN),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverridesByLocale: jsonb('voice_overrides')

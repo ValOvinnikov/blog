@@ -19,6 +19,10 @@ export async function insertSiteConfigIfMissing(
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    footerLayout,
+    footerBackground,
+    footerSurface,
+    cookieSettingsButton,
   } = PRESET_REGISTRY[preset];
 
   await getDb()
@@ -41,6 +45,10 @@ export async function insertSiteConfigIfMissing(
       headerLayout,
       headerSubmenuStyle,
       headerBarStyle,
+      footerLayout,
+      footerBackground,
+      footerSurface,
+      cookieSettingsButton,
     })
     .onConflictDoNothing({ target: siteConfig.tenantId });
 }

@@ -17,6 +17,14 @@ import {
 import { type TCapability, CAPABILITY } from './capability';
 import { type TCardStyle, CARD_STYLE } from './card-style';
 import {
+  COOKIE_SETTINGS_BUTTON,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
+  type TCookieSettingsButton,
+  type TFooterLayout,
+  type TFooterSurface,
+} from './footer-layout';
+import {
   type THeaderControlStyle,
   HEADER_CONTROL_STYLE,
 } from './header-control-style';
@@ -28,6 +36,7 @@ import {
   type THeaderLayout,
   type THeaderSubmenuStyle,
 } from './header-layout';
+import { type TBrandVariant, BRAND_VARIANT } from './layout';
 
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
@@ -103,6 +112,10 @@ export type TPresetBundle = {
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
+  footerLayout: TFooterLayout;
+  footerBackground: TBrandVariant;
+  footerSurface: TFooterSurface;
+  cookieSettingsButton: TCookieSettingsButton;
   featureDefaults: Record<TCapability, boolean>;
 };
 
@@ -125,6 +138,10 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     headerLayout: HEADER_LAYOUT.CLASSIC,
     headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
     headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+    footerLayout: FOOTER_LAYOUT.COLUMNS,
+    footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
+    footerSurface: FOOTER_SURFACE.FULL_WIDTH,
+    cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
@@ -153,6 +170,10 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     headerLayout: HEADER_LAYOUT.CLASSIC,
     headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
     headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+    footerLayout: FOOTER_LAYOUT.COLUMNS,
+    footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
+    footerSurface: FOOTER_SURFACE.FULL_WIDTH,
+    cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
     featureDefaults: {
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
