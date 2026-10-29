@@ -8,7 +8,7 @@ import { SAMPLE_FOOTER_TEST_ID } from '@platform/constants/sample-footer';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { useTranslations } from 'next-intl';
 
-export type TSampleSiteFooterProps = {
+type TSampleSiteFooterProps = {
   brand: TSampleSiteHeaderProps['brand'];
   footer: TSampleFooterStyle;
 };
