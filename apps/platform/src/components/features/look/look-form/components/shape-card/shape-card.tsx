@@ -8,6 +8,7 @@ import {
   type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -26,20 +27,17 @@ export const ShapeCard = () => {
   const cardStyleLock = useLookFieldLock('cardStyle');
   const headerControlStyleLock = useLookFieldLock('headerControlStyle');
 
-  const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
-    value: scale,
-    label: t(`radiusScaleOptionLabel.${scale}`),
-  }));
+  const radiusOptions = toOptions(RADIUS_SCALE, (scale) =>
+    t(`radiusScaleOptionLabel.${scale}`),
+  );
 
-  const densityOptions = Object.values(DENSITY).map((option) => ({
-    value: option,
-    label: t(`densityOptionLabel.${option}`),
-  }));
+  const densityOptions = toOptions(DENSITY, (option) =>
+    t(`densityOptionLabel.${option}`),
+  );
 
-  const cardStyleOptions = Object.values(CARD_STYLE).map((style) => ({
-    value: style,
-    label: t(`cardStyleOptionLabel.${style}`),
-  }));
+  const cardStyleOptions = toOptions(CARD_STYLE, (style) =>
+    t(`cardStyleOptionLabel.${style}`),
+  );
 
   const headerControlStyleOptions = Object.values(HEADER_CONTROL_STYLE).map(
     (style) => ({

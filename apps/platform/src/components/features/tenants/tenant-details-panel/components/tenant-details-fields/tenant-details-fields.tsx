@@ -2,6 +2,7 @@
 
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { toOptions } from '@blog/utils/primitives';
 import { LockableSegmentedField } from '@platform/components/features/tenants/tenant-details-panel/components/lockable-segmented-field';
 import type {
   TTenantDetailsFieldErrors,
@@ -49,10 +50,9 @@ export const TenantDetailsFields = ({
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
   ];
 
-  const localeOptions = Object.values(LOCALE_ISO_CODES).map((locale) => ({
-    value: locale,
-    label: tLanguage(locale),
-  }));
+  const localeOptions = toOptions(LOCALE_ISO_CODES, (locale) =>
+    tLanguage(locale),
+  );
 
   return (
     <>
