@@ -11,10 +11,7 @@ import {
   type TDataRequestMatchColumn,
 } from '@platform/constants/data-request';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
-import {
-  nextSort,
-  type TColumnSort,
-} from '@platform/utils/next-sort/next-sort';
+import { nextSort } from '@platform/utils/next-sort/next-sort';
 import { countPages } from '@platform/utils/pagination/pagination';
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
