@@ -14,6 +14,8 @@ export const signedInAccountVariants = tv({
         email: ['hidden text-admin-side-muted lg:block'],
         signOut: [
           'text-admin-side-text hover:bg-admin-side-raised hover:text-white',
+          // Keeps the 44px tap target from growing the 26px brand row of the phone band.
+          '-my-[9px] lg:my-0',
         ],
       },
     },

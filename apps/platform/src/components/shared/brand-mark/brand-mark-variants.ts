@@ -1,9 +1,22 @@
+import { SIZE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
+import type { VariantProps } from 'tailwind-variants';
 
 export const brandMarkVariants = tv({
   base: [
-    'grid size-[26px] shrink-0 place-items-center rounded-admin-control',
+    'grid shrink-0 place-items-center rounded-admin-control',
     'bg-gradient-to-br from-[#6366f1] to-[#a855f7]',
-    'text-admin-13 font-bold text-white',
+    'font-bold text-white',
   ],
+  variants: {
+    size: {
+      [SIZE.MD]: ['size-[26px] text-admin-13'],
+      [SIZE.LG]: ['size-9 rounded-admin text-admin-20'],
+    },
+  },
+  defaultVariants: {
+    size: SIZE.MD,
+  },
 });
+
+export type TBrandMarkVariants = VariantProps<typeof brandMarkVariants>;

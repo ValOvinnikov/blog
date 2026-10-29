@@ -1,3 +1,4 @@
+import { SIZE } from '@blog/config';
 import { BrandMark } from '@platform/components/shared/brand-mark';
 import { Card } from '@platform/components/shared/card';
 import { useTranslations } from 'next-intl';
@@ -15,17 +16,18 @@ export const CenteredCardFrame = ({
   footer,
 }: TCenteredCardFrameProps) => {
   const t = useTranslations('centeredCardFrame');
-  const { root, main, brand, brandName, card } = centeredCardFrameVariants();
+  const { root, main, brand, brandName, card, body } =
+    centeredCardFrameVariants();
 
   return (
     <div className={root()}>
       <main className={main()}>
         <div className={brand()}>
-          <BrandMark />
+          <BrandMark size={SIZE.LG} />
           <span className={brandName()}>{t('brandName')}</span>
         </div>
         <Card className={card()}>
-          <Card.Body>{children}</Card.Body>
+          <Card.Body className={body()}>{children}</Card.Body>
         </Card>
         {footer}
       </main>
