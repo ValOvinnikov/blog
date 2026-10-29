@@ -66,7 +66,6 @@ type TCachedDocumentType =
  * keep them in sync with `packages/service/src`.
  */
 const REVALIDATE_TAGS = {
-  // eslint-disable-next-line blog-touched/no-duplicate-string -- check:revalidate-tags-sync reads these tags as literals, so a shared const would hide them
   person: ['author', 'posts', 'modules:team'],
   blog_topic: ['topic', 'topics', 'posts'],
   blog_tag: ['tag', 'tags', 'posts'],
