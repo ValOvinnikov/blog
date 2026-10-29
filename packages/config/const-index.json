@@ -5506,6 +5506,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "SLUG_REQUIRED": [
+      {
+        "ref": "TENANT_FIELD_ERROR.SLUG_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "SLUG_INVALID": [
       {
         "ref": "TENANT_FIELD_ERROR.SLUG_INVALID",

@@ -41,11 +41,21 @@ import { z } from 'zod';
 
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1),
-  slug: z.string().trim().toLowerCase().regex(DOMAIN_LABEL_PATTERN),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, { abort: true })
+    .regex(DOMAIN_LABEL_PATTERN),
   plan: z.enum(TENANT_PLAN),
   ownerEmail: z.string().trim().toLowerCase().email(),
   confirmOwnerInviteToken: z.string().optional(),
 });
+
+const toSlugFieldError = (issues: z.ZodError['issues']) =>
+  issues.some(({ path, code }) => path[0] === 'slug' && code === 'too_small')
+    ? TENANT_FIELD_ERROR.SLUG_REQUIRED
+    : TENANT_FIELD_ERROR.SLUG_INVALID;
 
 export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
 
@@ -74,7 +84,7 @@ export const createTenantAction = async (
         parsed.error.issues,
         {
           name: TENANT_FIELD_ERROR.NAME_REQUIRED,
-          slug: TENANT_FIELD_ERROR.SLUG_INVALID,
+          slug: toSlugFieldError(parsed.error.issues),
           plan: TENANT_FIELD_ERROR.PLAN_UNSUPPORTED,
           ownerEmail: TENANT_FIELD_ERROR.EMAIL_INVALID,
         },
