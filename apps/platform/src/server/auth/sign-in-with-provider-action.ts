@@ -8,12 +8,14 @@ import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-call
 import { z } from 'zod';
 
 import { signIn } from './auth';
+import { setSignupTermsCookie } from './set-signup-terms-cookie';
 
 const signInWithProviderInputSchema = z.object({
   providerId: z.custom<TOAuthProviderId>((value) =>
     getEnabledOAuthProviderIds().some((id) => id === value),
   ),
   callbackPath: z.string(),
+  isSignUp: z.boolean().optional(),
 });
 
 export type TSignInWithProviderInput = z.input<
@@ -26,7 +28,8 @@ export const signInWithProviderAction = async (
   const parsed = signInWithProviderInputSchema.safeParse(input);
   if (!parsed.success) return;
 
-  const { providerId, callbackPath } = parsed.data;
+  const { providerId, callbackPath, isSignUp } = parsed.data;
+  if (isSignUp) await setSignupTermsCookie();
 
   await signIn(providerId, { redirectTo: toSafeCallbackPath(callbackPath) });
 };

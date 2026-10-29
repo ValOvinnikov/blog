@@ -10,12 +10,16 @@ import {
 } from '@blog/config';
 import {
   sendSignInLinkAction,
+  type TSendSignInLinkInput,
   type TSendSignInLinkFieldError,
   type TSendSignInLinkRefusal,
 } from '@platform/server/auth/send-sign-in-link-action';
 import { useState, useTransition } from 'react';
 
-export const useEmailSignIn = (callbackPath: string) => {
+export const useEmailSignIn = ({
+  callbackPath,
+  isSignUp,
+}: Omit<TSendSignInLinkInput, 'email'>) => {
   const [email, setEmail] = useState('');
   const [sentTo, setSentTo] = useState<TMaybeUndefined<string>>(undefined);
   const [emailError, setEmailError] =
@@ -28,7 +32,11 @@ export const useEmailSignIn = (callbackPath: string) => {
 
   const submit = () => {
     startTransition(async () => {
-      const result = await sendSignInLinkAction({ email, callbackPath });
+      const result = await sendSignInLinkAction({
+        email,
+        callbackPath,
+        isSignUp,
+      });
 
       setEmailError(
         isOutcomeInvalid(result) ? result.fieldErrors.email : undefined,

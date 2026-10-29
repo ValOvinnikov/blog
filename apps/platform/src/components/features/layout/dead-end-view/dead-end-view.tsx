@@ -1,6 +1,5 @@
+import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
-import { BrandMark } from '@platform/components/shared/brand-mark';
-import { Card } from '@platform/components/shared/card';
 import { Heading } from '@platform/components/shared/heading';
 import {
   StatusBadge,
@@ -31,11 +30,6 @@ export const DeadEndView = ({
 }: TDeadEndViewProps) => {
   const t = useTranslations('deadEndView');
   const {
-    root,
-    main,
-    brand,
-    brandName,
-    card,
     content,
     copy,
     actions,
@@ -44,37 +38,27 @@ export const DeadEndView = ({
   } = deadEndViewVariants();
 
   return (
-    <div className={root()}>
-      <main className={main()}>
-        <div className={brand()}>
-          <BrandMark />
-          <span className={brandName()}>{t('brandName')}</span>
+    <CenteredCardFrame>
+      <div className={content()}>
+        <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+        <div className={copy()}>
+          <Heading level={1} size="pageTitle">
+            {title}
+          </Heading>
+          <Text variant="supporting">{description}</Text>
         </div>
-        <Card className={card()}>
-          <Card.Body>
-            <div className={content()}>
-              <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
-              <div className={copy()}>
-                <Heading level={1} size="pageTitle">
-                  {title}
-                </Heading>
-                <Text variant="supporting">{description}</Text>
-              </div>
-              <div className={actions()}>{action}</div>
-              {errorId && (
-                <Text variant="meta" className={errorIdSlot()}>
-                  {t('errorId', { errorId })}
-                </Text>
-              )}
-              {accountEmail && (
-                <div className={account()}>
-                  <SignedInAccount email={accountEmail} />
-                </div>
-              )}
-            </div>
-          </Card.Body>
-        </Card>
-      </main>
-    </div>
+        <div className={actions()}>{action}</div>
+        {errorId && (
+          <Text variant="meta" className={errorIdSlot()}>
+            {t('errorId', { errorId })}
+          </Text>
+        )}
+        {accountEmail && (
+          <div className={account()}>
+            <SignedInAccount email={accountEmail} />
+          </div>
+        )}
+      </div>
+    </CenteredCardFrame>
   );
 };

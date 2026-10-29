@@ -17,6 +17,7 @@ const SEND_BUTTON = { name: 'Email me a sign-in link' };
 
 const setup = customRender(EmailSignInForm, {
   callbackPath: adminRoutes.dashboard(),
+  isSignUp: false,
 });
 
 describe(`<${EmailSignInForm.name}/>`, () => {
@@ -41,6 +42,7 @@ describe(`<${EmailSignInForm.name}/>`, () => {
     expect(sendSignInLinkAction).toHaveBeenCalledWith({
       email: MOCK_SIGN_IN_EMAIL,
       callbackPath: adminRoutes.dashboard(),
+      isSignUp: false,
     });
     expect(status).toHaveTextContent(
       `Check your emailWe've sent a sign-in link to ${MOCK_SIGN_IN_EMAIL}. It works once and expires after a while.`,

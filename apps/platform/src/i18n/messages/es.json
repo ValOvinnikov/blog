@@ -29,7 +29,6 @@
   "signInPage": {
     "heading": "Iniciar sesión",
     "description": "Usa la cuenta con la que te registraste o te invitaron.",
-    "brandMarkLabel": "Valstack",
     "accountNotLinkedTitle": "Este correo ya inicia sesión de otra forma",
     "accountNotLinkedDescription": "Tu correo electrónico ya se usa con otro método de inicio de sesión. Inicia sesión como lo hiciste la última vez.",
     "signInFailedTitle": "No hemos podido iniciar tu sesión",
@@ -38,14 +37,11 @@
   },
   "signUpPage": {
     "heading": "Crear una cuenta",
-    "description": "Acepta las condiciones y elige cómo quieres iniciar sesión.",
-    "brandMarkLabel": "Valstack"
+    "agreement": "Al continuar, aceptas los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
+    "signInPrompt": "¿Ya tienes una cuenta? <link>Inicia sesión</link>"
   },
-  "signUpForm": {
-    "continue": "Continuar",
-    "continuing": "Comprobando…",
-    "refusedTitle": "No hemos podido continuar con tu registro",
-    "refusedDescription": "Vuelve a intentarlo más tarde."
+  "signInOptions": {
+    "or": "o"
   },
   "termsAcceptance": {
     "acceptTerms": "Acepto los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
@@ -150,8 +146,10 @@
     "badge": "Error 500",
     "homeLink": "Volver al inicio"
   },
+  "centeredCardFrame": {
+    "brandName": "Valstack"
+  },
   "deadEndView": {
-    "brandName": "Valstack",
     "errorId": "ID del error: {errorId}"
   },
   "pageSkeleton": {

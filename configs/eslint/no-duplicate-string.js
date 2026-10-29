@@ -1,33 +1,17 @@
 import sonarjs from 'eslint-plugin-sonarjs';
 
 import {
-  ENV_OBJECT_NAME,
-  EQUALITY_OPERATORS,
-  PROCESS_NAME,
   PROTOCOL_ATTRIBUTE_KEYS,
   PROTOCOL_ATTRIBUTE_VALUES,
   ROLE_QUERY_CALLEES,
   STUB_ENV_CALLEE,
 } from './literal-vocabulary.js';
-import { isClassString } from './prefer-shared-constant.js';
+import {
+  isClassString,
+  isEnvComparisonOperand,
+} from './prefer-shared-constant.js';
 
 const sonarRule = sonarjs.rules['no-duplicate-string'];
-
-const isEnvObject = (expression) =>
-  (expression.type === 'Identifier' && expression.name === ENV_OBJECT_NAME) ||
-  (expression.type === 'MemberExpression' &&
-    !expression.computed &&
-    expression.property.name === ENV_OBJECT_NAME &&
-    expression.object.type === 'Identifier' &&
-    expression.object.name === PROCESS_NAME);
-
-const isEnvRead = (expression) =>
-  expression.type === 'MemberExpression' && isEnvObject(expression.object);
-
-const isEnvComparisonOperand = ({ parent }) =>
-  parent.type === 'BinaryExpression' &&
-  EQUALITY_OPERATORS.has(parent.operator) &&
-  (isEnvRead(parent.left) || isEnvRead(parent.right));
 
 const isStubEnvArgument = ({ parent }) =>
   parent.type === 'CallExpression' &&

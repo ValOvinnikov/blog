@@ -95,6 +95,10 @@ ruleTester.run('prefer-shared-constant', rule, {
     },
     { code: "const s = 'INTERNAL';", filename: '/repo/scripts/a.mjs' },
     {
+      code: "const isLive = process.env.NODE_ENV === 'INTERNAL';",
+      filename: WEB_SOURCE,
+    },
+    {
       code: 'export const isMissing = (code) => code === 404;',
       filename: '/repo/packages/config/src/constants/x.ts',
     },

@@ -1,3 +1,4 @@
+import type * as oauthProviders from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { MOCK_SIGN_IN_USER_ID } from '@platform/testing/auth/fixtures';
@@ -13,13 +14,29 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/server/auth/accept-signup-terms-action', () => ({
-  acceptSignupTermsAction: vi.fn(),
+vi.mock(
+  '@blog/auth/utils/oauth-providers/oauth-providers',
+  async (importActual) => {
+    const actual = await importActual<typeof oauthProviders>();
+    return {
+      ...actual,
+      getEnabledOAuthProviderIds: vi.fn(() => [actual.OAUTH_PROVIDER_IDS[0]]),
+    };
+  },
+);
+
+vi.mock('@platform/server/auth/sign-in-with-provider-action', () => ({
+  signInWithProviderAction: vi.fn(),
+}));
+
+vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
+  sendSignInLinkAction: vi.fn(),
 }));
 
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const tPage = makeEnTranslator('signUpPage');
-const tForm = makeEnTranslator('signUpForm');
+const tEmailForm = makeEnTranslator('emailSignInForm');
+const tProvider = makeEnTranslator('providerSignInButton');
 
 const setup = customRenderAsync(SignUpPage, {});
 
@@ -28,19 +45,23 @@ describe(`<${SignUpPage.name}/>`, () => {
     authMock.mockReset().mockResolvedValue(null);
   });
 
-  it('shows a signed-out visitor the sign-up form', async () => {
+  it('shows a signed-out visitor the sign-up options', async () => {
     await setup();
 
     const heading = screen.getByRole('heading', {
       level: 1,
       name: tPage('heading'),
     });
-    const continueButton = screen.getByRole('button', {
-      name: tForm('continue'),
+    const githubButton = screen.getByRole('button', {
+      name: tProvider('continueWithGithub'),
+    });
+    const sendButton = screen.getByRole('button', {
+      name: tEmailForm('sendLink'),
     });
 
     expect(heading).toBeVisible();
-    expect(continueButton).toBeVisible();
+    expect(githubButton).toBeVisible();
+    expect(sendButton).toBeVisible();
   });
 
   it('sends a signed-in user home', async () => {

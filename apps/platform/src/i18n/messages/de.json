@@ -29,7 +29,6 @@
   "signInPage": {
     "heading": "Anmelden",
     "description": "Verwenden Sie das Konto, mit dem Sie sich registriert haben oder eingeladen wurden.",
-    "brandMarkLabel": "Valstack",
     "accountNotLinkedTitle": "Diese E-Mail-Adresse meldet sich bereits anders an",
     "accountNotLinkedDescription": "Ihre E-Mail-Adresse wird bereits mit einer anderen Anmeldemethode verwendet. Melden Sie sich so an wie beim letzten Mal.",
     "signInFailedTitle": "Anmeldung fehlgeschlagen",
@@ -38,14 +37,11 @@
   },
   "signUpPage": {
     "heading": "Konto erstellen",
-    "description": "Akzeptiere die Bedingungen und wähle dann, wie du dich anmelden möchtest.",
-    "brandMarkLabel": "Valstack"
+    "agreement": "Indem du fortfährst, stimmst du den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
+    "signInPrompt": "Du hast schon ein Konto? <link>Anmelden</link>"
   },
-  "signUpForm": {
-    "continue": "Weiter",
-    "continuing": "Wird geprüft…",
-    "refusedTitle": "Wir konnten deine Registrierung nicht fortsetzen",
-    "refusedDescription": "Versuche es später erneut."
+  "signInOptions": {
+    "or": "oder"
   },
   "termsAcceptance": {
     "acceptTerms": "Ich stimme den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
@@ -150,8 +146,10 @@
     "badge": "Fehler 500",
     "homeLink": "Zur Startseite"
   },
+  "centeredCardFrame": {
+    "brandName": "Valstack"
+  },
   "deadEndView": {
-    "brandName": "Valstack",
     "errorId": "Fehler-ID: {errorId}"
   },
   "pageSkeleton": {

@@ -71,8 +71,9 @@
   in that app. Exempt: import and `vi.mock` paths, directives, property keys,
   HTML attribute names passed to `getAttribute`/`toHaveAttribute` and their
   siblings,
-  `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, the
-  const files themselves, and `0`/`1`/`-1`. Co-located
+  `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, a
+  value compared with an env read, the const files themselves, and
+  `0`/`1`/`-1`. Co-located
   `prefer-shared-constant.test.js`.
 - `no-duplicate-string.js` — `eslint-plugin-sonarjs`'s `no-duplicate-string`
   with Tailwind class strings (the same positions as above) skipped, plus a
