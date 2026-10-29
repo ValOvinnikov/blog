@@ -4,32 +4,74 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
+  getFindingDetails,
   listFindingsForTenant,
   openFinding,
   resolveFinding,
 } from '@blog/db/queries/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
+import type { TTenant } from '@blog/db/schema/tenants';
 import {
   OWNER_ACCESS_FINDING_AFTER_MS,
   OWNER_ACCESS_FINDING_IDENTIFIER,
   OWNER_ACCESS_LOG,
 } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
+import { z } from 'zod';
 
-export async function openOwnerAccessFindingOnceOverdue(
+import { msSinceOwnerInvited } from './report-owner-access-outcome';
+
+const failureCountSchema = z.object({
+  failureCount: z.number().int().nonnegative().catch(0),
+});
+
+async function findOpenOwnerAccessFinding(
   tenantId: string,
-  failingSince: number,
+): Promise<TMaybeUndefined<TFindingSummary>> {
+  const openFindings = await listFindingsForTenant(
+    tenantId,
+    FINDING_STATUS.OPEN,
+  );
+  return openFindings.find(
+    ({ kind }) => kind === FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
+  );
+}
+
+async function previousFailureCount(
+  tenantId: string,
+  finding: TFindingSummary,
+): Promise<number> {
+  const details = await getFindingDetails(tenantId, finding.id);
+  const parsed = failureCountSchema.safeParse(details ?? {});
+  return parsed.success ? parsed.data.failureCount : 0;
+}
+
+export async function recordOwnerAccessFailure(
+  tenant: TTenant,
   error: string,
 ): Promise<void> {
-  if (Date.now() - failingSince < OWNER_ACCESS_FINDING_AFTER_MS) return;
+  if (msSinceOwnerInvited(tenant) < OWNER_ACCESS_FINDING_AFTER_MS) return;
 
+  const tenantId = tenant.id;
+  const now = new Date();
+  const finding = await findOpenOwnerAccessFinding(tenantId);
+  const failureCount = finding
+    ? (await previousFailureCount(tenantId, finding)) + 1
+    : 1;
   const opened = await openFinding({
     tenantId,
     source: FINDING_SOURCE.TENANT_PROVISIONING,
     kind: FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
     identifier: OWNER_ACCESS_FINDING_IDENTIFIER,
     severity: FINDING_SEVERITY.WARNING,
-    details: { error, failingSince: new Date(failingSince).toISOString() },
+    details: {
+      error,
+      failureCount,
+      firstFailedAt: (finding?.firstSeenAt ?? now).toISOString(),
+      lastFailedAt: now.toISOString(),
+    },
   });
   if (!opened.ok) {
     logger.error(OWNER_ACCESS_LOG.FINDING_OPEN_FAILED, {
@@ -42,13 +84,7 @@ export async function openOwnerAccessFindingOnceOverdue(
 export async function resolveOwnerAccessFinding(
   tenantId: string,
 ): Promise<void> {
-  const openFindings = await listFindingsForTenant(
-    tenantId,
-    FINDING_STATUS.OPEN,
-  );
-  const finding = openFindings.find(
-    ({ kind }) => kind === FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
-  );
+  const finding = await findOpenOwnerAccessFinding(tenantId);
   if (!finding) return;
 
   const resolved = await resolveFinding(finding.id);

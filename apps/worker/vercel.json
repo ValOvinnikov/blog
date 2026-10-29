@@ -7,6 +7,10 @@
     {
       "path": "/api/inactivity-sweep",
       "schedule": "17 6 * * *"
+    },
+    {
+      "path": "/api/owner-access-sweep",
+      "schedule": "41 * * * *"
     }
   ]
 }

@@ -6532,6 +6532,30 @@
         "file": "apps/worker/src/constants/owner-access.ts"
       }
     ],
+    "owner_access.sweep_not_configured": [
+      {
+        "ref": "OWNER_ACCESS_LOG.SWEEP_NOT_CONFIGURED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.sweep_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.SWEEP_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
+    "owner_access.sweep_tenant_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.SWEEP_TENANT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
     "PENDING_SUBSCRIBERS": [
       {
         "ref": "RETENTION_KIND.PENDING_SUBSCRIBERS",
@@ -6602,6 +6626,22 @@
         "scope": "app:worker",
         "from": "@worker/constants/retention",
         "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "pending": [
+      {
+        "ref": "WORKFLOW_RUN_STATUS.PENDING",
+        "scope": "app:worker",
+        "from": "@worker/constants/workflow",
+        "file": "apps/worker/src/constants/workflow.ts"
+      }
+    ],
+    "running": [
+      {
+        "ref": "WORKFLOW_RUN_STATUS.RUNNING",
+        "scope": "app:worker",
+        "from": "@worker/constants/workflow",
+        "file": "apps/worker/src/constants/workflow.ts"
       }
     ]
   },

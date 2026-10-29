@@ -3,10 +3,10 @@ import {
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import {
-  OWNER_ACCESS_FAST_POLL_INTERVAL,
-  OWNER_ACCESS_FAST_POLL_TICKS,
   OWNER_ACCESS_HOOK_TOKEN_PREFIX,
-  OWNER_ACCESS_SLOW_POLL_INTERVAL,
+  OWNER_ACCESS_POLL_INTERVAL,
+  OWNER_ACCESS_RUN_CHECKS,
+  OWNER_ACCESS_SWEEP_CHECKS,
 } from '@worker/constants/owner-access';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { checkOwnerAccess } from '@worker/units/check-owner-access';
@@ -15,7 +15,6 @@ import { createHook, type Hook, sleep } from 'workflow';
 import { ensureOwnerAccess } from './ensure-owner-access';
 
 const { PENDING_ACCEPTANCE, ELEVATED, STALLED } = ELEVATE_TENANT_OWNER_OUTCOME;
-const MOCK_FAILING_SINCE = Date.parse('2026-10-28T21:44:00.000Z');
 
 vi.mock('@worker/units/check-owner-access');
 vi.mock('workflow');
@@ -42,7 +41,7 @@ function checksReturn(...outcomes: TElevateTenantOwnerOutcome[]) {
   outcomes.forEach((outcome) =>
     vi.mocked(checkOwnerAccess).mockResolvedValueOnce({
       outcome,
-      failingSince: null,
+      hasFailed: false,
     }),
   );
 }
@@ -70,38 +69,50 @@ describe(ensureOwnerAccess, () => {
     await expect(ensureOwnerAccess(MOCK_TENANT_ID)).resolves.toBe(STALLED);
   });
 
-  it('checks every minute for the fast-poll window, then hourly', async () => {
-    const pending = Array.from(
-      { length: OWNER_ACCESS_FAST_POLL_TICKS + 1 },
-      () => PENDING_ACCEPTANCE,
-    );
-    checksReturn(...pending, ELEVATED);
+  it('checks every minute', async () => {
+    checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
 
     await ensureOwnerAccess(MOCK_TENANT_ID);
 
-    const intervals = vi.mocked(sleep).mock.calls.map(([interval]) => interval);
-    expect(intervals.slice(0, OWNER_ACCESS_FAST_POLL_TICKS)).toEqual(
-      Array(OWNER_ACCESS_FAST_POLL_TICKS).fill(OWNER_ACCESS_FAST_POLL_INTERVAL),
-    );
-    expect(intervals[OWNER_ACCESS_FAST_POLL_TICKS]).toBe(
-      OWNER_ACCESS_SLOW_POLL_INTERVAL,
-    );
+    expect(vi.mocked(sleep).mock.calls).toEqual([
+      [OWNER_ACCESS_POLL_INTERVAL],
+      [OWNER_ACCESS_POLL_INTERVAL],
+    ]);
   });
 
-  it('carries the failure streak from one check to the next', async () => {
-    vi.mocked(checkOwnerAccess)
-      .mockResolvedValueOnce({
-        outcome: PENDING_ACCEPTANCE,
-        failingSince: MOCK_FAILING_SINCE,
-      })
-      .mockResolvedValueOnce({ outcome: ELEVATED, failingSince: null });
+  it('ends still pending after its last check', async () => {
+    checksReturn(
+      ...Array<TElevateTenantOwnerOutcome>(OWNER_ACCESS_RUN_CHECKS).fill(
+        PENDING_ACCEPTANCE,
+      ),
+    );
 
-    await ensureOwnerAccess(MOCK_TENANT_ID);
+    const outcome = await ensureOwnerAccess(MOCK_TENANT_ID);
 
-    expect(vi.mocked(checkOwnerAccess).mock.calls).toEqual([
-      [MOCK_TENANT_ID, null],
-      [MOCK_TENANT_ID, MOCK_FAILING_SINCE],
-    ]);
+    expect(outcome).toBe(PENDING_ACCEPTANCE);
+    expect(checkOwnerAccess).toHaveBeenCalledTimes(OWNER_ACCESS_RUN_CHECKS);
+  });
+
+  it('makes only the checks it was started with', async () => {
+    checksReturn(PENDING_ACCEPTANCE);
+
+    await ensureOwnerAccess(MOCK_TENANT_ID, OWNER_ACCESS_SWEEP_CHECKS);
+
+    expect(checkOwnerAccess).toHaveBeenCalledTimes(OWNER_ACCESS_SWEEP_CHECKS);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it('ends after a check that failed, leaving the retry to the next sweep', async () => {
+    vi.mocked(checkOwnerAccess).mockResolvedValueOnce({
+      outcome: PENDING_ACCEPTANCE,
+      hasFailed: true,
+    });
+
+    const outcome = await ensureOwnerAccess(MOCK_TENANT_ID);
+
+    expect(outcome).toBe(PENDING_ACCEPTANCE);
+    expect(checkOwnerAccess).toHaveBeenCalledOnce();
+    expect(sleep).not.toHaveBeenCalled();
   });
 
   it('releases the hook when it finishes', async () => {
@@ -125,14 +136,16 @@ describe(ensureOwnerAccess, () => {
       expect(checkOwnerAccess).toHaveBeenCalledTimes(2);
     });
 
-    it('goes back to checking every minute', async () => {
-      checksReturn(PENDING_ACCEPTANCE, PENDING_ACCEPTANCE, ELEVATED);
+    it('counts the woken check towards the run', async () => {
+      checksReturn(
+        ...Array<TElevateTenantOwnerOutcome>(OWNER_ACCESS_RUN_CHECKS).fill(
+          PENDING_ACCEPTANCE,
+        ),
+      );
 
       await ensureOwnerAccess(MOCK_TENANT_ID);
 
-      expect(vi.mocked(sleep).mock.calls.at(-1)?.[0]).toBe(
-        OWNER_ACCESS_FAST_POLL_INTERVAL,
-      );
+      expect(checkOwnerAccess).toHaveBeenCalledTimes(OWNER_ACCESS_RUN_CHECKS);
     });
   });
 

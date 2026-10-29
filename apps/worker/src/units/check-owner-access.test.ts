@@ -17,6 +17,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import {
+  getFindingDetails,
   listFindingsForTenant,
   openFinding,
   resolveFinding,
@@ -33,6 +34,7 @@ import {
   grantSanityProjectRole,
   listSanityProjectAcl,
   listSanityProjectInvites,
+  revokeSanityProjectRole,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import {
   assignSanityProjectUserRole,
@@ -95,10 +97,15 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('workflow');
 
-function aclEntry(roleName: string) {
+const MOCK_INVITED_FOR_THRESHOLD = new Date(
+  MOCK_NOW.getTime() - OWNER_ACCESS_FINDING_AFTER_MS,
+);
+const MOCK_PRIOR_FAILURE_COUNT = 2;
+
+function aclEntry(...roleNames: string[]) {
   return {
     projectUserId: MOCK_OWNER_PROJECT_USER_ID,
-    roles: [{ name: roleName }],
+    roles: roleNames.map((name) => ({ name })),
     isRobot: false,
   };
 }
@@ -194,13 +201,37 @@ describe(checkOwnerAccess, () => {
       );
     });
 
-    it('clears the failure streak', async () => {
-      const { failingSince } = await checkOwnerAccess(
-        MOCK_TENANT_ID,
-        MOCK_FOUR_DAYS_AGO.getTime(),
-      );
+    it('reports the check as not failed', async () => {
+      const { hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
 
-      expect(failingSince).toBeNull();
+      expect(hasFailed).toBe(false);
+    });
+
+    it('removes the viewer role the invite gave, leaving administrator alone', async () => {
+      await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        projectUserId: MOCK_OWNER_PROJECT_USER_ID,
+        roleName: SANITY_PROJECT_ROLE.VIEWER,
+      });
+    });
+
+    it('removes a viewer role left beside an existing administrator role', async () => {
+      vi.mocked(listSanityProjectAcl).mockResolvedValue([
+        aclEntry(SANITY_PROJECT_ROLE.ADMINISTRATOR, SANITY_PROJECT_ROLE.VIEWER),
+      ]);
+
+      await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(grantSanityProjectRole).not.toHaveBeenCalled();
+      expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        projectUserId: MOCK_OWNER_PROJECT_USER_ID,
+        roleName: SANITY_PROJECT_ROLE.VIEWER,
+      });
     });
 
     it('records the acceptance, Sanity user, login provider and role', async () => {
@@ -249,6 +280,7 @@ describe(checkOwnerAccess, () => {
 
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR);
       expect(grantSanityProjectRole).not.toHaveBeenCalled();
+      expect(revokeSanityProjectRole).not.toHaveBeenCalled();
     });
 
     it("resets the tenant's inactivity clock to the acceptance", async () => {
@@ -413,66 +445,102 @@ describe(checkOwnerAccess, () => {
     });
 
     describe('on the last attempt', () => {
-      const MOCK_FAILING_FOR_THRESHOLD =
-        MOCK_NOW.getTime() - OWNER_ACCESS_FINDING_AFTER_MS;
-
       beforeEach(() => {
         atStepAttempt(99);
       });
 
-      it('starts the failure streak at this check', async () => {
-        const { failingSince } = await checkOwnerAccess(MOCK_TENANT_ID);
+      it('reports the check as failed', async () => {
+        const { hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
 
-        expect(failingSince).toBe(MOCK_NOW.getTime());
-        expect(openFinding).not.toHaveBeenCalled();
+        expect(hasFailed).toBe(true);
       });
 
-      it('keeps the start of a running failure streak', async () => {
-        const { failingSince } = await checkOwnerAccess(
-          MOCK_TENANT_ID,
-          MOCK_FAILING_FOR_THRESHOLD,
-        );
-
-        expect(failingSince).toBe(MOCK_FAILING_FOR_THRESHOLD);
-      });
-
-      it('opens no finding before the checks have failed for the threshold', async () => {
-        await checkOwnerAccess(MOCK_TENANT_ID, MOCK_FAILING_FOR_THRESHOLD + 1);
+      it('opens no finding within the threshold of the invite', async () => {
+        await checkOwnerAccess(MOCK_TENANT_ID);
 
         expect(openFinding).not.toHaveBeenCalled();
       });
 
-      it('opens a finding naming the error once the checks have failed for the threshold', async () => {
-        await checkOwnerAccess(MOCK_TENANT_ID, MOCK_FAILING_FOR_THRESHOLD);
-
-        expect(openFinding).toHaveBeenCalledExactlyOnceWith({
-          tenantId: MOCK_TENANT_ID,
-          source: FINDING_SOURCE.TENANT_PROVISIONING,
-          kind: FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
-          identifier: OWNER_ACCESS_FINDING_IDENTIFIER,
-          severity: FINDING_SEVERITY.WARNING,
-          details: {
-            error: MOCK_SANITY_OUTAGE,
-            failingSince: new Date(MOCK_FAILING_FOR_THRESHOLD).toISOString(),
-          },
+      describe('once the invite is older than the threshold', () => {
+        beforeEach(() => {
+          vi.mocked(getTenantById).mockResolvedValue(
+            mockProvisionedTenant({
+              ownerInviteSentAt: MOCK_INVITED_FOR_THRESHOLD,
+            }),
+          );
         });
-      });
 
-      it('logs and still reports the wait when the finding cannot be opened', async () => {
-        vi.mocked(openFinding).mockResolvedValue(
-          errorResult(ERROR_CODE.DB_NOT_FOUND),
-        );
+        it('opens a finding naming the error and the first failure', async () => {
+          await checkOwnerAccess(MOCK_TENANT_ID);
 
-        const { outcome } = await checkOwnerAccess(
-          MOCK_TENANT_ID,
-          MOCK_FAILING_FOR_THRESHOLD,
-        );
+          expect(openFinding).toHaveBeenCalledExactlyOnceWith({
+            tenantId: MOCK_TENANT_ID,
+            source: FINDING_SOURCE.TENANT_PROVISIONING,
+            kind: FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
+            identifier: OWNER_ACCESS_FINDING_IDENTIFIER,
+            severity: FINDING_SEVERITY.WARNING,
+            details: {
+              error: MOCK_SANITY_OUTAGE,
+              failureCount: 1,
+              firstFailedAt: MOCK_NOW.toISOString(),
+              lastFailedAt: MOCK_NOW.toISOString(),
+            },
+          });
+        });
 
-        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
-        expect(logger.error).toHaveBeenCalledWith(
-          OWNER_ACCESS_LOG.FINDING_OPEN_FAILED,
-          { tenantId: MOCK_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
-        );
+        it('counts the failure onto an open finding, keeping its first failure', async () => {
+          const finding = mockOwnerAccessFinding();
+          vi.mocked(listFindingsForTenant).mockResolvedValue([finding]);
+          vi.mocked(getFindingDetails).mockResolvedValue({
+            failureCount: MOCK_PRIOR_FAILURE_COUNT,
+          });
+
+          await checkOwnerAccess(MOCK_TENANT_ID);
+
+          expect(getFindingDetails).toHaveBeenCalledWith(
+            MOCK_TENANT_ID,
+            MOCK_OWNER_ACCESS_FINDING_ID,
+          );
+          expect(openFinding).toHaveBeenCalledWith(
+            expect.objectContaining({
+              details: {
+                error: MOCK_SANITY_OUTAGE,
+                failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
+                firstFailedAt: finding.firstSeenAt.toISOString(),
+                lastFailedAt: MOCK_NOW.toISOString(),
+              },
+            }),
+          );
+        });
+
+        it('counts from one when an open finding records no count', async () => {
+          vi.mocked(listFindingsForTenant).mockResolvedValue([
+            mockOwnerAccessFinding(),
+          ]);
+          vi.mocked(getFindingDetails).mockResolvedValue(null);
+
+          await checkOwnerAccess(MOCK_TENANT_ID);
+
+          expect(openFinding).toHaveBeenCalledWith(
+            expect.objectContaining({
+              details: expect.objectContaining({ failureCount: 1 }),
+            }),
+          );
+        });
+
+        it('logs and still reports the wait when the finding cannot be opened', async () => {
+          vi.mocked(openFinding).mockResolvedValue(
+            errorResult(ERROR_CODE.DB_NOT_FOUND),
+          );
+
+          const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+          expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+          expect(logger.error).toHaveBeenCalledWith(
+            OWNER_ACCESS_LOG.FINDING_OPEN_FAILED,
+            { tenantId: MOCK_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
+          );
+        });
       });
     });
 

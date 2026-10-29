@@ -11,11 +11,15 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { logger } from '@worker/utils/logger/logger';
 import { postOperatorAlert } from '@worker/utils/operator-alert/operator-alert';
 
+export function msSinceOwnerInvited(tenant: TTenant): number {
+  const invitedAt = tenant.ownerInviteSentAt ?? tenant.createdAt;
+  return Date.now() - invitedAt.getTime();
+}
+
 export function pendingOwnerAccessOutcome(
   tenant: TTenant,
 ): TElevateTenantOwnerOutcome {
-  const invitedAt = tenant.ownerInviteSentAt ?? tenant.createdAt;
-  return Date.now() - invitedAt.getTime() >= OWNER_ACCESS_STALL_AFTER_MS
+  return msSinceOwnerInvited(tenant) >= OWNER_ACCESS_STALL_AFTER_MS
     ? ELEVATE_TENANT_OWNER_OUTCOME.STALLED
     : ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE;
 }

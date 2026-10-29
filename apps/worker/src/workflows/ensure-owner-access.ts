@@ -4,25 +4,16 @@ import {
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import {
-  OWNER_ACCESS_FAST_POLL_INTERVAL,
-  OWNER_ACCESS_FAST_POLL_TICKS,
-  OWNER_ACCESS_SLOW_POLL_INTERVAL,
+  OWNER_ACCESS_POLL_INTERVAL,
+  OWNER_ACCESS_RUN_CHECKS,
 } from '@worker/constants/owner-access';
-import {
-  checkOwnerAccess,
-  type TOwnerAccessCheck,
-} from '@worker/units/check-owner-access';
+import { checkOwnerAccess } from '@worker/units/check-owner-access';
 import { ownerAccessHookToken } from '@worker/utils/owner-access-hook/owner-access-hook';
 import { createHook, sleep } from 'workflow';
 
-function pollInterval(tick: number) {
-  return tick < OWNER_ACCESS_FAST_POLL_TICKS
-    ? OWNER_ACCESS_FAST_POLL_INTERVAL
-    : OWNER_ACCESS_SLOW_POLL_INTERVAL;
-}
-
 export async function ensureOwnerAccess(
   tenantId: string,
+  maxChecks: number = OWNER_ACCESS_RUN_CHECKS,
 ): Promise<TMaybeNull<TElevateTenantOwnerOutcome>> {
   'use workflow';
 
@@ -32,25 +23,17 @@ export async function ensureOwnerAccess(
 
     const wakes = wake[Symbol.asyncIterator]();
     let nextWake = wakes.next();
-    let tick = 0;
-    let failingSince: TMaybeNull<number> = null;
-    for (;;) {
-      const check: TOwnerAccessCheck = await checkOwnerAccess(
-        tenantId,
-        failingSince,
-      );
-      const { outcome } = check;
-      failingSince = check.failingSince;
-      if (outcome !== ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE) {
-        return outcome;
-      }
+    for (let checks = 1; ; checks++) {
+      const { outcome, hasFailed } = await checkOwnerAccess(tenantId);
+      const isWaiting =
+        outcome === ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE;
+      if (!isWaiting || hasFailed || checks >= maxChecks) return outcome;
 
       const woken = await Promise.race([
-        sleep(pollInterval(tick)).then(() => false),
+        sleep(OWNER_ACCESS_POLL_INTERVAL).then(() => false),
         nextWake.then(() => true),
       ]);
       if (woken) nextWake = wakes.next();
-      tick = woken ? 0 : tick + 1;
     }
   } finally {
     wake.dispose();

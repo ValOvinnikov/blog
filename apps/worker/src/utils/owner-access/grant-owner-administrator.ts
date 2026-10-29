@@ -16,6 +16,8 @@ import {
 import {
   grantSanityProjectRole,
   listSanityProjectAcl,
+  revokeSanityProjectRole,
+  type TSanityAclEntry,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
@@ -48,6 +50,24 @@ async function touchActivityOnInviteAcceptance(
   }
 }
 
+async function revokeRolesBesideAdministrator(
+  target: TOwnerAccessTarget,
+  entry: TSanityAclEntry,
+): Promise<void> {
+  const { projectId, env } = target;
+  const otherRoles = entry.roles.filter(
+    ({ name }) => name !== SANITY_PROJECT_ROLE.ADMINISTRATOR,
+  );
+  for (const { name } of otherRoles) {
+    await revokeSanityProjectRole({
+      token: env.sanityManagementToken,
+      projectId,
+      projectUserId: entry.projectUserId,
+      roleName: name,
+    });
+  }
+}
+
 export async function grantOwnerAdministrator(
   target: TOwnerAccessTarget,
   owner: TSanityUser,
@@ -74,6 +94,7 @@ export async function grantOwnerAdministrator(
       role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
     });
   }
+  await revokeRolesBesideAdministrator(target, entry);
 
   const inviteAcceptedAt = tenant.ownerInviteAcceptedAt ?? new Date();
   const recorded = await setTenantOwnerAccess(tenant.id, {
