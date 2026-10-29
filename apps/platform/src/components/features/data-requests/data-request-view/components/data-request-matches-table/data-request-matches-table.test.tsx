@@ -1,9 +1,9 @@
+import { SORT_DIRECTION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   DATA_REQUEST_MATCH_KIND,
   DATA_REQUEST_MATCHES_PAGE_SIZE,
 } from '@platform/constants/data-request';
-import { SORT_DIRECTION } from '@platform/constants/sort';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockDataRequestMatch } from '@platform/testing/data-requests/fixtures';

@@ -20,6 +20,10 @@ import {
   toClientTenant,
   type TClientTenant,
 } from '@platform/server/tenants/to-client-tenant';
+import {
+  DEFAULT_TENANTS_SORT,
+  type TTenantsListQuery,
+} from '@platform/utils/tenants-list-query/tenants-list-query';
 
 export const mockIdleProvisioningSteps = (): TTenantProvisioningState => {
   const idle: TProvisioningStepState = {
@@ -223,6 +227,19 @@ export const mockReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
 export const mockClientTenant = (
   overrides: Partial<TTenant> = {},
 ): TClientTenant => toClientTenant(mockTenant(overrides));
+
+export const mockReadyClientTenant = (
+  overrides: Partial<TTenant> = {},
+): TClientTenant => toClientTenant(mockReadyTenant(overrides));
+
+export const mockTenantsListQuery = (
+  overrides: Partial<TTenantsListQuery> = {},
+): TTenantsListQuery => ({
+  shouldShowArchived: false,
+  sort: DEFAULT_TENANTS_SORT,
+  search: '',
+  ...overrides,
+});
 export const OWNER_EMAIL_LABEL = 'Owner email';
 export const PRIMARY_DOMAIN_LABEL = 'Primary domain';
 export const REACTIVATE_TENANT_LABEL = 'Reactivate tenant';

@@ -1,5 +1,10 @@
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import { useRouter } from '@platform/i18n/navigation';
 import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  mockTenantsListQuery,
+  MOCK_TENANT_SLUG,
+} from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ArchivedTenantsToggle } from './archived-tenants-toggle';
@@ -11,7 +16,7 @@ const ALL_LABEL = 'All';
 const ARIA_PRESSED = 'aria-pressed';
 
 const setup = customRender(ArchivedTenantsToggle, {
-  shouldShowArchived: false,
+  listQuery: mockTenantsListQuery(),
 });
 
 describe(`<${ArchivedTenantsToggle.name}/>`, () => {
@@ -32,7 +37,7 @@ describe(`<${ArchivedTenantsToggle.name}/>`, () => {
   });
 
   it('shows All selected when archived tenants are shown', () => {
-    setup({ shouldShowArchived: true });
+    setup({ listQuery: mockTenantsListQuery({ shouldShowArchived: true }) });
 
     const allButton = screen.getByRole('button', { name: ALL_LABEL });
 
@@ -49,11 +54,30 @@ describe(`<${ArchivedTenantsToggle.name}/>`, () => {
   });
 
   it('navigates back to the active-only list when Active is selected', async () => {
-    setup({ shouldShowArchived: true });
+    setup({ listQuery: mockTenantsListQuery({ shouldShowArchived: true }) });
 
     const activeButton = screen.getByRole('button', { name: ACTIVE_LABEL });
     await user.click(activeButton);
 
     expect(push).toHaveBeenCalledWith('/tenants');
+  });
+
+  it('keeps the sort and search when the visibility changes', async () => {
+    setup({
+      listQuery: mockTenantsListQuery({
+        sort: {
+          column: TENANT_SORT_COLUMN.NAME,
+          direction: SORT_DIRECTION.ASCENDING,
+        },
+        search: MOCK_TENANT_SLUG,
+      }),
+    });
+
+    const allButton = screen.getByRole('button', { name: ALL_LABEL });
+    await user.click(allButton);
+
+    expect(push).toHaveBeenCalledWith(
+      `/tenants?archived=1&sort=NAME&direction=ascending&q=${MOCK_TENANT_SLUG}`,
+    );
   });
 });

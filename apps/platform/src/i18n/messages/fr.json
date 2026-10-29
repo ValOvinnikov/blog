@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "Aucun locataire pour le moment.",
+    "noMatches": "Aucun locataire ne correspond à « {search} ».",
     "columnTenant": "Locataire",
     "columnPlan": "Formule",
     "columnStatus": "Statut",
@@ -261,6 +262,10 @@
     },
     "manage": "Gérer",
     "manageAriaLabel": "Gérer {tenantName}"
+  },
+  "tenantsSearch": {
+    "label": "Rechercher des locataires",
+    "hint": "Nom ou domaine — appuyez sur Entrée pour rechercher."
   },
   "findingsView": {
     "title": "Constats",

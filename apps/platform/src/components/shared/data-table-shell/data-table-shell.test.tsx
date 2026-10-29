@@ -1,5 +1,5 @@
+import { SORT_DIRECTION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
-import { SORT_DIRECTION } from '@platform/constants/sort';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps, ReactNode } from 'react';

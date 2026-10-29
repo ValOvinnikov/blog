@@ -1,6 +1,7 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
-  mockTenant,
+  mockClientTenant,
+  mockTenantsListQuery,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -8,8 +9,8 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { TenantsView } from './tenants-view';
 
 const setup = customRender(TenantsView, {
-  tenants: [mockTenant()],
-  shouldShowArchived: false,
+  tenants: [mockClientTenant()],
+  listQuery: mockTenantsListQuery(),
   isEmailAlertingConfigured: true,
 });
 
@@ -37,6 +38,12 @@ describe(`<${TenantsView.name}/>`, () => {
       expect(addTenant).toHaveAttribute('href', adminRoutes.newTenant());
     });
 
+    it('offers a tenant search', () => {
+      const search = screen.getByRole('searchbox', { name: 'Search tenants' });
+
+      expect(search).toBeVisible();
+    });
+
     it('filters to active tenants by default', () => {
       const activeButton = screen.getByRole('button', { name: 'Active' });
 
@@ -51,7 +58,7 @@ describe(`<${TenantsView.name}/>`, () => {
   });
 
   it('filters to all tenants when archived tenants are included', () => {
-    setup({ shouldShowArchived: true });
+    setup({ listQuery: mockTenantsListQuery({ shouldShowArchived: true }) });
 
     const allButton = screen.getByRole('button', { name: 'All' });
 

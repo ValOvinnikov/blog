@@ -1,4 +1,5 @@
-import { TENANT_STATUS } from '@blog/db/constants';
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -16,6 +17,11 @@ const db = useQueryTestDb();
 
 const MOCK_FIRST_NAME = `A ${faker.company.name()}`;
 const MOCK_LAST_NAME = `Z ${faker.company.name()}`;
+const MOCK_NEWER_CREATED_AT = faker.date.recent();
+const MOCK_OLDER_CREATED_AT = faker.date.past({
+  refDate: MOCK_NEWER_CREATED_AT,
+});
+const MOCK_SEARCH_WORD = faker.string.alpha({ length: 8, casing: 'lower' });
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -55,6 +61,93 @@ describe(listTenants, () => {
     const result = await listTenants();
 
     expect(result).toEqual([firstTenant, lastTenant]);
+  });
+
+  describe('with an older and a newer tenant', () => {
+    let olderTenant: TTenant;
+    let newerTenant: TTenant;
+
+    beforeEach(async () => {
+      olderTenant = await insertTestTenant(db(), {
+        name: MOCK_FIRST_NAME,
+        plan: TENANT_PLAN.GROWTH,
+        createdAt: MOCK_OLDER_CREATED_AT,
+      });
+      newerTenant = await insertTestTenant(db(), {
+        name: MOCK_LAST_NAME,
+        plan: TENANT_PLAN.FREE,
+        createdAt: MOCK_NEWER_CREATED_AT,
+      });
+    });
+
+    it('orders newest first when sorted by created date descending', async () => {
+      const result = await listTenants({
+        sort: {
+          column: TENANT_SORT_COLUMN.CREATED,
+          direction: SORT_DIRECTION.DESCENDING,
+        },
+      });
+
+      expect(result).toEqual([newerTenant, olderTenant]);
+    });
+
+    it('orders by plan when sorted by plan ascending', async () => {
+      const result = await listTenants({
+        sort: {
+          column: TENANT_SORT_COLUMN.PLAN,
+          direction: SORT_DIRECTION.ASCENDING,
+        },
+      });
+
+      expect(result).toEqual([newerTenant, olderTenant]);
+    });
+
+    it('reverses the name order when sorted by name descending', async () => {
+      const result = await listTenants({
+        sort: {
+          column: TENANT_SORT_COLUMN.NAME,
+          direction: SORT_DIRECTION.DESCENDING,
+        },
+      });
+
+      expect(result).toEqual([newerTenant, olderTenant]);
+    });
+  });
+
+  describe('with a search', () => {
+    let matchingTenant: TTenant;
+
+    beforeEach(async () => {
+      matchingTenant = await insertTestTenant(db(), {
+        name: `${MOCK_FIRST_NAME} ${MOCK_SEARCH_WORD}`,
+      });
+      await insertTestTenant(db(), { name: MOCK_LAST_NAME });
+    });
+
+    it('narrows to tenants whose name contains it, ignoring case', async () => {
+      const result = await listTenants({
+        search: MOCK_SEARCH_WORD.toUpperCase(),
+      });
+
+      expect(result).toEqual([matchingTenant]);
+    });
+
+    it('matches against the primary domain', async () => {
+      const domainTenant = await insertTestTenant(db(), {
+        name: MOCK_LAST_NAME,
+        primaryDomain: `${MOCK_SEARCH_WORD}-site.example.com`,
+      });
+
+      const result = await listTenants({ search: `${MOCK_SEARCH_WORD}-site` });
+
+      expect(result).toEqual([domainTenant]);
+    });
+
+    it('treats wildcard characters as literal text', async () => {
+      const result = await listTenants({ search: '%' });
+
+      expect(result).toEqual([]);
+    });
   });
 
   it('returns an empty array when no tenants exist', async () => {

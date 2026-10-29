@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "Noch keine Mandanten.",
+    "noMatches": "Keine Mandanten passen zu „{search}“.",
     "columnTenant": "Mandant",
     "columnPlan": "Tarif",
     "columnStatus": "Status",
@@ -261,6 +262,10 @@
     },
     "manage": "Verwalten",
     "manageAriaLabel": "{tenantName} verwalten"
+  },
+  "tenantsSearch": {
+    "label": "Mandanten suchen",
+    "hint": "Name oder Domain – mit Enter suchen."
   },
   "findingsView": {
     "title": "Befunde",

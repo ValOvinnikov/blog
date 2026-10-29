@@ -1,5 +1,7 @@
 'use client';
 
+import { SORT_DIRECTION } from '@blog/config/constants';
+import type { TColumnSort } from '@blog/config/types';
 import {
   DATA_REQUEST_KIND_FILTER,
   DATA_REQUEST_MATCH_COLUMN,
@@ -8,8 +10,11 @@ import {
   type TDataRequestKindFilter,
   type TDataRequestMatchColumn,
 } from '@platform/constants/data-request';
-import { SORT_DIRECTION, type TSortDirection } from '@platform/constants/sort';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
+import {
+  nextSort,
+  type TColumnSort,
+} from '@platform/utils/next-sort/next-sort';
 import { countPages } from '@platform/utils/pagination/pagination';
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
@@ -19,7 +24,7 @@ export type TDataRequestMatchShownValues = Record<
   string
 >;
 
-type TSort = { column: TDataRequestMatchColumn; direction: TSortDirection };
+type TSort = TColumnSort<TDataRequestMatchColumn>;
 
 const DEFAULT_SORT: TSort = {
   column: DATA_REQUEST_MATCH_COLUMN.RECORDED,
@@ -85,15 +90,7 @@ export const useDataRequestMatchesTable = (
   };
 
   const sortBy = (column: TDataRequestMatchColumn) => {
-    const isFlip = sort.column === column;
-    const flipped =
-      sort.direction === SORT_DIRECTION.ASCENDING
-        ? SORT_DIRECTION.DESCENDING
-        : SORT_DIRECTION.ASCENDING;
-    setSort({
-      column,
-      direction: isFlip ? flipped : SORT_DIRECTION.ASCENDING,
-    });
+    setSort(nextSort(sort, column));
     setPage(1);
   };
 

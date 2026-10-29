@@ -224,6 +224,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SIZE**: `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`
 
+### `@blog/config/constants` — `packages/config/src/constants/sort.ts`
+
+- **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
+
 ### `@blog/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
 - **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
@@ -232,6 +236,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TAXONOMY_KIND**: `TOPICS`, `TAGS`
 - **TAXONOMY_SORT**: `ALPHABETICAL`, `MOST_POSTS`
+
+### `@blog/config/constants` — `packages/config/src/constants/tenant-sort.ts`
+
+- **TENANT_SORT_COLUMN**: `NAME`, `PLAN`, `STATUS`, `CREATED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/tenant-write-refusal.ts`
 
@@ -439,10 +447,6 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/site-config` — `apps/platform/src/constants/site-config.ts`
 
 - **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
-
-### `@platform/constants/sort` — `apps/platform/src/constants/sort.ts`
-
-- **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
 
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 

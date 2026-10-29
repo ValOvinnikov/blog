@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "Nog geen tenants.",
+    "noMatches": "Geen tenants gevonden voor ‘{search}’.",
     "columnTenant": "Tenant",
     "columnPlan": "Abonnement",
     "columnStatus": "Status",
@@ -261,6 +262,10 @@
     },
     "manage": "Beheren",
     "manageAriaLabel": "{tenantName} beheren"
+  },
+  "tenantsSearch": {
+    "label": "Tenants zoeken",
+    "hint": "Naam of domein — druk op Enter om te zoeken."
   },
   "findingsView": {
     "title": "Bevindingen",

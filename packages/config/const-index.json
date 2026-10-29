@@ -334,6 +334,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/audit.ts"
+      },
+      {
+        "ref": "TENANT_SORT_COLUMN.CREATED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/tenant-sort.ts"
       }
     ],
     "DEPROVISION_REQUESTED": [
@@ -3072,6 +3078,22 @@
         "file": "packages/config/src/constants/size.ts"
       }
     ],
+    "ascending": [
+      {
+        "ref": "SORT_DIRECTION.ASCENDING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sort.ts"
+      }
+    ],
+    "descending": [
+      {
+        "ref": "SORT_DIRECTION.DESCENDING",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sort.ts"
+      }
+    ],
     "ALREADY_PENDING": [
       {
         "ref": "SUBSCRIBER_OUTCOME.ALREADY_PENDING",
@@ -3160,6 +3182,30 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/taxonomy.ts"
+      }
+    ],
+    "NAME": [
+      {
+        "ref": "TENANT_SORT_COLUMN.NAME",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/tenant-sort.ts"
+      }
+    ],
+    "PLAN": [
+      {
+        "ref": "TENANT_SORT_COLUMN.PLAN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/tenant-sort.ts"
+      }
+    ],
+    "STATUS": [
+      {
+        "ref": "TENANT_SORT_COLUMN.STATUS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/tenant-sort.ts"
       }
     ],
     "UNRESOLVED": [
@@ -5448,22 +5494,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/site-config",
         "file": "apps/platform/src/constants/site-config.ts"
-      }
-    ],
-    "ascending": [
-      {
-        "ref": "SORT_DIRECTION.ASCENDING",
-        "scope": "app:platform",
-        "from": "@platform/constants/sort",
-        "file": "apps/platform/src/constants/sort.ts"
-      }
-    ],
-    "descending": [
-      {
-        "ref": "SORT_DIRECTION.DESCENDING",
-        "scope": "app:platform",
-        "from": "@platform/constants/sort",
-        "file": "apps/platform/src/constants/sort.ts"
       }
     ],
     "UPCOMING": [

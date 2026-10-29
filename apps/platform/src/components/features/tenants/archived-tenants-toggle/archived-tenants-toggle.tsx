@@ -3,35 +3,33 @@
 import { SIZE } from '@blog/config';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
-import { useRouter } from '@platform/i18n/navigation';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
 import { useTranslations } from 'next-intl';
-import { useOptimistic, useTransition } from 'react';
+import { useOptimistic } from 'react';
 
 import { archivedTenantsToggleVariants } from './archived-tenants-toggle-variants';
 
 export type TArchivedTenantsToggleProps = {
-  shouldShowArchived: boolean;
+  listQuery: TTenantsListQuery;
 };
 
 type TTenantVisibility = 'active' | 'all';
 
 export const ArchivedTenantsToggle = ({
-  shouldShowArchived,
+  listQuery,
 }: TArchivedTenantsToggleProps) => {
   const t = useTranslations('archivedTenantsToggle');
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, navigate } = useTenantsListNavigation(listQuery);
   const [value, setOptimisticValue] = useOptimistic<TTenantVisibility>(
-    shouldShowArchived ? 'all' : 'active',
+    listQuery.shouldShowArchived ? 'all' : 'active',
   );
   const { root } = archivedTenantsToggleVariants();
 
   const handleChange = (next: TTenantVisibility) => {
-    startTransition(() => {
-      setOptimisticValue(next);
-      router.push(adminRoutes.tenants({ archived: next === 'all' }));
-    });
+    navigate({ shouldShowArchived: next === 'all' }, () =>
+      setOptimisticValue(next),
+    );
   };
 
   return (
