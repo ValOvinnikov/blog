@@ -28,6 +28,10 @@ function presetLook(preset: TPresetId): TLook {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    footerLayout,
+    footerBackground,
+    footerSurface,
+    cookieSettingsButton,
   } = PRESET_REGISTRY[preset];
 
   return {
@@ -49,6 +53,10 @@ function presetLook(preset: TPresetId): TLook {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    footerLayout,
+    footerBackground,
+    footerSurface,
+    cookieSettingsButton,
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };

@@ -21,6 +21,10 @@ export const LOOK_FIELD = {
   HEADER_LAYOUT: 'headerLayout',
   HEADER_SUBMENU_STYLE: 'headerSubmenuStyle',
   HEADER_BAR_STYLE: 'headerBarStyle',
+  FOOTER_LAYOUT: 'footerLayout',
+  FOOTER_BACKGROUND: 'footerBackground',
+  FOOTER_SURFACE: 'footerSurface',
+  COOKIE_SETTINGS_BUTTON: 'cookieSettingsButton',
   LOGO_ASSET_URL: 'logoAssetUrl',
   FAVICON_ASSET_URL: 'faviconAssetUrl',
 } as const satisfies Record<string, keyof TSiteConfig>;
