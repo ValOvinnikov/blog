@@ -36,8 +36,10 @@ export const OnboardingActions = ({
         </Button>
       )}
       {children && <div className={status()}>{children}</div>}
+      {/* Distinct keys stop the clicked Continue becoming a submit button mid-click, which submits the form. */}
       {isLastStep ? (
         <Button
+          key="create-site"
           type="submit"
           variant="primary"
           isPending={isPending}
@@ -47,6 +49,7 @@ export const OnboardingActions = ({
         </Button>
       ) : (
         <Button
+          key="continue"
           variant="primary"
           isDisabled={isContinueDisabled}
           onClick={onContinue}

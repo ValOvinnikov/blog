@@ -6,7 +6,10 @@ import {
   SITE_TYPE,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
+import {
+  SIGN_UP_FIELD_ERROR,
+  SIGN_UP_REFUSAL,
+} from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
@@ -59,7 +62,9 @@ const {
 } = messages.onboardingForm;
 const { console: CONSOLE_PRESET, editorial: EDITORIAL_PRESET } =
   messages.presetPicker;
-const [ACCEPT_TERMS_LEAD] = messages.termsAcceptance.acceptTerms.split('<');
+const { acceptTerms: ACCEPT_TERMS, termsNotAccepted: TERMS_NOT_ACCEPTED } =
+  messages.termsAcceptance;
+const [ACCEPT_TERMS_LEAD] = ACCEPT_TERMS.split('<');
 const t = makeEnTranslator('onboardingForm');
 
 const MOCK_NAME_FIELD = { name: NAME_LABEL };
@@ -88,6 +93,13 @@ const MOCK_CONSOLE_LOOK = {
   preset: PRESET_ID.CONSOLE,
   accentHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
 };
+
+const MOCK_TERMS_NOT_ACCEPTED_RESULT = {
+  outcome: ACTION_OUTCOME.INVALID,
+  fieldErrors: {
+    hasAcceptedTerms: { reason: SIGN_UP_FIELD_ERROR.TERMS_NOT_ACCEPTED },
+  },
+} as const;
 
 const MOCK_CREATE_SITE_INPUT = {
   siteType: SITE_TYPE.BLOG,
@@ -422,6 +434,72 @@ describe(`<${OnboardingView.name}/>`, () => {
     const heading = stepHeading(STEPS.REVIEW);
 
     expect(heading).toBeVisible();
+  });
+
+  it('replaces Continue with a separate Create site button on reaching review', async () => {
+    await completeSiteStep();
+    await completeAddressStep();
+    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+    await user.click(continueButton);
+
+    const createButton = screen.getByRole('button', MOCK_CREATE);
+
+    expect(createButton).toBeVisible();
+    expect(continueButton).not.toBeInTheDocument();
+  });
+
+  it('neither creates the site nor flags the terms on arriving at review', async () => {
+    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
+    await reachReview();
+
+    const heading = stepHeading(STEPS.REVIEW);
+    const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
+
+    expect(heading).toBeVisible();
+    expect(createSiteMock).not.toHaveBeenCalled();
+    expect(termsError).not.toBeInTheDocument();
+  });
+
+  it('neither creates the site nor flags the terms on returning to review from an edit', async () => {
+    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
+    await reachReview();
+    const editName = screen.getByRole('button', {
+      name: t('editField', { field: NAME_LABEL }),
+    });
+    await user.click(editName);
+    await clickContinue();
+
+    const heading = stepHeading(STEPS.REVIEW);
+    const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
+
+    expect(heading).toBeVisible();
+    expect(createSiteMock).not.toHaveBeenCalled();
+    expect(termsError).not.toBeInTheDocument();
+  });
+
+  it('flags the terms when Create site is pressed with the box unticked', async () => {
+    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
+    await reachReview();
+    const createButton = screen.getByRole('button', MOCK_CREATE);
+    await user.click(createButton);
+
+    const message = await screen.findByText(TERMS_NOT_ACCEPTED);
+
+    expect(message).toBeVisible();
+  });
+
+  it('clears the terms error once the box is ticked', async () => {
+    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
+    await reachReview();
+    const createButton = screen.getByRole('button', MOCK_CREATE);
+    await user.click(createButton);
+    await screen.findByText(TERMS_NOT_ACCEPTED);
+    const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+    await user.click(acceptance);
+
+    const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
+
+    expect(termsError).not.toBeInTheDocument();
   });
 
   it('returns to the address step when the address was taken meanwhile', async () => {
