@@ -29,6 +29,7 @@ const FONT_SIZE_TOKENS = [
   'admin-14',
   'admin-15',
   'admin-16',
+  'admin-20',
   'admin-24',
 ];
 
