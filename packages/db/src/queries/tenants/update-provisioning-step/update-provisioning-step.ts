@@ -13,6 +13,7 @@ import {
   type TTenant,
 } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import { isUndefined } from '@blog/utils/primitives';
 import { eq, sql } from 'drizzle-orm';
 
 export type TUpdateProvisioningStepInput = {
@@ -34,9 +35,9 @@ export async function updateProvisioningStep(
 
   const stepState: TProvisioningStepState = {
     status: input.status,
-    ...(input.error === undefined ? {} : { error: input.error }),
-    ...(input.detail === undefined ? {} : { detail: input.detail }),
-    ...(input.failingSince === undefined
+    ...(isUndefined(input.error) ? {} : { error: input.error }),
+    ...(isUndefined(input.detail) ? {} : { detail: input.detail }),
+    ...(isUndefined(input.failingSince)
       ? {}
       : { failingSince: input.failingSince }),
     updatedAt: new Date().toISOString(),
@@ -51,10 +52,10 @@ export async function updateProvisioningStep(
         ${JSON.stringify(stepState)}::jsonb,
         true
       )`,
-      ...(input.provisioningStatus === undefined
+      ...(isUndefined(input.provisioningStatus)
         ? {}
         : { provisioningStatus: input.provisioningStatus }),
-      ...(input.notifiedOwnerElevationOutcome === undefined
+      ...(isUndefined(input.notifiedOwnerElevationOutcome)
         ? {}
         : {
             lastNotifiedOwnerElevationOutcome:
