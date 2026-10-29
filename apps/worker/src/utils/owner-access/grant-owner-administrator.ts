@@ -50,15 +50,19 @@ async function touchActivityOnInviteAcceptance(
   }
 }
 
-async function revokeRolesBesideAdministrator(
+function rolesBesideAdministrator(entry: TSanityAclEntry): string[] {
+  return entry.roles
+    .map(({ name }) => name)
+    .filter((name) => name !== SANITY_PROJECT_ROLE.ADMINISTRATOR);
+}
+
+async function revokeRoles(
   target: TOwnerAccessTarget,
   entry: TSanityAclEntry,
+  roleNames: string[],
 ): Promise<void> {
   const { projectId, env } = target;
-  const otherRoles = entry.roles.filter(
-    ({ name }) => name !== SANITY_PROJECT_ROLE.ADMINISTRATOR,
-  );
-  for (const { name } of otherRoles) {
+  for (const name of roleNames) {
     await revokeSanityProjectRole({
       token: env.sanityManagementToken,
       projectId,
@@ -86,6 +90,7 @@ export async function grantOwnerAdministrator(
   const isAdministrator = entry.roles.some(
     ({ name }) => name === SANITY_PROJECT_ROLE.ADMINISTRATOR,
   );
+  const otherRoles = rolesBesideAdministrator(entry);
   if (!isAdministrator) {
     await grantSanityProjectRole({
       token,
@@ -94,7 +99,7 @@ export async function grantOwnerAdministrator(
       role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
     });
   }
-  await revokeRolesBesideAdministrator(target, entry);
+  await revokeRoles(target, entry, otherRoles);
 
   const inviteAcceptedAt = tenant.ownerInviteAcceptedAt ?? new Date();
   const recorded = await setTenantOwnerAccess(tenant.id, {
@@ -113,7 +118,7 @@ export async function grantOwnerAdministrator(
     await touchActivityOnInviteAcceptance(tenant.id, inviteAcceptedAt);
   }
 
-  return isAdministrator
+  return isAdministrator && otherRoles.length === 0
     ? ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR
     : ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED;
 }

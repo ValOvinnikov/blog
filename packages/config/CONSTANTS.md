@@ -564,7 +564,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/owner-access` — `apps/worker/src/constants/owner-access.ts`
 
-- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `FINDING_RESOLVE_FAILED`=`"owner_access.finding_resolve_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`
+- **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `REPORT_FAILED`=`"owner_access.report_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `FINDING_RESOLVE_FAILED`=`"owner_access.finding_resolve_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`
 
 ### `@worker/constants/provisioning` — `apps/worker/src/constants/provisioning.ts`
 

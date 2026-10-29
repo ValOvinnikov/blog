@@ -7,8 +7,14 @@ import {
   SANITY_RESOURCE_TYPE,
   type TSanityResourceType,
 } from '@blog/config/constants';
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/db/constants';
 import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_IDLE_PROVISIONING_STEPS } from '@blog/db/testing/tenants/fixtures';
 import type { TSanityInvite } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
@@ -17,6 +23,7 @@ import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
+  mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
 import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access-target';
 
@@ -82,6 +89,23 @@ export function mockPendingInvite(
     createdAt: MOCK_INVITE_SENT_AT,
     ...overrides,
   };
+}
+
+export function mockOwnerAccessFailingSince(
+  failingSince: Date,
+  overrides: Partial<TTenant> = {},
+): TTenant {
+  return mockProvisionedTenant({
+    provisioningSteps: {
+      ...MOCK_IDLE_PROVISIONING_STEPS,
+      [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        detail: ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+        failingSince: failingSince.toISOString(),
+      },
+    },
+    ...overrides,
+  });
 }
 
 export function mockOwnerAccessFinding(): TFindingSummary {

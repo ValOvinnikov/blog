@@ -8,6 +8,9 @@ import { logger } from '@worker/utils/logger/logger';
 import { runOwnerAccessSweep } from '@worker/utils/owner-access-sweep/run-owner-access-sweep';
 import { respondError } from '@worker/utils/signed-tenant-request/signed-tenant-request';
 
+// Next requires a literal here, so it cannot import a const.
+export const maxDuration = 300;
+
 export async function GET(request: Request): Promise<Response> {
   const secret = env.CRON_SECRET;
   if (!secret) {

@@ -4,7 +4,7 @@ import {
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import {
-  OWNER_ACCESS_POLL_INTERVAL,
+  OWNER_ACCESS_POLL_INTERVAL_MS,
   OWNER_ACCESS_RUN_CHECKS,
 } from '@worker/constants/owner-access';
 import { checkOwnerAccess } from '@worker/units/check-owner-access';
@@ -30,7 +30,7 @@ export async function ensureOwnerAccess(
       if (!isWaiting || hasFailed || checks >= maxChecks) return outcome;
 
       const woken = await Promise.race([
-        sleep(OWNER_ACCESS_POLL_INTERVAL).then(() => false),
+        sleep(OWNER_ACCESS_POLL_INTERVAL_MS).then(() => false),
         nextWake.then(() => true),
       ]);
       if (woken) nextWake = wakes.next();

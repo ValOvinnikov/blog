@@ -21,21 +21,12 @@ export type TUpdateProvisioningStepInput = {
   status: TTenantProvisioningStepStatus;
   error?: string;
   detail?: TElevateTenantOwnerOutcome;
+  failingSince?: string;
   provisioningStatus?: TTenantProvisioningStatus;
   notifiedOwnerElevationOutcome?: TElevateTenantOwnerOutcome;
 };
 
-// Updates exactly one key of the `provisioningSteps` jsonb map via
-// Postgres's `jsonb_set`, never a JS-level read-modify-write of the whole
-// object — so two steps reporting status back around the same time can
-// never race each other into clobbering one another's entry. `error`/`detail`
-// are written only when supplied, matching `TProvisioningStepState`'s
-// optional fields; `updatedAt` is stamped with the current time on every
-// call; the overall `provisioningStatus` column is left untouched unless
-// this call explicitly supplies one.
-//
-// `tenantId` not matching any row is a real, reachable outcome — a CLI
-// caller passes a `--tenant-id` it does not itself validate.
+// `jsonb_set` writes the one key in Postgres, so two steps reporting at once never clobber each other's entry.
 export async function updateProvisioningStep(
   input: TUpdateProvisioningStepInput,
 ): Promise<TResult<TTenant, TErrorCode>> {
@@ -45,6 +36,9 @@ export async function updateProvisioningStep(
     status: input.status,
     ...(input.error === undefined ? {} : { error: input.error }),
     ...(input.detail === undefined ? {} : { detail: input.detail }),
+    ...(input.failingSince === undefined
+      ? {}
+      : { failingSince: input.failingSince }),
     updatedAt: new Date().toISOString(),
   };
 

@@ -114,6 +114,34 @@ describe(updateProvisioningStep, () => {
     });
   });
 
+  it('stores when the step started failing, replaced by the next write without one', async () => {
+    const failing = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: OWNER_ELEVATION,
+        status: DONE,
+        failingSince: MOCK_RUN_AT,
+      }),
+    );
+    const recovered = unwrapOk(
+      await updateProvisioningStep({
+        tenantId,
+        step: OWNER_ELEVATION,
+        status: DONE,
+      }),
+    );
+
+    expect(failing.provisioningSteps?.[OWNER_ELEVATION]).toEqual({
+      status: DONE,
+      failingSince: MOCK_RUN_AT,
+      updatedAt: MOCK_RUN_AT,
+    });
+    expect(recovered.provisioningSteps?.[OWNER_ELEVATION]).toEqual({
+      status: DONE,
+      updatedAt: MOCK_RUN_AT,
+    });
+  });
+
   it('leaves the overall provisioningStatus untouched when not supplied', async () => {
     const { provisioningStatus } = unwrapOk(
       await updateProvisioningStep({
