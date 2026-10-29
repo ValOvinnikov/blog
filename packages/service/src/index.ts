@@ -11,6 +11,7 @@ import { createSiteSettingsService } from './features/global/site-settings';
 import { createTranslationMapService } from './features/global/translation-map';
 import { createContactFormModuleService } from './features/modules/contact-form';
 import { createContentModuleService } from './features/modules/content';
+import { createCookieSettingsModuleService } from './features/modules/cookie-settings';
 import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
 import { createFeatureHighlightsModuleService } from './features/modules/feature-highlights';
@@ -70,6 +71,7 @@ export const service = {
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     contactForm: createContactFormModuleService(),
+    cookieSettings: createCookieSettingsModuleService(),
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
     featureHighlights: createFeatureHighlightsModuleService(),
@@ -120,6 +122,7 @@ export type {
 } from './features/modules/section-pages';
 export type { TContactFormModule } from './features/modules/contact-form';
 export type { TContentModule } from './features/modules/content';
+export type { TCookieSettingsModule } from './features/modules/cookie-settings';
 export type { TCtaModule } from './features/modules/cta';
 export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
 export type {
