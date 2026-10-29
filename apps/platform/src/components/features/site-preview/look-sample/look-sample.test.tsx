@@ -1,7 +1,10 @@
 import {
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -16,6 +19,7 @@ import {
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
   SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
 } from '@platform/constants/sample-busy';
+import { SAMPLE_FOOTER_TEST_ID } from '@platform/constants/sample-footer';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
@@ -28,6 +32,7 @@ import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { CSSProperties } from 'react';
 
@@ -57,6 +62,8 @@ const {
   accountMenuAriaLabel: ACCOUNT_MENU,
   myBookmarksDescription: BOOKMARKS_DESCRIPTION,
   signOut: SIGN_OUT,
+  footerArchive: ARCHIVE,
+  footerCookieSettings: COOKIE_SETTINGS,
 } = messages.lookPreview;
 
 const MOCK_BUSY: IBusyStyle = {
@@ -64,11 +71,18 @@ const MOCK_BUSY: IBusyStyle = {
   spinnerVariant: SPINNER_STYLE.BRAILLE,
 };
 
+const MOCK_FOOTER: TSampleFooterStyle = {
+  layout: FOOTER_LAYOUT.COLUMNS,
+  tone: BRAND_VARIANT.BRAND_PRIMARY,
+  surface: FOOTER_SURFACE.FULL_WIDTH,
+};
+
 const setup = customRender(LookSample, {
   brand: { name: MOCK_TENANT_NAME, logoSrc: undefined },
   theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   header: MOCK_SAMPLE_HEADER_STYLE,
+  footer: MOCK_FOOTER,
   busy: MOCK_BUSY,
   hasReaderAccounts: true,
 });
@@ -186,12 +200,15 @@ describe(`<${LookSample.name}/>`, () => {
     expect(brandPrimary).toBe(MOCK_DARK_ACCENT);
   });
 
-  it('renders the uploaded logo in place of the generated mark', () => {
+  it('renders the uploaded logo in the header and footer in place of the generated mark', () => {
     setup({ brand: { name: MOCK_TENANT_NAME, logoSrc: MOCK_LOGO_URL } });
 
-    const logo = screen.getByRole('img', { name: MOCK_TENANT_NAME });
+    const [headerLogo, footerLogo] = screen.getAllByRole('img', {
+      name: MOCK_TENANT_NAME,
+    });
 
-    expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
+    expect(headerLogo).toHaveAttribute('src', MOCK_LOGO_URL);
+    expect(footerLogo).toHaveAttribute('src', MOCK_LOGO_URL);
   });
 
   it('offers the light theme from a dark preview', () => {
@@ -376,6 +393,30 @@ describe(`<${LookSample.name}/>`, () => {
         SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
         spinnerVariant,
       );
+    });
+  });
+
+  describe('footer', () => {
+    it('ends the sample with the link groups and a Cookie settings link', () => {
+      setup();
+
+      const archiveLink = screen.getByRole('link', { name: ARCHIVE });
+      const cookieSettingsLink = screen.getByRole('link', {
+        name: COOKIE_SETTINGS,
+      });
+
+      expect(archiveLink).toBeVisible();
+      expect(cookieSettingsLink).toBeVisible();
+    });
+
+    it('arranges the footer by the chosen layout, dropping the link groups when compact', () => {
+      setup({ footer: { ...MOCK_FOOTER, layout: FOOTER_LAYOUT.COMPACT } });
+
+      const footer = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
+      const archiveLink = screen.queryByRole('link', { name: ARCHIVE });
+
+      expect(footer).toHaveAttribute('data-layout', FOOTER_LAYOUT.COMPACT);
+      expect(archiveLink).not.toBeInTheDocument();
     });
   });
 

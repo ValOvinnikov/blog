@@ -3,8 +3,12 @@ import {
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
   ACTION_OUTCOME,
+  BRAND_VARIANT,
   CARD_STYLE,
   BUSY_BUTTON_STYLE,
+  COOKIE_SETTINGS_BUTTON,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -24,6 +28,7 @@ import {
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
   SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
 } from '@platform/constants/sample-busy';
+import { SAMPLE_FOOTER_TEST_ID } from '@platform/constants/sample-footer';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
@@ -160,9 +165,11 @@ const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 const SAVING = 'Saving…';
 const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
-const GROWTH_ONLY_FIELD_COUNT = 16;
+const GROWTH_ONLY_FIELD_COUNT = 19;
 const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
 const SPINNER_LABEL = LOOK_FORM.spinnerStyleLabel;
+const FOOTER_LAYOUT_LABEL = LOOK_FORM.footerLayoutLabel;
+const COOKIE_BANNER_OFF_NOTE = LOOK_FORM.cookieSettingsButtonBannerOff;
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
 
 const setup = customRender(LookForm, {
@@ -172,6 +179,7 @@ const setup = customRender(LookForm, {
   plan: TENANT_PLAN.GROWTH,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
+  hasCookieBanner: true,
 });
 
 const setupWithSavedLogo = () =>
@@ -203,6 +211,10 @@ const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     accountPhonePlacement: defaults.accountPhonePlacement,
     busyButtonStyle: defaults.busyButtonStyle,
     spinnerStyle: defaults.spinnerStyle,
+    footerLayout: defaults.footerLayout,
+    footerBackground: defaults.footerBackground,
+    footerSurface: defaults.footerSurface,
+    cookieSettingsButton: defaults.cookieSettingsButton,
     languageSwitcherStyle: defaults.languageSwitcherStyle,
     ...overrides,
   };
@@ -247,6 +259,15 @@ const chooseSpinner = async (user: UserEvent, optionName: string) => {
   await user.click(option);
 };
 
+const chooseFooterLayout = async (user: UserEvent, optionName: string) => {
+  const layoutSelect = screen.getByRole('combobox', {
+    name: FOOTER_LAYOUT_LABEL,
+  });
+  await user.click(layoutSelect);
+  const option = await screen.findByRole('option', { name: optionName });
+  await user.click(option);
+};
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -271,7 +292,7 @@ describe(`<${LookForm.name}/>`, () => {
         setup();
       });
 
-      it('groups the settings into eight titled cards', () => {
+      it('groups the settings into nine titled cards', () => {
         const cardHeadings = screen.getAllByRole('heading', { level: 2 });
         const cardTitles = cardHeadings.map((heading) => heading.textContent);
 
@@ -282,6 +303,7 @@ describe(`<${LookForm.name}/>`, () => {
           LOOK_FORM.shapeHeading,
           LOOK_FORM.headerHeading,
           LOOK_FORM.buttonsHeading,
+          LOOK_FORM.footerHeading,
           LOOK_FORM.brandHeading,
           LOOK_FORM.languageSwitcherLabel,
         ]);
@@ -333,7 +355,10 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('describes each header buttons option', () => {
-        const plainButton = screen.getByRole('button', {
+        const headerButtonsGroup = screen.getByRole('group', {
+          name: LOOK_FORM.headerControlStyleLabel,
+        });
+        const plainButton = within(headerButtonsGroup).getByRole('button', {
           name: LOOK_FORM.headerControlStyleOptionLabel.PLAIN,
         });
 
@@ -379,6 +404,21 @@ describe(`<${LookForm.name}/>`, () => {
           saved: { busyButtonStyle: BUSY_BUTTON_STYLE.EDGE },
         },
         {
+          group: LOOK_FORM.footerBackgroundLabel,
+          option: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
+          saved: { footerBackground: BRAND_VARIANT.SECONDARY },
+        },
+        {
+          group: LOOK_FORM.footerSurfaceLabel,
+          option: LOOK_FORM.footerSurfaceOptionLabel.CARD,
+          saved: { footerSurface: FOOTER_SURFACE.CARD },
+        },
+        {
+          group: LOOK_FORM.cookieSettingsButtonLabel,
+          option: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
+          saved: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+        },
+        {
           group: LOOK_FORM.languageSwitcherLabel,
           option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
           saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },
@@ -417,6 +457,40 @@ describe(`<${LookForm.name}/>`, () => {
             savedLookValues({ headerLayout: HEADER_LAYOUT.TWO_ROWS }),
           );
         });
+      });
+
+      it('saves the chosen footer layout', async () => {
+        await chooseFooterLayout(
+          user,
+          LOOK_FORM.footerLayoutOptionLabel.BIG_WORDMARK,
+        );
+        await clickSave(user);
+
+        await waitFor(() => {
+          expect(updateLookAction).toHaveBeenCalledWith(
+            MOCK_TENANT_ID,
+            savedLookValues({ footerLayout: FOOTER_LAYOUT.BIG_WORDMARK }),
+          );
+        });
+      });
+
+      it('shows the chosen footer layout in the preview', async () => {
+        await chooseFooterLayout(
+          user,
+          LOOK_FORM.footerLayoutOptionLabel.CENTRED,
+        );
+
+        const sampleFooter = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
+        expect(sampleFooter).toHaveAttribute(
+          'data-layout',
+          FOOTER_LAYOUT.CENTRED,
+        );
+      });
+
+      it('shows no cookie banner note while the banner is on', () => {
+        const note = screen.queryByText(COOKIE_BANNER_OFF_NOTE);
+
+        expect(note).not.toBeInTheDocument();
       });
 
       it('saves the chosen spinner', async () => {
@@ -781,6 +855,21 @@ describe(`<${LookForm.name}/>`, () => {
     expect(inMenuButton).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
+  it('notes that the cookie settings button stays hidden while the cookie banner is off', () => {
+    setup({ hasCookieBanner: false });
+
+    const note = screen.getByText(COOKIE_BANNER_OFF_NOTE);
+    const cookieButtonGroup = screen.getByRole('group', {
+      name: LOOK_FORM.cookieSettingsButtonLabel,
+    });
+    const shownButton = within(cookieButtonGroup).getByRole('button', {
+      name: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
+    });
+
+    expect(note).toBeVisible();
+    expect(shownButton).toBeEnabled();
+  });
+
   it('shows a single-language note and no switcher choice with one language', () => {
     setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
@@ -1079,6 +1168,55 @@ describe(`<${LookForm.name}/>`, () => {
       expect(spinnerSelect).toHaveTextContent(
         LOOK_FORM.spinnerStyleOptionLabel.PRESET,
       );
+    });
+
+    it('shows the footer layout, background and surface locked at their defaults', () => {
+      const layoutSelect = screen.getByRole('combobox', {
+        name: FOOTER_LAYOUT_LABEL,
+      });
+      const backgroundGroup = screen.getByRole('group', {
+        name: LOOK_FORM.footerBackgroundLabel,
+      });
+      const brandTintButton = within(backgroundGroup).getByRole('button', {
+        name: LOOK_FORM.footerBackgroundOptionLabel.BRAND_PRIMARY,
+      });
+      const shadedButton = within(backgroundGroup).getByRole('button', {
+        name: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
+      });
+      const surfaceGroup = screen.getByRole('group', {
+        name: LOOK_FORM.footerSurfaceLabel,
+      });
+      const cardButton = within(surfaceGroup).getByRole('button', {
+        name: LOOK_FORM.footerSurfaceOptionLabel.CARD,
+      });
+
+      expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
+      expect(layoutSelect).toHaveTextContent(
+        LOOK_FORM.footerLayoutOptionLabel.COLUMNS,
+      );
+      expect(brandTintButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(shadedButton).toBeDisabled();
+      expect(cardButton).toBeDisabled();
+    });
+
+    it('keeps the cookie settings button editable and saves it', async () => {
+      const cookieButtonGroup = screen.getByRole('group', {
+        name: LOOK_FORM.cookieSettingsButtonLabel,
+      });
+      const shownButton = within(cookieButtonGroup).getByRole('button', {
+        name: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
+      });
+      await user.click(shownButton);
+      await clickSave(user);
+
+      await waitFor(() => {
+        expect(updateLookAction).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          savedLookValues({
+            cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+          }),
+        );
+      });
     });
 
     it('keeps the preset, accent hue and brand images editable', () => {

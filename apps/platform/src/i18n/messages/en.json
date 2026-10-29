@@ -685,6 +685,36 @@
       "DOTS": "Dots",
       "PULSE": "Pulse"
     },
+    "footerHeading": "Footer",
+    "footerDescription": "How the bottom of your site is arranged, its background, and a floating way back to cookie settings.",
+    "footerLayoutLabel": "Footer layout",
+    "footerLayoutDescription": "Where the brand, link groups and fine print sit. Compact shows no groups, about text or address.",
+    "footerLayoutOptionLabel": {
+      "COLUMNS": "Columns",
+      "CENTRED": "Centred",
+      "COMPACT": "Compact",
+      "BIG_WORDMARK": "Big wordmark"
+    },
+    "footerBackgroundLabel": "Background",
+    "footerBackgroundDescription": "The footer's colour. Each follows the reader's light or dark theme.",
+    "footerBackgroundOptionLabel": {
+      "PRIMARY": "Plain",
+      "SECONDARY": "Shaded",
+      "BRAND_PRIMARY": "Brand tint"
+    },
+    "footerSurfaceLabel": "Surface",
+    "footerSurfaceDescription": "Whether the footer spans the page or sits as a card.",
+    "footerSurfaceOptionLabel": {
+      "FULL_WIDTH": "Full width",
+      "CARD": "Card"
+    },
+    "cookieSettingsButtonLabel": "Cookie settings button",
+    "cookieSettingsButtonDescription": "A round button in the bottom-left corner that reopens cookie settings, once a reader has answered the cookie banner.",
+    "cookieSettingsButtonOptionLabel": {
+      "HIDDEN": "Hidden",
+      "SHOWN": "Shown"
+    },
+    "cookieSettingsButtonBannerOff": "The cookie banner is off, so the button stays hidden. Turn the banner on in Features to show it.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image"
@@ -734,7 +764,18 @@
     "myBookmarksDescription": "Posts you saved to read later",
     "accountSettings": "Account settings",
     "accountSettingsDescription": "Name, sign-in methods, your data",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "footerAbout": "Notes on tides, harbours and the coast between.",
+    "footerGroupsAriaLabel": "Footer",
+    "footerReadHeading": "Read",
+    "footerSiteHeading": "Site",
+    "footerArchive": "Archive",
+    "footerRss": "RSS feed",
+    "footerTeam": "Team",
+    "footerContact": "Contact",
+    "footerFinePrintAriaLabel": "Legal",
+    "footerPrivacy": "Privacy policy",
+    "footerCookieSettings": "Cookie settings"
   },
   "frontPageSample": {
     "heroHeading": "Dispatches from the coast",

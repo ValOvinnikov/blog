@@ -35,6 +35,10 @@ export const applyPresetDefaults = (
     accountPhonePlacement: current.accountPhonePlacement,
     busyButtonStyle: current.busyButtonStyle,
     spinnerStyle: current.spinnerStyle,
+    footerLayout: current.footerLayout,
+    footerBackground: current.footerBackground,
+    footerSurface: current.footerSurface,
+    cookieSettingsButton: current.cookieSettingsButton,
     languageSwitcherStyle: current.languageSwitcherStyle,
     logo: current.logo,
     favicon: current.favicon,
@@ -55,6 +59,12 @@ export const CARD_FIELDS = {
     'accountPhonePlacement',
   ],
   buttons: ['busyButtonStyle', 'spinnerStyle'],
+  footer: [
+    'footerLayout',
+    'footerBackground',
+    'footerSurface',
+    'cookieSettingsButton',
+  ],
   brand: ['logo', 'favicon'],
   languageSwitcher: ['languageSwitcherStyle'],
 } as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;

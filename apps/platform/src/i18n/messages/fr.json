@@ -685,6 +685,36 @@
       "DOTS": "Points",
       "PULSE": "Pulsation"
     },
+    "footerHeading": "Pied de page",
+    "footerDescription": "La disposition du bas de votre site, son arrière-plan et un accès flottant aux paramètres des cookies.",
+    "footerLayoutLabel": "Disposition du pied de page",
+    "footerLayoutDescription": "L’emplacement de la marque, des groupes de liens et des mentions. Compact n’affiche ni groupes, ni texte de présentation, ni adresse.",
+    "footerLayoutOptionLabel": {
+      "COLUMNS": "Colonnes",
+      "CENTRED": "Centré",
+      "COMPACT": "Compact",
+      "BIG_WORDMARK": "Grand logotype"
+    },
+    "footerBackgroundLabel": "Arrière-plan",
+    "footerBackgroundDescription": "La couleur du pied de page. Chacune suit le thème clair ou sombre du lecteur.",
+    "footerBackgroundOptionLabel": {
+      "PRIMARY": "Uni",
+      "SECONDARY": "Ombré",
+      "BRAND_PRIMARY": "Teinte de marque"
+    },
+    "footerSurfaceLabel": "Surface",
+    "footerSurfaceDescription": "Si le pied de page occupe toute la largeur ou s’affiche comme une carte.",
+    "footerSurfaceOptionLabel": {
+      "FULL_WIDTH": "Pleine largeur",
+      "CARD": "Carte"
+    },
+    "cookieSettingsButtonLabel": "Bouton des paramètres des cookies",
+    "cookieSettingsButtonDescription": "Un bouton rond dans le coin inférieur gauche qui rouvre les paramètres des cookies, une fois que le lecteur a répondu à la bannière des cookies.",
+    "cookieSettingsButtonOptionLabel": {
+      "HIDDEN": "Masqué",
+      "SHOWN": "Affiché"
+    },
+    "cookieSettingsButtonBannerOff": "La bannière des cookies est désactivée, le bouton reste donc masqué. Activez la bannière dans Fonctionnalités pour l’afficher.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
@@ -734,7 +764,18 @@
     "myBookmarksDescription": "Les articles enregistrés pour plus tard",
     "accountSettings": "Paramètres du compte",
     "accountSettingsDescription": "Nom, méthodes de connexion, vos données",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "footerAbout": "Notes sur les marées, les ports et la côte entre les deux.",
+    "footerGroupsAriaLabel": "Pied de page",
+    "footerReadHeading": "Lire",
+    "footerSiteHeading": "Site",
+    "footerArchive": "Archives",
+    "footerRss": "Flux RSS",
+    "footerTeam": "Équipe",
+    "footerContact": "Contact",
+    "footerFinePrintAriaLabel": "Mentions légales",
+    "footerPrivacy": "Politique de confidentialité",
+    "footerCookieSettings": "Paramètres des cookies"
   },
   "frontPageSample": {
     "heroHeading": "Chroniques de la côte",

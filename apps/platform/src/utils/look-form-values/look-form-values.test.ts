@@ -2,7 +2,11 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  COOKIE_SETTINGS_BUTTON,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -58,6 +62,25 @@ describe(applyPresetDefaults, () => {
       density: themeTokens.density,
       cardStyle,
       headerControlStyle,
+    });
+  });
+
+  it('keeps the footer layout, background, surface and cookie settings button', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      footerLayout: FOOTER_LAYOUT.COMPACT,
+      footerBackground: BRAND_VARIANT.PRIMARY,
+      footerSurface: FOOTER_SURFACE.CARD,
+      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+    };
+
+    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
+
+    expect(next).toMatchObject({
+      footerLayout: FOOTER_LAYOUT.COMPACT,
+      footerBackground: BRAND_VARIANT.PRIMARY,
+      footerSurface: FOOTER_SURFACE.CARD,
+      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
     });
   });
 

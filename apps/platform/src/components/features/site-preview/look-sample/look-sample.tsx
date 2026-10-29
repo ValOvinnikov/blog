@@ -6,11 +6,13 @@ import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
 import { SampleChip } from '@platform/components/features/site-preview/sample-chip';
+import { SampleSiteFooter } from '@platform/components/features/site-preview/sample-site-footer';
 import {
   SampleSiteHeader,
   type TSampleSiteHeaderProps,
 } from '@platform/components/features/site-preview/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
+import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
@@ -22,6 +24,7 @@ export type TLookSampleProps = {
   theme: TSitePreviewTheme;
   liveLocales: readonly TLocaleIsoCode[];
   header: TSampleHeaderStyle;
+  footer: TSampleFooterStyle;
   busy: IBusyStyle;
   hasReaderAccounts: boolean;
   isSignedIn?: boolean;
@@ -34,6 +37,7 @@ export const LookSample = ({
   theme,
   liveLocales,
   header,
+  footer,
   busy,
   hasReaderAccounts,
   isSignedIn = false,
@@ -92,6 +96,7 @@ export const LookSample = ({
           </Panel.Body>
         </Panel>
       </div>
+      <SampleSiteFooter brand={brand} footer={footer} />
     </SiteThemeFrame>
   );
 };

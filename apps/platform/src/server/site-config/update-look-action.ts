@@ -7,10 +7,14 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
+  COOKIE_SETTINGS_BUTTON,
   DENSITY,
   FONT_CHOICE,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -56,6 +60,10 @@ const updateLookInputSchema = z.object({
   accountPhonePlacement: z.enum(ACCOUNT_PHONE_PLACEMENT),
   busyButtonStyle: z.enum(BUSY_BUTTON_STYLE),
   spinnerStyle: z.enum(SPINNER_STYLE),
+  footerLayout: z.enum(FOOTER_LAYOUT),
+  footerBackground: z.enum(BRAND_VARIANT),
+  footerSurface: z.enum(FOOTER_SURFACE),
+  cookieSettingsButton: z.enum(COOKIE_SETTINGS_BUTTON),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;

@@ -5,10 +5,14 @@ import {
   type TAccountButtonStyle,
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
+  type TBrandVariant,
   type TBusyButtonStyle,
   type TCardStyle,
+  type TCookieSettingsButton,
   type TDensity,
   type TFontChoice,
+  type TFooterLayout,
+  type TFooterSurface,
   type THeaderBarStyle,
   type THeaderControlStyle,
   type THeaderLayout,
@@ -40,6 +44,10 @@ export type TLookFormValues = {
   accountPhonePlacement: TAccountPhonePlacement;
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
+  footerLayout: TFooterLayout;
+  footerBackground: TBrandVariant;
+  footerSurface: TFooterSurface;
+  cookieSettingsButton: TCookieSettingsButton;
   languageSwitcherStyle: TLanguageSwitcherStyle;
   logo: TStagedImage;
   favicon: TStagedImage;
@@ -64,6 +72,10 @@ export const defaultLookFormValues = (): TLookFormValues => {
     accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
+    footerLayout,
+    footerBackground,
+    footerSurface,
+    cookieSettingsButton,
   } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
   return {
@@ -84,6 +96,10 @@ export const defaultLookFormValues = (): TLookFormValues => {
     accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
+    footerLayout,
+    footerBackground,
+    footerSurface,
+    cookieSettingsButton,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     logo: { url: undefined },
     favicon: { url: undefined },
@@ -111,6 +127,10 @@ export const toLookFormValues = (
     accountPhonePlacement: siteConfig.accountPhonePlacement,
     busyButtonStyle: siteConfig.busyButtonStyle,
     spinnerStyle: siteConfig.spinnerStyle,
+    footerLayout: siteConfig.footerLayout,
+    footerBackground: siteConfig.footerBackground,
+    footerSurface: siteConfig.footerSurface,
+    cookieSettingsButton: siteConfig.cookieSettingsButton,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
     logo: { url: siteConfig.logoAssetUrl },
     favicon: { url: siteConfig.faviconAssetUrl },

@@ -685,6 +685,36 @@
       "DOTS": "Stippen",
       "PULSE": "Puls"
     },
+    "footerHeading": "Voettekst",
+    "footerDescription": "Hoe de onderkant van je site is ingedeeld, de achtergrond en een zwevende weg terug naar de cookie-instellingen.",
+    "footerLayoutLabel": "Indeling van de voettekst",
+    "footerLayoutDescription": "Waar het merk, de linkgroepen en de kleine lettertjes staan. Compact toont geen groepen, introtekst of adres.",
+    "footerLayoutOptionLabel": {
+      "COLUMNS": "Kolommen",
+      "CENTRED": "Gecentreerd",
+      "COMPACT": "Compact",
+      "BIG_WORDMARK": "Groot woordmerk"
+    },
+    "footerBackgroundLabel": "Achtergrond",
+    "footerBackgroundDescription": "De kleur van de voettekst. Elke kleur volgt het lichte of donkere thema van de lezer.",
+    "footerBackgroundOptionLabel": {
+      "PRIMARY": "Effen",
+      "SECONDARY": "Gearceerd",
+      "BRAND_PRIMARY": "Merktint"
+    },
+    "footerSurfaceLabel": "Oppervlak",
+    "footerSurfaceDescription": "Of de voettekst de hele breedte beslaat of als kaart wordt getoond.",
+    "footerSurfaceOptionLabel": {
+      "FULL_WIDTH": "Volle breedte",
+      "CARD": "Kaart"
+    },
+    "cookieSettingsButtonLabel": "Knop voor cookie-instellingen",
+    "cookieSettingsButtonDescription": "Een ronde knop linksonder die de cookie-instellingen opnieuw opent, zodra een lezer de cookiebanner heeft beantwoord.",
+    "cookieSettingsButtonOptionLabel": {
+      "HIDDEN": "Verborgen",
+      "SHOWN": "Getoond"
+    },
+    "cookieSettingsButtonBannerOff": "De cookiebanner staat uit, dus de knop blijft verborgen. Zet de banner aan bij Functies om hem te tonen.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
@@ -734,7 +764,18 @@
     "myBookmarksDescription": "Berichten die je hebt bewaard om later te lezen",
     "accountSettings": "Accountinstellingen",
     "accountSettingsDescription": "Naam, inlogmethoden, je gegevens",
-    "signOut": "Uitloggen"
+    "signOut": "Uitloggen",
+    "footerAbout": "Notities over getijden, havens en de kust ertussen.",
+    "footerGroupsAriaLabel": "Voettekst",
+    "footerReadHeading": "Lezen",
+    "footerSiteHeading": "Site",
+    "footerArchive": "Archief",
+    "footerRss": "RSS-feed",
+    "footerTeam": "Team",
+    "footerContact": "Contact",
+    "footerFinePrintAriaLabel": "Juridisch",
+    "footerPrivacy": "Privacybeleid",
+    "footerCookieSettings": "Cookie-instellingen"
   },
   "frontPageSample": {
     "heroHeading": "Berichten van de kust",

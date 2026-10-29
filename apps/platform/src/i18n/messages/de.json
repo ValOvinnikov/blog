@@ -685,6 +685,36 @@
       "DOTS": "Punkte",
       "PULSE": "Puls"
     },
+    "footerHeading": "Fußzeile",
+    "footerDescription": "Wie der untere Bereich Ihrer Website aufgebaut ist, sein Hintergrund und ein schwebender Weg zurück zu den Cookie-Einstellungen.",
+    "footerLayoutLabel": "Fußzeilen-Layout",
+    "footerLayoutDescription": "Wo Marke, Linkgruppen und Kleingedrucktes stehen. Kompakt zeigt keine Gruppen, keinen Info-Text und keine Adresse.",
+    "footerLayoutOptionLabel": {
+      "COLUMNS": "Spalten",
+      "CENTRED": "Zentriert",
+      "COMPACT": "Kompakt",
+      "BIG_WORDMARK": "Großer Schriftzug"
+    },
+    "footerBackgroundLabel": "Hintergrund",
+    "footerBackgroundDescription": "Die Farbe der Fußzeile. Jede folgt dem hellen oder dunklen Design der Leser.",
+    "footerBackgroundOptionLabel": {
+      "PRIMARY": "Schlicht",
+      "SECONDARY": "Schattiert",
+      "BRAND_PRIMARY": "Markenton"
+    },
+    "footerSurfaceLabel": "Fläche",
+    "footerSurfaceDescription": "Ob die Fußzeile die ganze Breite einnimmt oder als Karte erscheint.",
+    "footerSurfaceOptionLabel": {
+      "FULL_WIDTH": "Volle Breite",
+      "CARD": "Karte"
+    },
+    "cookieSettingsButtonLabel": "Cookie-Einstellungen-Schaltfläche",
+    "cookieSettingsButtonDescription": "Eine runde Schaltfläche unten links, die die Cookie-Einstellungen wieder öffnet, sobald Leser das Cookie-Banner beantwortet haben.",
+    "cookieSettingsButtonOptionLabel": {
+      "HIDDEN": "Ausgeblendet",
+      "SHOWN": "Angezeigt"
+    },
+    "cookieSettingsButtonBannerOff": "Das Cookie-Banner ist aus, daher bleibt die Schaltfläche ausgeblendet. Schalten Sie das Banner unter Funktionen ein, um sie anzuzeigen.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
@@ -734,7 +764,18 @@
     "myBookmarksDescription": "Beiträge, die Sie für später gespeichert haben",
     "accountSettings": "Kontoeinstellungen",
     "accountSettingsDescription": "Name, Anmeldemethoden, Ihre Daten",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "footerAbout": "Notizen über Gezeiten, Häfen und die Küste dazwischen.",
+    "footerGroupsAriaLabel": "Fußzeile",
+    "footerReadHeading": "Lesen",
+    "footerSiteHeading": "Website",
+    "footerArchive": "Archiv",
+    "footerRss": "RSS-Feed",
+    "footerTeam": "Team",
+    "footerContact": "Kontakt",
+    "footerFinePrintAriaLabel": "Rechtliches",
+    "footerPrivacy": "Datenschutzerklärung",
+    "footerCookieSettings": "Cookie-Einstellungen"
   },
   "frontPageSample": {
     "heroHeading": "Berichte von der Küste",
