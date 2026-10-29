@@ -24,6 +24,6 @@ export const signedInAccountVariants = tv({
 });
 
 export const SIGN_OUT_BUTTON_BY_SURFACE = {
-  card: { variant: 'secondary', size: SIZE.MD },
+  card: { variant: 'ghost', size: SIZE.SM },
   rail: { variant: 'ghost', size: SIZE.SM },
 } as const;
