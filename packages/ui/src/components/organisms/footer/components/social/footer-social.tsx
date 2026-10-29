@@ -1,12 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { footerSocialVariants } from './footer-social-variants';
 
 export type TFooterSocialProps = IWithClassName &
-  IWithDataTestId & {
-    children?: ReactNode;
-  };
+  IWithDataTestId &
+  PropsWithChildren;
 
 /** The site's social profile links, last in the footer's brand column. */
 export const FooterSocial = ({

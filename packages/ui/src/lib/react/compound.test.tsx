@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import {
   cloneElement,
   type ComponentPropsWithoutRef,
-  type ReactNode,
+  type PropsWithChildren,
 } from 'react';
 
 import { hasSlotContent, mapCompoundSlots } from './compound';
@@ -29,7 +29,7 @@ const Beta = ({ children }: ComponentPropsWithoutRef<'span'>) => (
 );
 const Unknown = () => <span>{MOCK_UNKNOWN}</span>;
 
-const TestHarness = ({ children }: { children: ReactNode }) => {
+const TestHarness = ({ children }: PropsWithChildren) => {
   const { slots, unmatched } = mapCompoundSlots(children, {
     alpha: Alpha,
     beta: Beta,

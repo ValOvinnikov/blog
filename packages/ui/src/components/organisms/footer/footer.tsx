@@ -10,16 +10,37 @@ import {
 } from '@blog/ui/lib/react';
 import { Fragment, type ElementType } from 'react';
 
+import { FooterAbout } from './components/about/footer-about';
+import { FooterAddress } from './components/address/footer-address';
+import { FooterCopyright } from './components/copyright/footer-copyright';
+import { FooterFinePrint } from './components/fine-print/footer-fine-print';
 import { FooterGroup } from './components/group/footer-group';
 import { FooterGroupItem } from './components/group-item/footer-group-item';
+import { FooterGroups } from './components/groups/footer-groups';
+import { FooterLogo } from './components/logo/footer-logo';
+import { FooterNav } from './components/nav/footer-nav';
+import { FooterSocial } from './components/social/footer-social';
+import { FooterWordmark } from './components/wordmark/footer-wordmark';
 import {
   BOTTOM_SLOTS,
   BRAND_SLOTS,
-  FooterSlotParts,
   LAYOUT_SLOTS,
   SLOT_HAS_CONTENT,
+  type TFooterSlot,
 } from './footer-slots';
 import { footerVariants, type TFooterVariants } from './footer-variants';
+
+const FooterSlotParts = {
+  Logo: FooterLogo,
+  About: FooterAbout,
+  Address: FooterAddress,
+  Social: FooterSocial,
+  Groups: FooterGroups,
+  Wordmark: FooterWordmark,
+  Copyright: FooterCopyright,
+  FinePrint: FooterFinePrint,
+  Nav: FooterNav,
+} satisfies Record<TFooterSlot, ElementType>;
 
 const FooterParts = {
   ...FooterSlotParts,
@@ -48,7 +69,7 @@ const FooterRoot = ({
   const shown = LAYOUT_SLOTS[layout].filter((key) =>
     SLOT_HAS_CONTENT[key](slots[key]),
   );
-  const isShown = (key: keyof typeof FooterSlotParts) => shown.includes(key);
+  const isShown = (key: TFooterSlot) => shown.includes(key);
   const hasBrand = BRAND_SLOTS.some(isShown);
   const hasMain = hasBrand || isShown('Groups');
   const hasBottom = BOTTOM_SLOTS.some(isShown);

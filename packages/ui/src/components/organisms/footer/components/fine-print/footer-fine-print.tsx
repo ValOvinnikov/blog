@@ -1,12 +1,12 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { footerFinePrintVariants } from './footer-fine-print-variants';
 
 export type TFooterFinePrintProps = IWithClassName &
-  IWithDataTestId & {
+  IWithDataTestId &
+  PropsWithChildren & {
     ariaLabel: string;
-    children?: ReactNode;
   };
 
 /** The legal and settings links in the footer's bottom row, beside the copyright line. */

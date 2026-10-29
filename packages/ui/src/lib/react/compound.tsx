@@ -5,6 +5,7 @@ import {
   type ElementType,
   Fragment,
   isValidElement,
+  type PropsWithChildren,
   type ReactElement,
   type ReactNode,
 } from 'react';
@@ -76,5 +77,5 @@ export type TCompoundChildren<Parts extends Record<string, ElementType>> =
 
 /** Whether a slot element was passed any children, so a parent can leave out the wrapper around a slot that would render nothing. */
 export const hasSlotContent = (slot: ReactNode): boolean =>
-  isValidElement<{ children?: ReactNode }>(slot) &&
+  isValidElement<PropsWithChildren>(slot) &&
   hasArrayGotItems(Children.toArray(slot.props.children));

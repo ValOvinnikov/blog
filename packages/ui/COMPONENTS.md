@@ -420,8 +420,17 @@ Variants: layout: FOOTER_LAYOUT.COLUMNS|FOOTER_LAYOUT.CENTRED|FOOTER_LAYOUT.COMP
 
 Slots:
 
+- **Footer.Logo** — The site's logo at the top of the footer's brand column. Props: _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
+- **Footer.About** — A short text about the site in the footer's brand column. Props: _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
+- **Footer.Address** — The site's contact address in the footer's brand column. Props: _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
+- **Footer.Social** — The site's social profile links, last in the footer's brand column. Props: _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
+- **Footer.Groups** — The footer's navigation landmark for the editor's link groups. Props: ariaLabel: string · children?: TCompoundChildren<{ Group: typeof FooterGroup }> _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Wordmark** — The site name set large as decoration in the Big wordmark layout, hidden from assistive technology because the copyright line already names the site. Props: children?: string _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Copyright** — The copyright line in the site `Footer`, rendering "© {year} {title}". Props: title: string · year: number _(extends IWithClassName, IWithDataTestId)_
+- **Footer.FinePrint** — The legal and settings links in the footer's bottom row, beside the copyright line. Props: ariaLabel: string _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
+- **Footer.Nav** — The navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Footer.Group** — One named group of footer links under the heading the editor gave it. Props: heading: string · headingLevel: THeadingLevel · children?: TCompoundChildren<{ Item: typeof FooterGroupItem }> _(extends IWithClassName, IWithDataTestId)_
-- **Footer.GroupItem** — One entry in a footer link group: a link, or any other content such as plain text. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.GroupItem** — One entry in a footer link group: a link, or any other content such as plain text. Props: _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
 
 ### Header — `components/organisms/header/header.tsx`
 

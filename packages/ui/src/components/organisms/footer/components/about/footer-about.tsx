@@ -1,12 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { footerAboutVariants } from './footer-about-variants';
 
 export type TFooterAboutProps = IWithClassName &
-  IWithDataTestId & {
-    children?: ReactNode;
-  };
+  IWithDataTestId &
+  PropsWithChildren;
 
 /** A short text about the site in the footer's brand column. */
 export const FooterAbout = ({

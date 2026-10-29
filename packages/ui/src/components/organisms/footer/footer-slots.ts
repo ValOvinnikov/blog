@@ -1,31 +1,19 @@
 import { FOOTER_LAYOUT, type TFooterLayout } from '@blog/config';
 import { hasSlotContent } from '@blog/ui/lib/react';
-import { isValidElement, type ElementType, type ReactNode } from 'react';
+import { isValidElement, type PropsWithChildren, type ReactNode } from 'react';
 
-import { FooterAbout } from './components/about/footer-about';
-import { FooterAddress } from './components/address/footer-address';
-import { FooterCopyright } from './components/copyright/footer-copyright';
-import { FooterFinePrint } from './components/fine-print/footer-fine-print';
-import { FooterGroups } from './components/groups/footer-groups';
 import { hasGroupItems } from './components/groups/has-group-items';
-import { FooterLogo } from './components/logo/footer-logo';
-import { FooterNav } from './components/nav/footer-nav';
-import { FooterSocial } from './components/social/footer-social';
-import { FooterWordmark } from './components/wordmark/footer-wordmark';
 
-export const FooterSlotParts = {
-  Logo: FooterLogo,
-  About: FooterAbout,
-  Address: FooterAddress,
-  Social: FooterSocial,
-  Groups: FooterGroups,
-  Wordmark: FooterWordmark,
-  Copyright: FooterCopyright,
-  FinePrint: FooterFinePrint,
-  Nav: FooterNav,
-} satisfies Record<string, ElementType>;
-
-type TFooterSlot = keyof typeof FooterSlotParts;
+export type TFooterSlot =
+  | 'Logo'
+  | 'About'
+  | 'Address'
+  | 'Social'
+  | 'Groups'
+  | 'Wordmark'
+  | 'Copyright'
+  | 'FinePrint'
+  | 'Nav';
 
 export const BRAND_SLOTS: readonly TFooterSlot[] = [
   'Logo',
@@ -48,7 +36,7 @@ export const LAYOUT_SLOTS: Record<TFooterLayout, readonly TFooterSlot[]> = {
 };
 
 const hasGroupsContent = (groups: ReactNode) =>
-  isValidElement<{ children?: ReactNode }>(groups) &&
+  isValidElement<PropsWithChildren>(groups) &&
   hasGroupItems(groups.props.children);
 
 export const SLOT_HAS_CONTENT: Record<

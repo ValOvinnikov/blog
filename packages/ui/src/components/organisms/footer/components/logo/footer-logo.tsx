@@ -1,12 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { footerLogoVariants } from './footer-logo-variants';
 
 export type TFooterLogoProps = IWithClassName &
-  IWithDataTestId & {
-    children?: ReactNode;
-  };
+  IWithDataTestId &
+  PropsWithChildren;
 
 /** The site's logo at the top of the footer's brand column. */
 export const FooterLogo = ({
