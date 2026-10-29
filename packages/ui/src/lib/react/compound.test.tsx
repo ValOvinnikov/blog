@@ -3,10 +3,10 @@ import { faker } from '@faker-js/faker';
 import {
   cloneElement,
   type ComponentPropsWithoutRef,
-  type ReactNode,
+  type PropsWithChildren,
 } from 'react';
 
-import { mapCompoundSlots } from './compound';
+import { hasSlotContent, mapCompoundSlots } from './compound';
 
 faker.seed(123);
 
@@ -29,7 +29,7 @@ const Beta = ({ children }: ComponentPropsWithoutRef<'span'>) => (
 );
 const Unknown = () => <span>{MOCK_UNKNOWN}</span>;
 
-const TestHarness = ({ children }: { children: ReactNode }) => {
+const TestHarness = ({ children }: PropsWithChildren) => {
   const { slots, unmatched } = mapCompoundSlots(children, {
     alpha: Alpha,
     beta: Beta,
@@ -157,5 +157,34 @@ describe(mapCompoundSlots, () => {
     const unmatchedItems = screen.queryAllByTestId(UNMATCHED_ITEM_TEST_ID);
 
     expect(unmatchedItems).toHaveLength(0);
+  });
+});
+
+describe(hasSlotContent, () => {
+  it.each([
+    ['text', <Alpha key="text">{MOCK_FIRST}</Alpha>],
+    [
+      'an element',
+      <Alpha key="element">
+        <Beta />
+      </Alpha>,
+    ],
+  ])('is true for a slot holding %s', (_, slot) => {
+    expect(hasSlotContent(slot)).toBe(true);
+  });
+
+  it.each([
+    ['no children', <Alpha key="none" />],
+    [
+      'only empty children',
+      <Alpha key="empty">
+        {null}
+        {false}
+        {undefined}
+      </Alpha>,
+    ],
+    ['no slot at all', undefined],
+  ])('is false for %s', (_, slot) => {
+    expect(hasSlotContent(slot)).toBe(false);
   });
 });

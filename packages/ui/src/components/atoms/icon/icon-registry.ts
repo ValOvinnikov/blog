@@ -39,6 +39,8 @@ import CodeComponent from '@blog/ui/assets/icons/code.svg';
 import CodeUrl from '@blog/ui/assets/icons/code.svg?url';
 import CommentComponent from '@blog/ui/assets/icons/comment.svg';
 import CommentUrl from '@blog/ui/assets/icons/comment.svg?url';
+import CookieComponent from '@blog/ui/assets/icons/cookie.svg';
+import CookieUrl from '@blog/ui/assets/icons/cookie.svg?url';
 import CopyComponent from '@blog/ui/assets/icons/copy.svg';
 import CopyUrl from '@blog/ui/assets/icons/copy.svg?url';
 import CpuComponent from '@blog/ui/assets/icons/cpu.svg';
@@ -220,6 +222,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.SEARCH]: { component: SearchComponent, url: SearchUrl },
   [ICONS.CHART]: { component: ChartComponent, url: ChartUrl },
   [ICONS.CLOCK]: { component: ClockComponent, url: ClockUrl },
+  [ICONS.COOKIE]: { component: CookieComponent, url: CookieUrl },
   [ICONS.WRENCH]: { component: WrenchComponent, url: WrenchUrl },
   [ICONS.ROCKET]: { component: RocketComponent, url: RocketUrl },
   [ICONS.BOOK]: { component: BookComponent, url: BookUrl },
