@@ -1200,6 +1200,7 @@
     "domainInvalid": "Introduzca un dominio válido.",
     "domainTaken": "Este dominio ya está en uso.",
     "domainAttachedElsewhere": "Este dominio ya está vinculado a otro proyecto de Vercel. Libérelo allí o use otro dominio.",
+    "slugRequired": "Introduzca la dirección del sitio.",
     "slugInvalid": "Un subdominio solo puede usar letras minúsculas, dígitos y guiones, hasta 63 caracteres, y no puede empezar ni terminar con un guion.",
     "slugReserved": "Este subdominio está reservado para la plataforma. Elija otro.",
     "slugTaken": "Otro cliente ya usa este subdominio.",

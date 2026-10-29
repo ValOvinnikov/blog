@@ -160,6 +160,19 @@ describe(createTenantAction, () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
+  it.each(['', '   '])(
+    'returns a required error for an empty site address %j',
+    async (slug) => {
+      const result = await createTenantAction({ ...validInput, slug });
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_REQUIRED } },
+      });
+      expect(createTenantDraftMock).not.toHaveBeenCalled();
+    },
+  );
+
   it('logs and returns a server error when no tenant root domain is configured', async () => {
     Object.assign(env, { TENANT_ROOT_DOMAIN: undefined });
 

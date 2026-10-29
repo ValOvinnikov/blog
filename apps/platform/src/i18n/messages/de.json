@@ -1200,6 +1200,7 @@
     "domainInvalid": "Geben Sie eine gültige Domain ein.",
     "domainTaken": "Diese Domain wird bereits verwendet.",
     "domainAttachedElsewhere": "Diese Domain ist bereits mit einem anderen Vercel-Projekt verknüpft — geben Sie sie dort frei oder verwenden Sie eine andere Domain.",
+    "slugRequired": "Geben Sie die Adresse der Website ein.",
     "slugInvalid": "Eine Subdomain darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten, höchstens 63 Zeichen lang sein und nicht mit einem Bindestrich beginnen oder enden.",
     "slugReserved": "Diese Subdomain ist für die Plattform reserviert. Wählen Sie eine andere.",
     "slugTaken": "Ein anderer Mandant verwendet diese Subdomain bereits.",
