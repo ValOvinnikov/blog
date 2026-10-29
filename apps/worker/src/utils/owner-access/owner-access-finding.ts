@@ -21,8 +21,6 @@ import {
 import { logger } from '@worker/utils/logger/logger';
 import { z } from 'zod';
 
-import { msSinceOwnerInvited } from './report-owner-access-outcome';
-
 const failureCountSchema = z.object({
   failureCount: z.number().int().nonnegative().catch(0),
 });
@@ -51,11 +49,14 @@ async function previousFailureCount(
 export async function recordOwnerAccessFailure(
   tenant: TTenant,
   error: string,
+  failingSince: Date,
 ): Promise<void> {
-  if (msSinceOwnerInvited(tenant) < OWNER_ACCESS_FINDING_AFTER_MS) return;
+  const now = new Date();
+  if (now.getTime() - failingSince.getTime() < OWNER_ACCESS_FINDING_AFTER_MS) {
+    return;
+  }
 
   const tenantId = tenant.id;
-  const now = new Date();
   const finding = await findOpenOwnerAccessFinding(tenantId);
   const failureCount = finding
     ? (await previousFailureCount(tenantId, finding)) + 1
@@ -69,7 +70,7 @@ export async function recordOwnerAccessFailure(
     details: {
       error,
       failureCount,
-      firstFailedAt: (finding?.firstSeenAt ?? now).toISOString(),
+      firstFailedAt: failingSince.toISOString(),
       lastFailedAt: now.toISOString(),
     },
   });

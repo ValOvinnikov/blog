@@ -1,4 +1,5 @@
 import { OPERATOR_ALERT_KIND } from '@blog/config/constants';
+import type { TMaybeNull } from '@blog/config/types';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   OWNER_ACCESS_STALL_AFTER_MS,
@@ -8,12 +9,20 @@ import {
 } from '@blog/db/constants';
 import { updateProvisioningStep } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 import { postOperatorAlert } from '@worker/utils/operator-alert/operator-alert';
 
-export function msSinceOwnerInvited(tenant: TTenant): number {
+function msSinceOwnerInvited(tenant: TTenant): number {
   const invitedAt = tenant.ownerInviteSentAt ?? tenant.createdAt;
   return Date.now() - invitedAt.getTime();
+}
+
+export function ownerAccessFailingSince(tenant: TTenant): TMaybeNull<Date> {
+  const failingSince =
+    tenant.provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]
+      ?.failingSince;
+  return failingSince ? new Date(failingSince) : null;
 }
 
 export function pendingOwnerAccessOutcome(
@@ -45,6 +54,7 @@ async function alertOnceWhenStalled(
 export async function reportOwnerAccessOutcome(
   tenant: TTenant,
   outcome: TElevateTenantOwnerOutcome,
+  failingSince?: Date,
 ): Promise<void> {
   const alerted = await alertOnceWhenStalled(tenant, outcome);
 
@@ -53,10 +63,11 @@ export async function reportOwnerAccessOutcome(
     step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
     status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     detail: outcome,
+    ...(failingSince ? { failingSince: failingSince.toISOString() } : {}),
     ...(alerted ? { notifiedOwnerElevationOutcome: outcome } : {}),
   });
   if (!result.ok) {
-    logger.error('owner_access.report_failed', {
+    logger.error(OWNER_ACCESS_LOG.REPORT_FAILED, {
       tenantId: tenant.id,
       outcome,
       error: result.error,

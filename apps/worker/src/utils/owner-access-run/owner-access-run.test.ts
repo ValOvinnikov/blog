@@ -107,6 +107,20 @@ describe(wakeOwnerAccess, () => {
     });
   });
 
+  it('starts a fresh run after cancelling a stale one, even while its hook still answers', async () => {
+    vi.mocked(resumeHook).mockResolvedValue({} as never);
+    const run = liveRun(MOCK_STALE_CREATED_AT);
+
+    await wakeOwnerAccess(MOCK_TENANT_ID);
+
+    expect(run.cancel).toHaveBeenCalled();
+    expect(resumeHook).not.toHaveBeenCalled();
+    expect(start).toHaveBeenCalledWith(ensureOwnerAccess, [
+      MOCK_TENANT_ID,
+      OWNER_ACCESS_RUN_CHECKS,
+    ]);
+  });
+
   it('leaves a recent run alone', async () => {
     vi.mocked(resumeHook).mockResolvedValue({} as never);
     const run = liveRun(new Date(MOCK_STALE_CREATED_AT.getTime() + 1));

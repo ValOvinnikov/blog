@@ -6566,6 +6566,14 @@
         "file": "apps/worker/src/constants/owner-access.ts"
       }
     ],
+    "owner_access.report_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.REPORT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
     "owner_access.activity_touch_failed": [
       {
         "ref": "OWNER_ACCESS_LOG.ACTIVITY_TOUCH_FAILED",

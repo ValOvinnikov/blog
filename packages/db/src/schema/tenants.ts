@@ -57,6 +57,7 @@ export type TProvisioningStepState = {
   status: TTenantProvisioningStepStatus;
   error?: string;
   detail?: TElevateTenantOwnerOutcome;
+  failingSince?: string;
   updatedAt?: string;
 };
 

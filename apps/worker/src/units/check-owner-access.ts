@@ -18,6 +18,7 @@ import {
 } from '@worker/utils/owner-access/owner-access-target';
 import { sendOwnerInvite } from '@worker/utils/owner-access/owner-invite';
 import {
+  ownerAccessFailingSince,
   pendingOwnerAccessOutcome,
   reportOwnerAccessOutcome,
 } from '@worker/utils/owner-access/report-owner-access-outcome';
@@ -61,23 +62,23 @@ export async function checkOwnerAccess(
   'use step';
 
   const target = await loadOwnerAccessTarget(tenantId);
-  let check: TOwnerAccessCheck;
+  const { tenant } = target;
+  let outcome: TElevateTenantOwnerOutcome;
   try {
-    const outcome = await resolveOwnerAccess(target);
-    check = { outcome, hasFailed: false };
+    outcome = await resolveOwnerAccess(target);
   } catch (error) {
     if (!isFinalStepAttempt(error)) throw error;
     const message = sanitizeLogMessage(error);
     logger.error(OWNER_ACCESS_LOG.CHECK_FAILED, { tenantId, error: message });
-    await recordOwnerAccessFailure(target.tenant, message);
-    check = {
-      outcome: pendingOwnerAccessOutcome(target.tenant),
-      hasFailed: true,
-    };
+    const failingSince = ownerAccessFailingSince(tenant) ?? new Date();
+    await recordOwnerAccessFailure(tenant, message, failingSince);
+    outcome = pendingOwnerAccessOutcome(tenant);
+    await reportOwnerAccessOutcome(tenant, outcome, failingSince);
+    return { outcome, hasFailed: true };
   }
 
-  await reportOwnerAccessOutcome(target.tenant, check.outcome);
-  return check;
+  await reportOwnerAccessOutcome(tenant, outcome);
+  return { outcome, hasFailed: false };
 }
 
 checkOwnerAccess.maxRetries = PROVISIONING_UNIT_MAX_RETRIES;

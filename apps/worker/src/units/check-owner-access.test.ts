@@ -57,6 +57,7 @@ import {
   MOCK_OWNER_PROJECT_USER_ID,
   MOCK_SANITY_INVITE_ID,
   MOCK_SANITY_USER_ID,
+  mockOwnerAccessFailingSince,
   mockOwnerAccessFinding,
   mockOwnerAccessTarget,
   mockPendingInvite,
@@ -97,8 +98,11 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('workflow');
 
-const MOCK_INVITED_FOR_THRESHOLD = new Date(
+const MOCK_FAILING_FOR_THRESHOLD = new Date(
   MOCK_NOW.getTime() - OWNER_ACCESS_FINDING_AFTER_MS,
+);
+const MOCK_FAILING_UNDER_THRESHOLD = new Date(
+  MOCK_FAILING_FOR_THRESHOLD.getTime() + 1,
 );
 const MOCK_PRIOR_FAILURE_COUNT = 2;
 
@@ -271,6 +275,28 @@ describe(checkOwnerAccess, () => {
       expect(sendPendingOwnerEmails).not.toHaveBeenCalled();
     });
 
+    it('still reports the owner elevated when a retry removes the viewer role the grant left', async () => {
+      vi.mocked(listSanityProjectAcl).mockResolvedValue([
+        aclEntry(SANITY_PROJECT_ROLE.ADMINISTRATOR, SANITY_PROJECT_ROLE.VIEWER),
+      ]);
+
+      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+    });
+
+    it('clears the failing time once a check succeeds', async () => {
+      vi.mocked(getTenantById).mockResolvedValue(
+        mockOwnerAccessFailingSince(MOCK_FAILING_FOR_THRESHOLD),
+      );
+
+      await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(updateProvisioningStep).toHaveBeenCalledWith(
+        expect.not.objectContaining({ failingSince: expect.anything() }),
+      );
+    });
+
     it('grants nothing when the owner is already administrator', async () => {
       vi.mocked(listSanityProjectAcl).mockResolvedValue([
         aclEntry(SANITY_PROJECT_ROLE.ADMINISTRATOR),
@@ -441,6 +467,7 @@ describe(checkOwnerAccess, () => {
         step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
         status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         detail: ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+        failingSince: MOCK_NOW.toISOString(),
       });
     });
 
@@ -455,17 +482,41 @@ describe(checkOwnerAccess, () => {
         expect(hasFailed).toBe(true);
       });
 
-      it('opens no finding within the threshold of the invite', async () => {
+      it('opens no finding on a first failed check, however old the invite', async () => {
+        vi.mocked(getTenantById).mockResolvedValue(
+          mockProvisionedTenant({ ownerInviteSentAt: MOCK_FOUR_DAYS_AGO }),
+        );
+
         await checkOwnerAccess(MOCK_TENANT_ID);
 
         expect(openFinding).not.toHaveBeenCalled();
       });
 
-      describe('once the invite is older than the threshold', () => {
+      it('opens no finding while checks have failed for less than the threshold', async () => {
+        vi.mocked(getTenantById).mockResolvedValue(
+          mockOwnerAccessFailingSince(MOCK_FAILING_UNDER_THRESHOLD),
+        );
+
+        await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(openFinding).not.toHaveBeenCalled();
+      });
+
+      describe('once checks have kept failing for the threshold', () => {
         beforeEach(() => {
           vi.mocked(getTenantById).mockResolvedValue(
-            mockProvisionedTenant({
-              ownerInviteSentAt: MOCK_INVITED_FOR_THRESHOLD,
+            mockOwnerAccessFailingSince(MOCK_FAILING_FOR_THRESHOLD, {
+              ownerInviteSentAt: MOCK_FAILING_FOR_THRESHOLD,
+            }),
+          );
+        });
+
+        it('keeps the time failures started on the owner elevation step', async () => {
+          await checkOwnerAccess(MOCK_TENANT_ID);
+
+          expect(updateProvisioningStep).toHaveBeenCalledWith(
+            expect.objectContaining({
+              failingSince: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
             }),
           );
         });
@@ -482,15 +533,16 @@ describe(checkOwnerAccess, () => {
             details: {
               error: MOCK_SANITY_OUTAGE,
               failureCount: 1,
-              firstFailedAt: MOCK_NOW.toISOString(),
+              firstFailedAt: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
               lastFailedAt: MOCK_NOW.toISOString(),
             },
           });
         });
 
-        it('counts the failure onto an open finding, keeping its first failure', async () => {
-          const finding = mockOwnerAccessFinding();
-          vi.mocked(listFindingsForTenant).mockResolvedValue([finding]);
+        it('counts the failure onto an open finding', async () => {
+          vi.mocked(listFindingsForTenant).mockResolvedValue([
+            mockOwnerAccessFinding(),
+          ]);
           vi.mocked(getFindingDetails).mockResolvedValue({
             failureCount: MOCK_PRIOR_FAILURE_COUNT,
           });
@@ -506,7 +558,7 @@ describe(checkOwnerAccess, () => {
               details: {
                 error: MOCK_SANITY_OUTAGE,
                 failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
-                firstFailedAt: finding.firstSeenAt.toISOString(),
+                firstFailedAt: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
                 lastFailedAt: MOCK_NOW.toISOString(),
               },
             }),
@@ -625,6 +677,20 @@ describe(checkOwnerAccess, () => {
         status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         detail: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
       });
+    });
+  });
+
+  it('logs when the outcome cannot be reported', async () => {
+    vi.mocked(updateProvisioningStep).mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
+
+    await checkOwnerAccess(MOCK_TENANT_ID);
+
+    expect(logger.error).toHaveBeenCalledWith(OWNER_ACCESS_LOG.REPORT_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      outcome: ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+      error: ERROR_CODE.DB_NOT_FOUND,
     });
   });
 

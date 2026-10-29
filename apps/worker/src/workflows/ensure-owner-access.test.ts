@@ -4,7 +4,7 @@ import {
 } from '@blog/db/constants';
 import {
   OWNER_ACCESS_HOOK_TOKEN_PREFIX,
-  OWNER_ACCESS_POLL_INTERVAL,
+  OWNER_ACCESS_POLL_INTERVAL_MS,
   OWNER_ACCESS_RUN_CHECKS,
   OWNER_ACCESS_SWEEP_CHECKS,
 } from '@worker/constants/owner-access';
@@ -75,8 +75,8 @@ describe(ensureOwnerAccess, () => {
     await ensureOwnerAccess(MOCK_TENANT_ID);
 
     expect(vi.mocked(sleep).mock.calls).toEqual([
-      [OWNER_ACCESS_POLL_INTERVAL],
-      [OWNER_ACCESS_POLL_INTERVAL],
+      [OWNER_ACCESS_POLL_INTERVAL_MS],
+      [OWNER_ACCESS_POLL_INTERVAL_MS],
     ]);
   });
 
