@@ -64,9 +64,9 @@ default to zero".
 - **Nothing imports `apps/worker`.** The admin panel reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
   `POST /api/owner-access/*` and `POST /api/custom-domain/*`
-  — every one authenticated by the shared enqueue secret. The one other route
-  is Vercel Cron's `GET /api/inactivity-sweep`, authenticated by
-  `CRON_SECRET`.
+  — every one authenticated by the shared enqueue secret. The other routes
+  are Vercel Cron's `GET /api/inactivity-sweep` and
+  `GET /api/owner-access-sweep`, authenticated by `CRON_SECRET`.
 - **All relational reads and writes go through `@blog/db`'s exported
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.
@@ -100,9 +100,16 @@ default to zero".
   lock is impossible on the stateless `neon-http` driver.
 - **Every external HTTP call has a timeout**, so a hung Management API call
   fails its step and is retried instead of stalling the run.
-- **Owner Studio access polls with backoff** — every minute for 30 minutes,
-  then hourly, STALLED at three days — with `sleep()` between ticks, never a
-  busy loop.
+- **A workflow may wait across a deploy only if it is short or safe to
+  restart.** A Vercel Workflow run stays on the deployment that started it,
+  so a run that sleeps for days keeps running old code after every fix. Bound
+  a polling run to minutes and let a scheduled sweep, which always runs the
+  current deployment, start the next one.
+- **Owner Studio access polls in short runs** — at most 30 one-minute checks
+  with `sleep()` between them, never a busy loop, ending early at a grant,
+  STALLED or a failed check. The hourly owner-access sweep makes one check
+  for every tenant whose owner is not yet administrator, and replaces a run
+  older than 45 minutes, which can only be one left on an earlier deploy.
 - **Secrets.** `SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, the
   registry `DATABASE_URL`, `SANITY_REVALIDATE_SECRET` and `VERCEL_TOKEN` live
   on this app alone, plus the enqueue secret it shares with the admin panel.

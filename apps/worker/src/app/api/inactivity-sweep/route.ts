@@ -1,12 +1,9 @@
 import { HTTP_STATUS } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
 import { sanitizeLogMessage } from '@blog/insight';
-import { isSecretMatch } from '@blog/utils';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import {
-  CRON_BEARER_PREFIX,
-  INACTIVITY_SWEEP_LOG,
-} from '@worker/constants/inactivity-sweep';
+import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
+import { hasCronSecret } from '@worker/utils/cron-secret/cron-secret';
 import { env } from '@worker/utils/env/env';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import {
@@ -19,14 +16,6 @@ import { respondError } from '@worker/utils/signed-tenant-request/signed-tenant-
 
 // Next requires a literal here, so it cannot import a const.
 export const maxDuration = 300;
-
-function hasCronSecret(request: Request, secret: string): boolean {
-  const authorization = request.headers.get('authorization');
-  const provided = authorization?.startsWith(CRON_BEARER_PREFIX)
-    ? authorization.slice(CRON_BEARER_PREFIX.length)
-    : null;
-  return isSecretMatch(provided, secret);
-}
 
 async function sweepInactiveTenants(
   now: Date,

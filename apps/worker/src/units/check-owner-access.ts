@@ -1,4 +1,3 @@
-import type { TMaybeNull } from '@blog/config/types';
 import {
   TENANT_OWNER_EMAIL,
   type TElevateTenantOwnerOutcome,
@@ -9,7 +8,7 @@ import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { logger } from '@worker/utils/logger/logger';
 import { grantOwnerAdministrator } from '@worker/utils/owner-access/grant-owner-administrator';
 import {
-  openOwnerAccessFindingOnceOverdue,
+  recordOwnerAccessFailure,
   resolveOwnerAccessFinding,
 } from '@worker/utils/owner-access/owner-access-finding';
 import {
@@ -31,7 +30,7 @@ import { isFinalStepAttempt } from './run-reported-step';
 
 export type TOwnerAccessCheck = {
   outcome: TElevateTenantOwnerOutcome;
-  failingSince: TMaybeNull<number>;
+  hasFailed: boolean;
 };
 
 async function resolveOwnerAccess(
@@ -58,7 +57,6 @@ async function resolveOwnerAccess(
 
 export async function checkOwnerAccess(
   tenantId: string,
-  failingSince: TMaybeNull<number> = null,
 ): Promise<TOwnerAccessCheck> {
   'use step';
 
@@ -66,16 +64,15 @@ export async function checkOwnerAccess(
   let check: TOwnerAccessCheck;
   try {
     const outcome = await resolveOwnerAccess(target);
-    check = { outcome, failingSince: null };
+    check = { outcome, hasFailed: false };
   } catch (error) {
     if (!isFinalStepAttempt(error)) throw error;
     const message = sanitizeLogMessage(error);
     logger.error(OWNER_ACCESS_LOG.CHECK_FAILED, { tenantId, error: message });
-    const since = failingSince ?? Date.now();
-    await openOwnerAccessFindingOnceOverdue(tenantId, since, message);
+    await recordOwnerAccessFailure(target.tenant, message);
     check = {
       outcome: pendingOwnerAccessOutcome(target.tenant),
-      failingSince: since,
+      hasFailed: true,
     };
   }
 

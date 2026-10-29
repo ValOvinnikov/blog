@@ -7,4 +7,3 @@ export const INACTIVITY_SWEEP_LOG = {
   ALERT_NO_RECIPIENTS: 'inactivity_sweep.alert_no_recipients',
   EMAIL_SEND_FAILED: 'inactivity_sweep.email_send_failed',
 } as const;
-export const CRON_BEARER_PREFIX = 'Bearer ';
