@@ -198,7 +198,7 @@ from `useSettingsFormState()`:
   `headerActions`) and, like Look, splits editor and preview 50/50 from `lg`.
 - A grid inside a column sizes from that column: `@container` on the card body
   and `@sm:grid-cols-2` on the grid.
-- Pre-shell pages (workspace pending, tenant picker) render `PreShellFrame`: a
+- Pre-shell pages (the tenant picker) render `PreShellFrame`: a
   full-width `min-h-dvh bg-admin-bg` root holding one `<main>`, a centred
   `max-w-sm` column, and one `Card` whose top is the `PageHeader` band passed
   as `header`, with the content in its body. Choices are visible light-surface

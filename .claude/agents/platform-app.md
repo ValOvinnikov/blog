@@ -400,13 +400,17 @@ The Voice page edits the site copy registered in `@blog/config`'s
 - Which strings are editable is the user's call (CLAUDE.md → "Check for Voice
   candidates"). This app's own UI copy is never Voice.
 
+## Indexing
+
+Every page is `noindex, nofollow`, set once by the `[locale]` root layout's
+`robots` metadata. Never override it per page, and never add a sitemap, feed or
+`robots.txt` — a `Disallow` would stop crawlers reading the `noindex`.
+
 ## Not decided — do not invent
 
 - **Locale in the URL.** `localePrefix: 'never'`; prefixed routes or a new way
   of choosing the locale are unsettled — report, don't decide. Adding a
   catalogue _key_ is ordinary work.
-- **SEO.** None: a plain title at most, no sitemap, robots or feeds. This app
-  is not indexed.
 - **Per-role page access** beyond the split above — the design doc states a
   default and flags it open. Follow the ticket; if it is silent, report the
   ambiguity.
