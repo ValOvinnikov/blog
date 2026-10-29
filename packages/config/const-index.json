@@ -2060,6 +2060,14 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
+    "COOKIE": [
+      {
+        "ref": "ICONS.COOKIE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "FULL_BLEED": [
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",

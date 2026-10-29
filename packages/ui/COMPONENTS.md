@@ -414,13 +414,22 @@ Props: isOpen: boolean · onOpenChange: (isOpen: boolean) => void · heading: st
 
 ### Footer — `components/organisms/footer/footer.tsx`
 
-The site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a `<footer>`.
-Props: children?: TCompoundChildren<typeof FooterParts> _(extends IWithClassName, IWithDataTestId)_
+The site footer: a brand column, named link groups and a fine-print row, arranged by `layout`, set full width or as a card by `surface`, on the skin `tone` picks.
+Props: layout?: TFooterVariants['layout'] · surface?: TFooterVariants['surface'] · tone?: TFooterVariants['tone'] · children?: TCompoundChildren<typeof FooterSlotParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: layout: FOOTER_LAYOUT.COLUMNS|FOOTER_LAYOUT.CENTRED|FOOTER_LAYOUT.COMPACT|FOOTER_LAYOUT.BIG_WORDMARK · surface: FOOTER_SURFACE.FULL_WIDTH|FOOTER_SURFACE.CARD · isDivided: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 Slots:
 
-- **Footer.Nav** — The navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Logo** — The site's logo at the top of the footer's brand column. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.About** — A short text about the site in the footer's brand column. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Address** — The site's contact address in the footer's brand column. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Social** — The site's social profile links, last in the footer's brand column. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Groups** — The footer's named link groups, set two per row on phones and as one centred row of links in the Centred layout. Props: ariaLabel: string · children?: TCompoundChildren<{ Group: typeof FooterGroup }> _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Wordmark** — The site name set large as decoration in the Big wordmark layout, hidden from assistive technology because the copyright line already names the site. Props: children?: string _(extends IWithClassName, IWithDataTestId)_
 - **Footer.Copyright** — The copyright line in the site `Footer`, rendering "© {year} {title}". Props: title: string · year: number _(extends IWithClassName, IWithDataTestId)_
+- **Footer.FinePrint** — The legal and settings links in the footer's bottom row, beside the copyright line. Props: ariaLabel: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Nav** — The navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Footer.Group** — One named group of footer links under the heading the editor gave it. Props: heading: string · headingLevel: THeadingLevel · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Header — `components/organisms/header/header.tsx`
 
