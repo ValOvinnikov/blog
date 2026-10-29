@@ -48,7 +48,7 @@ export const OnboardingActions = ({
       ) : (
         <Button
           variant="primary"
-          isDisabled={isContinueDisabled}
+          isAriaDisabled={isContinueDisabled}
           onClick={onContinue}
         >
           {t('continue')}

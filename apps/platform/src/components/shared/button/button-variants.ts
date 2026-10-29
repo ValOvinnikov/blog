@@ -64,6 +64,7 @@ export const buttonVariants = tv({
           'rounded-admin-control border font-medium no-underline',
           'cursor-pointer aria-busy:cursor-progress',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
+          'aria-disabled:not-aria-busy:cursor-not-allowed aria-disabled:not-aria-busy:opacity-[.45]',
           'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
         ],
         faces: ['grid'],

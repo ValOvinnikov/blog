@@ -75,6 +75,7 @@ const MOCK_PLACEHOLDER_ADDRESS = `${PLACEHOLDER_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}
 const MOCK_LIVE_PREVIEW = {
   name: messages.previewModeControl.livePreviewHeading,
 };
+const MOCK_LIGHT_MODE = { name: messages.previewModeControl.modeLight };
 const MOCK_SITE_TYPE_SELECT = { name: SITE_TYPE_LABEL };
 const MOCK_EDIT_SITE_TYPE = {
   name: t('editField', { field: SITE_TYPE_LABEL }),
@@ -324,8 +325,12 @@ describe(`<${OnboardingView.name}/>`, () => {
 
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
+    await user.click(continueButton);
+
+    const heading = stepHeading(STEPS.ADDRESS);
+
     expect(addressField).toBeInvalid();
-    expect(continueButton).toBeDisabled();
+    expect(heading).toBeVisible();
   });
 
   it('describes a taken address field by why it is taken', async () => {
@@ -369,7 +374,19 @@ describe(`<${OnboardingView.name}/>`, () => {
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
     expect(checking).toBeVisible();
-    expect(continueButton).toBeDisabled();
+    expect(continueButton).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('keeps Continue reachable by keyboard while the address is checked', async () => {
+    await completeSiteStep();
+    await typeAddress();
+    const lightMode = screen.getByRole('button', MOCK_LIGHT_MODE);
+    await user.click(lightMode);
+    await user.tab({ shift: true });
+
+    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+    expect(continueButton).toHaveFocus();
   });
 
   it('stays on the address step when Enter is pressed during the check', async () => {
