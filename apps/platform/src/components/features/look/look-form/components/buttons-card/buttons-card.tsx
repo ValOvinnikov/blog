@@ -3,6 +3,7 @@ import {
   SPINNER_STYLE,
   type TBusyButtonStyle,
 } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -20,15 +21,13 @@ export const ButtonsCard = () => {
   const busyLock = useLookFieldLock('busyButtonStyle');
   const spinnerLock = useLookFieldLock('spinnerStyle');
 
-  const busyOptions = Object.values(BUSY_BUTTON_STYLE).map((style) => ({
-    value: style,
-    label: t(`busyButtonStyleOptionLabel.${style}`),
-  }));
+  const busyOptions = toOptions(BUSY_BUTTON_STYLE, (style) =>
+    t(`busyButtonStyleOptionLabel.${style}`),
+  );
 
-  const spinnerOptions = Object.values(SPINNER_STYLE).map((style) => ({
-    value: style,
-    label: t(`spinnerStyleOptionLabel.${style}`),
-  }));
+  const spinnerOptions = toOptions(SPINNER_STYLE, (style) =>
+    t(`spinnerStyleOptionLabel.${style}`),
+  );
 
   return (
     <LookCard

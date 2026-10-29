@@ -1,6 +1,7 @@
 'use client';
 
 import { LOCALE_ISO_CODES, type TMaybeUndefined } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { SiteAddressField } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields/components/site-address-field';
 import { FormField } from '@platform/components/shared/form-field';
 import { OptionSelect } from '@platform/components/shared/option-select';
@@ -33,10 +34,7 @@ export const AddressStepFields = ({
       />
       <FormField label={t('languageLabel')} hint={t('languageHint')}>
         <OptionSelect
-          options={Object.values(LOCALE_ISO_CODES).map((locale) => ({
-            value: locale,
-            label: tLanguage(locale),
-          }))}
+          options={toOptions(LOCALE_ISO_CODES, (locale) => tLanguage(locale))}
           value={values.locale}
           onChange={(locale) => onFieldChange({ locale })}
         />
