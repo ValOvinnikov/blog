@@ -93,6 +93,12 @@ Every key/value const an agent should reuse before writing a literal. The
 - **FINDING_SEVERITY**: `INFO`, `WARNING`, `CRITICAL`
 - **FINDING_STATUS**: `OPEN`, `RESOLVED`
 
+### `@blog/config/constants` — `packages/config/src/constants/footer-layout.ts`
+
+- **FOOTER_LAYOUT**: `COLUMNS`, `CENTRED`, `COMPACT`, `BIG_WORDMARK`
+- **FOOTER_SURFACE**: `FULL_WIDTH`, `CARD`
+- **COOKIE_SETTINGS_BUTTON**: `HIDDEN`, `SHOWN`
+
 ### `@blog/config/constants` — `packages/config/src/constants/form-status.ts`
 
 - **FORM_STATUS**: `IDLE`, `SUBMITTING`, `SUCCESS`, `ERROR`

@@ -2,11 +2,15 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
   CARD_STYLE,
+  COOKIE_SETTINGS_BUTTON,
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -17,6 +21,7 @@ import {
   RADIUS_SCALE,
   SPINNER_STYLE,
 } from '@blog/config/constants';
+import { LOOK_FIELD } from '@blog/db/constants';
 import type { siteConfig } from '@blog/db/schema/site-config';
 import { isUndefined } from '@blog/utils/primitives';
 import { z } from 'zod';
@@ -50,6 +55,10 @@ export const updateSiteConfigInputSchema = z.object({
   headerLayout: z.enum(HEADER_LAYOUT).optional(),
   headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE).optional(),
   headerBarStyle: z.enum(HEADER_BAR_STYLE).optional(),
+  footerLayout: z.enum(FOOTER_LAYOUT).optional(),
+  footerBackground: z.enum(BRAND_VARIANT).optional(),
+  footerSurface: z.enum(FOOTER_SURFACE).optional(),
+  cookieSettingsButton: z.enum(COOKIE_SETTINGS_BUTTON).optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -66,51 +75,9 @@ type TSiteConfigWritable = Partial<typeof siteConfig.$inferInsert>;
 export function presentOptionalFields(
   parsed: z.output<typeof updateSiteConfigInputSchema>,
 ): TSiteConfigWritable {
-  const fields: TSiteConfigWritable = {};
-
-  if (!isUndefined(parsed.accentHue)) fields.accentHue = parsed.accentHue;
-  if (!isUndefined(parsed.logoHue)) fields.logoHue = parsed.logoHue;
-  if (!isUndefined(parsed.headingFont)) fields.headingFont = parsed.headingFont;
-  if (!isUndefined(parsed.bodyFont)) fields.bodyFont = parsed.bodyFont;
-  if (!isUndefined(parsed.radiusScale)) fields.radiusScale = parsed.radiusScale;
-  if (!isUndefined(parsed.density)) fields.density = parsed.density;
-  if (!isUndefined(parsed.languageSwitcherStyle)) {
-    fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
-  }
-  if (!isUndefined(parsed.cardStyle)) fields.cardStyle = parsed.cardStyle;
-  if (!isUndefined(parsed.headerControlStyle)) {
-    fields.headerControlStyle = parsed.headerControlStyle;
-  }
-  if (!isUndefined(parsed.accountButtonStyle)) {
-    fields.accountButtonStyle = parsed.accountButtonStyle;
-  }
-  if (!isUndefined(parsed.accountPanelStyle)) {
-    fields.accountPanelStyle = parsed.accountPanelStyle;
-  }
-  if (!isUndefined(parsed.accountPhonePlacement)) {
-    fields.accountPhonePlacement = parsed.accountPhonePlacement;
-  }
-  if (!isUndefined(parsed.busyButtonStyle)) {
-    fields.busyButtonStyle = parsed.busyButtonStyle;
-  }
-  if (!isUndefined(parsed.spinnerStyle)) {
-    fields.spinnerStyle = parsed.spinnerStyle;
-  }
-  if (!isUndefined(parsed.headerLayout)) {
-    fields.headerLayout = parsed.headerLayout;
-  }
-  if (!isUndefined(parsed.headerSubmenuStyle)) {
-    fields.headerSubmenuStyle = parsed.headerSubmenuStyle;
-  }
-  if (!isUndefined(parsed.headerBarStyle)) {
-    fields.headerBarStyle = parsed.headerBarStyle;
-  }
-  if (!isUndefined(parsed.logoAssetUrl)) {
-    fields.logoAssetUrl = parsed.logoAssetUrl;
-  }
-  if (!isUndefined(parsed.faviconAssetUrl)) {
-    fields.faviconAssetUrl = parsed.faviconAssetUrl;
-  }
-
-  return fields;
+  return Object.fromEntries(
+    Object.entries(parsed).filter(
+      ([field, value]) => field !== LOOK_FIELD.PRESET && !isUndefined(value),
+    ),
+  );
 }

@@ -1,8 +1,12 @@
 import type * as BlogConfig from '@blog/config';
 import {
-  VOICE_FIELD_ERROR,
-  VOICE_FIELDS,
+  BRAND_VARIANT,
+  COOKIE_SETTINGS_BUTTON,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   type TVoiceFieldFailuresByLocale,
+  VOICE_FIELDS,
+  VOICE_FIELD_ERROR,
 } from '@blog/config';
 import {
   ACCOUNT_BUTTON_STYLE,
@@ -118,6 +122,10 @@ const STYLE_FIELDS = [
   { field: 'headerLayout', value: HEADER_LAYOUT.CENTRED_BRAND },
   { field: 'headerSubmenuStyle', value: HEADER_SUBMENU_STYLE.WIDE_PANEL },
   { field: 'headerBarStyle', value: HEADER_BAR_STYLE.FLOATING },
+  { field: 'footerLayout', value: FOOTER_LAYOUT.CENTRED },
+  { field: 'footerBackground', value: BRAND_VARIANT.PRIMARY },
+  { field: 'footerSurface', value: FOOTER_SURFACE.CARD },
+  { field: 'cookieSettingsButton', value: COOKIE_SETTINGS_BUTTON.SHOWN },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -217,6 +225,34 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       headerBarStyle:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerBarStyle'],
+    },
+  ],
+  [
+    'an unknown footer layout',
+    {
+      footerLayout:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['footerLayout'],
+    },
+  ],
+  [
+    'an unknown footer background',
+    {
+      footerBackground:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['footerBackground'],
+    },
+  ],
+  [
+    'an unknown footer surface',
+    {
+      footerSurface:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['footerSurface'],
+    },
+  ],
+  [
+    'an unknown cookie settings button',
+    {
+      cookieSettingsButton:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['cookieSettingsButton'],
     },
   ],
   [

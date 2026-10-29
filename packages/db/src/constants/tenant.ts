@@ -69,6 +69,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
       LOOK_FIELD.ACCENT_HUE,
       LOOK_FIELD.LOGO_ASSET_URL,
       LOOK_FIELD.FAVICON_ASSET_URL,
+      LOOK_FIELD.COOKIE_SETTINGS_BUTTON,
     ],
     modulePacks: [MODULE_PACK.CORE],
   },
