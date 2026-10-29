@@ -302,7 +302,7 @@ Production scope like the rest:
 | Key                       | `web-dev` / `web-prod` value                     |
 | ------------------------- | ------------------------------------------------ |
 | `RESEND_API_KEY`          | the Resend API key                               |
-| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <signin@mail.{your-hosting}>`     |
+| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <sign-in@mail.{your-hosting}>`    |
 | `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>` |
 
 > **Set every `*_FROM_ADDRESS` to an address on a domain verified in
