@@ -12,7 +12,6 @@ export const footerGroupVariants = tv({
     ],
     list: [
       'flex flex-col gap-2',
-      'break-words',
       'group-data-[layout=CENTRED]/footer:contents',
     ],
   },

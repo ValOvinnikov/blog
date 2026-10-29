@@ -14,6 +14,7 @@ const MOCK_GROUPS_LABEL = faker.lorem.words(2);
 const MOCK_FINE_PRINT_LABEL = faker.lorem.words(3);
 const MOCK_GROUP_HEADING = faker.lorem.word();
 const MOCK_ABOUT = faker.lorem.sentence();
+const MOCK_GROUP_TEXT = faker.lorem.sentence();
 const MOCK_ADDRESS = faker.location.streetAddress();
 const MOCK_STRAY_TEXT = faker.lorem.sentence();
 const MOCK_LINK = {
@@ -37,9 +38,12 @@ const renderFullFooter = (layout: TFooterLayout) =>
       <Footer.Address>{MOCK_ADDRESS}</Footer.Address>
       <Footer.Groups ariaLabel={MOCK_GROUPS_LABEL}>
         <Footer.Group heading={MOCK_GROUP_HEADING} headingLevel={2}>
-          <TextLink appearance="nav" href={MOCK_LINK.href}>
-            {MOCK_LINK.label}
-          </TextLink>
+          <Footer.GroupItem>
+            <TextLink appearance="nav" href={MOCK_LINK.href}>
+              {MOCK_LINK.label}
+            </TextLink>
+          </Footer.GroupItem>
+          <Footer.GroupItem>{MOCK_GROUP_TEXT}</Footer.GroupItem>
         </Footer.Group>
       </Footer.Groups>
       <Footer.Wordmark>{MOCK_SITE_TITLE}</Footer.Wordmark>
@@ -155,18 +159,83 @@ describe(`<${Footer.name}/>`, () => {
     expect(wordmark).not.toBeInTheDocument();
   });
 
-  it('renders no link group that has no links', () => {
+  it('lists plain text in a link group as an item beside the links', () => {
+    renderFullFooter(FOOTER_LAYOUT.COLUMNS);
+
+    const groups = screen.getByRole('navigation', { name: MOCK_GROUPS_LABEL });
+    const items = within(groups).getAllByRole('listitem');
+    const textItem = within(groups).getByText(MOCK_GROUP_TEXT);
+
+    expect(items).toHaveLength(2);
+    expect(textItem).toBeVisible();
+  });
+
+  it('divides the brand column from the fine-print row', () => {
     renderElement(
       <Footer>
-        <Footer.Groups ariaLabel={MOCK_GROUPS_LABEL}>
-          <Footer.Group heading={MOCK_GROUP_HEADING} headingLevel={2} />
-        </Footer.Groups>
+        <Footer.About>{MOCK_ABOUT}</Footer.About>
+        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
       </Footer>,
     );
 
-    const heading = screen.queryByRole('heading', { name: MOCK_GROUP_HEADING });
+    const divider = screen.getByRole('separator');
 
+    expect(divider).toBeInTheDocument();
+  });
+
+  it.each([
+    ['logo', <Footer.Logo key="logo" />],
+    ['about text', <Footer.About key="about" />],
+    ['address', <Footer.Address key="address" />],
+    ['social links', <Footer.Social key="social" />],
+  ])('draws no brand column or divider for empty %s', (_, emptySlot) => {
+    renderElement(
+      <Footer>
+        {emptySlot}
+        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
+      </Footer>,
+    );
+
+    const divider = screen.queryByRole('separator');
+
+    expect(divider).not.toBeInTheDocument();
+  });
+
+  it('draws no navigation or divider for link groups that have no items', () => {
+    renderElement(
+      <Footer>
+        <Footer.Groups ariaLabel={MOCK_GROUPS_LABEL}>
+          <Footer.Group heading={MOCK_GROUP_HEADING} headingLevel={2}>
+            <Footer.GroupItem />
+          </Footer.Group>
+          <Footer.Group heading={MOCK_GROUP_HEADING} headingLevel={2} />
+        </Footer.Groups>
+        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
+      </Footer>,
+    );
+
+    const groups = screen.queryByRole('navigation', {
+      name: MOCK_GROUPS_LABEL,
+    });
+    const heading = screen.queryByRole('heading', { name: MOCK_GROUP_HEADING });
+    const divider = screen.queryByRole('separator');
+
+    expect(groups).not.toBeInTheDocument();
     expect(heading).not.toBeInTheDocument();
+    expect(divider).not.toBeInTheDocument();
+  });
+
+  it('draws no divider for an empty wordmark in the Big wordmark layout', () => {
+    renderElement(
+      <Footer layout={FOOTER_LAYOUT.BIG_WORDMARK}>
+        <Footer.Wordmark />
+        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
+      </Footer>,
+    );
+
+    const divider = screen.queryByRole('separator');
+
+    expect(divider).not.toBeInTheDocument();
   });
 
   it('renders Footer.Nav as a labelled navigation', () => {

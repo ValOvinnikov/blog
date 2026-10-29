@@ -12,6 +12,7 @@ export const footerVariants = tv({
     ],
     main: ['grid min-w-0 gap-10'],
     brand: ['flex min-w-0 flex-col gap-4'],
+    divider: ['-mb-4 border-0 border-t border-border'],
     bottom: [
       'flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between',
     ],
@@ -46,9 +47,6 @@ export const footerVariants = tv({
         root: ['px-3 pb-3'],
         inner: ['rounded-card border border-border shadow-card'],
       },
-    },
-    isDivided: {
-      true: { bottom: ['border-t border-border pt-6'] },
     },
     tone: {
       [BRAND_VARIANT.PRIMARY]: {},

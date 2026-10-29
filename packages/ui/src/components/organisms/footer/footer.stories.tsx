@@ -13,31 +13,36 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Footer, type TFooterProps } from './footer';
 import { footerVariants } from './footer-variants';
 
-const groups = [
-  {
-    heading: 'Read',
-    links: [
-      { href: '/blog', label: 'Blog' },
-      { href: '/guides', label: 'Guides' },
-      { href: '/topics', label: 'Topics' },
-    ],
-  },
-  {
-    heading: 'Studio',
-    links: [
-      { href: '/about', label: 'About' },
-      { href: '/team', label: 'Team' },
-      { href: '/contact', label: 'Contact' },
-    ],
-  },
-  {
-    heading: 'Elsewhere',
-    links: [
-      { href: '/newsletter', label: 'Newsletter' },
-      { href: '/rss.xml', label: 'RSS feed' },
-    ],
-  },
-];
+const groups: { heading: string; links: { href?: string; label: string }[] }[] =
+  [
+    {
+      heading: 'Read',
+      links: [
+        { href: '/blog', label: 'Blog' },
+        { href: '/guides', label: 'Guides' },
+        { href: '/topics', label: 'Topics' },
+      ],
+    },
+    {
+      heading: 'Studio',
+      links: [
+        { href: '/about', label: 'About' },
+        { href: '/team', label: 'Team' },
+        { href: '/contact', label: 'Contact' },
+      ],
+    },
+    {
+      heading: 'Elsewhere',
+      links: [
+        { href: '/newsletter', label: 'Newsletter' },
+        { href: '/rss.xml', label: 'RSS feed' },
+      ],
+    },
+    {
+      heading: 'Visit',
+      links: [{ label: 'Mon–Fri, 9am–5pm' }],
+    },
+  ];
 
 const FullContent = (
   <>
@@ -64,9 +69,11 @@ const FullContent = (
       {groups.map(({ heading, links }) => (
         <Footer.Group key={heading} heading={heading} headingLevel={2}>
           {links.map(({ href, label }) => (
-            <TextLink key={href} appearance="nav" href={href}>
-              {label}
-            </TextLink>
+            <Footer.GroupItem key={label}>
+              <TextLink appearance="nav" href={href}>
+                {label}
+              </TextLink>
+            </Footer.GroupItem>
           ))}
         </Footer.Group>
       ))}

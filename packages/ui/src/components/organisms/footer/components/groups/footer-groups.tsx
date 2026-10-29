@@ -1,9 +1,9 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { FooterGroup } from '@blog/ui/components/organisms/footer/components/group/footer-group';
 import type { TCompoundChildren } from '@blog/ui/lib/react';
-import { Children } from 'react';
 
 import { footerGroupsVariants } from './footer-groups-variants';
+import { hasGroupItems } from './has-group-items';
 
 export type TFooterGroupsProps = IWithClassName &
   IWithDataTestId & {
@@ -11,14 +11,14 @@ export type TFooterGroupsProps = IWithClassName &
     children?: TCompoundChildren<{ Group: typeof FooterGroup }>;
   };
 
-/** The footer's named link groups, set two per row on phones and as one centred row of links in the Centred layout. */
+/** The footer's navigation landmark for the editor's link groups. */
 export const FooterGroups = ({
   ariaLabel,
   className,
   dataTestId,
   children,
 }: TFooterGroupsProps) => {
-  if (Children.count(children) === 0) {
+  if (!hasGroupItems(children)) {
     return null;
   }
   return (

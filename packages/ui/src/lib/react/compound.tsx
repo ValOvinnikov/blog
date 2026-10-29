@@ -1,3 +1,4 @@
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import {
   Children,
   type ComponentProps,
@@ -72,3 +73,8 @@ type TMaybeSlotElement<Parts extends Record<string, ElementType>> =
 
 export type TCompoundChildren<Parts extends Record<string, ElementType>> =
   TMaybeSlotElement<Parts> | TMaybeSlotElement<Parts>[];
+
+/** Whether a slot element was passed any children, so a parent can leave out the wrapper around a slot that would render nothing. */
+export const hasSlotContent = (slot: ReactNode): boolean =>
+  isValidElement<{ children?: ReactNode }>(slot) &&
+  hasArrayGotItems(Children.toArray(slot.props.children));

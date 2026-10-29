@@ -10,33 +10,21 @@ import {
 } from '@blog/ui/lib/react';
 import { Fragment, type ElementType } from 'react';
 
-import { FooterAbout } from './components/about/footer-about';
-import { FooterAddress } from './components/address/footer-address';
-import { FooterCopyright } from './components/copyright/footer-copyright';
-import { FooterFinePrint } from './components/fine-print/footer-fine-print';
 import { FooterGroup } from './components/group/footer-group';
-import { FooterGroups } from './components/groups/footer-groups';
-import { FooterLogo } from './components/logo/footer-logo';
-import { FooterNav } from './components/nav/footer-nav';
-import { FooterSocial } from './components/social/footer-social';
-import { FooterWordmark } from './components/wordmark/footer-wordmark';
+import { FooterGroupItem } from './components/group-item/footer-group-item';
+import {
+  BOTTOM_SLOTS,
+  BRAND_SLOTS,
+  FooterSlotParts,
+  LAYOUT_SLOTS,
+  SLOT_HAS_CONTENT,
+} from './footer-slots';
 import { footerVariants, type TFooterVariants } from './footer-variants';
-
-const FooterSlotParts = {
-  Logo: FooterLogo,
-  About: FooterAbout,
-  Address: FooterAddress,
-  Social: FooterSocial,
-  Groups: FooterGroups,
-  Wordmark: FooterWordmark,
-  Copyright: FooterCopyright,
-  FinePrint: FooterFinePrint,
-  Nav: FooterNav,
-} satisfies Record<string, ElementType>;
 
 const FooterParts = {
   ...FooterSlotParts,
   Group: FooterGroup,
+  GroupItem: FooterGroupItem,
 } satisfies Record<string, ElementType>;
 
 export type TFooterProps = IWithClassName &
@@ -47,7 +35,7 @@ export type TFooterProps = IWithClassName &
     children?: TCompoundChildren<typeof FooterSlotParts>;
   };
 
-/** The site footer: a brand column, named link groups and a fine-print row, arranged by `layout`, set full width or as a card by `surface`, on the skin `tone` picks. */
+/** The public site's footer, where readers find the site's links, contact details and legal fine print. */
 const FooterRoot = ({
   layout = FOOTER_LAYOUT.COLUMNS,
   surface,
@@ -57,21 +45,21 @@ const FooterRoot = ({
   dataTestId,
 }: TFooterProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, FooterSlotParts);
-  const isCompact = layout === FOOTER_LAYOUT.COMPACT;
-  const logo = isCompact ? undefined : slots.Logo;
-  const about = isCompact ? undefined : slots.About;
-  const address = isCompact ? undefined : slots.Address;
-  const groups = isCompact ? undefined : slots.Groups;
-  const wordmark =
-    layout === FOOTER_LAYOUT.BIG_WORDMARK ? slots.Wordmark : undefined;
-  const hasBrand = Boolean(logo || about || address || slots.Social);
-  const hasMain = hasBrand || Boolean(groups);
-  const hasBottom = Boolean(slots.Copyright || slots.FinePrint || slots.Nav);
-  const { root, inner, main, brand, bottom } = footerVariants({
+  const shown = LAYOUT_SLOTS[layout].filter((key) =>
+    SLOT_HAS_CONTENT[key](slots[key]),
+  );
+  const isShown = (key: keyof typeof FooterSlotParts) => shown.includes(key);
+  const hasBrand = BRAND_SLOTS.some(isShown);
+  const hasMain = hasBrand || isShown('Groups');
+  const hasBottom = BOTTOM_SLOTS.some(isShown);
+  const isDivided =
+    layout !== FOOTER_LAYOUT.COMPACT &&
+    hasBottom &&
+    (hasMain || isShown('Wordmark'));
+  const { root, inner, main, brand, divider, bottom } = footerVariants({
     layout,
     surface,
     tone,
-    isDivided: !isCompact && (hasMain || Boolean(wordmark)),
   });
 
   return (
@@ -85,21 +73,21 @@ const FooterRoot = ({
           <div className={main()}>
             {hasBrand && (
               <div className={brand()}>
-                {logo}
-                {about}
-                {address}
-                {slots.Social}
+                {BRAND_SLOTS.filter(isShown).map((key) => (
+                  <Fragment key={key}>{slots[key]}</Fragment>
+                ))}
               </div>
             )}
-            {groups}
+            {isShown('Groups') && slots.Groups}
           </div>
         )}
-        {wordmark}
+        {isShown('Wordmark') && slots.Wordmark}
+        {isDivided && <hr className={divider()} />}
         {hasBottom && (
           <div className={bottom()}>
-            {slots.Copyright}
-            {slots.FinePrint}
-            {slots.Nav}
+            {BOTTOM_SLOTS.filter(isShown).map((key) => (
+              <Fragment key={key}>{slots[key]}</Fragment>
+            ))}
           </div>
         )}
         {unmatched.map((node, i) => (
