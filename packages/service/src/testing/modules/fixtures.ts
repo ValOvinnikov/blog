@@ -22,6 +22,7 @@ import {
 } from '@blog/config';
 import type { TRawContactFormModule } from '@blog/service/features/modules/contact-form/adaptor/transformer';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
+import type { TRawCookieSettingsModule } from '@blog/service/features/modules/cookie-settings/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
 import type { TRawFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/transformer';
@@ -71,6 +72,7 @@ export const MOCK_HERO_EYEBROW = 'Field notes';
 export const MOCK_HERO_IMAGE_ALT = 'Custom alt';
 export const MOCK_FEATURED_POST_ID = 'featured-ref';
 export const MOCK_CONTENT_MODULE_ID = 'content-1';
+export const MOCK_COOKIE_SETTINGS_MODULE_ID = 'cookie-settings-1';
 export const MOCK_CTA_MODULE_ID = 'cta-1';
 export const MOCK_FAQ_MODULE_ID = 'faq-1';
 export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
@@ -91,6 +93,7 @@ export const MOCK_CTA_BUTTON_URL = '/newsletter';
 export const MOCK_FAQ_QUESTION_ID = 'block-faq-1';
 export const MOCK_SECOND_FAQ_QUESTION_ID = 'block-faq-2';
 export const MOCK_SECTION_PAGES_HEADING = 'In this section';
+export const MOCK_COOKIE_SETTINGS_HEADING = 'Your cookie choices';
 const MOCK_NEWSLETTER_HEADING = 'Stay in the loop';
 export const MOCK_RECENT_POSTS_HEADING = 'Recent writing';
 export const MOCK_POST_LIST_PAGE_SIZE = 9;
@@ -467,6 +470,17 @@ export function mockRawContactFormModule(
     privacyNote: null,
     layout: null,
     contentAlignment: null,
+    ...overrides,
+  };
+}
+
+export function mockRawCookieSettingsModule(
+  overrides: Partial<TRawCookieSettingsModule> = {},
+): TRawCookieSettingsModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: mockRawHeadingBlock(MOCK_COOKIE_SETTINGS_HEADING),
+    layout: null,
     ...overrides,
   };
 }

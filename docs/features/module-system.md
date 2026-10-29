@@ -56,7 +56,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 ## Configuration
 
 - Editors (Studio) create module documents, set their fields, and order them in a template's Modules field. Every page accepts `module_cta` and `module_newsletter`; each template adds its own list in `modulesField({ extend })`. See [page-types](./page-types.md) for each template's list.
-- `module_cookieSettings` (Cookie Settings, Conversion group) is accepted by `template_home` and `template_landing` and carries only the shared fields, its heading optional. It exists in Studio only so far: the web has no renderer for it, so a placed one renders nothing.
+- `module_cookieSettings` (Cookie Settings, Conversion group) is accepted by `template_home` and `template_landing` and carries only the shared fields, its heading optional. `service.modules.cookieSettings.v1.getCookieSettings` returns its background, optional heading and layout, but the web has no renderer for it yet, so a placed one renders nothing.
 - `module_newsletter` is the only capability-gated module: Studio flags it when the Newsletter capability is off, and the web module renders nothing ([newsletter](./newsletter.md), [plans-and-entitlements](./plans-and-entitlements.md)). No module is plan-gated.
 - Look reach: accent hue (the Brand tint band and every accent colour), card style, radius, fonts and density restyle every module through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Voice reaches only the empty states of the post list and taxonomy list ([voice](./voice.md)).
 
