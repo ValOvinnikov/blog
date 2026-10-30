@@ -31,6 +31,8 @@ export const MOCK_TENANT_DOMAIN = tenantsFaker.internet.domainName();
 export const MOCK_MISSING_TENANT_ID = tenantsFaker.string.uuid();
 export const MOCK_TENANT_READ_TOKEN = tenantsFaker.string.alphanumeric(32);
 export const MOCK_TENANT_WRITE_TOKEN = tenantsFaker.string.alphanumeric(32);
+export const MOCK_TENANT_MANAGEMENT_TOKEN =
+  tenantsFaker.string.alphanumeric(32);
 export const MOCK_DEPROVISIONED_AT = tenantsFaker.date.past({
   refDate: MOCK_NOW,
 });
@@ -100,6 +102,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: faker.word.noun(),
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
+    sanityManagementTokenEncrypted: null,
     revalidateWebhookSecretEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
     additionalLocales: [],

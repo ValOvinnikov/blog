@@ -42,6 +42,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   sanityDataset: MOCK_TENANT_SANITY_CONTEXT.dataset,
   sanityReadTokenEncrypted: null,
   sanityWriteTokenEncrypted: null,
+  sanityManagementTokenEncrypted: null,
   revalidateWebhookSecretEncrypted: null,
   locale: LOCALE_ISO_CODES.EN,
   additionalLocales: [LOCALE_ISO_CODES.NL],
