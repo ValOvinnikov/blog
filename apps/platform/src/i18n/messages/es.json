@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "Todavía no hay clientes.",
+    "noMatches": "Ningún cliente coincide con «{search}».",
     "columnTenant": "Cliente",
     "columnPlan": "Plan",
     "columnStatus": "Estado",
@@ -261,6 +262,10 @@
     },
     "manage": "Gestionar",
     "manageAriaLabel": "Gestionar {tenantName}"
+  },
+  "tenantsSearch": {
+    "label": "Buscar clientes",
+    "hint": "Nombre o dominio: pulsa Intro para buscar."
   },
   "findingsView": {
     "title": "Incidencias",

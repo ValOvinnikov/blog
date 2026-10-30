@@ -24,7 +24,7 @@ describe(toRequestedPath, () => {
     {
       name: 'drops the client-navigation cache-buster',
       requested: `${adminRoutes.tenants()}?${MOCK_ARCHIVED_QUERY}&${MOCK_CACHE_BUSTER}`,
-      expected: adminRoutes.tenants({ archived: true }),
+      expected: adminRoutes.tenants({ shouldShowArchived: true }),
     },
   ])('$name', ({ requested, expected }) => {
     expect(toRequestedPath(toUrl(requested))).toBe(expected);

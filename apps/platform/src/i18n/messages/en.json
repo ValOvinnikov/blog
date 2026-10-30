@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "No tenants yet.",
+    "noMatches": "No tenants match “{search}”.",
     "columnTenant": "Tenant",
     "columnPlan": "Plan",
     "columnStatus": "Status",
@@ -261,6 +262,10 @@
     },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"
+  },
+  "tenantsSearch": {
+    "label": "Search tenants",
+    "hint": "Name or domain — press Enter to search."
   },
   "findingsView": {
     "title": "Findings",

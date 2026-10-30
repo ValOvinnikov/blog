@@ -76,3 +76,10 @@ export const TENANT_LOG = {
   UPDATE_LANGUAGES_FAILED: 'tenants.update_languages_failed',
   UPDATE_LANGUAGES_REJECTED: 'tenants.update_languages_rejected',
 } as const;
+
+export const TENANT_VISIBILITY = {
+  ACTIVE: 'ACTIVE',
+  ALL: 'ALL',
+} as const;
+
+export type TTenantVisibility = TValueOf<typeof TENANT_VISIBILITY>;

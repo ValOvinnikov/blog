@@ -1,3 +1,9 @@
+import {
+  ARCHIVED_PARAM_ON,
+  DEFAULT_TENANTS_SORT,
+  type TTenantsListQuery,
+} from '@platform/utils/tenants-list-query/tenants-list-query';
+
 /**
  * The final path segment both Studio routes share — also matched against
  * `useSelectedLayoutSegment()` by `ShellFrame` to switch `AdminShell`'s
@@ -18,8 +24,24 @@ export const adminRoutes = {
   signInError: () => '/sign-in-error',
   signUp: () => '/signup',
   onboarding: () => '/onboarding',
-  tenants: (options?: { archived?: boolean }) =>
-    options?.archived ? '/tenants?archived=1' : '/tenants',
+  tenants: ({
+    shouldShowArchived = false,
+    sort = DEFAULT_TENANTS_SORT,
+    search = '',
+  }: Partial<TTenantsListQuery> = {}) => {
+    const params = new URLSearchParams();
+    if (shouldShowArchived) params.set('archived', ARCHIVED_PARAM_ON);
+    if (
+      sort.column !== DEFAULT_TENANTS_SORT.column ||
+      sort.direction !== DEFAULT_TENANTS_SORT.direction
+    ) {
+      params.set('sort', sort.column);
+      params.set('direction', sort.direction);
+    }
+    if (search) params.set('q', search);
+    const query = params.toString();
+    return query ? `/tenants?${query}` : '/tenants';
+  },
   newTenant: () => '/tenants/new',
   findings: () => '/findings',
   releases: () => '/releases',

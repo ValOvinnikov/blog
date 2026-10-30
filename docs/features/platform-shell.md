@@ -41,9 +41,14 @@ that the platform hosts more than one tenant. The 404, error and
 
 URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
 
-- **Operator Platform section**, the `(operator)` group: `/tenants` (with
-  `?archived=1`), `/tenants/new`, `/findings`. `/` redirects an admin to
-  `/tenants`.
+- **Operator Platform section**, the `(operator)` group: `/tenants`,
+  `/tenants/new`, `/findings`. `/` redirects an admin to `/tenants`. The
+  tenants table opens newest first; each column header sorts it and a second
+  click reverses, and a search field narrows it by name or any of the
+  tenant's domains, so a site on a custom domain is still found by its slug. Visibility, sort and search live in the URL
+  (`?archived=1&sort=<column>&direction=<ascending|descending>&q=`), so a
+  reload or shared link keeps them; `listTenants`' own default order stays by
+  name, which the dashboard tenant picker relies on.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
   Languages, Domain, Email, Studio, Provisioning and Danger zone pages. The
   sidebar shows the Platform section plus the tenant's own sections.

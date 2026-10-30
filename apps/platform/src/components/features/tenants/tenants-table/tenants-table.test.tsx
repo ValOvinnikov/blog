@@ -1,3 +1,4 @@
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
@@ -5,8 +6,10 @@ import {
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
-  mockReadyTenant,
+  mockReadyClientTenant,
+  mockTenantsListQuery,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
@@ -14,14 +17,22 @@ import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
   MOCK_TENANT_ID,
+  MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';
 
-const setup = customRender(TenantsTable, { tenants: [mockReadyTenant()] });
+vi.mock('@platform/i18n/navigation');
+
+const setup = customRender(TenantsTable, {
+  tenants: [mockReadyClientTenant()],
+  listQuery: mockTenantsListQuery(),
+  toolbar: null,
+});
 
 const otherTenant = (overrides: Partial<TTenant> = {}) =>
-  mockReadyTenant({
+  mockReadyClientTenant({
     id: MOCK_OTHER_TENANT_ID,
     name: MOCK_OTHER_TENANT_NAME,
     primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
@@ -30,12 +41,16 @@ const otherTenant = (overrides: Partial<TTenant> = {}) =>
 
 const MANAGE_TENANT = `Manage ${MOCK_TENANT_NAME}`;
 const MANAGE_OTHER_TENANT = `Manage ${MOCK_OTHER_TENANT_NAME}`;
+const ARIA_SORT = 'aria-sort';
+const TENANT_COLUMN = 'Tenant';
+const CREATED_COLUMN = 'Created';
+const PLAN_COLUMN = 'Plan';
 
 describe(`<${TenantsTable.name}/>`, () => {
   it("shows each tenant's name, domain, plan and status", () => {
     setup({
       tenants: [
-        mockReadyTenant(),
+        mockReadyClientTenant(),
         otherTenant({
           plan: TENANT_PLAN.GROWTH,
           status: TENANT_STATUS.SUSPENDED,
@@ -61,7 +76,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   });
 
   it('links a ready tenant to its overview page', () => {
-    setup({ tenants: [mockReadyTenant(), otherTenant()] });
+    setup({ tenants: [mockReadyClientTenant(), otherTenant()] });
 
     const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
     const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
@@ -76,7 +91,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   it('links a not-yet-ready tenant to its provisioning page', () => {
     setup({
       tenants: [
-        mockReadyTenant({
+        mockReadyClientTenant({
           provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         }),
         otherTenant({
@@ -132,5 +147,76 @@ describe(`<${TenantsTable.name}/>`, () => {
 
     expect(emptyMessage).toBeVisible();
     expect(table).not.toBeInTheDocument();
+  });
+
+  it('names the search when no tenant matches it', () => {
+    setup({
+      tenants: [],
+      listQuery: mockTenantsListQuery({ search: MOCK_TENANT_SLUG }),
+    });
+
+    const emptyMessage = screen.getByText(
+      `No tenants match “${MOCK_TENANT_SLUG}”.`,
+    );
+
+    expect(emptyMessage).toBeVisible();
+  });
+
+  describe('sorting', () => {
+    let user: UserEvent;
+    let push: ReturnType<typeof mockLocaleRouterPush>;
+
+    beforeEach(() => {
+      user = userEvent.setup();
+      push = mockLocaleRouterPush();
+    });
+
+    describe('with the default sort', () => {
+      beforeEach(() => {
+        setup();
+      });
+
+      it('announces the created column as sorted newest first', () => {
+        const createdHeader = screen.getByRole('columnheader', {
+          name: CREATED_COLUMN,
+        });
+        const tenantHeader = screen.getByRole('columnheader', {
+          name: TENANT_COLUMN,
+        });
+
+        expect(createdHeader).toHaveAttribute(
+          ARIA_SORT,
+          SORT_DIRECTION.DESCENDING,
+        );
+        expect(tenantHeader).not.toHaveAttribute(ARIA_SORT);
+      });
+
+      it('sorts another column ascending when its header is clicked', async () => {
+        const tenantSort = screen.getByRole('button', { name: TENANT_COLUMN });
+        await user.click(tenantSort);
+
+        expect(push).toHaveBeenCalledWith(
+          '/tenants?sort=NAME&direction=ascending',
+        );
+      });
+    });
+
+    it('reverses the sorted column when its header is clicked again', async () => {
+      setup({
+        listQuery: mockTenantsListQuery({
+          sort: {
+            column: TENANT_SORT_COLUMN.PLAN,
+            direction: SORT_DIRECTION.ASCENDING,
+          },
+        }),
+      });
+
+      const planSort = screen.getByRole('button', { name: PLAN_COLUMN });
+      await user.click(planSort);
+
+      expect(push).toHaveBeenCalledWith(
+        '/tenants?sort=PLAN&direction=descending',
+      );
+    });
   });
 });

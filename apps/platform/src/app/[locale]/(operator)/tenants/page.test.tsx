@@ -1,12 +1,15 @@
+import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_NAME,
+  MOCK_TENANT_SLUG,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
+import { DEFAULT_TENANTS_SORT } from '@platform/utils/tenants-list-query/tenants-list-query';
 
 import TenantsPage from './page';
 
@@ -55,9 +58,32 @@ describe(`<${TenantsPage.name}/>`, () => {
     async ({ archived, includeArchived }) => {
       await setup({ searchParams: Promise.resolve({ archived }) });
 
-      expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived });
+      expect(listTenantsMock).toHaveBeenCalledWith({
+        includeArchived,
+        sort: DEFAULT_TENANTS_SORT,
+        search: '',
+      });
     },
   );
+
+  it('reads tenants in the sort and search the URL asks for', async () => {
+    await setup({
+      searchParams: Promise.resolve({
+        sort: TENANT_SORT_COLUMN.NAME,
+        direction: SORT_DIRECTION.ASCENDING,
+        q: MOCK_TENANT_SLUG,
+      }),
+    });
+
+    expect(listTenantsMock).toHaveBeenCalledWith({
+      includeArchived: false,
+      sort: {
+        column: TENANT_SORT_COLUMN.NAME,
+        direction: SORT_DIRECTION.ASCENDING,
+      },
+      search: MOCK_TENANT_SLUG,
+    });
+  });
 
   it('hides the email-alerts banner when Resend is configured', async () => {
     await setup();
