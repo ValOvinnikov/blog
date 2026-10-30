@@ -1,6 +1,7 @@
 import {
   COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
+  type IFooterStyle,
   LOCALE_ISO_CODES,
   routes,
   SITE_MESSAGES,
@@ -63,6 +64,18 @@ const getFooterStyleMock = vi.mocked(getFooterStyle);
 const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
 
 const setup = customRenderAsync(SiteFooter, {});
+
+const setupWithFooterStyle = async ({
+  style = {},
+  isConsentBannerEnabled = false,
+}: {
+  style?: Partial<IFooterStyle>;
+  isConsentBannerEnabled?: boolean;
+}) => {
+  getFooterStyleMock.mockResolvedValueOnce({ ...MOCK_FOOTER_STYLE, ...style });
+  isCapabilityEnabledMock.mockResolvedValueOnce(isConsentBannerEnabled);
+  await setup();
+};
 
 describe(`<${SiteFooter.name}/>`, () => {
   beforeEach(() => {
@@ -170,12 +183,7 @@ describe(`<${SiteFooter.name}/>`, () => {
   it.each(Object.values(FOOTER_LAYOUT))(
     'lays the footer out as the stored %s layout',
     async (layout) => {
-      getFooterStyleMock.mockResolvedValueOnce({
-        ...MOCK_FOOTER_STYLE,
-        layout,
-      });
-
-      await setup();
+      await setupWithFooterStyle({ style: { layout } });
 
       const footer = screen.getByRole('contentinfo');
       expect(footer).toHaveAttribute('data-layout', layout);
@@ -183,12 +191,9 @@ describe(`<${SiteFooter.name}/>`, () => {
   );
 
   it('sets the site name large in the Big wordmark layout', async () => {
-    getFooterStyleMock.mockResolvedValueOnce({
-      ...MOCK_FOOTER_STYLE,
-      layout: FOOTER_LAYOUT.BIG_WORDMARK,
+    await setupWithFooterStyle({
+      style: { layout: FOOTER_LAYOUT.BIG_WORDMARK },
     });
-
-    await setup();
 
     const wordmark = screen.getByText(MOCK_SITE_SETTINGS.brand.name, {
       ignore: 'p',
@@ -215,13 +220,10 @@ describe(`<${SiteFooter.name}/>`, () => {
     afterEach(clearConsentCookie);
 
     it('shows the floating Cookie settings button when it is Shown and the banner is on', async () => {
-      getFooterStyleMock.mockResolvedValueOnce({
-        ...MOCK_FOOTER_STYLE,
-        cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+      await setupWithFooterStyle({
+        style: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+        isConsentBannerEnabled: true,
       });
-      isCapabilityEnabledMock.mockResolvedValueOnce(true);
-
-      await setup();
 
       const floatingButton = screen.getByTestId(
         FLOATING_COOKIE_SETTINGS_TEST_ID,
@@ -230,9 +232,7 @@ describe(`<${SiteFooter.name}/>`, () => {
     });
 
     it('leaves the floating button out while it is Hidden', async () => {
-      isCapabilityEnabledMock.mockResolvedValueOnce(true);
-
-      await setup();
+      await setupWithFooterStyle({ isConsentBannerEnabled: true });
 
       const floatingButton = screen.queryByTestId(
         FLOATING_COOKIE_SETTINGS_TEST_ID,
@@ -241,12 +241,9 @@ describe(`<${SiteFooter.name}/>`, () => {
     });
 
     it('leaves the floating button out with the consent banner off', async () => {
-      getFooterStyleMock.mockResolvedValueOnce({
-        ...MOCK_FOOTER_STYLE,
-        cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+      await setupWithFooterStyle({
+        style: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
       });
-
-      await setup();
 
       const floatingButton = screen.queryByTestId(
         FLOATING_COOKIE_SETTINGS_TEST_ID,
