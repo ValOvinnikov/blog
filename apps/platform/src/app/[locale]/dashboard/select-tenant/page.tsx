@@ -4,8 +4,10 @@ import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toTenantPickerItems } from '@platform/server/tenants/to-tenant-picker-items';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { redirect } from 'next/navigation';
+
+export const viewport: Viewport = { viewportFit: 'cover' };
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('selectTenant');
