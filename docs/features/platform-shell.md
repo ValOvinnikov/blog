@@ -35,7 +35,8 @@ nav sections, a topbar with a breadcrumb and an account menu, and a content
 column. It comes in three gated trees: the operator's Platform section, the
 operator's view of one tenant, and the owner's `/dashboard`, which never shows
 that the platform hosts more than one tenant. The 404, error and
-`/dashboard/select-tenant` pages use a smaller pre-shell frame.
+`/dashboard/select-tenant` pages use the branded pre-shell
+`CenteredCardFrame`.
 
 ## Surfaces and routes
 

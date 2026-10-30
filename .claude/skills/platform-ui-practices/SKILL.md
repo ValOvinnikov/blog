@@ -198,12 +198,12 @@ from `useSettingsFormState()`:
   `headerActions`) and, like Look, splits editor and preview 50/50 from `lg`.
 - A grid inside a column sizes from that column: `@container` on the card body
   and `@sm:grid-cols-2` on the grid.
-- Pre-shell pages (the tenant picker) render `PreShellFrame`: a
-  full-width `min-h-dvh bg-admin-bg` root holding one `<main>`, a centred
-  `max-w-sm` column, and one `Card` whose top is the `PageHeader` band passed
-  as `header`, with the content in its body. Choices are visible light-surface
-  link rows, none pre-selected; dark sidebar components never sit on a light
-  page.
+- Pre-shell pages (the tenant picker, 404, error, sign-in error) render
+  `CenteredCardFrame`: one `<main>` holding the brand mark and wordmark above
+  one centred `Card`, whose body stacks the `PageHeader` (or the dead-end
+  copy), the content, and a top-ruled `SignedInAccount` row last. Choices are
+  visible light-surface link rows, none pre-selected; dark sidebar components
+  never sit on a light page.
 - The Studio route is full-bleed in every state, and is the only route that
   is: neither `ShellFrame` nor `StudioMountView` adds padding around the
   mounted Studio or its archived and not-provisioned states.

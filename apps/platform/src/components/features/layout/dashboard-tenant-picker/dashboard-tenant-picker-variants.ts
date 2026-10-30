@@ -2,6 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const dashboardTenantPickerVariants = tv({
   slots: {
+    content: ['flex flex-col gap-5'],
     list: ['flex flex-col divide-y divide-admin-line-2'],
     row: [
       'flex flex-col rounded-admin-control px-2.5 py-2 no-underline',
@@ -14,5 +15,6 @@ export const dashboardTenantPickerVariants = tv({
     ],
     domain: ['truncate font-mono text-admin-12 text-admin-muted'],
     badge: ['shrink-0'],
+    account: ['border-t border-admin-line-2 pt-3 text-admin-muted'],
   },
 });

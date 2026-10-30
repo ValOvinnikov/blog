@@ -1,5 +1,5 @@
 import type { TTenant } from '@blog/db/schema/tenants';
-import { PreShellFrame } from '@platform/components/features/layout/pre-shell-frame';
+import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -21,7 +21,7 @@ export const DashboardTenantPicker = ({
 }: TDashboardTenantPickerProps) => {
   const t = useTranslations('dashboardTenantPicker');
   const tSwitcher = useTranslations('tenantSwitcher');
-  const { list, row, nameRow, name, domain, badge } =
+  const { content, list, row, nameRow, name, domain, badge, account } =
     dashboardTenantPickerVariants();
 
   if (tenants.length === 0) {
@@ -29,37 +29,40 @@ export const DashboardTenantPicker = ({
   }
 
   return (
-    <PreShellFrame
-      header={
+    <CenteredCardFrame>
+      <div className={content()}>
         <PageHeader title={t('heading')} description={t('description')} />
-      }
-      footer={accountEmail && <SignedInAccount email={accountEmail} />}
-    >
-      <ul className={list()}>
-        {toTenantSwitcherItems(tenants).map((tenant) => (
-          <li key={tenant.id}>
-            <Link
-              href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
-              prefetch={false}
-              className={row()}
-            >
-              <span className={nameRow()}>
-                <span className={name()}>{tenant.name}</span>
-                {tenant.isArchived && (
-                  <StatusBadge
-                    tone="neutral"
-                    hasDot={false}
-                    className={badge()}
-                  >
-                    {tSwitcher('archived')}
-                  </StatusBadge>
-                )}
-              </span>
-              <span className={domain()}>{tenant.primaryDomain}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </PreShellFrame>
+        <ul className={list()}>
+          {toTenantSwitcherItems(tenants).map((tenant) => (
+            <li key={tenant.id}>
+              <Link
+                href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
+                prefetch={false}
+                className={row()}
+              >
+                <span className={nameRow()}>
+                  <span className={name()}>{tenant.name}</span>
+                  {tenant.isArchived && (
+                    <StatusBadge
+                      tone="neutral"
+                      hasDot={false}
+                      className={badge()}
+                    >
+                      {tSwitcher('archived')}
+                    </StatusBadge>
+                  )}
+                </span>
+                <span className={domain()}>{tenant.primaryDomain}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        {accountEmail && (
+          <div className={account()}>
+            <SignedInAccount email={accountEmail} />
+          </div>
+        )}
+      </div>
+    </CenteredCardFrame>
   );
 };

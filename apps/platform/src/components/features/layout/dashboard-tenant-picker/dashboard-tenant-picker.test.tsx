@@ -87,6 +87,32 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       expect(activeBadge).not.toBeInTheDocument();
     });
 
+    it('names the product, then shows the heading, the tenants and the account in that order', () => {
+      const main = screen.getByRole('main');
+      const wordmark = within(main).getByText(
+        messages.centeredCardFrame.brandName,
+      );
+      const heading = within(main).getByRole('heading', {
+        name: messages.dashboardTenantPicker.heading,
+      });
+      const tenantLink = within(main).getByRole('link', {
+        name: MOCK_TENANT_NAME_PATTERN,
+      });
+      const signOutButton = within(main).getByRole('button', {
+        name: messages.account.signOut,
+      });
+
+      expect(wordmark.compareDocumentPosition(heading)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+      expect(heading.compareDocumentPosition(tenantLink)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+      expect(tenantLink.compareDocumentPosition(signOutButton)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    });
+
     it('names the signed-in email and offers a sign out', () => {
       const email = screen.getByText(MOCK_SIGN_IN_EMAIL, { exact: false });
       const signOutButton = screen.getByRole('button', {
