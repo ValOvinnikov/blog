@@ -1,42 +1,17 @@
 'use client';
 
-import { CONSENT_CATEGORY } from '@blog/config';
 import { ConsentPreferences } from '@blog/ui/components/molecules/consent-preferences';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
-import { useConsentStore } from '@web/hooks/use-consent-store';
-import { OPTIONAL_CONSENT_CATEGORIES } from '@web/utils/consent-cookie';
+import { useConsentPreferencesForm } from '@web/hooks/use-consent-preferences-form';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
 
 export const ConsentPreferencesForm = () => {
-  const t = useTranslations('consent');
-  const { granted, save } = useConsentStore();
+  const t = useTranslations('consent.preferences');
+  const { categories, values, setCategory, save } = useConsentPreferencesForm();
   const { close } = useConsentPreferences();
-  const [values, setValues] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(
-      OPTIONAL_CONSENT_CATEGORIES.map((category) => [
-        category,
-        granted.includes(category),
-      ]),
-    ),
-  );
-
-  const categories = [
-    {
-      id: CONSENT_CATEGORY.NECESSARY,
-      label: t('categories.necessary.label'),
-      description: t('categories.necessary.description'),
-      isLocked: true,
-    },
-    {
-      id: CONSENT_CATEGORY.EXTERNAL_MEDIA,
-      label: t('categories.externalMedia.label'),
-      description: t('categories.externalMedia.description'),
-    },
-  ];
 
   const handleSave = () => {
-    save(OPTIONAL_CONSENT_CATEGORIES.filter((category) => values[category]));
+    save();
     close();
   };
 
@@ -44,12 +19,10 @@ export const ConsentPreferencesForm = () => {
     <ConsentPreferences
       categories={categories}
       values={values}
-      onCategoryChange={(id, checked) =>
-        setValues((current) => ({ ...current, [id]: checked }))
-      }
-      saveLabel={t('preferences.saveLabel')}
+      onCategoryChange={setCategory}
+      saveLabel={t('saveLabel')}
       onSave={handleSave}
-      closeLabel={t('preferences.closeLabel')}
+      closeLabel={t('closeLabel')}
       onClose={close}
       dataTestId="consent-preferences"
     />

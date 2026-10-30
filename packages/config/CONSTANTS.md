@@ -490,6 +490,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/consent` — `apps/web/src/constants/consent.ts`
 
 - **CONSENT_STATUS**: `UNKNOWN`, `UNANSWERED`, `ANSWERED`, `GRANTED`, `DENIED`
+- **CONSENT_LOG**: `MODULE_FETCH_FAILED`=`"cookie_settings_module.fetch_failed"`
 
 ### `@web/constants/contact-form` — `apps/web/src/constants/contact-form.ts`
 

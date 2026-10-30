@@ -9,6 +9,7 @@ import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContactFormModule } from '@web/modules/contact-form/contact-form-module';
 import { ContentModule } from '@web/modules/content/content-module';
+import { CookieSettingsModule } from '@web/modules/cookie-settings/cookie-settings-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { FaqModule } from '@web/modules/faq/faq-module';
 import { FeatureHighlightsModule } from '@web/modules/feature-highlights/feature-highlights-module';
@@ -41,6 +42,7 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
   module_contactForm: ContactFormModule,
+  module_cookieSettings: CookieSettingsModule,
   module_postLatest: PostLatestModule,
   module_taxonomyList: TaxonomyListModule,
   module_postFeatured: PostFeaturedModule,
