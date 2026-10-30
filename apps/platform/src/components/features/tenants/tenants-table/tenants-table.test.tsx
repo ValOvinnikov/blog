@@ -44,6 +44,7 @@ const MANAGE_OTHER_TENANT = `Manage ${MOCK_OTHER_TENANT_NAME}`;
 const ARIA_SORT = 'aria-sort';
 const TENANT_COLUMN = 'Tenant';
 const CREATED_COLUMN = 'Created';
+const PLAN_COLUMN = 'Plan';
 
 describe(`<${TenantsTable.name}/>`, () => {
   it("shows each tenant's name, domain, plan and status", () => {
@@ -209,7 +210,7 @@ describe(`<${TenantsTable.name}/>`, () => {
         }),
       });
 
-      const planSort = screen.getByRole('button', { name: 'Plan' });
+      const planSort = screen.getByRole('button', { name: PLAN_COLUMN });
       await user.click(planSort);
 
       expect(push).toHaveBeenCalledWith(

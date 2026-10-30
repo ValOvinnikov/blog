@@ -3,10 +3,21 @@ import {
   TENANT_SORT_COLUMN,
   type TTenantSortColumn,
 } from '@blog/config/constants';
-import type { TColumnSort } from '@blog/config/types';
+import type { TColumnSort, TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
+import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { and, asc, desc, ilike, isNull, or, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  exists,
+  ilike,
+  isNull,
+  or,
+  type SQL,
+} from 'drizzle-orm';
 
 export type TTenantSort = TColumnSort<TTenantSortColumn>;
 
@@ -32,12 +43,22 @@ function escapeLikePattern(value: string): string {
   return value.replace(/[\\%_]/g, (character) => `\\${character}`);
 }
 
-function matchesSearch(search: string): SQL | undefined {
+function matchesSearch(search: string): TMaybeUndefined<SQL> {
   const pattern = `%${escapeLikePattern(search)}%`;
+  const matchingDomain = getDb()
+    .select({ id: tenantDomains.id })
+    .from(tenantDomains)
+    .where(
+      and(
+        eq(tenantDomains.tenantId, tenants.id),
+        ilike(tenantDomains.domain, pattern),
+      ),
+    );
 
   return or(
     ilike(tenants.name, pattern),
     ilike(tenants.primaryDomain, pattern),
+    exists(matchingDomain),
   );
 }
 

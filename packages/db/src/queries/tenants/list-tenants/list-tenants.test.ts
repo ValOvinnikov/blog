@@ -22,6 +22,8 @@ const MOCK_OLDER_CREATED_AT = faker.date.past({
   refDate: MOCK_NEWER_CREATED_AT,
 });
 const MOCK_SEARCH_WORD = faker.string.alpha({ length: 8, casing: 'lower' });
+const MOCK_SLUG = faker.string.alpha({ length: 10, casing: 'lower' });
+const MOCK_CUSTOM_PRIMARY_DOMAIN = faker.internet.domainName();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -141,6 +143,29 @@ describe(listTenants, () => {
       const result = await listTenants({ search: `${MOCK_SEARCH_WORD}-site` });
 
       expect(result).toEqual([domainTenant]);
+    });
+
+    it('matches against any of the tenant domains', async () => {
+      const customDomainTenant = await insertTestTenant(db(), {
+        name: MOCK_LAST_NAME,
+        primaryDomain: MOCK_CUSTOM_PRIMARY_DOMAIN,
+      });
+      await db()
+        .insert(schema.tenantDomains)
+        .values([
+          {
+            tenantId: customDomainTenant.id,
+            domain: MOCK_CUSTOM_PRIMARY_DOMAIN,
+          },
+          {
+            tenantId: customDomainTenant.id,
+            domain: `${MOCK_SLUG}.example.com`,
+          },
+        ]);
+
+      const result = await listTenants({ search: MOCK_SLUG });
+
+      expect(result).toEqual([customDomainTenant]);
     });
 
     it('treats wildcard characters as literal text', async () => {

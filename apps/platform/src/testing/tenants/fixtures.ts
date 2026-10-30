@@ -240,6 +240,7 @@ export const mockTenantsListQuery = (
   search: '',
   ...overrides,
 });
+
 export const OWNER_EMAIL_LABEL = 'Owner email';
 export const PRIMARY_DOMAIN_LABEL = 'Primary domain';
 export const REACTIVATE_TENANT_LABEL = 'Reactivate tenant';

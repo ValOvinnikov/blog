@@ -1,4 +1,5 @@
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
+import type { TMaybeUndefined } from '@blog/config/types';
 import type { TTenantSort } from '@blog/db/queries/tenants/list-tenants';
 import { z } from 'zod';
 
@@ -8,11 +9,13 @@ export type TTenantsListQuery = {
   search: string;
 };
 
+type TSearchParam = TMaybeUndefined<string | string[]>;
+
 export type TTenantsListSearchParams = {
-  archived?: string;
-  sort?: string;
-  direction?: string;
-  q?: string;
+  archived?: TSearchParam;
+  sort?: TSearchParam;
+  direction?: TSearchParam;
+  q?: TSearchParam;
 };
 
 export const ARCHIVED_PARAM_ON = '1';
@@ -29,13 +32,27 @@ const sortSchema = z
   })
   .catch(DEFAULT_TENANTS_SORT);
 
+export const MAX_TENANT_SEARCH_LENGTH = 100;
+
+const searchSchema = z
+  .string()
+  .trim()
+  .transform((search) => search.slice(0, MAX_TENANT_SEARCH_LENGTH))
+  .catch('');
+
+const firstValue = (param: TSearchParam): TMaybeUndefined<string> =>
+  Array.isArray(param) ? param[0] : param;
+
 export const parseTenantsListQuery = ({
   archived,
   sort,
   direction,
   q,
 }: TTenantsListSearchParams): TTenantsListQuery => ({
-  shouldShowArchived: archived === ARCHIVED_PARAM_ON,
-  sort: sortSchema.parse({ column: sort, direction }),
-  search: q?.trim() ?? '',
+  shouldShowArchived: firstValue(archived) === ARCHIVED_PARAM_ON,
+  sort: sortSchema.parse({
+    column: firstValue(sort),
+    direction: firstValue(direction),
+  }),
+  search: searchSchema.parse(firstValue(q)),
 });

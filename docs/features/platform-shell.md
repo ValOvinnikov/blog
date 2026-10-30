@@ -44,8 +44,8 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
 - **Operator Platform section**, the `(operator)` group: `/tenants`,
   `/tenants/new`, `/findings`. `/` redirects an admin to `/tenants`. The
   tenants table opens newest first; each column header sorts it and a second
-  click reverses, and a search field narrows it by name or domain (which
-  carries the slug). Visibility, sort and search live in the URL
+  click reverses, and a search field narrows it by name or any of the
+  tenant's domains, so a site on a custom domain is still found by its slug. Visibility, sort and search live in the URL
   (`?archived=1&sort=<column>&direction=<ascending|descending>&q=`), so a
   reload or shared link keeps them; `listTenants`' own default order stays by
   name, which the dashboard tenant picker relies on.
