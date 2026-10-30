@@ -14,7 +14,7 @@ describe(toSafeCallbackPath, () => {
   it.each([
     adminRoutes.home(),
     adminRoutes.dashboardLeads(),
-    adminRoutes.tenants({ archived: true }),
+    adminRoutes.tenants({ shouldShowArchived: true }),
     `${adminRoutes.tenantOverview(MOCK_TENANT_ID)}?${faker.word.noun()}=1#${faker.word.noun()}`,
   ])('keeps the same-origin path %s', (path) => {
     expect(toSafeCallbackPath(path)).toBe(path);

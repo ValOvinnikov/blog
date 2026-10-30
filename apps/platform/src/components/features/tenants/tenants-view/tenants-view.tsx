@@ -1,29 +1,31 @@
 import { ICONS } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { ArchivedTenantsToggle } from '@platform/components/features/tenants/archived-tenants-toggle';
 import { EmailAlertsBanner } from '@platform/components/features/tenants/email-alerts-banner';
+import { TenantsSearch } from '@platform/components/features/tenants/tenants-search';
 import { TenantsTable } from '@platform/components/features/tenants/tenants-table';
 import { Icon } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';
 
 export type TTenantsViewProps = {
-  tenants: TTenant[];
-  shouldShowArchived: boolean;
+  tenants: TClientTenant[];
+  listQuery: TTenantsListQuery;
   isEmailAlertingConfigured: boolean;
 };
 
 export const TenantsView = ({
   tenants,
-  shouldShowArchived,
+  listQuery,
   isEmailAlertingConfigured,
 }: TTenantsViewProps) => {
   const t = useTranslations('tenantsView');
-  const { root, toolbar } = tenantsViewVariants();
+  const { root } = tenantsViewVariants();
 
   return (
     <div className={root()}>
@@ -38,10 +40,16 @@ export const TenantsView = ({
         }
       />
       {!isEmailAlertingConfigured && <EmailAlertsBanner />}
-      <div className={toolbar()}>
-        <ArchivedTenantsToggle shouldShowArchived={shouldShowArchived} />
-      </div>
-      <TenantsTable tenants={tenants} />
+      <TenantsTable
+        tenants={tenants}
+        listQuery={listQuery}
+        toolbar={
+          <>
+            <TenantsSearch key={listQuery.search} listQuery={listQuery} />
+            <ArchivedTenantsToggle listQuery={listQuery} />
+          </>
+        }
+      />
     </div>
   );
 };

@@ -17,6 +17,7 @@ export type TClientTenant = Pick<
   | 'provisioningStatus'
   | 'provisioningSteps'
   | 'deprovisioningSteps'
+  | 'createdAt'
 > & {
   hasSanityReadToken: boolean;
 };
@@ -37,6 +38,7 @@ export const toClientTenant = (tenant: TTenant): TClientTenant => {
     provisioningStatus,
     provisioningSteps,
     deprovisioningSteps,
+    createdAt,
   } = tenant;
 
   return {
@@ -54,5 +56,6 @@ export const toClientTenant = (tenant: TTenant): TClientTenant => {
     provisioningStatus,
     provisioningSteps,
     deprovisioningSteps,
+    createdAt,
   };
 };

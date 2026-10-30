@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLocaleIsoCode, TSortDirection } from '@blog/config/constants';
 
 export * from './action-result';
 export * from './contrast-result';
@@ -24,6 +24,11 @@ export type TMaybeJsonDates<T> = {
 export type TByLocale<V> = Record<TLocaleIsoCode, V>;
 
 export type TPartialByLocale<V> = Partial<TByLocale<V>>;
+
+export type TColumnSort<TColumn> = {
+  column: TColumn;
+  direction: TSortDirection;
+};
 
 export interface IWithDataTestId {
   dataTestId?: string;

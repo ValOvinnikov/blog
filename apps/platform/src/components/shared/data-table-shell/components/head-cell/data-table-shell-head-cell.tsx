@@ -1,7 +1,12 @@
-import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
+import {
+  ICONS,
+  SIZE,
+  SORT_DIRECTION,
+  type TMaybeUndefined,
+  type TSortDirection,
+} from '@blog/config';
 import { dataTableShellVariants } from '@platform/components/shared/data-table-shell/data-table-shell-variants';
 import { Icon } from '@platform/components/shared/icon';
-import { SORT_DIRECTION, type TSortDirection } from '@platform/constants/sort';
 import type { ReactNode } from 'react';
 
 export type TDataTableShellColumnSort = {

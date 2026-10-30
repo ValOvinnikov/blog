@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "No tenants yet.",
+    "noMatches": "No tenants match “{search}”.",
     "columnTenant": "Tenant",
     "columnPlan": "Plan",
     "columnStatus": "Status",
@@ -261,6 +262,10 @@
     },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"
+  },
+  "tenantsSearch": {
+    "label": "Search tenants",
+    "hint": "Name or domain — press Enter to search."
   },
   "findingsView": {
     "title": "Findings",
@@ -1190,7 +1195,7 @@
       "STALLED": "Your Studio invite hasn't been accepted"
     },
     "description": {
-      "INVITE_SENT": "We've emailed you an invite from Sanity, the editor behind Studio. Accept it, and Studio opens here once your access is confirmed.",
+      "INVITE_SENT": "Studio runs on Sanity, so you need a free Sanity account to edit. We've emailed you an invite from Sanity: accept it, and Studio opens here once your access is confirmed.",
       "ACTIVATING": "You've accepted the invite. We're giving your account editing rights, which usually takes a minute.",
       "STALLED": "The invite was sent more than three days ago and hasn't been accepted, so we've stopped checking. Resend it for a fresh one, or check now if you've just accepted it."
     },

@@ -245,6 +245,7 @@
   },
   "tenantsTable": {
     "empty": "Noch keine Mandanten.",
+    "noMatches": "Keine Mandanten passen zu „{search}“.",
     "columnTenant": "Mandant",
     "columnPlan": "Tarif",
     "columnStatus": "Status",
@@ -261,6 +262,10 @@
     },
     "manage": "Verwalten",
     "manageAriaLabel": "{tenantName} verwalten"
+  },
+  "tenantsSearch": {
+    "label": "Mandanten suchen",
+    "hint": "Name oder Domain – mit Enter suchen."
   },
   "findingsView": {
     "title": "Befunde",
@@ -1190,7 +1195,7 @@
       "STALLED": "Ihre Studio-Einladung wurde nicht angenommen"
     },
     "description": {
-      "INVITE_SENT": "Wir haben Ihnen eine Einladung von Sanity geschickt, dem Editor hinter Studio. Nehmen Sie sie an – Studio öffnet sich hier, sobald Ihr Zugang bestätigt ist.",
+      "INVITE_SENT": "Studio basiert auf Sanity, daher brauchen Sie zum Bearbeiten ein kostenloses Sanity-Konto. Wir haben Ihnen eine Einladung von Sanity geschickt: Nehmen Sie sie an – Studio öffnet sich hier, sobald Ihr Zugang bestätigt ist.",
       "ACTIVATING": "Sie haben die Einladung angenommen. Wir geben Ihrem Konto Bearbeitungsrechte; das dauert meist eine Minute.",
       "STALLED": "Die Einladung wurde vor mehr als drei Tagen gesendet und nicht angenommen, daher prüfen wir nicht mehr. Senden Sie eine neue oder prüfen Sie jetzt, falls Sie sie gerade angenommen haben."
     },

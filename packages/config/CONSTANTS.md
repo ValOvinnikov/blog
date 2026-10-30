@@ -224,6 +224,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SIZE**: `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`
 
+### `@blog/config/constants` — `packages/config/src/constants/sort.ts`
+
+- **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
+
 ### `@blog/config/constants` — `packages/config/src/constants/subscriber-outcome.ts`
 
 - **SUBSCRIBER_OUTCOME**: `ALREADY_PENDING`, `ALREADY_CONFIRMED`, `PENDING`, `NOT_PENDING`, `NOT_SUBSCRIBED`
@@ -232,6 +236,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TAXONOMY_KIND**: `TOPICS`, `TAGS`
 - **TAXONOMY_SORT**: `ALPHABETICAL`, `MOST_POSTS`
+
+### `@blog/config/constants` — `packages/config/src/constants/tenant-sort.ts`
+
+- **TENANT_SORT_COLUMN**: `NAME`, `PLAN`, `STATUS`, `CREATED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/tenant-write-refusal.ts`
 
@@ -440,10 +448,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
 
-### `@platform/constants/sort` — `apps/platform/src/constants/sort.ts`
-
-- **SORT_DIRECTION**: `ASCENDING`=`"ascending"`, `DESCENDING`=`"descending"`
-
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 
 - **STEP_INDICATOR_STATE**: `DONE`, `FAILED`, `RUNNING`, `ACTIVE`, `UPCOMING`
@@ -454,6 +458,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `PLATFORM_TENANT`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`
 - **TENANT_FIELD_LOCK_KIND**: `STEP`, `RUNNING`, `SUCCEEDED`, `ARCHIVED`, `CUSTOM_MAIN_DOMAIN`
 - **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `PLATFORM_TENANT_REFUSED`=`"tenants.platform_tenant_refused"`, `ROOT_DOMAIN_MISSING`=`"tenants.root_domain_missing"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
+- **TENANT_VISIBILITY**: `ACTIVE`, `ALL`
 
 ### `@platform/constants/upload` — `apps/platform/src/constants/upload.ts`
 

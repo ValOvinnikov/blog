@@ -3,35 +3,37 @@
 import { SIZE } from '@blog/config';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
-import { useRouter } from '@platform/i18n/navigation';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import {
+  TENANT_VISIBILITY,
+  type TTenantVisibility,
+} from '@platform/constants/tenant';
+import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
+import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
 import { useTranslations } from 'next-intl';
-import { useOptimistic, useTransition } from 'react';
+import { useOptimistic } from 'react';
 
 import { archivedTenantsToggleVariants } from './archived-tenants-toggle-variants';
 
 export type TArchivedTenantsToggleProps = {
-  shouldShowArchived: boolean;
+  listQuery: TTenantsListQuery;
 };
 
-type TTenantVisibility = 'active' | 'all';
-
 export const ArchivedTenantsToggle = ({
-  shouldShowArchived,
+  listQuery,
 }: TArchivedTenantsToggleProps) => {
   const t = useTranslations('archivedTenantsToggle');
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, navigate } = useTenantsListNavigation(listQuery);
   const [value, setOptimisticValue] = useOptimistic<TTenantVisibility>(
-    shouldShowArchived ? 'all' : 'active',
+    listQuery.shouldShowArchived
+      ? TENANT_VISIBILITY.ALL
+      : TENANT_VISIBILITY.ACTIVE,
   );
   const { root } = archivedTenantsToggleVariants();
 
   const handleChange = (next: TTenantVisibility) => {
-    startTransition(() => {
-      setOptimisticValue(next);
-      router.push(adminRoutes.tenants({ archived: next === 'all' }));
-    });
+    navigate({ shouldShowArchived: next === TENANT_VISIBILITY.ALL }, () =>
+      setOptimisticValue(next),
+    );
   };
 
   return (
@@ -40,8 +42,8 @@ export const ArchivedTenantsToggle = ({
       <SegmentedControl<TTenantVisibility>
         ariaLabel={t('ariaLabel')}
         options={[
-          { value: 'active', label: t('activeOption') },
-          { value: 'all', label: t('allOption') },
+          { value: TENANT_VISIBILITY.ACTIVE, label: t('activeOption') },
+          { value: TENANT_VISIBILITY.ALL, label: t('allOption') },
         ]}
         value={value}
         onChange={handleChange}
