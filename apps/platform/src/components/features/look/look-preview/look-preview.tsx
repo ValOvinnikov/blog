@@ -13,6 +13,7 @@ import {
   type TPreviewWidth,
 } from '@platform/constants/preview';
 import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
+import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
@@ -82,6 +83,7 @@ export const LookPreview = ({
         theme={buildSitePreviewTheme(values, isDark)}
         liveLocales={liveLocales}
         header={toSampleHeaderStyle(values)}
+        footer={toSampleFooterStyle(values)}
         busy={toSampleBusyStyle(values)}
         hasReaderAccounts={hasReaderAccounts}
         isSignedIn={readerState === PREVIEW_READER_STATE.SIGNED_IN}

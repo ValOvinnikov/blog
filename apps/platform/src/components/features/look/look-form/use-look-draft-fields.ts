@@ -6,12 +6,14 @@ import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 
 import { useAccountDraftFields } from './use-account-draft-fields';
+import { useFooterDraftFields } from './use-footer-draft-fields';
 
 export const useLookDraftFields = () => {
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
   const accountDraftFields = useAccountDraftFields();
+  const footerDraftFields = useFooterDraftFields();
   const displayBrandImage = ({ file }: TStagedImage) =>
     isUndefined(file) ? t('brandImageUnchanged') : t('brandImagePicked');
 
@@ -102,6 +104,7 @@ export const useLookDraftFields = () => {
       display: ({ spinnerStyle }: TLookFormValues) =>
         t(`spinnerStyleOptionLabel.${spinnerStyle}`),
     },
+    ...footerDraftFields,
     {
       id: 'languageSwitcherStyle',
       label: t('languageSwitcherLabel'),

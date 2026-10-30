@@ -685,6 +685,36 @@
       "DOTS": "Puntos",
       "PULSE": "Pulso"
     },
+    "footerHeading": "Pie de página",
+    "footerDescription": "Cómo se organiza la parte inferior de tu sitio, su fondo y un acceso flotante a la configuración de cookies.",
+    "footerLayoutLabel": "Diseño del pie de página",
+    "footerLayoutDescription": "Dónde se colocan la marca, los grupos de enlaces y la letra pequeña. Compacto no muestra grupos, texto de presentación ni dirección.",
+    "footerLayoutOptionLabel": {
+      "COLUMNS": "Columnas",
+      "CENTRED": "Centrado",
+      "COMPACT": "Compacto",
+      "BIG_WORDMARK": "Logotipo grande"
+    },
+    "footerBackgroundLabel": "Fondo",
+    "footerBackgroundDescription": "El color del pie de página. Cada uno sigue el tema claro u oscuro del lector.",
+    "footerBackgroundOptionLabel": {
+      "PRIMARY": "Liso",
+      "SECONDARY": "Sombreado",
+      "BRAND_PRIMARY": "Tono de marca"
+    },
+    "footerSurfaceLabel": "Superficie",
+    "footerSurfaceDescription": "Si el pie de página ocupa todo el ancho o aparece como una tarjeta.",
+    "footerSurfaceOptionLabel": {
+      "FULL_WIDTH": "Ancho completo",
+      "CARD": "Tarjeta"
+    },
+    "cookieSettingsButtonLabel": "Botón de configuración de cookies",
+    "cookieSettingsButtonDescription": "Un botón redondo en la esquina inferior izquierda que vuelve a abrir la configuración de cookies, una vez que el lector ha respondido al banner de cookies.",
+    "cookieSettingsButtonOptionLabel": {
+      "HIDDEN": "Oculto",
+      "SHOWN": "Visible"
+    },
+    "cookieSettingsButtonBannerOff": "El banner de cookies está desactivado, así que el botón permanece oculto. Activa el banner en Funciones para mostrarlo.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
@@ -734,7 +764,18 @@
     "myBookmarksDescription": "Publicaciones guardadas para leer más tarde",
     "accountSettings": "Configuración de la cuenta",
     "accountSettingsDescription": "Nombre, métodos de acceso, tus datos",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "footerAbout": "Notas sobre mareas, puertos y la costa que los une.",
+    "footerGroupsAriaLabel": "Pie de página",
+    "footerReadHeading": "Leer",
+    "footerSiteHeading": "Sitio",
+    "footerArchive": "Archivo",
+    "footerRss": "Feed RSS",
+    "footerTeam": "Equipo",
+    "footerContact": "Contacto",
+    "footerFinePrintAriaLabel": "Legal",
+    "footerPrivacy": "Política de privacidad",
+    "footerCookieSettings": "Configuración de cookies"
   },
   "frontPageSample": {
     "heroHeading": "Crónicas desde la costa",

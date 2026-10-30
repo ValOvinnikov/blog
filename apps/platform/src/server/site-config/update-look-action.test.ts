@@ -5,9 +5,13 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  BRAND_VARIANT,
   CARD_STYLE,
+  COOKIE_SETTINGS_BUTTON,
   DENSITY,
   FONT_CHOICE,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
@@ -75,6 +79,7 @@ const UNSUPPORTED_CARD_STYLE = 'SHADOWED';
 const UNSUPPORTED_HEADER_LAYOUT = 'ZIGZAG';
 const UNSUPPORTED_BUSY_BUTTON_STYLE = 'SHAKE';
 const UNSUPPORTED_ACCOUNT_PANEL_STYLE = 'DRAWER';
+const UNSUPPORTED_FOOTER_LAYOUT = 'MASONRY';
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -95,6 +100,10 @@ const VALID_INPUT: TUpdateLookInput = {
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
   busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
   spinnerStyle: SPINNER_STYLE.DOTS,
+  footerLayout: FOOTER_LAYOUT.CENTRED,
+  footerBackground: BRAND_VARIANT.SECONDARY,
+  footerSurface: FOOTER_SURFACE.CARD,
+  cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
 };
 
 const onPlan = (plan: TTenantPlan) =>
@@ -131,24 +140,27 @@ describe(updateLookAction, () => {
       onPlan(TENANT_PLAN.FREE);
     });
 
-    it('writes only the preset and accent hue, leaving every Growth-only field stored as it is', async () => {
-      const { preset, accentHue } = VALID_INPUT;
+    it('writes only the preset, accent hue and cookie settings button, leaving every Growth-only field stored as it is', async () => {
+      const { preset, accentHue, cookieSettingsButton } = VALID_INPUT;
 
       await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
       expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         preset,
         accentHue,
+        cookieSettingsButton,
       });
     });
 
     it('audits only what it wrote', async () => {
-      const { preset, accentHue } = VALID_INPUT;
+      const { preset, accentHue, cookieSettingsButton } = VALID_INPUT;
 
       await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
       expect(insertAuditEventMock).toHaveBeenCalledWith(
-        expect.objectContaining({ details: { preset, accentHue } }),
+        expect.objectContaining({
+          details: { preset, accentHue, cookieSettingsButton },
+        }),
       );
     });
   });
@@ -177,6 +189,20 @@ describe(updateLookAction, () => {
       ...VALID_INPUT,
       // @ts-expect-error -- an unsupported card style is the invalid input under test
       cardStyle: UNSUPPORTED_CARD_STYLE,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a footer layout the site has no arrangement for without writing it', async () => {
+    const result = await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      // @ts-expect-error -- an unsupported footer layout is the invalid input under test
+      footerLayout: UNSUPPORTED_FOOTER_LAYOUT,
     });
 
     expect(result).toEqual({

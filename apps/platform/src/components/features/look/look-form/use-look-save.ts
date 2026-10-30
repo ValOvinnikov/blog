@@ -106,6 +106,10 @@ export const useLookSave = ({
         accountPhonePlacement: vals.accountPhonePlacement,
         busyButtonStyle: vals.busyButtonStyle,
         spinnerStyle: vals.spinnerStyle,
+        footerLayout: vals.footerLayout,
+        footerBackground: vals.footerBackground,
+        footerSurface: vals.footerSurface,
+        cookieSettingsButton: vals.cookieSettingsButton,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
       return finish(outcome);

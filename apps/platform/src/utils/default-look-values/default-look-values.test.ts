@@ -85,6 +85,10 @@ describe(defaultLookFormValues, () => {
       accountPhonePlacement,
       busyButtonStyle,
       spinnerStyle,
+      footerLayout,
+      footerBackground,
+      footerSurface,
+      cookieSettingsButton,
     } = PRESET_REGISTRY[PRESET_ID.CONSOLE];
 
     const values = defaultLookFormValues();
@@ -107,6 +111,10 @@ describe(defaultLookFormValues, () => {
       accountPhonePlacement,
       busyButtonStyle,
       spinnerStyle,
+      footerLayout,
+      footerBackground,
+      footerSurface,
+      cookieSettingsButton,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logo: { url: undefined },
       favicon: { url: undefined },
@@ -137,6 +145,10 @@ describe(toLookFormValues, () => {
       accountPhonePlacement: MOCK_SITE_CONFIG.accountPhonePlacement,
       busyButtonStyle: MOCK_SITE_CONFIG.busyButtonStyle,
       spinnerStyle: MOCK_SITE_CONFIG.spinnerStyle,
+      footerLayout: MOCK_SITE_CONFIG.footerLayout,
+      footerBackground: MOCK_SITE_CONFIG.footerBackground,
+      footerSurface: MOCK_SITE_CONFIG.footerSurface,
+      cookieSettingsButton: MOCK_SITE_CONFIG.cookieSettingsButton,
       logo: { url: MOCK_LOGO_URL },
       favicon: { url: MOCK_FAVICON_URL },
     });

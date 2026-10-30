@@ -1,4 +1,4 @@
-import { READER_ACCOUNT_CAPABILITIES } from '@blog/config';
+import { CAPABILITY, READER_ACCOUNT_CAPABILITIES } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
@@ -30,6 +30,7 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
       hasReaderAccounts={READER_ACCOUNT_CAPABILITIES.some((capability) =>
         enabledCapabilities.includes(capability),
       )}
+      hasCookieBanner={enabledCapabilities.includes(CAPABILITY.CONSENT_BANNER)}
       savedAt={siteConfig?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
