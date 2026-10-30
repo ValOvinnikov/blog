@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { FOCUS_RING, tv } from '@blog/ui/lib/styling';
 
 export const accountMenuGroupVariants = tv({
   slots: {
@@ -8,6 +8,7 @@ export const accountMenuGroupVariants = tv({
       'font-mono text-meta text-text',
       'hover:bg-surface-2',
       '[&::-webkit-details-marker]:hidden',
+      FOCUS_RING,
     ],
     glyph: ['text-muted group-hover:text-text'],
     chevron: [

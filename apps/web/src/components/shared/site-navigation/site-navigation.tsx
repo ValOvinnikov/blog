@@ -72,6 +72,9 @@ export const SiteNavigation = ({
     containerRef.current
       ?.querySelectorAll<HTMLElement>('[popover]')
       .forEach((popover) => popover.hidePopover());
+    containerRef.current
+      ?.querySelectorAll<HTMLDetailsElement>('details[open]')
+      .forEach((details) => (details.open = false));
     if (open) close();
   });
 
