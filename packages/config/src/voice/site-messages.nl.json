@@ -308,7 +308,8 @@
     "preferences": {
       "heading": "Cookie-instellingen",
       "saveLabel": "Opslaan",
-      "closeLabel": "Sluiten"
+      "closeLabel": "Sluiten",
+      "savedStatus": "Je cookie-instellingen zijn opgeslagen."
     },
     "categories": {
       "necessary": {

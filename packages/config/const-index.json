@@ -6104,6 +6104,14 @@
         "file": "apps/web/src/constants/consent.ts"
       }
     ],
+    "cookie_settings_module.fetch_failed": [
+      {
+        "ref": "CONSENT_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/consent",
+        "file": "apps/web/src/constants/consent.ts"
+      }
+    ],
     "contact_form_module.fetch_failed": [
       {
         "ref": "CONTACT_FORM_LOG.MODULE_FETCH_FAILED",

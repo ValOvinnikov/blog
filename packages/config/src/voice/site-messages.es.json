@@ -308,7 +308,8 @@
     "preferences": {
       "heading": "Configuración de cookies",
       "saveLabel": "Guardar",
-      "closeLabel": "Cerrar"
+      "closeLabel": "Cerrar",
+      "savedStatus": "Tu configuración de cookies se ha guardado."
     },
     "categories": {
       "necessary": {
