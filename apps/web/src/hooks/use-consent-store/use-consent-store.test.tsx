@@ -88,6 +88,20 @@ describe(useConsentStore, () => {
     expect(result.current.granted).toEqual([]);
   });
 
+  it('reports a new save revision for every save, even one that repeats the stored answer', () => {
+    document.cookie = MOCK_ANSWERED_CONSENT_COOKIE;
+    const { result } = renderHook(() => useConsentStore());
+    const { saveRevision } = result.current;
+
+    let returnedRevision = saveRevision;
+    act(() => {
+      returnedRevision = result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+    });
+
+    expect(result.current.saveRevision).not.toBe(saveRevision);
+    expect(result.current.saveRevision).toBe(returnedRevision);
+  });
+
   it('updates every mounted tree when consent is written', () => {
     const first = renderHook(() => useConsentStore());
     const second = renderHook(() => useConsentStore());

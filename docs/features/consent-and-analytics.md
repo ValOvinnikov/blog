@@ -32,7 +32,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - **Banner** — `ConsentBannerSlot`, mounted once in `SiteProviders`, shows when the `CONSENT_BANNER` capability is on and the reader has no valid consent cookie.
 - **Preferences dialog** — `ConsentPreferencesDialog`: Necessary (locked on) and External media switches, Save and Close. Opened from the banner's settings button and from the footer's `CookieSettingsButton`, which renders on every site whatever the capability; focus returns to that button on close.
-- **Cookie settings module** — `module_cookieSettings` on the home and landing pages. Renders the same switches and Save inline, under the editor's heading or, without one, `consent.preferences.heading`. The switches appear only once the reader's saved choice is known, and a `role="status"` line confirms each save (`consent.preferences.savedStatus`), cleared when a switch changes again.
+- **Cookie settings module** — `module_cookieSettings` on the home and landing pages. Renders the same switches and Save inline, under the editor's heading or, without one, `consent.preferences.heading`. The switches appear only once the reader's saved choice is known, and a `role="status"` line confirms each save (`consent.preferences.savedStatus`), re-announced on a repeat Save and cleared when a switch changes or another surface saves.
 - **Analytics** — `SiteAnalytics`, rendered in the tenant layout, mounts `<Analytics />` and `<SpeedInsights />`.
 - No platform page of its own: both are rows on the Features page (see [plans-and-entitlements](./plans-and-entitlements.md)). The only Studio surface is the Cookie settings module document.
 
@@ -40,6 +40,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - `CONSENT_CATEGORY` (`@blog/config`): `NECESSARY`, `EXTERNAL_MEDIA`. Optional categories are every category but `NECESSARY`.
 - Cookie `consent`, value `1.<granted categories, comma-separated>` (version `1`; an empty list means rejected), 180 days, `Path=/`, `SameSite=Lax`, `Secure`. Written from the browser; no server reads it.
+- `useConsentStore` also reports a `saveRevision` that every `save` advances, even one that rewrites the same choice; `save` returns the new revision.
 - `useConsentStore` turns the cookie into `UNKNOWN` (server and first render), `UNANSWERED` (missing or invalid cookie) or `ANSWERED`; `useConsent(category)` answers `GRANTED` or `DENIED` per category and exposes `grant()`.
 - Sanity `module_cookieSettings`: `brandVariant`, optional `headingBlock`, `layout`. No Neon data. The capability flags come from `settings_features`, cached per tenant like every other capability.
 
@@ -56,7 +57,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `NECESSARY` is always granted and is never written to the cookie; `grant()` on it is a no-op.
 - The server snapshot is `UNKNOWN`, so the banner never renders during SSR and never flashes for a reader who already answered.
 - Every store instance re-reads the cookie on save through one listener set, so the banner, the dialog, the module and any consent-gated component update together.
-- The dialog and the module share `useConsentPreferencesForm`: one category list, and switches that start from the saved choice and re-derive whenever another surface saves, discarding unsaved changes.
+- The dialog and the module share `useConsentPreferencesForm`: one category list, and switches that start from the saved choice and re-derive on every save from any surface (keyed on `saveRevision`, not the cookie value), discarding unsaved changes.
 - The module renders no switches while the store is `UNKNOWN`, so Save can never write an empty choice over a granted one before the cookie is read.
 - `ConsentPlaceholder` (ui) and `useConsent` exist for content behind the external-media category; no web component uses them yet.
 - Vercel Analytics and Speed Insights load regardless of the reader's consent choice.

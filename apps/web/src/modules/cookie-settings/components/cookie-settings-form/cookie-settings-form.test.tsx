@@ -2,6 +2,7 @@ import { CONSENT_CATEGORY } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { renderElement, screen, within } from '@web/testing/custom-render';
+import { AppProviders } from '@web/testing/providers';
 import {
   clearConsentCookie,
   grantConsent,
@@ -11,6 +12,7 @@ import {
   OPEN_PREFERENCES_BUTTON_NAME,
   OpenPreferencesButton,
 } from '@web/testing/shared/consent/consent-preferences-probes';
+import { renderToString } from 'react-dom/server';
 
 import { CookieSettingsForm } from './cookie-settings-form';
 
@@ -85,29 +87,93 @@ describe(`<${CookieSettingsForm.name}/>`, () => {
     expect(status).toBeEmptyDOMElement();
   });
 
-  it('shows the choice saved from the dialog on the same page', async () => {
-    renderElement(
-      <>
+  it('shows no switches before the saved choice is known', () => {
+    grantConsent([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+    document.body.innerHTML = renderToString(
+      <AppProviders>
         <CookieSettingsForm />
-        <OpenPreferencesButton />
-        <ConsentPreferencesDialog />
-      </>,
+      </AppProviders>,
     );
-    const openButton = screen.getByRole('button', {
-      name: OPEN_PREFERENCES_BUTTON_NAME,
+
+    const switches = screen.queryAllByRole('switch');
+
+    expect(switches).toHaveLength(0);
+  });
+
+  it('confirms every save, even one that repeats the last', async () => {
+    renderElement(<CookieSettingsForm />);
+    const saveButton = screen.getByRole('button', { name: SAVE_BUTTON_NAME });
+    await user.click(saveButton);
+    const firstConfirmation = screen.getByText(SAVED_STATUS_TEXT);
+
+    await user.click(saveButton);
+
+    const secondConfirmation = screen.getByText(SAVED_STATUS_TEXT);
+    expect(firstConfirmation).not.toBeInTheDocument();
+    expect(secondConfirmation).toBeVisible();
+  });
+
+  describe('when the dialog saves on the same page', () => {
+    const saveExternalMediaFromDialog = async () => {
+      const openButton = screen.getByRole('button', {
+        name: OPEN_PREFERENCES_BUTTON_NAME,
+      });
+      await user.click(openButton);
+      const dialog = await screen.findByRole('dialog');
+      const dialogSwitch = within(dialog).getByRole('switch', {
+        name: EXTERNAL_MEDIA_SWITCH_NAME,
+      });
+      await user.click(dialogSwitch);
+      const dialogSaveButton = within(dialog).getByRole('button', {
+        name: SAVE_BUTTON_NAME,
+      });
+      await user.click(dialogSaveButton);
+    };
+
+    beforeEach(() => {
+      grantConsent([]);
+      renderElement(
+        <>
+          <CookieSettingsForm />
+          <OpenPreferencesButton />
+          <ConsentPreferencesDialog />
+        </>,
+      );
     });
 
-    await user.click(openButton);
-    const dialog = await screen.findByRole('dialog');
-    const dialogSwitch = within(dialog).getByRole('switch', {
-      name: EXTERNAL_MEDIA_SWITCH_NAME,
-    });
-    await user.click(dialogSwitch);
-    const dialogSaveButton = within(dialog).getByRole('button', {
-      name: SAVE_BUTTON_NAME,
-    });
-    await user.click(dialogSaveButton);
+    it('shows the choice saved from the dialog', async () => {
+      await saveExternalMediaFromDialog();
 
-    expect(getFormExternalMediaSwitch()).toBeChecked();
+      expect(getFormExternalMediaSwitch()).toBeChecked();
+    });
+
+    it('withdraws its own save confirmation', async () => {
+      const formSaveButton = within(screen.getByTestId(FORM_TEST_ID)).getByRole(
+        'button',
+        { name: SAVE_BUTTON_NAME },
+      );
+      await user.click(formSaveButton);
+
+      await saveExternalMediaFromDialog();
+
+      const confirmation = screen.queryByText(SAVED_STATUS_TEXT);
+      expect(confirmation).not.toBeInTheDocument();
+    });
+
+    it('drops changes the reader had not saved here', async () => {
+      await user.click(getFormExternalMediaSwitch());
+      const openButton = screen.getByRole('button', {
+        name: OPEN_PREFERENCES_BUTTON_NAME,
+      });
+      await user.click(openButton);
+      const dialog = await screen.findByRole('dialog');
+      const dialogSaveButton = within(dialog).getByRole('button', {
+        name: SAVE_BUTTON_NAME,
+      });
+
+      await user.click(dialogSaveButton);
+
+      expect(getFormExternalMediaSwitch()).not.toBeChecked();
+    });
   });
 });

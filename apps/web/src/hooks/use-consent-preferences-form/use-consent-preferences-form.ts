@@ -15,7 +15,7 @@ import { useState } from 'react';
 type TConsentValues = Record<string, boolean>;
 
 type TConsentDraft = {
-  savedGranted: readonly TConsentCategory[];
+  saveRevision: number;
   values: TConsentValues;
 };
 
@@ -29,11 +29,11 @@ const toValues = (granted: readonly TConsentCategory[]): TConsentValues =>
 
 export const useConsentPreferencesForm = () => {
   const t = useTranslations('consent');
-  const { status, granted, save } = useConsentStore();
+  const { status, granted, saveRevision, save } = useConsentStore();
   const [draft, setDraft] = useState<TMaybeUndefined<TConsentDraft>>();
 
   const values =
-    draft?.savedGranted === granted ? draft.values : toValues(granted);
+    draft?.saveRevision === saveRevision ? draft.values : toValues(granted);
 
   const categories: IConsentCategory[] = [
     {
@@ -50,13 +50,14 @@ export const useConsentPreferencesForm = () => {
   ];
 
   const setCategory = (id: string, checked: boolean) =>
-    setDraft({ savedGranted: granted, values: { ...values, [id]: checked } });
+    setDraft({ saveRevision, values: { ...values, [id]: checked } });
 
   const saveValues = () =>
     save(OPTIONAL_CONSENT_CATEGORIES.filter((category) => values[category]));
 
   return {
     isReady: status !== CONSENT_STATUS.UNKNOWN,
+    saveRevision,
     categories,
     values,
     setCategory,
