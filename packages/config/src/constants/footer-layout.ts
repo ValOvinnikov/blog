@@ -1,5 +1,7 @@
 import type { TValueOf } from '@blog/config/utils';
 
+import type { TBrandVariant } from './layout';
+
 export const FOOTER_LAYOUT = {
   COLUMNS: 'COLUMNS',
   CENTRED: 'CENTRED',
@@ -22,3 +24,10 @@ export const COOKIE_SETTINGS_BUTTON = {
 } as const;
 
 export type TCookieSettingsButton = TValueOf<typeof COOKIE_SETTINGS_BUTTON>;
+
+export interface IFooterStyle {
+  layout: TFooterLayout;
+  background: TBrandVariant;
+  surface: TFooterSurface;
+  cookieSettingsButton: TCookieSettingsButton;
+}

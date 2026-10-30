@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeNull, TNullable } from '@blog/config';
 import {
   createContext,
   useContext,
@@ -13,7 +14,9 @@ type TConsentPreferences = {
   isOpen: boolean;
   open: () => void;
   close: () => void;
-  settingsButtonRef: RefObject<HTMLElement | null>;
+  footerControlRef: RefObject<TMaybeNull<HTMLElement>>;
+  floatingControlRef: RefObject<TMaybeNull<HTMLButtonElement>>;
+  returnFocusRef: RefObject<TMaybeNull<HTMLElement>>;
 };
 
 const ConsentPreferencesContext = createContext<
@@ -24,11 +27,35 @@ export type TConsentPreferencesProviderProps = {
   children: ReactNode;
 };
 
+const toFocusable = (element: TNullable<Element>) =>
+  element instanceof HTMLElement ? element : null;
+
+// Read when the dialog closes, so it names a control mounted then rather than one gone with the banner.
+const useReturnFocusRef = (
+  floatingControlRef: RefObject<TMaybeNull<HTMLButtonElement>>,
+  footerControlRef: RefObject<TMaybeNull<HTMLElement>>,
+) => {
+  const [returnFocusRef] = useState<RefObject<TMaybeNull<HTMLElement>>>(() => ({
+    get current() {
+      return (
+        floatingControlRef.current ??
+        toFocusable(footerControlRef.current?.firstElementChild)
+      );
+    },
+  }));
+  return returnFocusRef;
+};
+
 export const ConsentPreferencesProvider = ({
   children,
 }: TConsentPreferencesProviderProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const settingsButtonRef = useRef<HTMLElement>(null);
+  const footerControlRef = useRef<HTMLElement>(null);
+  const floatingControlRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useReturnFocusRef(
+    floatingControlRef,
+    footerControlRef,
+  );
 
   return (
     <ConsentPreferencesContext.Provider
@@ -36,7 +63,9 @@ export const ConsentPreferencesProvider = ({
         isOpen,
         open: () => setIsOpen(true),
         close: () => setIsOpen(false),
-        settingsButtonRef,
+        footerControlRef,
+        floatingControlRef,
+        returnFocusRef,
       }}
     >
       {children}

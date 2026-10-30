@@ -18,6 +18,12 @@ export const signedInAccountVariants = tv({
           '-my-[9px] lg:my-0',
         ],
       },
+      railFooter: {
+        email: ['text-admin-side-text'],
+        signOut: [
+          'text-admin-side-text hover:bg-admin-side-raised hover:text-white',
+        ],
+      },
     },
   },
   defaultVariants: { surface: 'card' },
@@ -26,4 +32,5 @@ export const signedInAccountVariants = tv({
 export const SIGN_OUT_BUTTON_BY_SURFACE = {
   card: { variant: 'ghost', size: SIZE.SM },
   rail: { variant: 'ghost', size: SIZE.SM },
+  railFooter: { variant: 'ghost', size: SIZE.SM },
 } as const;

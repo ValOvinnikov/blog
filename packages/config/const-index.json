@@ -6120,6 +6120,22 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
+    "footer.layout_fetch_failed": [
+      {
+        "ref": "FOOTER_LOG.CONTENT_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/footer",
+        "file": "apps/web/src/constants/footer.ts"
+      }
+    ],
+    "footer.site_config_fetch_failed": [
+      {
+        "ref": "FOOTER_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/footer",
+        "file": "apps/web/src/constants/footer.ts"
+      }
+    ],
     "header_style.site_config_fetch_failed": [
       {
         "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
