@@ -99,7 +99,6 @@
     },
     "stepsAriaLabel": "Configuratiestappen",
     "stepProgress": "Stap {n} van {total}",
-    "stepProgressNamed": "Stap {n} van {total} · {step}",
     "siteSummary": "{siteType} · {name}",
     "back": "Terug",
     "continue": "Doorgaan",

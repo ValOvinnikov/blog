@@ -99,7 +99,6 @@
     },
     "stepsAriaLabel": "Einrichtungsschritte",
     "stepProgress": "Schritt {n} von {total}",
-    "stepProgressNamed": "Schritt {n} von {total} · {step}",
     "siteSummary": "{siteType} · {name}",
     "back": "Zurück",
     "continue": "Weiter",

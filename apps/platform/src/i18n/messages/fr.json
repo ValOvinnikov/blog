@@ -99,7 +99,6 @@
     },
     "stepsAriaLabel": "Étapes de configuration",
     "stepProgress": "Étape {n} sur {total}",
-    "stepProgressNamed": "Étape {n} sur {total} · {step}",
     "siteSummary": "{siteType} · {name}",
     "back": "Retour",
     "continue": "Continuer",

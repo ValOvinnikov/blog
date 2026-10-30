@@ -112,8 +112,14 @@ Free site.
   page (`FrontPageSample` in `site-preview/`) renders in the chosen preset,
   accent and light/dark mode: the header with the typed site name and its
   Topics sub-menu closed, a hero ("Dispatches from the coast") and three
-  posts. Below `lg` the rail is a top band reading "Step N of 4
-  · <step>", and fields, Back / Continue and the preview stack in that order.
+  posts. The step header shows "Step N of 4" beside a segmented progress
+  bar (the shared `SegmentedProgress`, Base UI `Progress`) at every width.
+  The layout has three tiers: from `xl` (1280px) the rail, the fields with
+  Back / Continue, and the preview sit side by side; from `md` (768px) the
+  rail stays on the left and fields, Back / Continue and the preview stack
+  beside it; below `md` the rail is a top band and the same three stack. The
+  Site step's type and name sit side by side whenever the card is at least
+  28rem wide (a container query), in any tier.
   The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
      Blank) and the site name.

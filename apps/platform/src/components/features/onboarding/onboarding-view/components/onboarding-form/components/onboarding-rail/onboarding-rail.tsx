@@ -34,9 +34,7 @@ export const OnboardingRail = ({
 }: TOnboardingRailProps) => {
   const t = useTranslations('onboardingPage');
   const tForm = useTranslations('onboardingForm');
-  const { root, brand, intro, progress, list, account } =
-    onboardingRailVariants();
-  const currentStep = steps[currentIndex];
+  const { root, brand, intro, list, account } = onboardingRailVariants();
 
   return (
     <header className={root()}>
@@ -46,15 +44,6 @@ export const OnboardingRail = ({
         description={t('description')}
         className={intro()}
       />
-      {currentStep && (
-        <p className={progress()}>
-          {tForm('stepProgressNamed', {
-            n: currentIndex + 1,
-            total: steps.length,
-            step: currentStep.label,
-          })}
-        </p>
-      )}
       <ol aria-label={tForm('stepsAriaLabel')} className={list()}>
         {steps.map((step, index) => (
           <OnboardingRailStep

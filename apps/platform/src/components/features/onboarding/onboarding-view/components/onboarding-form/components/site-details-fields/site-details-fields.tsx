@@ -12,6 +12,8 @@ import {
 import type { TCreateSiteInput } from '@platform/server/onboarding/create-site-input';
 import { useTranslations } from 'next-intl';
 
+import { siteDetailsFieldsVariants } from './site-details-fields-variants';
+
 export type TSiteDetailsFieldsProps = {
   values: TCreateSiteInput;
   fieldErrors: TOnboardingFieldErrors;
@@ -30,7 +32,7 @@ export const SiteDetailsFields = ({
   const nameError = fieldErrors.name?.reason;
 
   return (
-    <>
+    <div className={siteDetailsFieldsVariants()}>
       <FormField label={t('siteTypeLabel')} hint={t('siteTypeHint')}>
         <OptionSelect
           options={SELF_SERVE_SITE_TYPES.map((siteType) => ({
@@ -48,6 +50,6 @@ export const SiteDetailsFields = ({
         value={values.name}
         onChange={(name) => onFieldChange({ name })}
       />
-    </>
+    </div>
   );
 };
