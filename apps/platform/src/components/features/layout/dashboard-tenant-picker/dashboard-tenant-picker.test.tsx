@@ -243,19 +243,17 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
 
       expect(filter).toBeVisible();
     });
-  });
 
-  it('keeps focus in the filter when a query that made the tenants fit is cleared', async () => {
-    const user = userEvent.setup();
-    overflowViewportWhileUnfiltered();
-    setup();
-    const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
-    await user.type(filter, MOCK_OTHER_TENANT_NAME);
+    it('keeps focus in the filter when a query that made the tenants fit is cleared', async () => {
+      overflowViewportWhileUnfiltered();
+      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
+      await user.type(filter, MOCK_OTHER_TENANT_NAME);
 
-    await user.clear(filter);
+      await user.clear(filter);
 
-    expect(filter).toBeInTheDocument();
-    expect(filter).toHaveFocus();
+      expect(filter).toBeInTheDocument();
+      expect(filter).toHaveFocus();
+    });
   });
 
   it('hides the filter once an empty one fits the viewport again', () => {
