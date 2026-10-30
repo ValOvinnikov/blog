@@ -232,7 +232,11 @@
   },
   "dashboardTenantPicker": {
     "heading": "Elija un espacio de trabajo",
-    "description": "Tiene acceso a más de un espacio de trabajo. Elija uno para continuar."
+    "description": "Tiene acceso a más de un espacio de trabajo. Elija uno para continuar.",
+    "filterLabel": "Filtrar espacios de trabajo",
+    "visibleCount": "{count, plural, one {# espacio de trabajo} other {# espacios de trabajo}}",
+    "noMatch": "Ningún espacio de trabajo coincide con «{query}»",
+    "readOnly": "Solo lectura"
   },
   "tenantsView": {
     "title": "Clientes",

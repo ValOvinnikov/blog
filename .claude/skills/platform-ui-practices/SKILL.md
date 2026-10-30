@@ -198,12 +198,13 @@ from `useSettingsFormState()`:
   `headerActions`) and, like Look, splits editor and preview 50/50 from `lg`.
 - A grid inside a column sizes from that column: `@container` on the card body
   and `@sm:grid-cols-2` on the grid.
-- Pre-shell pages (the tenant picker, 404, error, sign-in error) render
-  `CenteredCardFrame`: one `<main>` holding the brand mark and wordmark above
-  one centred `Card`, whose body stacks the `PageHeader` (or the dead-end
-  copy), the content, and a top-ruled `SignedInAccount` row last. Choices are
-  visible light-surface link rows, none pre-selected; dark sidebar components
-  never sit on a light page.
+- Pre-shell pages share the onboarding wizard's dark rail: `RailBrand` and
+  `RailIntro` at the top and `SignedInAccount` at the foot, beside a light
+  pane. The workspace picker's rail is a 300px column from `lg` that never
+  scrolls, and a top band plus a sticky bottom account bar below it; its
+  `RailIntro` is the page's only `<h1>`. Choices are visible light-surface
+  link rows in one `Card`, none pre-selected. Dead-end pages (404, error,
+  sign-in error) use `DeadEndView` on `CenteredCardFrame`.
 - The Studio route is full-bleed in every state, and is the only route that
   is: neither `ShellFrame` nor `StudioMountView` adds padding around the
   mounted Studio or its archived and not-provisioned states.

@@ -2,19 +2,18 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const dashboardTenantPickerVariants = tv({
   slots: {
-    content: ['flex flex-col gap-5'],
-    list: ['flex flex-col divide-y divide-admin-line-2'],
-    row: [
-      'flex flex-col rounded-admin-control px-2.5 py-2 no-underline',
-      'transition-colors duration-base ease-smooth hover:bg-admin-surface-2',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+    root: [
+      'flex min-h-dvh flex-col bg-admin-bg text-admin-text',
+      'lg:grid lg:h-dvh lg:grid-cols-[300px_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)_auto] lg:overflow-hidden',
     ],
-    nameRow: ['flex min-w-0 items-center gap-1.5'],
-    name: [
-      'min-w-0 flex-1 truncate text-admin-13-5 font-semibold text-admin-text',
+    rail: [
+      'flex flex-col gap-6 bg-admin-side px-4 py-5',
+      'lg:col-start-1 lg:row-start-1 lg:gap-11 lg:border-r lg:border-admin-side-line lg:px-6 lg:pt-7 lg:pb-6',
     ],
-    domain: ['truncate font-mono text-admin-12 text-admin-muted'],
-    badge: ['shrink-0'],
-    account: ['border-t border-admin-line-2 pt-3 text-admin-muted'],
+    account: [
+      'sticky bottom-0 border-t border-admin-side-line bg-admin-side px-4 py-3',
+      'lg:static lg:col-start-1 lg:row-start-2 lg:border-r lg:border-t-0 lg:px-6 lg:pt-0 lg:pb-7',
+    ],
+    accountRule: ['lg:border-t lg:border-admin-side-line lg:pt-4'],
   },
 });

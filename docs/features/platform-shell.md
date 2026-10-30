@@ -35,8 +35,9 @@ nav sections, a topbar with a breadcrumb and an account menu, and a content
 column. It comes in three gated trees: the operator's Platform section, the
 operator's view of one tenant, and the owner's `/dashboard`, which never shows
 that the platform hosts more than one tenant. The 404, error and
-`/dashboard/select-tenant` pages use the branded pre-shell
-`CenteredCardFrame`.
+`/dashboard/select-tenant` pages render before the shell: the 404 and error
+pages in the branded `CenteredCardFrame`, the workspace picker on the
+onboarding wizard's dark rail.
 
 ## Surfaces and routes
 
@@ -55,7 +56,10 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   sidebar shows the Platform section plus the tenant's own sections.
 - **Owner dashboard**: `/dashboard` and its Look, Voice, Features,
   Languages, Domain, Email and Studio pages. `/dashboard/select-tenant` is a
-  picker for a user with several workspaces.
+  picker for a user with several workspaces: rows sorted by name, each with
+  its domain and "role · plan" (role hidden for a SUPERADMIN's virtual
+  membership), archived workspaces in their own read-only group, and a
+  filter by name or domain that appears only when the list would scroll.
 - `GET /api/dashboard/select-tenant?tenantId=` sets the active-workspace
   cookie and redirects to `/dashboard`.
 - Every other path 404s through a catch-all. `not-found.tsx` renders

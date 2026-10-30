@@ -1,17 +1,14 @@
-import type { TTenant } from '@blog/db/schema/tenants';
-import { CenteredCardFrame } from '@platform/components/features/layout/centered-card-frame';
+import { RailBrand } from '@platform/components/features/layout/rail-brand';
+import { RailIntro } from '@platform/components/features/layout/rail-intro';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
-import { PageHeader } from '@platform/components/shared/page-header';
-import { StatusBadge } from '@platform/components/shared/status-badge';
-import { Link } from '@platform/i18n/navigation';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
+import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
 import { useTranslations } from 'next-intl';
 
+import { TenantPickerPane } from './components/tenant-picker-pane';
 import { dashboardTenantPickerVariants } from './dashboard-tenant-picker-variants';
 
 export type TDashboardTenantPickerProps = {
-  tenants: TTenant[];
+  tenants: TTenantPickerItem[];
   accountEmail?: string;
 };
 
@@ -20,49 +17,30 @@ export const DashboardTenantPicker = ({
   accountEmail,
 }: TDashboardTenantPickerProps) => {
   const t = useTranslations('dashboardTenantPicker');
-  const tSwitcher = useTranslations('tenantSwitcher');
-  const { content, list, row, nameRow, name, domain, badge, account } =
-    dashboardTenantPickerVariants();
+  const { root, rail, account, accountRule } = dashboardTenantPickerVariants();
 
   if (tenants.length === 0) {
     return null;
   }
 
   return (
-    <CenteredCardFrame>
-      <div className={content()}>
-        <PageHeader title={t('heading')} description={t('description')} />
-        <ul className={list()}>
-          {toTenantSwitcherItems(tenants).map((tenant) => (
-            <li key={tenant.id}>
-              <Link
-                href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
-                prefetch={false}
-                className={row()}
-              >
-                <span className={nameRow()}>
-                  <span className={name()}>{tenant.name}</span>
-                  {tenant.isArchived && (
-                    <StatusBadge
-                      tone="neutral"
-                      hasDot={false}
-                      className={badge()}
-                    >
-                      {tSwitcher('archived')}
-                    </StatusBadge>
-                  )}
-                </span>
-                <span className={domain()}>{tenant.primaryDomain}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        {accountEmail && (
-          <div className={account()}>
-            <SignedInAccount email={accountEmail} />
+    <div className={root()}>
+      <header className={rail()}>
+        <RailBrand />
+        <RailIntro
+          title={t('heading')}
+          description={t('description')}
+          isPageHeading={true}
+        />
+      </header>
+      <TenantPickerPane tenants={tenants} />
+      {accountEmail && (
+        <footer className={account()}>
+          <div className={accountRule()}>
+            <SignedInAccount email={accountEmail} surface="railFooter" />
           </div>
-        )}
-      </div>
-    </CenteredCardFrame>
+        </footer>
+      )}
+    </div>
   );
 };
