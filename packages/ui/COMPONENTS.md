@@ -295,7 +295,7 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark; a link with `subItems` opens them as a sub-menu in the bar and in place in the phone menu, where only one `groupName` disclosure is open at a time.
+The site's main menu, where readers reach its top-level pages and their sub-pages.
 Props: links: INavItem[] · children?: TCompoundChildren<typeof PrimaryNavigationParts> · groupName?: string · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON
 

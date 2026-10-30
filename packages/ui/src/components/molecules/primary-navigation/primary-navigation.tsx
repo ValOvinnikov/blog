@@ -62,7 +62,7 @@ export type TPrimaryNavigationProps = IWithClassName &
     submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'];
   };
 
-/** Top-level `<nav>` landmark; a link with `subItems` opens them as a sub-menu in the bar and in place in the phone menu, where only one `groupName` disclosure is open at a time. */
+/** The site's main menu, where readers reach its top-level pages and their sub-pages. */
 const PrimaryNavigationRoot = ({
   links,
   children,

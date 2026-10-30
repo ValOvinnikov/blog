@@ -35,7 +35,9 @@ export const FooterGroup = ({
   return (
     <div className={root({ class: className })} data-testid={dataTestId}>
       <HeadingTag className={headingClass()}>{heading}</HeadingTag>
-      <ul className={list()}>{items}</ul>
+      <ul role="list" className={list()}>
+        {items}
+      </ul>
     </div>
   );
 };
