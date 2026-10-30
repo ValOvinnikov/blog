@@ -1,13 +1,16 @@
 'use client';
 
+import { ICONS, SIZE } from '@blog/config';
+import { Button } from '@platform/components/shared/button';
 import { FormField } from '@platform/components/shared/form-field';
+import { Icon } from '@platform/components/shared/icon';
 import { TextInput } from '@platform/components/shared/text-input';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
-import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
 import { useTranslations } from 'next-intl';
-import { useState, type FormEvent } from 'react';
+import { useRef, type FormEvent } from 'react';
 
 import { tenantsSearchVariants } from './tenants-search-variants';
+import { useTenantsSearch } from './use-tenants-search';
 
 export type TTenantsSearchProps = {
   listQuery: TTenantsListQuery;
@@ -15,24 +18,45 @@ export type TTenantsSearchProps = {
 
 export const TenantsSearch = ({ listQuery }: TTenantsSearchProps) => {
   const t = useTranslations('tenantsSearch');
-  const { navigate } = useTenantsListNavigation(listQuery);
-  const [value, setValue] = useState(listQuery.search);
-  const { root } = tenantsSearchVariants();
-
-  const handleChange = (nextValue: string) => {
-    setValue(nextValue);
-    if (!nextValue && listQuery.search) navigate({ search: '' });
-  };
+  const { value, change, submit, clear } = useTenantsSearch(listQuery);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { root, control, input, clearButton } = tenantsSearchVariants();
+  const clearLabel = t('clearLabel');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    navigate({ search: value.trim() });
+    submit();
+  };
+
+  const handleClear = () => {
+    clear();
+    inputRef.current?.focus();
   };
 
   return (
     <form role="search" className={root()} onSubmit={handleSubmit}>
       <FormField label={t('label')} hint={t('hint')}>
-        <TextInput type="search" value={value} onChange={handleChange} />
+        <div className={control()}>
+          <TextInput
+            ref={inputRef}
+            type="search"
+            value={value}
+            onChange={change}
+            className={input()}
+          />
+          {value && (
+            <Button
+              variant="ghost"
+              size={SIZE.SM}
+              onClick={handleClear}
+              aria-label={clearLabel}
+              title={clearLabel}
+              className={clearButton()}
+            >
+              <Icon name={ICONS.X} size={SIZE.SM} />
+            </Button>
+          )}
+        </div>
       </FormField>
     </form>
   );

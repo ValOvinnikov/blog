@@ -269,7 +269,8 @@
   },
   "tenantsSearch": {
     "label": "Tenants zoeken",
-    "hint": "Naam of domein — druk op Enter om te zoeken."
+    "hint": "Naam of domein.",
+    "clearLabel": "Zoekopdracht wissen"
   },
   "findingsView": {
     "title": "Bevindingen",

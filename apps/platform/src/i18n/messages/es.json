@@ -269,7 +269,8 @@
   },
   "tenantsSearch": {
     "label": "Buscar clientes",
-    "hint": "Nombre o dominio: pulsa Intro para buscar."
+    "hint": "Nombre o dominio.",
+    "clearLabel": "Borrar búsqueda"
   },
   "findingsView": {
     "title": "Incidencias",

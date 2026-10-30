@@ -269,7 +269,8 @@
   },
   "tenantsSearch": {
     "label": "Search tenants",
-    "hint": "Name or domain — press Enter to search."
+    "hint": "Name or domain.",
+    "clearLabel": "Clear search"
   },
   "findingsView": {
     "title": "Findings",

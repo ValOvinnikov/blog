@@ -45,7 +45,7 @@ export const TenantsView = ({
         listQuery={listQuery}
         toolbar={
           <>
-            <TenantsSearch key={listQuery.search} listQuery={listQuery} />
+            <TenantsSearch listQuery={listQuery} />
             <ArchivedTenantsToggle listQuery={listQuery} />
           </>
         }
