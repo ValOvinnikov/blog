@@ -15,9 +15,11 @@ const setup = customRender(SegmentedProgress, {
 });
 
 describe(`<${SegmentedProgress.name}/>`, () => {
-  it('exposes a progress bar named and valued by its label', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('exposes a progress bar named and valued by its label', () => {
     const progressBar = screen.getByRole('progressbar', { name: MOCK_LABEL });
 
     expect(progressBar).toHaveAttribute('aria-valuenow', String(MOCK_VALUE));
@@ -26,16 +28,12 @@ describe(`<${SegmentedProgress.name}/>`, () => {
   });
 
   it('renders one segment per step', () => {
-    setup();
-
     const segments = screen.getAllByTestId(SEGMENT_TEST_ID);
 
     expect(segments).toHaveLength(MOCK_TOTAL);
   });
 
   it('marks earlier steps done, the current step active and later steps upcoming', () => {
-    setup();
-
     const states = screen
       .getAllByTestId(SEGMENT_TEST_ID)
       .map((segment) => segment.dataset['state']);
