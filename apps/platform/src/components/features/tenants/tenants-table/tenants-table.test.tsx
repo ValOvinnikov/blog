@@ -5,8 +5,8 @@ import {
   TENANT_STATUS,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { useRouter } from '@platform/i18n/navigation';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
   mockReadyClientTenant,
   mockTenantsListQuery,
@@ -19,7 +19,7 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';
 
@@ -163,44 +163,45 @@ describe(`<${TenantsTable.name}/>`, () => {
   });
 
   describe('sorting', () => {
-    const push = vi.fn();
+    let user: UserEvent;
+    let push: ReturnType<typeof mockLocaleRouterPush>;
 
     beforeEach(() => {
-      push.mockReset();
-      vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push });
+      user = userEvent.setup();
+      push = mockLocaleRouterPush();
     });
 
-    it('announces the created column as sorted newest first by default', () => {
-      setup();
-
-      const createdHeader = screen.getByRole('columnheader', {
-        name: CREATED_COLUMN,
-      });
-      const tenantHeader = screen.getByRole('columnheader', {
-        name: TENANT_COLUMN,
+    describe('with the default sort', () => {
+      beforeEach(() => {
+        setup();
       });
 
-      expect(createdHeader).toHaveAttribute(
-        ARIA_SORT,
-        SORT_DIRECTION.DESCENDING,
-      );
-      expect(tenantHeader).not.toHaveAttribute(ARIA_SORT);
-    });
+      it('announces the created column as sorted newest first', () => {
+        const createdHeader = screen.getByRole('columnheader', {
+          name: CREATED_COLUMN,
+        });
+        const tenantHeader = screen.getByRole('columnheader', {
+          name: TENANT_COLUMN,
+        });
 
-    it('sorts another column ascending when its header is clicked', async () => {
-      const user = userEvent.setup();
-      setup();
+        expect(createdHeader).toHaveAttribute(
+          ARIA_SORT,
+          SORT_DIRECTION.DESCENDING,
+        );
+        expect(tenantHeader).not.toHaveAttribute(ARIA_SORT);
+      });
 
-      const tenantSort = screen.getByRole('button', { name: TENANT_COLUMN });
-      await user.click(tenantSort);
+      it('sorts another column ascending when its header is clicked', async () => {
+        const tenantSort = screen.getByRole('button', { name: TENANT_COLUMN });
+        await user.click(tenantSort);
 
-      expect(push).toHaveBeenCalledWith(
-        '/tenants?sort=NAME&direction=ascending',
-      );
+        expect(push).toHaveBeenCalledWith(
+          '/tenants?sort=NAME&direction=ascending',
+        );
+      });
     });
 
     it('reverses the sorted column when its header is clicked again', async () => {
-      const user = userEvent.setup();
       setup({
         listQuery: mockTenantsListQuery({
           sort: {

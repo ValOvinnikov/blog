@@ -1,6 +1,6 @@
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import { useRouter } from '@platform/i18n/navigation';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
   mockTenantsListQuery,
   MOCK_TENANT_SLUG,
@@ -21,11 +21,11 @@ const setup = customRender(ArchivedTenantsToggle, {
 
 describe(`<${ArchivedTenantsToggle.name}/>`, () => {
   let user: UserEvent;
-  const push = vi.fn();
+  let push: ReturnType<typeof mockLocaleRouterPush>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push });
+    push = mockLocaleRouterPush();
   });
 
   it('shows Active selected by default', () => {

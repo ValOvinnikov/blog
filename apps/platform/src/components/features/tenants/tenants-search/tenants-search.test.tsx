@@ -1,5 +1,5 @@
-import { useRouter } from '@platform/i18n/navigation';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
   mockTenantsListQuery,
   MOCK_TENANT_SLUG,
@@ -18,12 +18,11 @@ const setup = customRender(TenantsSearch, {
 
 describe(`<${TenantsSearch.name}/>`, () => {
   let user: UserEvent;
-  const push = vi.fn();
+  let push: ReturnType<typeof mockLocaleRouterPush>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    push.mockReset();
-    vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push });
+    push = mockLocaleRouterPush();
   });
 
   it('searches for the typed text when Enter is pressed', async () => {
