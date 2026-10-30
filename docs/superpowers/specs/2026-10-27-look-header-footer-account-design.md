@@ -109,7 +109,7 @@ to the cookie choice.
 
 | Setting (Look › Footer) | Options                                    | Default    | Plan   |
 | ----------------------- | ------------------------------------------ | ---------- | ------ |
-| Layout                  | Columns · Centred · Compact · Big wordmark | Columns    | Growth |
+| Footer layout           | Columns · Centred · Compact · Big wordmark | Columns    | Growth |
 | Background              | Plain · Shaded · Brand tint                | Brand tint | Growth |
 | Surface                 | Full width · Card                          | Full width | Growth |
 
