@@ -232,7 +232,11 @@
   },
   "dashboardTenantPicker": {
     "heading": "Arbeitsbereich wählen",
-    "description": "Sie haben Zugriff auf mehr als einen Arbeitsbereich. Wählen Sie einen aus, um fortzufahren."
+    "description": "Sie haben Zugriff auf mehr als einen Arbeitsbereich. Wählen Sie einen aus, um fortzufahren.",
+    "filterLabel": "Arbeitsbereiche filtern",
+    "visibleCount": "{count, plural, one {# Arbeitsbereich} other {# Arbeitsbereiche}}",
+    "noMatch": "Keine Arbeitsbereiche passen zu „{query}“",
+    "readOnly": "Nur lesen"
   },
   "tenantsView": {
     "title": "Mandanten",

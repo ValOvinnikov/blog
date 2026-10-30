@@ -2,6 +2,7 @@ import { DashboardTenantPicker } from '@platform/components/features/layout/dash
 import { getSessionEmail } from '@platform/server/auth/get-session-email';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
+import { toTenantPickerItems } from '@platform/server/tenants/to-tenant-picker-items';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -21,6 +22,9 @@ export default async function SelectTenantPage() {
   }
 
   return (
-    <DashboardTenantPicker tenants={tenants} accountEmail={accountEmail} />
+    <DashboardTenantPicker
+      tenants={toTenantPickerItems(tenants, memberships)}
+      accountEmail={accountEmail}
+    />
   );
 }

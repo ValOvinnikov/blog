@@ -1,6 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { RailBrand } from '@platform/components/features/layout/rail-brand';
+import { RailIntro } from '@platform/components/features/layout/rail-intro';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
-import { BrandMark } from '@platform/components/shared/brand-mark';
 import type { TOnboardingStep } from '@platform/constants/onboarding';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
 import { useTranslations } from 'next-intl';
@@ -33,29 +34,18 @@ export const OnboardingRail = ({
 }: TOnboardingRailProps) => {
   const t = useTranslations('onboardingPage');
   const tForm = useTranslations('onboardingForm');
-  const {
-    root,
-    brand,
-    brandName,
-    intro,
-    title,
-    description,
-    progress,
-    list,
-    account,
-  } = onboardingRailVariants();
+  const { root, brand, intro, progress, list, account } =
+    onboardingRailVariants();
   const currentStep = steps[currentIndex];
 
   return (
     <header className={root()}>
-      <div className={brand()}>
-        <BrandMark />
-        <span className={brandName()}>{t('brandName')}</span>
-      </div>
-      <div className={intro()}>
-        <p className={title()}>{t('heading')}</p>
-        <p className={description()}>{t('description')}</p>
-      </div>
+      <RailBrand className={brand()} />
+      <RailIntro
+        title={t('heading')}
+        description={t('description')}
+        className={intro()}
+      />
       {currentStep && (
         <p className={progress()}>
           {tForm('stepProgressNamed', {

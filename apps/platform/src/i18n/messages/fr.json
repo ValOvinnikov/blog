@@ -232,7 +232,11 @@
   },
   "dashboardTenantPicker": {
     "heading": "Choisir un espace de travail",
-    "description": "Vous avez accès à plusieurs espaces de travail. Choisissez-en un pour continuer."
+    "description": "Vous avez accès à plusieurs espaces de travail. Choisissez-en un pour continuer.",
+    "filterLabel": "Filtrer les espaces de travail",
+    "visibleCount": "{count, plural, one {# espace de travail} other {# espaces de travail}}",
+    "noMatch": "Aucun espace de travail ne correspond à « {query} »",
+    "readOnly": "Lecture seule"
   },
   "tenantsView": {
     "title": "Locataires",

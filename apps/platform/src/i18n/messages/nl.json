@@ -232,7 +232,11 @@
   },
   "dashboardTenantPicker": {
     "heading": "Kies een werkruimte",
-    "description": "U hebt toegang tot meer dan één werkruimte. Kies er een om verder te gaan."
+    "description": "U hebt toegang tot meer dan één werkruimte. Kies er een om verder te gaan.",
+    "filterLabel": "Werkruimtes filteren",
+    "visibleCount": "{count, plural, one {# werkruimte} other {# werkruimtes}}",
+    "noMatch": "Geen werkruimtes komen overeen met ‘{query}’",
+    "readOnly": "Alleen-lezen"
   },
   "tenantsView": {
     "title": "Tenants",
