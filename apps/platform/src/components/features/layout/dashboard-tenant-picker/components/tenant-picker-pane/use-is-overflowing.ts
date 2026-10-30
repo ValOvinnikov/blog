@@ -8,10 +8,13 @@ const isScrollable = (element: HTMLElement) =>
 export const useIsOverflowing = (
   ref: RefObject<TMaybeNull<HTMLElement>>,
   contentKey: number,
+  isMeasuring: boolean,
 ): boolean => {
   const [isOverflowing, setIsOverflowing] = useState(false);
 
   useEffect(() => {
+    if (!isMeasuring) return;
+
     const measure = () => {
       if (ref.current) setIsOverflowing(isScrollable(ref.current));
     };
@@ -20,7 +23,7 @@ export const useIsOverflowing = (
     window.addEventListener('resize', measure);
 
     return () => window.removeEventListener('resize', measure);
-  }, [ref, contentKey]);
+  }, [ref, contentKey, isMeasuring]);
 
   return isOverflowing;
 };

@@ -14,13 +14,17 @@ import { useIsOverflowing } from './use-is-overflowing';
 
 export type TTenantPickerPaneProps = {
   tenants: TTenantPickerItem[];
+  headingId: string;
 };
 
 const matches = (tenant: TTenantPickerItem, query: string) =>
   tenant.name.toLocaleLowerCase().includes(query) ||
   tenant.primaryDomain.toLocaleLowerCase().includes(query);
 
-export const TenantPickerPane = ({ tenants }: TTenantPickerPaneProps) => {
+export const TenantPickerPane = ({
+  tenants,
+  headingId,
+}: TTenantPickerPaneProps) => {
   const t = useTranslations('dashboardTenantPicker');
   const tSwitcher = useTranslations('tenantSwitcher');
   const archivedLabelId = useId();
@@ -30,7 +34,11 @@ export const TenantPickerPane = ({ tenants }: TTenantPickerPaneProps) => {
   const visibleTenants = normalizedQuery
     ? tenants.filter((tenant) => matches(tenant, normalizedQuery))
     : tenants;
-  const isOverflowing = useIsOverflowing(rootRef, visibleTenants.length);
+  const isOverflowing = useIsOverflowing(
+    rootRef,
+    tenants.length,
+    !normalizedQuery,
+  );
   const isFilterShown = isOverflowing || query !== '';
   const activeTenants = visibleTenants.filter(({ isArchived }) => !isArchived);
   const archivedTenants = visibleTenants.filter(({ isArchived }) => isArchived);
@@ -38,7 +46,7 @@ export const TenantPickerPane = ({ tenants }: TTenantPickerPaneProps) => {
     tenantPickerPaneVariants();
 
   return (
-    <main ref={rootRef} className={root()}>
+    <main ref={rootRef} aria-labelledby={headingId} className={root()}>
       <div className={column()}>
         {isFilterShown && (
           <>

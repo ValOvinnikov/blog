@@ -11,7 +11,7 @@ export const dashboardTenantPickerVariants = tv({
       'lg:col-start-1 lg:row-start-1 lg:gap-11 lg:border-r lg:border-admin-side-line lg:px-6 lg:pt-7 lg:pb-6',
     ],
     account: [
-      'sticky bottom-0 border-t border-admin-side-line bg-admin-side px-4 py-3',
+      'sticky bottom-0 border-t border-admin-side-line bg-admin-side px-4 pt-3 pb-[calc(--spacing(3)+env(safe-area-inset-bottom))]',
       'lg:static lg:col-start-1 lg:row-start-2 lg:border-r lg:border-t-0 lg:px-6 lg:pt-0 lg:pb-7',
     ],
     accountRule: ['lg:border-t lg:border-admin-side-line lg:pt-4'],
