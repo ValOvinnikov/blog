@@ -8,4 +8,5 @@ export const RESERVED_SUBDOMAINS = [
   'mail',
   'ui-library',
   'web-storybook',
+  'worker',
 ] as const;
