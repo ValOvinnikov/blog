@@ -61,10 +61,10 @@ async function revokeRoles(
   entry: TSanityAclEntry,
   roleNames: string[],
 ): Promise<void> {
-  const { projectId, env } = target;
+  const { projectId, token } = target;
   for (const name of roleNames) {
     await revokeSanityProjectRole({
-      token: env.sanityManagementToken,
+      token,
       projectId,
       projectUserId: entry.projectUserId,
       roleName: name,
@@ -76,8 +76,7 @@ export async function grantOwnerAdministrator(
   target: TOwnerAccessTarget,
   owner: TSanityUser,
 ): Promise<TElevateTenantOwnerOutcome> {
-  const { tenant, projectId, env } = target;
-  const token = env.sanityManagementToken;
+  const { tenant, projectId, token } = target;
 
   const acl = await listSanityProjectAcl({ token, projectId });
   const entry = findProjectAclEntry(acl, owner, projectId);

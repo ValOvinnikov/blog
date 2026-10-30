@@ -15,7 +15,6 @@ import {
   MOCK_DB_DOWN,
   MOCK_SANITY_OUTAGE,
 } from '@worker/testing/outage/fixtures';
-import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
   MOCK_MALFORMED_DOCUMENT_MESSAGE,
@@ -24,6 +23,7 @@ import {
   MOCK_SANITY_DATASET,
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
 import { buildAppliedMigrationLedger } from '@worker/utils/migration-ledger/migration-ledger';
@@ -34,13 +34,14 @@ import { seedTenantContent, type TSeedContentDeps } from './seed-content';
 faker.seed(7007);
 
 vi.mock('@blog/db/queries/tenants');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_WRITE_TOKEN = faker.string.alphanumeric(32);
 const MOCK_ROBOT_ID = faker.string.uuid();
 const MOCK_EXISTING_SETTINGS_SITE_ID = faker.string.uuid();
 const SITE_SETTINGS_QUERY = '*[_type == "settings_site"][0]._id';
 const MOCK_REVOKED_TOKEN = {
-  token: MOCK_PROVISION_ENV.sanityManagementToken,
+  token: MOCK_TENANT_MANAGEMENT_TOKEN,
   projectId: MOCK_SANITY_PROJECT_ID,
   robotId: MOCK_ROBOT_ID,
 };
@@ -104,12 +105,13 @@ describe(seedTenantContent, () => {
     } = {},
   ) {
     const { siteType = SITE_TYPE.BLANK, deps } = options;
-    return seedTenantContent(
-      options.tenant ?? tenant,
-      siteType,
-      MOCK_PROVISION_ENV,
-      { createClient, mintWriteToken, revokeWriteToken, sleep, ...deps },
-    );
+    return seedTenantContent(options.tenant ?? tenant, siteType, {
+      createClient,
+      mintWriteToken,
+      revokeWriteToken,
+      sleep,
+      ...deps,
+    });
   }
 
   beforeEach(() => {
@@ -194,7 +196,7 @@ describe(seedTenantContent, () => {
     await seed();
 
     expect(mintWriteToken).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
       label: SANITY_WRITE_TOKEN_LABEL,
       role: SANITY_ROBOT_ROLE.EDITOR,

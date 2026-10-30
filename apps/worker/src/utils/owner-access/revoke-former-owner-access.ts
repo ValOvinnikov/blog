@@ -56,8 +56,7 @@ async function revokeFormerRoles(
   target: TOwnerAccessTarget,
   formerUsers: TSanityUser[],
 ): Promise<void> {
-  const { projectId, env } = target;
-  const token = env.sanityManagementToken;
+  const { projectId, token } = target;
   const acl = await listSanityProjectAcl({ token, projectId });
 
   for (const user of formerUsers) {
@@ -90,11 +89,10 @@ export async function revokeFormerOwnerAccess(
   target: TOwnerAccessTarget,
   formerOwnerEmail?: string,
 ): Promise<void> {
-  const { tenant, projectId, env } = target;
+  const { tenant, projectId, token } = target;
   const { ownerSanityInviteId, ownerSanityUserId } = tenant;
   if (!ownerSanityInviteId && !ownerSanityUserId && !formerOwnerEmail) return;
 
-  const token = env.sanityManagementToken;
   const [invites, users] = await Promise.all([
     listSanityProjectInvites({ token, projectId }),
     listSanityProjectUsers({ token, projectId }),

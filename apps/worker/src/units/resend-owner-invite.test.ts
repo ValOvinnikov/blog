@@ -25,11 +25,11 @@ import {
   mockSanityOwner,
   mockSanityOwnerWithMembership,
 } from '@worker/testing/owner-access/fixtures';
-import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@worker/testing/tenant/fixtures';
 import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 
@@ -63,6 +63,7 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 describe(resendOwnerInvite, () => {
   beforeEach(() => {
@@ -87,7 +88,7 @@ describe(resendOwnerInvite, () => {
 
     expect(deleteSanityProjectInvite).toHaveBeenCalledOnce();
     expect(deleteSanityProjectInvite).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
       inviteId: MOCK_OLD_INVITE_ID,
     });
@@ -97,7 +98,7 @@ describe(resendOwnerInvite, () => {
     await resendOwnerInvite(MOCK_TENANT_ID);
 
     expect(createSanityProjectInvite).toHaveBeenCalledWith({
-      token: MOCK_PROVISION_ENV.sanityManagementToken,
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
       email: MOCK_OWNER_EMAIL,
       role: SANITY_PROJECT_ROLE.VIEWER,
@@ -184,7 +185,7 @@ describe(resendOwnerInvite, () => {
 
       expect(deleteSanityProjectInvite).toHaveBeenCalledOnce();
       expect(deleteSanityProjectInvite).toHaveBeenCalledWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         inviteId: MOCK_FORMER_INVITE_ID,
       });
@@ -196,7 +197,7 @@ describe(resendOwnerInvite, () => {
       expect(vi.mocked(revokeSanityProjectRole).mock.calls).toEqual([
         [
           {
-            token: MOCK_PROVISION_ENV.sanityManagementToken,
+            token: MOCK_TENANT_MANAGEMENT_TOKEN,
             projectId: MOCK_SANITY_PROJECT_ID,
             projectUserId: MOCK_FORMER_PROJECT_USER_ID,
             roleName: SANITY_PROJECT_ROLE.VIEWER,
@@ -204,7 +205,7 @@ describe(resendOwnerInvite, () => {
         ],
         [
           {
-            token: MOCK_PROVISION_ENV.sanityManagementToken,
+            token: MOCK_TENANT_MANAGEMENT_TOKEN,
             projectId: MOCK_SANITY_PROJECT_ID,
             projectUserId: MOCK_FORMER_PROJECT_USER_ID,
             roleName: SANITY_PROJECT_ROLE.ADMINISTRATOR,
@@ -273,7 +274,7 @@ describe(resendOwnerInvite, () => {
       await resendOwnerInvite(MOCK_TENANT_ID, MOCK_FORMER_OWNER_EMAIL);
 
       expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_FORMER_PROJECT_USER_ID,
         roleName: SANITY_PROJECT_ROLE.VIEWER,
@@ -291,7 +292,7 @@ describe(resendOwnerInvite, () => {
       await resendOwnerInvite(MOCK_TENANT_ID, MOCK_FORMER_OWNER_EMAIL);
 
       expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_FORMER_PROJECT_USER_ID,
         roleName: SANITY_PROJECT_ROLE.VIEWER,
@@ -305,7 +306,7 @@ describe(resendOwnerInvite, () => {
       );
 
       expect(deleteSanityProjectInvite).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         inviteId: MOCK_FORMER_INVITE_ID,
       });

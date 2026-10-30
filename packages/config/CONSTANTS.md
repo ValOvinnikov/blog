@@ -212,6 +212,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SANITY_PROJECT_ROLE**: `ADMINISTRATOR`=`"administrator"`, `EDITOR`=`"editor"`, `VIEWER`=`"viewer"`
 - **SANITY_RESOURCE_TYPE**: `PROJECT`=`"project"`, `ORGANIZATION`=`"organization"`
 - **SANITY_LOGIN_PROVIDER**: `GOOGLE`, `GITHUB`, `SANITY`
+- **SANITY_ROBOT_ROLE**: `DEVELOPER`=`"developer"`
 - **SANITY_API_SURFACE**: `MANAGEMENT`, `ACCESS`, `WEBHOOKS`
 - **TENANT_DELETE_SANITY_PROJECT_OUTCOME**: `DELETED`, `ALREADY_GONE`, `LEFT_ARCHIVED`, `NO_PROJECT`, `SKIPPED_NO_TOKEN`
 - **TENANT_DELETE_OUTCOME**: `DELETED`, `NOT_ARCHIVED`, `NOT_FOUND`

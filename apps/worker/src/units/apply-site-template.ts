@@ -8,7 +8,6 @@ import { insertSiteConfigIfMissing } from '@blog/db/queries/site-config';
 import { setTenantSiteTemplateVersion } from '@blog/db/queries/tenants';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { seedTenantContent } from '@worker/steps/seed-content';
-import { getProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { seedContentDeps } from '@worker/utils/step-deps/step-deps';
 
 import {
@@ -24,7 +23,6 @@ export async function applySiteTemplate(
 ): Promise<TUnitResult> {
   'use step';
 
-  const env = getProvisionEnv();
   const tenant = await loadTenant(tenantId);
   const siteType = toStarterSiteType(tenant.siteType);
 
@@ -33,7 +31,7 @@ export async function applySiteTemplate(
     ctx,
     step: TENANT_PROVISIONING_STEP.SEED_CONTENT,
     run: async () => {
-      await seedTenantContent(tenant, siteType, env, seedContentDeps);
+      await seedTenantContent(tenant, siteType, seedContentDeps);
       await insertSiteConfigIfMissing(
         tenantId,
         STARTER_PRESET_BY_SITE_TYPE[siteType],

@@ -14,12 +14,14 @@ import {
   getProvisionEnv,
   type TProvisionEnv,
 } from '@worker/utils/provision-env/provision-env';
+import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 import { FatalError } from 'workflow';
 
 export type TOwnerAccessTarget = {
   tenant: TTenant;
   projectId: string;
   ownerEmail: string;
+  token: string;
   env: TProvisionEnv;
 };
 
@@ -36,7 +38,8 @@ export async function loadOwnerAccessTarget(
   if (!ownerEmail) {
     throw new FatalError(`Tenant "${tenantId}" has no owner email.`);
   }
-  return { tenant, projectId: sanityProjectId, ownerEmail, env };
+  const token = await requireTenantManagementToken(tenantId);
+  return { tenant, projectId: sanityProjectId, ownerEmail, token, env };
 }
 
 export function hasOwnerEmail(
@@ -49,8 +52,7 @@ export function hasOwnerEmail(
 export async function findOwner(
   target: TOwnerAccessTarget,
 ): Promise<TMaybeUndefined<TSanityUser>> {
-  const { env, projectId } = target;
-  const token = env.sanityManagementToken;
+  const { env, projectId, token } = target;
 
   const projectUsers = await listSanityProjectUsers({ token, projectId });
   const member = projectUsers.find(({ profile }) =>
@@ -59,7 +61,7 @@ export async function findOwner(
   if (member) return member;
 
   const organizationUsers = await listSanityOrganizationUsers({
-    token,
+    token: env.sanityManagementToken,
     organizationId: env.sanityOrganizationId,
   });
   const organizationUser = organizationUsers.find(({ profile }) =>

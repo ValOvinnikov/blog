@@ -70,6 +70,7 @@ import {
   MOCK_TENANT_ID,
   mockProvisionedTenant,
   mockTenant,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@worker/testing/tenant/fixtures';
 import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { logger } from '@worker/utils/logger/logger';
@@ -97,6 +98,7 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('workflow');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_FAILING_FOR_THRESHOLD = new Date(
   MOCK_NOW.getTime() - OWNER_ACCESS_FINDING_AFTER_MS,
@@ -150,7 +152,7 @@ describe(checkOwnerAccess, () => {
 
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
       expect(grantSanityProjectRole).toHaveBeenCalledWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
@@ -166,7 +168,7 @@ describe(checkOwnerAccess, () => {
 
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
       expect(grantSanityProjectRole).toHaveBeenCalledWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
@@ -215,7 +217,7 @@ describe(checkOwnerAccess, () => {
       await checkOwnerAccess(MOCK_TENANT_ID);
 
       expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         roleName: SANITY_PROJECT_ROLE.VIEWER,
@@ -231,7 +233,7 @@ describe(checkOwnerAccess, () => {
 
       expect(grantSanityProjectRole).not.toHaveBeenCalled();
       expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         roleName: SANITY_PROJECT_ROLE.VIEWER,
@@ -361,8 +363,12 @@ describe(checkOwnerAccess, () => {
 
     const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
 
-    expect(assignSanityProjectUserRole).toHaveBeenCalledWith({
+    expect(listSanityOrganizationUsers).toHaveBeenCalledWith({
       token: MOCK_PROVISION_ENV.sanityManagementToken,
+      organizationId: MOCK_PROVISION_ENV.sanityOrganizationId,
+    });
+    expect(assignSanityProjectUserRole).toHaveBeenCalledWith({
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
       sanityUserId: MOCK_SANITY_USER_ID,
       role: SANITY_PROJECT_ROLE.VIEWER,
@@ -408,7 +414,7 @@ describe(checkOwnerAccess, () => {
       await checkOwnerAccess(MOCK_TENANT_ID);
 
       expect(createSanityProjectInvite).toHaveBeenCalledWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         email: MOCK_OWNER_EMAIL,
         role: SANITY_PROJECT_ROLE.VIEWER,

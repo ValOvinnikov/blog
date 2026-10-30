@@ -24,6 +24,7 @@ import {
   listSanityRobotTokens,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import {
+  SANITY_MANAGEMENT_TOKEN_LABEL,
   SANITY_READ_TOKEN_LABEL,
   SANITY_WRITE_TOKEN_LABEL,
 } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
@@ -44,11 +45,13 @@ import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
   mockProvisionedTenant,
   mockTenant,
 } from '@worker/testing/tenant/fixtures';
 import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { logger } from '@worker/utils/logger/logger';
+import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 import { runDeprovisioningStep } from './run-deprovisioning-step';
 
@@ -58,6 +61,7 @@ const MOCK_REVALIDATION_REFUSED = 'revalidation refused';
 const MOCK_PROVISIONED_TENANT = mockProvisionedTenant();
 const MOCK_READ_ROBOT_ID = faker.string.uuid();
 const MOCK_WRITE_ROBOT_ID = faker.string.uuid();
+const MOCK_MANAGEMENT_ROBOT_ID = faker.string.uuid();
 const MOCK_OTHER_ROBOT_ID = faker.string.uuid();
 const MOCK_OTHER_ROBOT_LABEL = faker.lorem.word();
 const MOCK_TENANT_HOSTS = [
@@ -84,6 +88,7 @@ vi.mock(
   () => import('@worker/testing/deprovision-env/fake-deprovision-env'),
 );
 vi.mock('workflow');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 function run(step: TDeprovisioningStep) {
   return runDeprovisioningStep(MOCK_TENANT_ID, MOCK_RUN_CONTEXT, step);
@@ -147,8 +152,9 @@ describe(runDeprovisioningStep, () => {
     expect(archiveSanityProject).not.toHaveBeenCalled();
   });
 
-  it('revokes only the provisioned Sanity robot tokens', async () => {
+  it('revokes only the provisioned Sanity robot tokens, the management token last', async () => {
     vi.mocked(listSanityRobotTokens).mockResolvedValue([
+      { id: MOCK_MANAGEMENT_ROBOT_ID, label: SANITY_MANAGEMENT_TOKEN_LABEL },
       { id: MOCK_READ_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
       { id: MOCK_WRITE_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL },
       { id: MOCK_OTHER_ROBOT_ID, label: MOCK_OTHER_ROBOT_LABEL },
@@ -160,7 +166,41 @@ describe(runDeprovisioningStep, () => {
       vi
         .mocked(deleteSanityRobotToken)
         .mock.calls.map(([input]) => input.robotId),
-    ).toEqual([MOCK_READ_ROBOT_ID, MOCK_WRITE_ROBOT_ID]);
+    ).toEqual([
+      MOCK_READ_ROBOT_ID,
+      MOCK_WRITE_ROBOT_ID,
+      MOCK_MANAGEMENT_ROBOT_ID,
+    ]);
+  });
+
+  it("revokes with the tenant's own management token", async () => {
+    vi.mocked(listSanityRobotTokens).mockResolvedValue([
+      { id: MOCK_READ_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
+    ]);
+
+    await run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS);
+
+    expect(deleteSanityRobotToken).toHaveBeenCalledWith({
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
+      projectId: MOCK_SANITY_PROJECT_ID,
+      robotId: MOCK_READ_ROBOT_ID,
+    });
+  });
+
+  it('logs and still succeeds when the tenant has no management token', async () => {
+    vi.mocked(requireTenantManagementToken).mockRejectedValue(
+      new Error(MOCK_SANITY_OUTAGE),
+    );
+
+    await expect(
+      run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
+    ).resolves.toEqual({ ok: true, data: undefined });
+
+    expect(listSanityRobotTokens).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_SANITY_OUTAGE },
+    );
   });
 
   it('logs and still succeeds when the tokens cannot be revoked', async () => {

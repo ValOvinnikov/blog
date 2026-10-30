@@ -16,6 +16,7 @@ import {
   MOCK_SANITY_READ_TOKEN,
   MOCK_TENANT_DOMAIN,
   mockProvisionedTenant,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@worker/testing/tenant/fixtures';
 import {
   MOCK_CURRENT_WEBHOOK,
@@ -31,9 +32,9 @@ import {
 faker.seed(7008);
 
 vi.mock('@blog/db/queries/tenants');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
-const { sanityManagementToken, vercelToken, vercelTeamId, vercelWebProjectId } =
-  MOCK_PROVISION_ENV;
+const { vercelToken, vercelTeamId, vercelWebProjectId } = MOCK_PROVISION_ENV;
 
 const MOCK_CREDENTIALS = {
   projectId: MOCK_SANITY_PROJECT_ID,
@@ -214,7 +215,7 @@ describe(verifyTenantSeededContent, () => {
     expect(clientOptions?.token).toBe(MOCK_SANITY_READ_TOKEN);
     expect(clientOptions?.useCdn).toBe(false);
     expect(listWebhooks).toHaveBeenCalledWith({
-      token: sanityManagementToken,
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
     });
     expect(listDomains).toHaveBeenCalledWith({

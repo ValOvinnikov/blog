@@ -2906,6 +2906,14 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
+    "developer": [
+      {
+        "ref": "SANITY_ROBOT_ROLE.DEVELOPER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
     "MANAGEMENT": [
       {
         "ref": "SANITY_API_SURFACE.MANAGEMENT",

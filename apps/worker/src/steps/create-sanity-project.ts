@@ -16,6 +16,7 @@ import {
 import { sanitizeLogMessage } from '@blog/insight';
 import { logger } from '@worker/utils/logger/logger';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { ensureTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 export type TCreateSanityProjectResult = {
   sanityProjectId: string;
@@ -43,25 +44,31 @@ export async function createTenantSanityProject(
     });
   }
 
+  const token = await ensureTenantManagementToken({
+    tenantId: tenant.id,
+    projectId,
+    organizationToken: env.sanityManagementToken,
+  });
+
   const datasets = await listSanityDatasets({
-    token: env.sanityManagementToken,
+    token,
     projectId,
   });
   if (!datasets.some((dataset) => dataset.name === env.tenantSanityDataset)) {
     await createSanityDataset({
-      token: env.sanityManagementToken,
+      token,
       projectId,
       dataset: env.tenantSanityDataset,
     });
   }
 
   const corsOrigins = await listSanityCorsOrigins({
-    token: env.sanityManagementToken,
+    token,
     projectId,
   });
   if (!corsOrigins.some((cors) => cors.origin === env.platformAppBaseUrl)) {
     await addSanityCorsOrigin({
-      token: env.sanityManagementToken,
+      token,
       projectId,
       origin: env.platformAppBaseUrl,
       allowCredentials: true,
@@ -76,7 +83,7 @@ export async function createTenantSanityProject(
     let alreadyInvited: TMaybeUndefined<boolean>;
     try {
       const invites = await listSanityProjectInvites({
-        token: env.sanityManagementToken,
+        token,
         projectId,
       });
       alreadyInvited = invites.some(
@@ -92,7 +99,7 @@ export async function createTenantSanityProject(
     if (alreadyInvited === false) {
       try {
         await createSanityProjectInvite({
-          token: env.sanityManagementToken,
+          token,
           projectId,
           email: ownerEmail,
           // The invites endpoint rejects `administrator` with a 403.

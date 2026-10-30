@@ -26,8 +26,10 @@ import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
   mockTenant,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
+import { ensureTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 import { createTenantSanityProject } from './create-sanity-project';
 
@@ -37,6 +39,7 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/queries/memberships');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-setup');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-project-access');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_CREATED_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_CORS_ORIGIN_ID = faker.string.uuid();
@@ -88,6 +91,16 @@ describe(createTenantSanityProject, () => {
       tenant = baseTenant();
     });
 
+    it("mints the tenant's management token for the new project with the organisation token", async () => {
+      await createTenantSanityProject(tenant, MOCK_PROVISION_ENV);
+
+      expect(ensureTenantManagementToken).toHaveBeenCalledWith({
+        tenantId: tenant.id,
+        projectId: MOCK_CREATED_PROJECT_ID,
+        organizationToken: sanityManagementToken,
+      });
+    });
+
     it('creates the project, dataset, and CORS origin and returns the project', async () => {
       const result = await createTenantSanityProject(
         tenant,
@@ -100,12 +113,12 @@ describe(createTenantSanityProject, () => {
         organizationId: sanityOrganizationId,
       });
       expect(createSanityDataset).toHaveBeenCalledWith({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_CREATED_PROJECT_ID,
         dataset: tenantSanityDataset,
       });
       expect(addSanityCorsOrigin).toHaveBeenCalledWith({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_CREATED_PROJECT_ID,
         origin: platformAppBaseUrl,
         allowCredentials: true,
@@ -151,12 +164,12 @@ describe(createTenantSanityProject, () => {
 
       expect(getTenantOwnerEmail).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(listSanityProjectInvites).toHaveBeenCalledWith({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_CREATED_PROJECT_ID,
       });
       expect(createSanityProjectInvite).toHaveBeenCalledOnce();
       expect(createSanityProjectInvite).toHaveBeenCalledWith({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_CREATED_PROJECT_ID,
         email: MOCK_OWNER_EMAIL,
         role: SANITY_PROJECT_ROLE.VIEWER,
@@ -247,7 +260,7 @@ describe(createTenantSanityProject, () => {
       expect(createSanityProject).not.toHaveBeenCalled();
       expect(setTenantSanityProject).not.toHaveBeenCalled();
       expect(createSanityDataset).toHaveBeenCalledWith({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         dataset: tenantSanityDataset,
       });
@@ -267,7 +280,7 @@ describe(createTenantSanityProject, () => {
       expect(setTenantSanityProject).not.toHaveBeenCalled();
       expect(createSanityDataset).not.toHaveBeenCalled();
       expect(addSanityCorsOrigin).toHaveBeenCalledWith({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         origin: platformAppBaseUrl,
         allowCredentials: true,
@@ -304,11 +317,11 @@ describe(createTenantSanityProject, () => {
         expect(addSanityCorsOrigin).not.toHaveBeenCalled();
         expect(createSanityProjectInvite).not.toHaveBeenCalled();
         expect(listSanityDatasets).toHaveBeenCalledWith({
-          token: sanityManagementToken,
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
           projectId: MOCK_SANITY_PROJECT_ID,
         });
         expect(listSanityCorsOrigins).toHaveBeenCalledWith({
-          token: sanityManagementToken,
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
           projectId: MOCK_SANITY_PROJECT_ID,
         });
       });

@@ -18,8 +18,8 @@ import {
   buildAppliedMigrationLedger,
   type TMigrationLedger,
 } from '@worker/utils/migration-ledger/migration-ledger';
-import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import { retryWithBackoff } from '@worker/utils/retry-with-backoff/retry-with-backoff';
+import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 const SANITY_API_VERSION = '2024-01-01';
 
@@ -43,7 +43,6 @@ const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 export async function seedTenantContent(
   tenant: TTenant,
   siteType: TStarterSiteType,
-  env: TProvisionEnv,
   deps: TSeedContentDeps = defaultDeps,
 ): Promise<void> {
   if (!tenant.sanityProjectId || !tenant.sanityDataset) {
@@ -52,8 +51,9 @@ export async function seedTenantContent(
     );
   }
 
+  const managementToken = await requireTenantManagementToken(tenant.id);
   const writeToken = await deps.mintWriteToken({
-    token: env.sanityManagementToken,
+    token: managementToken,
     projectId: tenant.sanityProjectId,
     label: SANITY_WRITE_TOKEN_LABEL,
     role: SANITY_ROBOT_ROLE.EDITOR,
@@ -106,7 +106,7 @@ export async function seedTenantContent(
   } finally {
     if (!persisted) {
       await deps.revokeWriteToken({
-        token: env.sanityManagementToken,
+        token: managementToken,
         projectId: tenant.sanityProjectId,
         robotId: writeToken.id,
       });
