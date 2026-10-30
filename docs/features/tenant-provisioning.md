@@ -88,6 +88,7 @@ The run then verifies all of it. The admin polls each step's progress and offers
   - `provisioningStatus` is PENDING, PROVISIONING, READY or FAILED.
   - `provisioningSteps` is jsonb, one entry per step (IDLE / RUNNING / DONE / FAILED with error and `updatedAt`), plus a `run` entry: `startedAt`, `finishedAt`, `admittedAt`, `registry` and `workflowRunUrl`.
   - Artifacts: `sanityProjectId`, `sanityDataset`, both encrypted tokens, `seededAt` and `webhookCreatedAt`.
+  - `sanityManagementTokenEncrypted`: a project-scoped Sanity token for the tenant's per-project operations, encrypted with `TENANT_TOKEN_ENCRYPTION_KEY` like the read and write tokens, written by `setTenantSanityManagementToken` and read with its project id by `getTenantSanityManagementCredentials`. Nullable; nothing mints it yet, and `CLEAR_ARTIFACTS` nulls it with the other tokens.
   - `lastNotifiedOwnerElevationOutcome` and `deprovisioningSteps` (same shape as `provisioningSteps`).
   - `siteType` (`SITE_TYPE`: BLOG, PORTFOLIO, PERSONAL, DOCS, BLANK, BUSINESS, PRODUCT; a `site_type` pgEnum, null for tenants created before signup) and `siteTemplateVersion`.
   - `selfServeOwnerEmailIndex`: the owner's normalised-address hash on a tenant created by self-serve signup, null otherwise, under the partial unique index `tenants_self_serve_free_owner_idx` that allows one FREE, non-archived self-serve tenant per person ([Platform sign-in and onboarding](platform-sign-in-and-onboarding.md)).

@@ -484,6 +484,13 @@
       "when": 1793262467378,
       "tag": "0068_add_site_config_footer",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1793395490795,
+      "tag": "0069_add_tenant_sanity_management_token",
+      "breakpoints": true
     }
   ]
 }

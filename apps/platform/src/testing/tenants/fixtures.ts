@@ -172,6 +172,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
+    sanityManagementTokenEncrypted: null,
     revalidateWebhookSecretEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
     additionalLocales: [],

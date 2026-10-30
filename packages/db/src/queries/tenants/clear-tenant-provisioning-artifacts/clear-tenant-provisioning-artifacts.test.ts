@@ -37,6 +37,7 @@ describe(clearTenantProvisioningArtifacts, () => {
     tenant = await insertTestTenant(db(), {
       sanityReadTokenEncrypted: faker.string.alphanumeric(32),
       sanityWriteTokenEncrypted: faker.string.alphanumeric(32),
+      sanityManagementTokenEncrypted: faker.string.alphanumeric(32),
       seededAt: MOCK_SEEDED_AT,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       provisioningSteps: {
@@ -53,6 +54,7 @@ describe(clearTenantProvisioningArtifacts, () => {
       ...tenant,
       sanityReadTokenEncrypted: null,
       sanityWriteTokenEncrypted: null,
+      sanityManagementTokenEncrypted: null,
       provisioningStatus: null,
       provisioningSteps: null,
       seededAt: null,
