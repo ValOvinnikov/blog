@@ -1,3 +1,4 @@
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { RailBrand } from '@platform/components/features/layout/rail-brand';
 import { RailIntro } from '@platform/components/features/layout/rail-intro';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
@@ -19,7 +20,7 @@ export const DashboardTenantPicker = ({
   const t = useTranslations('dashboardTenantPicker');
   const { root, rail, account, accountRule } = dashboardTenantPickerVariants();
 
-  if (tenants.length === 0) {
+  if (!hasArrayGotItems(tenants)) {
     return null;
   }
 

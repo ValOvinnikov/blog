@@ -1,5 +1,6 @@
 'use client';
 
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { TenantPickerRow } from '@platform/components/features/layout/dashboard-tenant-picker/components/tenant-picker-row';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
@@ -51,7 +52,7 @@ export const TenantPickerPane = ({ tenants }: TTenantPickerPaneProps) => {
         )}
         <Card>
           <Card.Body className={body()}>
-            {activeTenants.length > 0 && (
+            {hasArrayGotItems(activeTenants) && (
               <ul>
                 {activeTenants.map((tenant) => (
                   <li key={tenant.id} className={item()}>
@@ -60,7 +61,7 @@ export const TenantPickerPane = ({ tenants }: TTenantPickerPaneProps) => {
                 ))}
               </ul>
             )}
-            {archivedTenants.length > 0 && (
+            {hasArrayGotItems(archivedTenants) && (
               <>
                 <p id={archivedLabelId} className={groupLabel()}>
                   {tSwitcher('archived')}
@@ -74,7 +75,7 @@ export const TenantPickerPane = ({ tenants }: TTenantPickerPaneProps) => {
                 </ul>
               </>
             )}
-            {visibleTenants.length === 0 && (
+            {!hasArrayGotItems(visibleTenants) && (
               <p className={noMatch()}>{t('noMatch', { query })}</p>
             )}
           </Card.Body>
