@@ -19,14 +19,24 @@ const CardParts = {
 type TCardProps = {
   children?: TCompoundChildren<typeof CardParts>;
   className?: string;
+  'aria-labelledby'?: string;
 };
 
-const CardRoot = ({ children, className }: TCardProps) => {
+const CardRoot = ({
+  children,
+  className,
+  'aria-labelledby': ariaLabelledBy,
+}: TCardProps) => {
   const { root } = cardVariants();
   const { slots, unmatched } = mapCompoundSlots(children, CardParts);
 
   return (
-    <div data-slot="card" className={root({ class: className })}>
+    <div
+      data-slot="card"
+      role={ariaLabelledBy ? 'group' : undefined}
+      aria-labelledby={ariaLabelledBy}
+      className={root({ class: className })}
+    >
       {slots.Header}
       {slots.Body}
       {slots.Footer}

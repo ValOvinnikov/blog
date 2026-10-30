@@ -2,6 +2,7 @@ import { VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -28,7 +29,6 @@ const MOCK_ITEM_THREE = faker.lorem.words(3);
 const MOCK_ITEM_FOUR = faker.lorem.words(3);
 const MOCK_ITEM_FIVE = faker.lorem.words(3);
 const ARIA_PRESSED = 'aria-pressed';
-const ARIA_DISABLED = 'aria-disabled';
 const ARIA_MULTILINE = 'aria-multiline';
 const ARIA_SETSIZE = 'aria-setsize';
 const ARIA_POSINSET = 'aria-posinset';

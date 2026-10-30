@@ -658,7 +658,7 @@
       "FLOATING": "Flottante"
     },
     "accountButtonStyleLabel": "Bouton du compte",
-    "accountButtonStyleDescription": "Le bouton avec lequel les lecteurs se connectent et ouvrent leur compte, sur grand écran. Les téléphones affichent un cercle.",
+    "accountButtonStyleDescription": "Le bouton avec lequel les lecteurs se connectent et ouvrent leur compte, sur grand écran. Les téléphones suivent le réglage « Sur téléphone, le compte se trouve » plus bas.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pastille avec libellé",
       "CIRCLE": "Cercle"

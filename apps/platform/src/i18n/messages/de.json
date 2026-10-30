@@ -658,7 +658,7 @@
       "FLOATING": "Schwebend"
     },
     "accountButtonStyleLabel": "Konto-Schaltfläche",
-    "accountButtonStyleDescription": "Die Schaltfläche, mit der sich Leser anmelden und ihr Konto öffnen, auf breiten Bildschirmen. Telefone zeigen einen Kreis.",
+    "accountButtonStyleDescription": "Die Schaltfläche, mit der sich Leser anmelden und ihr Konto öffnen, auf breiten Bildschirmen. Telefone folgen der Einstellung „Auf Telefonen sitzt das Konto“ weiter unten.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pille mit Beschriftung",
       "CIRCLE": "Kreis"

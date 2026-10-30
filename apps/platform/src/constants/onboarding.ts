@@ -1,15 +1,15 @@
 import { SITE_TYPE } from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
 
-export const SELF_SERVE_SITE_TYPES = [
-  SITE_TYPE.BLOG,
-  SITE_TYPE.PORTFOLIO,
-  SITE_TYPE.PERSONAL,
-  SITE_TYPE.DOCS,
-  SITE_TYPE.BLANK,
-] as const;
+export const SELF_SERVE_SITE_TYPE = {
+  BLOG: SITE_TYPE.BLOG,
+  PORTFOLIO: SITE_TYPE.PORTFOLIO,
+  PERSONAL: SITE_TYPE.PERSONAL,
+  DOCS: SITE_TYPE.DOCS,
+  BLANK: SITE_TYPE.BLANK,
+} as const;
 
-export type TSelfServeSiteType = (typeof SELF_SERVE_SITE_TYPES)[number];
+export type TSelfServeSiteType = TValueOf<typeof SELF_SERVE_SITE_TYPE>;
 
 export const SITE_ADDRESS_STATUS = {
   IDLE: 'IDLE',

@@ -1,12 +1,13 @@
 'use client';
 
+import { toOptions } from '@blog/utils/primitives';
 import { useFieldErrorText } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-field-error-text';
 import type { TOnboardingFieldErrors } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-form';
 import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import {
-  SELF_SERVE_SITE_TYPES,
+  SELF_SERVE_SITE_TYPE,
   type TSelfServeSiteType,
 } from '@platform/constants/onboarding';
 import type { TCreateSiteInput } from '@platform/server/onboarding/create-site-input';
@@ -33,10 +34,9 @@ export const SiteDetailsFields = ({
     <>
       <FormField label={t('siteTypeLabel')} hint={t('siteTypeHint')}>
         <OptionSelect
-          options={SELF_SERVE_SITE_TYPES.map((siteType) => ({
-            value: siteType,
-            label: t(`siteTypes.${siteType}`),
-          }))}
+          options={toOptions(SELF_SERVE_SITE_TYPE, (siteType) =>
+            t(`siteTypes.${siteType}`),
+          )}
           value={values.siteType}
           onChange={onSiteTypeChange}
         />

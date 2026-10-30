@@ -45,6 +45,7 @@ import {
 } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import type { TUploadResult } from '@platform/server/uploads/upload-error';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -154,7 +155,6 @@ const ARROW_RIGHT_KEY = '{ArrowRight}';
 const ARIA_SELECTED = 'aria-selected';
 const ARIA_PRESSED = 'aria-pressed';
 const DATA_DISABLED = 'data-disabled';
-const ARIA_DISABLED = 'aria-disabled';
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
 const FOLLOW_ACCENT_HUE = messages.logoHueField.followAccentHue;
@@ -423,8 +423,8 @@ describe(`<${LookForm.name}/>`, () => {
           saved: { cardStyle: CARD_STYLE.OUTLINED },
         },
       ])('saves the chosen $group style', async ({ group, option, saved }) => {
-        const styleGroup = screen.getByRole('group', { name: group });
-        const optionButton = within(styleGroup).getByRole('button', {
+        const [styleGroup] = screen.getAllByRole('group', { name: group });
+        const optionButton = within(styleGroup!).getByRole('button', {
           name: option,
         });
         await user.click(optionButton);

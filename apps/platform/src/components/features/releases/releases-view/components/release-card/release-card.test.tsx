@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import type * as releaseConstants from '@platform/constants/release';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -18,8 +19,6 @@ import { ReleaseCard } from './release-card';
 import { POLL_INTERVAL_MS } from './use-release-run';
 
 faker.seed(5994);
-
-const ARIA_DISABLED = 'aria-disabled';
 
 const { startReleaseActionMock, getReleaseRunActionMock, releaseSwitch } =
   vi.hoisted(() => ({

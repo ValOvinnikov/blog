@@ -1,6 +1,7 @@
 import { SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -23,7 +24,6 @@ const MOCK_CONFIRM_ERROR = faker.lorem.sentence();
 const MOCK_DISABLED_REASON = faker.lorem.sentence();
 const MOCK_UNTYPED_TRIGGER_LABEL = faker.lorem.words(3);
 const CONFIRM_FIELD_NAME = t('confirmLabel', { name: MOCK_EXPECTED_VALUE });
-const ARIA_DISABLED = 'aria-disabled';
 
 type THarnessProps = Omit<
   ComponentProps<typeof ConfirmDialog>,

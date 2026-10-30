@@ -658,7 +658,7 @@
       "FLOATING": "Zwevend"
     },
     "accountButtonStyleLabel": "Accountknop",
-    "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons tonen een cirkel.",
+    "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons volgen de instelling ‘Op telefoons staat het account’ hieronder.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pil met label",
       "CIRCLE": "Cirkel"

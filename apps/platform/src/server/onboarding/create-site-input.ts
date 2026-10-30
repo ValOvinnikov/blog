@@ -6,7 +6,7 @@ import {
   PRESET_ID,
   type TActionResult,
 } from '@blog/config';
-import { SELF_SERVE_SITE_TYPES } from '@platform/constants/onboarding';
+import { SELF_SERVE_SITE_TYPE } from '@platform/constants/onboarding';
 import type {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
@@ -18,7 +18,7 @@ import type {
 import { z } from 'zod';
 
 export const createSiteInputSchema = z.object({
-  siteType: z.enum(SELF_SERVE_SITE_TYPES),
+  siteType: z.enum(SELF_SERVE_SITE_TYPE),
   name: z.string().trim().min(1),
   slug: z.string().trim().toLowerCase().min(1),
   locale: z.enum(LOCALE_ISO_CODES),
