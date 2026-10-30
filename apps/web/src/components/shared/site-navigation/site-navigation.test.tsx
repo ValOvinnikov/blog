@@ -1,7 +1,12 @@
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
-import { customRender, fireEvent, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  fireEvent,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import {
   MOCK_ABOUT_LINK,
@@ -132,6 +137,24 @@ describe(`<${SiteNavigation.name}/>`, () => {
     view.rerender(<SiteNavigation links={[MOCK_TOPICS_GROUP]} />);
 
     expect(hidePopover).toHaveBeenCalledOnce();
+  });
+
+  it('folds an open disclosure sub-menu when the route changes', async () => {
+    const user = userEvent.setup();
+    const view = setup({ links: [MOCK_TOPICS_GROUP] });
+    const toggle = screen.getByRole('button', { name: TOGGLE_NAME });
+    await user.click(toggle);
+    const disclosure = screen.getByRole('group');
+    const summary = within(disclosure).getByText(MOCK_TOPICS_GROUP.label, {
+      selector: 'summary',
+    });
+    await user.click(summary);
+    expect(disclosure).toHaveAttribute('open');
+
+    vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
+    view.rerender(<SiteNavigation links={[MOCK_TOPICS_GROUP]} />);
+
+    expect(disclosure).not.toHaveAttribute('open');
   });
 
   it('renders the actions slot', () => {
