@@ -29,7 +29,8 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 ## Surfaces and routes
 
 - **Banner** — `ConsentBannerSlot`, mounted once in `SiteProviders`, shows when the `CONSENT_BANNER` capability is on and the reader has no valid consent cookie.
-- **Preferences dialog** — `ConsentPreferencesDialog`: Necessary (locked on) and External media switches, Save and Close. Opened from the banner's settings button and from the footer's `CookieSettingsButton`, which renders on every site whatever the capability; focus returns to that button on close.
+- **Preferences dialog** — `ConsentPreferencesDialog`: Necessary (locked on) and External media switches, Save and Close. Opened from the banner's settings button, from the footer's `CookieSettingsButton`, which renders on every site whatever the capability, and from the floating button. On close focus returns to the control that opened it; when that control has gone (the banner, after Save), it falls back to the floating button, else the footer link.
+- **Floating button** — `FloatingCookieSettingsButton`, a 44px round icon button fixed bottom left and named "Cookie settings". `SiteFooter` mounts it when Look's Cookie settings button is Shown and the `CONSENT_BANNER` capability is on. It renders only once the reader has answered the banner, never during SSR, sits below toasts and the banner (`z-20`), and hides while a header overlay is open.
 - **Analytics** — `SiteAnalytics`, rendered in the tenant layout, mounts `<Analytics />` and `<SpeedInsights />`.
 - No platform page of its own: both are rows on the Features page (see [plans-and-entitlements](./plans-and-entitlements.md)). No Studio surface.
 
@@ -45,7 +46,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - **Owner or operator (platform Features)** — `CONSENT_BANNER` (in `FREE` and `GROWTH`) and `ANALYTICS` (`GROWTH` only). Both preset defaults are off.
 - **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` is required as well; analytics loads only when the env flag and the capability both allow it.
 - **Voice** — none; banner, dialog and footer-link copy are fixed keys (`consent.*`).
-- **Look** — the banner, dialog and placeholder are `@blog/ui` molecules and follow the site's Look.
+- **Look** — the banner, dialog and placeholder are `@blog/ui` molecules and follow the site's Look. Look › Footer › Cookie settings button (Hidden default · Shown, every plan) turns on the floating button, read through `getFooterStyle`.
 
 ## Constraints and invariants
 
@@ -71,13 +72,15 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `apps/web/src/hooks/use-consent/use-consent.ts`
 - `apps/web/src/components/shared/consent-banner-slot/consent-banner-slot.tsx`
 - `apps/web/src/components/shared/consent-preferences-dialog/consent-preferences-dialog.tsx`
+- `apps/web/src/components/shared/floating-cookie-settings-button/floating-cookie-settings-button.tsx`
+- `apps/web/src/context/consent-preferences-provider/consent-preferences-provider.tsx` — the footer and floating control refs and the focus-return fallback
 - `apps/web/src/components/shared/site-providers/site-providers.tsx`
 - `apps/web/src/components/shared/site-analytics/site-analytics.tsx`
 - `apps/web/src/app/[tenant]/[locale]/layout.tsx`
 
 ## Tests and stories
 
-- `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
+- `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
 - `packages/ui/src/components/molecules/consent-*/**/*.test.tsx`.
 - Stories: `consent-banner.stories.tsx`, `consent-preferences.stories.tsx`, `consent-placeholder.stories.tsx` (ui).
 

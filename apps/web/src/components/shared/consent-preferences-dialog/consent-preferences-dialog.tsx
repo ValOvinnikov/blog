@@ -8,7 +8,7 @@ import { ConsentPreferencesForm } from './components/consent-preferences-form/co
 
 export const ConsentPreferencesDialog = () => {
   const t = useTranslations('consent.preferences');
-  const { isOpen, open, close, settingsButtonRef } = useConsentPreferences();
+  const { isOpen, open, close, returnFocusRef } = useConsentPreferences();
 
   return (
     <Dialog
@@ -16,7 +16,7 @@ export const ConsentPreferencesDialog = () => {
       onOpenChange={(nextIsOpen) => (nextIsOpen ? open() : close())}
       heading={t('heading')}
       headingLevel={2}
-      fallbackFocusRef={settingsButtonRef}
+      fallbackFocusRef={returnFocusRef}
       dataTestId="consent-preferences-dialog"
     >
       <ConsentPreferencesForm />

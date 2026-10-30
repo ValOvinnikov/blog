@@ -11,10 +11,10 @@ const s = cookieSettingsButtonVariants();
 
 export const CookieSettingsButton = () => {
   const t = useTranslations('consent');
-  const { open, settingsButtonRef } = useConsentPreferences();
+  const { open, footerControlRef } = useConsentPreferences();
 
   return (
-    <span ref={settingsButtonRef} className={s.root()}>
+    <span ref={footerControlRef} className={s.root()}>
       <Button variant="link" size={SIZE.SM} onClick={open}>
         {t('footerSettingsLabel')}
       </Button>
