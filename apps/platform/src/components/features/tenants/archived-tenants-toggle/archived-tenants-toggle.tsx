@@ -3,6 +3,10 @@
 import { SIZE } from '@blog/config';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
+import {
+  TENANT_VISIBILITY,
+  type TTenantVisibility,
+} from '@platform/constants/tenant';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
 import { useTranslations } from 'next-intl';
@@ -14,20 +18,20 @@ export type TArchivedTenantsToggleProps = {
   listQuery: TTenantsListQuery;
 };
 
-type TTenantVisibility = 'active' | 'all';
-
 export const ArchivedTenantsToggle = ({
   listQuery,
 }: TArchivedTenantsToggleProps) => {
   const t = useTranslations('archivedTenantsToggle');
   const { isPending, navigate } = useTenantsListNavigation(listQuery);
   const [value, setOptimisticValue] = useOptimistic<TTenantVisibility>(
-    listQuery.shouldShowArchived ? 'all' : 'active',
+    listQuery.shouldShowArchived
+      ? TENANT_VISIBILITY.ALL
+      : TENANT_VISIBILITY.ACTIVE,
   );
   const { root } = archivedTenantsToggleVariants();
 
   const handleChange = (next: TTenantVisibility) => {
-    navigate({ shouldShowArchived: next === 'all' }, () =>
+    navigate({ shouldShowArchived: next === TENANT_VISIBILITY.ALL }, () =>
       setOptimisticValue(next),
     );
   };
@@ -38,8 +42,8 @@ export const ArchivedTenantsToggle = ({
       <SegmentedControl<TTenantVisibility>
         ariaLabel={t('ariaLabel')}
         options={[
-          { value: 'active', label: t('activeOption') },
-          { value: 'all', label: t('allOption') },
+          { value: TENANT_VISIBILITY.ACTIVE, label: t('activeOption') },
+          { value: TENANT_VISIBILITY.ALL, label: t('allOption') },
         ]}
         value={value}
         onChange={handleChange}

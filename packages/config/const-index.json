@@ -3366,6 +3366,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/step-indicator",
         "file": "apps/platform/src/constants/step-indicator.ts"
+      },
+      {
+        "ref": "TENANT_VISIBILITY.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "REMOVE_DOMAIN": [
@@ -4334,6 +4340,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/data-request",
         "file": "apps/platform/src/constants/data-request.ts"
+      },
+      {
+        "ref": "TENANT_VISIBILITY.ALL",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "KIND": [
