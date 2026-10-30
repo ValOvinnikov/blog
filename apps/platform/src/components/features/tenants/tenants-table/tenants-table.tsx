@@ -3,12 +3,14 @@
 import { SIZE, TENANT_SORT_COLUMN, type TTenantSortColumn } from '@blog/config';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import { Avatar } from '@platform/components/shared/avatar';
-import { DataTableShell } from '@platform/components/shared/data-table-shell';
+import {
+  DataTableShell,
+  nextSort,
+} from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { nextSort } from '@platform/utils/next-sort/next-sort';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';

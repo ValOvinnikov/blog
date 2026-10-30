@@ -2,6 +2,7 @@
 
 import { SORT_DIRECTION } from '@blog/config/constants';
 import type { TColumnSort } from '@blog/config/types';
+import { nextSort } from '@platform/components/shared/data-table-shell';
 import {
   DATA_REQUEST_KIND_FILTER,
   DATA_REQUEST_MATCH_COLUMN,
@@ -11,7 +12,6 @@ import {
   type TDataRequestMatchColumn,
 } from '@platform/constants/data-request';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
-import { nextSort } from '@platform/utils/next-sort/next-sort';
 import { countPages } from '@platform/utils/pagination/pagination';
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
