@@ -658,7 +658,7 @@
       "FLOATING": "Floating"
     },
     "accountButtonStyleLabel": "Account button",
-    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones show a circle.",
+    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones follow the “On phones, the account sits” setting below.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pill with label",
       "CIRCLE": "Circle"

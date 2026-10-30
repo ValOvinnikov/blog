@@ -658,7 +658,7 @@
       "FLOATING": "Flotante"
     },
     "accountButtonStyleLabel": "Botón de la cuenta",
-    "accountButtonStyleDescription": "El botón con el que los lectores inician sesión y abren su cuenta, en pantallas anchas. Los teléfonos muestran un círculo.",
+    "accountButtonStyleDescription": "El botón con el que los lectores inician sesión y abren su cuenta, en pantallas anchas. Los teléfonos siguen el ajuste «En teléfonos, la cuenta va» más abajo.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Píldora con etiqueta",
       "CIRCLE": "Círculo"

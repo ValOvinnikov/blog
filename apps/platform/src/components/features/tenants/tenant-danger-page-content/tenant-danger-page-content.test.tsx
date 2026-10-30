@@ -3,6 +3,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
   mockIdleDeprovisioningSteps,
@@ -67,8 +68,6 @@ const advancePoll = async (ticks = 1) => {
     await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * ticks);
   });
 };
-
-const ARIA_DISABLED = 'aria-disabled';
 
 describe(`<${TenantDangerPageContent.name}/>`, () => {
   beforeEach(() => {

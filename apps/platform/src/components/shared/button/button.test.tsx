@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -15,7 +16,6 @@ const MOCK_LABEL = faker.lorem.word();
 const MOCK_PENDING_LABEL = faker.lorem.word();
 const MOCK_REASON_ID = faker.string.alpha(8);
 const MOCK_REASON = faker.lorem.sentence();
-const ARIA_DISABLED = 'aria-disabled';
 
 const setup = customRender(Button, { children: MOCK_LABEL });
 

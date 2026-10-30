@@ -2,7 +2,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { Card } from '@platform/components/shared/card';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookCardKey } from '@platform/utils/look-form-values/look-form-values';
-import type { ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
 
@@ -22,14 +22,15 @@ export const LookCard = ({
   children,
 }: TLookCardProps) => {
   const { hasCardChanges } = useLookForm();
+  const titleId = useId();
   const { title: titleSlot, body } = lookCardVariants();
 
   return (
-    <Card>
+    <Card aria-labelledby={titleId}>
       <Card.Header
         title={
           <span className={titleSlot()}>
-            {title}
+            <span id={titleId}>{title}</span>
             {hasCardChanges(card) && (
               <>
                 {' '}

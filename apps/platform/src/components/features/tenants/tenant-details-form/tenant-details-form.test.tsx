@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import en from '@platform/i18n/messages/en.json';
 import type { TCreateTenantInput } from '@platform/server/tenants/create-tenant-action';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -26,7 +27,6 @@ const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
 const MOCK_EMAIL_EDIT_SUFFIX = `.${faker.string.alpha({ length: 2, casing: 'lower' })}`;
 const MOCK_MIXED_CASE_OWNER_EMAIL = 'John.Doe@Example.com';
 const MOCK_NORMALIZED_OWNER_EMAIL = MOCK_MIXED_CASE_OWNER_EMAIL.toLowerCase();
-const ARIA_DISABLED = 'aria-disabled';
 const OWNER_INVITE_CONFIRMATION = t('ownerInviteConfirmation', {
   email: MOCK_OWNER_EMAIL,
 });
