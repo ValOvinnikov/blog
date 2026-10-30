@@ -12,7 +12,6 @@ import { OnboardingStepHeader } from '@platform/components/features/onboarding/o
 import { ReviewStep } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/review-step';
 import { SiteDetailsFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-details-fields';
 import { SiteLookFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-look-fields';
-import { Card } from '@platform/components/shared/card';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 
@@ -69,52 +68,50 @@ export const OnboardingForm = ({
       />
       <main className={main()}>
         <Form className={form()} onSubmit={handleSubmit}>
-          <Card className={panel()}>
-            <Card.Body>
-              <div ref={panelRef} tabIndex={-1} className={fields()}>
-                <OnboardingStepHeader
-                  step={step}
-                  stepNumber={stepIndex + 1}
-                  stepTotal={railSteps.length}
+          <div className={panel()}>
+            <div ref={panelRef} tabIndex={-1} className={fields()}>
+              <OnboardingStepHeader
+                step={step}
+                stepNumber={stepIndex + 1}
+                stepTotal={railSteps.length}
+              />
+              {failure && <OnboardingFailureAlert failure={failure} />}
+              {step === ONBOARDING_STEP.SITE && (
+                <SiteDetailsFields
+                  values={values}
+                  fieldErrors={fieldErrors}
+                  onFieldChange={changeField}
+                  onSiteTypeChange={changeSiteType}
                 />
-                {failure && <OnboardingFailureAlert failure={failure} />}
-                {step === ONBOARDING_STEP.SITE && (
-                  <SiteDetailsFields
-                    values={values}
-                    fieldErrors={fieldErrors}
-                    onFieldChange={changeField}
-                    onSiteTypeChange={changeSiteType}
-                  />
-                )}
-                {step === ONBOARDING_STEP.ADDRESS && (
-                  <AddressStepFields
-                    values={values}
-                    rootDomain={rootDomain}
-                    addressErrorId={addressErrorId}
-                    onFieldChange={changeField}
-                  />
-                )}
-                {step === ONBOARDING_STEP.LOOK && (
-                  <SiteLookFields
-                    preset={values.preset}
-                    accentHue={values.accentHue}
-                    onPresetChange={changePreset}
-                    onAccentHueChange={changeAccentHue}
-                  />
-                )}
-                {step === ONBOARDING_STEP.REVIEW && (
-                  <ReviewStep
-                    values={values}
-                    siteAddress={siteAddress}
-                    legalPageUrls={legalPageUrls}
-                    hasTermsError={Boolean(fieldErrors.hasAcceptedTerms)}
-                    onFieldChange={changeField}
-                    onEdit={editStep}
-                  />
-                )}
-              </div>
-            </Card.Body>
-          </Card>
+              )}
+              {step === ONBOARDING_STEP.ADDRESS && (
+                <AddressStepFields
+                  values={values}
+                  rootDomain={rootDomain}
+                  addressErrorId={addressErrorId}
+                  onFieldChange={changeField}
+                />
+              )}
+              {step === ONBOARDING_STEP.LOOK && (
+                <SiteLookFields
+                  preset={values.preset}
+                  accentHue={values.accentHue}
+                  onPresetChange={changePreset}
+                  onAccentHueChange={changeAccentHue}
+                />
+              )}
+              {step === ONBOARDING_STEP.REVIEW && (
+                <ReviewStep
+                  values={values}
+                  siteAddress={siteAddress}
+                  legalPageUrls={legalPageUrls}
+                  hasTermsError={Boolean(fieldErrors.hasAcceptedTerms)}
+                  onFieldChange={changeField}
+                  onEdit={editStep}
+                />
+              )}
+            </div>
+          </div>
           <div className={actions()}>
             <OnboardingActions
               isFirstStep={isFirstStep}
