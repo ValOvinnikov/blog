@@ -276,7 +276,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 
-- **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `ARCHIVE_SANITY_PROJECT`, `REVOKE_SANITY_TOKENS`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`
+- **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `REVOKE_SANITY_TOKENS`, `ARCHIVE_SANITY_PROJECT`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-inactivity.ts`
 

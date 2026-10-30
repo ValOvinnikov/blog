@@ -3,7 +3,10 @@ import {
   getTenantSanityManagementCredentials,
   setTenantSanityManagementToken,
 } from '@blog/db/queries/tenants';
-import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
+import {
+  createSanityRobotToken,
+  deleteSanityRobotToken,
+} from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { SANITY_MANAGEMENT_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { faker } from '@faker-js/faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
@@ -25,6 +28,8 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-robot-tokens');
 
 const MOCK_MINTED_TOKEN = faker.string.alphanumeric(32);
+const MOCK_MINTED_ROBOT_ID = faker.string.uuid();
+const MOCK_STORE_FAILURE = 'store failed';
 const MOCK_STORED_CREDENTIALS = {
   projectId: MOCK_SANITY_PROJECT_ID,
   token: MOCK_TENANT_MANAGEMENT_TOKEN,
@@ -70,7 +75,7 @@ describe(ensureTenantManagementToken, () => {
   describe('when the tenant has no token yet', () => {
     beforeEach(() => {
       vi.mocked(createSanityRobotToken).mockResolvedValue({
-        id: faker.string.uuid(),
+        id: MOCK_MINTED_ROBOT_ID,
         token: MOCK_MINTED_TOKEN,
       });
     });
@@ -94,6 +99,22 @@ describe(ensureTenantManagementToken, () => {
         MOCK_TENANT_ID,
         MOCK_MINTED_TOKEN,
       );
+      expect(deleteSanityRobotToken).not.toHaveBeenCalled();
+    });
+
+    it('revokes the minted token and fails when it cannot be stored', async () => {
+      vi.mocked(setTenantSanityManagementToken).mockRejectedValue(
+        new Error(MOCK_STORE_FAILURE),
+      );
+
+      await expect(
+        ensureTenantManagementToken(MOCK_ENSURE_INPUT),
+      ).rejects.toThrow(MOCK_STORE_FAILURE);
+      expect(deleteSanityRobotToken).toHaveBeenCalledWith({
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        robotId: MOCK_MINTED_ROBOT_ID,
+      });
     });
   });
 });

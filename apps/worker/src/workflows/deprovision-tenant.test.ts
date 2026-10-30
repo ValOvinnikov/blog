@@ -35,8 +35,8 @@ describe(deprovisionTenant, () => {
     expect(outcome).toEqual({ ok: true, data: { skipped: false } });
     expect(stepsRun()).toEqual([
       DEPROVISIONING_STEP.REMOVE_DOMAIN,
-      DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
       DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
+      DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
       DEPROVISIONING_STEP.CLEAR_ARTIFACTS,
       DEPROVISIONING_STEP.ARCHIVE_TENANT,
       DEPROVISIONING_STEP.PURGE_READER_DATA,
@@ -66,7 +66,7 @@ describe(deprovisionTenant, () => {
     vi.mocked(runDeprovisioningStep)
       .mockResolvedValueOnce(okResult())
       .mockResolvedValueOnce(
-        errorResult(DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT),
+        errorResult(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
       );
 
     await expect(deprovisionTenant(MOCK_TENANT_ID)).rejects.toBeInstanceOf(
@@ -75,14 +75,14 @@ describe(deprovisionTenant, () => {
 
     expect(stepsRun()).toEqual([
       DEPROVISIONING_STEP.REMOVE_DOMAIN,
-      DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+      DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
     ]);
     expect(finishDeprovisioning).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_RUN_CONTEXT,
       {
         ok: false,
-        error: { failedStep: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT },
+        error: { failedStep: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS },
       },
     );
   });
