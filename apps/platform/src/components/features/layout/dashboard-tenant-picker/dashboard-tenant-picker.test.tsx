@@ -67,6 +67,13 @@ const setup = customRender(DashboardTenantPicker, {
   ],
 });
 
+const overflowViewportWhileUnfiltered = () =>
+  vi
+    .spyOn(document.documentElement, 'scrollHeight', 'get')
+    .mockImplementation(() =>
+      screen.queryAllByRole('link').length > 1 ? MOCK_OVERFLOWING_HEIGHT : 0,
+    );
+
 const overflowViewport = () =>
   vi
     .spyOn(document.documentElement, 'scrollHeight', 'get')
@@ -85,6 +92,12 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       expect(headings[0]).toHaveTextContent(
         messages.dashboardTenantPicker.heading,
       );
+    });
+
+    it('labels the main region with the page heading', () => {
+      const main = screen.getByRole('main');
+
+      expect(main).toHaveAccessibleName(messages.dashboardTenantPicker.heading);
     });
 
     it('links each tenant to selecting it', () => {
@@ -230,6 +243,19 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
 
       expect(filter).toBeVisible();
     });
+  });
+
+  it('keeps focus in the filter when a query that made the tenants fit is cleared', async () => {
+    const user = userEvent.setup();
+    overflowViewportWhileUnfiltered();
+    setup();
+    const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
+    await user.type(filter, MOCK_OTHER_TENANT_NAME);
+
+    await user.clear(filter);
+
+    expect(filter).toBeInTheDocument();
+    expect(filter).toHaveFocus();
   });
 
   it('hides the filter once an empty one fits the viewport again', () => {

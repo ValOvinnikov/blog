@@ -4,6 +4,7 @@ export type TRailIntroProps = {
   title: string;
   description: string;
   isPageHeading?: boolean;
+  titleId?: string;
   className?: string;
 };
 
@@ -11,6 +12,7 @@ export const RailIntro = ({
   title,
   description,
   isPageHeading = false,
+  titleId,
   className,
 }: TRailIntroProps) => {
   const {
@@ -22,7 +24,9 @@ export const RailIntro = ({
 
   return (
     <div className={root({ class: className })}>
-      <TitleTag className={titleSlot()}>{title}</TitleTag>
+      <TitleTag id={titleId} className={titleSlot()}>
+        {title}
+      </TitleTag>
       <p className={descriptionSlot()}>{description}</p>
     </div>
   );

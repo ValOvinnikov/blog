@@ -6,7 +6,7 @@ import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
@@ -15,6 +15,8 @@ type TProps = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 };
+
+export const viewport: Viewport = { viewportFit: 'cover' };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
