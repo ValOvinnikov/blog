@@ -4,7 +4,7 @@ import { toStepProgressState } from '@platform/utils/step-progress-state/step-pr
 
 import { segmentedProgressVariants } from './segmented-progress-variants';
 
-export type TSegmentedProgressProps = IWithClassName & {
+type TSegmentedProgressProps = IWithClassName & {
   value: number;
   total: number;
   label: string;

@@ -1,4 +1,1 @@
-export {
-  SegmentedProgress,
-  type TSegmentedProgressProps,
-} from './segmented-progress';
+export { SegmentedProgress } from './segmented-progress';
