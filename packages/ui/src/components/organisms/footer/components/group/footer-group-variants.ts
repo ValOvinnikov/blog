@@ -12,7 +12,8 @@ export const footerGroupVariants = tv({
     ],
     list: [
       'flex flex-col gap-2',
-      'group-data-[layout=CENTRED]/footer:contents',
+      'group-data-[layout=CENTRED]/footer:flex-row group-data-[layout=CENTRED]/footer:flex-wrap group-data-[layout=CENTRED]/footer:justify-center',
+      'group-data-[layout=CENTRED]/footer:gap-x-5 group-data-[layout=CENTRED]/footer:gap-y-2',
     ],
   },
 });
