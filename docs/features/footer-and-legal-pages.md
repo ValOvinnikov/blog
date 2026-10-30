@@ -20,7 +20,7 @@ The site footer closes every page with a copyright line, the site's social profi
 
 - **Public site:** every page rendered inside `app/[tenant]/[locale]/layout.tsx`, which mounts `SiteFooter`. The standalone 404 boundaries above that layout have no footer.
 - **Studio:** Settings → Footer, the `settings_footer` singleton — Social Links, Show language switcher, Show RSS feed. The copyright name is the brand name in Settings → Site Settings.
-- **Platform:** no footer editor. Look styles it through the theme tokens and picks the switcher style.
+- **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
 
 ## Data
 
@@ -28,6 +28,7 @@ The site footer closes every page with a copyright line, the site's social profi
 - **`socialProfile`:** a required `link` reference to a `link` document plus a `platform` from `SOCIAL_PLATFORMS` (X, GitHub, LinkedIn, YouTube, Instagram, Mastodon, Bluesky, Facebook, Threads, RSS). The same object backs `person.socialLinks` (./people.md), through one shared fragment and transformer.
 - **Service:** `service.global.footer.v1.getFooter(sanityContext)` returns `{ social: TSocialProfile[], showLanguageSwitcher?, showRssFeed }`, with `showRssFeed` defaulting to `true` when unset. A profile whose link has no label or no resolvable href is dropped.
 - **Cache:** the query is tagged `footer`, `link` and every page type, tenant-scoped; the publish webhook maps `settings_footer` → `footer` and `link` → `link`.
+- **Look:** `site_config.footer_layout`, `footer_background`, `footer_surface` and `cookie_settings_button`, read by `getFooterStyle` through `getSiteConfig`, so a plan without the field gets the preset's value. A failed read logs `footer.site_config_fetch_failed` and falls back to the preset (Columns, Brand tint, Full width, button Hidden).
 - **Copyright:** `© {year} {brand name}`, the year computed at render time; the format is fixed in `@blog/ui`'s `Footer.Copyright` and no editor or owner can reword it.
 - **Legal pages:** no schema, table or route exists for them.
 
@@ -36,7 +37,8 @@ The site footer closes every page with a copyright line, the site's social profi
 - **Editors** manage social profiles, the switcher toggle and the RSS toggle in Studio; a profile's destination is edited on its `link` document (./links.md).
 - The switcher shows only with two or more live languages, and Studio hides its toggle otherwise (./languages.md). Its style comes from Look (./look.md).
 - The cookie settings button reopens the consent preferences dialog (./consent-and-analytics.md). The RSS link goes to the current language's feed (./seo-and-feeds.md).
-- Nothing in the footer is plan-gated.
+- Layout, Background and Surface are Growth-only; a Free site renders the preset's. The content is not plan-gated.
+- Big wordmark sets the brand name large and `aria-hidden`, since the copyright line already names the site. Compact shows no groups, about text or address.
 
 ## Constraints and invariants
 
@@ -59,13 +61,14 @@ The site footer closes every page with a copyright line, the site's social profi
 - `packages/studio/src/schema-types/objects/social-profile/social-profile.ts`
 - `packages/service/src/features/global/footer/adaptor/query.ts`, `transformer.ts`
 - `apps/web/src/components/shared/site-footer/site-footer.tsx`
+- `apps/web/src/server/site-config/get-footer-style/get-footer-style.ts`
 - `apps/web/src/components/shared/social-links/social-link.tsx`
 - `packages/ui/src/components/organisms/footer/footer.tsx`
 
 ## Tests and stories
 
 - `packages/service/src/features/global/footer/adaptor/loader.test.ts`, `packages/service/src/shared/transformers/social-profile/to-social-profiles.test.ts`
-- `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
+- `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
 - `packages/ui/src/components/organisms/footer/footer.test.tsx`
 - Stories: `packages/ui/src/components/organisms/footer/footer.stories.tsx`, `apps/web/src/components/shared/social-links/social-links.stories.tsx`.
 

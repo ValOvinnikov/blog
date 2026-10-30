@@ -1,9 +1,23 @@
-import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@blog/config';
+import {
+  COOKIE_SETTINGS_BUTTON,
+  FOOTER_LAYOUT,
+  LOCALE_ISO_CODES,
+  routes,
+  SITE_MESSAGES,
+} from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { FOOTER_LOG } from '@web/constants/footer';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import {
+  clearConsentCookie,
+  grantConsent,
+} from '@web/testing/shared/consent/consent-cookie';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_FOOTER_STYLE } from '@web/testing/shared/footer-style/fixtures';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
@@ -27,6 +41,12 @@ vi.mock(
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
+vi.mock('@web/server/site-config/get-footer-style/get-footer-style');
+
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+);
+
 vi.mock('@blog/service', () => ({
   service: { global: { footer: { v1: { getFooter: getFooterMock } } } },
 }));
@@ -36,7 +56,11 @@ faker.seed(6103);
 const RSS_LINK_NAME = SITE_MESSAGES.rss.feedLinkLabel;
 const MOCK_NOW = faker.date.future({ refDate: '2026-01-01T00:00:00Z' });
 
+const FLOATING_COOKIE_SETTINGS_TEST_ID = 'floating-cookie-settings-button';
+
 const getRequestContextMock = vi.mocked(getRequestContext);
+const getFooterStyleMock = vi.mocked(getFooterStyle);
+const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
 
 const setup = customRenderAsync(SiteFooter, {});
 
@@ -143,6 +167,94 @@ describe(`<${SiteFooter.name}/>`, () => {
     expect(languageNav).not.toBeInTheDocument();
   });
 
+  it.each(Object.values(FOOTER_LAYOUT))(
+    'lays the footer out as the stored %s layout',
+    async (layout) => {
+      getFooterStyleMock.mockResolvedValueOnce({
+        ...MOCK_FOOTER_STYLE,
+        layout,
+      });
+
+      await setup();
+
+      const footer = screen.getByRole('contentinfo');
+      expect(footer).toHaveAttribute('data-layout', layout);
+    },
+  );
+
+  it('sets the site name large in the Big wordmark layout', async () => {
+    getFooterStyleMock.mockResolvedValueOnce({
+      ...MOCK_FOOTER_STYLE,
+      layout: FOOTER_LAYOUT.BIG_WORDMARK,
+    });
+
+    await setup();
+
+    const wordmark = screen.getByText(MOCK_SITE_SETTINGS.brand.name, {
+      ignore: 'p',
+    });
+    expect(wordmark).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('shows the footer Cookie settings link with the consent banner off', async () => {
+    await setup();
+
+    const footer = screen.getByRole('contentinfo');
+    const cookieSettings = within(footer).getByRole('button', {
+      name: SITE_MESSAGES.consent.footerSettingsLabel,
+    });
+
+    expect(cookieSettings).toBeVisible();
+  });
+
+  describe('when the reader has answered the consent banner', () => {
+    beforeEach(() => {
+      grantConsent();
+    });
+
+    afterEach(clearConsentCookie);
+
+    it('shows the floating Cookie settings button when it is Shown and the banner is on', async () => {
+      getFooterStyleMock.mockResolvedValueOnce({
+        ...MOCK_FOOTER_STYLE,
+        cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+      });
+      isCapabilityEnabledMock.mockResolvedValueOnce(true);
+
+      await setup();
+
+      const floatingButton = screen.getByTestId(
+        FLOATING_COOKIE_SETTINGS_TEST_ID,
+      );
+      expect(floatingButton).toBeVisible();
+    });
+
+    it('leaves the floating button out while it is Hidden', async () => {
+      isCapabilityEnabledMock.mockResolvedValueOnce(true);
+
+      await setup();
+
+      const floatingButton = screen.queryByTestId(
+        FLOATING_COOKIE_SETTINGS_TEST_ID,
+      );
+      expect(floatingButton).not.toBeInTheDocument();
+    });
+
+    it('leaves the floating button out with the consent banner off', async () => {
+      getFooterStyleMock.mockResolvedValueOnce({
+        ...MOCK_FOOTER_STYLE,
+        cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+      });
+
+      await setup();
+
+      const floatingButton = screen.queryByTestId(
+        FLOATING_COOKIE_SETTINGS_TEST_ID,
+      );
+      expect(floatingButton).not.toBeInTheDocument();
+    });
+  });
+
   describe('when the footer fails to load', () => {
     it('logs footer.layout_fetch_failed and renders without social links', async () => {
       getFooterMock.mockResolvedValue(errorResult(MOCK_ERROR));
@@ -153,7 +265,7 @@ describe(`<${SiteFooter.name}/>`, () => {
 
       expect(rssLink).toBeVisible();
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'footer.layout_fetch_failed',
+        FOOTER_LOG.CONTENT_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });

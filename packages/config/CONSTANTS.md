@@ -499,6 +499,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FIELD_ERROR**: `INVALID`
 
+### `@web/constants/footer` — `apps/web/src/constants/footer.ts`
+
+- **FOOTER_LOG**: `CONTENT_FETCH_FAILED`=`"footer.layout_fetch_failed"`, `SITE_CONFIG_FETCH_FAILED`=`"footer.site_config_fetch_failed"`
+
 ### `@web/constants/header-style` — `apps/web/src/constants/header-style.ts`
 
 - **HEADER_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"header_style.site_config_fetch_failed"`
