@@ -1,3 +1,4 @@
+import { SITE_MESSAGES } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
@@ -10,7 +11,8 @@ import {
 
 import { FloatingCookieSettingsButton } from './floating-cookie-settings-button';
 
-const BUTTON_NAME = 'Cookie settings';
+const { banner, preferences, footerSettingsLabel } = SITE_MESSAGES.consent;
+const BUTTON_NAME = footerSettingsLabel;
 const OPEN_OVERLAY_BUTTON_NAME = 'Open menu';
 
 const OpenHeaderOverlayButton = () => {
@@ -42,7 +44,7 @@ describe(`<${FloatingCookieSettingsButton.name}/>`, () => {
     expect(button).not.toBeInTheDocument();
   });
 
-  it.each(['Accept all', 'Reject all'])(
+  it.each([banner.acceptLabel, banner.rejectLabel])(
     'appears once the reader picks %s',
     async (answer) => {
       renderElement(
@@ -69,9 +71,13 @@ describe(`<${FloatingCookieSettingsButton.name}/>`, () => {
         <ConsentPreferencesDialog />
       </>,
     );
-    const settingsButton = screen.getByRole('button', { name: 'Settings' });
+    const settingsButton = screen.getByRole('button', {
+      name: banner.settingsLabel,
+    });
     await user.click(settingsButton);
-    const saveButton = await screen.findByRole('button', { name: 'Save' });
+    const saveButton = await screen.findByRole('button', {
+      name: preferences.saveLabel,
+    });
 
     await user.click(saveButton);
 
@@ -96,8 +102,10 @@ describe(`<${FloatingCookieSettingsButton.name}/>`, () => {
       const button = screen.getByRole('button', { name: BUTTON_NAME });
 
       await user.click(button);
-      await screen.findByRole('dialog', { name: BUTTON_NAME });
-      const closeButton = screen.getByRole('button', { name: 'Close' });
+      await screen.findByRole('dialog', { name: preferences.heading });
+      const closeButton = screen.getByRole('button', {
+        name: preferences.closeLabel,
+      });
       await user.click(closeButton);
 
       await waitFor(() => {

@@ -30,13 +30,11 @@ export type TConsentPreferencesProviderProps = {
 const toFocusable = (element: TNullable<Element>) =>
   element instanceof HTMLElement ? element : null;
 
-export const ConsentPreferencesProvider = ({
-  children,
-}: TConsentPreferencesProviderProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const footerControlRef = useRef<HTMLElement>(null);
-  const floatingControlRef = useRef<HTMLButtonElement>(null);
-  // Read when the dialog closes, so it names a control mounted then rather than one gone with the banner.
+// Read when the dialog closes, so it names a control mounted then rather than one gone with the banner.
+const useReturnFocusRef = (
+  floatingControlRef: RefObject<TMaybeNull<HTMLButtonElement>>,
+  footerControlRef: RefObject<TMaybeNull<HTMLElement>>,
+) => {
   const [returnFocusRef] = useState<RefObject<TMaybeNull<HTMLElement>>>(() => ({
     get current() {
       return (
@@ -45,6 +43,19 @@ export const ConsentPreferencesProvider = ({
       );
     },
   }));
+  return returnFocusRef;
+};
+
+export const ConsentPreferencesProvider = ({
+  children,
+}: TConsentPreferencesProviderProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const footerControlRef = useRef<HTMLElement>(null);
+  const floatingControlRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useReturnFocusRef(
+    floatingControlRef,
+    footerControlRef,
+  );
 
   return (
     <ConsentPreferencesContext.Provider
