@@ -1195,7 +1195,7 @@
       "STALLED": "Votre invitation à Studio n'a pas été acceptée"
     },
     "description": {
-      "INVITE_SENT": "Nous vous avons envoyé une invitation de Sanity, l'éditeur derrière Studio. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
+      "INVITE_SENT": "Studio fonctionne avec Sanity : il vous faut donc un compte Sanity gratuit pour modifier le contenu. Nous vous avons envoyé une invitation de Sanity. Acceptez-la : Studio s'ouvrira ici dès que votre accès sera confirmé.",
       "ACTIVATING": "Vous avez accepté l'invitation. Nous donnons à votre compte les droits de modification, ce qui prend généralement une minute.",
       "STALLED": "L'invitation a été envoyée il y a plus de trois jours et n'a pas été acceptée, nous avons donc arrêté de vérifier. Renvoyez-en une nouvelle ou vérifiez maintenant si vous venez de l'accepter."
     },
