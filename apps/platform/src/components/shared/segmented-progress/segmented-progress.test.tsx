@@ -1,3 +1,4 @@
+import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { SegmentedProgress } from './segmented-progress';
@@ -32,14 +33,18 @@ describe(`<${SegmentedProgress.name}/>`, () => {
     expect(segments).toHaveLength(MOCK_TOTAL);
   });
 
-  it('fills the segments up to and including the current step', () => {
+  it('marks earlier steps done, the current step active and later steps upcoming', () => {
     setup();
 
-    const segments = screen.getAllByTestId(SEGMENT_TEST_ID);
-    const filled = segments.map(
-      (segment) => segment.dataset['filled'] === 'true',
-    );
+    const states = screen
+      .getAllByTestId(SEGMENT_TEST_ID)
+      .map((segment) => segment.dataset['state']);
 
-    expect(filled).toEqual([true, true, false, false]);
+    expect(states).toEqual([
+      STEP_INDICATOR_STATE.DONE,
+      STEP_INDICATOR_STATE.ACTIVE,
+      STEP_INDICATOR_STATE.UPCOMING,
+      STEP_INDICATOR_STATE.UPCOMING,
+    ]);
   });
 });

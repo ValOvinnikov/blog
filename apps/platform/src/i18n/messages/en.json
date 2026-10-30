@@ -99,6 +99,7 @@
     },
     "stepsAriaLabel": "Setup steps",
     "stepProgress": "Step {n} of {total}",
+    "stepProgressNamed": "Step {n} of {total} · {step}",
     "siteSummary": "{siteType} · {name}",
     "back": "Back",
     "continue": "Continue",

@@ -1,5 +1,8 @@
 import { tv } from '@platform/utils/tv/tv';
 
 export const onboardingStepHeaderVariants = tv({
-  base: ['flex flex-col gap-2'],
+  slots: {
+    root: ['flex flex-col gap-1.5'],
+    progress: ['hidden font-semibold md:block'],
+  },
 });

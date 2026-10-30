@@ -112,14 +112,19 @@ Free site.
   page (`FrontPageSample` in `site-preview/`) renders in the chosen preset,
   accent and light/dark mode: the header with the typed site name and its
   Topics sub-menu closed, a hero ("Dispatches from the coast") and three
-  posts. The step header shows "Step N of 4" beside a segmented progress
-  bar (the shared `SegmentedProgress`, Base UI `Progress`) at every width.
-  The layout has three tiers: from `xl` (1280px) the rail, the fields with
-  Back / Continue, and the preview sit side by side; from `md` (768px) the
-  rail stays on the left and fields, Back / Continue and the preview stack
-  beside it; below `md` the rail is a top band and the same three stack. The
-  Site step's type and name sit side by side whenever the card is at least
-  28rem wide (a container query), in any tier.
+  posts. The step's content sits directly on a white column, not in a card,
+  and Back / Continue are pinned to the bottom: at the foot of that column
+  when everything sits side by side, and as a bar stuck to the bottom of the
+  screen when the content stacks. The layout has three tiers: from `xl`
+  (1280px) the rail, the content column and the preview sit side by side
+  (the preview column 480px wide, 560px from `2xl`); from `md` (768px) the
+  rail stays on the left and the content, Back / Continue and the preview
+  stack beside it; below `md` the rail is a dark top band reading "Step N of
+  4 · <step>" over a segmented progress bar (the shared `SegmentedProgress`,
+  on Base UI `Progress`), and the same three stack. From `md` up the step
+  header reads "Step N of 4" above the heading instead. The Site step's type
+  and name sit side by side whenever the content column is at least 28rem
+  wide (a container query), in any tier.
   The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
      Blank) and the site name.

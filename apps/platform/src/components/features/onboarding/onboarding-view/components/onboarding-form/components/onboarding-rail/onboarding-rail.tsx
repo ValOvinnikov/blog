@@ -2,8 +2,9 @@ import type { TMaybeUndefined } from '@blog/config';
 import { RailBrand } from '@platform/components/features/layout/rail-brand';
 import { RailIntro } from '@platform/components/features/layout/rail-intro';
 import { SignedInAccount } from '@platform/components/features/layout/signed-in-account';
+import { SegmentedProgress } from '@platform/components/shared/segmented-progress';
 import type { TOnboardingStep } from '@platform/constants/onboarding';
-import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
+import { toStepProgressState } from '@platform/utils/step-progress-state/step-progress-state';
 import { useTranslations } from 'next-intl';
 
 import { OnboardingRailStep } from './components/onboarding-rail-step/onboarding-rail-step';
@@ -21,12 +22,6 @@ export type TOnboardingRailProps = {
   accountEmail: TMaybeUndefined<string>;
 };
 
-const toIndicatorState = (index: number, currentIndex: number) => {
-  if (index < currentIndex) return STEP_INDICATOR_STATE.DONE;
-  if (index === currentIndex) return STEP_INDICATOR_STATE.ACTIVE;
-  return STEP_INDICATOR_STATE.UPCOMING;
-};
-
 export const OnboardingRail = ({
   steps,
   currentIndex,
@@ -34,7 +29,9 @@ export const OnboardingRail = ({
 }: TOnboardingRailProps) => {
   const t = useTranslations('onboardingPage');
   const tForm = useTranslations('onboardingForm');
-  const { root, brand, intro, list, account } = onboardingRailVariants();
+  const { root, brand, intro, progress, list, account } =
+    onboardingRailVariants();
+  const currentStep = steps[currentIndex];
 
   return (
     <header className={root()}>
@@ -44,6 +41,19 @@ export const OnboardingRail = ({
         description={t('description')}
         className={intro()}
       />
+      {currentStep && (
+        <SegmentedProgress
+          value={currentIndex + 1}
+          total={steps.length}
+          label={tForm('stepProgressNamed', {
+            n: currentIndex + 1,
+            total: steps.length,
+            step: currentStep.label,
+          })}
+          isOnDark={true}
+          className={progress()}
+        />
+      )}
       <ol aria-label={tForm('stepsAriaLabel')} className={list()}>
         {steps.map((step, index) => (
           <OnboardingRailStep
@@ -51,7 +61,7 @@ export const OnboardingRail = ({
             stepNumber={index + 1}
             label={step.label}
             summary={step.summary}
-            state={toIndicatorState(index, currentIndex)}
+            state={toStepProgressState(index, currentIndex)}
           />
         ))}
       </ol>

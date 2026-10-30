@@ -8,6 +8,7 @@ export const onboardingRailVariants = tv({
     ],
     brand: ['flex-1 md:flex-none'],
     intro: ['mt-11 hidden md:flex'],
+    progress: ['order-last basis-full md:hidden'],
     list: ['mt-8 hidden flex-col gap-1 md:flex'],
     account: ['md:mt-auto md:pt-8'],
   },

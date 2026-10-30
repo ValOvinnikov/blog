@@ -1,5 +1,5 @@
 import { Heading } from '@platform/components/shared/heading';
-import { SegmentedProgress } from '@platform/components/shared/segmented-progress';
+import { Text } from '@platform/components/shared/text';
 import type { TOnboardingStep } from '@platform/constants/onboarding';
 import { useTranslations } from 'next-intl';
 
@@ -17,14 +17,13 @@ export const OnboardingStepHeader = ({
   stepTotal,
 }: TOnboardingStepHeaderProps) => {
   const t = useTranslations('onboardingForm');
+  const { root, progress } = onboardingStepHeaderVariants();
 
   return (
-    <div className={onboardingStepHeaderVariants()}>
-      <SegmentedProgress
-        value={stepNumber}
-        total={stepTotal}
-        label={t('stepProgress', { n: stepNumber, total: stepTotal })}
-      />
+    <div className={root()}>
+      <Text variant="meta" className={progress()}>
+        {t('stepProgress', { n: stepNumber, total: stepTotal })}
+      </Text>
       <Heading level={1} size="pageTitle">
         {t(`steps.${step}`)}
       </Heading>
