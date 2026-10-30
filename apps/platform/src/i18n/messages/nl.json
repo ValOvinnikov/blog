@@ -1149,7 +1149,7 @@
       "STALLED": "Je Studio-uitnodiging is niet geaccepteerd"
     },
     "description": {
-      "INVITE_SENT": "We hebben je een uitnodiging van Sanity gestuurd, de editor achter Studio. Accepteer die, en Studio opent hier zodra je toegang is bevestigd.",
+      "INVITE_SENT": "Studio draait op Sanity, dus je hebt een gratis Sanity-account nodig om te bewerken. We hebben je een uitnodiging van Sanity gestuurd: accepteer die, en Studio opent hier zodra je toegang is bevestigd.",
       "ACTIVATING": "Je hebt de uitnodiging geaccepteerd. We geven je account bewerkrechten; dat duurt meestal een minuut.",
       "STALLED": "De uitnodiging is meer dan drie dagen geleden verstuurd en niet geaccepteerd, dus we controleren niet meer. Verstuur een nieuwe of controleer nu als je hem net hebt geaccepteerd."
     },

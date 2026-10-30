@@ -113,8 +113,12 @@ module types whose capability is off for the tenant carry a warning.
   own OWNER (a real membership, not an admin's virtual one) and the worker
   has recorded an invite (`ownerInviteSentAt`). Before READY,
   `/dashboard/studio` shows an explainer with Check now (and Resend, except
-  while ACTIVATING), which call the worker's owner-access routes; at READY the
-  Studio mounts with the owner's `loginProvider`. READY is read from stored
+  while ACTIVATING), which call the worker's owner-access routes. The
+  INVITE_SENT explainer says the invite comes by email from Sanity and that
+  editing needs a free Sanity account, since Sanity offers no direct invite
+  link. At READY the Studio mounts with the owner's recorded `loginProvider`,
+  so it offers only that sign-in method and skips the choice screen: one
+  click, or none with a live Sanity session. READY is read from stored
   columns, so the gate never closes again. Every other viewer gets the Studio
   as before: operators, editors, and tenants provisioned before the worker.
 - The route is gated by the shell: `resolveDashboardTenant` on `/dashboard`
