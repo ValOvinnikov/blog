@@ -18,6 +18,7 @@ export type THeadingProps = {
   className?: string;
   ref?: Ref<HTMLHeadingElement>;
   tabIndex?: number;
+  id?: string;
 };
 
 export const Heading = ({
@@ -27,11 +28,13 @@ export const Heading = ({
   className,
   ref,
   tabIndex,
+  id,
 }: THeadingProps) => {
   const Tag = HEADING_TAGS[level];
 
   return (
     <Tag
+      id={id}
       ref={ref}
       tabIndex={tabIndex}
       className={headingVariants({ size, class: className })}

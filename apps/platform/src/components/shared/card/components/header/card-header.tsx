@@ -12,6 +12,7 @@ export type TCardHeaderProps = {
   headingLevel?: THeadingLevel;
   titleRef?: Ref<HTMLHeadingElement>;
   titleTabIndex?: number;
+  titleId?: string;
   className?: string;
 };
 
@@ -22,6 +23,7 @@ export const CardHeader = ({
   headingLevel = 2,
   titleRef,
   titleTabIndex,
+  titleId,
   className,
 }: TCardHeaderProps) => {
   const { header, headerTitleGroup, headerDescription, headerActions } =
@@ -31,6 +33,7 @@ export const CardHeader = ({
     <div className={header({ class: className })}>
       <div className={headerTitleGroup()}>
         <Heading
+          id={titleId}
           level={headingLevel}
           size="cardTitle"
           ref={titleRef}
