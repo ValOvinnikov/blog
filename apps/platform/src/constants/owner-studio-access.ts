@@ -8,3 +8,8 @@ export const OWNER_STUDIO_ACCESS = {
 } as const;
 
 export type TOwnerStudioAccess = TValueOf<typeof OWNER_STUDIO_ACCESS>;
+
+export type TPendingOwnerStudioAccess = Exclude<
+  TOwnerStudioAccess,
+  typeof OWNER_STUDIO_ACCESS.READY
+>;
