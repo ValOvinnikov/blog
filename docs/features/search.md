@@ -2,8 +2,7 @@
 title: Search
 status: planned
 layers: [db, service, web]
-code:
-  - packages/db/migrations/0000_enable_pgvector_extension.sql
+code: []
 epics: [1045, 1046, 1047, 1048]
 ---
 
@@ -11,7 +10,7 @@ epics: [1045, 1046, 1047, 1048]
 
 ## What it does
 
-Readers will search a site's posts from a `/search` page and get results ranked by meaning rather than keyword match, which matters on a small corpus where exact words rarely line up. Nothing of it is built: the site has no search route, no search box and no search index. The only piece in place is the `pgvector` extension, switched on in the first database migration.
+Readers will search a site's posts from a `/search` page and get results ranked by meaning rather than keyword match, which matters on a small corpus where exact words rarely line up. Nothing of it is built: the site has no search route, no search box and no search index. Nothing is in place in the database either: the migration that adds the embeddings table also enables the `pgvector` extension.
 
 ## Surfaces and routes
 
@@ -20,7 +19,7 @@ Readers will search a site's posts from a `/search` page and get results ranked 
 
 ## Data
 
-- `pgvector` — enabled by `0000_enable_pgvector_extension.sql`. No table uses it. The test database (pglite) cannot load the extension, so `packages/db/src/testing/migration-files.ts` skips that migration.
+- `pgvector` — not enabled. The migration that adds the embeddings table enables it. The test database (pglite) cannot load the extension, so the test setup has to skip or stub that statement.
 - Planned `posts_embeddings (post_id, embedding, model, updated_at)` in Neon. `post_id` is the Sanity `_id` string — a cross-store reference, not a foreign key, the same pattern as bookmarks.
 - Content stays in Sanity. Postgres holds only the vector and the id; titles, excerpts and images for the results come from the existing post loaders.
 - Embeddings are generated at publish time by a pipeline that has no design yet; search depends on it.
@@ -49,8 +48,6 @@ These are decided in the design and must hold when it is built:
 
 ## Entry points
 
-- `packages/db/migrations/0000_enable_pgvector_extension.sql`
-- `packages/db/src/testing/migration-files.ts` (the pglite skip)
 - `docs/superpowers/specs/2026-07-31-semantic-search-design.md` — the design of record.
 
 ## Tests and stories

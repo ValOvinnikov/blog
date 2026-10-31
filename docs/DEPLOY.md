@@ -410,12 +410,12 @@ Provisioning notes for recreating this from scratch:
       Environment's → the `main` branch. Confirm each by running a migration
       against the branch you think you're targeting and checking its row
       counts/timestamps, not by trusting the secret's name.
-- [ ] Enable `pgvector` (needed by M3.4 semantic search) once per branch —
-      this repo's own migration does it
-      (`packages/db/migrations/0000_enable_pgvector_extension.sql`); running
-      `pnpm --filter @blog/db db:migrate` against a fresh branch (with
-      `DATABASE_URL_UNPOOLED` sourced into the shell first) is sufficient, no
-      manual `CREATE EXTENSION` step needed.
+- [ ] Create the schema on a fresh, empty branch with
+      `pnpm --filter @blog/db db:migrate` (with `DATABASE_URL_UNPOOLED`
+      sourced into the shell first). The history starts at
+      `packages/db/migrations/0000_baseline.sql`, which creates every table;
+      later migrations apply on top. A database that still records the old
+      history in drizzle-kit's table is dropped and recreated, not migrated.
 - [ ] Double-check each GitHub Environment's `DATABASE_URL_UNPOOLED` secret
       (§4 below) actually points at that environment's own branch —
       `development`'s at the `development` branch, `production`'s at the
@@ -1161,20 +1161,6 @@ features/sections; MAJOR = milestone / breaking redesign; `v1.0.0` = official
 launch. Pre-1.0 (`0.y.z`): bump MINOR freely for notable changes, PATCH for
 fixes. Only tag commits already green on `main`. Rollback = re-tag an earlier
 commit or redeploy a prior Vercel build.
-
-### The plain personal-data columns are gone
-
-Migration `0065_drop_plain_personal_data` drops the plain `subscribers`,
-`membership_invites` and `leads` email, name and message columns and makes
-their encrypted and index forms NOT NULL, and makes `users_email_index_idx`
-unique. There is no backfill step: a row with no encrypted form, or two users
-sharing an email index (such as leftover `+tag` accounts), fails the
-migration. If it does on dev, reset the dev database and re-apply instead of
-backfilling. `users.email` and `users.name`
-stay, always null, and the migration does not blank existing values; the
-reset clears them. Both apps then need `PERSONAL_DATA_ENCRYPTION_KEY` and
-`PERSONAL_DATA_INDEX_KEY`: every personal-data write and read throws without
-them.
 
 ---
 

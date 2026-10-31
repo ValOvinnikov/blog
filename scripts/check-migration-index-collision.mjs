@@ -43,12 +43,18 @@ export const readJournalTags = (journalText) => {
   return new Map((entries ?? []).map(({ idx, tag }) => [idx, tag]));
 };
 
+// The tag of the migration that replaced the whole history. The branch that
+// introduces it takes index 0 from the old history on purpose; once it is on
+// `main`, both sides carry it and it collides with nothing.
+export const BASELINE_TAG = '0000_baseline';
+
 // Indices carrying one tag on the base ref and a different one here — two
 // migrations generated against the same base, only one of which can keep the
 // number.
 export const findCollisions = (baseTags, headTags) =>
   [...headTags]
     .filter(([idx, tag]) => baseTags.has(idx) && baseTags.get(idx) !== tag)
+    .filter(([idx, tag]) => !(idx === 0 && tag === BASELINE_TAG))
     .map(([idx, tag]) => ({ idx, baseTag: baseTags.get(idx), headTag: tag }))
     .sort((a, b) => a.idx - b.idx);
 
