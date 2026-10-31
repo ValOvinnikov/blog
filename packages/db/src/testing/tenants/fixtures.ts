@@ -103,6 +103,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
     sanityManagementTokenEncrypted: null,
+    sanityManagementRobotId: null,
     revalidateWebhookSecretEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
     additionalLocales: [],
@@ -143,6 +144,8 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
 export const MOCK_WORKFLOW_RUN_URL = tenantsFaker.internet.url();
 export const MOCK_PROVISIONING_REGISTRY = tenantsFaker.word.noun();
 export const MOCK_STEP_ERROR = tenantsFaker.lorem.sentence();
+export const MOCK_TENANT_MANAGEMENT_ROBOT_ID =
+  tenantsFaker.string.alphanumeric(10);
 
 const MOCK_IDLE_STEP = { status: TENANT_PROVISIONING_STEP_STATUS.IDLE };
 

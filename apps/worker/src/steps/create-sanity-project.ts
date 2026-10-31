@@ -48,6 +48,7 @@ export async function createTenantSanityProject(
     tenantId: tenant.id,
     projectId,
     organizationToken: env.sanityManagementToken,
+    productName: env.productName,
   });
 
   const datasets = await listSanityDatasets({

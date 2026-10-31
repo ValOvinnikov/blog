@@ -15,6 +15,8 @@ export const env = createEnv({
     // @env-optional
     SANITY_ORGANIZATION_ID: z.string().min(1).optional(),
     // @env-optional
+    PRODUCT_NAME: z.string().trim().min(1).optional(),
+    // @env-optional
     VERCEL_TOKEN: z.string().min(1).optional(),
     // @env-optional
     VERCEL_TEAM_ID: z.string().min(1).optional(),
@@ -69,6 +71,7 @@ export const env = createEnv({
   runtimeEnv: {
     SANITY_MANAGEMENT_TOKEN: process.env.SANITY_MANAGEMENT_TOKEN,
     SANITY_ORGANIZATION_ID: process.env.SANITY_ORGANIZATION_ID,
+    PRODUCT_NAME: process.env.PRODUCT_NAME,
     VERCEL_TOKEN: process.env.VERCEL_TOKEN,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     VERCEL_PROJECT_ID_WEB: process.env.VERCEL_PROJECT_ID_WEB,

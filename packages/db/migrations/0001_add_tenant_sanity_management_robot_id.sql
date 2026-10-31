@@ -1,0 +1,1 @@
+ALTER TABLE "tenants" ADD COLUMN "sanity_management_robot_id" text;

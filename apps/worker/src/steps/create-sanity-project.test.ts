@@ -98,6 +98,7 @@ describe(createTenantSanityProject, () => {
         tenantId: tenant.id,
         projectId: MOCK_CREATED_PROJECT_ID,
         organizationToken: sanityManagementToken,
+        productName: MOCK_PROVISION_ENV.productName,
       });
     });
 

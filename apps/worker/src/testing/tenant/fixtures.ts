@@ -14,6 +14,7 @@ export const MOCK_SANITY_PROJECT_ID = 'sanity-project-1';
 export const MOCK_SANITY_DATASET = MOCK_PROVISION_ENV.tenantSanityDataset;
 export const MOCK_SANITY_READ_TOKEN = 'sk-read';
 export const MOCK_TENANT_MANAGEMENT_TOKEN = 'sk-tenant-management';
+export const MOCK_TENANT_MANAGEMENT_ROBOT_ID = 'robot-tenant-management';
 export const MOCK_ENCRYPTED_TOKEN = 'encrypted-read-token';
 
 export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -26,6 +27,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
     sanityManagementTokenEncrypted: null,
+    sanityManagementRobotId: null,
     revalidateWebhookSecretEncrypted: null,
     locale: LOCALE_ISO_CODES.EN,
     additionalLocales: [],

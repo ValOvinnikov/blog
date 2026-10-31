@@ -6,16 +6,19 @@ import { eq } from 'drizzle-orm';
 
 export async function setTenantSanityManagementToken(
   tenantId: string,
-  plaintextToken: string,
+  minted: { token: string; robotId: string },
 ): Promise<void> {
   const db = getDb();
   const encrypted = encryptSecret(
-    plaintextToken,
+    minted.token,
     requireTenantTokenEncryptionKey(),
   );
 
   await db
     .update(tenants)
-    .set({ sanityManagementTokenEncrypted: encrypted })
+    .set({
+      sanityManagementTokenEncrypted: encrypted,
+      sanityManagementRobotId: minted.robotId,
+    })
     .where(eq(tenants.id, tenantId));
 }

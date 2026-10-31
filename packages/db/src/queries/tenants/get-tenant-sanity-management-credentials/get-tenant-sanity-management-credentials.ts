@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { tenants } from '@blog/db/schema/tenants';
 import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
@@ -8,6 +8,7 @@ import { eq } from 'drizzle-orm';
 export type TTenantSanityManagementCredentials = {
   projectId: string;
   token: string;
+  managementRobotId: TMaybeNull<string>;
 };
 
 export async function getTenantSanityManagementCredentials(
@@ -19,6 +20,7 @@ export async function getTenantSanityManagementCredentials(
     .select({
       projectId: tenants.sanityProjectId,
       tokenEncrypted: tenants.sanityManagementTokenEncrypted,
+      managementRobotId: tenants.sanityManagementRobotId,
     })
     .from(tenants)
     .where(eq(tenants.id, tenantId));
@@ -31,5 +33,6 @@ export async function getTenantSanityManagementCredentials(
       tenant.tokenEncrypted,
       requireTenantTokenEncryptionKey(),
     ),
+    managementRobotId: tenant.managementRobotId,
   };
 }

@@ -11,7 +11,7 @@ import {
   createSanityRobotToken,
   deleteSanityRobotToken,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { createClient } from '@sanity/client';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import {
@@ -43,6 +43,7 @@ const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 export async function seedTenantContent(
   tenant: TTenant,
   siteType: TStarterSiteType,
+  productName: string,
   deps: TSeedContentDeps = defaultDeps,
 ): Promise<void> {
   if (!tenant.sanityProjectId || !tenant.sanityDataset) {
@@ -55,7 +56,7 @@ export async function seedTenantContent(
   const writeToken = await deps.mintWriteToken({
     token: managementToken,
     projectId: tenant.sanityProjectId,
-    label: SANITY_WRITE_TOKEN_LABEL,
+    label: buildSanityTokenLabels(productName).write,
     role: SANITY_ROBOT_ROLE.EDITOR,
   });
 

@@ -38,6 +38,7 @@ describe(clearTenantProvisioningArtifacts, () => {
       sanityReadTokenEncrypted: faker.string.alphanumeric(32),
       sanityWriteTokenEncrypted: faker.string.alphanumeric(32),
       sanityManagementTokenEncrypted: faker.string.alphanumeric(32),
+      sanityManagementRobotId: faker.string.alphanumeric(10),
       seededAt: MOCK_SEEDED_AT,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       provisioningSteps: {
@@ -55,6 +56,7 @@ describe(clearTenantProvisioningArtifacts, () => {
       sanityReadTokenEncrypted: null,
       sanityWriteTokenEncrypted: null,
       sanityManagementTokenEncrypted: null,
+      sanityManagementRobotId: null,
       provisioningStatus: null,
       provisioningSteps: null,
       seededAt: null,

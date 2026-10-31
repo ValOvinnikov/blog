@@ -10,6 +10,7 @@ import {
 } from '@blog/db/testing/tenant-token-encryption-key';
 import {
   MOCK_MISSING_TENANT_ID,
+  MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   MOCK_TENANT_VALUES,
   MOCK_TENANT_WRITE_TOKEN,
@@ -37,18 +38,19 @@ describe(getTenantSanityManagementCredentials, () => {
 
   describe('with a management token set', () => {
     beforeEach(async () => {
-      await setTenantSanityManagementToken(
-        tenant.id,
-        MOCK_TENANT_MANAGEMENT_TOKEN,
-      );
+      await setTenantSanityManagementToken(tenant.id, {
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        robotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
+      });
     });
 
-    it('resolves the decrypted token and the project it is scoped to', async () => {
+    it('resolves the decrypted token, its robot id and the project it is scoped to', async () => {
       const credentials = await getTenantSanityManagementCredentials(tenant.id);
 
       expect(credentials).toEqual({
         projectId: sanityProjectId,
         token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        managementRobotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
       });
     });
 

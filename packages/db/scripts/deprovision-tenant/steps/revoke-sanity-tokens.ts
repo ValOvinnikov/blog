@@ -2,11 +2,14 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-management-credentials';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
+  missingManagementRobotIdMessage,
+  robotsInRevocationOrder,
+} from '@blog/db/utils/sanity-management-client/sanity-robot-revocation';
+import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
   type TSanityRobotTokenSummary,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { provisionedTokensInRevocationOrder } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import type { TDeprovisionEnv } from '../lib/env';
@@ -24,23 +27,12 @@ const defaultDeps: TRevokeSanityTokensDeps = {
 };
 
 async function listProjectRobots(
-  tenantId: string,
+  token: string,
   projectId: string,
   deps: TRevokeSanityTokensDeps,
-): Promise<
-  TMaybeUndefined<{ token: string; robots: TSanityRobotTokenSummary[] }>
-> {
+): Promise<TMaybeUndefined<TSanityRobotTokenSummary[]>> {
   try {
-    const credentials = await deps.getManagementCredentials(tenantId);
-    if (!credentials) {
-      console.error(
-        `deprovision-tenant: tenant "${tenantId}" has no Sanity management token (sanityManagementTokenEncrypted), so the provisioned robot tokens on project "${projectId}" were not revoked — revoke them in Sanity Manage.`,
-      );
-      return undefined;
-    }
-    const { token } = credentials;
-    const robots = await deps.listRobotTokens({ token, projectId });
-    return { token, robots };
+    return await deps.listRobotTokens({ token, projectId });
   } catch (error) {
     console.error(
       `deprovision-tenant: failed to list Sanity robot tokens for project "${projectId}" (${sanitizeLogMessage(error)}).`,
@@ -49,7 +41,7 @@ async function listProjectRobots(
   }
 }
 
-// Tolerant throughout: a stray unrevoked token is a follow-up cleanup, never a reason to stop the teardown.
+// Tolerant once the order is known: a stray unrevoked token is a follow-up cleanup, never a reason to stop the teardown.
 export async function revokeTenantSanityTokens(
   tenant: TTenant,
   env: TDeprovisionEnv,
@@ -60,16 +52,22 @@ export async function revokeTenantSanityTokens(
 
   if (env.dryRun) {
     console.warn(
-      `[dry-run] would revoke provisioned Sanity robot tokens for project "${projectId}".`,
+      `[dry-run] would revoke every Sanity robot token on project "${projectId}".`,
     );
     return;
   }
 
-  const listed = await listProjectRobots(tenantId, projectId, deps);
-  if (!listed) return;
-  const { token, robots } = listed;
+  const credentials = await deps.getManagementCredentials(tenantId);
+  const managementRobotId = credentials?.managementRobotId;
+  if (!credentials || !managementRobotId) {
+    throw new Error(missingManagementRobotIdMessage(tenantId));
+  }
+  const { token } = credentials;
 
-  for (const robot of provisionedTokensInRevocationOrder(robots)) {
+  const robots = await listProjectRobots(token, projectId, deps);
+  if (!robots) return;
+
+  for (const robot of robotsInRevocationOrder(robots, managementRobotId)) {
     try {
       await deps.revokeToken({ token, projectId, robotId: robot.id });
     } catch (error) {
