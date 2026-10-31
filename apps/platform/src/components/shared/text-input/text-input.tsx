@@ -2,6 +2,7 @@
 
 import { Input } from '@base-ui/react/input';
 import { useFormFieldControl } from '@platform/components/shared/form-field';
+import type { Ref } from 'react';
 
 import {
   textInputVariants,
@@ -15,6 +16,7 @@ export type TTextInputProps = {
   placeholder?: string;
   isReadOnly?: TTextInputVariants['isReadOnly'];
   className?: string;
+  ref?: Ref<HTMLInputElement>;
 };
 
 export const TextInput = ({
@@ -24,11 +26,13 @@ export const TextInput = ({
   placeholder,
   isReadOnly,
   className,
+  ref,
 }: TTextInputProps) => {
   const { id, describedBy } = useFormFieldControl();
 
   return (
     <Input
+      ref={ref}
       id={id}
       type={type}
       placeholder={placeholder}

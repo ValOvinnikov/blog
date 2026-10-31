@@ -269,7 +269,8 @@
   },
   "tenantsSearch": {
     "label": "Mandanten suchen",
-    "hint": "Name oder Domain – mit Enter suchen."
+    "hint": "Name oder Domain.",
+    "clearLabel": "Suche löschen"
   },
   "findingsView": {
     "title": "Befunde",

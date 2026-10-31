@@ -269,7 +269,8 @@
   },
   "tenantsSearch": {
     "label": "Rechercher des locataires",
-    "hint": "Nom ou domaine — appuyez sur Entrée pour rechercher."
+    "hint": "Nom ou domaine.",
+    "clearLabel": "Effacer la recherche"
   },
   "findingsView": {
     "title": "Constats",

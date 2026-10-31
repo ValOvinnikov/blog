@@ -5,10 +5,12 @@ import { createRouterStub } from './router-stub';
 
 type TLocaleRouter = ReturnType<typeof useRouter>;
 
-export const mockLocaleRouterPush = (): Mock => {
+export const mockLocaleRouter = () => {
   const router = createRouterStub();
 
   vi.mocked(useRouter).mockReturnValue(router as unknown as TLocaleRouter);
 
-  return router.push;
+  return router;
 };
+
+export const mockLocaleRouterPush = (): Mock => mockLocaleRouter().push;

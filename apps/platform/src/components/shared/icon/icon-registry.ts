@@ -35,6 +35,7 @@ import ShieldCheck from '@platform/assets/icons/shield-check.svg';
 import Studio from '@platform/assets/icons/studio.svg';
 import Users from '@platform/assets/icons/users.svg';
 import Warning from '@platform/assets/icons/warning.svg';
+import X from '@platform/assets/icons/x.svg';
 import Zap from '@platform/assets/icons/zap.svg';
 import type { FC, SVGProps } from 'react';
 
@@ -78,6 +79,7 @@ export const ICON_REGISTRY = {
   [ICONS.STUDIO]: Studio,
   [ICONS.USERS]: Users,
   [ICONS.WARNING]: Warning,
+  [ICONS.X]: X,
   [ICONS.ZAP]: Zap,
 } as const satisfies Partial<Record<TIconName, TGlyph>>;
 

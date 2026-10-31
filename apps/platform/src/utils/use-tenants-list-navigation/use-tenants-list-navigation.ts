@@ -17,5 +17,11 @@ export const useTenantsListNavigation = (listQuery: TTenantsListQuery) => {
     });
   };
 
-  return { isPending, navigate };
+  const navigateInPlace = (changes: Partial<TTenantsListQuery>) => {
+    startTransition(() => {
+      router.replace(adminRoutes.tenants({ ...listQuery, ...changes }));
+    });
+  };
+
+  return { isPending, navigate, navigateInPlace };
 };
