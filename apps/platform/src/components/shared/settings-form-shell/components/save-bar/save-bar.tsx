@@ -1,6 +1,7 @@
 'use client';
 
 import { ICONS } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
@@ -40,8 +41,8 @@ export const SaveBar = ({
   const t = useTranslations('saveBar');
   const { ids: invalidControlIds, revealFirst } = invalidControls;
   const [firstInvalidControlId] = invalidControlIds;
-  const hasInvalidFields = firstInvalidControlId !== undefined;
-  const hasErrors = hasInvalidFields || saveError !== undefined;
+  const hasInvalidFields = !isUndefined(firstInvalidControlId);
+  const hasErrors = hasInvalidFields || !isUndefined(saveError);
   const {
     root,
     summary,
@@ -55,7 +56,7 @@ export const SaveBar = ({
   } = saveBarVariants({ hasErrors });
 
   const goToFirstField = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (firstInvalidControlId === undefined) return;
+    if (isUndefined(firstInvalidControlId)) return;
     event.preventDefault();
     if (revealFirst) flushSync(revealFirst);
     const target = document.getElementById(firstInvalidControlId);
@@ -74,10 +75,10 @@ export const SaveBar = ({
         {hasInvalidFields && (
           <>
             <Icon name={ICONS.WARNING} size={ICON_SIZE.XL} />
-            {saveError !== undefined && (
+            {!isUndefined(saveError) && (
               <span className={count()}>{t('notSaved')}</span>
             )}
-            <span className={saveError === undefined ? count() : undefined}>
+            <span className={isUndefined(saveError) ? count() : undefined}>
               {t('fieldsNeedAttention', { count: invalidControlIds.length })}
             </span>
             <a
@@ -89,7 +90,7 @@ export const SaveBar = ({
             </a>
           </>
         )}
-        {!hasInvalidFields && saveError !== undefined && (
+        {!hasInvalidFields && !isUndefined(saveError) && (
           <>
             <Icon name={ICONS.WARNING} size={ICON_SIZE.XL} />
             <span role="alert" className={count()}>
