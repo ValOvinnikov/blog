@@ -508,7 +508,9 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - A page with an editor beside a preview gives phones Edit/Preview tabs below
   `lg` and renders only the active pane: the shared `ViewTabs` with
   `useViewTabs()` (Base UI Tabs), used by Look and Email, whose panels take
-  `role="tabpanel"` below `lg` only. Voice keeps its per-card preview toggle.
+  `role="tabpanel"` below `lg` only. A page whose tabbed layout follows its
+  content width instead passes `useViewTabs({ isTabbed })`, and the tabs and
+  roles follow that. Voice keeps its per-card preview toggle.
 - A dialog keeps a 16px gutter (`w-[calc(100%-2rem)] max-w-md`), which
   `AlertDialogShell` owns for `ConfirmDialog` and `LeavePageDialog`.
 - Tables scroll sideways inside their card, and fact lists stack the term above
