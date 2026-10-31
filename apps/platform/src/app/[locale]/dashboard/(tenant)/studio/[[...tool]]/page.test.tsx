@@ -7,9 +7,11 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { auth } from '@platform/server/auth/auth';
+import { resolveHasEnteredStudio } from '@platform/server/studio-entry/resolve-has-entered-studio';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembershipWithTenant } from '@platform/testing/memberships/membership-with-tenant';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   MOCK_OWNER_INVITED_AT,
   MOCK_OWNER_JOINED_AT,
@@ -21,6 +23,7 @@ import {
   mockStudioReadyTenant,
 } from '@platform/testing/tenants/studio-ready-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { studioEnteredCookie } from '@platform/utils/studio-entered-cookie/studio-entered-cookie';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -41,6 +44,8 @@ const {
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
+
+vi.mock('@platform/server/studio-entry/resolve-has-entered-studio');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -68,6 +73,13 @@ const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(DashboardStudioPage, {});
 
+const MOCK_READY_OWNER_ACCESS: Partial<TTenant> = {
+  ownerInviteSentAt: MOCK_OWNER_INVITED_AT,
+  ownerInviteAcceptedAt: MOCK_OWNER_JOINED_AT,
+  ownerSanityUserId: MOCK_OWNER_SANITY_USER_ID,
+  ownerLoginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+};
+
 const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
   const tenant = mockStudioReadyTenant(overrides);
   listMembershipsWithTenantsForUserMock.mockResolvedValue([
@@ -81,10 +93,12 @@ const renderForTenant = async (overrides: Partial<TTenant> = {}) => {
 describe(`<${DashboardStudioPage.name}/>`, () => {
   beforeEach(() => {
     vi.useFakeTimers({ now: MOCK_OWNER_INVITED_AT, toFake: ['Date'] });
+    vi.mocked(resolveHasEnteredStudio).mockResolvedValue(false);
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    studioMountMock.mockClear();
   });
 
   it('redirects a signed-out visitor to sign-in without resolving a tenant', async () => {
@@ -128,12 +142,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   });
 
   it("opens Studio on the owner's login provider once their access is ready", async () => {
-    const tenant = await renderForTenant({
-      ownerInviteSentAt: MOCK_OWNER_INVITED_AT,
-      ownerInviteAcceptedAt: MOCK_OWNER_JOINED_AT,
-      ownerSanityUserId: MOCK_OWNER_SANITY_USER_ID,
-      ownerLoginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
-    });
+    const tenant = await renderForTenant(MOCK_READY_OWNER_ACCESS);
 
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
@@ -148,6 +157,28 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
       defaultLocale: tenant.locale,
       liveLocales: [],
       loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+      onSignedIn: expect.any(Function),
     });
+  });
+
+  it("records the owner's first Studio entry for this tenant and refreshes the shell", async () => {
+    const refresh = mockRouterRefresh();
+    const tenant = await renderForTenant(MOCK_READY_OWNER_ACCESS);
+    refresh.mockClear();
+
+    studioMountMock.mock.lastCall?.[0]?.onSignedIn();
+
+    expect(document.cookie).toContain(studioEnteredCookie(tenant.id));
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+
+  it('stops listening for a sign-in once the owner has entered the Studio in this browser', async () => {
+    vi.mocked(resolveHasEnteredStudio).mockResolvedValue(true);
+
+    await renderForTenant(MOCK_READY_OWNER_ACCESS);
+
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({ onSignedIn: undefined }),
+    );
   });
 });

@@ -5,7 +5,6 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
-import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type {
@@ -60,7 +59,7 @@ export const operatorNavSections = (
   },
 ];
 
-type TTenantNavHrefs = {
+export type TTenantNavHrefs = {
   look: string;
   voice: string;
   features: string;
@@ -71,7 +70,7 @@ type TTenantNavHrefs = {
   studio: string;
 };
 
-const configurationNavItems = (
+export const configurationNavItems = (
   t: TLooseTranslator,
   hrefs: TTenantNavHrefs,
   access: TPlanPageAccess,
@@ -196,45 +195,6 @@ export const tenantNavSections = (
           badge: platform,
         },
       ],
-    },
-  ];
-};
-
-export const dashboardNavSections = (
-  t: TLooseTranslator,
-  access: TPlanPageAccess,
-  studioAccess?: TOwnerStudioAccess,
-  unreadLeadsCount = 0,
-): TSidebarNavSection[] => {
-  const hrefs: TTenantNavHrefs = {
-    look: adminRoutes.dashboardLook(),
-    voice: adminRoutes.dashboardVoice(),
-    features: adminRoutes.dashboardFeatures(),
-    leads: adminRoutes.dashboardLeads(),
-    languages: adminRoutes.dashboardLanguages(),
-    domain: adminRoutes.dashboardDomain(),
-    email: adminRoutes.dashboardEmail(),
-    studio: adminRoutes.dashboardStudio(),
-  };
-
-  return [
-    {
-      label: t('dashboardLabel'),
-      items: [
-        {
-          label: t('overview'),
-          icon: ICONS.HOUSE,
-          href: adminRoutes.dashboard(),
-        },
-      ],
-    },
-    {
-      label: t('contentSectionLabel'),
-      items: [studioNavItem(t, hrefs.studio, studioAccess)],
-    },
-    {
-      label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, access, unreadLeadsCount),
     },
   ];
 };

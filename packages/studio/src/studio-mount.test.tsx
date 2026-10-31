@@ -17,10 +17,12 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import { StudioMount } from './studio-mount';
 
-const { STUDIO_LAYOUT_TEST_ID, receivedConfigs } = vi.hoisted(() => ({
-  STUDIO_LAYOUT_TEST_ID: 'studio-layout-mock',
-  receivedConfigs: [] as unknown[],
-}));
+const { STUDIO_LAYOUT_TEST_ID, receivedConfigs, useCurrentUserMock } =
+  vi.hoisted(() => ({
+    STUDIO_LAYOUT_TEST_ID: 'studio-layout-mock',
+    receivedConfigs: [] as unknown[],
+    useCurrentUserMock: vi.fn(),
+  }));
 
 vi.mock('sanity/structure');
 vi.mock('sanity-plugin-media');
@@ -56,6 +58,7 @@ vi.mock('sanity', async () => {
       );
     },
     StudioLayout: () => <div data-testid={STUDIO_LAYOUT_TEST_ID} />,
+    useCurrentUser: useCurrentUserMock,
   };
 });
 
@@ -65,6 +68,7 @@ const MOCK_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_DATASET = faker.lorem.word();
 const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
 const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_CURRENT_USER = { id: faker.string.alphanumeric(9) };
 
 const ENTITLEMENT_GATES_NAME = entitlementGates({
   entitledModulePacks: EVERY_MODULE_PACK,
@@ -103,6 +107,10 @@ const configsAcrossRerender = (
 };
 
 describe(`<${StudioMount.name}/>`, () => {
+  beforeEach(() => {
+    useCurrentUserMock.mockReset().mockReturnValue(null);
+  });
+
   it('mounts the Studio layout with a config built from the given strings', () => {
     const html = renderMount();
 
@@ -137,6 +145,10 @@ describe(`<${StudioMount.name}/>`, () => {
     {
       given: 'only the scheme handler changes',
       next: { onSchemeChange: vi.fn() },
+    },
+    {
+      given: 'only the sign-in handler changes',
+      next: { onSignedIn: vi.fn() },
     },
     {
       given: 'the array props are new but equal in value',
@@ -181,5 +193,23 @@ describe(`<${StudioMount.name}/>`, () => {
     });
 
     expect(second).not.toBe(first);
+  });
+
+  it('signals the sign-in once per mount while a user is signed in', () => {
+    useCurrentUserMock.mockReturnValue(MOCK_CURRENT_USER);
+    const onSignedIn = vi.fn();
+    const { rerender } = render(mountElement({ onSignedIn }));
+
+    rerender(mountElement({ onSignedIn, title: faker.lorem.words(3) }));
+
+    expect(onSignedIn).toHaveBeenCalledOnce();
+  });
+
+  it('never signals the sign-in while no user is signed in', () => {
+    const onSignedIn = vi.fn();
+
+    render(mountElement({ onSignedIn }));
+
+    expect(onSignedIn).not.toHaveBeenCalled();
   });
 });

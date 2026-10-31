@@ -5,8 +5,8 @@ import {
   type TBreadcrumbItem,
 } from '@platform/components/shared/breadcrumbs';
 import { usePathname } from '@platform/i18n/navigation';
+import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import {
-  dashboardNavSections,
   EVERY_PLAN_PAGE,
   navLabelForPathname,
 } from '@platform/utils/nav-sections/nav-sections';

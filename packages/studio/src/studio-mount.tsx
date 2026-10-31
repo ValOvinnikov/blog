@@ -6,11 +6,12 @@ import type {
   TSanityLoginProvider,
 } from '@blog/config/constants';
 import type { ThemeColorSchemeKey } from '@sanity/ui';
-import { type FC, useState } from 'react';
+import { type FC, type RefObject, useEffect, useRef, useState } from 'react';
 import {
   StudioLayout,
   StudioProvider,
   type StudioThemeColorSchemeKey,
+  useCurrentUser,
 } from 'sanity';
 
 import { buildStudioConfig, type TStudioEntitlements } from './studio-config';
@@ -27,11 +28,30 @@ export type TStudioMountProps = {
   loginProvider?: TSanityLoginProvider;
   scheme?: ThemeColorSchemeKey;
   onSchemeChange?: (nextScheme: StudioThemeColorSchemeKey) => void;
+  onSignedIn?: () => void;
 };
 
-// Fills the parent slot instead of assuming the viewport, unlike
-// next-sanity's NextStudio (which hardcodes 100vh and also injects
-// document-scoped global styles we don't want here).
+type TSignedInSignalProps = {
+  onSignedIn: () => void;
+  hasSignalledRef: RefObject<boolean>;
+};
+
+const SignedInSignal: FC<TSignedInSignalProps> = ({
+  onSignedIn,
+  hasSignalledRef,
+}) => {
+  const currentUser = useCurrentUser();
+
+  useEffect(() => {
+    if (!currentUser || hasSignalledRef.current) return;
+    hasSignalledRef.current = true;
+    onSignedIn();
+  }, [currentUser, onSignedIn, hasSignalledRef]);
+
+  return null;
+};
+
+// Unlike next-sanity's NextStudio, fills the parent slot instead of hardcoding 100vh.
 const containerStyle = { height: '100%' };
 
 /**
@@ -53,6 +73,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
   loginProvider,
   scheme,
   onSchemeChange,
+  onSignedIn,
 }) => {
   const params = {
     projectId,
@@ -75,6 +96,8 @@ export const StudioMount: FC<TStudioMountProps> = ({
   if (built.paramsKey !== paramsKey) {
     setBuilt({ paramsKey, config: buildStudioConfig(params) });
   }
+  // Survives the provider remounting its subtree when the config is rebuilt.
+  const hasSignalledRef = useRef(false);
 
   return (
     <div style={containerStyle}>
@@ -84,6 +107,12 @@ export const StudioMount: FC<TStudioMountProps> = ({
         onSchemeChange={onSchemeChange}
       >
         <StudioLayout />
+        {onSignedIn && (
+          <SignedInSignal
+            onSignedIn={onSignedIn}
+            hasSignalledRef={hasSignalledRef}
+          />
+        )}
       </StudioProvider>
     </div>
   );

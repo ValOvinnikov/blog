@@ -1,12 +1,11 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import { setPersistentCookie } from '@platform/utils/persistent-cookie/persistent-cookie';
 import { SIDEBAR_COLLAPSED_COOKIE } from '@platform/utils/sidebar-collapsed-cookie/sidebar-collapsed-cookie';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 import { sidebarCollapseProviderVariants } from './sidebar-collapse-provider-variants';
-
-const SIDEBAR_COLLAPSED_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 type TSidebarCollapseContextValue = {
   isCollapsed: boolean;
@@ -30,7 +29,7 @@ export const SidebarCollapseProvider = ({
 
   const toggle = () => {
     const next = !isCollapsed;
-    document.cookie = `${SIDEBAR_COLLAPSED_COOKIE}=${next}; max-age=${SIDEBAR_COLLAPSED_COOKIE_MAX_AGE_SECONDS}; path=/; SameSite=Lax`;
+    setPersistentCookie(SIDEBAR_COLLAPSED_COOKIE, String(next));
     setIsCollapsed(next);
   };
 

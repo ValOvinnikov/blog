@@ -17,7 +17,9 @@ describe(studioNavItem, () => {
 
   it('badges each owner access state with a label of its own', () => {
     const labels = Object.values(OWNER_STUDIO_ACCESS).map(
-      (access) => studioNavItem(t, studioHref, access).badge?.label,
+      (access) =>
+        studioNavItem(t, studioHref, { access, hasEntered: false }).badge
+          ?.label,
     );
 
     expect(labels.every(Boolean)).toBe(true);
@@ -28,5 +30,27 @@ describe(studioNavItem, () => {
     const { badge } = studioNavItem(t, studioHref);
 
     expect(badge).toBeUndefined();
+  });
+
+  it('drops the Ready badge once the owner has entered the Studio', () => {
+    const { badge } = studioNavItem(t, studioHref, {
+      access: OWNER_STUDIO_ACCESS.READY,
+      hasEntered: true,
+    });
+
+    expect(badge).toBeUndefined();
+  });
+
+  it.each([
+    OWNER_STUDIO_ACCESS.INVITE_SENT,
+    OWNER_STUDIO_ACCESS.ACTIVATING,
+    OWNER_STUDIO_ACCESS.STALLED,
+  ])('keeps the %s badge after a Studio entry', (access) => {
+    const { badge } = studioNavItem(t, studioHref, {
+      access,
+      hasEntered: true,
+    });
+
+    expect(badge?.label).toBe(t(`studioAccess.${access}`));
   });
 });
