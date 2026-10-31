@@ -1,12 +1,4 @@
-/*
- * apps/platform's own token layer. Admin is a separate deployment with a
- * separate audience: an operator tool, not a reader-facing site — its own
- * tokens keep it from inheriting the public site's look.
- *
- * Every token is `--admin-*` prefixed because the tenant theme preview
- * renders the SITE's tokens in this same document; an unprefixed
- * `--surface` would collide with it.
- */
+/* `--admin-*` prefixed: the tenant theme preview renders the site's unprefixed tokens in this same document. */
 :root {
   --admin-bg: #f6f7f9;
   --admin-surface: #ffffff;
@@ -34,6 +26,12 @@
   --admin-side-muted: #7d8696;
   --admin-side-raised: #20242e;
   --admin-side-accent: #a5b4fc;
+  --admin-rail: #0f1115;
+  --admin-rail-line: #1c1f26;
+  --admin-rail-text: #c9cfda;
+  --admin-rail-muted: #7d8696;
+  --admin-rail-raised: #20242e;
+  --admin-rail-accent: #a5b4fc;
 }
 
 @theme inline {
@@ -65,6 +63,12 @@
   --color-admin-side-muted: var(--admin-side-muted);
   --color-admin-side-raised: var(--admin-side-raised);
   --color-admin-side-accent: var(--admin-side-accent);
+  --color-admin-rail: var(--admin-rail);
+  --color-admin-rail-line: var(--admin-rail-line);
+  --color-admin-rail-text: var(--admin-rail-text);
+  --color-admin-rail-muted: var(--admin-rail-muted);
+  --color-admin-rail-raised: var(--admin-rail-raised);
+  --color-admin-rail-accent: var(--admin-rail-accent);
 
   --text-admin-11: 11px;
   --text-admin-11-5: 11.5px;
@@ -77,12 +81,14 @@
   --text-admin-16: 16px;
   --text-admin-20: 20px;
   --text-admin-24: 24px;
+  --text-admin-28: 28px;
 
   /* Clears the sticky topbar for sticky panels and scroll targets. */
   --spacing-admin-topbar: 68px;
 
   --radius-admin: 6px;
   --radius-admin-control: 4px;
+  --radius-admin-bar: 2px;
 
   --shadow-admin:
     0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
