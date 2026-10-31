@@ -7,7 +7,9 @@ import {
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
+  ONBOARDING_SCROLL_AREA_TEST_ID,
   ONBOARDING_STEP,
+  ONBOARDING_TIER_QUERY,
   type TOnboardingStep,
 } from '@platform/constants/onboarding';
 import {
@@ -25,6 +27,7 @@ import {
 } from '@platform/testing/aria';
 import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import {
+  act,
   customRender,
   isInaccessible,
   screen,
@@ -95,7 +98,6 @@ const MOCK_PLACEHOLDER_ADDRESS = `${PLACEHOLDER_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}
 const MOCK_LIVE_PREVIEW = {
   name: messages.previewModeControl.livePreviewHeading,
 };
-const MOCK_LIGHT_MODE = { name: messages.previewModeControl.modeLight };
 const MOCK_SITE_TYPE_SELECT = { name: SITE_TYPE_LABEL };
 const MOCK_EDIT_SITE_TYPE = {
   name: t('editField', { field: SITE_TYPE_LABEL }),
@@ -133,86 +135,83 @@ const setup = customRender(OnboardingView, {
   accountEmail: MOCK_SIGN_IN_EMAIL,
 });
 
+let user: UserEvent;
+
+const stepHeading = (name: string) =>
+  screen.getByRole('heading', { level: 1, name });
+
+const stepProgress = () =>
+  screen.getByRole('progressbar', { name: STEPS_ARIA_LABEL });
+
+const stepProgressText = (step: TOnboardingStep) =>
+  t('stepProgressNamed', {
+    n: STEP_ORDER.indexOf(step) + 1,
+    total: STEP_ORDER.length,
+    step: STEPS[step],
+  });
+
+const expectProgressAt = (step: TOnboardingStep) => {
+  const progressBar = stepProgress();
+
+  expect(progressBar).toHaveAttribute(
+    ARIA_VALUENOW,
+    String(STEP_ORDER.indexOf(step) + 1),
+  );
+  expect(progressBar).toHaveAttribute(ARIA_VALUEMAX, String(STEP_ORDER.length));
+  expect(progressBar).toHaveAttribute(ARIA_VALUETEXT, stepProgressText(step));
+};
+
+const clickContinue = async () => {
+  const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+  await user.click(continueButton);
+};
+
+const pickSiteType = async (name: string) => {
+  const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
+  await user.click(siteTypeSelect);
+  const option = await screen.findByRole('option', { name });
+  await user.click(option);
+};
+
+const changeSiteTypeFromReview = async (name: string) => {
+  const editSiteType = screen.getByRole('button', MOCK_EDIT_SITE_TYPE);
+  await user.click(editSiteType);
+  await pickSiteType(name);
+  await clickContinue();
+};
+
+const completeSiteStep = async () => {
+  const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+  await user.type(nameField, MOCK_TENANT_NAME);
+  await clickContinue();
+};
+
+const typeAddress = async () => {
+  const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+  await user.type(addressField, MOCK_SLUG);
+  return addressField;
+};
+
+const completeAddressStep = async () => {
+  await typeAddress();
+  await screen.findByText(MOCK_ADDRESS_AVAILABLE);
+  await clickContinue();
+};
+
+const reachReview = async () => {
+  await completeSiteStep();
+  await completeAddressStep();
+  await clickContinue();
+};
+
+const acceptAndCreate = async () => {
+  const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+  await user.click(acceptance);
+  const createButton = screen.getByRole('button', MOCK_CREATE);
+  await user.click(createButton);
+};
+
 describe(`<${OnboardingView.name}/>`, () => {
-  let user: UserEvent;
-
-  const stepHeading = (name: string) =>
-    screen.getByRole('heading', { level: 1, name });
-
-  const stepProgress = () =>
-    screen.getByRole('progressbar', { name: STEPS_ARIA_LABEL });
-
-  const stepProgressText = (step: TOnboardingStep) =>
-    t('stepProgressNamed', {
-      n: STEP_ORDER.indexOf(step) + 1,
-      total: STEP_ORDER.length,
-      step: STEPS[step],
-    });
-
-  const expectProgressAt = (step: TOnboardingStep) => {
-    const progressBar = stepProgress();
-
-    expect(progressBar).toHaveAttribute(
-      ARIA_VALUENOW,
-      String(STEP_ORDER.indexOf(step) + 1),
-    );
-    expect(progressBar).toHaveAttribute(
-      ARIA_VALUEMAX,
-      String(STEP_ORDER.length),
-    );
-    expect(progressBar).toHaveAttribute(ARIA_VALUETEXT, stepProgressText(step));
-  };
-
-  const clickContinue = async () => {
-    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
-    await user.click(continueButton);
-  };
-
-  const pickSiteType = async (name: string) => {
-    const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
-    await user.click(siteTypeSelect);
-    const option = await screen.findByRole('option', { name });
-    await user.click(option);
-  };
-
-  const changeSiteTypeFromReview = async (name: string) => {
-    const editSiteType = screen.getByRole('button', MOCK_EDIT_SITE_TYPE);
-    await user.click(editSiteType);
-    await pickSiteType(name);
-    await clickContinue();
-  };
-
-  const completeSiteStep = async () => {
-    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
-    await user.type(nameField, MOCK_TENANT_NAME);
-    await clickContinue();
-  };
-
-  const typeAddress = async () => {
-    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
-    await user.type(addressField, MOCK_SLUG);
-    return addressField;
-  };
-
-  const completeAddressStep = async () => {
-    await typeAddress();
-    await screen.findByText(MOCK_ADDRESS_AVAILABLE);
-    await clickContinue();
-  };
-
-  const reachReview = async () => {
-    await completeSiteStep();
-    await completeAddressStep();
-    await clickContinue();
-  };
-
-  const acceptAndCreate = async () => {
-    const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
-    await user.click(acceptance);
-    const createButton = screen.getByRole('button', MOCK_CREATE);
-    await user.click(createButton);
-  };
-
   beforeEach(() => {
     user = userEvent.setup();
     checkSiteAddressMock.mockResolvedValue(undefined);
@@ -431,9 +430,9 @@ describe(`<${OnboardingView.name}/>`, () => {
   it('keeps Continue reachable by keyboard while the address is checked', async () => {
     await completeSiteStep();
     await typeAddress();
-    const lightMode = screen.getByRole('button', MOCK_LIGHT_MODE);
-    await user.click(lightMode);
-    await user.tab({ shift: true });
+    const backButton = screen.getByRole('button', MOCK_BACK);
+    act(() => backButton.focus());
+    await user.tab();
 
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
@@ -615,6 +614,54 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(heading).toBeVisible();
   });
 
+  it('offers Continue alone on the first step', () => {
+    const backButton = screen.queryByRole('button', MOCK_BACK);
+    const continueButton = screen.queryByRole('button', MOCK_CONTINUE);
+
+    expect(backButton).not.toBeInTheDocument();
+    expect(continueButton).toBeInTheDocument();
+  });
+
+  it('offers Back beside Continue from the second step', async () => {
+    await completeSiteStep();
+
+    const backButton = screen.queryByRole('button', MOCK_BACK);
+    const continueButton = screen.queryByRole('button', MOCK_CONTINUE);
+
+    expect(backButton).toBeInTheDocument();
+    expect(continueButton).toBeInTheDocument();
+  });
+
+  it('offers Back beside Create site on review', async () => {
+    await reachReview();
+
+    const backButton = screen.queryByRole('button', MOCK_BACK);
+    const createButton = screen.queryByRole('button', MOCK_CREATE);
+
+    expect(backButton).toBeInTheDocument();
+    expect(createButton).toBeInTheDocument();
+  });
+
+  it('moves focus to the start of the new step on Continue', async () => {
+    await completeSiteStep();
+    await user.tab();
+
+    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+
+    expect(addressField).toHaveFocus();
+  });
+
+  it('moves focus to the start of the earlier step on Back', async () => {
+    await completeSiteStep();
+    const backButton = screen.getByRole('button', MOCK_BACK);
+    await user.click(backButton);
+    await user.tab();
+
+    const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
+
+    expect(siteTypeSelect).toHaveFocus();
+  });
+
   it('shows the neutral refusal when creation is refused', async () => {
     createSiteMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -626,5 +673,124 @@ describe(`<${OnboardingView.name}/>`, () => {
     const refusal = await screen.findByText(TRY_AGAIN_LATER);
 
     expect(refusal).toBeVisible();
+  });
+});
+
+const stubMatchMedia = window.matchMedia;
+
+const stubTier = (matchingQueries: readonly string[]) => {
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+    ...stubMatchMedia(query),
+    matches: matchingQueries.includes(query),
+  }));
+};
+
+const FULL_TIER = [ONBOARDING_TIER_QUERY.RAIL, ONBOARDING_TIER_QUERY.FULL];
+const RAIL_TIER = [ONBOARDING_TIER_QUERY.RAIL];
+
+const renderInTier = (matchingQueries: readonly string[]) => {
+  user = userEvent.setup();
+  checkSiteAddressMock.mockResolvedValue(undefined);
+  stubTier(matchingQueries);
+  setup();
+};
+
+const shellParts = () => ({
+  main: screen.getByRole('main'),
+  nameField: screen.getByRole('textbox', MOCK_NAME_FIELD),
+  preview: screen.getByRole('region', MOCK_LIVE_PREVIEW),
+  continueButton: screen.getByRole('button', MOCK_CONTINUE),
+});
+
+describe(`<${OnboardingView.name}/> layout`, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('places the preview after the footer, outside main, from 1360px', () => {
+    renderInTier(FULL_TIER);
+
+    const { main, nameField, preview, continueButton } = shellParts();
+
+    expect(main).toContainElement(continueButton);
+    expect(main).not.toContainElement(preview);
+    expect(nameField.compareDocumentPosition(continueButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(continueButton.compareDocumentPosition(preview)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('places the preview inside main between the fields and the footer from 768px', () => {
+    renderInTier(RAIL_TIER);
+
+    const { main, nameField, preview, continueButton } = shellParts();
+
+    expect(main).toContainElement(preview);
+    expect(main).toContainElement(continueButton);
+    expect(nameField.compareDocumentPosition(preview)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(preview.compareDocumentPosition(continueButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('places the preview and then the actions after main on a phone', () => {
+    renderInTier([]);
+
+    const { main, nameField, preview, continueButton } = shellParts();
+
+    expect(main).toContainElement(nameField);
+    expect(main).not.toContainElement(preview);
+    expect(main).not.toContainElement(continueButton);
+    expect(main.compareDocumentPosition(preview)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(preview.compareDocumentPosition(continueButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  describe.each([
+    ['from 1360px', FULL_TIER],
+    ['from 768px', RAIL_TIER],
+  ])('%s', (_tier, matchingQueries) => {
+    beforeEach(() => {
+      renderInTier(matchingQueries);
+    });
+
+    const expectClearOfFooter = (field: HTMLElement, footerButton: object) => {
+      const scrollArea = screen.getByTestId(ONBOARDING_SCROLL_AREA_TEST_ID);
+      const primaryButton = screen.getByRole('button', footerButton);
+
+      expect(field).toHaveFocus();
+      expect(scrollArea).toContainElement(field);
+      expect(scrollArea).not.toContainElement(primaryButton);
+    };
+
+    it('scrolls Site name inside an area the pinned footer never covers', async () => {
+      const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+      act(() => nameField.focus());
+
+      expectClearOfFooter(nameField, MOCK_CONTINUE);
+    });
+
+    it('scrolls the address input inside an area the pinned footer never covers', async () => {
+      await completeSiteStep();
+      const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+      act(() => addressField.focus());
+
+      expectClearOfFooter(addressField, MOCK_CONTINUE);
+    });
+
+    it('scrolls the terms box inside an area the pinned footer never covers', async () => {
+      await reachReview();
+      const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+      act(() => acceptance.focus());
+
+      expectClearOfFooter(acceptance, MOCK_CREATE);
+    });
   });
 });

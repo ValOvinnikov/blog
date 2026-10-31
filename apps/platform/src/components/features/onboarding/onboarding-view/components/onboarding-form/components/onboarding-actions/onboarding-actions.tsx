@@ -1,5 +1,6 @@
 'use client';
 
+import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
@@ -27,12 +28,12 @@ export const OnboardingActions = ({
   children,
 }: TOnboardingActionsProps) => {
   const t = useTranslations('onboardingForm');
-  const { root, back, status } = onboardingActionsVariants();
+  const { root, back, primary, status } = onboardingActionsVariants();
 
   return (
     <div className={root()}>
       {!isFirstStep && (
-        <Button onClick={onBack} className={back()}>
+        <Button size={SIZE.LG} onClick={onBack} className={back()}>
           {t('back')}
         </Button>
       )}
@@ -42,6 +43,8 @@ export const OnboardingActions = ({
           key="create-site"
           type="submit"
           variant={BUTTON_VARIANT.PRIMARY}
+          size={SIZE.LG}
+          className={primary()}
           isPending={isPending}
           pendingLabel={t('creating')}
         >
@@ -51,6 +54,8 @@ export const OnboardingActions = ({
         <Button
           key="continue"
           variant={BUTTON_VARIANT.PRIMARY}
+          size={SIZE.LG}
+          className={primary()}
           isAriaDisabled={isContinueDisabled}
           onClick={onContinue}
         >

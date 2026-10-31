@@ -3,28 +3,32 @@ import { tv } from '@platform/utils/tv/tv';
 export const onboardingFormVariants = tv({
   slots: {
     root: [
-      'min-h-dvh w-full bg-admin-bg text-admin-text',
-      'md:grid md:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]',
-      // Clears the pinned actions bar at its tallest: a long address verdict stacked above the buttons on a phone.
-      '[html:has(&)]:scroll-pb-48',
+      'flex min-h-dvh w-full flex-col bg-admin-bg text-admin-text',
+      'md:grid md:h-dvh md:grid-cols-[300px_minmax(0,1fr)] md:overflow-hidden',
     ],
-    main: ['min-w-0'],
     form: [
-      'grid grid-cols-1',
-      'xl:min-h-dvh xl:grid-cols-[minmax(0,1fr)_480px] xl:grid-rows-[1fr_auto] 2xl:grid-cols-[minmax(0,1fr)_560px]',
+      'flex flex-1 flex-col',
+      'md:grid md:min-h-0 md:grid-cols-1 md:grid-rows-[minmax(0,1fr)_auto] md:bg-admin-surface',
+      'min-[85rem]:grid-cols-[minmax(0,1fr)_560px]',
     ],
-    panel: [
-      'bg-admin-surface px-4 pt-6 pb-7 md:px-10 md:pt-10',
-      'xl:col-start-1 xl:row-start-1 2xl:px-16 2xl:pt-14',
+    main: [
+      'min-w-0 bg-admin-surface px-4 pt-6 pb-7',
+      'md:col-start-1 md:row-start-1 md:flex md:min-h-0 md:flex-col md:p-0',
     ],
-    fields: ['@container flex flex-col gap-4 outline-hidden'],
-    preview: [
-      'border-t border-admin-line px-3 pt-5 pb-6 md:p-[26px]',
-      'xl:sticky xl:top-0 xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:self-start xl:border-t-0 xl:px-7 xl:py-8',
+    scrollArea: ['md:min-h-0 md:flex-1 md:overflow-y-auto md:px-16 md:pt-14'],
+    column: ['md:max-w-[640px]'],
+    panel: ['flex flex-col outline-hidden'],
+    fields: ['@container mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],
+    railPreview: ['mt-8'],
+    previewColumn: [
+      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-admin-bg px-7 py-8',
+    ],
+    phonePreview: [
+      'flex-1 border-t border-admin-line bg-admin-bg px-3 pt-5 pb-6 md:hidden',
     ],
     actions: [
-      'sticky bottom-0 z-10 border-t border-admin-line bg-admin-surface p-4 md:px-10',
-      'xl:col-start-1 xl:row-start-2 xl:border-admin-line-2 2xl:px-16',
+      'border-t border-admin-line bg-admin-surface p-4',
+      'md:col-start-1 md:row-start-2 md:mx-16 md:max-w-[640px] md:border-admin-line-2 md:px-0 md:pt-5 md:pb-10',
     ],
   },
 });
