@@ -42,6 +42,7 @@ export * from './path';
 export * from './portable-text-block-type';
 export * from './preset';
 export * from './price-period';
+export * from './product';
 export * from './redirect';
 export * from './release';
 export * from './reserved-slug';

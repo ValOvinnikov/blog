@@ -9,6 +9,9 @@ import {
   mockTenant,
 } from '@blog/db/testing/tenants/fixtures';
 import {
+  LEGACY_SANITY_MANAGEMENT_TOKEN_LABEL,
+  LEGACY_SANITY_READ_TOKEN_LABEL,
+  LEGACY_SANITY_WRITE_TOKEN_LABEL,
   SANITY_MANAGEMENT_TOKEN_LABEL,
   SANITY_READ_TOKEN_LABEL,
   SANITY_WRITE_TOKEN_LABEL,
@@ -34,6 +37,18 @@ const MOCK_WRITE_ROBOT = {
 const MOCK_MANAGEMENT_ROBOT = {
   id: faker.string.uuid(),
   label: SANITY_MANAGEMENT_TOKEN_LABEL,
+};
+const MOCK_LEGACY_READ_ROBOT = {
+  id: faker.string.uuid(),
+  label: LEGACY_SANITY_READ_TOKEN_LABEL,
+};
+const MOCK_LEGACY_WRITE_ROBOT = {
+  id: faker.string.uuid(),
+  label: LEGACY_SANITY_WRITE_TOKEN_LABEL,
+};
+const MOCK_LEGACY_MANAGEMENT_ROBOT = {
+  id: faker.string.uuid(),
+  label: LEGACY_SANITY_MANAGEMENT_TOKEN_LABEL,
 };
 const MOCK_HUMAN_ROBOT = {
   id: faker.string.uuid(),
@@ -135,6 +150,27 @@ describe(revokeTenantSanityTokens, () => {
       MOCK_READ_ROBOT.id,
       MOCK_WRITE_ROBOT.id,
       MOCK_MANAGEMENT_ROBOT.id,
+    ]);
+  });
+
+  it('revokes tokens minted under the legacy labels, the management token last', async () => {
+    listRobotTokens.mockResolvedValueOnce([
+      MOCK_LEGACY_MANAGEMENT_ROBOT,
+      MOCK_LEGACY_READ_ROBOT,
+      MOCK_HUMAN_ROBOT,
+      MOCK_LEGACY_WRITE_ROBOT,
+    ]);
+
+    await revokeTenantSanityTokens(
+      MOCK_TENANT,
+      MOCK_DEPROVISION_ENV,
+      MOCK_DEPS,
+    );
+
+    expect(revokedRobotIds()).toEqual([
+      MOCK_LEGACY_READ_ROBOT.id,
+      MOCK_LEGACY_WRITE_ROBOT.id,
+      MOCK_LEGACY_MANAGEMENT_ROBOT.id,
     ]);
   });
 
