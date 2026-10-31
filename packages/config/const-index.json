@@ -6024,6 +6024,22 @@
         "file": "apps/platform/src/constants/upload.ts"
       }
     ],
+    "ERROR_PAGES": [
+      {
+        "ref": "VOICE_SECTION.ERROR_PAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
+      }
+    ],
+    "EMPTY_STATES": [
+      {
+        "ref": "VOICE_SECTION.EMPTY_STATES",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
+      }
+    ],
     "worker.enqueue_error": [
       {
         "ref": "WORKER_LOG.ENQUEUE_ERROR",
