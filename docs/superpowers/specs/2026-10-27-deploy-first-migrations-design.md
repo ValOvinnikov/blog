@@ -36,7 +36,13 @@ How each part finds a tenant's dataset and token:
 - Dev switches to the post-launch order (deploy first, then migrate) before launch, so the first breaking change after launch has already been rehearsed.
 - So launch has no migration problem. Everything below is about breaking changes after launch.
 - The migration tooling stays for that: a ledger in each dataset (the migration ids it has applied; a new tenant gets the ids its worker build knows, so a tenant created mid-release picks up the rest on the next run), the fan-out job, a record of which tenant failed, and a per-tenant retry.
-- Timing of the reset: [owner to confirm].
+- Timing of the dev reset: now, before launch (owner, 2026-10-31). Production's reset stays at launch. Dev's order:
+  1. Merge the clean-ups, in either order: every content migration deleted (#6439) and one Drizzle baseline (#6440). Auto-deploy is off, so nothing runs on merge, and no dev deploy is dispatched until step 5.
+  2. Deprovision the 3 dev test tenants with `deprovision-tenant` while their rows and the current key exist, then delete their archived Sanity projects in Manage.
+  3. Drop and recreate the dev Neon database.
+  4. Generate dev's fresh key set, back it up, and set it everywhere it is read.
+  5. Dispatch `deploy-development.yml`: `migrate-db` applies the baseline.
+  6. Reseed the dev console project from the starter content, bootstrap the super admin, and recreate the platform tenant and the test tenants through the worker.
 
 ## How we deploy today
 
