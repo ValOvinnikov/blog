@@ -42,6 +42,16 @@ export async function loadOwnerAccessTarget(
   return { tenant, projectId: sanityProjectId, ownerEmail, token, env };
 }
 
+// Sanity refuses a project-scoped token any change to an `administrator` role.
+export function tokenForRoleChange(
+  target: TOwnerAccessTarget,
+  roleName: string,
+): string {
+  return roleName === SANITY_PROJECT_ROLE.ADMINISTRATOR
+    ? target.env.sanityManagementToken
+    : target.token;
+}
+
 export function hasOwnerEmail(
   target: TOwnerAccessTarget,
   email: TMaybeUndefined<string>,

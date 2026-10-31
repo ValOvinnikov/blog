@@ -25,6 +25,7 @@ import {
   mockSanityOwner,
   mockSanityOwnerWithMembership,
 } from '@worker/testing/owner-access/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
@@ -205,7 +206,7 @@ describe(resendOwnerInvite, () => {
         ],
         [
           {
-            token: MOCK_TENANT_MANAGEMENT_TOKEN,
+            token: MOCK_PROVISION_ENV.sanityManagementToken,
             projectId: MOCK_SANITY_PROJECT_ID,
             projectUserId: MOCK_FORMER_PROJECT_USER_ID,
             roleName: SANITY_PROJECT_ROLE.ADMINISTRATOR,

@@ -19,7 +19,11 @@ import { hasArrayGotItems } from '@blog/utils/primitives';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
-import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
+import {
+  hasOwnerEmail,
+  type TOwnerAccessTarget,
+  tokenForRoleChange,
+} from './owner-access-target';
 
 function findFormerEmails(
   target: TOwnerAccessTarget,
@@ -64,7 +68,7 @@ async function revokeFormerRoles(
     if (!entry) continue;
     for (const { name } of entry.roles) {
       await revokeSanityProjectRole({
-        token,
+        token: tokenForRoleChange(target, name),
         projectId,
         projectUserId: entry.projectUserId,
         roleName: name,

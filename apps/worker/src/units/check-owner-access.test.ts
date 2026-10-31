@@ -152,7 +152,7 @@ describe(checkOwnerAccess, () => {
 
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
       expect(grantSanityProjectRole).toHaveBeenCalledWith({
-        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
@@ -168,7 +168,7 @@ describe(checkOwnerAccess, () => {
 
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
       expect(grantSanityProjectRole).toHaveBeenCalledWith({
-        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        token: MOCK_PROVISION_ENV.sanityManagementToken,
         projectId: MOCK_SANITY_PROJECT_ID,
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         role: SANITY_PROJECT_ROLE.ADMINISTRATOR,

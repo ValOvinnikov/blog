@@ -24,7 +24,10 @@ import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
-import type { TOwnerAccessTarget } from './owner-access-target';
+import {
+  type TOwnerAccessTarget,
+  tokenForRoleChange,
+} from './owner-access-target';
 
 function toLoginProvider(
   provider: TMaybeUndefined<string>,
@@ -92,7 +95,7 @@ export async function grantOwnerAdministrator(
   const otherRoles = rolesBesideAdministrator(entry);
   if (!isAdministrator) {
     await grantSanityProjectRole({
-      token,
+      token: tokenForRoleChange(target, SANITY_PROJECT_ROLE.ADMINISTRATOR),
       projectId,
       projectUserId: entry.projectUserId,
       role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
