@@ -16,7 +16,10 @@ import {
   loadOwnerAccessTarget,
   type TOwnerAccessTarget,
 } from '@worker/utils/owner-access/owner-access-target';
-import { sendOwnerInvite } from '@worker/utils/owner-access/owner-invite';
+import {
+  deleteOwnerInvitesAfterGrant,
+  sendOwnerInvite,
+} from '@worker/utils/owner-access/owner-invite';
 import {
   ownerAccessFailingSince,
   pendingOwnerAccessOutcome,
@@ -41,6 +44,7 @@ async function resolveOwnerAccess(
   const owner = await findOwner(target);
   if (owner) {
     const outcome = await grantOwnerAdministrator(target, owner);
+    await deleteOwnerInvitesAfterGrant(target);
     await resolveOwnerAccessFinding(tenant.id);
     await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.SITE_READY);
     return outcome;

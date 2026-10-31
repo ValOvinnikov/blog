@@ -13,6 +13,7 @@ export const OWNER_ACCESS_LOG = {
   CHECK_FAILED: 'owner_access.check_failed',
   REPORT_FAILED: 'owner_access.report_failed',
   ACTIVITY_TOUCH_FAILED: 'owner_access.activity_touch_failed',
+  INVITE_DELETE_FAILED: 'owner_access.invite_delete_failed',
   FINDING_OPEN_FAILED: 'owner_access.finding_open_failed',
   FINDING_RESOLVE_FAILED: 'owner_access.finding_resolve_failed',
   SWEEP_NOT_CONFIGURED: 'owner_access.sweep_not_configured',

@@ -7,7 +7,12 @@ import {
   listSanityProjectInvites,
   type TSanityInvite,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
-import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
+import { sanitizeLogMessage } from '@blog/insight';
+import {
+  OWNER_ACCESS_LOG,
+  SANITY_PENDING_INVITE_STATUS,
+} from '@worker/constants/owner-access';
+import { logger } from '@worker/utils/logger/logger';
 import { sendOwnerEmailOnce } from '@worker/utils/owner-email/send-owner-email';
 
 import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
@@ -25,6 +30,50 @@ async function listOwnerInvites(
   );
 }
 
+async function deleteInvites(
+  target: TOwnerAccessTarget,
+  invites: TSanityInvite[],
+): Promise<void> {
+  const { projectId, token } = target;
+  for (const { id } of invites) {
+    if (id) await deleteSanityProjectInvite({ token, projectId, inviteId: id });
+  }
+}
+
+async function deleteOwnerInvites(target: TOwnerAccessTarget): Promise<void> {
+  const { tenant } = target;
+
+  const invites = await listOwnerInvites(target);
+  await deleteInvites(target, invites);
+
+  const isRecordedInviteDeleted = invites.some(
+    ({ id }) => !!id && id === tenant.ownerSanityInviteId,
+  );
+  if (!isRecordedInviteDeleted) return;
+
+  const cleared = await setTenantOwnerAccess(tenant.id, {
+    sanityInviteId: null,
+  });
+  if (!cleared.ok) {
+    throw new Error(
+      `Tenant "${tenant.id}"'s deleted owner invite could not be cleared (${cleared.error}).`,
+    );
+  }
+}
+
+export async function deleteOwnerInvitesAfterGrant(
+  target: TOwnerAccessTarget,
+): Promise<void> {
+  try {
+    await deleteOwnerInvites(target);
+  } catch (error) {
+    logger.error(OWNER_ACCESS_LOG.INVITE_DELETE_FAILED, {
+      tenantId: target.tenant.id,
+      error: sanitizeLogMessage(error),
+    });
+  }
+}
+
 export async function sendOwnerInvite(
   target: TOwnerAccessTarget,
   options: { replaceExisting: boolean },
@@ -32,12 +81,7 @@ export async function sendOwnerInvite(
   const { tenant, projectId, ownerEmail, token } = target;
 
   const existing = await listOwnerInvites(target);
-  if (options.replaceExisting) {
-    for (const { id } of existing) {
-      if (id)
-        await deleteSanityProjectInvite({ token, projectId, inviteId: id });
-    }
-  }
+  if (options.replaceExisting) await deleteInvites(target, existing);
 
   let [invite] = options.replaceExisting ? [] : existing;
   if (!invite) {
