@@ -16,8 +16,10 @@ export const sidebarVariants = tv({
       'flex min-w-0 flex-col',
       'group-data-[collapsed=true]/shell:hidden',
     ],
-    brandName: ['text-admin-14 font-bold tracking-[0.2px] text-white'],
-    brandTagline: ['text-admin-12 text-admin-faint'],
+    brandName: [
+      'text-admin-14 font-bold tracking-[0.2px] text-admin-text-strong',
+    ],
+    brandTagline: ['text-admin-12 text-admin-side-muted'],
     toggle: ['ml-auto group-data-[collapsed=true]/shell:ml-0'],
     switcherSlot: [
       'px-3 pt-3 pb-1',
@@ -37,14 +39,14 @@ export const sidebarVariants = tv({
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0',
     ],
     note: [
-      'px-2.5 text-admin-12 text-admin-faint',
+      'px-2.5 text-admin-12 text-admin-side-muted',
       'group-data-[collapsed=true]/shell:hidden',
     ],
   },
   variants: {
     state: {
       active: {
-        row: ['bg-admin-side-raised text-white'],
+        row: ['bg-admin-side-raised text-admin-side-text'],
       },
       resting: {
         row: ['text-admin-side-text', 'hover:bg-admin-side-line'],

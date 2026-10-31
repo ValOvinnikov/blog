@@ -1,4 +1,5 @@
 import {
+  hexToOklch,
   oklchToHex,
   renderedContrastRatio,
   WCAG_AA_CONTRAST_MIN,
@@ -11,6 +12,25 @@ describe(oklchToHex, () => {
     ['a high-chroma indigo stop', 0.58, 0.21, 274, '#5966f3'],
   ])('converts %s colour to its hex', (_label, l, c, h, hex) => {
     expect(oklchToHex(l, c, h)).toBe(hex);
+  });
+});
+
+describe(hexToOklch, () => {
+  it.each([['#4f46e5'], ['#eef0f3'], ['#ffffff']])(
+    'round-trips %s through OKLCH',
+    (hex) => {
+      const { l, c, h } = hexToOklch(hex);
+
+      expect(oklchToHex(l, c, h)).toBe(hex);
+    },
+  );
+
+  it('gives an achromatic grey a hue of 0', () => {
+    expect(hexToOklch('#808080').h).toBe(0);
+  });
+
+  it('throws on a value that is not a colour', () => {
+    expect(() => hexToOklch('not-a-colour')).toThrow();
   });
 });
 
