@@ -53,10 +53,12 @@
     "@sanity/cli": "^7.7.1",
     "@sanity/client": "^8.9.0",
     "@sanity/validation": "^6.19.0",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "catalog:",
     "groq-js": "^2.0.0",
+    "jsdom": "^29.1.1",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
