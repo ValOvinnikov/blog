@@ -51,7 +51,7 @@ export const footerSettingsSchema = defineType({
       title: 'Privacy Policy',
       type: linkRefSchema.name,
       description:
-        'Your privacy policy, linked next to the copyright line at the bottom of the footer.',
+        'Your privacy policy, linked from the cookie banner and next to the copyright line at the bottom of the footer.',
     }),
     defineField({
       name: 'finePrint',
