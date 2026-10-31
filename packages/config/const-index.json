@@ -3916,6 +3916,46 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "primary": [
+      {
+        "ref": "BUTTON_VARIANT.PRIMARY",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "secondary": [
+      {
+        "ref": "BUTTON_VARIANT.SECONDARY",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "ghost": [
+      {
+        "ref": "BUTTON_VARIANT.GHOST",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "danger": [
+      {
+        "ref": "BUTTON_VARIANT.DANGER",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "unstyled": [
+      {
+        "ref": "BUTTON_VARIANT.UNSTYLED",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
     "contrast_result.record_failed": [
       {
         "ref": "CONTRAST_RESULT_LOG.RECORD_FAILED",

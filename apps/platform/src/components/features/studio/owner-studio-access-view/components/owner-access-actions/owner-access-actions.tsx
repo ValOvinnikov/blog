@@ -2,6 +2,7 @@
 
 import { isOutcomeSuccess, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   OWNER_STUDIO_ACCESS,
   type TPendingOwnerStudioAccess,
@@ -14,6 +15,8 @@ import { tv } from '@platform/utils/tv/tv';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
+
+const ACTION_BUTTON_DEFAULTS = { size: SIZE.SM } as const;
 
 const ownerAccessActionsVariants = tv({
   base: ['flex flex-wrap gap-2'],
@@ -60,8 +63,8 @@ export const OwnerAccessActions = ({
 
   const checkButton = (
     <Button
-      variant={isInviteSent ? 'primary' : 'secondary'}
-      size={SIZE.SM}
+      {...ACTION_BUTTON_DEFAULTS}
+      variant={isInviteSent ? BUTTON_VARIANT.PRIMARY : BUTTON_VARIANT.SECONDARY}
       isDisabled={isResending}
       isPending={isChecking}
       pendingLabel={t('checking')}
@@ -73,8 +76,8 @@ export const OwnerAccessActions = ({
 
   const resendButton = (
     <Button
-      variant={isStalled ? 'primary' : 'secondary'}
-      size={SIZE.SM}
+      {...ACTION_BUTTON_DEFAULTS}
+      variant={isStalled ? BUTTON_VARIANT.PRIMARY : BUTTON_VARIANT.SECONDARY}
       isDisabled={isChecking}
       isPending={isResending}
       pendingLabel={t('resending')}
