@@ -783,6 +783,21 @@ export type CtaButton = {
   link?: LinkReference;
 };
 
+export type CookieSettingsItem = {
+  _type: 'cookieSettingsItem';
+  placement?: string;
+};
+
+export type FooterLinkGroup = {
+  _type: 'footerLinkGroup';
+  heading?: InternationalizedArrayString;
+  links?: Array<
+    {
+      _key: string;
+    } & LinkRef
+  >;
+};
+
 export type SocialProfile = {
   _type: 'socialProfile';
   link?: LinkReference;
@@ -915,6 +930,21 @@ export type Settings_footer = {
     {
       _key: string;
     } & SocialProfile
+  >;
+  groups?: Array<
+    {
+      _key: string;
+    } & FooterLinkGroup
+  >;
+  about?: InternationalizedArrayString;
+  address?: InternationalizedArrayText;
+  finePrint?: Array<
+    | ({
+        _key: string;
+      } & LinkRef)
+    | ({
+        _key: string;
+      } & CookieSettingsItem)
   >;
   showLanguageSwitcher?: boolean;
   showRssFeed?: boolean;
@@ -2300,6 +2330,8 @@ export type AllSanitySchemaTypes =
   | LinkReference
   | CtaSecondaryButton
   | CtaButton
+  | CookieSettingsItem
+  | FooterLinkGroup
   | SocialProfile
   | LogoItem
   | SanityImageCrop
