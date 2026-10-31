@@ -14,16 +14,13 @@ import {
   listSanityProjectUsers,
   type TSanityUser,
 } from '@blog/db/utils/sanity-management-client/sanity-project-users';
+import { sanityRoleChangeToken } from '@blog/db/utils/sanity-management-client/sanity-role-change-token';
 import { normalizeEmail } from '@blog/utils/normalize-email-identity';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
-import {
-  hasOwnerEmail,
-  type TOwnerAccessTarget,
-  tokenForRoleChange,
-} from './owner-access-target';
+import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
 
 function findFormerEmails(
   target: TOwnerAccessTarget,
@@ -60,7 +57,7 @@ async function revokeFormerRoles(
   target: TOwnerAccessTarget,
   formerUsers: TSanityUser[],
 ): Promise<void> {
-  const { projectId, token } = target;
+  const { projectId, token, env } = target;
   const acl = await listSanityProjectAcl({ token, projectId });
 
   for (const user of formerUsers) {
@@ -68,7 +65,11 @@ async function revokeFormerRoles(
     if (!entry) continue;
     for (const { name } of entry.roles) {
       await revokeSanityProjectRole({
-        token: tokenForRoleChange(target, name),
+        token: sanityRoleChangeToken({
+          roleName: name,
+          organizationToken: env.sanityManagementToken,
+          projectToken: token,
+        }),
         projectId,
         projectUserId: entry.projectUserId,
         roleName: name,

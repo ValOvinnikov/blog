@@ -10,8 +10,21 @@ const PROVISIONED_TOKEN_LABELS: ReadonlySet<string> = new Set([
   SANITY_MANAGEMENT_TOKEN_LABEL,
 ]);
 
-export function isProvisionedRobotToken({
-  label,
-}: TSanityRobotTokenSummary): boolean {
+function isProvisionedRobotToken({ label }: TSanityRobotTokenSummary): boolean {
   return label !== undefined && PROVISIONED_TOKEN_LABELS.has(label);
+}
+
+function isManagementRobotToken({ label }: TSanityRobotTokenSummary): boolean {
+  return label === SANITY_MANAGEMENT_TOKEN_LABEL;
+}
+
+// The management token revokes itself, so it goes last.
+export function provisionedTokensInRevocationOrder(
+  robots: TSanityRobotTokenSummary[],
+): TSanityRobotTokenSummary[] {
+  const provisioned = robots.filter(isProvisionedRobotToken);
+  return [
+    ...provisioned.filter((robot) => !isManagementRobotToken(robot)),
+    ...provisioned.filter(isManagementRobotToken),
+  ];
 }

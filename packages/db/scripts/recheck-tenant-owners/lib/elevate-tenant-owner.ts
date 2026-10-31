@@ -3,39 +3,69 @@ import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
+import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-management-credentials';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   grantSanityProjectRole,
   listSanityProjectAcl,
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
+import { sanityRoleChangeToken } from '@blog/db/utils/sanity-management-client/sanity-role-change-token';
+import { sanitizeLogMessage } from '@blog/insight';
 
 import type { TRecheckEnv } from './env';
 
-// How long an owner may sit un-accepted before a run reports STALLED rather
-// than PENDING_ACCEPTANCE — long enough that a same-day signup isn't flagged,
-// short enough that a quiet non-acceptance still surfaces promptly.
+// Long enough not to flag a same-day signup, short enough to surface a quiet non-acceptance promptly.
 const OWNER_ACCEPTANCE_STALL_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3;
 
-/**
- * Promotes the tenant owner from `viewer` to `administrator` once they've
- * accepted their Sanity invite. A pending invitee never appears in the ACL listing, so its absence is not
- * an error — this reports a time-bound PENDING_ACCEPTANCE/STALLED outcome
- * instead of throwing, so a slow (or never) acceptance can never fail an
- * otherwise-successful sweep. Checks live ACL state rather than
- * any local record, so re-running against an already-administrator owner is
- * a safe no-op.
- */
+async function requireProjectToken(tenantId: string): Promise<string> {
+  const credentials = await getTenantSanityManagementCredentials(tenantId);
+  if (!credentials) {
+    throw new Error(
+      `tenant "${tenantId}" has no Sanity management token (sanityManagementTokenEncrypted) — re-provision it to mint one.`,
+    );
+  }
+  return credentials.token;
+}
+
+async function grantOwnerAdministrator(input: {
+  env: TRecheckEnv;
+  projectId: string;
+  projectToken: string;
+  projectUserId: string;
+}): Promise<void> {
+  const { env, projectId, projectToken, projectUserId } = input;
+  try {
+    await grantSanityProjectRole({
+      token: sanityRoleChangeToken({
+        roleName: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+        organizationToken: env.sanityManagementToken,
+        projectToken,
+      }),
+      projectId,
+      projectUserId,
+      role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
+    });
+  } catch (error) {
+    throw new Error(
+      `SANITY_MANAGEMENT_TOKEN could not make the owner administrator of Sanity project "${projectId}" (${sanitizeLogMessage(error)}). If the token was rotated after this project was created, it can no longer grant administrator there: make the owner Administrator by hand in Sanity Manage, under the project's Members.`,
+      { cause: error },
+    );
+  }
+}
+
+// A pending invitee never appears in the ACL listing, so its absence is a time-bound PENDING_ACCEPTANCE or STALLED outcome, never an error.
 export async function elevateTenantOwner(
   tenant: TTenant,
   env: TRecheckEnv,
 ): Promise<TElevateTenantOwnerOutcome> {
-  const { sanityProjectId } = tenant;
+  const { id: tenantId, sanityProjectId, createdAt } = tenant;
   if (!sanityProjectId) {
     return ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE;
   }
 
+  const projectToken = await requireProjectToken(tenantId);
   const acl = await listSanityProjectAcl({
-    token: env.sanityManagementToken,
+    token: projectToken,
     projectId: sanityProjectId,
   });
 
@@ -48,7 +78,7 @@ export async function elevateTenantOwner(
   const [ownerEntry] = humanEntries;
 
   if (!ownerEntry) {
-    const elapsedMs = Date.now() - tenant.createdAt.getTime();
+    const elapsedMs = Date.now() - createdAt.getTime();
     return elapsedMs >= OWNER_ACCEPTANCE_STALL_THRESHOLD_MS
       ? ELEVATE_TENANT_OWNER_OUTCOME.STALLED
       : ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE;
@@ -61,11 +91,11 @@ export async function elevateTenantOwner(
     return ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR;
   }
 
-  await grantSanityProjectRole({
-    token: env.sanityManagementToken,
+  await grantOwnerAdministrator({
+    env,
     projectId: sanityProjectId,
+    projectToken,
     projectUserId: ownerEntry.projectUserId,
-    role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
   });
 
   return ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED;
