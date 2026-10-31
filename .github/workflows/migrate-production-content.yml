@@ -10,7 +10,7 @@ on:
         type: string
         default: ''
       label:
-        description: 'Names the backup artifact — the release tag or version'
+        description: 'Names the backup — the release tag or version'
         type: string
         required: true
 
@@ -52,7 +52,7 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
       # A backup on the ephemeral runner is not a backup — export the dataset and
-      # upload it as an artifact BEFORE any mutation, so a bad migration is
+      # store it encrypted BEFORE any mutation, so a bad migration is
       # recoverable.
       - name: Back up production dataset
         working-directory: packages/studio
@@ -62,13 +62,16 @@ jobs:
           # green and a release that migrated nothing would look successful.
           : "${SANITY_AUTH_TOKEN:?empty — set the SANITY_MIGRATE_TOKEN secret on the production environment}"
           pnpm dataset:export "${RUNNER_TEMP}/prod-${BACKUP_LABEL}.tar.gz"
-      - name: Upload backup artifact
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - name: Store encrypted backup
+        uses: ./.github/actions/encrypted-backup
         with:
-          name: sanity-prod-backup-${{ inputs.label }}
-          path: ${{ runner.temp }}/prod-${{ inputs.label }}.tar.gz
-          retention-days: 30
-          if-no-files-found: error
+          file: ${{ runner.temp }}/prod-${{ inputs.label }}.tar.gz
+          name: release/${{ inputs.label }}/sanity-prod.tar.gz
+          recipient: ${{ vars.BACKUP_AGE_RECIPIENT }}
+          endpoint: ${{ vars.BACKUP_R2_ENDPOINT }}
+          bucket: ${{ vars.BACKUP_R2_BUCKET }}
+          access-key-id: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
       # Runs only un-applied migrations, recorded in the migrationState
       # ledger, so a second run is a no-op.
       - name: Apply pending migrations

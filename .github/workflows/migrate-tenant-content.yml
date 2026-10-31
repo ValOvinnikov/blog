@@ -26,7 +26,7 @@ name: Migrate Tenant Content
 #     production deploy, or another workflow migrating a single tenant.
 #
 # A production run exports each tenant dataset just before migrating it and
-# uploads the exports as one artifact.
+# stores the exports, encrypted, as one tarball in the backup bucket.
 on:
   push:
     branches: [main]
@@ -58,11 +58,20 @@ on:
         required: false
         type: string
         default: ''
+      label:
+        description: 'Names the production backup — the release version; blank names it after the run'
+        required: false
+        type: string
+        default: ''
     secrets:
       TENANT_REGISTRY_DATABASE_URL:
         required: true
       TENANT_TOKEN_ENCRYPTION_KEY:
         required: true
+      BACKUP_R2_ACCESS_KEY_ID:
+        required: false
+      BACKUP_R2_SECRET_ACCESS_KEY:
+        required: false
 
 permissions:
   contents: read
@@ -160,6 +169,8 @@ jobs:
       # `getTenantSanityWriteCredentials`. This run mutates content, unlike
       # validate-tenant-documents.yml's read-only sweep.
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      BACKUP_TENANT_EXPORTS: ${{ github.event_name != 'push' && (inputs.environment || 'production') == 'production' }}
+      BACKUP_NAME: release/${{ inputs.label || format('run-{0}-{1}', github.run_id, github.run_attempt) }}/tenant-exports.tar.gz
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -174,7 +185,19 @@ jobs:
           # runs `node scripts/migrate.mjs` (which imports `@sanity/client`),
           # both with `packages/studio` as their cwd.
           install-filter: '@blog/db... @blog/studio...'
+      - name: Check backup settings
+        if: ${{ env.BACKUP_TENANT_EXPORTS == 'true' }}
+        uses: ./.github/actions/encrypted-backup
+        with:
+          check-only: 'true'
+          name: ${{ env.BACKUP_NAME }}
+          recipient: ${{ vars.BACKUP_AGE_RECIPIENT }}
+          endpoint: ${{ vars.BACKUP_R2_ENDPOINT }}
+          bucket: ${{ vars.BACKUP_R2_BUCKET }}
+          access-key-id: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
       - name: Run tenant content-migration fan-out
+        id: fanout
         # `inputs.tenantId` is attacker-influenceable on the
         # workflow_dispatch path (any repo collaborator who can trigger it
         # controls it) — never interpolate a `${{ }}` expression directly
@@ -182,7 +205,7 @@ jobs:
         # `env` and reference the shell variable instead.
         env:
           TENANT_ID: ${{ inputs.tenantId }}
-          TENANT_EXPORT_DIR: ${{ (github.event_name != 'push' && (inputs.environment || 'production') == 'production') && format('{0}/tenant-exports', runner.temp) || '' }}
+          TENANT_EXPORT_DIR: ${{ env.BACKUP_TENANT_EXPORTS == 'true' && format('{0}/tenant-exports', runner.temp) || '' }}
         run: |
           set -euo pipefail
           if [ -n "$TENANT_EXPORT_DIR" ]; then
@@ -193,13 +216,22 @@ jobs:
           else
             pnpm --filter @blog/db db:migrate-tenant-content
           fi
-      # Uploaded even when a tenant failed, so the exports taken before the
+      # Stored even when a tenant failed, so the exports taken before the
       # failure stay recoverable.
-      - name: Upload tenant dataset exports
-        if: ${{ !cancelled() && github.event_name != 'push' && (inputs.environment || 'production') == 'production' }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - name: Bundle tenant dataset exports
+        if: ${{ !cancelled() && steps.fanout.outcome != 'skipped' && env.BACKUP_TENANT_EXPORTS == 'true' }}
+        run: |
+          set -euo pipefail
+          tar -czf "${RUNNER_TEMP}/tenant-exports.tar.gz" -C "${RUNNER_TEMP}" tenant-exports
+          rm -rf "${RUNNER_TEMP}/tenant-exports"
+      - name: Store encrypted tenant exports
+        if: ${{ !cancelled() && steps.fanout.outcome != 'skipped' && env.BACKUP_TENANT_EXPORTS == 'true' }}
+        uses: ./.github/actions/encrypted-backup
         with:
-          name: tenant-content-exports-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/tenant-exports
-          retention-days: 30
-          if-no-files-found: warn
+          file: ${{ runner.temp }}/tenant-exports.tar.gz
+          name: ${{ env.BACKUP_NAME }}
+          recipient: ${{ vars.BACKUP_AGE_RECIPIENT }}
+          endpoint: ${{ vars.BACKUP_R2_ENDPOINT }}
+          bucket: ${{ vars.BACKUP_R2_BUCKET }}
+          access-key-id: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}

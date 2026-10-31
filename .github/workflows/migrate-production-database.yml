@@ -10,7 +10,7 @@ on:
         type: string
         default: ''
       label:
-        description: 'Names the backup artifact — the release tag or version'
+        description: 'Names the backup — the release tag or version'
         type: string
         required: true
 
@@ -83,7 +83,7 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
       # A backup on the ephemeral runner is not a backup — pg_dump the
-      # production Neon branch and upload it as an artifact BEFORE any
+      # production Neon branch and store it encrypted BEFORE any
       # mutation, mirroring the Sanity job's dataset-export-before-mutate
       # step above. Custom format (-Fc, via --format=custom) so it restores
       # with `pg_restore` against a fresh Neon branch if a migration needs
@@ -105,13 +105,16 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y "postgresql-client-${PG_VERSION}"
           "/usr/lib/postgresql/${PG_VERSION}/bin/pg_dump" "$DATABASE_URL_UNPOOLED" --format=custom --file="${RUNNER_TEMP}/prod-db-${BACKUP_LABEL}.dump"
-      - name: Upload backup artifact
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - name: Store encrypted backup
+        uses: ./.github/actions/encrypted-backup
         with:
-          name: db-prod-backup-${{ inputs.label }}
-          path: ${{ runner.temp }}/prod-db-${{ inputs.label }}.dump
-          retention-days: 30
-          if-no-files-found: error
+          file: ${{ runner.temp }}/prod-db-${{ inputs.label }}.dump
+          name: release/${{ inputs.label }}/db-prod.dump
+          recipient: ${{ vars.BACKUP_AGE_RECIPIENT }}
+          endpoint: ${{ vars.BACKUP_R2_ENDPOINT }}
+          bucket: ${{ vars.BACKUP_R2_BUCKET }}
+          access-key-id: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
       # drizzle-kit's journal skips migrations already applied.
       - name: Apply pending db migrations
         run: |
