@@ -19,6 +19,8 @@ import { faker } from '@faker-js/faker';
 import {
   MOCK_INVITE_SENT_AT,
   MOCK_MIXED_CASE_OWNER_EMAIL,
+  MOCK_OTHER_INVITE_ID,
+  MOCK_OTHER_INVITEE_EMAIL,
   MOCK_OWNER_EMAIL,
   MOCK_SANITY_USER_ID,
   mockPendingInvite,
@@ -40,8 +42,6 @@ faker.seed(7010);
 
 const MOCK_OLD_INVITE_ID = faker.string.uuid();
 const MOCK_NEW_INVITE_ID = faker.string.uuid();
-const MOCK_OTHER_INVITE_ID = faker.string.uuid();
-const MOCK_OTHER_INVITEE_EMAIL = faker.internet.email();
 const MOCK_FORMER_OWNER_EMAIL = faker.internet.email();
 const MOCK_FORMER_INVITE_ID = faker.string.uuid();
 const MOCK_FORMER_SANITY_USER_ID = `g${faker.string.alphanumeric(10)}`;

@@ -38,6 +38,8 @@ export const MOCK_OWNER_PROJECT_USER_ID = 'p-owner';
 export const MOCK_SANITY_USER_ID = `g${mockFaker.string.alphanumeric(10)}`;
 const MOCK_OWNER_PROFILE_ID = `p${mockFaker.string.alphanumeric(10)}`;
 export const MOCK_OWNER_ACCESS_FINDING_ID = mockFaker.string.uuid();
+export const MOCK_OTHER_INVITE_ID = mockFaker.string.uuid();
+export const MOCK_OTHER_INVITEE_EMAIL = mockFaker.internet.email();
 
 export function mockSanityOwner(
   overrides: Partial<TSanityUser['profile']> = {},
