@@ -3,12 +3,21 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@platform/lib/react';
-import { cloneElement, Fragment, type ElementType, useId } from 'react';
+import {
+  cloneElement,
+  type ElementType,
+  Fragment,
+  type ReactElement,
+  useId,
+} from 'react';
 
 import { cardVariants } from './card-variants';
 import { CardBody } from './components/body/card-body';
 import { CardFooter } from './components/footer/card-footer';
-import { CardHeader } from './components/header/card-header';
+import {
+  CardHeader,
+  type TCardHeaderProps,
+} from './components/header/card-header';
 
 const CardParts = {
   Header: CardHeader,
@@ -40,7 +49,8 @@ const CardRoot = ({
       aria-labelledby={labelledBy}
       className={root({ class: className })}
     >
-      {Header && cloneElement(Header, { titleId })}
+      {Header &&
+        cloneElement(Header as ReactElement<TCardHeaderProps>, { titleId })}
       {slots.Body}
       {slots.Footer}
       {unmatched.map((node, i) => (
