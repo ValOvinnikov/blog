@@ -20,6 +20,8 @@ epics: [4840]
 
 One `@blog/studio` schema serves many Sanity projects: the platform's own console project, and one project per tenant. When a schema change alters an existing shape, a content migration rewrites the documents to match. This feature runs those migrations against every tenant's dataset, not only the console's. Each run records what it applied in that dataset's ledger, so the run is safe to repeat and resumes where it stopped. A tenant created later catches up on the next run. Editors and owners never see any of this.
 
+**No migrations exist until launch.** Launch replaces production, and every tenant is created from starter content, so `packages/studio/migrations/` holds no migration folders and `STUDIO_MIGRATION_IDS` is empty. A change to an existing content shape updates the starter content instead. The tooling below stays, for migrations written after launch.
+
 ## Surfaces and routes
 
 - **Commands.** Engineers write migrations under `packages/studio/migrations/<timestamp>-<slug>/` using these commands:
@@ -61,7 +63,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 ## Constraints and invariants
 
 - **Changes go expand, then contract.** Tenant projects reach a new schema independently, and there is no atomic cutover. So a change adds the new shape, migrates every tenant, and removes the old shape in a later change, never in one step.
-- **A migration must handle both shapes.** It has to be safe on documents in the old and the new shape, and re-running it on migrated input must be a no-op. A test proves this, either co-located with the migration or on the `migrations/lib/` helper it is built from.
+- **A migration must handle both shapes.** It has to be safe on documents in the old and the new shape, and re-running it on migrated input must be a no-op. A test co-located with the migration proves this.
 - **An empty ledger is backfilled, never replayed.** `isTenantMigrationLedgerEmpty` runs before every tenant's deploy. If the ledger is empty, the call switches to `deploy --backfill`, which marks migrations applied without running them. A tenant seeded from starter content is already at the current schema; one seeded before the seed step wrote its ledger takes this path.
 - **A new migration folder regenerates the id list.** `pnpm gen:migration-ids:check`, in `pnpm verify` and CI, fails until `pnpm gen:migration-ids` is re-run and committed.
 - **Each tenant uses its own write token.** No organisation-scoped content token exists, so one leaked credential reaches exactly one tenant.
@@ -70,7 +72,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 - **A failing migration deploy for one tenant never stops the sweep, but a failure to read or decrypt a tenant's credentials does.** Tenants run one after another; each deploy is wrapped in its own error handling, while the credentials read runs before it and aborts the run. Otherwise the job exits 1 only when a deploy errors, or when a requested `tenantId` is not found.
 - **Concurrency.** Runs are serialised per environment and tenant scope, without cancelling an earlier run, and time out after 45 minutes.
 - **A production run exports each tenant first.** With `TENANT_EXPORT_DIR` set, which the workflow does for production only, each tenant's dataset is exported just before its migration, and a failed export counts as that tenant's error without migrating it. The exports upload as one artifact, kept 30 days. The daily tenant backups (#5095) replace this.
-- **Code limits on migrations.** A migration never imports a Studio schema module, bare `sanity` or React; `sanity/migrate` is fine. A file in `migrations/lib/` depends only on `@blog/config`, `@blog/utils`, `sanity/migrate` and Node built-ins. One bad import stops every migration from loading at once.
+- **Code limits on migrations.** A migration never imports a Studio schema module, bare `sanity` or React; `sanity/migrate` is fine. A shared migration helper depends only on `@blog/config`, `@blog/utils`, `sanity/migrate` and Node built-ins. One bad import stops every migration from loading at once.
 - **A separate read-only check.** `validate-tenant-documents` runs the same per-tenant fan-out, read-only, recording drift as findings ([tenant provisioning](./tenant-provisioning.md), [audit and findings](./audit-and-findings.md)).
 
 ## Dependencies
@@ -94,7 +96,7 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
 - `packages/db/scripts/migrate-tenant-content/run.test.ts` and `lib/*.test.ts`. These mock `execFileSync`, so no Sanity call is made.
 - `packages/studio/scripts/migrate-lib.test.mjs`, covering ledger ordering and pending computation.
 - `scripts/gen-migration-ids.test.mjs`, covering the generated list's run order.
-- A co-located `index.test.ts` in most migration folders. A migration that only wires up a shared helper is covered by that helper's test in `packages/studio/migrations/lib/*.test.ts`.
+- A migration written after launch carries a co-located `index.test.ts`.
 - No Storybook; this feature has no UI.
 
 ## Related
