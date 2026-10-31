@@ -6,16 +6,16 @@ export const statusBadgeVariants = tv({
     root: [
       'inline-flex items-center gap-1.5',
       'rounded-full px-2.5 py-0.5',
-      'text-admin-11-5 font-semibold whitespace-nowrap',
+      'text-admin-11-5 leading-4 font-semibold whitespace-nowrap',
     ],
-    dot: ['size-1.5 rounded-full bg-current'],
+    dot: ['size-1.5 shrink-0 rounded-full bg-current'],
   },
   variants: {
     tone: {
       ok: { root: ['text-admin-ok bg-admin-ok-weak'] },
       warn: { root: ['text-admin-warn bg-admin-warn-weak'] },
       bad: { root: ['text-admin-bad bg-admin-bad-weak'] },
-      neutral: { root: ['text-admin-muted bg-admin-line-2'] },
+      neutral: { root: ['text-admin-muted bg-admin-pill-neutral'] },
       brand: { root: ['text-admin-brand bg-admin-brand-weak'] },
       plan: { root: ['text-admin-brand-strong bg-admin-brand-weak'] },
     },
