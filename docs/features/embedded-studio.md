@@ -39,7 +39,9 @@ module types whose capability is off for the tenant carry a warning.
   pinned to the viewport and the Studio fills it (`ShellFrame`).
 - The sidebar shows a Studio item under "Content" in both trees. Under
   `/dashboard`, the owner's item carries their access state as a badge:
-  Invite sent, Activating, Ready or Action needed (STALLED).
+  Invite sent, Activating, Ready or Action needed (STALLED). The badge
+  follows the current state without a reload (see
+  [platform-shell](./platform-shell.md)).
 - Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
