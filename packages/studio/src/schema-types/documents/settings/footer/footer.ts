@@ -47,18 +47,11 @@ export const footerSettingsSchema = defineType({
         'A postal address, shown under the about text with each line as you type it.',
     }),
     defineField({
-      name: 'privacyPolicy',
-      title: 'Privacy Policy',
-      type: linkRefSchema.name,
-      description:
-        'Your privacy policy, linked from the cookie banner and next to the copyright line at the bottom of the footer.',
-    }),
-    defineField({
       name: 'finePrint',
       title: 'Fine Print',
       type: 'array',
       description:
-        'Small links after the privacy policy, such as terms or a legal notice. Add Cookie settings to choose where that link sits.',
+        'Small links beside the copyright line, such as your privacy policy, terms or legal notice. Add Cookie settings to choose where that link sits.',
       of: [
         defineArrayMember({ type: linkRefSchema.name }),
         defineArrayMember({ type: cookieSettingsItemSchema.name }),

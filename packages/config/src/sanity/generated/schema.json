@@ -6075,14 +6075,6 @@
         },
         "optional": true
       },
-      "privacyPolicy": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "linkRef"
-        },
-        "optional": true
-      },
       "finePrint": {
         "type": "objectAttribute",
         "value": {
