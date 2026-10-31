@@ -1,4 +1,5 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -13,6 +14,10 @@ const MOCK_MESSAGE = faker.lorem.sentence();
 const MOCK_ACCEPT_LABEL = faker.lorem.words(2);
 const MOCK_REJECT_LABEL = faker.lorem.words(2);
 const MOCK_SETTINGS_LABEL = faker.lorem.words(2);
+const MOCK_POLICY_LINK = {
+  href: `/${faker.lorem.slug()}`,
+  label: faker.lorem.words(2),
+};
 
 const CONTROLS = [
   { control: 'Accept', label: MOCK_ACCEPT_LABEL, handler: 'onAccept', tabs: 1 },
@@ -90,4 +95,47 @@ describe(`<${ConsentBanner.name}/>`, () => {
       expect(handlers[handler]).toHaveBeenCalledTimes(1);
     },
   );
+
+  it('renders no link without a policy link', () => {
+    const link = screen.queryByRole('link');
+
+    expect(link).not.toBeInTheDocument();
+  });
+});
+
+describe(`<${ConsentBanner.name}/> with a policy link`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
+  it('renders the policy link named by its label', () => {
+    setup({ policyLink: MOCK_POLICY_LINK });
+
+    const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
+
+    expect(link).toHaveAttribute('href', MOCK_POLICY_LINK.href);
+  });
+
+  it('renders the policy link through the supplied link component', () => {
+    setup({ policyLink: MOCK_POLICY_LINK, linkAs: MockLink });
+
+    const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
+    expect(link).toBe(mockLink);
+  });
+
+  it('reaches the policy link by keyboard before the accept control', async () => {
+    setup({ policyLink: MOCK_POLICY_LINK });
+
+    await user.tab();
+    const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
+    expect(link).toHaveFocus();
+
+    await user.tab();
+    const accept = screen.getByRole('button', { name: MOCK_ACCEPT_LABEL });
+    expect(accept).toHaveFocus();
+  });
 });
