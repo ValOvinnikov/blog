@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -28,6 +29,7 @@ const setup = customRender(OwnerStudioAccessView, {
 });
 
 const RESEND_INVITE = 'Resend invite';
+const CHECK_NOW = 'Check now';
 
 describe(`<${OwnerStudioAccessView.name}/>`, () => {
   let user: UserEvent;
@@ -61,16 +63,19 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
     expect(titleElement).toBeVisible();
   });
 
-  it('offers no resend once the owner has accepted the invite', () => {
-    setup({ studioAccess: OWNER_STUDIO_ACCESS.ACTIVATING });
+  it.each([
+    [OWNER_STUDIO_ACCESS.INVITE_SENT, [CHECK_NOW, RESEND_INVITE]],
+    [OWNER_STUDIO_ACCESS.ACTIVATING, [CHECK_NOW]],
+    [OWNER_STUDIO_ACCESS.STALLED, [RESEND_INVITE, CHECK_NOW]],
+  ] as const)('orders the %s actions', (studioAccess, actionNames) => {
+    setup({ studioAccess });
 
-    const checkNowButton = screen.getByRole('button', { name: 'Check now' });
-    const resendInviteButton = screen.queryByRole('button', {
-      name: RESEND_INVITE,
-    });
+    const buttons = screen.getAllByRole('button');
+    const expectedButtons = actionNames.map((name) =>
+      screen.getByRole('button', { name }),
+    );
 
-    expect(checkNowButton).toBeVisible();
-    expect(resendInviteButton).not.toBeInTheDocument();
+    expect(buttons).toEqual(expectedButtons);
   });
 
   describe('with an invite waiting for the owner', () => {
@@ -79,7 +84,7 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
     });
 
     it('checks the access now, confirms it and refreshes the page', async () => {
-      const checkNowButton = screen.getByRole('button', { name: 'Check now' });
+      const checkNowButton = screen.getByRole('button', { name: CHECK_NOW });
       await user.click(checkNowButton);
 
       const checkStartedText = await screen.findByText(
@@ -103,6 +108,20 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
 
       expect(resendOwnerInviteActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(inviteResentText).toBeVisible();
+    });
+
+    it('holds Check now while the resend runs', async () => {
+      resendOwnerInviteActionMock.mockReturnValue(new Promise(() => {}));
+
+      const resendInviteButton = screen.getByRole('button', {
+        name: RESEND_INVITE,
+      });
+      await user.click(resendInviteButton);
+
+      const checkNowButton = screen.getByRole('button', { name: CHECK_NOW });
+
+      expect(resendInviteButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(checkNowButton).toBeDisabled();
     });
 
     it('reports a request the worker did not accept', async () => {

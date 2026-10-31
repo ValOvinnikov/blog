@@ -3,7 +3,7 @@ import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import {
   OWNER_STUDIO_ACCESS,
-  type TOwnerStudioAccess,
+  type TPendingOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
 import { useTranslations } from 'next-intl';
 
@@ -12,7 +12,7 @@ import { ownerStudioAccessViewVariants } from './owner-studio-access-view-varian
 
 export type TOwnerStudioAccessViewProps = {
   tenantId: string;
-  studioAccess: Exclude<TOwnerStudioAccess, typeof OWNER_STUDIO_ACCESS.READY>;
+  studioAccess: TPendingOwnerStudioAccess;
 };
 
 export const OwnerStudioAccessView = ({
@@ -35,10 +35,7 @@ export const OwnerStudioAccessView = ({
         title={t(`title.${studioAccess}`)}
         description={t(`description.${studioAccess}`)}
         action={
-          <OwnerAccessActions
-            tenantId={tenantId}
-            canResend={studioAccess !== OWNER_STUDIO_ACCESS.ACTIVATING}
-          />
+          <OwnerAccessActions tenantId={tenantId} studioAccess={studioAccess} />
         }
       />
     </div>

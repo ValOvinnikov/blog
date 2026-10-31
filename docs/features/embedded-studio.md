@@ -112,8 +112,12 @@ module types whose capability is off for the tenant carry a warning.
 - **The owner's access gate** applies only when the viewer is the tenant's
   own OWNER (a real membership, not an admin's virtual one) and the worker
   has recorded an invite (`ownerInviteSentAt`). Before READY,
-  `/dashboard/studio` shows an explainer with Check now (and Resend, except
-  while ACTIVATING), which call the worker's owner-access routes. The
+  `/dashboard/studio` shows an explainer whose actions call the worker's
+  owner-access routes, each state leading with its next step: INVITE_SENT
+  offers Check now (primary) then Resend invite; ACTIVATING offers only Check
+  now (secondary); STALLED leads with Resend invite (primary), then Check now.
+  The buttons share one wrapping row, and while one runs the other is
+  disabled. The
   INVITE_SENT explainer says the invite comes by email from Sanity and that
   editing needs a free Sanity account, since Sanity offers no direct invite
   link. At READY the Studio mounts with the owner's recorded `loginProvider`,
