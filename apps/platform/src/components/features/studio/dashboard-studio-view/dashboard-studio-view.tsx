@@ -7,6 +7,8 @@ import { resolveHasEnteredStudio } from '@platform/server/studio-entry/resolve-h
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
+import { ShellStudioAccessSync } from './components/shell-studio-access-sync/shell-studio-access-sync';
+
 export type TDashboardStudioViewProps = {
   tenant: TTenant;
   membership: TMembership;
@@ -17,23 +19,28 @@ export const DashboardStudioView = async ({
   membership,
 }: TDashboardStudioViewProps) => {
   const studioAccess = ownerStudioAccessFor(tenant, membership);
-
-  if (studioAccess && studioAccess !== OWNER_STUDIO_ACCESS.READY) {
-    return (
-      <OwnerStudioAccessView tenantId={tenant.id} studioAccess={studioAccess} />
-    );
-  }
-
   const shouldRecordFirstEntry =
     studioAccess === OWNER_STUDIO_ACCESS.READY &&
     !(await resolveHasEnteredStudio(tenant.id));
 
-  return StudioMountView({
-    tenant,
-    basePath: adminRoutes.dashboardStudio(),
-    loginProvider: studioAccess
-      ? (tenant.ownerLoginProvider ?? undefined)
-      : undefined,
-    shouldRecordFirstEntry,
-  });
+  const view =
+    studioAccess && studioAccess !== OWNER_STUDIO_ACCESS.READY ? (
+      <OwnerStudioAccessView tenantId={tenant.id} studioAccess={studioAccess} />
+    ) : (
+      await StudioMountView({
+        tenant,
+        basePath: adminRoutes.dashboardStudio(),
+        loginProvider: studioAccess
+          ? (tenant.ownerLoginProvider ?? undefined)
+          : undefined,
+        shouldRecordFirstEntry,
+      })
+    );
+
+  return (
+    <>
+      <ShellStudioAccessSync studioAccess={studioAccess} />
+      {view}
+    </>
+  );
 };

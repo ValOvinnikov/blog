@@ -13,6 +13,7 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
+import { useRefreshOnSettle } from '@platform/utils/use-refresh-on-settle/use-refresh-on-settle';
 import { useTranslations } from 'next-intl';
 
 import { siteSetupCardVariants } from './site-setup-card-variants';
@@ -35,7 +36,9 @@ export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
     isOverallFailed,
     allIdle,
     provisioningStatus,
+    isProvisioningRunning,
   } = useProvisioningPoll(tenant);
+  useRefreshOnSettle(isProvisioningRunning);
   const { root } = siteSetupCardVariants();
 
   const steps = CORE_PROVISIONING_STEPS.map((stepKey, index) => ({

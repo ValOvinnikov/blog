@@ -2,6 +2,7 @@ import { queries } from '@blog/db';
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
+import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
@@ -60,7 +61,9 @@ export default async function DashboardTenantLayout({ children }: TProps) {
         scope: admin ? tNavSections('platformLabel') : tenant.name,
       }}
     >
-      {children}
+      <ShellStudioAccessProvider studioAccess={studioAccess}>
+        {children}
+      </ShellStudioAccessProvider>
     </AdminShell>
   );
 }

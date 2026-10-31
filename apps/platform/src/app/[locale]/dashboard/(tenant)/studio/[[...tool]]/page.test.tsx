@@ -164,6 +164,8 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
   it("records the owner's first Studio entry for this tenant and refreshes the shell", async () => {
     const refresh = mockRouterRefresh();
     const tenant = await renderForTenant(MOCK_READY_OWNER_ACCESS);
+    refresh.mockClear();
+
     studioMountMock.mock.lastCall?.[0]?.onSignedIn();
 
     expect(document.cookie).toContain(studioEnteredCookie(tenant.id));

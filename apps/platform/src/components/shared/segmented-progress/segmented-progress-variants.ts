@@ -10,7 +10,7 @@ export const segmentedProgressVariants = tv({
   },
   variants: {
     isOnDark: {
-      true: { label: ['text-admin-side-text'] },
+      true: { label: ['text-admin-rail-text'] },
       false: { label: ['text-admin-muted'] },
     },
     state: {
@@ -33,7 +33,7 @@ export const segmentedProgressVariants = tv({
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.DONE,
-      class: { segment: ['bg-admin-side-accent'] },
+      class: { segment: ['bg-admin-rail-accent'] },
     },
     {
       isOnDark: true,
@@ -43,7 +43,7 @@ export const segmentedProgressVariants = tv({
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.UPCOMING,
-      class: { segment: ['bg-admin-side-raised'] },
+      class: { segment: ['bg-admin-rail-raised'] },
     },
   ],
   defaultVariants: { isOnDark: false },

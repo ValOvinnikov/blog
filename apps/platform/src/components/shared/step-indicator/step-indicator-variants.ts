@@ -33,14 +33,14 @@ export const stepIndicatorVariants = tv({
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.DONE,
-      class: { circle: ['bg-admin-side-accent text-admin-side'] },
+      class: { circle: ['bg-admin-rail-accent text-admin-rail'] },
     },
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.ACTIVE,
       class: {
         circle: [
-          'border-2 border-admin-side-accent bg-transparent text-admin-side-accent',
+          'border-2 border-admin-rail-accent bg-transparent text-admin-rail-accent',
         ],
       },
     },
@@ -49,7 +49,7 @@ export const stepIndicatorVariants = tv({
       state: STEP_INDICATOR_STATE.UPCOMING,
       class: {
         circle: [
-          'border border-admin-side-muted bg-transparent text-admin-side-muted',
+          'border border-admin-rail-muted bg-transparent text-admin-rail-muted',
         ],
       },
     },
