@@ -1,3 +1,4 @@
+import { routes } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ConsentBanner } from './consent-banner';
@@ -26,6 +27,17 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
+const POLICY_LINK = { href: routes.privacy(), label: 'Privacy policy' };
+
+export const WithPolicyLink: TStory = {
+  args: { policyLink: POLICY_LINK },
+};
+
+export const WithPolicyLinkOnPhone: TStory = {
+  args: { policyLink: POLICY_LINK },
+  globals: { viewport: 'phone' },
+};
+
 export const EqualWeightComparison: TStory = {
   render: (args) => (
     <div className="flex gap-8 p-8">
@@ -37,4 +49,9 @@ export const EqualWeightComparison: TStory = {
       </div>
     </div>
   ),
+};
+
+export const WithPolicyLinkLightAndDark: TStory = {
+  ...EqualWeightComparison,
+  args: { policyLink: POLICY_LINK },
 };
