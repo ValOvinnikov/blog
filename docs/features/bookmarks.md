@@ -70,7 +70,7 @@ A reader saves a post for later with a toggle in the post header and finds every
 
 ## Tests and stories
 
-- `packages/db/src/queries/bookmarks/**/*.test.ts`, plus the schema migration tests beside `packages/db/src/schema/bookmarks.ts`.
+- `packages/db/src/queries/bookmarks/**/*.test.ts`.
 - `apps/web/src/server/bookmarks/**/*.test.ts`, `bookmark-button.test.tsx`, `bookmark-button-gate.test.tsx`, `apps/web/src/components/pages/bookmarks-page/*.test.tsx`, `apps/web/src/app/[tenant]/[locale]/bookmarks/page.test.tsx`.
 - Stories: `bookmarks-page-view.stories.tsx` (web), `bookmark-toggle.stories.tsx` (ui).
 
