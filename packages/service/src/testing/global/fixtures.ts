@@ -53,6 +53,10 @@ export function mockRawNavigation(
 export function mockRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
   return {
     social: null,
+    groups: null,
+    about: null,
+    address: null,
+    finePrint: null,
     showLanguageSwitcher: null,
     showRssFeed: null,
     ...overrides,

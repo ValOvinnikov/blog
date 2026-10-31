@@ -14,7 +14,7 @@ epics: [3726, 4995]
 
 ## What it does
 
-The site footer closes every page with a copyright line, the site's social profiles as icon links, an optional language switcher, the cookie settings button and a link to the RSS feed. The footer half is built. Footer settings now hold link groups, an about line, an address and fine-print links in Studio, but the public site does not render them yet. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
+The site footer closes every page with a copyright line, the site's social profiles as icon links, an optional language switcher, the cookie settings button and a link to the RSS feed. The footer half is built. Footer settings hold link groups, an about line, an address and fine-print links in Studio, and the footer loader returns them, but the public site does not render them yet. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
 
 ## Surfaces and routes
 
@@ -28,7 +28,7 @@ The site footer closes every page with a copyright line, the site's social profi
 - **`footerLinkGroup`:** a localized `heading`, required in the default language, and `links[]`, one or more `linkRef`s in order. No fixed categories.
 - **`cookieSettingsItem`:** marks where the Cookie settings link sits in the fine print; it has no editable field. The link shows on every site whether or not the item is present.
 - **`socialProfile`:** a required `link` reference to a `link` document plus a `platform` from `SOCIAL_PLATFORMS` (X, GitHub, LinkedIn, YouTube, Instagram, Mastodon, Bluesky, Facebook, Threads, RSS). The same object backs `person.socialLinks` (./people.md), through one shared fragment and transformer.
-- **Service:** `service.global.footer.v1.getFooter(sanityContext)` returns `{ social: TSocialProfile[], showLanguageSwitcher?, showRssFeed }`, with `showRssFeed` defaulting to `true` when unset. A profile whose link has no label or no resolvable href is dropped.
+- **Service:** `service.global.footer.v1.getFooter(sanityContext)` returns `{ social: TSocialProfile[], groups: TFooterLinkGroup[], about?, address?, finePrint: TFooterFinePrintItem[], showLanguageSwitcher?, showRssFeed }`, with `showRssFeed` defaulting to `true` when unset. The heading, about and address resolve in the visitor's language, falling back to the default. Each fine-print item is a `FOOTER_FINE_PRINT_KIND.LINK` with its link or the one `COOKIE_SETTINGS` marker, in Studio order. A link whose document is missing, unpublished, unlabelled or without a resolvable href is dropped, from a profile, a group or the fine print alike; a group left with no links is dropped, and none of it fails the footer query.
 - **Cache:** the query is tagged `footer`, `link` and every page type, tenant-scoped; the publish webhook maps `settings_footer` → `footer` and `link` → `link`.
 - **Look:** `site_config.footer_layout`, `footer_background`, `footer_surface` and `cookie_settings_button`, read by `getFooterStyle` through `getSiteConfig`, so a plan without the field gets the preset's value. A failed read logs `footer.site_config_fetch_failed` and falls back to the preset (Columns, Brand tint, Full width, button Hidden).
 - **Copyright:** `© {year} {brand name}`, the year computed at render time; the format is fixed in `@blog/ui`'s `Footer.Copyright` and no editor or owner can reword it.
@@ -63,7 +63,7 @@ The site footer closes every page with a copyright line, the site's social profi
 - `packages/studio/src/schema-types/documents/settings/footer/footer.ts`
 - `packages/studio/src/schema-types/objects/social-profile/social-profile.ts`
 - `packages/studio/src/schema-types/objects/footer-link-group/footer-link-group.ts`, `cookie-settings-item/cookie-settings-item.ts`
-- `packages/service/src/features/global/footer/adaptor/query.ts`, `transformer.ts`
+- `packages/service/src/features/global/footer/adaptor/query.ts`, `transformer.ts`, `types.ts`
 - `apps/web/src/components/shared/site-footer/site-footer.tsx`
 - `apps/web/src/server/site-config/get-footer-style/get-footer-style.ts`
 - `apps/web/src/components/shared/social-links/social-link.tsx`
@@ -72,7 +72,7 @@ The site footer closes every page with a copyright line, the site's social profi
 ## Tests and stories
 
 - `packages/studio/src/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once.test.ts`
-- `packages/service/src/features/global/footer/adaptor/loader.test.ts`, `packages/service/src/shared/transformers/social-profile/to-social-profiles.test.ts`
+- `packages/service/src/features/global/footer/adaptor/loader.test.ts`, `query.test.ts`, `packages/service/src/shared/transformers/social-profile/to-social-profiles.test.ts`
 - `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
 - `packages/ui/src/components/organisms/footer/footer.test.tsx`
 - Stories: `packages/ui/src/components/organisms/footer/footer.stories.tsx`, `apps/web/src/components/shared/social-links/social-links.stories.tsx`.

@@ -1,4 +1,3 @@
-import { LINK_TYPE } from '@blog/config';
 import {
   BRAND_TAGLINE_SEPARATORS,
   LOCALE_ISO_CODES,
@@ -9,7 +8,10 @@ import {
   mockReference,
 } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqInLocale } from '@blog/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  mockLocalizedLinkDocument,
+  mockLocalizedStrings,
+} from '@blog/service/testing/shared/localized';
 import { faker } from '@faker-js/faker';
 
 import { navigationQuery } from './query';
@@ -26,16 +28,6 @@ const MOCK_SECOND_TAGLINE_KEY = faker.string.uuid();
 const MOCK_ENGLISH_TAGLINE_ITEM = faker.lorem.word();
 const MOCK_DUTCH_TAGLINE_ITEM = faker.lorem.word();
 const MOCK_UNTRANSLATED_TAGLINE_ITEM = faker.lorem.word();
-
-function mockLinkDocument(_id: string, label: string) {
-  return {
-    _id,
-    _type: 'link',
-    linkType: LINK_TYPE.EXTERNAL,
-    label: mockLocalizedStrings({ [EN]: label }),
-    url: mockLocalizedStrings({ [EN]: faker.internet.url() }),
-  };
-}
 
 const MOCK_NAVIGATION_DOCUMENT = {
   _id: faker.string.uuid(),
@@ -101,8 +93,8 @@ describe('navigationQuery', () => {
       navigationQuery.query,
       [
         MOCK_NAVIGATION_DOCUMENT,
-        mockLinkDocument(MOCK_PARENT_LINK_ID, faker.lorem.word()),
-        mockLinkDocument(MOCK_SUB_LINK_ID, MOCK_SUB_LABEL),
+        mockLocalizedLinkDocument(MOCK_PARENT_LINK_ID, faker.lorem.word()),
+        mockLocalizedLinkDocument(MOCK_SUB_LINK_ID, MOCK_SUB_LABEL),
       ],
       EN,
     );
