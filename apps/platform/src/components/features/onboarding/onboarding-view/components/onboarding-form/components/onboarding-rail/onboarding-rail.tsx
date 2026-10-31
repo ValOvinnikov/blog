@@ -45,7 +45,8 @@ export const OnboardingRail = ({
         <SegmentedProgress
           value={currentIndex + 1}
           total={steps.length}
-          label={tForm('stepProgressNamed', {
+          ariaLabel={tForm('stepsAriaLabel')}
+          valueText={tForm('stepProgressNamed', {
             n: currentIndex + 1,
             total: steps.length,
             step: currentStep.label,

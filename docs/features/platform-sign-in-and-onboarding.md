@@ -119,9 +119,12 @@ Free site.
   (1280px) the rail, the content column and the preview sit side by side
   (the preview column 480px wide, 560px from `2xl`); from `md` (768px) the
   rail stays on the left and the content, Back / Continue and the preview
-  stack beside it; below `md` the rail is a dark top band reading "Step N of
-  4 · <step>" over a segmented progress bar (the shared `SegmentedProgress`,
-  on Base UI `Progress`), and the same three stack. From `md` up the step
+  stack beside it; below `md` the rail is a dark top band: the brand row
+  (with Sign out at its right end), then "Step N of 4 · <step>" over a
+  segmented progress bar (the shared `SegmentedProgress`, on Base UI
+  `Progress`), and the same three stack. Assistive tech hears that bar once,
+  as one progressbar named "Setup steps" whose value text is the visible
+  line; the line and the segments themselves are hidden from it. From `md` up the step
   header reads "Step N of 4" above the heading instead. The Site step's type
   and name sit side by side whenever the content column is at least 28rem
   wide (a container query), in any tier.
