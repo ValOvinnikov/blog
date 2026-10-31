@@ -558,6 +558,11 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-prod**)
+- [ ] Variable `BACKUP_R2_ENDPOINT` = `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
+      and Variable `BACKUP_R2_BUCKET` = the backup bucket's name; Secrets
+      `BACKUP_R2_ACCESS_KEY_ID` and `BACKUP_R2_SECRET_ACCESS_KEY` = the
+      bucket-scoped R2 token — see "Repo level — release backup encryption"
+      below.
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] Every entry in **"Tenant lifecycle — both environments"** below, with this
       environment's own values. Every scheduled `recheck-tenant-owners.yml`
@@ -787,6 +792,30 @@ never be touching production); prod fails when its resolved host
 production, and only production). Set the Variable correctly before either
 job first runs with a real `DATABASE_URL_UNPOOLED`, or every deploy touching
 `@blog/db` — dev on merge, prod on tag — will fail at this step.
+
+**Repo level — release backup encryption**
+
+Both production migration jobs back up before they mutate, and the
+`.github/actions/encrypted-backup` action encrypts each backup with
+[`age`](https://age-encryption.org) and deletes the plaintext before anything
+is uploaded. Only the public key lives in GitHub; whoever holds the private
+key can read a backup, so it never goes in a Secret, a Variable or the repo.
+
+1. Locally, with `age` installed: `age-keygen -o blog-backup.key`. It prints
+   the public key (`age1…`). Store `blog-backup.key` offline — a password
+   manager entry plus one offline copy. Losing it makes every backup
+   unreadable.
+2. In Cloudflare → R2, create a private bucket (no public access, no custom
+   domain) and two lifecycle rules: delete objects under `release/` after 365
+   days and under `daily/` after 30 days.
+3. Create an R2 API token with **Object Read & Write** on that bucket only (R2
+   has no write-only level), and set the four `BACKUP_R2_*` values on the
+   `production` environment above.
+
+- [ ] Variable `BACKUP_AGE_RECIPIENT` = the `age1…` public key, set at repo
+      level (Settings → Secrets and variables → Actions → Variables). Unset or
+      not an `age1…` key, the backup step fails, naming it, before any
+      migration runs.
 
 ### 5. Sanity — revalidation webhooks · API → Webhooks → Create webhook
 
@@ -1082,8 +1111,9 @@ There are **no PR preview deployments** — deploys happen only on merge to
    needs it, so a failed or skipped gate blocks the release. The workflow also
    takes `workflow_call`, so another workflow calling it gets the same gate.
 2. **`migrate`** (`environment: production`, `needs: full-gate`) — exports a backup
-   of the production dataset (uploaded as a 30-day artifact) **before** any
-   mutation, then runs `migrate:deploy --yes` to apply only the un-applied
+   of the production dataset (encrypted and stored in R2 as
+   `release/<tag>/sanity-prod.tar.gz.age`, see "Restoring a release backup")
+   **before** any mutation, then runs `migrate:deploy --yes` to apply only the un-applied
    content migrations (dry → run → record in the `migrationState` ledger,
    idempotent). The `production` environment's required reviewer is the human
    approval gate. A missing `SANITY_MIGRATE_TOKEN` **fails the job**, naming
@@ -1093,8 +1123,8 @@ There are **no PR preview deployments** — deploys happen only on merge to
    un-migrated content — with the dataset backup skipped too.
 3. **`migrate-db`** (`environment: production`, `needs: full-gate`) — the same
    idea as `migrate` above, for the separate `@blog/db` (Drizzle/Neon)
-   relational store: `pg_dump`s the production Neon branch and uploads it as
-   a 30-day artifact **before** any mutation, then runs
+   relational store: `pg_dump`s the production Neon branch and stores it,
+   encrypted, as `release/<tag>/db-prod.dump.age` **before** any mutation, then runs
    `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`) to apply only
    the un-applied schema migrations (tracked in drizzle-kit's own journal
    under `packages/db/migrations/meta`, idempotent). Reuses the **same**
@@ -1121,6 +1151,26 @@ migrate, migrate-db]`; `deploy-admin` `needs: [full-gate, migrate-db]` — so **
 code is never served before pending migrations run**; a failed or
 reviewer-rejected `migrate`/`migrate-db` skips the deploy(s) that depend on
 it, leaving the old code serving the old (un-migrated) data.
+
+### Restoring a release backup
+
+Each release stores `release/<tag>/sanity-prod.tar.gz.age` and
+`release/<tag>/db-prod.dump.age` in the backup bucket, kept for a year. With
+the offline private key:
+
+```sh
+# download, from the R2 dashboard or with any S3 client and a read token
+age --decrypt --identity blog-backup.key \
+  --output sanity-prod.tar.gz sanity-prod.tar.gz.age
+age --decrypt --identity blog-backup.key \
+  --output db-prod.dump db-prod.dump.age
+tar -tzf sanity-prod.tar.gz | head   # a readable dataset export
+pg_restore --list db-prod.dump | head   # a readable custom-format dump
+```
+
+The dataset tarball imports with `sanity dataset import`; the dump restores
+with `pg_restore` into a fresh Neon branch. Delete the plaintext files when
+done.
 
 ### Refreshing development from production (manual, post-migration)
 

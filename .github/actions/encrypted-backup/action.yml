@@ -1,0 +1,78 @@
+name: Encrypted backup
+description: Encrypt a backup file with age, delete the plaintext, and upload the ciphertext to the backup bucket
+
+inputs:
+  file:
+    description: Path of the plaintext backup on the runner; deleted whether or not the upload succeeds
+    required: true
+  name:
+    description: 'Object key in the bucket, without the `.age` suffix. Starts with `release/` or `daily/`, the prefixes the bucket lifecycle rules retain for a year and 30 days.'
+    required: true
+  recipient:
+    description: The age public key (`age1…`) from the `BACKUP_AGE_RECIPIENT` repo Variable
+    required: true
+  endpoint:
+    description: The R2 S3 endpoint from the `BACKUP_R2_ENDPOINT` Variable
+    required: true
+  bucket:
+    description: The R2 bucket from the `BACKUP_R2_BUCKET` Variable
+    required: true
+  access-key-id:
+    description: The bucket-scoped R2 token's access key id
+    required: true
+  secret-access-key:
+    description: The bucket-scoped R2 token's secret access key
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Encrypt and upload backup
+      shell: bash
+      env:
+        BACKUP_FILE: ${{ inputs.file }}
+        BACKUP_NAME: ${{ inputs.name }}
+        BACKUP_AGE_RECIPIENT: ${{ inputs.recipient }}
+        BACKUP_R2_ENDPOINT: ${{ inputs.endpoint }}
+        BACKUP_R2_BUCKET: ${{ inputs.bucket }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-access-key }}
+        AWS_DEFAULT_REGION: auto
+        # R2 does not accept every checksum AWS CLI v2 sends by default.
+        AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
+        AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED
+      run: |
+        set -euo pipefail
+        ciphertext="${BACKUP_FILE}.age"
+        trap 'rm -f "$BACKUP_FILE" "$ciphertext"' EXIT
+        # Checked here rather than in an `if:`, because a skipped step reports
+        # green and a release with no backup would look successful.
+        : "${BACKUP_AGE_RECIPIENT:?empty — set the BACKUP_AGE_RECIPIENT repo Variable to the backup age public key (docs/DEPLOY.md)}"
+        : "${BACKUP_R2_ENDPOINT:?empty — set the BACKUP_R2_ENDPOINT Variable on the production environment}"
+        : "${BACKUP_R2_BUCKET:?empty — set the BACKUP_R2_BUCKET Variable on the production environment}"
+        : "${AWS_ACCESS_KEY_ID:?empty — set the BACKUP_R2_ACCESS_KEY_ID secret on the production environment}"
+        : "${AWS_SECRET_ACCESS_KEY:?empty — set the BACKUP_R2_SECRET_ACCESS_KEY secret on the production environment}"
+        if [[ "$BACKUP_AGE_RECIPIENT" != age1* ]]; then
+          echo "::error::BACKUP_AGE_RECIPIENT is not an age public key (age1…) — never paste the private key (AGE-SECRET-KEY-…) into GitHub." >&2
+          exit 1
+        fi
+        case "$BACKUP_NAME" in
+          release/* | daily/*) ;;
+          *)
+            echo "::error::backup name '$BACKUP_NAME' must start with release/ or daily/, or no lifecycle rule expires it." >&2
+            exit 1
+            ;;
+        esac
+        if [ ! -s "$BACKUP_FILE" ]; then
+          echo "::error::backup file $BACKUP_FILE is missing or empty." >&2
+          exit 1
+        fi
+        if ! command -v age >/dev/null; then
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq age
+        fi
+        age --encrypt --recipient "$BACKUP_AGE_RECIPIENT" --output "$ciphertext" "$BACKUP_FILE"
+        rm -f "$BACKUP_FILE"
+        aws s3 cp "$ciphertext" "s3://${BACKUP_R2_BUCKET}/${BACKUP_NAME}.age" \
+          --endpoint-url "$BACKUP_R2_ENDPOINT" --only-show-errors
+        echo "Stored encrypted backup s3://${BACKUP_R2_BUCKET}/${BACKUP_NAME}.age" >> "$GITHUB_STEP_SUMMARY"

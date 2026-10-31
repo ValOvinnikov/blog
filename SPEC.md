@@ -2578,6 +2578,14 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   automatic; prod: backed up via `pg_dump`, gated behind the same required-
   reviewer approval) — see `docs/DEPLOY.md` and `.claude/agents/db.md`'s
   "Migrations" section.
+- **Release backups are encrypted before they leave the runner.** Each
+  production migration job's dataset export or `pg_dump` goes through the
+  `.github/actions/encrypted-backup` composite action, which encrypts it with
+  `age` to the public key in the repo Variable `BACKUP_AGE_RECIPIENT`, deletes
+  the plaintext, and stores the ciphertext under `release/<tag>/` in a private
+  Cloudflare R2 bucket. The private key is held offline, never in GitHub, and
+  an unset recipient fails the job before it migrates. Decrypting:
+  `docs/DEPLOY.md` § "Restoring a release backup".
 - **Neon Postgres is one project with two branches, not a project-per-environment
   split like Sanity**: `main` backs production, `development` (branched off
   `main` on 2026-08-25) backs development. Before that date only `main`
