@@ -1,1 +1,0 @@
-ALTER TABLE "tenants" ADD COLUMN "content_migration_failed_at" timestamp;

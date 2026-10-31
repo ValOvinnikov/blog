@@ -6,6 +6,7 @@ import { Button } from '@platform/components/shared/button';
 import { useConfirmDialogContext } from '@platform/components/shared/confirm-dialog/confirm-dialog-context';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -43,7 +44,9 @@ export const ConfirmDialogContent = ({
       description={description}
       actions={
         <>
-          <AlertDialog.Close render={<Button type="button" variant="ghost" />}>
+          <AlertDialog.Close
+            render={<Button type="button" variant={BUTTON_VARIANT.GHOST} />}
+          >
             {t('cancelButton')}
           </AlertDialog.Close>
           <Button

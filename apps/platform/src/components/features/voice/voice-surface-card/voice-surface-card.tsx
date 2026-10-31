@@ -67,85 +67,83 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
   });
 
   return (
-    <section aria-label={tSurfaces(surface)}>
-      <Card>
-        <Card.Header
-          title={tSurfaces(surface)}
-          supportingText={tDescriptions(surface)}
-          actions={
-            <span className={summary()}>
-              {t('surfaceSummary', {
-                unit: isArchive ? 'lists' : 'fields',
-                total: fields.length,
-                customised: countCustomisedVoiceFields(values, fields),
-              })}
-            </span>
-          }
-        />
-        <Card.Body className={body()}>
-          <div className={fieldsSlot()}>
-            {isArchive ? (
-              <Accordion
-                openValue={openFieldId}
-                onOpenValueChange={setOpenListFieldId}
-              >
-                {fields.map((field) => (
-                  <div key={field.id} {...trackFocusOf(field.id)}>
-                    <VoiceListRow
-                      field={field}
-                      locale={locale}
-                      value={values[field.id]}
-                      savedValue={savedValues[field.id]}
-                      error={errors[field.id]}
-                      isOpen={openFieldId === field.id}
-                    >
-                      <VoiceField field={field} />
-                    </VoiceListRow>
-                  </div>
-                ))}
-              </Accordion>
-            ) : (
-              fields.map((field) => (
+    <Card>
+      <Card.Header
+        title={tSurfaces(surface)}
+        supportingText={tDescriptions(surface)}
+        actions={
+          <span className={summary()}>
+            {t('surfaceSummary', {
+              unit: isArchive ? 'lists' : 'fields',
+              total: fields.length,
+              customised: countCustomisedVoiceFields(values, fields),
+            })}
+          </span>
+        }
+      />
+      <Card.Body className={body()}>
+        <div className={fieldsSlot()}>
+          {isArchive ? (
+            <Accordion
+              openValue={openFieldId}
+              onOpenValueChange={setOpenListFieldId}
+            >
+              {fields.map((field) => (
                 <div key={field.id} {...trackFocusOf(field.id)}>
-                  <VoiceField field={field} />
+                  <VoiceListRow
+                    field={field}
+                    locale={locale}
+                    value={values[field.id]}
+                    savedValue={savedValues[field.id]}
+                    error={errors[field.id]}
+                    isOpen={openFieldId === field.id}
+                  >
+                    <VoiceField field={field} />
+                  </VoiceListRow>
                 </div>
-              ))
-            )}
-          </div>
-          <div className={previewColumn()}>
-            <div className={previewContent()}>
-              <Button
-                className={previewToggle()}
-                aria-expanded={isPreviewOpen}
-                aria-controls={previewId}
-                onClick={() => setIsPreviewOpen((open) => !open)}
-              >
-                {tSpecimen(isPreviewOpen ? 'hidePreview' : 'showPreview')}
-              </Button>
-              <div
-                id={previewId}
-                role="group"
-                aria-labelledby={previewLabelId}
-                className={preview()}
-              >
-                <p id={previewLabelId} className={previewLabel()}>
-                  {tPreview('livePreviewHeading')}
-                </p>
-                <VoiceSpecimen
-                  surface={surface}
-                  locale={locale}
-                  values={values}
-                  listSamples={listSamples}
-                  openListFieldId={openFieldId}
-                  focusedFieldId={focusedFieldId}
-                  theme={specimenTheme}
-                />
-                <p className={previewNote()}>{tNotes(surface)}</p>
+              ))}
+            </Accordion>
+          ) : (
+            fields.map((field) => (
+              <div key={field.id} {...trackFocusOf(field.id)}>
+                <VoiceField field={field} />
               </div>
+            ))
+          )}
+        </div>
+        <div className={previewColumn()}>
+          <div className={previewContent()}>
+            <Button
+              className={previewToggle()}
+              aria-expanded={isPreviewOpen}
+              aria-controls={previewId}
+              onClick={() => setIsPreviewOpen((open) => !open)}
+            >
+              {tSpecimen(isPreviewOpen ? 'hidePreview' : 'showPreview')}
+            </Button>
+            <div
+              id={previewId}
+              role="group"
+              aria-labelledby={previewLabelId}
+              className={preview()}
+            >
+              <p id={previewLabelId} className={previewLabel()}>
+                {tPreview('livePreviewHeading')}
+              </p>
+              <VoiceSpecimen
+                surface={surface}
+                locale={locale}
+                values={values}
+                listSamples={listSamples}
+                openListFieldId={openFieldId}
+                focusedFieldId={focusedFieldId}
+                theme={specimenTheme}
+              />
+              <p className={previewNote()}>{tNotes(surface)}</p>
             </div>
           </div>
-        </Card.Body>
-      </Card>
-    </section>
+        </div>
+      </Card.Body>
+    </Card>
   );
 };

@@ -3,6 +3,7 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
@@ -25,13 +26,13 @@ export const SendTestEmailButton = ({
     <Button
       type="button"
       size={SIZE.SM}
-      variant="secondary"
+      variant={BUTTON_VARIANT.SECONDARY}
       onClick={() => sendTest(email)}
       isDisabled={isArchived}
       isPending={isSending}
       pendingLabel={t('sendingTest')}
     >
-      <Icon name={ICONS.SEND} size={SIZE.SM} />
+      <Icon name={ICONS.SEND} />
       {t('sendTest')}
     </Button>
   );

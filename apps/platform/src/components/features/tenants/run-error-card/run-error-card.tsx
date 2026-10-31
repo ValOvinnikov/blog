@@ -4,6 +4,7 @@ import { Disclosure } from '@platform/components/shared/disclosure';
 import type { THeadingLevel } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
 import { Text } from '@platform/components/shared/text';
+import { ICON_SIZE } from '@platform/constants/icon';
 
 import { runErrorCardVariants } from './run-error-card-variants';
 
@@ -42,7 +43,11 @@ export const RunErrorCard = ({
         <Card.Header
           title={
             <span className={cardTitle()}>
-              <Icon name={ICONS.WARNING} className={titleIcon()} />
+              <Icon
+                name={ICONS.WARNING}
+                size={ICON_SIZE.XL}
+                className={titleIcon()}
+              />
               {headline}
             </span>
           }

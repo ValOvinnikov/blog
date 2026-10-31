@@ -1,4 +1,4 @@
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import {
   buttonVariants,
   type TButtonVariants,
@@ -33,7 +33,7 @@ export const LinkButton = ({
       aria-label={ariaLabel}
     >
       {children}
-      {hasArrow && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
+      {hasArrow && <Icon name={ICONS.ARROW} />}
     </Link>
   );
 };

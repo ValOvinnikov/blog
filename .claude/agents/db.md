@@ -124,8 +124,10 @@ schema diff — a different mechanism from the Sanity content migrations in
 touching shared data, back up before anything irreversible, production behind
 a human gate.
 
-Until launch, schema migrations are still generated, but no hand-written data
-fix is: both databases are recreated from one baseline at launch (CLAUDE.md →
+The history starts at `0000_baseline`, generated from the whole schema: dev's
+database is recreated from it at the dev reset, and production's at launch.
+Every later migration is generated on top of it. Until launch, schema
+migrations are still generated, but no hand-written data fix is (CLAUDE.md →
 "Until launch, no content migrations"). A generated migration must still apply
 to dev's existing rows, so a new `NOT NULL` column needs a default.
 

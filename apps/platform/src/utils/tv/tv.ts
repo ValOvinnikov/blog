@@ -31,6 +31,7 @@ const FONT_SIZE_TOKENS = [
   'admin-16',
   'admin-20',
   'admin-24',
+  'admin-28',
 ];
 
 const FONT_FAMILY_TOKENS = ['display', 'body', 'read', 'mono', 'ui', 'admin'];
@@ -54,7 +55,7 @@ const SPACING_TOKENS = [
   'card-y',
 ];
 
-const RADIUS_TOKENS = ['admin', 'admin-control'];
+const RADIUS_TOKENS = ['admin', 'admin-control', 'admin-bar'];
 
 const SHADOW_TOKENS = ['admin', 'admin-lg'];
 

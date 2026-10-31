@@ -10,6 +10,7 @@ import {
 } from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { findFailedStep } from '@platform/utils/run-steps/run-steps';
 import type { TUseProvisioningPollResult } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
@@ -54,7 +55,7 @@ export const ProvisioningBanner = ({
   const viewStepsButton = (
     <LinkButton
       href={adminRoutes.tenantProvisioning(tenantId)}
-      variant="secondary"
+      variant={BUTTON_VARIANT.SECONDARY}
       size={SIZE.SM}
       hasArrow={true}
     >

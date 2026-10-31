@@ -898,6 +898,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "BUTTON_VARIANT.PRIMARY",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
       }
     ],
     "SECONDARY": [
@@ -912,6 +918,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "BUTTON_VARIANT.SECONDARY",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
       }
     ],
     "SKIM": [
@@ -2074,6 +2086,78 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
+    "UNFOLD": [
+      {
+        "ref": "ICONS.UNFOLD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "TICK": [
+      {
+        "ref": "ICONS.TICK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SIDEBAR": [
+      {
+        "ref": "ICONS.SIDEBAR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MONITOR": [
+      {
+        "ref": "ICONS.MONITOR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "TABLET": [
+      {
+        "ref": "ICONS.TABLET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "USER_CHECK": [
+      {
+        "ref": "ICONS.USER_CHECK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CROSSHAIR": [
+      {
+        "ref": "ICONS.CROSSHAIR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MAXIMIZE": [
+      {
+        "ref": "ICONS.MAXIMIZE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "PAUSE": [
+      {
+        "ref": "ICONS.PAUSE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "FULL_BLEED": [
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",
@@ -2184,6 +2268,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.SM",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "MD": [
@@ -2204,6 +2294,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.MD",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "LG": [
@@ -2224,6 +2320,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.LG",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "XL": [
@@ -2244,6 +2346,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.XL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "NARROW": [
@@ -3076,6 +3184,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.XS",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "XXL": [
@@ -3084,6 +3198,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.XXL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "ascending": [
@@ -3916,6 +4036,30 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "GHOST": [
+      {
+        "ref": "BUTTON_VARIANT.GHOST",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "DANGER": [
+      {
+        "ref": "BUTTON_VARIANT.DANGER",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "UNSTYLED": [
+      {
+        "ref": "BUTTON_VARIANT.UNSTYLED",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
     "contrast_result.record_failed": [
       {
         "ref": "CONTRAST_RESULT_LOG.RECORD_FAILED",
@@ -4694,6 +4838,30 @@
         "scope": "app:platform",
         "from": "@platform/constants/github",
         "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "XXXS": [
+      {
+        "ref": "ICON_SIZE.XXXS",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "XXS": [
+      {
+        "ref": "ICON_SIZE.XXS",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "XXXL": [
+      {
+        "ref": "ICON_SIZE.XXXL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "leads.delete_failed": [
@@ -6022,6 +6190,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/upload",
         "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "ERROR_PAGES": [
+      {
+        "ref": "VOICE_SECTION.ERROR_PAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
+      }
+    ],
+    "EMPTY_STATES": [
+      {
+        "ref": "VOICE_SECTION.EMPTY_STATES",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
       }
     ],
     "worker.enqueue_error": [

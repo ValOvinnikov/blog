@@ -1,4 +1,4 @@
-import { ALERT_TYPE, ICONS, SIZE } from '@blog/config';
+import { ALERT_TYPE, ICONS } from '@blog/config';
 import {
   Icon,
   type TRegisteredIconName,
@@ -46,7 +46,7 @@ export const Alert = ({
 
   return (
     <div id={id} role={role} className={root({ class: className })}>
-      <Icon name={ALERT_ICON[type]} size={SIZE.SM} className={icon()} />
+      <Icon name={ALERT_ICON[type]} className={icon()} />
       <div className={text()}>
         {title && <strong className={titleSlot()}>{title}</strong>}
         {description && <div className={descriptionSlot()}>{description}</div>}

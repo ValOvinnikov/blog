@@ -1,15 +1,13 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
-import type { TButtonVariants } from '@platform/components/shared/button/button-variants';
+import type { BUTTON_VARIANT } from '@platform/constants/button';
 import { createContext, useContext } from 'react';
 
 import type { useConfirmDialog } from './use-confirm-dialog';
 
-export type TConfirmDialogTone = Extract<
-  TButtonVariants['variant'],
-  'danger' | 'primary'
->;
+export type TConfirmDialogTone =
+  typeof BUTTON_VARIANT.DANGER | typeof BUTTON_VARIANT.PRIMARY;
 
 type TConfirmDialogContext = ReturnType<typeof useConfirmDialog> & {
   expectedValue: TMaybeUndefined<string>;

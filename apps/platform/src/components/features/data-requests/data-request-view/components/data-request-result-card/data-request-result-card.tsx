@@ -6,6 +6,7 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   DATA_REQUEST_EXPORT_FORMAT,
   type TDataRequestExportFormat,
@@ -60,7 +61,7 @@ export const DataRequestResultCard = ({
             <div className={actions()}>
               <Button
                 type="button"
-                variant="secondary"
+                variant={BUTTON_VARIANT.SECONDARY}
                 size={SIZE.SM}
                 onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
                 isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
@@ -70,7 +71,7 @@ export const DataRequestResultCard = ({
               </Button>
               <Button
                 type="button"
-                variant="secondary"
+                variant={BUTTON_VARIANT.SECONDARY}
                 size={SIZE.SM}
                 onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
                 isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}

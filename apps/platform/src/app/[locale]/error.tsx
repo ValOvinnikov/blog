@@ -3,6 +3,7 @@
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
 import { Button } from '@platform/components/shared/button';
 import { LinkButton } from '@platform/components/shared/link-button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
@@ -22,10 +23,13 @@ export default function ErrorPage({ error, retry }: TProps) {
       errorId={error.digest}
       action={
         <>
-          <Button variant="secondary" onClick={() => retry()}>
+          <Button variant={BUTTON_VARIANT.SECONDARY} onClick={() => retry()}>
             {t('retry')}
           </Button>
-          <LinkButton href={adminRoutes.home()} variant="secondary">
+          <LinkButton
+            href={adminRoutes.home()}
+            variant={BUTTON_VARIANT.SECONDARY}
+          >
             {t('homeLink')}
           </LinkButton>
         </>

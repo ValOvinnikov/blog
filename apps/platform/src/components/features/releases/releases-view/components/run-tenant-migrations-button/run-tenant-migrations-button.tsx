@@ -9,6 +9,7 @@ import {
   type TOutcome,
 } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   MIGRATION_ENVIRONMENT,
   RELEASE_REFUSAL,
@@ -81,7 +82,7 @@ export const RunTenantMigrationsButton = ({
 
   return (
     <Button
-      variant={retryTenant ? 'secondary' : 'primary'}
+      variant={retryTenant ? BUTTON_VARIANT.SECONDARY : BUTTON_VARIANT.PRIMARY}
       size={SIZE.SM}
       isPending={isPending}
       pendingLabel={t('starting')}

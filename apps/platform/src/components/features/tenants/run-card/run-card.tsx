@@ -6,6 +6,7 @@ import { ExternalLinkButton } from '@platform/components/shared/external-link-bu
 import type { THeadingLevel } from '@platform/components/shared/heading';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { useLocale, useTranslations } from 'next-intl';
@@ -74,7 +75,7 @@ export const RunCard = ({ run, actions, headingLevel }: TRunCardProps) => {
             {run.workflowRunUrl && (
               <ExternalLinkButton
                 href={run.workflowRunUrl}
-                variant="ghost"
+                variant={BUTTON_VARIANT.GHOST}
                 size={SIZE.SM}
                 className={workflowLogLink()}
               >

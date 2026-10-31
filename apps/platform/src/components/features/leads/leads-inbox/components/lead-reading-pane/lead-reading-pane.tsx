@@ -4,6 +4,7 @@ import { buttonVariants } from '@platform/components/shared/button/button-varian
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { useLocale, useTranslations } from 'next-intl';
@@ -38,7 +39,7 @@ export const LeadReadingPane = ({
     <div className={styles.root()}>
       <Button
         size={SIZE.SM}
-        variant="secondary"
+        variant={BUTTON_VARIANT.SECONDARY}
         className={styles.back()}
         onClick={onBack}
       >
@@ -57,14 +58,14 @@ export const LeadReadingPane = ({
                 href={mailto}
                 className={buttonVariants({
                   size: SIZE.SM,
-                  variant: 'primary',
+                  variant: BUTTON_VARIANT.PRIMARY,
                 }).root()}
               >
                 {t('reply')}
               </a>
               <Button
                 size={SIZE.SM}
-                variant="secondary"
+                variant={BUTTON_VARIANT.SECONDARY}
                 onClick={() => onMarkUnread(lead)}
               >
                 {t('markUnread')}

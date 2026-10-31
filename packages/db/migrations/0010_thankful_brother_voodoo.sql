@@ -1,1 +1,0 @@
-ALTER TABLE "tenants" ADD COLUMN "sanity_read_token_encrypted" text;

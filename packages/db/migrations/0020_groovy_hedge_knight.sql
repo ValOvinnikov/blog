@@ -1,1 +1,0 @@
-ALTER TABLE "tenants" ADD COLUMN "last_notified_owner_elevation_outcome" text;

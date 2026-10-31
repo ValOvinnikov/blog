@@ -123,7 +123,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/icon.ts`
 
-- **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`
+- **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`, `UNFOLD`, `TICK`, `SIDEBAR`, `MONITOR`, `TABLET`, `USER_CHECK`, `CROSSHAIR`, `MAXIMIZE`, `PAUSE`
 
 ### `@blog/config/constants` — `packages/config/src/constants/image-layout.ts`
 
@@ -305,6 +305,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:platform
 
+### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
+
+- **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`
+
 ### `@platform/constants/contrast-result` — `apps/platform/src/constants/contrast-result.ts`
 
 - **CONTRAST_RESULT_LOG**: `RECORD_FAILED`=`"contrast_result.record_failed"`, `SECRET_MISSING`=`"contrast_result.secret_missing"`
@@ -372,6 +376,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **GITHUB_RUN_STATUS**: `QUEUED`=`"queued"`, `IN_PROGRESS`=`"in_progress"`, `COMPLETED`=`"completed"`
 - **GITHUB_RUN_CONCLUSION**: `SUCCESS`=`"success"`, `FAILURE`=`"failure"`, `SKIPPED`=`"skipped"`
 - **GITHUB_LOG**: `NOT_CONFIGURED`=`"github.not_configured"`, `RATE_LIMITED`=`"github.rate_limited"`, `REQUEST_ERROR`=`"github.request_error"`, `REQUEST_FAILED`=`"github.request_failed"`, `TAG_LIST_INCOMPLETE`=`"github.tag_list_incomplete"`, `UNEXPECTED_RESPONSE`=`"github.unexpected_response"`
+
+### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
+
+- **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
@@ -465,6 +473,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **UPLOAD_REFUSAL**: `UPLOADS_NOT_CONFIGURED`, `FILE_MISSING`, `FILE_TOO_LARGE`, `UNREADABLE_IMAGE`, `UNRECOGNIZED_TARGET`, `BRAND_IMAGE_TYPE_UNSUPPORTED`, `IMAGE_TOO_SMALL`, `IMAGE_TOO_LARGE`, `FAVICON_NOT_SQUARE`, `SVG_FAVICON_NOT_SQUARE`, `EMAIL_LOGO_SVG`, `EMAIL_LOGO_WEBP`, `EMAIL_LOGO_TYPE_UNSUPPORTED`
 - **UPLOAD_OPERATION**: `UPLOAD`, `CLEAR`
+
+### `@platform/constants/voice` — `apps/platform/src/constants/voice.ts`
+
+- **VOICE_SECTION**: `ERROR_PAGES`, `EMPTY_STATES`
 
 ### `@platform/constants/worker` — `apps/platform/src/constants/worker.ts`
 

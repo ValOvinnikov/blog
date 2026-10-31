@@ -6,6 +6,7 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
@@ -65,7 +66,7 @@ export const ConnectCustomDomainForm = ({
           <div className={footerActions()}>
             <Button
               type="submit"
-              variant="primary"
+              variant={BUTTON_VARIANT.PRIMARY}
               isPending={isPending}
               pendingLabel={t('connecting')}
             >

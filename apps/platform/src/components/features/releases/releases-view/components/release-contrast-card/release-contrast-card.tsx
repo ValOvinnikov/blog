@@ -5,6 +5,7 @@ import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   CONTRAST_STATUS,
   type TContrastStatus,
@@ -65,7 +66,7 @@ export const ReleaseContrastCard = ({
           {status === CONTRAST_STATUS.FAILED && (
             <LinkButton
               href={adminRoutes.findings()}
-              variant="secondary"
+              variant={BUTTON_VARIANT.SECONDARY}
               size={SIZE.SM}
             >
               {t('viewFinding')}

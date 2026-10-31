@@ -21,12 +21,6 @@
   "ignoreBinaries": ["sanity"],
   "workspaces": {
     "packages/studio": {
-      // Each migration's default export is loaded by the Sanity CLI
-      // (`sanity migrations run`), never imported from source. Listing them as
-      // entries — rather than ignoring them — keeps their own imports analysed.
-      // This replaces the default `{index,cli,main}` entry patterns, which match
-      // nothing here; the Sanity plugin still contributes sanity.{config,cli}.ts.
-      "entry": ["migrations/*/index.ts"],
       // Only `!`-suffixed patterns are read under `--production`, so restating
       // the default project glob alongside a negated `src/testing/**` drops
       // test infrastructure from the advisory run's reachability graph without

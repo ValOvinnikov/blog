@@ -1,14 +1,17 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ICON_TEST_ID } from '@platform/constants/icon';
+import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Icon } from './icon';
 
 faker.seed(5995);
 
-const ICON_TEST_ID = 'icon';
-const ARIA_HIDDEN = 'aria-hidden';
+const STROKE_WIDTH = 'stroke-width';
+const DEFAULT_STROKE_WIDTH = '1.6';
 const MOCK_ARIA_LABEL = faker.lorem.word();
+const MOCK_STROKE_WIDTH = 2.2;
 
 const setup = customRender(Icon, { name: ICONS.GRID });
 
@@ -28,5 +31,21 @@ describe(`<${Icon.name}/>`, () => {
 
     expect(icon).toHaveAccessibleName(MOCK_ARIA_LABEL);
     expect(icon).not.toHaveAttribute(ARIA_HIDDEN);
+  });
+
+  it('keeps the glyph stroke width when no override is given', () => {
+    setup();
+
+    const icon = screen.getByTestId(ICON_TEST_ID);
+
+    expect(icon).toHaveAttribute(STROKE_WIDTH, DEFAULT_STROKE_WIDTH);
+  });
+
+  it('draws the glyph at the given stroke width', () => {
+    setup({ strokeWidth: MOCK_STROKE_WIDTH });
+
+    const icon = screen.getByTestId(ICON_TEST_ID);
+
+    expect(icon).toHaveAttribute(STROKE_WIDTH, String(MOCK_STROKE_WIDTH));
   });
 });

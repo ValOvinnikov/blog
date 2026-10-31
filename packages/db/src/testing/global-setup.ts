@@ -13,7 +13,6 @@ declare module 'vitest' {
   // Augmenting vitest's own interface — the name must match theirs exactly.
   // eslint-disable-next-line @typescript-eslint/naming-convention
   export interface ProvidedContext {
-    pgliteEmptySnapshotPath: string;
     pgliteMigratedSnapshotPath: string;
   }
 }
@@ -28,14 +27,11 @@ export async function setup(
   project: TestProject,
 ): Promise<() => Promise<void>> {
   const snapshotDir = await mkdtemp(join(tmpdir(), 'blog-db-pglite-'));
-  const emptySnapshotPath = join(snapshotDir, 'empty.tar.gz');
   const migratedSnapshotPath = join(snapshotDir, 'migrated.tar.gz');
 
   // `new PGlite()` would not be ready yet: dumping it before initdb finishes ends the process silently.
   const client = await PGlite.create();
   const db = drizzle(client, { schema });
-
-  await writeSnapshot(client, emptySnapshotPath);
 
   for (const file of listMigrationFiles()) {
     await applyMigrationFile(db, file);
@@ -44,7 +40,6 @@ export async function setup(
   await writeSnapshot(client, migratedSnapshotPath);
   await client.close();
 
-  project.provide('pgliteEmptySnapshotPath', emptySnapshotPath);
   project.provide('pgliteMigratedSnapshotPath', migratedSnapshotPath);
 
   return async function teardown() {

@@ -60,7 +60,7 @@ export const AddressVerdict = ({
           {verdictStatus === SITE_ADDRESS_STATUS.CHECKING ? (
             <Spinner label="" size={SIZE.SM} />
           ) : (
-            <Icon name={VERDICT_ICON[verdictStatus]} size={SIZE.SM} />
+            <Icon name={VERDICT_ICON[verdictStatus]} />
           )}
         </span>
         <span id={messageId} className={message()}>

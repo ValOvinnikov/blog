@@ -8,6 +8,10 @@ within one round. A variant counts as adopted only if every test still passes.
 The adopted changes are tracked in epic #5892; "Follow-ups not filed" at the
 end lists what has no ticket.
 
+The migration history these measurements replayed has since been replaced by
+one baseline, and the migration-replay tests were removed with it; the db
+suite figures predate that.
+
 ## Per-suite picture
 
 | suite           | files | local `pnpm test` (turbo, concurrent) | alone, default | dominant phases                   |

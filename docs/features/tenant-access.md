@@ -125,7 +125,7 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
 - The `dashboard/select-tenant` page test and `tenant-switcher.test.tsx`.
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.test.ts`.
 - `apps/platform/src/server/signup-block/*.test.ts`, `admit-create-site.test.ts`, the `blocked-signups` layout and page tests, `blocked-signups-view.test.tsx` and `tenant-suspension-control.test.tsx`.
-- `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite), plus `schema/admins-granted-via-migration.test.ts`.
+- `packages/db/src/queries/{memberships,membership-invites,admins}/**` tests (PGlite).
 - No Storybook.
 
 ## Related

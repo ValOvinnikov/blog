@@ -28,7 +28,6 @@ itself stays.
 - `apps/platform/src/components/features/look/look-form/use-look-save.ts` — SUCCESS
 - `apps/platform/src/components/features/releases/releases-view/components/release-card/components/start-release-dialog/start-release-dialog.tsx` — INVALID, SUCCESS
 - `apps/platform/src/components/features/releases/releases-view/components/run-contrast-check-button/run-contrast-check-button.tsx` — REFUSED, SUCCESS, UNAVAILABLE
-- `apps/platform/src/components/features/studio/owner-studio-access-view/components/owner-access-actions/owner-access-actions.tsx` — SUCCESS
 - `apps/platform/src/components/features/tenants/tenant-details-form/use-create-tenant-submit.ts` — INVALID, REFUSED, SERVER_ERROR
 - `apps/platform/src/components/features/voice/voice-settings/use-voice-draft.ts` — INVALID
 - `apps/platform/src/server/provisioning/delete-tenant-action.ts` — SUCCESS

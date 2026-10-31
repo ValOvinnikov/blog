@@ -1,1 +1,0 @@
-ALTER TABLE "email_config" ADD COLUMN "contact_recipient" text;

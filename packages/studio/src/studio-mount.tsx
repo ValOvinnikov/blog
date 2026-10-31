@@ -5,8 +5,13 @@ import type {
   TLocaleIsoCode,
   TSanityLoginProvider,
 } from '@blog/config/constants';
+import type { ThemeColorSchemeKey } from '@sanity/ui';
 import type { FC } from 'react';
-import { StudioLayout, StudioProvider } from 'sanity';
+import {
+  StudioLayout,
+  StudioProvider,
+  type StudioThemeColorSchemeKey,
+} from 'sanity';
 
 import { buildStudioConfig, type TStudioEntitlements } from './studio-config';
 
@@ -20,6 +25,8 @@ export type TStudioMountProps = {
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
   loginProvider?: TSanityLoginProvider;
+  scheme?: ThemeColorSchemeKey;
+  onSchemeChange?: (nextScheme: StudioThemeColorSchemeKey) => void;
 };
 
 // Fills the parent slot instead of assuming the viewport, unlike
@@ -44,6 +51,8 @@ export const StudioMount: FC<TStudioMountProps> = ({
   defaultLocale,
   liveLocales,
   loginProvider,
+  scheme,
+  onSchemeChange,
 }) => {
   const config = buildStudioConfig({
     projectId,
@@ -59,7 +68,11 @@ export const StudioMount: FC<TStudioMountProps> = ({
 
   return (
     <div style={containerStyle}>
-      <StudioProvider config={config}>
+      <StudioProvider
+        config={config}
+        scheme={scheme}
+        onSchemeChange={onSchemeChange}
+      >
         <StudioLayout />
       </StudioProvider>
     </div>

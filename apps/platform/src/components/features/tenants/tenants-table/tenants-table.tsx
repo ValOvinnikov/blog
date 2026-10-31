@@ -9,6 +9,7 @@ import {
 } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -108,7 +109,7 @@ export const TenantsTable = ({
           <DataTableShell.Cell>
             <LinkButton
               href={manageHrefFor(tenant)}
-              variant="secondary"
+              variant={BUTTON_VARIANT.SECONDARY}
               size={SIZE.SM}
               ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
               hasArrow={true}

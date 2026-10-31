@@ -42,7 +42,8 @@ out" contract, a different store, and the two never reference each other.
   directly (`seed-tenant.ts`, `seed-admin.ts`, `deprovision-tenant/`,
   `recheck-tenant-owners/`, …); never imported by any app.
 - `migrations/` — the generated, committed SQL migration history plus
-  drizzle-kit's snapshot metadata (`migrations/meta/`).
+  drizzle-kit's snapshot metadata (`migrations/meta/`). The history starts at
+  `0000_baseline`, generated from `src/schema/` alone.
 
 ## Scripts
 
@@ -64,6 +65,9 @@ The root-level `pnpm type-check`, `pnpm lint`, and `pnpm test` run every
 workspace, including this one, through Turborepo.
 
 ### Migrations
+
+The history starts at `0000_baseline`, the whole schema generated in one step;
+every later migration is generated on top of it.
 
 `db:generate` produces the reviewable SQL diff under `migrations/` — that
 generation step _is_ the dry run, since drizzle-kit never touches a database

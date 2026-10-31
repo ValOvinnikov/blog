@@ -14,6 +14,7 @@ import { describe, it } from 'node:test';
 
 import {
   BASE_REF,
+  BASELINE_TAG,
   findCollisions,
   formatReport,
   readJournalTags,
@@ -88,6 +89,42 @@ describe('findCollisions', () => {
     assert.deepEqual(
       findCollisions(readJournalTags(BASE), readJournalTags(head)),
       [],
+    );
+  });
+
+  it('stays silent when the branch replaces the history with the baseline', () => {
+    assert.deepEqual(
+      findCollisions(
+        readJournalTags(BASE),
+        readJournalTags(journal(BASELINE_TAG)),
+      ),
+      [],
+    );
+  });
+
+  it('still reports a collision above the baseline', () => {
+    const base = journal(BASELINE_TAG, '0001_cultured_ego');
+    const head = journal(BASELINE_TAG, '0001_loud_wallow');
+
+    assert.deepEqual(
+      findCollisions(readJournalTags(base), readJournalTags(head)),
+      [{ idx: 1, baseTag: '0001_cultured_ego', headTag: '0001_loud_wallow' }],
+    );
+  });
+
+  it('reports an old history against a base that holds the baseline', () => {
+    assert.deepEqual(
+      findCollisions(
+        readJournalTags(journal(BASELINE_TAG)),
+        readJournalTags(BASE),
+      ),
+      [
+        {
+          idx: 0,
+          baseTag: BASELINE_TAG,
+          headTag: '0000_enable_pgvector_extension',
+        },
+      ],
     );
   });
 

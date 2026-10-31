@@ -1,12 +1,19 @@
 import { SIZE } from '@blog/config';
+import {
+  BUTTON_VARIANT,
+  type TButtonVariant,
+} from '@platform/constants/button';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
-const STYLED_VARIANTS: ('primary' | 'secondary' | 'ghost' | 'danger')[] = [
-  'primary',
-  'secondary',
-  'ghost',
-  'danger',
+const STYLED_VARIANTS: Exclude<
+  TButtonVariant,
+  typeof BUTTON_VARIANT.UNSTYLED
+>[] = [
+  BUTTON_VARIANT.PRIMARY,
+  BUTTON_VARIANT.SECONDARY,
+  BUTTON_VARIANT.GHOST,
+  BUTTON_VARIANT.DANGER,
 ];
 
 const FACE = [
@@ -24,25 +31,25 @@ export const buttonVariants = tv({
   },
   variants: {
     variant: {
-      primary: {
+      [BUTTON_VARIANT.PRIMARY]: {
         root: ['border-admin-brand bg-admin-brand text-white shadow-admin'],
       },
-      secondary: {
+      [BUTTON_VARIANT.SECONDARY]: {
         root: [
           'border-admin-control-line bg-admin-surface text-admin-text shadow-admin hover:bg-admin-surface-2',
         ],
       },
-      ghost: {
+      [BUTTON_VARIANT.GHOST]: {
         root: [
           'border-transparent bg-transparent text-admin-text hover:bg-admin-line-2',
         ],
       },
-      danger: {
+      [BUTTON_VARIANT.DANGER]: {
         root: [
           'border-admin-bad-line bg-admin-bad-weak text-admin-bad shadow-admin',
         ],
       },
-      unstyled: {
+      [BUTTON_VARIANT.UNSTYLED]: {
         root: [],
       },
     },
@@ -88,7 +95,7 @@ export const buttonVariants = tv({
     },
   ],
   defaultVariants: {
-    variant: 'secondary',
+    variant: BUTTON_VARIANT.SECONDARY,
     size: SIZE.MD,
     isPending: false,
   },
