@@ -93,6 +93,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **FINDING_SEVERITY**: `INFO`, `WARNING`, `CRITICAL`
 - **FINDING_STATUS**: `OPEN`, `RESOLVED`
 
+### `@blog/config/constants` — `packages/config/src/constants/footer-fine-print.ts`
+
+- **FOOTER_FINE_PRINT_KIND**: `LINK`, `COOKIE_SETTINGS`
+
 ### `@blog/config/constants` — `packages/config/src/constants/footer-layout.ts`
 
 - **FOOTER_LAYOUT**: `COLUMNS`, `CENTRED`, `COMPACT`, `BIG_WORDMARK`

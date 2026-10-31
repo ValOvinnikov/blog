@@ -1,5 +1,12 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
-import { SOCIAL_PLATFORMS } from '@blog/config/constants';
+import {
+  SANITY_CONTENT_REVALIDATE_SECONDS,
+  type TMaybeNull,
+} from '@blog/config';
+import {
+  FOOTER_FINE_PRINT_KIND,
+  PORTABLE_TEXT_BLOCK_TYPE,
+  SOCIAL_PLATFORMS,
+} from '@blog/config/constants';
 import {
   MOCK_LINKED_PAGE_CACHE_TAGS,
   mockRawFooter,
@@ -23,6 +30,20 @@ faker.seed(6015107);
 const MOCK_SOCIAL_LABEL = faker.lorem.word();
 const MOCK_SOCIAL_URL = faker.internet.url();
 const MOCK_TENANT = mockTenant();
+const MOCK_HEADING = faker.lorem.word();
+const MOCK_FIRST_URL = faker.internet.url();
+const MOCK_SECOND_URL = faker.internet.url();
+const MOCK_ABOUT = faker.lorem.sentence();
+const MOCK_ADDRESS = faker.location.streetAddress({ useFullAddress: true });
+
+const MOCK_UNRESOLVABLE_LINK = mockRawExternalLinkDocument({ url: null });
+
+function mockRawLinkRef(url: TMaybeNull<string>) {
+  return {
+    _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+    link: url === null ? null : mockRawExternalLinkDocument({ url }),
+  };
+}
 
 describe(getFooter, () => {
   beforeEach(() => {
@@ -66,6 +87,119 @@ describe(getFooter, () => {
         link: mockLinkView({ label: MOCK_SOCIAL_LABEL, href: MOCK_SOCIAL_URL }),
       },
     ]);
+  });
+
+  it('maps groups in order with their headings and resolved links', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawFooter({
+        groups: [
+          {
+            heading: MOCK_HEADING,
+            links: [
+              mockRawLinkRef(MOCK_FIRST_URL),
+              mockRawLinkRef(MOCK_SECOND_URL),
+            ],
+          },
+          { heading: null, links: [mockRawLinkRef(MOCK_SECOND_URL)] },
+        ],
+      }),
+    );
+
+    const result = await getFooter(MOCK_TENANT);
+
+    expect(result.groups).toEqual([
+      {
+        heading: MOCK_HEADING,
+        links: [
+          mockLinkView({ href: MOCK_FIRST_URL }),
+          mockLinkView({ href: MOCK_SECOND_URL }),
+        ],
+      },
+      { heading: undefined, links: [mockLinkView({ href: MOCK_SECOND_URL })] },
+    ]);
+  });
+
+  it('leaves out unresolvable links and drops a group left with none', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawFooter({
+        groups: [
+          {
+            heading: MOCK_HEADING,
+            links: [
+              mockRawLinkRef(null),
+              {
+                ...mockRawLinkRef(MOCK_FIRST_URL),
+                link: MOCK_UNRESOLVABLE_LINK,
+              },
+              mockRawLinkRef(MOCK_SECOND_URL),
+            ],
+          },
+          { heading: MOCK_HEADING, links: [mockRawLinkRef(null)] },
+          { heading: MOCK_HEADING, links: null },
+        ],
+      }),
+    );
+
+    const result = await getFooter(MOCK_TENANT);
+
+    expect(result.groups).toEqual([
+      {
+        heading: MOCK_HEADING,
+        links: [mockLinkView({ href: MOCK_SECOND_URL })],
+      },
+    ]);
+  });
+
+  it('maps fine-print items in order, leaving out unresolvable links', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawFooter({
+        finePrint: [
+          mockRawLinkRef(MOCK_FIRST_URL),
+          mockRawLinkRef(null),
+          { _type: 'cookieSettingsItem' },
+          { ...mockRawLinkRef(MOCK_FIRST_URL), link: MOCK_UNRESOLVABLE_LINK },
+          mockRawLinkRef(MOCK_SECOND_URL),
+        ],
+      }),
+    );
+
+    const result = await getFooter(MOCK_TENANT);
+
+    expect(result.finePrint).toEqual([
+      {
+        kind: FOOTER_FINE_PRINT_KIND.LINK,
+        link: mockLinkView({ href: MOCK_FIRST_URL }),
+      },
+      { kind: FOOTER_FINE_PRINT_KIND.COOKIE_SETTINGS },
+      {
+        kind: FOOTER_FINE_PRINT_KIND.LINK,
+        link: mockLinkView({ href: MOCK_SECOND_URL }),
+      },
+    ]);
+  });
+
+  it('returns no groups, fine print, about text or address when none are set', async () => {
+    const result = await getFooter(MOCK_TENANT);
+
+    expect(result).toMatchObject({
+      groups: [],
+      finePrint: [],
+      about: undefined,
+      address: undefined,
+    });
+  });
+
+  it('passes the about text and address through', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawFooter({ about: MOCK_ABOUT, address: MOCK_ADDRESS }),
+    );
+
+    const result = await getFooter(MOCK_TENANT);
+
+    expect({ about: result.about, address: result.address }).toEqual({
+      about: MOCK_ABOUT,
+      address: MOCK_ADDRESS,
+    });
   });
 
   it.each([

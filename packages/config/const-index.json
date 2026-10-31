@@ -1226,6 +1226,28 @@
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
+    "LINK": [
+      {
+        "ref": "FOOTER_FINE_PRINT_KIND.LINK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-fine-print.ts"
+      },
+      {
+        "ref": "ICONS.LINK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "COOKIE_SETTINGS": [
+      {
+        "ref": "FOOTER_FINE_PRINT_KIND.COOKIE_SETTINGS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-fine-print.ts"
+      }
+    ],
     "COLUMNS": [
       {
         "ref": "FOOTER_LAYOUT.COLUMNS",
@@ -2057,14 +2079,6 @@
     "ITALIC": [
       {
         "ref": "ICONS.ITALIC",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/icon.ts"
-      }
-    ],
-    "LINK": [
-      {
-        "ref": "ICONS.LINK",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"

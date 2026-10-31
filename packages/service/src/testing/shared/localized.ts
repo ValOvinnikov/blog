@@ -1,4 +1,8 @@
+import { LINK_TYPE } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
+import { faker } from '@faker-js/faker';
+
 type TLocalizedText = Partial<Record<string, string>>;
 
 export const MOCK_ENGLISH_TEXT = 'Read on.';
@@ -87,5 +91,15 @@ export function mockLocalizedImage(alt: TLocalizedText) {
     _type: 'localizedImageWithAlt',
     asset: mockReference(MOCK_IMAGE_ASSET_DOCUMENT_ID),
     alt: mockLocalizedStrings(alt),
+  };
+}
+
+export function mockLocalizedLinkDocument(_id: string, label: string) {
+  return {
+    _id,
+    _type: 'link',
+    linkType: LINK_TYPE.EXTERNAL,
+    label: mockLocalizedStrings({ [LOCALE_ISO_CODES.EN]: label }),
+    url: mockLocalizedStrings({ [LOCALE_ISO_CODES.EN]: faker.internet.url() }),
   };
 }
