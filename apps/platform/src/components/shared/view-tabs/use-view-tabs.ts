@@ -3,7 +3,6 @@ import { useId, useState } from 'react';
 
 import type { TView } from './view-tabs';
 
-/** Without `isTabbed` the tabs show below Tailwind's `lg`; a caller that passes it decides instead. */
 export const useViewTabs = ({ isTabbed }: { isTabbed?: boolean } = {}) => {
   const ids = {
     edit: { tab: useId(), panel: useId() },

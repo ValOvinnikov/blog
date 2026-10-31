@@ -38,6 +38,10 @@ const stubDesktop = () => {
   }));
 };
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe(`<${ViewTabs.name}/>`, () => {
   it('names the tablist "Edit or preview" by default', () => {
     setup();
