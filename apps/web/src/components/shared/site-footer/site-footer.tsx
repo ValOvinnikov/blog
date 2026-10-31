@@ -98,8 +98,12 @@ export const SiteFooter = async () => {
           </Footer.Social>
         )}
         <Footer.Groups ariaLabel={t('groupsAriaLabel')}>
-          {groups.map(({ heading, links }) => (
-            <Footer.Group key={heading} heading={heading} headingLevel={2}>
+          {groups.map(({ heading, links }, index) => (
+            <Footer.Group
+              key={`${index}-${heading}`}
+              heading={heading}
+              headingLevel={2}
+            >
               {links.map((link) => (
                 <Footer.GroupItem key={link.href}>
                   <FooterLink link={link} />
