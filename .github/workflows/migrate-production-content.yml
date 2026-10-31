@@ -66,7 +66,7 @@ jobs:
         uses: ./.github/actions/encrypted-backup
         with:
           file: ${{ runner.temp }}/prod-${{ inputs.label }}.tar.gz
-          name: release/${{ inputs.label }}/sanity-prod.tar.gz
+          name: release/${{ inputs.label }}/attempt-${{ github.run_attempt }}/sanity-prod.tar.gz
           recipient: ${{ vars.BACKUP_AGE_RECIPIENT }}
           endpoint: ${{ vars.BACKUP_R2_ENDPOINT }}
           bucket: ${{ vars.BACKUP_R2_BUCKET }}

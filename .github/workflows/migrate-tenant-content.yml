@@ -170,7 +170,7 @@ jobs:
       # validate-tenant-documents.yml's read-only sweep.
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
       BACKUP_TENANT_EXPORTS: ${{ github.event_name != 'push' && (inputs.environment || 'production') == 'production' }}
-      BACKUP_NAME: release/${{ inputs.label || format('run-{0}-{1}', github.run_id, github.run_attempt) }}/tenant-exports.tar.gz
+      BACKUP_NAME: release/${{ inputs.label || format('run-{0}', github.run_id) }}/attempt-${{ github.run_attempt }}/tenant-exports.tar.gz
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

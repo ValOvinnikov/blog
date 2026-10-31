@@ -1116,7 +1116,7 @@ There are **no PR preview deployments** — deploys happen only on merge to
    takes `workflow_call`, so another workflow calling it gets the same gate.
 2. **`migrate`** (`environment: production`, `needs: full-gate`) — exports a backup
    of the production dataset (encrypted and stored in R2 as
-   `release/<tag>/sanity-prod.tar.gz.age`, see "Restoring a release backup")
+   `release/<tag>/attempt-<n>/sanity-prod.tar.gz.age`, see "Restoring a release backup")
    **before** any mutation, then runs `migrate:deploy --yes` to apply only the un-applied
    content migrations (dry → run → record in the `migrationState` ledger,
    idempotent). The `production` environment's required reviewer is the human
@@ -1128,7 +1128,7 @@ There are **no PR preview deployments** — deploys happen only on merge to
 3. **`migrate-db`** (`environment: production`, `needs: full-gate`) — the same
    idea as `migrate` above, for the separate `@blog/db` (Drizzle/Neon)
    relational store: `pg_dump`s the production Neon branch and stores it,
-   encrypted, as `release/<tag>/db-prod.dump.age` **before** any mutation, then runs
+   encrypted, as `release/<tag>/attempt-<n>/db-prod.dump.age` **before** any mutation, then runs
    `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`) to apply only
    the un-applied schema migrations (tracked in drizzle-kit's own journal
    under `packages/db/migrations/meta`, idempotent). Reuses the **same**
@@ -1158,11 +1158,13 @@ it, leaving the old code serving the old (un-migrated) data.
 
 ### Restoring a release backup
 
-Each release stores `release/<tag>/sanity-prod.tar.gz.age`,
-`release/<tag>/db-prod.dump.age` and `release/<tag>/tenant-exports.tar.gz.age`
-in the backup bucket, kept for a year. A production `workflow_dispatch` of
-`migrate-tenant-content.yml` stores its exports under
-`release/run-<run id>-<attempt>/` instead. With the offline private key:
+Each release stores `sanity-prod.tar.gz.age`, `db-prod.dump.age` and
+`tenant-exports.tar.gz.age` under `release/<tag>/attempt-<n>/` in the backup
+bucket, kept for a year. `<n>` is the workflow run attempt: the bucket lock
+refuses overwrites, so a re-run job writes a new attempt folder, and
+`attempt-1` holds the copy taken before any migration ran. A production
+`workflow_dispatch` of `migrate-tenant-content.yml` stores its exports under
+`release/run-<run id>/attempt-<n>/` instead. With the offline private key:
 
 ```sh
 # download, from the R2 dashboard or with any S3 client and a read token

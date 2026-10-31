@@ -2583,10 +2583,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   fan-out's per-tenant exports bundled into one tarball, go through the
   `.github/actions/encrypted-backup` composite action, which encrypts it with
   `age` to the public key in the repo Variable `BACKUP_AGE_RECIPIENT`, deletes
-  the plaintext, and stores the ciphertext under `release/<tag>/` in a private
+  the plaintext, and stores the ciphertext under `release/<tag>/attempt-<n>/` in a private
   Cloudflare R2 bucket. The private key is held offline, never in GitHub, and
   an unset recipient fails the job before it migrates. A bucket lock on
-  `release/` stops the bucket-scoped token deleting a release backup early. Decrypting:
+  `release/` stops the bucket-scoped token deleting or overwriting a release backup
+  early, which is why each run attempt writes its own folder. Decrypting:
   `docs/DEPLOY.md` § "Restoring a release backup".
 - **Neon Postgres is one project with two branches, not a project-per-environment
   split like Sanity**: `main` backs production, `development` (branched off
