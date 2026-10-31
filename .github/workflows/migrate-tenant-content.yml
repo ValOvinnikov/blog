@@ -15,8 +15,9 @@ name: Migrate Tenant Content
 # destructive. See `lib/read-tenant-migration-ledger.ts`.
 #
 # Three triggers:
-#   - `push` to `main`, mirroring deploy-development.yml's `migrate` job:
-#     gated on the same studio||web change detection, targets `development`
+#   - `push` to `main`, parked until launch (no content migrations before
+#     then): gated on the same studio||web change detection as
+#     deploy-development.yml's `migrate` job, targets `development`
 #     unconditionally, never scoped to one tenant.
 #   - `workflow_dispatch`, deliberately NOT a release tag — a release tag is
 #     too low-ceremony a trigger for a run that mutates customer content
@@ -28,8 +29,8 @@ name: Migrate Tenant Content
 # A production run exports each tenant dataset just before migrating it and
 # stores the exports, encrypted, as one tarball in the backup bucket.
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   workflow_dispatch:
     inputs:
       tenantId:
