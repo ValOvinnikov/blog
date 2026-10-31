@@ -107,6 +107,10 @@
     "fallbackDescription": "Die neuesten Beiträge.",
     "feedLinkLabel": "RSS-Feed"
   },
+  "siteFooter": {
+    "groupsAriaLabel": "Fußzeilen-Links",
+    "finePrintAriaLabel": "Rechtliches"
+  },
   "authMenu": {
     "signIn": "Anmelden",
     "signInHeading": "Anmelden",

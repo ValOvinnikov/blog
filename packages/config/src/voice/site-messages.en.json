@@ -107,6 +107,10 @@
     "fallbackDescription": "The latest posts.",
     "feedLinkLabel": "RSS feed"
   },
+  "siteFooter": {
+    "groupsAriaLabel": "Footer links",
+    "finePrintAriaLabel": "Legal"
+  },
   "authMenu": {
     "signIn": "Sign in",
     "signInHeading": "Sign in",

@@ -107,6 +107,10 @@
     "fallbackDescription": "Las últimas publicaciones.",
     "feedLinkLabel": "Canal RSS"
   },
+  "siteFooter": {
+    "groupsAriaLabel": "Enlaces del pie de página",
+    "finePrintAriaLabel": "Información legal"
+  },
   "authMenu": {
     "signIn": "Iniciar sesión",
     "signInHeading": "Iniciar sesión",

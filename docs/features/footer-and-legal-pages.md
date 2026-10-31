@@ -14,7 +14,7 @@ epics: [3726, 4995]
 
 ## What it does
 
-The site footer closes every page with a copyright line, the site's social profiles as icon links, an optional language switcher, the cookie settings button and a link to the RSS feed. The footer half is built. Footer settings hold link groups, an about line, an address and fine-print links in Studio, and the footer loader returns them, but the public site does not render them yet. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
+The site footer closes every page with a brand column (the Look logo, an about line, an address and the site's social profiles as icon links), the editor's link groups under their headings, and a fine-print row: the copyright line, the editor's fine-print links and the Cookie settings link. An optional language switcher and a link to the RSS feed sit beside the fine print. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
 
 ## Surfaces and routes
 
@@ -46,10 +46,13 @@ The site footer closes every page with a copyright line, the site's social profi
 
 - A social link renders as an icon only. Its accessible name is derived from the platform through the catalog's `socialLinks.linkAriaLabel`, never stored per link, so it stays translated; the list is named by `socialLinks.listAriaLabel`.
 - A social profile holds no destination of its own — always a `link` document reference.
-- Footer order is fixed in code: social links, language switcher, cookie settings, RSS.
-- A failed site-settings read renders no footer. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no social links and no switcher, and with the RSS link shown.
+- Footer order is fixed in code: the brand column (logo, about, address, social links), the groups, then the bottom row — copyright, fine print, language switcher, RSS. Each part renders only when it has content.
+- The Cookie settings link always renders in the fine print: at the `cookieSettingsItem`'s position when set, at the end otherwise, and once even if the item repeats.
+- A group or fine-print link whose href an earlier one already carries is skipped, groups before fine print; a group left with no links, or with no heading, is dropped. A link opens in a new tab only when its `link` document says so.
+- The groups and the fine print are two `nav` landmarks named by the fixed catalog keys `siteFooter.groupsAriaLabel` and `siteFooter.finePrintAriaLabel`.
+- A failed site-settings read renders no footer. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no editor content and no switcher, and with the copyright, Cookie settings and RSS link shown.
 - The footer's links (`TextLink` `appearance="nav"`), including the footer language codes, mark the current item with `aria-current="page"` and the active colour and underline.
-- `@blog/ui`'s `Footer` is a compound shell (`Footer.Nav`, `Footer.Copyright`) and stays prop-driven; `apps/web` composes the content.
+- `@blog/ui`'s `Footer` is a compound shell (`Footer.Logo`, `About`, `Address`, `Social`, `Groups`/`Group`/`GroupItem`, `Wordmark`, `Copyright`, `FinePrint`, `Nav`) and stays prop-driven; `apps/web` composes the content. On a phone the groups sit two per row.
 - The `Footer` lays out by its own width (container queries on `@container/footer`), never the window's, so it renders the same in any frame; on the public site it spans the window. The Big wordmark's `text-wordmark` size scales with the footer's width (`cqi`) for the same reason.
 
 ## Dependencies
@@ -65,6 +68,7 @@ The site footer closes every page with a copyright line, the site's social profi
 - `packages/studio/src/schema-types/objects/footer-link-group/footer-link-group.ts`, `cookie-settings-item/cookie-settings-item.ts`
 - `packages/service/src/features/global/footer/adaptor/query.ts`, `transformer.ts`, `types.ts`
 - `apps/web/src/components/shared/site-footer/site-footer.tsx`
+- `apps/web/src/utils/arrange-footer-links/arrange-footer-links.ts`
 - `apps/web/src/server/site-config/get-footer-style/get-footer-style.ts`
 - `apps/web/src/components/shared/social-links/social-link.tsx`
 - `packages/ui/src/components/organisms/footer/footer.tsx`
@@ -79,5 +83,5 @@ The site footer closes every page with a copyright line, the site's social profi
 
 ## Related
 
-- #3726 — a tenant-owned privacy-policy page, linked from the consent banner and the footer.
+- #3726 — the footer renders the editor's footer content.
 - #4995 — the current page in navigation, footer links included, is marked by more than colour.

@@ -107,6 +107,10 @@
     "fallbackDescription": "De nieuwste berichten.",
     "feedLinkLabel": "RSS-feed"
   },
+  "siteFooter": {
+    "groupsAriaLabel": "Voettekstlinks",
+    "finePrintAriaLabel": "Juridisch"
+  },
   "authMenu": {
     "signIn": "Inloggen",
     "signInHeading": "Inloggen",
