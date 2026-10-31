@@ -3,12 +3,14 @@ import { bodyImageSchema } from './body-image/body-image';
 import { brandSchema } from './brand/brand';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
 import { brandTaglineItemSchema } from './brand-tagline-item/brand-tagline-item';
+import { cookieSettingsItemSchema } from './cookie-settings-item/cookie-settings-item';
 import {
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
 } from './cta-button/cta-button';
 import { ctaLayoutSchema } from './cta-layout/cta-layout';
 import { featureHighlightSchema } from './feature-highlight/feature-highlight';
+import { footerLinkGroupSchema } from './footer-link-group/footer-link-group';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
@@ -47,6 +49,8 @@ export const objects = [
   linkRefWithSubItemsSchema,
   logoItemSchema,
   socialProfileSchema,
+  footerLinkGroupSchema,
+  cookieSettingsItemSchema,
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
   featureHighlightSchema,
