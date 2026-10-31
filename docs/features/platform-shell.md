@@ -14,6 +14,9 @@ code:
   - apps/platform/src/server/auth/list-session-tenants*
   - apps/platform/src/server/auth/resolve-dashboard-tenant*
   - apps/platform/src/utils/nav-sections/**
+  - apps/platform/src/utils/dashboard-nav-sections/**
+  - apps/platform/src/utils/studio-nav-item/**
+  - apps/platform/src/utils/persistent-cookie/**
   - apps/platform/src/utils/routes/**
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/utils/sidebar-collapsed-cookie/**
@@ -85,8 +88,11 @@ switches the content column to full-bleed (see
 - Neon: `admins` (role), `memberships` and `tenants`, read through
   `@blog/db` queries; nothing is written except the cookies below.
 - Cookies: `admin-active-tenant` (httpOnly, 30 days, set only by the
-  select-tenant route) and `admin-sidebar-collapsed` (client-written, one
-  year; read server-side for the first render).
+  select-tenant route), `admin-sidebar-collapsed` (client-written, one
+  year; read server-side for the first render) and the per-tenant
+  `studio-entered-<tenantId>` (client-written, one year), which the
+  `/dashboard` layout reads to drop the Studio item's Ready badge
+  (`embedded-studio.md`).
 - Request caching: `listSessionTenants`, `resolveDashboardTenant`,
   `requireAdmin` and `requireTenantById` are React `cache()`-wrapped, so a
   layout and its page share one lookup per request. Nothing is cached across

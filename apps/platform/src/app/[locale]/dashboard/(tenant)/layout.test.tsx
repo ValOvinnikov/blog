@@ -94,6 +94,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       { membership: MOCK_GROWTH_MEMBERSHIP, tenant: MOCK_GROWTH_TENANT },
     ]);
     cookiesMock.mockResolvedValue({
+      has: vi.fn(() => false),
       get: vi.fn((name: string) =>
         name === ACTIVE_TENANT_COOKIE
           ? { value: MOCK_OTHER_TENANT_ID }

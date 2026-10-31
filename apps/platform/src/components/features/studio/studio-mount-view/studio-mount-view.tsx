@@ -2,7 +2,7 @@ import { ALERT_TYPE, type TSanityLoginProvider } from '@blog/config';
 import { queries } from '@blog/db';
 import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { StudioMount } from '@blog/studio';
+import { PlatformStudioMount } from '@platform/components/features/studio/platform-studio-mount';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -15,12 +15,14 @@ export type TStudioMountViewProps = {
   tenant: TTenant;
   basePath: string;
   loginProvider?: TSanityLoginProvider;
+  shouldRecordFirstEntry?: boolean;
 };
 
 export const StudioMountView = async ({
   tenant,
   basePath,
   loginProvider,
+  shouldRecordFirstEntry,
 }: TStudioMountViewProps) => {
   const t = await getTranslations('studioPage');
   const { root } = studioMountViewVariants();
@@ -54,7 +56,7 @@ export const StudioMountView = async ({
   const { modulePacks } = PLAN_ENTITLEMENTS[tenant.plan];
 
   return (
-    <StudioMount
+    <PlatformStudioMount
       projectId={sanityProjectId}
       dataset={sanityDataset}
       basePath={basePath}
@@ -64,6 +66,7 @@ export const StudioMountView = async ({
       defaultLocale={tenant.locale}
       liveLocales={liveLocales}
       loginProvider={loginProvider}
+      firstEntryTenantId={shouldRecordFirstEntry ? tenant.id : undefined}
     />
   );
 };

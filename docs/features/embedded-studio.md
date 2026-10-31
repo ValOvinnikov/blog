@@ -13,6 +13,8 @@ code:
   - apps/platform/src/components/features/studio/**
   - apps/platform/src/app/**/studio/**
   - apps/platform/src/utils/content-security-policy/**
+  - apps/platform/src/utils/studio-entered-cookie/**
+  - apps/platform/src/server/studio-entry/**
 epics: [4840, 4956, 4959, 4035, 1036]
 ---
 
@@ -39,7 +41,8 @@ module types whose capability is off for the tenant carry a warning.
   pinned to the viewport and the Studio fills it (`ShellFrame`).
 - The sidebar shows a Studio item under "Content" in both trees. Under
   `/dashboard`, the owner's item carries their access state as a badge:
-  Invite sent, Activating, Ready or Action needed (STALLED).
+  Invite sent, Activating, Ready or Action needed (STALLED). Ready clears
+  after the owner's first signed-in Studio session in that browser.
 - Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
@@ -91,7 +94,8 @@ module types whose capability is off for the tenant carry a warning.
 
 - `StudioMount` takes plain props only (`projectId`, `dataset`, `basePath`,
   `title`, `enabledCapabilities`, `entitlements`, `defaultLocale`,
-  `liveLocales`, `loginProvider`) and calls
+  `liveLocales`, `loginProvider`, plus the `onSchemeChange` and `onSignedIn`
+  callbacks) and calls
   `buildStudioConfig` itself. It is the only `'use client'` file in
   `@blog/studio`. Nothing exports a built config: calling the builder in a
   Server Component pulls the Sanity SDK into the RSC graph, where `swr`,
@@ -101,6 +105,18 @@ module types whose capability is off for the tenant carry a warning.
   without it, Sanity's default provider list shows. A provider missing from
   Sanity's list falls back to the full list, so the owner is never left
   without a way in.
+- `onSignedIn` fires once per mount, when Sanity reports a signed-in current
+  user, and never while the sign-in, loading or no-access screen shows.
+  Neither callback is part of the config key, so changing one never rebuilds
+  the Studio.
+- **The first-entry cookie** `studio-entered-<tenantId>` (client-written, one
+  year, per tenant) records the owner's first signed-in Studio session. Only
+  `/dashboard/studio` at READY passes `onSignedIn`, through the client
+  `PlatformStudioMount`, and only until the cookie exists; it then refreshes
+  the route so the sidebar drops Ready. Every mount goes through
+  `PlatformStudioMount`, so that refresh never remounts the Studio. It is a
+  hint, not a record: another browser shows Ready until the owner enters
+  there. No database column backs it.
 - `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
   `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@blog/service` there.
 - `StudioMount` fills its parent (`height: 100%`) instead of `NextStudio`'s
@@ -189,5 +205,6 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   and the mount happens only once access is READY.
 - #4959 owner Studio access states in the sidebar and the explainer before
   READY.
+- #6473 the Ready badge clears after the owner's first Studio entry.
 - #4035 localize the Studio interface for editors.
 - #1036 draft preview with Sanity Presentation.
