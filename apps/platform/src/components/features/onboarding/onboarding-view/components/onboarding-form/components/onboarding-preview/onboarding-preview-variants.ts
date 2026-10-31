@@ -7,7 +7,7 @@ export const onboardingPreviewVariants = tv({
   },
   variants: {
     isDark: {
-      true: { browser: ['border-admin-side-line bg-admin-side'] },
+      true: { browser: ['border-admin-rail-line bg-admin-rail'] },
       false: { browser: ['border-admin-line bg-admin-surface'] },
     },
   },

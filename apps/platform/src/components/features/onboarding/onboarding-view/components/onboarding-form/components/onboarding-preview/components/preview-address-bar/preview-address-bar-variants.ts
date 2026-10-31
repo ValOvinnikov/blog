@@ -13,10 +13,10 @@ export const previewAddressBarVariants = tv({
   variants: {
     isDark: {
       true: {
-        root: ['border-admin-side-line'],
-        dot: ['bg-admin-side-raised'],
+        root: ['border-admin-rail-line'],
+        dot: ['bg-admin-rail-raised'],
         address: [
-          'border-admin-side-line bg-admin-side-raised text-admin-side-text',
+          'border-admin-rail-line bg-admin-rail-raised text-admin-rail-text',
         ],
       },
       false: {

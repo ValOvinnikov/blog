@@ -12,17 +12,17 @@ export const signedInAccountVariants = tv({
     surface: {
       card: {},
       rail: {
-        email: ['hidden text-admin-side-muted md:block'],
+        email: ['hidden text-admin-rail-muted md:block'],
         signOut: [
-          'text-admin-side-text hover:bg-admin-side-raised hover:text-white',
+          'text-admin-rail-text hover:bg-admin-rail-raised hover:text-white',
           // Keeps the 44px tap target from growing the 26px brand row of the phone band.
           '-my-[9px] md:my-0',
         ],
       },
       railFooter: {
-        email: ['text-admin-side-text'],
+        email: ['text-admin-rail-text'],
         signOut: [
-          'text-admin-side-text hover:bg-admin-side-raised hover:text-white',
+          'text-admin-rail-text hover:bg-admin-rail-raised hover:text-white',
         ],
       },
     },
