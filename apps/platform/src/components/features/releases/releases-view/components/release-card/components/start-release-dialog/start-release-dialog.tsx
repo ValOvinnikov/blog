@@ -14,6 +14,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { Text } from '@platform/components/shared/text';
 import { Textarea } from '@platform/components/shared/textarea';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TReleaseFieldError } from '@platform/constants/release';
 import { startReleaseAction } from '@platform/server/releases/start-release-action';
 import type { TReleaseMigrationSummary } from '@platform/server/releases/summarise-release-migrations';
@@ -83,7 +84,7 @@ export const StartReleaseDialog = ({
 
   return (
     <ConfirmDialog
-      tone={isOverrideRequired ? 'danger' : 'primary'}
+      tone={isOverrideRequired ? BUTTON_VARIANT.DANGER : BUTTON_VARIANT.PRIMARY}
       onConfirm={handleConfirm}
       onOpenChange={handleOpenChange}
     >

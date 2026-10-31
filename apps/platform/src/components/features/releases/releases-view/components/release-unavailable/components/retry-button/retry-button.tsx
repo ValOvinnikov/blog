@@ -2,6 +2,7 @@
 
 import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -13,7 +14,7 @@ export const RetryButton = () => {
 
   return (
     <Button
-      variant="secondary"
+      variant={BUTTON_VARIANT.SECONDARY}
       size={SIZE.SM}
       isPending={isPending}
       pendingLabel={t('retrying')}

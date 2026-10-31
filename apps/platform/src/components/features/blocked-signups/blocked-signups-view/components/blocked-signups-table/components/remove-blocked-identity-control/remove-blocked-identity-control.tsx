@@ -3,6 +3,7 @@
 import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
 import { removeBlockedIdentityAction } from '@platform/server/signup-block/remove-blocked-identity-action';
@@ -32,7 +33,7 @@ export const RemoveBlockedIdentityControl = ({
 
   return (
     <ConfirmDialog
-      tone="danger"
+      tone={BUTTON_VARIANT.DANGER}
       onConfirm={remove}
       onConfirmed={() => router.refresh()}
     >

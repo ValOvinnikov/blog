@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -40,7 +41,7 @@ export const OnboardingActions = ({
         <Button
           key="create-site"
           type="submit"
-          variant="primary"
+          variant={BUTTON_VARIANT.PRIMARY}
           isPending={isPending}
           pendingLabel={t('creating')}
         >
@@ -49,7 +50,7 @@ export const OnboardingActions = ({
       ) : (
         <Button
           key="continue"
-          variant="primary"
+          variant={BUTTON_VARIANT.PRIMARY}
           isAriaDisabled={isContinueDisabled}
           onClick={onContinue}
         >

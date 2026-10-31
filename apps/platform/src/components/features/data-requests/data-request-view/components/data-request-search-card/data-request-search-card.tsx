@@ -5,6 +5,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import type { FormEvent } from 'react';
@@ -60,7 +61,7 @@ export const DataRequestSearchCard = ({
           <div className={footerActions()}>
             <Button
               type="submit"
-              variant="primary"
+              variant={BUTTON_VARIANT.PRIMARY}
               isPending={isPending}
               pendingLabel={t('submitting')}
             >

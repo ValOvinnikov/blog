@@ -5,6 +5,7 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Spinner } from '@platform/components/shared/spinner';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { useTranslations } from 'next-intl';
 import type { Ref } from 'react';
@@ -67,7 +68,11 @@ export const LeadsList = ({
           {isLoading ? (
             <Spinner label={t('loadingMore')} hasLabel={true} />
           ) : (
-            <Button size={SIZE.SM} variant="secondary" onClick={loadMore}>
+            <Button
+              size={SIZE.SM}
+              variant={BUTTON_VARIANT.SECONDARY}
+              onClick={loadMore}
+            >
               {t('loadMoreFailed')}
             </Button>
           )}

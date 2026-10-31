@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 
 export type TVerifyCustomDomainButtonProps = {
@@ -16,7 +17,7 @@ export const VerifyCustomDomainButton = ({
 
   return (
     <Button
-      variant="primary"
+      variant={BUTTON_VARIANT.PRIMARY}
       isPending={isPending}
       pendingLabel={t('verifying')}
       onClick={onVerify}

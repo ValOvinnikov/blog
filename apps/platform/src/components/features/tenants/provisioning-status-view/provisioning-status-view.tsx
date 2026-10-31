@@ -14,6 +14,7 @@ import { Button } from '@platform/components/shared/button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
@@ -67,7 +68,7 @@ export const ProvisioningStatusView = ({
   const retryButtonNode = isOverallFailed ? (
     <Button
       type="button"
-      variant="secondary"
+      variant={BUTTON_VARIANT.SECONDARY}
       size={SIZE.SM}
       onClick={handleDispatch}
       isDisabled={isArchived}
@@ -81,7 +82,7 @@ export const ProvisioningStatusView = ({
     allIdle && !isProvisioningRunning ? (
       <Button
         type="button"
-        variant="primary"
+        variant={BUTTON_VARIANT.PRIMARY}
         onClick={handleDispatch}
         isDisabled={isArchived}
         aria-describedby={isArchived ? archivedNoticeId : undefined}

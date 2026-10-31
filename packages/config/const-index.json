@@ -898,6 +898,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "BUTTON_VARIANT.PRIMARY",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
       }
     ],
     "SECONDARY": [
@@ -912,6 +918,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "BUTTON_VARIANT.SECONDARY",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
       }
     ],
     "SKIM": [
@@ -3988,23 +4000,7 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
-    "primary": [
-      {
-        "ref": "BUTTON_VARIANT.PRIMARY",
-        "scope": "app:platform",
-        "from": "@platform/constants/button",
-        "file": "apps/platform/src/constants/button.ts"
-      }
-    ],
-    "secondary": [
-      {
-        "ref": "BUTTON_VARIANT.SECONDARY",
-        "scope": "app:platform",
-        "from": "@platform/constants/button",
-        "file": "apps/platform/src/constants/button.ts"
-      }
-    ],
-    "ghost": [
+    "GHOST": [
       {
         "ref": "BUTTON_VARIANT.GHOST",
         "scope": "app:platform",
@@ -4012,7 +4008,7 @@
         "file": "apps/platform/src/constants/button.ts"
       }
     ],
-    "danger": [
+    "DANGER": [
       {
         "ref": "BUTTON_VARIANT.DANGER",
         "scope": "app:platform",
@@ -4020,7 +4016,7 @@
         "file": "apps/platform/src/constants/button.ts"
       }
     ],
-    "unstyled": [
+    "UNSTYLED": [
       {
         "ref": "BUTTON_VARIANT.UNSTYLED",
         "scope": "app:platform",

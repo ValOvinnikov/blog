@@ -307,7 +307,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
-- **BUTTON_VARIANT**: `PRIMARY`=`"primary"`, `SECONDARY`=`"secondary"`, `GHOST`=`"ghost"`, `DANGER`=`"danger"`, `UNSTYLED`=`"unstyled"`
+- **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`
 
 ### `@platform/constants/contrast-result` — `apps/platform/src/constants/contrast-result.ts`
 

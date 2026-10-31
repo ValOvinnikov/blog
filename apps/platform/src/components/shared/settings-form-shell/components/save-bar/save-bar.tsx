@@ -3,6 +3,7 @@
 import { ICONS } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 import type { MouseEvent } from 'react';
 import { flushSync } from 'react-dom';
@@ -114,7 +115,7 @@ export const SaveBar = ({
           {t('discard')}
         </Button>
         <Button
-          variant="primary"
+          variant={BUTTON_VARIANT.PRIMARY}
           onClick={onSave}
           isPending={isPending}
           pendingLabel={t('saving')}

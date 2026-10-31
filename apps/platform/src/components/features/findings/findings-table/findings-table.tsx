@@ -4,6 +4,7 @@ import { ContrastFindingDetails } from '@platform/components/features/findings/c
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
@@ -43,7 +44,7 @@ export const FindingsTable = ({ findings }: TFindingsTableProps) => {
             {finding.tenantId ? (
               <LinkButton
                 href={adminRoutes.tenantOverview(finding.tenantId)}
-                variant="secondary"
+                variant={BUTTON_VARIANT.SECONDARY}
                 size={SIZE.SM}
               >
                 {finding.tenantName ?? finding.tenantId}
