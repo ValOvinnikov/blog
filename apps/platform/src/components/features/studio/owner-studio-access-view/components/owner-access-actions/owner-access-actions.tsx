@@ -1,7 +1,11 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE } from '@blog/config';
+import { isOutcomeSuccess, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import {
+  OWNER_STUDIO_ACCESS,
+  type TPendingOwnerStudioAccess,
+} from '@platform/constants/owner-studio-access';
 import { useToast } from '@platform/context/toast-provider';
 import { checkOwnerAccessAction } from '@platform/server/owner-access/check-owner-access-action';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
@@ -17,12 +21,12 @@ const ownerAccessActionsVariants = tv({
 
 export type TOwnerAccessActionsProps = {
   tenantId: string;
-  canResend: boolean;
+  studioAccess: TPendingOwnerStudioAccess;
 };
 
 export const OwnerAccessActions = ({
   tenantId,
-  canResend,
+  studioAccess,
 }: TOwnerAccessActionsProps) => {
   const t = useTranslations('ownerStudioAccess');
   const toast = useToast();
@@ -30,8 +34,11 @@ export const OwnerAccessActions = ({
   const [isChecking, startCheck] = useTransition();
   const [isResending, startResend] = useTransition();
 
+  const isInviteSent = studioAccess === OWNER_STUDIO_ACCESS.INVITE_SENT;
+  const isStalled = studioAccess === OWNER_STUDIO_ACCESS.STALLED;
+
   const settle = (result: TOwnerAccessRequestResult, successKey: string) => {
-    if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+    if (!isOutcomeSuccess(result)) {
       toast.error({ message: t('requestFailed') });
       return;
     }
@@ -51,30 +58,37 @@ export const OwnerAccessActions = ({
     });
   };
 
+  const checkButton = (
+    <Button
+      variant={isInviteSent ? 'primary' : 'secondary'}
+      size={SIZE.SM}
+      isDisabled={isResending}
+      isPending={isChecking}
+      pendingLabel={t('checking')}
+      onClick={handleCheck}
+    >
+      {t('checkNow')}
+    </Button>
+  );
+
+  const resendButton = (
+    <Button
+      variant={isStalled ? 'primary' : 'secondary'}
+      size={SIZE.SM}
+      isDisabled={isChecking}
+      isPending={isResending}
+      pendingLabel={t('resending')}
+      onClick={handleResend}
+    >
+      {t('resendInvite')}
+    </Button>
+  );
+
   return (
     <div className={ownerAccessActionsVariants()}>
-      <Button
-        variant="primary"
-        size={SIZE.SM}
-        isDisabled={isResending}
-        isPending={isChecking}
-        pendingLabel={t('checking')}
-        onClick={handleCheck}
-      >
-        {t('checkNow')}
-      </Button>
-      {canResend && (
-        <Button
-          variant="secondary"
-          size={SIZE.SM}
-          isDisabled={isChecking}
-          isPending={isResending}
-          pendingLabel={t('resending')}
-          onClick={handleResend}
-        >
-          {t('resendInvite')}
-        </Button>
-      )}
+      {isStalled && resendButton}
+      {checkButton}
+      {isInviteSent && resendButton}
     </div>
   );
 };
