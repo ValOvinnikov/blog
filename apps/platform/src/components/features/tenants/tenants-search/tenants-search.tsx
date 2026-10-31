@@ -5,6 +5,7 @@ import { Button } from '@platform/components/shared/button';
 import { FormField } from '@platform/components/shared/form-field';
 import { Icon } from '@platform/components/shared/icon';
 import { TextInput } from '@platform/components/shared/text-input';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTranslations } from 'next-intl';
 import { useRef, type FormEvent } from 'react';
@@ -46,7 +47,7 @@ export const TenantsSearch = ({ listQuery }: TTenantsSearchProps) => {
           />
           {value && (
             <Button
-              variant="ghost"
+              variant={BUTTON_VARIANT.GHOST}
               size={SIZE.SM}
               onClick={handleClear}
               aria-label={clearLabel}

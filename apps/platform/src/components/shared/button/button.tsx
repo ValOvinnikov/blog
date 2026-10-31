@@ -2,6 +2,7 @@ import { ICONS, SIZE } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
@@ -54,7 +55,7 @@ export const Button = ({
   const hasPendingLabel = !isUndefined(pendingLabel);
   const isPendingWithLabel = isPending && hasPendingLabel;
   const isBlocked = isAriaDisabled || isPending;
-  const isUnstyled = variant === 'unstyled';
+  const isUnstyled = variant === BUTTON_VARIANT.UNSTYLED;
 
   const hasClickBehaviour = !isUndefined(onClick) || isBlocked;
 

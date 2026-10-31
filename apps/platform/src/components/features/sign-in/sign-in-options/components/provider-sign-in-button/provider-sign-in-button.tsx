@@ -7,6 +7,7 @@ import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
@@ -47,7 +48,7 @@ export const ProviderSignInButton = ({
 
   return (
     <Button
-      variant="secondary"
+      variant={BUTTON_VARIANT.SECONDARY}
       isPending={isPending}
       pendingLabel={t('redirecting')}
       onClick={handleClick}
