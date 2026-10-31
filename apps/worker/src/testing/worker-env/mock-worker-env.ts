@@ -5,6 +5,7 @@ import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision
 export const MOCK_WORKER_ENV: Record<string, TMaybeUndefined<string>> = {
   SANITY_MANAGEMENT_TOKEN: MOCK_PROVISION_ENV.sanityManagementToken,
   SANITY_ORGANIZATION_ID: MOCK_PROVISION_ENV.sanityOrganizationId,
+  PRODUCT_NAME: MOCK_PROVISION_ENV.productName,
   VERCEL_TOKEN: MOCK_PROVISION_ENV.vercelToken,
   VERCEL_TEAM_ID: MOCK_PROVISION_ENV.vercelTeamId,
   VERCEL_PROJECT_ID_WEB: MOCK_PROVISION_ENV.vercelWebProjectId,

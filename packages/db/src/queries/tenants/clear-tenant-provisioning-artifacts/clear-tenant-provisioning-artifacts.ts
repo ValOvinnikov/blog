@@ -15,6 +15,7 @@ export async function clearTenantProvisioningArtifacts(
       sanityReadTokenEncrypted: null,
       sanityWriteTokenEncrypted: null,
       sanityManagementTokenEncrypted: null,
+      sanityManagementRobotId: null,
       provisioningStatus: null,
       provisioningSteps: null,
       seededAt: null,

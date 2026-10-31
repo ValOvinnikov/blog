@@ -57,6 +57,7 @@
         "CRON_SECRET",
         "OPERATOR_ALERT_FROM_ADDRESS",
         "OWNER_EMAIL_FROM_ADDRESS",
+        "PRODUCT_NAME",
         "CONTRAST_RESULT_SECRET",
         "SANITY_LIVE_CONTENT"
       ],

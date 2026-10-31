@@ -24,16 +24,14 @@ import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
 } from './sanity-robot-tokens';
-import {
-  SANITY_READ_TOKEN_LABEL,
-  SANITY_WRITE_TOKEN_LABEL,
-} from './sanity-token-labels';
 
 faker.seed(1903);
 
+const MOCK_READ_LABEL = faker.lorem.words(2);
+const MOCK_WRITE_LABEL = faker.lorem.words(2);
 const MOCK_LEGACY_TOKEN = faker.string.alphanumeric(16);
 const MOCK_CREATE_INPUT = mockSanityProjectInput({
-  label: SANITY_READ_TOKEN_LABEL,
+  label: MOCK_READ_LABEL,
   role: SANITY_ROBOT_ROLE.VIEWER,
 });
 
@@ -126,8 +124,8 @@ describe(deleteSanityRobotToken, () => {
 describe(listSanityRobotTokens, () => {
   it('GETs the robots endpoint and normalizes id/label from a bare array', async () => {
     const robots = [
-      { id: MOCK_SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
-      { id: MOCK_SECOND_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL },
+      { id: MOCK_SANITY_ROBOT_ID, label: MOCK_READ_LABEL },
+      { id: MOCK_SECOND_ROBOT_ID, label: MOCK_WRITE_LABEL },
     ];
     fetchMock.mockResolvedValue(jsonResponse(robots));
 
@@ -143,24 +141,22 @@ describe(listSanityRobotTokens, () => {
     {
       title: 'unwraps a `data` envelope response',
       response: {
-        data: [{ id: MOCK_SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+        data: [{ id: MOCK_SANITY_ROBOT_ID, label: MOCK_READ_LABEL }],
       },
-      expected: [{ id: MOCK_SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+      expected: [{ id: MOCK_SANITY_ROBOT_ID, label: MOCK_READ_LABEL }],
     },
     {
       title: 'falls back to the tokenId field when id is absent',
-      response: [
-        { tokenId: MOCK_SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
-      ],
-      expected: [{ id: MOCK_SANITY_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL }],
+      response: [{ tokenId: MOCK_SANITY_ROBOT_ID, label: MOCK_READ_LABEL }],
+      expected: [{ id: MOCK_SANITY_ROBOT_ID, label: MOCK_READ_LABEL }],
     },
     {
       title: 'drops entries with no resolvable id',
       response: [
-        { label: SANITY_READ_TOKEN_LABEL },
-        { id: MOCK_SECOND_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL },
+        { label: MOCK_READ_LABEL },
+        { id: MOCK_SECOND_ROBOT_ID, label: MOCK_WRITE_LABEL },
       ],
-      expected: [{ id: MOCK_SECOND_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL }],
+      expected: [{ id: MOCK_SECOND_ROBOT_ID, label: MOCK_WRITE_LABEL }],
     },
   ])('$title', async ({ response, expected }) => {
     fetchMock.mockResolvedValue(jsonResponse(response));

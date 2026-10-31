@@ -16,6 +16,7 @@ import {
   archiveTenant,
   clearTenantProvisioningArtifacts,
   getTenantById,
+  getTenantSanityManagementCredentials,
   updateDeprovisioningStep,
 } from '@blog/db/queries/tenants';
 import { archiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-project-lifecycle';
@@ -23,11 +24,6 @@ import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import {
-  SANITY_MANAGEMENT_TOKEN_LABEL,
-  SANITY_READ_TOKEN_LABEL,
-  SANITY_WRITE_TOKEN_LABEL,
-} from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { deleteVercelProjectDomains } from '@blog/db/utils/vercel-client/vercel-project-domains';
 import { errorResult, okResult } from '@blog/utils/result';
@@ -45,13 +41,13 @@ import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
+  MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   mockProvisionedTenant,
   mockTenant,
 } from '@worker/testing/tenant/fixtures';
 import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { logger } from '@worker/utils/logger/logger';
-import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 import { runDeprovisioningStep } from './run-deprovisioning-step';
 
@@ -61,9 +57,12 @@ const MOCK_REVALIDATION_REFUSED = 'revalidation refused';
 const MOCK_PROVISIONED_TENANT = mockProvisionedTenant();
 const MOCK_READ_ROBOT_ID = faker.string.uuid();
 const MOCK_WRITE_ROBOT_ID = faker.string.uuid();
-const MOCK_MANAGEMENT_ROBOT_ID = faker.string.uuid();
-const MOCK_OTHER_ROBOT_ID = faker.string.uuid();
-const MOCK_OTHER_ROBOT_LABEL = faker.lorem.word();
+const MOCK_HAND_MADE_ROBOT_ID = faker.string.uuid();
+const MOCK_MANAGEMENT_CREDENTIALS = {
+  projectId: MOCK_SANITY_PROJECT_ID,
+  token: MOCK_TENANT_MANAGEMENT_TOKEN,
+  managementRobotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
+};
 const MOCK_TENANT_HOSTS = [
   MOCK_PROVISIONED_TENANT.primaryDomain,
   faker.internet.domainName(),
@@ -88,7 +87,6 @@ vi.mock(
   () => import('@worker/testing/deprovision-env/fake-deprovision-env'),
 );
 vi.mock('workflow');
-vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 function run(step: TDeprovisioningStep) {
   return runDeprovisioningStep(MOCK_TENANT_ID, MOCK_RUN_CONTEXT, step);
@@ -111,6 +109,9 @@ describe(runDeprovisioningStep, () => {
       okResult(MOCK_PROVISIONED_TENANT),
     );
     vi.mocked(listSanityRobotTokens).mockResolvedValue([]);
+    vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue(
+      MOCK_MANAGEMENT_CREDENTIALS,
+    );
     vi.mocked(purgeTenantReaderData).mockResolvedValue(MOCK_READER_DATA_COUNTS);
     vi.mocked(listTenantHosts).mockResolvedValue(MOCK_TENANT_HOSTS);
   });
@@ -152,12 +153,12 @@ describe(runDeprovisioningStep, () => {
     expect(archiveSanityProject).not.toHaveBeenCalled();
   });
 
-  it('revokes only the provisioned Sanity robot tokens, the management token last', async () => {
+  it('revokes every Sanity robot token on the project, the management token last', async () => {
     vi.mocked(listSanityRobotTokens).mockResolvedValue([
-      { id: MOCK_MANAGEMENT_ROBOT_ID, label: SANITY_MANAGEMENT_TOKEN_LABEL },
-      { id: MOCK_READ_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
-      { id: MOCK_WRITE_ROBOT_ID, label: SANITY_WRITE_TOKEN_LABEL },
-      { id: MOCK_OTHER_ROBOT_ID, label: MOCK_OTHER_ROBOT_LABEL },
+      { id: MOCK_TENANT_MANAGEMENT_ROBOT_ID, label: faker.company.name() },
+      { id: MOCK_READ_ROBOT_ID, label: faker.lorem.words(2) },
+      { id: MOCK_WRITE_ROBOT_ID, label: faker.lorem.words(2) },
+      { id: MOCK_HAND_MADE_ROBOT_ID, label: faker.internet.email() },
     ]);
 
     await run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS);
@@ -169,13 +170,14 @@ describe(runDeprovisioningStep, () => {
     ).toEqual([
       MOCK_READ_ROBOT_ID,
       MOCK_WRITE_ROBOT_ID,
-      MOCK_MANAGEMENT_ROBOT_ID,
+      MOCK_HAND_MADE_ROBOT_ID,
+      MOCK_TENANT_MANAGEMENT_ROBOT_ID,
     ]);
   });
 
   it("revokes with the tenant's own management token", async () => {
     vi.mocked(listSanityRobotTokens).mockResolvedValue([
-      { id: MOCK_READ_ROBOT_ID, label: SANITY_READ_TOKEN_LABEL },
+      { id: MOCK_READ_ROBOT_ID, label: faker.lorem.words(2) },
     ]);
 
     await run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS);
@@ -188,8 +190,8 @@ describe(runDeprovisioningStep, () => {
   });
 
   it('logs and still succeeds when the tenant has no management token', async () => {
-    vi.mocked(requireTenantManagementToken).mockRejectedValue(
-      new Error(MOCK_SANITY_OUTAGE),
+    vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue(
+      undefined,
     );
 
     await expect(
@@ -199,8 +201,29 @@ describe(runDeprovisioningStep, () => {
     expect(listSanityRobotTokens).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
-      { tenantId: MOCK_TENANT_ID, error: MOCK_SANITY_OUTAGE },
+      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
+  });
+
+  it('fails the step without revoking anything when the tenant has no stored management robot id', async () => {
+    vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue({
+      ...MOCK_MANAGEMENT_CREDENTIALS,
+      managementRobotId: null,
+    });
+
+    await expect(
+      run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
+    ).resolves.toEqual({
+      ok: false,
+      error: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
+    });
+
+    expect(listSanityRobotTokens).not.toHaveBeenCalled();
+    expect(deleteSanityRobotToken).not.toHaveBeenCalled();
+    expect(reportedStatuses()).toEqual([
+      TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    ]);
   });
 
   it('logs and still succeeds when the tokens cannot be revoked', async () => {

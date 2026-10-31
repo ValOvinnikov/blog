@@ -7,12 +7,12 @@ import {
   createSanityRobotToken,
   deleteSanityRobotToken,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { SANITY_MANAGEMENT_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { faker } from '@faker-js/faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
+  MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@worker/testing/tenant/fixtures';
 import { FatalError } from 'workflow';
@@ -33,11 +33,13 @@ const MOCK_STORE_FAILURE = 'store failed';
 const MOCK_STORED_CREDENTIALS = {
   projectId: MOCK_SANITY_PROJECT_ID,
   token: MOCK_TENANT_MANAGEMENT_TOKEN,
+  managementRobotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
 };
 const MOCK_ENSURE_INPUT = {
   tenantId: MOCK_TENANT_ID,
   projectId: MOCK_SANITY_PROJECT_ID,
   organizationToken: MOCK_PROVISION_ENV.sanityManagementToken,
+  productName: MOCK_PROVISION_ENV.productName,
 };
 
 describe(requireTenantManagementToken, () => {
@@ -86,18 +88,18 @@ describe(ensureTenantManagementToken, () => {
       expect(createSanityRobotToken).toHaveBeenCalledWith({
         token: MOCK_PROVISION_ENV.sanityManagementToken,
         projectId: MOCK_SANITY_PROJECT_ID,
-        label: SANITY_MANAGEMENT_TOKEN_LABEL,
+        label: MOCK_PROVISION_ENV.productName,
         role: SANITY_ROBOT_ROLE.DEVELOPER,
       });
     });
 
-    it('stores the minted token and returns it', async () => {
+    it('stores the minted token with its robot id and returns it', async () => {
       await expect(
         ensureTenantManagementToken(MOCK_ENSURE_INPUT),
       ).resolves.toBe(MOCK_MINTED_TOKEN);
       expect(setTenantSanityManagementToken).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
-        MOCK_MINTED_TOKEN,
+        { token: MOCK_MINTED_TOKEN, robotId: MOCK_MINTED_ROBOT_ID },
       );
       expect(deleteSanityRobotToken).not.toHaveBeenCalled();
     });

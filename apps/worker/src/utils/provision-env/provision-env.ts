@@ -8,6 +8,7 @@ import {
 export type TProvisionEnv = TVercelEnv & {
   sanityManagementToken: string;
   sanityOrganizationId: string;
+  productName: string;
   platformAppBaseUrl: string;
   tenantSanityDataset: string;
   webAppBaseUrl: string;
@@ -18,6 +19,7 @@ export function getProvisionEnv(): TProvisionEnv {
   const required = requireValues({
     SANITY_MANAGEMENT_TOKEN: env.SANITY_MANAGEMENT_TOKEN,
     SANITY_ORGANIZATION_ID: env.SANITY_ORGANIZATION_ID,
+    PRODUCT_NAME: env.PRODUCT_NAME,
     PLATFORM_APP_BASE_URL: env.PLATFORM_APP_BASE_URL,
     TENANT_SANITY_DATASET: env.TENANT_SANITY_DATASET,
     WEB_APP_URL: env.WEB_APP_URL,
@@ -28,6 +30,7 @@ export function getProvisionEnv(): TProvisionEnv {
     ...getVercelEnv(),
     sanityManagementToken: required.SANITY_MANAGEMENT_TOKEN,
     sanityOrganizationId: required.SANITY_ORGANIZATION_ID,
+    productName: required.PRODUCT_NAME,
     platformAppBaseUrl: required.PLATFORM_APP_BASE_URL,
     tenantSanityDataset: required.TENANT_SANITY_DATASET,
     webAppBaseUrl: required.WEB_APP_URL,

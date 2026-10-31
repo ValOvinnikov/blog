@@ -2,8 +2,9 @@ import { SANITY_ROBOT_ROLE } from '@blog/config';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import { setTenantSanityToken } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { SANITY_READ_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { faker } from '@faker-js/faker';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_READ_TOKEN,
@@ -46,7 +47,7 @@ describe(persistTenantSanityToken, () => {
         sanityReadTokenEncrypted: MOCK_PERSISTED_TOKEN,
       });
 
-      await persistTenantSanityToken(tenant, {
+      await persistTenantSanityToken(tenant, MOCK_PROVISION_ENV.productName, {
         mintReadToken,
       });
 
@@ -58,7 +59,9 @@ describe(persistTenantSanityToken, () => {
       const tenant = baseTenant({ sanityProjectId: null });
 
       await expect(
-        persistTenantSanityToken(tenant, { mintReadToken }),
+        persistTenantSanityToken(tenant, MOCK_PROVISION_ENV.productName, {
+          mintReadToken,
+        }),
       ).rejects.toThrow(/has no Sanity project yet/);
     });
   });
@@ -69,14 +72,14 @@ describe(persistTenantSanityToken, () => {
       .fn()
       .mockResolvedValue({ id: MOCK_ROBOT_ID, token: MOCK_SANITY_READ_TOKEN });
 
-    await persistTenantSanityToken(tenant, {
+    await persistTenantSanityToken(tenant, MOCK_PROVISION_ENV.productName, {
       mintReadToken,
     });
 
     expect(mintReadToken).toHaveBeenCalledWith({
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
-      label: SANITY_READ_TOKEN_LABEL,
+      label: buildSanityTokenLabels(MOCK_PROVISION_ENV.productName).read,
       role: SANITY_ROBOT_ROLE.VIEWER,
     });
     expect(setTenantSanityToken).toHaveBeenCalledWith(

@@ -7,7 +7,7 @@ import {
   createSanityRobotToken,
   deleteSanityRobotToken,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { SANITY_MANAGEMENT_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { FatalError } from 'workflow';
 
 export async function requireTenantManagementToken(
@@ -27,19 +27,23 @@ export async function ensureTenantManagementToken(input: {
   tenantId: string;
   projectId: string;
   organizationToken: string;
+  productName: string;
 }): Promise<string> {
-  const { tenantId, projectId, organizationToken } = input;
+  const { tenantId, projectId, organizationToken, productName } = input;
   const existing = await getTenantSanityManagementCredentials(tenantId);
   if (existing) return existing.token;
 
   const minted = await createSanityRobotToken({
     token: organizationToken,
     projectId,
-    label: SANITY_MANAGEMENT_TOKEN_LABEL,
+    label: buildSanityTokenLabels(productName).management,
     role: SANITY_ROBOT_ROLE.DEVELOPER,
   });
   try {
-    await setTenantSanityManagementToken(tenantId, minted.token);
+    await setTenantSanityManagementToken(tenantId, {
+      token: minted.token,
+      robotId: minted.id,
+    });
   } catch (error) {
     await deleteSanityRobotToken({
       token: organizationToken,

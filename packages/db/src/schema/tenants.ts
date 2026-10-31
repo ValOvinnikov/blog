@@ -109,6 +109,7 @@ export const tenants = pgTable(
     sanityReadTokenEncrypted: text('sanity_read_token_encrypted'),
     sanityWriteTokenEncrypted: text('sanity_write_token_encrypted'),
     sanityManagementTokenEncrypted: text('sanity_management_token_encrypted'),
+    sanityManagementRobotId: text('sanity_management_robot_id'),
     revalidateWebhookSecretEncrypted: text(
       'revalidate_webhook_secret_encrypted',
     ),

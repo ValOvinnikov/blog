@@ -8,13 +8,14 @@ import { SITE_TYPE } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import { setTenantSanityWriteTokenAndSeededAt } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { SANITY_WRITE_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { faker } from '@faker-js/faker';
 import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_DB_DOWN,
   MOCK_SANITY_OUTAGE,
 } from '@worker/testing/outage/fixtures';
+import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
   MOCK_MALFORMED_DOCUMENT_MESSAGE,
@@ -105,13 +106,18 @@ describe(seedTenantContent, () => {
     } = {},
   ) {
     const { siteType = SITE_TYPE.BLANK, deps } = options;
-    return seedTenantContent(options.tenant ?? tenant, siteType, {
-      createClient,
-      mintWriteToken,
-      revokeWriteToken,
-      sleep,
-      ...deps,
-    });
+    return seedTenantContent(
+      options.tenant ?? tenant,
+      siteType,
+      MOCK_PROVISION_ENV.productName,
+      {
+        createClient,
+        mintWriteToken,
+        revokeWriteToken,
+        sleep,
+        ...deps,
+      },
+    );
   }
 
   beforeEach(() => {
@@ -198,7 +204,7 @@ describe(seedTenantContent, () => {
     expect(mintWriteToken).toHaveBeenCalledWith({
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
-      label: SANITY_WRITE_TOKEN_LABEL,
+      label: buildSanityTokenLabels(MOCK_PROVISION_ENV.productName).write,
       role: SANITY_ROBOT_ROLE.EDITOR,
     });
   });

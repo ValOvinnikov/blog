@@ -5,14 +5,11 @@ import {
 import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
 import {
   MOCK_STEP_ERROR,
+  MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   mockTenant,
 } from '@blog/db/testing/tenants/fixtures';
-import {
-  SANITY_MANAGEMENT_TOKEN_LABEL,
-  SANITY_READ_TOKEN_LABEL,
-  SANITY_WRITE_TOKEN_LABEL,
-} from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { missingManagementRobotIdMessage } from '@blog/db/utils/sanity-management-client/sanity-robot-revocation';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -25,19 +22,24 @@ faker.seed(5765);
 const MOCK_TENANT = mockTenant({ sanityProjectId: MOCK_SANITY_PROJECT_ID });
 const MOCK_READ_ROBOT = {
   id: faker.string.uuid(),
-  label: SANITY_READ_TOKEN_LABEL,
+  label: faker.lorem.words(2),
 };
 const MOCK_WRITE_ROBOT = {
   id: faker.string.uuid(),
-  label: SANITY_WRITE_TOKEN_LABEL,
+  label: faker.lorem.words(2),
 };
 const MOCK_MANAGEMENT_ROBOT = {
-  id: faker.string.uuid(),
-  label: SANITY_MANAGEMENT_TOKEN_LABEL,
+  id: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
+  label: faker.company.name(),
 };
-const MOCK_HUMAN_ROBOT = {
+const MOCK_HAND_MADE_ROBOT = {
   id: faker.string.uuid(),
   label: faker.internet.email(),
+};
+const MOCK_CREDENTIALS = {
+  projectId: MOCK_SANITY_PROJECT_ID,
+  token: MOCK_TENANT_MANAGEMENT_TOKEN,
+  managementRobotId: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
 };
 
 const getManagementCredentials =
@@ -55,10 +57,7 @@ function revokedRobotIds(): string[] {
 }
 
 beforeEach(() => {
-  getManagementCredentials.mockResolvedValue({
-    projectId: MOCK_SANITY_PROJECT_ID,
-    token: MOCK_TENANT_MANAGEMENT_TOKEN,
-  });
+  getManagementCredentials.mockResolvedValue(MOCK_CREDENTIALS);
 });
 
 describe(revokeTenantSanityTokens, () => {
@@ -83,11 +82,11 @@ describe(revokeTenantSanityTokens, () => {
     expect(revokeToken).not.toHaveBeenCalled();
   });
 
-  it('revokes only the provisioned tokens, using the tenant management token', async () => {
+  it('revokes every robot on the project, using the tenant management token', async () => {
     listRobotTokens.mockResolvedValueOnce([
       MOCK_READ_ROBOT,
       MOCK_WRITE_ROBOT,
-      MOCK_HUMAN_ROBOT,
+      MOCK_HAND_MADE_ROBOT,
     ]);
 
     await revokeTenantSanityTokens(
@@ -100,28 +99,23 @@ describe(revokeTenantSanityTokens, () => {
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_TENANT.sanityProjectId,
     });
-    expect(revokeToken.mock.calls).toEqual([
-      [
-        {
-          token: MOCK_TENANT_MANAGEMENT_TOKEN,
-          projectId: MOCK_TENANT.sanityProjectId,
-          robotId: MOCK_READ_ROBOT.id,
-        },
-      ],
-      [
-        {
-          token: MOCK_TENANT_MANAGEMENT_TOKEN,
-          projectId: MOCK_TENANT.sanityProjectId,
-          robotId: MOCK_WRITE_ROBOT.id,
-        },
-      ],
+    expect(revokeToken).toHaveBeenCalledWith({
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
+      projectId: MOCK_TENANT.sanityProjectId,
+      robotId: MOCK_READ_ROBOT.id,
+    });
+    expect(revokedRobotIds()).toEqual([
+      MOCK_READ_ROBOT.id,
+      MOCK_WRITE_ROBOT.id,
+      MOCK_HAND_MADE_ROBOT.id,
     ]);
   });
 
-  it('revokes the management token last', async () => {
+  it('revokes the management token last, identified by its stored robot id', async () => {
     listRobotTokens.mockResolvedValueOnce([
       MOCK_MANAGEMENT_ROBOT,
       MOCK_READ_ROBOT,
+      MOCK_HAND_MADE_ROBOT,
       MOCK_WRITE_ROBOT,
     ]);
 
@@ -133,6 +127,7 @@ describe(revokeTenantSanityTokens, () => {
 
     expect(revokedRobotIds()).toEqual([
       MOCK_READ_ROBOT.id,
+      MOCK_HAND_MADE_ROBOT.id,
       MOCK_WRITE_ROBOT.id,
       MOCK_MANAGEMENT_ROBOT.id,
     ]);
@@ -149,15 +144,17 @@ describe(revokeTenantSanityTokens, () => {
     expect(revokeToken).not.toHaveBeenCalled();
   });
 
-  it('revokes nothing when no robot matches a provisioned label', async () => {
-    listRobotTokens.mockResolvedValueOnce([MOCK_HUMAN_ROBOT]);
+  it('throws and revokes nothing when the tenant has no stored management robot id', async () => {
+    getManagementCredentials.mockResolvedValueOnce({
+      ...MOCK_CREDENTIALS,
+      managementRobotId: null,
+    });
 
-    await revokeTenantSanityTokens(
-      MOCK_TENANT,
-      MOCK_DEPROVISION_ENV,
-      MOCK_DEPS,
-    );
+    await expect(
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),
+    ).rejects.toThrow(missingManagementRobotIdMessage(MOCK_TENANT.id));
 
+    expect(listRobotTokens).not.toHaveBeenCalled();
     expect(revokeToken).not.toHaveBeenCalled();
   });
 
