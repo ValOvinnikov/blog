@@ -11,6 +11,7 @@ import type { TCardHeaderProps } from './components/header/card-header';
 faker.seed(5995);
 
 const MOCK_TITLE = faker.lorem.words(2);
+const MOCK_OTHER_TITLE = faker.lorem.words(3);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_ACTION = faker.lorem.word();
 const MOCK_BODY = faker.lorem.sentence();
@@ -84,24 +85,79 @@ describe(`<${Card.name}/>`, () => {
     );
   });
 
-  it('is a group named by the element it is labelled by', () => {
+  it('is a region named by its header title', () => {
     renderWithIntl(
-      <Card aria-labelledby={MOCK_TITLE_ID}>
-        <Card.Header title={<span id={MOCK_TITLE_ID}>{MOCK_TITLE}</span>} />
+      <Card>
+        <Card.Header title={MOCK_TITLE} />
         <Card.Body>{MOCK_BODY}</Card.Body>
       </Card>,
     );
 
-    const group = screen.getByRole('group', { name: MOCK_TITLE });
+    const region = screen.getByRole('region', { name: MOCK_TITLE });
 
-    expect(group).toHaveTextContent(MOCK_BODY);
+    expect(region).toHaveTextContent(MOCK_BODY);
   });
 
-  it('is not a group when nothing labels it', () => {
+  it('names each region by its own header title', () => {
+    renderWithIntl(
+      <>
+        <Card>
+          <Card.Header title={MOCK_TITLE} />
+          <Card.Body>{MOCK_BODY}</Card.Body>
+        </Card>
+        <Card>
+          <Card.Header title={MOCK_OTHER_TITLE} />
+          <Card.Body>{MOCK_FOOTER}</Card.Body>
+        </Card>
+      </>,
+    );
+
+    const first = screen.getByRole('region', { name: MOCK_TITLE });
+    const second = screen.getByRole('region', { name: MOCK_OTHER_TITLE });
+
+    expect(first).toHaveTextContent(MOCK_BODY);
+    expect(second).toHaveTextContent(MOCK_FOOTER);
+  });
+
+  it('is a region named by the element it is labelled by over its header title', () => {
+    renderWithIntl(
+      <Card aria-labelledby={MOCK_TITLE_ID}>
+        <Card.Header
+          title={
+            <>
+              <span id={MOCK_TITLE_ID}>{MOCK_TITLE}</span> {MOCK_ACTION}
+            </>
+          }
+        />
+        <Card.Body>{MOCK_BODY}</Card.Body>
+      </Card>,
+    );
+
+    const region = screen.getByRole('region', { name: MOCK_TITLE });
+
+    expect(region).toHaveTextContent(MOCK_BODY);
+  });
+
+  it('is not a group', () => {
     setup();
 
     const group = screen.queryByRole('group');
 
     expect(group).not.toBeInTheDocument();
+  });
+
+  it('is not a region when it has no header title and no label', () => {
+    renderWithIntl(
+      <Card>
+        <Card.Body>{MOCK_BODY}</Card.Body>
+      </Card>,
+    );
+
+    const body = screen.getByText(MOCK_BODY);
+    const regionsAroundBody = screen
+      .queryAllByRole('region')
+      .filter((region) => region.contains(body));
+
+    expect(regionsAroundBody).toHaveLength(0);
   });
 });

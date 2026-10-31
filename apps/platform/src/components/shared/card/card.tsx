@@ -3,12 +3,21 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@platform/lib/react';
-import { Fragment, type ElementType } from 'react';
+import {
+  cloneElement,
+  type ElementType,
+  Fragment,
+  type ReactElement,
+  useId,
+} from 'react';
 
 import { cardVariants } from './card-variants';
 import { CardBody } from './components/body/card-body';
 import { CardFooter } from './components/footer/card-footer';
-import { CardHeader } from './components/header/card-header';
+import {
+  CardHeader,
+  type TCardHeaderProps,
+} from './components/header/card-header';
 
 const CardParts = {
   Header: CardHeader,
@@ -28,22 +37,26 @@ const CardRoot = ({
   'aria-labelledby': ariaLabelledBy,
 }: TCardProps) => {
   const { root } = cardVariants();
+  const titleId = useId();
   const { slots, unmatched } = mapCompoundSlots(children, CardParts);
+  const { Header } = slots;
+  const labelledBy = ariaLabelledBy ?? (Header ? titleId : undefined);
+  const Root = labelledBy ? 'section' : 'div';
 
   return (
-    <div
+    <Root
       data-slot="card"
-      role={ariaLabelledBy ? 'group' : undefined}
-      aria-labelledby={ariaLabelledBy}
+      aria-labelledby={labelledBy}
       className={root({ class: className })}
     >
-      {slots.Header}
+      {Header &&
+        cloneElement(Header as ReactElement<TCardHeaderProps>, { titleId })}
       {slots.Body}
       {slots.Footer}
       {unmatched.map((node, i) => (
         <Fragment key={i}>{node}</Fragment>
       ))}
-    </div>
+    </Root>
   );
 };
 
