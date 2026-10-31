@@ -1,7 +1,14 @@
-import { SIZE, type IWithClassName, type IWithDataTestId } from '@blog/config';
+import {
+  SIZE,
+  type ILink,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
+import type { TAnchorElementType } from '@blog/config/react';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
+import { TextLink } from '@blog/ui/components/atoms/text-link';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 
 import { consentBannerVariants } from './consent-banner-variants';
@@ -11,6 +18,8 @@ export type TConsentBannerProps = IWithClassName &
     headingLevel: THeadingLevel;
     heading: string;
     message: string;
+    policyLink?: Pick<ILink, 'href' | 'label'>;
+    linkAs?: TAnchorElementType;
     acceptLabel: string;
     rejectLabel: string;
     settingsLabel: string;
@@ -26,6 +35,8 @@ export const ConsentBanner = ({
   headingLevel,
   heading,
   message,
+  policyLink,
+  linkAs,
   acceptLabel,
   rejectLabel,
   settingsLabel,
@@ -41,6 +52,14 @@ export const ConsentBanner = ({
     </Heading>
     <Text variant="card" className={s.message()}>
       {message}
+      {policyLink && (
+        <>
+          {' '}
+          <TextLink href={policyLink.href} as={linkAs}>
+            {policyLink.label}
+          </TextLink>
+        </>
+      )}
     </Text>
     <div className={s.actions()}>
       <Button variant="primary" size={SIZE.SM} onClick={onAccept}>

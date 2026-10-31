@@ -200,7 +200,7 @@ Props: dateValue: string · dateLabel: string · readingTime?: string _(extends 
 ### ConsentBanner — `components/molecules/consent-banner/consent-banner.tsx`
 
 A persistent, non-modal card offering cookie-consent choices, fixed to the bottom of the viewport.
-Props: headingLevel: THeadingLevel · heading: string · message: string · acceptLabel: string · rejectLabel: string · settingsLabel: string · onAccept: () => void · onReject: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
+Props: headingLevel: THeadingLevel · heading: string · message: string · policyLink?: Pick<ILink, 'href' | 'label'> · linkAs?: TAnchorElementType · acceptLabel: string · rejectLabel: string · settingsLabel: string · onAccept: () => void · onReject: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ConsentPlaceholder — `components/molecules/consent-placeholder/consent-placeholder.tsx`
 
