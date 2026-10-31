@@ -18,6 +18,7 @@ export const Tile = ({ href, icon, title, description }: TTileProps) => {
   const {
     root,
     icon: iconSlot,
+    text,
     title: titleSlot,
     description: descriptionSlot,
   } = tileVariants();
@@ -25,8 +26,10 @@ export const Tile = ({ href, icon, title, description }: TTileProps) => {
   return (
     <Link href={href} className={root()}>
       <Icon name={icon} size={ICON_SIZE.XXXL} className={iconSlot()} />
-      <span className={titleSlot()}>{title}</span>
-      <span className={descriptionSlot()}>{description}</span>
+      <span className={text()}>
+        <span className={titleSlot()}>{title}</span>
+        <span className={descriptionSlot()}>{description}</span>
+      </span>
     </Link>
   );
 };

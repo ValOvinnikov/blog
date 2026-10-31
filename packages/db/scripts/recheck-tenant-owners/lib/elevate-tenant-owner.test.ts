@@ -4,17 +4,32 @@ import {
   MOCK_RECHECK_ENV,
   MOCK_SANITY_MANAGEMENT_TOKEN,
 } from '@blog/db/testing/recheck-tenant-owners/fixtures';
-import { mockTenant } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_STEP_ERROR,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
+  mockTenant,
+} from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { elevateTenantOwner } from './elevate-tenant-owner';
 
 faker.seed(5804);
 
-const { listSanityProjectAclMock, grantSanityProjectRoleMock } = vi.hoisted(
+const {
+  getTenantSanityManagementCredentialsMock,
+  listSanityProjectAclMock,
+  grantSanityProjectRoleMock,
+} = vi.hoisted(() => ({
+  getTenantSanityManagementCredentialsMock: vi.fn(),
+  listSanityProjectAclMock: vi.fn(),
+  grantSanityProjectRoleMock: vi.fn(),
+}));
+
+vi.mock(
+  '@blog/db/queries/tenants/get-tenant-sanity-management-credentials',
   () => ({
-    listSanityProjectAclMock: vi.fn(),
-    grantSanityProjectRoleMock: vi.fn(),
+    getTenantSanityManagementCredentials:
+      getTenantSanityManagementCredentialsMock,
   }),
 );
 
@@ -43,6 +58,13 @@ function mockAclEntry(
 beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(MOCK_NOW);
+  getTenantSanityManagementCredentialsMock.mockImplementation(
+    (tenantId: string) =>
+      Promise.resolve({
+        projectId: tenantId,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+      }),
+  );
 });
 
 afterEach(() => {
@@ -90,6 +112,10 @@ describe(elevateTenantOwner, () => {
     const result = await elevateTenantOwner(tenant, MOCK_RECHECK_ENV);
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+    expect(listSanityProjectAclMock).toHaveBeenCalledWith({
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
+      projectId: tenant.sanityProjectId,
+    });
     expect(grantSanityProjectRoleMock).toHaveBeenCalledWith({
       token: MOCK_SANITY_MANAGEMENT_TOKEN,
       projectId: tenant.sanityProjectId,
@@ -138,5 +164,25 @@ describe(elevateTenantOwner, () => {
 
     expect(result).toBe(ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP);
     expect(grantSanityProjectRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('names the Sanity Manage step when the organisation token cannot grant administrator', async () => {
+    listSanityProjectAclMock.mockResolvedValue([
+      mockAclEntry([SANITY_PROJECT_ROLE.VIEWER]),
+    ]);
+    grantSanityProjectRoleMock.mockRejectedValue(new Error(MOCK_STEP_ERROR));
+
+    await expect(
+      elevateTenantOwner(mockTenant({ createdAt: MOCK_NOW }), MOCK_RECHECK_ENV),
+    ).rejects.toThrow('by hand in Sanity Manage');
+  });
+
+  it('throws without reading the ACL when the tenant has no management token', async () => {
+    getTenantSanityManagementCredentialsMock.mockResolvedValue(undefined);
+
+    await expect(
+      elevateTenantOwner(mockTenant({ createdAt: MOCK_NOW }), MOCK_RECHECK_ENV),
+    ).rejects.toThrow('has no Sanity management token');
+    expect(listSanityProjectAclMock).not.toHaveBeenCalled();
   });
 });

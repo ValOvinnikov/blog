@@ -1,4 +1,5 @@
 import { isUndefined } from '@blog/utils/primitives';
+import { ICON_TEST_ID } from '@platform/constants/icon';
 
 import { ICON_REGISTRY, type TRegisteredIconName } from './icon-registry';
 import { iconVariants, type TIconVariants } from './icon-variants';
@@ -26,7 +27,7 @@ export const Icon = ({
       aria-hidden={ariaLabel ? undefined : true}
       className={iconVariants({ size, class: className })}
       {...(isUndefined(strokeWidth) ? {} : { strokeWidth })}
-      data-testid="icon"
+      data-testid={ICON_TEST_ID}
     />
   );
 };

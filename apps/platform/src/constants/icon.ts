@@ -1,3 +1,5 @@
+export const ICON_TEST_ID = 'icon';
+
 export const ICON_SIZE = {
   XXXS: 'XXXS',
   XXS: 'XXS',

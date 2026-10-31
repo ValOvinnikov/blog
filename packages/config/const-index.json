@@ -2074,6 +2074,78 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
+    "UNFOLD": [
+      {
+        "ref": "ICONS.UNFOLD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "TICK": [
+      {
+        "ref": "ICONS.TICK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "SIDEBAR": [
+      {
+        "ref": "ICONS.SIDEBAR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MONITOR": [
+      {
+        "ref": "ICONS.MONITOR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "TABLET": [
+      {
+        "ref": "ICONS.TABLET",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "USER_CHECK": [
+      {
+        "ref": "ICONS.USER_CHECK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "CROSSHAIR": [
+      {
+        "ref": "ICONS.CROSSHAIR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "MAXIMIZE": [
+      {
+        "ref": "ICONS.MAXIMIZE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "PAUSE": [
+      {
+        "ref": "ICONS.PAUSE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "FULL_BLEED": [
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",
@@ -6082,6 +6154,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/upload",
         "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
+    "ERROR_PAGES": [
+      {
+        "ref": "VOICE_SECTION.ERROR_PAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
+      }
+    ],
+    "EMPTY_STATES": [
+      {
+        "ref": "VOICE_SECTION.EMPTY_STATES",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
       }
     ],
     "worker.enqueue_error": [

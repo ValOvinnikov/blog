@@ -1,22 +1,53 @@
+import type { TMaybeUndefined } from '@blog/config/types';
+import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-management-credentials';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   deleteSanityRobotToken,
   listSanityRobotTokens,
+  type TSanityRobotTokenSummary,
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
-import { isProvisionedRobotToken } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
+import { provisionedTokensInRevocationOrder } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import type { TDeprovisionEnv } from '../lib/env';
 
 export type TRevokeSanityTokensDeps = {
+  getManagementCredentials: typeof getTenantSanityManagementCredentials;
   listRobotTokens: typeof listSanityRobotTokens;
   revokeToken: typeof deleteSanityRobotToken;
 };
 
 const defaultDeps: TRevokeSanityTokensDeps = {
+  getManagementCredentials: getTenantSanityManagementCredentials,
   listRobotTokens: listSanityRobotTokens,
   revokeToken: deleteSanityRobotToken,
 };
+
+async function listProjectRobots(
+  tenantId: string,
+  projectId: string,
+  deps: TRevokeSanityTokensDeps,
+): Promise<
+  TMaybeUndefined<{ token: string; robots: TSanityRobotTokenSummary[] }>
+> {
+  try {
+    const credentials = await deps.getManagementCredentials(tenantId);
+    if (!credentials) {
+      console.error(
+        `deprovision-tenant: tenant "${tenantId}" has no Sanity management token (sanityManagementTokenEncrypted), so the provisioned robot tokens on project "${projectId}" were not revoked — revoke them in Sanity Manage.`,
+      );
+      return undefined;
+    }
+    const { token } = credentials;
+    const robots = await deps.listRobotTokens({ token, projectId });
+    return { token, robots };
+  } catch (error) {
+    console.error(
+      `deprovision-tenant: failed to list Sanity robot tokens for project "${projectId}" (${sanitizeLogMessage(error)}).`,
+    );
+    return undefined;
+  }
+}
 
 // Tolerant throughout: a stray unrevoked token is a follow-up cleanup, never a reason to stop the teardown.
 export async function revokeTenantSanityTokens(
@@ -24,40 +55,26 @@ export async function revokeTenantSanityTokens(
   env: TDeprovisionEnv,
   deps: TRevokeSanityTokensDeps = defaultDeps,
 ): Promise<void> {
-  if (!tenant.sanityProjectId) return;
+  const { id: tenantId, sanityProjectId: projectId } = tenant;
+  if (!projectId) return;
 
   if (env.dryRun) {
     console.warn(
-      `[dry-run] would revoke provisioned Sanity robot tokens for project "${tenant.sanityProjectId}".`,
+      `[dry-run] would revoke provisioned Sanity robot tokens for project "${projectId}".`,
     );
     return;
   }
 
-  let robots;
-  try {
-    robots = await deps.listRobotTokens({
-      token: env.sanityManagementToken,
-      projectId: tenant.sanityProjectId,
-    });
-  } catch (error) {
-    console.error(
-      `deprovision-tenant: failed to list Sanity robot tokens for project "${tenant.sanityProjectId}" (${sanitizeLogMessage(error)}).`,
-    );
-    return;
-  }
+  const listed = await listProjectRobots(tenantId, projectId, deps);
+  if (!listed) return;
+  const { token, robots } = listed;
 
-  const provisionedRobots = robots.filter(isProvisionedRobotToken);
-
-  for (const robot of provisionedRobots) {
+  for (const robot of provisionedTokensInRevocationOrder(robots)) {
     try {
-      await deps.revokeToken({
-        token: env.sanityManagementToken,
-        projectId: tenant.sanityProjectId,
-        robotId: robot.id,
-      });
+      await deps.revokeToken({ token, projectId, robotId: robot.id });
     } catch (error) {
       console.error(
-        `deprovision-tenant: failed to revoke Sanity robot token "${robot.id}" (label "${robot.label}") for project "${tenant.sanityProjectId}" (${sanitizeLogMessage(error)}).`,
+        `deprovision-tenant: failed to revoke Sanity robot token "${robot.id}" (label "${robot.label}") for project "${projectId}" (${sanitizeLogMessage(error)}).`,
       );
     }
   }

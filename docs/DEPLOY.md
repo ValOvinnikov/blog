@@ -587,12 +587,12 @@ fully-configured `production` does nothing for a `development` dispatch: it
 fails on whatever `development` is missing. These workflows read
 overlapping subsets:
 
-| Workflow                        | Reads                                                                                                                                                                |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `deprovision-tenant.yml`        | `SANITY_MANAGEMENT_TOKEN`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
-| `invalidate-tenant-cache.yml`   | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                         |
-| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `PLATFORM_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                          |
-| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `PLATFORM_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                      |
+| Workflow                        | Reads                                                                                                                                                                                               |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deprovision-tenant.yml`        | `SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID_WEB`, `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` |
+| `invalidate-tenant-cache.yml`   | `TENANT_REGISTRY_DATABASE_URL`, `WEB_APP_URL`, `SITE_CONFIG_REVALIDATE_SECRET` — the recovery path for `deprovision-tenant.yml`'s final step                                                        |
+| `recheck-tenant-owners.yml`     | `SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, `TENANT_REGISTRY_DATABASE_URL`, and optionally `PLATFORM_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                          |
+| `validate-tenant-documents.yml` | `TENANT_REGISTRY_DATABASE_URL`, `TENANT_TOKEN_ENCRYPTION_KEY`, and optionally `PLATFORM_APP_BASE_URL` + `OPERATOR_ALERT_SECRET`                                                                     |
 
 `recheck-tenant-owners.yml` also runs on a `schedule:`, and a scheduled run
 carries no `inputs` context at all, so its binding is
@@ -630,12 +630,14 @@ dispatch can point it at `development`.
       which is scoped to one already-existing project). Mint it at
       https://manage.sanity.io → your organization → API → Tokens. Used by
       `deprovision-tenant.yml` to archive a tenant's Sanity project, and by
-      the owner-elevation sweep to read and grant tenant project ACLs.
+      the owner-elevation sweep to grant the owner `administrator`.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set as
       the Vercel env var of the same name on that environment's `apps/web`
       project (see the `@blog/db` env vars table above): `web-dev`'s on
       `development`, `web-prod`'s on `production`. `setTenantSanityToken`
-      throws without it.
+      throws without it, and `deprovision-tenant.yml` and
+      `recheck-tenant-owners.yml` need it to decrypt each tenant's management
+      token.
 - [ ] Variable `PLATFORM_APP_BASE_URL` — the deployed `apps/platform` origin for
       that environment (no trailing slash/path), e.g.
       `https://platform.{your-hosting}`. The two sweeps below

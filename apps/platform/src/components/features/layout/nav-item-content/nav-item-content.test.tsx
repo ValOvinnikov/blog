@@ -1,5 +1,6 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ICON_TEST_ID } from '@platform/constants/icon';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockNavBadge } from '@platform/testing/layout/fixtures';
 
@@ -22,7 +23,7 @@ describe(`<${NavItemContent.name}/>`, () => {
     setup();
 
     const label = screen.getByText(MOCK_LABEL);
-    const icon = screen.getByTestId('icon');
+    const icon = screen.getByTestId(ICON_TEST_ID);
 
     expect(label).toBeVisible();
     expect(icon).toBeVisible();

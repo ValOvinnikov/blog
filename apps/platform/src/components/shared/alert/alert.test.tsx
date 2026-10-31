@@ -1,5 +1,7 @@
 import { ALERT_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ICON_TEST_ID } from '@platform/constants/icon';
+import { ARIA_HIDDEN } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -124,9 +126,9 @@ describe(`<${Alert.name}/>`, () => {
     (type) => {
       setup({ type });
 
-      const icon = screen.getByTestId('icon');
+      const icon = screen.getByTestId(ICON_TEST_ID);
 
-      expect(icon).toHaveAttribute('aria-hidden', 'true');
+      expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
     },
   );
 });

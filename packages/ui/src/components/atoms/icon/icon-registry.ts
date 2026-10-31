@@ -45,6 +45,8 @@ import CopyComponent from '@blog/ui/assets/icons/copy.svg';
 import CopyUrl from '@blog/ui/assets/icons/copy.svg?url';
 import CpuComponent from '@blog/ui/assets/icons/cpu.svg';
 import CpuUrl from '@blog/ui/assets/icons/cpu.svg?url';
+import CrosshairComponent from '@blog/ui/assets/icons/crosshair.svg';
+import CrosshairUrl from '@blog/ui/assets/icons/crosshair.svg?url';
 import ErrorComponent from '@blog/ui/assets/icons/error.svg';
 import ErrorUrl from '@blog/ui/assets/icons/error.svg?url';
 import ExternalLinkComponent from '@blog/ui/assets/icons/external-link.svg';
@@ -85,14 +87,20 @@ import MapPinComponent from '@blog/ui/assets/icons/map-pin.svg';
 import MapPinUrl from '@blog/ui/assets/icons/map-pin.svg?url';
 import MastodonComponent from '@blog/ui/assets/icons/mastodon.svg';
 import MastodonUrl from '@blog/ui/assets/icons/mastodon.svg?url';
+import MaximizeComponent from '@blog/ui/assets/icons/maximize.svg';
+import MaximizeUrl from '@blog/ui/assets/icons/maximize.svg?url';
 import MenuRowsComponent from '@blog/ui/assets/icons/menu-rows.svg';
 import MenuRowsUrl from '@blog/ui/assets/icons/menu-rows.svg?url';
 import MenuComponent from '@blog/ui/assets/icons/menu.svg';
 import MenuUrl from '@blog/ui/assets/icons/menu.svg?url';
+import MonitorComponent from '@blog/ui/assets/icons/monitor.svg';
+import MonitorUrl from '@blog/ui/assets/icons/monitor.svg?url';
 import MoonComponent from '@blog/ui/assets/icons/moon.svg';
 import MoonUrl from '@blog/ui/assets/icons/moon.svg?url';
 import PaletteComponent from '@blog/ui/assets/icons/palette.svg';
 import PaletteUrl from '@blog/ui/assets/icons/palette.svg?url';
+import PauseComponent from '@blog/ui/assets/icons/pause.svg';
+import PauseUrl from '@blog/ui/assets/icons/pause.svg?url';
 import PenComponent from '@blog/ui/assets/icons/pen.svg';
 import PenUrl from '@blog/ui/assets/icons/pen.svg?url';
 import PhoneComponent from '@blog/ui/assets/icons/phone.svg';
@@ -117,6 +125,8 @@ import ShareComponent from '@blog/ui/assets/icons/share.svg';
 import ShareUrl from '@blog/ui/assets/icons/share.svg?url';
 import ShieldCheckComponent from '@blog/ui/assets/icons/shield-check.svg';
 import ShieldCheckUrl from '@blog/ui/assets/icons/shield-check.svg?url';
+import SidebarComponent from '@blog/ui/assets/icons/sidebar.svg';
+import SidebarUrl from '@blog/ui/assets/icons/sidebar.svg?url';
 import SmileComponent from '@blog/ui/assets/icons/smile.svg';
 import SmileUrl from '@blog/ui/assets/icons/smile.svg?url';
 import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
@@ -127,12 +137,20 @@ import StudioComponent from '@blog/ui/assets/icons/studio.svg';
 import StudioUrl from '@blog/ui/assets/icons/studio.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
 import SunUrl from '@blog/ui/assets/icons/sun.svg?url';
+import TabletComponent from '@blog/ui/assets/icons/tablet.svg';
+import TabletUrl from '@blog/ui/assets/icons/tablet.svg?url';
 import TargetComponent from '@blog/ui/assets/icons/target.svg';
 import TargetUrl from '@blog/ui/assets/icons/target.svg?url';
 import ThreadsComponent from '@blog/ui/assets/icons/threads.svg';
 import ThreadsUrl from '@blog/ui/assets/icons/threads.svg?url';
+import TickComponent from '@blog/ui/assets/icons/tick.svg';
+import TickUrl from '@blog/ui/assets/icons/tick.svg?url';
 import TrendingUpComponent from '@blog/ui/assets/icons/trending-up.svg';
 import TrendingUpUrl from '@blog/ui/assets/icons/trending-up.svg?url';
+import UnfoldComponent from '@blog/ui/assets/icons/unfold.svg';
+import UnfoldUrl from '@blog/ui/assets/icons/unfold.svg?url';
+import UserCheckComponent from '@blog/ui/assets/icons/user-check.svg';
+import UserCheckUrl from '@blog/ui/assets/icons/user-check.svg?url';
 import UserComponent from '@blog/ui/assets/icons/user.svg';
 import UserUrl from '@blog/ui/assets/icons/user.svg?url';
 import UsersComponent from '@blog/ui/assets/icons/users.svg';
@@ -243,4 +261,13 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.LINK]: { component: LinkComponent, url: LinkUrl },
   [ICONS.SMILE]: { component: SmileComponent, url: SmileUrl },
   [ICONS.SEND]: { component: SendComponent, url: SendUrl },
+  [ICONS.UNFOLD]: { component: UnfoldComponent, url: UnfoldUrl },
+  [ICONS.TICK]: { component: TickComponent, url: TickUrl },
+  [ICONS.SIDEBAR]: { component: SidebarComponent, url: SidebarUrl },
+  [ICONS.MONITOR]: { component: MonitorComponent, url: MonitorUrl },
+  [ICONS.TABLET]: { component: TabletComponent, url: TabletUrl },
+  [ICONS.USER_CHECK]: { component: UserCheckComponent, url: UserCheckUrl },
+  [ICONS.CROSSHAIR]: { component: CrosshairComponent, url: CrosshairUrl },
+  [ICONS.MAXIMIZE]: { component: MaximizeComponent, url: MaximizeUrl },
+  [ICONS.PAUSE]: { component: PauseComponent, url: PauseUrl },
 };
