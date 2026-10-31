@@ -76,6 +76,15 @@ export const ICONS = {
   LINK: 'LINK',
   SEND: 'SEND',
   COOKIE: 'COOKIE',
+  UNFOLD: 'UNFOLD',
+  TICK: 'TICK',
+  SIDEBAR: 'SIDEBAR',
+  MONITOR: 'MONITOR',
+  TABLET: 'TABLET',
+  USER_CHECK: 'USER_CHECK',
+  CROSSHAIR: 'CROSSHAIR',
+  MAXIMIZE: 'MAXIMIZE',
+  PAUSE: 'PAUSE',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
