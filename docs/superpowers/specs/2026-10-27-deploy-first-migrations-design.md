@@ -35,6 +35,7 @@ How each part finds a tenant's dataset and token:
 - Production's first content comes from dev (owner, 2026-10-31): the `marketing.dev` and `demo.dev` tenants are its source. Production creates those two tenants through the worker like any other, then launch needs two things no tool does yet:
   - A dev→prod Sanity dataset copy for each. Cloud Clone is Enterprise-only, so it is an export from the dev project and an import into the production project the worker created. Asset files go first, so asset ids come back unchanged.
   - A way to carry each tenant's Postgres settings across: site config, Voice, feature toggles, and email config and templates. They live in dev's registry, keyed by dev's tenant ids, and must land on production's new tenant rows.
+  - The source tenants hold content and styling only (owner, 2026-10-31): no reader accounts, so no users, sessions, subscribers, bookmarks or leads are carried.
 - Every other production tenant is created like every new tenant: the worker creates its Sanity project and seeds starter content at the current shape.
 - Dev switches to the post-launch order (deploy first, then migrate) before launch, so the first breaking change after launch has already been rehearsed.
 - So launch has no migration problem. Everything below is about breaking changes after launch.
