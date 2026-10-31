@@ -1,9 +1,10 @@
 import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { ToastProvider } from '@web/context/toast-provider';
-import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { mockSession } from '@web/testing/shared/session/fixtures';
+import { mockedAuth } from '@web/testing/shared/session/mocked-auth';
 
 import { IdentitySection } from './identity-section';
 
@@ -27,7 +28,7 @@ const LAST_METHOD_NOTE = "Last remaining method — can't unlink";
 const UNLINK_BUTTON = 'Unlink';
 const LINK_BUTTON = 'Link';
 
-const authMock = vi.mocked(auth as () => Promise<unknown>);
+const authMock = mockedAuth();
 const getLinkedProvidersMock = vi.mocked(queries.account.getLinkedProviders);
 
 const setup = customRenderServerAsync(
@@ -38,9 +39,7 @@ const setup = customRenderServerAsync(
 
 describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue({
-      user: MOCK_ACCOUNT_USER,
-    });
+    authMock.mockResolvedValue(mockSession({ user: MOCK_ACCOUNT_USER }));
   });
 
   it('renders nothing when there is no session', async () => {
@@ -145,7 +144,7 @@ describe(`<${IdentitySection.name}/>`, () => {
   });
 
   it('prefills the display-name field with the handle when the reader has no name', async () => {
-    authMock.mockResolvedValue({ user: MOCK_NAMELESS_USER });
+    authMock.mockResolvedValue(mockSession({ user: MOCK_NAMELESS_USER }));
     getLinkedProvidersMock.mockResolvedValue({
       github: false,
       google: false,

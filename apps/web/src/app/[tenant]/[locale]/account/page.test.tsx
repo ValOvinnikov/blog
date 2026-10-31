@@ -1,9 +1,9 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { auth } from '@web/server/auth/auth';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSession } from '@web/testing/shared/session/fixtures';
+import { mockedAuth } from '@web/testing/shared/session/mocked-auth';
 import { notFound } from 'next/navigation';
 
 import AccountRoute from './page';
@@ -29,7 +29,7 @@ vi.mock(
   }),
 );
 
-const authMock = vi.mocked(auth as () => Promise<unknown>);
+const authMock = mockedAuth();
 
 const setup = customRenderAsync(AccountRoute, { params: mockRouteParams() });
 

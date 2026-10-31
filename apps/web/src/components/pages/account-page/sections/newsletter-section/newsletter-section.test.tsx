@@ -2,10 +2,11 @@ import { SUBSCRIBER_OUTCOME } from '@blog/config';
 import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { ToastProvider } from '@web/context/toast-provider';
-import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { mockSession } from '@web/testing/shared/session/fixtures';
+import { mockedAuth } from '@web/testing/shared/session/mocked-auth';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_ID,
@@ -23,7 +24,7 @@ vi.mock('@blog/db', () => ({
 
 const NEWSLETTER_HEADING = 'Newsletter';
 
-const authMock = vi.mocked(auth as () => Promise<unknown>);
+const authMock = mockedAuth();
 const getSubscriptionStatusMock = vi.mocked(
   queries.subscribers.getSubscriptionStatus,
 );
@@ -36,9 +37,7 @@ const setup = customRenderServerAsync(
 
 describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockResolvedValue({
-      user: MOCK_ACCOUNT_USER,
-    });
+    authMock.mockResolvedValue(mockSession({ user: MOCK_ACCOUNT_USER }));
   });
 
   it.each([
