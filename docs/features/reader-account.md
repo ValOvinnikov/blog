@@ -1,7 +1,7 @@
 ---
 title: Reader account
 status: built
-layers: [db, web, ui]
+layers: [db, web, ui, platform-app]
 code:
   - apps/web/src/app/[tenant]/[locale]/account/**
   - apps/web/src/app/api/account/**
@@ -13,6 +13,7 @@ code:
   - apps/web/src/server/settings-features/is-reader-account-enabled/**
   - apps/web/src/metadata/account-metadata/**
   - apps/web/src/testing/pages/account-page/**
+  - apps/platform/src/components/features/capabilities/features-settings/**
   - packages/db/src/queries/account/**
 epics: [5047, 4979, 1040, 1041]
 ---
@@ -43,6 +44,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 ## Configuration
 
 - **Owner or operator (platform Features)** — bookmarks, comments and newsletter together decide whether reader accounts exist (`isReaderAccountEnabled`). Only Bookmarks is switchable: comments and newsletter are Coming soon and every Features save writes them off, so they count only through the preset default (`COMMENTS` on) when no `settings_features` row is stored, or through a stored row that predates the lock. On `FREE` none of the three is in the plan, so a `FREE` site has no reader accounts.
+- **Platform Features page** — while bookmarks, comments and newsletter are all off in the form (`hasReaderAccountFeature`), an info note tells the owner that nobody new can sign in and that readers already signed in keep their account page, to download or delete their data, until their session ends. Turning any of the three on hides it.
 - **Voice** — none; account copy is fixed (`accountPage.*`).
 - **Look** — the page renders through `@blog/ui` primitives (`Panel`, `SettingRow`) and follows the site's Look.
 
@@ -74,12 +76,14 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 - `apps/web/src/server/account/account-actions/account-actions.ts`
 - `apps/web/src/app/api/account/export/route.ts`
 - `apps/web/src/server/settings-features/is-reader-account-enabled/is-reader-account-enabled.ts`
+- `apps/platform/src/components/features/capabilities/features-settings/features-settings.tsx` — the Features page note
 - `packages/db/src/queries/account/` — `deleteAccount`, `exportAccountData`, `getLinkedProviders`, `unlinkProvider`, `updateDisplayName`
 
 ## Tests and stories
 
 - `apps/web/src/components/pages/account-page/**/*.test.tsx`, `apps/web/src/server/account/**/*.test.ts`, `apps/web/src/app/api/account/export/route.test.ts`, `apps/web/src/app/[tenant]/[locale]/account/page.test.tsx`, and the controls' own tests.
 - `packages/db/src/queries/account/**/*.test.ts`.
+- `apps/platform/src/components/features/capabilities/features-settings/features-settings.test.tsx` — the Features page note.
 - Story: `apps/web/src/components/pages/account-page/account-page-view.stories.tsx`; fixtures in `apps/web/src/testing/pages/account-page/`.
 
 ## Related

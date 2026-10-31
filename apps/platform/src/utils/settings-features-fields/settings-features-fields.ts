@@ -1,4 +1,8 @@
-import { CAPABILITY, type TCapability } from '@blog/config';
+import {
+  CAPABILITY,
+  READER_ACCOUNT_CAPABILITIES,
+  type TCapability,
+} from '@blog/config';
 
 export type TSettingsFeaturesValues = {
   commentsEnabled: boolean;
@@ -87,3 +91,13 @@ export const withComingSoonOff = (
   }
   return clamped;
 };
+
+const READER_ACCOUNT_FIELDS = CAPABILITY_TOGGLES.filter(({ capability }) =>
+  READER_ACCOUNT_CAPABILITIES.some(
+    (readerCapability) => readerCapability === capability,
+  ),
+).map(({ field }) => field);
+
+export const hasReaderAccountFeature = (
+  values: TSettingsFeaturesValues,
+): boolean => READER_ACCOUNT_FIELDS.some((field) => values[field]);

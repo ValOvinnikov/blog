@@ -1361,6 +1361,7 @@
     "switchOn": "Activado",
     "switchOff": "Desactivado",
     "capabilitiesHeading": "Funciones disponibles",
+    "readerAccountNote": "Guardados, comentarios y boletín están desactivados, así que nadie nuevo puede iniciar sesión en su sitio. Los lectores que ya han iniciado sesión aún pueden abrir la página de su cuenta para descargar o eliminar sus datos hasta que termine su sesión.",
     "toggleLabel": {
       "COMMENTS": "Comentarios",
       "RATINGS": "Valoraciones",

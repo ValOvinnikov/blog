@@ -1361,6 +1361,7 @@
     "switchOn": "On",
     "switchOff": "Off",
     "capabilitiesHeading": "Capabilities",
+    "readerAccountNote": "Bookmarks, comments and newsletter are all off, so nobody new can sign in to your site. Readers who are already signed in can still open their account page to download or delete their data until their session ends.",
     "toggleLabel": {
       "COMMENTS": "Comments",
       "RATINGS": "Ratings",

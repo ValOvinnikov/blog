@@ -1361,6 +1361,7 @@
     "switchOn": "An",
     "switchOff": "Aus",
     "capabilitiesHeading": "Verfügbare Funktionen",
+    "readerAccountNote": "Lesezeichen, Kommentare und Newsletter sind alle deaktiviert, daher kann sich niemand neu auf Ihrer Website anmelden. Bereits angemeldete Leser können ihre Kontoseite weiterhin öffnen, um ihre Daten herunterzuladen oder zu löschen, bis ihre Sitzung endet.",
     "toggleLabel": {
       "COMMENTS": "Kommentare",
       "RATINGS": "Bewertungen",

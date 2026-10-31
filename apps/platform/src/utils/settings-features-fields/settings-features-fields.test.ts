@@ -3,6 +3,7 @@ import { CAPABILITY } from '@blog/config';
 import {
   clampToEntitlement,
   featureDefaultsToValues,
+  hasReaderAccountFeature,
   keepStoredOutOfPlan,
   type TSettingsFeaturesValues,
   withComingSoonOff,
@@ -127,5 +128,26 @@ describe(withComingSoonOff, () => {
     const values = { ...ALL_OFF, bookmarksEnabled: true };
 
     expect(withComingSoonOff(values)).toEqual(values);
+  });
+});
+
+describe(hasReaderAccountFeature, () => {
+  it('is false when bookmarks, comments and newsletter are all off', () => {
+    expect(
+      hasReaderAccountFeature({
+        ...ALL_ON,
+        bookmarksEnabled: false,
+        commentsEnabled: false,
+        newsletterEnabled: false,
+      }),
+    ).toBe(false);
+  });
+
+  it.each([
+    'bookmarksEnabled',
+    'commentsEnabled',
+    'newsletterEnabled',
+  ] as const)('is true when only %s is on', (field) => {
+    expect(hasReaderAccountFeature({ ...ALL_OFF, [field]: true })).toBe(true);
   });
 });
