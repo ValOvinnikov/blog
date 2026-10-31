@@ -8,6 +8,7 @@ import {
   type TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
 import { Icon } from '@platform/components/shared/icon';
+import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -22,7 +23,14 @@ export type TTopbarNavMenuProps = {
 export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
   const t = useTranslations('topbarNavMenu');
   const pathname = usePathname();
-  const { trigger, popup, row: phoneRow } = topbarNavMenuVariants();
+  const {
+    trigger,
+    popup,
+    sectionLabel: phoneSectionLabel,
+    row: phoneRow,
+    note: phoneNote,
+  } = topbarNavMenuVariants();
+  const { popup: surfacePopup } = menuSurfaceVariants();
   const { switcherSlot, section, sectionLabel, row, note } = sidebarVariants();
 
   return (
@@ -36,12 +44,14 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">
-          <Menu.Popup className={popup()}>
+          <Menu.Popup className={surfacePopup({ class: popup() })}>
             {switcher && <div className={switcherSlot()}>{switcher}</div>}
 
             {sections.map((navSection) => (
               <Menu.Group className={section()} key={navSection.label}>
-                <Menu.GroupLabel className={sectionLabel()}>
+                <Menu.GroupLabel
+                  className={sectionLabel({ class: phoneSectionLabel() })}
+                >
                   {navSection.label}
                 </Menu.GroupLabel>
                 {navSection.items.length > 0
@@ -91,7 +101,9 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                       );
                     })
                   : navSection.note && (
-                      <p className={note()}>{navSection.note}</p>
+                      <p className={note({ class: phoneNote() })}>
+                        {navSection.note}
+                      </p>
                     )}
               </Menu.Group>
             ))}

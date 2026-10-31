@@ -13,11 +13,11 @@ export const topbarNavMenuVariants = tv({
       'data-[popup-open]:border-admin-brand data-[popup-open]:text-admin-text',
     ],
     popup: [
-      // Portalled outside the sidebar, so it carries the `--admin-side*` surface itself.
-      'w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-admin border',
-      'border-admin-side-line bg-admin-side py-2 shadow-admin-lg outline-none',
+      'w-72 max-w-[calc(100vw-2rem)] overflow-y-auto p-1.5',
       'max-h-[var(--available-height)]',
     ],
-    row: ['min-h-11 md:min-h-0'],
+    sectionLabel: ['text-admin-muted'],
+    row: ['min-h-11 text-admin-text md:min-h-0'],
+    note: ['text-admin-muted'],
   },
 });
