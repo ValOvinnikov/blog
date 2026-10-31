@@ -5,6 +5,7 @@ import { useSidebarCollapse } from '@platform/components/features/layout/sidebar
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { useTranslations } from 'next-intl';
 
 import { sidebarCollapseToggleVariants } from './sidebar-collapse-toggle-variants';
@@ -30,7 +31,7 @@ export const SidebarCollapseToggle = ({
       title={label}
       className={root({ class: className })}
     >
-      <Icon name={ICONS.CHEVRON_RIGHT} className={icon()} />
+      <Icon name={ICONS.CHEVRON_RIGHT} size={ICON_SIZE.XL} className={icon()} />
     </Button>
   );
 };

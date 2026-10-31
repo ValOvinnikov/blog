@@ -1,4 +1,3 @@
-import { SIZE } from '@blog/config';
 import {
   Icon,
   type TRegisteredIconName,
@@ -34,7 +33,7 @@ export const NavItemContent = ({
 
   return (
     <>
-      <Icon name={icon} size={SIZE.SM} className={rowIcon()} />
+      <Icon name={icon} className={rowIcon()} />
       <span className={rowBody()}>
         <span className={rowLabel()}>{label}</span>
         {disabledReason && (

@@ -1,4 +1,4 @@
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import {
   buttonVariants,
   type TButtonVariants,
@@ -34,7 +34,7 @@ export const ExternalLinkButton = ({
       title={title}
     >
       {children}
-      <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />
+      <Icon name={ICONS.EXTERNAL_LINK} />
     </ExternalLink>
   );
 };

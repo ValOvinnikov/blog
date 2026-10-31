@@ -32,7 +32,7 @@ export const SendTestEmailButton = ({
       isPending={isSending}
       pendingLabel={t('sendingTest')}
     >
-      <Icon name={ICONS.SEND} size={SIZE.SM} />
+      <Icon name={ICONS.SEND} />
       {t('sendTest')}
     </Button>
   );

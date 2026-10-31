@@ -1,6 +1,5 @@
 import {
   ICONS,
-  SIZE,
   SORT_DIRECTION,
   type TMaybeUndefined,
   type TSortDirection,
@@ -42,7 +41,6 @@ export const DataTableShellHeadCell = ({
         {direction && (
           <Icon
             name={ICONS.CHEVRON_DOWN}
-            size={SIZE.SM}
             className={sortIcon({
               isAscending: direction === SORT_DIRECTION.ASCENDING,
             })}

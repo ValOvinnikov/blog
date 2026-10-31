@@ -4,6 +4,7 @@ import { Collapsible } from '@base-ui/react/collapsible';
 import { ICONS } from '@blog/config';
 import type { THeadingLevel } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
 
 import {
@@ -41,7 +42,11 @@ export const Disclosure = ({
   const triggerButton = (
     <Collapsible.Trigger className={trigger()}>
       {summary}
-      <Icon name={ICONS.CHEVRON_RIGHT} className={chevron()} />
+      <Icon
+        name={ICONS.CHEVRON_RIGHT}
+        size={ICON_SIZE.XL}
+        className={chevron()}
+      />
     </Collapsible.Trigger>
   );
   const HeadingTag = headingLevel ? HEADING_TAGS[headingLevel] : undefined;

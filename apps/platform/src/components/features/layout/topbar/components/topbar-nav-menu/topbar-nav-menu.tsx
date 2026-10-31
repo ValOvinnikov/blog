@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import {
   sidebarVariants,
@@ -32,7 +32,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
         aria-label={t('triggerLabel')}
         title={t('triggerLabel')}
       >
-        <Icon name={ICONS.MENU} size={SIZE.SM} />
+        <Icon name={ICONS.MENU} />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">

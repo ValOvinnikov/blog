@@ -1,8 +1,8 @@
-import { SIZE } from '@blog/config';
 import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { Link } from '@platform/i18n/navigation';
 
 import { tileVariants } from './tile-variants';
@@ -25,7 +25,7 @@ export const Tile = ({ href, icon, title, description }: TTileProps) => {
 
   return (
     <Link href={href} className={root()}>
-      <Icon name={icon} size={SIZE.LG} className={iconSlot()} />
+      <Icon name={icon} size={ICON_SIZE.XXXL} className={iconSlot()} />
       <span className={text()}>
         <span className={titleSlot()}>{title}</span>
         <span className={descriptionSlot()}>{description}</span>

@@ -1,7 +1,6 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { Toolbar } from '@base-ui/react/toolbar';
 import { Tooltip } from '@base-ui/react/tooltip';
-import { SIZE } from '@blog/config';
 import {
   Icon,
   type TRegisteredIconName,
@@ -54,7 +53,7 @@ export const PortableTextEditorToggleButton = ({
         aria-controls={ariaControls}
         className={button()}
       >
-        <Icon name={icon} size={SIZE.SM} />
+        <Icon name={icon} />
       </Toolbar.Button>
       <Tooltip.Portal>
         <Tooltip.Positioner sideOffset={6}>

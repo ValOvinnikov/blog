@@ -106,7 +106,7 @@ export const Button = ({
             </span>
           </span>
         )}
-        {hasArrow && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
+        {hasArrow && <Icon name={ICONS.ARROW} />}
       </button>
       {hasPendingLabel && (
         <span role="status" aria-live="polite" className={srOnlyStatus()}>

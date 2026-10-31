@@ -2,6 +2,7 @@ import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import { ICONS } from '@blog/config';
 import { accordionVariants } from '@platform/components/shared/accordion/accordion-variants';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { AriaAttributes, ReactNode } from 'react';
 
 export type TAccordionTriggerProps = {
@@ -24,7 +25,11 @@ export const AccordionTrigger = ({
         className={trigger({ class: className })}
       >
         {children}
-        <Icon name={ICONS.CHEVRON_DOWN} className={chevron()} />
+        <Icon
+          name={ICONS.CHEVRON_DOWN}
+          size={ICON_SIZE.XL}
+          className={chevron()}
+        />
       </BaseAccordion.Trigger>
     </BaseAccordion.Header>
   );

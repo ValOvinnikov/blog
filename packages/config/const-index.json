@@ -2268,6 +2268,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.SM",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "MD": [
@@ -2288,6 +2294,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.MD",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "LG": [
@@ -2308,6 +2320,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.LG",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "XL": [
@@ -2328,6 +2346,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.XL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "NARROW": [
@@ -3160,6 +3184,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.XS",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "XXL": [
@@ -3168,6 +3198,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/size.ts"
+      },
+      {
+        "ref": "ICON_SIZE.XXL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "ascending": [
@@ -4802,6 +4838,30 @@
         "scope": "app:platform",
         "from": "@platform/constants/github",
         "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "XXXS": [
+      {
+        "ref": "ICON_SIZE.XXXS",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "XXS": [
+      {
+        "ref": "ICON_SIZE.XXS",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "XXXL": [
+      {
+        "ref": "ICON_SIZE.XXXL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "leads.delete_failed": [

@@ -7,6 +7,7 @@ import { Icon } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
@@ -38,7 +39,7 @@ export const TenantsView = ({
             href={adminRoutes.newTenant()}
             variant={BUTTON_VARIANT.PRIMARY}
           >
-            <Icon name={ICONS.PLUS} />
+            <Icon name={ICONS.PLUS} size={ICON_SIZE.XL} />
             {t('addTenant')}
           </LinkButton>
         }

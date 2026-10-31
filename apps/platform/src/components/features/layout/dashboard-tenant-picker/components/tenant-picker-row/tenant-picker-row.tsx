@@ -1,4 +1,4 @@
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { Link } from '@platform/i18n/navigation';
 import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
@@ -59,11 +59,7 @@ export const TenantPickerRow = ({ tenant }: TTenantPickerRowProps) => {
             )}
             <span>{tTenants(`plan.${plan}`)}</span>
           </span>
-          <Icon
-            name={ICONS.CHEVRON_RIGHT}
-            size={SIZE.SM}
-            className={chevron()}
-          />
+          <Icon name={ICONS.CHEVRON_RIGHT} className={chevron()} />
         </>
       )}
     </Link>

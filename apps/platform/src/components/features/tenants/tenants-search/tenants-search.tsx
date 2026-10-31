@@ -53,7 +53,7 @@ export const TenantsSearch = ({ listQuery }: TTenantsSearchProps) => {
               aria-label={clearLabel}
               className={clearButton()}
             >
-              <Icon name={ICONS.X} size={SIZE.SM} />
+              <Icon name={ICONS.X} />
             </Button>
           )}
         </div>

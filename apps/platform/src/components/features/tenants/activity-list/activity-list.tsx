@@ -2,7 +2,6 @@ import {
   AUDIT_ACTION,
   GITHUB_AUDIT_ACTOR_ID_PREFIX,
   ICONS,
-  SIZE,
   type TAuditAction,
   WORKER_AUDIT_ACTOR_ID,
 } from '@blog/config';
@@ -64,7 +63,7 @@ export const ActivityList = ({ events }: TActivityListProps) => {
         <CardList.Row key={event.id}>
           <CardList.Lead>
             <span className={activityIcon()}>
-              <Icon name={ACTIVITY_ICON[event.action]} size={SIZE.SM} />
+              <Icon name={ACTIVITY_ICON[event.action]} />
             </span>
           </CardList.Lead>
           <CardList.Primary>{t(`action.${event.action}`)}</CardList.Primary>
