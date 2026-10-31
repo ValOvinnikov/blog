@@ -1361,6 +1361,7 @@
     "switchOn": "Aan",
     "switchOff": "Uit",
     "capabilitiesHeading": "Mogelijkheden",
+    "readerAccountNote": "Bladwijzers, reacties en nieuwsbrief staan allemaal uit, dus niemand nieuw kan inloggen op je site. Lezers die al zijn ingelogd, kunnen hun accountpagina nog openen om hun gegevens te downloaden of te verwijderen tot hun sessie afloopt.",
     "toggleLabel": {
       "COMMENTS": "Reacties",
       "RATINGS": "Beoordelingen",

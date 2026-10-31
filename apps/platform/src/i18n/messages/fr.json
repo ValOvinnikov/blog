@@ -1361,6 +1361,7 @@
     "switchOn": "Activé",
     "switchOff": "Désactivé",
     "capabilitiesHeading": "Fonctionnalités disponibles",
+    "readerAccountNote": "Les favoris, les commentaires et la newsletter sont tous désactivés : personne de nouveau ne peut se connecter à votre site. Les lecteurs déjà connectés peuvent encore ouvrir la page de leur compte pour télécharger ou supprimer leurs données jusqu’à la fin de leur session.",
     "toggleLabel": {
       "COMMENTS": "Commentaires",
       "RATINGS": "Notes",

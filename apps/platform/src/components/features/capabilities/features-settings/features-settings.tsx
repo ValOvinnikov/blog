@@ -1,6 +1,7 @@
 'use client';
 
-import { FORM_STATUS, type TCapability } from '@blog/config';
+import { ALERT_TYPE, FORM_STATUS, type TCapability } from '@blog/config';
+import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import {
@@ -16,6 +17,7 @@ import {
 } from '@platform/server/settings-features/update-features-action';
 import {
   CAPABILITY_TOGGLES,
+  hasReaderAccountFeature,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { useRouter } from 'next/navigation';
@@ -95,6 +97,9 @@ export const FeaturesSettings = ({
       form={form}
       errorTitle={status === FORM_STATUS.ERROR ? t('alertError') : undefined}
     >
+      {!hasReaderAccountFeature(values) && (
+        <Alert type={ALERT_TYPE.INFO} description={t('readerAccountNote')} />
+      )}
       <Card>
         <Card.Header title={t('capabilitiesHeading')} />
         <Card.Body>

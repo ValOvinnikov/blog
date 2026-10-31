@@ -50,6 +50,7 @@ const {
   planLockedBadge,
   alertSuccess,
   alertError,
+  readerAccountNote,
   toggleLabel,
   toggleDescription,
 } = messages.featuresSettings;
@@ -348,6 +349,38 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     expect(alert).toHaveTextContent(alertError);
     expect(refresh).not.toHaveBeenCalled();
+  });
+
+  describe('with every reader feature off', () => {
+    beforeEach(() => {
+      setup({ initialValues: mockSettingsFeaturesValues() });
+    });
+
+    it('tells the owner signed-in readers keep their account page', () => {
+      const note = screen.getByText(readerAccountNote);
+
+      expect(note).toBeVisible();
+    });
+
+    it('withdraws the note once Bookmarks is switched on', async () => {
+      const bookmarksSwitch = screen.getByRole('switch', {
+        name: BOOKMARKS_LABEL,
+      });
+
+      await user.click(bookmarksSwitch);
+
+      const note = screen.queryByText(readerAccountNote);
+
+      expect(note).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows no reader-account note while a reader feature is on', () => {
+    setup();
+
+    const note = screen.queryByText(readerAccountNote);
+
+    expect(note).not.toBeInTheDocument();
   });
 
   describe('for an archived tenant', () => {
