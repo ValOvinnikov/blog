@@ -189,34 +189,42 @@ describe(runDeprovisioningStep, () => {
     });
   });
 
-  it.each([
-    ['has no management token', undefined],
-    [
-      'has no stored management robot id',
-      { ...MOCK_MANAGEMENT_CREDENTIALS, managementRobotId: null },
-    ],
-  ])(
-    'fails the step without revoking anything when the tenant %s',
-    async (_case, credentials) => {
-      vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue(
-        credentials,
-      );
+  it('logs and still succeeds when the tenant has no management token', async () => {
+    vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue(
+      undefined,
+    );
 
-      await expect(
-        run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
-      ).resolves.toEqual({
-        ok: false,
-        error: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
-      });
+    await expect(
+      run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
+    ).resolves.toEqual({ ok: true, data: undefined });
 
-      expect(listSanityRobotTokens).not.toHaveBeenCalled();
-      expect(deleteSanityRobotToken).not.toHaveBeenCalled();
-      expect(reportedStatuses()).toEqual([
-        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      ]);
-    },
-  );
+    expect(listSanityRobotTokens).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
+      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
+    );
+  });
+
+  it('fails the step without revoking anything when the tenant has no stored management robot id', async () => {
+    vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue({
+      ...MOCK_MANAGEMENT_CREDENTIALS,
+      managementRobotId: null,
+    });
+
+    await expect(
+      run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
+    ).resolves.toEqual({
+      ok: false,
+      error: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
+    });
+
+    expect(listSanityRobotTokens).not.toHaveBeenCalled();
+    expect(deleteSanityRobotToken).not.toHaveBeenCalled();
+    expect(reportedStatuses()).toEqual([
+      TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    ]);
+  });
 
   it('logs and still succeeds when the tokens cannot be revoked', async () => {
     vi.mocked(listSanityRobotTokens).mockRejectedValue(

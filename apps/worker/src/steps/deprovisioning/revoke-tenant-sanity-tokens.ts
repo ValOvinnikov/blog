@@ -19,11 +19,17 @@ export async function revokeTenantSanityTokens(tenant: TTenant): Promise<void> {
   if (!projectId) return;
 
   const credentials = await getTenantSanityManagementCredentials(tenantId);
-  const managementRobotId = credentials?.managementRobotId;
-  if (!credentials || !managementRobotId) {
+  if (!credentials) {
+    logger.error(DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT, {
+      tenantId,
+      error: 'no Sanity management token (sanityManagementTokenEncrypted)',
+    });
+    return;
+  }
+  const { token, managementRobotId } = credentials;
+  if (!managementRobotId) {
     throw new FatalError(missingManagementRobotIdMessage(tenantId));
   }
-  const { token } = credentials;
 
   try {
     const robots = await listSanityRobotTokens({ token, projectId });

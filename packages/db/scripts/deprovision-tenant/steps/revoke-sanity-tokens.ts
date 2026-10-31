@@ -58,11 +58,16 @@ export async function revokeTenantSanityTokens(
   }
 
   const credentials = await deps.getManagementCredentials(tenantId);
-  const managementRobotId = credentials?.managementRobotId;
-  if (!credentials || !managementRobotId) {
+  if (!credentials) {
+    console.error(
+      `deprovision-tenant: tenant "${tenantId}" has no Sanity management token (sanityManagementTokenEncrypted), so it holds no robot tokens of ours on project "${projectId}" — nothing to revoke.`,
+    );
+    return;
+  }
+  const { token, managementRobotId } = credentials;
+  if (!managementRobotId) {
     throw new Error(missingManagementRobotIdMessage(tenantId));
   }
-  const { token } = credentials;
 
   const robots = await listProjectRobots(token, projectId, deps);
   if (!robots) return;

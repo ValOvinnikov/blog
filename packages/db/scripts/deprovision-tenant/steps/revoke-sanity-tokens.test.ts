@@ -133,25 +133,30 @@ describe(revokeTenantSanityTokens, () => {
     ]);
   });
 
-  it.each([
-    ['has no management token', undefined],
-    [
-      'has no stored management robot id',
-      { ...MOCK_CREDENTIALS, managementRobotId: null },
-    ],
-  ])(
-    'throws and revokes nothing when the tenant %s',
-    async (_case, credentials) => {
-      getManagementCredentials.mockResolvedValueOnce(credentials);
+  it('resolves without calling Sanity when the tenant has no management token', async () => {
+    getManagementCredentials.mockResolvedValueOnce(undefined);
 
-      await expect(
-        revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),
-      ).rejects.toThrow(missingManagementRobotIdMessage(MOCK_TENANT.id));
+    await expect(
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),
+    ).resolves.toBeUndefined();
 
-      expect(listRobotTokens).not.toHaveBeenCalled();
-      expect(revokeToken).not.toHaveBeenCalled();
-    },
-  );
+    expect(listRobotTokens).not.toHaveBeenCalled();
+    expect(revokeToken).not.toHaveBeenCalled();
+  });
+
+  it('throws and revokes nothing when the tenant has no stored management robot id', async () => {
+    getManagementCredentials.mockResolvedValueOnce({
+      ...MOCK_CREDENTIALS,
+      managementRobotId: null,
+    });
+
+    await expect(
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),
+    ).rejects.toThrow(missingManagementRobotIdMessage(MOCK_TENANT.id));
+
+    expect(listRobotTokens).not.toHaveBeenCalled();
+    expect(revokeToken).not.toHaveBeenCalled();
+  });
 
   it('still attempts the other token when one revocation fails', async () => {
     listRobotTokens.mockResolvedValueOnce([MOCK_READ_ROBOT, MOCK_WRITE_ROBOT]);
