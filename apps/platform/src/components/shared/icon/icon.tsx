@@ -1,5 +1,5 @@
 import { isUndefined } from '@blog/utils/primitives';
-import { ICON_TEST_ID } from '@platform/constants/icon';
+import { ICON_SIZE, ICON_TEST_ID } from '@platform/constants/icon';
 
 import { ICON_REGISTRY, type TRegisteredIconName } from './icon-registry';
 import { iconVariants, type TIconVariants } from './icon-variants';
@@ -14,7 +14,7 @@ export type TIconProps = {
 
 export const Icon = ({
   name,
-  size,
+  size = ICON_SIZE.XL,
   strokeWidth,
   ariaLabel,
   className,

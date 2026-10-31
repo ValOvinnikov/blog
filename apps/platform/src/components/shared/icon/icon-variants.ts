@@ -17,9 +17,6 @@ export const iconVariants = tv({
       [ICON_SIZE.XXXL]: ['size-6'],
     },
   },
-  defaultVariants: {
-    size: ICON_SIZE.XL,
-  },
 });
 
 export type TIconVariants = VariantProps<typeof iconVariants>;
