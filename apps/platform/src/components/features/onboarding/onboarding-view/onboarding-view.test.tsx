@@ -7,6 +7,10 @@ import {
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
+  ONBOARDING_STEP,
+  type TOnboardingStep,
+} from '@platform/constants/onboarding';
+import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
 } from '@platform/constants/sign-up';
@@ -14,8 +18,18 @@ import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
+import {
+  ARIA_VALUEMAX,
+  ARIA_VALUENOW,
+  ARIA_VALUETEXT,
+} from '@platform/testing/aria';
 import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  isInaccessible,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_TENANT_NAME,
@@ -66,6 +80,7 @@ const { acceptTerms: ACCEPT_TERMS, termsNotAccepted: TERMS_NOT_ACCEPTED } =
   messages.termsAcceptance;
 const [ACCEPT_TERMS_LEAD] = ACCEPT_TERMS.split('<');
 const t = makeEnTranslator('onboardingForm');
+const STEP_ORDER = Object.values(ONBOARDING_STEP);
 
 const MOCK_NAME_FIELD = { name: NAME_LABEL };
 const MOCK_ADDRESS_FIELD = { name: SITE_ADDRESS_LABEL };
@@ -123,6 +138,30 @@ describe(`<${OnboardingView.name}/>`, () => {
 
   const stepHeading = (name: string) =>
     screen.getByRole('heading', { level: 1, name });
+
+  const stepProgress = () =>
+    screen.getByRole('progressbar', { name: STEPS_ARIA_LABEL });
+
+  const stepProgressText = (step: TOnboardingStep) =>
+    t('stepProgressNamed', {
+      n: STEP_ORDER.indexOf(step) + 1,
+      total: STEP_ORDER.length,
+      step: STEPS[step],
+    });
+
+  const expectProgressAt = (step: TOnboardingStep) => {
+    const progressBar = stepProgress();
+
+    expect(progressBar).toHaveAttribute(
+      ARIA_VALUENOW,
+      String(STEP_ORDER.indexOf(step) + 1),
+    );
+    expect(progressBar).toHaveAttribute(
+      ARIA_VALUEMAX,
+      String(STEP_ORDER.length),
+    );
+    expect(progressBar).toHaveAttribute(ARIA_VALUETEXT, stepProgressText(step));
+  };
 
   const clickContinue = async () => {
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
@@ -267,7 +306,7 @@ describe(`<${OnboardingView.name}/>`, () => {
     const accentSlider = screen.getByRole('slider', MOCK_ACCENT_SLIDER);
     await user.click(accentSlider);
     await user.keyboard('{ArrowRight}');
-    const movedHue = Number(accentSlider.getAttribute('aria-valuenow'));
+    const movedHue = Number(accentSlider.getAttribute(ARIA_VALUENOW));
     await clickContinue();
     await changeSiteTypeFromReview(SITE_TYPES.DOCS);
     await acceptAndCreate();
@@ -426,6 +465,48 @@ describe(`<${OnboardingView.name}/>`, () => {
     const stepSummary = within(steps).getByText(summary);
 
     expect(stepSummary).toBeVisible();
+  });
+
+  it('announces the first step as one named progress bar', () => {
+    expectProgressAt(ONBOARDING_STEP.SITE);
+  });
+
+  it('hides the visible step text from assistive tech', () => {
+    const visibleText = screen.getByText(
+      stepProgressText(ONBOARDING_STEP.SITE),
+    );
+
+    expect(isInaccessible(visibleText)).toBe(true);
+  });
+
+  it('moves the progress bar on to the next step on Continue', async () => {
+    await completeSiteStep();
+
+    expectProgressAt(ONBOARDING_STEP.ADDRESS);
+  });
+
+  it('moves the progress bar back a step on Back', async () => {
+    await completeSiteStep();
+    const backButton = screen.getByRole('button', MOCK_BACK);
+    await user.click(backButton);
+
+    expectProgressAt(ONBOARDING_STEP.SITE);
+  });
+
+  it('announces review as the last step', async () => {
+    await reachReview();
+
+    expectProgressAt(ONBOARDING_STEP.REVIEW);
+  });
+
+  it('moves the progress bar to the step opened from review', async () => {
+    await reachReview();
+    const editAddress = screen.getByRole('button', {
+      name: t('editField', { field: SITE_ADDRESS_LABEL }),
+    });
+    await user.click(editAddress);
+
+    expectProgressAt(ONBOARDING_STEP.ADDRESS);
   });
 
   it('opens a step from its Edit link on review', async () => {

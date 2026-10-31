@@ -6,7 +6,7 @@ export const segmentedProgressVariants = tv({
     root: ['flex flex-col gap-2.5'],
     label: ['text-admin-13 font-semibold'],
     track: ['flex gap-1.5'],
-    segment: ['h-1 flex-1 rounded-full'],
+    segment: ['h-1 flex-1 rounded-admin-bar'],
   },
   variants: {
     isOnDark: {

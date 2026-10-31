@@ -7,34 +7,33 @@ import { segmentedProgressVariants } from './segmented-progress-variants';
 type TSegmentedProgressProps = IWithClassName & {
   value: number;
   total: number;
-  label: string;
+  ariaLabel: string;
+  valueText: string;
   isOnDark?: boolean;
 };
 
 export const SegmentedProgress = ({
   value,
   total,
-  label,
+  ariaLabel,
+  valueText,
   isOnDark,
   className,
 }: TSegmentedProgressProps) => {
-  const {
-    root,
-    label: labelSlot,
-    track,
-  } = segmentedProgressVariants({
-    isOnDark,
-  });
+  const { root, label, track } = segmentedProgressVariants({ isOnDark });
 
   return (
     <Progress.Root
       value={value}
       max={total}
-      getAriaValueText={() => label}
+      aria-label={ariaLabel}
+      getAriaValueText={() => valueText}
       className={root({ class: className })}
     >
-      <Progress.Label className={labelSlot()}>{label}</Progress.Label>
-      <Progress.Track className={track()}>
+      <span aria-hidden="true" className={label()}>
+        {valueText}
+      </span>
+      <Progress.Track aria-hidden="true" className={track()}>
         {Array.from({ length: total }, (_, index) => {
           const state = toStepProgressState(index + 1, value);
 
