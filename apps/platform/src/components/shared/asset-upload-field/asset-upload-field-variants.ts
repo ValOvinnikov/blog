@@ -8,7 +8,7 @@ export const assetUploadFieldVariants = tv({
     top: ['flex items-center gap-3'],
     thumb: [
       'relative flex shrink-0 items-center justify-center overflow-hidden',
-      'border border-admin-line bg-admin-surface text-[10px] text-admin-faint',
+      'border border-admin-line bg-admin-surface text-[10px] text-admin-muted',
     ],
     thumbImage: ['object-contain'],
     text: ['min-w-0'],

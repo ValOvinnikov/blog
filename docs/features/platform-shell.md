@@ -73,7 +73,11 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   for an admin, `/dashboard` otherwise); `error.tsx` offers only Retry.
 
 Below `md` the sidebar is hidden and `TopbarNavMenu` carries the same sections.
-The Studio segment switches the content column to full-bleed (see
+The content column and the notices above it start at the sidebar's right
+edge, never centred: at most 1180px wide, with 26px padding from `md` and
+16px below, and any spare width on the right. The column adds no gap of its
+own; spacing between page children is each page's. The Studio segment
+switches the content column to full-bleed (see
 [embedded-studio](./embedded-studio.md)).
 
 ## Data

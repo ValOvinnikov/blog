@@ -18,7 +18,7 @@ export const portableTextEditorVariants = tv({
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
       INVALID_SURFACE_CLASSES,
     ],
-    placeholder: ['text-admin-faint'],
+    placeholder: ['text-admin-muted'],
   },
   variants: {
     mode: {
@@ -29,7 +29,7 @@ export const portableTextEditorVariants = tv({
       [CONTROL_MODE.DISABLED]: {
         editable: [
           DISABLED_READONLY_SURFACE_CLASSES,
-          'cursor-not-allowed text-admin-faint',
+          'cursor-not-allowed text-admin-muted',
         ],
       },
     },
