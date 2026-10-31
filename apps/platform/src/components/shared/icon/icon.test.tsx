@@ -9,7 +9,7 @@ import { Icon } from './icon';
 faker.seed(5995);
 
 const STROKE_WIDTH = 'stroke-width';
-const DEFAULT_STROKE_WIDTH = '1.6';
+const DEFAULT_STROKE_WIDTH = '2';
 const MOCK_ARIA_LABEL = faker.lorem.word();
 const MOCK_STROKE_WIDTH = 2.2;
 
