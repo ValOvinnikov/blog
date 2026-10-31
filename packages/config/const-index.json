@@ -4696,6 +4696,54 @@
         "file": "apps/platform/src/constants/github.ts"
       }
     ],
+    "PX_10": [
+      {
+        "ref": "ICON_SIZE.PX_10",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "PX_12": [
+      {
+        "ref": "ICON_SIZE.PX_12",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "PX_14": [
+      {
+        "ref": "ICON_SIZE.PX_14",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "PX_15": [
+      {
+        "ref": "ICON_SIZE.PX_15",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "PX_17": [
+      {
+        "ref": "ICON_SIZE.PX_17",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
+    "PX_20": [
+      {
+        "ref": "ICON_SIZE.PX_20",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
     "leads.delete_failed": [
       {
         "ref": "LEAD_LOG.DELETE_FAILED",

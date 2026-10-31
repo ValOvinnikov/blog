@@ -373,6 +373,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **GITHUB_RUN_CONCLUSION**: `SUCCESS`=`"success"`, `FAILURE`=`"failure"`, `SKIPPED`=`"skipped"`
 - **GITHUB_LOG**: `NOT_CONFIGURED`=`"github.not_configured"`, `RATE_LIMITED`=`"github.rate_limited"`, `REQUEST_ERROR`=`"github.request_error"`, `REQUEST_FAILED`=`"github.request_failed"`, `TAG_LIST_INCOMPLETE`=`"github.tag_list_incomplete"`, `UNEXPECTED_RESPONSE`=`"github.unexpected_response"`
 
+### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
+
+- **ICON_SIZE**: `PX_10`, `PX_12`, `PX_14`, `PX_15`, `PX_17`, `PX_20`
+
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
 - **LEAD_REFUSAL**: `NOT_FOUND`
