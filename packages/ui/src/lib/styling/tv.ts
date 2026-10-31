@@ -33,6 +33,7 @@ export const tv = createTV({
           {
             text: [
               'display',
+              'wordmark',
               'hero',
               'title-xl',
               'title-2xl',

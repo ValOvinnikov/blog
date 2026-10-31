@@ -48,7 +48,7 @@ The site footer closes every page with a copyright line, the site's social profi
 - A failed site-settings read renders no footer. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no social links and no switcher, and with the RSS link shown.
 - The footer's links (`TextLink` `appearance="nav"`), including the footer language codes, mark the current item with `aria-current="page"` and the active colour and underline.
 - `@blog/ui`'s `Footer` is a compound shell (`Footer.Nav`, `Footer.Copyright`) and stays prop-driven; `apps/web` composes the content.
-- The `Footer` lays out by its own width (container queries on `@container/footer`), never the window's, so it renders the same in any frame; on the public site it spans the window.
+- The `Footer` lays out by its own width (container queries on `@container/footer`), never the window's, so it renders the same in any frame; on the public site it spans the window. The Big wordmark's `text-wordmark` size scales with the footer's width (`cqi`) for the same reason.
 
 ## Dependencies
 
