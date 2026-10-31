@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { Switch } from '@platform/components/shared/switch';
+import { ICON_TEST_ID } from '@platform/constants/icon';
+import { ARIA_HIDDEN } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -16,7 +18,6 @@ const MOCK_LOCKED_REASON = faker.lorem.sentence();
 const MOCK_CONTROL_LABEL = faker.lorem.word();
 const MOCK_ARCHIVED_NOTICE_ID = faker.string.alpha(8);
 const MOCK_ARCHIVED_NOTICE = faker.lorem.sentence();
-const LOCK_ICON = '🔒';
 
 const setup = customRender(SettingRow, {
   label: MOCK_LABEL,
@@ -50,6 +51,14 @@ describe(`<${SettingRow.name}/>`, () => {
     expect(lockedReason).toBeVisible();
   });
 
+  it('shows a decorative lock icon beside the locked reason', () => {
+    setup({ isLocked: true, lockedReason: MOCK_LOCKED_REASON });
+
+    const lockIcon = screen.getByTestId(ICON_TEST_ID);
+
+    expect(lockIcon).toHaveAttribute(ARIA_HIDDEN, 'true');
+  });
+
   it('omits the locked reason when not locked, even if one is passed', () => {
     setup({ lockedReason: MOCK_LOCKED_REASON });
 
@@ -61,7 +70,7 @@ describe(`<${SettingRow.name}/>`, () => {
   it('omits the reason row when locked but no reason is given', () => {
     setup({ isLocked: true });
 
-    const lockIcon = screen.queryByText(LOCK_ICON);
+    const lockIcon = screen.queryByTestId(ICON_TEST_ID);
 
     expect(lockIcon).not.toBeInTheDocument();
   });
