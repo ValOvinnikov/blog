@@ -6,7 +6,7 @@ import type {
   TSanityLoginProvider,
 } from '@blog/config/constants';
 import type { ThemeColorSchemeKey } from '@sanity/ui';
-import type { FC } from 'react';
+import { type FC, useState } from 'react';
 import {
   StudioLayout,
   StudioProvider,
@@ -54,7 +54,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
   scheme,
   onSchemeChange,
 }) => {
-  const config = buildStudioConfig({
+  const params = {
     projectId,
     dataset,
     basePath,
@@ -64,12 +64,22 @@ export const StudioMount: FC<TStudioMountProps> = ({
     defaultLocale,
     liveLocales,
     loginProvider,
-  });
+  };
+  // Keyed by value: a new config makes Sanity re-resolve the workspace and
+  // reset pane state, and callers pass fresh arrays on every render.
+  const paramsKey = JSON.stringify(params);
+  const [built, setBuilt] = useState(() => ({
+    paramsKey,
+    config: buildStudioConfig(params),
+  }));
+  if (built.paramsKey !== paramsKey) {
+    setBuilt({ paramsKey, config: buildStudioConfig(params) });
+  }
 
   return (
     <div style={containerStyle}>
       <StudioProvider
-        config={config}
+        config={built.config}
         scheme={scheme}
         onSchemeChange={onSchemeChange}
       >
