@@ -124,9 +124,12 @@ jobs:
     with:
       environment: production
       ref: ${{ needs.validate.outputs.sha }}
+      label: ${{ needs.validate.outputs.version }}
     secrets:
       TENANT_REGISTRY_DATABASE_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      BACKUP_R2_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+      BACKUP_R2_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
 
   tag:
     name: Tag release

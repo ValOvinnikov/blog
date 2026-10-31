@@ -558,12 +558,12 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-prod**)
+      — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] Variable `BACKUP_R2_ENDPOINT` = `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
       and Variable `BACKUP_R2_BUCKET` = the backup bucket's name; Secrets
       `BACKUP_R2_ACCESS_KEY_ID` and `BACKUP_R2_SECRET_ACCESS_KEY` = the
       bucket-scoped R2 token — see "Repo level — release backup encryption"
       below.
-      — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] Every entry in **"Tenant lifecycle — both environments"** below, with this
       environment's own values. Every scheduled `recheck-tenant-owners.yml`
       sweep resolves them from here.
@@ -808,7 +808,11 @@ key can read a backup, so it never goes in a Secret, a Variable or the repo.
 2. In Cloudflare → R2, create a private bucket (no public access, no custom
    domain) and two lifecycle rules: delete objects under `release/` after 365
    days and under `daily/` after 30 days.
-3. Create an R2 API token with **Object Read & Write** on that bucket only (R2
+3. On the same bucket, add a bucket lock rule on the `release/` prefix with a
+   365-day retention, matching its lifecycle rule. The token below can delete
+   objects, and the lock is what stops a leaked token removing a release
+   backup before it expires.
+4. Create an R2 API token with **Object Read & Write** on that bucket only (R2
    has no write-only level), and set the four `BACKUP_R2_*` values on the
    `production` environment above.
 
@@ -1154,9 +1158,11 @@ it, leaving the old code serving the old (un-migrated) data.
 
 ### Restoring a release backup
 
-Each release stores `release/<tag>/sanity-prod.tar.gz.age` and
-`release/<tag>/db-prod.dump.age` in the backup bucket, kept for a year. With
-the offline private key:
+Each release stores `release/<tag>/sanity-prod.tar.gz.age`,
+`release/<tag>/db-prod.dump.age` and `release/<tag>/tenant-exports.tar.gz.age`
+in the backup bucket, kept for a year. A production `workflow_dispatch` of
+`migrate-tenant-content.yml` stores its exports under
+`release/run-<run id>-<attempt>/` instead. With the offline private key:
 
 ```sh
 # download, from the R2 dashboard or with any S3 client and a read token
@@ -1164,12 +1170,16 @@ age --decrypt --identity blog-backup.key \
   --output sanity-prod.tar.gz sanity-prod.tar.gz.age
 age --decrypt --identity blog-backup.key \
   --output db-prod.dump db-prod.dump.age
+age --decrypt --identity blog-backup.key \
+  --output tenant-exports.tar.gz tenant-exports.tar.gz.age
 tar -tzf sanity-prod.tar.gz | head   # a readable dataset export
 pg_restore --list db-prod.dump | head   # a readable custom-format dump
+tar -xzf tenant-exports.tar.gz   # tenant-exports/, one dataset export per tenant
 ```
 
-The dataset tarball imports with `sanity dataset import`; the dump restores
-with `pg_restore` into a fresh Neon branch. Delete the plaintext files when
+Each dataset tarball imports with `sanity dataset import`, a tenant's into
+that tenant's own project; the dump restores with `pg_restore` into a fresh
+Neon branch. Delete the plaintext files when
 done.
 
 ### Refreshing development from production (manual, post-migration)

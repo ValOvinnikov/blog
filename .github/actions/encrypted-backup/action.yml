@@ -4,7 +4,8 @@ description: Encrypt a backup file with age, delete the plaintext, and upload th
 inputs:
   file:
     description: Path of the plaintext backup on the runner; deleted whether or not the upload succeeds
-    required: true
+    required: false
+    default: ''
   name:
     description: 'Object key in the bucket, without the `.age` suffix. Starts with `release/` or `daily/`, the prefixes the bucket lifecycle rules retain for a year and 30 days.'
     required: true
@@ -23,6 +24,10 @@ inputs:
   secret-access-key:
     description: The bucket-scoped R2 token's secret access key
     required: true
+  check-only:
+    description: "'true' validates the settings and stops, so a job can fail before it produces the backup"
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -30,6 +35,7 @@ runs:
     - name: Encrypt and upload backup
       shell: bash
       env:
+        CHECK_ONLY: ${{ inputs.check-only }}
         BACKUP_FILE: ${{ inputs.file }}
         BACKUP_NAME: ${{ inputs.name }}
         BACKUP_AGE_RECIPIENT: ${{ inputs.recipient }}
@@ -43,8 +49,6 @@ runs:
         AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED
       run: |
         set -euo pipefail
-        ciphertext="${BACKUP_FILE}.age"
-        trap 'rm -f "$BACKUP_FILE" "$ciphertext"' EXIT
         # Checked here rather than in an `if:`, because a skipped step reports
         # green and a release with no backup would look successful.
         : "${BACKUP_AGE_RECIPIENT:?empty — set the BACKUP_AGE_RECIPIENT repo Variable to the backup age public key (docs/DEPLOY.md)}"
@@ -63,6 +67,11 @@ runs:
             exit 1
             ;;
         esac
+        if [ "$CHECK_ONLY" = true ]; then
+          exit 0
+        fi
+        ciphertext="${BACKUP_FILE}.age"
+        trap 'rm -f "$BACKUP_FILE" "$ciphertext"' EXIT
         if [ ! -s "$BACKUP_FILE" ]; then
           echo "::error::backup file $BACKUP_FILE is missing or empty." >&2
           exit 1
