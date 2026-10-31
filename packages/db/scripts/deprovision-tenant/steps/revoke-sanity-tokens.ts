@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config/types';
-import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants';
+import { getTenantSanityManagementCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-management-credentials';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   deleteSanityRobotToken,
