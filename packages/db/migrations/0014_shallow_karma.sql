@@ -1,1 +1,0 @@
-ALTER TABLE "tenants" ADD COLUMN "webhook_created_at" timestamp;

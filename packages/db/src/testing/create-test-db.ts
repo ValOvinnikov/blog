@@ -17,8 +17,3 @@ async function restoreSnapshot(snapshotPath: string): Promise<TTestDb> {
 export function createTestDb(): Promise<TTestDb> {
   return restoreSnapshot(inject('pgliteMigratedSnapshotPath'));
 }
-
-// A private in-memory database with no migration applied, for tests that replay migrations themselves.
-export function createEmptyTestDb(): Promise<TTestDb> {
-  return restoreSnapshot(inject('pgliteEmptySnapshotPath'));
-}

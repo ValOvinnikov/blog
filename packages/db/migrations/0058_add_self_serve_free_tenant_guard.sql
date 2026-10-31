@@ -1,2 +1,0 @@
-ALTER TABLE "tenants" ADD COLUMN "self_serve_owner_email_index" text;--> statement-breakpoint
-CREATE UNIQUE INDEX "tenants_self_serve_free_owner_idx" ON "tenants" USING btree ("self_serve_owner_email_index") WHERE "tenants"."plan" = 'FREE' and "tenants"."status" <> 'ARCHIVED';
