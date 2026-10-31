@@ -107,6 +107,10 @@
     "fallbackDescription": "Les derniers articles.",
     "feedLinkLabel": "Flux RSS"
   },
+  "siteFooter": {
+    "groupsAriaLabel": "Liens du pied de page",
+    "finePrintAriaLabel": "Mentions légales"
+  },
   "authMenu": {
     "signIn": "Se connecter",
     "signInHeading": "Se connecter",

@@ -22,6 +22,8 @@ export const VOICE_FIXED_KEYS = [
   'topicPage.paginationAriaLabel',
   'tagPage.paginationAriaLabel',
   'rss.feedLinkLabel',
+  'siteFooter.groupsAriaLabel',
+  'siteFooter.finePrintAriaLabel',
   'authMenu.emailAriaLabel',
   'authMenu.accountMenuAriaLabel',
   'authMenu.loadingAccountStatus',
