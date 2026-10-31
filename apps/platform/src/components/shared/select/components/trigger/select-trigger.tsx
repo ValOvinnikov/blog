@@ -2,7 +2,6 @@ import { Select as BaseSelect } from '@base-ui/react/select';
 import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { selectVariants } from '@platform/components/shared/select/select-variants';
-import { ICON_SIZE } from '@platform/constants/icon';
 import type { AriaAttributes, ReactNode } from 'react';
 
 export type TSelectTriggerProps = {
@@ -28,7 +27,7 @@ export const SelectTrigger = ({
     >
       {children}
       <BaseSelect.Icon className={icon()}>
-        <Icon name={ICONS.CHEVRON_DOWN} size={ICON_SIZE.MD} />
+        <Icon name={ICONS.CHEVRON_DOWN} />
       </BaseSelect.Icon>
     </BaseSelect.Trigger>
   );

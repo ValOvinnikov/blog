@@ -14,7 +14,7 @@ export type TIconProps = {
 
 export const Icon = ({
   name,
-  size = ICON_SIZE.XL,
+  size = ICON_SIZE.MD,
   strokeWidth,
   ariaLabel,
   className,

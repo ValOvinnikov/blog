@@ -11,7 +11,6 @@ import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
-import { ICON_SIZE } from '@platform/constants/icon';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -64,7 +63,7 @@ export const ActivityList = ({ events }: TActivityListProps) => {
         <CardList.Row key={event.id}>
           <CardList.Lead>
             <span className={activityIcon()}>
-              <Icon name={ACTIVITY_ICON[event.action]} size={ICON_SIZE.MD} />
+              <Icon name={ACTIVITY_ICON[event.action]} />
             </span>
           </CardList.Lead>
           <CardList.Primary>{t(`action.${event.action}`)}</CardList.Primary>

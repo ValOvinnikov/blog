@@ -6,7 +6,6 @@ import {
   StatusBadge,
   type TStatusBadgeProps,
 } from '@platform/components/shared/status-badge';
-import { ICON_SIZE } from '@platform/constants/icon';
 
 import { navItemContentVariants } from './nav-item-content-variants';
 
@@ -34,7 +33,7 @@ export const NavItemContent = ({
 
   return (
     <>
-      <Icon name={icon} size={ICON_SIZE.MD} className={rowIcon()} />
+      <Icon name={icon} className={rowIcon()} />
       <span className={rowBody()}>
         <span className={rowLabel()}>{label}</span>
         {disabledReason && (

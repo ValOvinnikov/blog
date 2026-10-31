@@ -7,7 +7,6 @@ import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
-import { ICON_SIZE } from '@platform/constants/icon';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
@@ -54,7 +53,7 @@ export const ProviderSignInButton = ({
       onClick={handleClick}
       className={providerSignInButtonVariants()}
     >
-      <Icon name={icon} size={ICON_SIZE.MD} />
+      <Icon name={icon} />
       {t(labelKey)}
     </Button>
   );

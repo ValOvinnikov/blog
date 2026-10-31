@@ -5,7 +5,6 @@ import { ICONS } from '@blog/config';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import { ICON_SIZE } from '@platform/constants/icon';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
@@ -62,11 +61,7 @@ export const TenantSwitcher = ({
           </span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
-        <Icon
-          name={ICONS.CHEVRON_RIGHT}
-          size={ICON_SIZE.MD}
-          className={chev()}
-        />
+        <Icon name={ICONS.CHEVRON_RIGHT} className={chev()} />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">

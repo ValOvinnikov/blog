@@ -3,6 +3,7 @@
 import { ICONS } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { useTranslations } from 'next-intl';
 import type { MouseEvent } from 'react';
 import { flushSync } from 'react-dom';
@@ -72,7 +73,7 @@ export const SaveBar = ({
       <span className={summary()}>
         {hasInvalidFields && (
           <>
-            <Icon name={ICONS.WARNING} />
+            <Icon name={ICONS.WARNING} size={ICON_SIZE.XL} />
             {saveError !== undefined && (
               <span className={count()}>{t('notSaved')}</span>
             )}
@@ -90,7 +91,7 @@ export const SaveBar = ({
         )}
         {!hasInvalidFields && saveError !== undefined && (
           <>
-            <Icon name={ICONS.WARNING} />
+            <Icon name={ICONS.WARNING} size={ICON_SIZE.XL} />
             <span role="alert" className={count()}>
               {saveError}
             </span>

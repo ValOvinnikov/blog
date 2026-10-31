@@ -5,7 +5,6 @@ import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
-import { ICON_SIZE } from '@platform/constants/icon';
 
 import { portableTextEditorToggleButtonVariants } from './portable-text-editor-toggle-button-variants';
 
@@ -54,7 +53,7 @@ export const PortableTextEditorToggleButton = ({
         aria-controls={ariaControls}
         className={button()}
       >
-        <Icon name={icon} size={ICON_SIZE.MD} />
+        <Icon name={icon} />
       </Toolbar.Button>
       <Tooltip.Portal>
         <Tooltip.Positioner sideOffset={6}>

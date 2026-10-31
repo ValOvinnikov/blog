@@ -4,7 +4,6 @@ import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
 import { useFieldErrorText } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-field-error-text';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
-import { ICON_SIZE } from '@platform/constants/icon';
 import {
   SITE_ADDRESS_STATUS,
   type TSiteAddressStatus,
@@ -61,7 +60,7 @@ export const AddressVerdict = ({
           {verdictStatus === SITE_ADDRESS_STATUS.CHECKING ? (
             <Spinner label="" size={SIZE.SM} />
           ) : (
-            <Icon name={VERDICT_ICON[verdictStatus]} size={ICON_SIZE.MD} />
+            <Icon name={VERDICT_ICON[verdictStatus]} />
           )}
         </span>
         <span id={messageId} className={message()}>

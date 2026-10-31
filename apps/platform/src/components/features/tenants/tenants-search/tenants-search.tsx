@@ -5,7 +5,6 @@ import { Button } from '@platform/components/shared/button';
 import { FormField } from '@platform/components/shared/form-field';
 import { Icon } from '@platform/components/shared/icon';
 import { TextInput } from '@platform/components/shared/text-input';
-import { ICON_SIZE } from '@platform/constants/icon';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTranslations } from 'next-intl';
 import { useRef, type FormEvent } from 'react';
@@ -53,7 +52,7 @@ export const TenantsSearch = ({ listQuery }: TTenantsSearchProps) => {
               aria-label={clearLabel}
               className={clearButton()}
             >
-              <Icon name={ICONS.X} size={ICON_SIZE.MD} />
+              <Icon name={ICONS.X} />
             </Button>
           )}
         </div>
