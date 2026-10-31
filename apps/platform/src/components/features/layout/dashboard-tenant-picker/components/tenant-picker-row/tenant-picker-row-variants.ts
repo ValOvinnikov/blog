@@ -19,7 +19,7 @@ export const tenantPickerRowVariants = tv({
     meta: [
       'flex flex-none gap-1.5 text-admin-13 whitespace-nowrap text-admin-muted',
     ],
-    separator: ['text-admin-faint'],
+    separator: ['text-admin-muted'],
     chevron: [
       'flex-none text-admin-faint transition-colors duration-base ease-smooth group-hover:text-admin-brand',
     ],
@@ -28,9 +28,7 @@ export const tenantPickerRowVariants = tv({
   variants: {
     isArchived: {
       true: {
-        tile: [
-          'border border-dashed border-admin-faint bg-transparent text-admin-faint',
-        ],
+        tile: ['border border-dashed border-admin-faint bg-transparent'],
         name: ['text-admin-muted'],
       },
     },

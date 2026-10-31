@@ -16,7 +16,7 @@ export const textInputVariants = tv({
   ],
   variants: {
     isDisabled: {
-      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-faint cursor-not-allowed`,
+      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-muted cursor-not-allowed`,
     },
     isReadOnly: {
       true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-muted`,
