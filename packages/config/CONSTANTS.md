@@ -466,6 +466,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **UPLOAD_REFUSAL**: `UPLOADS_NOT_CONFIGURED`, `FILE_MISSING`, `FILE_TOO_LARGE`, `UNREADABLE_IMAGE`, `UNRECOGNIZED_TARGET`, `BRAND_IMAGE_TYPE_UNSUPPORTED`, `IMAGE_TOO_SMALL`, `IMAGE_TOO_LARGE`, `FAVICON_NOT_SQUARE`, `SVG_FAVICON_NOT_SQUARE`, `EMAIL_LOGO_SVG`, `EMAIL_LOGO_WEBP`, `EMAIL_LOGO_TYPE_UNSUPPORTED`
 - **UPLOAD_OPERATION**: `UPLOAD`, `CLEAR`
 
+### `@platform/constants/voice` — `apps/platform/src/constants/voice.ts`
+
+- **VOICE_SECTION**: `ERROR_PAGES`, `EMPTY_STATES`
+
 ### `@platform/constants/worker` — `apps/platform/src/constants/worker.ts`
 
 - **WORKER_LOG**: `ENQUEUE_ERROR`=`"worker.enqueue_error"`, `ENQUEUE_SKIPPED`=`"worker.enqueue_skipped"`

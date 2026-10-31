@@ -11,6 +11,7 @@ import {
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 
 export type TVoiceField = (typeof VOICE_FIELDS)[number];
@@ -31,12 +32,23 @@ type TStoredVoiceOverrides = Partial<
   Record<TLocaleIsoCode, Partial<Record<string, unknown>>>
 >;
 
-export const VOICE_SURFACES_IN_PAGE_ORDER = [
-  VOICE_SURFACE.NOT_FOUND,
-  VOICE_SURFACE.ERROR,
-  VOICE_SURFACE.ARCHIVE,
-  VOICE_SURFACE.BOOKMARKS,
-] as const satisfies TVoiceSurface[];
+export const VOICE_SECTIONS_IN_PAGE_ORDER = [
+  VOICE_SECTION.ERROR_PAGES,
+  VOICE_SECTION.EMPTY_STATES,
+] as const satisfies TVoiceSection[];
+
+export const VOICE_SURFACES_BY_SECTION = {
+  [VOICE_SECTION.ERROR_PAGES]: [VOICE_SURFACE.NOT_FOUND, VOICE_SURFACE.ERROR],
+  [VOICE_SECTION.EMPTY_STATES]: [
+    VOICE_SURFACE.ARCHIVE,
+    VOICE_SURFACE.BOOKMARKS,
+  ],
+} as const satisfies Record<TVoiceSection, TVoiceSurface[]>;
+
+export const VOICE_SURFACES_IN_PAGE_ORDER =
+  VOICE_SECTIONS_IN_PAGE_ORDER.flatMap(
+    (section) => VOICE_SURFACES_BY_SECTION[section],
+  );
 
 export const voiceFieldsOf = (surface: TVoiceSurface): TVoiceField[] =>
   VOICE_FIELDS.filter((field) => field.surface === surface);
