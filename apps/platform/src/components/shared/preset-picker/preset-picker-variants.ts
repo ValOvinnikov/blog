@@ -37,7 +37,7 @@ export const presetPickerVariants = tv({
       [PRESET_ID.CONSOLE]: {
         mini: ['bg-[#0f1115]'],
         miniPrimary: ['text-[oklch(0.7_0.16_250)]'],
-        miniSecondary: ['text-admin-side-text'],
+        miniSecondary: ['text-[#c9cfda]'],
       },
       [PRESET_ID.EDITORIAL]: {
         mini: ['bg-[#fbf7f0]'],
