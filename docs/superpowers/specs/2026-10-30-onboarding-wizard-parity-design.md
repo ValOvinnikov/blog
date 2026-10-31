@@ -115,7 +115,7 @@ boards (each difference is owned by a ticket in §16):
   widths 1280 / 820 / 390 scaled to fit, the icon toolbar for device and
   Light/Dark with aria-labels and tooltips, the sample header switching by
   frame width via container queries, no Newsletter specimen — is introduced
-  once (#6390), adopted by Look (NEW-look-23 (not yet filed)), then by onboarding
+  once (#6390), adopted by Look (#6426), then by onboarding
   (#6332), in that order. Onboarding keeps a readout of the chosen site
   address, because the address is what the wizard is choosing, and leaves out
   the reader switch and the follow control (§11).
@@ -184,7 +184,7 @@ Status of every decision D-1 to D-33 after the resolutions and the gap boards.
 | D-13 | Site step fields side by side                    | board      | Stacked at every width (W2 step 1); #6301's container-query pairing is removed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | D-14 | Rail landmark                                    | rule       | One `header`, an `ol` named "Setup steps", no `nav` (`platform-ui-practices` bans a nav around a list with no links). The boards' `nav` is not built.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | D-15 | Shared rail parts used by the workspace picker   | rule       | The picker is on no chosen board, so it stays as it is: the wizard sizes reach `RailBrand` / `RailIntro` / `BrandMark` through a prop. The picker also stays dark (it moves to the `rail` tokens with the wizard, §14).                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| D-16 | Preset picker anatomy                            | rule (X20) | The wizard takes W2's card anatomy (#6329, in `SH/preset-picker/`). The Look page takes LX's compact strip (NEW-look-19 (not yet filed), built in `features/look/look-form/components/preset-card/`, which stops rendering the shared picker on the Look page; #6395 extends it). Because the Look page's use of the picker changes under both, X20 and resolutions § 4 keep NEW-look-19 and #6395 never in parallel with #6329. Until NEW-look-19 lands, the Look page shows the W2 card.                                                                                                                                                                |
+| D-16 | Preset picker anatomy                            | rule (X20) | The wizard takes W2's card anatomy (#6329, in `SH/preset-picker/`). The Look page takes LX's compact strip (#6425, built in `features/look/look-form/components/preset-card/`, which stops rendering the shared picker on the Look page; #6395 extends it). Because the Look page's use of the picker changes under both, X20 and resolutions § 4 keep #6425 and #6395 never in parallel with #6329. Until #6425 lands, the Look page shows the W2 card.                                                                                                                                                                                                  |
 | D-17 | Button shadow                                    | board      | No shadow on the wizard's `LG` buttons.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | D-18 | FormField hint position                          | rule (X18) | Hint below the control in the wizard only, through a FormField option. Other admin forms keep the hint above.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | D-19 | Sample header extras                             | user (X21) | Superseded: the shared sample header follows the tenant (Look D-34). In the wizard: three-layer mark, name, Posts / About / Topics, language switcher, theme toggle, no Sign in; name plus Menu under 1024px of frame width (§11.4).                                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -478,8 +478,8 @@ Keyboard focus keeps the shared focus-visible ring on the card.
 
 This is the wizard's card (X20). The Look page renders the shared
 `PresetPicker` today through `features/look/look-form/components/preset-card/`,
-so until NEW-look-19 replaces that with LX's strip the Look page shows this
-card and keeps its group name "Preset". NEW-look-19 and #6395 build the
+so until #6425 replaces that with LX's strip the Look page shows this
+card and keeps its group name "Preset". #6425 and #6395 build the
 strip inside `preset-card/` and never edit `SH/preset-picker/`, so they share
 no file with the wizard tickets.
 
@@ -536,7 +536,7 @@ the 120px `dt`, and Edit grows to 44×44.
 The wizard adopts the shared LX device-frame preview (X21). The shared parts —
 `PreviewFrame`'s heading row and readout, the `PreviewToolbar` with its icon
 groups and tooltips, `DeviceFrame` and its scale rule, the LX sample — are
-introduced by #6390 and first adopted by Look in NEW-look-23; their
+introduced by #6390 and first adopted by Look in #6426; their
 values live in the Look spec § 12. This section states what the wizard adds,
 leaves out and shows. W2's browser-chrome preview (old E67–E87, E114–E127, the
 `#c9ced6` chrome dots, the 480px container switch and the compact chrome
@@ -676,7 +676,7 @@ tokens.
 | Back / Continue / Create site                                                                                                                                   | `onboardingForm.back` / `continue` / `createSite`                     | existing                                                    | fixed            |
 | Live preview / Preview colour scheme / Light / Dark                                                                                                             | `previewModeControl.*`                                                | existing                                                    | fixed            |
 | Desktop                                                                                                                                                         | `lookPreview.widthDesktop`                                            | existing                                                    | fixed            |
-| Tablet, Phone, Preview device, Preview options, the three device tooltips, "{width} px wide · shown at {percent}%", "Sample page at {width} px", "Latest posts" | shared preview keys                                                   | new, **added by #6390 / NEW-look-23**, not by this set      | fixed            |
+| Tablet, Phone, Preview device, Preview options, the three device tooltips, "{width} px wide · shown at {percent}%", "Sample page at {width} px", "Latest posts" | shared preview keys                                                   | new, **added by #6390 / #6426**, not by this set            | fixed            |
 | sample site copy                                                                                                                                                | `lookPreview.*`                                                       | existing (the Look sample's)                                | fixed            |
 
 No public-site copy is added or changed. This set adds at most two keys
@@ -780,7 +780,7 @@ Path prefixes: `OF` = `apps/platform/src/components/features/onboarding/onboardi
 | #6333 dark             | the wizard's variant files where a Dark value in §14.1 is not already a token (`OF/onboarding-form-variants.ts` preview-column rule, phone wrapper and action bar rules; `OF/components/onboarding-rail/*` header border if D-27 takes it; `SH/preset-picker/*` selected tone and card ground; `SH/hue-slider/*` thumb; the Back ground comes from the `LG` secondary in `SH/button/button-variants.ts`), plus whatever `gap-onboarding-dark-steps` draws among `SH/option-select/*`, `SH/text-input/*`, `OF/components/address-step-fields/*` (suffix), `OF/components/address-verdict/*` (verdict chip), `SH/detail-list/*` (bordered rows), `SH/button/*` (link variant) and `SH/checkbox/*`                                                                                                                                                                                                                             | §14.1                                                                                                                                                                                                                                                                                                                    |
 
 The shared primitives whose look changes for every consumer are the
-`PresetPicker` card (until NEW-look-19 gives Look its strip), the
+`PresetPicker` card (until #6425 gives Look its strip), the
 `HueSlider` thumb and labelling, and the new `AccentSwatch`, which the Look
 page's Colour card moves to with its look unchanged. Every other change is a variant, size or option
 on a shared primitive whose only consumer is the wizard, so it ships in the PR
@@ -823,7 +823,7 @@ ticket touches (§15), never from numbering.
 8. #6331 Review step (§10). Needs 4 (Button `LG`, `onboarding-actions/*`),
    7 (`AccentSwatch`), #6337 (the link colour it reuses, `button/`) and
    #6356 (the detail-list metrics its variant builds on).
-9. #6332 preview (§11). Needs NEW-look-23 (Look adopts the shared preview
+9. #6332 preview (§11). Needs #6426 (Look adopts the shared preview
    first, the user's order), 4 (the column, wrapper and Rail placement) and
    device-frame frame E drawn (§1).
 10. #6333 Dark (§14.1). Needs #6291 (dark palette), 1a, 2, 3, 4, 5, 7, 8, 9, 10, #6390
@@ -832,7 +832,7 @@ ticket touches (§15), never from numbering.
     checks the criteria of 1, 1a and 1b, which have no other check.
 
 1 runs after 0 and 2 after #6337, in parallel; 1a and 1b run beside each
-other; 9 can run beside 5–8 once NEW-look-23 is in.
+other; 9 can run beside 5–8 once #6426 is in.
 
 **Never in parallel with other sets (same files; order free unless an edge
 above fixes it):**
@@ -840,7 +840,7 @@ above fixes it):**
 `SH/form-field/`, `text-input/`, `option-select/` — #6325, #6333,
 #6337, #6339, #6343, #6384, #6385; `SH/preset-picker/` —
 #6322 (`preset-picker-variants.ts`), #6329, #6333, #6339, #6291,
-NEW-look-19, #6395 (X20: the two Look tickets build in
+#6425, #6395 (X20: the two Look tickets build in
 `features/look/look-form/components/preset-card/` and take the Look page off
 the shared picker);
 `SH/accent-swatch/` and `colour-card/` — #6330, #6394 (then
@@ -850,7 +850,7 @@ the shared picker);
 #6333, #6356, #6359, #6409, #6383; `SH/step-indicator/` —
 #6322, #6328, #6291; `LY/dashboard-tenant-picker/` — #6323,
 #6340, #6291; `preview-frame/` — #6332,
-#6390, #6406, NEW-look-23 (#6332 only adopts `device-frame/`); `LY/signed-in-account/` — #6322,
+#6390, #6406, #6426 (#6332 only adopts `device-frame/`); `LY/signed-in-account/` — #6322,
 #6287, #6288, #6375; onboarding's site address — #6332 and #6351
 (which goes last).
 

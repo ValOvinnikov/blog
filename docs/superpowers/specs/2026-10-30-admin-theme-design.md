@@ -1261,7 +1261,7 @@ sidebar tickets; `form-field/`, `text-input/`, `select/`, `option-select/`,
 follows #6338); `shared/portable-text-editor/` — #6339, #6336 with
 #6412; `layout/tenant-switcher/` — #6288, #6335 with #6379; `shared/accordion/` —
 #6339 with #6411 and #6386; `shared/preset-picker/` —
-#6339 and #6291 with NEW-look-19 (not yet filed), #6395 and #6329 (#6291 after
+#6339 and #6291 with #6425, #6395 and #6329 (#6291 after
 #6339); `shared/step-indicator/` — #6291 with #6327 and #6328;
 `layout/dashboard-tenant-picker/` — #6340 with #6336 (#6291 after
 both); owner-home tiles — #6340 with #6360. `shared/hue-slider/`,
