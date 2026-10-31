@@ -5,6 +5,8 @@ export const onboardingFormVariants = tv({
     root: [
       'min-h-dvh w-full bg-admin-bg text-admin-text',
       'md:grid md:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]',
+      // Clears the pinned actions bar at its tallest: a long address verdict stacked above the buttons on a phone.
+      '[html:has(&)]:scroll-pb-48',
     ],
     main: ['min-w-0'],
     form: [

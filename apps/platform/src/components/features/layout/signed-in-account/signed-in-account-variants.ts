@@ -12,11 +12,11 @@ export const signedInAccountVariants = tv({
     surface: {
       card: {},
       rail: {
-        email: ['hidden text-admin-side-muted lg:block'],
+        email: ['hidden text-admin-side-muted md:block'],
         signOut: [
           'text-admin-side-text hover:bg-admin-side-raised hover:text-white',
           // Keeps the 44px tap target from growing the 26px brand row of the phone band.
-          '-my-[9px] lg:my-0',
+          '-my-[9px] md:my-0',
         ],
       },
       railFooter: {
