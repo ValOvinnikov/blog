@@ -4734,6 +4734,54 @@
         "file": "apps/platform/src/constants/email-test.ts"
       }
     ],
+    "SIDE": [
+      {
+        "ref": "FOCUS_RING_GROUND.SIDE",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "BG": [
+      {
+        "ref": "FOCUS_RING_GROUND.BG",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "SURFACE": [
+      {
+        "ref": "FOCUS_RING_GROUND.SURFACE",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "SURFACE_HEAD": [
+      {
+        "ref": "FOCUS_RING_GROUND.SURFACE_HEAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "POPOVER": [
+      {
+        "ref": "FOCUS_RING_GROUND.POPOVER",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "THEME_TRACK": [
+      {
+        "ref": "FOCUS_RING_GROUND.THEME_TRACK",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
     "GITHUB_ERROR": [
       {
         "ref": "GITHUB_FAILURE.GITHUB_ERROR",

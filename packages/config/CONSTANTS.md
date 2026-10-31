@@ -373,6 +373,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_TEST_LOG**: `SEND_FAILED`=`"email_test.send_failed"`
 
+### `@platform/constants/focus-ring` — `apps/platform/src/constants/focus-ring.ts`
+
+- **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`
+
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`
