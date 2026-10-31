@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const footerVariants = tv({
   slots: {
-    root: ['group/footer w-full'],
+    root: ['group/footer @container/footer w-full'],
     inner: [
       'flex flex-col gap-10',
       'mx-auto w-full max-w-page min-w-0 px-gutter py-10',
@@ -14,29 +14,30 @@ export const footerVariants = tv({
     brand: ['flex min-w-0 flex-col gap-4'],
     divider: ['-mb-4 border-0 border-t border-border'],
     bottom: [
-      'flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between',
+      'flex min-w-0 flex-col gap-3',
+      '@min-[40rem]/footer:flex-row @min-[40rem]/footer:flex-wrap @min-[40rem]/footer:items-center @min-[40rem]/footer:justify-between',
     ],
   },
   variants: {
     layout: {
       [FOOTER_LAYOUT.COLUMNS]: {
-        main: ['lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]'],
+        main: ['@min-[64rem]/footer:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]'],
       },
       [FOOTER_LAYOUT.CENTRED]: {
         inner: ['text-center'],
         brand: ['items-center'],
-        bottom: ['items-center sm:justify-center'],
+        bottom: ['items-center @min-[40rem]/footer:justify-center'],
       },
       [FOOTER_LAYOUT.COMPACT]: {
         inner: [
           'gap-3 py-[0.875rem]',
-          'sm:flex-row sm:flex-wrap sm:items-center sm:justify-between',
+          '@min-[40rem]/footer:flex-row @min-[40rem]/footer:flex-wrap @min-[40rem]/footer:items-center @min-[40rem]/footer:justify-between',
         ],
         main: ['flex'],
-        bottom: ['sm:flex-1'],
+        bottom: ['@min-[40rem]/footer:flex-1'],
       },
       [FOOTER_LAYOUT.BIG_WORDMARK]: {
-        main: ['lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]'],
+        main: ['@min-[64rem]/footer:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]'],
       },
     },
     surface: {

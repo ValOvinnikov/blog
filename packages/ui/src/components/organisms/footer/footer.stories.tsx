@@ -169,9 +169,16 @@ export const CardSkinsDark: TStory = {
   globals: { theme: 'dark' },
 };
 
-// The groups' two-per-row grid only applies below `md`, so this pins the narrow canvas.
-export const Phone: TStory = {
-  globals: { viewport: 'phone' },
+const AllLayoutsNarrow = (args: TFooterProps) => (
+  <div className="flex max-w-[24rem] flex-col gap-8">
+    {Object.values(FOOTER_LAYOUT).map((layout) => (
+      <Footer key={layout} {...args} layout={layout} />
+    ))}
+  </div>
+);
+
+export const NarrowContainer: TStory = {
+  render: AllLayoutsNarrow,
 };
 
 export const WithoutGroupsAboutOrAddress: TStory = {
