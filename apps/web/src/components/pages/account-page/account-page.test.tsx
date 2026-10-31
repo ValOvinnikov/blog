@@ -4,9 +4,10 @@ import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
-import { auth } from '@web/server/auth/auth';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { mockSession } from '@web/testing/shared/session/fixtures';
+import { mockedAuth } from '@web/testing/shared/session/mocked-auth';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
 
@@ -36,7 +37,7 @@ const IDENTITY_TITLE = 'Connected accounts';
 const NEWSLETTER_TITLE = 'Newsletter';
 const PRIVACY_TITLE = 'Privacy';
 
-const authMock = vi.mocked(auth as () => Promise<unknown>);
+const authMock = mockedAuth();
 
 const setup = customRenderServerAsync(
   AccountPage,
@@ -49,9 +50,7 @@ describe(`<${AccountPage.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    authMock.mockResolvedValue({
-      user: MOCK_ACCOUNT_USER,
-    });
+    authMock.mockResolvedValue(mockSession({ user: MOCK_ACCOUNT_USER }));
     vi.mocked(queries.account.getLinkedProviders).mockResolvedValue({
       github: true,
       google: false,

@@ -1,8 +1,5 @@
-import { auth } from '@web/server/auth/auth';
-import type { Session } from 'next-auth';
+import { mockedAuth } from './mocked-auth';
 
 export const arrangeNoSessionOnce = (): void => {
-  vi.mocked(
-    auth as unknown as () => Promise<Session | null>,
-  ).mockResolvedValueOnce(null);
+  mockedAuth().mockResolvedValueOnce(null);
 };
