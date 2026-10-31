@@ -3,24 +3,24 @@ import { useId, useState } from 'react';
 
 import type { TView } from './view-tabs';
 
-export const useViewTabs = () => {
+export const useViewTabs = ({ isTabbed }: { isTabbed?: boolean } = {}) => {
   const ids = {
     edit: { tab: useId(), panel: useId() },
     preview: { tab: useId(), panel: useId() },
   };
   const [view, setView] = useState<TView>('edit');
-  // Tailwind's `lg`, where the view tabs hide and both panels show.
-  const isTabbed = !useMediaQuery('(width >= 64rem)');
+  const isBelowLg = !useMediaQuery('(width >= 64rem)');
+  const hasTabPanels = isTabbed ?? isBelowLg;
 
   const panelProps = (panel: TView) => ({
     id: ids[panel].panel,
-    role: isTabbed ? 'tabpanel' : undefined,
-    'aria-labelledby': isTabbed ? ids[panel].tab : undefined,
+    role: hasTabPanels ? 'tabpanel' : undefined,
+    'aria-labelledby': hasTabPanels ? ids[panel].tab : undefined,
   });
 
   return {
     view,
-    tabsProps: { value: view, onChange: setView, ids },
+    tabsProps: { value: view, onChange: setView, ids, isTabbed },
     panelProps,
   };
 };

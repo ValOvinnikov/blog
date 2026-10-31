@@ -6192,6 +6192,22 @@
         "file": "apps/platform/src/constants/upload.ts"
       }
     ],
+    "SEGMENTED": [
+      {
+        "ref": "VIEW_TABS_VARIANT.SEGMENTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/view-tabs",
+        "file": "apps/platform/src/constants/view-tabs.ts"
+      }
+    ],
+    "UNDERLINE": [
+      {
+        "ref": "VIEW_TABS_VARIANT.UNDERLINE",
+        "scope": "app:platform",
+        "from": "@platform/constants/view-tabs",
+        "file": "apps/platform/src/constants/view-tabs.ts"
+      }
+    ],
     "ERROR_PAGES": [
       {
         "ref": "VOICE_SECTION.ERROR_PAGES",
