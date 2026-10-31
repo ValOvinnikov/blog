@@ -17,5 +17,8 @@ test('buildModule lists ids in migration run order', () => {
 });
 
 test('buildModule emits an empty list when there are no migrations', () => {
-  assert.match(buildModule([]), /= \[\n\] as const;/);
+  assert.match(
+    buildModule([]),
+    /\nexport const STUDIO_MIGRATION_IDS = \[\] as const;\n$/,
+  );
 });

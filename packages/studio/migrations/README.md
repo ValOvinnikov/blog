@@ -27,7 +27,7 @@ order across migrations authored on different branches/dates:
 packages/studio/migrations/
   <timestamp>-<slug>/
     index.ts        # export default defineMigration({ ... })
-  lib/               # pure helpers shared by two or more migrations
+  lib/               # pure helpers shared by two or more migrations (added when needed)
   backups/           # dataset export backups — gitignored, see below
   README.md          # this file
 ```
