@@ -50,7 +50,6 @@ export const TenantsSearch = ({ listQuery }: TTenantsSearchProps) => {
               size={SIZE.SM}
               onClick={handleClear}
               aria-label={clearLabel}
-              title={clearLabel}
               className={clearButton()}
             >
               <Icon name={ICONS.X} size={SIZE.SM} />

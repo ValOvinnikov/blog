@@ -51,7 +51,9 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   The search applies 300ms after typing pauses, or at once on Enter, ignores
   surrounding spaces, keeps focus in the field while results update, and has
   its own clear button in place of the browser's native one. Each applied
-  search is a fresh server query. Visibility, sort and search live in the URL
+  search is a fresh server query that replaces the history entry rather than
+  adding one, and a late response for an older search never overwrites newer
+  typing. Visibility, sort and search live in the URL
   (`?archived=1&sort=<column>&direction=<ascending|descending>&q=`), so a
   reload or shared link keeps them; `listTenants`' own default order stays by
   name, which the dashboard tenant picker relies on.

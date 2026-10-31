@@ -1,50 +1,55 @@
-import type { TMaybeUndefined } from '@blog/config/types';
+import { TENANTS_SEARCH_DEBOUNCE_MS } from '@platform/constants/tenant';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-export const TENANTS_SEARCH_DEBOUNCE_MS = 300;
+import { useDebouncedCallback } from './use-debounced-callback';
 
 export const useTenantsSearch = (listQuery: TTenantsListQuery) => {
-  const { navigate } = useTenantsListNavigation(listQuery);
+  const { navigateInPlace } = useTenantsListNavigation(listQuery);
   const [value, setValue] = useState(listQuery.search);
-  const [requestedSearch, setRequestedSearch] = useState(listQuery.search);
   const [shownSearch, setShownSearch] = useState(listQuery.search);
-  const timer =
-    useRef<TMaybeUndefined<ReturnType<typeof setTimeout>>>(undefined);
+  const [requestedSearches, setRequestedSearches] = useState<string[]>([]);
+  const latestSearch = requestedSearches.at(-1) ?? listQuery.search;
 
-  // A URL change this field did not request (a nav link, back/forward) replaces what was typed.
   if (listQuery.search !== shownSearch) {
     setShownSearch(listQuery.search);
-    if (listQuery.search !== requestedSearch) {
-      setRequestedSearch(listQuery.search);
+    const ownIndex = requestedSearches.lastIndexOf(listQuery.search);
+    if (ownIndex === -1) {
+      setRequestedSearches([]);
       setValue(listQuery.search);
+    } else {
+      setRequestedSearches(requestedSearches.slice(ownIndex + 1));
     }
   }
 
-  useEffect(() => () => clearTimeout(timer.current), []);
-
-  const apply = (nextValue: string) => {
-    clearTimeout(timer.current);
+  const request = (nextValue: string) => {
     const search = nextValue.trim();
-    if (search === requestedSearch) return;
-    setRequestedSearch(search);
-    navigate({ search });
+    if (search !== latestSearch) {
+      setRequestedSearches([...requestedSearches, search]);
+    }
+    navigateInPlace({ search });
   };
+
+  const debounced = useDebouncedCallback((nextValue: string) => {
+    if (nextValue.trim() !== latestSearch) request(nextValue);
+  }, TENANTS_SEARCH_DEBOUNCE_MS);
 
   const change = (nextValue: string) => {
     setValue(nextValue);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(
-      () => apply(nextValue),
-      TENANTS_SEARCH_DEBOUNCE_MS,
-    );
+    debounced.schedule(nextValue);
+  };
+
+  const submit = () => {
+    debounced.cancel();
+    request(value);
   };
 
   const clear = () => {
     setValue('');
-    apply('');
+    debounced.cancel();
+    request('');
   };
 
-  return { value, change, submit: () => apply(value), clear };
+  return { value, change, submit, clear };
 };
