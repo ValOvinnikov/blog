@@ -19,7 +19,11 @@ import { hasArrayGotItems } from '@blog/utils/primitives';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
-import { hasOwnerEmail, type TOwnerAccessTarget } from './owner-access-target';
+import {
+  hasOwnerEmail,
+  type TOwnerAccessTarget,
+  tokenForRoleChange,
+} from './owner-access-target';
 
 function findFormerEmails(
   target: TOwnerAccessTarget,
@@ -56,8 +60,7 @@ async function revokeFormerRoles(
   target: TOwnerAccessTarget,
   formerUsers: TSanityUser[],
 ): Promise<void> {
-  const { projectId, env } = target;
-  const token = env.sanityManagementToken;
+  const { projectId, token } = target;
   const acl = await listSanityProjectAcl({ token, projectId });
 
   for (const user of formerUsers) {
@@ -65,7 +68,7 @@ async function revokeFormerRoles(
     if (!entry) continue;
     for (const { name } of entry.roles) {
       await revokeSanityProjectRole({
-        token,
+        token: tokenForRoleChange(target, name),
         projectId,
         projectUserId: entry.projectUserId,
         roleName: name,
@@ -90,11 +93,10 @@ export async function revokeFormerOwnerAccess(
   target: TOwnerAccessTarget,
   formerOwnerEmail?: string,
 ): Promise<void> {
-  const { tenant, projectId, env } = target;
+  const { tenant, projectId, token } = target;
   const { ownerSanityInviteId, ownerSanityUserId } = tenant;
   if (!ownerSanityInviteId && !ownerSanityUserId && !formerOwnerEmail) return;
 
-  const token = env.sanityManagementToken;
   const [invites, users] = await Promise.all([
     listSanityProjectInvites({ token, projectId }),
     listSanityProjectUsers({ token, projectId }),

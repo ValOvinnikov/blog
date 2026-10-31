@@ -14,6 +14,7 @@ import {
 } from '@blog/db/utils/sanity-management-client/sanity-webhooks';
 import { HEX_ENCODING } from '@blog/utils/hash';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 const WEBHOOK_NAME = 'web-revalidate (provisioned)';
 const WEBHOOK_SECRET_BYTES = 32;
@@ -102,7 +103,7 @@ export async function createTenantRevalidateWebhook(
 
   const target: TTenantWebhookTarget = {
     tenantId,
-    token: env.sanityManagementToken,
+    token: await requireTenantManagementToken(tenantId),
     projectId: sanityProjectId,
     dataset: sanityDataset,
     url: revalidateWebhookUrl(env.webAppBaseUrl),

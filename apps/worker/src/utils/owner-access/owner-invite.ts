@@ -16,7 +16,7 @@ async function listOwnerInvites(
   target: TOwnerAccessTarget,
 ): Promise<TSanityInvite[]> {
   const invites = await listSanityProjectInvites({
-    token: target.env.sanityManagementToken,
+    token: target.token,
     projectId: target.projectId,
   });
   return invites.filter(
@@ -29,8 +29,7 @@ export async function sendOwnerInvite(
   target: TOwnerAccessTarget,
   options: { replaceExisting: boolean },
 ): Promise<Date> {
-  const { tenant, projectId, ownerEmail, env } = target;
-  const token = env.sanityManagementToken;
+  const { tenant, projectId, ownerEmail, token } = target;
 
   const existing = await listOwnerInvites(target);
   if (options.replaceExisting) {

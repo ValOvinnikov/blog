@@ -33,7 +33,7 @@ export async function ensureInfrastructure(
     },
     {
       step: TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
-      run: () => persistTenantSanityToken(tenant, env),
+      run: () => persistTenantSanityToken(tenant),
     },
     {
       step: TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,

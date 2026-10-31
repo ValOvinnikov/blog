@@ -212,6 +212,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SANITY_PROJECT_ROLE**: `ADMINISTRATOR`=`"administrator"`, `EDITOR`=`"editor"`, `VIEWER`=`"viewer"`
 - **SANITY_RESOURCE_TYPE**: `PROJECT`=`"project"`, `ORGANIZATION`=`"organization"`
 - **SANITY_LOGIN_PROVIDER**: `GOOGLE`, `GITHUB`, `SANITY`
+- **SANITY_ROBOT_ROLE**: `DEVELOPER`=`"developer"`
 - **SANITY_API_SURFACE**: `MANAGEMENT`, `ACCESS`, `WEBHOOKS`
 - **TENANT_DELETE_SANITY_PROJECT_OUTCOME**: `DELETED`, `ALREADY_GONE`, `LEFT_ARCHIVED`, `NO_PROJECT`, `SKIPPED_NO_TOKEN`
 - **TENANT_DELETE_OUTCOME**: `DELETED`, `NOT_ARCHIVED`, `NOT_FOUND`
@@ -275,7 +276,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-deprovisioning.ts`
 
-- **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `ARCHIVE_SANITY_PROJECT`, `REVOKE_SANITY_TOKENS`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`
+- **DEPROVISIONING_STEP**: `REMOVE_DOMAIN`, `REVOKE_SANITY_TOKENS`, `ARCHIVE_SANITY_PROJECT`, `CLEAR_ARTIFACTS`, `ARCHIVE_TENANT`, `PURGE_READER_DATA`, `INVALIDATE_TENANT_CACHE`
 
 ### `@blog/db/constants` — `packages/db/src/constants/tenant-inactivity.ts`
 

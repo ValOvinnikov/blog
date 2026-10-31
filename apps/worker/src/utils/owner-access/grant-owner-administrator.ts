@@ -24,7 +24,10 @@ import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
-import type { TOwnerAccessTarget } from './owner-access-target';
+import {
+  type TOwnerAccessTarget,
+  tokenForRoleChange,
+} from './owner-access-target';
 
 function toLoginProvider(
   provider: TMaybeUndefined<string>,
@@ -61,10 +64,10 @@ async function revokeRoles(
   entry: TSanityAclEntry,
   roleNames: string[],
 ): Promise<void> {
-  const { projectId, env } = target;
+  const { projectId, token } = target;
   for (const name of roleNames) {
     await revokeSanityProjectRole({
-      token: env.sanityManagementToken,
+      token,
       projectId,
       projectUserId: entry.projectUserId,
       roleName: name,
@@ -76,8 +79,7 @@ export async function grantOwnerAdministrator(
   target: TOwnerAccessTarget,
   owner: TSanityUser,
 ): Promise<TElevateTenantOwnerOutcome> {
-  const { tenant, projectId, env } = target;
-  const token = env.sanityManagementToken;
+  const { tenant, projectId, token } = target;
 
   const acl = await listSanityProjectAcl({ token, projectId });
   const entry = findProjectAclEntry(acl, owner, projectId);
@@ -93,7 +95,7 @@ export async function grantOwnerAdministrator(
   const otherRoles = rolesBesideAdministrator(entry);
   if (!isAdministrator) {
     await grantSanityProjectRole({
-      token,
+      token: tokenForRoleChange(target, SANITY_PROJECT_ROLE.ADMINISTRATOR),
       projectId,
       projectUserId: entry.projectUserId,
       role: SANITY_PROJECT_ROLE.ADMINISTRATOR,

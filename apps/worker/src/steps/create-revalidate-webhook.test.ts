@@ -24,6 +24,7 @@ import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
 } from '@worker/testing/tenant/fixtures';
 import {
   MOCK_CURRENT_WEBHOOK,
@@ -40,6 +41,7 @@ faker.seed(7003);
 
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/utils/sanity-management-client/sanity-webhooks');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const MOCK_STORED_TENANT_SECRET = faker.string.alphanumeric(32);
 const MOCK_ENCRYPTED_SECRET = faker.string.alphanumeric(32);
@@ -47,8 +49,7 @@ const MOCK_OTHER_TENANT_ID = faker.string.uuid();
 const MOCK_OTHER_PROJECT_ID = faker.string.alphanumeric(8);
 const MOCK_SECOND_WEBHOOK_ID = faker.string.uuid();
 
-const { sanityManagementToken, webAppBaseUrl, revalidateSecret } =
-  MOCK_PROVISION_ENV;
+const { webAppBaseUrl, revalidateSecret } = MOCK_PROVISION_ENV;
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   return mockProvisionedTenant({
@@ -116,7 +117,7 @@ describe(createTenantRevalidateWebhook, () => {
       vi.mocked(createSanityWebhook).mock.invocationCallOrder;
     expect(secret).not.toBe(revalidateSecret);
     expect(created).toEqual({
-      token: sanityManagementToken,
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
       dataset: MOCK_SANITY_DATASET,
       url: MOCK_REVALIDATE_WEBHOOK_URL,
@@ -261,7 +262,7 @@ describe(createTenantRevalidateWebhook, () => {
     expect(secret).not.toBe(revalidateSecret);
     expect(updates).toEqual(
       [MOCK_WEBHOOK_ID, MOCK_SECOND_WEBHOOK_ID].map((webhookId) => ({
-        token: sanityManagementToken,
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
         projectId: MOCK_SANITY_PROJECT_ID,
         webhookId,
         secret,

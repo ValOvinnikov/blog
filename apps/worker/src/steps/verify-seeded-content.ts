@@ -12,6 +12,7 @@ import {
   retryWithBackoff,
   type TRetryWithBackoffOptions,
 } from '@worker/utils/retry-with-backoff/retry-with-backoff';
+import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 import {
   listVercelProjectDomains,
   type TVercelDomain,
@@ -185,10 +186,11 @@ export async function verifyTenantSeededContent(
     );
   }
 
+  const managementToken = await requireTenantManagementToken(tenant.id);
   const webhooks = await readWithGrantPropagationRetry<TSanityWebhook[]>(
     () =>
       deps.listWebhooks({
-        token: env.sanityManagementToken,
+        token: managementToken,
         projectId: credentials.projectId,
       }),
     retryOptions,

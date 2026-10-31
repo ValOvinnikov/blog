@@ -64,6 +64,7 @@ export const SANITY_LOGIN_PROVIDER = {
 export type TSanityLoginProvider = TValueOf<typeof SANITY_LOGIN_PROVIDER>;
 
 export const SANITY_ROBOT_ROLE = {
+  DEVELOPER: 'developer',
   EDITOR: SANITY_PROJECT_ROLE.EDITOR,
   VIEWER: SANITY_PROJECT_ROLE.VIEWER,
 } as const;

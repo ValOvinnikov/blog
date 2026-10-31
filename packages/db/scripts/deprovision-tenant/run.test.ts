@@ -52,12 +52,12 @@ const STEP_MOCKS: [
 ][] = [
   [DEPROVISIONING_STEP.REMOVE_DOMAIN, vi.mocked(removeTenantDomain)],
   [
-    DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
-    vi.mocked(archiveTenantSanityProject),
-  ],
-  [
     DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
     vi.mocked(revokeTenantSanityTokens),
+  ],
+  [
+    DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+    vi.mocked(archiveTenantSanityProject),
   ],
   [DEPROVISIONING_STEP.CLEAR_ARTIFACTS, vi.mocked(clearTenantArtifacts)],
   [DEPROVISIONING_STEP.ARCHIVE_TENANT, vi.mocked(archiveTenantRow)],
@@ -173,9 +173,9 @@ describe(runSteps, () => {
     expect(archiveTenantRow).toHaveBeenCalledTimes(1);
   });
 
-  describe('when archive-sanity-project throws', () => {
+  describe('when revoke-sanity-tokens throws', () => {
     beforeEach(() => {
-      vi.mocked(archiveTenantSanityProject).mockRejectedValueOnce(
+      vi.mocked(revokeTenantSanityTokens).mockRejectedValueOnce(
         new Error(MOCK_STEP_ERROR),
       );
     });
@@ -185,8 +185,8 @@ describe(runSteps, () => {
 
       expect(result).toEqual({ ok: false });
       expect(removeTenantDomain).toHaveBeenCalledTimes(1);
-      expect(archiveTenantSanityProject).toHaveBeenCalledTimes(1);
-      expect(revokeTenantSanityTokens).not.toHaveBeenCalled();
+      expect(revokeTenantSanityTokens).toHaveBeenCalledTimes(1);
+      expect(archiveTenantSanityProject).not.toHaveBeenCalled();
       expect(clearTenantArtifacts).not.toHaveBeenCalled();
       expect(archiveTenantRow).not.toHaveBeenCalled();
       expect(purgeTenantReaderData).not.toHaveBeenCalled();
@@ -215,14 +215,14 @@ describe(runSteps, () => {
         [
           {
             tenantId: MOCK_TENANT.id,
-            step: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+            step: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
             status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
           },
         ],
         [
           {
             tenantId: MOCK_TENANT.id,
-            step: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+            step: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
             error: MOCK_STEP_ERROR,
           },

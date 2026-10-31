@@ -2906,6 +2906,14 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       }
     ],
+    "developer": [
+      {
+        "ref": "SANITY_ROBOT_ROLE.DEVELOPER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-project.ts"
+      }
+    ],
     "MANAGEMENT": [
       {
         "ref": "SANITY_API_SURFACE.MANAGEMENT",
@@ -3382,17 +3390,17 @@
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
-    "ARCHIVE_SANITY_PROJECT": [
+    "REVOKE_SANITY_TOKENS": [
       {
-        "ref": "DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT",
+        "ref": "DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"
       }
     ],
-    "REVOKE_SANITY_TOKENS": [
+    "ARCHIVE_SANITY_PROJECT": [
       {
-        "ref": "DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS",
+        "ref": "DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-deprovisioning.ts"

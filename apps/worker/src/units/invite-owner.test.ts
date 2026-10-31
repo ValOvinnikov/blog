@@ -39,6 +39,7 @@ vi.mock('@blog/db/utils/sanity-management-client/sanity-project-users');
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/provision-env/provision-env');
 vi.mock('workflow');
+vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 describe(inviteOwner, () => {
   beforeEach(() => {

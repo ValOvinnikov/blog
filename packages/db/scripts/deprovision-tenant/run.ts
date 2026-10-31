@@ -76,14 +76,14 @@ const STEPS: TStep[] = [
     run: removeTenantDomain,
   },
   {
-    key: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
-    name: 'archive-sanity-project',
-    run: archiveTenantSanityProject,
-  },
-  {
     key: DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
     name: 'revoke-sanity-tokens',
     run: revokeTenantSanityTokens,
+  },
+  {
+    key: DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
+    name: 'archive-sanity-project',
+    run: archiveTenantSanityProject,
   },
   {
     key: DEPROVISIONING_STEP.CLEAR_ARTIFACTS,

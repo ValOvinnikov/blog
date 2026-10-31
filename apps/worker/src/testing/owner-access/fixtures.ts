@@ -23,6 +23,7 @@ import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision
 import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_ID,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
 import type { TOwnerAccessTarget } from '@worker/utils/owner-access/owner-access-target';
@@ -75,6 +76,7 @@ export function mockOwnerAccessTarget(tenant: TTenant): TOwnerAccessTarget {
     tenant,
     projectId: MOCK_SANITY_PROJECT_ID,
     ownerEmail: MOCK_OWNER_EMAIL,
+    token: MOCK_TENANT_MANAGEMENT_TOKEN,
     env: MOCK_PROVISION_ENV,
   };
 }

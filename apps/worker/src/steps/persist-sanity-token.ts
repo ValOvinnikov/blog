@@ -3,7 +3,7 @@ import { setTenantSanityToken } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { createSanityRobotToken } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { SANITY_READ_TOKEN_LABEL } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
-import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
+import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
 
 export type TPersistSanityTokenDeps = {
   mintReadToken: typeof createSanityRobotToken;
@@ -16,7 +16,6 @@ const defaultDeps: TPersistSanityTokenDeps = {
 // Idempotent on `sanityReadTokenEncrypted`, so a token minted by an interrupted run is orphaned, never reused.
 export async function persistTenantSanityToken(
   tenant: TTenant,
-  env: TProvisionEnv,
   deps: TPersistSanityTokenDeps = defaultDeps,
 ): Promise<void> {
   if (tenant.sanityReadTokenEncrypted) return;
@@ -28,7 +27,7 @@ export async function persistTenantSanityToken(
   }
 
   const readToken = await deps.mintReadToken({
-    token: env.sanityManagementToken,
+    token: await requireTenantManagementToken(tenant.id),
     projectId: tenant.sanityProjectId,
     label: SANITY_READ_TOKEN_LABEL,
     role: SANITY_ROBOT_ROLE.VIEWER,

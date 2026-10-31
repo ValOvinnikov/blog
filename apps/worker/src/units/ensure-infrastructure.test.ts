@@ -85,14 +85,13 @@ describe(ensureInfrastructure, () => {
   it('hands the project created for the tenant to the later steps', async () => {
     await ensureInfrastructure(MOCK_TENANT_ID, MOCK_RUN_CONTEXT);
 
-    const [persistedTenant, persistEnv] =
+    const [persistedTenant] =
       vi.mocked(persistTenantSanityToken).mock.lastCall ?? [];
     const [mappedDomain, mapEnv] =
       vi.mocked(mapTenantDomain).mock.lastCall ?? [];
     expect(persistedTenant?.sanityProjectId).toBe(MOCK_SANITY_PROJECT_ID);
     expect(persistedTenant?.sanityDataset).toBe(MOCK_SANITY_DATASET);
     expect(mappedDomain).toBe(MOCK_TENANT_DOMAIN);
-    expect(persistEnv).toBe(MOCK_PROVISION_ENV);
     expect(mapEnv).toBe(MOCK_PROVISION_ENV);
   });
 
