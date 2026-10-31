@@ -72,6 +72,9 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+      # Decrypts the tenant's own Sanity management token; the organisation token
+      # above is used only for what a project-scoped token is refused.
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
       # The *shared* apps/web Vercel project — step 1 removes the tenant's

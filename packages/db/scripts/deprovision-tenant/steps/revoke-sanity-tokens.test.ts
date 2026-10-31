@@ -2,8 +2,14 @@ import {
   MOCK_DEPROVISION_DRY_RUN_ENV,
   MOCK_DEPROVISION_ENV,
 } from '@blog/db/testing/deprovision-tenant/fixtures';
-import { MOCK_STEP_ERROR, mockTenant } from '@blog/db/testing/tenants/fixtures';
+import { MOCK_SANITY_PROJECT_ID } from '@blog/db/testing/sanity-management-client/fixtures';
 import {
+  MOCK_STEP_ERROR,
+  MOCK_TENANT_MANAGEMENT_TOKEN,
+  mockTenant,
+} from '@blog/db/testing/tenants/fixtures';
+import {
+  SANITY_MANAGEMENT_TOKEN_LABEL,
   SANITY_READ_TOKEN_LABEL,
   SANITY_WRITE_TOKEN_LABEL,
 } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
@@ -16,7 +22,7 @@ import {
 
 faker.seed(5765);
 
-const MOCK_TENANT = mockTenant();
+const MOCK_TENANT = mockTenant({ sanityProjectId: MOCK_SANITY_PROJECT_ID });
 const MOCK_READ_ROBOT = {
   id: faker.string.uuid(),
   label: SANITY_READ_TOKEN_LABEL,
@@ -25,14 +31,35 @@ const MOCK_WRITE_ROBOT = {
   id: faker.string.uuid(),
   label: SANITY_WRITE_TOKEN_LABEL,
 };
+const MOCK_MANAGEMENT_ROBOT = {
+  id: faker.string.uuid(),
+  label: SANITY_MANAGEMENT_TOKEN_LABEL,
+};
 const MOCK_HUMAN_ROBOT = {
   id: faker.string.uuid(),
   label: faker.internet.email(),
 };
 
+const getManagementCredentials =
+  vi.fn<TRevokeSanityTokensDeps['getManagementCredentials']>();
 const listRobotTokens = vi.fn<TRevokeSanityTokensDeps['listRobotTokens']>();
 const revokeToken = vi.fn<TRevokeSanityTokensDeps['revokeToken']>();
-const MOCK_DEPS: TRevokeSanityTokensDeps = { listRobotTokens, revokeToken };
+const MOCK_DEPS: TRevokeSanityTokensDeps = {
+  getManagementCredentials,
+  listRobotTokens,
+  revokeToken,
+};
+
+function revokedRobotIds(): string[] {
+  return revokeToken.mock.calls.map(([{ robotId }]) => robotId);
+}
+
+beforeEach(() => {
+  getManagementCredentials.mockResolvedValue({
+    projectId: MOCK_SANITY_PROJECT_ID,
+    token: MOCK_TENANT_MANAGEMENT_TOKEN,
+  });
+});
 
 describe(revokeTenantSanityTokens, () => {
   it('skips when no Sanity project id is set', async () => {
@@ -56,7 +83,7 @@ describe(revokeTenantSanityTokens, () => {
     expect(revokeToken).not.toHaveBeenCalled();
   });
 
-  it('revokes only the provisioned read and write tokens', async () => {
+  it('revokes only the provisioned tokens, using the tenant management token', async () => {
     listRobotTokens.mockResolvedValueOnce([
       MOCK_READ_ROBOT,
       MOCK_WRITE_ROBOT,
@@ -70,25 +97,56 @@ describe(revokeTenantSanityTokens, () => {
     );
 
     expect(listRobotTokens).toHaveBeenCalledWith({
-      token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+      token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_TENANT.sanityProjectId,
     });
     expect(revokeToken.mock.calls).toEqual([
       [
         {
-          token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
           projectId: MOCK_TENANT.sanityProjectId,
           robotId: MOCK_READ_ROBOT.id,
         },
       ],
       [
         {
-          token: MOCK_DEPROVISION_ENV.sanityManagementToken,
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
           projectId: MOCK_TENANT.sanityProjectId,
           robotId: MOCK_WRITE_ROBOT.id,
         },
       ],
     ]);
+  });
+
+  it('revokes the management token last', async () => {
+    listRobotTokens.mockResolvedValueOnce([
+      MOCK_MANAGEMENT_ROBOT,
+      MOCK_READ_ROBOT,
+      MOCK_WRITE_ROBOT,
+    ]);
+
+    await revokeTenantSanityTokens(
+      MOCK_TENANT,
+      MOCK_DEPROVISION_ENV,
+      MOCK_DEPS,
+    );
+
+    expect(revokedRobotIds()).toEqual([
+      MOCK_READ_ROBOT.id,
+      MOCK_WRITE_ROBOT.id,
+      MOCK_MANAGEMENT_ROBOT.id,
+    ]);
+  });
+
+  it('resolves without calling Sanity when the tenant has no management token', async () => {
+    getManagementCredentials.mockResolvedValueOnce(undefined);
+
+    await expect(
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),
+    ).resolves.toBeUndefined();
+
+    expect(listRobotTokens).not.toHaveBeenCalled();
+    expect(revokeToken).not.toHaveBeenCalled();
   });
 
   it('revokes nothing when no robot matches a provisioned label', async () => {

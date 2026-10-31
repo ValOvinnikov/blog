@@ -73,6 +73,9 @@ jobs:
     environment: ${{ inputs.environment || 'production' }}
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+      # Decrypts the tenant's own Sanity management token; the organisation token
+      # above is used only for what a project-scoped token is refused.
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
       # The deployed `apps/platform` origin (no trailing slash/path) this
       # sweep POSTs an operator-alert event to on a notifiable
       # owner-elevation outcome. Unset means the sweep still runs; only the
