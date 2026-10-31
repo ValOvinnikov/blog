@@ -4,6 +4,7 @@ import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
@@ -138,7 +139,7 @@ export const AssetUploadField = ({
             id={id}
             type="button"
             size={SIZE.SM}
-            variant="secondary"
+            variant={BUTTON_VARIANT.SECONDARY}
             onClick={() => inputRef.current?.click()}
             isDisabled={isDisabled}
             aria-describedby={describedBy}
@@ -149,7 +150,7 @@ export const AssetUploadField = ({
             <Button
               type="button"
               size={SIZE.SM}
-              variant="ghost"
+              variant={BUTTON_VARIANT.GHOST}
               onClick={handleRemove}
               isDisabled={isDisabled}
               aria-describedby={describedBy}

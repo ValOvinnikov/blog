@@ -4,6 +4,7 @@ import { Field } from '@base-ui/react/field';
 import { Form } from '@base-ui/react/form';
 import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 import { useState, type FormEvent } from 'react';
 
@@ -50,15 +51,25 @@ export const PortableTextEditorLinkControl = ({
         />
         <Field.Error className={error()} />
       </Field.Root>
-      <Button type="submit" variant="secondary" size={SIZE.SM}>
+      <Button type="submit" variant={BUTTON_VARIANT.SECONDARY} size={SIZE.SM}>
         {t('linkApply')}
       </Button>
       {hasExistingLink && (
-        <Button type="button" variant="ghost" size={SIZE.SM} onClick={onRemove}>
+        <Button
+          type="button"
+          variant={BUTTON_VARIANT.GHOST}
+          size={SIZE.SM}
+          onClick={onRemove}
+        >
           {t('removeLink')}
         </Button>
       )}
-      <Button type="button" variant="ghost" size={SIZE.SM} onClick={onCancel}>
+      <Button
+        type="button"
+        variant={BUTTON_VARIANT.GHOST}
+        size={SIZE.SM}
+        onClick={onCancel}
+      >
         {t('linkCancel')}
       </Button>
     </Form>

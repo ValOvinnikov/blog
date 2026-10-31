@@ -5,6 +5,7 @@ import { BlockOwnerFields } from '@platform/components/features/tenants/tenant-s
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   liftTenantSuspensionAction,
   suspendTenantAction,
@@ -64,7 +65,7 @@ export const TenantSuspensionControl = ({
           <Text variant="muted">{t(`${copyKey}.description`)}</Text>
 
           <ConfirmDialog
-            tone={isSuspended ? 'primary' : 'danger'}
+            tone={isSuspended ? BUTTON_VARIANT.PRIMARY : BUTTON_VARIANT.DANGER}
             onConfirm={confirm}
             onConfirmed={() => router.refresh()}
             onOpenChange={resetBlockChoice}

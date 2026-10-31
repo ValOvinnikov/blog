@@ -3,6 +3,7 @@ import { Alert } from '@platform/components/shared/alert';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   RELEASE_RUN_STATUS,
   type TReleaseRunStatus,
@@ -45,7 +46,11 @@ export const ReleaseRunStatus = ({ status, run }: TReleaseRunStatusProps) => {
         />
       )}
       {run && (
-        <ExternalLinkButton href={run.url} variant="secondary" size={SIZE.SM}>
+        <ExternalLinkButton
+          href={run.url}
+          variant={BUTTON_VARIANT.SECONDARY}
+          size={SIZE.SM}
+        >
           {t('viewRun')}
         </ExternalLinkButton>
       )}

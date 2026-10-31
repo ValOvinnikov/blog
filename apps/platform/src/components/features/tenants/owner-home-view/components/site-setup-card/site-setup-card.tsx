@@ -9,6 +9,7 @@ import {
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
@@ -51,7 +52,7 @@ export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
   const dispatchButton = (label: string, pendingLabel: string) =>
     canRetry ? (
       <Button
-        variant="secondary"
+        variant={BUTTON_VARIANT.SECONDARY}
         size={SIZE.SM}
         isPending={isDispatchPending}
         pendingLabel={pendingLabel}

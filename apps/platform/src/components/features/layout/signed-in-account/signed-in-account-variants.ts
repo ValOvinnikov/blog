@@ -1,4 +1,5 @@
 import { SIZE } from '@blog/config';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { tv } from '@platform/utils/tv/tv';
 
 export const signedInAccountVariants = tv({
@@ -30,7 +31,7 @@ export const signedInAccountVariants = tv({
 });
 
 export const SIGN_OUT_BUTTON_BY_SURFACE = {
-  card: { variant: 'ghost', size: SIZE.SM },
-  rail: { variant: 'ghost', size: SIZE.SM },
-  railFooter: { variant: 'ghost', size: SIZE.SM },
+  card: { variant: BUTTON_VARIANT.GHOST, size: SIZE.SM },
+  rail: { variant: BUTTON_VARIANT.GHOST, size: SIZE.SM },
+  railFooter: { variant: BUTTON_VARIANT.GHOST, size: SIZE.SM },
 } as const;

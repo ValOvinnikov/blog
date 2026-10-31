@@ -5,6 +5,7 @@ import { ActivityList } from '@platform/components/features/tenants/activity-lis
 import { Card } from '@platform/components/shared/card';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 
 export type TRecentActivityCardProps = {
@@ -30,7 +31,7 @@ export const RecentActivityCard = ({
             {hasArrayGotItems(events) && (
               <LinkButton
                 href={viewAllHref}
-                variant="ghost"
+                variant={BUTTON_VARIANT.GHOST}
                 size={SIZE.SM}
                 hasArrow={true}
               >

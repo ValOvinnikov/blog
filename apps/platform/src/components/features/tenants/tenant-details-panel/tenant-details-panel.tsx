@@ -6,6 +6,7 @@ import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { TENANT_FIELD_LOCK_KIND } from '@platform/constants/tenant';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
@@ -121,7 +122,7 @@ export const TenantDetailsPanel = ({
           <div className={footerActions()}>
             <Button
               type="button"
-              variant="primary"
+              variant={BUTTON_VARIANT.PRIMARY}
               onClick={handleSave}
               isDisabled={!isDirty || isArchived}
               isPending={isPending}

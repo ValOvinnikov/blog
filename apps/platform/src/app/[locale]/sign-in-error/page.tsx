@@ -1,5 +1,6 @@
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
 import { LinkButton } from '@platform/components/shared/link-button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
@@ -29,7 +30,10 @@ export default async function SignInErrorPage({ searchParams }: TProps) {
         title={t('linkSpentHeading')}
         description={t('linkSpentDescription')}
         action={
-          <LinkButton href={adminRoutes.signIn()} variant="primary">
+          <LinkButton
+            href={adminRoutes.signIn()}
+            variant={BUTTON_VARIANT.PRIMARY}
+          >
             {t('requestNewLink')}
           </LinkButton>
         }
@@ -43,7 +47,10 @@ export default async function SignInErrorPage({ searchParams }: TProps) {
       title={t('heading')}
       description={t('description')}
       action={
-        <LinkButton href={adminRoutes.signIn()} variant="secondary">
+        <LinkButton
+          href={adminRoutes.signIn()}
+          variant={BUTTON_VARIANT.SECONDARY}
+        >
           {t('backToSignIn')}
         </LinkButton>
       }

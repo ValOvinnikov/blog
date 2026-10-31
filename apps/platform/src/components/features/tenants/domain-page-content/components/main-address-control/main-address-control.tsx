@@ -9,6 +9,7 @@ import {
 import { errorResult, okResult } from '@blog/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   MAIN_ADDRESS_TARGET,
   type TMainAddressTarget,
@@ -63,7 +64,7 @@ export const MainAddressControl = ({
 
   return (
     <ConfirmDialog
-      tone="primary"
+      tone={BUTTON_VARIANT.PRIMARY}
       onConfirm={confirm}
       onConfirmed={handleConfirmed}
     >

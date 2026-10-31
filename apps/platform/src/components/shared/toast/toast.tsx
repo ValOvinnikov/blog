@@ -1,5 +1,6 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 
 import type { IToastRecord } from './toast-record';
@@ -46,7 +47,7 @@ export const Toast = ({ record, onDismiss }: TToastProps) => {
       {time && <span className={s.time()}>{time}</span>}
       {action && (
         <Button
-          variant="unstyled"
+          variant={BUTTON_VARIANT.UNSTYLED}
           onClick={action.onAct}
           className={s.action()}
         >
@@ -57,7 +58,7 @@ export const Toast = ({ record, onDismiss }: TToastProps) => {
         </Button>
       )}
       <Button
-        variant="unstyled"
+        variant={BUTTON_VARIANT.UNSTYLED}
         onClick={onDismiss}
         aria-label={dismissLabel}
         title={dismissLabel}

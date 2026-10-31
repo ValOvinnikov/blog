@@ -4,6 +4,7 @@ import { ICONS } from '@blog/config';
 import { useSidebarCollapse } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 
 import { sidebarCollapseToggleVariants } from './sidebar-collapse-toggle-variants';
@@ -22,7 +23,7 @@ export const SidebarCollapseToggle = ({
 
   return (
     <Button
-      variant="unstyled"
+      variant={BUTTON_VARIANT.UNSTYLED}
       onClick={toggle}
       aria-expanded={!isCollapsed}
       aria-label={label}

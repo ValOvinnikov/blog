@@ -2,6 +2,7 @@ import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { fieldStatusTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 
@@ -29,7 +30,11 @@ export const FieldStatus = ({
         {t(status)}
       </StatusBadge>
       {isCustomised && onReset && (
-        <Button size={SIZE.SM} variant="secondary" onClick={onReset}>
+        <Button
+          size={SIZE.SM}
+          variant={BUTTON_VARIANT.SECONDARY}
+          onClick={onReset}
+        >
           {t('reset')}
         </Button>
       )}

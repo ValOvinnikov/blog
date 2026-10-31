@@ -7,6 +7,7 @@ import {
   type TConfirmDialogActionResult,
 } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -32,7 +33,7 @@ export const DataRequestEraseDialog = ({
 
   return (
     <ConfirmDialog
-      tone="danger"
+      tone={BUTTON_VARIANT.DANGER}
       expectedValue={email}
       onConfirm={() => onErase(hasReaderAccount && includesReaderAccount)}
       onConfirmed={onErased}

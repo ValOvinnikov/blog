@@ -8,6 +8,7 @@ import {
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Disclosure } from '@platform/components/shared/disclosure';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TDraftDifference } from '@platform/utils/settings-draft-offer/settings-draft-offer';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -98,16 +99,16 @@ export const DraftRecoveryBanner = ({
         hasDifferences ? (
           <>
             <Button onClick={onRestore}>{t('restoreAnyway')}</Button>
-            <Button variant="ghost" onClick={onDiscard}>
+            <Button variant={BUTTON_VARIANT.GHOST} onClick={onDiscard}>
               {t('discardDraft')}
             </Button>
           </>
         ) : (
           <>
-            <Button variant="primary" onClick={onRestore}>
+            <Button variant={BUTTON_VARIANT.PRIMARY} onClick={onRestore}>
               {t('restore', { count: changeCount })}
             </Button>
-            <Button variant="ghost" onClick={onDiscard}>
+            <Button variant={BUTTON_VARIANT.GHOST} onClick={onDiscard}>
               {t('discard')}
             </Button>
           </>
