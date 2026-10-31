@@ -31,6 +31,7 @@ import {
 } from '@blog/db/queries/tenants';
 import {
   createSanityProjectInvite,
+  deleteSanityProjectInvite,
   grantSanityProjectRole,
   listSanityProjectAcl,
   listSanityProjectInvites,
@@ -54,6 +55,8 @@ import {
   MOCK_MIXED_CASE_OWNER_EMAIL,
   MOCK_OWNER_ACCESS_FINDING_ID,
   MOCK_OWNER_EMAIL,
+  MOCK_OTHER_INVITE_ID,
+  MOCK_OTHER_INVITEE_EMAIL,
   MOCK_OWNER_PROJECT_USER_ID,
   MOCK_SANITY_INVITE_ID,
   MOCK_SANITY_USER_ID,
@@ -127,6 +130,7 @@ describe(checkOwnerAccess, () => {
     vi.mocked(listSanityProjectAcl).mockResolvedValue([
       aclEntry(SANITY_PROJECT_ROLE.VIEWER),
     ]);
+    vi.mocked(listSanityProjectInvites).mockResolvedValue([]);
     vi.mocked(setTenantOwnerAccess).mockResolvedValue(okResult({} as never));
     vi.mocked(updateProvisioningStep).mockResolvedValue(okResult(mockTenant()));
     vi.mocked(touchTenantActivity).mockResolvedValue(okResult(mockTenant()));
@@ -343,6 +347,70 @@ describe(checkOwnerAccess, () => {
         OWNER_ACCESS_LOG.ACTIVITY_TOUCH_FAILED,
         { tenantId: MOCK_TENANT_ID, error: ERROR_CODE.DB_NOT_FOUND },
       );
+    });
+
+    describe('while an invite to the owner is still pending', () => {
+      beforeEach(() => {
+        vi.mocked(getTenantById).mockResolvedValue({
+          ...MOCK_WAITING_TENANT,
+          ownerSanityInviteId: MOCK_SANITY_INVITE_ID,
+        });
+        vi.mocked(listSanityProjectInvites).mockResolvedValue([
+          mockPendingInvite({ email: MOCK_MIXED_CASE_OWNER_EMAIL }),
+          mockPendingInvite({
+            id: MOCK_OTHER_INVITE_ID,
+            email: MOCK_OTHER_INVITEE_EMAIL,
+          }),
+        ]);
+      });
+
+      it("deletes the owner's pending invite and leaves other emails' invites alone", async () => {
+        await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(deleteSanityProjectInvite).toHaveBeenCalledExactlyOnceWith({
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
+          projectId: MOCK_SANITY_PROJECT_ID,
+          inviteId: MOCK_SANITY_INVITE_ID,
+        });
+      });
+
+      it('clears the recorded invite once it is deleted', async () => {
+        await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+          sanityInviteId: null,
+        });
+      });
+
+      it('still grants access and logs when the invite cannot be deleted', async () => {
+        atStepAttempt(99);
+        vi.mocked(deleteSanityProjectInvite).mockRejectedValue(
+          new Error(MOCK_SANITY_OUTAGE),
+        );
+
+        const { outcome, hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+        expect(hasFailed).toBe(false);
+        expect(setTenantOwnerAccess).not.toHaveBeenCalledWith(MOCK_TENANT_ID, {
+          sanityInviteId: null,
+        });
+        expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+          OWNER_ACCESS_LOG.INVITE_DELETE_FAILED,
+          { tenantId: MOCK_TENANT_ID, error: MOCK_SANITY_OUTAGE },
+        );
+      });
+    });
+
+    it('sends no invite to an owner found before one was sent', async () => {
+      vi.mocked(getTenantById).mockResolvedValue(
+        mockProvisionedTenant({ createdAt: MOCK_NOW }),
+      );
+
+      await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(createSanityProjectInvite).not.toHaveBeenCalled();
+      expect(deleteSanityProjectInvite).not.toHaveBeenCalled();
     });
 
     it('fails the attempt when recording the access fails', async () => {

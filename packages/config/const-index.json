@@ -6856,6 +6856,14 @@
         "file": "apps/worker/src/constants/owner-access.ts"
       }
     ],
+    "owner_access.invite_delete_failed": [
+      {
+        "ref": "OWNER_ACCESS_LOG.INVITE_DELETE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/owner-access",
+        "file": "apps/worker/src/constants/owner-access.ts"
+      }
+    ],
     "owner_access.finding_open_failed": [
       {
         "ref": "OWNER_ACCESS_LOG.FINDING_OPEN_FAILED",
