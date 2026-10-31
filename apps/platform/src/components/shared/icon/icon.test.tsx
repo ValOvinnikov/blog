@@ -1,13 +1,13 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ICON_TEST_ID } from '@platform/constants/icon';
+import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Icon } from './icon';
 
 faker.seed(5995);
 
-const ICON_TEST_ID = 'icon';
-const ARIA_HIDDEN = 'aria-hidden';
 const MOCK_ARIA_LABEL = faker.lorem.word();
 
 const setup = customRender(Icon, { name: ICONS.GRID });
