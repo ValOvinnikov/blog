@@ -32,12 +32,12 @@ type TStoredVoiceOverrides = Partial<
   Record<TLocaleIsoCode, Partial<Record<string, unknown>>>
 >;
 
-export const VOICE_SECTIONS_IN_PAGE_ORDER = [
+const VOICE_SECTIONS_IN_PAGE_ORDER = [
   VOICE_SECTION.ERROR_PAGES,
   VOICE_SECTION.EMPTY_STATES,
 ] as const satisfies TVoiceSection[];
 
-export const VOICE_SURFACES_BY_SECTION = {
+const VOICE_SURFACES_BY_SECTION = {
   [VOICE_SECTION.ERROR_PAGES]: [VOICE_SURFACE.NOT_FOUND, VOICE_SURFACE.ERROR],
   [VOICE_SECTION.EMPTY_STATES]: [
     VOICE_SURFACE.ARCHIVE,
