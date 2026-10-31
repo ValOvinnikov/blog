@@ -1,1 +1,0 @@
-ALTER TABLE "tenants" ADD COLUMN "unsent_reinvite_former_owner_email_encrypted" text;

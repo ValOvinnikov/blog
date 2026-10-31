@@ -1,2 +1,0 @@
-CREATE TYPE "public"."language_switcher_style" AS ENUM('MENU_CODE', 'MENU_GLOBE', 'CODES');--> statement-breakpoint
-ALTER TABLE "site_config" ADD COLUMN "language_switcher_style" "language_switcher_style" DEFAULT 'MENU_CODE' NOT NULL;

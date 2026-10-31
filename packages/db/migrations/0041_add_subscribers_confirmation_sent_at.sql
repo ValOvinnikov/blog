@@ -1,1 +1,0 @@
-ALTER TABLE "subscribers" ADD COLUMN "confirmation_sent_at" timestamp;

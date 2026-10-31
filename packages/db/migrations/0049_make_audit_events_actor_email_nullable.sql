@@ -1,1 +1,0 @@
-ALTER TABLE "audit_events" ALTER COLUMN "actor_email" DROP NOT NULL;
