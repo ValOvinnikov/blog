@@ -1,12 +1,12 @@
 import {
   ICONS,
-  SIZE,
   SORT_DIRECTION,
   type TMaybeUndefined,
   type TSortDirection,
 } from '@blog/config';
 import { dataTableShellVariants } from '@platform/components/shared/data-table-shell/data-table-shell-variants';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
 
 export type TDataTableShellColumnSort = {
@@ -42,7 +42,7 @@ export const DataTableShellHeadCell = ({
         {direction && (
           <Icon
             name={ICONS.CHEVRON_DOWN}
-            size={SIZE.SM}
+            size={ICON_SIZE.MD}
             className={sortIcon({
               isAscending: direction === SORT_DIRECTION.ASCENDING,
             })}

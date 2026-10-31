@@ -375,7 +375,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
 
-- **ICON_SIZE**: `PX_10`, `PX_12`, `PX_14`, `PX_15`, `PX_17`, `PX_20`
+- **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 

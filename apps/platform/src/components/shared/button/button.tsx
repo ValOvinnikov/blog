@@ -2,6 +2,7 @@ import { ICONS, SIZE } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
@@ -105,7 +106,7 @@ export const Button = ({
             </span>
           </span>
         )}
-        {hasArrow && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
+        {hasArrow && <Icon name={ICONS.ARROW} size={ICON_SIZE.MD} />}
       </button>
       {hasPendingLabel && (
         <span role="status" aria-live="polite" className={srOnlyStatus()}>

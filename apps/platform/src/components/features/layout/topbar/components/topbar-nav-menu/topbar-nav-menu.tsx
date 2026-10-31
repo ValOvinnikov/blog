@@ -1,13 +1,14 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import {
   sidebarVariants,
   type TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -32,7 +33,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
         aria-label={t('triggerLabel')}
         title={t('triggerLabel')}
       >
-        <Icon name={ICONS.MENU} size={SIZE.SM} />
+        <Icon name={ICONS.MENU} size={ICON_SIZE.MD} />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">

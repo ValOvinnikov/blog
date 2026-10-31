@@ -1,12 +1,13 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
@@ -53,7 +54,7 @@ export const ProviderSignInButton = ({
       onClick={handleClick}
       className={providerSignInButtonVariants()}
     >
-      <Icon name={icon} size={SIZE.SM} />
+      <Icon name={icon} size={ICON_SIZE.MD} />
       {t(labelKey)}
     </Button>
   );

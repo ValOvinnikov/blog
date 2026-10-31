@@ -1,7 +1,8 @@
 import { Select as BaseSelect } from '@base-ui/react/select';
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { selectVariants } from '@platform/components/shared/select/select-variants';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
 
 export type TSelectItemProps = {
@@ -16,7 +17,7 @@ export const SelectItem = ({ value, children }: TSelectItemProps) => {
     <BaseSelect.Item value={value} className={item()}>
       <span className={indicator()}>
         <BaseSelect.ItemIndicator>
-          <Icon name={ICONS.CHECK} size={SIZE.SM} />
+          <Icon name={ICONS.CHECK} size={ICON_SIZE.MD} />
         </BaseSelect.ItemIndicator>
       </span>
       {children}

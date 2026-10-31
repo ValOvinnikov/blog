@@ -1,10 +1,11 @@
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS } from '@blog/config';
 import {
   buttonVariants,
   type TButtonVariants,
 } from '@platform/components/shared/button/button-variants';
 import { ExternalLink } from '@platform/components/shared/external-link';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
 
 export type TExternalLinkButtonProps = {
@@ -34,7 +35,7 @@ export const ExternalLinkButton = ({
       title={title}
     >
       {children}
-      <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />
+      <Icon name={ICONS.EXTERNAL_LINK} size={ICON_SIZE.MD} />
     </ExternalLink>
   );
 };

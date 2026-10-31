@@ -1,8 +1,9 @@
-import { ALERT_TYPE, ICONS, SIZE } from '@blog/config';
+import { ALERT_TYPE, ICONS } from '@blog/config';
 import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
@@ -46,7 +47,7 @@ export const Alert = ({
 
   return (
     <div id={id} role={role} className={root({ class: className })}>
-      <Icon name={ALERT_ICON[type]} size={SIZE.SM} className={icon()} />
+      <Icon name={ALERT_ICON[type]} size={ICON_SIZE.MD} className={icon()} />
       <div className={text()}>
         {title && <strong className={titleSlot()}>{title}</strong>}
         {description && <div className={descriptionSlot()}>{description}</div>}

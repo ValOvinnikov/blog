@@ -3,6 +3,7 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
@@ -31,7 +32,7 @@ export const SendTestEmailButton = ({
       isPending={isSending}
       pendingLabel={t('sendingTest')}
     >
-      <Icon name={ICONS.SEND} size={SIZE.SM} />
+      <Icon name={ICONS.SEND} size={ICON_SIZE.MD} />
       {t('sendTest')}
     </Button>
   );
