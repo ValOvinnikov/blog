@@ -26,6 +26,7 @@ code:
   - apps/platform/src/components/shared/button/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
+  - apps/platform/src/styles/admin-theme*
 epics: [4979, 4980, 4840, 4959]
 ---
 
@@ -143,6 +144,16 @@ switches the content column to full-bleed (see
   unsaved changes.
 - The admin's language is next-intl's: the `NEXT_LOCALE` cookie first, then
   the browser's language, falling back to English.
+- The admin's colours are `--admin-*` tokens in `styles/admin-theme.css`,
+  each with a `--color-admin-*` Tailwind colour; shadows read `--admin-shadow`
+  and `--admin-shadow-menu`. The light sidebar is grey (`side` #eef0f3 with
+  `side-line` rules); its wordmark is `text-strong`, its text `side-text` and
+  `side-muted`, and no sidebar text is drawn in `faint`, which is for icons
+  and chevrons only. The onboarding rail and the Choose a workspace page read
+  the separate `rail` tokens and stay dark.
+- `styles/admin-theme-contrast.test.ts` guards the light palette: each pair
+  of token names must meet 4.5:1 for text and 3:1 for borders, tracks and
+  focus rings, measured from the values in `admin-theme.css`.
 - `apps/platform` owns its own primitives on Base UI and never imports
   `@blog/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is
@@ -180,7 +191,8 @@ switches the content column to full-bleed (see
   (`server/layout`, `server/tenant-pages`, `list-session-tenants`,
   `resolve-dashboard-tenant`, `nav-sections`, `routes`), plus
   `app/api/dashboard/select-tenant/route.test.ts`, `i18n/routing.test.ts` and
-  `proxy.test.ts`. `apps/platform` has no Storybook.
+  `proxy.test.ts`, and the light-palette contrast guard
+  `styles/admin-theme-contrast.test.ts`. `apps/platform` has no Storybook.
 
 ## Related
 

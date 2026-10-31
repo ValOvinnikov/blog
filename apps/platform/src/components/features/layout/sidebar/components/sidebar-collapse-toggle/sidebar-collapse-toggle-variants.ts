@@ -5,7 +5,7 @@ export const sidebarCollapseToggleVariants = tv({
     root: [
       'inline-flex shrink-0 items-center justify-center rounded-admin-control p-1.5',
       'text-admin-side-text/75 transition-colors duration-base ease-smooth',
-      'hover:bg-admin-side-line hover:text-white',
+      'hover:bg-admin-side-line hover:text-admin-side-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
     ],

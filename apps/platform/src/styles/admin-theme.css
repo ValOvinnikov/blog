@@ -3,13 +3,17 @@
   --admin-bg: #f6f7f9;
   --admin-surface: #ffffff;
   --admin-surface-2: #fbfbfd;
+  --admin-surface-head: #eef1f6;
   --admin-line: #e5e7eb;
   --admin-line-2: #eef0f3;
-  --admin-control-line: #818a99;
+  --admin-control-line: #878f9d;
+  --admin-control-line-tint: #7c8493;
   --admin-text: #12141a;
+  --admin-text-strong: #12141a;
   --admin-muted: #5b6472;
-  --admin-faint: #8a93a3;
+  --admin-faint: #7a8394;
   --admin-brand: #4f46e5;
+  --admin-brand-ink: #4f46e5;
   --admin-brand-strong: #3730a3;
   --admin-brand-weak: #eef2ff;
   --admin-ok: #16794d;
@@ -20,18 +24,35 @@
   --admin-bad-weak: #fdeceb;
   --admin-bad-line: #dd6152;
   --admin-warn-on-dark: #f5c451;
-  --admin-side: #0f1115;
-  --admin-side-line: #1c1f26;
-  --admin-side-text: #c9cfda;
-  --admin-side-muted: #7d8696;
-  --admin-side-raised: #20242e;
-  --admin-side-accent: #a5b4fc;
+  --admin-side: #eef0f3;
+  --admin-side-line: #d9dde4;
+  --admin-side-text: #2a303b;
+  --admin-side-muted: #5b6472;
+  --admin-side-raised: #ffffff;
+  --admin-side-accent: #4f46e5;
+  --admin-side-field: #ffffff;
+  --admin-side-field-line: #7c8493;
   --admin-rail: #0f1115;
   --admin-rail-line: #1c1f26;
   --admin-rail-text: #c9cfda;
   --admin-rail-muted: #7d8696;
   --admin-rail-raised: #20242e;
   --admin-rail-accent: #a5b4fc;
+  --admin-popover: #ffffff;
+  --admin-popover-line: #e5e7eb;
+  --admin-popover-hover: #eef1f6;
+  --admin-pill-neutral: #eef0f3;
+  --admin-pill-neutral-popover: #eef0f3;
+  --admin-segment-on: #ffffff;
+  --admin-switch-thumb: #ffffff;
+  --admin-theme-track: #eef0f3;
+  --admin-tooltip: #12141a;
+  --admin-tooltip-text: #ffffff;
+  --admin-tooltip-line: transparent;
+  --admin-scrim: rgba(10, 12, 15, 0.35);
+  --admin-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --admin-shadow-menu: 0 12px 40px rgba(16, 24, 40, 0.14);
 }
 
 @theme inline {
@@ -40,13 +61,17 @@
   --color-admin-bg: var(--admin-bg);
   --color-admin-surface: var(--admin-surface);
   --color-admin-surface-2: var(--admin-surface-2);
+  --color-admin-surface-head: var(--admin-surface-head);
   --color-admin-line: var(--admin-line);
   --color-admin-line-2: var(--admin-line-2);
   --color-admin-control-line: var(--admin-control-line);
+  --color-admin-control-line-tint: var(--admin-control-line-tint);
   --color-admin-text: var(--admin-text);
+  --color-admin-text-strong: var(--admin-text-strong);
   --color-admin-muted: var(--admin-muted);
   --color-admin-faint: var(--admin-faint);
   --color-admin-brand: var(--admin-brand);
+  --color-admin-brand-ink: var(--admin-brand-ink);
   --color-admin-brand-strong: var(--admin-brand-strong);
   --color-admin-brand-weak: var(--admin-brand-weak);
   --color-admin-ok: var(--admin-ok);
@@ -63,12 +88,26 @@
   --color-admin-side-muted: var(--admin-side-muted);
   --color-admin-side-raised: var(--admin-side-raised);
   --color-admin-side-accent: var(--admin-side-accent);
+  --color-admin-side-field: var(--admin-side-field);
+  --color-admin-side-field-line: var(--admin-side-field-line);
   --color-admin-rail: var(--admin-rail);
   --color-admin-rail-line: var(--admin-rail-line);
   --color-admin-rail-text: var(--admin-rail-text);
   --color-admin-rail-muted: var(--admin-rail-muted);
   --color-admin-rail-raised: var(--admin-rail-raised);
   --color-admin-rail-accent: var(--admin-rail-accent);
+  --color-admin-popover: var(--admin-popover);
+  --color-admin-popover-line: var(--admin-popover-line);
+  --color-admin-popover-hover: var(--admin-popover-hover);
+  --color-admin-pill-neutral: var(--admin-pill-neutral);
+  --color-admin-pill-neutral-popover: var(--admin-pill-neutral-popover);
+  --color-admin-segment-on: var(--admin-segment-on);
+  --color-admin-switch-thumb: var(--admin-switch-thumb);
+  --color-admin-theme-track: var(--admin-theme-track);
+  --color-admin-tooltip: var(--admin-tooltip);
+  --color-admin-tooltip-text: var(--admin-tooltip-text);
+  --color-admin-tooltip-line: var(--admin-tooltip-line);
+  --color-admin-scrim: var(--admin-scrim);
 
   --text-admin-11: 11px;
   --text-admin-11-5: 11.5px;
@@ -90,7 +129,6 @@
   --radius-admin-control: 4px;
   --radius-admin-bar: 2px;
 
-  --shadow-admin:
-    0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
-  --shadow-admin-lg: 0 12px 40px rgba(16, 24, 40, 0.14);
+  --shadow-admin: var(--admin-shadow);
+  --shadow-admin-lg: var(--admin-shadow-menu);
 }

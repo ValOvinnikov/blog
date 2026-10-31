@@ -13,7 +13,9 @@ export const tenantSwitcherVariants = tv({
     ],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameRow: ['flex min-w-0 items-center gap-1.5'],
-    name: ['min-w-0 flex-1 truncate text-admin-13 font-semibold text-white'],
+    name: [
+      'min-w-0 flex-1 truncate text-admin-13 font-semibold text-admin-side-text',
+    ],
     domain: ['truncate font-mono text-admin-11 text-admin-faint'],
     chev: ['rotate-90 text-admin-faint'],
     badge: ['shrink-0'],

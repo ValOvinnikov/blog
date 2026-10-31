@@ -11,6 +11,13 @@ export function oklchToHex(l: number, c: number, h: number): string {
   return formatHex({ mode: 'oklch', l, c, h });
 }
 
+export function hexToOklch(hex: string): TOklchColor {
+  const color = toOklch(hex);
+  if (!color) throw new Error(`Not a hex colour: ${hex}`);
+
+  return { l: color.l, c: color.c, h: color.h ?? 0 };
+}
+
 /** WCAG 2 AA contrast-ratio floor for normal text. */
 export const WCAG_AA_CONTRAST_MIN = 4.5;
 
@@ -19,6 +26,7 @@ export type TOklchColor = { l: number; c: number; h: number; alpha?: number };
 type TToSrgb = (color: TOklchColor) => Rgb;
 
 const toRgb = converter('rgb');
+const toOklch = converter('oklch');
 const mapToSrgbGamut = toGamut('rgb', 'oklch');
 
 const memoizeByColor = (toSrgb: TToSrgb): TToSrgb => {
