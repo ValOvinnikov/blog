@@ -124,6 +124,14 @@ switches the content column to full-bleed (see
   admin role behind it.
 - Plan-gated dashboard pages go through `renderTenantScopedPage`, which 404s
   when the plan lacks the page. It is called as a function, never as JSX.
+- The tenant layouts render the sidebar once and keep it across client
+  navigation, so a badge that can change while the owner stays in
+  `/dashboard` must refresh the route itself. The Studio badge does: the
+  Studio page compares its fresh access state with the one the sidebar was
+  rendered with (`ShellStudioAccessProvider`) and refreshes when they differ,
+  and the home page's site-setup card refreshes once the run it polls
+  settles, which is when the owner invite is recorded. **Check now** already
+  refreshes. A virtual membership has no badge on either side.
 - `adminRoutes` is the only place platform URLs are built.
 - The shell's `Link` is `GuardedLink`, which asks before leaving a page with
   unsaved changes.
