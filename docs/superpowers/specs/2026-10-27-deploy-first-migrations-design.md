@@ -32,7 +32,11 @@ How each part finds a tenant's dataset and token:
 - Fresh keys for each recreated database, generated with `openssl rand -base64 32` and backed up in the team password manager before first use: `TENANT_TOKEN_ENCRYPTION_KEY`, `PERSONAL_DATA_ENCRYPTION_KEY` (a one-entry keyring, `v1:<key>`), `PERSONAL_DATA_INDEX_KEY` and `NEWSLETTER_UNSUBSCRIBE_KEY`. Production gets its set before its first deploy; dev gets a new set when its database is recreated, set in every Vercel project and GitHub Environment that reads them (`docs/context/environment-variables.md`) before the dev test tenants are recreated. The current values cannot be carried over: no backup of them exists outside the deployed env vars, and no database dump exists.
 - Until the reset, no Sanity content migrations or hand-written data fixes are written: nothing on dev is worth keeping. A change to a content shape updates the starter content the worker seeds instead, so every new tenant starts at the current shape. Postgres schema migrations are still generated for every table or column change, because dev's database only gets them that way; they must apply to dev's existing rows (a new required column needs a default).
 - After launch, content migrations return for every change to an existing shape, in option C's form below.
-- The first production tenant is created like every new tenant: the worker creates its Sanity project and seeds starter content at the current shape.
+- Production's first content comes from dev (owner, 2026-10-31): the `marketing.dev` and `demo.dev` tenants are its source. Production creates those two tenants through the worker like any other, then launch needs two things no tool does yet:
+  - A dev→prod Sanity dataset copy for each. Cloud Clone is Enterprise-only, so it is an export from the dev project and an import into the production project the worker created. Asset files go first, so asset ids come back unchanged.
+  - A way to carry each tenant's Postgres settings across: site config, Voice, feature toggles, and email config and templates. They live in dev's registry, keyed by dev's tenant ids, and must land on production's new tenant rows.
+  - The source tenants hold content and styling only (owner, 2026-10-31): no reader accounts, so no users, sessions, subscribers, bookmarks or leads are carried.
+- Every other production tenant is created like every new tenant: the worker creates its Sanity project and seeds starter content at the current shape.
 - Dev switches to the post-launch order (deploy first, then migrate) before launch, so the first breaking change after launch has already been rehearsed.
 - So launch has no migration problem. Everything below is about breaking changes after launch.
 - The migration tooling stays for that: a ledger in each dataset (the migration ids it has applied; a new tenant gets the ids its worker build knows, so a tenant created mid-release picks up the rest on the next run), the fan-out job, a record of which tenant failed, and a per-tenant retry.
@@ -43,6 +47,7 @@ How each part finds a tenant's dataset and token:
   4. Generate dev's fresh key set, back it up, and set it everywhere it is read.
   5. Dispatch `deploy-development.yml`: `migrate-db` applies the baseline.
   6. Reseed the dev console project from the starter content, bootstrap the super admin, and recreate the platform tenant and the test tenants through the worker.
+- Dev's database is clean (owner, 2026-10-31): no content migrations, and one Drizzle baseline.
 
 ## How we deploy today
 
