@@ -11,6 +11,7 @@ import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
 import { TextInput } from '@platform/components/shared/text-input';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -158,7 +159,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
               <div className={footerActions()}>
                 <Button
                   type="button"
-                  variant="primary"
+                  variant={BUTTON_VARIANT.PRIMARY}
                   onClick={handleSubmit}
                   isPending={isPending}
                   hasArrow={!isPending}

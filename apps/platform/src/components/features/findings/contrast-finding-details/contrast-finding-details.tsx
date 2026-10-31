@@ -2,6 +2,7 @@ import { SIZE } from '@blog/config';
 import type { TContrastResultBody } from '@blog/config/types';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { LinkButton } from '@platform/components/shared/link-button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
@@ -43,7 +44,7 @@ export const ContrastFindingDetails = ({
       <span className={actions()}>
         <ExternalLinkButton
           href={runUrl}
-          variant="secondary"
+          variant={BUTTON_VARIANT.SECONDARY}
           size={SIZE.SM}
           ariaLabel={t('viewRunLabel', { sha: shortSha })}
         >
@@ -51,7 +52,7 @@ export const ContrastFindingDetails = ({
         </ExternalLinkButton>
         <LinkButton
           href={adminRoutes.releases()}
-          variant="secondary"
+          variant={BUTTON_VARIANT.SECONDARY}
           size={SIZE.SM}
         >
           {t('openReleases')}

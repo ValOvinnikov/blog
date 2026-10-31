@@ -3,6 +3,7 @@
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { reactivateTenantAction } from '@platform/server/provisioning/reactivate-tenant-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useTenantLifecycleAction } from '@platform/utils/use-tenant-lifecycle-action/use-tenant-lifecycle-action';
@@ -36,7 +37,7 @@ export const ReactivateTenantControl = ({
           <Text variant="muted">{t('description')}</Text>
 
           <ConfirmDialog
-            tone="primary"
+            tone={BUTTON_VARIANT.PRIMARY}
             expectedValue={name}
             onConfirm={(confirm) => reactivateTenant(id, { confirm })}
             onConfirmed={() => router.refresh()}

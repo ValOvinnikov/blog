@@ -3,6 +3,7 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { ConfirmDialogContent } from '@platform/components/shared/confirm-dialog/components/content/confirm-dialog-content';
 import { ConfirmDialogTrigger } from '@platform/components/shared/confirm-dialog/components/trigger/confirm-dialog-trigger';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -38,7 +39,7 @@ const ConfirmDialogRoot = ({
   onConfirm,
   onConfirmed,
   onOpenChange,
-  tone = 'danger',
+  tone = BUTTON_VARIANT.DANGER,
   children,
 }: TConfirmDialogProps) => {
   const dialog = useConfirmDialog({ onConfirm, onConfirmed, onOpenChange });

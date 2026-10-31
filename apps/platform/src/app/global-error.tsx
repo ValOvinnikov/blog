@@ -6,6 +6,7 @@ import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
 import { Button } from '@platform/components/shared/button';
 import { inter } from '@platform/config/font-loaders/inter-font';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { NextIntlClientProvider } from 'next-intl';
 
 const globalErrorCopy = {
@@ -38,7 +39,10 @@ export default function GlobalError({ retry }: TProps) {
             title={globalErrorCopy.title}
             description={globalErrorCopy.description}
             action={
-              <Button variant="secondary" onClick={() => retry()}>
+              <Button
+                variant={BUTTON_VARIANT.SECONDARY}
+                onClick={() => retry()}
+              >
                 {globalErrorCopy.reload}
               </Button>
             }

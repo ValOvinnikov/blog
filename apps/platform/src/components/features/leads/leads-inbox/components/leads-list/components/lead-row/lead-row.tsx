@@ -1,4 +1,5 @@
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { formatShortDateTime } from '@platform/utils/format-short-date-time/format-short-date-time';
 import { useLocale, useNow, useTranslations } from 'next-intl';
@@ -23,7 +24,7 @@ export const LeadRow = ({ lead, isSelected, onOpen, ref }: TLeadRowProps) => {
   return (
     <Button
       ref={ref}
-      variant="unstyled"
+      variant={BUTTON_VARIANT.UNSTYLED}
       className={styles.row()}
       aria-current={isSelected ? 'true' : undefined}
       onClick={() => onOpen(lead)}

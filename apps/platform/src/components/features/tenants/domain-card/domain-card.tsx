@@ -4,6 +4,7 @@ import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -43,7 +44,7 @@ export const DomainCard = ({
             </StatusBadge>
             <LinkButton
               href={dnsHref}
-              variant="ghost"
+              variant={BUTTON_VARIANT.GHOST}
               size={SIZE.SM}
               hasArrow={true}
             >

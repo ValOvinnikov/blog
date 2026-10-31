@@ -3,6 +3,7 @@ import { LookCard } from '@platform/components/features/look/look-form/component
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Button } from '@platform/components/shared/button';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
@@ -21,7 +22,7 @@ export const PresetCard = () => {
         isDivergedFromPreset && (
           <Button
             type="button"
-            variant="secondary"
+            variant={BUTTON_VARIANT.SECONDARY}
             size={SIZE.SM}
             onClick={resetToPreset}
             isDisabled={isArchived}

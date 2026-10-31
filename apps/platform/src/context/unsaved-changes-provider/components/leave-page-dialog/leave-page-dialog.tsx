@@ -3,6 +3,7 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { AlertDialogShell } from '@platform/components/shared/alert-dialog-shell';
 import { Button } from '@platform/components/shared/button';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 
 type TLeavePageDialogProps = {
@@ -36,14 +37,22 @@ export const LeavePageDialog = ({
         description={description}
         actions={
           <>
-            <Button variant="ghost" onClick={onStay} isDisabled={isSaving}>
+            <Button
+              variant={BUTTON_VARIANT.GHOST}
+              onClick={onStay}
+              isDisabled={isSaving}
+            >
               {t('stay')}
             </Button>
-            <Button variant="danger" onClick={onDiscard} isDisabled={isSaving}>
+            <Button
+              variant={BUTTON_VARIANT.DANGER}
+              onClick={onDiscard}
+              isDisabled={isSaving}
+            >
               {t('discardAndLeave')}
             </Button>
             <Button
-              variant="primary"
+              variant={BUTTON_VARIANT.PRIMARY}
               onClick={onSave}
               isPending={isSaving}
               pendingLabel={t('saving')}
