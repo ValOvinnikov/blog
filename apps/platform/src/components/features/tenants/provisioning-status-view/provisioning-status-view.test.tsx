@@ -34,6 +34,7 @@ import {
   mockFirstStepRunningProvisioningSteps,
   mockMapDomainFailedProvisioningSteps,
   MOCK_TENANT_ID,
+  RUN_FINISHED_PENDING_TEXT,
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { STEP_REVEAL_DWELL_MS } from '@platform/utils/use-staged-step-statuses/use-staged-step-statuses';
@@ -69,7 +70,7 @@ const MOCK_DOMAINS_FAILURE =
   'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error';
 const MOCK_QUEUED_ADMITTED_AT = '2026-10-15T13:00:00.000Z';
 const MOCK_QUEUED_STARTED_AT = '2026-10-15T13:01:00.000Z';
-const FINISHED_PENDING = '—';
+const MOCK_FINISHED_AT_LABEL = /Aug 12, 2026, 2:25 PM UTC/;
 const MOCK_FINISHED_RUN = {
   startedAt: MOCK_RUN_STARTED_AT,
   finishedAt: MOCK_RUN_PLUS_7_MIN_AT,
@@ -638,7 +639,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
 
       await advance(STEP_POLL_INTERVAL_MS);
 
-      const pendingFinish = screen.getByText(FINISHED_PENDING);
+      const pendingFinish = screen.getByText(RUN_FINISHED_PENDING_TEXT);
 
       expect(pendingFinish).toBeVisible();
 
@@ -646,15 +647,20 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         await advance(STEP_REVEAL_DWELL_MS);
       }
 
-      const stillPendingFinish = screen.getByText(FINISHED_PENDING);
+      const stillPendingFinish = screen.getByText(RUN_FINISHED_PENDING_TEXT);
 
       expect(stillPendingFinish).toBeVisible();
 
       await advance(STEP_REVEAL_DWELL_MS);
 
-      const removedPendingFinish = screen.queryByText(FINISHED_PENDING);
+      const removedPendingFinish = screen.queryByText(
+        RUN_FINISHED_PENDING_TEXT,
+      );
+      const finishedTime = screen.getByText(MOCK_FINISHED_AT_LABEL);
 
       expect(removedPendingFinish).not.toBeInTheDocument();
+      expect(finishedTime.tagName).toBe('TIME');
+      expect(finishedTime).toHaveAttribute('dateTime', MOCK_RUN_PLUS_7_MIN_AT);
     });
 
     it('shows a reloaded finished run as finished at once', () => {
@@ -668,7 +674,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         }),
       });
 
-      const pendingFinish = screen.queryByText(FINISHED_PENDING);
+      const pendingFinish = screen.queryByText(RUN_FINISHED_PENDING_TEXT);
       const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
       const runningStatus = within(stepsCard).queryByText(RUNNING);
 
