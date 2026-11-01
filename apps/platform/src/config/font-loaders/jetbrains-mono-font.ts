@@ -9,5 +9,6 @@ export const jetbrainsMono = localFont({
     },
   ],
   display: 'swap',
+  variable: '--font-admin-mono-family',
   preload: false,
 });
