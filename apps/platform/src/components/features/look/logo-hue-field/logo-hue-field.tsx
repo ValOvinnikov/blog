@@ -60,7 +60,7 @@ export const LogoHueField = ({
           <span className={tone()} style={{ background: tones['--logo-3'] }} />
         </span>
         <HueSlider
-          ariaLabel={t('logoHueAriaLabel')}
+          name={{ ariaLabel: t('logoHueAriaLabel') }}
           value={resolvedHue}
           onChange={onChange}
           isDisabled={follows || isDisabled}

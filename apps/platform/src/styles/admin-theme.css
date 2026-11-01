@@ -70,6 +70,8 @@
   --admin-shadow-bar: 0 2px 8px rgba(16, 24, 40, 0.08);
   --admin-shadow-dock: 0 -2px 8px rgba(16, 24, 40, 0.06);
   --admin-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.08);
+  --admin-shadow-thumb: 0 1px 3px rgba(16, 24, 40, 0.25);
+  --admin-thumb-line: rgba(16, 24, 40, 0.12);
 }
 
 @theme inline {
@@ -135,6 +137,7 @@
   --color-admin-frame-dot: var(--admin-frame-dot);
   --color-admin-frame-track: var(--admin-frame-track);
   --color-admin-frame-thumb: var(--admin-frame-thumb);
+  --color-admin-thumb-line: var(--admin-thumb-line);
   --color-admin-fade-end: var(--admin-fade-end);
   --color-admin-fade-end-surface: var(--admin-fade-end-surface);
 
@@ -178,4 +181,5 @@
   --shadow-admin-bar: var(--admin-shadow-bar);
   --shadow-admin-dock: var(--admin-shadow-dock);
   --shadow-admin-xs: var(--admin-shadow-xs);
+  --shadow-admin-thumb: var(--admin-shadow-thumb);
 }

@@ -1842,6 +1842,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "HUE_SLIDER_TRACK.PALETTE",
+        "scope": "app:platform",
+        "from": "@platform/constants/hue-slider",
+        "file": "apps/platform/src/constants/hue-slider.ts"
       }
     ],
     "QUOTE": [
@@ -4908,6 +4914,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/github",
         "file": "apps/platform/src/constants/github.ts"
+      }
+    ],
+    "RAINBOW": [
+      {
+        "ref": "HUE_SLIDER_TRACK.RAINBOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/hue-slider",
+        "file": "apps/platform/src/constants/hue-slider.ts"
       }
     ],
     "XXXS": [

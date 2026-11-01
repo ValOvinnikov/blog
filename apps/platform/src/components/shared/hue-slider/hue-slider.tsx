@@ -2,32 +2,38 @@
 
 import { Slider } from '@base-ui/react/slider';
 import { HUE_MAX, HUE_MIN } from '@blog/config';
-import { accentHueGradient } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
-import type { AriaAttributes, CSSProperties } from 'react';
+import {
+  HUE_SLIDER_TRACK,
+  type THueSliderTrack,
+} from '@platform/constants/hue-slider';
+import { useTranslations } from 'next-intl';
+import type { AriaAttributes } from 'react';
 
+import { HUE_SLIDER_TRACK_STYLE } from './hue-slider-tracks';
 import { hueSliderVariants } from './hue-slider-variants';
 
-const TRACK_STYLE: CSSProperties = { background: accentHueGradient() };
+type THueSliderName = { ariaLabel: string } | { labelledBy: string };
 
 export type THueSliderProps = {
   id?: string;
-  ariaLabel: string;
+  name: THueSliderName;
   value: number;
   onChange: (value: number) => void;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
-  className?: string;
+  track?: THueSliderTrack;
 };
 
 export const HueSlider = ({
   id,
-  ariaLabel,
+  name,
   value,
   onChange,
   isDisabled,
   'aria-describedby': ariaDescribedBy,
-  className,
+  track: trackKind = HUE_SLIDER_TRACK.PALETTE,
 }: THueSliderProps) => {
+  const t = useTranslations('logoHueField');
   const { root, control, track, thumb } = hueSliderVariants();
 
   return (
@@ -40,13 +46,18 @@ export const HueSlider = ({
       min={HUE_MIN}
       max={HUE_MAX}
       disabled={isDisabled}
-      className={root({ class: className })}
+      className={root()}
     >
       <Slider.Control className={control()}>
-        <Slider.Track className={track()} style={TRACK_STYLE}>
+        <Slider.Track
+          className={track()}
+          style={HUE_SLIDER_TRACK_STYLE[trackKind]}
+        >
           <Slider.Thumb
             id={id}
-            aria-label={ariaLabel}
+            aria-label={'ariaLabel' in name ? name.ariaLabel : undefined}
+            aria-labelledby={'labelledBy' in name ? name.labelledBy : undefined}
+            getAriaValueText={(_formatted, hue) => t('hueValue', { hue })}
             aria-describedby={ariaDescribedBy}
             className={thumb()}
           />
