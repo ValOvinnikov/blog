@@ -150,7 +150,13 @@ switches the content column to full-bleed (see
   and `--admin-shadow-menu`. The light sidebar is grey (`side` #eef0f3 with
   `side-line` rules); its wordmark is `text-strong`, its text `side-text` and
   `side-muted`, and no sidebar text is drawn in `faint`, which is for icons
-  and chevrons only. The onboarding rail and the Choose a workspace page read
+  and chevrons only. A nav row rests in `side-text` with a `side-muted`
+  icon (a colour, never an opacity) and hovers to a `side-line` ground; the
+  current page's row is a `side-raised` plate with the raised shadow, its
+  text and icon `text-strong` at 600, and a 3px `side-accent` bar on its left
+  edge, on the collapsed rail too. A focused row keeps its rest colours and
+  shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
+  The onboarding rail and the Choose a workspace page read
   the separate `rail` tokens and stay dark.
 - Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`

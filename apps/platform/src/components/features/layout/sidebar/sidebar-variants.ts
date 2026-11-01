@@ -32,7 +32,7 @@ export const sidebarVariants = tv({
     ],
     list: ['flex flex-col gap-0.5'],
     row: [
-      'group flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-admin-13',
+      'group relative flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-admin-13',
       'transition-colors duration-base ease-smooth',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
@@ -46,7 +46,11 @@ export const sidebarVariants = tv({
   variants: {
     state: {
       active: {
-        row: ['bg-admin-side-raised text-admin-side-text'],
+        row: [
+          'bg-admin-side-raised font-semibold text-admin-text-strong shadow-admin',
+          'focus-visible:shadow-none',
+          'before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-admin-bar before:bg-admin-side-accent',
+        ],
       },
       resting: {
         row: ['text-admin-side-text', 'hover:bg-admin-side-line'],

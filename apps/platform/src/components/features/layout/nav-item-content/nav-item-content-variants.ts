@@ -4,8 +4,8 @@ export const navItemContentVariants = tv({
   slots: {
     // The icon reads `aria-current` off its ancestor row via `group-aria-*`, not a state prop.
     rowIcon: [
-      'opacity-75 transition-opacity duration-base ease-smooth',
-      'group-aria-[current=page]:text-admin-side-accent group-aria-[current=page]:opacity-100',
+      'text-admin-side-muted transition-colors duration-base ease-smooth',
+      'group-aria-[current=page]:text-admin-text-strong',
     ],
     // `sr-only`, not `hidden`, so the label stays the row's accessible name when collapsed.
     rowBody: [
