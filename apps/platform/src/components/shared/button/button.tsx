@@ -57,7 +57,8 @@ export const Button = ({
   const hasPendingLabel = !isUndefined(pendingLabel);
   const isPendingWithLabel = isPending && hasPendingLabel;
   const isBlocked = isAriaDisabled || isPending;
-  const isUnstyled = variant === BUTTON_VARIANT.UNSTYLED;
+  const isUnstyled =
+    variant === BUTTON_VARIANT.UNSTYLED || variant === BUTTON_VARIANT.LINK;
 
   const hasClickBehaviour = !isUndefined(onClick) || isBlocked;
 

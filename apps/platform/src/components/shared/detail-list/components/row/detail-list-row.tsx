@@ -19,15 +19,15 @@ export const DetailListRow = ({
   action,
   className,
 }: TDetailListRowProps) => {
-  const { term, description, value } = detailListVariants({ isMono });
+  const { row, term, description, value } = detailListVariants({ isMono });
 
   return (
-    <>
+    <div className={row()}>
       <dt className={term()}>{label}</dt>
       <dd className={description({ class: className })}>
         <span className={value()}>{children}</span>
         {action}
       </dd>
-    </>
+    </div>
   );
 };
