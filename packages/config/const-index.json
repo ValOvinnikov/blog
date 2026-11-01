@@ -4982,6 +4982,28 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "DESKTOP": [
+      {
+        "ref": "MENU_RADIO_GROUP_SIZE.DESKTOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/menu-radio-group",
+        "file": "apps/platform/src/constants/menu-radio-group.ts"
+      },
+      {
+        "ref": "PREVIEW_WIDTH.DESKTOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "TOUCH": [
+      {
+        "ref": "MENU_RADIO_GROUP_SIZE.TOUCH",
+        "scope": "app:platform",
+        "from": "@platform/constants/menu-radio-group",
+        "file": "apps/platform/src/constants/menu-radio-group.ts"
+      }
+    ],
     "CHECKING": [
       {
         "ref": "SITE_ADDRESS_STATUS.CHECKING",
@@ -5124,14 +5146,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/owner-studio-access",
         "file": "apps/platform/src/constants/owner-studio-access.ts"
-      }
-    ],
-    "DESKTOP": [
-      {
-        "ref": "PREVIEW_WIDTH.DESKTOP",
-        "scope": "app:platform",
-        "from": "@platform/constants/preview",
-        "file": "apps/platform/src/constants/preview.ts"
       }
     ],
     "MOBILE": [
