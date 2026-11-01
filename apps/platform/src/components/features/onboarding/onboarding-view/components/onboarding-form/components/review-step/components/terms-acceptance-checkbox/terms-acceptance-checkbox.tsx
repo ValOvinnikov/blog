@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Checkbox } from '@platform/components/shared/checkbox';
 import { LegalPageLink } from '@platform/components/shared/legal-page-link';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
@@ -23,6 +23,7 @@ export const TermsAcceptanceCheckbox = ({
     <Checkbox
       isChecked={isChecked}
       onCheckedChange={onCheckedChange}
+      size={SIZE.LG}
       label={t.rich('acceptTerms', {
         terms: (chunks) => (
           <LegalPageLink href={legalPageUrls?.terms}>{chunks}</LegalPageLink>

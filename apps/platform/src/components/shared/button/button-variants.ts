@@ -1,4 +1,5 @@
 import { SIZE } from '@blog/config';
+import { TEXT_LINK_COLOUR_CLASSES } from '@platform/components/shared/text-link/text-link-variants';
 import {
   BUTTON_VARIANT,
   type TButtonVariant,
@@ -10,7 +11,7 @@ import type { VariantProps } from 'tailwind-variants';
 
 const STYLED_VARIANTS: Exclude<
   TButtonVariant,
-  typeof BUTTON_VARIANT.UNSTYLED
+  typeof BUTTON_VARIANT.UNSTYLED | typeof BUTTON_VARIANT.LINK
 >[] = [
   BUTTON_VARIANT.PRIMARY,
   BUTTON_VARIANT.SECONDARY,
@@ -53,6 +54,16 @@ export const buttonVariants = tv({
       },
       [BUTTON_VARIANT.UNSTYLED]: {
         root: [],
+      },
+      [BUTTON_VARIANT.LINK]: {
+        root: [
+          'inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center md:min-h-9 md:min-w-9',
+          'rounded-admin-control border-0 bg-transparent px-1 py-0',
+          'text-admin-13-5 leading-5 font-semibold no-underline',
+          TEXT_LINK_COLOUR_CLASSES,
+          'hover:text-admin-brand-hover',
+          focusRingClasses(FOCUS_RING_GROUND.SURFACE),
+        ],
       },
     },
     size: {

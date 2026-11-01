@@ -9,16 +9,18 @@ import {
 
 type TDetailListProps = {
   isStackedToLg?: TDetailListVariants['isStackedToLg'];
+  isBordered?: TDetailListVariants['isBordered'];
   children: ReactNode;
   className?: string;
 };
 
 const DetailListRoot = ({
   isStackedToLg = false,
+  isBordered = false,
   children,
   className,
 }: TDetailListProps) => {
-  const { root } = detailListVariants({ isStackedToLg });
+  const { root } = detailListVariants({ isStackedToLg, isBordered });
 
   return <dl className={root({ class: className })}>{children}</dl>;
 };

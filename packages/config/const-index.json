@@ -1238,6 +1238,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "BUTTON_VARIANT.LINK",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
       }
     ],
     "COOKIE_SETTINGS": [

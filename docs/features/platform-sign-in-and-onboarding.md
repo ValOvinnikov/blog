@@ -154,9 +154,12 @@ Free site.
      Blank), and changing the site type moves the preview with it until the
      owner picks a preset or moves the accent here; from then on their choice
      stays whatever the site type.
-  4. **Review** — every choice with an Edit button back to its step, and the
-     terms acceptance again (a magic link opened in another browser carries
-     no `/signup` cookie).
+  4. **Review** — every choice in a ruled row (`DetailList` with
+     `isBordered`), each with an Edit back to its step: a button styled as a
+     text link (`BUTTON_VARIANT.LINK`), since it changes the step rather than
+     navigating. Below the rows, the terms acceptance again in the 18px
+     checkbox (`SIZE.LG`) (a magic link opened in another browser carries no
+     `/signup` cookie).
 
   Continue checks only the current step: the name must not be blank, and the
   address must be filled in and not known to be taken, reserved or invalid.
