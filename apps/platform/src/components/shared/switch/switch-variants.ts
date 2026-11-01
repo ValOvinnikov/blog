@@ -1,4 +1,6 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const switchVariants = tv({
@@ -13,10 +15,10 @@ export const switchVariants = tv({
       'transition-colors duration-150',
       'data-[checked]:bg-admin-brand',
       'data-[disabled]:cursor-not-allowed',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     thumb: [
-      'absolute left-0.5 top-0.5 size-4 rounded-full bg-admin-surface shadow-admin',
+      'absolute left-0.5 top-0.5 size-4 rounded-full bg-admin-switch-thumb shadow-[0_1px_2px_rgba(16,24,40,.25)]',
       'transition-transform duration-150',
       'data-[checked]:translate-x-4',
     ],

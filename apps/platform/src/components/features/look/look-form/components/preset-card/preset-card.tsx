@@ -4,6 +4,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { Button } from '@platform/components/shared/button';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
@@ -24,6 +25,7 @@ export const PresetCard = () => {
             type="button"
             variant={BUTTON_VARIANT.SECONDARY}
             size={SIZE.SM}
+            focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
             onClick={resetToPreset}
             isDisabled={isArchived}
             aria-describedby={archivedDescribedBy}

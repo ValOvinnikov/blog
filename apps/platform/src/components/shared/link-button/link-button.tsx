@@ -11,6 +11,7 @@ export type TLinkButtonProps = {
   href: string;
   variant?: TButtonVariants['variant'];
   size?: TButtonVariants['size'];
+  focusGround?: TButtonVariants['focusGround'];
   children?: ReactNode;
   className?: string;
   ariaLabel?: string;
@@ -21,6 +22,7 @@ export const LinkButton = ({
   href,
   variant,
   size,
+  focusGround,
   children,
   className,
   ariaLabel,
@@ -29,7 +31,9 @@ export const LinkButton = ({
   return (
     <Link
       href={href}
-      className={buttonVariants({ variant, size }).root({ class: className })}
+      className={buttonVariants({ variant, size, focusGround }).root({
+        class: className,
+      })}
       aria-label={ariaLabel}
     >
       {children}

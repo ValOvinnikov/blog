@@ -4,7 +4,10 @@ import {
   BUTTON_VARIANT,
   type TButtonVariant,
 } from '@platform/constants/button';
-import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import {
+  FOCUS_RING_GROUND,
+  type TFocusRingGround,
+} from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
@@ -18,6 +21,12 @@ const STYLED_VARIANTS: Exclude<
   BUTTON_VARIANT.GHOST,
   BUTTON_VARIANT.DANGER,
 ];
+
+const FOCUS_GROUNDS = [
+  FOCUS_RING_GROUND.BG,
+  FOCUS_RING_GROUND.SURFACE,
+  FOCUS_RING_GROUND.SURFACE_HEAD,
+] as const satisfies TFocusRingGround[];
 
 const FACE = [
   'col-start-1 row-start-1 inline-flex items-center justify-center gap-[7px]',
@@ -72,12 +81,22 @@ export const buttonVariants = tv({
       [SIZE.MD]: {},
       [SIZE.LG]: {},
     },
+    focusGround: {
+      [FOCUS_RING_GROUND.BG]: {},
+      [FOCUS_RING_GROUND.SURFACE]: {},
+      [FOCUS_RING_GROUND.SURFACE_HEAD]: {},
+    },
     isPending: {
       true: { idleFace: ['invisible'] },
       false: { busyFace: ['invisible'] },
     },
   },
   compoundVariants: [
+    ...FOCUS_GROUNDS.map((focusGround) => ({
+      variant: STYLED_VARIANTS,
+      focusGround,
+      class: { root: [focusRingClasses(focusGround)] },
+    })),
     {
       variant: STYLED_VARIANTS,
       class: {
@@ -87,7 +106,6 @@ export const buttonVariants = tv({
           'cursor-pointer aria-busy:cursor-progress',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
           'aria-disabled:not-aria-busy:cursor-not-allowed aria-disabled:not-aria-busy:opacity-[.45]',
-          'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
         ],
         faces: ['grid'],
         idleFace: FACE,
@@ -101,8 +119,6 @@ export const buttonVariants = tv({
         root: [
           'h-11 min-w-16 justify-center px-[14px] py-0 text-admin-13-5 leading-4 font-semibold shadow-none',
           'md:h-7 md:min-w-0 md:px-[10px] md:text-admin-12-5',
-          'focus-visible:ring-0 focus-visible:ring-offset-0',
-          focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
       },
     },
@@ -147,10 +163,20 @@ export const buttonVariants = tv({
       size: SIZE.LG,
       class: { root: ['px-[18px]'] },
     },
+    {
+      variant: BUTTON_VARIANT.SECONDARY,
+      class: {
+        root: [
+          'disabled:border-admin-control-line-locked disabled:text-admin-muted disabled:opacity-100',
+          'aria-disabled:not-aria-busy:border-admin-control-line-locked aria-disabled:not-aria-busy:text-admin-muted aria-disabled:not-aria-busy:opacity-100',
+        ],
+      },
+    },
   ],
   defaultVariants: {
     variant: BUTTON_VARIANT.SECONDARY,
     size: SIZE.MD,
+    focusGround: FOCUS_RING_GROUND.SURFACE,
     isPending: false,
   },
 });

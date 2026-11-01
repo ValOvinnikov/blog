@@ -3,6 +3,7 @@
 import { ACTION_OUTCOME, SIZE, type TOutcome } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { useToast } from '@platform/context/toast-provider';
 import { startContrastCheckAction } from '@platform/server/releases/start-contrast-check-action';
@@ -61,6 +62,7 @@ export const RunContrastCheckButton = ({
     <Button
       variant={BUTTON_VARIANT.PRIMARY}
       size={SIZE.SM}
+      focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
       isDisabled={isRunning}
       isPending={isPending}
       pendingLabel={t('starting')}
