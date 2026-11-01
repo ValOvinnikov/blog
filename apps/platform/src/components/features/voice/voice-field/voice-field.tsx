@@ -9,6 +9,7 @@ import {
   type TVoicePortableText,
 } from '@blog/config';
 import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
+import { FieldResetButton } from '@platform/components/shared/field-reset-button';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
@@ -47,6 +48,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const {
     root,
     header,
+    status,
     labelGroup,
     label: labelSlot,
     token,
@@ -58,6 +60,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const errorId = `${inputId}-error`;
   const label = tLabels(field.id);
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
+  const isCustomised = isVoiceValueCustomised(value);
   const textValue = typeof value === 'string' ? value : '';
   const [placeholderToken] = field.placeholders;
   const richDescribedBy = [
@@ -91,11 +94,13 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
             {tHints(field.id)}
           </Field.Description>
         </div>
-        <FieldStatus
-          isCustomised={isVoiceValueCustomised(value)}
-          isUnsaved={!isSameJson(value, savedValue)}
-          onReset={isReadOnly ? undefined : reset}
-        />
+        <div className={status()}>
+          <FieldStatus
+            isCustomised={isCustomised}
+            isUnsaved={!isSameJson(value, savedValue)}
+          />
+          {isCustomised && !isReadOnly && <FieldResetButton onReset={reset} />}
+        </div>
       </div>
       {isRich ? (
         <PortableTextEditor<TVoicePortableText[number]>
