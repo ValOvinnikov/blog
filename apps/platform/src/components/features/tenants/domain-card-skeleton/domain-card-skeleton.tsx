@@ -6,10 +6,10 @@ import { Fragment } from 'react';
 
 import { domainCardSkeletonVariants } from './domain-card-skeleton-variants';
 
-const ROW_KEYS = ['domain', 'last-checked'];
+const ROW_KEYS = ['status', 'domain', 'last-checked'];
 
 export const DomainCardSkeleton = () => {
-  const { title, badge, action, term, value } = domainCardSkeletonVariants();
+  const { title, action, term, value } = domainCardSkeletonVariants();
   const { header: cardHeader, headerActions, body: cardBody } = cardVariants();
   const { root: detailList } = detailListVariants();
 
@@ -18,7 +18,6 @@ export const DomainCardSkeleton = () => {
       <div className={cardHeader()}>
         <Skeleton className={title()} />
         <div className={headerActions()}>
-          <Skeleton className={badge()} />
           <Skeleton className={action()} />
         </div>
       </div>

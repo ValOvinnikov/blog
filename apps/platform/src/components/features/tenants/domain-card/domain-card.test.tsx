@@ -48,6 +48,22 @@ describe(`<${DomainCard.name}/>`, () => {
   });
 
   it.each([
+    [DOMAIN_VERIFICATION_STATUS.VERIFIED, 'Verified'],
+    [DOMAIN_VERIFICATION_STATUS.PENDING, 'Pending — awaiting DNS'],
+    [DOMAIN_VERIFICATION_STATUS.NOT_ADDED, 'Not added yet'],
+    [DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED, 'Unavailable'],
+    [DOMAIN_VERIFICATION_STATUS.ERROR, "Couldn't check"],
+  ])('leads its rows with a %s Status row reading "%s"', (status, text) => {
+    setup({ domainVerificationStatus: status });
+
+    const [firstTerm] = screen.getAllByRole('term');
+    const [firstDefinition] = screen.getAllByRole('definition');
+
+    expect(firstTerm).toHaveTextContent('Status');
+    expect(firstDefinition).toHaveTextContent(text);
+  });
+
+  it.each([
     DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
     DOMAIN_VERIFICATION_STATUS.PENDING,
     DOMAIN_VERIFICATION_STATUS.VERIFIED,

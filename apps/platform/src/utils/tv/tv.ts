@@ -76,6 +76,9 @@ const SHADOW_TOKENS = [
   'admin-sheet',
   'admin-index',
   'admin-unsaved',
+  'admin-bar',
+  'admin-dock',
+  'admin-xs',
 ];
 
 const FONT_WEIGHT_TOKENS = ['admin-650'];

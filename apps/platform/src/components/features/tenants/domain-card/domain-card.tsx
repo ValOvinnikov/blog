@@ -30,31 +30,32 @@ export const DomainCard = ({
   dnsHref,
 }: TDomainCardProps) => {
   const t = useTranslations('tenantOverviewPage');
+  const tDomainPage = useTranslations('tenantDomainPage');
 
   return (
     <Card>
       <Card.Header
         title={t('domainCardTitle')}
         actions={
-          <>
+          <LinkButton
+            href={dnsHref}
+            variant={BUTTON_VARIANT.GHOST}
+            size={SIZE.SM}
+            hasArrow={true}
+          >
+            {t('dnsLinkButton')}
+          </LinkButton>
+        }
+      />
+      <Card.Body>
+        <DetailList>
+          <DetailList.Row label={tDomainPage('statusLabel')}>
             <StatusBadge
               tone={domainVerificationTone(domainVerificationStatus)}
             >
               {t(`dnsStatus.${domainVerificationStatus}`)}
             </StatusBadge>
-            <LinkButton
-              href={dnsHref}
-              variant={BUTTON_VARIANT.GHOST}
-              size={SIZE.SM}
-              hasArrow={true}
-            >
-              {t('dnsLinkButton')}
-            </LinkButton>
-          </>
-        }
-      />
-      <Card.Body>
-        <DetailList>
+          </DetailList.Row>
           <DetailList.Row label={t('publicDomainLabel')} isMono={true}>
             {tenant.primaryDomain}
           </DetailList.Row>
