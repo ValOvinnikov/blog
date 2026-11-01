@@ -4782,6 +4782,14 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "TOAST": [
+      {
+        "ref": "FOCUS_RING_GROUND.TOAST",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
     "GITHUB_ERROR": [
       {
         "ref": "GITHUB_FAILURE.GITHUB_ERROR",
