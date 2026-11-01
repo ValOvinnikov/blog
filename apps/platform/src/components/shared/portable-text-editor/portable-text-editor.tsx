@@ -2,6 +2,7 @@
 
 import { SIZE } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import {
   CONTROL_MODE,
   type TControlMode,
@@ -117,7 +118,7 @@ export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
             }
           }}
         />
-        {tokens !== undefined && tokens.length > 0 && (
+        {hasArrayGotItems(tokens) && (
           <PortableTextEditorTokenDecorations
             tokens={tokens}
             className={token()}

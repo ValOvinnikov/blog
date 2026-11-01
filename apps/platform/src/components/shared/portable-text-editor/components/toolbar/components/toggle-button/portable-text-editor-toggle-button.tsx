@@ -1,6 +1,7 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { Toolbar } from '@base-ui/react/toolbar';
 import { SIZE } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import { PortableTextEditorToolbarGlyph } from '@platform/components/shared/portable-text-editor/components/toolbar/components/glyph/portable-text-editor-toolbar-glyph';
 import type { TPortableTextEditorSize } from '@platform/components/shared/portable-text-editor/portable-text-editor-variants';
@@ -29,12 +30,12 @@ export const PortableTextEditorToggleButton = ({
 }: TPortableTextEditorToggleButtonProps) => {
   const { button } = portableTextEditorToggleButtonVariants({
     isActive,
-    isIconOnly: icon !== undefined,
+    isIconOnly: !isUndefined(icon),
     size,
   });
   const toggle = <Toggle pressed={isActive} onPressedChange={onToggle} />;
 
-  if (icon === undefined) {
+  if (isUndefined(icon)) {
     return (
       <Toolbar.Button
         render={toggle}
