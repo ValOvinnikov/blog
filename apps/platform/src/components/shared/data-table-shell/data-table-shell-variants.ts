@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const dataTableShellVariants = tv({
@@ -5,8 +7,7 @@ export const dataTableShellVariants = tv({
     card: ['overflow-hidden'],
     scrollRegion: [
       'overflow-x-auto',
-      // Inset because the card's overflow-hidden would clip an offset ring.
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-brand',
+      insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     table: ['w-full border-collapse text-left'],
     head: [
@@ -14,8 +15,8 @@ export const dataTableShellVariants = tv({
       'text-left text-admin-11 font-bold text-admin-muted uppercase tracking-[.06em]',
     ],
     sortButton: [
-      'inline-flex cursor-pointer items-center gap-1 rounded-admin-control uppercase',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      'flex w-full cursor-pointer items-center gap-1 px-[14px] py-2.5 uppercase',
+      insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
       'hover:text-admin-text',
     ],
     sortIcon: [],
@@ -32,6 +33,9 @@ export const dataTableShellVariants = tv({
   variants: {
     isAscending: {
       true: { sortIcon: ['rotate-180'] },
+    },
+    isSortable: {
+      true: { head: ['p-0'] },
     },
   },
 });

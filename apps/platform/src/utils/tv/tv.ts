@@ -34,7 +34,15 @@ const FONT_SIZE_TOKENS = [
   'admin-28',
 ];
 
-const FONT_FAMILY_TOKENS = ['display', 'body', 'read', 'mono', 'ui', 'admin'];
+const FONT_FAMILY_TOKENS = [
+  'display',
+  'body',
+  'read',
+  'mono',
+  'ui',
+  'admin',
+  'admin-mono',
+];
 
 const TRACKING_TOKENS = [
   'tight-display',
@@ -76,6 +84,9 @@ const SHADOW_TOKENS = [
   'admin-sheet',
   'admin-index',
   'admin-unsaved',
+  'admin-bar',
+  'admin-dock',
+  'admin-xs',
 ];
 
 const FONT_WEIGHT_TOKENS = ['admin-650'];

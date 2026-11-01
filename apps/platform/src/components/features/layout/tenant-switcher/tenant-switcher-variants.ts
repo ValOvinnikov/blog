@@ -1,23 +1,26 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const tenantSwitcherVariants = tv({
   slots: {
     trigger: [
-      'flex w-full items-center gap-[9px] rounded-admin-control border border-admin-side-line',
-      'bg-admin-side-raised px-2.5 py-2 text-left',
+      'flex w-full items-center gap-[9px] rounded-admin-control border border-admin-side-field-line',
+      'bg-admin-side-field px-2.5 py-2 text-left shadow-admin',
       'transition-colors duration-base ease-smooth',
       'hover:border-admin-side-accent/40',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
-      'data-[popup-open]:border-admin-brand',
+      focusRingClasses(FOCUS_RING_GROUND.SIDE),
+      'data-[popup-open]:border-admin-side-accent',
     ],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameRow: ['flex min-w-0 items-center gap-1.5'],
     name: [
-      'min-w-0 flex-1 truncate text-admin-13 font-semibold text-admin-side-text',
+      'min-w-0 flex-1 truncate text-admin-13 font-semibold text-admin-text',
     ],
-    domain: ['truncate font-mono text-admin-11 text-admin-faint'],
-    chev: ['rotate-90 text-admin-faint'],
+    domain: [
+      'truncate font-admin-mono text-admin-11 font-medium text-admin-muted',
+    ],
+    chev: ['rotate-90 text-admin-muted'],
     badge: ['shrink-0'],
     popup: [
       'min-w-56 overflow-hidden rounded-admin border border-admin-side-line',

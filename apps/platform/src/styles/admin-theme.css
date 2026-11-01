@@ -16,6 +16,8 @@
   --admin-brand-ink: #4f46e5;
   --admin-brand-strong: #3730a3;
   --admin-brand-weak: #eef2ff;
+  --admin-brand-line: #c7d2fe;
+  --admin-brand-hover: #3730a3;
   --admin-ok: #16794d;
   --admin-ok-weak: #e7f6ee;
   --admin-warn: #8a5f00;
@@ -65,10 +67,15 @@
   --admin-shadow-sheet: 0 -8px 24px rgba(16, 24, 40, 0.18);
   --admin-shadow-index: 0 1px 2px rgba(16, 24, 40, 0.05);
   --admin-shadow-unsaved: 0 -4px 12px rgba(16, 24, 40, 0.08);
+  --admin-shadow-bar: 0 2px 8px rgba(16, 24, 40, 0.08);
+  --admin-shadow-dock: 0 -2px 8px rgba(16, 24, 40, 0.06);
+  --admin-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.08);
 }
 
 @theme inline {
   --font-admin: var(--font-admin-family, 'Inter', system-ui, sans-serif);
+  --font-admin-mono:
+    var(--font-admin-mono-family, 'JetBrains Mono'), ui-monospace, monospace;
 
   --color-admin-bg: var(--admin-bg);
   --color-admin-surface: var(--admin-surface);
@@ -86,6 +93,8 @@
   --color-admin-brand-ink: var(--admin-brand-ink);
   --color-admin-brand-strong: var(--admin-brand-strong);
   --color-admin-brand-weak: var(--admin-brand-weak);
+  --color-admin-brand-line: var(--admin-brand-line);
+  --color-admin-brand-hover: var(--admin-brand-hover);
   --color-admin-ok: var(--admin-ok);
   --color-admin-ok-weak: var(--admin-ok-weak);
   --color-admin-warn: var(--admin-warn);
@@ -165,4 +174,7 @@
   --shadow-admin-sheet: var(--admin-shadow-sheet);
   --shadow-admin-index: var(--admin-shadow-index);
   --shadow-admin-unsaved: var(--admin-shadow-unsaved);
+  --shadow-admin-bar: var(--admin-shadow-bar);
+  --shadow-admin-dock: var(--admin-shadow-dock);
+  --shadow-admin-xs: var(--admin-shadow-xs);
 }

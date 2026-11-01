@@ -1,4 +1,6 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const checkboxVariants = tv({
@@ -15,7 +17,7 @@ export const checkboxVariants = tv({
       'transition-colors duration-150',
       'data-[checked]:border-admin-brand data-[checked]:bg-admin-brand',
       'data-[disabled]:cursor-not-allowed',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     tick: [
       'mb-0.5 h-2 w-1 rotate-45 border-b-2 border-r-2 border-admin-surface',

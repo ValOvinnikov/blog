@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const portableTextEditorToggleButtonVariants = tv({
@@ -8,7 +10,7 @@ export const portableTextEditorToggleButtonVariants = tv({
       'min-h-11 min-w-11 md:min-h-0 md:min-w-0',
       'text-admin-12-5 text-admin-text',
       'hover:bg-admin-line-2',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       'cursor-pointer',
     ],
   },

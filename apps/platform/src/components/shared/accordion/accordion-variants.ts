@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const accordionVariants = tv({
@@ -8,7 +10,7 @@ export const accordionVariants = tv({
     trigger: [
       'group/accordion-trigger flex min-h-11 w-full cursor-pointer items-start gap-3 rounded-admin-control px-2.5 py-3 text-left',
       'transition-colors duration-base ease-smooth hover:bg-admin-surface-2',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     chevron: [
       'mt-0.5 shrink-0 text-admin-muted',

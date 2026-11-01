@@ -14,8 +14,8 @@ export const avatarVariants = tv({
         'bg-admin-line-2 text-admin-muted',
       ],
       switcher: [
-        'size-[22px] rounded-admin-control text-admin-11 font-semibold',
-        'bg-admin-side-raised text-admin-side-text',
+        'size-[22px] rounded-admin-control text-admin-11 font-bold',
+        'bg-admin-brand-weak text-admin-brand-strong',
       ],
     },
   },

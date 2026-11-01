@@ -36,12 +36,12 @@ export const buttonVariants = tv({
       },
       [BUTTON_VARIANT.SECONDARY]: {
         root: [
-          'border-admin-control-line bg-admin-surface text-admin-text shadow-admin hover:bg-admin-surface-2',
+          'border-admin-control-line bg-admin-surface text-admin-text shadow-admin hover:border-admin-brand-ink',
         ],
       },
       [BUTTON_VARIANT.GHOST]: {
         root: [
-          'border-transparent bg-transparent text-admin-text hover:bg-admin-line-2',
+          'border-transparent bg-transparent text-admin-text hover:bg-admin-hover',
         ],
       },
       [BUTTON_VARIANT.DANGER]: {
@@ -102,6 +102,19 @@ export const buttonVariants = tv({
           'h-11 justify-center px-5 text-admin-14 font-semibold shadow-none md:h-10',
         ],
       },
+    },
+    {
+      variant: BUTTON_VARIANT.GHOST,
+      class: {
+        root: ['gap-[6px]'],
+        idleFace: ['gap-[6px]'],
+        busyFace: ['gap-[6px]'],
+      },
+    },
+    {
+      variant: BUTTON_VARIANT.GHOST,
+      size: SIZE.SM,
+      class: { root: ['px-[10px] py-0 md:px-[9px] md:py-[5px]'] },
     },
     {
       variant: BUTTON_VARIANT.SECONDARY,

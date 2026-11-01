@@ -156,8 +156,18 @@ switches the content column to full-bleed (see
   text and icon `text-strong` at 600, and a 3px `side-accent` bar on its left
   edge, on the collapsed rail too. A focused row keeps its rest colours and
   shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
-  The onboarding rail and the Choose a workspace page read
-  the separate `rail` tokens and stay dark.
+  The Workspace field is a `side-field` plate with a `side-field-line` border
+  and the raised shadow, its border `side-accent` while its dropdown is open;
+  its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
+  domain `muted` in the Mono font and its chevron `muted`. It carries the
+  active workspace's full name as its `title`, so a name cut by its ellipsis
+  reads on hover. Focused, it shows the side-gapped ring in place of its
+  shadow. The onboarding rail and the Choose a workspace page read the
+  separate `rail` tokens and stay dark.
+- The admin's Mono font is JetBrains Mono, from
+  `config/font-loaders/jetbrains-mono-font.ts`, applied on the admin `<body>`
+  and read through `--font-admin-mono` (`font-admin-mono`), with
+  `ui-monospace, monospace` behind it.
 - Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
@@ -170,9 +180,18 @@ switches the content column to full-bleed (see
 - Focus is one gapped ring, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-head, popover,
-  theme-track): a 2px gap in that ground, then a 2px `brand-ink` ring
+  theme-track, toast): a 2px gap in that ground, then a 2px `brand-ink` ring
   (`side-accent` on the sidebar), with no visible outline outside forced-colors mode. Text inputs, textareas
-  and the rich-text editor take it on `surface`. Fields have a
+  and the rich-text editor take it on `surface`, as do checkboxes, select
+  triggers, accordion triggers, underline view tabs, preset cards, the
+  hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
+  segmented options and segmented view tabs take it on `theme-track`. A ring
+  that a clipping parent would cut off is drawn inset
+  (`insetFocusRingClasses`): the data table's scroll region, and its sort
+  buttons, which fill their head cell. The toast's dismiss button is the one
+  exception: the same gap in the toast's ground with a fixed white ring,
+  since `brand-ink` is under 3:1 there. A raised shadow gives way to the
+  ring while focused. Fields have a
   `control-line` border, or `control-line-tint` on a card header or
   toolbar. An invalid field has a `bad-line` border, with its error in
   `bad` text and no icon.
