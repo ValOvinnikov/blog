@@ -27,46 +27,51 @@ const setup = customRender(OnboardingRail, {
   accountEmail: undefined,
 });
 
+const getRows = () =>
+  within(screen.getByRole('list', { name: STEPS_ARIA_LABEL })).getAllByRole(
+    'listitem',
+  );
+
 describe(`<${OnboardingRail.name}/>`, () => {
-  it('lists the steps as a named list with no navigation landmark', () => {
-    setup();
+  describe('past the first step', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const list = screen.getByRole('list', { name: STEPS_ARIA_LABEL });
-    const navigation = screen.queryByRole('navigation');
+    it('lists the steps as a named list with no navigation landmark', () => {
+      const list = screen.getByRole('list', { name: STEPS_ARIA_LABEL });
+      const navigation = screen.queryByRole('navigation');
 
-    expect(list).toBeInTheDocument();
-    expect(navigation).not.toBeInTheDocument();
+      expect(list).toBeInTheDocument();
+      expect(navigation).not.toBeInTheDocument();
+    });
+
+    it('announces a done step as complete, then its summary', () => {
+      const [doneRow] = getRows();
+
+      expect(doneRow).toHaveTextContent(
+        `${STEPS.SITE}${STEP_COMPLETE}${MOCK_SITE_SUMMARY}`,
+      );
+    });
+
+    it('marks only the current step as the current one', () => {
+      const rows = getRows();
+      const currentRows = rows.filter((row) => row.hasAttribute(ARIA_CURRENT));
+
+      expect(currentRows).toEqual([rows[1]]);
+      expect(rows[1]).toHaveAttribute(ARIA_CURRENT, 'step');
+    });
   });
 
-  it('announces a done step as complete, then its summary', () => {
-    setup();
+  describe('on the first step', () => {
+    beforeEach(() => {
+      setup({ currentIndex: 0 });
+    });
 
-    const [doneRow] = within(
-      screen.getByRole('list', { name: STEPS_ARIA_LABEL }),
-    ).getAllByRole('listitem');
+    it('does not call any step complete', () => {
+      const complete = screen.queryByText(STEP_COMPLETE);
 
-    expect(doneRow).toHaveTextContent(
-      `${STEPS.SITE}${STEP_COMPLETE}${MOCK_SITE_SUMMARY}`,
-    );
-  });
-
-  it('marks only the current step as the current one', () => {
-    setup();
-
-    const rows = within(
-      screen.getByRole('list', { name: STEPS_ARIA_LABEL }),
-    ).getAllByRole('listitem');
-    const currentRows = rows.filter((row) => row.hasAttribute(ARIA_CURRENT));
-
-    expect(currentRows).toEqual([rows[1]]);
-    expect(rows[1]).toHaveAttribute(ARIA_CURRENT, 'step');
-  });
-
-  it('does not call a step complete before it is done', () => {
-    setup({ currentIndex: 0 });
-
-    const complete = screen.queryByText(STEP_COMPLETE);
-
-    expect(complete).not.toBeInTheDocument();
+      expect(complete).not.toBeInTheDocument();
+    });
   });
 });
