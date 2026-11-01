@@ -168,7 +168,18 @@ switches the content column to full-bleed (see
   domain `muted` in the Mono font and its chevron `muted`. It carries the
   active workspace's full name as its `title`, so a name cut by its ellipsis
   reads on hover. Focused, it shows the side-gapped ring in place of its
-  shadow. The onboarding rail and the Choose a workspace page read the
+  shadow. The field is 52px tall at full sidebar width: padding 8px 8px 8px
+  10px, a 9px gap, `rounded-admin-control`, the 22×22 initials avatar, the
+  name (13px/600) on an 18px line over the domain (11px Mono) on a 16px line,
+  each cut to one line with an ellipsis, and one unrotated 16px down chevron;
+  it carries no "Workspace" label. Its dropdown opens 4px below it,
+  left-aligned at the field's width, on the shared popup frame. Each item is
+  the name (13px/500 `text`) over the Mono domain (11px `muted`), padding 6px
+  8px, `rounded-admin-control`, wrapping long text in full; the highlighted
+  item takes a `popover-hover` ground and no focus ring, and below `md` every
+  item is at least 44px tall with its lines centred. The current workspace
+  carries no visual marker; its item has `aria-current` for screen readers.
+  The onboarding rail and the Choose a workspace page read the
   separate `rail` tokens and stay dark.
 - The admin's Mono font is JetBrains Mono, from
   `config/font-loaders/jetbrains-mono-font.ts`, applied on the admin `<body>`

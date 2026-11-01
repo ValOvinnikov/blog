@@ -23,7 +23,7 @@ export const CenteredCardFrame = ({
     <div className={root()}>
       <main className={main()}>
         <div className={brand()}>
-          <BrandMark size={SIZE.LG} />
+          <BrandMark size={SIZE.XL} />
           <span className={brandName()}>{t('brandName')}</span>
         </div>
         <Card className={card()}>

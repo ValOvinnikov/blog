@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_CURRENT } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { WizardRail } from './wizard-rail';
@@ -12,7 +13,6 @@ const mockStep = () => ({
 });
 
 const MOCK_STEPS = [mockStep(), mockStep(), mockStep()];
-const ARIA_CURRENT = 'aria-current';
 const MOCK_ARIA_LABEL = faker.lorem.words(2);
 
 const setup = customRender(WizardRail, {

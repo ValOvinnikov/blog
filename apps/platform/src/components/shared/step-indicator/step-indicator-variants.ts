@@ -25,7 +25,7 @@ export const stepIndicatorVariants = tv({
       false: {},
     },
     isOnDark: {
-      true: {},
+      true: { circle: ['text-admin-12 font-semibold'] },
       false: {},
     },
   },
@@ -49,7 +49,7 @@ export const stepIndicatorVariants = tv({
       state: STEP_INDICATOR_STATE.UPCOMING,
       class: {
         circle: [
-          'border border-admin-rail-muted bg-transparent text-admin-rail-muted',
+          'border-[1.5px] border-admin-rail-muted bg-transparent text-admin-rail-muted',
         ],
       },
     },

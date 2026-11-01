@@ -11,6 +11,7 @@ import {
   DATA_REQUEST_EXPORT_FORMAT,
   type TDataRequestExportFormat,
 } from '@platform/constants/data-request';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
@@ -63,6 +64,7 @@ export const DataRequestResultCard = ({
                 type="button"
                 variant={BUTTON_VARIANT.SECONDARY}
                 size={SIZE.SM}
+                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
                 onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
                 isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
                 pendingLabel={t('exporting')}
@@ -73,6 +75,7 @@ export const DataRequestResultCard = ({
                 type="button"
                 variant={BUTTON_VARIANT.SECONDARY}
                 size={SIZE.SM}
+                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
                 onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
                 isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
                 pendingLabel={t('exporting')}

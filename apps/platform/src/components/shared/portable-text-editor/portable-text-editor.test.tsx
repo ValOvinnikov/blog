@@ -1,4 +1,4 @@
-import { VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
+import { SIZE, VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
@@ -125,6 +125,30 @@ describe(`<${PortableTextEditor.name}/>`, () => {
     );
   });
 
+  describe('in the compact size with the Voice schema', () => {
+    it('offers Bold, Italic and Link by name', () => {
+      setup({ schema: VOICE_PORTABLE_TEXT_SCHEMA, size: SIZE.SM });
+
+      const controls = screen.getAllByRole('button');
+      const allowedControls = [t('bold'), t('italic'), t('link')].map((name) =>
+        screen.getByRole('button', { name }),
+      );
+
+      expect(controls).toEqual(allowedControls);
+    });
+
+    it.each([CONTROL_MODE.READ_ONLY, CONTROL_MODE.DISABLED])(
+      'shows no toolbar when %s',
+      (mode) => {
+        setup({ schema: VOICE_PORTABLE_TEXT_SCHEMA, size: SIZE.SM, mode });
+
+        const toolbarButton = screen.queryByRole('button');
+
+        expect(toolbarButton).not.toBeInTheDocument();
+      },
+    );
+  });
+
   describe('when disabled', () => {
     beforeEach(() => {
       setup({ mode: CONTROL_MODE.DISABLED });
@@ -167,8 +191,11 @@ describe(`<${PortableTextEditor.name}/>`, () => {
 
   it('marks the field invalid and points it at its description', () => {
     setup({
-      field: { label: MOCK_LABEL, isInvalid: true },
-      'aria-describedby': MOCK_DESCRIPTION_ID,
+      field: {
+        label: MOCK_LABEL,
+        isInvalid: true,
+        describedBy: MOCK_DESCRIPTION_ID,
+      },
     });
 
     const field = screen.getByRole('textbox', { name: MOCK_LABEL });

@@ -10,6 +10,7 @@ import {
 } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import {
   MIGRATION_ENVIRONMENT,
   RELEASE_REFUSAL,
@@ -84,6 +85,9 @@ export const RunTenantMigrationsButton = ({
     <Button
       variant={retryTenant ? BUTTON_VARIANT.SECONDARY : BUTTON_VARIANT.PRIMARY}
       size={SIZE.SM}
+      focusGround={
+        retryTenant ? FOCUS_RING_GROUND.SURFACE : FOCUS_RING_GROUND.SURFACE_HEAD
+      }
       isPending={isPending}
       pendingLabel={t('starting')}
       aria-label={

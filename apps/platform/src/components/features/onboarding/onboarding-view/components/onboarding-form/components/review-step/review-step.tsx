@@ -5,6 +5,7 @@ import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   ONBOARDING_STEP,
   type TOnboardingStep,
@@ -21,7 +22,6 @@ type TReviewRow = {
   label: string;
   value: ReactNode;
   step: TOnboardingStep;
-  isMono?: boolean;
 };
 
 export type TReviewStepProps = {
@@ -45,7 +45,7 @@ export const ReviewStep = ({
   const tLanguage = useTranslations('languageNames');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
-  const { edit } = reviewStepVariants();
+  const { edit, swatch } = reviewStepVariants();
   const { siteType, name, locale, preset, accentHue, hasAcceptedTerms } =
     values;
 
@@ -60,7 +60,6 @@ export const ReviewStep = ({
       label: t('siteAddressLabel'),
       value: siteAddress,
       step: ONBOARDING_STEP.ADDRESS,
-      isMono: true,
     },
     {
       label: t('languageLabel'),
@@ -71,11 +70,12 @@ export const ReviewStep = ({
       label: t('presetLabel'),
       value: (
         <>
-          {tPreset(PRESET_LABEL_KEY[preset])}{' '}
+          {tPreset(PRESET_LABEL_KEY[preset])}
           <AccentSwatch
             hue={accentHue}
             size={SIZE.SM}
             name={tHue('hueValue', { hue: accentHue })}
+            className={swatch()}
           />
         </>
       ),
@@ -85,15 +85,14 @@ export const ReviewStep = ({
 
   return (
     <>
-      <DetailList>
-        {rows.map(({ label, value, step, isMono }) => (
+      <DetailList isBordered={true}>
+        {rows.map(({ label, value, step }) => (
           <DetailList.Row
             key={label}
             label={label}
-            isMono={isMono}
             action={
               <Button
-                size={SIZE.SM}
+                variant={BUTTON_VARIANT.LINK}
                 onClick={() => onEdit(step)}
                 aria-label={t('editField', { field: label })}
                 className={edit()}

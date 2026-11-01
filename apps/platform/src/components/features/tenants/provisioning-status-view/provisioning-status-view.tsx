@@ -13,6 +13,7 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
@@ -69,6 +70,7 @@ export const ProvisioningStatusView = ({
       type="button"
       variant={BUTTON_VARIANT.SECONDARY}
       size={SIZE.SM}
+      focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
       onClick={handleDispatch}
       isDisabled={isArchived}
       aria-describedby={isArchived ? archivedNoticeId : undefined}
@@ -82,6 +84,7 @@ export const ProvisioningStatusView = ({
       <Button
         type="button"
         variant={BUTTON_VARIANT.PRIMARY}
+        focusGround={FOCUS_RING_GROUND.BG}
         onClick={handleDispatch}
         isDisabled={isArchived}
         aria-describedby={isArchived ? archivedNoticeId : undefined}

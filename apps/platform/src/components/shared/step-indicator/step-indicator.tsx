@@ -1,3 +1,6 @@
+import { ICONS } from '@blog/config';
+import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE } from '@platform/constants/icon';
 import {
   STEP_INDICATOR_STATE,
   type TStepIndicatorState,
@@ -30,6 +33,7 @@ export const StepIndicator = ({
     isConnectorDone,
     isOnDark,
   });
+  const hasTick = isOnDark && state === STEP_INDICATOR_STATE.DONE;
 
   return (
     <div className={root()}>
@@ -38,7 +42,11 @@ export const StepIndicator = ({
         aria-hidden="true"
         data-testid="step-indicator-glyph"
       >
-        {GLYPH_BY_STATE[state] ?? stepNumber}
+        {hasTick ? (
+          <Icon name={ICONS.TICK} size={ICON_SIZE.XS} />
+        ) : (
+          (GLYPH_BY_STATE[state] ?? stepNumber)
+        )}
       </span>
       {hasConnector && (
         <span

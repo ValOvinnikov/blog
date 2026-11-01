@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
+import { ARIA_CURRENT } from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
@@ -32,8 +33,6 @@ const MOCK_INERT_ITEM = mockNavInertItem({
   disabledReason: MOCK_DISABLED_REASON,
 });
 
-const ARIA_CURRENT = 'aria-current';
-
 const renderSidebar = (
   props: Partial<TSidebarProps> = {},
   isInitiallyCollapsed = false,
@@ -59,7 +58,7 @@ describe(`<${Sidebar.name}/>`, () => {
     expect(link).toHaveAttribute('href', MOCK_LOOK_ITEM.href);
   });
 
-  it('renders the note instead of links when a section has no items yet', () => {
+  it('shows the note when a section has no items yet', () => {
     renderSidebar({
       sections: [mockNavSection({ items: [], note: MOCK_NOTE })],
     });

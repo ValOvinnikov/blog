@@ -1,3 +1,4 @@
+import { ICON_TEST_ID } from '@platform/constants/icon';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
 import { customRender, screen } from '@platform/testing/custom-render';
 
@@ -27,6 +28,16 @@ describe(`<${StepIndicator.name}/>`, () => {
     });
 
     expect(indicatorGlyph).toBeVisible();
+  });
+
+  it('draws a tick in place of the text glyph for a done step on dark', () => {
+    setup({ state: STEP_INDICATOR_STATE.DONE, isOnDark: true });
+
+    const tick = screen.getByTestId(ICON_TEST_ID);
+    const textGlyph = screen.queryByText('✓');
+
+    expect(tick).toBeInTheDocument();
+    expect(textGlyph).not.toBeInTheDocument();
   });
 
   it('renders a connector when it has one', () => {
