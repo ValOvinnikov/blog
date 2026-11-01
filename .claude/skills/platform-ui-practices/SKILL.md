@@ -183,10 +183,10 @@ from `useSettingsFormState()`:
   Settings pages get it from `SettingsFormShell`, whose `description` is
   required. The main action goes in `actions`: a primary `LinkButton` for an
   in-app route, `ExternalLinkButton` for an off-app one.
-- `PageHeader` is a band: `admin-surface` with an `admin-line` bottom rule,
-  painted out to the shell's edges and pulled up flush under the topbar by the
-  `--shell-gutter` `ShellFrame` sets. Status and controls sit in its right-hand
-  `actions` slot. The page root's `gap-6` sets header-to-content at 24px; don't
+- `PageHeader` sits directly on the page background — no band, rule or
+  padding of its own. The title block takes the free width and `actions` sit
+  top-right, wrapping under it, left-aligned, once less than 320px would be
+  left for the title. Status and controls sit in `actions`. The page root's `gap-6` sets header-to-content at 24px; don't
   add margin, padding or a background around it per page.
 - Width: a single-column settings page keeps `SettingsFormShell`'s `max-w-3xl`;
   one with a preview, or list + editor + preview, passes `isWide`; every other

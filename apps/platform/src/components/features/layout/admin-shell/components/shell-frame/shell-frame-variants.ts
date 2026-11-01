@@ -22,10 +22,7 @@ export const shellFrameVariants = tv({
         content: ['min-h-0 overflow-hidden'],
       },
       false: {
-        content: [
-          'w-full max-w-[1180px] p-4 md:p-[26px]',
-          '[--shell-gutter:--spacing(4)] md:[--shell-gutter:26px]',
-        ],
+        content: ['w-full max-w-[1180px] p-4 md:p-[26px]'],
       },
     },
   },
