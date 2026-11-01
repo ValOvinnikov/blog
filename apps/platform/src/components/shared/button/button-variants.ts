@@ -3,6 +3,8 @@ import {
   BUTTON_VARIANT,
   type TButtonVariant,
 } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -54,6 +56,7 @@ export const buttonVariants = tv({
       },
     },
     size: {
+      [SIZE.XS]: {},
       [SIZE.SM]: {},
       [SIZE.MD]: {},
       [SIZE.LG]: {},
@@ -78,6 +81,18 @@ export const buttonVariants = tv({
         faces: ['grid'],
         idleFace: FACE,
         busyFace: FACE,
+      },
+    },
+    {
+      variant: STYLED_VARIANTS,
+      size: SIZE.XS,
+      class: {
+        root: [
+          'h-11 min-w-16 justify-center px-[14px] py-0 text-admin-13-5 leading-4 font-semibold shadow-none',
+          'md:h-7 md:min-w-0 md:px-[10px] md:text-admin-12-5',
+          'focus-visible:ring-0 focus-visible:ring-offset-0',
+          focusRingClasses(FOCUS_RING_GROUND.SURFACE),
+        ],
       },
     },
     {

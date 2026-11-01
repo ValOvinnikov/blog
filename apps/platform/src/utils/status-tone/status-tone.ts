@@ -95,7 +95,7 @@ const SANITY_VALIDATION_MARKER_TONE: Record<
 
 const FIELD_STATUS_TONE: Record<TEmailItemStatus, TBadgeTone> = {
   default: 'neutral',
-  customised: 'brand',
+  customised: 'plan',
   unsaved: 'warn',
 };
 
