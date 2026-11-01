@@ -1,6 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { StepIndicator } from '@platform/components/shared/step-indicator';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
+import { useTranslations } from 'next-intl';
 
 import {
   onboardingRailStepVariants,
@@ -20,11 +21,13 @@ export const OnboardingRailStep = ({
   summary,
   state,
 }: TOnboardingRailStepProps) => {
+  const t = useTranslations('onboardingForm');
   const {
     item,
     body,
     label: labelSlot,
     summary: summarySlot,
+    status,
   } = onboardingRailStepVariants({ state });
   const isDone = state === STEP_INDICATOR_STATE.DONE;
 
@@ -41,6 +44,7 @@ export const OnboardingRailStep = ({
       />
       <span className={body()}>
         <span className={labelSlot()}>{label}</span>
+        {isDone && <span className={status()}>{t('stepComplete')}</span>}
         {isDone && summary && <span className={summarySlot()}>{summary}</span>}
       </span>
     </li>

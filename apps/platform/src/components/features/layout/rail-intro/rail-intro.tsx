@@ -4,6 +4,7 @@ export type TRailIntroProps = {
   title: string;
   description: string;
   isPageHeading?: boolean;
+  isWizard?: boolean;
   titleId?: string;
   className?: string;
 };
@@ -12,6 +13,7 @@ export const RailIntro = ({
   title,
   description,
   isPageHeading = false,
+  isWizard = false,
   titleId,
   className,
 }: TRailIntroProps) => {
@@ -19,7 +21,7 @@ export const RailIntro = ({
     root,
     title: titleSlot,
     description: descriptionSlot,
-  } = railIntroVariants({ isPageHeading });
+  } = railIntroVariants({ isPageHeading, isWizard });
   const TitleTag = isPageHeading ? 'h1' : 'p';
 
   return (

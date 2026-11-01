@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_CURRENT } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -9,7 +10,6 @@ vi.mock('@platform/i18n/navigation');
 
 faker.seed(5995);
 
-const ARIA_CURRENT = 'aria-current';
 const MOCK_ARIA_LABEL = faker.lorem.word();
 const MOCK_PLATFORM = faker.lorem.words(2);
 const MOCK_TENANTS = faker.lorem.words(3);
