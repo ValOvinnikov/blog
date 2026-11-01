@@ -13,14 +13,14 @@ export const selectVariants = tv({
     icon: ['shrink-0 text-admin-muted'],
     popup: [
       'max-h-[var(--available-height)] w-[min(20rem,calc(100vw-2rem))] min-w-[var(--anchor-width)] overflow-y-auto',
-      'rounded-admin border border-admin-line bg-admin-surface p-1 shadow-admin-lg outline-none',
+      'rounded-admin border border-admin-popover-line bg-admin-popover p-1 shadow-admin-lg outline-none',
     ],
     item: [
       'flex min-h-11 cursor-pointer items-center gap-2 rounded-admin-control px-2 py-2',
       'outline-none',
-      'data-[highlighted]:bg-admin-surface-2',
       'data-[selected]:bg-admin-brand-weak',
+      'data-[highlighted]:bg-admin-popover-hover data-[highlighted]:data-[selected]:bg-admin-popover-hover',
     ],
-    indicator: ['w-4 shrink-0 text-admin-brand'],
+    indicator: ['w-4 shrink-0 text-admin-brand-ink'],
   },
 });
