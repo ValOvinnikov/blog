@@ -4934,6 +4934,22 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "Home": [
+      {
+        "ref": "KEYBOARD_KEY.HOME",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "End": [
+      {
+        "ref": "KEYBOARD_KEY.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
     "leads.delete_failed": [
       {
         "ref": "LEAD_LOG.DELETE_FAILED",
