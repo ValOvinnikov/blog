@@ -173,6 +173,15 @@ switches the content column to full-bleed (see
 - `styles/admin-theme-contrast.test.ts` guards the light palette: each pair
   of token names must meet 4.5:1 for text and 3:1 for borders, tracks and
   focus rings, measured from the values in `admin-theme.css`.
+- Focus is one gapped ring, built by
+  `utils/focus-ring-classes/focus-ring-classes.ts` for a named
+  `FOCUS_RING_GROUND` (side, bg, surface, surface-head, popover,
+  theme-track): a 2px gap in that ground, then a 2px `brand-ink` ring
+  (`side-accent` on the sidebar), with no visible outline outside forced-colors mode. Text inputs, textareas
+  and the rich-text editor take it on `surface`. Fields have a
+  `control-line` border, or `control-line-tint` on a card header or
+  toolbar. An invalid field has a `bad-line` border, with its error in
+  `bad` text and no icon.
 - `apps/platform` owns its own primitives on Base UI and never imports
   `@blog/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is
