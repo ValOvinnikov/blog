@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const segmentedControlVariants = tv({
@@ -11,8 +13,8 @@ export const segmentedControlVariants = tv({
       'min-h-11 rounded-admin-control border-0 bg-transparent px-[14px] py-[7px] md:min-h-0',
       'text-admin-13 font-medium text-admin-muted',
       'cursor-pointer disabled:cursor-not-allowed',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-      'data-[pressed]:bg-admin-surface data-[pressed]:text-admin-text data-[pressed]:shadow-admin',
+      focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
+      'data-[pressed]:bg-admin-surface data-[pressed]:text-admin-text data-[pressed]:not-focus-visible:shadow-admin',
     ],
     optionLabel: ['font-semibold'],
     optionDescription: ['font-mono text-admin-11 font-normal text-admin-muted'],

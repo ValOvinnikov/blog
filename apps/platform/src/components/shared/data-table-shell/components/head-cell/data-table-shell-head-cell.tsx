@@ -35,7 +35,11 @@ export const DataTableShellHeadCell = ({
   const { direction, onSort } = sort;
 
   return (
-    <th className={head()} scope="col" aria-sort={direction}>
+    <th
+      className={head({ isSortable: true })}
+      scope="col"
+      aria-sort={direction}
+    >
       <button type="button" className={sortButton()} onClick={onSort}>
         {label}
         {direction && (

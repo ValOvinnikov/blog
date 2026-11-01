@@ -1,13 +1,13 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const viewTabsVariants = tv({
   slots: {
     root: [],
     list: ['grid grid-cols-2'],
-    tab: [
-      'cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-    ],
+    tab: ['cursor-pointer'],
   },
   variants: {
     variant: {
@@ -16,7 +16,8 @@ export const viewTabsVariants = tv({
         tab: [
           'min-h-11 rounded-admin-control px-[14px] py-[7px] md:min-h-0',
           'text-admin-13 font-medium text-admin-muted',
-          'data-[active]:bg-admin-surface data-[active]:text-admin-text data-[active]:shadow-admin',
+          'data-[active]:bg-admin-surface data-[active]:text-admin-text data-[active]:not-focus-visible:shadow-admin',
+          focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
       },
       [VIEW_TABS_VARIANT.UNDERLINE]: {
@@ -28,6 +29,7 @@ export const viewTabsVariants = tv({
           'h-11 border-b-2 border-transparent text-center',
           'text-admin-14 font-medium text-admin-muted not-data-[active]:hover:text-admin-text',
           'data-[active]:border-admin-brand data-[active]:font-semibold data-[active]:text-admin-brand-strong',
+          focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
       },
     },

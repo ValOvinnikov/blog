@@ -1,4 +1,6 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const selectVariants = tv({
@@ -7,7 +9,7 @@ export const selectVariants = tv({
       'flex min-h-11 w-full min-w-0 cursor-pointer items-center justify-between gap-2.5 md:min-h-10',
       'rounded-admin-control border border-admin-control-line bg-admin-surface px-[11px] py-[3px] text-left',
       'text-admin-16 text-admin-text md:text-admin-13-5',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
     ],
     icon: ['shrink-0 text-admin-muted'],

@@ -11,9 +11,10 @@ export const hueSliderVariants = tv({
     thumb: [
       'block size-5 rounded-full bg-white',
       'shadow-[0_1px_4px_rgba(0,0,0,.35),inset_0_0_0_1px_rgba(0,0,0,.08)]',
-      'outline-hidden transition-colors',
-      'focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-      'data-[dragging]:ring-2 data-[dragging]:ring-admin-brand',
+      'transition-colors',
+      // The focusable element is the thumb's hidden range input, not the thumb itself.
+      'has-[:focus-visible]:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]',
+      'data-[dragging]:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]',
     ],
   },
 });
