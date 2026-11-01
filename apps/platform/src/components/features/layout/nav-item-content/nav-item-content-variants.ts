@@ -13,7 +13,7 @@ export const navItemContentVariants = tv({
       'group-data-[collapsed=true]/shell:sr-only',
     ],
     rowLabel: ['truncate'],
-    rowReason: ['truncate text-admin-11 text-admin-side-muted'],
+    rowReason: ['text-admin-12 leading-4 text-admin-side-muted'],
     badgeSlot: [
       'ml-auto shrink-0',
       'group-data-[collapsed=true]/shell:sr-only',
