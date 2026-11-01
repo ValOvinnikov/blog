@@ -21,15 +21,11 @@ const FOCUS_RING_SHADOW_CLASSES: Record<TFocusRingGround, string> = {
   // Brand-ink is 2.93:1 on the toast's dark ground, so its ring is a fixed white.
   [FOCUS_RING_GROUND.TOAST]:
     'focus-visible:shadow-[0_0_0_2px_var(--admin-text),0_0_0_4px_#ffffff]',
-  [FOCUS_RING_GROUND.BRAND_WEAK]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-brand-weak),0_0_0_4px_var(--admin-brand-ink)]',
 };
 
 const INSET_FOCUS_RING_SHADOW_CLASSES: Record<TInsetFocusRingGround, string> = {
   [FOCUS_RING_GROUND.SURFACE]:
     'focus-visible:shadow-[inset_0_0_0_2px_var(--admin-surface),inset_0_0_0_4px_var(--admin-brand-ink)]',
-  [FOCUS_RING_GROUND.BRAND_WEAK]:
-    'focus-visible:shadow-[inset_0_0_0_2px_var(--admin-brand-weak),inset_0_0_0_4px_var(--admin-brand-ink)]',
 };
 
 export const focusRingClasses = (ground: TFocusRingGround): string =>

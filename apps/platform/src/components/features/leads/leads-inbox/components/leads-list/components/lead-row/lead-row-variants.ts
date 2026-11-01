@@ -24,8 +24,9 @@ export const leadRowVariants = tv({
     isSelected: {
       true: {
         row: [
-          'bg-admin-brand-weak ring-1 ring-inset ring-admin-brand hover:bg-admin-brand-weak focus-visible:ring-0',
-          insetFocusRingClasses(FOCUS_RING_GROUND.BRAND_WEAK),
+          'bg-admin-brand-weak ring-1 ring-inset ring-admin-brand hover:bg-admin-brand-weak',
+          // 3px and 5px, not 2px and 4px: the 1px brand edge stays outermost, then the 2px gap and ring.
+          'focus-visible:outline-hidden focus-visible:shadow-[inset_0_0_0_3px_var(--admin-brand-weak),inset_0_0_0_5px_var(--admin-brand-ink)]',
         ],
       },
       false: { row: [insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE)] },

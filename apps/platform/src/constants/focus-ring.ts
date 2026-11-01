@@ -8,10 +8,8 @@ export const FOCUS_RING_GROUND = {
   POPOVER: 'POPOVER',
   THEME_TRACK: 'THEME_TRACK',
   TOAST: 'TOAST',
-  BRAND_WEAK: 'BRAND_WEAK',
 } as const;
 
 export type TFocusRingGround = TValueOf<typeof FOCUS_RING_GROUND>;
 
-export type TInsetFocusRingGround =
-  typeof FOCUS_RING_GROUND.SURFACE | typeof FOCUS_RING_GROUND.BRAND_WEAK;
+export type TInsetFocusRingGround = typeof FOCUS_RING_GROUND.SURFACE;
