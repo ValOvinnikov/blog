@@ -105,29 +105,38 @@ Free site.
   (the sidebar's `admin-side*` tokens) carries the Valstack mark, "Create your
   site" and the step list, where each done step shows its choice ("Blog ·
   Field Notes", the site address, the preset); the current step's fields sit
-  in the middle with Back / Continue, and the live site preview stays on the
-  right on every step. The preview is framed as the new site in a browser: an
+  beside it with Back / Continue, and the live site preview follows every
+  step. The preview is framed as the new site in a browser: an
   address bar shows `<slug>.<TENANT_ROOT_DOMAIN>` as it is typed
   (`your-site.<TENANT_ROOT_DOMAIN>` before then), and below it a sample front
   page (`FrontPageSample` in `site-preview/`) renders in the chosen preset,
   accent and light/dark mode: the header with the typed site name and its
   Topics sub-menu closed, a hero ("Dispatches from the coast") and three
   posts. The step's content sits directly on a white column, not in a card,
-  and Back / Continue are pinned to the bottom: at the foot of that column
-  when everything sits side by side, and as a bar stuck to the bottom of the
-  screen when the content stacks. The layout has three tiers: from `xl`
-  (1280px) the rail, the content column and the preview sit side by side
-  (the preview column 480px wide, 560px from `2xl`); from `md` (768px) the
-  rail stays on the left and the content, Back / Continue and the preview
-  stack beside it; below `md` the rail is a dark top band: the brand row
-  (with Sign out at its right end), then "Step N of 4 · <step>" over a
-  segmented progress bar (the shared `SegmentedProgress`, on Base UI
-  `Progress`), and the same three stack. Assistive tech hears that bar once,
-  as one progressbar named "Setup steps" whose value text is the visible
-  line; the line and the segments themselves are hidden from it. From `md` up the step
-  header reads "Step N of 4" above the heading instead. The Site step's type
-  and name sit side by side whenever the content column is at least 28rem
-  wide (a container query), in any tier.
+  capped at 640px and left-aligned. The layout has three tiers, read in JS
+  with `useMediaQuery` at the same edges the CSS uses, so the preview renders
+  once, in its tier's place, and the DOM order is the keyboard order:
+  - **Full** (from 1360px): the 300px rail, the content column and a 560px
+    grey preview column side by side. The page never scrolls; the content
+    column scrolls inside itself above Back / Continue, pinned to its foot.
+  - **Rail** (768–1359px): the 300px rail and the content column, with the
+    preview inside the column below the fields and above the same pinned
+    Back / Continue.
+  - **Phone** (below 768px): the rail is a dark top band: the brand row (with
+    Sign out at its right end), then "Step N of 4 · <step>" over a segmented
+    progress bar (the shared `SegmentedProgress`, on Base UI `Progress`).
+    Then the fields, the preview on grey, and Back / Continue as a bar at the
+    end of the page, in flow; the page scrolls as one column.
+
+  The pinned actions sit below the scrolling area, never over it, so a
+  focused field can always be scrolled clear of them. The server renders the
+  Phone order; from 768px the phone preview stays hidden until the tier is
+  read, so neither wider tier flashes it. Assistive tech hears the phone
+  progress bar once, as one progressbar named "Setup steps" whose value text
+  is the visible line; the line and the segments themselves are hidden from
+  it. From 768px up the step header reads "Step N of 4" above the heading
+  instead. The Site step's type and name sit side by side whenever the
+  content column is at least 28rem wide (a container query), in any tier.
   The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
      Blank) and the site name.
@@ -135,8 +144,8 @@ Free site.
      `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live by
      `checkSiteAddressAction` as the user types) and the starting language.
      The check's verdict is a tinted chip in a `role="status"` region in the
-     actions row, between Back and Continue (on its own line above them on a
-     phone), never under the input, which only turns red on an error:
+     pinned actions, between Back and Continue (on its own line above the
+     buttons in the phone action bar), never under the input, which only turns red on an error:
      checking, "<address> is yours", the taken / reserved / invalid error, or
      an amber "couldn't check" note.
   3. **Look** — the preset and accent colour. Each site type starts on its

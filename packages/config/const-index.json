@@ -4998,6 +4998,22 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
+    "(width >= 48rem)": [
+      {
+        "ref": "ONBOARDING_TIER_QUERY.RAIL",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "(width >= 85rem)": [
+      {
+        "ref": "ONBOARDING_TIER_QUERY.FULL",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
     "operator_alert.no_recipients": [
       {
         "ref": "OPERATOR_ALERT_LOG.NO_RECIPIENTS",

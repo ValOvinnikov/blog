@@ -56,6 +56,7 @@ export const buttonVariants = tv({
     size: {
       [SIZE.SM]: {},
       [SIZE.MD]: {},
+      [SIZE.LG]: {},
     },
     isPending: {
       true: { idleFace: ['invisible'] },
@@ -92,6 +93,20 @@ export const buttonVariants = tv({
       class: {
         root: ['min-h-11 px-[13px] py-[8px] text-admin-13 md:min-h-0'],
       },
+    },
+    {
+      variant: STYLED_VARIANTS,
+      size: SIZE.LG,
+      class: {
+        root: [
+          'h-11 justify-center px-5 text-admin-14 font-semibold shadow-none md:h-10',
+        ],
+      },
+    },
+    {
+      variant: BUTTON_VARIANT.SECONDARY,
+      size: SIZE.LG,
+      class: { root: ['px-[18px]'] },
     },
   ],
   defaultVariants: {

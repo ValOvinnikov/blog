@@ -2,20 +2,21 @@
 
 import { Form } from '@base-ui/react/form';
 import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
-import { AddressStepFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields';
 import { AddressVerdict } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-verdict';
 import { OnboardingActions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-actions';
 import { OnboardingFailureAlert } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-failure-alert';
 import { OnboardingPreview } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-preview';
 import { OnboardingRail } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-rail';
+import { OnboardingStepFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-step-fields';
 import { OnboardingStepHeader } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-step-header';
-import { ReviewStep } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/review-step';
-import { SiteDetailsFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-details-fields';
-import { SiteLookFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/site-look-fields';
-import { ONBOARDING_STEP } from '@platform/constants/onboarding';
+import {
+  ONBOARDING_SCROLL_AREA_TEST_ID,
+  ONBOARDING_STEP,
+} from '@platform/constants/onboarding';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 
 import { onboardingFormVariants } from './onboarding-form-variants';
+import { useOnboardingTier } from './use-onboarding-tier';
 import { useOnboardingWizard } from './use-onboarding-wizard';
 
 export type TOnboardingFormProps = {
@@ -56,8 +57,47 @@ export const OnboardingForm = ({
     goBack,
     handleSubmit,
   } = useOnboardingWizard(initialLocale, rootDomain);
-  const { root, main, form, panel, fields, preview, actions } =
-    onboardingFormVariants();
+  const { isPhone, isRail, isFull } = useOnboardingTier();
+  const {
+    root,
+    form,
+    main,
+    scrollArea,
+    column,
+    panel,
+    fields,
+    railPreview,
+    previewColumn,
+    phonePreview,
+    actions,
+  } = onboardingFormVariants();
+
+  const preview = (
+    <OnboardingPreview
+      name={values.name}
+      siteAddress={previewAddress}
+      locale={values.locale}
+      preset={values.preset}
+      accentHue={values.accentHue}
+    />
+  );
+
+  const footer = (
+    <div className={actions()}>
+      <OnboardingActions
+        isFirstStep={isFirstStep}
+        isLastStep={isLastStep}
+        isPending={isPending}
+        isContinueDisabled={isContinueDisabled}
+        onBack={goBack}
+        onContinue={goNext}
+      >
+        {step === ONBOARDING_STEP.ADDRESS && (
+          <AddressVerdict verdict={addressVerdict} />
+        )}
+      </OnboardingActions>
+    </div>
+  );
 
   return (
     <div className={root()}>
@@ -66,77 +106,46 @@ export const OnboardingForm = ({
         currentIndex={stepIndex}
         accountEmail={accountEmail}
       />
-      <main className={main()}>
-        <Form className={form()} onSubmit={handleSubmit}>
-          <div className={panel()}>
-            <div ref={panelRef} tabIndex={-1} className={fields()}>
-              <OnboardingStepHeader
-                step={step}
-                stepNumber={stepIndex + 1}
-                stepTotal={railSteps.length}
-              />
-              {failure && <OnboardingFailureAlert failure={failure} />}
-              {step === ONBOARDING_STEP.SITE && (
-                <SiteDetailsFields
-                  values={values}
-                  fieldErrors={fieldErrors}
-                  onFieldChange={changeField}
-                  onSiteTypeChange={changeSiteType}
+      <Form className={form()} onSubmit={handleSubmit}>
+        <main className={main()}>
+          <div
+            className={scrollArea()}
+            data-testid={ONBOARDING_SCROLL_AREA_TEST_ID}
+          >
+            <div className={column()}>
+              <div ref={panelRef} tabIndex={-1} className={panel()}>
+                <OnboardingStepHeader
+                  step={step}
+                  stepNumber={stepIndex + 1}
+                  stepTotal={railSteps.length}
                 />
-              )}
-              {step === ONBOARDING_STEP.ADDRESS && (
-                <AddressStepFields
-                  values={values}
-                  rootDomain={rootDomain}
-                  addressErrorId={addressErrorId}
-                  onFieldChange={changeField}
-                />
-              )}
-              {step === ONBOARDING_STEP.LOOK && (
-                <SiteLookFields
-                  preset={values.preset}
-                  accentHue={values.accentHue}
-                  onPresetChange={changePreset}
-                  onAccentHueChange={changeAccentHue}
-                />
-              )}
-              {step === ONBOARDING_STEP.REVIEW && (
-                <ReviewStep
-                  values={values}
-                  siteAddress={siteAddress}
-                  legalPageUrls={legalPageUrls}
-                  hasTermsError={Boolean(fieldErrors.hasAcceptedTerms)}
-                  onFieldChange={changeField}
-                  onEdit={editStep}
-                />
-              )}
+                <div className={fields()}>
+                  {failure && <OnboardingFailureAlert failure={failure} />}
+                  <OnboardingStepFields
+                    step={step}
+                    values={values}
+                    fieldErrors={fieldErrors}
+                    addressErrorId={addressErrorId}
+                    siteAddress={siteAddress}
+                    changeField={changeField}
+                    changeSiteType={changeSiteType}
+                    changePreset={changePreset}
+                    changeAccentHue={changeAccentHue}
+                    editStep={editStep}
+                    rootDomain={rootDomain}
+                    legalPageUrls={legalPageUrls}
+                  />
+                </div>
+              </div>
+              {isRail && <div className={railPreview()}>{preview}</div>}
             </div>
           </div>
-          <div className={actions()}>
-            <OnboardingActions
-              isFirstStep={isFirstStep}
-              isLastStep={isLastStep}
-              isPending={isPending}
-              isContinueDisabled={isContinueDisabled}
-              onBack={goBack}
-              onContinue={goNext}
-            >
-              {step === ONBOARDING_STEP.ADDRESS && (
-                <AddressVerdict verdict={addressVerdict} />
-              )}
-            </OnboardingActions>
-          </div>
-          <div className={preview()}>
-            <OnboardingPreview
-              name={values.name}
-              siteAddress={previewAddress}
-              locale={values.locale}
-              preset={values.preset}
-              accentHue={values.accentHue}
-            />
-          </div>
-        </Form>
-      </main>
+          {!isPhone && footer}
+        </main>
+        {isFull && <div className={previewColumn()}>{preview}</div>}
+        {isPhone && <div className={phonePreview()}>{preview}</div>}
+        {isPhone && footer}
+      </Form>
     </div>
   );
 };

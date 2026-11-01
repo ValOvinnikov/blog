@@ -37,3 +37,10 @@ export const ONBOARDING_LOG = {
   TERMS_RECORD_FAILED: 'onboarding.terms_record_failed',
   CREATE_FAILED: 'onboarding.create_failed',
 } as const;
+
+export const ONBOARDING_TIER_QUERY = {
+  RAIL: '(width >= 48rem)',
+  FULL: '(width >= 85rem)',
+} as const;
+
+export const ONBOARDING_SCROLL_AREA_TEST_ID = 'onboarding-scroll-area';

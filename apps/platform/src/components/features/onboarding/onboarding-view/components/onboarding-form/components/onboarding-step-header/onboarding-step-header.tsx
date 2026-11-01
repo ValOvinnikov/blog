@@ -17,14 +17,14 @@ export const OnboardingStepHeader = ({
   stepTotal,
 }: TOnboardingStepHeaderProps) => {
   const t = useTranslations('onboardingForm');
-  const { root, progress } = onboardingStepHeaderVariants();
+  const { root, progress, title } = onboardingStepHeaderVariants();
 
   return (
     <div className={root()}>
       <Text variant="meta" className={progress()}>
         {t('stepProgress', { n: stepNumber, total: stepTotal })}
       </Text>
-      <Heading level={1} size="pageTitle">
+      <Heading level={1} size="pageTitle" className={title()}>
         {t(`steps.${step}`)}
       </Heading>
     </div>
