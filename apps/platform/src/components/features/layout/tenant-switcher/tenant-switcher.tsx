@@ -48,7 +48,7 @@ export const TenantSwitcher = ({
 
   return (
     <Menu.Root>
-      <Menu.Trigger className={trigger()}>
+      <Menu.Trigger className={trigger()} title={active.name}>
         <Avatar name={active.name} variant="switcher" />
         <span className={meta()}>
           <span className={nameRow()}>

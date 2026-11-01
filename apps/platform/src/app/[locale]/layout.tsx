@@ -2,6 +2,7 @@ import '../../../index.css';
 
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { inter } from '@platform/config/font-loaders/inter-font';
+import { jetbrainsMono } from '@platform/config/font-loaders/jetbrains-mono-font';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
@@ -40,7 +41,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   return (
     <html lang={LOCALE_BCP47_TAGS[locale]}>
-      <body className={`${inter.variable} font-admin text-admin-14`}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} font-admin text-admin-14`}
+      >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>
             <UnsavedChangesProvider>{children}</UnsavedChangesProvider>

@@ -156,8 +156,18 @@ switches the content column to full-bleed (see
   text and icon `text-strong` at 600, and a 3px `side-accent` bar on its left
   edge, on the collapsed rail too. A focused row keeps its rest colours and
   shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
-  The onboarding rail and the Choose a workspace page read
-  the separate `rail` tokens and stay dark.
+  The Workspace field is a `side-field` plate with a `side-field-line` border
+  and the raised shadow, its border `side-accent` while its dropdown is open;
+  its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
+  domain `muted` in the Mono font and its chevron `muted`. It carries the
+  active workspace's full name as its `title`, so a name cut by its ellipsis
+  reads on hover. Focused, it shows the side-gapped ring in place of its
+  shadow. The onboarding rail and the Choose a workspace page read the
+  separate `rail` tokens and stay dark.
+- The admin's Mono font is JetBrains Mono, from
+  `config/font-loaders/jetbrains-mono-font.ts`, applied on the admin `<body>`
+  and read through `--font-admin-mono` (`font-admin-mono`), with
+  `ui-monospace, monospace` behind it.
 - Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
   border, `rounded-admin` on every corner, 4px padding, `text` colour and

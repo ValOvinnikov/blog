@@ -53,6 +53,20 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     },
   );
 
+  it.each([
+    { activeTenantId: MOCK_TENANT_ID, title: MOCK_TENANT_NAME },
+    { activeTenantId: MOCK_OTHER_TENANT_ID, title: MOCK_OTHER_TENANT_NAME },
+  ])(
+    'describes its trigger with the full active workspace name $title',
+    ({ activeTenantId, title }) => {
+      setup({ activeTenantId });
+
+      const trigger = screen.getByRole('button', { description: title });
+
+      expect(trigger).toBeVisible();
+    },
+  );
+
   describe('with the menu open', () => {
     let menu: HTMLElement;
 
