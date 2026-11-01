@@ -5,9 +5,7 @@ import {
   CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import { RunCard } from '@platform/components/features/tenants/run-card';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
-import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
@@ -24,6 +22,7 @@ import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { DispatchNotice } from './components/dispatch-notice/dispatch-notice';
+import { ProvisioningRunCard } from './components/provisioning-run-card/provisioning-run-card';
 import { QueuedRunNotice } from './components/queued-run-notice/queued-run-notice';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 
@@ -94,22 +93,6 @@ export const ProvisioningStatusView = ({
       </Button>
     ) : null;
 
-  const runCardActions = (
-    <>
-      <RunStatusBadge
-        status={
-          isOverallFailed
-            ? TENANT_PROVISIONING_STEP_STATUS.FAILED
-            : isRevealing
-              ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
-              : displayOverallStatus
-        }
-        isPreRun={isAwaitingRunner}
-      />
-      {retryButtonNode}
-    </>
-  );
-
   return (
     <div className={root()}>
       <PageHeader
@@ -150,7 +133,14 @@ export const ProvisioningStatusView = ({
           />
         </div>
 
-        <RunCard run={provisioningRun} actions={runCardActions} />
+        <ProvisioningRunCard
+          run={provisioningRun}
+          overallStatus={displayOverallStatus}
+          isFailed={isOverallFailed}
+          isRevealingSteps={isRevealing}
+          isPreRun={isAwaitingRunner}
+          retryAction={retryButtonNode}
+        />
       </div>
 
       {isOverallFailed && errorKind && (
