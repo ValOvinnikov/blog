@@ -70,11 +70,11 @@ The run then verifies all of it. The admin polls each step's progress and offers
 - **Operator pages (any `admins` row):**
   - `/tenants` lists tenants, with an archived toggle.
   - `/tenants/new` is the add-tenant wizard.
-  - `/tenants/{id}` shows an overview with a provisioning banner.
+  - `/tenants/{id}` shows an overview with a provisioning banner. Its Domain card has the title and a DNS link in its header, then rows for Status (the verification pill), Public domain and, when Vercel reported a status, Last checked.
   - `/tenants/{id}/provisioning` shows each step's status and the run. Until the workflow starts the run, it says the run is queued and counts the wait. A step that finishes between two polls is still shown Running before it settles.
   - `/tenants/{id}/domain` shows a Your domain card with live Vercel verification. Until the domain verifies it shows the address and lists the DNS records to add; once verified it shows the address with a Visit site link, its status, when it was last checked, whether it is a platform address (under `TENANT_ROOT_DOMAIN`) or a custom domain, and that HTTPS is active.
 - **SUPERADMIN only:** `/tenants/{id}/danger` holds deprovision (with dry run), reactivate and delete.
-- **Owner:** `/dashboard` shows a setup progress card, with Retry on a failure and Start setup when the first run never started (PENDING, every step idle), until provisioning is READY. Both call the same retry action, whose worker guard refuses a second concurrent run. `/dashboard/domain` shows the same domain view.
+- **Owner:** `/dashboard` shows a setup progress card, with Retry on a failure and Start setup when the first run never started (PENDING, every step idle), until provisioning is READY. Both call the same retry action, whose worker guard refuses a second concurrent run. Its Domain card has the same header and rows as the operator Overview's. `/dashboard/domain` shows the same domain view.
 - **Workflows:**
   - `deprovision-tenant.yml` and `invalidate-tenant-cache.yml` are dispatch only. No workflow provisions a tenant.
   - `recheck-tenant-owners.yml` and `validate-tenant-documents.yml` are dispatch only while their crons are parked.
