@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const leadRowVariants = tv({
@@ -6,7 +8,6 @@ export const leadRowVariants = tv({
       'flex w-full min-w-0 min-h-11 flex-col gap-1 text-left',
       'border-b border-l-[3px] border-b-admin-line-2 px-[15px] py-3',
       'cursor-pointer hover:bg-admin-surface-2',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-brand',
     ],
     top: ['flex min-w-0 items-center gap-2'],
     dot: ['size-2 flex-none rounded-full bg-admin-brand'],
@@ -23,10 +24,11 @@ export const leadRowVariants = tv({
     isSelected: {
       true: {
         row: [
-          'bg-admin-brand-weak ring-1 ring-inset ring-admin-brand hover:bg-admin-brand-weak',
+          'bg-admin-brand-weak ring-1 ring-inset ring-admin-brand hover:bg-admin-brand-weak focus-visible:ring-0',
+          insetFocusRingClasses(FOCUS_RING_GROUND.BRAND_WEAK),
         ],
       },
-      false: {},
+      false: { row: [insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE)] },
     },
   },
 });
