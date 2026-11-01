@@ -15,7 +15,9 @@ export const onboardingFormVariants = tv({
       'min-w-0 bg-admin-surface px-4 pt-6 pb-7',
       'md:col-start-1 md:row-start-1 md:flex md:min-h-0 md:flex-col md:p-0',
     ],
-    scrollArea: ['md:min-h-0 md:flex-1 md:overflow-y-auto md:px-16 md:pt-14'],
+    scrollArea: [
+      'md:min-h-0 md:flex-1 md:overflow-y-auto md:px-16 md:pt-14 md:pb-14',
+    ],
     column: ['md:max-w-[640px]'],
     panel: ['flex flex-col outline-hidden'],
     fields: ['@container mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],

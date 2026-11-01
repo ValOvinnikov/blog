@@ -32,9 +32,9 @@ export const OnboardingForm = ({
   initialLocale,
   accountEmail,
 }: TOnboardingFormProps) => {
-  const wizard = useOnboardingWizard(initialLocale, rootDomain);
   const {
     values,
+    fieldErrors,
     failure,
     isPending,
     step,
@@ -44,12 +44,19 @@ export const OnboardingForm = ({
     isContinueDisabled,
     panelRef,
     addressVerdict,
+    addressErrorId,
+    siteAddress,
     previewAddress,
     railSteps,
+    changeField,
+    changeSiteType,
+    changePreset,
+    changeAccentHue,
+    editStep,
     goNext,
     goBack,
     handleSubmit,
-  } = wizard;
+  } = useOnboardingWizard(initialLocale, rootDomain);
   const { isPhone, isRail, isFull } = useOnboardingTier();
   const {
     root,
@@ -115,7 +122,16 @@ export const OnboardingForm = ({
                 <div className={fields()}>
                   {failure && <OnboardingFailureAlert failure={failure} />}
                   <OnboardingStepFields
-                    {...wizard}
+                    step={step}
+                    values={values}
+                    fieldErrors={fieldErrors}
+                    addressErrorId={addressErrorId}
+                    siteAddress={siteAddress}
+                    changeField={changeField}
+                    changeSiteType={changeSiteType}
+                    changePreset={changePreset}
+                    changeAccentHue={changeAccentHue}
+                    editStep={editStep}
                     rootDomain={rootDomain}
                     legalPageUrls={legalPageUrls}
                   />
