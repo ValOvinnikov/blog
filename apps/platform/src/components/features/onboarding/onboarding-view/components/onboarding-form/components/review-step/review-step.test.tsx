@@ -9,8 +9,9 @@ import {
   MOCK_TENANT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
-import { ReviewStep } from './review-step';
+import { ReviewStep, type TReviewStepProps } from './review-step';
 
 faker.seed(6331);
 
@@ -49,15 +50,11 @@ const setup = customRender(ReviewStep, {
 });
 
 describe(`<${ReviewStep.name}/>`, () => {
-  let user: UserEvent;
-
   beforeEach(() => {
-    user = userEvent.setup();
+    setup();
   });
 
   it('lists the five answers in wizard order', () => {
-    setup();
-
     const terms = screen
       .getAllByRole('term')
       .map(({ textContent }) => textContent);
@@ -72,8 +69,6 @@ describe(`<${ReviewStep.name}/>`, () => {
   });
 
   it('shows each answer beside its term', () => {
-    setup();
-
     const values = screen
       .getAllByRole('definition')
       .map(({ textContent }) => textContent);
@@ -90,13 +85,22 @@ describe(`<${ReviewStep.name}/>`, () => {
   });
 
   it('names the accent swatch by its hue', () => {
-    setup();
-
     const swatch = screen.getByRole('img', {
       name: tHue('hueValue', { hue: MOCK_HUE }),
     });
 
     expect(swatch).toBeVisible();
+  });
+});
+
+describe(`<${ReviewStep.name}/> Edit`, () => {
+  let user: UserEvent;
+  let onEdit: Mock<TReviewStepProps['onEdit']>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+    onEdit = vi.fn();
+    setup({ onEdit });
   });
 
   it.each([
@@ -105,10 +109,7 @@ describe(`<${ReviewStep.name}/>`, () => {
     [SITE_ADDRESS_LABEL, ONBOARDING_STEP.ADDRESS],
     [LANGUAGE_LABEL, ONBOARDING_STEP.ADDRESS],
     [PRESET_LABEL, ONBOARDING_STEP.LOOK],
-  ])('opens the step that asks for %s from its Edit', async (field, step) => {
-    const onEdit = vi.fn();
-    setup({ onEdit });
-
+  ])('opens the step that asks for %s', async (field, step) => {
     const edit = screen.getByRole('button', {
       name: t('editField', { field }),
     });
@@ -116,10 +117,14 @@ describe(`<${ReviewStep.name}/>`, () => {
 
     expect(onEdit).toHaveBeenCalledExactlyOnceWith(step);
   });
+});
+
+describe(`<${ReviewStep.name}/> without the terms accepted`, () => {
+  beforeEach(() => {
+    setup({ hasTermsError: true });
+  });
 
   it('describes the terms box by its error', () => {
-    setup({ hasTermsError: true });
-
     const checkbox = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
 
     expect(checkbox).toHaveAccessibleDescription(TERMS_NOT_ACCEPTED);
