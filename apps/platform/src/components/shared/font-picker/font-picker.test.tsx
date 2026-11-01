@@ -2,6 +2,7 @@ import { FONT_CHOICE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { customRender, screen, within } from '@platform/testing/custom-render';
+import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -82,10 +83,10 @@ describe(`<${FontPicker.name}/>`, () => {
     const handleChange = vi.fn();
     setup({ onChange: handleChange });
 
-    await user.tab();
-    await user.keyboard('{ArrowDown}');
-    await screen.findByRole('listbox');
-    await user.keyboard('{ArrowDown}{Enter}');
+    await pickNextOptionByKeyboard(
+      user,
+      FONT_OPTIONS[FONT_CHOICE.NEWSREADER].label,
+    );
 
     expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.NEWSREADER);
   });
