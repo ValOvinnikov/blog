@@ -1,10 +1,12 @@
 import { Link } from '@platform/i18n/navigation';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
+import { CrumbLabel } from './components/crumb-label';
 
 export type TBreadcrumbItem = {
   label: string;
   href?: string;
+  isShrinkable?: boolean;
 };
 
 export type TBreadcrumbsProps = {
@@ -13,31 +15,38 @@ export type TBreadcrumbsProps = {
 };
 
 export const Breadcrumbs = ({ items, ariaLabel }: TBreadcrumbsProps) => {
-  const { root, list, item, sep, link, current } = breadcrumbsVariants();
+  const { root, list, sep } = breadcrumbsVariants();
 
   return (
     <nav aria-label={ariaLabel} className={root()}>
       <ol className={list()}>
-        {items.map((crumb, index) => {
+        {items.map(({ label, href, isShrinkable = false }, index) => {
           const isLast = index === items.length - 1;
+          const { item, link, current } = breadcrumbsVariants({
+            isShrinkable,
+          });
 
           return (
-            <li key={crumb.label} className={item()}>
+            <li key={label} className={item()}>
               {index > 0 && (
                 <span aria-hidden="true" className={sep()}>
                   ›
                 </span>
               )}
-              {isLast || !crumb.href ? (
-                <span
+              {isLast || !href ? (
+                <CrumbLabel
+                  label={label}
                   className={current()}
-                  aria-current={isLast ? 'page' : undefined}
-                >
-                  {crumb.label}
-                </span>
+                  isCurrent={isLast}
+                  hasFullTitle={isShrinkable}
+                />
               ) : (
-                <Link href={crumb.href} className={link()}>
-                  {crumb.label}
+                <Link
+                  href={href}
+                  className={link()}
+                  title={isShrinkable ? label : undefined}
+                >
+                  {label}
                 </Link>
               )}
             </li>

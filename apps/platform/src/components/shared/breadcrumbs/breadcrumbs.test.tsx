@@ -15,6 +15,7 @@ const MOCK_PLATFORM = faker.lorem.words(2);
 const MOCK_TENANTS = faker.lorem.words(3);
 const MOCK_YOUR_SITE = faker.lorem.words(2);
 const MOCK_LOOK = faker.lorem.words(4);
+const MOCK_OVERFLOW_WIDTH = faker.number.int({ min: 300, max: 900 });
 
 const setup = customRender(Breadcrumbs, {
   ariaLabel: MOCK_ARIA_LABEL,
@@ -22,6 +23,10 @@ const setup = customRender(Breadcrumbs, {
 });
 
 describe(`<${Breadcrumbs.name}/>`, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('renders every ancestor with an href as a real link', () => {
     setup({
       items: [
@@ -61,6 +66,58 @@ describe(`<${Breadcrumbs.name}/>`, () => {
 
     expect(platformLink).not.toBeInTheDocument();
     expect(platformText).not.toHaveAttribute(ARIA_CURRENT);
+  });
+
+  it('titles a shrinkable link with its full label', () => {
+    setup({
+      items: [
+        { label: MOCK_TENANTS, href: adminRoutes.tenants() },
+        {
+          label: MOCK_TENANT_NAME,
+          href: adminRoutes.dashboard(),
+          isShrinkable: true,
+        },
+        { label: MOCK_LOOK },
+      ],
+    });
+
+    const tenantsLink = screen.getByRole('link', { name: MOCK_TENANTS });
+    const tenantLink = screen.getByRole('link', { name: MOCK_TENANT_NAME });
+
+    expect(tenantsLink).not.toHaveAttribute('title');
+    expect(tenantLink).toHaveAttribute('title', MOCK_TENANT_NAME);
+  });
+
+  it('titles a shrinkable current crumb with its full label', () => {
+    setup({
+      items: [
+        { label: MOCK_TENANTS, href: adminRoutes.tenants() },
+        { label: MOCK_TENANT_NAME, isShrinkable: true },
+      ],
+    });
+
+    const current = screen.getByText(MOCK_TENANT_NAME);
+
+    expect(current).toHaveAttribute('title', MOCK_TENANT_NAME);
+  });
+
+  it('leaves a current crumb that fits untitled', () => {
+    setup({ items: [{ label: MOCK_PLATFORM }, { label: MOCK_LOOK }] });
+
+    const current = screen.getByText(MOCK_LOOK);
+
+    expect(current).not.toHaveAttribute('title');
+  });
+
+  it('titles a current crumb cut off at its cap', () => {
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(
+      MOCK_OVERFLOW_WIDTH,
+    );
+    setup({ items: [{ label: MOCK_PLATFORM }, { label: MOCK_LOOK }] });
+
+    const current = screen.getByText(MOCK_LOOK);
+
+    expect(current).toHaveAttribute('title', MOCK_LOOK);
   });
 
   it('renders a nav landmark labelled with the given label', () => {

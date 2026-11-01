@@ -25,6 +25,7 @@ code:
   - apps/platform/src/components/shared/guarded-link/**
   - apps/platform/src/components/shared/button/**
   - apps/platform/src/components/shared/menu-surface/**
+  - apps/platform/src/components/shared/breadcrumbs/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
   - apps/platform/src/styles/admin-theme*
@@ -201,6 +202,13 @@ switches the content column to full-bleed (see
   `control-line` border, or `control-line-tint` on a card header or
   toolbar. An invalid field has a `bad-line` border, with its error in
   `bad` text and no icon.
+- The topbar breadcrumb never wraps: it fits on one row in whatever width the
+  bar leaves it. Every crumb keeps its full width except the tenant name, the
+  one crumb marked `isShrinkable`, which truncates to no less than 48px,
+  including when it is the current crumb, and carries its full name as
+  `title`. The current crumb is capped at 280px with an ellipsis and carries
+  its full text as `title` when the cap cuts it off. On a phone every
+  breadcrumb link keeps a 44px tap height. Links take the focus ring on `bg`.
 - `apps/platform` owns its own primitives on Base UI and never imports
   `@blog/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is
