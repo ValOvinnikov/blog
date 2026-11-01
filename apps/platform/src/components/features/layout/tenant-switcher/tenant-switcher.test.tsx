@@ -33,6 +33,8 @@ const MOCK_ARCHIVED_TENANT: TTenantSwitcherItem = {
 const ACTIVE_TENANT_NAME = `${MOCK_TENANT_NAME}${MOCK_TENANT_DOMAIN}`;
 const ARCHIVED_TENANT_NAME = `${MOCK_OTHER_TENANT_NAME}${messages.tenantSwitcher.archived}${MOCK_OTHER_TENANT_DOMAIN}`;
 
+const ARIA_CURRENT = 'aria-current';
+
 const setup = customRender(TenantSwitcher, {
   tenants: [MOCK_ACTIVE_TENANT, MOCK_ARCHIVED_TENANT],
   activeTenantId: MOCK_TENANT_ID,
@@ -93,5 +95,17 @@ describe(`<${TenantSwitcher.name}/>`, () => {
         );
       },
     );
+
+    it('marks only the active workspace as current', () => {
+      const active = within(menu).getByRole('menuitem', {
+        name: ACTIVE_TENANT_NAME,
+      });
+      const other = within(menu).getByRole('menuitem', {
+        name: ARCHIVED_TENANT_NAME,
+      });
+
+      expect(active).toHaveAttribute(ARIA_CURRENT, 'true');
+      expect(other).not.toHaveAttribute(ARIA_CURRENT);
+    });
   });
 });
