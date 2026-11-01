@@ -22,7 +22,14 @@ const DetailListRoot = ({
 }: TDetailListProps) => {
   const { root } = detailListVariants({ isStackedToLg, isBordered });
 
-  return <dl className={root({ class: className })}>{children}</dl>;
+  return (
+    <dl
+      data-bordered={isBordered || undefined}
+      className={root({ class: className })}
+    >
+      {children}
+    </dl>
+  );
 };
 
 const DetailListParts = {

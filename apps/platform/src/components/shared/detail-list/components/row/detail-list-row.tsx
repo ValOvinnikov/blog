@@ -7,7 +7,6 @@ import type { ReactNode } from 'react';
 export type TDetailListRowProps = {
   label: string;
   isMono?: TDetailListVariants['isMono'];
-  isBordered?: TDetailListVariants['isBordered'];
   children: ReactNode;
   action?: ReactNode;
   className?: string;
@@ -16,25 +15,19 @@ export type TDetailListRowProps = {
 export const DetailListRow = ({
   label,
   isMono,
-  isBordered = false,
   children,
   action,
   className,
 }: TDetailListRowProps) => {
-  const { row, term, description, value } = detailListVariants({
-    isMono,
-    isBordered,
-  });
+  const { row, term, description, value } = detailListVariants({ isMono });
 
-  const pair = (
-    <>
+  return (
+    <div className={row()}>
       <dt className={term()}>{label}</dt>
       <dd className={description({ class: className })}>
         <span className={value()}>{children}</span>
         {action}
       </dd>
-    </>
+    </div>
   );
-
-  return isBordered ? <div className={row()}>{pair}</div> : pair;
 };

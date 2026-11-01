@@ -94,7 +94,6 @@ export const ReviewStep = ({
           <DetailList.Row
             key={label}
             label={label}
-            isBordered={true}
             action={
               <Button
                 variant={BUTTON_VARIANT.LINK}

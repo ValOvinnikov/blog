@@ -71,7 +71,6 @@ export const buttonVariants = tv({
           'text-admin-13-5 leading-5 font-semibold no-underline',
           TEXT_LINK_COLOUR_CLASSES,
           'hover:text-admin-brand-hover',
-          focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
       },
     },
@@ -93,7 +92,7 @@ export const buttonVariants = tv({
   },
   compoundVariants: [
     ...FOCUS_GROUNDS.map((focusGround) => ({
-      variant: STYLED_VARIANTS,
+      variant: [...STYLED_VARIANTS, BUTTON_VARIANT.LINK],
       focusGround,
       class: { root: [focusRingClasses(focusGround)] },
     })),
