@@ -53,6 +53,18 @@
   --admin-shadow:
     0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
   --admin-shadow-menu: 0 12px 40px rgba(16, 24, 40, 0.14);
+  --admin-hover: #e2e5ea;
+  --admin-note-line: rgba(79, 70, 229, 0.3);
+  --admin-control-line-locked: #c5cad3;
+  --admin-frame-dot: #d5d9e0;
+  --admin-frame-track: rgba(18, 20, 26, 0.08);
+  --admin-frame-thumb: #5b6472;
+  --admin-fade-end: rgba(246, 247, 249, 0);
+  --admin-fade-end-surface: rgba(255, 255, 255, 0);
+  --admin-shadow-frame: 0 6px 20px rgba(16, 24, 40, 0.1);
+  --admin-shadow-sheet: 0 -8px 24px rgba(16, 24, 40, 0.18);
+  --admin-shadow-index: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --admin-shadow-unsaved: 0 -4px 12px rgba(16, 24, 40, 0.08);
 }
 
 @theme inline {
@@ -108,6 +120,14 @@
   --color-admin-tooltip-text: var(--admin-tooltip-text);
   --color-admin-tooltip-line: var(--admin-tooltip-line);
   --color-admin-scrim: var(--admin-scrim);
+  --color-admin-hover: var(--admin-hover);
+  --color-admin-note-line: var(--admin-note-line);
+  --color-admin-control-line-locked: var(--admin-control-line-locked);
+  --color-admin-frame-dot: var(--admin-frame-dot);
+  --color-admin-frame-track: var(--admin-frame-track);
+  --color-admin-frame-thumb: var(--admin-frame-thumb);
+  --color-admin-fade-end: var(--admin-fade-end);
+  --color-admin-fade-end-surface: var(--admin-fade-end-surface);
 
   --text-admin-11: 11px;
   --text-admin-11-5: 11.5px;
@@ -122,13 +142,27 @@
   --text-admin-24: 24px;
   --text-admin-28: 28px;
 
+  --font-weight-admin-650: 650;
+
   /* Clears the sticky topbar for sticky panels and scroll targets. */
   --spacing-admin-topbar: 68px;
 
   --radius-admin: 6px;
   --radius-admin-control: 4px;
   --radius-admin-bar: 2px;
+  --radius-admin-3: 3px;
+  --radius-admin-5: 5px;
+  --radius-admin-8: 8px;
+  --radius-admin-10: 10px;
+  --radius-admin-12: 12px;
+  --radius-admin-14: 14px;
+  --radius-admin-18: 18px;
+  --radius-admin-22: 22px;
 
   --shadow-admin: var(--admin-shadow);
   --shadow-admin-lg: var(--admin-shadow-menu);
+  --shadow-admin-frame: var(--admin-shadow-frame);
+  --shadow-admin-sheet: var(--admin-shadow-sheet);
+  --shadow-admin-index: var(--admin-shadow-index);
+  --shadow-admin-unsaved: var(--admin-shadow-unsaved);
 }

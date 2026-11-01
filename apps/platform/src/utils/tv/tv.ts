@@ -55,9 +55,30 @@ const SPACING_TOKENS = [
   'card-y',
 ];
 
-const RADIUS_TOKENS = ['admin', 'admin-control', 'admin-bar'];
+const RADIUS_TOKENS = [
+  'admin',
+  'admin-control',
+  'admin-bar',
+  'admin-3',
+  'admin-5',
+  'admin-8',
+  'admin-10',
+  'admin-12',
+  'admin-14',
+  'admin-18',
+  'admin-22',
+];
 
-const SHADOW_TOKENS = ['admin', 'admin-lg'];
+const SHADOW_TOKENS = [
+  'admin',
+  'admin-lg',
+  'admin-frame',
+  'admin-sheet',
+  'admin-index',
+  'admin-unsaved',
+];
+
+const FONT_WEIGHT_TOKENS = ['admin-650'];
 
 /** Project-configured `tv`. Import this instead of `tv` from `tailwind-variants`. */
 export const tv = createTV({
@@ -66,6 +87,7 @@ export const tv = createTV({
       classGroups: {
         'font-size': [{ text: FONT_SIZE_TOKENS }],
         'font-family': [{ font: FONT_FAMILY_TOKENS }],
+        'font-weight': [{ font: FONT_WEIGHT_TOKENS }],
         tracking: [{ tracking: TRACKING_TOKENS }],
         rounded: [{ rounded: RADIUS_TOKENS }],
         'rounded-t': [{ 'rounded-t': RADIUS_TOKENS }],
