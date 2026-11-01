@@ -74,6 +74,8 @@
 
 @theme inline {
   --font-admin: var(--font-admin-family, 'Inter', system-ui, sans-serif);
+  --font-admin-mono:
+    var(--font-admin-mono-family, 'JetBrains Mono'), ui-monospace, monospace;
 
   --color-admin-bg: var(--admin-bg);
   --color-admin-surface: var(--admin-surface);
