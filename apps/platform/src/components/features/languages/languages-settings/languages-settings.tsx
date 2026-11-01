@@ -183,12 +183,14 @@ export const LanguagesSettings = ({
                   lockedReason={lockedReason}
                 >
                   <Switch
+                    aria={{
+                      label: label,
+                      describedBy: isArchived ? archivedNoticeId : undefined,
+                    }}
                     isChecked={isLive}
                     onCheckedChange={(checked) => handleToggle(locale, checked)}
                     isDisabled={isLocked || isPending || isArchived}
-                    ariaLabel={label}
                     labels={{ on: t('switchOn'), off: t('switchOff') }}
-                    aria-describedby={isArchived ? archivedNoticeId : undefined}
                   />
                 </SettingRow>
               );

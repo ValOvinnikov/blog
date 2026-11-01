@@ -35,13 +35,15 @@ export const LockableSegmentedField = <TValue extends string>({
       hint={lockReason && <span id={lockReasonId}>{lockReason}</span>}
     >
       <SegmentedControl<TValue>
-        ariaLabel={label}
+        aria={{
+          label: label,
+          describedBy: lockReason ? lockReasonId : undefined,
+        }}
         options={options}
         value={value}
         onChange={onChange}
         className={control()}
         isDisabled={Boolean(lockReason)}
-        aria-describedby={lockReason ? lockReasonId : undefined}
       />
     </FormField>
   );

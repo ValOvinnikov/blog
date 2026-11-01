@@ -19,6 +19,10 @@ const MOCK_SECOND_LABEL = faker.lorem.words(2);
 const MOCK_DESCRIPTION = faker.lorem.sentence();
 const MOCK_HINT_ID = faker.string.alpha(8);
 const MOCK_HINT = faker.lorem.sentence();
+const MOCK_LABEL_ID = faker.string.alpha(8);
+const MOCK_BADGE_ID = faker.string.alpha(8);
+const MOCK_FIELD_LABEL = faker.lorem.word();
+const MOCK_BADGE = faker.lorem.word();
 
 const MOCK_FIRST_OPTION = { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL };
 const MOCK_SECOND_OPTION = {
@@ -27,7 +31,7 @@ const MOCK_SECOND_OPTION = {
 };
 
 const setup = customRender(SegmentedControl<string>, {
-  ariaLabel: MOCK_GROUP_LABEL,
+  aria: { label: MOCK_GROUP_LABEL },
   options: [MOCK_FIRST_OPTION, MOCK_SECOND_OPTION],
   value: MOCK_FIRST_VALUE,
   onChange: vi.fn(),
@@ -76,11 +80,10 @@ describe(`<${SegmentedControl.name}/>`, () => {
       <div>
         <span id={MOCK_HINT_ID}>{MOCK_HINT}</span>
         <SegmentedControl
-          ariaLabel={MOCK_GROUP_LABEL}
+          aria={{ label: MOCK_GROUP_LABEL, describedBy: MOCK_HINT_ID }}
           options={[MOCK_FIRST_OPTION, MOCK_SECOND_OPTION]}
           value={MOCK_FIRST_VALUE}
           onChange={vi.fn()}
-          aria-describedby={MOCK_HINT_ID}
         />
       </div>,
     );
@@ -162,6 +165,88 @@ describe(`<${SegmentedControl.name}/>`, () => {
       await user.click(secondOption);
 
       expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('locked', () => {
+    let onChange: Mock<(value: string) => void>;
+
+    beforeEach(() => {
+      onChange = vi.fn();
+      renderWithIntl(
+        <div>
+          <span id={MOCK_LABEL_ID}>{MOCK_FIELD_LABEL}</span>
+          <span id={MOCK_BADGE_ID}>{MOCK_BADGE}</span>
+          <SegmentedControl
+            aria={{
+              labelledBy: `${MOCK_LABEL_ID} ${MOCK_BADGE_ID}`,
+              describedBy: MOCK_BADGE_ID,
+            }}
+            options={[MOCK_FIRST_OPTION, MOCK_SECOND_OPTION]}
+            value={MOCK_SECOND_VALUE}
+            onChange={onChange}
+            isLocked={true}
+          />
+        </div>,
+      );
+    });
+
+    it('names the group by its label and badge and describes it by the badge', () => {
+      const group = screen.getByRole('group', {
+        name: `${MOCK_FIELD_LABEL} ${MOCK_BADGE}`,
+      });
+
+      expect(group).toHaveAccessibleDescription(MOCK_BADGE);
+    });
+
+    it('announces every option disabled while keeping the pressed one pressed', () => {
+      const firstOption = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+      const secondOption = screen.getByRole('button', {
+        name: MOCK_SECOND_LABEL,
+      });
+
+      const options = screen.getAllByRole('button');
+
+      expect(options).toHaveLength(2);
+      options.forEach((option) =>
+        expect(option).toHaveAttribute('aria-disabled', 'true'),
+      );
+      expect(firstOption).toBeEnabled();
+      expect(secondOption).toBePressed();
+    });
+
+    it('stays reachable by Tab and the arrow keys', async () => {
+      await user.tab();
+      const tabbed = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+
+      expect(tabbed).toHaveFocus();
+
+      await user.keyboard('{ArrowRight}');
+      const arrowed = screen.getByRole('button', { name: MOCK_SECOND_LABEL });
+
+      expect(arrowed).toHaveFocus();
+    });
+
+    it('ignores a click', async () => {
+      const firstOption = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+      await user.click(firstOption);
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it.each(['{Enter}', ' '])('reports nothing on %s', async (key) => {
+      const firstOption = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+      firstOption.focus();
+      await user.keyboard(key);
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(firstOption).not.toBePressed();
     });
   });
 

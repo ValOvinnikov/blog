@@ -36,13 +36,13 @@ export const EmailPreview = ({
       isNarrow={width === PREVIEW_WIDTH.MOBILE}
       widthControl={
         <SegmentedControl
+          aria={{ label: t('widthAriaLabel') }}
           options={[
             { value: PREVIEW_WIDTH.DESKTOP, label: t('desktop') },
             { value: PREVIEW_WIDTH.MOBILE, label: t('mobile') },
           ]}
           value={width}
           onChange={setWidth}
-          ariaLabel={t('widthAriaLabel')}
         />
       }
       actions={actions}

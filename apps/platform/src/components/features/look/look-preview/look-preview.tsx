@@ -56,8 +56,8 @@ export const LookPreview = ({
       widthControl={
         // Below 27.5rem the stage leaves the frame no wider than its 390px mobile width.
         <SegmentedControl
+          aria={{ label: t('previewWidthAriaLabel') }}
           className="@max-[27.5rem]:hidden"
-          ariaLabel={t('previewWidthAriaLabel')}
           options={widthOptions}
           value={width}
           onChange={setWidth}
@@ -68,7 +68,7 @@ export const LookPreview = ({
           <PreviewModeControl value={mode} onChange={setMode} />
           {hasReaderAccounts && (
             <SegmentedControl
-              ariaLabel={t('readerStateAriaLabel')}
+              aria={{ label: t('readerStateAriaLabel') }}
               options={readerStateOptions}
               value={readerState}
               onChange={setReaderState}

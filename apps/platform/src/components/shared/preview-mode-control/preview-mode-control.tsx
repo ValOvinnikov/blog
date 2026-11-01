@@ -17,7 +17,7 @@ export const PreviewModeControl = ({
 
   return (
     <SegmentedControl
-      ariaLabel={t('previewColorSchemeAriaLabel')}
+      aria={{ label: t('previewColorSchemeAriaLabel') }}
       options={[
         { value: PREVIEW_MODE.LIGHT, label: t('modeLight') },
         { value: PREVIEW_MODE.DARK, label: t('modeDark') },

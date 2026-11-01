@@ -1,5 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Switch } from './switch';
@@ -10,13 +14,17 @@ const MOCK_ARIA_LABEL = faker.lorem.words(2);
 const MOCK_ON = faker.lorem.word();
 const MOCK_OFF = faker.lorem.words(2);
 const MOCK_CAPTION = faker.lorem.words(3);
+const MOCK_LABEL_ID = faker.string.alpha(8);
+const MOCK_BADGE_ID = faker.string.alpha(8);
+const MOCK_FIELD_LABEL = faker.lorem.word();
+const MOCK_BADGE = faker.lorem.word();
 
 const onCheckedChange = vi.fn();
 
 const setup = customRender(Switch, {
   isChecked: false,
   onCheckedChange,
-  ariaLabel: MOCK_ARIA_LABEL,
+  aria: { label: MOCK_ARIA_LABEL },
   labels: { caption: MOCK_CAPTION },
 });
 
@@ -84,5 +92,60 @@ describe(`<${Switch.name}/>`, () => {
 
     expect(onCheckedChange).not.toHaveBeenCalled();
     expect(toggle).toBeDisabled();
+  });
+
+  describe('locked', () => {
+    beforeEach(() => {
+      renderWithIntl(
+        <div>
+          <span id={MOCK_LABEL_ID}>{MOCK_FIELD_LABEL}</span>
+          <span id={MOCK_BADGE_ID}>{MOCK_BADGE}</span>
+          <Switch
+            aria={{
+              labelledBy: `${MOCK_LABEL_ID} ${MOCK_BADGE_ID}`,
+              describedBy: MOCK_BADGE_ID,
+            }}
+            isChecked={true}
+            onCheckedChange={onCheckedChange}
+            labels={{ caption: MOCK_CAPTION }}
+            isLocked={true}
+          />
+        </div>,
+      );
+    });
+
+    it('is named by its label and badge and described by the badge', () => {
+      const toggle = screen.getByRole('switch', {
+        name: `${MOCK_FIELD_LABEL} ${MOCK_BADGE}`,
+      });
+
+      expect(toggle).toHaveAccessibleDescription(MOCK_BADGE);
+    });
+
+    it('keeps its checked state, stays focusable and announces disabled', async () => {
+      await user.tab();
+      const toggle = screen.getByRole('switch');
+
+      expect(toggle).toHaveFocus();
+      expect(toggle).toBeChecked();
+      expect(toggle).toBeEnabled();
+      expect(toggle).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('ignores Space', async () => {
+      await user.tab();
+      await user.keyboard(' ');
+
+      expect(onCheckedChange).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      { target: 'track', getTarget: () => screen.getByRole('switch') },
+      { target: 'caption', getTarget: () => screen.getByText(MOCK_CAPTION) },
+    ])('ignores a click on its $target', async ({ getTarget }) => {
+      await user.click(getTarget());
+
+      expect(onCheckedChange).not.toHaveBeenCalled();
+    });
   });
 });

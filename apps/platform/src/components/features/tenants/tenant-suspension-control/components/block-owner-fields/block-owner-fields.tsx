@@ -33,9 +33,9 @@ export const BlockOwnerFields = ({
     <div className={root()}>
       <SettingRow label={t('switchLabel')} description={t('description')}>
         <Switch
+          aria={{ label: t('switchLabel') }}
           isChecked={isBlocking}
           onCheckedChange={onBlockingChange}
-          ariaLabel={t('switchLabel')}
           labels={{ on: t('switchOn'), off: t('switchOff') }}
         />
       </SettingRow>

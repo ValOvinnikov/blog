@@ -65,11 +65,11 @@ export const ShapeCard = () => {
         lock={radiusScaleLock.lock}
       >
         <SegmentedControl<TRadiusScale>
+          aria={{ describedBy: radiusScaleLock.describedBy }}
           options={radiusOptions}
           value={radiusScale}
           onChange={(scale) => updateField('radiusScale', scale)}
           isDisabled={radiusScaleLock.isDisabled}
-          aria-describedby={radiusScaleLock.describedBy}
         />
       </LookField>
 
@@ -80,11 +80,11 @@ export const ShapeCard = () => {
         lock={densityLock.lock}
       >
         <SegmentedControl<TDensity>
+          aria={{ describedBy: densityLock.describedBy }}
           options={densityOptions}
           value={density}
           onChange={(option) => updateField('density', option)}
           isDisabled={densityLock.isDisabled}
-          aria-describedby={densityLock.describedBy}
         />
       </LookField>
 
@@ -95,11 +95,11 @@ export const ShapeCard = () => {
         lock={cardStyleLock.lock}
       >
         <SegmentedControl<TCardStyle>
+          aria={{ describedBy: cardStyleLock.describedBy }}
           options={cardStyleOptions}
           value={cardStyle}
           onChange={(style) => updateField('cardStyle', style)}
           isDisabled={cardStyleLock.isDisabled}
-          aria-describedby={cardStyleLock.describedBy}
         />
       </LookField>
 
@@ -110,11 +110,11 @@ export const ShapeCard = () => {
         lock={headerControlStyleLock.lock}
       >
         <SegmentedControl<THeaderControlStyle>
+          aria={{ describedBy: headerControlStyleLock.describedBy }}
           options={headerControlStyleOptions}
           value={headerControlStyle}
           onChange={(style) => updateField('headerControlStyle', style)}
           isDisabled={headerControlStyleLock.isDisabled}
-          aria-describedby={headerControlStyleLock.describedBy}
         />
       </LookField>
     </LookCard>

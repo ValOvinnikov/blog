@@ -43,6 +43,15 @@ export interface IWithClassName {
   className?: string;
 }
 
+export type TControlAria = {
+  label?: string;
+  labelledBy?: string;
+  describedBy?: string;
+};
+
+export type TNamedControlAria = TControlAria &
+  ({ label: string } | { labelledBy: string });
+
 export interface ILocalizedParams {
   locale: TLocaleIsoCode;
 }
