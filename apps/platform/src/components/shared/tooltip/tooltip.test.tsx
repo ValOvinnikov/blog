@@ -30,79 +30,69 @@ const expectTooltipClosed = () =>
 
 describe(`<${Tooltip.name}/>`, () => {
   let user: UserEvent;
+  let trigger: HTMLElement;
 
   beforeEach(() => {
     user = userEvent.setup();
+    renderTooltip();
+    trigger = screen.getByRole('button', { name: MOCK_LABEL });
   });
 
   it('shows its label at once when the trigger receives keyboard focus', async () => {
-    renderTooltip();
-
     await user.tab();
     const tooltip = screen.getByText(MOCK_LABEL);
 
     expect(tooltip).toBeInTheDocument();
   });
 
-  it('shows its label after hovering the trigger', async () => {
-    renderTooltip();
-    const trigger = screen.getByRole('button', { name: MOCK_LABEL });
+  describe('once opened by keyboard focus', () => {
+    beforeEach(async () => {
+      await user.tab();
+      await screen.findByText(MOCK_LABEL);
+    });
 
-    await user.hover(trigger);
-    const tooltip = await screen.findByText(MOCK_LABEL, {}, HOVER_TIMEOUT);
+    it('leaves the trigger its own name as the only announcement', () => {
+      const tooltip = screen.getByText(MOCK_LABEL);
 
-    expect(tooltip).toBeInTheDocument();
+      expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(trigger).not.toHaveAccessibleDescription();
+    });
+
+    it('closes on Escape', async () => {
+      await user.keyboard('{Escape}');
+
+      await expectTooltipClosed();
+    });
+
+    it('closes when the trigger loses focus', async () => {
+      await user.tab();
+
+      await expectTooltipClosed();
+    });
+
+    it('closes when the trigger is activated', async () => {
+      await user.keyboard('{Enter}');
+
+      await expectTooltipClosed();
+    });
   });
 
-  it('leaves the trigger its own name as the only announcement', async () => {
-    renderTooltip();
+  describe('once opened by hover', () => {
+    beforeEach(async () => {
+      await user.hover(trigger);
+      await screen.findByText(MOCK_LABEL, {}, HOVER_TIMEOUT);
+    });
 
-    await user.tab();
-    const tooltip = await screen.findByText(MOCK_LABEL);
-    const trigger = screen.getByRole('button', { name: MOCK_LABEL });
+    it('shows its label after the hover delay', () => {
+      const tooltip = screen.getByText(MOCK_LABEL);
 
-    expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
-    expect(trigger).not.toHaveAccessibleDescription();
-  });
+      expect(tooltip).toBeInTheDocument();
+    });
 
-  it('closes on Escape', async () => {
-    renderTooltip();
-    await user.tab();
-    await screen.findByText(MOCK_LABEL);
+    it('closes when the pointer leaves the trigger', async () => {
+      await user.unhover(trigger);
 
-    await user.keyboard('{Escape}');
-
-    await expectTooltipClosed();
-  });
-
-  it('closes when the trigger loses focus', async () => {
-    renderTooltip();
-    await user.tab();
-    await screen.findByText(MOCK_LABEL);
-
-    await user.tab();
-
-    await expectTooltipClosed();
-  });
-
-  it('closes when the trigger is activated', async () => {
-    renderTooltip();
-    await user.tab();
-    await screen.findByText(MOCK_LABEL);
-
-    await user.keyboard('{Enter}');
-
-    await expectTooltipClosed();
-  });
-
-  it('closes when the pointer leaves the trigger', async () => {
-    renderTooltip();
-    const trigger = screen.getByRole('button', { name: MOCK_LABEL });
-    await user.hover(trigger);
-    await screen.findByText(MOCK_LABEL, {}, HOVER_TIMEOUT);
-
-    await user.unhover(trigger);
-
-    await expectTooltipClosed();
+      await expectTooltipClosed();
+    });
   });
 });
