@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const leadsInboxVariants = tv({
@@ -5,7 +7,7 @@ export const leadsInboxVariants = tv({
     root: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
     listColumn: [
       'min-w-0 rounded-admin',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
     paneColumn: [
       'min-w-0',

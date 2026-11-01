@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
+import { ARIA_CURRENT } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   mockNavBadge,
@@ -23,8 +24,6 @@ const MOCK_BADGED_ITEM = mockNavLinkItem({ badge: MOCK_BADGE });
 const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
 const MOCK_SECTION = mockNavSection({ items: [MOCK_LOOK_ITEM] });
-
-const ARIA_CURRENT = 'aria-current';
 
 const setup = customRender(TopbarNavMenu, { sections: [MOCK_SECTION] });
 

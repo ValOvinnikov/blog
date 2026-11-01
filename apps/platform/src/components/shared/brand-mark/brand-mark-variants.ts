@@ -10,8 +10,10 @@ export const brandMarkVariants = tv({
   ],
   variants: {
     size: {
+      [SIZE.SM]: ['size-[26px] rounded-admin text-admin-14'],
       [SIZE.MD]: ['size-[26px] text-admin-13'],
-      [SIZE.LG]: ['size-9 rounded-admin text-admin-20'],
+      [SIZE.LG]: ['size-7 rounded-admin text-admin-15'],
+      [SIZE.XL]: ['size-9 rounded-admin text-admin-20'],
     },
   },
   defaultVariants: {

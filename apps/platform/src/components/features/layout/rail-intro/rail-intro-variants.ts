@@ -10,5 +10,11 @@ export const railIntroVariants = tv({
     isPageHeading: {
       true: { title: ['text-admin-20 leading-tight'] },
     },
+    isWizard: {
+      true: {
+        title: ['text-admin-20 leading-[1.3]'],
+        description: ['leading-[1.55]'],
+      },
+    },
   },
 });
