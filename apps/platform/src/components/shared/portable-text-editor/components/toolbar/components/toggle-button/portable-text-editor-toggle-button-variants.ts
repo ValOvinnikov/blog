@@ -11,10 +11,6 @@ export const portableTextEditorToggleButtonVariants = tv({
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
       'cursor-pointer',
     ],
-    tooltip: [
-      'rounded-admin-control bg-admin-text px-2 py-1',
-      'text-admin-11-5 text-admin-surface shadow-admin-lg',
-    ],
   },
   variants: {
     isActive: {

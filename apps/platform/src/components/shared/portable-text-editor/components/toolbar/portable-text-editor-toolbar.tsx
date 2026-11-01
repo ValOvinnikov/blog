@@ -1,8 +1,8 @@
 'use client';
 
 import { Toolbar } from '@base-ui/react/toolbar';
-import { Tooltip } from '@base-ui/react/tooltip';
 import { ICONS, type TMaybeUndefined } from '@blog/config';
+import { Tooltip } from '@platform/components/shared/tooltip';
 import {
   useEditor,
   useEditorSelector,

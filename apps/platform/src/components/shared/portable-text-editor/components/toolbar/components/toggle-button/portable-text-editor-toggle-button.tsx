@@ -1,10 +1,10 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { Toolbar } from '@base-ui/react/toolbar';
-import { Tooltip } from '@base-ui/react/tooltip';
 import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
+import { Tooltip } from '@platform/components/shared/tooltip';
 
 import { portableTextEditorToggleButtonVariants } from './portable-text-editor-toggle-button-variants';
 
@@ -25,7 +25,7 @@ export const PortableTextEditorToggleButton = ({
   isExpanded,
   ariaControls,
 }: TPortableTextEditorToggleButtonProps) => {
-  const { button, tooltip } = portableTextEditorToggleButtonVariants({
+  const { button } = portableTextEditorToggleButtonVariants({
     isActive,
     isIconOnly: icon !== undefined,
   });
@@ -45,21 +45,21 @@ export const PortableTextEditorToggleButton = ({
   }
 
   return (
-    <Tooltip.Root>
-      <Toolbar.Button
-        render={<Tooltip.Trigger render={toggle} />}
-        aria-label={label}
-        aria-expanded={isExpanded}
-        aria-controls={ariaControls}
-        className={button()}
-      >
-        <Icon name={icon} />
-      </Toolbar.Button>
-      <Tooltip.Portal>
-        <Tooltip.Positioner sideOffset={6}>
-          <Tooltip.Popup className={tooltip()}>{label}</Tooltip.Popup>
-        </Tooltip.Positioner>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+    <Tooltip
+      label={label}
+      side="top"
+      align="center"
+      trigger={
+        <Toolbar.Button
+          render={toggle}
+          aria-label={label}
+          aria-expanded={isExpanded}
+          aria-controls={ariaControls}
+          className={button()}
+        >
+          <Icon name={icon} />
+        </Toolbar.Button>
+      }
+    />
   );
 };
