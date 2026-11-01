@@ -11,6 +11,7 @@ export type TButtonProps = {
   id?: string;
   variant?: TButtonVariants['variant'];
   size?: TButtonVariants['size'];
+  focusGround?: TButtonVariants['focusGround'];
   type?: 'button' | 'submit' | 'reset';
   isDisabled?: boolean;
   isAriaDisabled?: boolean;
@@ -33,6 +34,7 @@ export const Button = ({
   id,
   variant,
   size,
+  focusGround,
   type = 'button',
   isDisabled,
   isAriaDisabled = false,
@@ -51,7 +53,7 @@ export const Button = ({
   ref,
 }: TButtonProps) => {
   const { root, faces, idleFace, busyFace, busyGlyph, srOnlyStatus } =
-    buttonVariants({ variant, size, isPending });
+    buttonVariants({ variant, size, focusGround, isPending });
   const hasPendingLabel = !isUndefined(pendingLabel);
   const isPendingWithLabel = isPending && hasPendingLabel;
   const isBlocked = isAriaDisabled || isPending;
